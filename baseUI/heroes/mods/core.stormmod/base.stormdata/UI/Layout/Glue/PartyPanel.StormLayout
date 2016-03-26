@@ -1,0 +1,612 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<Desc>
+    <DescFlags val="Locked"/>
+    
+    <Frame Type="BattleUserContextMenu" name="PartyPanelContextMenu" template="BattleUserContextMenu/BattleUserContextMenu" >
+        <Anchor side="Top" relative="$parent" pos="Max" offset="0"/>
+        <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+    </Frame>
+
+    <Frame type="Frame" name="BonusIconTemplate">
+        <Animation name="BonusActivate">
+            <Event event="XPBonusActive" action="DirectionForward" frame="$parent"/>
+            <Event event="XPBonusActive" action="Play" frame="$parent"/>
+            <Event event="XPBonusDeactivate" action="DirectionReverse" frame="$parent"/>
+            <Event event="XPBonusDeactivate" action="Play" frame="$parent"/>
+            <Controller type="Fade" end="Pause">
+                <Key type="Curve" time="0.0" value="255" out="Slow"/>
+                <Key type="Curve" time="0.2" value="0" out="Slow"/>
+                <Key type="Curve" time="0.4" value="255" out="Slow"/>
+                <Key type="Curve" time="0.6" value="0" out="Slow"/>
+                <Key type="Curve" time="0.8" value="255" out="Slow"/>
+                <Key type="Curve" time="1.0" value="0" out="Slow"/>
+                <Key type="Curve" time="1.2" value="255" out="Slow"/>
+            </Controller>
+
+            <Controller type="Sound" end="Pause">
+                <Key type="Sound" time="0.0" sound="@UI_BNet_FriendBonus_Active" direction="Forward"/>
+                <Key type="Sound" time="1.2" sound="@UI_BNet_FriendBonus_Inactive" direction="Reverse"/>
+            </Controller>
+        </Animation>
+            
+        <Frame type="Image" name="BonusIconImage">
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+            <Width val="36"/>
+            <Texture val="@UI/Storm_Social_ProfileFrame_Xp_Inactive"/>
+            <DesaturateOnDisable val="False"/>
+            <Animation name="BonusActivate">
+                <Event event="XPBonusActive" action="DirectionForward" frame="$parent/$parent"/>
+                <Event event="XPBonusActive" action="Play" frame="$parent/$parent"/>
+                <Event event="XPBonusDeactivate" action="DirectionReverse" frame="$parent/$parent"/>
+                <Event event="XPBonusDeactivate" action="Play" frame="$parent/$parent"/>
+              
+                <Controller type="Texture" end="Pause">
+                    <Key type="Image" time="0.00" image="@UI/Storm_Social_ProfileFrame_Xp_Inactive"/>
+                    <Key type="Image" time="0.59" image="@UI/Storm_Social_ProfileFrame_Xp_Inactive"/>
+                    <Key type="Image" time="0.61" image="@UI/Storm_Social_ProfileFrame_Xp_Active"/>
+                    <Key type="Image" time="1.20" image="@UI/Storm_Social_ProfileFrame_Xp_Active"/>
+                </Controller>
+            </Animation>
+        </Frame>
+
+        <Frame type="Label" name="InactiveLabel">
+            <Anchor side="Bottom" relative="$parent/BonusIconImage" pos="Max" offset="-1"/>
+            <Anchor side="Right" relative="$parent/BonusIconImage" pos="Min" offset="22"/>
+            <Style val="SocialBonusInactive"/>
+            <Text val="@UI/PartyPanel/BonusExperience"/>
+          
+            <Animation name="BonusActivate">
+                <Event event="XPBonusActive" action="DirectionForward" frame="$parent/$parent"/>
+                <Event event="XPBonusActive" action="Play" frame="$parent/$parent"/>
+                <Event event="XPBonusDeactivate" action="DirectionReverse" frame="$parent/$parent"/>
+                <Event event="XPBonusDeactivate" action="Play" frame="$parent/$parent"/>
+
+                <Controller type="Visibility" end="Pause">
+                    <Key type="Bool" time="0.00" value="true"/>
+                    <Key type="Bool" time="0.59" value="true"/>
+                    <Key type="Bool" time="0.61" value="false"/>
+                    <Key type="Bool" time="1.20" value="false"/>
+                </Controller>
+            </Animation>
+        </Frame>
+            
+        <Frame type="Label" name="ActiveLabel">
+            <Anchor side="Bottom" relative="$parent/BonusIconImage" pos="Max" offset="-1"/>
+            <Anchor side="Right" relative="$parent/BonusIconImage" pos="Min" offset="22"/>
+            <Style val="SocialBonusActive"/>
+            <Text val="@UI/PartyPanel/BonusExperience"/>
+            <Visible val="false"/>
+          
+            <Animation name="BonusActivate">
+                <Event event="XPBonusActive" action="DirectionForward" frame="$parent/$parent"/>
+                <Event event="XPBonusActive" action="Play" frame="$parent/$parent"/>
+                <Event event="XPBonusDeactivate" action="DirectionReverse" frame="$parent/$parent"/>
+                <Event event="XPBonusDeactivate" action="Play" frame="$parent/$parent"/>
+
+                <Controller type="Visibility" end="Pause">
+                    <Key type="Bool" time="0.00" value="false"/>
+                    <Key type="Bool" time="0.59" value="false"/>
+                    <Key type="Bool" time="0.61" value="true"/>
+                    <Key type="Bool" time="1.20" value="true"/>
+                </Controller>
+            </Animation>
+        </Frame>
+    </Frame>
+    
+    <!--     PartyMemberTileListItem Events : Show / Hide  
+            /BorderImage BoostEnabled / BoostDisabled
+            XPBonusActive / XPBonusDeactivate
+    -->
+    <Frame type="PartyMemberHeroTileListItem" name="PartyMemberTileListItemTemplate">
+        <Anchor side="Right" relative="AvatarFrame" pos="Max" offset="0"/>
+        <Anchor side="Bottom" relative="PartyMemberName" pos="Max" offset="0"/>
+        <ContextMenuButtons val="Left|Right"/>
+        
+        <SelectedSound val="@UI_BNet_Generic_01" direction="Forward"/>
+        <HideWhenCleared val="false"/>
+        <AcceptsMouse val="true"/>
+        <TooltipAnchorPosition val="BottomCenter"/>
+
+        <Frame type="Image" name="BorderImage">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+            <Texture val="@UI/Storm_UI_Social_ProfileFrame_Party"/>
+            <DesaturateOnDisable val="False"/>
+        </Frame>
+        
+        <Frame type="Image" name="HoverBorderImage">
+            <Anchor relative="$parent/BorderImage" />
+            <Alpha val="0"/>
+            <Texture val="@UI/Storm_UI_Social_ProfileFrame_Party_Active"/>
+            <Animation name="FillSlot">
+                <Event event="Show" action="DirectionForward" frame="$parent"/>
+                <Event event="Show" action="Play" frame="$parent"/>
+                <Event event="Hide" action="DirectionReverse" frame="$parent"/>
+                <Event event="Hide" action="Play" frame="$parent"/>
+                <Controller type="Texture" end="Pause">
+                    <Key type="Image" time="0" image="@UI/Storm_UI_Social_ProfileFrame_Party_Active_Empty"/>
+                    <Key type="Image" time="0.01" image="@UI/Storm_UI_Social_ProfileFrame_Party_Active"/>
+                </Controller>
+            </Animation>
+            <Animation name="Hover">
+                <Event event="OnMouseEnter" action="DirectionForward" frame="$parent"/>
+                <Event event="OnMouseEnter" action="Play" frame="$parent"/>
+                <Event event="OnMouseExit" action="DirectionReverse" frame="$parent"/>
+                <Event event="OnMouseExit" action="Play" frame="$parent"/>
+                <Controller type="Fade" end="Pause">
+                    <Key type="Curve" time="0" value="0" out="Fast"/>
+                    <Key type="Curve" time="0.2" value="255" in="Slow"/>
+                </Controller>
+            </Animation>
+        </Frame>
+        
+        <Frame type="AvatarFrame" name="AvatarFrame" template="StandardTemplates/AvatarFrameMediumTemplate">
+            <Anchor side="Top" relative="$parent/BorderImage" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent/BorderImage" pos="Mid" offset="0"/>
+            <Anchor side="Left" relative="$parent/BorderImage" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent/BorderImage" pos="Mid" offset="0"/>
+            
+            <Frame type="Image" name="PortraitBorderImage">
+                <Unclipped val="True"/>
+            </Frame>
+
+            <Visible val="True"/>
+            <Animation name="Fill">
+                <Event event="Show" action="DirectionForward" frame="$parent"/>
+                <Event event="Show" action="Play" frame="$parent"/>
+                <Event event="Hide" action="DirectionReverse" frame="$parent"/>
+                <Event event="Hide" action="Play" frame="$parent"/>
+                <Controller type="Visibility" end="Pause">
+                    <Key type="Bool" time="0" value="false"/>
+                    <Key type="Bool" time=".01" value="true"/>
+                </Controller>
+            </Animation>
+        </Frame>
+        
+        <Frame type="Image" name="AvatarDarkenImage">
+            <Anchor relative="$parent/AvatarFrame/PortraitBorderImage"/>
+            <LayerCount val="2"/>
+            <Alpha val="0"/>
+            
+            <Texture val="@UI/Storm_UI_PortraitBorder_DefaultMask_Medium" layer="0"/>
+            <AlphaLayer val="True" layer="0"/>
+            <WrapUV val="False" layer="0"/>
+         
+            <Color val="000000" layer="1"/>
+            
+            <Animation name="TeamLeague">
+                <Event event="ResetOverlay" action="Stop" frame="$parent/AvatarFrame"/>
+                <Event event="OverlayStyleLevel" action="Stop" frame="$parent/AvatarFrame"/>
+                <Event event="OverlayStyleHero" action="Play" frame="$parent/AvatarFrame"/>
+                <Event event="OverlayStyleTeam" action="Play" frame="$parent/AvatarFrame"/>
+                <Controller type="Texture" end="Pause" layer="0" name="BorderTexture">
+                    <Key type="Image" time="0" image="@UI/Storm_UI_PortraitBorder_DefaultMask_Medium"/>
+                    <Key type="Image" time="0.01" image="@UI/Storm_UI_PortraitBorder_HeroMask_Medium"/>
+                </Controller>
+            </Animation>
+        </Frame>
+
+        <Frame type="Image" name="LeaderIcon">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="4"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="5"/>
+            <Width val="26"/>
+            <Height val="33"/>
+            <Texture val="@UI/Storm_PartyPanel_LeaderIcon"/>
+            <DesaturateOnDisable val="False"/>
+        </Frame>
+
+        <Frame type="Image" name="ReadyIcon" template="StandardTemplates/ReadyIconTemplate">
+            <Anchor side="Top" relative="$parent/AvatarFrame/PortraitBackground" pos="Mid" offset="0"/>
+            <Anchor side="Left" relative="$parent/AvatarFrame/PortraitBackground" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent/AvatarFrame/PortraitBackground" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent/AvatarFrame/PortraitBackground" pos="Mid" offset="0"/>
+            <Animation name="DarkenAvatar">
+                <Event event="OnShown" action="DirectionForward"/>
+                <Event event="OnShown" action="Play"/>
+                <Event event="OnHidden" action="DirectionReverse"/>
+                <Event event="OnHidden" action="Play"/>
+                <Controller type="Fade" end="Pause" frame="$parent/AvatarDarkenImage">
+                    <Key type="Curve" time="0" value="0" out="Fast"/>
+                    <Key type="Curve" time="0.4" value="190" in="Slow"/>
+                </Controller>
+            </Animation>
+        </Frame>
+
+        <Frame type="Image" name="OfflineIcon" template="PartyPanel/PartyMemberTileListItemTemplate/ReadyIcon">
+            <Texture val="@UI/Storm_UI_Social_ProfileFrame_Party_Offline"/>
+            <DesaturateOnDisable val="False"/>
+        </Frame>
+        
+        <Frame type="Image" name="InGameIcon">
+            <Anchor side="Top" relative="$parent/AvatarFrame/PortraitBackground" pos="Mid" offset="0"/>
+            <Anchor side="Left" relative="$parent/AvatarFrame/PortraitBackground" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent/AvatarFrame/PortraitBackground" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent/AvatarFrame/PortraitBackground" pos="Mid" offset="0"/>
+            <Width val="13"/>
+            <Height val="13"/>
+            <Alpha val="0"/>
+            <Texture val="@UI/Storm_Social_StatusIcon_Busy"/>
+            <DesaturateOnDisable val="False"/>
+        </Frame>
+
+        <Frame type="Image" name="PendingIcon">
+            <Anchor side="Top" relative="$parent/AvatarFrame/PortraitBackground" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent/AvatarFrame/PortraitBackground" pos="Mid" offset="0"/>
+            <Anchor side="Left" relative="$parent/AvatarFrame/PortraitBackground" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent/AvatarFrame/PortraitBackground" pos="Mid" offset="0"/>
+            <Texture val="@UI/Storm_UI_Social_ProfileFrame_Party_Pending"/>
+            <SubpixelRendering val="True"/>
+            
+            <Animation name="Rotation">
+                <Event event="OnShown" action="Reset"/>
+                <Event event="OnShown" action="Play"/>
+                <Controller type="Rotation" relative="False" end="Loop" >
+                    <Key type="Curve" time="0" value="0" in="linear" out="linear"/>
+                    <Key type="Curve" time="1" value="-360" in="linear" out="linear"/>
+                </Controller>
+            </Animation>
+            
+            <Animation name="OnShown">
+                <Event event="OnShown" action="Reset"/>
+                <Event event="OnShown" action="DirectionForward"/>
+                <Event event="OnShown" action="Play"/>
+                <Event event="OnHidden" action="DirectionReverse"/>
+                <Event event="OnHidden" action="Play"/>
+                <Controller type="Fade" end="Pause" >
+                    <Key type="Curve" time="0" value="0" out="Fast"/>
+                    <Key type="Curve" time="0.6" value="255" in="Slow"/>
+                </Controller>
+                <Controller type="Fade" end="Pause" frame="$parent/AvatarDarkenImage">
+                    <Key type="Curve" time="0" value="0" out="Fast"/>
+                    <Key type="Curve" time="0.4" value="193" in="Slow"/>
+                </Controller>
+            </Animation>
+        </Frame>
+
+        <Frame type="Label" name="PartyMemberName">
+            <Anchor side="Top" relative="$parent/BorderImage" pos="Max" offset="-5"/>
+            <Anchor side="Left" relative="$parent/AvatarFrame" pos="Min" offset="10"/>
+            <Anchor side="Right" relative="$parent/AvatarFrame" pos="Max" offset="-10"/>
+            <Options val="NoWrapping"/>
+            <Style val="PartyPanelMemberRoleLabel"/>
+            <Text val="LoremIpsum"/>
+        </Frame>
+        
+        <Frame type="Frame" name="HitTestFrame">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="-30"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+        </Frame>
+        
+    </Frame>
+
+    <Frame type="PartyMemberHeroTileListItem" name="PartyMemberTileListItem" template="PartyPanel/PartyMemberTileListItemTemplate">
+        <Width val="118"/>
+        <Frame type="AvatarFrame" name="AvatarFrame" template="StandardTemplates/AvatarFrameMediumSmallTemplate">
+        </Frame>
+    </Frame>
+    
+    <Frame type="PartyMemberHeroTileListItem" name="PartyMemberPlayer" template="PartyPanel/PartyMemberTileListItemTemplate">
+        <Width val="130"/>
+        <Tooltip val="@UI/BattleUserContextMenuViewProfile"/>
+
+        <Frame type="Image" name="InviteImage">
+            <Visible val="false"/>
+        </Frame>
+        <Frame type="Label" name="PartyMemberName">
+            <Visible val="false"/>
+        </Frame>
+        <Frame type="Image" name="HoverBorderImage">
+            <Visible val="false"/>
+        </Frame>
+        <Frame type="Image" name="BorderImage">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Width val="124"/>
+            <Height val="124"/>
+            <DesaturateOnDisable val="False"/>
+        </Frame>
+    </Frame>
+    
+    <Frame type="PartyPanelHero" name="PartyPanelTemplate">
+        <Animation name="PartySizeIncreased">
+            <Event event="PartySizeIncreased" action="Reset"/>
+            <Event event="PartySizeIncreased" action="Play"/>
+
+            <Controller type="Sound" end="Pause">
+                <Key type="Sound" time="0.0" sound="@UI_BNet_PartyAccept_Increment" direction="Forward"/>
+            </Controller>
+        </Animation>
+        
+        <Animation name="PartySizeFull">
+            <Event event="PartySizeFull" action="Reset"/>
+            <Event event="PartySizeFull" action="Play"/>
+
+            <Controller type="Sound" end="Pause">
+                <Key type="Sound" time="0.0" sound="@UI_BNet_PartyAccept_Increment_End" direction="Forward"/>
+            </Controller>
+        </Animation>
+
+        <Animation name="PartyInviteSent">
+            <Event event="PartyInviteSent" action="Reset"/>
+            <Event event="PartyInviteSent" action="Play"/>
+
+            <Controller type="Sound" end="Pause">
+                <Key type="Sound" time="0.0" sound="@UI_BNet_PartyInviteSent" direction="Forward"/>
+            </Controller>
+        </Animation>
+
+        <Animation name="PartyPromote">
+            <Event event="PartyPromote" action="Reset"/>
+            <Event event="PartyPromote" action="Play"/>
+
+            <Controller type="Sound" end="Pause">
+                <Key type="Sound" time="0.0" sound="@UI_BNet_Promote" direction="Forward"/>
+            </Controller>
+        </Animation>
+
+        <Animation name="PartyInviteDeclined">
+            <Event event="PartyInviteDeclined" action="Reset"/>
+            <Event event="PartyInviteDeclined" action="Play"/>
+
+            <Controller type="Sound" end="Pause">
+                <Key type="Sound" time="0.0" sound="@UI_BNet_PartyInviteDeclined" direction="Forward"/>
+            </Controller>
+        </Animation>
+        
+        <Frame type="TileList" name="TileList">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="11"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+            <Anchor side="Bottom" relative="GoldIconImage" pos="Max" offset="0"/>
+            
+            <Frame type="Image" name="LeaverImage">
+                <Anchor side="Top" relative="$parent/IGRBonusFrame" pos="Min" offset="0"/>
+                <Anchor side="Right" relative="$parent/IGRBonusFrame" pos="Min" offset="-3"/>
+                <Visible val="False"/>
+                <Alpha val="0"/>
+                <CollapseLayout val="True"/>
+                <Texture val="@UI/Storm_UI_Social_ProfileFrame_Party_LeaverIcon"/>
+                <AcceptsMouse val="True"/>
+                <TooltipAnchorPosition val="BottomLeft"/>
+                <Animation name="Pulse">
+                    <Event event="OnShown" action="DirectionForward"/>
+                    <Event event="OnShown" action="Play"/>
+                    <Controller type="Fade" end="PingPong">
+                        <Key type="Curve" time="0" value="255" out="Fast"/>
+                        <Key type="Curve" time="1" value="175" in="Slow"/>
+                    </Controller>
+                </Animation>
+                <Animation name="LeaverStatus">
+                    <Event event="ShowLeaverIcon" action="DirectionForward" frame="$parent/$parent"/>
+                    <Event event="ShowLeaverIcon" action="Play" frame="$parent/$parent"/>
+                    <Event event="HideLeaverIcon" action="DirectionReverse" frame="$parent/$parent"/>
+                    <Event event="HideLeaverIcon" action="Play" frame="$parent/$parent"/>
+                    <Controller type="Fade" end="Pause">
+                        <Key type="Curve" time="0" value="0" out="Fast"/>
+                        <Key type="Curve" time=".4" value="255" in="Slow"/>
+                    </Controller>
+                    <Controller type="Visibility" end="Pause">
+                        <Key type="Bool" time="0" value="false"/>
+                        <Key type="Bool" time="0.01" value="true"/>
+                    </Controller>
+                </Animation>
+            </Frame>
+
+            <Frame type="IGRBenefitsTooltip" name="IGRBenefitsTooltip2" template="IGRBenefitsPanel/IGRBenefitsTooltipTemplate"/>
+
+            <Frame type="Image" name="IGRBonusFrame">
+                <Anchor side="Top" relative="$parent/StimpackBonusFrame" pos="Min" offset="0"/>
+                <Anchor side="Right" relative="$parent/StimpackBonusFrame" pos="Min" offset="-3"/>
+                <CollapseLayout val="True"/>
+                <Texture val="@UI/Storm_UI_Social_ProfileFrame_Party_IGRActive"/>
+                <AcceptsMouse val="True"/>
+                <TooltipFrame val="IGRBenefitsTooltip2"/>
+                <TooltipAnchorPosition val="BottomCenter"/>
+                <Alpha val="0"/>
+                <Visible val="false"/>
+
+                <Animation name="IGRVisibility">
+                    <Event event="IGRTypeKRUnpaid" action="DirectionForward" frame="$parent/$parent"/>
+                    <Event event="IGRTypeKRUnpaid" action="Play" frame="$parent/$parent"/>
+                    <Event event="IGRTypeKRPaid" action="DirectionForward" frame="$parent/$parent"/>
+                    <Event event="IGRTypeKRPaid" action="Play" frame="$parent/$parent"/>
+                    <Event event="IGRTypeNonKRFree" action="DirectionForward" frame="$parent/$parent"/>
+                    <Event event="IGRTypeNonKRFree" action="Play" frame="$parent/$parent"/>
+                    <Event event="IGRTypeNCNP" action="DirectionForward" frame="$parent/$parent"/>
+                    <Event event="IGRTypeNCNP" action="Play" frame="$parent/$parent"/>
+                    <Event event="IGRTypeUnknown" action="DirectionReverse" frame="$parent/$parent"/>
+                    <Event event="IGRTypeUnknown" action="Play" frame="$parent/$parent"/>
+                    <Controller type="Fade" end="Pause">
+                        <Key type="Curve" time="0" value="0" out="Fast"/>
+                        <Key type="Curve" time=".4" value="255" in="Slow"/>
+                    </Controller>
+                    <Controller type="Visibility" end="Pause">
+                        <Key type="Bool" time="0" value="false"/>
+                        <Key type="Bool" time="0.01" value="true"/>
+                        <Key type="Bool" time="0.4" value="true"/>
+                    </Controller>
+                </Animation>
+
+                <Animation name="InIGR">
+                    <Event event="IGRTypeKRUnpaid" action="DirectionReverse" frame="$parent/$parent"/>
+                    <Event event="IGRTypeKRUnpaid" action="Play" frame="$parent/$parent"/>
+                    <Event event="IGRTypeKRPaid" action="DirectionForward" frame="$parent/$parent"/>
+                    <Event event="IGRTypeKRPaid" action="Play" frame="$parent/$parent"/>
+                    <Event event="IGRTypeNonKRFree" action="DirectionForward" frame="$parent/$parent"/>
+                    <Event event="IGRTypeNonKRFree" action="Play" frame="$parent/$parent"/>
+                    <Event event="IGRTypeNCNP" action="DirectionForward" frame="$parent/$parent"/>
+                    <Event event="IGRTypeNCNP" action="Play" frame="$parent/$parent"/>
+                    <Controller type="Texture" end="Pause">
+                        <Key type="Image" time="0.00" image="@UI/Storm_UI_Social_ProfileFrame_Party_IGRInactive"/>
+                        <Key type="Image" time="0.01" image="@UI/Storm_UI_Social_ProfileFrame_Party_IGRActive"/>
+                    </Controller>
+                </Animation>
+            </Frame>
+
+            <Frame type="Image" name="StimpackBonusFrame">
+                <Anchor side="Top" relative="$parent/FriendBonusFrame" pos="Min" offset="0"/>
+                <Anchor side="Right" relative="$parent/FriendBonusFrame" pos="Min" offset="-3"/>
+                <CollapseLayout val="True"/>
+                <Texture val="@UI/Storm_UI_Social_ProfileFrame_Party_Stimpack_Off"/>
+                <AcceptsMouse val="True"/>
+                <TooltipAnchorPosition val="BottomLeft"/>
+
+                <Frame type="Image" name="StimpackBoostActiveImage">
+                    <Anchor relative="$parent"/>
+                    <Texture val="@UI/Storm_UI_Social_ProfileFrame_Party_Stimpack_On"/>
+                    <Visible val="False"/>
+                    <Alpha val="0"/>
+                </Frame>
+
+                <Animation name="StimpackActive">
+                    <Event event="BoostEnabled" action="DirectionForward" frame="$parent/$parent"/>
+                    <Event event="BoostEnabled" action="Play" frame="$parent/$parent"/>
+                    <Event event="BoostDisabled" action="DirectionReverse" frame="$parent/$parent"/>
+                    <Event event="BoostDisabled" action="Play" frame="$parent/$parent"/>
+                    <Controller type="Fade" end="Pause" frame="StimpackBoostActiveImage">
+                        <Key type="Curve" time="0" value="0" out="Fast"/>
+                        <Key type="Curve" time=".4" value="255" in="Slow"/>
+                    </Controller>
+                    <Controller type="Visibility" end="Pause" frame="StimpackBoostActiveImage">
+                        <Key type="Bool" time="0" value="false"/>
+                        <Key type="Bool" time="0.01" value="true"/>
+                        <Key type="Bool" time="0.4" value="true"/>
+                    </Controller>
+                </Animation>
+            </Frame>
+            
+            <Frame type="Image" name="FriendBonusFrame">
+                <Anchor side="Top" relative="$parent/Item4" pos="Min" offset="4"/>
+                <Anchor side="Right" relative="$parent/Item4" pos="Min" offset="0"/>
+                <CollapseLayout val="True"/>
+                <Texture val="@UI/Storm_UI_Social_ProfileFrame_Party_XPBoost_Off"/>
+                <AcceptsMouse val="True"/>
+                <TooltipAnchorPosition val="BottomLeft"/>
+
+                <Frame type="Image" name="XPBoostActiveImage">
+                    <Anchor relative="$parent"/>
+                    <Texture val="@UI/Storm_UI_Social_ProfileFrame_Party_XPBoost_On"/>
+                    <Visible val="False"/>
+                    <Alpha val="0"/>
+                </Frame>
+
+                <Animation name="XPBoostActive">
+                    <Event event="XPBonusActive" action="DirectionForward" frame="$parent/$parent"/>
+                    <Event event="XPBonusActive" action="Play" frame="$parent/$parent"/>
+                    <Event event="XPBonusDeactivate" action="DirectionReverse" frame="$parent/$parent"/>
+                    <Event event="XPBonusDeactivate" action="Play" frame="$parent/$parent"/>
+                    <Controller type="Fade" end="Pause" frame="XPBoostActiveImage">
+                        <Key type="Curve" time="0" value="0" out="Fast"/>
+                        <Key type="Curve" time=".4" value="255" in="Slow"/>
+                    </Controller>
+                    <Controller type="Visibility" end="Pause" frame="XPBoostActiveImage">
+                        <Key type="Bool" time="0" value="false"/>
+                        <Key type="Bool" time="0.01" value="true"/>
+                        <Key type="Bool" time="0.4" value="true"/>
+                    </Controller>
+                </Animation>
+            </Frame>            
+            <Constant name="PartyMemberOffset" val="19"/>
+            
+            <Frame type="PartyMemberHeroTileListItem" name="Item4" template="PartyPanel/PartyMemberTileListItem">
+                <Anchor side="Top" relative="$parent/Item3" pos="Min" offset="0"/>
+                <Anchor side="Right" relative="$parent/Item3" pos="Min" offset="#PartyMemberOffset"/>
+            </Frame>
+            
+            <Frame type="PartyMemberHeroTileListItem" name="Item3" template="PartyPanel/PartyMemberTileListItem">
+                <Anchor side="Top" relative="$parent/Item2" pos="Min" offset="0"/>
+                <Anchor side="Right" relative="$parent/Item2" pos="Min" offset="#PartyMemberOffset"/>
+            </Frame>
+
+            <Frame type="PartyMemberHeroTileListItem" name="Item2" template="PartyPanel/PartyMemberTileListItem">
+                <Anchor side="Top" relative="$parent/Item1" pos="Min" offset="0"/>
+                <Anchor side="Right" relative="$parent/Item1" pos="Min" offset="#PartyMemberOffset"/>
+            </Frame>
+
+            <Frame type="PartyMemberHeroTileListItem" name="Item1" template="PartyPanel/PartyMemberTileListItem">
+                <Anchor side="Top" relative="$parent/Item0" pos="Min" offset="1"/>
+                <Anchor side="Right" relative="$parent/Item0" pos="Min" offset="#PartyMemberOffset"/>
+            </Frame>
+
+            <Frame type="PartyMemberHeroTileListItem" name="Item0" template="PartyPanel/PartyMemberPlayer">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="-1"/>
+                <Anchor side="Right" relative="$parent" pos="Max" offset="4"/>
+                
+            </Frame>
+
+            <Frame type="Image" name="GoldIconImage">
+                <Anchor side="Top" relative="$parent/BalanceLabel" pos="Mid" offset="0"/>
+                <Anchor side="Bottom" relative="$parent/BalanceLabel" pos="Mid" offset="0"/>
+                <Anchor side="Right" relative="$parent/BalanceLabel" pos="Min" offset="9"/>
+                <AcceptsMouse val="True"/>
+                <Texture val="@UI/Storm_UI_gold_icon_small"/>
+                <Alpha val="255"/>
+            </Frame>
+            
+            <Frame type="CutsceneFrame" name="GoldIconCutscene">
+                <Anchor side="Top" relative="$parent/BalanceLabel" pos="Mid" offset="0"/>
+                <Anchor side="Bottom" relative="$parent/BalanceLabel" pos="Mid" offset="0"/>
+                <Anchor side="Right" relative="$parent/BalanceLabel" pos="Min" offset="9"/>
+                <Width val="53"/>
+                <Height val="56"/>
+                <RenderType val="HDR"/>
+                <AutoPlay val="true"/>
+                <File val="Cutscenes/Glues_Coin.StormCutscene"/>
+                <Visible val="False"/>
+                
+                <Animation name="OnShown">
+                    <Event event="OnShown" action="Reset"/>
+                    <Event event="OnShown" action="Play"/>
+                    <Controller type="Cutscene" end="Stop">
+                        <Key type="Cutscene" time="0.0" action="Play"/>
+                        <Key type="Cutscene" time="0.0" action="Bookmark" bookmark="Spin Start"/>
+                    </Controller>
+                </Animation>
+            </Frame>
+
+            <Frame type="BalanceLabel" name="BalanceLabel">
+                <Anchor side="Top" relative="$parent/item0" pos="Max" offset="-17"/>
+                <Anchor side="Right" relative="$parent/item0" pos="Max" offset="-15"/>
+                <Style val="GemsLabel"/>
+            </Frame>
+            
+            <Frame type="Frame" name="GoldHitTest">
+                <Anchor side="Top" relative="$parent/BalanceLabel" pos="Min" offset="0"/>
+                <Anchor side="Bottom" relative="$parent/BalanceLabel" pos="Max" offset="0"/>
+                <Anchor side="Left" relative="$parent/GoldIconCutscene" pos="Min" offset="0"/>
+                <Anchor side="Right" relative="$parent/BalanceLabel" pos="Max" offset="0"/>
+                <AcceptsMouse val="True"/>
+                <Tooltip val="@UI/PartyPanel/GoldTooltip"/>
+                <TooltipAnchorPosition val="BottomRight"/>
+            </Frame>
+        </Frame>
+
+        <Frame type="InviteUserFlyout" name="InviteUserFlyout" template="InviteUserFlyout/InviteUserFlyoutTemplate">
+            <Anchor side="Top" relative="$parent/TileList" pos="Max" offset="-75"/>
+            <Anchor side="Left" relative="$parent/TileList" pos="Min" offset="0"/>
+            <Width val="325"/>
+            <Height val="400"/>
+            <Visible val="false"/>
+
+            <Frame type="Image" name="SocialBackgroundArrow" template="StandardTemplates/BottomEdgeArrow">
+                <Anchor side="Left" relative="$parent" pos="Mid" offset="-11" />
+                <Anchor side="Right" relative="$parent" pos="Mid" offset="0" />
+                <Anchor side="Top" relative="$parent" pos="Min" offset="-21" />
+                <Unclipped val="True"/>
+            </Frame>
+
+            <Frame type="Label" name="Title">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="40"/>
+                <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+                <Style val="SocialTitleLabel"/>
+            </Frame>
+
+            <Frame type="InviteUserPanel" name="InviteUserPanel">
+                <Anchor side="Left" relative="$parent" pos="Min" offset="35"/>
+            </Frame>
+        </Frame>
+    </Frame>
+</Desc>

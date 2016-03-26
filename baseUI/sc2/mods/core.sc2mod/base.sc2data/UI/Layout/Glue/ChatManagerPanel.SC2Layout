@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<Desc>
+    <DescFlags val="Locked"/>
+
+    <Frame type="ChatFilterListBoxItem" name="ChatFilterListBoxItem">
+        <Frame type="Label" name="NameLabel">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+            <Anchor side="Right" relative="$parent/UnreadMessagesLabel" pos="Min" offset="0"/>
+            <Style val="@@StandardPulldownMenu"/>
+        </Frame>
+        
+        <Frame type="Label" name="UnreadMessagesLabel">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+            <Style val="@@StandardPulldownMenu"/>
+        </Frame>
+    </Frame>
+    
+    <Frame type="Image" name="ChatManagerPulldownMenuBackground">
+        <Texture val="@UI/ChatPanelDropDownMenu"/>
+        <TextureType val="Nineslice"/>
+        <Tiled val="true"/>
+        <DescFlags val="Internal"/>
+    </Frame>
+    
+    <Frame type="Image" name="ChatManagerPulldownMenuSelected">
+        <Texture val="@UI/ChatPanelDropDownMenuItem"/>
+        <TextureType val="Nineslice"/>
+        <Tiled val="true"/>
+        <Alpha val="200"/>
+        <DescFlags val="Internal"/>
+    </Frame>
+
+    <Frame type="Image" name="ChatManagerPulldownMenuHover">
+        <Texture val="@UI/ChatPanelDropDownMenuItem"/>
+        <TextureType val="Nineslice"/>
+        <Alpha val="125"/>
+        <Tiled val="true"/>
+        <DescFlags val="Internal"/>
+    </Frame>
+    
+    <Frame type="ListBox" name="ChatManagerPulldownMenuTemplate" template="StandardBattlenetTemplates/BattlenetPulldownMenuTemplate">
+        <BackgroundImage val="PulldownMenuBackground"/>
+        <SelectedImage val="PulldownMenuSelected"/>
+        <HoverImage val="PulldownMenuHover"/>
+        
+        <Frame type="Image" name="PulldownMenuBackground" template="ChatManagerPanel/ChatManagerPulldownMenuBackground">
+            
+        </Frame>
+
+        <Frame type="Image" name="PulldownMenuSelected" template="ChatManagerPanel/ChatManagerPulldownMenuSelected">
+
+        </Frame>
+
+        <Frame type="Image" name="PulldownMenuHover" template="ChatManagerPanel/ChatManagerPulldownMenuHover">
+
+        </Frame>
+    </Frame>
+    
+    <Frame type="Pulldown" name="ChatFilterPulldownTemplate" template="StandardBattlenetTemplates/BattlenetPulldownTemplate">
+        <Item val="ChatManagerPanel/ChatFilterListBoxItem"/>
+
+        <Frame type="ListBox" name="PulldownMenu" template="ChatManagerPanel/ChatManagerPulldownMenuTemplate">
+            <Width val="400"/>
+        </Frame>
+    </Frame>
+    
+    <Frame type="ChatManagerPanel" name="ChatManagerPanelTemplate">
+
+        <Frame type="Pulldown" name="ChatFilterPulldown" template="ChatManagerPanel/ChatFilterPulldownTemplate">
+            <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="18"/>
+            <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+            <Width val="460"/>
+            
+            <Frame type="Image" name="PulldownBackground" template="StandardBattlenetTemplates/BattlenetPulldownBackground">
+                <Alpha val ="0"/>
+            </Frame>
+
+            <Frame type="Image" name="PulldownBackgroundHover" template="StandardBattlenetTemplates/BattlenetPulldownBackgroundHover">
+                <Alpha val ="0"/>
+            </Frame>
+            
+            <Frame type="Image" name="PulldownArrow" template="StandardBattlenetTemplates/BattlenetPulldownArrow">
+                <Anchor side="Left" relative="$parent/NotificationImage" pos="Max" offset="5"/>
+                <Anchor side="Right" relative="$this" pos="Min" offset="0"/>
+            </Frame>
+
+            <Frame type="Image" name="PulldownArrowHover" template="StandardBattlenetTemplates/BattlenetPulldownArrowHover">
+                <Anchor side="Left" relative="$parent/NotificationImage" pos="Max" offset="5"/>
+                <Anchor side="Right" relative="$this" pos="Min" offset="0"/>
+            </Frame>
+            
+            <Frame type="Frame" name="ItemContainer">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="15"/>
+                <Anchor side="Left" relative="$parent/AnchorFrame" pos="Max" offset="-4"/>
+                <Anchor side="Bottom" relative="$parent" pos="Max" offset="-10"/>
+                <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+                <DescFlags val="Internal"/>
+            </Frame>
+            
+            <Frame type="Frame" name="AnchorFrame">
+                <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Left" relative="$parent/NotificationImage" pos="Max" offset="5"/>
+                <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+                <Width val="35"/>
+                <Height val="35"/>
+            </Frame>
+
+            <!-- For notifying when you have missed messages -->
+            <Frame type="Image" name="NotificationImage">
+                <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Right" relative="$this" pos="Min" offset="0"/>
+                <Texture val="@UI/ChatPanelNotificationFilter"/>
+                <CollapseLayout val="true"/>
+                <Visible val="false"/>
+                
+                <Animation name="Pulse">
+                    <Event event="OnShown" action="Play"/>
+                    
+                    <Controller name="Fade" type="Fade" end="PingPong">
+                        <Key type="Curve" time="0" value="50" out="Slow"/>
+                        <Key type="Curve" time=".5" value="255" in="Slow"/>
+                    </Controller>
+                </Animation>
+
+                <Animation name="Notify">
+                    <Event event="MissedChatMessage" action="Reset,Play" frame="$parent/$parent"/>
+                    <Event event="ReadChatMessage" action="Reset,Stop" frame="$parent/$parent"/>
+                    <Event event="OnClick" action="Reset,Stop" frame="$parent"/>
+
+                    <Controller name="Visibility" type="Visibility" end="Pause">
+                        <Key type="Bool" time="0" value="true"/>
+                    </Controller>
+                </Animation>
+            </Frame>
+        </Frame>
+    </Frame>
+</Desc>

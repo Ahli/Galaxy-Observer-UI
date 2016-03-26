@@ -1,0 +1,763 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<Desc>
+    <DescFlags val="Locked"/>
+    
+    <!--
+    
+    
+    
+    
+    UI Slide Animation
+    
+    
+    
+    
+    -->
+    
+    <Animation name="UISlideOutAnimationTemplate">
+        <Event event="UISlideOut" action="DirectionForward" frame="$parent"/>
+        <Event event="UISlideOut" action="Play" frame="$parent"/>
+        <Event event="UISlideIn" action="DirectionReverse" frame="$parent"/>
+        <Event event="UISlideIn" action="Play" frame="$parent"/>
+        <Event event="Hide" action="Reset,Stop" frame="$parent/$parent"/>
+        
+        <Controller type="Anchor" end="Pause" side="Left" relative="true">
+            <Key type="Curve" time="0" value="0" out="Fast"/>
+            <Key type="Curve" time=".5" value="-2000" in="Fast"/>
+        </Controller>
+    </Animation>
+    
+    
+    
+    <!--
+    
+    
+    
+    
+    Commander Selection Panel
+    
+    
+    
+    
+    -->
+
+    <Frame type="CommanderSelectionPanel" name="CommanderSelectionPanelTemplate">
+    
+        <!-- 
+        ===========================
+        Events being sent to this frame
+        ===========================
+        
+        CountdownStart
+        CountdownEnd
+        Ready
+        NotReady
+        -->
+        
+        
+        <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+        <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+        <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+        <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+        
+        <Animation name="ReadySound">
+            <Event event="Ready" action="Reset"/>
+            <Event event="Ready" action="Play"/>
+             
+            <Controller type="Sound" end="Stop">
+                <Key type="Sound" time="0" sound="*@AC_UI_PlayerReady01"/>
+            </Controller>
+        </Animation>
+        
+        <Frame type="CutsceneFrame" name="BackgroundCutscene">
+            <Anchor relative="$parent"/>
+            <RenderType val="HDR"/>
+            <File val="Cutscenes/UI_Screens_AlliedCommander_Background.SC2Cutscene"/>
+            
+            <Animation name="Show">
+                <Event event="OnShown" action="Reset"/>
+                <Event event="OnShown" action="Play"/>
+                
+                <Controller type="Cutscene" end="Loop">
+                    <Key type="Cutscene" action="Play" time="0.0"/>
+                </Controller>
+            </Animation>
+        </Frame>
+        
+        <Frame type="Frame" name="ScoreScreenBG">
+            <Anchor relative="$parent"/>
+            <RenderType val="HDR"/>
+            <Visible val="False"/>
+            
+            <Animation name="Entrance">
+                <Event event="OnShown" action="Reset,Play" frame="$parent/$parent/ScorePanel"/>
+                <Event event="OnHidden" action="Reset" frame="$parent/$parent/ScorePanel"/>
+         
+                <Controller type="Visibility" end="Pause">
+                    <Key type="Bool" time="0" value="True"/>
+                </Controller>
+            </Animation>
+        
+            <Frame type="BlurFrame" name="ContentBGBlur">
+                <Anchor relative="$parent/ContentBG"/>
+
+                <Animation name="Blur">
+                    <Event event="OnShown" action="Reset,Play" frame="$parent" />
+
+                    <Controller type="Blur" end="Pause">
+                        <Key type="Curve" time="0" value="0" out="Fast"/>
+                        <Key type="Curve" time="1" value=".35" in="Slow"/>
+                    </Controller>
+                </Animation>
+            </Frame>
+
+            <Frame type="Image" name="ContentBG">
+                <Anchor side="Top" relative="$parent" pos="Mid" offset="-10"/>
+                <Anchor side="Bottom" relative="$parent" pos="Mid" offset="-10"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+                <Height val="880"/>
+                <Texture val="@UI/SC2_UI_Battlenet_Glue_Campaign_PanelBg"/>
+                
+                <Animation name="Entrance">
+                    <Event event="OnShown" action="Reset" frame="$parent"/>
+                    <Event event="OnShown" action="Play" frame="$parent"/>
+             
+                    <Controller type="Anchor" end="Pause" side="Right" relative="true">
+                        <Key type="Curve" time="0" value="-2000" out="Fast"/>
+                        <Key type="Curve" time=".4" value="0" in="Slow"/>
+                    </Controller>
+
+                    <Controller type="Sound" end="Stop">
+                        <Key type="Sound" time="0" sound="*@C_UI_CampaignPanel_EntranceSound"/>
+                    </Controller>
+
+                </Animation>
+            </Frame>
+            
+            <Frame type="Image" name="ContentBGShimmer">
+                <Anchor side="Top" relative="$parent/ContentBG" pos="Min" offset="0"/>
+                <Anchor side="Bottom" relative="$parent/ContentBG" pos="Max" offset="0"/>
+                <Anchor side="Left" relative="$parent/ContentBG" pos="Min" offset="0"/>
+                <LayerCount val="2"/>
+                <Alpha val="255"/>
+                <ScaleWidthToTexture val="True"/>
+     
+                <Texture val="@UI/SC2_UI_Battlenet_Glue_Campaign_PanelBg_Mask_Shimmer" layer="0"/>
+                <AlphaLayer val="True" layer="0"/>
+             
+                <Texture val="@UI/SC2_UI_Battlenet_Glue_Campaign_PanelBg_Mask" layer="1"/>
+                <TextureCoords top="0" left="0" bottom="1" right="1" layer="1"/>
+                
+             
+                <Animation name="ShimmerAnimation">
+                    <Event event="OnShown" action="DirectionForward" frame="$parent"/>
+                    <Event event="OnShown" action="Play" frame="$parent"/>
+             
+                    <Controller type="LayerUV" layer="0" side="Left" relative="False" sidelock="True" end="Loop" >
+                        <Key type="Curve" time="0" value="0.5" out="linear"/>
+                        <Key type="Curve" time="0" value="0.5" out="linear"/>
+                        <Key type="Curve" time="9" value="-1" in="linear"/>
+                    </Controller>
+             
+                </Animation>
+            </Frame>
+
+            <Frame type="Image" name="BorderTop">
+                <Anchor side="Top" relative="$parent/ContentBG" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/ContentBG" pos="Min" offset="0"/>
+                <Anchor side="Right" relative="$parent/ContentBG" pos="Max" offset="0"/>
+                <Height val="2"/>
+                <Color val="86,159,200"/>
+                <Alpha val="77"/>
+            </Frame>
+
+            <Frame type="Image" name="BorderTopShimmer">
+                <Anchor side="Top" relative="$parent/BorderTop" pos="Mid" offset="0"/>
+                <Anchor side="Bottom" relative="$parent/BorderTop" pos="Mid" offset="0"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                <Texture val="@UI/SC2_UI_Battlenet_Glue_Campaign_PanelBorderShimmer"/>
+
+                <Animation name="Show">
+                    <Event event="OnShown" action="Reset,Play" frame="$parent" />
+
+                    <Controller type="Anchor" end="Loop" side="Left" relative="true">
+                        <Key type="Curve" time="0" value="-2000" out="Fast"/>
+                        <Key type="Curve" time="5" value="2000" in="Slow"/>
+                        <Key type="Curve" time="5.05" value="2000" in="Slow"/>
+                    </Controller>
+                </Animation>
+            </Frame>
+
+            <Frame type="Image" name="BorderBottom">
+                <Anchor side="Bottom" relative="$parent/ContentBG" pos="Max" offset="0"/>
+                <Anchor side="Left" relative="$parent/ContentBG" pos="Min" offset="0"/>
+                <Anchor side="Right" relative="$parent/ContentBG" pos="Max" offset="0"/>
+                <Height val="2"/>
+                <Color val="86,159,200"/>
+                <Alpha val="77"/>
+            </Frame>
+
+            <Frame type="Image" name="BorderBottomShimmer">
+                <Anchor side="Top" relative="$parent/BorderBottom" pos="Mid" offset="0"/>
+                <Anchor side="Bottom" relative="$parent/BorderBottom" pos="Mid" offset="0"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                <Texture val="@UI/SC2_UI_Battlenet_Glue_Campaign_PanelBorderShimmer"/>
+
+                <Animation name="Show">
+                    <Event event="OnShown" action="Reset,Play" frame="$parent" />
+
+                    <Controller type="Anchor" end="Loop" side="Left" relative="true">
+                        <Key type="Curve" time="0" value="-2000" out="Fast"/>
+                        <Key type="Curve" time="0.05" value="-2000" in="Fast"/>
+                        <Key type="Curve" time="5.05" value="2000" in="Slow"/>
+                    </Controller>
+                </Animation>
+            </Frame>
+        </Frame>
+        
+        <Frame type="CutsceneFrame" name="ForegroundCutscene">
+            <Anchor relative="$parent"/>
+            <File val="Cutscenes/UI_Screens_AlliedCommander_Foreground.SC2Cutscene"/>
+            <RenderType val="HDR"/>
+            
+            <Animation name="Show">
+                <Event event="OnShown" action="Reset"/>
+                <Event event="OnShown" action="Play"/>
+                
+                <Controller type="Cutscene" end="Loop">
+                    <Key type="Cutscene" action="Play" time="0.0"/>
+                </Controller>
+            </Animation>
+
+            <Animation name="CharacterReadyStart">
+                <Event event="Ready" action="Reset" frame="$parent"/>
+                <Event event="Ready" action="Play" frame="$parent"/>
+
+                <Controller type="Cutscene" end="Stop">
+                    <Key type="Cutscene" action="Bookmark" time="0.0" bookmark="CharacterReadyStart"/>
+                </Controller>
+            </Animation>
+
+            <Animation name="CharacterReadyCancel">
+                <Event event="NotReady" action="Reset" frame="$parent"/>
+                <Event event="NotReady" action="Play" frame="$parent"/>
+
+                <Controller type="Cutscene" end="Stop">
+                    <Key type="Cutscene" action="Bookmark" time="0.0" bookmark="CharacterReadyCancel"/>
+                </Controller>
+            </Animation>
+        </Frame>
+        
+        <Frame type="Image" name="Vignette">
+            <Anchor relative="$parent"/>
+            <Texture val="@UI/SC2_UI_Coop_Vignette"/>
+            <Alpha val="255"/>
+        </Frame>
+        
+        <Frame type="Label" name="Title">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="163"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="115"/>
+            <Text val="@UI/ScreenCoopCampaign/Title"/>
+            <Style val="@Coop_Title"/>
+            
+            <Animation name="UISlideOut" template="CommanderSelectionPanel/UISlideOutAnimationTemplate"/>
+        </Frame>
+        
+        <Frame type="Label" name="Subtitle">
+            <Anchor side="Top" relative="$parent/Title" pos="Max" offset="9"/>
+            <Anchor side="Left" relative="$parent/Title" pos="Min" offset="0"/>
+            <Text val="@UI/ScreenCoopCampaign/Subtitle"/>
+            <Style val="@Coop_Subtitle"/>
+            
+            <Animation name="UISlideOut" template="CommanderSelectionPanel/UISlideOutAnimationTemplate"/>
+        </Frame>
+
+        <Frame type="Frame" name="AnchorFrame">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+            <Width val="1548"/>
+        </Frame>
+
+        <Frame type="Frame" name="PartyMemberContainer">
+            <Anchor relative="$parent"/>
+            <Visible val="false"/>
+            <Alpha val="0"/>
+
+            <Animation name="ReadyAnimation">
+                <Event event="Ready" action="DirectionForward" frame="$parent"/>
+                <Event event="Ready" action="Play" frame="$parent"/>
+                <Event event="NotReady" action="DirectionReverse" frame="$parent"/>
+                <Event event="NotReady" action="Play" frame="$parent"/>
+
+                <Controller type="Fade" end="Pause">
+                    <Key type="Curve" time="0" value="0" out="Auto"/>
+                    <Key type="Curve" time="0.2" value="0" in="Auto"/>
+                </Controller>
+
+                <Controller type="Visibility" end="Pause">
+                    <Key type="Bool" time="0" value="false"/>
+                    <Key type="Bool" time="0.01" value="true"/>
+                    <Key type="Bool" time="0.20" value="true"/>
+                </Controller>
+            </Animation>
+
+            <Frame type="Label" name="CommanderNamePartyLabel">
+                <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+                <Style val="BattlenetGlueTitle"/>
+            </Frame>
+
+            <Frame type="Label" name="PlayerNamePartyLabel">
+                <Anchor side="Top" relative="$parent/CommanderNamePartyLabel" pos="Max" offset="0"/>
+                <Anchor side="Left" relative="$parent/CommanderNamePartyLabel" pos="Mid" offset="0"/>
+                <Anchor side="Right" relative="$parent/CommanderNamePartyLabel" pos="Mid" offset="0"/>
+                <Style val="GlueDescription"/>
+            </Frame>
+
+            <Frame type="Label" name="LevelPartyLabel">
+                <Anchor side="Top" relative="$parent/PlayerNamePartyLabel" pos="Max" offset="0"/>
+                <Anchor side="Right" relative="$parent/PlayerNamePartyLabel" pos="Max" offset="0"/>
+                <Style val="BattlenetGlueTitle"/>
+                <Text val="0"/>
+            </Frame>
+        </Frame>
+
+        <Frame type="Frame" name="PlayerReadyContainer">
+            <Anchor relative="$parent"/>
+            <Visible val="true"/>
+            <Alpha val="255"/>
+
+            <!--
+            <Animation name="ReadyAnimation">
+                <Event event="Ready" action="DirectionForward" frame="$parent"/>
+                <Event event="Ready" action="Play" frame="$parent"/>
+                <Event event="NotReady" action="DirectionReverse" frame="$parent"/>
+                <Event event="NotReady" action="Play" frame="$parent"/>
+
+                <Controller type="Fade" end="Pause">
+                    <Key type="Curve" time="0" value="0" out="Auto"/>
+                    <Key type="Curve" time="0.2" value="255" in="Auto"/>
+                </Controller>
+
+                <Controller type="Visibility" end="Pause">
+                    <Key type="Bool" time="0" value="false"/>
+                    <Key type="Bool" time="0.01" value="true"/>
+                    <Key type="Bool" time="0.20" value="true"/>
+                </Controller>
+            </Animation>
+            -->
+            
+            <Frame type="Label" name="CommanderNameLabel">
+                <Anchor side="Top" relative="$parent/$parent" pos="Min" offset="-50"/>
+                <Anchor side="Left" relative="$parent/$parent" pos="Mid" offset="0"/>
+                <Anchor side="Right" relative="$parent/$parent" pos="Mid" offset="0"/>
+                <Width val="300"/>
+            </Frame>
+
+            <Frame type="Label" name="PlayerNameLabel">
+                <Anchor side="Top" relative="$parent/CommanderNameLabel" pos="Max" offset="0"/>
+                <Anchor side="Left" relative="$parent/CommanderNameLabel" pos="Mid" offset="0"/>
+                <Anchor side="Right" relative="$parent/CommanderNameLabel" pos="Mid" offset="0"/>
+                <Style val="GlueDescription"/>
+            </Frame>
+        </Frame>
+        
+        
+        <!-- Commander Selection Container -->
+
+        <Frame type="Frame" name="CommanderSelectionContainer" template="CommanderSelectionButtonsContainer/CommanderSelectionContainerTemplate">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="226"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+            
+            <Animation name="UISlideOut" template="CommanderSelectionPanel/UISlideOutAnimationTemplate"/>
+        </Frame>
+        
+        
+        <!-- Commander Info Container -->
+
+        <Frame type="Frame" name="CommanderInfoContainer" template="CommanderSelectionInfoContainer/CommanderInfoContainerTemplate">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="482"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+            
+            <Animation name="UISlideOut" template="CommanderSelectionPanel/UISlideOutAnimationTemplate"/>
+        </Frame>
+        
+        <!-- LicenseWarningGlow -->
+        
+        <Frame type="Image" name="PurchaseWarningGlow">
+            <Anchor side="Top" relative="$parent/UpsellInfo" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent/UpsellInfo" pos="Mid" offset="0"/>
+            <Anchor side="Left" relative="$parent/UpsellInfo" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent/UpsellInfo" pos="Mid" offset="0"/>
+            <Texture val="@UI/Glues_Battlenet_PurchaseGlow"/>
+            <Alpha val="77"/>
+            <Visible val="false"/>
+        </Frame>
+        
+        <!-- UpsellInfo -->
+        
+        <Frame type="Frame" name="UpsellInfo">
+            <Anchor side="Top" relative="$parent/CampaignPurchaseButton" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent/CampaignPurchaseButton" pos="Mid" offset="0"/>
+            <Anchor side="Left" relative="$parent/CampaignPurchaseButton" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$this/ErrorText" pos="Max" offset="0"/>
+            <Height val="120"/>
+            <Visible val="False"/>
+            
+            <Frame type="Image" name="PurchaseWarningIcon">
+                <Anchor side="Top" relative="$parent/$parent/CampaignPurchaseButton" pos="Mid" offset="0"/>
+                <Anchor side="Bottom" relative="$parent/$parent/CampaignPurchaseButton" pos="Mid" offset="0"/>
+                <Anchor side="Left" relative="$parent/$parent/CampaignPurchaseButton" pos="Max" offset="6"/>
+                <Texture val="@UI/Glues_Icons_PurchaseWarning"/>
+            </Frame>
+            
+            <Frame type="Label" name="ErrorText">
+                <Anchor side="Top" relative="$parent/$parent/CampaignPurchaseButton" pos="Min" offset="14"/>
+                <Anchor side="Left" relative="$parent/PurchaseWarningIcon" pos="Max" offset="3"/>
+                <Style val="@Tournament_LicenseWarningTitle"/>
+                <Text val="@UI/ScreenCoopCampaign/LicenseWarningErrorText"/>
+            </Frame>
+            
+        </Frame>
+        
+        
+        <!-- Ready Button -->
+        
+        <Frame type="GlueButton" name="ReadyButton" template="StandardBattlenetTemplates/BattlenetAlternateButtonTemplate">
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="-164"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="105"/>
+            <Text val="@UI/ScreenCoopCampaign/Ready"/>
+            
+            <Animation name="UISlideOut" template="CommanderSelectionPanel/UISlideOutAnimationTemplate"/>
+
+            <Animation name="Show">
+                <Event event="Ready" action="Reset" frame="$parent"/>
+                <Event event="Ready" action="Play" frame="$parent"/>
+                <Event event="NotReady" action="Reset" frame="$parent"/>
+                <Event event="NotReady" action="Stop" frame="$parent"/>
+
+                <Controller type="Visibility" end="Pause">
+                    <Key type="Bool" time="0" value="false"/>
+                </Controller>
+            </Animation>
+        </Frame>
+        
+        
+        <!-- Party Ready Button -->
+
+        <Frame type="Button" name="PartyReadyButton" template="StandardBattlenetTemplates/BattlenetAlternateButtonTemplate">
+            <Anchor relative="$parent/ReadyButton"/>
+            <Text val="@UI/ScreenCoopCampaign/Ready"/>
+            <Visible val="false"/>
+
+            <Animation name="CanReady">
+                <Event event="PartyButtonShow" action="Reset,Play" frame="$parent"/>
+                <Event event="PartyButtonHide" action="Reset,Stop" frame="$parent"/>
+
+                <Controller type="Visibility" end="Pause">
+                    <Key type="Bool" time="0" value="true"/>
+                </Controller>
+            </Animation>
+
+            <Animation name="Show">
+                <Event event="OnShown" action="Reset,Play"/>
+                <Event event="OnHidden" action="Reset,Stop"/>
+
+                <Controller type="Visibility" end="Pause" frame="$parent/ReadyButton">
+                    <Key type="Bool" time="0" value="false"/>
+                </Controller>
+            </Animation>
+        </Frame>
+        
+        
+        <!-- Cancel Button -->
+
+        <Frame type="Button" name="CancelButton" template="StandardBattlenetTemplates/BattlenetAlternateButtonTemplate">
+            <Anchor relative="$parent/ReadyButton"/>
+            <Text val="@UI/ScreenCoopCampaign/Cancel"/>
+            <Visible val="false"/>
+
+            <Animation name="Show">
+                <Event event="Ready" action="Reset,Play" frame="$parent"/>
+                <Event event="NotReady" action="Reset,Stop" frame="$parent"/>
+
+                <Controller type="Visibility" end="Pause">
+                    <Key type="Bool" time="0" value="true"/>
+                </Controller>
+            </Animation>
+
+            <Animation name="Countdown">
+                <Event event="CountdownStart" action="Reset,Play" frame="$parent"/>
+                <Event event="CountdownEnd" action="Reset,Stop" frame="$parent"/>
+                <Event event="NotReady" action="Reset,Stop" frame="$parent"/>
+
+                <Controller type="Enabled" end="Pause">
+                    <Key type="Bool" time="0" value="false"/>
+                </Controller>
+            </Animation>
+        </Frame>
+        
+        
+        <!-- Maps Button -->
+        
+        <Frame type="Button" name="MapButton" template="StandardBattlenetTemplates/BattlenetStandardButtonTemplate">
+            <Anchor side="Top" relative="$parent/ReadyButton" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent/ReadyButton" pos="Max" offset="5"/>
+            <Visible val="true"/>
+
+            <!-- Animation to set like, bonus icons, etc... -->
+            <Animation name="MapSelection">
+                <Event event="Random" action="Reset"/>
+                <Event event="Random" action="Stop"/>
+                <Event event="NotRandom" action="Reset"/>
+                <Event event="NotRandom" action="Play"/>
+
+                <Controller type="Event" end="Pause">
+                    <Key type="Event" time="0.0" event="NoOp"/>
+                </Controller>
+            </Animation>
+
+            <Animation name="Show">
+                <Event event="Show" action="DirectionForward"/>
+                <Event event="Show" action="Play"/>
+                <Event event="Hide" action="DirectionReverse"/>
+                <Event event="Hide" action="Play"/>
+
+                <Controller type="Fade" end="Pause">
+                    <Key type="Curve" time="0" value="0" out="Slow"/>
+                    <Key type="Curve" time=".175" value="255" in="Auto"/>
+                </Controller>
+
+                <Controller type="Visibility" end="Pause">
+                    <Key type="Bool" time="0" value="false"/>
+                    <Key type="Bool" time=".001" value="true"/>
+                    <Key type="Bool" time=".175" value="true"/>
+                </Controller>
+            </Animation>
+            
+            <Animation name="UISlideOut" template="CommanderSelectionPanel/UISlideOutAnimationTemplate"/>
+        </Frame>
+        
+        <Frame type="Label" name="SelectMapLabel">
+            <Anchor side="Top" relative="$parent/MapButton" pos="Min" offset="-20"/>
+            <Anchor side="Left" relative="$parent/MapButton" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent/MapButton" pos="Max" offset="0"/>
+            <Style val="Coop_MapDifficultyLabel"/>
+            <Text val="@UI/ScreenCoopCampaign/SelectMap"/>
+        </Frame>
+
+        <Frame type="Label" name="MapBonusLabel">
+            <Anchor side="Top" relative="$parent/MapButton" pos="Max" offset="5"/>
+            <Anchor side="Left" relative="$parent/MapButton" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent/MapButton" pos="Max" offset="0"/>
+            <Style val="Coop_MapDifficultyLabel"/>
+        </Frame>
+        
+        <Frame type="Button" name="DifficultyButton" template="StandardBattlenetTemplates/BattlenetStandardButtonTemplate">
+            <Anchor side="Top" relative="$parent/MapButton" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent/MapButton" pos="Max" offset="5"/>
+            <Style val="@Coop_CommanderStandardButton"/>
+            <Width val ="285"/>
+
+            <Animation name="UISlideOut" template="CommanderSelectionPanel/UISlideOutAnimationTemplate"/>
+        </Frame>
+        
+        <Frame type="Label" name="DifficultyLabel">
+            <Anchor side="Top" relative="$parent/DifficultyButton" pos="Min" offset="-20"/>
+            <Anchor side="Left" relative="$parent/DifficultyButton" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent/DifficultyButton" pos="Max" offset="0"/>
+            <Style val="Coop_MapDifficultyLabel"/>
+            <Text val="@UI/ScreenCoopCampaign/SelectDifficulty"/>
+        </Frame>
+
+        <Frame type="Label" name="DifficultyBonusLabel">
+            <Anchor side="Top" relative="$parent/DifficultyButton" pos="Max" offset="5"/>
+            <Anchor side="Left" relative="$parent/DifficultyButton" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent/DifficultyButton" pos="Max" offset="0"/>
+            <Style val="Coop_MapDifficultyLabel"/>
+        </Frame>
+        
+        <!-- Individual Commander Purchase WarningGlow -->
+        
+        <Frame type="Image" name="CommanderPurchaseWarningGlow">
+            <Anchor side="Top" relative="$parent/CommanderPurchaseInfo" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent/CommanderPurchaseInfo" pos="Mid" offset="0"/>
+            <Anchor side="Left" relative="$parent/CommanderPurchaseInfo" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent/CommanderPurchaseInfo" pos="Mid" offset="0"/>
+            <Texture val="@UI/Glues_Battlenet_PurchaseGlow"/>
+            <Alpha val="77"/>
+            <Visible val="false"/>
+        </Frame>
+        
+        <Frame type="CommanderBuyButton" name="CommanderPurchaseButton" template="StandardBattlenetTemplates/BattlenetAlternateButtonTemplate">
+            <Anchor side="Top" relative="$parent/ReadyButton" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent/ReadyButton" pos="Min" offset="0"/>
+            <Style val="@Coop_CommanderStandardButton"/>
+            <ShowPrice val="false"/>
+            <Visible val="false"/>
+
+            <Frame type="Label" name="Label">
+                <Text val="@UI/BuyCommander"/>
+            </Frame>
+
+            <Animation name="UISlideOut" template="CommanderSelectionPanel/UISlideOutAnimationTemplate"/>
+        </Frame>
+
+        <!-- Commander Upsell Info -->
+        
+        <Frame type="Frame" name="CommanderPurchaseInfo">
+            <Anchor side="Top" relative="$parent/CommanderPurchaseButton" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent/CommanderPurchaseButton" pos="Mid" offset="0"/>
+            <Anchor side="Left" relative="$parent/CommanderPurchaseButton" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$this/ErrorText" pos="Max" offset="0"/>
+            <Height val="120"/>
+            <Visible val="False"/>
+            
+            <Frame type="Image" name="PurchaseWarningIcon">
+                <Anchor side="Top" relative="$parent/$parent/CommanderPurchaseButton" pos="Mid" offset="0"/>
+                <Anchor side="Bottom" relative="$parent/$parent/CommanderPurchaseButton" pos="Mid" offset="0"/>
+                <Anchor side="Left" relative="$parent/$parent/CommanderPurchaseButton" pos="Max" offset="6"/>
+                <Texture val="@UI/Glues_Icons_PurchaseWarning"/>
+            </Frame>
+            
+            <Frame type="Label" name="ErrorText">
+                <Anchor side="Top" relative="$parent/$parent/CommanderPurchaseButton" pos="Min" offset="14"/>
+                <Anchor side="Left" relative="$parent/PurchaseWarningIcon" pos="Max" offset="3"/>
+                <Style val="@Tournament_LicenseWarningTitle"/>
+                <Text val="@UI/ScreenCoopCampaign/NewCommander"/>
+            </Frame>
+            
+        </Frame>
+        
+        
+        <!-- Void Purchase Button -->
+        
+        <Frame type="CampaignBuyButton" name="CampaignPurchaseButton" template="StandardBattlenetTemplates/BattlenetAlternateButtonTemplate">
+            <Anchor relative="$parent/CommanderPurchaseButton"/>
+            <ShowPrice val="false"/>
+            <AlwaysShow val="true"/>
+            <CampaignLink val="LegacyOfTheVoid"/>
+            <Text val="@UI/ScreenTournament/LicenseWarningUpsellText"/>
+            <Visible val="false"/>
+            
+            <Animation name="UISlideOut" template="CommanderSelectionPanel/UISlideOutAnimationTemplate"/>
+        </Frame>
+        
+        <!-- Details Container -->
+
+        <Frame type="Frame" name="DetailsContainer" template="CommanderSelectionDetailsContainer/DetailsContainerTemplate">
+            <Anchor side="Top" relative="$parent/CommanderInfoContainer" pos="Max" offset="10"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+            
+            <Animation name="UISlideOut" template="CommanderSelectionPanel/UISlideOutAnimationTemplate"/>
+        </Frame>
+        
+        
+        <!-- Movie Container -->
+        
+        <Frame type="Frame" name="MovieContainer" template="CommanderSelectionPopupContainers/MovieContainerTemplate">
+            <Anchor relative="$parent"/>
+            <Visible val="false"/>
+            <Alpha val="0"/>
+
+            <Animation name="Show">
+                <Event event="OnClick" action="Reset,Play" frame="$parent/DetailsContainer/InfoContainer/MovieButton"/>
+                <Event event="OnClick" action="DirectionReverse,Play" frame="$this/CloseButton"/>
+                <Event event="MovieFinished" action="DirectionReverse,Play" frame="$parent"/>
+
+                <Controller type="Fade" end="Pause">
+                    <Key type="Curve" time="0" value="0" out="Auto"/>
+                    <Key type="Curve" time="0.2" value="255" in="Auto"/>
+                </Controller>
+
+                <Controller type="Visibility" end="Pause">
+                    <Key type="Bool" time="0.00" value="false"/>
+                    <Key type="Bool" time="0.01" value="true"/>
+                    <Key type="Bool" time="0.20" value="true"/>
+                </Controller>
+
+                <!-- Set the visibility of the movie frame after the fade in, because the movie frame doesn't seem to like fading -->
+                <Controller type="Visibility" end="Pause" frame="MovieFrame">
+                    <Key type="Bool" time="0.00" value="false"/>
+                    <Key type="Bool" time="0.19" value="false"/>
+                    <Key type="Bool" time="0.20" value="true"/>
+                </Controller>
+            </Animation>
+        </Frame>
+        
+        
+        <!-- Difficulty Container -->
+
+        <Frame type="Frame" name="DifficultyContainer" template="CommanderSelectionPopupContainers/DifficultyContainerTemplate">
+            <Anchor relative="$parent"/>
+            <Visible val="false"/>
+            <Alpha val="0"/>
+
+            <Animation name="Show">
+                <Event event="OnClick" action="Reset" frame="$parent/DifficultyButton"/>
+                <Event event="OnClick" action="Play" frame="$parent/DifficultyButton"/>
+                <Event event="OnClick" action="DirectionReverse" frame="$this/AcceptButton"/>
+                <Event event="OnClick" action="Play" frame="$this/AcceptButton"/>
+                <Event event="OnClick" action="DirectionReverse" frame="$this/CancelButton"/>
+                <Event event="OnClick" action="Play" frame="$this/CancelButton"/>
+                <Event event="Hide" action="Reset,Stop" frame="$parent/$parent"/>
+
+                <Controller type="Fade" end="Pause">
+                    <Key type="Curve" time="0" value="0" out="Auto"/>
+                    <Key type="Curve" time="0.2" value="255" in="Auto"/>
+                </Controller>
+
+                <Controller type="Visibility" end="Pause">
+                    <Key type="Bool" time="0.00" value="false"/>
+                    <Key type="Bool" time="0.01" value="true"/>
+                    <Key type="Bool" time="0.20" value="true"/>
+                </Controller>
+            </Animation>
+        </Frame>
+
+        <StateGroup name="ButtonWarningVisibilty">
+            <DefaultState val="ShowButtons"/>
+            
+            <State name="ShowButtons">
+                <Action type="SetProperty" frame="MapButton" visible="True"/>
+                <Action type="SetProperty" frame="SelectMapLabel" visible="True"/>
+                <Action type="SetProperty" frame="MapBonusLabel" visible="True"/>
+                <Action type="SetProperty" frame="DifficultyButton" visible="True"/>
+                <Action type="SetProperty" frame="DifficultyLabel" visible="True"/>
+                <Action type="SetProperty" frame="DifficultyBonusLabel" visible="True"/>
+            </State>
+
+            <State name="ShowCampaignPurchaseWarning">
+                <When type="AnimationState" CommanderCampaignPurchase="ShowCampaignPurchase"/>
+                <Action type="SetProperty" frame="MapButton" visible="False"/>
+                <Action type="SetProperty" frame="SelectMapLabel" visible="False"/>
+                <Action type="SetProperty" frame="MapBonusLabel" visible="False"/>
+                <Action type="SetProperty" frame="DifficultyButton" visible="False"/>
+                <Action type="SetProperty" frame="DifficultyLabel" visible="False"/>
+                <Action type="SetProperty" frame="DifficultyBonusLabel" visible="False"/>
+
+                <Action type="SetProperty" frame="CampaignPurchaseButton" visible="True"/>
+                <Action type="SetProperty" frame="UpsellInfo" visible="True"/>
+                <Action type="SetProperty" frame="PurchaseWarningGlow" visible="True"/>
+            </State>
+
+            <State name="ShowCommanderPurchaseWarning">
+                <When type="AnimationState" CommanderPurchase="ShowCommanderPurchase"/>
+                <Action type="SetProperty" frame="MapButton" visible="False"/>
+                <Action type="SetProperty" frame="SelectMapLabel" visible="False"/>
+                <Action type="SetProperty" frame="MapBonusLabel" visible="False"/>
+                <Action type="SetProperty" frame="DifficultyButton" visible="False"/>
+                <Action type="SetProperty" frame="DifficultyLabel" visible="False"/>
+                <Action type="SetProperty" frame="DifficultyBonusLabel" visible="False"/>
+
+                <Action type="SetProperty" frame="CommanderPurchaseButton" visible="True"/>
+                <Action type="SetProperty" frame="CommanderPurchaseInfo" visible="True"/>
+                <Action type="SetProperty" frame="CommanderPurchaseWarningGlow" visible="True"/>
+            </State>
+        </StateGroup>
+    </Frame>
+</Desc>

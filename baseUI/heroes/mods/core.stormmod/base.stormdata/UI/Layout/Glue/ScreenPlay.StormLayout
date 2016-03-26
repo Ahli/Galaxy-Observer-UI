@@ -1,0 +1,205 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<Desc>
+    <DescFlags val="Locked"/>
+
+    <Frame type="GlueButton" name="NavigationButtonTemplate" template="StandardTemplates/Top_Navigation">
+        <ReportsStats val="true"/>
+
+        <Animation name="Transition">
+            <Event event="Show" action="Reset" frame="$parent"/>
+            <Event event="Show" action="Play" frame="$parent"/>
+            <Controller type="Fade" end="Pause">
+                <Key type="Curve" time="0.0" value="0" out="Slow"/>
+                <Key type="Curve" time="0" value="0" out="Slow"/>
+                <Key type="Curve" time="0.4" value="255" in="Slow" out="Step"/>
+            </Controller>
+            <Controller type="Anchor" end="Pause" side="Top" relative="true">
+                <Key type="Curve" time="0.0" value="-10" out="Slow"/>
+                <Key type="Curve" time="0.1" value="-10" out="Fast"/>
+                <Key type="Curve" time="0.5" value="0" in="Slow" />
+            </Controller>
+        </Animation>
+    </Frame>
+
+    <Frame type="ScreenPlay" name="ScreenPlay" template="StandardTemplates/GlueScreen">
+        <Animation name="Transition">
+            <Event event="Show" action="Play"/>
+            <Event event="Show" action="Reset"/>
+            <Event event="Hide" action="Play"/>
+            <Event event="Hide" action="DirectionReverse"/>
+            <Controller type="Fade" end="Pause">
+                <Key type="Curve" time="0.0" value="0" out="Slow"/>
+                <Key type="Curve" time="0.4" value="255" in="Slow" out="Slow"/>
+            </Controller>
+        </Animation>
+
+        <Animation name="LeaveHeroSelect">
+            <Event event="LeaveHeroSelect" action="Play" />
+            <Event event="LeaveHeroSelect" action="Reset" />
+
+            <Controller type="Sound" end="Pause">
+                <Key type="Sound" time="0.0" sound=""/>
+            </Controller>
+        </Animation>
+
+        <Frame type="CustomGamePanel" name="CustomGamePanel" template="CustomGamePanel/CustomGamePanelTemplate">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="100"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+        </Frame>
+
+        <Frame type="HeroCustomGamePanel" name="HeroCustomGamePanel" template="HeroCustomGamePanel/HeroCustomGamePanel">
+            <Anchor relative="$parent"/>
+            <Handle val="ScreenPlay_HeroCustomGamePanel"/>
+        </Frame>
+        
+        <Frame type="Image" name="VersusAIBackground">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="54"/>
+            <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+            <Width val="1920"/>
+            <Height val="716"/>
+            <LayerCount val="2"/>
+            <Visible val="False"/>
+            <Alpha val="0"/>
+            
+            <RenderType val="HDR"/>
+            <BlendMode val="Add"/>
+            
+            <Texture val="@UI/HUD_Effect_Phase_Glow_Mask2" layer="0"/>
+            <TextureCoords top="0" left="0" bottom="1" right="1" layer="0"/>
+            <AlphaLayer val="True" layer="0"/>
+            <WrapUV val="True" layer="0"/>
+            
+            <Texture val="@UI/Storm_UI_Play_AI_Background" layer="1"/>
+            <TextureCoords top="0" left="0" bottom="1" right="1" layer="1"/>
+            <WrapUV val="True" layer="1"/>
+            
+            <Animation name="UVScroll">
+                <Event event="PlayScreenModeCoop" action="Restart,Play" frame="$parent"/>
+                <Event event="PlayScreenModePractice" action="DirectionReverse,Play" frame="$parent"/>
+                <Event event="PlayScreenModeVersus" action="DirectionReverse,Play" frame="$parent"/>
+                <Event event="PlayScreenModeRanked" action="DirectionReverse,Play" frame="$parent"/>
+                <Event event="PlayScreenModeCustom" action="DirectionReverse,Play" frame="$parent"/>
+                <Event event="PlayScreenModeInvalid" action="DirectionReverse,Play" frame="$parent"/>
+                <Controller type="LayerUV" layer="0" side="Top" relative="True" sidelock="True" end="Loop" >
+                    <Key type="Curve" time="0" value="0" out="Slow"/>
+                    <Key type="Curve" time="3" value="1" in="fast"/>
+                </Controller>
+                <Controller type="Fade" end="Pause">
+                    <Key type="Curve" time="0" value="0" out="Fast"/>
+                    <Key type="Curve" time=".8" value="255" in="Slow"/>
+                </Controller>
+                <Controller type="Visibility" end="Pause">
+                    <Key type="Bool" time="0" value="False"/>
+                    <Key type="Bool" time=".01" value="True"/>
+                </Controller>
+            </Animation>
+        </Frame>
+        
+        <Frame type="Image" name="HueShiftImage">
+            <Anchor relative="$parent"/>
+            <Alpha val="255"/>
+            <Color val="175,175,175"/>
+            <Texture val="@UI/Storm_UI_Play_AI_ColorShift"/>
+            <Visible val="False"/>
+
+            <Unclipped val="True"/>
+            <RenderType val="HDR"/>
+            <BlendMode val="Multiply"/>
+            <IgnoreParentAlpha val="True"/>
+            <Animation name="MultiplyFade">
+                <Event event="OnShown" action="Restart,Play" frame="$parent/VersusAIBackground"/>
+                <Event event="OnHidden" action="DirectionReverse,Play" frame="$parent/VersusAIBackground"/>
+                <Controller type="Color" end="Pause" name="ColorChange">
+                    <Key type="Curve" time="0" value="175;175;175" out="Fast"/>
+                    <Key type="Curve" time=".5" value="255;255;255" out="Slow"/>
+                </Controller>
+                <Controller type="Visibility" end="Pause">
+                    <Key type="Bool" time="0" value="False"/>
+                    <Key type="Bool" time=".01" value="True"/>
+                </Controller>
+            </Animation>
+        </Frame>
+        
+        <Frame type="HeroUnrankedPanel" name="HeroUnrankedPanel" template="HeroUnrankedPanel/HeroUnrankedPanel">
+            <Anchor relative="$parent"/>
+            <Handle val="ScreenPlay_HeroUnrankedPanel"/>
+        </Frame>
+
+        <Frame type="HeroRankedPanel" name="HeroRankedPanel" template="HeroRankedPanel/HeroRankedPanel">
+            <Anchor relative="$parent"/>
+            <Handle val="ScreenPlay_HeroRankedPanel"/>
+        </Frame>
+
+        <Frame type="BattleLobbyPanel" name="BattleLobbyPanel" template="BattleLobbyPanel/BattleLobbyPanel">
+            <Anchor relative="$parent"/>
+        </Frame>
+
+        <Frame type="HeroDraftPanel" name="HeroDraftPanel" template="HeroDraftPanel/HeroDraftPanel">
+            <Anchor relative="$parent"/>
+            <Handle val="ScreenPlay_HeroDraftPanel"/>
+        </Frame>
+
+        <Frame type="Frame" name="SubNavContainer" template="StandardTemplates/SubNavContainer">
+            <Anchor side="Top" relative="$parent/$parent/ScreenNavigationHero/TopNavContainer" pos="Max" offset="-20"/>
+
+            <Animation name="Visibility">
+                <Event event="OnShown" action="DirectionForward" frame="$parent/QuickMatchButton"/>
+                <Event event="OnShown" action="Play" frame="$parent/QuickMatchButton"/>
+                <Event event="OnHidden" action="DirectionReverse" frame="$parent/QuickMatchButton"/>
+                <Event event="OnHidden" action="Play" frame="$parent/QuickMatchButton"/>
+
+                <Controller type="Visibility" end="Pause">
+                    <Key type="Bool" time="0" value="false"/>
+                    <Key type="Bool" time=".01" value="true"/>
+                </Controller>
+            </Animation>
+            <Handle val="ScreenPlay_SubNavContainer"/>
+        </Frame>
+
+        <Frame type="GlueButton" name="PracticeButton" template="ScreenPlay/NavigationButtonTemplate">
+            <Anchor side="Top" relative="$parent/SubNavContainer" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="Label" pos="Min" offset="-130"/>
+            <Text val="@UI/Training"/>
+            <Handle val="ScreenPlay_PracticeButton"/>
+            <Frame type="Label" name="Label">
+                <Anchor side="Left" relative="$parent/$parent" pos="Min" offset="130"/>
+            </Frame>
+            <CollapseLayout val="True"/>
+            <Visible val="False"/>
+        </Frame>
+
+        <Frame type="GlueButton" name="CooperativeButton" template="ScreenPlay/NavigationButtonTemplate">
+            <Anchor side="Top" relative="$parent/PracticeButton" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent/PracticeButton" pos="Max" offset="-200"/>
+            <Text val="@UI/ScreenPlay/CooperativeButton"/>
+            <Handle val="ScreenPlay_CooperativeButton"/>
+        </Frame>
+
+        <Frame type="GlueButton" name="QuickMatchButton" template="ScreenPlay/NavigationButtonTemplate">
+            <Anchor side="Top" relative="$parent/CooperativeButton" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent/CooperativeButton" pos="Max" offset="-200"/>
+            <Text val="@UI/ScreenPlay/QuickMatchButton"/>
+            <Handle val="ScreenPlay_QuickMatchButton"/>
+        </Frame>
+
+        <Frame type="GlueButton" name="RankedLeagueButton" template="ScreenPlay/NavigationButtonTemplate">
+            <Anchor side="Top" relative="$parent/QuickMatchButton" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent/QuickMatchButton" pos="Max" offset="-200"/>
+            <Text val="@UI/ScreenPlay/RankedLeagueButton"/>
+            <Handle val="ScreenPlay_RankedLeagueButton"/>
+        </Frame>
+
+        <Frame type="GlueButton" name="CustomGamesButton" template="ScreenPlay/NavigationButtonTemplate">
+            <Anchor side="Top" relative="$parent/RankedLeagueButton" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent/RankedLeagueButton" pos="Max" offset="-200"/>
+            <Text val="@UI/ScreenPlay/CustomGamesButton"/>
+            <Handle val="ScreenPlay_CustomGamesButton"/>
+            <Frame type="Image" name="SeparatorImage">
+                <Visible val="false"/>
+            </Frame>
+        </Frame>
+    </Frame>
+</Desc>
