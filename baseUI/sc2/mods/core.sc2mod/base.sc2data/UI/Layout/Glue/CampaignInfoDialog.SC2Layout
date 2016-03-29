@@ -90,7 +90,7 @@
     -->
     
     <Frame type="Frame" name="CampaignInfoPageButtonsContainerTemplate">
-        <Width val="700"/>
+        <Width val="900"/>
         <Height val="100"/>
         
         <Frame type="Button" name="Button01" template="StandardBattlenetTemplates/BattlenetSmallTabLeftButtonTemplate">
@@ -106,7 +106,7 @@
             </Frame>
         </Frame>
         
-        <Frame type="Button" name="Button02" template="StandardBattlenetTemplates/BattlenetSmallTabRightButtonTemplate">
+        <Frame type="Button" name="Button02" template="StandardBattlenetTemplates/BattlenetSmallTabMidButtonTemplate">
             <Anchor side="Top" relative="$parent/Button01" pos="Min" offset="0"/>
             <Anchor side="Left" relative="$parent/Button01" pos="Max" offset="-20"/>
             <Anchor side="Right" relative="$this/Label" pos="Max" offset="25"/>
@@ -119,6 +119,36 @@
             </Frame>
         </Frame>
     </Frame>
+
+    <Frame type="Frame" name="CampaignInfoPage3ButtonsContainerTemplate" template="CampaignInfoDialog/CampaignInfoPageButtonsContainerTemplate">
+        <Frame type="Button" name="Button03" template="StandardBattlenetTemplates/BattlenetSmallTabRightButtonTemplate">
+            <Anchor side="Top" relative="$parent/Button02" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent/Button02" pos="Max" offset="-20"/>
+            <Anchor side="Right" relative="$this/Label" pos="Max" offset="25"/>
+            <Width val="0"/>
+            <Text val="@UI/CampaignPurchase/Deluxe"/>
+            <Toggleable val="True"/>
+
+            <Frame type="Label" name="Label">
+                <Anchor side="Right" relative="$this" pos="Min" offset="0"/>
+            </Frame>
+        </Frame>
+    </Frame>
+
+    <Frame type="Frame" name="CampaignInfoPage4ButtonsContainerTemplate" template="CampaignInfoDialog/CampaignInfoPage3ButtonsContainerTemplate">
+        <Frame type="Button" name="Button04" template="StandardBattlenetTemplates/BattlenetSmallTabRightButtonTemplate">
+            <Anchor side="Top" relative="$parent/Button03" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent/Button03" pos="Max" offset="-20"/>
+            <Anchor side="Right" relative="$this/Label" pos="Max" offset="25"/>
+            <Width val="0"/>
+            <Text val="@UI/CampaignPurchase/Deluxe"/>
+            <Toggleable val="True"/>
+
+            <Frame type="Label" name="Label">
+                <Anchor side="Right" relative="$this" pos="Min" offset="0"/>
+            </Frame>
+        </Frame>
+    </Frame>
     
     <!--
     
@@ -126,7 +156,7 @@
     
     -->
     
-    <Frame type="Frame" name="CampaignInfoContainerTemplate">
+    <Frame type="Frame" name="CampaignInfoContainerTemplateBase">
         <Anchor side="Top" relative="$parent/BackgroundFrame" pos="Min" offset="0"/>
         <Anchor side="Bottom" relative="$parent/BackgroundFrame" pos="Max" offset="0"/>
         <Anchor side="Left" relative="$parent/BackgroundFrame" pos="Min" offset="0"/>
@@ -152,16 +182,18 @@
             <Style val="@Campaign_PurchaseInfoDialogSubtitle"/>
             <Text val="@UI/CampaignPurchase/DigitalDownload"/>
         </Frame>
-        
+    </Frame>
+
+    <Frame type="Frame" name="CampaignInfoContainerTemplate" template="CampaignInfoDialog/CampaignInfoContainerTemplateBase">
         <Frame type="TabControl" name="InfoTabController">
             <Anchor relative="$parent"/>
-            
+
             <TabListItem val="PageButtonsContainer/Button01"/>
             <TabListItem val="PageButtonsContainer/Button02"/>
-            
+
             <PanelListItem val="InfoPage1"/>
             <PanelListItem val="InfoPage2"/>
-        
+
             <Frame type="Frame" name="PageButtonsContainer" template="CampaignInfoDialog/CampaignInfoPageButtonsContainerTemplate">
                 <Anchor side="Top" relative="$parent" pos="Min" offset="199"/>
                 <Anchor side="Left" relative="$parent" pos="Min" offset="78"/>
@@ -176,7 +208,7 @@
                         </Controller>
                     </Animation>
                 </Frame>
-                
+
                 <Frame type="Button" name="Button02">
                     <Animation name="Show">
                         <Event event="OnShown" action="Reset,Play" frame="$parent/$parent/InfoPage2"/>
@@ -188,14 +220,151 @@
                     </Animation>
                 </Frame>
             </Frame>
-            
+
             <Frame type="Frame" name="InfoPage1" template="CampaignInfoDialog/CampaignInfoTemplate"/>
-            
+
             <Frame type="Frame" name="InfoPage2" template="CampaignInfoDialog/CampaignInfoTemplate"/>
-        
+
+        </Frame>
+
+        <StateGroup name="SelectedTab">
+            <State name="StandardEdition">
+                <When type="AnimationState" frame="$parent" ProductType="StandardEdition" />
+                <Action type="SetProperty" frame="InfoTabController" SelectedIndex="0"/>
+            </State>
+            <State name="DeluxeEdition" >
+                <When type="AnimationState" frame="$parent" ProductType="DeluxeEdition" />
+                <Action type="SetProperty" frame="InfoTabController" SelectedIndex="1"/>
+            </State>
+        </StateGroup>
+    </Frame>
+
+    <Frame type="Frame" name="CampaignInfoContainer3ButtonTemplate" template="CampaignInfoDialog/CampaignInfoContainerTemplateBase">
+        <Frame type="TabControl" name="InfoTabController">
+            <Anchor relative="$parent"/>
+
+            <TabListItem val="PageButtonsContainer/Button01"/>
+            <TabListItem val="PageButtonsContainer/Button02"/>
+            <TabListItem val="PageButtonsContainer/Button03"/>
+
+            <PanelListItem val="InfoPage1"/>
+            <PanelListItem val="InfoPage2"/>
+            <PanelListItem val="InfoPage3"/>
+
+            <Frame type="Frame" name="PageButtonsContainer" template="CampaignInfoDialog/CampaignInfoPage3ButtonsContainerTemplate">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="199"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="78"/>
+
+                <Frame type="Button" name="Button01">
+                    <Animation name="Show">
+                        <Event event="OnShown" action="Reset,Play" frame="$parent/$parent/InfoPage1"/>
+                        <Event event="OnHidden" action="Reset,Stop" frame="$parent/$parent/InfoPage1"/>
+
+                        <Controller type="Style" end="Pause" style1="BattlenetSmallTabButtonSelected" style2="BattlenetSmallTabButtonSelected" frame="Label">
+                            <Key type="Curve" time="0" value="0"/>
+                        </Controller>
+                    </Animation>
+                </Frame>
+
+                <Frame type="Button" name="Button02">
+                    <Animation name="Show">
+                        <Event event="OnShown" action="Reset,Play" frame="$parent/$parent/InfoPage2"/>
+                        <Event event="OnHidden" action="Reset,Stop" frame="$parent/$parent/InfoPage2"/>
+
+                        <Controller type="Style" end="Pause" style1="BattlenetSmallTabButtonSelected" style2="BattlenetSmallTabButtonSelected" frame="Label">
+                            <Key type="Curve" time="0" value="0"/>
+                        </Controller>
+                    </Animation>
+                </Frame>
+
+                <Frame type="Button" name="Button03">
+                    <Animation name="Show">
+                        <Event event="OnShown" action="Reset,Play" frame="$parent/$parent/InfoPage3"/>
+                        <Event event="OnHidden" action="Reset,Stop" frame="$parent/$parent/InfoPage3"/>
+
+                        <Controller type="Style" end="Pause" style1="BattlenetSmallTabButtonSelected" style2="BattlenetSmallTabButtonSelected" frame="Label">
+                            <Key type="Curve" time="0" value="0"/>
+                        </Controller>
+                    </Animation>
+                </Frame>
+            </Frame>
+
+            <Frame type="Frame" name="InfoPage1" template="CampaignInfoDialog/CampaignInfoTemplate"/>
+            <Frame type="Frame" name="InfoPage2" template="CampaignInfoDialog/CampaignInfoTemplate"/>
+            <Frame type="Frame" name="InfoPage3" template="CampaignInfoDialog/CampaignInfoTemplate"/>
         </Frame>
     </Frame>
     
+    <Frame type="Frame" name="CampaignInfoContainer4ButtonTemplate" template="CampaignInfoDialog/CampaignInfoContainerTemplateBase">
+        <Frame type="TabControl" name="InfoTabController">
+            <Anchor relative="$parent"/>
+
+            <TabListItem val="PageButtonsContainer/Button01"/>
+            <TabListItem val="PageButtonsContainer/Button02"/>
+            <TabListItem val="PageButtonsContainer/Button03"/>
+            <TabListItem val="PageButtonsContainer/Button04"/>
+
+            <PanelListItem val="InfoPage1"/>
+            <PanelListItem val="InfoPage2"/>
+            <PanelListItem val="InfoPage3"/>
+            <PanelListItem val="InfoPage4"/>
+
+            <Frame type="Frame" name="PageButtonsContainer" template="CampaignInfoDialog/CampaignInfoPage4ButtonsContainerTemplate">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="199"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="78"/>
+
+                <Frame type="Button" name="Button01">
+                    <Animation name="Show">
+                        <Event event="OnShown" action="Reset,Play" frame="$parent/$parent/InfoPage1"/>
+                        <Event event="OnHidden" action="Reset,Stop" frame="$parent/$parent/InfoPage1"/>
+
+                        <Controller type="Style" end="Pause" style1="BattlenetSmallTabButtonSelected" style2="BattlenetSmallTabButtonSelected" frame="Label">
+                            <Key type="Curve" time="0" value="0"/>
+                        </Controller>
+                    </Animation>
+                </Frame>
+
+                <Frame type="Button" name="Button02">
+                    <Animation name="Show">
+                        <Event event="OnShown" action="Reset,Play" frame="$parent/$parent/InfoPage2"/>
+                        <Event event="OnHidden" action="Reset,Stop" frame="$parent/$parent/InfoPage2"/>
+
+                        <Controller type="Style" end="Pause" style1="BattlenetSmallTabButtonSelected" style2="BattlenetSmallTabButtonSelected" frame="Label">
+                            <Key type="Curve" time="0" value="0"/>
+                        </Controller>
+                    </Animation>
+                </Frame>
+                
+                <Frame type="Button" name="Button03">
+                    <Animation name="Show">
+                        <Event event="OnShown" action="Reset,Play" frame="$parent/$parent/InfoPage3"/>
+                        <Event event="OnHidden" action="Reset,Stop" frame="$parent/$parent/InfoPage3"/>
+
+                        <Controller type="Style" end="Pause" style1="BattlenetSmallTabButtonSelected" style2="BattlenetSmallTabButtonSelected" frame="Label">
+                            <Key type="Curve" time="0" value="0"/>
+                        </Controller>
+                    </Animation>
+                </Frame>
+
+                <Frame type="Button" name="Button04">
+                    <Animation name="Show">
+                        <Event event="OnShown" action="Reset,Play" frame="$parent/$parent/InfoPage4"/>
+                        <Event event="OnHidden" action="Reset,Stop" frame="$parent/$parent/InfoPage4"/>
+
+                        <Controller type="Style" end="Pause" style1="BattlenetSmallTabButtonSelected" style2="BattlenetSmallTabButtonSelected" frame="Label">
+                            <Key type="Curve" time="0" value="0"/>
+                        </Controller>
+                    </Animation>
+                </Frame>
+            </Frame>
+
+            <Frame type="Frame" name="InfoPage1" template="CampaignInfoDialog/CampaignInfoTemplate"/>
+            <Frame type="Frame" name="InfoPage2" template="CampaignInfoDialog/CampaignInfoTemplate"/>
+            <Frame type="Frame" name="InfoPage3" template="CampaignInfoDialog/CampaignInfoTemplate"/>
+            <Frame type="Frame" name="InfoPage4" template="CampaignInfoDialog/CampaignInfoTemplate"/>
+
+        </Frame>
+    </Frame>
     
     <!-- 
     
@@ -702,62 +871,210 @@
     
     -->
     
-    <!-- Standard Info Page -->
-    
-    <Frame type="Frame" name="NovaStandardInfoSet" template="CampaignInfoDialog/CampaignInfoTemplate">
+    <!-- NovaDLC1 Info Page -->
+    <Frame type="Frame" name="NovaDLC1InfoSet" template="CampaignInfoDialog/CampaignInfoTemplate">
+        <Anchor relative="$parent"/>
+        <Visible val="False"/>
+
+        <Frame type="Frame" name="Item1">
+
+            <Frame type="Image" name="Thumb">
+                <Texture val="@UI/SC2_UI_Battlenet_Glue_Campaign_Purchase_InfoDialog_Thumb_Nova_MP1_01"/>
+            </Frame>
+
+            <Frame type="Label" name="Title">
+                <Text val="@UI/CampaignPurchase/InfoDialog/Nova/MissionPack1/Item1/Title"/>
+            </Frame>
+
+            <Frame type="Label" name="Description">
+                <Text val="@UI/CampaignPurchase/InfoDialog/Nova/MissionPack1/Item1/Description"/>
+            </Frame>
+        </Frame>
+
+        <Frame type="Frame" name="Item2">
+
+            <Frame type="Image" name="Thumb">
+                <Texture val="@UI/SC2_UI_Battlenet_Glue_Campaign_Purchase_InfoDialog_Thumb_Nova_MP1_02"/>
+            </Frame>
+
+            <Frame type="Label" name="Title">
+                <Text val="@UI/CampaignPurchase/InfoDialog/Nova/MissionPack1/Item2/Title"/>
+            </Frame>
+
+            <Frame type="Label" name="Description">
+                <Text val="@UI/CampaignPurchase/InfoDialog/Nova/MissionPack1/Item2/Description"/>
+            </Frame>
+        </Frame>
+
+        <Frame type="Frame" name="Item3">
+
+            <Frame type="Image" name="Thumb">
+                <Texture val="@UI/SC2_UI_Battlenet_Glue_Campaign_Purchase_InfoDialog_Thumb_Nova_MP1_03"/>
+            </Frame>
+
+            <Frame type="Label" name="Title">
+                <Text val="@UI/CampaignPurchase/InfoDialog/Nova/MissionPack1/Item3/Title"/>
+            </Frame>
+
+            <Frame type="Label" name="Description">
+                <Text val="@UI/CampaignPurchase/InfoDialog/Nova/MissionPack1/Item3/Description"/>
+            </Frame>
+        </Frame>
+    </Frame>
+
+    <!-- NovaDLC2 Info Page -->
+    <Frame type="Frame" name="NovaDLC2InfoSet" template="CampaignInfoDialog/CampaignInfoTemplate">
+        <Anchor relative="$parent"/>
+        <Visible val="False"/>
+
+        <Frame type="Frame" name="Item1">
+
+            <Frame type="Image" name="Thumb">
+                <Texture val="@UI/SC2_UI_Battlenet_Glue_Campaign_Purchase_InfoDialog_Thumb_Nova_MP2_01"/>
+            </Frame>
+
+            <Frame type="Label" name="Title">
+                <Text val="@UI/CampaignPurchase/InfoDialog/Nova/MissionPack2/Item1/Title"/>
+            </Frame>
+
+            <Frame type="Label" name="Description">
+                <Text val="@UI/CampaignPurchase/InfoDialog/Nova/MissionPack2/Item1/Description"/>
+            </Frame>
+        </Frame>
+
+        <Frame type="Frame" name="Item2">
+
+            <Frame type="Image" name="Thumb">
+                <Texture val="@UI/SC2_UI_Battlenet_Glue_Campaign_Purchase_InfoDialog_Thumb_Nova_MP2_02"/>
+            </Frame>
+
+            <Frame type="Label" name="Title">
+                <Text val="@UI/CampaignPurchase/InfoDialog/Nova/MissionPack2/Item2/Title"/>
+            </Frame>
+
+            <Frame type="Label" name="Description">
+                <Text val="@UI/CampaignPurchase/InfoDialog/Nova/MissionPack2/Item2/Description"/>
+            </Frame>
+        </Frame>
+
+        <Frame type="Frame" name="Item3">
+
+            <Frame type="Image" name="Thumb">
+                <Texture val="@UI/SC2_UI_Battlenet_Glue_Campaign_Purchase_InfoDialog_Thumb_Nova_MP2_03"/>
+            </Frame>
+
+            <Frame type="Label" name="Title">
+                <Text val="@UI/CampaignPurchase/InfoDialog/Nova/MissionPack2/Item3/Title"/>
+            </Frame>
+
+            <Frame type="Label" name="Description">
+                <Text val="@UI/CampaignPurchase/InfoDialog/Nova/MissionPack2/Item3/Description"/>
+            </Frame>
+        </Frame>
+    </Frame>
+
+    <!-- NovaDLC3 Info Page -->
+    <Frame type="Frame" name="NovaDLC3InfoSet" template="CampaignInfoDialog/CampaignInfoTemplate">
+        <Anchor relative="$parent"/>
+        <Visible val="False"/>
+
+        <Frame type="Frame" name="Item1">
+
+            <Frame type="Image" name="Thumb">
+                <Texture val="@UI/SC2_UI_Battlenet_Glue_Campaign_Purchase_InfoDialog_Thumb_Nova_MP3_01"/>
+            </Frame>
+
+            <Frame type="Label" name="Title">
+                <Text val="@UI/CampaignPurchase/InfoDialog/Nova/MissionPack3/Item1/Title"/>
+            </Frame>
+
+            <Frame type="Label" name="Description">
+                <Text val="@UI/CampaignPurchase/InfoDialog/Nova/MissionPack3/Item1/Description"/>
+            </Frame>
+        </Frame>
+
+        <Frame type="Frame" name="Item2">
+
+            <Frame type="Image" name="Thumb">
+                <Texture val="@UI/SC2_UI_Battlenet_Glue_Campaign_Purchase_InfoDialog_Thumb_Nova_MP3_02"/>
+            </Frame>
+
+            <Frame type="Label" name="Title">
+                <Text val="@UI/CampaignPurchase/InfoDialog/Nova/MissionPack3/Item2/Title"/>
+            </Frame>
+
+            <Frame type="Label" name="Description">
+                <Text val="@UI/CampaignPurchase/InfoDialog/Nova/MissionPack3/Item2/Description"/>
+            </Frame>
+        </Frame>
+
+        <Frame type="Frame" name="Item3">
+
+            <Frame type="Image" name="Thumb">
+                <Texture val="@UI/SC2_UI_Battlenet_Glue_Campaign_Purchase_InfoDialog_Thumb_Nova_MP3_03"/>
+            </Frame>
+
+            <Frame type="Label" name="Title">
+                <Text val="@UI/CampaignPurchase/InfoDialog/Nova/MissionPack3/Item3/Title"/>
+            </Frame>
+
+            <Frame type="Label" name="Description">
+                <Text val="@UI/CampaignPurchase/InfoDialog/Nova/MissionPack3/Item3/Description"/>
+            </Frame>
+        </Frame>
+    </Frame>
+
+    <!-- Nova Bundle Info Page-->
+    <Frame type="Frame" name="NovaBundleInfoSet" template="CampaignInfoDialog/CampaignInfoTemplate">
         <Anchor relative="$parent"/>
         <Visible val="False"/>
         
         <Frame type="Frame" name="Item1">
-        
             <Frame type="Image" name="Thumb">
-                <Texture val="@UI/SC2_UI_Battlenet_Glue_Campaign_Purchase_InfoDialog_Thumb_Nova_Standard_01"/>
+                <Texture val="@UI/SC2_UI_Battlenet_Glue_Campaign_Purchase_InfoDialog_Thumb_Nova_Bundle_01"/>
             </Frame>
             
             <Frame type="Label" name="Title">
-                <Text val="@UI/CampaignPurchase/InfoDialog/Nova/Standard/Item1/Title"/>
+                <Text val="@UI/CampaignPurchase/InfoDialog/Nova/MissionBundle/Item1/Title"/>
             </Frame>
             
             <Frame type="Label" name="Description">
-                <Text val="@UI/CampaignPurchase/InfoDialog/Nova/Standard/Item1/Description"/>
+                <Text val="@UI/CampaignPurchase/InfoDialog/Nova/MissionBundle/Item1/Description"/>
             </Frame>
         </Frame>
         
         <Frame type="Frame" name="Item2">
-            
             <Frame type="Image" name="Thumb">
-                <Texture val="@UI/SC2_UI_Battlenet_Glue_Campaign_Purchase_InfoDialog_Thumb_Nova_Standard_02"/>
+                <Texture val="@UI/SC2_UI_Battlenet_Glue_Campaign_Purchase_InfoDialog_Thumb_Nova_Bundle_02"/>
             </Frame>
             
             <Frame type="Label" name="Title">
-                <Text val="@UI/CampaignPurchase/InfoDialog/Nova/Standard/Item2/Title"/>
+                <Text val="@UI/CampaignPurchase/InfoDialog/Nova/MissionBundle/Item2/Title"/>
             </Frame>
             
             <Frame type="Label" name="Description">
-                <Text val="@UI/CampaignPurchase/InfoDialog/Nova/Standard/Item2/Description"/>
+                <Text val="@UI/CampaignPurchase/InfoDialog/Nova/MissionBundle/Item2/Description"/>
             </Frame>
         </Frame>
         
         <Frame type="Frame" name="Item3">
-        
             <Frame type="Image" name="Thumb">
-                <Texture val="@UI/SC2_UI_Battlenet_Glue_Campaign_Purchase_InfoDialog_Thumb_Nova_Standard_03"/>
+                <Texture val="@UI/SC2_UI_Battlenet_Glue_Campaign_Purchase_InfoDialog_Thumb_Nova_Bundle_03"/>
             </Frame>
             
             <Frame type="Label" name="Title">
-                <Text val="@UI/CampaignPurchase/InfoDialog/Nova/Standard/Item3/Title"/>
+                <Text val="@UI/CampaignPurchase/InfoDialog/Nova/MissionBundle/Item3/Title"/>
             </Frame>
             
             <Frame type="Label" name="Description">
-                <Text val="@UI/CampaignPurchase/InfoDialog/Nova/Standard/Item3/Description"/>
+                <Text val="@UI/CampaignPurchase/InfoDialog/Nova/MissionBundle/Item3/Description"/>
             </Frame>
         </Frame>
     </Frame>
     
-    <!-- Main Info Page -->
+    <!-- Nova DLC Plus Bundle Main Info Page -->
     
-    <Frame type="Frame" name="NovaCovertOpsInfo" template="CampaignInfoDialog/CampaignInfoContainerTemplate">
-        
+    <Frame type="Frame" name="NovaCovertOpsAndBundleInfo" template="CampaignInfoDialog/CampaignInfoContainer4ButtonTemplate">
         <Frame type="Label" name="TitleLabel">
             <Text val="@UI/CampaignPurchase/InfoDialog/Nova/Title"/>
         </Frame>
@@ -767,17 +1084,62 @@
         </Frame>
         
         <Frame type="TabControl" name="InfoTabController">
-        
             <Frame type="Frame" name="PageButtonsContainer">
-                <Visible val="False"/>
+                <Frame type="Button" name="Button01">
+                    <Text val="@UI/CampaignPurchase/Bundle"/>
+                </Frame>
+                
+                <Frame type="Button" name="Button02">
+                    <Text val="@UI/CampaignPurchase/Pack1"/>
+                </Frame>
+                
+                <Frame type="Button" name="Button03">
+                    <Text val="@UI/CampaignPurchase/Pack2"/>
+                </Frame>
+                
+                <Frame type="Button" name="Button04">
+                    <Text val="@UI/CampaignPurchase/Pack3"/>
+                </Frame>
             </Frame>
-            
-            <Frame type="Frame" name="InfoPage1" template="CampaignInfoDialog/NovaStandardInfoSet"/>
+
+            <Frame type="Frame" name="InfoPage1" template="CampaignInfoDialog/NovaBundleInfoSet"/>
+            <Frame type="Frame" name="InfoPage2" template="CampaignInfoDialog/NovaDLC1InfoSet"/>
+            <Frame type="Frame" name="InfoPage3" template="CampaignInfoDialog/NovaDLC2InfoSet"/>
+            <Frame type="Frame" name="InfoPage4" template="CampaignInfoDialog/NovaDLC3InfoSet"/>
         </Frame>
     </Frame>
 
-    
-    
+    <!-- Nova A la carte Info Page -->
+    <Frame type="Frame" name="NovaCovertOpsInfo" template="CampaignInfoDialog/CampaignInfoContainer3ButtonTemplate">
+        <Frame type="Label" name="TitleLabel">
+            <Text val="@UI/CampaignPurchase/InfoDialog/Nova/Title"/>
+        </Frame>
+
+        <Frame type="Image" name="Logo">
+            <Texture val="@UI/SC2_UI_Battlenet_Glue_Campaign_Purchase_InfoDialog_Logo_Nova"/>
+        </Frame>
+
+        <Frame type="TabControl" name="InfoTabController">
+            <Frame type="Frame" name="PageButtonsContainer">
+                <Frame type="Button" name="Button01">
+                    <Text val="@UI/CampaignPurchase/Pack1"/>
+                </Frame>
+
+                <Frame type="Button" name="Button02">
+                    <Text val="@UI/CampaignPurchase/Pack2"/>
+                </Frame>
+
+                <Frame type="Button" name="Button03">
+                    <Text val="@UI/CampaignPurchase/Pack3"/>
+                </Frame>
+            </Frame>
+
+            <Frame type="Frame" name="InfoPage1" template="CampaignInfoDialog/NovaDLC1InfoSet"/>
+            <Frame type="Frame" name="InfoPage2" template="CampaignInfoDialog/NovaDLC2InfoSet"/>
+            <Frame type="Frame" name="InfoPage3" template="CampaignInfoDialog/NovaDLC3InfoSet"/>
+        </Frame>
+    </Frame>
+
     <!--
     
     
@@ -790,6 +1152,29 @@
         <Anchor relative="$parent"/>
         <VisibilityOnFade val="true"/>
         <AcceptsMouse val="true"/>
+        
+        <Frame type="Image" name="Blackout">
+            <Anchor relative="$parent"/>
+            <LayerColor val="000000"/>
+            <Alpha val="170"/>
+    
+            <Animation name="DialogAnimation">
+                <Event event="OnShown" action="DirectionForward" frame="$parent"/>
+                <Event event="OnShown" action="Play" frame="$parent"/>
+                <Event event="DialogDismissed" action="DirectionReverse" frame="$parent"/>
+                <Event event="DialogDismissed" action="Play" frame="$parent"/>
+                
+                <Controller type="Anchor" end="Pause" side="Top" relative="true">
+                    <Key type="Curve" time="0" value="-20" out="Slow"/>
+                    <Key type="Curve" time=".2" value="0" in="Slow"/>
+                </Controller>
+                
+                <Controller type="Anchor" end="Pause" side="Bottom" relative="true">
+                    <Key type="Curve" time="0" value="40" out="Slow"/>
+                    <Key type="Curve" time=".2" value="0" in="Slow"/>
+                </Controller>
+            </Animation>
+        </Frame>
         
         <Frame type="BlurFrame" name="BackgroundFrameBlur">
             <Anchor side="Top" relative="$parent/BackgroundFrame" pos="Min" offset="13"/>
@@ -806,6 +1191,21 @@
             </Animation>
         </Frame>
         
+        <Frame type="Image" name="LeftBGGlowPattern">
+            <Anchor side="Top" relative="$parent/BackgroundFrame" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent/BackgroundFrame" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent/BackgroundFrame" pos="Min" offset="10"/>
+            <Texture val="@UI/Glues_Battlenet_DialogBox_BackGlow"/>
+        </Frame>
+
+        <Frame type="Image" name="RightBGGlowPattern">
+            <Anchor side="Top" relative="$parent/BackgroundFrame" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent/BackgroundFrame" pos="Mid" offset="0"/>
+            <Anchor side="Left" relative="$parent/BackgroundFrame" pos="Max" offset="-10"/>
+            <Texture val="@UI/Glues_Battlenet_DialogBox_BackGlow"/>
+            <TextureCoords top="0.0" left="1.0" bottom="1.0" right="0.0"/>
+        </Frame>
+
         <Frame type="Frame" name="BackgroundFrame" template="StandardTemplates/GlueDialogTemplate">
             <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
             <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
@@ -814,138 +1214,90 @@
             <Height val="860"/>
             <Width val="1270"/>
         </Frame>
-        
-        
-        <Frame type="Frame" name="WingsofLibertyInfo" template="CampaignInfoDialog/LibertyInfo"/>
-        
-        <Frame type="Frame" name="HeartoftheSwarmInfo" template="CampaignInfoDialog/SwarmInfo"/>
-        
-        <Frame type="Frame" name="LegacyoftheVoidInfo" template="CampaignInfoDialog/VoidInfo"/>
-        
-        <Frame type="Frame" name="CompleteEditionInfo" template="CampaignInfoDialog/CompleteInfo"/>
-        
-        <Frame type="Frame" name="NovaCovertOpsInfo" template="CampaignInfoDialog/NovaCovertOpsInfo"/>
-        
-        
-        <Animation name="Liberty">
-            <Event event="WingsOfLiberty" action="Reset,Play"/>
-            
-            <Controller type="Visibility" end="Pause" frame="LegacyoftheVoidInfo">
-                <Key type="Bool" time="0" value="False"/>
-            </Controller>
-            
-            <Controller type="Visibility" end="Pause" frame="WingsofLibertyInfo">
-                <Key type="Bool" time="0" value="True"/>
-            </Controller>
-            
-            <Controller type="Visibility" end="Pause" frame="HeartoftheSwarmInfo">
-                <Key type="Bool" time="0" value="False"/>
-            </Controller>
-            
-            <Controller type="Visibility" end="Pause" frame="CompleteEditionInfo">
-                <Key type="Bool" time="0" value="False"/>
-            </Controller>
-            
-            <Controller type="Visibility" end="Pause" frame="NovaCovertOpsInfo">
-                <Key type="Bool" time="0" value="False"/>
-            </Controller>
-        </Animation>
-        
-        <Animation name="Swarm">
-            <Event event="HeartOfTheSwarm" action="Reset,Play"/>
-             
-            <Controller type="Visibility" end="Pause" frame="LegacyoftheVoidInfo">
-                <Key type="Bool" time="0" value="False"/>
-            </Controller>
-            
-            <Controller type="Visibility" end="Pause" frame="WingsofLibertyInfo">
-                <Key type="Bool" time="0" value="False"/>
-            </Controller>
-            
-            <Controller type="Visibility" end="Pause" frame="HeartoftheSwarmInfo">
-                <Key type="Bool" time="0" value="True"/>
-            </Controller>
-            
-            <Controller type="Visibility" end="Pause" frame="CompleteEditionInfo">
-                <Key type="Bool" time="0" value="False"/>
-            </Controller>
-            
-            <Controller type="Visibility" end="Pause" frame="NovaCovertOpsInfo">
-                <Key type="Bool" time="0" value="False"/>
-            </Controller>
-        </Animation>
-        
-        <Animation name="Void">
-            <Event event="LegacyOfTheVoid" action="Reset,Play"/>
-            
-            <Controller type="Visibility" end="Pause" frame="LegacyoftheVoidInfo">
-                <Key type="Bool" time="0" value="True"/>
-            </Controller>
-            
-            <Controller type="Visibility" end="Pause" frame="WingsofLibertyInfo">
-                <Key type="Bool" time="0" value="False"/>
-            </Controller>
-            
-            <Controller type="Visibility" end="Pause" frame="HeartoftheSwarmInfo">
-                <Key type="Bool" time="0" value="False"/>
-            </Controller>
-            
-            <Controller type="Visibility" end="Pause" frame="CompleteEditionInfo">
-                <Key type="Bool" time="0" value="False"/>
-            </Controller>
-            
-            <Controller type="Visibility" end="Pause" frame="NovaCovertOpsInfo">
-                <Key type="Bool" time="0" value="False"/>
-            </Controller>
-        </Animation>
-        
-        <Animation name="Complete">
-            <Event event="CompleteEdition" action="Reset,Play"/>
-            
-            <Controller type="Visibility" end="Pause" frame="LegacyoftheVoidInfo">
-                <Key type="Bool" time="0" value="False"/>
-            </Controller>
-            
-            <Controller type="Visibility" end="Pause" frame="WingsofLibertyInfo">
-                <Key type="Bool" time="0" value="False"/>
-            </Controller>
-            
-            <Controller type="Visibility" end="Pause" frame="HeartoftheSwarmInfo">
-                <Key type="Bool" time="0" value="False"/>
-            </Controller>
-            
-            <Controller type="Visibility" end="Pause" frame="CompleteEditionInfo">
-                <Key type="Bool" time="0" value="True"/>
-            </Controller>
-            
-            <Controller type="Visibility" end="Pause" frame="NovaCovertOpsInfo">
-                <Key type="Bool" time="0" value="False"/>
-            </Controller>
-        </Animation>
-        
-        <Animation name="Nova">
-            <Event event="NovasAwesomeDay" action="Reset,Play"/>
-            
-            <Controller type="Visibility" end="Pause" frame="LegacyoftheVoidInfo">
-                <Key type="Bool" time="0" value="False"/>
-            </Controller>
-            
-            <Controller type="Visibility" end="Pause" frame="WingsofLibertyInfo">
-                <Key type="Bool" time="0" value="False"/>
-            </Controller>
-            
-            <Controller type="Visibility" end="Pause" frame="HeartoftheSwarmInfo">
-                <Key type="Bool" time="0" value="False"/>
-            </Controller>
-            
-            <Controller type="Visibility" end="Pause" frame="CompleteEditionInfo">
-                <Key type="Bool" time="0" value="False"/>
-            </Controller>
-            
-            <Controller type="Visibility" end="Pause" frame="NovaCovertOpsInfo">
-                <Key type="Bool" time="0" value="True"/>
-            </Controller>
-        </Animation>
+
+
+        <Frame type="Frame" name="WingsofLibertyInfo" template="CampaignInfoDialog/LibertyInfo">
+            <Visible val="false"/>
+        </Frame>
+
+        <Frame type="Frame" name="HeartoftheSwarmInfo" template="CampaignInfoDialog/SwarmInfo">
+            <Visible val="false"/>
+        </Frame>
+
+        <Frame type="Frame" name="LegacyoftheVoidInfo" template="CampaignInfoDialog/VoidInfo">
+            <Visible val="false"/>
+        </Frame>
+
+        <Frame type="Frame" name="CompleteEditionInfo" template="CampaignInfoDialog/CompleteInfo">
+            <Visible val="false"/>
+        </Frame>
+
+        <Frame type="Frame" name="NovaCovertOpsAndBundleInfo" template="CampaignInfoDialog/NovaCovertOpsAndBundleInfo">
+            <Visible val="false"/>
+        </Frame>
+
+        <Frame type="Frame" name="NovaCovertOpsInfo" template="CampaignInfoDialog/NovaCovertOpsInfo">
+            <Visible val="false"/>
+        </Frame>
+
+        <StateGroup name="InfoVisibility">
+            <State name="Liberty">
+                <When type="AnimationState" SelectedCampaign="WingsOfLiberty" />
+                <Action type="SetProperty" frame="WingsofLibertyInfo" visible="true"/>
+            </State>
+
+            <State name="Swarm">
+                <When type="AnimationState" SelectedCampaign="HeartOfTheSwarm" />
+                <Action type="SetProperty" frame="HeartoftheSwarmInfo" visible="true"/>
+            </State>
+
+            <State name="Void">
+                <When type="AnimationState" SelectedCampaign="LegacyOfTheVoid" />
+                <Action type="SetProperty" frame="LegacyoftheVoidInfo" visible="true"/>
+            </State>
+
+            <State name="CompleteEdition">
+                <When type="AnimationState" SelectedCampaign="CompleteEdition" />
+                <Action type="SetProperty" frame="CompleteEditionInfo" visible="true"/>
+            </State>
+
+            <State name="NovaDLC1Bundle">
+                <When type="AnimationState" SelectedCampaign="NovaDLC1" />
+                <When type="AnimationState" ProductType="MissionBundle" />
+                <Action type="SetProperty" frame="NovaCovertOpsAndBundleInfo" visible="true"/>
+                <Action type="SetProperty" frame="NovaCovertOpsAndBundleInfo/InfoTabController" SelectedIndex="0"/>
+            </State>
+
+            <State name="NovaDLC1">
+                <When type="AnimationState" SelectedCampaign="NovaDLC1" />
+                <Action type="SetProperty" frame="NovaCovertOpsAndBundleInfo" visible="true"/>
+                <Action type="SetProperty" frame="NovaCovertOpsAndBundleInfo/InfoTabController" SelectedIndex="1"/>
+            </State>
+
+            <State name="NovaDLC1NoBundle">
+                <When type="AnimationState" SelectedCampaign="NovaDLC1NoBundle" />
+                <Action type="SetProperty" frame="NovaCovertOpsInfo" visible="true"/>
+                <Action type="SetProperty" frame="NovaCovertOpsInfo/InfoTabController" SelectedIndex="0"/>
+            </State>
+
+            <State name="NovaDLC2">
+                <When type="AnimationState" SelectedCampaign="NovaDLC2" />
+                <Action type="SetProperty" frame="NovaCovertOpsInfo" visible="true"/>
+                <Action type="SetProperty" frame="NovaCovertOpsInfo/InfoTabController" SelectedIndex="1"/>
+            </State>
+
+            <State name="NovaDLC3">
+                <When type="AnimationState" SelectedCampaign="NovaDLC3" />
+                <Action type="SetProperty" frame="NovaCovertOpsInfo" visible="true"/>
+                <Action type="SetProperty" frame="NovaCovertOpsInfo/InfoTabController" SelectedIndex="2"/>
+            </State>
+
+            <State name="NovaDLCBundle">
+                <When type="AnimationState" SelectedCampaign="NovaDLCBundle" />
+                <Action type="SetProperty" frame="NovaCovertOpsAndBundleInfo" visible="true"/>
+                <Action type="SetProperty" frame="NovaCovertOpsAndBundleInfo/InfoTabController" SelectedIndex="0"/>
+            </State>
+        </StateGroup>
 
         <Frame type="Button" name="CloseButton" template="StandardBattlenetTemplates/BattlenetStandardButtonTemplate">
             <Anchor side="Bottom" relative="$parent/BackgroundFrame" pos="Max" offset="-42"/>
@@ -962,3 +1314,4 @@
         </Frame>
     </Frame>
 </Desc>
+

@@ -153,22 +153,38 @@
 
     <Frame type="CampaignSelectionPanel" name="CampaignSelectionPanel">
         
-        <!-- Events used in this Frame
-            ShowChallengePanel
-            HideChallengePanel
-            
-            ShowSelected
-            HideSelection
-            HideSubSelection
+        <!-- AnimationStates used in this frame
+            Selected - used to set filters in the SelectedCutscene
+                SelectNone
+                SelectLiberty
+                SelectSwarm
+                SelectVoid
+                SelectNovaDLC
+                
+            CampaignPanel - used to control ForegroundFrame visibility and SelectedFrame
+                CampaignPanel
+                CampaignSelection
+                ChallengePanel
+                CampaignSubPanel
+                
+            CutsceneLoad - comes from CCutsceneFrame, used to signal when a cutscene is loading/has been loaded
+                Loading
+                Loaded
 
-            SelectLiberty           - used to set filters in the SelectedCutscene
-            SelectSwarm             - used to set filters in the SelectedCutscene
-            SelectVoid              - used to set filters in the SelectedCutscene
-            
+            AnimationEvents used in this frame
+
             ShowCampaignHintLiberty 
             ShowCampaignHintSwarm
             ShowCampaignHintVoid
             HideCampaignHint
+            
+            RaynorBounds
+            KerriganBounds
+            ArtanisBounds
+            NovaBounds
+            
+            CampaginSelectionEntering
+            CampaginSelectionReturning
         -->
         
         <Frame type="Frame" name="BackgroundFrame">
@@ -342,11 +358,11 @@
                 <RenderType val="LDR"/>
                 
                 <Frame type="Label" name="ProgressText">
-                    <Visible val="False"/>
+                    <Visible val="True"/>
                 </Frame>
                 
                 <Frame type="Label" name="PurchaseText">
-                    <Visible val="True"/>
+                    <Visible val="False"/>
                 </Frame>
                 
                 <Animation name="SetExpansion">
@@ -357,40 +373,37 @@
                         <Key type="Event" time="0" event="Nova"/>
                     </Controller>
                 </Animation>
-                
-                <Animation name="NotPurchased">
-                    <Event event="NotPurchased" action="Reset,Play"/>
-                     
-                    <Controller type="Text" end="Pause" frame="PurchaseText">
-                        <Key type="Text" time="0" text="@UI/CampaignPurchase/FloatingNotPurchased"/>
-                    </Controller>
-                </Animation>
-                
-                <Animation name="Purchased">
-                    <Event event="Purchased" action="Reset,Play"/>
-                     
-                    <Controller type="Text" end="Pause" frame="PurchaseText">
-                        <Key type="Text" time="0" text="@UI/CampaignPurchase/FloatingPurchased"/>
-                    </Controller>
-                </Animation>
+
+                <StateGroup name="NovaLabel">
+                    <DefaultState val="Purchased" />
+
+                    <State name="NotPurchased">
+                        <When type="AnimationState" frame="$parent/$parent" NovaLabelState="NovaLabelStateNotPurchased"/>
+                        <Action type="SetProperty" frame="PurchaseText" visible="True"/>
+                        <Action type="SetProperty" frame="PurchaseText" text="@UI/CampaignPurchase/FloatingNotPurchased"/>
+                        <Action type="SetProperty" frame="ProgressText" visible="False"/>
+                    </State>
+
+                    <State name="PurchasedNotCelebrated">
+                        <When type="AnimationState" frame="$parent/$parent" NovaLabelState="NovaLabelStatePurchasedNotCelebrated"/>
+                        <Action type="SetProperty" frame="PurchaseText" visible="True"/>
+                        <Action type="SetProperty" frame="PurchaseText" text="@UI/CampaignPurchase/ReadyToPlay"/>
+                        <Action type="SetProperty" frame="ProgressText" visible="False"/>
+                    </State>
+
+                    <State name="Purchased">
+                        <Action type="SetProperty" frame="PurchaseText" visible="False"/>
+                        <Action type="SetProperty" frame="ProgressText" visible="True"/>
+                    </State>
+                </StateGroup>
 
                 <Frame type="Label" name="EpisodeNumber">
                     <Text val="@UI/MissionPackNova"/>
                 </Frame>
             </Frame>
 
-            <Animation name="ForegroundVisibility">
-                <Event event="HideSelected" action="DirectionForward,Play" frame="$parent"/>
-                <Event event="ShowSelected" action="DirectionReverse,Play" frame="$parent"/>
-
-                <Controller type="Visibility" end="Pause">
-                    <Key type="Bool" time="0" value="False"/>
-                    <Key type="Bool" time=".01" value="True"/>
-                </Controller>
-            </Animation>
-
             <Animation name="SelectNone">
-                <Event event="ForegroundSelectNone" action="Reset,Play" frame="$parent"/>
+                <Event event="SelectNone" action="Reset,Play" frame="$parent"/>
                 <Event event="OnMouseExit" action="Reset,Play" frame="FloatingContainer_Liberty"/>
                 <Event event="OnMouseExit" action="Reset,Play" frame="FloatingContainer_Void"/>
                 <Event event="OnMouseExit" action="Reset,Play" frame="FloatingContainer_Swarm"/>
@@ -409,7 +422,7 @@
                 </Controller>
 
                 <Controller type="Cutscene" end="Stop" frame="$this/ForegroundCutsceneFrame">
-                    <Key type="Cutscene" action="RemoveFilter" time="0.0" filter="NovaPre"/>
+                    <Key type="Cutscene" action="RemoveFilter" time="0.0" filter="dlc"/>
                 </Controller>
 
                 <Controller type="Event" end="Stop" frame="FloatingContainer_Liberty">
@@ -446,7 +459,7 @@
                 </Controller>
 
                 <Controller type="Cutscene" end="Stop" frame="$this/ForegroundCutsceneFrame">
-                    <Key type="Cutscene" action="RemoveFilter" time="0.0" filter="NovaPre"/>
+                    <Key type="Cutscene" action="RemoveFilter" time="0.0" filter="dlc"/>
                 </Controller>
                 
                 <Controller type="Event" end="Stop" frame="FloatingContainer_Liberty">
@@ -475,7 +488,7 @@
                 </Controller>
 
                 <Controller type="Cutscene" end="Stop" frame="$this/ForegroundCutsceneFrame">
-                    <Key type="Cutscene" action="RemoveFilter" time="0.0" filter="NovaPre"/>
+                    <Key type="Cutscene" action="RemoveFilter" time="0.0" filter="dlc"/>
                 </Controller>
                 
                 <Controller type="Event" end="Stop" frame="FloatingContainer_Swarm">
@@ -504,7 +517,7 @@
                 </Controller>
 
                 <Controller type="Cutscene" end="Stop" frame="$this/ForegroundCutsceneFrame">
-                    <Key type="Cutscene" action="RemoveFilter" time="0.0" filter="NovaPre"/>
+                    <Key type="Cutscene" action="RemoveFilter" time="0.0" filter="dlc"/>
                 </Controller>
                 
                 <Controller type="Event" end="Stop" frame="FloatingContainer_Void">
@@ -533,7 +546,7 @@
                 </Controller>
 
                 <Controller type="Cutscene" end="Stop" frame="$this/ForegroundCutsceneFrame">
-                    <Key type="Cutscene" action="AddFilter" time="0.0" filter="NovaPre"/>
+                    <Key type="Cutscene" action="AddFilter" time="0.0" filter="dlc"/>
                 </Controller>
                 
                 <Controller type="Event" end="Stop" frame="FloatingContainer_Nova">
@@ -544,6 +557,19 @@
                     <Key type="Sound" time="0" sound="*@C_UI_CampaignPanel_UnitHoverRSound"/>
                 </Controller>
             </Animation>
+
+            <StateGroup name="ForegroundVisibility">
+                <DefaultState val="ForegroundNotVisible"/>
+
+                <State name="ForegroundVisible">
+                    <When type="AnimationState" frame="$parent" CampaignPanel="CampaignSelection"/>
+                    <Action type="SetProperty" frame="$this" visible="True"/>
+                </State>
+
+                <State name="ForegroundNotVisible">
+                    <Action type="SetProperty" frame="$this" visible="False"/>
+                </State>
+            </StateGroup>
         </Frame>
 
         <Frame type="CampaignPanel" name="CampaignPanel" template="CampaignPanel/CampaignPanel">
@@ -552,6 +578,24 @@
             <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
             <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
             <Visible val="False"/>
+
+            <StateGroup name="CampaignPanelVisibility">
+                <DefaultState val="CampaignPanelNotVisible"/>
+
+                <State name="CampaignPanelVisible">
+                    <When type="AnimationState" frame="$parent" CampaignPanel="CampaignPanel"/>
+                    <Action type="SetProperty" frame="$this" visible="True"/>
+                </State>
+
+                <State name="CampaignSubPanelVisible">
+                    <When type="AnimationState" frame="$parent" CampaignPanel="CampaignSubPanel"/>
+                    <Action type="SetProperty" frame="$this" visible="True"/>
+                </State>
+
+                <State name="CampaignPanelNotVisible">
+                    <Action type="SetProperty" frame="$this" visible="False"/>
+                </State>
+            </StateGroup>
         </Frame>
 
         <Frame type="ChallengePanel" name="ChallengePanel" template="ChallengePanel/ChallengePanel">
@@ -561,16 +605,20 @@
             <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
             <Visible val="False"/>
 
-            <Animation name="ChallengePanelVisibility">
-                <Event event="ShowChallengePanel" action="Reset,Play" frame="$parent"/>
-                <Event event="HideChallengePanel" action="Reset" frame="$parent"/>
+            <StateGroup name="ChallengePanelVisibility">
+                <DefaultState val="ChallengePanelNotVisible"/>
 
-                <Controller type="Visibility" end="Pause">
-                    <Key type="Bool" time="0" value="True"/>
-                </Controller>
-            </Animation>
+                <State name="ChallengePanelVisible">
+                    <When type="AnimationState" frame="$parent" CampaignPanel="ChallengePanel"/>
+                    <Action type="SetProperty" frame="$this" visible="True"/>
+                </State>
+
+                <State name="ChallengePanelNotVisible">
+                    <Action type="SetProperty" frame="$this" visible="False"/>
+                </State>
+            </StateGroup>
         </Frame>
-        
+
         <Frame type="AspectRatioFrame" name="Liberty_16x10Anchor">
             <Anchor side="Top" relative="$parent" pos="Min" offset="100"/>
             <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
@@ -746,16 +794,7 @@
             <Text val="@UI/BuyCompleteCollection"/>
             <ShowPrice val="false"/>
             <CampaignLink val="CompleteEdition"/>
-            <Visible val="false"/>
-
-            <Animation name="SelectedVisibility">
-                <Event event="HideSelected" action="Reset,Play" frame="$parent"/>
-                <Event event="ShowSelected" action="Reset" frame="$parent"/>
-
-                <Controller type="Visibility" end="Pause">
-                    <Key type="Bool" time="0" value="true"/>
-                </Controller>
-            </Animation>
+            <Visible val="False"/>
 
             <Animation name="HideTrilogyHighlight">
                 <Event event="OnMouseExit" action="Reset,Play"/>
@@ -766,20 +805,33 @@
             </Animation>
 
             <Animation name="ShowTrilogyHighlight">
-                <Event event="OnMouseEnter" action="Reset,Play"/>
+            <Event event="OnMouseEnter" action="Reset,Play"/>
 
-                <Controller type="Cutscene" end="Stop" frame="$parent/ForegroundFrame/ForegroundCutsceneFrame">
-                    <Key type="Cutscene" action="AddFilter" time="0.0" filter="PurchaseAllCampaigns"/>
-                </Controller>
+            <Controller type="Cutscene" end="Stop" frame="$parent/ForegroundFrame/ForegroundCutsceneFrame">
+                <Key type="Cutscene" action="AddFilter" time="0.0" filter="PurchaseAllCampaigns"/>
+            </Controller>
 
-                <Controller type="Sound" end="Stop">
-                    <Key type="Sound" time="0" sound="*@C_UI_CampaignPanel_BuyAllCampaignsButtonHoverSound"/>
-                </Controller>
+            <Controller type="Sound" end="Stop">
+                <Key type="Sound" time="0" sound="*@C_UI_CampaignPanel_BuyAllCampaignsButtonHoverSound"/>
+            </Controller>
 
-                <!-- <Controller type="Sound" end="Stop">
-                    <Key type="Sound" time="0" sound="@C_UI_CampaignPanel_SpotlightLoop"/> 
-                </Controller> looping sounds won't stop -->
+            <!-- <Controller type="Sound" end="Stop">
+                <Key type="Sound" time="0" sound="@C_UI_CampaignPanel_SpotlightLoop"/> 
+            </Controller> looping sounds won't stop -->
             </Animation>
+                
+            <StateGroup name="CampaignBuyButtonVisibility">
+                <DefaultState val="CampaignBuyButtonNotVisible"/>
+
+                <State name="CampaignBuyButtonVisible">
+                    <When type="AnimationState" frame="$parent" CampaignPanel="CampaignSelection"/>
+                    <Action type="SetProperty" frame="$this" visible="True"/>
+                </State>
+
+                <State name="CampaignBuyButtonNotVisible">
+                    <Action type="SetProperty" frame="$this" visible="False"/>
+                </State>
+            </StateGroup>
         </Frame>
 
         <Frame type="Frame" name="SelectedFrame">
@@ -812,16 +864,6 @@
                 <Alpha val="255"/>
             </Frame>
 
-            <Animation name="SelectedVisibility">
-                <Event event="HideSelected" action="DirectionForward,Play" frame="$parent"/>
-                <Event event="ShowSelected" action="DirectionReverse,Play" frame="$parent"/>
-
-                <Controller type="Visibility" end="Pause">
-                    <Key type="Bool" time="0" value="True"/>
-                    <Key type="Bool" time=".01" value="False"/>
-                </Controller>
-            </Animation>
-
             <Animation name="ShowLiberty">
                 <Event event="SelectLiberty" action="Reset,Play" frame="$parent"/>
 
@@ -838,7 +880,11 @@
                 </Controller>
 
                 <Controller type="Cutscene" end="Stop" frame="$this/SelectedCutsceneFrame">
-                    <Key type="Cutscene" action="RemoveFilter" time="0.0" filter="NovaPre"/>
+                    <Key type="Cutscene" action="RemoveFilter" time="0.0" filter="Nova"/>
+                </Controller>
+
+                <Controller type="Cutscene" end="Stop" frame="$this/SelectedCutsceneFrame">
+                    <Key type="Cutscene" action="RemoveFilter" time="0.0" filter="dlc"/>
                 </Controller>
             </Animation>
 
@@ -858,7 +904,11 @@
                 </Controller>
 
                 <Controller type="Cutscene" end="Stop" frame="$this/SelectedCutsceneFrame">
-                    <Key type="Cutscene" action="RemoveFilter" time="0.0" filter="NovaPre"/>
+                    <Key type="Cutscene" action="RemoveFilter" time="0.0" filter="Nova"/>
+                </Controller>
+
+                <Controller type="Cutscene" end="Stop" frame="$this/SelectedCutsceneFrame">
+                    <Key type="Cutscene" action="RemoveFilter" time="0.0" filter="dlc"/>
                 </Controller>
             </Animation>
 
@@ -878,10 +928,13 @@
                 </Controller>
 
                 <Controller type="Cutscene" end="Stop" frame="$this/SelectedCutsceneFrame">
-                    <Key type="Cutscene" action="RemoveFilter" time="0.0" filter="NovaPre"/>
+                    <Key type="Cutscene" action="RemoveFilter" time="0.0" filter="Nova"/>
+                </Controller>
+
+                <Controller type="Cutscene" end="Stop" frame="$this/SelectedCutsceneFrame">
+                    <Key type="Cutscene" action="RemoveFilter" time="0.0" filter="dlc"/>
                 </Controller>
             </Animation>
-
 
             <Animation name="ShowNovaDLC">
                 <Event event="SelectNovaDLC" action="Reset,Play" frame="$parent"/>
@@ -899,9 +952,39 @@
                 </Controller>
 
                 <Controller type="Cutscene" end="Stop" frame="$this/SelectedCutsceneFrame">
-                    <Key type="Cutscene" action="AddFilter" time="0.0" filter="NovaPre"/>
+                    <Key type="Cutscene" action="AddFilter" time="0.0" filter="Nova"/>
+                </Controller>
+
+                <Controller type="Cutscene" end="Stop" frame="$this/SelectedCutsceneFrame">
+                    <Key type="Cutscene" action="AddFilter" time="0.0" filter="dlc"/>
                 </Controller>
             </Animation>
+
+            <Animation name="PlayNovaPurchaseCelebration">
+                <Event event="PlayNovaPurchaseCelebration" action="Reset,Play" frame="$parent"/>
+
+                <Controller type="Cutscene" end="Stop" frame="$this/SelectedCutsceneFrame">
+                    <Key type="Cutscene" action="Bookmark" time="0.0" bookmark="CameraStart"/>
+                </Controller>
+            </Animation>
+
+            <StateGroup name="SelectedVisibility">
+                <DefaultState val="SelectedNotVisible"/>
+
+                <State name="SelectedVisibleCampaignPanel">
+                    <When type="AnimationState" frame="$parent" CampaignPanel="CampaignPanel"/>
+                    <Action type="SetProperty" frame="$this" visible="True"/>
+                </State>
+
+                <State name="SelectedVisibleCampaignSubPanel">
+                    <When type="AnimationState" frame="$parent" CampaignPanel="CampaignSubPanel"/>
+                    <Action type="SetProperty" frame="$this" visible="True"/>
+                </State>
+
+                <State name="SelectedNotVisible">
+                    <Action type="SetProperty" frame="$this" visible="False"/>
+                </State>
+            </StateGroup>
         </Frame>
     </Frame>
 </Desc>

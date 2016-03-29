@@ -178,18 +178,45 @@
             <Anchor side="Bottom" relative="$parent/CheckBox" pos="Mid" offset="1"/>
             <Anchor side="Left" relative="$parent/CheckBox" pos="Max" offset="11"/>
             <Style val="@Campaign_PurchaseCurrency"/>
-            <CollapseLayout val="true"/>
         </Frame>
-        
-        <Frame type="Label" name="PriceLabel">
+
+        <Frame type="Label" name="OriginalPriceLabel">
             <Anchor side="Top" relative="$parent/CurrencyLabel" pos="Mid" offset="0"/>
             <Anchor side="Bottom" relative="$parent/CurrencyLabel" pos="Mid" offset="0"/>
             <Anchor side="Left" relative="$parent/CurrencyLabel" pos="Max" offset="0"/>
+            <Style val="@Campaign_OriginalPurchasePrice"/>
+            <CollapseLayout val="true"/>
+        </Frame>
+        
+        <Frame type="Image" name="OriginalPriceStrikethrough">
+            <Anchor side="Top" relative="$parent/OriginalPriceLabel" pos="Mid" offset="-1"/>
+            <Anchor side="Bottom" relative="$parent/OriginalPriceLabel" pos="Mid" offset="-1"/>
+            <Anchor side="Left" relative="$parent/OriginalPriceLabel" pos="Min" offset="-2"/>
+            <Anchor side="Right" relative="$parent/OriginalPriceLabel" pos="Max" offset="-4"/>
+            <Height val="2"/>
+            <Color val="538393"/>
+            <Visible val="False"/>
+            
+            <Animation name="ShowStrike">
+                <Event event="OnShown" action="Reset, Play" frame="$parent/OriginalPriceLabel"/>
+                <Event event="OnHidden" action="Reset" frame="$parent/OriginalPriceLabel"/>
+                
+                <Controller type="Visibility" end="Pause">
+                    <Key type="Bool" time="0" value="True"/>
+                </Controller>
+            </Animation>
+        </Frame>
+
+        <Frame type="Label" name="PriceLabel">
+            <Anchor side="Top" relative="$parent/CurrencyLabel" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent/CurrencyLabel" pos="Mid" offset="0"/>
+            <Anchor side="Left" relative="$parent/OriginalPriceLabel" pos="Max" offset="5"/>
             <Style val="@Campaign_PurchasePrice"/>
         </Frame>
         
         <Frame type="Label" name="TypeLabel">
-            <Anchor side="Bottom" relative="$parent/PriceLabel" pos="Max" offset="-2"/>
+            <Anchor side="Top" relative="$parent/PriceLabel" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent/PriceLabel" pos="Mid" offset="0"/>
             <Anchor side="Left" relative="$parent/PriceLabel" pos="Max" offset="11"/>
             <Style val="@Campaign_PurchaseType"/>
         </Frame>
@@ -206,13 +233,38 @@
                 <Visible val="True"/>
             </Frame>
 
-            <Animation name="ShowPlayButton">
-                <Event event="NovasAwesomeDay" action="Reset,Play" frame="$parent"/>
+            <StateGroup name="CampaignVideoPlayButtonVisiblity">
+                <DefaultState val="CampaignVideoPlayButtonEnabled"/>
+
+                <State name="CampaignVideoPlayButtonNovaDLC1">
+                    <When type="AnimationState" frame="$parent" SelectedCampagin="NovaDLC1"/>
+                    <Action type="SetProperty" frame="PlayButton" visible="False"/>
+                </State>
+
+                <State name="CampaignVideoPlayButtonNovaDLC1NoBundle">
+                    <When type="AnimationState" frame="$parent" SelectedCampagin="NovaDLC1NoBundle"/>
+                    <Action type="SetProperty" frame="PlayButton" visible="False"/>
+                </State>
                 
-                <Controller type="Visibility" end="Pause" frame="$this/PlayButton">
-                    <Key type="Bool" time="0" value="False"/>
-                </Controller>
-            </Animation>
+                <State name="CampaignVideoPlayButtonNovaDLC2">
+                    <When type="AnimationState" frame="$parent" SelectedCampagin="NovaDLC2"/>
+                    <Action type="SetProperty" frame="PlayButton" visible="False"/>
+                </State>
+
+                <State name="CampaignVideoPlayButtonNovaDLC3">
+                    <When type="AnimationState" frame="$parent" SelectedCampagin="NovaDLC3"/>
+                    <Action type="SetProperty" frame="PlayButton" visible="False"/>
+                </State>
+
+                <State name="CampaignVideoPlayButtonNovaBundle">
+                    <When type="AnimationState" frame="$parent" SelectedCampagin="NovaDLCBundle"/>
+                    <Action type="SetProperty" frame="PlayButton" visible="False"/>
+                </State>
+
+                <State name="CampaignVideoPlayButtonEnabled">
+                    <Action type="SetProperty" frame="PlayButton" visible="True"/>
+                </State>
+            </StateGroup>
         </Frame>
         
         <Frame type="Label" name="CampaignTitleLabel">
@@ -270,11 +322,11 @@
         </Frame>
 
         <Frame type="Label" name="NovaPurchaseFinePrint">
-            <Anchor side="Top" relative="$parent/CampaignProductTileList" pos="Max" offset="-10"/>
-            <Anchor side="Left" relative="$parent/CampaignProductTileList" pos="Min" offset="42"/>
-            <Anchor side="Right" relative="$parent/CampaignProductTileList" pos="Max" offset="-250"/>
+            <Anchor side="Top" relative="$parent/CampaignProductTileList" pos="Max" offset="0"/>
+            <Anchor side="Left" relative="$parent/CampaignProductTileList" pos="Min" offset="55"/>
+            <Anchor side="Right" relative="$parent/CampaignProductTileList" pos="Max" offset="-120"/>
             <CollapseLayout val="true"/>
-            <Style val="@CampaignPanelLastMissionDescription"/>
+            <Style val="@NovaDLCFinePrint"/>
             <Visible val="false"/>
             <Text val="@UI/CampaignPurchase/NovaDLCFinePrint"/>
 
@@ -288,20 +340,28 @@
                 </Controller>
             </Animation>
 
-            <Animation name="ShowFinePrintNovaDLC">
-                <Event event="WingsOfLiberty" action="Reset" frame="$parent"/>
-                <Event event="HeartOfTheSwarm" action="Reset" frame="$parent"/>
-                <Event event="LegacyOfTheVoid" action="Reset" frame="$parent"/>
-                <Event event="NovasAwesomeDay" action="Reset,Play" frame="$parent"/>
-                
-                <Controller type="Visibility" end="Pause">
-                    <Key type="Bool" time="0" value="true"/>
-                </Controller>
-            </Animation>
+            <StateGroup name="FinePrintNovaDLCVisibility">
+                <DefaultState val="FinePrintNovaDLCDisabled"/>
+
+                <State name="FinePrintNovaDLCDisabled">
+                    <Action type="SetProperty" visible="false"/>
+                </State>
+
+                <State name="FinePrintNovaDLEnabled">
+                    <When type="AnimationState" frame="$parent" SelectedCampagin="NovaDLC1"/>
+                    <Action type="SetProperty" visible="True"/>
+                </State>
+
+                <State name="FinePrintNovaDLEnabledBundled">
+                    <When type="AnimationState" frame="$parent" SelectedCampagin="NovaDLCBundle"/>
+                    <Action type="SetProperty" visible="True"/>
+                </State>
+            </StateGroup>
         </Frame>
 
+
         <Frame type="Label" name="CNFinePrint">
-            <Anchor side="Top" relative="$parent/NovaPurchaseFinePrint" pos="Max" offset="2"/>
+            <Anchor side="Top" relative="$parent/NovaPurchaseFinePrint" pos="Max" offset="4"/>
             <Anchor side="Left" relative="$parent/CampaignProductTileList" pos="Min" offset="0"/>
             <Anchor side="Right" relative="$parent/CampaignProductTileList" pos="Max" offset="-250"/>
             <CollapseLayout val="true"/>

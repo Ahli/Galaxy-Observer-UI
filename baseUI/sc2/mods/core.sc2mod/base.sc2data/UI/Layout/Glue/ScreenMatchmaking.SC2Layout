@@ -2,6 +2,18 @@
 <Desc>
     <DescFlags val="Locked"/>
 
+    <Frame type="MatchmakingRaceTileListItem" name="MatchmakingRaceTileListItemTemplate" template="StandardBattlenetTemplates/MatchmakingTileListItemTemplate">
+        <Animation name="TandemDisabled">
+            <Event event="OnEnabled" action="Reset,Stop" frame="$this"/>
+            <Event event="OnDisabled" action="Reset,Play" frame="$this"/>
+            
+            <!-- TODO: If there's more than one reason to disable race selection, use a state group -->
+            <Controller type="Property" property="Tooltip" end="Pause">
+                <Key type="Property" time="0" value="@UI/ScreenMatchmaking/QueueNotPartyLeaderTooltip"/>
+            </Controller>
+        </Animation>
+    </Frame>
+
     <Frame type="ScreenMatchmaking" name="ScreenMatchmaking">
         <Anchor relative="$parent"/>
         <DisplayBackgroundModel val="false"/>
@@ -136,6 +148,422 @@
             <Anchor relative="$parent"/>
             <Texture val="@UI/SC2_UI_Coop_Vignette"/>
             <Alpha val="150"/>
+        </Frame>
+            
+        <Frame type="Label" name="TitleLabel">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="170"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="118"/>
+            <Style val="@Tournament_Title"/>
+            
+            <Animation name="ModeState0">
+                <Event event="Mode0" action="Reset,Play" frame="$parent"/>
+
+                <Controller type="Text" end="Pause">
+                    <Key type="Text" time="0" text="@UI/ScreenMultiplayer/TrainingButton"/>
+                </Controller>
+            </Animation>
+
+            <Animation name="ModeState1">
+                <Event event="Mode1" action="Reset,Play" frame="$parent"/>
+
+                <Controller type="Text" end="Pause">
+                    <Key type="Text" time="0" text="@UI/ScreenMultiplayer/VersusAIButton"/>
+                </Controller>
+            </Animation>
+
+            <Animation name="ModeState2">
+                <Event event="Mode2" action="Reset,Play" frame="$parent"/>
+
+                <Controller type="Text" end="Pause">
+                    <Key type="Text" time="0" text="@UI/ScreenMultiplayer/UnrankedButton"/>
+                </Controller>
+            </Animation>
+
+            <Animation name="ModeState3">
+                <Event event="Mode3" action="Reset,Play" frame="$parent"/>
+
+                <Controller type="Text" end="Pause">
+                    <Key type="Text" time="0" text="@UI/ScreenMultiplayer/RankedButton"/>
+                </Controller>
+            </Animation>
+        </Frame>
+        
+        <Frame type="Label" name="SubtitleLabel">
+            <Anchor side="Top" relative="$parent/TitleLabel" pos="Max" offset="8"/>
+            <Anchor side="Left" relative="$parent/TitleLabel" pos="Min" offset="-2"/>
+            <Style val="@Tournament_Subtitle"/>
+
+            <Animation name="ModeState0">
+                <Event event="Mode0" action="Reset,Play" frame="$parent"/>
+
+                <Controller type="Text" end="Pause">
+                    <Key type="Text" time="0" text="@UI/ScreenMatchmaking/TrainingDescription"/>
+                </Controller>
+            </Animation>
+
+            <Animation name="ModeState1">
+                <Event event="Mode1" action="Reset,Play" frame="$parent"/>
+
+                <Controller type="Text" end="Pause">
+                    <Key type="Text" time="0" text="@UI/ScreenMatchmaking/VersusAIDescription"/>
+                </Controller>
+            </Animation>
+
+            <Animation name="ModeState2">
+                <Event event="Mode2" action="Reset,Play" frame="$parent"/>
+
+                <Controller type="Text" end="Pause">
+                    <Key type="Text" time="0" text="@UI/ScreenMatchmaking/UnrankedDescription"/>
+                </Controller>
+            </Animation>
+
+            <Animation name="ModeState3">
+                <Event event="Mode3" action="Reset,Play" frame="$parent"/>
+
+                <Controller type="Text" end="Pause">
+                    <Key type="Text" time="0" text="@UI/ScreenMatchmaking/RankedDescription"/>
+                </Controller>
+            </Animation>
+        </Frame>
+
+        <Frame type="Frame" name="ContainerFrame">
+            <Anchor relative="$parent"/>
+            <Alpha val="0"/>
+            <Visible val="false"/>
+
+            <Animation name="StateLoading">
+                <Event event="Loading" action="Reset,Stop" frame="$parent"/>
+                <Event event="Loaded" action="Reset,Play" frame="$parent"/>
+
+                <Controller type="Fade" end="Pause">
+                    <Key type="Curve" time="0" value="0" out="Fast"/>
+                    <Key type="Curve" time="0.2" value="0" out="Fast"/>
+                    <Key type="Curve" time="0.5" value="255" in="Slow"/>
+                </Controller>
+
+                <Controller name="Visibility" type="Visibility" end="Pause">
+                    <Key type="Bool" time="0.00" value="false"/>
+                    <Key type="Bool" time="0.01" value="true"/>
+                    <Key type="Bool" time="0.50" value="true"/>
+                </Controller>
+            </Animation>
+
+            <Frame type="Label" name="ModeLabel">
+                <Anchor side="Bottom" relative="$parent/QueueTileList" pos="Min" offset="-3"/>
+                <Anchor side="Left" relative="$parent/$parent/SubtitleLabel" pos="Min" offset="0"/>
+                <Style val="@Tournament_DetailTitle"/>
+                <Text val="@UI/ScreenMatchmaking/SelectMode"/>
+            </Frame>
+
+            <Frame type="TileList" name="QueueTileList">
+                <Anchor side="Bottom" relative="$parent/RaceLabel" pos="Min" offset="-21"/>
+                <Anchor side="Left" relative="$parent/ModeLabel" pos="Min" offset="-1"/>
+                <Width val="1260"/>
+                <Height val="63"/>
+
+                <Frame type="MatchmakingQueueTileListItem" name="Item0" template="StandardBattlenetTemplates/MatchmakingTileListItemTemplate">
+                    <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                    <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                </Frame>
+
+                <Frame type="MatchmakingQueueTileListItem" name="Item1" template="StandardBattlenetTemplates/MatchmakingTileListItemTemplate">
+                    <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                    <Anchor side="Left" relative="$parent/Item0" pos="Max" offset="6"/>
+                </Frame>
+
+                <Frame type="MatchmakingQueueTileListItem" name="Item2" template="StandardBattlenetTemplates/MatchmakingTileListItemTemplate">
+                    <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                    <Anchor side="Left" relative="$parent/Item1" pos="Max" offset="6"/>
+                </Frame>
+
+                <Frame type="MatchmakingQueueTileListItem" name="Item3" template="StandardBattlenetTemplates/MatchmakingTileListItemTemplate">
+                    <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                    <Anchor side="Left" relative="$parent/Item2" pos="Max" offset="6"/>
+                </Frame>
+
+                <Frame type="MatchmakingQueueTileListItem" name="Item4" template="StandardBattlenetTemplates/MatchmakingTileListItemTemplate">
+                    <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                    <Anchor side="Left" relative="$parent/Item3" pos="Max" offset="6"/>
+                </Frame>
+
+                <Frame type="MatchmakingQueueTileListItem" name="Item5" template="StandardBattlenetTemplates/MatchmakingTileListItemTemplate">
+                    <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                    <Anchor side="Left" relative="$parent/Item4" pos="Max" offset="6"/>
+                </Frame>
+            </Frame>
+
+            <Frame type="Label" name="RaceLabel">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="422"/>
+                <Anchor side="Left" relative="$parent/QueueTileList" pos="Min" offset="0"/>
+                <Style val="@Tournament_DetailTitle"/>
+                <Text val="@UI/ScreenMatchmaking/SelectRace"/>
+            </Frame>
+
+            <Frame type="MatchmakingRaceTileList" name="RaceTileList">
+                <Anchor side="Top" relative="$parent/RaceLabel" pos="Max" offset="3"/>
+                <Anchor side="Left" relative="$parent/RaceLabel" pos="Min" offset="-1"/>
+                <Width val="1260"/>
+                <Height val="63"/>
+
+                <Frame type="MatchmakingRaceTileListItem" name="Item0" template="ScreenMatchmaking/MatchmakingRaceTileListItemTemplate">
+                    <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                    <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                </Frame>
+
+                <Frame type="MatchmakingRaceTileListItem" name="Item1" template="ScreenMatchmaking/MatchmakingRaceTileListItemTemplate">
+                    <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                    <Anchor side="Left" relative="$parent/Item0" pos="Max" offset="6"/>
+                </Frame>
+
+                <Frame type="MatchmakingRaceTileListItem" name="Item2" template="ScreenMatchmaking/MatchmakingRaceTileListItemTemplate">
+                    <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                    <Anchor side="Left" relative="$parent/Item1" pos="Max" offset="6"/>
+                </Frame>
+
+                <Frame type="MatchmakingRaceTileListItem" name="Item3" template="ScreenMatchmaking/MatchmakingRaceTileListItemTemplate">
+                    <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                    <Anchor side="Left" relative="$parent/Item2" pos="Max" offset="6"/>
+                </Frame>
+
+                <Frame type="MatchmakingRaceTileListItem" name="Item4" template="ScreenMatchmaking/MatchmakingRaceTileListItemTemplate">
+                    <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                    <Anchor side="Left" relative="$parent/Item3" pos="Max" offset="6"/>
+                </Frame>
+
+                <Frame type="MatchmakingRaceTileListItem" name="Item5" template="ScreenMatchmaking/MatchmakingRaceTileListItemTemplate">
+                    <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                    <Anchor side="Left" relative="$parent/Item4" pos="Max" offset="6"/>
+                </Frame>
+            </Frame>
+            
+            <StateGroup name="MatchmakingPanelsGroup">
+                <State name="NotSelected">
+                    <When type="AnimationState" frame="$parent" SelectionState="NotSelected"/>
+                    <Action type="SetProperty" frame="LeaguePanel" visible="false"/>
+                    <Action type="SetProperty" frame="VersusAIPanel" visible="false"/>
+                    <Action type="SetProperty" frame="QueueInfoPanel" visible="false"/>
+                </State>
+                
+                <State name="SelectedModeTraining">
+                    <When type="AnimationState" frame="$parent" SelectionState="Selected"/>
+                    <When type="AnimationState" frame="$parent" ModeState="Mode0"/>
+                    <Action type="SetProperty" frame="LeaguePanel" visible="false"/>
+                    <Action type="SetProperty" frame="VersusAIPanel" visible="false"/>
+                    <Action type="SetProperty" frame="QueueInfoPanel" visible="true"/>
+                </State>
+
+                <State name="SelectedModeVersusAI">
+                    <When type="AnimationState" frame="$parent" SelectionState="Selected"/>
+                    <When type="AnimationState" frame="$parent" ModeState="Mode1"/>
+                    <Action type="SetProperty" frame="LeaguePanel" visible="false"/>
+                    <Action type="SetProperty" frame="VersusAIPanel" visible="true"/>
+                    <Action type="SetProperty" frame="QueueInfoPanel" visible="false"/>
+                </State>
+
+                <State name="SelectedModeUnranked">
+                    <When type="AnimationState" frame="$parent" SelectionState="Selected"/>
+                    <When type="AnimationState" frame="$parent" ModeState="Mode2"/>
+                    <Action type="SetProperty" frame="LeaguePanel" visible="false"/>
+                    <Action type="SetProperty" frame="VersusAIPanel" visible="false"/>
+                    <Action type="SetProperty" frame="QueueInfoPanel" visible="false"/>
+                </State>
+
+                <State name="SelectedModeRanked">
+                    <When type="AnimationState" frame="$parent" SelectionState="Selected"/>
+                    <When type="AnimationState" frame="$parent" ModeState="Mode3"/>
+                    <Action type="SetProperty" frame="LeaguePanel" visible="true"/>
+                    <Action type="SetProperty" frame="VersusAIPanel" visible="false"/>
+                    <Action type="SetProperty" frame="QueueInfoPanel" visible="false"/>
+                </State>
+            </StateGroup>
+
+            <Frame type="MatchmakingLeaguePanel" name="LeaguePanel" template="MatchmakingLeaguePanel/MatchmakingLeaguePanelTemplate">
+                <Anchor side="Top" relative="$parent/RaceTileList" pos="Max" offset="33"/>
+                <Anchor side="Left" relative="$parent/RaceTileList" pos="Min" offset="-28"/>
+                <Visible val="false"/>
+            </Frame>
+
+            <Frame type="MatchmakingQueueInfoPanel" name="QueueInfoPanel" template="MatchmakingQueueInfoPanel/MatchmakingQueueInfoPanelTemplate">
+                <Anchor side="Top" relative="$parent/RaceTileList" pos="Max" offset="33"/>
+                <Anchor side="Left" relative="$parent/RaceTileList" pos="Min" offset="-38"/>
+                <Visible val="false"/>
+
+                <StateGroup name="MatchmakingQueueInfoPanelGroup">
+                    <State name="Stage1WoLState">
+                        <When type="AnimationState" frame="$this" QueueIdState="QueueId81"/>
+                        <Action type="SetProperty" frame="IconImage" Texture="@UI/Glues_Icons_GameMode_Training_Stage1"/>
+                    </State>
+
+                    <State name="Stage2WoLState">
+                        <When type="AnimationState" frame="$this" QueueIdState="QueueId82"/>
+                        <Action type="SetProperty" frame="IconImage" Texture="@UI/Glues_Icons_GameMode_Training_Stage2"/>
+                    </State>
+
+                    <State name="Stage3WoLState">
+                        <When type="AnimationState" frame="$this" QueueIdState="QueueId83"/>
+                        <Action type="SetProperty" frame="IconImage" Texture="@UI/Glues_Icons_GameMode_Training_Stage3"/>
+                    </State>
+                    
+                    <State name="Stage1HotSState">
+                        <When type="AnimationState" frame="$this" QueueIdState="QueueId181"/>
+                        <Action type="SetProperty" frame="IconImage" Texture="@UI/Glues_Icons_GameMode_Training_Stage1"/>
+                    </State>
+
+                    <State name="Stage2HotSState">
+                        <When type="AnimationState" frame="$this" QueueIdState="QueueId182"/>
+                        <Action type="SetProperty" frame="IconImage" Texture="@UI/Glues_Icons_GameMode_Training_Stage2"/>
+                    </State>
+
+                    <State name="Stage3HotSState">
+                        <When type="AnimationState" frame="$this" QueueIdState="QueueId183"/>
+                        <Action type="SetProperty" frame="IconImage" Texture="@UI/Glues_Icons_GameMode_Training_Stage3"/>
+                    </State>
+
+                    <State name="Stage1LotVState">
+                        <When type="AnimationState" frame="$this" QueueIdState="QueueId281"/>
+                        <Action type="SetProperty" frame="IconImage" Texture="@UI/Glues_Icons_GameMode_Training_Stage1"/>
+                    </State>
+
+                    <State name="Stage2LotVState">
+                        <When type="AnimationState" frame="$this" QueueIdState="QueueId282"/>
+                        <Action type="SetProperty" frame="IconImage" Texture="@UI/Glues_Icons_GameMode_Training_Stage2"/>
+                    </State>
+
+                    <State name="Stage3LotVState">
+                        <When type="AnimationState" frame="$this" QueueIdState="QueueId283"/>
+                        <Action type="SetProperty" frame="IconImage" Texture="@UI/Glues_Icons_GameMode_Training_Stage3"/>
+                    </State>
+                </StateGroup>
+            </Frame>
+
+            <Frame type="MatchmakingVersusAIPanel" name="VersusAIPanel" template="MatchmakingVersusAIPanel/MatchmakingVersusAIPanelTemplate">
+                <Anchor side="Top" relative="$parent/RaceTileList" pos="Max" offset="33"/>
+                <Anchor side="Left" relative="$parent/RaceTileList" pos="Min" offset="-28"/>
+                <Visible val="false"/>
+            </Frame>
+
+            <StateGroup name="SelectionStateGroup">
+                <State name="NotSelectedState">
+                    <When type="AnimationState" frame="$parent" SelectionState="NotSelected"/>
+                    <Action type="SetProperty" frame="PlayButton" Enabled="false"/>
+                    <Action type="SetProperty" frame="MapVetoButton" Enabled="false"/>
+                </State>
+                
+                <State name="SelectedState">
+                    <When type="AnimationState" frame="$parent" SelectionState="Selected"/>
+                    <Action type="SetProperty" frame="PlayButton" Enabled="true"/>
+                    <Action type="SetProperty" frame="MapVetoButton" Enabled="true"/>
+                </State>
+            </StateGroup>
+
+            <Frame type="GlueButton" name="PlayButton" template="StandardBattlenetTemplates/BattlenetAlternateButtonTemplate">
+                <Anchor side="Bottom" relative="$parent" pos="Max" offset="-164"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="105"/>
+                <Width val="288"/>
+                <Text val="@UI/ScreenMatchmaking/PlayButton"/>
+            </Frame>
+
+            <Frame type="GlueButton" name="MapVetoButton" template="StandardBattlenetTemplates/BattlenetStandardButtonTemplate">
+                <Anchor side="Top" relative="$parent/PlayButton" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/PlayButton" pos="Max" offset="5"/>
+                <Width val="340"/>
+                <Visible val="false"/>
+                <CollapseLayout val="true"/>
+
+                <Animation name="ModeState">
+                    <Event event="Mode0" action="Reset,Stop" frame="$parent/$parent"/>
+                    <Event event="Mode1" action="Reset,Stop" frame="$parent/$parent"/>
+                    <Event event="Mode2" action="Reset,Play" frame="$parent/$parent"/>
+                    <Event event="Mode3" action="Reset,Play" frame="$parent/$parent"/>
+
+                    <Controller name="Visibility" type="Visibility" end="Pause">
+                        <Key type="Bool" time="0.0" value="true"/>
+                    </Controller>
+                </Animation>
+
+                <Animation name="SelectionState">
+                    <Event event="NotSelected" action="Reset,Play" frame="$parent/$parent"/>
+
+                    <Controller type="Property" property="Text" end="Pause">
+                        <Key type="Property" time="0" value="@UI/ScreenMatchmaking/MapVetoButtonNoQueue"/>
+                    </Controller>
+                </Animation>
+            </Frame>
+            
+            <Frame type="ExpansionLevelFrame" name="ExpansionIconFrame">
+                <Width val="82"/>
+                <Height val="87"/>
+                <Anchor side="Top" relative="$parent/PlayButton" pos="Mid" offset="0"/>
+                <Anchor side="Bottom" relative="$parent/PlayButton" pos="Mid" offset="0"/>
+                <Anchor side="Left" relative="$parent/MapVetoButton" pos="Max" offset="10"/>
+                <AcceptsMouseTooltip val="true"/>
+                
+                <Frame type="Image" name="ExpansionIcon">
+                    <Anchor relative="$parent"/>
+                </Frame>
+
+                <StateGroup name="ExpansionStateGroup">
+                    <State name="WoLQueueTagState">
+                        <When type="AnimationState" frame="$parent/$parent" ExpansionTag="TagWoL"/>
+                        <Action type="SetProperty" frame="ExpansionIcon" Texture="@UI/Glues_Icons_ExpansionLevel_Large_WoL"/>
+                        <Action type="SetProperty" frame="$this" Tooltip="@UI/ExpansionLevelIcon/TooltipWoL"/>
+                    </State>
+
+                    <State name="HotSQueueTagState">
+                        <When type="AnimationState" frame="$parent/$parent" ExpansionTag="TagHotS"/>
+                        <Action type="SetProperty" frame="ExpansionIcon" Texture="@UI/Glues_Icons_ExpansionLevel_Large_HoTS"/>
+                        <Action type="SetProperty" frame="$this" Tooltip="@UI/ExpansionLevelIcon/TooltipHotS"/>
+                    </State>
+
+                    <State name="LotVQueueTagState">
+                        <When type="AnimationState" frame="$parent/$parent" ExpansionTag="TagLotV"/>
+                        <Action type="SetProperty" frame="ExpansionIcon" Texture="@UI/Glues_Icons_ExpansionLevel_Large_LotV"/>
+                        <Action type="SetProperty" frame="$this" Tooltip="@UI/ExpansionLevelIcon/TooltipLotV"/>
+                    </State>
+                    
+                    <State name="StarterEditionState">
+                        <When type="AnimationState" frame="$this" ExpansionLevel="ExpansionLevel0"/>
+                        <Action type="SetProperty" frame="ExpansionIcon" Texture="@UI/Glues_Icons_ExpansionLevel_Large_SE"/>
+                        <Action type="SetProperty" frame="$this" Tooltip=""/>
+                    </State>
+                    
+                    <State name="WoLState">
+                        <When type="AnimationState" frame="$this" ExpansionLevel="ExpansionLevel1"/>
+                        <Action type="SetProperty" frame="ExpansionIcon" Texture="@UI/Glues_Icons_ExpansionLevel_Large_WoL"/>
+                        <Action type="SetProperty" frame="$this" Tooltip="@UI/ExpansionLevelIcon/TooltipWoL"/>
+                    </State>
+                    
+                    <State name="HotSState">
+                        <When type="AnimationState" frame="$this" ExpansionLevel="ExpansionLevel2"/>
+                        <Action type="SetProperty" frame="ExpansionIcon" Texture="@UI/Glues_Icons_ExpansionLevel_Large_HoTS"/>
+                        <Action type="SetProperty" frame="$this" Tooltip="@UI/ExpansionLevelIcon/TooltipHotS"/>
+                    </State>
+                    
+                    <State name="LotVState">
+                        <When type="AnimationState" frame="$this" ExpansionLevel="ExpansionLevel3"/>
+                        <Action type="SetProperty" frame="ExpansionIcon" Texture="@UI/Glues_Icons_ExpansionLevel_Large_LotV"/>
+                        <Action type="SetProperty" frame="$this" Tooltip="@UI/ExpansionLevelIcon/TooltipLotV"/>
+                    </State>
+                </StateGroup>
+            </Frame>
+
+            <Frame type="MatchmakingMapVetoFrame" name="MapVetoFrame" template="MatchmakingMapVetoFrame/MatchmakingMapVetoFrameTemplate">
+                <Anchor relative="$parent"/>
+                <Visible val="false"/>
+
+                <Animation name="ToggleMapVetoListFrameVisibility">
+                    <Event event="OnClick" action="ToggleDirection,Play" frame="$parent/MapVetoButton"/>
+                    <Event event="OnHidden" action="DirectionForward,Play" frame="$parent/MapVetoButton"/>
+                    <Event event="OnClick" action="DirectionForward,Play" frame="CancelButton"/>
+                    <Event event="OnClick" action="DirectionForward,Play" frame="AcceptButton"/>
+                    <Event event="LeftTournament" action="DirectionForward,Play"/>
+                    <Event event="JoinedMatchQueue" action="DirectionForward,Play"/>
+                    <Controller name="Name1" type="Visibility" end="Pause">
+                        <Key type="Bool" time="0" value="true"/>
+                        <Key type="Bool" time=".01" value="false"/>
+                    </Controller>
+                </Animation>
+            </Frame>
         </Frame>
     </Frame>
 </Desc>

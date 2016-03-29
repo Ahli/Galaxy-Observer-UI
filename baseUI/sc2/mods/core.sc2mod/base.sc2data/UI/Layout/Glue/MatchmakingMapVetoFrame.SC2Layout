@@ -4,7 +4,7 @@
     
     <Constant name="VerticalItemGap" val="-4"/>
     
-    <Frame type="TournamentMapVetoTileListItem" name="TournamentMapVetoTileListItemTemplate">
+    <Frame type="MatchmakingMapVetoTileListItem" name="MatchmakingMapVetoTileListItemTemplate">
         <Anchor side="Left" relative="$this/NormalImage" pos="Min" offset="0"/>
         <Anchor side="Right" relative="$this/NormalImage" pos="Max" offset="0"/>
         <Height val="52"/>
@@ -81,18 +81,23 @@
             <Anchor side="Left" relative="$parent/MapNameLabel" pos="Max" offset="15"/>
             <Style val="Tournament_MapVetoText"/>
             <Width val="190"/>
-        </Frame>
+            <Visible val="false"/>
 
-        <Frame type="Label" name="OpponentRecordLabel">
-            <Anchor side="Top" relative="$parent" pos="Min" offset="5"/>
-            <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
-            <Anchor side="Left" relative="$parent/LocalRecordLabel" pos="Max" offset="15"/>
-            <Style val="Tournament_MapVetoText"/>
-            <Width val="190"/>
+            <!-- Only show win records for Ranked -->
+            <Animation name="ModeState">
+                <Event event="Mode0" action="Reset,Stop" frame="$parent/$parent/$parent/$parent/$parent"/>
+                <Event event="Mode1" action="Reset,Stop" frame="$parent/$parent/$parent/$parent/$parent"/>
+                <Event event="Mode2" action="Reset,Stop" frame="$parent/$parent/$parent/$parent/$parent"/>
+                <Event event="Mode3" action="Reset,Play" frame="$parent/$parent/$parent/$parent/$parent"/>
+
+                <Controller name="Visibility" type="Visibility" end="Pause">
+                    <Key type="Bool" time="0.0" value="true"/>
+                </Controller>
+            </Animation>
         </Frame>
     </Frame>
 
-    <Frame type="TournamentMapVetoListFrame" name="TournamentMapVetoListFrameTemplate">
+    <Frame type="MatchmakingMapVetoFrame" name="MatchmakingMapVetoFrameTemplate">
         <Animation name="Default">
             <Event event="Active" action="Reset,Play"/>
 
@@ -140,11 +145,20 @@
                 <Key type="Bool" time="0" value="false"/>
             </Controller>
         </Animation>
+        
+        <!-- This tooltip is just for blocking tooltips behind this panel -->
+        <Frame type="StandardTooltip" name="MapVetoTooltip">
+            <Frame type="Label" name="Label">
+                <Anchor relative="$parent"/>
+            </Frame>
+        </Frame>
 
         <Frame type="Image" name="BackgroundTint">
             <Anchor relative="$parent"/>
             <Color val="0,0,0"/>
             <Alpha val="180"/>
+            <AcceptsMouse val="true"/>
+            <TooltipFrame val="MapVetoTooltip"/>
         </Frame>
 
         <Frame type="Image" name="LeftBGGlowPattern">
@@ -170,7 +184,7 @@
             <Texture val="@UI/Glues_Battlenet_DialogBox_BG"/>
             <TextureType val="HorizontalBorder"/>
             <Tiled val="false"/>
-            <Width val="1138"/>
+            <Width val="950"/>
             <Height val="846"/>
         </Frame>
         
@@ -197,8 +211,16 @@
             <Text val="@UI/MatchmakingMapVetoFrame/Title"/>
         </Frame>
 
-        <Frame type="Label" name="VetoesRemainingLabel">
+        <Frame type="Label" name="MessageLabel">
             <Anchor side="Top" relative="$parent/Title" pos="Max" offset="10"/>
+            <Anchor side="Left" relative="$parent/BackgroundImage" pos="Min" offset="30"/>
+            <Anchor side="Right" relative="$parent/BackgroundImage" pos="Max" offset="-30"/>
+            <Style val="@StandardDialogMessage"/>
+            <Text val="@UI/MatchmakingMapVetoFrame/Description"/>
+        </Frame>
+
+        <Frame type="Label" name="VetoesRemainingLabel">
+            <Anchor side="Top" relative="$parent/MessageLabel" pos="Max" offset="20"/>
             <Anchor side="Left" relative="$parent/BackgroundImage" pos="Min" offset="32"/>
             <Anchor side="Right" relative="$parent/BackgroundImage" pos="Max" offset="-30"/>
             <Style val="Tournament_MapVetoesRemaining"/>
@@ -207,7 +229,7 @@
         <Frame type="Image" name="ListFrame">
             <Anchor side="Top" relative="$parent/VetoesRemainingLabel" pos="Max" offset="10"/>
             <Anchor side="Left" relative="$parent/BackgroundImage" pos="Min" offset="30"/>
-            <Anchor side="Bottom" relative="$parent/SavePreferencesCheckBox" pos="Min" offset="-10"/>
+            <Anchor side="Bottom" relative="$parent/AcceptButton" pos="Min" offset="-10"/>
             <Anchor side="Right" relative="$parent/MapInfoFrame" pos="Min" offset="-10"/>
             <Texture val="@UI/Glues_Battlenet_PageAssets_ContainerBorder"/>
             <TextureType val="NineSlice"/>
@@ -231,25 +253,31 @@
             <Style val="BattlenetListHeader"/>
         </Frame>
 
-        <Frame type="Label" name="LocalUserNameLabel">
+        <Frame type="Label" name="LocalRecordTitle">
             <Anchor side="Top" relative="$parent/MapTileListHeaderBg" pos="Min" offset="3"/>
             <Anchor side="Bottom" relative="$parent/MapTileListHeaderBg" pos="Max" offset="0"/>
             <Anchor side="Left" relative="$parent/TileList/Item0/LocalRecordLabel" pos="Min" offset="0"/>
             <Style val="@BattlenetListHeader"/>
             <Width val="190"/>
-        </Frame>
+            <Text val="@UI/MatchmakingMapVetoFrame/LocalRecordTitle"/>
+            <Visible val="false"/>
+            
+            <!-- Only show win records for Ranked -->
+            <Animation name="ModeState">
+                <Event event="Mode0" action="Reset,Stop" frame="$parent/$parent/$parent"/>
+                <Event event="Mode1" action="Reset,Stop" frame="$parent/$parent/$parent"/>
+                <Event event="Mode2" action="Reset,Stop" frame="$parent/$parent/$parent"/>
+                <Event event="Mode3" action="Reset,Play" frame="$parent/$parent/$parent"/>
 
-        <Frame type="Label" name="OpponentNameLabel">
-            <Anchor side="Top" relative="$parent/MapTileListHeaderBg" pos="Min" offset="3"/>
-            <Anchor side="Bottom" relative="$parent/MapTileListHeaderBg" pos="Max" offset="0"/>
-            <Anchor side="Left" relative="$parent/TileList/Item0/OpponentRecordLabel" pos="Min" offset="0"/>
-            <Style val="@BattlenetListHeader"/>
-            <Width val="190"/>
+                <Controller name="Visibility" type="Visibility" end="Pause">
+                    <Key type="Bool" time="0.0" value="true"/>
+                </Controller>
+            </Animation>
         </Frame>
 
         <Frame type="Frame" name="MapInfoFrame">
             <Anchor side="Top" relative="$parent/ListFrame" pos="Min" offset="0"/>
-            <Anchor side="Bottom" relative="$parent/SavePreferencesCheckBox" pos="Min" offset="-10"/>
+            <Anchor side="Bottom" relative="$parent/AcceptButton" pos="Min" offset="-10"/>
             <Anchor side="Right" relative="$parent/BackgroundImage" pos="Max" offset="-30"/>
             <Width val="338"/>
             
@@ -297,63 +325,50 @@
             <RequireSelection val="true"/>
             <ClearSelectionIfNotVisible val="true"/>
 
-            <Frame type="TournamentMapVetoTileListItem" name="Item0" template="TournamentMapVetoListFrame/TournamentMapVetoTileListItemTemplate">
+            <Frame type="MatchmakingMapVetoTileListItem" name="Item0" template="MatchmakingMapVetoFrame/MatchmakingMapVetoTileListItemTemplate">
                 <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
                 <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
             </Frame>
 
-            <Frame type="TournamentMapVetoTileListItem" name="Item1" template="TournamentMapVetoListFrame/TournamentMapVetoTileListItemTemplate">
+            <Frame type="MatchmakingMapVetoTileListItem" name="Item1" template="MatchmakingMapVetoFrame/MatchmakingMapVetoTileListItemTemplate">
                 <Anchor side="Top" relative="$parent/Item0" pos="Max" offset="#VerticalItemGap"/>
                 <Anchor side="Left" relative="$parent/Item0" pos="Min" offset="0"/>
             </Frame>
 
-            <Frame type="TournamentMapVetoTileListItem" name="Item2" template="TournamentMapVetoListFrame/TournamentMapVetoTileListItemTemplate">
+            <Frame type="MatchmakingMapVetoTileListItem" name="Item2" template="MatchmakingMapVetoFrame/MatchmakingMapVetoTileListItemTemplate">
                 <Anchor side="Top" relative="$parent/Item1" pos="Max" offset="#VerticalItemGap"/>
                 <Anchor side="Left" relative="$parent/Item1" pos="Min" offset="0"/>
             </Frame>
 
-            <Frame type="TournamentMapVetoTileListItem" name="Item3" template="TournamentMapVetoListFrame/TournamentMapVetoTileListItemTemplate">
+            <Frame type="MatchmakingMapVetoTileListItem" name="Item3" template="MatchmakingMapVetoFrame/MatchmakingMapVetoTileListItemTemplate">
                 <Anchor side="Top" relative="$parent/Item2" pos="Max" offset="#VerticalItemGap"/>
                 <Anchor side="Left" relative="$parent/Item2" pos="Min" offset="0"/>
             </Frame>
 
-            <Frame type="TournamentMapVetoTileListItem" name="Item4" template="TournamentMapVetoListFrame/TournamentMapVetoTileListItemTemplate">
+            <Frame type="MatchmakingMapVetoTileListItem" name="Item4" template="MatchmakingMapVetoFrame/MatchmakingMapVetoTileListItemTemplate">
                 <Anchor side="Top" relative="$parent/Item3" pos="Max" offset="#VerticalItemGap"/>
                 <Anchor side="Left" relative="$parent/Item3" pos="Min" offset="0"/>
             </Frame>
 
-            <Frame type="TournamentMapVetoTileListItem" name="Item5" template="TournamentMapVetoListFrame/TournamentMapVetoTileListItemTemplate">
+            <Frame type="MatchmakingMapVetoTileListItem" name="Item5" template="MatchmakingMapVetoFrame/MatchmakingMapVetoTileListItemTemplate">
                 <Anchor side="Top" relative="$parent/Item4" pos="Max" offset="#VerticalItemGap"/>
                 <Anchor side="Left" relative="$parent/Item4" pos="Min" offset="0"/>
             </Frame>
 
-            <Frame type="TournamentMapVetoTileListItem" name="Item6" template="TournamentMapVetoListFrame/TournamentMapVetoTileListItemTemplate">
+            <Frame type="MatchmakingMapVetoTileListItem" name="Item6" template="MatchmakingMapVetoFrame/MatchmakingMapVetoTileListItemTemplate">
                 <Anchor side="Top" relative="$parent/Item5" pos="Max" offset="#VerticalItemGap"/>
                 <Anchor side="Left" relative="$parent/Item5" pos="Min" offset="0"/>
             </Frame>
 
-            <Frame type="TournamentMapVetoTileListItem" name="Item7" template="TournamentMapVetoListFrame/TournamentMapVetoTileListItemTemplate">
+            <Frame type="MatchmakingMapVetoTileListItem" name="Item7" template="MatchmakingMapVetoFrame/MatchmakingMapVetoTileListItemTemplate">
                 <Anchor side="Top" relative="$parent/Item6" pos="Max" offset="#VerticalItemGap"/>
                 <Anchor side="Left" relative="$parent/Item6" pos="Min" offset="0"/>
             </Frame>
 
-            <Frame type="TournamentMapVetoTileListItem" name="Item8" template="TournamentMapVetoListFrame/TournamentMapVetoTileListItemTemplate">
+            <Frame type="MatchmakingMapVetoTileListItem" name="Item8" template="MatchmakingMapVetoFrame/MatchmakingMapVetoTileListItemTemplate">
                 <Anchor side="Top" relative="$parent/Item7" pos="Max" offset="#VerticalItemGap"/>
                 <Anchor side="Left" relative="$parent/Item7" pos="Min" offset="0"/>
             </Frame>
-        </Frame>
-
-        <Frame type="CheckBox" name="SavePreferencesCheckBox" template="StandardTemplates/StandardCheckBoxTemplate">
-            <Anchor side="Bottom" relative="$parent/AcceptButton" pos="Min" offset="-10"/>
-            <Anchor side="Left" relative="$parent/BackgroundImage" pos="Min" offset="28"/>
-        </Frame>
-
-        <Frame type="Label" name="SavePreferencesLabel">
-            <Anchor side="Top" relative="$parent/SavePreferencesCheckbox" pos="Min" offset="2"/>
-            <Anchor side="Bottom" relative="$parent/SavePreferencesCheckbox" pos="Max" offset="0"/>
-            <Anchor side="Left" relative="$parent/SavePreferencesCheckbox" pos="Max" offset="5"/>
-            <Text val="@UI/MatchmakingMapVetoFrame/SavePreference"/>
-            <Style val="StandardDialogMessage"/>
         </Frame>
 
         <Frame type="Button" name="AcceptButton" template="StandardBattlenetTemplates/BattlenetAlternateButtonTemplate">

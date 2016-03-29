@@ -34,6 +34,10 @@
             <Height val="801"/>
         </Frame>
 
+        <Frame type="MatchmakingInvitePanel" name="MatchmakingInvitePanel" template="MatchmakingInvitePanel/MatchmakingInvitePanelTemplate">
+            <Anchor relative="$parent"/>
+        </Frame>
+
         <Frame type="Frame" name="SocialContainer">
             <Handle val="ScreenForegroundSC2_SocialContainer"/>
             <Anchor relative="$parent"/>
@@ -428,11 +432,6 @@
                 <Animation name="OfflineDisabled" template="ScreenForegroundSC2/OfflineDisabledAnimation"/>
             </Frame>
 
-            <Frame type="HoloPanel" name="HoloPanel" template="HoloPanel/HoloPanelTemplate">
-                <Anchor side="Top" relative="$parent" pos="Min" offset="40"/>
-                <Anchor side="Right" relative="$parent" pos="Mid" offset="165"/>
-            </Frame>
-
             <Frame type="Frame" name="IGRBenefitsPanel" template="IGRBenefitsPanel/IGRBenefitsPanelTemplate">
                 <Anchor side="Bottom" relative="$parent" pos="Max" offset="3"/>
                 <Anchor side="Left" relative="$parent" pos="Min" offset="-1"/>
@@ -452,23 +451,60 @@
                 <Anchor side="Top" relative="$parent" pos="Min" offset="110"/>
                 <Anchor side="Right" relative="$parent" pos="Max" offset="-10"/>
                 <CollapseLayout val="true"/>
-
-                <Animation name="SystemSound">
-                    <Event event="PlaySystemSound" action="DirectionForward"/>
-                    <Event event="PlaySystemSound" action="Play"/>
-
-                    <Controller type="Sound" end="Reset">
-                        <Key type="Sound" time="0" sound="@UI_BNet_SystemAlert" direction="Forward"/>
-                    </Controller>
-                </Animation>
             </Frame>
 
-            <Frame type="PartyInvitePanel" name="PartyInvitePanel" template="StandardBattlenetTemplates/ToastPanelTemplateNoSound">
+            <Frame type="PartyInvitePanel" name="PartyInvitePanel" template="StandardBattlenetTemplates/ToastTemplate">
                 <Anchor side="Top" relative="$parent/ToastNotificationPanel" pos="Max" offset="5"/>
                 <Anchor side="Right" relative="$parent" pos="Max" offset="-15"/>
+                <Height val="105"/>
+                <Width val="412"/>
 
-                <Frame type="Image" name="MainBackground">
-                    <Anchor relative="$parent"/>
+                <Frame type="Image" name="BorderShimmer">
+                    <Anchor relative="$parent/MainBackground"/>
+                    <LayerCount val="2"/>
+                    <Texture val="@UI/Glues_Battlenet_Toast_BorderMask" layer="0"/>
+                    <AlphaLayer val="true" layer="0"/>
+                    <TextureType val="Normal"/>
+                    <Texture val="@UI/Glues_Battlenet_Toast_BorderShimmer" layer="1"/>
+                    <TextureCoords top="1" left="1" bottom="0" right="0" layer="1"/>
+
+                    <Animation name="ShimmerAnim">
+                        <Event event="OnShown" action="Reset" frame="$parent"/>
+                        <Event event="OnShown" action="Play" frame="$parent"/>
+
+                        <Controller type="Fade" end="Loop">
+                            <Key type="Curve" time="0" value="0" out="Linear"/>
+                            <Key type="Curve" time="1" value="255" out="Linear"/>
+                            <Key type="Curve" time="4" value="255" out="Linear"/>
+                            <Key type="Curve" time="5" value="0" out="Linear"/>
+                        </Controller>
+
+                        <Controller type="LayerUV" layer="1" side="Left" relative="false" sidelock="true" end="Loop">
+                            <Key type="Curve" time="0" value="0" out="Linear"/>
+                            <Key type="Curve" time="5" value="2" out="Linear"/>
+                        </Controller>
+                    </Animation>
+                </Frame>
+
+                <Frame type="Image" name="IconBackground">
+                    <Anchor side="Top" relative="$parent/MainBackground" pos="Mid" offset="0"/>
+                    <Anchor side="Bottom" relative="$parent/MainBackground" pos="Mid" offset="0"/>
+                    <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                    <CollapseLayout val="True"/>
+                    <Unclipped val="True"/>
+                    <Height val="0"/>
+                    <Width val="0"/>
+                    <AcceptsMouse val="true"/>
+                </Frame>
+
+                <Frame type="Label" name="Label">
+                    <Anchor side="Top" relative="$parent" pos="Min" offset="11"/>
+                    <Anchor side="Bottom" relative="$parent/Button" pos="Min" offset="3"/>
+                    <Anchor side="Left" relative="$parent/AvatarFrame" pos="Max" offset="10"/>
+                    <Anchor side="Right" relative="$parent" pos="Max" offset="-15"/>
+                    <AcceptsMouseTooltip val="True"/>
+                    <Options val="Ellipsis | TooltipIfTruncated"/>
+                    <Style val="BattlenetToastLabel"/>
                 </Frame>
 
                 <Frame type="AvatarFrame" name="AvatarFrame" template="StandardTemplates/AvatarFrameMediumTemplate">
@@ -494,12 +530,6 @@
                     </Animation>
                 </Frame>
 
-                <Frame type="Label" name="Label">
-                    <Anchor side="Top" relative="$parent" pos="Min" offset="11"/>
-                    <Anchor side="Bottom" relative="$parent/Button" pos="Min" offset="3"/>
-                    <Anchor side="Left" relative="$parent/AvatarFrame" pos="Max" offset="10"/>
-                </Frame>
-
                 <Frame type="Button" name="Button" template="StandardBattlenetTemplates/BattlenetSmallAlternateButtonTemplate">
                     <Anchor side="Bottom" relative="$parent" pos="Max" offset="-12"/>
                     <Anchor side="Left" relative="$parent/AvatarFrame" pos="Max" offset="5"/>
@@ -515,25 +545,129 @@
                 </Frame>
 
                 <Animation name="SlideIn">
-                    <Controller name="ShowHideSounds" type="Sound" end="Pause">
-                        <Key type="Sound" time="0" sound="@G_UI_Invrec01" direction="Forward"/>
+                    <Controller name="Move" type="Anchor" side="Left" relative="true" end="Pause">
+                        <Key type="Curve" time="0" value="412" out="Fast"/>
+                        <Key type="Curve" time="0.3" value="0" in="Fast"/>
                     </Controller>
                 </Animation>
             </Frame>
 
-            <Frame type="DownloadPanel" name="DownloadPanel" template="DownloadPanel/DownloadPanelTemplate">
+            <!-- State group shows only one panel at a time in priority order -->
+            <StateGroup name="HoloPanelStateGroup">
+                <State name="CountdownState">
+                    <When type="AnimationState" frame="LobbyCountdownPanel" CountdownState="Show"/>
+                    <Action type="SetProperty" frame="LobbyCountdownPanel" visible="true"/>
+                    <Action type="SetProperty" frame="DownloadPanel" visible="false"/>
+                    <Action type="SetProperty" frame="MatchmakingSearchPanel" visible="false"/>
+                    <Action type="SetProperty" frame="PartyReadyStatusPanel" visible="false"/>
+                    <Action type="SetProperty" frame="LobbyStatusPanel" visible="false"/>
+                    <Action type="SendEvent" frame="$this" event="OnHolopanelShown"/>
+                </State>
+
+                <State name="SearchState">
+                    <When type="AnimationState" frame="MatchmakingSearchPanel" SearchState="Show"/>
+                    <Action type="SetProperty" frame="MatchmakingSearchPanel" visible="true"/>
+                    <Action type="SetProperty" frame="DownloadPanel" visible="false"/>
+                    <Action type="SetProperty" frame="LobbyCountdownPanel" visible="false"/>
+                    <Action type="SetProperty" frame="PartyReadyStatusPanel" visible="false"/>
+                    <Action type="SetProperty" frame="LobbyStatusPanel" visible="false"/>
+                    <Action type="SendEvent" frame="$this" event="OnHolopanelShown"/>
+                </State>
+
+                <State name="DownloadState">
+                    <When type="AnimationState" frame="DownloadPanel" DownloadState="Show"/>
+                    <Action type="SetProperty" frame="DownloadPanel" visible="true"/>
+                    <Action type="SetProperty" frame="LobbyCountdownPanel" visible="false"/>
+                    <Action type="SetProperty" frame="MatchmakingSearchPanel" visible="false"/>
+                    <Action type="SetProperty" frame="PartyReadyStatusPanel" visible="false"/>
+                    <Action type="SetProperty" frame="LobbyStatusPanel" visible="false"/>
+                    <Action type="SendEvent" frame="$this" event="OnHolopanelShown"/>
+                </State>
+
+                <State name="PartyReadyState">
+                    <When type="AnimationState" frame="PartyReadyStatusPanel" ReadyState="Show"/>
+                    <Action type="SetProperty" frame="PartyReadyStatusPanel" visible="true"/>
+                    <Action type="SetProperty" frame="DownloadPanel" visible="false"/>
+                    <Action type="SetProperty" frame="LobbyCountdownPanel" visible="false"/>
+                    <Action type="SetProperty" frame="MatchmakingSearchPanel" visible="false"/>
+                    <Action type="SetProperty" frame="LobbyStatusPanel" visible="false"/>
+                    <Action type="SendEvent" frame="$this" event="OnHolopanelShown"/>
+                </State>
+
+                <State name="LobbyStatusState">
+                    <When type="AnimationState" frame="LobbyStatusPanel" LobbyState="Show"/>
+                    <Action type="SetProperty" frame="LobbyStatusPanel" visible="true"/>
+                    <Action type="SetProperty" frame="PartyReadyStatusPanel" visible="false"/>
+                    <Action type="SetProperty" frame="DownloadPanel" visible="false"/>
+                    <Action type="SetProperty" frame="LobbyCountdownPanel" visible="false"/>
+                    <Action type="SetProperty" frame="MatchmakingSearchPanel" visible="false"/>
+                    <Action type="SendEvent" frame="$this" event="OnHolopanelShown"/>
+                </State>
+                
+                <State name="DefaultState">
+                    <Action type="SetProperty" frame="LobbyCountdownPanel" Visible="false"/>
+                    <Action type="SetProperty" frame="MatchmakingSearchPanel" Visible="false"/>
+                    <Action type="SetProperty" frame="DownloadPanel" Visible="false"/>
+                    <Action type="SetProperty" frame="PartyReadyStatusPanel" Visible="false"/>
+                    <Action type="SetProperty" frame="LobbyStatusPanel" visible="false"/>
+                </State>
+            </StateGroup>
+            
+            <StateGroup name="HoloPanelHiddenStateGroup">
+                <State name="HiddenState">
+                    <When type="Property" frame="LobbyCountdownPanel" visible="false"/>
+                    <When type="Property" frame="DownloadPanel" visible="false"/>
+                    <When type="Property" frame="MatchmakingSearchPanel" visible="false"/>
+                    <When type="Property" frame="PartyReadyStatusPanel" visible="false"/>
+                    <When type="Property" frame="LobbyStatusPanel" visible="false"/>
+                    <Action type="SendEvent" frame="$this" event="OnHolopanelHidden"/>
+                </State>
+            </StateGroup>
+
+            <Animation name="ShowSound">
+                <Event event="OnHolopanelShown" frame="$this" action="Reset,Play"/>
+
+                <Controller type="Sound" end="Pause">
+                    <Key type="Sound" time="0" sound="@UI_BnetSearchTransition" direction="Forward"/>
+                </Controller>
+            </Animation>
+
+            <Animation name="HideSound">
+                <Event event="OnHolopanelHidden" frame="$this" action="Reset,Play"/>
+
+                <Controller type="Sound" end="Pause">
+                    <Key type="Sound" time="0" sound="@UI_BnetSearchClose" direction="Forward"/>
+                </Controller>
+            </Animation>
+
+            <Frame type="LobbyCountdownPanel" name="LobbyCountdownPanel" template="LobbyCountdownPanel/LobbyCountdownPanelTemplate">
                 <Anchor side="Bottom" relative="$parent" pos="Max" offset="52"/>
                 <Anchor side="Left" relative="$parent" pos="Min" offset="84"/>
                 <Visible val="false"/>
-                
-                <Animation name="Show">
-                    <Event event="Show" action="Reset,Play"/>
-                    <Event event="Hide" action="Reset,Stop"/>
+            </Frame>
 
-                    <Controller name="Visibility" type="Visibility" end="Pause">
-                        <Key type="Bool" time="0.00" value="true"/>
-                    </Controller>
-                </Animation>
+            <Frame type="MatchmakingSearchPanel" name="MatchmakingSearchPanel" template="MatchmakingSearchPanel/MatchmakingSearchPanelTemplate">
+                <Anchor side="Bottom" relative="$parent/LobbyCountdownPanel" pos="Max" offset="0"/>
+                <Anchor side="Left" relative="$parent/LobbyCountdownPanel" pos="Min" offset="0"/>
+                <Visible val="false"/>
+            </Frame>
+
+            <Frame type="DownloadPanel" name="DownloadPanel" template="DownloadPanel/DownloadPanelTemplate">
+                <Anchor side="Bottom" relative="$parent/LobbyCountdownPanel" pos="Max" offset="0"/>
+                <Anchor side="Left" relative="$parent/LobbyCountdownPanel" pos="Min" offset="0"/>
+                <Visible val="false"/>
+            </Frame>
+
+            <Frame type="PartyReadyStatusPanel" name="PartyReadyStatusPanel" template="PartyReadyStatusPanel/PartyReadyStatusPanelTemplate">
+                <Anchor side="Bottom" relative="$parent/LobbyCountdownPanel" pos="Max" offset="0"/>
+                <Anchor side="Left" relative="$parent/LobbyCountdownPanel" pos="Min" offset="0"/>
+                <Visible val="false"/>
+            </Frame>
+
+            <Frame type="LobbyStatusPanel" name="LobbyStatusPanel" template="LobbyStatusPanel/LobbyStatusPanelTemplate">
+                <Anchor side="Bottom" relative="$parent/LobbyCountdownPanel" pos="Max" offset="0"/>
+                <Anchor side="Left" relative="$parent/LobbyCountdownPanel" pos="Min" offset="0"/>
+                <Visible val="false"/>
             </Frame>
         </Frame>
     </Frame>

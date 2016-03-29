@@ -1,5 +1,12 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <Desc>
+    <Constant name="ChatPanelWidth" val="800"/>
+    <Constant name="ChatPanelHeight" val="550"/>
+    <Constant name="SocialPanelWidth" val="422"/>
+    <Constant name="SocialPanelWidthNegative" val="-422"/>
+    <Constant name="SocialPanelHeight" val="550"/>
+    <Constant name="SocialPanelHeightNegative" val="-550"/>
+    
     <Frame type="GameUI" name="GameUI">
         <Anchor relative="$parent"/>
         <ConsoleWorldTopOffset val="0"/>
@@ -532,11 +539,35 @@
                     <Anchor side="Left" relative="$parent/ChatDisplay" pos="Min" offset="0"/>
                     <Style val="@@ChatHelp"/>
                 </Frame>
-                
-                <Frame type="ToastNotificationPanel" name="ToastNotificationPanel" template="StandardBattlenetTemplates/ToastNotificationPanelTemplate">
+
+                <Frame type="ToastNotificationPanel" name="ToastNotificationPanel" template="StandardBattlenetTemplates/ToastTemplate">
+                    <Anchor side="Top" relative="$this/Label" pos="Min" offset="-12"/>
                     <Anchor side="Bottom" relative="$parent" pos="Max" offset="-380"/>
                     <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
-                    <Visible val="false"/>
+                    <Width val="450"/>
+
+                    <Frame type="Label" name="Label">
+                        <Anchor side="Left" relative="$parent" pos="Min" offset="20"/>
+                        <Anchor side="Bottom" relative="$parent/Button" pos="Min" offset="-10"/>
+                        <Width val="410"/>
+                        <Style val="BattlenetToastWarningLabel"/>
+                    </Frame>
+
+                    <Frame type="Button" name="Button" template="StandardBattlenetTemplates/BattlenetSmallButtonTemplate">
+                        <Anchor side="Bottom" relative="$parent" pos="Max" offset="-12"/>
+                        <Anchor side="Left" relative="$parent/Label" pos="Mid" offset="0"/>
+                        <Anchor side="Right" relative="$parent/Label" pos="Mid" offset="0"/>
+                        <Width val="205"/>
+                        <Text val="@UI/Close"/>
+                        <CollapseLayout val="true"/>
+                    </Frame>
+
+                    <Animation name="SlideIn">
+                        <Controller name="Move" type="Anchor" side="Right" relative="true" end="Pause">
+                            <Key type="Curve" time="0.0001" value="-450" out="Fast"/>
+                            <Key type="Curve" time="0.3001" value="0" in="Fast"/>
+                        </Controller>
+                    </Animation>
                 </Frame>
 
                 <Frame type="EnforcedGameResultIndicatorFrame" name="EnforcedGameResultIndicatorFrame" template="EnforcedGameResultIndicatorFrame/EnforcedGameResultIndicatorFrameTemplate">
@@ -549,15 +580,170 @@
                 <Frame type="Frame" name="MenuBarConsoleAnchor">
                     <Anchor side="Bottom" relative="$parent" pos="Max" offset="-267"/>
                     <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
-                    <Width val="192"/>
+                    <Width val="241"/>
                     <Height val="65"/>
                 </Frame>
 
                 <Frame type="Frame" name="MenuBarFullscreenAnchor">
                     <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
                     <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
-                    <Width val="192"/>
+                    <Width val="241"/>
                     <Height val="65"/>
+                </Frame>
+                
+                <Frame type="GameSocialPanel" name="SocialPanel">
+                    <Anchor relative="$parent"/>
+                    <Visible val="false"/>
+                    
+                    <Animation name="ToggleSocialPanelVisibility">
+                        <Event event="OnClick" action="ToggleDirection,Play" frame="$parent/MenuBar/ChatButton"/>
+                        <Event event="OnHidden" action="DirectionForward,Play" frame="$parent/MenuBar/ChatButton"/>
+                        <Event event="Hide" action="DirectionForward,Play"/>
+
+                        <Controller type="Visibility" end="Pause">
+                            <Key type="Bool" time="0" value="true"/>
+                            <Key type="Bool" time=".01" value="false"/>
+                        </Controller>
+                    </Animation>
+
+                    <Frame type="ChatPanel" name="ChatPanel" template="GameChatPanel/ChatPanelTemplate">
+                        <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+                        <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+                        <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+                        <Width val="#ChatPanelWidth"/>
+                        <Height val="#ChatPanelHeight"/>
+                    </Frame>
+                </Frame>
+                
+                <Frame type="Frame" name="FriendsPanel">
+                    <Anchor relative="$parent"/>
+                    <Visible val="false"/>
+
+                    <Animation name="ToggleSocialPanelVisibility">
+                        <Event event="OnClick" action="DirectionForward,Play" frame="Socialpanel/CloseButton"/>
+                        <Event event="Toggle" action="ToggleDirection,Play" frame="$parent/MenuBar/SocialButton"/>
+                        <Event event="OnHidden" action="DirectionForward,Play" frame="$parent/MenuBar/SocialButton"/>
+                        <Event event="Hide" action="DirectionForward,Play"/>
+
+                        <Controller type="Visibility" end="Pause">
+                            <Key type="Bool" time="0" value="true"/>
+                            <Key type="Bool" time=".01" value="false"/>
+                        </Controller>
+                    </Animation>
+
+                    <StateGroup name="AnchorStateGroup">
+                        <State name="AnchorTopLeftState">
+                            <When type="AnimationState" frame="$parent/MenuBar/SocialButton" PositionState="TopLeft"/>
+                            <When type="Property" frame="$this" Visible="true"/>
+                            <Action type="SendEvent" frame="$this" event="TopLeft"/>
+                        </State>
+                        
+                        <State name="AnchorTopRightState">
+                            <When type="AnimationState" frame="$parent/MenuBar/SocialButton" PositionState="TopRight"/>
+                            <When type="Property" frame="$this" Visible="true"/>
+                            <Action type="SendEvent" frame="$this" event="TopRight"/>
+                        </State>
+
+                        <State name="AnchorBottomLeftState">
+                            <When type="AnimationState" frame="$parent/MenuBar/SocialButton" PositionState="BottomLeft"/>
+                            <When type="Property" frame="$this" Visible="true"/>
+                            <Action type="SendEvent" frame="$this" event="BottomLeft"/>
+                        </State>
+
+                        <State name="AnchorBottomRightState">
+                            <When type="AnimationState" frame="$parent/MenuBar/SocialButton" PositionState="BottomRight"/>
+                            <When type="Property" frame="$this" Visible="true"/>
+                            <Action type="SendEvent" frame="$this" event="BottomRight"/>
+                        </State>
+                    </StateGroup>
+
+                    <Frame type="SocialPanel" name="SocialPanel" template="GameSocialPanel/SocialPanelTemplate">
+                        <Anchor side="Bottom" relative="$parent/$parent/MenuBar" pos="Min" offset="7"/>
+                        <Anchor side="Right" relative="$parent/$parent/MenuBar" pos="Max" offset="0"/>
+                        <Height val="#SocialPanelHeight"/>
+                        <Width val="#SocialPanelWidth"/>
+
+                        <!-- Animations to reanchor the panel when the social button position changes -->
+                        <Animation name="AnchorTopLeft">
+                            <Event event="TopLeft" action="Reset,Play" frame="$parent"/>
+
+                            <Controller type="Anchor" side="Top" relative="True" relativeFrame="$parent/$parent/MenuBar/SocialButton" pos="Max" end="Pause">
+                                <Key type="Curve" time="0.0" value="0" out="Auto"/>
+                            </Controller>
+
+                            <Controller type="Anchor" side="Bottom" relative="True" relativeFrame="$parent/$parent/MenuBar/SocialButton" pos="Max" end="Pause">
+                                <Key type="Curve" time="0.0" value="#SocialPanelHeight" out="Auto"/>
+                            </Controller>
+
+                            <Controller type="Anchor" side="Left" relative="True" relativeFrame="$parent/$parent/MenuBar/SocialButton" pos="Min" end="Pause">
+                                <Key type="Curve" time="0.0" value="0" out="Auto"/>
+                            </Controller>
+
+                            <Controller type="Anchor" side="Right" relative="True" relativeFrame="$parent/$parent/MenuBar/SocialButton" pos="Min" end="Pause">
+                                <Key type="Curve" time="0.0" value="#SocialPanelWidth" out="Auto"/>
+                            </Controller>
+                        </Animation>
+
+                        <Animation name="AnchorTopRight">
+                            <Event event="TopRight" action="Reset,Play" frame="$parent"/>
+
+                            <Controller type="Anchor" side="Top" relative="True" relativeFrame="$parent/$parent/MenuBar/SocialButton" pos="Max" end="Pause">
+                                <Key type="Curve" time="0.0" value="0" out="Auto"/>
+                            </Controller>
+
+                            <Controller type="Anchor" side="Bottom" relative="True" relativeFrame="$parent/$parent/MenuBar/SocialButton" pos="Max" end="Pause">
+                                <Key type="Curve" time="0.0" value="#SocialPanelHeight" out="Auto"/>
+                            </Controller>
+
+                            <Controller type="Anchor" side="Left" relative="True" relativeFrame="$parent/$parent/MenuBar/SocialButton" pos="Max" end="Pause">
+                                <Key type="Curve" time="0.0" value="#SocialPanelWidthNegative" out="Auto"/>
+                            </Controller>
+
+                            <Controller type="Anchor" side="Right" relative="True" relativeFrame="$parent/$parent/MenuBar/SocialButton" pos="Max" end="Pause">
+                                <Key type="Curve" time="0.0" value="0" out="Auto"/>
+                            </Controller>
+                        </Animation>
+
+                        <Animation name="AnchorBottomLeft">
+                            <Event event="BottomLeft" action="Reset,Play" frame="$parent"/>
+
+                            <Controller type="Anchor" side="Top" relative="True" relativeFrame="$parent/$parent/MenuBar/SocialButton" pos="Min" end="Pause">
+                                <Key type="Curve" time="0.0" value="#SocialPanelHeightNegative" out="Auto"/>
+                            </Controller>
+
+                            <Controller type="Anchor" side="Bottom" relative="True" relativeFrame="$parent/$parent/MenuBar/SocialButton" pos="Min" end="Pause">
+                                <Key type="Curve" time="0.0" value="0" out="Auto"/>
+                            </Controller>
+
+                            <Controller type="Anchor" side="Left" relative="True" relativeFrame="$parent/$parent/MenuBar/SocialButton" pos="Min" end="Pause">
+                                <Key type="Curve" time="0.0" value="0" out="Auto"/>
+                            </Controller>
+
+                            <Controller type="Anchor" side="Right" relative="True" relativeFrame="$parent/$parent/MenuBar/SocialButton" pos="Min" end="Pause">
+                                <Key type="Curve" time="0.0" value="#SocialPanelWidth" out="Auto"/>
+                            </Controller>
+                        </Animation>
+
+                        <Animation name="AnchorBottomRight">
+                            <Event event="BottomRight" action="Reset,Stop" frame="$parent"/>
+
+                            <Controller type="Anchor" side="Top" relative="True" end="Pause">
+                                <Key type="Curve" time="0.0" value="0" out="Auto"/>
+                            </Controller>
+
+                            <Controller type="Anchor" side="Bottom" relative="True" end="Pause">
+                                <Key type="Curve" time="0.0" value="0" out="Auto"/>
+                            </Controller>
+
+                            <Controller type="Anchor" side="Left" relative="True" end="Pause">
+                                <Key type="Curve" time="0.0" value="0" out="Auto"/>
+                            </Controller>
+
+                            <Controller type="Anchor" side="Right" relative="True" end="Pause">
+                                <Key type="Curve" time="0.0" value="0" out="Auto"/>
+                            </Controller>
+                        </Animation>
+                    </Frame>
                 </Frame>
 
                 <Frame type="MenuBar" name="MenuBar" template="MenuBar/MenuBarTemplate">
