@@ -69,6 +69,7 @@
 						</Controller>
 					</Animation>
 				</Frame>
+				
 				<!-- new border image -->
 				<Frame type="Image" name="TalentTreeIcon4Border">
 					<Anchor side="Top" relative="$parent\TalentTreeIcon4" pos="Min" offset="-2"/>
@@ -80,7 +81,7 @@
 					<TextureCoords top="0.197" left="0.0" bottom="0.803" right="1.0"/>
 					<ImageMaskTexture val="@UI/obs_alphaMask_mini_heroic"/>
 					<AlphaMaskTexture val=""/>
-					<RenderPriority val="511"/>
+					<RenderPriority val="510"/>
 					<Visible val="false"/>
 					<IgnoreParentColor val="true"/>
 					
@@ -94,7 +95,63 @@
 						</Controller>
 					</Animation>
 				</Frame>
-				
+				<!-- Tracer border image -->
+				<Frame type="Image" name="TalentTreeIcon4BorderTracer">
+					<Anchor side="Top" relative="$parent\TalentTreeIcon4" pos="Min" offset="-2"/>
+					<Anchor side="Left" relative="$parent\TalentTreeIcon4" pos="Min" offset="-2"/>
+					<Anchor side="Right" relative="$parent\TalentTreeIcon4" pos="Max" offset="2"/>
+					<Anchor side="Bottom" relative="$parent\TalentTreeIcon4" pos="Max" offset="2"/>
+					<Texture val="Assets/Textures/white32.dds"/>
+					<!-- calculated with target size of 62x36 (-> 66x40) -->
+					<TextureCoords top="0.197" left="0.0" bottom="0.803" right="1.0"/>
+					<ImageMaskTexture val="@UI/obs_alphaMask_mini_heroic"/>
+					<AlphaMaskTexture val=""/>
+					<RenderPriority val="510"/>
+					<Visible val="false"/>
+					<IgnoreParentColor val="true"/>
+				</Frame>
+				<!-- Tracer ability bg image -->
+				<!-- has to be between TalentTreeIcon4 and TalentTreeIcon4Border -->
+				<!-- visibility controlled by events in TracerDetector -->
+				<Frame type="Image" name="TracerAbilityImage">
+					<Anchor side="Top" relative="$parent\TalentTreeIcon4" pos="Min" offset="0"/>
+					<Anchor side="Left" relative="$parent\TalentTreeIcon4" pos="Min" offset="0"/>
+					<Anchor side="Right" relative="$parent\TalentTreeIcon4" pos="Max" offset="0"/>
+					<Anchor side="Bottom" relative="$parent\TalentTreeIcon4" pos="Max" offset="0"/>
+					<!-- calculated with target size of 62x36 (-> 66x40) -->
+					<TextureCoords top="0.197" left="0.0" bottom="0.803" right="1.0"/>
+					<ImageMaskTexture val="@UI/obs_alphaMask_mini_heroic"/>
+					<AlphaMaskTexture val=""/>
+					<IgnoreParentColor val="true"/>
+					<RenderPriority val="511"/>
+					<Visible val="false"/>
+					<Texture val="Assets\Textures\storm_ui_icon_tracer_pulsebomb.dds"/>
+					
+					<Animation name="ShowBorder">
+						<Event event="OnShown" action="DirectionForward,Play"/>
+						<Event event="OnHidden" action="DirectionReverse,Play"/>
+						
+						<Controller type="Visibility" end="Pause" frame="$parent/TalentTreeIcon4BorderTracer">
+							<Key type="Bool" time="0" value="false"/>
+							<Key type="Bool" time="0" value="true"/>
+						</Controller>
+					</Animation>
+					
+					<Animation name="DarkenIcon">
+						<Event event="DarkIcon" action="DirectionForward, Play"/>
+						<Event event="BrightIcon" action="DirectionReverse, Play"/>
+						
+						<Controller type="Color" end="Pause">
+							<Key type="Curve" time="0.0" value="255;255;255" out="Step"/>
+							<Key type="Curve" time="0.01" value="64;64;64" out="Step"/>
+						</Controller>
+						<Controller type="Color" end="Pause" frame="$parent/TalentTreeIcon4">
+							<Key type="Curve" time="0.0" value="255;255;255" out="Step"/>
+							<Key type="Curve" time="0.01" value="64;64;64" out="Step"/>
+						</Controller>
+					</Animation>
+					
+				</Frame>
 				
 			</Frame>
 		</Frame>
@@ -123,6 +180,9 @@
 				<Frame type="Image" name="TalentTreeIcon4Border">
 					<Color val="4790C1"/>
 				</Frame>
+				<Frame type="Image" name="TalentTreeIcon4BorderTracer">
+					<Color val="4790C1"/>
+				</Frame>
 			</Frame>
 		</Frame>
 	</Frame>
@@ -136,6 +196,13 @@
 				<Frame type="Image" name="TalentTreeIcon4Border">
 					<ImageMaskTexture val="@UI/obs_alphaMask_mini_heroic_mirrored"/>
 					<Color val="FF3D3D"/>
+				</Frame>
+				<Frame type="Image" name="TalentTreeIcon4BorderTracer">
+					<ImageMaskTexture val="@UI/obs_alphaMask_mini_heroic_mirrored"/>
+					<Color val="FF3D3D"/>
+				</Frame>
+				<Frame type="Image" name="TracerAbilityImage">
+					<ImageMaskTexture val="@UI/obs_alphaMask_mini_heroic_mirrored"/>
 				</Frame>
 			</Frame>
 		</Frame>
@@ -164,7 +231,12 @@
 		
         <Frame type="Image" name="IconFrame">
             <Texture val="_Assets\Textures\storm_ui_ingame_obs_player_frame_blue.dds"/>
+			<RenderType val="HDR"/>
         </Frame>
+		
+		<Frame type="Image" name="HeroPortraitImage">
+			<RenderType val="HDR"/>
+		</Frame>
 		
 		<Frame type="UnitStatusFrame" name="HeroStatus">
             <Anchor side="Top" relative="$parent" pos="Min" offset="64"/>
@@ -194,9 +266,87 @@
 						<Key type="Bool" time="0" value="true"/>
 						<Key type="Bool" time="0.25" value="true"/>
 					</Controller>
+				</Animation>
+				
+			</Frame>
+			
+			<!-- Tracer Detection for Heroic -->
+			<Frame type="UnitStatusBehaviorAnim" name="TracerDetector">
+				<Anchor relative="$parent"/>
+				<Behavior val="TracerReloadController"/>
+				
+				<!-- make placeholder visible, make cooldown visible -->
+				<Animation name="TracerOn">
+					<Event event="BehaviorCreate" action="Reset,Play"/>
 					
+					<Controller type="Event" end="Stop" frame="$parent/HeroicPlaceholder">
+						<Key type="Event" time="0" event="HeroicShown"/>
+					</Controller>
+					<Controller type="Visibility" end="Pause" frame="$parent/TracerPulseBombChargeFrame">
+						<Key type="Bool" time="0" value="True"/>
+					</Controller>
+				</Animation>
+				<Animation name="TracerOff">
+					<Event event="BehaviorDestroy" action="Reset,Play"/>
+					
+					<Controller type="Event" end="Stop" frame="$parent/HeroicPlaceholder">
+						<Key type="Event" time="0" event="HeroicHidden"/>
+					</Controller>
+					<Controller type="Visibility" end="Pause" frame="$parent/TracerPulseBombChargeFrame">
+						<Key type="Bool" time="0" value="False"/>
+					</Controller>
 				</Animation>
 			</Frame>
+			
+			<!-- Tracer special heroic -->
+			<Frame type="UnitStatusAbilCharge" name="TracerPulseBombChargeFrame" template="Tracer/TracerCommandCardFrame/UnitStatusFrame0/TracerPulseBombChargeFrame">
+				<Visible val="false"/>
+				<Frame type="Image" name="TracerPulseBombBackgroundImage">
+					<Anchor side="Top" relative="$parent" pos="Min" offset="-23"/>
+					<Anchor side="Left" relative="$parent" pos="Min" offset="3"/>
+					<Width val="35"/>
+					<Height val="38"/>
+					<!-- @UI/Storm_UI_HUD_Tracer_Pulse_Bomb_Background 68x76 -->
+					<!-- <TextureCoords top="0.2097" left="0.0" bottom="0.7903" right="1.0"/>
+					<ImageMaskTexture val="@UI/obs_alphaMask_mini_heroic"/>
+					<AlphaMaskTexture val=""/> -->
+					<Unclipped val="true"/>
+					<Alpha val="128"/>
+				</Frame>
+				<Frame type="ProgressBar" name="ChargeFillProgress">
+					<Anchor side="Top" relative="$parent/TracerPulseBombBackgroundImage" pos="Min" offset="0"/>
+					<Anchor side="Left" relative="$parent/TracerPulseBombBackgroundImage" pos="Mid" offset="0"/>
+					<Anchor side="Right" relative="$parent/TracerPulseBombBackgroundImage" pos="Mid" offset="0"/>
+					<Width val="35"/>
+					<Height val="38"/>
+					<!-- @UI/Storm_UI_HUD_Tracer_Pulse_Bomb_Fill_Image 68x76 -->
+					<Unclipped val="true"/>
+				</Frame>
+				<Frame type="Label" name="ChargesLabel">
+					<Anchor side="Top" relative="$parent/TracerPulseBombBackgroundImage" pos="Min" offset="6"/>
+					<Anchor side="Right" relative="$parent/TracerPulseBombBackgroundImage" pos="Max" offset="2"/>
+					<Anchor side="Left" relative="$parent/TracerPulseBombBackgroundImage" pos="Min" offset="2"/>
+					<Width val="0"/>
+					<Style val="Storm_HUD_Tracer_Pulse_Bomb_Charge_Ahli"/>
+					<Unclipped val="true"/>
+				</Frame>
+				<!-- hidden -->
+				<Frame type="Image" name="PulseBombReadyPingImage">
+					<!-- @UI/Storm_UI_HeroUI_Greymane_PulseRing 120x120 animation alters height/width -->
+					<Anchor side="Top" relative="$parent/TracerPulseBombBackgroundImage" pos="Mid" offset="9999"/>
+					<Anchor side="Left" relative="$parent/TracerPulseBombBackgroundImage" pos="Mid" offset="9999"/>
+					<Anchor side="Right" relative="$parent/TracerPulseBombBackgroundImage" pos="Mid" offset="9999"/>
+					<Anchor side="Bottom" relative="$parent/TracerPulseBombBackgroundImage" pos="Mid" offset="9999"/>
+				</Frame>
+				<!-- hidden, no space for % -->
+				<Frame type="Label" name="ChargePercentLabel">
+					<Visible val="false"/>
+				</Frame>
+			</Frame>
+			
+			
+			
+			
 			
 			<Frame type="UnitStatusShieldedHealthBar" name="HealthBar">
 				<Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
@@ -412,6 +562,13 @@
                 <AlphaMaskTexture val="@UI/obs_bar_player_red"/>
 			</Frame>
 			
+			<!-- Tracer special heroic -->
+			<Frame type="UnitStatusAbilCharge" name="TracerPulseBombChargeFrame">
+				<Frame type="Image" name="TracerPulseBombBackgroundImage">
+					<Anchor side="Left" relative="$parent" pos="Min" offset="7"/>
+				</Frame>
+			</Frame>
+			
 		</Frame>
 
 		<Frame type="UnitTargetFrame" name="TargetHeroUnitFrame">
@@ -420,7 +577,7 @@
 	</Frame>
 
 	<Frame type="Frame" name="GameUI/UIContainer/FullscreenUpperContainer/ObserverHeroOverviewPanel" file="GameUI">
-	
+		
 		<!-- Fade animation -->
 		<Animation name="IntroAnim">
 			<Event event="Intro" action="DirectionForward,Play"/>
@@ -442,14 +599,149 @@
             <Anchor side="Right" relative="$parent" pos="Mid" offset="-193"/>
 			
 			<Frame type="Frame" name="HeroOverview1" template="_TopPanel/HeroOverviewTemplateL">
+				<!-- slot specific animtions -->
+				<Frame type="UnitStatusFrame" name="HeroStatus">
+					<Frame type="UnitStatusAbilCharge" name="TracerPulseBombChargeFrame">
+						<Animation name="ShowHeroicBg">
+							<Event event="OnShown" action="DirectionForward,Play"/>
+							<Event event="OnHidden" action="DirectionReverse,Play"/>
+							<Controller type="Visibility" end="Pause" frame="$parent/$parent/$parent/$parent/TalentsOverview/TalentOverview/HeroLeaderPanelContainer/TabControl/PlayerFrame0/StatsContainerFrame/TalentTreeCustom/TracerAbilityImage">
+								<Key type="Bool" time="0.0" value="false"/>
+								<Key type="Bool" time="0.0" value="true"/>
+							</Controller>
+						</Animation>
+						<Frame type="Image" name="TracerPulseBombBackgroundImage">
+							<Animation name="NotEnoughCharges">
+								<Event event="OnShown" action="DirectionForward,Play"/>
+								<Controller type="Event" end="Stop" frame="$parent/$parent/$parent/$parent/$parent/TalentsOverview/TalentOverview/HeroLeaderPanelContainer/TabControl/PlayerFrame0/StatsContainerFrame/TalentTreeCustom/TracerAbilityImage">
+									<Key type="Event" time="0" event="DarkIcon"/>
+								</Controller>
+							</Animation>
+							<Animation name="Usable">
+								<Event event="OnHidden" action="DirectionForward,Play"/>
+								<Controller type="Event" end="Stop" frame="$parent/$parent/$parent/$parent/$parent/TalentsOverview/TalentOverview/HeroLeaderPanelContainer/TabControl/PlayerFrame0/StatsContainerFrame/TalentTreeCustom/TracerAbilityImage">
+									<Key type="Event" time="0" event="BrightIcon"/>
+								</Controller>
+							</Animation>
+						</Frame>
+					</Frame>
+				</Frame>
 			</Frame>
 			<Frame type="Frame" name="HeroOverview2" template="_TopPanel/HeroOverviewTemplateL">
+				<!-- slot specific animtions -->
+				<Frame type="UnitStatusFrame" name="HeroStatus">
+					<Frame type="UnitStatusAbilCharge" name="TracerPulseBombChargeFrame">
+						<Animation name="ShowHeroicBg">
+							<Event event="OnShown" action="DirectionForward,Play"/>
+							<Event event="OnHidden" action="DirectionReverse,Play"/>
+							<Controller type="Visibility" end="Pause" frame="$parent/$parent/$parent/$parent/TalentsOverview/TalentOverview/HeroLeaderPanelContainer/TabControl/PlayerFrame1/StatsContainerFrame/TalentTreeCustom/TracerAbilityImage">
+								<Key type="Bool" time="0.0" value="false"/>
+								<Key type="Bool" time="0.0" value="true"/>
+							</Controller>
+						</Animation>
+						<Frame type="Image" name="TracerPulseBombBackgroundImage">
+							<Animation name="NotEnoughCharges">
+								<Event event="OnShown" action="DirectionForward,Play"/>
+								<Controller type="Event" end="Stop" frame="$parent/$parent/$parent/$parent/$parent/TalentsOverview/TalentOverview/HeroLeaderPanelContainer/TabControl/PlayerFrame1/StatsContainerFrame/TalentTreeCustom/TracerAbilityImage">
+									<Key type="Event" time="0" event="DarkIcon"/>
+								</Controller>
+							</Animation>
+							<Animation name="Usable">
+								<Event event="OnHidden" action="DirectionForward,Play"/>
+								<Controller type="Event" end="Stop" frame="$parent/$parent/$parent/$parent/$parent/TalentsOverview/TalentOverview/HeroLeaderPanelContainer/TabControl/PlayerFrame1/StatsContainerFrame/TalentTreeCustom/TracerAbilityImage">
+									<Key type="Event" time="0" event="BrightIcon"/>
+								</Controller>
+							</Animation>
+						</Frame>
+					</Frame>
+				</Frame>
 			</Frame>
 			<Frame type="Frame" name="HeroOverview3" template="_TopPanel/HeroOverviewTemplateL">
+				<!-- slot specific animtions -->
+				<Frame type="UnitStatusFrame" name="HeroStatus">
+					<Frame type="UnitStatusAbilCharge" name="TracerPulseBombChargeFrame">
+						<Animation name="ShowHeroicBg">
+							<Event event="OnShown" action="DirectionForward,Play"/>
+							<Event event="OnHidden" action="DirectionReverse,Play"/>
+							<Controller type="Visibility" end="Pause" frame="$parent/$parent/$parent/$parent/TalentsOverview/TalentOverview/HeroLeaderPanelContainer/TabControl/PlayerFrame2/StatsContainerFrame/TalentTreeCustom/TracerAbilityImage">
+								<Key type="Bool" time="0.0" value="false"/>
+								<Key type="Bool" time="0.0" value="true"/>
+							</Controller>
+						</Animation>
+						<Frame type="Image" name="TracerPulseBombBackgroundImage">
+							<Animation name="NotEnoughCharges">
+								<Event event="OnShown" action="DirectionForward,Play"/>
+								<Controller type="Event" end="Stop" frame="$parent/$parent/$parent/$parent/$parent/TalentsOverview/TalentOverview/HeroLeaderPanelContainer/TabControl/PlayerFrame2/StatsContainerFrame/TalentTreeCustom/TracerAbilityImage">
+									<Key type="Event" time="0" event="DarkIcon"/>
+								</Controller>
+							</Animation>
+							<Animation name="Usable">
+								<Event event="OnHidden" action="DirectionForward,Play"/>
+								<Controller type="Event" end="Stop" frame="$parent/$parent/$parent/$parent/$parent/TalentsOverview/TalentOverview/HeroLeaderPanelContainer/TabControl/PlayerFrame2/StatsContainerFrame/TalentTreeCustom/TracerAbilityImage">
+									<Key type="Event" time="0" event="BrightIcon"/>
+								</Controller>
+							</Animation>
+						</Frame>
+					</Frame>
+				</Frame>
 			</Frame>
 			<Frame type="Frame" name="HeroOverview4" template="_TopPanel/HeroOverviewTemplateL">
+				<!-- slot specific animtions -->
+				<Frame type="UnitStatusFrame" name="HeroStatus">
+					<Frame type="UnitStatusAbilCharge" name="TracerPulseBombChargeFrame">
+						<Animation name="ShowHeroicBg">
+							<Event event="OnShown" action="DirectionForward,Play"/>
+							<Event event="OnHidden" action="DirectionReverse,Play"/>
+							<Controller type="Visibility" end="Pause" frame="$parent/$parent/$parent/$parent/TalentsOverview/TalentOverview/HeroLeaderPanelContainer/TabControl/PlayerFrame3/StatsContainerFrame/TalentTreeCustom/TracerAbilityImage">
+								<Key type="Bool" time="0.0" value="false"/>
+								<Key type="Bool" time="0.0" value="true"/>
+							</Controller>
+						</Animation>
+						<Frame type="Image" name="TracerPulseBombBackgroundImage">
+							<Animation name="NotEnoughCharges">
+								<Event event="OnShown" action="DirectionForward,Play"/>
+								<Controller type="Event" end="Stop" frame="$parent/$parent/$parent/$parent/$parent/TalentsOverview/TalentOverview/HeroLeaderPanelContainer/TabControl/PlayerFrame3/StatsContainerFrame/TalentTreeCustom/TracerAbilityImage">
+									<Key type="Event" time="0" event="DarkIcon"/>
+								</Controller>
+							</Animation>
+							<Animation name="Usable">
+								<Event event="OnHidden" action="DirectionForward,Play"/>
+								<Controller type="Event" end="Stop" frame="$parent/$parent/$parent/$parent/$parent/TalentsOverview/TalentOverview/HeroLeaderPanelContainer/TabControl/PlayerFrame3/StatsContainerFrame/TalentTreeCustom/TracerAbilityImage">
+									<Key type="Event" time="0" event="BrightIcon"/>
+								</Controller>
+							</Animation>
+						</Frame>
+					</Frame>
+				</Frame>
 			</Frame>
 			<Frame type="Frame" name="HeroOverview5" template="_TopPanel/HeroOverviewTemplateL">
+				<!-- slot specific animtions -->
+				<Frame type="UnitStatusFrame" name="HeroStatus">
+					<Frame type="UnitStatusAbilCharge" name="TracerPulseBombChargeFrame">
+						<Animation name="ShowHeroicBg">
+							<Event event="OnShown" action="DirectionForward,Play"/>
+							<Event event="OnHidden" action="DirectionReverse,Play"/>
+							<Controller type="Visibility" end="Pause" frame="$parent/$parent/$parent/$parent/TalentsOverview/TalentOverview/HeroLeaderPanelContainer/TabControl/PlayerFrame4/StatsContainerFrame/TalentTreeCustom/TracerAbilityImage">
+								<Key type="Bool" time="0.0" value="false"/>
+								<Key type="Bool" time="0.0" value="true"/>
+							</Controller>
+						</Animation>
+						<Frame type="Image" name="TracerPulseBombBackgroundImage">
+							<Animation name="NotEnoughCharges">
+								<Event event="OnShown" action="DirectionForward,Play"/>
+								<Controller type="Event" end="Stop" frame="$parent/$parent/$parent/$parent/$parent/TalentsOverview/TalentOverview/HeroLeaderPanelContainer/TabControl/PlayerFrame4/StatsContainerFrame/TalentTreeCustom/TracerAbilityImage">
+									<Key type="Event" time="0" event="DarkIcon"/>
+								</Controller>
+							</Animation>
+							<Animation name="Usable">
+								<Event event="OnHidden" action="DirectionForward,Play"/>
+								<Controller type="Event" end="Stop" frame="$parent/$parent/$parent/$parent/$parent/TalentsOverview/TalentOverview/HeroLeaderPanelContainer/TabControl/PlayerFrame4/StatsContainerFrame/TalentTreeCustom/TracerAbilityImage">
+									<Key type="Event" time="0" event="BrightIcon"/>
+								</Controller>
+							</Animation>
+						</Frame>
+					</Frame>
+				</Frame>
 			</Frame>
 			
 			<!-- towns blue -->
@@ -541,6 +833,7 @@
 				<TextureCoords top="0.0" left="1.0" bottom="1.0" right="0.6666"/>
 				<RenderPriority val="400"/>
 				<Visible val="false"/>
+				<RenderType val="HDR"/>
 				
 				<Animation name="VisibilityLink">
 					<Event event="OnShown" action="DirectionForward,Play" frame="$parent/HeroOverview1"/>
@@ -578,6 +871,7 @@
 				<TextureCoords top="0.0" left="0.3333" bottom="1.0" right="0.0"/>
 				<RenderPriority val="400"/>
 				<Visible val="false"/>
+				<RenderType val="HDR"/>
 			</Frame>
 			<Frame type="Image" name="BgImageCenter">
 				<Anchor side="Top" relative="$parent/BgImageLeft" pos="Min" offset="0"/>
@@ -588,20 +882,156 @@
 				<TextureCoords top="0.0" left="0.6666" bottom="1.0" right="0.3333"/>
 				<RenderPriority val="400"/>
 				<Visible val="false"/>
+				<RenderType val="HDR"/>
 			</Frame>
 		</Frame>
 		<Frame type="Frame" name="Team2HeroOverview">
             <Anchor side="Left" relative="$parent" pos="Mid" offset="193"/>
 			
 			<Frame type="Frame" name="HeroOverview1" template="_TopPanel/HeroOverviewTemplateR">
+				<!-- slot specific animtions -->
+				<Frame type="UnitStatusFrame" name="HeroStatus">
+					<Frame type="UnitStatusAbilCharge" name="TracerPulseBombChargeFrame">
+						<Animation name="ShowHeroicBg">
+							<Event event="OnShown" action="DirectionForward,Play"/>
+							<Event event="OnHidden" action="DirectionReverse,Play"/>
+							<Controller type="Visibility" end="Pause" frame="$parent/$parent/$parent/$parent/TalentsOverview/TalentOverview/HeroLeaderPanelContainer/TabControl/PlayerFrame5/StatsContainerFrame/TalentTreeCustom/TracerAbilityImage">
+								<Key type="Bool" time="0.0" value="false"/>
+								<Key type="Bool" time="0.0" value="true"/>
+							</Controller>
+						</Animation>
+						<Frame type="Image" name="TracerPulseBombBackgroundImage">
+							<Animation name="NotEnoughCharges">
+								<Event event="OnShown" action="DirectionForward,Play"/>
+								<Controller type="Event" end="Stop" frame="$parent/$parent/$parent/$parent/$parent/TalentsOverview/TalentOverview/HeroLeaderPanelContainer/TabControl/PlayerFrame5/StatsContainerFrame/TalentTreeCustom/TracerAbilityImage">
+									<Key type="Event" time="0" event="DarkIcon"/>
+								</Controller>
+							</Animation>
+							<Animation name="Usable">
+								<Event event="OnHidden" action="DirectionForward,Play"/>
+								<Controller type="Event" end="Stop" frame="$parent/$parent/$parent/$parent/$parent/TalentsOverview/TalentOverview/HeroLeaderPanelContainer/TabControl/PlayerFrame5/StatsContainerFrame/TalentTreeCustom/TracerAbilityImage">
+									<Key type="Event" time="0" event="BrightIcon"/>
+								</Controller>
+							</Animation>
+						</Frame>
+					</Frame>
+				</Frame>
 			</Frame>
 			<Frame type="Frame" name="HeroOverview2" template="_TopPanel/HeroOverviewTemplateR">
+				<!-- slot specific animtions -->
+				<Frame type="UnitStatusFrame" name="HeroStatus">
+					<Frame type="UnitStatusAbilCharge" name="TracerPulseBombChargeFrame">
+						<Animation name="ShowHeroicBg">
+							<Event event="OnShown" action="DirectionForward,Play"/>
+							<Event event="OnHidden" action="DirectionReverse,Play"/>
+							<Controller type="Visibility" end="Pause" frame="$parent/$parent/$parent/$parent/TalentsOverview/TalentOverview/HeroLeaderPanelContainer/TabControl/PlayerFrame6/StatsContainerFrame/TalentTreeCustom/TracerAbilityImage">
+								<Key type="Bool" time="0.0" value="false"/>
+								<Key type="Bool" time="0.0" value="true"/>
+							</Controller>
+						</Animation>
+						<Frame type="Image" name="TracerPulseBombBackgroundImage">
+							<Animation name="NotEnoughCharges">
+								<Event event="OnShown" action="DirectionForward,Play"/>
+								<Controller type="Event" end="Stop" frame="$parent/$parent/$parent/$parent/$parent/TalentsOverview/TalentOverview/HeroLeaderPanelContainer/TabControl/PlayerFrame6/StatsContainerFrame/TalentTreeCustom/TracerAbilityImage">
+									<Key type="Event" time="0" event="DarkIcon"/>
+								</Controller>
+							</Animation>
+							<Animation name="Usable">
+								<Event event="OnHidden" action="DirectionForward,Play"/>
+								<Controller type="Event" end="Stop" frame="$parent/$parent/$parent/$parent/$parent/TalentsOverview/TalentOverview/HeroLeaderPanelContainer/TabControl/PlayerFrame6/StatsContainerFrame/TalentTreeCustom/TracerAbilityImage">
+									<Key type="Event" time="0" event="BrightIcon"/>
+								</Controller>
+							</Animation>
+						</Frame>
+					</Frame>
+				</Frame>
 			</Frame>
 			<Frame type="Frame" name="HeroOverview3" template="_TopPanel/HeroOverviewTemplateR">
+				<!-- slot specific animtions -->
+				<Frame type="UnitStatusFrame" name="HeroStatus">
+					<Frame type="UnitStatusAbilCharge" name="TracerPulseBombChargeFrame">
+						<Animation name="ShowHeroicBg">
+							<Event event="OnShown" action="DirectionForward,Play"/>
+							<Event event="OnHidden" action="DirectionReverse,Play"/>
+							<Controller type="Visibility" end="Pause" frame="$parent/$parent/$parent/$parent/TalentsOverview/TalentOverview/HeroLeaderPanelContainer/TabControl/PlayerFrame7/StatsContainerFrame/TalentTreeCustom/TracerAbilityImage">
+								<Key type="Bool" time="0.0" value="false"/>
+								<Key type="Bool" time="0.0" value="true"/>
+							</Controller>
+						</Animation>
+						<Frame type="Image" name="TracerPulseBombBackgroundImage">
+							<Animation name="NotEnoughCharges">
+								<Event event="OnShown" action="DirectionForward,Play"/>
+								<Controller type="Event" end="Stop" frame="$parent/$parent/$parent/$parent/$parent/TalentsOverview/TalentOverview/HeroLeaderPanelContainer/TabControl/PlayerFrame7/StatsContainerFrame/TalentTreeCustom/TracerAbilityImage">
+									<Key type="Event" time="0" event="DarkIcon"/>
+								</Controller>
+							</Animation>
+							<Animation name="Usable">
+								<Event event="OnHidden" action="DirectionForward,Play"/>
+								<Controller type="Event" end="Stop" frame="$parent/$parent/$parent/$parent/$parent/TalentsOverview/TalentOverview/HeroLeaderPanelContainer/TabControl/PlayerFrame7/StatsContainerFrame/TalentTreeCustom/TracerAbilityImage">
+									<Key type="Event" time="0" event="BrightIcon"/>
+								</Controller>
+							</Animation>
+						</Frame>
+					</Frame>
+				</Frame>
 			</Frame>
 			<Frame type="Frame" name="HeroOverview4" template="_TopPanel/HeroOverviewTemplateR">
+				<!-- slot specific animtions -->
+				<Frame type="UnitStatusFrame" name="HeroStatus">
+					<Frame type="UnitStatusAbilCharge" name="TracerPulseBombChargeFrame">
+						<Animation name="ShowHeroicBg">
+							<Event event="OnShown" action="DirectionForward,Play"/>
+							<Event event="OnHidden" action="DirectionReverse,Play"/>
+							<Controller type="Visibility" end="Pause" frame="$parent/$parent/$parent/$parent/TalentsOverview/TalentOverview/HeroLeaderPanelContainer/TabControl/PlayerFrame8/StatsContainerFrame/TalentTreeCustom/TracerAbilityImage">
+								<Key type="Bool" time="0.0" value="false"/>
+								<Key type="Bool" time="0.0" value="true"/>
+							</Controller>
+						</Animation>
+						<Frame type="Image" name="TracerPulseBombBackgroundImage">
+							<Animation name="NotEnoughCharges">
+								<Event event="OnShown" action="DirectionForward,Play"/>
+								<Controller type="Event" end="Stop" frame="$parent/$parent/$parent/$parent/$parent/TalentsOverview/TalentOverview/HeroLeaderPanelContainer/TabControl/PlayerFrame8/StatsContainerFrame/TalentTreeCustom/TracerAbilityImage">
+									<Key type="Event" time="0" event="DarkIcon"/>
+								</Controller>
+							</Animation>
+							<Animation name="Usable">
+								<Event event="OnHidden" action="DirectionForward,Play"/>
+								<Controller type="Event" end="Stop" frame="$parent/$parent/$parent/$parent/$parent/TalentsOverview/TalentOverview/HeroLeaderPanelContainer/TabControl/PlayerFrame8/StatsContainerFrame/TalentTreeCustom/TracerAbilityImage">
+									<Key type="Event" time="0" event="BrightIcon"/>
+								</Controller>
+							</Animation>
+						</Frame>
+					</Frame>
+				</Frame>
 			</Frame>
 			<Frame type="Frame" name="HeroOverview5" template="_TopPanel/HeroOverviewTemplateR">
+				<!-- slot specific animtions -->
+				<Frame type="UnitStatusFrame" name="HeroStatus">
+					<Frame type="UnitStatusAbilCharge" name="TracerPulseBombChargeFrame">
+						<Animation name="ShowHeroicBg">
+							<Event event="OnShown" action="DirectionForward,Play"/>
+							<Event event="OnHidden" action="DirectionReverse,Play"/>
+							<Controller type="Visibility" end="Pause" frame="$parent/$parent/$parent/$parent/TalentsOverview/TalentOverview/HeroLeaderPanelContainer/TabControl/PlayerFrame9/StatsContainerFrame/TalentTreeCustom/TracerAbilityImage">
+								<Key type="Bool" time="0.0" value="false"/>
+								<Key type="Bool" time="0.0" value="true"/>
+							</Controller>
+						</Animation>
+						<Frame type="Image" name="TracerPulseBombBackgroundImage">
+							<Animation name="NotEnoughCharges">
+								<Event event="OnShown" action="DirectionForward,Play"/>
+								<Controller type="Event" end="Stop" frame="$parent/$parent/$parent/$parent/$parent/TalentsOverview/TalentOverview/HeroLeaderPanelContainer/TabControl/PlayerFrame9/StatsContainerFrame/TalentTreeCustom/TracerAbilityImage">
+									<Key type="Event" time="0" event="DarkIcon"/>
+								</Controller>
+							</Animation>
+							<Animation name="Usable">
+								<Event event="OnHidden" action="DirectionForward,Play"/>
+								<Controller type="Event" end="Stop" frame="$parent/$parent/$parent/$parent/$parent/TalentsOverview/TalentOverview/HeroLeaderPanelContainer/TabControl/PlayerFrame9/StatsContainerFrame/TalentTreeCustom/TracerAbilityImage">
+									<Key type="Event" time="0" event="BrightIcon"/>
+								</Controller>
+							</Animation>
+						</Frame>
+					</Frame>
+				</Frame>
 			</Frame>
 			
 			<!-- towns red -->
@@ -693,6 +1123,7 @@
 				<TextureCoords top="0.0" left="0.0" bottom="1.0" right="0.3333"/>
 				<RenderPriority val="400"/>
 				<Visible val="false"/>
+				<RenderType val="HDR"/>
 				
 				<Animation name="VisibilityLink">
 					<Event event="OnShown" action="DirectionForward,Play" frame="$parent/HeroOverview1"/>
@@ -730,6 +1161,7 @@
 				<TextureCoords top="0.0" left="0.6666" bottom="1.0" right="1.0"/>
 				<RenderPriority val="400"/>
 				<Visible val="false"/>
+				<RenderType val="HDR"/>
 			</Frame>
 			<Frame type="Image" name="BgImageCenter">
 				<Anchor side="Top" relative="$parent/BgImageLeft" pos="Min" offset="0"/>
@@ -740,6 +1172,7 @@
 				<TextureCoords top="0.0" left="0.3333" bottom="1.0" right="0.6666"/>
 				<RenderPriority val="400"/>
 				<Visible val="false"/>
+				<RenderType val="HDR"/>
 			</Frame>
 			
 		</Frame>
@@ -804,6 +1237,7 @@
 		<!-- edit default talents panel -->
 		<Frame type="Frame" name="TalentsOverview">
 			<Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+			<RenderPriority val="511"/>
 			
 			<Frame type="HeroLeaderPanel" name="TalentOverview">
 				<Frame type="Frame" name="HeroLeaderPanelContainer">
