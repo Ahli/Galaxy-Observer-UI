@@ -192,11 +192,6 @@
     <Frame type="ChatSessionsTooltip" name="ChatPanelChatSessionsTooltip" template="ChatSessionsTooltip/ChatSessionsTooltip" />
     <Frame type="ChatCommandsTooltip" name="ChatPanelChatCommandsTooltip" template="ChatCommandsTooltip/ChatCommandsTooltip" />
     <Frame type="WhisperRecipientsTooltip" name="ChatPanelRecipientsTooltip" template="WhisperRecipientsTooltip/WhisperRecipientsTooltip" />
-
-    <Frame Type="BattleUserContextMenu" name="ChatPanelUserContextMenu" template="BattleUserContextMenu/BattleUserContextMenu" >
-        <Anchor side="Top" relative="$parent" pos="Max" offset="0"/>
-        <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
-    </Frame>
     
     <Frame type="ChatDisplayListBoxItem" name="ChatDisplayListBoxItem">
         <AcceptsMouse val="false"/>
@@ -248,6 +243,11 @@
 
     <Frame type="ChatPanel" name="ChatPanelBaseTemplate">
         <WhoCommandLevelRequirement val="5"/>
+
+        <Frame Type="BattleUserContextMenu" name="ChatPanelUserContextMenu" template="BattleUserContextMenu/BattleUserContextMenu" >
+            <Anchor side="Top" relative="$parent" pos="Max" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+        </Frame>
         
         <Frame type="Frame" name="InnerContainerAnchor">
             <Anchor side="Top" relative="$parent/ContentAreaAnchor" pos="Min" offset="3"/>
@@ -354,9 +354,12 @@
                 <HighlightOnGainFocus val="false"/>
                 <Style val="BattleChatActive"/>
 
-                <Frame type="Label" name="Label">
+                <Frame type="Frame" name="LabelContainerFrame">
                     <Anchor relative="$parent"/>
-                    <Options val="Ellipsis | IgnoreFormatTags"/>
+                    <Frame type="Label" name="Label">
+                        <Anchor relative="$parent"/>
+                        <Options val="Ellipsis | IgnoreFormatTags"/>
+                    </Frame>
                 </Frame>
             </Frame>
         </Frame>
@@ -564,31 +567,40 @@
 
     <!-- MaximizeChat functionality -->
     <Frame type="ChatPanel" name="ChatPanelTemplate" template="ChatPanel/ChatPanelBaseTemplate">
-        <!-- The Maximize Animation. It's important not to change the name because it is referenced by code -->
+        <Animation name="MaximizeButtonClick">
+            <Event event="OnClick" action="DirectionForward,Play" frame="ChatManagerPanel/MaximizeChatButton"/>
+            <Event event="OnClick" action="DirectionReverse,Play" frame="ChatManagerPanel/MinimizeChatButton"/>
+
+            <Controller type="Property" property="Maximized" end="Pause">
+                <Key type="Property" time="0.00" value="false"/>
+                <Key type="Property" time="0.01" value="true"/>
+            </Controller>
+        </Animation>
+
+        <StateGroup name="MaximizeButtonStateGroup">
+            <State name="MaximizedState">
+                <When type="Property" frame="$this" Maximized="true"/>
+                <Action type="SetProperty" frame="ChatManagerPanel/MaximizeChatButton" Visible="false"/>
+                <Action type="SetProperty" frame="ChatManagerPanel/MinimizeChatButton" Visible="true"/>
+                <Action type="SendEvent" frame="$this" event="MaximizeChat"/>
+            </State>
+
+            <State name="MinimizedState">
+                <When type="Property" frame="$this" Maximized="false"/>
+                <Action type="SetProperty" frame="ChatManagerPanel/MaximizeChatButton" Visible="true"/>
+                <Action type="SetProperty" frame="ChatManagerPanel/MinimizeChatButton" Visible="false"/>
+                <Action type="SendEvent" frame="$this" event="MinimizeChat"/>
+            </State>
+        </StateGroup>
+        
         <Animation name="MaximizeChat">
-            <Event event="MaximizeChat" action="DirectionForward"/>
-            <Event event="MaximizeChat" action="Play"/>
-            <Event event="MinimizeChat" action="DirectionReverse"/>
-            <Event event="MinimizeChat" action="Play"/>
-            <Event event="OnClick" action="DirectionForward" frame="ChatManagerPanel/MaximizeChatButton"/>
-            <Event event="OnClick" action="Play" frame="ChatManagerPanel/MaximizeChatButton"/>
-            <Event event="OnClick" action="DirectionReverse" frame="ChatManagerPanel/MinimizeChatButton"/>
-            <Event event="OnClick" action="Play" frame="ChatManagerPanel/MinimizeChatButton"/>
+            <Event event="MaximizeChat" action="DirectionForward,Play"/>
+            <Event event="MinimizeChat" action="DirectionReverse,Play"/>
             <Event event="EditBoxFocusLostImmediate" action="Reset,Stop"/>
 
             <Controller type="Anchor" end="Pause" side="Top" relative="true">
                 <Key type="Curve" time="0.0" value="0" out="Step"/>
                 <Key type="Curve" time="0.1" value="-426" out="Step"/>
-            </Controller>
-            
-            <Controller type="Event" end="Pause" frame="ChatManagerPanel/MaximizeChatButton">
-                <Key type="Event" time="0.0" event="MinimizeChat"/>
-                <Key type="Event" time="0.1" event="MaximizeChat"/>
-            </Controller>
-
-            <Controller type="Event" end="Pause" frame="ChatManagerPanel/MinimizeChatButton">
-                <Key type="Event" time="0.0" event="MinimizeChat"/>
-                <Key type="Event" time="0.1" event="MaximizeChat"/>
             </Controller>
 
             <Controller type="Event" end="Pause">
@@ -628,17 +640,6 @@
                     <Texture val="@UI/ChatPanel_Maximize_Normal" layer="3"/>
                     <DesaturateOnDisable val="true"/>
                 </Frame>
-
-                <Animation name="ToggleButton">
-                    <Event event="MaximizeChat" action="Reset"/>
-                    <Event event="MaximizeChat" action="Play"/>
-                    <Event event="MinimizeChat" action="Reset"/>
-                    <Event event="MinimizeChat" action="Stop"/>
-
-                    <Controller type="Visibility" end="Pause">
-                        <Key type="Bool" time="0" value="false"/>
-                    </Controller>
-                </Animation>
             </Frame>
 
             <Frame type="Button" name="MinimizeChatButton" template="StandardTemplates/StormCloseButtonTemplate">
@@ -670,17 +671,6 @@
                     <Texture val="@UI/ChatPanel_Minimize_Normal" layer="3"/>
                     <DesaturateOnDisable val="true"/>
                 </Frame>
-
-                <Animation name="ToggleButton">
-                    <Event event="MaximizeChat" action="Reset"/>
-                    <Event event="MaximizeChat" action="Play"/>
-                    <Event event="MinimizeChat" action="Reset"/>
-                    <Event event="MinimizeChat" action="Stop"/>
-
-                    <Controller type="Visibility" end="Pause">
-                        <Key type="Bool" time="0" value="true"/>
-                    </Controller>
-                </Animation>
             </Frame>
         </Frame>
     </Frame>

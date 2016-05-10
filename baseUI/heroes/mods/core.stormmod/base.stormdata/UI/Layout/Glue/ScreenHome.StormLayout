@@ -4,12 +4,13 @@
 
     <Frame type="ScreenHome" name="ScreenHome" template="StandardTemplates/GlueScreen">
         <Anchor relative="$parent"/>
+        <AutoCycleContent val="true"/>
+        <AutoShowContent val="true"/>
+        <ContentCycleDelay val="16000"/>
 
         <Animation name="Transition">
-            <Event event="Show" action="Reset"/>
-            <Event event="Show" action="Play"/>
-            <Event event="Hide" action="DirectionReverse"/>
-            <Event event="Hide" action="Play"/>
+            <Event event="Show" action="Reset,Play"/>
+            <Event event="Hide" action="DirectionReverse,Play"/>
             <Controller type="Fade" end="Pause">
                 <Key type="Curve" time="0.0" value="0" out="Slow"/>
                 <Key type="Curve" time="0.4" value="255" in="Slow" out="Slow"/>
@@ -37,6 +38,35 @@
 
         <Frame type="HeroHomeInfoPanel" name="HeroHomeInfoPanel">
             <Anchor relative="$parent"/>
+            <Alpha val="0"/>
+
+            <Animation name="ShowContent">
+                <Event event="ShowContent" action="DirectionForward, Play" frame="$parent"/>
+                <Event event="HideContent" action="DirectionReverse, Play" frame="$parent"/>
+
+                <Controller type="Visibility" end="Pause">
+                    <Key type="Bool" time="0.00" value="true"/>
+                    <Key type="Bool" time="0.99" value="true"/>
+                    <Key type="Bool" time="1" value="false"/>
+                </Controller>
+            </Animation>
+            
+            <Animation name="DataFade">
+                <Event event="DataReceived" action="Play" frame="$parent"/>
+
+                <Controller type="Visibility" end="Pause">
+                    <Key type="Bool" time="0.0" value="false"/>
+                    <Key type="Bool" time="0.5" value="true"/>
+                    <Key type="Bool" time="1" value="true"/>
+                </Controller>
+
+                <Controller type="Fade" end="Pause">
+                    <Key type="Curve" time="0.0" value="0"/>
+                    <Key type="Curve" time="0.5" value="0"/>
+                    <Key type="Curve" time="0.9" value="255"/>
+                </Controller>
+            </Animation>
+            
             <Frame type="HeroContainerFrame" name="PTRFrame" template="HomePTR/PTRFrameTemplate">
                 <Animation name="ChangeHomeScreenHero">
                     <Event event="ResetHero" action="Stop" frame="$parent"/>
@@ -47,38 +77,20 @@
                         <Key type="Bool" time="0.01" value="true"/>
                     </Controller>
                 </Animation>
-            </Frame>
-
-            <Frame type="HeroContainerFrame" name="TracerFrame" template="Home17mid/TracerFrameTemplate">
+            </Frame>           
+            
+            <Frame type="HeroContainerFrame" name="ChromieFrame" template="Home18/ChromieFrameTemplate">
                 <Animation name="ChangeHomeScreenHero">
                     <Event event="ResetHero" action="Stop" frame="$parent"/>
-                    <Event event="Tracer" action="Restart,Play" frame="$parent"/>
+                    <Event event="Chromie" action="Restart,Play" frame="$parent"/>
                     <Controller type="Visibility" end="Pause">
                         <Key type="Bool" time="0" value="false"/>
                         <Key type="Bool" time=".01" value="true"/>
                     </Controller>
-                    <Controller type="State" stateGroup="SoundtrackState" end="Pause" frame="$layer/GlueUI">
-                        <Key type="Identifier" time="0" value="Tracer"/>
-                    </Controller>
                 </Animation>
                 <Visible val="False"/>
             </Frame>
-        
-            <Frame type="HeroContainerFrame" name="DehakaFrame" template="Home17/DehakaFrameTemplate">
-                <Animation name="ChangeHomeScreenHero">
-                    <Event event="ResetHero" action="Stop" frame="$parent"/>
-                    <Event event="Dehaka" action="Restart,Play" frame="$parent"/>
-                    <Controller type="Visibility" end="Pause">
-                        <Key type="Bool" time="0" value="false"/>
-                        <Key type="Bool" time=".01" value="true"/>
-                    </Controller>
-                    <Controller type="State" stateGroup="SoundtrackState" end="Pause" frame="$layer/GlueUI">
-                        <Key type="Identifier" time="0" value="Dehaka"/>
-                    </Controller>
-                </Animation>
-                <Visible val="False"/>
-            </Frame>
-        
+      
             <Frame type="HeroGlueButton" name="HomeDebugButton" template="StandardTemplates/StandardButtonMiniTemplate" requiredtoload="IS_SCREEN_MAIN_MENU_ENABLED">
                 <Anchor side="Bottom" relative="$parent" pos="Max" offset="-112"/>
                 <Anchor side="Left" relative="$parent" pos="Min" offset="-12"/>
@@ -127,10 +139,11 @@
                     </Controller>
                 </Animation>
             
-                <Frame type="Button" name="TemplateButton" template="StandardTemplates/StandardButtonSmallTemplate">
+                <Frame type="Button" name="TemplateButton" template="StandardTemplates/StandardButtonMiniTemplate">
                     <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
                     <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
                     <CollapseLayout val="True"/>
+                    <Height val="70"/>
                     <Animation name="Begin">
                         <Event event="Begin" action="DirectionForward" frame="$parent"/>
                         <Event event="Begin" action="Play" frame="$parent"/>
@@ -157,249 +170,64 @@
                         </Controller>
                     </Animation>
                 </Frame>
-                
-                <Frame type="Button" name="SylvanasButton" template="ScreenHome/ScreenHome/HeroHomeInfoPanel/HomeDebugContainer/TemplateButton">
+                                
+                <Frame type="Button" name="ChromieButton" template="ScreenHome/ScreenHome/HeroHomeInfoPanel/HomeDebugContainer/TemplateButton">
                     <Anchor side="Bottom" relative="$parent/PTRButton" pos="Min" offset="40"/>
                     <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
-                    <Text val="Sylvanas"/>
-                    <Visible val="False"/>
-                    <Animation name="Click">
-                        <Event event="OnMouseDown" action="Restart"/>
-                        <Event event="OnMouseDown" action="Play"/>
-                        <Controller type="Event" end="Stop" frame="$parent/$parent">
-                            <Key type="Event" time="0" event="HomeReset"/>
-                            <Key type="Event" time="0.01" event="Sylvanas"/>
-                        </Controller>
-                    </Animation>
-                </Frame>
-                
-                <Frame type="Button" name="CrusaderButton" template="ScreenHome/ScreenHome/HeroHomeInfoPanel/HomeDebugContainer/TemplateButton">
-                    <Anchor side="Bottom" relative="$parent/SylvanasButton" pos="Min" offset="40"/>
-                    <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
-                    <Text val="Crusader"/>
-                    <Visible val="False"/>
-                    <Animation name="Click">
-                        <Event event="OnMouseDown" action="Restart"/>
-                        <Event event="OnMouseDown" action="Play"/>
-                        <Controller type="Event" end="Stop" frame="$parent/$parent">
-                            <Key type="Event" time="0" event="HomeReset"/>
-                            <Key type="Event" time="0.01" event="Crusader"/>
-                        </Controller>
-                    </Animation>
-                </Frame>
-                
-                <Frame type="Button" name="KaelthasButton" template="ScreenHome/ScreenHome/HeroHomeInfoPanel/HomeDebugContainer/TemplateButton">
-                    <Anchor side="Bottom" relative="$parent/CrusaderButton" pos="Min" offset="40"/>
-                    <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
-                    <Text val="Kaelthas"/>
-                    <Visible val="False"/>
-                    <Animation name="Click">
-                        <Event event="OnMouseDown" action="Restart"/>
-                        <Event event="OnMouseDown" action="Play"/>
-                        <Controller type="Event" end="Stop" frame="$parent/$parent">
-                            <Key type="Event" time="0" event="HomeReset"/>
-                            <Key type="Event" time="0.01" event="Kaelthas"/>
-                        </Controller>
-                    </Animation>
-                </Frame>
-                
-                <Frame type="Button" name="ButcherButton" template="ScreenHome/ScreenHome/HeroHomeInfoPanel/HomeDebugContainer/TemplateButton">
-                    <Anchor side="Bottom" relative="$parent/KaelthasButton" pos="Min" offset="40"/>
-                    <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
-                    <Text val="Butcher"/>
-                    <Visible val="False"/>
-                    <Animation name="Click">
-                        <Event event="OnMouseDown" action="Restart"/>
-                        <Event event="OnMouseDown" action="Play"/>
-                        <Controller type="Event" end="Stop" frame="$parent/$parent">
-                            <Key type="Event" time="0" event="HomeReset"/>
-                            <Key type="Event" time="0.01" event="Butcher"/>
-                        </Controller>
-                    </Animation>
-                </Frame>
-                
-                <Frame type="Button" name="LeoricButton" template="ScreenHome/ScreenHome/HeroHomeInfoPanel/HomeDebugContainer/TemplateButton">
-                    <Anchor side="Bottom" relative="$parent/ButcherButton" pos="Min" offset="40"/>
-                    <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
-                    <Text val="Leoric"/>
-                    <Visible val="False"/>
-                    <Animation name="Click">
-                        <Event event="OnMouseDown" action="Restart"/>
-                        <Event event="OnMouseDown" action="Play"/>
-                        <Controller type="Event" end="Stop" frame="$parent/$parent">
-                            <Key type="Event" time="0" event="HomeReset"/>
-                            <Key type="Event" time="0.01" event="Leoric"/>
-                        </Controller>
-                    </Animation>
-                </Frame>
-                
-                <Frame type="Button" name="MonkButton" template="ScreenHome/ScreenHome/HeroHomeInfoPanel/HomeDebugContainer/TemplateButton">
-                    <Anchor side="Bottom" relative="$parent/LeoricButton" pos="Min" offset="40"/>
-                    <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
-                    <Text val="Monk"/>
-                    <Visible val="False"/>
-                    <Animation name="Click">
-                        <Event event="OnMouseDown" action="Restart"/>
-                        <Event event="OnMouseDown" action="Play"/>
-                        <Controller type="Event" end="Stop" frame="$parent/$parent">
-                            <Key type="Event" time="0" event="HomeReset"/>
-                            <Key type="Event" time="0.01" event="Monk"/>
-                        </Controller>
-                    </Animation>
-                </Frame>
-                
-                <Frame type="Button" name="RexxarButton" template="ScreenHome/ScreenHome/HeroHomeInfoPanel/HomeDebugContainer/TemplateButton">
-                    <Anchor side="Bottom" relative="$parent/MonkButton" pos="Min" offset="40"/>
-                    <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
-                    <Text val="Rexxar"/>
-                    <Visible val="False"/>
-                    <Animation name="Click">
-                        <Event event="OnMouseDown" action="Restart"/>
-                        <Event event="OnMouseDown" action="Play"/>
-                        <Controller type="Event" end="Stop" frame="$parent/$parent">
-                            <Key type="Event" time="0" event="HomeReset"/>
-                            <Key type="Event" time="0.01" event="Rexxar"/>
-                        </Controller>
-                    </Animation>
-                </Frame>
-                
-                <Frame type="Button" name="MedicButton" template="ScreenHome/ScreenHome/HeroHomeInfoPanel/HomeDebugContainer/TemplateButton">
-                    <Anchor side="Bottom" relative="$parent/RexxarButton" pos="Min" offset="40"/>
-                    <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
-                    <Text val="Medic"/>
-                    <Visible val="False"/>
+                    <Text val="Chromie"/>
                     <Animation name="Click">
                         <Event event="OnMouseDown" action="Restart,Play"/>
                         <Controller type="Event" end="Stop" frame="$parent/$parent">
                             <Key type="Event" time="0" event="HomeReset"/>
-                            <Key type="Event" time="0.01" event="Medic"/>
+                            <Key type="Event" time="0.01" event="Chromie"/>
                         </Controller>
                     </Animation>
-                </Frame>
-                
-                <Frame type="Button" name="ArtanisButton" template="ScreenHome/ScreenHome/HeroHomeInfoPanel/HomeDebugContainer/TemplateButton">
-                    <Anchor side="Bottom" relative="$parent/MedicButton" pos="Min" offset="40"/>
-                    <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
-                    <Text val="Artanis"/>
-                    <Visible val="False"/>
-                    <Animation name="Click">
-                        <Event event="OnMouseDown" action="Restart,Play"/>
-                        <Controller type="Event" end="Stop" frame="$parent/$parent">
-                            <Key type="Event" time="0" event="HomeReset"/>
-                            <Key type="Event" time="0.01" event="Artanis"/>
-                        </Controller>
-                    </Animation>
-                </Frame>
-
-                <Frame type="Button" name="ChoButton" template="ScreenHome/ScreenHome/HeroHomeInfoPanel/HomeDebugContainer/TemplateButton">
-                    <Anchor side="Bottom" relative="$parent/ArtanisButton" pos="Min" offset="40"/>
-                    <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
-                    <Text val="Cho"/>
-                    <Visible val="False"/>
-                    <Animation name="Click">
-                        <Event event="OnMouseDown" action="Restart,Play"/>
-                        <Controller type="Event" end="Stop" frame="$parent/$parent">
-                            <Key type="Event" time="0" event="HomeReset"/>
-                            <Key type="Event" time="0.01" event="Cho"/>
-                        </Controller>
-                    </Animation>
-                </Frame>
-
-                <Frame type="Button" name="GreymaneButton" template="ScreenHome/ScreenHome/HeroHomeInfoPanel/HomeDebugContainer/TemplateButton">
-                    <Anchor side="Bottom" relative="$parent/ChoButton" pos="Min" offset="40"/>
-                    <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
-                    <Text val="Greymane"/>
-                    <Visible val="True"/>
-                    <Animation name="Click">
-                        <Event event="OnMouseDown" action="Restart,Play"/>
-                        <Controller type="Event" end="Stop" frame="$parent/$parent">
-                            <Key type="Event" time="0" event="HomeReset"/>
-                            <Key type="Event" time="0.01" event="Greymane"/>
-                        </Controller>
-                    </Animation>
-                </Frame>
-
-                <Frame type="Button" name="DryadButton" template="ScreenHome/ScreenHome/HeroHomeInfoPanel/HomeDebugContainer/TemplateButton">
-                    <Anchor side="Bottom" relative="$parent/GreymaneButton" pos="Min" offset="40"/>
-                    <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
-                    <Text val="Dryad"/>
-                    <Visible val="True"/>
-                    <Animation name="Click">
-                        <Event event="OnMouseDown" action="Restart,Play"/>
-                        <Controller type="Event" end="Stop" frame="$parent/$parent">
-                            <Key type="Event" time="0" event="HomeReset"/>
-                            <Key type="Event" time="0.01" event="Dryad"/>
-                        </Controller>
-                    </Animation>
-                </Frame>
-
-                <Frame type="Button" name="LeoricSpaceSkinButton" template="ScreenHome/ScreenHome/HeroHomeInfoPanel/HomeDebugContainer/TemplateButton">
-                    <Anchor side="Bottom" relative="$parent/DryadButton" pos="Min" offset="40"/>
-                    <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
-                    <Text val="LeoricSpaceSkin"/>
-                    <Visible val="True"/>
-                    <Animation name="Click">
-                        <Event event="OnMouseDown" action="Restart,Play"/>
-                        <Controller type="Event" end="Stop" frame="$parent/$parent">
-                            <Key type="Event" time="0" event="HomeReset"/>
-                            <Key type="Event" time="0.01" event="LeoricSpaceSkin"/>
-                        </Controller>
-                    </Animation>
-                </Frame>
-
-                <Frame type="Button" name="WizardButton" template="ScreenHome/ScreenHome/HeroHomeInfoPanel/HomeDebugContainer/TemplateButton">
-                    <Anchor side="Bottom" relative="$parent/LeoricSpaceSkinButton" pos="Min" offset="40"/>
-                    <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
-                    <Text val="Wizard"/>
-                    <Animation name="Click">
-                        <Event event="OnMouseDown" action="Restart,Play"/>
-                        <Controller type="Event" end="Stop" frame="$parent/$parent">
-                            <Key type="Event" time="0" event="HomeReset"/>
-                            <Key type="Event" time="0.01" event="Wizard"/>
-                        </Controller>
-                    </Animation>
-                </Frame>
-
-                <Frame type="Button" name="NecromancerButton" template="ScreenHome/ScreenHome/HeroHomeInfoPanel/HomeDebugContainer/TemplateButton">
-                    <Anchor side="Bottom" relative="$parent/WizardButton" pos="Min" offset="40"/>
-                    <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
-                    <Text val="Necromancer"/>
-                    <Animation name="Click">
-                        <Event event="OnMouseDown" action="Restart,Play"/>
-                        <Controller type="Event" end="Stop" frame="$parent/$parent">
-                            <Key type="Event" time="0" event="HomeReset"/>
-                            <Key type="Event" time="0.01" event="Necromancer"/>
-                        </Controller>
-                    </Animation>
-                </Frame>
-
-                <Frame type="Button" name="TracerButton" template="ScreenHome/ScreenHome/HeroHomeInfoPanel/HomeDebugContainer/TemplateButton">
-                    <Anchor side="Bottom" relative="$parent/NecromancerButton" pos="Min" offset="40"/>
-                    <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
-                    <Text val="Tracer"/>
-                    <Animation name="Click">
-                        <Event event="OnMouseDown" action="Restart,Play"/>
-                        <Controller type="Event" end="Stop" frame="$parent/$parent">
-                            <Key type="Event" time="0" event="HomeReset"/>
-                            <Key type="Event" time="0.01" event="Tracer"/>
-                        </Controller>
-                    </Animation>
-                </Frame>
-
-                <Frame type="Button" name="DehakaButton" template="ScreenHome/ScreenHome/HeroHomeInfoPanel/HomeDebugContainer/TemplateButton">
-                    <Anchor side="Bottom" relative="$parent/TracerButton" pos="Min" offset="40"/>
-                    <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
-                    <Text val="Dehaka"/>
-                    <Animation name="Click">
-                        <Event event="OnMouseDown" action="Restart,Play"/>
-                        <Controller type="Event" end="Stop" frame="$parent/$parent">
-                            <Key type="Event" time="0" event="HomeReset"/>
-                            <Key type="Event" time="0.01" event="Dehaka"/>
-                        </Controller>
-                    </Animation>
-                </Frame>
-                
+                </Frame>                
            </Frame>
+        </Frame>
+
+        <Frame type="ContentFeedPanel" name="TakeoverContentFeed" template="ContentFeedPanel/ContentFeedPanelTemplate">
+            <Anchor relative="$parent"/>
+            <UseCached val="True"/>
+            <KeepDataOnHide val="True"/>
+            <UseAdCampaign val="true"/>
+            <NydusLink val="feed/ad"/>
+            <!-- For Testing Purposes: -->
+            <!-- <FeedURL val="https://cms-us.web.blizzard.net/system/cms/oauth/api/ad/list?locale=enUS&amp;community=Heroes_client&amp;mediaCategory=IN_GAME_AD"/> -->
+
+            <Frame type="PageSelectorButtonList" name="PageSelector">
+                <AllowAutoPageWrap val="True"/>
+                <AutoIncrement val="False"/>
+            </Frame>
+
+            <Frame type="Button" name="BackToHeroInfoButton" template="StandardTemplates/StandardLongArrowButtonTemplate_Left">
+                <Visible val="False"/>
+                <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                <Shortcut val="@UI/ScreenNavigationLeft_Hotkey"/>
+            </Frame>
+
+            <Frame type="Frame" name="ContentFeedPage">
+                <Frame type="Button" name="LinkButton" >
+                    <ReportsStats val="true"/>
+                    <Handle val="HomeTakeover_LinkButton"/>
+                </Frame>
+            </Frame>
+            
+            <Animation name="ShowContent">
+                <Event event="ShowContent" action="DirectionForward, Play" frame="$parent"/>
+                <Event event="HideContent" action="DirectionReverse, Play" frame="$parent"/>
+                <Controller type="Fade" end="Pause">
+                    <Key type="Curve" time="0.0" value="0" out="Auto"/>
+                    <Key type="Curve" time="0.5" value="255" out="Auto"/>
+                </Controller>
+                <Controller type="Visibility" end="Pause">
+                    <Key type="Bool" time="0.00" value="false"/>
+                    <Key type="Bool" time="0.01" value="true"/>
+                    <Key type="Bool" time="0.50" value="true"/>
+                </Controller>
+            </Animation>
         </Frame>
 
         <Frame type="Frame" name="IGRBenefitsPanel" template="IGRBenefitsPanel/IGRBenefitsPanelTemplate">
@@ -415,6 +243,25 @@
             <Anchor side="Top" relative="$parent/IGRBenefitsPanel" pos="Max" offset="300"/>
             <Anchor side="Right" relative="$parent" pos="Max" offset="-15"/>
             <PreserveAnchorOffset val="True"/>
+        </Frame>
+        
+        <Frame type="Button" name="ShowTakeoverContentButton" template="StandardTemplates/StandardLongArrowButtonTemplate_Right">
+            <Visible val="False"/>
+            <Alpha val="0"/>
+            <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+            <Shortcut val="@UI/ScreenNavigationRight_Hotkey"/>
+
+            <Animation name="ToggleButton">
+                <Event event="HideContent" action="DirectionForward, Play" frame="$parent"/>
+                <Event event="ShowContent" action="DirectionReverse, Play" frame="$parent"/>
+                
+                <Controller type="Fade" end="Pause">
+                    <Key type="Curve" time="0.0" value="0" out="Auto"/>
+                    <Key type="Curve" time="0.5" value="255" out="Auto"/>
+                </Controller>
+            </Animation>
         </Frame>
     </Frame>
 </Desc>

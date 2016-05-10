@@ -119,51 +119,145 @@
         </Animation>
     </Frame>
     
-    <Frame type="Image" name="SelectedTalentTreeIconImageTemplate">
-        <Width val="40"/>
-        <Height val="40"/>
-        <Texture val="@UI/Storm_UI_InGame_Leader_Talent_Unselected"/>
-        <IgnoreParentColor val="true"/>
-        <AcceptsMouse val="true"/>
-        <ImageMaskTexture val="@UI/Storm_UI_HexMask"/>
-        <TooltipFrame val="HeroTalentTooltip"/>
-
-        <Animation name="TalentAvailable">
-            <Event event="NotSelected" action="Reset"/>
-            <Event event="NotSelected" action="Play"/>
-            <Controller type="Texture" end="Pause">
-                <Key type="Image" time="0.0" image="@UI/Storm_UI_InGame_Leader_Talent_Unselected"/>
-            </Controller>
-        </Animation>        
-    </Frame>
-
-    <Frame type="Image" name="SelectedTalentTreeIconBorderTemplate">
+    <Frame type="UnitStatusTalentIcon" name="SelectedTalentTreeIconImageTemplate">
         <Width val="72"/>
         <Height val="76"/>
-        <Texture val="@UI/Storm_UI_InGame_Leader_Talent_Unavailable"/>
-        <IgnoreParentColor val="true"/>
-        <RenderPriority val="530"/>
 
-        <Animation name="TalentAvailable">
-            <Event event="NotAvailable" action="DirectionReverse"/>
-            <Event event="NotAvailable" action="Play"/>
-            <Event event="Available" action="Restart"/>
-            <Event event="Available" action="Play"/>
-            <Controller type="Texture" end="Pause">
-                <Key type="Image" time="0.0" image="@UI/Storm_UI_InGame_Leader_Talent_Unavailable"/>
-                <Key type="Image" time="0.01" image="@UI/Storm_UI_InGame_Leader_Talent_Available"/>
-            </Controller>
-        </Animation>
-        <Animation name="UltimateTalentAvailable">
-            <Event event="UltimateNotAvailable" action="DirectionReverse"/>
-            <Event event="UltimateNotAvailable" action="Play"/>
-            <Event event="UltimateAvailable" action="Restart"/>
-            <Event event="UltimateAvailable" action="Play"/>
-            <Controller type="Texture" end="Pause">
-                <Key type="Image" time="0.0" image="@UI/Storm_UI_InGame_Leader_Talent_Unavailable"/>
-                <Key type="Image" time="0.01" image="@UI/Storm_UI_InGame_Leader_Talent_Available_Ult"/>
-            </Controller>
-        </Animation> 
+        <TooltipFrame val="HeroTalentTooltip"/>
+        <AcceptsMouse val="True"/>
+
+        <Frame type="Image" name="IconBorderImage">
+            <Anchor relative="$parent"/>
+
+            <Texture val="@UI/Storm_UI_InGame_Leader_Talent_Unavailable"/>
+            <IgnoreParentColor val="true"/>
+            <RenderPriority val="530"/>
+        </Frame>
+
+        <Frame type="Image" name="IconImage">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="18"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="16"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="-16"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="-18"/>
+            
+            <Texture val="@UI/Storm_UI_InGame_Leader_Talent_Unselected"/>
+            <IgnoreParentColor val="true"/>
+            <ImageMaskTexture val="@UI/Storm_UI_HexMask"/>
+        </Frame>
+
+        <Frame type="Image" name="UnfilledProgressImage">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="11"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="13"/>
+            <Visible val="False"/>
+
+            <RenderPriority val="535"/>
+            <IgnoreParentColor val="True"/>
+
+            <Texture val="@UI/Storm_UI_InGame_Tab_Screen_Progress_Bar_Background"/>
+        </Frame>
+
+        <Frame type="ProgressBar" name="QuestProgressBar">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="5"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="7"/>
+            <Visible val="False"/>
+            
+            <IgnoreParentColor val="True"/>
+            <Vertical val="True"/>
+            <Width val="60"/>
+            <Height val="68"/>
+            <FillInset val="0.1"/>
+            <MinValue val="1"/>
+            <AcceptsMouse val="false"/>
+
+            <Frame type="Frame" name="FillImageContainer">
+                <Anchor relative="$parent" offset="0"/>
+
+                <Frame type="Image" name="FillImage">
+                    <Anchor relative="$parent"/>
+                    <RenderPriority val="536"/>
+                    <LayerCount val="1"/>
+
+                    <Texture val="@UI/Storm_UI_InGame_Tab_Screen_Quest_Progress_Bar"/>
+                </Frame>
+            </Frame>
+        </Frame>
+
+        <Frame type="Image" name="QuestCompleteImage">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="2"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="5"/>
+            <Visible val="False"/>
+
+            <RenderPriority val="536"/>
+            <Visible val="False"/>
+            <IgnoreParentColor val="True"/>
+
+            <Texture val="@UI/Storm_UI_InGame_Tab_Screen_QuestComplete"/>
+        </Frame>
+
+        <StateGroup name="TalentTierState">
+            <DefaultState val="TierNotAvailable"/>
+
+            <State name="TierNotAvailable">
+                <When type="AnimationState" frame="$this" TalentTierState="TierNotAvailable"/>
+                <Action type="SetProperty" frame="$this" visible="false"/>
+            </State>
+
+            <State name="TierAvailable">
+                <When type="AnimationState" frame="$this" TalentTierState="TierAvailable"/>
+                <Action type="SetProperty" frame="$this/IconImage" texture="@UI/Storm_UI_InGame_Leader_Talent_Unselected"/>
+            </State>
+
+            <State name="TierSelected">
+                <When type="AnimationState" frame="$this" TalentTierState="TierSelected"/>
+                <!-- IconImage Texture taken care of by code -->
+            </State>
+        </StateGroup>
+
+
+        <StateGroup name="TalentTypeState">
+            <DefaultState val="TypeTalent"/>
+
+            <State name="TypeTalent">
+                <When type="AnimationState" frame="$this" TalentTypeState="TypeTalent"/>
+                <Action type="SetProperty" frame="$this/IconBorderImage" texture="@UI/Storm_UI_InGame_Leader_Talent_Available"/>
+            </State>
+
+            <State name="TypeUltimate">
+                <When type="AnimationState" frame="$this" TalentTypeState="TypeUltimate"/>
+                <Action type="SetProperty" frame="$this/IconBorderImage" texture="@UI/Storm_UI_InGame_Leader_Talent_Available_Ult"/>
+            </State>
+        </StateGroup>
+
+        <StateGroup name="TalentQuestProgress">
+            <DefaultState val="NoQuest"/>
+
+            <State name="HasQuest">
+                <When type="Property" frame="$this" QuestProgress="QuestInProgress"/>
+                <Action type="SetProperty" frame="QuestProgressBar" visible="True"/>
+                <Action type="SetProperty" frame="UnfilledProgressImage" visible="True"/>
+                <Action type="SetProperty" frame="QuestCompleteImage" visible="False"/>
+            </State>
+
+            <State name="HasUntrackedQuest">
+                <When type="Property" frame="$this" QuestProgress="ProgressUntracked"/>
+                <Action type="SetProperty" frame="QuestProgressBar" visible="false"/>
+                <Action type="SetProperty" frame="UnfilledProgressImage" visible="True"/>
+                <Action type="SetProperty" frame="QuestCompleteImage" visible="False"/>
+            </State>
+
+            <State name="FinishedQuest">
+                <When type="Property" frame="$this" QuestProgress="FinishedQuest"/>
+                <Action type="SetProperty" frame="QuestProgressBar" visible="False"/>
+                <Action type="SetProperty" frame="UnfilledProgressImage" visible="True"/>
+                <Action type="SetProperty" frame="QuestCompleteImage" visible="True"/>
+            </State>
+
+            <State name="NoQuest">
+                <Action type="SetProperty" frame="QuestProgressBar" visible="False"/>
+                <Action type="SetProperty" frame="UnfilledProgressImage" visible="False"/>
+                <Action type="SetProperty" frame="QuestCompleteImage" visible="False"/>
+            </State>
+        </StateGroup>
     </Frame>
 
     <Frame type="PlayerScoreValueFrame" name="PlayerScoreValueProgressBarFrameTemplate">
@@ -220,17 +314,11 @@
             </Animation>
         </Frame>
 
-        <Frame type="Image" name="TalentIcon" template="GameStatsPanel/SelectedTalentTreeIconImageTemplate">
+        <Frame type="UnitStatusTalentIcon" name="TalentIcon" template="GameStatsPanel/SelectedTalentTreeIconImageTemplate">
             <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
             <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
-            <Anchor side="Left" relative="$parent" pos="Min" offset="10"/>
-        </Frame>
-        
-        <Frame type="Image" name="TalentTreeIconBorder" template="GameStatsPanel/SelectedTalentTreeIconBorderTemplate">
-            <Anchor side="Top" relative="$parent/TalentIcon" pos="Mid" offset="0"/>
-            <Anchor side="Right" relative="$parent/TalentIcon" pos="Mid" offset="0"/>
-            <Anchor side="Bottom" relative="$parent/TalentIcon" pos="Mid" offset="0"/>
-            <Anchor side="Left" relative="$parent/TalentIcon" pos="Mid" offset="0"/>
+            <Anchor side="Left" relative="$parent/ProgressBar" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent/ProgressBar" pos="Min" offset="0"/>
         </Frame>
     </Frame>
 
@@ -401,7 +489,7 @@
         <Frame type="Frame" name="TalentsContainer">
             <Anchor relative="$parent"/>
 
-            <Frame type="PlayerScoreValueResultTalentFrame" name="TalentIcon0" template="GameStatsPanel/PlayerScoreValueTalentFrameTemplate">
+            <Frame type="PlayerScoreValueResultTalentFrame" name="TalentResultFrame0" template="GameStatsPanel/PlayerScoreValueTalentFrameTemplate">
                 <Anchor side="Left" relative="$parent/$parent/HeroNameLabel" pos="Max" offset="35"/>
                 <ScoreValueLink val="Tier1Talent"/>
                 <Frame type="ProgressBar" name="ProgressBar">
@@ -410,8 +498,8 @@
                 </Frame>
             </Frame>
 
-            <Frame type="PlayerScoreValueResultTalentFrame" name="TalentIcon1" template="GameStatsPanel/PlayerScoreValueTalentFrameTemplate">
-                <Anchor side="Left" relative="$parent/TalentIcon0" pos="Max" offset="0"/>
+            <Frame type="PlayerScoreValueResultTalentFrame" name="TalentResultFrame1" template="GameStatsPanel/PlayerScoreValueTalentFrameTemplate">
+                <Anchor side="Left" relative="$parent/TalentResultFrame0" pos="Max" offset="0"/>
                 <ScoreValueLink val="Tier2Talent"/>
                 <Frame type="ProgressBar" name="ProgressBar">
                     <MinValue val="4.000000"/>
@@ -419,8 +507,8 @@
                 </Frame>
             </Frame>
 
-            <Frame type="PlayerScoreValueResultTalentFrame" name="TalentIcon2" template="GameStatsPanel/PlayerScoreValueTalentFrameTemplate">
-                <Anchor side="Left" relative="$parent/TalentIcon1" pos="Max" offset="0"/>
+            <Frame type="PlayerScoreValueResultTalentFrame" name="TalentResultFrame2" template="GameStatsPanel/PlayerScoreValueTalentFrameTemplate">
+                <Anchor side="Left" relative="$parent/TalentResultFrame1" pos="Max" offset="0"/>
                 <ScoreValueLink val="Tier3Talent"/>
                 <Frame type="ProgressBar" name="ProgressBar">
                     <MinValue val="7.000000"/>
@@ -428,8 +516,8 @@
                 </Frame>
             </Frame>
 
-            <Frame type="PlayerScoreValueResultTalentFrame" name="TalentIcon3" template="GameStatsPanel/PlayerScoreValueTalentFrameTemplate">
-                <Anchor side="Left" relative="$parent/TalentIcon2" pos="Max" offset="0"/>
+            <Frame type="PlayerScoreValueResultTalentFrame" name="TalentResultFrame3" template="GameStatsPanel/PlayerScoreValueTalentFrameTemplate">
+                <Anchor side="Left" relative="$parent/TalentResultFrame2" pos="Max" offset="0"/>
                 <ScoreValueLink val="Tier4Talent"/>
 
                 <Frame type="ProgressBar" name="ProgressBar">
@@ -438,8 +526,8 @@
                 </Frame>
             </Frame>
 
-            <Frame type="PlayerScoreValueResultTalentFrame" name="TalentIcon4" template="GameStatsPanel/PlayerScoreValueTalentFrameTemplate">
-                <Anchor side="Left" relative="$parent/TalentIcon3" pos="Max" offset="0"/>
+            <Frame type="PlayerScoreValueResultTalentFrame" name="TalentResultFrame4" template="GameStatsPanel/PlayerScoreValueTalentFrameTemplate">
+                <Anchor side="Left" relative="$parent/TalentResultFrame3" pos="Max" offset="0"/>
                 <ScoreValueLink val="Tier5Talent"/>
                 <Frame type="ProgressBar" name="ProgressBar">
                     <MinValue val="13.000000"/>
@@ -447,8 +535,8 @@
                 </Frame>
             </Frame>
 
-            <Frame type="PlayerScoreValueResultTalentFrame" name="TalentIcon5" template="GameStatsPanel/PlayerScoreValueTalentFrameTemplate">
-                <Anchor side="Left" relative="$parent/TalentIcon4" pos="Max" offset="0"/>
+            <Frame type="PlayerScoreValueResultTalentFrame" name="TalentResultFrame5" template="GameStatsPanel/PlayerScoreValueTalentFrameTemplate">
+                <Anchor side="Left" relative="$parent/TalentResultFrame4" pos="Max" offset="0"/>
                 <ScoreValueLink val="Tier6Talent"/>
                 <Frame type="ProgressBar" name="ProgressBar">
                     <MinValue val="16.000000"/>
@@ -456,8 +544,8 @@
                 </Frame>
             </Frame>
 
-            <Frame type="PlayerScoreValueResultTalentFrame" name="TalentIcon6" template="GameStatsPanel/PlayerScoreValueTalentFrameTemplate">
-                <Anchor side="Left" relative="$parent/TalentIcon5" pos="Max" offset="0"/>
+            <Frame type="PlayerScoreValueResultTalentFrame" name="TalentResultFrame6" template="GameStatsPanel/PlayerScoreValueTalentFrameTemplate">
+                <Anchor side="Left" relative="$parent/TalentResultFrame5" pos="Max" offset="0"/>
                 <ScoreValueLink val="Tier7Talent"/>
                 <Frame type="ProgressBar" name="ProgressBar">
                     <Visible val="false"/>
@@ -746,46 +834,45 @@
         <!======================================================================================-->
         <Frame type="Label" name="TalentLabel0" template="GameStatsPanel/TalentLabelTemplate">
             <Anchor side="Bottom" relative="$parent/Player0" pos="Min" offset="-10"/>
-            <Anchor side="Left" relative="$parent/Player0/TalentsContainer/TalentIcon0" pos="Min" offset="0"/>
-            <Anchor side="Right" relative="$parent/Player0/TalentsContainer/TalentIcon0" pos="Min" offset="60"/>
-            
+            <Anchor side="Left" relative="$parent/Player0/TalentsContainer/TalentResultFrame0" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent/Player0/TalentsContainer/TalentResultFrame0" pos="Min" offset="60"/>
         </Frame>
 
         <Frame type="Label" name="TalentLabel1" template="GameStatsPanel/TalentLabelTemplate">
             <Anchor side="Bottom" relative="$parent/Player0" pos="Min" offset="-10"/>
-            <Anchor side="Left" relative="$parent/Player0/TalentsContainer/TalentIcon1" pos="Min" offset="0"/>
-            <Anchor side="Right" relative="$parent/Player0/TalentsContainer/TalentIcon1" pos="Min" offset="60"/>
+            <Anchor side="Left" relative="$parent/Player0/TalentsContainer/TalentResultFrame1" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent/Player0/TalentsContainer/TalentResultFrame1" pos="Min" offset="60"/>
         </Frame>
 
         <Frame type="Label" name="TalentLabel2" template="GameStatsPanel/TalentLabelTemplate">
             <Anchor side="Bottom" relative="$parent/Player0" pos="Min" offset="-10"/>
-            <Anchor side="Left" relative="$parent/Player0/TalentsContainer/TalentIcon2" pos="Min" offset="0"/>
-            <Anchor side="Right" relative="$parent/Player0/TalentsContainer/TalentIcon2" pos="Min" offset="60"/>
+            <Anchor side="Left" relative="$parent/Player0/TalentsContainer/TalentResultFrame2" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent/Player0/TalentsContainer/TalentResultFrame2" pos="Min" offset="60"/>
         </Frame>
 
         <Frame type="Label" name="TalentLabel3" template="GameStatsPanel/TalentLabelTemplate">
             <Anchor side="Bottom" relative="$parent/Player0" pos="Min" offset="-10"/>
-            <Anchor side="Left" relative="$parent/Player0/TalentsContainer/TalentIcon3" pos="Min" offset="0"/>
-            <Anchor side="Right" relative="$parent/Player0/TalentsContainer/TalentIcon3" pos="Min" offset="60"/>
+            <Anchor side="Left" relative="$parent/Player0/TalentsContainer/TalentResultFrame3" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent/Player0/TalentsContainer/TalentResultFrame3" pos="Min" offset="60"/>
             <Style val="Storm_LeaderTalentUltHeader"/>
         </Frame>
 
         <Frame type="Label" name="TalentLabel4" template="GameStatsPanel/TalentLabelTemplate">
             <Anchor side="Bottom" relative="$parent/Player0" pos="Min" offset="-10"/>
-            <Anchor side="Left" relative="$parent/Player0/TalentsContainer/TalentIcon4" pos="Min" offset="0"/>
-            <Anchor side="Right" relative="$parent/Player0/TalentsContainer/TalentIcon4" pos="Min" offset="60"/>
+            <Anchor side="Left" relative="$parent/Player0/TalentsContainer/TalentResultFrame4" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent/Player0/TalentsContainer/TalentResultFrame4" pos="Min" offset="60"/>
         </Frame>
 
         <Frame type="Label" name="TalentLabel5" template="GameStatsPanel/TalentLabelTemplate">
             <Anchor side="Bottom" relative="$parent/Player0" pos="Min" offset="-10"/>
-            <Anchor side="Left" relative="$parent/Player0/TalentsContainer/TalentIcon5" pos="Min" offset="0"/>
-            <Anchor side="Right" relative="$parent/Player0/TalentsContainer/TalentIcon5" pos="Min" offset="60"/>
+            <Anchor side="Left" relative="$parent/Player0/TalentsContainer/TalentResultFrame5" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent/Player0/TalentsContainer/TalentResultFrame5" pos="Min" offset="60"/>
         </Frame>
 
         <Frame type="Label" name="TalentLabel6" template="GameStatsPanel/TalentLabelTemplate">
             <Anchor side="Bottom" relative="$parent/Player0" pos="Min" offset="-10"/>
-            <Anchor side="Left" relative="$parent/Player0/TalentsContainer/TalentIcon6" pos="Min" offset="0"/>
-            <Anchor side="Right" relative="$parent/Player0/TalentsContainer/TalentIcon6" pos="Min" offset="60"/>
+            <Anchor side="Left" relative="$parent/Player0/TalentsContainer/TalentResultFrame6" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent/Player0/TalentsContainer/TalentResultFrame6" pos="Min" offset="60"/>
         </Frame>
 
         <!--=======================================================================================

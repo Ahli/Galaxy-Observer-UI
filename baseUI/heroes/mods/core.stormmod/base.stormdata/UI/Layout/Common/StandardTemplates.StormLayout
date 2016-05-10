@@ -94,10 +94,13 @@
             <TextureType val="Nineslice"/>
         </Frame>
 
-        <Frame type="Label" name="Label">
+        <Frame type="Frame" name="LabelContainerFrame">
             <Anchor relative="$parent"/>
-            <Style val="StandardEditBoxLabel"/>
-            <Options val="Ellipsis | IgnoreFormatTags"/>
+            <Frame type="Label" name="Label">
+                <Anchor relative="$parent"/>
+                <Style val="StandardEditBoxLabel"/>
+                <Options val="Ellipsis | IgnoreFormatTags"/>
+            </Frame>
         </Frame>
     </Frame>
 <!-- EndRegion -->
@@ -941,28 +944,31 @@
     </Frame>
 
     <Frame type="StreamingIndicatorFrame" name="StreamingIndicatorFrameTemplate">
-        <Height val="48"/>
-        <Width val="48"/>
-        <Alpha val="128"/>
+        <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+        <Anchor side="Left" relative="$parent" pos="Max" offset="0"/>       
+        <Height val="72"/>
+        <Width val="72"/>
 
         <Frame type="Frame" name="IndicatorFrame">
             <Anchor relative="$parent"/>
 
             <Frame type="Image" name="IconBackgroundImage">
                 <Anchor relative="$parent"/>
-                <Texture val="@UI/StreamingIndicatorBackground"/>
-                <Color val="255, 255, 255"/>
+                <Texture val="@UI/storm_ui_streaming_indicator_bg"/>
             </Frame>
 
             <Frame type="Image" name="IconImage">
                 <Anchor relative="$parent"/>
-                <TextureCoords top="0.0" left="0.0" bottom="0.25" right="0.25"/>
-                <Texture val="@UI/StreamingIndicator"/>
-                <AnimDuration val="1500"/>
-                <AnimColumns val="4"/>
-                <AnimCount val="16"/>
-                <Animating val="true"/>
-                <ManagedAnim val="true"/>
+                <Texture val="@UI/storm_ui_streaming_indicator_icon"/>
+
+                <Animation name="Rotate">
+                    <Event event="OnShown" action="Play,Restart"/>
+                    
+                    <Controller type="Rotation" relative="False" end="Loop">
+                        <Key type="Curve" time="0" value="0" out="linear"/>
+                        <Key type="Curve" time="2.5" value="-360" in="linear"/>
+                    </Controller>
+                </Animation>
             </Frame>
 
             <Frame type="Frame" name="TooltipAnchorFrame">
@@ -4014,7 +4020,7 @@
         </Frame>
     </Frame>
 
-    <Frame type="HeroTalentTierButton" name="InGameHeroTalentTierButtonTemplate">
+    <Frame type="HeroTalentTierButton" name="HeroTalentTierButtonTemplate">
         <Width val="76"/>
         <Height val="76"/>
         <ClickSound val="@UI_Game_Click"/>
@@ -4054,20 +4060,59 @@
             <TextureType val="Normal" layer="3"/>
             <DesaturateOnDisable val="false"/>
         </Frame>
-        
-        <Frame type="Image" name="IconImage">
+
+        <Frame type="UnitStatusTalentIcon" name="TalentIcon">
             <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
             <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
             <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
             <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
-            <RenderPriority val="513"/>
-            <SubpixelRendering val="True"/>
-            
             <Width val="47"/>
             <Height val="47"/>
-            <ImageMaskTexture val="@UI/HUD_BTN_BG_Ability_AlphaMask"/>
-            <LayerCount val="2"/>
-            <Texture val="@UI/storm_ui_ingame_shop_shopbuttonicon_shadow" layer="1"/>
+
+            <RenderPriority val="513"/>
+
+            <Frame type="Image" name="IconImage">
+                <Anchor relative="$parent"/>
+                <RenderPriority val="513"/>
+                <SubpixelRendering val="True"/>
+
+                <LayerCount val="2"/>
+                <Texture val="@UI/storm_ui_ingame_shop_shopbuttonicon_shadow" layer="1"/>
+                <ImageMaskTexture val="@UI/HUD_BTN_BG_Ability_AlphaMask"/>
+            </Frame>
+
+            <StateGroup name="TalentTierState">
+                <DefaultState val="TierNotAvailable"/>
+
+                <State name="TierNotAvailable">
+                    <When type="AnimationState" frame="$this" TalentTierState="TierNotAvailable"/>
+                    <Action type="SetProperty" frame="$this" visible="false"/>
+                </State>
+
+                <State name="TierAvailable">
+                    <When type="AnimationState" frame="$this" TalentTierState="TierAvailable"/>
+                    <Action type="SetProperty" frame="$this/IconImage" texture="@UI/storm_ui_ingame_shop_shopbuttonicon_shadow"/>
+                </State>
+
+                <State name="TierSelected">
+                    <When type="AnimationState" frame="$this" TalentTierState="TierSelected"/>
+                    <Action type="SetProperty" frame="$parent/Label" visible="false"/>
+                    <!-- IconImage Texture taken care of by code -->
+                </State>
+            </StateGroup>
+
+
+            <StateGroup name="TalentTypeState">
+                <DefaultState val="TypeTalent"/>
+
+                <State name="TypeTalent">
+                    <When type="AnimationState" frame="$this" TalentTypeState="TypeTalent"/>
+                </State>
+
+                <State name="TypeUltimate">
+                    <When type="AnimationState" frame="$this" TalentTypeState="TypeUltimate"/>
+                </State>
+            </StateGroup>
         </Frame>
 
         <Frame type="Image" name="HoverAnimationImage">
@@ -7919,64 +7964,7 @@
     </Frame>
     
     <Frame type="HeroAbilHotkeyFrame" name="HeroAbilHotkeyFrameBaseTemplate">
-        <Animation name="HotkeyAbility">
-            <Event event="HotkeyAbility" action="Reset"/>
-            <Event event="HotkeyAbility" action="Play"/>
-            <Controller type="Texture" end="Pause" frame="HotkeyBorderImage">
-                <Key type="Image" time=".01" image="@UI/Storm_UI_HeroSelect_CustomizePanel_Hotkeyborder_Ability"/>
-            </Controller>
-            <Controller type="Texture" end="Pause" frame="ArrowImage">
-                <Key type="Image" time=".01" image="@UI/Storm_UI_HeroSelect_CustomizePanel_AbilityFrame_UpgradeArrow"/>
-            </Controller>
-            <Controller type="Style" end="Pause" style1="HeroSelectPanelHotkeyLabel" style2="HeroSelectPanelHotkeyLabel" frame="HotkeyLabel">
-                <Key type="Curve" time=".01" value="0"/>
-            </Controller>
-        </Animation>
-        <Animation name="HotkeyHeroic">
-            <Event event="HotkeyHeroic" action="Reset"/>
-            <Event event="HotkeyHeroic" action="Play"/>
-            <Controller type="Texture" end="Pause" frame="HotkeyBorderImage">
-                <Key type="Image" time=".01" image="@UI/Storm_UI_HeroSelect_CustomizePanel_Hotkeyborder_Heroic"/>
-            </Controller>
-            <Controller type="Texture" end="Pause" frame="ArrowImage">
-                <Key type="Image" time=".01" image="@UI/Storm_UI_HeroSelect_CustomizePanel_AbilityFrame_HeroicUpgradeArrow"/>
-            </Controller>
-            <Controller type="Style" end="Pause" style1="HeroSelectPanelHotkeyHeroicLabel" style2="HeroSelectPanelHotkeyHeroicLabel" frame="HotkeyLabel">
-                <Key type="Curve" time=".01" value="0"/>
-            </Controller>
-        </Animation>
-        <Animation name="HotkeyPassive">
-            <Event event="HotkeyPassive" action="Reset"/>
-            <Event event="HotkeyPassive" action="Play"/>
-            <Controller type="Texture" end="Pause" frame="HotkeyBorderImage">
-                <Key type="Image" time=".01" image="@UI/Storm_UI_HeroSelect_CustomizePanel_Hotkeyborder_Passive"/>
-            </Controller>
-            <Controller type="Style" end="Pause" style1="HeroSelectPanelHotkeyPassiveLabel" style2="HeroSelectPanelHotkeyPassiveLabel" frame="HotkeyLabel">
-                <Key type="Curve" time=".01" value="0"/>
-            </Controller>
-        </Animation>
-        <Animation name="HotkeyActive">
-            <Event event="HotkeyActive" action="Reset"/>
-            <Event event="HotkeyActive" action="Play"/>
-            <Controller type="Texture" end="Pause" frame="HotkeyBorderImage">
-                <Key type="Image" time=".01" image="@UI/Storm_UI_HeroSelect_CustomizePanel_Hotkeyborder_Active"/>
-            </Controller>
-            <Controller type="Style" end="Pause" style1="HeroSelectPanelHotkeyActiveLabel" style2="HeroSelectPanelHotkeyActiveLabel" frame="HotkeyLabel">
-                <Key type="Curve" time=".01" value="0"/>
-            </Controller>
-        </Animation>
-        <Animation name="HotkeyMissing">
-            <Event event="HotkeyMissing" action="DirectionReverse"/>
-            <Event event="HotkeyMissing" action="Play"/>
-            <Event event="HotkeyNormal" action="DirectionForward"/>
-            <Event event="HotkeyNormal" action="Play"/>
-            <Event event="HotkeyUpgrade" action="DirectionForward"/>
-            <Event event="HotkeyUpgrade" action="Play"/>
-            <Controller type="Visibility" end="Pause">
-                <Key type="Bool" time="0" value="false"/>
-                <Key type="Bool" time=".001" value="true"/>
-            </Controller>
-        </Animation>
+        <Visible val="True"/>
 
         <Frame type="Image" name="HotkeyBorderImage">
             <Anchor side="Top" relative="$parent" pos="Min" offset="2"/>
@@ -7994,26 +7982,19 @@
             <DesaturationColor val="a682dc"/>
             <OnDisableDesaturationColor val="a682dc"/>
             <CollapseLayout val="True"/>
-            <Animation name="ShimSize">
-                <Event event="OnHidden" action="DirectionForward"/>
-                <Event event="OnHidden" action="Play"/>
-                <Event event="OnShown" action="DirectionReverse"/>
-                <Event event="OnShown" action="Play"/>
-                <Controller type="Dimension" dimension="Width" relative="False" percentage="False" end="Pause" frame="$parent/HotkeyShimFrame">
-                    <Key type="Curve" time="0" value="32" out="linear"/>
-                    <Key type="Curve" time=".01" value="10" in="Step"/>
-                </Controller>
-            </Animation>
-            <Animation name="Upgrade">
-                <Event event="HotkeyUpgrade" action="Restart,Play" frame="$parent"/>
-                <Event event="HotkeyNormal" action="DirectionReverse,Play" frame="$parent"/>
-                <Event event="HotkeyMissing" action="DirectionReverse,Play" frame="$parent"/>
-                <Controller type="Visibility" end="Pause">
-                    <Key type="Bool" time="0" value="false"/>
-                    <Key type="Bool" time=".001" value="true"/>
-                </Controller>
-            </Animation>
             <RenderPriority val="550"/>
+
+            <ColorAdjustMode val="Colorize"/>
+            <AdjustmentColor val="7F7F7F"/>
+        </Frame>
+
+        <Frame type="Image" name="QuestingIcon">
+            <Anchor side="Top" relative="$parent/HotkeyBorderImage" pos="Min" offset="5"/>
+            <RenderPriority val="560"/>
+            <IgnoreParentColor val="True"/>
+            <DesaturationColor val="a682dc"/>
+            <OnDisableDesaturationColor val="a682dc"/>
+            <Texture val="@UI/Storm_UI_InGame_TalentPanel_Upgrade_Quest_Icon"/>
         </Frame>
         
         <Frame type="Frame" name="HotkeyShimFrame">
@@ -8029,6 +8010,75 @@
             <Style val="HeroSelectPanelHotkeyLabel"/>
             <RenderPriority val="550"/>
         </Frame>
+
+
+        <StateGroup name="HeroAbilHotkeyFrame">
+            <State name="HotkeyAbility">
+                <When type="AnimationState" frame="$this" HeroAbilHotkeyFrame="HotkeyAbility"/>
+                <Action type="SetProperty" frame="HotkeyBorderImage" texture="@UI/Storm_UI_HeroSelect_CustomizePanel_Hotkeyborder_Ability"/>
+                <Action type="SetProperty" frame="ArrowImage" AdjustmentColor="684DCA"/>
+                <Action type="SetProperty" frame="HotkeyLabel" style="HeroSelectPanelHotkeyLabel"/>
+            </State>
+
+            <State name="HotkeyHeroic">
+                <When type="AnimationState" frame="$this" HeroAbilHotkeyFrame="HotkeyHeroic"/>
+                <Action type="SetProperty" frame="HotkeyBorderImage" texture="@UI/Storm_UI_HeroSelect_CustomizePanel_Hotkeyborder_Heroic"/>
+                <Action type="SetProperty" frame="ArrowImage" AdjustmentColor="CA8B4D"/>
+                <Action type="SetProperty" frame="HotkeyLabel" style="HeroSelectPanelHotkeyHeroicLabel"/>
+            </State>
+
+            <State name="HotkeyPassive">
+                <When type="AnimationState" frame="$this" HeroAbilHotkeyFrame="HotkeyPassive"/>
+                <Action type="SetProperty" frame="HotkeyBorderImage" texture="@UI/Storm_UI_HeroSelect_CustomizePanel_Hotkeyborder_Passive"/>
+                <Action type="SetProperty" frame="ArrowImage" AdjustmentColor="3CA997"/>
+                <Action type="SetProperty" frame="HotkeyLabel" style="HeroSelectPanelHotkeyPassiveLabel"/>
+            </State>
+
+            <State name="HotkeyActive">
+                <When type="AnimationState" frame="$this" HeroAbilHotkeyFrame="HotkeyActive"/>
+                <Action type="SetProperty" frame="HotkeyBorderImage" texture="@UI/Storm_UI_HeroSelect_CustomizePanel_Hotkeyborder_Active"/>
+                <Action type="SetProperty" frame="ArrowImage" AdjustmentColor="CD558E"/>
+                <Action type="SetProperty" frame="HotkeyLabel" style="HeroSelectPanelHotkeyActiveLabel"/>
+            </State>
+        </StateGroup>
+
+        <StateGroup name="HotkeyType">
+            <DefaultState val="HotkeyNormal"/>
+
+            <State name="HotkeyMissing">
+                <When type="AnimationState" frame="$this" HotkeyType="HotkeyMissing"/>
+                <Action type="SetProperty" frame="$this" visible="false"/>
+            </State>
+
+            <State name="HotkeyNormal">
+                <When type="AnimationState" frame="$this" HotkeyType="HotkeyNormal"/>
+                <Action type="SetProperty" frame="ArrowImage" visible="false"/>
+                <Action type="SetProperty" frame="QuestingIcon" visible="false"/>
+            </State>
+
+            <State name="HotkeyQuesting">
+                <When type="AnimationState" frame="$this" HotkeyType="HotkeyQuesting"/>
+                <Action type="SetProperty" frame="ArrowImage" visible="false"/>
+                <Action type="SetProperty" frame="QuestingIcon" visible="True"/>
+            </State>
+
+            <State name="HotkeyUpgrade">
+                <When type="AnimationState" frame="$this" HotkeyType="HotkeyUpgrade"/>
+                <Action type="SetProperty" frame="QuestingIcon" visible="false"/>
+                <Action type="SetProperty" frame="ArrowImage" visible="True"/>
+            </State>
+        </StateGroup>
+
+        <!-- Currently SetProperty does not work with Width -->
+        <Animation name="ShimSize">
+            <Event event="HotkeyNormal" action="DirectionForward, Play"/>
+            <Event event="HotkeyQuesting" action="DirectionReverse,Play"/>
+            <Event event="HotkeyUpgrade" action="DirectionReverse,Play"/>
+            <Controller type="Dimension" dimension="Width" relative="False" percentage="False" end="Pause" frame="HotkeyShimFrame">
+                <Key type="Curve" time="0" value="32" inout="linear"/>
+                <Key type="Curve" time="0.01" value="10" in="Step"/>
+            </Controller>
+        </Animation>
     </Frame>
     
     <Frame type="HeroAbilHotkeyFrame" name="HeroAbilHotkeyFrameTemplate" template="StandardTemplates/HeroAbilHotkeyFrameBaseTemplate">
@@ -8039,6 +8089,10 @@
         
         <Frame type="Image" name="ArrowImage">
             <Anchor side="Right" relative="$parent/HotkeyLabel" pos="Min" offset="2"/>
+        </Frame>
+
+        <Frame type="Image" name="QuestingIcon">
+            <Anchor side="Right" relative="$parent/HotkeyLabel" pos="Min" offset="-3"/>
         </Frame>
         
         <Frame type="Frame" name="HotkeyShimFrame">
@@ -8057,6 +8111,11 @@
         </Frame>
         
         <Frame type="Image" name="ArrowImage">
+            <Anchor side="Left" relative="$parent/HotkeyBorderImage" pos="Min" offset="2"/>
+            <Anchor side="Right" relative="$this" pos="Min" offset="0"/>
+        </Frame>
+
+        <Frame type="Image" name="QuestingIcon">
             <Anchor side="Left" relative="$parent/HotkeyBorderImage" pos="Min" offset="2"/>
             <Anchor side="Right" relative="$this" pos="Min" offset="0"/>
         </Frame>
@@ -8270,32 +8329,42 @@
             </Controller>
         </Animation>
 
-        <Animation name="HeroUnavailableAnimation">
-            <Event event="SharedHeroResetState" action="Reset,Play"/>
-            <Event event="SharedHeroAvailable" action="Stop"/>
-            <Event event="SharedHeroUnavailable" action="Stop"/>
+        <StateGroup name="ReadyNotification">
+            <DefaultState val="None"/>
 
-            <Controller type="Visibility" end="Pause">
-                <Key type="Bool" time="0" value="False"/>
-            </Controller>
-        </Animation>
-        
+            <State name="None">
+                <When type="AnimationState" frame="$this" ReadyNotification="None"/>
+                <Action type="SetProperty" frame="$this" visible="false"/>
+            </State>
+
+            <State name="Error">
+                <When type="AnimationState" frame="$this" ReadyNotification="Error"/>
+                <Action type="SetProperty" frame="$this" visible="true"/>
+                <Action type="SetProperty" frame="$this/BGImage" texture="@UI/Storm_HeroSelect_TeammatesUnavailable"/>
+            </State>
+
+            <State name="Info">
+                <When type="AnimationState" frame="$this" ReadyNotification="Info"/>
+                <Action type="SetProperty" frame="$this" visible="true"/>
+                <Action type="SetProperty" frame="$this/BGImage" texture="@UI/Storm_HeroSelect_TeammatesAvailable"/>
+            </State>
+
+            <State name="Warning">
+                <When type="AnimationState" frame="$this" ReadyNotification="Warning"/>
+                <Action type="SetProperty" frame="$this" visible="true"/>
+                <Action type="SetProperty" frame="$this/BGImage" texture="@UI/Storm_HeroSelect_TeammatesUnavailable"/>
+                <Action type="SetProperty" frame="$this/BGImage" colorAdjustMode="Colorize"/>
+                <Action type="SetProperty" frame="$this/BGImage" adjustmentColor="f38b0d"/>
+            </State>
+        </StateGroup>
+
         <Frame type="Image" name="BGImage">
             <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
             <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
             <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
             <Texture val="@UI/Storm_HeroSelect_TeammatesAvailable"/>
-
-            <Animation name="NotificationUpdateAnimation">
-                <Event event="SharedHeroUnavailable" action="Play" frame="$parent"/>
-                <Event event="SharedHeroAvailable" action="Stop" frame="$parent"/>
-
-                <Controller type="Texture" end="Pause">
-                    <Key type="Image" time="0.0" image="@UI/Storm_HeroSelect_TeammatesUnavailable"/>
-                </Controller>
-            </Animation>
         </Frame>
-            
+
         <Frame type="Frame" name="TooltipHandler">
             <Anchor side="Top" relative="$parent" pos="Mid" offset="-24"/>
             <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
@@ -8310,7 +8379,7 @@
         </Frame>
 
         <Frame type="Label" name="Label">
-            <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent/BGImage" pos="Max" offset="-20"/>
             <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
             <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
         </Frame>

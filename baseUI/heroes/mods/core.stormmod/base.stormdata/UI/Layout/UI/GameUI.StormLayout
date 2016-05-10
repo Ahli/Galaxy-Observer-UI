@@ -22,6 +22,22 @@
             <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
             <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
             <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+            
+            <Frame type="UnitStatusFloatingCombatElement" name="CinematicFloatingCombatElement" template="FloatingCombatElements/UnitStatusFloatingCombatElementTemplate">
+                <StateGroup name="CinematicFloatingCombatState">
+                    <DefaultState val="PlayingState"/>
+                     
+                    <State name="PlayingState">
+                        <When type="Property" frame="$parent/$parent/UIContainer/ConsoleUIContainer" visible="true"/>
+                        <Action type="SetProperty" frame="$this" visible="false"/>
+                    </State>
+                    
+                    <State name="WatchingState">
+                        <When type="Property" frame="$parent/$parent/UIContainer/ConsoleUIContainer" visible="false"/>
+                        <Action type="SetProperty" frame="$this" visible="true"/>
+                    </State>
+                </StateGroup>
+            </Frame>
 
             <Frame type="UnitStatusPanel" name="UnitStatusPanel">
                 <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
@@ -166,6 +182,40 @@
                         <VisibleToOwner val="true"/>
 
                         <Frame type="UnitStatusFloatingCombatElement" name="UnitStatusFloatingCombatElement" template="FloatingCombatElements/UnitStatusFloatingCombatElementTemplate"/>
+
+
+                        <Frame type="HeroTalentTreeSelectionPanel" name="HeroTalentTreeSelectionPanel" template="HeroTalentTreeSelectionPanel/HeroTalentTreeSelectionPanelTemplate">
+                            <Handle val="GameUI_HeroTalentTreeSelectionPanel"/>
+                            <Anchor side="Bottom" relative="$parent/$parent/$parent/$parent/ConsolePanel/PortraitPanel" pos="Mid" offset="30"/>
+                            <Anchor side="Left" relative="$parent/$parent/$parent/$parent/ConsolePanel/PortraitPanel" pos="Min" offset="-20"/>
+
+                            <Frame type="Frame" name="PortraitMaskFrame" template="GameUI/PortraitMaskFrameTemplate">
+                                <Anchor relative="$parent/$parent/$parent/$parent/$parent/ConsolePanel/PortraitPanel" offset="-10"/>
+                            </Frame>
+
+                            <Animation name="Show">
+                                <Event event="Toggle" action="ToggleDirection, Play"/>
+                                <Event event="Hide" action="DirectionReverse, Play"/>
+                                <Event event="Begin" action="DirectionForward, Play"/>
+                                <Event event="End" action="DirectionReverse, Play"/>
+                                <Event event="Show" action="DirectionReverse, Play" frame="$parent/$parent/$parent/HeroCharacterSheetPanelContainer/HeroCharacterSheetPanel"/>
+
+                                <Controller type="Fade" end="Pause">
+                                    <Key type="Curve" time="0" value="0"/>
+                                    <Key type="Curve" time=".175" value="255"/>
+                                </Controller>
+
+                                <Controller type="Anchor" end="Pause" side="Left" relative="true">
+                                    <Key type="Curve" time="0" value="-75" out="Slow"/>
+                                    <Key type="Curve" time=".175" value="0" in="Slow"/>
+                                </Controller>
+
+                                <Controller type="Sound" end="Pause">
+                                    <Key type="Sound" time="0.07" sound="@UI_Game_PickTalentAppears" direction="Forward"/>
+                                    <Key type="Sound" time="0.175" sound="@UI_Game_PickTalentHides" direction="Reverse"/>
+                                </Controller>
+                            </Animation>
+                        </Frame>
                     </Frame>
                 </Frame>
 
@@ -184,54 +234,21 @@
                         </Frame>
                     </Frame>
                 </Frame>
-                
-                <Frame type="HeroTalentTreeSelectionPanel" name="HeroTalentTreeSelectionPanel" template="HeroTalentTreeSelectionPanel/HeroTalentTreeSelectionPanelTemplate">
-                    <Handle val="GameUI_HeroTalentTreeSelectionPanel"/>
-                    <Anchor side="Bottom" relative="$parent/$parent/ConsolePanel/PortraitPanel" pos="Mid" offset="30"/>
-                    <Anchor side="Left" relative="$parent/$parent/ConsolePanel/PortraitPanel" pos="Min" offset="-20"/>
-
-                    <Frame type="Frame" name="PortraitMaskFrame" template="GameUI/PortraitMaskFrameTemplate">
-                        <Anchor relative="$parent/$parent/$parent/ConsolePanel/PortraitPanel" offset="-10"/>
-                    </Frame>
-
-                    <Animation name="Show">
-                        <Event event="Toggle" action="ToggleDirection, Play"/>
-                        <Event event="Hide" action="DirectionReverse, Play"/>
-                        <Event event="Begin" action="DirectionForward, Play"/>
-                        <Event event="End" action="DirectionReverse, Play"/>
-                        <Event event="Show" action="DirectionReverse, Play" frame="$parent/HeroCharacterSheetPanelContainer/HeroCharacterSheetPanel"/>
-
-                        <Controller type="Fade" end="Pause">
-                            <Key type="Curve" time="0" value="0"/>
-                            <Key type="Curve" time=".175" value="255"/>
-                        </Controller>
-
-                        <Controller type="Anchor" end="Pause" side="Left" relative="true">
-                            <Key type="Curve" time="0" value="-75" out="Slow"/>
-                            <Key type="Curve" time=".175" value="0" in="Slow"/>
-                        </Controller>
-
-                        <Controller type="Sound" end="Pause">
-                            <Key type="Sound" time="0.07" sound="@UI_Game_PickTalentAppears" direction="Forward"/>
-                            <Key type="Sound" time="0.175" sound="@UI_Game_PickTalentHides" direction="Reverse"/>
-                        </Controller>
-                    </Animation>
-                </Frame>
 
                 <Frame type="Frame" name="HeroCharacterSheetPanelContainer">
                     <Anchor relative="$parent"/>
                     <Frame type="HeroCharacterSheetPanel" name="HeroCharacterSheetPanel" template="HeroCharacterSheetPanel/HeroCharacterSheetPanelTemplate">
                         <Anchor side="Bottom" relative="$parent/$parent/$parent/ConsolePanel/PortraitPanel" pos="Mid" offset="30"/>
-                        <Anchor side="Left" relative="$parent/$parent/$parent/ConsolePanel/PortraitPanel" pos="Min" offset="40"/>
+                        <Anchor side="Left" relative="$parent/$parent/$parent/ConsolePanel/PortraitPanel" pos="Min" offset="30"/>
 
                         <Frame type="Frame" name="PortraitMaskFrame" template="GameUI/PortraitMaskFrameTemplate">
-                            <Anchor relative="$parent/$parent/$parent/$parent/ConsolePanel/PortraitPanel"/>
+                            <Anchor relative="$parent/$parent/$parent/$parent/ConsolePanel/PortraitPanel" offset="-11"/>
                         </Frame>
 
                         <Animation name="Show">
                             <Event event="Show" action="ToggleDirection, Play"/>
                             <Event event="Hide" action="DirectionReverse, Play"/>
-                            <Event event="Toggle" action="DirectionReverse, Play" frame="$parent/$parent/HeroTalentTreeSelectionPanel"/>
+                            <Event event="Toggle" action="DirectionReverse, Play" frame="$parent/$parent/FloatingCombatUnitSelectionPanel/UnitStatusFrame0/HeroTalentTreeSelectionPanel"/>
 
                             <Controller type="Fade" end="Pause">
                                 <Key type="Curve" time="0" value="0"/>
@@ -251,9 +268,9 @@
                     </Frame>
 
                     <Animation name="Hide">
-                        <Event event="Begin" action="DirectionForward, Play" frame="$parent/HeroTalentTreeSelectionPanel"/>
-                        <Event event="End" action="DirectionReverse, Play" frame="$parent/HeroTalentTreeSelectionPanel"/>
-                        <Event event="Hide" action="DirectionReverse, Play" frame="$parent/HeroTalentTreeSelectionPanel"/>
+                        <Event event="Begin" action="DirectionForward, Play" frame="$parent/FloatingCombatUnitSelectionPanel/UnitStatusFrame0/HeroTalentTreeSelectionPanel"/>
+                        <Event event="End" action="DirectionReverse, Play" frame="$parent/FloatingCombatUnitSelectionPanel/UnitStatusFrame0/HeroTalentTreeSelectionPanel"/>
+                        <Event event="Hide" action="DirectionReverse, Play" frame="$parent/FloatingCombatUnitSelectionPanel/UnitStatusFrame0/HeroTalentTreeSelectionPanel"/>
 
                         <Event event="Show" action="DirectionReverse, Play" frame="$parent/HeroCharacterSheetPanelContainer/HeroCharacterSheetPanel"/>
 
@@ -351,12 +368,6 @@
                     <Anchor relative="$parent"/>
                     <RenderPriority val="601"/>
                 </Frame>
-                
-                <!--Frame type="Frame" name="KillCounterPanel" template="KillCounterPanel/KillCounterPanelTemplate">
-                    <Anchor side="Top" relative="$parent/HeroConsolePanel" pos="Max" offset="-31"/>
-                    <Anchor side="Left" relative="$parent/HeroConsolePanel" pos="Min" offset="-22"/>
-                    <RenderPriority val="600"/>
-                </Frame-->
                 
                 <Frame type="Frame" name="HeroSpecificFullUIModContainer">
                     <Anchor relative="$parent"/>
@@ -844,14 +855,13 @@
                 </Frame>
 
                 <Frame type="StreamingIndicatorFrame" name="StreamingIndicatorFrame" template="StandardTemplates/StreamingIndicatorFrameTemplate">
-                    <Anchor side="Top" relative="$parent" pos="Min" offset="40"/>
-                    <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
-                    <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+                    <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                    <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
                 </Frame>
 
                 <Frame type="LatencyIndicatorFrame" name="LatencyIndicatorFrame">
                     <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
-                    <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                    <Anchor side="Left" relative="$parent" pos="Min" offset="-495"/>
                     <Height val="81"/>
                     <Width val="81"/>
 

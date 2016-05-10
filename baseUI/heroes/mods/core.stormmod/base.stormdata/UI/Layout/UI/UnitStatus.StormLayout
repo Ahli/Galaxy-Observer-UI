@@ -1,10 +1,12 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <Desc>
     <Constant name="RenderPriority_Background" val="500"/>
+    <Constant name="LifeLossDuration" val="2000"/>
     <Constant name="DecreaseDuration_NoReduction" val="500"/>
     <Constant name="YellowResourceColor" val="254, 210, 16"/>
     <Constant name="OrangeResourceColor" val="234, 154, 31"/>
     <Constant name="PurpleResourceColor" val="163, 73, 164"/>
+    <Constant name="PinkResourceColor" val="255, 105, 180"/>
     <Constant name="LowStatusBarAnnounceThreshold" val="0.50"/>
 
     <!--===========================================================================================
@@ -85,7 +87,7 @@
         <ReductionColor val="180, 0, 85"/>
         <ReductionShown val="true"/>
         <IncreaseDuration val="1000"/>
-        <DecreaseDuration val="2000"/>
+        <DecreaseDuration val="#LifeLossDuration"/>
     </Frame>
     
     <Frame type="UnitStatusHealthBar" name="UnitStatusSegmentedHealthBarTemplate" template="UnitStatus/UnitStatusHealthBarTemplate">
@@ -106,12 +108,20 @@
         <ApplyToTotal val="false" index="1"/>
 
         <!-- Expected Life Subtract Bar -->
-        <ReductionShown val="True" index="2"/>
-        <IncreaseDuration val="0" index="2"/>
+        <ReductionShown val="false" index="2"/>
+        <IncreaseDuration val="#LifeLossDuration" index="2"/>
         <OwnerColor val="150, 117, 12" index="2"/>
         <AllyColor val="150, 117, 12" index="2"/>
         <EnemyColor val="150, 117, 12" index="2"/>
         <ApplyToTotal val="false" index="2"/>
+    </Frame>
+
+    <Frame type="UnitStatusHealthBar" name="UnitStatusProtectedHealthBarTemplate" template="UnitStatus/UnitStatusSegmentedHealthBarTemplate">
+        <OwnerColor val="255, 255, 255"/>
+        <AllyColor val="255, 255, 255"/>
+        <EnemyColor val="255,255, 255"/>
+        <Segmented val="False"/>
+        <Texture val="@UI/State/Protected"/>
     </Frame>
 
     <!-- Shielded Health Bar Templates -->
@@ -136,8 +146,8 @@
         <ApplyToTotal val="false" index="2"/>
 
         <!-- Expected Life Subtract Bar -->
-        <ReductionShown val="True" index="3"/>
-        <IncreaseDuration val="0" index="3"/>
+        <ReductionShown val="false" index="3"/>
+        <IncreaseDuration val="#LifeLossDuration" index="3"/>
         <OwnerColor val="150, 117, 12" index="3"/>
         <AllyColor val="150, 117, 12" index="3"/>
         <EnemyColor val="150, 117, 12" index="3"/>
@@ -888,8 +898,6 @@
             <Text val="@UI/Talents/Available"/>
             <Style val="TalentChoiceAlertNameplateLabel"/>
             <RenderPriority val="601"/>
-            <ColorAdjustMode val="OutlineColor"/>
-            <AdjustmentColor val="003445"/>
         </Frame>
 
         <Frame type="Image" name="TalentAvailableOverlay">
@@ -951,22 +959,15 @@
                 <Key type="Curve" time="0.15" value="255" in="Fast"/>
             </Controller>
         </Animation>
-        
-        <Animation name="Invulnerable">
-            <Event event="UserCategoryTargetInvulnerable" action="Restart,Play"/>
 
-            <Controller type="Text" end="Pause" frame="BuffLabel">
-                <Key type="Text" time="0" text="@UI/State/Invulnerable"/>
-            </Controller>
-
-            <Controller type="Texture" end="Pause" frame="BuffIconLeft">
-                <Key type="Image" time="0.0" image="@UI/State/InvulnerableIcon"/>
-            </Controller>
-
-            <Controller type="Texture" end="Pause" frame="BuffPlateBg">
-                <Key type="Image" time="0.0" image="@UI/State/InvulnerableBG"/>
-            </Controller>
-        </Animation>
+        <StateGroup name="BuffState">
+            <State name="Invulnerable">
+                <When type="AnimationState" UnitStatusValidatorState="UserCategoryTargetInvulnerable"/>
+                <Action type="SetProperty" frame="BuffLabel" text="@UI/State/Invulnerable"/>
+                <Action type="SetProperty" frame="BuffIconLeft" texture="@UI/State/InvulnerableIcon"/>
+                <Action type="SetProperty" frame="BuffPlateBg" texture="@UI/State/InvulnerableBG"/>
+            </State>
+        </StateGroup>
 
         <Frame type="Label" name="BuffLabel">
             <Anchor side="Top" relative="$parent/BuffPlateBg" pos="Mid" offset="0"/>
@@ -999,6 +1000,8 @@
         <Validator val="UserCategoryTargetStasis"/>
         <Validator val="UserCategoryTargetInvulnerable"/> 
         <Validator val="TargetMindControlled"/>
+        <Validator val="CasterTaunted"/>
+        <Validator val="CasterIsProtectedCombine"/>
         <Validator val="UserCategoryTargetUnstoppable"/>
         <Validator val="UserCategoryTargetStunned"/>
         <Validator val="UserCategoryTargetRooted"/>
@@ -1014,188 +1017,6 @@
             <Texture val="@UI/State/UnstoppableBG"/>
             <RenderPriority val="600"/>
         </Frame>
-
-        <!-- ResetVisibility is called whenever frame gets hidden so that fading animation is not
-             resumed when unit comes out of the fog of war.
-        -->
-        <Animation name="FadeAnimation">
-            <Event event="ResetVisibility" action="Stop"/>
-            <Event event="Hide" action="DirectionReverse,Play"/>
-            <Event event="Show" action="DirectionForward,Play"/>
-
-            <Controller type="Fade" end="Pause">
-                <Key type="Curve" time="0.0" value="0" out="Fast"/>
-                <Key type="Curve" time="0.15" value="255" in="Fast"/>
-            </Controller>
-        </Animation>
-
-        <Animation name="Stasis">
-            <Event event="UserCategoryTargetStasis" action="Restart,Play"/>
-
-            <Controller type="Text" end="Pause" frame="DebuffLabel">
-                <Key type="Text" time="0" text="@UI/State/Stasis"/>
-            </Controller>
-
-            <Controller type="Texture" end="Pause" frame="DebuffIconLeft">
-                <Key type="Image" time="0.0" image="@UI/State/StasisIcon"/>
-            </Controller>
-
-            <Controller type="Texture" end="Pause" frame="DebuffPlateBg">
-                <Key type="Image" time="0.0" image="@UI/State/StasisBG"/>
-            </Controller>
-        </Animation>
-        
-        <Animation name="Invulnerable">
-            <Event event="UserCategoryTargetInvulnerable" action="Restart,Play"/>
-
-            <Controller type="Text" end="Pause" frame="DebuffLabel">
-                <Key type="Text" time="0" text="@UI/State/Invulnerable"/>
-            </Controller>
-
-            <Controller type="Texture" end="Pause" frame="DebuffIconLeft">
-                <Key type="Image" time="0.0" image="@UI/State/InvulnerableIcon"/>
-            </Controller>
-
-            <Controller type="Texture" end="Pause" frame="DebuffPlateBg">
-                <Key type="Image" time="0.0" image="@UI/State/InvulnerableBG"/>
-            </Controller>
-        </Animation>
-
-        <Animation name="Unstoppable">
-            <Event event="UserCategoryTargetUnstoppable" action="Restart,Play"/>
-
-            <Controller type="Text" end="Pause" frame="DebuffLabel">
-                <Key type="Text" time="0" text="@UI/State/Unstoppable"/>
-            </Controller>
-
-            <Controller type="Texture" end="Pause" frame="DebuffIconLeft">
-                <Key type="Image" time="0.0" image="@UI/State/UnstoppableIcon"/>
-            </Controller>
-
-            <Controller type="Texture" end="Pause" frame="DebuffPlateBg">
-                <Key type="Image" time="0.0" image="@UI/State/UnstoppableBG"/>
-            </Controller>
-        </Animation>
-
-        <Animation name="Stunned">
-            <Event event="UserCategoryTargetStunned" action="Restart,Play"/>
-
-            <Controller type="Text" end="Pause" frame="DebuffLabel">
-                <Key type="Text" time="0" text="@UI/State/Stunned"/>
-            </Controller>
-
-            <Controller type="Texture" end="Pause" frame="DebuffIconLeft">
-                <Key type="Image" time="0.0" image="@UI/State/StunnedIcon"/>
-            </Controller>
-
-            <Controller type="Texture" end="Pause" frame="DebuffPlateBg">
-                <Key type="Image" time="0.0" image="@UI/State/StunnedBG"/>
-            </Controller>
-        </Animation>
-
-        <Animation name="Rooted">
-            <Event event="UserCategoryTargetRooted" action="Restart,Play"/>
-
-            <Controller type="Text" end="Pause" frame="DebuffLabel">
-                <Key type="Text" time="0" text="@UI/State/Rooted"/>
-            </Controller>
-
-            <Controller type="Texture" end="Pause" frame="DebuffIconLeft">
-                <Key type="Image" time="0.0" image="@UI/State/RootedIcon"/>
-            </Controller>
-
-            <Controller type="Texture" end="Pause" frame="DebuffPlateBg">
-                <Key type="Image" time="0.0" image="@UI/State/RootedBG"/>
-            </Controller>
-        </Animation>
-
-        <Animation name="Polymorphed">
-            <Event event="TargetIsPolymorphedCombine" action="Restart,Play"/>
-
-            <Controller type="Text" end="Pause" frame="DebuffLabel">
-                <Key type="Text" time="0" text="@UI/State/Polymorphed"/>
-            </Controller>
-
-            <Controller type="Texture" end="Pause" frame="DebuffIconLeft">
-                <Key type="Image" time="0.0" image="@UI/State/PolymorphedIcon"/>
-            </Controller>
-
-            <Controller type="Texture" end="Pause" frame="DebuffPlateBg">
-                <Key type="Image" time="0.0" image="@UI/State/PolymorphedBG"/>
-            </Controller>
-        </Animation>
-        
-        <Animation name="MindControlled">
-            <Event event="TargetMindControlled" action="Restart,Play"/>
-
-            <Controller type="Text" end="Pause" frame="DebuffLabel">
-                <Key type="Text" time="0" text="@UI/State/MindControlled"/>
-            </Controller>
-
-            <Controller type="Texture" end="Pause" frame="DebuffIconLeft">
-                <Key type="Image" time="0.0" image="@UI/State/MindControlled"/>
-            </Controller>
-
-            <Controller type="Texture" end="Pause" frame="DebuffPlateBg">
-                <Key type="Image" time="0.0" image="@UI/State/MindControlBG"/>
-            </Controller>
-        </Animation>
-        
-        <Animation name="Silenced">
-            <Event event="UserCategoryTargetSilenced" action="Restart,Play"/>
-
-            <Controller type="Text" end="Pause" frame="DebuffLabel">
-                <Key type="Text" time="0" text="@UI/State/Silenced"/>
-            </Controller>
-
-            <Controller type="Texture" end="Pause" frame="DebuffIconLeft">
-                <Key type="Image" time="0.0" image="@UI/State/SilencedIcon"/>
-            </Controller>
-
-            <Controller type="Texture" end="Pause" frame="DebuffPlateBg">
-                <Key type="Image" time="0.0" image="@UI/State/SilencedBG"/>
-            </Controller>
-        </Animation>
-
-        <Animation name="Blinded">
-            <Event event="UserCategoryTargetBlinded" action="Restart,Play"/>
-
-            <Controller type="Text" end="Pause" frame="DebuffLabel">
-                <Key type="Text" time="0" text="@UI/State/Blinded"/>
-            </Controller>
-
-            <Controller type="Texture" end="Pause" frame="DebuffIconLeft">
-                <Key type="Image" time="0.0" image="@UI/State/BlindedIcon"/>
-            </Controller>
-
-            <Controller type="Texture" end="Pause" frame="DebuffPlateBg">
-                <Key type="Image" time="0.0" image="@UI/State/BlindedBG"/>
-            </Controller>
-        </Animation>
-
-        <!-- Slowed was deemed to spamy and therefore removed -->
-        <!--Animation name="Slowed">
-            <Event event="Reset" action="Stop"/>
-            <Event event="UserCategoryTargetSlowed" action="Play"/>
-
-            <Controller type="Fade" end="Pause">
-                <Key type="Curve" time="0" value="0" out="Fast"/>
-                <Key type="Curve" time=".25" value="255" in="Fast"/>
-            </Controller>
-
-            <Controller type="Text" end="Pause" frame="DebuffLabel">
-                <Key type="Text" time="0" text="@UI/State/Slowed"/>
-            </Controller>
-
-            <Controller type="Texture" end="Pause" frame="DebuffIconLeft">
-                <Key type="Image" time="0.0" image="@UI/State/SlowedIcon"/>
-            </Controller>
-
-            <Controller type="Texture" end="Pause" frame="DebuffPlateBg">
-                <Key type="Image" time="0.0" image="@UI/State/SlowedBG"/>
-            </Controller>
-
-        </Animation-->
 
         <Frame type="Label" name="DebuffLabel">
             <Anchor side="Top" relative="$parent/DebuffPlateBg" pos="Mid" offset="0"/>
@@ -1217,8 +1038,8 @@
             <Texture val="@UI/Editor/BorderImage"/>
             <RenderPriority val="601"/>
         </Frame>
-        <!--
-        <Frame type="Image" name="DebuffIconRight">
+
+        <!--Frame type="Image" name="DebuffIconRight">
             <Anchor side="Top" relative="$parent/DebuffPlateBg" pos="Mid" offset="0"/>
             <Anchor side="Bottom" relative="$parent/DebuffPlateBg" pos="Mid" offset="0"/>
             <Anchor side="Left" relative="$parent/DebuffLabel" pos="Max" offset="2"/>
@@ -1228,8 +1049,120 @@
 
             <Texture val="@UI/Editor/BorderImage"/>
             <RenderPriority val="601"/>
-        </Frame>
+        </Frame-->
+
+        <!-- ResetVisibility is called whenever frame gets hidden so that fading animation is not
+             resumed when unit comes out of the fog of war.
         -->
+        <Animation name="FadeAnimation">
+            <Event event="ResetVisibility" action="Stop"/>
+            <Event event="Hide" action="DirectionReverse,Play"/>
+            <Event event="Show" action="DirectionForward,Play"/>
+
+            <Controller type="Fade" end="Pause">
+                <Key type="Curve" time="0.0" value="0" out="Fast"/>
+                <Key type="Curve" time="0.15" value="255" in="Fast"/>
+            </Controller>
+        </Animation>
+
+        <StateGroup name="DebuffState">
+            <DefaultState val="NoState"/>
+            
+            <State name="NoState">
+                <!-- This is a temp solution to bug 169364 until we can get
+                     states to (optionally) not revert properties on exit.
+                     Then we can get that nice fade-out effect again. -->
+                <When type="AnimationState" UnitStatusValidatorState="NoState"/>
+                <Action type="SetProperty" frame="DebuffLabel" visible="false"/>
+                <Action type="SetProperty" frame="DebuffIconLeft" visible="false"/>
+                <Action type="SetProperty" frame="DebuffPlateBg" visible="false"/>
+            </State>
+            
+            <State name="Stasis">
+                <When type="AnimationState" UnitStatusValidatorState="UserCategoryTargetStasis"/>
+                <Action type="SetProperty" frame="DebuffLabel" text="@UI/State/Stasis"/>
+                <Action type="SetProperty" frame="DebuffIconLeft" texture="@UI/State/StasisIcon"/>
+                <Action type="SetProperty" frame="DebuffPlateBg" texture="@UI/State/StasisBG"/>
+            </State>
+
+            <State name="Invulnerable">
+                <When type="AnimationState" UnitStatusValidatorState="UserCategoryTargetInvulnerable"/>
+                <Action type="SetProperty" frame="DebuffLabel" text="@UI/State/Invulnerable"/>
+                <Action type="SetProperty" frame="DebuffIconLeft" texture="@UI/State/InvulnerableIcon"/>
+                <Action type="SetProperty" frame="DebuffPlateBg" texture="@UI/State/InvulnerableBG"/>
+            </State>
+
+            <State name="Unstoppable">
+                <When type="AnimationState" UnitStatusValidatorState="UserCategoryTargetUnstoppable"/>
+                <Action type="SetProperty" frame="DebuffLabel" text="@UI/State/Unstoppable"/>
+                <Action type="SetProperty" frame="DebuffIconLeft" texture="@UI/State/UnstoppableIcon"/>
+                <Action type="SetProperty" frame="DebuffPlateBg" texture="@UI/State/UnstoppableBG"/>
+            </State>
+
+            <State name="Protected">
+                <When type="AnimationState" UnitStatusValidatorState="CasterIsProtectedCombine"/>
+                <Action type="SetProperty" frame="DebuffLabel" text="@UI/State/Protected"/>
+                <Action type="SetProperty" frame="DebuffIconLeft" texture="@UI/State/InvulnerableIcon"/>
+                <Action type="SetProperty" frame="DebuffPlateBg" texture="@UI/State/InvulnerableBG"/>
+            </State>
+
+            <State name="Stunned">
+                <When type="AnimationState" UnitStatusValidatorState="UserCategoryTargetStunned"/>
+                <Action type="SetProperty" frame="DebuffLabel" text="@UI/State/Stunned"/>
+                <Action type="SetProperty" frame="DebuffIconLeft" texture="@UI/State/StunnedIcon"/>
+                <Action type="SetProperty" frame="DebuffPlateBg" texture="@UI/State/StunnedBG"/>
+            </State>
+
+            <State name="Rooted">
+                <When type="AnimationState" UnitStatusValidatorState="UserCategoryTargetRooted"/>
+                <Action type="SetProperty" frame="DebuffLabel" text="@UI/State/Rooted"/>
+                <Action type="SetProperty" frame="DebuffIconLeft" texture="@UI/State/RootedIcon"/>
+                <Action type="SetProperty" frame="DebuffPlateBg" texture="@UI/State/RootedBG"/>
+            </State>
+
+            <State name="Polymorphed">
+                <When type="AnimationState" UnitStatusValidatorState="TargetIsPolymorphedCombine"/>
+                <Action type="SetProperty" frame="DebuffLabel" text="@UI/State/Polymorphed"/>
+                <Action type="SetProperty" frame="DebuffIconLeft" texture="@UI/State/PolymorphedIcon"/>
+                <Action type="SetProperty" frame="DebuffPlateBg" texture="@UI/State/PolymorphedBG"/>
+            </State>
+
+            <State name="MindControlled">
+                <When type="AnimationState" UnitStatusValidatorState="TargetMindControlled"/>
+                <Action type="SetProperty" frame="DebuffLabel" text="@UI/State/MindControlled"/>
+                <Action type="SetProperty" frame="DebuffIconLeft" texture="@UI/State/MindControlled"/>
+                <Action type="SetProperty" frame="DebuffPlateBg" texture="@UI/State/MindControlBG"/>
+            </State>
+
+            <State name="Taunted">
+                <When type="AnimationState" UnitStatusValidatorState="CasterTaunted"/>
+                <Action type="SetProperty" frame="DebuffLabel" text="@UI/State/Taunted"/>
+                <Action type="SetProperty" frame="DebuffIconLeft" texture="@UI/State/SilencedIcon"/>
+                <Action type="SetProperty" frame="DebuffPlateBg" texture="@UI/State/MindControlBG"/>
+            </State>
+
+            <State name="Silenced">
+                <When type="AnimationState" UnitStatusValidatorState="UserCategoryTargetSilenced"/>
+                <Action type="SetProperty" frame="DebuffLabel" text="@UI/State/Silenced"/>
+                <Action type="SetProperty" frame="DebuffIconLeft" texture="@UI/State/SilencedIcon"/>
+                <Action type="SetProperty" frame="DebuffPlateBg" texture="@UI/State/SilencedBG"/>
+            </State>
+
+            <State name="Blinded">
+                <When type="AnimationState" UnitStatusValidatorState="UserCategoryTargetBlinded"/>
+                <Action type="SetProperty" frame="DebuffLabel" text="@UI/State/Blinded"/>
+                <Action type="SetProperty" frame="DebuffIconLeft" texture="@UI/State/BlindedIcon"/>
+                <Action type="SetProperty" frame="DebuffPlateBg" texture="@UI/State/BlindedBG"/>
+            </State>
+
+            <!-- Slowed was deemed too spamy and therefore removed -->
+            <!--State name="Slowed">
+                <When type="AnimationState" UserCategoryTargetSlowed="true"/>
+                <Action type="SetProperty" frame="DebuffLabel" text="@UI/State/Slowed"/>
+                <Action type="SetProperty" frame="DebuffIconLeft" texture="@UI/SlowedIcon"/>
+                <Action type="SetProperty" frame="DebuffPlateBg" texture="@UI/State/SlowedBG"/>
+            </State-->
+        </StateGroup>
     </Frame>
 
     <!-- Resist/Vulnerability Display -->
@@ -1633,6 +1566,90 @@
                 </Animation>
             </Frame>
 
+            <Frame type="Frame" name="InvincibleHealthBarFrame">
+                <Anchor side="Top" relative="$parent/HeroFrameBackgroundContainer" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/HeroFrameBackgroundContainer" pos="Min" offset="0"/>
+                <Width val="140"/>
+                <Height val="16"/>
+                <Visible val="False"/>
+                <!--RenderPriority val="514"/-->
+
+                <Frame type="UnitStatusHealthBar" name="HealthBarInvincible" template="UnitStatus/UnitStatusProtectedHealthBarTemplate">
+                    <Anchor side="Top" relative="$parent/$parent/HeroFrameBackgroundContainer" pos="Min" offset="3"/>
+                    <Anchor side="Left" relative="$parent/$parent/HeroFrameBackgroundContainer" pos="Min" offset="2"/>
+                    <Width val="136"/>
+                    <Height val="12"/>
+                </Frame>
+
+                <Animation name="InvincibleOn">
+                    <Event event="InvincibleOn" action="Reset, Play"/>
+                    <Controller type="Visibility" end="Pause">
+                        <Key type="Bool" time="0" value="True"/>
+                    </Controller>
+                    <Controller type="Event" frame="$parent/HealthBarInvincibleFlash">
+                        <Key type="Event" time="0" event="FlashOn"/>
+                    </Controller>
+                </Animation>
+                <Animation name="InvincibleOff">
+                    <Event event="InvincibleOff" action="Reset, Play"/>
+                    <Controller type="Visibility" end="Pause">
+                        <Key type="Bool" time="0" value="False"/>
+                    </Controller>
+                    <Controller type="Event" frame="$parent/HealthBarInvincibleFlash">
+                        <Key type="Event" time="0" event="FlashOff"/>
+                    </Controller>
+                </Animation>
+            </Frame>
+
+            <Frame type="Image" name="HealthBarInvincibleFlash">
+                <Anchor side="Top" relative="$parent/HeroFrameBackgroundContainer" pos="Mid" offset="-8"/>
+                <Anchor side="Left" relative="$parent/HeroFrameBackgroundContainer" pos="Mid" offset="0"/>
+                <Anchor side="Right" relative="$parent/HeroFrameBackgroundContainer" pos="Mid" offset="0"/>
+                <Anchor side="Bottom" relative="$parent/HeroFrameBackgroundContainer" pos="Mid" offset="0"/>
+                <RenderPriority val="497"/>
+                <Color val="255, 255, 255"/>
+                <Alpha val="0"/>
+                <BlendMode val="Add"/>
+                <Height val="52"/>
+                <Width val="193"/>
+                <Texture val="@UI/StormTalentAlertNameplateBG"/>
+
+                <Animation name="FlashOn">
+                    <Event event="FlashOn" action="Reset, DirectionForward, Play"/>
+
+                    <Controller type="Fade" end="Pause">
+                        <Key type="Curve" time="0" value="0"/>
+                        <Key type="Curve" time=".1" value="255"/>
+                        <Key type="Curve" time=".3" value="0"/>
+                    </Controller>
+                    <Controller type="Dimension" dimension="Height" relative="False" percentage="True" end="Pause">
+                        <Key type="Curve" time="0" value="95"/>
+                        <Key type="Curve" time=".3" value="150"/>
+                    </Controller>
+                    <Controller type="Dimension" dimension="Width" relative="False" percentage="True" end="Pause">
+                        <Key type="Curve" time="0" value="95"/>
+                        <Key type="Curve" time=".3" value="200"/>
+                    </Controller>
+                </Animation>
+                <Animation name="FlashOff">
+                    <Event event="FlashOff" action="Reset, DirectionForward, Play"/>
+
+                    <Controller type="Fade" end="Pause">
+                        <Key type="Curve" time="0" value="0"/>
+                        <Key type="Curve" time=".1" value="220"/>
+                        <Key type="Curve" time=".25" value="0"/>
+                    </Controller>
+                    <Controller type="Dimension" dimension="Height" relative="False" percentage="True" end="Pause">
+                        <Key type="Curve" time="0" value="150"/>
+                        <Key type="Curve" time=".2" value="95"/>
+                    </Controller>
+                    <Controller type="Dimension" dimension="Width" relative="False" percentage="True" end="Pause">
+                        <Key type="Curve" time="0" value="200"/>
+                        <Key type="Curve" time=".2" value="95"/>
+                    </Controller>
+                </Animation>
+            </Frame>
+
             <Frame type="Label" name="BotStatusLabel">
                 <Anchor side="Top" relative="$parent/HealthBar" pos="Max" offset="8"/>
                 <Anchor side="Left" relative="$parent/HealthBar" pos="Min" offset="6"/>
@@ -1819,12 +1836,13 @@
                 <VisibleToOwner val="false"/>
             </Frame>
             
-            <Frame type="UnitStatusElement" name="VikingIdentityFrame">
+            <Frame type="UnitStatusControlGroupHotkeyFrame" name="VikingIdentityFrame">
                 <Anchor side="Bottom" relative="$parent/HeroFrameBackgroundContainer" pos="Min" offset="-1"/>
                 <Anchor side="Left" relative="$parent/HeroFrameBackgroundContainer" pos="Mid" offset="0"/>
                 <Anchor side="Right" relative="$parent/HeroFrameBackgroundContainer" pos="Mid" offset="0"/>
                 <Width val="32"/>
                 <Height val="36"/>
+                <HookupAlias original="HotkeyFrame" alias="SelectionNumberLabel"/>
 
                 <VisibleToOwner val="true"/>
                 <VisibleToAlly val="false"/>
@@ -1837,7 +1855,6 @@
                 
                 <Frame type="CommandHotkeyFrame" name="SelectionNumberLabel" template="UnitStatus/UnitSelectionNumberLabelTemplate">
                     <Anchor relative="$parent"/>
-                    <Hotkey val="ControlGroupRecall3"/>
                     <RenderPriority val="700"/>
                 </Frame>
             </Frame>
@@ -1871,12 +1888,13 @@
                 <VisibleToOwner val="false"/>
             </Frame>
             
-            <Frame type="UnitStatusElement" name="VikingIdentityFrame">
+            <Frame type="UnitStatusControlGroupHotkeyFrame" name="VikingIdentityFrame">
                 <Anchor side="Bottom" relative="$parent/HeroFrameBackgroundContainer" pos="Min" offset="-1"/>
                 <Anchor side="Left" relative="$parent/HeroFrameBackgroundContainer" pos="Mid" offset="0"/>
                 <Anchor side="Right" relative="$parent/HeroFrameBackgroundContainer" pos="Mid" offset="0"/>
                 <Width val="32"/>
                 <Height val="36"/>
+                <HookupAlias original="HotkeyFrame" alias="SelectionNumberLabel"/>
 
                 <VisibleToOwner val="true"/>
                 <VisibleToAlly val="false"/>
@@ -1889,7 +1907,6 @@
                 
                 <Frame type="CommandHotkeyFrame" name="SelectionNumberLabel" template="UnitStatus/UnitSelectionNumberLabelTemplate">
                     <Anchor relative="$parent"/>
-                    <Hotkey val="ControlGroupRecall2"/>
                     <RenderPriority val="700"/>
                 </Frame>
 
@@ -1924,12 +1941,13 @@
                 <VisibleToOwner val="false"/>
             </Frame>
             
-            <Frame type="UnitStatusElement" name="VikingIdentityFrame">
+            <Frame type="UnitStatusControlGroupHotkeyFrame" name="VikingIdentityFrame">
                 <Anchor side="Bottom" relative="$parent/HeroFrameBackgroundContainer" pos="Min" offset="-1"/>
                 <Anchor side="Left" relative="$parent/HeroFrameBackgroundContainer" pos="Mid" offset="0"/>
                 <Anchor side="Right" relative="$parent/HeroFrameBackgroundContainer" pos="Mid" offset="0"/>
                 <Width val="32"/>
                 <Height val="36"/>
+                <HookupAlias original="HotkeyFrame" alias="SelectionNumberLabel"/>
 
                 <VisibleToOwner val="true"/>
                 <VisibleToAlly val="false"/>
@@ -1942,7 +1960,6 @@
                 
                 <Frame type="CommandHotkeyFrame" name="SelectionNumberLabel" template="UnitStatus/UnitSelectionNumberLabelTemplate">
                     <Anchor relative="$parent"/>
-                    <Hotkey val="ControlGroupRecall1"/>
                     <RenderPriority val="605"/>
                 </Frame>
 
@@ -2116,6 +2133,18 @@
                 <OwnerColor val="#PurpleResourceColor"/>
                 <AllyColor val="#PurpleResourceColor"/>
                 <EnemyColor val="#PurpleResourceColor"/>
+                <Texture val="@UI/StormTempWhite"/>
+                <SegmentValue val="25"/>
+            </Frame>
+        </Frame>
+    </Frame>
+    
+    <Frame type="UnitStatusFrame" name="HeroUnitStatusFramePinkEnergy" template="UnitStatus/HeroUnitStatusFrameTemplate">
+        <Frame type="Frame" name="HeroUnitStatusParentFrame">
+            <Frame type="UnitStatusEnergyBar" name="EnergyBar">
+                <OwnerColor val="#PinkResourceColor"/>
+                <AllyColor val="#PinkResourceColor"/>
+                <EnemyColor val="#PinkResourceColor"/>
                 <Texture val="@UI/StormTempWhite"/>
                 <SegmentValue val="25"/>
             </Frame>
@@ -2500,6 +2529,35 @@
             </Frame>
         </Frame>
 
+        <Frame type="Image" name="HardenedFocusIndicator">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="2"/>
+            <Anchor side="Left" relative="$parent" pos="Max" offset="-95"/>
+            <Visible val="False"/>
+            <!--BlendMode val="Add"/--> <!-- This will make the image glow more -->
+            <!--Texture val="@UI/Storm_UI_MainNavigation_Separator"/-->
+            <Texture val="@UI/HUD_DeathTimer_PortraitArrow"/>
+        </Frame>
+        
+        <Frame type="UnitStatusValidatorAnimElement" name="HardenedFocusVisibilityAnims">
+            <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+
+            <Validator val="HasHardenedFocusTalent"/>
+            <Validator val="NoHardenedFocusTalent"/>
+            
+            <!-- this will show/hide the indicator based off of the validators -->
+            <Animation name="ShowHideHardenedFocusIndicator">
+                <Event event="HasHardenedFocusTalent" action="Reset,Play"/>
+                <Event event="NoHardenedFocusTalent" action="Stop"/>
+
+                <Controller type="Visibility" end="Pause" frame="$parent/HardenedFocusIndicator">
+                    <Key type="Bool" time="0" value="True"/>
+                </Controller>
+            </Animation>
+        </Frame>
+
     </Frame>
         
     <!-- Heroes without a Mana/Resource (Illidan/Murky/etc) -->
@@ -2582,6 +2640,24 @@
             <OwnerColor val="#OrangeResourceColor"/>
             <AllyColor val="#OrangeResourceColor"/>
             <EnemyColor val="#OrangeResourceColor"/>
+        </Frame>
+    </Frame>
+    
+    <!-- Pink Energy Heroes -->
+    <Frame type="UnitStatusFrame" name="HeroUnitStatusConsoleFramePinkEnergyTemplate" template="UnitStatus/HeroUnitStatusConsoleFrameTemplate">
+        <Frame type="UnitStatusEnergyBar" name="EnergyBar" template="UnitStatus/UnitStatusEnergyBarTemplate">
+            <Width val="212"/>
+            <Height val="24"/>
+            <Texture val="@UI/HUD_Bar_Mana"/>
+            <BackgroundColor val="255, 0, 0, 0"/>
+            <VisibleToAlly val="true"/>
+            <VisibleToEnemy val="true"/>
+            <AcceptsMouse val="true"/>
+            <ShowStatusTooltip val="true"/>
+            
+            <OwnerColor val="#PinkResourceColor"/>
+            <AllyColor val="#PinkResourceColor"/>
+            <EnemyColor val="#PinkResourceColor"/>
         </Frame>
     </Frame>
     
@@ -3465,6 +3541,19 @@
             <Height val="0"/>
             <Width val="0"/>
         </Frame>
+        
+        <Frame type="UnitStatusBuffDebuffElement" name="UnitStatusBuffDebuffDisplay" template="UnitStatus/InvulnerableUnitStatusBuffDisplayTemplate">
+            <Anchor side="Bottom" relative="$parent/AttachPointFrame" pos="Min" offset="-30"/>
+            <Anchor side="Left" relative="$parent/AttachPointFrame" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent/AttachPointFrame" pos="Mid" offset="0"/>
+            
+            <CollapseLayout val="true"/>
+            <VisibleToOwner val="true"/>
+            <VisibleToAlly val="true"/>
+            <VisibleToEnemy val="true"/>
+            <Width val="193"/>
+            <Height val="64"/>
+        </Frame>    
 
         <Frame type="Image" name="HealthFrameBackground" template="UnitStatus/HealthBarBackgroundTemplate">
             <Anchor side="Top" relative="$parent/HealthBar" pos="Min" offset="0"/>
@@ -3501,6 +3590,19 @@
             <Height val="0"/>
             <Width val="0"/>
         </Frame>
+        
+        <Frame type="UnitStatusBuffDebuffElement" name="UnitStatusBuffDebuffDisplay" template="UnitStatus/InvulnerableUnitStatusBuffDisplayTemplate">
+            <Anchor side="Bottom" relative="$parent/AttachPointFrame" pos="Min" offset="-30"/>
+            <Anchor side="Left" relative="$parent/AttachPointFrame" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent/AttachPointFrame" pos="Mid" offset="0"/>
+            
+            <CollapseLayout val="true"/>
+            <VisibleToOwner val="true"/>
+            <VisibleToAlly val="true"/>
+            <VisibleToEnemy val="true"/>
+            <Width val="193"/>
+            <Height val="64"/>
+        </Frame>    
 
         <Frame type="Image" name="HealthFrameBackground" template="UnitStatus/HealthBarBackgroundTemplate">
             <Anchor side="Top" relative="$parent/HealthBar" pos="Min" offset="0"/>
@@ -3588,7 +3690,18 @@
             <VisibleToEnemy val="true"/>
             <Width val="193"/>
             <Height val="64"/>
-        </Frame>    
+
+            <StateGroup name="BuffState">
+                <State name="Invulnerable">
+                    <!--Core appears as "Protected" when actually "Invulnerable"-->
+                    <When type="AnimationState" UnitStatusValidatorState="UserCategoryTargetInvulnerable"/>
+                    <Action type="SetProperty" frame="BuffLabel" text="@UI/State/Protected"/>
+                    <Action type="SetProperty" frame="BuffIconLeft" texture="@UI/State/InvulnerableIcon"/>
+                    <Action type="SetProperty" frame="BuffPlateBg" texture="@UI/State/InvulnerableBG"/>
+                    <Action type="SetProperty" frame="$parent/HealthBarProtected" visible="true"/>
+                </State>
+            </StateGroup>
+        </Frame>
 
         <Frame type="Image" name="HealthFrameBackground" template="UnitStatus/HealthBarBackgroundTemplate">
             <Anchor side="Top" relative="$parent/HealthBar" pos="Min" offset="0"/>
@@ -3619,6 +3732,18 @@
             <Anchor side="Left" relative="$parent" pos="min" offset="5"/>
             <SegmentValue val="2000"/>
             <Segmented val="true"/>
+        </Frame>
+
+        <Frame type="Frame" name="HealthBarProtected">
+            <Anchor side="Top" relative="$parent/HealthBar" pos="Min" offset="2"/>
+            <Anchor side="Left" relative="$parent/HealthBar" pos="Min" offset="2"/>
+            <Anchor side="Bottom" relative="$parent/HealthBar" pos="Max" offset="-2"/>
+            <Anchor side="Right" relative="$parent/HealthBar" pos="Max" offset="-2"/>
+            <Visible val="false"/>
+
+            <Frame type="UnitStatusHealthBar" name="Bar" template="UnitStatus/UnitStatusProtectedHealthBarTemplate">
+                <Anchor relative="$parent"/>
+            </Frame>
         </Frame>
 
         <Frame type="UnitStatusProgressBar" name="TrainingBar" template="UnitStatus/UnitStatusProgressBarTemplate">
@@ -3720,6 +3845,19 @@
             <Width val="0"/>
         </Frame>
 
+        <Frame type="UnitStatusBuffDebuffElement" name="UnitStatusBuffDebuffDisplay" template="UnitStatus/InvulnerableUnitStatusBuffDisplayTemplate">
+            <Anchor side="Bottom" relative="$parent/AttachPointFrame" pos="Min" offset="-30"/>
+            <Anchor side="Left" relative="$parent/AttachPointFrame" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent/AttachPointFrame" pos="Mid" offset="0"/>
+            
+            <CollapseLayout val="true"/>
+            <VisibleToOwner val="true"/>
+            <VisibleToAlly val="true"/>
+            <VisibleToEnemy val="true"/>
+            <Width val="193"/>
+            <Height val="64"/>
+        </Frame>     
+        
         <Frame type="Image" name="HealthFrameBackground" template="UnitStatus/HealthBarBackgroundTemplate">
             <Anchor side="Top" relative="$parent/HealthBar" pos="Min" offset="0"/>
             <Anchor side="Left" relative="$parent/HealthBar" pos="Min" offset="0"/>
