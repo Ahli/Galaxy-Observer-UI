@@ -2,8 +2,10 @@
 <Desc>
 	<!-- created by Ahli
 			twitter.com/AhliSC2 -->
-	<Constant name="talent_Bottom_TopOffset" val="5"/>
-	<Constant name="talent_Bottom_HorizontalGap" val="10"/>
+	<Constant name="talent_Bottom_TopOffset" val="-16"/>
+	<Constant name="talent_Bottom_LeftOffset" val="32"/>
+	<Constant name="talent_Bottom_HorizontalGap" val="-20"/>
+	
 	<Constant name="talent_Bottom_OffsetBottom" val="0"/>
 	<Constant name="talent_Bottom_PortraitTopOffset" val="0"/>
 	<Constant name="talent_Bottom_Panel_HorizontalOffset" val="-16"/>
@@ -30,7 +32,7 @@
 	<Frame type="HeroLeaderPanel" name="CleanLeaderPanelTemplate" template="HeroLeaderPanel/HeroLeaderPanelTemplate">
 		<Visible val="false"/>
 		<!--<Alpha val="0"/>-->
-        <!--<Batch val="true"/>-->
+		<!--<Batch val="true"/>-->
 		
 		<Frame type="Frame" name="HeroLeaderPanelContainer">
 			<Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
@@ -66,33 +68,33 @@
 				<Visible val="false"/>
 			</Frame>
 
-            <Frame type="Frame" name="BlueTeamStats">
+			<Frame type="Frame" name="BlueTeamStats">
 				<Visible val="false"/>
 			</Frame>
 			
-            <Frame type="Frame" name="RedTeamStats">
+			<Frame type="Frame" name="RedTeamStats">
 				<Visible val="false"/>
 			</Frame>
 			
-            <Frame type="TabControl" name="TabControl">
-                <Anchor relative="$parent" offset="0"/>
-                
-                <Frame type="Button" name="ShowStatsButton">
-                    <Visible val="false"/>
-                    <AcceptsMouse val="false"/>
-                </Frame>
-                
-                <Frame type="Button" name="ShowTalentsButton">
-                    <Visible val="false"/>
-                    <AcceptsMouse val="false"/>
+			<Frame type="TabControl" name="TabControl">
+				<Anchor relative="$parent" offset="0"/>
+				
+				<Frame type="Button" name="ShowStatsButton">
+					<Visible val="false"/>
+					<AcceptsMouse val="false"/>
+				</Frame>
+				
+				<Frame type="Button" name="ShowTalentsButton">
+					<Visible val="false"/>
+					<AcceptsMouse val="false"/>
 					<Alpha val="0"/>
-                </Frame>
-                
-                <Frame type="Button" name="ShowDeathRecapButton">
-                    <Visible val="false"/>
-                    <AcceptsMouse val="false"/>
-                </Frame>
-                
+				</Frame>
+				
+				<Frame type="Button" name="ShowDeathRecapButton">
+					<Visible val="false"/>
+					<AcceptsMouse val="false"/>
+				</Frame>
+				
 				<Frame type="Frame" name="StatsContainerFrame">
 					<Visible val="false"/>
 					<Frame type="HeroLeaderPanelSortButton" name="SortButton0">
@@ -154,7 +156,7 @@
 				</Frame>
 				
 				
-            </Frame>
+			</Frame>
 			
 
 		</Frame>
@@ -252,543 +254,269 @@
 		</Frame>
 	</Frame>
 
-	<Frame type="Image" name="HighlightImageMouseFadeTemplate">
-		<Texture val="_Assets\Textures\talentAvailableHighlightBorder.dds"/>
-		<Visible val="false"/>
-		<Alpha val="0"/>
-		<RenderPriority val="700"/>
-		<IgnoreParentColor val="true"/>
+	<Frame type="UnitStatusTalentIcon" name="TalentTreeIconTemplate">
 		<Unclipped val="true"/>
 		
-		<Animation name="Ahlimation">
-			<Event event="HighlightOn" action="DirectionForward,Play"/>
-			<Event event="HighlightOff" action="DirectionReverse,Play"/>
-			<Controller type="Fade" end="Pause">
+		<Animation name="MouseHighlight">
+			<Event event="OnMouseEnter" action="DirectionForward,Play"/>
+			<Event event="OnMouseExit" action="DirectionReverse,Play"/>
+			
+			<Controller type="Fade" end="Pause" frame="IconBorderImageHighlight">
 				<Key type="Curve" time="0" value="0"/>
 				<Key type="Curve" time="0.25" value="0"/>
 				<Key type="Curve" time="0.5" value="255"/>
 				<Key type="Curve" time="1.0" value="255"/>
 			</Controller>
 		</Animation>
+		
+		<Frame type="Image" name="IconBorderImage">
+			<!--<Alpha val="#talentBorderAlpha"/>-->
+			<Alpha val="#talentBorderAlpha2"/>
+			<Unclipped val="true"/>
+			
+			<Animation name="TalentAvailable2">
+				<Event event="NotAvailable" action="DirectionReverse,Play"/>
+				<Event event="Available" action="Restart,Play"/>
+				
+			<!-- <Controller type="Fade" end="Pause">
+					<Key type="Curve" time="0.0" value="#talentBorderAlpha" out="Fast"/>
+					<Key type="Curve" time="0.0625" value="#talentBorderAlpha2" out="Fast"/>
+				</Controller> -->
+				<Controller type="Visibility" end="Pause" frame="$parent/IconBorderImageHighlight">
+					<Key type="Bool" time="0" value="false"/>
+					<Key type="Bool" time="0" value="true"/>
+				</Controller>
+			</Animation>
+		</Frame>
+		
+		<Frame type="Image" name="IconBorderImageHighlight">
+			<Anchor relative="$parent/IconBorderImage"/>
+			<Texture val="_Assets\Textures\talentAvailableHighlightBorder.dds"/>
+			<Visible val="false"/>
+			<Alpha val="0"/>
+			<RenderPriority val="700"/>
+			<IgnoreParentColor val="true"/>
+			<Unclipped val="true"/>
+		</Frame>
+		
+		<StateGroup name="TalentTierState2">
+			<DefaultState val="TierNotAvailable"/>
+			
+			<State name="TierNotAvailable">
+				<When type="AnimationState" frame="$this" TalentTierState="TierNotAvailable"/>
+				<Action type="SendEvent" frame="IconBorderImage" event="NotAvailable"/>
+				<Action type="SetProperty" frame="$this" visible="false"/>
+			</State>
+			
+			<State name="TierAvailable">
+				<When type="AnimationState" frame="$this" TalentTierState="TierAvailable"/>
+				<Action type="SendEvent" frame="IconBorderImage" event="Available"/>
+				<Action type="SetProperty" frame="$this" visible="false"/>
+			</State>
+			
+			<State name="TierSelected">
+				<When type="AnimationState" frame="$this" TalentTierState="TierSelected"/>
+				<Action type="SendEvent" frame="IconBorderImage" event="Available"/>
+				<Action type="SetProperty" frame="$this" visible="true"/>
+			</State>
+		</StateGroup>
+		
+		<Frame type="Image" name="UnfilledProgressImage">
+			<Unclipped val="true"/>
+			<RenderPriority val="535"/>
+		</Frame>
+		<Frame type="ProgressBar" name="QuestProgressBar">
+			<Unclipped val="true"/>
+			<RenderPriority val="536"/>
+			<Frame type="Frame" name="FillImageContainer">
+				<Unclipped val="true"/>
+				<Frame type="Image" name="FillImage">
+					<Unclipped val="true"/>
+				</Frame>
+			</Frame>
+		</Frame>
+		<Frame type="Image" name="QuestCompleteImage">
+			<Unclipped val="true"/>
+			<RenderPriority val="536"/>
+		</Frame>
+		
 	</Frame>
 
+	<Frame type="UnitStatusTalentIcon" name="TalentTreeIconHeroicTemplate">
+		<Unclipped val="true"/>
+		
+		<Animation name="MouseHighlight">
+			<Event event="OnMouseEnter" action="DirectionForward,Play"/>
+			<Event event="OnMouseExit" action="DirectionReverse,Play"/>
+			
+			<Controller type="Fade" end="Pause" frame="IconBorderImageHighlight">
+				<Key type="Curve" time="0" value="0"/>
+				<Key type="Curve" time="0.25" value="0"/>
+				<Key type="Curve" time="0.5" value="255"/>
+				<Key type="Curve" time="1.0" value="255"/>
+			</Controller>
+		</Animation>
+		
+		<Frame type="Image" name="IconImage">
+			<!-- <ImageMaskTexture val="_Assets\Textures\heroicTalentAlphaMask.dds"/> -->
+		</Frame>
+		
+		<Frame type="Image" name="IconBorderImage">
+			<IgnoreParentColor val="true"/>
+			<Unclipped val="true"/>
+			<!-- <ImageMaskTexture val="_Assets\Textures\heroicTalentAlphaMask.dds"/> -->
+			<!-- <Alpha val="#ultimateTalentBorderAlpha"/> -->
+			<Alpha val="#ultimateTalentBorderAlpha2"/>
+			
+			<Animation name="TalentAvailable2">
+				<Event event="NotAvailable" action="DirectionReverse,Play"/>
+				<Event event="Available" action="Restart,Play"/>
+				<!-- <Controller type="Fade" end="Pause">
+					<Key type="Curve" time="0.0" value="#ultimateTalentBorderAlpha" out="Fast"/>
+					<Key type="Curve" time="0.0625" value="#ultimateTalentBorderAlpha2" out="Fast"/>
+				</Controller> -->
+				<Controller type="Visibility" end="Pause" frame="$parent/IconBorderImageHighlight">
+					<Key type="Bool" time="0" value="false"/>
+					<Key type="Bool" time="0" value="true"/>
+				</Controller>
+			</Animation>
+		</Frame>
+		
+		<Frame type="Image" name="IconBorderImageHighlight">
+			<Anchor relative="$parent/IconBorderImage"/>
+			<Texture val="_Assets\Textures\talentAvailableHighlightBorder.dds"/>
+			<Visible val="false"/>
+			<Alpha val="0"/>
+			<RenderPriority val="700"/>
+			<IgnoreParentColor val="true"/>
+			<Unclipped val="true"/>
+		</Frame>
+		
+		<StateGroup name="TalentTierState2">
+			<DefaultState val="TierNotAvailable"/>
+			
+			<State name="TierNotAvailable">
+				<When type="AnimationState" frame="$this" TalentTierState="TierNotAvailable"/>
+				<Action type="SendEvent" frame="IconBorderImage" event="NotAvailable"/>
+				<Action type="SetProperty" frame="$this" visible="false"/>
+			</State>
+			
+			<State name="TierAvailable">
+				<When type="AnimationState" frame="$this" TalentTierState="TierAvailable"/>
+				<Action type="SendEvent" frame="IconBorderImage" event="Available"/>
+				<Action type="SetProperty" frame="$this" visible="false"/>
+			</State>
+			
+			<State name="TierSelected">
+				<When type="AnimationState" frame="$this" TalentTierState="TierSelected"/>
+				<Action type="SendEvent" frame="IconBorderImage" event="Available"/>
+				<Action type="SetProperty" frame="$this" visible="true"/>
+			</State>
+		</StateGroup>
+		
+		<Frame type="Image" name="UnfilledProgressImage">
+			<Unclipped val="true"/>
+			<RenderPriority val="535"/>
+		</Frame>
+		<Frame type="ProgressBar" name="QuestProgressBar">
+			<Unclipped val="true"/>
+			<RenderPriority val="536"/>
+			<Frame type="Frame" name="FillImageContainer">
+				<Unclipped val="true"/>
+				<Frame type="Image" name="FillImage">
+					<Unclipped val="true"/>
+				</Frame>
+			</Frame>
+		</Frame>
+		<Frame type="Image" name="QuestCompleteImage">
+			<Unclipped val="true"/>
+			<RenderPriority val="536"/>
+		</Frame>
+	</Frame>
+	
 	<Frame type="HeroLeaderPanelPlayerFrame" name="HeroLeaderPanelPlayerFrameTemplate_StatsTalentPage_Talents_Left">
 		<Height val="50"/>
 		<Width val="0"/>
 		
-        <Frame type="Image" name="Background">
+		<Frame type="Image" name="Background">
 			<Visible val="false"/>
 			<Anchor side="Top" relative="$parent" pos="Min" offset="9999"/>
 			<Anchor side="Left" relative="$parent" pos="Min" offset="9999"/>
 			<Anchor side="Bottom" relative="$parent" pos="Min" offset="9999"/>
 			<Anchor side="Right" relative="$parent" pos="Min" offset="9999"/>
-        </Frame>
-        <Frame type="Image" name="SelfBackground">
+		</Frame>
+		<Frame type="Image" name="SelfBackground">
 			<Visible val="false"/>
 			<Anchor side="Top" relative="$parent" pos="Min" offset="9999"/>
 			<Anchor side="Left" relative="$parent" pos="Min" offset="9999"/>
 			<Anchor side="Bottom" relative="$parent" pos="Min" offset="9999"/>
 			<Anchor side="Right" relative="$parent" pos="Min" offset="9999"/>
-        </Frame>
-        <Frame type="BattleUserContextMenu" name="PlayerContextMenu">
+		</Frame>
+		<Frame type="BattleUserContextMenu" name="PlayerContextMenu">
 			<Visible val="false"/>
-        </Frame>
+		</Frame>
 
 		<Frame type="Frame" name="StatsContainerFrame">
 			<Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
 			<Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
 			<Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
 			<Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
-			<Visible val="true"/>
-            <Frame type="PlayerScoreValueFrame" name="SoloKillScoreValueFrame">
+			<Visible val="false"/>
+			<Frame type="PlayerScoreValueFrame" name="SoloKillScoreValueFrame">
 				<Visible val="false"/>
-                <Frame type="ScoreValueLabelFrame" name="ScoreValueFrame0">
+				<Frame type="ScoreValueLabelFrame" name="ScoreValueFrame0">
 					<Visible val="false"/>
-                </Frame>
-            </Frame>
-            <Frame type="PlayerScoreValueFrame" name="AssistsScoreValueFrame">
-				<Visible val="false"/>
-                <Frame type="ScoreValueLabelFrame" name="ScoreValueFrame0">
-					<Visible val="false"/>
-                </Frame>
-            </Frame>
-            <Frame type="PlayerScoreValueFrame" name="DeathsScoreValueFrame">
-				<Visible val="false"/>
-                <Frame type="ScoreValueLabelFrame" name="ScoreValueFrame0">
-					<Visible val="false"/>
-                </Frame>
-            </Frame>
-            <Frame type="PlayerScoreValueFrame" name="SiegeDamageScoreValueFrame">
-				<Visible val="false"/>
-                <Frame type="ScoreValueLabelFrame" name="ScoreValueFrame0">
-					<Visible val="false"/>
-                </Frame>
-            </Frame>
-            <Frame type="PlayerScoreValueFrame" name="HeroDamageScoreValueFrame">
-				<Visible val="false"/>
-                <Frame type="ScoreValueLabelFrame" name="ScoreValueFrame0">
-					<Visible val="false"/>
-                </Frame>
-            </Frame>
-            <Frame type="PlayerScoreValueFrame" name="HealingScoreValueFrame">
-				<Visible val="false"/>
-                <Frame type="ScoreValueLabelFrame" name="ScoreValueFrame0">
-					<Visible val="false"/>
-                </Frame>
-                <Frame type="ScoreValueImageFrame" name="ScoreValueFrame1">
-					<Visible val="false"/>
-                </Frame>
-            </Frame>
-            <Frame type="PlayerScoreValueFrame" name="ExperienceScoreValueFrame">
-				<Visible val="false"/>
-                <Frame type="ScoreValueLabelFrame" name="ScoreValueFrame0">
-					<Visible val="false"/>
-                </Frame>
-                <Frame type="ScoreValueImageFrame" name="ScoreValueFrame1">
-					<Visible val="false"/>
-                </Frame>
-            </Frame>
-
-			<!-- newly added -->
-			<Frame type="PlayerHeroSelectedTalentTreeFrame" name="TalentTreeCustom" template="HeroLeaderPanel/PlayerHeroSelectedTalentTreeFrameTemplate">
-				<Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
-				<Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
-				<Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
-				<Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
-				<Width val="0"/>
-				<Height val="0"/>
-
-				<Frame type="Image" name="TalentTreeIcon0" template="GameStatsPanel/SelectedTalentTreeIconImageTemplate">
-					<Anchor side="Top" relative="$parent" pos="Min" offset="#talent_Bottom_TopOffset"/>
-					<Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
-					<Anchor side="Right" relative="$this" pos="Min" offset="0"/>
-					<Anchor side="Bottom" relative="$this" pos="Min" offset="0"/>
 				</Frame>
-
-				<Frame type="Image" name="TalentTreeIcon1" template="GameStatsPanel/SelectedTalentTreeIconImageTemplate">
-					<Anchor side="Top" relative="$parent\TalentTreeIcon0" pos="Min" offset="0"/>
-					<Anchor side="Left" relative="$parent\TalentTreeIcon0" pos="Max" offset="#talent_Bottom_HorizontalGap"/>
-					<Anchor side="Right" relative="$this" pos="Min" offset="0"/>
-					<Anchor side="Bottom" relative="$this" pos="Min" offset="0"/>
-					<Unclipped val="true"/>
-					
-					<Animation name="MouseHighlight">
-						<Event event="OnMouseEnter" action="DirectionForward,Play"/>
-						<Event event="OnMouseExit" action="DirectionReverse,Play"/>
-						<Controller type="Event" end="Pause" frame="$parent/TalentTreeIconBorder1Highlight">
-							<Key type="Event" time="0.0" event="HighlightOff"/>
-							<Key type="Event" time="0.0" event="HighlightOn"/>
-						</Controller>
-					</Animation>
-				</Frame>
-
-				<Frame type="Image" name="TalentTreeIcon2" template="GameStatsPanel/SelectedTalentTreeIconImageTemplate">
-					<Anchor side="Top" relative="$parent\TalentTreeIcon0" pos="Min" offset="0"/>
-					<Anchor side="Left" relative="$parent\TalentTreeIcon1" pos="Max" offset="#talent_Bottom_HorizontalGap"/>
-					<Anchor side="Right" relative="$this" pos="Min" offset="0"/>
-					<Anchor side="Bottom" relative="$this" pos="Min" offset="0"/>
-					<Unclipped val="true"/>
-					
-					<Animation name="MouseHighlight">
-						<Event event="OnMouseEnter" action="DirectionForward,Play"/>
-						<Event event="OnMouseExit" action="DirectionReverse,Play"/>
-						<Controller type="Event" end="Pause" frame="$parent/TalentTreeIconBorder2Highlight">
-							<Key type="Event" time="0.0" event="HighlightOff"/>
-							<Key type="Event" time="0.0" event="HighlightOn"/>
-						</Controller>
-					</Animation>
-				</Frame>
-
-				<Frame type="Image" name="TalentTreeIcon3" template="GameStatsPanel/SelectedTalentTreeIconImageTemplate">
-					<Anchor side="Top" relative="$parent\TalentTreeIcon0" pos="Min" offset="0"/>
-					<Anchor side="Left" relative="$parent\TalentTreeIcon2" pos="Max" offset="#talent_Bottom_HorizontalGap"/>
-					<Anchor side="Right" relative="$this" pos="Min" offset="0"/>
-					<Anchor side="Bottom" relative="$this" pos="Min" offset="0"/>
-					<Unclipped val="true"/>
-					
-					<Animation name="MouseHighlight">
-						<Event event="OnMouseEnter" action="DirectionForward,Play"/>
-						<Event event="OnMouseExit" action="DirectionReverse,Play"/>
-						<Controller type="Event" end="Pause" frame="$parent/TalentTreeIconBorder3Highlight">
-							<Key type="Event" time="0.0" event="HighlightOff"/>
-							<Key type="Event" time="0.0" event="HighlightOn"/>
-						</Controller>
-					</Animation>
-				</Frame>
-
-				<Frame type="Image" name="TalentTreeIcon4" template="GameStatsPanel/SelectedTalentTreeIconImageTemplate">
-					<Anchor side="Top" relative="$parent\TalentTreeIcon0" pos="Min" offset="0"/>
-					<Anchor side="Left" relative="$parent\TalentTreeIcon3" pos="Max" offset="#talent_Bottom_HorizontalGap"/>
-					<Anchor side="Right" relative="$this" pos="Min" offset="0"/>
-					<Anchor side="Bottom" relative="$this" pos="Min" offset="0"/>
-					<ImageMaskTexture val="_Assets\Textures\heroicTalentAlphaMask.dds"/>
-					<Unclipped val="true"/>
-					
-					<Animation name="Ahlimation">
-						<Event event="OnShown" action="DirectionForward,Play"/>
-						<Event event="OnHidden" action="DirectionReverse,Play"/>
-
-						<Controller type="Visibility" end="Pause" frame="$parent/CustomBorder4">
-							<Key type="Bool" time="0.0" value="false"/>
-							<Key type="Bool" time="0.0" value="true"/>
-						</Controller>
-						<Controller type="Visibility" end="Pause" frame="$parent/CustomBorder4NoColor">
-							<Key type="Bool" time="0.0" value="true"/>
-							<Key type="Bool" time="0.0" value="false"/>
-						</Controller>
-					</Animation>
-					
-					<Animation name="MouseHighlight">
-						<Event event="OnMouseEnter" action="DirectionForward,Play"/>
-						<Event event="OnMouseExit" action="DirectionReverse,Play"/>
-						<Controller type="Event" end="Pause" frame="$parent/TalentTreeIconBorder4Highlight">
-							<Key type="Event" time="0.0" event="HighlightOff"/>
-							<Key type="Event" time="0.0" event="HighlightOn"/>
-						</Controller>
-					</Animation>
-					
-				</Frame>
-
-				<Frame type="Image" name="TalentTreeIcon5" template="GameStatsPanel/SelectedTalentTreeIconImageTemplate">
-					<Anchor side="Top" relative="$parent\TalentTreeIcon0" pos="Min" offset="0"/>
-					<Anchor side="Left" relative="$parent\TalentTreeIcon4" pos="Max" offset="#talent_Bottom_HorizontalGap"/>
-					<Anchor side="Right" relative="$this" pos="Min" offset="0"/>
-					<Anchor side="Bottom" relative="$this" pos="Min" offset="0"/>
-					<Unclipped val="true"/>
-					
-					<Animation name="MouseHighlight">
-						<Event event="OnMouseEnter" action="DirectionForward,Play"/>
-						<Event event="OnMouseExit" action="DirectionReverse,Play"/>
-						<Controller type="Event" end="Pause" frame="$parent/TalentTreeIconBorder5Highlight">
-							<Key type="Event" time="0.0" event="HighlightOff"/>
-							<Key type="Event" time="0.0" event="HighlightOn"/>
-						</Controller>
-					</Animation>
-				</Frame>
-
-				<Frame type="Image" name="TalentTreeIcon6" template="GameStatsPanel/SelectedTalentTreeIconImageTemplate">
-					<Anchor side="Top" relative="$parent\TalentTreeIcon0" pos="Min" offset="0"/>
-					<Anchor side="Left" relative="$parent\TalentTreeIcon5" pos="Max" offset="#talent_Bottom_HorizontalGap"/>
-					<Anchor side="Right" relative="$this" pos="Min" offset="0"/>
-					<Anchor side="Bottom" relative="$this" pos="Min" offset="0"/>
-					<Unclipped val="true"/>
-					
-					<Animation name="MouseHighlight">
-						<Event event="OnMouseEnter" action="DirectionForward,Play"/>
-						<Event event="OnMouseExit" action="DirectionReverse,Play"/>
-						<Controller type="Event" end="Pause" frame="$parent/TalentTreeIconBorder6Highlight">
-							<Key type="Event" time="0.0" event="HighlightOff"/>
-							<Key type="Event" time="0.0" event="HighlightOn"/>
-						</Controller>
-					</Animation>
-				</Frame>
-
-				<Frame type="Image" name="TalentTreeIcon7" template="GameStatsPanel/SelectedTalentTreeIconImageTemplate">
-					<Anchor side="Top" relative="$parent\TalentTreeIcon0" pos="Min" offset="0"/>
-					<Anchor side="Left" relative="$parent\TalentTreeIcon6" pos="Max" offset="#talent_Bottom_HorizontalGap"/>
-					<Anchor side="Right" relative="$this" pos="Min" offset="0"/>
-					<Anchor side="Bottom" relative="$this" pos="Min" offset="0"/>
-					<ImageMaskTexture val="_Assets\Textures\heroicTalentAlphaMask.dds"/>
-					<Unclipped val="true"/>
-					
-					<Animation name="Ahlimation">
-						<Event event="OnShown" action="DirectionForward,Play"/>
-						<Event event="OnHidden" action="DirectionReverse,Play"/>
-
-						<Controller type="Visibility" end="Pause" frame="$parent/CustomBorder7">
-							<Key type="Bool" time="0.0" value="false"/>
-							<Key type="Bool" time="0.0" value="true"/>
-						</Controller>
-						<Controller type="Visibility" end="Pause" frame="$parent/CustomBorder7NoColor">
-							<Key type="Bool" time="0.0" value="true"/>
-							<Key type="Bool" time="0.0" value="false"/>
-						</Controller>
-					</Animation>
-					
-					<Animation name="MouseHighlight">
-						<Event event="OnMouseEnter" action="DirectionForward,Play"/>
-						<Event event="OnMouseExit" action="DirectionReverse,Play"/>
-						<Controller type="Event" end="Pause" frame="$parent/TalentTreeIconBorder7Highlight">
-							<Key type="Event" time="0.0" event="HighlightOff"/>
-							<Key type="Event" time="0.0" event="HighlightOn"/>
-						</Controller>
-					</Animation>
-				</Frame>
-
-				<Frame type="Image" name="TalentTreeIconBorder0" template="HeroLeaderPanel/SelectedTalentTreeIconBorderTemplate">
-					<Anchor side="Top" relative="$parent/TalentTreeIcon0" pos="Mid" offset="0"/>
-					<Anchor side="Right" relative="$parent/TalentTreeIcon0" pos="Mid" offset="0"/>
-					<Anchor side="Bottom" relative="$parent/TalentTreeIcon0" pos="Mid" offset="0"/>
-					<Anchor side="Left" relative="$parent/TalentTreeIcon0" pos="Mid" offset="0"/>
-				</Frame>
-				<Frame type="Image" name="TalentTreeIconBorder1" template="HeroLeaderPanel/SelectedTalentTreeIconBorderTemplate">
-					<Anchor side="Top" relative="$parent/TalentTreeIcon1" pos="Mid" offset="0"/>
-					<Anchor side="Right" relative="$parent/TalentTreeIcon1" pos="Mid" offset="0"/>
-					<Anchor side="Bottom" relative="$parent/TalentTreeIcon1" pos="Mid" offset="0"/>
-					<Anchor side="Left" relative="$parent/TalentTreeIcon1" pos="Mid" offset="0"/>
-					<Alpha val="#talentBorderAlpha"/>
-					<Unclipped val="true"/>
-					
-					<Animation name="TalentAvailable2">
-						<Event event="NotAvailable" action="DirectionReverse,Play"/>
-						<Event event="Available" action="Restart,Play"/>
-						<Controller type="Fade" end="Pause">
-							<Key type="Curve" time="0.0" value="#talentBorderAlpha" out="Fast"/>
-							<Key type="Curve" time="0.0625" value="#talentBorderAlpha2" out="Fast"/>
-						</Controller>
-						<Controller type="Visibility" end="Pause" frame="$parent/TalentTreeIconBorder1Highlight">
-							<Key type="Bool" time="0" value="false"/>
-							<Key type="Bool" time="0" value="true"/>
-						</Controller>
-					</Animation>
-				</Frame>
-				<Frame type="Image" name="TalentTreeIconBorder2" template="HeroLeaderPanel/SelectedTalentTreeIconBorderTemplate">
-					<Anchor side="Top" relative="$parent/TalentTreeIcon2" pos="Mid" offset="0"/>
-					<Anchor side="Right" relative="$parent/TalentTreeIcon2" pos="Mid" offset="0"/>
-					<Anchor side="Bottom" relative="$parent/TalentTreeIcon2" pos="Mid" offset="0"/>
-					<Anchor side="Left" relative="$parent/TalentTreeIcon2" pos="Mid" offset="0"/>
-					<Alpha val="#talentBorderAlpha"/>
-					<Unclipped val="true"/>
-					
-					<Animation name="TalentAvailable2">
-						<Event event="NotAvailable" action="DirectionReverse,Play"/>
-						<Event event="Available" action="Restart,Play"/>
-						<Controller type="Fade" end="Pause">
-							<Key type="Curve" time="0.0" value="#talentBorderAlpha" out="Fast"/>
-							<Key type="Curve" time="0.0625" value="#talentBorderAlpha2" out="Fast"/>
-						</Controller>
-						<Controller type="Visibility" end="Pause" frame="$parent/TalentTreeIconBorder2Highlight">
-							<Key type="Bool" time="0" value="false"/>
-							<Key type="Bool" time="0" value="true"/>
-						</Controller>
-					</Animation>
-				</Frame>
-				<Frame type="Image" name="TalentTreeIconBorder3" template="HeroLeaderPanel/SelectedTalentTreeIconBorderTemplate">
-					<Anchor side="Top" relative="$parent/TalentTreeIcon3" pos="Mid" offset="0"/>
-					<Anchor side="Right" relative="$parent/TalentTreeIcon3" pos="Mid" offset="0"/>
-					<Anchor side="Bottom" relative="$parent/TalentTreeIcon3" pos="Mid" offset="0"/>
-					<Anchor side="Left" relative="$parent/TalentTreeIcon3" pos="Mid" offset="0"/>
-					<Alpha val="#talentBorderAlpha"/>
-					<Unclipped val="true"/>
-					
-					<Animation name="TalentAvailable2">
-						<Event event="NotAvailable" action="DirectionReverse,Play"/>
-						<Event event="Available" action="Restart,Play"/>
-						<Controller type="Fade" end="Pause">
-							<Key type="Curve" time="0.0" value="#talentBorderAlpha" out="Fast"/>
-							<Key type="Curve" time="0.0625" value="#talentBorderAlpha2" out="Fast"/>
-						</Controller>
-						<Controller type="Visibility" end="Pause" frame="$parent/TalentTreeIconBorder3Highlight">
-							<Key type="Bool" time="0" value="false"/>
-							<Key type="Bool" time="0" value="true"/>
-						</Controller>
-					</Animation>
-				</Frame>
-				<Frame type="Image" name="TalentTreeIconBorder4" template="HeroLeaderPanel/SelectedTalentTreeIconUltimateBorderTemplate">
-					<Anchor side="Top" relative="$parent/TalentTreeIcon4" pos="Mid" offset="0"/>
-					<Anchor side="Right" relative="$parent/TalentTreeIcon4" pos="Mid" offset="0"/>
-					<Anchor side="Bottom" relative="$parent/TalentTreeIcon4" pos="Mid" offset="0"/>
-					<Anchor side="Left" relative="$parent/TalentTreeIcon4" pos="Mid" offset="0"/>
-					<Visible val="false"/>
-					<Alpha val="0"/>
-				</Frame>
-				<Frame type="Image" name="CustomBorder4">
-					<Anchor side="Top" relative="$parent/TalentTreeIcon4" pos="Mid" offset="0"/>
-					<Anchor side="Right" relative="$parent/TalentTreeIcon4" pos="Mid" offset="0"/>
-					<Anchor side="Bottom" relative="$parent/TalentTreeIcon4" pos="Mid" offset="0"/>
-					<Anchor side="Left" relative="$parent/TalentTreeIcon4" pos="Mid" offset="0"/>
-					<Width val="84"/>
-					<Height val="84"/>
-					<Texture val="_Assets\Textures\heroicBlue.dds"/>
-					<IgnoreParentColor val="true"/>
-					<Unclipped val="true"/>
-					<Visible val="false"/>
-					<Alpha val="#ultimateTalentBorderAlpha"/>
-					
-					<Animation name="UltimateTalentAvailable">
-						<Event event="OnHidden" action="DirectionReverse,Play"/>
-						<Event event="OnShown" action="Restart,Play"/>
-						<Controller type="Fade" end="Pause">
-							<Key type="Curve" time="0.0" value="#ultimateTalentBorderAlpha" out="Fast"/>
-							<Key type="Curve" time="0.0" value="#ultimateTalentBorderAlpha2" out="Fast"/>
-						</Controller>
-						<Controller type="Visibility" end="Pause" frame="$parent/TalentTreeIconBorder4Highlight">
-							<Key type="Bool" time="0" value="false"/>
-							<Key type="Bool" time="0" value="true"/>
-						</Controller>
-					</Animation>
-				</Frame>
-				<Frame type="Image" name="CustomBorder4NoColor">
-					<Anchor side="Top" relative="$parent/TalentTreeIcon4" pos="Mid" offset="0"/>
-					<Anchor side="Right" relative="$parent/TalentTreeIcon4" pos="Mid" offset="0"/>
-					<Anchor side="Bottom" relative="$parent/TalentTreeIcon4" pos="Mid" offset="0"/>
-					<Anchor side="Left" relative="$parent/TalentTreeIcon4" pos="Mid" offset="0"/>
-					<Width val="84"/>
-					<Height val="84"/>
-					<Texture val="_Assets\Textures\heroicNoLight.dds"/>
-					<IgnoreParentColor val="true"/>
-					<Unclipped val="true"/>
-					<Alpha val="#ultimateTalentBorderAlpha"/>
-				</Frame>
-				<Frame type="Image" name="TalentTreeIconBorder5" template="HeroLeaderPanel/SelectedTalentTreeIconBorderTemplate">
-					<Anchor side="Top" relative="$parent/TalentTreeIcon5" pos="Mid" offset="0"/>
-					<Anchor side="Right" relative="$parent/TalentTreeIcon5" pos="Mid" offset="0"/>
-					<Anchor side="Bottom" relative="$parent/TalentTreeIcon5" pos="Mid" offset="0"/>
-					<Anchor side="Left" relative="$parent/TalentTreeIcon5" pos="Mid" offset="0"/>
-					<Alpha val="#talentBorderAlpha"/>
-					<Unclipped val="true"/>
-					
-					<Animation name="TalentAvailable2">
-						<Event event="NotAvailable" action="DirectionReverse,Play"/>
-						<Event event="Available" action="Restart,Play"/>
-						<Controller type="Fade" end="Pause">
-							<Key type="Curve" time="0.0" value="#talentBorderAlpha" out="Fast"/>
-							<Key type="Curve" time="0.0625" value="#talentBorderAlpha2" out="Fast"/>
-						</Controller>
-						<Controller type="Visibility" end="Pause" frame="$parent/TalentTreeIconBorder5Highlight">
-							<Key type="Bool" time="0" value="false"/>
-							<Key type="Bool" time="0" value="true"/>
-						</Controller>
-					</Animation>
-				</Frame>
-				<Frame type="Image" name="TalentTreeIconBorder6" template="HeroLeaderPanel/SelectedTalentTreeIconBorderTemplate">
-					<Anchor side="Top" relative="$parent/TalentTreeIcon6" pos="Mid" offset="0"/>
-					<Anchor side="Right" relative="$parent/TalentTreeIcon6" pos="Mid" offset="0"/>
-					<Anchor side="Bottom" relative="$parent/TalentTreeIcon6" pos="Mid" offset="0"/>
-					<Anchor side="Left" relative="$parent/TalentTreeIcon6" pos="Mid" offset="0"/>
-					<Alpha val="#talentBorderAlpha"/>
-					<Unclipped val="true"/>
-					
-					<Animation name="TalentAvailable2">
-						<Event event="NotAvailable" action="DirectionReverse,Play"/>
-						<Event event="Available" action="Restart,Play"/>
-						<Controller type="Fade" end="Pause">
-							<Key type="Curve" time="0.0" value="#talentBorderAlpha" out="Fast"/>
-							<Key type="Curve" time="0.0625" value="#talentBorderAlpha2" out="Fast"/>
-						</Controller>
-						<Controller type="Visibility" end="Pause" frame="$parent/TalentTreeIconBorder6Highlight">
-							<Key type="Bool" time="0" value="false"/>
-							<Key type="Bool" time="0" value="true"/>
-						</Controller>
-					</Animation>
-				</Frame>
-				<Frame type="Image" name="TalentTreeIconBorder7" template="HeroLeaderPanel/SelectedTalentTreeIconUltimateBorderTemplate">
-					<Anchor side="Top" relative="$parent/TalentTreeIcon7" pos="Mid" offset="0"/>
-					<Anchor side="Right" relative="$parent/TalentTreeIcon7" pos="Mid" offset="0"/>
-					<Anchor side="Bottom" relative="$parent/TalentTreeIcon7" pos="Mid" offset="0"/>
-					<Anchor side="Left" relative="$parent/TalentTreeIcon7" pos="Mid" offset="0"/>
-					<Visible val="false"/>
-					<Alpha val="0"/>
-				</Frame>
-				<Frame type="Image" name="CustomBorder7">
-					<Anchor side="Top" relative="$parent/TalentTreeIcon7" pos="Mid" offset="0"/>
-					<Anchor side="Right" relative="$parent/TalentTreeIcon7" pos="Mid" offset="0"/>
-					<Anchor side="Bottom" relative="$parent/TalentTreeIcon7" pos="Mid" offset="0"/>
-					<Anchor side="Left" relative="$parent/TalentTreeIcon7" pos="Mid" offset="0"/>
-					<Width val="84"/>
-					<Height val="84"/>
-					<Texture val="_Assets\Textures\heroicBlue.dds"/>
-					<IgnoreParentColor val="true"/>
-					<Unclipped val="true"/>
-					<Visible val="false"/>
-					<Alpha val="#ultimateTalentBorderAlpha"/>
-					<Unclipped val="true"/>
-					
-					<Animation name="UltimateTalentAvailable">
-						<Event event="OnHidden" action="DirectionReverse,Play"/>
-						<Event event="OnShown" action="Restart,Play"/>
-						<Controller type="Fade" end="Pause">
-							<Key type="Curve" time="0.0" value="#ultimateTalentBorderAlpha" out="Fast"/>
-							<Key type="Curve" time="0.0" value="#ultimateTalentBorderAlpha2" out="Fast"/>
-						</Controller>
-						<Controller type="Visibility" end="Pause" frame="$parent/TalentTreeIconBorder7Highlight">
-							<Key type="Bool" time="0" value="false"/>
-							<Key type="Bool" time="0" value="true"/>
-						</Controller>
-					</Animation>
-				</Frame>
-				<Frame type="Image" name="CustomBorder7NoColor">
-					<Anchor side="Top" relative="$parent/TalentTreeIcon7" pos="Mid" offset="0"/>
-					<Anchor side="Right" relative="$parent/TalentTreeIcon7" pos="Mid" offset="0"/>
-					<Anchor side="Bottom" relative="$parent/TalentTreeIcon7" pos="Mid" offset="0"/>
-					<Anchor side="Left" relative="$parent/TalentTreeIcon7" pos="Mid" offset="0"/>
-					<Width val="84"/>
-					<Height val="84"/>
-					<Texture val="_Assets\Textures\heroicNoLight.dds"/>
-					<IgnoreParentColor val="true"/>
-					<Unclipped val="true"/>
-					<Alpha val="#ultimateTalentBorderAlpha"/>
-					<Unclipped val="true"/>
-				</Frame>
-				<Frame type="Image" name="TalentTreeIconBorder1Highlight" template="_LeaderPanelBottom/HighlightImageMouseFadeTemplate">
-					<Anchor relative="$parent/TalentTreeIconBorder1"/>					
-				</Frame>
-				<Frame type="Image" name="TalentTreeIconBorder2Highlight" template="_LeaderPanelBottom/HighlightImageMouseFadeTemplate">
-					<Anchor relative="$parent/TalentTreeIconBorder2"/>					
-				</Frame>
-				<Frame type="Image" name="TalentTreeIconBorder3Highlight" template="_LeaderPanelBottom/HighlightImageMouseFadeTemplate">
-					<Anchor relative="$parent/TalentTreeIconBorder3"/>					
-				</Frame>
-				<Frame type="Image" name="TalentTreeIconBorder5Highlight" template="_LeaderPanelBottom/HighlightImageMouseFadeTemplate">
-					<Anchor relative="$parent/TalentTreeIconBorder5"/>					
-				</Frame>
-				<Frame type="Image" name="TalentTreeIconBorder6Highlight" template="_LeaderPanelBottom/HighlightImageMouseFadeTemplate">
-					<Anchor relative="$parent/TalentTreeIconBorder6"/>					
-				</Frame>
-				<Frame type="Image" name="TalentTreeIconBorder4Highlight" template="_LeaderPanelBottom/HighlightImageMouseFadeTemplate">
-					<Anchor relative="$parent/CustomBorder4"/>
-					<Texture val="_Assets\Textures\heroicHighlight.dds"/>
-				</Frame>
-				<Frame type="Image" name="TalentTreeIconBorder7Highlight" template="_LeaderPanelBottom/HighlightImageMouseFadeTemplate">
-					<Anchor relative="$parent/CustomBorder7"/>
-					<Texture val="_Assets\Textures\heroicHighlight.dds"/>
-				</Frame>
-				<Frame type="PlayerScoreValueFrame" name="PlayerScoreValueProgressBar0">
-					<Visible val="false"/>
-					<Frame type="ScoreValueProgressBarFrame" name="ScoreValueFrame0">
-						<Visible val="false"/>
-					</Frame>
-				</Frame>
-				<Frame type="PlayerScoreValueFrame" name="PlayerScoreValueProgressBar1">
-					<Visible val="false"/>
-					<Frame type="ScoreValueProgressBarFrame" name="ScoreValueFrame0">
-						<Visible val="false"/>
-					</Frame>
-				</Frame>
-				<Frame type="PlayerScoreValueFrame" name="PlayerScoreValueProgressBar2">
-					<Visible val="false"/>
-					<Frame type="ScoreValueProgressBarFrame" name="ScoreValueFrame0">
-						<Visible val="false"/>
-					</Frame>
-				</Frame>
-				<Frame type="PlayerScoreValueFrame" name="PlayerScoreValueProgressBar3">
-					<Visible val="false"/>
-					<Frame type="ScoreValueProgressBarFrame" name="ScoreValueFrame0">
-						<Visible val="false"/>
-					</Frame>
-				</Frame>
-				<Frame type="PlayerScoreValueFrame" name="PlayerScoreValueProgressBar4">
-					<Visible val="false"/>
-					<Frame type="ScoreValueProgressBarFrame" name="ScoreValueFrame0">
-						<Visible val="false"/>
-					</Frame>
-				</Frame>
-				<Frame type="PlayerScoreValueFrame" name="PlayerScoreValueProgressBar5">
-					<Visible val="false"/>
-					<Frame type="ScoreValueProgressBarFrame" name="ScoreValueFrame0">
-						<Visible val="false"/>
-					</Frame>
-				</Frame>
-
 			</Frame>
-			
+			<Frame type="PlayerScoreValueFrame" name="AssistsScoreValueFrame">
+				<Visible val="false"/>
+				<Frame type="ScoreValueLabelFrame" name="ScoreValueFrame0">
+					<Visible val="false"/>
+				</Frame>
+			</Frame>
+			<Frame type="PlayerScoreValueFrame" name="DeathsScoreValueFrame">
+				<Visible val="false"/>
+				<Frame type="ScoreValueLabelFrame" name="ScoreValueFrame0">
+					<Visible val="false"/>
+				</Frame>
+			</Frame>
+			<Frame type="PlayerScoreValueFrame" name="SiegeDamageScoreValueFrame">
+				<Visible val="false"/>
+				<Frame type="ScoreValueLabelFrame" name="ScoreValueFrame0">
+					<Visible val="false"/>
+				</Frame>
+			</Frame>
+			<Frame type="PlayerScoreValueFrame" name="HeroDamageScoreValueFrame">
+				<Visible val="false"/>
+				<Frame type="ScoreValueLabelFrame" name="ScoreValueFrame0">
+					<Visible val="false"/>
+				</Frame>
+			</Frame>
+			<Frame type="PlayerScoreValueFrame" name="HealingScoreValueFrame">
+				<Visible val="false"/>
+				<Frame type="ScoreValueLabelFrame" name="ScoreValueFrame0">
+					<Visible val="false"/>
+				</Frame>
+				<Frame type="ScoreValueImageFrame" name="ScoreValueFrame1">
+					<Visible val="false"/>
+				</Frame>
+			</Frame>
+			<Frame type="PlayerScoreValueFrame" name="ExperienceScoreValueFrame">
+				<Visible val="false"/>
+				<Frame type="ScoreValueLabelFrame" name="ScoreValueFrame0">
+					<Visible val="false"/>
+				</Frame>
+				<Frame type="ScoreValueImageFrame" name="ScoreValueFrame1">
+					<Visible val="false"/>
+				</Frame>
+			</Frame>
 		</Frame>
 		<!-- added duplicate because I cannot undo the death's animation transparency anymore -->
 		<Frame type="PlayerHeroIconFrame" name="PlayerHeroIconFrame">
-            <Anchor side="Top" relative="$parent" pos="Min" offset="9999"/>
-            <Anchor side="Left" relative="$parent" pos="Min" offset="9999"/>
-            <Anchor side="Bottom" relative="$this" pos="Min" offset="0"/>
-            <Anchor side="Right" relative="$this" pos="Min" offset="0"/>
+			<Anchor side="Top" relative="$parent" pos="Min" offset="9999"/>
+			<Anchor side="Left" relative="$parent" pos="Min" offset="9999"/>
+			<Anchor side="Bottom" relative="$this" pos="Min" offset="0"/>
+			<Anchor side="Right" relative="$this" pos="Min" offset="0"/>
 			<Width val="115"/>
 			<Height val="50"/>
 			<Visible val="true"/>
@@ -808,10 +536,10 @@
 			</Frame>
 		</Frame>
 		<Frame type="PlayerHeroIconFrame" name="PlayerHeroIconFrame2">
-            <Anchor side="Top" relative="$parent" pos="Min" offset="#talent_Bottom_PortraitTopOffset"/>
-            <Anchor side="Left" relative="$parent" pos="Min" offset="-60"/>
-            <Anchor side="Bottom" relative="$this" pos="Min" offset="0"/>
-            <Anchor side="Right" relative="$this" pos="Min" offset="0"/>
+			<Anchor side="Top" relative="$parent" pos="Min" offset="#talent_Bottom_PortraitTopOffset"/>
+			<Anchor side="Left" relative="$parent" pos="Min" offset="-60"/>
+			<Anchor side="Bottom" relative="$this" pos="Min" offset="0"/>
+			<Anchor side="Right" relative="$this" pos="Min" offset="0"/>
 			<Width val="115"/>
 			<Height val="50"/>
 			<Visible val="true"/>
@@ -855,26 +583,266 @@
 		</Frame>
 		
 		<Frame type="Frame" name="TalentsContainerFrame">
-			<Anchor side="Top" relative="$parent" pos="Min" offset="9999"/>
-			<Anchor side="Bottom" relative="$parent" pos="Max" offset="9999"/>
-			<Anchor side="Left" relative="$parent" pos="Min" offset="9999"/>
-			<Anchor side="Right" relative="$parent" pos="Max" offset="9999"/>
-			<Visible val="false"/>
-
-			<Frame type="PlayerHeroSelectedTalentTreeFrame" name="HeroSelectedTalentTreeFrame">
-				<Visible val="false"/>
-			</Frame>
-
+			<Visible val="true"/>
+			<Batch val="False"/>
+			
+			<Animation name="KeepVisible">
+				<Event event="OnHidden" action="Reset,Play"/>
+				<Controller type="Visibility" end="Pause">
+					<Key type="Bool" time="0" value="true"/>
+				</Controller>
+			</Animation>
+			
 			<Frame type="SelectionUnitStatusPanel" name="SelectionUnitStatusPanel">
-				<Visible val="false"/>
+				<Frame type="UnitStatusFrame" name="UnitStatusFrame0">
+					<Frame type="PlayerHeroSelectedTalentTreeFrame" name="HeroSelectedTalentTreeFrame">
+						<Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+						<Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+						<Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+						<Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+						<Width val="0"/>
+						<Height val="0"/>
+						
+						<Frame type="UnitStatusTalentIcon" name="TalentTreeIcon0">
+							<Visible val="false"/>
+						</Frame>
+						
+						<Frame type="UnitStatusTalentIcon" name="TalentTreeIcon1" template="_LeaderPanelBottom/TalentTreeIconTemplate">
+							<Anchor side="Top" relative="$parent" pos="Min" offset="#talent_Bottom_TopOffset"/>
+							<Anchor side="Left" relative="$parent" pos="Min" offset="#talent_Bottom_LeftOffset"/>
+							<Anchor side="Right" relative="$this" pos="Min" offset="0"/>
+							<Anchor side="Bottom" relative="$this" pos="Min" offset="0"/>
+							
+							<Animation name="Visibility">
+								<Event event="OnShown" action="DirectionForward,Play"/>
+								<Event event="OnHidden" action="DirectionReverse,Play"/>
+								
+								<Controller type="Visibility" end="Pause" frame="$parent/CustomBorder1NoColor">
+									<Key type="Bool" time="0.0" value="true"/>
+									<Key type="Bool" time="0.0" value="false"/>
+								</Controller>
+							</Animation>
+						</Frame>
+						
+						<Frame type="UnitStatusTalentIcon" name="TalentTreeIcon2" template="_LeaderPanelBottom/TalentTreeIconTemplate">
+							<Anchor side="Top" relative="$parent\TalentTreeIcon1" pos="Min" offset="0"/>
+							<Anchor side="Left" relative="$parent\TalentTreeIcon1" pos="Max" offset="#talent_Bottom_HorizontalGap"/>
+							<Anchor side="Right" relative="$this" pos="Min" offset="0"/>
+							<Anchor side="Bottom" relative="$this" pos="Min" offset="0"/>
+							
+							<Animation name="Visibility">
+								<Event event="OnShown" action="DirectionForward,Play"/>
+								<Event event="OnHidden" action="DirectionReverse,Play"/>
+								
+								<Controller type="Visibility" end="Pause" frame="$parent/CustomBorder2NoColor">
+									<Key type="Bool" time="0.0" value="true"/>
+									<Key type="Bool" time="0.0" value="false"/>
+								</Controller>
+							</Animation>
+						</Frame>
+						
+						<Frame type="UnitStatusTalentIcon" name="TalentTreeIcon3" template="_LeaderPanelBottom/TalentTreeIconTemplate">
+							<Anchor side="Top" relative="$parent\TalentTreeIcon1" pos="Min" offset="0"/>
+							<Anchor side="Left" relative="$parent\TalentTreeIcon2" pos="Max" offset="#talent_Bottom_HorizontalGap"/>
+							<Anchor side="Right" relative="$this" pos="Min" offset="0"/>
+							<Anchor side="Bottom" relative="$this" pos="Min" offset="0"/>
+							
+							<Animation name="Visibility">
+								<Event event="OnShown" action="DirectionForward,Play"/>
+								<Event event="OnHidden" action="DirectionReverse,Play"/>
+								
+								<Controller type="Visibility" end="Pause" frame="$parent/CustomBorder3NoColor">
+									<Key type="Bool" time="0.0" value="true"/>
+									<Key type="Bool" time="0.0" value="false"/>
+								</Controller>
+							</Animation>
+						</Frame>
+						
+						<Frame type="UnitStatusTalentIcon" name="TalentTreeIcon4" template="_LeaderPanelBottom/TalentTreeIconHeroicTemplate">
+							<Anchor side="Top" relative="$parent\TalentTreeIcon1" pos="Min" offset="0"/>
+							<Anchor side="Left" relative="$parent\TalentTreeIcon3" pos="Max" offset="#talent_Bottom_HorizontalGap"/>
+							<Anchor side="Right" relative="$this" pos="Min" offset="0"/>
+							<Anchor side="Bottom" relative="$this" pos="Min" offset="0"/>
+							
+							<Animation name="Visibility">
+								<Event event="OnShown" action="DirectionForward,Play"/>
+								<Event event="OnHidden" action="DirectionReverse,Play"/>
+								
+								<Controller type="Visibility" end="Pause" frame="$parent/CustomBorder4NoColor">
+									<Key type="Bool" time="0.0" value="true"/>
+									<Key type="Bool" time="0.0" value="false"/>
+								</Controller>
+							</Animation>
+						</Frame>
+						
+						<Frame type="UnitStatusTalentIcon" name="TalentTreeIcon5" template="_LeaderPanelBottom/TalentTreeIconTemplate">
+							<Anchor side="Top" relative="$parent\TalentTreeIcon1" pos="Min" offset="0"/>
+							<Anchor side="Left" relative="$parent\TalentTreeIcon4" pos="Max" offset="#talent_Bottom_HorizontalGap"/>
+							<Anchor side="Right" relative="$this" pos="Min" offset="0"/>
+							<Anchor side="Bottom" relative="$this" pos="Min" offset="0"/>
+							
+							<Animation name="Visibility">
+								<Event event="OnShown" action="DirectionForward,Play"/>
+								<Event event="OnHidden" action="DirectionReverse,Play"/>
+								
+								<Controller type="Visibility" end="Pause" frame="$parent/CustomBorder5NoColor">
+									<Key type="Bool" time="0.0" value="true"/>
+									<Key type="Bool" time="0.0" value="false"/>
+								</Controller>
+							</Animation>
+						</Frame>
+						
+						<Frame type="UnitStatusTalentIcon" name="TalentTreeIcon6" template="_LeaderPanelBottom/TalentTreeIconTemplate">
+							<Anchor side="Top" relative="$parent\TalentTreeIcon1" pos="Min" offset="0"/>
+							<Anchor side="Left" relative="$parent\TalentTreeIcon5" pos="Max" offset="#talent_Bottom_HorizontalGap"/>
+							<Anchor side="Right" relative="$this" pos="Min" offset="0"/>
+							<Anchor side="Bottom" relative="$this" pos="Min" offset="0"/>
+							
+							<Animation name="Visibility">
+								<Event event="OnShown" action="DirectionForward,Play"/>
+								<Event event="OnHidden" action="DirectionReverse,Play"/>
+								
+								<Controller type="Visibility" end="Pause" frame="$parent/CustomBorder6NoColor">
+									<Key type="Bool" time="0.0" value="true"/>
+									<Key type="Bool" time="0.0" value="false"/>
+								</Controller>
+							</Animation>
+						</Frame>
+						
+						<Frame type="UnitStatusTalentIcon" name="TalentTreeIcon7" template="_LeaderPanelBottom/TalentTreeIconHeroicTemplate">
+							<Anchor side="Top" relative="$parent\TalentTreeIcon1" pos="Min" offset="0"/>
+							<Anchor side="Left" relative="$parent\TalentTreeIcon6" pos="Max" offset="#talent_Bottom_HorizontalGap"/>
+							<Anchor side="Right" relative="$this" pos="Min" offset="0"/>
+							<Anchor side="Bottom" relative="$this" pos="Min" offset="0"/>
+							<ImageMaskTexture val="_Assets\Textures\heroicTalentAlphaMask.dds"/>
+							<Unclipped val="true"/>
+							
+							<Animation name="Visibility">
+								<Event event="OnShown" action="DirectionForward,Play"/>
+								<Event event="OnHidden" action="DirectionReverse,Play"/>
+								
+								<Controller type="Visibility" end="Pause" frame="$parent/CustomBorder7NoColor">
+									<Key type="Bool" time="0.0" value="true"/>
+									<Key type="Bool" time="0.0" value="false"/>
+								</Controller>
+							</Animation>
+						</Frame>
+						
+						<Frame type="Image" name="CustomBorder1NoColor">
+							<Anchor relative="$parent/TalentTreeIcon1/IconBorderImage"/>
+							<Texture val="@UI/Storm_UI_InGame_Leader_Talent_Unavailable"/>
+							<IgnoreParentColor val="true"/>
+							<Unclipped val="true"/>
+							<Alpha val="#talentBorderAlpha"/>
+						</Frame>
+						<Frame type="Image" name="CustomBorder2NoColor">
+							<Anchor relative="$parent/TalentTreeIcon2/IconBorderImage"/>
+							<Texture val="@UI/Storm_UI_InGame_Leader_Talent_Unavailable"/>
+							<IgnoreParentColor val="true"/>
+							<Unclipped val="true"/>
+							<Alpha val="#talentBorderAlpha"/>
+						</Frame>
+						<Frame type="Image" name="CustomBorder3NoColor">
+							<Anchor relative="$parent/TalentTreeIcon3/IconBorderImage"/>
+							<Texture val="@UI/Storm_UI_InGame_Leader_Talent_Unavailable"/>
+							<IgnoreParentColor val="true"/>
+							<Unclipped val="true"/>
+							<Alpha val="#talentBorderAlpha"/>
+						</Frame>
+						<Frame type="Image" name="CustomBorder4NoColor">
+							<Anchor side="Top" relative="$parent/TalentTreeIcon4/IconBorderImage" pos="Mid" offset="0"/>
+							<Anchor side="Right" relative="$parent/TalentTreeIcon4/IconBorderImage" pos="Mid" offset="0"/>
+							<Anchor side="Bottom" relative="$parent/TalentTreeIcon4/IconBorderImage" pos="Mid" offset="0"/>
+							<Anchor side="Left" relative="$parent/TalentTreeIcon4/IconBorderImage" pos="Mid" offset="0"/>
+							<Width val="84"/>
+							<Height val="84"/>
+							<Texture val="@UI/Storm_UI_InGame_Leader_Talent_Available_Ult"/>
+							<IgnoreParentColor val="true"/>
+							<Unclipped val="true"/>
+							<Alpha val="#ultimateTalentBorderAlpha"/>
+						</Frame>
+						<Frame type="Image" name="CustomBorder5NoColor">
+							<Anchor relative="$parent/TalentTreeIcon5/IconBorderImage"/>
+							<Texture val="@UI/Storm_UI_InGame_Leader_Talent_Unavailable"/>
+							<IgnoreParentColor val="true"/>
+							<Unclipped val="true"/>
+							<Alpha val="#talentBorderAlpha"/>
+						</Frame>
+						<Frame type="Image" name="CustomBorder6NoColor">
+							<Anchor relative="$parent/TalentTreeIcon6/IconBorderImage"/>
+							<Texture val="@UI/Storm_UI_InGame_Leader_Talent_Unavailable"/>
+							<IgnoreParentColor val="true"/>
+							<Unclipped val="true"/>
+							<Alpha val="#talentBorderAlpha"/>
+						</Frame>
+						<Frame type="Image" name="CustomBorder7NoColor">
+							<Anchor side="Top" relative="$parent/TalentTreeIcon7/IconBorderImage" pos="Mid" offset="0"/>
+							<Anchor side="Right" relative="$parent/TalentTreeIcon7/IconBorderImage" pos="Mid" offset="0"/>
+							<Anchor side="Bottom" relative="$parent/TalentTreeIcon7/IconBorderImage" pos="Mid" offset="0"/>
+							<Anchor side="Left" relative="$parent/TalentTreeIcon7/IconBorderImage" pos="Mid" offset="0"/>
+							<Width val="84"/>
+							<Height val="84"/>
+							<Texture val="@UI/Storm_UI_InGame_Leader_Talent_Available_Ult"/>
+							<IgnoreParentColor val="true"/>
+							<Unclipped val="true"/>
+							<Alpha val="#ultimateTalentBorderAlpha"/>
+							<Unclipped val="true"/>
+						</Frame>
+						
+						<Frame type="PlayerScoreValueFrame" name="PlayerScoreValueProgressBar0">
+							<Visible val="false"/>
+							<Frame type="ScoreValueProgressBarFrame" name="ScoreValueFrame0">
+								<Visible val="false"/>
+							</Frame>
+						</Frame>
+						<Frame type="PlayerScoreValueFrame" name="PlayerScoreValueProgressBar1">
+							<Visible val="false"/>
+							<Frame type="ScoreValueProgressBarFrame" name="ScoreValueFrame0">
+								<Visible val="false"/>
+							</Frame>
+						</Frame>
+						<Frame type="PlayerScoreValueFrame" name="PlayerScoreValueProgressBar2">
+							<Visible val="false"/>
+							<Frame type="ScoreValueProgressBarFrame" name="ScoreValueFrame0">
+								<Visible val="false"/>
+							</Frame>
+						</Frame>
+						<Frame type="PlayerScoreValueFrame" name="PlayerScoreValueProgressBar3">
+							<Visible val="false"/>
+							<Frame type="ScoreValueProgressBarFrame" name="ScoreValueFrame0">
+								<Visible val="false"/>
+							</Frame>
+						</Frame>
+						<Frame type="PlayerScoreValueFrame" name="PlayerScoreValueProgressBar4">
+							<Visible val="false"/>
+							<Frame type="ScoreValueProgressBarFrame" name="ScoreValueFrame0">
+								<Visible val="false"/>
+							</Frame>
+						</Frame>
+						<Frame type="PlayerScoreValueFrame" name="PlayerScoreValueProgressBar5">
+							<Visible val="false"/>
+							<Frame type="ScoreValueProgressBarFrame" name="ScoreValueFrame0">
+								<Visible val="false"/>
+							</Frame>
+						</Frame>
+						
+					</Frame>
+					
+					<Frame type="UnitStatusAbilIcon" name="UnitStatusAbil">
+						<Anchor side="Top" relative="$parent" pos="Min" offset="9999"/>
+						<Anchor side="Left" relative="$parent" pos="Min" offset="9999"/>
+						<Anchor side="Right" relative="$parent" pos="Max" offset="9999"/>
+						<Anchor side="Bottom" relative="$parent" pos="Max" offset="9999"/>
+						<Visible val="false"/>
+					</Frame>
+				</Frame>
 			</Frame>
-
 		</Frame>
 		
 		<Frame type="PlayerBlockFrame" name="BlockFrame">
 			<Visible val="false"/>
-            <Anchor side="Right" relative="$parent" pos="Max" offset="9999"/>
-        </Frame>
+			<Anchor side="Right" relative="$parent" pos="Max" offset="9999"/>
+		</Frame>
 
 		<Frame type="PlayerScoreValueFrame" name="CarriedMechanicScoreValueFrame">
 			<Visible val="false"/>
@@ -891,18 +859,6 @@
 	<Frame type="HeroLeaderPanelPlayerFrame" name="HeroLeaderPanelPlayerFrameTemplate_StatsTalentPage_Talents_Right" template="_LeaderPanelBottom/HeroLeaderPanelPlayerFrameTemplate_StatsTalentPage_Talents_Left">
 		<Frame type="PlayerHeroIconFrame" name="PlayerHeroIconFrame2" template="_LeaderPanelBottom/PlayerHeroIconFrameTemplate_R">
 		</Frame>
-
-		<Frame type="Frame" name="StatsContainerFrame">
-			<Frame type="PlayerHeroSelectedTalentTreeFrame" name="TalentTreeCustom">
-				<Frame type="Image" name="CustomBorder4">
-					<Texture val="_Assets\Textures\heroicRed.dds"/>
-				</Frame>
-				<Frame type="Image" name="CustomBorder7">
-					<Texture val="_Assets\Textures\heroicRed.dds"/>
-				</Frame>
-			</Frame>
-		</Frame>
-
 	</Frame>
 	
 
@@ -935,92 +891,92 @@
 			<Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
 			<Visible val="true"/>
 			
-            <Frame type="PlayerScoreValueFrame" name="SoloKillScoreValueFrame">
+			<Frame type="PlayerScoreValueFrame" name="SoloKillScoreValueFrame">
 				<Anchor side="Top" relative="$parent" pos="Min" offset="#stats_scores_topOffset"/>
 				<Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
 				<Anchor side="Left" relative="$parent" pos="Min" offset="#stats_scores_leftOffset"/>
 				<Anchor side="Right" relative="$this" pos="Min" offset="0"/>
 				<Width val="145"/>
-                <Frame type="ScoreValueLabelFrame" name="ScoreValueFrame0">
-                    <BestValueGrouping val="Team"/>
-                </Frame>
-            </Frame>
-            <Frame type="PlayerScoreValueFrame" name="DeathsScoreValueFrame">
+				<Frame type="ScoreValueLabelFrame" name="ScoreValueFrame0">
+					<BestValueGrouping val="Team"/>
+				</Frame>
+			</Frame>
+			<Frame type="PlayerScoreValueFrame" name="DeathsScoreValueFrame">
 				<Anchor side="Top" relative="$parent/SoloKillScoreValueFrame" pos="Min" offset="0"/>
 				<Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
 				<Anchor side="Left" relative="$parent/SoloKillScoreValueFrame" pos="Max" offset="0"/>
-                <Anchor side="Right" relative="$this" pos="Min" offset="0"/>
+				<Anchor side="Right" relative="$this" pos="Min" offset="0"/>
 				<Width val="145"/>
-                <Frame type="ScoreValueLabelFrame" name="ScoreValueFrame0">
-                </Frame>
-            </Frame>
-            <Frame type="PlayerScoreValueFrame" name="AssistsScoreValueFrame">
+				<Frame type="ScoreValueLabelFrame" name="ScoreValueFrame0">
+				</Frame>
+			</Frame>
+			<Frame type="PlayerScoreValueFrame" name="AssistsScoreValueFrame">
 				<Anchor side="Top" relative="$parent/SoloKillScoreValueFrame" pos="Min" offset="0"/>
 				<Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
 				<Anchor side="Left" relative="$parent/DeathsScoreValueFrame" pos="Max" offset="0"/>
-                <Anchor side="Right" relative="$this" pos="Min" offset="0"/>
+				<Anchor side="Right" relative="$this" pos="Min" offset="0"/>
 				<Width val="145"/>
-                <Frame type="ScoreValueLabelFrame" name="ScoreValueFrame0">
-                    <BestValueGrouping val="Team"/>
-                </Frame>
-            </Frame>
-            <Frame type="PlayerScoreValueFrame" name="SiegeDamageScoreValueFrame">
+				<Frame type="ScoreValueLabelFrame" name="ScoreValueFrame0">
+					<BestValueGrouping val="Team"/>
+				</Frame>
+			</Frame>
+			<Frame type="PlayerScoreValueFrame" name="SiegeDamageScoreValueFrame">
 				<Anchor side="Top" relative="$parent/SoloKillScoreValueFrame" pos="Min" offset="0"/>
 				<Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
 				<Anchor side="Left" relative="$parent/DeathsScoreValueFrame" pos="Max" offset="0"/>
-                <Anchor side="Right" relative="$this" pos="Min" offset="0"/>
-                <Width val="150"/>
-                <Frame type="ScoreValueLabelFrame" name="ScoreValueFrame0">
-                </Frame>
-            </Frame>
-            <Frame type="PlayerScoreValueFrame" name="HeroDamageScoreValueFrame">
+				<Anchor side="Right" relative="$this" pos="Min" offset="0"/>
+				<Width val="150"/>
+				<Frame type="ScoreValueLabelFrame" name="ScoreValueFrame0">
+				</Frame>
+			</Frame>
+			<Frame type="PlayerScoreValueFrame" name="HeroDamageScoreValueFrame">
 				<Anchor side="Top" relative="$parent/SoloKillScoreValueFrame" pos="Min" offset="0"/>
 				<Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
 				<Anchor side="Left" relative="$parent/SiegeDamageScoreValueFrame" pos="Max" offset="0"/>
-                <Anchor side="Right" relative="$this" pos="Min" offset="0"/>
-                <Frame type="ScoreValueLabelFrame" name="ScoreValueFrame0">
-                <Width val="150"/>
-                </Frame>
-            </Frame>
-            <Frame type="PlayerScoreValueFrame" name="HealingScoreValueFrame">
+				<Anchor side="Right" relative="$this" pos="Min" offset="0"/>
+				<Frame type="ScoreValueLabelFrame" name="ScoreValueFrame0">
+				<Width val="150"/>
+				</Frame>
+			</Frame>
+			<Frame type="PlayerScoreValueFrame" name="HealingScoreValueFrame">
 				<Anchor side="Top" relative="$parent/SoloKillScoreValueFrame" pos="Min" offset="0"/>
 				<Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
 				<Anchor side="Left" relative="$parent/HeroDamageScoreValueFrame" pos="Max" offset="0"/>
-                <Anchor side="Right" relative="$this" pos="Min" offset="0"/>
-                <Width val="150"/>
-                <Frame type="ScoreValueLabelFrame" name="ScoreValueFrame0">
-                </Frame>
-            </Frame>
-            <Frame type="PlayerScoreValueFrame" name="ExperienceScoreValueFrame">
+				<Anchor side="Right" relative="$this" pos="Min" offset="0"/>
+				<Width val="150"/>
+				<Frame type="ScoreValueLabelFrame" name="ScoreValueFrame0">
+				</Frame>
+			</Frame>
+			<Frame type="PlayerScoreValueFrame" name="ExperienceScoreValueFrame">
 				<Anchor side="Top" relative="$parent/SoloKillScoreValueFrame" pos="Min" offset="0"/>
 				<Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
 				<Anchor side="Left" relative="$parent/HealingScoreValueFrame" pos="Max" offset="0"/>
-                <Anchor side="Right" relative="$this" pos="Min" offset="0"/>
-                <Width val="150"/>
-                <Frame type="ScoreValueLabelFrame" name="ScoreValueFrame0">
-                    <ScoreValueLink val="ExperienceContribution"/>
-                    <BestValueGrouping val="Team"/>
-                </Frame>
-            </Frame>
-            <Frame type="PlayerScoreValueFrame" name="MechanicsScoreValueFrame">
+				<Anchor side="Right" relative="$this" pos="Min" offset="0"/>
+				<Width val="150"/>
+				<Frame type="ScoreValueLabelFrame" name="ScoreValueFrame0">
+					<ScoreValueLink val="ExperienceContribution"/>
+					<BestValueGrouping val="Team"/>
+				</Frame>
+			</Frame>
+			<Frame type="PlayerScoreValueFrame" name="MechanicsScoreValueFrame">
 				<Anchor side="Top" relative="$parent/SoloKillScoreValueFrame" pos="Min" offset="0"/>
 				<Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
 				<Anchor side="Left" relative="$parent/ExperienceScoreValueFrame" pos="Max" offset="0"/>
-                <Anchor side="Right" relative="$this" pos="Min" offset="0"/>
-                <Width val="150"/>
-                <Frame type="ScoreValueLabelFrame" name="ScoreValueFrame0">
-                    <ScoreValueLink val="MapMechanics"/>
-                    <BestValueGrouping val="Team"/>
-                </Frame>
-            </Frame>
+				<Anchor side="Right" relative="$this" pos="Min" offset="0"/>
+				<Width val="150"/>
+				<Frame type="ScoreValueLabelFrame" name="ScoreValueFrame0">
+					<ScoreValueLink val="MapMechanics"/>
+					<BestValueGrouping val="Team"/>
+				</Frame>
+			</Frame>
 		</Frame>
 
 		<!-- added duplicate because I cannot undo the death's animation transparency anymore -->
 		<Frame type="PlayerHeroIconFrame" name="PlayerHeroIconFrame">
-            <Anchor side="Top" relative="$parent" pos="Min" offset="9999"/>
-            <Anchor side="Left" relative="$parent" pos="Min" offset="9999"/>
-            <Anchor side="Bottom" relative="$this" pos="Min" offset="0"/>
-            <Anchor side="Right" relative="$this" pos="Min" offset="0"/>
+			<Anchor side="Top" relative="$parent" pos="Min" offset="9999"/>
+			<Anchor side="Left" relative="$parent" pos="Min" offset="9999"/>
+			<Anchor side="Bottom" relative="$this" pos="Min" offset="0"/>
+			<Anchor side="Right" relative="$this" pos="Min" offset="0"/>
 			<Width val="115"/>
 			<Height val="50"/>
 			<Visible val="true"/>
@@ -1040,10 +996,10 @@
 			</Frame>
 		</Frame>
 		<Frame type="PlayerHeroIconFrame" name="PlayerHeroIconFrame2">
-            <Anchor side="Top" relative="$parent" pos="Min" offset="#talent_Bottom_PortraitTopOffset"/>
-            <Anchor side="Left" relative="$parent" pos="Min" offset="-60"/>
-            <Anchor side="Bottom" relative="$this" pos="Min" offset="0"/>
-            <Anchor side="Right" relative="$this" pos="Min" offset="0"/>
+			<Anchor side="Top" relative="$parent" pos="Min" offset="#talent_Bottom_PortraitTopOffset"/>
+			<Anchor side="Left" relative="$parent" pos="Min" offset="-60"/>
+			<Anchor side="Bottom" relative="$this" pos="Min" offset="0"/>
+			<Anchor side="Right" relative="$this" pos="Min" offset="0"/>
 			<Width val="115"/>
 			<Height val="50"/>
 			<Visible val="true"/>
@@ -1089,7 +1045,7 @@
 		</Frame>
 		<Frame type="PlayerBlockFrame" name="BlockFrame">
 			<Visible val="false"/>
-            <Anchor side="Right" relative="$parent" pos="Max" offset="9999"/>
+			<Anchor side="Right" relative="$parent" pos="Max" offset="9999"/>
 		</Frame>
 
 		<Frame type="PlayerScoreValueFrame" name="CarriedMechanicScoreValueFrame">
@@ -1129,7 +1085,7 @@
 				<Frame type="ScoreValueLabelFrame" name="ScoreValueFrame0">
 					<Width val="1"/>
 					<Visible val="false"/>
-                </Frame>
+				</Frame>
 			</Frame>
 			<Frame type="PlayerScoreValueFrame" name="AssistsScoreValueFrame">
 				<Width val="1"/>
@@ -1137,40 +1093,40 @@
 				<Frame type="ScoreValueLabelFrame" name="ScoreValueFrame0">
 					<Width val="1"/>
 					<Visible val="false"/>
-                </Frame>
+				</Frame>
 			</Frame>
 			<Frame type="PlayerScoreValueFrame" name="DeathsScoreValueFrame">
-                <Width val="60"/>
+				<Width val="60"/>
 			</Frame>
-            <Frame type="PlayerScoreValueFrame" name="SiegeDamageScoreValueFrame">
-                <Width val="103"/>
+			<Frame type="PlayerScoreValueFrame" name="SiegeDamageScoreValueFrame">
+				<Width val="103"/>
 			</Frame>
-            <Frame type="PlayerScoreValueFrame" name="HeroDamageScoreValueFrame">
-                <Width val="103"/>
+			<Frame type="PlayerScoreValueFrame" name="HeroDamageScoreValueFrame">
+				<Width val="103"/>
 			</Frame>
-            <Frame type="PlayerScoreValueFrame" name="HealingScoreValueFrame">
-                <Width val="103"/>
-                <Frame type="ScoreValueLabelFrame" name="ScoreValueFrame0">
-                </Frame>
-                <Frame type="ScoreValueImageFrame" name="ScoreValueFrame1">
-                    <Anchor side="Left" relative="$parent/ScoreValueFrame0/Label" pos="Min" offset="-20"/>
-                </Frame>
+			<Frame type="PlayerScoreValueFrame" name="HealingScoreValueFrame">
+				<Width val="103"/>
+				<Frame type="ScoreValueLabelFrame" name="ScoreValueFrame0">
+				</Frame>
+				<Frame type="ScoreValueImageFrame" name="ScoreValueFrame1">
+					<Anchor side="Left" relative="$parent/ScoreValueFrame0/Label" pos="Min" offset="-20"/>
+				</Frame>
 			</Frame>
-            <Frame type="PlayerScoreValueFrame" name="ExperienceScoreValueFrame">
+			<Frame type="PlayerScoreValueFrame" name="ExperienceScoreValueFrame">
 				<Width val="1"/>
 				<Visible val="false"/>
 				<Frame type="ScoreValueLabelFrame" name="ScoreValueFrame0">
 					<Width val="1"/>
 					<Visible val="false"/>
-                </Frame>
+				</Frame>
 			</Frame>
-            <Frame type="PlayerScoreValueFrame" name="MechanicsScoreValueFrame">
+			<Frame type="PlayerScoreValueFrame" name="MechanicsScoreValueFrame">
 				<Width val="1"/>
 				<Visible val="false"/>
 				<Frame type="ScoreValueLabelFrame" name="ScoreValueFrame0">
 					<Width val="1"/>
 					<Visible val="false"/>
-                </Frame>
+				</Frame>
 			</Frame>
 		</Frame>
 	</Frame>
@@ -1187,7 +1143,7 @@
 				<Frame type="ScoreValueLabelFrame" name="ScoreValueFrame0">
 					<Width val="1"/>
 					<Visible val="false"/>
-                </Frame>
+				</Frame>
 			</Frame>
 			<Frame type="PlayerScoreValueFrame" name="AssistsScoreValueFrame">
 				<Width val="1"/>
@@ -1195,79 +1151,79 @@
 				<Frame type="ScoreValueLabelFrame" name="ScoreValueFrame0">
 					<Width val="1"/>
 					<Visible val="false"/>
-                </Frame>
+				</Frame>
 			</Frame>
 			<Frame type="PlayerScoreValueFrame" name="DeathsScoreValueFrame">
-                <Width val="1"/>
-				<Visible val="false"/>
-				<Frame type="ScoreValueLabelFrame" name="ScoreValueFrame0">
-					<Width val="1"/>
-					<Visible val="false"/>
-                </Frame>
-			</Frame>
-            <Frame type="PlayerScoreValueFrame" name="SiegeDamageScoreValueFrame">
-                <Width val="1"/>
-				<Visible val="false"/>
-				<Frame type="ScoreValueLabelFrame" name="ScoreValueFrame0">
-					<Width val="1"/>
-					<Visible val="false"/>
-                </Frame>
-			</Frame>
-            <Frame type="PlayerScoreValueFrame" name="HeroDamageScoreValueFrame">
-                <Width val="1"/>
-				<Visible val="false"/>
-				<Frame type="ScoreValueLabelFrame" name="ScoreValueFrame0">
-					<Width val="1"/>
-					<Visible val="false"/>
-                </Frame>
-			</Frame>
-            <Frame type="PlayerScoreValueFrame" name="HealingScoreValueFrame">
-                <Width val="1"/>
-				<Visible val="false"/>
-				<Frame type="ScoreValueLabelFrame" name="ScoreValueFrame0">
-					<Width val="1"/>
-					<Visible val="false"/>
-                </Frame>
-                <Frame type="ScoreValueImageFrame" name="ScoreValueFrame1">
-					<Width val="1"/>
-					<Visible val="false"/>
-                </Frame>
-			</Frame>
-            <Frame type="PlayerScoreValueFrame" name="ExperienceScoreValueFrame">
 				<Width val="1"/>
 				<Visible val="false"/>
 				<Frame type="ScoreValueLabelFrame" name="ScoreValueFrame0">
 					<Width val="1"/>
 					<Visible val="false"/>
-                </Frame>
+				</Frame>
 			</Frame>
-            <Frame type="PlayerScoreValueFrame" name="MechanicsScoreValueFrame">
+			<Frame type="PlayerScoreValueFrame" name="SiegeDamageScoreValueFrame">
 				<Width val="1"/>
 				<Visible val="false"/>
 				<Frame type="ScoreValueLabelFrame" name="ScoreValueFrame0">
 					<Width val="1"/>
 					<Visible val="false"/>
-                </Frame>
+				</Frame>
 			</Frame>
-            <Frame type="PlayerScoreValueFrame" name="ApmScoreValueFrame" template="HeroLeaderPanel/PlayerScoreValueLabelFrameTemplate">
+			<Frame type="PlayerScoreValueFrame" name="HeroDamageScoreValueFrame">
+				<Width val="1"/>
+				<Visible val="false"/>
+				<Frame type="ScoreValueLabelFrame" name="ScoreValueFrame0">
+					<Width val="1"/>
+					<Visible val="false"/>
+				</Frame>
+			</Frame>
+			<Frame type="PlayerScoreValueFrame" name="HealingScoreValueFrame">
+				<Width val="1"/>
+				<Visible val="false"/>
+				<Frame type="ScoreValueLabelFrame" name="ScoreValueFrame0">
+					<Width val="1"/>
+					<Visible val="false"/>
+				</Frame>
+				<Frame type="ScoreValueImageFrame" name="ScoreValueFrame1">
+					<Width val="1"/>
+					<Visible val="false"/>
+				</Frame>
+			</Frame>
+			<Frame type="PlayerScoreValueFrame" name="ExperienceScoreValueFrame">
+				<Width val="1"/>
+				<Visible val="false"/>
+				<Frame type="ScoreValueLabelFrame" name="ScoreValueFrame0">
+					<Width val="1"/>
+					<Visible val="false"/>
+				</Frame>
+			</Frame>
+			<Frame type="PlayerScoreValueFrame" name="MechanicsScoreValueFrame">
+				<Width val="1"/>
+				<Visible val="false"/>
+				<Frame type="ScoreValueLabelFrame" name="ScoreValueFrame0">
+					<Width val="1"/>
+					<Visible val="false"/>
+				</Frame>
+			</Frame>
+			<Frame type="PlayerScoreValueFrame" name="ApmScoreValueFrame" template="HeroLeaderPanel/PlayerScoreValueLabelFrameTemplate">
 				<Anchor side="Top" relative="$parent/SoloKillScoreValueFrame" pos="Min" offset="0"/>
 				<Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
 				<Anchor side="Left" relative="$parent/MechanicsScoreValueFrame" pos="Max" offset="16"/>
-                <Width val="170"/>
-                <Frame type="ScoreValueLabelFrame" name="ScoreValueFrame0">
-                    <ScoreValueLink val="APM"/>
-                    <BestValueGrouping val="Team"/>
-                </Frame>
+				<Width val="170"/>
+				<Frame type="ScoreValueLabelFrame" name="ScoreValueFrame0">
+					<ScoreValueLink val="APM"/>
+					<BestValueGrouping val="Team"/>
+				</Frame>
 			</Frame>
-            <Frame type="PlayerScoreValueFrame" name="ApmAverageScoreValueFrame" template="HeroLeaderPanel/PlayerScoreValueLabelFrameTemplate">
+			<Frame type="PlayerScoreValueFrame" name="ApmAverageScoreValueFrame" template="HeroLeaderPanel/PlayerScoreValueLabelFrameTemplate">
 				<Anchor side="Top" relative="$parent/SoloKillScoreValueFrame" pos="Min" offset="0"/>
 				<Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
 				<Anchor side="Left" relative="$parent/ApmScoreValueFrame" pos="Max" offset="0"/>
-                <Width val="170"/>
-                <Frame type="ScoreValueLabelFrame" name="ScoreValueFrame0">
-                    <ScoreValueLink val="APMAverage"/>
-                    <BestValueGrouping val="Team"/>
-                </Frame>
+				<Width val="170"/>
+				<Frame type="ScoreValueLabelFrame" name="ScoreValueFrame0">
+					<ScoreValueLink val="APMAverage"/>
+					<BestValueGrouping val="Team"/>
+				</Frame>
 			</Frame>
 		</Frame>
 	</Frame>
@@ -1284,7 +1240,7 @@
 				<Frame type="ScoreValueLabelFrame" name="ScoreValueFrame0">
 					<Width val="1"/>
 					<Visible val="false"/>
-                </Frame>
+				</Frame>
 			</Frame>
 			<Frame type="PlayerScoreValueFrame" name="AssistsScoreValueFrame">
 				<Width val="1"/>
@@ -1292,55 +1248,55 @@
 				<Frame type="ScoreValueLabelFrame" name="ScoreValueFrame0">
 					<Width val="1"/>
 					<Visible val="false"/>
-                </Frame>
+				</Frame>
 			</Frame>
 			<Frame type="PlayerScoreValueFrame" name="DeathsScoreValueFrame">
-                <Width val="1"/>
-				<Visible val="false"/>
-				<Frame type="ScoreValueLabelFrame" name="ScoreValueFrame0">
-					<Width val="1"/>
-					<Visible val="false"/>
-                </Frame>
-			</Frame>
-            <Frame type="PlayerScoreValueFrame" name="SiegeDamageScoreValueFrame">
-                <Width val="1"/>
-				<Visible val="false"/>
-				<Frame type="ScoreValueLabelFrame" name="ScoreValueFrame0">
-					<Width val="1"/>
-					<Visible val="false"/>
-                </Frame>
-			</Frame>
-            <Frame type="PlayerScoreValueFrame" name="HeroDamageScoreValueFrame">
-                <Width val="1"/>
-				<Visible val="false"/>
-				<Frame type="ScoreValueLabelFrame" name="ScoreValueFrame0">
-					<Width val="1"/>
-					<Visible val="false"/>
-                </Frame>
-			</Frame>
-            <Frame type="PlayerScoreValueFrame" name="HealingScoreValueFrame">
-                <Width val="1"/>
-				<Visible val="false"/>
-				<Frame type="ScoreValueLabelFrame" name="ScoreValueFrame0">
-					<Width val="1"/>
-					<Visible val="false"/>
-                </Frame>
-                <Frame type="ScoreValueImageFrame" name="ScoreValueFrame1">
-					<Width val="1"/>
-					<Visible val="false"/>
-                </Frame>
-			</Frame>
-            <Frame type="PlayerScoreValueFrame" name="ExperienceScoreValueFrame">
-				<Width val="240"/>
-				<Anchor side="Left" relative="$parent/HealingScoreValueFrame" pos="Max" offset="16"/>
-			</Frame>
-            <Frame type="PlayerScoreValueFrame" name="MechanicsScoreValueFrame">
 				<Width val="1"/>
 				<Visible val="false"/>
 				<Frame type="ScoreValueLabelFrame" name="ScoreValueFrame0">
 					<Width val="1"/>
 					<Visible val="false"/>
-                </Frame>
+				</Frame>
+			</Frame>
+			<Frame type="PlayerScoreValueFrame" name="SiegeDamageScoreValueFrame">
+				<Width val="1"/>
+				<Visible val="false"/>
+				<Frame type="ScoreValueLabelFrame" name="ScoreValueFrame0">
+					<Width val="1"/>
+					<Visible val="false"/>
+				</Frame>
+			</Frame>
+			<Frame type="PlayerScoreValueFrame" name="HeroDamageScoreValueFrame">
+				<Width val="1"/>
+				<Visible val="false"/>
+				<Frame type="ScoreValueLabelFrame" name="ScoreValueFrame0">
+					<Width val="1"/>
+					<Visible val="false"/>
+				</Frame>
+			</Frame>
+			<Frame type="PlayerScoreValueFrame" name="HealingScoreValueFrame">
+				<Width val="1"/>
+				<Visible val="false"/>
+				<Frame type="ScoreValueLabelFrame" name="ScoreValueFrame0">
+					<Width val="1"/>
+					<Visible val="false"/>
+				</Frame>
+				<Frame type="ScoreValueImageFrame" name="ScoreValueFrame1">
+					<Width val="1"/>
+					<Visible val="false"/>
+				</Frame>
+			</Frame>
+			<Frame type="PlayerScoreValueFrame" name="ExperienceScoreValueFrame">
+				<Width val="240"/>
+				<Anchor side="Left" relative="$parent/HealingScoreValueFrame" pos="Max" offset="16"/>
+			</Frame>
+			<Frame type="PlayerScoreValueFrame" name="MechanicsScoreValueFrame">
+				<Width val="1"/>
+				<Visible val="false"/>
+				<Frame type="ScoreValueLabelFrame" name="ScoreValueFrame0">
+					<Width val="1"/>
+					<Visible val="false"/>
+				</Frame>
 			</Frame>
 		</Frame>
 	</Frame>
@@ -1363,7 +1319,7 @@
 				<Frame type="ScoreValueLabelFrame" name="ScoreValueFrame0">
 					<Width val="1"/>
 					<Visible val="false"/>
-                </Frame>
+				</Frame>
 			</Frame>
 			<Frame type="PlayerScoreValueFrame" name="AssistsScoreValueFrame">
 				<Width val="1"/>
@@ -1371,78 +1327,78 @@
 				<Frame type="ScoreValueLabelFrame" name="ScoreValueFrame0">
 					<Width val="1"/>
 					<Visible val="false"/>
-                </Frame>
+				</Frame>
 			</Frame>
 			
-            <Frame type="PlayerScoreValueFrame" name="DeathTimeScoreValueFrame" template="HeroLeaderPanel/PlayerScoreValueLabelFrameTemplate">
+			<Frame type="PlayerScoreValueFrame" name="DeathTimeScoreValueFrame" template="HeroLeaderPanel/PlayerScoreValueLabelFrameTemplate">
 				<Anchor side="Top" relative="$parent/SoloKillScoreValueFrame" pos="Min" offset="0"/>
 				<Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
 				<Anchor side="Left" relative="$parent/SoloKillScoreValueFrame" pos="Max" offset="16"/>
-                <Width val="130"/>
-                <Frame type="ScoreValueLabelFrame" name="ScoreValueFrame0">
-                    <ScoreValueLink val="TimeSpentDead"/>
-                    <!-- <BestValueGrouping val="Team"/> -->
-                </Frame>
+				<Width val="130"/>
+				<Frame type="ScoreValueLabelFrame" name="ScoreValueFrame0">
+					<ScoreValueLink val="TimeSpentDead"/>
+					<!-- <BestValueGrouping val="Team"/> -->
+				</Frame>
 			</Frame>
 			<Frame type="PlayerScoreValueFrame" name="DeathsScoreValueFrame">
 				<Anchor side="Left" relative="$parent/DeathTimeScoreValueFrame" pos="Max" offset="0"/>
-                <Width val="90"/>
+				<Width val="90"/>
 			</Frame>
-            <Frame type="PlayerScoreValueFrame" name="SelfHealingScoreValueFrame" template="HeroLeaderPanel/PlayerScoreValueLabelFrameTemplate">
+			<Frame type="PlayerScoreValueFrame" name="SelfHealingScoreValueFrame" template="HeroLeaderPanel/PlayerScoreValueLabelFrameTemplate">
 				<Anchor side="Top" relative="$parent/SoloKillScoreValueFrame" pos="Min" offset="0"/>
 				<Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
 				<Anchor side="Left" relative="$parent/DeathsScoreValueFrame" pos="Max" offset="16"/>
-                <Width val="130"/>
-                <Frame type="ScoreValueLabelFrame" name="ScoreValueFrame0">
-                    <ScoreValueLink val="SelfHealing"/>
-                    <BestValueGrouping val="Team"/>
-                </Frame>
-			</Frame>
-            <Frame type="PlayerScoreValueFrame" name="SiegeDamageScoreValueFrame">
-                <Width val="1"/>
-				<Visible val="false"/>
+				<Width val="130"/>
 				<Frame type="ScoreValueLabelFrame" name="ScoreValueFrame0">
-					<Width val="1"/>
-					<Visible val="false"/>
-					<Alpha val="0"/>
-                </Frame>
+					<ScoreValueLink val="SelfHealing"/>
+					<BestValueGrouping val="Team"/>
+				</Frame>
 			</Frame>
-            <Frame type="PlayerScoreValueFrame" name="HeroDamageScoreValueFrame">
-                <Width val="1"/>
-				<Visible val="false"/>
-				<Frame type="ScoreValueLabelFrame" name="ScoreValueFrame0">
-					<Width val="1"/>
-					<Visible val="false"/>
-					<Alpha val="0"/>
-                </Frame>
-			</Frame>
-            <Frame type="PlayerScoreValueFrame" name="HealingScoreValueFrame">
-                <Width val="1"/>
-				<Visible val="false"/>
-				<Frame type="ScoreValueLabelFrame" name="ScoreValueFrame0">
-					<Width val="1"/>
-					<Visible val="false"/>
-                </Frame>
-                <Frame type="ScoreValueImageFrame" name="ScoreValueFrame1">
-					<Width val="1"/>
-					<Visible val="false"/>
-                </Frame>
-			</Frame>
-            <Frame type="PlayerScoreValueFrame" name="ExperienceScoreValueFrame">
+			<Frame type="PlayerScoreValueFrame" name="SiegeDamageScoreValueFrame">
 				<Width val="1"/>
 				<Visible val="false"/>
 				<Frame type="ScoreValueLabelFrame" name="ScoreValueFrame0">
 					<Width val="1"/>
 					<Visible val="false"/>
-                </Frame>
+					<Alpha val="0"/>
+				</Frame>
 			</Frame>
-            <Frame type="PlayerScoreValueFrame" name="MechanicsScoreValueFrame">
+			<Frame type="PlayerScoreValueFrame" name="HeroDamageScoreValueFrame">
 				<Width val="1"/>
 				<Visible val="false"/>
 				<Frame type="ScoreValueLabelFrame" name="ScoreValueFrame0">
 					<Width val="1"/>
 					<Visible val="false"/>
-                </Frame>
+					<Alpha val="0"/>
+				</Frame>
+			</Frame>
+			<Frame type="PlayerScoreValueFrame" name="HealingScoreValueFrame">
+				<Width val="1"/>
+				<Visible val="false"/>
+				<Frame type="ScoreValueLabelFrame" name="ScoreValueFrame0">
+					<Width val="1"/>
+					<Visible val="false"/>
+				</Frame>
+				<Frame type="ScoreValueImageFrame" name="ScoreValueFrame1">
+					<Width val="1"/>
+					<Visible val="false"/>
+				</Frame>
+			</Frame>
+			<Frame type="PlayerScoreValueFrame" name="ExperienceScoreValueFrame">
+				<Width val="1"/>
+				<Visible val="false"/>
+				<Frame type="ScoreValueLabelFrame" name="ScoreValueFrame0">
+					<Width val="1"/>
+					<Visible val="false"/>
+				</Frame>
+			</Frame>
+			<Frame type="PlayerScoreValueFrame" name="MechanicsScoreValueFrame">
+				<Width val="1"/>
+				<Visible val="false"/>
+				<Frame type="ScoreValueLabelFrame" name="ScoreValueFrame0">
+					<Width val="1"/>
+					<Visible val="false"/>
+				</Frame>
 			</Frame>
 		</Frame>
 	</Frame>
@@ -1454,73 +1410,73 @@
 
 	<Frame type="HeroLeaderPanelPlayerFrame" name="HeroLeaderPanelPlayerFrameTemplate_StatsTalentPage_Stats_MapMechanics_Left" template="_LeaderPanelBottom/HeroLeaderPanelPlayerFrameTemplate_StatsTalentPage_Stats_Base">
 		<Frame type="Frame" name="StatsContainerFrame">
-            <Frame type="PlayerScoreValueFrame" name="SoloKillScoreValueFrame">
-                <Width val="1"/>
+			<Frame type="PlayerScoreValueFrame" name="SoloKillScoreValueFrame">
+				<Width val="1"/>
 				<Visible val="false"/>
-                <Frame type="ScoreValueLabelFrame" name="ScoreValueFrame0">
-                <Width val="1"/>
+				<Frame type="ScoreValueLabelFrame" name="ScoreValueFrame0">
+				<Width val="1"/>
 					<Visible val="false"/>
-                </Frame>
-            </Frame>
-            <Frame type="PlayerScoreValueFrame" name="AssistsScoreValueFrame">
-                <Width val="1"/>
+				</Frame>
+			</Frame>
+			<Frame type="PlayerScoreValueFrame" name="AssistsScoreValueFrame">
+				<Width val="1"/>
 				<Visible val="false"/>
-                <Frame type="ScoreValueLabelFrame" name="ScoreValueFrame0">
-                <Width val="1"/>
+				<Frame type="ScoreValueLabelFrame" name="ScoreValueFrame0">
+				<Width val="1"/>
 					<Visible val="false"/>
-                </Frame>
-            </Frame>
+				</Frame>
+			</Frame>
 			<Frame type="PlayerScoreValueFrame" name="DeathsScoreValueFrame">
-                <Width val="1"/>
-				<Visible val="false"/>
-				<Frame type="ScoreValueLabelFrame" name="ScoreValueFrame0">
-					<Width val="1"/>
-					<Visible val="false"/>
-                </Frame>
-			</Frame>
-            <Frame type="PlayerScoreValueFrame" name="SiegeDamageScoreValueFrame">
-                <Width val="1"/>
-				<Visible val="false"/>
-				<Frame type="ScoreValueLabelFrame" name="ScoreValueFrame0">
-					<Width val="1"/>
-					<Visible val="false"/>
-                </Frame>
-			</Frame>
-            <Frame type="PlayerScoreValueFrame" name="HeroDamageScoreValueFrame">
-                <Width val="1"/>
-				<Visible val="false"/>
-				<Frame type="ScoreValueLabelFrame" name="ScoreValueFrame0">
-					<Width val="1"/>
-					<Visible val="false"/>
-                </Frame>
-			</Frame>
-            <Frame type="PlayerScoreValueFrame" name="HealingScoreValueFrame">
-                <Width val="1"/>
-				<Visible val="false"/>
-				<Frame type="ScoreValueLabelFrame" name="ScoreValueFrame0">
-					<Width val="1"/>
-					<Visible val="false"/>
-                </Frame>
-                <Frame type="ScoreValueImageFrame" name="ScoreValueFrame1">
-					<Width val="1"/>
-					<Visible val="false"/>
-                </Frame>
-			</Frame>
-            <Frame type="PlayerScoreValueFrame" name="ExperienceScoreValueFrame">
 				<Width val="1"/>
 				<Visible val="false"/>
 				<Frame type="ScoreValueLabelFrame" name="ScoreValueFrame0">
 					<Width val="1"/>
 					<Visible val="false"/>
-                </Frame>
+				</Frame>
 			</Frame>
-            <Frame type="PlayerScoreValueFrame" name="MechanicsScoreValueFrame">
+			<Frame type="PlayerScoreValueFrame" name="SiegeDamageScoreValueFrame">
 				<Width val="1"/>
 				<Visible val="false"/>
 				<Frame type="ScoreValueLabelFrame" name="ScoreValueFrame0">
 					<Width val="1"/>
 					<Visible val="false"/>
-                </Frame>
+				</Frame>
+			</Frame>
+			<Frame type="PlayerScoreValueFrame" name="HeroDamageScoreValueFrame">
+				<Width val="1"/>
+				<Visible val="false"/>
+				<Frame type="ScoreValueLabelFrame" name="ScoreValueFrame0">
+					<Width val="1"/>
+					<Visible val="false"/>
+				</Frame>
+			</Frame>
+			<Frame type="PlayerScoreValueFrame" name="HealingScoreValueFrame">
+				<Width val="1"/>
+				<Visible val="false"/>
+				<Frame type="ScoreValueLabelFrame" name="ScoreValueFrame0">
+					<Width val="1"/>
+					<Visible val="false"/>
+				</Frame>
+				<Frame type="ScoreValueImageFrame" name="ScoreValueFrame1">
+					<Width val="1"/>
+					<Visible val="false"/>
+				</Frame>
+			</Frame>
+			<Frame type="PlayerScoreValueFrame" name="ExperienceScoreValueFrame">
+				<Width val="1"/>
+				<Visible val="false"/>
+				<Frame type="ScoreValueLabelFrame" name="ScoreValueFrame0">
+					<Width val="1"/>
+					<Visible val="false"/>
+				</Frame>
+			</Frame>
+			<Frame type="PlayerScoreValueFrame" name="MechanicsScoreValueFrame">
+				<Width val="1"/>
+				<Visible val="false"/>
+				<Frame type="ScoreValueLabelFrame" name="ScoreValueFrame0">
+					<Width val="1"/>
+					<Visible val="false"/>
+				</Frame>
 			</Frame>
 		</Frame>
 		<Frame type="PlayerScoreValueFrame" name="CarriedMechanicScoreValueFrame">
@@ -1543,58 +1499,58 @@
 
 	<Frame type="HeroLeaderPanelPlayerFrame" name="HeroLeaderPanelPlayerFrameTemplate_StatsTalentPage_Stats_KDA_Left" template="_LeaderPanelBottom/HeroLeaderPanelPlayerFrameTemplate_StatsTalentPage_Stats_Base">
 		<Frame type="Frame" name="StatsContainerFrame">
-            <Frame type="PlayerScoreValueFrame" name="SoloKillScoreValueFrame">
-                <Width val="116"/>
-            </Frame>
+			<Frame type="PlayerScoreValueFrame" name="SoloKillScoreValueFrame">
+				<Width val="116"/>
+			</Frame>
 			<Frame type="PlayerScoreValueFrame" name="DeathsScoreValueFrame">
-                <Width val="116"/>
+				<Width val="116"/>
 			</Frame>
-            <Frame type="PlayerScoreValueFrame" name="AssistsScoreValueFrame">
-                <Width val="116"/>
-            </Frame>
-            <Frame type="PlayerScoreValueFrame" name="SiegeDamageScoreValueFrame">
-                <Width val="1"/>
-				<Visible val="false"/>
-				<Frame type="ScoreValueLabelFrame" name="ScoreValueFrame0">
-					<Width val="1"/>
-					<Visible val="false"/>
-                </Frame>
+			<Frame type="PlayerScoreValueFrame" name="AssistsScoreValueFrame">
+				<Width val="116"/>
 			</Frame>
-            <Frame type="PlayerScoreValueFrame" name="HeroDamageScoreValueFrame">
-                <Width val="1"/>
-				<Visible val="false"/>
-				<Frame type="ScoreValueLabelFrame" name="ScoreValueFrame0">
-					<Width val="1"/>
-					<Visible val="false"/>
-                </Frame>
-			</Frame>
-            <Frame type="PlayerScoreValueFrame" name="HealingScoreValueFrame">
-                <Width val="1"/>
-				<Visible val="false"/>
-				<Frame type="ScoreValueLabelFrame" name="ScoreValueFrame0">
-					<Width val="1"/>
-					<Visible val="false"/>
-                </Frame>
-                <Frame type="ScoreValueImageFrame" name="ScoreValueFrame1">
-					<Width val="1"/>
-					<Visible val="false"/>
-                </Frame>
-			</Frame>
-            <Frame type="PlayerScoreValueFrame" name="ExperienceScoreValueFrame">
+			<Frame type="PlayerScoreValueFrame" name="SiegeDamageScoreValueFrame">
 				<Width val="1"/>
 				<Visible val="false"/>
 				<Frame type="ScoreValueLabelFrame" name="ScoreValueFrame0">
 					<Width val="1"/>
 					<Visible val="false"/>
-                </Frame>
+				</Frame>
 			</Frame>
-            <Frame type="PlayerScoreValueFrame" name="MechanicsScoreValueFrame">
+			<Frame type="PlayerScoreValueFrame" name="HeroDamageScoreValueFrame">
 				<Width val="1"/>
 				<Visible val="false"/>
 				<Frame type="ScoreValueLabelFrame" name="ScoreValueFrame0">
 					<Width val="1"/>
 					<Visible val="false"/>
-                </Frame>
+				</Frame>
+			</Frame>
+			<Frame type="PlayerScoreValueFrame" name="HealingScoreValueFrame">
+				<Width val="1"/>
+				<Visible val="false"/>
+				<Frame type="ScoreValueLabelFrame" name="ScoreValueFrame0">
+					<Width val="1"/>
+					<Visible val="false"/>
+				</Frame>
+				<Frame type="ScoreValueImageFrame" name="ScoreValueFrame1">
+					<Width val="1"/>
+					<Visible val="false"/>
+				</Frame>
+			</Frame>
+			<Frame type="PlayerScoreValueFrame" name="ExperienceScoreValueFrame">
+				<Width val="1"/>
+				<Visible val="false"/>
+				<Frame type="ScoreValueLabelFrame" name="ScoreValueFrame0">
+					<Width val="1"/>
+					<Visible val="false"/>
+				</Frame>
+			</Frame>
+			<Frame type="PlayerScoreValueFrame" name="MechanicsScoreValueFrame">
+				<Width val="1"/>
+				<Visible val="false"/>
+				<Frame type="ScoreValueLabelFrame" name="ScoreValueFrame0">
+					<Width val="1"/>
+					<Visible val="false"/>
+				</Frame>
 			</Frame>
 		</Frame>
 	</Frame>
@@ -1714,54 +1670,54 @@
 			<Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
 		</Frame>
 
-        <Frame type="Image" name="FilterIcon">
-            <Anchor relative="$parent/ClearIcon"/>
-            <Texture val="@UI/Storm_UI_InGame_Leader_Filter_Off"/>
+		<Frame type="Image" name="FilterIcon">
+			<Anchor relative="$parent/ClearIcon"/>
+			<Texture val="@UI/Storm_UI_InGame_Leader_Filter_Off"/>
 			<Alpha val="0"/>
-            <Animation name="ToggleVisibility">
-                <Event event="OnShown" action="Restart,Play" frame="$parent/ClearIcon"/>
-                <Event event="OnHidden" action="Reset" frame="$parent/ClearIcon"/>
-                <Controller type="Visibility" end="Pause">
-                    <Key type="Bool" time="0" value="true"/>
-                    <Key type="Bool" time=".01" value="false"/>
-                </Controller>
-            </Animation>
-        </Frame>
+			<Animation name="ToggleVisibility">
+				<Event event="OnShown" action="Restart,Play" frame="$parent/ClearIcon"/>
+				<Event event="OnHidden" action="Reset" frame="$parent/ClearIcon"/>
+				<Controller type="Visibility" end="Pause">
+					<Key type="Bool" time="0" value="true"/>
+					<Key type="Bool" time=".01" value="false"/>
+				</Controller>
+			</Animation>
+		</Frame>
 		
-        <Frame type="Image" name="ClearIcon">
-            <Anchor side="Bottom" relative="$parent/Label" pos="Max" offset="8"/>
-            <Anchor side="Left" relative="$parent/Label" pos="Max" offset="-11"/>
-            <Width val="0"/>
-            <Height val="0"/>
-            <Texture val="@UI/Storm_UI_InGame_Leader_Filter_On"/>
-        </Frame>
+		<Frame type="Image" name="ClearIcon">
+			<Anchor side="Bottom" relative="$parent/Label" pos="Max" offset="8"/>
+			<Anchor side="Left" relative="$parent/Label" pos="Max" offset="-11"/>
+			<Width val="0"/>
+			<Height val="0"/>
+			<Texture val="@UI/Storm_UI_InGame_Leader_Filter_On"/>
+		</Frame>
 		
 	</Frame>
 	
 	<Frame type="HeroLeaderPanelSortButton" name="SortButtonTemplate_L" template="_LeaderPanelBottom/SortButtonTemplate">
 		<Frame type="Label" name="Label">			
 
-            <Animation name="ToggleStyle">
-                <Event event="Toggled" action="DirectionForward,Play" frame="$parent"/>
-                <Event event="Normal" action="DirectionReverse,Play" frame="$parent"/>
-                <Controller type="Style" end="Pause" style1="AhliColumnHeaderL" style2="Storm_LeaderHeader_Active">
-                    <Key type="Curve" time="0" value="0" out="Auto"/>
-                    <Key type="Curve" time=".01" value="1" in="Auto"/>
-                </Controller>
-            </Animation>
+			<Animation name="ToggleStyle">
+				<Event event="Toggled" action="DirectionForward,Play" frame="$parent"/>
+				<Event event="Normal" action="DirectionReverse,Play" frame="$parent"/>
+				<Controller type="Style" end="Pause" style1="AhliColumnHeaderL" style2="Storm_LeaderHeader_Active">
+					<Key type="Curve" time="0" value="0" out="Auto"/>
+					<Key type="Curve" time=".01" value="1" in="Auto"/>
+				</Controller>
+			</Animation>
 
 		</Frame>
 	</Frame>
 	<Frame type="HeroLeaderPanelSortButton" name="SortButtonTemplate_R" template="_LeaderPanelBottom/SortButtonTemplate">
 		<Frame type="Label" name="Label">
-            <Animation name="ToggleStyle">
-                <Event event="Toggled" action="DirectionForward,Play" frame="$parent"/>
-                <Event event="Normal" action="DirectionReverse,Play" frame="$parent"/>
-                <Controller type="Style" end="Pause" style1="AhliColumnHeaderR" style2="Storm_LeaderHeader_Active">
-                    <Key type="Curve" time="0" value="0" out="Auto"/>
-                    <Key type="Curve" time=".01" value="1" in="Auto"/>
-                </Controller>
-            </Animation>
+			<Animation name="ToggleStyle">
+				<Event event="Toggled" action="DirectionForward,Play" frame="$parent"/>
+				<Event event="Normal" action="DirectionReverse,Play" frame="$parent"/>
+				<Controller type="Style" end="Pause" style1="AhliColumnHeaderR" style2="Storm_LeaderHeader_Active">
+					<Key type="Curve" time="0" value="0" out="Auto"/>
+					<Key type="Curve" time=".01" value="1" in="Auto"/>
+				</Controller>
+			</Animation>
 		</Frame>
 	</Frame>
 	
@@ -1804,7 +1760,6 @@
 					<Key type="Bool" time="0.001" value="true"/>
 					<Key type="Bool" time="0.5" value="true"/>
 				</Controller>
-				
 			</Animation>
 		</Frame>
 		<Frame type="HeroLeaderPanel" name="TalentOverview" template="_LeaderPanelBottom/CleanLeaderPanelBottomTemplate">
@@ -1814,10 +1769,12 @@
 			<Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
 			<Width val="0"/>
 			<Height val="0"/>
-
+			<!-- FIX: talents can receive the wrong state if this panel was not visible at least once, thus it is visible at map start and hidden when player enters the game -->
+			<Visible val="true"/>
+			
 			<Frame type="Frame" name="HeroLeaderPanelContainer">
 				<Frame type="TabControl" name="TabControl">
-				
+					
 					<Frame type="HeroLeaderPanelPlayerFrame" name="PlayerFrame0" template="_LeaderPanelBottom\HeroLeaderPanelPlayerFrameTemplate_StatsTalentPage_Talents_Left">
 						<Anchor side="Top" relative="$this" pos="Min" offset="0"/>
 						<Anchor side="Left" relative="$this" pos="Min" offset="0"/>
