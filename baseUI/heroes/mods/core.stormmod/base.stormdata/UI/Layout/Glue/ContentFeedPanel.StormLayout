@@ -1,6 +1,70 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <Desc>
     <DescFlags val="Locked"/>
+
+    <Frame type="Image" name="ContentFeedSparkleTemplate">
+        <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+        <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+        <Anchor side="Bottom" relative="$parent" pos="Min" offset="0"/>
+        <Anchor side="Right" relative="$parent" pos="Min" offset="0"/>
+        <Width val="100"/>
+        <Height val="100"/>
+        <ColorAdjustMode val="Colorize"/>
+        <Texture val="@UI/Storm_UI_Global_Sparkle_Centered_Grey"/>
+        <BlendMode val="Add"/>
+        <Visible val="False"/>
+
+        <Animation name="StartSparkleCycle">
+            <Event event="OnShown" action="Restart,Play"/>
+            <Event event="OnHidden" action="Stop"/>
+            <Controller name="SparkleDelay" type="Event" end="Loop">
+                <!-- Keys get changed via code. Adjusts based on position -->
+                <Key type="Event" time="0" event=""/>
+            </Controller>
+        </Animation>
+
+        <Animation name="HideSparkle">
+            <Event event="HideAnimationEffects" action="Restart, Play" frame="$parent"/>
+            <Controller type="Visibility" end="Pause">
+                <Key type="Bool" time="0" value="False" out="linear"/>
+            </Controller>
+        </Animation>
+
+        <Animation name="SparkleSparkle">
+            <Event event="DoSparkle" action="Play"/>
+            <Event event="ResetSparkle" action="Stop, Restart"/>
+
+            <Controller type="Rotation" relative="False" end="Pause">
+                <Key type="Curve" time="0" value="0" out="linear"/>
+                <Key type="Curve" time="1" value="-180" in="linear"/>
+            </Controller>
+
+            <Controller type="Dimension" dimension="Width" relative="False" percentage="true" end="Pause" >
+                <Key type="Curve" time="0" value="1" inout="Smooth"/>
+                <Key type="Curve" time="0.4" value="50" inout="Smooth"/>
+                <Key type="Curve" time="0.5" value="100" inout="Smooth"/>
+                <Key type="Curve" time="0.6" value="50" inout="Smooth"/>
+                <Key type="Curve" time="1" value="1" inout="Smooth"/>
+            </Controller>
+
+            <Controller type="Dimension" dimension="Height" relative="False" percentage="true" end="Pause" >
+                <Key type="Curve" time="0" value="1" inout="Smooth"/>
+                <Key type="Curve" time="0.4" value="50" inout="Smooth"/>
+                <Key type="Curve" time="0.5" value="100" inout="Smooth"/>
+                <Key type="Curve" time="0.6" value="50" inout="Smooth"/>
+                <Key type="Curve" time="1" value="1" inout="Smooth"/>
+            </Controller>
+
+            <Controller type="Fade" end="Pause">
+                <Key type="Curve" time="0" value="0" inout="linear"/>
+                <Key type="Curve" time="0.25" value="50" inout="linear"/>
+                <Key type="Curve" time="0.45" value="255" inout="linear"/>
+                <Key type="Curve" time="0.55" value="255" inout="linear"/>
+                <Key type="Curve" time="0.75" value="50" inout="linear"/>
+                <Key type="Curve" time="1" value="0" inout="linear"/>
+            </Controller>
+        </Animation>
+    </Frame>
     
     <Frame type="PageSelectorButtonList" name="ContentFeedPageSelectorButtonListTemplate">
         <Width val="500"/>
@@ -96,12 +160,19 @@
             </Controller>
         </Animation>
     </Frame>
-
+    
     <Frame type="ContentFeedPanel" name="ContentFeedPanelTemplate">
-        <!-- <Visible val="false"/> -->
-
+        <SparkleSweepDuration val ="4"/>
+        <SparkleSweepDelay val ="3"/>
+        
         <Frame type="Frame" name="ContentFeedPage">
             <Anchor relative="$parent"/>
+            <Visible val="False"/>
+            <Frame type="Image" name="BlackBackground">
+                <Anchor relative="$parent"/>
+                <Color val="FF000000"/>
+            </Frame>
+            
             <Frame type="Image" name="FeedPanelBackground">
                 <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
                 <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
@@ -110,7 +181,136 @@
                 <Texture val="@UI/Storm_background_generic"/>
                 <ScaleWidthToTexture val="true"/>
             </Frame>
+            
+            <Frame type="Image" name="FeedPanelBackgroundEffect">
+                <Anchor relative="$parent/FeedPanelBackground"/>
+                <Visible val="False"/>
+                <LayerCount val="3"/>
+                <BlendMode val="Add"/>
+                <Texture val="@UI/Storm_background_generic" layer="0"/>
+                <AlphaLayer val="True" layer="0"/>
+                <AlphaChannel val="Green" layer="0"/>
+                <Texture val="@UI/Storm_UI_ProfileDialog_BorderGlow_Mask" layer="1"/>
+                <AlphaLayer val="True" layer="1"/>
+                <WrapUV val="False" layer="1"/>
+                <Texture val="@UI/Storm_background_generic" layer="2"/>
+                
+                <Animation name="HighlightSweep">
+                    <Event event="StartSweep" action="Restart,Play" frame="$parent/$parent"/>
+                    <Event event="OnShown" action="Restart,Play"/>
+                    
+                    <Controller type="LayerUV" end="Loop" side="Left" relative="true" sideloc="true" layer="1">
+                        <Key type="Curve" time="0" value="1" inout="Linear"/>
+                        <Key type="Curve" time="10" value="-1" inout="Linear"/>
+                        <Key type="Curve" time="15" value="-1" inout="Linear"/>
+                    </Controller>
+                    
+                    <Controller type="Visibility" end="Pause">
+                        <Key type="Bool" time="0" value="false" inout="Linear"/>
+                        <Key type="Bool" time="0.01" value="true" inout="Linear"/>
+                    </Controller>
+                </Animation>
 
+                <Animation name="HideSweep">
+                    <Event event="HideAnimationEffects" action="Restart,Play" frame="$parent/$parent"/>
+
+                    <Controller type="Visibility" end="Stop">
+                        <Key type="Bool" time="0" value="false" inout="Linear"/>
+                    </Controller>
+                </Animation>
+            </Frame>
+         
+            <Frame type="PropertyBind" name="ImageBinding">
+                <Anchor relative="$parent"/>
+                <Enabled val="true"/>
+                <Source frame="$parent/FeedPanelBackground" property="Texture"/>
+                <Target frame="$parent/FeedPanelBackgroundEffect" property="Texture2"/>
+            </Frame>
+
+            <Frame type="PropertyBind" name="MaskBinding">
+                <Anchor relative="$parent"/>
+                <Enabled val="true"/>
+                <Source frame="$parent/FeedPanelBackground" property="Texture"/>
+                <Target frame="$parent/FeedPanelBackgroundEffect" property="Texture"/>
+            </Frame>
+
+            <Frame type="CutsceneFrame" name="SmokeCutscene">
+                <Anchor relative="$parent"/>
+                <AutoPlay val="true"/>
+                <ToneMapping val="False"/>
+                <File val="Cutscenes/Home_Smoke_Generic.StormCutscene"/>
+                <Visible val="false"/>
+
+                <Animation name="OnShown">
+                    <Event event="StartSmoke" action="Restart,Play" frame="$parent/$parent"/>
+                    
+                    <Controller type="Cutscene" end="Stop">
+                        <Key type="Cutscene" time="0" action="Bookmark" bookmark="Stand Start"/>
+                        <Key type="Cutscene" time="0" action="Play"/>
+                    </Controller>
+                    
+                    <Controller type="Visibility" end="Pause">
+                        <Key type="Bool" time="0" value="true" inout="Linear"/>
+                    </Controller>
+                </Animation>
+
+                <Animation name="HideSmoke">
+                    <Event event="HideAnimationEffects" action="Restart, Play" frame="$parent/$parent"/>
+                    <Controller type="Visibility" end="Pause">
+                        <Key type="Bool" time="0" value="False" out="linear"/>
+                    </Controller>
+                </Animation>
+            </Frame>
+
+            <Frame type="BlurFrame" name="DescriptionBackgroundBlur">
+                <Anchor relative="$parent/DescriptionBackgroundImage" offset="-6"/>
+                <AlphaMaskTexture val="@UI/Storm_UI_HomeScreen_Descriptionplate"/>
+                <!-- <TextureType val="Nineslice"/> -->
+                <BlurAmount val="0.2"/>
+            </Frame>
+
+            <Frame type="Image" name="DescriptionBackgroundImage">
+                <Anchor side="Top" relative="$parent/TitleLabel" pos="Min" offset="-20"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Right" relative="$parent/TitleLabel" pos="Max" offset="142"/>
+                <Height val="168"/>
+                <Texture val="@UI/Storm_UI_HomeScreen_Descriptionplate"/>
+                <TextureType val="Normal"/>
+                <Alpha val="80"/>
+            </Frame>
+
+            <Frame type="Image" name="DescriptionBackgroundWipeImage">
+                <Anchor relative="$parent/DescriptionBackgroundImage" />
+                <Alpha val="0"/>
+                <BlendMode val="Add"/>
+                <LayerCount val="2"/>
+                <Color val="c2e8fe"/>
+
+                <Texture val="@UI/Storm_UI_HomeScreen_Descriptionplate" layer="0"/>
+                <TextureCoords top="0" left="0" bottom="1" right="1" layer="0"/>
+                <AlphaLayer val="True" layer="0"/>
+                <WrapUV val="False" layer="0"/>
+
+                <Texture val="@UI/storm_ui_glues_draft_headerBar_AngleGlow_Glow" layer="1"/>
+                <TextureCoords top="0" left="1" bottom="1" right="0" layer="1"/>
+                <WrapUV val="False" layer="1"/>
+
+                <Animation name="UVScroll">
+                    <Event event="OnShown" action="Restart" frame="$parent"/>
+                    <Event event="OnShown" action="Play" frame="$parent"/>
+                    <Controller type="LayerUV" layer="1" side="Left" relative="True" sidelock="True" end="Loop" >
+                        <Key type="Curve" time="0" value="-2" out="fast"/>
+                        <Key type="Curve" time="3" value="2" in="fast"/>
+                    </Controller>
+
+                    <Controller type="Fade" end="Loop">
+                        <Key type="Curve" time="0" value="0" out="Fast"/>
+                        <Key type="Curve" time="8" value="100" in="Slow"/>
+                        <Key type="Curve" time="12" value="0" out="Fast"/>
+                    </Controller>
+                </Animation>
+            </Frame>
+            
             <Frame type="Label" name="TitleLabel">
                 <Visible val="false"/>
                 <Anchor side="Bottom" relative="$parent" pos="Max" offset="-200"/>
@@ -120,18 +320,25 @@
 
             <Frame type="Label" name="DescriptionLabel">
                 <Visible val="false"/>
-                <Anchor side="Top" relative="$parent/TitleLabel" pos="Max" offset="0"/>
+                <Anchor side="Top" relative="$parent/TitleLabel" pos="Max" offset="-5"/>
                 <Anchor side="Left" relative="$parent" pos="Min" offset="50"/>
                 <Style val="HomeContentFeedBodyLabel"/>
             </Frame>
 
             <Frame type="Button" name="LinkButton" template="StandardTemplates/StandardButtonTemplate">
                 <Visible val="false"/>
-                <Anchor side="Top" relative="$parent/DescriptionLabel" pos="Max" offset="10"/>
+                <Anchor side="Top" relative="$parent/DescriptionBackgroundImage" pos="Max" offset="0"/>
                 <Anchor side="Left" relative="$parent" pos="Min" offset="29"/>
                 <Width val="300"/>
                 <ReportsStats val="true"/>
                 <Handle val="ContentFeedLinkButton"/>
+                
+                <Frame type="Label" name="Label">
+                    <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                    <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+                    <Anchor side="Left" relative="$parent" pos="Min" offset="22"/>
+                    <Anchor side="Right" relative="$parent" pos="Max" offset="-22"/>
+                </Frame>
             </Frame>
 
             <Animation name="ShowContentFeed">

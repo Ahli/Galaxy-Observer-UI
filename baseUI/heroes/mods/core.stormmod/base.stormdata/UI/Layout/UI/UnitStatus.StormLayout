@@ -2,6 +2,7 @@
 <Desc>
     <Constant name="RenderPriority_Background" val="500"/>
     <Constant name="LifeLossDuration" val="2000"/>
+    <Constant name="ReductionColor" val="180,0,85"/>
     <Constant name="DecreaseDuration_NoReduction" val="500"/>
     <Constant name="YellowResourceColor" val="254, 210, 16"/>
     <Constant name="OrangeResourceColor" val="234, 154, 31"/>
@@ -84,7 +85,7 @@
         <OwnerColor val="247, 222, 14"/>
         <AllyColor val="49, 132, 255"/>
         <EnemyColor val="219, 0, 64"/>
-        <ReductionColor val="180, 0, 85"/>
+        <ReductionColor val="#ReductionColor"/>
         <ReductionShown val="true"/>
         <IncreaseDuration val="1000"/>
         <DecreaseDuration val="#LifeLossDuration"/>
@@ -116,12 +117,44 @@
         <ApplyToTotal val="false" index="2"/>
     </Frame>
 
-    <Frame type="UnitStatusHealthBar" name="UnitStatusProtectedHealthBarTemplate" template="UnitStatus/UnitStatusSegmentedHealthBarTemplate">
-        <OwnerColor val="255, 255, 255"/>
-        <AllyColor val="255, 255, 255"/>
-        <EnemyColor val="255,255, 255"/>
+    <Frame type="UnitStatusShieldedHealthBar" name="UnitStatusProtectedHealthBarTemplate">
         <Segmented val="False"/>
         <Texture val="@UI/State/Protected"/>
+        <ReductionColor val="#ReductionColor"/>
+
+        <BarCount val="4"/>
+
+        <OwnerColor val="255,255,255" index="0"/>
+        <AllyColor val="255,255,255" index="0"/>
+        <EnemyColor val="255,255,255" index="0"/>
+        <ReductionShown val="true" index="0"/>
+        <IncreaseDuration val="0" index="0"/>
+        <DecreaseDuration val="0" index="0"/>
+        <Tiled val="True" index="0"/>
+
+        <OwnerColor val="255,255,255" index="1"/>
+        <AllyColor val="255,255,255" index="1"/>
+        <EnemyColor val="255,255,255" index="1"/>
+        <IncreaseDuration val="0" index="1"/>
+        <DecreaseDuration val="0" index="1"/>
+        <Tiled val="True" index="1"/>
+
+        <OwnerColor val="255,255,255" index="2"/>
+        <AllyColor val="255,255,255" index="2"/>
+        <EnemyColor val="255,255,255" index="2"/>
+        <IncreaseDuration val="0" index="2"/>
+        <DecreaseDuration val="0" index="2"/>
+        <ApplyToTotal val="false" index="2"/>
+        <Tiled val="True" index="2"/>
+
+        <OwnerColor val="255,255,255" index="3"/>
+        <AllyColor val="255,255,255" index="3"/>
+        <EnemyColor val="255,255,255" index="3"/>
+        <IncreaseDuration val="0" index="3"/>
+        <DecreaseDuration val="0" index="3"/>
+        <ApplyToTotal val="false" index="3"/>
+        <Tiled val="True" index="3"/>
+
     </Frame>
 
     <!-- Shielded Health Bar Templates -->
@@ -1001,8 +1034,8 @@
         <Validator val="UserCategoryTargetInvulnerable"/> 
         <Validator val="TargetMindControlled"/>
         <Validator val="CasterTaunted"/>
-        <Validator val="CasterIsProtectedCombine"/>
         <Validator val="UserCategoryTargetUnstoppable"/>
+        <Validator val="CasterIsProtectedCombine"/>
         <Validator val="UserCategoryTargetStunned"/>
         <Validator val="UserCategoryTargetRooted"/>
         <Validator val="TargetIsPolymorphedCombine"/>
@@ -1102,7 +1135,7 @@
             <State name="Protected">
                 <When type="AnimationState" UnitStatusValidatorState="CasterIsProtectedCombine"/>
                 <Action type="SetProperty" frame="DebuffLabel" text="@UI/State/Protected"/>
-                <Action type="SetProperty" frame="DebuffIconLeft" texture="@UI/State/InvulnerableIcon"/>
+                <Action type="SetProperty" frame="DebuffIconLeft" texture="@UI/State/ProtectedIcon"/>
                 <Action type="SetProperty" frame="DebuffPlateBg" texture="@UI/State/InvulnerableBG"/>
             </State>
 
@@ -1572,30 +1605,26 @@
                 <Width val="140"/>
                 <Height val="16"/>
                 <Visible val="False"/>
-                <!--RenderPriority val="514"/-->
 
-                <Frame type="UnitStatusHealthBar" name="HealthBarInvincible" template="UnitStatus/UnitStatusProtectedHealthBarTemplate">
-                    <Anchor side="Top" relative="$parent/$parent/HeroFrameBackgroundContainer" pos="Min" offset="3"/>
-                    <Anchor side="Left" relative="$parent/$parent/HeroFrameBackgroundContainer" pos="Min" offset="2"/>
-                    <Width val="136"/>
-                    <Height val="12"/>
+                <Frame type="UnitStatusShieldedHealthBar" name="HealthBarInvincible" template="UnitStatus/UnitStatusProtectedHealthBarTemplate">
+                    <Anchor relative="$parent/$parent/HealthBar"/>
+                    <SnapToDevicePixels val="True"/>
+                    <BorderWidth val="1"/>
+                    <BarInsetRect top="1" left="1" bottom="1" right="1"/>
+                    <BackgroundInsetRect top="1" left="1" bottom="1" right="1"/>
                 </Frame>
 
-                <Animation name="InvincibleOn">
-                    <Event event="InvincibleOn" action="Reset, Play"/>
-                    <Controller type="Visibility" end="Pause">
-                        <Key type="Bool" time="0" value="True"/>
-                    </Controller>
-                    <Controller type="Event" frame="$parent/HealthBarInvincibleFlash">
+                <Animation name="ProtectedHealthBarFlashOn">
+                    <Event event="OnShown" action="Reset, Play"/>
+
+                    <Controller type="Event" end="Stop" frame="$parent/HealthBarInvincibleFlash">
                         <Key type="Event" time="0" event="FlashOn"/>
                     </Controller>
                 </Animation>
-                <Animation name="InvincibleOff">
-                    <Event event="InvincibleOff" action="Reset, Play"/>
-                    <Controller type="Visibility" end="Pause">
-                        <Key type="Bool" time="0" value="False"/>
-                    </Controller>
-                    <Controller type="Event" frame="$parent/HealthBarInvincibleFlash">
+                <Animation name="ProtectedHealthBarFlashOff">
+                    <Event event="OnHidden" action="Reset, Play"/>
+
+                    <Controller type="Event" end="Stop" frame="$parent/HealthBarInvincibleFlash">
                         <Key type="Event" time="0" event="FlashOff"/>
                     </Controller>
                 </Animation>
@@ -1646,6 +1675,26 @@
                     <Controller type="Dimension" dimension="Width" relative="False" percentage="True" end="Pause">
                         <Key type="Curve" time="0" value="200"/>
                         <Key type="Curve" time=".2" value="95"/>
+                    </Controller>
+                </Animation>
+            </Frame>
+
+            <Frame type="UnitStatusValidatorAnimElement" name="ValidatorBasedVisibilityAnims">
+                <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+
+                <Validator val="CasterIsProtectedCombine"/>
+                <Validator val="CasterIsNotProtectedCombine"/>
+                
+                <!-- this will show/hide the protected health bars -->
+                <Animation name="ShowHideProtectedHealthBar">
+                    <Event event="CasterIsProtectedCombine" action="Reset, Play"/>
+                    <Event event="CasterIsNotProtectedCombine" action="Stop"/>
+
+                    <Controller type="Visibility" end="Pause" frame="$parent/InvincibleHealthBarFrame">
+                        <Key type="Bool" time="0" value="True"/>
                     </Controller>
                 </Animation>
             </Frame>
@@ -1770,9 +1819,10 @@
         </Frame>
     </Frame>
 
-    <Frame type="UnitStatusFrame" name="HeroUnitStatusFrameNoNameNoEnergyShowDebuffsTemplate" template="UnitStatus/HeroUnitStatusFrameNoEnergyTemplate">
+    <Frame type="UnitStatusFrame" name="HeroUnitStatusFrameNoNameNoEnergyShowDebuffs_PetTemplate" template="UnitStatus/HeroUnitStatusFrameNoEnergyTemplate">
         <Frame type="Frame" name="HeroUnitStatusParentFrame">
             <Frame type="UnitStatusPlayerName" name="PlayerNameLabel">
+                <UseNameTypeVisibilityRules val="false"/>
                 <VisibleToOwner val="false"/>
                 <VisibleToAlly val="false"/>
                 <VisibleToEnemy val="false"/>
@@ -1796,6 +1846,28 @@
                 <VisibleToOwner val="true"/>
                 <VisibleToAlly val="true"/>
                 <VisibleToEnemy val="true"/>
+            </Frame>
+
+            <Frame type="UnitStatusElement" name="HeroFrameBackgroundContainer">
+                <Frame type="Image" name="TopBorder">
+                    <Color val="AAAA00"/>
+                    <Alpha val="128"/>
+                </Frame>
+
+                <Frame type="Image" name="BottomBorder">
+                    <Color val="AAAA00"/>
+                    <Alpha val="128"/>
+                </Frame>
+
+                <Frame type="Image" name="LeftBorder">
+                    <Color val="AAAA00"/>
+                    <Alpha val="128"/>
+                </Frame>
+
+                <Frame type="Image" name="RightBorder">
+                    <Color val="AAAA00"/>
+                    <Alpha val="128"/>
+                </Frame>
             </Frame>
         </Frame>
     </Frame>
@@ -2325,6 +2397,14 @@
                 <VisibleToAlly val="false"/>
                 <VisibleToEnemy val="true"/>
             </Frame>
+
+            <Frame type="Frame" name="InvincibleHealthBarFrame">
+                <Frame type="UnitStatusHealthBar" name="HealthBarInvincible">
+                    <VisibleToOwner val="false"/>
+                    <VisibleToAlly val="false"/>
+                    <VisibleToEnemy val="true"/>
+                </Frame>
+            </Frame>
             
             <Frame type="UnitStatusElement" name="IllusionHealthFrame">
                 <Anchor side="Top" relative="$parent/HeroFrameBackgroundContainer" pos="Mid" offset="0"/>
@@ -2375,6 +2455,45 @@
                 <Anchor side="Top" relative="$parent/IllusionHealthFrame" pos="Max" offset="0"/>
                 <Anchor side="Left" relative="$parent/IllusionHealthFrame" pos="Min" offset="2"/>
                 <CollapseLayout val="true"/>
+            </Frame>
+
+            <Frame type="Frame" name="IllusionInvincibleHealthBarFrame">
+                <Anchor relative="$parent/IllusionHealthFrame"/>
+                <RenderPriority val="514"/>
+                <Visible val="False"/>
+
+                <Frame type="UnitStatusShieldedHealthBar" name="HealthBarInvincible" template="UnitStatus/UnitStatusProtectedHealthBarTemplate">
+                    <Anchor relative="$parent/$parent/IllusionHealthBar"/>
+                    <BarInsetRect top="2" left="2" bottom="2" right="2"/>
+                    <BackgroundInsetRect top="2" left="2" bottom="2" right="2"/>
+
+                    <VisibleToOwner val="true"/>
+                    <VisibleToAlly val="true"/>
+                    <VisibleToEnemy val="false"/>
+                </Frame>
+            </Frame>
+
+            <Frame type="UnitStatusValidatorAnimElement" name="ValidatorBasedVisibilityAnims">
+                <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+
+                <Validator val="CasterIsProtectedCombine"/>
+                <Validator val="CasterIsNotProtectedCombine"/>
+                
+                <!-- this will show/hide the protected health bars -->
+                <Animation name="ShowHideProtectedHealthBar">
+                    <Event event="CasterIsProtectedCombine" action="Reset, Play"/>
+                    <Event event="CasterIsNotProtectedCombine" action="Stop"/>
+
+                    <Controller type="Visibility" end="Pause" frame="$parent/InvincibleHealthBarFrame">
+                        <Key type="Bool" time="0" value="True"/>
+                    </Controller>
+                    <Controller type="Visibility" end="Pause" frame="$parent/IllusionInvincibleHealthBarFrame">
+                        <Key type="Bool" time="0" value="True"/>
+                    </Controller>
+                </Animation>
             </Frame>
             
             <Frame type="UnitStatusProgressBar" name="ProgressBar">
@@ -2475,6 +2594,8 @@
             <Anchor side="Left" relative="$parent/HealthBar" pos="Min" offset="14"/>
             <Anchor side="Bottom" relative="$parent/HealthBar" pos="Max" offset="-13"/>
             <Anchor side="Right" relative="$parent/HealthBar" pos="Max" offset="-20"/>
+
+            <ShowWhileInvulnerable val="True"/>
 
             <Frame type="Label" name="StatusLabel">
                 <Anchor side="Bottom" relative="$parent" pos="Max" offset="5"/>
@@ -3735,14 +3856,15 @@
         </Frame>
 
         <Frame type="Frame" name="HealthBarProtected">
-            <Anchor side="Top" relative="$parent/HealthBar" pos="Min" offset="2"/>
-            <Anchor side="Left" relative="$parent/HealthBar" pos="Min" offset="2"/>
-            <Anchor side="Bottom" relative="$parent/HealthBar" pos="Max" offset="-2"/>
-            <Anchor side="Right" relative="$parent/HealthBar" pos="Max" offset="-2"/>
+            <Anchor relative="UnitStatusShieldedHealthBar"/>
             <Visible val="false"/>
 
-            <Frame type="UnitStatusHealthBar" name="Bar" template="UnitStatus/UnitStatusProtectedHealthBarTemplate">
-                <Anchor relative="$parent"/>
+            <Frame type="UnitStatusShieldedHealthBar" name="Bar" template="UnitStatus/UnitStatusProtectedHealthBarTemplate">
+                <Anchor relative="$parent/$parent/HealthBar"/>
+                <SnapToDevicePixels val="True"/>
+                <BorderWidth val="1"/>
+                <BarInsetRect top="1" left="1" bottom="1" right="1"/>
+                <BackgroundInsetRect top="1" left="1" bottom="1" right="1"/>
             </Frame>
         </Frame>
 

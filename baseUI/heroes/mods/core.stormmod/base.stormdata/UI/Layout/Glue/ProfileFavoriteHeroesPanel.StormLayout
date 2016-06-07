@@ -5,11 +5,172 @@
     <Constant name="FavoriteHeroesVerticalSpace" val="-100"/>
     <Constant name="FavoriteHeroesHorizontalSpace" val="-104"/>
 
+    <Frame type="Frame" name="SparkleContainerTemplate">
+        <AcceptsMouse val="false"/>
+
+        <Animation name="SparkleController">
+            <Event event="OnShown" action="Restart,Play"/>
+
+            <!-- Reset Sparkles whenever data is updated due to paging --> 
+            <Event event="HeroItemUpdated" action="Restart,Play" frame="$ancestor[@type=HeroCollectionTileListItem]"/>
+
+            <Controller type="Event" end="Loop">
+                <Key type="Event" time="0" event="ResetSparkle"/>
+                <Key type="Event" time="3" event="BeginFlare"/>
+                <Key type="Event" time="3.3" event="BeginShine"/>
+                <Key type="Event" time="7" event="Null"/>
+            </Controller>
+        </Animation>
+
+        <Frame type="Image" name="CoinFlashImage">
+            <Anchor relative="$parent/$parent/HeroContainerFrame/HeroExperienceBar/FillImageContainer/FillImage"/>
+            <LayerCount val="2"/>
+            <BlendMode val="Add"/>
+            <Alpha val="0"/>
+            
+            <Texture val="@UI/Storm_UI_Play_HeroPortrait_ProgressBar_Mask" layer="0"/>
+            <TextureCoords top="0" left="0" bottom="1" right="1" layer="0"/>
+            <AlphaLayer val="True" layer="0"/>
+            <WrapUV val="True" layer="0"/>
+            
+            <Texture val="@UI/storm_ui_glues_draft_headerBar_AngleGlow_Glow" layer="1"/>
+            <TextureCoords top="-1" left=".4" bottom="2" right=".6" layer="1"/>
+            <LayerColor val="dfc482" layer="1"/>
+            <WrapUV val="False" layer="1"/>
+            
+            <Animation name="UVScroll">
+                <Event event="BeginShine" action="Restart,Play" frame="$parent"/>
+                <Event event="ResetSparkle" action="Stop" frame="$parent"/>
+
+                <Controller type="LayerUV" layer="1" side="Left" relative="False" sidelock="True" end="Stop" >
+                    <Key type="Curve" time="0" value="2" out="fast"/>
+                    <Key type="Curve" time="1" value="2" out="fast"/>
+                    <Key type="Curve" time="3" value="-2" in="fast"/>
+                    <Key type="Curve" time="7" value="-2" in="fast"/>
+                </Controller>
+                <Controller type="Fade" end="Stop">
+                    <Key type="Curve" time="0" value="0" out="Auto"/>
+                    <Key type="Curve" time="2.5" value="255" out="Auto"/>
+                    <Key type="Curve" time="3" value="255" in="Auto"/>
+                    <Key type="Curve" time="7" value="0" in="Auto"/>
+                </Controller>
+            </Animation>
+        </Frame>
+
+        <Frame type="Frame" name="LensFlare1Anchor">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="75"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="84"/>
+            <Width val="1"/>
+            <Height val="1"/>
+        </Frame>
+        
+        <Frame type="Image" name="LensFlareImage">
+            <Anchor side="Top" relative="$parent/LensFlare1Anchor" pos="Mid" offset="0"/>
+            <Anchor side="Left" relative="$parent/LensFlare1Anchor" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent/LensFlare1Anchor" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent/LensFlare1Anchor" pos="Mid" offset="0"/>
+            
+            <Alpha val="0"/>
+            <BlendMode val="Add"/>
+            <Texture val="@UI/Storm_UI_GoldCoin_Flare"/>
+            <Unclipped val="true"/>
+
+            <Animation name="Flare">
+                <Event event="BeginFlare" action="Restart,Play" frame="$parent"/>
+                <Event event="ResetSparkle" action="Stop" frame="$parent"/>
+
+                <Controller type="Fade" end="Pause">
+                    <Key type="Curve" time="0" value="0" out="Slow"/>
+                    <Key type="Curve" time=".4" value="255" in="Slow"/>
+                    <Key type="Curve" time="1.6" value="255" in="Slow"/>
+                    <Key type="Curve" time="2" value="0" in="Slow"/>
+                </Controller>
+                <Controller type="Rotation" relative="False" end="Loop" >
+                    <Key type="Curve" time="0" value="-45" out="linear"/>
+                    <Key type="Curve" time="2" value="55" in="linear"/>
+                </Controller>
+                <Controller type="Anchor" end="Loop" side="Left" relative="true" frame="$parent/LensFlare1Anchor">
+                    <Key type="Curve" time="0" value="-10" out="Fast"/>
+                    <Key type="Curve" time="2" value="14" in="Slow"/>
+                </Controller>
+                <Controller type="Anchor" end="Loop" side="Top" relative="true" frame="$parent/LensFlare1Anchor">
+                    <Key type="Curve" time="0" value="10" out="Fast"/>
+                    <Key type="Curve" time="2" value="-5" in="Slow"/>
+                </Controller>
+                <Controller type="Dimension" dimension="Width" relative="False" percentage="True" end="Loop" >
+                    <Key type="Curve" time="0" value="40" out="Slow"/>
+                    <Key type="Curve" time=".5" value="80" in="Slow"/>
+                    <Key type="Curve" time="1.4" value="104" in="Slow"/>
+                    <Key type="Curve" time="2" value="8" in="Slow"/>
+                </Controller>
+                <Controller type="Dimension" dimension="Height" relative="False" percentage="True" end="Loop" >
+                    <Key type="Curve" time="0" value="40" out="Slow"/>
+                    <Key type="Curve" time=".5" value="80" in="Slow"/>
+                    <Key type="Curve" time="1.4" value="104" in="Slow"/>
+                    <Key type="Curve" time="2" value="8" in="Slow"/>
+                </Controller>
+            </Animation>
+        </Frame>
+
+        <Frame type="Frame" name="LensFlare2Anchor">
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="-73"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="-79"/>
+            <Width val="5"/>
+            <Height val="5"/>
+        </Frame>
+        
+        <Frame type="Image" name="LensFlare2Image">
+            <Anchor side="Top" relative="$parent/LensFlare2Anchor" pos="Mid" offset="0"/>
+            <Anchor side="Left" relative="$parent/LensFlare2Anchor" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent/LensFlare2Anchor" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent/LensFlare2Anchor" pos="Mid" offset="0"/>
+            
+            <Texture val="@UI/Storm_UI_GoldCoin_Flare"/>
+            <BlendMode val="Add"/>
+            <Alpha val="0"/>
+
+            <Animation name="Flare">
+                <Event event="BeginFlare" action="Restart,Play" frame="$parent"/>
+                <Event event="ResetSparkle" action="Stop" frame="$parent"/>
+
+                <Controller type="Fade" end="Pause">
+                    <Key type="Curve" time="0" value="0" out="Slow"/>
+                    <Key type="Curve" time=".5" value="255" in="Slow"/>
+                    <Key type="Curve" time="1.4" value="255" in="Slow"/>
+                    <Key type="Curve" time="2" value="0" in="Slow"/>
+                </Controller>
+                <Controller type="Rotation" relative="False" end="Pause" >
+                    <Key type="Curve" time="0" value="180" out="linear"/>
+                    <Key type="Curve" time="2" value="210" in="linear"/>
+                </Controller>
+                <Controller type="Anchor" end="Pause" side="Left" relative="true" frame="$parent/LensFlare2Anchor">
+                    <Key type="Curve" time="0" value="8" out="Fast"/>
+                    <Key type="Curve" time="2" value="-10" in="Slow"/>
+                </Controller>
+                <Controller type="Anchor" end="Pause" side="Top" relative="true" frame="$parent/LensFlare2Anchor">
+                    <Key type="Curve" time="0" value="-5" out="Fast"/>
+                    <Key type="Curve" time="2" value="7" in="Slow"/>
+                </Controller>
+                <Controller type="Dimension" dimension="Width" relative="False" percentage="True" end="Pause" >
+                    <Key type="Curve" time="0" value="40" out="Slow"/>
+                    <Key type="Curve" time=".5" value="80" in="Slow"/>
+                    <Key type="Curve" time="1.4" value="80" in="Slow"/>
+                    <Key type="Curve" time="2" value="8" in="Slow"/>
+                </Controller>
+                <Controller type="Dimension" dimension="Height" relative="False" percentage="True" end="Pause" >
+                    <Key type="Curve" time="0" value="40" out="Slow"/>
+                    <Key type="Curve" time=".5" value="80" in="Slow"/>
+                    <Key type="Curve" time="1.4" value="80" in="Slow"/>
+                    <Key type="Curve" time="2" value="8" in="Slow"/>
+                </Controller>
+            </Animation>
+        </Frame>
+    </Frame>
 
     <!--=======================================================================================
     <! Favorite TileListItem Template
     <!======================================================================================-->
-    <Frame type="HeroCollectionTileListItem" name="FavoriteTileListItemTemplate" template="HeroStandardTemplate/HeroTileListItemTemplate">
+    <Frame type="HeroCollectionTileListItem" name="FavoriteBaseTileListItemTemplate" template="HeroStandardTemplate/HeroTileListItemTemplate">
         <Frame type="Image" name="HoverBackgroundImage">
             <RenderPriority val="500"/>
             <Anchor side="Top" relative="$parent/HeroContainerFrame" pos="Mid" offset="0"/>
@@ -87,10 +248,24 @@
         </Animation>
     </Frame>
 
+    <Frame type="HeroCollectionTileListItem" name="FavoriteTileListItemTemplate" template="ProfileFavoriteHeroesPanel/FavoriteBaseTileListItemTemplate">
+        <Frame type="Frame" name="SparkleContainer" template="ProfileFavoriteHeroesPanel/SparkleContainerTemplate">
+            <Anchor relative="$parent" />
+            <Visible val="false"/>
+            <StateGroup name="ShowSparkle">
+                <State name="Show">
+                    <When type="Property" frame="$parent/HeroContainerFrame/HeroState" levelType="Max"/>
+                    <When type="Property" frame="$parent/HeroContainerFrame/HeroState" isAllowed="true"/>
+                    <Action type="SetProperty" visible="true"/>
+                </State>
+            </StateGroup>
+        </Frame>
+    </Frame>
+
     <!--=======================================================================================
     <! FavoriteTargetTileListItemTemplate
     <!======================================================================================-->
-    <Frame type="HeroCollectionTileListItem" name="FavoriteTargetTileListItemTemplate" template="ProfileFavoriteHeroesPanel/FavoriteTileListItemTemplate">
+    <Frame type="HeroCollectionTileListItem" name="FavoriteTargetTileListItemTemplate" template="ProfileFavoriteHeroesPanel/FavoriteBaseTileListItemTemplate">
         <StateGroup name="DragIndicator">
             <DefaultState val="Empty"/>
             
@@ -443,6 +618,67 @@
             <Anchor side="Top" relative="$parent/HeroTileList" pos="Min" offset="0"/>
             <Anchor side="Right" relative="$parent" pos="Max" offset="-78"/>
             <FilterTarget val="$parent"/>
+
+            <!-- Hide Blur frame that creates an artifact -->
+            <Frame type="Button" name="FilterWarriorButton">
+                <Frame type="BlurFrame" name="BlurFrame">
+                    <Visible val="false"/>
+                </Frame>
+            </Frame>
+
+            <Frame type="Button" name="FilterDamageButton">
+                <Frame type="BlurFrame" name="BlurFrame">
+                    <Visible val="false"/>
+                </Frame>
+            </Frame>
+
+            <Frame type="Button" name="FilterSupportButton">
+                <Frame type="BlurFrame" name="BlurFrame">
+                    <Visible val="false"/>
+                </Frame>
+            </Frame>
+
+            <Frame type="Button" name="FilterSpecialistButton">
+                <Frame type="BlurFrame" name="BlurFrame">
+                    <Visible val="false"/>
+                </Frame>
+            </Frame>
+
+            <Frame type="Button" name="FilterRetroButton">
+                <Frame type="BlurFrame" name="BlurFrame">
+                    <Visible val="false"/>
+                </Frame>
+            </Frame>
+
+            <Frame type="Button" name="FilterWarcraftButton">
+                <Frame type="BlurFrame" name="BlurFrame">
+                    <Visible val="false"/>
+                </Frame>
+            </Frame>
+
+            <Frame type="Button" name="FilterStarCraftButton">
+                <Frame type="BlurFrame" name="BlurFrame">
+                    <Visible val="false"/>
+                </Frame>
+            </Frame>
+
+            <Frame type="Button" name="FilterDiabloButton">
+                <Frame type="BlurFrame" name="BlurFrame">
+                    <Visible val="false"/>
+                </Frame>
+            </Frame>
+
+            <Frame type="Button" name="FilterOverwatchButton">
+                <Frame type="BlurFrame" name="BlurFrame">
+                    <Visible val="false"/>
+                </Frame>
+            </Frame>
+
+            <Frame type="Button" name="FilterRetroButton">
+                <Frame type="BlurFrame" name="BlurFrame">
+                    <Visible val="false"/>
+                </Frame>
+            </Frame>
         </Frame>
 
         <StateGroup name="DragState">

@@ -2,6 +2,11 @@
 <Desc>
     <DescFlags val="Locked"/>
 
+    <Constant name="PageTransitionDuration" val="0.3"/>
+    <Constant name="PageStayDuration" val="4.5"/>
+    <Constant name="PageTabWidth" val="240"/>
+    <Constant name="PageTabNegativeOffset" val="-240"/>
+
 <!-- Region: TUTORIAL MAP DIALOG -->
     <!--  Tile List Item Template  -->
     <Frame type="TileListItem" name="TutorialMapTileListItemTemplate">
@@ -29,6 +34,7 @@
             <Animation name="SetState">
                 <Event event="StateLocked" action="Play" frame="$parent"/>
                 <Event event="StateAvailable" action="Stop" frame="$parent"/>
+                <Event event="StateClaimed" action="Stop" frame="$parent"/>
                 <Event event="StateCompleted" action="Stop" frame="$parent"/>
                 <Controller type="Visibility" end="Pause">
                     <Key type="Bool" time="0.0" value="True" />
@@ -53,6 +59,7 @@
             <Animation name="SetState">
                 <Event event="StateLocked" action="Stop" frame="$parent"/>
                 <Event event="StateCompleted" action="Play" frame="$parent"/>
+                <Event event="StateClaimed" action="Play" frame="$parent"/>
                 <Event event="StateAvailable" action="Play" frame="$parent"/>
                 <Controller type="Visibility" end="Pause">
                     <Key type="Bool" time="0.0" value="True" />
@@ -108,6 +115,7 @@
                 <Texture val="@UI/Storm_UI_NewUser_IconIncomplete"/>
                 <Animation name="SetState">
                     <Event event="StateAvailable" action="Stop" frame="$parent/$parent"/>
+                    <Event event="StateClaimed" action="Play" frame="$parent/$parent"/>
                     <Event event="StateCompleted" action="Play" frame="$parent/$parent"/>
                     <Controller type="Visibility" end="Pause">
                         <Key type="Bool" time="0.0" value="False" />
@@ -160,6 +168,7 @@
             <Animation name="SetState">
                 <Event event="StateLocked" action="Stop" frame="$parent"/>
                 <Event event="StateAvailable" action="Stop" frame="$parent"/>
+                <Event event="StateClaimed" action="Stop" frame="$parent"/>
                 <Event event="StateCompleted" action="Play" frame="$parent"/>
                 <Controller type="Visibility" end="Pause">
                     <Key type="Bool" time="0.0" value="True" />
@@ -176,6 +185,7 @@
             <Animation name="StyleState">
                 <Event event="StateAvailable" action="Stop" frame="$parent"/>
                 <Event event="StateCompleted" action="Stop" frame="$parent"/>
+                <Event event="StateClaimed" action="Stop" frame="$parent"/>
                 <Event event="StateLocked" action="Play" frame="$parent"/>
                 <Controller type="Style" end="Pause" style1="NewUserUtherPanelItem" style2="NewUserUtherPanelItemOff">
                     <Key type="Curve" time="0.00" value="1.0" out="Auto"/>
@@ -204,6 +214,7 @@
             <Animation name="SetState">
                 <Event event="StateLocked" action="Stop" frame="$parent"/>
                 <Event event="StateCompleted" action="Play" frame="$parent"/>
+                <Event event="StateClaimed" action="Play" frame="$parent"/>
                 <Event event="StateAvailable" action="Play" frame="$parent"/>
                 <Controller type="Visibility" end="Pause">
                     <Key type="Bool" time="0.0" value="True" />
@@ -221,6 +232,7 @@
             <Animation name="ShowReward">
                 <Event event="StateLocked" action="Play" frame="$parent"/>
                 <Event event="StateAvailable" action="Play" frame="$parent"/>
+                <Event event="StateClaimed" action="Play" frame="$parent"/>
                 <Event event="StateCompleted" action="Stop" frame="$parent"/>
                 <Controller type="Visibility" end="Pause">
                     <Key type="Bool" time="0.0" value="True" />
@@ -230,6 +242,7 @@
             <Animation name="StylizeReward">
                 <Event event="StateLocked" action="Play" frame="$parent"/>
                 <Event event="StateAvailable" action="Stop" frame="$parent"/>
+                <Event event="StateClaimed" action="Stop" frame="$parent"/>
                 <Event event="StateCompleted" action="Stop" frame="$parent"/>
                 <Controller type="Style" end="Pause" style1="GemsLabel" style2="SocialPlayerNameOffline">
                     <Key type="Curve" time="0.00" value="1.0" out="Auto"/>
@@ -238,8 +251,8 @@
         </Frame>
     </Frame>
     <!--  End: Tile List Item Template  -->
-
-    <Frame type="NewUserTutorialMapDialog" name="TutorialProgessDialog" template="StandardTemplates/StandardClosableDialog">
+    
+    <Frame type="NewUserTutorialMapDialog" name="CasualTutorialProgressDialog" template="StandardTemplates/StandardClosableDialog">
         <!--    This prevents bleed through on the Uther cutscene.  Not sure why it has to be 'this' texture, but it must be colored
                 black to prevent color adding.  The Render priority must also be less than the dialog's blur.  -->
         <Frame type="Image" name="HideTheBleedThrough">
@@ -486,12 +499,838 @@
     </Frame>
 <!-- EndRegion: TUTORIAL MAP DIALOG -->
 
-    <!-- Questionnaire button template -->
+    <!-- Commercial Break Page Tab Template -->
+    <Frame type="Frame" name="PageTabTemplate">
+        <Width val="272"/>
+        <Height val="44"/>
+        
+        <Animation name="FillAnim">
+            <Event event="FillAnim" action="Restart,Play"/>
+            <Event event="StopAutoPlay" action="Pause" frame="$parent/$parent"/>
+            <Controller type="Anchor" end="Pause" side="Right" relative="False" frame="Fill">
+                <Key type="Curve" time="0" value="0" out="Fast"/>
+                <Key type="Curve" time="#PageStayDuration" value="240" in="Slow"/>
+            </Controller>
+        </Animation>
+        
+        <Animation name="Show">
+            <Event event="PageTransition" action="DirectionReverse,Play" frame="$parent/$parent"/>
+            <Event event="Show" action="DirectionForward,Play"/>
+            <Event event="FillAnim" action="DirectionForward,Play"/>
+            <Controller type="Fade" end="Pause" frame="Fill">
+                <Key type="Curve" time="0" value="0" out="Slow"/>
+                <Key type="Curve" time="#PageTransitionDuration" value="255" in="Fast"/>
+            </Controller>
+        </Animation>
+        
+        <Animation name="Click">
+            <Event event="OnMouseDown" action="Restart,Play" frame="HitTest"/>
+            <Controller type="Event" end="Stop" frame="$parent/$parent">
+                <Key type="Event" time="0" event="StopAutoPlay"/>
+            </Controller>
+            <Controller type="Event" end="Stop">
+                <Key type="Event" time=".04" event="Show"/>
+            </Controller>
+            <Controller type="Visibility" end="Pause" frame="HitTest">
+                <Key type="Bool" time=".01" value="False"/>
+            </Controller>
+            <Controller type="Anchor" end="Pause" side="Right" relative="False" frame="Fill">
+                <Key type="Curve" time="0" value="240"/>
+            </Controller>
+        </Animation>
+        
+        <Animation name="Visibility">
+            <Event event="PageTransition" action="Reset" frame="$parent/$parent"/>
+            <Controller type="Visibility" end="Pause" frame="HitTest">
+                <Key type="Bool" time="0" value="True"/>
+            </Controller>
+        </Animation>
+
+        <Frame type="Image" name="Back">
+            <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+            <Width val="#PageTabWidth"/>
+            <Height val="12"/>
+            <Color val="05031d"/>
+        </Frame>
+        
+        <Frame type="Image" name="HitTest">
+            <Anchor relative="$parent/Back" offset="16"/>
+            <AcceptsMouse val="True"/>
+            <Alpha val="0"/>
+        </Frame>
+
+        <Frame type="Image" name="Hover">
+            <Anchor relative="$parent/Back"/>
+            <Color val="17acff"/>
+            <BlendMode val="Add"/>
+            <Alpha val="0"/>
+            <Animation name="Hover">
+                <Event event="OnMouseEnter" action="DirectionForward,Play" frame="$parent/HitTest"/>
+                <Event event="OnMouseExit" action="DirectionReverse,Play" frame="$parent/HitTest"/>
+                <Controller type="Fade" end="Pause">
+                    <Key type="Curve" time="0" value="0" out="Fast"/>
+                    <Key type="Curve" time=".1" value="180" in="Slow"/>
+                </Controller>
+            </Animation>
+        </Frame>
+
+        <Frame type="Image" name="Fill">
+            <Anchor side="Top" relative="$parent/Back" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent/Back" pos="Min" offset="0"/>
+            <Anchor side="Bottom" relative="$parent/Back" pos="Max" offset="0"/>
+            <Anchor side="Right" relative="$parent/Back" pos="Min" offset="0"/>
+            <Color val="17acff"/>
+            <Alpha val="0"/>
+            <Frame type="Image" name="Glow">
+                <Anchor relative="$parent" offset="16"/>
+                <Unclipped val="True"/>
+                <Texture val="@UI/Storm_UI_NewUser_SellTabGlow"/>
+                <TextureType val="NineSlice"/>
+                <BlendMode val="Add"/>
+                <Color val="0037d4"/>
+            </Frame>
+        </Frame>
+    </Frame>
+    <!-- End: Commercial Break Page Tab Template -->
+    
+    <Frame type="Frame" name="CommercialPageTemplate">
+        <Anchor relative="$parent" offset="-4"/>
+        
+        <Animation name="Begin">
+            <Event event="Begin" action="DirectionForward,Play"/>
+            <Event event="PageTransition" action="DirectionReverse,Play" frame="$parent"/>
+            <Controller type="Fade" end="Pause">
+                <Key type="Curve" time="0" value="0" out="Slow"/>
+                <Key type="Curve" time="#PageTransitionDuration" value="255" in="Fast"/>
+            </Controller>
+        </Animation>
+        
+        <Animation name="BeginVisible">
+            <Event event="Begin" action="Restart,Play"/>
+            <Controller type="Visibility" end="Pause">
+                <Key type="Bool" time="0" value="False"/>
+                <Key type="Bool" time=".01" value="True"/>
+            </Controller>
+        </Animation>
+        
+        <Frame type="Frame" name="TextAnchor">
+            <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+            <Animation name="Begin">
+                <Event event="Begin" action="Restart,Play" frame="$parent"/>
+                <Controller type="Anchor" end="Pause" side="Left" relative="true">
+                    <Key type="Curve" time="0" value="300" out="Fast"/>
+                    <Key type="Curve" time=".3" value="0" in="Slow"/>
+                </Controller>
+            </Animation>
+            <Animation name="End">
+                <Event event="PageTransition" action="Restart,Play" frame="$parent/$parent"/>
+                <Controller type="Anchor" end="Pause" side="Left" relative="true">
+                    <Key type="Curve" time="0" value="0" out="Fast"/>
+                    <Key type="Curve" time=".2" value="-300" in="Slow"/>
+                </Controller>
+            </Animation>
+        </Frame>
+        
+        <Frame type="Label" name="BodyText">
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="-105"/>
+            <Anchor side="Left" relative="$parent/TextAnchor" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent/TextAnchor" pos="Mid" offset="0"/>
+            <Style val="NewUserCommercialBody"/>
+            <RenderPriority val="515"/>
+        </Frame>
+    </Frame>
+
+<!-- Region: VETERAN DIALOG -->
+    <Frame type="NewUserVeteranDialog" name="VeteranTutorialProgressDialog" template="StandardTemplates/StandardClosableDialog">
+        <Frame type="Image" name="BackgroundFrame">
+            <Width val="1380"/>
+            <Height val="790"/>
+        </Frame>
+        
+        <Frame type="Image" name="BorderGlowImage">
+            <RenderPriority val="515"/>
+            <AcceptsMouse val="False"/>
+        </Frame>
+        
+        <Frame type="Image" name="DialogHeaderBackgroundImage">
+            <Visible val="False"/>
+        </Frame>
+        <Frame type="Image" name="DialogHeaderUnderlineImage">
+            <Visible val="False"/>
+        </Frame>
+
+        <Frame type="Label" name="TitleLabel">
+            <Anchor side="Top" relative="$parent/DialogHeaderBackgroundImage" pos="Min" offset="38"/>
+            <Anchor side="Left" relative="$parent/DialogHeaderBackgroundImage" pos="Min" offset="68"/>
+            <Anchor side="Right" relative="$parent/DialogHeaderBackgroundImage" pos="Max" offset="-20"/>
+            <Text val="@UI/NewUser/VeteranIntroduction/Title"/>
+            <Style val="NewUserVeteranTitle"/>
+        </Frame>
+
+        <Frame type="Frame" name="ProgressFrame">
+            <Anchor relative="$parent/BackgroundFrame"/>
+
+            <Frame type="Frame" name="BackgroundContainer">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="4"/>
+                <Anchor side="Bottom" relative="$parent" pos="Max" offset="-3"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="4"/>
+                <Anchor side="Right" relative="$parent" pos="Max" offset="-3"/>
+
+                <Animation name="Welcome">
+                    <Event event="Welcome" action="Restart,Play"/>
+                    <Event event="Incomplete" action="DirectionReverse,Play"/>
+                    <Event event="Complete" action="DirectionReverse,Play"/>
+                    <Controller type="Cutscene" end="Pause" frame="DialogCutscene">
+                        <Key type="Cutscene" time="0.00" action="RemoveFilter" filter="Unstarted"/>
+                        <Key type="Cutscene" time="0.01" action="AddFilter" filter="Unstarted"/>
+                    </Controller>
+                </Animation>
+                <Animation name="Incomplete">
+                    <Event event="Welcome" action="DirectionReverse,Play"/>
+                    <Event event="Incomplete" action="Restart,Play"/>
+                    <Event event="Complete" action="DirectionReverse,Play"/>
+                    <Controller type="Cutscene" end="Pause" frame="DialogCutscene">
+                        <Key type="Cutscene" time="0.00" action="RemoveFilter" filter="Incomplete"/>
+                        <Key type="Cutscene" time="0.01" action="AddFilter" filter="Incomplete"/>
+                    </Controller>
+                </Animation>
+                <Animation name="Complete">
+                    <Event event="Welcome" action="DirectionReverse,Play"/>
+                    <Event event="Incomplete" action="DirectionReverse,Play"/>
+                    <Event event="Complete" action="Restart,Play"/>
+                    <Controller type="Cutscene" end="Pause" frame="DialogCutscene">
+                        <Key type="Cutscene" time="0.00" action="RemoveFilter" filter="Complete"/>
+                        <Key type="Cutscene" time="0.01" action="AddFilter" filter="Complete"/>
+                    </Controller>
+                </Animation>
+
+                <Frame type="Image" name="Background">
+                    <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                    <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+                    <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+                    <Texture val="@UI/Storm_UI_NewUser_Uther_Background"/>
+                </Frame>
+    
+                <Frame type="CutsceneFrame" name="DialogCutscene">
+                    <Anchor relative="$parent"/>
+                    <RenderType val="LDR"/>
+                    <AutoPlay val="true"/>
+                    <File val="Cutscenes/UI_TreasureChest.StormCutscene"/>
+                    
+                    <Animation name="OnShown">
+                        <Event event="OnShown" action="Reset,Play"/>
+                        <Controller type="Cutscene" end="Stop">
+                            <Key type="Cutscene" time="0" action="Bookmark" bookmark="Birth Start"/>
+                        </Controller>
+                    </Animation>
+                </Frame>
+            </Frame>
+
+            <Frame type="Image" name="Rewards">
+                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Bottom" relative="$parent" pos="Max" offset="-185"/>
+                <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+                <Height val="175"/>
+                <Texture val="@UI/Storm_UI_NewUser_RewardBackground"/>
+                <TextureType val="NineSlice"/>
+
+                <Frame type="Image" name="RewardIcon">
+                    <Anchor side="Left" relative="$parent" pos="Min" offset="75"/>
+                    <Anchor side="Top" relative="$parent" pos="Min" offset="10"/>
+                    <Width val="132"/>
+                    <Height val="108"/>
+                    <Texture val="@UI/Storm_UI_NewUser_Gold_IconComplete"/>
+                </Frame>
+
+                <Frame type="Label" name="RewardLabel">
+                    <Anchor side="Top" relative="$parent/RewardIcon" pos="Max" offset="3"/>
+                    <Anchor side="Left" relative="$parent/RewardIcon" pos="Mid" offset="0"/>
+                    <Anchor side="Right" relative="$parent/RewardIcon" pos="Mid" offset="0"/>
+                    <Style val="NewUserHomePageBody"/>
+                    <!-- Text controlled by CNewUserVeteranDialog -->
+                </Frame>
+
+                <Frame type="Image" name="RewardCompletion">
+                    <Anchor side="Top" relative="$parent/RewardLabel" pos="Mid" offset="-2"/>
+                    <Anchor side="Right" relative="$parent/RewardLabel" pos="Min" offset="-4"/>
+                    <Anchor side="Bottom" relative="$parent/RewardLabel" pos="Mid" offset="0"/>
+                    <Width val="40"/>
+                    <Height val="40"/>
+                    <Texture val="@UI/Storm_HeroSelect_PurchasePanel_LockIcon"/>
+                </Frame>
+
+                <Frame type="Label" name="RewardDescription">
+                    <Anchor side="Top" relative="$parent" pos="Min" offset="33"/>
+                    <Anchor side="Left" relative="$parent/RewardIcon" pos="Max" offset="-7"/>
+                    <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+                    <Style val="NewUserHomePageBody"/>
+                    <!-- Text controlled by CNewUserVeteranDialog -->
+                </Frame>
+            </Frame>
+
+            <Frame type="Label" name="ProgressLabel">
+                <Anchor side="Top" relative="$parent/$parent/TitleLabel" pos="Max" offset="-8"/>
+                <Anchor side="Left" relative="$parent/$parent/TitleLabel" pos="Min" offset="0"/>
+                <Text val="@UI/NewUser/VeteranIntroduction/IncompleteSubtitle"/>
+                <Style val="NewUserVeteranSubtitle"/>
+            </Frame>
+
+            <Frame type="Label" name="DescriptionLabel">
+                <Anchor side="Top" relative="$parent/$parent/TitleLabel" pos="Max" offset="80"/>
+                <Anchor side="Bottom" relative="$parent/Rewards" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/$parent/TitleLabel" pos="Min" offset="0"/>
+                <Anchor side="Right" relative="$parent" pos="Mid" offset="-10"/>
+
+                <Text val="@UI/NewUser/VeteranIntroduction/IncompleteBody"/>
+                <Style val="NewUserHomePageBody"/>
+            </Frame>
+
+            <Frame type="Button" name="PrimaryButton" template="StandardTemplates/StandardButtonTemplate">
+                <Anchor side="Bottom" relative="$parent" pos="Max" offset="-25"/>
+                <Anchor side="Left" relative="$parent/$parent/TitleLabel" pos="Min" offset="-20"/>
+                <Text val="@UI/Play"/>
+                <ClickSound val="@UI_BNet_PanelSelect"/>
+            </Frame>
+
+            <Frame type="Button" name="SecondaryButton" template="StandardTemplates/StandardButtonTemplate">
+                <Anchor side="Top" relative="$parent/PrimaryButton" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/PrimaryButton" pos="Max" offset="-18"/>
+                <Text val="@UI/No"/>
+                <ClickSound val="@UI_BNet_PanelSelect"/>
+            </Frame>
+        </Frame>
+
+        <Frame type="Frame" name="CommercialBreakFrame">
+            <Anchor relative="$parent/BackgroundFrame"/>
+            <Visible val="false"/>
+
+            <Frame type="Image" name="Background">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Bottom" relative="$parent" pos="Max" offset="-90"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="4"/>
+                <Anchor side="Right" relative="$parent" pos="Max" offset="-4"/>
+                <Texture val="@UI/Storm_UI_NewUser_Sell_Background"/>
+                <BlendMode val="Add"/>
+            </Frame>
+            
+            <Frame type="Frame" name="CommercialFrame1" template="NewUserPopupPanel/CommercialPageTemplate">
+                <Animation name="Dispatch">
+                    <Event event="OnShown" action="Restart,Play"/>
+                    <Controller type="Event" end="Stop" frame="Rank1Image">
+                        <Key type="Event" time=".2" event="Trigger"/>
+                    </Controller>
+                    <Controller type="Event" end="Stop" frame="Rank2Image">
+                        <Key type="Event" time=".25" event="Trigger"/>
+                    </Controller>
+                    <Controller type="Event" end="Stop" frame="Rank3Image">
+                        <Key type="Event" time=".3" event="Trigger"/>
+                    </Controller>
+                    <Controller type="Event" end="Stop" frame="Rank4Image">
+                        <Key type="Event" time=".35" event="Trigger"/>
+                    </Controller>
+                    <Controller type="Event" end="Stop" frame="TeamCutscene">
+                        <Key type="Event" time=".4" event="Trigger"/>
+                    </Controller>
+                </Animation>
+                
+                <Frame type="Image" name="Rank1Image">
+                    <Anchor side="Top" relative="$parent" pos="Min" offset="296"/>
+                    <Anchor side="Left" relative="$parent" pos="Min" offset="61"/>
+                    <Texture val="@UI/Storm_UI_VeteranCB_Rank1"/>
+                    <SubpixelRendering val="True"/>
+                    <Animation name="Slide">
+                        <Event event="Trigger" action="Restart,Play"/>
+                        <Controller type="Anchor" end="Pause" side="Left" relative="true">
+                            <Key type="Curve" time="0" value="-200" out="Fast"/>
+                            <Key type="Curve" time=".3" value="0" in="Slow"/>
+                        </Controller>
+                        <Controller type="Fade" end="Pause">
+                            <Key type="Curve" time="0" value="0" out="Fast"/>
+                            <Key type="Curve" time=".4" value="255" in="Slow"/>
+                        </Controller>
+                    </Animation>
+                    <Animation name="Reset">
+                        <Event event="OnShown" action="Restart,Play"/>
+                        <Controller type="Fade" end="Pause">
+                            <Key type="Curve" time="0" value="0" out="Slow"/>
+                        </Controller>
+                    </Animation>
+                </Frame>
+                
+                <Frame type="Image" name="Rank2Image" template="NewUserPopupPanel/VeteranTutorialProgressDialog/CommercialBreakFrame/CommercialFrame1/Rank1Image">
+                    <Anchor side="Top" relative="$parent" pos="Min" offset="265"/>
+                    <Anchor side="Left" relative="$parent" pos="Min" offset="140"/>
+                    <Texture val="@UI/Storm_UI_VeteranCB_Rank2"/>
+                </Frame>
+                
+                <Frame type="Image" name="Rank3Image" template="NewUserPopupPanel/VeteranTutorialProgressDialog/CommercialBreakFrame/CommercialFrame1/Rank1Image">
+                    <Anchor side="Top" relative="$parent" pos="Min" offset="229"/>
+                    <Anchor side="Left" relative="$parent" pos="Min" offset="237"/>
+                    <Texture val="@UI/Storm_UI_VeteranCB_Rank3"/>
+                </Frame>
+                
+                <Frame type="Image" name="Rank4Image" template="NewUserPopupPanel/VeteranTutorialProgressDialog/CommercialBreakFrame/CommercialFrame1/Rank1Image">
+                    <Anchor side="Top" relative="$parent" pos="Min" offset="171"/>
+                    <Anchor side="Left" relative="$parent" pos="Min" offset="383"/>
+                    <Texture val="@UI/Storm_UI_VeteranCB_Rank4"/>
+                </Frame>
+
+                
+                <Frame type="CutsceneFrame" name="TeamCutscene">
+                    <Anchor relative="$parent"/>
+                    <RenderType val="LDR"/>
+                    <AutoPlay val="true"/>
+                    <TimeScale val="0.5"/>
+                    <Alpha val="0"/>
+
+                    <Animation name="Reset">
+                        <Event event="OnShown" action="Restart,Play"/>
+                        <Controller type="Fade" end="Pause">
+                            <Key type="Curve" time="0" value="0" out="Slow"/>
+                        </Controller>
+                    </Animation>
+                    
+                    <Animation name="Trigger">
+                        <Event event="Trigger" action="Reset,Play"/>
+                        <Controller type="Fade" end="Pause">
+                            <Key type="Curve" time="0" value="0" out="Slow"/>
+                            <Key type="Curve" time=".3" value="255" in="Fast"/>
+                        </Controller>
+                        <Controller type="Cutscene" end="Stop">
+                            <Key type="Cutscene" time="0" action="SetCutscene" file="Cutscenes/UI_RankedHeroes.StormCutscene"/>
+                            <Key type="Cutscene" time=".01" action="Bookmark" bookmark="Birth Start"/>
+                            <Key type="Cutscene" time=".01" action="Play"/>
+                        </Controller>
+                    </Animation>
+                </Frame>
+                
+                <Frame type="Label" name="BodyText">
+                    <Text val="@UI/NewUser/CommercialBreak/Page1"/>
+                </Frame>
+            </Frame>
+            
+            <Frame type="Frame" name="CommercialFrame2" template="NewUserPopupPanel/CommercialPageTemplate">
+                <Constant name="MapFrameOffset" val="190"/>
+                
+                <Animation name="Dispatch">
+                    <Event event="OnShown" action="Restart,Play"/>
+                    <Controller type="Event" end="Stop" frame="RavenImage">
+                        <Key type="Event" time=".2" event="Trigger"/>
+                    </Controller>
+                    <Controller type="Event" end="Stop" frame="SpiderQueenImage">
+                        <Key type="Event" time=".3" event="Trigger"/>
+                    </Controller>
+                    <Controller type="Event" end="Stop" frame="TowersImage">
+                        <Key type="Event" time=".4" event="Trigger"/>
+                    </Controller>
+                    <Controller type="Event" end="Stop" frame="DragonshireImage">
+                        <Key type="Event" time=".5" event="Trigger"/>
+                    </Controller>
+                    <Controller type="Event" end="Stop" frame="ShrinesImage">
+                        <Key type="Event" time=".6" event="Trigger"/>
+                    </Controller>
+                    <Controller type="Event" end="Stop" frame="BoEImage">
+                        <Key type="Event" time=".7" event="Trigger"/>
+                    </Controller>
+                </Animation>
+                
+                <Frame type="Image" name="AnchorFrame">
+                    <Anchor side="Top" relative="$parent" pos="Min" offset="177"/>
+                    <Anchor side="Left" relative="$parent" pos="Min" offset="210"/>
+                    <Texture val=""/>
+                </Frame>
+                
+                <Frame type="Image" name="RavenImage">
+                    <Anchor side="Top" relative="$parent/AnchorFrame" pos="Mid" offset="166"/>
+                    <Anchor side="Bottom" relative="$parent/AnchorFrame" pos="Mid" offset="166"/>
+                    <Anchor side="Left" relative="$parent/AnchorFrame" pos="Mid" offset="0"/>
+                    <Anchor side="Right" relative="$parent/AnchorFrame" pos="Mid" offset="0"/>
+                    
+                    <Width val="332"/>
+                    <Height val="440"/>
+                    <LayerCount val="2"/>
+                    <SubpixelRendering val="True"/>
+                    
+                    <Texture val="@UI/Storm_UI_VeteranCB_MapMask" layer="0"/>
+                    <TextureCoords top="0" left="0" bottom="1" right="1" layer="0"/>
+                    <AlphaLayer val="True" layer="0"/>
+                    <WrapUV val="True" layer="0"/>
+                    
+                    <Texture val="@UI/LoadingScreen_CursedHollow" layer="1"/>
+                    <TextureCoords top=".05" left=".2" bottom=".8" right=".6" layer="1"/>
+                    <WrapUV val="True" layer="1"/>
+                    
+                    <Animation name="UVScroll">
+                        <Event event="OnShown" action="Restart,Play" frame="$parent"/>
+                        <Controller type="LayerUV" layer="1" side="Left" relative="True" sidelock="True" end="PingPong">
+                            <Key type="Curve" time="0" value="0" out="linear"/>
+                            <Key type="Curve" time="45" value=".2" in="linear"/>
+                        </Controller>
+                    </Animation>
+                    
+                    <Animation name="Reset">
+                        <Event event="OnShown" action="Restart,Play"/>
+                        <Controller type="Fade" end="Pause">
+                            <Key type="Curve" time="0" value="0" out="Slow"/>
+                        </Controller>
+                    </Animation>
+
+                    <Animation name="Trigger">
+                        <Event event="Trigger" action="Restart,Play"/>
+                        <Controller type="Dimension" dimension="Width" relative="False" percentage="True" end="Pause">
+                            <Key type="Curve" time="0" value="400" out="Fast"/>
+                            <Key type="Curve" time=".4" value="100" in="Slow"/>
+                        </Controller>
+                        <Controller type="Dimension" dimension="Height" relative="False" percentage="True" end="Pause">
+                            <Key type="Curve" time="0" value="400" out="Fast"/>
+                            <Key type="Curve" time=".4" value="100" in="Slow"/>
+                        </Controller>
+                        <Controller type="Fade" end="Pause">
+                            <Key type="Curve" time="0" value="0" out="Fast"/>
+                            <Key type="Curve" time=".4" value="255" in="Slow"/>
+                        </Controller>
+                        <Controller type="Anchor" end="Pause" side="Left" relative="true">
+                            <Key type="Curve" time="0" value="-100" out="Fast"/>
+                            <Key type="Curve" time=".5" value="0" in="Slow"/>
+                        </Controller>
+                    </Animation>
+                </Frame>
+                
+                <Frame type="Image" name="SpiderQueenImage" template="NewUserPopupPanel/VeteranTutorialProgressDialog/CommercialBreakFrame/CommercialFrame2/RavenImage">
+                    <Anchor side="Left" relative="$parent/RavenImage" pos="Mid" offset="#MapFrameOffset"/>
+                    <Anchor side="Right" relative="$parent/RavenImage" pos="Mid" offset="#MapFrameOffset"/>
+
+                    <Texture val="@UI/LoadingScreen_SpiderQueen" layer="1"/>
+                    <TextureCoords top=".05" left=".25" bottom=".8" right=".55" layer="1"/>
+
+                </Frame>
+                
+                <Frame type="Image" name="TowersImage" template="NewUserPopupPanel/VeteranTutorialProgressDialog/CommercialBreakFrame/CommercialFrame2/RavenImage">
+                    <Anchor side="Left" relative="$parent/SpiderQueenImage" pos="Mid" offset="#MapFrameOffset"/>
+                    <Anchor side="Right" relative="$parent/SpiderQueenImage" pos="Mid" offset="#MapFrameOffset"/>
+
+                    <Texture val="@UI/LoadingScreen_TowersofDoom" layer="1"/>
+                    <TextureCoords top=".1" left=".4" bottom=".9" right=".75" layer="1"/>
+
+                </Frame>
+                
+                <Frame type="Image" name="DragonshireImage" template="NewUserPopupPanel/VeteranTutorialProgressDialog/CommercialBreakFrame/CommercialFrame2/RavenImage">
+                    <Anchor side="Left" relative="$parent/TowersImage" pos="Mid" offset="#MapFrameOffset"/>
+                    <Anchor side="Right" relative="$parent/TowersImage" pos="Mid" offset="#MapFrameOffset"/>
+
+                    <Texture val="@UI/LoadingScreen_DragonShire" layer="1"/>
+                    <TextureCoords top="0" left=".2" bottom=".9" right=".65" layer="1"/>
+                </Frame>
+
+                <Frame type="Image" name="ShrinesImage" template="NewUserPopupPanel/VeteranTutorialProgressDialog/CommercialBreakFrame/CommercialFrame2/RavenImage">
+                    <Anchor side="Left" relative="$parent/DragonshireImage" pos="Mid" offset="#MapFrameOffset"/>
+                    <Anchor side="Right" relative="$parent/DragonshireImage" pos="Mid" offset="#MapFrameOffset"/>
+
+                    <Texture val="@UI/LoadingScreen_Shrines" layer="1"/>
+                    <TextureCoords top="0" left=".25" bottom=".9" right=".65" layer="1"/>
+                </Frame>
+                
+                <Frame type="Image" name="BoEImage" template="NewUserPopupPanel/VeteranTutorialProgressDialog/CommercialBreakFrame/CommercialFrame2/RavenImage">
+                    <Anchor side="Left" relative="$parent/ShrinesImage" pos="Mid" offset="#MapFrameOffset"/>
+                    <Anchor side="Right" relative="$parent/ShrinesImage" pos="Mid" offset="#MapFrameOffset"/>
+
+                    <Texture val="@UI/LoadingScreen_Eternity" layer="1"/>
+                    <TextureCoords top="0" left=".2" bottom=".9" right=".65" layer="1"/>
+                </Frame>
+
+                <Frame type="Label" name="BodyText">
+                    <Text val="@UI/NewUser/CommercialBreak/Page2"/>
+                </Frame>
+            </Frame>
+
+            <Frame type="Frame" name="CommercialFrame3" template="NewUserPopupPanel/CommercialPageTemplate">
+                <Frame type="CutsceneFrame" name="LineupCutscene">
+                    <Anchor relative="$parent"/>
+                    <RenderType val="LDR"/>
+                    <AutoPlay val="true"/>
+                    <TimeScale val="0.5"/>
+                    <File val="Cutscenes/UI_Heroes_lookback.StormCutscene"/>
+                    <AcceptsMouse val="True"/>
+                    
+                    <Animation name="OnShown">
+                        <Event event="OnShown" action="Reset,Play"/>
+                        <Controller type="Cutscene" end="Stop">
+                            <Key type="Cutscene" time="0" action="SetCutscene" file="Cutscenes/UI_Heroes_lookback.StormCutscene"/>
+                            <Key type="Cutscene" time=".01" action="Bookmark" bookmark="Birth Start"/>
+                            <Key type="Cutscene" time=".01" action="Play"/>
+                        </Controller>
+                    </Animation>
+                    
+                    <Animation name="Click">
+                        <Event event="OnMouseDown" action="ToggleDirection,Play"/>
+                        <Controller type="Cutscene" end="Pause">
+                            <Key type="Cutscene" time="0" action="RemoveFilter" filter="Squirrel"/>
+                            <Key type="Cutscene" time=".01" action="AddFilter" filter="Squirrel"/>
+                        </Controller>
+                    </Animation>
+                </Frame>
+
+                <Frame type="Label" name="BodyText">
+                    <Text val="@UI/NewUser/CommercialBreak/Page3"/>
+                </Frame>
+            </Frame>
+
+            <Frame type="Frame" name="PageTabs">
+                <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Bottom" relative="$parent" pos="Max" offset="-40"/>
+                <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+                <Width val="800"/>
+                <Height val="44"/>
+
+                <Frame type="Frame" name="PageTab1" template="NewUserPopupPanel/PageTabTemplate">
+                    <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                    <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+                    <Anchor side="Right" relative="$parent/PageTab2/Back" pos="Min" offset="-10"/>
+                    <Animation name="Click">
+                        <Controller type="Event" end="Stop" frame="$parent/$parent">
+                            <Key type="Event" time="0" event="Page1"/>
+                        </Controller>
+                    </Animation>
+                </Frame>
+
+                <Frame type="Frame" name="PageTab2" template="NewUserPopupPanel/PageTabTemplate">
+                    <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                    <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+                    <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+                    <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+                    <Animation name="Click">
+                        <Controller type="Event" end="Stop" frame="$parent/$parent">
+                            <Key type="Event" time="0" event="Page2"/>
+                        </Controller>
+                    </Animation>
+                </Frame>
+
+                <Frame type="Frame" name="PageTab3" template="NewUserPopupPanel/PageTabTemplate">
+                    <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                    <Anchor side="Left" relative="$parent/PageTab2/Back" pos="Max" offset="10"/>
+                    <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+                    <Animation name="Click">
+                        <Controller type="Event" end="Stop" frame="$parent/$parent">
+                            <Key type="Event" time="0" event="Page3"/>
+                        </Controller>
+                    </Animation>
+                </Frame>
+            </Frame>
+
+            <Frame type="Button" name="DoneButton" template="StandardTemplates/StandardButtonTemplate">
+                <Anchor side="Bottom" relative="$parent" pos="Max" offset="-10"/>
+                <Anchor side="Right" relative="$parent" pos="Max" offset="-10"/>
+                <Alpha val="0"/>
+                <Text val="@UI/NewUser/CommercialBreak/ConcludeButton"/>
+                <ClickSound val="@UI_BNet_PanelSelect"/>
+            </Frame>
+
+            <Animation name="ShowTime">
+                <Event event="CommercialBreak" action="Stop,Play" frame="$parent"/>
+                <Event event="OnShown" action="Stop" frame="$parent"/>
+                <Event event="OnHidden" action="Stop" frame="$parent"/>
+                
+                <Controller type="Fade" end="Pause" frame="$this">
+                    <Key type="Curve" time="0" value="0" in="Smooth" out="Smooth"/>
+                    <Key type="Curve" time=".2" value="255" in="Smooth" out="Smooth"/>
+                </Controller>
+                
+                <Controller type="Fade" end="Pause" frame="$parent/ProgressFrame">
+                    <Key type="Curve" time="0" value="255" in="Smooth" out="Smooth"/>
+                    <Key type="Curve" time=".2" value="0" in="Smooth" out="Smooth"/>
+                </Controller>
+                
+                <Controller type="Visibility" end="Pause" frame="$parent/ProgressFrame">
+                    <Key type="Bool" time="0" value="true"/>
+                    <Key type="Bool" time=".2" value="false"/>
+                </Controller>
+                
+                <Controller type="Event" end="Stop">
+                    <Key type="Event" time="0" event="AutoPlayFrames"/>
+                </Controller>
+
+                <Controller type="Fade" end="Pause" frame="DoneButton">
+                    <Key type="Curve" time="0" value="0" out="Fast"/>
+                    <Key type="Curve" time="9" value="0" out="Fast"/>
+                    <Key type="Curve" time="9.4" value="255" in="Slow"/>
+                </Controller>
+                
+                <Controller type="Visibility" end="Pause" frame="$parent/CloseButton">
+                    <Key type="Bool" time="0" value="False"/>
+                    <Key type="Bool" time="9" value="True"/>
+                </Controller>
+            </Animation>
+            
+                            
+            <Animation name="AutoPlayFrames">
+                <Event event="AutoPlayFrames" action="Restart,Play"/>
+                <Event event="StopAutoPlay" action="Stop"/>
+                <Event event="OnShown" action="Stop" frame="$parent"/>
+                <Event event="OnHidden" action="Stop" frame="$parent"/>
+
+                <Controller type="Event" end="Stop">
+                    <Key type="Event" time="0" event="Page1"/>
+                    <Key type="Event" time="3" event="Page2"/>
+                    <Key type="Event" time="6" event="Page3"/>
+                </Controller>
+                <Controller type="Event" end="Stop" frame="PageTabs/PageTab1">
+                    <Key type="Event" time="0.01" event="FillAnim"/>
+                </Controller>
+                <Controller type="Event" end="Stop" frame="PageTabs/PageTab2">
+                    <Key type="Event" time="3.01" event="FillAnim"/>
+                </Controller>
+                <Controller type="Event" end="Stop" frame="PageTabs/PageTab3">
+                    <Key type="Event" time="6.01" event="FillAnim"/>
+                </Controller>
+            </Animation>
+
+            <Animation name="Page1">
+                <Event event="CommercialBreak" action="Stop,Play" frame="$parent"/>
+                <Event event="Page1" action="Restart,Play"/>
+
+                <Controller type="Event" end="Stop">
+                    <Key type="Event" time="0" event="PageTransition"/>
+                </Controller>
+
+                <Controller type="Event" end="Stop" frame="CommercialFrame1">
+                    <Key type="Event" time="0" event="Begin"/>
+                </Controller>
+            </Animation>
+
+            <Animation name="Page2">
+                <Event event="CommercialBreak" action="Stop" frame="$parent"/>
+                <Event event="Page2" action="Restart,Play"/>
+                
+                <Controller type="Event" end="Stop">
+                    <Key type="Event" time="0" event="PageTransition"/>
+                </Controller>
+
+                <Controller type="Event" end="Stop" frame="CommercialFrame2">
+                    <Key type="Event" time="0" event="Begin"/>
+                </Controller>
+            </Animation>
+
+            <Animation name="Page3">
+                <Event event="CommercialBreak" action="Stop" frame="$parent"/>
+                <Event event="Page3" action="Restart,Play"/>
+
+                <Controller type="Event" end="Stop">
+                    <Key type="Event" time="0" event="PageTransition"/>
+                </Controller>
+
+                <Controller type="Event" end="Stop" frame="CommercialFrame3">
+                    <Key type="Event" time="0" event="Begin"/>
+                </Controller>
+            </Animation>
+            
+        </Frame>
+
+        <StateGroup name="RewardState">
+            <State name="RewardClaimed">
+                <When type="Property" ChallengeCleared="true"/>
+                <Action type="SetProperty" frame="ProgressFrame/Rewards/RewardLabel" style="StoreItemGoldLabel"/>
+                <Action type="SetProperty" frame="ProgressFrame/Rewards/RewardCompletion" texture="@UI/Storm_UI_NewUser_IconComplete"/>
+            </State>
+            
+            <State name="RewardedElsewhere">
+                <When type="Property" RewardRemaining="0"/>
+                <Action type="SetProperty" frame="ProgressFrame/Rewards/RewardCompletion" texture="@UI/Storm_UI_NewUser_IconComplete"/>
+            </State>
+            
+            <State name="RewardAvailable">
+                <When type="Property" ChallengeCleared="false"/>
+                <Action type="SetProperty" frame="ProgressFrame/Rewards/RewardLabel" style="NewUserHomePageLocked"/>
+                <Action type="SetProperty" frame="ProgressFrame/Rewards/RewardCompletion" texture="@UI/Storm_UI_NewUser_SmallLockIcon"/>
+            </State>
+        </StateGroup>
+
+        <StateGroup name="CommercialState">
+            <State name="On">
+                <When type="Property" CommercialActive="true"/>
+                <Action type="SetProperty" frame="CommercialBreakFrame" Visible="true"/>
+                <Action type="SendEvent" frame="$this" event="CommercialBreak"/>
+            </State>
+            <State name="Off">
+                <When type="Property" CommercialActive="false"/>
+                <Action type="SetProperty" frame="CommercialBreakFrame" Visible="false"/>
+                <Action type="SetProperty" frame="ProgressFrame" Visible="true"/>
+                <Action type="SetProperty" frame="ProgressFrame" alpha="255"/>
+            </State>
+        </StateGroup>
+
+        <StateGroup name="TutorialProgress">
+            <State name="Welcome">
+                <When type="Property" JustPlayed="false"/>
+                <When type="Property" ChallengeCleared="false"/>
+                <Action type="SetProperty" frame="TitleLabel" text="@UI/MapLoadingScreen/VeteranTutorialWelcome"/>
+                <Action type="SetProperty" frame="ProgressFrame/PrimaryButton" text="@UI/Play"/>
+                <Action type="SetProperty" frame="ProgressFrame/SecondaryButton" visible="false"/>
+                <Action type="SetProperty" frame="ProgressFrame/DescriptionLabel" text="@UI/NewUser/VeteranIntroduction/WelcomeBody"/>
+                <Action type="SetProperty" frame="ProgressFrame/ProgressLabel" text="@UI/NewUser/VeteranIntroduction/Title"/>
+                <Action type="SetProperty" frame="ProgressFrame/ProgressLabel" style="NewUserHomePageTitle"/>
+            </State>
+
+            <State name="FinishedFirstTime">
+                <When type="Property" CommercialActive="true"/>
+                <Action type="SetProperty" frame="TitleLabel" text="@UI/NewUser/CommercialBreak/Title"/>
+            </State>
+            
+            <State name="Completed">
+                <When type="Property" ChallengeCleared="true"/>
+                <Action type="SetProperty" frame="TitleLabel" text="@UI/NewUser/VeteranIntroduction/Title"/>
+                <Action type="SetProperty" frame="ProgressFrame/PrimaryButton" text="@UI/NewUser/VeteranIntroduction/ConcludeButton"/>
+                <Action type="SetProperty" frame="ProgressFrame/SecondaryButton" text="@UI/Restart"/>
+                <Action type="SetProperty" frame="ProgressFrame/DescriptionLabel" text="@UI/NewUser/VeteranIntroduction/CompleteBody"/>
+                <Action type="SetProperty" frame="ProgressFrame/ProgressLabel" text="@UI/NewUser/VeteranIntroduction/CompleteSubtitle"/>
+                <Action type="SetProperty" frame="ProgressFrame/ProgressLabel" style="NewUserVeteranSubtitleComplete"/>
+            </State>
+            
+            <State name="Incomplete">
+                <When type="Property" ChallengeCleared="false"/>
+                <Action type="SetProperty" frame="TitleLabel" text="@UI/NewUser/VeteranIntroduction/Title"/>
+                <Action type="SetProperty" frame="ProgressFrame/PrimaryButton" text="@UI/NewUser/VeteranIntroduction/RestartIntroduction"/>
+                <Action type="SetProperty" frame="ProgressFrame/SecondaryButton" text="@UI/NewUser/VeteranIntroduction/AbortButton"/>
+                <Action type="SetProperty" frame="ProgressFrame/DescriptionLabel" text="@UI/NewUser/VeteranIntroduction/IncompleteBody"/>
+                <Action type="SetProperty" frame="ProgressFrame/ProgressLabel" text="@UI/NewUser/VeteranIntroduction/IncompleteSubtitle"/>
+                <Action type="SetProperty" frame="ProgressFrame/ProgressLabel" style="NewUserVeteranSubtitle"/>
+            </State>
+        </StateGroup>
+
+        <StateGroup name="CutsceneFilterStates">
+            <State name="Welcome">
+                <When type="Property" JustPlayed="false"/>
+                <Action type="SendEvent" frame="ProgressFrame/BackgroundContainer" event="Welcome"/>
+            </State>
+
+            <State name="NoReward">
+                <When type="Property" RewardRemaining="0"/>
+                <Action type="SendEvent" frame="ProgressFrame/BackgroundContainer" event="Welcome"/>
+            </State>
+
+            <State name="Completed">
+                <When type="Property" ChallengeCleared="true"/>
+                <Action type="SendEvent" frame="ProgressFrame/BackgroundContainer" event="Complete"/>
+            </State>
+
+            <State name="Incomplete">
+                <When type="Property" ChallengeCleared="false"/>
+                <Action type="SendEvent" frame="ProgressFrame/BackgroundContainer" event="Incomplete"/>
+            </State>
+        </StateGroup>
+    </Frame>
+<!-- EndRegion: VETERAN DIALOG -->
+    
+<!-- Questionnaire button template -->
     <Frame type="Button" name="QuestionnaireButtonTemplate">
         <ClickSound val="@UI_BNet_Generic_01"/>
         <Width val="548"/>
         <Height val="783"/>
         <DisplayType val="ImageLayer"/>
+        <Toggleable val="true"/>
 
         <Frame type="Image" name="NormalImage">
             <Anchor relative="$parent"/>
@@ -788,45 +1627,16 @@
                 <Text val="@UI/NewUser/Questionnaire/Subtitle"/>
             </Frame>
 
-            <Frame type="Button" name="ChoiceNewButton" template="NewUserPopupPanel/QuestionnaireButtonTemplate">
-                <Anchor side="Right" relative="$parent/ChoiceCasualButton" pos="Min" offset="150"/>
+            <Frame type="Button" name="ChoiceCasualButton" template="NewUserPopupPanel/QuestionnaireButtonTemplate">
+                <Anchor side="Right" relative="$parent" pos="Mid" offset="25"/>
                 <Anchor side="Top" relative="$parent/BodyLabel" pos="Min" offset="30"/>
                 <Frame type="Label" name="Label">
                     <Text val="@UI/NewUser/Questionnaire/Button/New"/>
                 </Frame>
-                
-                <Frame type="Label" name="SubLabel">
-                    <Text val="@UI/NewUser/Questionnaire/Button/NewSubLabel"/>
-                </Frame>
-                
-                <Frame type="Image" name="ButtonShimmer">
-                    <Anchor relative="$parent/HitTestFrame"/>
-
-                    <LayerCount val="2"/>
-                    <BlendMode val="Add"/>
-                    <RenderPriority val="600"/>
-                    <Alpha val="170"/>
-                    
-                    <Texture val="@UI/Storm_NewUser_NewButtonMask" layer="0"/>
-                    <AlphaLayer val="true" layer="0"/>
-                    <TextureType val="Normal" layer="0"/>
-
-                    <Texture val="@UI/Storm_NewUser_ButtonGleamAnim" layer="1"/>
-                    <TextureCoords top="0" left="0" bottom="1" right="1" layer="1"/>
-                    <WrapUV val="False" layer="1"/>
-                </Frame>
-            </Frame>
-
-            <Frame type="Button" name="ChoiceCasualButton" template="NewUserPopupPanel/QuestionnaireButtonTemplate">
-                <Anchor side="Right" relative="$parent" pos="Mid" offset="75"/>
-                <Anchor side="Top" relative="$parent/ChoiceNewButton" pos="Min" offset="0"/>
-                <Frame type="Label" name="Label">
-                    <Text val="@UI/NewUser/Questionnaire/Button/Casual"/>
-                </Frame>
                 <Frame type="Label" name="SubLabel">
                     <Text val="@UI/NewUser/Questionnaire/Button/CasualSubLabel"/>
                 </Frame>
-                
+
                 <Frame type="Image" name="NormalImage">
                     <Texture val="@UI/Storm_NewUser_CasualButton_Normal" layer="0"/>
                     <Texture val="@UI/Storm_NewUser_CasualButton_Hover" layer="1"/>
@@ -836,7 +1646,7 @@
                     <Texture val="@UI/Storm_NewUser_CasualButton_Hover" layer="0"/>
                     <Texture val="@UI/Storm_NewUser_CasualButton_Hover" layer="1"/>
                 </Frame>
-                
+
                 <Frame type="Image" name="ButtonShimmer">
                     <Anchor relative="$parent/HitTestFrame"/>
 
@@ -844,7 +1654,7 @@
                     <BlendMode val="Add"/>
                     <RenderPriority val="600"/>
                     <Alpha val="170"/>
-                    
+
                     <Texture val="@UI/Storm_NewUser_CasualButtonMask" layer="0"/>
                     <AlphaLayer val="true" layer="0"/>
                     <TextureType val="Normal" layer="0"/>
@@ -856,15 +1666,17 @@
             </Frame>
 
             <Frame type="Button" name="ChoiceVeteranButton" template="NewUserPopupPanel/QuestionnaireButtonTemplate">
-                <Anchor side="Left" relative="$parent" pos="Mid" offset="-75"/>
+                <Anchor side="Left" relative="$parent" pos="Mid" offset="-25"/>
                 <Anchor side="Top" relative="$parent/ChoiceCasualButton" pos="Min" offset="0"/>
                 <Frame type="Label" name="Label">
                     <Text val="@UI/NewUser/Questionnaire/Button/Veteran"/>
                 </Frame>
                 <Frame type="Label" name="SubLabel">
+                    <Anchor side="Bottom" relative="$parent" pos="Max" offset="-85"/>
+                    <Height val="70"/>
                     <Text val="@UI/NewUser/Questionnaire/Button/VeteranSubLabel"/>
                 </Frame>
-                
+
                 <Frame type="Image" name="NormalImage">
                     <Texture val="@UI/Storm_NewUser_VeteranButton_Normal" layer="0"/>
                     <Texture val="@UI/Storm_NewUser_VeteranButton_Hover" layer="1"/>
@@ -874,7 +1686,7 @@
                     <Texture val="@UI/Storm_NewUser_VeteranButton_Hover" layer="0"/>
                     <Texture val="@UI/Storm_NewUser_VeteranButton_Hover" layer="1"/>
                 </Frame>
-                
+
                 <Frame type="Image" name="ButtonShimmer">
                     <Anchor relative="$parent/HitTestFrame"/>
 
@@ -882,7 +1694,7 @@
                     <BlendMode val="Add"/>
                     <RenderPriority val="600"/>
                     <Alpha val="170"/>
-                    
+
                     <Texture val="@UI/Storm_NewUser_VeteranButtonMask" layer="0"/>
                     <AlphaLayer val="true" layer="0"/>
                     <TextureType val="Normal" layer="0"/>
@@ -893,42 +1705,39 @@
                 </Frame>
             </Frame>
 
-            <Frame type="Button" name="ChoiceMasterButton" template="NewUserPopupPanel/QuestionnaireButtonTemplate">
-                <Anchor side="Left" relative="$parent/ChoiceVeteranButton" pos="Max" offset="-150"/>
-                <Anchor side="Top" relative="$parent/ChoiceVeteranButton" pos="Min" offset="0"/>
-                <Frame type="Label" name="Label">
-                    <Text val="@UI/NewUser/Questionnaire/Button/Master"/>
-                </Frame>
-                <Frame type="Label" name="SubLabel">
-                    <Text val="@UI/NewUser/Questionnaire/Button/MasterSubLabel"/>
-                </Frame>
-                
-                <Frame type="Image" name="NormalImage">
-                    <Texture val="@UI/Storm_NewUser_MasterButton_Normal" layer="0"/>
-                    <Texture val="@UI/Storm_NewUser_MasterButton_Hover" layer="1"/>
-                </Frame>
+            <Frame type="ABChoiceFrame" name="ABTest">
+                <Anchor relative="$parent"/>
+                <Visible val="false"/>
+                <!--ABChoice val="9"/-->
+                <NumABChoices val="10"/>
+                <ReportsStats val="true"/>
+                <Handle val="ForceVeteranTutorial"/>
+            </Frame>
 
-                <Frame type="Image" name="HoverImage">
-                    <Texture val="@UI/Storm_NewUser_MasterButton_Hover" layer="0"/>
-                    <Texture val="@UI/Storm_NewUser_MasterButton_Hover" layer="1"/>
-                </Frame>
-                
-                <Frame type="Image" name="ButtonShimmer">
-                    <Anchor relative="$parent/HitTestFrame"/>
+            <Frame type="GlueButton" name="PlayButton" template="StandardTemplates/StandardButtonSmallTemplate">
+                <Anchor side="Top" relative="$parent/ChoiceCasualButton" pos="Max" offset="-40"/>
+                <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+                <Text val="@UI/Play"/>
+                <Alpha val="0"/>
+                <VisibilityOnFade val="true"/>
 
-                    <LayerCount val="2"/>
-                    <BlendMode val="Add"/>
-                    <RenderPriority val="600"/>
-                    <Alpha val="170"/>
-                    
-                    <Texture val="@UI/Storm_NewUser_MasterButtonMask" layer="0"/>
-                    <AlphaLayer val="true" layer="0"/>
-                    <TextureType val="Normal" layer="0"/>
+                <Animation name="FadeAnimation">
+                    <Event event="Show" action="DirectionForward,Play"/>
+                    <Event event="Hide" action="DirectionReverse,Play"/>
 
-                    <Texture val="@UI/Storm_NewUser_ButtonGleamAnim" layer="1"/>
-                    <TextureCoords top="0" left="0" bottom="1" right="1" layer="1"/>
-                    <WrapUV val="False" layer="1"/>
-                </Frame>
+                    <Controller type="Fade" end="Pause">
+                        <Key type="Curve" time="0" value="0" out="Fast"/>
+                        <Key type="Curve" time="0.15" value="255" in="Fast"/>
+                    </Controller>
+                </Animation>
+            </Frame>
+
+            <Frame type="Button" name="CloseButton" template="StandardTemplates/SmallPanelCloseButtonTemplate">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="1"/>
+                <Anchor side="Right" relative="$parent" pos="Max" offset="-3"/>
+                <Visible val="false"/>
+                <Tooltip val="Developer Shortcut (Debug Builds Only)"/>
             </Frame>
         </Frame>
         <!-- QuestionnairePanel -->
@@ -1085,29 +1894,6 @@
 
         <!-- QuestionnairePanel -->
         <Frame type="Frame" name="QuestionnairePanel">
-            <Frame type="Button" name="ChoiceNewButton">
-                <Frame type="Image" name="ButtonShimmer">
-                    <Animation name="ShimmerEffect">
-                        <Event event="OnMouseEnter" action="Reset" frame="$parent"/>
-                        <Event event="OnMouseEnter" action="Play" frame="$parent"/>
-                        <Event event="OnMouseExit" action="Stop" frame="$parent"/>
-                        <Event event="OnMouseExit" action="Reset" frame="$parent"/>
-
-                        <Controller type="LayerUV" layer="1" side="Top" relative="False" sidelock="false" end="Loop">
-                            <Key type="Curve" time="0" value="-1" out="Auto"/>
-                            <Key type="Curve" time="3.0" value="1" in="Auto" out="Auto"/>
-                            <Key type="Curve" time="6.8" value="1" in="Auto" out="Auto"/>
-                        </Controller>
-
-                        <Controller type="LayerUV" layer="1" side="Bottom" relative="False" sidelock="false" end="Loop">
-                            <Key type="Curve" time="0" value="0" out="Auto"/>
-                            <Key type="Curve" time="3.0" value="2" in="Auto" out="Auto"/>
-                            <Key type="Curve" time="6.8" value="2" in="Auto" out="Auto"/>
-                        </Controller>
-                    </Animation>
-                </Frame>
-            </Frame>
-
             <Frame type="Button" name="ChoiceCasualButton">
                 <Frame type="Image" name="ButtonShimmer">
                     <Animation name="ShimmerEffect">
@@ -1132,29 +1918,6 @@
             </Frame>
 
             <Frame type="Button" name="ChoiceVeteranButton">
-                <Frame type="Image" name="ButtonShimmer">
-                    <Animation name="ShimmerEffect">
-                        <Event event="OnMouseEnter" action="Reset" frame="$parent"/>
-                        <Event event="OnMouseEnter" action="Play" frame="$parent"/>
-                        <Event event="OnMouseExit" action="Stop" frame="$parent"/>
-                        <Event event="OnMouseExit" action="Reset" frame="$parent"/>
-
-                        <Controller type="LayerUV" layer="1" side="Top" relative="False" sidelock="false" end="Loop">
-                            <Key type="Curve" time="0" value="-1" out="Auto"/>
-                            <Key type="Curve" time="3.0" value="1" in="Auto" out="Auto"/>
-                            <Key type="Curve" time="6.8" value="1" in="Auto" out="Auto"/>
-                        </Controller>
-
-                        <Controller type="LayerUV" layer="1" side="Bottom" relative="False" sidelock="false" end="Loop">
-                            <Key type="Curve" time="0" value="0" out="Auto"/>
-                            <Key type="Curve" time="3.0" value="2" in="Auto" out="Auto"/>
-                            <Key type="Curve" time="6.8" value="2" in="Auto" out="Auto"/>
-                        </Controller>
-                    </Animation>
-                </Frame>
-            </Frame>
-
-            <Frame type="Button" name="ChoiceMasterButton">
                 <Frame type="Image" name="ButtonShimmer">
                     <Animation name="ShimmerEffect">
                         <Event event="OnMouseEnter" action="Reset" frame="$parent"/>
