@@ -6,6 +6,8 @@
     <Constant name="SocialPanelWidthNegative" val="-422"/>
     <Constant name="SocialPanelHeight" val="550"/>
     <Constant name="SocialPanelHeightNegative" val="-550"/>
+    <Constant name="PartyInvitePanelHeight" val="105"/>
+    <Constant name="PartyInvitePanelHeightNegative" val="-105"/>
     
     <Frame type="GameUI" name="GameUI">
         <Anchor relative="$parent"/>
@@ -613,6 +615,46 @@
                         <Width val="#ChatPanelWidth"/>
                         <Height val="#ChatPanelHeight"/>
                     </Frame>
+                    
+                    <!--
+
+                    <Frame type="EmoticonSelectionPanel" name="EmoticonPanel" template="EmoticonSelectionPanel/EmoticonSelectionPanelTemplate">
+                        <Anchor side="Bottom" relative="$parent/EmoticonButton" pos="Min" offset="5"/>
+                        <Anchor side="Right" relative="$parent/ChatPanel" pos="Min" offset="7"/>
+                        <CollapseLayout val="true"/>
+                    </Frame>
+                    
+                    -->
+
+                    <!-- This property bind actually inserts the selected emoticon into the chat edit box -->
+                    
+                    <!--
+                    
+                    <Frame type="PropertyBind" name="BindEmoticon">
+                        <Anchor relative="$parent/EmoticonPanel"/>
+                        <Source frame="$parent/EmoticonPanel" property="SelectedEmoticon"/>
+                        <Target frame="$parent/ChatPanel" property="InsertEmoticon"/>
+                    </Frame>
+
+                    <Frame type="Button" name="EmoticonButton"  template="EmoticonSelectionPanel/EmoticonButtonTemplate">
+                        <Anchor side="Bottom" relative="$parent/ChatPanel" pos="Max" offset="0"/>
+                        <Anchor side="Right" relative="$parent/ChatPanel" pos="Min" offset="7"/>
+                        <Toggleable val="true"/>
+
+                        <StateGroup name="VisibilityStateGroup">
+                            <State name="VisibleState">
+                                <When type="Property" frame="$this" Toggled="true"/>
+                                <Action type="SetProperty" frame="$parent/EmoticonPanel" Visible="true"/>
+                            </State>
+
+                            <State name="InvisibleState">
+                                <When type="Property" frame="$this" Toggled="false"/>
+                                <Action type="SetProperty" frame="$parent/EmoticonPanel" Visible="false"/>
+                            </State>
+                        </StateGroup>
+                    </Frame>
+                    
+                    -->
                 </Frame>
                 
                 <Frame type="Frame" name="FriendsPanel">
@@ -656,6 +698,46 @@
                             <Action type="SendEvent" frame="$this" event="BottomRight"/>
                         </State>
                     </StateGroup>
+
+                    <Frame type="PartyInvitePanel" name="PartyInvitePanel" template="StandardBattlenetTemplates/PartyInvitePanel">
+                        <Anchor side="Bottom" relative="$parent/SocialPanel" pos="Min" offset="-5"/>
+                        <Anchor side="Right" relative="$parent/SocialPanel" pos="Max" offset="0"/>
+                        <Width val="#SocialPanelWidth"/>
+
+                        <Animation name="SlideIn">
+                            <Controller name="Move" type="Anchor" side="Left" relative="true" end="Pause">
+                                <Key type="Curve" time="0" value="0" out="Fast"/>
+                                <Key type="Curve" time="0.3" value="0" in="Fast"/>
+                            </Controller>
+                        </Animation>
+
+                        <!-- Animations to reanchor the panel when the social button position changes -->
+                        <Animation name="AnchorTop">
+                            <Event event="TopLeft" action="Reset,Play" frame="$parent"/>
+                            <Event event="TopRight" action="Reset,Play" frame="$parent"/>
+
+                            <Controller type="Anchor" side="Top" relative="True" relativeFrame="$parent/SocialPanel" pos="Max" end="Pause">
+                                <Key type="Curve" time="0.0" value="0" out="Auto"/>
+                            </Controller>
+
+                            <Controller type="Anchor" side="Bottom" relative="True" relativeFrame="$parent/SocialPanel" pos="Max" end="Pause">
+                                <Key type="Curve" time="0.0" value="#PartyInvitePanelHeight" out="Auto"/>
+                            </Controller>
+                        </Animation>
+
+                        <Animation name="AnchorBottom">
+                            <Event event="BottomLeft" action="Reset,Play" frame="$parent"/>
+                            <Event event="BottomRight" action="Reset,Stop" frame="$parent"/>
+
+                            <Controller type="Anchor" side="Top" relative="True" relativeFrame="$parent/SocialPanel" pos="Min" end="Pause">
+                                <Key type="Curve" time="0.0" value="#PartyInvitePanelHeightNegative" out="Auto"/>
+                            </Controller>
+
+                            <Controller type="Anchor" side="Bottom" relative="True" relativeFrame="$parent/SocialPanel" pos="Min" end="Pause">
+                                <Key type="Curve" time="0.0" value="0" out="Auto"/>
+                            </Controller>
+                        </Animation>
+                    </Frame>
 
                     <Frame type="SocialPanel" name="SocialPanel" template="GameSocialPanel/SocialPanelTemplate">
                         <Anchor side="Bottom" relative="$parent/$parent/MenuBar" pos="Min" offset="7"/>

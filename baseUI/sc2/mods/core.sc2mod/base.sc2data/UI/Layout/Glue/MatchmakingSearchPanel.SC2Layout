@@ -4,7 +4,7 @@
 
     <Frame type="MatchmakingSearchPanel" name="MatchmakingSearchPanelTemplate">
         <Height val="200"/>
-        <Width val="500"/>
+        <Width val="650"/>
 
         <Animation name="Searching">
             <Event event="Matched" action="Reset, Play"/>
@@ -187,6 +187,16 @@
                 </Controller>
             </Animation>
         </Frame>
+
+        <Animation name="InitializingSearching">
+            <Event event="Searching" action="Reset, Play"/>
+            <Event event="Matched" action="Reset, Stop"/>
+
+            <Controller type="Event" end="Pause">
+                <Key type="Event" time="0.0" event="NoOp"/>
+                <Key type="Event" time="3.0" event="InitializedSearch"/>
+            </Controller>
+        </Animation>
         
         <Frame type="Image" name="SearchingIcon">
             <Anchor side="Top" relative="$parent/SearchInnerCircle" pos="Mid" offset="0"/>
@@ -207,11 +217,28 @@
                 </Controller>
             </Animation>
             
-            <Animation name="Searching">
-                <Event event="Searching" action="Reset, Play" frame="$parent"/>
+            <Animation name="InitializedSearch">
+                <Event event="Searching" action="Reset, Stop" frame="$parent"/>
+                <Event event="InitializedSearch" action="Reset, Play" frame="$parent"/>
 
                 <Controller type="Texture" end="Pause">
-                    <Key type="Image" time="3" image="@UI/Glues_Icons_Holopanel_Searching"/>
+                    <Key type="Image" time="0" image="@UI/Glues_Icons_Holopanel_Searching"/>
+                </Controller>
+            </Animation>
+
+            <Animation name="Connecting">
+                <Event event="Connecting" action="Reset, Play" frame="$parent"/>
+
+                <Controller type="Texture" end="Pause">
+                    <Key type="Image" time="0" image="@UI/Glues_Icons_Holopanel_Initializing"/>
+                </Controller>
+            </Animation>
+
+            <Animation name="Waiting">
+                <Event event="Waiting" action="Reset, Play" frame="$parent"/>
+
+                <Controller type="Texture" end="Pause">
+                    <Key type="Image" time="0" image="@UI/Glues_Icons_Holopanel_Lobby"/>
                 </Controller>
             </Animation>
         </Frame>
@@ -260,6 +287,27 @@
                 </Controller>
             </Animation>
         </Frame>
+
+        <Animation name="MatchedConnecting">
+            <Event event="Matched" action="Reset, Play"/>
+            <Event event="WaitingForPlayers" action="Reset, Stop"/>
+
+            <!-- If we haven't transitioned to the lobby in 3 seconds of matching, switch to display "Connecting" -->
+            <Controller type="Event" end="Pause">
+                <Key type="Event" time="0.0" event="NoOp"/>
+                <Key type="Event" time="3.0" event="Connecting"/>
+            </Controller>
+        </Animation>
+
+        <Animation name="ConnectingWaitingForPlayers">
+            <Event event="WaitingForPlayers" action="Reset, Play"/>
+
+            <!-- Once in the lobby and waiting for players, after 3 seconds show "Waiting" -->
+            <Controller type="Event" end="Pause">
+                <Key type="Event" time="0.0" event="NoOp"/>
+                <Key type="Event" time="3.0" event="Waiting"/>
+            </Controller>
+        </Animation>
         
         <Frame type="Label" name="MatchedLabel">
             <Anchor side="Top" relative="$parent/SearchBackgroundImage" pos="Mid" offset="0"/>
@@ -269,12 +317,32 @@
             <Text val="@UI/MatchmakingSearchPanel/MatchFound"/>
             <Visible val="false"/>
 
-            <Animation name="Searching">
+            <Animation name="Matched">
                 <Event event="Searching" action="Reset, Stop" frame="$parent"/>
                 <Event event="Matched" action="Reset, Play" frame="$parent"/>
 
                 <Controller type="Visibility" end="Pause">
                     <Key type="Bool" time="0" value="True"/>
+                </Controller>
+                
+                <Controller type="Text" end="Pause">
+                    <Key type="Text" time="0" text="@UI/MatchmakingSearchPanel/MatchFound"/>
+                </Controller>
+            </Animation>
+
+            <Animation name="Connecting">
+                <Event event="Connecting" action="Reset, Play" frame="$parent"/>
+
+                <Controller type="Text" end="Pause">
+                    <Key type="Text" time="0" text="@UI/MatchmakingSearchPanel/Connecting"/>
+                </Controller>
+            </Animation>
+
+            <Animation name="Waiting">
+                <Event event="Waiting" action="Reset, Play" frame="$parent"/>
+
+                <Controller type="Text" end="Pause">
+                    <Key type="Text" time="0" text="@UI/MatchmakingSearchPanel/WaitingForPlayers"/>
                 </Controller>
             </Animation>
         </Frame>

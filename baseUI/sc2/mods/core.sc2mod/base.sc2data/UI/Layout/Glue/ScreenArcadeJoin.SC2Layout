@@ -73,8 +73,6 @@
         <!-- Available Animation Events: -->
         <!-- Popular: Game is popular -->
         <!-- NotPopular: Game is not popular -->
-        <!-- IconNotLoaded: Icon is loading -->
-        <!-- IconLoaded: Icon finishes loading -->
 
         <Frame type="Image" name="NormalImage">
             <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
@@ -112,10 +110,6 @@
                     <Key type="Curve" time="0" value="0"/>
                 </Controller>
                 
-                <Controller type="Style" end="Pause" style1="Arcade_ListGenre_Selected" style2="Arcade_ListGenre_Selected" frame="$parent/Genre">
-                    <Key type="Curve" time="0" value="0"/>
-                </Controller>
-                
                 <Controller type="Style" end="Pause" style1="Arcade_ListMode_Selected" style2="Arcade_ListMode_Selected" frame="$parent/Mode">
                     <Key type="Curve" time="0" value="0"/>
                 </Controller>
@@ -126,7 +120,7 @@
             <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
             <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
             <Anchor side="Left" relative="$parent" pos="Min" offset="84"/>
-            <Anchor side="Right" relative="$parent/Genre" pos="Min" offset="-20"/>
+            <Anchor side="Right" relative="$parent/Mode" pos="Min" offset="-20"/>
             <Style val="@Arcade_ListTitle_Normal"/>
             <PreserveAnchorOffset val="True"/>
             <Height val="20"/>
@@ -144,16 +138,6 @@
                 </Controller>
             </Animation>
             -->
-        </Frame>
-
-        <!-- TODO: Hide this label -->
-        <Frame type="Label" name="Genre">
-            <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
-            <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
-            <Anchor side="Right" relative="$parent/Mode" pos="Min" offset="-5"/>
-            <Style val="@Arcade_ListGenre_Normal"/>
-            <CollapseLayout val="True"/>
-            <Visible val="False"/>
         </Frame>
 
         <Frame type="Label" name="Mode">
@@ -174,7 +158,7 @@
             </Animation>
         </Frame>
 
-        <Frame type="Image" name="Icon">
+        <Frame type="BattleMapIcon" name="Icon">
             <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
             <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
             <Anchor side="Left" relative="$parent" pos="Min" offset="6"/>
@@ -182,9 +166,13 @@
             <Height val="40"/>
             <Alpha val="0"/>
 
+            <Frame type="Image" name="Image">
+                <Anchor relative="$parent"/>
+            </Frame>
+
             <Animation name="GameTileListIcon">
-                <Event event="IconNotLoaded" action="Reset,Stop" frame="$parent"/>
-                <Event event="IconLoaded" action="Reset,Play" frame="$parent"/>
+                <Event event="Hide" action="Reset,Stop" frame="$this"/>
+                <Event event="Show" action="Reset,Play" frame="$this"/>
 
                 <Controller type="Fade" end="Pause">
                     <Key type="Curve" time="0.0" value="0" out="Auto"/>
@@ -313,14 +301,12 @@
         </Animation>
     </Frame>
 
-    <Frame type="ScreenArcadeJoin" name="ScreenArcadeJoin">
-        <Anchor relative="$parent"/>
-        <DisplayBackgroundModel val="false"/>
-        <!-- Available Animation Events: -->
-        <!-- Empty: No games were found -->
-        <!-- NotEmpty: Games list populated -->
-        <!-- Loading: Requesting list of games -->
-
+    <Frame type="ArcadeGameListPanel" name="ArcadeGameListPanelTemplate">
+         <!-- Available Animation Events: -->
+         <!-- Empty: No games were found -->
+         <!-- NotEmpty: Games list populated -->
+         <!-- Loading: Requesting list of games -->
+         
         <Frame type="Label" name="TitleLabel">
             <Anchor side="Top" relative="$parent" pos="Min" offset="170"/>
             <Anchor side="Left" relative="$parent" pos="Min" offset="118"/>
@@ -396,6 +382,7 @@
             <Anchor side="Left" relative="$parent/GamesTileList" pos="Min" offset="0"/>
             <Anchor side="Right" relative="$parent/GamesTileList" pos="Max" offset="-14"/>
             <Height val="44"/>
+            <LoseFocusOnEnterOrEsc val="true"/>
             <Tooltip val="@UI/ScreenArcadeJoin/FilterTooltip"/>
             <TooltipAnchorPosition val="TopCenter"/>
             <Insets top="5" left="15" bottom="5" right="30"/>
@@ -409,9 +396,11 @@
                 <StateCount val="1"/>
                 <Tiled val="true"/>
             </Frame>
-            
-            <Frame type="Label" name="Label">
-                <Style val="ArcadeFilterInput"/>
+
+            <Frame type="Frame" name="LabelContainerFrame">
+                <Frame type="Label" name="Label">
+                    <Style val="ArcadeFilterInput"/>
+                </Frame>
             </Frame>
 
             <Frame type="Label" name="SearchTextLabel">
@@ -651,7 +640,7 @@
             </Frame>
         </Frame>
 
-        <Frame type="ArcadeGameInfoPanel" name="GameInfoPanel" template="ArcadeGameInfoPanel/ArcadeGameInfoPanelTemplate">
+        <Frame type="BattleMapInfoPanel" name="GameInfoPanel" template="BattleMapInfoPanel/BattleMapInfoPanelTemplate">
             <Anchor side="Top" relative="$parent/JoinListBG" pos="Min" offset="54"/>
             <Anchor side="Right" relative="$parent/JoinListBG" pos="Max" offset="-22"/>
             <Visible val="False"/>
@@ -833,5 +822,14 @@
                 <Key type="Bool" time="0" value="False"/>
             </Controller>
         </Animation>
+    </Frame>
+
+    <Frame type="ScreenArcadeJoin" name="ScreenArcadeJoin">
+        <Anchor relative="$parent"/>
+        <DisplayBackgroundModel val="false"/>
+
+        <Frame type="ArcadeGameListPanel" name="GameListPanel" template="ScreenArcadeJoin/ArcadeGameListPanelTemplate">
+            <Anchor relative="$parent"/>
+        </Frame>
     </Frame>
 </Desc>

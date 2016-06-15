@@ -1,0 +1,473 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<Desc>
+    <DescFlags val="Locked"/>
+
+    <Frame type="CommanderMasteryTalentFrame" name="CommanderMasteryTalentFrameTemplate">
+        <Height val="72"/>
+        <BatchRankAmount val="5"/>
+
+        <Frame type="Image" name="NormalImage">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+            <Texture val="@UI/Glues_Battlenet_PageAssets_ListItem_Normal"/>
+            <TextureType val="NineSlice"/>
+            <Alpha val="0"/>
+        </Frame>
+
+        <Frame type="Image" name="IconImage">
+            <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="4"/>
+            <Width val="72"/>
+            <Height val="72"/>
+            <AcceptsMouseTooltip val="true"/>
+            <AlphaMaskTexture val="@UI/SC2_UI_Coop_AbilityFrame_Mask"/>
+            <CollapseLayout val="true"/>
+            <Visible val="false"/>
+        </Frame>
+        
+        <Frame type="Image" name="BorderImage">
+            <Anchor relative="$parent/IconImage"/>
+            <Texture val="@UI/SC2_UI_Coop_AbilityFrame"/>
+        </Frame>
+
+        <Frame type="Label" name="NameLabel">
+            <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="16"/>
+            <Width val="280"/>
+            <Style val="@Coop_CommanderMasteryTalentInfo"/>
+        </Frame>
+
+        <Frame type="Frame" name="TooltipAnchorFrame">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+            <Anchor side="Left" relative="$parent/NameLabel" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent/NameLabel" pos="Max" offset="0"/>
+            <AcceptsMouseTooltip val="true"/>
+            <TooltipAnchorPosition val="MiddleLeft"/>
+
+            <Frame type="PropertyBind" name="BindEmoticon">
+                <Anchor relative="$parent"/>
+                <Source frame="$parent/$parent/IconImage" property="Tooltip"/>
+                <Target frame="$parent" property="Tooltip"/>
+            </Frame>
+        </Frame>
+
+        <Frame type="Label" name="ValueLabel">
+            <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Mid" offset="69"/>
+            <Anchor side="Right" relative="$parent" pos="Mid" offset="69"/>
+            <Style val="@Coop_CommanderMasteryTalentInfoCentered"/>
+        </Frame>
+
+        <Frame type="Label" name="RankLabel">
+            <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent/DecrementButton" pos="Min" offset="-9"/>
+            <Style val="@Coop_CommanderMasteryTalentInfo"/>
+        </Frame>
+
+        <Frame type="Button" name="DecrementButton" template="StandardBattlenetTemplates/BattlenetSquareIconButtonTemplate">
+            <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent/IncrementButton" pos="Min" offset="-1"/>
+            
+            <Frame type="Image" name="Icon">
+                <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+                <Texture val="@UI/SC2_UI_Coop_MasteryIcons_Decrement"/>
+                <DesaturateOnDisable val="false"/>
+                
+                <Animation name="Disabled">
+                    <Event event="OnDisabled" action="Reset,Play" frame="$parent"/>
+                    <Event event="OnEnabled" action="Reset" frame="$parent"/>
+                    
+                    <Controller type="Texture" end="Pause">
+                        <Key type="Image" time="0" image="@UI/SC2_UI_Coop_MasteryIcons_Decrement_Disabled"/>
+                    </Controller>
+                </Animation>
+            </Frame>
+        </Frame>
+
+        <Frame type="Button" name="IncrementButton" template="StandardBattlenetTemplates/BattlenetSquareIconButtonTemplate">
+            <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="-7"/>
+            
+            <Frame type="Image" name="Icon">
+                <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+                <Texture val="@UI/SC2_UI_Coop_MasteryIcons_Increment"/>
+                <DesaturateOnDisable val="false"/>
+                
+                <Animation name="Disabled">
+                    <Event event="OnDisabled" action="Reset,Play" frame="$parent"/>
+                    <Event event="OnEnabled" action="Reset" frame="$parent"/>
+                    
+                    <Controller type="Texture" end="Pause">
+                        <Key type="Image" time="0" image="@UI/SC2_UI_Coop_MasteryIcons_Increment_Disabled"/>
+                    </Controller>
+                </Animation>
+            </Frame>
+        </Frame>
+
+        <StateGroup name="RankStateGroup">
+            <State name="NoRankState">
+                <When type="AnimationState" frame="$this" RankState="NoRank"/>
+                <Action type="SetProperty" frame="DecrementButton" Enabled="false"/>
+                <Action type="SetProperty" frame="IncrementButton" Enabled="false"/>
+            </State>
+            
+            <State name="AllSpentMinRankState">
+                <When type="AnimationState" frame="$this" RankState="MinRank"/>
+                <When type="AnimationState" frame="$this" BucketState="AllSpent"/>
+                <Action type="SetProperty" frame="DecrementButton" Enabled="false"/>
+                <Action type="SetProperty" frame="IncrementButton" Enabled="false"/>
+            </State>
+            
+            <State name="AllSpentState">
+                <When type="AnimationState" frame="$this" BucketState="AllSpent"/>
+                <Action type="SetProperty" frame="DecrementButton" Enabled="true"/>
+                <Action type="SetProperty" frame="IncrementButton" Enabled="false"/>
+            </State>
+            
+            <State name="MinRankState">
+                <When type="AnimationState" frame="$this" RankState="MinRank"/>
+                <Action type="SetProperty" frame="DecrementButton" Enabled="false"/>
+                <Action type="SetProperty" frame="IncrementButton" Enabled="true"/>
+            </State>
+            
+            <State name="MidRankState">
+                <When type="AnimationState" frame="$this" RankState="MidRank"/>
+                <Action type="SetProperty" frame="DecrementButton" Enabled="true"/>
+                <Action type="SetProperty" frame="IncrementButton" Enabled="true"/>
+            </State>
+            
+            <State name="MaxRankState">
+                <When type="AnimationState" frame="$this" RankState="MaxRank"/>
+                <Action type="SetProperty" frame="DecrementButton" Enabled="true"/>
+                <Action type="SetProperty" frame="IncrementButton" Enabled="false"/>
+            </State>
+        </StateGroup>
+    </Frame>
+
+    <Frame type="CommanderMasterySelectionPanel" name="CommanderMasterySelectionPanelTemplate">
+        <!-- This tooltip is just for blocking tooltips behind this panel -->
+        <Frame type="StandardTooltip" name="CoopCampaignTooltip">
+            <Frame type="Label" name="Label">
+                <Anchor relative="$parent"/>
+            </Frame>
+        </Frame>
+
+        <Frame type="Image" name="FullscreenBlackoutImage">
+            <Anchor relative="$parent"/>
+            <Color val="0,0,0"/>
+            <Alpha val="180"/>
+            <AcceptsMouse val="true"/>
+            <TooltipFrame val="CoopCampaignTooltip"/>
+        </Frame>
+        
+        <Frame type="Image" name="LeftBGGlowPattern">
+            <Anchor side="Top" relative="$parent/BackgroundImage" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent/BackgroundImage" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent/BackgroundImage" pos="Min" offset="40"/>
+            <Texture val="@UI/Glues_Battlenet_DialogBox_BackGlow"/>
+        </Frame>
+        
+        <Frame type="Image" name="RightBGGlowPattern">
+            <Anchor side="Top" relative="$parent/BackgroundImage" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent/BackgroundImage" pos="Mid" offset="0"/>
+            <Anchor side="Left" relative="$parent/BackgroundImage" pos="Max" offset="-40"/>
+            <Texture val="@UI/Glues_Battlenet_DialogBox_BackGlow"/>
+            <TextureCoords top="0.0" left="1.0" bottom="1.0" right="0.0"/>
+        </Frame>
+
+        <Frame type="Image" name="BackgroundImage">
+            <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+            <Texture val="@UI/Glues_Battlenet_DialogBox_BG"/>
+            <TextureType val="HorizontalBorder"/>
+            <Tiled val="false"/>
+            <Width val="782"/>
+            <Height val="950"/>
+        </Frame>
+        
+        <Frame type="Image" name="TopHexPattern">
+            <Anchor side="Top" relative="$parent/BackgroundImage" pos="Min" offset="11"/>
+            <Anchor side="Left" relative="$parent/BackgroundImage" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent/BackgroundImage" pos="Mid" offset="0"/>
+            <Texture val="@UI/Glues_Battlenet_DialogBox_HexPattern"/>
+        </Frame>
+        
+        <Frame type="Image" name="BottomHexPattern">
+            <Anchor side="Bottom" relative="$parent/BackgroundImage" pos="Max" offset="-11"/>
+            <Anchor side="Left" relative="$parent/BackgroundImage" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent/BackgroundImage" pos="Mid" offset="0"/>
+            <Texture val="@UI/Glues_Battlenet_DialogBox_HexPattern"/>
+            <TextureCoords top="1.0" left="1.0" bottom="0.0" right="0.0"/>
+        </Frame>
+
+        <Frame type="Label" name="TitleLabel">
+            <Anchor side="Top" relative="$parent/BackgroundImage" pos="Min" offset="46"/>
+            <Anchor side="Left" relative="$parent/BackgroundImage" pos="Min" offset="30"/>
+            <Anchor side="Right" relative="$parent/BackgroundImage" pos="Max" offset="-30"/>
+            <Style val="@BattlenetDialogTitle"/>
+        </Frame>
+
+        <Frame type="Label" name="DescriptionLabel">
+            <Anchor side="Top" relative="$parent/TitleLabel" pos="Max" offset="0"/>
+            <Anchor side="Left" relative="$parent/BackgroundImage" pos="Min" offset="30"/>
+            <Anchor side="Right" relative="$parent/BackgroundImage" pos="Max" offset="-30"/>
+            <Style val="@Coop_CommanderMasterySubtitle"/>
+            <Text val="@UI/CommanderMasterySelectionPanel/Description"/>
+        </Frame>
+
+        <Frame type="ProgressBar" name="MasteryLevelProgressBar">
+            <Anchor side="Top" relative="$parent/DescriptionLabel" pos="Max" offset="17"/>
+            <Anchor side="Right" relative="$parent/ListBackground0" pos="Max" offset="-19"/>
+            <Width val="626"/>
+            <Height val="25"/>
+            <Color val="FFFFFF"/>
+            <ColorStep val="FFFFFF"/>
+            <UseFillContainer val="true"/>
+            <!-- <Color val="##StandardProgressBorder"/>
+            <ColorStep val="##StandardProgressFill"/> -->
+
+            <Frame type="Image" name="BorderImage">
+                <Anchor relative="$parent"/>
+                <Texture val="@UI/SC2_UI_Coop_Mastery_XP"/>
+                <TextureCoords top="0.0" left="0.0" right="1.0" bottom="0.5"/>
+            </Frame>
+
+            <Frame type="Frame" name="FillImageContainer">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+
+                <Frame type="Image" name="FillImage">
+                    <Anchor relative="$parent/$parent"/>
+                    <Texture val="@UI/SC2_UI_Coop_Mastery_XP"/>
+                    <TextureCoords top="0.5" left="0.0" right="1.0" bottom="1.0"/>
+                </Frame>
+            </Frame>
+        </Frame>
+        
+        <Frame type="CommanderMasteryLevelFrame" name="MasteryLevelFrame" template="CommanderMasteryLevelFrame/CommanderMasteryLevelFrameTemplate">
+            <Anchor side="Top" relative="$parent/MasteryLevelProgressBar" pos="Mid" offset="12"/>
+            <Anchor side="Bottom" relative="$parent/MasteryLevelProgressBar" pos="Mid" offset="12"/>
+            <Anchor side="Right" relative="$parent/MasteryLevelProgressBar" pos="Min" offset="4"/>
+        </Frame>
+
+        <Frame type="Label" name="MasteryExperienceLabel">
+            <Anchor side="Top" relative="$parent/MasteryLevelProgressBar" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent/MasteryLevelProgressBar" pos="Mid" offset="0"/>
+            <Anchor side="Left" relative="$parent/MasteryLevelProgressBar" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent/MasteryLevelProgressBar" pos="Mid" offset="0"/>
+            <Style val="@Coop_CommanderMasteryXP"/>
+        </Frame>
+
+        <Frame type="Button" name="ResetButton" template="StandardBattlenetTemplates/BattlenetSmallButtonTemplate">
+            <Anchor side="Bottom" relative="$parent/ListBackground0" pos="Min" offset="-10"/>
+            <Anchor side="Right" relative="$parent/ListBackground0" pos="Max" offset="0"/>
+            <Text val="@UI/CommanderMasterySelectionPanel/Reset"/>
+            <Visible val="False"/>
+        </Frame>
+
+        <Frame type="Label" name="MaxRankLabel">
+            <Anchor side="Bottom" relative="$parent/ListBackground0" pos="Min" offset="-12"/>
+            <Anchor side="Left" relative="$parent/BackgroundImage" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent/BackgroundImage" pos="Mid" offset="0"/>
+            <Style val="@Coop_CommanderMasteryInfoHeader"/>
+        </Frame>
+
+        <Frame type="Image" name="ListBackground0">
+            <Anchor side="Top" relative="$parent/BackgroundImage" pos="Min" offset="203"/>
+            <Anchor side="Left" relative="$parent/BackgroundImage" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent/BackgroundImage" pos="Mid" offset="0"/>
+            <Width val="712"/>
+            <Height val="204"/>
+            <Texture val="@UI/Glues_Battlenet_PageAssets_ContainerBorder"/>
+            <TextureType val="NineSlice"/>
+        </Frame>
+        
+        <Frame type="Image" name="ListDivider0">
+            <Anchor side="Top" relative="$parent/ListBackground0" pos="Mid" offset="19"/>
+            <Anchor side="Bottom" relative="$parent/ListBackground0" pos="Mid" offset="19"/>
+            <Anchor side="Left" relative="$parent/ListBackground0" pos="Min" offset="2"/>
+            <Anchor side="Right" relative="$parent/ListBackground0" pos="Max" offset="-2"/>
+            <Height val="2"/>
+            <Color val="11,49,88"/>
+            <Alpha val="127"/>
+        </Frame>
+
+        <Frame type="Image" name="ListHeader0">
+            <Anchor side="Top" relative="$parent/ListBackground0" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent/ListBackground0" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent/ListBackground0" pos="Max" offset="0"/>
+            <Texture val="@UI/Glues_Battlenet_PageAssets_ContainerHeader"/>
+            <TextureType val="NineSlice"/>
+            <Height val="40"/>
+        </Frame>
+
+        <Frame type="Label" name="HeaderTitle0">
+            <Anchor side="Top" relative="$parent/ListHeader0" pos="Mid" offset="1"/>
+            <Anchor side="Bottom" relative="$parent/ListHeader0" pos="Mid" offset="1"/>
+            <Anchor side="Left" relative="$parent/ListHeader0" pos="Min" offset="15"/>
+            <Style val="@Coop_CommanderMasteryInfoHeader"/>
+            <Text val="@UI/CommanderMasterySelectionPanel/HeaderTitle0"/>
+        </Frame>
+
+        <Frame type="CommanderMasteryTalentFrame" name="TalentFrame0" template="CommanderMasterySelectionPanel/CommanderMasteryTalentFrameTemplate">
+            <Anchor side="Top" relative="$parent/ListHeader0" pos="Max" offset="5"/>
+            <Anchor side="Left" relative="$parent/ListBackground0" pos="Min" offset="5"/>
+            <Anchor side="Right" relative="$parent/ListBackground0" pos="Max" offset="-5"/>
+        </Frame>
+
+        <Frame type="CommanderMasteryTalentFrame" name="TalentFrame1" template="CommanderMasterySelectionPanel/CommanderMasteryTalentFrameTemplate">
+            <Anchor side="Top" relative="$parent/TalentFrame0" pos="Max" offset="8"/>
+            <Anchor side="Left" relative="$parent/ListBackground0" pos="Min" offset="5"/>
+            <Anchor side="Right" relative="$parent/ListBackground0" pos="Max" offset="-5"/>
+        </Frame>
+        
+        <Frame type="Image" name="ListBackground1">
+            <Anchor side="Top" relative="$parent/ListBackground0" pos="Max" offset="8"/>
+            <Anchor side="Left" relative="$parent/ListBackground0" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent/ListBackground0" pos="Max" offset="0"/>
+            <Height val="204"/>
+            <Texture val="@UI/Glues_Battlenet_PageAssets_ContainerBorder"/>
+            <TextureType val="NineSlice"/>
+        </Frame>
+        
+        <Frame type="Image" name="ListDivider1">
+            <Anchor side="Top" relative="$parent/ListBackground1" pos="Mid" offset="19"/>
+            <Anchor side="Bottom" relative="$parent/ListBackground1" pos="Mid" offset="19"/>
+            <Anchor side="Left" relative="$parent/ListBackground1" pos="Min" offset="2"/>
+            <Anchor side="Right" relative="$parent/ListBackground1" pos="Max" offset="-2"/>
+            <Height val="2"/>
+            <Color val="11,49,88"/>
+            <Alpha val="127"/>
+        </Frame>
+
+        <Frame type="Image" name="ListHeader1">
+            <Anchor side="Top" relative="$parent/ListBackground1" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent/ListBackground1" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent/ListBackground1" pos="Max" offset="0"/>
+            <Texture val="@UI/Glues_Battlenet_PageAssets_ContainerHeader"/>
+            <TextureType val="NineSlice"/>
+            <Height val="40"/>
+        </Frame>
+
+        <Frame type="Label" name="HeaderTitle1">
+            <Anchor side="Top" relative="$parent/ListHeader1" pos="Mid" offset="1"/>
+            <Anchor side="Bottom" relative="$parent/ListHeader1" pos="Mid" offset="1"/>
+            <Anchor side="Left" relative="$parent/ListHeader1" pos="Min" offset="15"/>
+            <Style val="@Coop_CommanderMasteryInfoHeader"/>
+            <Text val="@UI/CommanderMasterySelectionPanel/HeaderTitle1"/>
+        </Frame>
+
+        <Frame type="CommanderMasteryTalentFrame" name="TalentFrame2" template="CommanderMasterySelectionPanel/CommanderMasteryTalentFrameTemplate">
+            <Anchor side="Top" relative="$parent/ListHeader1" pos="Max" offset="5"/>
+            <Anchor side="Left" relative="$parent/ListBackground1" pos="Min" offset="5"/>
+            <Anchor side="Right" relative="$parent/ListBackground1" pos="Max" offset="-5"/>
+        </Frame>
+
+        <Frame type="CommanderMasteryTalentFrame" name="TalentFrame3" template="CommanderMasterySelectionPanel/CommanderMasteryTalentFrameTemplate">
+            <Anchor side="Top" relative="$parent/TalentFrame2" pos="Max" offset="8"/>
+            <Anchor side="Left" relative="$parent/ListBackground1" pos="Min" offset="5"/>
+            <Anchor side="Right" relative="$parent/ListBackground1" pos="Max" offset="-5"/>
+        </Frame>
+        
+        <Frame type="Image" name="ListBackground2">
+            <Anchor side="Top" relative="$parent/ListBackground1" pos="Max" offset="8"/>
+            <Anchor side="Left" relative="$parent/ListBackground0" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent/ListBackground0" pos="Max" offset="0"/>
+            <Height val="204"/>
+            <Texture val="@UI/Glues_Battlenet_PageAssets_ContainerBorder"/>
+            <TextureType val="NineSlice"/>
+        </Frame>
+        
+        <Frame type="Image" name="ListDivider2">
+            <Anchor side="Top" relative="$parent/ListBackground2" pos="Mid" offset="19"/>
+            <Anchor side="Bottom" relative="$parent/ListBackground2" pos="Mid" offset="19"/>
+            <Anchor side="Left" relative="$parent/ListBackground2" pos="Min" offset="2"/>
+            <Anchor side="Right" relative="$parent/ListBackground2" pos="Max" offset="-2"/>
+            <Height val="2"/>
+            <Color val="11,49,88"/>
+            <Alpha val="127"/>
+        </Frame>
+
+        <Frame type="Image" name="ListHeader2">
+            <Anchor side="Top" relative="$parent/ListBackground2" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent/ListBackground2" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent/ListBackground2" pos="Max" offset="0"/>
+            <Texture val="@UI/Glues_Battlenet_PageAssets_ContainerHeader"/>
+            <TextureType val="NineSlice"/>
+            <Height val="40"/>
+        </Frame>
+
+        <Frame type="Label" name="HeaderTitle2">
+            <Anchor side="Top" relative="$parent/ListHeader2" pos="Mid" offset="1"/>
+            <Anchor side="Bottom" relative="$parent/ListHeader2" pos="Mid" offset="1"/>
+            <Anchor side="Left" relative="$parent/ListHeader2" pos="Min" offset="15"/>
+            <Style val="@Coop_CommanderMasteryInfoHeader"/>
+            <Text val="@UI/CommanderMasterySelectionPanel/HeaderTitle2"/>
+        </Frame>
+
+        <Frame type="CommanderMasteryTalentFrame" name="TalentFrame4" template="CommanderMasterySelectionPanel/CommanderMasteryTalentFrameTemplate">
+            <Anchor side="Top" relative="$parent/ListHeader2" pos="Max" offset="5"/>
+            <Anchor side="Left" relative="$parent/ListBackground2" pos="Min" offset="5"/>
+            <Anchor side="Right" relative="$parent/ListBackground2" pos="Max" offset="-5"/>
+        </Frame>
+
+        <Frame type="CommanderMasteryTalentFrame" name="TalentFrame5" template="CommanderMasterySelectionPanel/CommanderMasteryTalentFrameTemplate">
+            <Anchor side="Top" relative="$parent/TalentFrame4" pos="Max" offset="8"/>
+            <Anchor side="Left" relative="$parent/ListBackground2" pos="Min" offset="5"/>
+            <Anchor side="Right" relative="$parent/ListBackground2" pos="Max" offset="-5"/>
+        </Frame>
+
+        <Frame type="Label" name="RemainingRankLabel0">
+            <Anchor side="Top" relative="$parent/ListHeader0" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent/ListHeader0" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent/ListHeader0" pos="Max" offset="-10"/>
+            <Style val="@Coop_CommanderMasteryTalentInfo"/>
+        </Frame>
+
+        <Frame type="Label" name="RemainingRankLabel1">
+            <Anchor side="Top" relative="$parent/ListHeader1" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent/ListHeader1" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent/ListHeader1" pos="Max" offset="-10"/>
+            <Style val="@Coop_CommanderMasteryTalentInfo"/>
+        </Frame>
+
+        <Frame type="Label" name="RemainingRankLabel2">
+            <Anchor side="Top" relative="$parent/ListHeader2" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent/ListHeader2" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent/ListHeader2" pos="Max" offset="-10"/>
+            <Style val="@Coop_CommanderMasteryTalentInfo"/>
+        </Frame>
+
+        <Frame type="Button" name="AcceptButton" template="StandardBattlenetTemplates/BattlenetAlternateButtonTemplate">
+            <Anchor side="Bottom" relative="$parent/BackgroundImage" pos="Max" offset="-35"/>
+            <Anchor side="Right" relative="$parent/BackgroundImage" pos="Mid" offset="-3"/>
+            <Text val="@UI/StandardDialog_Ok_Control"/>
+            <Shortcut val="@UI/StandardDialog_Enter_Hotkey"/>
+        </Frame>
+
+        <Frame type="Button" name="CancelButton" template="StandardBattlenetTemplates/BattlenetStandardButtonTemplate">
+            <Anchor side="Bottom" relative="$parent/AcceptButton" pos="Max" offset="0"/>
+            <Anchor side="Left" relative="$parent/BackgroundImage" pos="Mid" offset="3"/>
+            <Text val="@UI/StandardDialog_Cancel_Control"/>
+            <Shortcut val="@UI/ScreenNavigationBack_Hotkey"/>
+        </Frame>
+    </Frame>
+</Desc>

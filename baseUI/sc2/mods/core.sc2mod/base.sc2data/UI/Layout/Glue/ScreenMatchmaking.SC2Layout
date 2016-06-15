@@ -154,78 +154,113 @@
             <Anchor side="Top" relative="$parent" pos="Min" offset="170"/>
             <Anchor side="Left" relative="$parent" pos="Min" offset="118"/>
             <Style val="@Tournament_Title"/>
-            
-            <Animation name="ModeState0">
-                <Event event="Mode0" action="Reset,Play" frame="$parent"/>
 
-                <Controller type="Text" end="Pause">
-                    <Key type="Text" time="0" text="@UI/ScreenMultiplayer/TrainingButton"/>
-                </Controller>
-            </Animation>
+            <StateGroup name="MatchmakingTitleStateGroup">
+                <State name="TrainingState">
+                    <When type="AnimationState" frame="$parent" ModeState="ModeTraining"/>
+                    <Action type="SetProperty" frame="$this" Text="@UI/ScreenMultiplayer/TrainingButton"/>
+                </State>
+                
+                <State name="VersusAIState">
+                    <When type="AnimationState" frame="$parent" ModeState="ModeVersusAI"/>
+                    <Action type="SetProperty" frame="$this" Text="@UI/ScreenMultiplayer/VersusAIButton"/>
+                </State>
 
-            <Animation name="ModeState1">
-                <Event event="Mode1" action="Reset,Play" frame="$parent"/>
+                <State name="UnrankedState">
+                    <When type="AnimationState" frame="$parent" ModeState="ModeUnranked"/>
+                    <Action type="SetProperty" frame="$this" Text="@UI/ScreenMultiplayer/UnrankedButton"/>
+                </State>
 
-                <Controller type="Text" end="Pause">
-                    <Key type="Text" time="0" text="@UI/ScreenMultiplayer/VersusAIButton"/>
-                </Controller>
-            </Animation>
-
-            <Animation name="ModeState2">
-                <Event event="Mode2" action="Reset,Play" frame="$parent"/>
-
-                <Controller type="Text" end="Pause">
-                    <Key type="Text" time="0" text="@UI/ScreenMultiplayer/UnrankedButton"/>
-                </Controller>
-            </Animation>
-
-            <Animation name="ModeState3">
-                <Event event="Mode3" action="Reset,Play" frame="$parent"/>
-
-                <Controller type="Text" end="Pause">
-                    <Key type="Text" time="0" text="@UI/ScreenMultiplayer/RankedButton"/>
-                </Controller>
-            </Animation>
+                <State name="RankedState">
+                    <When type="AnimationState" frame="$parent" ModeState="ModeRanked"/>
+                    <Action type="SetProperty" frame="$this" Text="@UI/ScreenMultiplayer/RankedButton"/>
+                </State>
+            </StateGroup>
         </Frame>
         
         <Frame type="Label" name="SubtitleLabel">
             <Anchor side="Top" relative="$parent/TitleLabel" pos="Max" offset="8"/>
             <Anchor side="Left" relative="$parent/TitleLabel" pos="Min" offset="-2"/>
             <Style val="@Tournament_Subtitle"/>
+            
+            <StateGroup name="MatchmakingSubtitleStateGroup">
+                <State name="TrainingState">
+                    <When type="AnimationState" frame="$parent" ModeState="ModeTraining"/>
+                    <Action type="SetProperty" frame="$this" Text="@UI/ScreenMatchmaking/TrainingDescription"/>
+                </State>
 
-            <Animation name="ModeState0">
-                <Event event="Mode0" action="Reset,Play" frame="$parent"/>
+                <State name="VersusAIState">
+                    <When type="AnimationState" frame="$parent" ModeState="ModeVersusAI"/>
+                    <Action type="SetProperty" frame="$this" Text="@UI/ScreenMatchmaking/VersusAIDescription"/>
+                </State>
 
-                <Controller type="Text" end="Pause">
-                    <Key type="Text" time="0" text="@UI/ScreenMatchmaking/TrainingDescription"/>
-                </Controller>
-            </Animation>
+                <State name="UnrankedState">
+                    <When type="AnimationState" frame="$parent" ModeState="ModeUnranked"/>
+                    <Action type="SetProperty" frame="$this" Text="@UI/ScreenMatchmaking/UnrankedDescription"/>
+                </State>
 
-            <Animation name="ModeState1">
-                <Event event="Mode1" action="Reset,Play" frame="$parent"/>
-
-                <Controller type="Text" end="Pause">
-                    <Key type="Text" time="0" text="@UI/ScreenMatchmaking/VersusAIDescription"/>
-                </Controller>
-            </Animation>
-
-            <Animation name="ModeState2">
-                <Event event="Mode2" action="Reset,Play" frame="$parent"/>
-
-                <Controller type="Text" end="Pause">
-                    <Key type="Text" time="0" text="@UI/ScreenMatchmaking/UnrankedDescription"/>
-                </Controller>
-            </Animation>
-
-            <Animation name="ModeState3">
-                <Event event="Mode3" action="Reset,Play" frame="$parent"/>
-
-                <Controller type="Text" end="Pause">
-                    <Key type="Text" time="0" text="@UI/ScreenMatchmaking/RankedDescription"/>
-                </Controller>
-            </Animation>
+                <State name="RankedState">
+                    <When type="AnimationState" frame="$parent" ModeState="ModeRanked"/>
+                    <Action type="SetProperty" frame="$this" Text="@UI/ScreenMatchmaking/RankedDescription"/>
+                </State>
+            </StateGroup>
         </Frame>
 
+        <Frame type="Frame" name="LoadingFrame">
+            <Anchor relative="$parent"/>
+
+            <Frame type="Frame" name="IdleSpinner" template="StandardBattlenetTemplates/IdleSpinnerTemplate">
+                <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+                <Visible val="false"/>
+
+                <Animation name="StateLoading">
+                    <Event event="Loading" action="Reset,Play" frame="$parent/$parent"/>
+                    <Event event="Loaded" action="Reset,Stop" frame="$parent/$parent"/>
+
+                    <Controller type="Visibility" end="Pause">
+                        <Key type="Bool" time="0" value="false"/>
+                        <Key type="Bool" time="1.5" value="true"/>
+                        <Key type="Bool" time="6" value="false"/>
+                    </Controller>
+
+                    <Controller type="Fade" end="Pause">
+                        <Key type="Curve" time="0" value="0" out="Fast"/>
+                        <Key type="Curve" time="1.5" value="0" out="Fast"/>
+                        <Key type="Curve" time="1.8" value="255" out="Fast"/>
+                    </Controller>
+                </Animation>
+            </Frame>
+
+            <Frame type="Label" name="NoQueuesLabel">
+                <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+                <Visible val="false"/>
+                <Style val="@Arcade_ListError"/>
+                <Text val="@UI/ScreenMatchmaking/NoQueues"/>
+
+                <Animation name="StateLoading">
+                    <Event event="Loading" action="Reset,Play" frame="$parent/$parent"/>
+                    <Event event="Loaded" action="Reset,Stop" frame="$parent/$parent"/>
+
+                    <Controller type="Visibility" end="Pause">
+                        <Key type="Bool" time="0" value="false"/>
+                        <Key type="Bool" time="6" value="true"/>
+                    </Controller>
+
+                    <Controller type="Fade" end="Pause">
+                        <Key type="Curve" time="0" value="0" out="Fast"/>
+                        <Key type="Curve" time="6" value="0" out="Fast"/>
+                        <Key type="Curve" time="6.3" value="255" out="Fast"/>
+                    </Controller>
+                </Animation>
+            </Frame>
+        </Frame>
+        
         <Frame type="Frame" name="ContainerFrame">
             <Anchor relative="$parent"/>
             <Alpha val="0"/>
@@ -346,7 +381,7 @@
                 
                 <State name="SelectedModeTraining">
                     <When type="AnimationState" frame="$parent" SelectionState="Selected"/>
-                    <When type="AnimationState" frame="$parent" ModeState="Mode0"/>
+                    <When type="AnimationState" frame="$parent" ModeState="ModeTraining"/>
                     <Action type="SetProperty" frame="LeaguePanel" visible="false"/>
                     <Action type="SetProperty" frame="VersusAIPanel" visible="false"/>
                     <Action type="SetProperty" frame="QueueInfoPanel" visible="true"/>
@@ -354,7 +389,7 @@
 
                 <State name="SelectedModeVersusAI">
                     <When type="AnimationState" frame="$parent" SelectionState="Selected"/>
-                    <When type="AnimationState" frame="$parent" ModeState="Mode1"/>
+                    <When type="AnimationState" frame="$parent" ModeState="ModeVersusAI"/>
                     <Action type="SetProperty" frame="LeaguePanel" visible="false"/>
                     <Action type="SetProperty" frame="VersusAIPanel" visible="true"/>
                     <Action type="SetProperty" frame="QueueInfoPanel" visible="false"/>
@@ -362,7 +397,7 @@
 
                 <State name="SelectedModeUnranked">
                     <When type="AnimationState" frame="$parent" SelectionState="Selected"/>
-                    <When type="AnimationState" frame="$parent" ModeState="Mode2"/>
+                    <When type="AnimationState" frame="$parent" ModeState="ModeUnranked"/>
                     <Action type="SetProperty" frame="LeaguePanel" visible="false"/>
                     <Action type="SetProperty" frame="VersusAIPanel" visible="false"/>
                     <Action type="SetProperty" frame="QueueInfoPanel" visible="false"/>
@@ -370,7 +405,7 @@
 
                 <State name="SelectedModeRanked">
                     <When type="AnimationState" frame="$parent" SelectionState="Selected"/>
-                    <When type="AnimationState" frame="$parent" ModeState="Mode3"/>
+                    <When type="AnimationState" frame="$parent" ModeState="ModeRanked"/>
                     <Action type="SetProperty" frame="LeaguePanel" visible="true"/>
                     <Action type="SetProperty" frame="VersusAIPanel" visible="false"/>
                     <Action type="SetProperty" frame="QueueInfoPanel" visible="false"/>
@@ -471,10 +506,10 @@
                 <CollapseLayout val="true"/>
 
                 <Animation name="ModeState">
-                    <Event event="Mode0" action="Reset,Stop" frame="$parent/$parent"/>
-                    <Event event="Mode1" action="Reset,Stop" frame="$parent/$parent"/>
-                    <Event event="Mode2" action="Reset,Play" frame="$parent/$parent"/>
-                    <Event event="Mode3" action="Reset,Play" frame="$parent/$parent"/>
+                    <Event event="ModeTraining" action="Reset,Stop" frame="$parent/$parent"/>
+                    <Event event="ModeVersusAI" action="Reset,Stop" frame="$parent/$parent"/>
+                    <Event event="ModeUnranked" action="Reset,Play" frame="$parent/$parent"/>
+                    <Event event="ModeRanked" action="Reset,Play" frame="$parent/$parent"/>
 
                     <Controller name="Visibility" type="Visibility" end="Pause">
                         <Key type="Bool" time="0.0" value="true"/>

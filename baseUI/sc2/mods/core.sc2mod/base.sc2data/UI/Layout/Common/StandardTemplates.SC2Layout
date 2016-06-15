@@ -373,10 +373,13 @@
             <Tiled val="true" layer="0"/>
         </Frame>
 
-        <Frame type="Label" name="Label">
+        <Frame type="Frame" name="LabelContainerFrame">
             <Anchor relative="$parent"/>
-            <Style val="GlueEditBox"/>
-            <Options val="Ellipsis | IgnoreFormatTags"/>
+            <Frame type="Label" name="Label">
+                <Anchor relative="$parent"/>
+                <Style val="GlueEditBox"/>
+                <Options val="Ellipsis | IgnoreFormatTags"/>
+            </Frame>
         </Frame>
     </Frame>
 
@@ -2731,6 +2734,302 @@
                     <Key type="Bool" time="0" value="true"/>
                 </Controller>
             </Animation>
+        </Frame>
+    </Frame>
+
+    <!-- Example layout for achievement tooltip -->
+    <Frame type="UnlockableFrame" name="AchievementInfoUnlockableFrameTemplate">
+        <Height val="50"/>
+        <Width val="50"/>
+        <CollapseLayout val="true"/>
+
+        <Frame type="Image" name="UnlockableImage">
+            <Anchor relative="$parent"/>
+        </Frame>
+    </Frame>
+
+    <Frame type="AchievementInfoFrame" name="AchievementInfoFrameTemplate">
+        <Width val="500"/>
+        <Anchor side="Bottom" relative="$this/RewardLabel" pos="Max" offset="0"/>
+
+        <Frame type="Image" name="Icon">
+            <Width val="70"/>
+            <Height val="70"/>
+            <Anchor side="Top" relative="$parent" pos="Min" offset="9"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="9"/>
+        </Frame>
+
+        <Frame type="Label" name="Title">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="9"/>
+            <Anchor side="Left" relative="$parent/Icon" pos="Max" offset="9"/>
+        </Frame>
+
+        <Frame type="Label" name="Description">
+            <Anchor side="Top" relative="$parent/Title" pos="Max" offset="3"/>
+            <Anchor side="Left" relative="$parent/Title" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="-9"/>
+        </Frame>
+
+        <Frame type="Label" name="CompletionLabel">
+            <Anchor side="Top" relative="$parent/Description" pos="Max" offset="20"/>
+            <Anchor side="Left" relative="$parent/Description" pos="Min" offset="0"/>
+        </Frame>
+
+        <Frame type="Label" name="PointsLabel">
+            <Anchor side="Top" relative="$parent/Icon" pos="Max" offset="9"/>
+            <Anchor side="Left" relative="$parent/Icon" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent/Icon" pos="Mid" offset="0"/>
+        </Frame>
+
+        <Frame type="UnlockableFrame" name="UnlockableFrame0" template="StandardTemplates/AchievementInfoUnlockableFrameTemplate">
+            <Anchor side="Top" relative="$parent/CompletionLabel" pos="Max" offset="20"/>
+            <Anchor side="Left" relative="$parent/CompletionLabel" pos="Min" offset="0"/>
+        </Frame>
+
+        <Frame type="UnlockableFrame" name="UnlockableFrame1" template="StandardTemplates/AchievementInfoUnlockableFrameTemplate">
+            <Anchor side="Top" relative="$parent/UnlockableFrame0" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent/UnlockableFrame0" pos="Max" offset="0"/>
+        </Frame>
+
+        <Frame type="UnlockableFrame" name="UnlockableFrame2" template="StandardTemplates/AchievementInfoUnlockableFrameTemplate">
+            <Anchor side="Top" relative="$parent/UnlockableFrame1" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent/UnlockableFrame1" pos="Max" offset="0"/>
+        </Frame>
+
+        <Frame type="UnlockableFrame" name="UnlockableFrame3" template="StandardTemplates/AchievementInfoUnlockableFrameTemplate">
+            <Anchor side="Top" relative="$parent/UnlockableFrame2" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent/UnlockableFrame2" pos="Max" offset="0"/>
+        </Frame>
+
+        <Frame type="Label" name="RewardLabel">
+            <Anchor side="Top" relative="$parent/UnlockableFrame0" pos="Max" offset="5"/>
+            <Anchor side="Left" relative="$parent/UnlockableFrame0" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="-9"/>
+        </Frame>
+    </Frame>
+
+    <Frame type="AchievementInfoTooltip" name="AchievementInfoTooltipTemplate">
+        <Insets top="10" left="10" bottom="20" right="10"/>
+        <MaxWidth val="550"/>
+        <MinWidth val="500"/>
+
+        <Frame type="Image" name="BackgroundImage" template="StandardTemplates/StandardBorderTooltipGame">
+            <Anchor relative="$parent"/>
+        </Frame>
+        
+        <Frame type="AchievementInfoFrame" name="AchievementInfoFrame" template="StandardTemplates/AchievementInfoFrameTemplate">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="10"/>
+            <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+        </Frame>
+    </Frame>
+
+    <!-- Example layout for unlockables -->
+    <Frame type="UnlockableTileListItem" name="UnlockableTileListItemTemplate">
+        <Width val="100"/>
+        <Height val="150"/>
+        <TooltipFrame val="AchievementInfoTooltip"/>
+
+        <Animation name="Locked">
+            <Event event="Locked" action="Reset,Play"/>
+            <Event event="Unlocked" action="Reset,Stop"/>
+
+            <Controller type="Fade" end="Pause">
+                <Key type="Curve" time="0.0" value="125" out="Auto"/>
+            </Controller>
+        </Animation>
+
+        <Animation name="Enabled">
+            <Event event="Enabled" action="Reset,Stop"/>
+            <Event event="Disabled" action="Reset,Play"/>
+
+            <Controller type="Enabled" name="Enabled" end="Pause">
+                <Key type="Bool" time="0" value="False"/>
+            </Controller>
+        </Animation>
+
+        <Frame type="Image" name="SelectedImage">
+            <Anchor relative="$parent"/>
+            <Color val="255,255,255"/>
+        </Frame>
+
+        <Frame type="Image" name="Background">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="9"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="9"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="-9"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="-9"/>
+            <Color val="100,0,100"/>
+        </Frame>
+        
+        <Frame type="UnlockableFrame" name="UnlockableFrame">
+            <Anchor relative="$parent"/>
+
+            <Frame type="Image" name="UnlockableImage">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="18"/>
+                <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+                <Height val="75"/>
+                <Width val="75"/>
+
+                <DesaturateOnDisable val="False"/>
+            </Frame>
+        </Frame>
+
+        <Frame type="Label" name="TitleLabel">
+            <Anchor side="Left" relative="$parent" pos="Min" offset="9"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="-9"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="-9"/>
+            <Style val="SocialPanelRankLabel"/>
+        </Frame>
+    </Frame>
+
+    <Frame type="ScrollBar" name="UnlockablePanelScrollBarTemplate">
+        <Image val="$root/StandardTemplates/StandardScrollBarBackgroundImage"/>
+        <Button val="$root/StandardTemplates/StandardScrollBarButtonTemplate"/>
+        <Orientation val="Vertical"/>
+        <Width val="24"/>
+        <IncrementSound val="@UI_ScrollButtonSelect"/>
+    </Frame>
+
+    <Frame type="UnlockablePanel" name="UnlockablePanelTemplate">
+        <Width val="600"/>
+        <Height val="600"/>
+        <IsLocalUser val="true"/>
+        <UnlockableTag val="PORT"/>
+        <SelectionEnabled val="true"/>
+
+        <Frame type="TileList" name="UnlockableTileList">
+            <Anchor relative="$parent"/>
+            <AcceptsMouse val="true"/>
+            <ScrollStepValue val="6"/>
+
+            <Frame type="AchievementInfoTooltip" name="AchievementInfoTooltip" template="StandardTemplates/AchievementInfoTooltipTemplate"/>
+
+            <Frame type="UnlockableTileListItem" name="Item0" template="StandardTemplates/UnlockableTileListItemTemplate">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+            </Frame>
+
+            <Frame type="UnlockableTileListItem" name="Item1" template="StandardTemplates/UnlockableTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item0" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item0" pos="Max" offset="0"/>
+            </Frame>
+
+            <Frame type="UnlockableTileListItem" name="Item2" template="StandardTemplates/UnlockableTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item1" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item1" pos="Max" offset="0"/>
+            </Frame>
+
+            <Frame type="UnlockableTileListItem" name="Item3" template="StandardTemplates/UnlockableTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item2" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item2" pos="Max" offset="0"/>
+            </Frame>
+
+            <Frame type="UnlockableTileListItem" name="Item4" template="StandardTemplates/UnlockableTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item3" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item3" pos="Max" offset="0"/>
+            </Frame>
+
+            <Frame type="UnlockableTileListItem" name="Item5" template="StandardTemplates/UnlockableTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item4" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item4" pos="Max" offset="0"/>
+            </Frame>
+
+            <Frame type="UnlockableTileListItem" name="Item6" template="StandardTemplates/UnlockableTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item0" pos="Max" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item0" pos="Min" offset="0"/>
+            </Frame>
+
+            <Frame type="UnlockableTileListItem" name="Item7" template="StandardTemplates/UnlockableTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item6" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item6" pos="Max" offset="0"/>
+            </Frame>
+
+            <Frame type="UnlockableTileListItem" name="Item8" template="StandardTemplates/UnlockableTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item7" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item7" pos="Max" offset="0"/>
+            </Frame>
+
+            <Frame type="UnlockableTileListItem" name="Item9" template="StandardTemplates/UnlockableTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item8" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item8" pos="Max" offset="0"/>
+            </Frame>
+
+            <Frame type="UnlockableTileListItem" name="Item10" template="StandardTemplates/UnlockableTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item9" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item9" pos="Max" offset="0"/>
+            </Frame>
+
+            <Frame type="UnlockableTileListItem" name="Item11" template="StandardTemplates/UnlockableTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item10" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item10" pos="Max" offset="0"/>
+            </Frame>
+
+            <Frame type="UnlockableTileListItem" name="Item12" template="StandardTemplates/UnlockableTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item6" pos="Max" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item6" pos="Min" offset="0"/>
+            </Frame>
+
+            <Frame type="UnlockableTileListItem" name="Item13" template="StandardTemplates/UnlockableTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item12" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item12" pos="Max" offset="0"/>
+            </Frame>
+
+            <Frame type="UnlockableTileListItem" name="Item14" template="StandardTemplates/UnlockableTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item13" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item13" pos="Max" offset="0"/>
+            </Frame>
+
+            <Frame type="UnlockableTileListItem" name="Item15" template="StandardTemplates/UnlockableTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item14" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item14" pos="Max" offset="0"/>
+            </Frame>
+
+            <Frame type="UnlockableTileListItem" name="Item16" template="StandardTemplates/UnlockableTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item15" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item15" pos="Max" offset="0"/>
+            </Frame>
+
+            <Frame type="UnlockableTileListItem" name="Item17" template="StandardTemplates/UnlockableTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item16" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item16" pos="Max" offset="0"/>
+            </Frame>
+
+            <Frame type="UnlockableTileListItem" name="Item18" template="StandardTemplates/UnlockableTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item12" pos="Max" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item12" pos="Min" offset="0"/>
+            </Frame>
+
+            <Frame type="UnlockableTileListItem" name="Item19" template="StandardTemplates/UnlockableTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item18" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item18" pos="Max" offset="0"/>
+            </Frame>
+
+            <Frame type="UnlockableTileListItem" name="Item20" template="StandardTemplates/UnlockableTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item19" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item19" pos="Max" offset="0"/>
+            </Frame>
+
+            <Frame type="UnlockableTileListItem" name="Item21" template="StandardTemplates/UnlockableTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item20" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item20" pos="Max" offset="0"/>
+            </Frame>
+
+            <Frame type="UnlockableTileListItem" name="Item22" template="StandardTemplates/UnlockableTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item21" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item21" pos="Max" offset="0"/>
+            </Frame>
+
+            <Frame type="UnlockableTileListItem" name="Item23" template="StandardTemplates/UnlockableTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item22" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item22" pos="Max" offset="0"/>
+            </Frame>
+
+            <Frame type="ScrollBar" name="ScrollBar" template="StandardTemplates/UnlockablePanelScrollBarTemplate">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+                <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+            </Frame>
         </Frame>
     </Frame>
     

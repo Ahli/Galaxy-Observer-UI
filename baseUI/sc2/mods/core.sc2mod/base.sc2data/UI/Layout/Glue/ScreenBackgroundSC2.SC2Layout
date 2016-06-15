@@ -14,28 +14,32 @@
         ~~~~~~~~~~~~~~~~~~~~~~~
         EVENTS
         ~~~~~~~~~~~~~~~~~~~~~~~
+         This is here because of a limitation of the SetProperty action which prevents
+        ScreenBackgroundSC2 being able to reference GlueUI during preloading. So 
+        GlueUI has a parallel state group to set the customSoundtrack propery based
+        on the event coming from here.
         The following events are being sent to this frame:
 
         Default - No custom content is available.
-        Nova - The Nova custom content is available.
+        Abathur - The Abathur custom content is available.
         -->
-        <Animation name="Default">
-            <Event event="Default" action="Reset,Play"/>
+        <StateGroup name="ContentFeedState">
+            <DefaultState val="Default" />
 
-            <Controller type="Visibility" end="Pause" frame="NovaContainerFrame">
-                <Key type="Bool" time="0" value="false"/>
-            </Controller>
-        </Animation>
+            <State name="Default">
+                <When type="AnimationState" ScreenBackgroundSC2State="Default"/>
+                <Action type="SetProperty" frame="AbathurContainerFrame" visible="false"/>
+                <Action type="SetState" frame="$GlueUI" group="ContentFeedState" state="Default"/>
+            </State>
 
-        <Animation name="Nova">
-            <Event event="Nova" action="Reset,Play"/>
+            <State name="Abathur">
+                <When type="AnimationState" ScreenBackgroundSC2State="Abathur"/>
+                <Action type="SetProperty" frame="AbathurContainerFrame" visible="false"/>
+                <Action type="SetState" frame="$GlueUI" group="ContentFeedState" state="Abathur"/>
+            </State>
+        </StateGroup>
 
-            <Controller type="Visibility" end="Pause" frame="NovaContainerFrame">
-                <Key type="Bool" time="0" value="true"/>
-            </Controller>
-        </Animation>
-
-        <Frame type="Frame" name="NovaContainerFrame">
+        <Frame type="Frame" name="AbathurContainerFrame">
             <Anchor relative="$parent"/>
             <Visible val="false"/>
 
@@ -102,28 +106,19 @@
             </Frame>
 
             <Frame type="Label" name="ContentLabel">
-                <Anchor side="Bottom" relative="$parent/ContentLabelSmall" pos="Min" offset="5"/>
+                <Anchor side="Bottom" relative="$parent/LearnMoreButton" pos="Min" offset="5"/>
                 <Anchor side="Left" relative="$parent/LearnMoreButton" pos="Mid" offset="0"/>
                 <Anchor side="Right" relative="$parent/LearnMoreButton" pos="Mid" offset="0"/>
                 <Text val="@UI/ScreenBackground/Content"/>
                 <Style val="Home_CommanderPurchaseName"/>
             </Frame>
-            
-            <Frame type="Label" name="ContentLabelSmall">
-                <Anchor side="Bottom" relative="$parent/LearnMoreButton" pos="Min" offset="-10"/>
-                <Anchor side="Left" relative="$parent/LearnMoreButton" pos="Mid" offset="0"/>
-                <Anchor side="Right" relative="$parent/LearnMoreButton" pos="Mid" offset="0"/>
-                <Text val="@UI/ScreenBackground/ContentSub"/>
-                <Style val="Home_CommanderPurchaseNameSmall"/>
-            </Frame>
 
-            <Frame type="ActivateCampaignScreenButton" name="LearnMoreButton" template="StandardBattlenetTemplates/BattlenetAlternateButtonTemplate">
-                <CampaignId val="NovaDLC1"/>
-                <ScreenSingleMode val="Campaign"/>
+            <Frame type="ActivateCoopScreenButton" name="LearnMoreButton" template="StandardBattlenetTemplates/BattlenetAlternateButtonTemplate">
                 <Anchor side="Bottom" relative="$parent" pos="Max" offset="-150"/>
                 <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
                 <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
-                <Text val="@UI/ScreenBackground/CheckItOut"/>
+                <Text val="@UI/ScreenBackground/LearnMoreButton"/>
+                <CommanderId val="Abathur"/>
             </Frame>
         </Frame>
 

@@ -228,15 +228,39 @@
                 <Action type="SetProperty" frame="MinimizedLobbyIcon" visible="false"/>
                 <Action type="SetProperty" frame="EnteringLobbyLabel" visible="true"/>
                 <Action type="SetProperty" frame="EnteringLobbyIcon" visible="true"/>
+                <Action type="SetProperty" frame="CountdownPanel" visible="false"/>
+            </State>
+            
+            <State name="CountdownMinimizedStatus">
+                <When type="AnimationState" frame="$this" LobbyStatus="Countdown"/>
+                <When type="AnimationState" frame="$this" MinimizedState="Minimized"/>
+                <Action type="SetProperty" frame="CountdownPanel" visible="true"/>
+                <Action type="SetProperty" frame="ReturnButton" visible="true"/>
+                <Action type="SetProperty" frame="TitleLabel" visible="false"/>
+                <Action type="SetProperty" frame="MinimizedLobbyIcon" visible="false"/>
+                <Action type="SetProperty" frame="EnteringLobbyLabel" visible="false"/>
+                <Action type="SetProperty" frame="EnteringLobbyIcon" visible="false"/>
+            </State>
+
+            <State name="CountdownStatus">
+                <When type="AnimationState" frame="$this" LobbyStatus="Countdown"/>
+                <Action type="SetProperty" frame="CountdownPanel" visible="true"/>
+                <Action type="SetProperty" frame="ReturnButton" visible="false"/>
+                <Action type="SetProperty" frame="TitleLabel" visible="false"/>
+                <Action type="SetProperty" frame="MinimizedLobbyIcon" visible="false"/>
+                <Action type="SetProperty" frame="EnteringLobbyLabel" visible="false"/>
+                <Action type="SetProperty" frame="EnteringLobbyIcon" visible="false"/>
             </State>
             
             <State name="MinimizedLobbyStatus">
-                <When type="AnimationState" frame="$this" LobbyStatus="Minimized"/>
+                <When type="AnimationState" frame="$this" LobbyStatus="InLobby"/>
+                <When type="AnimationState" frame="$this" MinimizedState="Minimized"/>
                 <Action type="SetProperty" frame="TitleLabel" visible="true"/>
                 <Action type="SetProperty" frame="ReturnButton" visible="true"/>
                 <Action type="SetProperty" frame="MinimizedLobbyIcon" visible="true"/>
                 <Action type="SetProperty" frame="EnteringLobbyLabel" visible="false"/>
                 <Action type="SetProperty" frame="EnteringLobbyIcon" visible="false"/>
+                <Action type="SetProperty" frame="CountdownPanel" visible="false"/>
             </State>
         </StateGroup>
         
@@ -288,12 +312,92 @@
             </Frame>
 
             <Animation name="Spin">
-                <Event event="OnShown" action="Reset, Play"/>
+                <Event event="OnShown" action="Reset, Play" frame="$parent"/>
                 <Controller type="Fade" end="Pause">
                     <Key type="Curve" time="0" value="0" out="Step"/>
                     <Key type="Curve" time="0.3" value="255" in="Step"/>
                 </Controller>
             </Animation>
+        </Frame>
+
+        <Frame type="LobbyCountdownPanel" name="CountdownPanel">
+            <Anchor relative="$parent"/>
+
+            <StateGroup name="LobbyStatusStateGroup">
+                <State name="CountdownMinimizedStatus">
+                    <When type="AnimationState" frame="$parent" MinimizedState="Minimized"/>
+                    <Action type="SetProperty" frame="TitleLabel" visible="true"/>
+                    <Action type="SetProperty" frame="TitleCenteredLabel" visible="false"/>
+                </State>
+
+                <State name="CountdownNotMinimizedStatus">
+                    <When type="AnimationState" frame="$parent" MinimizedState="NotMinimized"/>
+                    <Action type="SetProperty" frame="TitleCenteredLabel" visible="true"/>
+                    <Action type="SetProperty" frame="TitleLabel" visible="false"/>
+                </State>
+            </StateGroup>
+            
+            <Frame type="CountdownLabel" name="CountdownLabel">
+                <Anchor side="Top" relative="$parent/$parent/SearchInnerCircle" pos="Min" offset="2"/>
+                <Anchor side="Bottom" relative="$parent/$parent/SearchInnerCircle" pos="Max" offset="0"/>
+                <Anchor side="Left" relative="$parent/$parent/SearchInnerCircle" pos="Min" offset="4"/>
+                <Anchor side="Right" relative="$parent/$parent/SearchInnerCircle" pos="Max" offset="0"/>
+                <Style val="Coop_CountdownText"/>
+                <Alpha val="0"/>
+                <CountdownSound val="UI_BnetCountdownLoop"/>
+
+                <Animation name="Spin">
+                    <Event event="OnShown" action="Reset, Play"/>
+                    <Controller type="Fade" end="Pause">
+                        <Key type="Curve" time="0" value="0" out="Step"/>
+                        <Key type="Curve" time="0.3" value="255" in="Step"/>
+                    </Controller>
+                </Animation>
+
+                <Animation name="BeepSound">
+                    <Event event="Show" frame="$parent" action="Reset,Play"/>
+                    <Event event="Hide" frame="$parent" action="Reset,Stop"/>
+
+                    <Controller type="Sound" end="Loop">
+                        <Key type="Sound" time="1" sound="@UI_BnetCountdownBeep" direction="Forward"/>
+                    </Controller>
+                </Animation>
+            </Frame>
+
+            <Frame type="Label" name="TitleLabel">
+                <Anchor side="Top" relative="$parent/$parent/SearchBackgroundImage" pos="Min" offset="15"/>
+                <Anchor side="Left" relative="$parent/$parent/SearchBackgroundImage" pos="Min" offset="52"/>
+                <Style val="Coop_DownloadPanelTitle"/>
+                <Text val="@UI/LobbyCountdownPanel/GameStarting"/>
+                <Alpha val="0"/>
+                <Visible val="false"/>
+
+                <Animation name="Spin">
+                    <Event event="OnShown" action="Reset, Play" frame="$parent"/>
+                    <Controller type="Fade" end="Pause">
+                        <Key type="Curve" time="0" value="0" out="Step"/>
+                        <Key type="Curve" time="0.3" value="255" in="Step"/>
+                    </Controller>
+                </Animation>
+            </Frame>
+
+            <Frame type="Label" name="TitleCenteredLabel">
+                <Anchor side="Top" relative="$parent/$parent/SearchBackgroundImage" pos="Mid" offset="0"/>
+                <Anchor side="Bottom" relative="$parent/$parent/SearchBackgroundImage" pos="Mid" offset="0"/>
+                <Anchor side="Left" relative="$parent/$parent/SearchBackgroundImage" pos="Min" offset="52"/>
+                <Style val="Coop_DownloadPanelTitle"/>
+                <Text val="@UI/LobbyCountdownPanel/GameStarting"/>
+                <Alpha val="0"/>
+                <Visible val="false"/>
+
+                <Animation name="Spin">
+                    <Event event="OnShown" action="Reset, Play" frame="$parent"/>
+                    <Controller type="Fade" end="Pause">
+                        <Key type="Curve" time="0" value="0" out="Step"/>
+                        <Key type="Curve" time="0.3" value="255" in="Step"/>
+                    </Controller>
+                </Animation>
+            </Frame>
         </Frame>
 
         <Frame type="Label" name="EnteringLobbyLabel">
