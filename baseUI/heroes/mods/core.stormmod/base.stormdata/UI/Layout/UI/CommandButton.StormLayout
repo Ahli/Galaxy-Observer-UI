@@ -114,6 +114,39 @@
                 <Action type="SetProperty" frame="NormalImage" OnDisableDesaturationColor="#ColorCommandEnergy"/>
             </State>
         </StateGroup>
+
+        <Frame type="AnnounceableFrame" name="Announcer">
+            <Anchor relative="$parent"/>
+            <AnnounceFromParent val="True"/>
+
+            <StateGroup name="AnnounceState">
+                <DefaultState val="Invalid"/>
+                
+                <!-- Special Cases -->
+                <State name="AurielBestowHope">
+                    <When type="Property" AbilityLink="AurielBestowHope"/>
+                    <Action type="SetProperty" Announcement="VitalAmount"/>
+                    <Action type="SetProperty" Vital="Energy"/>
+                </State>
+                <!-- /Special Cases -->
+
+                <State name="Invalid">
+                    <When type="Property" AbilityLink="invalid"/>
+                    <When type="Property" BehaviorLink="invalid"/>
+                    <Action type="SetProperty" Announcement="Disabled"/>
+                </State>
+
+                <State name="Behavior">
+                    <When type="Property" AbilityLink="invalid"/>
+                    <Action type="SetProperty" Announcement="Behavior"/>
+                </State>
+                
+                <State name="Ability">
+                    <When type="Property" BehaviorLink="invalid"/>
+                    <Action type="SetProperty" Announcement="AbilityReady"/>
+                </State>
+            </StateGroup>
+        </Frame>
     </Frame>
 
     <Frame type="CommandButton" name="CommandButtonTemplate" template="CommandButton/BaseCommandButtonTemplate">
@@ -239,6 +272,21 @@
                 <Action type="SetProperty" frame="HoverImage" Enabled="false"/>
             </State>
         </StateGroup>
+
+        <StateGroup name="ClearedState">
+            <State name="Cleared">
+                <When type="Property" Cleared="true"/>
+                <Action type="SetProperty" frame="$this" Alpha="0"/>
+                <Action type="SetProperty" frame="$this" Enabled="false"/>
+            </State>
+
+            <State name="Set">
+                <When type="Property" Cleared="false"/>
+                <Action type="SetProperty" frame="$this" Alpha="255"/>
+                <Action type="SetProperty" frame="$this" Enabled="true"/>
+            </State>
+        </StateGroup>
+
     </Frame>
 
     <Frame type="CommandButton" name="MountButtonTemplate" template="CommandButton/BookendCommandButtonTemplate">
@@ -275,6 +323,26 @@
         <Frame type="Frame" name="HitTestFrame">
             <Anchor side="Left" relative="$parent" pos="Min" offset="18"/>
             <Anchor side="Right" relative="$parent" pos="Max" offset="-16"/>
+        </Frame>
+
+        <Frame type="AnnounceableFrame" name="Announcer">
+            <Anchor relative="$parent/HitTestFrame"/>
+            <AnnounceFromParent val="True"/>
+            <Announcement val="AbilityReady"/>
+
+            <StateGroup name="AnnounceState">
+                <!-- Special Cases -->
+                <State name="StandardMount">
+                    <When type="Property" AbilityLink="Mount"/>
+                    <Action type="SetProperty" Announcement="Disabled"/>
+                </State>
+                
+                <State name="Dismount">
+                    <When type="Property" AbilityLink="Dismount"/>
+                    <Action type="SetProperty" Announcement="Disabled"/>
+                </State>
+                <!-- /Special Cases -->
+            </StateGroup>
         </Frame>
     </Frame>
 

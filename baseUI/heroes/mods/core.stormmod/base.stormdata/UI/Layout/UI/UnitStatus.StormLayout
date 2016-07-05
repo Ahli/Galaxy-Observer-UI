@@ -8,7 +8,7 @@
     <Constant name="OrangeResourceColor" val="234, 154, 31"/>
     <Constant name="PurpleResourceColor" val="163, 73, 164"/>
     <Constant name="PinkResourceColor" val="255, 105, 180"/>
-    <Constant name="LowStatusBarAnnounceThreshold" val="0.50"/>
+    <Constant name="LowStatusBarAnnounceThreshold" val="1.00"/>
 
     <!--===========================================================================================
     <! UnitStatusFrame
@@ -86,6 +86,7 @@
         <AllyColor val="49, 132, 255"/>
         <EnemyColor val="219, 0, 64"/>
         <ReductionColor val="#ReductionColor"/>
+        <ColorStyle val="Primary" index="0"/>
         <ReductionShown val="true"/>
         <IncreaseDuration val="1000"/>
         <DecreaseDuration val="#LifeLossDuration"/>
@@ -169,6 +170,7 @@
         <AllyColor val="255, 255, 255" index="1"/>
         <EnemyColor val="255, 255, 255" index="1"/>
         <ReductionColor val="109, 255, 255" index="1"/>
+        <ColorStyle val="Shields" index="1"/>
 
         <!-- Expected Life Grant Bar -->
         <ReductionShown val="true" index="2"/>
@@ -176,6 +178,7 @@
         <OwnerColor val="0, 110, 0" index="2"/>
         <AllyColor val="0, 50, 110" index="2"/>
         <EnemyColor val="110, 0, 0" index="2"/>
+        <ColorStyle val="HoT" index="2"/>
         <ApplyToTotal val="false" index="2"/>
 
         <!-- Expected Life Subtract Bar -->
@@ -992,7 +995,7 @@
                 <Key type="Curve" time="0.15" value="255" in="Fast"/>
             </Controller>
         </Animation>
-
+        
         <StateGroup name="BuffState">
             <State name="Invulnerable">
                 <When type="AnimationState" UnitStatusValidatorState="UserCategoryTargetInvulnerable"/>
@@ -1033,10 +1036,12 @@
         <Validator val="UserCategoryTargetStasis"/>
         <Validator val="UserCategoryTargetInvulnerable"/> 
         <Validator val="TargetMindControlled"/>
-        <Validator val="CasterTaunted"/>
+        <Validator val="TargetTaunted"/>
         <Validator val="UserCategoryTargetUnstoppable"/>
         <Validator val="CasterIsProtectedCombine"/>
+        <Validator val="CasterIsUnkillable"/>
         <Validator val="UserCategoryTargetStunned"/>
+        <Validator val="TargetFeared"/>
         <Validator val="UserCategoryTargetRooted"/>
         <Validator val="TargetIsPolymorphedCombine"/>
         <Validator val="UserCategoryTargetSilenced"/>
@@ -1132,6 +1137,13 @@
                 <Action type="SetProperty" frame="DebuffPlateBg" texture="@UI/State/UnstoppableBG"/>
             </State>
 
+            <State name="Unkillable">
+                <When type="AnimationState" UnitStatusValidatorState="CasterIsUnkillable"/>
+                <Action type="SetProperty" frame="DebuffLabel" text="@UI/State/Unkillable"/>
+                <Action type="SetProperty" frame="DebuffIconLeft" texture="@UI/State/InvulnerableIcon"/>
+                <Action type="SetProperty" frame="DebuffPlateBg" texture="@UI/State/InvulnerableBG"/>
+            </State>
+
             <State name="Protected">
                 <When type="AnimationState" UnitStatusValidatorState="CasterIsProtectedCombine"/>
                 <Action type="SetProperty" frame="DebuffLabel" text="@UI/State/Protected"/>
@@ -1167,8 +1179,15 @@
                 <Action type="SetProperty" frame="DebuffPlateBg" texture="@UI/State/MindControlBG"/>
             </State>
 
+            <State name="Feared">
+                <When type="AnimationState" UnitStatusValidatorState="TargetFeared"/>
+                <Action type="SetProperty" frame="DebuffLabel" text="@UI/State/Feared"/>
+                <Action type="SetProperty" frame="DebuffIconLeft" texture="@UI/State/FearedIcon"/>
+                <Action type="SetProperty" frame="DebuffPlateBg" texture="@UI/State/MindControlBG"/>
+            </State>
+            
             <State name="Taunted">
-                <When type="AnimationState" UnitStatusValidatorState="CasterTaunted"/>
+                <When type="AnimationState" UnitStatusValidatorState="TargetTaunted"/>
                 <Action type="SetProperty" frame="DebuffLabel" text="@UI/State/Taunted"/>
                 <Action type="SetProperty" frame="DebuffIconLeft" texture="@UI/State/SilencedIcon"/>
                 <Action type="SetProperty" frame="DebuffPlateBg" texture="@UI/State/MindControlBG"/>
@@ -1188,7 +1207,7 @@
                 <Action type="SetProperty" frame="DebuffPlateBg" texture="@UI/State/BlindedBG"/>
             </State>
 
-            <!-- Slowed was deemed too spamy and therefore removed -->
+            <!-- Slowed was deemed too spammy and therefore removed -->
             <!--State name="Slowed">
                 <When type="AnimationState" UserCategoryTargetSlowed="true"/>
                 <Action type="SetProperty" frame="DebuffLabel" text="@UI/State/Slowed"/>
@@ -2152,6 +2171,22 @@
         </Frame>
     </Frame>
     
+    <Frame type="UnitStatusFrame" name="HeroUnit1SegmentStatusFrame" template="UnitStatus/HeroUnitStatusFrameNoEnergyTemplate">
+        <Frame type="Frame" name="HeroUnitStatusParentFrame">
+            <Frame type="UnitStatusPlayerName" name="PlayerNameLabel">
+                <Visible val="false"/>
+            </Frame>
+            <Frame type="UnitStatusShieldedHealthBar" name="HealthBar">
+                <SegmentValue val="1"/>
+            <Visible val="false"/>
+            </Frame>
+            <Frame type="UnitStatusShieldedHealthBar" name="HealthBarResistant">
+                <SegmentValue val="1"/>
+            <Visible val="false"/>
+            </Frame>
+        </Frame>
+    </Frame>
+    
     <!-- Hero Health/Energy Bar Without Talent Notification -->
     <Frame type="UnitStatusFrame" name="HeroUnitStatusFrameNoTalentNotification" template="UnitStatus/HeroUnitStatusFrameTemplate">
         <Frame type="Frame" name="HeroUnitStatusParentFrame">
@@ -2558,6 +2593,7 @@
             <OwnerColor val="53e81e" index="0"/>
             <AllyColor val="53e81e" index="0"/>
             <EnemyColor val="53e81e" index="0"/>
+            <ColorStyle val="" index="0"/>
             <Tiled val="true" index="0"/>
 
             <!-- Shield Bar -->
@@ -2573,12 +2609,14 @@
             <OwnerColor val="3c8e00" index="2"/>
             <AllyColor val="82ff94" index="2"/>
             <EnemyColor val="42ba19" index="2"/>
+            <ColorStyle val="" index="2"/>
             <Tiled val="true" index="2"/>
 
             <!-- Expected Life Lost Bar -->
             <OwnerColor val="e82c1e" index="3"/>
             <AllyColor val="e82c1e" index="3"/>
             <EnemyColor val="e82c1e" index="3"/>
+            <ColorStyle val="" index="3"/>
             <Tiled val="true" index="3"/>
 
             <Frame type="Label" name="StatusBarLabel">
@@ -3822,7 +3860,7 @@
                     <Action type="SetProperty" frame="$parent/HealthBarProtected" visible="true"/>
                 </State>
             </StateGroup>
-        </Frame>
+        </Frame>    
 
         <Frame type="Image" name="HealthFrameBackground" template="UnitStatus/HealthBarBackgroundTemplate">
             <Anchor side="Top" relative="$parent/HealthBar" pos="Min" offset="0"/>

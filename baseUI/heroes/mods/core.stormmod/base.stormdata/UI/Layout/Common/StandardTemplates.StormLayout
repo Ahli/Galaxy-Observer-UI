@@ -943,14 +943,18 @@
         </Frame>
     </Frame>
 
-    <Frame type="StreamingIndicatorFrame" name="StreamingIndicatorFrameTemplate">
+    <Frame type="IndicatorFrame" name="IndicatorFrameTemplate">
         <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
         <Anchor side="Left" relative="$parent" pos="Max" offset="0"/>       
         <Height val="72"/>
-        <Width val="72"/>
+        <Width val="144"/>
 
-        <Frame type="Frame" name="IndicatorFrame">
-            <Anchor relative="$parent"/>
+        <Frame type="Frame" name="StreamingIndicatorFrame">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+            <Height val="72"/>
+            <Width val="72"/>
+            <CollapseLayout val="true"/>
 
             <Frame type="Image" name="IconBackgroundImage">
                 <Anchor relative="$parent"/>
@@ -981,8 +985,51 @@
                 <AcceptsMouse val="true"/>
             </Frame>
         </Frame>
-    </Frame>
 
+        <Frame type="Frame" name="ThrottlingIndicatorFrame">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent/StreamingIndicatorFrame" pos="Max" offset="-11"/>
+            <Height val="58"/>
+            <Width val="68"/>
+
+            <Frame type="Image" name="IconImage">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="9"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="5"/>             
+                <Height val="52"/>
+                <Width val="67"/>
+                <Texture val="@UI/storm_ui_throttling_indicator_icon"/>
+            </Frame>
+
+            <Frame type="Frame" name="TooltipAnchorFrame">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="10"/>
+                <Anchor side="Bottom" relative="$parent" pos="Max" offset="-10"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="10"/>
+                <Anchor side="Right" relative="$parent" pos="Max" offset="-10"/>
+                <Tooltip val="@UI/ThrottlingIndicator"/>
+                <TooltipAnchorPosition val="BottomRight"/>
+                <AcceptsMouse val="true"/>
+            </Frame>
+
+            <Animation name="ShowAndFade">
+                <Event event="Show" action="DirectionForward,Play"/>
+                <Event event="Hide" action="DirectionReverse,Play"/>
+                <Controller type="Fade" end="Pause">
+                    <Key type="Curve" time="0" value="0"/>
+                    <Key type="Curve" time="1" value="255"/>
+                    <Key type="Curve" time="2" value="255"/>
+                </Controller>
+                <Controller type="Visibility" end="Pause">
+                    <Key type="Bool" time="0" value="False"/>
+                    <Key type="Bool" time="0.01" value="True"/>
+                    <Key type="Bool" time="2" value="True"/> <!-- Not having this extra line caused the indicataor to blink out briefly while animating in reverse -->
+                </Controller>
+                <Controller type="Event" end="Pause" frame="$parent">
+                  <Key type="Event" time="2" event="ThrottlingShowComplete"/>
+                </Controller>
+            </Animation>
+        </Frame>
+    </Frame>
+  
     <Frame type="MovieFrame" name="StandardMovieTemplate">
         <PausedImage val="StandardMoviePausedImage"/>
         <ProgressSlider val="StandardMovieProgressSlider"/>

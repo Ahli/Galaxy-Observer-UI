@@ -4,35 +4,53 @@
     <!-- Core health bar templates -->
     <Frame type="UnitStatusFrame" name="CoreUnitStatusBaseTemplate">
         <Width val="186"/>
-        <Height val="63"/>
+        <Height val="80"/>
         <VisibilityControlledByUnitAlliances val="false"/>
-        
-        <Frame type="UnitStatusElement" name="HealthBarBackingBlue">
-            <Width val="186"/>
-            <Height val="63"/>
-            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
-            
+
+        <Frame type="UnitStatusElement" name="AllyStatusElement">
+            <Anchor relative="$parent"/>
             <VisibleToAlly val="true"/>
             <VisibleToEnemy val="false"/>
-            
-            <Frame type="Image" name="Image">
-                <Anchor relative="$parent"/>
-            </Frame>
         </Frame>
-        
-        <Frame type="UnitStatusElement" name="HealthBarBackingRed">
+
+        <Frame type="Image" name="HealthBarBacking">
             <Width val="186"/>
             <Height val="63"/>
             <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+        </Frame>
+
+        <Frame type="Image" name="HealthBarInvulnerable">
+            <RenderPriority val="601"/>
+            <Anchor side="Top" relative="$parent\HealthBarBacking" pos="Min" offset="-5"/>
+            <Anchor side="Bottom" relative="$parent\HealthBarBacking" pos="Max" offset="4"/>
+            <Anchor side="Left" relative="$parent\HealthBarBacking" pos="Min" offset="-5"/>
+            <Anchor side="Right" relative="$parent\HealthBarBacking" pos="Max" offset="6"/>
+            <Texture val="@UI/HUD_Bar_CoreHealth_Invulnerable_Health"/>
             
-            <VisibleToAlly val="false"/>
-            <VisibleToEnemy val="true"/>
-            
-            <Frame type="Image" name="Image">
+            <Frame type="Image" name="Glow">
                 <Anchor relative="$parent"/>
+                <BlendMode val="Add"/>
+                <ColorAdjustMode val="Colorize"/>
+                <Texture val="@UI/HUD_Bar_CoreHealth_Invulnerable_Glow"/>                
             </Frame>
         </Frame>
-        
+
+        <StateGroup name="Alliance">
+            <DefaultState val="Ally"/>
+
+            <State name="Ally">
+                <When type="Property" frame="AllyStatusElement" visible="true"/>
+                <Action type="SetProperty" frame="HealthBarBacking" texture="@UI/HUD_TopBar_CoreHealth_BackingBlue"/>
+                <Action type="SetProperty" frame="HealthBarInvulnerable/Glow" AdjustmentColor="1040c0"/>
+            </State>
+
+            <State name="Enemy">
+                <When type="Property" frame="AllyStatusElement" visible="false"/>
+                <Action type="SetProperty" frame="HealthBarBacking" texture="@UI/HUD_TopBar_CoreHealth_BackingRed"/>
+                <Action type="SetProperty" frame="HealthBarInvulnerable/Glow" AdjustmentColor="701018"/>
+            </State>
+        </StateGroup>
+
         <Frame type="UnitStatusShieldedHealthBar" name="HealthBar" template="UnitStatus/UnitStatusShieldedHealthBarTemplate">
             <Width val="139"/>
             <Height val="32"/>
@@ -68,13 +86,10 @@
                 <Width val="0"/>
             </Frame>
         </Frame>
-        
+
         <Frame type="UnitStatusHealthLabel" name="HealthLabel">
             <Width val="100"/>
-            <Anchor side="Top" relative="$parent" pos="Min" offset="5"/>
-            <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
-            <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
-            <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor relative="$parent/HealthBarBacking"/>
             <ShowPercent val="true"/>
             <RenderPriority val="601"/>
             <Frame type="Label" name="StatusLabel">
@@ -82,20 +97,20 @@
             </Frame>
         </Frame>
 
-        <!--Frame type="UnitStatusBuffDebuffElement" name="CoreInvulnerableLabelFrame">
+        <Frame type="UnitStatusBuffDebuffElement" name="CoreInvulnerableLabelFrame">
             <Anchor relative="$parent"/>
             <Alpha val="0"/>
             <VisibilityOnFade val="False"/>
             <RenderPriority val="602"/>
 
-            <Validator val="CoreShowInvulnerableCombineValidator"/-->
+            <Validator val="CoreShowInvulnerableCombineValidator"/>
 
 
             <!-- ResetVisibility is called whenever frame gets hidden so that fading animation is not
-                 resumed when unit comes out of the fog of war.
+                resumed when unit comes out of the fog of war.
             -->
-            
-            <!--Animation name="FadeAnimation">
+
+            <Animation name="FadeAnimation">
                 <Event event="ResetVisibility" action="Stop"/>
                 <Event event="Hide" action="DirectionReverse,Play"/>
                 <Event event="Show" action="DirectionForward,Play"/>
@@ -105,7 +120,7 @@
                     <Key type="Curve" time="0.15" value="255" in="Fast"/>
                 </Controller>
             </Animation>
-            
+
             <Animation name="Invulnerable">
                 <Event event="CoreShowInvulnerableCombineValidator" action="Restart,Play"/>
                 <Event event="Hide" action="DirectionReverse,Play"/>
@@ -118,72 +133,77 @@
                     <Key type="Curve" time="0.0" value="255" out="Fast"/>
                     <Key type="Curve" time="0.15" value="0" in="Fast"/>
                 </Controller>
+
+                <Controller type="Fade" end="Pause" frame="$parent/HealthBarInvulnerable">
+                    <Key type="Curve" time="0.0" value="0" out="Fast"/>
+                    <Key type="Curve" time="0.15" value="255" in="Fast"/>
+                </Controller>
             </Animation>
 
-            
             <Frame type="Label" name="BuffLabel">
-                <Anchor relative="$parent"/>
-                <Style val="Storm_TopBar_CoreHealth"/>
+                <Anchor side="Top" relative="$parent" pos="Max" offset="-20"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+                <Style val="Storm_TopBar_CoreLabel"/>
             </Frame>
-        </Frame-->
-
+        </Frame>
     </Frame>
 
+    <!-- Core Unit Status Template (Left version) -->
     <Frame type="UnitStatusFrame" name="CoreUnitStatusLeftTemplate" template="TopBar/CoreUnitStatusBaseTemplate">
-        <Frame type="UnitStatusElement" name="HealthBarBackingBlue">
+        <Frame type="Image" name="HealthBarBacking">
             <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
-            <Frame type="Image" name="Image">
-                <Texture val="@UI/HUD_TopBar_CoreHealth_BackingBlue"/>
-            </Frame>
         </Frame>
-        
-        <Frame type="UnitStatusElement" name="HealthBarBackingRed">
-            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
-            <Frame type="Image" name="Image">
-                <Texture val="@UI/HUD_TopBar_CoreHealth_BackingRed"/>
-            </Frame>
-        </Frame>
-        
+
         <Frame type="UnitStatusShieldedHealthBar" name="HealthBar">
             <Anchor side="Left" relative="$parent" pos="Min" offset="22"/>
             <Texture val="@UI/HUD_TopBar_CoreHealth_BarLeft"/>
         </Frame>
-        
+
         <Frame type="UnitStatusHealthLabel" name="HealthLabel">
             <Frame type="Label" name="StatusLabel">
                 <!-- the font style for this is set to the opposite color for team 2 in script -->
                 <Style val="Storm_TopBar_CoreHealthPercentLeftBlue"/>
             </Frame>
         </Frame>
+
+        <Frame type="UnitStatusBuffDebuffElement" name="CoreInvulnerableLabelFrame">
+            <Frame type="Label" name="BuffLabel">
+                <Anchor side="left" relative="$parent" pos="Min" offset="28"/>
+            </Frame>
+        </Frame>
     </Frame>
 
+    <!-- Core Unit Status Template (Right version) -->
     <Frame type="UnitStatusFrame" name="CoreUnitStatusRightTemplate" template="TopBar/CoreUnitStatusBaseTemplate">
-        <Frame type="UnitStatusElement" name="HealthBarBackingBlue">
+        <Frame type="Image" name="HealthBarBacking">
             <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
-            <Frame type="Image" name="Image">
-                <Texture val="@UI/HUD_TopBar_CoreHealth_BackingBlue"/>
+            <TextureCoords top="0.0" left="1.0" bottom="1.0" right="0.0"/>
+        </Frame>
+
+        <Frame type="Image" name="HealthBarInvulnerable">
+            <TextureCoords top="0.0" left="1.0" bottom="1.0" right="0.0"/>
+            <Frame type="Image" name="Glow">
                 <TextureCoords top="0.0" left="1.0" bottom="1.0" right="0.0"/>
             </Frame>
         </Frame>
-        
-        <Frame type="UnitStatusElement" name="HealthBarBackingRed">
-            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
-            <Frame type="Image" name="Image">
-                <Texture val="@UI/HUD_TopBar_CoreHealth_BackingRed"/>
-                <TextureCoords top="0.0" left="1.0" bottom="1.0" right="0.0"/>
-            </Frame>
-        </Frame>
-        
+
         <Frame type="UnitStatusShieldedHealthBar" name="HealthBar">
             <Anchor side="Right" relative="$parent" pos="Max" offset="-22"/>
             <Texture val="@UI/HUD_TopBar_CoreHealth_BarRight"/>
             <Expansion val="Left"/>
         </Frame>
-        
+
         <Frame type="UnitStatusHealthLabel" name="HealthLabel">
             <Frame type="Label" name="StatusLabel">
                 <!-- the font style for this is set to the opposite color for team 2 in script -->
                 <Style val="Storm_TopBar_CoreHealthPercentRightRed"/>
+            </Frame>
+        </Frame>
+
+        <Frame type="UnitStatusBuffDebuffElement" name="CoreInvulnerableLabelFrame">
+            <Frame type="Label" name="BuffLabel">
+                <Anchor side="Right" relative="$parent" pos="Max" offset="-28"/>
             </Frame>
         </Frame>
     </Frame>
@@ -191,13 +211,13 @@
     <!-- Main Top Bar Panel Template -->
     <Frame type="Frame" name="TopBarPanelTemplate">
         <Height val="150"/>
-        
+
         <!-- Anim events sent to this frame from script
             Team1LevelUp (team 1 gains a level)
             Team2LevelUp (team 2 gains a level)
         -->
 
-        <Animation name="ArenaModeTransition">            
+        <Animation name="ArenaModeTransition">
             <Event event="ArenaMode" action="Play"/>
 
             <Controller type="Visibility" end="Pause" frame="Team1XPBackgroundBlue">
@@ -211,10 +231,10 @@
             </Controller>
             <Controller type="Visibility" end="Pause" frame="Team2XPBackgroundRed">
                 <Key type="Bool" time=".01" value="False"/>
-            </Controller>   
-        </Animation>        
+            </Controller>
+        </Animation>
 
-        <Animation name="ArenaModeTransitionOrder">            
+        <Animation name="ArenaModeTransitionOrder">
             <Event event="ArenaModeOrder" action="Play"/>
 
             <Controller type="Visibility" end="Pause" frame="Team1XPBackgroundBlueArena">
@@ -228,10 +248,10 @@
             </Controller>
             <Controller type="Visibility" end="Pause" frame="Team2XPBackgroundRedArena">
                 <Key type="Bool" time=".01" value="True"/>
-            </Controller>        
+            </Controller>
         </Animation>
 
-        <Animation name="ArenaModeTransitionChaos">            
+        <Animation name="ArenaModeTransitionChaos">
             <Event event="ArenaModeChaos" action="Play"/>
 
             <Controller type="Visibility" end="Pause" frame="Team1XPBackgroundBlueArena">
@@ -245,7 +265,7 @@
             </Controller>
             <Controller type="Visibility" end="Pause" frame="Team2XPBackgroundRedArena">
                 <Key type="Bool" time=".01" value="False"/>
-            </Controller>        
+            </Controller>
         </Animation>
 
         <Animation name="TutorialLevelFlash">
@@ -286,14 +306,14 @@
             <Visible val="#IngameBlur"/>
             <RenderType val="HDR"/>
         </Frame>
-        
+
         <Frame type="Image" name="TopBarBacking">
             <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
             <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
             <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
             <Texture val="@UI/HUD_TopBar_Backing"/>
         </Frame>
-        
+
         <Frame type="Label" name="GameTimerLabel">
             <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
             <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
@@ -303,7 +323,7 @@
             <Width val="120"/>
             <Height val="34"/>
         </Frame>
-        
+
         <!-- XP Bars -->
         <Frame type="Image" name="Team1XPBackgroundBlue">
             <Width val="268"/>
@@ -314,7 +334,7 @@
             <TooltipAnchorPosition val="BottomCenter"/>
             <Visible val="false"/>
         </Frame>
-        
+
         <Frame type="Image" name="Team1XPBackgroundRed">
             <Width val="268"/>
             <Height val="91"/>
@@ -335,7 +355,7 @@
             <TooltipAnchorPosition val="BottomCenter"/>
             <Visible val="false"/>
         </Frame>
-        
+
         <Frame type="Image" name="Team1XPBackgroundRedArena">
             <Width val="268"/>
             <Height val="91"/>
@@ -345,7 +365,7 @@
             <TextureCoords top="0.0" left="1.0" bottom="1.0" right="0.0"/>
             <TooltipAnchorPosition val="BottomCenter"/>
             <Visible val="false"/>
-        </Frame>     
+        </Frame>
 
         <Frame type="TeamVeterancyUnitStatusFrame" name="Team1XPUnitStatusFrame">
             <Width val="117"/>
@@ -363,7 +383,7 @@
                 <BackgroundShown val="false"/>
             </Frame>
         </Frame>
-        
+
         <Frame type="Image" name="Team2XPBackgroundBlue">
             <Width val="268"/>
             <Height val="91"/>
@@ -374,7 +394,7 @@
             <TooltipAnchorPosition val="BottomCenter"/>
             <Visible val="false"/>
         </Frame>
-        
+
         <Frame type="Image" name="Team2XPBackgroundRed">
             <Width val="268"/>
             <Height val="91"/>
@@ -404,7 +424,7 @@
             <Texture val="@UI/hud_topbar_arena_backingred"/>
             <TooltipAnchorPosition val="BottomCenter"/>
             <Visible val="false"/>
-        </Frame>           
+        </Frame>
 
         <Frame type="TeamVeterancyUnitStatusFrame" name="Team2XPUnitStatusFrame">
             <Width val="117"/>
@@ -423,7 +443,7 @@
                 <Expansion val="Left"/>
             </Frame>
         </Frame>
-        
+
         <!-- Team Level Labels -->
         <Frame type="Label" name="Team1LevelLabel">
             <Anchor side="Top" relative="$parent/TopBarBacking" pos="Min" offset="5"/>
@@ -432,7 +452,7 @@
             <Style val="Storm_TopBar_TeamLevelLeft"/>
             <Text val="88"/>
             <TooltipAnchorPosition val="BottomCenter"/>
-            
+
             <Animation name="LevelUpBlue">
                 <Event event="Team1LevelUpBlue" action="Reset" frame="$parent"/>
                 <Event event="Team1LevelUpBlue" action="Play" frame="$parent"/>
@@ -455,7 +475,7 @@
                 </Controller>
             </Animation>
         </Frame>
-        
+
         <Frame type="Frame" name="TutorialArrowLevel1" template="StartingExperience/HUDAlertArrow_Single">
             <Anchor side="Left" relative="$parent/Team1LevelLabel" pos="Mid" offset="0"/>
             <Anchor side="Right" relative="$parent/Team1LevelLabel" pos="Mid" offset="0"/>
@@ -473,7 +493,7 @@
             <!-- the font style for this is set to the opposite color for team 2 in script -->
             <Style val="Storm_TopBar_TeamLevelUpLeftBlue"/>
             <Text val="@UI/LevelUp"/>
-            
+
             <Animation name="LevelUp">
                 <Event event="Team1LevelUpBlue" action="Reset" frame="$parent"/>
                 <Event event="Team1LevelUpBlue" action="Play" frame="$parent"/>
@@ -491,7 +511,7 @@
                 </Controller>
             </Animation>
         </Frame>
-        
+
         <Frame type="Label" name="TeamLevelVSLabel">
             <Anchor side="Top" relative="$parent" pos="Min" offset="40"/>
             <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
@@ -499,14 +519,14 @@
             <Style val="Storm_TopBar_TeamLevelVS"/>
             <Text val="@UI/VS"/>
         </Frame>
-        
+
         <Frame type="Label" name="Team2LevelLabel">
             <Anchor side="Top" relative="$parent/Team1LevelLabel" pos="Min" offset="0"/>
             <Anchor side="Left" relative="$parent/TopBarBacking" pos="Mid" offset="30"/>
             <Width val="90"/>
             <Style val="Storm_TopBar_TeamLevelRight"/>
             <Text val="88"/>
-            
+
             <Animation name="LevelUpBlue">
                 <Event event="Team2LevelUpBlue" action="Reset" frame="$parent"/>
                 <Event event="Team2LevelUpBlue" action="Play" frame="$parent"/>
@@ -529,7 +549,7 @@
                 </Controller>
             </Animation>
         </Frame>
-        
+
         <Frame type="Frame" name="TutorialArrowLevel2" template="StartingExperience/HUDAlertArrow_Single">
             <Anchor side="Left" relative="$parent/Team2LevelLabel" pos="Mid" offset="0"/>
             <Anchor side="Right" relative="$parent/Team2LevelLabel" pos="Mid" offset="0"/>
@@ -547,7 +567,7 @@
             <!-- the font style for this is set to the opposite color for team 2 in script -->
             <Style val="Storm_TopBar_TeamLevelUpRightRed"/>
             <Text val="@UI/LevelUp"/>
-            
+
             <Animation name="LevelUp">
                 <Event event="Team2LevelUpBlue" action="Reset" frame="$parent"/>
                 <Event event="Team2LevelUpBlue" action="Play" frame="$parent"/>
@@ -565,26 +585,26 @@
                 </Controller>
             </Animation>
         </Frame>
-        
+
         <!-- Core Health -->
         <Frame type="UnitStatusFrame" name="Team1CoreUnitStatus" template="TopBar/CoreUnitStatusLeftTemplate">
             <Anchor side="Top" relative="$parent/Team1LevelLabel" pos="Max" offset="-15"/>
-            <Anchor side="Right" relative="$parent/Team1LevelLabel" pos="Max" offset="-65"/>
+            <Anchor side="Right" relative="$parent/TopBarBacking" pos="Mid" offset="-92"/>
         </Frame>
-        
+
         <Frame type="UnitStatusFrame" name="Team2CoreUnitStatus" template="TopBar/CoreUnitStatusRightTemplate">
             <Anchor side="Top" relative="$parent/Team2LevelLabel" pos="Max" offset="-15"/>
-            <Anchor side="Left" relative="$parent/Team2LevelLabel" pos="Max" offset="-25"/>
+            <Anchor side="Left" relative="$parent/TopBarBacking" pos="Mid" offset="92"/>
         </Frame>
-        
+
         <Frame type="Label" name="CoreHealthLabel">
-            <Anchor side="Bottom" relative="$parent/Team1CoreUnitStatus" pos="Max" offset="-7"/>
+            <Anchor side="Top" relative="$parent/TopBarBacking" pos="Max" offset="-5"/>
             <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
             <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
             <Width val="230"/>
             <Text val="@UI/CoreHealth"/>
-            <Style val="Storm_TopBar_CoreHealth"/>
+            <Style val="Storm_TopBar_CoreLabel"/>
         </Frame>
-    </Frame> 
+    </Frame>
 
 </Desc>
