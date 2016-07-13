@@ -14,9 +14,84 @@
         </Animation>
     </Frame>
 
+    <Frame type="LeaguePromotionDebugFrame" name="LeaguePromotionDebugFrameTemplate" requiredtoload="IS_TOURNAMENT_DEBUG_CODE_ENABLED">
+        <Frame type="Label" name="SourceLeagueLabel">
+            <Anchor side="Top" relative="$parent" pos="Min" offset ="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset ="20"/>
+            <Text val="SOURCE LEAGUE"/>
+        </Frame>
+        
+        <Frame type="Pulldown" name="SourceLeaguePulldown" template="StandardTemplates/StandardPulldownTemplate">
+            <Anchor side="Top" relative="$parent/SourceLeagueLabel" pos="Max" offset ="5"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset ="20"/>
+        </Frame>
+        
+        <Frame type="Pulldown" name="SourceTierPulldown" template="StandardTemplates/StandardPulldownTemplate">
+            <Width val="100"/>
+            <Anchor side="Top" relative="$parent/SourceLeaguePulldown" pos="Min" offset ="0"/>
+            <Anchor side="Left" relative="$parent/SourceLeaguePulldown" pos="Max" offset ="20"/>
+        </Frame>
+
+        <Frame type="Label" name="DestLeagueLabel">
+            <Anchor side="Top" relative="$parent/SourceLeaguePulldown" pos="Max" offset ="20"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset ="20"/>
+            <Text val="DEST LEAGUE"/>
+        </Frame>
+        
+        <Frame type="Pulldown" name="DestLeaguePulldown" template="StandardTemplates/StandardPulldownTemplate">
+            <Anchor side="Top" relative="$parent/DestLeagueLabel" pos="Max" offset ="5"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset ="20"/>
+        </Frame>
+        
+        <Frame type="Pulldown" name="DestTierPulldown" template="StandardTemplates/StandardPulldownTemplate">
+            <Width val="100"/>
+            <Anchor side="Top" relative="$parent/DestLeaguePulldown" pos="Min" offset ="0"/>
+            <Anchor side="Left" relative="$parent/DestLeaguePulldown" pos="Max" offset ="20"/>
+        </Frame>
+
+        <Frame type="Label" name="QueueIdLabel">
+            <Anchor side="Top" relative="$parent/DestLeaguePulldown" pos="Max" offset ="20"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset ="20"/>
+            <Text val="QUEUE ID"/>
+        </Frame>
+
+        <Frame type="EditBox" name="QueueEditBox" template="StandardBattlenetTemplates/BattlenetEditBoxTemplate">
+            <Anchor side="Top" relative="$parent/QueueIdLabel" pos="Max" offset ="5"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="20"/>
+            <Height val="68"/>
+            <Width val ="315"/>
+        </Frame>
+
+        <Frame type="Button" name="ShowPromotionButton" template="StandardTemplates/StandardButtonTemplate">
+            <Anchor side="Top" relative="$parent/QueueEditBox" pos="Max" offset="40"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="20"/>
+            <Text val="Promote"/>
+        </Frame>
+
+        <Frame type="Button" name="SeasonPlacementButton" template="StandardTemplates/StandardButtonTemplate">
+            <Anchor side="Top" relative="$parent/ShowPromotionButton" pos="Max" offset="40"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="20"/>
+            <Text val="Season Placement"/>
+        </Frame>
+
+        <Frame type="Button" name="LadderReassignmentButton" template="StandardTemplates/StandardButtonTemplate">
+            <Anchor side="Top" relative="$parent/SeasonPlacementButton" pos="Max" offset="40"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="20"/>
+            <Text val="Ladder Reassignment"/>
+        </Frame>
+
+        <Frame type="Button" name="PauseFanfareButton" template="StandardTemplates/StandardButtonTemplate">
+            <Anchor side="Top" relative="$parent/LadderReassignmentButton" pos="Max" offset="40"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="20"/>
+            <Text val="Toggle Fanfare Pause"/>
+            <Toggleable val="true"/>
+        </Frame>
+    </Frame>
+
     <Frame type="ScreenMatchmaking" name="ScreenMatchmaking">
         <Anchor relative="$parent"/>
         <DisplayBackgroundModel val="false"/>
+        <ShowingNotification val="false"/>
         
         <Frame type="CutsceneFrame" name="BackgroundCutscene">
             <Anchor relative="$parent"/>
@@ -24,7 +99,16 @@
             <AutoPlay val="false"/>
             <RenderType val="HDR"/>
         </Frame>
-        
+
+        <Animation name="VersionState">
+            <Event event="NewVersion" action="Reset,Play" frame="RankedDialogContainer/LadderSplashDialogNotificationFrame"/>
+            <Event event="OldVersion" action="Reset,Stop" frame="RankedDialogContainer/LadderSplashDialogNotificationFrame"/>
+            <Event event="InvalidVersion" action="Reset,Stop" frame="RankedDialogContainer/LadderSplashDialogNotificationFrame"/>
+
+            <Controller type="Property" property="ShowingNotification" end="Pause">
+                <Key type="Property" time="0" value="true"/>
+            </Controller>
+        </Animation>
 
         <!-- These animation events are the race's entry index -->
         <!-- 0=Terr, 1=Zerg, 2=Prot, 3=Rand -->
@@ -205,6 +289,28 @@
                 </State>
             </StateGroup>
         </Frame>
+
+        <Frame type="Button" name="PromotionDebugButton" template="StandardTemplates/StandardButtonTemplate" requiredtoload="IS_LEAGUE_PROMOTION_DEBUG_ENABLED">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="150"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="-50"/>
+            <Text val="Debug"/>
+
+            <Animation name="TogglePromotionDebugFrameVisibility">
+                <Event event="OnMouseUp" action="ToggleDirection,Play"/>
+                <Controller name="Name1" type="Visibility" end="Pause" frame="$parent/LeaguePromotionDebugFrame">
+                    <Key type="Bool" time="0" value="true"/>
+                    <Key type="Bool" time=".01" value="false"/>
+                </Controller>
+            </Animation>
+        </Frame>
+
+        <Frame type="LeaguePromotionDebugFrame" name="LeaguePromotionDebugFrame" template="ScreenMatchmaking/LeaguePromotionDebugFrameTemplate" requiredtoload="IS_LEAGUE_PROMOTION_DEBUG_ENABLED">
+            <Anchor side="Top" relative="$parent/PromotionDebugButton" pos="Max" offset="20"/>
+            <Anchor side="Right" relative="$parent/PromotionDebugButton" pos="Max" offset="0"/>
+            <Height val="800"/>
+            <Width val="450"/>
+            <Visible val="false"/>
+         </Frame>
 
         <Frame type="Frame" name="LoadingFrame">
             <Anchor relative="$parent"/>
@@ -414,7 +520,7 @@
 
             <Frame type="MatchmakingLeaguePanel" name="LeaguePanel" template="MatchmakingLeaguePanel/MatchmakingLeaguePanelTemplate">
                 <Anchor side="Top" relative="$parent/RaceTileList" pos="Max" offset="33"/>
-                <Anchor side="Left" relative="$parent/RaceTileList" pos="Min" offset="-28"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
                 <Visible val="false"/>
             </Frame>
 
@@ -492,7 +598,7 @@
             </StateGroup>
 
             <Frame type="GlueButton" name="PlayButton" template="StandardBattlenetTemplates/BattlenetAlternateButtonTemplate">
-                <Anchor side="Bottom" relative="$parent" pos="Max" offset="-164"/>
+                <Anchor side="Bottom" relative="$parent" pos="Max" offset="-125"/>
                 <Anchor side="Left" relative="$parent" pos="Min" offset="105"/>
                 <Width val="288"/>
                 <Text val="@UI/ScreenMatchmaking/PlayButton"/>
@@ -598,6 +704,63 @@
                         <Key type="Bool" time=".01" value="false"/>
                     </Controller>
                 </Animation>
+            </Frame>
+        </Frame>
+        
+        <Frame type="Frame" name="RankedDialogContainer">
+            <Anchor relative="$parent"/>
+            <Visible val="False"/>
+            
+            <StateGroup name="MatchmakingModeStateGroup">
+                <State name="TrainingState">
+                    <When type="AnimationState" frame="$parent" ModeState="ModeTraining"/>
+                    <Action type="SetProperty" frame="$this" Visible="False"/>
+                </State>
+                
+                <State name="VersusAIState">
+                    <When type="AnimationState" frame="$parent" ModeState="ModeVersusAI"/>
+                    <Action type="SetProperty" frame="$this" Visible="False"/>
+                </State>
+
+                <State name="UnrankedState">
+                    <When type="AnimationState" frame="$parent" ModeState="ModeUnranked"/>
+                    <Action type="SetProperty" frame="$this" Visible="False"/>
+                </State>
+
+                <State name="RankedState">
+                    <When type="AnimationState" frame="$parent" ModeState="ModeRanked"/>
+                    <Action type="SetProperty" frame="$this" Visible="True"/>
+                </State>
+            </StateGroup>
+        
+            <Frame type="VersionNotificationFrame" name="LadderSplashDialogNotificationFrame">
+                <Anchor relative="$parent"/>
+                <Visible val="False"/>
+                <Version val="1"/>
+                <SettingName val="LadderSplashDialog"/>
+                
+                <Animation name="VersionState">
+                    <Event event="NewVersion" action="Reset,Play"/>
+                    <Event event="OldVersion" action="Reset,Stop"/>
+                    <Event event="InvalidVersion" action="Reset,Stop"/>
+
+                    <Controller type="Visibility" end="Pause">
+                        <Key type="Bool" time="0" value="True"/>
+                    </Controller>
+                </Animation>
+
+                <!-- The name of this animation must be "ClearNotification" -->
+                <!-- When played, it will update the version of this notification  -->
+                <Animation name="ClearNotification">
+                    <Event event="OnClick" action="Reset,Play" frame="LadderSplashDialog/CloseButton"/>
+
+                    <Controller type="Event" end="Stop">
+                        <Key type="Event" time="0.0" event="NoOp"/>
+                        <Key type="Event" time="1.0" event="NoOp"/>
+                    </Controller>
+                </Animation>
+                
+                <Frame type="Frame" name="LadderSplashDialog" template="LadderSplashDialog/LadderSplashDialog"/>
             </Frame>
         </Frame>
     </Frame>

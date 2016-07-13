@@ -1788,13 +1788,17 @@
         </Frame>
     </Frame>
 
-    <Frame type="StreamingIndicatorFrame" name="StreamingIndicatorFrameTemplate">
+    <Frame type="IndicatorFrame" name="IndicatorFrameTemplate">
         <Height val="48"/>
-        <Width val="48"/>
+        <Width val="96"/>
         <Alpha val="128"/>
-        
-        <Frame type="Frame" name="IndicatorFrame">
-            <Anchor relative="$parent"/>
+
+        <Frame type="Frame" name="StreamingIndicatorFrame">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+            <Height val="48"/>
+            <Width val="48"/>
+            <CollapseLayout val="true"/>
 
             <Frame type="Image" name="IconBackgroundImage">
                 <Anchor relative="$parent"/>
@@ -1822,6 +1826,51 @@
                 <TooltipAnchorPosition val="BottomRight"/>
                 <AcceptsMouse val="true"/>
             </Frame>
+        </Frame>
+
+        <Frame type="Frame" name="ThrottlingIndicatorFrame">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent/StreamingIndicatorFrame" pos="Max" offset="0"/>
+            <Height val="48"/>
+            <Width val="48"/>
+          
+            <Frame type="Image" name="IconBackgroundImage">
+                <Anchor relative="$parent"/>
+                <Texture val="@UI/StreamingIndicatorBackground"/>
+            </Frame>
+
+            <Frame type="Image" name="IconImage">
+                <Anchor relative="$parent"/>
+                <Texture val="@UI/ThrottleIndicator"/>
+            </Frame>
+
+            <Frame type="Frame" name="TooltipAnchorFrame">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="10"/>
+                <Anchor side="Bottom" relative="$parent" pos="Max" offset="-10"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="10"/>
+                <Anchor side="Right" relative="$parent" pos="Max" offset="-10"/>
+                <Tooltip val="@UI/ThrottlingIndicator"/>
+                <TooltipAnchorPosition val="BottomRight"/>
+                <AcceptsMouse val="true"/>
+            </Frame>
+            
+            <Animation name="ShowAndFade">
+                <Event event="Show" action="DirectionForward,Play"/>
+                <Event event="Hide" action="DirectionReverse,Play"/>
+                <Controller type="Fade" end="Pause">
+                    <Key type="Curve" time="0" value="0"/>
+                    <Key type="Curve" time="1" value="255"/>
+                    <Key type="Curve" time="2" value="255"/>
+                </Controller>
+                <Controller type="Visibility" end="Pause">
+                    <Key type="Bool" time="0" value="False"/>
+                    <Key type="Bool" time="0.01" value="True"/>
+                    <Key type="Bool" time="2" value="True"/> <!-- Not having this extra line caused the indicataor to blink out briefly while animating in reverse -->
+                </Controller>
+                <Controller type="Event" end="Pause" frame="$parent">
+                    <Key type="Event" time="2" event="ThrottlingShowComplete"/>
+                </Controller>
+            </Animation>          
         </Frame>
     </Frame>
 
@@ -1914,27 +1963,36 @@
     </Frame>
 
     <Frame type="AvatarFrame" name="AvatarFrameTemplate">
-        <Height val="63"/>
-        <Width val="63"/>
+        <Height val="66"/>
+        <Width val="65"/>
         
         <Frame type="UnlockableFrame" name="PortraitFrame">
             <Anchor relative="$parent"/>
             
             <Frame type="Image" name="UnlockableImage">
-                <Anchor side="Top" relative="$parent" pos="Min" offset="9"/>
-                <Anchor side="Left" relative="$parent" pos="Min" offset="9"/>
-                <Height val="46"/>
-                <Width val="46"/>
+                <Anchor side="Top" relative="$parent" pos="Min" offset="11"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="11"/>
+                <Height val="43"/>
+                <Width val="43"/>
             
                <DesaturateOnDisable val="False"/>
             </Frame>
         </Frame>
         
+        <Frame type="Image" name="AvatarDarken">
+            <Anchor side="Top" relative="$parent/PortraitFrame/UnlockableImage" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent/PortraitFrame/UnlockableImage" pos="Min" offset="0"/>
+            <Anchor side="Bottom" relative="$parent/PortraitFrame/UnlockableImage" pos="Max" offset="0"/>
+            <Anchor side="Right" relative="$parent/PortraitFrame/UnlockableImage" pos="Max" offset="0"/>
+            <Alpha val="0"/>
+            <Color val="000000"/>
+        </Frame>
+        
         <Frame type="Image" name="PortraitBorderImage">
             <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
             <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
-            <Height val="63"/>
-            <Width val="63"/>
+            <Height val="65"/>
+            <Width val="65"/>
             <Texture val="@UI/Glues_Avatar_LeagueBorder_Small_Unranked"/>
 
             <Animation name="PortraitBorderBronze">
@@ -1992,7 +2050,7 @@
             </Animation>
 
             <Animation name="PortraitBorderGrandmaster">
-                <Event event="ShowGrandMaster" action="Reset" frame="$parent"/>
+                <Event event="ShowGrandmaster" action="Reset" frame="$parent"/>
                 <Event event="ShowGrandmaster" action="Play" frame="$parent"/>
 
                 <Controller type="Texture" end="Pause">
@@ -2009,13 +2067,306 @@
                 </Controller>
             </Animation>
         </Frame>
+        
+        <Frame type="Frame" name="FrameAnimations">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+            <Height val="65"/>
+            <Width val="65"/>
+            
+            <Frame type="Frame" name="BaseShimmer">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                <Height val="65"/>
+                <Width val="65"/>
+                <Visible val="False"/>
+                
+                <Frame type="Image" name="Shimmer">
+                    <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                    <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                    <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+                    <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+                    <LayerCount val="2"/>
+                    <BlendMode val="Add"/>
+                
+                    <Texture val="@UI/Glues_Avatar_LeagueBorder_Small_FrameMask" layer="0"/>
+                    <TextureType val="Normal" layer="0"/>
+                    <AlphaLayer val="true" layer="0"/>
+                    
+                    <Texture val="@UI/Glues_Avatar_LeagueBorder_Small_FrameShimmer" layer="1"/>
+                    <TextureCoords top="0" left="0" bottom="1" right="1" layer="1"/>
+
+                    <Animation name="Shimmer">
+                        <Event event="OnShown" action="Reset"/>
+                        <Event event="OnShown" action="Play" />
+                 
+                        <Controller type="LayerUV" layer="1" side="Top" relative="False" sidelock="True" end="Loop" >
+                            <Key type="Curve" time="0" value="-1" out="fast"/>
+                            <Key type="Curve" time="0.5" value="1" in="fast"/>
+                            <Key type="Curve" time="6.6" value="1" in="fast"/>
+                        </Controller>
+                    </Animation>
+                </Frame>
+            </Frame>
+            
+            <Frame type="Frame" name="UnrankedShimmer">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                <Height val="65"/>
+                <Width val="65"/>
+                <Visible val="False"/>
+
+                <Frame type="Image" name="Shimmer">
+                    <Anchor relative="$parent"/>
+                    <LayerCount val="2"/>
+                
+                    <Texture val="@UI/Glues_Avatar_LeagueBorder_Small_UnrankedMask" layer="0"/>
+                    <TextureType val="Normal" layer="0"/>
+                    <AlphaLayer val="true" layer="0"/>
+                    
+                    <Texture val="@UI/Glues_Avatar_LeagueBorder_Small_UnrankedShimmer" layer="1"/>
+                    <TextureCoords top="0" left="0" bottom="1" right="1" layer="1"/>
+                    <BlendMode val="Add" layer="1"/>
+                    <Alpha val="170" layer="1"/>
+                    
+                    <Animation name="Shimmer">
+                        <Event event="OnShown" action="Reset"/>
+                        <Event event="OnShown" action="Play" />
+                 
+                        <Controller type="LayerUV" layer="1" side="Top" relative="False" sidelock="True" end="Loop" >
+                            <Key type="Curve" time="0" value="1" out="Fast"/>
+                            <Key type="Curve" time="1.0" value="-1" in="Fast"/>
+                            <Key type="Curve" time="6" value="-1" in="Fast"/>
+                        </Controller>
+                    </Animation>
+                </Frame>
+            </Frame>
+            
+            <Frame type="Frame" name="DiamondEffect">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                <Height val="65"/>
+                <Width val="65"/>
+                <Visible val="False"/>
+                
+                <Frame type="Image" name="Shimmer">
+                    <Anchor relative="$parent"/>
+                    <LayerCount val="2"/>
+                    <Alpha val="175"/>
+                
+                    <Texture val="@UI/Glues_Avatar_LeagueBorder_Small_MasterFrameMask" layer="0"/>
+                    <TextureType val="Normal" layer="0"/>
+                    <AlphaLayer val="true" layer="0"/>
+                    
+                    <Texture val="@UI/Glues_Avatar_LeagueBorder_Small_DiamondEffect" layer="1"/>
+                    <TextureCoords top="0" left="1" bottom="1" right="0" layer="1"/>
+                    <BlendMode val="Add" layer="1"/>
+                    <WrapUV val="True" layer="1"/>
+                    
+                    <Animation name="Shimmer">
+                        <Event event="OnShown" action="Reset"/>
+                        <Event event="OnShown" action="Play" />
+                 
+                        <Controller type="LayerUV" layer="1" side="Top" relative="False" sidelock="True" end="Loop" >
+                            <Key type="Curve" time="0" value="1" out="Linear"/>
+                            <Key type="Curve" time="10" value="-1" in="Linear"/>
+                        </Controller>
+                    </Animation>
+                </Frame>
+                
+                <Frame type="Image" name="BadgeIconSparkle_Top">
+                    <Anchor side="Bottom" relative="$parent" pos="Max" offset="5"/>
+                    <Anchor side="Right" relative="$parent" pos="Max" offset="-3"/>
+                    <Texture val="@UI/Glues_Icons_Ladder_Tier_Badge_Sparkle"/>
+                    <Height val="25"/>
+                    <Width val="25"/>
+                    <Alpha val="255"/>
+                    
+                    <Animation name="SparkleAnim">
+                        <Event event="OnShown" action="DirectionForward" frame="$parent"/>
+                        <Event event="OnShown" action="Play" frame="$parent"/>
+                        
+                        <Controller type="Rotation" relative="False" end="Loop">
+                            <Key type="Curve" time="0" value="0" out="linear"/>
+                            <Key type="Curve" time="6" value="-360" in="linear"/>
+                            <Key type="Curve" time="7" value="-360" in="linear"/>
+                        </Controller>
+                        <Controller type="Fade" end="Loop">
+                            <Key type="Curve" time="0" value="0" in="Slow"/>
+                            <Key type="Curve" time="1.5" value="150" out="Fast"/>
+                            <Key type="Curve" time="2" value="255" out="Fast"/>
+                            <Key type="Curve" time="3.5" value="200" out="Fast"/>
+                            <Key type="Curve" time="4" value="0" in="Slow"/>
+                            <Key type="Curve" time="7" value="0" in="Slow"/>
+                        </Controller>
+                    </Animation>
+                </Frame>
+            </Frame>
+            
+            <Frame type="Frame" name="MasterEffect">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                <Height val="65"/>
+                <Width val="65"/>
+                <Visible val="False"/>
+                
+                <Frame type="Image" name="WingsMasterEffect">
+                    <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                    <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                    <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+                    <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+                    <LayerCount val="2"/>
+                    <Alpha val="200"/>
+         
+                    <Texture val="@UI/Glues_Avatar_LeagueBorder_Small_MasterFrameMask" layer="0"/>
+                    <AlphaLayer val="True" layer="0"/>
+                    <TextureType val="Normal" layer="0"/>
+                 
+                    <Texture val="@UI/Glues_Avatar_LeagueBorder_Small_MasterEffect" layer="1"/>
+                    <TextureCoords top="0" left="1" bottom="1" right="0" layer="1"/>
+                    <BlendMode val="Add" layer="1"/>
+                    <WrapUV val="True" layer="1"/>
+
+                    <Animation name="ShimmerAnim">
+                        <Event event="OnShown" action="DirectionForward" frame="$parent"/>
+                        <Event event="OnShown" action="Play" frame="$parent"/>
+                 
+                        <Controller type="LayerUV" layer="1" side="Left" relative="False" sidelock="True" end="Loop" >
+                            <Key type="Curve" time="0" value="1" out="linear"/>
+                            <Key type="Curve" time="24" value="-1" in="linear"/>
+                        </Controller>
+                    </Animation>
+                </Frame>
+                
+                <Frame type="Image" name="Sparkle_Top">
+                    <Anchor side="Top" relative="$parent" pos="Min" offset="-3"/>
+                    <Anchor side="Left" relative="$parent" pos="Min" offset="8"/>
+                    <Texture val="@UI/Glues_Icons_Ladder_Tier_Badge_Sparkle"/>
+                    <Height val="25"/>
+                    <Width val="25"/>
+                    <Alpha val="255"/>
+                    
+                    <Animation name="SparkleAnim">
+                        <Event event="OnShown" action="DirectionForward" frame="$parent"/>
+                        <Event event="OnShown" action="Play" frame="$parent"/>
+                        
+                        <Controller type="Rotation" relative="False" end="Loop">
+                            <Key type="Curve" time="0" value="0" out="linear"/>
+                            <Key type="Curve" time="6" value="360" in="linear"/>
+                            <Key type="Curve" time="7" value="360" in="linear"/>
+                        </Controller>
+                        <Controller type="Fade" end="Loop">
+                            <Key type="Curve" time="0" value="0" in="Slow"/>
+                            <Key type="Curve" time="2.5" value="150" out="Fast"/>
+                            <Key type="Curve" time="3" value="255" out="Fast"/>
+                            <Key type="Curve" time="5.5" value="200" out="Fast"/>
+                            <Key type="Curve" time="6" value="0" in="Slow"/>
+                            <Key type="Curve" time="7" value="0" in="Slow"/>
+                        </Controller>
+                    </Animation>
+                </Frame>
+                
+                <Frame type="Image" name="Sparkle_Bottom">
+                    <Anchor side="Bottom" relative="$parent" pos="Max" offset="5"/>
+                    <Anchor side="Right" relative="$parent" pos="Max" offset="-3"/>
+                    <Texture val="@UI/Glues_Icons_Ladder_Tier_Badge_Sparkle"/>
+                    <Height val="25"/>
+                    <Width val="25"/>
+                    <Alpha val="255"/>
+                    
+                    <Animation name="SparkleAnim">
+                        <Event event="OnShown" action="DirectionForward" frame="$parent"/>
+                        <Event event="OnShown" action="Play" frame="$parent"/>
+                        
+                        <Controller type="Rotation" relative="False" end="Loop">
+                            <Key type="Curve" time="0" value="0" out="linear"/>
+                            <Key type="Curve" time="6" value="-360" in="linear"/>
+                            <Key type="Curve" time="7" value="-360" in="linear"/>
+                        </Controller>
+                        <Controller type="Fade" end="Loop">
+                            <Key type="Curve" time="0" value="0" in="Slow"/>
+                            <Key type="Curve" time="1.5" value="150" out="Fast"/>
+                            <Key type="Curve" time="2" value="255" out="Fast"/>
+                            <Key type="Curve" time="3.5" value="200" out="Fast"/>
+                            <Key type="Curve" time="4" value="0" in="Slow"/>
+                            <Key type="Curve" time="7" value="0" in="Slow"/>
+                        </Controller>
+                    </Animation>
+                </Frame>
+            </Frame>
+            
+            <Frame type="Frame" name="GrandmasterEffect">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                <Height val="65"/>
+                <Width val="65"/>
+                <Visible val="False"/>
+                
+                <Frame type="Image" name="GrandMasterEffect">
+                    <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                    <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                    <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+                    <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+                    <LayerCount val="2"/>
+                    <Alpha val="200"/>
+         
+                    <Texture val="@UI/Glues_Avatar_LeagueBorder_Small_MasterFrameMask" layer="0"/>
+                    <AlphaLayer val="True" layer="0"/>
+                    <TextureType val="Normal" layer="0"/>
+                 
+                    <Texture val="@UI/Glues_Avatar_LeagueBorder_Small_GrandmasterEffect" layer="1"/>
+                    <TextureCoords top="0" left="1" bottom="1" right="0" layer="1"/>
+                    <BlendMode val="Add" layer="1"/>
+                    <WrapUV val="True" layer="1"/>
+
+                    <Animation name="ShimmerAnim">
+                        <Event event="OnShown" action="DirectionForward" frame="$parent"/>
+                        <Event event="OnShown" action="Play" frame="$parent"/>
+                 
+                        <Controller type="LayerUV" layer="1" side="Right" relative="False" sidelock="True" end="Loop" >
+                            <Key type="Curve" time="0" value="-1" out="linear"/>
+                            <Key type="Curve" time="22" value="1" in="linear"/>
+                        </Controller>
+                    </Animation>
+                </Frame>
+                
+                <Frame type="Image" name="GrandMasterEffect2">
+                    <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                    <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                    <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+                    <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+                    <LayerCount val="2"/>
+                    <Alpha val="150"/>
+         
+                    <Texture val="@UI/Glues_Avatar_LeagueBorder_Small_MasterFrameMask" layer="0"/>
+                    <AlphaLayer val="True" layer="0"/>
+                    <TextureType val="Normal" layer="0"/>
+                 
+                    <Texture val="@UI/Glues_Avatar_LeagueBorder_Small_GrandmasterEffect" layer="1"/>
+                    <TextureCoords top="1" left="0" bottom="0" right="1" layer="1"/>
+                    <BlendMode val="Add" layer="1"/>
+                    <WrapUV val="True" layer="1"/>
+
+                    <Animation name="ShimmerAnim">
+                        <Event event="OnShown" action="DirectionForward" frame="$parent"/>
+                        <Event event="OnShown" action="Play" frame="$parent"/>
+                 
+                        <Controller type="LayerUV" layer="1" side="Top" relative="False" sidelock="True" end="Loop" >
+                            <Key type="Curve" time="0" value="-1" out="linear"/>
+                            <Key type="Curve" time="17" value="1" in="linear"/>
+                        </Controller>
+                    </Animation>
+                </Frame>
+            </Frame>
+        </Frame>
 
         <Frame type="Image" name="PortraitGlass">
-            <Anchor side="Top" relative="$parent" pos="Min" offset="8"/>
-            <Anchor side="Left" relative="$parent" pos="Min" offset="8"/>
-            <Height val="48"/>
-            <Width val="48"/>
+            <Anchor side="Top" relative="$parent" pos="Min" offset="10"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="11"/>
+            <Height val="44"/>
+            <Width val="43"/>
             <Texture val="@UI/Glues_Avatar_LeagueBorderGlass_Small_Unranked"/>
+            <Alpha val="0"/>
 
             <Animation name="PortraitGlassBronze">
                 <Event event="ShowBronze" action="Reset" frame="$parent"/>
@@ -2072,7 +2423,7 @@
             </Animation>
 
             <Animation name="PortraitGlassGrandmaster">
-                <Event event="ShowGrandaster" action="Reset" frame="$parent"/>
+                <Event event="ShowGrandmaster" action="Reset" frame="$parent"/>
                 <Event event="ShowGrandmaster" action="Play" frame="$parent"/>
 
                 <Controller type="Texture" end="Pause">
@@ -2091,11 +2442,45 @@
 
         </Frame>
         
+        <Frame type="Image" name="HoverBorder">
+            <Anchor relative="$parent/PortraitBorderImage" />
+            <Texture val="@UI/Glues_Avatar_LeagueBorder_Small_Hover"/>
+            <Alpha val="0"/>
+            <BlendMode val="Add"/>
+        </Frame>
+        
+        <Frame type="Image" name="WingsImage">
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+            <Height val="26"/>
+            <Width val="48"/>
+            <Texture val="@UI/Glues_Avatar_LeagueBorder_Small_Master_Wings"/>
+            <Visible val="False"/>
+
+            <Animation name="PortraitGlassMaster">
+                <Event event="ShowMaster" action="Reset,Play" frame="$parent"/>
+
+                <Controller type="Texture" end="Pause">
+                    <Key type="Image" time="0" image="@UI/Glues_Avatar_LeagueBorder_Small_Master_Wings"/>
+                </Controller>
+            </Animation>
+
+            <Animation name="PortraitGlassGrandmaster">
+                <Event event="ShowGrandmaster" action="Reset,Play" frame="$parent"/>
+
+                <Controller type="Texture" end="Pause">
+                    <Key type="Image" time="0" image="@UI/Glues_Avatar_LeagueBorder_Small_Grandmaster_Wings"/>
+                </Controller>
+            </Animation>
+        </Frame>
+        
         <Frame type="Frame" name="RankLabelFrame">
-            <Anchor side="Bottom" relative="$parent" pos="Max" offset="-2"/>
-            <Anchor side="Left" relative="$parent" pos="Min" offset="2"/>
-            <Anchor side="Right" relative="$parent" pos="Max" offset="-2"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="-3"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="4"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="-4"/>
             <Height val="25"/>
+            <Visible val="false"/>
 
             <Frame type="Image" name="RankBg">
                 <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
@@ -2111,6 +2496,170 @@
                 <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
                 <Anchor side="Left" relative="$parent/RankBg" pos="Min" offset="9"/>
                 <Style val="SocialPanelRankLabel"/>
+            </Frame>
+        </Frame>
+        
+        <Frame type="Frame" name="TierBadgeFrame">
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="-4"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="4"/>
+            <Width val="26"/>
+            <Height val="25"/>
+            <Visible val="False"/>
+            
+            <Frame type="Frame" name="Bronze">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                <Width val="26"/>
+                <Height val="25"/>
+                <Visible val="False"/>
+                
+                <Frame type="Image" name="Tier1">
+                    <Anchor relative="$parent"/>
+                    <Texture val="@UI/Glues_Avatar_LeagueBorder_TierBadge_Bronze_1"/>
+                    <Visible val="False"/>
+                </Frame>
+                
+                <Frame type="Image" name="Tier2">
+                    <Anchor relative="$parent"/>
+                    <Texture val="@UI/Glues_Avatar_LeagueBorder_TierBadge_Bronze_2"/>
+                    <Visible val="False"/>
+                </Frame>
+                
+                <Frame type="Image" name="Tier3">
+                    <Anchor relative="$parent"/>
+                    <Texture val="@UI/Glues_Avatar_LeagueBorder_TierBadge_Bronze_3"/>
+                    <Visible val="False"/>
+                </Frame>
+            </Frame>
+            
+            <Frame type="Frame" name="Silver">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                <Width val="26"/>
+                <Height val="25"/>
+                <Visible val="False"/>
+                
+                <Frame type="Image" name="Tier1">
+                    <Anchor relative="$parent"/>
+                    <Texture val="@UI/Glues_Avatar_LeagueBorder_TierBadge_Silver_1"/>
+                    <Visible val="False"/>
+                </Frame>
+                
+                <Frame type="Image" name="Tier2">
+                    <Anchor relative="$parent"/>
+                    <Texture val="@UI/Glues_Avatar_LeagueBorder_TierBadge_Silver_2"/>
+                    <Visible val="False"/>
+                </Frame>
+                
+                <Frame type="Image" name="Tier3">
+                    <Anchor relative="$parent"/>
+                    <Texture val="@UI/Glues_Avatar_LeagueBorder_TierBadge_Silver_3"/>
+                    <Visible val="False"/>
+                </Frame>
+            </Frame>
+            
+            <Frame type="Frame" name="Gold">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                <Width val="26"/>
+                <Height val="25"/>
+                <Visible val="False"/>
+                
+                <Frame type="Image" name="Tier1">
+                    <Anchor relative="$parent"/>
+                    <Texture val="@UI/Glues_Avatar_LeagueBorder_TierBadge_Gold_1"/>
+                    <Visible val="False"/>
+                </Frame>
+                
+                <Frame type="Image" name="Tier2">
+                    <Anchor relative="$parent"/>
+                    <Texture val="@UI/Glues_Avatar_LeagueBorder_TierBadge_Gold_2"/>
+                    <Visible val="False"/>
+                </Frame>
+                
+                <Frame type="Image" name="Tier3">
+                    <Anchor relative="$parent"/>
+                    <Texture val="@UI/Glues_Avatar_LeagueBorder_TierBadge_Gold_3"/>
+                    <Visible val="False"/>
+                </Frame>
+            </Frame>
+           
+            <Frame type="Frame" name="Platinum">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                <Width val="26"/>
+                <Height val="25"/>
+                <Visible val="False"/>
+                
+                <Frame type="Image" name="Tier1">
+                    <Anchor relative="$parent"/>
+                    <Texture val="@UI/Glues_Avatar_LeagueBorder_TierBadge_Platinum_1"/>
+                    <Visible val="False"/>
+                </Frame>
+                
+                <Frame type="Image" name="Tier2">
+                    <Anchor relative="$parent"/>
+                    <Texture val="@UI/Glues_Avatar_LeagueBorder_TierBadge_Platinum_2"/>
+                    <Visible val="False"/>
+                </Frame>
+                
+                <Frame type="Image" name="Tier3">
+                    <Anchor relative="$parent"/>
+                    <Texture val="@UI/Glues_Avatar_LeagueBorder_TierBadge_Platinum_3"/>
+                    <Visible val="False"/>
+                </Frame>
+            </Frame>
+            
+            <Frame type="Frame" name="Diamond">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                <Width val="26"/>
+                <Height val="25"/>
+                <Visible val="False"/>
+                
+                <Frame type="Image" name="Tier1">
+                    <Anchor relative="$parent"/>
+                    <Texture val="@UI/Glues_Avatar_LeagueBorder_TierBadge_Diamond_1"/>
+                    <Visible val="False"/>
+                </Frame>
+                
+                <Frame type="Image" name="Tier2">
+                    <Anchor relative="$parent"/>
+                    <Texture val="@UI/Glues_Avatar_LeagueBorder_TierBadge_Diamond_2"/>
+                    <Visible val="False"/>
+                </Frame>
+                
+                <Frame type="Image" name="Tier3">
+                    <Anchor relative="$parent"/>
+                    <Texture val="@UI/Glues_Avatar_LeagueBorder_TierBadge_Diamond_3"/>
+                    <Visible val="False"/>
+                </Frame>
+            </Frame>
+            
+            <Frame type="Frame" name="Master">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                <Width val="26"/>
+                <Height val="25"/>
+                <Visible val="False"/>
+                
+                <Frame type="Image" name="Tier1">
+                    <Anchor relative="$parent"/>
+                    <Texture val="@UI/Glues_Avatar_LeagueBorder_TierBadge_Master_1"/>
+                    <Visible val="False"/>
+                </Frame>
+                
+                <Frame type="Image" name="Tier2">
+                    <Anchor relative="$parent"/>
+                    <Texture val="@UI/Glues_Avatar_LeagueBorder_TierBadge_Master_2"/>
+                    <Visible val="False"/>
+                </Frame>
+                
+                <Frame type="Image" name="Tier3">
+                    <Anchor relative="$parent"/>
+                    <Texture val="@UI/Glues_Avatar_LeagueBorder_TierBadge_Master_3"/>
+                    <Visible val="False"/>
+                </Frame>
             </Frame>
         </Frame>
 
@@ -2131,30 +2680,268 @@
                 </Controller>
             </Animation>
         </Frame>
+
+        <StateGroup name="StateEffect">
+            <DefaultState val="BaseShimmer"/>
+
+            <State name="Unranked">
+                <When type="AnimationState" LeagueIcon="ShowUnranked"/>
+                <Action type="SetProperty" frame="FrameAnimations/UnrankedShimmer" visible="True"/>
+            </State>
+
+
+            <State name="Diamond">
+                <When type="AnimationState" LeagueIcon="ShowDiamond"/>
+                <Action type="SetProperty" frame="FrameAnimations/DiamondEffect" visible="True"/>
+            </State>
+            
+            <State name="Master">
+                <When type="AnimationState" LeagueIcon="ShowMaster"/>
+                <Action type="SetProperty" frame="FrameAnimations/MasterEffect" visible="True"/>
+            </State>
+
+            <State name="Grandmaster">
+                <When type="AnimationState" LeagueIcon="ShowGrandmaster"/>
+                <Action type="SetProperty" frame="FrameAnimations/GrandmasterEffect" visible="True"/>
+            </State>
+
+            <State name="BaseShimmer">
+                <Action type="SetProperty" frame="FrameAnimations/BaseShimmer" visible="True"/>
+            </State>
+        </StateGroup>
+
+        <StateGroup name="StateWings">
+            <DefaultState val="HideWings"/>
+
+            <State name="Master">
+                <When type="AnimationState" LeagueIcon="ShowMaster"/>
+                <Action type="SetProperty" frame="WingsImage" visible="True"/>
+            </State>
+
+            <State name="Grandmaster">
+                <When type="AnimationState" LeagueIcon="ShowGrandmaster"/>
+                <Action type="SetProperty" frame="WingsImage" visible="True"/>
+            </State>
+
+            <State name="HideWings">
+                <Action type="SetProperty" frame="WingsImage" visible="False"/>
+            </State>
+        </StateGroup>
+
+        <StateGroup name="StateLeagueTierFrame">
+            <DefaultState val="Unranked"/>
+
+            <State name="Bronze">
+                <When type="AnimationState" LeagueIcon="ShowBronze"/>
+                <Action type="SetProperty" frame="TierBadgeFrame" visible="True"/>
+                <Action type="SetProperty" frame="TierBadgeFrame/Bronze" visible="True"/>
+            </State>
+
+            <State name="Silver">
+                <When type="AnimationState" LeagueIcon="ShowSilver"/>
+                <Action type="SetProperty" frame="TierBadgeFrame" visible="True"/>
+                <Action type="SetProperty" frame="TierBadgeFrame/Silver" visible="True"/>
+            </State>
+
+            <State name="Gold">
+                <When type="AnimationState" LeagueIcon="ShowGold"/>
+                <Action type="SetProperty" frame="TierBadgeFrame" visible="True"/>
+                <Action type="SetProperty" frame="TierBadgeFrame/Gold" visible="True"/>
+            </State>
+
+            <State name="Platinum">
+                <When type="AnimationState" LeagueIcon="ShowPlatinum"/>
+                <Action type="SetProperty" frame="TierBadgeFrame" visible="True"/>
+                <Action type="SetProperty" frame="TierBadgeFrame/Platinum" visible="True"/>
+            </State>
+
+            <State name="Diamond">
+                <When type="AnimationState" LeagueIcon="ShowDiamond"/>
+                <Action type="SetProperty" frame="TierBadgeFrame" visible="True"/>
+                <Action type="SetProperty" frame="TierBadgeFrame/Diamond" visible="True"/>
+            </State>
+
+            <State name="Master">
+                <When type="AnimationState" LeagueIcon="ShowMaster"/>
+                <Action type="SetProperty" frame="TierBadgeFrame" visible="True"/>
+                <Action type="SetProperty" frame="TierBadgeFrame/Master" visible="True"/>
+            </State>
+
+            <State name="Grandmaster">
+                <When type="AnimationState" LeagueIcon="ShowGrandmaster"/>
+                <Action type="SetProperty" frame="$this/RankLabelFrame" visible="False"/>
+            </State>
+
+            <State name="UnrankedHasValidRank">
+                <When type="AnimationState" LeagueRankValid="LeagueRankIsValid"/>
+                <Action type="SetProperty" frame="$this/RankLabelFrame" visible="True"/>
+            </State>
+
+            <State name="Unranked">
+                <Action type="SetProperty" frame="$this/RankLabelFrame" visible="False"/>
+            </State>
+        </StateGroup>
+
+        <StateGroup name="StateLeagueTier">
+            <State name="Bronze1">
+                <When type="AnimationState" LeagueIcon="ShowBronze"/>
+                <When type="AnimationState" LeagueTier="1"/>
+
+                <Action type="SetProperty" frame="TierBadgeFrame/Bronze/Tier1" visible="True"/>
+            </State>
+
+            <State name="Bronze2">
+                <When type="AnimationState" LeagueIcon="ShowBronze"/>
+                <When type="AnimationState" LeagueTier="2"/>
+
+                <Action type="SetProperty" frame="TierBadgeFrame/Bronze/Tier2" visible="True"/>
+            </State>
+
+            <State name="Bronze3">
+                <When type="AnimationState" LeagueIcon="ShowBronze"/>
+                <When type="AnimationState" LeagueTier="3"/>
+
+                <Action type="SetProperty" frame="TierBadgeFrame/Bronze/Tier3" visible="True"/>
+            </State>
+
+            <State name="Silver1">
+                <When type="AnimationState" LeagueIcon="ShowSilver"/>
+                <When type="AnimationState" LeagueTier="1"/>
+
+                <Action type="SetProperty" frame="TierBadgeFrame/Silver/Tier1" visible="True"/>
+            </State>
+
+            <State name="Silver2">
+                <When type="AnimationState" LeagueIcon="ShowSilver"/>
+                <When type="AnimationState" LeagueTier="2"/>
+
+                <Action type="SetProperty" frame="TierBadgeFrame/Silver/Tier2" visible="True"/>
+            </State>
+
+            <State name="Silver3">
+                <When type="AnimationState" LeagueIcon="ShowSilver"/>
+                <When type="AnimationState" LeagueTier="3"/>
+
+                <Action type="SetProperty" frame="TierBadgeFrame/Silver/Tier3" visible="True"/>
+            </State>
+
+            <State name="Gold1">
+                <When type="AnimationState" LeagueIcon="ShowGold"/>
+                <When type="AnimationState" LeagueTier="1"/>
+
+                <Action type="SetProperty" frame="TierBadgeFrame/Gold/Tier1" visible="True"/>
+            </State>
+
+            <State name="Gold2">
+                <When type="AnimationState" LeagueIcon="ShowGold"/>
+                <When type="AnimationState" LeagueTier="2"/>
+
+                <Action type="SetProperty" frame="TierBadgeFrame/Gold/Tier2" visible="True"/>
+            </State>
+
+            <State name="Gold3">
+                <When type="AnimationState" LeagueIcon="ShowGold"/>
+                <When type="AnimationState" LeagueTier="3"/>
+
+                <Action type="SetProperty" frame="TierBadgeFrame/Gold/Tier3" visible="True"/>
+            </State>
+
+            <State name="Platinum1">
+                <When type="AnimationState" LeagueIcon="ShowPlatinum"/>
+                <When type="AnimationState" LeagueTier="1"/>
+
+                <Action type="SetProperty" frame="TierBadgeFrame/Platinum/Tier1" visible="True"/>
+            </State>
+
+            <State name="Platinum2">
+                <When type="AnimationState" LeagueIcon="ShowPlatinum"/>
+                <When type="AnimationState" LeagueTier="2"/>
+
+                <Action type="SetProperty" frame="TierBadgeFrame/Platinum/Tier2" visible="True"/>
+            </State>
+
+            <State name="Platinum3">
+                <When type="AnimationState" LeagueIcon="ShowPlatinum"/>
+                <When type="AnimationState" LeagueTier="3"/>
+
+                <Action type="SetProperty" frame="TierBadgeFrame/Platinum/Tier3" visible="True"/>
+            </State>
+
+            <State name="Diamond1">
+                <When type="AnimationState" LeagueIcon="ShowDiamond"/>
+                <When type="AnimationState" LeagueTier="1"/>
+
+                <Action type="SetProperty" frame="TierBadgeFrame/Diamond/Tier1" visible="True"/>
+            </State>
+
+            <State name="Diamond2">
+                <When type="AnimationState" LeagueIcon="ShowDiamond"/>
+                <When type="AnimationState" LeagueTier="2"/>
+
+                <Action type="SetProperty" frame="TierBadgeFrame/Diamond/Tier2" visible="True"/>
+            </State>
+
+            <State name="Diamond3">
+                <When type="AnimationState" LeagueIcon="ShowDiamond"/>
+                <When type="AnimationState" LeagueTier="3"/>
+
+                <Action type="SetProperty" frame="TierBadgeFrame/Diamond/Tier3" visible="True"/>
+            </State>
+
+            <State name="Master1">
+                <When type="AnimationState" LeagueIcon="ShowMaster"/>
+                <When type="AnimationState" LeagueTier="1"/>
+
+                <Action type="SetProperty" frame="TierBadgeFrame/Master/Tier1" visible="True"/>
+            </State>
+
+            <State name="Master2">
+                <When type="AnimationState" LeagueIcon="ShowMaster"/>
+                <When type="AnimationState" LeagueTier="2"/>
+
+                <Action type="SetProperty" frame="TierBadgeFrame/Master/Tier2" visible="True"/>
+            </State>
+
+            <State name="Master3">
+                <When type="AnimationState" LeagueIcon="ShowMaster"/>
+                <When type="AnimationState" LeagueTier="3"/>
+
+                <Action type="SetProperty" frame="TierBadgeFrame/Master/Tier3" visible="True"/>
+            </State>
+        </StateGroup>
     </Frame>
     
-    <Frame type="AvatarFrame" name="AvatarFrameMediumTemplate">
-        <Height val="97"/>
-        <Width val="97"/>
+    <Frame type="AvatarFrame" name="AvatarFrameMediumTemplate" template="StandardTemplates/AvatarFrameTemplate">
+        <Height val="115"/>
+        <Width val="113"/>
         
         <Frame type="UnlockableFrame" name="PortraitFrame">
             <Anchor relative="$parent"/>
             
             <Frame type="Image" name="UnlockableImage">
-                <Anchor side="Top" relative="$parent" pos="Min" offset="10"/>
-                <Anchor side="Left" relative="$parent" pos="Min" offset="10"/>
-                <Height val="77"/>
-                <Width val="77"/>
+                <Anchor side="Top" relative="$parent" pos="Min" offset="16"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="17"/>
+                <Height val="79"/>
+                <Width val="79"/>
             
                <DesaturateOnDisable val="False"/>
             </Frame>
         </Frame>
         
+        <Frame type="Image" name="AvatarDarken">
+            <Anchor side="Top" relative="$parent/PortraitFrame/UnlockableImage" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent/PortraitFrame/UnlockableImage" pos="Min" offset="0"/>
+            <Anchor side="Bottom" relative="$parent/PortraitFrame/UnlockableImage" pos="Max" offset="0"/>
+            <Anchor side="Right" relative="$parent/PortraitFrame/UnlockableImage" pos="Max" offset="0"/>
+            <Alpha val="0"/>
+            <Color val="000000"/>
+        </Frame>
+        
         <Frame type="Image" name="PortraitBorderImage">
             <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
             <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
-            <Height val="97"/>
-            <Width val="97"/>
+            <Height val="113"/>
+            <Width val="113"/>
             <Texture val="@UI/Glues_Avatar_LeagueBorder_Medium_Unranked"/>
 
             <Animation name="PortraitBorderBronze">
@@ -2212,7 +2999,7 @@
             </Animation>
 
             <Animation name="PortraitBorderGrandmaster">
-                <Event event="ShowGrandMaster" action="Reset" frame="$parent"/>
+                <Event event="ShowGrandmaster" action="Reset" frame="$parent"/>
                 <Event event="ShowGrandmaster" action="Play" frame="$parent"/>
 
                 <Controller type="Texture" end="Pause">
@@ -2229,13 +3016,306 @@
                 </Controller>
             </Animation>
         </Frame>
+        
+        <Frame type="Frame" name="FrameAnimations">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+            <Height val="113"/>
+            <Width val="113"/>
+            
+            <Frame type="Frame" name="BaseShimmer">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                <Height val="113"/>
+                <Width val="113"/>
+                <Visible val="False"/>
+                
+                <Frame type="Image" name="Shimmer">
+                    <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                    <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                    <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+                    <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+                    <LayerCount val="2"/>
+                    <BlendMode val="Add"/>
+                
+                    <Texture val="@UI/Glues_Avatar_LeagueBorder_Medium_FrameMask" layer="0"/>
+                    <TextureType val="Normal" layer="0"/>
+                    <AlphaLayer val="true" layer="0"/>
+                    
+                    <Texture val="@UI/Glues_Avatar_LeagueBorder_Medium_FrameShimmer" layer="1"/>
+                    <TextureCoords top="0" left="0" bottom="1" right="1" layer="1"/>
+
+                    <Animation name="Shimmer">
+                        <Event event="OnShown" action="Reset"/>
+                        <Event event="OnShown" action="Play" />
+                 
+                        <Controller type="LayerUV" layer="1" side="Top" relative="False" sidelock="True" end="Loop" >
+                            <Key type="Curve" time="0" value="-1" out="fast"/>
+                            <Key type="Curve" time="0.5" value="1" in="fast"/>
+                            <Key type="Curve" time="6.6" value="1" in="fast"/>
+                        </Controller>
+                    </Animation>
+                </Frame>
+            </Frame>
+            
+            <Frame type="Frame" name="UnrankedShimmer">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                <Height val="113"/>
+                <Width val="113"/>
+                <Visible val="False"/>
+
+                <Frame type="Image" name="Shimmer">
+                    <Anchor relative="$parent"/>
+                    <LayerCount val="2"/>
+                
+                    <Texture val="@UI/Glues_Avatar_LeagueBorder_Medium_UnrankedMask" layer="0"/>
+                    <TextureType val="Normal" layer="0"/>
+                    <AlphaLayer val="true" layer="0"/>
+                    
+                    <Texture val="@UI/Glues_Avatar_LeagueBorder_Medium_UnrankedShimmer" layer="1"/>
+                    <TextureCoords top="0" left="0" bottom="1" right="1" layer="1"/>
+                    <BlendMode val="Add" layer="1"/>
+                    <Alpha val="170" layer="1"/>
+                    
+                    <Animation name="Shimmer">
+                        <Event event="OnShown" action="Reset"/>
+                        <Event event="OnShown" action="Play" />
+                 
+                        <Controller type="LayerUV" layer="1" side="Top" relative="False" sidelock="True" end="Loop" >
+                            <Key type="Curve" time="0" value="1" out="Fast"/>
+                            <Key type="Curve" time="1.0" value="-1" in="Fast"/>
+                            <Key type="Curve" time="6" value="-1" in="Fast"/>
+                        </Controller>
+                    </Animation>
+                </Frame>
+            </Frame>
+            
+            <Frame type="Frame" name="DiamondEffect">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                <Height val="113"/>
+                <Width val="113"/>
+                <Visible val="False"/>
+                
+                <Frame type="Image" name="Shimmer">
+                    <Anchor relative="$parent"/>
+                    <LayerCount val="2"/>
+                    <Alpha val="175"/>
+                
+                    <Texture val="@UI/Glues_Avatar_LeagueBorder_Medium_MasterFrameMask" layer="0"/>
+                    <TextureType val="Normal" layer="0"/>
+                    <AlphaLayer val="true" layer="0"/>
+                    
+                    <Texture val="@UI/Glues_Avatar_LeagueBorder_Medium_DiamondEffect" layer="1"/>
+                    <TextureCoords top="0" left="1" bottom="1" right="0" layer="1"/>
+                    <BlendMode val="Add" layer="1"/>
+                    <WrapUV val="True" layer="1"/>
+                    
+                    <Animation name="Shimmer">
+                        <Event event="OnShown" action="Reset"/>
+                        <Event event="OnShown" action="Play" />
+                 
+                        <Controller type="LayerUV" layer="1" side="Top" relative="False" sidelock="True" end="Loop" >
+                            <Key type="Curve" time="0" value="1" out="Linear"/>
+                            <Key type="Curve" time="10" value="-1" in="Linear"/>
+                        </Controller>
+                    </Animation>
+                </Frame>
+                
+                <Frame type="Image" name="BadgeIconSparkle_Top">
+                    <Anchor side="Bottom" relative="$parent" pos="Max" offset="5"/>
+                    <Anchor side="Right" relative="$parent" pos="Max" offset="-3"/>
+                    <Texture val="@UI/Glues_Icons_Ladder_Tier_Badge_Sparkle"/>
+                    <Height val="45"/>
+                    <Width val="45"/>
+                    <Alpha val="255"/>
+                    
+                    <Animation name="SparkleAnim">
+                        <Event event="OnShown" action="DirectionForward" frame="$parent"/>
+                        <Event event="OnShown" action="Play" frame="$parent"/>
+                        
+                        <Controller type="Rotation" relative="False" end="Loop">
+                            <Key type="Curve" time="0" value="0" out="linear"/>
+                            <Key type="Curve" time="6" value="-360" in="linear"/>
+                            <Key type="Curve" time="7" value="-360" in="linear"/>
+                        </Controller>
+                        <Controller type="Fade" end="Loop">
+                            <Key type="Curve" time="0" value="0" in="Slow"/>
+                            <Key type="Curve" time="1.5" value="150" out="Fast"/>
+                            <Key type="Curve" time="2" value="255" out="Fast"/>
+                            <Key type="Curve" time="3.5" value="200" out="Fast"/>
+                            <Key type="Curve" time="4" value="0" in="Slow"/>
+                            <Key type="Curve" time="7" value="0" in="Slow"/>
+                        </Controller>
+                    </Animation>
+                </Frame>
+            </Frame>
+            
+            <Frame type="Frame" name="MasterEffect">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                <Height val="113"/>
+                <Width val="113"/>
+                <Visible val="False"/>
+                
+                <Frame type="Image" name="WingsMasterEffect">
+                    <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                    <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                    <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+                    <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+                    <LayerCount val="2"/>
+                    <Alpha val="200"/>
+         
+                    <Texture val="@UI/Glues_Avatar_LeagueBorder_Medium_MasterFrameMask" layer="0"/>
+                    <AlphaLayer val="True" layer="0"/>
+                    <TextureType val="Normal" layer="0"/>
+                 
+                    <Texture val="@UI/Glues_Avatar_LeagueBorder_Medium_MasterEffect" layer="1"/>
+                    <TextureCoords top="0" left="1" bottom="1" right="0" layer="1"/>
+                    <BlendMode val="Add" layer="1"/>
+                    <WrapUV val="True" layer="1"/>
+
+                    <Animation name="ShimmerAnim">
+                        <Event event="OnShown" action="DirectionForward" frame="$parent"/>
+                        <Event event="OnShown" action="Play" frame="$parent"/>
+                 
+                        <Controller type="LayerUV" layer="1" side="Left" relative="False" sidelock="True" end="Loop" >
+                            <Key type="Curve" time="0" value="1" out="linear"/>
+                            <Key type="Curve" time="24" value="-1" in="linear"/>
+                        </Controller>
+                    </Animation>
+                </Frame>
+                
+                <Frame type="Image" name="Sparkle_Top">
+                    <Anchor side="Top" relative="$parent" pos="Min" offset="-6"/>
+                    <Anchor side="Left" relative="$parent" pos="Min" offset="8"/>
+                    <Texture val="@UI/Glues_Icons_Ladder_Tier_Badge_Sparkle"/>
+                    <Height val="45"/>
+                    <Width val="45"/>
+                    <Alpha val="255"/>
+                    
+                    <Animation name="SparkleAnim">
+                        <Event event="OnShown" action="DirectionForward" frame="$parent"/>
+                        <Event event="OnShown" action="Play" frame="$parent"/>
+                        
+                        <Controller type="Rotation" relative="False" end="Loop">
+                            <Key type="Curve" time="0" value="0" out="linear"/>
+                            <Key type="Curve" time="6" value="360" in="linear"/>
+                            <Key type="Curve" time="7" value="360" in="linear"/>
+                        </Controller>
+                        <Controller type="Fade" end="Loop">
+                            <Key type="Curve" time="0" value="0" in="Slow"/>
+                            <Key type="Curve" time="2.5" value="150" out="Fast"/>
+                            <Key type="Curve" time="3" value="255" out="Fast"/>
+                            <Key type="Curve" time="5.5" value="200" out="Fast"/>
+                            <Key type="Curve" time="6" value="0" in="Slow"/>
+                            <Key type="Curve" time="7" value="0" in="Slow"/>
+                        </Controller>
+                    </Animation>
+                </Frame>
+                
+                <Frame type="Image" name="Sparkle_Bottom">
+                    <Anchor side="Bottom" relative="$parent" pos="Max" offset="5"/>
+                    <Anchor side="Right" relative="$parent" pos="Max" offset="-3"/>
+                    <Texture val="@UI/Glues_Icons_Ladder_Tier_Badge_Sparkle"/>
+                    <Height val="45"/>
+                    <Width val="45"/>
+                    <Alpha val="255"/>
+                    
+                    <Animation name="SparkleAnim">
+                        <Event event="OnShown" action="DirectionForward" frame="$parent"/>
+                        <Event event="OnShown" action="Play" frame="$parent"/>
+                        
+                        <Controller type="Rotation" relative="False" end="Loop">
+                            <Key type="Curve" time="0" value="0" out="linear"/>
+                            <Key type="Curve" time="6" value="-360" in="linear"/>
+                            <Key type="Curve" time="7" value="-360" in="linear"/>
+                        </Controller>
+                        <Controller type="Fade" end="Loop">
+                            <Key type="Curve" time="0" value="0" in="Slow"/>
+                            <Key type="Curve" time="1.5" value="150" out="Fast"/>
+                            <Key type="Curve" time="2" value="255" out="Fast"/>
+                            <Key type="Curve" time="3.5" value="200" out="Fast"/>
+                            <Key type="Curve" time="4" value="0" in="Slow"/>
+                            <Key type="Curve" time="7" value="0" in="Slow"/>
+                        </Controller>
+                    </Animation>
+                </Frame>
+            </Frame>
+            
+            <Frame type="Frame" name="GrandmasterEffect">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                <Height val="113"/>
+                <Width val="113"/>
+                <Visible val="False"/>
+                
+                <Frame type="Image" name="GrandMasterEffect">
+                    <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                    <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                    <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+                    <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+                    <LayerCount val="2"/>
+                    <Alpha val="200"/>
+         
+                    <Texture val="@UI/Glues_Avatar_LeagueBorder_Medium_MasterFrameMask" layer="0"/>
+                    <AlphaLayer val="True" layer="0"/>
+                    <TextureType val="Normal" layer="0"/>
+                 
+                    <Texture val="@UI/Glues_Avatar_LeagueBorder_Medium_GrandmasterEffect" layer="1"/>
+                    <TextureCoords top="0" left="1" bottom="1" right="0" layer="1"/>
+                    <BlendMode val="Add" layer="1"/>
+                    <WrapUV val="True" layer="1"/>
+
+                    <Animation name="ShimmerAnim">
+                        <Event event="OnShown" action="DirectionForward" frame="$parent"/>
+                        <Event event="OnShown" action="Play" frame="$parent"/>
+                 
+                        <Controller type="LayerUV" layer="1" side="Right" relative="False" sidelock="True" end="Loop" >
+                            <Key type="Curve" time="0" value="-1" out="linear"/>
+                            <Key type="Curve" time="22" value="1" in="linear"/>
+                        </Controller>
+                    </Animation>
+                </Frame>
+                
+                <Frame type="Image" name="GrandMasterEffect2">
+                    <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                    <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                    <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+                    <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+                    <LayerCount val="2"/>
+                    <Alpha val="150"/>
+         
+                    <Texture val="@UI/Glues_Avatar_LeagueBorder_Medium_MasterFrameMask" layer="0"/>
+                    <AlphaLayer val="True" layer="0"/>
+                    <TextureType val="Normal" layer="0"/>
+                 
+                    <Texture val="@UI/Glues_Avatar_LeagueBorder_Medium_GrandmasterEffect" layer="1"/>
+                    <TextureCoords top="1" left="0" bottom="0" right="1" layer="1"/>
+                    <BlendMode val="Add" layer="1"/>
+                    <WrapUV val="True" layer="1"/>
+
+                    <Animation name="ShimmerAnim">
+                        <Event event="OnShown" action="DirectionForward" frame="$parent"/>
+                        <Event event="OnShown" action="Play" frame="$parent"/>
+                 
+                        <Controller type="LayerUV" layer="1" side="Top" relative="False" sidelock="True" end="Loop" >
+                            <Key type="Curve" time="0" value="-1" out="linear"/>
+                            <Key type="Curve" time="17" value="1" in="linear"/>
+                        </Controller>
+                    </Animation>
+                </Frame>
+            </Frame>
+        </Frame>
 
         <Frame type="Image" name="PortraitGlass">
-            <Anchor side="Top" relative="$parent" pos="Min" offset="10"/>
-            <Anchor side="Left" relative="$parent" pos="Min" offset="10"/>
-            <Height val="77"/>
-            <Width val="77"/>
+            <Anchor side="Top" relative="$parent" pos="Min" offset="16"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="17"/>
+            <Height val="79"/>
+            <Width val="79"/>
             <Texture val="@UI/Glues_Avatar_LeagueBorderGlass_Medium_Unranked"/>
+            <Alpha val="0"/>
 
             <Animation name="PortraitGlassBronze">
                 <Event event="ShowBronze" action="Reset" frame="$parent"/>
@@ -2292,7 +3372,7 @@
             </Animation>
 
             <Animation name="PortraitGlassGrandmaster">
-                <Event event="ShowGrandaster" action="Reset" frame="$parent"/>
+                <Event event="ShowGrandmaster" action="Reset" frame="$parent"/>
                 <Event event="ShowGrandmaster" action="Play" frame="$parent"/>
 
                 <Controller type="Texture" end="Pause">
@@ -2309,12 +3389,48 @@
                 </Controller>
             </Animation>
         </Frame>
+        
+        <Frame type="Image" name="HoverBorder">
+            <Anchor relative="$parent/PortraitBorderImage" />
+            <Texture val="@UI/Glues_Avatar_LeagueBorder_Medium_Hover"/>
+            <Alpha val="0"/>
+            <BlendMode val="Add"/>
+        </Frame>
+        
+        <Frame type="Image" name="WingsImage">
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="-1"/>
+            <Anchor side="Left" relative="$parent" pos="Mid" offset="1"/>
+            <Anchor side="Right" relative="$parent" pos="Mid" offset="1"/>
+            <Height val="37"/>
+            <Width val="72"/>
+            <Texture val="@UI/Glues_Avatar_LeagueBorder_Medium_Master_Wings"/>
+            <Visible val="False"/>
+
+            <Animation name="PortraitGlassMaster">
+                <Event event="ShowMaster" action="Reset" frame="$parent"/>
+                <Event event="ShowMaster" action="Play" frame="$parent"/>
+
+                <Controller type="Texture" end="Pause">
+                    <Key type="Image" time="0" image="@UI/Glues_Avatar_LeagueBorder_Medium_Master_Wings"/>
+                </Controller>
+            </Animation>
+
+            <Animation name="PortraitGlassGrandmaster">
+                <Event event="ShowGrandmaster" action="Reset" frame="$parent"/>
+                <Event event="ShowGrandmaster" action="Play" frame="$parent"/>
+
+                <Controller type="Texture" end="Pause">
+                    <Key type="Image" time="0" image="@UI/Glues_Avatar_LeagueBorder_Medium_Grandmaster_Wings"/>
+                </Controller>
+            </Animation>
+        </Frame>
 
         <Frame type="Frame" name="RankLabelFrame">
-            <Anchor side="Bottom" relative="$parent" pos="Max" offset="-6"/>
-            <Anchor side="Left" relative="$parent" pos="Min" offset="6"/>
-            <Anchor side="Right" relative="$parent" pos="Max" offset="-6"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="-13"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="12"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="-12"/>
             <Height val="30"/>
+            <Visible val="false"/>
 
             <Frame type="Image" name="RankBg">
                 <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
@@ -2330,6 +3446,170 @@
                 <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
                 <Anchor side="Left" relative="$parent/RankBg" pos="Min" offset="12"/>
                 <Style val="PartyPanelMediumRankLabel"/>
+            </Frame>
+        </Frame>
+        
+        <Frame type="Frame" name="TierBadgeFrame">
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="-15"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="15"/>
+            <Width val="26"/>
+            <Height val="25"/>
+            <Visible val="False"/>
+            
+            <Frame type="Frame" name="Bronze">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                <Width val="26"/>
+                <Height val="25"/>
+                <Visible val="False"/>
+                
+                <Frame type="Image" name="Tier1">
+                    <Anchor relative="$parent"/>
+                    <Texture val="@UI/Glues_Avatar_LeagueBorder_TierBadge_Bronze_1"/>
+                    <Visible val="False"/>
+                </Frame>
+                
+                <Frame type="Image" name="Tier2">
+                    <Anchor relative="$parent"/>
+                    <Texture val="@UI/Glues_Avatar_LeagueBorder_TierBadge_Bronze_2"/>
+                    <Visible val="False"/>
+                </Frame>
+                
+                <Frame type="Image" name="Tier3">
+                    <Anchor relative="$parent"/>
+                    <Texture val="@UI/Glues_Avatar_LeagueBorder_TierBadge_Bronze_3"/>
+                    <Visible val="False"/>
+                </Frame>
+            </Frame>
+            
+            <Frame type="Frame" name="Silver">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                <Width val="26"/>
+                <Height val="25"/>
+                <Visible val="False"/>
+                
+                <Frame type="Image" name="Tier1">
+                    <Anchor relative="$parent"/>
+                    <Texture val="@UI/Glues_Avatar_LeagueBorder_TierBadge_Silver_1"/>
+                    <Visible val="False"/>
+                </Frame>
+                
+                <Frame type="Image" name="Tier2">
+                    <Anchor relative="$parent"/>
+                    <Texture val="@UI/Glues_Avatar_LeagueBorder_TierBadge_Silver_2"/>
+                    <Visible val="False"/>
+                </Frame>
+                
+                <Frame type="Image" name="Tier3">
+                    <Anchor relative="$parent"/>
+                    <Texture val="@UI/Glues_Avatar_LeagueBorder_TierBadge_Silver_3"/>
+                    <Visible val="False"/>
+                </Frame>
+            </Frame>
+            
+            <Frame type="Frame" name="Gold">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                <Width val="26"/>
+                <Height val="25"/>
+                <Visible val="False"/>
+                
+                <Frame type="Image" name="Tier1">
+                    <Anchor relative="$parent"/>
+                    <Texture val="@UI/Glues_Avatar_LeagueBorder_TierBadge_Gold_1"/>
+                    <Visible val="False"/>
+                </Frame>
+                
+                <Frame type="Image" name="Tier2">
+                    <Anchor relative="$parent"/>
+                    <Texture val="@UI/Glues_Avatar_LeagueBorder_TierBadge_Gold_2"/>
+                    <Visible val="False"/>
+                </Frame>
+                
+                <Frame type="Image" name="Tier3">
+                    <Anchor relative="$parent"/>
+                    <Texture val="@UI/Glues_Avatar_LeagueBorder_TierBadge_Gold_3"/>
+                    <Visible val="False"/>
+                </Frame>
+            </Frame>
+           
+            <Frame type="Frame" name="Platinum">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                <Width val="26"/>
+                <Height val="25"/>
+                <Visible val="False"/>
+                
+                <Frame type="Image" name="Tier1">
+                    <Anchor relative="$parent"/>
+                    <Texture val="@UI/Glues_Avatar_LeagueBorder_TierBadge_Platinum_1"/>
+                    <Visible val="False"/>
+                </Frame>
+                
+                <Frame type="Image" name="Tier2">
+                    <Anchor relative="$parent"/>
+                    <Texture val="@UI/Glues_Avatar_LeagueBorder_TierBadge_Platinum_2"/>
+                    <Visible val="False"/>
+                </Frame>
+                
+                <Frame type="Image" name="Tier3">
+                    <Anchor relative="$parent"/>
+                    <Texture val="@UI/Glues_Avatar_LeagueBorder_TierBadge_Platinum_3"/>
+                    <Visible val="False"/>
+                </Frame>
+            </Frame>
+            
+            <Frame type="Frame" name="Diamond">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                <Width val="26"/>
+                <Height val="25"/>
+                <Visible val="False"/>
+                
+                <Frame type="Image" name="Tier1">
+                    <Anchor relative="$parent"/>
+                    <Texture val="@UI/Glues_Avatar_LeagueBorder_TierBadge_Diamond_1"/>
+                    <Visible val="False"/>
+                </Frame>
+                
+                <Frame type="Image" name="Tier2">
+                    <Anchor relative="$parent"/>
+                    <Texture val="@UI/Glues_Avatar_LeagueBorder_TierBadge_Diamond_2"/>
+                    <Visible val="False"/>
+                </Frame>
+                
+                <Frame type="Image" name="Tier3">
+                    <Anchor relative="$parent"/>
+                    <Texture val="@UI/Glues_Avatar_LeagueBorder_TierBadge_Diamond_3"/>
+                    <Visible val="False"/>
+                </Frame>
+            </Frame>
+            
+            <Frame type="Frame" name="Master">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                <Width val="26"/>
+                <Height val="25"/>
+                <Visible val="False"/>
+                
+                <Frame type="Image" name="Tier1">
+                    <Anchor relative="$parent"/>
+                    <Texture val="@UI/Glues_Avatar_LeagueBorder_TierBadge_Master_1"/>
+                    <Visible val="False"/>
+                </Frame>
+                
+                <Frame type="Image" name="Tier2">
+                    <Anchor relative="$parent"/>
+                    <Texture val="@UI/Glues_Avatar_LeagueBorder_TierBadge_Master_2"/>
+                    <Visible val="False"/>
+                </Frame>
+                
+                <Frame type="Image" name="Tier3">
+                    <Anchor relative="$parent"/>
+                    <Texture val="@UI/Glues_Avatar_LeagueBorder_TierBadge_Master_3"/>
+                    <Visible val="False"/>
+                </Frame>
             </Frame>
         </Frame>
 
@@ -2350,6 +3630,24 @@
                 </Controller>
             </Animation>
         </Frame>
+
+        <StateGroup name="StateWingsMedium">
+            <DefaultState val="HideWings"/>
+
+            <State name="Master">
+                <When type="AnimationState" LeagueIcon="ShowMaster"/>
+                <Action type="SetProperty" frame="WingsImage" visible="True"/>
+            </State>
+
+            <State name="Grandmaster">
+                <When type="AnimationState" LeagueIcon="ShowGrandmaster"/>
+                <Action type="SetProperty" frame="WingsImage" visible="True"/>
+            </State>
+
+            <State name="HideWings">
+                <Action type="SetProperty" frame="WingsImage" visible="False"/>
+            </State>
+        </StateGroup>
     </Frame>
     
     <Frame type="AvatarFrame" name="AvatarFrameSmallTemplate" template="StandardTemplates/AvatarFrameTemplate">
@@ -2420,7 +3718,7 @@
             </Animation>
 
             <Animation name="PortraitBorderGrandmaster">
-                <Event event="ShowGrandMaster" action="Reset" frame="$parent"/>
+                <Event event="ShowGrandmaster" action="Reset" frame="$parent"/>
                 <Event event="ShowGrandmaster" action="Play" frame="$parent"/>
 
                 <Controller type="Texture" end="Pause">
@@ -2436,6 +3734,12 @@
                     <Key type="Image" time="0" image="@UI/Glues_Avatar_LeagueBorder_Medium_Unranked"/>
                 </Controller>
             </Animation>
+        </Frame>
+        
+        <Frame type="Frame" name="FrameAnimations">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+            <Visible val="False"/>
         </Frame>
         
         <Frame type="UnlockableFrame" name="PortraitFrame">
@@ -2522,7 +3826,7 @@
             </Animation>
 
             <Animation name="PortraitGlassGrandmaster">
-                <Event event="ShowGrandaster" action="Reset" frame="$parent"/>
+                <Event event="ShowGrandmaster" action="Reset" frame="$parent"/>
                 <Event event="ShowGrandmaster" action="Play" frame="$parent"/>
 
                 <Controller type="Texture" end="Pause">
@@ -2564,6 +3868,14 @@
                 <Style val="SocialPanelRankLabel"/>
             </Frame>
         </Frame>
+        
+        <Frame type="Frame" name="TierBadgeFrame">
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="-10"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="10"/>
+            <Width val="26"/>
+            <Height val="25"/>
+            <Visible val="False"/>
+        </Frame>
 
         <Frame type="Image" name="SilencePenaltyIcon">
             <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
@@ -2586,8 +3898,8 @@
     </Frame>
     
     <Frame type="AvatarFrame" name="AvatarFrameMiniTemplate" template="StandardTemplates/AvatarFrameTemplate">
-        <Height val="53"/>
-        <Width val="53"/>
+        <Height val="55"/>
+        <Width val="55"/>
 
         <Frame type="UnlockableFrame" name="PortraitFrame">
             <Anchor relative="$parent"/>
@@ -2610,8 +3922,8 @@
             <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
             <Texture val="@UI/Glues_Avatar_LeagueBorder_Tiny_Unranked"/>
             <Visible val="true"/>
-            <Height val="53"/>
-            <Width val="53"/>
+            <Height val="55"/>
+            <Width val="55"/>
             
             <Animation name="PortraitBorderBronze">
                 <Event event="ShowBronze" action="Reset" frame="$parent"/>
@@ -2668,7 +3980,7 @@
             </Animation>
 
             <Animation name="PortraitBorderGrandmaster">
-                <Event event="ShowGrandMaster" action="Reset" frame="$parent"/>
+                <Event event="ShowGrandmaster" action="Reset" frame="$parent"/>
                 <Event event="ShowGrandmaster" action="Play" frame="$parent"/>
 
                 <Controller type="Texture" end="Pause">
@@ -2686,6 +3998,12 @@
             </Animation>
         </Frame>
         
+        <Frame type="Frame" name="FrameAnimations">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+            <Visible val="False"/>
+        </Frame>
+        
         <Frame type="Image" name="PortraitGlass">
             <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
             <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
@@ -2693,6 +4011,32 @@
             <Width val="45"/>
             <Texture val="Assets\Textures\UI_Glues_PageAssets_AvatarFrame.dds"/>
             <Visible val="false"/>
+        </Frame>
+        
+        <Frame type="Image" name="WingsImage">
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+            <Height val="20"/>
+            <Width val="35"/>
+            <Texture val="@UI/Glues_Avatar_LeagueBorder_Tiny_Master_Wings"/>
+            <Visible val="False"/>
+
+            <Animation name="PortraitGlassMaster">
+                <Event event="ShowMaster" action="Reset,Play" frame="$parent"/>
+
+                <Controller type="Texture" end="Pause">
+                    <Key type="Image" time="0" image="@UI/Glues_Avatar_LeagueBorder_Tiny_Master_Wings"/>
+                </Controller>
+            </Animation>
+
+            <Animation name="PortraitGlassGrandmaster">
+                <Event event="ShowGrandmaster" action="Reset,Play" frame="$parent"/>
+
+                <Controller type="Texture" end="Pause">
+                    <Key type="Image" time="0" image="@UI/Glues_Avatar_LeagueBorder_Tiny_Grandmaster_Wings"/>
+                </Controller>
+            </Animation>
         </Frame>
 
         <Frame type="Frame" name="RankLabelFrame">
@@ -2716,6 +4060,15 @@
                 <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
                 <Style val="SocialPanelRankLabel"/>
             </Frame>
+        </Frame>
+        
+        <Frame type="Frame" name="TierBadgeFrame">
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+            <Width val="26"/>
+            <Height val="25"/>
+            <Visible val="False"/>
+            <Alpha val="0"/>
         </Frame>
 
         <Frame type="Image" name="SilencePenaltyIcon">
@@ -2824,375 +4177,6 @@
         </Frame>
     </Frame>
 
-    <!-- Example layout for unlockables -->
-    <Frame type="UnlockableTileListItem" name="UnlockableTileListItemTemplate">
-        <Width val="100"/>
-        <Height val="150"/>
-        <TooltipFrame val="AchievementInfoTooltip"/>
-
-        <Animation name="Locked">
-            <Event event="Locked" action="Reset,Play"/>
-            <Event event="Unlocked" action="Reset,Stop"/>
-
-            <Controller type="Fade" end="Pause">
-                <Key type="Curve" time="0.0" value="125" out="Auto"/>
-            </Controller>
-        </Animation>
-
-        <Animation name="Enabled">
-            <Event event="Enabled" action="Reset,Stop"/>
-            <Event event="Disabled" action="Reset,Play"/>
-
-            <Controller type="Enabled" name="Enabled" end="Pause">
-                <Key type="Bool" time="0" value="False"/>
-            </Controller>
-        </Animation>
-
-        <Frame type="Image" name="SelectedImage">
-            <Anchor relative="$parent"/>
-            <Color val="255,255,255"/>
-        </Frame>
-
-        <Frame type="Image" name="Background">
-            <Anchor side="Top" relative="$parent" pos="Min" offset="9"/>
-            <Anchor side="Left" relative="$parent" pos="Min" offset="9"/>
-            <Anchor side="Bottom" relative="$parent" pos="Max" offset="-9"/>
-            <Anchor side="Right" relative="$parent" pos="Max" offset="-9"/>
-            <Color val="100,0,100"/>
-        </Frame>
-        
-        <Frame type="UnlockableFrame" name="UnlockableFrame">
-            <Anchor relative="$parent"/>
-
-            <Frame type="Image" name="UnlockableImage">
-                <Anchor side="Top" relative="$parent" pos="Min" offset="18"/>
-                <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
-                <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
-                <Height val="75"/>
-                <Width val="75"/>
-
-                <DesaturateOnDisable val="False"/>
-            </Frame>
-        </Frame>
-
-        <Frame type="Label" name="TitleLabel">
-            <Anchor side="Left" relative="$parent" pos="Min" offset="9"/>
-            <Anchor side="Bottom" relative="$parent" pos="Max" offset="-9"/>
-            <Anchor side="Right" relative="$parent" pos="Max" offset="-9"/>
-            <Style val="SocialPanelRankLabel"/>
-        </Frame>
-    </Frame>
-
-    <Frame type="ScrollBar" name="UnlockablePanelScrollBarTemplate">
-        <Image val="$root/StandardTemplates/StandardScrollBarBackgroundImage"/>
-        <Button val="$root/StandardTemplates/StandardScrollBarButtonTemplate"/>
-        <Orientation val="Vertical"/>
-        <Width val="24"/>
-        <IncrementSound val="@UI_ScrollButtonSelect"/>
-    </Frame>
-
-    <Frame type="UnlockablePanel" name="UnlockablePanelTemplate">
-        <Width val="600"/>
-        <Height val="600"/>
-        <IsLocalUser val="true"/>
-        <UnlockableTag val="PORT"/>
-        <SelectionEnabled val="true"/>
-
-        <Frame type="TileList" name="UnlockableTileList">
-            <Anchor relative="$parent"/>
-            <AcceptsMouse val="true"/>
-            <ScrollStepValue val="6"/>
-
-            <Frame type="AchievementInfoTooltip" name="AchievementInfoTooltip" template="StandardTemplates/AchievementInfoTooltipTemplate"/>
-
-            <Frame type="UnlockableTileListItem" name="Item0" template="StandardTemplates/UnlockableTileListItemTemplate">
-                <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
-                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
-            </Frame>
-
-            <Frame type="UnlockableTileListItem" name="Item1" template="StandardTemplates/UnlockableTileListItemTemplate">
-                <Anchor side="Top" relative="$parent/Item0" pos="Min" offset="0"/>
-                <Anchor side="Left" relative="$parent/Item0" pos="Max" offset="0"/>
-            </Frame>
-
-            <Frame type="UnlockableTileListItem" name="Item2" template="StandardTemplates/UnlockableTileListItemTemplate">
-                <Anchor side="Top" relative="$parent/Item1" pos="Min" offset="0"/>
-                <Anchor side="Left" relative="$parent/Item1" pos="Max" offset="0"/>
-            </Frame>
-
-            <Frame type="UnlockableTileListItem" name="Item3" template="StandardTemplates/UnlockableTileListItemTemplate">
-                <Anchor side="Top" relative="$parent/Item2" pos="Min" offset="0"/>
-                <Anchor side="Left" relative="$parent/Item2" pos="Max" offset="0"/>
-            </Frame>
-
-            <Frame type="UnlockableTileListItem" name="Item4" template="StandardTemplates/UnlockableTileListItemTemplate">
-                <Anchor side="Top" relative="$parent/Item3" pos="Min" offset="0"/>
-                <Anchor side="Left" relative="$parent/Item3" pos="Max" offset="0"/>
-            </Frame>
-
-            <Frame type="UnlockableTileListItem" name="Item5" template="StandardTemplates/UnlockableTileListItemTemplate">
-                <Anchor side="Top" relative="$parent/Item4" pos="Min" offset="0"/>
-                <Anchor side="Left" relative="$parent/Item4" pos="Max" offset="0"/>
-            </Frame>
-
-            <Frame type="UnlockableTileListItem" name="Item6" template="StandardTemplates/UnlockableTileListItemTemplate">
-                <Anchor side="Top" relative="$parent/Item0" pos="Max" offset="0"/>
-                <Anchor side="Left" relative="$parent/Item0" pos="Min" offset="0"/>
-            </Frame>
-
-            <Frame type="UnlockableTileListItem" name="Item7" template="StandardTemplates/UnlockableTileListItemTemplate">
-                <Anchor side="Top" relative="$parent/Item6" pos="Min" offset="0"/>
-                <Anchor side="Left" relative="$parent/Item6" pos="Max" offset="0"/>
-            </Frame>
-
-            <Frame type="UnlockableTileListItem" name="Item8" template="StandardTemplates/UnlockableTileListItemTemplate">
-                <Anchor side="Top" relative="$parent/Item7" pos="Min" offset="0"/>
-                <Anchor side="Left" relative="$parent/Item7" pos="Max" offset="0"/>
-            </Frame>
-
-            <Frame type="UnlockableTileListItem" name="Item9" template="StandardTemplates/UnlockableTileListItemTemplate">
-                <Anchor side="Top" relative="$parent/Item8" pos="Min" offset="0"/>
-                <Anchor side="Left" relative="$parent/Item8" pos="Max" offset="0"/>
-            </Frame>
-
-            <Frame type="UnlockableTileListItem" name="Item10" template="StandardTemplates/UnlockableTileListItemTemplate">
-                <Anchor side="Top" relative="$parent/Item9" pos="Min" offset="0"/>
-                <Anchor side="Left" relative="$parent/Item9" pos="Max" offset="0"/>
-            </Frame>
-
-            <Frame type="UnlockableTileListItem" name="Item11" template="StandardTemplates/UnlockableTileListItemTemplate">
-                <Anchor side="Top" relative="$parent/Item10" pos="Min" offset="0"/>
-                <Anchor side="Left" relative="$parent/Item10" pos="Max" offset="0"/>
-            </Frame>
-
-            <Frame type="UnlockableTileListItem" name="Item12" template="StandardTemplates/UnlockableTileListItemTemplate">
-                <Anchor side="Top" relative="$parent/Item6" pos="Max" offset="0"/>
-                <Anchor side="Left" relative="$parent/Item6" pos="Min" offset="0"/>
-            </Frame>
-
-            <Frame type="UnlockableTileListItem" name="Item13" template="StandardTemplates/UnlockableTileListItemTemplate">
-                <Anchor side="Top" relative="$parent/Item12" pos="Min" offset="0"/>
-                <Anchor side="Left" relative="$parent/Item12" pos="Max" offset="0"/>
-            </Frame>
-
-            <Frame type="UnlockableTileListItem" name="Item14" template="StandardTemplates/UnlockableTileListItemTemplate">
-                <Anchor side="Top" relative="$parent/Item13" pos="Min" offset="0"/>
-                <Anchor side="Left" relative="$parent/Item13" pos="Max" offset="0"/>
-            </Frame>
-
-            <Frame type="UnlockableTileListItem" name="Item15" template="StandardTemplates/UnlockableTileListItemTemplate">
-                <Anchor side="Top" relative="$parent/Item14" pos="Min" offset="0"/>
-                <Anchor side="Left" relative="$parent/Item14" pos="Max" offset="0"/>
-            </Frame>
-
-            <Frame type="UnlockableTileListItem" name="Item16" template="StandardTemplates/UnlockableTileListItemTemplate">
-                <Anchor side="Top" relative="$parent/Item15" pos="Min" offset="0"/>
-                <Anchor side="Left" relative="$parent/Item15" pos="Max" offset="0"/>
-            </Frame>
-
-            <Frame type="UnlockableTileListItem" name="Item17" template="StandardTemplates/UnlockableTileListItemTemplate">
-                <Anchor side="Top" relative="$parent/Item16" pos="Min" offset="0"/>
-                <Anchor side="Left" relative="$parent/Item16" pos="Max" offset="0"/>
-            </Frame>
-
-            <Frame type="UnlockableTileListItem" name="Item18" template="StandardTemplates/UnlockableTileListItemTemplate">
-                <Anchor side="Top" relative="$parent/Item12" pos="Max" offset="0"/>
-                <Anchor side="Left" relative="$parent/Item12" pos="Min" offset="0"/>
-            </Frame>
-
-            <Frame type="UnlockableTileListItem" name="Item19" template="StandardTemplates/UnlockableTileListItemTemplate">
-                <Anchor side="Top" relative="$parent/Item18" pos="Min" offset="0"/>
-                <Anchor side="Left" relative="$parent/Item18" pos="Max" offset="0"/>
-            </Frame>
-
-            <Frame type="UnlockableTileListItem" name="Item20" template="StandardTemplates/UnlockableTileListItemTemplate">
-                <Anchor side="Top" relative="$parent/Item19" pos="Min" offset="0"/>
-                <Anchor side="Left" relative="$parent/Item19" pos="Max" offset="0"/>
-            </Frame>
-
-            <Frame type="UnlockableTileListItem" name="Item21" template="StandardTemplates/UnlockableTileListItemTemplate">
-                <Anchor side="Top" relative="$parent/Item20" pos="Min" offset="0"/>
-                <Anchor side="Left" relative="$parent/Item20" pos="Max" offset="0"/>
-            </Frame>
-
-            <Frame type="UnlockableTileListItem" name="Item22" template="StandardTemplates/UnlockableTileListItemTemplate">
-                <Anchor side="Top" relative="$parent/Item21" pos="Min" offset="0"/>
-                <Anchor side="Left" relative="$parent/Item21" pos="Max" offset="0"/>
-            </Frame>
-
-            <Frame type="UnlockableTileListItem" name="Item23" template="StandardTemplates/UnlockableTileListItemTemplate">
-                <Anchor side="Top" relative="$parent/Item22" pos="Min" offset="0"/>
-                <Anchor side="Left" relative="$parent/Item22" pos="Max" offset="0"/>
-            </Frame>
-
-            <Frame type="ScrollBar" name="ScrollBar" template="StandardTemplates/UnlockablePanelScrollBarTemplate">
-                <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
-                <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
-                <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
-            </Frame>
-        </Frame>
-    </Frame>
-    
-    <!-- SearchEditBox -->
-    <Frame type="EditBox" name="StandardSearchEditBoxTemplate" template="StandardTemplates/StandardEditBoxTemplate">
-        <Insets top="10" left="15" bottom="10" right="40"/>
-
-        <Frame type="Label" name="SearchTextLabel">
-            <Anchor side="Top" relative="$parent" pos="Min" offset="15"/>
-            <Anchor side="Bottom" relative="$parent" pos="Max" offset="-12"/>
-            <Anchor side="Left" relative="$parent" pos="Min" offset="15"/>
-            <Anchor side="Right" relative="$parent" pos="Max" offset="15"/>
-            <Style val="GlueEditBox"/>
-            <Text val="@UI/ScreenStore/SearchLabel"/>
-        </Frame>
-
-        <Frame type="Button" name="ClearTextButton">
-            <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
-            <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
-            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
-            <Height val="47"/>
-            <Width val ="51"/>
-
-            <Frame type="Image" name="NormalImage">
-                <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
-                <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
-                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
-                <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
-                <Texture val="@UI/Glues_Icons_CloseButton" layer="0"/>
-                <TextureType val="Normal"/>
-                <Tiled val="false"/>
-                <StateCount val="1"/>
-            </Frame>
-
-            <Frame type="Image" name="HoverImage">
-                <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
-                <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
-                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
-                <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
-                <Texture val="@UI/Glues_Icons_CloseButton" layer="0"/>
-                <TextureType val="Normal"/>
-                <Tiled val="false"/>
-                <StateCount val="1"/>
-            </Frame>
-
-            <Frame type="Frame" name="HitTestFrame">
-                <Anchor side="Top" relative="$parent" pos="Min" offset="6"/>
-                <Anchor side="Bottom" relative="$parent" pos="Max" offset="-6"/>
-                <Anchor side="Left" relative="$parent" pos="Min" offset="6"/>
-                <Anchor side="Right" relative="$parent" pos="Max" offset="-6"/>
-            </Frame>
-        </Frame>
-    </Frame>
-
-    <!-- Standard Icon Button -->
-    <Frame type="Button" name="StandardIconButtonTemplate">
-        <Width val="94"/>
-        <Height val="83"/>
-        <DisplayType val="ImageLayer"/>
-
-        <Frame type="Image" name="NormalImage">
-            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
-            <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
-            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
-            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
-            <LayerCount val="4"/>
-            <Texture val="@UI/Glues_BlueButtons_SmallIconButton_Normal" layer="0"/>
-            <Texture val="@UI/Glues_BlueButtons_SmallIconButton_Down" layer="1"/>
-            <Texture val="@UI/Glues_BlueButtons_SmallIconButton_Down" layer="2"/>
-            <Texture val="@UI/Glues_BlueButtons_SmallIconButton_Down" layer="3"/>
-            <TextureType val="Normal"/>
-            <Tiled val="false"/>
-            <StateCount val="1"/>
-            <DesaturateOnDisable val="false"/>
-        </Frame>
-
-        <Frame type="Image" name="HoverImage">
-            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
-            <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
-            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
-            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
-            <LayerCount val="4"/>
-            <Texture val="@UI/Glues_BlueButtons_SmallIconButton_Hover" layer="0"/>
-            <Texture val="@UI/Glues_BlueButtons_SmallIconButton_Down" layer="1"/>
-            <Texture val="@UI/Glues_BlueButtons_SmallIconButton_Down" layer="2"/>
-            <Texture val="@UI/Glues_BlueButtons_SmallIconButton_Down" layer="3"/>
-            <TextureType val="Normal"/>
-            <Tiled val="false"/>
-            <StateCount val="1"/>
-            <DesaturateOnDisable val="false"/>
-        </Frame>
-
-        <Frame type="Frame" name="HitTestFrame">
-            <Anchor side="Top" relative="$parent" pos="Min" offset="20"/>
-            <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
-            <Anchor side="Left" relative="$parent" pos="Min" offset="15"/>
-            <Anchor side="Right" relative="$parent" pos="Max" offset="-15"/>
-        </Frame>
-
-        <Frame type="Label" name="Label">
-            <Anchor side="Top" relative="$parent" pos="Min" offset="25"/>
-            <Anchor side="Left" relative="$parent" pos="Min" offset="15"/>
-            <Anchor side="Right" relative="$parent" pos="Max" offset="-15"/>
-            <Style val="StandardGlueButtonMini"/>
-        </Frame>
-    </Frame>
-
-    <Frame type="Button" name="Top_Navigation">
-        <Width val="289"/>
-        <Height val="115"/>
-        <DisplayType val="ImageLayer"/>
-
-        <Frame type="Image" name="NormalImage">
-            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
-            <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
-            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
-            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
-            <LayerCount val="4"/>
-            <Texture val="@UI/Glues_BlueButtons_BackButton_Normal" layer="0"/>
-            <Texture val="@UI/Glues_BlueButtons_BackButton_Down" layer="1"/>
-            <Texture val="@UI/Glues_BlueButtons_BackButton_Down" layer="2"/>
-            <Texture val="@UI/Glues_BlueButtons_BackButton_Disabled" layer="3"/>
-            <TextureType val="Normal"/>
-            <Tiled val="false"/>
-            <StateCount val="1"/>
-            <DesaturateOnDisable val="false"/>
-            <RenderPriority val="599"/>
-        </Frame>
-
-        <Frame type="Image" name="HoverImage">
-            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
-            <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
-            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
-            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
-            <LayerCount val="4"/>
-            <Texture val="@UI/Glues_BlueButtons_BackButton_Hover" layer="0"/>
-            <Texture val="@UI/Glues_BlueButtons_BackButton_Down" layer="1"/>
-            <Texture val="@UI/Glues_BlueButtons_BackButton_Down" layer="2"/>
-            <Texture val="@UI/Glues_BlueButtons_BackButton_Disabled" layer="3"/>
-            <TextureType val="Normal"/>
-            <Tiled val="false"/>
-            <StateCount val="1"/>
-            <DesaturateOnDisable val="false"/>
-            <RenderPriority val="599"/>
-        </Frame>
-
-        <Frame type="Label" name="Label">
-            <Anchor side="Top" relative="$parent" pos="Min" offset="8"/>
-            <Anchor side="Bottom" relative="$parent" pos="Max" offset="-49"/>
-            <Anchor side="Left" relative="$parent" pos="Min" offset="42"/>
-            <Anchor side="Right" relative="$parent" pos="Max" offset="-42"/>
-            <RenderPriority val="601"/>
-            <Style val="TopNavigation"/>
-        </Frame>
-
-        <Frame type="Frame" name="HitTestFrame">
-            <Anchor side="Top" relative="$parent" pos="Min" offset="4"/>
-            <Anchor side="Bottom" relative="$parent" pos="Max" offset="-49"/>
-            <Anchor side="Left" relative="$parent" pos="Min" offset="17"/>
-            <Anchor side="Right" relative="$parent" pos="Max" offset="-17"/>
-        </Frame>
-    </Frame>
-
     <Frame type="BlurFrame" name="FullscreenBlurFrame">
         <Anchor relative="$parent"/>
 
@@ -3200,26 +4184,6 @@
             <Anchor relative="$parent"/>
             <Color val="17,25,50"/>
             <Alpha val="220"/>
-        </Frame>
-    </Frame>
-
-    <Frame type="GlueButton" name="Top_Navigation_Notify" template="StandardTemplates/Top_Navigation">
-        <Frame type="Image" name="NotifyFrame">
-            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
-            <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
-            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
-            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
-            <Texture val="@UI/Glues_BlueButtons_BackButton_Down"/>
-            <TextureType val="Normal"/>
-            <RenderPriority val="600"/>
-              
-            <Animation name="Pulse">
-                <Event event="OnShown" action="Play"/>
-                <Controller type="Fade" end="PingPong">
-                    <Key type="Curve" time="0" value="100" out="Slow"/>
-                    <Key type="Curve" time=".5" value="255" in="Slow"/>
-                </Controller>
-            </Animation>
         </Frame>
     </Frame>
 
