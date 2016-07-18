@@ -470,9 +470,72 @@
 		
 		<Frame type="Image" name="IconFrame">
 			<Texture val="_Assets\Textures\storm_ui_ingame_obs_player_frame_blue.dds"/>
+			<RenderPriority val="512"/>
 		</Frame>
 		
 		<Frame type="Image" name="HeroPortraitImage">
+			<RenderPriority val="511"/>
+		</Frame>
+		
+		<!-- custom vehicle portrait -->
+		<Frame type="Frame" name="VehiclePortrait">
+			<Anchor relative="$parent/HeroPortraitImage"/>
+			<Visible val="false"/>
+			<RenderPriority val="511"/>
+			
+			<Animation name="FadeLoop">
+				<Event event="OnShown" action="Reset,DirectionForward,Play"/>
+				<Event event="OnHidden" action="Stop"/>
+				
+				<Controller type="Fade" end="Loop">
+					<Key type="Curve" time="0" value="255"/>
+					<Key type="Curve" time="2.0" value="255"/>
+					<Key type="Curve" time="2.5" value="0"/>
+					<Key type="Curve" time="4.5" value="0"/>
+					<Key type="Curve" time="5.0" value="255"/>
+				</Controller>
+			</Animation>
+			
+			<Frame type="Image" name="DragonKnightIcon">
+				<Anchor relative="$parent"/>
+				<Unclipped val="true"/>
+				<!-- size: 184x164
+				<Texture val="Assets/Textures/ui_ingame_mapmechanic_loadscreen_dragonshire_icon3.dds"/> -->
+				<!-- size: 197x220
+				<Texture val="Assets/Textures/hud_minimap_dragon_dragonhud.dds"/> -->
+				<Texture val="Assets/Textures/ui_ingame_mapmechanic_loadscreen_dragonshire.dds"/>
+				<TextureCoords top="0.1574" left="0.4328" bottom="0.3241" right="0.6229"/>
+				<Visible val="false"/>
+				<AlphaMaskTexture val="@UI/obs_alphaMask_portrait"/>
+			</Frame>
+			<Frame type="Image" name="GardenTerrorIcon">
+				<!-- <Anchor side="Top" relative="$parent" pos="Min" offset="-50"/>
+				<Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+				<Width val="100"/>
+				<Height val="100"/> -->
+				<Anchor relative="$parent"/>
+				<Unclipped val="true"/>
+				<!-- size: 300x300
+				<Texture val="Assets/Textures/ui_ingame_mapmechanic_loadscreen_gardenofterror_icon3.dds"/> -->
+				<Texture val="Assets/Textures/ui_ingame_mapmechanic_loadscreen_gardenofterror.dds"/>
+				<TextureCoords top="0.1481" left="0.4047" bottom="0.3463" right="0.6521"/>
+				<Visible val="false"/>
+				<AlphaMaskTexture val="@UI/obs_alphaMask_portrait"/>
+			</Frame>
+			
+			<StateGroup name="MapMechanicState">
+				<DefaultState val="Nothing"/>
+				<State name="DragonShire">
+					<When type="Property" frame="$ancestor[@name=UIContainer]/ConsoleUIContainer/MapMechanicPanel/DragonShirePanel" visible="True"/>
+					<Action type="SetProperty" frame="DragonKnightIcon" visible="True"/>
+				</State>
+				<State name="GardenOfTerror">
+					<When type="Property" frame="$ancestor[@name=UIContainer]/ConsoleUIContainer/MapMechanicPanel/GardenOfTerrorPanel" visible="True"/>
+					<Action type="SetProperty" frame="GardenTerrorIcon" visible="True"/>
+				</State>
+				<State name="Nothing">
+				</State>
+			</StateGroup>
 		</Frame>
 		
 		<Frame type="UnitStatusFrame" name="HeroStatus">
@@ -480,6 +543,7 @@
 			<Anchor side="Right" relative="$parent" pos="Max" offset="-36"/>
 			<Height val="33"/>
 			<Width val="134"/>
+			<RenderPriority val="513"/>
 			
 			<Frame type="Frame" name="HeroicPlaceholder">
 				<Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
@@ -519,9 +583,10 @@
 				<OwnerColor val="00ba00" index="0"/>
 				<AllyColor val="00ba00" index="0"/>
 				<EnemyColor val="00ba00" index="0"/>
-				<OwnerColor val="34, 90, 194" index="1"/>
-				<AllyColor val="34, 90, 194" index="1"/>
-				<EnemyColor val="34, 90, 194" index="1"/>
+				<!-- old color: blue 34,90,194 -->
+				<OwnerColor val="FFFFFF" index="1"/>
+				<AllyColor val="FFFFFF" index="1"/>
+				<EnemyColor val="FFFFFF" index="1"/>
 				<OwnerColor val="0, 77, 0" index="2"/>
 				<AllyColor val="0, 77, 0" index="2"/>
 				<EnemyColor val="0, 77, 0" index="2"/>
@@ -553,6 +618,28 @@
 				<AlphaMaskTexture val="@UI/obs_bar_player_blue"/>
 				<Color val="40,40,40"/>
 				<RenderPriority val="500"/>
+			</Frame>
+			
+			<!-- Vehicle Detector -->
+			<Frame type="UnitStatusBehaviorAnim" name="VehicleDetector">
+				<Anchor relative="$parent"/>
+				<Behavior val="UsingVehicle"/>
+				
+				<!-- make placeholder visible, make cooldown visible -->
+				<Animation name="VehicleEntered">
+					<Event event="BehaviorCreate" action="Reset,Play"/>
+					
+					<Controller type="Visibility" end="Pause" frame="$parent/$parent/VehiclePortrait">
+						<Key type="Bool" time="0" value="True"/>
+					</Controller>
+				</Animation>
+				<Animation name="VehicleLeft">
+					<Event event="BehaviorDestroy" action="Reset,Play"/>
+					
+					<Controller type="Visibility" end="Pause" frame="$parent/$parent/VehiclePortrait">
+						<Key type="Bool" time="0" value="False"/>
+					</Controller>
+				</Animation>
 			</Frame>
 			
 		</Frame>
@@ -591,6 +678,15 @@
 		
 		<Frame type="Image" name="IconFrame">
 			<Texture val="_Assets\Textures\storm_ui_ingame_obs_player_frame_red.dds"/>
+		</Frame>
+		
+		<Frame type="Frame" name="VehiclePortrait">
+			<Frame type="Image" name="DragonKnightIcon">
+				<AlphaMaskTexture val="@UI/obs_alphaMask_portrait_mirrored"/>
+			</Frame>
+			<Frame type="Image" name="GardenTerrorIcon">
+				<AlphaMaskTexture val="@UI/obs_alphaMask_portrait_mirrored"/>
+			</Frame>
 		</Frame>
 		
 		<Frame type="UnitStatusFrame" name="HeroStatus">
