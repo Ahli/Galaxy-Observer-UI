@@ -21,39 +21,86 @@
         <Anchor side="Right" relative="$parent" pos="Mid" offset="748"/>
         <Height val="70"/>
 
-        <Frame type="Image" name="LoadingBarFrameImage">
+        <Frame type="ProgressBar" name="LoadingProgressBar">
             <Anchor side="Top" relative="$parent" pos="Max" offset="-50"/>
             <Anchor side="Left" relative="$parent" pos="Min" offset="-2"/>
             <Width val="1500"/>
+            <Height val="36"/>
 
-            <Texture val="@UI/Storm_LoadingScreen_LoadBar"/>
-            <TextureType val="NineSlice"/>
-            <Color val="6F6F6F"/>
-            <HSkew val="45"/>
+            <UseFillContainer val="true" />
 
-            <Frame type="PropertyBind" name="BindTexture">
+            <FillInset val="0.0"/>
+            <MinValue val="-5.0"/>
+            <MaxValue val="100.00"/>
+            <Value val="100.0"/>
+
+            <Frame type="Image" name="ProgressBarBackground">
                 <Anchor relative="$parent"/>
-                <Source frame="$parent/$parent/LoadingBarImage" property="Texture"/>
-                <Target frame="$parent" property="Texture"/>
+                <Texture val="@UI/Storm_UI_Global_ProgressBar_Background"/>
+                <TextureType val="Nineslice"/>
+                <Alpha val="160"/>
             </Frame>
-        </Frame>
 
-        <Frame type="Image" name="LoadingBarImage">
-            <Anchor side="Top" relative="$parent" pos="Max" offset="-50"/>
-            <Anchor side="Left" relative="$parent" pos="Min" offset="-2"/>
-            <Width val="1500"/>
+            <Frame type="Frame" name="FillImageContainer">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
 
-            <Texture val="@UI/Storm_LoadingScreen_LoadBar"/>
-            <TextureType val="NineSlice"/>
-            <Alpha val="128"/>
-            <HSkew val="45"/>
-            <BlendMode val="Add"/>
+                <Frame type="Image" name="FillImage">
+                    <Anchor relative="$parent"/>
+                    <Texture val="@UI/Storm_UI_Global_ProgressBar"/>
+                    <TextureType val="Nineslice"/>
+                </Frame>
+
+                <Frame type="Image" name="SeasonProgressBarSubGlowImage">
+                    <Anchor side="Top" relative="$parent/FillImage" pos="Mid" offset="0"/>
+                    <Anchor side="Bottom" relative="$parent/FillImage" pos="Mid" offset="0"/>
+                    <Anchor side="Right" relative="$parent/FillImage" pos="Max" offset="23"/>
+                    <Unclipped val="true"/>
+                    <Texture val="@UI/Storm_UI_Global_ProgressBar_Glow"/>
+                    <BlendMode val="Add"/>
+                </Frame>
+            </Frame>
+
+            <Frame type="PropertyBind" name="BindValue">
+                <Anchor relative="$parent"/>
+                <Source frame="$ancestor[@type=LoadingBar]" property="ProgressValue"/>
+                <Target frame="$parent" property="Value"/>
+            </Frame>
+
+            <Frame type="PropertyBind" name="BindVisibility">
+                <Anchor relative="$parent"/>
+                <Source frame="$ancestor[@type=LoadingBar]" property="ShowLoadingBar"/>
+                <Target frame="$parent" property="Visible"/>
+            </Frame>
+
+            <StateGroup name="Type">
+                <DefaultState val="Loading"/>
+                <State name="Complete">
+                    <When type="Property" frame="$ancestor[@type=LoadingBar]" IsComplete="True"/>
+                    <Action type="SendEvent" frame="$this" event="StartPulse"/>
+                    <Action type="SetProperty" frame="FillImageContainer/SeasonProgressBarSubGlowImage" visible="false"/>
+                </State>
+                <State name="Loading">
+                    <Action type="SendEvent" frame="$this" event="StopPulse"/>
+                    <Action type="SetProperty" frame="FillImageContainer/SeasonProgressBarSubGlowImage" visible="true"/>
+                </State>
+            </StateGroup>
+
+            <Animation name="Pulse">
+                <Event event="StartPulse" action="Play"/>
+                <Event event="StopPulse" action="Stop"/>
+                <Controller type="Fade" end="PingPong">
+                    <Key type="Curve" time="0" value="150" out="Slow"/>
+                    <Key type="Curve" time=".6" value="255" in="Slow"/>
+                </Controller>
+            </Animation>
         </Frame>
 
         <Frame type="Label" name="LoadingBarLabel">
-            <Anchor side="Bottom" relative="$parent/LoadingBarFrameImage" pos="Min" offset="8"/>
-            <Anchor side="Left" relative="$parent/LoadingBarFrameImage" pos="Mid" offset="0"/>
-            <Anchor side="Right" relative="$parent/LoadingBarFrameImage" pos="Max" offset="-20"/>
+            <Anchor side="Bottom" relative="$parent/LoadingProgressBar" pos="Min" offset="8"/>
+            <Anchor side="Left" relative="$parent/LoadingProgressBar" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent/LoadingProgressBar" pos="Max" offset="-20"/>
             <Style val="LoadingStartup"/>
         </Frame>
 
@@ -172,8 +219,8 @@
         <Frame type="Label" name="LoadingStartupLabel">
             <Style val="LoadingBarLabel"/>
             <Text val="@UI/ScreenLoadingStartup"/>
-            <Anchor side="Top" relative="$parent/LoadingBar/LoadingBarFrameImage" pos="Min" offset="-35"/>
-            <Anchor side="Left" relative="$parent/LoadingBar/LoadingBarFrameImage" pos="Min" offset="8"/>
+            <Anchor side="Top" relative="$parent/LoadingBar/LoadingProgressBar" pos="Min" offset="-35"/>
+            <Anchor side="Left" relative="$parent/LoadingBar/LoadingProgressBar" pos="Min" offset="8"/>
             <Width val="880"/>
         </Frame>
     </Frame>
