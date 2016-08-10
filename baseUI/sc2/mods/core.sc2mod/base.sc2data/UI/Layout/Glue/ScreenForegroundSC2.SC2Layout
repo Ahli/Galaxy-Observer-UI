@@ -26,13 +26,61 @@
             <Anchor side="Right" relative="$parent" pos="Max" offset="-100"/>
             <Height val="230"/>
         </Frame>
-        
+
+        <Frame type="TrophyCollectionFrame" name="TrophyCollectionFrame" template="TrophyCollectionFrame/TrophyCollectionFrameTemplate">
+            <Anchor side="Top" relative="$parent" pos="Mid" offset="-390"/>
+            <Anchor side="Left" relative="$parent" pos="Mid" offset="-366"/>
+            <Width val="1117"/>
+            <Height val="801"/>
+
+            <StateGroup name="TrophyCollectionVisibleState">
+                <DefaultState val="DefaultState"/>
+                
+                <State name="TrophyCollectionStateEmpty">
+                    <When type="AnimationState" DefaultState="Empty"/>
+                    <Action type="SetProperty" Visible="false"/>
+                </State>
+
+                <State name="TrophyCollectionStateHideForeground">
+                    <When type="AnimationState" frame="$parent" ShowForeground="NotVisible"/>
+                    <Action type="SetProperty" Visible="false"/>
+                </State>
+
+                <State name="DefaultState">
+                    <Action type="SetProperty" Visible="true"/>
+                </State>
+            </StateGroup>
+        </Frame>
+
+        <Frame type="ScoreScreenLadderFrame" name="ScoreScreenLadderFrame" template="ScoreScreenLadderFrame/ScoreScreenLadderFrameTemplate">
+            <Anchor side="Top" relative="$parent" pos="Mid" offset="-332"/>
+            <Anchor side="Left" relative="$parent" pos="Mid" offset="1"/>
+            <Anchor side="Right" relative="$parent" pos="Mid" offset="1"/>
+            <Width val="1500"/>
+            <Height val="667"/>
+
+            <StateGroup name="ScoreScreenLadderVisibility">
+                <DefaultState val="ScoreScreenLadderNotVisible"/>
+
+                <State name="ScoreScreenLadderVisible">
+                    <When type="AnimationState" ScoreScreenLadderIsVisible="ScoreScreenLadderVisible"/>
+                    <When type="AnimationState" frame="$parent" ShowForeground="Visible"/>
+                    <Action type="SetProperty" visible="True"/>
+                </State>
+
+                <State name="ScoreScreenLadderNotVisible">
+                    <Action type="SetProperty" visible="False"/>
+                </State>
+            </StateGroup>
+        </Frame>
+
         <Frame type="BattleMapProfilePanel" name="MapProfilePanel" template="BattleMapProfilePanel/BattleMapProfilePanelTemplate">
             <Anchor relative="$parent"/>
             <Visible val="false"/>
 
             <Animation name="Show">
-                <Event event="Show" action="Reset,Play" frame="$this"/>
+                <Event event="OnHidden" action="Reset,Stop" frame="$this"/>
+                <Event event="Show" action="DirectionForward,Play" frame="$this"/>
                 <Event event="Hide" action="Reset,Stop" frame="$this"/>
                 <Event event="OnClick" action="Reset,Stop" frame="CloseButton"/>
                 <Event event="ToonOffline" action="Reset,Stop" frame="$parent"/>
@@ -50,24 +98,26 @@
             </Animation>
         </Frame>
 
-        <Frame type="TrophyCollectionFrame" name="TrophyCollectionFrame" template="TrophyCollectionFrame/TrophyCollectionFrameTemplate">
-            <Anchor side="Top" relative="$parent" pos="Mid" offset="-390"/>
-            <Anchor side="Left" relative="$parent" pos="Mid" offset="-366"/>
-            <Width val="1117"/>
-            <Height val="801"/>
-        </Frame>
-
-        <Frame type="ScoreScreenLadderFrame" name="ScoreScreenLadderFrame" template="ScoreScreenLadderFrame/ScoreScreenLadderFrameTemplate">
-            <Anchor side="Top" relative="$parent" pos="Mid" offset="-332"/>
-            <Anchor side="Left" relative="$parent" pos="Mid" offset="1"/>
-            <Anchor side="Right" relative="$parent" pos="Mid" offset="1"/>
-            <Width val="1500"/>
-            <Height val="667"/>
-        </Frame>
-
         <Frame type="MatchmakingInvitePanel" name="MatchmakingInvitePanel" template="MatchmakingInvitePanel/MatchmakingInvitePanelTemplate">
             <Anchor relative="$parent"/>
         </Frame>
+
+        <Frame type="CustomGameInvitePanel" name="CustomGameInvitePanel" template="CustomGameInvitePanel/CustomGameInvitePanelTemplate">
+            <Anchor relative="$parent"/>
+        </Frame>
+
+        <StateGroup name="ShowForegroundStateGroup">
+            <State name="ShowForegroundState">
+                <When type="AnimationState" frame="$this" ShowForeground="Visible"/>
+                <Action type="SetProperty" frame="SocialContainer" Visible="true"/>
+            </State>
+
+            <State name="HideForegroundState">
+                <When type="AnimationState" frame="$this" ShowForeground="NotVisible"/>
+                <Action type="SetProperty" frame="SocialContainer" Visible="false"/>
+                <Action type="SendEvent" frame="MapProfilePanel" event="Hide"/>
+            </State>
+        </StateGroup>
 
         <Frame type="Frame" name="SocialContainer">
             <Handle val="ScreenForegroundSC2_SocialContainer"/>
@@ -577,6 +627,14 @@
                     <Action type="SetProperty" frame="PartyReadyStatusPanel" visible="false"/>
                     <Action type="SetProperty" frame="DownloadPanel" visible="false"/>
                     <Action type="SetProperty" frame="MatchmakingSearchPanel" visible="false"/>
+                </State>
+
+                <State name="ReadyHiddenState">
+                    <When type="AnimationState" frame="PartyReadyStatusPanel" ReadyState="Hide"/>
+                    <Action type="SetProperty" frame="MatchmakingSearchPanel" Visible="false"/>
+                    <Action type="SetProperty" frame="DownloadPanel" Visible="false"/>
+                    <Action type="SetProperty" frame="PartyReadyStatusPanel" Visible="false"/>
+                    <Action type="SetProperty" frame="LobbyStatusPanel" visible="false"/>
                 </State>
                 
                 <State name="DefaultState">

@@ -1,0 +1,189 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<Desc>
+    <DescFlags val="Locked"/>
+
+    <Frame type="CustomGameInvitePanel" name="CustomGameInvitePanelTemplate">
+        <Visible val="false"/>
+        <Alpha val="0"/>
+
+        <Frame Type="BattleUserContextMenu" name="UserContextMenu" template="BattleUserContextMenu/BattleUserContextMenu">
+            <Anchor side="Top" relative="$parent" pos="Max" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+        </Frame>
+
+        <Animation name="Show">
+            <Event event="ShowGame" action="Reset,Play"/>
+            <Event event="ShowReplay" action="Reset,Play"/>
+            <Event event="Hide" action="Reset,Stop"/>
+
+            <Controller type="Fade" end="Pause">
+                <Key type="Curve" time="0.0" value="0" out="Auto"/>
+                <Key type="Curve" time="0.2" value="255" out="Auto"/>
+            </Controller>
+
+            <Controller type="Visibility" end="Pause">
+                <Key type="Bool" time="0" value="True"/>
+            </Controller>
+
+            <Controller type="Sound" end="Pause">
+                <Key type="Sound" time="0.0" sound="@UI_BnetWindowOpen" direction="Forward"/>
+            </Controller>
+        </Animation>
+
+        <!-- This tooltip is just for blocking tooltips behind this panel -->
+        <Frame type="StandardTooltip" name="CustomGameInviteTooltip">
+            <Frame type="Label" name="Label">
+                <Anchor relative="$parent"/>
+            </Frame>
+        </Frame>
+
+        <Frame type="Image" name="FullscreenBlackoutImage">
+            <Anchor relative="$parent"/>
+            <Color val="0, 0, 0"/>
+            <Alpha val="180"/>
+            <RenderPriority val="1"/>
+            <AcceptsMouse val="true"/>
+            <TooltipFrame val="CustomGameInviteTooltip"/>
+        </Frame>
+        
+        <Frame type="Frame" name="BackgroundFrame" template="StandardTemplates/StandardSmallPanelTemplate">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="300"/>
+            <Anchor side="Bottom" relative="$parent\AcceptButton" pos="Max" offset="50"/>
+            <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+            <Width val="750"/>
+        </Frame>
+        
+        <Frame type="Image" name="TopHexPattern">
+            <Anchor side="Top" relative="$parent/BackgroundFrame/BorderImage" pos="Min" offset="11"/>
+            <Anchor side="Left" relative="$parent/BackgroundFrame" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent/BackgroundFrame" pos="Mid" offset="0"/>
+            <Texture val="@UI/Glues_Battlenet_DialogBox_HexPattern"/>
+        </Frame>
+
+        <Frame type="Image" name="BottomHexPattern">
+            <Anchor side="Bottom" relative="$parent/BackgroundFrame/BorderImage" pos="Max" offset="-11"/>
+            <Anchor side="Left" relative="$parent/BackgroundFrame" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent/BackgroundFrame" pos="Mid" offset="0"/>
+            <Texture val="@UI/Glues_Battlenet_DialogBox_HexPattern"/>
+            <TextureCoords top="1.0" left="1.0" bottom="0.0" right="0.0"/>
+        </Frame>
+
+        <Frame type="Label" name="TitleLabel">
+            <Anchor side="Top" relative="$parent/BackgroundFrame/BorderImage" pos="Min" offset="45"/>
+            <Anchor side="Left" relative="$parent/BackgroundFrame/BorderImage" pos="Min" offset="60"/>
+            <Anchor side="Right" relative="$parent/BackgroundFrame/BorderImage" pos="Max" offset="-60"/>
+            <Style val="@@StandardDialogTitle"/>
+
+            <StateGroup name="TitleStateGroup">
+                <State name="GameState">
+                    <When type="AnimationState" frame="$parent" CustomGameInvitePanelState="ShowGame"/>
+                    <Action type="SetProperty" frame="$this" Text="@UI/CustomGameInvitePanel/TitleGame"/>
+                </State>
+                <State name="ReplayState">
+                    <When type="AnimationState" frame="$parent" CustomGameInvitePanelState="ShowReplay"/>
+                    <Action type="SetProperty" frame="$this" Text="@UI/CustomGameInvitePanel/TitleReplay"/>
+                </State>
+            </StateGroup>
+        </Frame>
+        
+        <Frame type="Image" name="ExpansionFrameImage">
+            <Anchor side="Top" relative="$parent/InviterAvatar" pos="Min" offset="-63"/>
+            <Anchor side="Left" relative="$parent/InviterAvatar" pos="Mid" offset="-1"/>
+            <Anchor side="Right" relative="$parent/InviterAvatar" pos="Mid" offset="-1"/>
+            <Height val="241"/>
+            <Width val="358"/>
+            <Texture val="@UI/SC2_UI_Battlenet_Glue_Arcade_GameInvite_Expansion_None"/>
+            
+            <StateGroup name="ExpansionStateGroup">
+                <State name="NoneState">
+                    <When type="AnimationState" frame="$parent" ExpansionLevel="None"/>
+                    <Action type="SetProperty" frame="$this" texture="@UI/SC2_UI_Battlenet_Glue_Arcade_GameInvite_Expansion_None"/>
+                </State>
+                <State name="StarterState">
+                    <When type="AnimationState" frame="$parent" ExpansionLevel="Starter"/>
+                    <Action type="SetProperty" frame="$this" texture="@UI/SC2_UI_Battlenet_Glue_Arcade_GameInvite_Expansion_None"/>
+                </State>
+                <State name="WoLState">
+                    <When type="AnimationState" frame="$parent" ExpansionLevel="WoL"/>
+                    <Action type="SetProperty" frame="$this" texture="@UI/SC2_UI_Battlenet_Glue_Arcade_GameInvite_Expansion_Wol"/>
+                </State>
+                <State name="HotSState">
+                    <When type="AnimationState" frame="$parent" ExpansionLevel="HotS"/>
+                    <Action type="SetProperty" frame="$this" texture="@UI/SC2_UI_Battlenet_Glue_Arcade_GameInvite_Expansion_Hots"/>
+                </State>
+                <State name="LotVState">
+                    <When type="AnimationState" frame="$parent" ExpansionLevel="LotV"/>
+                    <Action type="SetProperty" frame="$this" texture="@UI/SC2_UI_Battlenet_Glue_Arcade_GameInvite_Expansion_LotV"/>
+                </State>
+            </StateGroup>
+        </Frame>
+
+        <Frame type="Label" name="ExpansionLabel">
+            <Anchor side="Top" relative="$parent/TitleLabel" pos="Max" offset="25"/>
+            <Anchor side="Left" relative="$parent/BackgroundFrame/BorderImage" pos="Min" offset="50"/>
+            <Anchor side="Right" relative="$parent/BackgroundFrame/BorderImage" pos="Max" offset="-50"/>
+            <Style val="@Arcade_GameInvite_Expansion"/>
+
+            <StateGroup name="ExpansionStateGroup">
+                <State name="NoneState">
+                    <When type="AnimationState" frame="$parent" ExpansionLevel="None"/>
+                    <Action type="SetProperty" frame="$this" Text=""/>
+                </State>
+                <State name="StarterState">
+                    <When type="AnimationState" frame="$parent" ExpansionLevel="Starter"/>
+                    <Action type="SetProperty" frame="$this" Text=""/>
+                </State>
+                <State name="WoLState">
+                    <When type="AnimationState" frame="$parent" ExpansionLevel="WoL"/>
+                    <Action type="SetProperty" frame="$this" Text="@UI/ExpansionLevel/WingsOfLiberty"/>
+                </State>
+                <State name="HotSState">
+                    <When type="AnimationState" frame="$parent" ExpansionLevel="HotS"/>
+                    <Action type="SetProperty" frame="$this" Text="@UI/ExpansionLevel/HeartOfTheSwarm"/>
+                </State>
+                <State name="LotVState">
+                    <When type="AnimationState" frame="$parent" ExpansionLevel="LotV"/>
+                    <Action type="SetProperty" frame="$this" Text="@UI/ExpansionLevel/LegacyOfTheVoid"/>
+                </State>
+            </StateGroup>
+        </Frame>
+
+        <Frame type="AvatarFrame" name="InviterAvatar" template="StandardTemplates/AvatarFrameMediumTemplate">
+            <Anchor side="Top" relative="$parent/ExpansionLabel" pos="Max" offset="20"/>
+            <Anchor side="Left" relative="$parent/BackgroundFrame/BorderImage" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent/BackgroundFrame/BorderImage" pos="Mid" offset="0"/>
+            <AcceptsMouse val="true"/>
+            <ContextMenu val="$parent/UserContextMenu"/>
+        </Frame>
+
+        <Frame type="Label" name="MessageLabel">
+            <Anchor side="Top" relative="$parent/InviterAvatar" pos="Max" offset="30"/>
+            <Anchor side="Left" relative="$parent/BackgroundFrame/BorderImage" pos="Min" offset="50"/>
+            <Anchor side="Right" relative="$parent/BackgroundFrame/BorderImage" pos="Max" offset="-50"/>
+            <Style val="@Arcade_GameInvite_Message"/>
+        </Frame>
+
+        <Frame type="Label" name="MapNameLabel">
+            <Anchor side="Top" relative="$parent/MessageLabel" pos="Max" offset="0"/>
+            <Anchor side="Left" relative="$parent/BackgroundFrame/BorderImage" pos="Min" offset="50"/>
+            <Anchor side="Right" relative="$parent/BackgroundFrame/BorderImage" pos="Max" offset="-50"/>
+            <Style val="@Arcade_GameInvite_MapName"/>
+        </Frame>
+        
+        <Frame type="Button" name="AcceptButton" template="StandardTemplates/StandardButtonAlternateTemplate">
+            <Anchor side="Top" relative="$parent/MapNameLabel" pos="Max" offset="30"/>
+            <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+            <Width val="288"/>
+            <Text val="@UI/Accept"/>
+        </Frame>
+
+        <Frame type="Button" name="CancelButton" template="StandardTemplates/StandardButtonTemplate">
+            <Anchor side="Top" relative="$parent/AcceptButton" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+            <Width val="288"/>
+            <Text val="@UI/Decline"/>
+            <Shortcut val="@UI/Hotkey/DialogDismiss"/>
+        </Frame>
+    </Frame>
+</Desc>
