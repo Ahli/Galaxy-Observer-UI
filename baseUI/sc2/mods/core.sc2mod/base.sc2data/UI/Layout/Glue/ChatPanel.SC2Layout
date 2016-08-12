@@ -9,10 +9,39 @@
     <Frame type="ChatSessionsTooltip" name="ChatPanelChatSessionsTooltip" template="ChatSessionsTooltip/ChatSessionsTooltip" />
     <Frame type="ChatCommandsTooltip" name="ChatPanelChatCommandsTooltip" template="ChatCommandsTooltip/ChatCommandsTooltip" />
     <Frame type="WhisperRecipientsTooltip" name="ChatPanelRecipientsTooltip" template="WhisperRecipientsTooltip/WhisperRecipientsTooltip" />
-    
-    <Frame type="ScrollBar" name="ChatScrollBarTemplate" template="StandardBattlenetTemplates/GluesSocialScrollBarTemplate">
+
+    <Frame type="Button" name="ChatScrollBarButtonTemplate">
+        <NormalImage val="NormalImage"/>
+        <HoverImage val="HoverImage"/>
+
+        <Frame type="Image" name="NormalImage">
+            <Texture val="@UI/ChatPanelScrollBarGrabber_Normal"/>
+            <TextureType val="Nineslice"/>
+            <Tiled val="true"/>
+            <DescFlags val="Internal"/>
+        </Frame>
+
+        <Frame type="Image" name="HoverImage">
+            <Texture val="@UI/ChatPanelScrollBarGrabber_Hover"/>
+            <TextureType val="Nineslice"/>
+            <Tiled val="true"/>
+            <DescFlags val="Internal"/>
+        </Frame>
+    </Frame>
+
+    <Frame type="ScrollBar" name="ChatScrollBarTemplate">
+        <Image val="$root/StandardBattlenetTemplates/GluesSocialScrollBarBackgroundImage"/>
+        <Orientation val="Vertical"/>
+        <Width val="16"/>
+        <IncrementSound val="@UI_ScrollButtonSelect"/>
         <Alpha val="0"/>
-        <Enabled val="false"/>
+
+        <Frame type="Button" name="Button" template="ChatPanel/ChatScrollBarButtonTemplate">
+            <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+        </Frame>
         
         <Animation name="FadeScrollbar">
             <Event event="EditBoxFocusLost" action="DirectionReverse,Play" frame="$parent/$parent/$parent"/>
@@ -23,13 +52,22 @@
                 <Key type="Curve" time="0" value="0" out="Auto"/>
                 <Key type="Curve" time="0.5" value="230" out="Auto"/>
             </Controller>
-
-            <Controller name="Enabled" type="Enabled" end="Pause">
-                <Key type="Bool" time="0.00" value="false"/>
-                <Key type="Bool" time="0.01" value="true"/>
-                <Key type="Bool" time="0.50" value="true"/>
-            </Controller>
         </Animation>
+
+        <StateGroup name="AcceptsMouseStateGroup">
+            <DefaultState val="ShownState"/>
+            
+            <State name="HiddenState">
+                <When type="Property" frame="$this" Alpha="0"/>
+                <Action type="SetProperty" frame="$this" AcceptsMouse="false"/>
+                <Action type="SetProperty" frame="Button" AcceptsMouse="false"/>
+            </State>
+            
+            <State name="ShownState">
+                <Action type="SetProperty" frame="$this" AcceptsMouse="true"/>
+                <Action type="SetProperty" frame="Button" AcceptsMouse="true"/>
+            </State>
+        </StateGroup>
     </Frame>
     
     <Frame type="ChatDisplayListBoxItem" name="ChatDisplayListBoxItem">
