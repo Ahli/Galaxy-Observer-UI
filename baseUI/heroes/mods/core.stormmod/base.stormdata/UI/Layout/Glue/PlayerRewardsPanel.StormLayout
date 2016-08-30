@@ -67,9 +67,10 @@
     <!--===========================================================================================
     <! TOOLTIP TEMPLATES 
     <!==========================================================================================-->
-    <Frame type="Frame" name="ToolTipItemTemplate">
+    <Frame type="RewardBreakdownItem" name="ToolTipItemTemplate">
         <Height val="20"/>
         <CollapseLayout val="true"/>
+        <HideWhenCleared val="true"/>
         <Visible val="false"/>
         <Anchor side="Left" relative="$parent" pos="Min" offset="#EarnedRewardTooltipHorizontalLeftPadding"/>
         <Anchor side="Right" relative="$parent" pos="Max" offset="#EarnedRewardTooltipHorizontalRightPadding"/>
@@ -81,6 +82,12 @@
             <Text val="999999999"/>
             <Style val="ScoreRewardAmountLabel"/>
             <Unclipped val="True"/>
+
+            <Frame type="PropertyBind" name="BindText">
+                <Anchor relative="$parent"/>
+                <Source frame="$ancestor[@type=RewardBreakdownItem]" property="Text"/>
+                <Target frame="$parent" property="Text"/>
+            </Frame>
         </Frame>
 
         <Frame type="Label" name="AmountLabel">
@@ -88,21 +95,47 @@
             <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
             <Text val="999999999"/>
             <Style val="ScoreRewardAmountLabel"/>
+
+            <Frame type="PropertyBind" name="BindText">
+                <Anchor relative="$parent"/>
+                <Source frame="$ancestor[@type=RewardBreakdownItem]" property="Amount"/>
+                <Target frame="$parent" property="Text"/>
+            </Frame>
         </Frame>
+
+        <Animation name="SpacerHeightAnimation">
+            <Event event="NotSpacer" action="DirectionForward,Play"/>
+            <Event event="IsSpacer" action="DirectionReverse,Play"/>
+
+            <Controller type="Dimension" dimension="Height" relative="False" percentage="False" end="Pause">
+                <Key type="Curve" time=".00" value="10"/>
+                <Key type="Curve" time=".01" value="20"/>
+            </Controller>
+        </Animation>
+
+        <StateGroup name="TooltipItemStyle">
+            <DefaultState val="Normal"/>
+            <State name="Spacer">
+                <When type="Property" IsSpacer="true"/>
+                <Action type="SetProperty" frame="NameLabel" visible="false"/>
+                <Action type="SetProperty" frame="AmountLabel" visible="false"/>
+                <Action type="SendEvent" event="IsSpacer"/>
+            </State>
+            <State name="Bold">
+                <When type="Property" UseBold="true"/>
+                <Action type="SetProperty" frame="NameLabel" style="ScoreRewardTotalLabel"/>
+                <Action type="SetProperty" frame="AmountLabel" style="ScoreRewardTotalLabel"/>
+                <Action type="SendEvent" event="NotSpacer"/>
+            </State>
+            <State name="Normal">
+                <Action type="SetProperty" frame="NameLabel" style="ScoreRewardAmountLabel"/>
+                <Action type="SetProperty" frame="AmountLabel" style="ScoreRewardAmountLabel"/>
+                <Action type="SendEvent" event="NotSpacer"/>
+            </State>
+        </StateGroup>
     </Frame>
-    
-    <Frame type="Frame" name="ToolTipTotalTemplate" template="PlayerRewardsPanel/ToolTipItemTemplate">
 
-        <Frame type="Label" name="NameLabel">
-            <Style val="ScoreRewardTotalLabel"/>
-        </Frame>
-
-        <Frame type="Label" name="AmountLabel">
-            <Style val="ScoreRewardTotalLabel"/>
-        </Frame>
-    </Frame>
-
-    <Frame type="Frame" name="ToolTipFrameTemplate">
+    <Frame type="TileList" name="ToolTipFrameTemplate">
         <Unclipped val="True"/>
         
         <Frame type="Frame" name="EarnedToolTipBackground" template="StandardTooltip/TooltipBlurFrameTemplate">
@@ -118,119 +151,71 @@
             <Style val="ScoreRewardPanelHeaderLabel"/>
         </Frame>
 
-        <Frame type="Frame" name="Item0" template="PlayerRewardsPanel/ToolTipItemTemplate">
+        <Frame type="RewardBreakdownItem" name="Item0" template="PlayerRewardsPanel/ToolTipItemTemplate">
             <Anchor side="Bottom" relative="$parent/Item1" pos="Min" offset="#EarnedRewardTileSpacing"/>
         </Frame>
 
-        <Frame type="Frame" name="Item1" template="PlayerRewardsPanel/ToolTipItemTemplate">
+        <Frame type="RewardBreakdownItem" name="Item1" template="PlayerRewardsPanel/ToolTipItemTemplate">
             <Anchor side="Bottom" relative="$parent/Item2" pos="Min" offset="#EarnedRewardTileSpacing"/>
         </Frame>
 
-        <Frame type="Frame" name="Item2" template="PlayerRewardsPanel/ToolTipItemTemplate">
+        <Frame type="RewardBreakdownItem" name="Item2" template="PlayerRewardsPanel/ToolTipItemTemplate">
             <Anchor side="Bottom" relative="$parent/Item3" pos="Min" offset="#EarnedRewardTileSpacing"/>
         </Frame>
 
-        <Frame type="Frame" name="Item3" template="PlayerRewardsPanel/ToolTipItemTemplate">
+        <Frame type="RewardBreakdownItem" name="Item3" template="PlayerRewardsPanel/ToolTipItemTemplate">
             <Anchor side="Bottom" relative="$parent/Item4" pos="Min" offset="#EarnedRewardTileSpacing"/>
         </Frame>
 
-        <Frame type="Frame" name="Item4" template="PlayerRewardsPanel/ToolTipItemTemplate">
+        <Frame type="RewardBreakdownItem" name="Item4" template="PlayerRewardsPanel/ToolTipItemTemplate">
             <Anchor side="Bottom" relative="$parent/Item5" pos="Min" offset="#EarnedRewardTileSpacing"/>
         </Frame>
 
-        <Frame type="Frame" name="Item5" template="PlayerRewardsPanel/ToolTipItemTemplate">
+        <Frame type="RewardBreakdownItem" name="Item5" template="PlayerRewardsPanel/ToolTipItemTemplate">
             <Anchor side="Bottom" relative="$parent/Item6" pos="Min" offset="#EarnedRewardTileSpacing"/>
         </Frame>
 
-        <Frame type="Frame" name="Item6" template="PlayerRewardsPanel/ToolTipItemTemplate">
+        <Frame type="RewardBreakdownItem" name="Item6" template="PlayerRewardsPanel/ToolTipItemTemplate">
             <Anchor side="Bottom" relative="$parent/Item7" pos="Min" offset="#EarnedRewardTileSpacing"/>
         </Frame>
 
-        <Frame type="Frame" name="Item7" template="PlayerRewardsPanel/ToolTipItemTemplate">
+        <Frame type="RewardBreakdownItem" name="Item7" template="PlayerRewardsPanel/ToolTipItemTemplate">
             <Anchor side="Bottom" relative="$parent/Item8" pos="Min" offset="#EarnedRewardTileSpacing"/>
         </Frame>
 
-        <Frame type="Frame" name="Item8" template="PlayerRewardsPanel/ToolTipItemTemplate">
+        <Frame type="RewardBreakdownItem" name="Item8" template="PlayerRewardsPanel/ToolTipItemTemplate">
             <Anchor side="Bottom" relative="$parent/Item9" pos="Min" offset="#EarnedRewardTileSpacing"/>
         </Frame>
 
-        <Frame type="Frame" name="Item9" template="PlayerRewardsPanel/ToolTipItemTemplate">
+        <Frame type="RewardBreakdownItem" name="Item9" template="PlayerRewardsPanel/ToolTipItemTemplate">
             <Anchor side="Bottom" relative="$parent/Item10" pos="Min" offset="#EarnedRewardTileSpacing"/>
         </Frame>
 
-        <Frame type="Frame" name="Item10" template="PlayerRewardsPanel/ToolTipItemTemplate">
+        <Frame type="RewardBreakdownItem" name="Item10" template="PlayerRewardsPanel/ToolTipItemTemplate">
             <Anchor side="Bottom" relative="$parent/Item11" pos="Min" offset="#EarnedRewardTileSpacing"/>
         </Frame>
 
-        <Frame type="Frame" name="Item11" template="PlayerRewardsPanel/ToolTipItemTemplate">
+        <Frame type="RewardBreakdownItem" name="Item11" template="PlayerRewardsPanel/ToolTipItemTemplate">
             <Anchor side="Bottom" relative="$parent/Item12" pos="Min" offset="#EarnedRewardTileSpacing"/>
         </Frame>
 
-        <Frame type="Frame" name="Item12" template="PlayerRewardsPanel/ToolTipItemTemplate">
+        <Frame type="RewardBreakdownItem" name="Item12" template="PlayerRewardsPanel/ToolTipItemTemplate">
             <Anchor side="Bottom" relative="$parent/Item13" pos="Min" offset="#EarnedRewardTileSpacing"/>
         </Frame>
 
-        <Frame type="Frame" name="Item13" template="PlayerRewardsPanel/ToolTipItemTemplate">
+        <Frame type="RewardBreakdownItem" name="Item13" template="PlayerRewardsPanel/ToolTipItemTemplate">
             <Anchor side="Bottom" relative="$parent/Item14" pos="Min" offset="#EarnedRewardTileSpacing"/>
         </Frame>
 
-        <Frame type="Frame" name="Item14" template="PlayerRewardsPanel/ToolTipItemTemplate">
+        <Frame type="RewardBreakdownItem" name="Item14" template="PlayerRewardsPanel/ToolTipItemTemplate">
             <Anchor side="Bottom" relative="$parent/Item15" pos="Min" offset="#EarnedRewardTileSpacing"/>
         </Frame>
 
-        <Frame type="Frame" name="Item15" template="PlayerRewardsPanel/ToolTipItemTemplate">
+        <Frame type="RewardBreakdownItem" name="Item15" template="PlayerRewardsPanel/ToolTipItemTemplate">
             <Anchor side="Bottom" relative="$parent/Item16" pos="Min" offset="#EarnedRewardTileSpacing"/>
         </Frame>
 
-        <Frame type="Frame" name="Item16" template="PlayerRewardsPanel/ToolTipItemTemplate">
-            <Anchor side="Bottom" relative="$parent/Item17" pos="Min" offset="#EarnedRewardTileSpacing"/>
-        </Frame>
-
-        <Frame type="Frame" name="Item17" template="PlayerRewardsPanel/ToolTipItemTemplate">
-            <Anchor side="Bottom" relative="$parent/Item18" pos="Min" offset="#EarnedRewardTileSpacing"/>
-        </Frame>
-
-        <Frame type="Frame" name="Item18" template="PlayerRewardsPanel/ToolTipItemTemplate">
-            <Anchor side="Bottom" relative="$parent/Item19" pos="Min" offset="#EarnedRewardTileSpacing"/>
-        </Frame>
-
-        <Frame type="Frame" name="Item19" template="PlayerRewardsPanel/ToolTipItemTemplate">
-            <Anchor side="Bottom" relative="$parent/Item20" pos="Min" offset="#EarnedRewardTileSpacing"/>
-        </Frame>
-
-        <Frame type="Frame" name="Item20" template="PlayerRewardsPanel/ToolTipItemTemplate">
-            <Anchor side="Bottom" relative="$parent/Item21" pos="Min" offset="#EarnedRewardTileSpacing"/>
-        </Frame>
-
-        <Frame type="Frame" name="Item21" template="PlayerRewardsPanel/ToolTipItemTemplate">
-            <Anchor side="Bottom" relative="$parent/Item22" pos="Min" offset="#EarnedRewardTileSpacing"/>
-        </Frame>
-
-        <Frame type="Frame" name="Item22" template="PlayerRewardsPanel/ToolTipItemTemplate">
-            <Anchor side="Bottom" relative="$parent/Item23" pos="Min" offset="#EarnedRewardTileSpacing"/>
-        </Frame>
-
-        <Frame type="Frame" name="Item23" template="PlayerRewardsPanel/ToolTipItemTemplate">
-            <Anchor side="Bottom" relative="$parent/Item24" pos="Min" offset="#EarnedRewardTileSpacing"/>
-        </Frame>
-
-        <Frame type="Frame" name="Item24" template="PlayerRewardsPanel/ToolTipItemTemplate">
-            <Anchor side="Bottom" relative="$parent/Item25" pos="Min" offset="#EarnedRewardTileSpacing"/>
-        </Frame>
-
-        <Frame type="Frame" name="Item25" template="PlayerRewardsPanel/ToolTipItemTemplate">
-            <Anchor side="Bottom" relative="$parent/Item26" pos="Min" offset="#EarnedRewardTileSpacing"/>
-        </Frame>
-
-        <Frame type="Frame" name="Item26" template="PlayerRewardsPanel/ToolTipItemTemplate">
-            <Anchor side="Bottom" relative="$parent/Item27" pos="Min" offset="#EarnedRewardTileSpacing"/>
-        </Frame>
-
-        <Frame type="Frame" name="Item27" template="PlayerRewardsPanel/ToolTipItemTemplate">
-            <Anchor side="Bottom" relative="$parent/ItemTotal" pos="Min" offset="-10"/>
-        </Frame>
-
-        <Frame type="Frame" name="ItemTotal" template="PlayerRewardsPanel/ToolTipTotalTemplate">
+        <Frame type="RewardBreakdownItem" name="Item16" template="PlayerRewardsPanel/ToolTipItemTemplate">
             <Anchor side="Bottom" relative="$parent" pos="Max" offset="-15"/>
         </Frame>
 
@@ -239,7 +224,7 @@
     <Frame type="Frame" name="EarnedToolTipHitTestFrameTemplate">
         <AcceptsMouse val="true"/>
 
-        <Frame type="Frame" name="EarnedToolTipFrame" template="PlayerRewardsPanel/ToolTipFrameTemplate">
+        <Frame type="TileList" name="EarnedToolTipFrame" template="PlayerRewardsPanel/ToolTipFrameTemplate">
             <Anchor side="Top" relative="ToolTipHeader" pos="Min" offset="-10"/>
             <Anchor side="Bottom" relative="$parent" pos="Min" offset="-30"/>
             <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
@@ -2315,7 +2300,7 @@
             <Anchor side="Left" relative="$parent/XPCountingFrame/XPEarnedLabel" pos="Mid" offset="-180"/>
             <Anchor side="Right" relative="$parent/XPCountingFrame/XPEarnedLabel" pos="Mid" offset="180"/>
 
-            <Frame type="Frame" name="EarnedToolTipFrame">
+            <Frame type="TileList" name="EarnedToolTipFrame">
                 <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
                 <Frame type="Label" name="ToolTipHeader">
                     <Text val="@UI/PlayerRewardsPanel/XPEarnedToolTipHeader"/>
@@ -2329,7 +2314,7 @@
             <Anchor side="Left" relative="$parent/GoldCountingFrame/GoldEarnedLabel" pos="Mid" offset="-200"/>
             <Anchor side="Right" relative="$parent/GoldCountingFrame/GoldEarnedLabel" pos="Mid" offset="150"/> 
 
-            <Frame type="Frame" name="EarnedToolTipFrame">
+            <Frame type="TileList" name="EarnedToolTipFrame">
                 <Anchor side="Left" relative="$parent" pos="Mid" offset="30"/>
                 <Anchor side="Right" relative="$parent" pos="Mid" offset="30"/>
                 <Frame type="Label" name="ToolTipHeader">
@@ -2345,7 +2330,7 @@
             <Anchor side="Left" relative="$parent/XPEarnedToolTipHitTestFrame" pos="Max" offset="0"/>
             <Anchor side="Right" relative="$parent/GoldEarnedToolTipHitTestFrame" pos="Min" offset="0"/>
 
-            <Frame type="Frame" name="EarnedToolTipFrame">
+            <Frame type="TileList" name="EarnedToolTipFrame">
                 <Anchor side="Left" relative="$parent" pos="Mid" offset="20"/>
                 <Anchor side="Right" relative="$parent" pos="Mid" offset="20"/>
                 <Frame type="Label" name="ToolTipHeader">

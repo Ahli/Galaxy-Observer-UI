@@ -3,6 +3,7 @@
     
     <Constant name="PlayerFrameVerticalGap" val="-12"/>
     <Constant name="SortButtonFrameAlignment" val="0"/>
+    <Constant name="AwardIconStackingOffset" val="30"/>
     
     <!--===========================================================================================
     <! TEMPLATES
@@ -270,6 +271,31 @@
         </Frame>
     </Frame>
 
+    <Frame type="ScoreValueAwardIconFrame" name="EndOfMatchAwardIconTemplate">
+        <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+        <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+        <Anchor side="Right" relative="$parent" pos="Mid" offset="36"/>
+        <Height val="72"/>
+        <Width val="72"/>
+        <Visible val="false"/>
+
+        <Frame type="Image" name="Image">
+            <Anchor relative="$parent"/>
+            <Visible val="false"/>
+        </Frame>
+
+        <Frame type="Frame" name="TooltipHitFrame">
+            <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+            <Width val="38"/>
+            <Height val="44"/>
+
+            <AcceptsMouseTooltip val="true"/>
+        </Frame>
+    </Frame>
+
     <Frame type="PlayerScoreValueResultTalentFrame" name="PlayerScoreValueTalentFrameTemplate">
         <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
         <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
@@ -309,7 +335,7 @@
 
     <Frame type="PlayerScoreResultFrame" name="PlayerScoreResultFrameTemplate">
         <AcceptsMouse val="true"/>
-        <Width val="1294"/>
+        <Width val="1324"/>
         <Height val="70"/>
 
         <Frame type="Image" name="Background">
@@ -407,6 +433,34 @@
             <Anchor side="Right" relative="$parent/ContextMenuButton" pos="Min" offset="-10"/>
         </Frame>
 
+        <Frame type="Frame" name="AwardsContainer">
+            <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent/HeroNameLabel" pos="Max" offset="55"/>
+            <Height val="72"/>
+            <Width val="72"/>
+
+            <Frame type="ScoreValueAwardIconFrame" name="AwardIcon0" template="GameStatsPanel/EndOfMatchAwardIconTemplate">
+                <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+            </Frame>
+
+            <Animation name="FreeSpace">
+                <!-- allow the HeroNameLabel to claim this award space if there is no award -->
+                <Event event="OnHidden" frame="AwardIcon0" action="Play"/>
+                <Event event="OnShown" frame="AwardIcon0" action="Reset"/>
+
+                <Controller type="Dimension" frame="$parent/HeroNameLabel" end="Pause" dimension="Width" percentage="False" relative="true">
+                    <Key type="Curve" time="0" value="0"/>
+                    <Key type="Curve" time=".01" value="55"/>
+                </Controller>
+
+                <Controller type="Anchor" end="Pause" side="Right" relative="true">
+                    <Key type="Curve" time="0" value="0"/>
+                    <Key type="Curve" time=".01" value="-55"/>
+                </Controller>
+            </Animation>
+        </Frame>
+
         <!--===========================================================================================
         <! STAT COLUMNS
         <!==========================================================================================-->
@@ -415,7 +469,7 @@
 
             <Frame type="PlayerScoreValueResultNumberFrame" name="SoloKillResultFrame" template="GameStatsPanel/PlayerScoreValueResultFrameTemplate">
                 <Width val="67"/>
-                <Anchor side="Left" relative="$parent/$parent/HeroNameLabel" pos="Max" offset="5"/>
+                <Anchor side="Left" relative="$parent/$parent/AwardsContainer" pos="Max" offset="-12"/>
                 <ScoreValueLink val="SoloKill"/>
             </Frame>
 
