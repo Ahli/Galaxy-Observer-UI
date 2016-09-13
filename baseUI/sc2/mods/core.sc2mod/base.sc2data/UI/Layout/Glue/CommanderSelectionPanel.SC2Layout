@@ -69,6 +69,14 @@
             </Controller>
         </Animation>
         
+        <Animation name="SlideInSound">
+            <Event event="UISlideIn" action="Reset,Play"/>
+             
+            <Controller type="Sound" end="Stop">
+                <Key type="Sound" time="0" sound="@C_UI_CampaignPanel_Whoosh"/>
+            </Controller>
+        </Animation>
+        
         <Frame type="CutsceneFrame" name="BackgroundCutscene">
             <Anchor relative="$parent"/>
             <RenderType val="HDR"/>
@@ -86,6 +94,11 @@
                 <State name="ModeMutator">
                     <When type="AnimationState" frame="$parent/$parent" ModeState="ModeMutator"/>
                     <Action type="SendEvent" frame="$this" event="ModeMutator"/>
+                </State>
+                
+                <State name="ModeCustom">
+                    <When type="AnimationState" frame="$parent/$parent" ModeState="ModeCustom"/>
+                    <Action type="SendEvent" frame="$this" event="ModeCustom"/>
                 </State>
 
                 <State name="ModeStandard">
@@ -108,6 +121,15 @@
                 
                 <Controller type="Cutscene" end="Pause">
                     <Key type="Cutscene" time="0" action="SetCutscene" file="Cutscenes/UI_Screens_AlliedCommander_Mutators_Background.SC2Cutscene"/>
+                    <Key type="Cutscene" time="0.0" action="Play"/>
+                </Controller>
+            </Animation>
+            
+            <Animation name="SetCustomBackground">
+                <Event event="ModeCustom" action="Reset,Play"/>
+                
+                <Controller type="Cutscene" end="Pause">
+                    <Key type="Cutscene" time="0" action="SetCutscene" file="Cutscenes/UI_Screens_AlliedCommander_CustomMutators_Background.SC2Cutscene"/>
                     <Key type="Cutscene" time="0.0" action="Play"/>
                 </Controller>
             </Animation>
@@ -282,6 +304,11 @@
                     <When type="AnimationState" frame="$parent/$parent" ModeState="ModeMutator"/>
                     <Action type="SendEvent" frame="$this" event="ModeMutator"/>
                 </State>
+                
+                <State name="ModeCustom">
+                    <When type="AnimationState" frame="$parent/$parent" ModeState="ModeCustom"/>
+                    <Action type="SendEvent" frame="$this" event="ModeCustom"/>
+                </State>
 
                 <State name="ModeStandard">
                     <When type="AnimationState" frame="$parent/$parent" ModeState="ModeStandard"/>
@@ -295,6 +322,7 @@
                 <Controller type="Cutscene" end="Pause">
                     <Key type="Cutscene" action="AddFilter" time="0.0" filter="Standard"/>
                     <Key type="Cutscene" action="RemoveFilter" time="0.0" filter="Mutator"/>
+                    <Key type="Cutscene" action="RemoveFilter" time="0.0" filter="Custom"/>
                 </Controller>
             </Animation>
             
@@ -304,6 +332,17 @@
                 <Controller type="Cutscene" end="Pause">
                     <Key type="Cutscene" action="AddFilter" time="0.0" filter="Mutator"/>
                     <Key type="Cutscene" action="RemoveFilter" time="0.0" filter="Standard"/>
+                    <Key type="Cutscene" action="RemoveFilter" time="0.0" filter="Custom"/>
+                </Controller>
+            </Animation>
+            
+            <Animation name="SetCustomLight">
+                <Event event="ModeCustom" action="Reset,Play"/>
+                
+                <Controller type="Cutscene" end="Pause">
+                    <Key type="Cutscene" action="AddFilter" time="0.0" filter="CustomMutator"/>
+                    <Key type="Cutscene" action="RemoveFilter" time="0.0" filter="Standard"/>
+                    <Key type="Cutscene" action="RemoveFilter" time="0.0" filter="Mutator"/>
                 </Controller>
             </Animation>
         </Frame>
@@ -547,9 +586,23 @@
         <Frame type="GlueButton" name="ReadyButton" template="StandardBattlenetTemplates/BattlenetAlternateButtonTemplate">
             <Anchor side="Top" relative="$parent" pos="Min" offset="999"/>
             <Anchor side="Left" relative="$parent" pos="Min" offset="105"/>
+            <Width val="258"/>
             <Text val="@UI/ScreenCoopCampaign/Ready"/>
             
             <Animation name="UISlideOut" template="CommanderSelectionPanel/UISlideOutAnimationTemplate"/>
+            
+            <StateGroup name="ReadyButtonModeStateGroup">
+                
+                <State name="ReadyButtonStandard">
+                    <When type="AnimationState" frame="$ScreenCoopCampaign" ModeState="ModeStandard"/>
+                    <Action type="SetProperty" frame="$this/Label" Text="@UI/ScreenCoopCampaign/Ready"/>
+                </State>
+                
+                <State name="ReadyButtonMutator">
+                    <When type="AnimationState" frame="$ScreenCoopCampaign" ModeState="ModeMutator"/>
+                    <Action type="SetProperty" frame="$this/Label" Text="@UI/ScreenCoopCampaign/ReadyMutator"/>
+                </State>
+            </StateGroup>
         </Frame>
         
         
@@ -582,9 +635,9 @@
         
         <Frame type="Button" name="DifficultyButton" template="StandardBattlenetTemplates/BattlenetStandardButtonTemplate">
             <Anchor side="Top" relative="$parent/ReadyButton" pos="Min" offset="0"/>
-            <Anchor side="Left" relative="$parent/MapButton" pos="Max" offset="5"/>
+            <Anchor side="Left" relative="$parent/MapButton" pos="Max" offset="6"/>
             <Style val="@Coop_CommanderStandardButton"/>
-            <Width val ="285"/>
+            <Width val ="258"/>
 
             <Animation name="UISlideOut" template="CommanderSelectionPanel/UISlideOutAnimationTemplate"/>
         </Frame>
