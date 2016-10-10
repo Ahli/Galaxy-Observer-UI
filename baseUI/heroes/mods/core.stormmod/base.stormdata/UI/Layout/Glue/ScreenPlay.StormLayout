@@ -7,24 +7,116 @@
     <Constant name="ScreenPlay_RenderPriority_PanelLayerTop" val="525"/>
     <Constant name="ScreenPlay_RenderPriority_NavigationButton" val="530"/>
 
+    <Constant name="ScreenPlay_NavigationButton_Offset" val="0"/>
+
+    <Constant name="ScreenPlay_SuggestedImage_Width" val="35"/>
+
     <Frame type="GlueButton" name="NavigationButtonTemplate" template="StandardTemplates/Top_Navigation">
+        <Anchor side="Right" relative="SuggestedImageContainer" pos="Max" offset="10"/>
+        <PreserveAnchorOffset val="true"/>
         <RenderPriority val="#ScreenPlay_RenderPriority_NavigationButton"/>
         <ReportsStats val="true"/>
+        <TooltipAnchorPosition val="LeftToLeft | TopToBottom"/>
+        <TooltipDelayed val="true"/>
 
-        <Animation name="Transition">
-            <Event event="Show" action="Reset" frame="$parent"/>
-            <Event event="Show" action="Play" frame="$parent"/>
-            <Controller type="Fade" end="Pause">
-                <Key type="Curve" time="0.0" value="0" out="Slow"/>
-                <Key type="Curve" time="0" value="0" out="Slow"/>
-                <Key type="Curve" time="0.4" value="255" in="Slow" out="Step"/>
-            </Controller>
-            <Controller type="Anchor" end="Pause" side="Top" relative="true">
-                <Key type="Curve" time="0.0" value="-10" out="Slow"/>
-                <Key type="Curve" time="0.1" value="-10" out="Fast"/>
-                <Key type="Curve" time="0.5" value="0" in="Slow" />
-            </Controller>
-        </Animation>
+        <Frame type="Frame" name="Spacer">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+            <Anchor side="Left" relative="$parent/Label" pos="Max" offset="0"/>
+            <Width val="10"/>
+        </Frame>
+
+        <Frame type="Frame" name="SuggestedImageContainer">
+            <Anchor side="Top" relative="$parent/Label" pos="Min" offset="3"/>
+            <Anchor side="Left" relative="$parent/Spacer" pos="Max" offset="0"/>
+            <Width val="25"/>
+            <CollapseLayout val="true"/>
+            <Visible val="false"/>
+
+            <Frame type="Image" name="SuggestedImage">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+                <Unclipped val="true"/>
+                <ColorAdjustMode val="AddSelf"/>
+                <AdjustmentColor val="0,255,255,255"/>
+                <Texture val="@UI/Storm_UI_MainNavigation_Recommended"/>
+            </Frame>
+
+            <Animation name="SuggestedImagePulse">
+                <Event event="StartPulse" action="DirectionForward,Play"/>
+                <Event event="StopPulse" action="Stop"/>
+
+                <Controller type="AdjustmentColor" end="Loop" frame="SuggestedImage">
+                    <Key type="Curve" time="0" value="0;255;255;255" out="Fast"/>
+                    <Key type="Curve" time="1" value="150;255;255;255" inout="Slow"/>
+                    <Key type="Curve" time="2" value="0;255;255;255" in="Fast"/>
+                </Controller>
+
+                <Controller type="Style" end="Loop" style1="TopNavigation" style2="TopNavigationPulse" frame="$ancestor[@type=GlueButton]/Label">
+                    <Key type="Curve" time="0" value="0" out="Fast"/>
+                    <Key type="Curve" time="1" value="1" inout="Slow"/>
+                    <Key type="Curve" time="2" value="0" in="Fast"/>
+                </Controller>
+            </Animation>
+
+            <StateGroup name="SuggestedTexture">
+                <DefaultState val="Normal"/>
+                <State name="Toggled">
+                    <When type="Property" Toggled="true" frame="$ancestor[@type=GlueButton]"/>
+                    <Action type="SetProperty" frame="SuggestedImage" Texture="@UI/Storm_UI_MainNavigation_Recommended"/>
+                </State>
+                <State name="Hover">
+                    <When type="Property" Hovering="true" frame="$ancestor[@type=GlueButton]"/>
+                    <Action type="SetProperty" frame="SuggestedImage" Texture="@UI/Storm_UI_MainNavigation_Recommended_Hover"/>
+                </State>
+                <State name="Normal">
+                    <Action type="SetProperty" frame="SuggestedImage" Texture="@UI/Storm_UI_MainNavigation_Recommended_Off"/>
+                </State>
+            </StateGroup>
+
+            <Animation name="Transition">
+                <Event event="Show" action="Reset" frame="$parent/$parent"/>
+                <Event event="Show" action="Play" frame="$parent/$parent"/>
+                <Controller type="Fade" end="Pause" frame="SuggestedImage">
+                    <Key type="Curve" time="0.0" value="0" out="Slow"/>
+                    <Key type="Curve" time="0" value="0" out="Slow"/>
+                    <Key type="Curve" time="0.4" value="255" in="Slow" out="Step"/>
+                </Controller>
+                <Controller type="Anchor" end="Pause" side="Top" relative="true">
+                    <Key type="Curve" time="0.0" value="-10" out="Slow"/>
+                    <Key type="Curve" time="0.1" value="-10" out="Fast"/>
+                    <Key type="Curve" time="0.5" value="0" in="Slow" />
+                </Controller>
+            </Animation>
+
+            <Animation name="Suggested">
+                <Event event="Suggest" action="Play" frame="$ancestor[@type=GlueButton]"/>
+                <Event event="Unsuggest" action="Stop" frame="$ancestor[@type=GlueButton]"/>
+
+                <Controller type="Visibility" end="Pause">
+                    <Key type="Bool" time="0" value="true"/>
+                </Controller>
+            </Animation>
+
+            <StateGroup name="SuggestedPlayModePulseStates">
+                <DefaultState val="SuggestedOff"/>
+                <State name="Toggled">
+                    <When type="Property" Toggled="true" frame="$ancestor[@type=GlueButton]"/>
+                    <When type="Property" frame="$ancestor[@type=GlueButton]/SuggestedImageContainer" visible="True"/>
+                    <Action type="SendEvent" event="StopPulse"/>
+                </State>
+                <State name="Normal">
+                    <When type="Property" frame="$ancestor[@type=GlueButton]/SuggestedImageContainer" visible="True"/>
+                    <Action type="SendEvent" event="StartPulse"/>
+                </State>
+                <State name="SuggestedOff">
+                    <When type="Property" frame="$ancestor[@type=GlueButton]/SuggestedImageContainer" visible="False"/>
+                    <Action type="SendEvent" event="StopPulse"/>
+                </State>
+            </StateGroup>
+
+        </Frame>       
     </Frame>
 
     <Frame type="ScreenPlay" name="ScreenPlay" template="StandardTemplates/GlueScreen">
@@ -86,8 +178,7 @@
             <WrapUV val="True" layer="1"/>
             
             <Animation name="UVScroll">
-                <Event event="PlayScreenModeCoop" action="Restart,Play" frame="$parent"/>
-                <Event event="PlayScreenModePractice" action="DirectionReverse,Play" frame="$parent"/>
+                <Event event="PlayScreenModeCoop" action="DirectionForward,Play" frame="$parent"/>
                 <Event event="PlayScreenModeVersus" action="DirectionReverse,Play" frame="$parent"/>
                 <Event event="PlayScreenModeUnrankedDraft" action="DirectionReverse,Play" frame="$parent"/>
                 <Event event="PlayScreenModeNexusBrawl" action="DirectionReverse,Play" frame="$parent"/>
@@ -182,49 +273,37 @@
             <Handle val="ScreenPlay_SubNavContainer"/>
         </Frame>
 
-        <Frame type="GlueButton" name="PracticeButton" template="ScreenPlay/NavigationButtonTemplate">
-            <Anchor side="Top" relative="$parent/SubNavContainer" pos="Min" offset="0"/>
-            <Anchor side="Left" relative="Label" pos="Min" offset="-130"/>
-            <Text val="@UI/Training"/>
-            <Handle val="ScreenPlay_PracticeButton"/>
-            <Frame type="Label" name="Label">
-                <Anchor side="Left" relative="$parent/$parent" pos="Min" offset="30"/>
-            </Frame>
-            <CollapseLayout val="True"/>
-            <Visible val="False"/>
-        </Frame>
-
         <Frame type="GlueButton" name="CooperativeButton" template="ScreenPlay/NavigationButtonTemplate">
-            <Anchor side="Top" relative="$parent/PracticeButton" pos="Min" offset="0"/>
-            <Anchor side="Left" relative="$parent/PracticeButton" pos="Max" offset="#NavigationButtonOffset"/>
+            <Anchor side="Top" relative="$parent/SubNavContainer" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent/SubNavContainer" pos="Min" offset="10"/>
             <Text val="@UI/ScreenPlay/CooperativeButton"/>
             <Handle val="ScreenPlay_CooperativeButton"/>
         </Frame>
 
         <Frame type="GlueButton" name="QuickMatchButton" template="ScreenPlay/NavigationButtonTemplate">
             <Anchor side="Top" relative="$parent/CooperativeButton" pos="Min" offset="0"/>
-            <Anchor side="Left" relative="$parent/CooperativeButton" pos="Max" offset="#NavigationButtonOffset"/>
+            <Anchor side="Left" relative="$parent/CooperativeButton" pos="Max" offset="#ScreenPlay_NavigationButton_Offset"/>
             <Text val="@UI/ScreenPlay/QuickMatchButton"/>
             <Handle val="ScreenPlay_QuickMatchButton"/>
         </Frame>
 
         <Frame type="GlueButton" name="UnrankedDraftButton" template="ScreenPlay/NavigationButtonTemplate">
             <Anchor side="Top" relative="$parent/QuickMatchButton" pos="Min" offset="0"/>
-            <Anchor side="Left" relative="$parent/QuickMatchButton" pos="Max" offset="#NavigationButtonOffset"/>
+            <Anchor side="Left" relative="$parent/QuickMatchButton" pos="Max" offset="#ScreenPlay_NavigationButton_Offset"/>
             <Text val="@UI/ScreenPlay/UnrankedDraftButton"/>
             <Handle val="ScreenPlay_UnrankedDraftButton"/>
         </Frame>
 
         <Frame type="GlueButton" name="RankedLeagueButton" template="ScreenPlay/NavigationButtonTemplate">
             <Anchor side="Top" relative="$parent/UnrankedDraftButton" pos="Min" offset="0"/>
-            <Anchor side="Left" relative="$parent/UnrankedDraftButton" pos="Max" offset="#NavigationButtonOffset"/>
+            <Anchor side="Left" relative="$parent/UnrankedDraftButton" pos="Max" offset="#ScreenPlay_NavigationButton_Offset"/>
             <Text val="@UI/ScreenPlay/RankedLeagueButton"/>
             <Handle val="ScreenPlay_RankedLeagueButton"/>
         </Frame>
 
         <Frame type="GlueButton" name="CustomGamesButton" template="ScreenPlay/NavigationButtonTemplate">
             <Anchor side="Top" relative="$parent/RankedLeagueButton" pos="Min" offset="0"/>
-            <Anchor side="Left" relative="$parent/RankedLeagueButton" pos="Max" offset="#NavigationButtonOffset"/>
+            <Anchor side="Left" relative="$parent/RankedLeagueButton" pos="Max" offset="#ScreenPlay_NavigationButton_Offset"/>
             <Text val="@UI/ScreenPlay/CustomGamesButton"/>
             <Handle val="ScreenPlay_CustomGamesButton"/>
             <Frame type="Image" name="SeparatorImage">

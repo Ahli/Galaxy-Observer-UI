@@ -2,6 +2,19 @@
 <Desc>
     <DescFlags val="Locked"/>
 
+    <Frame type="Frame" name="MatchHistoryPortraitTemplate" template="ProfileSummaryPanel/HeroPortraitSmallTemplate">
+        <StateGroup name="HeroVisibility">
+            <DefaultState val="NoHero"/>
+            <State name="NoHero">
+                <When type="Property" frame="PortraitContainer" Hero=""/>
+                <Action type="SetProperty" frame="$this" visible="False"/>
+            </State>
+            <State name="HasHero">
+                <When type="Property" frame="PortraitContainer" Hero="!"/>
+            </State>
+        </StateGroup>
+    </Frame>
+
     <Frame type="ProfileMatchHistoryListBoxItem" name="ProfileMatchHistoryListBoxItemTemplate">
         <TooltipFrame val="MatchHistoryTooltip"/>
         <TooltipAnchorPosition val="MiddleRight"/>
@@ -18,14 +31,25 @@
             <Anchor side="Left" relative="$parent" pos="Min" offset="30"/>
             <Width val="162"/>
             <Style val="PlayerProfileHistoryLeft"/>
+            <Text val="{$parent/@ModeName}"/>
         </Frame>
-        
-        <Frame type="Label" name="HeroLabel">
+
+        <Frame type="Frame" name="HeroPortrait0" template="ProfileMatchHistoryPanel/MatchHistoryPortraitTemplate">
             <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
             <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
             <Anchor side="Left" relative="$parent/ModeLabel" pos="Max" offset="10"/>
-            <Width val="260"/>
-            <Style val="PlayerProfileHistory"/>
+            <Frame type="HeroContainerFrame" name="PortraitContainer">
+                <Hero val="{$ancestor[@type=ProfileMatchHistoryListBoxItem]/@Hero[0]}"/>
+            </Frame>
+        </Frame>
+               
+        <Frame type="Label" name="HeroLabel">
+            <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Left" relative="$parent/HeroPortrait0" pos="Max" offset="0"/>
+            <Width val="206"/>
+            <Style val="PlayerProfileHistoryLeft"/>
+            <Text val="{$parent/@HeroName}"/>
         </Frame>
         
         <Frame type="Label" name="MapLabel">
@@ -34,6 +58,7 @@
             <Anchor side="Left" relative="$parent/HeroLabel" pos="Max" offset="10"/>
             <Width val="242"/>
             <Style val="PlayerProfileHistory"/>
+            <Text val="{$parent/@MapName}"/>
         </Frame>
         
         <Frame type="Label" name="ResultLabel">
@@ -42,6 +67,7 @@
             <Anchor side="Left" relative="$parent/MapLabel" pos="Max" offset="10"/>
             <Width val="140"/>
             <Style val="PlayerProfileHistory"/>
+            <Text val="{$parent/@ResultText}"/>
             
             <Animation name="Win">
                 <Event event="Win" action="DirectionForward" frame="$parent"/>
@@ -74,7 +100,6 @@
                     <Key type="Curve" time="0" value="1.0" out="Step"/>
                 </Controller>
             </Animation>
-
         </Frame>
         
         <Frame type="Label" name="TimeLabel">
@@ -83,6 +108,7 @@
             <Anchor side="Left" relative="$parent/ResultLabel" pos="Max" offset="10"/>
             <Anchor side="Right" relative="$parent" pos="Max" offset="-10"/>
             <Style val="PlayerProfileHistory"/>
+            <Text val="{$parent/@TimeText}"/>
         </Frame>
     </Frame>
         
@@ -90,7 +116,7 @@
         <Frame type="PlayedGameFrame" name="PlayedGameFrame">
             <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
             <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
-            <Anchor side="Bottom" relative="$this/ContentContainer/EnemyHeroPortrait1" pos="Min" offset="88"/>
+            <Anchor side="Bottom" relative="$this/ContentContainer/EnemyHeroPortrait1" pos="Min" offset="98"/>
             <Width val="318"/>
             <Frame type="Frame" name="ContentContainer">
                 <Anchor side="Top" relative="$parent" pos="Min" offset="12"/>
@@ -103,7 +129,7 @@
                     <Anchor side="Left" relative="$parent" pos="Min" offset="-48"/>
                     <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
                     <Anchor side="Right" relative="$parent" pos="Max" offset="48"/>
-                    <Texture val=""/>
+                    <Texture val="{$ancestor[@type=PlayedGameFrame]/@MapImage}"/>
                     <Alpha val="51"/>
                 </Frame>
 
@@ -111,7 +137,7 @@
                     <Anchor side="Top" relative="$parent" pos="Min" offset="10"/>
                     <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
                     <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
-                    <Text val="Map Name"/>
+                    <Text val="{$ancestor[@type=PlayedGameFrame]/@MapName}"/>
                     <Style val="PlayerProfileRecentMapName"/>
                 </Frame> 
         
@@ -119,7 +145,7 @@
                     <Anchor side="Top" relative="$parent/MapNameLabel" pos="Max" offset="0"/>
                     <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
                     <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
-                    <Text val="Map Mode"/>
+                    <Text val="{$ancestor[@type=PlayedGameFrame]/@ModeName}"/>
                     <Style val="PlayerProfileRecentMapType"/>
                     <Alpha val="128"/>
                 </Frame> 
@@ -187,6 +213,31 @@
                     <Anchor side="Top" relative="$parent/EnemyHeroPortrait3" pos="Min" offset="0"/>
                     <Anchor side="Left" relative="$parent/EnemyHeroPortrait3" pos="Max" offset="-12"/>
                 </Frame>
+                <Frame type="PageSelectorButtonList" name="RoundSelector" template="ProfileSummaryPanel/RoundSelectorButtonListTemplate">
+                    <Anchor side="Bottom" relative="$parent" pos="Max" offset="3"/>
+                    <Anchor side="Left" relative="$parent" pos="Min" offset="42"/>
+                    <Anchor side="Right" relative="$parent" pos="Max" offset="5"/>
+
+                    <AutoIncrement val="True"/>
+                    <AllowAutoPageWrap val="True"/>
+                    <CycleDelay val="3000"/>
+
+                    <Animation name="CenteringOdd">
+                        <Event event="OnShown" frame="PageButton2" action="Reset, Play"/>
+
+                        <Controller type="Anchor" end="Pause" side="Left" relative="false" pos="Min" frame="$this">
+                            <Key type="Curve" time="0" value="18" out="Linear"/>
+                        </Controller>
+                    </Animation>
+
+                    <Animation name="CenteringEven">
+                        <Event event="OnHidden" frame="PageButton2" action="Reset, Play"/>
+
+                        <Controller type="Anchor" end="Pause" side="Left" relative="false" pos="Min" frame="$this">
+                            <Key type="Curve" time="0" value="42" out="Linear"/>
+                        </Controller>
+                    </Animation>
+                </Frame>
             </Frame>
         </Frame>
     </Frame>
@@ -240,8 +291,22 @@
             <Frame type="Label" name="ModeLabel">
                 <Text val="@UI/ProfileDialog/MatchHistory/Mode"/>
             </Frame>
+
+            <Frame type="Frame" name="HeroPortrait0">
+                <Visible val="false"/>
+            </Frame>
+
+            <Frame type="Frame" name="HeroPortrait1">
+                <Visible val="false"/>
+            </Frame>
+
+            <Frame type="Frame" name="HeroPortrait2">
+                <Visible val="false"/>
+            </Frame>
         
             <Frame type="Label" name="HeroLabel">
+                <Anchor side="Left" relative="$parent/ModeLabel" pos="Max" offset="20"/>
+                <Width val="260"/>
                 <Text val="@UI/ProfileDialog/MatchHistory/Hero"/>
             </Frame>
         

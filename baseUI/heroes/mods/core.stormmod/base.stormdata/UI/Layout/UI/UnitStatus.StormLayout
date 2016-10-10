@@ -1190,7 +1190,7 @@
             <State name="Taunted">
                 <When type="AnimationState" UnitStatusValidatorState="TargetTaunted"/>
                 <Action type="SetProperty" frame="DebuffLabel" text="@UI/State/Taunted"/>
-                <Action type="SetProperty" frame="DebuffIconLeft" texture="@UI/State/SilencedIcon"/>
+                <Action type="SetProperty" frame="DebuffIconLeft" texture="@UI/State/TauntedIcon"/>
                 <Action type="SetProperty" frame="DebuffPlateBg" texture="@UI/State/MindControlBG"/>
             </State>
 
@@ -1220,14 +1220,18 @@
 
     <!-- Resist/Vulnerability Display -->
     <Frame type="UnitStatusBuffDebuffElement" name="UnitStatusResistDisplayTemplate">
-        <Width val="32"/>
-        <Height val="32"/>
+        <Anchor side="Right" relative="StatusImage" pos="Max" offset="0"/>
+        <Anchor side="Bottom" relative="StatusImage" pos="Max" offset="0"/>
         <Alpha val="0"/>
         <VisibilityOnFade val="False"/>
 
         <Frame type="Image" name="StatusImage">
-            <Anchor relative="$parent" offset="0"/>
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+            <Width val="32"/>
+            <Height val="32"/>
             <Texture val=""/>
+            <CollapseLayout val="True"/>
         </Frame>
 
         <Validator val="UserCategoryTargetVulnerable"/>
@@ -1244,8 +1248,12 @@
                 <Key type="Curve" time="0.0" value="0" out="Fast"/>
                 <Key type="Curve" time="0.15" value="255" in="Fast"/>
             </Controller>
+            <Controller type="Visibility" end="Pause" frame="StatusImage">
+                <Key type="Bool" time="0" value="False"/>
+                <Key type="Bool" time="0.001" value="True"/>
+            </Controller>
         </Animation>
-        
+
         <Animation name="Resist3">
             <Event event="Resist3" action="Restart,Play"/>
             <Controller type="Texture" end="Pause" frame="StatusImage">
@@ -1285,7 +1293,44 @@
     </Frame>
     <!-- Resist/Vulnerability Display -->
 
-    
+    <!-- MortalStrike Display -->
+    <Frame type="UnitStatusBuffDebuffElement" name="UnitStatusHinderedHealingDisplayTemplate">
+        <Anchor side="Right" relative="StatusImage" pos="Max" offset="0"/>
+        <Anchor side="Bottom" relative="StatusImage" pos="Max" offset="0"/>
+        <Alpha val="0"/>
+        <VisibilityOnFade val="False"/>
+
+        <Frame type="Image" name="StatusImage">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+            <Width val="32"/>
+            <Height val="32"/>
+            <Texture val="@UI/Storm_UI_InGame_Status_HinderedHealing"/>
+            <CollapseLayout val="True"/>
+        </Frame>
+
+        <Validator val="HasHinderedHealingDebuff"/>
+
+        <!-- ResetVisibility is called whenever frame gets hidden so that fading animation is not
+             resumed when unit comes out of the fog of war. -->
+        <Animation name="FadeAnimation">
+            <Event event="ResetVisibility" action="Stop"/>
+            <Event event="Hide" action="DirectionReverse,Play"/>
+            <Event event="Show" action="DirectionForward,Play"/>
+
+            <Controller type="Fade" end="Pause">
+                <Key type="Curve" time="0.0" value="0" out="Fast"/>
+                <Key type="Curve" time="0.15" value="255" in="Fast"/>
+            </Controller>
+            <Controller type="Visibility" end="Pause" frame="StatusImage">
+                <Key type="Bool" time="0" value="False"/>
+                <Key type="Bool" time="0.001" value="True"/>
+            </Controller>
+        </Animation>
+    </Frame>
+    <!-- Resist/Vulnerability Display -->
+
+
     <!-- Hero Health/Energy Bar -->
     <Frame type="UnitStatusFrame" name="HeroUnitStatusFrameNoEnergyTemplate">
         <Width val="260"/>
@@ -1774,9 +1819,13 @@
             </Frame>
             
             <Frame type="UnitStatusBuffDebuffElement" name="UnitStatusResistDisplay" template="UnitStatus/UnitStatusResistDisplayTemplate">
-                <Anchor side="Top" relative="$parent/HeroFrameBackgroundContainer" pos="Mid" offset="0"/>
-                <Anchor side="Bottom" relative="$parent/HeroFrameBackgroundContainer" pos="Mid" offset="0"/>
+                <Anchor side="Top" relative="$parent/HeroFrameBackgroundContainer" pos="Mid" offset="-16"/>
                 <Anchor side="Left" relative="$parent/HeroFrameBackgroundContainer" pos="Max" offset="0"/>
+            </Frame>
+
+            <Frame type="UnitStatusBuffDebuffElement" name="UnitStatusHinderedHealingDisplay" template="UnitStatus/UnitStatusHinderedHealingDisplayTemplate">
+                <Anchor side="Top" relative="$parent/UnitStatusResistDisplay" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/UnitStatusResistDisplay" pos="Max" offset="0"/>
             </Frame>
 
             <Frame type="Image" name="DimmingFrame">
@@ -3639,9 +3688,13 @@
         </Frame>
         
         <Frame type="UnitStatusBuffDebuffElement" name="UnitStatusResistDisplay" template="UnitStatus/UnitStatusResistDisplayTemplate">
-            <Anchor side="Top" relative="$parent/HealthBar" pos="Mid" offset="0"/>
-            <Anchor side="Bottom" relative="$parent/HealthBar" pos="Mid" offset="0"/>
+            <Anchor side="Top" relative="$parent/HealthBar" pos="Mid" offset="-16"/>
             <Anchor side="Left" relative="$parent/HealthBar" pos="Max" offset="15"/>
+        </Frame>
+
+        <Frame type="UnitStatusBuffDebuffElement" name="UnitStatusHinderedHealingDisplay" template="UnitStatus/UnitStatusHinderedHealingDisplayTemplate">
+            <Anchor side="Top" relative="$parent/UnitStatusResistDisplay" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent/UnitStatusResistDisplay" pos="Max" offset="0"/>
         </Frame>
         
     </Frame>

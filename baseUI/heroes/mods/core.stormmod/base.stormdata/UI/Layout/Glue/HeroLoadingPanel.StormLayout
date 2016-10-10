@@ -5,8 +5,6 @@
     
     <!--===========================================================================================
     <! HeroLoadingPanelPlayerFrame
-    <!=============================================================================================
-    <! Events : Reset / LocalPlayer / BluePlayer / RedPlayer
     <!==========================================================================================-->
     <Frame type="HeroLoadingPanelPlayerFrame" name="HeroLoadingPanelPlayerFrameTemplate">
         <Height val="147"/>
@@ -73,11 +71,8 @@
 
         <Frame type="Label" name="NameLabel">
             <Anchor side="Bottom" relative="$parent" pos="Max" offset="-27"/>
-            <Style val="LoadingPlayerNameLabel"/>
             <Options val="Ellipsis | NoWrapping"/>
             <Text val="NameLabel"/>
-            <ColorAdjustMode val="Colorize"/>
-            <AdjustmentColor val="92d1ef"/>
         </Frame>
 
         <Frame type="Label" name="BuildLabel">
@@ -108,41 +103,51 @@
         </Frame>
 
         <!--=======================================================================================
-        <! BLUE/RED TEAM ANIMATION
+        <! BLUE/RED TEAM STATE
         <!======================================================================================-->
-        <Animation name="PlayerNameColor">
-            <Event event="Reset" action="Stop"/>
-            <Event event="BluePlayer" action="Stop"/>
-            <Event event="LocalPlayer" action="DirectionForward,Play"/>
-            <Event event="RedPlayer" action="DirectionReverse,Play"/>
-                      
-            <Controller type="AdjustmentColor" end="Pause" frame="NameLabel">
-                <Key type="Curve" time="0.00" value="255;113;151" out="Step"/>
-                <Key type="Curve" time="0.01" value="231;161;13" out="Step"/>
-            </Controller>
-        </Animation>
+        <StateGroup name="TeamBorder">
+            <State name="RedTeamBorder">
+                <When type="AnimationState" PlayerTeam="RedTeam"/>
+                <Action type="SetProperty" frame="PlayerBorder" texture="@UI/LoadingScreen_PlayerFrame_Red"/>
+                <Action type="SetProperty" frame="LoadingProgressBarImage" texture="@UI/LoadingScreen_LoadingBar_Red"/>
+            </State>
+        </StateGroup>
 
-        <Animation name="RedTeamColor">
-            <Event event="Reset" action="Stop"/>
-            <Event event="RedPlayer" action="Play"/>
-     
-            <Controller type="Texture" end="Pause" frame="PlayerBorder">
-                <Key type="Image" time="0" image="@UI/LoadingScreen_PlayerFrame_Red"/>
-            </Controller>
-            <Controller type="Texture" end="Pause" frame="LoadingProgressBarImage">
-                <Key type="Image" time="0" image="@UI/LoadingScreen_LoadingBar_Red"/>
-            </Controller>
-        </Animation>
+        <StateGroup name="PlayerLabelColor">
+            <DefaultState val="BluePlayerName"/>
 
-        <Animation name="BlueTeamColor">
-            <Event event="Reset" action="Stop"/>
-            <Event event="BluePlayer" action="Play"/>
-            
-            <Controller type="AdjustmentColor" end="Pause" frame="NameLabel">
-                <Key type="Curve" time="0.0" value="146;209;239" out="Step"/>
-            </Controller>
-        </Animation>
+            <!-- Player name only -->
+            <State name="LocalPlayerNameOnly">
+                <When type="Property" frame="$ancestor[@type=CustomLoadingPanel]" UseInGameHeroSelection="true"/>
+                <When type="AnimationState" LocalPlayer="True"/>
+                <Action type="SetProperty" frame="HeroContainerFrame" visible="false"/>
+                <Action type="SetProperty" frame="NameLabel" style="LoadingPlayerNameBigLocal"/>
+            </State>
+            <State name="RedPlayerNameOnly">
+                <When type="Property" frame="$ancestor[@type=CustomLoadingPanel]" UseInGameHeroSelection="true"/>
+                <When type="AnimationState" PlayerTeam="RedTeam"/>
+                <Action type="SetProperty" frame="HeroContainerFrame" visible="false"/>
+                <Action type="SetProperty" frame="NameLabel" style="LoadingPlayerNameBigRed"/>
+            </State>
+            <State name="BluePlayerNameOnly">
+                <When type="Property" frame="$ancestor[@type=CustomLoadingPanel]" UseInGameHeroSelection="true"/>
+                <Action type="SetProperty" frame="HeroContainerFrame" visible="false"/>
+                <Action type="SetProperty" frame="NameLabel" style="LoadingPlayerNameBigBlue"/>
+            </State>
 
+            <!-- Player name and hero name -->
+            <State name="LocalPlayerName">
+                <When type="AnimationState" LocalPlayer="True"/>
+                <Action type="SetProperty" frame="NameLabel" style="LoadingPlayerNameSmallLocal"/>
+            </State>
+            <State name="RedPlayerName">
+                <When type="AnimationState" PlayerTeam="RedTeam"/>
+                <Action type="SetProperty" frame="NameLabel" style="LoadingPlayerNameSmallRed"/>
+            </State>
+            <State name="BluePlayerName">
+                <Action type="SetProperty" frame="NameLabel" style="LoadingPlayerNameSmallBlue"/>
+            </State>
+        </StateGroup>
     </Frame>
 
     <!--=======================================================================================

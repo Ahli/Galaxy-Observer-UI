@@ -2,8 +2,51 @@
 <Desc>
     <DescFlags val="Locked"/>
 
-    <Frame type="Frame" name="VersusAIPanelTemplate">
-        <Anchor side="Bottom" relative="DifficultyPulldown" pos="Max" offset="20"/>
+    <Frame type="Button" name="RadioButtonTemplate">
+        <!-- Button that's used as Radio button should have Toggleable property set to false -->
+        <Toggleable val="false"/>
+        <TooltipAnchorPosition val="MiddleRight"/>
+
+        <ClickSound val="@UI_BNet_Generic_03"/>
+        <Height val="64"/>
+
+        <Frame type="Image" name="Image">
+            <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+            <Texture val="@UI/Storm_ExclusiveButton_Normal"/>
+            <TextureType val="NineSlice"/>
+        </Frame>
+
+        <StateGroup name="RadioState">
+            <DefaultState val="Off"/>
+            <State name="Toggled">
+                <When type="Property" Toggled="True"/>
+                <Action type="SetProperty" frame="Image" texture="@UI/Storm_ExclusiveButton_Selected"/>
+                <Action type="SetProperty" frame="Label" style="RadioButtonSelected"/>
+            </State>
+            <State name="Hovering">
+                <When type="Property" Hovering="True"/>
+                <Action type="SetProperty" frame="Image" texture="@UI/Storm_ExclusiveButton_Hover"/>
+                <Action type="SetProperty" frame="Label" style="RadioButtonLabel"/>
+            </State>
+            <State name="Off">
+                <Action type="SetProperty" frame="Image" texture="@UI/Storm_ExclusiveButton_Normal"/>
+                <Action type="SetProperty" frame="Label" style="RadioButtonLabel"/>
+            </State>
+        </StateGroup>
+
+        <Frame type="Label" name="Label">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="21"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="-20"/>
+        </Frame>
+    </Frame>
+
+    <Frame type="VersusAIPanel" name="VersusAIPanelTemplate">
+        <Anchor side="Bottom" relative="TrainingButton" pos="Max" offset="20"/>
         <Anchor side="Right" relative="Header" pos="Max" offset="20"/>
         <RenderType val="HDR"/>
         <Visible val="False"/>
@@ -28,7 +71,12 @@
             <Event event="Hide" action="DirectionReverse,Play" frame="$parent/HeroAttributesGroup/ChangeHeroPanel"/>
             <Controller type="Fade" end="Pause">
                 <Key type="Curve" time="0" value="255" out="Fast"/>
-                <Key type="Curve" time=".4" value="0" in="Slow"/>
+                <Key type="Curve" time=".2" value="0" in="Slow"/>
+            </Controller>
+            <Controller type="Visibility" end="Pause" frame="MouseBlocker">
+                <Key type="Bool" time="0.0" value="false"/>
+                <Key type="Bool" time="0.199" value="false"/>
+                <Key type="Bool" time="0.200" value="true"/>
             </Controller>
         </Animation>
 
@@ -50,40 +98,82 @@
 
         <Frame type="Frame" name="Header" template="StandardTemplates/SummarySubHeaderTemplate">
             <Anchor side="Top" relative="$parent/VersusAIPanelBg" pos="Min" offset="16"/>
-            <Anchor side="Left" relative="$parent/VersusAIPanelBg" pos="Min" offset="12"/>
+            <Anchor side="Left" relative="$parent/VersusAIPanelBg" pos="Min" offset="25"/>
             <Anchor side="Right" relative="$this/HeaderLabel" pos="Max" offset="15"/>
 
             <Frame type="Label" name="HeaderLabel">
                 <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
                 <Text val="@UI/ScreenPlay/AIOptionsTitle"/>
                 <Style val="PlayerProfileTitle"/>
-                <AutoSizeClamps minWidth="128"/>
+                <AutoSizeClamps minWidth="228"/>
             </Frame>
         </Frame>
 
-        <Frame type="CheckBox" name="AIAlliesCheckbox" template="StandardTemplates/StandardCheckBoxTemplate">
-            <Handle val="HeroUnrankedPanel_AIAlliesCheckbox"/>
+        <Frame type="Label" name="HeaderLabel">
             <Anchor side="Top" relative="$parent/Header" pos="Max" offset="10"/>
-            <Anchor side="Left" relative="$parent/Header" pos="Min" offset="-6"/>
-            <Tooltip val="@UI/GameplayOptionsTooltips/AITeammates"/>
-        </Frame>
-            
-        <Frame type="Label" name="AIAlliesLabel">
-            <Anchor side="Top" relative="$parent/AIAlliesCheckbox" pos="Min" offset="0"/>
-            <Anchor side="Bottom" relative="$parent/AIAlliesCheckbox" pos="Max" offset="0"/>
-            <Anchor side="Left" relative="$parent/AIAlliesCheckbox" pos="Max" offset="10"/>
-            <Text val="@UI/ScreenPlay/AITeammates"/>
-            <Style val="OptionsValueLabel"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="23"/>
+            <Text val="@UI/Difficulty_Colon"/>
+            <Style val="RadioButtonLabel"/>
         </Frame>
 
-        <Frame type="Pulldown" name="DifficultyPulldown" template="StandardTemplates/StandardPulldownTemplate">
-            <Handle val="HeroUnrankedPanel_DifficultyPulldown"/>
-            <Anchor side="Top" relative="$parent/AIAlliesCheckbox" pos="Max" offset="10"/>
-            <Anchor side="Left" relative="$parent/AIAlliesCheckbox" pos="Min" offset="0"/>
-            <Anchor side="Right" relative="$parent/Header" pos="Max" offset="10"/>
-            <Width val="0"/>
+        <Frame type="Label" name="DifficultyLabel">
+            <Anchor side="Top" relative="$parent/Header" pos="Max" offset="10"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="-23"/>
+            <Text val="{$parent/@DifficultyText}"/>
+            <Style val="RadioButtonLabel"/>
+        </Frame>
+
+        <Frame type="Slider" name="DifficultySlider" template="StandardTemplates/StandardSliderTemplate">
+            <Handle val="HeroUnrankedPanel_DifficultySlider"/>
+            <Anchor side="Top" relative="$parent/DifficultyLabel" pos="Max" offset="5"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="21"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="-23"/>
             <Tooltip val="@UI/GameplayOptionsTooltips/AIDifficulty"/>
-            <RenderPriority val="512"/>
+            <TooltipAnchorPosition val="MiddleRight"/>
+            <Continuous val="false"/>
+        </Frame>
+        
+        <Frame type="RadioGroup" name="RadioGroup">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="17"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="-17"/>
+            <ButtonFrame val="$parent/TrainingButton"/>
+            <ButtonFrame val="$parent/AIAlliesButton"/>
+            <ButtonFrame val="$parent/CoopButton"/>
+        </Frame>
+
+        <Frame type="Button" name="CoopButton" template="HeroUnrankedPanel/RadioButtonTemplate">
+            <Handle val="HeroUnrankedPanel_CoopCheckbox"/>
+            <Anchor side="Top" relative="$parent/DifficultySlider" pos="Max" offset="5"/>
+            <Anchor side="Left" relative="$parent/RadioGroup" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent/RadioGroup" pos="Max" offset="0"/>
+            <Tooltip val="@UI/GameplayOptionsTooltips/Coop"/>
+            <Text val="@UI/ScreenPlay/Coop"/>
+        </Frame>
+
+        <Frame type="Button" name="AIAlliesButton" template="HeroUnrankedPanel/RadioButtonTemplate">
+            <Handle val="HeroUnrankedPanel_AIAlliesCheckbox"/>
+            <Anchor side="Top" relative="$parent/CoopButton" pos="Max" offset="-4"/>
+            <Anchor side="Left" relative="$parent/RadioGroup" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent/RadioGroup" pos="Max" offset="0"/>
+            <Tooltip val="@UI/GameplayOptionsTooltips/AITeammates"/>
+            <Text val="@UI/ScreenPlay/AITeammates"/>
+        </Frame>
+
+        <Frame type="Button" name="TrainingButton" template="HeroUnrankedPanel/RadioButtonTemplate">
+            <Handle val="HeroUnrankedPanel_TrainingCheckbox"/>
+            <Anchor side="Top" relative="$parent/AIAlliesButton" pos="Max" offset="-4"/>
+            <Anchor side="Left" relative="$parent/RadioGroup" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent/RadioGroup" pos="Max" offset="0"/>
+            <Tooltip val="@UI/GameplayOptionsTooltips/Training"/>
+            <Text val="@UI/ScreenPlay/PracticeButton"/>
+        </Frame>
+
+        <Frame type="Frame" name="MouseBlocker">
+            <Anchor relative="$parent"/>
+            <AcceptsMouse val="true"/>
+            <Visible val="false"/>
         </Frame>
     </Frame>
 
@@ -125,8 +215,8 @@
                 <DisplayLocal val="true"/>
             </Frame>
 
-            <Frame type="Frame" name="VersusAIPanel" template="HeroUnrankedPanel/VersusAIPanelTemplate">
-                <Anchor side="Top" relative="$parent/HeroAttributesGroup/SkinsButton" pos="Min" offset="-180"/>
+            <Frame type="VersusAIPanel" name="VersusAIPanel" template="HeroUnrankedPanel/VersusAIPanelTemplate">
+                <Anchor side="Top" relative="$parent/HeroAttributesGroup/SkinsButton" pos="Min" offset="-322"/>
                 <Anchor side="Left" relative="$parent/HeroAttributesGroup/SkinsButton" pos="Min" offset="35"/>
             </Frame>
 
