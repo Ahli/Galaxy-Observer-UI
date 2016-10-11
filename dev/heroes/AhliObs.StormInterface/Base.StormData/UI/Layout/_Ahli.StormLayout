@@ -658,8 +658,9 @@ UI/Storm_UI_InGame_AbilityButton_ActivateBorder_Add=Assets\Textures\storm_ui_ing
 			<Height val="34"/>
 			<Unclipped val="true"/>
 			<Visible val="false"/>
+			<Alpha val="0"/>
 			
-			<!-- TODO: disabling this animation did not work -->
+			<!-- TODO: disabling default animation did not work -->
 			<Animation name="RollIn">
 				<Event event="OnShown" action="Reset"/>
 				<Controller type="Anchor" name="Anchor_1" end="Pause" side="Top" relative="true">
@@ -687,6 +688,7 @@ UI/Storm_UI_InGame_AbilityButton_ActivateBorder_Add=Assets\Textures\storm_ui_ing
 					<Key type="Curve" time="0" value="0" out="Step"/>
 				</Controller>
 			</Animation>
+			
 		</Frame>
 		<Frame type="Frame" name="LedContainer">
 			<Frame type="Image" name="Led3">
@@ -732,12 +734,25 @@ UI/Storm_UI_InGame_AbilityButton_ActivateBorder_Add=Assets\Textures\storm_ui_ing
 								<Key type="Curve" time="0.0" value="0" out="Step"/>
 								<Key type="Curve" time="0.1" value="9000" out="Step"/>
 							</Controller>
-							<Controller type="Fade" end="Pause" frame="$ancestor[@name=CommandPanel]/ButtonHolder">
-								<Key type="Curve" time="0" value="0"/>
-								<Key type="Curve" time="0" value="255"/>
-							</Controller>
 						</Animation>
 					</Frame>
+				</Frame>
+				<!-- designed to fail when not on Warhead Junction -->
+				<Frame type="UnitStatusValidatorAnimElement" name="OnlyShowHolderForHeroicUnits">
+					<Anchor relative="$parent/ArmedValidator"/>
+					
+					<Validator val="OriginIsHeroic"/>
+					<Validator val="TargetIsNotHeroic"/>
+					
+					<Animation name="OnlyShowHolderForHeroicUnits">
+						<Event event="OriginIsHeroic" action="Reset,Play"/>
+						<Event event="TargetIsNotHeroic" action="Stop"/>
+
+						<Controller type="Fade" end="Pause" frame="$ancestor[@name=CommandPanel]/ButtonHolder">
+							<Key type="Curve" time="0" value="0"/>
+							<Key type="Curve" time="0" value="255"/>
+						</Controller>
+					</Animation>
 				</Frame>
 			</Frame>
 		</Frame>
@@ -1658,8 +1673,6 @@ UI/Storm_UI_InGame_AbilityButton_ActivateBorder_Add=Assets\Textures\storm_ui_ing
 							<Frame type="SelectionUnitStatusPanel" name="Greymane" template="Greymane/GreymaneFrame">
 								<Anchor side="Bottom" relative="$parent" pos="Max" offset="-98"/>
 								<Anchor side="Left" relative="$parent" pos="Min" offset="225"/>
-								<Height val="137"/>
-								<Width val="300"/>
 								<Frame type="UnitStatusFrame" name="UnitStatusFrame0">
 									<Frame type="Image" name="WatchPulseImage">
 										<!-- 120x120 -->
@@ -1863,8 +1876,6 @@ UI/Storm_UI_InGame_AbilityButton_ActivateBorder_Add=Assets\Textures\storm_ui_ing
 							<Frame type="SelectionUnitStatusPanel" name="Xul" template="Xul/XulFrame">
 								<Anchor side="Bottom" relative="$parent" pos="Max" offset="-96"/>
 								<Anchor side="Left" relative="$parent" pos="Min" offset="225"/>
-								<Height val="137"/>
-								<Width val="300"/>
 								<!--
 								UI/Storm_UI_HUD_Necro_Icon=Assets\Textures\Storm_UI_HUD_Necro_Icon.dds		128x128
 								UI/Storm_UI_HUD_Necro_GlowFX=Assets\Textures\Storm_UI_HUD_Necro_GlowFX.dds	128x128
@@ -1939,14 +1950,10 @@ UI/Storm_UI_InGame_AbilityButton_ActivateBorder_Add=Assets\Textures\storm_ui_ing
 							<Frame type="SelectionUnitStatusPanel" name="Dehaka" template="Dehaka/DehakaFrame">
 								<Anchor side="Bottom" relative="$parent" pos="Max" offset="-96"/>
 								<Anchor side="Left" relative="$parent" pos="Min" offset="225"/>
-								<Height val="137"/>
-								<Width val="300"/>
 							</Frame>
 							<Frame type="SelectionUnitStatusPanel" name="Guldan" template="Guldan/GuldanRampantHellfireFrame">
 								<Anchor side="Bottom" relative="$parent" pos="Max" offset="-96"/>
 								<Anchor side="Left" relative="$parent" pos="Min" offset="225"/>
-								<Height val="137"/>
-								<Width val="300"/>
 								
 								<Frame type="Frame" name="RampantHellfireImageFrame">
 									<Frame type="Image" name="RampantHellfirePulseImage">
@@ -1972,7 +1979,7 @@ UI/Storm_UI_InGame_AbilityButton_ActivateBorder_Add=Assets\Textures\storm_ui_ing
 								</Frame>
 							</Frame>
 							
-							<!-- TODO: does not work properly
+							<!-- TODO: does not work properly, cutscene frame + name label are not updated
 							<Frame type="SelectionUnitStatusPanel" name="Auriel" template="Auriel/AurielBestowHopeFrame">
 								<Anchor side="Bottom" relative="$parent" pos="Max" offset="-96"/>
 								<Anchor side="Left" relative="$parent" pos="Min" offset="225"/>
@@ -2038,24 +2045,24 @@ UI/Storm_UI_InGame_AbilityButton_ActivateBorder_Add=Assets\Textures\storm_ui_ing
 								</Frame>
 							</Frame>
 
-							<!-- altered bottom offset -->
-							<!-- TODO: does not work properly
 							<Frame type="SelectionUnitStatusPanel" name="Zarya" template="Zarya/ZaryaTraitFrame">
 								<Anchor side="Bottom" relative="$parent" pos="Max" offset="-106"/>
 								<Anchor side="Left" relative="$parent" pos="Min" offset="225"/>
-								<Height val="137"/>
-								<Width val="300"/>
-								
-								<Visible val="false"/>
-								<Anchor side="Bottom" relative="$parent" pos="Max" offset="9999"/>
 								
 								<Frame type="UnitStatusFrame" name="UnitStatusFrame0">
+									<!-- label is by default not functional -->
 									<Frame type="Label" name="ZaryaTraitLabel">
 										<Unclipped val="true"/>
+										<Text val="@Ahli/ZaryaTraitDamageBoostFix"/>
 									</Frame>
 								</Frame>
 							</Frame>
-							 -->
+							
+							<Frame type="SelectionUnitStatusPanel" name="Samuro" template="Samuro/SamuroFrame">
+								<Anchor side="Bottom" relative="$parent" pos="Max" offset="-111"/>
+								<Anchor side="Left" relative="$parent" pos="Min" offset="275"/>
+							</Frame>
+							
 							
 						</Frame>
 						
@@ -4260,67 +4267,52 @@ UI/Storm_UI_InGame_AbilityButton_ActivateBorder_Add=Assets\Textures\storm_ui_ing
 					<Frame type="Image" name="TopBarBacking">
 						<Visible val="false"/>
 					</Frame>
+					<Frame type="Image" name="TopBarBackingBlur">
+						<Visible val="false"/>
+					</Frame>
 					<Frame type="Image" name="TopBarLogoOverlay">
 						<Visible val="false"/>
 					</Frame>
-					<!-- TODO change -->
-					<Frame type="Label" name="GameTimerLabel">
-						<Style val="ObsBar_MatchTimer"/>
-					</Frame>
-					<Frame type="Label" name="Team1LevelLabel">
-					</Frame>
-					<Frame type="Label" name="Team2LevelLabel">
-					</Frame>
-
-					<!-- FIX: fix ctrl+W making default xp bars re-appear -->
-					<Frame type="UnitStatusFrame" name="Team1XPUnitStatusFrame">
-						<Anchor side="Top" relative="$parent" pos="Min" offset="9999"/>
-					</Frame>
-					<Frame type="UnitStatusFrame" name="Team2XPUnitStatusFrame">
-						<Anchor side="Top" relative="$parent" pos="Min" offset="9999"/>
-					</Frame>
-					<Frame type="UnitStatusFrame" name="Team2XPBackgroundRedArena">
-						<Anchor side="Top" relative="$parent" pos="Min" offset="9999"/>
-					</Frame>
-					<Frame type="UnitStatusFrame" name="Team2XPBackgroundBlueArena">
-						<Anchor side="Top" relative="$parent" pos="Min" offset="9999"/>
-					</Frame>
-					<Frame type="UnitStatusFrame" name="Team2XPBackgroundRed">
-						<Anchor side="Top" relative="$parent" pos="Min" offset="9999"/>
-					</Frame>
-					<Frame type="UnitStatusFrame" name="Team2XPBackgroundBlue">
-						<Anchor side="Top" relative="$parent" pos="Min" offset="9999"/>
-					</Frame>
-					<Frame type="UnitStatusFrame" name="Team1XPBackgroundRedArena">
-						<Anchor side="Top" relative="$parent" pos="Min" offset="9999"/>
-					</Frame>
-					<Frame type="UnitStatusFrame" name="Team1XPBackgroundBlueArena">
-						<Anchor side="Top" relative="$parent" pos="Min" offset="9999"/>
-					</Frame>
-					<Frame type="UnitStatusFrame" name="Team1XPBackgroundRed">
-						<Anchor side="Top" relative="$parent" pos="Min" offset="9999"/>
-					</Frame>
-					<Frame type="UnitStatusFrame" name="Team1XPBackgroundBlue">
-						<Anchor side="Top" relative="$parent" pos="Min" offset="9999"/>
-					</Frame>
+					<Frame type="Frame" name="NormalModeContainer">
+						<!-- FIX: fix ctrl+W making default xp bars re-appear -->
+						<Frame type="TeamVeterancyUnitStatusFrame" name="Team1XPUnitStatusFrame">
+							<Anchor side="Top" relative="$parent" pos="Min" offset="9999"/>
+						</Frame>
+						<Frame type="TeamVeterancyUnitStatusFrame" name="Team2XPUnitStatusFrame">
+							<Anchor side="Top" relative="$parent" pos="Min" offset="9999"/>
+						</Frame>
+						<Frame type="UnitStatusFrame" name="Team2XPBackgroundRed">
+							<Anchor side="Top" relative="$parent" pos="Min" offset="9999"/>
+						</Frame>
+						<Frame type="UnitStatusFrame" name="Team2XPBackgroundBlue">
+							<Anchor side="Top" relative="$parent" pos="Min" offset="9999"/>
+						</Frame>
+						<Frame type="UnitStatusFrame" name="Team1XPBackgroundRed">
+							<Anchor side="Top" relative="$parent" pos="Min" offset="9999"/>
+						</Frame>
+						<Frame type="UnitStatusFrame" name="Team1XPBackgroundBlue">
+							<Anchor side="Top" relative="$parent" pos="Min" offset="9999"/>
+						</Frame>
+						
+						<!-- Remove core health label -->
+						<Frame type="Label" name="CoreHealthLabel">
+							<Anchor side="Bottom" relative="$parent/Team1CoreUnitStatus" pos="Max" offset="99999"/>
+							<Visible val="false"/>
+							<Alpha val="0"/>
+						</Frame>
 					
-					<!-- Remove core health label -->
-					<Frame type="Label" name="CoreHealthLabel">
-						<Anchor side="Bottom" relative="$parent/Team1CoreUnitStatus" pos="Max" offset="99999"/>
-						<Visible val="false"/>
-						<Alpha val="0"/>
-					</Frame>
-					
-					<!-- hide default core life bar and bg image -->
-					<Frame type="UnitStatusFrame" name="Team1CoreUnitStatus">
-						<Anchor side="Top" relative="$parent" pos="Max" offset="9999"/>
-					</Frame>
-					<Frame type="UnitStatusFrame" name="Team2CoreUnitStatus">
-						<Anchor side="Top" relative="$parent" pos="Max" offset="9999"/>
-					</Frame>
-					<!-- remove vs label because my special button is there -->
-					<Frame type="Label" name="TeamLevelVSLabel">
-						<Visible val="false"/>
+						<!-- hide default core life bar and bg image -->
+						<Frame type="UnitStatusFrame" name="Team1CoreUnitStatus">
+							<Anchor side="Top" relative="$parent" pos="Max" offset="9999"/>
+						</Frame>
+						<Frame type="UnitStatusFrame" name="Team2CoreUnitStatus">
+							<Anchor side="Top" relative="$parent" pos="Max" offset="9999"/>
+						</Frame>
+						
+						<!-- remove vs label because my special button is there -->
+						<Frame type="Label" name="TeamLevelVSLabel">
+							<Visible val="false"/>
+						</Frame>
 					</Frame>
 				</Frame>
 				
