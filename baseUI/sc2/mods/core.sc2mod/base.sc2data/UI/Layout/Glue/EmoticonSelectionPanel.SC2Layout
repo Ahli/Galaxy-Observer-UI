@@ -83,10 +83,28 @@
                 <Key type="Bool" time="0" value="true"/>
             </Controller>
         </Animation>
+                
+        <Animation name="OnHover">
+            <Event event="OnMouseEnter" action="Reset, Play"/>
+            
+            <Controller type="Event" end="Stop" frame="$parent/$parent/$parent">
+                <Key type="Event" time="0" event="ItemMouseEnter"/>
+            </Controller>
+        </Animation>
+                
+        <Animation name="OnUnhover">
+            <Event event="OnMouseExit" action="Reset, Play"/>
+            
+            <Controller type="Event" end="Stop" frame="$parent/$parent/$parent">
+                <Key type="Event" time="0" event="ItemMouseExit"/>
+            </Controller>
+        </Animation>
     </Frame>
     
     <Frame type="Button" name="EmoticonPageButtonTemplate" template="StandardBattlenetTemplates/BattlenetMiniIconButtonTemplate">
         <ClickSound val="@UI_ReplayButtonSelect"/>
+        <!-- This property bind is so clicking on the disabled button doesn't dismiss the emoticon panel -->
+        <AcceptsMouse val="{$this/@Enabled}"/>
         
         <Frame type="Image" name="NormalImage">
             <Alpha val="0"/>
@@ -104,6 +122,22 @@
             <Texture val="@UI/Glues_Icons_SmallPageArrow_Left_Normal"/>
             <DesaturateOnDisable val="false"/>
         </Frame>
+                
+        <Animation name="OnHover">
+            <Event event="OnMouseEnter" action="Reset, Play"/>
+            
+            <Controller type="Event" end="Stop" frame="$parent/$parent/$parent">
+                <Key type="Event" time="0" event="ItemMouseEnter"/>
+            </Controller>
+        </Animation>
+                
+        <Animation name="OnUnhover">
+            <Event event="OnMouseExit" action="Reset, Play"/>
+            
+            <Controller type="Event" end="Stop" frame="$parent/$parent/$parent">
+                <Key type="Event" time="0" event="ItemMouseExit"/>
+            </Controller>
+        </Animation>
     </Frame>
     
     <Frame type="PageSelectorButtonList" name="PageSelectorTemplate">
@@ -198,12 +232,14 @@
         <Width val="30"/>
         <Height val="30"/>
         <TooltipFrame val="EmoticonTooltip"/>
+        <Enabled val="{$this/@EmoticonAllowed}"/>
+        <Tooltip val="{$this/@EmoticonDescription}"/>
 
         <Frame type="StandardTooltip" name="EmoticonTooltip" template="StandardTooltip/StandardBattlenetTooltipTemplate"/>
 
         <StateGroup name="DisabledStateGroup">
             <State name="VisibleState">
-                <When type="Property" frame="$this" Enabled="false"/>
+                <When type="Property" frame="$this" EmoticonAllowed="false"/>
                 <Action type="SetProperty" frame="Background" Alpha="100"/>
                 <Action type="SetProperty" frame="Icon" Alpha="100"/>
                 <Action type="SetProperty" frame="Icon" ColorAdjustMode="Colorize"/>
@@ -245,26 +281,44 @@
             <Alpha val="255"/>
         </Frame>
 
+        <Frame type="Frame" name="DisabledTooltipFrame">
+            <Anchor relative="$parent"/>
+            <AcceptsMouseTooltip val="true"/>
+            <TooltipFrame val="EmoticonTooltip"/>
+            <Tooltip val="{$parent/@EmoticonDescriptionLocked}"/>
+        </Frame>
+        
         <Frame type="EmoticonAchievementFrame" name="AchievementFrame">
             <Anchor relative="$parent"/>
             <AcceptsMouseTooltip val="true"/>
             <TooltipFrame val="AchievementInfoTooltip"/>
             <Visible val="false"/>
+            <AchievementId val="{$parent/@AchievementId}"/>
+            <MouseInside val="{$parent/@Hovered}"/>
 
             <Frame type="AchievementInfoTooltip" name="AchievementInfoTooltip" template="StandardTemplates/AchievementInfoTooltipTemplate"/>
-
-            <StateGroup name="AchievementStateGroup">
-                <State name="ShowState">
-                    <When type="Property" frame="$parent" Enabled="false"/>
-                    <When type="AnimationState" frame="$this" AchievementState="HasAchievement"/>
-                    <Action type="SetProperty" frame="$this" Visible="true"/>
-                </State>
-
-                <State name="HideState">
-                    <Action type="SetProperty" frame="$this" Visible="false"/>
-                </State>
-            </StateGroup>
         </Frame>
+
+        <StateGroup name="TooltipStateGroup">
+            <State name="AchievementState">
+                <When type="Property" frame="$this" EmoticonAllowed="false"/>
+                <When type="AnimationState" frame="AchievementFrame" AchievementState="HasAchievement"/>
+                <Action type="SetProperty" frame="AchievementFrame" Visible="true"/>
+                <Action type="SetProperty" frame="DisabledTooltipFrame" Visible="false"/>
+            </State>
+
+            <State name="DisabledState">
+                <When type="Property" frame="$this" EmoticonAllowed="false"/>
+                <Action type="SetProperty" frame="AchievementFrame" Visible="false"/>
+                <Action type="SetProperty" frame="DisabledTooltipFrame" Visible="true"/>
+            </State>
+
+            <State name="EnabledState">
+                <When type="Property" frame="$this" EmoticonAllowed="true"/>
+                <Action type="SetProperty" frame="AchievementFrame" Visible="false"/>
+                <Action type="SetProperty" frame="DisabledTooltipFrame" Visible="false"/>
+            </State>
+        </StateGroup>
 
         <StateGroup name="HoverStateGroup">
             <State name="HoveredState">
@@ -300,7 +354,6 @@
             <Anchor relative="$parent"/>
             <TextureType val="Nineslice"/>
             <Texture val="@UI/Glues_Battlenet_PageAssets_MainContainer"/>
-            <AcceptsMouse val="true"/>
         </Frame>
         
         <Frame type="Image" name="BackgroundInner">
@@ -322,14 +375,12 @@
         </Frame>
 
         <Frame type="TileList" name="TileList">
-            <Anchor side="Top" relative="$parent/BackgroundInner" pos="Min" offset="9"/>
-            <Anchor side="Left" relative="$parent/BackgroundInner" pos="Min" offset="0"/>
-            <Anchor side="Bottom" relative="$parent" pos="Max" offset="-10"/>
-            <Anchor side="Right" relative="$parent/BackgroundInner" pos="Max" offset="0"/>
+            <Anchor relative="$parent"/>
+            <AcceptsMouse val="true"/>
 
             <Frame type="EmoticonTileListItem" name="Item0" template="EmoticonSelectionPanel/EmoticonTileListItemTemplate">
-                <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
-                <Anchor side="Left" relative="$parent" pos="Min" offset="10"/>
+                <Anchor side="Top" relative="$parent/$parent/BackgroundInner" pos="Min" offset="9"/>
+                <Anchor side="Left" relative="$parent/$parent/BackgroundInner" pos="Min" offset="10"/>
             </Frame>
 
             <Frame type="EmoticonTileListItem" name="Item1" template="EmoticonSelectionPanel/EmoticonTileListItemTemplate">
@@ -615,9 +666,9 @@
             </Frame>
             
             <Frame type="Frame" name="PageSelectorAnchor">
-                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
-                <Anchor side="Bottom" relative="$parent" pos="Max" offset="-1"/>
-                <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+                <Anchor side="Left" relative="$parent/$parent/BackgroundInner" pos="Min" offset="0"/>
+                <Anchor side="Bottom" relative="$parent" pos="Max" offset="-11"/>
+                <Anchor side="Right" relative="$parent/$parent/BackgroundInner" pos="Max" offset="0"/>
                 <Height val="35"/>
             </Frame>
             

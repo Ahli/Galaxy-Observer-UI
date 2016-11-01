@@ -428,28 +428,30 @@
                     <Key type="Curve" time="0.9" value="255" in="Slow"/>
                 </Controller>
             </Animation>
-
-            <Animation name="TryCampaignVisibility">
-                <Event event="HideTryCampaign" action="Reset,Play" frame="$parent" />
-                <Event event="ShowTryCampaign" action="Reset" frame="$parent" />
-
-                <Controller type="Visibility" end="Pause">
-                    <Key type="Bool" time="0" value="false"/>
-                </Controller>
-            </Animation>
-
-            <Frame type="Label" name="Label">
-                <Animation name="ContinueCampaignEnabled">
-                    <Event event="EnableContinueCampaign" action="Reset,Play" frame="$parent/$parent" />
-                    <Event event="DisableContinueCampaign" action="Reset" frame="$parent/$parent" />
-
-                    <Controller type="Text" end="Pause">
-                        <Key type="Text" time="0" text="@UI/CampaignPurchase/TryRestartCampaign"/>
-                    </Controller>
-                </Animation>
-            </Frame>
-
         </Frame>
+
+        <StateGroup name="TryCampaignButtonState">
+            <DefaultState val="HideTryCampaign"/>
+
+            <State name="EnableStartCampaign">
+                <When type="AnimationState" TryCampaignState="ShowTryCampaign"/>
+                <When type="AnimationState" ContinueCampaignState="DisableContinueCampaign"/>
+                <Action type="SetProperty" frame="TryCampaignButton" text="@UI/CampaignPurchase/TryCampaign"/>
+                <Action type="SetProperty" frame="TryCampaignButton" visible="True"/>
+            </State>
+
+
+            <State name="EnableContinueCampaign">
+                <When type="AnimationState" TryCampaignState="ShowTryCampaign"/>
+                <When type="AnimationState" ContinueCampaignState="EnableContinueCampaign"/>
+                <Action type="SetProperty" frame="TryCampaignButton" text="@UI/CampaignPurchase/TryRestartCampaign"/>
+                <Action type="SetProperty" frame="TryCampaignButton" visible="True"/>
+            </State>
+
+            <State name="HideTryCampaign">
+                <Action type="SetProperty" frame="TryCampaignButton" visible="False"/>
+            </State>
+        </StateGroup>
 
         <Frame type="Button" name="ContinueCampaignButton" template="StandardBattlenetTemplates/BattlenetStandardButtonTemplate">
             <Anchor side="Top" relative="$parent/PurchaseButton" pos="Min" offset="0"/>
@@ -466,26 +468,22 @@
                     <Key type="Curve" time="0.9" value="255" in="Slow"/>
                 </Controller>
             </Animation>
-
-            <Animation name="TryCampaignVisibility">
-                <Event event="HideTryCampaign" action="Reset,Play" frame="$parent" />
-                <Event event="ShowTryCampaign" action="Reset" frame="$parent" />
-
-                <Controller type="Visibility" end="Pause">
-                    <Key type="Bool" time="0" value="false"/>
-                </Controller>
-            </Animation>
-
-            <Animation name="ContinueCampaignEnabled">
-                <Event event="EnableContinueCampaign" action="Reset" frame="$parent" />
-                <Event event="DisableContinueCampaign" action="Reset,Play" frame="$parent" />
-
-                <Controller type="Visibility" end="Pause">
-                    <Key type="Bool" time="0" value="false"/>
-                </Controller>
-            </Animation>
         </Frame>
-        
+
+        <StateGroup name="ContinueCampaignButtonState">
+            <DefaultState val="DisableContinueCampagin"/>
+
+            <State name="EnableContinueCampaign">
+                <When type="AnimationState" ContinueCampaignState="EnableContinueCampaign"/>
+                <When type="AnimationState" TryCampaignState="ShowTryCampaign"/>
+                <Action type="SetProperty" frame="ContinueCampaignButton" visible="True"/>
+            </State>
+
+            <State name="DisableContinueCampagin">
+                <Action type="SetProperty" frame="ContinueCampaignButton" visible="False"/>
+            </State>
+        </StateGroup>
+                
         <Frame type="Button" name="LearnMoreButton" template="StandardBattlenetTemplates/BattlenetStandardButtonTemplate">
             <Anchor side="Top" relative="$parent/ContinueCampaignButton" pos="Min" offset="0"/>
             <Anchor side="Left" relative="$parent/ContinueCampaignButton" pos="Max" offset="6"/>

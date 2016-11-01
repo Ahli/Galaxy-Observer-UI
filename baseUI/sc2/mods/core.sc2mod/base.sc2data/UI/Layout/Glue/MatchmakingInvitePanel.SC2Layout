@@ -2,16 +2,28 @@
 <Desc>
     <DescFlags val="Locked"/>
 
-    <Frame type="MatchmakingRaceTileListItem" name="MatchmakingRaceTileListItemTemplate" template="StandardBattlenetTemplates/MatchmakingTileListItemTemplate">
-        <Animation name="TandemDisabled">
-            <Event event="OnEnabled" action="Reset,Stop" frame="$this"/>
-            <Event event="OnDisabled" action="Reset,Play" frame="$this"/>
+    <Frame type="RaceTileListItem" name="MatchmakingRaceTileListItemTemplate" template="StandardBattlenetTemplates/MatchmakingTileListItemTemplate">
+        <StateGroup name="RaceSelectEnabledGroup">
+            <State name="RaceSelectionMatched">
+                <When type="AnimationState" frame="$parent" MatchmakingQueueState="MatchmakingStateRaceSelectionMatched"/>
+                <Action type="SetProperty" tooltip="@UI/ScreenMatchmaking/SoloSearchingTooltip"/>
+            </State>
 
-            <!-- TODO: If there's more than one reason to disable race selection, use a state group -->
-            <Controller type="Property" property="Tooltip" end="Pause">
-                <Key type="Property" time="0" value="@UI/ScreenMatchmaking/QueueNotPartyLeaderTooltip"/>
-            </Controller>
-        </Animation>
+            <State name="RaceSelectionSoloSearching">
+                <When type="AnimationState" frame="$parent" MatchmakingQueueState="MatchmakingStateRaceSelectionSearching"/>
+                <When type="AnimationState" frame="$parent" IsSoloQueue="SoloQueueTrue"/>
+                <Action type="SetProperty" tooltip="@UI/ScreenMatchmaking/SoloSearchingTooltip"/>
+            </State>
+
+            <State name="TandemFollower">
+                <When type="AnimationState" frame="$parent" IsTandemFollower="TandemFollowerTrue"/>
+                <Action type="SetProperty" tooltip="@UI/ScreenMatchmaking/QueueNotPartyLeaderTooltip"/>
+            </State>
+
+            <State name="RaceSelectionEnabled">
+                <Action type="SetProperty" tooltip=""/>
+            </State>
+        </StateGroup>
     </Frame>
 
     <Frame type="MatchmakingInvitePanel" name="MatchmakingInvitePanelTemplate">
@@ -82,25 +94,47 @@
             <Width val="828"/>
             <Height val="63"/>
             
-            <Frame type="MatchmakingRaceTileListItem" name="Item0" template="MatchmakingInvitePanel/MatchmakingRaceTileListItemTemplate">
+            <Frame type="RaceTileListItem" name="Item0" template="MatchmakingInvitePanel/MatchmakingRaceTileListItemTemplate">
                 <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
                 <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
             </Frame>
 
-            <Frame type="MatchmakingRaceTileListItem" name="Item1" template="MatchmakingInvitePanel/MatchmakingRaceTileListItemTemplate">
+            <Frame type="RaceTileListItem" name="Item1" template="MatchmakingInvitePanel/MatchmakingRaceTileListItemTemplate">
                 <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
                 <Anchor side="Left" relative="$parent/Item0" pos="Max" offset="6"/>
             </Frame>
 
-            <Frame type="MatchmakingRaceTileListItem" name="Item2" template="MatchmakingInvitePanel/MatchmakingRaceTileListItemTemplate">
+            <Frame type="RaceTileListItem" name="Item2" template="MatchmakingInvitePanel/MatchmakingRaceTileListItemTemplate">
                 <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
                 <Anchor side="Left" relative="$parent/Item1" pos="Max" offset="6"/>
             </Frame>
 
-            <Frame type="MatchmakingRaceTileListItem" name="Item3" template="MatchmakingInvitePanel/MatchmakingRaceTileListItemTemplate">
+            <Frame type="RaceTileListItem" name="Item3" template="MatchmakingInvitePanel/MatchmakingRaceTileListItemTemplate">
                 <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
                 <Anchor side="Left" relative="$parent/Item2" pos="Max" offset="0"/>
             </Frame>
+            
+            <StateGroup name="RaceSelectEnabledGroup">
+                <State name="RaceSelectionMatched">
+                    <When type="AnimationState" MatchmakingQueueState="MatchmakingStateRaceSelectionMatched"/>
+                    <Action type="SetProperty" enabled="false"/>
+                </State>
+
+                <State name="RaceSelectionSoloSearching">
+                    <When type="AnimationState" MatchmakingQueueState="MatchmakingStateRaceSelectionSearching"/>
+                    <When type="AnimationState" IsSoloQueue="SoloQueueTrue"/>
+                    <Action type="SetProperty" enabled="false"/>
+                </State>
+
+                <State name="TandemFollower">
+                    <When type="AnimationState" IsTandemFollower="TandemFollowerTrue"/>
+                    <Action type="SetProperty" enabled="false"/>
+                </State>
+
+                <State name="RaceSelectionEnabled">
+                    <Action type="SetProperty" enabled="true"/>
+                </State>
+            </StateGroup>
         </Frame>
         
         <Frame type="Button" name="AcceptButton" template="StandardTemplates/StandardButtonAlternateTemplate">

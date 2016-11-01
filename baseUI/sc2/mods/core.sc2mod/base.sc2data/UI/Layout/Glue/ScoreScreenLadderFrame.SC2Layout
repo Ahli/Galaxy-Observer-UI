@@ -32,6 +32,14 @@
     </Frame>
 
     <Frame type="ScoreScreenLadderFrame" name="ScoreScreenLadderFrameTemplate">
+        <Frame type="RaceCacheFrame" name="RaceCacheFrame">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+            <Race val="{$parent/@Race}"/>
+        </Frame>
+        
         <Frame type="Frame" name="AnchorFrame">
             <Anchor side="Top" relative="$parent" pos="Min" offset="8"/>
             <Anchor side="Left" relative="$parent" pos="Min" offset="8"/>
@@ -54,15 +62,6 @@
             <TextureType val="Normal"/>
             <Width val="1476"/>
             <Height val="640"/>
-            
-            <Animation name="ShowPlacementBg">
-                <Event event="OnShown" action="Reset, Play" frame="$parent/DivisionFrame/LeagueIcon/LeagueIconImage"/>
-                <Event event="OnHidden" action="Reset" frame="$parent/DivisionFrame/LeagueIcon/LeagueIconImage"/>
-                
-                <Controller type="Texture" end="Pause">
-                    <Key type="Image" time="0" image="@UI/Battlenet_Glue_Ladder_Score_PlacementBg"/>
-                </Controller>
-            </Animation>
         </Frame>
         
         <Frame type="Image" name="InnerBorderTop">
@@ -442,6 +441,15 @@
                 <Source frame="$parent/DemotionWarning" property="Visible"/>
                 <Target  frame="$this" property="Visible"/>
             </Frame>
+
+            <Frame type="Label" name="CurrentLeagueRankLabel">
+                <Anchor side="Top" relative="$parent/MMRProgressBar" pos="Min" offset="3"/>
+                <Anchor side="Bottom" relative="$parent/MMRProgressBar" pos="Max" offset="0"/>
+                <Anchor side="Left" relative="$parent/MMRProgressBar" pos="Min" offset="38"/>
+                <Anchor side="Right" relative="$parent/MMRProgressBar" pos="Max" offset="0"/>
+                <Style val="@CurrentLeagueRankTitle"/>
+                <Text val="{$parent/$parent/@CurrentLeagueName}"/>
+            </Frame>
             
             <Frame type="Image" name="LeagueIconGlow">
                 <Anchor side="Top" relative="$parent" pos="Min" offset="10"/>
@@ -789,16 +797,48 @@
                 <When type="AnimationState" frame="DivisionFrame/LeagueIcon" LeagueIcon="Bronze"/>
                 <When type="AnimationState" frame="DivisionFrame/LeagueIcon" LeagueTier="LeagueTier3"/>
                 <Action type="SetProperty" frame="DivisionFrame/DemotionWarning" visible="False"/>
+                <Action type="SetProperty" frame="DivisionFrame/CurrentLeagueRankLabel" visible="True"/>
             </State>
 
             <State name="Warning">
                 <When type="AnimationState" ScoreScreenIsDemotionDanger="ScoreScreenShowDemotionDanger"/>
                 <Action type="SetProperty" frame="DivisionFrame/DemotionWarning" visible="True"/>
+                <Action type="SetProperty" frame="DivisionFrame/CurrentLeagueRankLabel" visible="True"/>
             </State>
 
             <State name="NoWarning">
                 <Action type="SetProperty" frame="DivisionFrame/DemotionWarning" visible="False"/>
+                <Action type="SetProperty" frame="DivisionFrame/CurrentLeagueRankLabel" visible="False"/>
             </State>
         </StateGroup>
+
+        <StateGroup name="SelectedRace">
+            <DefaultState val="Unknown"/>
+
+            <State name="Placement">
+                <When type="Property" frame="DivisionFrame/LeagueIcon/LeagueIconImage" visible="True"/>
+                <Action type="SetProperty" frame="Background" Texture="@UI/Battlenet_Glue_Ladder_Score_PlacementBg"/>
+            </State>
+
+            <State name="Terran">
+                <When type="Property" frame="RaceCacheFrame" Race="Terr"/>
+                <Action type="SetProperty" frame="Background" Texture="@UI/Battlenet_Glue_Ladder_Score_Bg_Terran"/>
+            </State>
+
+            <State name="Zerg">
+                <When type="Property" frame="RaceCacheFrame" Race="Zerg"/>
+                <Action type="SetProperty" frame="Background" Texture="@UI/Battlenet_Glue_Ladder_Score_Bg_Zerg"/>
+            </State>
+
+            <State name="Protoss">
+                <When type="Property" frame="RaceCacheFrame" Race="Prot"/>
+                <Action type="SetProperty" frame="Background" Texture="@UI/Battlenet_Glue_Ladder_Score_Bg_Protoss"/>
+            </State>
+
+            <State name="Unknown">
+                <Action type="SetProperty" frame="Background" Texture="@UI/Battlenet_Glue_Ladder_Score_GenericBg"/>
+            </State>
+        </StateGroup>
+       
     </Frame>
 </Desc>
