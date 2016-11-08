@@ -1342,6 +1342,7 @@
         <Anchor side="Left" relative="$parent" pos="Min" offset="4"/>
         <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
         <Width val="42"/>
+		<CollapseLayout val="true"/>
 
         <!-- Custom Player Race Image Border -->
         <Frame type="PlayerFrame" name="PlayerRaceImageBorder" template="_CONSTANTS/PlayerFrameAlternatedColorsTemplate">
@@ -1367,6 +1368,7 @@
             <Anchor relative="$parent"/>
             <VersusModePlayerSide val="Left"/>
             <BaseTexture val="@UI/RaceIcon"/>
+			<Visible val="false"/>
 
             <Frame type="Image" name="RaceImage">
                 <Anchor relative="$parent"/>
@@ -1379,6 +1381,7 @@
 		<!-- Player ClanLogo or Race Image -->
 		<Frame type="Frame" name="ClanLogoOrRaceIcon" template="_bottomPanel/ClanLogoOrRaceIconTemplate">
 			<Anchor relative="$parent"/>
+			<Visible val="true"/>
 
 			<Frame type="PlayerLogoImageFrame" name="ClanLogo">
 				<VersusModePlayerSide val="Left"/>
@@ -1706,7 +1709,6 @@
 			<Style val="_BebasData_30_Left_Mins"/>
 			<CollapseLayout val="true"/>
 			<CountdownTime val="250"/>
-			<!--<CountdownText val="%value%"/>-->
 			<StartValue val="0"/>
 			<CurrentValue val="0"/>
 			<!-- TODO: currentValue propertybind is a workaround for currentValue only displaying the first copied value in TargetValue -->
@@ -1715,6 +1717,7 @@
 			<!--<IntegerBias val="Ceil"/>
 			<FormatNumber val="true"/>
 			<Counting val="true"/>-->
+			<!--<CountdownText val="%value%"/>-->
 			
 			<!--<Animation name="ShowCountDown">
 				<Event event="OnShown" action="Restart,Play"/>
@@ -2510,17 +2513,32 @@
 		</Frame>
 		
 		<!-- Custom Player Race Image button to alternat between 3 settings -->
-        <Frame type="ToggleControl" name="IncrementRaceIconSetting">
+		<Frame type="Frame" name="RaceIconSettingIncrement">
+			<Anchor relative="$parent"/>
+			<Visible val="False"/>
+			
+			<Animation name="Hide">
+				<Event event="Hide" action="Reset,Play"/>
+				 
+				<Controller type="Visibility" end="Pause">
+					<Key type="Bool" time="0" value="False"/>
+				</Controller>
+			</Animation>
+		</Frame>
+        <Frame type="ToggleControl" name="ButtonIncrementRaceIconSetting">
             <Anchor relative="$parent"/>
             <Shortcut val="#Toggle Player Race Icon - Hotkey"/>
             <AcceptsMouse val="false"/>
-			<Visible val="true"/>
+			<Visible val="false"/>
 			
 			<Animation name="Show">
-				<Event event="OnClick" action="Reset,Play"/>
+				<Event event="OnShown" action="Reset,Play"/>
 				 
 				<Controller type="Visibility" end="Pause" frame="$parent/RaceIconSettingIncrement">
 					<Key type="Bool" time="0" value="True"/>
+				</Controller>
+				<Controller type="Visibility" end="Pause" frame="$this">
+					<Key type="Bool" time="0" value="false"/>
 				</Controller>
 			</Animation>
         </Frame>
@@ -2775,57 +2793,14 @@
 			</State>
 		</StateGroup>
 		
-		<Frame type="Frame" name="RaceIconSettingIncrement">
-			<Anchor relative="$parent"/>
-			<Visible val="False"/>
-			
-			<Animation name="Hide">
-				<Event event="Hide" action="Reset,Play"/>
-				 
-				<Controller type="Visibility" end="Pause">
-					<Key type="Bool" time="0" value="False"/>
-				</Controller>
-			</Animation>
-		</Frame>
 		
 		<StateGroup name="RaceIconSetting">
-			<DefaultState val="FromMod"/>
-			<!-- state 2 -->
-			<State name="ForceDefault">
-				<When type="Property" frame="IncrementEventStateFrame" visible="true"/>
-				<When type="Property" frame="ResourcePanel/ResourceFrame1/RaceOrClanLogoPanel" visible="false"/>
-				<!--<Action type="SendEvent" frame="IncrementEventStateFrame" event="Hide"/>-->
-				<When type="Property" frame="IncrementEventStateFrame" visible="false"/>
-				<Action type="SetProperty" frame="ResourcePanel/ResourceFrame1/RaceOrClanLogoPanel" visible="true"/>
-				<Action type="SetProperty" frame="ResourcePanel/ResourceFrame2/RaceOrClanLogoPanel" visible="true"/>
-				<Action type="SetProperty" frame="ResourcePanel/ResourceFrame3/RaceOrClanLogoPanel" visible="true"/>
-				<Action type="SetProperty" frame="ResourcePanel/ResourceFrame4/RaceOrClanLogoPanel" visible="true"/>
-				<Action type="SetProperty" frame="ResourcePanel/ResourceFrame1/RaceOrClanLogoPanel/PlayerRaceIcon" visible="true"/>
-				<Action type="SetProperty" frame="ResourcePanel/ResourceFrame2/RaceOrClanLogoPanel/PlayerRaceIcon" visible="true"/>
-				<Action type="SetProperty" frame="ResourcePanel/ResourceFrame3/RaceOrClanLogoPanel/PlayerRaceIcon" visible="true"/>
-				<Action type="SetProperty" frame="ResourcePanel/ResourceFrame4/RaceOrClanLogoPanel/PlayerRaceIcon" visible="true"/>
-				<Action type="SetProperty" frame="ResourcePanel/ResourceFrame1/RaceOrClanLogoPanel/ClanLogoOrRaceIcon" visible="false"/>
-				<Action type="SetProperty" frame="ResourcePanel/ResourceFrame2/RaceOrClanLogoPanel/ClanLogoOrRaceIcon" visible="false"/>
-				<Action type="SetProperty" frame="ResourcePanel/ResourceFrame3/RaceOrClanLogoPanel/ClanLogoOrRaceIcon" visible="false"/>
-				<Action type="SetProperty" frame="ResourcePanel/ResourceFrame4/RaceOrClanLogoPanel/ClanLogoOrRaceIcon" visible="false"/>
-			</State>
-			<!-- state 1 -->
-			<State name="None">
-				<When type="Property" frame="IncrementEventStateFrame" visible="true"/>
-				<When type="Property" frame="ResourcePanel/ResourceFrame1/RaceOrClanLogoPanel" visible="true"/>
-				<When type="Property" frame="ResourcePanel/ResourceFrame1/RaceOrClanLogoPanel/ClanLogoOrRaceIcon" visible="true"/>
-				<!--<Action type="SendEvent" frame="IncrementEventStateFrame" event="Hide"/>-->
-				<When type="Property" frame="IncrementEventStateFrame" visible="false"/>
-				<Action type="SetProperty" frame="ResourcePanel/ResourceFrame1/RaceOrClanLogoPanel" visible="false"/>
-				<Action type="SetProperty" frame="ResourcePanel/ResourceFrame2/RaceOrClanLogoPanel" visible="false"/>
-				<Action type="SetProperty" frame="ResourcePanel/ResourceFrame3/RaceOrClanLogoPanel" visible="false"/>
-				<Action type="SetProperty" frame="ResourcePanel/ResourceFrame4/RaceOrClanLogoPanel" visible="false"/>
-			</State>
-			<!-- state 0 -->
+			<!-- state initial -->
 			<State name="FromMod">
-				<When type="Property" frame="IncrementEventStateFrame" visible="true"/>
-				<!--<Action type="SendEvent" frame="IncrementEventStateFrame" event="Hide"/>-->
-				<When type="Property" frame="IncrementEventStateFrame" visible="false"/>
+				<When type="Property" frame="RaceIconSettingIncrement" visible="true"/>
+				<When type="Property" frame="ResourcePanel/ResourceFrame1/RaceOrClanLogoPanel" visible="true"/>
+				<When type="Property" frame="ResourcePanel/ResourceFrame1/RaceOrClanLogoPanel/PlayerRaceIcon" visible="true"/>
+				<Action type="SendEvent" frame="RaceIconSettingIncrement" event="Hide"/>
 				<Action type="SetProperty" frame="ResourcePanel/ResourceFrame1/RaceOrClanLogoPanel" visible="true"/>
 				<Action type="SetProperty" frame="ResourcePanel/ResourceFrame2/RaceOrClanLogoPanel" visible="true"/>
 				<Action type="SetProperty" frame="ResourcePanel/ResourceFrame3/RaceOrClanLogoPanel" visible="true"/>
@@ -2838,6 +2813,45 @@
 				<Action type="SetProperty" frame="ResourcePanel/ResourceFrame2/RaceOrClanLogoPanel/ClanLogoOrRaceIcon" visible="true"/>
 				<Action type="SetProperty" frame="ResourcePanel/ResourceFrame3/RaceOrClanLogoPanel/ClanLogoOrRaceIcon" visible="true"/>
 				<Action type="SetProperty" frame="ResourcePanel/ResourceFrame4/RaceOrClanLogoPanel/ClanLogoOrRaceIcon" visible="true"/>
+			</State>
+			<!-- state 1 -->
+			<State name="None">
+				<When type="Property" frame="RaceIconSettingIncrement" visible="true"/>
+				<When type="Property" frame="ResourcePanel/ResourceFrame1/RaceOrClanLogoPanel" visible="true"/>
+				<When type="Property" frame="ResourcePanel/ResourceFrame1/RaceOrClanLogoPanel/PlayerRaceIcon" visible="false"/>
+				<Action type="SendEvent" frame="RaceIconSettingIncrement" event="Hide"/>
+				<Action type="SetProperty" frame="ResourcePanel/ResourceFrame1/RaceOrClanLogoPanel" visible="false"/>
+				<Action type="SetProperty" frame="ResourcePanel/ResourceFrame2/RaceOrClanLogoPanel" visible="false"/>
+				<Action type="SetProperty" frame="ResourcePanel/ResourceFrame3/RaceOrClanLogoPanel" visible="false"/>
+				<Action type="SetProperty" frame="ResourcePanel/ResourceFrame4/RaceOrClanLogoPanel" visible="false"/>
+				<Action type="SetProperty" frame="ResourcePanel/ResourceFrame1/RaceOrClanLogoPanel/PlayerRaceIcon" visible="false"/>
+				<Action type="SetProperty" frame="ResourcePanel/ResourceFrame2/RaceOrClanLogoPanel/PlayerRaceIcon" visible="false"/>
+				<Action type="SetProperty" frame="ResourcePanel/ResourceFrame3/RaceOrClanLogoPanel/PlayerRaceIcon" visible="false"/>
+				<Action type="SetProperty" frame="ResourcePanel/ResourceFrame4/RaceOrClanLogoPanel/PlayerRaceIcon" visible="false"/>
+				<Action type="SetProperty" frame="ResourcePanel/ResourceFrame1/RaceOrClanLogoPanel/ClanLogoOrRaceIcon" visible="true"/>
+				<Action type="SetProperty" frame="ResourcePanel/ResourceFrame2/RaceOrClanLogoPanel/ClanLogoOrRaceIcon" visible="true"/>
+				<Action type="SetProperty" frame="ResourcePanel/ResourceFrame3/RaceOrClanLogoPanel/ClanLogoOrRaceIcon" visible="true"/>
+				<Action type="SetProperty" frame="ResourcePanel/ResourceFrame4/RaceOrClanLogoPanel/ClanLogoOrRaceIcon" visible="true"/>
+			</State>
+			<!-- state 2 -->
+			<!-- TODO: this state is considered invalid for some reason -->
+			<State name="ForceDefault">
+				<When type="Property" frame="RaceIconSettingIncrement" visible="true"/>
+				<When type="Property" frame="ResourcePanel/ResourceFrame1/RaceOrClanLogoPanel" visible="false"/>
+				<!--<When type="Property" frame="ResourcePanel/ResourceFrame1/RaceOrClanLogoPanel/PlayerRaceIcon" visible="false"/>-->
+				<Action type="SendEvent" frame="RaceIconSettingIncrement" event="Hide"/>
+				<Action type="SetProperty" frame="ResourcePanel/ResourceFrame1/RaceOrClanLogoPanel" visible="true"/>
+				<Action type="SetProperty" frame="ResourcePanel/ResourceFrame2/RaceOrClanLogoPanel" visible="true"/>
+				<Action type="SetProperty" frame="ResourcePanel/ResourceFrame3/RaceOrClanLogoPanel" visible="true"/>
+				<Action type="SetProperty" frame="ResourcePanel/ResourceFrame4/RaceOrClanLogoPanel" visible="true"/>
+				<Action type="SetProperty" frame="ResourcePanel/ResourceFrame1/RaceOrClanLogoPanel/PlayerRaceIcon" visible="true"/>
+				<Action type="SetProperty" frame="ResourcePanel/ResourceFrame2/RaceOrClanLogoPanel/PlayerRaceIcon" visible="true"/>
+				<Action type="SetProperty" frame="ResourcePanel/ResourceFrame3/RaceOrClanLogoPanel/PlayerRaceIcon" visible="true"/>
+				<Action type="SetProperty" frame="ResourcePanel/ResourceFrame4/RaceOrClanLogoPanel/PlayerRaceIcon" visible="true"/>
+				<Action type="SetProperty" frame="ResourcePanel/ResourceFrame1/RaceOrClanLogoPanel/ClanLogoOrRaceIcon" visible="false"/>
+				<Action type="SetProperty" frame="ResourcePanel/ResourceFrame2/RaceOrClanLogoPanel/ClanLogoOrRaceIcon" visible="false"/>
+				<Action type="SetProperty" frame="ResourcePanel/ResourceFrame3/RaceOrClanLogoPanel/ClanLogoOrRaceIcon" visible="false"/>
+				<Action type="SetProperty" frame="ResourcePanel/ResourceFrame4/RaceOrClanLogoPanel/ClanLogoOrRaceIcon" visible="false"/>
 			</State>
 		</StateGroup>
 		
