@@ -1,7 +1,126 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <Desc>
     <DescFlags val="Locked"/>
-    
+
+    <Constant name="QuestIneligibleColor" val="FF888888"/>
+
+    <Frame type="QuestTooltip" name="QuestTooltipTemplate" template="StandardTooltip/StandardTooltip">
+        <MinWidth val="330"/>
+
+        <Frame type="Label" name="NameLabel">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="20"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="26"/>
+            <CollapseLayout val="true"/>
+            <Style val="QuestTooltipTitle"/>
+            <Options val="Ellipsis | NoWrapping"/>
+
+        </Frame>
+
+        <Frame type="Label" name="DescriptionLabel">
+            <Anchor side="Top" relative="$parent/NameLabel" pos="Max" offset="8"/>
+            <Anchor side="Left" relative="$parent/NameLabel" pos="Min" offset="0"/>
+            <CollapseLayout val="true"/>
+            <Style val="QuestTooltipText"/>
+        </Frame>
+
+        <Frame type="Image" name="BorderImage" template="StandardTemplates/BorderImageTemplate">
+            <Anchor side="Top" relative="$parent/DescriptionLabel" pos="Max" offset="10"/>
+            <Anchor side="Left" relative="$parent/BackgroundColorImage" pos="Min" offset="4"/>
+            <Anchor side="Right" relative="$parent/BackgroundColorImage" pos="Max" offset="-4"/>
+            <OnDisableDesaturationColor val="#QuestIneligibleColor"/>
+        </Frame>
+
+        <Frame type="Label" name="RewardHeaderLabel">
+            <Anchor side="Top" relative="$parent/BorderImage" pos="Max" offset="10"/>
+            <Anchor side="Left" relative="$parent/NameLabel" pos="Min" offset="0"/>
+            <CollapseLayout val="true"/>
+            <Style val="QuestTooltipRewardHeader"/>
+            <Text val="@UI/ScoreScreen/TotalRewards"/>
+        </Frame>
+
+        <Frame type="Label" name="RewardLabel">
+            <Anchor side="Top" relative="$parent/RewardHeaderLabel" pos="Max" offset="0"/>
+            <Anchor side="Left" relative="$parent/NameLabel" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent/BackgroundColorImage" pos="Max" offset="-5"/>
+            <CollapseLayout val="true"/>
+            <Style val="QuestTooltipText"/>
+        </Frame>
+
+        <!-- Overwatch Rewards -->
+        <Animation name="ShowOverwatchRewards">
+            <Event event="Reset" action="Stop"/>
+            <Event event="ShowOverwatchRewards" action="Play"/>
+            <Controller type="Visibility" end="Pause" frame="RewardHeaderLabel2">
+                <Key type="Bool" time="0" value="true"/>
+            </Controller>
+            <Controller type="Visibility" end="Pause" frame="RewardLabel2">
+                <Key type="Bool" time="0" value="true"/>
+            </Controller>
+            <Controller type="Text" end="Pause" frame="RewardHeaderLabel2">
+                <Key type="Text" time="0" text="@UI/QuestReward/OverwatchTitle"/>
+            </Controller>
+            <Controller type="Text" end="Pause" frame="RewardLabel2">
+                <Key type="Text" time="0" text="@UI/QuestReward/OverwatchRewards"/>
+            </Controller>
+        </Animation>
+
+        <Frame type="Label" name="RewardHeaderLabel2">
+            <Anchor side="Top" relative="$parent/RewardLabel" pos="Max" offset="8"/>
+            <Anchor side="Left" relative="$parent/NameLabel" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent/BackgroundColorImage" pos="Max" offset="-5"/>
+            <CollapseLayout val="true"/>
+            <Visible val="false"/>
+            <Style val="QuestTooltipRewardHeader"/>
+        </Frame>
+
+        <Frame type="Label" name="RewardLabel2">
+            <Anchor side="Top" relative="$parent/RewardHeaderLabel2" pos="Max" offset="0"/>
+            <Anchor side="Left" relative="$parent/NameLabel" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent/BackgroundColorImage" pos="Max" offset="-5"/>
+            <CollapseLayout val="true"/>
+            <Visible val="false"/>
+            <Style val="QuestTooltipText"/>
+        </Frame>
+
+        <Frame type="Image" name="BorderImage2" template="StandardTemplates/BorderImageTemplate">
+            <Anchor side="Top" relative="$parent/RewardLabel2" pos="Max" offset="10"/>
+            <Anchor side="Left" relative="$parent/BackgroundColorImage" pos="Min" offset="4"/>
+            <Anchor side="Right" relative="$parent/BackgroundColorImage" pos="Max" offset="-4"/>
+            <Visible val="false"/>
+            <CollapseLayout val="true"/>
+            <OnDisableDesaturationColor val="#QuestIneligibleColor"/>
+
+            <StateGroup name="ShowBorder">
+                <State name="ShowBorder">
+                    <When type="Property" frame="$parent/RequirementsLabel" visible="true"/>
+                    <Action type="SetProperty" visible="true"/>
+                </State>
+            </StateGroup>
+        </Frame>
+
+        <Frame type="Label" name="RequirementsLabel">
+            <Anchor side="Top" relative="$parent/BorderImage2" pos="Max" offset="10"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="15"/>
+            <Anchor side="Right" relative="$parent/BackgroundColorImage" pos="Max" offset="-5"/>
+            <CollapseLayout val="true"/>
+            <Style val="QuestTooltipText"/>
+            <Visible val="false"/>
+        </Frame>
+
+        <Frame type="Frame" name="BottomFrame">
+            <Anchor side="Top" relative="$parent/RequirementsLabel" pos="Max" offset="0"/>
+            <Anchor side="Left" relative="$parent/NameLabel" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent/NameLabel" pos="Max" offset="0"/>
+        </Frame>
+
+        <Frame type="Frame" name="AnchorFrame">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Bottom" relative="$parent/BottomFrame" pos="Max" offset="25"/>
+            <Anchor side="Left" relative="$parent/NameLabel" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent/NameLabel" pos="Max" offset="0"/>
+        </Frame>
+    </Frame>    
+
     <Frame type="QuestTileListItem" name="QuestTileListItemTemplate">
         <Height val="115"/>
         <AcceptsMouse val="false"/>
@@ -27,10 +146,14 @@
             <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
             <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
 
+            <AcceptsMouse val="true"/>
+            <TooltipAnchorPosition val="RightToLeft  | VCenterToCenter"/>
+            <TooltipFrame val="QuestTooltip"/>
+
             <Frame type="Frame" name="ValidQuest">
                 <Anchor relative="$parent"/>
-
                 <Frame type="ProgressBar" name="QuestProgressBar">
+                    <AcceptsMouse val="false"/>
                     <Anchor side="Top" relative="$parent" pos="Mid" offset="-7"/>
                     <Anchor side="Bottom" relative="$parent" pos="Mid" offset="-7"/>
                     <Anchor side="Left" relative="$parent" pos="Min" offset="16"/>
@@ -68,6 +191,7 @@
                     <Height val="77"/>
                     <Width val="77"/>
                     <SubpixelRendering val="True"/>
+                    <OnDisableDesaturationColor val="#QuestIneligibleColor"/>
                 </Frame>
                 
                 <Frame type="Image" name="QuestIconOverrideImage">
@@ -80,6 +204,7 @@
                     <Texture val="@UI/Storm_UI_Blank"/>
                     <Width val="100"/>
                     <Height val="100"/>
+                    <OnDisableDesaturationColor val="#QuestIneligibleColor"/>
                 </Frame>
 
                 <Frame type="Label" name="ProgressLabel">
@@ -113,7 +238,7 @@
                     <Anchor side="Left" relative="$parent/DescriptionLabel" pos="Max" offset="10"/>
                     <Height val="65"/>
                     <Width val="65"/>
-                    <AcceptsMouse val="True"/>
+                    <OnDisableDesaturationColor val="#QuestIneligibleColor"/>
                 </Frame>
 
                 <Frame type="Label" name="RewardLabel">
@@ -241,6 +366,7 @@
                 <Texture val="@UI/Storm_UI_QuestLog_NewGlow"/>
                 <TextureType val="Nineslice"/>
                 <Unclipped val="True"/>
+                <OnDisableDesaturationColor val="#QuestIneligibleColor"/>
             </Frame>
             
             <Frame type="Label" name="NewLabelAnchor">
@@ -280,6 +406,7 @@
                 <Anchor side="Right" relative="$parent/NewBadgeAnchor" pos="Mid" offset="0"/>
                 <Texture val="@UI/Storm_UI_QuestLog_NewBadge"/>
                 <SubpixelRendering val="true"/>
+                <OnDisableDesaturationColor val="#QuestIneligibleColor"/>
             </Frame>
             
             <Frame type="Label" name="NewBadgeLabel">
@@ -300,6 +427,7 @@
         <Alpha val="0"/>
         <BlendMode val="Add"/>
         <RenderPriority val="512"/>
+        <OnDisableDesaturationColor val="#QuestIneligibleColor"/>
         <Animation name="Sparkle">
             <Event event="Trigger" action="Restart,Play"/>
             <Controller type="Fade" end="Stop">
@@ -323,6 +451,7 @@
         <LayerCount val="2"/>
         <BlendMode val="Add"/>
         <Alpha val="50"/>
+        <OnDisableDesaturationColor val="#QuestIneligibleColor"/>
         
         <Texture val="@UI/Storm_UI_QuestLog_Winter_Veil_Background_Effect_Mask_1" layer="0"/>
         <TextureCoords top="0" left="0" bottom="1" right="1" layer="0"/>
@@ -355,130 +484,91 @@
         <Frame type="QuestFrame" name="QuestFrame">
             <Preload val="false"/>
             
-            <!--
-                Eternal Conflict Quests
-            -->
-            <Animation name="KillTreasureGoblinDaily">
-                <Event event="Reset" action="Stop"/>
-                <Event event="KillTreasureGoblinDaily" action="Restart,Play"/>
-                <Controller type="Cutscene" end="Stop" frame="ValidQuest/RewardCutscene">
-                    <Key type="Cutscene" time="0.0" action="SetCutscene" file="Cutscenes/UI_QuestLog_TreasureGoblin.StormCutscene"/>
-                </Controller>
-                <Controller type="Visibility" end="Pause" frame="ValidQuest/RewardCutscene">
-                    <Key type="Bool" time="0" value="True"/>
-                </Controller>
-                <Controller type="Visibility" end="Pause" frame="ValidQuest/QuestIconImage">
-                    <Key type="Bool" time="0" value="False"/>
-                </Controller>
-            </Animation>
+            <StateGroup name="QuestType">
 
-            <!--
-                Hallow's End 2015 Quests
-            -->
-            <Animation name="HallowsEnd">
-                <Event event="Reset" action="Stop"/>
-                <Event event="HallowsEnd" action="Restart,Play"/>
-                <Event event="HallowsEnd2016Portrait" action="Restart,Play"/>
-                <Controller type="Texture" end="Pause" frame="ValidQuest/QuestIconOverrideImage">
-                    <Key type="Image" time=".01" image="@UI/Storm_UI_QuestLog_Sapper"/>
-                </Controller>
-                <Controller type="Visibility" end="Pause" frame="ValidQuest/QuestIconImage">
-                    <Key type="Bool" time="0" value="false"/>
-                </Controller>
-            </Animation>
+                <State name="OverwatchPromo">
+                    <When type="AnimationState" SpecialEventQuestCategory="OverwatchCrossPromo"/>
+                    <Action type="SetProperty" frame="ValidQuest/OverwatchPromoFrame" visible="true"/>
+                    <Action type="SetProperty" frame="ValidQuest/QuestIconOverrideImage" texture="@UI/Storm_UI_QuestLog_Overwatch_Promo_Icon"/>
+                    <Action type="SetProperty" frame="ValidQuest/QuestIconImage" visible="false"/>
+                    <Action type="SetProperty" frame="ValidQuest/SparkleFXImage" visible="false"/>
+                    <Action type="SetProperty" frame="ValidQuest/DescriptionLabel" style="OverwatchQuestDescriptionLabel"/>
+                </State>
 
-            <!--
-                Cho'gall Buddy Brawl Quests
-            -->
-            <Animation name="ReceiveChoGall">
-                <Event event="Reset" action="Stop"/>
-                <Event event="ReceiveChoGall" action="Restart,Play"/>
-                <Controller type="Texture" end="Pause" frame="ValidQuest/QuestIconOverrideImage">
-                    <Key type="Image" time=".01" image="@UI/Storm_UI_QuestLog_Cho"/>
-                </Controller>
-                <Controller type="Visibility" end="Pause" frame="ValidQuest/QuestIconImage">
-                    <Key type="Bool" time="0" value="false"/>
-                </Controller>
-            </Animation>
+                <State name="MachinesofWar">
+                    <When type="AnimationState" SpecialEventQuestCategory="MachinesofWar"/>
+                    <Action type="SetProperty" frame="ValidQuest/QuestIconOverrideImage" texture="@UI/Storm_UI_QuestLog_SCEvent"/>
+                    <Action type="SetProperty" frame="ValidQuest/QuestIconImage" visible="false"/>
+                </State>
 
-            <Animation name="GiveChoGall">
-                <Event event="Reset" action="Stop"/>
-                <Event event="GiveChoGall" action="Restart,Play"/>
-                <Controller type="Texture" end="Pause" frame="ValidQuest/QuestIconOverrideImage">
-                    <Key type="Image" time=".01" image="@UI/Storm_UI_QuestLog_Gall"/>
-                </Controller>
-                <Controller type="Visibility" end="Pause" frame="ValidQuest/QuestIconImage">
-                    <Key type="Bool" time="0" value="false"/>
-                </Controller>
-            </Animation>
+                <!-- Eternal Conflict Quests -->
+                <State name="KillTreasureGoblinDaily">
+                    <When type="AnimationState" SpecialEventQuest="KillTreasureGoblinDaily"/>
+                    <Action type="SetProperty" frame="ValidQuest/RewardCutscene" file="Cutscenes/UI_QuestLog_TreasureGoblin.StormCutscene"/>
+                    <Action type="SetProperty" frame="ValidQuest/RewardCutscene" visible="true"/>
+                    <Action type="SetProperty" frame="ValidQuest/QuestIconImage" visible="false"/>
+                </State>
 
-            <!--
-                Winter Veil 2015 Quests
-            -->
-            <Animation name="WinterVeil">
-                <Event event="Reset" action="Stop"/>
-                <Event event="WinterVeil15Games" action="Restart,Play"/>
-                <Event event="WinterVeil50Games" action="Restart,Play"/>
-                <Controller type="Visibility" end="Pause" frame="ValidQuest/WinterVeilQuestFrame">
-                    <Key type="Bool" time="0" value="true"/>
-                </Controller>
-            </Animation>
+                <State name="HallowsEnd">
+                    <When type="AnimationState" SpecialEventQuestCategory="HallowsEnd"/>
+                    <Action type="SetProperty" frame="ValidQuest/QuestIconOverrideImage" texture="@UI/Storm_UI_QuestLog_Sapper"/>
+                    <Action type="SetProperty" frame="ValidQuest/QuestIconImage" visible="false"/>
+                </State>
 
-            <Animation name="WinterVeil15Games">
-                <Event event="Reset" action="Stop"/>
-                <Event event="WinterVeil15Games" action="Restart,Play"/>
-                <Controller type="Texture" end="Pause" frame="ValidQuest/QuestIconOverrideImage">
-                    <Key type="Image" time=".01" image="@UI/Storm_UI_QuestLog_Winter_Goblin"/>
-                </Controller>
-                <Controller type="Visibility" end="Pause" frame="ValidQuest/QuestIconImage">
-                    <Key type="Bool" time="0" value="false"/>
-                </Controller>
-            </Animation>
+                <State name="HallowsEnd2016Portrait">
+                    <When type="AnimationState" SpecialEventQuestCategory="HallowsEnd2016"/>
+                    <Action type="SetProperty" frame="ValidQuest/QuestIconOverrideImage" texture="@UI/Storm_UI_QuestLog_Sapper"/>
+                    <Action type="SetProperty" frame="ValidQuest/QuestIconImage" visible="false"/>
+                </State>
 
-            <Animation name="WinterVeil50Games">
-                <Event event="Reset" action="Stop"/>
-                <Event event="WinterVeil50Games" action="Restart,Play"/>
-                <Controller type="Texture" end="Pause" frame="ValidQuest/QuestIconOverrideImage">
-                    <Key type="Image" time=".01" image="@UI/Storm_UI_QuestLog_Reindeer"/>
-                </Controller>
-                <Controller type="Visibility" end="Pause" frame="ValidQuest/QuestIconImage">
-                    <Key type="Bool" time="0" value="false"/>
-                </Controller>
-            </Animation>
+                <State name="WinterVeil15Games">
+                    <When type="AnimationState" SpecialEventQuest="WinterVeil15Games"/>
+                    <Action type="SetProperty" frame="ValidQuest/WinterVeilQuestFrame" visible="true"/>
+                    <Action type="SetProperty" frame="ValidQuest/BackgroundImage" visible="false"/>
+                    <Action type="SetProperty" frame="ValidQuest/SparkleFXImage" visible="false"/>
+                    <Action type="SetProperty" frame="ValidQuest/QuestIconOverrideImage" texture="@UI/Storm_UI_QuestLog_Winter_Goblin"/>
+                    <Action type="SetProperty" frame="ValidQuest/QuestIconImage" visible="false"/>
+                </State>
 
-            <!--
-                Lunar Festival 2016 Quests
-            -->
-            <Animation name="LunarFestival">
-                <Event event="Reset" action="Stop"/>
-                <Event event="LunarFestivalCatchMonkeyElder" action="Restart, Play"/>
-                <Event event="LunarFestivalPortrait" action="Restart, Play"/>
-                <Controller type="Visibility" end="Pause" frame="ValidQuest/LunarFestivalQuestFrame">
-                    <Key type="Bool" time="0" value="True"/>
-                </Controller>
-            </Animation>
+                <State name="WinterVeil50Games">
+                    <When type="AnimationState" SpecialEventQuest="WinterVeil15Games"/>
+                    <Action type="SetProperty" frame="ValidQuest/WinterVeilQuestFrame" visible="true"/>
+                    <Action type="SetProperty" frame="ValidQuest/BackgroundImage" visible="false"/>
+                    <Action type="SetProperty" frame="ValidQuest/SparkleFXImage" visible="false"/>
+                    <Action type="SetProperty" frame="ValidQuest/QuestIconOverrideImage" texture="@UI/Storm_UI_QuestLog_Reindeer"/>
+                    <Action type="SetProperty" frame="ValidQuest/QuestIconImage" visible="false"/>
+                </State>
 
-            <Animation name="LunarFestivalPortrait">
-                <Event event="Reset" action="Stop"/>
-                <Event event="LunarFestivalPortrait" action="Restart,Play"/>
-                <Controller type="Texture" end="Pause" frame="ValidQuest/QuestIconOverrideImage">
-                    <Key type="Image" time=".01" image="@UI/Storm_UI_QuestLog_Lunar_Lantern"/>
-                </Controller>
-                <Controller type="Visibility" end="Pause" frame="ValidQuest/QuestIconImage">
-                    <Key type="Bool" time="0" value="false"/>
-                </Controller>
-            </Animation>
+                <State name="ReceiveChoGall">
+                    <When type="AnimationState" SpecialEventQuest="ReceiveChoGall"/>
+                    <Action type="SetProperty" frame="ValidQuest/QuestIconOverrideImage" texture="@UI/Storm_UI_QuestLog_Cho"/>
+                    <Action type="SetProperty" frame="ValidQuest/QuestIconImage" visible="false"/>
+                </State>
 
-            <Animation name="LunarFestivalCatchMonkeyElder">
-                <Event event="Reset" action="Stop"/>
-                <Event event="LunarFestivalCatchMonkeyElder" action="Restart,Play"/>
-                <Controller type="Texture" end="Pause" frame="ValidQuest/QuestIconOverrideImage">
-                    <Key type="Image" time=".01" image="@UI/Storm_UI_QuestLog_Elder_Monkey"/>
-                </Controller>
-                <Controller type="Visibility" end="Pause" frame="ValidQuest/QuestIconImage">
-                    <Key type="Bool" time="0" value="false"/>
-                </Controller>
-            </Animation>
+                <State name="GiveChoGall">
+                    <When type="AnimationState" SpecialEventQuest="GiveChoGall"/>
+                    <Action type="SetProperty" frame="ValidQuest/QuestIconOverrideImage" texture="@UI/Storm_UI_QuestLog_Gall"/>
+                    <Action type="SetProperty" frame="ValidQuest/QuestIconImage" visible="false"/>
+                </State>
+
+                <State name="LunarFestivalCatchMonkeyElder">
+                    <When type="AnimationState" SpecialEventQuest="LunarFestivalCatchMonkeyElder"/>
+                    <Action type="SetProperty" frame="ValidQuest/LunarFestivalQuestFrame" visible="true"/>
+                    <Action type="SetProperty" frame="ValidQuest/QuestIconOverrideImage" texture="@UI/Storm_UI_QuestLog_Elder_Monkey"/>
+                    <Action type="SetProperty" frame="ValidQuest/QuestIconImage" visible="false"/>
+                </State>
+
+                <State name="LunarFestivalPortrait">
+                    <When type="AnimationState" SpecialEventQuest="LunarFestivalPortrait"/>
+                    <Action type="SetProperty" frame="ValidQuest/LunarFestivalQuestFrame" visible="true"/>
+                    <Action type="SetProperty" frame="ValidQuest/QuestIconOverrideImage" texture="@UI/Storm_UI_QuestLog_Lunar_Lantern"/>
+                    <Action type="SetProperty" frame="ValidQuest/QuestIconImage" visible="false"/>
+                    <Action type="SetProperty" frame="ValidQuest/BackgroundImage" visible="false"/>
+                    <Action type="SetProperty" frame="ValidQuest/SparkleFXImage" visible="false"/>
+                    <Action type="SetProperty" frame="ValidQuest/DescriptionLabel" style="LunarFestivalQuestDescriptionLabel"/>
+                </State>
+
+            </StateGroup>
 
             <!-- 
                 Animation to play Lunar Festival Intro sound. 
@@ -506,23 +596,45 @@
                 </State>
             </StateGroup>
 
-            <!--
-                Machines of War Quests
-            -->
-            <Animation name="MachinesofWar">
-                <Event event="Reset" action="Stop"/>
-                <Event event="MachinesofWarDailyQuest" action="Restart,Play"/>
-                <Event event="MachinesofWarPortrait" action="Restart,Play"/>
-                <Controller type="Texture" end="Pause" frame="ValidQuest/QuestIconOverrideImage">
-                    <Key type="Image" time=".01" image="@UI/Storm_UI_QuestLog_SCEvent"/>
-                </Controller>
-                <Controller type="Visibility" end="Pause" frame="ValidQuest/QuestIconImage">
-                    <Key type="Bool" time="0" value="false"/>
-                </Controller>
-            </Animation>
-
             <Frame type="Frame" name="ValidQuest">
             
+                <!-- Frame for Overwatch Promo Quest Art -->
+                <Frame type="Frame" name="OverwatchPromoFrame">
+                    <Anchor relative="$parent"/>
+                    <RenderPriority val="511"/>
+                    <Visible val="false"/>
+
+                    <Frame type="Image" name="BackgroundImage">
+                        <Anchor relative="$parent"/>
+                        <Texture val="@UI/Storm_UI_QuestLog_Overwatch_Promo_Background"/>
+                        <OnDisableDesaturationColor val="#QuestIneligibleColor"/>
+                    </Frame>
+
+                    <Frame type="Image" name="EffectAMaskImage">
+                        <Anchor relative="$parent"/>
+                        <OnDisableDesaturationColor val="#QuestIneligibleColor"/>
+
+                        <BlendMode val="Add"/>
+                        <LayerCount val="2"/>
+                        
+                        <Texture val="@UI/Storm_UI_QuestLog_Overwatch_Promo_Mask" layer="0"/>
+                        <TextureCoords top="0" left="0" bottom="1" right="1" layer="0"/>
+                        <Texture val="@UI/Storm_UI_QuestLog_Overwatch_Promo_Effect" layer="1"/>
+
+                        <AlphaLayer val="True" layer="0"/>
+                        
+                        <Animation name="UVScroll">
+                            <Event event="HideEffect" action="Stop" frame="$ancestor[@type=QuestFrame]"/>
+                            <Event event="ShowEffect" action="Restart,Play" frame="$ancestor[@type=QuestFrame]"/>
+                            <Controller type="LayerUV" layer="1" side="Left" relative="True" sidelock="True" end="Loop" >
+                                <Key type="Curve" time="0" value="2" in="Slow"/>
+                                <Key type="Curve" time="3.0" value="-2" out="Slow"/>
+                                <Key type="Curve" time="5.0" value="-2" in="Slow"/>
+                            </Controller>
+                        </Animation>
+                    </Frame>
+                </Frame>
+
                 <!-- Frame for Winter Veil Quest Art Changes -->
                 <Frame type="Frame" name="WinterVeilQuestFrame">
                     <Anchor relative="$parent"/>
@@ -570,16 +682,6 @@
                             </Controller>
                         </Animation>
                     </Frame>
-
-                    <Animation name="WinterVeilStyle">
-                        <Event event="OnShown" action="Restart,Play"/>
-                            <Controller type="Visibility" end="Pause" frame="$parent/BackgroundImage">
-                                    <Key type="Bool" time="0" value="False"/>
-                            </Controller>
-                            <Controller type="Visibility" end="Pause" frame="$parent/SparkleFXImage">
-                                    <Key type="Bool" time="0" value="False"/>
-                            </Controller>
-                    </Animation>
                 </Frame>
 
                 <!-- Frame for Lunar Festival Quest Art -->
@@ -591,11 +693,13 @@
                     <Frame type="Image" name="BackgroundImage">
                         <Anchor relative="$parent"/>
                         <Texture val="@UI/Storm_UI_QuestLog_Lunar_Festival_Background"/>
+                        <OnDisableDesaturationColor val="#QuestIneligibleColor"/>
                     </Frame>
 
                     <Frame type="Image" name="EffectAMaskImage">
                         <Anchor relative="$parent"/>
                         <LayerCount val="2"/>
+                        <OnDisableDesaturationColor val="#QuestIneligibleColor"/>
         
                         <Texture val="@UI/Storm_UI_QuestLog_Lunar_Festival_Background_Effect_A" layer="1"/>
                         
@@ -619,6 +723,7 @@
                         <Anchor relative="$parent"/>
                         <LayerCount val="2"/>
                         <BlendMode val="Add"/>
+                        <OnDisableDesaturationColor val="#QuestIneligibleColor"/>
 
                         <Texture val="@UI/Storm_UI_QuestLog_Lunar_Festival_Background_Effect_B" layer="1"/>
 
@@ -635,25 +740,13 @@
                             </Controller>
                         </Animation>
                     </Frame>
-
-                    <Animation name="LunarFestivalStyle">
-                        <Event event="OnShown" action="Restart,Play"/>
-                            <Controller type="Visibility" end="Pause" frame="$parent/BackgroundImage">
-                                <Key type="Bool" time="0" value="False"/>
-                            </Controller>
-                            <Controller type="Visibility" end="Pause" frame="$parent/SparkleFXImage">
-                                <Key type="Bool" time="0" value="False"/>
-                            </Controller>
-                            <Controller type="Style" end="Pause" style1="LunarFestivalQuestDescriptionLabel" style2="LunarFestivalQuestDescriptionLabel" frame="$parent/DescriptionLabel">
-                                <Key type="Curve" time="0" value="0"/>
-                            </Controller>
-                    </Animation>
                 </Frame>
 
                 <Frame type="Image" name="BackgroundImage">
                     <Anchor relative="$parent"/> 
                     <Texture val="@UI/Storm_UI_QuestLog_Special_Event_DefaultBackground"/>
                     <RenderPriority val="511"/>
+                    <OnDisableDesaturationColor val="#QuestIneligibleColor"/>
                 </Frame>
                 
                 <Frame type="Image" name="SparkleFXImage">
@@ -663,6 +756,7 @@
                     <LayerCount val="3"/>
                     <BlendMode val="Add"/>
                     <RenderPriority val="511"/>
+                    <OnDisableDesaturationColor val="#QuestIneligibleColor"/>
                     <Texture val="@UI/Storm_UI_QuestLog_Special_Event_DefaultBackground_Effect_Mask" layer="0"/>
                     <TextureCoords top="0.2" left="0.2" bottom=".8" right=".8" layer="0"/>
                     <AlphaLayer val="True" layer="0"/>
@@ -702,7 +796,6 @@
                     <Anchor side="Bottom" relative="$parent" pos="Max" offset="-20"/>
                     <Style val="SpecialQuestDescriptionLabel"/>
                     <Options val="Ellipsis | TooltipIfTruncated"/>
-                    <AcceptsMouseTooltip val="True"/>
                     <Visible val="True"/>
                 </Frame>
                 
@@ -713,6 +806,7 @@
                 <Frame type="ProgressBar" name="QuestProgressBar">
                     <Frame type="Frame" name="FillImageContainer">
                         <Frame type="Image" name="FillImage">
+                            <OnDisableDesaturationColor val="#QuestIneligibleColor"/>
                             <Texture val="@UI/Storm_UI_QuestLog_ProgressBackground_Special" layer="0"/>
                             <Texture val="@UI/Storm_UI_QuestLog_ProgressBar_Special" layer="1"/>
                         </Frame>
@@ -729,7 +823,8 @@
                     <Anchor side="Right" relative="$parent/QuestIconImage" pos="Mid" offset="24"/>
                     <RenderPriority val="512"/>
                     <Animation name="Trigger">
-                        <Event event="OnShown" action="Restart,Play"/>
+                        <Event event="HideEffect" action="Stop" frame="$ancestor[@type=QuestFrame]"/>
+                        <Event event="ShowEffect" action="Restart,Play" frame="$ancestor[@type=QuestFrame]"/>
                         <Controller type="Event" end="Loop" name="TriggerEvent">
                             <Key type="Event" time="0.4" event="Trigger"/>
                             <Key type="Event" time="1.6" event="Null"/>
@@ -744,7 +839,8 @@
                     <Anchor side="Right" relative="$parent/QuestIconImage" pos="Mid" offset="-18"/>
                     <RenderPriority val="512"/>
                     <Animation name="Trigger">
-                        <Event event="OnShown" action="Restart,Play"/>
+                        <Event event="HideEffect" action="Stop" frame="$ancestor[@type=QuestFrame]"/>
+                        <Event event="ShowEffect" action="Restart,Play" frame="$ancestor[@type=QuestFrame]"/>
                         <Controller type="Event" end="Loop" name="TriggerEvent">
                             <Key type="Event" time=".8" event="Trigger"/>
                             <Key type="Event" time="1.6" event="Null"/>
@@ -755,7 +851,6 @@
                 <Frame type="CutsceneFrame" name="RewardCutscene">
                     <Width val="150"/>
                     <Height val="150"/>
-                    <AcceptsMouse val="True"/>
                     <RenderType val="LDR"/>
                     <AutoPlay val="True"/>
                     <ToneMapping val="False"/>
@@ -765,21 +860,18 @@
                     <Visible val="False"/>
                     <Preload val="false"/>
                 </Frame>
-                
-                <Frame type="Frame" name="RewardCutsceneClickFrame">
-                    <Anchor relative="$parent/QuestIconImage"/>
-                    <AcceptsMouse val="True"/>
-                    <Animation name="OnMouseUp">
-                        <Event event="OnMouseUp" action="Play"/>
-                        <Controller type="Cutscene" end="Stop" frame="$parent/RewardCutscene">
-                            <Key type="Cutscene" time="0.0" action="Bookmark" bookmark="Tap"/>
-                        </Controller>
-                    </Animation>
-                </Frame>
+
+                <Animation name="QuestIconClicked">
+                    <Event event="QuestIconClicked" action="Play" frame="$ancestor[@type=QuestFrame]"/>
+                    <Controller type="Cutscene" end="Stop" frame="RewardCutscene">
+                        <Key type="Cutscene" time="0.0" action="Bookmark" bookmark="Tap"/>
+                    </Controller>
+                </Animation>
                 
                 <Frame type="Image" name="Masktemp">
                     <Anchor relative="$parent/RewardCutscene"/>
                     <Texture val="@UI/Storm_UI_QuestLog_Special_TGoblinMask"/>
+                    <OnDisableDesaturationColor val="#QuestIneligibleColor"/>
                     <Visible val="False"/>
                 </Frame>
                 
@@ -790,8 +882,8 @@
                     <Anchor side="Right" relative="$parent/QuestIconImage" pos="Mid" offset="-22"/>
                     <RenderPriority val="513"/>
                     <Animation name="Trigger">
-                        <Event event="OnShown" action="Restart"/>
-                        <Event event="OnShown" action="Play"/>
+                        <Event event="HideEffect" action="Stop" frame="$ancestor[@type=QuestFrame]"/>
+                        <Event event="ShowEffect" action="Restart,Play" frame="$ancestor[@type=QuestFrame]"/>
                         <Controller type="Event" end="Loop" name="TriggerEvent">
                             <Key type="Event" time="0.6" event="Trigger"/>
                             <Key type="Event" time="1.6" event="Null"/>
@@ -800,6 +892,26 @@
                 </Frame>
                 
             </Frame>
+
+            <Frame type="Image" name="DisabledFrame">
+                <Anchor relative="$parent"/>
+                <Color val="110b3c"/>
+                <Alpha val="153"/>
+                <Visible val="false"/>
+            </Frame>
+
+            <StateGroup name="QuestEnabled">
+                <DefaultState val="Eligible"/>
+                <State name="Ineligible">
+                    <When type="Property" frame="$this" Ineligible="true"/>
+                    <Action type="SetProperty" frame="DisabledFrame" visible="true"/>
+                    <Action type="SetProperty" frame="$this" enabled="false"/>
+                    <Action type="SendEvent" frame="$this" event="HideEffect"/>
+                </State>
+                <State name="Eligible">
+                    <Action type="SendEvent" frame="$this" event="ShowEffect"/>
+                </State>
+            </StateGroup>
         </Frame>
     </Frame>
 
@@ -914,13 +1026,85 @@
     </Frame>
 
     <Frame type="QuestLogPanel" name="QuestLogPanelTemplate">
-        <Anchor side="Top" relative="QuestContainer" pos="Min" offset="-5"/>
+        <Anchor side="Top" relative="SpecialEventsContainer" pos="Min" offset="-5"/>
         <Anchor side="Bottom" relative="$parent" pos="Max" offset="10"/>
         <Width val="471"/> 
 
+        <Frame type="QuestTooltip" name="QuestTooltip" template="QuestLogPanel/QuestTooltipTemplate"/>
+
+        <Frame type="Frame" name="SpecialEventsContainer">
+            <Anchor side="Top" relative="TitleFrame" pos="Min" offset="0"/>
+            <Anchor side="Bottom" relative="$parent/QuestContainer" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+            <CollapseLayout val="True"/>
+            <Visible val="False"/>
+            
+            <Animation name="SpecialEventsVisibility">
+                <Event event="QuestsUnavailable" action="DirectionReverse" frame="QuestTileList"/>
+                <Event event="QuestsUnavailable" action="Play" frame="QuestTileList"/>
+                <Event event="QuestsAvailable" action="Reset" frame="QuestTileList"/>
+                <Event event="QuestsAvailable" action="Play" frame="QuestTileList"/>
+                <Controller type="Visibility" end="Pause">
+                    <Key type="Bool" time="0" value="false"/>
+                    <Key type="Bool" time="0.01" value="true"/>
+                </Controller>
+            </Animation>
+
+            <Frame type="Frame" name="TitleFrame">
+                <Height val="50"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+                <Anchor side="Bottom" relative="$parent/QuestTileList" pos="Min" offset="0"/>
+
+                <Frame type="Label" name="TitleLabel">
+                    <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+                    <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+                    <Anchor side="Left" relative="$parent" pos="Min" offset="23"/>
+
+                    <Style val="DialogHeaderLabelSmallGold"/>
+                    <Text val="@UI/QuestLogPanel/SpecialEventsSubHeader"/>
+                </Frame>
+            </Frame>            
+
+            <Frame type="TileList" name="QuestTileList">
+                <Anchor side="Top" relative="Item0" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+                <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+
+                <Frame type="QuestTileListItem" name="Item0" template="QuestLogPanel/SpecialQuestTileListItemTemplate">
+                    <Anchor side="Bottom" relative="$parent/Item1" pos="Min" offset="0"/>
+                    <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                    <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+                    <CollapseLayout val="True"/>
+                </Frame>
+
+                <Frame type="QuestTileListItem" name="Item1" template="QuestLogPanel/SpecialQuestTileListItemTemplate">
+                    <Anchor side="Bottom" relative="$parent/Item2" pos="Min" offset="0"/>
+                    <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                    <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+                    <CollapseLayout val="True"/>
+                </Frame>
+
+                <Frame type="QuestTileListItem" name="Item2" template="QuestLogPanel/SpecialQuestTileListItemTemplate">
+                    <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+                    <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                    <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+                    <CollapseLayout val="True"/>
+                </Frame>
+            </Frame>
+
+            <Frame type="Image" name="BorderImage2" template="StandardTemplates/BorderImageTemplate">
+                <Anchor side="Bottom" relative="$parent/QuestTileList" pos="Max" offset="0"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+            </Frame>
+        </Frame>
+
         <Frame type="Frame" name="QuestContainer">
             <Anchor side="Top" relative="TitleFrame" pos="Min" offset="0"/>
-            <Anchor side="Bottom" relative="$parent/SpecialEventsContainer" pos="Min" offset="0"/>
+            <Anchor side="Bottom" relative="$parent/QuestContainerShim" pos="Min" offset="0"/>
             <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
             <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
 
@@ -1030,76 +1214,6 @@
                 </Frame>
             </Frame>
         </Frame>
-
-        <Frame type="Frame" name="SpecialEventsContainer">
-            <Anchor side="Top" relative="TitleFrame" pos="Min" offset="0"/>
-            <Anchor side="Bottom" relative="$parent/QuestContainerShim" pos="Min" offset="0"/>
-            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
-            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
-            <CollapseLayout val="True"/>
-            <Visible val="False"/>
-            
-            <Animation name="SpecialEventsVisibility">
-                <Event event="QuestsUnavailable" action="DirectionReverse" frame="QuestTileList"/>
-                <Event event="QuestsUnavailable" action="Play" frame="QuestTileList"/>
-                <Event event="QuestsAvailable" action="Reset" frame="QuestTileList"/>
-                <Event event="QuestsAvailable" action="Play" frame="QuestTileList"/>
-                <Controller type="Visibility" end="Pause">
-                    <Key type="Bool" time="0" value="false"/>
-                    <Key type="Bool" time="0.01" value="true"/>
-                </Controller>
-            </Animation>
-
-            <Frame type="Image" name="BorderImage" template="StandardTemplates/BorderImageTemplate">
-                <Anchor side="Top" relative="$parent/TitleFrame" pos="Min" offset="0"/>
-                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
-                <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
-            </Frame>
-
-            <Frame type="Frame" name="TitleFrame">
-                <Height val="50"/>
-                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
-                <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
-                <Anchor side="Bottom" relative="$parent/QuestTileList" pos="Min" offset="0"/>
-
-                <Frame type="Label" name="TitleLabel">
-                    <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
-                    <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
-                    <Anchor side="Left" relative="$parent" pos="Min" offset="23"/>
-
-                    <Style val="DialogHeaderLabelSmallGold"/>
-                    <Text val="@UI/QuestLogPanel/SpecialEventsSubHeader"/>
-                </Frame>
-            </Frame>            
-
-            <Frame type="TileList" name="QuestTileList">
-                <Anchor side="Top" relative="Item0" pos="Min" offset="0"/>
-                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
-                <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
-                <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
-
-                <Frame type="QuestTileListItem" name="Item0" template="QuestLogPanel/SpecialQuestTileListItemTemplate">
-                    <Anchor side="Bottom" relative="$parent/Item1" pos="Min" offset="0"/>
-                    <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
-                    <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
-                    <CollapseLayout val="True"/>
-                </Frame>
-
-                <Frame type="QuestTileListItem" name="Item1" template="QuestLogPanel/SpecialQuestTileListItemTemplate">
-                    <Anchor side="Bottom" relative="$parent/Item2" pos="Min" offset="0"/>
-                    <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
-                    <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
-                    <CollapseLayout val="True"/>
-                </Frame>
-
-                <Frame type="QuestTileListItem" name="Item2" template="QuestLogPanel/SpecialQuestTileListItemTemplate">
-                    <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
-                    <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
-                    <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
-                    <CollapseLayout val="True"/>
-                </Frame>
-            </Frame>
-        </Frame>
         
         <Frame type="Frame" name="QuestContainerShim">
             <Anchor side="Bottom" relative="$parent/PlayProgression" pos="Min" offset="0"/>
@@ -1149,10 +1263,9 @@
         </Frame>
 
         <Animation name="PlayerLevelStates">
-            <Event event="PlayerLevelMax" action="DirectionReverse"/>
-            <Event event="PlayerLevelMax" action="Play"/>
-            <Event event="PlayerLevelNormal" action="DirectionForward"/>
-            <Event event="PlayerLevelNormal" action="Play"/>
+            <Event event="HidePlayerLevel" action="DirectionReverse,Play"/>
+            <Event event="ShowPlayerLevel" action="DirectionForward,Play"/>
+            
             <Controller type="Visibility" end="Pause" frame="PlayerAtMaxLevel">
                 <Key type="Bool" time="0" value="true"/>
                 <Key type="Bool" time="0.01" value="false"/>

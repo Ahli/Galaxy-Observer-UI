@@ -17,7 +17,7 @@
     <!--
         Override for StoreTileListItem to hide unnecessary frames
     -->
-    <Frame type="StoreTileListItem" name="HeroTileListItemTemplate" template="ScreenStore/StoreTileListItemTemplate">
+    <Frame type="StoreTileListItem" name="HeroTileListItemTemplate" template="NewUserPopupPanel/HeroTileListItemTemplate">
         <Frame type="Image" name="EmptyImage">
             <RenderType val="LDR" />
         </Frame>
@@ -91,7 +91,7 @@
     <!======================================================================================-->
     <Frame type="FreeHeroSelectionDialog" name="FreeHeroSelectionDialog" template="StandardDialog/GridPulseDialogTemplate">
         <Handle val="FreeHeroSelectionDialog"/>
-        <Visible val="true"/>
+        <Visible val="false"/>
 
         <!--=======================================================================================
         <! State Groups
@@ -100,21 +100,17 @@
         <StateGroup name="PanelStates">
             <DefaultState val="HeroesAvailable"/>
 
-            <State name="NoHeroesAvailable">
-                <When type="Property" NumHeroes="0"/>
-                <When type="Property" IsHeroSelected="false"/>
+            <State name="GoldGranted">
+                <When type="Property" frame="GoldRewardImage" Visible="True"/>
 
                 <Action type="SetProperty" frame="Button" Visible="true"/>
                 <Action type="SetProperty" frame="InfoIcon" Visible="true"/>
-                <Action type="SetProperty" frame="GoldRewardImage" Visible="true"/>
-                <Action type="SetProperty" frame="ChooseLaterButton" Visible="False"/>
             </State>
 
             <State name="HeroesAvailable">
                 <When type="Property" IsHeroSelected="false"/>
 
                 <Action type="SetProperty" frame="HeroTileList" Visible="true"/>
-                <Action type="SetProperty" frame="ChooseLaterButton" Visible="True"/>
             </State>
 
             <State name="HeroSelected">
@@ -122,14 +118,13 @@
 
                 <Action type="SetProperty" frame="TitleLabel" Visible="false"/>
                 <Action type="SetProperty" frame="FreeHeroSelectionDetailsPanel" Visible="true"/>
-                <Action type="SetProperty" frame="ChooseLaterButton" Visible="False"/>
             </State>
         </StateGroup>
 
+        <!--
         <StateGroup name="UtherPopupStates">
-
             <State name="DontShowUtherPopup">
-                <When type="Property" NumHeroes="0"/>
+                <When type="Property" GrantedGold="True"/>
             </State>
 
             <State name="HideUtherPopup">
@@ -161,6 +156,7 @@
                 <Action type="SetProperty" frame="UtherPopupShownFrame" Visible="True"/>
             </State>
         </StateGroup>
+        -->
 
         <!--=======================================================================================
         <! Selection Background
@@ -274,10 +270,11 @@
         <! Title Label
         <!======================================================================================-->
         <Frame type="Label" name="TitleLabel">
-            <Anchor side="Left" relative="$parent" pos="Mid" offset="-400"/>
+            <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
             <Anchor side="Bottom" relative="$parent/UnlockedLabel" pos="Min" offset="0"/>
-            <Width val="800"/>
-            <Style val="RewardsFanfareTitle"/>
+            <Width val="0"/>
+            <Style val="NewUserFreeHeroTitle"/>
             <Text val="@UI/FreeHeroFanfare/Choose"/>
 
             <Animation name="LabelFade">
@@ -320,10 +317,13 @@
             <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
             <Visible val="false"/>
 
+            <Frame type="StoreTileTooltip" name="HeroTileListItemTooltip" template="NewUserPopupPanel/HeroTileListItemTooltipTemplate"/>
+
             <Frame type="StoreTileListItem" name="Item0" template="FreeHeroSelectionDialog/HeroTileListItemTemplate">
                 <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
                 <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
                 <Anchor side="Left" relative="$parent/$parent/ItemAnchorFrame" pos="Max" offset="0"/>
+                <TooltipFrame val="HeroTileListItemTooltip"/>
 
                 <Animation name="Item1Fade">
                     <Event event="OnShown" action="Restart, Play"/>
@@ -338,6 +338,7 @@
             <Frame type="StoreTileListItem" name="Item1" template="FreeHeroSelectionDialog/HeroTileListItemTemplate">
                 <Anchor side="Top" relative="$parent/Item0" pos="Min" offset="0"/>
                 <Anchor side="Left" relative="$parent/Item0" pos="Max" offset="#StoreTileItemSpacing"/>
+                <TooltipFrame val="HeroTileListItemTooltip"/>
 
                 <Animation name="Item2Fade">
                     <Event event="OnShown" action="Restart, Play"/>
@@ -353,6 +354,7 @@
             <Frame type="StoreTileListItem" name="Item2" template="FreeHeroSelectionDialog/HeroTileListItemTemplate">
                 <Anchor side="Top" relative="$parent/Item0" pos="Min" offset="0"/>
                 <Anchor side="Left" relative="$parent/Item1" pos="Max" offset="#StoreTileItemSpacing"/>
+                <TooltipFrame val="HeroTileListItemTooltip"/>
 
                 <Animation name="Item3Fade">
                     <Event event="OnShown" action="Restart, Play"/>
@@ -555,11 +557,14 @@
             <Height val="600"/>
             <Width val="500"/>
             <SubpixelRendering val="true"/>
+            <Alpha val="0"/>
             <Visible val="false"/>
+            <VisibilityOnFade val="true"/>
             <Texture val="@UI/Storm_UI_Promotional_Fanfare_GoldCHest"/>
 
             <Animation name="Intro">
-                <Event event="OnShown" action="Reset,Play"/>
+                <Event event="ShowGold" frame="$parent" action="DirectionForward,Play"/>
+                <Event event="HideGold" frame="$parent" action="DirectionReverse,Play"/>
 
                 <Controller type="Fade" end="Pause">
                     <Key type="Curve" time="0" value="0" out="Slow"/>
@@ -577,9 +582,6 @@
                     <Key type="Curve" time=".5" value="500" in="fast" out="fast"/>
                     <Key type="Curve" time=".9" value="90" in="fast" out="slow"/>
                     <Key type="Curve" time="1" value="100" in="slow" out="fast"/>
-                </Controller>
-                <Controller type="Visibility" end="Pause" frame="$parent/UnlockedLabel">
-                    <Key type="Bool" time="0" value="True"/>
                 </Controller>
                 <Controller type="Anchor" end="Pause" side="Bottom" relative="true" frame="$parent/UnlockedLabel">
                     <Key type="Curve" time="0" value="-110"/>
@@ -672,24 +674,6 @@
             </Animation>
         </Frame>
 
-        <Frame type="Button" name="ChooseLaterButton" template="StandardTemplates/StandardButtonSmallTemplate">
-            <ClickSound val="@UI_BNet_Cancel"/>
-            <Anchor side="Top" relative="$parent/InfoIcon" pos="Max" offset="-10"/>
-            <Anchor side="Right" relative="$parent" pos="Max" offset="-100"/>
-
-            <Text val="@UI/FreeHeroFanfare/Later"/>
-
-            <Animation name="LaterButtonFade">
-                <Event event="OnShown" action="Restart, Play"/>
-
-                <Controller type="Fade" end="Pause">
-                    <Key type="Curve" time="0" value="0"/>
-                    <Key type="Curve" time=".1" value="0" out="Slow"/>
-                    <Key type="Curve" time=".3" value="255" in="Fast"/>
-                </Controller>
-            </Animation>
-        </Frame>
-
         <!-- Dialog acceptance -->
         <Frame type="Button" name="Button">
             <Anchor side="Top" relative="$parent/InfoIcon" pos="Max" offset="0"/>
@@ -706,6 +690,47 @@
                 </Controller>
             </Animation>
         </Frame>
+
+        <StateGroup name="Mode">
+            <State name="GoldClaim">
+                <When type="Property" GrantedGold="True"/>
+                <When type="Property" frame="GoldRewardImage" Visible="True"/>
+                <Action type="SetProperty" frame="TitleLabel" style="RewardsFanfareTitle"/>
+            </State>
+            <State name="GoldWithHeroes">
+                <When type="Property" GrantedGold="True"/>
+                <When type="Property" frame="GoldRewardImage" Visible="False"/>
+                <Action type="SetProperty" frame="TitleLabel" text="@UI/ArenaHeroSelect/Title1" undo="false"/>
+                <Action type="SetProperty" frame="FreeHeroSelectionDetailsPanel/TitleLabel" text=""/>
+                <Action type="SetProperty" frame="FreeHeroSelectionDetailsPanel/ChooseLaterButton" visible="false"/>
+            </State>
+            <State name="Tutorial">
+                <When type="Property" DismissToTutorial="true"/>
+                <Action type="SetProperty" frame="FreeHeroSelectionDetailsPanel/HeroUnlockedFrame/HeroUnlockedButton" text="@UI/NewUserPopup/NextTutorial"/>
+                <Action type="SetProperty" frame="TitleLabel" style="RewardsFanfareTitle"/>
+                <Action type="SetProperty" frame="TitleLabel" text="@UI/FreeHeroFanfare/ChooseOther" undo="false"/>
+                <Action type="SetProperty" frame="FreeHeroSelectionDetailsPanel/TitleLabel" text="@UI/FreeHeroFanfare/Present"/>
+            </State>
+            <State name="Returners">
+                <When type="Property" DismissToTutorial="false"/>
+                <Action type="SetProperty" frame="FreeHeroSelectionDetailsPanel/HeroUnlockedFrame/HeroUnlockedButton" text="@UI/Sweet"/>
+                <Action type="SetProperty" frame="TitleLabel" style="NewUserFreeHeroTitle"/>
+                <Action type="SetProperty" frame="TitleLabel" text="@UI/FreeHeroFanfare/Choose" undo="false"/>
+                <Action type="SetProperty" frame="FreeHeroSelectionDetailsPanel/TryButton" text="@UI/ScreenHome/TryButton"/>
+                <Action type="SetProperty" frame="FreeHeroSelectionDetailsPanel/TitleLabel" text=""/>
+            </State>
+        </StateGroup>
+
+        <!--=======================================================================================
+        <! Intro Fanfare
+        <!======================================================================================-->
+        <Animation name="Fanfare">
+            <Event event="ShowHero" action="Play"/>
+            <Event event="OnShown" frame="$ScreenLogin" action="Stop"/>
+            <Controller type="Sound" end="Pause">
+                <Key type="Sound" time="0.0" sound="@UI_Tutorial01_FreeGift_Hero_Fanfare"/>
+            </Controller>
+        </Animation>
     </Frame>
 
 </Desc>

@@ -15,14 +15,6 @@
         <Anchor side="Right" relative="Background" pos="Max" offset="0"/>
         
         <Visible val="False"/>
-        
-        <Frame type="BlurFrame" name="BlurFrame" template="StandardTemplates/FullscreenBlurFrame">
-            <Anchor relative="$parent/Background"/>
-            <BlurAmount val="0.2"/>
-            <Alpha val="150"/>
-            <Visible val="#IngameBlur"/>
-            <RenderType val="HDR"/>
-        </Frame>
 
         <Frame type="Image" name="Background">
             <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
@@ -84,12 +76,13 @@
 
     </Frame>
 
+    <!-- Control box in the upper left of tutorial -->
     <Frame type="Frame" name="TutorialReferenceCardTemplate">
         <Width val="375"/>
         <Anchor side="Bottom" relative="Background" pos="Max" offset="0"/>
         
         <Visible val="false"/>
-        
+                
         <Animation name="HideTutorialButton">
             <Event event="OnShown" action="Restart,Play"/>
             <Controller type="Visibility" end="Pause" frame="$parent/TutorialCardButton">
@@ -97,14 +90,6 @@
                 <Key type="Bool" time=".01" value="False"/>
             </Controller>
         </Animation>
-                
-        <Frame type="BlurFrame" name="BlurFrame" template="StandardTemplates/FullscreenBlurFrame">
-            <Anchor relative="$parent/Background"/>
-            <BlurAmount val="0.3"/>
-            <Alpha val="150"/>
-            <Visible val="#IngameBlur"/>
-            <RenderType val="HDR"/>
-        </Frame>
 
         <Frame type="Image" name="Background">
             <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
@@ -115,6 +100,11 @@
             <TextureType val="Nineslice"/>
             <Tiled val="true"/>
             <Alpha val="180"/>
+        </Frame>
+        
+        <!-- Highlight frame -->
+        <Frame type="Frame" name="ReferenceCardHighlight" template="StartingExperience/HighlightSquare">
+            <Anchor relative="$parent"/>
         </Frame>
         
         <Frame type="Image" name="Bullet1Image" template="TutorialUI/BulletImageTemplate">
@@ -206,16 +196,34 @@
             <CollapseLayout val="true"/>
         </Frame>
         
+        <Frame type="Image" name="Bullet6Image" template="TutorialUI/BulletImageTemplate">
+            <Anchor side="Top" relative="$parent/Item6" pos="Min" offset="10"/>
+            <Anchor side="Right" relative="$parent/Bullet1Image" pos="Max" offset="0"/>
+            <Visible val="false"/>
+        </Frame>
+
+        <Frame type="Label" name="Item6">
+            <Anchor side="Top" relative="$parent/Item5" pos="Max" offset="#ItemSpacing"/>
+            <Anchor side="Left" relative="$parent/Item5" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent/Item1" pos="Max" offset="0"/>
+            <Style val="Storm_TutorialReferenceCardItem"/>
+            <Alpha val="255"/>
+            <WriteOutText val="false"/>
+            <WriteOutTextDuration val="2000"/>
+            <Visible val="false"/>
+            <CollapseLayout val="true"/>
+        </Frame>
+
         <Frame type="Frame" name="BottomShim">
             <Width val="300"/>
             <Height val="1"/>
-            <Anchor side="Top" relative="$parent/Item5" pos="Max" offset="0"/>
-            <Anchor side="Left" relative="$parent/Item5" pos="Min" offset="0"/>
+            <Anchor side="Top" relative="$parent/Item6" pos="Max" offset="0"/>
+            <Anchor side="Left" relative="$parent/Item6" pos="Min" offset="0"/>
         </Frame>
         
         <Frame type="Button" name="CloseButton" template="StandardTemplates/SmallPanelCloseButtonTemplate">
-            <Anchor side="Top" relative="$parent/BlurFrame" pos="Min" offset="4"/>
-            <Anchor side="Right" relative="$parent/BlurFrame" pos="Max" offset="-4"/>
+            <Anchor side="Top" relative="$parent" pos="Min" offset="4"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="-4"/>
             <Tooltip val="@UI/Tooltip/CollapsePanel"/>
             <Animation name="Click">
                 <Event event="OnMouseUp" action="Restart"/>
@@ -232,7 +240,170 @@
         </Frame>
         
     </Frame>
-    
+  
+    <!-- Base template, used for trigger: Display VO Message -->
+    <Frame type="Frame" name="TutorialTextBoxTemplate">
+        <Anchor relative="$parent"/>
+        
+        <Frame type="Label" name="Text">
+            <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+            <Width val="850"/>
+            <Height val="100"/>
+            <Style val="TutorialTextBoxPausedMessage"/>
+            <Text val="In this tutorial, you'll be playing Jaina, an ranged assassin hero. Use her icy abilities to slow enemy heroes and kill them."/>
+            <WriteOutText val="true"/>
+            <WriteOutTextDuration val="1000"/>
+            <AutoSizeClamps minHeight="75" maxHeight="100"/>
+        </Frame>
+
+        <Frame type="Image" name="TextBackground">
+            <Anchor side="Top" relative="$parent/Text" pos="Mid" offset="0"/>
+            <Anchor side="Left" relative="$parent/Text" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent/Text" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent/Text" pos="Mid" offset="0"/>
+            <Width val="1000"/>
+            <Texture val="@UI/Storm_TutorialTextBG"/>
+            <RenderPriority val="300"/>
+        </Frame>
+        
+        <Frame type="Frame" name="FlareTopContainer">
+            <Anchor side="Top" relative="$parent/TextBackground" pos="Min" offset="26"/>
+            <Anchor side="Left" relative="$parent/TextBackground" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent/TextBackground" pos="Max" offset="0"/>
+            <Height val="60"/>
+            
+            <Frame type="Image" name="FlareTop">
+                <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Left" relative="$parent/$parent/TextBackground" pos="Min" offset="-246"/>
+                <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+                <Height val="60"/>
+                <Texture val="@UI/Storm_UI_Centered_Lens_Flare"/>
+                <Alpha val="0"/>
+                
+                <Animation name="Enter">
+                    <Event event="OnShown" action="Reset,Play"/>
+                    <Event event="TriggerTutorialDialogAnim" frame="$parent/$parent" action="Reset,Play"/>
+                    
+                    <Controller type="Anchor" end="Pause" side="Left" relative="true">
+                        <Key type="Curve" time="0" value="0" out="auto"/>
+                        <Key type="Curve" time="1" value="950" in="auto"/>
+                    </Controller>
+
+                    <Controller type="Dimension" dimension="Height" relative="True" percentage="True" end="Pause">
+                        <Key type="Curve" time="0" value="1"/>
+                        <Key type="Curve" time="0.5" value="25"/>
+                        <Key type="Curve" time="1" value="1"/>
+                    </Controller>
+                    
+                    <Controller type="Dimension" dimension="Width" relative="True" percentage="True" end="Pause">
+                        <Key type="Curve" time="0" value="1"/>
+                        <Key type="Curve" time="0.5" value="250"/>
+                        <Key type="Curve" time="1" value="1"/>
+                    </Controller>
+                    
+                    <Controller type="Fade" end="Pause">
+                        <Key type="Curve" time="0" value="0" out="auto"/>
+                        <Key type="Curve" time="0.5" value="255" in="auto"/>
+                        <Key type="Curve" time="1" value="0" in="auto"/>
+                    </Controller>
+                </Animation>
+            </Frame>
+        </Frame>
+        
+        <Frame type="Frame" name="FlareBottomContainer">
+            <Anchor side="Top" relative="$parent/TextBackground" pos="Max" offset="-88"/>
+            <Anchor side="Left" relative="$parent/TextBackground" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent/TextBackground" pos="Max" offset="0"/>
+            <Height val="60"/>
+            
+            <Frame type="Image" name="FlareBottom">
+                <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Left" relative="$parent/$parent/TextBackground" pos="Min" offset="-246"/>
+                <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+                <Height val="60"/>
+                <Texture val="@UI/Storm_UI_Centered_Lens_Flare"/>
+                <Alpha val="0"/>
+                
+                <Animation name="Enter">
+                    <Event event="OnShown" action="Reset,Play"/>
+                    <Event event="TriggerTutorialDialogAnim" frame="$parent/$parent" action="Reset,Play"/>
+                    
+                    <Controller type="Anchor" end="Pause" side="Left" relative="true">
+                        <Key type="Curve" time="0" value="0" out="auto"/>
+                        <Key type="Curve" time="1" value="950" in="auto"/>
+                    </Controller>
+
+                    <Controller type="Dimension" dimension="Height" relative="True" percentage="True" end="Pause">
+                        <Key type="Curve" time="0" value="1"/>
+                        <Key type="Curve" time="0.5" value="25"/>
+                        <Key type="Curve" time="1" value="1"/>
+                    </Controller>
+                    
+                    <Controller type="Dimension" dimension="Width" relative="True" percentage="True" end="Pause">
+                        <Key type="Curve" time="0" value="1"/>
+                        <Key type="Curve" time="0.5" value="250"/>
+                        <Key type="Curve" time="1" value="1"/>
+                    </Controller>
+                    
+                    <Controller type="Fade" end="Pause">
+                        <Key type="Curve" time="0" value="0" out="auto"/>
+                        <Key type="Curve" time="0.5" value="255" in="auto"/>
+                        <Key type="Curve" time="1" value="0" in="auto"/>
+                    </Controller>
+                </Animation>
+            </Frame>
+        </Frame>
+        
+        <Animation name="Enter">
+            <Event event="OnShown" action="Reset,Play"/>
+            <Event event="TriggerTutorialDialogAnim" action="Reset,Play"/>
+            
+            <Controller type="Dimension" dimension="Height" relative="False" percentage="True" frame="TextBackground" end="Pause">
+                <Key type="Curve" time="0" value="1"/>
+                <Key type="Curve" time="0.3" value="100"/>
+            </Controller>
+        </Animation>
+    </Frame>
+
+    <Frame type="Frame" name="TutorialTextBoxPausedTemplate" template="TutorialUI/TutorialTextBoxTemplate">
+        <Anchor relative="$parent"/>
+        
+        <Frame type="Label" name="Text">
+            <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="-290"/>
+            <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+            <Width val="850"/>
+            <AutoSizeClamps minHeight="75" maxHeight="100"/>
+            <Style val="TutorialTextBoxPausedMessage"/>
+            <Text val="In this tutorial, you'll be playing Jaina, an ranged assassin hero. Use her icy abilities to slow enemy heroes and kill them."/>
+        </Frame>
+
+        <Frame type="Button" name="ContinueButton" template="StandardTemplates/StandardButtonTemplate">            
+            <Anchor side="Top" relative="$parent/Text" pos="Max" offset="10"/>
+            <Anchor side="Left" relative="$parent/Text" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent/Text" pos="Mid" offset="0"/>
+            <Width val="240"/>
+            <Height val="90"/>
+            <Text val="@UI/GameResultDialog/Quit"/>
+            <Style val="TutorialTextBoxPausedMessage"/>
+            <ClickSound val="@UI_Tutorial01_VO_Message_Paused_Clear"/>
+        </Frame>
+    </Frame>
+
+    <!-- used in trigger: Display Vo Message (Paused) -->
+    <Frame type="StandardDialog" name="TutorialTextBoxPausedDialogTemplate" template="TutorialUI/TutorialTextBoxPausedTemplate">
+        <HookupAlias original="Button" alias="ContinueButton"/>
+        <HookupAlias original="MessageLabel" alias="Text"/>
+
+        <Frame type="Label" name="TitleLabel">
+            <Anchor relative="$parent"/>
+            <Visible val="false"/>
+        </Frame>
+    </Frame>
+
     <Frame type="Frame" name="DummyUITemplate">
         <Width val="430"/>
         <Height val="200"/>
@@ -246,13 +417,13 @@
             </Controller>
         </Animation>
 
-        <Frame type="BlurFrame" name="BlurFrame" template="StandardTemplates/FullscreenBlurFrame">
+        <!--<Frame type="BlurFrame" name="BlurFrame" template="StandardTemplates/FullscreenBlurFrame">
             <Anchor relative="$parent/Background"/>
             <BlurAmount val="0.4"/>
             <Alpha val="150"/>
             <Visible val="#IngameBlur"/>
             <RenderType val="HDR"/>
-        </Frame>
+        </Frame>-->
 
         <Frame type="Image" name="Background">
             <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>

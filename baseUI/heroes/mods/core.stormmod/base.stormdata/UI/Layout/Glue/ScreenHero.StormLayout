@@ -108,6 +108,8 @@
             <Anchor side="Left" relative="$parent/AbilitiesLabel" pos="Min" offset="-5"/>
             <Anchor side="Right" relative="Item2" pos="Max" offset="0"/>
 
+            <PreserveAnchorOffset val="True"/>
+
             <Frame type="HeroAbilTileListItem" name="Item0" template="HeroAbilTileListItem/HeroAbilTileListItemTemplate">
                 <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
                 <Anchor side="Left" relative="$parent" pos="Min" offset="-8"/>
@@ -143,7 +145,9 @@
             <Anchor side="Top" relative="$parent/HeroicAbilitiesLabel" pos="Max" offset="12"/>
             <Anchor side="Bottom" relative="Item0" pos="Max" offset="0"/>
             <Anchor side="Left" relative="$parent/HeroicAbilitiesLabel" pos="Min" offset="#AbilityButtonSpacing"/>
-            <Anchor side="Right" relative="Item1" pos="Max" offset="0"/>
+            <Anchor side="Right" relative="Item2" pos="Max" offset="0"/>
+
+            <PreserveAnchorOffset val="True"/>
 
             <Frame type="HeroAbilTileListItem" name="Item0" template="HeroAbilTileListItem/HeroAbilTileListHeroicItemTemplate">
                 <Anchor side="Top" relative="$parent" pos="Min" offset="2"/>
@@ -164,7 +168,18 @@
                     <Frame type="Label" name="HotkeyLabel">
                         <Anchor side="Top" relative="$parent/$parent/IconFrame" pos="Max" offset="13"/>
                     </Frame>
-                </Frame>                
+                </Frame>
+            </Frame>
+
+            <Frame type="HeroAbilTileListItem" name="Item2" template="HeroAbilTileListItem/HeroAbilTileListHeroicItemTemplate">
+                <Anchor side="Top" relative="$parent/Item0" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item1" pos="Max" offset="#AbilityButtonSpacing"/>
+
+                <Frame type="HeroAbilHotkeyFrame" name="HotkeyFrame">
+                    <Frame type="Label" name="HotkeyLabel">
+                        <Anchor side="Top" relative="$parent/$parent/IconFrame" pos="Max" offset="13"/>
+                    </Frame>
+                </Frame>
             </Frame>
         </Frame>
 
@@ -192,6 +207,28 @@
             <Anchor side="Left" relative="$parent/HeroicAbilTileList" pos="Max" offset="0"/>
             <Style val="StandardHeroBodyHeaderLabel"/>
             <Text val="@UI/HeroInfoPanel/Passive"/>
+
+            <StateGroup name="PasivePositionStates">
+                <DefaultState val="Normal"/>
+
+                <State name="OneHeroic">
+                    <When type="Property" frame="$parent/HeroicAbilTileList/Item1" visible="False"/>
+                    <Action type="SendEvent" frame="$this" event="OneHeroicPosition"/>
+                </State>
+                <State name="Normal">
+                    <When type="Property" frame="$parent/HeroicAbilTileList/Item1" visible="True"/>
+                    <Action type="SendEvent" frame="$this" event="NormalPosition"/>
+                </State>
+            </StateGroup>
+
+            <Animation name="PassivePositionAnims">
+                <Event event="OneHeroicPosition" action="Reset, Play"/>
+                <Event event="NormalPosition" action="Stop"/>
+
+                <Controller type="Anchor" end="Pause" side="Left">
+                    <Key type="Curve" time="0" value="96"/>
+                </Controller>
+            </Animation>
         </Frame>
 
         <Frame type="TileList" name="PassiveTileList">
@@ -640,68 +677,13 @@
             <Height val="100"/>
         </Frame>
 
-        <Frame type="Button" name="BackButton" template="StandardTemplates/StandardButtonTemplate">
+        <Frame type="Button" name="BackButton" template="StandardTemplates/StandardNavigationBackButtonTemplate">
             <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
             <Anchor side="Left" relative="$parent" pos="Min" offset="30"/>
             <Anchor side="Right" relative="Label" pos="Max" offset="10"/>
-            <Shortcut val="@UI/ScreenNavigationBack_Hotkey"/>
             <ReportsStats val="true"/>
             <Handle val="ScreenHero_BackButton"/>
             <Text val="@UI/ScreenStore/Back"/>
-            <Style val="StandardGlueBackButton"/>
-            <Height val="84"/>
-            
-            <Frame type="Label" name="Label">
-                <Anchor side="Left" relative="$parent/BackImage" pos="Max" offset="-25"/>
-                <Anchor side="Right" relative="$this" pos="Min" offset="0"/>
-                <Style val="StandardGlueBackButton"/>
-            </Frame>
-            <Frame type="Frame" name="HitTestFrame">
-                <Anchor side="Right" relative="$parent" pos="Max" offset="-10"/>
-            </Frame>
-
-            <Frame type="Image" name="NormalImage">
-                <Visible val="False"/> 
-                <Alpha val="0"/>
-            </Frame>
-    
-            <Frame type="Image" name="HoverImage">
-                <Visible val="False"/>
-                <Alpha val="0"/>
-            </Frame>
-            
-            <Frame type="Image" name="BackImage">
-                <Anchor side="Top" relative="$parent" pos="Mid" offset="1"/>
-                <Anchor side="Bottom" relative="$parent" pos="Mid" offset="1"/>
-                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
-                <Texture val="@UI/Storm_UI_MainNavigation_BackButton"/>
-            </Frame>
-            
-            <Frame type="Image" name="HoverBackImage">
-                <Anchor relative="$parent/BackImage"/>
-                <BlendMode val="Add"/>
-                <Alpha val="0"/>
-                <Texture val="@UI/Storm_UI_MainNavigation_BackButton"/>
-                <Animation name="Hover">
-                    <Event event="OnMouseEnter" action="DirectionForward" frame="$parent"/>
-                    <Event event="OnMouseEnter" action="Play" frame="$parent"/>
-                    <Event event="OnMouseExit" action="DirectionReverse" frame="$parent"/>
-                    <Event event="OnMouseExit" action="Play" frame="$parent"/>
-                    <Controller type="Fade" end="Pause">
-                        <Key type="Curve" time="0" value="0" out="Fast"/>
-                        <Key type="Curve" time=".2" value="255" in="Slow"/>
-                    </Controller>
-                </Animation>
-            </Frame>
-            
-            <Animation name="Pulse">
-                <Event event="OnShown" action="DirectionForward"/>
-                <Event event="OnShown" action="Play"/>
-                <Controller type="Fade" end="PingPong">
-                    <Key type="Curve" time="0" value="200" out="Fast"/>
-                    <Key type="Curve" time=".8" value="255" in="Slow"/>
-                </Controller>
-            </Animation>
         </Frame>
 
         <Frame type="Frame" name="SpacingFrame">
@@ -945,12 +927,13 @@
                 <Anchor side="Top" relative="$parent/PassiveTileList" pos="Max" offset="0"/>
                 <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
                 <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
-                <Anchor side="Bottom" relative="Item1" pos="Max" offset="0"/>
-                
-                <Frame type="HeroAbilTileListItem" name="Item0" template="HeroAbilTileListItem/StoreHeroAbilTileListItemTemplate">
-                </Frame>
-                <Frame type="HeroAbilTileListItem" name="Item1" template="HeroAbilTileListItem/StoreHeroAbilTileListItemTemplate">
-                </Frame>
+                <Anchor side="Bottom" relative="Item2" pos="Max" offset="0"/>
+
+                <PreserveAnchorOffset val="True"/>
+
+                <Frame type="HeroAbilTileListItem" name="Item0" template="HeroAbilTileListItem/StoreHeroAbilTileListItemTemplate"/>
+                <Frame type="HeroAbilTileListItem" name="Item1" template="HeroAbilTileListItem/StoreHeroAbilTileListItemTemplate"/>
+                <Frame type="HeroAbilTileListItem" name="Item2" template="HeroAbilTileListItem/StoreHeroAbilTileListItemTemplate"/>
             </Frame>
 
         </Frame>

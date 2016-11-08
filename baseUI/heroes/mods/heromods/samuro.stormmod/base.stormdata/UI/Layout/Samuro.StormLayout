@@ -878,8 +878,54 @@
                 <VisibleToOwner val="false"/>
                 <VisibleToAlly val="false"/>
                 <VisibleToEnemy val="true"/>
-
                 <SegmentValue val="125"/>
+            </Frame>
+
+            <Frame type="Frame" name="InvincibleHealthBarFrame">
+                <Frame type="UnitStatusHealthBar" name="HealthBarInvincible">
+                    <VisibleToOwner val="false"/>
+                    <VisibleToAlly val="false"/>
+                    <VisibleToEnemy val="true"/>
+                </Frame>
+            </Frame>
+
+            <Frame type="Frame" name="IllusionInvincibleHealthBarFrame">
+                <Anchor relative="$parent/IllusionHealthFrame"/>
+                <RenderPriority val="514"/>
+                <Visible val="False"/>
+
+                <Frame type="UnitStatusShieldedHealthBar" name="HealthBarInvincible" template="UnitStatus/UnitStatusProtectedHealthBarTemplate">
+                    <Anchor relative="$parent/$parent/IllusionHealthBar"/>
+                    <BarInsetRect top="2" left="2" bottom="2" right="2"/>
+                    <BackgroundInsetRect top="2" left="2" bottom="2" right="2"/>
+
+                    <VisibleToOwner val="true"/>
+                    <VisibleToAlly val="true"/>
+                    <VisibleToEnemy val="false"/>
+                </Frame>
+            </Frame>
+
+            <Frame type="UnitStatusValidatorAnimElement" name="ValidatorBasedVisibilityAnims">
+                <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+
+                <Validator val="CasterIsProtectedCombine"/>
+                <Validator val="CasterIsNotProtectedCombine"/>
+                
+                <!-- this will show/hide the protected health bars -->
+                <Animation name="ShowHideProtectedHealthBar">
+                    <Event event="CasterIsProtectedCombine" action="Reset, Play"/>
+                    <Event event="CasterIsNotProtectedCombine" action="Stop"/>
+
+                    <Controller type="Visibility" end="Pause" frame="$parent/InvincibleHealthBarFrame">
+                        <Key type="Bool" time="0" value="True"/>
+                    </Controller>
+                    <Controller type="Visibility" end="Pause" frame="$parent/IllusionInvincibleHealthBarFrame">
+                        <Key type="Bool" time="0" value="True"/>
+                    </Controller>
+                </Animation>
             </Frame>
             
             <Frame type="UnitStatusElement" name="IllusionHealthFrame">
