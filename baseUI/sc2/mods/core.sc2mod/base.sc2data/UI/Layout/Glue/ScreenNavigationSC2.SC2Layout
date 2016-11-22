@@ -282,7 +282,7 @@
                 <Anchor side="Left" relative="$parent/CampaignButton" pos="Max" offset="#ButtonOffsetLeft"/>
                 <Text val="@UI/ScreenNavigationSC2/CooperativeButton"/>
                 <Shortcut val="@UI/ScreenNavigation3_Hotkey"/>
-                <Enabled val="true"/>
+                <Enabled val="{$BattleUI/@IsOnline}"/>
                 
                 <!--  ALARAK & CUSTOM MUTATORS IS LATEST VERSION (3) -->
                 <Frame type="VersionNotificationFrame" name="NewContentFrame">
@@ -297,15 +297,6 @@
 
                     <Controller type="Tooltip" end="Pause">
                         <Key type="Text" time="0" text="@UI/ScreenNavigation/NewContent"/>
-                    </Controller>
-                </Animation>
-
-                <Animation Name="ButtonDisabled">
-                    <Event event="Offline" action="Reset,Play" frame="$parent/$parent"/>
-                    <Event event="Online" action="Reset,Stop" frame="$parent/$parent"/>
-                    
-                    <Controller type="Enabled" end ="Pause">
-                        <Key type="Bool" time="0" value="false"/>
                     </Controller>
                 </Animation>
 
@@ -362,25 +353,26 @@
                 <Anchor side="Left" relative="$parent/ArcadeButton" pos="Max" offset="#ButtonOffsetLeft"/>
                 <Text val="@UI/ScreenNavigationSC2/CollectionButton"/>
                 <Shortcut val="@UI/ScreenNavigation6_Hotkey"/>
+                <Enabled val="{$BattleUI/@IsOnline}"/>
 
-                <Animation Name="ButtonDisabled">
-                    <Event event="Offline" action="Reset,Play" frame="$parent/$parent"/>
-                    <Event event="Online" action="Reset,Stop" frame="$parent/$parent"/>
+                <StateGroup name="TooltipStateGroup">
+                    <State name="DisabledState">
+                        <When type="Property" Enabled="false"/>
+                        <Action type="SetProperty" Tooltip="@UI/OfflineDisabledTooltip"/>
+                    </State>
 
-                    <Controller type="Enabled" end ="Pause">
-                        <Key type="Bool" time="0" value="false"/>
-                    </Controller>
-                    
-                    <Controller type="Tooltip" end="Pause">
-                        <Key type="Text" time="0" text="@UI/OfflineDisabledTooltip"/>
-                    </Controller>
-                </Animation>
+                    <State name="EnabledState">
+                        <When type="Property" Enabled="true"/>
+                        <Action type="SetProperty" Tooltip=""/>
+                    </State>
+                </StateGroup>
             </Frame>
 
             <Frame type="Button" name="ReplayButton" template="ScreenNavigationSC2/ScreenNavigationButtonTemplate">
                 <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
                 <Anchor side="Left" relative="$parent/CollectionButton" pos="Max" offset="#ButtonOffsetLeft"/>
                 <Text val="@UI/ScreenNavigationSC2/ReplayButton"/>
+                <!-- F7 actually doesn't work in non-RC builds because the shortcut is overridden by a dev-cheat to repeat last cheat (Play.cpp) -->
                 <Shortcut val="@UI/ScreenNavigation7_Hotkey"/>
             </Frame>
 
@@ -395,6 +387,7 @@
                 <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
                 <Height val="1000"/>
                 <Width val="700"/>
+                <Visible val="{$BattleUI/@IsOnline}"/>
             </Frame>
 
             <Frame type="Frame" name="NavigationBlockFrame">

@@ -3,7 +3,7 @@
     <DescFlags val="Locked"/>
     
     <Constant name="MaxProductListHeight" val="150"/>
-    
+
     <Frame type="Frame" name="PaymentBackgroundTemplate">
         <Anchor relative="$parent"/>
         
@@ -65,21 +65,51 @@
     </Frame>
 
     <Frame type="ProductListBoxItem" name="ProductListBoxItemTemplate">
+        <Frame type="GameContentFrame" name="GameContentFrame">
+            <Anchor relative="$parent"/>
+            <GameContent val="{$parent/@GameContent}"/>
+        </Frame>
+            
         <Frame type="Label" name="ProductNameLabel">
             <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
             <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
-            <Anchor side="Right" relative="$parent/QuantityLabel" pos="Min" offset="-5"/>
+            <Anchor side="Right" relative="$parent/OwnedLabel" pos="Min" offset="-5"/>
             <Height val="46"/>
             <Style val="@Campaign_PurchaseDialogItemTitle"/>
         </Frame>
 
+        <Frame type="Label" name="OwnedLabel">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent/$parent/$parent/$parent/QuantityHeaderLabel" pos="Min" offset="-80"/>
+            <Anchor side="Right" relative="$parent/$parent/$parent/$parent/QuantityHeaderLabel" pos="Max" offset="-5"/>
+            <Text val="@UI/Store/DescriptionFormat/Owned"/>
+            <Style val="@Campaign_PurchaseDialogQuantity_Owned"/>
+        </Frame>
+        
         <Frame type="Label" name="QuantityLabel">
             <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
             <Anchor side="Left" relative="$parent/$parent/$parent/$parent/QuantityHeaderLabel" pos="Min" offset="0"/>
-            <Anchor side="Right" relative="$parent/$parent/$parent/$parent/QuantityHeaderLabel" pos="Max" offset="0"/>
+            <Anchor side="Right" relative="$parent/$parent/$parent/$parent/QuantityHeaderLabel" pos="Max" offset="-5"/>
             <Text val="1"/>
-            <Style val="@Campaign_PurchaseDialogItemTitle"/>
+            <Style val="@Campaign_PurchaseDialogQuantity"/>
         </Frame>
+    
+        <StateGroup name="PurchasedState">
+            <DefaultState val="NotPurchased"/>
+
+            <State name="Purchased">
+                <When type="AnimationState" frame="$this/GameContentFrame" PurchasedState="Purchased"/>
+                <Action type="SetProperty" frame="ProductNameLabel" style="@Campaign_PurchaseDialogItemTitle_Owned"/>
+                <Action type="SetProperty" frame="QuantityLabel" visible="false"/>
+                <Action type="SetProperty" frame="OwnedLabel" visible="true"/>
+            </State>
+
+            <State name="NotPurchased">
+                <Action type="SetProperty" frame="ProductNameLabel" style="@Campaign_PurchaseDialogItemTitle"/>
+                <Action type="SetProperty" frame="QuantityLabel" visible="true"/>
+                <Action type="SetProperty" frame="OwnedLabel" visible="false"/>
+            </State>
+        </StateGroup>
     </Frame>
     
     <Frame type="Label" name="ProductHeaderTemplate">
@@ -91,6 +121,11 @@
     <Frame type="ProductPurchasePanel" name="ProductPurchasePanelTemplate">
         <Anchor relative="$parent"/>
         <RenderType val="LDR"/>
+        
+        <Frame type="GameContentFrame" name="GameContentFrame">
+            <Anchor relative="$parent"/>
+            <GameContent val="{$parent/@GameContent}"/>
+        </Frame>
         
         <Frame type="Frame" name="PaymentBackground" template="ProductPurchasePanel/PaymentBackgroundTemplate"/>
         
@@ -206,27 +241,31 @@
         -->
     
         <Frame type="Frame" name="CompletePurchasePanel">
-            <Anchor relative="$parent/AnchorFrame"/>
+            <Anchor relative="$parent"/>
             <Alpha val="0"/>
+
+            <Frame type="Frame" name="AnchorFrame">
+                <Anchor relative="$parent/$parent/AnchorFrame"/>
+            </Frame>
             
             <Frame type="Label" name="Title">
-                <Anchor side="Top" relative="$parent" pos="Min" offset="47"/>
-                <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
-                <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Top" relative="$parent/AnchorFrame" pos="Min" offset="47"/>
+                <Anchor side="Left" relative="$parent/AnchorFrame" pos="Mid" offset="0"/>
+                <Anchor side="Right" relative="$parent/AnchorFrame" pos="Mid" offset="0"/>
                 <Style val="@Campaign_PurchaseDialogTitle"/>
                 <Text val="@UI/CampaignPurchase/PurchaseDialog/ConfirmPurchase"/>
             </Frame>
             
             <Frame type="Label" name="ProductHeaderLabel" template="ProductPurchasePanel/ProductHeaderTemplate">
-                <Anchor side="Top" relative="$parent" pos="Min" offset="114"/>
-                <Anchor side="Left" relative="$parent" pos="Min" offset="65"/>
+                <Anchor side="Top" relative="$parent/AnchorFrame" pos="Min" offset="114"/>
+                <Anchor side="Left" relative="$parent/AnchorFrame" pos="Min" offset="65"/>
                 <Style val="@Campaign_PurchaseDialogItemHeader"/>
                 <Text val="@UI/ProductPurchase/Item"/>
             </Frame>
             
             <Frame type="Label" name="QuantityHeaderLabel">
                 <Anchor side="Top" relative="$parent/ProductHeaderLabel" pos="Min" offset="0"/>
-                <Anchor side="Right" relative="$parent" pos="Max" offset="-65"/>
+                <Anchor side="Right" relative="$parent/AnchorFrame" pos="Max" offset="-65"/>
                 <Style val="@Campaign_PurchaseDialogItemHeader"/>
                 <Text val="@UI/ProductPurchase/Quantity"/>
             </Frame>
@@ -259,11 +298,90 @@
                     <DescFlags val="Internal"/>
                 </Frame>
             </Frame>
+
+            <Frame type="Frame" name="BundleFrame">
+                <Anchor side="Top" relative="$parent" pos="Mid" offset="-5"/>
+                <Anchor side="Bottom" relative="$parent" pos="Mid" offset="-5"/>
+                <Anchor side="Left" relative="$parent/AnchorFrame" pos="Max" offset="0"/>
+                <Width val="440"/>
+                <Height val="440"/>
+
+                <Frame type="Frame" name="PaymentBackground">
+                    <Anchor relative="$parent"/>
+
+                    <Frame type="Image" name="PurchasePanelBG">
+                        <Anchor relative="$parent"/>
+                        <Texture val="@UI/StandardGameTooltip" layer="0"/>
+                        <TextureType val="Border" layer="0"/>
+                        <Tiled val="false" layer="0"/>
+                    </Frame>
+                </Frame>
+                                
+                <Frame type="Label" name="Title">
+                    <Anchor side="Top" relative="$parent" pos="Min" offset="25"/>
+                    <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+                    <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+                    <Style val="@BundlePurchaseContents_Title"/>
+                    <Text val="@UI/CampaignPurchase/PurchaseDialog/BundleContents"/>
+                </Frame>
+
+                <Frame type="Image" name="Divider">
+                    <Anchor side="Bottom" relative="$parent/Title" pos="Max" offset="20"/>
+                    <Anchor side="Left" relative="$parent" pos="Min" offset="4"/>
+                    <Anchor side="Right" relative="$parent" pos="Max" offset="-4"/>
+                    <Height val="2"/>
+                    <Color val="44,149,229"/>
+                    <Alpha val="77"/>
+                </Frame>
+
+                <Frame type="Label" name="ProductHeaderLabel" template="ProductPurchasePanel/ProductHeaderTemplate">
+                    <Anchor side="Top" relative="$parent/Divider" pos="Max" offset="20"/>
+                    <Anchor side="Left" relative="$parent" pos="Min" offset="30"/>
+                    <Style val="@Campaign_PurchaseDialogItemHeader"/>
+                    <Text val="@UI/ProductPurchase/Item"/>
+                </Frame>
+
+                <Frame type="Label" name="QuantityHeaderLabel">
+                    <Anchor side="Top" relative="$parent/ProductHeaderLabel" pos="Min" offset="0"/>
+                    <Anchor side="Right" relative="$parent" pos="Max" offset="-25"/>
+                    <Style val="@Campaign_PurchaseDialogItemHeader"/>
+                    <Text val="@UI/ProductPurchase/Quantity"/>
+                </Frame>
+
+                <Frame type="ListBox" name="BundleProductListBox">
+                    <Anchor side="Top" relative="$parent/ProductHeaderLabel" pos="Max" offset="5"/>
+                    <Anchor side="Left" relative="$parent/ProductHeaderLabel" pos="Min" offset="0"/>
+                    <Anchor side="Right" relative="$parent/QuantityHeaderLabel" pos="Max" offset="10"/>
+                    <Anchor side="Bottom" relative="$parent" pos="Max" offset="-10"/>
+                    
+                    <ItemHeight val="40"/>
+                    <ItemDesc val="ProductPurchasePanel/ProductListBoxItemTemplate"/>
+                    <SelectedImage val="SelectedImage"/>
+                    <HoverImage val="HoverImage"/>
+                    <BackgroundImage val="BackgroundImage"/>
+                    <ScrollBar val="$root/StandardBattlenetTemplates/StandardBattlenetScrollBarTemplate"/>
+
+                    <Frame type="Image" name="SelectedImage">
+                        <Alpha val="0"/>
+                        <DescFlags val="Internal"/>
+                    </Frame>
+
+                    <Frame type="Image" name="HoverImage">
+                        <Alpha val="0"/>
+                        <DescFlags val="Internal"/>
+                    </Frame>
+
+                    <Frame type="Image" name="BackgroundImage">
+                        <Alpha val="0"/>
+                        <DescFlags val="Internal"/>
+                    </Frame>
+                </Frame>
+            </Frame>
             
             <Frame type="Image" name="TotalBackground">
-                <Anchor side="Top" relative="$parent" pos="Min" offset="223"/>
-                <Anchor side="Left" relative="$parent" pos="Min" offset="13"/>
-                <Anchor side="Right" relative="$parent" pos="Max" offset="-13"/>
+                <Anchor side="Top" relative="$parent/AnchorFrame" pos="Min" offset="223"/>
+                <Anchor side="Left" relative="$parent/AnchorFrame" pos="Min" offset="13"/>
+                <Anchor side="Right" relative="$parent/AnchorFrame" pos="Max" offset="-13"/>
                 <Height val="270"/>
                 <Color val="0, 94, 176"/>
                 <Alpha val="25"/>
@@ -289,11 +407,12 @@
             
             <Frame type="Label" name="TotalHeaderLabel">
                 <Anchor side="Top" relative="$parent/TotalBackground" pos="Min" offset="32"/>
-                <Anchor side="Left" relative="$parent" pos="Min" offset="66"/>
+                <Anchor side="Left" relative="$parent/AnchorFrame" pos="Min" offset="66"/>
                 <Width val="168"/>
                 <Style val="@Campaign_PurchaseDialogSubItemTitle"/>
                 <Text val="@UI/ProductPurchase/Total"/>
             </Frame>
+            
             <Frame type="Label" name="PaymentMethodHeaderLabel">
                 <Anchor side="Top" relative="$parent/TotalHeaderLabel" pos="Max" offset="45"/>
                 <Anchor side="Left" relative="$parent/TotalHeaderLabel" pos="Min" offset="0"/>
@@ -313,7 +432,7 @@
                 <Anchor side="Top" relative="$parent/PaymentMethodHeaderLabel" pos="Mid" offset="0"/>
                 <Anchor side="Bottom" relative="$parent/PaymentMethodHeaderLabel" pos="Mid" offset="0"/>
                 <Anchor side="Left" relative="$parent/PaymentMethodHeaderLabel" pos="Max" offset="0"/>
-                <Anchor side="Right" relative="$parent" pos="Max" offset="-50"/>
+                <Anchor side="Right" relative="$parent/AnchorFrame" pos="Max" offset="-50"/>
                 <Width val="0"/>
             </Frame>
             
@@ -338,7 +457,7 @@
                 <Anchor side="Top" relative="$parent/TotalPriceTooltip" pos="Mid" offset="1"/>
                 <Anchor side="Bottom" relative="$parent/TotalPriceTooltip" pos="Mid" offset="1"/>
                 <Anchor side="Left" relative="$parent/TotalPriceTooltip" pos="Max" offset="5"/>
-                <Anchor side="Right" relative="$parent" pos="Max" offset="-30"/>
+                <Anchor side="Right" relative="$parent/AnchorFrame" pos="Max" offset="-30"/>
                 <Style val="@Campaign_PurchaseDialogItemHeader"/>
                 <Text val="@UI/ProductPurchase/TaxesIncluded"/>
             </Frame>
@@ -374,7 +493,7 @@
             <Frame type="EditBox" name="InputEditBox" template="StandardBattlenetTemplates/BattlenetEditBoxTemplate">
                 <Anchor side="Top" relative="$parent/PaymentMethodPulldown" pos="Max" offset="40"/>
                 <Anchor side="Left" relative="$parent/InputLabel" pos="Max" offset="0"/>
-                <Anchor side="Right" relative="$parent" pos="Max" offset="-50"/>
+                <Anchor side="Right" relative="$parent/AnchorFrame" pos="Max" offset="-50"/>
                 <Width val="0"/>
                 <Height val="68"/>
                 <CollapseLayout val="true"/>
@@ -425,7 +544,7 @@
             </Frame>
 
             <Frame type="Frame" name="ProductRatingFrame">
-                <Anchor side="Bottom" relative="$parent" pos="Max" offset="-135"/>
+                <Anchor side="Bottom" relative="$parent/AnchorFrame" pos="Max" offset="-135"/>
                 <Anchor side="Right" relative="$parent/CancelButton" pos="Max" offset="0"/>
                 <Height val="118"/>
                 <Width val="0"/>
@@ -493,16 +612,15 @@
                 <Text val="@UI/ProductPurchase/BundleLegalText"/>
             </Frame>
 
-        
             <Frame type="Button" name="ConfirmButton" template="StandardBattlenetTemplates/BattlenetAlternateButtonTemplate">
-                <Anchor side="Bottom" relative="$parent" pos="Max" offset="-49"/>
-                <Anchor side="Left" relative="$parent" pos="Min" offset="60"/>
+                <Anchor side="Bottom" relative="$parent/AnchorFrame" pos="Max" offset="-49"/>
+                <Anchor side="Left" relative="$parent/AnchorFrame" pos="Min" offset="60"/>
                 <Text val="@UI/ProductPurchase/ConfirmButton"/>
             </Frame>
 
             <Frame type="Button" name="CancelButton" template="StandardBattlenetTemplates/BattlenetStandardButtonTemplate">
                 <Anchor side="Top" relative="$parent/ConfirmButton" pos="Min" offset="0"/>
-                <Anchor side="Right" relative="$parent" pos="Max" offset="-60"/>
+                <Anchor side="Right" relative="$parent/AnchorFrame" pos="Max" offset="-60"/>
                 <Text val="@UI/ProductPurchase/CancelButton"/>
                 <Shortcut val="@UI/ScreenNavigationBack_Hotkey"/>
                 <ClickSound val="@UI_ActionButtonSelect"/>
@@ -529,6 +647,19 @@
                     <Key type="Bool" time="0" value="false"/>
                 </Controller>
             </Animation>
+        
+            <StateGroup name="BundleFrameVisibility">
+                <DefaultState val="NotBundle"/>
+
+                <State name="Bundle">
+                    <When type="Property" frame="$parent/GameContentFrame" IsBundle="True"/>
+                    <Action type="SetProperty" frame="BundleFrame" visible="true"/>
+                </State>
+
+                <State name="NotBundle">
+                    <Action type="SetProperty" frame="BundleFrame" visible="false"/>
+                </State>
+            </StateGroup>
         </Frame>
 
         <Frame type="Frame" name="PurchasingPanel">

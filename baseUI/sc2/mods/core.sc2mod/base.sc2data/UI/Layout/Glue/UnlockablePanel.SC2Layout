@@ -488,26 +488,26 @@
             <UnlockableTag val="{$parent/@UnlockableTag}"/>
             <UnlockableIndex val="{$parent/@UnlockableIndex}"/>
         </Frame>
+
+        <Frame type="BlurFrame" name="BackgroundBlur">
+            <Anchor side="Top" relative="$parent/InfoBackground" pos="Min" offset="4"/>
+            <Anchor side="Left" relative="$parent/InfoBackground" pos="Min" offset="4"/>
+            <Anchor side="Bottom" relative="$parent/InfoBackground" pos="Max" offset="-4"/>
+            <Anchor side="Right" relative="$parent/InfoBackground" pos="Max" offset="-4"/>
+            <BlurAmount val=".35"/>
+        </Frame>
+
+        <Frame type="Image" name="InfoBackground">
+            <Anchor relative="$parent/InfoContainer"/>
+            <Texture val="@UI/SC2_UI_Battlenet_Glue_Arcade_MainContainer"/>
+            <TextureType val="NineSlice"/>
+        </Frame>
         
         <Frame type="Frame" name="InfoContainer">
             <Anchor side="Top" relative="$parent/UnlockableTileList" pos="Min" offset="-5"/>
             <Anchor side="Left" relative="$parent/UnlockableTileList" pos="Max" offset="12"/>
             <Width val="486"/>
             <Height val="681"/>
-            
-            <Frame type="BlurFrame" name="BackgroundBlur">
-                <Anchor side="Top" relative="$parent/Background" pos="Min" offset="4"/>
-                <Anchor side="Left" relative="$parent/Background" pos="Min" offset="4"/>
-                <Anchor side="Bottom" relative="$parent/Background" pos="Max" offset="-4"/>
-                <Anchor side="Right" relative="$parent/Background" pos="Max" offset="-4"/>
-                <BlurAmount val=".35"/>
-            </Frame>
-            
-            <Frame type="Image" name="Background">
-                <Anchor relative="$parent"/>
-                <Texture val="@UI/SC2_UI_Battlenet_Glue_Arcade_MainContainer"/>
-                <TextureType val="NineSlice"/>
-            </Frame>
             
             <Frame type="Label" name="UnlockableTypeLabel">
                 <Anchor side="Top" relative="$parent" pos="Min" offset="41"/>
@@ -532,20 +532,15 @@
                 <Anchor side="Left" relative="$parent/UnlockableNameLabel" pos="Min" offset="0"/>
                 <Anchor side="Right" relative="$parent/UnlockableNameLabel" pos="Max" offset="0"/>
                 <Style val="@Collection_ItemFrame_Desc"/>
-                <Text val="@UI/ScreenCollection/Unlockables/DefaultItem"/>
-                <Visible val="False"/>
+                <Text val="{$parent/$parent/RewardCacheFrame/@DescriptionText}"/>
+            </Frame>
 
-                <StateGroup name="ShowDefaultDescription">
-                    <State name="ActiveState">
-                        <When type="AnimationState" frame="$parent/AchievementInfoFrame" AchievementInfoFrame="Active"/>
-                        <Action type="SetProperty" frame="$this" Visible="false"/>
-                    </State>
-
-                    <State name="EmptyState">
-                        <When type="AnimationState" frame="$parent/AchievementInfoFrame" AchievementInfoFrame="Empty"/>
-                        <Action type="SetProperty" frame="$this" Visible="true"/>
-                    </State>
-                </StateGroup>
+            <Frame type="Label" name="UnlockableDescriptionLabelUnearned">
+                <Anchor side="Top" relative="$parent/UnlockableNameLabel" pos="Max" offset="30"/>
+                <Anchor side="Left" relative="$parent/UnlockableNameLabel" pos="Min" offset="0"/>
+                <Anchor side="Right" relative="$parent/UnlockableNameLabel" pos="Max" offset="0"/>
+                <Style val="@Collection_ItemFrame_Desc"/>
+                <Text val="{$parent/$parent/RewardCacheFrame/@DescriptionUnearnedText}"/>
             </Frame>
 
             <Frame type="Image" name="UnlockableImage">
@@ -565,19 +560,61 @@
                 <Anchor side="Right" relative="$parent" pos="Max" offset="-26"/>
                 <PresenceId val="{$parent/$parent/@PresenceId}"/>
                 <AchievementId val="{$parent/$parent/@AchievementId}"/>
-
-                <StateGroup name="AchievementInfoFrame">
-                    <State name="ActiveState">
-                        <When type="AnimationState" frame="$this" AchievementInfoFrame="Active"/>
-                        <Action type="SetProperty" frame="$this" Visible="true"/>
-                    </State>
-
-                    <State name="EmptyState">
-                        <When type="AnimationState" frame="$this" AchievementInfoFrame="Empty"/>
-                        <Action type="SetProperty" frame="$this" Visible="false"/>
-                    </State>
-                </StateGroup>
             </Frame>
+
+            <StateGroup name="SelectionEnabledStateGroup">
+                <DefaultState val="Default"/>
+
+                <State name="SelectionNoneState">
+                    <When type="AnimationState" frame="$parent" SelectionEnabledState="None"/>
+                    <Action type="SetProperty" Visible="false"/>
+                </State>
+
+                <State name="Default">
+                    <Action type="SetProperty" Visible="true"/>
+                </State>
+            </StateGroup>
+
+            <StateGroup name="InfoContainerState">
+
+                <State name="AchievementState">
+                    <When type="AnimationState" frame="AchievementInfoFrame" AchievementInfoFrame="Active"/>
+                    <When type="Property" frame="$parent/RewardCacheFrame" ParentBundle=""/>
+                    <When type="Property" frame="$parent/RewardCacheFrame" Prerequisite=""/>
+                    <Action type="SetProperty" frame="AchievementInfoFrame" Visible="true"/>
+                    <Action type="SetProperty" frame="UnlockableDescriptionLabel" Visible="false"/>
+                    <Action type="SetProperty" frame="UnlockableDescriptionLabelUnearned" Visible="false"/>
+                </State>
+                
+                <State name="NotEarned">
+                    <When type="AnimationState" frame="AchievementInfoFrame" AchievementInfoFrame="Active"/>
+                    <When type="Property" frame="AchievementInfoFrame" Awarded="false"/>
+                    <Action type="SetProperty" frame="AchievementInfoFrame" Visible="false"/>
+                    <Action type="SetProperty" frame="UnlockableDescriptionLabel" Visible="false"/>
+                    <Action type="SetProperty" frame="UnlockableDescriptionLabelUnearned" Visible="true"/>
+                </State>
+
+                <State name="Earned">
+                    <When type="AnimationState" frame="AchievementInfoFrame" AchievementInfoFrame="Active"/>
+                    <When type="Property" frame="AchievementInfoFrame" Awarded="true"/>
+                    <Action type="SetProperty" frame="AchievementInfoFrame" Visible="false"/>
+                    <Action type="SetProperty" frame="UnlockableDescriptionLabel" Visible="true"/>
+                    <Action type="SetProperty" frame="UnlockableDescriptionLabelUnearned" Visible="false"/>
+                </State>
+
+                <State name="DefaultState">
+                    <When type="AnimationState" frame="AchievementInfoFrame" AchievementInfoFrame="Empty"/>
+                    <Action type="SetProperty" frame="AchievementInfoFrame" Visible="false"/>
+                    <Action type="SetProperty" frame="UnlockableDescriptionLabel" Visible="true"/>
+                    <Action type="SetProperty" frame="UnlockableDescriptionLabelUnearned" Visible="false"/>
+                </State>
+
+                <State name="ErrorState">
+                    <Action type="SetProperty" frame="AchievementInfoFrame" Visible="false"/>
+                    <Action type="SetProperty" frame="UnlockableDescriptionLabel" Visible="false"/>
+                    <Action type="SetProperty" frame="UnlockableDescriptionLabelUnearned" Visible="false"/>
+                </State>
+            </StateGroup>
         </Frame>
     </Frame>
     
@@ -604,51 +641,147 @@
     </Frame>
 
     <Frame type="UnlockablePanel" name="UnlockableSelectionPanelTemplate" template="UnlockablePanel/UnlockablePanelTemplate">
-    
-        <Frame type="SelectUnlockableButton" name="SelectUnlockableButton" template="StandardBattlenetTemplates/BattlenetAlternateButtonTemplate">
+
+        <Frame type="BuyButton" name="BuyButton" template="CollectionTemplates/BuyButtonTemplate">
             <Anchor side="Bottom" relative="$Anchor_BottomActionButton" pos="Min" offset="0"/>
             <Anchor side="Left" relative="$Anchor_LeftStandard" pos="Max" offset="0"/>
+            <CollapseLayout val="true"/>
+            <GameContent val="{$parent/RewardCacheFrame/@Prerequisite}"/>
+            <AlwaysShow val="true"/>
+        </Frame>
+
+        <Frame type="SelectUnlockableButton" name="SelectUnlockableButton" template="StandardBattlenetTemplates/BattlenetAlternateButtonTemplate">
+            <Anchor side="Bottom" relative="$Anchor_BottomActionButton" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent/BuyButton" pos="Max" offset="0"/>
+            <CollapseLayout val="true"/>
             <UnlockableTag val="{$parent/@UnlockableTag}"/>
             <UnlockableIndex val="{$parent/@UnlockableIndex}"/>
             <PresenceId val="{$parent/@PresenceId}"/>
             <Text val="@UI/ScreenCollection/Buttons/Equip"/>
         </Frame>
-        
+
+        <Frame type="Button" name="ViewBundleButton" template="StandardBattlenetTemplates/BattlenetStandardButtonTemplate">
+            <Anchor side="Bottom" relative="$Anchor_BottomActionButton" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent/SelectUnlockableButton" pos="Max" offset="5"/>
+            <CollapseLayout val="true"/>
+            <Text val="@UI/ScreenCollection/Buttons/ViewBundle"/>
+
+            <StateGroup name="ViewBundleVisibilityStateGroup">
+                <DefaultState val="ViewBundleNotVisible"/>
+
+                <State name="CanEquip">
+                    <When type="AnimationState" frame="$parent" SelectionEnabledState="Enabled"/>
+                    <Action type="SetProperty" frame="$this" visible="False"/>
+                </State>
+
+                <State name="HasBundle">
+                    <When type="Property" frame="$parent/RewardCacheFrame" HasParentBundle="true"/>
+                    <Action type="SetProperty" frame="$this" visible="True"/>
+                </State>
+
+                <State name="ViewBundleNotVisible">
+                    <Action type="SetProperty" frame="$this" visible="False"/>
+                </State>
+            </StateGroup>
+
+            <Animation name="Event">
+                <Event event="OnClick" action="Reset,Play"/>
+
+                <Controller type="Property" frame="$parent/SelectedBundleFrame" property="Visible" end="Pause">
+                    <Key type="Property" time="0" value="false"/>
+                    <Key type="Property" time="0.01" value="true"/>
+                </Controller>
+            </Animation>
+        </Frame>
+
         <Frame type="Frame" name="EquippedWarningContainer" template="CollectionTemplates/EquippedWarningContainerTemplate">
             <Anchor side="Bottom" relative="$Anchor_BottomActionButton" pos="Min" offset="0"/>
-            <Anchor side="Left" relative="$parent/SelectUnlockableButton" pos="Max" offset="20"/>
-            
+            <Anchor side="Left" relative="$parent/ViewBundleButton" pos="Max" offset="20"/>
+
             <StateGroup name="EquippedStateGroup">
-            
+
                 <State name="EquippedState">
                     <When type="AnimationState" frame="$parent/RewardCacheFrame" SelectedState="Selected"/>
                     <Action type="SetProperty" frame="$this" visible="True"/>
                 </State>
-                
+
                 <State name="UnequippedState">
                     <When type="AnimationState" frame="$parent/RewardCacheFrame" SelectedState="NotSelected"/>
                     <Action type="SetProperty" frame="$this" visible="False"/>
                 </State>
             </StateGroup>
         </Frame>
-        
+
         <Frame type="Frame" name="AchievementLockedWarningContainer" template="CollectionTemplates/AchievementLockedWarningContainerTemplate">
             <Anchor side="Bottom" relative="$Anchor_BottomActionButton" pos="Min" offset="0"/>
-            <Anchor side="Left" relative="$parent/SelectUnlockableButton" pos="Max" offset="20"/>
-            
+            <Anchor side="Left" relative="$parent/ViewBundleButton" pos="Max" offset="20"/>
+
             <StateGroup name="AchievementLockedStateGroup">
                 <DefaultState val="NotAchievementLockedState"/>
-            
+
+                <State name="HasPortraitPack">
+                    <When type="Property" frame="$parent/RewardCacheFrame" HasPortraitPack="true"/>
+                    <Action type="SetProperty" frame="$this" visible="False"/>
+                </State>
+
+                <State name="HasDecalPack">
+                    <When type="Property" frame="$parent/RewardCacheFrame" HasDecalPack="true"/>
+                    <Action type="SetProperty" frame="$this" visible="False"/>
+                </State>
+
+                <State name="HasParentBundle">
+                    <When type="Property" frame="$parent/RewardCacheFrame" HasParentBundle="true"/>
+                    <Action type="SetProperty" frame="$this" visible="False"/>
+                </State>
+
                 <State name="AchievementLockedState">
                     <When type="AnimationState" frame="$parent/InfoContainer/AchievementInfoFrame" AchievementInfoFrame="Active"/>
                     <When type="Property" frame="$parent/InfoContainer/AchievementInfoFrame" Awarded="False"/>
                     <Action type="SetProperty" frame="$this" visible="True"/>
                 </State>
-                
+
                 <State name="NotAchievementLockedState">
                     <Action type="SetProperty" frame="$this" visible="False"/>
                 </State>
             </StateGroup>
+        </Frame>
+
+        <Frame type="SelectedBundleFrame" name="SelectedBundleFrame" template="SelectedBundleFrame/SelectedBundleFrameTemplate">
+            <Anchor side="Top" relative="$parent/$parent" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent/$parent" pos="Min" offset="0"/>
+            <Anchor side="Bottom" relative="$parent/$parent" pos="Max" offset="0"/>
+            <Anchor side="Right" relative="$parent/$parent" pos="Max" offset="0"/>
+            <Bundle val="{$parent/RewardCacheFrame/@ParentBundle}"/>
+            <RenderPriority val="600"/>
+
+            <Frame type="BuyButton" name="BuyButton" template="CollectionTemplates/BuyButtonTemplate">
+                <Anchor side="Bottom" relative="$parent/BackgroundImage" pos="Max" offset="-50"/>
+                <Anchor side="Right" relative="$parent/BackgroundImage" pos="Mid" offset="-3"/>
+                <ShowPrice val="true"/>
+                <AlwaysShow val="true"/>
+
+                <GameContent val="{$parent/$parent/RewardCacheFrame/@ParentBundleContent}"/>
+                <CollapseLayout val="false"/>
+            </Frame>
+
+            <Frame type="BundleCacheFrame" name="BundleCacheFrame">
+                <Anchor relative="$parent"/>
+                <Bundle val="{$parent/@Bundle}"/>
+            </Frame>
+
+            <Frame type="GameContentFrame" name="GameContentFrame">
+                <Anchor relative="$parent"/>
+                <GameContent val="{$parent/$parent/RewardCacheFrame/@ParentBundleContent}"/>
+            </Frame>
+
+            <Animation name="Event">
+                <Event event="OnClick" frame="$this/CloseButton" action="Reset,Play"/>
+
+                <Controller type="Property" property="Visible" end="Pause">
+                    <Key type="Property" time="0" value="true"/>
+                    <Key type="Property" time="0.01" value="false"/>
+                </Controller>
+            </Animation>
         </Frame>
 
         <StateGroup name="SelectionEnabledStateGroup">
@@ -656,18 +789,51 @@
                 <When type="AnimationState" frame="$this" SelectionEnabledState="Enabled"/>
                 <When type="AnimationState" frame="RewardCacheFrame" SelectedState="NotSelected"/>
                 <Action type="SetProperty" frame="SelectUnlockableButton" Enabled="true"/>
+                <Action type="SetProperty" frame="SelectUnlockableButton" Visible="true"/>
+                <Action type="SetProperty" frame="BuyButton" Visible="false"/>
+            </State>
+
+            <State name="HasPortraitPack">
+                <When type="Property" frame="$this/RewardCacheFrame" HasPortraitPack="true"/>
+                <Action type="SetProperty" frame="SelectUnlockableButton" Visible="false"/>
+                <Action type="SetProperty" frame="BuyButton" Visible="true"/>
+            </State>
+
+            <State name="HasDecalPack">
+                <When type="Property" frame="$this/RewardCacheFrame" HasDecalPack="true"/>
+                <Action type="SetProperty" frame="SelectUnlockableButton" Visible="false"/>
+                <Action type="SetProperty" frame="BuyButton" Visible="true"/>
             </State>
 
             <State name="SelectionDisabledState">
                 <When type="AnimationState" frame="$this" SelectionEnabledState="Disabled"/>
                 <Action type="SetProperty" frame="SelectUnlockableButton" Enabled="false"/>
+                <Action type="SetProperty" frame="SelectUnlockableButton" Visible="true"/>
+                <Action type="SetProperty" frame="BuyButton" Visible="false"/>
+            </State>
+
+            <State name="SelectionNoneState">
+                <When type="AnimationState" frame="$this" SelectionEnabledState="None"/>
+                <Action type="SetProperty" frame="SelectUnlockableButton" Enabled="false"/>
+                <Action type="SetProperty" frame="SelectUnlockableButton" Visible="true"/>
+                <Action type="SetProperty" frame="BuyButton" Visible="false"/>
             </State>
 
             <State name="SelectedState">
                 <When type="AnimationState" frame="RewardCacheFrame" SelectedState="Selected"/>
                 <Action type="SetProperty" frame="SelectUnlockableButton" Enabled="false"/>
+                <Action type="SetProperty" frame="SelectUnlockableButton" Visible="true"/>
+                <Action type="SetProperty" frame="BuyButton" Visible="false"/>
             </State>
         </StateGroup>
+
+        <Animation name="SelectedBundleFrameVisibility">
+            <Event event="OnHidden" action="Reset,Play"/>
+
+            <Controller type="Visibility" frame="SelectedBundleFrame" end="Pause">
+                <Key type="Bool" time="0" value="false"/>
+            </Controller>
+        </Animation>
     </Frame>
     
     <Frame type="CheckBox" name="PortraitInGameCheckboxTemplate">
