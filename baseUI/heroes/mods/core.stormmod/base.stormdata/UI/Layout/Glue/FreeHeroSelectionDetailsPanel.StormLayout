@@ -242,7 +242,6 @@
                 <Action type="SetProperty" frame="AcceptButton" visible="True"/>
                 <Action type="SetProperty" frame="DeclineButton" visible="True"/>
                 <Action type="SetProperty" frame="TryButton" visible="True"/>
-                <Action type="SetProperty" frame="ChooseLaterButton" visible="True"/>
             </State>
             <State name="HeroUnlocked">
                 <When type="Property" frame="HeroUnlockedFrame" visible="True"/>
@@ -256,7 +255,6 @@
                 <Action type="SetProperty" frame="AcceptButton" visible="False"/>
                 <Action type="SetProperty" frame="DeclineButton" visible="False"/>
                 <Action type="SetProperty" frame="TryButton" visible="False"/>
-                <Action type="SetProperty" frame="ChooseLaterButton" visible="False"/>
             </State>
         </StateGroup>
 
@@ -332,15 +330,15 @@
             <StateGroup name="AcceptMode">
                 <State name="Unlock">
                     <When type="Property" frame="$parent/$parent" OwnsHero="false"/>
+                    <When type="Property" frame="$parent/$parent" CanUnlockHeroes="true"/>
                 </State>
                 <State name="NoAction">
                     <When type="Property" frame="$parent/$parent" OwnsHero="true"/>
-                    <When type="Property" frame="$parent/$parent" GrantedGold="false"/>
+                    <When type="Property" frame="$parent/$parent" CanUnlockHeroes="true"/>
                     <Action type="SetProperty" enabled="false"/>
                     <Action type="SetProperty" tooltip="@UI/PurchasedIndicator/Hero"/>
                 </State>
                 <State name="NextTutorial">
-                    <When type="Property" frame="$parent/ChooseLaterButton" visible="false"/>
                     <When type="Property" frame="$parent/$parent" DismissToTutorial="true"/>
                     <Action type="SetProperty" text="@UI/NewUserPopup/NextTutorial"/>
                 </State>
@@ -445,9 +443,16 @@
             <StateGroup name="LaterButtonStates">
                 <DefaultState val="ButtonShown"/>
 
-                <State name="ButtonHidden">
+                <State name="OnlyOneChoice">
                     <When type="Property" frame="$parent/$parent" NumHeroes="1"/>
-
+                    <Action type="SetProperty" frame="$this" Visible="False"/>
+                </State>
+                <State name="NoChoices">
+                    <When type="Property" frame="$parent/$parent" CanUnlockHeroes="False"/>
+                    <Action type="SetProperty" frame="$this" Visible="False"/>
+                </State>
+                <State name="Unlocked">
+                    <When type="StateGroup" frame="$parent" VisibilityStates="HeroUnlocked"/>
                     <Action type="SetProperty" frame="$this" Visible="False"/>
                 </State>
                 <State name="ButtonShown">

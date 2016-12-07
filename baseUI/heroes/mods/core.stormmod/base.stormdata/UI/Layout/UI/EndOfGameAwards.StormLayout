@@ -15,7 +15,7 @@
     <Constant name="MVPStatGapX" val="22"/>
     <Constant name="MVPStatGapY" val="35"/>
     <Constant name="MVPStatLabelWidth" val="297"/><!-- set a little wide to prevent truncation in other languages -->
-    <Constant name="VoteButtonSize" val="72"/>
+    <Constant name="VoteButtonSize" val="96"/>
     <Constant name="MVPCountdownStart" val="10"/>
 
     <Frame type="Frame" name="BestInGameTemplate">
@@ -116,7 +116,7 @@
                 </State>
             </StateGroup>
         </Frame>
-            
+        
         <Frame type="Image" name="AwardIcon">
             <Anchor side="Top" relative="$parent" pos="11%" offset="5"/>
             <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
@@ -129,7 +129,6 @@
             <Unclipped val="True"/>
             
             <Texture val="@UI/Storm_UI_EOM_Icons_Rewards"/>
-            <!-- <TextureCoords top="0" left="0" bottom="0" right="0"/> -->
             
             <Animation name="Tier2LegendaryTransition">
                 <Event event="Tier2LegendaryTransition" frame="$this" action="Reset,Play"/>
@@ -600,6 +599,16 @@
             </StateGroup>
         </Frame>
         
+        <Frame type="Frame" name="AwardTooltipHitBox">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent/AwardIcon" pos="Max" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+            <Width val="200"/>
+            <AcceptsMouse val="true"/>
+            <TooltipAnchorPosition val="BottomCenter"/>
+        </Frame>
+        
         <Frame type="Label" name="PlayerNameLabel">
             <Anchor side="Top" relative="$parent" pos="70%" offset="-5"/>
             <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
@@ -1014,9 +1023,6 @@
             
             <Style val="MVP_Award_Value"/>
             <Text val=""/>
-            
-            <AcceptsMouseTooltip val="True"/>
-            <TooltipAnchorPosition val="BottomCenter"/>
         </Frame>
         
         <!-- sets the colors based on team- including fonts, textures
@@ -1094,6 +1100,10 @@
                 <Controller type="Cutscene" end="Stop">
                     <Key type="Cutscene" time="0.0" action="AddFilter" filter="Team0"/>
                 </Controller>
+                
+                <Controller type="State" stateGroup="ReadyForSync" end="Pause">
+                    <Key type="Identifier" time="0.01" value="Ready"/>
+                </Controller>
             </Animation>
             
             <Animation name="RedTeamEffectFilter">
@@ -1101,6 +1111,10 @@
                 
                 <Controller type="Cutscene" end="Stop">
                     <Key type="Cutscene" time="0.0" action="AddFilter" filter="Team1"/>
+                </Controller>
+                
+                <Controller type="State" stateGroup="ReadyForSync" end="Pause">
+                    <Key type="Identifier" time="0.01" value="Ready"/>
                 </Controller>
             </Animation>
             
@@ -1157,6 +1171,37 @@
                     <When type="AnimationState" TeamColor="Red"/>
                     <When type="StateGroup" frame="$this" SemaphorThing="Unlock"/>
                     <Action type="SendEvent" frame="$this" event="RedTeamEffectFilter"/>
+                </State>
+            </StateGroup>
+            
+            <StateGroup name="ReadyForSync">
+                <State name="Ready">
+                    <Action type="SendEvent" event="DummyEvent"/>
+                </State>
+            </StateGroup>
+            
+            <!-- state group waits for the cutscene to load if there is a need to update when secondaries are revealed (if votes have been cast due to earlier skip)-->
+            <StateGroup name="SkipStatusFlags">
+                <State name="Tier0">
+                    <When type="AnimationState" SkipStatusFlags="Tier0"/>
+                    <When type="StateGroup" frame="$this" ReadyForSync="Ready"/>
+                    <Action type="SendEvent" frame="$this" event="Tier0Sync"/>
+                </State>
+                
+                <State name="Tier1">
+                    <When type="AnimationState" SkipStatusFlags="Tier1"/>
+                    <When type="StateGroup" frame="$this" ReadyForSync="Ready"/>
+                    <Action type="SendEvent" frame="$this" event="Tier0Sync"/>
+                    <Action type="SendEvent" frame="$this" event="Tier1Sync"/>
+                    <Action type="SendEvent" frame="$this" event="Tier1EpicTransition"/>
+                </State>
+                
+                <State name="Tier2">
+                    <When type="AnimationState" SkipStatusFlags="Tier2"/>
+                    <When type="StateGroup" frame="$this" ReadyForSync="Ready"/>
+                    <Action type="SendEvent" frame="$this" event="Tier0Sync"/>
+                    <Action type="SendEvent" frame="$this" event="Tier2Sync"/>
+                    <Action type="SendEvent" frame="$this" event="Tier2LegendaryTransition"/>
                 </State>
             </StateGroup>
         </Frame>
@@ -1265,28 +1310,46 @@
             <TextureCoords top="-4.5" left="-16" right="16" bottom="9"/>
             <WrapUV val="True"/>
 
-            <Animation name="TileChange">
+            <Animation name="TileScroll">
                 <Event event="OnShown" action="Reset, Play"/>
+                <Event event="BGZoom" frame="$parent" action="Stop"/>
 
                 <Controller type="LayerUV" side="Left" relative="False" sidelock="False" end="Pause">
                     <Key type="Curve" time="0" value="-16"/>
                     <Key type="Curve" time="10.2" value="-16.5" out="Slow"/>
-                    <Key type="Curve" time="10.5" value="-24" in="Auto"/>
                 </Controller>
                 <Controller type="LayerUV" side="Right" relative="False" sidelock="False" end="Pause">
                     <Key type="Curve" time="0" value="16"/>
                     <Key type="Curve" time="10.2" value="16.5" out="Slow"/>
-                    <Key type="Curve" time="10.5" value="24" in="Auto"/>
                 </Controller>
                 <Controller type="LayerUV" side="Top" relative="False" sidelock="False" end="Pause">
                     <Key type="Curve" time="0" value="-4.5"/>
                     <Key type="Curve" time="10.2" value="-5" out="Slow"/>
-                    <Key type="Curve" time="10.5" value="-7" in="Auto"/>
                 </Controller>
                 <Controller type="LayerUV" side="Bottom" relative="False" sidelock="False" end="Pause">
                     <Key type="Curve" time="0" value="9"/>
                     <Key type="Curve" time="10.2" value="9.4" out="Slow"/>
-                    <Key type="Curve" time="10.5" value="12" in="Auto"/>
+                </Controller>
+            </Animation>
+            
+            <Animation name="TileZoomOut">
+                <Event event="BGZoom" frame="$parent" action="Play"/>
+
+                <Controller type="LayerUV" side="Left" relative="False" sidelock="False" end="Pause">
+                    <Key type="Curve" time="0" value="-16.5" out="Slow"/>
+                    <Key type="Curve" time="0.3" value="-24" in="Auto"/>
+                </Controller>
+                <Controller type="LayerUV" side="Right" relative="False" sidelock="False" end="Pause">
+                    <Key type="Curve" time="0" value="16.5" out="Slow"/>
+                    <Key type="Curve" time="0.3" value="24" in="Auto"/>
+                </Controller>
+                <Controller type="LayerUV" side="Top" relative="False" sidelock="False" end="Pause">
+                    <Key type="Curve" time="0" value="-5" out="Slow"/>
+                    <Key type="Curve" time="0.3" value="-7" in="Auto"/>
+                </Controller>
+                <Controller type="LayerUV" side="Bottom" relative="False" sidelock="False" end="Pause">
+                    <Key type="Curve" time="0" value="9.4" out="Slow"/>
+                    <Key type="Curve" time="0.3" value="12" in="Auto"/>
                 </Controller>
             </Animation>
         </Frame>
@@ -1314,37 +1377,59 @@
             <UseAlternateTime val="true"/>
             <BlendMode  layer="1" val="Add"/>
 
-            <Animation name="TileChange">
+            <Animation name="FullScroll">
                 <Event event="OnShown" action="Reset, Play"/>
-
+            
                 <!-- SCROLLING MASK -->
                 <Controller type="LayerUV" side="Top" relative="False" sidelock="True" end="Loop">
                     <Key type="Curve" time="0" value="-4" out="Smooth" InOut="Linear"/>
                     <Key type="Curve" time="70" value="0" out="Smooth" InOut="Linear"/>
                 </Controller>
+            </Animation>
+            
+            <Animation name="TileChange">
+                <Event event="OnShown" action="Reset, Play"/>
+                <Event event="BGZoom" frame="$parent" action="Stop"/>
 
                 <!-- GRID SCALE -->
                 <Controller type="LayerUV" layer="1" side="Left" relative="False" sidelock="False" end="Pause">
                     <Key type="Curve" time="0" value="-16"/>
                     <Key type="Curve" time="10.2" value="-16.5" out="Slow"/>
-                    <Key type="Curve" time="10.5" value="-24" in="Auto"/>
                 </Controller>
                 <Controller type="LayerUV" layer="1" side="Right" relative="False" sidelock="False" end="Pause">
                     <Key type="Curve" time="0" value="16"/>
                     <Key type="Curve" time="10.2" value="16.5" out="Slow"/>
-                    <Key type="Curve" time="10.5" value="24" in="Auto"/>
                 </Controller>
                 <Controller type="LayerUV" layer="1" side="Top" relative="False" sidelock="False" end="Pause">
                     <Key type="Curve" time="0" value="-4.5"/>
                     <Key type="Curve" time="10.2" value="-5" out="Slow"/>
-                    <Key type="Curve" time="10.5" value="-7" in="Auto"/>
                 </Controller>
                 <Controller type="LayerUV" layer="1" side="Bottom" relative="False" sidelock="False" end="Pause">
                     <Key type="Curve" time="0" value="9"/>
                     <Key type="Curve" time="10.2" value="9.4" out="Slow"/>
-                    <Key type="Curve" time="10.5" value="12" in="Auto"/>
                 </Controller>
-
+            </Animation>
+            
+            <Animation name="ScaleChange">
+                <Event event="BGZoom" frame="$parent" action="Play"/>
+                
+                <!-- GRID SCALE -->
+                <Controller type="LayerUV" layer="1" side="Left" relative="False" sidelock="False" end="Pause">
+                    <Key type="Curve" time="0" value="-16.5" out="Slow"/>
+                    <Key type="Curve" time="0.3" value="-24" in="Auto"/>
+                </Controller>
+                <Controller type="LayerUV" layer="1" side="Right" relative="False" sidelock="False" end="Pause">
+                    <Key type="Curve" time="0" value="16.5" out="Slow"/>
+                    <Key type="Curve" time="0.3" value="24" in="Auto"/>
+                </Controller>
+                <Controller type="LayerUV" layer="1" side="Top" relative="False" sidelock="False" end="Pause">
+                    <Key type="Curve" time="0" value="-5" out="Slow"/>
+                    <Key type="Curve" time="0.3" value="-7" in="Auto"/>
+                </Controller>
+                <Controller type="LayerUV" layer="1" side="Bottom" relative="False" sidelock="False" end="Pause">
+                    <Key type="Curve" time="0" value="9.4" out="Slow"/>
+                    <Key type="Curve" time="0.3" value="12" in="Auto"/>
+                </Controller>
             </Animation>
         </Frame>
 
@@ -1399,6 +1484,35 @@
                         <Action type="SendEvent" frame="$this" event="RedTeamEffectFilter"/>
                     </State>
                 </StateGroup>
+                
+                <!-- Animations for triggering events when skip votes need to be synced up -->
+                <Animation name="SlotSync">
+                    <Event event="Tier0Sync" frame="$this" action="Reset,Play"/>
+                    
+                    <Controller type="Event" end="Stop" frame="$parent/$parent/AwardWinnerContainerMVP/VoterButton">
+                        <Key type="Event" time="0" event="TurnOnVoteCounters"/>
+                    </Controller>
+                </Animation>
+                
+                <Animation name="SlotSyncEpic">
+                    <Event event="Tier1Sync" frame="$this" action="Reset,Play"/>
+                    
+                    <Controller type="Event" end="Stop" frame="$parent/$parent/AwardWinnerContainerMVP/VoterButton">
+                        <Key type="Event" time="0.01" event="Tier1EpicTransition"/>
+                    </Controller>
+                </Animation>
+                
+                <Animation name="SlotSyncLegendary">
+                    <Event event="Tier2Sync" frame="$this" action="Reset,Play"/>
+                    
+                    <Controller type="Event" end="Stop" frame="$parent/$parent/AwardWinnerContainerMVP/VoterButton">
+                        <Key type="Event" time="0" event="Tier2LegendaryTransition"/>
+                    </Controller>
+                    
+                    <Controller type="Event" end="Stop" frame="$parent/$parent/AwardWinnerContainerMVP/AwardIcon">
+                        <Key type="Event" time="0" event="Tier2LegendaryTransition"/>
+                    </Controller>
+                </Animation>
             </Frame>
             
             <Animation name="InitialPlacement">
@@ -1693,6 +1807,7 @@
             <!-- Animation for that overwatch-style text movement and appearance for all stats -->
             <Animation name="ScrollEffect">
                 <Event event="OnShown" action="Reset,Play" frame="$this"/>
+                <Event event="MVPSkipEvent" action="Pause" frame="$this"/>
                 
                 <!-- Section: MVP heading/name -->
                 <Controller type="Anchor" end="Pause" side="Left" relative="true" frame="MVPLabel">
@@ -1715,8 +1830,6 @@
                     <Key type="Curve" time="0.0" value="-300"/>
                     <Key type="Curve" time="1.0" value="-300" out="Fast"/>
                     <Key type="Curve" time="1.3" value="300" in="Slow"/>
-                    <!--<Key type="Curve" time="9.0" value="320" out="Slow"/>
-                    <Key type="Curve" time="9.3" value="900" in="Fast"/>-->
                 </Controller>
 
                 <Controller type="Fade" end="Pause" frame="SeparatorImage_Blue">
@@ -2022,6 +2135,15 @@
                     <Key type="Curve" time="9.5" value="0" in="Auto"/>
                 </Controller>
             </Animation>
+        
+            <Animation name="InterruptScrollEffect">
+                <Event event="MVPSkipEvent" action="Play" frame="$this"/>
+                
+                <Controller type="Fade" end="Pause">
+                    <Key type="Curve" time="0" value="255" out="Slow"/>
+                    <Key type="Curve" time="0.2" value="0" in="Slow"/>
+                </Controller>
+            </Animation>
         </Frame>
         
         <Frame type="Frame" name="AwardWinnerContainerMVP" template="EndOfGameAwards/SecondaryAwardBaseTemplate">
@@ -2198,22 +2320,22 @@
                 
                 <Controller type="Visibility" end="Pause" frame="AwardWinnerContainer1">
                     <Key type="Bool" time="0" value="False"/>
-                    <Key type="Bool" time="0.5" value="True"/>
+                    <Key type="Bool" time="0.905" value="True"/>
                 </Controller>
                 
                 <Controller type="Visibility" end="Pause" frame="AwardWinnerContainer2">
                     <Key type="Bool" time="0" value="False"/>
-                    <Key type="Bool" time="1" value="True"/>
+                    <Key type="Bool" time="1.405" value="True"/>
                 </Controller>
                 
                 <Controller type="Visibility" end="Pause" frame="AwardWinnerContainer3">
                     <Key type="Bool" time="0" value="False"/>
-                    <Key type="Bool" time="1.5" value="True"/>
+                    <Key type="Bool" time="1.905" value="True"/>
                 </Controller>
                 
                 <Controller type="Visibility" end="Pause" frame="AwardWinnerContainer4">
                     <Key type="Bool" time="0" value="False"/>
-                    <Key type="Bool" time="2" value="True"/>
+                    <Key type="Bool" time="2.405" value="True"/>
                 </Controller>
             </Animation>
         </Frame>
@@ -2221,19 +2343,7 @@
         <Frame type="Frame" name="SecondaryAwardCutscenes">
             <Anchor relative="$parent"/>
             <RenderPriority val="500"/>
-            <!-- TODO (heroes 21) All this can switch to property bind
-            <Visible val="{$parent/SecondaryAwardStats/@Visible}"/>-->
-            <Visible val="False"/>
-            <StateGroup name="TEMPshowhide">
-                <DefaultState val="hide"/>
-                <State name="hide">
-                    <Action type="SetProperty" frame="$this" visible="false"/>
-                </State>
-                <State name="show">
-                    <When type="Property" frame="$parent/SecondaryAwardStats" visible="true"/>
-                    <Action type="SetProperty" frame="$this" visible="true"/>
-                </State>
-            </StateGroup>
+            <Visible val="{$parent/SecondaryAwardStats/@Visible}"/>
             
             <!-- slot numbers: 3 1 mvp 2 4 
                 in a n awkward order to render over one another in the lineup -->
@@ -2245,9 +2355,9 @@
                 <Handle val="EndOfGame_CutsceneFrame_Slot3"/>
 
                 <Frame type="HeroCutsceneFrame" name="HeroCutscene">
-                    <!--<Visible val="{$parent/$parent/$parent/SecondaryAwardStats/AwardWinnerContainer3/@Visible}"/>-->
+                    <Visible val="{$parent/$parent/$parent/SecondaryAwardStats/AwardWinnerContainer3/@Visible}"/>
 					<Height val="1350"/>
-                    <Visible val="False"/>
+                    
                     <Animation name="SlotReveal">
                         <Event event="Tier0Filter" frame="$this" action="Reset,Play"/>
                         
@@ -2261,16 +2371,34 @@
                         </Controller>
                     </Animation>
                     
-                    <StateGroup name="TEMPshowhide">
-                        <DefaultState val="hide"/>
-                        <State name="hide">
-                            <Action type="SetProperty" frame="$this" visible="false"/>
-                        </State>
-                        <State name="show">
-                            <When type="Property" frame="$parent/$parent/$parent/SecondaryAwardStats/AwardWinnerContainer3" visible="true"/>
-                            <Action type="SetProperty" frame="$this" visible="true"/>
-                        </State>
-                    </StateGroup>
+                    <!-- Animations for triggering events when skip votes need to be synced up -->
+                    <Animation name="SlotSync">
+                        <Event event="Tier0Sync" frame="$this" action="Reset,Play"/>
+                        
+                        <Controller type="Event" end="Stop" frame="$parent/$parent/$parent/SecondaryAwardStats/AwardWinnerContainer3/VoterButton">
+                            <Key type="Event" time="0" event="TurnOnVoteCounters"/>
+                        </Controller>
+                    </Animation>
+                
+                    <Animation name="SlotSyncEpic">
+                        <Event event="Tier1Sync" frame="$this" action="Reset,Play"/>
+                        
+                        <Controller type="Event" end="Stop" frame="$parent/$parent/$parent/SecondaryAwardStats/AwardWinnerContainer3/VoterButton">
+                            <Key type="Event" time="0" event="Tier1EpicTransition"/>
+                        </Controller>
+                    </Animation>
+                    
+                    <Animation name="SlotSyncLegendary">
+                        <Event event="Tier2Sync" frame="$this" action="Reset,Play"/>
+                        
+                        <Controller type="Event" end="Stop" frame="$parent/$parent/$parent/SecondaryAwardStats/AwardWinnerContainer3/VoterButton">
+                            <Key type="Event" time="0" event="Tier2LegendaryTransition"/>
+                        </Controller>
+                        
+                        <Controller type="Event" end="Stop" frame="$parent/$parent/$parent/SecondaryAwardStats/AwardWinnerContainer3/AwardIcon">
+                            <Key type="Event" time="0" event="Tier2LegendaryTransition"/>
+                        </Controller>
+                    </Animation>
                 </Frame>
             </Frame>
             
@@ -2284,8 +2412,8 @@
                     <Anchor side="Left" relative="$parent" pos="Mid" offset="-794"/>
                     <Anchor side="Right" relative="$parent" pos="Mid" offset="855"/>
                 
-                    <!--<Visible val="{$parent/$parent/$parent/SecondaryAwardStats/AwardWinnerContainer1/@Visible}"/>-->
-                    <Visible val="False"/>
+                    <Visible val="{$parent/$parent/$parent/SecondaryAwardStats/AwardWinnerContainer1/@Visible}"/>
+                    
                     <Animation name="SlotReveal">
                         <Event event="Tier0Filter" frame="$this" action="Reset,Play"/>
                         
@@ -2299,16 +2427,34 @@
                         </Controller>
                     </Animation>
                     
-                    <StateGroup name="TEMPshowhide">
-                        <DefaultState val="hide"/>
-                        <State name="hide">
-                            <Action type="SetProperty" frame="$this" visible="false"/>
-                        </State>
-                        <State name="show">
-                            <When type="Property" frame="$parent/$parent/$parent/SecondaryAwardStats/AwardWinnerContainer1" visible="true"/>
-                            <Action type="SetProperty" frame="$this" visible="true"/>
-                        </State>
-                    </StateGroup>
+                    <!-- Animations for triggering events when skip votes need to be synced up -->
+                    <Animation name="SlotSync">
+                        <Event event="Tier0Sync" frame="$this" action="Reset,Play"/>
+                        
+                        <Controller type="Event" end="Stop" frame="$parent/$parent/$parent/SecondaryAwardStats/AwardWinnerContainer1/VoterButton">
+                            <Key type="Event" time="0" event="TurnOnVoteCounters"/>
+                        </Controller>
+                    </Animation>
+                
+                    <Animation name="SlotSyncEpic">
+                        <Event event="Tier1Sync" frame="$this" action="Reset,Play"/>
+                        
+                        <Controller type="Event" end="Stop" frame="$parent/$parent/$parent/SecondaryAwardStats/AwardWinnerContainer1/VoterButton">
+                            <Key type="Event" time="0" event="Tier1EpicTransition"/>
+                        </Controller>
+                    </Animation>
+                    
+                    <Animation name="SlotSyncLegendary">
+                        <Event event="Tier2Sync" frame="$this" action="Reset,Play"/>
+                        
+                        <Controller type="Event" end="Stop" frame="$parent/$parent/$parent/SecondaryAwardStats/AwardWinnerContainer1/VoterButton">
+                            <Key type="Event" time="0" event="Tier2LegendaryTransition"/>
+                        </Controller>
+                        
+                        <Controller type="Event" end="Stop" frame="$parent/$parent/$parent/SecondaryAwardStats/AwardWinnerContainer1/AwardIcon">
+                            <Key type="Event" time="0" event="Tier2LegendaryTransition"/>
+                        </Controller>
+                    </Animation>
                 </Frame>
             </Frame>
             
@@ -2318,10 +2464,10 @@
                 <Anchor side="Right" relative="$parent/$parent/SecondaryAwardStats/AwardWinnerContainer4" pos="Mid" offset="-96"/>
                 <Handle val="EndOfGame_CutsceneFrame_Slot4"/>
 
-                <Frame type="HeroCutsceneFrame" name="HeroCutscene"><!--
-                    <Visible val="{$parent/$parent/$parent/SecondaryAwardStats/AwardWinnerContainer4/@Visible}"/>-->
+                <Frame type="HeroCutsceneFrame" name="HeroCutscene">
+                    <Visible val="{$parent/$parent/$parent/SecondaryAwardStats/AwardWinnerContainer4/@Visible}"/>
 					<Height val="1350"/>
-                    <Visible val="False"/>
+                    
                     <Animation name="SlotReveal">
                         <Event event="Tier0Filter" frame="$this" action="Reset,Play"/>
                         
@@ -2335,16 +2481,34 @@
                         </Controller>
                     </Animation>
                     
-                    <StateGroup name="TEMPshowhide">
-                        <DefaultState val="hide"/>
-                        <State name="hide">
-                            <Action type="SetProperty" frame="$this" visible="false"/>
-                        </State>
-                        <State name="show">
-                            <When type="Property" frame="$parent/$parent/$parent/SecondaryAwardStats/AwardWinnerContainer4" visible="true"/>
-                            <Action type="SetProperty" frame="$this" visible="true"/>
-                        </State>
-                    </StateGroup>
+                    <!-- Animations for triggering events when skip votes need to be synced up -->
+                    <Animation name="SlotSync">
+                        <Event event="Tier0Sync" frame="$this" action="Reset,Play"/>
+                        
+                        <Controller type="Event" end="Stop" frame="$parent/$parent/$parent/SecondaryAwardStats/AwardWinnerContainer4/VoterButton">
+                            <Key type="Event" time="0" event="TurnOnVoteCounters"/>
+                        </Controller>
+                    </Animation>
+                
+                    <Animation name="SlotSyncEpic">
+                        <Event event="Tier1Sync" frame="$this" action="Reset,Play"/>
+                        
+                        <Controller type="Event" end="Stop" frame="$parent/$parent/$parent/SecondaryAwardStats/AwardWinnerContainer4/VoterButton">
+                            <Key type="Event" time="0" event="Tier1EpicTransition"/>
+                        </Controller>
+                    </Animation>
+                    
+                    <Animation name="SlotSyncLegendary">
+                        <Event event="Tier2Sync" frame="$this" action="Reset,Play"/>
+                        
+                        <Controller type="Event" end="Stop" frame="$parent/$parent/$parent/SecondaryAwardStats/AwardWinnerContainer4/VoterButton">
+                            <Key type="Event" time="0" event="Tier2LegendaryTransition"/>
+                        </Controller>
+                        
+                        <Controller type="Event" end="Stop" frame="$parent/$parent/$parent/SecondaryAwardStats/AwardWinnerContainer4/AwardIcon">
+                            <Key type="Event" time="0" event="Tier2LegendaryTransition"/>
+                        </Controller>
+                    </Animation>
                 </Frame>
             </Frame>
             
@@ -2358,8 +2522,8 @@
                     <Anchor side="Left" relative="$parent" pos="Mid" offset="794"/>
                     <Anchor side="Right" relative="$parent" pos="Mid" offset="-855"/>
                     
-                    <!--<Visible val="{$parent/$parent/$parent/SecondaryAwardStats/AwardWinnerContainer2/@Visible}"/>-->
-                    <Visible val="False"/>
+                    <Visible val="{$parent/$parent/$parent/SecondaryAwardStats/AwardWinnerContainer2/@Visible}"/>
+                    
                     <Animation name="SlotReveal">
                         <Event event="Tier0Filter" frame="$this" action="Reset,Play"/>
                         
@@ -2373,16 +2537,34 @@
                         </Controller>
                     </Animation>
                     
-                    <StateGroup name="TEMPshowhide">
-                        <DefaultState val="hide"/>
-                        <State name="hide">
-                            <Action type="SetProperty" frame="$this" visible="false"/>
-                        </State>
-                        <State name="show">
-                            <When type="Property" frame="$parent/$parent/$parent/SecondaryAwardStats/AwardWinnerContainer2" visible="true"/>
-                            <Action type="SetProperty" frame="$this" visible="true"/>
-                        </State>
-                    </StateGroup>
+                    <!-- Animations for triggering events when skip votes need to be synced up -->
+                    <Animation name="SlotSync">
+                        <Event event="Tier0Sync" frame="$this" action="Reset,Play"/>
+                        
+                        <Controller type="Event" end="Stop" frame="$parent/$parent/$parent/SecondaryAwardStats/AwardWinnerContainer2/VoterButton">
+                            <Key type="Event" time="0" event="TurnOnVoteCounters"/>
+                        </Controller>
+                    </Animation>
+                
+                    <Animation name="SlotSyncEpic">
+                        <Event event="Tier1Sync" frame="$this" action="Reset,Play"/>
+                        
+                        <Controller type="Event" end="Stop" frame="$parent/$parent/$parent/SecondaryAwardStats/AwardWinnerContainer2/VoterButton">
+                            <Key type="Event" time="0" event="Tier1EpicTransition"/>
+                        </Controller>
+                    </Animation>
+                    
+                    <Animation name="SlotSyncLegendary">
+                        <Event event="Tier2Sync" frame="$this" action="Reset,Play"/>
+                        
+                        <Controller type="Event" end="Stop" frame="$parent/$parent/$parent/SecondaryAwardStats/AwardWinnerContainer2/VoterButton">
+                            <Key type="Event" time="0" event="Tier2LegendaryTransition"/>
+                        </Controller>
+                        
+                        <Controller type="Event" end="Stop" frame="$parent/$parent/$parent/SecondaryAwardStats/AwardWinnerContainer2/AwardIcon">
+                            <Key type="Event" time="0" event="Tier2LegendaryTransition"/>
+                        </Controller>
+                    </Animation>
                 </Frame>
             </Frame>
         </Frame>
@@ -2419,11 +2601,11 @@
 			<Event event="FXTransition" action="Reset,Play"/>
 			
 			<Controller type="Cutscene" end="Stop" frame="SmokeVignetteCutscene">
-				<Key type="Cutscene" time="0.0" action="Bookmark" bookmark="Line Up Start"/>
+				<Key type="Cutscene" time="0" action="Bookmark" bookmark="Line Up Start"/>
 			</Controller>
 			
 			<Controller type="Cutscene" end="Stop" frame="ParticleBGCutscene">
-				<Key type="Cutscene" time="0.0" action="Bookmark" bookmark="Line Up Start"/>
+				<Key type="Cutscene" time="0" action="Bookmark" bookmark="Line Up Start"/>
 			</Controller>
 		</Animation>
         
@@ -2440,22 +2622,56 @@
             <Anchor side="Bottom" relative="$parent/TerminatingFrame" pos="Max" offset="0"/>
             <RenderPriority val="910"/>
             <VisibilityOnFade val="true"/>
-            <Visible val="true"/>
             <UseAlternateTime val="true"/>
 
             <Frame type="Label" name="Label">
                 <Text val="@UI/EndOfGameAwards/Leave"/>
             </Frame>
+            
+	        <Animation name="TimedEntrance">
+	            <Event event="Enter" frame="$parent" action="Restart,Play"/>
+    
+	            <Controller type="Anchor" frame="$this" end="Pause" side="Bottom" relative="true">
+	                <Key type="Curve" time="0" value="100"/>
+	                <Key type="Curve" time="1.8" value="100" out="Fast"/>
+	                <Key type="Curve" time="2.2" value="0" in="Slow"/>
+	            </Controller>
+	        </Animation>
 
-            <Animation name="TimedEntrance">
-                <Event event="OnShown" frame="$parent" action="Restart,Play"/>
+            <!-- can this flow be changed to wait a second? -->
+            <StateGroup name="DisableState">
+                <State name="Disabled">
+                    <When type="Property" frame="$parent/SecondaryAwardStats/AwardWinnerContainer4" visible="false"/>
+                    <Action type="SetProperty" AcceptsMouse="false"/>
+                    <Action type="SetProperty" alpha="0"/>
+                    <Action type="SendEvent" event="Enter" on="Exit"/>
+                </State>
+            </StateGroup>
+        </Frame>
 
-                <Controller type="Anchor" frame="$this" end="Pause" side="Bottom" relative="true">
-                    <Key type="Curve" time="0" value="100"/>
-                    <Key type="Curve" time="1.8" value="100" out="Fast"/>
-                    <Key type="Curve" time="2.2" value="0" in="Slow"/>
-                </Controller>
-            </Animation>
+        <Frame type="Button" name="SkipButton" template="StandardTemplates/StandardButtonSmallTemplate">
+            <Anchor relative="$parent/LeaveButton"/>
+            <RenderPriority val="920"/>
+            <UseAlternateTime val="true"/>
+            <AcceptsMouse val="true"/>
+            
+            <Frame type="Frame" name="HitTestFrame">
+                <Anchor relative="$parent"/>
+                <AcceptsMouse val="true"/>
+                <RenderPriority val="1000"/>
+            </Frame>
+
+            <Frame type="Label" name="Label">
+                <Text val="@UI/EndOfGameAwards/Skip"/>
+            </Frame>
+            
+            <StateGroup name="DisableState">
+                <State name="TimedOut">
+                    <When type="Property" frame="$parent/SecondaryAwardStats" visible="true"/>
+                    <Action type="SetProperty" AcceptsMouse="false"/>
+                    <Action type="SetProperty" visible="false"/>
+                </State>
+            </StateGroup>
         </Frame>
 
         <Frame type="Frame" name="TerminatingFrame">
@@ -2570,6 +2786,29 @@
             <Controller type="Visibility" end="Pause" frame="BackgroundImage">
                 <Key type="Bool" time="0" value="False"/>
                 <Key type="Bool" time="0" value="True"/>
+            </Controller>
+        </Animation>
+        
+        <!-- trigger all transition related animations off of one trigger event-->
+        <Animation name="WaitForTransitionSound">
+            <Event event="WaitForSound" frame="$this" action="Play"/>
+            
+            <Controller type="Event" end="Stop" frame="MVPCutsceneFrame/HeroCutscene">
+                <Key type="Event" time="0.405" event="Tier0Bookmark"/>
+            </Controller>
+            
+            <Controller type="Event" end="Stop" frame="$this">
+                <Key type="Event" time="0.405" event="FXTransition"/>
+                <Key type="Event" time="0.405" event="BGZoom"/>
+            </Controller>
+        </Animation>
+        
+        <!-- Send off the mvp skip event to whatever child frames need it -->
+        <Animation name="SkipMVPTriggered">
+            <Event event="SkipMVP" frame="MVPStats" action="Play"/>
+            
+            <Controller type="Event" end="Stop" frame="$parent">
+                <Key type="Event" time="0" event="MVPSkipEvent"/>
             </Controller>
         </Animation>
         
