@@ -382,6 +382,7 @@
 						</Frame>
 						
 					</Frame>
+					
 				</Frame>
 			</Frame>
 			
@@ -660,6 +661,28 @@
 				</Animation>
 			</Frame>
 			
+			<!-- Chromie Detector -->
+			<Frame type="UnitStatusValidatorAnimElement" name="ChromieDetector">
+				<Anchor relative="$parent"/>
+				<Validator val="CasterIsChromie"/>
+				
+				<Frame type="Frame" name="State">
+					<Anchor relative="$parent"/>
+					<Visible val="false"/>
+				</Frame>
+				
+				<Animation name="CasterIsChromie">
+					<Event event="Reset" action="Stop"/>
+					<Event event="NoState" action="Stop"/>
+					<Event event="CasterIsChromie" action="Restart, Play"/>
+
+					<Controller type="Visibility" end="Pause" frame="$this/State">
+						<Key type="Bool" time="0" value="False"/>
+						<Key type="Bool" time="0" value="True"/>
+					</Controller>
+				</Animation>
+			</Frame>
+			
 		</Frame>
 		
 		<Frame type="UnitTargetFrame" name="TargetHeroUnitFrame">
@@ -748,10 +771,14 @@
 	<Frame type="Frame" name="TalentUnlockStateTemplate">
 		<Anchor relative="$parent"/>
 		<Visible val="false"/>
-
-		<StateGroup name="VisibilityControl">
+		
+		<StateGroup name="VisibilityControl_Slot1">
 			<!--<DefaultState val="TierNotAvailable"/>-->
-
+			<State name="Chromie">
+				<When type="Property" frame="$GameUI/UIContainer/FullscreenUpperContainer/ObserverHeroOverviewPanel/Team1HeroOverview/HeroOverview1/HeroStatus/ChromieDetector/State" visible="true"/>
+				<Action type="SendEvent" frame="$this" event="NULL"/>
+			</State>
+			
 			<State name="TierHidden">
 				<When type="AnimationState" frame="$parent/$parent/$parent/TalentsOverview/TalentOverview/HeroLeaderPanelContainer/TabControl/PlayerFrame0/TalentsContainerFrame/SelectionUnitStatusPanel/UnitStatusFrame0/HeroSelectedTalentTreeFrame/TalentTreeIcon4" TalentTierState="TierHidden"/>
 				<Action type="SendEvent" frame="$this" event="Hide"/>
@@ -770,6 +797,44 @@
 			<State name="TierSelected">
 				<When type="AnimationState" frame="$parent/$parent/$parent/TalentsOverview/TalentOverview/HeroLeaderPanelContainer/TabControl/PlayerFrame0/TalentsContainerFrame/SelectionUnitStatusPanel/UnitStatusFrame0/HeroSelectedTalentTreeFrame/TalentTreeIcon4" TalentTierState="TierSelected"/>
 				<Action type="SendEvent" frame="$this" event="Show"/>
+			</State>
+
+		</StateGroup>
+		<StateGroup name="VisibilityControl_Slot2">
+			<DefaultState val="OtherSlotActive"/>
+			<!-- snippet, if there are more than 2 Chromies...
+			<State name="Chromie">
+				<When type="AnimationState" frame="$this" VisibilityControl_Slot1="Chromie"/>
+				<When type="Property" frame="$GameUI/UIContainer/FullscreenUpperContainer/ObserverHeroOverviewPanel/Team1HeroOverview/HeroOverview2/HeroStatus/ChromieDetector/State" visible="true"/>
+				<Action type="SendEvent" frame="$this" event="Hide"/>
+			</State> -->
+			
+			<State name="TierHidden">
+				<When type="Property" frame="$GameUI/UIContainer/FullscreenUpperContainer/ObserverHeroOverviewPanel/Team1HeroOverview/HeroOverview1/HeroStatus/ChromieDetector/State" visible="true"/>
+				<When type="AnimationState" frame="$parent/$parent/$parent/TalentsOverview/TalentOverview/HeroLeaderPanelContainer/TabControl/PlayerFrame0/TalentsContainerFrame/SelectionUnitStatusPanel/UnitStatusFrame0/HeroSelectedTalentTreeFrame/TalentTreeIcon4" TalentTierState="TierHidden"/>
+				<Action type="SendEvent" frame="$this" event="Hide"/>
+			</State>
+
+			<State name="TierNotAvailable">
+				<When type="Property" frame="$GameUI/UIContainer/FullscreenUpperContainer/ObserverHeroOverviewPanel/Team1HeroOverview/HeroOverview1/HeroStatus/ChromieDetector/State" visible="true"/>
+				<When type="AnimationState" frame="$parent/$parent/$parent/TalentsOverview/TalentOverview/HeroLeaderPanelContainer/TabControl/PlayerFrame0/TalentsContainerFrame/SelectionUnitStatusPanel/UnitStatusFrame0/HeroSelectedTalentTreeFrame/TalentTreeIcon4" TalentTierState="TierNotAvailable"/>
+				<Action type="SendEvent" frame="$this" event="Hide"/>
+			</State>
+
+			<State name="TierAvailable">
+				<When type="Property" frame="$GameUI/UIContainer/FullscreenUpperContainer/ObserverHeroOverviewPanel/Team1HeroOverview/HeroOverview1/HeroStatus/ChromieDetector/State" visible="true"/>
+				<When type="AnimationState" frame="$parent/$parent/$parent/TalentsOverview/TalentOverview/HeroLeaderPanelContainer/TabControl/PlayerFrame0/TalentsContainerFrame/SelectionUnitStatusPanel/UnitStatusFrame0/HeroSelectedTalentTreeFrame/TalentTreeIcon4" TalentTierState="TierAvailable"/>
+				<Action type="SendEvent" frame="$this" event="Show"/>
+			</State>
+
+			<State name="TierSelected">
+				<When type="Property" frame="$GameUI/UIContainer/FullscreenUpperContainer/ObserverHeroOverviewPanel/Team1HeroOverview/HeroOverview1/HeroStatus/ChromieDetector/State" visible="true"/>
+				<When type="AnimationState" frame="$parent/$parent/$parent/TalentsOverview/TalentOverview/HeroLeaderPanelContainer/TabControl/PlayerFrame0/TalentsContainerFrame/SelectionUnitStatusPanel/UnitStatusFrame0/HeroSelectedTalentTreeFrame/TalentTreeIcon4" TalentTierState="TierSelected"/>
+				<Action type="SendEvent" frame="$this" event="Show"/>
+			</State>
+			
+			<State name="OtherSlotActive">
+				<Action type="SendEvent" frame="$this" event="NULL"/>
 			</State>
 		</StateGroup>
 		
@@ -812,29 +877,14 @@
 			<RenderPriority val="512"/>
 			
 			<Frame type="Frame" name="HeroOverview1" template="_TopPanel/HeroOverviewTemplateL">
-				<!-- slot specific animtions -->
-				<Frame type="UnitStatusFrame" name="HeroStatus">
-				</Frame>
 			</Frame>
 			<Frame type="Frame" name="HeroOverview2" template="_TopPanel/HeroOverviewTemplateL">
-				<!-- slot specific animtions -->
-				<Frame type="UnitStatusFrame" name="HeroStatus">
-				</Frame>
 			</Frame>
 			<Frame type="Frame" name="HeroOverview3" template="_TopPanel/HeroOverviewTemplateL">
-				<!-- slot specific animtions -->
-				<Frame type="UnitStatusFrame" name="HeroStatus">
-				</Frame>
 			</Frame>
 			<Frame type="Frame" name="HeroOverview4" template="_TopPanel/HeroOverviewTemplateL">
-				<!-- slot specific animtions -->
-				<Frame type="UnitStatusFrame" name="HeroStatus">
-				</Frame>
 			</Frame>
 			<Frame type="Frame" name="HeroOverview5" template="_TopPanel/HeroOverviewTemplateL">
-				<!-- slot specific animtions -->
-				<Frame type="UnitStatusFrame" name="HeroStatus">
-				</Frame>
 			</Frame>
 			
 			<!-- towns blue -->
@@ -980,29 +1030,14 @@
 			<RenderPriority val="513"/>
 			
 			<Frame type="Frame" name="HeroOverview1" template="_TopPanel/HeroOverviewTemplateR">
-				<!-- slot specific animtions -->
-				<Frame type="UnitStatusFrame" name="HeroStatus">
-				</Frame>
 			</Frame>
 			<Frame type="Frame" name="HeroOverview2" template="_TopPanel/HeroOverviewTemplateR">
-				<!-- slot specific animtions -->
-				<Frame type="UnitStatusFrame" name="HeroStatus">
-				</Frame>
 			</Frame>
 			<Frame type="Frame" name="HeroOverview3" template="_TopPanel/HeroOverviewTemplateR">
-				<!-- slot specific animtions -->
-				<Frame type="UnitStatusFrame" name="HeroStatus">
-				</Frame>
 			</Frame>
 			<Frame type="Frame" name="HeroOverview4" template="_TopPanel/HeroOverviewTemplateR">
-				<!-- slot specific animtions -->
-				<Frame type="UnitStatusFrame" name="HeroStatus">
-				</Frame>
 			</Frame>
 			<Frame type="Frame" name="HeroOverview5" template="_TopPanel/HeroOverviewTemplateR">
-				<!-- slot specific animtions -->
-				<Frame type="UnitStatusFrame" name="HeroStatus">
-				</Frame>
 			</Frame>
 			
 			<!-- towns red -->
@@ -1195,7 +1230,10 @@
 				<Visible val="false"/>
 				
 				<Frame type="Frame" name="TalentUnlockT2Blue" template="_TopPanel/TalentUnlockStateTemplate">
-					<StateGroup name="VisibilityControl">
+					<StateGroup name="VisibilityControl_Slot1">
+						<State name="Chromie">
+							<When type="Property" frame="$GameUI/UIContainer/FullscreenUpperContainer/ObserverHeroOverviewPanel/Team1HeroOverview/HeroOverview1/HeroStatus/ChromieDetector/State" visible="true"/>
+						</State>
 						<State name="TierHidden">
 							<When type="AnimationState" frame="$parent/$parent/$parent/TalentsOverview/TalentOverview/HeroLeaderPanelContainer/TabControl/PlayerFrame0/TalentsContainerFrame/SelectionUnitStatusPanel/UnitStatusFrame0/HeroSelectedTalentTreeFrame/TalentTreeIcon2" TalentTierState="TierHidden"/>
 						</State>
@@ -1209,9 +1247,31 @@
 							<When type="AnimationState" frame="$parent/$parent/$parent/TalentsOverview/TalentOverview/HeroLeaderPanelContainer/TabControl/PlayerFrame0/TalentsContainerFrame/SelectionUnitStatusPanel/UnitStatusFrame0/HeroSelectedTalentTreeFrame/TalentTreeIcon2" TalentTierState="TierSelected"/>
 						</State>
 					</StateGroup>
+					<StateGroup name="VisibilityControl_Slot2">
+						<DefaultState val="OtherSlotActive"/>
+						<State name="TierHidden">
+				<When type="Property" frame="$GameUI/UIContainer/FullscreenUpperContainer/ObserverHeroOverviewPanel/Team1HeroOverview/HeroOverview1/HeroStatus/ChromieDetector/State" visible="true"/>
+							<When type="AnimationState" frame="$parent/$parent/$parent/TalentsOverview/TalentOverview/HeroLeaderPanelContainer/TabControl/PlayerFrame1/TalentsContainerFrame/SelectionUnitStatusPanel/UnitStatusFrame0/HeroSelectedTalentTreeFrame/TalentTreeIcon2" TalentTierState="TierHidden"/>
+						</State>
+						<State name="TierNotAvailable">
+				<When type="Property" frame="$GameUI/UIContainer/FullscreenUpperContainer/ObserverHeroOverviewPanel/Team1HeroOverview/HeroOverview1/HeroStatus/ChromieDetector/State" visible="true"/>
+							<When type="AnimationState" frame="$parent/$parent/$parent/TalentsOverview/TalentOverview/HeroLeaderPanelContainer/TabControl/PlayerFrame1/TalentsContainerFrame/SelectionUnitStatusPanel/UnitStatusFrame0/HeroSelectedTalentTreeFrame/TalentTreeIcon2" TalentTierState="TierNotAvailable"/>
+						</State>
+						<State name="TierAvailable">
+				<When type="Property" frame="$GameUI/UIContainer/FullscreenUpperContainer/ObserverHeroOverviewPanel/Team1HeroOverview/HeroOverview1/HeroStatus/ChromieDetector/State" visible="true"/>
+							<When type="AnimationState" frame="$parent/$parent/$parent/TalentsOverview/TalentOverview/HeroLeaderPanelContainer/TabControl/PlayerFrame1/TalentsContainerFrame/SelectionUnitStatusPanel/UnitStatusFrame0/HeroSelectedTalentTreeFrame/TalentTreeIcon2" TalentTierState="TierAvailable"/>
+						</State>
+						<State name="TierSelected">
+				<When type="Property" frame="$GameUI/UIContainer/FullscreenUpperContainer/ObserverHeroOverviewPanel/Team1HeroOverview/HeroOverview1/HeroStatus/ChromieDetector/State" visible="true"/>
+							<When type="AnimationState" frame="$parent/$parent/$parent/TalentsOverview/TalentOverview/HeroLeaderPanelContainer/TabControl/PlayerFrame1/TalentsContainerFrame/SelectionUnitStatusPanel/UnitStatusFrame0/HeroSelectedTalentTreeFrame/TalentTreeIcon2" TalentTierState="TierSelected"/>
+						</State>
+					</StateGroup>
 				</Frame>
 				<Frame type="Frame" name="TalentUnlockT3Blue" template="_TopPanel/TalentUnlockStateTemplate">
-					<StateGroup name="VisibilityControl">
+					<StateGroup name="VisibilityControl_Slot1">
+						<State name="Chromie">
+							<When type="Property" frame="$GameUI/UIContainer/FullscreenUpperContainer/ObserverHeroOverviewPanel/Team1HeroOverview/HeroOverview1/HeroStatus/ChromieDetector/State" visible="true"/>
+						</State>
 						<State name="TierHidden">
 							<When type="AnimationState" frame="$parent/$parent/$parent/TalentsOverview/TalentOverview/HeroLeaderPanelContainer/TabControl/PlayerFrame0/TalentsContainerFrame/SelectionUnitStatusPanel/UnitStatusFrame0/HeroSelectedTalentTreeFrame/TalentTreeIcon3" TalentTierState="TierHidden"/>
 						</State>
@@ -1225,9 +1285,31 @@
 							<When type="AnimationState" frame="$parent/$parent/$parent/TalentsOverview/TalentOverview/HeroLeaderPanelContainer/TabControl/PlayerFrame0/TalentsContainerFrame/SelectionUnitStatusPanel/UnitStatusFrame0/HeroSelectedTalentTreeFrame/TalentTreeIcon3" TalentTierState="TierSelected"/>
 						</State>
 					</StateGroup>
+					<StateGroup name="VisibilityControl_Slot2">
+						<DefaultState val="OtherSlotActive"/>
+						<State name="TierHidden">
+							<When type="Property" frame="$GameUI/UIContainer/FullscreenUpperContainer/ObserverHeroOverviewPanel/Team1HeroOverview/HeroOverview1/HeroStatus/ChromieDetector/State" visible="true"/>
+							<When type="AnimationState" frame="$parent/$parent/$parent/TalentsOverview/TalentOverview/HeroLeaderPanelContainer/TabControl/PlayerFrame1/TalentsContainerFrame/SelectionUnitStatusPanel/UnitStatusFrame0/HeroSelectedTalentTreeFrame/TalentTreeIcon3" TalentTierState="TierHidden"/>
+						</State>
+						<State name="TierNotAvailable">
+							<When type="Property" frame="$GameUI/UIContainer/FullscreenUpperContainer/ObserverHeroOverviewPanel/Team1HeroOverview/HeroOverview1/HeroStatus/ChromieDetector/State" visible="true"/>
+							<When type="AnimationState" frame="$parent/$parent/$parent/TalentsOverview/TalentOverview/HeroLeaderPanelContainer/TabControl/PlayerFrame1/TalentsContainerFrame/SelectionUnitStatusPanel/UnitStatusFrame0/HeroSelectedTalentTreeFrame/TalentTreeIcon3" TalentTierState="TierNotAvailable"/>
+						</State>
+						<State name="TierAvailable">
+							<When type="Property" frame="$GameUI/UIContainer/FullscreenUpperContainer/ObserverHeroOverviewPanel/Team1HeroOverview/HeroOverview1/HeroStatus/ChromieDetector/State" visible="true"/>
+							<When type="AnimationState" frame="$parent/$parent/$parent/TalentsOverview/TalentOverview/HeroLeaderPanelContainer/TabControl/PlayerFrame1/TalentsContainerFrame/SelectionUnitStatusPanel/UnitStatusFrame0/HeroSelectedTalentTreeFrame/TalentTreeIcon3" TalentTierState="TierAvailable"/>
+						</State>
+						<State name="TierSelected">
+							<When type="Property" frame="$GameUI/UIContainer/FullscreenUpperContainer/ObserverHeroOverviewPanel/Team1HeroOverview/HeroOverview1/HeroStatus/ChromieDetector/State" visible="true"/>
+							<When type="AnimationState" frame="$parent/$parent/$parent/TalentsOverview/TalentOverview/HeroLeaderPanelContainer/TabControl/PlayerFrame1/TalentsContainerFrame/SelectionUnitStatusPanel/UnitStatusFrame0/HeroSelectedTalentTreeFrame/TalentTreeIcon3" TalentTierState="TierSelected"/>
+						</State>
+					</StateGroup>
 				</Frame>
 				<Frame type="Frame" name="TalentUnlockT4Blue" template="_TopPanel/TalentUnlockStateTemplate">
-					<StateGroup name="VisibilityControl">
+					<StateGroup name="VisibilityControl_Slot1">
+						<State name="Chromie">
+							<When type="Property" frame="$GameUI/UIContainer/FullscreenUpperContainer/ObserverHeroOverviewPanel/Team1HeroOverview/HeroOverview1/HeroStatus/ChromieDetector/State" visible="true"/>
+						</State>
 						<State name="TierHidden">
 							<When type="AnimationState" frame="$parent/$parent/$parent/TalentsOverview/TalentOverview/HeroLeaderPanelContainer/TabControl/PlayerFrame0/TalentsContainerFrame/SelectionUnitStatusPanel/UnitStatusFrame0/HeroSelectedTalentTreeFrame/TalentTreeIcon4" TalentTierState="TierHidden"/>
 						</State>
@@ -1241,9 +1323,31 @@
 							<When type="AnimationState" frame="$parent/$parent/$parent/TalentsOverview/TalentOverview/HeroLeaderPanelContainer/TabControl/PlayerFrame0/TalentsContainerFrame/SelectionUnitStatusPanel/UnitStatusFrame0/HeroSelectedTalentTreeFrame/TalentTreeIcon4" TalentTierState="TierSelected"/>
 						</State>
 					</StateGroup>
+					<StateGroup name="VisibilityControl_Slot2">
+						<DefaultState val="OtherSlotActive"/>
+						<State name="TierHidden">
+							<When type="Property" frame="$GameUI/UIContainer/FullscreenUpperContainer/ObserverHeroOverviewPanel/Team1HeroOverview/HeroOverview1/HeroStatus/ChromieDetector/State" visible="true"/>
+							<When type="AnimationState" frame="$parent/$parent/$parent/TalentsOverview/TalentOverview/HeroLeaderPanelContainer/TabControl/PlayerFrame1/TalentsContainerFrame/SelectionUnitStatusPanel/UnitStatusFrame0/HeroSelectedTalentTreeFrame/TalentTreeIcon4" TalentTierState="TierHidden"/>
+						</State>
+						<State name="TierNotAvailable">
+							<When type="Property" frame="$GameUI/UIContainer/FullscreenUpperContainer/ObserverHeroOverviewPanel/Team1HeroOverview/HeroOverview1/HeroStatus/ChromieDetector/State" visible="true"/>
+							<When type="AnimationState" frame="$parent/$parent/$parent/TalentsOverview/TalentOverview/HeroLeaderPanelContainer/TabControl/PlayerFrame1/TalentsContainerFrame/SelectionUnitStatusPanel/UnitStatusFrame0/HeroSelectedTalentTreeFrame/TalentTreeIcon4" TalentTierState="TierNotAvailable"/>
+						</State>
+						<State name="TierAvailable">
+							<When type="Property" frame="$GameUI/UIContainer/FullscreenUpperContainer/ObserverHeroOverviewPanel/Team1HeroOverview/HeroOverview1/HeroStatus/ChromieDetector/State" visible="true"/>
+							<When type="AnimationState" frame="$parent/$parent/$parent/TalentsOverview/TalentOverview/HeroLeaderPanelContainer/TabControl/PlayerFrame1/TalentsContainerFrame/SelectionUnitStatusPanel/UnitStatusFrame0/HeroSelectedTalentTreeFrame/TalentTreeIcon4" TalentTierState="TierAvailable"/>
+						</State>
+						<State name="TierSelected">
+							<When type="Property" frame="$GameUI/UIContainer/FullscreenUpperContainer/ObserverHeroOverviewPanel/Team1HeroOverview/HeroOverview1/HeroStatus/ChromieDetector/State" visible="true"/>
+							<When type="AnimationState" frame="$parent/$parent/$parent/TalentsOverview/TalentOverview/HeroLeaderPanelContainer/TabControl/PlayerFrame1/TalentsContainerFrame/SelectionUnitStatusPanel/UnitStatusFrame0/HeroSelectedTalentTreeFrame/TalentTreeIcon4" TalentTierState="TierSelected"/>
+						</State>
+					</StateGroup>
 				</Frame>
 				<Frame type="Frame" name="TalentUnlockT5Blue" template="_TopPanel/TalentUnlockStateTemplate">
-					<StateGroup name="VisibilityControl">
+					<StateGroup name="VisibilityControl_Slot1">
+						<State name="Chromie">
+							<When type="Property" frame="$GameUI/UIContainer/FullscreenUpperContainer/ObserverHeroOverviewPanel/Team1HeroOverview/HeroOverview1/HeroStatus/ChromieDetector/State" visible="true"/>
+						</State>
 						<State name="TierHidden">
 							<When type="AnimationState" frame="$parent/$parent/$parent/TalentsOverview/TalentOverview/HeroLeaderPanelContainer/TabControl/PlayerFrame0/TalentsContainerFrame/SelectionUnitStatusPanel/UnitStatusFrame0/HeroSelectedTalentTreeFrame/TalentTreeIcon5" TalentTierState="TierHidden"/>
 						</State>
@@ -1257,9 +1361,31 @@
 							<When type="AnimationState" frame="$parent/$parent/$parent/TalentsOverview/TalentOverview/HeroLeaderPanelContainer/TabControl/PlayerFrame0/TalentsContainerFrame/SelectionUnitStatusPanel/UnitStatusFrame0/HeroSelectedTalentTreeFrame/TalentTreeIcon5" TalentTierState="TierSelected"/>
 						</State>
 					</StateGroup>
+					<StateGroup name="VisibilityControl_Slot2">
+						<DefaultState val="OtherSlotActive"/>
+						<State name="TierHidden">
+							<When type="Property" frame="$GameUI/UIContainer/FullscreenUpperContainer/ObserverHeroOverviewPanel/Team1HeroOverview/HeroOverview1/HeroStatus/ChromieDetector/State" visible="true"/>
+							<When type="AnimationState" frame="$parent/$parent/$parent/TalentsOverview/TalentOverview/HeroLeaderPanelContainer/TabControl/PlayerFrame1/TalentsContainerFrame/SelectionUnitStatusPanel/UnitStatusFrame0/HeroSelectedTalentTreeFrame/TalentTreeIcon5" TalentTierState="TierHidden"/>
+						</State>
+						<State name="TierNotAvailable">
+							<When type="Property" frame="$GameUI/UIContainer/FullscreenUpperContainer/ObserverHeroOverviewPanel/Team1HeroOverview/HeroOverview1/HeroStatus/ChromieDetector/State" visible="true"/>
+							<When type="AnimationState" frame="$parent/$parent/$parent/TalentsOverview/TalentOverview/HeroLeaderPanelContainer/TabControl/PlayerFrame1/TalentsContainerFrame/SelectionUnitStatusPanel/UnitStatusFrame0/HeroSelectedTalentTreeFrame/TalentTreeIcon5" TalentTierState="TierNotAvailable"/>
+						</State>
+						<State name="TierAvailable">
+							<When type="Property" frame="$GameUI/UIContainer/FullscreenUpperContainer/ObserverHeroOverviewPanel/Team1HeroOverview/HeroOverview1/HeroStatus/ChromieDetector/State" visible="true"/>
+							<When type="AnimationState" frame="$parent/$parent/$parent/TalentsOverview/TalentOverview/HeroLeaderPanelContainer/TabControl/PlayerFrame1/TalentsContainerFrame/SelectionUnitStatusPanel/UnitStatusFrame0/HeroSelectedTalentTreeFrame/TalentTreeIcon5" TalentTierState="TierAvailable"/>
+						</State>
+						<State name="TierSelected">
+							<When type="Property" frame="$GameUI/UIContainer/FullscreenUpperContainer/ObserverHeroOverviewPanel/Team1HeroOverview/HeroOverview1/HeroStatus/ChromieDetector/State" visible="true"/>
+							<When type="AnimationState" frame="$parent/$parent/$parent/TalentsOverview/TalentOverview/HeroLeaderPanelContainer/TabControl/PlayerFrame1/TalentsContainerFrame/SelectionUnitStatusPanel/UnitStatusFrame0/HeroSelectedTalentTreeFrame/TalentTreeIcon5" TalentTierState="TierSelected"/>
+						</State>
+					</StateGroup>
 				</Frame>
 				<Frame type="Frame" name="TalentUnlockT6Blue" template="_TopPanel/TalentUnlockStateTemplate">
-					<StateGroup name="VisibilityControl">
+					<StateGroup name="VisibilityControl_Slot1">
+						<State name="Chromie">
+							<When type="Property" frame="$GameUI/UIContainer/FullscreenUpperContainer/ObserverHeroOverviewPanel/Team1HeroOverview/HeroOverview1/HeroStatus/ChromieDetector/State" visible="true"/>
+						</State>
 						<State name="TierHidden">
 							<When type="AnimationState" frame="$parent/$parent/$parent/TalentsOverview/TalentOverview/HeroLeaderPanelContainer/TabControl/PlayerFrame0/TalentsContainerFrame/SelectionUnitStatusPanel/UnitStatusFrame0/HeroSelectedTalentTreeFrame/TalentTreeIcon6" TalentTierState="TierHidden"/>
 						</State>
@@ -1273,9 +1399,31 @@
 							<When type="AnimationState" frame="$parent/$parent/$parent/TalentsOverview/TalentOverview/HeroLeaderPanelContainer/TabControl/PlayerFrame0/TalentsContainerFrame/SelectionUnitStatusPanel/UnitStatusFrame0/HeroSelectedTalentTreeFrame/TalentTreeIcon6" TalentTierState="TierSelected"/>
 						</State>
 					</StateGroup>
+					<StateGroup name="VisibilityControl_Slot2">
+						<DefaultState val="OtherSlotActive"/>
+						<State name="TierHidden">
+							<When type="Property" frame="$GameUI/UIContainer/FullscreenUpperContainer/ObserverHeroOverviewPanel/Team1HeroOverview/HeroOverview1/HeroStatus/ChromieDetector/State" visible="true"/>
+							<When type="AnimationState" frame="$parent/$parent/$parent/TalentsOverview/TalentOverview/HeroLeaderPanelContainer/TabControl/PlayerFrame1/TalentsContainerFrame/SelectionUnitStatusPanel/UnitStatusFrame0/HeroSelectedTalentTreeFrame/TalentTreeIcon6" TalentTierState="TierHidden"/>
+						</State>
+						<State name="TierNotAvailable">
+							<When type="Property" frame="$GameUI/UIContainer/FullscreenUpperContainer/ObserverHeroOverviewPanel/Team1HeroOverview/HeroOverview1/HeroStatus/ChromieDetector/State" visible="true"/>
+							<When type="AnimationState" frame="$parent/$parent/$parent/TalentsOverview/TalentOverview/HeroLeaderPanelContainer/TabControl/PlayerFrame1/TalentsContainerFrame/SelectionUnitStatusPanel/UnitStatusFrame0/HeroSelectedTalentTreeFrame/TalentTreeIcon6" TalentTierState="TierNotAvailable"/>
+						</State>
+						<State name="TierAvailable">
+							<When type="Property" frame="$GameUI/UIContainer/FullscreenUpperContainer/ObserverHeroOverviewPanel/Team1HeroOverview/HeroOverview1/HeroStatus/ChromieDetector/State" visible="true"/>
+							<When type="AnimationState" frame="$parent/$parent/$parent/TalentsOverview/TalentOverview/HeroLeaderPanelContainer/TabControl/PlayerFrame1/TalentsContainerFrame/SelectionUnitStatusPanel/UnitStatusFrame0/HeroSelectedTalentTreeFrame/TalentTreeIcon6" TalentTierState="TierAvailable"/>
+						</State>
+						<State name="TierSelected">
+							<When type="Property" frame="$GameUI/UIContainer/FullscreenUpperContainer/ObserverHeroOverviewPanel/Team1HeroOverview/HeroOverview1/HeroStatus/ChromieDetector/State" visible="true"/>
+							<When type="AnimationState" frame="$parent/$parent/$parent/TalentsOverview/TalentOverview/HeroLeaderPanelContainer/TabControl/PlayerFrame1/TalentsContainerFrame/SelectionUnitStatusPanel/UnitStatusFrame0/HeroSelectedTalentTreeFrame/TalentTreeIcon6" TalentTierState="TierSelected"/>
+						</State>
+					</StateGroup>
 				</Frame>
 				<Frame type="Frame" name="TalentUnlockT7Blue" template="_TopPanel/TalentUnlockStateTemplate">
-					<StateGroup name="VisibilityControl">
+					<StateGroup name="VisibilityControl_Slot1">
+						<State name="Chromie">
+							<When type="Property" frame="$GameUI/UIContainer/FullscreenUpperContainer/ObserverHeroOverviewPanel/Team1HeroOverview/HeroOverview1/HeroStatus/ChromieDetector/State" visible="true"/>
+						</State>
 						<State name="TierHidden">
 							<When type="AnimationState" frame="$parent/$parent/$parent/TalentsOverview/TalentOverview/HeroLeaderPanelContainer/TabControl/PlayerFrame0/TalentsContainerFrame/SelectionUnitStatusPanel/UnitStatusFrame0/HeroSelectedTalentTreeFrame/TalentTreeIcon7" TalentTierState="TierHidden"/>
 						</State>
@@ -1289,11 +1437,33 @@
 							<When type="AnimationState" frame="$parent/$parent/$parent/TalentsOverview/TalentOverview/HeroLeaderPanelContainer/TabControl/PlayerFrame0/TalentsContainerFrame/SelectionUnitStatusPanel/UnitStatusFrame0/HeroSelectedTalentTreeFrame/TalentTreeIcon7" TalentTierState="TierSelected"/>
 						</State>
 					</StateGroup>
+					<StateGroup name="VisibilityControl_Slot2">
+						<DefaultState val="OtherSlotActive"/>
+						<State name="TierHidden">
+							<When type="Property" frame="$GameUI/UIContainer/FullscreenUpperContainer/ObserverHeroOverviewPanel/Team1HeroOverview/HeroOverview1/HeroStatus/ChromieDetector/State" visible="true"/>
+							<When type="AnimationState" frame="$parent/$parent/$parent/TalentsOverview/TalentOverview/HeroLeaderPanelContainer/TabControl/PlayerFrame1/TalentsContainerFrame/SelectionUnitStatusPanel/UnitStatusFrame0/HeroSelectedTalentTreeFrame/TalentTreeIcon7" TalentTierState="TierHidden"/>
+						</State>
+						<State name="TierNotAvailable">
+							<When type="Property" frame="$GameUI/UIContainer/FullscreenUpperContainer/ObserverHeroOverviewPanel/Team1HeroOverview/HeroOverview1/HeroStatus/ChromieDetector/State" visible="true"/>
+							<When type="AnimationState" frame="$parent/$parent/$parent/TalentsOverview/TalentOverview/HeroLeaderPanelContainer/TabControl/PlayerFrame1/TalentsContainerFrame/SelectionUnitStatusPanel/UnitStatusFrame0/HeroSelectedTalentTreeFrame/TalentTreeIcon7" TalentTierState="TierNotAvailable"/>
+						</State>
+						<State name="TierAvailable">
+							<When type="Property" frame="$GameUI/UIContainer/FullscreenUpperContainer/ObserverHeroOverviewPanel/Team1HeroOverview/HeroOverview1/HeroStatus/ChromieDetector/State" visible="true"/>
+							<When type="AnimationState" frame="$parent/$parent/$parent/TalentsOverview/TalentOverview/HeroLeaderPanelContainer/TabControl/PlayerFrame1/TalentsContainerFrame/SelectionUnitStatusPanel/UnitStatusFrame0/HeroSelectedTalentTreeFrame/TalentTreeIcon7" TalentTierState="TierAvailable"/>
+						</State>
+						<State name="TierSelected">
+							<When type="Property" frame="$GameUI/UIContainer/FullscreenUpperContainer/ObserverHeroOverviewPanel/Team1HeroOverview/HeroOverview1/HeroStatus/ChromieDetector/State" visible="true"/>
+							<When type="AnimationState" frame="$parent/$parent/$parent/TalentsOverview/TalentOverview/HeroLeaderPanelContainer/TabControl/PlayerFrame1/TalentsContainerFrame/SelectionUnitStatusPanel/UnitStatusFrame0/HeroSelectedTalentTreeFrame/TalentTreeIcon7" TalentTierState="TierSelected"/>
+						</State>
+					</StateGroup>
 				</Frame>
 				
 				
 				<Frame type="Frame" name="TalentUnlockT2Red" template="_TopPanel/TalentUnlockStateTemplate">
-					<StateGroup name="VisibilityControl">
+					<StateGroup name="VisibilityControl_Slot1">
+						<State name="Chromie">
+							<When type="Property" frame="$GameUI/UIContainer/FullscreenUpperContainer/ObserverHeroOverviewPanel/Team2HeroOverview/HeroOverview1/HeroStatus/ChromieDetector/State" visible="true"/>
+						</State>
 						<State name="TierHidden">
 							<When type="AnimationState" frame="$parent/$parent/$parent/TalentsOverview/TalentOverview/HeroLeaderPanelContainer/TabControl/PlayerFrame5/TalentsContainerFrame/SelectionUnitStatusPanel/UnitStatusFrame0/HeroSelectedTalentTreeFrame/TalentTreeIcon2" TalentTierState="TierHidden"/>
 						</State>
@@ -1307,9 +1477,31 @@
 							<When type="AnimationState" frame="$parent/$parent/$parent/TalentsOverview/TalentOverview/HeroLeaderPanelContainer/TabControl/PlayerFrame5/TalentsContainerFrame/SelectionUnitStatusPanel/UnitStatusFrame0/HeroSelectedTalentTreeFrame/TalentTreeIcon2" TalentTierState="TierSelected"/>
 						</State>
 					</StateGroup>
+					<StateGroup name="VisibilityControl_Slot2">
+						<DefaultState val="OtherSlotActive"/>
+						<State name="TierHidden">
+							<When type="Property" frame="$GameUI/UIContainer/FullscreenUpperContainer/ObserverHeroOverviewPanel/Team2HeroOverview/HeroOverview1/HeroStatus/ChromieDetector/State" visible="true"/>
+							<When type="AnimationState" frame="$parent/$parent/$parent/TalentsOverview/TalentOverview/HeroLeaderPanelContainer/TabControl/PlayerFrame6/TalentsContainerFrame/SelectionUnitStatusPanel/UnitStatusFrame0/HeroSelectedTalentTreeFrame/TalentTreeIcon2" TalentTierState="TierHidden"/>
+						</State>
+						<State name="TierNotAvailable">
+							<When type="Property" frame="$GameUI/UIContainer/FullscreenUpperContainer/ObserverHeroOverviewPanel/Team2HeroOverview/HeroOverview1/HeroStatus/ChromieDetector/State" visible="true"/>
+							<When type="AnimationState" frame="$parent/$parent/$parent/TalentsOverview/TalentOverview/HeroLeaderPanelContainer/TabControl/PlayerFrame6/TalentsContainerFrame/SelectionUnitStatusPanel/UnitStatusFrame0/HeroSelectedTalentTreeFrame/TalentTreeIcon2" TalentTierState="TierNotAvailable"/>
+						</State>
+						<State name="TierAvailable">
+							<When type="Property" frame="$GameUI/UIContainer/FullscreenUpperContainer/ObserverHeroOverviewPanel/Team2HeroOverview/HeroOverview1/HeroStatus/ChromieDetector/State" visible="true"/>
+							<When type="AnimationState" frame="$parent/$parent/$parent/TalentsOverview/TalentOverview/HeroLeaderPanelContainer/TabControl/PlayerFrame6/TalentsContainerFrame/SelectionUnitStatusPanel/UnitStatusFrame0/HeroSelectedTalentTreeFrame/TalentTreeIcon2" TalentTierState="TierAvailable"/>
+						</State>
+						<State name="TierSelected">
+							<When type="Property" frame="$GameUI/UIContainer/FullscreenUpperContainer/ObserverHeroOverviewPanel/Team2HeroOverview/HeroOverview1/HeroStatus/ChromieDetector/State" visible="true"/>
+							<When type="AnimationState" frame="$parent/$parent/$parent/TalentsOverview/TalentOverview/HeroLeaderPanelContainer/TabControl/PlayerFrame6/TalentsContainerFrame/SelectionUnitStatusPanel/UnitStatusFrame0/HeroSelectedTalentTreeFrame/TalentTreeIcon2" TalentTierState="TierSelected"/>
+						</State>
+					</StateGroup>
 				</Frame>
 				<Frame type="Frame" name="TalentUnlockT3Red" template="_TopPanel/TalentUnlockStateTemplate">
-					<StateGroup name="VisibilityControl">
+					<StateGroup name="VisibilityControl_Slot1">
+						<State name="Chromie">
+							<When type="Property" frame="$GameUI/UIContainer/FullscreenUpperContainer/ObserverHeroOverviewPanel/Team2HeroOverview/HeroOverview1/HeroStatus/ChromieDetector/State" visible="true"/>
+						</State>
 						<State name="TierHidden">
 							<When type="AnimationState" frame="$parent/$parent/$parent/TalentsOverview/TalentOverview/HeroLeaderPanelContainer/TabControl/PlayerFrame5/TalentsContainerFrame/SelectionUnitStatusPanel/UnitStatusFrame0/HeroSelectedTalentTreeFrame/TalentTreeIcon3" TalentTierState="TierHidden"/>
 						</State>
@@ -1323,9 +1515,31 @@
 							<When type="AnimationState" frame="$parent/$parent/$parent/TalentsOverview/TalentOverview/HeroLeaderPanelContainer/TabControl/PlayerFrame5/TalentsContainerFrame/SelectionUnitStatusPanel/UnitStatusFrame0/HeroSelectedTalentTreeFrame/TalentTreeIcon3" TalentTierState="TierSelected"/>
 						</State>
 					</StateGroup>
+					<StateGroup name="VisibilityControl_Slot2">
+						<DefaultState val="OtherSlotActive"/>
+						<State name="TierHidden">
+							<When type="Property" frame="$GameUI/UIContainer/FullscreenUpperContainer/ObserverHeroOverviewPanel/Team2HeroOverview/HeroOverview1/HeroStatus/ChromieDetector/State" visible="true"/>
+							<When type="AnimationState" frame="$parent/$parent/$parent/TalentsOverview/TalentOverview/HeroLeaderPanelContainer/TabControl/PlayerFrame6/TalentsContainerFrame/SelectionUnitStatusPanel/UnitStatusFrame0/HeroSelectedTalentTreeFrame/TalentTreeIcon3" TalentTierState="TierHidden"/>
+						</State>
+						<State name="TierNotAvailable">
+							<When type="Property" frame="$GameUI/UIContainer/FullscreenUpperContainer/ObserverHeroOverviewPanel/Team2HeroOverview/HeroOverview1/HeroStatus/ChromieDetector/State" visible="true"/>
+							<When type="AnimationState" frame="$parent/$parent/$parent/TalentsOverview/TalentOverview/HeroLeaderPanelContainer/TabControl/PlayerFrame6/TalentsContainerFrame/SelectionUnitStatusPanel/UnitStatusFrame0/HeroSelectedTalentTreeFrame/TalentTreeIcon3" TalentTierState="TierNotAvailable"/>
+						</State>
+						<State name="TierAvailable">
+							<When type="Property" frame="$GameUI/UIContainer/FullscreenUpperContainer/ObserverHeroOverviewPanel/Team2HeroOverview/HeroOverview1/HeroStatus/ChromieDetector/State" visible="true"/>
+							<When type="AnimationState" frame="$parent/$parent/$parent/TalentsOverview/TalentOverview/HeroLeaderPanelContainer/TabControl/PlayerFrame6/TalentsContainerFrame/SelectionUnitStatusPanel/UnitStatusFrame0/HeroSelectedTalentTreeFrame/TalentTreeIcon3" TalentTierState="TierAvailable"/>
+						</State>
+						<State name="TierSelected">
+							<When type="Property" frame="$GameUI/UIContainer/FullscreenUpperContainer/ObserverHeroOverviewPanel/Team2HeroOverview/HeroOverview1/HeroStatus/ChromieDetector/State" visible="true"/>
+							<When type="AnimationState" frame="$parent/$parent/$parent/TalentsOverview/TalentOverview/HeroLeaderPanelContainer/TabControl/PlayerFrame6/TalentsContainerFrame/SelectionUnitStatusPanel/UnitStatusFrame0/HeroSelectedTalentTreeFrame/TalentTreeIcon3" TalentTierState="TierSelected"/>
+						</State>
+					</StateGroup>
 				</Frame>
 				<Frame type="Frame" name="TalentUnlockT4Red" template="_TopPanel/TalentUnlockStateTemplate">
-					<StateGroup name="VisibilityControl">
+					<StateGroup name="VisibilityControl_Slot1">
+						<State name="Chromie">
+							<When type="Property" frame="$GameUI/UIContainer/FullscreenUpperContainer/ObserverHeroOverviewPanel/Team2HeroOverview/HeroOverview1/HeroStatus/ChromieDetector/State" visible="true"/>
+						</State>
 						<State name="TierHidden">
 							<When type="AnimationState" frame="$parent/$parent/$parent/TalentsOverview/TalentOverview/HeroLeaderPanelContainer/TabControl/PlayerFrame5/TalentsContainerFrame/SelectionUnitStatusPanel/UnitStatusFrame0/HeroSelectedTalentTreeFrame/TalentTreeIcon4" TalentTierState="TierHidden"/>
 						</State>
@@ -1339,9 +1553,31 @@
 							<When type="AnimationState" frame="$parent/$parent/$parent/TalentsOverview/TalentOverview/HeroLeaderPanelContainer/TabControl/PlayerFrame5/TalentsContainerFrame/SelectionUnitStatusPanel/UnitStatusFrame0/HeroSelectedTalentTreeFrame/TalentTreeIcon4" TalentTierState="TierSelected"/>
 						</State>
 					</StateGroup>
+					<StateGroup name="VisibilityControl_Slot2">
+						<DefaultState val="OtherSlotActive"/>
+						<State name="TierHidden">
+							<When type="Property" frame="$GameUI/UIContainer/FullscreenUpperContainer/ObserverHeroOverviewPanel/Team2HeroOverview/HeroOverview1/HeroStatus/ChromieDetector/State" visible="true"/>
+							<When type="AnimationState" frame="$parent/$parent/$parent/TalentsOverview/TalentOverview/HeroLeaderPanelContainer/TabControl/PlayerFrame6/TalentsContainerFrame/SelectionUnitStatusPanel/UnitStatusFrame0/HeroSelectedTalentTreeFrame/TalentTreeIcon4" TalentTierState="TierHidden"/>
+						</State>
+						<State name="TierNotAvailable">
+							<When type="Property" frame="$GameUI/UIContainer/FullscreenUpperContainer/ObserverHeroOverviewPanel/Team2HeroOverview/HeroOverview1/HeroStatus/ChromieDetector/State" visible="true"/>
+							<When type="AnimationState" frame="$parent/$parent/$parent/TalentsOverview/TalentOverview/HeroLeaderPanelContainer/TabControl/PlayerFrame6/TalentsContainerFrame/SelectionUnitStatusPanel/UnitStatusFrame0/HeroSelectedTalentTreeFrame/TalentTreeIcon4" TalentTierState="TierNotAvailable"/>
+						</State>
+						<State name="TierAvailable">
+							<When type="Property" frame="$GameUI/UIContainer/FullscreenUpperContainer/ObserverHeroOverviewPanel/Team2HeroOverview/HeroOverview1/HeroStatus/ChromieDetector/State" visible="true"/>
+							<When type="AnimationState" frame="$parent/$parent/$parent/TalentsOverview/TalentOverview/HeroLeaderPanelContainer/TabControl/PlayerFrame6/TalentsContainerFrame/SelectionUnitStatusPanel/UnitStatusFrame0/HeroSelectedTalentTreeFrame/TalentTreeIcon4" TalentTierState="TierAvailable"/>
+						</State>
+						<State name="TierSelected">
+							<When type="Property" frame="$GameUI/UIContainer/FullscreenUpperContainer/ObserverHeroOverviewPanel/Team2HeroOverview/HeroOverview1/HeroStatus/ChromieDetector/State" visible="true"/>
+							<When type="AnimationState" frame="$parent/$parent/$parent/TalentsOverview/TalentOverview/HeroLeaderPanelContainer/TabControl/PlayerFrame6/TalentsContainerFrame/SelectionUnitStatusPanel/UnitStatusFrame0/HeroSelectedTalentTreeFrame/TalentTreeIcon4" TalentTierState="TierSelected"/>
+						</State>
+					</StateGroup>
 				</Frame>
 				<Frame type="Frame" name="TalentUnlockT5Red" template="_TopPanel/TalentUnlockStateTemplate">
-					<StateGroup name="VisibilityControl">
+					<StateGroup name="VisibilityControl_Slot1">
+						<State name="Chromie">
+							<When type="Property" frame="$GameUI/UIContainer/FullscreenUpperContainer/ObserverHeroOverviewPanel/Team2HeroOverview/HeroOverview1/HeroStatus/ChromieDetector/State" visible="true"/>
+						</State>
 						<State name="TierHidden">
 							<When type="AnimationState" frame="$parent/$parent/$parent/TalentsOverview/TalentOverview/HeroLeaderPanelContainer/TabControl/PlayerFrame5/TalentsContainerFrame/SelectionUnitStatusPanel/UnitStatusFrame0/HeroSelectedTalentTreeFrame/TalentTreeIcon5" TalentTierState="TierHidden"/>
 						</State>
@@ -1355,9 +1591,31 @@
 							<When type="AnimationState" frame="$parent/$parent/$parent/TalentsOverview/TalentOverview/HeroLeaderPanelContainer/TabControl/PlayerFrame5/TalentsContainerFrame/SelectionUnitStatusPanel/UnitStatusFrame0/HeroSelectedTalentTreeFrame/TalentTreeIcon5" TalentTierState="TierSelected"/>
 						</State>
 					</StateGroup>
+					<StateGroup name="VisibilityControl_Slot2">
+						<DefaultState val="OtherSlotActive"/>
+						<State name="TierHidden">
+							<When type="Property" frame="$GameUI/UIContainer/FullscreenUpperContainer/ObserverHeroOverviewPanel/Team2HeroOverview/HeroOverview1/HeroStatus/ChromieDetector/State" visible="true"/>
+							<When type="AnimationState" frame="$parent/$parent/$parent/TalentsOverview/TalentOverview/HeroLeaderPanelContainer/TabControl/PlayerFrame6/TalentsContainerFrame/SelectionUnitStatusPanel/UnitStatusFrame0/HeroSelectedTalentTreeFrame/TalentTreeIcon5" TalentTierState="TierHidden"/>
+						</State>
+						<State name="TierNotAvailable">
+							<When type="Property" frame="$GameUI/UIContainer/FullscreenUpperContainer/ObserverHeroOverviewPanel/Team2HeroOverview/HeroOverview1/HeroStatus/ChromieDetector/State" visible="true"/>
+							<When type="AnimationState" frame="$parent/$parent/$parent/TalentsOverview/TalentOverview/HeroLeaderPanelContainer/TabControl/PlayerFrame6/TalentsContainerFrame/SelectionUnitStatusPanel/UnitStatusFrame0/HeroSelectedTalentTreeFrame/TalentTreeIcon5" TalentTierState="TierNotAvailable"/>
+						</State>
+						<State name="TierAvailable">
+							<When type="Property" frame="$GameUI/UIContainer/FullscreenUpperContainer/ObserverHeroOverviewPanel/Team2HeroOverview/HeroOverview1/HeroStatus/ChromieDetector/State" visible="true"/>
+							<When type="AnimationState" frame="$parent/$parent/$parent/TalentsOverview/TalentOverview/HeroLeaderPanelContainer/TabControl/PlayerFrame6/TalentsContainerFrame/SelectionUnitStatusPanel/UnitStatusFrame0/HeroSelectedTalentTreeFrame/TalentTreeIcon5" TalentTierState="TierAvailable"/>
+						</State>
+						<State name="TierSelected">
+							<When type="Property" frame="$GameUI/UIContainer/FullscreenUpperContainer/ObserverHeroOverviewPanel/Team2HeroOverview/HeroOverview1/HeroStatus/ChromieDetector/State" visible="true"/>
+							<When type="AnimationState" frame="$parent/$parent/$parent/TalentsOverview/TalentOverview/HeroLeaderPanelContainer/TabControl/PlayerFrame6/TalentsContainerFrame/SelectionUnitStatusPanel/UnitStatusFrame0/HeroSelectedTalentTreeFrame/TalentTreeIcon5" TalentTierState="TierSelected"/>
+						</State>
+					</StateGroup>
 				</Frame>
 				<Frame type="Frame" name="TalentUnlockT6Red" template="_TopPanel/TalentUnlockStateTemplate">
-					<StateGroup name="VisibilityControl">
+					<StateGroup name="VisibilityControl_Slot1">
+						<State name="Chromie">
+							<When type="Property" frame="$GameUI/UIContainer/FullscreenUpperContainer/ObserverHeroOverviewPanel/Team2HeroOverview/HeroOverview1/HeroStatus/ChromieDetector/State" visible="true"/>
+						</State>
 						<State name="TierHidden">
 							<When type="AnimationState" frame="$parent/$parent/$parent/TalentsOverview/TalentOverview/HeroLeaderPanelContainer/TabControl/PlayerFrame5/TalentsContainerFrame/SelectionUnitStatusPanel/UnitStatusFrame0/HeroSelectedTalentTreeFrame/TalentTreeIcon6" TalentTierState="TierHidden"/>
 						</State>
@@ -1371,9 +1629,31 @@
 							<When type="AnimationState" frame="$parent/$parent/$parent/TalentsOverview/TalentOverview/HeroLeaderPanelContainer/TabControl/PlayerFrame5/TalentsContainerFrame/SelectionUnitStatusPanel/UnitStatusFrame0/HeroSelectedTalentTreeFrame/TalentTreeIcon6" TalentTierState="TierSelected"/>
 						</State>
 					</StateGroup>
+					<StateGroup name="VisibilityControl_Slot2">
+						<DefaultState val="OtherSlotActive"/>
+						<State name="TierHidden">
+							<When type="Property" frame="$GameUI/UIContainer/FullscreenUpperContainer/ObserverHeroOverviewPanel/Team2HeroOverview/HeroOverview1/HeroStatus/ChromieDetector/State" visible="true"/>
+							<When type="AnimationState" frame="$parent/$parent/$parent/TalentsOverview/TalentOverview/HeroLeaderPanelContainer/TabControl/PlayerFrame6/TalentsContainerFrame/SelectionUnitStatusPanel/UnitStatusFrame0/HeroSelectedTalentTreeFrame/TalentTreeIcon6" TalentTierState="TierHidden"/>
+						</State>
+						<State name="TierNotAvailable">
+							<When type="Property" frame="$GameUI/UIContainer/FullscreenUpperContainer/ObserverHeroOverviewPanel/Team2HeroOverview/HeroOverview1/HeroStatus/ChromieDetector/State" visible="true"/>
+							<When type="AnimationState" frame="$parent/$parent/$parent/TalentsOverview/TalentOverview/HeroLeaderPanelContainer/TabControl/PlayerFrame6/TalentsContainerFrame/SelectionUnitStatusPanel/UnitStatusFrame0/HeroSelectedTalentTreeFrame/TalentTreeIcon6" TalentTierState="TierNotAvailable"/>
+						</State>
+						<State name="TierAvailable">
+							<When type="Property" frame="$GameUI/UIContainer/FullscreenUpperContainer/ObserverHeroOverviewPanel/Team2HeroOverview/HeroOverview1/HeroStatus/ChromieDetector/State" visible="true"/>
+							<When type="AnimationState" frame="$parent/$parent/$parent/TalentsOverview/TalentOverview/HeroLeaderPanelContainer/TabControl/PlayerFrame6/TalentsContainerFrame/SelectionUnitStatusPanel/UnitStatusFrame0/HeroSelectedTalentTreeFrame/TalentTreeIcon6" TalentTierState="TierAvailable"/>
+						</State>
+						<State name="TierSelected">
+							<When type="Property" frame="$GameUI/UIContainer/FullscreenUpperContainer/ObserverHeroOverviewPanel/Team2HeroOverview/HeroOverview1/HeroStatus/ChromieDetector/State" visible="true"/>
+							<When type="AnimationState" frame="$parent/$parent/$parent/TalentsOverview/TalentOverview/HeroLeaderPanelContainer/TabControl/PlayerFrame6/TalentsContainerFrame/SelectionUnitStatusPanel/UnitStatusFrame0/HeroSelectedTalentTreeFrame/TalentTreeIcon6" TalentTierState="TierSelected"/>
+						</State>
+					</StateGroup>
 				</Frame>
 				<Frame type="Frame" name="TalentUnlockT7Red" template="_TopPanel/TalentUnlockStateTemplate">
-					<StateGroup name="VisibilityControl">
+					<StateGroup name="VisibilityControl_Slot1">
+						<State name="Chromie">
+							<When type="Property" frame="$GameUI/UIContainer/FullscreenUpperContainer/ObserverHeroOverviewPanel/Team2HeroOverview/HeroOverview1/HeroStatus/ChromieDetector/State" visible="true"/>
+						</State>
 						<State name="TierHidden">
 							<When type="AnimationState" frame="$parent/$parent/$parent/TalentsOverview/TalentOverview/HeroLeaderPanelContainer/TabControl/PlayerFrame5/TalentsContainerFrame/SelectionUnitStatusPanel/UnitStatusFrame0/HeroSelectedTalentTreeFrame/TalentTreeIcon7" TalentTierState="TierHidden"/>
 						</State>
@@ -1385,6 +1665,25 @@
 						</State>
 						<State name="TierSelected">
 							<When type="AnimationState" frame="$parent/$parent/$parent/TalentsOverview/TalentOverview/HeroLeaderPanelContainer/TabControl/PlayerFrame5/TalentsContainerFrame/SelectionUnitStatusPanel/UnitStatusFrame0/HeroSelectedTalentTreeFrame/TalentTreeIcon7" TalentTierState="TierSelected"/>
+						</State>
+					</StateGroup>
+					<StateGroup name="VisibilityControl_Slot2">
+						<DefaultState val="OtherSlotActive"/>
+						<State name="TierHidden">
+							<When type="Property" frame="$GameUI/UIContainer/FullscreenUpperContainer/ObserverHeroOverviewPanel/Team2HeroOverview/HeroOverview1/HeroStatus/ChromieDetector/State" visible="true"/>
+							<When type="AnimationState" frame="$parent/$parent/$parent/TalentsOverview/TalentOverview/HeroLeaderPanelContainer/TabControl/PlayerFrame6/TalentsContainerFrame/SelectionUnitStatusPanel/UnitStatusFrame0/HeroSelectedTalentTreeFrame/TalentTreeIcon7" TalentTierState="TierHidden"/>
+						</State>
+						<State name="TierNotAvailable">
+							<When type="Property" frame="$GameUI/UIContainer/FullscreenUpperContainer/ObserverHeroOverviewPanel/Team2HeroOverview/HeroOverview1/HeroStatus/ChromieDetector/State" visible="true"/>
+							<When type="AnimationState" frame="$parent/$parent/$parent/TalentsOverview/TalentOverview/HeroLeaderPanelContainer/TabControl/PlayerFrame6/TalentsContainerFrame/SelectionUnitStatusPanel/UnitStatusFrame0/HeroSelectedTalentTreeFrame/TalentTreeIcon7" TalentTierState="TierNotAvailable"/>
+						</State>
+						<State name="TierAvailable">
+							<When type="Property" frame="$GameUI/UIContainer/FullscreenUpperContainer/ObserverHeroOverviewPanel/Team2HeroOverview/HeroOverview1/HeroStatus/ChromieDetector/State" visible="true"/>
+							<When type="AnimationState" frame="$parent/$parent/$parent/TalentsOverview/TalentOverview/HeroLeaderPanelContainer/TabControl/PlayerFrame6/TalentsContainerFrame/SelectionUnitStatusPanel/UnitStatusFrame0/HeroSelectedTalentTreeFrame/TalentTreeIcon7" TalentTierState="TierAvailable"/>
+						</State>
+						<State name="TierSelected">
+							<When type="Property" frame="$GameUI/UIContainer/FullscreenUpperContainer/ObserverHeroOverviewPanel/Team2HeroOverview/HeroOverview1/HeroStatus/ChromieDetector/State" visible="true"/>
+							<When type="AnimationState" frame="$parent/$parent/$parent/TalentsOverview/TalentOverview/HeroLeaderPanelContainer/TabControl/PlayerFrame6/TalentsContainerFrame/SelectionUnitStatusPanel/UnitStatusFrame0/HeroSelectedTalentTreeFrame/TalentTreeIcon7" TalentTierState="TierSelected"/>
 						</State>
 					</StateGroup>
 				</Frame>
