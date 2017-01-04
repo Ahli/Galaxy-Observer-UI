@@ -430,15 +430,23 @@
                 <When type="AnimationState" DraftState="CountdownBegin"/>
 
                 <Action type="SendEvent" event="Hide" frame="VersusPanel"/>
-                <Action type="SendEvent" event="Hide" frame="ConfirmButton"/>
-                <Action type="SendEvent" event="Hide" frame="ShowAlternateHeroSelectButton"/>
-                <Action type="SendEvent" event="Hide" frame="HeroSelectPanel"/>
+                <Action type="SetState" group="VisibilityState" state="Hidden" frame="ConfirmButton"/>
+                <Action type="SetState" group="VisibilityState" state="Hidden" frame="ShowAlternateHeroSelectButton"/>
+                <Action type="SetState" group="VisibilityState" state="Hidden" frame="HeroSelectPanel"/>
                 <Action type="SendEvent" event="Hide" frame="Team0DraftBanLeft"/>
                 <Action type="SendEvent" event="Hide" frame="Team0DraftBanRight"/>
                 <Action type="SendEvent" event="Hide" frame="Team1DraftBanLeft"/>
                 <Action type="SendEvent" event="Hide" frame="Team1DraftBanRight"/>
 
                 <Action type="SendEvent" event="TriggerPlayCountdownSoundtrack"/>
+            </State>
+
+            <State name="SwapRound">
+                <When type="AnimationState" DraftRoundState="SwapRound"/>
+
+                <Action type="SetState" group="VisibilityState" state="Hidden" frame="ConfirmButton"/>
+                <Action type="SetState" group="VisibilityState" state="Hidden" frame="ShowAlternateHeroSelectButton"/>
+                <Action type="SetState" group="VisibilityState" state="Hidden" frame="HeroSelectPanel/HeroAttributesGroup/ChangeHeroPanel"/>
             </State>
 
             <State name="DraftStartedObserver">
@@ -463,9 +471,9 @@
                 <Action type="SendEvent" event="Show" frame="BanChooserPickingLabel"/>
 
                 <!-- Bottom Controls : Hide for observer -->
-                <Action type="SendEvent" event="Reset" frame="HeroSelectPanel"/>
-                <Action type="SendEvent" event="Reset" frame="ShowAlternateHeroSelectButton"/>
-                <Action type="SendEvent" event="Reset" frame="ConfirmButton"/>
+                <Action type="SetState" group="VisibilityState" state="Hidden" frame="HeroSelectPanel"/>
+                <Action type="SetState" group="VisibilityState" state="Hidden" frame="ShowAlternateHeroSelectButton"/>
+                <Action type="SetState" group="VisibilityState" state="Hidden" frame="ConfirmButton"/>
             </State>
 
             <State name="DraftStartedParticipant">
@@ -489,9 +497,10 @@
                 <Action type="SendEvent" event="Show" frame="BanChooserPickingLabel"/>
 
                 <!-- Bottom Controls : Show for participant -->
-                <Action type="SendEvent" event="Show" frame="HeroSelectPanel"/>
-                <Action type="SendEvent" event="Show" frame="ShowAlternateHeroSelectButton"/>
-                <Action type="SendEvent" event="Show" frame="ConfirmButton"/>
+                <Action type="SetState" group="VisibilityState" state="Visible" frame="HeroSelectPanel"/>
+                <Action type="SetState" group="VisibilityState" state="Visible" frame="ShowAlternateHeroSelectButton"/>
+                <Action type="SetState" group="VisibilityState" state="Visible" frame="ConfirmButton"/>
+                <Action type="SetState" group="VisibilityState" state="Shown" frame="HeroSelectPanel/HeroAttributesGroup/ChangeHeroPanel"/>
             </State>
 
             <!-- Intro OR NotActive -->
@@ -515,6 +524,10 @@
                 <Action type="SendEvent" event="Reset" frame="BanChooserPickingLabel"/>
 
                 <!-- Bottom Controls -->
+                <Action type="SetState" group="VisibilityState" state="Hidden" frame="HeroSelectPanel"/>
+                <Action type="SetState" group="VisibilityState" state="Hidden" frame="ShowAlternateHeroSelectButton"/>
+                <Action type="SetState" group="VisibilityState" state="Hidden" frame="ConfirmButton"/>
+                <Action type="SetState" group="VisibilityState" state="Shown" frame="HeroSelectPanel/HeroAttributesGroup/ChangeHeroPanel"/>
                 <Action type="SendEvent" event="Reset" frame="HeroSelectPanel"/>
                 <Action type="SendEvent" event="Reset" frame="ShowAlternateHeroSelectButton"/>
                 <Action type="SendEvent" event="Reset" frame="ConfirmButton"/>
@@ -549,6 +562,7 @@
 
         <Animation name="TeamBlueBan">
             <Event event="BlueBan" action="Reset,Play"/>
+            <Event event="SwapRound" action="Reset,Play"/>
             <Controller type="Sound" end="Pause">
                 <Key type="Sound" time="0" sound="@UI_BNet_Draft_Ban_GoBlue" direction="Forward"/>
                 <Key type="Sound" time="0" sound="@UI_BNet_Draft_Ban_Go_VFX" direction="Forward"/>
@@ -571,12 +585,27 @@
             </Controller>
         </Animation>
 
+        <Animation name="SwapRound">
+            <Event event="SwapRound" action="Reset,Play"/>
+            <Controller type="Sound" end="Pause">
+                <Key type="Sound" time="0" sound="@UI_Bnet_Draft_Reveal_VFX" direction="Forward"/>
+            </Controller>
+        </Animation>
+
         <Animation name="CountdownStarted">
             <Event event="CountdownStarted" action="Reset,Play" frame="VersusPanel"/>
             <Event event="CountdownBanStarted" action="Reset,Play" frame="VersusPanel"/>
 
             <Controller type="Sound" end="Pause">
                 <Key type="Sound" time="0.00" sound="@UI_BNet_Draft_Countdown_Start" direction="Forward"/>
+            </Controller>
+        </Animation>
+
+        <Animation name="CountdownSwapStarted">
+            <Event event="CountdownSwapStarted" action="Reset,Play" frame="VersusPanel"/>
+
+            <Controller type="Sound" end="Pause">
+                <Key type="Sound" time="0.00" sound="@UI_Bnet_Draft_Swap_Countdown_Start" direction="Forward"/>
             </Controller>
         </Animation>
 
@@ -910,6 +939,32 @@
                 <Action type="SetProperty" frame="$this/RoundTypeFrame/RoundTypeHexBg/HexAnimGlow4" texture="@UI/storm_ui_glues_draft_hero_final_countdown_HexAnim_red"/>
                 <Action type="SetProperty" frame="$this/RoundTypeFrame/RoundTypeHexBg/HexAnimGlow5" texture="@UI/storm_ui_glues_draft_hero_final_countdown_HexAnim_red"/>
             </State>
+
+            <State name="DraftRound_SwapRound">
+                <When type="AnimationState" DraftRoundState="SwapRound"/>
+                <Action type="SetProperty" frame="$this/RoundTypeFrame/RoundTypeHexBg/HexBg" texture="@UI/storm_ui_glues_draft_hero_final_countdown_Bg"/>
+                <Action type="SetProperty" frame="$this/RoundTypeFrame/BlueLabel" text="@UI/HeroDraft/ActiveRoundTooltip/SwapRound" />
+                <Action type="SetProperty" frame="$this/RoundTypeFrame/BlueLabel" style="HeroDraftTeamTurn_Blue"/>
+                <Action type="SetProperty" frame="$this/RoundTypeFrame/TextBackingImage" texture="@UI/Storm_HeroSelect_EnterGame_Countdown_glare"/>
+                <Action type="SetProperty" frame="$this/RoundTypeFrame/RoundTypeHexBg/HexAnimGlow1" texture="@UI/storm_ui_glues_draft_hero_final_countdown_HexAnim"/>
+                <Action type="SetProperty" frame="$this/RoundTypeFrame/RoundTypeHexBg/HexAnimGlow2" texture="@UI/storm_ui_glues_draft_hero_final_countdown_HexAnim"/>
+                <Action type="SetProperty" frame="$this/RoundTypeFrame/RoundTypeHexBg/HexAnimGlow3" texture="@UI/storm_ui_glues_draft_hero_final_countdown_HexAnim"/>
+                <Action type="SetProperty" frame="$this/RoundTypeFrame/RoundTypeHexBg/HexAnimGlow4" texture="@UI/storm_ui_glues_draft_hero_final_countdown_HexAnim"/>
+                <Action type="SetProperty" frame="$this/RoundTypeFrame/RoundTypeHexBg/HexAnimGlow5" texture="@UI/storm_ui_glues_draft_hero_final_countdown_HexAnim"/>
+            </State>
+
+            <State name="DraftRound_SwapRound">
+                <When type="AnimationState" DraftRoundState="SwapRound"/>
+                <Action type="SetProperty" frame="$this/RoundTypeFrame/RoundTypeHexBg/HexBg" texture="@UI/storm_ui_glues_draft_hero_final_countdown_Bg"/>
+                <Action type="SetProperty" frame="$this/RoundTypeFrame/BlueLabel" text="@UI/HeroDraft/ActiveRoundTooltip/SwapRound" />
+                <Action type="SetProperty" frame="$this/RoundTypeFrame/BlueLabel" style="HeroDraftTeamTurn_Blue"/>
+                <Action type="SetProperty" frame="$this/RoundTypeFrame/TextBackingImage" texture="@UI/Storm_HeroSelect_EnterGame_Countdown_glare"/>
+                <Action type="SetProperty" frame="$this/RoundTypeFrame/RoundTypeHexBg/HexAnimGlow1" texture="@UI/storm_ui_glues_draft_hero_final_countdown_HexAnim"/>
+                <Action type="SetProperty" frame="$this/RoundTypeFrame/RoundTypeHexBg/HexAnimGlow2" texture="@UI/storm_ui_glues_draft_hero_final_countdown_HexAnim"/>
+                <Action type="SetProperty" frame="$this/RoundTypeFrame/RoundTypeHexBg/HexAnimGlow3" texture="@UI/storm_ui_glues_draft_hero_final_countdown_HexAnim"/>
+                <Action type="SetProperty" frame="$this/RoundTypeFrame/RoundTypeHexBg/HexAnimGlow4" texture="@UI/storm_ui_glues_draft_hero_final_countdown_HexAnim"/>
+                <Action type="SetProperty" frame="$this/RoundTypeFrame/RoundTypeHexBg/HexAnimGlow5" texture="@UI/storm_ui_glues_draft_hero_final_countdown_HexAnim"/>
+            </State>
         </StateGroup>
 
         <Frame type="Frame" name="RoundTypeFrame" template="HeroDraftTemplates/RoundTypeFrameTemplate">
@@ -930,6 +985,7 @@
             <Animation name="BlueRoundAnimations">
                 <Event event="BlueBan" action="Reset,Play" frame="$parent"/>
                 <Event event="BluePick" action="Reset,Play" frame="$parent"/>
+                <Event event="SwapRound" action="Reset,Play" frame="$parent"/>
 
                 <Controller type="Event" end="Stop">
                     <Key type="Event" time="0.1" event="StartBlue"/>
@@ -1092,6 +1148,19 @@
             <Alpha val="0"/>
             <VisibilityOnFade val="true"/>
 
+            <StateGroup name="VisibilityState">
+                <DefaultState val="Hidden"/>
+                
+                <State name="Hidden">
+                    <Action type="SendEvent" event="Hide"/>
+                </State>
+                
+                <State name="Visible">
+                    <Action type="SendEvent" event="Show"/>
+                    <Action type="SetState" group="VisibilityState" state="Shown" frame="HeroAttributesGroup/ChangeHeroPanel"/>
+                </State>
+            </StateGroup>
+
             <Animation name="Show">
                 <Event event="Show" action="Reset,Play"/>
                 <Event event="Reset" action="Stop"/>
@@ -1145,6 +1214,34 @@
 
                 <Frame type="HeroSelectChangeHeroPanel" name="ChangeHeroPanel">
                     <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+
+                    <StateGroup name="VisibilityState">
+                        <DefaultState val="Shown"/>
+                        
+                        <State name="Shown">
+                            <Action type="SendEvent" frame="$this" event="Reset"/>
+                        </State>
+
+                        <State name="Hidden">
+                            <Action type="SendEvent" frame="$this" event="HideHeroSelect"/>
+                        </State>
+                    </StateGroup>
+
+                    <Animation name="Hide">
+                        <Event event="HideHeroSelect" action="Play"/>
+                        <Event event="Reset" action="Reset"/>
+
+                        <Controller type="Fade" end="Pause">
+                            <Key type="Curve" time="0" value="255"/>
+                            <Key type="Curve" time="0.5" value="0"/>
+                        </Controller>
+
+                        <Controller type="Visibility" end="Pause">
+                            <Key type="Bool" time="0" value="True"/>
+                            <Key type="Bool" time="0.49" value="True"/>
+                            <Key type="Bool" time="0.5" value="False"/>
+                        </Controller>
+                    </Animation>
 
                     <StateGroup name="HideWhenCollapsed">
                         <DefaultState val="Show"/>
@@ -1357,6 +1454,18 @@
                 <Style val="HeroReadyButtonMinorDraft"/>
             </Frame>
 
+            <StateGroup name="VisibilityState">
+                <DefaultState val="Hidden"/>
+
+                <State name="Hidden">
+                    <Action type="SendEvent" event="Hide"/>
+                </State>
+
+                <State name="Visible">
+                    <Action type="SendEvent" event="Show"/>
+                </State>
+            </StateGroup>
+
             <Animation name="Show">
                 <Event event="Show" action="Reset,Play"/>
                 <Event event="Reset" action="Stop"/>
@@ -1398,6 +1507,18 @@
                     <Key type="Event" time="0" event="ShowAlternateHeroSelectRequest"/>
                 </Controller>
             </Animation>
+
+            <StateGroup name="VisibilityState">
+                <DefaultState val="Hidden"/>
+
+                <State name="Hidden">
+                    <Action type="SendEvent" event="Hide"/>
+                </State>
+
+                <State name="Visible">
+                    <Action type="SendEvent" event="Show"/>
+                </State>
+            </StateGroup>
 
             <Animation name="Show">
                 <Event event="Show" action="Reset,Play"/>

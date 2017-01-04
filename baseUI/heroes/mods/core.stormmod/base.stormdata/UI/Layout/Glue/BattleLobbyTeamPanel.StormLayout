@@ -6,7 +6,42 @@
     <Constant name="BackgroundTileLeftHorizontalSpacing" val="-10"/>
     <Constant name="BackgroundTileRightHorizontalSpacing" val="10"/>
     <Constant name="DraftTileVerticalSpacing" val="-188"/>
-    
+
+    <Frame type="Button" name="SwapButtonStateTemplate">
+        <StateGroup name="PropagateHover">
+            <State name="NoHover">
+                <When type="Property" Hovering="False"/>
+                <Action type="SetProperty" frame="$parent/$parent" HasSwapHovering="False"/>
+            </State>
+
+            <State name="HasHover">
+                <When type="Property" Hovering="True"/>
+                <When type="Property" Visible="True"/>
+                <When type="Property" Enabled="True"/>
+                <Action type="SetProperty" frame="$parent/$parent" HasSwapHovering="True"/>
+            </State>
+        </StateGroup>
+
+        <Animation name="Throttle">
+            <Event event="OnMouseUp" action="Reset, Play"/>
+            <Event event="CountdownSwapStopped" frame="$parent/$parent/$parent/VersusPanel" action="Pause"/>
+
+            <Controller type="Property" property="Enabled" end="Pause">
+                <Key type="Property" time="0" value="False"/>
+                <Key type="Property" time="2" value="True"/>
+            </Controller>
+        </Animation>
+
+        <Animation name="Unlock">
+            <Event event="CountdownSwapStarted" frame="$parent/$parent/$parent/VersusPanel" action="DirectionForward,Play"/>
+            <Event event="CountdownSwapStopped" frame="$parent/$parent/$parent/VersusPanel" action="DirectionReverse,Play"/>
+
+            <Controller type="Property" property="Enabled" end="Pause">
+                <Key type="Property" time="0" value="False"/>
+                <Key type="Property" time="0.01" value="True"/>
+            </Controller>
+        </Animation>
+    </Frame>
     
     <Frame type="BattleLobbyTeamPanel" name="HeroDraftTeamPanelTemplate">
         <Height val="1200"/>
@@ -121,7 +156,7 @@
                 <Action type="SendEvent" event="HideActiveBorder"/>
             </State>
             <State name="Countdown">
-                <When type="AnimationState" SlotState="Countdown" frame="Slot0"/>
+                <When type="Property" SlotState="Countdown" frame="Slot0"/>
                 <Action type="SendEvent" event="ShowActiveBorder"/>
             </State>
             <State name="MyTeamTurn">
@@ -217,26 +252,43 @@
         <Frame type="HeroDraftSlotFrame" name="Slot0" template="HeroDraftSlotFrame/HeroDraftSlotFrameLeftTemplate">
             <Anchor side="Bottom" relative="$parent/Slot1" pos="Max" offset="#DraftTileVerticalSpacing"/>
             <Anchor side="Left" relative="$parent" pos="Min" offset="-74"/>
+
+            <Frame type="Button" name="SwapButton" template="BattleLobbyTeamPanel/SwapButtonStateTemplate"/>
         </Frame>
 
         <Frame type="HeroDraftSlotFrame" name="Slot1" template="HeroDraftSlotFrame/HeroDraftSlotFrameLeftTemplate">
             <Anchor side="Bottom" relative="$parent/Slot2" pos="Max" offset="#DraftTileVerticalSpacing"/>
             <Anchor side="Left" relative="$parent/Slot0" pos="Min" offset="110"/>
+            
+            <Frame type="Button" name="SwapButton" template="BattleLobbyTeamPanel/SwapButtonStateTemplate"/>
         </Frame>
 
         <Frame type="HeroDraftSlotFrame" name="Slot2" template="HeroDraftSlotFrame/HeroDraftSlotFrameLeftTemplate">
             <Anchor side="Bottom" relative="$parent/Slot3" pos="Max" offset="#DraftTileVerticalSpacing"/>
             <Anchor side="Left" relative="$parent/Slot0" pos="Min" offset="0"/>
+
+            <Frame type="Button" name="SwapButton" template="BattleLobbyTeamPanel/SwapButtonStateTemplate"/>
         </Frame>
 
         <Frame type="HeroDraftSlotFrame" name="Slot3" template="HeroDraftSlotFrame/HeroDraftSlotFrameLeftTemplate">
             <Anchor side="Bottom" relative="$parent/Slot4" pos="Max" offset="#DraftTileVerticalSpacing"/>
             <Anchor side="Left" relative="$parent/Slot1" pos="Min" offset="0"/>
+
+            <Frame type="Button" name="SwapButton" template="BattleLobbyTeamPanel/SwapButtonStateTemplate"/>
         </Frame>
 
         <Frame type="HeroDraftSlotFrame" name="Slot4" template="HeroDraftSlotFrame/HeroDraftSlotFrameLeftTemplate">
             <Anchor side="Bottom" relative="$parent" pos="Max" offset="-68"/>
             <Anchor side="Left" relative="$parent/Slot2" pos="Min" offset="0"/>
+
+            <Frame type="Button" name="SwapButton" template="BattleLobbyTeamPanel/SwapButtonStateTemplate"/>
+        </Frame>
+
+        <Frame type="Frame" name="LeftSwapButtonAnchor">
+            <Anchor side="Left" relative="$parent/Slot1/BorderImage" pos="Max" offset="0"/>
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Width val="80"/>
+            <Height val="72"/>
         </Frame>
     </Frame>
 
