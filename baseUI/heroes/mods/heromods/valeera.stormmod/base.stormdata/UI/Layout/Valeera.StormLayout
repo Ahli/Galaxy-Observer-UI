@@ -1,0 +1,857 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<Desc>
+
+<!-- Start: Frame Overrides used for creating the glowing effect on the, Portrait Frame. Resource Fraem, and Ability Backplate -->
+
+    <Frame type="CommandPanel" name="GameUI/UIContainer/ConsoleUIContainer/CommandPanel" file="GameUI">
+
+        <StateGroup name="CurrentUnit">
+            <State name="HeroValeera">
+                <When type="AnimationState" CurrentUnit="HeroValeera"/>
+                <Action type="SetProperty" frame="$AbilityBackPlate" LightAdjustColor="68002C"/>
+                <Action type="SetProperty" frame="$AbilityBackPlate" DarkAdjustColor="350000"/>
+                <Action type="SetProperty" frame="$PortraitBackPlate" LightAdjustColor="68002C"/>
+                <Action type="SetProperty" frame="$PortraitBackPlate" DarkAdjustColor="350000"/>
+                <Action type="SetProperty" frame="$ResourceBackPlate" LightAdjustColor="68002C"/>
+                <Action type="SetProperty" frame="$ResourceBackPlate" DarkAdjustColor="350000"/>
+
+                <Action type="SetProperty" frame="$AbilityBackPlate/$parent" LightAdjustColor="859BB8"/>
+                <Action type="SetProperty" frame="$AbilityBackPlate/$parent" DarkAdjustColor="3B3F55"/>
+                <Action type="SetProperty" frame="$PortraitBackPlate/$parent" LightAdjustColor="859BB8"/>
+                <Action type="SetProperty" frame="$PortraitBackPlate/$parent" DarkAdjustColor="3B3F55"/>
+                <Action type="SetProperty" frame="$ResourceBackPlate/$parent" LightAdjustColor="859BB8"/>
+                <Action type="SetProperty" frame="$ResourceBackPlate/$parent" DarkAdjustColor="3B3F55"/>
+                <Action type="SetProperty" frame="HeroValeeraCommandPanelAnimFrame" Visible="true"/>
+            </State>
+        </StateGroup>
+
+        <Frame type="Frame" name="HeroValeeraCommandPanelAnimFrame">
+            <Anchor side="Top" relative="$parent" pos="Max" offset="0"/>
+            <Anchor side="Left" relative="$layer" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$layer" pos="Max" offset="0"/>
+            <Height val="4"/>
+            <Visible val="False"/>
+
+            <!-- An invisible frame will still update its animations, but not its children's.  This child frame
+                is to prevent the animation from running when the parent is hidden. -->
+            <Frame type="Frame" name="HeroValeera">
+                <Anchor relative="$parent" offset="0"/>
+
+                <Animation name="PulseFade" flags="NoEventsWhileHidden">
+                    <Event event="OnHidden" action="Stop" frame="$parent"/>
+                    <Event event="AbilBarHealthBarPortraitGlow" action="Restart,Play" frame="$AbilBarHealthBarPortraitGlow"/>
+                    <Event event="NoState" action="Stop" frame="$AbilBarHealthBarPortraitGlow"/>
+
+                    <Controller type="Fade" end="pause" frame="$AbilityBackPlate">
+                        <Key type="Curve" time="0" value="0" inout="Linear"/>
+                        <Key type="Curve" time="1" value="255" inout="Linear"/>
+                    </Controller>
+                    <Controller type="Fade" end="pause" frame="$PortraitBackPlate">
+                        <Key type="Curve" time="0" value="0" inout="Linear"/>
+                        <Key type="Curve" time="1" value="255" inout="Linear"/>
+                    </Controller>
+                    <Controller type="Fade" end="pause" frame="$ResourceBackPlate">
+                        <Key type="Curve" time="0" value="0" inout="Linear"/>
+                        <Key type="Curve" time="1" value="255" inout="Linear"/>
+                    </Controller>
+
+                    <Controller type="Property" property="ColorAdjustMode" end="Pause" frame="$AbilityBackPlate/$parent">
+                        <Key type="Property" time="0" value="Colorize"/>
+                    </Controller>
+                    <Controller type="Property" property="ColorAdjustMode" end="Pause" frame="$PortraitBackPlate/$parent">
+                        <Key type="Property" time="0" value="Colorize"/>
+                    </Controller>
+                    <Controller type="Property" property="ColorAdjustMode" end="Pause" frame="$ResourceBackPlate/$parent">
+                        <Key type="Property" time="0" value="Colorize"/>
+                    </Controller>
+                </Animation>
+            </Frame>
+        </Frame>
+    </Frame>
+
+<!-- End: Frame Overrides used for creating the glowing effect on the, Portrait Frame. Resource Fraem, and Ability Backplate -->
+
+<!-- Start: ComboGem Templates -->
+
+    <!-- Turn on Pulse Ring: This is seperate, because the ring pusles need to play on top of all the other gem and gem container elements -->
+    <Frame type="Image" name="ContainerRingPulseTemplate">
+        <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+        <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+        <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+        <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+        <Height val="55"/>
+        <Width val="55"/>
+        <ColorAdjustMode val="Colorize"/>
+        <LightAdjustColor val="ffe68f"/>
+        <DarkAdjustColor val="ff8260"/>
+        <Texture val="@UI/Storm_UI_GenFX_RingGlow"/>
+        <RenderPriority val="520"/>
+        <Visible val="false"/>
+
+        <Animation name="ContainerRingPulseAnimation">
+            <Event event="OnShown" action="Reset, Play"/>
+            <Controller type="Fade" end="Pause">
+                <Key type="Curve" time="0" value="0" out="Fast"/>
+                <Key type="Curve" time=".23" value="255" in="Fast"/>
+                <Key type="Curve" time=".33" value="255" out="Slow"/>
+                <Key type="Curve" time=".57" value="0" in="Slow"/>
+            </Controller>
+            <Controller type="Dimension" dimension="Width" relative="False" percentage="false" unclip="true" end="pause">
+                <Key type="Curve" time="0" value="126"/>
+                <Key type="Curve" time=".23" value="55"/>
+            </Controller>
+            <Controller type="Dimension" dimension="Height" relative="False" percentage="false" unclip="true" end="pause">
+                <Key type="Curve" time="0" value="126"/>
+                <Key type="Curve" time=".23" value="55"/>
+            </Controller>
+        </Animation>
+    </Frame>
+
+    <!-- Red Pulse Three Stack Ring: This is seperate, because the ring pusles need to play on top of all the other gem and gem container elements -->
+    <Frame type="Image" name="ThreeStacksIndicatorRingTemplate">
+        <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+        <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+        <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+        <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+        <Height val="45"/>
+        <Width val="45"/>
+        <BlendMode val="Add"/>
+        <ColorAdjustMode val="Colorize"/>
+        <DarkAdjustColor val="c5006b"/>
+        <LightAdjustColor val="ff0000"/>
+        <Unclipped val="True"/>
+        <Texture val="@UI/Storm_UI_GenFX_RingGlow"/>
+        <RenderPriority val="620"/>
+        <Visible val="false"/>
+
+        <Animation name="ThreeStacksIndicatorRingAnimation">
+            <Event event="OnShown" action="Reset, Play"/>
+            <Controller type="Fade" end="Pause">
+                <Key type="Curve" time="0" value="0" out="Fast"/>
+                <Key type="Curve" time=".16" value="0" in="Fast"/>
+                <Key type="Curve" time=".17" value="255" in="Fast"/>
+                <Key type="Curve" time=".97" value="0" out="Slow"/>
+            </Controller>
+            <Controller type="Dimension" dimension="Width" relative="False" percentage="false" unclip="true" end="pause">
+                <Key type="Curve" time="0" value="45"/>
+                <Key type="Curve" time=".17" value="45"/>
+                <Key type="Curve" time=".97" value="116"/>
+            </Controller>
+            <Controller type="Dimension" dimension="Height" relative="False" percentage="false" unclip="true" end="pause">
+                <Key type="Curve" time="0" value="45"/>
+                <Key type="Curve" time=".17" value="45"/>
+                <Key type="Curve" time=".97" value="116"/>
+            </Controller>
+        </Animation>
+    </Frame>
+
+    <!-- Main Gem Images -->
+
+    <Frame type="Image" name="ComboGemTemplate">
+        <Anchor side="Left" relative="$parent" pos="Min" offset="25"/>
+        <Anchor side="Bottom" relative="$parent" pos="Max" offset="-28"/>
+        <Texture val="@UI/Storm_UI_HUD_Valeera_Socket"/>
+
+        <!-- Series of Images that play when the Combo Gem 1 is turned on -->
+
+        <Frame type="BehaviorIcon" name="ComboGemTooltipFrame">
+            <Anchor relative="$parent"/>
+            <TooltipFrame val="StandardNameTooltip"/>
+            <Behavior val="ValeeraComboPoints"/>
+        </Frame>
+        
+        <Frame type="Frame" name="TurnONGem">
+            <Anchor relative="$parent"/>
+            <Visible val="false"/>
+
+            <Frame type="Frame" name="ExpireWarning">
+                <Anchor relative="$parent"/>
+                <Visible val="false"/>
+                <RenderPriority val="630"/>
+
+                <Frame type="Image" name="InnerGlowPulse">
+                    <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+                    <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+                    <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+                    <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+                    <Height val="35"/>
+                    <Width val="35"/>
+                    <ColorAdjustMode val="Colorize"/>
+                    <DarkAdjustColor val="ff8260"/>
+                    <LightAdjustColor val="ffe68f"/>
+                    <Texture val="@UI/Storm_UI_GenFX_CircleInnerGlow"/>
+
+                    <Animation name="InnerGlowPulseAnimation">
+                        <Event event="OnShown" action="Reset, Play"/>
+                        <Controller type="Fade" end="pingpong">
+                            <Key type="Curve" time="0" value="0" out="Fast"/>
+                            <Key type="Curve" time=".5" value="255" in="Fast"/>
+                        </Controller>
+                    </Animation>
+                </Frame>
+            </Frame>
+
+            <Frame type="Image" name="ContainerSparkle1">
+                <Anchor side="Top" relative="$parent/$parent" pos="Min" offset="-60"/>
+                <Anchor side="Left" relative="$parent/$parent" pos="Min" offset="-80"/>
+                <Texture val="@UI/Storm_UI_InGame_PocketWatchRing_Flare"/>
+                <BlendMode val="Add"/>
+                <ColorAdjustMode val="Colorize"/>
+                <AdjustmentColor val="0000ff"/>
+                <Unclipped val="True"/>
+                <Alpha val="0"/>
+                <RenderPriority val="620"/>
+
+                <Animation name="SparkleAnimation1">
+                    <Event event="OnShown" action="Reset, Play"/>
+                    <Controller type="Fade" end="Pause">
+                        <Key type="Curve" time="0" value="0" out="Fast"/>
+                        <Key type="Curve" time=".13" value="0" out="Fast"/>
+                        <Key type="Curve" time=".23" value="255" in="Fast"/>
+                        <Key type="Curve" time=".47" value="255" out="Slow"/>
+                        <Key type="Curve" time=".57" value="0" in="Slow"/>
+                    </Controller>
+                    <Controller type="Anchor" end="Pause" side="Left" relative="true">
+                        <Key type="Curve" time="0" value="0" out="Fast"/>
+                        <Key type="Curve" time=".23" value="0" out="Fast"/>
+                        <Key type="Curve" time=".33" value="15" in="Slow"/>
+                    </Controller>
+                </Animation>
+            </Frame>
+
+            <Frame type="Image" name="ContainerSparkle2">
+                <Anchor side="Top" relative="$parent/$parent" pos="Min" offset="-22"/>
+                <Anchor side="Left" relative="$parent/$parent" pos="Min" offset="-65"/>
+                <Texture val="@UI/Storm_UI_InGame_PocketWatchRing_Flare"/>
+                <BlendMode val="Add"/>
+                <ColorAdjustMode val="Colorize"/>
+                <AdjustmentColor val="0000ff"/>
+                <Unclipped val="True"/>
+                <Alpha val="0"/>
+                <RenderPriority val="620"/>
+
+                <Animation name="SparkleAnimation2">
+                    <Event event="OnShown" action="Reset, Play"/>
+                    <Controller type="Fade" end="Pause">
+                        <Key type="Curve" time="0" value="0" out="Fast"/>
+                        <Key type="Curve" time=".13" value="0" out="Fast"/>
+                        <Key type="Curve" time=".23" value="255" in="Fast"/>
+                        <Key type="Curve" time=".47" value="255" out="Slow"/>
+                        <Key type="Curve" time=".57" value="0" in="Slow"/>
+                    </Controller>
+                    <Controller type="Anchor" end="Pause" side="Left" relative="true">
+                        <Key type="Curve" time="0" value="0" out="Fast"/>
+                        <Key type="Curve" time=".23" value="0" out="Fast"/>
+                        <Key type="Curve" time=".33" value="-15" in="Slow"/>
+                    </Controller>
+                </Animation>
+            </Frame>
+
+            <Frame type="Image" name="ComboGem">
+                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+                <Texture val="@UI/Storm_UI_HUD_Valeera_ComboGem"/>
+                <Animation name="FadeControllerMainGem">
+                    <Event event="OnShown" action="Reset, Play"/>
+                    <Controller type="Fade" end="Pause">
+                        <Key type="Curve" time="0" value="0" out="Slow"/>
+                        <Key type="Curve" time=".23" value="255" in="Slow"/>
+                    </Controller>
+                </Animation>
+
+                <Frame type="Image" name="ComboGemPop">
+                    <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                    <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+                    <Texture val="@UI/Storm_UI_HUD_Valeera_ComboGem"/>
+                    <BlendMode val="Add"/>
+                    <Animation name="FadeControllerChildGemOn">
+                    <Event event="OnShown" action="Reset, Play" frame="$parent"/>
+                        <Controller type="Fade" end="pause">
+                            <Key type="Curve" time="0" value="0" out="Fast"/>
+                            <Key type="Curve" time=".23" value="0" in="Slow"/>
+                            <Key type="Curve" time=".43" value="255" out="Slow"/>
+                            <Key type="Curve" time=".63" value="0" in="Fast"/>
+                        </Controller>
+                    </Animation>
+                </Frame>
+            </Frame>
+        </Frame>
+
+        <Frame type="Frame" name="TurnOFFGem">
+            <Anchor relative="$parent"/>
+            <Visible val="false"/>
+
+            <Frame type="Image" name="ComboGemFadeOut">
+                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+                <Texture val="@UI/Storm_UI_HUD_Valeera_ComboGem"/>
+                <Animation name="ComboGemFadeOut">
+                    <Event event="OnShown" action="Reset, Play"/>
+                    <Controller type="Fade" end="Pause">
+                        <Key type="Curve" time="0" value="255" out="Slow"/>
+                        <Key type="Curve" time=".1" value="255" in="Slow"/>
+                        <Key type="Curve" time=".37" value="0" in="Slow"/>
+                    </Controller>
+                </Animation>
+            </Frame>
+
+
+            <Frame type="Image" name="InnerGlowFadeOut">
+                <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+                <Height val="35"/>
+                <Width val="35"/>
+                <ColorAdjustMode val="Colorize"/>
+                <DarkAdjustColor val="ff8260"/>
+                <LightAdjustColor val="ffe68f"/>
+                <Texture val="@UI/Storm_UI_GenFX_CircleInnerGlow"/>
+
+                <Animation name="InnerGlowFadeOutAnimation">
+                    <Event event="OnShown" action="Reset, Play"/>
+                    <Controller type="Fade" end="Pause">
+                        <Key type="Curve" time="0" value="0" out="Fast"/>
+                        <Key type="Curve" time=".23" value="255" in="Fast"/>
+                        <Key type="Curve" time=".37" value="0" out="Slow"/>
+                    </Controller>
+                    <Controller type="Dimension" dimension="Width" relative="False" percentage="false" unclip="true" end="pause">
+                        <Key type="Curve" time="0" value="35"/>
+                        <Key type="Curve" time=".23" value="35"/>
+                        <Key type="Curve" time=".37" value="20"/>
+                    </Controller>
+                    <Controller type="Dimension" dimension="Height" relative="False" percentage="false" unclip="true" end="pause">
+                        <Key type="Curve" time="0" value="35"/>
+                        <Key type="Curve" time=".23" value="35"/>
+                        <Key type="Curve" time=".37" value="20"/>
+                    </Controller>
+                </Animation>
+            </Frame>
+        </Frame>
+
+        <Frame type="Frame" name="ThreeStacksIndicatorFrame">
+            <Anchor relative="$parent"/>
+            <Visible val="false"/>
+
+            <Frame type="Image" name="ThreeStacksIndicatorComboGemShineImage">
+                <Anchor relative="$parent"/>
+                <LayerCount val="2"/>
+                <BlendMode val="Add"/>
+                <Alpha val="0"/>
+                <ColorAdjustMode val="Fill"/>
+                <AdjustmentColor val="FFFFFF"/>
+                
+                <Texture val="@UI/Storm_UI_HeroUI_Greymane_ChromeShine_Mask" layer="0"/>
+                <TextureCoords top=".5" left=".5" bottom="1" right="1.1" layer="0"/>
+                <AlphaLayer val="True" layer="0"/>
+                <WrapUV val="False" layer="0"/>
+                
+                <Texture val="@UI/Storm_UI_HUD_Valeera_ComboGem" layer="1"/>
+
+                <Animation name="UVScroll">
+                    <Event event="OnShown" action="Reset, Play"/>
+                    <Controller type="Fade" end="Pause">
+                        <Key type="Curve" time="0" value="0" out="Fast"/>
+                        <Key type="Curve" time=".73" value="255" out="Fast"/>
+                        <Key type="Curve" time="1" value="0" in="Slow"/>
+                    </Controller>
+                    <Controller type="LayerUV" layer="0" side="Left" relative="False" sidelock="True" end="Pause">
+                        <Key type="Curve" time="0" value="2" out="fast"/>
+                        <Key type="Curve" time="1" value="-1" in="fast"/>
+                        <Key type="Curve" time="3" value="-1" in="fast"/>
+                    </Controller>
+                </Animation>
+            </Frame>
+        </Frame>
+    </Frame>
+<!-- End: ComboGem Template -->
+
+
+<!-- Start: Stealth Smoke Affect -->
+    <Frame type="SelectionUnitStatusPanel" name="ValeeraSmokeFrame">
+        <Anchor relative="$parent"/>
+        <AcceptsMouse val="false"/>
+        <SpecificUnit val="HeroValeera"/>
+        <RenderType val="HDR"/>
+        <RenderPriority val="400"/>
+
+        <Frame type="UnitStatusFrame" name="UnitStatusFrame0">
+            <Anchor relative="$parent"/>
+
+            <Frame type="UnitStatusValidatorAnimElement" name="StealthValidators">
+                <Anchor relative="$parent"/>
+                <Validator val="ValeeraIsStealthedCombine"/>
+                <Validator val="ValeeraNotStealthed"/>
+                
+                <Animation name="ValeeraIsStealthedCombine">
+                    <Event event="Reset" action="Stop"/>
+                    <Event event="ValeeraIsStealthedCombine" action="Restart, Play"/>
+
+                    <Controller type="Visibility" end="Pause" frame="$parent/SmokeAnimationSmoke">
+                        <Key type="Bool" time="0" value="True"/>
+                    </Controller>
+                    <Controller type="Visibility" end="Pause" frame="$parent/SmokeAnimationBackground">
+                        <Key type="Bool" time="0" value="True"/>
+                    </Controller>
+                    <Controller type="Fade" end="pause" frame="$parent/SmokeAnimationSmoke">
+                        <Key type="Curve" time="0" value="0" out="Fast"/>
+                        <Key type="Curve" time="1" value="255" in="Fast"/>
+                    </Controller>
+                    <Controller type="Fade" end="pause" frame="$parent/SmokeAnimationBackground">
+                        <Key type="Curve" time="0" value="0" out="Fast"/>
+                        <Key type="Curve" time="1" value="150" in="Fast"/>
+                    </Controller>
+
+                </Animation>
+
+                <Animation name="ValeeraNotStealthed">
+                    <Event event="Reset" action="Stop"/>
+                    <Event event="ValeeraNotStealthed" action="Restart, Play"/>
+
+                    <Controller type="Visibility" end="Pause" frame="$parent/SmokeAnimationSmoke">
+                        <Key type="Bool" time=".5" value="false"/>
+                    </Controller>
+                    <Controller type="Visibility" end="Pause" frame="$parent/SmokeAnimationBackground">
+                        <Key type="Bool" time=".5" value="false"/>
+                    </Controller>
+                    <Controller type="Fade" end="pause" frame="$parent/SmokeAnimationSmoke">
+                        <Key type="Curve" time="0" value="255" out="Fast"/>
+                        <Key type="Curve" time=".5" value="0" in="Fast"/>
+                    </Controller>
+                    <Controller type="Fade" end="pause" frame="$parent/SmokeAnimationBackground">
+                        <Key type="Curve" time="0" value="150" out="Fast"/>
+                        <Key type="Curve" time=".5" value="0" in="Fast"/>
+                    </Controller>
+
+                </Animation>
+
+            </Frame>
+
+            <Frame type="Image" name="SmokeAnimationBackground">
+                <Anchor relative="$parent"/>
+                <RenderPriority val="513"/>
+                <Visible val="false"/>
+                <Alpha val="150"/>
+                <Texture val="@UI/storm_ui_hud_fx_valeera_smoke_vignette_small"/>
+                <RenderType val="HDR"/>
+                <RenderPriority val="1"/>
+            </Frame>
+
+            <Frame type="Image" name="SmokeAnimationSmoke">
+                <Anchor relative="$parent"/>
+                <RenderPriority val="514"/>
+                <Visible val="False"/>
+                <Alpha val="255"/>
+                <LayerCount val="3"/>
+                <BlendMode val="Normal"/>
+                <RenderType val="HDR"/>
+                <SubpixelRendering val="True"/>
+                <RenderPriority val="1"/>
+
+                <Texture val="@UI/storm_ui_hud_fx_valeera_smoke" layer="2"/>
+                <TextureCoords top="1.7" left="0" bottom="0" right="1.7" layer="2"/>
+                <WrapUV val="True" layer="2"/>
+                <AlphaLayer val="false" layer="2"/>
+                <LayerColor val="2c0606" layer="2"/>
+
+                <Texture val="@UI/storm_ui_hud_fx_valeera_smoke" layer="1"/>
+                <TextureCoords top="1.7" left="0" bottom="0" right="1.7" layer="1"/>
+                <WrapUV val="True" layer="1"/>
+                <AlphaLayer val="true" layer="1"/>
+                <LayerColor val="ffffff" layer="1"/>
+
+                <Texture val="@UI/storm_ui_hud_fx_valeera_smoke_vignette_small" layer="0"/>
+                <TextureCoords top="0" left="0" bottom="1" right="1" layer="0"/>
+                <AlphaLayer val="true" layer="0"/>
+                <LayerAlpha val="255" layer="0"/>
+                <WrapUV val="True" layer="0"/>
+
+                <Animation name="UVScroll">
+                    <Event event="OnShown" action="Restart" frame="$parent"/>
+                    <Event event="OnShown" action="DirectionForward" frame="$parent"/>
+                    <Event event="OnShown" action="Play" frame="$parent"/>
+                    <Controller type="LayerUV" layer="1" side="top" relative="True" sidelock="True" end="Loop">
+                        <Key type="Curve" time="0" value="0" out="fast"/>
+                        <Key type="Curve" time="12" value="-1" in="fast"/>
+                    </Controller>
+                    <Controller type="LayerUV" layer="1" side="right" relative="True" sidelock="True" end="Loop">
+                        <Key type="Curve" time="0" value="0" out="fast"/>
+                        <Key type="Curve" time="10" value="1" in="fast"/>
+                    </Controller>
+                    <Controller type="LayerUV" layer="2" side="top" relative="True" sidelock="True" end="Loop">
+                        <Key type="Curve" time="0" value="0" out="fast"/>
+                        <Key type="Curve" time="14" value="-1" in="fast"/>
+                    </Controller>
+                    <Controller type="LayerUV" layer="2" side="right" relative="True" sidelock="True" end="Loop">
+                        <Key type="Curve" time="0" value="0" out="fast"/>
+                        <Key type="Curve" time="9" value="-1" in="fast"/>
+                    </Controller>
+                    <Controller type="LayerUV" layer="0" side="left" relative="True" sidelock="false" end="pingpong">
+                        <Key type="Curve" time="0" value="0" out="fast"/>
+                        <Key type="Curve" time="2" value="0.0525" in="fast"/>
+                    </Controller>
+                    <Controller type="LayerUV" layer="0" side="right" relative="True" sidelock="false" end="pingpong">
+                        <Key type="Curve" time="0" value="0" out="fast"/>
+                        <Key type="Curve" time="3" value="-0.025" in="fast"/>
+                    </Controller>
+                    <Controller type="LayerUV" layer="0" side="top" relative="True" sidelock="false" end="pingpong">
+                        <Key type="Curve" time="0" value="0" out="fast"/>
+                        <Key type="Curve" time="2" value="0.025" in="fast"/>
+                    </Controller>
+                    <Controller type="LayerUV" layer="0" side="bottom" relative="True" sidelock="false" end="pingpong">
+                        <Key type="Curve" time="0" value="0" out="fast"/>
+                        <Key type="Curve" time="4" value="-0.025" in="fast"/>
+                    </Controller>
+                </Animation>           
+            </Frame> 
+        </Frame>
+    </Frame>
+<!-- End: Stealth Smoke Affect -->
+    
+    <Frame type="SelectionUnitStatusPanel" name="ValeeraBackplateFrame" template="StandardHeroUITemplates/CircularHeroUIBackplateTemplate">
+        <SpecificUnit val="HeroValeera"/>
+        <Frame type="Image" name="Backplate">
+            <ScaleWidthToTexture val="true"/>
+            <TextureType val="Nineslice"/>
+            <Width val="225"/>
+        </Frame>
+    </Frame>
+    
+<!-- Start: Combo Gem Animations -->
+    <Frame type="SelectionUnitStatusPanel" name="ValeeraFrame">
+        <Anchor relative="$parent"/>
+        <AcceptsMouse val="false"/>
+        <SpecificUnit val="HeroValeera"/>
+
+        <Frame type="UnitStatusFrame" name="UnitStatusFrame0">
+            <Anchor relative="$parent"/>
+
+            <Frame type="UnitStatusValidatorAnimElement" name="ComboTimerAnims">
+                <Anchor relative="$parent"/>
+                <Validator val="ValeeraComboPointLT5"/>
+                <Validator val="ValeeraComboPointTimerGT5"/>
+                
+                <Animation name="ValeeraComboPointLT5">
+                    <Event event="Reset" action="Stop"/>
+                    <Event event="NoState" action="Stop"/>
+                    <Event event="ValeeraComboPointLT5" action="Restart, Play"/>
+
+                    <!-- Start: Gem One Animations -->
+                    <Controller type="Visibility" end="Pause" frame="$parent/ComboGemContainer1/TurnONGem/ExpireWarning">
+                        <Key type="Bool" time="0" value="True"/>
+                    </Controller>
+                    <!-- End: Gem One Animations -->
+
+                    <!-- Start: Gem Two Animations -->
+                    <Controller type="Visibility" end="Pause" frame="$parent/ComboGemContainer2/TurnONGem/ExpireWarning">
+                        <Key type="Bool" time="0" value="True"/>
+                    </Controller>
+                    <!-- End: Gem Two Animations -->
+
+                    <!-- Start: Gem Three Animations -->
+                    <Controller type="Visibility" end="Pause" frame="$parent/ComboGemContainer3/TurnONGem/ExpireWarning">
+                        <Key type="Bool" time="0" value="True"/>
+                    </Controller>
+                    <!-- End: Gem Three Animations -->
+
+                </Animation>
+
+                <Animation name="ValeeraComboPointTimerGT5">
+                    <Event event="Reset" action="Stop"/>
+                    <Event event="NoState" action="Stop"/>
+                    <Event event="ValeeraComboPointTimerGT5" action="Restart, Play"/>
+
+                    <!-- Start: Gem One Animations -->
+                    <Controller type="Visibility" end="Pause" frame="$parent/ComboGemContainer1/TurnONGem/ExpireWarning">
+                        <Key type="Bool" time="0" value="False"/>
+                    </Controller>
+                    <!-- End: Gem One Animations -->
+
+                    <!-- Start: Gem Two Animations -->
+                    <Controller type="Visibility" end="Pause" frame="$parent/ComboGemContainer2/TurnONGem/ExpireWarning">
+                        <Key type="Bool" time="0" value="False"/>
+                    </Controller>
+                    <!-- End: Gem Two Animations -->
+
+                    <!-- Start: Gem Three Animations -->
+                    <Controller type="Visibility" end="Pause" frame="$parent/ComboGemContainer3/TurnONGem/ExpireWarning">
+                        <Key type="Bool" time="0" value="False"/>
+                    </Controller>
+                    <!-- End: Gem Three Animations -->
+
+                </Animation> 
+            </Frame>
+
+            <Frame type="UnitStatusValidatorAnimElement" name="ComboGemAnims">
+                <Anchor relative="$parent"/>
+                <Validator val="ValeeraHas0CP"/>
+                <Validator val="ValeeraHas1CP"/> 
+                <Validator val="ValeeraHas2CP"/> 
+                <Validator val="ValeeraHas3CP"/>
+
+                <Animation name="ValeerZeroStack">
+                    <Event event="Reset" action="Stop"/>
+                    <Event event="NoState" action="Stop"/>
+                    <Event event="ValeeraHas0CP" action="Restart, Play"/>
+
+                    <!-- Start: Gem One Animations -->
+                    <Controller type="Visibility" end="Pause" frame="$parent/ComboGemContainer1/TurnONGem">
+                        <Key type="Bool" time="0" value="false"/>
+                    </Controller>
+                    <Controller type="Visibility" end="Pause" frame="$parent/ComboGemContainer1/TurnOFFGem">
+                        <Key type="Bool" time="0" value="True"/>
+                    </Controller>
+                    <Controller type="Visibility" end="Pause" frame="$parent/ContainerRingPulse1">
+                        <Key type="Bool" time="0" value="false"/>
+                    </Controller>
+                    <Controller type="Visibility" end="Pause" frame="$parent/ThreeStacksIndicatorRing1">
+                        <Key type="Bool" time="0" value="False"/>
+                    </Controller>
+                    <!-- End: Gem One Animations -->
+
+                    <!-- Start: Gem Two Animations -->
+                    <Controller type="Visibility" end="Pause" frame="$parent/ComboGemContainer2/TurnONGem">
+                        <Key type="Bool" time="0" value="false"/>
+                    </Controller>
+                    <Controller type="Visibility" end="Pause" frame="$parent/ComboGemContainer2/TurnOFFGem">
+                        <Key type="Bool" time="0" value="True"/>
+                    </Controller>
+                    <Controller type="Visibility" end="Pause" frame="$parent/ContainerRingPulse2">
+                        <Key type="Bool" time="0" value="false"/>
+                    </Controller>
+                    <Controller type="Visibility" end="Pause" frame="$parent/ThreeStacksIndicatorRing2">
+                        <Key type="Bool" time="0" value="False"/>
+                    </Controller>
+                    <!-- End: Gem Two Animations -->
+
+                    <!-- Start: Gem Three Animations -->
+                    <Controller type="Visibility" end="Pause" frame="$parent/ComboGemContainer3/TurnONGem">
+                        <Key type="Bool" time="0" value="false"/>
+                    </Controller>
+                    <Controller type="Visibility" end="Pause" frame="$parent/ComboGemContainer3/TurnOFFGem">
+                        <Key type="Bool" time="0" value="True"/>
+                    </Controller>
+                    <Controller type="Visibility" end="Pause" frame="$parent/ContainerRingPulse3">
+                        <Key type="Bool" time="0" value="false"/>
+                    </Controller>
+                    <Controller type="Visibility" end="Pause" frame="$parent/ThreeStacksIndicatorRing3">
+                        <Key type="Bool" time="0" value="False"/>
+                    </Controller>
+                    <!-- End: Gem Three Animations -->
+
+                </Animation>               
+                
+                <Animation name="ValeerOneStack">
+                    <Event event="Reset" action="Stop"/>
+                    <Event event="NoState" action="Stop"/>
+                    <Event event="ValeeraHas1CP" action="Restart, Play"/>
+
+                    <!-- Start: Gem One Animations -->
+                    <Controller type="Visibility" end="Pause" frame="$parent/ComboGemContainer1/TurnONGem">
+                        <Key type="Bool" time="0" value="True"/>
+                    </Controller>
+                    <Controller type="Visibility" end="Pause" frame="$parent/ComboGemContainer1/TurnOFFGem">
+                        <Key type="Bool" time="0" value="False"/>
+                    </Controller>
+                    <Controller type="Visibility" end="Pause" frame="$parent/ContainerRingPulse1">
+                        <Key type="Bool" time="0" value="True"/>
+                    </Controller>
+                    <!-- Start: Gem One Animations -->
+
+                </Animation>
+
+                <Animation name="ValeerTwoStack">
+                    <Event event="Reset" action="Stop"/>
+                    <Event event="NoState" action="Stop"/>
+                    <Event event="ValeeraHas2CP" action="Restart, Play"/>
+
+                    <!-- Start: Gem One Animations -->
+                    <Controller type="Visibility" end="Pause" frame="$parent/ComboGemContainer1/TurnONGem">
+                        <Key type="Bool" time="0" value="True"/>
+                    </Controller>
+                    <Controller type="Visibility" end="Pause" frame="$parent/ComboGemContainer1/TurnOFFGem">
+                        <Key type="Bool" time="0" value="False"/>
+                    </Controller>
+                    <Controller type="Visibility" end="Pause" frame="$parent/ContainerRingPulse1">
+                        <Key type="Bool" time="0" value="True"/>
+                    </Controller>
+                    <!-- Start: Gem One Animations -->
+
+                    <!-- Start: Gem Two Animations -->
+                    <Controller type="Visibility" end="Pause" frame="$parent/ComboGemContainer2/TurnONGem">
+                        <Key type="Bool" time="0" value="True"/>
+                    </Controller>
+                    <Controller type="Visibility" end="Pause" frame="$parent/ComboGemContainer2/TurnOFFGem">
+                        <Key type="Bool" time="0" value="False"/>
+                    </Controller>
+                    <Controller type="Visibility" end="Pause" frame="$parent/ContainerRingPulse2">
+                        <Key type="Bool" time="0" value="True"/>
+                    </Controller>
+                    <!-- Start: Gem Two Animations -->
+
+                </Animation>
+
+                <Animation name="ValeerThreeStack">
+                    <Event event="Reset" action="Stop"/>
+                    <Event event="NoState" action="Stop"/>
+                    <Event event="ValeeraHas3CP" action="Restart, Play"/>
+
+                    <!-- Start: Gem One Animations -->
+                    <Controller type="Visibility" end="Pause" frame="$parent/ComboGemContainer1/TurnONGem">
+                        <Key type="Bool" time="0" value="True"/>
+                    </Controller>
+                    <Controller type="Visibility" end="Pause" frame="$parent/ComboGemContainer1/TurnOFFGem">
+                        <Key type="Bool" time="0" value="False"/>
+                    </Controller>
+                    <Controller type="Visibility" end="Pause" frame="$parent/ThreeStacksIndicatorRing1">
+                        <Key type="Bool" time="0" value="True"/>
+                    </Controller>
+                    <Controller type="Visibility" end="Pause" frame="$parent/ContainerRingPulse1">
+                        <Key type="Bool" time="0" value="True"/>
+                    </Controller>
+                    <!-- Start: Gem One Animations -->
+
+                    <!-- Start: Gem Two Animations -->
+                    <Controller type="Visibility" end="Pause" frame="$parent/ComboGemContainer2/TurnONGem">
+                        <Key type="Bool" time="0" value="True"/>
+                    </Controller>
+                    <Controller type="Visibility" end="Pause" frame="$parent/ComboGemContainer2/TurnOFFGem">
+                        <Key type="Bool" time="0" value="False"/>
+                    </Controller>
+                    <Controller type="Visibility" end="Pause" frame="$parent/ThreeStacksIndicatorRing2">
+                        <Key type="Bool" time="0" value="True"/>
+                    </Controller>
+                    <Controller type="Visibility" end="Pause" frame="$parent/ContainerRingPulse2">
+                        <Key type="Bool" time="0" value="True"/>
+                    </Controller>
+                    <!-- Start: Gem Two Animations -->
+
+                    <!-- Start: Gem Three Animations -->
+                    <Controller type="Visibility" end="Pause" frame="$parent/ComboGemContainer3/TurnONGem">
+                        <Key type="Bool" time="0" value="True"/>
+                    </Controller>
+                    <Controller type="Visibility" end="Pause" frame="$parent/ComboGemContainer3/TurnOFFGem">
+                        <Key type="Bool" time="0" value="False"/>
+                    </Controller>
+                    <Controller type="Visibility" end="Pause" frame="$parent/ThreeStacksIndicatorRing3">
+                        <Key type="Bool" time="0" value="True"/>
+                    </Controller>
+                    <Controller type="Visibility" end="Pause" frame="$parent/ContainerRingPulse3">
+                        <Key type="Bool" time="0" value="True"/>
+                    </Controller>
+                    <!-- Start: Gem Three Animations -->
+
+                </Animation>
+            </Frame>
+<!-- End: Combo Gem Aniamtions -->
+            
+
+<!-- Start: Combo Gem Implementations -->            
+            <Frame type="Image" name="ComboGemContainer1" template="Valeera/ComboGemTemplate">
+            </Frame>
+
+            <Frame type="Image" name="ComboGemContainer2" template="Valeera/ComboGemTemplate">
+                <Anchor side="Left" relative="$parent/ComboGemContainer1" pos="Min" offset="55"/>
+                <Anchor side="Bottom" relative="$parent/ComboGemContainer1" pos="Max" offset="0"/>
+            </Frame>
+
+            <Frame type="Image" name="ComboGemContainer3" template="Valeera/ComboGemTemplate">
+                <Anchor side="Left" relative="$parent/ComboGemContainer2" pos="Min" offset="55"/>
+                <Anchor side="Bottom" relative="$parent/ComboGemContainer2" pos="Max" offset="0"/>
+            </Frame>
+
+            <Frame type="Image" name="ContainerRingPulse1" template="Valeera/ContainerRingPulseTemplate">
+                <Anchor side="Left" relative="$parent/ComboGemContainer1/TurnONGem" pos="Mid" offset="-1"/>
+                <Anchor side="Bottom" relative="$parent/ComboGemContainer1/TurnONGem" pos="Mid" offset="0"/>
+                <Anchor side="Right" relative="$parent/ComboGemContainer1/TurnONGem" pos="Mid" offset="-1"/>
+                <Anchor side="Top" relative="$parent/ComboGemContainer1/TurnONGem" pos="Mid" offset="0"/>
+            </Frame>
+
+            <Frame type="Image" name="ContainerRingPulse2" template="Valeera/ContainerRingPulseTemplate">
+                <Anchor side="Left" relative="$parent/ComboGemContainer2/TurnONGem" pos="Mid" offset="-1"/>
+                <Anchor side="Bottom" relative="$parent/ComboGemContainer2/TurnONGem" pos="Mid" offset="0"/>
+                <Anchor side="Right" relative="$parent/ComboGemContainer2/TurnONGem" pos="Mid" offset="-1"/>
+                <Anchor side="Top" relative="$parent/ComboGemContainer2/TurnONGem" pos="Mid" offset="0"/>
+            </Frame>
+
+            <Frame type="Image" name="ContainerRingPulse3" template="Valeera/ContainerRingPulseTemplate">
+                <Anchor side="Left" relative="$parent/ComboGemContainer3/TurnONGem" pos="Mid" offset="-1"/>
+                <Anchor side="Bottom" relative="$parent/ComboGemContainer3/TurnONGem" pos="Mid" offset="0"/>
+                <Anchor side="Right" relative="$parent/ComboGemContainer3/TurnONGem" pos="Mid" offset="-1"/>
+                <Anchor side="Top" relative="$parent/ComboGemContainer3/TurnONGem" pos="Mid" offset="0"/>
+            </Frame>
+
+            <Frame type="Image" name="ThreeStacksIndicatorRing1" template="Valeera/ThreeStacksIndicatorRingTemplate">
+                <Anchor side="Left" relative="$parent/ComboGemContainer1" pos="Mid" offset="0"/>
+                <Anchor side="Bottom" relative="$parent/ComboGemContainer1" pos="Mid" offset="0"/>
+                <Anchor side="Right" relative="$parent/ComboGemContainer1" pos="Mid" offset="0"/>
+                <Anchor side="Top" relative="$parent/ComboGemContainer1" pos="Mid" offset="0"/>
+            </Frame>
+
+            <Frame type="Image" name="ThreeStacksIndicatorRing2" template="Valeera/ThreeStacksIndicatorRingTemplate">
+                <Anchor side="Left" relative="$parent/ComboGemContainer2" pos="Mid" offset="0"/>
+                <Anchor side="Bottom" relative="$parent/ComboGemContainer2" pos="Mid" offset="0"/>
+                <Anchor side="Right" relative="$parent/ComboGemContainer2" pos="Mid" offset="0"/>
+                <Anchor side="Top" relative="$parent/ComboGemContainer2" pos="Mid" offset="0"/>
+            </Frame>
+
+            <Frame type="Image" name="ThreeStacksIndicatorRing3" template="Valeera/ThreeStacksIndicatorRingTemplate">
+                <Anchor side="Left" relative="$parent/ComboGemContainer3" pos="Mid" offset="0"/>
+                <Anchor side="Bottom" relative="$parent/ComboGemContainer3" pos="Mid" offset="0"/>
+                <Anchor side="Right" relative="$parent/ComboGemContainer3" pos="Mid" offset="0"/>
+                <Anchor side="Top" relative="$parent/ComboGemContainer3" pos="Mid" offset="0"/>
+            </Frame>
+<!-- End: Combo Gem Implementations -->  
+
+<!-- Start: Progress Bar Container and Progress Bar -->
+            <Frame type="Image" name="ProgressBarContainer">
+                <Anchor side="Left" relative="$parent/" pos="Min" offset="42"/>
+                <Anchor side="Bottom" relative="$parent" pos="Max" offset="-12"/>
+                <ScaleWidthToTexture val="true"/>
+                <TextureType val="Nineslice"/>
+                <Texture val="@UI/Storm_UI_GenIG_BarSkewLeftBG_Half"/>
+                <Width val="161"/>
+            </Frame>
+
+            <!-- Combo Points Progress Bar -->
+            <Frame type="UnitStatusBehaviorIcon" name="ValeeraComboPointsIcon">
+                <Anchor relative="$parent"/>
+                <Behavior val="ValeeraInCombatComboPoints"/>
+                <RenderPriority val="611"/>
+                <AcceptsMouse val="false"/>
+
+                <Frame type="BehaviorIcon" name="BehaviorIcon">
+                    <Anchor relative="$parent"/>
+                    <AcceptsMouse val="false"/>
+
+                    <Frame type="ProgressBar" name="CooldownBar">
+                        <Anchor side="Left" relative="$parent/$parent/$parent/ProgressBarContainer" pos="Min" offset="6"/>
+                        <Anchor side="Bottom" relative="$parent/$parent/$parent/ProgressBarContainer" pos="Max" offset="-3"/>
+                        <MinValue val="0"/>
+                        <MaxValue val="1"/>
+                        <Value val="0"/>
+                        <FillInset val="0.0"/>
+                        <Height val="8"/>
+                        <Width val="150"/>
+
+                        <Frame type="Frame" name="FillImageContainer">
+                            <Anchor relative="$parent"/>
+
+                            <Frame type="Image" name="FillImage">
+                                <Anchor relative="$parent"/>
+                                <Texture val="@UI/Storm_UI_GenIG_BarFill"/>
+                                <HSkew val="-30"/>
+                                <ColorAdjustMode val="Colorize"/>
+                                <AdjustmentColor val="CC0000"/>
+                                <TextureType val="Nineslice"/>
+                                <SubpixelRendering val="True"/>
+                                <RenderPriority val="511"/>
+<!-- End: Progress Bar Container and Progress Bar -->
+                            </Frame>
+                        </Frame>
+                    </Frame>
+                </Frame>
+            </Frame>
+        </Frame>
+    </Frame>
+</Desc>

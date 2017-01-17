@@ -4,14 +4,37 @@
 <!-- Start: Frame Overrides used for creating the glowing effect on the, Portrait Frame. Resource Fraem, and Ability Backplate -->
 
         <Frame type="CommandPanel" name="GameUI/UIContainer/ConsoleUIContainer/CommandPanel" file="GameUI">
-            <Frame type="Image" name="MiddleFill">
-                <Frame type="Image" name="AbilityBarGlowImage">
-                    <LightAdjustColor val="e88317"/>
-                    <DarkAdjustColor val="c32828"/>
 
-                    <Animation name="PulseFade">
-                        <Event event="NoState" action="Restart,Stop" frame="#AbilBarHealthBarPortraitGlow"/>
-                        <Event event="AbilBarHealthBarPortraitGlow" action="Restart,Play" frame="#AbilBarHealthBarPortraitGlow"/>
+            <StateGroup name="CurrentUnit">
+                <State name="RagnarosBigRag">
+                    <When type="AnimationState" CurrentUnit="RagnarosBigRag"/>
+                    <Action type="SetProperty" frame="$AbilityBackPlate" LightAdjustColor="E88317"/>
+                    <Action type="SetProperty" frame="$AbilityBackPlate" DarkAdjustColor="C32828"/>
+                    <Action type="SetProperty" frame="$PortraitBackPlate" LightAdjustColor="E88317"/>
+                    <Action type="SetProperty" frame="$PortraitBackPlate" DarkAdjustColor="C32828"/>
+                    <Action type="SetProperty" frame="$ResourceBackPlate" LightAdjustColor="E88317"/>
+                    <Action type="SetProperty" frame="$ResourceBackPlate" DarkAdjustColor="C32828"/>
+                    <Action type="SetProperty" frame="RagnarosBigRagCommandPanelAnimFrame" Visible="true"/>
+                </State>
+            </StateGroup>
+
+            <Frame type="Frame" name="RagnarosBigRagCommandPanelAnimFrame">
+                <Anchor side="Top" relative="$parent" pos="Max" offset="0"/>
+                <Anchor side="Left" relative="$layer" pos="Min" offset="0"/>
+                <Anchor side="Right" relative="$layer" pos="Max" offset="0"/>
+                <Height val="400"/>
+                <Visible val="False"/>
+
+                <!-- An invisible frame will still update its animations, but not its children's.  This child frame
+                is to prevent the animation from running when the parent is hidden. -->
+                <Frame type="Frame" name="RagnarosBigRag">
+                    <Anchor relative="$parent" offset="0"/>
+
+                    <Animation name="PulseFade" flags="NoEventsWhileHidden">
+                        <Event event="OnHidden" action="Stop" frame="$parent"/>
+                        <Event event="AbilBarHealthBarPortraitGlow" action="Restart,Play" frame="$AbilBarHealthBarPortraitGlow"/>
+                        <Event event="NoState" action="Stop" frame="$AbilBarHealthBarPortraitGlow"/>
+
                         <Controller type="Fade" end="pingpong" frame="$AbilityBackPlate">
                             <Key type="Curve" time="0" value="255" out="Fast"/>
                             <Key type="Curve" time=".16" value="255" in="Slow"/>
@@ -42,33 +65,7 @@
                             <Key type="Curve" time="1" value="191" in="Slow"/>
                             <Key type="Curve" time="1.2" value="255" in="Slow"/>
                         </Controller>
-                        <Controller type="Fade" end="pause" frame="$AbilityBackPlate">
-                            <Key type="Curve" time="0" value="255" out="Fast"/>
-                            <Key type="Curve" time=".16" value="255" in="Slow"/>
-                            <Key type="Curve" time=".3" value="127" in="Slow"/>
-                            <Key type="Curve" time=".5" value="255" in="Slow"/>
-                            <Key type="Curve" time=".6" value="191" in="Slow"/>
-                            <Key type="Curve" time=".8" value="255" in="Slow"/>
-                            <Key type="Curve" time="1" value="191" in="Slow"/>
-                            <Key type="Curve" time="1.2" value="255" in="Slow"/>
-                        </Controller>
                     </Animation>
-
-                </Frame>
-            </Frame>
-        </Frame>
-
-        <Frame type="Frame" name="GameUI/UIContainer/ConsoleUIContainer/HeroConsolePanel" file="GameUI">
-            <Frame type="Image" name="PortraitFrameImage">
-                <Frame type="Image" name="PortraitFrameGlowImage">
-                    <LightAdjustColor val="e88317"/>
-                    <DarkAdjustColor val="c32828"/>
-                </Frame>
-            </Frame>
-            <Frame type="Image" name="Background">
-                <Frame type="Image" name="ArtBarGlowImage">
-                    <LightAdjustColor val="e88317"/>
-                    <DarkAdjustColor val="c32828"/>
                 </Frame>
             </Frame>
         </Frame>
@@ -754,9 +751,11 @@
                     <Anchor side="Bottom" relative="$this" pos="Min" offset="32"/>
                     <Anchor side="Left" relative="$parent/HeroFrameBackground" pos="Min" offset="-6"/>
                     <Anchor side="Right" relative="$parent/HeroFrameBackground" pos="Max" offset="7"/>
+                    <RenderPriority val="#RenderPriority_Background"/>
+
                     <Texture val="@UI/Storm_UI_Ingame_BossBar_VertLights"/>
                     <SubpixelRendering val="True"/>
-                    <RenderPriority val="#RenderPriority_Background"/>
+
                     <ColorAdjustMode val="Desaturate"/>
                     <LightAdjustColor val="{$parent/$parent/$parent/PrimaryHighlightColorFrame/@Color}"/>
                     <DarkAdjustColor val="{$parent/$parent/$parent/PrimaryColorFrame/@Color}"/>
@@ -767,9 +766,11 @@
                     <Anchor side="Right" relative="$parent/HeroFrameBackground" pos="Min" offset="10"/>
                     <Anchor side="Left" relative="$this" pos="Max" offset="-28"/>
                     <Anchor side="Bottom" relative="$this" pos="Min" offset="32"/>
+                    <RenderPriority val="#RenderPriority_Background"/>
+
                     <Texture val="@UI/Storm_UI_Ingame_BossBar_HorizLights"/>
                     <SubpixelRendering val="True"/>
-                    <RenderPriority val="#RenderPriority_Background"/>
+
                     <ColorAdjustMode val="Desaturate"/>
                     <LightAdjustColor val="{$parent/$parent/$parent/PrimaryHighlightColorFrame/@Color}"/>
                     <DarkAdjustColor val="{$parent/$parent/$parent/PrimaryColorFrame/@Color}"/>
@@ -780,10 +781,12 @@
                     <Anchor side="Left" relative="$parent/HeroFrameBackground" pos="Max" offset="-10"/>
                     <Anchor side="Right" relative="$this" pos="Min" offset="28"/>
                     <Anchor side="Bottom" relative="$this" pos="Min" offset="32"/>
+                    <RenderPriority val="#RenderPriority_Background"/>
+
                     <Texture val="@UI/Storm_UI_Ingame_BossBar_HorizLights"/>
                     <TextureCoords top="0" left="1" bottom="1" right="0"/>
                     <SubpixelRendering val="True"/>
-                    <RenderPriority val="#RenderPriority_Background"/>
+
                     <ColorAdjustMode val="Desaturate"/>
                     <LightAdjustColor val="{$parent/$parent/$parent/PrimaryHighlightColorFrame/@Color}"/>
                     <DarkAdjustColor val="{$parent/$parent/$parent/PrimaryColorFrame/@Color}"/>
