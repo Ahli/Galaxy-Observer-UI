@@ -7,6 +7,42 @@
         <Height val="48"/>
         <HideWhenCleared val="true"/>
         <SelectedSound val="@UI_FileSelectionSelect"/>
+
+        <Frame type="Frame" name="HoverSound2Frame">
+            <Anchor relative="$parent"/>
+            <Visible val="False"/>
+
+            <Animation name="HoverSound2">
+                <Event event="OnShown" action="Reset,Play" frame="$this"/>
+
+                <Controller type="Sound" end="Stop">
+                    <Key type="Sound" time="0" sound="@UI_HoverTick"/>
+                </Controller>
+            </Animation>
+
+            <StateGroup name="VisibleState">
+                <DefaultState val="NotVisible"/>
+
+                <State name="Visible">
+                    <When type="Property" frame="$parent/HoverImage" visible="true"/>
+                    <When type="Property" frame="$parent" selected="false"/>
+                    <Action type="SetProperty" frame="$this" visible="true"/>
+                </State>
+
+                <State name="NotVisible">
+                    <Action type="SetProperty" frame="$this" visible="false"/>
+                </State>
+            </StateGroup>
+        </Frame>
+
+        <!-- <Animation name="HoverSound">
+            <Event event="OnMouseEnter" action="Reset,Play"/>
+            <Event event="OnMouseExit" action="Reset, Stop"/>
+            <Controller type="Sound" end="Stop">
+                <Key type="Sound" time="0" sound="@UI_HoverTick"/>
+            </Controller>
+        </Animation> -->
+
         <PresenceId val="{$parent/$parent/UnitSkinSelectionFrame/@PresenceId}"/>
 
         <Frame type="Image" name="NormalImage">
@@ -119,6 +155,8 @@
 
     <Frame type="TileList" name="UnitTileListTemplate">
         <Width val="517"/>
+        <!-- Different height when we have large format selection -->
+        <!--<Height val="601"/>-->
         <Height val="681"/>
         <AcceptsMouse val="true"/>
         <RequireSelection val="true"/>
@@ -204,123 +242,6 @@
             <Anchor side="Top" relative="$parent" pos="Min" offset="-4"/>
             <Anchor side="Right" relative="$parent" pos="Max" offset="-12"/>
             <Anchor side="Bottom" relative="$parent" pos="Max" offset="-1"/>
-        </Frame>
-    </Frame>
-
-    <Frame type="SkinPackLargeFormatTileListItem" name="SkinPackLargeFormatTileListItemTemplate">
-        <Height val="42"/>
-        <HideWhenCleared val="true"/>
-        <UnitSelected val="{$this/CheckBox/@Checked}"/>
-
-        <Frame type="Frame" name="BackgroundImage" template="StandardGreyboxTemplates/StandardContainerInnerTemplate">
-            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
-            <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
-            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
-            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
-            <Width val="0"/>
-            <Height val="0"/>
-        </Frame>
-
-        <Frame type="UnitCacheFrame" name="UnitCacheFrame">
-            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
-            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
-            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
-            <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
-            <Unit val="{$parent/@Unit}"/>
-        </Frame>
-
-        <Frame type="CheckBox" name="CheckBox" template="StandardGreyboxTemplates/StandardCheckBoxTemplate">
-            <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
-            <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
-            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
-            <Checked val="{$parent/@UnitSelected}"/>
-        </Frame>
-
-        <Frame type="Label" name="NameLabel">
-            <Anchor side="Top" relative="$parent/CheckBox" pos="Mid" offset="0"/>
-            <Anchor side="Bottom" relative="$parent/CheckBox" pos="Mid" offset="0"/>
-            <Anchor side="Left" relative="$parent/CheckBox" pos="Max" offset="0"/>
-            <Style val="@Greybox_StandardTextButtonSmall"/>
-            <Text val="{$parent/UnitCacheFrame/@NameText}"/>
-        </Frame>
-
-        <StateGroup name="CheckBoxEnabledStateGroup">
-            <DefaultState val="CheckBoxNotEnabled"/>
-
-            <State name="SelectionsRemaining">
-                <When type="Property" frame="$parent/$parent" SelectionsRemaining="true"/>
-                <Action type="SetProperty" frame="CheckBox" enabled="true"/>
-            </State>
-
-            <State name="CheckBoxAlreadyChecked">
-                <When type="Property" frame="CheckBox" Checked="true"/>
-                <Action type="SetProperty" frame="CheckBox" enabled="true"/>
-            </State>
-
-            <State name="CheckBoxNotEnabled">
-                <Action type="SetProperty" frame="CheckBox" enabled="false"/>
-            </State>
-        </StateGroup>
-    </Frame>
-
-    <Frame type="TileList" name="LargeFormatUnitTileListTemplate">
-        <Frame type="SkinPackLargeFormatTileListItem" name="Item0" template="SkinPackUnitSelectionFrame/SkinPackLargeFormatTileListItemTemplate">
-            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
-            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
-            <Anchor side="Right" relative="$parent/ScrollBar" pos="Min" offset="0"/>
-        </Frame>
-
-        <Frame type="SkinPackLargeFormatTileListItem" name="Item1" template="SkinPackUnitSelectionFrame/SkinPackLargeFormatTileListItemTemplate">
-            <Anchor side="Top" relative="$parent/Item0" pos="Max" offset="0"/>
-            <Anchor side="Left" relative="$parent/Item0" pos="Min" offset="0"/>
-            <Anchor side="Right" relative="$parent/ScrollBar" pos="Min" offset="0"/>
-        </Frame>
-
-        <Frame type="SkinPackLargeFormatTileListItem" name="Item2" template="SkinPackUnitSelectionFrame/SkinPackLargeFormatTileListItemTemplate">
-            <Anchor side="Top" relative="$parent/Item1" pos="Max" offset="0"/>
-            <Anchor side="Left" relative="$parent/Item1" pos="Min" offset="0"/>
-            <Anchor side="Right" relative="$parent/ScrollBar" pos="Min" offset="0"/>
-        </Frame>
-
-        <Frame type="SkinPackLargeFormatTileListItem" name="Item3" template="SkinPackUnitSelectionFrame/SkinPackLargeFormatTileListItemTemplate">
-            <Anchor side="Top" relative="$parent/Item2" pos="Max" offset="0"/>
-            <Anchor side="Left" relative="$parent/Item2" pos="Min" offset="0"/>
-            <Anchor side="Right" relative="$parent/ScrollBar" pos="Min" offset="0"/>
-        </Frame>
-
-        <Frame type="SkinPackLargeFormatTileListItem" name="Item4" template="SkinPackUnitSelectionFrame/SkinPackLargeFormatTileListItemTemplate">
-            <Anchor side="Top" relative="$parent/Item3" pos="Max" offset="0"/>
-            <Anchor side="Left" relative="$parent/Item3" pos="Min" offset="0"/>
-            <Anchor side="Right" relative="$parent/ScrollBar" pos="Min" offset="0"/>
-        </Frame>
-
-        <Frame type="SkinPackLargeFormatTileListItem" name="Item5" template="SkinPackUnitSelectionFrame/SkinPackLargeFormatTileListItemTemplate">
-            <Anchor side="Top" relative="$parent/Item4" pos="Max" offset="0"/>
-            <Anchor side="Left" relative="$parent/Item4" pos="Min" offset="0"/>
-            <Anchor side="Right" relative="$parent/ScrollBar" pos="Min" offset="0"/>
-        </Frame>
-
-        <Frame type="SkinPackLargeFormatTileListItem" name="Item6" template="SkinPackUnitSelectionFrame/SkinPackLargeFormatTileListItemTemplate">
-            <Anchor side="Top" relative="$parent/Item5" pos="Max" offset="0"/>
-            <Anchor side="Left" relative="$parent/Item5" pos="Min" offset="0"/>
-            <Anchor side="Right" relative="$parent/ScrollBar" pos="Min" offset="0"/>
-        </Frame>
-
-        <Frame type="ScrollBar" name="ScrollBar" template="CollectionTemplates/ScrollBarTemplate">
-            <Anchor side="Top" relative="$parent" pos="Min" offset="-4"/>
-            <Anchor side="Right" relative="$parent" pos="Max" offset="-12"/>
-            <Anchor side="Bottom" relative="$parent" pos="Max" offset="-1"/>
-        </Frame>
-    </Frame>
-
-    <Frame type="SkinPackLargeFormatUnitSelectionFrame" name="LargeFormatSkinPackUnitSelectionFrameTemplate">
-        <Width val="400"/>
-
-        <Frame type="TileList" name="UnitTileList" template="SkinPackUnitSelectionFrame/LargeFormatUnitTileListTemplate">
-            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
-            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
-            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
-            <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
         </Frame>
     </Frame>
 
@@ -454,7 +375,7 @@
         <HideWhenCleared val="False"/>
         <SelectedSound val="@UI_FileSelectionSelect"/>
         <TooltipFrame val="UnitSkinSelectionTileListItemTooltip"/>
-        
+
         <Frame type="BlurFrame" name="BackgroundBlur">
             <Anchor side="Top" relative="$parent/NormalImage" pos="Min" offset="8"/>
             <Anchor side="Left" relative="$parent/NormalImage" pos="Min" offset="8"/>
@@ -489,6 +410,33 @@
             <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
             <Texture val="@UI/SC2_UI_Collection_StandardItemFrame_Hover"/>
             <TextureType val="NineSlice"/>
+        </Frame>
+
+        <Frame type="Frame" name="HoverSoundFrame">
+            <Anchor relative="$parent"/>
+            <Visible val="False"/>
+
+            <Animation name="HoverSound">
+                <Event event="OnShown" action="Reset,Play" frame="$this"/>
+
+                <Controller type="Sound" end="Stop">
+                    <Key type="Sound" time="0" sound="@UI_Large_MouseOver"/>
+                </Controller>
+            </Animation>
+
+            <StateGroup name="VisibleState">
+                <DefaultState val="NotVisible"/>
+
+                <State name="Visible">
+                    <When type="Property" frame="$parent/HoverImage" visible="true"/>
+                    <When type="Property" frame="$parent" selected="false"/>
+                    <Action type="SetProperty" frame="$this" visible="true"/>
+                </State>
+
+                <State name="NotVisible">
+                    <Action type="SetProperty" frame="$this" visible="false"/>
+                </State>
+            </StateGroup>
         </Frame>
         
         <Frame type="Image" name="HoverGlow">
@@ -598,10 +546,12 @@
         </Frame>
 
         <Frame type="Label" name="NameLabel">
-            <Anchor side="Top" relative="$parent/TextBackground" pos="Min" offset="17"/>
+            <Anchor side="Top" relative="$parent/TextBackground" pos="Min" offset="15"/>
             <Anchor side="Left" relative="$parent/TextBackground" pos="Min" offset="17"/>
             <Anchor side="Right" relative="$parent/TextBackground" pos="Max" offset="-17"/>
+            <Height val="23"/>
             <Options val="Ellipsis | NoWrapping | TooltipIfTruncated"/>
+            <AcceptsMouseTooltip val="True"/>
             <Style val="@Collection_ListItem_Name"/>
             <Text val="{$parent/SkinCacheFrame/@NameText}"/>
             
@@ -625,14 +575,14 @@
         </Frame>
 
         <Frame type="Label" name="CostLabel">
-            <Anchor side="Top" relative="$parent/NameLabel" pos="Max" offset="-4"/>
+            <Anchor side="Top" relative="$parent/NameLabel" pos="Max" offset="0"/>
             <Anchor side="Left" relative="$parent/NameLabel" pos="Min" offset="0"/>
             <Style val="@Collection_ListItem_Cost"/>
             <Text val="{$parent/GameContentFrame/@CostText}"/>
         </Frame>
 
         <Frame type="Label" name="StateLabel">
-            <Anchor side="Top" relative="$parent/NameLabel" pos="Max" offset="-4"/>
+            <Anchor side="Top" relative="$parent/NameLabel" pos="Max" offset="0"/>
             <Anchor side="Left" relative="$parent/NameLabel" pos="Min" offset="0"/>
             <Anchor side="Right" relative="$parent/NameLabel" pos="Max" offset="0"/>
             <Options val="Ellipsis | NoWrapping | TooltipIfTruncated"/>
@@ -649,6 +599,11 @@
                 <State name="HoverState">
                     <When type="Property" frame="$parent/HoverImage" visible="True"/>
                     <Action type="SetProperty" frame="$this" Style="@Collection_ListItem_Desc_Selected"/>
+                </State>
+                
+                <State name="LockedState">
+                    <When type="StateGroup" frame="$parent" GameContentOwnedStateGroup="GameContentLocked"/>
+                    <Action type="SetProperty" frame="$this" Style="@Collection_ListItem_Desc_Locked"/>
                 </State>
 
                 <State name="NormalState">
@@ -716,7 +671,7 @@
             <State name="GameContentAllowed">
                 <When type="AnimationState" frame="RewardCacheFrame" AllowedState="Allowed"/>
                 <Action type="SetProperty" frame="StateLabel" visible="true"/>
-                <Action type="SetProperty" frame="StateLabel" text="@UI/ScreenCollection/Earned"/>
+                <Action type="SetProperty" frame="StateLabel" text="@UI/ScreenCollection/Owned"/>
                 <Action type="SetProperty" frame="CostLabel" visible="false"/>
                 <Action type="SetProperty" frame="LockIcon" visible="false"/>
             </State>
@@ -725,7 +680,6 @@
                 <When type="Property" frame="GameContentFrame" CanPurchase="false"/>
                 <Action type="SetProperty" frame="StateLabel" visible="true"/>
                 <Action type="SetProperty" frame="StateLabel" text="@UI/ScreenCollection/Locked"/>
-                <Action type="SetProperty" frame="StateLabel" style="@Collection_ListItem_Desc_Locked"/>
                 <Action type="SetProperty" frame="CostLabel" visible="false"/>
                 <Action type="SetProperty" frame="LockIcon" visible="True"/>
             </State>
@@ -909,113 +863,6 @@
         </Frame>
     </Frame>
 
-    <Frame type="Frame" name="LargeFormatFrameTemplate">
-        <Visible val="false"/>
-
-        <Frame type="Image" name="BlackMaskImage">
-            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
-            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
-            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
-            <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
-            <Texture val="@@UI/LargePanelBlackMask"/>
-            <TextureType val="HorizontalBorder"/>
-            <Tiled val="true"/>
-            <AcceptsMouse val="true"/>
-        </Frame>
-
-        <Frame type="Frame" name="BorderFrame" template="StandardGreyboxTemplates/StandardBorderExtraLargeTemplate">
-            <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
-            <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
-            <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
-            <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
-            <Width val="1200"/>
-            <Height val="800"/>
-        </Frame>
-
-        <Frame type="SkinPackLargeFormatUnitSelectionFrame" name="TerranUnitSelectionFrame" template="SkinPackUnitSelectionFrame/LargeFormatSkinPackUnitSelectionFrameTemplate">
-            <Anchor side="Top" relative="$parent/BorderFrame" pos="Min" offset="0"/>
-            <Anchor side="Left" relative="$parent/BorderFrame" pos="Min" offset="0"/>
-            <Anchor side="Bottom" relative="$parent/BorderFrame" pos="Max" offset="0"/>
-            <Race val="Terr"/>
-        </Frame>
-
-        <Frame type="SkinPackLargeFormatUnitSelectionFrame" name="ZergUnitSelectionFrame" template="SkinPackUnitSelectionFrame/LargeFormatSkinPackUnitSelectionFrameTemplate">
-            <Anchor side="Top" relative="$parent/BorderFrame" pos="Min" offset="0"/>
-            <Anchor side="Left" relative="$parent/TerranUnitSelectionFrame" pos="Max" offset="0"/>
-            <Anchor side="Bottom" relative="$parent/BorderFrame" pos="Max" offset="0"/>
-            <Race val="Zerg"/>
-        </Frame>
-
-        <Frame type="SkinPackLargeFormatUnitSelectionFrame" name="ProtossUnitSelectionFrame" template="SkinPackUnitSelectionFrame/LargeFormatSkinPackUnitSelectionFrameTemplate">
-            <Anchor side="Top" relative="$parent/BorderFrame" pos="Min" offset="0"/>
-            <Anchor side="Left" relative="$parent/ZergUnitSelectionFrame" pos="Max" offset="0"/>
-            <Anchor side="Bottom" relative="$parent/BorderFrame" pos="Max" offset="0"/>
-            <Race val="Prot"/>
-        </Frame>
-
-        <Frame type="Button" name="AcceptButton" template="StandardGreyboxTemplates/StandardTextButtonLargeTemplate">
-            <Anchor side="Bottom" relative="$parent/BorderFrame" pos="Max" offset="0"/>
-            <Anchor side="Right" relative="$parent/BorderFrame" pos="Mid" offset="0"/>
-
-            <Frame type="Label" name="Label">
-                <Text val="@UI/Accept"/>
-            </Frame>
-        </Frame>
-
-        <Frame type="Button" name="CancelButton" template="StandardGreyboxTemplates/StandardTextButtonLargeTemplate">
-            <Anchor side="Bottom" relative="$parent/BorderFrame" pos="Max" offset="0"/>
-            <Anchor side="Left" relative="$parent/BorderFrame" pos="Mid" offset="0"/>
-
-            <Frame type="Label" name="Label">
-                <Text val="@UI/Cancel"/>
-            </Frame>
-        </Frame>
-
-        <Animation name="Show">
-            <Event event="OnHidden" action="DirectionReverse,Play" frame="$parent"/>
-            <Event event="OnClick" action="Reset,Play" frame="$parent/LargeFormatButton"/>
-            <Event event="OnClick" action="DirectionReverse,Play" frame="AcceptButton"/>
-            <Event event="OnClick" action="DirectionReverse,Play" frame="CancelButton"/>
-
-            <Controller type="Visibility" end="Pause">
-                <Key type="Bool" time="0" value="false"/>
-                <Key type="Bool" time=".001" value="true"/>
-            </Controller>
-        </Animation>
-
-        <Animation name="Accept">
-            <Event event="OnClick" action="Reset,Play" frame="AcceptButton"/>
-
-            <Controller type="Property" end="Pause" property="SaveOnHidden" frame="TerranUnitSelectionFrame">
-                <Key type="Property" time="0" value="true"/>
-            </Controller>
-
-            <Controller type="Property" end="Pause" property="SaveOnHidden" frame="ZergUnitSelectionFrame">
-                <Key type="Property" time="0" value="true"/>
-            </Controller>
-
-            <Controller type="Property" end="Pause" property="SaveOnHidden" frame="ProtossUnitSelectionFrame">
-                <Key type="Property" time="0" value="true"/>
-            </Controller>
-        </Animation>
-
-        <Animation name="Cancel">
-            <Event event="OnClick" action="Reset,Play" frame="CancelButton"/>
-
-            <Controller type="Property" end="Pause" property="SaveOnHidden" frame="TerranUnitSelectionFrame">
-                <Key type="Property" time="0" value="false"/>
-            </Controller>
-
-            <Controller type="Property" end="Pause" property="SaveOnHidden" frame="ZergUnitSelectionFrame">
-                <Key type="Property" time="0" value="false"/>
-            </Controller>
-
-            <Controller type="Property" end="Pause" property="SaveOnHidden" frame="ProtossUnitSelectionFrame">
-                <Key type="Property" time="0" value="false"/>
-            </Controller>
-        </Animation>
-    </Frame>
-
     <Frame type="UnitSkinSelectionFrame" name="UnitSkinSelectionFrameTemplate">
         <Height val="1200"/>
         <PresenceId val="{$BattleUI/@LocalToonPresenceId}"/>
@@ -1023,6 +870,13 @@
         <Frame type="GameContentSortPulldown" name="SortPulldown" template="StandardBattlenetTemplates/BattlenetLargePulldownTemplate">
             <Anchor side="Bottom" relative="$parent/$parent/UnitTileList" pos="Min" offset="3"/>
             <Anchor side="Right" relative="$parent/SkinTileList/Item2" pos="Max" offset="0"/>
+            <Animation name="HoverSound">
+                <Event event="OnMouseEnter" action="Reset,Play"/>
+                <Event event="OnMouseExit" action="Reset, Stop"/>
+                <Controller type="Sound" end="Stop">
+                    <Key type="Sound" time="0" sound="@UI_HoverTick"/>
+                </Controller>
+            </Animation>
         </Frame>
 
         <Frame type="TileList" name="SkinTileList" template="SkinPackUnitSelectionFrame/SkinTileListTemplate">
@@ -1035,6 +889,14 @@
             <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
             <Reward val="{$parent/@SelectedReward}"/>
             <PresenceId val="{$parent/@PresenceId}"/>
+
+            <Animation name="HoverSound">
+                <Event event="OnMouseEnter" action="Reset,Play"/>
+                <Event event="OnMouseExit" action="Reset, Stop"/>
+                <Controller type="Sound" end="Stop">
+                    <Key type="Sound" time="0" sound="@UI_HoverTick"/>
+                </Controller>
+            </Animation>
 
             <Frame type="GameContentFrame" name="GameContentFrame">
                 <GameContent val="{$parent/$parent/@SelectedGameContent}"/>
@@ -1135,56 +997,18 @@
             <Unit val="{$parent/@SelectedUnit}"/>
             <SortMethod val="{$this/SortPulldown/@SelectedSort}"/>
         </Frame>
-        
-        <Frame type="Frame" name="LargeFormatContainer">
-            <Anchor side="Top" relative="$parent/UnitTileList" pos="Max" offset="32"/>
+
+        <Frame type="SkinPackLargeFormatUnitSelectionFrame" name="LargeFormatUnitSelectionFrame" template="SkinPackLargeFormatUnitSelectionFrame/SkinPackLargeFormatUnitSelectionFrameTemplate">
+            <Anchor side="Top" relative="$parent/UnitTileList" pos="Min" offset="0"/>
+            <Anchor side="Bottom" relative="$parent/UnitTileList" pos="Max" offset="80"/>
             <Anchor side="Left" relative="$parent/UnitTileList" pos="Min" offset="0"/>
             <Anchor side="Right" relative="$parent/UnitTileList" pos="Max" offset="0"/>
-            <Height val="78"/>
-            
-            <!--
-            
-            <Frame type="Image" name="Background">
-                <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
-                <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
-                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
-                <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
-                <Texture val="@UI/SC2_UI_Collection_Emoji_List_Background"/>
-                <TextureType val="NineSlice"/>
-            </Frame>
-            
-            <Frame type="Label" name="Title">
-                <Anchor side="Top" relative="$parent" pos="Min" offset="19"/>
-                <Anchor side="Left" relative="$parent" pos="Min" offset="28"/>
-                <Text val="@UI/ScreenCollection/Skins/LargeFormatWidgetTitle"/>
-                <Style val="@Collection_LargeFormatGames_Title"/>
-            </Frame>
-            
-            <Frame type="Label" name="Description">
-                <Anchor side="Top" relative="$parent/Title" pos="Max" offset="-2"/>
-                <Anchor side="Left" relative="$parent/Title" pos="Min" offset="0"/>
-                <Text val="@UI/ScreenCollection/Skins/LargeFormatWidgetInfo"/>
-                <Style val="@Collection_LargeFormatGames_Info"/>
-            </Frame>
-            
-            -->
-        </Frame>
-
-        <Frame type="Button" name="LargeFormatButton" template="StandardBattlenetTemplates/BattlenetSmallButtonTemplate">
-            <Anchor side="Top" relative="$parent/LargeFormatContainer" pos="Mid" offset="0"/>
-            <Anchor side="Bottom" relative="$parent/LargeFormatContainer" pos="Mid" offset="0"/>
-            <Anchor side="Right" relative="$parent/LargeFormatContainer" pos="Max" offset="-17"/>
-            <Text val="@UI/ScreenCollection/Select"/>
-            <Visible val="False"/>
-            <Enabled val="False"/>
-        </Frame>
-
-        <Frame type="Frame" name="LargeFormatFrame" template="SkinPackUnitSelectionFrame/LargeFormatFrameTemplate">
-            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
-            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
-            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
-            <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
-            <Visible val="False"/>
+            <PresenceId val="{$BattleUI/@LocalToonPresenceId}"/>
+            <Race val="{$parent/RaceTabControl/@SelectedRace}"/>
+            <!-- Remove once we have large format selection -->
+            <Visible val="false"/>
+            <!-- Also add this to RewardData.xml -->
+            <!-- <Flags index="ExcludeInLargeFormatGame" value="1"/> -->
         </Frame>
     </Frame>
 </Desc>

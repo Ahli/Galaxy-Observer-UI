@@ -1,0 +1,675 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<Desc>
+    <DescFlags val="Locked"/>
+
+    <Frame type="AchievementInfoFrame" name="AchievementInfoFrameTemplate">
+        <Anchor side="Left" relative="$this/UnlockableFrame3" pos="Min" offset="0"/>
+        <AcceptsMouseTooltip val="true"/>
+        <Tooltip val="{$this/@RewardText}"/>
+
+        <Frame type="UnlockableFrame" name="UnlockableFrame0" template="StandardTemplates/AchievementInfoUnlockableFrameTemplate">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+            <CollapseLayout val="true"/>
+        </Frame>
+
+        <Frame type="UnlockableFrame" name="UnlockableFrame1" template="StandardTemplates/AchievementInfoUnlockableFrameTemplate">
+            <Anchor side="Top" relative="$parent/UnlockableFrame0" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent/UnlockableFrame0" pos="Min" offset="0"/>
+            <CollapseLayout val="true"/>
+        </Frame>
+
+        <Frame type="UnlockableFrame" name="UnlockableFrame2" template="StandardTemplates/AchievementInfoUnlockableFrameTemplate">
+            <Anchor side="Top" relative="$parent/UnlockableFrame1" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent/UnlockableFrame1" pos="Min" offset="0"/>
+            <CollapseLayout val="true"/>
+        </Frame>
+
+        <Frame type="UnlockableFrame" name="UnlockableFrame3" template="StandardTemplates/AchievementInfoUnlockableFrameTemplate">
+            <Anchor side="Top" relative="$parent/UnlockableFrame2" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent/UnlockableFrame2" pos="Min" offset="0"/>
+            <CollapseLayout val="true"/>
+        </Frame>
+    </Frame>
+
+    <Frame type="PlayerScoreValueResultNumberFrame" name="ScoreValueFrameTemplate">
+        <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+        <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+        <Height val="30"/>
+        <Visible val="false"/>
+        
+        <Frame type="Image" name="IconImage">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+        </Frame>
+
+        <Frame type="Label" name="ResultLabel">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="2"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+        </Frame>
+    </Frame>
+
+    <Frame type="ScoreRewardItem" name="RewardXPItemTemplate">
+        <Frame type="Image" name="IconImage">
+            <Visible val="false"/>
+        </Frame>
+
+        <Frame type="Label" name="SourceLabel">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="40"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+            <Style val="Coop_ScoreScreen_RewardSource"/>
+        </Frame>
+        
+        <Frame type="Image" name="AmountAccent">
+            <Anchor side="Top" relative="$parent/AmountLabel" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent/AmountLabel" pos="Mid" offset="0"/>
+            <Anchor side="Left" relative="$parent/AmountLabel" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent/AmountLabel" pos="Mid" offset="0"/>
+            <Texture val="@UI/SC2_UI_Battlenet_Glue_Campaign_Purchase_Celebration_Accent"/>
+            <Width val="200"/>
+            <Height val="70"/>
+            <Alpha val="0"/>
+            
+            <Animation name="Show">
+                <Event event="Begin" action="Reset" frame="$parent/$parent/$parent/$parent"/>
+                <Event event="OnShown" action="Play" frame="$parent"/>
+                 
+                <Controller type="Fade" end="Pause">
+                    <Key type="Curve" time="0" value="0" out="Slow"/>
+                    <Key type="Curve" time="0.6" value="255" in="Slow"/>
+                     <Key type="Curve" time="4" value="255" in="Slow"/>
+                </Controller>
+                
+                <Controller type="Dimension" dimension="Width" relative="False" percentage="True" end="Pause" >
+                    <Key type="Curve" time="0" value="0"/>
+                    <Key type="Curve" time="0.6" value="150"/>
+                    <Key type="Curve" time="4" value="100"/>
+                </Controller>
+                
+                <Controller type="Dimension" dimension="Height" relative="False" percentage="True" end="Pause" >
+                    <Key type="Curve" time="0" value="0"/>
+                    <Key type="Curve" time="0.6" value="150"/>
+                    <Key type="Curve" time="4" value="100"/>
+                </Controller>
+                
+                <Controller type="Event" end="Stop">
+                    <Key type="Event" time="4" event="Pulse"/>
+                </Controller>
+            </Animation>
+        </Frame>
+        
+        <Frame type="Label" name="PlusSign">
+            <Anchor side="Top" relative="$parent/SourceLabel" pos="Max" offset="1"/>
+            <Anchor side="Left" relative="$parent/SourceLabel" pos="Min" offset="0"/>
+            <Style val="Coop_ScoreScreen_RewardAmount"/>
+            <Text val="+"/>
+        </Frame>
+
+        <Frame type="CountdownLabel" name="AmountLabel">
+            <Anchor side="Top" relative="$parent/SourceLabel" pos="Max" offset="1"/>
+            <Anchor side="Left" relative="$parent/PlusSign" pos="Max" offset="0"/>
+            <FormatNumber val="true"/>
+            <Style val="Coop_ScoreScreen_RewardAmount"/>
+            <CountdownSound val="AC_UI_XPBarFillLoop"/>
+
+            <Animation name="CountUp">
+                <!-- Only reset this label's animation when we begin the whole process, so it doesn't reset from just hiding/showing -->
+                <!-- We must begin the counter on being shown so that the hidden items do not affect the TotalXPLabel animation -->
+                <Event event="Begin" action="Reset" frame="$parent/$parent/$parent/$parent"/>
+                <Event event="OnShown" action="Play" frame="$parent"/>
+
+                <!-- This controls how long it takes to count up -->
+                <Controller type="Counter" end="Pause">
+                    <Key type="Curve" time="0.0" value="0.0" out="Slow"/>
+                    <Key type="Curve" time="1.0" value="1.0" in="Slow"/>
+                </Controller>
+
+                <!-- This controls the delay before the next item beings counting up -->
+                <Controller type="Event" end="Pause" frame="$parent/$parent">
+                    <Key type="Event" time="0.0" event="Restart"/>
+                    <Key type="Event" time="0.5" event="ShowNextRewardItem"/>
+                </Controller>
+
+                <!-- Every time a label begins counting up, it resets the total count label until the last one is finished
+                <!   so it only starts after all the breakdown categories finish.  BeginTotalCounter must not begin counting
+                <!   until after ShowNextRewardItem begins. -->
+                <Controller type="Event" end="Pause" frame="$parent/$parent/$parent/$parent/TotalXPLabel">
+                    <Key type="Event" time="0.0" event="DelayTotalCounter"/>
+                </Controller>
+            </Animation>
+        </Frame>
+        
+        <Frame type="Label" name="XPLabel">
+            <Anchor side="Top" relative="$parent/SourceLabel" pos="Max" offset="1"/>
+            <Anchor side="Left" relative="$parent/AmountLabel" pos="Max" offset="5"/>
+            <Style val="Coop_ScoreScreen_RewardAmount"/>
+            <Text val="@UI/ScoreScreenExperience/XP"/>
+        </Frame>
+    </Frame>
+
+    <Frame type="ScoreRewardTileListItem" name="RewardXPTileListItemTemplate">
+        <Height val="55"/>
+        <Width val="900"/>
+        <HideWhenCleared val="true"/>
+        <CollapseLayout val="true"/>
+
+        <Frame type="ScoreRewardItem" name="ScoreRewardItem" template="ScoreScreenExperienceFrame/RewardXPItemTemplate">
+            <Anchor relative="$parent"/>
+            <Visible val="false"/>
+
+            <Animation name="Show">
+                <Event event="ShowRewardItem" action="Reset" frame="$parent"/>
+                <Event event="ShowRewardItem" action="Play" frame="$parent"/>
+
+                <Controller type="Visibility" end="Pause">
+                    <Key type="Bool" time="0" value="false"/>
+                    <Key type="Bool" time="0.1" value="true"/>
+                </Controller>
+            </Animation>
+
+            <Animation name="Hide">
+                <Event event="Begin" action="Reset" frame="$parent/$parent/$parent"/>
+
+                <Controller type="Visibility" end="Pause">
+                    <Key type="Bool" time="0" value="false"/>
+                </Controller>
+            </Animation>
+        </Frame>
+    </Frame>
+
+    <Frame type="ScoreScreenExperienceFrame" name="ScoreScreenExperienceFrameTemplate">
+        <CurrentXP val="{$this/TotalXPLabel/@CurrentValue}"/>
+
+        <Frame type="Image" name="OuterBorder">
+            <Anchor relative="$parent"/>
+            <Texture val="@UI/Battlenet_Glue_Ladder_Score_OuterContainer"/>
+            <TextureType val="Nineslice"/>
+            <RenderPriority val="400"/>
+        </Frame>
+
+        <Frame type="Image" name="RaceBackground">
+            <Anchor side="Top" relative="$parent/OuterBorder" pos="Min" offset="10"/>
+            <Anchor side="Left" relative="$parent/OuterBorder" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent/OuterBorder" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent/OuterBorder" pos="Max" offset="-10"/>
+            <Texture val="@UI/Battlenet_Glue_Multiplayer_Score_ExperienceRageBg_Terr"/>
+            <TextureType val="Normal"/>
+            <Width val="1476"/>
+
+            <StateGroup name="PlayerRace">
+                <DefaultState val="Terran"/>
+
+                <State name="Terran">
+                    <When type="Property" frame="$parent" RaceId="Terr"/>
+                    <Action type="SetProperty" frame="$this" Texture="@UI/Battlenet_Glue_Multiplayer_Score_ExperienceRageBg_Terr"/>
+                </State>
+
+                <State name="Zerg">
+                    <When type="Property" frame="$parent" RaceId="Zerg"/>
+                    <Action type="SetProperty" frame="$this" Texture="@UI/Battlenet_Glue_Multiplayer_Score_ExperienceRageBg_Zerg"/>
+                </State>
+
+                <State name="Protoss">
+                    <When type="Property" frame="$parent" RaceId="Prot"/>
+                    <Action type="SetProperty" frame="$this" Texture="@UI/Battlenet_Glue_Multiplayer_Score_ExperienceRageBg_Prot"/>
+                </State>
+            </StateGroup>
+        </Frame>
+        
+        <Frame type="TileList" name="TileList">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="25"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="15"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="-10"/>
+            <Anchor side="Bottom" relative="$parent/TotalXPTitleLabel" pos="Min" offset="-10"/>
+            
+            <Frame type="ScoreRewardTileListItem" name="Item0" template="ScoreScreenExperienceFrame/RewardXPTileListItemTemplate">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="16"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+
+                <Animation name="ShowDelay">
+                    <Event event="Begin" action="Reset,Play" frame="$parent/$parent"/>
+
+                    <Controller type="Event" end="Stop">
+                        <Key type="Event" time="0.0" event="NoOp"/>
+                        <Key type="Event" time="1.0" event="BeginDelayed"/>
+                    </Controller>
+                </Animation>
+                
+                <Animation name="Show">
+                    <Event event="BeginDelayed" action="Reset,Play"/>
+
+                    <Controller type="Event" end="Stop">
+                        <Key type="Event" time="0.0" event="ShowRewardItem"/>
+                    </Controller>
+                </Animation>
+            </Frame>
+
+            <Frame type="ScoreRewardTileListItem" name="Item1" template="ScoreScreenExperienceFrame/RewardXPTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item0" pos="Max" offset="0"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+
+                <Animation name="Show">
+                    <Event event="ShowNextRewardItem" action="Reset" frame="$parent/Item0"/>
+                    <Event event="ShowNextRewardItem" action="Play" frame="$parent/Item0"/>
+
+                    <Controller type="Event" end="Stop">
+                        <Key type="Event" time="0.0" event="ShowRewardItem"/>
+                    </Controller>
+                </Animation>
+            </Frame>
+
+            <Frame type="ScoreRewardTileListItem" name="Item2" template="ScoreScreenExperienceFrame/RewardXPTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item1" pos="Max" offset="0"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+
+                <Animation name="Show">
+                    <Event event="ShowNextRewardItem" action="Reset" frame="$parent/Item1"/>
+                    <Event event="ShowNextRewardItem" action="Play" frame="$parent/Item1"/>
+
+                    <Controller type="Event" end="Stop">
+                        <Key type="Event" time="0.0" event="ShowRewardItem"/>
+                    </Controller>
+                </Animation>
+            </Frame>
+
+            <Frame type="ScoreRewardTileListItem" name="Item3" template="ScoreScreenExperienceFrame/RewardXPTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item2" pos="Max" offset="0"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+
+                <Animation name="Show">
+                    <Event event="ShowNextRewardItem" action="Reset" frame="$parent/Item2"/>
+                    <Event event="ShowNextRewardItem" action="Play" frame="$parent/Item2"/>
+
+                    <Controller type="Event" end="Stop">
+                        <Key type="Event" time="0.0" event="ShowRewardItem"/>
+                    </Controller>
+                </Animation>
+            </Frame>
+            
+            <Frame type="ScoreRewardTileListItem" name="Item4" template="ScoreScreenExperienceFrame/RewardXPTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item3" pos="Max" offset="0"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+
+                <Animation name="Show">
+                    <Event event="ShowNextRewardItem" action="Reset" frame="$parent/Item3"/>
+                    <Event event="ShowNextRewardItem" action="Play" frame="$parent/Item3"/>
+
+                    <Controller type="Event" end="Stop">
+                        <Key type="Event" time="0.0" event="ShowRewardItem"/>
+                    </Controller>
+                </Animation>
+            </Frame>
+            
+            <Frame type="ScoreRewardTileListItem" name="Item5" template="ScoreScreenExperienceFrame/RewardXPTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item4" pos="Max" offset="0"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+
+                <Animation name="Show">
+                    <Event event="ShowNextRewardItem" action="Reset" frame="$parent/Item3"/>
+                    <Event event="ShowNextRewardItem" action="Play" frame="$parent/Item3"/>
+
+                    <Controller type="Event" end="Stop">
+                        <Key type="Event" time="0.0" event="ShowRewardItem"/>
+                    </Controller>
+                </Animation>
+            </Frame>
+        </Frame>
+
+        <Frame type="Label" name="TotalXPTitleLabel">
+            <Anchor side="Left" relative="$parent/LevelLabel" pos="Min" offset="0"/>
+            <Anchor side="Bottom" relative="$parent/TotalXPLabel" pos="Min" offset="-2"/>
+            <Style val="Coop_ScoreScreen_RewardSourceLarge"/>
+            <Text val="@UI/ScoreScreenExperience/TotalExperienceTitle"/>
+        </Frame>
+        
+        <Frame type="Image" name="TotalXPAccent">
+            <Anchor side="Top" relative="$parent/TotalXPLabel" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent/TotalXPLabel" pos="Mid" offset="0"/>
+            <Anchor side="Left" relative="$parent/TotalXPLabel" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent/TotalXPLabel" pos="Mid" offset="0"/>
+            <Texture val="@UI/SC2_UI_Battlenet_Glue_Campaign_Purchase_Celebration_Accent"/>
+            <Width val="400"/>
+            <Height val="150"/>
+            <Alpha val="0"/>
+            <ColorAdjustMode val="None"/>
+            <AdjustmentColor val="255,108,0"/>
+            
+            <Animation name="Show">
+                <Event event="LevelUp" action="Reset,Play" frame="$parent"/>
+                 
+                <Controller type="Fade" end="Pause">
+                    <Key type="Curve" time="0" value="0" out="Slow"/>
+                    <Key type="Curve" time="0.6" value="255" in="Slow"/>
+                     <Key type="Curve" time="4" value="255" in="Slow"/>
+                </Controller>
+                
+                <Controller type="Dimension" dimension="Width" relative="False" percentage="True" end="Pause" >
+                    <Key type="Curve" time="0" value="0"/>
+                    <Key type="Curve" time="0.6" value="150"/>
+                    <Key type="Curve" time="4" value="100"/>
+                </Controller>
+                
+                <Controller type="Dimension" dimension="Height" relative="False" percentage="True" end="Pause" >
+                    <Key type="Curve" time="0" value="0"/>
+                    <Key type="Curve" time="0.6" value="150"/>
+                    <Key type="Curve" time="4" value="100"/>
+                </Controller>
+                
+                <Controller type="Event" end="Stop">
+                    <Key type="Event" time="4" event="Pulse"/>
+                </Controller>
+            </Animation>
+            
+            <Animation name="Hide">
+                <Event event="OnShown" action="Reset,Play"/>
+                 
+                <Controller type="Fade" end="Pause">
+                    <Key type="Curve" time="0" value="0" out="Slow"/>
+                </Controller>
+            </Animation>
+        </Frame>
+        
+        <Frame type="Label" name="TotalXPPlusSign">
+            <Anchor side="Bottom" relative="$parent/TotalXPBar" pos="Min" offset="7"/>
+            <Anchor side="Left" relative="$parent/LevelLabel" pos="Min" offset="0"/>
+            <Style val="Coop_ScoreScreen_TotalRewardAmount"/>
+            <Text val="+"/>
+        </Frame>
+            
+        <Frame type="CountdownLabel" name="TotalXPLabel">
+            <Anchor side="Bottom" relative="$parent/TotalXPBar" pos="Min" offset="7"/>
+            <Anchor side="Left" relative="$parent/TotalXPPlusSign" pos="Max" offset="0"/>
+            <Style val="Coop_ScoreScreen_TotalRewardAmount"/>
+            <FormatNumber val="true"/>
+            <CountdownSound val="AC_UI_XPBarFillLoop"/>
+            <TargetValue val="{$parent/@TotalXP}"/>
+            <CurrentValue val="0"/>
+            <Text val="0"/>
+            
+            <Animation name="Delay">
+                <Event event="DelayTotalCounter" action="Restart,Play"/>
+                
+                <Controller type="Event" end="Pause">
+                    <Key type="Event" time="0.0" event="NoOp"/>
+                    <Key type="Event" time="1.0" event="BeginTotalCounter"/>
+                </Controller>
+            </Animation>
+            
+            <!-- NOTE: Don't use Reset actions on the counter controller -->
+            <!-- It causes the label to unset the controller -->
+            <Animation name="CountUp">
+                <Event event="Reset" action="Restart,Pause" frame="$parent"/>
+                <Event event="Begin" action="Restart" frame="$parent"/>
+                <Event event="LevelUp" action="Pause" frame="$parent"/>
+                <Event event="BeginTotalCounter" action="Restart,Play"/>
+                <Event event="ResumeTotalCounter" action="Play"/>
+                <!-- It is important that the counter has a delay that is longer than the ShowNextRewardItem in AmountLabel -->
+                <!-- We need the additonal key so that there's one more update after reaching the full value -->
+                <Controller type="Counter" end="Pause">
+                    <Key type="Curve" time="0.0" value="0.0" out="Slow"/>
+                    <Key type="Curve" time="2.0" value="1.0" in="Slow"/>
+                    <Key type="Curve" time="2.1" value="1.0" in="Slow"/>
+                </Controller>
+                
+                <Controller type="Property" frame="$parent" property="AnimationComplete" end="Stop">
+                    <Key type="Property" time="0" value="false"/>
+                    <Key type="Property" time="2.5" value="true"/>
+                </Controller>
+            </Animation>
+        </Frame>
+        
+        <Frame type="Label" name="TotalXPXPLabel">
+            <Anchor side="Bottom" relative="$parent/TotalXPBar" pos="Min" offset="7"/>
+            <Anchor side="Left" relative="$parent/TotalXPLabel" pos="Max" offset="10"/>
+            <Style val="Coop_ScoreScreen_TotalRewardAmount"/>
+            <Text val="@UI/ScoreScreenExperience/XP"/>
+        </Frame>
+        
+        <Frame type="Image" name="TotalXPBarGlow">
+            <Anchor side="Top" relative="$parent/TotalXPBar" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent/TotalXPBar" pos="Mid" offset="0"/>
+            <Anchor side="Left" relative="$parent/TotalXPBar" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent/TotalXPBar" pos="Mid" offset="0"/>
+            <Texture val="@UI/SC2_UI_Coop_SummaryXPBar_Glow"/>
+            <Alpha val="0"/>
+            <ColorAdjustMode val="None"/>
+            <AdjustmentColor val="255,162,0"/>
+            
+            <Animation name="LevelUp">
+                <Event event="Begin" action="Reset" frame="$parent"/>
+                <Event event="LevelUp" action="Reset,Play" frame="$parent"/>
+
+                <Controller type="Fade" end="Pause">
+                    <Key type="Curve" time="0" value="0" out="Slow"/>
+                    <Key type="Curve" time="0.3" value="255" in="Auto"/>
+                    <Key type="Curve" time="0.5" value="0" in="Auto"/>
+                </Controller>
+            </Animation>
+        </Frame>
+
+        <Frame type="ProgressBar" name="TotalXPBar">
+            <Anchor side="Bottom" relative="$parent/LevelLabel" pos="Min" offset="5"/>
+            <Anchor side="Left" relative="$parent/LevelLabel" pos="Min" offset="-23"/>
+            <Width val="1032"/>
+            <Height val="84"/>
+            <UseFillContainer val="true"/>
+            <MinValue val="{$parent/@MinValue}"/>
+            <MaxValue val="{$parent/@MaxValue}"/>
+            <Value val="{$parent/@TargetValue}"/>
+
+            <Frame type="Image" name="BorderImage">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="18"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="18"/>
+                <Anchor side="Right" relative="$parent" pos="Max" offset="-18"/>
+                <Anchor side="Bottom" relative="$parent" pos="Max" offset="-18"/>
+                <Texture val="@UI/Battlenet_Glue_Ladder_Score_ProgressBorder"/>
+                <TextureType val="Nineslice"/>
+                <Tiled val="True"/>
+            </Frame>
+
+            <Frame type="Frame" name="FillImageContainer">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+
+                <Frame type="Image" name="FillImage">
+                    <Anchor relative="$parent/$parent"/>
+                    <Texture val="@UI/Battlenet_Glue_Ladder_Score_ProgressFill"/>
+                    <TextureCoords top="1" left="0.0" right="1.0" bottom="0.0"/>
+                </Frame>
+
+                <Frame type="Frame" name="FillImageAccentMask">
+                    <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+                    <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+                    <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                    <Width val="1032"/>
+                    <Height val="84"/>
+                    <AlphaMaskTexture val="@UI/Battlenet_Glue_Ladder_Score_AccentMask"/>
+
+                    <Frame type="Image" name="FillImageAccent">
+                        <Anchor side="Top" relative="$parent" pos="Mid" offset="-1"/>
+                        <Anchor side="Bottom" relative="$parent" pos="Mid" offset="-1"/>
+                        <Anchor side="Right" relative="$parent" pos="Max" offset="-24"/>
+                        <Texture val="@UI/Battlenet_Glue_Ladder_Score_ProgressAccent"/>
+                    </Frame>
+                </Frame>
+            </Frame>
+
+            <Frame type="Frame" name="MaxLevelContainer">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+                <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+                <Visible val="false"/>
+
+                <Animation name="Show">
+                    <Event event="MaxLevelStart" action="Reset,Play" frame="$parent/$parent"/>
+
+                    <Controller type="Visibility" end="Pause">
+                        <Key type="Bool" time="0" value="true"/>
+                    </Controller>
+                </Animation>
+
+                <Frame type="Image" name="FillImage">
+                    <Anchor relative="$parent/$parent"/>
+                    <Texture val="@UI/Battlenet_Glue_Ladder_Score_ProgressFill"/>
+                    <TextureCoords top="1" left="0.0" right="1.0" bottom="0.0"/>
+                </Frame>
+
+                <Frame type="Frame" name="FillImageAccentMask">
+                    <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+                    <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+                    <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                    <Width val="1032"/>
+                    <Height val="84"/>
+                    <AlphaMaskTexture val="@UI/Battlenet_Glue_Ladder_Score_AccentMask"/>
+
+                    <Frame type="Image" name="FillImageAccent">
+                        <Anchor side="Top" relative="$parent" pos="Mid" offset="-1"/>
+                        <Anchor side="Bottom" relative="$parent" pos="Mid" offset="-1"/>
+                        <Anchor side="Right" relative="$parent" pos="Max" offset="-24"/>
+                        <Texture val="@UI/Battlenet_Glue_Ladder_Score_ProgressAccent"/>
+                    </Frame>
+                </Frame>
+            </Frame>
+        </Frame>
+
+        <Frame type="Label" name="LevelLabel">
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="-50"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="60"/>
+            <Style val="Coop_ScoreScreen_CommanderInfo"/>
+            <Text val="{$parent/@LevelText}"/>
+            <ColorAdjustMode val="None"/>
+            <AdjustmentColor val="255,162,0"/>
+                        
+            <Animation name="LevelUp">
+                <Event event="Begin" action="Reset" frame="$parent"/>
+                <Event event="LevelUp" action="Reset,Play" frame="$parent"/>
+
+                <Controller type="Style" end="Pause" style1="Coop_ScoreScreen_CommanderInfo" style2="Coop_ScoreScreen_CommanderInfoHighlight">
+                    <Key type="Curve" time="0" value="0"/>
+                    <Key type="Curve" time="0.3" value="1"/>
+                    <Key type="Curve" time="0.5" value="0"/>
+                </Controller>
+            </Animation>
+        </Frame>
+
+        <Frame type="Label" name="LevelUpLabel">
+            <Anchor side="Top" relative="$parent/TotalXPBar" pos="Min" offset="2"/>
+            <Anchor side="Bottom" relative="$parent/TotalXPBar" pos="Max" offset="0"/>
+            <Anchor side="Left" relative="$parent/TotalXPBar" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent/TotalXPBar" pos="Mid" offset="0"/>
+            <Style val="Coop_ScoreScreen_LevelUp"/>
+            <Alpha val="0"/>
+            <Text val="@UI/ScoreScreenExperience/LevelUp"/>
+            
+            <Animation name="LevelUp">
+                <Event event="Begin" action="Reset" frame="$parent"/>
+                <Event event="LevelUp" action="Reset,Play" frame="$parent"/>
+
+                <Controller type="Fade" end="Pause">
+                    <Key type="Curve" time="0" value="0" out="Slow"/>
+                    <Key type="Curve" time="0.3" value="255" in="Auto"/>
+                    <Key type="Curve" time="0.5" value="0" in="Auto"/>
+                </Controller>
+                
+                <Controller type="Sound" end="Stop">
+                    <Key type="Sound" time="0" sound="@AC_UI_Unlock01"/>
+                </Controller>
+
+                <!-- This controls resuming the count up animation after leveling up -->
+                <Controller type="Event" end="Pause" frame="$parent/TotalXPLabel">
+                    <Key type="Event" time="0.0" event="NoOp"/>
+                    <Key type="Event" time="0.5" event="ResumeTotalCounter"/>
+                </Controller>
+            </Animation>
+        </Frame>
+
+        <Frame type="Label" name="MaxLevelLabel">
+            <Anchor side="Top" relative="$parent/TotalXPBar" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent/TotalXPBar" pos="Mid" offset="0"/>
+            <Anchor side="Left" relative="$parent/TotalXPBar" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent/TotalXPBar" pos="Mid" offset="0"/>
+            <Style val="Coop_ScoreScreen_LevelUp"/>
+            <Alpha val="0"/>
+            <Text val="@UI/ScoreScreenExperience/MaxLevel"/>
+            
+            <Animation name="MaxLevel">
+                <Event event="Begin" action="Reset" frame="$parent"/>
+                <Event event="MaxLevel" action="Reset" frame="$parent"/>
+                <Event event="MaxLevel" action="Play" frame="$parent"/>
+
+                <Controller type="Fade" end="Pause">
+                    <Key type="Curve" time="0" value="0" out="Slow"/>
+                    <Key type="Curve" time="0.25" value="255" in="Auto"/>
+                </Controller>
+            </Animation>
+        </Frame>
+
+        <Frame type="AchievementInfoFrame" name="AchievementInfoFrame" template="ScoreScreenExperienceFrame/AchievementInfoFrameTemplate">
+            <Anchor side="Top" relative="$parent/TotalXPBar" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent/TotalXPBar" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="-60"/>
+            <PresenceId val="{$BattleUI/@LocalToonPresenceId}"/>
+            <AchievementId val="{$parent/@AchievementId}"/>
+            <Height val="50"/>
+                
+            <Animation name="Show">
+                <Event event="MaxLevelStart" action="Reset,Play" frame="$parent"/>
+                <Event event="MaxLevel" action="Reset,Play" frame="$parent"/>
+
+                <Controller type="Visibility" end="Pause">
+                    <Key type="Bool" time="0" value="False"/>
+                </Controller>
+            </Animation>
+        </Frame>
+
+        <Frame type="Image" name="AchievementInfoIconFrame">
+            <Anchor side="Top" relative="$parent/AchievementInfoFrame" pos="Min" offset="-9"/>
+            <Anchor side="Left" relative="$parent/AchievementInfoFrame" pos="Min" offset="-9"/>
+            <Anchor side="Bottom" relative="$parent/AchievementInfoFrame" pos="Max" offset="9"/>
+            <Anchor side="Right" relative="$parent/AchievementInfoFrame" pos="Max" offset="9"/>
+            <Texture val="@UI/SC2_UI_Coop_AbilityFrame"/>
+            <Visible val="{$parent/AchievementInfoFrame/UnlockableFrame0/@Visible}"/>
+
+            <Animation name="Show">
+                <Event event="MaxLevelStart" action="Reset,Play" frame="$parent"/>
+                <Event event="MaxLevel" action="Reset,Play" frame="$parent"/>
+
+                <Controller type="Visibility" end="Pause">
+                    <Key type="Bool" time="0" value="False"/>
+                </Controller>
+            </Animation>
+        </Frame>
+
+        <Frame type="Label" name="NextRewardTitleLabel">
+            <Anchor side="Top" relative="$parent/AchievementInfoIconFrame" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent/AchievementInfoIconFrame" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent/AchievementInfoIconFrame" pos="Min" offset="-5"/>
+            <Style val="Coop_ScoreScreen_NextRewardSource"/>
+            <Text val="{$parent/@NextRewardText}"/>
+            <Visible val="{$parent/AchievementInfoFrame/UnlockableFrame0/@Visible}"/>
+        </Frame>
+
+        <!-- This container has a bunch of ScoreValueResultFrames.  It uses these to calculate and populate values in the tile list. -->
+        <Frame type="Frame" name="ScoreValueFrameContainer">
+            <Anchor relative="$parent"/>
+            <Visible val="false"/>
+
+            <Frame type="PlayerScoreValueResultNumberFrame" name="ScoreValueFrame0" template="ScoreScreenExperienceFrame/ScoreValueFrameTemplate">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                <ScoreValueLink val="SpendingResourcePoints"/>
+            </Frame>
+
+            <Frame type="PlayerScoreValueResultNumberFrame" name="ScoreValueFrame1" template="ScoreScreenExperienceFrame/ScoreValueFrameTemplate">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                <ScoreValueLink val="DestructionPoints"/>
+            </Frame>
+        </Frame>
+    </Frame>
+</Desc>

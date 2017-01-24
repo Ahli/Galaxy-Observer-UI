@@ -317,6 +317,7 @@
             <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
             <Anchor side="Right" relative="$parent" pos="Max" offset="-10"/>
             <ClickSound val="{$parent/@LineSound}"/>
+            <HoverSound val="@UI_HoverTick"/>
         </Frame>
     </Frame>
 
@@ -375,6 +376,41 @@
         <Height val="#TileListItemHeight"/>
         <HideWhenCleared val="true"/>
         <SelectedSound val="@UI_FileSelectionSelect"/>
+
+        <Frame type="Frame" name="HoverSound2Frame">
+            <Anchor relative="$parent"/>
+            <Visible val="False"/>
+
+            <Animation name="HoverSound2">
+                <Event event="OnShown" action="Reset,Play" frame="$this"/>
+
+                <Controller type="Sound" end="Stop">
+                    <Key type="Sound" time="0" sound="@UI_HoverTick"/>
+                </Controller>
+            </Animation>
+
+            <StateGroup name="VisibleState">
+                <DefaultState val="NotVisible"/>
+
+                <State name="Visible">
+                    <When type="Property" frame="$parent/HoverImage" visible="true"/>
+                    <When type="Property" frame="$parent" selected="false"/>
+                    <Action type="SetProperty" frame="$this" visible="true"/>
+                </State>
+
+                <State name="NotVisible">
+                    <Action type="SetProperty" frame="$this" visible="false"/>
+                </State>
+            </StateGroup>
+        </Frame>
+        
+        <!-- <Animation name="HoverSound">
+            <Event event="OnMouseEnter" action="Reset,Play"/>
+            <Event event="OnMouseExit" action="Reset, Stop"/>
+            <Controller type="Sound" end="Stop">
+                <Key type="Sound" time="0" sound="@UI_HoverTick"/>
+            </Controller>
+        </Animation> -->
 
         <Frame type="Image" name="NormalImage">
             <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
@@ -754,6 +790,12 @@
             <Visible val="False"/>
         </Frame>
 
+        <Frame type="Frame" name="CharacterFrame_Nova" template="VoicePackCharacterFrame/VoicePackCharacterFrame_Nova">
+            <Anchor side="Top" relative="$parent/CharacterFrame_Background" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent/CharacterFrame_Background" pos="Min" offset="0"/>
+            <Visible val="False"/>
+        </Frame>
+
         <Frame type="Frame" name="CharacterFrame_Raynor" template="VoicePackCharacterFrame/VoicePackCharacterFrame_Raynor">
             <Anchor side="Top" relative="$parent/CharacterFrame_Background" pos="Min" offset="0"/>
             <Anchor side="Left" relative="$parent/CharacterFrame_Background" pos="Min" offset="0"/>
@@ -761,6 +803,12 @@
         </Frame>
 
         <Frame type="Frame" name="CharacterFrame_Swann" template="VoicePackCharacterFrame/VoicePackCharacterFrame_Swann">
+            <Anchor side="Top" relative="$parent/CharacterFrame_Background" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent/CharacterFrame_Background" pos="Min" offset="0"/>
+            <Visible val="False"/>
+        </Frame>
+
+        <Frame type="Frame" name="CharacterFrame_TotalBiscuit" template="VoicePackCharacterFrame/VoicePackCharacterFrame_TotalBiscuit">
             <Anchor side="Top" relative="$parent/CharacterFrame_Background" pos="Min" offset="0"/>
             <Anchor side="Left" relative="$parent/CharacterFrame_Background" pos="Min" offset="0"/>
             <Visible val="False"/>
@@ -852,6 +900,22 @@
             <Text val="{$parent/@DescriptionText}"/>
             <Height val="175"/>
         </Frame>
+        
+        <Frame type="Label" name="LocaleRestrictionLabel">
+            <Anchor side="Bottom" relative="$parent/CharacterFrame_Background" pos="Max" offset="0"/>
+            <Anchor side="Left" relative="$parent/ExampleLineTitle" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent/ExampleLineTitle" pos="Max" offset="0"/>
+            <Style val="@VoicePack_ItemFrame_LanguageWarning"/>
+            <Visible val="false"/>
+
+            <StateGroup name="LocaleStateGroup">
+                <State name="enUSState">
+                    <When type="Property" frame="$parent" LocaleRestriction="enUS"/>
+                    <Action type="SetProperty" frame="$this" Visible="true"/>
+                    <Action type="SetProperty" frame="$this" Text="@UI/ScreenCollection/VoicePack/LocaleRestriction/enUS"/>
+                </State>
+            </StateGroup>
+        </Frame>
 
         <Frame type="Label" name="ExampleLineTitle">
             <Anchor side="Top" relative="$parent/DescriptionLabel" pos="Max" offset="15"/>
@@ -918,6 +982,11 @@
                 <Action type="SetProperty" frame="CharacterFrame_Kerrigan" visible="true"/>
             </State>
 
+            <State name="Nova">
+                <When type="Property" frame="$this" VoicePack="Nova"/>
+                <Action type="SetProperty" frame="CharacterFrame_Nova" visible="true"/>
+            </State>
+
             <State name="Raynor">
                 <When type="Property" frame="$this" VoicePack="Raynor"/>
                 <Action type="SetProperty" frame="CharacterFrame_Raynor" visible="true"/>
@@ -926,6 +995,11 @@
             <State name="Swann">
                 <When type="Property" frame="$this" VoicePack="Swann"/>
                 <Action type="SetProperty" frame="CharacterFrame_Swann" visible="true"/>
+            </State>
+
+            <State name="TotalBiscuit">
+                <When type="Property" frame="$this" VoicePack="TotalBiscuit"/>
+                <Action type="SetProperty" frame="CharacterFrame_TotalBiscuit" visible="true"/>
             </State>
 
             <State name="NotValid">
@@ -1097,6 +1171,13 @@
         <Frame type="GameContentSortPulldown" name="SortPulldown" template="StandardBattlenetTemplates/BattlenetLargePulldownTemplate">
             <Anchor side="Bottom" relative="$parent/VoicePackFrame" pos="Min" offset="3"/>
             <Anchor side="Right" relative="$parent/VoicePackFrame" pos="Max" offset="-4"/>
+            <Animation name="HoverSound">
+                <Event event="OnMouseEnter" action="Reset,Play"/>
+                <Event event="OnMouseExit" action="Reset, Stop"/>
+                <Controller type="Sound" end="Stop">
+                    <Key type="Sound" time="0" sound="@UI_HoverTick"/>
+                </Controller>
+            </Animation>
         </Frame>
 
         <Frame type="VoicePackFrame" name="VoicePackFrame" template="VoicePackSelectionFrame/VoicePackFrameTemplate">
@@ -1150,6 +1231,14 @@
             <Frame type="GameContentFrame" name="GameContentFrame">
                 <GameContent val="{$parent/$parent/@SelectedGameContent}"/>
             </Frame>
+
+            <Animation name="HoverSound">
+                <Event event="OnMouseEnter" action="Reset,Play"/>
+                <Event event="OnMouseExit" action="Reset, Stop"/>
+                <Controller type="Sound" end="Stop">
+                    <Key type="Sound" time="0" sound="@UI_HoverTick"/>
+                </Controller>
+            </Animation>
         </Frame>
 
         <Frame type="RacePulldown" name="RacePulldown" template="StandardBattlenetTemplates/BattlenetLargePulldownTemplate">
@@ -1159,6 +1248,13 @@
             <IncludeAllEntry val="true"/>
             <SortMethod val="Expansion"/>
             <CollapseLayout val="True"/>
+            <Animation name="HoverSound">
+                <Event event="OnMouseEnter" action="Reset,Play"/>
+                <Event event="OnMouseExit" action="Reset, Stop"/>
+                <Controller type="Sound" end="Stop">
+                    <Key type="Sound" time="0" sound="@UI_HoverTick"/>
+                </Controller>
+            </Animation>
         </Frame>
         
         <Frame type="Frame" name="EquippedWarningContainer" template="CollectionTemplates/EquippedWarningContainerTemplate">
@@ -1183,7 +1279,8 @@
         
         <Frame type="Frame" name="AchievementLockedWarningContainer" template="CollectionTemplates/AchievementLockedWarningContainerTemplate">
             <Anchor side="Bottom" relative="$Anchor_BottomActionButton" pos="Min" offset="0"/>
-            <Anchor side="Left" relative="$parent/SelectUnlockableButton" pos="Max" offset="20"/>
+            <Anchor side="Left" relative="$parent/ViewBundleButton" pos="Max" offset="5"/>
+            <CollapseLayout val="true"/>
             
             <StateGroup name="AchievementLockedStateGroup">
                 <DefaultState val="NotAchievementLockedState"/>
@@ -1202,16 +1299,62 @@
                 </State>
             </StateGroup>
             
-            <StateGroup name="DVABlizzconCheck">
-                <DefaultState val="NotDVABlizzcon"/>
+            <StateGroup name="AchievementWarningText">
+                <DefaultState val="ContentLocked"/>
+                
+                <State name="Nova">
+                    <When type="StateGroup" frame="$parent/VoicePackFrame" VoicePackIdStateGroup="Nova"/>
+                    <Action type="SetProperty" frame="$this/Title" text="@UI/ScreenCollection/AchievementNovaTitle"/>
+                </State>
             
                 <State name="DVABlizzcon">
                     <When type="StateGroup" frame="$parent/VoicePackFrame" VoicePackIdStateGroup="Dva"/>
                     <Action type="SetProperty" frame="$this/Title" text="@UI/ScreenCollection/AchievementBlizzcon2016Title"/>
                 </State>
                 
-                <State name="NotDVABlizzcon">
+                <State name="ContentLocked">
                     <Action type="SetProperty" frame="$this/Title" text="@UI/ScreenCollection/AchievementWarningTitle"/>
+                </State>
+            </StateGroup>
+        </Frame>
+        
+        <Frame type="Frame" name="LanguageWarningContainer" template="CollectionTemplates/LanguageWarningContainerTemplate">
+            <Anchor side="Bottom" relative="$Anchor_BottomActionButton" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent/BuyButton" pos="Max" offset="20"/>
+            
+            <StateGroup name="LocaleStateGroup">
+                <DefaultState val="NoRestriction"/>
+                
+                <State name="EquippedState">
+                    <When type="Property" frame="$parent/SelectUnlockableButton" enabled="False"/>
+                    <When type="Property" frame="$parent/SelectUnlockableButton" visible="True"/>
+                    <When type="AnimationState" frame="$parent/SelectUnlockableButton/FirstUnlockedRewardCacheFrame" AllowedState="Allowed"/>
+                    <Action type="SetProperty" frame="$this" visible="False"/>
+                </State>
+                
+                <State name="enUSState">
+                    <When type="AnimationState" frame="$parent/SelectUnlockableButton/GameContentFrame" PurchasedState="NotPurchased"/>
+                    <When type="Property" frame="$parent/VoicePackFrame" LocaleRestriction="enUS"/>
+                    <Action type="SetProperty" frame="$this" Visible="True"/>
+                    <Action type="SetProperty" frame="$this/Title" Text="@UI/ScreenCollection/VoicePack/LocaleRestriction/enUS"/>
+                </State>
+                
+                <State name="frFRState">
+                    <When type="AnimationState" frame="$parent/SelectUnlockableButton/GameContentFrame" PurchasedState="NotPurchased"/>
+                    <When type="Property" frame="$parent/VoicePackFrame" LocaleRestriction="frFR"/>
+                    <Action type="SetProperty" frame="$this" Visible="True"/>
+                    <Action type="SetProperty" frame="$this/Title" Text="@UI/ScreenCollection/VoicePack/LocaleRestriction/frFR"/>
+                </State>
+                
+                <State name="koKRState">
+                    <When type="AnimationState" frame="$parent/SelectUnlockableButton/GameContentFrame" PurchasedState="NotPurchased"/>
+                    <When type="Property" frame="$parent/VoicePackFrame" LocaleRestriction="koKR"/>
+                    <Action type="SetProperty" frame="$this" Visible="True"/>
+                    <Action type="SetProperty" frame="$this/Title" Text="@UI/ScreenCollection/VoicePack/LocaleRestriction/koKR"/>
+                </State>
+                
+                <State name="NoRestriction">
+                    <Action type="SetProperty" frame="$this" Visible="False"/>
                 </State>
             </StateGroup>
         </Frame>
@@ -1233,6 +1376,78 @@
                     <Action type="SetProperty" frame="$this" visible="true"/>
                 </State>
             </StateGroup>
+        </Frame>
+        
+        <Frame type="Button" name="ViewBundleButton" template="StandardBattlenetTemplates/BattlenetStandardButtonTemplate">
+            <Anchor side="Bottom" relative="$Anchor_BottomActionButton" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent/BuyButton" pos="Max" offset="5"/>
+            <CollapseLayout val="true"/>
+            <Text val="@UI/ScreenCollection/Buttons/ViewBundle"/>
+
+            <StateGroup name="ViewBundleVisibilityStateGroup">
+                <DefaultState val="ViewBundleNotVisible"/>
+
+                <State name="CanEquip">
+                    <When type="AnimationState" frame="$parent/SelectUnlockableButton/FirstUnlockedRewardCacheFrame" AllowedState="Allowed"/>
+                    <Action type="SetProperty" frame="$this" visible="False"/>
+                </State>
+
+                <State name="HasBundle">
+                    <When type="Property" frame="$parent/VoicePackFrame" ParentBundle="!"/>
+                    <Action type="SetProperty" frame="$this" visible="True"/>
+                </State>
+
+                <State name="ViewBundleNotVisible">
+                    <Action type="SetProperty" frame="$this" visible="False"/>
+                </State>
+            </StateGroup>
+
+            <Animation name="Event">
+                <Event event="OnClick" action="Reset,Play"/>
+
+                <Controller type="Property" frame="$parent/SelectedBundleFrame" property="Visible" end="Pause">
+                    <Key type="Property" time="0" value="false"/>
+                    <Key type="Property" time="0.01" value="true"/>
+                </Controller>
+            </Animation>
+        </Frame>
+        
+        <Frame type="SelectedBundleFrame" name="SelectedBundleFrame" template="SelectedBundleFrame/SelectedBundleFrameTemplate">
+            <Anchor side="Top" relative="$parent/$parent" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent/$parent" pos="Min" offset="0"/>
+            <Anchor side="Bottom" relative="$parent/$parent" pos="Max" offset="0"/>
+            <Anchor side="Right" relative="$parent/$parent" pos="Max" offset="0"/>
+            <Bundle val="{$parent/VoicePackFrame/@ParentBundle}"/>
+            <RenderPriority val="600"/>
+
+            <Frame type="BuyButton" name="BuyButton" template="CollectionTemplates/BuyButtonTemplate">
+                <Anchor side="Bottom" relative="$parent/BackgroundImage" pos="Max" offset="-50"/>
+                <Anchor side="Right" relative="$parent/BackgroundImage" pos="Mid" offset="-3"/>
+                <ShowPrice val="true"/>
+                <AlwaysShow val="true"/>
+
+                <GameContent val="{$parent/$parent/VoicePackFrame/@ParentBundleContent}"/>
+                <CollapseLayout val="false"/>
+            </Frame>
+
+            <Frame type="BundleCacheFrame" name="BundleCacheFrame">
+                <Anchor relative="$parent"/>
+                <Bundle val="{$parent/@Bundle}"/>
+            </Frame>
+
+            <Frame type="GameContentFrame" name="GameContentFrame">
+                <Anchor relative="$parent"/>
+                <GameContent val="{$parent/$parent/VoicePackFrame/@ParentBundleContent}"/>
+            </Frame>
+
+            <Animation name="Event">
+                <Event event="OnClick" frame="$this/CloseButton" action="Reset,Play"/>
+
+                <Controller type="Property" property="Visible" end="Pause">
+                    <Key type="Property" time="0" value="true"/>
+                    <Key type="Property" time="0.01" value="false"/>
+                </Controller>
+            </Animation>
         </Frame>
 
         <StateGroup name="SwapButtonsGroup">
