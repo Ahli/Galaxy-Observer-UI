@@ -201,7 +201,43 @@
 			<Alpha val="0"/>
 		</Frame>
 	</Frame>
+	<Frame type="UnitStatusEnergyBar" name="ValeeraEnergyConsoleTemplate" template="UnitStatus/UnitStatusEnergyBarTemplate">
+		<Anchor side="Top" relative="$parent\$parent" pos="Min" offset="0"/>
+		<Anchor side="Bottom" relative="$this" pos="Min" offset="0"/>
+		<Anchor side="Left" relative="$parent\$parent" pos="Min" offset="0"/>
+		<Width val="252"/>
+		<Height val="22"/>
+		<Texture val="_Assets\Textures\2dhud_manaBar.dds"/>
+		<BackgroundColor val="255, 0, 0, 0"/>
+		<VisibleToAlly val="true"/>
+		<VisibleToEnemy val="true"/>
+		<AcceptsMouse val="false"/>
+		<ShowStatusTooltip val="false"/>
+		<Unclipped val="false"/>
 
+		<!-- Energy Bar -->
+		<OwnerColor val="fed210" index="0"/>
+		<AllyColor val="fed210" index="0"/>
+		<EnemyColor val="fed210" index="0"/>
+		<Tiled val="true" index="0"/>
+		<ReductionShown val="false" index="0"/>
+		<IncreaseDuration val="0" index="0"/>
+
+		<!-- Expected Energy Grant Bar -->
+		<OwnerColor val="fed210" index="1"/>
+		<AllyColor val="fed210" index="1"/>
+		<EnemyColor val="fed210" index="1"/>
+		<Tiled val="true" index="1"/>
+		<ReductionShown val="false" index="1"/>
+		<IncreaseDuration val="0" index="1"/>
+
+		<Frame type="Label" name="StatusBarLabel">
+			<Anchor side="Bottom" relative="$parent" pos="Max" offset="-5"/>
+			<Anchor side="Right" relative="$parent" pos="Max" offset="-15"/>
+			<Style val="Storm_VitalsLabel_R"/>
+			<Alpha val="0"/>
+		</Frame>
+	</Frame>
 	<!-- Observer templates -->
 	<Frame type="UnitStatusEnergyBar" name="ManaBarObserverOverviewTemplate">
 		<OwnerColor val="00a4f0" index="0"/>
@@ -256,6 +292,15 @@
 		<OwnerColor val="255, 105, 108" index="1"/>
 		<AllyColor val="255, 105, 108" index="1"/>
 		<EnemyColor val="255, 105, 108" index="1"/>
+		<Segmented val="false" index="0"/>
+	</Frame>
+	<Frame type="UnitStatusEnergyBar" name="ValeeraEnergyObserverOverviewTemplate">
+		<OwnerColor val="fed210" index="0"/>
+		<AllyColor val="fed210" index="0"/>
+		<EnemyColor val="fed210" index="0"/>
+		<OwnerColor val="fed210" index="1"/>
+		<AllyColor val="fed210" index="1"/>
+		<EnemyColor val="fed210" index="1"/>
 		<Segmented val="false" index="0"/>
 	</Frame>
 	
@@ -417,6 +462,15 @@
 				</Frame>
 			</Frame>
 		</Frame>
+		<Frame type="SelectionUnitStatusPanel" name="ValeeraEnergy">
+			<Anchor relative="$parent"/>
+			<SpecificUnit val="HeroValeera"/>
+			<Frame type="UnitStatusFrame" name="UnitStatusFrame0">
+				<Anchor relative="$parent"/>
+				<Frame type="UnitStatusEnergyBar" name="ManaBar" template="_ColoredManaBars/ValeeraEnergyConsoleTemplate">
+				</Frame>
+			</Frame>
+		</Frame>
 		
 	</Frame>
 
@@ -569,6 +623,25 @@
 				</Controller>
 			</Animation>
 		</Frame>
+		<Frame type="UnitStatusBehaviorAnim" name="ValeeraComboPointsToken">
+			<Anchor relative="$parent"/>
+			<Behavior val="ValeeraComboPointsToken"/>
+			
+			<Frame type="Frame" name="ValeeraComboPointsTokenState">
+				<Anchor relative="$parent"/>
+				<Visible val="false"/>
+			</Frame>
+			
+			<Animation name="BehaviorControlAnim">
+				<Event event="BehaviorCreate" action="Reset,DirectionForward,Play"/>
+				<Event event="BehaviorDestroy" action="DirectionReverse,Play"/>
+
+				<Controller type="Visibility" end="Pause" frame="ValeeraComboPointsTokenState">
+					<Key type="Bool" time="0" value="false"/>
+					<Key type="Bool" time="0" value="true"/>
+				</Controller>
+			</Animation>
+		</Frame>
 
 		<!-- switch colors -->
 		<StateGroup name="ManaBarColorSwitcher">
@@ -593,6 +666,10 @@
 			<State name="ZaryaEnergy">
 				<When type="Property" frame="ZaryaEnergyBoostDecay/ZaryaEnergyBoostDecayState" visible="true"/>
 				<Action type="ApplyTemplate" frame="ManaBar" template="_ColoredManaBars/ZaryaEnergyBarObserverOverviewTemplate"/>
+			</State>
+			<State name="ValeeraEnergy">
+				<When type="Property" frame="ValeeraComboPointsToken/ValeeraComboPointsTokenState" visible="true"/>
+				<Action type="ApplyTemplate" frame="ManaBar" template="_ColoredManaBars/ValeeraEnergyObserverOverviewTemplate"/>
 			</State>
 			<State name="BlueMana">
 				<Action type="ApplyTemplate" frame="ManaBar" template="_ColoredManaBars/ManaBarObserverOverviewTemplate"/>
