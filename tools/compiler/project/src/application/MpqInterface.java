@@ -5,8 +5,11 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.nio.file.Files;
-import java.nio.file.StandardCopyOption;
+import javax.xml.parsers.ParserConfigurationException;
+
+import org.xml.sax.SAXException;
+
+import application.protection.XmlCompressor;
 
 /**
  * 
@@ -60,50 +63,72 @@ public class MpqInterface {
 		// add 2 to be sure to have enough space for listfile and attributes
 		int fileCount = 2 + getFileCountInFolder(new File(mpqCachePath));
 
-		// make way for file
-		File f = new File(absolutePath);
-		if (f.exists() && f.isFile()) {
-			f.delete();
-		}
-
-		// unprotected file, if protectMPQ
-		File fup = null;
-		String unprotectedAbsolutePath = absolutePath;
 		if (protectMPQ) {
-			unprotectedAbsolutePath = getdPathWithSuffix(absolutePath, "_unprtctd");
-			fup = new File(unprotectedAbsolutePath);
+			// special unprotected file path
+			String unprotectedAbsolutePath = getPathWithSuffix(absolutePath, "_unprtctd");
+			
+			// make way for unprotected file
+			File fup = new File(unprotectedAbsolutePath);
 			if (fup.exists() && fup.isFile()) {
 				fup.delete();
 			}
-		}
-
-		newMpq(unprotectedAbsolutePath, fileCount);
-		addToMpq(unprotectedAbsolutePath, mpqCachePath, "");
-		compactMpq(unprotectedAbsolutePath);
-
-		if (protectMPQ) {
-			String absolutePathTMP = getdPathWithSuffix(absolutePath, "_TMP");
-			// copy file
-			Files.copy(new File(unprotectedAbsolutePath).toPath(), new File(absolutePathTMP).toPath(),
-					StandardCopyOption.REPLACE_EXISTING);
-
-			// f*ck with mpq
-			//deleteListFile(absolutePathTMP);
+			// build unprotected file
+			newMpq(unprotectedAbsolutePath, fileCount);
+			addToMpq(unprotectedAbsolutePath, mpqCachePath, "");
+			compactMpq(unprotectedAbsolutePath);
 			
-			renameFileInMpq(absolutePathTMP, "_Ahli.StormLayout", "_QQQ.StormLayout");
-			renameFileInMpq(absolutePathTMP, "(listfile)", "QQQ");
-			
-			//writeWrongFileAmount(absolutePathTMP, absolutePath);
-			//copy tmp file to final file
-			Files.copy(new File(absolutePathTMP).toPath(), new File(absolutePath).toPath(),
-					StandardCopyOption.REPLACE_EXISTING);
-			
-			// clear temporary file
-			File ftmp = new File(absolutePathTMP);
-			if (ftmp.exists() && ftmp.isFile()) {
-				ftmp.delete();
+			// make way for protected file
+			File f = new File(absolutePath);
+			if (f.exists() && f.isFile()) {
+				f.delete();
 			}
+			
+			////////////////////////
+			// PROTECTION MEASURES
+			////////////////////////
+				// doesn't work
+					//deleteListFile(absolutePathTMP);
+				// doesn't work
+					//renameFileInMpq(absolutePathTMP, "_Ahli.StormLayout", "_QQQ.StormLayout");
+					//renameFileInMpq(absolutePathTMP, "(listfile)", "QQQ");
+				// doesn't work
+					//writeWrongFileAmount(absolutePathTMP, absolutePath);
+			
+			// extra compression
+			try {
+				XmlCompressor.processCache(mpqCachePath, 1);
+				
+				
+				
+				
+			} catch (ParserConfigurationException | SAXException e) {
+				e.printStackTrace();
+			}
+			
+			// build protected file
+			newMpq(absolutePath, fileCount);
+			addToMpq(absolutePath, mpqCachePath, "");
+			compactMpq(absolutePath);
+
+		} 
+		else {
+			// NO PROTECTION OPTION
+			
+			// make way for file
+			File f = new File(absolutePath);
+			if (f.exists() && f.isFile()) {
+				f.delete();
+			}
+			
+			// build unprotected file
+			newMpq(absolutePath, fileCount);
+			addToMpq(absolutePath, mpqCachePath, "");
+			compactMpq(absolutePath);
+			
 		}
+		
+
+
 	}
 
 	/**
@@ -112,7 +137,7 @@ public class MpqInterface {
 	 * @param absolutePath
 	 * @return
 	 */
-	private String getdPathWithSuffix(String absolutePath, String suffix) {
+	private String getPathWithSuffix(String absolutePath, String suffix) {
 		int i = absolutePath.lastIndexOf('.');
 		return absolutePath.substring(0, i) + suffix + absolutePath.substring(i);
 	}
