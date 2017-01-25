@@ -127,8 +127,6 @@ public class MpqInterface {
 			
 		}
 		
-
-
 	}
 
 	/**
@@ -212,10 +210,12 @@ public class MpqInterface {
 		File f = new File(mpqCachePath);
 		if (f.exists()) {
 			if (deleteDir(f)) {
-				System.out.println("clearedCache");
+				System.out.println("clearing Cache succeeded");
 				return true;
-			} else
+			} else {
+				System.out.println("ERROR: clearing Cache FAILED");
 				return false;
+			}
 		} else
 			return true;
 	}
@@ -234,7 +234,11 @@ public class MpqInterface {
 				}
 			}
 		}
-		return f.delete();
+		boolean result = f.delete();
+		if(!result){
+			System.out.println("ERROR: Deleting file/folder "+f.getPath()+" failed.");
+		}
+		return result;
 	}
 
 	/**
@@ -347,7 +351,7 @@ public class MpqInterface {
 	public File getComponentListFile() {
 		File f = new File(mpqCachePath + File.separator + "ComponentList.StormComponents");
 		if (!f.exists() || f.isDirectory()) {
-			f = new File(mpqCachePath + File.separator + "\\ComponentList.SC2Components");
+			f = new File(mpqCachePath + File.separator + "ComponentList.SC2Components");
 			if (!f.exists() || f.isDirectory()) {
 				return null;
 			}

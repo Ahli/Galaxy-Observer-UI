@@ -2,12 +2,11 @@ package application;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URISyntaxException;
+import java.net.URI;
 import java.net.URL;
+import java.nio.file.FileSystemException;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
-
 import javax.swing.JFileChooser;
 import javax.xml.parsers.ParserConfigurationException;
 
@@ -45,7 +44,7 @@ public class Main extends Application {
 	public void start(Stage primaryStage) {
 		try {
 			clearErrorEncounter();
-			
+
 			BorderPane root = new BorderPane();
 			primaryStage.setTitle("Compiling Interfaces...");
 
@@ -54,7 +53,7 @@ public class Main extends Application {
 
 			root.setCenter(txtArea);
 			Scene scene = new Scene(root, 1200, 400);
-			scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
+			// scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
 			primaryStage.setScene(scene);
 			primaryStage.show();
 
@@ -98,9 +97,8 @@ public class Main extends Application {
 
 			primaryStage.setTitle("Compiling Interfaces... done.");
 			addLogMessage("All done.");
-			
-			
-			if(!hasEncounteredError() && !primaryStage.isFocused()){
+
+			if (!hasEncounteredError() && !primaryStage.isFocused()) {
 				// close after 5 seconds
 				PauseTransition delay = new PauseTransition(Duration.seconds(5));
 				delay.setOnFinished(event -> primaryStage.close());
@@ -132,12 +130,16 @@ public class Main extends Application {
 
 	/**
 	 * Builds MPQ Archive File.
+	 * 
 	 * @param file
 	 * @param isHeroes
 	 */
+	@SuppressWarnings("static-access")
 	private void buildFile(File file, boolean isHeroes) {
-
 		String buildPath = documentsPath + File.separator;
+		
+		System.out.println("Starting to build file: "+file.getPath());
+		
 		if (isHeroes) {
 			buildPath += "Heroes of the Storm";
 		} else {
@@ -145,23 +147,70 @@ public class Main extends Application {
 		}
 		buildPath += File.separator + "Interfaces";
 
-		// file.getAbsolutePath();
-
 		// get and create cache
 		File cache = new File(mpqi.getMpqCachePath());
 		cache.mkdirs();
-		mpqi.clearCacheExtractedMpq();
+		
+		int cacheClearAttempts = 0;
+		y:for (cacheClearAttempts = 0; cacheClearAttempts <= 100; cacheClearAttempts++) {
+			if(!mpqi.clearCacheExtractedMpq()){				
+				// sleep and hope the file gets released soon
+				try {
+					Thread.currentThread().sleep(500);
+				} catch (InterruptedException e1) {
+					e1.printStackTrace();
+				}
+			} else {
+				//  success
+				break y;
+			}
+		}
+		if(cacheClearAttempts > 100){
+			System.out.println("ERROR: Cache could not be cleared");
+			addLogMessage(errorLine);
+			addLogMessage("Cache could not be cleared...");
+			addLogMessage(errorLine);
+			return;
+		}
 
 		// put files into cache
-		try {
-			copyFolder(file, cache);
-		} catch (IOException e) {
-			e.printStackTrace();
-			reportErrorEncounter();
-			addLogMessage(errorLine);
-			addLogMessage("ERROR unable to copy directory:\n    " + e + "\n    " + e.getMessage() + "\n    "
-					+ e.getLocalizedMessage() + "\n    " + e.getCause());
-			addLogMessage(errorLine);
+		int copyAttempts = 0;
+		x:for (copyAttempts = 0; copyAttempts <= 100; copyAttempts++) {
+			try {
+				copyFolder(file, cache);
+				System.out.println("Copy Folder took "+copyAttempts+" attempts to succeed.");
+				break x;
+			} catch (FileSystemException e) {
+				if (copyAttempts == 0) {
+					e.printStackTrace();
+//					System.out.println("ERROR unable to copy directory:\n    " + e + "\n    " + e.getMessage() + "\n    "
+//							+ e.getLocalizedMessage() + "\n    " + e.getCause());
+				} else if (copyAttempts == 100) {
+					e.printStackTrace();
+					reportErrorEncounter();
+					addLogMessage(errorLine);
+					addLogMessage("ERROR unable to copy directory:\n    " + e + "\n    " + e.getMessage() + "\n    "
+							+ e.getLocalizedMessage() + "\n    " + e.getCause());
+					addLogMessage(errorLine);
+				}
+				// sleep and hope the file gets released soon
+				try {
+					Thread.currentThread().sleep(500);
+				} catch (InterruptedException e1) {
+					e1.printStackTrace();
+				}
+			} catch (IOException e) {
+				e.printStackTrace();
+				reportErrorEncounter();
+				addLogMessage(errorLine);
+				addLogMessage("ERROR unable to copy directory:\n    " + e + "\n    " + e.getMessage() + "\n    "
+						+ e.getLocalizedMessage() + "\n    " + e.getCause());
+				addLogMessage(errorLine);
+			}
+		}
+		if(copyAttempts > 100){
+			// copy keeps failing -> abort
+			return;
 		}
 
 		// do stuff
@@ -311,50 +360,105 @@ public class Main extends Application {
 	 * @param aclass
 	 * @return
 	 */
-	public static File getJarDir(Class<Main> aclass) {
-		URL url;
-		String extURL; // url.toExternalForm();
+	public File getJarDir(Class<Main> aclass) {
+		URI uri = new File(".").toURI();
+		// results in: "file:/D:/GalaxyObsUI/dev/./"
+		// addLogMessage("METHOD TEST: " + new File(".").toURI());
 
-		// get an url
-		try {
-			url = aclass.getProtectionDomain().getCodeSource().getLocation();
-			// url is in one of two forms
-			// ./build/classes/ NetBeans test
-			// jardir/JarName.jar froma jar
-		} catch (SecurityException ex) {
-			url = aclass.getResource(aclass.getSimpleName() + ".class");
-			// url is in one of two forms, both ending
-			// "/com/physpics/tools/ui/PropNode.class"
-			// file:/U:/Fred/java/Tools/UI/build/classes
-			// jar:file:/U:/Fred/java/Tools/UI/dist/UI.jar!
+		String str = uri.getPath();
+		if (str.startsWith("file:/")) {
+			str = str.substring(6);
+		}
+		if (str.startsWith("/")) {
+			str = str.substring(1);
+		}
+		if (str.endsWith("/./")) {
+			str = str.substring(0, str.length() - 3);
+		}
+		// addLogMessage("str: " + str);
+
+		// check if not in JAR
+
+		URL url = aclass.getProtectionDomain().getCodeSource().getLocation();
+		// addLogMessage(url.toString());
+		// jar returns "rsrc:./", if 2nd option during export was chosen
+
+		if (!url.toString().startsWith("rsrc:./")) {
+			str += "/testEnv/baseUI/";
 		}
 
-		// convert to external form
-		extURL = url.toExternalForm();
+		return new File(str);
 
-		// prune for various cases
-		if (extURL.endsWith(".jar")) // from getCodeSource
-			extURL = extURL.substring(0, extURL.lastIndexOf("/"));
-		else { // from getResource
-			String suffix = "/" + (aclass.getName()).replace(".", "/") + ".class";
-			extURL = extURL.replace(suffix, "");
-			if (extURL.startsWith("jar:") && extURL.endsWith(".jar!"))
-				extURL = extURL.substring(4, extURL.lastIndexOf("/"));
-		}
-
-		// convert back to url
-		try {
-			url = new URL(extURL);
-		} catch (MalformedURLException mux) {
-			// leave url unchanged; probably does not happen
-		}
-
-		// convert url to File
-		try {
-			return new File(url.toURI());
-		} catch (URISyntaxException ex) {
-			return new File(url.getPath());
-		}
+		// URL url;
+		// String extURL; // url.toExternalForm();
+		//
+		// // get an url
+		// try {
+		// addLogMessage("attempting to get URL");
+		// url = aclass.getProtectionDomain().getCodeSource().getLocation();
+		// // url is in one of two forms
+		// // ./build/classes/ NetBeans test
+		// // jardir/JarName.jar froma jar
+		// } catch (SecurityException ex) {
+		// addLogMessage("attempting to get URL - had exception");
+		// url = aclass.getResource(aclass.getSimpleName() + ".class");
+		// // url is in one of two forms, both ending
+		// // "/com/physpics/tools/ui/PropNode.class"
+		// // file:/U:/Fred/java/Tools/UI/build/classes
+		// // jar:file:/U:/Fred/java/Tools/UI/dist/UI.jar!
+		// }
+		// addLogMessage("URL: "+url);
+		//
+		// // convert to external form
+		// extURL = url.toExternalForm();
+		// addLogMessage("URL external form: "+extURL);
+		//
+		// // prune for various cases
+		// if (extURL.endsWith(".jar")) { // from getCodeSource
+		// addLogMessage("URL ends with jar");
+		//
+		// extURL = extURL.substring(0, extURL.lastIndexOf("/"));
+		// addLogMessage("extURL: "+extURL);
+		// } else { // from getResource
+		// addLogMessage("get URL from resource");
+		// String suffix = "/" + (aclass.getName()).replace(".", "/") +
+		// ".class";
+		// extURL = extURL.replace(suffix, "");
+		// addLogMessage("extURL: "+extURL);
+		// if (extURL.startsWith("jar:") && extURL.endsWith(".jar!")) {
+		// addLogMessage("JAR path cutting");
+		// extURL = extURL.substring(4, extURL.lastIndexOf("/"));
+		// addLogMessage("extURL: "+extURL);
+		// } else {
+		// addLogMessage("not JAR");
+		// //hack for dev environment => move up two levels
+		// if(extURL.endsWith("/classes/")){
+		// addLogMessage("URL ends with classes");
+		// extURL = extURL.substring(0, extURL.lastIndexOf("/"));
+		// extURL = extURL.substring(0, extURL.lastIndexOf("/"));
+		// extURL = extURL.substring(0, extURL.lastIndexOf("/"));
+		// extURL += "/testEnv/baseUI/";
+		// addLogMessage("extURL: "+extURL);
+		// }
+		// }
+		// }
+		//
+		// // convert back to url
+		// try {
+		// url = new URL(extURL);
+		// addLogMessage("URL: "+url);
+		// } catch (MalformedURLException mux) {
+		// // leave url unchanged; probably does not happen
+		// addLogMessage("leave url unchanged; probably does not happen");
+		// }
+		//
+		// // convert url to File
+		// try {
+		// return new File(url.toURI());
+		// } catch (URISyntaxException ex) {
+		// addLogMessage("catched URISyntaxException");
+		// return new File(url.getPath());
+		// }
 	}
 
 	public boolean hasEncounteredError() {
