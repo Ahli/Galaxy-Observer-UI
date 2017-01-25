@@ -1,0 +1,1349 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<Desc>	
+
+    <Constant name="TierXGap" val="-125"/>
+    <Constant name="TierXGapHalf" val="1"/>
+    <Constant name="TierXGapLeft" val="-2"/>
+    <Constant name="TierXGapLeftHalf" val="-1"/>
+    
+    <Frame type="Image" name="ShipHighlightTemplate">
+        <Texture val="@UI/LotV_Story_SoA_TutorialHighlight"/>
+        <DesaturateOnDisable val="false"/>
+        <Visible val="false"/>
+        
+        <Animation name="Highlight">
+            <Event event="OnShown" action="Play"/>
+            <Controller type="Fade" end="Pause">
+                <Key type="Curve" time="0" value="0" out="Slow"/>
+                <Key type="Curve" time="1" value="255" out="Slow"/>
+                <Key type="Curve" time="2" value="0" out="Slow"/>
+            </Controller>
+        </Animation>
+        
+        <Animation name="HighlightLoop">
+            <Event event="OnShown" action="Play"/>
+            <Controller type="Animation" end="Loop" animation="Highlight">
+                <Key type="Animation" time="2.1" action="Reset"/>
+                <Key type="Animation" time="2.1" action="Play"/>
+            </Controller>
+        </Animation>
+        
+        <Animation name="HideGracefully">
+            <Event event="OnDisabled" action="Play"/>
+            <Controller type="Animation" end="Pause" animation="HighlightLoop">
+                <Key type="Animation" time="0.1" action="Pause"/>
+            </Controller>
+        </Animation>
+    </Frame>
+    
+    <Frame type="Image" name="ShipButtonShimmerTemplate">
+        <Anchor relative="$parent"/>
+        <Visible val="False"/>
+        <Alpha val="220"/>
+        <LayerCount val="2"/>
+     
+        <Texture val="@UI/LotV_Story_SoA_AbilityFrame_Selected" layer="0"/>
+        <AlphaLayer val="True" layer="0"/>
+        <!--TextureType val="Nineslice" layer="0"/-->
+     
+        <Texture val="Assets\Textures\ui_void_mission_soa_frame_energy_highlightmask.dds" layer="1"/>
+        <TextureCoords top="0" left="0" bottom="1" right="1" layer="1"/>
+     
+        <!--Animation name="Shimmer">
+            <Event event="OnShown" action="DirectionForward" frame="$parent"/>
+            <Event event="OnShown" action="Play" frame="$parent"/>
+     
+            <Controller type="LayerUV" layer="1" side="Top" relative="False" sidelock="True" end="Loop" >
+                <Key type="Curve" time="0" value="1" out="fast"/>
+                <Key type="Curve" time="2" value="-1" in="fast"/>
+            </Controller>
+        </Animation-->
+        
+        <Animation name="Highlight">
+            <Event event="OnShown" action="Reset" frame="$parent"/>
+            <Event event="OnShown" action="DirectionForward" frame="$parent"/>
+            <Event event="OnShown" action="Play" frame="$parent"/>
+            <Controller type="LayerUV" layer="1" side="Left" relative="false" sidelock="false" end="Loop">
+                <Key type="Curve" time="0" value="1" out="Auto"/>
+                <Key type="Curve" time="2.0" value="-1" out="Auto"/>
+            </Controller>
+            <Controller type="LayerUV" layer="1" side="Right" relative="false" sidelock="false" end="Loop">
+                <Key type="Curve" time="0" value="2" out="Auto"/>
+                <Key type="Curve" time="2.0" value="0" out="Auto"/>
+            </Controller>
+        </Animation>
+    </Frame>
+
+    <Frame type="Button" name="ShipButtonTemplate">
+        <Width val="116"/>
+        <Height val="116"/>
+        <DisplayType val="ImageLayer"/>
+        
+        <Frame type="Image" name="IconBackground">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="22"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="-22"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="22"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="-22"/>
+            <LayerColor val="000000"/>
+        </Frame>
+        
+        <Frame type="Image" name="ShipButtonIcon">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="22"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="-22"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="22"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="-22"/>
+            
+            <Animation name="DisabledEvent">
+                <Event event="OnDisabled" action="Reset,Play"/>
+                <Event event="OnEnabled" action="Reset"/>
+                <Controller type="Desaturation" end="Pause">
+                    <Key type="Bool" time="0" value="True"/>
+                </Controller>
+                <Controller type="Color" end="Pause">
+                    <Key type="Curve" time="0" value="25,69,118" out="Step"/>
+                </Controller>
+            </Animation>
+        </Frame>
+
+        <Frame type="Image" name="NormalImage">
+            <Anchor relative="$parent"/>
+            <LayerCount val="4"/>
+            <StateCount val="1"/>
+            <Texture val="@UI/LotV_Story_SoA_AbilityFrame_Normal" layer="0"/>
+            <Texture val="@UI/LotV_Story_SoA_AbilityFrame_Selected" layer="1"/>
+            <Texture val="@UI/LotV_Story_SoA_AbilityFrame_Selected" layer="2"/>
+            <Texture val="@UI/LotV_Story_SoA_AbilityFrame_Disabled" layer="3"/>
+            <DesaturateOnDisable val="false"/>
+        </Frame>
+
+        <Frame type="Image" name="HoverImage">
+            <Anchor relative="$parent"/>
+            <StateCount val="1"/>
+            <LayerCount val="4"/>
+            <Texture val="@UI/LotV_Story_SoA_AbilityFrame_Hover" layer="0"/>
+            <Texture val="@UI/LotV_Story_SoA_AbilityFrame_Hover" layer="1"/>
+            <Texture val="@UI/LotV_Story_SoA_AbilityFrame_Selected" layer="2"/>
+            <Texture val="@UI/LotV_Story_SoA_AbilityFrame_Disabled" layer="3"/>
+            <DesaturateOnDisable val="false"/>
+        </Frame>
+
+        <Frame type="Frame" name="HitTestFrame">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="22"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="-22"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="22"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="-22"/>
+        </Frame>
+        
+        <Frame type="Image" name="Shimmer" template="LotV_ShipUpgradeUI/ShipButtonShimmerTemplate">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="8"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="-8"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="8"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="-8"/>
+            <DesaturateOnDisable val="true"/>
+            <DisabledAlpha val="120"/>
+            <DesaturationColor val="0052a6"/>
+        </Frame>
+
+        <Frame type="Image" name="NumberHolder">
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="-5"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="-5"/>
+            <Width val="44"/>
+            <Height val="44"/>
+            <Texture val="@UI/LotV_Story_SoA_AbilityCost"/>
+            <DesaturateOnDisable val="false"/>
+        </Frame>
+    </Frame>
+
+    <Frame type="Frame" name="ShipItemTemplate">
+        <Width val="200"/>
+        <Height val="155"/>
+        
+        <Frame type="Button" name="Button" template="LotV_ShipUpgradeUI/ShipButtonTemplate">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+            <ClickSound val="*@UI_Void_ShipScreen_ButtonClick_Ability_ActorSound"/>
+            <HoverSound val="@UI_Void_SolarCore_Button_RollOvers"/>
+            
+            <Frame type="Image" name="NumberHolder">
+                <Animation name="ItemSelected">
+                    <Event event="Selected" action="Reset,Play" frame="$parent/$parent"/>
+                    <Controller type="Texture" end="Pause">
+                        <Key type="Image" time="0" image="@UI/LotV_Story_SoA_AbilityCostSelected"/>
+                    </Controller>
+                </Animation>
+                
+                <Animation name="ItemAvailable">
+                    <Event event="Available" action="Reset,Play" frame="$parent/$parent"/>
+                    <Controller type="Texture" end="Pause">
+                        <Key type="Image" time="0" image="@UI/LotV_Story_SoA_AbilityCost"/>
+                    </Controller>
+                </Animation>
+                
+                <Animation name="ItemDisabled">
+                    <Event event="OnDisabled" action="Reset,Play" frame="$parent"/>
+                    <Controller type="Texture" end="Pause">
+                        <Key type="Image" time="0" image="@UI/LotV_Story_SoA_AbilityCostDisabled"/>
+                    </Controller>
+                </Animation>
+            </Frame>
+        </Frame>
+                
+        <Frame type="Label" name="Name">
+            <Height val="45"/>
+            <Anchor side="Top" relative="$parent/Button" pos="Max" offset="-5"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="15"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="-15"/>
+            <Style val="Void_ShipPrimaryLabelSmallDisabled"/>
+
+            <Animation name="ItemSelected">
+                <Event event="Selected" action="Reset" frame="$parent"/>
+                <Event event="Selected" action="Play" frame="$parent"/>
+                <Controller type="Style" style1="Void_ShipPrimaryLabelSmallSelected" style2="Void_ShipPrimaryLabelSmallSelected" end="Pause">
+                    <Key type="Curve" time="0" value="1"/>
+                </Controller>
+            </Animation>
+            <Animation name="ItemAvailable">
+                <Event event="Available" action="Reset" frame="$parent"/>
+                <Event event="Available" action="Play" frame="$parent"/>
+                <Controller type="Style" style1="Void_ShipPrimaryLabelSmall" style2="Void_ShipPrimaryLabelSmall" end="Pause">
+                    <Key type="Curve" time="0" value="1"/>
+                </Controller>
+            </Animation>
+            <Animation name="ItemDisabled">
+                <Event event="OnDisabled" action="Reset" frame="$parent/Button"/>
+                <Event event="OnDisabled" action="Play" frame="$parent/Button"/>
+                <Controller type="Style" style1="Void_ShipPrimaryLabelSmallDisabled" style2="Void_ShipPrimaryLabelSmallDisabled" end="Pause">
+                    <Key type="Curve" time="0" value="1"/>
+                </Controller>
+            </Animation>
+        </Frame>
+        
+        <Frame type="Label" name="Power">
+            <Anchor side="Top" relative="$parent/Button/NumberHolder" pos="Min" offset="1"/>
+            <Anchor side="Bottom" relative="$parent/Button/NumberHolder" pos="Max" offset="0"/>
+            <Anchor side="Left" relative="$parent/Button/NumberHolder" pos="Min" offset="-1"/>
+            <Anchor side="Right" relative="$parent/Button/NumberHolder" pos="Max" offset="0"/>
+            <Style val="Void_ShipPowerLabel"/>
+            <Text val="0"/>
+            
+            <Animation name="ItemSelected">
+                <Event event="Selected" action="Reset" frame="$parent"/>
+                <Event event="Selected" action="Play" frame="$parent"/>
+                <Controller type="Style" style1="Void_ShipPowerLabelSelected" style2="Void_ShipPowerLabelSelected" end="Pause">
+                    <Key type="Curve" time="0" value="1"/>
+                </Controller>
+            </Animation>
+            <Animation name="ItemAvailable">
+                <Event event="Available" action="Reset" frame="$parent"/>
+                <Event event="Available" action="Play" frame="$parent"/>
+                <Controller type="Style" style1="Void_ShipPowerLabel" style2="Void_ShipPowerLabel" end="Pause">
+                    <Key type="Curve" time="0" value="1"/>
+                </Controller>
+            </Animation>
+            <Animation name="ItemDisabled">
+                <Event event="OnDisabled" action="Reset" frame="$parent/Button"/>
+                <Event event="OnDisabled" action="Play" frame="$parent/Button"/>
+                <Controller type="Style" style1="Void_ShipPowerLabelDisabled" style2="Void_ShipPowerLabelDisabled" end="Pause">
+                    <Key type="Curve" time="0" value="1"/>
+                </Controller>
+            </Animation>
+        </Frame>
+    </Frame>
+
+    <Frame type="Frame" name="ShipInventoryTemplate">
+        <Width val="240"/>
+        <Height val="532"/>
+        <AcceptsMouse val="true"/>
+
+        <Frame type="Image" name="BackgroundScanLines">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="20"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+            <Texture val="@UI/LoTV_Shared_HeaderScanLines"/>	
+            <DisabledAlpha val="0"/>
+            <Width val="450"/>
+            <Height val="80"/>
+            <Alpha val="150"/>
+            <Visible val="False"/>
+        </Frame>
+        
+        <Frame type="Image" name="Background">
+            <Anchor side="Top" relative="$parent/BackgroundScanLines" pos="Min" offset="5"/>
+            <Anchor side="Left" relative="$parent/BackgroundScanLines" pos="Min" offset="0"/>
+            <Texture val="@UI/LoTV_Shared_HeaderUnderline"/>
+            <DesaturateOnDisable val="true"/>
+            <DesaturationColor val="0773bf"/>
+            <DisabledAlpha val="150"/>
+            <Height val="60"/>
+            <Width val="460"/>
+            <Visible val="False"/>
+        </Frame>
+
+        <Frame type="Image" name="Highlight" template="LotV_ShipUpgradeUI/ShipHighlightTemplate">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+            <Height val="532"/>
+            <Width val="240"/>
+            <Visible val="False"/>
+        </Frame>
+        
+        <Frame type="Label" name="TierNumber">
+            <Anchor side="Top" relative="$parent/Background" pos="Mid" offset="-15"/>
+            <Anchor side="Left" relative="$parent/Background" pos="Min" offset="60"/>
+            <Style val="Void_ShipCalloutTitleRight"/>
+            <Text val="1"/>
+            <Visible val="False"/>
+        </Frame>
+        
+        <Frame type="Label" name="TierName">
+            <Anchor side="Top" relative="$parent/TierNumber" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent/Background" pos="Min" offset="60"/>
+            <Anchor side="Right" relative="$parent/Background" pos="Max" offset="0"/>
+            <Style val="Void_ShipCalloutTitleRight"/>
+            <Text val="Tier Name"/>
+            <Visible val="False"/>
+        </Frame>
+        
+        <Frame type="Label" name="SelectedItemName">
+            <Anchor side="Top" relative="$parent/Background" pos="Mid" offset="32"/>
+            <Anchor side="Left" relative="$parent/TierName" pos="Min" offset="2"/>
+            <Style val="Void_TierSelectedItemLabel"/>
+            <Text val="@UI/StoryShipUpgrade/Locked"/>
+            <Height val="22"/>
+            <Visible val="False"/>
+        </Frame>
+    
+        <Frame type="Frame" name="Item1" template="LotV_ShipUpgradeUI/ShipItemTemplate">
+            <Anchor side="Left" relative="$parent/Item2" pos="Min" offset="12"/>
+            <Anchor side="Top" relative="$parent/Item2" pos="Max" offset="-5"/>
+        </Frame>
+        
+        <Frame type="Frame" name="Item2" template="LotV_ShipUpgradeUI/ShipItemTemplate">
+            <Anchor side="Left" relative="$parent/Item3" pos="Min" offset="12"/>
+            <Anchor side="Top" relative="$parent/Item3" pos="Max" offset="-5"/>
+        </Frame>
+        
+        <Frame type="Frame" name="Item3" template="LotV_ShipUpgradeUI/ShipItemTemplate">
+            <Anchor side="Left" relative="$parent" pos="Min" offset="8"/>
+            <Anchor side="Top" relative="$parent" pos="Min" offset="20"/>
+        </Frame>
+        
+        <Frame type="Image" name="LockedIcon1">
+            <Anchor side="Left" relative="$parent/Item1" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent/Item1" pos="Mid" offset="0"/>
+            <Anchor side="Top" relative="$parent/Item1" pos="Min" offset="14"/>
+            <DesaturateOnDisable val="false"/>
+            <Texture val="@UI/LotV_Story_SoA_AbilityLocked"/>
+            <Visible val="false"/>
+        </Frame>
+        
+        <Frame type="Image" name="LockedIcon2">
+            <Anchor side="Left" relative="$parent/Item2" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent/Item2" pos="Mid" offset="0"/>
+            <Anchor side="Top" relative="$parent/Item2" pos="Min" offset="14"/>
+            <DesaturateOnDisable val="false"/>
+            <Texture val="@UI/LotV_Story_SoA_AbilityLocked"/>
+            <Visible val="false"/>
+        </Frame>
+        
+        <Frame type="Image" name="LockedIcon3">
+            <Anchor side="Left" relative="$parent/Item3" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent/Item3" pos="Mid" offset="0"/>
+            <Anchor side="Top" relative="$parent/Item3" pos="Min" offset="14"/>
+            <DesaturateOnDisable val="false"/>
+            <Texture val="@UI/LotV_Story_SoA_AbilityLocked"/>
+            <Visible val="false"/>
+        </Frame>
+    </Frame>
+    
+    <Frame type="Frame" name="ShipInventoryTemplate_Right">
+        <Width val="240"/>
+        <Height val="532"/>
+        <AcceptsMouse val="true"/>
+
+        <Frame type="Image" name="BackgroundScanLines">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="20"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+            <Texture val="@UI/LoTV_Shared_HeaderScanLines"/>
+            <DisabledAlpha val="0"/>
+            <Width val="450"/>
+            <Height val="80"/>
+            <Alpha val="150"/>
+            <TextureCoords top="0" left="1" bottom="1" right="0"/>
+            <Visible val="false"/>
+        </Frame>
+        
+        <Frame type="Image" name="Background">
+            <Anchor side="Top" relative="$parent/BackgroundScanLines" pos="Min" offset="5"/>
+            <Anchor side="Right" relative="$parent/BackgroundScanLines" pos="Max" offset="0"/>
+            <Texture val="@UI/LoTV_Shared_HeaderUnderline"/>
+            <DesaturateOnDisable val="true"/>
+            <DesaturationColor val="0773bf"/>
+            <DisabledAlpha val="150"/>
+            <Height val="60"/>
+            <Width val="460"/>
+            <TextureCoords top="0" left="1" bottom="1" right="0"/>
+            <Visible val="false"/>
+        </Frame>
+
+        <Frame type="Image" name="Highlight" template="LotV_ShipUpgradeUI/ShipHighlightTemplate">
+            <Anchor side="Top" relative="$parent/Background" pos="Min" offset="-34"/>
+            <Anchor side="Right" relative="$parent/Background" pos="Max" offset="5"/>
+            <Width val="240"/>
+            <Height val="532"/>
+            <TextureCoords top="0" left="1" bottom="1" right="0"/>
+        </Frame>
+        
+        <Frame type="Label" name="TierNumber">
+            <Anchor side="Top" relative="$parent/Background" pos="Mid" offset="-15"/>
+            <Anchor side="Right" relative="$parent/Background" pos="Max" offset="-60"/>
+            <Style val="Void_ShipCalloutTitleLeft"/>
+            <Text val="1"/>
+            <Visible val="False"/>
+        </Frame>
+        
+        <Frame type="Label" name="TierName">
+            <Anchor side="Top" relative="$parent/TierNumber" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent/Background" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent/Background" pos="Max" offset="-60"/>
+            <Style val="Void_ShipCalloutTitleLeft"/>
+            <Text val="Tier Name"/>
+            <Visible val="false"/>
+        </Frame>
+        
+        <Frame type="Label" name="SelectedItemName">
+            <Anchor side="Top" relative="$parent/Background" pos="Mid" offset="32"/>
+            <Anchor side="Right" relative="$parent/TierName" pos="Max" offset="-2"/>
+            <Style val="Void_TierSelectedItemLabel"/>
+            <Text val="@UI/StoryShipUpgrade/Locked"/>
+            <Height val="22"/>
+            <Visible val="false"/>
+        </Frame>
+    
+        <Frame type="Frame" name="Item1" template="LotV_ShipUpgradeUI/ShipItemTemplate">
+            <Anchor side="Right" relative="$parent/Item2" pos="Max" offset="-12"/>
+            <Anchor side="Top" relative="$parent/Item2" pos="Max" offset="-5"/>
+        </Frame>
+        
+        <Frame type="Frame" name="Item2" template="LotV_ShipUpgradeUI/ShipItemTemplate">
+            <Anchor side="Right" relative="$parent/Item3" pos="Max" offset="-12"/>
+            <Anchor side="Top" relative="$parent/Item3" pos="Max" offset="-5"/>
+        </Frame>
+        
+        <Frame type="Frame" name="Item3" template="LotV_ShipUpgradeUI/ShipItemTemplate">
+            <Anchor side="Right" relative="$parent" pos="Max" offset="-4"/>
+            <Anchor side="Top" relative="$parent" pos="Min" offset="20"/>
+        </Frame>
+        
+        <Frame type="Image" name="LockedIcon1">
+            <Anchor side="Left" relative="$parent/Item1" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent/Item1" pos="Mid" offset="0"/>
+            <Anchor side="Top" relative="$parent/Item1" pos="Min" offset="14"/>
+            <DesaturateOnDisable val="false"/>
+            <Texture val="@UI/LotV_Story_SoA_AbilityLocked"/>
+            <Visible val="false"/>
+        </Frame>
+        
+        <Frame type="Image" name="LockedIcon2">
+            <Anchor side="Left" relative="$parent/Item2" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent/Item2" pos="Mid" offset="0"/>
+            <Anchor side="Top" relative="$parent/Item2" pos="Min" offset="14"/>
+            <DesaturateOnDisable val="false"/>
+            <Texture val="@UI/LotV_Story_SoA_AbilityLocked"/>
+            <Visible val="false"/>
+        </Frame>
+        
+        <Frame type="Image" name="LockedIcon3">
+            <Anchor side="Left" relative="$parent/Item3" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent/Item3" pos="Mid" offset="0"/>
+            <Anchor side="Top" relative="$parent/Item3" pos="Min" offset="14"/>
+            <DesaturateOnDisable val="false"/>
+            <Texture val="@UI/LotV_Story_SoA_AbilityLocked"/>
+            <Visible val="false"/>
+        </Frame>
+    </Frame>
+    
+    <Frame type="Frame" name="ShipPowerPipTemplate">
+        <Width val="52"/>
+        <Height val="28"/>
+        
+        <Frame type="Image" name="PowerFill">
+            <Anchor relative="$parent"/>
+            <Texture val="@UI/LotV_Story_SoA_GaugePipFilled1"/>
+        </Frame>
+    </Frame>
+
+    <Frame type="Frame" name="ShipAuxiliaryTemplate">
+        <Width val="320"/>
+        <Height val="60"/>
+
+        <Frame type="Label" name="AuxiliaryTitleLabel">
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+            <Height val="30"/>
+            <Style val="Void_ShipSecondaryLabelSmall"/>
+        </Frame>
+        
+        <Frame type="Button" name="AuxiliaryPlusButton">
+            <Anchor side="Top" relative="$parent/AuxiliaryPowerOutline" pos="Min" offset="4"/>
+            <Anchor side="Left" relative="$parent/AuxiliaryPowerOutline" pos="Max" offset="-10"/>
+            <Width val="36"/>
+            <Height val="20"/>
+            <DisplayType val="ImageLayer"/>
+            <NormalImage val="NormalImage"/>
+            <HoverImage val="HoverImage"/>
+            <TooltipFrame val="AuxiliaryTooltip"/>
+            <ClickSound val="*@UI_Void_ShipScreen_ButtonClick_AuxPowerUp_ActorSound"/>
+            
+            <Frame type="Image" name="NormalImage">
+                <Anchor relative="$parent"/>
+                <LayerCount val="4"/>
+                <Texture val="@UI/LotV_Story_SoA_Button_GaugeArrow" layer="0"/>
+                <Texture val="@UI/LotV_Story_SoA_Button_GaugeArrow_Disabled" layer="3"/>
+                <DesaturateOnDisable val="false"/>
+            </Frame>
+            
+            <Frame type="Image" name="HoverImage">
+                <Anchor relative="$parent"/>
+                <Texture val="@UI/LotV_Story_SoA_Button_GaugeArrow_Hover"/>
+                <DesaturateOnDisable val="false"/>
+            </Frame>
+        </Frame>
+
+        <Frame type="Button" name="AuxiliaryMinusButton">
+            <Anchor side="Top" relative="$parent/AuxiliaryPowerOutline" pos="Min" offset="4"/>
+            <Anchor side="Right" relative="$parent/AuxiliaryPowerOutline" pos="Min" offset="11"/>
+            <Width val="36"/>
+            <Height val="20"/>
+            <DisplayType val="ImageLayer"/>
+            <NormalImage val="NormalImage"/>
+            <HoverImage val="HoverImage"/>
+            <TooltipFrame val="AuxiliaryTooltip"/>
+            <ClickSound val="*@UI_Void_ShipScreen_ButtonClick_AuxPowerDown_ActorSound"/>
+            
+            <Frame type="Image" name="NormalImage">
+                <Anchor relative="$parent"/>
+                <LayerCount val="4"/>
+                <Texture val="@UI/LotV_Story_SoA_Button_GaugeArrowDown" layer="0"/>
+                <Texture val="@UI/LotV_Story_SoA_Button_GaugeArrowDown_Disabled" layer="3"/>
+                <DesaturateOnDisable val="false"/>
+            </Frame>
+            
+            <Frame type="Image" name="HoverImage">
+                <Anchor relative="$parent"/>
+                <LayerCount val="1"/>
+                <Texture val="@UI/LotV_Story_SoA_Button_GaugeArrowDown_Hover" layer="0"/>
+                <DesaturateOnDisable val="false"/>
+            </Frame>
+        </Frame>
+              
+        <Frame type="Image" name="AuxiliaryPowerOutline">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="5"/>
+            <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+            <Texture val="@UI/LotV_Story_SoA_GaugeBar"/>
+            <Width val="148"/>
+            <Height val="28"/>
+            <DesaturateOnDisable val="true"/>
+            <DisabledAlpha val="150"/>
+            <AdjustmentColor val="376ea9"/>
+            
+            <Animation name="DisabledColor">
+                <Event event="OnDisabled" action="Reset, Play"/>
+                <Event event="OnEnabled" action="Reset"/>
+                <Controller type="Desaturation" end="Pause">
+                    <Key type="Bool" time="0" value="true"/>
+                </Controller>
+                <Controller type="Color" end="Pause">
+                    <Key type="Curve" time="0" value="55,110,169" out="Auto"/>
+                </Controller>
+            </Animation>
+        </Frame>
+        
+        <Frame type="Frame" name="AuxiliaryPip1" template="LotV_ShipUpgradeUI/ShipPowerPipTemplate">
+            <Anchor side="Top" relative="$parent/AuxiliaryPowerOutline" pos="Min" offset="1"/>
+            <Anchor side="Left" relative="$parent/AuxiliaryPowerOutline" pos="Min" offset="-2"/>
+            <CollapseLayout val="true"/>
+        </Frame>
+        
+        <Frame type="Frame" name="AuxiliaryPip2" template="LotV_ShipUpgradeUI/ShipPowerPipTemplate">
+            <Anchor side="Top" relative="$parent/AuxiliaryPip1" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent/AuxiliaryPip1" pos="Max" offset="-19"/>
+            <CollapseLayout val="true"/>
+            
+            <Frame type="Image" name="PowerFill">
+                <Texture val="@UI/LotV_Story_SoA_GaugePipFilled2"/>
+            </Frame>
+        </Frame>
+        
+        <Frame type="Frame" name="AuxiliaryPip3" template="LotV_ShipUpgradeUI/ShipPowerPipTemplate">
+            <Anchor side="Top" relative="$parent/AuxiliaryPip2" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent/AuxiliaryPip2" pos="Max" offset="-18"/>
+            <CollapseLayout val="true"/>
+            
+            <Frame type="Image" name="PowerFill">
+                <Texture val="@UI/LotV_Story_SoA_GaugePipFilled3"/>
+            </Frame>
+        </Frame>
+        
+        <Frame type="Frame" name="AuxiliaryPip4" template="LotV_ShipUpgradeUI/ShipPowerPipTemplate">
+            <Anchor side="Top" relative="$parent/AuxiliaryPip3" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent/AuxiliaryPip3" pos="Max" offset="-19"/>
+            <CollapseLayout val="true"/>
+            
+            <Frame type="Image" name="PowerFill">
+                <Texture val="@UI/LotV_Story_SoA_GaugePipFilled4"/>
+            </Frame>
+        </Frame>
+        
+        <!--Frame type="Frame" name="AuxiliaryPip5" template="LotV_ShipUpgradeUI/ShipPowerPipTemplate">
+            <Anchor side="Top" relative="$parent/AuxiliaryPip4" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent/AuxiliaryPip4" pos="Max" offset="-8"/>
+            <CollapseLayout val="true"/>
+        </Frame-->
+    
+    </Frame>
+    
+    <Frame type="Frame" name="ShipCalloutRightTemplate">
+        <Height val="180"/>
+        <Width val="500"/>
+        
+        <Frame type="Image" name="Callout">
+            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+            <Height val="151"/>
+            <Width val="495"/>
+            <Texture val="Assets\Textures\ui_void_spearofadun_callout_highlight.dds"/>
+        </Frame>
+
+        <Frame type="Label" name="Title">
+            <Anchor side="Left" relative="$parent/Callout" pos="Min" offset="110"/>
+            <Anchor side="Right" relative="$parent/Callout" pos="Max" offset="0"/>
+            <Anchor side="Bottom" relative="$parent/Callout" pos="Min" offset="45"/>
+            <Height val="40"/>
+            <Text val="Annihilation Cluster"/>
+            <Style val="Void_ShipCalloutTitleRight"/>
+        </Frame>
+        
+        <Frame type="Label" name="Subtitle">
+            <Anchor side="Right" relative="$parent/Title" pos="Max" offset="0"/>
+            <Anchor side="Left" relative="$parent/Title" pos="Min" offset="0"/>
+            <Anchor side="Top" relative="$parent/Title" pos="Max" offset="20"/>
+            <Height val="40"/>
+            <Text val="Purifier Mothership"/>
+            <Style val="Void_ShipCalloutSubtitleRight"/>
+        </Frame>
+        
+        <Animation name="Birth">
+            <Event event="Birth" action="Play"/>
+            <Event event="Birth" action="Reset"/>
+            <Controller type="Anchor" end="Pause" side="Right" relative="true">
+                <Key type="Curve" time="0" value="-500" out="Slow"/>
+                <Key type="Curve" time="0.4" value="-500" out="Slow"/>
+                <Key type="Curve" time="0.9" value="0" in="Slow"/>
+            </Controller>
+            <Controller type="Anchor" end="Pause" side="Top" relative="true">
+                <Key type="Curve" time="0" value="0" out="Slow"/>
+                <Key type="Curve" time="0.4" value="0" out="Slow"/>
+                <Key type="Curve" time="0.9" value="-180" in="Slow"/>
+            </Controller>
+            <Controller type="Fade" end="Pause" frame="Title">
+                <Key type="Curve" time="0" value="0" out="Slow"/>
+                <Key type="Curve" time="0.8" value="0" out="Slow"/>
+                <Key type="Curve" time="1.1" value="255" out="Slow"/>
+            </Controller>
+            <Controller type="Fade" end="Pause" frame="Subtitle">
+                <Key type="Curve" time="0" value="0" out="Slow"/>
+                <Key type="Curve" time="0.8" value="0" out="Slow"/>
+                <Key type="Curve" time="1.1" value="255" out="Slow"/>
+            </Controller>
+            <Controller type="Sound" end="Stop">
+                <Key type="Sound" time="0.01" sound="@UI_Void_SolarCore_BG_Screen_Data_1"/>
+            </Controller>
+        </Animation>
+        
+        <Animation name="Death">
+            <Event event="Death" action="Play"/>
+            <Event event="Death" action="Reset"/>
+            <Controller type="Anchor" end="Pause" side="Right" relative="true">
+                <Key type="Curve" time="0" value="0" out="Slow"/>
+                <Key type="Curve" time="0.15" value="0" out="Slow"/>
+                <Key type="Curve" time="0.4" value="-500" out="Slow"/>
+            </Controller>
+            
+            <Controller type="Fade" end="Pause" frame="Title">
+                <Key type="Curve" time="0" value="255" out="Slow"/>
+                <Key type="Curve" time="0.15" value="0" out="Slow"/>
+            </Controller>
+
+            <Controller type="Fade" end="Pause" frame="Subtitle">
+                <Key type="Curve" time="0" value="255" out="Slow"/>
+                <Key type="Curve" time="0.15" value="0" out="Slow"/>
+            </Controller>
+            <Controller type="Sound" end="Stop">
+                <Key type="Sound" time="0.01" sound="@UI_Void_SolarCore_BG_Screen_Data_4"/>
+            </Controller>
+        </Animation>
+    </Frame>
+    
+    <Frame type="Frame" name="ShipCalloutLeftTemplate">
+        <Height val="180"/>
+        <Width val="385"/>
+    
+        <Frame type="Image" name="Diagonal">
+            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+            <Width val="128"/>
+            <Height val="128"/>
+            <Texture val="Assets\Textures\ui_void_starmap_calloutdiagonalright.dds"/>
+        </Frame>
+                
+        <Frame type="Image" name="Horizontal">
+            <Anchor side="Right" relative="$parent/Diagonal" pos="Min" offset="0"/>
+            <Anchor side="Top" relative="$parent/Diagonal" pos="Min" offset="0"/>
+            <Anchor side="Bottom" relative="$parent/Diagonal" pos="Max" offset="0"/>
+            <Width val="129"/>
+            <Texture val="Assets\Textures\ui_void_starmap_callouthorizontal.dds"/>
+        </Frame>
+        
+        <Frame type="Image" name="EndCap">
+            <Anchor side="Right" relative="$parent/Horizontal" pos="Min" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+            <Width val="128"/>
+            <Height val="128"/>
+            <Texture val="Assets\Textures\ui_void_starmap_calloutendcapleft.dds"/>
+        </Frame>
+
+        <Frame type="Label" name="Title">
+            <Anchor side="Left" relative="$parent/EndCap" pos="Min" offset="10"/>
+            <Anchor side="Bottom" relative="$parent/Horizontal" pos="Min" offset="8"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+            <Height val="40"/>
+            <Text val="Annihilation Cluster"/>
+            <Style val="Void_ShipCalloutTitleLeft"/>
+        </Frame>
+        
+        <Frame type="Label" name="Subtitle">
+            <Anchor side="Right" relative="$parent/Title" pos="Max" offset="0"/>
+            <Anchor side="Left" relative="$parent/Title" pos="Min" offset="0"/>
+            <Anchor side="Top" relative="$parent/Title" pos="Max" offset="4"/>
+            <Height val="40"/>
+            <Text val="Purifier Mothership"/>
+            <Style val="Void_ShipCalloutSubtitleLeft"/>
+        </Frame>
+        
+        <Animation name="Birth">
+            <Event event="Birth" action="Play"/>
+            <Event event="Birth" action="Reset"/>
+            <Controller type="Anchor" end="Pause" side="Left" relative="true">
+                <Key type="Curve" time="0" value="0" out="Slow"/>
+                <Key type="Curve" time="0.5" value="-385" in="Slow"/>
+            </Controller>
+            <Controller type="Anchor" end="Pause" side="Top" relative="true">
+                <Key type="Curve" time="0" value="0" out="Slow"/>
+                <Key type="Curve" time="0.5" value="-180" in="Slow"/>
+            </Controller>
+            <Controller type="Fade" end="Pause" frame="Title">
+                <Key type="Curve" time="0" value="0" out="Slow"/>
+                <Key type="Curve" time="0.4" value="0" out="Slow"/>
+                <Key type="Curve" time="0.7" value="255" out="Slow"/>
+            </Controller>
+            <Controller type="Fade" end="Pause" frame="Subtitle">
+                <Key type="Curve" time="0" value="0" out="Slow"/>
+                <Key type="Curve" time="0.4" value="0" out="Slow"/>
+                <Key type="Curve" time="0.7" value="255" out="Slow"/>
+            </Controller>
+            <Controller type="Sound" end="Stop">
+                <Key type="Sound" time="0.01" sound="@UI_Void_SolarCore_BG_Screen_Data_1"/>
+            </Controller>
+        </Animation>
+        
+        <Animation name="Death">
+            <Event event="Death" action="Play"/>
+            <Event event="Death" action="Reset"/>
+            <Controller type="Anchor" end="Pause" side="Left" relative="true">
+                <Key type="Curve" time="0" value="-385" out="Slow"/>
+                <Key type="Curve" time="0.15" value="-385" out="Slow"/>
+                <Key type="Curve" time="0.4" value="-0" out="Slow"/>
+            </Controller>
+            
+            <Controller type="Fade" end="Pause" frame="Title">
+                <Key type="Curve" time="0" value="255" out="Slow"/>
+                <Key type="Curve" time="0.15" value="0" out="Slow"/>
+            </Controller>
+
+            <Controller type="Fade" end="Pause" frame="Subtitle">
+                <Key type="Curve" time="0" value="255" out="Slow"/>
+                <Key type="Curve" time="0.15" value="0" out="Slow"/>
+            </Controller>
+            <Controller type="Sound" end="Stop">
+                <Key type="Sound" time="0.01" sound="@UI_Void_SolarCore_BG_Screen_Data_4"/>
+            </Controller>
+        </Animation>
+    </Frame>
+    
+    <Frame type="Frame" name="ShipUpgradeTemplate">
+        <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+        <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+        <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+        <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+        
+        <Frame type="Frame" name="TopBorder" template="VoidShared_GenericTemplates/TopBorderTemplate"/>
+        <Frame type="Frame" name="BottomBorder" template="LotV_GenericTemplates/BottomBorderTwoButtonTemplate">
+            <RenderPriority val="600"/>
+        </Frame>
+        
+        <Frame type="CutsceneFrame" name="BackgroundCutscene">
+            <Anchor relative="$parent"/>
+            <RenderType val="HDR"/>
+            <RenderPriority val="1"/>
+        </Frame>
+        
+        <Frame type="Image" name="Background">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+            <Texture val="@UI/LotV_Story_SoA_Vignette"/>
+            <TextureType val="Normal"/>
+            <Alpha val="200"/>
+            <RenderPriority val="100"/>
+            <RenderType val="HDR"/>
+        </Frame>
+
+        <!-- Cutscene callouts -->
+        <Frame type="Frame" name="Callout1" template="LotV_ShipUpgradeUI/ShipCalloutRightTemplate">	
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+        </Frame>
+        
+        <Frame type="Frame" name="Callout2" template="LotV_ShipUpgradeUI/ShipCalloutRightTemplate">	
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+        </Frame>
+        
+        <Frame type="Frame" name="Callout3" template="LotV_ShipUpgradeUI/ShipCalloutRightTemplate">	
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+        </Frame>
+        
+        <Frame type="Frame" name="Callout4" template="LotV_ShipUpgradeUI/ShipCalloutRightTemplate">	
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+        </Frame>
+        
+        <Frame type="Frame" name="Callout5" template="LotV_ShipUpgradeUI/ShipCalloutRightTemplate">	
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+        </Frame>
+        
+        <Frame type="Frame" name="Callout6" template="LotV_ShipUpgradeUI/ShipCalloutLeftTemplate">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+        </Frame>
+        
+        <!-- Inventory -->
+        
+        <Frame type="Frame" name="TopPanel">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+            <Height val="450"/>
+            
+            <Frame type="Image" name="BackgroundScanLines">
+                <Anchor side="Left" relative="$parent/ShipUpgradeTitle" pos="Mid" offset="0"/>
+                <Anchor side="Right" relative="$parent/ShipUpgradeTitle" pos="Mid" offset="0"/>
+                <Anchor side="Top" relative="$parent/ShipUpgradeTitle" pos="Min" offset="-10"/>
+                <Anchor side="Bottom" relative="$parent/ShipUpgradePrompt" pos="Max" offset="40"/>
+                <Width val="550"/>
+                <Texture val="@UI/LoTV_Shared_HeaderScanLines"/>
+            </Frame>
+            
+            <Frame type="Label" name="ShipUpgradeTitle">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="20"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="25"/>
+                <Anchor side="Right" relative="$parent" pos="Max" offset="-25"/>
+                <Text val="@UI/StoryShipUpgrade/Title"/>
+                <Style val="Void_ShipTitleLabel"/>
+            </Frame>
+                
+            <Frame type="Label" name="ShipUpgradePrompt">
+                <Anchor side="Top" relative="$parent/ShipUpgradeTitle" pos="Max" offset="0"/>
+                <Anchor side="Left" relative="$parent/ShipUpgradeTitle" pos="Min" offset="0"/>
+                <Anchor side="Right" relative="$parent/ShipUpgradeTitle" pos="Max" offset="0"/>
+                <Text val="@UI/StoryShipUpgrade/PromptTitle"/>
+                <Style val="Void_ShipPromptLabel"/>
+            </Frame>
+        </Frame>
+            
+        <Frame type="Frame" name="BottomPanel">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+
+            <Frame type="Image" name="BackgroundLeft">
+                <Anchor side="Bottom" relative="$parent" pos="Max" offset="-40"/>
+                <Anchor side="Right" relative="$parent" pos="Mid" offset="-160"/>
+                <Texture val="@UI/LotV_Story_SoA_ButtonBG_Left"/>
+                <TextureType val="Normal"/>
+                <RenderPriority val="100"/>
+            </Frame>
+            
+            <Frame type="Image" name="BackgroundRight">
+                <Anchor side="Bottom" relative="$parent" pos="Max" offset="-40"/>
+                <Anchor side="Left" relative="$parent" pos="Mid" offset="160"/>
+                <Texture val="@UI/LotV_Story_SoA_ButtonBG_Left"/>
+                <TextureType val="Normal"/>
+                <RenderPriority val="100"/>
+                <TextureCoords top="0" left="1" bottom="1" right="0"/>
+            </Frame>
+            
+            <Frame type="Frame" name="InventoryPanel">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+                
+                <!-- Tier 3-->
+                <Frame type="Frame" name="ShipInventory3" template="LotV_ShipUpgradeUI/ShipInventoryTemplate">
+                    <Anchor side="Bottom" relative="$parent" pos="Max" offset="-17"/>
+                    <Anchor side="Right" relative="$parent/$parent/BackgroundLeft" pos="Max" offset="11"/>
+                </Frame>
+                
+                <!-- Tier 2 -->
+                <Frame type="Frame" name="ShipInventory2" template="LotV_ShipUpgradeUI/ShipInventoryTemplate">
+                    <Anchor side="Bottom" relative="$parent/ShipInventory3" pos="Max" offset="0"/>
+                    <Anchor side="Right" relative="$parent/ShipInventory3" pos="Min" offset="73"/>
+                    <Width val="260"/>
+                    
+                    <Frame type="Image" name="Highlight">
+                        <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                        <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                        <Height val="532"/>
+                        <Width val="260"/>
+                        <Visible val="False"/>
+                        <Texture val="@UI/LotV_Story_SoA_TutorialHighlight1"/>
+                    </Frame>
+                    
+                    <Frame type="Frame" name="Item1">
+                        <Anchor side="Left" relative="$parent/Item2" pos="Min" offset="18"/>
+                    </Frame>
+                    
+                    <Frame type="Frame" name="Item3">
+                        <Anchor side="Left" relative="$parent" pos="Min" offset="10"/>
+                    </Frame>
+                </Frame>
+                
+                <!-- Tier 1 -->
+                <Frame type="Frame" name="ShipInventory1" template="LotV_ShipUpgradeUI/ShipInventoryTemplate">
+                    <Anchor side="Bottom" relative="$parent/ShipInventory2" pos="Max" offset="0"/>
+                    <Anchor side="Right" relative="$parent/ShipInventory2" pos="Min" offset="92"/>
+                    <Width val="280"/>
+                    
+                    <Frame type="Image" name="Highlight">
+                        <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                        <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                        <Height val="532"/>
+                        <Width val="280"/>
+                        <Visible val="False"/>
+                        <Texture val="@UI/LotV_Story_SoA_TutorialHighlight2"/>
+                    </Frame>
+                    
+                    <Frame type="Frame" name="Item1">
+                        <Anchor side="Left" relative="$parent/Item2" pos="Min" offset="25"/>
+                    </Frame>
+                    
+                    <Frame type="Frame" name="Item3">
+                        <Anchor side="Left" relative="$parent" pos="Min" offset="15"/>
+                    </Frame>
+                </Frame>
+                
+                <!-- Tier 4 -->
+                <Frame type="Frame" name="ShipInventory4" template="LotV_ShipUpgradeUI/ShipInventoryTemplate_Right">
+                    <Anchor side="Bottom" relative="$parent/ShipInventory1" pos="Max" offset="0"/>
+                    <Anchor side="Left" relative="$parent/$parent/BackgroundRight" pos="Min" offset="-14"/>
+                    
+                    <Frame type="Image" name="Highlight">
+                        <TextureCoords top="0" left="1" bottom="1" right="0"/>
+                    </Frame>
+                </Frame>
+                
+                <!-- Tier 5 -->
+                <Frame type="Frame" name="ShipInventory5" template="LotV_ShipUpgradeUI/ShipInventoryTemplate_Right">
+                    <Anchor side="Bottom" relative="$parent/ShipInventory4" pos="Max" offset="0"/>
+                    <Anchor side="Left" relative="$parent/ShipInventory4" pos="Max" offset="-70"/>
+                    <Width val="260"/>
+
+                    <Frame type="Image" name="Highlight">
+                        <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                        <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                        <Height val="532"/>
+                        <Width val="260"/>
+                        <Texture val="@UI/LotV_Story_SoA_TutorialHighlight1"/>
+                        <TextureCoords top="0" left="1" bottom="1" right="0"/>
+                        <Visible val="False"/>
+                    </Frame>
+                    
+                    <Frame type="Frame" name="Item1">
+                        <Anchor side="Right" relative="$parent/Item2" pos="Max" offset="-18"/>
+                    </Frame>
+                    
+                    <Frame type="Frame" name="Item3">
+                        <Anchor side="Right" relative="$parent" pos="Max" offset="-10"/>
+                    </Frame>
+                </Frame>
+                
+                <!-- Tier 6 -->
+                <Frame type="Frame" name="ShipInventory6" template="LotV_ShipUpgradeUI/ShipInventoryTemplate_Right">
+                    <Anchor side="Bottom" relative="$parent/ShipInventory5" pos="Max" offset="0"/>
+                    <Anchor side="Left" relative="$parent/ShipInventory5" pos="Max" offset="-91"/>
+                    <Width val="280"/>
+
+                    <Frame type="Image" name="Highlight">
+                        <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                        <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                        <Height val="532"/>
+                        <Width val="280"/>
+                        <Texture val="@UI/LotV_Story_SoA_TutorialHighlight2"/>
+                        <TextureCoords top="0" left="1" bottom="1" right="0"/>
+                        <Visible val="False"/>
+                    </Frame>
+                    
+                    <Frame type="Frame" name="Item1">
+                        <Anchor side="Right" relative="$parent/Item2" pos="Max" offset="-25"/>
+                    </Frame>
+                    
+                    <Frame type="Frame" name="Item3">
+                        <Anchor side="Right" relative="$parent" pos="Max" offset="-13"/>
+                    </Frame>
+                </Frame>
+                
+                <!-- (Bottom Middle) Auxiliary passives -->	
+                
+                <Frame type="Frame" name="AuxiliaryPanel">
+                    <Width val="320"/>
+                    <Height val="275"/>
+                    <Anchor side="Bottom" relative="$parent" pos="Max" offset="-50"/>
+                    <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+                    <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+                    
+                    <Frame type="Image" name="AuxiliaryBg">
+                        <Anchor side="Top" relative="$parent/ShipAuxiliaryTitle" pos="Min" offset="-10"/>
+                        <Anchor side="Left" relative="$parent/ShipAuxiliaryTitle" pos="Mid" offset="0"/>					
+                        <Anchor side="Right" relative="$parent/ShipAuxiliaryTitle" pos="Mid" offset="0"/>
+                        <Texture val="@UI/LoTV_Shared_HeaderScanLines"/>
+                        <Height val="50"/>
+                        <Width val="320"/>
+                    </Frame>
+                    
+                    <Frame type="Label" name="ShipAuxiliaryTitle">
+                        <Anchor side="Top" relative="$parent" pos="Min" offset="12"/>
+                        <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+                        <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+                        <Width val="320"/>
+                        <Text val="@UI/StoryShipUpgrade/AuxiliarySystemsTitle"/>
+                        <Style val="Void_ShipSecondaryTitleLabel"/>
+                    </Frame>
+                    
+                    <Frame type="Frame" name="ShipAuxiliaryFrame1" template="LotV_ShipUpgradeUI/ShipAuxiliaryTemplate">
+                        <Anchor side="Top" relative="$parent/ShipAuxiliaryTitle" pos="Max" offset="10"/>
+                        <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+                        <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+                        <AcceptsMouse val="true"/>
+                        <TooltipFrame val="AuxiliaryTooltip"/>
+                    </Frame>
+                    
+                    <Frame type="Frame" name="ShipAuxiliaryFrame2" template="LotV_ShipUpgradeUI/ShipAuxiliaryTemplate">
+                        <Anchor side="Top" relative="$parent/ShipAuxiliaryFrame1" pos="Max" offset="10"/>
+                        <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+                        <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+                        <AcceptsMouse val="true"/>
+                        <TooltipFrame val="AuxiliaryTooltip"/>
+                    </Frame>
+                    
+                    <Frame type="Frame" name="ShipAuxiliaryFrame3" template="LotV_ShipUpgradeUI/ShipAuxiliaryTemplate">
+                        <Anchor side="Top" relative="$parent/ShipAuxiliaryFrame2" pos="Max" offset="10"/>
+                        <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+                        <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+                        <AcceptsMouse val="true"/>
+                        <TooltipFrame val="AuxiliaryTooltip"/>
+                    </Frame>
+                    
+                    <Frame type="Image" name="AuxiliaryHighlight" template="LotV_ShipUpgradeUI/ShipHighlightTemplate">
+                        <Anchor side="Top" relative="$parent/ShipAuxiliaryFrame1/AuxiliaryPowerOutline" pos="Min" offset="-2"/>
+                        <Anchor side="Left" relative="$parent/ShipAuxiliaryFrame1/AuxiliaryPowerOutline" pos="Mid" offset="0"/>					
+                        <Anchor side="Right" relative="$parent/ShipAuxiliaryFrame1/AuxiliaryPowerOutline" pos="Mid" offset="0"/>
+                        <Texture val="@UI/LotV_Story_SoA_Aux_TutorialHighlight"/>
+                    </Frame>
+                    
+                    <Frame type="Image" name="AuxiliaryHighlight2" template="LotV_ShipUpgradeUI/ShipHighlightTemplate">
+                        <Anchor side="Top" relative="$parent/ShipAuxiliaryFrame2/AuxiliaryPowerOutline" pos="Min" offset="-2"/>
+                        <Anchor side="Left" relative="$parent/ShipAuxiliaryFrame2/AuxiliaryPowerOutline" pos="Mid" offset="0"/>					
+                        <Anchor side="Right" relative="$parent/ShipAuxiliaryFrame2/AuxiliaryPowerOutline" pos="Mid" offset="0"/>
+                        <Texture val="@UI/LotV_Story_SoA_Aux_TutorialHighlight"/>
+                        <Visible val="false"/>
+                        
+                        <Animation name="OnAuxHighlight">
+                            <Event event="OnShown" action="Reset, Play" frame="$parent/AuxiliaryHighlight"/>
+                            <Event event="OnDisabled" action="Reset" frame="$parent/AuxiliaryHighlight"/>
+                            <Controller type="Visibility" end="Pause">
+                                <Key type="Bool" time="0" value="True"/>
+                            </Controller>
+                        </Animation>
+                    </Frame>
+
+                    <Frame type="StandardTooltip" name="AuxiliaryTooltip" template="StandardTooltip/StandardTooltip">
+                        <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+                        <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+                        <Anchor side="Bottom" relative="$parent" pos="Max" offset="-320"/>
+                        <MinWidth val="0"/>
+                        <MaxWidth val="600"/>
+                        <Width val="600"/>
+                        <Height val="300"/>
+                    </Frame>
+                </Frame>
+            </Frame>
+            
+            <Frame type="Image" name="PowerInfoFrameBackground">
+                <Anchor side="Bottom" relative="$parent/InventoryPanel/AuxiliaryPanel" pos="Min" offset="-10"/>
+                <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+                <Height val="256"/>
+                <Width val="256"/>
+                <Texture val="@UI/LotV_Story_SoA_SolariteUnderline"/>
+                <RenderType val="HDR"/>
+            </Frame>
+            
+            <Frame type="Image" name="PowerHighlight" template="LotV_ShipUpgradeUI/ShipHighlightTemplate">
+                <Anchor side="Top" relative="$parent/PowerInfoFrameBackground" pos="Mid" offset="0"/>
+                <Anchor side="Bottom" relative="$parent/PowerInfoFrameBackground" pos="Mid" offset="0"/>
+                <Anchor side="Left" relative="$parent/PowerInfoFrameBackground" pos="Mid" offset="0"/>
+                <Anchor side="Right" relative="$parent/PowerInfoFrameBackground" pos="Mid" offset="0"/>
+                <Texture val="@UI/LotV_Story_SoA_Top_TutorialHighlight"/>
+            </Frame>
+         
+            <Frame type="Frame" name="ShipPowerInfoFrame">
+                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+                <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+
+                <Frame type="Label" name="ShipPowerStatusLabel">
+                    <Anchor side="Bottom" relative="$parent/ShipPowerRemainingHeader" pos="Min" offset="15"/>
+                    <Anchor side="Left" relative="$parent/ShipPowerRemainingHeader" pos="Min" offset="0"/>
+                    <Anchor side="Right" relative="$parent/ShipPowerRemainingHeader" pos="Max" offset="0"/>
+                    <Height val="83"/>
+                    <Text val="##"/>
+                    <Style val="Void_ShipPowerStatusLabel"/>
+                </Frame>
+                
+                <Frame type="Label" name="ShipPowerRemainingHeader">
+                    <Anchor side="Bottom" relative="$parent/$parent/PowerInfoFrameBackground" pos="Mid" offset="55"/>
+                    <Anchor side="Left" relative="$parent/$parent/PowerInfoFrameBackground" pos="Min" offset="42"/>
+                    <Anchor side="Right" relative="$parent/$parent/PowerInfoFrameBackground" pos="Max" offset="-40"/>
+                    <Height val="50"/>
+                    <Text val="@UI/StoryShipUpgrade/PowerRemaining"/>
+                    <Style val="Void_ShipPowerStatusLabelSmall"/>
+                    <AcceptsMouseTooltip val="True"/>
+                    <Options val="Ellipsis|TooltipIfTruncated"/>
+                </Frame>                               
+            </Frame>
+        </Frame>
+        
+        <Frame type="Frame" name="ShipPowerCutsceneMask">                
+            <Anchor side="Top" relative="$parent/BottomPanel/PowerInfoFrameBackground" pos="Min" offset="30"/>
+            <Anchor side="Bottom" relative="$parent/BottomPanel/PowerInfoFrameBackground" pos="Max" offset="-36"/>
+            <Anchor side="Left" relative="$parent/BottomPanel/PowerInfoFrameBackground" pos="Min" offset="33"/>
+            <Anchor side="Right" relative="$parent/BottomPanel/PowerInfoFrameBackground" pos="Max" offset="-33"/>
+            <AlphaMaskTexture val="@UI/HotS_Shared_Frame_PortraitMask_Circle01"/>
+            
+            <Frame type="CutsceneFrame" name="ShipPowerCutscene">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="-220"/>
+                <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+                
+                <File val="Cutscenes/UI_ShipUpgradeCore.SC2Cutscene"/>
+                <AutoPlay val="True"/>
+                <RenderType val="HDR"/>
+                <ToneMapping val="False"/>
+                <RenderPriority val="512"/>
+            </Frame>
+        </Frame>
+        
+        <Frame type="CutsceneFrame" name="ShipPowerGlassCutscene">
+            <Width val="2200"/>
+            <Height val="2200"/>
+            <Anchor side="Top" relative="$parent/BottomPanel/PowerInfoFrameBackground" pos="Min" offset="-220"/>
+            <Anchor side="Left" relative="$parent" pos="Mid" offset="-1103"/>
+            <Alpha val="100"/>
+            <File val="Cutscenes/UI_ShipUpgradeCore_Glass.SC2Cutscene"/>
+            <AutoPlay val="True"/>
+            <RenderType val="HDR"/>
+            <ToneMapping val="False"/>
+            <RenderPriority val="900"/>
+            
+            <Animation name="StartBookmark">
+                <Event event="OnShown" action="Play"/>
+                <Controller type="Cutscene" end="Stop">
+                    <Key type="Cutscene" time="0" action="Bookmark" bookmark="PowerUpLoopStart"/>
+                </Controller>
+            </Animation>
+        </Frame>
+
+        <Frame type="Image" name="PowerInfoFrameBackgroundAnim1">
+            <Anchor side="Top" relative="$parent/PowerInfoFrameBackground" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent/PowerInfoFrameBackground" pos="Mid" offset="0"/>
+            <Anchor side="Left" relative="$parent/PowerInfoFrameBackground" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent/PowerInfoFrameBackground" pos="Mid" offset="0"/>
+            <Height val="328"/>
+            <Width val="320"/>
+            <Texture val="@UI/LotV_Story_SoA_SolariteAnim1"/>
+            <RenderType val="HDR"/>
+            <RenderPriority val="901"/>
+            
+            <Animation name="Rotate">
+                <Event event="OnShown" action="Reset,Play"/>
+                <Controller type="Rotation" relative="False" end="Loop">
+                    <Key type="Curve" time="0" value="0" out="linear"/>
+                    <Key type="Curve" time="40" value="360" in="linear"/>
+                </Controller>
+                
+                <Controller type="Fade" end="Loop">
+                    <Key type="Curve" time="0" value="255" out="Fast"/>
+                    <Key type="Curve" time="10" value="200" in="Slow"/>
+                    <Key type="Curve" time="25" value="180" out="Fast"/>
+                    <Key type="Curve" time="40" value="255" in="Slow"/>
+                </Controller>
+            </Animation>
+        </Frame>
+        
+        <Frame type="Image" name="PowerInfoFrameBackgroundAnim2">
+            <Anchor side="Top" relative="$parent/PowerInfoFrameBackground" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent/PowerInfoFrameBackground" pos="Mid" offset="0"/>
+            <Anchor side="Left" relative="$parent/PowerInfoFrameBackground" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent/PowerInfoFrameBackground" pos="Mid" offset="0"/>
+            <Height val="328"/>
+            <Width val="320"/>
+            <Texture val="@UI/LotV_Story_SoA_SolariteAnim1"/>
+            <RenderType val="HDR"/>
+            <RenderPriority val="901"/>
+            
+            <Animation name="Rotate">
+                <Event event="OnShown" action="Reset,Play"/>
+                <Controller type="Rotation" relative="False" end="Loop">
+                    <Key type="Curve" time="0" value="360" out="linear"/>
+                    <Key type="Curve" time="30" value="0" in="linear"/>
+                </Controller>
+                
+                <Controller type="Fade" end="Loop">
+                    <Key type="Curve" time="0" value="255" out="Fast"/>
+                    <Key type="Curve" time="10" value="200" in="Slow"/>
+                    <Key type="Curve" time="20" value="150" out="Fast"/>
+                    <Key type="Curve" time="30" value="255" in="Slow"/>
+                </Controller>
+            </Animation>
+        </Frame>
+        
+        <Frame type="Image" name="PowerInfoFrameBackground">
+            <Anchor side="Bottom" relative="$parent/BottomPanel/InventoryPanel/AuxiliaryPanel" pos="Min" offset="-10"/>
+            <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+            <Height val="256"/>
+            <Width val="256"/>
+            <Texture val="@UI/LotV_Story_SoA_SolariteUnderline"/>
+            <RenderType val="HDR"/>
+            <RenderPriority val="901"/>
+        </Frame>
+        
+        <Frame type="Image" name="PowerInfoFrameBackgroundRimLight">
+            <Anchor side="Bottom" relative="$parent/BottomPanel/InventoryPanel/AuxiliaryPanel" pos="Min" offset="-10"/>
+            <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+            <Height val="256"/>
+            <Width val="256"/>
+            <RenderType val="HDR"/>
+            <RenderPriority val="901"/>
+            
+            <LayerCount val="2"/>
+            <Texture val="@UI/LotV_Story_SoA_SolariteUnderlineHighlight" layer="0"/>
+            <AlphaLayer val="true" layer="0"/>
+            <TextureType val="Normal" layer="0"/>
+            
+            <Texture val="@UI/LotV_Story_SoA_SolariteUnderlineHighlightMask" layer="1"/>
+            <TextureCoords top="0" left="0" bottom="1" right="1" layer="1"/>
+            
+            <Animation name="Shimmer">
+                <Event event="OnShown" action="Reset,Play"/>
+                <Controller type="LayerUV" layer="1" side="Top" relative="False" sidelock="True" end="Loop" >
+                    <Key type="Curve" time="0" value="1" out="auto"/>
+                    <Key type="Curve" time="9" value="-1" in="auto"/>
+                </Controller>
+                <Controller type="Fade" end="Loop">
+                    <Key type="Curve" time="0" value="0" out="auto"/>
+                    <Key type="Curve" time="1" value="255" out="auto"/>
+                    <Key type="Curve" time="8" value="255" out="auto"/>
+                    <Key type="Curve" time="9" value="0" out="auto"/>
+                </Controller>
+            </Animation>
+        </Frame>
+        
+        <Frame type="Frame" name="SubtitleFrame">
+            <Anchor side="Bottom" relative="$parent/BottomPanel" pos="Max" offset="-85"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="50"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+            <Height val="200"/>
+        </Frame>
+        
+        <!-- Top level buttons -->
+        
+        <Frame type="Button" name="BackButton" template="VoidShared_GenericTemplates/StoryButtonTemplate">            
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="-4"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="-15"/>
+            <Width val="240"/>  
+            <Text val="@UI/VoidStoryBack"/>
+            <Shortcut val="@UI/Hotkey/Back_Control"/>
+            <ClickSound val="*@UI_Void_ShipScreen_ButtonClick_Confirm_ActorSound"/>
+            <RenderPriority val="700"/>	
+        </Frame>
+        
+        <Frame type="Button" name="ResetButton" template="VoidShared_GenericTemplates/StoryButtonTemplate">            
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="-4"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="15"/>
+            <Width val="240"/>  
+            <Text val="@UI/StoryShipUpgradeReset"/>
+            <Shortcut val="@UI/Hotkey/StoryReset"/>
+            <ClickSound val="*@UI_Void_ShipScreen_ButtonClick_Reset_ActorSound"/>
+            <RenderPriority val="700"/>	
+        </Frame>
+        
+        <!-- Progress Debug -->
+        
+        <Frame type="Button" name="DebugProgressOpen" template="StandardTemplates/StandardGlueButton">
+            <Width val="200"/>
+            <Height val="50"/>
+            <Anchor side="Bottom" relative="$parent/BottomPanel" pos="Min" offset="-60"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="30"/>
+            <Visible val="false"/>
+        </Frame>
+        
+        <Frame type="Button" name="DebugProgressMissionA" template="StandardTemplates/StandardGlueButton">
+            <Width val="200"/>
+            <Height val="50"/>
+            <Anchor side="Bottom" relative="$parent/DebugProgressOpen" pos="Max" offset="52"/>
+            <Anchor side="Right" relative="$parent/DebugProgressOpen" pos="Max" offset="0"/>
+            <Visible val="false"/>
+        </Frame>
+        
+        <Frame type="Button" name="DebugProgressMissionB" template="StandardTemplates/StandardGlueButton">
+            <Width val="200"/>
+            <Height val="50"/>
+            <Anchor side="Bottom" relative="$parent/DebugProgressMissionA" pos="Max" offset="0"/>
+            <Anchor side="Left" relative="$parent/DebugProgressMissionA" pos="Max" offset="6"/>
+            <Visible val="false"/>
+        </Frame>
+        
+    </Frame> <!-- ShipUpgradeTemplate -->
+</Desc>
