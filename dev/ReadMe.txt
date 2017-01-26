@@ -16,5 +16,7 @@ See the following example:
 =============================================================================================================================================
 Example code for Notepad++'s NppExec plugin:
 javaw -jar D:\GalaxyObsUI\dev\compile.jar --compile="$(CURRENT_DIRECTORY)" --run="F:\Spiele\Heroes of the Storm\Support\HeroesSwitcher.exe"
+	(You might have to enable NppExec's Follow $(CURRENT_DIRECTORY) setting inside the dropdown.)
+	(Suggested highlight for NppExec: "*ERROR:*%FILE%*" and "	at*".)
 =============================================================================================================================================
 

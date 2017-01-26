@@ -428,6 +428,14 @@ public class Main extends Application {
 			addLogMessage("ERROR unable to construct final Interface file:\n    " + e + "\n    " + e.getMessage()
 					+ "\n    " + e.getLocalizedMessage() + "\n    " + e.getCause());
 			addLogMessage(errorLine);
+		} catch (Exception e1){
+			System.out.println("ERROR: caught the following unexpected Exception...");
+			reportErrorEncounter();
+			addLogMessage(errorLine);
+			addLogMessage("ERROR unable to construct final Interface file:\n    " + e1 + "\n    " + e1.getMessage()
+					+ "\n    " + e1.getLocalizedMessage() + "\n    " + e1.getCause());
+			addLogMessage(errorLine);
+			e1.printStackTrace();
 		}
 	}
 

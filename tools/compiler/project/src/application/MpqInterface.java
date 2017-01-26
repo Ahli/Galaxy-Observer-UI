@@ -70,8 +70,11 @@ public class MpqInterface {
 			// make way for unprotected file
 			File fup = new File(unprotectedAbsolutePath);
 			if (fup.exists() && fup.isFile()) {
-				fup.delete();
+				if(!fup.delete()){
+					throw new IOException("ERROR: Could not delete file "+unprotectedAbsolutePath);
+				};
 			}
+			
 			// build unprotected file
 			newMpq(unprotectedAbsolutePath, fileCount);
 			addToMpq(unprotectedAbsolutePath, mpqCachePath, "");
@@ -80,7 +83,9 @@ public class MpqInterface {
 			// make way for protected file
 			File f = new File(absolutePath);
 			if (f.exists() && f.isFile()) {
-				f.delete();
+				if(!f.delete()){
+					throw new IOException("ERROR: Could not delete file "+absolutePath);
+				};
 			}
 			
 			////////////////////////
@@ -117,9 +122,11 @@ public class MpqInterface {
 			// make way for file
 			File f = new File(absolutePath);
 			if (f.exists() && f.isFile()) {
-				f.delete();
+				if(!f.delete()){
+					throw new IOException("ERROR: Could not delete file "+absolutePath);
+				};
 			}
-			
+						
 			// build unprotected file
 			newMpq(absolutePath, fileCount);
 			addToMpq(absolutePath, mpqCachePath, "");
