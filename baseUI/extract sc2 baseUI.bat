@@ -50,5 +50,7 @@ echo echo | set /p=...resetting configuration file...
 start /WAIT /MIN cmd /K ""%CASCSETTINGSPROG%" "%CASCSETTINGSFILE%" "QQQ" "QQQ" "QQQ" "QQQ" & exit"
 echo 	OK.
 
+: Clear Debug output file from casc tool
+del %~dp0debug.log
 
-: pause
+:pause

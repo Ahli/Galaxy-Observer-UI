@@ -7,9 +7,16 @@ import java.net.URL;
 import java.nio.file.FileSystemException;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Map;
+
 import javax.swing.JFileChooser;
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.io.filefilter.TrueFileFilter;
 import org.xml.sax.SAXException;
 
 import javafx.animation.PauseTransition;
@@ -32,9 +39,7 @@ public class Main extends Application {
 	private String documentsPath = new JFileChooser().getFileSystemView().getDefaultDirectory().toString();
 	private File basePath = null;
 	public final static String errorLine = "#########################################";
-
 	private TextArea txtArea = null;
-
 	private boolean encounteredError = false;
 
 	@Override
@@ -44,6 +49,41 @@ public class Main extends Application {
 	public void start(Stage primaryStage) {
 		try {
 			clearErrorEncounter();
+
+			// {
+			// // TEST
+			// String paramRunPath = "F:" + File.separator + "Spiele" +
+			// File.separator + "Heroes of the Storm"
+			// + File.separator + "Support" + File.separator +
+			// "HeroesSwitcher.exe";
+			// boolean isHeroes = paramRunPath.contains("HeroesSwitcher.exe");
+			// File replay = getNewestReplay(isHeroes);
+			// if (replay != null) {
+			// System.out.println("LOAD REPLAY INTO GAME");
+			// System.out.println("cmd /C start \"\" \"" + paramRunPath + "\"
+			// \"" +
+			// replay.getAbsolutePath() + "\"");
+			//
+			// Runtime.getRuntime()
+			// .exec("cmd /C start \"\" \"" + paramRunPath + "\" \"" +
+			// replay.getAbsolutePath() + "\"");
+			// System.out.println("AFTER EXEC");
+			// }
+			// if (true) {
+			// return;
+			// }
+			// }
+
+			// named params
+			// e.g. "--paramname=value".
+			Parameters params = this.getParameters();
+			Map<String, String> namedParams = params.getNamed();
+			// --compile="D:\GalaxyObsUI\dev\heroes\AhliObs.StormInterface"
+			String paramCompilePath = namedParams.get("compile");
+			paramCompilePath = cutCompileParamPath(paramCompilePath);
+			boolean hasParamCompilePath = (paramCompilePath != null);
+			// --run="F:\Spiele\Heroes of the Storm\Support\HeroesSwitcher.exe"
+			String paramRunPath = namedParams.get("run");
 
 			BorderPane root = new BorderPane();
 			primaryStage.setTitle("Compiling Interfaces...");
@@ -65,48 +105,175 @@ public class Main extends Application {
 			System.out.println("documentsPath: " + documentsPath);
 			addLogMessage("basePath: " + basePath);
 			addLogMessage("documentsPath: " + documentsPath);
+
+			if (paramCompilePath != null) {
+				addLogMessage("compile param path: " + paramCompilePath);
+				System.out.println("compile param path: " + paramCompilePath);
+			}
+			if (paramRunPath != null) {
+				addLogMessage("run param path: " + paramRunPath);
+				System.out.println("run param path: " + paramRunPath);
+			}
+
 			mpqi = new MpqInterface();
 			initMpqInterface(mpqi);
 
-			File dir = new File(basePath.getAbsolutePath() + File.separator + "heroes");
-			namespaceHeroes = true;
-			if (dir.exists() && dir.isDirectory()) {
-
-				File[] directoryListing = dir.listFiles();
-				if (directoryListing != null) {
-					for (File child : directoryListing) {
-						if (child.isDirectory()) {
-							buildFile(child, true);
-						}
-					}
-				}
-			}
-			dir = new File(basePath.getAbsolutePath() + File.separator + "sc2");
-			namespaceHeroes = false;
-			if (dir.exists() && dir.isDirectory()) {
-
-				File[] directoryListing = dir.listFiles();
-				if (directoryListing != null) {
-					for (File child : directoryListing) {
-						if (child.isDirectory()) {
-							buildFile(child, false);
-						}
-					}
-				}
+			if (!hasParamCompilePath) {
+				// compile all
+				buildGamesUIs("heroes", true);
+				buildGamesUIs("sc2", false);
+			} else {
+				// compile param
+				boolean isHeroes = paramCompilePath.contains("heroes" + File.separator);
+				buildSpecificUI(new File(paramCompilePath), isHeroes);
 			}
 
 			primaryStage.setTitle("Compiling Interfaces... done.");
 			addLogMessage("All done.");
 
-			if (!hasEncounteredError() && !primaryStage.isFocused()) {
-				// close after 5 seconds
+			if (!hasEncounteredError()) {
+				// start game, launch replay
+				attemptToRunGameWithReplay(paramRunPath);
+			}
+
+			if (!hasEncounteredError() && !hasParamCompilePath) {
+				// close after 5 seconds, if compiled all and no errors
 				PauseTransition delay = new PauseTransition(Duration.seconds(5));
 				delay.setOnFinished(event -> primaryStage.close());
 				delay.play();
+			} else if (!hasEncounteredError() && (hasParamCompilePath || paramRunPath != null)) {
+				// close instantly, if compiled special and no errors
+				primaryStage.close();
 			}
-
 		} catch (Exception e) {
 			e.printStackTrace();
+		}
+	}
+
+	/**
+	 * Attempt to run the Game with the newest Replay file.
+	 * 
+	 * @param paramRunPath
+	 */
+	private void attemptToRunGameWithReplay(String paramRunPath) {
+		if (paramRunPath != null) {
+			boolean isHeroes = paramRunPath.contains("HeroesSwitcher.exe");
+			File replay = getNewestReplay(isHeroes);
+			if (replay != null) {
+				System.out.println("Starting game with replay...");
+				System.out.println("cmd /C start \"\" \"" + paramRunPath + "\" \"" + replay.getAbsolutePath() + "\"");
+				try {
+					Runtime.getRuntime()
+							.exec("cmd /C start \"\" \"" + paramRunPath + "\" \"" + replay.getAbsolutePath() + "\"");
+					System.out.println("After Start attempt...");
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+	}
+
+	/**
+	 * Param path might be some layout or folder within the interface, so we cut
+	 * it down to the interface base path.
+	 * 
+	 * @param paramPath
+	 * @return
+	 */
+	private String cutCompileParamPath(String paramPath) {
+		String str = paramPath;
+		if (str != null) {
+			while (str.length() > 0 && !str.endsWith("Interface")) {
+				System.out.println("cutting progress: " + str);
+				int lastIndex = str.lastIndexOf(File.separatorChar);
+				if (lastIndex != -1) {
+					str = str.substring(0, lastIndex);
+				} else {
+					System.out.println("LastIndex is -1 => null compile path");
+					return null;
+				}
+			}
+		}
+		System.out.println("cutting result: " + str);
+		return str;
+	}
+
+	/**
+	 * Returns the newest Replay file for the game.
+	 * 
+	 * @param isHeroes
+	 * @return
+	 */
+	private File getNewestReplay(boolean isHeroes) {
+		String basePath = documentsPath + File.separator;
+		String[] extensions = null;
+		if (isHeroes) {
+			basePath += "Heroes of the Storm";
+			extensions = new String[] { "StormReplay" };
+		} else {
+			basePath += "StarCraft II";
+			extensions = new String[] { "SC2Replay" };
+		}
+		basePath += File.separator + "Accounts";
+		System.out.println(basePath);
+		// FAILS for some reason
+		// boolean recursive = true;
+		// Collection<File> allReplays = FileUtils.listFiles(new File(basePath),
+		// extensions, recursive);
+		Collection<File> allReplays = FileUtils.listFiles(new File(basePath), TrueFileFilter.INSTANCE,
+				TrueFileFilter.INSTANCE);
+		System.out.println("# Replays found: " + allReplays.size());
+
+		long newestDate = Long.MIN_VALUE;
+		File newestReplay = null;
+		for (File curReplay : allReplays) {
+			// check extension of file
+			// System.out.println(curReplay.getName());
+			// System.out.println(FilenameUtils.getExtension(curReplay.getName()));
+			if (curReplay.isFile() && FilenameUtils.getExtension(curReplay.getName()).equalsIgnoreCase(extensions[0])) {
+				// check date
+				long curDate = curReplay.lastModified();
+				// System.out.println(curDate);
+				if (curDate > newestDate) {
+					newestDate = curDate;
+					newestReplay = curReplay;
+				}
+			}
+		}
+		if (newestReplay != null) {
+			System.out.println("newest Replay: " + newestReplay.getName());
+		}
+		return newestReplay;
+	}
+
+	/**
+	 * Build all Interfaces for game subfolders.
+	 * 
+	 * @param subfolderName
+	 * @param isHeroes
+	 */
+	public void buildGamesUIs(String subfolderName, boolean isHeroes) {
+		File dir = new File(basePath.getAbsolutePath() + File.separator + subfolderName);
+		namespaceHeroes = isHeroes;
+		if (dir.exists() && dir.isDirectory()) {
+			File[] directoryListing = dir.listFiles();
+			if (directoryListing != null) {
+				for (File child : directoryListing) {
+					buildSpecificUI(child, isHeroes);
+				}
+			}
+		}
+	}
+
+	/**
+	 * Build a specific Interface.
+	 * 
+	 * @param folder
+	 * @param isHeroes
+	 */
+	public void buildSpecificUI(File interfaceFolder, boolean isHeroes) {
+		if (interfaceFolder.isDirectory()) {
+			buildFile(interfaceFolder, isHeroes);
 		}
 	}
 
@@ -116,6 +283,7 @@ public class Main extends Application {
 	 * @param args
 	 */
 	public static void main(String[] args) {
+		System.out.println("Launch arguments: " + Arrays.toString(args));
 		launch(args);
 	}
 
@@ -137,9 +305,9 @@ public class Main extends Application {
 	@SuppressWarnings("static-access")
 	private void buildFile(File file, boolean isHeroes) {
 		String buildPath = documentsPath + File.separator;
-		
-		System.out.println("Starting to build file: "+file.getPath());
-		
+
+		System.out.println("Starting to build file: " + file.getPath());
+
 		if (isHeroes) {
 			buildPath += "Heroes of the Storm";
 		} else {
@@ -150,10 +318,10 @@ public class Main extends Application {
 		// get and create cache
 		File cache = new File(mpqi.getMpqCachePath());
 		cache.mkdirs();
-		
+
 		int cacheClearAttempts = 0;
-		y:for (cacheClearAttempts = 0; cacheClearAttempts <= 100; cacheClearAttempts++) {
-			if(!mpqi.clearCacheExtractedMpq()){				
+		y: for (cacheClearAttempts = 0; cacheClearAttempts <= 100; cacheClearAttempts++) {
+			if (!mpqi.clearCacheExtractedMpq()) {
 				// sleep and hope the file gets released soon
 				try {
 					Thread.currentThread().sleep(500);
@@ -161,11 +329,11 @@ public class Main extends Application {
 					e1.printStackTrace();
 				}
 			} else {
-				//  success
+				// success
 				break y;
 			}
 		}
-		if(cacheClearAttempts > 100){
+		if (cacheClearAttempts > 100) {
 			System.out.println("ERROR: Cache could not be cleared");
 			addLogMessage(errorLine);
 			addLogMessage("Cache could not be cleared...");
@@ -175,16 +343,17 @@ public class Main extends Application {
 
 		// put files into cache
 		int copyAttempts = 0;
-		x:for (copyAttempts = 0; copyAttempts <= 100; copyAttempts++) {
+		x: for (copyAttempts = 0; copyAttempts <= 100; copyAttempts++) {
 			try {
 				copyFolder(file, cache);
-				System.out.println("Copy Folder took "+copyAttempts+" attempts to succeed.");
+				System.out.println("Copy Folder took " + copyAttempts + " attempts to succeed.");
 				break x;
 			} catch (FileSystemException e) {
 				if (copyAttempts == 0) {
 					e.printStackTrace();
-//					System.out.println("ERROR unable to copy directory:\n    " + e + "\n    " + e.getMessage() + "\n    "
-//							+ e.getLocalizedMessage() + "\n    " + e.getCause());
+					// System.out.println("ERROR unable to copy directory:\n " +
+					// e + "\n " + e.getMessage() + "\n "
+					// + e.getLocalizedMessage() + "\n " + e.getCause());
 				} else if (copyAttempts == 100) {
 					e.printStackTrace();
 					reportErrorEncounter();
@@ -208,7 +377,7 @@ public class Main extends Application {
 				addLogMessage(errorLine);
 			}
 		}
-		if(copyAttempts > 100){
+		if (copyAttempts > 100) {
 			// copy keeps failing -> abort
 			return;
 		}
@@ -275,7 +444,9 @@ public class Main extends Application {
 	 * Is called when the App is closing.
 	 */
 	public void stop() {
+		System.out.println("App is about to shut down.");
 		mpqi.clearCacheExtractedMpq();
+		System.out.println("App waves Goodbye!");
 	}
 
 	/**
@@ -361,31 +532,52 @@ public class Main extends Application {
 	 * @return
 	 */
 	public File getJarDir(Class<Main> aclass) {
-		URI uri = new File(".").toURI();
-		// results in: "file:/D:/GalaxyObsUI/dev/./"
-		// addLogMessage("METHOD TEST: " + new File(".").toURI());
+		System.out.println("_FINDING JAR'S PATH");
 
-		String str = uri.getPath();
-		if (str.startsWith("file:/")) {
-			str = str.substring(6);
-		}
-		if (str.startsWith("/")) {
-			str = str.substring(1);
-		}
-		if (str.endsWith("/./")) {
-			str = str.substring(0, str.length() - 3);
-		}
-		// addLogMessage("str: " + str);
+		// ATTEMPT #1
+		File f = new File(System.getProperty("java.class.path"));
+		File dir = f.getAbsoluteFile().getParentFile();
+		String str = dir.toString();
+		System.out.println("Attempt#1 java.class.path: " + str);
+		addLogMessage("Attempt#1 java.class.path: " + str);
 
-		// check if not in JAR
+		// check if started in eclipse
+		if (str.contains("tools" + File.separator + "compiler" + File.separator + "project" + File.separator + "target"
+				+ File.separator + "classes;")) {
+			// get current working directory
+			URI uri = new File(".").toURI();
+			// results in: "file:/D:/GalaxyObsUI/dev/./"
+			// but maybe results in something completely different like
+			// notepad++'s directory...
+			// addLogMessage("METHOD TEST: " + new File(".").toURI());
 
-		URL url = aclass.getProtectionDomain().getCodeSource().getLocation();
-		// addLogMessage(url.toString());
-		// jar returns "rsrc:./", if 2nd option during export was chosen
+			str = uri.getPath();
+			System.out.println("_URI path:" + str);
+			addLogMessage("_URI path:" + str);
 
-		if (!url.toString().startsWith("rsrc:./")) {
-			str += "/testEnv/baseUI/";
+			if (str.startsWith("file:/")) {
+				str = str.substring(6);
+			}
+			if (str.startsWith("/")) {
+				str = str.substring(1);
+			}
+			if (str.endsWith("/./")) {
+				str = str.substring(0, str.length() - 3);
+			}
+
+			URL url = aclass.getProtectionDomain().getCodeSource().getLocation();
+			// class returns "rsrc:./", if 2nd option during jar export was
+			// chosen
+			if (!url.toString().startsWith("rsrc:./")) {
+				// wild guess that we are in test environment
+				str += "/testEnv/baseUI/";
+				System.out.println("_Assuming Test Environment: " + str);
+				addLogMessage("_Assuming Test Environment: " + str);
+			}
+
 		}
+		System.out.println("_RESULT PATH: " + str);
+		addLogMessage("_RESULT PATH: " + str);
 
 		return new File(str);
 
