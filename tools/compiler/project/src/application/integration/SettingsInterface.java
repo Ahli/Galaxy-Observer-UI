@@ -8,7 +8,8 @@ import java.io.IOException;
 public class SettingsInterface {
 	private String SETTINGS_FILE = "";
 	private String SC2_Path = "", HEROES_Path = "", HEROES_PTR_Path = "";
-	private boolean ptrActive = false, SC2_64bit = false, HEROES_64bit = false, HEROES_PTR_64bit = false;
+	private boolean ptrActive = false, SC2_64bit = false, HEROES_64bit = false, HEROES_PTR_64bit = false,
+			HEROES_protectMPQ = false, SC2_protectMPQ = false, buildUnprotectedToo = false;
 
 	/**
 	 * Set the File path of the Settings file.
@@ -111,5 +112,17 @@ public class SettingsInterface {
 
 	public boolean isHeroes64bit() {
 		return HEROES_64bit;
+	}
+
+	public boolean isHeroesProtectMPQ() {
+		return HEROES_protectMPQ;
+	}
+
+	public boolean isSC2ProtectMPQ() {
+		return SC2_protectMPQ;
+	}
+
+	public boolean isBuildUnprotectedToo() {
+		return buildUnprotectedToo;
 	}
 }

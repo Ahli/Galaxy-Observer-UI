@@ -42,13 +42,16 @@ public class MpqInterface {
 	 * @param buildPath
 	 * @param buildFileName
 	 * @param protectMPQ
+	 * @param buildBoth
+	 *            if protectMPQ, then this controls if an unprotected version is
+	 *            build, too
 	 * @throws IOException
 	 * @throws InterruptedException
 	 */
-	public void buildMpq(String buildPath, String buildFileName, boolean protectMPQ)
+	public void buildMpq(String buildPath, String buildFileName, boolean protectMPQ, boolean buildBoth)
 			throws IOException, InterruptedException {
 		String absolutePath = buildPath + File.separator + buildFileName;
-		buildMpq(absolutePath, protectMPQ);
+		buildMpq(absolutePath, protectMPQ, buildBoth);
 	}
 
 	/**
@@ -56,84 +59,88 @@ public class MpqInterface {
 	 * 
 	 * @param absolutePath
 	 * @param protectMPQ
+	 * @param buildBoth
+	 *            if protectMPQ, then this controls if an unprotected version is
+	 *            build, too
 	 * @throws IOException
 	 * @throws InterruptedException
 	 */
-	public void buildMpq(String absolutePath, boolean protectMPQ) throws IOException, InterruptedException {
+	public void buildMpq(String absolutePath, boolean protectMPQ, boolean buildBoth)
+			throws IOException, InterruptedException {
 		// add 2 to be sure to have enough space for listfile and attributes
 		int fileCount = 2 + getFileCountInFolder(new File(mpqCachePath));
 
 		if (protectMPQ) {
-			// special unprotected file path
-			String unprotectedAbsolutePath = getPathWithSuffix(absolutePath, "_unprtctd");
-			
-			// make way for unprotected file
-			File fup = new File(unprotectedAbsolutePath);
-			if (fup.exists() && fup.isFile()) {
-				if(!fup.delete()){
-					throw new IOException("ERROR: Could not delete file "+unprotectedAbsolutePath);
-				};
+
+			if (buildBoth) {
+				// special unprotected file path
+				String unprotectedAbsolutePath = getPathWithSuffix(absolutePath, "_unprtctd");
+
+				// make way for unprotected file
+				File fup = new File(unprotectedAbsolutePath);
+				if (fup.exists() && fup.isFile()) {
+					if (!fup.delete()) {
+						throw new IOException("ERROR: Could not delete file " + unprotectedAbsolutePath);
+					}
+				}
+
+				// build unprotected file
+				newMpq(unprotectedAbsolutePath, fileCount);
+				addToMpq(unprotectedAbsolutePath, mpqCachePath, "");
+				compactMpq(unprotectedAbsolutePath);
 			}
-			
-			// build unprotected file
-			newMpq(unprotectedAbsolutePath, fileCount);
-			addToMpq(unprotectedAbsolutePath, mpqCachePath, "");
-			compactMpq(unprotectedAbsolutePath);
-			
+
 			// make way for protected file
 			File f = new File(absolutePath);
 			if (f.exists() && f.isFile()) {
-				if(!f.delete()){
-					throw new IOException("ERROR: Could not delete file "+absolutePath);
-				};
+				if (!f.delete()) {
+					throw new IOException("ERROR: Could not delete file " + absolutePath);
+				}
 			}
-			
+
 			////////////////////////
 			// PROTECTION MEASURES
 			////////////////////////
-				// doesn't work
-					//deleteListFile(absolutePathTMP);
-				// doesn't work
-					//renameFileInMpq(absolutePathTMP, "_Ahli.StormLayout", "_QQQ.StormLayout");
-					//renameFileInMpq(absolutePathTMP, "(listfile)", "QQQ");
-				// doesn't work
-					//writeWrongFileAmount(absolutePathTMP, absolutePath);
-			
+			// doesn't work
+			// deleteListFile(absolutePathTMP);
+			// doesn't work
+			// renameFileInMpq(absolutePathTMP, "_Ahli.StormLayout",
+			//////////////////////// "_QQQ.StormLayout");
+			// renameFileInMpq(absolutePathTMP, "(listfile)", "QQQ");
+			// doesn't work
+			// writeWrongFileAmount(absolutePathTMP, absolutePath);
+
 			// extra compression
 			try {
 				XmlCompressor.processCache(mpqCachePath, 1);
-				
-				
-				
-				
+
 			} catch (ParserConfigurationException | SAXException e) {
 				e.printStackTrace();
 			}
-			
+
 			// build protected file
 			newMpq(absolutePath, fileCount);
 			addToMpq(absolutePath, mpqCachePath, "");
 			compactMpq(absolutePath);
 
-		} 
-		else {
+		} else {
 			// NO PROTECTION OPTION
-			
+
 			// make way for file
 			File f = new File(absolutePath);
 			if (f.exists() && f.isFile()) {
-				if(!f.delete()){
-					throw new IOException("ERROR: Could not delete file "+absolutePath);
-				};
+				if (!f.delete()) {
+					throw new IOException("ERROR: Could not delete file " + absolutePath);
+				}
 			}
-						
+
 			// build unprotected file
 			newMpq(absolutePath, fileCount);
 			addToMpq(absolutePath, mpqCachePath, "");
 			compactMpq(absolutePath);
-			
+
 		}
-		
+
 	}
 
 	/**
@@ -242,8 +249,8 @@ public class MpqInterface {
 			}
 		}
 		boolean result = f.delete();
-		if(!result){
-			System.out.println("ERROR: Deleting file/folder "+f.getPath()+" failed.");
+		if (!result) {
+			System.out.println("ERROR: Deleting file/folder " + f.getPath() + " failed.");
 		}
 		return result;
 	}
@@ -326,7 +333,7 @@ public class MpqInterface {
 		Runtime.getRuntime()
 				.exec("cmd /C " + MPQ_EDITOR + " /d " + "\"" + mpqPath + "\"" + " " + "\"" + filePath + "\"").waitFor();
 	}
-	
+
 	/**
 	 * 
 	 * @param mpqPath
@@ -335,9 +342,10 @@ public class MpqInterface {
 	 * @throws InterruptedException
 	 * @throws IOException
 	 */
-	public void renameFileInMpq(String mpqPath, String oldfilePath, String newFilePath) throws InterruptedException, IOException {
-		Runtime.getRuntime()
-				.exec("cmd /C " + MPQ_EDITOR + " /r " + "\"" + mpqPath + "\"" + " " + "\"" + oldfilePath + "\"" + " " + "\"" + newFilePath + "\"").waitFor();
+	public void renameFileInMpq(String mpqPath, String oldfilePath, String newFilePath)
+			throws InterruptedException, IOException {
+		Runtime.getRuntime().exec("cmd /C " + MPQ_EDITOR + " /r " + "\"" + mpqPath + "\"" + " " + "\"" + oldfilePath
+				+ "\"" + " " + "\"" + newFilePath + "\"").waitFor();
 	}
 
 	/**
@@ -392,11 +400,12 @@ public class MpqInterface {
 		// String sourceFilePath = "plugins" + File.separator + "mpq" +
 		// File.separator + "listfile";
 		// addToMpq(MPQ_EDITOR, sourceFilePath, absolutePath);
-		
-//		 Runtime.getRuntime()
-//		 .exec("cmd /C " + MPQ_EDITOR + " /rename " + "\"" + absolutePath +
-//		 "\"" + " " + "\"" + "(listfile)" + "\"" + " " + "\"" + "(listfile2)" + "\"")
-//		 .waitFor();
+
+		// Runtime.getRuntime()
+		// .exec("cmd /C " + MPQ_EDITOR + " /rename " + "\"" + absolutePath +
+		// "\"" + " " + "\"" + "(listfile)" + "\"" + " " + "\"" + "(listfile2)"
+		// + "\"")
+		// .waitFor();
 
 	}
 

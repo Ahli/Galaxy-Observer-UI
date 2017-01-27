@@ -481,8 +481,8 @@ public class Main extends Application {
 		addLogMessage("Building... " + file.getName());
 
 		try {
-			boolean protectMPQ = isHeroes ? true : false;
-			mpqi.buildMpq(buildPath, file.getName(), protectMPQ);
+			boolean protectMPQ = isHeroes ? settings.isHeroesProtectMPQ() : settings.isSC2ProtectMPQ();
+			mpqi.buildMpq(buildPath, file.getName(), protectMPQ, settings.isBuildUnprotectedToo());
 		} catch (IOException | InterruptedException e) {
 			e.printStackTrace();
 			reportErrorEncounter();
