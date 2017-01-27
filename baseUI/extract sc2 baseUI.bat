@@ -3,21 +3,48 @@
 : author: @AhliSC2
 
 : User Params:
-set GAMEPATH=F:\Spiele\StarCraft II
 set PRODUCT=sc2
 set LOCALE=enUS
 set DESTINATION_SUBFOLDER=sc2
 
-: Set up Parameters
-echo ===============Parameters==============
-set DESTINATION=%~dp0%DESTINATION_SUBFOLDER%\
+
+: Get GamePath from settings.ini
+: code based on http://stackoverflow.com/questions/2866117/read-ini-from-windows-batch-file
 pushd ..
 set parentLevel=%cd%
 popd
+: code from http://stackoverflow.com/questions/2866117/read-ini-from-windows-batch-file
+set file=%parentLevel%\settings.ini
+set area=[GamePaths]
+set key=StarCraft2_Path
+@setlocal enableextensions enabledelayedexpansion
+set currarea=
+for /f "usebackq delims=" %%a in ("!file!") do (
+    set ln=%%a
+    if "x!ln:~0,1!"=="x[" (
+        set currarea=!ln!
+    ) else (
+        for /f "tokens=1,2 delims==" %%b in ("!ln!") do (
+            set currkey=%%b
+            set currval=%%c
+            if "x!area!"=="x!currarea!" if "x!key!"=="x!currkey!" (
+                set val=!currval!
+            )
+        )
+    )
+)
+( endlocal & rem return
+   Set "GAMEPATH=%val%"
+)
+
+: Set up Parameters
+echo ===============Parameters==============
+set DESTINATION=%~dp0%DESTINATION_SUBFOLDER%\
 set CASCPROGRAM=%parentLevel%\tools\plugins\casc\CASCConsole.exe
 set CASCSETTINGSPROG=%parentLevel%\tools\cascToolSettingEdit\cascExplorerSettingsEdit.jar
 set CASCSETTINGSFILE=%parentLevel%\tools\plugins\casc\CASCConsole.exe.config
 
+echo GAMEPATH=%GAMEPATH%
 echo DESTINATION=%DESTINATION%
 echo CASCPROGRAM=%CASCPROGRAM%
 echo CASCSETTINGSPROG=%CASCSETTINGSPROG%
@@ -53,4 +80,4 @@ echo 	OK.
 : Clear Debug output file from casc tool
 del %~dp0debug.log
 
-:pause
+: pause

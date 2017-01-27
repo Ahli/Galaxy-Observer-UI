@@ -1,6 +1,7 @@
 package application;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URL;
@@ -19,6 +20,7 @@ import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.filefilter.TrueFileFilter;
 import org.xml.sax.SAXException;
 
+import application.integration.SettingsInterface;
 import javafx.animation.PauseTransition;
 import javafx.application.Application;
 import javafx.stage.Stage;
@@ -34,6 +36,7 @@ import javafx.scene.layout.BorderPane;
  */
 public class Main extends Application {
 	private MpqInterface mpqi;
+	private SettingsInterface settings = new SettingsInterface();
 	private DescIndexData descIndex = new DescIndexData(this);
 	private boolean namespaceHeroes = true;
 	private String documentsPath = new JFileChooser().getFileSystemView().getDefaultDirectory().toString();
@@ -49,6 +52,7 @@ public class Main extends Application {
 	public void start(Stage primaryStage) {
 		try {
 			clearErrorEncounter();
+
 
 			// {
 			// // TEST
@@ -79,9 +83,17 @@ public class Main extends Application {
 			Parameters params = this.getParameters();
 			Map<String, String> namedParams = params.getNamed();
 			// --compile="D:\GalaxyObsUI\dev\heroes\AhliObs.StormInterface"
-			String paramCompilePath = namedParams.get("compile");
+			String paramCompilePath = null;
+			paramCompilePath = namedParams.get("compile");
+			boolean compileAndRun = false;
+			if (namedParams.get("compileRun") != null) {
+				paramCompilePath = namedParams.get("compileRun");
+				compileAndRun = true;
+			}
 			paramCompilePath = cutCompileParamPath(paramCompilePath);
 			boolean hasParamCompilePath = (paramCompilePath != null);
+
+			// run parameter (most likely not used)
 			// --run="F:\Spiele\Heroes of the Storm\Support\HeroesSwitcher.exe"
 			String paramRunPath = namedParams.get("run");
 
@@ -101,23 +113,31 @@ public class Main extends Application {
 			// basePath = new
 			// File(Main.class.getProtectionDomain().getCodeSource().getLocation().toURI());
 			basePath = getJarDir(Main.class);
+			initSettings(settings);
+			
+			// output data
 			System.out.println("basePath: " + basePath);
 			System.out.println("documentsPath: " + documentsPath);
 			addLogMessage("basePath: " + basePath);
 			addLogMessage("documentsPath: " + documentsPath);
-
 			if (paramCompilePath != null) {
 				addLogMessage("compile param path: " + paramCompilePath);
 				System.out.println("compile param path: " + paramCompilePath);
+				if (compileAndRun) {
+					addLogMessage("run after compile: " + compileAndRun);
+					System.out.println("run after compile: " + compileAndRun);
+				}
 			}
 			if (paramRunPath != null) {
 				addLogMessage("run param path: " + paramRunPath);
 				System.out.println("run param path: " + paramRunPath);
 			}
 
+			// init MPQ stuff
 			mpqi = new MpqInterface();
 			initMpqInterface(mpqi);
 
+			// WORK WORK WORK
 			if (!hasParamCompilePath) {
 				// compile all
 				buildGamesUIs("heroes", true);
@@ -133,7 +153,7 @@ public class Main extends Application {
 
 			if (!hasEncounteredError()) {
 				// start game, launch replay
-				attemptToRunGameWithReplay(paramRunPath);
+				attemptToRunGameWithReplay(paramRunPath, compileAndRun, paramCompilePath);
 			}
 
 			if (!hasEncounteredError() && !hasParamCompilePath) {
@@ -154,17 +174,59 @@ public class Main extends Application {
 	 * Attempt to run the Game with the newest Replay file.
 	 * 
 	 * @param paramRunPath
+	 * @param paramCompilePath
+	 * @param compileAndRun
 	 */
-	private void attemptToRunGameWithReplay(String paramRunPath) {
-		if (paramRunPath != null) {
-			boolean isHeroes = paramRunPath.contains("HeroesSwitcher.exe");
+	private void attemptToRunGameWithReplay(String paramRunPath, boolean compileAndRun, String paramCompilePath) {
+		boolean isHeroes = false;
+		String gamePath = null;
+
+		if (!compileAndRun) {
+			// use the run param
+			gamePath = paramRunPath;
+			isHeroes = paramRunPath.contains("HeroesSwitcher.exe");
+		} else {
+			// compileAndRun is active -> figure out the right game
+			if(paramCompilePath.contains(File.separator+"heroes"+File.separator)){
+				// Heroes
+				isHeroes = true;
+				if(settings.isPtrActive()){
+					// PTR Heroes
+					if(settings.isHeroesPtr64bit()){
+						gamePath = settings.getHeroesPtrPath()+File.separator+"Support64"+File.separator+"HeroesSwitcher_x64.exe";
+					}
+					else {
+						gamePath = settings.getHeroesPtrPath()+File.separator+"Support"+File.separator+"HeroesSwitcher.exe";
+					}
+				} else {
+					// live Heroes
+					if(settings.isHeroes64bit()){
+						gamePath = settings.getHeroesPath()+File.separator+"Support64"+File.separator+"HeroesSwitcher_x64.exe";
+					}
+					else {
+						gamePath = settings.getHeroesPath()+File.separator+"Support"+File.separator+"HeroesSwitcher.exe";
+					}
+				}
+			} else {
+				// SC2
+				isHeroes = false;
+				if(settings.isSC264bit()){
+					gamePath = settings.getSC2Path()+File.separator+"Support64"+File.separator+"SC2Switcher_x64.exe";
+				}
+				else {
+					gamePath = settings.getSC2Path()+File.separator+"Support"+File.separator+"SC2Switcher.exe";
+				}
+			}
+		}
+
+		if (gamePath != null) {
 			File replay = getNewestReplay(isHeroes);
 			if (replay != null) {
 				System.out.println("Starting game with replay...");
-				System.out.println("cmd /C start \"\" \"" + paramRunPath + "\" \"" + replay.getAbsolutePath() + "\"");
+				System.out.println("cmd /C start \"\" \"" + gamePath + "\" \"" + replay.getAbsolutePath() + "\"");
 				try {
 					Runtime.getRuntime()
-							.exec("cmd /C start \"\" \"" + paramRunPath + "\" \"" + replay.getAbsolutePath() + "\"");
+							.exec("cmd /C start \"\" \"" + gamePath + "\" \"" + replay.getAbsolutePath() + "\"");
 					System.out.println("After Start attempt...");
 				} catch (IOException e) {
 					e.printStackTrace();
@@ -428,7 +490,7 @@ public class Main extends Application {
 			addLogMessage("ERROR unable to construct final Interface file:\n    " + e + "\n    " + e.getMessage()
 					+ "\n    " + e.getLocalizedMessage() + "\n    " + e.getCause());
 			addLogMessage(errorLine);
-		} catch (Exception e1){
+		} catch (Exception e1) {
 			System.out.println("ERROR: caught the following unexpected Exception...");
 			reportErrorEncounter();
 			addLogMessage(errorLine);
@@ -467,6 +529,21 @@ public class Main extends Application {
 		mpqi.setMpqEditorPath(basePath.getParent() + File.separator + "tools" + File.separator + "plugins"
 				+ File.separator + "mpq" + File.separator + "MPQEditor.exe");
 
+	}
+
+	/**
+	 * Initializes the Settings File Interface.
+	 * 
+	 * @param settings
+	 */
+	private void initSettings(SettingsInterface settings) {
+		settings.setSettingsFilePath(basePath.getParent() + File.separator + "settings.ini");
+		try {
+			settings.readSettingsFromFile();
+		} catch (FileNotFoundException e) {
+			System.out.println("ERROR: Settings file could not be found.");
+			e.printStackTrace();
+		}
 	}
 
 	/**
