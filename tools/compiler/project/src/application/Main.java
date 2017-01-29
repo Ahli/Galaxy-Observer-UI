@@ -53,7 +53,6 @@ public class Main extends Application {
 		try {
 			clearErrorEncounter();
 
-
 			// {
 			// // TEST
 			// String paramRunPath = "F:" + File.separator + "Spiele" +
@@ -114,7 +113,7 @@ public class Main extends Application {
 			// File(Main.class.getProtectionDomain().getCodeSource().getLocation().toURI());
 			basePath = getJarDir(Main.class);
 			initSettings(settings);
-			
+
 			// output data
 			System.out.println("basePath: " + basePath);
 			System.out.println("documentsPath: " + documentsPath);
@@ -183,38 +182,43 @@ public class Main extends Application {
 
 		if (!compileAndRun) {
 			// use the run param
+			if (paramRunPath == null) {
+				return;
+			}
 			gamePath = paramRunPath;
-			isHeroes = paramRunPath.contains("HeroesSwitcher.exe");
+			isHeroes = gamePath.contains("HeroesSwitcher.exe");
 		} else {
 			// compileAndRun is active -> figure out the right game
-			if(paramCompilePath.contains(File.separator+"heroes"+File.separator)){
+			if (paramCompilePath.contains(File.separator + "heroes" + File.separator)) {
 				// Heroes
 				isHeroes = true;
-				if(settings.isPtrActive()){
+				if (settings.isPtrActive()) {
 					// PTR Heroes
-					if(settings.isHeroesPtr64bit()){
-						gamePath = settings.getHeroesPtrPath()+File.separator+"Support64"+File.separator+"HeroesSwitcher_x64.exe";
-					}
-					else {
-						gamePath = settings.getHeroesPtrPath()+File.separator+"Support"+File.separator+"HeroesSwitcher.exe";
+					if (settings.isHeroesPtr64bit()) {
+						gamePath = settings.getHeroesPtrPath() + File.separator + "Support64" + File.separator
+								+ "HeroesSwitcher_x64.exe";
+					} else {
+						gamePath = settings.getHeroesPtrPath() + File.separator + "Support" + File.separator
+								+ "HeroesSwitcher.exe";
 					}
 				} else {
 					// live Heroes
-					if(settings.isHeroes64bit()){
-						gamePath = settings.getHeroesPath()+File.separator+"Support64"+File.separator+"HeroesSwitcher_x64.exe";
-					}
-					else {
-						gamePath = settings.getHeroesPath()+File.separator+"Support"+File.separator+"HeroesSwitcher.exe";
+					if (settings.isHeroes64bit()) {
+						gamePath = settings.getHeroesPath() + File.separator + "Support64" + File.separator
+								+ "HeroesSwitcher_x64.exe";
+					} else {
+						gamePath = settings.getHeroesPath() + File.separator + "Support" + File.separator
+								+ "HeroesSwitcher.exe";
 					}
 				}
 			} else {
 				// SC2
 				isHeroes = false;
-				if(settings.isSC264bit()){
-					gamePath = settings.getSC2Path()+File.separator+"Support64"+File.separator+"SC2Switcher_x64.exe";
-				}
-				else {
-					gamePath = settings.getSC2Path()+File.separator+"Support"+File.separator+"SC2Switcher.exe";
+				if (settings.isSC264bit()) {
+					gamePath = settings.getSC2Path() + File.separator + "Support64" + File.separator
+							+ "SC2Switcher_x64.exe";
+				} else {
+					gamePath = settings.getSC2Path() + File.separator + "Support" + File.separator + "SC2Switcher.exe";
 				}
 			}
 		}
