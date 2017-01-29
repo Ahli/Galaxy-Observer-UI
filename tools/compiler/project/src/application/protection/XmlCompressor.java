@@ -38,10 +38,9 @@ public class XmlCompressor {
 		System.out.println("cachePath: " + cachePath);
 
 		File cache = new File(cachePath);
-		String[] extensions = null; // = new String[] {".txt"};
 		boolean recursive = true;
 
-		Collection<File> filesOfCache = FileUtils.listFiles(cache, extensions, recursive);
+		Collection<File> filesOfCache = FileUtils.listFiles(cache, null, recursive);
 
 		DocumentBuilder dBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
 		// provide error handler that does not print incompatible files into

@@ -164,7 +164,7 @@ public class Main extends Application {
 				// close instantly, if compiled special and no errors
 				primaryStage.close();
 			}
-		} catch (Exception e) {
+		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
@@ -223,18 +223,16 @@ public class Main extends Application {
 			}
 		}
 
-		if (gamePath != null) {
-			File replay = getNewestReplay(isHeroes);
-			if (replay != null) {
-				System.out.println("Starting game with replay...");
-				System.out.println("cmd /C start \"\" \"" + gamePath + "\" \"" + replay.getAbsolutePath() + "\"");
-				try {
-					Runtime.getRuntime()
-							.exec("cmd /C start \"\" \"" + gamePath + "\" \"" + replay.getAbsolutePath() + "\"");
-					System.out.println("After Start attempt...");
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
+		File replay = getNewestReplay(isHeroes);
+		if (replay != null) {
+			System.out.println("Starting game with replay...");
+			System.out.println("cmd /C start \"\" \"" + gamePath + "\" \"" + replay.getAbsolutePath() + "\"");
+			try {
+				Runtime.getRuntime()
+						.exec("cmd /C start \"\" \"" + gamePath + "\" \"" + replay.getAbsolutePath() + "\"");
+				System.out.println("After Start attempt...");
+			} catch (IOException e) {
+				e.printStackTrace();
 			}
 		}
 	}
@@ -317,8 +315,9 @@ public class Main extends Application {
 	 * 
 	 * @param subfolderName
 	 * @param isHeroes
+	 * @throws IOException
 	 */
-	public void buildGamesUIs(String subfolderName, boolean isHeroes) {
+	public void buildGamesUIs(String subfolderName, boolean isHeroes) throws IOException {
 		File dir = new File(basePath.getAbsolutePath() + File.separator + subfolderName);
 		namespaceHeroes = isHeroes;
 		if (dir.exists() && dir.isDirectory()) {
@@ -336,8 +335,9 @@ public class Main extends Application {
 	 * 
 	 * @param folder
 	 * @param isHeroes
+	 * @throws IOException
 	 */
-	public void buildSpecificUI(File interfaceFolder, boolean isHeroes) {
+	public void buildSpecificUI(File interfaceFolder, boolean isHeroes) throws IOException {
 		if (interfaceFolder.isDirectory()) {
 			buildFile(interfaceFolder, isHeroes);
 		}
@@ -367,9 +367,10 @@ public class Main extends Application {
 	 * 
 	 * @param file
 	 * @param isHeroes
+	 * @throws IOException
 	 */
 	@SuppressWarnings("static-access")
-	private void buildFile(File file, boolean isHeroes) {
+	private void buildFile(File file, boolean isHeroes) throws IOException {
 		String buildPath = documentsPath + File.separator;
 
 		System.out.println("Starting to build file: " + file.getPath());
@@ -383,7 +384,14 @@ public class Main extends Application {
 
 		// get and create cache
 		File cache = new File(mpqi.getMpqCachePath());
-		cache.mkdirs();
+		if (!cache.exists() && !cache.mkdirs()) {
+			reportErrorEncounter();
+			addLogMessage(errorLine);
+			addLogMessage("ERROR: unable to create cache directory.");
+			System.out.println("ERROR: unable to create chache directory.");
+			addLogMessage(errorLine);
+			throw new IOException("ERROR: unable to create cache directory.");
+		}
 
 		int cacheClearAttempts = 0;
 		y: for (cacheClearAttempts = 0; cacheClearAttempts <= 100; cacheClearAttempts++) {
@@ -596,12 +604,16 @@ public class Main extends Application {
 	private static void copyFolder(File source, File target) throws IOException {
 		if (source.isDirectory()) {
 			// create folder if not existing
-			if (!target.exists()) {
-				target.mkdir();
+			if (!target.exists() && !target.mkdir()) {
+				throw new IOException("ERROR: Could not create directory " + target.getAbsolutePath());
 			}
 
 			// copy all contained files recursively
-			for (String file : source.list()) {
+			String[] fileList = source.list();
+			if (fileList == null) {
+				throw new IOException("ERROR: Source directory's files returned null.");
+			}
+			for (String file : fileList) {
 				File srcFile = new File(source, file);
 				File destFile = new File(target, file);
 				// Recursive function call

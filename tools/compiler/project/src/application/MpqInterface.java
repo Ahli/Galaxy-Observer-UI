@@ -1,10 +1,7 @@
 package application;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.xml.sax.SAXException;
@@ -242,9 +239,11 @@ public class MpqInterface {
 	public static boolean deleteDir(File f) {
 		if (f.isDirectory()) {
 			File[] content = f.listFiles();
-			for (int i = 0; i < content.length; i++) {
-				if (!deleteDir(content[i])) {
-					return false;
+			if (content != null) {
+				for (int i = 0; i < content.length; i++) {
+					if (!deleteDir(content[i])) {
+						return false;
+					}
 				}
 			}
 		}
@@ -409,70 +408,70 @@ public class MpqInterface {
 
 	}
 
-	public void writeWrongFileAmount(String readAbsolutePath, String writeAbsolutePath) {
-		// DOES NOT WORK, GAME DOES NOT READ MPQ ANYMORE
-		FileInputStream fis = null;
-		OutputStream out = null;
-
-		try {
-			fis = new FileInputStream(new File(readAbsolutePath));
-			out = new FileOutputStream(new File(writeAbsolutePath));
-
-			//// print hex
-			// char[] line = new char[16];
-			// for (int i=0; i < 16; i++) {
-			// int readByte = fis.read();
-			// String paddingZero = (readByte < 16) ? "0" : "";
-			// System.out.print(paddingZero + Integer.toHexString(readByte)
-			// + " ");
-			// line[i] = (readByte >= 33 && readByte <= 126) ? (char)
-			// readByte : '.';
-			// }
-			// System.out.println(new String(line));
-
-			// skip parts of header
-			for (int i = 0; i < 25; i++) {
-				int readByte = fis.read();
-				out.write(readByte);
-			}
-			// read file count bytes
-			int[] fileCountByte = new int[4];
-			for (int i = 0; i < 4; i++) {
-				fileCountByte[i] = fis.read();
-			}
-			// increment bytes
-			for (int i = 3; i > 0; i--) {
-				if (fileCountByte[i] == 255) {
-					fileCountByte[i] = 0;
-					fileCountByte[i - 1]++;
-				} else {
-					fileCountByte[i]++;
-				}
-			}
-			// write filecount bytes
-			for (int i = 0; i < 4; i++) {
-				out.write(fileCountByte[i]);
-			}
-			// write rest of file
-			while (fis.available() > 0) {
-				out.write(fis.read());
-			}
-		} catch (Exception e1) {
-			e1.printStackTrace();
-		} finally {
-			// close streams no matter what
-			if (fis != null)
-				try {
-					fis.close();
-				} catch (Exception e) {
-				}
-			if (out != null)
-				try {
-					out.close();
-				} catch (Exception e) {
-				}
-		}
-	}
+//	public void writeWrongFileAmount(String readAbsolutePath, String writeAbsolutePath) {
+//		// DOES NOT WORK, GAME DOES NOT READ MPQ ANYMORE
+//		FileInputStream fis = null;
+//		OutputStream out = null;
+//
+//		try {
+//			fis = new FileInputStream(new File(readAbsolutePath));
+//			out = new FileOutputStream(new File(writeAbsolutePath));
+//
+//			//// print hex
+//			// char[] line = new char[16];
+//			// for (int i=0; i < 16; i++) {
+//			// int readByte = fis.read();
+//			// String paddingZero = (readByte < 16) ? "0" : "";
+//			// System.out.print(paddingZero + Integer.toHexString(readByte)
+//			// + " ");
+//			// line[i] = (readByte >= 33 && readByte <= 126) ? (char)
+//			// readByte : '.';
+//			// }
+//			// System.out.println(new String(line));
+//
+//			// skip parts of header
+//			for (int i = 0; i < 25; i++) {
+//				int readByte = fis.read();
+//				out.write(readByte);
+//			}
+//			// read file count bytes
+//			int[] fileCountByte = new int[4];
+//			for (int i = 0; i < 4; i++) {
+//				fileCountByte[i] = fis.read();
+//			}
+//			// increment bytes
+//			for (int i = 3; i > 0; i--) {
+//				if (fileCountByte[i] == 255) {
+//					fileCountByte[i] = 0;
+//					fileCountByte[i - 1]++;
+//				} else {
+//					fileCountByte[i]++;
+//				}
+//			}
+//			// write filecount bytes
+//			for (int i = 0; i < 4; i++) {
+//				out.write(fileCountByte[i]);
+//			}
+//			// write rest of file
+//			while (fis.available() > 0) {
+//				out.write(fis.read());
+//			}
+//		} catch (Exception e1) {
+//			e1.printStackTrace();
+//		} finally {
+//			// close streams no matter what
+//			if (fis != null)
+//				try {
+//					fis.close();
+//				} catch (Exception e) {
+//				}
+//			if (out != null)
+//				try {
+//					out.close();
+//				} catch (Exception e) {
+//				}
+//		}
+//	}
 
 	// public void batchFileExecutionExample() throws IOException,
 	// InterruptedException{
