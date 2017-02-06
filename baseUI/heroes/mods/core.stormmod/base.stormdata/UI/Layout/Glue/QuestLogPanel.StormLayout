@@ -5,7 +5,7 @@
     <Constant name="QuestIneligibleColor" val="FF888888"/>
 
     <Frame type="QuestTooltip" name="QuestTooltipTemplate" template="StandardTooltip/StandardTooltip">
-        <MinWidth val="330"/>
+        <MinWidth val="360"/>
 
         <Frame type="Label" name="NameLabel">
             <Anchor side="Top" relative="$parent" pos="Min" offset="20"/>
@@ -19,6 +19,7 @@
         <Frame type="Label" name="DescriptionLabel">
             <Anchor side="Top" relative="$parent/NameLabel" pos="Max" offset="8"/>
             <Anchor side="Left" relative="$parent/NameLabel" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="-10"/>
             <CollapseLayout val="true"/>
             <Style val="QuestTooltipText"/>
         </Frame>
@@ -61,6 +62,24 @@
             </Controller>
             <Controller type="Text" end="Pause" frame="RewardLabel2">
                 <Key type="Text" time="0" text="@UI/QuestReward/OverwatchRewards"/>
+            </Controller>
+        </Animation>
+
+        <!-- WoW Rewards -->
+        <Animation name="ShowWoWRewards">
+            <Event event="Reset" action="Stop"/>
+            <Event event="ShowWoWRewards" action="Play"/>
+            <Controller type="Visibility" end="Pause" frame="RewardHeaderLabel2">
+                <Key type="Bool" time="0" value="true"/>
+            </Controller>
+            <Controller type="Visibility" end="Pause" frame="RewardLabel2">
+                <Key type="Bool" time="0" value="true"/>
+            </Controller>
+            <Controller type="Text" end="Pause" frame="RewardHeaderLabel2">
+                <Key type="Text" time="0" text="@UI/QuestReward/WoWTitle"/>
+            </Controller>
+            <Controller type="Text" end="Pause" frame="RewardLabel2">
+                <Key type="Text" time="0" text="@UI/QuestReward/WoWRewards"/>
             </Controller>
         </Animation>
 
@@ -495,6 +514,18 @@
                     <Action type="SetProperty" frame="ValidQuest/DescriptionLabel" style="OverwatchQuestDescriptionLabel"/>
                 </State>
 
+                <State name="WoWPromo">
+                    <When type="AnimationState" SpecialEventQuestCategory="WoWCrossPromo"/>
+                    <Action type="SetProperty" frame="ValidQuest/WoWPromoFrame" visible="true"/>
+                    <Action type="SetProperty" frame="ValidQuest/QuestIconOverrideImage" texture="@UI/Storm_UI_QuestLog_WoW_Promo_Icon"/>
+                    <Action type="SetProperty" frame="ValidQuest/QuestIconImage" visible="false"/>
+                    <Action type="SetProperty" frame="ValidQuest/SparkleFXImage" visible="false"/>
+                    <Action type="SetProperty" frame="ValidQuest/BackgroundImage" visible="false"/>
+                    <Action type="SetProperty" frame="ValidQuest/DescriptionLabel" style="OverwatchQuestDescriptionLabel"/>                
+                    <Action type="SendEvent" frame="$this" event="CenterRewardIcon"/>
+                    <Action type="SendEvent" frame="$this" event="ResetRewardIcon" on="Exit"/>
+                </State>
+
                 <State name="MachinesofWar">
                     <When type="AnimationState" SpecialEventQuestCategory="MachinesofWar"/>
                     <Action type="SetProperty" frame="ValidQuest/QuestIconOverrideImage" texture="@UI/Storm_UI_QuestLog_SCEvent"/>
@@ -585,6 +616,8 @@
                     <Action type="SetProperty" frame="ValidQuest/BackgroundImage" visible="false"/>
                     <Action type="SetProperty" frame="ValidQuest/SparkleFXImage" visible="false"/>
                     <Action type="SetProperty" frame="ValidQuest/DescriptionLabel" style="LunarFestivalQuestDescriptionLabel"/>
+                    <Action type="SendEvent" frame="$this" event="CenterRewardIcon"/>
+                    <Action type="SendEvent" frame="$this" event="ResetRewardIcon" on="Exit"/>
                 </State>
 
                 <State name="LunarFestival2017DailyGold">
@@ -599,6 +632,17 @@
 
             </StateGroup>
 
+            <Animation name="CenterRewardIcon">
+                <Event event="CenterRewardIcon" action="Restart,Play"/>
+                <Event event="ResetRewardIcon" action="Stop"/>
+                <Controller type="Anchor" end="Pause" side="Top" relative="True" frame="ValidQuest/QuestRewardIconImage">
+                    <Key type="Curve" time="0" value="11"/>
+                </Controller>
+                <Controller type="Anchor" end="Pause" side="Bottom" relative="True" frame="ValidQuest/QuestRewardIconImage">
+                    <Key type="Curve" time="0" value="11"/>
+                </Controller>
+            </Animation>
+            
             <!-- 
                 Animation to play Lunar Festival Intro sound. 
                 Should be only controlled by following StateGroup.
@@ -659,6 +703,55 @@
                                 <Key type="Curve" time="0" value="2" in="Slow"/>
                                 <Key type="Curve" time="3.0" value="-2" out="Slow"/>
                                 <Key type="Curve" time="5.0" value="-2" in="Slow"/>
+                            </Controller>
+                        </Animation>
+                    </Frame>
+                </Frame>
+
+                <!-- Frame for WoW Promo Quest Art -->
+                <Frame type="Frame" name="WoWPromoFrame">
+                    <Anchor relative="$parent"/>
+                    <RenderPriority val="511"/>
+                    <Visible val="false"/>
+
+                    <Frame type="Image" name="BackgroundImage">
+                        <Anchor relative="$parent"/>
+                        <OnDisableDesaturationColor val="#QuestIneligibleColor"/>
+                        <StateGroup name="BackgroundTexture">
+                            <DefaultState val="Background00"/>
+                            <State name="Background00">
+                                <Action type="SetProperty" texture="@UI/Storm_UI_QuestLog_WoW_Promo_Background_00"/>
+                            </State>
+                            <State name="Background01">
+                                <Action type="SetProperty" texture="@UI/Storm_UI_QuestLog_WoW_Promo_Background_01"/>
+                            </State>
+                            <State name="Background02">
+                                <Action type="SetProperty" texture="@UI/Storm_UI_QuestLog_WoW_Promo_Background_02"/>
+                            </State>
+                            <State name="Background03">
+                                <Action type="SetProperty" texture="@UI/Storm_UI_QuestLog_WoW_Promo_Background_03"/>
+                            </State>
+                            <State name="Background04">
+                                <Action type="SetProperty" texture="@UI/Storm_UI_QuestLog_WoW_Promo_Background_04"/>
+                            </State>
+                        </StateGroup>
+                    </Frame>
+
+                    <Frame type="Image" name="BackgroundVfxImage">
+                        <Anchor relative="$parent"/>
+                        <BlendMode val="Add"/>
+                        <LayerCount val="2"/>
+                        
+                        <Texture val="@UI/Storm_UI_QuestLog_WoW_Promo_Border_Mask" layer="0"/>
+                        <AlphaLayer val="True" layer="0"/>
+                        
+                        <Texture val="@UI/Storm_UI_QuestLog_WoW_Promo_Border_Sheen" layer="1"/>
+                        <Animation name="UVScroll">
+                            <Event event="HideEffect" action="Stop" frame="$ancestor[@type=QuestFrame]"/>
+                            <Event event="ShowEffect" action="Restart,Play" frame="$ancestor[@type=QuestFrame]"/>
+                            <Controller type="LayerUV" layer="1" side="Left" end="Loop" >
+                                <Key type="Curve" time="0" value="2"/>
+                                <Key type="Curve" time="5.0" value="-2"/>
                             </Controller>
                         </Animation>
                     </Frame>
@@ -876,7 +969,7 @@
                         </Controller>
                     </Animation>
                 </Frame>
-
+                
                 <Frame type="CutsceneFrame" name="RewardCutscene">
                     <Width val="150"/>
                     <Height val="150"/>
