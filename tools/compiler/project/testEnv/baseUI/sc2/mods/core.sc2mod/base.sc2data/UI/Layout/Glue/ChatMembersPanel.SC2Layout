@@ -1,0 +1,591 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<Desc>
+    <DescFlags val="Locked"/>
+    
+    <Frame type="Image" name="HoverImageTemplate">
+        <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+        <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+        <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+        <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+        <Texture val="Assets/Textures/Blank.dds"/>
+        <Alpha val="255"/>
+    </Frame>
+    
+    <Frame type="Image" name="SelectedImageTemplate">
+        <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+        <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+        <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+        <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+        <Texture val="Assets/Textures/Blank.dds"/>
+        <Alpha val="255"/>
+    </Frame>
+
+    
+    <!--
+    
+    ========================================================================
+    
+    SOCIAL LISTBOX ITEM TEMPLATE   (Used in the chat members list)
+    
+    ========================================================================
+    
+    This template manages the display of the list items in the members list of the chat system.  It displays both the
+    users themselves and the channel titles.
+    
+    -->
+ 
+    <Frame type="ChatMembersPanelListBoxItem" name="MembersListBoxItemTemplate">
+        <!-- Animation States: -->
+        <!-- ItemState: NotWhisper, Whisper, WhisperTitle -->
+        <!-- TitleState: Expanded, Collapsed -->
+        <!-- MessageState: Read, Unread -->
+        <!-- OnlineState: Online, Offline -->
+        <!-- ChatFocus: Focused, Unfocused -->
+        <TooltipAnchorPosition val="MiddleLeft"/>
+        <RejectsFocus val="true"/>
+        <TooltipFrame val="UserTooltip"/>
+
+        <Frame type="StandardTooltip" name="UserTooltip" template="StandardTooltip/StandardBattlenetTooltipTemplate"/>
+        
+        <!-- 
+        ===============================
+        USER CONTAINER 
+        ===============================
+        
+        This frame contains the data for the actual users being displayed in the members list (not the channel titles). 
+        -->
+        <Frame type="Frame" name="UserContainer">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+            <Height val="61"/>
+            
+            
+            <!-- WhisperBackground -->
+            <Frame type="Image" name="WhisperBackground">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+                <Texture val="Assets/Textures/UI_Battlenet_Glue_ChatPanel_WhisperListItem_Normal.dds"/>
+                <TextureType val="NineSlice"/>
+                <Tiled val="True"/>
+                <Visible val="False"/>
+                
+                <Animation name="MouseOver">
+                    <Event event="OnMouseEnter" action="Reset,Play" frame="$parent/$parent"/>
+                    <Event event="OnMouseExit" action="Reset" frame="$parent/$parent"/>
+                     
+                    <Controller type="Texture" end="Pause">
+                        <Key type="Image" time="0" image="Assets/Textures/UI_Battlenet_Glue_ChatPanel_WhisperListItem_Over.dds"/>
+                    </Controller>
+                </Animation>
+            </Frame>
+            
+            
+            <!-- WhisperFocus -->
+            <Frame type="Image" name="WhisperFocus">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+                <Texture val="Assets/Textures/UI_Battlenet_Glue_ChatPanel_WhisperListItem_Blink.dds"/>
+                <TextureType val="NineSlice"/>
+                <Tiled val="True"/>
+                <Visible val="False"/>
+            </Frame>
+            
+            
+            <!-- WhisperBlink -->
+            <Frame type="Image" name="WhisperBlink">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+                <Texture val="Assets/Textures/UI_Battlenet_Glue_ChatPanel_WhisperListItem_Blink.dds"/>
+                <TextureType val="NineSlice"/>
+                <Tiled val="True"/>
+                <Visible val="True"/>
+                <Alpha val="0"/>
+                
+                <Animation name="Fade">
+                    <Event event="NewMessage" action="Reset,Play" frame="$parent/$parent"/>
+
+                    <Controller type="Fade" end="Pause">
+                        <Key type="Curve" time="0" value="0" out="Slow"/>
+                        <Key type="Curve" time=".1" value="255" out="Slow"/>
+                        <Key type="Curve" time="1.1" value="0" out="Slow"/>
+                    </Controller>
+                </Animation>
+            </Frame>
+
+            
+            <!-- AvatarFrame -->
+            <Frame type="AvatarFrame" name="AvatarFrame" template="StandardTemplates/AvatarFrameMiniTemplate">
+                <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="4"/>
+                <CollapseLayout val="true"/>
+            </Frame>
+            
+            
+            <!-- OfflineImage -->
+            <Frame type="Image" name="OfflineImage">
+                <Visible val="false"/>
+                <Anchor side="Top" relative="$parent/AvatarFrame" pos="Min" offset="7"/>
+                <Anchor side="Left" relative="$parent/AvatarFrame" pos="Min" offset="7"/>
+                <Anchor side="Bottom" relative="$parent/AvatarFrame" pos="Max" offset="-7"/>
+                <Anchor side="Right" relative="$parent/AvatarFrame" pos="Max" offset="-7"/>
+                <Texture val="Assets\Textures\UI_Glues_Icons_DefaultAvatarBgOffline_Small.dds"/>
+            </Frame>
+
+            
+            <!-- OfflineBorderImage -->
+            <Frame type="Image" name="OfflineBorderImage">
+                <Visible val="false"/>
+                <Anchor side="Top" relative="$parent/AvatarFrame" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/AvatarFrame" pos="Min" offset="0"/>
+                <Anchor side="Bottom" relative="$parent/AvatarFrame" pos="Max" offset="0"/>
+                <Anchor side="Right" relative="$parent/AvatarFrame" pos="Max" offset="0"/>
+                <Texture val="@UI/Glues_Avatar_LeagueBorder_Tiny_Offline"/>
+            </Frame>
+            
+            
+            <!-- NameLabel -->
+            <Frame type="Label" name="NameLabel">
+                <Anchor side="Top" relative="$parent/AvatarFrame" pos="Min" offset="5"/>
+                <Anchor side="Left" relative="$parent/AvatarFrame" pos="Max" offset="2"/>
+                <Anchor side="Right" relative="$parent" pos="Max" offset="-10"/>
+                <Height val="24"/>
+                <Style val="SocialPlayerName"/>
+            </Frame>
+            
+            
+            <!-- StatusIcon -->
+            <Frame type="BattleUserStatusIcon" name="StatusIcon" template="StandardTemplates/BattleUserStatusIconTemplate">
+                <Anchor side="Top" relative="$parent/StatusLabel" pos="Min" offset="-4"/>
+                <Anchor side="Left" relative="$parent/NameLabel" pos="Min" offset="-4"/>
+            </Frame>
+            
+            
+            <!-- StatusLabel -->
+            <Frame type="Label" name="StatusLabel">
+                <Anchor side="Top" relative="$parent/NameLabel" pos="Max" offset="-1"/>
+                <Anchor side="Left" relative="$parent/StatusIcon" pos="Max" offset="3"/>
+                <Anchor side="Right" relative="$parent" pos="Max" offset="-10"/>
+                <Height val="20"/>
+                <Style val="SocialPlayerStatus"/>
+                <CollapseLayout val="true"/>
+            </Frame>
+
+            
+            <!-- UnreadMessagesBG -->
+            <Frame type="Image" name="UnreadMessagesBackground">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                <Texture val="Assets/Textures/UI_Battlenet_Glue_ChatPanel_WhisperNotification.dds"/>
+                <Visible val="false"/>
+            </Frame>
+            
+            
+            <!-- UnreadMessagesLabel -->
+            <Frame type="Label" name="UnreadMessagesLabel">
+                <Anchor side="Top" relative="$parent/UnreadMessagesBackground" pos="Mid" offset="-2"/>
+                <Anchor side="Bottom" relative="$parent/UnreadMessagesBackground" pos="Mid" offset="-2"/>
+                <Anchor side="Left" relative="$parent/UnreadMessagesBackground" pos="Mid" offset="0"/>
+                <Anchor side="Right" relative="$parent/UnreadMessagesBackground" pos="Mid" offset="0"/>
+                <Style val="@SocialPlayerStatusWhisperCount"/>
+                <Width val="26"/>
+                <Visible val="false"/>
+            </Frame>
+        </Frame>
+        
+        
+        <!-- 
+        ===============================
+        TITLE CONTAINER 
+        ===============================
+        
+        This frame contains the data for the channel titles which are displayed above the users in the chat member list. 
+        -->
+        <Frame type="Frame" name="TitleContainer">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+            <Height val="48"/>
+            
+            
+            <!-- TitleBorderImage -->
+            <Frame type="Image" name="TitleBorderImage">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="4"/>
+                <Anchor side="Bottom" relative="$parent" pos="Max" offset="-4"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="4"/>
+                <Anchor side="Right" relative="$parent" pos="Max" offset="-4"/>
+                <Texture val="@UI/Glues_Battlenet_PageAssets_ChatPanelCategoryBg"/>
+                <TextureType val="Nineslice"/>
+                <Visible val="False"/>
+            </Frame>
+            
+            
+            <!-- WhisperTitleBorderImage -->
+            <Frame type="Image" name="WhisperTitleBorderImage">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="4"/>
+                <Anchor side="Bottom" relative="$parent" pos="Max" offset="-4"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="4"/>
+                <Anchor side="Right" relative="$parent" pos="Max" offset="-4"/>
+                <Texture val="Assets/Textures/UI_Battlenet_Glue_ChatPanel_WhisperCategoryBG.dds"/>
+                <TextureType val="Nineslice"/>
+                <Visible val="False"/>
+                
+                <Animation name="MouseOver">
+                    <Event event="OnMouseEnter" action="Reset,Play" frame="$parent/$parent"/>
+                    <Event event="OnMouseExit" action="Reset" frame="$parent/$parent"/>
+                     
+                    <Controller type="Texture" end="Pause">
+                        <Key type="Image" time="0" image="Assets/Textures/UI_Battlenet_Glue_ChatPanel_WhisperCategoryBG_Blink.dds"/>
+                    </Controller>
+                </Animation>
+            </Frame>
+            
+            
+            <!-- WhisperTitleUnreadNotification -->
+            <Frame type="Frame" name="WhisperTitleUnreadNotification">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="4"/>
+                <Anchor side="Bottom" relative="$parent" pos="Max" offset="-4"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="4"/>
+                <Anchor side="Right" relative="$parent" pos="Max" offset="-4"/>
+                <Visible val="false"/>
+
+                <Frame type="Image" name="ImageNotification">
+                    <Anchor relative="$parent"/>
+                    <Texture val="Assets/Textures/UI_Battlenet_Glue_ChatPanel_WhisperCategoryBG_Blink.dds"/>
+                    <TextureType val="NineSlice"/>
+
+                    <Animation name="Fade">
+                        <Event event="OnShown" action="Play"/>
+
+                        <Controller type="Fade" end="PingPong">
+                            <Key type="Curve" time="0" value="0" out="Slow"/>
+                            <Key type="Curve" time="1" value="255" out="Slow"/>
+                        </Controller>
+                    </Animation>
+                </Frame>
+            </Frame>
+            
+            
+            <!-- TitleLabel -->
+            <!-- Set the explicit height to truncate, since channels can user named (really long) -->
+            <Frame type="Label" name="TitleLabel">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="3"/>
+                <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="40"/>
+                <Anchor side="Right" relative="$parent" pos="Max" offset="10"/>
+                <Anchor side="Right" relative="$parent/UserCountLabel" pos="Min" offset="0"/>
+                <Style val="ChatMembersTitleLabel"/>
+                <AcceptsMouseTooltip val="true"/>
+                <Options val="Ellipsis | TooltipIfTruncated | NoWrapping"/>
+            </Frame>
+            
+            
+            <!-- UserCountLabel -->
+            <!-- Optional label that displays the member count -->
+            <Frame type="Label" name="UserCountLabel">
+                <Anchor side="Right" relative="$parent" pos="Max" offset="-10"/>
+                <Anchor side="Top" relative="$parent/TitleLabel" pos="Min" offset="0"/>
+                <Anchor side="Bottom" relative="$parent/TitleLabel" pos="Max" offset="0"/>
+                <Style val="ChatMembersTitleLabel"/>
+            </Frame>
+      
+
+            <!-- ExpandButton -->
+            <Frame type="Button" name="ExpandButton" template="StandardTemplates/SocialListBoxItemExpandButton">
+                <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="15"/>
+                <AcceptsMouse val="false"/>
+                
+                <Frame type="Image" name="NormalImage">
+                    <ColorAdjustMode val="None"/>
+                    <AdjustmentColor val="210,90,210"/>
+                </Frame>
+
+                <Frame type="Image" name="HoverImage">
+                    <ColorAdjustMode val="None"/>
+                    <AdjustmentColor val="210,90,210"/>
+                </Frame>
+            </Frame>
+        </Frame>
+        
+        
+        <!--
+        ==================================================
+        SOCIAL ITEM USER STATUS STATE GROUP
+        ==================================================
+        -->
+        <StateGroup name="SocialItemUserStatusStateGroup">
+        
+            <!-- Standard Online User State -->
+            <!-- This item is displaying a normal, online user in the members list -->
+            <State name="StandardOnlineUserState">
+                <When type="AnimationState" frame="$this" ItemState="NotWhisper"/>
+                <When type="AnimationState" frame="$this" OnlineState="Online"/>
+                <Action type="SetProperty" frame="UserContainer/WhisperBackground" visible="False"/>
+                <Action type="SetProperty" frame="UserContainer/OfflineImage" visible="False"/>
+                <Action type="SetProperty" frame="UserContainer/OfflineBorderImage" visible="False"/>
+                <Action type="SetProperty" frame="UserContainer/NameLabel" style="SocialPlayerName"/>
+                <Action type="SetProperty" frame="UserContainer/StatusLabel" style="SocialPlayerStatus"/>
+            </State>
+        
+            <!-- Standard Offline User State -->
+            <!-- This item is displaying a normal, offline user in the members list -->
+            <State name="StandardOfflineUserState">
+                <When type="AnimationState" frame="$this" ItemState="NotWhisper"/>
+                <When type="AnimationState" frame="$this" OnlineState="Offline"/>
+                <Action type="SetProperty" frame="UserContainer/WhisperBackground" visible="False"/>
+                <Action type="SetProperty" frame="UserContainer/OfflineImage" visible="True"/>
+                <Action type="SetProperty" frame="UserContainer/OfflineBorderImage" visible="True"/>
+                <Action type="SetProperty" frame="UserContainer/NameLabel" style="SocialPlayerNameOffline"/>
+                <Action type="SetProperty" frame="UserContainer/StatusLabel" style="SocialPlayerStatusOffline"/>
+            </State>
+        
+            <!-- Whisper Online User State -->
+            <!-- This item is displaying an online whisper in the members list -->
+            <State name="WhisperOnlineUserState">
+                <When type="AnimationState" frame="$this" ItemState="Whisper"/>
+                <When type="AnimationState" frame="$this" OnlineState="Online"/>
+                <Action type="SetProperty" frame="UserContainer/WhisperBackground" visible="True"/>
+                <Action type="SetProperty" frame="UserContainer/OfflineImage" visible="False"/>
+                <Action type="SetProperty" frame="UserContainer/OfflineBorderImage" visible="False"/>
+                <Action type="SetProperty" frame="UserContainer/NameLabel" style="SocialPlayerNameWhisper"/>
+                <Action type="SetProperty" frame="UserContainer/StatusLabel" style="SocialPlayerStatusWhisper"/>
+            </State>
+            
+            <!-- Whisper Offline User State -->
+            <!-- This item is displaying an offline whisper in the members list -->
+            <State name="WhisperOfflineUserState">
+                <When type="AnimationState" frame="$this" ItemState="Whisper"/>
+                <When type="AnimationState" frame="$this" OnlineState="Offline"/>
+                <Action type="SetProperty" frame="UserContainer/WhisperBackground" visible="True"/>
+                <Action type="SetProperty" frame="UserContainer/OfflineImage" visible="True"/>
+                <Action type="SetProperty" frame="UserContainer/OfflineBorderImage" visible="True"/>
+                <Action type="SetProperty" frame="UserContainer/NameLabel" style="SocialPlayerNameOffline"/>
+                <Action type="SetProperty" frame="UserContainer/StatusLabel" style="SocialPlayerStatusOffline"/>
+            </State>
+        </StateGroup>
+        
+        
+        <!--
+        ==================================================
+        UNREAD MESSAGES WHISPER USER STATE GROUP
+        ==================================================
+        -->
+        
+        <StateGroup name="UnreadMessagesWhisperUserStateGroup">
+        
+            <!-- Unread Messages User State -->
+            <!-- This item is displaying that there are unread messages from a whisper user in the members list -->
+            <State name="UnreadMessagesState">
+                <When type="AnimationState" frame="$this" ItemState="Whisper"/>
+                <When type="AnimationState" frame="$this" MessageState="Unread"/>
+                <Action type="SetProperty" frame="UserContainer/UnreadMessagesBackground" visible="True"/>
+                <Action type="SetProperty" frame="UserContainer/UnreadMessagesLabel" visible="True"/>
+            </State>
+            
+            <!-- No Unread Messages User State -->
+            <!-- This item is displaying that there are NO unread messages from a whisper user in the members list -->
+            <State name="NoUnreadMessagesState">
+                <When type="AnimationState" frame="$this" ItemState="Whisper"/>
+                <When type="AnimationState" frame="$this" MessageState="Read"/>
+                <Action type="SetProperty" frame="UserContainer/UnreadMessagesBackground" visible="False"/>
+                <Action type="SetProperty" frame="UserContainer/UnreadMessagesLabel" visible="False"/>
+            </State>
+        </StateGroup>
+        
+        
+        <!--
+        ==================================================
+        FOCUSED WHISPER USER STATE GROUP
+        ==================================================
+        -->
+        
+        <StateGroup name="FocusedWhisperUserStateGroup">
+        
+            <!-- Focused Whisper State -->
+            <!-- This item is indicating that you have this whisper actively focused in the members list -->
+            <State name="FocusedWhisperState">
+                <When type="AnimationState" frame="$this" ItemState="Whisper"/>
+                <When type="AnimationState" frame="$this" ChatFocus="Focused"/>
+                <Action type="SetProperty" frame="UserContainer/WhisperFocus" visible="True"/>
+            </State>
+            
+            <!-- Unfocused Whisper State -->
+            <!-- This item is indicating that you DO NOT have this whisper actively focused in the members list -->
+            <State name="UnfocusedWhisperState">
+                <When type="AnimationState" frame="$this" ItemState="Whisper"/>
+                <When type="AnimationState" frame="$this" ChatFocus="Unfocused"/>
+                <Action type="SetProperty" frame="UserContainer/WhisperFocus" visible="False"/>
+            </State>
+        </StateGroup>
+        
+        
+        <!--
+        ==================================================
+        SOCIAL ITEM TITLE STATUS STATE GROUP
+        ==================================================
+        -->
+        
+        <StateGroup name="SocialItemTitleStatusStateGroup">
+        
+            <!-- Standard Title State -->
+            <!-- This item is displaying a standard channel title in the members list -->
+            <State name="StandardTitleState">
+                <When type="AnimationState" frame="$this" ItemState="NotWhisper"/>
+                <Action type="SetProperty" frame="TitleContainer/TitleBorderImage" visible="True"/>
+                <Action type="SetProperty" frame="TitleContainer/WhisperTitleBorderImage" visible="False"/>
+                <Action type="SetProperty" frame="TitleContainer/TitleLabel" style="ChatMembersTitleLabel"/>
+                <Action type="SetProperty" frame="TitleContainer/UserCountLabel" style="ChatMembersTitleLabel"/>
+                <Action type="SetProperty" frame="TitleContainer/ExpandButton/NormalImage" ColorAdjustMode="None"/>
+                <Action type="SetProperty" frame="TitleContainer/ExpandButton/HoverImage" ColorAdjustMode="None"/>
+            </State>
+        
+            <!-- Whisper Title State -->
+            <!-- This item is displaying a whisper channel title in the members list -->
+            <State name="WhisperTitleState">
+                <When type="AnimationState" frame="$this" ItemState="WhisperTitle"/>
+                <Action type="SetProperty" frame="TitleContainer/TitleBorderImage" visible="False"/>
+                <Action type="SetProperty" frame="TitleContainer/WhisperTitleBorderImage" visible="True"/>
+                <Action type="SetProperty" frame="TitleContainer/TitleLabel" style="ChatMembersTitleLabelWhispers"/>
+                <Action type="SetProperty" frame="TitleContainer/UserCountLabel" style="ChatMembersTitleLabelWhispers"/>
+                <Action type="SetProperty" frame="TitleContainer/ExpandButton/NormalImage" ColorAdjustMode="Colorize"/>
+                <Action type="SetProperty" frame="TitleContainer/ExpandButton/HoverImage" ColorAdjustMode="Colorize"/>
+            </State>
+        </StateGroup>
+        
+        
+        <!--
+        ==================================================
+        UNREAD MESSAGES WHISPER TITLE STATE GROUP
+        ==================================================
+        -->
+        
+        <StateGroup name="UnreadMessagesWhisperTitleStateGroup">
+        
+            <!-- Unread Messages Title State -->
+            <!-- This item is displaying that there are unread messages from a whisper while the whispers channel title is collapsed -->
+            <State name="UnreadTitleState">
+                <When type="AnimationState" frame="$this" ItemState="WhisperTitle"/>
+                <When type="AnimationState" frame="$this" TitleState="Collapsed"/>
+                <When type="AnimationState" frame="$this" MessageState="Unread"/>
+                <Action type="SetProperty" frame="TitleContainer/WhisperTitleUnreadNotification" visible="True"/>
+            </State>
+            
+            <!-- No Unread Messages Title State -->
+            <!-- This item is displaying that there are NO unread messages from a whisper while the whispers channel title is collapsed -->
+            <State name="NoUnreadTitleState">
+                <When type="AnimationState" frame="$this" ItemState="WhisperTitle"/>
+                <When type="AnimationState" frame="$this" TitleState="Collapsed"/>
+                <When type="AnimationState" frame="$this" MessageState="Unread"/>
+                <Action type="SetProperty" frame="TitleContainer/WhisperTitleUnreadNotification" visible="False"/>
+            </State>
+        </StateGroup>
+    </Frame>
+    
+    
+    <!--
+    
+    ========================================================================
+    
+    CHAT MEMBERS PANEL TEMPLATE
+    
+    ========================================================================
+    
+    -->
+      
+    <Frame type="ChatMembersPanel" name="ChatMembersPanelTemplate">
+        <Frame type="Image" name="Background">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="4"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="-4"/>
+            <TextureType val="Nineslice"/>
+            <Texture val="@UI/Glues_Battlenet_PageAssets_MainInnerContainer"/>
+        </Frame>
+        
+        <Frame type="Image" name="ScrollBarLine">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="1"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="-1"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="-16"/>
+            <Width val="3"/>
+            <TextureType val="Nineslice"/>
+            <Texture val="@UI/ChatPanelScrollBarLine"/>
+            <Visible val="true"/>
+        </Frame>
+        
+        <Frame type="SocialListBox" name="MembersListBox" template="SocialListBox/SocialListBoxTemplate">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="5"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="5"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="-5"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="3"/>
+            <ItemDesc val="ChatMembersPanel/MembersListBoxItemTemplate"/>
+            <AlwaysPositionRelativeToScrollBar val="False"/>
+            <RejectsFocus val="true"/>
+            <ScrollBar val="ScrollBar"/>
+            <Insets top="-4" left="0" bottom="-4" right="-4"/>
+            <ItemGap val="-6"/>
+            <ItemScrollBarOffset val="4"/>
+            
+            <SelectedImage val="$root/ChatMembersPanel/SelectedImageTemplate"/>
+            <HoverImage val="$root/ChatMembersPanel/HoverImageTemplate"/>
+            
+            <Frame type="Image" name="SelectedImage">
+                <Texture val="Assets/Textures/blank.dds"/>
+                <RenderPriority val="510"/>
+                
+                <Frame type="Image" name="Background">
+                    <Anchor side="Top" relative="$parent" pos="Min" offset="4"/>
+                    <Anchor side="Bottom" relative="$parent" pos="Max" offset="-4"/>
+                    <Anchor side="Left" relative="$parent" pos="Min" offset="4"/>
+                    <Anchor side="Right" relative="$parent" pos="Max" offset="-4"/>
+                    <Texture val="@UI/Glues_Battlenet_PageAssets_MainListItem_Selected"/>
+                    <TextureType val="NineSlice"/>
+                </Frame>
+            </Frame>
+            
+            <Frame type="Image" name="HoverImage">
+                <Texture val="Assets/Textures/blank.dds"/>
+                <RenderPriority val="510"/>
+                
+                <Frame type="Image" name="Background">
+                    <Anchor side="Top" relative="$parent" pos="Min" offset="4"/>
+                    <Anchor side="Bottom" relative="$parent" pos="Max" offset="-4"/>
+                    <Anchor side="Left" relative="$parent" pos="Min" offset="4"/>
+                    <Anchor side="Right" relative="$parent" pos="Max" offset="-4"/>
+                    <Texture val="@UI/Glues_Battlenet_PageAssets_MainListItem_Over"/>
+                    <TextureType val="NineSlice"/>
+                </Frame>
+            </Frame>
+
+            <Frame type="ScrollBar" name="ScrollBar" template="StandardBattlenetTemplates/GluesSocialScrollBarTemplate">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="-4"/>
+                <Anchor side="Right" relative="$parent" pos="Max" offset="-8"/>
+                <Anchor side="Bottom" relative="$parent" pos="Max" offset="4"/>
+
+                <Animation name="EmptyScrollbarFiller">
+                    <Event event="OnShown" action="Reset,Play"/>
+                    <Event event="OnHidden" action="Reset"/>
+
+                    <Controller type="Visibility" end="Pause" frame="$parent/$parent/ScrollBarLine">
+                        <Key type="Bool" time="0" value="false"/>
+                    </Controller>
+                </Animation>
+            </Frame>
+        </Frame>
+        
+
+
+        <Frame Type="ChatSessionContextMenu" name="ChatContextMenu" template="ChatSessionContextMenu/ChatSessionContextMenu" >
+            <Anchor side="Top" relative="$parent" pos="Max" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+        </Frame>
+    </Frame>
+</Desc>

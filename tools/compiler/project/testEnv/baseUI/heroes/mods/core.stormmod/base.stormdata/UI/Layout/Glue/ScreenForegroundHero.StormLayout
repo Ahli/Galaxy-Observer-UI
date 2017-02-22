@@ -1,0 +1,325 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<Desc>
+    <DescFlags val="Locked"/>
+
+    <Frame type="AnchoredPopup" name="DraftQuestTooltipPopupTemplate" template="StandardPopupTooltip/AnchoredPopupNoArrowTemplate">
+        <Visible val="False"/>
+
+        <Animation name="Dismiss">
+            <Event event="Dismiss" action="Restart,Play"/>
+
+            <Controller type="Property" name="SetSeen" property="" end="Pause" frame="$ScreenForeground_QuestPanel/QuestLogPanel"/>
+            <Controller type="Property" name="HideThis" property="Show" end="Pause">
+                <Key type="Property" time="0" value="False"/>
+            </Controller>
+        </Animation>
+
+        <Frame type="Frame" name="Container">
+            <Frame type="Label" name="TitleLabel">
+                <Text val="@UI/QuestDraftTooltip/Title"/>
+            </Frame>
+
+            <Frame type="Label" name="BodyLabel">
+                <Text val="@UI/QuestDraftTooltip/Body"/>
+            </Frame>
+        </Frame>
+    </Frame>
+
+    <Frame type="AnchoredPopup" name="QuestPanelDraftTooltipPopupTemplate" template="ScreenForegroundHero/DraftQuestTooltipPopupTemplate">
+        <StateGroup name="StateShow">
+            <State name="Show">
+                <When type="Property" frame="$ScreenForeground_QuestPanel" Visible="True"/>
+                <When type="Property" frame="$ScreenForeground_QuestPanel/QuestLogPanel" IsDraftingVisible="True"/>
+                <When type="Property" frame="$ScreenForeground_QuestPanel/QuestLogPanel" HasSeenQuestPanelTooltip="False"/>
+                <Action type="SetProperty" frame="$this" Show="True"/>
+            </State>
+        </StateGroup>
+
+        <Animation name="Dismiss">
+            <Controller type="Property" name="SetSeen" property="HasSeenQuestPanelTooltip">
+                <Key type="Property" time="0" value="True"/>
+            </Controller>
+        </Animation>
+
+        <Frame type="Image" name="QuestLogDarkenImage">
+            <Anchor relative="$ScreenForeground_QuestPanel/QuestLogPanel"/>
+            <Unclipped val="True"/>
+            <RenderPriority val="500"/>
+
+            <Color val="110033"/>
+            <Alpha val="150"/>
+        </Frame>
+    </Frame>
+    <Frame type="AnchoredPopup" name="DraftScreenTooltipPopupTemplate" template="ScreenForegroundHero/DraftQuestTooltipPopupTemplate">
+        <StateGroup name="StateShow">
+            <State name="Show">
+                <When type="Property" frame="$ScreenForeground_QuestPanel/QuestLogPanel" IsDraftPlayScreenVisible="True"/>
+                <When type="Property" frame="$ScreenForeground_QuestPanel/QuestLogPanel" HasSeenDraftScreenTooltip="False" />
+                <Action type="SetProperty" frame="$this" Show="true"/>
+            </State>
+        </StateGroup>
+
+        <Animation name="Dismiss">
+            <Controller type="Property" name="SetSeen" property="HasSeenDraftScreenTooltip">
+                <Key type="Property" time="0" value="True"/>
+            </Controller>
+        </Animation>
+    </Frame>
+
+    <Frame type="ScreenForegroundHero" name="ScreenForegroundHero">
+        <Anchor relative="$parent"/>
+        <RenderPriority val="600"/>
+
+        <Animation name="ToggleUIEvent">
+            <Event event="ToggleUI" action="ToggleDirection,Play" frame="$parent/ScreenHome"/>
+            <Event event="OnShown" action="DirectionReverse,Play"/>
+            <Controller type="Fade" end="Pause">
+                <Key type="Curve" time="0" value="255" out="Fast"/>
+                <Key type="Curve" time=".4" value="0" in="Slow"/>
+            </Controller>
+        </Animation>
+
+        <Animation name="Transition">
+            <Event event="Show" action="Reset"/>
+            <Event event="Show" action="Play"/>
+            <Event event="Hide" action="DirectionReverse"/>
+            <Event event="Hide" action="Play"/>
+            <Controller type="Fade" end="Pause">
+                <Key type="Curve" time="0.0" value="0" out="Slow"/>
+                <Key type="Curve" time="0.4" value="255" in="Slow" out="Slow"/>
+            </Controller>
+        </Animation>
+
+        <Frame type="Frame" name="SocialContainerFrame">
+            <Anchor relative="$parent"/>
+
+            <Frame type="PartyPanelHero" name="PartyPanel" template="PartyPanel/PartyPanelTemplate">
+                <Handle val="ScreenNavigation_PartyPanel"/>
+                <Anchor side="Top" relative="$parent" pos="Min" offset="-4" />
+                <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+                <Height val="700"/>
+                <Width val="1300"/>
+
+                <Animation name="Transition">
+                    <Event event="Show" action="DirectionForward"/>
+                    <Event event="Show" action="Play"/>
+                    <Event event="Hide" action="DirectionReverse"/>
+                    <Event event="Hide" action="Play"/>
+
+                    <Controller type="Fade" end="Pause">
+                        <Key type="Curve" time="0.0" value="0" out="Slow"/>
+                        <Key type="Curve" time="0.2" value="255" out="Slow"/>
+                    </Controller>
+
+                    <Controller type="Anchor" end="Pause" side="Top" relative="true">
+                        <Key type="Curve" time="0.0" value="-400" out="Auto"/>
+                        <Key type="Curve" time="0.2" value="0" out="Auto"/>
+                    </Controller>
+                </Animation>
+            </Frame>
+
+            <Frame type="ChatPanel" name="ChatPanel" template="ChatPanel/ChatPanelTemplate">
+                <Height val="550"/>
+                <Anchor side="Left" relative="$parent" pos="Mid" offset="210"/>
+                <Anchor side="Bottom" relative="$parent/$parent/MenuButton" pos="Max" offset="-3"/>
+                <Anchor side="Right" relative="$parent/$parent/MenuButton" pos="Max" offset="6"/>
+            </Frame>
+
+            <Frame type="SocialPanel" name="SocialPanel" template="SocialPanel/SocialPanelTemplate">
+                <Handle val="ScreenForeground_SocialPanel"/>
+                <Anchor side="Right" relative="$parent" pos="Max" offset="-24"/>
+                <Anchor side="Bottom" relative="$parent/SocialButton" pos="Min" offset="-30"/>
+                <Visible val="False"/>
+            </Frame>
+
+            <Frame type="FriendsButton" name="SocialButton" template="StandardTemplates/StandardSocialButtonTemplate">
+                <Handle val="ScreenForeground_SocialButton"/>
+                <Anchor side="Bottom" relative="$parent/$parent/MenuButton" pos="Max" offset="0"/>
+                <Anchor side="Right" relative="$parent/$parent/QuestButton" pos="Min" offset="8"/>
+                <Shortcut val="@UI/ScreenForegroundToggleSocial_Hotkey"/>
+                <Toggleable val="true"/>
+
+                <Animation name="FriendRequest">
+                    <Event event="SocialPanelFriendRequestNew" action="DirectionForward"/>
+                    <Event event="SocialPanelFriendRequestNew" action="Play"/>
+                    <Event event="SocialPanelFriendRequestEmpty" action="DirectionReverse"/>
+                    <Event event="SocialPanelFriendRequestEmpty" action="Play"/>
+
+                    <Controller type="Visibility" end="Pause" frame="$this/FriendRequestIcon">
+                        <Key type="Bool" time="0" value="false"/>
+                        <Key type="Bool" time=".001" value="true"/>
+                    </Controller>
+                </Animation>
+
+                <Animation name="FriendRequestLoop">
+                    <Event event="SocialPanelFriendRequestNew" action="DirectionForward"/>
+                    <Event event="SocialPanelFriendRequestNew" action="Play"/>
+                    <Event event="SocialPanelFriendRequestEmpty" action="Reset"/>
+                    <Event event="SocialPanelFriendRequestEmpty" action="Stop"/>
+                    <Event event="SocialPanelFriendRequestEmpty" action="Reset"/>
+                    <Event event="SocialPanelFriendRequestEmpty" action="Stop"/>
+                    <Controller type="Sound" end="Pause">
+                        <Key type="Sound" time="0.00" sound="@UI_BNet_InviteReceived" direction="Forward"/>
+                    </Controller>
+
+                    <Controller type="Fade" end="PingPong" frame="$this/FriendRequestIcon">
+                        <Key type="Curve" time="0" value="0" out="Auto"/>
+                        <Key type="Curve" time=".6" value="255" in="Auto"/>
+                    </Controller>
+                </Animation>
+
+                <Frame type="Image" name="IconImage">
+                    <Texture val="@UI/Storm_UI_Taskbar_ButtonIcon_Social"/>
+                </Frame>
+
+                <Frame type="Image" name="FriendRequestIcon">
+                    <Anchor side="Top" relative="$parent/IconImage" pos="Mid" offset="0"/>
+                    <Anchor side="Left" relative="$parent/IconImage" pos="Mid" offset="0"/>
+                    <Anchor side="Bottom" relative="$parent/IconImage" pos="Mid" offset="0"/>
+                    <Anchor side="Right" relative="$parent/IconImage" pos="Mid" offset="0"/>
+                    <Width val="0"/>
+                    <Height val="0"/>
+                    <Texture val="@UI/Storm_UI_Taskbar_ButtonIcon_Request"/>
+                    <Visible val="false"/>
+                </Frame>
+
+                <Frame type="Image" name="CountBg">
+                    <Anchor side="Top" relative="$parent/Label" pos="Mid" offset="-1"/>
+                    <Anchor side="Bottom" relative="$parent/Label" pos="Mid" offset="-1"/>
+                    <Anchor side="Left" relative="$parent/Label" pos="Min" offset="-15"/>
+                    <Anchor side="Right" relative="$parent/Label" pos="Max" offset="15"/>
+                    <Texture val="@UI/Storm_Taskbar_SocialButton_Countbg"/>
+                    <TextureType val="Nineslice"/>
+                    <Unclipped val="True"/>
+                    <RenderPriority val="512"/>
+                </Frame>
+            </Frame>
+        </Frame>
+
+        <Frame type="EnterGamePanel" name="EnterGamePanel" template="EnterGamePanel/EnterGamePanelTemplate">
+            <Anchor relative="$parent"/>
+            <Handle val="ScreenForegroundHero_EnterGamePanel"/>
+        </Frame>
+
+        <Frame type="ToastPanel" name="ToastPanel" template="ToastPanel/ToastPanelTemplate">
+            <Width val="600"/>
+            <Anchor side="Top" relative="$parent" pos="Min" offset="160"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="-200"/>
+        </Frame>
+
+        <Frame type="NewUserPopupPanel" name="NewUserPopupPanel" template="NewUserPopupPanel/NewUserPopupPanelTemplate"/>
+
+        <Frame type="MenuPanelHero" name="MenuPanel" template="MenuPanel/MenuPanelTemplate">
+            <Handle val="ScreenForeground_MenuPanel"/>
+            <Anchor side="Right" relative="$parent/MenuButton" pos="Max" offset="-8"/>
+            <Anchor side="Bottom" relative="$parent/MenuButton" pos="Max" offset="-65"/>
+            <Visible val="false"/>
+        </Frame>
+
+        <Frame type="Button" name="MenuButton" template="StandardTemplates/StandardSocialButtonTemplate">
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="-14"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="-14"/>
+            <Handle val="ScreenForeground_MenuButton"/>
+            <Shortcut val="@UI/ScreenNavigationBack_Hotkey"/>
+            <Toggleable val="true"/>
+            <Frame type="Image" name="CountBg">
+                <Visible val="False"/>
+            </Frame>
+            <Frame type="Image" name="IconImage">
+                <Texture val="@UI/Storm_UI_Taskbar_ButtonIcon_Menu"/>
+            </Frame>
+        </Frame>
+
+        <Frame type="PopupPanel" name="QuestPopupPanel" template="QuestPopupPanel/QuestPopupPanelTemplate">
+            <Handle val="ScreenForeground_QuestPanel"/>
+            <Anchor side="Right" relative="$parent/QuestButton" pos="Max" offset="52"/>
+            <Anchor side="Bottom" relative="$parent/MenuButton" pos="Max" offset="-55"/>
+            <Visible val="False"/>
+
+            <Frame type="Frame" name="AnchoredPopupAnchorFrame">
+                <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+                <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+
+                <TooltipAnchorPosition val="MiddleLeft"/>
+
+                <Frame type="AnchoredPopup" name="QuestPanelDraftTooltipPopup" template="ScreenForegroundHero/QuestPanelDraftTooltipPopupTemplate"/>
+            </Frame>
+        </Frame>
+
+        <Frame type="Button" name="QuestButton" template="StandardTemplates/StandardSocialButtonTemplate">
+            <Anchor side="Bottom" relative="$parent/MenuButton" pos="Max" offset="0"/>
+            <Anchor side="Right" relative="$parent/MenuButton" pos="Min" offset="8"/>
+            <Handle val="ScreenForeground_QuestButton"/>
+            <Toggleable val="true"/>
+
+            <Frame type="Image" name="IconImage">
+                <Texture val="@UI/Storm_UI_Taskbar_ButtonIcon_Quests"/>
+                <DesaturateOnDisable val="True"/>
+                <DesaturationColor val="726890"/>
+                <OnDisableDesaturationColor val="726890"/>
+            </Frame>
+        </Frame>
+
+        <Frame type="Image" name="NotificationFrame">
+            <Anchor side="Bottom" relative="$parent/QuestButton" pos="Mid" offset="0"/>
+            <Anchor side="Left" relative="$parent/QuestButton" pos="Mid" offset="0"/>
+            <Anchor side="Top" relative="$parent/QuestButton" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent/QuestButton" pos="Mid" offset="0"/>
+
+            <Texture val="@UI/Storm_UI_Taskbar_Notification"/>
+            <TextureType val="Normal"/>
+            <Visible val="false"/>
+
+            <Animation name="Pulse">
+                <Event event="OnShown" action="DirectionForward,Play"/>
+                <Event event="OnHidden" action="Stop"/>
+
+                <Controller type="Fade" end="Loop">
+                    <Key type="Curve" time="0" value="50" out="Fast"/>
+                    <Key type="Curve" time="1" value="255" inout="Slow"/>
+                    <Key type="Curve" time="2" value="50" in="Fast"/>
+                </Controller>
+            </Animation>
+
+            <StateGroup name="QuestEnabled">
+                <State name="ShowNotification">
+                    <When type="Property" frame="$ScreenForeground_QuestPanel/QuestLogPanel" ShowNotification="true"/>
+                    <Action type="SetProperty" frame="$this" visible="true"/>
+                </State>
+            </StateGroup>
+
+            <Animation name="NotificationSound">
+                <Event event="OnShown" action="DirectionForward,Play"/>
+                <Event event="OnHidden" action="Reset,Stop"/>
+                <Controller type="Sound" end="Pause">
+                    <Key type="Sound" time="0.00" sound="@UI_BNet_Quest_Nexus_Challenge_Received" direction="Forward"/>
+                </Controller>
+            </Animation>
+
+        </Frame>
+
+        <Frame type="Label" name="VersionLabel">
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="5"/>
+            <Style val="StandardSmallHeaderLabel"/>
+        </Frame>
+
+        <Frame type="Label" name="PublishInfoLabel">
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+            <Anchor side="Left" relative="$parent/VersionLabel" pos="Max" offset="5"/>
+            <Style val="StandardSmallHeaderLabel"/>
+        </Frame>
+
+        <Frame type="BreakingNewsPanel" name="BreakingNews" template="BreakingNewsPanel/BreakingNewsPanelTemplate"/>
+
+        <Frame type="LogMessagePanel" name="LogMessagePanel" template="LogMessagePanel/LogMessagePanelTemplate">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="130"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="10"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="-200"/>
+            <Height val="200"/>
+        </Frame>
+    </Frame>
+</Desc>

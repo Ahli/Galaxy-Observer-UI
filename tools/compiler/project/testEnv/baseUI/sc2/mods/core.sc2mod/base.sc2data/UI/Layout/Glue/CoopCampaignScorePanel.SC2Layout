@@ -1,0 +1,272 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<Desc>
+    <DescFlags val="Locked"/>
+    
+    <Frame type="BattleUserContextMenuListBoxItem" name="AllyOptionsContextMenuListBoxItem" template="BattleuserContextMenu/BattleUserContextMenuListBoxItem">
+        <Frame type="Frame" name="LineBreak">
+            <Height val="27"/>
+        </Frame>
+    </Frame>
+
+    <Frame type="CoopCampaignScorePanel" name="CoopCampaignScorePanelTemplate">
+        <Anchor relative="$parent"/>
+        <!-- This tooltip is just for blocking tooltips behind this panel -->
+        <Frame type="StandardTooltip" name="CoopCampaignTooltip">
+            <Frame type="Label" name="Label">
+                <Anchor relative="$parent"/>
+            </Frame>
+        </Frame>
+
+        <Frame type="Image" name="BackgroundImage">
+            <Anchor relative="$parent"/>
+            <Alpha val="0"/>
+            <AcceptsMouse val="true"/>
+            <TooltipFrame val="CoopCampaignTooltip"/>
+        </Frame>
+        
+        <Frame type="Image" name="Vignette">
+            <Anchor relative="$parent"/>
+            <Texture val="@UI/SC2_UI_Coop_Vignette"/>
+        </Frame>
+
+        <Frame type="Image" name="ContentBG">
+            <Anchor side="Top" relative="$parent" pos="Mid" offset="-10"/>
+            <Anchor side="Bottom" relative="$parent" pos="Mid" offset="-10"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+            <Height val="880"/>
+            <Texture val="@UI/SC2_UI_Battlenet_Glue_Campaign_PanelBg"/>
+            <Visible val="False"/>
+        </Frame>
+
+        <Frame type="Label" name="GameResultLabel">
+            <Anchor side="Top" relative="$parent/ContentBG" pos="Min" offset="49"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="116"/>
+            <Style val="@Coop_ScoreScreen_GameResult"/>
+        </Frame>
+        
+        <Frame type="Label" name="MapNameLabel">
+            <Anchor side="Top" relative="$parent/GameResultLabel" pos="Max" offset="2"/>
+            <Anchor side="Left" relative="$parent/GameResultLabel" pos="Min" offset="3"/>
+            <Style val="Coop_ScoreScreen_MapName"/>
+            <Text val="{$parent/@MapName}"/>
+        </Frame>
+
+        <Frame type="Label" name="MutatorNameLabel">
+            <Anchor side="Top" relative="$parent/GameResultLabel" pos="Max" offset="2"/>
+            <Anchor side="Left" relative="$parent/GameResultLabel" pos="Min" offset="3"/>
+            <Style val="Coop_ScoreScreen_MapName"/>
+            <Text val="{$parent/@MutatorName}"/>
+        </Frame>
+
+        <StateGroup name="TitleStateGroup">
+            <State name="NoMutators">
+                <When type="Property" HasMutators="false"/>
+                <When type="Property" MutatorName=""/>
+                <Action type="SetProperty" frame="MapNameLabel" Visible="true"/>
+                <Action type="SetProperty" frame="MutatorNameLabel" Visible="false"/>
+            </State>
+            
+            <State name="CustomMutators">
+                <When type="Property" HasMutators="false"/>
+                <Action type="SetProperty" frame="MapNameLabel" Visible="true"/>
+                <Action type="SetProperty" frame="MutatorNameLabel" Visible="false"/>
+            </State>
+
+            <State name="HasMutators">
+                <When type="Property" HasMutators="true"/>
+                <Action type="SetProperty" frame="MapNameLabel" Visible="false"/>
+                <Action type="SetProperty" frame="MutatorNameLabel" Visible="true"/>
+            </State>
+        </StateGroup>
+
+        <Frame type="Label" name="MessageLabel">
+            <Anchor side="Left" relative="$parent/GameResultLabel" pos="Min" offset="0"/>
+            <Anchor side="Bottom" relative="$parent/BackgroundImage" pos="Mid" offset="-30"/>
+            <Anchor side="Right" relative="$parent/BackgroundImage" pos="Mid" offset="0"/>
+            <Style val="Coop_ScoreScreen_MessageLabel"/>
+            <Alpha val="0"/>
+
+            <Animation name="Show">
+                <Event event="Show" action="DirectionForward"/>
+                <Event event="Show" action="Play"/>
+                <Event event="Hide" action="DirectionReverse"/>
+                <Event event="Hide" action="Play"/>
+
+                <Controller type="Fade" end="Pause">
+                    <Key type="Curve" time="0" value="0" out="Slow"/>
+                    <Key type="Curve" time="1" value="0" out="Slow"/>
+                    <Key type="Curve" time="1.175" value="255" in="Auto"/>
+                </Controller>
+            </Animation>
+        </Frame>
+        
+
+
+        <Frame type="Button" name="SummaryButton" template="StandardBattlenetTemplates/BattlenetSmallTabLeftButtonTemplate">
+            <Anchor side="Top" relative="$parent/MapNameLabel" pos="Max" offset="18"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="119"/>
+            <Anchor side="Right" relative="$this/Label" pos="Max" offset="30"/>
+            <Text val="@UI/ScreenCoopCampaign/ScorePanel/Summary"/>
+            <Enabled val="false"/>
+            <Visible val="True"/>
+            <Width val="0"/>
+            <ClickSound val="AC_UI_SummaryButtonClick"/>
+            
+            <Frame type="Label" name="Label">
+                <Anchor side="Right" relative="$this" pos="Min" offset="0"/>
+            </Frame>
+            
+            <Animation name="Show">
+                <Event event="OnShown" action="Reset" frame="$parent/SummaryPanel"/>
+                <Event event="OnShown" action="Play" frame="$parent/SummaryPanel"/>
+                <Event event="OnHidden" action="Reset" frame="$parent/SummaryPanel"/>
+                <Event event="OnHidden" action="Stop" frame="$parent/SummaryPanel"/>
+
+                <Controller type="Style" end="Pause" style1="Coop_CommanderTabButton_Selected" style2="Coop_CommanderTabButton_Selected" frame="Label">
+                    <Key type="Curve" time="0" value="0"/>
+                </Controller>
+            </Animation>
+        </Frame>
+
+        <Frame type="Button" name="StatsButton" template="StandardBattlenetTemplates/BattlenetSmallTabRightButtonTemplate">
+            <Anchor side="Top" relative="$parent/SummaryButton" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent/SummaryButton" pos="Max" offset="-20"/>
+            <Anchor side="Right" relative="$this/Label" pos="Max" offset="30"/>
+            <Text val="@UI/ScreenCoopCampaign/ScorePanel/Stats"/>
+            <Enabled val="false"/>
+            <Visible val="True"/>
+            <Width val="0"/>
+            <ClickSound val="AC_UI_StatsButtonClick"/>
+            
+            <Frame type="Label" name="Label">
+                <Anchor side="Right" relative="$this" pos="Min" offset="0"/>
+            </Frame>
+            
+            <Animation name="Show">
+                <Event event="OnShown" action="Reset" frame="$parent/StatsPanel"/>
+                <Event event="OnShown" action="Play" frame="$parent/StatsPanel"/>
+                <Event event="OnHidden" action="Reset" frame="$parent/StatsPanel"/>
+                <Event event="OnHidden" action="Stop" frame="$parent/StatsPanel"/>
+
+                <Controller type="Style" end="Pause" style1="Coop_CommanderTabButton_Selected" style2="Coop_CommanderTabButton_Selected" frame="Label">
+                    <Key type="Curve" time="0" value="0"/>
+                </Controller>
+            </Animation>
+        </Frame>
+        
+
+        <Frame type="GlueButton" name="PlayAgainButton" template="StandardBattlenetTemplates/BattlenetAlternateButtonTemplate">
+            <Anchor side="Bottom" relative="$parent/ContentBG" pos="Max" offset="-52"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="107"/>
+            <Text val="@UI/ScreenCoopCampaign/ScorePanel/PlayAgain"/>
+            <Visible val="false"/>
+        </Frame>
+        
+        <Frame type="Button" name="CloseButton" template="StandardBattlenetTemplates/BattlenetAlternateButtonTemplate">
+            <Anchor side="Bottom" relative="$parent/PlayAgainButton" pos="Max" offset="0"/>
+            <Anchor side="Left" relative="$parent/PlayAgainButton" pos="Min" offset="5"/>
+            <Text val="@UI/ScreenCoopCampaign/ScorePanel/Close"/>
+            <Shortcut val="@UI/ScreenNavigationBack_Hotkey"/>
+        </Frame>
+
+        <Frame type="PartyInviteButton" name="PartyInviteButton" template="StandardBattlenetTemplates/BattlenetStandardButtonTemplate">
+            <Anchor side="Bottom" relative="$parent/CloseButton" pos="Max" offset="0"/>
+            <Anchor side="Left" relative="$parent/CloseButton" pos="Max" offset="5"/>
+            <Text val="@UI/ScreenCoopCampaign/ScorePanel/PartyInvite"/>
+        </Frame>
+
+        <Frame type="Button" name="AllyOptionsButton" template="StandardBattlenetTemplates/BattlenetStandardButtonTemplate">
+            <Anchor side="Bottom" relative="$parent/PartyInviteButton" pos="Max" offset="0"/>
+            <Anchor side="Left" relative="$parent/PartyInviteButton" pos="Max" offset="5"/>
+            <Text val="@UI/ScreenCoopCampaign/ScorePanel/AllyOptions"/>
+            <ContextMenuButtons val="Left"/>
+            <ContextMenu val="$parent/AllyContextMenu"/>
+
+            <Frame type="Label" name="Label">
+                <Anchor side="Left" relative="$parent" pos="Min" offset="30"/>
+                <Anchor side="Right" relative="$this" pos="Min" offset="0"/>
+            </Frame>
+        </Frame>
+
+        <!-- This is to make the button a "fake pulldown" -->
+        <Frame type="Frame" name="PulldownArrow">
+            <Anchor side="Top" relative="$parent/AllyOptionsButton" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent/AllyOptionsButton" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent/AllyOptionsButton" pos="Max" offset="-20"/>
+            <Height val="26"/>
+            <Width val="32"/>
+
+            <Frame type="Image" name="PulldownArrow">
+                <Anchor relative="$parent"/>
+                <Texture val="@UI/Glues_Battlenet_LargeDropDownArrowNormal"/>
+                <TextureType val="Normal"/>
+                <Tiled val="false"/>
+                <StateCount val="2"/>
+                
+                <Animation name="OnHover">
+                    <Event event="OnMouseEnter" action="Reset,Play" frame="$parent/$parent/AllyOptionsButton"/>
+                    <Event event="OnMouseExit" action="Reset,Stop" frame="$parent/$parent/AllyOptionsButton"/>
+                    <Controller type="Visibility" end="Pause">
+                        <Key type="Bool" time="0" value="false"/>
+                    </Controller>
+                </Animation>
+            </Frame>
+
+            <Frame type="Image" name="PulldownArrowHover">
+                <Anchor relative="$parent"/>
+                <Texture val="@UI/Glues_Battlenet_LargeDropDownArrowOver"/>
+                <TextureType val="Normal"/>
+                <Tiled val="false"/>
+                <StateCount val="2"/>
+                <Visible val="false"/>
+
+                <Animation name="OnHover">
+                    <Event event="OnMouseEnter" action="Reset,Play" frame="$parent/$parent/AllyOptionsButton"/>
+                    <Event event="OnMouseExit" action="Reset,Stop" frame="$parent/$parent/AllyOptionsButton"/>
+                    <Controller type="Visibility" end="Pause">
+                        <Key type="Bool" time="0" value="true"/>
+                    </Controller>
+                </Animation>
+            </Frame>
+        </Frame>
+
+        <Frame type="BattleUserContextMenu" name="AllyContextMenu" template="StandardTemplates/StandardContextMenuTemplate">
+            <Anchor side="Top" relative="$parent/AllyOptionsButton" pos="Max" offset="-5"/>
+            <Anchor side="Left" relative="$parent/AllyOptionsButton" pos="Min" offset="7"/>
+            <MenuMinWidth val="260"/>
+            <MenuMaxHeight val="230"/>
+            <UseAnchors val="true"/>
+
+            <Frame type="ListBox" name="Menu">
+                <Insets top="8" left="14" bottom="8" right="8"/>
+                <ItemHoverWhileDisabled val="false"/>
+                <ItemDesc val="CoopCampaignScorePanel/AllyOptionsContextMenuListBoxItem"/>
+                <ItemHeight val="27"/>
+                <ScrollBar val="ScrollBar"/>
+
+                <Frame type="ScrollBar" name="ScrollBar" template="StandardBattlenetTemplates/GluesSocialScrollBarTemplate">
+                    <Anchor side="Top" relative="$parent" pos="Min" offset="3"/>
+                    <Anchor side="Right" relative="$parent" pos="Max" offset="-2"/>
+                    <Anchor side="Bottom" relative="$parent" pos="Max" offset="-3"/>
+                </Frame>
+            </Frame>
+        </Frame>
+
+        <Frame type="CoopCampaignScoreSummaryPanel" name="SummaryPanel" template="CoopCampaignScoreSummaryPanel/CoopCampaignScoreSummaryPanelTemplate">
+            <Anchor side="Bottom" relative="$parent/CloseButton" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent/BackgroundImage" pos="Min" offset="10"/>
+            <Anchor side="Right" relative="$parent/BackgroundImage" pos="Max" offset="-10"/>
+            <Height val="550"/>
+            <Visible val="false"/>
+        </Frame>
+
+        <Frame type="CoopCampaignScoreStatsPanel" name="StatsPanel" template="CoopCampaignScoreStatsPanel/CoopCampaignScoreStatsPanelTemplate">
+            <Anchor side="Bottom" relative="$parent/CloseButton" pos="Min" offset="10"/>
+            <Anchor side="Left" relative="$parent/BackgroundImage" pos="Min" offset="10"/>
+            <Anchor side="Right" relative="$parent/BackgroundImage" pos="Max" offset="-10"/>
+            <Height val="550"/>
+            <Visible val="false"/>
+        </Frame>
+    </Frame>
+</Desc>

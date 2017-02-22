@@ -1,0 +1,520 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<Desc>
+    <!-- StatsOverviewPanelTemplate is a template to create a panel displaying the stats of each player.
+
+         Right now, this template uses the HeroLeaderPanelTemplate from the default UI and is therefore error-prone.
+         Patches can break this template. Tests are required when the HeroLeaderPanelTemplate has been altered.
+    -->
+
+    <!-- bottom panel placement constants -->
+    <Constant name="BottomPanelSlot5BottomOffset" val="4"/>
+    <Constant name="BottomPanelSlotWidth" val="565"/>
+    <Constant name="BottomPanelSlotHeight" val="40"/>
+
+    <Constant name="BottomPanelScoreValueWidth" val="100"/>
+    <Constant name="BottomPanelScoreValueGapSize" val="10"/>
+
+    <Constant name="BottomPanelColumnHeader1_BottomOffset" val="-240"/>
+    <Constant name="BottomPanelColumnHeader2_HorizontalShift" val="-8"/>
+
+    <Frame type="Image" name="HighlightImageTemplate">
+        <Anchor side="Bottom" relative="$parent" pos="Max" offset="22"/>
+        <Anchor side="Left" relative="$parent" pos="Mid" offset="-8"/>
+        <Anchor side="Right" relative="$parent" pos="Mid" offset="-8"/>
+        <Unclipped val="true"/>
+        <IgnoreParentColor val="true"/>
+    </Frame>
+
+    <Frame type="PlayerScoreValueFrame" name="ScoreValueFrameHighlightAnimation_Blue">
+        <Frame type="ScoreValueLabelFrame" name="ScoreValueFrame0">
+            <Frame type="Image" name="HighlightImage" template="StatsOverviewPanel/HighlightImageTemplate">
+                <Texture val="@UI/obs_stats_leader_blue"/>
+
+                <Animation name="ShowHighlight">
+                    <Event event="AllyBestValue" action="Reset,Play" frame="$parent"/>
+                    <Event event="EnemyBestValue" action="Reset,Play" frame="$parent"/>
+                    
+                    <Controller type="Property" property="Visible" end="Pause">
+                        <Key type="Property" time="0" value="True"/>
+                    </Controller>
+                </Animation>
+                
+                <Animation name="HideHighlight">
+                    <Event event="AllyNotBestValue" action="Reset,Play" frame="$parent"/>
+                    <Event event="EnemyNotBestValue" action="Reset,Play" frame="$parent"/>
+                    
+                    <Controller type="Property" property="Visible" end="Pause">
+                        <Key type="Property" time="0" value="False"/>
+                    </Controller>
+                </Animation>
+            </Frame>
+            
+            <Animation name="BestValue">
+                <Event event="EnemyBestValue" action="Reset,Play"/>
+                <Event event="AllyBestValue" action="Reset,Play"/>
+
+                <Controller type="Style" end="Pause" frame="Label" style1="BottomPanel_ValueHighlighted_L" style2="BottomPanel_ValueHighlighted_L">
+                    <Key type="Curve" time="0.00" value="1.0" out="Auto"/>
+                </Controller>
+            </Animation>
+
+            <Animation name="NotBestValue">
+                <Event event="EnemyNotBestValue" action="Reset,Play"/>
+                <Event event="AllyNotBestValue" action="Reset,Play"/>
+
+                <Controller type="Style" end="Pause" frame="Label" style1="BottomPanel_ValueNormal_L" style2="BottomPanel_ValueNormal_L">
+                    <Key type="Curve" time="0.00" value="1.0" out="Auto"/>
+                </Controller>
+            </Animation>
+        </Frame>
+    </Frame>
+    
+    <Frame type="PlayerScoreValueFrame" name="ScoreValueFrameHighlightAnimation_Red">
+        <Frame type="ScoreValueLabelFrame" name="ScoreValueFrame0">
+            <Frame type="Image" name="HighlightImage" template="StatsOverviewPanel/HighlightImageTemplate">
+                <Texture val="@UI/obs_stats_leader_red"/>
+
+                <Animation name="ShowHighlight">
+                    <Event event="AllyBestValue" action="Reset,Play" frame="$parent"/>
+                    <Event event="EnemyBestValue" action="Reset,Play" frame="$parent"/>
+                    
+                    <Controller type="Property" property="Visible" end="Pause">
+                        <Key type="Property" time="0" value="True"/>
+                    </Controller>
+                </Animation>
+                
+                <Animation name="HideHighlight">
+                    <Event event="AllyNotBestValue" action="Reset,Play" frame="$parent"/>
+                    <Event event="EnemyNotBestValue" action="Reset,Play" frame="$parent"/>
+                    
+                    <Controller type="Property" property="Visible" end="Pause">
+                        <Key type="Property" time="0" value="False"/>
+                    </Controller>
+                </Animation>
+            </Frame>
+
+            <Animation name="BestValue">
+                <Event event="AllyBestValue" action="Reset,Play"/>
+                <Event event="EnemyBestValue" action="Reset,Play"/>
+
+                <Controller type="Style" end="Pause" frame="Label" style1="BottomPanel_ValueHighlighted_R" style2="BottomPanel_ValueHighlighted_R">
+                    <Key type="Curve" time="0.00" value="1.0" out="Auto"/>
+                </Controller>
+            </Animation>
+
+            <Animation name="NotBestValue">
+                <Event event="AllyNotBestValue" action="Reset,Play"/>
+                <Event event="EnemyNotBestValue" action="Reset,Play"/>
+
+                <Controller type="Style" end="Pause" frame="Label" style1="BottomPanel_ValueNormal_R" style2="BottomPanel_ValueNormal_R">
+                    <Key type="Curve" time="0.00" value="1.0" out="Auto"/>
+                </Controller>
+            </Animation>
+        </Frame>
+    </Frame>
+
+    <Frame type="PlayerHeroIconFrame" name="PlayerHeroIconFrameTemplate">
+        <Anchor side="Top" relative="$parent" pos="Min" offset="10"/>
+        <Anchor side="Left" relative="$parent" pos="Min" offset="23"/>
+        <Width val="90"/>
+        <Height val="33"/>
+
+        <Frame type="Image" name="HeroIconImage">
+            <Anchor relative="$parent"/>
+            <IgnoreParentColor val="true"/>
+            <!-- source image has size of 100x56, this image has a size of 90x33 -->
+            <TextureCoords top="0.2054" left="0.05" bottom="0.7946" right="0.95"/>
+        </Frame>
+    </Frame>
+
+    <!-- Team specific player frame changes -->
+    <Frame type="HeroLeaderPanelPlayerFrame" name="StatsOverviewPanelPlayerFrameTemplate_Blue" template="CleanLeaderPanel/HeroLeaderPanelPlayerFrame_Base">
+        <Frame type="Frame" name="StatsContainerFrame">
+            <Frame type="PlayerScoreValueFrame" name="DeathsScoreValueFrame" template="StatsOverviewPanel/ScoreValueFrameHighlightAnimation_Blue">
+                <Anchor side="Left" relative="$parent" pos="Min" offset="130"/>
+                <Anchor side="Top" relative="$parent" pos="Min" offset="12"/>
+                <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+                <Anchor side="Right" relative="$this" pos="Min" offset="0"/>
+                <Width val="#BottomPanelScoreValueWidth"/>
+            </Frame>
+
+            <Frame type="PlayerScoreValueFrame" name="SiegeDamageScoreValueFrame" template="StatsOverviewPanel/ScoreValueFrameHighlightAnimation_Blue">
+                <Anchor side="Top" relative="$parent/DeathsScoreValueFrame" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/DeathsScoreValueFrame" pos="Max" offset="#BottomPanelScoreValueGapSize"/>
+                <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+                <Anchor side="Right" relative="$this" pos="Min" offset="0"/>
+                <Width val="#BottomPanelScoreValueWidth"/>
+            </Frame>
+
+            <Frame type="PlayerScoreValueFrame" name="HeroDamageScoreValueFrame" template="StatsOverviewPanel/ScoreValueFrameHighlightAnimation_Blue">
+                <Anchor side="Top" relative="$parent/DeathsScoreValueFrame" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/SiegeDamageScoreValueFrame" pos="Max" offset="#BottomPanelScoreValueGapSize"/>
+                <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+                <Anchor side="Right" relative="$this" pos="Min" offset="0"/>
+                <Width val="#BottomPanelScoreValueWidth"/>
+            </Frame>
+
+            <Frame type="PlayerScoreValueFrame" name="HealingScoreValueFrame" template="StatsOverviewPanel/ScoreValueFrameHighlightAnimation_Blue">
+                <Anchor side="Top" relative="$parent/DeathsScoreValueFrame" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/HeroDamageScoreValueFrame" pos="Max" offset="#BottomPanelScoreValueGapSize"/>
+                <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+                <Anchor side="Right" relative="$this" pos="Min" offset="0"/>
+                <Width val="#BottomPanelScoreValueWidth"/>
+
+                <Frame type="ScoreValueLabelFrame" name="ScoreValueFrame0">
+                    <RoleBasedScoreValue val="True"/>
+                    <BestValueGrouping val="Team"/>
+                    <AcceptsMouseTooltip val="False"/>
+
+                    <Frame type="Label" name="Label">
+                        <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                        <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+                        <Anchor side="Right" relative="$parent" pos="Max" offset="9"/>
+                        <Anchor side="Left" relative="$parent" pos="Min" offset="16"/>
+                    </Frame>
+                </Frame>
+
+                <Frame type="ScoreValueImageFrame" name="ScoreValueFrame1">
+                    <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+                    <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+                    <Anchor side="Left" relative="$parent/ScoreValueFrame0/Label" pos="Min" offset="-30"/>
+                    <Width val="28"/>
+                    <Height val="28"/>
+                    <ScoreValueLink val="Healing"/>
+                    <RoleBasedScoreValue val="True"/>
+                    <HideZero val="false"/>
+                    <Unclipped val="true"/>
+                </Frame>
+            </Frame>
+        
+            <Animation name="StatsForceVisible">
+                <Event event="OnShown" frame="$parent" action="Reset,Play"/>
+         
+                <Controller type="Visibility" end="Pause">
+                    <Key type="Bool" time="0" value="true"/>
+                    <Key type="Bool" time="0.1" value="true"/>
+                </Controller>
+            </Animation>
+        </Frame>
+
+        <Frame type="Frame" name="TalentsContainerFrame">
+            <Visible val="false"/>
+            <Alpha val="0"/>
+        </Frame>
+        
+        <!-- custom Portrait (because original one can potentially be bugged by patches) -->
+        <Frame type="PlayerHeroIconFrame" name="CustomPlayerHeroIconFrame" template="StatsOverviewPanel/PlayerHeroIconFrameTemplate">
+        </Frame>
+    </Frame>
+
+    <Frame type="HeroLeaderPanelPlayerFrame" name="StatsOverviewPanelPlayerFrameTemplate_Red" template="CleanLeaderPanel/HeroLeaderPanelPlayerFrame_Base">
+        <Frame type="Frame" name="StatsContainerFrame">
+            <Frame type="PlayerScoreValueFrame" name="DeathsScoreValueFrame" template="StatsOverviewPanel/ScoreValueFrameHighlightAnimation_Red">
+                <Anchor side="Left" relative="$parent" pos="Min" offset="20"/>
+                <Anchor side="Top" relative="$parent" pos="Min" offset="12"/>
+                <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+                <Anchor side="Right" relative="$this" pos="Min" offset="0"/>
+                <Width val="#BottomPanelScoreValueWidth"/>
+            </Frame>
+
+            <Frame type="PlayerScoreValueFrame" name="SiegeDamageScoreValueFrame" template="StatsOverviewPanel/ScoreValueFrameHighlightAnimation_Red">
+                <Anchor side="Top" relative="$parent/DeathsScoreValueFrame" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/DeathsScoreValueFrame" pos="Max" offset="#BottomPanelScoreValueGapSize"/>
+                <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+                <Anchor side="Right" relative="$this" pos="Min" offset="0"/>
+                <Width val="#BottomPanelScoreValueWidth"/>
+            </Frame>
+
+            <Frame type="PlayerScoreValueFrame" name="HeroDamageScoreValueFrame" template="StatsOverviewPanel/ScoreValueFrameHighlightAnimation_Red">
+                <Anchor side="Top" relative="$parent/DeathsScoreValueFrame" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/SiegeDamageScoreValueFrame" pos="Max" offset="#BottomPanelScoreValueGapSize"/>
+                <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+                <Anchor side="Right" relative="$this" pos="Min" offset="0"/>
+                <Width val="#BottomPanelScoreValueWidth"/>
+            </Frame>
+
+            <Frame type="PlayerScoreValueFrame" name="HealingScoreValueFrame" template="StatsOverviewPanel/ScoreValueFrameHighlightAnimation_Red">
+                <Anchor side="Top" relative="$parent/DeathsScoreValueFrame" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/HeroDamageScoreValueFrame" pos="Max" offset="#BottomPanelScoreValueGapSize"/>
+                <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+                <Anchor side="Right" relative="$this" pos="Min" offset="0"/>
+                <Width val="#BottomPanelScoreValueWidth"/>
+
+                <Frame type="ScoreValueLabelFrame" name="ScoreValueFrame0">
+                    <RoleBasedScoreValue val="True"/>
+                    <BestValueGrouping val="Team"/>
+                    <AcceptsMouseTooltip val="False"/>
+
+                    <Frame type="Label" name="Label">
+                        <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                        <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+                        <Anchor side="Right" relative="$parent" pos="Max" offset="9"/>
+                        <Anchor side="Left" relative="$parent" pos="Min" offset="16"/>
+                    </Frame>
+                </Frame>
+
+                <Frame type="ScoreValueImageFrame" name="ScoreValueFrame1">
+                    <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+                    <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+                    <Anchor side="Left" relative="$parent/ScoreValueFrame0/Label" pos="Min" offset="-30"/>
+                    <Width val="28"/>
+                    <Height val="28"/>
+                    <ScoreValueLink val="Healing"/>
+                    <RoleBasedScoreValue val="True"/>
+                    <HideZero val="false"/>
+                    <Unclipped val="true"/>
+                </Frame>
+            </Frame>
+        
+            <Animation name="StatsForceVisible">
+                <Event event="OnShown" frame="$parent" action="Reset,Play"/>
+         
+                <Controller type="Visibility" end="Pause">
+                    <Key type="Bool" time="0" value="true"/>
+                    <Key type="Bool" time="0.1" value="true"/>
+                </Controller>
+            </Animation>
+        </Frame>
+
+        <Frame type="Frame" name="TalentsContainerFrame">
+            <Visible val="false"/>
+            <Alpha val="0"/>
+        </Frame>
+        
+        <!-- custom Portrait (because original one can potentially be bugged by patches) -->
+        <Frame type="PlayerHeroIconFrame" name="CustomPlayerHeroIconFrame" template="StatsOverviewPanel/PlayerHeroIconFrameTemplate">
+            <Anchor side="Left" relative="$this" pos="Max" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="-23"/>
+        </Frame>
+    </Frame>
+
+    <!-- Main Template -->
+    <Frame type="Frame" name="StatsOverviewPanelTemplate">
+        <Frame type="HeroLeaderPanel" name="StatsOverviewBottomPanel" template="CleanLeaderPanel/CleanLeaderPanelTemplate">
+            <Anchor side="Top" relative="$this" pos="Max" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+            <Anchor side="Right" relative="$parent/$parent/$parent/$parent/$parent/ConsoleUIContainer/MinimapPanel" pos="Min" offset="0"/>
+            <Width val="0"/>
+            <Height val="350"/>
+            <Visible val="true"/>
+            
+            <Frame type="Image" name="CustomBackgroundImage">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+                <Texture val="@UI/obs_talents_bg"/>
+                <RenderPriority val="100"/>
+            </Frame>
+
+            <Frame type="Image" name="StatsGridImage">
+                <Anchor side="Bottom" relative="$parent" pos="Max" offset="-22"/>
+                <Anchor side="Left" relative="$parent/CustomBackgroundImage" pos="Mid" offset="0"/>
+                <Anchor side="Right" relative="$parent/CustomBackgroundImage" pos="Mid" offset="0"/>
+                <Texture val="@UI/obs_stats_top"/>
+                <RenderPriority val="500"/>
+            </Frame>
+            
+            <Frame type="Frame" name="HeroLeaderPanelContainer">
+                <Visible val="true"/>
+                
+                <Frame type="TabControl" name="TabControl">
+                    <Anchor side="Left" relative="$parent/$parent/StatsGridImage" pos="Min" offset="0"/>
+                    <Anchor side="Right" relative="$parent/$parent/StatsGridImage" pos="Max" offset="0"/>
+                    
+                    <Frame type="frame" name="TalentsContainerFrame">
+                        <Visible val="false"/>
+                        <Alpha val="0"/>
+                    </Frame>
+                    
+                    <!-- Player frame positions are anchored from the bottom up -->
+                    <Frame type="HeroLeaderPanelPlayerFrame" name="PlayerFrame0" template="StatsOverviewPanel/StatsOverviewPanelPlayerFrameTemplate_Blue">
+                        <Anchor side="Top" relative="$this" pos="Max" offset="0"/>
+                        <Anchor side="Left" relative="$this" pos="Max" offset="0"/>
+                        <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+                        <Anchor side="Bottom" relative="$parent/PlayerFrame1" pos="Min" offset="0"/>
+                        <Width val="#BottomPanelSlotWidth"/>
+                        <Height val="#BottomPanelSlotHeight"/>
+                    </Frame>
+                    
+                    <Frame type="HeroLeaderPanelPlayerFrame" name="PlayerFrame1" template="StatsOverviewPanel/StatsOverviewPanelPlayerFrameTemplate_Blue">
+                        <Anchor side="Top" relative="$this" pos="Max" offset="0"/>
+                        <Anchor side="Left" relative="$parent/PlayerFrame0" pos="Min" offset="0"/>
+                        <Anchor side="Right" relative="$parent/PlayerFrame0" pos="Max" offset="0"/>
+                        <Anchor side="Bottom" relative="$parent/PlayerFrame2" pos="Min" offset="0"/>
+                        <Width val="0"/>
+                        <Height val="#BottomPanelSlotHeight"/>
+                    </Frame>
+                    
+                    <Frame type="HeroLeaderPanelPlayerFrame" name="PlayerFrame2" template="StatsOverviewPanel/StatsOverviewPanelPlayerFrameTemplate_Blue">
+                        <Anchor side="Top" relative="$this" pos="Max" offset="0"/>
+                        <Anchor side="Left" relative="$parent/PlayerFrame0" pos="Min" offset="0"/>
+                        <Anchor side="Right" relative="$parent/PlayerFrame0" pos="Max" offset="0"/>
+                        <Anchor side="Bottom" relative="$parent/PlayerFrame3" pos="Min" offset="0"/>
+                        <Width val="0"/>
+                        <Height val="#BottomPanelSlotHeight"/>
+                    </Frame>
+                    
+                    <Frame type="HeroLeaderPanelPlayerFrame" name="PlayerFrame3" template="StatsOverviewPanel/StatsOverviewPanelPlayerFrameTemplate_Blue">
+                        <Anchor side="Top" relative="$this" pos="Max" offset="0"/>
+                        <Anchor side="Left" relative="$parent/PlayerFrame0" pos="Min" offset="0"/>
+                        <Anchor side="Right" relative="$parent/PlayerFrame0" pos="Max" offset="0"/>
+                        <Anchor side="Bottom" relative="$parent/PlayerFrame4" pos="Min" offset="0"/>
+                        <Width val="0"/>
+                        <Height val="#BottomPanelSlotHeight"/>
+                    </Frame>
+                    
+                    <Frame type="HeroLeaderPanelPlayerFrame" name="PlayerFrame4" template="StatsOverviewPanel/StatsOverviewPanelPlayerFrameTemplate_Blue">
+                        <Anchor side="Top" relative="$this" pos="Max" offset="0"/>
+                        <Anchor side="Left" relative="$parent/PlayerFrame0" pos="Min" offset="0"/>
+                        <Anchor side="Right" relative="$parent/PlayerFrame0" pos="Max" offset="0"/>
+                        <Anchor side="Bottom" relative="$parent" pos="Max" offset="#BottomPanelSlot5BottomOffset"/>
+                        <Width val="0"/>
+                        <Height val="#BottomPanelSlotHeight"/>
+                    </Frame>
+                    
+                    <Frame type="HeroLeaderPanelPlayerFrame" name="PlayerFrame5" template="StatsOverviewPanel/StatsOverviewPanelPlayerFrameTemplate_Red">
+                        <Anchor side="Top" relative="$this" pos="Max" offset="0"/>
+                        <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+                        <Anchor side="Right" relative="$this" pos="Min" offset="0"/>
+                        <Anchor side="Bottom" relative="$parent/PlayerFrame6" pos="Min" offset="0"/>
+                        <Width val="#BottomPanelSlotWidth"/>
+                        <Height val="#BottomPanelSlotHeight"/>
+                    </Frame>
+                    
+                    <Frame type="HeroLeaderPanelPlayerFrame" name="PlayerFrame6" template="StatsOverviewPanel/StatsOverviewPanelPlayerFrameTemplate_Red">
+                        <Anchor side="Top" relative="$this" pos="Max" offset="0"/>
+                        <Anchor side="Left" relative="$parent/PlayerFrame5" pos="Min" offset="0"/>
+                        <Anchor side="Right" relative="$parent/PlayerFrame5" pos="Max" offset="0"/>
+                        <Anchor side="Bottom" relative="$parent/PlayerFrame7" pos="Min" offset="0"/>
+                        <Width val="0"/>
+                        <Height val="#BottomPanelSlotHeight"/>
+                    </Frame>
+                    
+                    <Frame type="HeroLeaderPanelPlayerFrame" name="PlayerFrame7" template="StatsOverviewPanel/StatsOverviewPanelPlayerFrameTemplate_Red">
+                        <Anchor side="Top" relative="$this" pos="Max" offset="0"/>
+                        <Anchor side="Left" relative="$parent/PlayerFrame5" pos="Min" offset="0"/>
+                        <Anchor side="Right" relative="$parent/PlayerFrame5" pos="Max" offset="0"/>
+                        <Anchor side="Bottom" relative="$parent/PlayerFrame8" pos="Min" offset="0"/>
+                        <Width val="0"/>
+                        <Height val="#BottomPanelSlotHeight"/>
+                    </Frame>
+                    
+                    <Frame type="HeroLeaderPanelPlayerFrame" name="PlayerFrame8" template="StatsOverviewPanel/StatsOverviewPanelPlayerFrameTemplate_Red">
+                        <Anchor side="Top" relative="$this" pos="Max" offset="0"/>
+                        <Anchor side="Left" relative="$parent/PlayerFrame5" pos="Min" offset="0"/>
+                        <Anchor side="Right" relative="$parent/PlayerFrame5" pos="Max" offset="0"/>
+                        <Anchor side="Bottom" relative="$parent/PlayerFrame9" pos="Min" offset="0"/>
+                        <Width val="0"/>
+                        <Height val="#BottomPanelSlotHeight"/>
+                    </Frame>
+                    
+                    <Frame type="HeroLeaderPanelPlayerFrame" name="PlayerFrame9" template="StatsOverviewPanel/StatsOverviewPanelPlayerFrameTemplate_Red">
+                        <Anchor side="Top" relative="$this" pos="Max" offset="0"/>
+                        <Anchor side="Left" relative="$parent/PlayerFrame5" pos="Min" offset="0"/>
+                        <Anchor side="Right" relative="$parent/PlayerFrame5" pos="Max" offset="0"/>
+                        <Anchor side="Bottom" relative="$parent" pos="Max" offset="#BottomPanelSlot5BottomOffset"/>
+                        <Width val="0"/>
+                        <Height val="#BottomPanelSlotHeight"/>
+                    </Frame>
+                </Frame>
+            </Frame>
+
+            <Frame type="Label" name="PanelHeader">
+                <Anchor side="Left" relative="$parent/CustomBackgroundImage" pos="Mid" offset="0"/>
+                <Anchor side="Right" relative="$parent/CustomBackgroundImage" pos="Mid" offset="0"/>
+                <Anchor side="Top" relative="$parent" pos="Max" offset="-336"/>
+                <Style val="BottomPanel_Header"/>
+                <Text val="@UI/BottomPanel_Stats"/>
+            </Frame>
+
+            <!--<Frame type="Label" name="LeftTeamName">
+                <Anchor side="Left" relative="$parent/StatsGridImage" pos="Min" offset="20"/>
+                <Anchor side="Top" relative="$parent/CustomBackgroundImage" pos="Max" offset="50"/>
+                <Style val="BottomPanel_TeamName_L"/>
+                <Text val="@UI/HeroDraftTeamReadyPanel/Team0"/>
+            </Frame>
+
+            <Frame type="Label" name="RightTeamName">
+                <Anchor side="Right" relative="$parent/StatsGridImage" pos="Max" offset="20"/>
+                <Anchor side="Top" relative="$parent/LeftTeamName" pos="Min" offset="0"/>
+                <Style val="BottomPanel_TeamName_R"/>
+                <Text val="@UI/HeroDraftTeamReadyPanel/Team1"/>
+            </Frame>-->
+
+            <Frame type="Label" name="ColumnHeader1_L">
+                <Anchor side="Left" relative="$parent/HeroLeaderPanelContainer/TabControl/PlayerFrame0" pos="Min" offset="16"/>
+                <Anchor side="Bottom" relative="$parent" pos="Max" offset="#BottomPanelColumnHeader1_BottomOffset"/>
+                <Width val="#BottomPanelScoreValueWidth"/>
+                <Style val="BottomPanel_ColumnTitle_L"/>
+                <Text val="@UI/BottomPanel_Hero"/>
+            </Frame>
+
+            <Frame type="Label" name="ColumnHeader2_L">
+                <Anchor side="Left" relative="$parent/HeroLeaderPanelContainer/TabControl/PlayerFrame0/StatsContainerFrame/DeathsScoreValueFrame" pos="Min" offset="#BottomPanelColumnHeader2_HorizontalShift"/>
+                <Anchor side="Bottom" relative="$parent/ColumnHeader1_L" pos="Max" offset="0"/>
+                <Width val="#BottomPanelScoreValueWidth"/>
+                <Style val="BottomPanel_ColumnTitle_L"/>
+                <Text val="@UI/BottomPanel_Deaths"/>
+            </Frame>
+
+            <Frame type="Label" name="ColumnHeader3_L">
+                <Anchor side="Left" relative="$parent/ColumnHeader2_L" pos="Max" offset="12"/>
+                <Anchor side="Bottom" relative="$parent/ColumnHeader1_L" pos="Max" offset="0"/>
+                <Width val="100"/>
+                <Style val="BottomPanel_ColumnTitle_L"/>
+                <Text val="@UI/BottomPanel_SiegeDMG"/>
+                <Options val="Ellipsis | NoWrapping | TooltipIfTruncated"/>
+                <AcceptsMouse val="True"/>
+                <AcceptsMouseTooltip val="True"/>
+            </Frame>
+
+            <Frame type="Label" name="ColumnHeader4_L">
+                <Anchor side="Left" relative="$parent/ColumnHeader3_L" pos="Max" offset="5"/>
+                <Anchor side="Bottom" relative="$parent/ColumnHeader1_L" pos="Max" offset="0"/>
+                <Width val="124"/>
+                <Style val="BottomPanel_ColumnTitle_L"/>
+                <Text val="@UI/BottomPanel_HeroDMG"/>
+                <Options val="Ellipsis | NoWrapping | TooltipIfTruncated"/>
+                <AcceptsMouse val="True"/>
+                <AcceptsMouseTooltip val="True"/>
+            </Frame>
+
+            <Frame type="Label" name="ColumnHeader5_L">
+                <Anchor side="Left" relative="$parent/ColumnHeader4_L" pos="Max" offset="-11"/>
+                <Anchor side="Bottom" relative="$parent/ColumnHeader1_L" pos="Max" offset="0"/>
+                <Width val="#BottomPanelScoreValueWidth"/>
+                <Style val="BottomPanel_ColumnTitle_L"/>
+                <Options val="Ellipsis | NoWrapping | TooltipIfTruncated"/>
+                <Text val="@UI/BottomPanel_Role"/>
+            </Frame>
+
+            <Frame type="Label" name="ColumnHeader1_R">
+                <Anchor side="Left" relative="$parent/HeroLeaderPanelContainer/TabControl/PlayerFrame5" pos="Max" offset="-116"/>
+                <Anchor side="Bottom" relative="$parent" pos="Max" offset="#BottomPanelColumnHeader1_BottomOffset"/>
+                <Width val="#BottomPanelScoreValueWidth"/>
+                <Style val="BottomPanel_ColumnTitle_R"/>
+                <Text val="@UI/BottomPanel_Hero"/>
+            </Frame>
+
+            <Frame type="Label" name="ColumnHeader2_R" template="StatsOverviewPanel/StatsOverviewPanelTemplate/StatsOverviewBottomPanel/ColumnHeader2_L">
+                <Anchor side="Left" relative="$parent/HeroLeaderPanelContainer/TabControl/PlayerFrame5/StatsContainerFrame/DeathsScoreValueFrame" pos="Min" offset="#BottomPanelColumnHeader2_HorizontalShift"/>
+                <Style val="BottomPanel_ColumnTitle_R"/>
+            </Frame>
+
+            <Frame type="Label" name="ColumnHeader3_R" template="StatsOverviewPanel/StatsOverviewPanelTemplate/StatsOverviewBottomPanel/ColumnHeader3_L">
+                <Anchor side="Left" relative="$parent/ColumnHeader2_R" pos="Max" offset="12"/>
+                <Style val="BottomPanel_ColumnTitle_R"/>
+            </Frame>
+
+            <Frame type="Label" name="ColumnHeader4_R" template="StatsOverviewPanel/StatsOverviewPanelTemplate/StatsOverviewBottomPanel/ColumnHeader4_L">
+                <Anchor side="Left" relative="$parent/ColumnHeader3_R" pos="Max" offset="5"/>
+                <Style val="BottomPanel_ColumnTitle_R"/>
+            </Frame>
+
+            <Frame type="Label" name="ColumnHeader5_R" template="StatsOverviewPanel/StatsOverviewPanelTemplate/StatsOverviewBottomPanel/ColumnHeader5_L">
+                <Anchor side="Left" relative="$parent/ColumnHeader4_R" pos="Max" offset="-11"/>
+                <Style val="BottomPanel_ColumnTitle_R"/>
+            </Frame>
+        </Frame>
+    </Frame>
+</Desc>

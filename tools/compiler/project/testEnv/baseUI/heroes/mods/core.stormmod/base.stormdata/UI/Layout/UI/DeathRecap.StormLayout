@@ -1,0 +1,2280 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<Desc>
+    
+    <!-- General Constants -->
+    <Constant name="DividerThickness" val="5"/>
+    <Constant name="TotalWidth" val="1310"/>
+    <Constant name="DebuffsWidth" val="750"/>
+    <Constant name="DamageWidth" val="295"/>
+    <Constant name="TotalHeight" val="360"/>
+    <Constant name="UpperSectionHeight" val="245"/>
+    <Constant name="LowerSectionHeight" val="200"/>
+    
+    <!-- Debuff Timeline Constants -->
+    <Constant name="DebuffBarColor1" val="ff1111"/>
+    <Constant name="DebuffBarColor2" val="ffaa11"/>
+    <Constant name="DebuffBarHeight" val="17"/>
+    <Constant name="DebuffLabelHeight" val="21"/>
+    
+    <!-- Damage Taken Constants -->
+    <Constant name="DamageChunkWidth" val="20"/>
+    <Constant name="DamageChunkHeight" val="1"/>
+    <Constant name="DamageChunkBorderLineWidth" val="3"/>
+    <Constant name="DamageChunkBorderLineWidthNegative" val="-3"/>
+    <Constant name="DamageChunkBorderLineColor" val="eeeeee"/>
+    <Constant name="DamageChunkColor1" val="ff5555"/>
+    <Constant name="DamageChunkColor2" val="ffaa55"/>
+    
+    <!-- New Colors 8.28.15 -->
+    <Constant name="DamageChunkColor" val="FF6600"/>
+    <Constant name="HealingChunkColor" val="33DD33"/>
+    <Constant name="HealthChunkColor" val="33DD33"/>
+    
+    <!-- New stuff -->
+    <!-- Effect Bar Constants -->
+    <Constant name="EffectFrameWidth" val="700"/>
+    <Constant name="EffectBarWidth" val="120"/>
+    <Constant name="EffectBarHieght" val="360"/>
+    
+    <!-- Details Constants -->
+    <Constant name="AbilityIconFrameSize" val="64"/>
+
+    <!-- Icon Template -->
+    <Frame type="Image" name="DeathRecapIconImageTemplate">
+        <Width val="52"/>
+        <Height val="52"/>
+        <Texture val="@UI/Storm_UI_InGame_Leader_Talent_Unselected"/>
+        <IgnoreParentColor val="true"/>
+        <ImageMaskTexture val="@UI/Storm_UI_InGame_AbilityButtonBorder_Small_Mask"/>
+        <SubpixelRendering val="True"/>
+    </Frame>
+    
+    <Frame type="Image" name="DeathRecapIconBorderTemplate">
+        <Width val="76"/>
+        <Height val="76"/>
+        <Texture val="@UI/Storm_UI_InGame_AbilityButtonBorder_Small"/>
+        <!--Texture val="@UI/Storm_UI_DeathRecap_Ability_Icon_Border"/-->
+        <!--IgnoreParentColor val="true"/-->
+    </Frame>
+    
+    <!-- Damage Chunk Template -->
+    <Frame type="Image" name="ColorChunk">
+        <Width val="#DamageChunkWidth"/>
+        <Texture val="@UI/StormTempWhite"/>
+        <Color val="#DamageChunkColor1"/>
+        <AcceptsMouse val="false"/>
+        <AcceptsMouseTooltip val="true"/>
+    </Frame>
+    
+    <!-- Damage Amount Label Template -->
+    <Frame type="Label" name="DamageAmountLabelTemplate">
+        <Style val="Heroes_DeathRecapDamageChunkAmountLabelWhite"/>
+    </Frame>
+    
+    <!-- Ability Icon Frame Template -->
+    <Frame type="Frame" name="AbilityIconFrameTemplate">
+        <Height val="#AbilityIconFrameSize"/>
+        <Width val="#AbilityIconFrameSize"/>
+        
+        <Frame type="Image" name="IconImage">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="2"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="-2"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="2"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="-2"/>
+        </Frame>
+    </Frame>
+
+    <Frame type="Frame" name="EffectTimeZoneTemplate">
+        <Width val="100"/>
+        <Height val="450"/>
+        <CollapseLayout val="True"/>
+    
+        <Frame type="Frame" name="HealthChunk">
+            <Height val="1"/>
+            <Width val="#DamageChunkWidth"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="-53"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+            <Visible val="True"/>
+            <Alpha val="100"/>
+            <AlphaMaskSiblings val="True"/>
+            <AcceptsMouse val="True"/>
+
+            <Animation name="HideDotAnim">
+                <Event event="OnShown" action="DirectionForward, Play"/>
+                <Event event="OnHidden" action="Stop"/>
+
+                <Controller type="Visibility" end="Pause" frame="$parent/LineGraphDotImage">
+                    <Key type="Bool" time="0" value="True"/>
+                </Controller>
+            </Animation>
+        </Frame>   
+
+        <!--Frame type="Frame" name="TooltipFrame">
+            <Anchor side="Top" relative="$parent/HealthChunk" pos="Min" offset="-10"/>
+            <Anchor side="Left" relative="$parent/HealthChunk" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent/HealthChunk" pos="Max" offset="0"/>
+            <Anchor side="Bottom" relative="$parent/HealthChunk" pos="Max" offset="50"/>
+            <AcceptsMouse val="False"/>
+
+            <Frame type="Frame" name="LineGraphTooltipFrame">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+                <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+                <AcceptsMouse val="False"/>
+                <Tooltip val="Tooltip"/>
+                <TooltipAnchorPosition val="TopCenter"/>
+                <Tooltip val="TESTESTESTESTEST"/>
+
+                <Animation name="LineGraphDotHoverAnim">
+                    <Event event="OnMouseEnter" action="DirectionForward, Play"/>
+                    <Event event="OnMouseExit" action="DirectionReverse, Play"/>
+
+                    <Controller type="Visibility" end="Pause" frame="$parent/$parent/LineGraphDotImage/LineGraphDotHoverImage">
+                        <Key type="Bool" time="0" value="False"/>
+                        <Key type="Bool" time="0.1" value="True"/>
+                    </Controller>
+                    <Controller type="Fade" end="Pause" frame="$parent/$parent/LineGraphDotImage/LineGraphDotHoverImage">
+                        <Key type="Curve" time="0" value="0"/>
+                        <Key type="Curve" time="0.3" value="255"/>
+                    </Controller>
+                    <Controller type="Visibility" end="Pause" frame="$parent/$parent/HealthAmountLabel">
+                        <Key type="Bool" time="0" value="False"/>
+                        <Key type="Bool" time="0.1" value="True"/>
+                    </Controller>
+                </Animation>
+            </Frame>
+        </Frame-->
+
+        <Frame type="Image" name="LineGraphDotImage">
+            <Anchor side="Top" relative="$parent/HealthChunk" pos="Min" offset="-10"/>
+            <Anchor side="Left" relative="$parent/HealthChunk" pos="Min" offset="38"/>
+            <Visible val="False"/>
+            <RenderPriority val="512"/>
+            <Height val="20"/>
+            <Width val="20"/>
+            <Texture val="@UI/Storm_UI_DeathRecap_Line_Graph_Point"/>
+
+            <Frame type="Image" name="LineGraphDotHoverImage">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="-2"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="-2"/>
+                <RenderPriority val="513"/>
+                <BlendMode val="Add"/>
+                <Visible val="False"/>
+                <Height val="24"/>
+                <Width val="24"/>
+                <Texture val="@UI/Storm_UI_DeathRecap_Line_Graph_Point_Hover"/>
+            </Frame>
+        </Frame>
+
+        <Frame type="Frame" name="HealthGraphTooltipFrame">
+            <Anchor side="Top" relative="$parent/LineGraphDotImage" pos="Min" offset="-10"/>
+            <Anchor side="Left" relative="$parent/LineGraphDotImage" pos="Min" offset="-100"/>
+            <Anchor side="Right" relative="$parent/LineGraphDotImage" pos="Max" offset="100"/>
+            <Anchor side="Bottom" relative="$parent/LineGraphDotImage" pos="Max" offset="100"/>
+
+            <AcceptsMouseTooltip val="True"/>
+            <Tooltip val="Your Health"/>
+            <TooltipAnchorPosition val="TopCenter"/>
+        </Frame>
+        
+        <!--Frame type="Frame" name="HeroImageChunkContainer">
+            <Anchor side="Top" relative="$parent" pos="Max" offset="-51"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="16"/>
+            <Height val="34"/>
+            <Width val="64"/>
+            <RenderPriority val="512"/>
+
+            <Frame type="Image" name="HeroImageChunk">
+                <Width val="64"/>
+                <Height val="34"/>
+                <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+            </Frame>
+        </Frame>
+        
+        <Frame type="Image" name="AbilityIconBorder" template="DeathRecap/DeathRecapIconBorderTemplate">
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="20"/>
+            <RenderPriority val="514"/>
+
+            <Animation name="HideHeroImage">
+                <Event event="OnShown" action="Restart, DirectionForward, Play"/>
+                <Event event="OnHidden" aciton="Stop"/>
+
+                <Controller type="Visibility" end="Pause" frame="$parent/HeroImageChunkContainer">
+                    <Key type="Bool" time="0" value="False"/>
+                </Controller>
+            </Animation>
+        </Frame>                
+        
+        <Frame type="Image" name="AbilityIcon" template="DeathRecap/DeathRecapIconImageTemplate">
+            <Anchor side="Top" relative="$parent/AbilityIconBorder" pos="Min" offset="12"/>
+            <Anchor side="Left" relative="$parent/AbilityIconBorder" pos="Min" offset="3"/>
+            <RenderPriority val="513"/>
+        </Frame>
+        
+        <Frame type="Label" name="EventCountLabel">
+            <Anchor side="Left" relative="$parent/AbilityIcon" pos="Max" offset="-10"/>
+            <Anchor side="Top" relative="$parent/AbilityIcon" pos="Mid" offset="0"/>
+            <Text val="X"/>
+            <Style val="Heroes_DeathRecapEventCountLabel"/>
+            <RenderPriority val="514"/>
+        </Frame>
+        
+        <Frame type="Label" name="HealthAmountLabel" template="DeathRecap/DamageAmountLabelTemplate">
+            <Anchor side="Top" relative="$parent/LineGraphDotImage" pos="Min" offset="-12"/>
+            <Anchor side="Left" relative="$parent/LineGraphDotImage" pos="Max" offset="-4"/>
+            <Visible val="False"/>
+            <Unclipped val="True"/>
+            <RenderPriority val="515"/>
+            <Text val="xx%"/>
+            <Style val="Heroes_DeathRecapTooltipHealth"/>
+        </Frame>
+        
+        <Frame type="Label" name="TimeLabel">
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="30"/>
+            <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+            <Unclipped val="True"/>
+            <Text val="1.1s"/>
+            <Style val="Heroes_DeathRecapGraphDataXAxis"/>
+        </Frame-->        
+    </Frame>
+
+    <Frame type="Frame" name="AbilitiesPanelTimeZoneTemplate">
+        <Width val="112"/>
+        <Height val="550"/>
+        <CollapseLayout val="True"/>
+
+        <Frame type="Frame" name="HealthChunk">
+            <Height val="1"/>
+            <Width val="#DamageChunkWidth"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="-184"/>
+            <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+            <Visible val="True"/>
+            <Alpha val="255"/>
+            <RenderPriority val="513"/>
+
+            <Frame type="Image" name="HealthBarFull2DImage">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+                <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+                <Color val="10122d"/>
+                <Alpha val="0"/>
+            </Frame>
+            
+            <Frame type="Frame" name="HealthBarFillContainer">
+                <Anchor relative="$parent/HealthBarFull2DImage" />
+
+                <Frame type="Image" name="HealthBarFillImage">
+                    <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+                    <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+                    <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+                    <Texture val="@UI/Storm_UI_InGame_DeathRecap_HealthFill"/>
+                </Frame>
+            </Frame>
+            
+            <Frame type="Image" name="HealthBarFull2dImageGlow">
+                <Anchor relative="$parent/HealthBarFillContainer/HealthBarFillImage" offset="-2"/>
+                <Alpha val="0"/>
+                <BlendMode val="Add"/>
+                <Texture val="@UI/Storm_UI_InGame_DeathRecap_HealthFill"/>
+            </Frame>
+
+            <!---Frame type="Image" name="HealthBarGlow">
+                <Anchor side="Top" relative="$parent/HealthBarFillContainer" pos="Min" offset="-11"/>
+                <Anchor side="Bottom" relative="$parent/HealthBarFillContainer" pos="Max" offset="0"/>
+                <Anchor side="Left" relative="$parent/HealthBarFillContainer/HealthBarFillImage" pos="Min" offset="-10"/>
+                <Anchor side="Right" relative="$parent/HealthBarFillContainer/HealthBarFillImage" pos="Max" offset="10"/>
+                <Alpha val="255"/>
+                <Texture val="@UI/Storm_UI_InGame_DeathRecap_HealthBorder"/-->
+                <!-- <BlendMode val="Add"/> -->
+                <!--TextureType val="NineSlice"/>
+                <SubpixelRendering val="True"/>
+                <Unclipped val="True"/>
+            </Frame-->
+
+            <Frame type="Image" name="HealthBarBorderTop">
+                <Anchor side="Top" relative="$parent/HealthBarFillContainer" pos="Min" offset="-12"/>
+                <Anchor side="Left" relative="$parent/HealthBarFillContainer/HealthBarFillImage" pos="Min" offset="-10"/>
+                <Anchor side="Right" relative="$parent/HealthBarFillContainer/HealthBarFillImage" pos="Max" offset="10"/>
+                <Alpha val="255"/>
+                <Texture val="@UI/Storm_UI_InGame_DeathRecap_HealthBorder_Top"/>
+                <SubpixelRendering val="True"/>
+                <!--BlendMode val="Add"/-->
+                <Unclipped val="True"/>
+            </Frame>
+
+            <Frame type="Image" name="HealthBarBorderLeft">
+                <Anchor side="Top" relative="$parent/HealthBarBorderTop" pos="Min" offset="16"/>
+                <Anchor side="Bottom" relative="$parent/HealthBarFillContainer" pos="Max" offset="0"/>
+                <Anchor side="Left" relative="$parent/HealthBarFillContainer/HealthBarFillImage" pos="Min" offset="-10"/>
+                <Anchor side="Right" relative="$parent/HealthBarFillContainer/HealthBarFillImage" pos="Max" offset="10"/>
+                <Alpha val="255"/>
+                <Texture val="@UI/Storm_UI_InGame_DeathRecap_HealthBorder_Side"/>
+                <SubpixelRendering val="True"/>
+                <!--BlendMode val="Add"/-->
+                <Unclipped val="True"/>
+            </Frame>
+
+        </Frame>
+    
+        <Frame type="Frame" name="DamageChunk">
+            <Height val="1"/>
+            <Anchor side="Left" relative="$parent/HealthChunk" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent/HealthChunk" pos="Max" offset="0"/>
+            <Anchor side="Bottom" relative="$parent/HealthChunk" pos="Min" offset="0"/>
+            <Visible val="True"/>
+            <Alpha val="255"/>
+            <RenderPriority val="512"/>
+
+            <Frame type="Image" name="HealthBarFull2DImage">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+                <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+
+                <Color val="dc0000"/>
+                <Alpha val="0"/>
+
+                <Animation name="HideOtherBars">
+                    <Event event="OnShown" action="DirectionForward, Play"/>
+                    <!-- TODO Remove? -->
+                    <Controller type="Visibility" end="Pause" frame="$parent/HealthBarFullImage">
+                        <Key type="Bool" time="0" value="False"/>
+                    </Controller>
+                </Animation>
+                
+                <Animation name="ShowTooltipFrames">
+                    <Event event="OnShown" action="Restart, DirectionForward, Play"/>
+                    <Event event="OnHidden" action="Stop"/>
+
+                    <Controller type="Visibility" end="Pause" frame="$parent/$parent/DamageBarTooltipFrame">
+                        <Key type="Bool" time="0" value="True"/>
+                    </Controller>
+                </Animation>
+            </Frame>
+
+            <Frame type="Frame" name="HealthBarFillContainer">
+                <Anchor relative="$parent/HealthBarFull2DImage" />
+
+                <Frame type="Image" name="HealthBarFillImage">
+                    <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                    <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+                    <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+                    <Texture val="@UI/Storm_UI_InGame_DeathRecap_DamageFill"/>
+                </Frame>
+            </Frame>
+            
+            <Frame type="Image" name="HealthBarFull2dImageGlow">
+                <Anchor relative="$parent/HealthBarFillContainer/HealthBarFillImage"/>
+                <Alpha val="0"/>
+                <BlendMode val="Add"/>
+                <Texture val="@UI/Storm_UI_InGame_DeathRecap_DamageFill"/>
+            </Frame>
+
+            <!--Frame type="Image" name="HealthBarGlow">
+                <Anchor side="Top" relative="$parent/HealthBarFillContainer" pos="Min" offset="-11"/>
+                <Anchor side="Bottom" relative="$parent/HealthBarFillContainer" pos="Max" offset="0"/>
+                <Anchor side="Left" relative="$parent/HealthBarFillContainer/HealthBarFillImage" pos="Min" offset="-10"/>
+                <Anchor side="Right" relative="$parent/HealthBarFillContainer/HealthBarFillImage" pos="Max" offset="10"/>
+                <Alpha val="0"/>
+                <Texture val="@UI/Storm_UI_InGame_DeathRecap_DamageBorder"/>
+                <TextureType val="NineSlice"/>
+                <SubpixelRendering val="True"/>
+                <BlendMode val="Add"/>
+                <Unclipped val="True"/>
+            </Frame-->
+
+            <Frame type="Image" name="HealthBarBorderTop">
+                <Anchor side="Top" relative="$parent/HealthBarFillContainer" pos="Min" offset="-12"/>
+                <Anchor side="Left" relative="$parent/HealthBarFillContainer/HealthBarFillImage" pos="Min" offset="-10"/>
+                <Anchor side="Right" relative="$parent/HealthBarFillContainer/HealthBarFillImage" pos="Max" offset="10"/>
+                <Alpha val="255"/>
+                <Texture val="@UI/Storm_UI_InGame_DeathRecap_DamageBorder_Top"/>
+                <SubpixelRendering val="True"/>
+                <BlendMode val="Add"/>
+                <Unclipped val="True"/>
+            </Frame>
+
+            <Frame type="Image" name="HealthBarBorderLeft">
+                <Anchor side="Top" relative="$parent/HealthBarBorderTop" pos="Min" offset="16"/>
+                <Anchor side="Bottom" relative="$parent/HealthBarFillContainer" pos="Max" offset="0"/>
+                <Anchor side="Left" relative="$parent/HealthBarFillContainer/HealthBarFillImage" pos="Min" offset="-10"/>
+                <Anchor side="Right" relative="$parent/HealthBarFillContainer/HealthBarFillImage" pos="Max" offset="10"/>
+                <Alpha val="255"/>
+                <Texture val="@UI/Storm_UI_InGame_DeathRecap_DamageBorder_Side"/>
+                <SubpixelRendering val="True"/>
+                <BlendMode val="Add"/>
+                <Unclipped val="True"/>
+            </Frame>
+
+            <!-- TODO Remove? -->
+            <Frame type="Image" name="HealthBarFullImage">
+                <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                <Batch val="False"/>
+                <Texture val="@UI/Storm_UI_DeathRecap_Health_Bar_Normal_Full"/>
+            </Frame>
+
+            <Animation name="ShowTooltipAnim">
+                <Event event="OnShown" action="Restart, Play"/>
+                <Event event="OnHidden" action="Stop"/>
+
+                <!--Controller type="Visibility" end="Pause" frame="$parent/DamageBarCapImage">
+                    <Key type="Bool" time="0" value="True"/>
+                </Controller-->
+                <Controller type="Visibility" end="Pause" frame="$parent/DamageBarTooltipFrame">
+                    <Key type="Bool" time="0" value="True"/>
+                </Controller>
+            </Animation>
+        </Frame>   
+
+        <Frame type="Frame" name="DamageBarTooltipFrame">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+            <AcceptsMouse val="True"/>
+            <Visible val="False"/>
+
+            <Frame type="Frame" name="BarGraphTooltipFrame">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+                <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+                <AcceptsMouse val="True"/>
+                <TooltipAnchorPosition val="BottomCenter"/>
+
+                <Tooltip val="---"/>
+
+                <Animation name="HoverAnim">
+                    <Event event="OnMouseEnter" action="DirectionForward, Play"/>
+                    <Event event="OnMouseExit" action="DirectionReverse, Play"/>
+
+                    <!--Controller type="Fade" end="Pause" frame="$parent/$parent/DamageChunk">
+                        <Key type="Curve" time="0" value="100"/>
+                        <Key type="Curve" time="0.1" value="255"/>
+                    </Controller>
+                    <Controller type="Visibility" end="Pause" frame="$parent/$parent/DamageBarCapHoverImage">
+                        <Key type="Bool" time="0" value="False"/>
+                        <Key type="Bool" time="0.1" value="True"/>
+                    </Controller>
+                    <Controller type="Visibility" end="Pause" frame="$parent/$parent/DamageBarCapImage">
+                        <Key type="Bool" time="0" value="True"/>
+                        <Key type="Bool" time="0.1" value="False"/>
+                    </Controller-->
+                    <Controller type="Fade" end="Pause" frame="$parent/$parent/DamageChunk/HealthBarFull2DImageGlow">
+                        <Key type="Curve" time="0" value="0"/>
+                        <Key type="Curve" time="0.1" value="180"/>
+                    </Controller>
+                    <Controller type="Fade" end="Pause" frame="$parent/$parent/HealthChunk/HealthBarFull2DImageGlow">
+                        <Key type="Curve" time="0" value="0"/>
+                        <Key type="Curve" time="0.1" value="180"/>
+                    </Controller>
+                    <Controller type="Fade" end="Pause" frame="$parent/$parent/HeroImageChunkContainer/HeroImageChunk">
+                        <Key type="Curve" time="0" value="180" out="Fast"/>
+                        <Key type="Curve" time="0.2" value="255" in="Slow"/>
+                    </Controller>
+                    <!--Controller type="Visibility" end="Pause" frame="$parent/$parent/DamageHealthAmountLabel">
+                        <Key type="Bool" time="0" value="False"/>
+                        <Key type="Bool" time="0.1" value="True"/>
+                    </Controller-->
+                </Animation>
+            </Frame>
+        </Frame>
+
+        <Frame type="Image" name="DamageBarCapHoverImage">
+            <Anchor side="Top" relative="$parent/DamageChunk" pos="Min" offset="-16"/>
+            <Anchor side="Left" relative="$parent/DamageChunk" pos="Min" offset="16"/>
+            <Visible val="False"/>
+            <Height val="32"/>
+            <Width val="64"/>
+            <Texture val="@UI/Storm_UI_DeathRecap_Health_Bar_Normal_Top"/>
+        </Frame>
+
+        <Frame type="Image" name="DamageBarCapImage">
+            <Anchor side="Top" relative="$parent/DamageChunk" pos="Min" offset="-16"/>
+            <Anchor side="Left" relative="$parent/DamageChunk" pos="Min" offset="16"/>
+            <Visible val="False"/>
+            <Height val="32"/>
+            <Width val="64"/>
+            <Texture val="@UI/Storm_UI_DeathRecap_Health_Bar_Normal_Top_Dim"/>
+        </Frame>
+
+        <Frame type="Frame" name="HealingChunk">
+            <Height val="1"/>
+            <Width val="#DamageChunkWidth"/>
+            <Anchor side="Bottom" relative="$parent/HealthChunk" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+            <Visible val="True"/>
+            <Alpha val="255"/>
+
+            <Frame type="Image" name="HealthBarFull2DImage">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+                <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+
+                <Color val="00aa00"/>
+                <Alpha val="0"/>
+
+                <Animation name="HideOtherBars">
+                    <Event event="OnShown" action="DirectionForward, Play"/>
+
+                    <Controller type="Visibility" end="Pause" frame="$parent/HealthBarFullImage">
+                        <Key type="Bool" time="0" value="False"/>
+                    </Controller>
+                </Animation>
+                <!--Animation name="ShowTooltipFrames">
+                    <Event event="OnShown" action="Restart, DirectionForward, Play"/>
+                    <Event event="OnHidden" action="Stop"/>
+
+                    <Controller type="Visibility" end="Pause" frame="$parent/HealingBarTooltipFrame">
+                        <Key type="Bool" time="0" value="True"/>
+                    </Controller>
+                </Animation-->
+            </Frame>
+
+            <Frame type="Frame" name="HealthBarFillContainer">
+                <Anchor relative="$parent/HealthBarFull2DImage" />
+
+                <Frame type="Image" name="HealthBarFillImage">
+                    <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                    <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+                    <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+                    <Texture val="@UI/Storm_UI_InGame_DeathRecap_HealFill"/>
+                </Frame>
+            </Frame>
+
+            <Frame type="Image" name="HealthBarFull2dImageGlow">
+                <Anchor relative="$parent/HealthBarFillContainer/HealthBarFillImage"/>
+                <Alpha val="0"/>
+                <BlendMode val="Add"/>
+                <Texture val="@UI/Storm_UI_InGame_DeathRecap_HealFill"/>
+            </Frame>
+
+            <!--Frame type="Image" name="HealthBarGlow">
+                <Anchor side="Top" relative="$parent/HealthBarFillContainer" pos="Min" offset="-11"/>
+                <Anchor side="Bottom" relative="$parent/HealthBarFillContainer" pos="Max" offset="0"/>
+                <Anchor side="Left" relative="$parent/HealthBarFillContainer/HealthBarFillImage" pos="Min" offset="-10"/>
+                <Anchor side="Right" relative="$parent/HealthBarFillContainer/HealthBarFillImage" pos="Max" offset="10"/>
+                <Alpha val="255"/>
+                <Texture val="@UI/Storm_UI_InGame_DeathRecap_HealBorder"/>
+                <TextureType val="NineSlice"/>
+                <SubpixelRendering val="True"/>
+                <BlendMode val="Add"/>
+                <Unclipped val="True"/>
+            </Frame-->
+
+            <Frame type="Image" name="HealthBarBorderTop">
+                <Anchor side="Top" relative="$parent/HealthBarFillContainer" pos="Min" offset="-12"/>
+                <Anchor side="Left" relative="$parent/HealthBarFillContainer/HealthBarFillImage" pos="Min" offset="-10"/>
+                <Anchor side="Right" relative="$parent/HealthBarFillContainer/HealthBarFillImage" pos="Max" offset="10"/>
+                <Alpha val="255"/>
+                <Texture val="@UI/Storm_UI_InGame_DeathRecap_HealBorder_Top"/>
+                <SubpixelRendering val="True"/>
+                <BlendMode val="Add"/>
+                <Unclipped val="True"/>
+            </Frame>
+
+            <Frame type="Image" name="HealthBarBorderLeft">
+                <Anchor side="Top" relative="$parent/HealthBarBorderTop" pos="Min" offset="16"/>
+                <Anchor side="Bottom" relative="$parent/HealthBarFillContainer" pos="Max" offset="0"/>
+                <Anchor side="Left" relative="$parent/HealthBarFillContainer/HealthBarFillImage" pos="Min" offset="-10"/>
+                <Anchor side="Right" relative="$parent/HealthBarFillContainer/HealthBarFillImage" pos="Max" offset="10"/>
+                <Alpha val="255"/>
+                <Texture val="@UI/Storm_UI_InGame_DeathRecap_HealBorder_Side"/>
+                <SubpixelRendering val="True"/>
+                <BlendMode val="Add"/>
+                <Unclipped val="True"/>
+            </Frame>
+            
+            <Frame type="Image" name="HealthBarFullImage">
+                <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                <Texture val="@UI/Storm_UI_DeathRecap_Health_Bar_Healing_Full"/>
+            </Frame>
+
+            <Animation name="HideCap">
+                <Event event="OnShown" action="Restart, Play"/>
+                <Event event="OnHidden" action="Stop"/>
+
+                <!--Controller type="Visibility" end="Pause" frame="$parent/HealingBarCapImage">
+                    <Key type="Bool" time="0" value="True"/>
+                </Controller-->
+                <Controller type="Visibility" end="Pause" frame="$parent/HealingBarTooltipFrame">
+                    <Key type="Bool" time="0" value="True"/>
+                </Controller>
+            </Animation>
+        </Frame>   
+
+        <Frame type="Frame" name="HealingBarTooltipFrame">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+            <AcceptsMouse val="True"/>
+            <Visible val="False"/>
+
+            <Frame type="Frame" name="BarGraphTooltipFrame">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+                <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+                <AcceptsMouse val="True"/>
+                <TooltipAnchorPosition val="BottomCenter"/>
+
+                <Tooltip val="---"/>
+
+                <Animation name="HoverAnim">
+                    <Event event="OnMouseEnter" action="DirectionForward, Play"/>
+                    <Event event="OnMouseExit" action="DirectionReverse, Play"/>
+
+                    <!--Controller type="Fade" end="Pause" frame="$parent/$parent/HealingChunk">
+                        <Key type="Curve" time="0" value="100"/>
+                        <Key type="Curve" time="0.1" value="255"/>
+                    </Controller>
+                    <Controller type="Visibility" end="Pause" frame="$parent/$parent/HealingBarCapHoverImage">
+                        <Key type="Bool" time="0" value="False"/>
+                        <Key type="Bool" time="0.1" value="True"/>
+                    </Controller>
+                    <Controller type="Visibility" end="Pause" frame="$parent/$parent/HealingBarCapImage">
+                        <Key type="Bool" time="0" value="True"/>
+                        <Key type="Bool" time="0.1" value="False"/>
+                    </Controller-->
+                    <Controller type="Fade" end="Pause" frame="$parent/$parent/HealingChunk/HealthBarFull2DImageGlow">
+                        <Key type="Curve" time="0" value="0"/>
+                        <Key type="Curve" time="0.1" value="180"/>
+                    </Controller>
+                    <Controller type="Fade" end="Pause" frame="$parent/$parent/HealthChunk/HealthBarFull2DImageGlow">
+                        <Key type="Curve" time="0" value="0"/>
+                        <Key type="Curve" time="0.1" value="180"/>
+                    </Controller>
+                    <Controller type="Fade" end="Pause" frame="$parent/$parent/HeroImageChunkContainer/HeroImageChunk">
+                        <Key type="Curve" time="0" value="180" out="Fast"/>
+                        <Key type="Curve" time="0.2" value="255" in="Slow"/>
+                    </Controller>
+                    <!--Controller type="Visibility" end="Pause" frame="$parent/$parent/HealingHealthAmountLabel">
+                        <Key type="Bool" time="0" value="False"/>
+                        <Key type="Bool" time="0.1" value="True"/>
+                    </Controller-->
+                </Animation>
+            </Frame>
+        </Frame>
+
+        <Frame type="Image" name="HealingBarCapHoverImage">
+            <Anchor side="Top" relative="$parent/HealingChunk" pos="Min" offset="-30"/>
+            <Anchor side="Left" relative="$parent/HealingChunk" pos="Min" offset="8"/>
+            <Visible val="False"/>
+            <Height val="60"/>
+            <Width val="80"/>
+            <Texture val="@UI/Storm_UI_DeathRecap_Health_Bar_Healing_Top"/>
+        </Frame>
+
+        <Frame type="Image" name="HealingBarCapImage">
+            <Anchor side="Top" relative="$parent/HealingChunk" pos="Min" offset="-16"/>
+            <Anchor side="Left" relative="$parent/HealingChunk" pos="Min" offset="16"/>
+            <Visible val="False"/>
+            <Height val="32"/>
+            <Width val="64"/>
+            <Texture val="@UI/Storm_UI_DeathRecap_Health_Bar_Healing_Top_Dim"/>
+        </Frame>
+        
+        <Frame type="Frame" name="HeroImageChunkContainer">
+            <Anchor side="Top" relative="$parent/HealthChunk" pos="Max" offset="32"/>
+            <Anchor side="Left" relative="$parent/HealthChunk" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent/HealthChunk" pos="Mid" offset="0"/>
+            <Width val="112"/>
+            <Height val="140"/>
+            <Alpha val="255"/>
+            <Unclipped val="True"/>    
+
+            <Frame type="Image" name="HeroImageChunk">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="8"/>
+                <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+                <Width val="90"/>
+                <Height val="90"/>
+                <Alpha val="180"/>
+            </Frame>
+            
+            <Frame type="Image" name="HeroImageFrame">
+                <Anchor side="Top" relative="$parent/HeroImageChunk" pos="Min" offset="-7"/>
+                <Anchor side="Left" relative="$parent/HeroImageChunk" pos="Mid" offset="0"/>
+                <Anchor side="Right" relative="$parent/HeroImageChunk" pos="Mid" offset="0"/>
+                <Texture val="@UI/Storm_UI_InGame_DeathRecap_PortraitBorder"/>
+            </Frame>
+
+        </Frame>
+
+        
+        <Frame type="Image" name="AbilityIconBorder" template="DeathRecap/DeathRecapIconBorderTemplate">
+            <Anchor side="Bottom" relative="$parent/HeroImageChunkContainer" pos="Max" offset="10"/>
+            <Anchor side="Right" relative="$parent/HeroImageChunkContainer" pos="Max" offset="10"/>
+            <RenderPriority val="514"/>
+            <Unclipped val="True"/>
+
+            <!--Animation name="HideHeroPortrait">
+                <Event event="OnShown" action="Restart, DirectionForward, Play"/>
+                <Event event="OnHidden" action="Stop"/>
+
+                <Controller type="Visibility" end="Pause" frame="$parent/HeroImageChunkContainer">
+                    <Key type="Bool" time="0" value="False"/>
+                </Controller>
+            </Animation-->
+        </Frame>                
+        
+        <Frame type="Image" name="AbilityIcon" template="DeathRecap/DeathRecapIconImageTemplate">
+            <Anchor side="Top" relative="$parent/AbilityIconBorder" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent/AbilityIconBorder" pos="Mid" offset="0"/>
+            <Anchor side="Left" relative="$parent/AbilityIconBorder" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent/AbilityIconBorder" pos="Mid" offset="0"/>
+            <RenderPriority val="513"/>
+            <CollapseLayout val="True"/>
+            <Unclipped val="True"/>
+        </Frame>
+        
+        <Frame type="Label" name="EventCountLabel">
+            <Anchor side="Left" relative="$parent/AbilityIcon" pos="Max" offset="-20"/>
+            <Anchor side="Top" relative="$parent/AbilityIcon" pos="Mid" offset="0"/>
+            <Text val="X"/>
+            <Style val="Heroes_DeathRecapEventCountLabel"/>
+            <RenderPriority val="514"/>
+            <Unclipped val="True"/>
+        </Frame>
+        
+        <Frame type="Label" name="DamageHealthAmountLabel" template="DeathRecap/DamageAmountLabelTemplate">
+            <Anchor side="Top" relative="$parent/DamageChunk" pos="Min" offset="-10"/>
+            <Anchor side="Left" relative="$parent/DamageChunk" pos="Min" offset="30"/>
+            <Visible val="False"/>
+            <Unclipped val="True"/>
+            <RenderPriority val="515"/>
+            <Text val="xx%"/>
+            <Style val="Heroes_DeathRecapTooltipHealth"/>
+        </Frame>
+
+        <Frame type="Label" name="HealingHealthAmountLabel" template="DeathRecap/DamageAmountLabelTemplate">
+            <Anchor side="Top" relative="$parent/HealingChunk" pos="Min" offset="-10"/>
+            <Anchor side="Left" relative="$parent/HealingChunk" pos="Min" offset="30"/>
+            <Visible val="False"/>
+            <Unclipped val="True"/>
+            <RenderPriority val="515"/>
+            <Text val="xx%"/>
+            <Style val="Heroes_DeathRecapTooltipHealth"/>
+        </Frame>
+        
+        <Frame type="Label" name="TimeLabel">
+            <Anchor side="Top" relative="$parent/HealthChunk" pos="Max" offset="4"/>
+            <Anchor side="Right" relative="$parent/HealthChunk" pos="Mid" offset="0"/>
+            <Anchor side="Left" relative="$parent/HealthChunk" pos="Mid" offset="0"/>
+            <RenderPriority val="515"/>
+            <Unclipped val="True"/>
+            <Text val="1.1s"/>
+            <Style val="Heroes_DeathRecapGraphDataXAxis"/>
+        </Frame>        
+    </Frame>
+
+    <Frame type="Frame" name="HealthBarTemplate">
+        <Height val="200"/>
+        <Width val="1000"/>
+
+        <Frame type="Label" name="HealthLabel">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="30"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="75"/>
+            <Style val="Heroes_DeathRecapMaxDamagersHeader"/>
+            <Text val="Health"/>
+        </Frame>
+
+        <Frame type="Image" name="HealthBarBackgroundImage">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="20"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="175"/>
+            <Height val="40"/>
+            <Width val="700"/>
+            <ColorAdjustMode val="Fill"/>
+            <AdjustmentColor val="042b00"/>
+            <Texture val="@UI/StormTempWhite"/>
+        </Frame>
+
+        <Frame type="Image" name="HealthBarImage">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="20"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="175"/>
+            <Height val="40"/>
+            <Width val="500"/>
+            <CollapseLayout val="True"/>
+            <ColorAdjustMode val="Fill"/>
+            <AdjustmentColor val="08fa0f"/>
+            <Texture val="@UI/StormTempWhite"/>
+        </Frame>
+
+        <Frame type="Image" name="DamageBarImage">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="20"/>
+            <Anchor side="Left"  relative="$parent/HealthBarImage" pos="Max" offset="0"/>
+            <Height val="40"/>
+            <Width val="100"/>
+            <!--ColorAdjustMode val="Fill"/>
+            <AdjustmentColor val="fa0808"/-->
+            <Texture val="@UI/StormTempWhite"/>
+        </Frame>
+
+        <Frame type="Label" name="HealthPercentLabel">
+            <Anchor side="Top" relative="$parent/HealthBarBackgroundImage" pos="Min" offset="50"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="175"/>
+            <Style val="Heroes_DeathRecapMaxDamagersPercent"/>
+            <Text val="90%"/>
+        </Frame>
+
+        <Frame type="Label" name="HealthAmountLabel">
+            <Anchor side="Top" relative="$parent/HealthPercentLabel" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent/HealthPercentLabel" pos="Max" offset="200"/>
+            <Style val="Heroes_DeathRecapMaxDamagersPercent"/>
+            <Text val="4738/6000"/>
+        </Frame>
+    </Frame>
+
+    <Frame type="Frame" name="TimeZoneTooltipTemplate">
+        <Height val="200"/>
+        <Width val="350"/>
+
+        <Frame type="Label" name="ToolipLabel">
+            <Anchor relative="$parent"/>
+            <Text val="Damage and other stuffs"/>
+        </Frame>
+
+    </Frame>
+    
+    <Frame type="Frame" name="HighestDamagePanelTemplate">
+        <Height val="144"/>
+        <Width val="396"/>
+                
+        <Frame type="Image" name="HighestDamagerPortraitBackgroundImage">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+            <Visible val="False"/>
+            <RenderPriority val="511"/>
+            <Height val="132"/>
+            <Width val="132"/>
+            <Texture val="@UI/Storm_UI_DeathRecap_Highest_Damagers_Portrait_Background"/>
+
+            <Frame type="Image" name="MaxDamagerPortrait">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="24"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="24"/>
+                <RenderPriority val="513"/>
+                <Height val="84"/>
+                <Width val="84"/>
+                <Texture val="@UI/Storm_UI_InGame_Leader_DeathIcon"/>
+                <ImageMaskTexture val="@UI/Storm_UI_DeathRecap_Highest_Damagers_PortraitMask"/>
+            </Frame>
+            
+            <Frame type="Image" name="MaxDamagerPortraitCoverImage">
+                <Anchor side="Top" relative="$parent/MaxDamagerPortrait" pos="Mid" offset="0"/>
+                <Anchor side="Bottom" relative="$parent/MaxDamagerPortrait" pos="Mid" offset="0"/>
+                <Anchor side="Left" relative="$parent/MaxDamagerPortrait" pos="Mid" offset="0"/>
+                <Anchor side="Right" relative="$parent/MaxDamagerPortrait" pos="Mid" offset="0"/>
+                <Texture val="@UI/Storm_UI_DeathRecap_Highest_Damagers_PortraitCover"/>
+                <RenderPriority val="513"/>
+            </Frame>
+
+            <Frame type="ProgressBar" name="HighestDamagerPercentProgressBar">
+                <Anchor relative="$parent"/>
+                <RenderPriority val="512"/>
+                <Height val="132"/>
+                <Width val="132"/>
+                <FillInset val="0.0"/>
+                <Circular val="True"/>
+                <CircularStart val="0"/>
+                <CircularEndOffset val="360"/>
+                <MinValue val="1"/>
+                <MaxValue val="100"/>
+                <Value val="60"/>
+                
+                <Frame type="Frame" name="FillImageContainer">
+                    <Anchor relative="$parent"/>
+
+                    <Frame type="Image" name="FillImage">
+                        <Anchor relative="$parent"/>
+                        <Texture val="@UI/Storm_UI_DeathRecap_Highest_Damagers_Background_Progress_Bar"/>
+                        <TextureType layer="0" val="Circular"/>
+                    </Frame>
+                </Frame>
+            </Frame>
+
+            <Frame type="Frame" name="PortraitTooltipFrame">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="5"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="5"/>
+                <Anchor side="Right" relative="$parent" pos="Max" offset="-5"/>
+                <Anchor side="Bottom" relative="$parent" pos="Max" offset="-5"/>
+                <AcceptsMouseTooltip val="True"/>
+                <Tooltip val="@UI/DeathRecapMostDamagePercentTooltip"/>
+                <TooltipAnchorPosition val="TopCenter"/>
+            </Frame>
+        </Frame>
+
+        <Frame type="Label" name="MaxDamagerAmountLabel">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent/MaxDamagerPercentLabel" pos="Max" offset="-16"/>
+            <Text val="XX%"/>
+            <Style val="Heroes_DeathRecapMaxDamagersPercent"/>
+            <RenderPriority val="513"/>
+
+            <Animation name="Show/HidePercentLabel">
+                <Event event="OnShown" action="DirectionForward, Play"/>
+                <Event event="OnHidden" action="Stop"/>
+
+                <Controller type="Visibility" end="Pause" frame="$parent/MaxDamagerPercentLabel">
+                    <Key type="Bool" time="0" value="True"/>
+                </Controller>
+                <Controller type="Visibility" end="Pause" frame="$parent/HighestDamagerPortraitBackgroundImage">
+                    <Key type="Bool" time="0" value="True"/>
+                </Controller>
+                <Controller type="Visibility" end="Pause" frame="$parent/MaxDamagerPlacementLabel">
+                    <Key type="Bool" time="0" value="True"/>
+                </Controller>
+            </Animation>
+        </Frame>
+
+        <Frame type="Frame" name="AmountLabelTooltipFrame">
+            <Anchor side="Top" relative="$parent/MaxDamagerAmountLabel" pos="Min" offset="5"/>
+            <Anchor side="Left" relative="$parent/MaxDamagerAmountLabel" pos="Min" offset="5"/>
+            <Anchor side="Right" relative="$parent/MaxDamagerAmountLabel" pos="Max" offset="20"/>
+            <Anchor side="Bottom" relative="$parent/MaxDamagerAmountLabel" pos="Max" offset="-5"/>
+            <AcceptsMouseTooltip val="True"/>
+            <Tooltip val="@UI/DeathRecapMostDamagePercentTooltip"/>
+            <TooltipAnchorPosition val="TopCenter"/>
+        </Frame>
+
+        <Frame type="Label" name="MaxDamagerPercentLabel">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="5"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+            <Visible val="False"/>
+            <Text val="%"/>
+            <Style val="Heroes_DeathRecapMaxDamagersPercentSmall"/>
+        </Frame>
+        
+        <Frame type="Label" name="MaxDamagerHeroNameLabel">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="146"/>
+            <Width val="180"/>
+            <Text val="HeroName"/>
+            <Style val="Heroes_DeathRecapMaxDamagersHeader"/>
+            <Options val="Ellipsis | NoWrapping | TooltipIfTruncated"/>
+            <AcceptsMouseTooltip val="True"/>
+            <RenderPriority val="513"/>
+        </Frame>
+
+        <Frame type="Label" name="MaxDamagerNameLabel">
+            <Anchor side="Top" relative="$parent/MaxDamagerHeroNameLabel" pos="Min" offset="22"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="146"/>
+            <Text val="PlayerName"/>
+            <Style val="Heroes_DeathRecapMaxDamagersPlayer"/>
+            <RenderPriority val="513"/>
+        </Frame>
+
+        <Frame type="Label" name="MaxDamagerPlacementLabel">
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="40"/>
+            <Visible val="False"/>
+            <Text val="@UI/DeathRecapMostDamage1st"/>
+            <Style val="Heroes_DeathRecapMaxDamagersPlacement"/>
+            <RenderPriority val="513"/>
+        </Frame>
+
+        <Frame type="Image" name="HighestDamagerAbilityImage1">
+            <Anchor side="Top" relative="$parent/MaxDamagerNameLabel" pos="Max" offset="5"/>
+            <Anchor side="Left" relative="$parent/HighestDamagerPortraitBackgroundImage" pos="Max" offset="16"/>
+            <Height val="24"/>
+            <Width val="248"/>
+            <Texture val="@UI/Storm_UI_DeathRecap_Highest_Damagers_Abilities_Bar_Empty"/>
+
+            <Frame type="Image" name="AbilityProgressBar">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                <Height val="24"/>
+                <Width val="248"/>
+                <Texture val="@UI/Storm_UI_DeathRecap_Highest_Damagers_Abilities_Progress_Bar"/>
+            </Frame>
+        </Frame>
+
+        <Frame type="Frame" name="HighestDamagerAbilityTooltip1">
+            <Anchor side="Top" relative="$parent/HighestDamagerAbilityImage1" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent/HighestDamagerAbilityImage1" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent/HighestDamagerAbilityImage1" pos="Max" offset="0"/>
+            <Anchor side="Bottom" relative="$parent/HighestDamagerAbilityImage1" pos="Max" offset="0"/>
+            <AcceptsMouseTooltip val="True"/>
+            <Tooltip val="---"/>
+            <TooltipAnchorPosition val="BottomCenter"/>
+        </Frame>
+
+        <Frame type="Label" name="HighestDamagerAbilityLabel1">
+            <Anchor side="Top" relative="$parent/HighestDamagerAbilityImage1" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent/HighestDamagerAbilityImage1" pos="Min" offset="8"/>
+            <Width val="190"/>
+            <Options val="Ellipsis | NoWrapping | TooltipIfTruncated"/>
+            <Style val="Heroes_DeathRecapMaxDamagersAbilityInfo"/>
+            <Text val="Ability"/>
+        </Frame>
+
+        <Frame type="Label" name="HighestDamagerAbilityAmount1">
+            <Anchor side="Top" relative="$parent/HighestDamagerAbilityImage1" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent/HighestDamagerAbilityImage1" pos="Max" offset="-6"/>
+            <Style val="Heroes_DeathRecapMaxDamagersAbilityInfoRight"/>
+            <Text val="xx,xxx"/>
+        </Frame>
+
+        <Frame type="Image" name="HighestDamagerAbilityImage2">
+            <Anchor side="Top" relative="$parent/HighestDamagerAbilityImage1" pos="Max" offset="3"/>
+            <Anchor side="Left" relative="$parent/HighestDamagerAbilityImage1" pos="Min" offset="0"/>
+            <Height val="24"/>
+            <Width val="248"/>
+            <Texture val="@UI/Storm_UI_DeathRecap_Highest_Damagers_Abilities_Bar_Empty"/>
+
+            <Frame type="Image" name="AbilityProgressBar">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                <Height val="24"/>
+                <Width val="248"/>
+                <Texture val="@UI/Storm_UI_DeathRecap_Highest_Damagers_Abilities_Progress_Bar"/>
+            </Frame>
+        </Frame>
+
+        <Frame type="Frame" name="HighestDamagerAbilityTooltip2">
+            <Anchor side="Top" relative="$parent/HighestDamagerAbilityImage2" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent/HighestDamagerAbilityImage2" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent/HighestDamagerAbilityImage2" pos="Max" offset="0"/>
+            <Anchor side="Bottom" relative="$parent/HighestDamagerAbilityImage2" pos="Max" offset="0"/>
+            <AcceptsMouseTooltip val="True"/>
+            <Tooltip val="---"/>
+            <TooltipAnchorPosition val="BottomCenter"/>
+        </Frame>
+
+        <Frame type="Label" name="HighestDamagerAbilityLabel2">
+            <Anchor side="Top" relative="$parent/HighestDamagerAbilityImage2" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent/HighestDamagerAbilityImage2" pos="Min" offset="8"/>
+            <Width val="190"/>
+            <Options val="Ellipsis | NoWrapping | TooltipIfTruncated"/>
+            <Style val="Heroes_DeathRecapMaxDamagersAbilityInfo"/>
+            <Text val="Ability"/>
+        </Frame>
+
+        <Frame type="Label" name="HighestDamagerAbilityAmount2">
+            <Anchor side="Top" relative="$parent/HighestDamagerAbilityImage2" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent/HighestDamagerAbilityImage2" pos="Max" offset="-6"/>
+            <Style val="Heroes_DeathRecapMaxDamagersAbilityInfoRight"/>
+            <Text val="xx,xxx"/>
+        </Frame>
+
+        <Frame type="Image" name="HighestDamagerAbilityImage3">
+            <Anchor side="Top" relative="$parent/HighestDamagerAbilityImage2" pos="Max" offset="3"/>
+            <Anchor side="Left" relative="$parent/HighestDamagerAbilityImage2" pos="Min" offset="0"/>
+            <Height val="24"/>
+            <Width val="248"/>
+            <Texture val="@UI/Storm_UI_DeathRecap_Highest_Damagers_Abilities_Bar_Empty"/>
+
+            <Frame type="Image" name="AbilityProgressBar">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                <Height val="24"/>
+                <Width val="248"/>
+                <Texture val="@UI/Storm_UI_DeathRecap_Highest_Damagers_Abilities_Progress_Bar"/>
+            </Frame>
+        </Frame>
+
+        <Frame type="Frame" name="HighestDamagerAbilityTooltip3">
+            <Anchor side="Top" relative="$parent/HighestDamagerAbilityImage3" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent/HighestDamagerAbilityImage3" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent/HighestDamagerAbilityImage3" pos="Max" offset="0"/>
+            <Anchor side="Bottom" relative="$parent/HighestDamagerAbilityImage3" pos="Max" offset="0"/>
+            <AcceptsMouseTooltip val="True"/>
+            <Tooltip val="---"/>
+            <TooltipAnchorPosition val="BottomCenter"/>
+        </Frame>
+
+        <Frame type="Label" name="HighestDamagerAbilityLabel3">
+            <Anchor side="Top" relative="$parent/HighestDamagerAbilityImage3" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent/HighestDamagerAbilityImage3" pos="Min" offset="8"/>
+            <Width val="190"/>
+            <Options val="Ellipsis | NoWrapping | TooltipIfTruncated"/>
+            <Style val="Heroes_DeathRecapMaxDamagersAbilityInfo"/>
+            <Text val="Ability"/>
+        </Frame>
+
+        <Frame type="Label" name="HighestDamagerAbilityAmount3">
+            <Anchor side="Top" relative="$parent/HighestDamagerAbilityImage3" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent/HighestDamagerAbilityImage3" pos="Max" offset="-6"/>
+            <Style val="Heroes_DeathRecapMaxDamagersAbilityInfoRight"/>
+            <Text val="xx,xxx"/>
+        </Frame>
+    </Frame>
+    
+    <!-- Death Recap Panel Template -->
+    <Frame type="Frame" name="DeathRecapPanelTemplate">
+        <Width val="1350"/>
+        <Height val="820"/>
+        <!--AcceptsMouse val="True"/-->
+
+        <Frame type="Image" name="BackgroundImage">
+            <Anchor relative="$parent"/>
+            <RenderPriority val="508"/>
+            <Texture val="@UI/Storm_UI_DeathRecap_Death_Recap_Background"/>
+            <Alpha val="200"/>
+        </Frame>
+        
+        <!-- Highest Damagers Panel -->
+        <Frame type="Frame" name="HighestDamagersPanel">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="-20"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+            <Height val="300"/>
+            <Width val="1350"/>
+
+            <Frame type="Label" name="HighestDamageInfoLabel" template="DeathRecap/DamageAmountLabelTemplate">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="36"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="45"/>
+                <Style val="Heroes_DeathRecapHeader"/>
+                <Text val="@UI/DeathRecapMostDamageTitle"/>
+            </Frame>
+
+            <Frame type="Image" name="HighestDamageBackgroundTopImage">
+                <Anchor side="Top" relative="$parent/HighestDamageInfoLabel" pos="Min" offset="40"/>
+                <Anchor side="Left" relative="$parent/HighestDamageInfoLabel" pos="Min" offset="0"/>
+                <Height val="4"/>
+                <Width val="1268"/>
+                <Texture val="@UI/Storm_UI_DeathRecap_Highest_Damagers_Background_Top"/>
+            </Frame>
+
+            <Frame type="Frame" name="HighestDamage1" template="DeathRecap/HighestDamagePanelTemplate">
+                <Anchor side="Top" relative="$parent/HighestDamageInfoLabel" pos="Min" offset="50"/>
+                <Anchor side="Left" relative="$parent/HighestDamageInfoLabel" pos="Min" offset="0"/>
+            </Frame>
+            
+            <Frame type="Frame" name="HighestDamage2" template="DeathRecap/HighestDamagePanelTemplate">
+                <Anchor side="Top" relative="$parent/HighestDamage1" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/HighestDamage1" pos="Max" offset="30"/>
+
+                <Frame type="Label" name="MaxDamagerPlacementLabel">
+                    <Text val="@UI/DeathRecapMostDamage2nd"/>
+                </Frame>
+            </Frame>
+            
+            <Frame type="Frame" name="HighestDamage3" template="DeathRecap/HighestDamagePanelTemplate">
+                <Anchor side="Top" relative="$parent/HighestDamage2" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/HighestDamage2" pos="Max" offset="30"/>
+
+                <Frame type="Label" name="MaxDamagerPlacementLabel">
+                    <Text val="@UI/DeathRecapMostDamage3rd"/>
+                </Frame>
+            </Frame>
+
+            <Frame type="Image" name="HighestDamageBackgroundImage">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="38"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="35"/>
+                <RenderPriority val="510"/>
+                <Height val="196"/>
+                <Width val="1280"/>
+                <Texture val="@UI/Storm_UI_DeathRecap_Highest_Damagers_Background"/>
+            </Frame>
+        </Frame>
+        
+        <Frame type="Label" name="GraphTitleLabel">
+            <Anchor side="Top" relative="$parent/AbilitiesPanel" pos="Min" offset="26"/>
+            <Anchor side="Left" relative="$parent/AbilitiesPanel" pos="Min" offset="70"/>
+            <Text val="@UI/DeathRecapGraphTitle"/>
+            <Style val="Heroes_DeathRecapHeader"/>
+        </Frame>
+
+        <Frame type="Label" name="GraphLabel">
+            <Anchor side="Bottom" relative="$parent/GraphTitleLabel" pos="Max" offset="0"/>
+            <Anchor side="Left" relative="$parent/GraphTitleLabel" pos="Max" offset="20"/>
+            <Text val=""/>
+            <Style val="Heroes_DeathRecapMaxDamagersPlayer"/>
+        </Frame>
+
+        <Frame type="Image" name="GraphLabelBarImage">
+            <Anchor side="Bottom" relative="$parent/GraphLabel" pos="Max" offset="5"/>
+            <Anchor side="Left" relative="$parent/GraphLabel" pos="Min" offset="0"/>
+            <Height val="4"/>
+            <Width val="864"/>
+            <Texture val="@UI/Storm_UI_DeathRecap_Graph_Label_Bar"/>
+        </Frame>
+
+        <Frame type="Label" name="GraphBottomLabel">
+            <Anchor side="Bottom" relative="$parent/AbilitiesPanel/HealthAxisLineVertical" pos="Max" offset="0"/>
+            <Anchor side="Right" relative="$parent/AbilitiesPanel/HealthAxisLineVertical" pos="Min" offset="0"/>
+            <Text val="0"/>
+            <Style val="Heroes_DeathRecapGraphDataYAxis"/>
+        </Frame>
+
+        <Frame type="Image" name="GraphBackgroundImage">
+            <Anchor side="Top" relative="$parent/AbilitiesPanel" pos="Min" offset="75"/>
+            <Anchor side="Left" relative="$parent/AbilitiesPanel" pos="Min" offset="85"/>
+            <RenderPriority val="511"/>
+            <Height val="300"/>
+            <Width val="1300"/>
+            <Texture val="@UI/Storm_UI_DeathRecap_Background_Grid"/>
+            <Tiled val="True"/>
+        </Frame>
+
+        <Frame type="Image" name="GraphBackgroundMaskTopImage">
+            <Anchor side="Top" relative="$parent/GraphBackgroundImage" pos="Min" offset="-10"/>
+            <Anchor side="Left" relative="$parent/GraphBackgroundImage" pos="Min" offset="0"/>
+            <RenderPriority val="511"/>
+            <Height val="128"/>
+            <Width val="1300"/>
+            <Rotation val="-180"/>
+            <Texture val="@UI/Storm_UI_DeathRecap_Background_Grid_Mask"/>
+            <TextureType val="NineSlice"/>
+        </Frame>
+
+        <Frame type="Image" name="GraphBackgroundMaskRightImage">
+            <Anchor side="Top" relative="$parent/GraphBackgroundImage" pos="Min" offset="100"/>
+            <Anchor side="Right" relative="$parent/GraphBackgroundImage" pos="Max" offset="55"/>
+            <RenderPriority val="511"/>
+            <Height val="128"/>
+            <Width val="300"/>
+            <Rotation val="-90"/>
+            <Texture val="@UI/Storm_UI_DeathRecap_Background_Grid_Mask"/>
+            <TextureType val="NineSlice"/>
+        </Frame>
+
+        <!-- Damage Taken -->
+        <Frame type="Frame" name="DamageTakenContainerFrame">
+            <Anchor side="Top" relative="$parent/AbilitiesPanel" pos="Min" offset="78"/>
+            <Anchor side="Left" relative="$parent/AbilitiesPanel" pos="Min" offset="0"/>
+            <Visible val="False"/>
+            <Height val="400"/>
+            <Width val="1350"/>
+
+            <Frame type="Frame" name="DamageTakenPanel">
+                <Anchor side="Left" relative="$parent/$parent/AbilitiesPanel" pos="Min" offset="0"/>
+                <Anchor side="Top" relative="$parent/$parent/AbilitiesPanel" pos="Min" offset="0"/>  
+                <Width val="1350"/>
+                <Height val="555"/>
+                <Alpha val="75"/>
+                <RenderPriority val="512"/>
+                <Visible val="True"/>
+
+                <Frame type="Frame" name="EffectTimeZone12" template="DeathRecap/EffectTimeZoneTemplate">
+                    <Anchor side="Bottom" relative="$parent" pos="Max" offset="-30"/>
+                    <Anchor side="Left" relative="$parent" pos="Min" offset="100"/>
+
+                    <Frame type="Image" name="LineGraphDotImage">
+                        <Animation name="HideLineAnim">
+                            <Event event="OnShown" action="DirectionForward, Play"/>
+                            <Event event="OnHIdden" action="Stop"/>
+
+                            <Controller type="Visibility" end="Pause" frame="$parent/$parent/LineFrame9">
+                                <Key type="Bool" time="0" value="True"/>
+                            </Controller>
+                        </Animation>
+                    </Frame>
+                </Frame>
+
+                <Frame type="Image" name="LineFrame11">
+                    <Anchor side="Top" relative="$parent/EffectTimeZone12/LineGraphDotImage" pos="Min" offset="5"/>
+                    <Anchor side="Left" relative="$parent/EffectTimeZone12/LineGraphDotImage" pos="Min" offset="9"/>
+                    <Visible val="False"/>
+                    <RenderPriority val="511"/>
+                    <Height val="10"/>
+                    <RotationPosition val="MiddleLeft"/>
+                    <Texture val="@UI/Storm_UI_DeathRecap_Line_Graph_Line"/>
+                </Frame>
+
+                <Frame type="Frame" name="EffectTimeZone11" template="DeathRecap/EffectTimeZoneTemplate">
+                    <Anchor side="Bottom" relative="$parent/EffectTimeZone12" pos="Max" offset="0"/>
+                    <Anchor side="Left" relative="$parent/EffectTimeZone12" pos="Max" offset="0"/>
+
+                    <Frame type="Image" name="LineGraphDotImage">
+                        <Animation name="HideLineAnim">
+                            <Event event="OnShown" action="DirectionForward, Play"/>
+                            <Event event="OnHIdden" action="Stop"/>
+
+                            <Controller type="Visibility" end="Pause" frame="$parent/$parent/LineFrame9">
+                                <Key type="Bool" time="0" value="True"/>
+                            </Controller>
+                        </Animation>
+                    </Frame>
+                </Frame>
+
+                <Frame type="Image" name="LineFrame10">
+                    <Anchor side="Top" relative="$parent/EffectTimeZone11/LineGraphDotImage" pos="Min" offset="5"/>
+                    <Anchor side="Left" relative="$parent/EffectTimeZone11/LineGraphDotImage" pos="Min" offset="9"/>
+                    <Visible val="False"/>
+                    <RenderPriority val="511"/>
+                    <Height val="10"/>
+                    <RotationPosition val="MiddleLeft"/>
+                    <Texture val="@UI/Storm_UI_DeathRecap_Line_Graph_Line"/>
+                </Frame>
+                
+                <Frame type="Frame" name="EffectTimeZone10" template="DeathRecap/EffectTimeZoneTemplate">
+                    <Anchor side="Bottom" relative="$parent/EffectTimeZone11" pos="Max" offset="0"/>
+                    <Anchor side="Left" relative="$parent/EffectTimeZone11" pos="Max" offset="0"/>
+
+                    <Frame type="Image" name="LineGraphDotImage">
+                        <Animation name="HideLineAnim">
+                            <Event event="OnShown" action="DirectionForward, Play"/>
+                            <Event event="OnHIdden" action="Stop"/>
+
+                            <Controller type="Visibility" end="Pause" frame="$parent/$parent/LineFrame9">
+                                <Key type="Bool" time="0" value="True"/>
+                            </Controller>
+                        </Animation>
+                    </Frame>
+                </Frame>
+
+                <Frame type="Image" name="LineFrame9">
+                    <Anchor side="Top" relative="$parent/EffectTimeZone10/LineGraphDotImage" pos="Min" offset="5"/>
+                    <Anchor side="Left" relative="$parent/EffectTimeZone10/LineGraphDotImage" pos="Min" offset="9"/>
+                    <Visible val="False"/>
+                    <RenderPriority val="511"/>
+                    <Height val="10"/>
+                    <RotationPosition val="MiddleLeft"/>
+                    <Texture val="@UI/Storm_UI_DeathRecap_Line_Graph_Line"/>
+                </Frame>
+                         
+                <Frame type="Frame" name="EffectTimeZone9" template="DeathRecap/EffectTimeZoneTemplate">
+                    <Anchor side="Bottom" relative="$parent/EffectTimeZone10" pos="Max" offset="0"/>
+                    <Anchor side="Left" relative="$parent/EffectTimeZone10" pos="Max" offset="0"/>
+
+                    <Frame type="Image" name="LineGraphDotImage">
+                        <Animation name="HideLineAnim">
+                            <Event event="OnShown" action="DirectionForward, Play"/>
+                            <Event event="OnHIdden" action="Stop"/>
+
+                            <Controller type="Visibility" end="Pause" frame="$parent/$parent/LineFrame8">
+                                <Key type="Bool" time="0" value="True"/>
+                            </Controller>
+                        </Animation>
+                    </Frame>
+                </Frame>
+
+                <Frame type="Image" name="LineFrame8">
+                    <Anchor side="Top" relative="$parent/EffectTimeZone9/LineGraphDotImage" pos="Min" offset="5"/>
+                    <Anchor side="Left" relative="$parent/EffectTimeZone9/LineGraphDotImage" pos="Min" offset="9"/>
+                    <Visible val="False"/>
+                    <RenderPriority val="511"/>
+                    <Height val="10"/>
+                    <RotationPosition val="MiddleLeft"/>
+                    <Texture val="@UI/Storm_UI_DeathRecap_Line_Graph_Line"/>
+                </Frame>
+                
+                <Frame type="Frame" name="EffectTimeZone8" template="DeathRecap/EffectTimeZoneTemplate">
+                    <Anchor side="Bottom" relative="$parent/EffectTimeZone9" pos="Max" offset="0"/>
+                    <Anchor side="Left" relative="$parent/EffectTimeZone9" pos="Max" offset="0"/>
+
+                    <Frame type="Image" name="LineGraphDotImage">
+                        <Animation name="HideLineAnim">
+                            <Event event="OnShown" action="DirectionForward, Play"/>
+                            <Event event="OnHIdden" action="Stop"/>
+
+                            <Controller type="Visibility" end="Pause" frame="$parent/$parent/LineFrame7">
+                                <Key type="Bool" time="0" value="True"/>
+                            </Controller>
+                        </Animation>
+                    </Frame>
+                </Frame>
+
+                <Frame type="Image" name="LineFrame7">
+                    <Anchor side="Top" relative="$parent/EffectTimeZone8/LineGraphDotImage" pos="Min" offset="5"/>
+                    <Anchor side="Left" relative="$parent/EffectTimeZone8/LineGraphDotImage" pos="Min" offset="9"/>
+                    <Visible val="False"/>
+                    <RenderPriority val="511"/>
+                    <Height val="10"/>
+                    <RotationPosition val="MiddleLeft"/>
+                    <Texture val="@UI/Storm_UI_DeathRecap_Line_Graph_Line"/>
+                </Frame>
+                
+                <Frame type="Frame" name="EffectTimeZone7" template="DeathRecap/EffectTimeZoneTemplate">
+                    <Anchor side="Bottom" relative="$parent/EffectTimeZone8" pos="Max" offset="0"/>
+                    <Anchor side="Left" relative="$parent/EffectTimeZone8" pos="Max" offset="0"/>
+
+                    <Frame type="Image" name="LineGraphDotImage">
+                        <Animation name="HideLineAnim">
+                            <Event event="OnShown" action="DirectionForward, Play"/>
+                            <Event event="OnHIdden" action="Stop"/>
+
+                            <Controller type="Visibility" end="Pause" frame="$parent/$parent/LineFrame6">
+                                <Key type="Bool" time="0" value="True"/>
+                            </Controller>
+                        </Animation>
+                    </Frame>
+                </Frame>
+
+                <Frame type="Image" name="LineFrame6">
+                    <Anchor side="Top" relative="$parent/EffectTimeZone7/LineGraphDotImage" pos="Min" offset="5"/>
+                    <Anchor side="Left" relative="$parent/EffectTimeZone7/LineGraphDotImage" pos="Min" offset="9"/>
+                    <Visible val="False"/>
+                    <RenderPriority val="511"/>
+                    <Height val="10"/>
+                    <RotationPosition val="MiddleLeft"/>
+                    <Texture val="@UI/Storm_UI_DeathRecap_Line_Graph_Line"/>
+                </Frame>
+                
+                <Frame type="Frame" name="EffectTimeZone6" template="DeathRecap/EffectTimeZoneTemplate">   
+                    <Anchor side="Bottom" relative="$parent/EffectTimeZone7" pos="Max" offset="0"/>
+                    <Anchor side="Left" relative="$parent/EffectTimeZone7" pos="Max" offset="0"/>
+
+                    <Frame type="Image" name="LineGraphDotImage">
+                        <Animation name="HideLineAnim">
+                            <Event event="OnShown" action="DirectionForward, Play"/>
+                            <Event event="OnHIdden" action="Stop"/>
+
+                            <Controller type="Visibility" end="Pause" frame="$parent/$parent/LineFrame5">
+                                <Key type="Bool" time="0" value="True"/>
+                            </Controller>
+                        </Animation>
+                    </Frame>
+                </Frame>
+
+                <Frame type="Image" name="LineFrame5">
+                    <Anchor side="Top" relative="$parent/EffectTimeZone6/LineGraphDotImage" pos="Min" offset="5"/>
+                    <Anchor side="Left" relative="$parent/EffectTimeZone6/LineGraphDotImage" pos="Min" offset="9"/>
+                    <Visible val="False"/>
+                    <RenderPriority val="511"/>
+                    <Height val="10"/>
+                    <RotationPosition val="MiddleLeft"/>
+                    <Texture val="@UI/Storm_UI_DeathRecap_Line_Graph_Line"/>
+                </Frame>
+                
+                <Frame type="Frame" name="EffectTimeZone5" template="DeathRecap/EffectTimeZoneTemplate">   
+                    <Anchor side="Bottom" relative="$parent/EffectTimeZone6" pos="Max" offset="0"/>
+                    <Anchor side="Left" relative="$parent/EffectTimeZone6" pos="Max" offset="0"/>
+
+                    <Frame type="Image" name="LineGraphDotImage">
+                        <Animation name="HideLineAnim">
+                            <Event event="OnShown" action="DirectionForward, Play"/>
+                            <Event event="OnHIdden" action="Stop"/>
+
+                            <Controller type="Visibility" end="Pause" frame="$parent/$parent/LineFrame4">
+                                <Key type="Bool" time="0" value="True"/>
+                            </Controller>
+                        </Animation>
+                    </Frame>
+                </Frame>
+
+                <Frame type="Image" name="LineFrame4">
+                    <Anchor side="Top" relative="$parent/EffectTimeZone5/LineGraphDotImage" pos="Min" offset="5"/>
+                    <Anchor side="Left" relative="$parent/EffectTimeZone5/LineGraphDotImage" pos="Min" offset="9"/>
+                    <Visible val="False"/>
+                    <RenderPriority val="511"/>
+                    <Height val="10"/>
+                    <RotationPosition val="MiddleLeft"/>
+                    <Texture val="@UI/Storm_UI_DeathRecap_Line_Graph_Line"/>
+                </Frame>
+                
+                <Frame type="Frame" name="EffectTimeZone4" template="DeathRecap/EffectTimeZoneTemplate">
+                    <Anchor side="Bottom" relative="$parent/EffectTimeZone5" pos="Max" offset="0"/>
+                    <Anchor side="Left" relative="$parent/EffectTimeZone5" pos="Max" offset="0"/>
+
+                    <Frame type="Image" name="LineGraphDotImage">
+                        <Animation name="HideLineAnim">
+                            <Event event="OnShown" action="DirectionForward, Play"/>
+                            <Event event="OnHIdden" action="Stop"/>
+
+                            <Controller type="Visibility" end="Pause" frame="$parent/$parent/LineFrame3">
+                                <Key type="Bool" time="0" value="True"/>
+                            </Controller>
+                        </Animation>
+                    </Frame>
+                </Frame>
+
+                <Frame type="Image" name="LineFrame3">
+                    <Anchor side="Top" relative="$parent/EffectTimeZone4/LineGraphDotImage" pos="Min" offset="5"/>
+                    <Anchor side="Left" relative="$parent/EffectTimeZone4/LineGraphDotImage" pos="Min" offset="9"/>
+                    <Visible val="False"/>
+                    <RenderPriority val="511"/>
+                    <Height val="10"/>
+                    <RotationPosition val="MiddleLeft"/>
+                    <Texture val="@UI/Storm_UI_DeathRecap_Line_Graph_Line"/>
+                </Frame>
+                
+                <Frame type="Frame" name="EffectTimeZone3" template="DeathRecap/EffectTimeZoneTemplate">   
+                    <Anchor side="Bottom" relative="$parent/EffectTimeZone4" pos="Max" offset="0"/>
+                    <Anchor side="Left" relative="$parent/EffectTimeZone4" pos="Max" offset="0"/>
+
+                    <Frame type="Image" name="LineGraphDotImage">
+                        <Animation name="HideLineAnim">
+                            <Event event="OnShown" action="DirectionForward, Play"/>
+                            <Event event="OnHIdden" action="Stop"/>
+
+                            <Controller type="Visibility" end="Pause" frame="$parent/$parent/LineFrame2">
+                                <Key type="Bool" time="0" value="True"/>
+                            </Controller>
+                        </Animation>
+                    </Frame>
+                </Frame>
+
+                <Frame type="Image" name="LineFrame2">
+                    <Anchor side="Top" relative="$parent/EffectTimeZone3/LineGraphDotImage" pos="Min" offset="5"/>
+                    <Anchor side="Left" relative="$parent/EffectTimeZone3/LineGraphDotImage" pos="Min" offset="9"/>
+                    <Visible val="False"/>
+                    <RenderPriority val="511"/>
+                    <Height val="10"/>
+                    <RotationPosition val="MiddleLeft"/>
+                    <Texture val="@UI/Storm_UI_DeathRecap_Line_Graph_Line"/>
+                </Frame>
+                
+                <Frame type="Frame" name="EffectTimeZone2" template="DeathRecap/EffectTimeZoneTemplate">   
+                    <Anchor side="Bottom" relative="$parent/EffectTimeZone3" pos="Max" offset="0"/>
+                    <Anchor side="Left" relative="$parent/EffectTimeZone3" pos="Max" offset="0"/>
+
+                    <Frame type="Image" name="LineGraphDotImage">
+                        <Animation name="HideLineAnim">
+                            <Event event="OnShown" action="DirectionForward, Play"/>
+                            <Event event="OnHIdden" action="Stop"/>
+
+                            <Controller type="Visibility" end="Pause" frame="$parent/$parent/LineFrame1">
+                                <Key type="Bool" time="0" value="True"/>
+                            </Controller>
+                        </Animation>
+                    </Frame>
+                </Frame>
+
+                <Frame type="Image" name="LineFrame1">
+                    <Anchor side="Top" relative="$parent/EffectTimeZone2/LineGraphDotImage" pos="Min" offset="5"/>
+                    <Anchor side="Left" relative="$parent/EffectTimeZone2/LineGraphDotImage" pos="Min" offset="9"/>
+                    <Visible val="False"/>
+                    <RenderPriority val="511"/>
+                    <Height val="10"/>
+                    <RotationPosition val="MiddleLeft"/>
+                    <Texture val="@UI/Storm_UI_DeathRecap_Line_Graph_Line"/>
+                </Frame>
+                
+                <Frame type="Frame" name="EffectTimeZone1" template="DeathRecap/EffectTimeZoneTemplate">   
+                    <Anchor side="Bottom" relative="$parent/EffectTimeZone2" pos="Max" offset="0"/>
+                    <Anchor side="Left" relative="$parent/EffectTimeZone2" pos="Max" offset="0"/>
+                </Frame>
+
+                <!--Frame type="Image" name="HealthAxisLineVertical">
+                    <Width val="16"/>
+                    <Height val="376"/>
+                    <Anchor side="Top" relative="$parent" pos="Min" offset="102"/>
+                    <Anchor side="Left" relative="$parent" pos="Min" offset="78"/>
+                    <Texture val="@UI/Storm_UI_DeathRecap_Graph_Border_Vertical"/>
+                </Frame-->
+                
+                <!--Frame type="Label" name="HealthAxisLabel">
+                    <Width val="140"/>
+                    <Rotation val="-90"/>
+                    <RotationPosition val="TopLeft"/>
+                    <Anchor side="Bottom" relative="$parent/HealthAxisLineVertical" pos="Mid" offset="80"/>
+                    <Anchor side="Left" relative="$parent/HealthAxisLineVertical" pos="Min" offset="-22"/>
+                    <Text val="@UI/DeathRecapHealthGraphLabel"/>
+                    <Style val="Heroes_DeathRecapGraphLabel"/>
+                </Frame>
+
+                <Frame type="Label" name="GraphTopLabel">
+                    <Anchor side="Top" relative="$parent" pos="Min" offset="100"/>
+                    <Anchor side="Right" relative="$parent/HealthAxisLineVertical" pos="Min" offset="0"/>
+                    <RenderPriority val="514"/>
+                    <Text val="100"/>
+                    <Style val="Heroes_DeathRecapGraphDataYAxis"/>
+                </Frame>
+           
+                <Frame type="Image" name="HealthAxisLineHorizontalBottom">
+                    <Width val="800"/>
+                    <Height val="12"/>
+                    <RenderPriority val="511"/>
+                    <Anchor side="Bottom" relative="$parent/HealthAxisLineVertical" pos="Max" offset="0"/>
+                    <Anchor side="Left" relative="$parent/HealthAxisLineVertical" pos="Min" offset="16"/>
+                    <Texture val="@UI/Storm_UI_DeathRecap_Graph_Border_Horizontal"/>
+                </Frame-->
+            </Frame>
+        </Frame>
+        
+        <!-- Abilities Panel -->
+        <Frame type="Frame" name="AbilitiesPanel">
+            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="-75"/> 
+            <Width val="1350"/>
+            <Height val="555"/>
+            <RenderPriority val="513"/>       
+            
+            <Frame type="Frame" name="AbilityTimeZone10" template="DeathRecap/AbilitiesPanelTimeZoneTemplate">
+                <Anchor side="Bottom" relative="$parent/HealthAxisLineHorizontalBottom" pos="Max" offset="177"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="108"/>
+                <RenderPriority val="523"/>
+
+                <Frame type="Frame" name="DamageBarTooltipFrame">
+                    <AcceptsMouse val="True"/>
+
+                    <Animation name="ShowAdditionalInfo">
+                        <Event event="OnMouseEnter" action="Restart, DirectionForward, Play"/>
+                        <Event event="OnMouseExit" action="Stop"/>
+
+                        <Controller type="Fade" end="Pause" frame="$parent/DamageChunk/HealthBarFull2DImageGlow">
+                            <Key type="Curve" time="0" value="0"/>
+                            <Key type="Curve" time="0.1" value="100"/>
+                        </Controller>
+                    </Animation>
+                </Frame>
+
+                <Frame type="Frame" name="HealingBarTooltipFrame">
+                    <AcceptsMouse val="True"/>
+
+                    <Animation name="ShowAdditionalInfo">
+                        <Event event="OnMouseEnter" action="Restart, DirectionForward, Play"/>
+                        <Event event="OnMouseExit" action="Stop"/>
+
+                        <Controller type="Fade" end="Pause" frame="$parent/HealingChunk/HealthBarFull2DImageGlow">
+                            <Key type="Curve" time="0" value="0"/>
+                            <Key type="Curve" time="0.1" value="100"/>
+                        </Controller>
+                    </Animation>
+                </Frame>
+            </Frame>
+                       
+            <Frame type="Frame" name="AbilityTimeZone9" template="DeathRecap/AbilitiesPanelTimeZoneTemplate">
+                <Anchor side="Bottom" relative="$parent/AbilityTimeZone10" pos="Max" offset="0"/>
+                <Anchor side="Left" relative="$parent/AbilityTimeZone10" pos="Max" offset="8"/>
+                <RenderPriority val="522"/>
+
+                <Frame type="Frame" name="DamageBarTooltipFrame">
+                    <AcceptsMouse val="True"/>
+
+                    <Animation name="ShowAdditionalInfo">
+                        <Event event="OnMouseEnter" action="Restart, DirectionForward, Play"/>
+                        <Event event="OnMouseExit" action="Stop"/>
+
+                        <Controller type="Fade" end="Pause" frame="$parent/DamageChunk/HealthBarFull2DImageGlow">
+                            <Key type="Curve" time="0" value="0"/>
+                            <Key type="Curve" time="0.1" value="100"/>
+                        </Controller>
+                    </Animation>
+                </Frame>
+
+                <Frame type="Frame" name="HealingBarTooltipFrame">
+                    <AcceptsMouse val="True"/>
+
+                    <Animation name="ShowAdditionalInfo">
+                        <Event event="OnMouseEnter" action="Restart, DirectionForward, Play"/>
+                        <Event event="OnMouseExit" action="Stop"/>
+
+                        <Controller type="Fade" end="Pause" frame="$parent/HealingChunk/HealthBarFull2DImageGlow">
+                            <Key type="Curve" time="0" value="0"/>
+                            <Key type="Curve" time="0.1" value="100"/>
+                        </Controller>
+                    </Animation>
+                </Frame>
+            </Frame>
+            
+            <Frame type="Frame" name="AbilityTimeZone8" template="DeathRecap/AbilitiesPanelTimeZoneTemplate">
+                <Anchor side="Bottom" relative="$parent/AbilityTimeZone9" pos="Max" offset="0"/>
+                <Anchor side="Left" relative="$parent/AbilityTimeZone9" pos="Max" offset="8"/>
+                <RenderPriority val="521"/>
+
+                <Frame type="Frame" name="DamageBarTooltipFrame">
+                    <AcceptsMouse val="True"/>
+
+                    <Animation name="ShowAdditionalInfo">
+                        <Event event="OnMouseEnter" action="Restart, DirectionForward, Play"/>
+                        <Event event="OnMouseExit" action="Stop"/>
+
+                        <Controller type="Fade" end="Pause" frame="$parent/DamageChunk/HealthBarFull2DImageGlow">
+                            <Key type="Curve" time="0" value="0"/>
+                            <Key type="Curve" time="0.1" value="100"/>
+                        </Controller>
+                    </Animation>
+                </Frame>
+
+                <Frame type="Frame" name="HealingBarTooltipFrame">
+                    <AcceptsMouse val="True"/>
+
+                    <Animation name="ShowAdditionalInfo">
+                        <Event event="OnMouseEnter" action="Restart, DirectionForward, Play"/>
+                        <Event event="OnMouseExit" action="Stop"/>
+
+                        <Controller type="Fade" end="Pause" frame="$parent/HealingChunk/HealthBarFull2DImageGlow">
+                            <Key type="Curve" time="0" value="0"/>
+                            <Key type="Curve" time="0.1" value="100"/>
+                        </Controller>
+                    </Animation>
+                </Frame>
+            </Frame>
+            
+            <Frame type="Frame" name="AbilityTimeZone7" template="DeathRecap/AbilitiesPanelTimeZoneTemplate">
+                <Anchor side="Bottom" relative="$parent/AbilityTimeZone8" pos="Max" offset="0"/>
+                <Anchor side="Left" relative="$parent/AbilityTimeZone8" pos="Max" offset="8"/>
+                <RenderPriority val="520"/>
+
+                <Frame type="Frame" name="DamageBarTooltipFrame">
+                    <AcceptsMouse val="True"/>
+
+                    <Animation name="ShowAdditionalInfo">
+                        <Event event="OnMouseEnter" action="Restart, DirectionForward, Play"/>
+                        <Event event="OnMouseExit" action="Stop"/>
+
+                        <Controller type="Fade" end="Pause" frame="$parent/DamageChunk/HealthBarFull2DImageGlow">
+                            <Key type="Curve" time="0" value="0"/>
+                            <Key type="Curve" time="0.1" value="100"/>
+                        </Controller>
+                    </Animation>
+                </Frame>
+
+                <Frame type="Frame" name="HealingBarTooltipFrame">
+                    <AcceptsMouse val="True"/>
+
+                    <Animation name="ShowAdditionalInfo">
+                        <Event event="OnMouseEnter" action="Restart, DirectionForward, Play"/>
+                        <Event event="OnMouseExit" action="Stop"/>
+
+                        <Controller type="Fade" end="Pause" frame="$parent/HealingChunk/HealthBarFull2DImageGlow">
+                            <Key type="Curve" time="0" value="0"/>
+                            <Key type="Curve" time="0.1" value="100"/>
+                        </Controller>
+                    </Animation>
+                </Frame>
+            </Frame>
+            
+            <Frame type="Frame" name="AbilityTimeZone6" template="DeathRecap/AbilitiesPanelTimeZoneTemplate">   
+                <Anchor side="Bottom" relative="$parent/AbilityTimeZone7" pos="Max" offset="0"/>
+                <Anchor side="Left" relative="$parent/AbilityTimeZone7" pos="Max" offset="8"/>
+                <RenderPriority val="519"/>
+
+                <Frame type="Frame" name="DamageBarTooltipFrame">
+                    <AcceptsMouse val="True"/>
+
+                    <Animation name="ShowAdditionalInfo">
+                        <Event event="OnMouseEnter" action="Restart, DirectionForward, Play"/>
+                        <Event event="OnMouseExit" action="Stop"/>
+
+                        <Controller type="Fade" end="Pause" frame="$parent/DamageChunk/HealthBarFull2DImageGlow">
+                            <Key type="Curve" time="0" value="0"/>
+                            <Key type="Curve" time="0.1" value="100"/>
+                        </Controller>
+                    </Animation>
+                </Frame>
+
+                <Frame type="Frame" name="HealingBarTooltipFrame">
+                    <AcceptsMouse val="True"/>
+
+                    <Animation name="ShowAdditionalInfo">
+                        <Event event="OnMouseEnter" action="Restart, DirectionForward, Play"/>
+                        <Event event="OnMouseExit" action="Stop"/>
+
+                        <Controller type="Fade" end="Pause" frame="$parent/HealingChunk/HealthBarFull2DImageGlow">
+                            <Key type="Curve" time="0" value="0"/>
+                            <Key type="Curve" time="0.1" value="100"/>
+                        </Controller>
+                    </Animation>
+                </Frame>
+            </Frame>
+            
+            <Frame type="Frame" name="AbilityTimeZone5" template="DeathRecap/AbilitiesPanelTimeZoneTemplate">   
+                <Anchor side="Bottom" relative="$parent/AbilityTimeZone6" pos="Max" offset="0"/>
+                <Anchor side="Left" relative="$parent/AbilityTimeZone6" pos="Max" offset="8"/>
+                <RenderPriority val="518"/>
+
+                <Frame type="Frame" name="DamageBarTooltipFrame">
+                    <AcceptsMouse val="True"/>
+
+                    <Animation name="ShowAdditionalInfo">
+                        <Event event="OnMouseEnter" action="Restart, DirectionForward, Play"/>
+                        <Event event="OnMouseExit" action="Stop"/>
+
+                        <Controller type="Fade" end="Pause" frame="$parent/DamageChunk/HealthBarFull2DImageGlow">
+                            <Key type="Curve" time="0" value="0"/>
+                            <Key type="Curve" time="0.1" value="100"/>
+                        </Controller>
+                    </Animation>
+                </Frame>
+
+                <Frame type="Frame" name="HealingBarTooltipFrame">
+                    <AcceptsMouse val="True"/>
+
+                    <Animation name="ShowAdditionalInfo">
+                        <Event event="OnMouseEnter" action="Restart, DirectionForward, Play"/>
+                        <Event event="OnMouseExit" action="Stop"/>
+
+                        <Controller type="Fade" end="Pause" frame="$parent/HealingChunk/HealthBarFull2DImageGlow">
+                            <Key type="Curve" time="0" value="0"/>
+                            <Key type="Curve" time="0.1" value="100"/>
+                        </Controller>
+                    </Animation>
+                </Frame>
+            </Frame>
+            
+            <Frame type="Frame" name="AbilityTimeZone4" template="DeathRecap/AbilitiesPanelTimeZoneTemplate">
+                <Anchor side="Bottom" relative="$parent/AbilityTimeZone5" pos="Max" offset="0"/>
+                <Anchor side="Left" relative="$parent/AbilityTimeZone5" pos="Max" offset="8"/>
+                <RenderPriority val="517"/>
+
+                <Frame type="Frame" name="DamageBarTooltipFrame">
+                    <AcceptsMouse val="True"/>
+
+                    <Animation name="ShowAdditionalInfo">
+                        <Event event="OnMouseEnter" action="Restart, DirectionForward, Play"/>
+                        <Event event="OnMouseExit" action="Stop"/>
+
+                        <Controller type="Fade" end="Pause" frame="$parent/DamageChunk/HealthBarFull2DImageGlow">
+                            <Key type="Curve" time="0" value="0"/>
+                            <Key type="Curve" time="0.1" value="100"/>
+                        </Controller>
+                    </Animation>
+                </Frame>
+
+                <Frame type="Frame" name="HealingBarTooltipFrame">
+                    <AcceptsMouse val="True"/>
+
+                    <Animation name="ShowAdditionalInfo">
+                        <Event event="OnMouseEnter" action="Restart, DirectionForward, Play"/>
+                        <Event event="OnMouseExit" action="Stop"/>
+
+                        <Controller type="Fade" end="Pause" frame="$parent/HealingChunk/HealthBarFull2DImageGlow">
+                            <Key type="Curve" time="0" value="0"/>
+                            <Key type="Curve" time="0.1" value="100"/>
+                        </Controller>
+                    </Animation>
+                </Frame>
+            </Frame>
+            
+            <Frame type="Frame" name="AbilityTimeZone3" template="DeathRecap/AbilitiesPanelTimeZoneTemplate">   
+                <Anchor side="Bottom" relative="$parent/AbilityTimeZone4" pos="Max" offset="0"/>
+                <Anchor side="Left" relative="$parent/AbilityTimeZone4" pos="Max" offset="8"/>
+                <RenderPriority val="516"/>
+
+                <Frame type="Frame" name="DamageBarTooltipFrame">
+                    <AcceptsMouse val="True"/>
+
+                    <Animation name="ShowAdditionalInfo">
+                        <Event event="OnMouseEnter" action="Restart, DirectionForward, Play"/>
+                        <Event event="OnMouseExit" action="Stop"/>
+
+                        <Controller type="Fade" end="Pause" frame="$parent/DamageChunk/HealthBarFull2DImageGlow">
+                            <Key type="Curve" time="0" value="0"/>
+                            <Key type="Curve" time="0.1" value="100"/>
+                        </Controller>
+                    </Animation>
+                </Frame>
+
+                <Frame type="Frame" name="HealingBarTooltipFrame">
+                    <AcceptsMouse val="True"/>
+
+                    <Animation name="ShowAdditionalInfo">
+                        <Event event="OnMouseEnter" action="Restart, DirectionForward, Play"/>
+                        <Event event="OnMouseExit" action="Stop"/>
+
+                        <Controller type="Fade" end="Pause" frame="$parent/HealingChunk/HealthBarFull2DImageGlow">
+                            <Key type="Curve" time="0" value="0"/>
+                            <Key type="Curve" time="0.1" value="100"/>
+                        </Controller>
+                    </Animation>
+                </Frame>
+            </Frame>
+            
+            <Frame type="Frame" name="AbilityTimeZone2" template="DeathRecap/AbilitiesPanelTimeZoneTemplate">   
+                <Anchor side="Bottom" relative="$parent/AbilityTimeZone3" pos="Max" offset="0"/>
+                <Anchor side="Left" relative="$parent/AbilityTimeZone3" pos="Max" offset="8"/>
+                <RenderPriority val="515"/>
+
+                <Frame type="Frame" name="DamageBarTooltipFrame">
+                    <AcceptsMouse val="True"/>
+
+                    <Animation name="ShowAdditionalInfo">
+                        <Event event="OnMouseEnter" action="Restart, DirectionForward, Play"/>
+                        <Event event="OnMouseExit" action="Stop"/>
+
+                        <Controller type="Fade" end="Pause" frame="$parent/DamageChunk/HealthBarFull2DImageGlow">
+                            <Key type="Curve" time="0" value="0"/>
+                            <Key type="Curve" time="0.1" value="100"/>
+                        </Controller>
+                    </Animation>
+                </Frame>
+
+                <Frame type="Frame" name="HealingBarTooltipFrame">
+                    <AcceptsMouse val="True"/>
+
+                    <Animation name="ShowAdditionalInfo">
+                        <Event event="OnMouseEnter" action="Restart, DirectionForward, Play"/>
+                        <Event event="OnMouseExit" action="Stop"/>
+
+                        <Controller type="Fade" end="Pause" frame="$parent/HealingChunk/HealthBarFull2DImageGlow">
+                            <Key type="Curve" time="0" value="0"/>
+                            <Key type="Curve" time="0.1" value="100"/>
+                        </Controller>
+                    </Animation>
+                </Frame>
+            </Frame>
+            
+            <Frame type="Frame" name="AbilityTimeZone1" template="DeathRecap/AbilitiesPanelTimeZoneTemplate">   
+                <Anchor side="Bottom" relative="$parent/AbilityTimeZone2" pos="Max" offset="0"/>
+                <Anchor side="Left" relative="$parent/AbilityTimeZone2" pos="Max" offset="8"/>
+                <RenderPriority val="514"/>
+
+                <Frame type="Frame" name="DamageBarTooltipFrame">
+                    <AcceptsMouse val="True"/>
+
+                    <Animation name="ShowAdditionalInfo">
+                        <Event event="OnMouseEnter" action="Restart, DirectionForward, Play"/>
+                        <Event event="OnMouseExit" action="Stop"/>
+
+                        <Controller type="Fade" end="Pause" frame="$parent/DamageChunk/HealthBarFull2DImageGlow">
+                            <Key type="Curve" time="0" value="0"/>
+                            <Key type="Curve" time="0.1" value="100"/>
+                        </Controller>
+                    </Animation>
+                </Frame>
+
+                <Frame type="Frame" name="HealingBarTooltipFrame">
+                    <AcceptsMouse val="True"/>
+
+                    <Animation name="ShowAdditionalInfo">
+                        <Event event="OnMouseEnter" action="Restart, DirectionForward, Play"/>
+                        <Event event="OnMouseExit" action="Stop"/>
+
+                        <Controller type="Fade" end="Pause" frame="$parent/HealingChunk/HealthBarFull2DImageGlow">
+                            <Key type="Curve" time="0" value="0"/>
+                            <Key type="Curve" time="0.1" value="100"/>
+                        </Controller>
+                    </Animation>
+                </Frame>
+            </Frame>
+
+            <Frame type="Image" name="HealthAxisLineVertical">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="70"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="78"/>
+                <Width val="16"/>
+                <Height val="311"/>
+                <Texture val="@UI/Storm_UI_DeathRecap_Graph_Border_Vertical"/>
+                <TextureType val="NineSlice"/>
+            </Frame>
+            
+            <Frame type="Label" name="HealthAxisLabel">
+                <Width val="275"/>
+                <Rotation val="-90"/>
+                <RotationPosition val="TopLeft"/>
+                <Visible val="True"/>
+                <!--Anchor side="Top" relative="$parent/HealthAxisLineVertical" pos="Mid" offset="0"/-->
+                <Anchor side="Bottom" relative="$parent/HealthAxisLineVertical" pos="Max" offset="0"/>
+                <Anchor side="Left" relative="$parent/HealthAxisLineVertical" pos="Min" offset="-22"/>
+                <Text val="@UI/DeathRecapAbilitiesGraphLabel"/>
+                <Style val="Heroes_DeathRecapGraphLabel"/>
+                <Options val="Ellipsis | NoWrapping | TooltipIfTruncated"/>
+            </Frame>
+
+            <Frame type="Label" name="GraphTopLabel">
+                <Anchor side="Top" relative="$parent/HealthAxisLineVertical" pos="Min" offset="0"/>
+                <Anchor side="Right" relative="$parent/HealthAxisLineVertical" pos="Min" offset="0"/>
+                <RenderPriority val="514"/>
+                <Text val="100"/>
+                <Style val="Heroes_DeathRecapGraphDataYAxis"/>
+            </Frame>
+       
+            <Frame type="Image" name="HealthAxisLineHorizontalBottom">
+                <Width val="1225"/>
+                <Height val="12"/>
+                <RenderPriority val="515"/>
+                <Anchor side="Bottom" relative="$parent/HealthAxisLineVertical" pos="Max" offset="0"/>
+                <Anchor side="Left" relative="$parent/HealthAxisLineVertical" pos="Min" offset="12"/>
+                <Texture val="@UI/Storm_UI_DeathRecap_Graph_Border_Horizontal"/>
+                <TextureType val="NineSlice"/>
+            </Frame>
+        </Frame>
+
+        <!-- Killed By Panel -->
+        <!--Frame type="Frame" name="KilledByPanel">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="10"/>
+            <Height val="520"/>
+            <Width val="450"/>
+            <Visible val="False"/>
+
+            <Frame type="Label" name="KilledByLabel">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="36"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="32"/>
+                <RenderPriority val="514"/>
+                <Text val="@UI/DeathRecapKilledBy"/>
+                <Style val="Heroes_DeathRecapHeader"/>               
+            </Frame>
+
+            <Frame type="Image" name="KilledByTopImage">
+                <Anchor side="Bottom" relative="$parent/KilledByLabel" pos="Max" offset="5"/>
+                <Anchor side="Left" relative="$parent/KilledByLabel" pos="Min" offset="0"/>
+                <RenderPriority val="514"/>
+                <Height val="4"/>
+                <Width val="392"/>
+                <Texture val="@UI/Storm_UI_DeathRecap_Killed_By_Label_Bar"/>
+            </Frame>
+
+            <Frame type="Label" name="KilledByHeroName">
+                <Anchor side="Bottom" relative="$parent" pos="Max" offset="-26"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="60"/>
+                <RenderPriority val="514"/>
+                <Text val="HeroName"/>
+                <Style val="Heroes_DeathRecapMaxDamagersHeader"/>
+            </Frame>
+
+            <Frame type="Label" name="KilledByPlayerName">
+                <Anchor side="Bottom" relative="$parent" pos="Max" offset="-5"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="60"/>
+                <RenderPriority val="514"/>
+                <Text val="PlayerName"/>
+                <Style val="Heroes_DeathRecapMaxDamagersPlayer"/>
+            </Frame>
+
+            <Frame type="Label" name="KilledByAbilityName">
+                <Anchor side="Bottom" relative="$parent" pos="Max" offset="-26"/>
+                <Anchor side="Right" relative="$parent" pos="Max" offset="-60"/>
+                <RenderPriority val="514"/>
+                <Text val="Ability"/>
+                <Style val="Heroes_DeathRecapInfoLarge"/>
+            </Frame>
+
+            <Frame type="Label" name="KilledByAbilityDamage">
+                <Anchor side="Bottom" relative="$parent" pos="Max" offset="-5"/>
+                <Anchor side="Right" relative="$parent" pos="Max" offset="-60"/>
+                <RenderPriority val="514"/>
+                <Text val="XX,XXX"/>
+                <Style val="Heroes_DeathRecapMaxDamagersAbilityInfoRight"/>
+            </Frame>
+
+            <Frame type="Image" name="AbilityIconBorder" template="DeathRecap/DeathRecapIconBorderTemplate">
+                <Anchor side="Bottom" relative="$parent" pos="Max" offset="-6"/>
+                <Anchor side="Right" relative="$parent" pos="Max" offset="-25"/>
+                <Visible val="False"/>
+                <RenderPriority val="514"/>
+            </Frame>                
+            
+            <Frame type="Image" name="AbilityIcon" template="DeathRecap/DeathRecapIconImageTemplate">
+                <Anchor side="Top" relative="$parent/AbilityIconBorder" pos="Min" offset="7"/>
+                <Anchor side="Left" relative="$parent/AbilityIconBorder" pos="Min" offset="2"/>
+                <RenderPriority val="513"/>
+
+                <Animation name="Show/HideIconBorder">
+                    <Event event="OnShown" action="DirectionForward, Play"/>
+                    <Event event="OnHidden" action="Stop"/>
+
+                    <Controller type="Visibility" end="Pause" frame="$parent/AbilityIconBorder">
+                        <Key type="Bool" time="0" value="True"/>
+                    </Controller>
+                </Animation>
+            </Frame>
+
+            <Frame type="HeroCutsceneFrame" name="KilledByCutscene">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                <Height val="565"/>
+                <Width val="450"/>
+                <Visible val="True"/>
+                <RenderPriority val="512"/>
+                <RenderType val="LDR"/>
+                <AutoPlay val="True"/>
+                <File val="Cutscenes/FrameBarbarian.StormCutscene" layer="0"/>
+                <HeroCutsceneDragEnabled val="true"/>
+                <HeroCutsceneType val="ShopTileZoomed"/>
+
+                <Frame type="Image" name="KilledByCutsceneMaskBottomImage">
+                    <Anchor side="Bottom" relative="$parent/$parent" pos="Max" offset="0"/>
+                    <Anchor side="Left" relative="$parent/$parent" pos="Min" offset="0"/>
+                    <Height val="200"/>
+                    <Width val="452"/>
+                    <AlphaLayer val="True" layer="0"/>
+                    <Texture val="@UI/Storm_UI_DeathRecap_Death_Recap_Killed_By_Mask"/>
+                </Frame>
+
+                <Frame type="Image" name="KilledByCutsceneMaskSideImage">
+                    <Anchor side="Top" relative="$parent/$parent" pos="Min" offset="140"/>
+                    <Anchor side="Right" relative="$parent/$parent" pos="Max" offset="180"/>
+                    <Height val="200"/>
+                    <Width val="452"/>
+                    <Rotation val="-90"/>
+                    <Texture val="@UI/Storm_UI_DeathRecap_Death_Recap_Killed_By_Mask"/>
+                </Frame>
+
+                <Frame type="Image" name="KilledByCutsceneMaskTopImage">
+                    <Anchor side="Top" relative="$parent/$parent" pos="Min" offset="-2"/>
+                    <Anchor side="Right" relative="$parent/$parent" pos="Max" offset="0"/>
+                    <Height val="90"/>
+                    <Width val="452"/>
+                    <Rotation val="180"/>
+                    <Texture val="@UI/Storm_UI_DeathRecap_Death_Recap_Killed_By_Mask"/>
+                </Frame>
+
+            </Frame>
+
+            
+        </Frame-->
+    </Frame>
+    
+    <!-- Toast Button -->
+    <Frame type="Button" name="DeathRecapButtonTemplate">
+        <Width val="492"/>
+        <Height val="180"/>
+        <ClickSound val="@UI_Game_Click"/>
+        <Visible val="false"/>
+        
+        <Animation name="Begin">
+            <Event event="Begin" action="Restart,Play"/>
+            <Event event="End" action="Stop"/>
+            <Controller type="Visibility" end="Pause">
+                <Key type="Bool" time="0" value="False"/>
+                <Key type="Bool" time=".01" value="True"/>
+            </Controller>
+            
+            <Controller type="Fade" end="Pause">
+                <Key type="Curve" time="0" value="0"/>
+                <Key type="Curve" time=".15" value="255"/>
+            </Controller>
+
+            <Controller type="Anchor" end="Pause" side="Left" relative="true">
+                <Key type="Curve" time="0" value="-75" out="Slow"/>
+                <Key type="Curve" time=".25" value="0" in="Slow"/>
+            </Controller>
+        </Animation>
+        
+        <Animation name="End">
+            <Event event="End" action="Play"/>
+            <Event event="Begin" action="Stop"/>
+            <Controller type="Visibility" end="Pause">
+                <Key type="Bool" time="0" value="True"/>
+                <Key type="Bool" time=".25" value="False"/>
+            </Controller>
+            
+            <Controller type="Fade" end="Pause">
+                <Key type="Curve" time="0" value="255"/>
+                <Key type="Curve" time=".15" value="0"/>
+            </Controller>
+
+            <Controller type="Anchor" end="Pause" side="Left" relative="true">
+                <Key type="Curve" time="0" value="0" out="Slow"/>
+                <Key type="Curve" time=".25" value="-75" in="Slow"/>
+            </Controller>
+        </Animation>
+
+        <Frame type="Image" name="ToastBackgroundImage">
+            <Anchor relative="$parent"/>
+            <Texture val="@UI/Storm_UI_DeathRecap_Toast_Background"/>
+            <!--RenderPriority val="400"/-->
+        </Frame>
+
+        <Frame type="Image" name="ToastBottomImage">
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="-17"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="6"/>
+            <Height val="32"/>
+            <Width val="472"/>
+            <RenderPriority val="514"/>
+            <Texture val="@UI/Storm_UI_DeathRecap_Toast_Bottom"/>
+        </Frame>
+
+        <Frame type="Image" name="HoverGlowImage">
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="34"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="185"/>
+            <RenderPriority val="514"/>
+            <Height val="124"/>
+            <Width val="684"/>
+            <BlendMode val="Add"/>
+            <Alpha val="0"/>
+            <Unclipped val="True"/>
+            <Texture val="@UI/Storm_UI_DeathRecap_Toast_Hover_Glow"/>
+
+            <Animation name="HoverAnim">
+                <Event event="OnMouseEnter" action="DirectionForward, Play" frame="$parent"/>
+                <Event event="OnMouseExit" action="DirectionReverse, Play" frame="$parent"/>
+
+                <Controller type="Fade" end="Pause">
+                    <Key type="Curve" time="0" value="0"/>
+                    <Key type="Curve" time="0.2" value="255"/>
+                </Controller>
+            </Animation>
+        </Frame>
+        
+         <Frame type="Label" name="FinishedYouLabel">
+            <Anchor side="Left" relative="$parent" pos="Min" offset="16"/>
+            <Anchor side="Top" relative="$parent" pos="Min" offset="10"/>
+            <RenderPriority val="514"/>
+            <Text val="FinishedYouLabel"/>
+            <Style val="Heroes_DeathRecapButtonHeaderGlow"/>
+        </Frame>
+
+        <Frame type="Label" name="PlayerNameLabel">
+            <Anchor side="Top" relative="$parent/FinishedYouLabel" pos="Max" offset="-6"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="16"/>
+            <CollapseLayout val="True"/>
+            <RenderPriority val="514"/>
+            <Text val="PlayerName"/>
+            <Style val="Heroes_DeathRecapButtonHeader"/>
+            <PreserveAnchorOffset val="True"/>
+        </Frame>
+                
+        <Frame type="Label" name="AbilityNameLabel">
+            <Anchor side="Left" relative="$parent/AbilityIconBorder" pos="Max" offset="0"/>
+            <Anchor side="Top" relative="$parent/AbilityIconBorder" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent/AbilityIconBorder" pos="Mid" offset="0"/>
+            <RenderPriority val="514"/>
+            <Text val="Ability"/>
+            <Style val="Heroes_DeathRecapButtonInfo"/>
+        </Frame>
+
+        <Frame type="Image" name="AbilityIconBorder" template="DeathRecap/DeathRecapIconBorderTemplate">
+            <Anchor side="Top" relative="$parent/PlayerNameLabel" pos="Max" offset="0"/>
+            <Anchor side="Left" relative="$parent/DamageSymbolImage" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent/DamageSymbolImage" pos="Mid" offset="0"/>
+            <Height val="35"/>
+            <Width val="35"/>
+            <RenderPriority val="514"/>
+            <PreserveAnchorOffset val="True"/>
+        </Frame>
+        
+        <Frame type="Image" name="AbilityIcon" template="DeathRecap/DeathRecapIconImageTemplate">
+            <Anchor side="Top" relative="$parent/AbilityIconBorder" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent/AbilityIconBorder" pos="Mid" offset="0"/>
+            <Anchor side="Left" relative="$parent/AbilityIconBorder" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent/AbilityIconBorder" pos="Mid" offset="0"/>
+            <Height val="20"/>
+            <Width val="20"/>
+            <RenderPriority val="513"/>
+        </Frame>
+
+        <Frame type="Image" name="DamageSymbolImage">
+            <Anchor side="Top" relative="$parent/AbilityIconBorder" pos="Max" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="20"/>
+            <Height val="20"/>
+            <Width val="20"/>
+            <Texture val="@UI/Storm_UI_DeathRecap_Damage_Sword_Symbol"/>
+        </Frame>
+
+        <Frame type="Label" name="DamageAmountLabel">
+            <Anchor side="Top" relative="$parent/DamageSymbolImage" pos="Mid" offset="0"/>
+            <Anchor side="Left" relative="$parent/DamageSymbolImage" pos="Max" offset="8"/>
+            <Anchor side="Bottom" relative="$parent/DamageSymbolImage" pos="Mid" offset="0"/>
+            <RenderPriority val="514"/>
+            <Text val="XX,XXX (XX%)"/>
+            <Style val="Heroes_DeathRecapButtonInfo"/>
+        </Frame>
+        
+        <Frame type="Label" name="ClickForMoreDetailsLabel">
+            <Anchor side="Right" relative="$parent" pos="Max" offset="-18"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="-16"/>
+            <RenderPriority val="514"/>
+            <Text val="@UI/DeathRecapToastAdditionalInfo"/>
+            <Style val="Heroes_DeathRecapButtonInfoSmall"/>
+            <AcceptsMouseTooltip val="True"/>
+            <Options val="Ellipsis | NoWrapping | TooltipIfTruncated"/>
+        </Frame>
+        
+        <Frame type="Frame" name="ToastCutsceneFrame">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="7"/>
+            <Anchor side="Left" relative="$parent/ToastBackgroundImage" pos="Min" offset="8"/>
+            <Anchor side="Right" relative="$parent/ToastBackgroundImage" pos="Max" offset="-14"/>
+            <Height val="156"/>
+            <Width val="0"/>
+            <Frame type="HeroCutsceneFrame" name="KilledByCutscene">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="-25"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="110"/>
+                <Height val="290"/>
+                <Width val="450"/>
+                <Visible val="True"/>
+                <!--Unclipped val="True"/-->
+                <HeroCutsceneType val="ShopTileZoomed"/>
+                <HeroCutsceneFilter val="SmallTile"/>
+                <RenderPriority val="513"/>
+                <RenderType val="LDR"/>
+                <AutoPlay val="True"/>
+                <File val="Cutscenes/FrameBarbarian.StormCutscene" layer="0"/>
+                <ToneMapping val="false"/>
+            </Frame>
+        </Frame>v
+    </Frame>
+</Desc>

@@ -1,0 +1,288 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<Desc>
+    <DescFlags val="Locked"/>
+    <Constant name="SectionTextOffset" val="5"/>
+    <Constant name="BottomMapObjectiveOffset" val="-76"/>
+
+    <!--=======================================================================================
+    <! MAP ICON TEMPLATE
+    <!======================================================================================-->
+    <Frame type="Frame" name="MapIconTemplate">
+        <Width val="308"/>
+        <Height val="327"/>
+
+        <Frame type="Image" name="BucketFrame">
+            <Anchor side="Left" relative="$parent" pos="Min" offset="-100"/>
+            <Anchor side="Top" relative="$parent" pos="Min" offset="-148"/>
+            <Texture val="@UI/LoadingScreen_Bucket"/>
+            <ColorAdjustMode val="Colorize"/>
+            <Unclipped val="True"/>
+        </Frame>
+
+        <!-- Icon Anchor -->
+        <Frame type="Frame" name="IconAnchorFrame">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+            <Width val="106"/>
+            <Height val="121"/>
+        </Frame>
+
+        <Frame type="Image" name="Icon">
+            <Anchor side="Top" relative="$parent/IconAnchorFrame" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent/IconAnchorFrame" pos="Mid" offset="0"/>
+            <Anchor side="Left" relative="$parent/IconAnchorFrame" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent/IconAnchorFrame" pos="Mid" offset="0"/>
+            <Unclipped val="True"/>
+        </Frame>
+
+        <Frame type="Label" name="ObjectiveTitle">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="130"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="15"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="-15"/>
+            <Text val="Objective"/>
+            <Style val="{$parent/$parent/MapCache/@SectionTitleStyle}"/>
+            <Height val="65"/>
+        </Frame>
+        
+        <Frame type="Label" name="ObjectiveDescription">
+            <Anchor side="Top" relative="$parent/ObjectiveTitle" pos="Max" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="17"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="-17"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="-10"/>
+            <Text val="Description"/>
+            <Style val="{$parent/$parent/MapCache/@DescriptionStyle}"/>
+        </Frame>
+    </Frame>
+
+    <!--=======================================================================================
+    <! HELP TIP TEMPLATE
+    <!======================================================================================-->        
+    <Frame type="Label" name="LoadingHelpLabelTemplate">
+        <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+        <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+        <Width val="1000"/>      
+        <Style val="LoadingHelpLabel"/>            
+        <Visible val="false"/>
+
+        <Animation name="ShowLoadingScreenTip">
+            <Event event="HideLoadingScreenTip" action="Stop" frame="$ancestor[@type=ScreenLoading]"/>
+            <Event event="ShowLoadingScreenTip" action="Play" frame="$ancestor[@type=ScreenLoading]"/>
+            
+            <Controller type="Visibility" end="Pause">
+                <Key type="Bool" time="0" value="true"/>
+            </Controller>          
+        </Animation> 
+
+        <Frame type="PropertyBind" name="BindText">
+            <Anchor relative="$parent"/>
+            <Source frame="$ancestor[@type=ScreenLoading]/LoadingHelpLabel" property="Text"/>
+            <Target frame="$parent" property="Text"/>
+        </Frame>
+    </Frame>
+    
+    <Frame type="Frame" name="LoadingTemplateBase">
+        <Anchor relative="$parent"/>
+        
+        <!--=======================================================================================
+        <! BACKGROUND
+        <!======================================================================================-->
+        <Frame type="Image" name="BackgroundImage">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+            <ScaleWidthToTexture val="true"/>
+            <TextureType val="Normal"/>
+            <Texture val="{$parent/MapCache/@BackgroundImagePath}"/>
+        </Frame>
+
+        <!--=======================================================================================
+        <! MAP STATE AND STYLES
+        <!======================================================================================-->
+        <Frame type="MapCacheFrame" name="MapCache">
+            <Anchor relative="$parent"/>
+            <Link val="{$ancestor[@type=CustomLoadingPanel]/@MapLink}"/>
+        </Frame>
+
+        <StateGroup name="HeaderState">
+            <DefaultState val="Normal"/>
+            <State name="HasExtention">
+                <When type="Property" frame="$ancestor[@type=CustomLoadingPanel]" HasExtentionMod="true"/>
+                <Action type="SetProperty" frame="MapLabel_HeaderTitle" visible="true"/>
+                <Action type="SetProperty" frame="MapLabel_MapTitle" visible="true"/>
+            </State>
+            <State name="Normal">
+                <Action type="SetProperty" frame="MapLabel_Subtitle" visible="true"/>
+                <Action type="SetProperty" frame="MapLabel_Title" visible="true"/>
+            </State>
+        </StateGroup>
+        
+        <!--=======================================================================================
+        <! MAP TITLE
+        <!======================================================================================-->
+        <Frame type="Label" name="MapLabel_Subtitle">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="32"/>
+            <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+            <Text val="@UI/MapLoadingScreen/Welcome"/>
+            <Style val="{$parent/MapCache/@SubTitleStyle}"/>
+            <Visible val="false"/>
+        </Frame>
+        
+        <Frame type="Label" name="MapLabel_Title">
+            <Anchor side="Top" relative="$parent/MapLabel_Subtitle" pos="Max" offset="-8"/>
+            <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+            <Style val="{$parent/MapCache/@TitleStyle}"/>
+            <Text val="{$ancestor[@type=CustomLoadingPanel]/@MapName}"/>
+            <Visible val="false"/>
+        </Frame>
+
+        <!--=======================================================================================
+        <! EXTENTION TITLE
+        <!======================================================================================-->
+        <Frame type="Label" name="MapLabel_HeaderTitle">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="32"/>
+            <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+            <Text val="{$ancestor[@type=CustomLoadingPanel]/@HeaderText}"/>
+            <Style val="{$parent/MapCache/@TitleStyle}"/>
+            <Visible val="false"/>
+        </Frame>
+
+        <Frame type="Label" name="MapLabel_MapTitle">
+            <Anchor side="Top" relative="$parent/MapLabel_HeaderTitle" pos="Max" offset="-8"/>
+            <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+            <Text val="{$ancestor[@type=CustomLoadingPanel]/@MapName}"/>
+            <Style val="{$parent/MapCache/@HeadingStyle}"/>
+            <Visible val="false"/>
+        </Frame>
+
+        <!--=======================================================================================
+        <! MAP MECHANICS
+        <!======================================================================================-->
+        <Frame type="Frame" name="MapObjective1" template="LoadingShared/MapIconTemplate">
+            <Anchor side="Bottom" relative="$parent/MapObjective2" pos="Max" offset="0"/>
+            <Anchor side="Right" relative="$parent/MapObjective2" pos="Min" offset="-7"/>
+        </Frame>
+
+        <Frame type="Frame" name="MapObjective2" template="LoadingShared/MapIconTemplate">
+            <Anchor side="Bottom" relative="$parent/LoadingBarShim" pos="Max" offset="#BottomMapObjectiveOffset"/>
+            <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+        </Frame>
+
+        <Frame type="Frame" name="MapObjective3" template="LoadingShared/MapIconTemplate">
+            <Anchor side="Bottom" relative="$parent/MapObjective2" pos="Max" offset="0"/>
+            <Anchor side="Left" relative="$parent/MapObjective2" pos="Max" offset="7"/>
+        </Frame>
+
+        <Frame type="Frame" name="LoadingBarShim">
+            <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="#BottomMapObjectiveOffset"/>
+            <Width val="1"/>
+            <Height val="1"/>
+            <CollapseLayout val="True"/>
+        </Frame>
+        
+        <!-- TODO: replace with new Property Bind syntax in H.21 -->
+        <Frame type="PropertyBind" name="BindValue">
+            <Anchor relative="$parent"/>
+            <Source frame="$parent/$parent/$parent/LoadingBar/LoadingProgressBar" property="Visible"/>
+            <Target frame="$parent/LoadingBarShim" property="Visible"/>
+        </Frame>
+
+        <!--=======================================================================================
+        <! MAP LOGO
+        <!======================================================================================-->
+        <Frame type="Image" name="ThemeLogoImage">
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+        </Frame>
+        
+        <!--=======================================================================================
+        <! HELP TIP
+        <!======================================================================================-->        
+        <Frame type="Label" name="LoadingHelpLabel" template="LoadingShared/LoadingHelpLabelTemplate">
+            <Anchor side="Top" pos="Max" relative="$parent/MapObjective2" offset="7"/>
+            <Style val="{$parent/MapCache/@TipTextStyle}"/>
+        </Frame>        
+    </Frame>
+
+    <Frame type="Frame" name="LoadingTemplate" template="LoadingShared/LoadingTemplateBase">
+        <Anchor relative="$parent"/>
+        
+        <!--=======================================================================================
+        <! HERO LIST
+        <!======================================================================================-->
+        <Frame type="HeroLoadingPanel" name="HeroLoadingPanel" template="HeroLoadingPanel/HeroLoadingPanelTemplate">
+            <Anchor relative="$parent"/>
+        </Frame>
+    </Frame>
+
+    <Frame type="Frame" name="ArenaLoadingTemplate" template="LoadingShared/LoadingTemplate">
+        <Anchor relative="$parent"/>
+
+        <!--=======================================================================================
+        <! ARENA MAP MECHANICS
+        <!======================================================================================-->
+        <Frame type="Frame" name="MapObjective1">
+            <Anchor side="Bottom" relative="$parent/MapObjective2" pos="Max" offset="0"/>
+            <Anchor side="Right" relative="$parent/MapObjective2" pos="Min" offset="-7"/>
+        </Frame>
+
+        <Frame type="Frame" name="MapObjective2">
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="#BottomMapObjectiveOffset"/>
+            <Anchor side="Left" relative="$parent" pos="Mid" offset="158"/>
+            <Anchor side="Right" relative="$parent" pos="Mid" offset="158"/>
+        </Frame>
+
+        <Frame type="Frame" name="MapObjective3">
+            <Visible val="false"/>
+        </Frame>
+    </Frame>
+
+    <Frame type="Frame" name="AttackDefendLoadingTemplate" template="LoadingShared/LoadingTemplate">
+        <Anchor relative="$parent"/>
+
+        <Frame type="Label" name="MapLabel_MapAttackDefend">
+            <Anchor side="Top" relative="$parent/MapLabel_MapTitle" pos="Max" offset="-4"/>
+            <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+            <Text val="@UI/MapLoadingScreen/AttackDefendMode/HeaderAttack"/>
+            <Style val="{$parent/MapCache/@SubTitleStyle}"/>
+        </Frame>
+
+        <!--=======================================================================================
+        <! MAP MECHANICS
+        <!======================================================================================-->
+        <Frame type="Frame" name="MapObjective1">
+            <Anchor side="Bottom" relative="$parent/MapObjective2" pos="Max" offset="0"/>
+            <Anchor side="Right" relative="$parent/MapObjective2" pos="Min" offset="-7"/>
+        </Frame>
+
+        <Frame type="Frame" name="MapObjective2">
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="#BottomMapObjectiveOffset"/>
+            <Anchor side="Left" relative="$parent" pos="Mid" offset="158"/>
+            <Anchor side="Right" relative="$parent" pos="Mid" offset="158"/>
+        </Frame>
+
+        <Frame type="Frame" name="MapObjective3">
+            <Visible val="false"/>
+        </Frame>
+
+        <!--=======================================================================================
+        <! ATTACK/DEFENSE STATE TOGGLE
+        <!======================================================================================-->
+        <Animation name="RedTeamOnLeft">
+            <Event event="BlueTeamOnLeft" action="Stop" frame="HeroLoadingPanel"/>
+            <Event event="RedTeamOnLeft" action="Reset,Play" frame="HeroLoadingPanel"/>
+            <Controller type="Text" end="Pause" frame="MapLabel_MapAttackDefend">
+                <Key type="Text" time="0" text="@UI/MapLoadingScreen/AttackDefendMode/HeaderDefend"/>
+            </Controller>
+        </Animation>
+    </Frame>
+</Desc>

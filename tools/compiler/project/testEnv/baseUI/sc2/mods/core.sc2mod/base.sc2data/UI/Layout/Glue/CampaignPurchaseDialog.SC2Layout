@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<Desc>
+    <DescFlags val="Locked"/>
+
+    <Frame type="CampaignPurchaseDialog" name="CampaignPurchaseDialog">
+        <Anchor relative="$parent"/>
+        <VisibilityOnFade val="true"/>
+        <AcceptsMouse val="true"/>
+        
+        <Frame type="BlurFrame" name="FullscreenBlurFrame" template="StandardTemplates/FullscreenBlurFrame">
+            <Anchor relative="$parent"/>
+            <Alpha val="0"/>
+            
+            <Animation name="DialogAnimation">
+                <Event event="OnShown" action="DirectionForward" frame="$parent"/>
+                <Event event="OnShown" action="Play" frame="$parent"/>
+                <Event event="DialogDismissed" action="DirectionReverse" frame="$parent"/>
+                <Event event="DialogDismissed" action="Play" frame="$parent"/>
+                <Controller type="Blur" end="Pause">
+                    <Key type="Curve" time="0" value="0.0" out="Auto"/>
+                    <Key type="Curve" time="0.2" value="1.0" in="Auto"/>
+                </Controller>
+            </Animation>
+        </Frame>
+    
+        <Frame type="Image" name="Blackout">
+            <Anchor relative="$parent"/>
+            <LayerColor val="000000"/>
+            <Alpha val="170"/>
+    
+            <Animation name="DialogAnimation">
+                <Event event="OnShown" action="DirectionForward" frame="$parent"/>
+                <Event event="OnShown" action="Play" frame="$parent"/>
+                <Event event="DialogDismissed" action="DirectionReverse" frame="$parent"/>
+                <Event event="DialogDismissed" action="Play" frame="$parent"/>
+                
+                <Controller type="Anchor" end="Pause" side="Top" relative="true">
+                    <Key type="Curve" time="0" value="-20" out="Slow"/>
+                    <Key type="Curve" time=".2" value="0" in="Slow"/>
+                </Controller>
+                
+                <Controller type="Anchor" end="Pause" side="Bottom" relative="true">
+                    <Key type="Curve" time="0" value="40" out="Slow"/>
+                    <Key type="Curve" time=".2" value="0" in="Slow"/>
+                </Controller>
+            </Animation>
+        </Frame>
+        
+        <Frame type="BlurFrame" name="BackgroundFrameBlur">
+            <Anchor side="Top" relative="$parent/BackgroundFrame" pos="Min" offset="13"/>
+            <Anchor side="Left" relative="$parent/BackgroundFrame" pos="Min" offset="13"/>
+            <Anchor side="Bottom" relative="$parent/BackgroundFrame" pos="Max" offset="-13"/>
+            <Anchor side="Right" relative="$parent/BackgroundFrame" pos="Max" offset="-13"/>
+
+            <Animation name="Blur">
+                <Event event="OnShown" action="Reset,Play" frame="$parent" />
+
+                <Controller type="Blur" end="Pause">
+                    <Key type="Curve" time="0" value=".35" out="Fast"/>
+                </Controller>
+            </Animation>
+        </Frame>
+        
+        <Frame type="Image" name="LeftBGGlowPattern">
+            <Anchor side="Top" relative="$parent/BackgroundFrame" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent/BackgroundFrame" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent/BackgroundFrame" pos="Min" offset="10"/>
+            <Texture val="@UI/Glues_Battlenet_DialogBox_BackGlow"/>
+        </Frame>
+
+        <Frame type="Image" name="RightBGGlowPattern">
+            <Anchor side="Top" relative="$parent/BackgroundFrame" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent/BackgroundFrame" pos="Mid" offset="0"/>
+            <Anchor side="Left" relative="$parent/BackgroundFrame" pos="Max" offset="-10"/>
+            <Texture val="@UI/Glues_Battlenet_DialogBox_BackGlow"/>
+            <TextureCoords top="0.0" left="1.0" bottom="1.0" right="0.0"/>
+        </Frame>
+        
+        <Frame type="Frame" name="BackgroundFrame" template="StandardTemplates/GlueDialogTemplate">
+            <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+            <Height val="642"/>
+            <Width val="1270"/>
+        </Frame>
+        
+        <Frame type="Image" name="ImageAccent">
+            <Anchor side="Top" relative="$parent/BackgroundFrame" pos="Min" offset="17"/>
+            <Anchor side="Right" relative="$parent/BackgroundFrame" pos="Max" offset="-15"/>
+            <Texture val="@UI/SC2_UI_Battlenet_Glue_Campaign_Purchase_InfoDialog_Logo_Complete"/>
+        </Frame>
+
+        <StateGroup name="BackgroundImage">
+            <DefaultState val="NovaDLC" />
+
+            <State name="CompleteEdition">
+                <When type="AnimationState" SelectedCampaign="CompleteEdition" />
+                <Action type="SetProperty" frame="ImageAccent" Texture="@UI/SC2_UI_Battlenet_Glue_Campaign_Purchase_InfoDialog_Logo_Complete"/>
+            </State>
+
+            <State name="LegacyOfTheVoid">
+                <When type="AnimationState" SelectedCampaign="LegacyOfTheVoid"/>
+                <Action type="SetProperty" frame="ImageAccent" Texture="@UI/SC2_UI_Battlenet_Glue_Campaign_Purchase_InfoDialog_Logo_Void"/>
+            </State>
+
+            <State name="NovaDLC">
+                <Action type="SetProperty" frame="ImageAccent" Texture="@UI/SC2_UI_Battlenet_Glue_Campaign_Purchase_InfoDialog_Logo_Nova"/>
+            </State>
+        </StateGroup>
+
+        <!-- REMOVE THIS AFTER IT STOPS BEING HOOKED UP -->
+
+        <Frame type="Image" name="CampaignImage">
+            <Anchor relative="$parent"/>
+            <TextureType val="Normal"/>
+            <AlphaMaskTexture val="@UI/SC2_UI_Battlenet_Glue_Campaign_MapIcon_Mask"/>
+            <Alpha val="0"/>
+        </Frame>
+        
+        <!-- REMOVE THIS AFTER IT STOPS BEING HOOKED UP -->
+
+        <Frame type="Label" name="CampaignTitleLabel">
+            <Anchor side="Top" relative="$parent/BackgroundFrame" pos="Min" offset="80"/>
+            <Anchor side="Left" relative="$parent/BackgroundFrame" pos="Min" offset="80"/>
+            <Style val="@Campaign_Title"/>
+            
+            <Animation name="Show">
+                <Event event="OnShown" action="Reset,Play" frame="$parent" />
+
+                <Controller type="Fade" end="Pause">
+                    <Key type="Curve" time="0.0" value="0" out="Fast"/>
+                    <Key type="Curve" time="0.3" value="0" out="Fast"/>
+                    <Key type="Curve" time="0.7" value="255" in="Slow"/>
+                </Controller>
+            </Animation>
+        </Frame>
+
+        <Frame type="CampaignPurchasePanel" name="CampaignPurchasePanel" template="CampaignPurchasePanel/CampaignPurchasePanelTemplate">
+            <Anchor side="Top" relative="$parent/BackgroundFrame" pos="Min" offset="132"/>
+            <Anchor side="Left" relative="$parent/BackgroundFrame" pos="Min" offset="31"/>
+            <Anchor side="Right" relative="$parent/BackgroundFrame" pos="Max" offset="-20"/>
+            <Height val="600"/>
+            
+            <Frame type="BuyButton" name="PurchaseButton" template="StandardBattlenetTemplates/BattlenetAlternateButtonTemplate">
+                <Anchor side="Bottom" relative="$parent/$parent/CloseButton" pos="Max" offset="0"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="47"/>
+            </Frame>
+            
+            <Frame type="Button" name="LearnMoreButton">
+                <Anchor side="Top" relative="$parent/ContinueCampaignButton" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/ContinueCampaignButton" pos="Max" offset="6"/>
+            </Frame>
+        </Frame>
+
+        <Frame type="Button" name="CloseButton" template="StandardBattlenetTemplates/BattlenetStandardButtonTemplate">
+            <Anchor side="Bottom" relative="$parent/BackgroundFrame" pos="Max" offset="-42"/>
+            <Anchor side="Left" relative="$parent/CampaignPurchasePanel/LearnMoreButton" pos="Max" offset="6"/>
+            <RenderPriority val="530"/>
+            <Shortcut val="@UI/Close_Hotkey"/>
+            <Shortcut val="@UI/ScreenNavigationBack_Hotkey"/>
+            <Text val="@UI/Close_Control"/>
+
+            <Frame type="Label" name="Label">
+                <Options val="StripHotkeys"/>
+            </Frame>
+
+            <Animation name="Show">
+                <Event event="OnShown" action="Reset,Play" frame="$parent" />
+
+                <Controller type="Fade" end="Pause">
+                    <Key type="Curve" time="0.0" value="0" out="Fast"/>
+                    <Key type="Curve" time="0.45" value="0" out="Fast"/>
+                    <Key type="Curve" time="0.85" value="255" in="Slow"/>
+                </Controller>
+            </Animation>
+        </Frame>
+    </Frame>
+</Desc>

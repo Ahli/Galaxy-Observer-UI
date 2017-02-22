@@ -1,0 +1,660 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<Desc>
+    <DescFlags val="Locked"/>
+
+    <Frame type="NydusLinkButton" name="LeaderBoardsButton">
+        <NydusLink val="LeaderBoards"/>
+        <UseBrowser val="true"/>
+        <Tooltip val="@UI/RankedPlay/LeaderBoards/Tooltip"/>
+        <ClickSound val="@UI_BNet_Generic_01"/>
+        <Width val="60"/>
+        <Height val="60"/>
+
+        <Frame type="Frame" name="IconAnchor">
+            <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+        </Frame>
+
+        <Frame type="Image" name="NormalImage">
+            <Anchor side="Top" relative="$parent/IconAnchor" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent/IconAnchor" pos="Mid" offset="0"/>
+            <Anchor side="Left" relative="$parent/IconAnchor" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent/IconAnchor" pos="Mid" offset="0"/>
+            <Texture val="@UI/Storm_UI_Ranked_SeasonProgress_Leaderboards_Button"/>
+            <TextureType val="Normal"/>
+            <DesaturateOnDisable val="false"/>
+        </Frame>
+
+        <Frame type="Image" name="HoverImage">
+            <Anchor relative="$parent/NormalImage"/>
+            <TextureType val="Normal"/>
+            <DesaturateOnDisable val="false"/>
+            <ColorAdjustMode val="AddSelf"/>
+            <AdjustmentColor val="50,255,255,255"/>
+
+            <Frame type="PropertyBind" name="BindTexture">
+                <Anchor relative="$parent"/>
+                <Source frame="$parent/$parent/NormalImage" property="Texture"/>
+                <Target frame="$parent" property="Texture"/>
+            </Frame>
+        </Frame>
+
+        <Frame type="Image" name="DarkenImage">
+            <Anchor relative="$parent/NormalImage"/>
+            <TextureType val="Normal"/>
+            <DesaturateOnDisable val="false"/>
+            <ColorAdjustMode val="Fill"/>
+            <AdjustmentColor val="100,0,0,0"/>
+            <Visible val="false"/>
+
+            <Frame type="PropertyBind" name="BindTexture">
+                <Anchor relative="$parent"/>
+                <Source frame="$parent/$parent/NormalImage" property="Texture"/>
+                <Target frame="$parent" property="Texture"/>
+            </Frame>
+        </Frame>
+
+        <StateGroup name="ButtonState">
+            <State name="Pushed">
+                <When type="AnimationState" buttonState="Pushed"/>
+                <Action type="SetProperty" frame="DarkenImage" visible="true"/>
+            </State>
+        </StateGroup>
+    </Frame>
+
+    <Frame type="NydusLinkButton" name="RankedGuideButton" template="HeroRankedPanel/LeaderBoardsButton">
+        <NydusLink val="RankedGuide"/>
+        <Tooltip val="@UI/RankedPlay/RankedGuide/Tooltip"/>
+        <Frame type="Image" name="NormalImage">
+            <Texture val="@UI/Storm_UI_Ranked_SeasonProgress_RankedGuide_Button"/>
+        </Frame>
+    </Frame>
+
+    <!--=======================================================================================
+    <! Queue Requirements Explanation Tooltip
+    <!======================================================================================-->
+    <Frame type="AnchoredPopup" name="RankedReadyButtonAnchoredPopupTemplate" template="StandardPopupTooltip/ReadyButtonAnchoredPopupTemplate">
+        <StateGroup name="ReadyEnabled">
+            <State name="Hide_ButtonEnabled">
+                <When type="Property" frame="$ScreenPlay_HeroRankedPanel" ReadyAllowed="true" />
+                <Action type="SendEvent" frame="$this" event="HideRequirements" />
+            </State>
+            <State name="Hide_PanelDisabled">
+                <When type="Property" frame="$ScreenPlay_HeroRankedPanel" Visible="false" />
+                <Action type="SendEvent" frame="$this" event="HideRequirements" />
+            </State>
+            <State name="Suppressed">
+                <When type="Property" frame="$ScreenPlay_HeroRankedPanel" ReadyRequirementsPopupSuppressed="true" />
+                <Action type="SendEvent" frame="$this" event="HideRequirements" />
+            </State>
+            <State name="Show">
+                <When type="Property" frame="$ScreenPlay_HeroRankedPanel" Visible="true" />
+                <When type="Property" frame="$ScreenPlay_HeroRankedPanel" ReadyAllowed="false" />
+                <Action type="SendEvent" frame="$this" event="ShowRequirements" />
+            </State>            
+        </StateGroup>
+
+        <Frame type="Button" name="CloseButton">
+            <Animation name="OnShown">
+                <Controller type="Property" name="Suppress" frame="$ScreenPlay_HeroRankedPanel" property="ReadyRequirementsPopupSuppressed" end="Pause">
+                    <Key type="Property" time="0.00" value="true"/>
+                </Controller>
+            </Animation>
+        </Frame>
+
+        <Animation name="ReadyEnabledShow">
+            <Event event="ShowRequirements" action="DirectionForward,Play"/>
+            <Event event="HideRequirements" action="DirectionReverse,Play"/>
+
+            <Controller type="Property" property="Show" end="Pause">
+                <Key type="Property" time="0.00" value="false"/>
+                <Key type="Property" time="0.24" value="false"/>
+                <Key type="Property" time="0.25" value="true"/>
+            </Controller>
+        </Animation>
+
+        <Animation name="TransitionOut">
+            <Event event="Hide" frame="$ScreenPlay_HeroRankedPanel" action="Restart,Play"/>
+            <Controller type="Event" end="Stop">
+                <Key type="Event" time="0" event="Hide" />
+            </Controller>
+        </Animation>
+
+        <Animation name="TransitionIn">
+            <Event event="Show" frame="$ScreenPlay_HeroRankedPanel" action="Restart,Play"/>
+            <Controller type="Fade" end="Pause">
+                <Key type="Curve" time="0.0" value="0" out="Slow"/>
+                <Key type="Curve" time="0.4" value="255" in="Slow" out="Slow"/>
+            </Controller>
+        </Animation>
+
+        <Frame type="PropertyBind" name="PropertyBindTitle">
+            <Anchor relative="$parent"/>
+            <Source frame="$ScreenPlay_HeroRankedPanel" property="ReadyRequirementsTitle"/>
+            <Target frame="$parent/Container/TitleLabel" property="Text"/>
+        </Frame>
+
+        <Frame type="PropertyBind" name="PropertyBindText">
+            <Anchor relative="$parent"/>
+            <Source frame="$ScreenPlay_HeroRankedPanel" property="ReadyRequirementsText"/>
+            <Target frame="$parent/Container/BodyLabel" property="Text"/>
+        </Frame>
+    </Frame>
+
+    <!--=======================================================================================
+    <! Promotion / Demotion Explanation Tooltip
+    <!======================================================================================-->
+    <Frame type="AnchoredPopup" name="HeroAnchoredPopupTemplate" template="StandardPopupTooltip/AnchoredPopupRightArrowTemplate">
+        <MinWidth val="350"/>
+
+        <Frame type="Frame" name="Container">
+            <Frame type="Label" name="TitleLabel">
+                <Style val="RankedBadge_Promotion_Tooltip_Title_Left"/>
+            </Frame>
+
+            <Frame type="Label" name="BodyLabel">
+                <Style val="RankedBadge_Tooltip_Text"/>
+            </Frame>
+        </Frame>
+
+        <StateGroup name="ShowPopup">
+            <DefaultState val="Hidden"/>
+
+            <State name="Shown">
+                <When type="Property" frame="$RankedPanel_HeroLeagueBadge" showPopup="true"/>
+                <Action type="SetProperty" frame="$this" show="true"/>
+            </State>
+            <State name="Hidden">
+                <Action type="SetProperty" frame="$this" show="false"/>
+            </State>
+        </StateGroup>
+
+        <Animation name="TransitionOut">
+            <Event event="Hide" frame="$ScreenPlay_HeroRankedPanel" action="Restart,Play"/>
+            <Controller type="Event" end="Stop">
+                <Key type="Event" time="0" event="Hide" />
+            </Controller>
+        </Animation>
+
+        <Animation name="TransitionIn">
+            <Event event="Show" frame="$ScreenPlay_HeroRankedPanel" action="Restart,Play"/>
+            <Controller type="Fade" end="Pause">
+                <Key type="Curve" time="0.0" value="0" out="Slow"/>
+                <Key type="Curve" time="0.4" value="255" in="Slow" out="Slow"/>
+            </Controller>
+        </Animation>
+
+        <StateGroup name="TitleStyle">
+            <DefaultState val="Normal"/>
+
+            <State name="Demotion">
+                <When type="Property" frame="$RankedPanel_HeroLeagueBadge" PromotionState="DemotionNextGame"/>
+                <Action type="SetProperty" frame="Container/TitleLabel" style="RankedBadge_Demotion_Tooltip_Title_Left"/>
+            </State>
+            <State name="Normal">
+                <Action type="SetProperty" frame="Container/TitleLabel" style="RankedBadge_Promotion_Tooltip_Title_Left"/>
+            </State>
+        </StateGroup>
+
+        <Frame type="PropertyBind" name="PropertyBindTitle">
+            <Anchor relative="$parent"/>
+            <Source frame="$RankedPanel_HeroLeagueBadge" property="PopupTitle"/>
+            <Target frame="$parent/Container/TitleLabel" property="Text"/>
+        </Frame>
+
+        <Frame type="PropertyBind" name="PropertyBindText">
+            <Anchor relative="$parent"/>
+            <Source frame="$RankedPanel_HeroLeagueBadge" property="PopupText"/>
+            <Target frame="$parent/Container/BodyLabel" property="Text"/>
+        </Frame>
+
+        <Animation name="OnDismiss">
+            <Event event="Dismiss" action="Play"/>
+            <Controller type="Event" end="Stop" frame="$RankedPanel_HeroLeagueBadge">
+                <Key type="Event" time="0" event="FirstTimeExplanationDismissed"/>
+            </Controller>
+        </Animation>
+    </Frame>
+
+    <Frame type="AnchoredPopup" name="TeamAnchoredPopupTemplate" template="StandardPopupTooltip/AnchoredPopupLeftArrowTemplate">
+        <MinWidth val="350"/>
+
+        <Frame type="Frame" name="Container">
+            <Frame type="Label" name="TitleLabel">
+                <Style val="RankedBadge_Promotion_Tooltip_Title_Left"/>
+            </Frame>
+
+            <Frame type="Label" name="BodyLabel">
+                <Style val="RankedBadge_Tooltip_Text"/>
+            </Frame>
+        </Frame>
+
+        <StateGroup name="ShowPopup">
+            <DefaultState val="Hidden"/>
+
+            <State name="Shown">
+                <When type="Property" frame="$RankedPanel_TeamLeagueBadge" showPopup="true"/>
+                <Action type="SetProperty" frame="$this" show="true"/>
+            </State>
+            <State name="Hidden">
+                <Action type="SetProperty" frame="$this" show="false"/>
+            </State>
+        </StateGroup>
+
+        <Animation name="TransitionOut">
+            <Event event="Hide" frame="$ScreenPlay_HeroRankedPanel" action="Restart,Play"/>
+            <Controller type="Event" end="Stop">
+                <Key type="Event" time="0" event="Hide" />
+            </Controller>
+        </Animation>
+
+        <Animation name="TransitionIn">
+            <Event event="Show" frame="$ScreenPlay_HeroRankedPanel" action="Restart,Play"/>
+            <Controller type="Fade" end="Pause">
+                <Key type="Curve" time="0.0" value="0" out="Slow"/>
+                <Key type="Curve" time="0.4" value="255" in="Slow" out="Slow"/>
+            </Controller>
+        </Animation>
+        
+        <StateGroup name="TitleStyle">
+            <DefaultState val="Normal"/>
+
+            <State name="Demotion">
+                <When type="Property" frame="$RankedPanel_TeamLeagueBadge" PromotionState="DemotionNextGame"/>
+                <Action type="SetProperty" frame="Container/TitleLabel" style="RankedBadge_Demotion_Tooltip_Title_Left"/>
+            </State>
+            <State name="Normal">
+                <Action type="SetProperty" frame="Container/TitleLabel" style="RankedBadge_Promotion_Tooltip_Title_Left"/>
+            </State>
+        </StateGroup>
+
+        <Frame type="PropertyBind" name="PropertyBindTitle">
+            <Anchor relative="$parent"/>
+            <Source frame="$RankedPanel_TeamLeagueBadge" property="PopupTitle"/>
+            <Target frame="$parent/Container/TitleLabel" property="Text"/>
+        </Frame>
+
+        <Frame type="PropertyBind" name="PropertyBindText">
+            <Anchor relative="$parent"/>
+            <Source frame="$RankedPanel_TeamLeagueBadge" property="PopupText"/>
+            <Target frame="$parent/Container/BodyLabel" property="Text"/>
+        </Frame>
+
+        <Animation name="OnDismiss">
+            <Event event="Dismiss" action="Play"/>
+            <Controller type="Event" end="Stop" frame="$RankedPanel_TeamLeagueBadge">
+                <Key type="Event" time="0" event="FirstTimeExplanationDismissed"/>
+            </Controller>
+        </Animation>
+    </Frame>
+
+    <!--=======================================================================================
+    <! Main Panel
+    <!======================================================================================-->
+    <Frame type="HeroRankedPanel" name="HeroRankedPanel">
+        <Anchor relative="$parent"/>
+
+        <Animation name="Transition">
+            <Event event="Show" action="Reset"/>
+            <Event event="Show" action="Play"/>
+            <Event event="Hide" action="DirectionReverse"/>
+            <Event event="Hide" action="Play"/>
+            <Controller type="Fade" end="Pause">
+                <Key type="Curve" time="0.0" value="0" out="Slow"/>
+                <Key type="Curve" time="0.4" value="255" in="Slow" out="Slow"/>
+            </Controller>
+        </Animation>
+
+        <Animation name="TransitionSound">
+            <Event event="Show" action="Reset"/>
+            <Event event="Show" action="Play"/>
+
+            <Controller type="Sound" end="Pause">
+                <Key type="Sound" time="0.0" sound="@UI_Gluescreen_Transition_HeroLeague"/> <!-- TODO: Use correct sound? -->
+            </Controller>
+        </Animation>
+
+        <!--
+            Hero League or Team League
+        -->
+        <Animation name="ToggleGameMode">
+            <Event event="RankedPlayTeamLeagueActive" action="Restart"/>
+            <Event event="RankedPlayTeamLeagueActive" action="Play"/>
+            <Event event="RankedPlayHeroLeagueActive" action="DirectionReverse"/>
+            <Event event="RankedPlayHeroLeagueActive" action="Play"/>
+
+            <Controller type="Fade" end="Pause" frame="$this/LeagueTypes/HeroLeague">
+                <Key type="Curve" time="0" value="255" out="Auto"/>
+                <Key type="Curve" time=".4" value="225" out="Auto"/>
+            </Controller>
+
+            <Controller type="Fade" end="Pause" frame="$this/LeagueTypes/TeamLeague">
+                <Key type="Curve" time="0" value="225" out="Auto"/>
+                <Key type="Curve" time=".4" value="255" out="Auto"/>
+            </Controller>
+
+            <Controller type="Event" end="Stop" frame="$this/LeagueTypes/HeroLeague">
+                <Key type="Event" time="0" event="Selected"/>
+                <Key type="Event" time=".01" event="Deselected"/>
+            </Controller>
+
+            <Controller type="Event" end="Stop" frame="$this/LeagueTypes/TeamLeague">
+                <Key type="Event" time="0" event="Deselected"/>
+                <Key type="Event" time=".01" event="Selected"/>
+            </Controller>
+        </Animation>
+
+        <Animation name="NoGameModeActive">
+            <Event event="RankedPlayNoActiveQueue" action="Restart"/>
+            <Event event="RankedPlayNoActiveQueue" action="Play"/>
+
+            <Controller type="Fade" end="Pause" frame="$this/LeagueTypes/HeroLeague">
+                <Key type="Curve" time="0" value="225" out="Auto"/>
+            </Controller>
+
+            <Controller type="Fade" end="Pause" frame="$this/LeagueTypes/TeamLeague">
+                <Key type="Curve" time="0" value="225" out="Auto"/>
+            </Controller>
+
+            <Controller type="Event" end="Stop" frame="$this/LeagueTypes/HeroLeague">
+                <Key type="Event" time="0" event="Deselected"/>
+            </Controller>
+
+            <Controller type="Event" end="Stop" frame="$this/LeagueTypes/TeamLeague">
+                <Key type="Event" time="0" event="Deselected"/>
+            </Controller>
+        </Animation>
+
+        <Frame type="Frame" name="LeagueTypes">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="200" />
+            <Anchor side="Left" relative="$parent" pos="Min" offset="0" />
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="0" />
+            <Anchor side="Right" relative="$parent" pos="Max" offset="0" />
+
+            <Frame type="Image" name="FloorBackground">
+                <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+                <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+                <Width val="0"/>
+                <Texture val="@UI/Storm_UI_Ranked_BackgroundFloor"/>
+                <RenderType val="HDR"/>
+            </Frame>
+
+            <Frame type="HeroRankedLeagueContainer" name="HeroLeague" template="HeroRankedLeagueContainer/HeroRankedLeagueContainerTemplate">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="0" />
+                <Anchor side="Right" relative="$parent" pos="Mid" offset="-5" />
+                <QueueTag val="RnkS"/>
+                <Animation name="LeagueType">
+                    <Event event="OnShown" action="Play"/>
+                    <Controller type="Event" end="Stop">
+                        <Key type="Event" time="0" event="HeroLeague"/>
+                    </Controller>
+                </Animation>
+
+                <Frame type="RankBadge" name="RankBadge">
+                    <Handle val="RankedPanel_HeroLeagueBadge"/>
+                </Frame>
+
+                <Frame type="Frame" name="RankBadgePopupAnchor">
+                    <!-- Give more room for arrow -->
+                    <Anchor side="Top" relative="$parent/RankBadge/AnchorFrame" pos="Min" offset="0" />
+                    <Anchor side="Left" relative="$parent/RankBadge/AnchorFrame" pos="Min" offset="-20" />
+                    <Anchor side="Bottom" relative="$parent/RankBadge/AnchorFrame" pos="Max" offset="0" />
+                    <Anchor side="Right" relative="$parent/RankBadge/AnchorFrame" pos="Max" offset="20" />
+                    <TooltipAnchorPosition val="MiddleLeft"/>
+                    <Frame type="AnchoredPopup" name="HeroAnchoredPopup" template="HeroRankedPanel/HeroAnchoredPopupTemplate"/>
+                </Frame>
+            </Frame>
+
+            <Frame type="HeroRankedLeagueContainer" name="TeamLeague" template="HeroRankedLeagueContainer/TeamRankedLeagueContainerTemplate">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="0" />
+                <Anchor side="Left" relative="$parent" pos="Mid" offset="5" />
+                <QueueTag val="RnkP"/>
+                <Animation name="LeagueType">
+                    <Event event="OnShown" action="Play"/>
+                    <Controller type="Event" end="Stop">
+                        <Key type="Event" time="0" event="TeamLeague"/>
+                    </Controller>
+                </Animation>
+
+                <Frame type="RankBadge" name="RankBadge">
+                    <Handle val="RankedPanel_TeamLeagueBadge"/>
+                </Frame>
+
+                <Frame type="Frame" name="RankBadgePopupAnchor">
+                    <!-- Give more room for arrow -->
+                    <Anchor side="Top" relative="$parent/RankBadge/AnchorFrame" pos="Min" offset="0" />
+                    <Anchor side="Left" relative="$parent/RankBadge/AnchorFrame" pos="Min" offset="-20" />
+                    <Anchor side="Bottom" relative="$parent/RankBadge/AnchorFrame" pos="Max" offset="0" />
+                    <Anchor side="Right" relative="$parent/RankBadge/AnchorFrame" pos="Max" offset="20" />
+                    <TooltipAnchorPosition val="MiddleRight"/>
+                    <Frame type="AnchoredPopup" name="TeamAnchoredPopup" template="HeroRankedPanel/TeamAnchoredPopupTemplate"/>
+                </Frame>
+            </Frame>
+
+            <Animation name="StartShine">
+                <Event event="OnShown" action="Play" frame="$ancestor[@type=HeroRankedPanel]"/>
+
+                <Controller type="Event" end="Stop" frame="TeamLeague/RankBadge">
+                    <Key type="Event" time="0" event="StartShine"/>
+                </Controller>
+                <Controller type="Event" end="Stop" frame="HeroLeague/RankBadge">
+                    <Key type="Event" time="0.30" event="StartShine"/>
+                </Controller>
+            </Animation>
+
+            <Frame type="Image" name="Clouds1Image">
+                <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+                <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+                <Height val="936"/>
+                <Width val="4000"/>
+                <LayerCount val="3"/>
+                <SubpixelRendering val="True"/>
+
+                <Texture val="@UI/Storm_UI_Plasma_Clouds2_Mask" layer="0"/>
+                <TextureCoords top="0" left="0" bottom="1" right=".5" layer="0"/>
+                <AlphaLayer val="True" layer="0"/>
+                <WrapUV val="True" layer="0"/>
+
+                <Texture val="@UI/Storm_UI_Clouds_RepeatX" layer="1"/>
+                <TextureCoords top="0" left="-.2" bottom="1" right=".8" layer="1"/>
+                <AlphaLayer val="True" layer="1"/>
+                <WrapUV val="True" layer="1"/>
+
+                <Texture val="@UI/Storm_UI_Clouds_RepeatX" layer="2"/>
+                <TextureCoords top="0" left="0" bottom="1" right=".5" layer="2"/>
+                <WrapUV val="True" layer="2"/>
+
+                <Animation name="UVScroll">
+                    <Event event="OnShown" action="Restart" frame="$parent"/>
+                    <Event event="OnShown" action="Play" frame="$parent"/>
+                    <Controller type="LayerUV" layer="0" side="Left" relative="True" sidelock="True" end="Loop" >
+                        <Key type="Curve" time="0" value="0" out="fast"/>
+                        <Key type="Curve" time="91.9" value="1" in="fast"/>
+                    </Controller>
+                    <Controller type="LayerUV" layer="1" side="Left" relative="True" sidelock="True" end="Loop" >
+                        <Key type="Curve" time="0" value="0" out="fast"/>
+                        <Key type="Curve" time="31.9" value="1" in="fast"/>
+                    </Controller>
+                </Animation>
+            </Frame>
+
+            <Frame type="Image" name="Clouds2Image">
+                <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+                <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+                <Height val="936"/>
+                <Width val="4000"/>
+                <LayerCount val="3"/>
+                <SubpixelRendering val="True"/>
+                <Alpha val="255"/>
+                <Visible val="True"/>
+
+                <Texture val="@UI/Storm_UI_Clouds_RepeatX" layer="0"/>
+                <TextureCoords top="0" left="0" bottom="1" right=".5" layer="0"/>
+                <AlphaLayer val="True" layer="0"/>
+                <WrapUV val="True" layer="0"/>
+
+                <Texture val="@UI/Storm_UI_Clouds_RepeatX" layer="1"/>
+                <TextureCoords top="0" left="-.2" bottom="1" right=".8" layer="1"/>
+                <AlphaLayer val="True" layer="1"/>
+                <WrapUV val="True" layer="1"/>
+
+                <Texture val="@UI/Storm_UI_Clouds_RepeatX" layer="2"/>
+                <TextureCoords top="0" left="1" bottom="1" right="0" layer="2"/>
+                <WrapUV val="True" layer="2"/>
+
+                <Animation name="UVScroll">
+                    <Event event="OnShown" action="Restart" frame="$parent"/>
+                    <Event event="OnShown" action="Play" frame="$parent"/>
+                    <Controller type="LayerUV" layer="0" side="Left" relative="True" sidelock="True" end="Loop" >
+                        <Key type="Curve" time="0" value="0" out="fast"/>
+                        <Key type="Curve" time="121.9" value="1" in="fast"/>
+                    </Controller>
+                    <Controller type="LayerUV" layer="1" side="Left" relative="True" sidelock="True" end="Loop" >
+                        <Key type="Curve" time="0" value="0" out="fast"/>
+                        <Key type="Curve" time="91.9" value="1" in="fast"/>
+                    </Controller>
+                </Animation>
+            </Frame>
+
+            <Frame type="CutsceneFrame" name="FogCutscene">
+                <Anchor side="Bottom" relative="$parent" pos="Max" offset="100"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+                <Height val="1500"/>
+                <RenderType val="HDR"/>
+                <AutoPlay val="true"/>
+                <Alpha val="70"/>
+                <Preload val="false"/>
+
+                <Animation name="OnShown">
+                    <Event event="OnShown" action="Reset"/>
+                    <Event event="OnShown" action="Play"/>
+                    <Controller type="Cutscene" end="Stop">
+                        <Key type="Cutscene" time="0.0" action="SetCutscene" file="Cutscenes/UI_GroundFog_Blue.StormCutscene"/>
+                        <Key type="Cutscene" time="0.0" action="Bookmark" bookmark="Stand Start"/>
+                        <Key type="Cutscene" time="0.0" action="Play"/>
+                    </Controller>
+                </Animation>
+            </Frame>
+        </Frame>
+
+        <Frame type="BlurFrame" name="BlurFrame" template="StandardTemplates/FullscreenBlurFrame">
+            <Anchor relative="$parent/SeasonProgressBackgroundImage" offset="-3"/>
+            <AlphaMaskTexture val="@UI/Storm_UI_Ranked_SeasonProgressBackgroundAlpha"/>
+            <BlurAmount val="0.2"/>
+            <RenderType val="HDR"/>
+        </Frame>
+
+        <Frame type="Image" name="SeasonProgressBackgroundImage">
+            <Anchor side="Bottom" relative="$parent/LeagueTypes/HeroLeague" pos="Max" offset="18" />
+            <Anchor side="Right" relative="$parent/LeagueTypes" pos="Mid" offset="0" />
+            <Anchor side="Left" relative="$parent/LeagueTypes" pos="Mid" offset="0" />
+
+            <RenderType val="LDR"/>
+
+            <Texture val="@UI/Storm_UI_Ranked_SeasonProgressBackground"/>
+            <Width val="894"/>
+            <TextureType val="Nineslice"/>
+
+            <Frame type="ProgressBar" name="SeasonProgressBar">
+                <Anchor side="Left" relative="$parent" pos="Min" offset="7"/>
+                <Anchor side="Bottom" relative="$parent" pos="Max" offset="-2"/>
+                <Anchor side="Right" relative="$parent" pos="Max" offset="-7"/>
+                <Height val="36"/>
+                <AcceptsMouseTooltip val="True"/>
+                <TooltipAnchorPosition val="TopCenter"/>
+
+                <UseFillContainer val="true" />
+
+                <FillInset val="0.0"/>
+                <MinValue val="-.10"/>
+                <MaxValue val="1.00"/>
+                <Value val="1.0"/>
+
+                <Frame type="Frame" name="FillImageContainer">
+                    <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                    <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                    <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+
+                    <Frame type="Image" name="FillImage">
+                        <Anchor relative="$parent"/>
+                        <Texture val="@UI/Storm_UI_Ranked_SeasonProgressBar"/>
+                        <TextureType val="Nineslice"/>
+                    </Frame>
+
+                    <Frame type="Image" name="SeasonProgressBarSubGlowImage">
+                        <Anchor side="Top" relative="$parent/FillImage" pos="Mid" offset="0"/>
+                        <Anchor side="Bottom" relative="$parent/FillImage" pos="Mid" offset="0"/>
+                        <Anchor side="Right" relative="$parent/FillImage" pos="Max" offset="23"/>
+                        <Unclipped val="true"/>
+                        <Texture val="@UI/Storm_UI_Ranked_SeasonProgressBar_SubGlow"/>
+                        <BlendMode val="Add"/>
+                        <Animation name="Pulse">
+                            <Event event="OnShown" action="Play"/>
+                            <Controller type="Fade" end="PingPong">
+                                <Key type="Curve" time="0" value="200" out="Slow"/>
+                                <Key type="Curve" time=".4" value="255" in="Slow"/>
+                            </Controller>
+                        </Animation>
+                    </Frame>
+                </Frame>
+            </Frame>
+
+            <Frame type="Label" name="SeasonLabel">
+                <Anchor side="Top" relative="$parent" pos="Mid" offset="-8" />
+                <Anchor side="Bottom" relative="$parent" pos="Mid" offset="-8" />
+                <Anchor side="Right" relative="$parent" pos="Mid" offset="-30" />
+                <Anchor side="Left" relative="$parent" pos="Mid" offset="-30" />
+                <Style val="HeroLobbyRankedHeroLeagueSeason" />
+                <Text val="@UI/RankedPlay/CurrentSeasonDates" />                
+            </Frame>
+
+            <Frame type="NydusLinkButton" name="LeaderBoardsButton" template="HeroRankedPanel/LeaderBoardsButton">
+                <Anchor side="Top" relative="$parent/SeasonLabel" pos="Mid" offset="0" />
+                <Anchor side="Bottom" relative="$parent/SeasonLabel" pos="Mid" offset="0" />
+                <Anchor side="Left" relative="$parent/SeasonLabel" pos="Max" offset="10" />
+                <Handle val="HeroRankedPanel_LeaderBoardsButton"/>
+                <ReportsStats val="true"/>
+            </Frame>
+
+            <Frame type="NydusLinkButton" name="RankedGuideButton" template="HeroRankedPanel/RankedGuideButton">
+                <Anchor side="Top" relative="$parent/SeasonLabel" pos="Mid" offset="0" />
+                <Anchor side="Bottom" relative="$parent/SeasonLabel" pos="Mid" offset="0" />
+                <Anchor side="Left" relative="$parent/LeaderBoardsButton" pos="Max" offset="0" />
+                <Handle val="HeroRankedPanel_RankedGuideButton"/>
+                <ReportsStats val="true"/>
+            </Frame>
+        </Frame>
+
+        <Frame type="Frame" name="AnchoredPopupAnchorFrame">
+            <Anchor side="Top" relative="$this" pos="Max" offset="0"/>
+            <Anchor side="Left" relative="$parent/ReadyButton" pos="Mid" offset="-8"/>
+            <Anchor side="Right" relative="$parent/ReadyButton" pos="Mid" offset="12"/>
+            <Anchor side="Bottom" relative="$parent/ReadyButton" pos="Min" offset="0"/>
+            <Width val="20"/>
+            <Height val="20"/>
+            <TooltipAnchorPosition val="TopCenter"/>
+            <Frame type="AnchoredPopup" name="ReadyRequirementsPopup" template="HeroRankedPanel/RankedReadyButtonAnchoredPopupTemplate"/>
+        </Frame>
+
+        <Frame type="Button" name="ReadyButton" template="StandardTemplates/ReadyButtonTemplate_Middle">
+            <ClickSound val="@UI_BNet_Ready"/>
+            <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="-20"/>
+            <Text val="@UI/ScreenHeroMatchmaking/ReadyButton"/>
+            <TooltipAnchorPosition val="TopCenter"/>
+        </Frame>
+
+        <Frame type="Frame" name="ReadyButtonNotificationContainer" template="StandardTemplates/ReadyButtonNotificationContainerTemplate">
+            <Anchor side="Bottom" relative="$parent/ReadyButton" pos="Mid" offset="-50"/>
+            <Anchor side="Left" relative="$parent/ReadyButton" pos="Min" offset="-100"/>
+            <Anchor side="Right" relative="$parent/ReadyButton" pos="Max" offset="100"/>
+        </Frame>
+    </Frame>
+</Desc>

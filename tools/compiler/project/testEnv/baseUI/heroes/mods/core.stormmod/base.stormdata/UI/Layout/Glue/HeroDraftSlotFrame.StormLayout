@@ -1,0 +1,1610 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<Desc>
+    <DescFlags val="Locked"/>
+
+    <Constant name="DraftNameRotationLeft" val="30.50"/>
+    <Constant name="DraftNameRotationRight" val="-30.50"/>
+    <Constant name="DraftSwapButtonOffset" val="-25"/>
+
+    <Frame type="Button" name="SwapButtonTemplate">
+        <Width val="68"/>
+        <Height val="68"/>
+        <Unclipped val="True"/>
+        <Tooltip val="@UI/Draft/SwapButtonTooltip"/>
+        <TooltipAnchorPosition val="MiddleRight"/>
+        <ClickSound val="@UI_BNet_Generic_01"/>
+        <DisplayType val="ImageLayer"/>
+
+        <Frame type="Image" name="NormalImage">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+            <LayerCount val="1"/>
+            <Texture val="@UI/Storm_UI_Draft_Swap_Normal" layer="0"/>
+            <StateCount val="1"/>
+            <DesaturateOnDisable val="True"/>
+        </Frame>
+
+        <Frame type="Image" name="HoverImage">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+            <ColorAdjustMode val="AddSelf"/>
+            <AdjustmentColor val="150,255,255,255"/>
+            <LayerCount val="1"/>
+            <Texture val="@UI/Storm_UI_Draft_Swap_Normal" layer="0"/>
+            <TextureType val="Nineslice" layer="0"/>
+            <Tiled val="true"/>
+            <StateCount val="1"/>
+            <DesaturateOnDisable val="false"/>
+        </Frame>
+
+        <Frame type="Frame" name="HitTestFrame">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="10"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="-10"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="10"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="-10"/>
+        </Frame>
+        
+        <StateGroup name="SwapVisibility">
+            <DefaultState val="NotSwapping"/>
+            
+            <State name="NotSwapping">
+                <Action type="SetProperty" Visible="False"/>
+            </State>
+            
+            <State name="SwapPhase">
+                <When type="Property" frame="$ancestor[@type=HeroDraftSlotFrame]" SlotState="Swapping"/>
+                <When type="Property" frame="$ancestor[@type=HeroDraftSlotFrame]" IsSwappable="True"/>
+                <Action type="SetProperty" Visible="True"/>
+            </State>
+        </StateGroup>
+    </Frame>
+
+    <Frame type="Image" name="UnknownSelectionTemplate">
+        <Anchor side="Top" relative="$parent/Cutscene" pos="Mid" offset="-100"/>
+        <Anchor side="Bottom" relative="$parent/Cutscene" pos="Mid" offset="-100"/>
+        <Anchor side="Left" relative="$parent/Cutscene" pos="Mid" offset="-6"/>
+        <Anchor side="Right" relative="$parent/Cutscene" pos="Mid" offset="-6"/>        
+        <Texture val="@UI/storm_ui_draft_blue_spinner"/>
+        <Visible val="False"/>
+
+        <Animation name="UnknownSelectionSpinner">
+            <Event event="OnShown" action="Play,DirectionForward" frame="$parent"/>
+            <Event event="HiddenSelection" action="Play,DirectionForward" frame="$parent"/>
+
+            <Controller type="Rotation" relative="False" end="Loop">
+                <Key type="Curve" time="0" value="0" out="linear"/>
+                <Key type="Curve" time="5" value="-360" in="linear"/>
+            </Controller>            
+        </Animation>
+    </Frame>
+
+    <Frame type="Image" name="PickingHighlightTemplate">
+        <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+        <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+        <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+        <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+        <Width val="284"/>
+        <Height val="304"/>
+        <LayerCount val="2"/>
+        <BlendMode val="Normal"/>
+        <Alpha val="0"/>
+        
+        <Texture val="@UI/Storm_UI_Glues_Draft_Portrait_Selecting_Glow_Mask" layer="0"/>
+        <TextureCoords top="0" left=".6" bottom="1" right=".3" layer="0"/>
+        <AlphaLayer val="True" layer="0"/>
+        <WrapUV val="True" layer="0"/>
+        
+        <Texture val="@UI/Storm_UI_Glues_Draft_Portrait_Selecting_Glow_Blue" layer="1"/>
+        <WrapUV val="True" layer="1"/>
+        
+        <Animation name="PreviewSelectPicking">
+            <Event event="MyTurn" action="Reset,DirectionForward,Play" frame="$parent"/>
+            <Event event="EnemyTeamTurn" action="Stop" frame="$parent"/>
+            <Event event="MyTeamTurn" action="Stop" frame="$parent"/>
+            <Event event="ResetActiveState" action="Stop" frame="$parent"/>
+            
+            <Controller type="Fade" end="Pause">
+                <Key type="Curve" time="0" value="0" out="Slow"/>
+                <Key type="Curve" time=".326" value="255" out="Slow"/>
+            </Controller>
+            <Controller type="LayerUV" layer="0" side="Left" relative="True" sidelock="True" end="Loop" >
+                <Key type="Curve" time="0" value="0" out="fast"/>
+                <Key type="Curve" time="1.956" value="1" in="fast"/>
+            </Controller>
+        </Animation>
+    </Frame>
+
+    <Frame type="Frame" name="BanChooserFrameTemplate">
+        <Width val="80"/>
+        <Height  val="80"/>
+        <Visible val="false"/>
+
+        <Frame type="Image" name="PulseImage">
+            <Anchor side="Top" relative="$parent/BanChooserIcon" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent/BanChooserIcon" pos="Mid" offset="0"/>
+            <Anchor side="Left" relative="$parent/BanChooserIcon" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent/BanChooserIcon" pos="Mid" offset="0"/>
+            <Unclipped val="true"/>
+            <Texture val="@UI/storm_ui_draft_leader_icon_pulse"/>
+
+            <Animation name="BanIsActive">
+                <Event event="OnShown" action="Reset,Play"/>
+                <Event event="OnHidden" action="Stop"/>
+
+                <Controller type="Dimension" dimension="Width" relative="False" percentage="True" end="PingPong" >
+                    <Key type="Curve" time="0" value="90" out="Auto"/>
+                    <Key type="Curve" time=".6" value="70" in="Auto" />
+                </Controller>
+                <Controller type="Dimension" dimension="Height" relative="False" percentage="True" end="PingPong" >
+                    <Key type="Curve" time="0" value="90" out="Auto"/>
+                    <Key type="Curve" time=".6" value="70" in="Auto" />
+                </Controller>
+            </Animation>
+        </Frame>
+
+        <Frame type="Image" name="BanChooserIcon">
+            <Anchor relative="$parent"/>
+            <Texture val="@UI/storm_ui_draft_leader_icon_active"/>
+        </Frame>
+
+        <Frame type="Frame" name="ShineEffectFrame">
+            <Anchor relative="$parent"/>
+
+            <Frame type="Image" name="GlareImage">
+                <Anchor relative="$parent"/>
+                <BlendMode val="Add"/>
+                <LayerCount val="2"/>
+
+                <Texture val="@UI/storm_ui_draft_leader_icon_mask" layer="0"/>
+                <AlphaLayer val="True" layer="0"/>
+                <TextureType val="Normal" layer="0"/>
+
+                <Texture val="@UI/storm_ui_draft_leader_icon_uvscroll" layer="1"/>
+                <TextureType val="Normal" layer="1"/>
+                <TextureCoords top="0" left="0" bottom="1" right="1" layer="1"/>
+                <WrapUV val="false" layer="1"/>
+                
+
+                <Animation name="UVScroll">
+                    <Event event="OnShown" action="Reset,Play" frame="$parent"/>
+                    <Event event="OnHidden" action="Stop" frame="$parent"/>
+
+                    <Controller type="LayerUV" layer="1" side="Top" relative="False" sidelock="True" end="Loop" >
+                        <Key type="Curve" time="0" value="-1" out="fast"/>
+                        <Key type="Curve" time="1.0" value="1" in="fast"/>
+                        <Key type="Curve" time="5.0" value="1" in="fast"/>
+                    </Controller>
+                    <Controller type="Fade" end="Loop">
+                        <Key type="Curve" time="0" value="200" out="Auto"/>
+                    </Controller>                    
+                </Animation>
+            </Frame>
+
+            <Frame type="Image" name="Flare">
+                <Anchor side="Top" relative="$parent" pos="Mid" offset="-19"/>
+                <Anchor side="Bottom" relative="$parent" pos="Mid" offset="-19"/>
+                <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+
+                <Texture val="@UI/storm_ui_draft_leader_icon_flare"/>
+                <BlendMode val="Add"/>
+                <Animation name="Flicker">
+                    <Event event="OnShown" action="Reset,Play" frame="$parent"/>
+                    <Event event="OnHidden" action="Stop" frame="$parent"/>
+                    
+                    <Controller type="Dimension" dimension="Width" relative="False" percentage="True" end="Loop">
+                        <Key type="Curve" time="0" value="1"/>
+                        <Key type="Curve" time=".5" value="1" out="Fast"/>
+                        <Key type="Curve" time="1.0" value="100" out="Slow"/>
+                        <Key type="Curve" time="1.5" value="1"/>
+                        <Key type="Curve" time="5" value="1"/>
+                    </Controller>
+                    <Controller type="Dimension" dimension="Height" relative="False" percentage="True" end="Loop">
+                        <Key type="Curve" time="0" value="1"/>
+                        <Key type="Curve" time=".5" value="1" out="Fast"/>
+                        <Key type="Curve" time="1.0" value="100" out="Slow"/>
+                        <Key type="Curve" time="1.5" value="1"/>
+                        <Key type="Curve" time="5" value="1"/>
+                    </Controller>
+                </Animation>
+            </Frame>
+        </Frame>
+
+        <StateGroup name="BanChooserState">
+            <DefaultState val="BanChooserOff"/>
+
+            <State name="BanChooserOff">
+                <Action type="SetProperty" frame="$this" visible="false"/>
+                <Action type="SetProperty" frame="BanChooserIcon" visible="false"/>
+                <Action type="SetProperty" frame="PulseImage" visible="false"/>
+                <Action type="SetProperty" frame="ShineEffectFrame" visible="false"/>
+            </State>
+            <State name="BanChooserBanning">
+                <Action type="SetProperty" frame="$this" visible="true"/>
+                <Action type="SetProperty" frame="PulseImage" visible="true"/>
+                <Action type="SetProperty" frame="ShineEffectFrame" visible="true"/>
+                <Action type="SetProperty" frame="BanChooserIcon" visible="true"/>
+                <Action type="SetProperty" frame="BanChooserIcon" texture="@UI/storm_ui_draft_leader_icon_active"/>
+            </State>
+            <State name="BanChooserOnMyTeamTurn">
+                <Action type="SetProperty" frame="$this" visible="true"/>
+                <Action type="SetProperty" frame="PulseImage" visible="false"/>
+                <Action type="SetProperty" frame="ShineEffectFrame" visible="false"/>
+                <Action type="SetProperty" frame="BanChooserIcon" visible="true"/>
+                <Action type="SetProperty" frame="BanChooserIcon" texture="@UI/storm_ui_draft_leader_icon_normal"/>
+            </State>
+            <State name="BanChooserOn">
+                <Action type="SetProperty" frame="$this" visible="true"/>
+                <Action type="SetProperty" frame="PulseImage" visible="false"/>
+                <Action type="SetProperty" frame="ShineEffectFrame" visible="false"/>
+                <Action type="SetProperty" frame="BanChooserIcon" visible="true"/>
+                <Action type="SetProperty" frame="BanChooserIcon" texture="@UI/storm_ui_draft_leader_icon_disabled"/>
+            </State>
+        </StateGroup>
+
+        <Frame type="Frame" name="TooltipAnchorFrame">
+            <Anchor relative="$parent"/>
+            <Tooltip val="@UI/Draft/BanChooser"/>
+            <TooltipAnchorPosition val="TopCenter"/>
+            <AcceptsMouse val="true"/>
+        </Frame>
+    </Frame>
+
+    <Frame type="CutsceneFrame" name="HeroSelectedCutsceneTemplate">
+        <File val="Cutscenes/DraftUI_NamePlate.StormCutscene"/>
+        <RenderType val="HDR"/>
+        <AutoPlay val="true"/>
+        <AcceptsMouse val="false"/>
+        <Width val="700"/>
+        <Height val="700"/>
+        <Unclipped val="True"/>
+        <IgnoreParentAlpha val="true"/>
+    </Frame>
+
+    <Frame type="HeroDraftSlotFrame" name="HeroDraftSlotFrameTemplate">
+        <Width val="412"/>
+        <Height val="412"/>
+        <AcceptsMouse val="false"/>
+
+        <Animation name="Intro">
+            <Event event="Intro" action="Restart,Play"/>
+            <Event event="Reset" action="Stop" frame="$parent"/>
+
+            <Controller type="Fade" end="Pause">
+                <Key type="Curve" time="0" value="0" out="Fast"/>
+                <Key type="Curve" time=".2" value="255" in="Slow"/>
+            </Controller>
+            <Controller type="Anchor" end="Pause" side="Bottom" relative="true" frame="NameLabelBackgroundImage">
+                <Key type="Curve" time="0" value="-40" out="Fast"/>
+                <Key type="Curve" time=".6" value="0" in="Slow"/>
+            </Controller>
+            <Controller type="Fade" end="Pause" frame="NameLabelBackgroundImage">
+                <Key type="Curve" time="0.0" value="0" out="Fast"/>
+                <Key type="Curve" time=".6" value="255" in="Slow"/>
+            </Controller>
+            <Controller type="Visibility" end="Pause" frame="PortraitContainer">
+                <Key type="Bool" time="0" value="true"/>
+            </Controller>
+            <Controller type="Visibility" end="Pause" frame="PortraitContainer/UnknownSelection">
+                <Key type="Bool" time="0" value="false"/>
+            </Controller>
+            <Controller type="Visibility" end="Pause" frame="PortraitContainer/Cutscene">
+                <Key type="Bool" time="0" value="false"/>
+            </Controller>
+            <Controller type="Fade" end="Pause" frame="PortraitContainer/DisabledBackgroundImage">
+                <Key type="Curve" time="0" value="0" out="Step"/>
+                <Key type="Curve" time="1.0" value="0" out="Fast"/>
+                <Key type="Curve" time="2.0" value="255" out="Slow"/>
+            </Controller>
+            <Controller type="Fade" end="Pause" frame="PortraitContainer/BackgroundImage">
+                <Key type="Curve" time="0" value="0" out="Step"/>
+                <Key type="Curve" time="1.0" value="0" out="Fast"/>
+                <Key type="Curve" time="1.5" value="255" out="Fast"/>
+                <Key type="Curve" time="2.0" value="0" out="Slow"/>
+            </Controller>
+            <Controller type="Property" property="AcceptsMouse" end="Pause">
+                <Key type="Property" time="0" value="False"/>
+                <Key type="Property" time="3.0" value="True"/>
+            </Controller>
+        </Animation>
+
+        <Animation name="ReadySelected">
+            <Event event="Ready" action="Reset,Play"/>
+            <Event event="NotReady" action="Stop" frame="$parent"/>
+
+            <Controller type="Event" end="Stop">
+                <Key type="Event" time="0.0" event="Null"/>
+                <Key type="Event" time="0.6" event="Selected"/>
+            </Controller>
+        </Animation>
+
+        <Frame type="Frame" name="HitTestFrame">
+            <Anchor side="Top" relative="$parent" pos="Mid" offset="9"/>
+            <Anchor side="Bottom" relative="$parent" pos="Mid" offset="9"/>
+            <Anchor side="Left" relative="$parent" pos="Mid" offset="-13"/>
+            <Anchor side="Right" relative="$parent" pos="Mid" offset="-13"/>
+            <Alpha val="50"/>
+            <Width val="232"/>
+            <Height val="252"/>
+            <HitTestTexture val="@UI/Storm_UI_Glues_Draft_Portrait_Hittest_Left"/>
+            <TooltipAnchorPosition val="MiddleRight"/>
+        </Frame>
+
+        <Frame type="Frame" name="AnchorFrame">
+            <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+            <Width val="232"/>
+            <Height val="256"/>
+        </Frame>
+
+        <StateGroup name="MyTurnState">
+            <DefaultState val="DimmedBorder"/>
+
+            <!-- DraftNotStarted -->
+            <State name="DraftNotStarted">
+                <When type="AnimationState" ActiveState="DraftNotStarted"/>
+                <Action type="SendEvent" event="ResetActiveState"/>
+            </State>
+
+            <!-- Actively Banning -->
+            <State name="ActiveBorder">
+                <When type="AnimationState" ActiveState="Active"/>
+                <Action type="SendEvent" event="MyTurn"/>
+            </State>
+            <!-- My team's turn -->
+            <State name="NormalBorder">
+                <When type="AnimationState" TeamState="MyTeam"/>
+                <Action type="SendEvent" event="MyTeamTurn"/>
+            </State>
+            <!-- Show active border for both team when counting down -->
+            <State name="NormalBorder2">
+                <When type="Property" SlotState="Countdown"/>
+                <Action type="SendEvent" event="MyTeamTurn"/>
+            </State>
+            <!-- Show active border for both team when Swapping -->
+            <State name="NormalBorder3">
+                <When type="Property" SlotState="Swapping"/>
+                <Action type="SendEvent" event="MyTeamTurn"/>
+            </State>
+            <!-- Default -->
+            <State name="DimmedBorder">
+                <Action type="SendEvent" event="EnemyTeamTurn"/>
+            </State>
+        </StateGroup>
+
+        <StateGroup name="SlotStateController">
+            <State name="PreviewSelect">
+                <When type="Property" SlotState="PreviewSelect"/>
+                <Action type="SetState" group="SlotVisualState" state="PreviewSelect"/>
+            </State>
+
+            <State name="PreviewSelectNotYourTurn">
+                <When type="Property" SlotState="PreviewSelectNotYourTurn"/>
+                <Action type="SetState" group="SlotVisualState" state="PreviewSelectNotYourTurn"/>
+            </State>
+
+            <State name="PreviewSelectPicking">
+                <When type="Property" SlotState="PreviewSelectPicking"/>
+                <Action type="SetState" group="SlotVisualState" state="PreviewSelectPicking"/>
+            </State>
+
+            <State name="Selected">
+                <When type="Property" SlotState="Selected"/>
+                <Action type="SetState" group="SlotVisualState" state="Selected"/>
+            </State>
+
+            <State name="Countdown">
+                <When type="Property" SlotState="Countdown"/>
+                <Action type="SetState" group="SlotVisualState" state="Selected"/>
+            </State>
+
+            <State name="Swapping">
+                <When type="Property" SlotState="Swapping"/>
+                <Action type="SetState" group="SlotVisualState" state="Selected"/>
+            </State>
+
+            <State name="SelectedNotYourTurn">
+                <When type="Property" SlotState="SelectedNotYourTurn"/>
+                <Action type="SetState" group="SlotVisualState" state="SelectedNotYourTurn"/>
+            </State>
+
+            <State name="NotSelectedYourTurn">
+                <When type="Property" SlotState="NotSelectedYourTurn"/>
+                <Action type="SetState" group="SlotVisualState" state="NotSelectedYourTurn"/>
+            </State>
+
+            <State name="NotSelectedNotYourTurn">
+                <When type="Property" SlotState="NotSelectedNotYourTurn"/>
+                <Action type="SetState" group="SlotVisualState" state="NotSelectedNotYourTurn"/>
+            </State>
+
+            <State name="NotSelectedPicking">
+                <When type="Property" SlotState="NotSelectedPicking"/>
+                <Action type="SetState" group="SlotVisualState" state="NotSelectedPicking"/>
+            </State>
+
+            <State name="HiddenSelection">
+                <When type="Property" SlotState="HiddenSelection"/>
+                <Action type="SetState" group="SlotVisualState" state="HiddenSelection"/>
+            </State>
+        </StateGroup>
+        
+        <StateGroup name="PortraitOverlayState">
+            <State name="None">
+                <Action type="SetProperty" frame="PortraitContainer/PortraitOverlay" Visible="False"/>
+                <Action type="SetProperty" frame="PortraitContainer/PortraitOverlayNotYourTurn" Visible="False"/>
+            </State>
+
+            <State name="Regular">
+                <Action type="SetProperty" frame="PortraitContainer/PortraitOverlay" Visible="True"/>
+                <Action type="SetProperty" frame="PortraitContainer/PortraitOverlayNotYourTurn" Visible="False"/>
+            </State>
+
+            <State name="NotYourTurn">
+                <Action type="SetProperty" frame="PortraitContainer/PortraitOverlay" Visible="False"/>
+                <Action type="SetProperty" frame="PortraitContainer/PortraitOverlayNotYourTurn" Visible="True"/>
+            </State>
+        </StateGroup>
+
+        <StateGroup name="PortraitState">
+            <State name="None">
+                <Action type="SetProperty" frame="PortraitContainer/BackgroundImage" Alpha="0"/>
+                <Action type="SetProperty" frame="PortraitContainer/Cutscene" Visible="False" undo="false"/>
+            </State>
+
+            <State name="HeroOnly">
+                <Action type="SetProperty" frame="PortraitContainer/BackgroundImage" Alpha="0"/>
+                <Action type="SetProperty" frame="PortraitContainer/Cutscene" Visible="True" undo="false"/>
+            </State>
+
+            <State name="BackgroundOnly">
+                <Action type="SetProperty" frame="PortraitContainer/BackgroundImage" Alpha="255"/>
+                <Action type="SetProperty" frame="PortraitContainer/Cutscene" Visible="False" undo="false"/>
+            </State>
+
+            <State name="HeroAndBackground">
+                <Action type="SetProperty" frame="PortraitContainer/BackgroundImage" Alpha="255"/>
+                <Action type="SetProperty" frame="PortraitContainer/Cutscene" Visible="True" undo="false"/>
+            </State>
+        </StateGroup>
+        
+        <StateGroup name="SlotVisualState">
+            <DefaultState val="NotSelectedNotYourTurn"/>
+            
+            <State name="PreviewSelect">
+                <Action type="SetState" group="PortraitState" state="HeroAndBackground"/>
+                <Action type="SetState" group="HeroLabelState" state="Hidden"/>
+                <Action type="SetState" group="NameLabelState" state="NotSelected"/>
+                <Action type="SetState" group="PortraitOverlayState" state="Regular"/>
+            </State>
+
+            <State name="PreviewSelectNotYourTurn">
+                <Action type="SetState" group="PortraitState" state="HeroOnly"/>
+                <Action type="SetState" group="HeroLabelState" state="Hidden"/>
+                <Action type="SetState" group="NameLabelState" state="Disabled"/>
+                <Action type="SetState" group="PortraitOverlayState" state="Regular"/>
+            </State>
+
+            <State name="PreviewSelectPicking">
+                <Action type="SetState" group="PortraitState" state="HeroAndBackground"/>
+                <Action type="SetState" group="HeroLabelState" state="Picking"/>
+                <Action type="SetState" group="NameLabelState" state="NotSelected"/>
+                <Action type="SetState" group="PortraitOverlayState" state="Regular"/>
+            </State>
+
+            <State name="Selected">
+                <Action type="SetState" group="PortraitState" state="HeroAndBackground"/>
+                <Action type="SetState" group="HeroLabelState" state="Selected"/>
+                <Action type="SetState" group="NameLabelState" state="Selected"/>
+                <Action type="SetState" group="PortraitOverlayState" state="None"/>
+            </State>
+
+            <State name="SelectedNotYourTurn">
+                <Action type="SetState" group="PortraitState" state="HeroOnly"/>
+                <Action type="SetState" group="HeroLabelState" state="Disabled"/>
+                <Action type="SetState" group="NameLabelState" state="Disabled"/>
+                <Action type="SetState" group="PortraitOverlayState" state="NotYourTurn"/>
+            </State>
+
+            <State name="NotSelectedYourTurn">
+                <Action type="SetState" group="PortraitState" state="BackgroundOnly"/>
+                <Action type="SetState" group="HeroLabelState" state="Hidden"/>
+                <Action type="SetState" group="NameLabelState" state="NotSelected"/>
+                <Action type="SetState" group="PortraitOverlayState" state="None"/>
+            </State>
+        
+            <State name="NotSelectedNotYourTurn">
+                <Action type="SetState" group="PortraitState" state="None"/>
+                <Action type="SetState" group="HeroLabelState" state="Hidden"/>
+                <Action type="SetState" group="NameLabelState" state="Disabled"/>
+                <Action type="SetState" group="PortraitOverlayState" state="None"/>
+            </State>
+        
+            <State name="NotSelectedPicking">
+                <Action type="SetState" group="PortraitState" state="BackgroundOnly"/>
+                <Action type="SetState" group="HeroLabelState" state="Picking"/>
+                <Action type="SetState" group="NameLabelState" state="Picking"/>
+                <Action type="SetState" group="PortraitOverlayState" state="None"/>
+                <Action type="SetProperty" frame="PortraitContainer/UnknownSelection" Visible="True"/>
+            </State>
+                
+            <State name="HiddenSelection">
+                <Action type="SetState" group="PortraitState" state="BackgroundOnly"/>
+                <Action type="SetProperty" frame="PortraitContainer/UnknownSelection" Visible="True"/>
+                <Action type="SetState" group="HeroLabelState" state="Picking"/>
+                <Action type="SetState" group="NameLabelState" state="NotSelected"/>
+                <Action type="SetState" group="PortraitOverlayState" state="None"/>
+            </State>
+        </StateGroup>
+
+        <Frame type="Image" name="PortraitBorderSelectedGlowImage">
+            <Anchor relative="$parent/BorderImage" />
+            <Texture val="@UI/Storm_Draft_Portrait_Selected_Blue"/>
+            <Alpha val="0"/>
+            
+            <Animation name="Ready">
+                <Event event="MyTurn" action="DirectionForward,Play" frame="$parent"/>
+                <Event event="EnemyTeamTurn" action="DirectionReverse,Play" frame="$parent"/>
+                <Event event="MyTeamTurn" action="DirectionReverse,Play" frame="$parent"/>
+                <Event event="ResetActiveState" action="DirectionReverse,Play" frame="$parent"/>
+
+                <Controller type="Fade" end="Pause">
+                    <Key type="Curve" time="0" value="0" out="Slow"/>
+                    <Key type="Curve" time=".9" value="255" in="Slow"/>
+                </Controller>
+            </Animation>
+        </Frame>
+        
+    <!--Player Frame Cutscenes-->
+        <Frame type="Frame" name="PortraitContainer">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="110"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="121"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="-119"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="-121"/>
+            <AlphaMaskTexture val="@UI/storm_ui_draft_alphamask_portrait_left"/>
+            <Visible val="false"/>
+
+            <Frame type="BlurFrame" name="AlternateHeroTileListBlurFrame" template="StandardTemplates/FullscreenBlurFrame">
+                <Anchor relative="$parent"/>
+                <BlurAmount val="0.2"/>
+            </Frame>     
+
+            <Frame type="Image" name="DisabledBackgroundImage">
+                <Anchor side="Top" relative="$parent/$parent" pos="Mid" offset="0"/>
+                <Anchor side="Bottom" relative="$parent/$parent" pos="Mid" offset="0"/>
+                <Anchor side="Left" relative="$parent/$parent" pos="Mid" offset="0"/>
+                <Anchor side="Right" relative="$parent/$parent" pos="Mid" offset="0"/>
+                <Texture val="@UI/storm_ui_glues_draft_portrait_disabled_bg"/>
+                <Alpha val="0"/>
+                <Width val="232"/>
+                <Height val="256"/>
+            </Frame>        
+            
+            <Frame type="Image" name="BackgroundImage">
+                <Anchor side="Top" relative="$parent/$parent" pos="Mid" offset="0"/>
+                <Anchor side="Bottom" relative="$parent/$parent" pos="Mid" offset="0"/>
+                <Anchor side="Left" relative="$parent/$parent" pos="Mid" offset="0"/>
+                <Anchor side="Right" relative="$parent/$parent" pos="Mid" offset="0"/>
+                <Texture val="@UI/Storm_Draft_Portrait_BG_Blue"/>
+                <Width val="232"/>
+                <Height val="256"/>
+                <Alpha val="0"/>
+
+                <Animation name="ActiveTimeScale">
+                    <Event event="MyTurn" action="Reset,Play" frame="$parent/$parent"/>
+                    <Event event="MyTeamTurn" action="Reset,Play" frame="$parent/$parent"/>
+                    <Event event="ResetActiveState" action="Stop" frame="$parent/$parent"/>
+
+                    <Controller type="Fade" end="Pause">
+                        <Key type="Curve" time="0" value="255"/>
+                    </Controller>
+                </Animation>
+            </Frame>
+
+            <Frame type="HeroCutsceneFrame" name="Cutscene">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="-111"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="-89"/>
+                <Anchor side="Bottom" relative="$parent" pos="Max" offset="315"/>
+                <Anchor side="Right" relative="$parent" pos="Max" offset="102"/>
+                <HeroCutsceneType val="DraftPick"/>
+                <ToneMapping val="false"/>
+                <AcceptsMouse val="false"/>
+
+                <Animation name="ActiveTimeScale">
+                    <Event event="MyTurn" action="DirectionForward,Play" frame="$parent/$parent"/>
+                    <Event event="EnemyTeamTurn" action="DirectionReverse,Play" frame="$parent/$parent"/>
+                    <Event event="MyTeamTurn" action="DirectionReverse,Play" frame="$parent/$parent"/>
+                    <Event event="ResetActiveState" action="DirectionReverse,Play" frame="$parent/$parent"/>
+
+                    <Controller type="Cutscene" end="Pause">
+                        <Key type="Cutscene" time="0.00" action="TimeScale" value="0.38" out="Fast"/>
+                        <Key type="Cutscene" time="0.01" action="TimeScale" value="1.0" out="Fast"/>
+                    </Controller>
+                </Animation>
+            </Frame>
+
+            <Frame type="Image" name="UnknownSelection" template="HeroDraftSlotFrame/UnknownSelectionTemplate">
+            </Frame>
+
+            <Frame type="Image" name="PortraitOverlay">
+                <Anchor relative="$parent" offset="2"/>
+                <Texture val="@UI/storm_ui_draft_portrait_overlay_blue_v2"/>
+                <Width val="244"/>
+                <Height val="98"/>
+                <Alpha val="130"/>
+            </Frame>
+
+            <Frame type="Image" name="PortraitOverlayNotYourTurn">
+                <Anchor relative="$parent" offset="2"/>
+                <Texture val="@UI/storm_ui_draft_portrait_overlay_blue_v2"/>
+                <Width val="244"/>
+                <Height val="98"/>
+                <Alpha val="50"/>
+            </Frame>
+        </Frame>
+
+        <!-- Used to hide boundary of masked PortraitContainer -->
+        <Frame type="Image" name="PortraitContainerOutliner">
+            <Anchor side="Top" relative="$parent/BorderImage" pos="Mid" offset="-1"/>
+            <Anchor side="Bottom" relative="$parent/BorderImage" pos="Mid" offset="-1"/>
+            <Anchor side="Left" relative="$parent/BorderImage" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent/BorderImage" pos="Mid" offset="0"/>
+            <Texture val="@UI/Storm_Draft_Portrait_Selected_Blue_Line"/>
+            <Alpha val="0"/>
+            
+            <Animation name="Ready">
+                <Event event="MyTurn" action="Reset,Play" frame="$parent"/>
+                <Event event="MyTeamTurn" action="Reset,Play" frame="$parent"/>
+                <Event event="EnemyTeamTurn" action="Stop" frame="$parent"/>
+                <Event event="ResetActiveState" action="Stop" frame="$parent"/>
+
+                <Controller type="Fade" end="Pause">
+                    <Key type="Curve" time="0" value="0" out="Slow"/>
+                    <Key type="Curve" time="0.1" value="255" out="Slow"/>
+                </Controller>
+            </Animation>
+        </Frame>
+
+        <!--PIPS-->
+        <Frame type="Frame" name="ThinkingContainer" template="HeroDraftTemplates/ThinkingContainerTemplate">
+            <Anchor side="Top" relative="$parent/AnchorFrame" pos="Min" offset="40"/>
+            <Anchor side="Left" relative="$parent/AnchorFrame" pos="Min" offset="1"/>
+            <Anchor side="Right" relative="$parent/AnchorFrame" pos="Max" offset="1"/>
+            <RenderType val="HDR"/>
+
+            <Animation name="PreviewSelectPicking">
+                <Event event="OnShown" action="Play"/>
+                <Event event="OnHidden" action="Stop"/>
+
+                <Controller type="Event" end="Stop">
+                    <Key type="Event" time="0.0" event="Start"/>
+                </Controller>
+            </Animation>            
+        </Frame>
+
+        <Frame type="Image" name="BorderImage">
+            <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+            <Width val="232"/>
+            <Height val="256"/>
+            <Texture val="@UI/Storm_Draft_Portrait_Normal"/>
+            <Alpha val="0"/>
+
+            <Animation name="ShowBorder">
+                <Event event="MyTurn" action="Reset,Play" frame="$parent"/>
+                <Event event="EnemyTeamTurn" action="Reset,Play" frame="$parent"/>
+                <Event event="MyTeamTurn" action="Reset,Play" frame="$parent"/>
+                <Event event="ResetActiveState" action="Stop" frame="$parent"/>
+
+                <Controller type="Fade" end="Pause">
+                    <Key type="Curve" time="0" value="0" out="Slow"/>
+                    <Key type="Curve" time="0.1" value="255" out="Slow"/>
+                </Controller>
+            </Animation>
+
+            <Animation name="UpdateBorderTexture">
+                <Event event="MyTurn" action="DirectionForward,Play" frame="$parent"/>
+                <Event event="EnemyTeamTurn" action="DirectionReverse,Play" frame="$parent"/>
+                <Event event="MyTeamTurn" action="Stop" frame="$parent"/>
+                <Event event="ResetActiveState" action="Stop" frame="$parent"/>
+
+                <Controller type="Texture" end="Pause">
+                    <Key type="Image" time="0.00" image="@UI/Storm_Draft_Portrait_Disabled"/>
+                    <Key type="Image" time="0.01" image="@UI/Storm_Draft_Portrait_Selected"/>
+                </Controller>
+            </Animation>
+        </Frame>
+
+        <Frame type="Image" name="WhiteOutImage">
+            <Anchor side="Top" relative="$parent/AnchorFrame" pos="Mid" offset="0"/>
+            <Anchor side="Left" relative="$parent/AnchorFrame" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent/AnchorFrame" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent/AnchorFrame" pos="Mid" offset="0"/>
+            <Texture val="@UI/storm_ui_glues_draft_portrait_whiteout"/>
+            <BlendMode val="Add"/>
+            <Alpha val="0"/>
+            
+            <Animation name="Ready">
+                <Event event="Ready" action="Reset,Play,DirectionForward" frame="$parent"/>
+                <Event event="NotReady" action="Stop" frame="$parent"/>
+
+                <Controller type="Fade" end="Pause">
+                    <Key type="Curve" time="0" value="0" out="Slow"/>
+                    <Key type="Curve" time=".6" value="0" out="Slow"/>
+                    <Key type="Curve" time=".9" value="255" in="Slow"/>
+                    <Key type="Curve" time="1.5" value="0" in="Slow"/>
+                </Controller>
+            </Animation>
+
+            <Animation name="Swap">
+                <Event event="HeroSwapped" action="Reset,Play,DirectionForward" frame="$parent"/>
+
+                <Controller type="Fade" end="Pause">
+                    <Key type="Curve" time="0" value="130" out="Slow"/>
+                    <Key type="Curve" time=".1" value="255" in="Slow"/>
+                    <Key type="Curve" time=".7" value="0" in="Slow"/>
+                </Controller>
+            </Animation>
+        </Frame>
+
+        <Frame type="Image" name="PickingHighlight" template="HeroDraftSlotFrame/PickingHighlightTemplate">
+
+        </Frame>
+
+        <Frame type="Image" name="IntroBorderImage">
+            <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+            <Width val="232"/>
+            <Height val="256"/>
+            <LayerCount val="2"/>
+            <Visible val="true"/>
+            
+            <Texture val="@UI/Storm_UI_Glues_Draft_Portrait_Outline_Mask" layer="0"/>
+            <TextureCoords top="0" left="0" bottom="1.45" right="1" layer="0"/>
+            <AlphaLayer val="True" layer="0"/>
+            <WrapUV val="False" layer="0"/>
+            
+            <Texture val="@UI/Storm_Draft_Portrait_Normal" layer="1"/>
+            
+            <Animation name="Intro">
+                <Event event="Intro" action="Reset,Play" frame="$parent"/>
+                <Event event="MyTurn" action="Stop" frame="$parent"/>
+                <Event event="EnemyTeamTurn" action="Stop" frame="$parent"/>
+                <Event event="MyTeamTurn" action="Stop" frame="$parent"/>
+
+                <Controller type="Visibility" end="Pause">
+                    <Key type="Bool" time="0" value="true"/>
+                </Controller>
+
+                <Controller type="LayerUV" layer="0" side="Top" relative="False" sidelock="True" end="Pause" >
+                    <Key type="Curve" time="0" value="-1" out="fast"/>
+                    <Key type="Curve" time="0.2" value="-1" out="fast"/>
+                    <Key type="Curve" time="1.1" value="1" in="fast"/>
+                </Controller>
+            </Animation>
+        </Frame>
+        
+        <Frame type="Image" name="OutlineImage">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="82"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="98"/>
+            <Width val="216"/>
+            <Height val="244"/>
+            <LayerCount val="2"/>
+            
+            <Texture val="@UI/Storm_UI_Glues_Draft_Portrait_Outline_Mask" layer="0"/>
+            <TextureCoords top="0" left="0" bottom="1.45" right="1" layer="0"/>
+            <AlphaLayer val="True" layer="0"/>
+            <WrapUV val="False" layer="0"/>
+            <Alpha val="0"/>
+            
+            <Texture val="@UI/Storm_UI_Glues_Draft_Portrait_Outline" layer="1"/>
+            <TextureCoords top="0" left="0" bottom="1" right="1" layer="1"/>
+            
+            <Animation name="UVScroll">
+                <Event event="Intro" action="Restart,DirectionForward,Play" frame="$parent"/>
+                <Event event="MyTurn" action="Stop" frame="$parent"/>
+                <Event event="EnemyTeamTurn" action="Stop" frame="$parent"/>
+                <Event event="MyTeamTurn" action="Stop" frame="$parent"/>
+
+                <Controller type="LayerUV" layer="0" side="Top" relative="False" sidelock="True" end="Pause" >
+                    <Key type="Curve" time="0" value="-1" out="fast"/>
+                    <Key type="Curve" time=".6" value="1" in="fast"/>
+                </Controller>
+                <Controller type="Fade" end="Pause">
+                    <Key type="Curve" time="0" value="255" out="Slow"/>
+                    <Key type="Curve" time="1.3" value="255" out="Slow"/>
+                    <Key type="Curve" time="1.9" value="0" out="Slow"/>
+                </Controller>
+            </Animation>
+        </Frame>
+
+        <Frame type="Image" name="IntroGlow">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="60"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="75"/>
+            <Width val="264"/>
+            <Height val="288"/>
+            <BlendMode val="Add"/>
+            <Texture val="@UI/Storm_UI_Glues_Draft_Portrait_Intro_Glow"/>
+
+            <Animation name="Fade">
+                <Event event="Intro" action="Restart,DirectionForward,Play" frame="$parent"/>
+
+                <Controller type="Fade" end="Pause" >
+                    <Key type="Curve" time="0" value="0" out="fast"/>
+                    <Key type="Curve" time=".9" value="0" out="fast"/>
+                    <Key type="Curve" time="1.4" value="255" in="fast"/>
+                    <Key type="Curve" time="3.2" value="0" in="fast"/>
+                </Controller>
+            </Animation>
+        </Frame>
+
+        <!-- Quick Burn-in Glow -->
+        <Frame type="Image" name="Glow1Image">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+            <Width val="412"/>
+            <Height val="412"/>
+            <LayerCount val="2"/>
+            <BlendMode val="Add"/>
+            <Alpha val="0"/>
+            
+            <Texture val="@UI/storm_ui_glues_draft_portrait_glow_mask" layer="0"/>
+            <TextureCoords top=".07" left=".04" bottom=".95" right=".95" layer="0"/>
+            <AlphaLayer val="True" layer="0"/>
+            <WrapUV val="True" layer="0"/>
+            
+            <Texture val="@UI/storm_ui_glues_draft_portrait_glow" layer="1"/>
+            <TextureCoords top="0" left="0" bottom="1" right="1" layer="1"/>
+            <WrapUV val="False" layer="1"/>
+            
+            <Animation name="Ready">
+                <Event event="Ready" action="Restart,DirectionForward,Play" frame="$parent"/>
+                <Event event="NotReady" action="Stop" frame="$parent"/>
+
+                <Controller type="Fade" end="Pause">
+                    <Key type="Curve" time="0" value="0" out="Slow"/>
+                    <Key type="Curve" time=".6" value="0" out="Fast"/>
+                    <Key type="Curve" time=".9" value="255" in="Slow"/>
+                    <Key type="Curve" time="1.2" value="0" in="Slow"/>
+                </Controller>
+            </Animation>
+        </Frame>
+            
+        <!-- Lingering Glow after Lock In -->
+        <Frame type="Image" name="BlueGlowImage">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+            <Width val="412"/>
+            <Height val="412"/>
+            <LayerCount val="2"/>
+            <BlendMode val="Add"/>
+            <Alpha val="0"/>
+            
+            <Texture val="@UI/storm_ui_glues_draft_portrait_glow_mask" layer="0"/>
+            <TextureCoords top=".07" left=".04" bottom=".95" right=".95" layer="0"/>
+            <AlphaLayer val="True" layer="0"/>
+            <WrapUV val="True" layer="0"/>
+            
+            <Texture val="@UI/storm_ui_glues_draft_portrait_glow2" layer="1"/>
+            <TextureCoords top="0" left="0" bottom="1" right="1" layer="1"/>
+            <WrapUV val="False" layer="1"/>
+            
+            <Animation name="Ready">
+                <Event event="Ready" action="Restart,DirectionForward,Play" frame="$parent"/>
+                <Event event="NotReady" action="Stop" frame="$parent"/>
+
+                <Controller type="Fade" end="Pause">
+                    <Key type="Curve" time="0" value="0" out="Slow"/>
+                    <Key type="Curve" time=".5" value="0" out="Slow"/>
+                    <Key type="Curve" time=".9" value="255" in="Slow"/>
+                    <Key type="Curve" time="4" value="0" in="Slow"/>
+                </Controller>
+            </Animation>
+        </Frame>
+        
+        <Frame type="Image" name="BorderSlamImage">
+            <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+            <Texture val="@UI/storm_ui_glues_draft_portrait_highlight"/>
+            <Alpha val="0"/>
+
+            <Animation name="Ready">
+                <Event event="Ready" action="Reset,Play,DirectionForward" frame="$parent"/>
+                <Event event="NotReady" action="Stop" frame="$parent"/>
+
+                <Controller type="Fade" end="Pause">
+                    <Key type="Curve" time="0" value="0" out="Slow"/>
+                    <Key type="Curve" time=".5" value="0" out="Slow"/>
+                    <Key type="Curve" time=".6" value="255" out="Slow"/>
+                    <Key type="Curve" time=".7" value="255" in="Slow"/>
+                    <Key type="Curve" time=".9" value="0" in="Slow"/>
+                </Controller>
+                <Controller type="Dimension" dimension="Height" relative="False" percentage="True" end="Pause" >
+                    <Key type="Curve" time="0" value="200" in="linear" out="linear"/>
+                    <Key type="Curve" time=".5" value="200" in="linear" out="slow"/>
+                    <Key type="Curve" time=".6" value="100" in="fast" out="linear"/>
+                </Controller>
+                <Controller type="Dimension" dimension="Width" relative="False" percentage="True" end="Pause" >
+                    <Key type="Curve" time="0" value="200" in="linear" out="linear"/>
+                    <Key type="Curve" time=".5" value="200" in="linear" out="slow"/>
+                    <Key type="Curve" time=".6" value="100" in="fast" out="linear"/>
+                </Controller>
+            </Animation>
+        </Frame>
+
+        <Frame type="CutsceneFrame" name="HeroSelectedCutscene" template="HeroDraftSlotFrame/HeroSelectedCutsceneTemplate">
+            <Anchor side="Top" relative="$parent/PortraitContainer" pos="Mid" offset="13"/>
+            <Anchor side="Bottom" relative="$parent/PortraitContainer" pos="Mid" offset="13"/>
+            <Anchor side="Left" relative="$parent/PortraitContainer" pos="Mid" offset="1"/>
+            <Anchor side="Right" relative="$parent/PortraitContainer" pos="Mid" offset="1"/>
+
+            <Animation name="Hover">
+                <Event event="MyTurn" action="Reset,Play" frame="$parent"/>
+
+                <Controller type="Cutscene" end="Pause">
+                    <Key type="Cutscene" time="0.00" action="Bookmark" bookmark="Hover Start"/>
+                </Controller>
+            </Animation>
+
+            <Animation name="Idle">
+                <Event event="EnemyTeamTurn" action="Reset,Play" frame="$parent"/>
+                <Event event="MyTeamTurn" action="Reset,Play" frame="$parent"/>
+                <Event event="NotReady" action="Reset,Play" frame="$parent"/>
+
+                <Controller type="Cutscene" end="Pause">
+                    <Key type="Cutscene" time="0.00" action="Bookmark" bookmark="Idle"/>
+                </Controller>
+            </Animation>
+
+            <Animation name="LockIn">
+                <Event event="Ready" action="Reset,Play" frame="$parent"/>
+                <Event event="NotReady" action="Stop" frame="$parent"/>
+
+                <Controller type="Cutscene" end="Pause">
+                    <Key type="Cutscene" time="0.5" action="Bookmark" bookmark="Confirm Start"/>
+                    <Key type="Cutscene" time="3.5" action="Bookmark" bookmark="Death Start"/>
+                </Controller>
+            </Animation>
+        </Frame>
+
+        <Frame type="Image" name="NameLabelBackgroundImage">
+            <Width val="152"/>
+            <Height val="140"/>
+        </Frame>
+        
+        <Frame type="Label" name="NameLabel">
+            <Anchor side="Top" relative="$parent/NameLabelBackgroundImage" pos="Min" offset="23"/>
+            <Anchor side="Left" relative="$parent/NameLabelBackgroundImage" pos="Min" offset="27"/>
+            <Anchor side="Right" relative="$parent/NameLabelBackgroundImage" pos="Max" offset="10"/>
+            <Rotation val="#DraftNameRotationLeft"/>
+            <RotationPosition val="TopLeft"/>
+            <Style val="HeroDraftPlayerLeftName"/>
+            <Options val="Ellipsis | NoWrapping"/> 
+            <HitTestTexture val="@UI/Storm_Draft_Nameplate_Hero_Selected_Blue"/>
+        </Frame>
+
+        <Frame type="Image" name="HeroLabelBackgroundImage">
+            <Anchor side="Right" relative="$parent/NameLabelBackgroundImage" pos="Max" offset="-2"/>
+            <Anchor side="Top" relative="$parent/NameLabelBackgroundImage" pos="Mid" offset="-21"/>
+            <Texture val="@UI/Storm_Draft_Nameplate_Hero_Selected_Blue"/>
+            <Height val="112"/>
+            <Width val="140"/>
+        </Frame>
+
+        <Frame type="Frame" name="PickingLabelBackgroundImage">
+            <Anchor relative="$parent/HeroLabelBackgroundImage"/>
+            <Alpha val="0"/>
+            
+            <Frame type="Image" name="PickingBackgroundImage">
+                <Anchor relative="$parent"/>
+                <Texture val="@UI/storm_ui_glues_draft_nameplate_picking"/>
+            </Frame>
+            
+            <Frame type="Image" name="StripesImage">
+                <Anchor side="Left" relative="$parent" pos="Min" offset="2"/>
+                <Anchor side="Top" relative="$parent" pos="Min" offset="2"/>
+                <Width val="130"/>
+                <Height val="101"/>
+                <LayerCount val="2"/>
+                
+                <Texture val="@UI/storm_ui_glues_draft_nameplate_picking_stripes_mask" layer="0"/>
+                <AlphaLayer val="True" layer="0"/>
+                
+                <Texture val="@UI/storm_ui_glues_draft_nameplate_picking_stripes" layer="1"/>
+                <TextureCoords top="0" left="0" bottom=".94" right="1.37" layer="1"/>
+                <WrapUV val="True" layer="1"/>
+            </Frame>
+
+            <Animation name="PreviewSelectPicking">
+                <Event event="HiddenSelection" action="Play,DirectionForward" frame="$parent"/>
+                <Event event="NotSelectedPicking" action="Play,DirectionForward" frame="$parent"/>
+                <Event event="PreviewSelectPicking" action="Play,DirectionForward" frame="$parent"/>
+                <Event event="PreviewSelect" action="Stop" frame="$parent"/>
+                <Event event="PreviewSelectNotYourTurn" action="Stop" frame="$parent"/>
+                <Event event="Selected" action="Stop" frame="$parent"/>
+                <Event event="Countdown" action="Stop" frame="$parent"/>
+                <Event event="Swapping" action="Stop" frame="$parent"/>
+                <Event event="SelectedNotYourTurn" action="Stop" frame="$parent"/>
+                <Event event="NotSelectedNotYourTurn" action="Stop" frame="$parent"/>
+                <Event event="NotSelectedYourTurn" action="Stop" frame="$parent"/>
+
+                <Controller type="Fade" end="Pause">
+                    <Key type="Curve" time="0" value="0" out="Slow"/>
+                    <Key type="Curve" time=".4" value="255" out="Slow"/>
+                </Controller>
+            </Animation>
+        </Frame>
+        
+        <Frame type="Label" name="HeroLabel">
+            <Anchor side="Top" relative="$parent/HeroLabelBackgroundImage" pos="Min" offset="11"/>
+            <Anchor side="Left" relative="$parent/HeroLabelBackgroundImage" pos="Min" offset="13"/>
+            <Anchor side="Right" relative="$parent/HeroLabelBackgroundImage" pos="Max" offset="10"/>
+            <Rotation val="#DraftNameRotationLeft"/>
+            <RotationPosition val="TopLeft"/>
+            <Style val="HeroDraftHeroLeftName"/>
+            <Text val="@UI/HeroDraftPanel/Picking"/>
+            <Options val="Ellipsis | NoWrapping"/> 
+            <HitTestTexture val="@UI/Storm_Draft_Nameplate_Hero_Selected_Blue"/>            
+        </Frame>
+
+        <Frame type="Image" name="SilencedIcon">
+            <Anchor side="Top" relative="$parent" pos="Mid" offset="65"/>
+            <Anchor side="Bottom" relative="$parent" pos="Mid" offset="65"/>
+            <Anchor side="Left" relative="$parent" pos="Mid" offset="25"/>
+            <Anchor side="Right" relative="$parent" pos="Mid" offset="25"/>
+            <Width val="60"/>
+            <Height val="45"/>
+            <RenderPriority val="600"/>
+            <Texture val="@UI/Storm_UI_PortraitBorder_SilencePenaltyIcon"/>
+            <Visible val="False"/>
+
+            <Animation name="SilencePenalty">
+                <Event event="SilencedPenaltyOn" action="Play" frame="$parent"/>
+                <Event event="SilencedPenaltyOff" action="Stop" frame="$parent"/>
+
+                <Controller type="Visibility" end="Pause">
+                    <Key type="Bool" time="0" value="true"/>
+                </Controller>
+            </Animation>
+        </Frame>
+
+        <Frame type="Frame" name="BanChooserFrame" template="HeroDraftSlotFrame/BanChooserFrameTemplate">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="69"/>
+            <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+            <RenderPriority val="600"/>
+
+            <StateGroup name="BanChooserState">
+                <State name="BanChooserOff">
+                    <When type="Property" frame="$ancestor[@type=HeroDraftPanel]" IsTournamentSpectator="True"/>
+                </State>
+                <State name="BanChooserBanning">
+                    <When type="AnimationState" frame="$parent" BanChooserState="BanChooserBanning"/>
+                </State>
+                <State name="BanChooserOnMyTeamTurn">
+                    <When type="AnimationState" frame="$parent" TeamState="MyTeam"/>
+                    <When type="AnimationState" frame="$parent" BanChooserState="BanChooserOn"/>
+                </State>
+                <State name="BanChooserOn">
+                    <When type="AnimationState" frame="$parent" BanChooserState="BanChooserOn"/>
+                </State>
+            </StateGroup>
+        </Frame>
+
+        <StateGroup name="SelectionValidityState">
+            <DefaultState val="ValidSelection"/>
+
+            <State name="InvalidSelection">
+                <When type="AnimationState" SelectionState="SelectionInvalid"/>
+                <Action type="SetProperty" frame="$this/ThinkingContainer" visible="false"/>
+                <Action type="SetProperty" frame="$this/InvalidSelectionContainer" visible="true"/>
+            </State>
+
+            <State name="ValidSelectionThinking">
+                <When type="Property" SlotState="PreviewSelectPicking"/>
+                <Action type="SetProperty" frame="$this/ThinkingContainer" visible="true"/>
+                <Action type="SetProperty" frame="$this/InvalidSelectionContainer" visible="false"/>
+            </State>
+
+            <State name="ValidSelection">
+                <Action type="SetProperty" frame="$this/ThinkingContainer" visible="false"/>
+                <Action type="SetProperty" frame="$this/InvalidSelectionContainer" visible="false"/>
+            </State>
+        </StateGroup>
+
+        <Frame type="Frame" name="InvalidSelectionContainer">
+            <Anchor side="Left" relative="$parent/AnchorFrame" pos="Min" offset="0"/>
+            <Anchor side="Top" relative="$parent/AnchorFrame" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent/AnchorFrame" pos="Max" offset="0"/>
+            <Anchor side="Bottom" relative="$parent/AnchorFrame" pos="Max" offset="0"/>
+
+            <Frame type="Image" name="Image">
+                <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Top" relative="$parent" pos="Mid" offset="-10"/>
+                <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Bottom" relative="$parent" pos="Mid" offset="-10"/>
+
+                <Texture val="@UI/storm_ui_draft_invalid_selection_icon"/>
+                <AcceptsMouseTooltip val="true"/>
+                <Tooltip val="@UI/HeroDraft/InvalidSelectionTooltip"/>
+
+                <Animation name="Pulse">
+                    <Event event="OnShown" action="Reset,Play"/>
+
+                    <Controller type="Fade" end="Loop">
+                        <Key type="Curve" time="0.0" value="30"/>
+                        <Key type="Curve" time="0.75" value="255"/>
+                        <Key type="Curve" time="1.5" value="30"/>
+                    </Controller>
+                </Animation>
+            </Frame>
+        </Frame>
+
+        <StateGroup name="HeroLabelTournamentOverride">
+            <State name="TournamentSelected">
+                <When type="StateGroup" HeroLabelState="Selected"/>
+                <When type="Property" frame="$ancestor[@type=HeroDraftPanel]" IsTournamentSpectator="True"/>
+                <When type="Property" SlotState="!Countdown"/>
+
+                <Action type="SetProperty" frame="HeroLabel" Visible="false"/>
+                <Action type="SetProperty" frame="HeroLabelBackgroundImage" Visible="false"/>
+            </State>
+
+            <State name="TournamentDisabled">
+                <When type="StateGroup" HeroLabelState="Disabled"/>
+                <When type="Property" frame="$ancestor[@type=HeroDraftPanel]" IsTournamentSpectator="True"/>
+                <When type="Property" SlotState="!Countdown"/>
+
+                <Action type="SetProperty" frame="HeroLabel" Visible="false"/>
+                <Action type="SetProperty" frame="HeroLabelBackgroundImage" Visible="false"/>
+            </State>
+        </StateGroup>
+    </Frame>
+    
+    <Frame type="HeroDraftSlotFrame" name="HeroDraftSlotFrameLeftTemplate" template="HeroDraftSlotFrame/HeroDraftSlotFrameTemplate">
+        <Animation name="IntroAnchor">
+            <Event event="Intro" action="Restart,DirectionForward,Play"/>
+
+            <Controller type="Anchor" end="Pause" side="Right" relative="true" frame="NameLabelBackgroundImage">
+                <Key type="Curve" time="0" value="-80" out="Fast"/>
+                <Key type="Curve" time=".6" value="0" in="Slow"/>
+            </Controller>
+        </Animation>      
+        
+        <Frame type="Frame" name="PickingLabelBackgroundImage">
+            <Frame type="Image" name="StripesImage">
+                <Animation name="UVScroll">
+                    <Event event="HiddenSelection" action="Reset,Play" frame="$parent/$parent"/>
+                    <Event event="NotSelectedPicking" action="Reset,Play" frame="$parent/$parent"/>
+                    <Event event="PreviewSelectPicking" action="Reset,Play" frame="$parent/$parent"/>
+
+                    <Controller type="LayerUV" layer="1" side="Left" relative="True" sidelock="True" end="Loop" >
+                        <Key type="Curve" time="0" value="-1" out="fast"/>
+                        <Key type="Curve" time="1.9" value="0" in="fast"/>
+                    </Controller>
+                </Animation>
+            </Frame>
+        </Frame>
+
+        <Frame type="Image" name="NameLabelBackgroundImage">
+            <Anchor side="Right" relative="$parent/BorderImage" pos="Mid" offset="22"/>
+            <Anchor side="Bottom" relative="$parent/BorderImage" pos="Max" offset="-11"/>
+            <Width val="152"/>
+            <Height val="140"/>
+            <Texture val="@UI/Storm_Draft_Nameplate_NotSelected_Blue"/>
+        </Frame>
+
+        <Frame type="CutsceneFrame" name="HeroSelectedCutscene">
+            <Animation name="SetFilters">
+                <Event event="OnShown" action="Reset,Play"/>
+
+                <Controller type="Cutscene" end="Pause">
+                    <Key type="Cutscene" time="0" action="AddFilter" filter="DraftMyTeam"/>
+                </Controller>
+            </Animation>
+        </Frame>
+
+        <Frame type="Button" name="SwapButton" template="HeroDraftSlotFrame/SwapButtonTemplate">
+            <Anchor side="Right" relative="$parent/BorderImage" pos="Max" offset="-5"/>
+            <Anchor side="Bottom" relative="$parent/BorderImage" pos="Max" offset="-45"/>
+
+            <Animation name="Show">
+                <Event event="OnShown" action="Reset, Play"/>
+
+                <Controller type="Fade" end="Pause">
+                    <Key type="Curve" time="0" value="0" out="Auto"/>
+                    <Key type="Curve" time=".7" value="255" in="Auto"/>
+                </Controller>
+            </Animation>
+        </Frame>
+
+        <Frame type="Image" name="SwapHighlight">
+            <Anchor side="Top" relative="$parent/BorderImage" pos="Mid" offset="-25"/>
+            <Anchor side="Bottom" relative="$parent/BorderImage" pos="Mid" offset="-25"/>
+            <Anchor side="Left" relative="$parent/BorderImage" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent/BorderImage" pos="Mid" offset="0"/>
+            <Texture val="@UI/Storm_UI_Draft_Swap_Hero_Frame_Inside_Highlight"/>
+            <Alpha val="0"/>
+
+            <Animation name="Fade">
+                <Event event="PulseStop" action="DirectionReverse, Play" frame="$this"/>
+                
+                <Controller type="Fade" end="Pause">
+                    <Key type="Curve" time="0" value="0"/>
+                    <Key type="Curve" time="0.5" value="255"/>
+                </Controller>
+            </Animation>
+
+            <Animation name="PingPong">
+                <Event event="PulseStart" action="Reset, Play" frame="$this"/>
+                <Event event="PulseStop" action="Pause" frame="$this"/>
+
+                <Controller type="Animation" end="PingPong" animation="Fade">
+                    <Key type="Animation" time="0" action="DirectionForward"/>
+                    <Key type="Animation" time="0" action="Play"/>
+                    <Key type="Animation" time="0.5" action="DirectionReverse"/>
+                    <Key type="Animation" time="0.5" action="Play"/>
+                </Controller>
+            </Animation>
+
+            <StateGroup name="ButtonHover">
+                <DefaultState val="NotHovering"/>
+
+                <State name="NotHovering">
+                    <Action type="SendEvent" event="PulseStop"/>
+                </State>
+
+                <State name="Hovering">
+                    <When type="Property" frame="$parent/SwapButton" Hovering="True"/>
+                    <When type="Property" frame="$parent/SwapButton" Enabled="True"/>
+                    <When type="Property" frame="$parent/SwapButton" Visible="True"/>
+                    <Action type="SendEvent" event="PulseStart"/>
+                </State>
+            </StateGroup>
+
+            <StateGroup name="SelfHover">
+                <DefaultState val="NotHovering"/>
+                
+                <State name="NotHovering">
+                    <When type="Property" frame="$parent" IsSelf="True"/>
+                    <When type="Property" frame="$ancestor[@type=BattleLobbyTeamPanel]" HasSwapHovering="False"/>
+                    <Action type="SendEvent" event="PulseStop"/>
+                </State>
+                
+                <State name="Hovering">
+                    <When type="Property" frame="$parent" IsSelf="True"/>
+                    <When type="Property" frame="$ancestor[@type=BattleLobbyTeamPanel]" HasSwapHovering="True"/>
+                    <Action type="SendEvent" event="PulseStart"/>
+                </State>
+            </StateGroup>
+        </Frame>
+
+        <StateGroup name="NameLabelState">
+            <State name="NotSelected">
+                <Action type="SetProperty" frame="NameLabel" Style="HeroDraftPlayerLeftName"/>
+                <Action type="SetProperty" frame="NameLabelBackgroundImage" Texture="@UI/Storm_Draft_Nameplate_NotSelected_Blue"/>
+            </State>
+
+            <State name="Disabled">
+                <Action type="SetProperty" frame="NameLabel" Style="HeroDraftPlayerLeftName_Disabled"/>
+                <Action type="SetProperty" frame="NameLabelBackgroundImage" Texture="@UI/Storm_Draft_Nameplate_Disabled_Blue"/>
+            </State>
+
+            <State name="Selected">
+                <Action type="SetProperty" frame="NameLabel" Style="HeroDraftPlayerLeftName_Selected"/>
+                <Action type="SetProperty" frame="NameLabelBackgroundImage" Texture="@UI/Storm_Draft_Nameplate_Selected_Blue"/>
+            </State>
+
+            <State name="Picking">
+                <Action type="SetProperty" frame="NameLabel" Style="HeroDraftPlayerLeftName_Picking"/>
+                <Action type="SetProperty" frame="NameLabelBackgroundImage" Texture="@UI/Storm_Draft_Nameplate_NotSelected_Blue"/>
+            </State>
+        </StateGroup>
+
+        <StateGroup name="HeroLabelState">
+            <State name="Hidden">
+                <Action type="SetProperty" frame="HeroLabelBackgroundImage" Alpha="0"/>
+                <Action type="SetProperty" frame="HeroLabel" Alpha="0"/>
+            </State>
+
+            <State name="Picking">
+                <Action type="SetProperty" frame="HeroLabel" Style="HeroDraftHeroLeftPicking"/>
+                <Action type="SetProperty" frame="HeroLabelBackgroundImage" Texture="@UI/Storm_Draft_Nameplate_Hero_Picking_Blue"/>
+            </State>
+
+            <State name="Selected">
+                <Action type="SetProperty" frame="HeroLabel" Style="HeroDraftHeroLeftName" undo="false"/>
+                <Action type="SetProperty" frame="HeroLabelBackgroundImage" Texture="@UI/Storm_Draft_Nameplate_Hero_Selected_Blue" undo="false"/>
+            </State>
+
+            <State name="Disabled">
+                <Action type="SetProperty" frame="HeroLabel" Style="HeroDraftHeroLeftName_Disabled" undo="false"/>
+                <Action type="SetProperty" frame="HeroLabelBackgroundImage" Texture="@UI/Storm_Draft_Nameplate_Hero_Disabled_Blue" undo="false"/>
+            </State>
+        </StateGroup>
+    </Frame>
+    
+
+    <!--Red Team-->
+    <Frame type="HeroDraftSlotFrame" name="HeroDraftSlotFrameRightTemplate" template="HeroDraftSlotFrame/HeroDraftSlotFrameTemplate">
+        <Animation name="IntroAnchor">
+            <Event event="Intro" action="Restart,DirectionForward,Play"/>
+
+            <!-- Nameplate In -->
+            <Controller type="Anchor" end="Pause" side="Left" relative="true" frame="NameLabelBackgroundImage">
+                <Key type="Curve" time="0.0" value="80" out="Fast"/>
+                <Key type="Curve" time=".6" value="0" in="Slow"/>
+            </Controller>
+        </Animation>
+
+        <Frame type="Frame" name="HitTestFrame">
+            <Anchor side="Top" relative="$parent" pos="Mid" offset="9"/>
+            <Anchor side="Bottom" relative="$parent" pos="Mid" offset="9"/>
+            <Anchor side="Left" relative="$parent" pos="Mid" offset="13"/>
+            <Anchor side="Right" relative="$parent" pos="Mid" offset="13"/>
+            <HitTestTexture val="@UI/Storm_UI_Glues_Draft_Portrait_Hittest_Right"/>
+            <TooltipAnchorPosition val="MiddleLeft"/>
+        </Frame>
+
+        <Frame type="Image" name="WhiteOutImage">
+            <TextureCoords top="0" left="1" bottom="1" right="0"/>
+        </Frame>        
+
+        <Frame type="Image" name="PortraitBorderSelectedGlowImage">
+            <Texture val="@UI/Storm_Draft_Portrait_Selected_Red"/>
+        </Frame>
+
+        <Frame type="Image" name="IntroBorderImage">
+            <TextureCoords top="0" left="1" bottom="1" right="0" layer="1"/>
+        </Frame>
+        
+        <Frame type="Image" name="OutlineImage">
+            <Texture val="@UI/Storm_UI_Glues_Draft_Portrait_Outline_Red" layer="1"/>
+        </Frame>
+
+        <Frame type="Image" name="PortraitContainerOutliner">
+            <Texture val="@UI/Storm_Draft_Portrait_Selected_Red_Line"/>
+        </Frame>
+
+        <Frame type="Image" name="BorderImage">
+            <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+            <Texture val="@UI/Storm_Draft_Portrait_Normal"/>
+            <Width val="232"/>
+            <Height val="256"/>
+            <TextureCoords top="0.0" left="1.0" bottom="1.0" right="0.0"/>
+        </Frame>
+
+        <Frame type="Image" name="PickingHighlight">
+            <Texture val="@UI/Storm_UI_Glues_Draft_Portrait_Selecting_Glow_Red" layer="1"/>
+        </Frame>
+
+        <Frame type="Image" name="Glow1Image">
+            <Texture val="@UI/storm_ui_glues_draft_portrait_glow_red" layer="1"/>
+        </Frame>
+            
+        <!-- Lingering Glow after Lock In -->
+        <Frame type="Image" name="BlueGlowImage">
+            <Texture val="@UI/storm_ui_glues_draft_portrait_glow2_red" layer="1"/>
+        </Frame>
+        
+        <Frame type="Image" name="BorderSlamImage">
+            <Texture val="@UI/storm_ui_glues_draft_portrait_highlight_red"/>
+        </Frame>
+
+        <Frame type="Frame" name="PortraitContainer">
+            <AlphaMaskTexture val="@UI/storm_ui_draft_alphamask_portrait_right"/>
+
+            <Frame type="Image" name="BackgroundImage">
+                <Texture val="@UI/Storm_Draft_Portrait_BG_Red"/>
+            </Frame>
+
+            <Frame type="Image" name="UnknownSelection" template="HeroDraftSlotFrame/UnknownSelectionTemplate">
+                <Texture val="@UI/storm_ui_draft_red_spinner"/>
+            </Frame>    
+
+            <Frame type="Image" name="PortraitOverlay">
+                <Texture val="@UI/storm_ui_draft_portrait_overlay_red_v2"/>
+            </Frame>
+
+            <Frame type="Image" name="PortraitOverlayNotYourTurn">
+                <Texture val="@UI/storm_ui_draft_portrait_overlay_red_v2"/>
+            </Frame>             
+        </Frame>   
+
+        <Frame type="Image" name="NameLabelBackgroundImage">
+            <Anchor side="Left" relative="$parent/BorderImage" pos="Mid" offset="-22"/>
+            <Anchor side="Bottom" relative="$parent/BorderImage" pos="Max" offset="-7"/>
+            <Width val="152"/>
+            <Height val="140"/>
+            <Texture val="@UI/Storm_Draft_Nameplate_NotSelected_Red"/>
+        </Frame>
+
+        <Frame type="Label" name="NameLabel">
+            <Anchor side="Top" relative="$parent/NameLabelBackgroundImage" pos="Min" offset="23"/>
+            <Anchor side="Left" relative="$parent/NameLabelBackgroundImage" pos="Min" offset="-10"/>
+            <Anchor side="Right" relative="$parent/NameLabelBackgroundImage" pos="Max" offset="-27"/>
+            <Rotation val="#DraftNameRotationRight"/>
+            <RotationPosition val="TopRight"/>
+            <Style val="HeroDraftPlayerRightName"/>
+        </Frame>
+
+        <Frame type="Image" name="HeroLabelBackgroundImage">
+            <Anchor side="Left" relative="$parent/NameLabelBackgroundImage" pos="Min" offset="1"/>
+            <Anchor side="Top" relative="$parent/NameLabelBackgroundImage" pos="Mid" offset="-22"/>
+            <Texture val="@UI/Storm_Draft_Nameplate_Hero_Selected_Red"/>
+            <Height val="112"/>
+            <Width val="140"/>
+        </Frame>
+        
+        <Frame type="Frame" name="PickingLabelBackgroundImage">
+            <Frame type="Image" name="PickingBackgroundImage">
+                <TextureCoords top="0" left="1" bottom="1" right="0" layer="0"/>
+            </Frame>
+
+            <Frame type="Image" name="StripesImage">
+                <Anchor side="Left" relative="$parent" pos="Min" offset="1"/>
+                <Anchor side="Right" relative="$parent" pos="Max" offset="2"/>
+                <Anchor side="Top" relative="$parent" pos="Min" offset="4"/>
+
+                <TextureCoords top="0" left="1" bottom="1" right="0" layer="0"/>
+                <TextureCoords top="0" left="1.37" bottom=".94" right="0" layer="1"/>
+                
+                <Animation name="UVScroll">
+                    <Event event="HiddenSelection" action="Reset,Play" frame="$parent/$parent"/>
+                    <Event event="NotSelectedPicking" action="Reset,Play" frame="$parent/$parent"/>
+                    <Event event="PreviewSelectPicking" action="Reset,Play" frame="$parent/$parent"/>
+
+                    <Controller type="LayerUV" layer="1" side="Left" relative="True" sidelock="True" end="Loop" >
+                        <Key type="Curve" time="0" value="-1" out="fast"/>
+                        <Key type="Curve" time="1.9" value="0" in="fast"/>
+                    </Controller>
+                </Animation>
+            </Frame>
+        </Frame>
+
+        <Frame type="Label" name="HeroLabel">
+            <Anchor side="Top" relative="$parent/HeroLabelBackgroundImage" pos="Min" offset="10"/>
+            <Anchor side="Left" relative="$parent/HeroLabelBackgroundImage" pos="Min" offset="-10"/>
+            <Anchor side="Right" relative="$parent/HeroLabelBackgroundImage" pos="Max" offset="-13"/>
+            <Rotation val="#DraftNameRotationRight"/>
+            <RotationPosition val="TopRight"/>
+            <Style val="HeroDraftHeroRightName"/>
+        </Frame>
+
+        <Frame type="Image" name="SilencedIcon">
+            <Anchor side="Top" relative="$parent" pos="Mid" offset="65"/>
+            <Anchor side="Bottom" relative="$parent" pos="Mid" offset="65"/>
+            <Anchor side="Left" relative="$parent" pos="Mid" offset="-25"/>
+            <Anchor side="Right" relative="$parent" pos="Mid" offset="-25"/>
+            <Width val="60"/>
+            <Height val="45"/>
+            <TextureCoords top="0" left="1" bottom="1" right="0"/>
+            <RenderPriority val="600"/>
+            <Texture val="@UI/Storm_UI_PortraitBorder_SilencePenaltyIcon"/>
+            <Visible val="False"/>
+
+            <Animation name="SilencePenalty">
+                <Event event="SilencedPenaltyOn" action="Play" frame="$parent"/>
+                <Event event="SilencedPenaltyOff" action="Stop" frame="$parent"/>
+
+                <Controller type="Visibility" end="Pause">
+                    <Key type="Bool" time="0" value="true"/>
+                </Controller>
+            </Animation>
+        </Frame>
+
+        <Frame type="CutsceneFrame" name="HeroSelectedCutscene">
+            <Animation name="SetFilters">
+                <Event event="OnShown" action="Reset,Play"/>
+
+                <Controller type="Cutscene" end="Pause">
+                    <Key type="Cutscene" time="0" action="AddFilter" filter="DraftEnemyTeam"/>
+                </Controller>
+            </Animation>
+        </Frame>
+        
+        <StateGroup name="NameLabelState">
+            <State name="NotSelected">
+                <Action type="SetProperty" frame="NameLabel" Style="HeroDraftPlayerRightName"/>
+                <Action type="SetProperty" frame="NameLabelBackgroundImage" Texture="@UI/Storm_Draft_Nameplate_NotSelected_Red"/>
+            </State>
+
+            <State name="Disabled">
+                <Action type="SetProperty" frame="NameLabel" Style="HeroDraftPlayerRightName_Disabled"/>
+                <Action type="SetProperty" frame="NameLabelBackgroundImage" Texture="@UI/Storm_Draft_Nameplate_Disabled_Red"/>
+            </State>
+
+            <State name="Selected">
+                <Action type="SetProperty" frame="NameLabel" Style="HeroDraftPlayerRightName_Selected"/>
+                <Action type="SetProperty" frame="NameLabelBackgroundImage" Texture="@UI/Storm_Draft_Nameplate_Selected_Red"/>
+            </State>
+
+            <State name="Picking">
+                <Action type="SetProperty" frame="NameLabel" Style="HeroDraftPlayerRightName_Picking"/>
+                <Action type="SetProperty" frame="NameLabelBackgroundImage" Texture="@UI/Storm_Draft_Nameplate_NotSelected_Red"/>
+            </State>
+        </StateGroup>
+
+        <StateGroup name="HeroLabelState">
+            <State name="Hidden">
+                <Action type="SetProperty" frame="HeroLabelBackgroundImage" Alpha="0"/>
+                <Action type="SetProperty" frame="HeroLabel" Alpha="0"/>
+            </State>
+
+            <State name="Picking">
+                <Action type="SetProperty" frame="HeroLabel" Style="HeroDraftHeroRightPicking"/>
+                <Action type="SetProperty" frame="HeroLabelBackgroundImage" Texture="@UI/Storm_Draft_Nameplate_Hero_Picking_Red"/>
+            </State>
+
+            <State name="Selected">
+                <Action type="SetProperty" frame="HeroLabel" Style="HeroDraftHeroRightName" undo="false"/>
+                <Action type="SetProperty" frame="HeroLabelBackgroundImage" Texture="@UI/Storm_Draft_Nameplate_Hero_Selected_Red" undo="false"/>
+            </State>
+
+            <State name="Disabled">
+                <Action type="SetProperty" frame="HeroLabel" Style="HeroDraftHeroRightName_Disabled" undo="false"/>
+                <Action type="SetProperty" frame="HeroLabelBackgroundImage" Texture="@UI/Storm_Draft_Nameplate_Hero_Disabled_Red" undo="false"/>
+            </State>
+        </StateGroup>
+    </Frame>
+
+    <Frame type="HeroDraftSlotFrame" name="HeroDraftSlotFrameCountdownLeftTemplate">
+        <Width val="544"/>
+        <Height val="80"/>
+
+        <Frame type="Image" name="HeroLabelBackgroundImage">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+            <Texture val="@UI/Storm_Draft_Countdown_ItemBg"/>
+            <LayerColor val="3c73ef"/>
+        </Frame>
+
+        <Frame type="Label" name="HeroLabel">
+            <Anchor side="Top" relative="$parent/HeroLabelBackgroundImage" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent/HeroLabelBackgroundImage" pos="Mid" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="15"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="-20"/>
+            <Style val="HeroDraftCountdownItemName_Blue"/>
+        </Frame>
+    </Frame>
+
+    <Frame type="HeroDraftSlotFrame" name="HeroDraftSlotFrameCountdownRightTemplate">  
+        <Width val="544"/>
+        <Height val="80"/>
+
+        <Frame type="Image" name="HeroLabelBackgroundImage">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+            <Texture val="@UI/Storm_Draft_Countdown_ItemBg"/>
+            <LayerColor val="cd3545"/>
+            <TextureCoords top="0.0" left="1.0" bottom="1.0" right="0.0"/>
+        </Frame>
+
+        <Frame type="Label" name="HeroLabel">
+            <Anchor side="Top" relative="$parent/HeroLabelBackgroundImage" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent/HeroLabelBackgroundImage" pos="Mid" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="20"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="-15"/>
+            <Style val="HeroDraftCountdownItemName_Red"/>
+        </Frame>
+    </Frame>
+</Desc>

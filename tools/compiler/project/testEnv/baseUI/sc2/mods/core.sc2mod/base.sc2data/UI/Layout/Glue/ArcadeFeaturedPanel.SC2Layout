@@ -1,0 +1,657 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<Desc>
+    <DescFlags val="Locked"/>
+
+    <Constant name="TileListItemCycleTime" val="8.0"/>
+    
+    <Frame type="ArcadeFeaturedTileListItem" name="ArcadeFeaturedTileListItemTemplate">
+        <Width val="107"/>
+        <Height val="78"/>
+        <HideWhenCleared val="true"/>
+        <SelectedSound val="@UI_ActionButtonSelect"/>
+
+        <Animation name="HoverSound">
+            <Event event="OnMouseEnter" action="Reset,Play"/>
+            <Event event="OnMouseExit" action="Reset, Stop"/>
+            <Controller type="Sound" end="Stop">
+                <Key type="Sound" time="0" sound="@UI_HoverTick"/>
+            </Controller>
+        </Animation>
+
+        <Frame type="Image" name="Image">
+            <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+            <Width val="91"/>
+            <Height val="62"/>
+        </Frame>
+        
+        <Frame type="Image" name="Border">
+            <Anchor side="Top" relative="$parent/Image" pos="Min" offset="-8"/>
+            <Anchor side="Left" relative="$parent/Image" pos="Min" offset="-8"/>
+            <Anchor side="Right" relative="$parent/Image" pos="Max" offset="8"/>
+            <Anchor side="Bottom" relative="$parent/Image" pos="Max" offset="8"/>
+            <Texture val="@UI/SC2_UI_Battlenet_Glue_Arcade_FeaturedListItem_Normal"/>
+            <TextureType val="NineSlice"/>
+            <Alpha val="255"/>
+            
+            <Animation name="Hover">
+                <Event event="OnMouseEnter" action="Reset" frame="$parent"/>
+                <Event event="OnMouseEnter" action="Play" frame="$parent"/>
+                <Event event="OnMouseExit" action="Reset" frame="$parent"/>
+                 
+                <Controller type="Texture" end="Pause">
+                    <Key type="Image" time="0" image="@UI/SC2_UI_Battlenet_Glue_Arcade_FeaturedListItem_Over"/>
+                </Controller>
+            </Animation>
+        </Frame>
+
+        <Frame type="Image" name="SelectedImage">
+            <Anchor side="Top" relative="$parent/Image" pos="Min" offset="-8"/>
+            <Anchor side="Left" relative="$parent/Image" pos="Min" offset="-8"/>
+            <Anchor side="Right" relative="$parent/Image" pos="Max" offset="8"/>
+            <Anchor side="Bottom" relative="$parent/Image" pos="Max" offset="8"/>
+            <Texture val="@UI/SC2_UI_Battlenet_Glue_Arcade_FeaturedListItem_Selected"/>
+            <TextureType val="NineSlice"/>
+            <Alpha val="255"/>
+        </Frame>
+        
+        <Animation name="CycleReset">
+            <Event event="OnClick" action="Reset"/>
+            <Event event="OnClick" action="Play"/>
+
+            <Controller type="Event" end="Pause" frame="$parent/$parent">
+                <Key type="Event" time="0.0" event="ItemClicked"/>
+            </Controller>
+        </Animation>
+    </Frame>
+
+    <Frame type="ArcadeFeaturedPanel" name="ArcadeFeaturedPanelTemplate">
+        <Width val="552"/>
+        <Height val="534"/>
+        
+        <!-- Available Animation Events: -->
+        <!-- FeedDownloading: downloading the news feed -->
+        <!-- FeedError: Feed failed to load -->
+        <!-- FeedEmpty: No featured games -->
+        <!-- FeedLoaded: Feed completed downloading -->
+        
+        <!-- ItemLoading: Loading the selected map's data -->
+        <!-- ItemError: Selected map's data failed to load -->
+        <!-- ItemLoaded: Selected map's data completed -->
+        
+        
+        
+        <Frame type="BlurFrame" name="BackgroundBlur">
+            <Anchor side="Top" relative="$parent/Background" pos="Min" offset="4"/>
+            <Anchor side="Left" relative="$parent/Background" pos="Min" offset="4"/>
+            <Anchor side="Bottom" relative="$parent/Background" pos="Max" offset="-4"/>
+            <Anchor side="Right" relative="$parent/Background" pos="Max" offset="-4"/>
+
+            <Animation name="Blur">
+                <Event event="OnShown" action="Reset,Play" frame="$parent" />
+
+                <Controller type="Blur" end="Pause">
+                    <Key type="Curve" time="0" value=".35" out="Fast"/>
+                </Controller>
+            </Animation>
+        </Frame>
+
+        <Frame type="Image" name="Background">
+            <Anchor relative="$parent"/>
+            <Texture val="@UI/SC2_UI_Battlenet_Glue_Arcade_MainContainer"/>
+            <TextureType val="NineSlice"/>
+        </Frame>
+        
+        <Frame type="Label" name="Spotlight">
+            <Anchor side="Top" relative="$parent/Background" pos="Min" offset="21"/>
+            <Anchor side="Left" relative="$parent/Background" pos="Min" offset="28"/>
+            <Text val="@UI/ScreenArcadeFeatured/Spotlight"/>
+            <Style val="@Arcade_Subtitle"/>
+        </Frame>
+        
+        <Frame type="Image" name="MapImageBg">
+            <Anchor side="Top" relative="$parent/MapImage" pos="Min" offset="0"/>
+            <Anchor side="Bottom" relative="$parent/MapImage" pos="Max" offset="0"/>
+            <Anchor side="Left" relative="$parent/MapImage" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent/MapImage" pos="Max" offset="0"/>
+            <LayerColor val="02060b"/>
+            <Alpha val="190"/>
+        </Frame>
+        
+        <Frame type="Image" name="MapImage">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="56"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="24"/>
+            <Width val="504"/>
+            <Height val="378"/>
+            <Visible val="False"/>
+        </Frame>
+        
+        <Frame type="Image" name="MapImageBorder">
+            <Anchor side="Top" relative="$parent/MapImage" pos="Min" offset="-2"/>
+            <Anchor side="Left" relative="$parent/MapImage" pos="Min" offset="-2"/>
+            <Anchor side="Right" relative="$parent/MapImage" pos="Max" offset="2"/>
+            <Anchor side="Bottom" relative="$parent/MapImage" pos="Max" offset="2"/>
+            <Texture val="@UI/SC2_UI_Battlenet_Glue_Arcade_ImageBorder"/>
+            <TextureType val="NineSlice"/>
+            <Visible val="False"/>
+            <Alpha val="255"/>
+        </Frame>
+
+        <Frame type="Label" name="TitleLabel">
+            <Anchor side="Bottom" relative="$parent/MapNameLabel" pos="Min" offset="1"/>
+            <Anchor side="Left" relative="$parent/MapNameLabel" pos="Min" offset="0"/>
+            <Style val="@Arcade_Featured_Title"/>
+            <Alpha val="127"/>
+            <Visible val="False"/>
+        </Frame>
+
+        <Frame type="Label" name="MapNameLabel">
+            <Anchor side="Bottom" relative="$parent/MapImage" pos="Max" offset="-11"/>
+            <Anchor side="Left" relative="$parent/MapImage" pos="Min" offset="18"/>
+            <Style val="@Arcade_GameInfo_Title"/>
+            <Visible val="False"/>
+        </Frame>
+
+        <Frame type="ProgressBar" name="RatingProgressBar">
+            <Anchor side="Bottom" relative="$parent/MapImage" pos="Max" offset="-11"/>
+            <Anchor side="Right" relative="$parent/MapImage" pos="Max" offset="-12"/>
+            <Width val="114"/>
+            <Height val="24"/>
+            <Texture val="@UI/SC2_UI_Battlenet_Glue_Arcade_RatingStars"/>
+            <Color val="FFFFFF"/>
+            <ColorStep val="FFFFFF"/>
+            <MinValue val="0"/>
+            <MaxValue val="5"/>
+            <Visible val="False"/>
+        </Frame>
+
+        <Frame type="Button" name="MapButton">
+            <Anchor side="Top" relative="$parent/MapImage" pos="Min" offset="-2"/>
+            <Anchor side="Left" relative="$parent/MapImage" pos="Min" offset="-2"/>
+            <Anchor side="Right" relative="$parent/MapImage" pos="Max" offset="2"/>
+            <Anchor side="Bottom" relative="$parent/MapImage" pos="Max" offset="2"/>
+            <AcceptsMouse val="true"/>
+            <Visible val="False"/>
+
+            <Frame type="Image" name="NormalImage">
+                <Anchor relative="$parent"/>
+                <Texture val="@UI/SC2_UI_Battlenet_Glue_Arcade_ImageBorder"/>
+                <TextureType val="NineSlice"/>
+                <Alpha val="0"/>
+            </Frame>
+
+            <Frame type="Image" name="HoverImage">
+                <Anchor relative="$parent"/>
+                <Texture val="@UI/SC2_UI_Battlenet_Glue_Arcade_ImageBorder_Over"/>
+                <TextureType val="NineSlice"/>
+            </Frame>
+        </Frame>
+        
+        <Frame type="Frame" name="ItemDownloading">
+            <Anchor relative="$parent/MapImage"/>
+            <Visible val="False"/>
+            <Alpha val="0"/>
+            
+            <Frame type="Frame" name="IdleSpinner" template="StandardBattlenetTemplates/IdleSpinnerTemplate">
+                <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+            </Frame>
+        </Frame>
+        
+        <Frame type="Frame" name="ItemError">
+            <Anchor relative="$parent/MapImage"/>
+            <Visible val="False"/>
+            <Alpha val="0"/>
+            
+            <Frame type="Label" name="ErrorLabel">
+                <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="70"/>
+                <Anchor side="Right" relative="$parent" pos="Max" offset="-70"/>
+                <Style val="@Arcade_ListError"/>
+                <Text val="@UI/ScreenArcadeFeatured/ItemError"/>
+            </Frame>
+        </Frame>
+        
+        <Frame type="Frame" name="FeedDownloading">
+            <Anchor relative="$parent/MapImage"/>
+            <Visible val="False"/>
+            
+            <Frame type="Frame" name="IdleSpinner" template="StandardBattlenetTemplates/IdleSpinnerTemplate">
+                <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+            </Frame>
+        </Frame>
+        
+        <Frame type="Frame" name="FeedEmpty">
+            <Anchor relative="$parent"/>
+            <Visible val="False"/>
+            
+            <Frame type="Label" name="EmptyLabel">
+                <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="70"/>
+                <Anchor side="Right" relative="$parent" pos="Max" offset="-70"/>
+                <Style val="@Arcade_ListError"/>
+                <Text val="@UI/ScreenArcadeFeatured/Empty"/>
+            </Frame>
+        </Frame>
+        
+        <Frame type="Frame" name="FeedError">
+            <Anchor relative="$parent"/>
+            <Visible val="False"/>
+            
+            <Frame type="Label" name="ErrorLabel">
+                <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="70"/>
+                <Anchor side="Right" relative="$parent" pos="Max" offset="-70"/>
+                <Style val="@Arcade_ListError"/>
+                <Text val="@UI/ScreenArcadeFeatured/Error"/>
+            </Frame>
+        </Frame>
+        
+
+        <!-- Animation to cycle the featured selection -->
+        <Animation name="CycleFeatured">
+            <Event event="OnShown" action="Reset"/>
+            <Event event="OnShown" action="Play"/>
+            <Event event="OnHidden" action="Reset"/>
+            <Event event="OnHidden" action="Stop"/>
+            <Event event="ItemClicked" action="Reset"/>
+            <Event event="ItemClicked" action="Play"/>
+
+            <Controller type="Event" end="Loop">
+                <Key type="Event" time="0.0" event="CycleStart"/>
+                <Key type="Event" time="#TileListItemCycleTime" event="CycleEnd"/>
+            </Controller>
+        </Animation>
+        
+        <Frame type="TileList" name="TileList">
+            <Anchor side="Top" relative="$parent/MapImage" pos="Max" offset="5"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="5"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="-5"/>
+            <Height val="300"/>
+            <RequireSelection val="true"/>
+            <Visible val="False"/>
+
+            <Frame type="ArcadeFeaturedTileListItem" name="Item0" template="ArcadeFeaturedPanel/ArcadeFeaturedTileListItemTemplate">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="11"/>
+            </Frame>
+
+            <Frame type="ArcadeFeaturedTileListItem" name="Item1" template="ArcadeFeaturedPanel/ArcadeFeaturedTileListItemTemplate">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item0" pos="Max" offset="-4"/>
+            </Frame>
+
+            <Frame type="ArcadeFeaturedTileListItem" name="Item2" template="ArcadeFeaturedPanel/ArcadeFeaturedTileListItemTemplate">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item1" pos="Max" offset="-4"/>
+            </Frame>
+
+            <Frame type="ArcadeFeaturedTileListItem" name="Item3" template="ArcadeFeaturedPanel/ArcadeFeaturedTileListItemTemplate">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item2" pos="Max" offset="-4"/>
+            </Frame>
+
+            <Frame type="ArcadeFeaturedTileListItem" name="Item4" template="ArcadeFeaturedPanel/ArcadeFeaturedTileListItemTemplate">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item3" pos="Max" offset="-4"/>
+            </Frame>
+        </Frame>
+        
+        
+        <!-- 
+
+        FEED STATE ANIMATIONS
+        
+        -->
+        
+        <!-- Feed Downloading -->
+        
+        <Animation name="FeedDownloadingPrep">
+            <Event event="FeedDownloading" action="Reset,Play"/>
+            
+            <Controller type="Visibility" end="Pause" frame="Spotlight">
+                <Key type="Bool" time="0" value="False"/>
+            </Controller>
+
+            <Controller type="Visibility" end="Pause" frame="MapImage">
+                <Key type="Bool" time="0" value="False"/>
+            </Controller>
+            
+            <Controller type="Visibility" end="Pause" frame="MapImageBorder">
+                <Key type="Bool" time="0" value="False"/>
+            </Controller>
+            
+            <Controller type="Visibility" end="Pause" frame="TitleLabel">
+                <Key type="Bool" time="0" value="False"/>
+            </Controller>
+            
+            <Controller type="Visibility" end="Pause" frame="MapNameLabel">
+                <Key type="Bool" time="0" value="False"/>
+            </Controller>
+            
+            <Controller type="Visibility" end="Pause" frame="RatingProgressBar">
+                <Key type="Bool" time="0" value="False"/>
+            </Controller>
+            
+            <Controller type="Visibility" end="Pause" frame="MapButton">
+                <Key type="Bool" time="0" value="False"/>
+            </Controller>
+            
+            <Controller type="Visibility" end="Pause" frame="TileList">
+                <Key type="Bool" time="0" value="False"/>
+            </Controller>
+            
+            <Controller type="Visibility" end="Pause" frame="FeedDownloading">
+                <Key type="Bool" time="0" value="True"/>
+            </Controller>
+            
+            <Controller type="Visibility" end="Pause" frame="FeedEmpty">
+                <Key type="Bool" time="0" value="False"/>
+            </Controller>
+            
+            <Controller type="Visibility" end="Pause" frame="FeedError">
+                <Key type="Bool" time="0" value="False"/>
+            </Controller>
+            
+            <Controller type="Visibility" end="Pause" frame="ItemDownloading">
+                <Key type="Bool" time="0" value="False"/>
+            </Controller>
+            
+            <Controller type="Visibility" end="Pause" frame="ItemError">
+                <Key type="Bool" time="0" value="False"/>
+            </Controller>
+        </Animation>
+        
+        <!-- Feed Empty -->
+        
+        <Animation name="FeedEmptyPrep">
+            <Event event="FeedEmpty" action="Reset,Play"/>
+            
+            <Controller type="Visibility" end="Pause" frame="Spotlight">
+                <Key type="Bool" time="0" value="False"/>
+            </Controller>
+
+            <Controller type="Visibility" end="Pause" frame="MapImage">
+                <Key type="Bool" time="0" value="False"/>
+            </Controller>
+            
+            <Controller type="Visibility" end="Pause" frame="MapImageBorder">
+                <Key type="Bool" time="0" value="False"/>
+            </Controller>
+            
+            <Controller type="Visibility" end="Pause" frame="TitleLabel">
+                <Key type="Bool" time="0" value="False"/>
+            </Controller>
+            
+            <Controller type="Visibility" end="Pause" frame="MapNameLabel">
+                <Key type="Bool" time="0" value="False"/>
+            </Controller>
+            
+            <Controller type="Visibility" end="Pause" frame="RatingProgressBar">
+                <Key type="Bool" time="0" value="False"/>
+            </Controller>
+            
+            <Controller type="Visibility" end="Pause" frame="MapButton">
+                <Key type="Bool" time="0" value="False"/>
+            </Controller>
+            
+            <Controller type="Visibility" end="Pause" frame="TileList">
+                <Key type="Bool" time="0" value="False"/>
+            </Controller>
+            
+            <Controller type="Visibility" end="Pause" frame="FeedDownloading">
+                <Key type="Bool" time="0" value="False"/>
+            </Controller>
+            
+            <Controller type="Visibility" end="Pause" frame="FeedEmpty">
+                <Key type="Bool" time="0" value="True"/>
+            </Controller>
+            
+            <Controller type="Visibility" end="Pause" frame="FeedError">
+                <Key type="Bool" time="0" value="False"/>
+            </Controller>
+            
+            <Controller type="Visibility" end="Pause" frame="ItemDownloading">
+                <Key type="Bool" time="0" value="False"/>
+            </Controller>
+            
+            <Controller type="Visibility" end="Pause" frame="ItemError">
+                <Key type="Bool" time="0" value="False"/>
+            </Controller>
+        </Animation>
+        
+        <!-- Feed Error -->
+        
+        <Animation name="FeedErrorPrep">
+            <Event event="FeedError" action="Reset,Play"/>
+            
+            <Controller type="Visibility" end="Pause" frame="Spotlight">
+                <Key type="Bool" time="0" value="False"/>
+            </Controller>
+
+            <Controller type="Visibility" end="Pause" frame="MapImage">
+                <Key type="Bool" time="0" value="False"/>
+            </Controller>
+            
+            <Controller type="Visibility" end="Pause" frame="MapImageBorder">
+                <Key type="Bool" time="0" value="False"/>
+            </Controller>
+            
+            <Controller type="Visibility" end="Pause" frame="TitleLabel">
+                <Key type="Bool" time="0" value="False"/>
+            </Controller>
+            
+            <Controller type="Visibility" end="Pause" frame="MapNameLabel">
+                <Key type="Bool" time="0" value="False"/>
+            </Controller>
+            
+            <Controller type="Visibility" end="Pause" frame="RatingProgressBar">
+                <Key type="Bool" time="0" value="False"/>
+            </Controller>
+            
+            <Controller type="Visibility" end="Pause" frame="MapButton">
+                <Key type="Bool" time="0" value="False"/>
+            </Controller>
+            
+            <Controller type="Visibility" end="Pause" frame="TileList">
+                <Key type="Bool" time="0" value="False"/>
+            </Controller>
+            
+            <Controller type="Visibility" end="Pause" frame="FeedDownloading">
+                <Key type="Bool" time="0" value="False"/>
+            </Controller>
+            
+            <Controller type="Visibility" end="Pause" frame="FeedEmpty">
+                <Key type="Bool" time="0" value="False"/>
+            </Controller>
+            
+            <Controller type="Visibility" end="Pause" frame="FeedError">
+                <Key type="Bool" time="0" value="True"/>
+            </Controller>
+            
+            <Controller type="Visibility" end="Pause" frame="ItemDownloading">
+                <Key type="Bool" time="0" value="False"/>
+            </Controller>
+            
+            <Controller type="Visibility" end="Pause" frame="ItemError">
+                <Key type="Bool" time="0" value="False"/>
+            </Controller>
+        </Animation>
+        
+        <!-- Feed Loaded -->
+        
+        <Animation name="FeedLoadedPrep">
+            <Event event="FeedLoaded" action="Reset,Play"/>
+            
+            <Controller type="Visibility" end="Pause" frame="Spotlight">
+                <Key type="Bool" time="0" value="True"/>
+            </Controller>
+
+            <Controller type="Visibility" end="Pause" frame="MapImage">
+                <Key type="Bool" time="0" value="True"/>
+            </Controller>
+            
+            <Controller type="Visibility" end="Pause" frame="MapImageBorder">
+                <Key type="Bool" time="0" value="True"/>
+            </Controller>
+            
+            <Controller type="Visibility" end="Pause" frame="TitleLabel">
+                <Key type="Bool" time="0" value="True"/>
+            </Controller>
+            
+            <Controller type="Visibility" end="Pause" frame="MapNameLabel">
+                <Key type="Bool" time="0" value="True"/>
+            </Controller>
+            
+            <Controller type="Visibility" end="Pause" frame="RatingProgressBar">
+                <Key type="Bool" time="0" value="True"/>
+            </Controller>
+            
+            <Controller type="Visibility" end="Pause" frame="MapButton">
+                <Key type="Bool" time="0" value="True"/>
+            </Controller>
+            
+            <Controller type="Visibility" end="Pause" frame="TileList">
+                <Key type="Bool" time="0" value="True"/>
+            </Controller>
+            
+            <Controller type="Visibility" end="Pause" frame="FeedDownloading">
+                <Key type="Bool" time="0" value="False"/>
+            </Controller>
+            
+            <Controller type="Visibility" end="Pause" frame="FeedEmpty">
+                <Key type="Bool" time="0" value="False"/>
+            </Controller>
+            
+            <Controller type="Visibility" end="Pause" frame="FeedError">
+                <Key type="Bool" time="0" value="False"/>
+            </Controller>
+            
+            <Controller type="Visibility" end="Pause" frame="ItemDownloading">
+                <Key type="Bool" time="0" value="True"/>
+            </Controller>
+            
+            <Controller type="Visibility" end="Pause" frame="ItemError">
+                <Key type="Bool" time="0" value="True"/>
+            </Controller>
+        </Animation>
+        
+        <!-- 
+
+        ITEM STATE ANIMATIONS
+        
+        -->
+        
+        <!-- Item Downloading -->
+        
+        <Animation name="ItemLoadingPrep">
+            <Event event="ItemLoading" action="Reset,Play"/>
+            
+            <Controller type="Fade" end="Pause" frame="MapImage">
+                <Key type="Curve" time="0" value="0" in="Slow"/>
+            </Controller>
+            
+            <Controller type="Fade" end="Pause" frame="TitleLabel">
+                <Key type="Curve" time="0" value="0" in="Slow"/>
+            </Controller>
+            
+            <Controller type="Fade" end="Pause" frame="MapNameLabel">
+                <Key type="Curve" time="0" value="0" in="Slow"/>
+            </Controller>
+            
+            <Controller type="Fade" end="Pause" frame="RatingProgressBar">
+                <Key type="Curve" time="0" value="0" in="Slow"/>
+            </Controller>
+            
+            <Controller type="Fade" end="Pause" frame="MapButton">
+                <Key type="Curve" time="0" value="0" in="Slow"/>
+            </Controller>
+            
+            <Controller type="Fade" end="Pause" frame="ItemDownloading">
+                <Key type="Curve" time="0" value="255" in="Slow"/>
+            </Controller>
+            
+            <Controller type="Fade" end="Pause" frame="ItemError">
+                <Key type="Curve" time="0" value="0" in="Slow"/>
+            </Controller>
+        </Animation>
+        
+        <!-- Item Error -->
+        
+        <Animation name="ItemErrorPrep">
+            <Event event="ItemError" action="Reset,Play"/>
+            
+            <Controller type="Fade" end="Pause" frame="MapImage">
+                <Key type="Curve" time="0" value="0" in="Slow"/>
+            </Controller>
+            
+            <Controller type="Fade" end="Pause" frame="TitleLabel">
+                <Key type="Curve" time="0" value="0" in="Slow"/>
+            </Controller>
+            
+            <Controller type="Fade" end="Pause" frame="MapNameLabel">
+                <Key type="Curve" time="0" value="0" in="Slow"/>
+            </Controller>
+            
+            <Controller type="Fade" end="Pause" frame="RatingProgressBar">
+                <Key type="Curve" time="0" value="0" in="Slow"/>
+            </Controller>
+            
+            <Controller type="Fade" end="Pause" frame="MapButton">
+                <Key type="Curve" time="0" value="0" in="Slow"/>
+            </Controller>
+            
+            <Controller type="Fade" end="Pause" frame="ItemDownloading">
+                <Key type="Curve" time="0" value="0" in="Slow"/>
+            </Controller>
+            
+            <Controller type="Fade" end="Pause" frame="ItemError">
+                <Key type="Curve" time="0" value="255" in="Slow"/>
+            </Controller>
+        </Animation>
+        
+        <!-- Item Loaded -->
+        
+        <Animation name="ItemLoadedPrep">
+            <Event event="ItemLoaded" action="Reset,Play"/>
+            
+            <Controller type="Fade" end="Pause" frame="MapImage">
+                <Key type="Curve" time="0" value="255" in="Slow"/>
+            </Controller>
+            
+            <Controller type="Fade" end="Pause" frame="TitleLabel">
+                <Key type="Curve" time="0" value="255" in="Slow"/>
+            </Controller>
+            
+            <Controller type="Fade" end="Pause" frame="MapNameLabel">
+                <Key type="Curve" time="0" value="255" in="Slow"/>
+            </Controller>
+            
+            <Controller type="Fade" end="Pause" frame="RatingProgressBar">
+                <Key type="Curve" time="0" value="255" in="Slow"/>
+            </Controller>
+            
+            <Controller type="Fade" end="Pause" frame="MapButton">
+                <Key type="Curve" time="0" value="255" in="Slow"/>
+            </Controller>
+            
+            <Controller type="Fade" end="Pause" frame="ItemDownloading">
+                <Key type="Curve" time="0" value="0" in="Slow"/>
+            </Controller>
+            
+            <Controller type="Fade" end="Pause" frame="ItemError">
+                <Key type="Curve" time="0" value="0" in="Slow"/>
+            </Controller>
+        </Animation>
+    </Frame>
+</Desc>

@@ -1,0 +1,678 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<Desc>
+    <DescFlags val="Locked"/>
+    
+    <Frame type="ChatSessionsTooltip" name="ChatPanelChatSessionsTooltip" template="ChatSessionsTooltip/ChatSessionsTooltip" />
+    <Frame type="ChatCommandsTooltip" name="ChatPanelChatCommandsTooltip" template="ChatCommandsTooltip/ChatCommandsTooltip" />
+    <Frame type="WhisperRecipientsTooltip" name="ChatPanelRecipientsTooltip" template="WhisperRecipientsTooltip/WhisperRecipientsTooltip" />
+
+    <Frame type="Image" name="ChatBorderTemplate">
+        <Anchor side="Top" relative="$parent" pos="Min" offset="-96"/>
+        <Anchor side="Bottom" relative="$parent" pos="Max" offset="96"/>
+        <Anchor side="Left" relative="$parent" pos="Min" offset="-98"/>
+        <Anchor side="Right" relative="$parent" pos="Max" offset="98"/>
+
+        <Texture val="@UI/ChatPanel_Border"/>
+        <TextureType val="Nineslice"/>
+        <Unclipped val="True"/>
+    </Frame>
+
+    <Frame type="ScrollBar" name="ChatScrollBarTemplate" template="StandardTemplates/NarrowScrollableBarTemplate">
+        <Anchor side="Top" relative="$parent/$parent" pos="Min" offset="0"/>
+        <Anchor side="Right" relative="$parent/$parent" pos="Max" offset="0"/>
+        <Anchor side="Bottom" relative="$parent/$parent" pos="Max" offset="0"/>
+        <Alpha val="0"/>
+        <Enabled val="false"/>
+
+        <Animation name="FadeScrollbar">
+            <Event event="EditBoxFocusLost" action="DirectionReverse,Play" frame="$parent/$parent/$parent"/>
+            <Event event="EditBoxFocusGained" action="DirectionForward,Play" frame="$parent/$parent/$parent"/>
+            <Event event="EditBoxFocusLostImmediate" action="Reset,Stop" frame="$parent/$parent/$parent"/>
+
+            <Controller name="Fade" type="Fade" end="Pause">
+                <Key type="Curve" time="0" value="0" out="Auto"/>
+                <Key type="Curve" time="0.1" value="230" out="Auto"/>
+            </Controller>
+
+            <Controller name="Enabled" type="Enabled" end="Pause">
+                <Key type="Bool" time="0.00" value="false"/>
+                <Key type="Bool" time="0.01" value="true"/>
+                <Key type="Bool" time="0.10" value="true"/>
+            </Controller>
+        </Animation>
+    </Frame>
+
+    <Frame type="Button" name="MessageNotificationButtonTemplate" template="StandardTemplates/StandardButtonTemplate">
+        <ClickSound val="@UI_ActionButtonSelect"/>
+        <Height val="45"/>
+
+        <Frame type="Image" name="NormalImage">
+            <Anchor relative="$parent"/>
+            <Texture val="@UI/ChatPanelNotificationHighlight"/>
+            <TextureType val="Nineslice"/>
+            <Tiled val="false"/>
+            <StateCount val="2"/>
+            <DesaturateOnDisable val="false"/>
+            <DisabledAlpha val="0"/>
+            <Alpha val="0"/>
+        </Frame>
+
+        <Frame type="Image" name="HoverImage">
+            <Anchor relative="$parent"/>
+            <Texture val="@UI/ChatPanelNotificationHighlight"/>
+            <TextureType val="Nineslice"/>
+            <Tiled val="false"/>
+            <StateCount val="2"/>
+            <DesaturateOnDisable val="false"/>
+            <DisabledAlpha val="0"/>
+            <Alpha val="0"/>
+        </Frame>
+
+        <Frame type="Frame" name="HitTestFrame">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+        </Frame>
+        
+        <Frame type="Image" name="HighlightImage">
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+            <Texture val="@UI/ChatPanelNotificationHighlight"/>
+            <TextureType val="Normal"/>
+            
+            <Animation name="Pulse">
+                <Event event="OnShown" action="Play"/>
+                <Controller type="Fade" end="PingPong">
+                    <Key type="Curve" time="0" value="255" in="Slow" out="Slow"/>
+                    <Key type="Curve" time=".40" value="100" in="Slow" out="Slow"/>
+                </Controller>
+            </Animation>
+        </Frame>
+        
+        <Frame type="Image" name="Arrow1">
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="-3"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+            <TextureType val="Normal"/>
+            <Texture val="@UI/ChatPanelNotificationArrow"/>
+
+            <Animation name="Pulse">
+                <Event event="OnShown" action="Play"/>
+                <Controller type="Fade" end="Loop">
+                    <Key type="Curve" time="0" value="255" in="Slow" out="Slow"/>
+                    <Key type="Curve" time=".20" value="64" in="Slow" out="Slow"/>
+                    <Key type="Curve" time=".40" value="64" in="Slow" out="Slow"/>
+                    <Key type="Curve" time=".80" value="255" in="Slow" out="Slow"/>
+                </Controller>
+            </Animation>
+        </Frame>
+
+        <Frame type="Image" name="Arrow2" template="ChatPanel/MessageNotificationButtonTemplate/Arrow1">
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="-10"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+
+            <Animation name="Pulse">
+                <Event event="OnShown" action="Play"/>
+                <Controller type="Fade" end="Loop">
+                    <Key type="Curve" time="0" value="64" in="Slow" out="Slow"/>
+                    <Key type="Curve" time=".20" value="64" in="Slow" out="Slow"/>
+                    <Key type="Curve" time=".40" value="255" in="Slow" out="Slow"/>
+                    <Key type="Curve" time=".80" value="64" in="Slow" out="Slow"/>
+                </Controller>
+            </Animation>
+        </Frame>
+
+        <Frame type="Image" name="Arrow3" template="ChatPanel/MessageNotificationButtonTemplate/Arrow1">
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="-17"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+
+            <Animation name="Pulse">
+                <Event event="OnShown" action="Play"/>
+                <Controller type="Fade" end="Loop">
+                    <Key type="Curve" time="0" value="64" in="Slow" out="Slow"/>
+                    <Key type="Curve" time=".20" value="255" in="Slow" out="Slow"/>
+                    <Key type="Curve" time=".40" value="64" in="Slow" out="Slow"/>
+                    <Key type="Curve" time=".80" value="64" in="Slow" out="Slow"/>
+                </Controller>
+            </Animation>
+        </Frame>
+
+        <Frame type="Image" name="HighlightImageHover">
+            <Anchor relative="$parent/HighlightImage"/>
+            <Texture val="@UI/ChatPanelNotificationHighlight"/>
+            <TextureType val="Normal"/>
+            <Visible val="false"/>
+        </Frame>
+
+        <Frame type="Image" name="Arrow1Hover">
+            <Anchor relative="$parent/Arrow1"/>
+            <TextureType val="Normal"/>
+            <Texture val="@UI/ChatPanelNotificationArrow"/>
+            <Visible val="false"/>
+            <Alpha val="190"/>
+        </Frame>
+
+        <Frame type="Image" name="Arrow2Hover">
+            <Anchor relative="$parent/Arrow2"/>
+            <TextureType val="Normal"/>
+            <Texture val="@UI/ChatPanelNotificationArrow"/>
+            <Visible val="false"/>
+            <Alpha val="190"/>
+        </Frame>
+
+        <Frame type="Image" name="Arrow3Hover">
+            <Anchor relative="$parent/Arrow3"/>
+            <TextureType val="Normal"/>
+            <Texture val="@UI/ChatPanelNotificationArrow"/>
+            <Visible val="false"/>
+            <Alpha val="190"/>
+        </Frame>
+
+        <Animation name="Pulse">
+            <Event event="OnMouseEnter" action="Play"/>
+            <Event event="OnShown" action="Stop"/>
+            <Event event="OnMouseExit" action="Stop"/>
+            <Controller type="Visibility" end="Pause" frame="HighlightImageHover">
+                <Key type="Bool" time="0" value="true"/>
+            </Controller>
+            <Controller type="Visibility" end="Pause" frame="Arrow1Hover">
+                <Key type="Bool" time="0" value="true"/>
+            </Controller>
+            <Controller type="Visibility" end="Pause" frame="Arrow2Hover">
+                <Key type="Bool" time="0" value="true"/>
+            </Controller>
+            <Controller type="Visibility" end="Pause" frame="Arrow3Hover">
+                <Key type="Bool" time="0" value="true"/>
+            </Controller>
+        </Animation>
+
+    </Frame>
+
+    <Frame type="ChatSessionsTooltip" name="ChatPanelChatSessionsTooltip" template="ChatSessionsTooltip/ChatSessionsTooltip" />
+    <Frame type="ChatCommandsTooltip" name="ChatPanelChatCommandsTooltip" template="ChatCommandsTooltip/ChatCommandsTooltip" />
+    <Frame type="WhisperRecipientsTooltip" name="ChatPanelRecipientsTooltip" template="WhisperRecipientsTooltip/WhisperRecipientsTooltip" />
+    
+    <Frame type="ChatDisplayListBoxItem" name="ChatDisplayListBoxItem">
+        <AcceptsMouse val="false"/>
+        <Frame type="Label" name="MessageLabel">
+            <Style val="BattleChatDisplay"/>
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+            <AcceptsMouse val="true"/>
+            <AllowedButtons val="Left|Right"/>
+
+            <!-- This is a special case animation, if there's only one very large item to fade out, use a delay -->
+            <Animation name="FadeItemDelayed">
+                <Event event="EditBoxFocusLostDelayed" action="Reset" frame="$parent"/>
+                <Event event="EditBoxFocusLostDelayed" action="Play" frame="$parent"/>
+                <Event event="EditBoxFocusGained" action="Reset" frame="$parent"/>
+                <Event event="EditBoxFocusGained" action="Stop" frame="$parent"/>
+
+                <Controller type="Event" end="Pause">
+                    <Key type="Event" time="0.0" event="EditBoxFocusGained"/>
+                    <Key type="Event" time="1.0" event="EditBoxFocusLost"/>
+                </Controller>
+            </Animation>
+                
+            <Animation name="FadeItem">
+                <Event event="EditBoxFocusLost" action="DirectionForward" frame="$parent"/>
+                <Event event="EditBoxFocusLost" action="Play" frame="$parent"/>
+                <Event event="EditBoxFocusGained" action="DirectionReverse" frame="$parent"/>
+                <Event event="EditBoxFocusGained" action="Play" frame="$parent"/>
+                <Event event="EditBoxFocusLost" action="DirectionForward"/>
+                <Event event="EditBoxFocusLost" action="Play"/>
+                <Event event="EditBoxFocusGained" action="DirectionReverse"/>
+                <Event event="EditBoxFocusGained" action="Play"/>
+
+                <!-- This controls how fast each item fades out -->
+                <Controller type="Fade" end="Pause">
+                    <Key type="Curve" time="0" value="255" out="Auto"/>
+                    <Key type="Curve" time="0.05" value="0" out="Auto"/>
+                </Controller>
+
+                <Controller type="Visibility" end="Pause">
+                    <Key type="Bool" time="0" value="true"/>
+                    <Key type="Bool" time="0.049" value="true"/>
+                    <Key type="Bool" time="0.050" value="false"/>
+                </Controller>
+            </Animation>
+        </Frame>
+    </Frame>
+
+    <Frame type="ChatPanel" name="ChatPanelBaseTemplate">
+        <WhoCommandLevelRequirement val="5"/>
+
+        <Frame Type="BattleUserContextMenu" name="ChatPanelUserContextMenu" template="BattleUserContextMenu/BattleUserContextMenu" >
+            <Anchor side="Top" relative="$parent" pos="Max" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+        </Frame>
+        
+        <Frame type="Frame" name="InnerContainerAnchor">
+            <Anchor side="Top" relative="$parent/ContentAreaAnchor" pos="Min" offset="3"/>
+            <Anchor side="Bottom" relative="$parent/ContentAreaAnchor" pos="Max" offset="-3"/>
+            <Anchor side="Left" relative="$parent/ContentAreaAnchor" pos="Min" offset="3"/>
+            <Anchor side="Right" relative="$parent/ContentAreaAnchor" pos="Max" offset="-3"/>
+        </Frame>
+
+        <Frame type="Frame" name="ContentAreaAnchor">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="4"/>
+            <Anchor side="Bottom" relative="$parent/ChatEditBoxFrame" pos="Min" offset="-5"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="-12"/>
+
+            <Visible val="false"/>
+
+            <Frame type="BlurFrame" name="BlurBackground">
+                <Anchor relative="$parent/$parent/InnerContainerAnchor"/>
+                <BlurAmount val="0"/>
+
+                <Frame type="Image" name="LowImage">
+                    <Anchor relative="$parent" />
+                    <Texture val="@UI/Storm_Generic_Background_Low"/>
+                    <Alpha val="200"/>
+                </Frame>
+            </Frame>
+
+            <Frame type="Image" name="BackgroundColorImage">
+                <Anchor relative="$parent/$parent/InnerContainerAnchor"/>
+                <Color val="24194f"/>
+                <Alpha val="165"/>
+            </Frame>
+
+            <Frame type="Image" name="BackgroundGradientImage">
+                <Anchor relative="$parent/BlurBackground"/>
+                <Texture val="@UI/storm_ui_glues_draft_hero_gradient"/>
+                <TextureCoords top="-.5" left="0.0" bottom="1" right="1.0"/>
+                <Alpha val="115"/>
+            </Frame>
+        
+            <Frame type="Image" name="BorderBackground" template="ChatPanel/ChatBorderTemplate">
+            </Frame>
+
+            <Animation name="FadeBackground">
+                <Event event="EditBoxFocusLost" action="DirectionReverse" frame="$parent"/>
+                <Event event="EditBoxFocusLost" action="Play" frame="$parent"/>
+                <Event event="EditBoxFocusGained" action="DirectionForward" frame="$parent"/>
+                <Event event="EditBoxFocusGained" action="Play" frame="$parent"/>
+                <Event event="EditBoxFocusLostImmediate" action="Reset,Stop" frame="$parent"/>
+
+                <Controller type="Fade" end="Pause">
+                    <Key type="Curve" time="0" value="0" out="Auto"/>
+                    <Key type="Curve" time="0.3" value="255" out="Auto"/>
+                </Controller>
+
+                <Controller type="Blur" end="Pause" frame="BlurBackground">
+                    <Key type="Curve" time="0" value="0.0" out="Auto"/>
+                    <Key type="Curve" time="0.3" value="0.8" out="Auto"/>
+                </Controller>
+
+                <Controller type="Visibility" end="Pause">
+                    <Key type="Bool" time="0.00" value="false"/>
+                    <Key type="Bool" time="0.01" value="true"/>
+                    <Key type="Bool" time="0.30" value="true"/>
+                </Controller>
+            </Animation>
+        </Frame>
+      
+        <Frame type="Frame" name="ChatEditBoxFrame">
+            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent/$parent/SocialButton" pos="Min" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+            <Height val="70"/>
+            <AcceptsMouse val="false"/>
+            
+            <Frame type="Image" name="ChatEditBoxBorderImage">
+                <Anchor relative="$parent"/>
+                <Texture val="@UI/Storm_UI_Taskbar_ChatInputBox"/>
+                <TextureType val="Nineslice"/>
+            </Frame>
+
+            <Frame type="Label" name="InactiveChatLabel">
+                <Anchor side="Left" relative="$parent" pos="Min" offset="25"/>
+                <Anchor side="Top" relative="$parent" pos="Min" offset="5"/>
+                <Anchor side="Bottom" relative="$parent" pos="Max" offset="-5"/>
+                <Style val="BattleChatInactive"/>
+            </Frame>
+
+            <Frame type="Label" name="ActiveChatLabel">
+                <Anchor side="Left" relative="$parent" pos="Min" offset="25"/>
+                <Anchor side="Top" relative="$parent" pos="Min" offset="5"/>
+                <Anchor side="Bottom" relative="$parent" pos="Max" offset="-5"/>
+                <Style val="BattleChatActive"/>
+            </Frame>
+        
+            <Frame type="EditBox" name="ChatEditBox">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="5"/>
+                <Anchor side="Left" relative="$parent/ActiveChatLabel" pos="Max" offset="-15"/>
+                <Anchor side="Bottom" relative="$parent" pos="Max" offset="-5"/>
+                <Anchor side="Right" relative="$parent" pos="Max" offset="-25"/>
+                <Insets top="10" left="15" bottom="10" right="15"/>
+                <HighlightColor val="##StandardEditBoxHighlightColor"/>
+                <HighlightAlpha val="##StandardEditBoxHighlightAlpha"/>
+                <HighlightOnGainFocus val="false"/>
+                <Style val="BattleChatActive"/>
+
+                <Frame type="Frame" name="LabelContainerFrame">
+                    <Anchor relative="$parent"/>
+                    <Frame type="Label" name="Label">
+                        <Anchor relative="$parent"/>
+                        <Options val="Ellipsis | IgnoreFormatTags"/>
+                    </Frame>
+                </Frame>
+            </Frame>
+        </Frame>
+
+        <Frame type="ChatManagerPanel" name="ChatManagerPanel" template="ChatManagerPanel/ChatManagerPanelTemplate">
+            <Anchor side="Top" relative="$parent/InnerContainerAnchor" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent/InnerContainerAnchor" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent/InnerContainerAnchor" pos="Max" offset="0"/>
+            <Height val="52"/>
+            <Alpha val="0"/>
+            <Visible val="false"/>
+            
+            <Animation name="FadeBackground">
+                <Event event="EditBoxFocusLost" action="DirectionReverse" frame="$parent"/>
+                <Event event="EditBoxFocusLost" action="Play" frame="$parent"/>
+                <Event event="EditBoxFocusGained" action="DirectionForward" frame="$parent"/>
+                <Event event="EditBoxFocusGained" action="Play" frame="$parent"/>
+                <Event event="EditBoxFocusLostImmediate" action="Reset,Stop" frame="$parent"/>
+
+                <Controller name="Fade" type="Fade" end="Pause">
+                    <Key type="Curve" time="0" value="0" out="Auto"/>
+                    <Key type="Curve" time="0.3" value="255" out="Auto"/>
+                </Controller>
+
+                <Controller name="Visibility" type="Visibility" end="Pause">
+                    <Key type="Bool" time="0.00" value="false"/>
+                    <Key type="Bool" time="0.01" value="true"/>
+                    <Key type="Bool" time="0.30" value="true"/>
+                </Controller>
+            </Animation>
+
+            <Frame type="Image" name="BottomBorderImage" template="StandardTemplates/BorderImageTemplate">
+                <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+            </Frame>
+        </Frame>
+
+        <Frame type="ChatMembersPanel" name="ChatMembersPanel" template="ChatMembersPanel/ChatMembersPanelTemplate">
+            <Anchor side="Top" relative="$parent/ChatManagerPanel" pos="Max" offset="0"/>
+            <Anchor side="Bottom" relative="$parent/InnerContainerAnchor" pos="Max" offset="0"/>
+            <Anchor side="Right" relative="$parent/InnerContainerAnchor" pos="Max" offset="0"/>
+
+            <Width val="245"/>
+            <Alpha val="0"/>
+            <Visible val="false"/>
+
+            <Animation name="FadeBackground">
+                <Event event="EditBoxFocusLost" action="DirectionReverse" frame="$parent"/>
+                <Event event="EditBoxFocusLost" action="Play" frame="$parent"/>
+                <Event event="EditBoxFocusGained" action="DirectionForward" frame="$parent"/>
+                <Event event="EditBoxFocusGained" action="Play" frame="$parent"/>
+                <Event event="EditBoxFocusLostImmediate" action="Reset,Stop" frame="$parent"/>
+
+                <Controller name="Fade" type="Fade" end="Pause">
+                    <Key type="Curve" time="0" value="0" out="Auto"/>
+                    <Key type="Curve" time="0.3" value="255" out="Auto"/>
+                </Controller>
+
+                <Controller name="Visibility" type="Visibility" end="Pause">
+                    <Key type="Bool" time="0.00" value="false"/>
+                    <Key type="Bool" time="0.01" value="true"/>
+                    <Key type="Bool" time="0.30" value="true"/>
+                </Controller>
+            </Animation>
+        </Frame>
+
+        <Frame Type="ChatSessionContextMenu" name="ChatPanelChatContextMenu" template="ChatSessionContextMenu/ChatSessionContextMenu">
+            <Anchor side="Top" relative="$parent" pos="Max" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+        </Frame>
+
+        <Frame type="Frame" name="ChatDisplayFrame">
+            <Anchor side="Top" relative="$parent/ChatManagerPanel" pos="Max" offset="0"/>
+            <Anchor side="Left" relative="$parent/InnerContainerAnchor" pos="Min" offset="0"/>
+            <Anchor side="Bottom" relative="$parent/InnerContainerAnchor" pos="Max" offset="0"/>
+            <Anchor side="Right" relative="$parent/ChatMembersPanel" pos="Min" offset="5"/>
+            <AcceptsMouse val="false"/>
+            
+            <!-- This frame blocks mouse clicks when the chat is focused -->
+            <Frame type="Frame" name="MouseTargetFrame">
+                <Anchor relative="$parent"/>
+                <AcceptsMouse val="true"/>
+                <Visible val="false"/>
+                
+                <Animation name="HideMouseTarget">
+                    <Event event="EditBoxFocusLost" action="DirectionReverse" frame="$parent/$parent"/>
+                    <Event event="EditBoxFocusLost" action="Play" frame="$parent/$parent"/>
+                    <Event event="EditBoxFocusGained" action="DirectionForward" frame="$parent/$parent"/>
+                    <Event event="EditBoxFocusGained" action="Play" frame="$parent/$parent"/>
+                    
+                    <Controller name="Visibility" type="Visibility" end="Pause">
+                        <Key type="Bool" time="0" value="false"/>
+                        <Key type="Bool" time="0.3" value="true"/>
+                    </Controller>
+                </Animation>
+            </Frame>
+
+            <Animation name="FadeOut">
+                <Event event="DelayedFadeOut" action="DirectionForward"/>
+                <Event event="DelayedFadeOut" action="Play"/>
+                <Event event="EditBoxFocusGained" action="DirectionReverse" frame="$parent"/>
+                <Event event="EditBoxFocusGained" action="Play" frame="$parent"/>
+                <Event event="MessageAdded" action="DirectionReverse" frame="$this/ChatDisplayListBox"/>
+                <Event event="MessageAdded" action="Play" frame="$this/ChatDisplayListBox"/>
+
+                <Controller type="Fade" end="Pause">
+                    <Key type="Curve" time="0.0" value="255" out="Auto"/>
+                    <Key type="Curve" time="0.08" value="0" out="Auto"/>
+                </Controller>
+
+                <Controller name="Visibility" type="Visibility" end="Pause">
+                    <Key type="Bool" time="0" value="true"/>
+                    <Key type="Bool" time="0.079" value="true"/>
+                    <Key type="Bool" time="0.080" value="false"/>
+                </Controller>
+            </Animation>
+
+            <Animation name="FadeDelay">
+                <Event event="EditBoxFocusLost" action="Reset" frame="$parent"/>
+                <Event event="EditBoxFocusLost" action="Play" frame="$parent"/>
+                <Event event="EditBoxFocusGained" action="Reset" frame="$parent"/>
+                <Event event="EditBoxFocusGained" action="Stop" frame="$parent"/>
+                <Event event="MessageAdded" action="Reset" frame="$this/ChatDisplayListBox"/>
+                <Event event="MessageAdded" action="Play" frame="$this/ChatDisplayListBox"/>
+
+                <!-- This controls the delay before the entire panel fades out due to inactivity -->
+                <Controller type="Event" end="Pause" frame="$this">
+                    <Key type="Event" time="0.0" event="NoOp"/>
+                    <Key type="Event" time="30.0" event="DelayedFadeOut"/>
+                </Controller>
+            </Animation>
+
+            <Frame type="ChatDisplayListBox" name="ChatDisplayListBox">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+                <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+                <ItemDesc val="ChatPanel/ChatDisplayListBoxItem"/>
+                <ScrollBar val="$root/ChatPanel/ChatScrollBarTemplate"/>
+
+                <!-- Use inset to set padding around item container, but scroll bar is anchored to the parent borders -->
+                <AutoScrollBarLayout val="false"/>
+                <AlwaysPositionRelativeToScrollBar val="true"/>
+                <Insets top="18" left="10" bottom="18" right="2"/>
+
+                <Frame type="Frame" name="ScrollBarBorder" template="ChatMembersPanel/ChatScrollBarBorderTemplate">
+                    <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                    <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+                    <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+                    <Width val="10"/>
+                </Frame>
+
+                <Frame Type="ChatDisplayListBoxContextMenu" name="ContextMenu" template="ChatDisplayListBoxContextMenu/ChatDisplayListBoxContextMenu">
+                    <Anchor side="Top" relative="$parent" pos="Max" offset="0"/>
+                    <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+                </Frame>
+
+                <Frame type="Button" name="MessageNotificationButton" template="ChatPanel/MessageNotificationButtonTemplate">
+                    <Anchor side="Right" relative="$parent" pos="Max" offset="-10"/>
+                    <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+                    <Width val="470"/>
+                </Frame>
+                
+                <!-- This frame's animations controls the rate and position at which the chat messages fade out -->
+                <Frame type="Frame" name="MessageFadeFrame">
+                    <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                    <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                    <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+                    <Anchor side="Bottom" relative="$parent" pos="Max" offset="-105"/>
+
+                    <!-- These are a couple of tricky animations in order to support chat height resizing, without needing to change this animation. -->
+                    <!-- We reset the top and bottom anchors here to override the height animations. -->
+                    <Animation name="ResetShrink">
+                        <Event event="EditBoxFocusLost" action="Reset" frame="$parent/$parent/$parent"/>
+                        <Event event="EditBoxFocusGained" action="Reset" frame="$parent/$parent/$parent"/>
+
+                        <Controller type="Anchor" side="Top" relative="True" end="Pause">
+                            <Key type="Curve" time="0.0" value="0" out="Auto"/>
+                        </Controller>
+
+                        <Controller type="Anchor" side="Bottom" relative="True" end="Pause">
+                            <Key type="Curve" time="0.0" value="0" out="Auto"/>
+                        </Controller>
+                    </Animation>
+
+                    <!-- We use a negative percentage in the dimension animation because this frame is anchored to the top and bottom of its parent -->
+                    <!-- which causes height changes to be anchored in the middle.  We only care about the end position of the top anchor so this -->
+                    <!-- animation will end with the top anchor where the bottom anchor started at. -->
+                    <Animation name="Shrink">
+                        <Event event="EditBoxFocusLost" action="RefreshBaseValue" frame="$parent/$parent/$parent"/>
+                        <Event event="EditBoxFocusLost" action="Reset" frame="$parent/$parent/$parent"/>
+                        <Event event="EditBoxFocusLost" action="Play" frame="$parent/$parent/$parent"/>
+                        <Event event="EditBoxFocusGained" action="Stop" frame="$parent/$parent/$parent"/>
+
+                        <Controller type="Dimension" dimension="Height" relative="False" percentage="True" end="Pause">
+                            <Key type="Curve" time="0.0" value="100" out="Auto"/>
+                            <Key type="Curve" time="0.10" value="-100" out="Auto"/>
+                        </Controller>
+                    </Animation>
+                </Frame>
+            </Frame>
+        </Frame>
+    </Frame>
+
+    <!-- MaximizeChat functionality -->
+    <Frame type="ChatPanel" name="ChatPanelTemplate" template="ChatPanel/ChatPanelBaseTemplate">
+        <Animation name="MaximizeButtonClick">
+            <Event event="OnClick" action="DirectionForward,Play" frame="ChatManagerPanel/MaximizeChatButton"/>
+            <Event event="OnClick" action="DirectionReverse,Play" frame="ChatManagerPanel/MinimizeChatButton"/>
+
+            <Controller type="Property" property="Maximized" end="Pause">
+                <Key type="Property" time="0.00" value="false"/>
+                <Key type="Property" time="0.01" value="true"/>
+            </Controller>
+        </Animation>
+
+        <StateGroup name="MaximizeButtonStateGroup">
+            <State name="MaximizedState">
+                <When type="Property" frame="$this" Maximized="true"/>
+                <Action type="SetProperty" frame="ChatManagerPanel/MaximizeChatButton" Visible="false"/>
+                <Action type="SetProperty" frame="ChatManagerPanel/MinimizeChatButton" Visible="true"/>
+                <Action type="SendEvent" frame="$this" event="MaximizeChat"/>
+            </State>
+
+            <State name="MinimizedState">
+                <When type="Property" frame="$this" Maximized="false"/>
+                <Action type="SetProperty" frame="ChatManagerPanel/MaximizeChatButton" Visible="true"/>
+                <Action type="SetProperty" frame="ChatManagerPanel/MinimizeChatButton" Visible="false"/>
+                <Action type="SendEvent" frame="$this" event="MinimizeChat"/>
+            </State>
+        </StateGroup>
+        
+        <Animation name="MaximizeChat">
+            <Event event="MaximizeChat" action="DirectionForward,Play"/>
+            <Event event="MinimizeChat" action="DirectionReverse,Play"/>
+            <Event event="EditBoxFocusLostImmediate" action="Reset,Stop"/>
+
+            <Controller type="Anchor" end="Pause" side="Top" relative="true">
+                <Key type="Curve" time="0.0" value="0" out="Step"/>
+                <Key type="Curve" time="0.1" value="-426" out="Step"/>
+            </Controller>
+
+            <Controller type="Event" end="Pause">
+                <Key type="Event" time="0.0" event="ChatMaximizeStart"/>
+                <Key type="Event" time="0.1" event="ChatMaximizeEnd"/>
+            </Controller>
+        </Animation>
+
+        <Frame type="ChatManagerPanel" name="ChatManagerPanel">
+            <Frame type="Button" name="MaximizeChatButton" template="StandardTemplates/StormCloseButtonTemplate">
+                <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+                <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+                <Width val="44"/>
+                <Height val="50"/>
+
+                <Frame type="Image" name="NormalImage">
+                    <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+                    <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+                    <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+                    <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+                    <Texture val="@UI/ChatPanel_Maximize_Normal" layer="0"/>
+                    <Texture val="@UI/ChatPanel_Maximize_Down" layer="1"/>
+                    <Texture val="@UI/ChatPanel_Maximize_Down" layer="2"/>
+                    <Texture val="@UI/ChatPanel_Maximize_Normal" layer="3"/>
+                    <DesaturateOnDisable val="true"/>
+                </Frame>
+
+                <Frame type="Image" name="HoverImage">
+                    <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+                    <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+                    <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+                    <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+                    <Texture val="@UI/ChatPanel_Maximize_Hover" layer="0"/>
+                    <Texture val="@UI/ChatPanel_Maximize_Down" layer="1"/>
+                    <Texture val="@UI/ChatPanel_Maximize_Down" layer="2"/>
+                    <Texture val="@UI/ChatPanel_Maximize_Normal" layer="3"/>
+                    <DesaturateOnDisable val="true"/>
+                </Frame>
+            </Frame>
+
+            <Frame type="Button" name="MinimizeChatButton" template="StandardTemplates/StormCloseButtonTemplate">
+                <Anchor relative="$parent/MaximizeChatButton"/>
+                <Visible val="false"/>
+                <Width val="44"/>
+                <Height val="50"/>
+
+                <Frame type="Image" name="NormalImage">
+                    <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+                    <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+                    <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+                    <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+                    <Texture val="@UI/ChatPanel_Minimize_Normal" layer="0"/>
+                    <Texture val="@UI/ChatPanel_Minimize_Down" layer="1"/>
+                    <Texture val="@UI/ChatPanel_Minimize_Down" layer="2"/>
+                    <Texture val="@UI/ChatPanel_Minimize_Normal" layer="3"/>
+                    <DesaturateOnDisable val="true"/>
+                </Frame>
+
+                <Frame type="Image" name="HoverImage">
+                    <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+                    <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+                    <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+                    <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+                    <Texture val="@UI/ChatPanel_Minimize_Hover" layer="0"/>
+                    <Texture val="@UI/ChatPanel_Minimize_Down" layer="1"/>
+                    <Texture val="@UI/ChatPanel_Minimize_Down" layer="2"/>
+                    <Texture val="@UI/ChatPanel_Minimize_Normal" layer="3"/>
+                    <DesaturateOnDisable val="true"/>
+                </Frame>
+            </Frame>
+        </Frame>
+    </Frame>
+
+</Desc>

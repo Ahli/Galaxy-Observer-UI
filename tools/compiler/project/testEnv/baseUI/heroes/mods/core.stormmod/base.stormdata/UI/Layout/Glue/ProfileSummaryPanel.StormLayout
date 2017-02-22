@@ -1,0 +1,1281 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<Desc>
+    <DescFlags val="Locked"/>
+
+    <Constant name="SummaryContainerWidth" val="220"/>
+    <Constant name="SummaryContainerHeight" val="140"/>
+    <Constant name="SummaryContainerTopOffset" val="-15"/>
+    <Constant name="AwardsIconOffset" val="-19"/>
+
+    <Frame type="Button" name="RoundPipButtonTemplate">
+        <ClickSound val="@UI_BNet_PanelRotate"/>
+        <Width val="20"/>
+        <Height val="20"/>
+        <DisplayType val="ImageLayer"/>
+        <Visible val="False"/>
+
+        <Frame type="Image" name="NormalImage">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+            <StateCount val="1"/>
+            <LayerCount val="1"/>
+            <TextureType val="Normal"/>
+            <Tiled val="false"/>
+            <DesaturateOnDisable val="false"/>
+            <DisabledAlpha val="75"/>
+            <Texture val=""/>
+        </Frame>
+
+        <Frame type="Image" name="HoverImage">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+            <StateCount val="1"/>
+            <LayerCount val="1"/>
+            <TextureType val="Normal"/>
+            <Tiled val="false"/>
+            <DesaturateOnDisable val="false"/>
+            <DisabledAlpha val="75"/>
+            <Texture val=""/>
+        </Frame>
+
+        <Frame type="Image" name="HoverAddImage">
+            <Anchor relative="$parent/NormalImage"/>
+            <BlendMode val="Add"/>
+            <Alpha val="0"/>
+            <Texture val=""/>
+            <Animation name="Hover">
+                <Event event="OnMouseEnter" action="DirectionForward" frame="$parent"/>
+                <Event event="OnMouseEnter" action="Play" frame="$parent"/>
+                <Event event="OnMouseExit" action="DirectionReverse" frame="$parent"/>
+                <Event event="OnMouseExit" action="Play" frame="$parent"/>
+                <Controller type="Fade" end="Pause">
+                    <Key type="Curve" time="0" value="0" out="Fast"/>
+                    <Key type="Curve" time=".2" value="255" in="Slow"/>
+                </Controller>
+            </Animation>
+        </Frame>
+
+        <Frame type="Image" name="SelectedImage">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+            <Visible val="False"/>
+            <Texture val="@UI/Storm_UI_Brawl_HUD_Round_Highlight"/>
+        </Frame>
+
+        <Frame type="Frame" name="HitTestFrame">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+        </Frame>
+    </Frame>
+
+    <Frame type="PageSelectorButtonList" name="RoundSelectorButtonListTemplate">
+        <Height val="35"/>
+        <AllowPageWrap val="true"/>
+
+        <Frame type="Button" name="PageButton0" template="ProfileSummaryPanel/RoundPipButtonTemplate">
+            <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Mid" offset="-35"/>
+            <Anchor side="Right" relative="$parent" pos="Mid" offset="-35"/>
+            <CollapseLayout val="true"/>
+            
+            <StateGroup name="RoundState">
+                <DefaultState val="None"/>
+                
+                <State name="None">
+                    <When type="Property" frame="$ancestor[@type=PlayedGameFrame]" RoundResult="None" Index="0"/>
+                </State>
+                <State name="Win">
+                    <When type="Property" frame="$ancestor[@type=PlayedGameFrame]" RoundResult="Win" Index="0"/>
+                    <Action type="SetProperty" frame="$this/NormalImage" Texture="@UI/Storm_UI_Brawl_HUD_Round_Blue"/>
+                    <Action type="SetProperty" frame="$this/HoverImage" Texture="@UI/Storm_UI_Brawl_HUD_Round_Blue"/>
+                    <Action type="SetProperty" frame="$this/HoverAddImage" Texture="@UI/Storm_UI_Brawl_HUD_Round_Blue"/>
+                </State>
+                <State name="Loss">
+                    <When type="Property" frame="$ancestor[@type=PlayedGameFrame]" RoundResult="Loss" Index="0"/>
+                    <Action type="SetProperty" frame="$this/NormalImage" Texture="@UI/Storm_UI_Brawl_HUD_Round_Red"/>
+                    <Action type="SetProperty" frame="$this/HoverImage" Texture="@UI/Storm_UI_Brawl_HUD_Round_Red"/>
+                    <Action type="SetProperty" frame="$this/HoverAddImage" Texture="@UI/Storm_UI_Brawl_HUD_Round_Red"/>
+                </State>
+            </StateGroup>
+
+            <Frame type="Image" name="SelectedImage">
+                <StateGroup name="Selections">
+                    <State name="Selected">
+                        <When type="Property" frame="$ancestor[@type=PageSelectorButtonList]" CurrentPage="0"/>
+                        <Action type="SetProperty" visible="True"/>
+                    </State>
+                </StateGroup>
+            </Frame>
+        </Frame>
+
+        <Frame type="Button" name="PageButton1" template="ProfileSummaryPanel/RoundPipButtonTemplate">
+            <Anchor side="Top" relative="$parent/PageButton0" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent/PageButton0" pos="Max" offset="5"/>
+            <CollapseLayout val="true"/>
+            
+            <StateGroup name="RoundState">
+                <DefaultState val="None"/>
+                
+                <State name="None">
+                    <When type="Property" frame="$ancestor[@type=PlayedGameFrame]" RoundResult="None" Index="1"/>
+                </State>
+                <State name="Win">
+                    <When type="Property" frame="$ancestor[@type=PlayedGameFrame]" RoundResult="Win" Index="1"/>
+                    <Action type="SetProperty" frame="$this/NormalImage" Texture="@UI/Storm_UI_Brawl_HUD_Round_Blue"/>
+                    <Action type="SetProperty" frame="$this/HoverImage" Texture="@UI/Storm_UI_Brawl_HUD_Round_Blue"/>
+                    <Action type="SetProperty" frame="$this/HoverAddImage" Texture="@UI/Storm_UI_Brawl_HUD_Round_Blue"/>
+                </State>
+                <State name="Loss">
+                    <When type="Property" frame="$ancestor[@type=PlayedGameFrame]" RoundResult="Loss" Index="1"/>
+                    <Action type="SetProperty" frame="$this/NormalImage" Texture="@UI/Storm_UI_Brawl_HUD_Round_Red"/>
+                    <Action type="SetProperty" frame="$this/HoverImage" Texture="@UI/Storm_UI_Brawl_HUD_Round_Red"/>
+                    <Action type="SetProperty" frame="$this/HoverAddImage" Texture="@UI/Storm_UI_Brawl_HUD_Round_Red"/>
+                </State>
+            </StateGroup>
+            <Frame type="Image" name="SelectedImage">
+                <StateGroup name="Selections">
+                    <State name="Selected">
+                        <When type="Property" frame="$ancestor[@type=PageSelectorButtonList]" CurrentPage="1"/>
+                        <Action type="SetProperty" visible="True"/>
+                    </State>
+                </StateGroup>
+            </Frame>
+        </Frame>
+
+        <Frame type="Button" name="PageButton2" template="ProfileSummaryPanel/RoundPipButtonTemplate">
+            <Anchor side="Top" relative="$parent/PageButton0" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent/PageButton1" pos="Max" offset="5"/>
+            <CollapseLayout val="true"/>
+            
+            <StateGroup name="RoundState">
+                <DefaultState val="None"/>
+                
+                <State name="None">
+                    <When type="Property" frame="$ancestor[@type=PlayedGameFrame]" RoundResult="None" Index="2"/>
+                </State>
+                <State name="Win">
+                    <When type="Property" frame="$ancestor[@type=PlayedGameFrame]" RoundResult="Win" Index="2"/>
+                    <Action type="SetProperty" frame="$this/NormalImage" Texture="@UI/Storm_UI_Brawl_HUD_Round_Blue"/>
+                    <Action type="SetProperty" frame="$this/HoverImage" Texture="@UI/Storm_UI_Brawl_HUD_Round_Blue"/>
+                    <Action type="SetProperty" frame="$this/HoverAddImage" Texture="@UI/Storm_UI_Brawl_HUD_Round_Blue"/>
+                </State>
+                <State name="Loss">
+                    <When type="Property" frame="$ancestor[@type=PlayedGameFrame]" RoundResult="Loss" Index="2"/>
+                    <Action type="SetProperty" frame="$this/NormalImage" Texture="@UI/Storm_UI_Brawl_HUD_Round_Red"/>
+                    <Action type="SetProperty" frame="$this/HoverImage" Texture="@UI/Storm_UI_Brawl_HUD_Round_Red"/>
+                    <Action type="SetProperty" frame="$this/HoverAddImage" Texture="@UI/Storm_UI_Brawl_HUD_Round_Red"/>
+                </State>
+            </StateGroup>
+            <Frame type="Image" name="SelectedImage">
+                <StateGroup name="Selections">
+                    <State name="Selected">
+                        <When type="Property" frame="$ancestor[@type=PageSelectorButtonList]" CurrentPage="2"/>
+                        <Action type="SetProperty" visible="True"/>
+                    </State>
+                </StateGroup>
+            </Frame>
+        </Frame>
+    </Frame>
+
+    <Frame type="PlayerMostPlayedHeroTileListItem" name="PlayerMostPlayedHeroTileListItemTemplate">
+        <Width val="240"/>
+        <Height val="360"/>
+        <HideWhenCleared val="false"/>
+        <AcceptsMouse val="True"/>
+        <SelectedSound val="@UI_BNet_Generic_01"/>
+
+        <Animation name="Intro">
+            <Event event="Intro" action="Play"/>
+            <Event event="OnHidden" action="Reset"/>
+            <Controller type="Fade" end="Pause">
+                <Key type="Curve" time="0" value="0" out="Slow"/>
+                <Key type="Curve" time=".3" value="255" in="Slow"/>
+            </Controller>
+            <Controller type="Anchor" end="Pause" side="Top" relative="true">
+                <Key type="Curve" time="0.0" value="-20" out="Fast"/>
+                <Key type="Curve" time=".4" value="0" in="Slow"/>
+            </Controller>
+        </Animation>
+
+        <Frame type="Image" name="HeroBackgroundImage">
+            <Anchor relative="$parent" offset="-6" />
+            <Texture val="@UI/Storm_UI_ProfileDialog_MostPlayed_Background"/>
+
+            <Animation name="Hover">
+                <Event event="OnMouseEnter" action="DirectionForward" frame="$parent"/>
+                <Event event="OnMouseEnter" action="Play" frame="$parent"/>
+                <Event event="OnMouseExit" action="DirectionReverse" frame="$parent"/>
+                <Event event="OnMouseExit" action="Play" frame="$parent"/>
+                <Controller type="Texture" end="Pause">
+                    <Key type="Image" time="0.0" image="@UI/Storm_UI_ProfileDialog_MostPlayed_Background"/>
+                    <Key type="Image" time="0.0001" image="@UI/Storm_UI_ProfileDialog_MostPlayed_Background_Hover"/>
+                </Controller>
+            </Animation>
+        </Frame>
+
+        <Frame type="Frame" name="HeroContainer">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="13"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="13"/>
+            <Width val="214"/>
+            <Height val="334"/>
+
+            <Frame type="HeroCutsceneFrame" name="HeroCutsceneFrame">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="-42"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="-146"/>
+                <Width val="498"/>
+                <Height val="384"/>
+                <HeroCutsceneDragEnabled val="false"/>
+
+                <Animation name="ShowHoverState">
+                    <Event event="OnMouseEnter" action="Play" frame="$parent/$parent"/>
+                    <Controller type="Cutscene" end="Stop">
+                        <Key type="Cutscene" time="0.0" action="Bookmark" bookmark="Hover Start"/>
+                        <Key type="Cutscene" time="0.0" action="TimeScale" value="1.0"/>
+                    </Controller>
+                </Animation>
+
+                <Animation name="HideHoverState">
+                    <Event event="OnMouseExit" action="Play" frame="$parent/$parent"/>
+                    <Controller type="Cutscene" end="Stop">
+                        <Key type="Cutscene" time="0.0" action="Bookmark" bookmark="Hover Off Start"/>
+                        <Key type="Cutscene" time="0.0" action="TimeScale" value="0.5"/>
+                    </Controller>
+                </Animation>
+            </Frame>
+
+            <Animation name="HasHero">
+                <Event event="HasHero" action="Reset" frame="$parent"/>
+                <Event event="HasHero" action="Play" frame="$parent"/>
+                <Controller type="Visibility" end="Pause">
+                    <Key type="Bool" time="0.00" value="true"/>
+                </Controller>
+            </Animation>
+
+            <Animation name="EmptyHero">
+                <Event event="EmptyHero" action="Reset" frame="$parent"/>
+                <Event event="EmptyHero" action="Play" frame="$parent"/>
+                <Controller type="Visibility" end="Pause">
+                    <Key type="Bool" time="0.00" value="false"/>
+                </Controller>
+            </Animation>
+        </Frame>
+
+        <Frame type="Image" name="HeroTextVignetteImage">
+            <Anchor side="Bottom" relative="$parent/HeroBackgroundImage" pos="Max" offset="-8"/>
+            <Anchor side="Left" relative="$parent/HeroBackgroundImage" pos="Min" offset="7"/>
+            <Anchor side="Right" relative="$parent/HeroBackgroundImage" pos="Max" offset="-7"/>
+            <Texture val="@UI/Storm_UI_ProfileDialog_MostPlayed_Vignette"/>
+        </Frame>
+
+        <Frame type="Label" name="HeroNameLabel">
+            <Anchor side="Left" relative="$parent/TotalGamesLabel" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent/TotalGamesLabel" pos="Max" offset="0"/>
+            <Anchor side="Bottom" relative="$parent/TotalGamesLabel" pos="Min" offset="-5"/>
+            <Style val="PlayerProfileNameLabel"/>
+            <Options val="Ellipsis | TooltipIfTruncated" />
+            <AcceptsMouseTooltip val="true" />
+        </Frame>
+
+        <Frame type="Label" name="TotalGamesLabel">
+            <Anchor side="Left" relative="$parent/HeroContainer" pos="Min" offset="10"/>
+            <Anchor side="Right" relative="$parent/HeroContainer" pos="Max" offset="-10"/>
+            <Anchor side="Bottom" relative="$parent/HeroContainer" pos="Max" offset="-7"/>
+            <Style val="PlayerProfileTextSmall"/>
+        </Frame>
+
+        <Frame type="Image" name="HeroHoverImage">
+            <Anchor relative="$parent" />
+            <Texture val="@UI/Storm_UI_ProfileDialog_MostPlayed_Hover_9slice"/>
+            <TextureType val="NineSlice"/>
+            <Alpha val="0"/>
+
+            <Animation name="Hover">
+                <Event event="OnMouseEnter" action="DirectionForward" frame="$parent"/>
+                <Event event="OnMouseEnter" action="Play" frame="$parent"/>
+                <Event event="OnMouseExit" action="DirectionReverse" frame="$parent"/>
+                <Event event="OnMouseExit" action="Play" frame="$parent"/>
+                <Controller type="Fade" end="Pause">
+                    <Key type="Curve" time="0" value="0" out="Fast"/>
+                    <Key type="Curve" time=".1" value="255" in="Slow"/>
+                </Controller>
+            </Animation>
+        </Frame>
+
+        <!-- Empty Icon Spinner if player has fewer than 3 recently played heroes -->
+        <Frame type="Frame" name="EmptyIconContainer">
+            <Anchor relative="$parent" />
+
+            <Animation name="HasHero">
+                <Event event="HasHero" action="Reset" frame="$parent"/>
+                <Event event="HasHero" action="Play" frame="$parent"/>
+                <Controller type="Visibility" end="Pause">
+                    <Key type="Bool" time="0.00" value="false"/>
+                </Controller>
+            </Animation>
+
+            <Animation name="EmptyHero">
+                <Event event="EmptyHero" action="Reset" frame="$parent"/>
+                <Event event="EmptyHero" action="Play" frame="$parent"/>
+                <Controller type="Visibility" end="Pause">
+                    <Key type="Bool" time="0.00" value="true"/>
+                </Controller>
+            </Animation>
+
+            <Frame type="Image" name="EmptyIcon">
+                <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+                <Texture val="@UI/Storm_UI_ProfileDialog_MostPlayed_Empty"/>
+                <SubpixelRendering val="true"/>
+                <RenderPriority val="600"/>
+                <Animation name="Idle">
+                    <Event event="OnShown" action="Play"/>
+                    <Controller type="Rotation" relative="False" end="Loop" >
+                        <Key type="Curve" time="0" value="0" in="linear" out="linear"/>
+                        <Key type="Curve" time="30" value="-360" in="linear" out="linear"/>
+                    </Controller>
+                </Animation>
+            </Frame>
+        </Frame>
+
+    </Frame>
+
+    <Frame type="ScoreValueAwardIconFrame" name="EarnedAwardTemplate">
+        <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+        <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+        <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+        <Height val="72"/>
+        <Width val="72"/>
+
+        <Frame type="Image" name="Image">
+            <Anchor relative="$parent"/>
+            <Unclipped val="false"/>
+            <AcceptsMouse val="false"/>
+            <Visible val="false"/>
+        </Frame>
+
+        <Frame type="Frame" name="TooltipHitFrame">
+            <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+            <Height val="38"/>
+            <Width val="44"/>
+            <AcceptsMouseTooltip val="true"/>
+        </Frame>
+    </Frame>
+
+    <Frame type="TeamRankFrame" name="RankedPlayBadgeTemplate">
+        <Width val="#SummaryContainerWidth"/>
+        <Height val="#SummaryContainerHeight"/>
+
+        <StateGroup name="RankType">
+            <DefaultState val="Placement"/>
+
+            <State name="Invalid">
+                <When type="Property" RankType="Invalid"/>
+                <Action type="SetProperty" frame="BadgeImage" Texture="@UI/Storm_UI_ProfileDialog_Disabled_Badge"/>
+                <Action type="SetProperty" frame="TeamRankLabel" Visible="false"/>
+            </State>
+            <State name="Placement">
+                <When type="Property" RankType="Placement"/>
+                <Action type="SetProperty" frame="BadgeImage" Texture="@UI/Storm_UI_ProfileDialog_Placement_Badge"/>
+                <Action type="SetProperty" frame="TeamRankLabel" Visible="false"/>
+            </State>
+            <State name="Bronze">
+                <When type="Property" RankType="Bronze"/>
+                <Action type="SetProperty" frame="BadgeImage" Texture="@UI/Storm_UI_ProfileDialog_Bronze_Badge"/>
+                <Action type="SetProperty" frame="TeamRankLabel" Visible="true"/>
+            </State>
+            <State name="Silver">
+                <When type="Property" RankType="Silver"/>
+                <Action type="SetProperty" frame="BadgeImage" Texture="@UI/Storm_UI_ProfileDialog_Silver_Badge"/>
+                <Action type="SetProperty" frame="TeamRankLabel" Visible="true"/>
+            </State>
+            <State name="Gold">
+                <When type="Property" RankType="Gold"/>
+                <Action type="SetProperty" frame="BadgeImage" Texture="@UI/Storm_UI_ProfileDialog_Gold_Badge"/>
+                <Action type="SetProperty" frame="TeamRankLabel" Visible="true"/>
+            </State>
+            <State name="Platinum">
+                <When type="Property" RankType="Platinum"/>
+                <Action type="SetProperty" frame="BadgeImage" Texture="@UI/Storm_UI_ProfileDialog_Platinum_Badge"/>
+                <Action type="SetProperty" frame="TeamRankLabel" Visible="true"/>
+            </State>
+            <State name="Diamond">
+                <When type="Property" RankType="Diamond"/>
+                <Action type="SetProperty" frame="BadgeImage" Texture="@UI/Storm_UI_ProfileDialog_Diamond_Badge"/>
+                <Action type="SetProperty" frame="TeamRankLabel" Visible="true"/>
+            </State>
+            <State name="Master">
+                <When type="Property" RankType="Master"/>
+                <Action type="SetProperty" frame="BadgeImage" Texture="@UI/Storm_UI_ProfileDialog_Master_Badge"/>
+                <Action type="SetProperty" frame="TeamRankLabel" Visible="true"/>
+            </State>
+            <State name="Grandmaster">
+                <When type="Property" RankType="Grandmaster"/>
+                <Action type="SetProperty" frame="BadgeImage" Texture="@UI/Storm_UI_ProfileDialog_Grandmaster_Badge"/>
+                <Action type="SetProperty" frame="TeamRankLabel" Visible="true"/>
+            </State>
+
+            <State name="PreseasonHeroLeague">
+                <When type="Property" RankType="Preseason"/>
+                <When type="Property" LeagueType="HeroLeague"/>
+                <Action type="SetProperty" frame="BadgeImage" Texture="@UI/Storm_UI_ProfileDialog_HeroLeague_Badge"/>
+                <Action type="SetProperty" frame="TeamRankLabel" Visible="true"/>
+            </State>
+            <State name="PreseasonTeamLeague">
+                <When type="Property" RankType="Preseason"/>
+                <When type="Property" LeagueType="TeamLeague"/>
+                <Action type="SetProperty" frame="BadgeImage" Texture="@UI/Storm_UI_ProfileDialog_TeamLeague_Badge"/>
+                <Action type="SetProperty" frame="TeamRankLabel" Visible="true"/>
+            </State>
+        </StateGroup>
+
+        <Frame type="Image" name="BadgeImage">
+            <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+            <AcceptsMouseTooltip val="true" />
+            <Texture val="@UI/Storm_UI_ProfileDialog_Disabled_Badge"/>
+
+            <Width val="120"/>
+            <Height val="120"/>
+        </Frame>
+
+        <Frame type="Label" name="TeamRankLabel">
+            <Anchor side="Top" relative="$parent/BadgeImage" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent/BadgeImage" pos="Mid" offset="0"/>
+            <Anchor side="Left" relative="$parent/BadgeImage" pos="Min" offset="2"/>
+            <Anchor side="Right" relative="$parent/BadgeImage" pos="Max" offset="2"/>
+            <Style val="PlayerProfileRankedLevel"/>
+
+            <Frame type="PropertyBind" name="BindRankText">
+                <Anchor relative="$parent"/>
+                <Source frame="$parent/$parent" property="RankText"/>
+                <Target frame="$parent" property="Text"/>
+            </Frame>
+        </Frame>
+
+        <Frame type="Label" name="TeamNameLabel">
+            <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+            <Style val="PlayerProfileText"/>
+            <Text val="@UI/TeamRankFrame/NotYetPlayed"/>
+
+            <Frame type="PropertyBind" name="BindTeamName">
+                <Anchor relative="$parent"/>
+                <Source frame="$parent/$parent" property="TeamName"/>
+                <Target frame="$parent" property="Text"/>
+            </Frame>
+        </Frame>
+    </Frame>
+
+    <Frame type="Frame" name="HeroPortraitSmallTemplate">
+        <Width val="64"/>
+        <Height val="64"/>
+        <AcceptsMouse val="false"/>
+
+        <Animation name="Visibility">
+            <Event event="Empty" action="DirectionReverse"/>
+            <Event event="Empty" action="Play"/>
+            <Event event="Self" action="DirectionForward"/>
+            <Event event="Self" action="Play"/>
+            <Event event="Ally" action="DirectionForward"/>
+            <Event event="Ally" action="Play"/>
+            <Event event="Enemy" action="DirectionForward"/>
+            <Event event="Enemy" action="Play"/>
+
+            <Controller type="Visibility" end="Pause">
+                <Key type="Bool" time="0.00" value="false"/>
+                <Key type="Bool" time="0.01" value="true"/>
+            </Controller>
+        </Animation>
+
+        <Frame type="Image" name="FrameImage">
+            <Anchor relative="$parent" />
+            <SubpixelRendering val="true"/>
+            <LayerCount val="1"/>
+            <Texture val="@UI/Storm_UI_ProfileDialog_HeroFrame_Ally" layer="0"/>
+
+            <Animation name="Ally">
+                <Event event="Ally" action="DirectionForward" frame="$parent"/>
+                <Event event="Ally" action="Play" frame="$parent"/>
+
+                <Controller type="Texture" end="Reset" layer="0">
+                    <Key type="Image" time="0.0" image="@UI/Storm_UI_ProfileDialog_HeroFrame_Ally"/>
+                </Controller>
+            </Animation>
+
+            <Animation name="Enemy">
+                <Event event="Enemy" action="DirectionForward" frame="$parent"/>
+                <Event event="Enemy" action="Play" frame="$parent"/>
+
+                <Controller type="Texture" end="Reset" layer="0">
+                    <Key type="Image" time="0.0" image="@UI/Storm_UI_ProfileDialog_HeroFrame_Enemy"/>
+                </Controller>
+            </Animation>
+
+            <Animation name="Self">
+                <Event event="Self" action="DirectionForward" frame="$parent"/>
+                <Event event="Self" action="Play" frame="$parent"/>
+
+                <Controller type="Texture" end="Reset" layer="0">
+                    <Key type="Image" time="0.0" image="@UI/Storm_UI_ProfileDialog_HeroFrame_Self"/>
+                </Controller>
+            </Animation>
+        </Frame>
+        <Frame type="HeroContainerFrame" name="PortraitContainer">
+            <Anchor relative="$parent/FrameImage"/>
+            <Frame type="HeroImage" name="PortraitImage">
+                <Anchor relative="$parent"/>
+                <SubpixelRendering val="true"/>
+                <HeroImageType val="SelectScreenButton"/>
+                <ImageMaskTexture val="@UI/Storm_UI_ProfileDialog_HeroFrame_Mask"/>
+            </Frame>
+        </Frame>
+
+        <Animation name="Bounce">
+            <Event event="OnMouseEnter" action="DirectionForward"/>
+            <Event event="OnMouseEnter" action="Play"/>
+            <Event event="OnMouseExit" action="DirectionReverse"/>
+            <Event event="OnMouseExit" action="Play"/>
+            <Controller type="Dimension" dimension="Width" relative="False" percentage="True" end="Pause" frame="FrameImage">
+                <Key type="Curve" time="0" value="100" out="Fast"/>
+                <Key type="Curve" time=".2" value="116" in="Fast" out="Slow"/>
+            </Controller>
+            <Controller type="Dimension" dimension="Height" relative="False" percentage="True" end="Pause" frame="FrameImage">
+                <Key type="Curve" time="0" value="100" out="Fast"/>
+                <Key type="Curve" time=".2" value="116" in="Fast" out="Slow"/>
+            </Controller>
+        </Animation>
+
+        <Animation name="Reset">
+            <Event event="Reset" action="Reset"/>
+            <Event event="Reset" action="Play"/>
+            <Controller type="Fade" end="Pause">
+                <Key type="Curve" time="0" value="0" out="Auto"/>
+            </Controller>
+        </Animation>
+
+        <Animation name="AllyIntro">
+            <Event event="AllyIntro" action="Reset"/>
+            <Event event="AllyIntro" action="Play"/>
+            <Controller type="Anchor" end="Pause" side="Top" relative="true" >
+                <Key type="Curve" time="0.0" value="-30" out="Fast"/>
+                <Key type="Curve" time=".5" value="0" in="Slow"/>
+            </Controller>
+            <Controller type="Event" end="Stop" >
+                <Key type="Event" time="0" event="Intro"/>
+            </Controller>
+        </Animation>
+
+        <Animation name="EnemyIntro">
+            <Event event="EnemyIntro" action="Reset"/>
+            <Event event="EnemyIntro" action="Play"/>
+            <Controller type="Anchor" end="Pause" side="Top" relative="true" >
+                <Key type="Curve" time="0.0" value="30" out="Fast"/>
+                <Key type="Curve" time=".5" value="0" in="Slow"/>
+            </Controller>
+            <Controller type="Event" end="Stop" >
+                <Key type="Event" time="0" event="Intro"/>
+            </Controller>
+        </Animation>
+
+        <Animation name="Intro">
+            <Event event="Intro" action="Reset"/>
+            <Event event="Intro" action="Play"/>
+            <Controller type="Fade" end="Pause">
+                <Key type="Curve" time="0" value="0" out="Auto"/>
+                <Key type="Curve" time=".3" value="255" out="Auto"/>
+            </Controller>
+            <Controller type="Dimension" dimension="Width" relative="False" percentage="True" end="Pause" frame="FrameImage">
+                <Key type="Curve" time="0" value="20" out="Fast"/>
+                <Key type="Curve" time=".4" value="100" in="Slow"/>
+            </Controller>
+            <Controller type="Dimension" dimension="Height" relative="False" percentage="True" end="Pause" frame="FrameImage">
+                <Key type="Curve" time="0" value="20" out="Fast"/>
+                <Key type="Curve" time=".4" value="100" in="Slow"/>
+            </Controller>
+        </Animation>
+    </Frame>
+
+    <Frame type="PlayedGameFrame" name="RecentGameTemplate">
+        <Width val="330"/>
+        <Height val="360"/>
+        <AcceptsMouse val="true"/>
+        <AllowedButtons val="Left"/>
+
+        <Animation name="ClickSound">
+            <Event event="OnClick" action="Reset"/>
+            <Event event="OnClick" action="Play"/>
+            <Controller type="Sound" end="Pause">
+                <Key type="Sound" time="0" sound="@UI_BNet_Generic_01" direction="Forward"/>
+            </Controller>
+        </Animation>
+
+        <Frame type="Image" name="FrameImage">
+            <Anchor relative="$parent" offset="-6" />
+            <Texture val="@UI/Storm_UI_ProfileDialog_RecentGame_Frame"/>
+        </Frame>
+
+        <Frame type="Image" name="HoverImage">
+            <Anchor relative="$parent" />
+            <Texture val="@UI/Storm_UI_ProfileDialog_MostPlayed_Hover_9slice"/>
+            <TextureType val="NineSlice"/>
+            <Alpha val="0"/>
+
+            <Animation name="Hover">
+                <Event event="OnMouseEnter" action="DirectionForward" frame="$parent"/>
+                <Event event="OnMouseEnter" action="Play" frame="$parent"/>
+                <Event event="OnMouseExit" action="DirectionReverse" frame="$parent"/>
+                <Event event="OnMouseExit" action="Play" frame="$parent"/>
+                <Controller type="Fade" end="Pause">
+                    <Key type="Curve" time="0" value="0" out="Fast"/>
+                    <Key type="Curve" time=".1" value="255" in="Slow"/>
+                </Controller>
+            </Animation>
+
+            <Animation name="Show">
+                <Event event="Normal" action="Reset" frame="$parent"/>
+                <Event event="Normal" action="Play" frame="$parent"/>
+
+                <Controller type="Visibility" end="Pause">
+                    <Key type="Bool" time="0" value="true"/>
+                </Controller>
+            </Animation>
+
+            <Animation name="Hide">
+                <Event event="Empty" action="Reset" frame="$parent"/>
+                <Event event="Empty" action="Play" frame="$parent"/>
+
+                <Controller type="Visibility" end="Pause">
+                    <Key type="Bool" time="0" value="false"/>
+                </Controller>
+            </Animation>
+        </Frame>
+
+        <Frame type="Image" name="EmptyImage">
+            <Anchor relative="$parent/ContentContainer"/>
+            <Texture val="@UI/Storm_UI_ProfileDialog_RecentGame_Empty"/>
+
+            <Animation name="Show">
+                <Event event="Normal" action="DirectionForward" frame="$parent"/>
+                <Event event="Normal" action="Play" frame="$parent"/>
+                <Event event="Empty" action="DirectionReverse" frame="$parent"/>
+                <Event event="Empty" action="Play" frame="$parent"/>
+
+                <Controller type="Fade" end="Pause">
+                    <Key type="Curve" time="0" value="255"/>
+                    <Key type="Curve" time="0.2" value="0"/>
+                </Controller>
+            </Animation>
+        </Frame>
+
+        <Frame type="Frame" name="ContentContainer">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="13"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="13"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="-13"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="-14"/>
+
+            <Animation name="Show">
+                <Event event="Normal" action="DirectionForward" frame="$parent"/>
+                <Event event="Normal" action="Play" frame="$parent"/>
+                <Event event="Empty" action="DirectionReverse" frame="$parent"/>
+                <Event event="Empty" action="Play" frame="$parent"/>
+
+                <Controller type="Fade" end="Pause">
+                    <Key type="Curve" time="0" value="0"/>
+                    <Key type="Curve" time="0.2" value="255"/>
+                </Controller>
+            </Animation>
+
+            <Frame type="Image" name="MapPreviewImage">
+                <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+                <Texture val="{$ancestor[@type=PlayedGameFrame]/@MapImage}"/>
+                <Alpha val="0"/>
+
+                <Animation name="Show">
+                    <Event event="OnShown" action="Reset"/>
+                    <Event event="OnShown" action="Play"/>
+
+                    <Controller type="Fade" end="Pause">
+                        <Key type="Curve" time="0" value="0"/>
+                        <Key type="Curve" time="0.2" value="51"/>
+                    </Controller>
+                </Animation>
+            </Frame>
+
+            <Frame type="PlayedGamePlayerFrame" name="AllyHeroPortrait2" template="ProfileSummaryPanel/HeroPortraitSmallTemplate">
+                <Anchor side="Top" relative="$parent/AllyTeamBackgroundImage" pos="Min" offset="62"/>
+                <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+            </Frame>
+            <Frame type="PlayedGamePlayerFrame" name="AllyHeroPortrait1" template="ProfileSummaryPanel/HeroPortraitSmallTemplate">
+                <Anchor side="Top" relative="$parent/AllyHeroPortrait2" pos="Min" offset="0"/>
+                <Anchor side="Right" relative="$parent/AllyHeroPortrait2" pos="Min" offset="12"/>
+            </Frame>
+            <Frame type="PlayedGamePlayerFrame" name="AllyHeroPortrait0" template="ProfileSummaryPanel/HeroPortraitSmallTemplate">
+                <Anchor side="Top" relative="$parent/AllyHeroPortrait1" pos="Min" offset="0"/>
+                <Anchor side="Right" relative="$parent/AllyHeroPortrait1" pos="Min" offset="12"/>
+            </Frame>
+            <Frame type="PlayedGamePlayerFrame" name="AllyHeroPortrait3" template="ProfileSummaryPanel/HeroPortraitSmallTemplate">
+                <Anchor side="Top" relative="$parent/AllyHeroPortrait2" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/AllyHeroPortrait2" pos="Max" offset="-12"/>
+            </Frame>
+            <Frame type="PlayedGamePlayerFrame" name="AllyHeroPortrait4" template="ProfileSummaryPanel/HeroPortraitSmallTemplate">
+                <Anchor side="Top" relative="$parent/AllyHeroPortrait3" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/AllyHeroPortrait3" pos="Max" offset="-12"/>
+            </Frame>
+
+            <Frame type="PlayedGamePlayerFrame" name="EnemyHeroPortrait2" template="ProfileSummaryPanel/HeroPortraitSmallTemplate">
+                <Anchor side="Bottom" relative="$parent/EnemyTeamBackgroundImage" pos="Min" offset="54"/>
+                <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+            </Frame>
+            <Frame type="PlayedGamePlayerFrame" name="EnemyHeroPortrait1" template="ProfileSummaryPanel/HeroPortraitSmallTemplate">
+                <Anchor side="Top" relative="$parent/EnemyHeroPortrait2" pos="Min" offset="0"/>
+                <Anchor side="Right" relative="$parent/EnemyHeroPortrait2" pos="Min" offset="12"/>
+            </Frame>
+            <Frame type="PlayedGamePlayerFrame" name="EnemyHeroPortrait0" template="ProfileSummaryPanel/HeroPortraitSmallTemplate">
+                <Anchor side="Top" relative="$parent/EnemyHeroPortrait1" pos="Min" offset="0"/>
+                <Anchor side="Right" relative="$parent/EnemyHeroPortrait1" pos="Min" offset="12"/>
+            </Frame>
+            <Frame type="PlayedGamePlayerFrame" name="EnemyHeroPortrait3" template="ProfileSummaryPanel/HeroPortraitSmallTemplate">
+                <Anchor side="Top" relative="$parent/EnemyHeroPortrait2" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/EnemyHeroPortrait2" pos="Max" offset="-12"/>
+            </Frame>
+            <Frame type="PlayedGamePlayerFrame" name="EnemyHeroPortrait4" template="ProfileSummaryPanel/HeroPortraitSmallTemplate">
+                <Anchor side="Top" relative="$parent/EnemyHeroPortrait3" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/EnemyHeroPortrait3" pos="Max" offset="-12"/>
+            </Frame>
+
+            <Frame type="Image" name="EnemyTeamBackgroundImage">
+                <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                <Texture val="@UI/Storm_UI_ProfileDialog_RecentGame_EnemyBackground"/>
+                <Animation name="Intro">
+                    <Event event="OnShown" action="Reset" />
+                    <Event event="OnShown" action="Play" />
+                    <Controller type="Anchor" end="Pause" side="Bottom" relative="true">
+                        <Key type="Curve" time="0.0" value="20" out="Fast"/>
+                        <Key type="Curve" time=".5" value="0" in="Slow"/>
+                    </Controller>
+                    <Controller type="Event" end="Stop" frame="$parent/EnemyHeroPortrait2">
+                        <Key type="Event" time="0.0" event="Reset"/>
+                        <Key type="Event" time="0.1" event="EnemyIntro"/>
+                    </Controller>
+                    <Controller type="Event" end="Stop" frame="$parent/EnemyHeroPortrait1">
+                        <Key type="Event" time="0.0" event="Reset"/>
+                        <Key type="Event" time="0.2" event="EnemyIntro"/>
+                    </Controller>
+                    <Controller type="Event" end="Stop" frame="$parent/EnemyHeroPortrait3">
+                        <Key type="Event" time="0.0" event="Reset"/>
+                        <Key type="Event" time="0.2" event="EnemyIntro"/>
+                    </Controller>
+                    <Controller type="Event" end="Stop" frame="$parent/EnemyHeroPortrait0">
+                        <Key type="Event" time="0.0" event="Reset"/>
+                        <Key type="Event" time="0.3" event="EnemyIntro"/>
+                    </Controller>
+                    <Controller type="Event" end="Stop" frame="$parent/EnemyHeroPortrait4">
+                        <Key type="Event" time="0.0" event="Reset"/>
+                        <Key type="Event" time="0.3" event="EnemyIntro"/>
+                    </Controller>
+                </Animation>
+            </Frame>
+
+            <Frame type="Image" name="AllyTeamBackgroundImage">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                <Texture val="@UI/Storm_UI_ProfileDialog_RecentGame_AllyBackground"/>
+                <Animation name="Intro">
+                    <Event event="OnShown" action="Reset" />
+                    <Event event="OnShown" action="Play"/>
+                    <Controller type="Anchor" end="Pause" side="Top" relative="true">
+                        <Key type="Curve" time="0.0" value="-20" out="Fast"/>
+                        <Key type="Curve" time=".5" value="0" in="Slow"/>
+                    </Controller>
+                    <Controller type="Event" end="Stop" frame="$parent/AllyHeroPortrait2">
+                        <Key type="Event" time="0.0" event="Reset"/>
+                        <Key type="Event" time="0.1" event="AllyIntro"/>
+                    </Controller>
+                    <Controller type="Event" end="Stop" frame="$parent/AllyHeroPortrait1">
+                        <Key type="Event" time="0.0" event="Reset"/>
+                        <Key type="Event" time="0.2" event="AllyIntro"/>
+                    </Controller>
+                    <Controller type="Event" end="Stop" frame="$parent/AllyHeroPortrait3">
+                        <Key type="Event" time="0.0" event="Reset"/>
+                        <Key type="Event" time="0.2" event="AllyIntro"/>
+                    </Controller>
+                    <Controller type="Event" end="Stop" frame="$parent/AllyHeroPortrait0">
+                        <Key type="Event" time="0.0" event="Reset"/>
+                        <Key type="Event" time="0.3" event="AllyIntro"/>
+                    </Controller>
+                    <Controller type="Event" end="Stop" frame="$parent/AllyHeroPortrait4">
+                        <Key type="Event" time="0.0" event="Reset"/>
+                        <Key type="Event" time="0.3" event="AllyIntro"/>
+                    </Controller>
+                </Animation>
+            </Frame>
+
+            <Frame type="Label" name="AllyTeamLabel">
+                <Anchor side="Top" relative="$parent/AllyTeamBackgroundImage" pos="Min" offset="10"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+                <Style val="PlayerProfileRecentTeam"/>
+                <Text val="{$ancestor[@type=PlayedGameFrame]/@AllyTeamName}"/>
+            </Frame>
+
+            <Frame type="Label" name="EnemyTeamLabel">
+                <Anchor side="Bottom" relative="$parent/EnemyTeamBackgroundImage" pos="Max" offset="-10"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+                <Style val="PlayerProfileRecentTeam"/>
+                <Text val="{$ancestor[@type=PlayedGameFrame]/@EnemyTeamName}"/>
+            </Frame>
+
+            <Frame type="Label" name="MapNameLabel">
+                <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+                <Text val="{$ancestor[@type=PlayedGameFrame]/@MapName}"/>
+                <Style val="PlayerProfileRecentMapName"/>
+            </Frame>
+
+            <Frame type="Label" name="ModeNameLabel">
+                <Anchor side="Top" relative="$parent/MapNameLabel" pos="Max" offset="-5"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+                <Text val="{$ancestor[@type=PlayedGameFrame]/@ModeName}"/>
+                <Style val="PlayerProfileRecentMapType"/>
+                <Alpha val="128"/>
+            </Frame>
+
+            <Frame type="PageSelectorButtonList" name="RoundSelector" template="ProfileSummaryPanel/RoundSelectorButtonListTemplate">
+                <Anchor side="Bottom" relative="$parent" pos="Max" offset="-35"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="42"/>
+                <Anchor side="Right" relative="$parent" pos="Max" offset="5"/>
+
+                <Animation name="CenteringOdd">
+                    <Event event="OnShown" frame="PageButton2" action="Reset, Play"/>
+
+                    <Controller type="Anchor" end="Pause" side="Left" relative="false" pos="Min" frame="$this">
+                        <Key type="Curve" time="0" value="18" out="Linear"/>
+                    </Controller>
+                </Animation>
+
+                <Animation name="CenteringEven">
+                    <Event event="OnHidden" frame="PageButton2" action="Reset, Play"/>
+
+                    <Controller type="Anchor" end="Pause" side="Left" relative="false" pos="Min" frame="$this">
+                        <Key type="Curve" time="0" value="42" out="Linear"/>
+                    </Controller>
+                </Animation>
+            </Frame>
+        </Frame>
+    </Frame>
+
+    <Frame type="PlayerRoleGamesTileListItem" name="PlayerRoleGamesTileListItemTemplate">
+        <Width val="340"/>
+        <Height val="30"/>
+        <CollapseLayout val="true"/>
+
+        <Frame type="Label" name="RoleNameLabel">
+            <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+            <Width val="125"/>
+            <Style val="PlayerProfileTextSmall"/>
+        </Frame>
+
+        <Frame type="ProgressBar" name="RoleGamesProgressBar">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent/RoleNameLabel" pos="Max" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="-100"/>
+            <Height val="34"/>
+            <MinValue val="0.000000"/>
+            <MaxValue val="1.00"/>
+            <FillInset val="0.0"/>
+            <UseFillContainer val="true"/>
+
+            <Frame type="Frame" name="FillImageContainer">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+
+                <Frame type="Image" name="FillImage">
+                    <Anchor relative="$parent"/>
+                    <Texture val="@UI/Storm_UI_ProfileDialog_Summary_RoleProgressBar"/>
+                </Frame>
+            </Frame>
+
+        </Frame>
+
+        <Frame type="Frame" name="CapContainer">
+            <Anchor side="Top" relative="$parent/RoleGamesProgressBar/FillImageContainer" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent/RoleGamesProgressBar/FillImageContainer" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+
+            <Frame type="Image" name="ProgressCap">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/$parent/RoleGamesProgressBar/FillImageContainer" pos="Max" offset="0"/>
+                <Texture val="@UI/Storm_UI_ProfileDialog_Summary_RoleProgressCap"/>
+            </Frame>
+        </Frame>
+
+        <Frame type="Label" name="RoleGamesLabel">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="7"/>
+            <Anchor side="Left" relative="$parent/CapContainer/ProgressCap" pos="Max" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+            <Style val="PlayerProfileTextNumber"/>
+        </Frame>
+    </Frame>
+
+    <Frame type="Frame" name="SummarySubHeaderTemplate" template="StandardTemplates/BaseSummarySubHeaderTemplate">
+        <Width val="#SummaryContainerWidth"/>
+    </Frame>
+
+    <Frame type="ProfileSummaryPanel" name="ProfileSummaryPanelTemplate">
+
+        <Animation name="PanelIntro">
+            <Event event="OnShown" action="Play"/>
+            <Event event="OnHidden" action="Reset"/>
+            <Controller type="Fade" end="Pause">
+                <Key type="Curve" time="0" value="0" out="Slow"/>
+                <Key type="Curve" time=".7" value="255" in="Slow"/>
+            </Controller>
+            <Controller type="Event" end="Stop" frame="MostPlayedTileList">
+                <Key type="Event" time="0" event="Intro"/>
+            </Controller>
+        </Animation>
+
+        <Frame type="Label" name="MostPlayedHeaderLabel">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="48"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="335"/>
+            <Text val="@UI/ProfileDialog/MostPlayedHeader"/>
+            <Style val="PlayerProfileSubHeader"/>
+        </Frame>
+
+        <Frame type="TileList" name="MostPlayedTileList">
+            <Anchor side="Top" relative="$parent/MostPlayedHeaderLabel" pos="Max" offset="-40"/>
+            <Anchor side="Left" relative="$parent/MostPlayedHeaderLabel" pos="Min" offset="-70"/>
+            <Width val="793"/>
+            <Height val="418"/>
+            <AcceptsMouse val="true"/>
+
+            <Frame type="PlayerMostPlayedHeroTileListItem" name="Item0" template="ProfileSummaryPanel/PlayerMostPlayedHeroTileListItemTemplate">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="50"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="66"/>
+            </Frame>
+
+            <Frame type="PlayerMostPlayedHeroTileListItem" name="Item1" template="ProfileSummaryPanel/PlayerMostPlayedHeroTileListItemTemplate">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="50"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="308"/>
+            </Frame>
+
+            <Frame type="PlayerMostPlayedHeroTileListItem" name="Item2" template="ProfileSummaryPanel/PlayerMostPlayedHeroTileListItemTemplate">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="50"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="546"/>
+            </Frame>
+
+            <Animation name="Intro">
+                <Event event="Intro" action="Play"/>
+                <Event event="OnHidden" action="Reset"/>
+                <Controller type="Fade" end="Pause" frame="Item0">
+                    <Key type="Curve" time="0" value="0"/>
+                </Controller>
+                <Controller type="Fade" end="Pause" frame="Item1">
+                    <Key type="Curve" time="0" value="0"/>
+                </Controller>
+                <Controller type="Fade" end="Pause" frame="Item2">
+                    <Key type="Curve" time="0" value="0"/>
+                </Controller>
+                <Controller type="Event" end="Pause" frame="Item0">
+                    <Key type="Event" time="0.0" event="Intro"/>
+                </Controller>
+                <Controller type="Event" end="Pause" frame="Item1">
+                    <Key type="Event" time="0.1" event="Intro"/>
+                </Controller>
+                <Controller type="Event" end="Pause" frame="Item2">
+                    <Key type="Event" time="0.2" event="Intro"/>
+                </Controller>
+            </Animation>
+        </Frame>
+
+        <Frame type="Label" name="RecentVictoryHeaderLabel">
+            <Anchor side="Top" relative="$parent/MostPlayedHeaderLabel" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent/MostPlayedTileList" pos="Max" offset="20"/>
+            <Text val="@UI/ProfileDialog/RecentVictoryHeader"/>
+            <Style val="PlayerProfileSubHeader"/>
+        </Frame>
+
+        <Frame type="PlayedGameFrame" name="RecentVictory" template="ProfileSummaryPanel/RecentGameTemplate">
+            <Anchor side="Top" relative="$parent/RecentVictoryHeaderLabel" pos="Max" offset="10"/>
+            <Anchor side="Left" relative="$parent/RecentVictoryHeaderLabel" pos="Min" offset="-2"/>
+            <AcceptsMouse val="true"/>
+        </Frame>
+
+<!-- Start Leveling Badges -->
+
+        <Frame type="Frame" name="LevelHeaderLabel" template="ProfileSummaryPanel/SummarySubHeaderTemplate">
+            <Anchor side="Top" relative="$parent/MostPlayedTileList" pos="Max" offset="20"/>
+            <Anchor side="Left" relative="$parent/MostPlayedHeaderLabel" pos="Min" offset="0"/>
+
+            <Frame type="Label" name="HeaderLabel">
+                <Text val="@UI/ProfileDialog/LevelHeader"/>
+            </Frame>
+        </Frame>
+
+        <Frame type="Frame" name="PlayerLevelFrameContainer">
+            <Anchor side="Top" relative="$parent/LevelHeaderLabel" pos="Max" offset="#SummaryContainerTopOffset"/>
+            <Anchor side="Left" relative="$parent/LevelHeaderLabel" pos="Min" offset="0"/>
+            <Width val="#SummaryContainerWidth"/>
+            <Height val="#SummaryContainerHeight"/>
+
+            <Frame type="PlayerLevelFrame" name="PlayerLevelFrame" template="StandardTemplates/PlayerLevelFrameTemplate">
+                <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+
+                <Frame type="Image" name="PlayerExperienceBar">
+                    <Anchor side="Top" relative="$parent" pos="Min" offset="-5"/>
+                </Frame>
+            </Frame>
+
+            <Frame type="Label" name="PlayerLevelHeaderLabel">
+                <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+                <Anchor side="Left" relative="$parent/PlayerLevelFrame" pos="Mid" offset="0"/>
+                <Anchor side="Right" relative="$parent/PlayerLevelFrame" pos="Mid" offset="0"/>
+                <Text val="@UI/ProfileDialog/PlayerLevelHeader"/>
+                <Style val="PlayerProfileText"/>
+            </Frame>
+
+            <Animation name="Intro">
+                <Event event="OnShown" action="Reset" frame="$parent"/>
+                <Event event="OnShown" action="Play" frame="$parent"/>
+                <Controller type="Fade" end="Pause">
+                    <Key type="Curve" time="0" value="0" out="Slow"/>
+                    <Key type="Curve" time=".2" value="255" in="Slow"/>
+                </Controller>
+                <Controller type="Anchor" end="Pause" side="Top" relative="true">
+                    <Key type="Curve" time="0.0" value="-30" out="Slow"/>
+                    <Key type="Curve" time=".4" value="0" in="Slow"/>
+                </Controller>
+            </Animation>
+        </Frame>
+
+        <Frame type="HeroContainerFrame" name="TotalHeroLevelFrame">
+            <Anchor side="Top" relative="$parent/PlayerLevelFrameContainer" pos="Max" offset="#SummaryContainerTopOffset"/>
+            <Anchor side="Left" relative="$parent/PlayerLevelFrameContainer" pos="Min" offset="0"/>
+            <Width val="#SummaryContainerWidth"/>
+            <Height val="#SummaryContainerHeight"/>
+            <AcceptsMouse val="true"/>
+
+            <Frame type="Image" name="HeroTotalBackground">
+                <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+                <Texture val="@UI/Storm_UI_ProfileDialog_Summary_HeroTotal_Background"/>
+            </Frame>
+
+            <Frame type="HeroLabel" name="HeroLevelLabel">
+                <Anchor side="Top" relative="$parent/HeroTotalBackground" pos="Mid" offset="0"/>
+                <Anchor side="Bottom" relative="$parent/HeroTotalBackground" pos="Mid" offset="0"/>
+                <Anchor side="Left" relative="$parent/HeroTotalBackground" pos="Min" offset="0"/>
+                <Anchor side="Right" relative="$parent/HeroTotalBackground" pos="Max" offset="0"/>
+                <HeroLabelType val="LevelTotal"/>
+                <Style val="PlayerProfileProgressBadgeHeroLabel"/>
+            </Frame>
+
+            <Frame type="Label" name="HeroLevelHeaderLabel">
+                <Anchor side="Left" relative="$parent/HeroTotalBackground" pos="Mid" offset="0"/>
+                <Anchor side="Right" relative="$parent/HeroTotalBackground" pos="Mid" offset="0"/>
+                <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+                <Text val="@UI/ProfileDialog/TotalHeroLevelHeader"/>
+                <Style val="PlayerProfileText"/>
+            </Frame>
+
+            <Animation name="Intro">
+                <Event event="OnShown" action="Reset" frame="$parent"/>
+                <Event event="OnShown" action="Play" frame="$parent"/>
+                <Controller type="Fade" end="Pause">
+                    <Key type="Curve" time="0" value="0" out="Slow"/>
+                    <Key type="Curve" time=".2" value="255" in="Slow"/>
+                </Controller>
+                <Controller type="Anchor" end="Pause" side="Top" relative="true">
+                    <Key type="Curve" time="0.0" value="-30" out="Slow"/>
+                    <Key type="Curve" time=".4" value="0" in="Slow"/>
+                </Controller>
+            </Animation>
+        </Frame>
+
+<!-- End Leveling Badges -->
+<!-- Start Ranked Play Badges -->
+
+        <Frame type="Frame" name="RankedHeaderLabel" template="ProfileSummaryPanel/SummarySubHeaderTemplate">
+            <Anchor side="Top" relative="$parent/LevelHeaderLabel" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent/LevelHeaderLabel" pos="Max" offset="19"/>
+
+            <Frame type="Label" name="HeaderLabel">
+                <Text val="@UI/ProfileDialog/RankedPlayHeader"/>
+            </Frame>
+        </Frame>
+
+        <Frame type="TeamRankFrame" name="SoloTeamRankFrame" template="ProfileSummaryPanel/RankedPlayBadgeTemplate">
+            <Anchor side="Top" relative="$parent/RankedHeaderLabel" pos="Max" offset="#SummaryContainerTopOffset"/>
+            <Anchor side="Left" relative="$parent/RankedHeaderLabel" pos="Min" offset="0"/>
+
+            <Animation name="Intro">
+                <Event event="OnShown" action="Reset" frame="$parent"/>
+                <Event event="OnShown" action="Play" frame="$parent"/>
+                <Controller type="Fade" end="Pause">
+                    <Key type="Curve" time="0" value="0" out="Slow"/>
+                    <Key type="Curve" time="0.2" value="0" out="Slow"/>
+                    <Key type="Curve" time=".4" value="255" in="Slow"/>
+                </Controller>
+                <Controller type="Anchor" end="Pause" side="Top" relative="true">
+                    <Key type="Curve" time="0" value="-30" out="Slow"/>
+                    <Key type="Curve" time="0.2" value="-30" out="Slow"/>
+                    <Key type="Curve" time=".7" value="0" in="Slow"/>
+                </Controller>
+            </Animation>
+        </Frame>
+
+        <Frame type="TeamRankFrame" name="TeamTeamRankFrame" template="ProfileSummaryPanel/RankedPlayBadgeTemplate">
+            <Anchor side="Top" relative="$parent/SoloTeamRankFrame" pos="Max" offset="#SummaryContainerTopOffset"/>
+            <Anchor side="Left" relative="$parent/RankedHeaderLabel" pos="Min" offset="0"/>
+
+            <Animation name="Intro">
+                <Event event="OnShown" action="Reset" frame="$parent"/>
+                <Event event="OnShown" action="Play" frame="$parent"/>
+                <Controller type="Fade" end="Pause">
+                    <Key type="Curve" time="0" value="0" out="Slow"/>
+                    <Key type="Curve" time="0.2" value="0" out="Slow"/>
+                    <Key type="Curve" time=".4" value="255" in="Slow"/>
+                </Controller>
+                <Controller type="Anchor" end="Pause" side="Top" relative="true">
+                    <Key type="Curve" time="0" value="-30" out="Slow"/>
+                    <Key type="Curve" time="0.2" value="-30" out="Slow"/>
+                    <Key type="Curve" time=".7" value="0" in="Slow"/>
+                </Controller>
+            </Animation>
+        </Frame>
+
+<!-- End Ranked Play Badges -->
+
+        <Frame type="Frame" name="InfoHeaderLabel" template="ProfileSummaryPanel/SummarySubHeaderTemplate">
+            <Anchor side="Top" relative="$parent/RankedHeaderLabel" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent/RecentVictoryHeaderLabel" pos="Min" offset="0"/>
+            <Width val="308"/>
+
+            <Frame type="Label" name="HeaderLabel">
+                <Text val="@UI/ProfileDialog/InfoHeader"/>
+            </Frame>
+        </Frame>
+
+        <Frame type="TileList" name="RoleGamesTileList">
+            <Anchor side="Top" relative="$parent/InfoHeaderLabel" pos="Max" offset="24"/>
+            <Anchor side="Left" relative="$parent/InfoHeaderLabel" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent/InfoHeaderLabel" pos="Max" offset="40"/>
+
+            <Height val="250"/>
+            <AcceptsMouse val="true"/>
+
+            <Frame type="PlayerRoleGamesTileListItem" name="Item0" template="ProfileSummaryPanel/PlayerRoleGamesTileListItemTemplate">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+            </Frame>
+
+            <Frame type="PlayerRoleGamesTileListItem" name="Item1" template="ProfileSummaryPanel/PlayerRoleGamesTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item0" pos="Max" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item0" pos="Min" offset="0"/>
+            </Frame>
+
+            <Frame type="PlayerRoleGamesTileListItem" name="Item2" template="ProfileSummaryPanel/PlayerRoleGamesTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item1" pos="Max" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item1" pos="Min" offset="0"/>
+            </Frame>
+
+            <Frame type="PlayerRoleGamesTileListItem" name="Item3" template="ProfileSummaryPanel/PlayerRoleGamesTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item2" pos="Max" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item2" pos="Min" offset="0"/>
+            </Frame>
+
+            <Frame type="PlayerRoleGamesTileListItem" name="Item4" template="ProfileSummaryPanel/PlayerRoleGamesTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item3" pos="Max" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item3" pos="Min" offset="0"/>
+            </Frame>
+        </Frame>
+
+        <Frame type="Frame" name="TotalGamesShim">
+            <Anchor side="Top" relative="$parent/RoleGamesTileList/Item4" pos="Max" offset="0"/>
+            <Anchor side="Left" relative="$parent/RoleGamesTileList" pos="Min" offset="0"/>
+        </Frame>
+        
+        <Frame type="Label" name="TotalGamesLabel">
+            <Anchor side="Top" relative="$parent/TotalGamesShim" pos="Min" offset="25"/>
+            <Anchor side="Left" relative="$parent/TotalGamesShim" pos="Min" offset="0"/>
+            <Style val="PlayerProfileTextSmall"/>
+        </Frame>
+
+        <Frame type="Frame" name="MostEarnedAwardsContainer">
+            <Anchor side="Top" relative="$parent/TotalGamesLabel" pos="Max" offset="3"/>
+            <Anchor side="Left" relative="$parent/TotalGamesLabel" pos="Min" offset="-15"/>
+            <Anchor side="Right" relative="$parent/InfoHeaderLabel" pos="Max" offset="15"/>
+            <Height val="75"/>
+            <Visible val="false"/>
+
+            <Frame type="ScoreValueAwardIconFrame" name="EarnedAward0" template="ProfileSummaryPanel/EarnedAwardTemplate">
+                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+            </Frame>
+
+            <Frame type="ScoreValueAwardIconFrame" name="EarnedAward1" template="ProfileSummaryPanel/EarnedAwardTemplate">
+                <Anchor side="Left" relative="$parent/EarnedAward0" pos="Max" offset="#AwardsIconOffset"/>
+            </Frame>
+
+            <Frame type="ScoreValueAwardIconFrame" name="EarnedAward2" template="ProfileSummaryPanel/EarnedAwardTemplate">
+                <Anchor side="Left" relative="$parent/EarnedAward1" pos="Max" offset="#AwardsIconOffset"/>
+            </Frame>
+
+            <Frame type="ScoreValueAwardIconFrame" name="EarnedAward3" template="ProfileSummaryPanel/EarnedAwardTemplate">
+                <Anchor side="Left" relative="$parent/EarnedAward2" pos="Max" offset="#AwardsIconOffset"/>
+            </Frame>
+
+            <Frame type="ScoreValueAwardIconFrame" name="EarnedAward4" template="ProfileSummaryPanel/EarnedAwardTemplate">
+                <Anchor side="Left" relative="$parent/EarnedAward3" pos="Max" offset="#AwardsIconOffset"/>
+            </Frame>
+
+            <Frame type="ScoreValueAwardIconFrame" name="EarnedAward5" template="ProfileSummaryPanel/EarnedAwardTemplate">
+                <Anchor side="Left" relative="$parent/EarnedAward4" pos="Max" offset="#AwardsIconOffset"/>
+            </Frame>
+        </Frame>
+
+        <Frame type="Label" name="TotalMVPAwardsLabel">
+            <Anchor side="Top" relative="$parent/MostEarnedAwardsContainer" pos="Max" offset="-9"/>
+            <Anchor side="Left" relative="$parent/TotalGamesLabel" pos="Min" offset="0"/>
+            <Style val="PlayerProfileTextSmall"/>
+            <Visible val="false"/>
+            <!--Text val="@UI/ProfileDialog/TotalMVPAwards"/-->
+        </Frame>
+        
+    </Frame>
+</Desc>

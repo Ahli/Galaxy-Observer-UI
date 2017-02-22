@@ -1,0 +1,414 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<Desc>
+
+    <Constant name="BerserkerColor" val="255, 105, 180"/>
+
+    <!-- Frame for Berserker Attack Speed Bonus -->
+
+    <Frame type="SelectionUnitStatusPanel" name="ZuljinTraitFrame">
+        <Anchor side="Left" relative="$parent" pos="Min" offset="30"/>
+        <Anchor side="Bottom" relative="$parent" pos="Max" offset="-4"/>
+        <Height val="140"/>
+        <Width val="250"/>
+        <AcceptsMouse val="false"/>
+        <SpecificUnit val="HeroZuljin"/>
+
+        <Frame type="UnitStatusFrame" name="UnitStatusFrame0">
+            <Anchor relative="$parent"/>
+
+<!-- Start: Frames associated with the main Berserker UI for Zuljin. -->
+
+            <Frame type="Image" name="ZuljinIconBackground">
+                <Anchor side="Bottom" relative="$parent" pos="Max" offset="-10"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="5"/>
+                <RenderPriority val="500"/>
+                <Visible val="True"/>
+                <Texture val="@UI/Storm_UI_HeroUI_Zuljin_IconBG"/>
+            </Frame>
+
+            <Frame type="Image" name="ZuljinIconMain">
+                <Anchor relative="$parent/ZuljinIconBackground"/>
+                <RenderPriority val="502"/>
+                <Visible val="True"/>
+                <Texture val="@UI/Storm_UI_HeroUI_Zuljin_Icon"/>
+                <Frame type="BehaviorIcon" name="BehaviorTooltipFrame">
+                    <Anchor relative="$parent"/>
+                    <TooltipFrame val="StandardNameTooltip"/>
+                    <Behavior val="ZuljinBerserkerPassive"/>
+                </Frame>
+            </Frame>
+
+            <Frame type="Image" name="ZuljinIconGlow">
+                <Anchor relative="$parent/ZuljinIconBackground"/>
+                <RenderPriority val="503"/>
+                <Visible val="False"/>
+                <Alpha val="0"/>
+                <Texture val="@UI/Storm_UI_HeroUI_Zuljin_IconGlow"/>
+            </Frame>
+
+            <Frame type="Label" name="ZuljinBerserkerValueLabel">
+                <Anchor side="Left" relative="$parent/ZuljinIconBackground" pos="Max" offset="-24"/>
+                <Anchor side="Bottom" relative="$parent/ZuljinIconBackground" pos="Max" offset="13"/>
+                <Height val="48"/>
+                <Style val="ZuljinAttackSpeedBonusLarge"/>
+                <Text val="@UI/Tooltip/AttackSpeedUI"/>
+            </Frame>
+
+            <!-- Unit Status frame that tracks the current total and maximum health of the Hero. THANKS Chris Knorr! -->
+            <Frame type="UnitStatusHealth" name="HealthValues">
+                <Anchor relative="$parent" offset="0"/>
+                <!-- Property Bindings -->
+                <!-- Integer "{@Health}" -->
+                <!-- Integer "{@MaxHealth}" -->
+                <!-- Integer "{@Shields}" -->
+            </Frame>
+
+            <!-- Progress bar tracks Zuljin's health. The less he has the more the progress bar fills up. -->
+            <Frame type="ProgressBar" name="ZuljinRingHealthTrackerMain">
+                <Anchor side="Top" relative="$parent/ZuljinIconBackground" pos="Mid" offset="0"/>
+                <Anchor side="Left" relative="$parent/ZuljinIconBackground" pos="Mid" offset="0"/>
+                <Anchor side="Right" relative="$parent/ZuljinIconBackground" pos="Mid" offset="0"/>
+                <Anchor side="Bottom" relative="$parent/ZuljinIconBackground" pos="Mid" offset="0"/>
+                <RenderPriority val="501"/>
+                <Visible val="True"/>
+
+                <MinValue val="0"/>
+                <MaxValue val="{$parent/HealthValues/@MaxHealth}"/>
+                <Value val="{$parent/HealthValues/@Health}"/>
+                <Circular val="true"/>
+                <CircularStart val="0"/>
+                <CircularEndOffset val="360"/>
+                <InvertFill val="true"/>
+                <Height val="110"/>
+                <Width val="110"/>
+
+                <Frame type="Frame" name="FillImageContainer">
+                    <Anchor relative="$parent"/>
+
+                    <Frame type="Image" name="FillImage">
+                        <Anchor relative="$parent"/>
+                        <Texture val="@UI/Storm_UI_HeroUI_Zuljin_IconCircle"/>
+                        <TextureType val="Circular"/>
+                        <Unclipped val="true"/>
+                        <BlendMode val="Normal"/>
+                        <Alpha val="255"/>
+                    </Frame>
+                </Frame>
+            </Frame>
+
+            <!-- The giant flare that appears behind the UI elements when Zuljin is at 90% attack speed bonus. -->
+            <Frame type="Image" name="ZuljinIconFlare">
+                <Anchor side="Left" relative="$parent/ZuljinIconBackground" pos="Min" offset="-35"/>
+                <Anchor side="Bottom" relative="$parent/ZuljinIconBackground" pos="Max" offset="35"/>
+                <Anchor side="Right" relative="$parent/ZuljinIconBackground" pos="Max" offset="35"/>
+                <Anchor side="Top" relative="$parent/ZuljinIconBackground" pos="Min" offset="-35"/>
+                <BlendMode val="Add"/>
+                <Alpha val="0"/>
+                <RenderPriority val="499"/>
+                <ColorAdjustMode val="Colorize"/>
+                <LightAdjustColor val="ffc983"/>
+                <DarkAdjustColor val="ff0000"/>
+                <Visible val="False"/>
+                <Unclipped val="true"/>
+                <Texture val="@UI/Storm_UI_GenFX_Flare"/>
+                <SubpixelRendering val="true"/>
+
+                <Animation name="FlarePulse">
+                    <Event event="OnShown" action="Restart, Play" frame="$parent"/>
+                    <Controller type="Dimension" dimension="Height" end="pingpong" unclipped="True" percentage="True" relative="False">
+                        <Key type="Curve" time="0" value="90" out="Fast"/>
+                        <Key type="Curve" time=".5" value="100" in="Slow"/>
+                    </Controller>
+                    <Controller type="Dimension" dimension="Width" end="pingpong" unclipped="True" percentage="True" relative="False">
+                        <Key type="Curve" time="0" value="90" out="Fast"/>
+                        <Key type="Curve" time=".5" value="100" in="Slow"/>
+                    </Controller>
+                </Animation>
+
+                <StateGroup name="ToggleBlendmode">
+                    <State name="ToggleBlendmodeON">
+                        <When type="Property" frame="$parent/ZuljinIconFlare" Visible="True"/>
+                        <Action type="SetProperty" frame="$parent/ZuljinRingHealthTrackerMain/FillImageContainer/FillImage" BlendMode="Add"/>
+                        <Action type="SetProperty" frame="$parent/ZuljinRingHealthTrackerMain/FillImageContainer/FillImage" Alpha="150"/>
+                    </State>
+                    <State name="ToggleBlendmodeOFF">
+                        <When type="Property" frame="$parent/ZuljinIconFlare" Visible="False"/>
+                        <Action type="SetProperty" frame="$parent/ZuljinRingHealthTrackerMain/FillImageContainer/FillImage" BlendMode="Normal"/>
+                        <Action type="SetProperty" frame="$parent/ZuljinRingHealthTrackerMain/FillImageContainer/FillImage" Alpha="255"/>
+                    </State>
+                </StateGroup>
+            </Frame>
+
+<!-- End: Frames associated with the main Berserker UI for Zuljin. -->
+
+<!-- Start: Validators that control the Icon and Label animations for Zuljin. -->
+
+            <!-- Validators that control the UI animations when Zuljin is at 50% health. -->
+            <Frame type="UnitStatusValidatorAnimElement" name="HealthTrackerValidators">
+                <Anchor relative="$parent"/>
+                <Validator val="ZuljinHasNotGuillotineandBelow50Health"/>
+                <Validator val="ZuljinHasNotGuillotineandAbove50Health"/>
+                <Validator val="ZuljinHasGuillotineandBelow50Health"/>
+                <Validator val="ZuljinHasGuillotineandAbove50Health"/>
+                                
+                <Animation name="ZuljinHasNotGuillotineandBelow50Health">
+                    <Event event="Reset" action="Stop"/>
+                    <Event event="ZuljinHasNotGuillotineandBelow50Health" action="Restart, Play"/>
+
+                    <Controller type="Style" end="Pause" style1="ZuljinAttackSpeedBonusLarge" style2="ZuljinAttackSpeedBonusLarge2" frame="$parent/ZuljinBerserkerValueLabel">
+                        <Key type="Curve" time="0" value="0"/>
+                        <Key type="Curve" time=".01" value="1"/>
+                    </Controller>
+
+                    <Controller type="Fade" end="pause" frame="$parent/ZuljinIconGlow">
+                        <Key type="Curve" time="0" value="0" out="Fast"/>
+                        <Key type="Curve" time=".25" value="255" in="Slow"/>
+                    </Controller>
+
+                    <Controller type="Visibility" end="Pause" frame="$parent/ZuljinIconGlow">
+                        <Key type="Bool" time="0" value="True"/>
+                    </Controller>
+                    
+                </Animation>
+
+                <Animation name="ZuljinHasNotGuillotineandAbove50Health">
+                    <Event event="Reset" action="Stop"/>
+                    <Event event="ZuljinHasNotGuillotineandAbove50Health" action="Restart, Play"/>
+
+                    <Controller type="Style" end="Pause" style1="ZuljinAttackSpeedBonusLarge2" style2="ZuljinAttackSpeedBonusLarge" frame="$parent/ZuljinBerserkerValueLabel">
+                        <Key type="Curve" time="0" value="0"/>
+                        <Key type="Curve" time=".01" value="1"/>
+                    </Controller>
+
+                    <Controller type="Visibility" end="Pause" frame="$parent/ZuljinIconGlow">
+                        <Key type="Bool" time="0" value="False"/>
+                    </Controller>
+                    
+                </Animation>
+
+                <Animation name="ZuljinHasGuillotineandBelow50Health">
+                    <Event event="Reset" action="Stop"/>
+                    <Event event="ZuljinHasGuillotineandBelow50Health" action="Restart, Play"/>
+
+                    <Controller type="Style" end="Pause" style1="ZuljinAttackSpeedBonusSmall" style2="ZuljinAttackSpeedBonusSmall2" frame="$parent/ZuljinBerserkerValueLabel">
+                        <Key type="Curve" time="0" value="0"/>
+                        <Key type="Curve" time=".01" value="1"/>
+                    </Controller>
+
+                    <Controller type="Fade" end="pause" frame="$parent/ZuljinIconGlow">
+                        <Key type="Curve" time="0" value="0" out="Fast"/>
+                        <Key type="Curve" time=".25" value="255" in="Slow"/>
+                    </Controller>
+
+                    <Controller type="Visibility" end="Pause" frame="$parent/ZuljinIconGlow">
+                        <Key type="Bool" time="0" value="True"/>
+                    </Controller>
+                    
+                </Animation>
+
+                <Animation name="ZuljinHasGuillotineandAbove50Health">
+                    <Event event="Reset" action="Stop"/>
+                    <Event event="ZuljinHasGuillotineandAbove50Health" action="Restart, Play"/>
+
+                    <Controller type="Style" end="Pause" style1="ZuljinAttackSpeedBonusSmall2" style2="ZuljinAttackSpeedBonusSmall" frame="$parent/ZuljinBerserkerValueLabel">
+                        <Key type="Curve" time="0" value="0"/>
+                        <Key type="Curve" time=".01" value="1"/>
+                    </Controller>
+
+                    <Controller type="Visibility" end="Pause" frame="$parent/ZuljinIconGlow">
+                        <Key type="Bool" time="0" value="False"/>
+                    </Controller>
+                    
+                </Animation>
+            </Frame>
+
+            <!-- Validators that control the UI animations when Zuljin is at 10% health. -->
+            <Frame type="UnitStatusValidatorAnimElement" name="HealthTrackerFlareValidators">
+                <Anchor relative="$parent"/>
+                <Validator val="ZuljinBerserkerCasterLifeGT10Percent"/>
+                <Validator val="ZuljinBerserkerCasterLifeLE10Percent"/>
+
+                <Animation name="ZuljinBerserkerCasterLifeGT10Percent">
+                    <Event event="Reset" action="Stop"/>
+                    <Event event="NoState" action="stop"/>
+                    <Event event="ZuljinBerserkerCasterLifeGT10Percent" action="Restart, Play"/>
+
+                    <Controller type="Visibility" end="Pause" frame="$parent/ZuljinIconFlare">
+                        <Key type="Bool" time="0" value="False"/>
+                    </Controller>
+
+                    <Controller type="Visibility" end="Pause" frame="$parent/ZuljinGuillotineParent/ZuljinIconFlareGuillotine">
+                        <Key type="Bool" time="0" value="False"/>
+                    </Controller>
+                    
+                </Animation>
+
+                <Animation name="ZuljinBerserkerCasterLifeLE10Percent">
+                    <Event event="Reset" action="Stop"/>
+                    <Event event="NoState" action="stop"/>
+                    <Event event="ZuljinBerserkerCasterLifeLE10Percent" action="Restart, Play"/>
+
+                    <Controller type="Fade" end="pause" frame="$parent/ZuljinIconFlare">
+                        <Key type="Curve" time="0" value="0" out="Fast"/>
+                        <Key type="Curve" time=".25" value="255" in="Slow"/>
+                    </Controller>
+
+                    <Controller type="Visibility" end="Pause" frame="$parent/ZuljinIconFlare">
+                        <Key type="Bool" time="0" value="True"/>
+                    </Controller>
+
+                    <Controller type="Fade" end="pause" frame="$parent/ZuljinGuillotineParent/ZuljinIconFlareGuillotine">
+                        <Key type="Curve" time="0" value="0" out="Fast"/>
+                        <Key type="Curve" time=".25" value="255" in="Slow"/>
+                    </Controller>
+
+                    <Controller type="Visibility" end="Pause" frame="$parent/ZuljinGuillotineParent/ZuljinIconFlareGuillotine">
+                        <Key type="Bool" time="0" value="True"/>
+                    </Controller>
+
+                </Animation>
+
+            </Frame>
+
+<!-- End: Validators that control the Icon and Label animations for Zuljin. -->
+
+<!-- Start: Frames associated with the Guillotine Heroic -->
+
+            <!-- This label is turned on in triggers when the Guillotine talent is taken.  It uses a state group to turn on the rest of the Guillotine related frames. -->
+            <!-- The actual value for the label is controlled in triggers. The is because, the value goes through an equation in triggers to find its value. -->
+            <Frame type="Label" name="ZuljinGuillotineValueLabel">
+                <Anchor side="Left" relative="$parent/ZuljinGuillotineParent/ZuljinGuillotineIcon" pos="Max" offset="-10"/>
+                <Anchor side="Bottom" relative="$parent/ZuljinGuillotineParent/ZuljinGuillotineIcon" pos="Max" offset="10"/>
+                <Visible val="False"/>
+                <Height val="48"/>
+                <Style val="ZuljinAttackSpeedBonusSmall"/>
+                <Text val="0"/>
+                <RenderPriority val="520"/>
+
+                <StateGroup name="ToggleVisibility">
+                    <State name="TurnONVisibity">
+                        <When type="Property" frame="$parent/ZuljinGuillotineValueLabel" visible="True"/>
+                        <Action type="SetProperty" frame="$parent/ZuljinGuillotineParent" visible="True"/>
+                    </State>
+                    <State name="TurnOFFVisibity">
+                        <When type="Property" frame="$parent/ZuljinGuillotineValueLabel" visible="false"/>
+                        <Action type="SetProperty" frame="$parent/ZuljinGuillotineParent" visible="false"/>
+                    </State>
+                </StateGroup>
+            </Frame>
+
+            <!-- This frame contains the Guillotine Icon, Progress Circle, and Flare Icon -->
+            <Frame type="Frame" name="ZuljinGuillotineParent">
+                <Anchor relative="$parent"/>
+                <Visible val="False"/>
+
+                <Frame type="Image" name="ZuljinGuillotineIcon">
+                    <Anchor side="Bottom" relative="$parent/$parent/ZuljinIconBackground" pos="Max" offset="0"/>
+                    <Anchor side="Left" relative="$parent/$parent/ZuljinIconBackground" pos="Max" offset="30"/>
+                    <RenderPriority val="511"/>
+                    <Visible val="True"/>
+                    <Texture val="@UI/Storm_UI_HeroUI_Zuljin_Guillotine"/>
+                    <Frame type="BehaviorIcon" name="BehaviorTooltipFrame">
+                        <Anchor relative="$parent"/>
+                        <TooltipFrame val="StandardNameTooltip"/>
+                        <Behavior val="ZuljinGuillotineCritValidatorBuff"/>
+                    </Frame>
+
+                    <!-- Animation that plays to change the text style and position of the ZuljinBerserkerValueLabel.  This is so it lines up with the ZuljinGuillotineValueLabel. -->
+                    <Animation name="ZuljinStyleTextChange">
+                        <Event event="OnShown" action="Restart, Play"/>
+                        <Controller type="Anchor" end="Pause" side="Top" relative="true" frame="$parent/$parent/ZuljinBerserkerValueLabel">
+                            <Key type="Curve" time="0" value="0" out="Fast"/>
+                            <Key type="Curve" time=".01" value="-3" in="Slow"/>
+                        </Controller>
+                        <Controller type="Anchor" end="Pause" side="Bottom" relative="true" frame="$parent/$parent/ZuljinBerserkerValueLabel">
+                            <Key type="Curve" time="0" value="0" out="Fast"/>
+                            <Key type="Curve" time=".01" value="-3" in="Slow"/>
+                        </Controller>
+                    </Animation>
+
+                    <!-- Progress bar tracks Zuljin's health. The less he has the more the progress bar fills up. -->
+                    <Frame type="ProgressBar" name="ZuljinRingHealthTrackerGuilltone">
+                        <Anchor side="Top" relative="$parent" pos="Mid" offset="1"/>
+                        <Anchor side="Left" relative="$parent" pos="Mid" offset="-4"/>
+                        <Anchor side="Right" relative="$parent" pos="Mid" offset="3"/>
+                        <Anchor side="Bottom" relative="$parent" pos="Mid" offset="-1"/>
+                        <RenderPriority val="501"/>
+                        <Visible val="True"/>
+
+                        <MinValue val="0"/>
+                        <MaxValue val="{$parent/$parent/$parent/HealthValues/@MaxHealth}"/>
+                        <Value val="{$parent/$parent/$parent/HealthValues/@Health}"/>
+                        <Circular val="true"/>
+                        <CircularStart val="0"/>
+                        <CircularEndOffset val="360"/>
+                        <InvertFill val="true"/>
+                        <Height val="54"/>
+                        <Width val="54"/>
+
+                        <Frame type="Frame" name="FillImageContainer">
+                            <Anchor relative="$parent"/>
+
+                            <Frame type="Image" name="FillImage">
+                                <Anchor relative="$parent"/>
+                                <Texture val="@UI/Storm_UI_HeroUI_Zuljin_IconCircle"/>
+                                <TextureType val="Circular"/>
+                                <Unclipped val="true"/>
+                                <BlendMode val="Normal"/>
+                                <Alpha val="255"/>
+                            </Frame>
+                        </Frame>
+                    </Frame>
+                </Frame>
+
+                <!-- The giant flare that appears behind the UI elements when Zuljin is at 90% attack speed bonus. -->
+                <Frame type="Image" name="ZuljinIconFlareGuillotine">
+                    <Anchor side="Left" relative="$parent/ZuljinGuillotineIcon" pos="Min" offset="-17"/>
+                    <Anchor side="Bottom" relative="$parent/ZuljinGuillotineIcon" pos="Max" offset="15"/>
+                    <Anchor side="Right" relative="$parent/ZuljinGuillotineIcon" pos="Max" offset="15"/>
+                    <Anchor side="Top" relative="$parent/ZuljinGuillotineIcon" pos="Min" offset="-15"/>
+                    <BlendMode val="Add"/>
+                    <Alpha val="255"/>
+                    <RenderPriority val="499"/>
+                    <ColorAdjustMode val="Colorize"/>
+                    <LightAdjustColor val="ffc983"/>
+                    <DarkAdjustColor val="ff0000"/>
+                    <Visible val="False"/>
+                    <Unclipped val="true"/>
+                    <Texture val="@UI/Storm_UI_GenFX_Flare"/>
+                    <SubpixelRendering val="true"/>
+
+                    <Animation name="FlarePulse">
+                        <Event event="OnShown" action="Restart, Play" frame="$parent"/>
+                        <Controller type="Dimension" dimension="Height" end="pingpong" unclipped="True" percentage="True" relative="False">
+                            <Key type="Curve" time="0" value="90" out="Fast"/>
+                            <Key type="Curve" time=".5" value="100" in="Slow"/>
+                        </Controller>
+                        <Controller type="Dimension" dimension="Width" end="pingpong" unclipped="True" percentage="True" relative="False">
+                            <Key type="Curve" time="0" value="90" out="Fast"/>
+                            <Key type="Curve" time=".5" value="100" in="Slow"/>
+                        </Controller>
+                    </Animation>
+
+                    <StateGroup name="ToggleBlendmode">
+                        <State name="ToggleBlendmodeON">
+                            <When type="Property" frame="$parent/ZuljinIconFlareGuillotine" Visible="True"/>
+                            <Action type="SetProperty" frame="$parent/ZuljinGuillotineIcon/ZuljinRingHealthTrackerGuilltone/FillImageContainer/FillImage" BlendMode="Add"/>
+                            <Action type="SetProperty" frame="$parent/ZuljinGuillotineIcon/ZuljinRingHealthTrackerGuilltone/FillImageContainer/FillImage" Alpha="150"/>
+                        </State>
+                        <State name="ToggleBlendmodeOFF">
+                            <When type="Property" frame="$parent/ZuljinIconFlareGuillotine" Visible="False"/>
+                            <Action type="SetProperty" frame="$parent/ZuljinGuillotineIcon/ZuljinRingHealthTrackerGuilltone/FillImageContainer/FillImage" BlendMode="Normal"/>
+                            <Action type="SetProperty" frame="$parent/ZuljinGuillotineIcon/ZuljinRingHealthTrackerGuilltone/FillImageContainer/FillImage" Alpha="255"/>
+                        </State>
+                    </StateGroup>
+                </Frame>
+            </Frame>
+
+<!-- End: Frames associated with the Guillotine Heroic -->
+
+        </Frame>
+
+    </Frame>
+
+</Desc>

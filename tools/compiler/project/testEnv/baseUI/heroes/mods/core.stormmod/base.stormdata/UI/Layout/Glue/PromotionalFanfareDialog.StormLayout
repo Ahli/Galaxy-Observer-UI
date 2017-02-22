@@ -1,0 +1,420 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<Desc>
+    <DescFlags val="Locked"/>
+
+    <Frame type="AnchoredPopup" name="RewardsAnhcoredPopup" template="StandardPopupTooltip/AnchoredPopupBottomArrowTemplate">
+        <MinWidth val="500"/>
+
+        <Frame type="Frame" name="Container">
+            <Frame type="Label" name="TitleLabel">
+                <Visible val="False"/>
+                <Style val="RankedBadge_Promotion_Tooltip_Title_Left"/>
+                <CollapseLayout val="true"/>
+            </Frame>
+
+            <Frame type="Label" name="BodyLabel">
+                <Style val="PromotionFanfareRewardTooltip"/>
+            </Frame>
+        </Frame>
+
+        <Animation name="ShowPopup">
+            <Event event="OnMouseEnter" action="Play" frame="$PromotionalFanfareDialog/InfoIcon"/>
+            <Event event="OnMouseExit" action="Stop" frame="$PromotionalFanfareDialog/InfoIcon"/>
+            <Controller type="Property" property="Show" end="Pause">
+                <Key type="Property" time="0" value="True"/>
+            </Controller>
+        </Animation>
+
+        <Frame type="PropertyBind" name="PropertyBindText">
+            <Anchor relative="$parent"/>
+            <Target frame="$parent/Container/BodyLabel" property="Text"/>
+            <Source frame="$PromotionalFanfareDialog" property="DescriptionText"/>
+        </Frame>
+    </Frame>
+
+    <Frame type="PromotionalFanfareDialog" name="PromotionalFanfareDialog" template="StandardDialog/GridPulseDialogTemplate">
+        <Handle val="PromotionalFanfareDialog"/>
+
+        <Animation name="ShowAnimation">
+            <Event event="OnShown" action="Reset"/>
+            <Event event="OnShown" action="Play"/>
+
+            <Controller type="Sound" end="Pause">
+                <Key type="Sound" time="0" sound="@UI_BNet_Menu_Show" />
+                <Key type="Sound" time="0" sound="@UI_BNet_RewardUnlocked" />
+            </Controller>
+        </Animation>
+
+        <Animation name="HideAnimation">
+            <Event event="OnHidden" action="Reset"/>
+            <Event event="OnHidden" action="Play"/>
+
+            <Controller type="Sound" end="Pause">
+                <Key type="Sound" time="0" sound="@UI_BNet_Menu_Hide" />
+            </Controller>
+        </Animation>
+
+        <StateGroup name="FanfareType">
+            <State name="HeroCutscene">
+                <When type="Property" FanfareType="HeroCutscene"/>
+                <Action type="SetProperty" frame="ImageClippingContainer/HeroCutsceneFrame" visible="true"/>
+            </State>
+            <State name="Portrait">
+                <When type="Property" FanfareType="Portrait"/>
+                <Action type="SetProperty" frame="ImageClippingContainer/PortraitContainer" visible="true"/>
+            </State>
+            <State name="Cutscene">
+                <When type="Property" FanfareType="Cutscene"/>
+                <Action type="SetProperty" frame="ImageClippingContainer/CutsceneFrame" visible="true"/>
+            </State>
+            <State name="LargeImage">
+                <When type="Property" FanfareType="LargeImage"/>
+                <Action type="SetProperty" frame="ImageClippingContainer/LargePromoArtImage" visible="true"/>
+            </State>
+        </StateGroup>
+
+        <Frame type="Frame" name="ImageClippingContainer">
+            <Anchor relative="$parent"/>
+
+            <Frame type="BlurFrame" name="BackgroundBlurFrame" template="StandardTemplates/FullscreenBlurFrame">
+                <Anchor side="Top" relative="$parent/BackgroundFrame" pos="Min" offset="60"/>
+                <Anchor side="Bottom" relative="$parent/BackgroundFrame" pos="Max" offset="-60"/>
+                <RenderPriority val="509"/>
+                <BlurAmount val="0.8"/>
+
+                <Animation name="DialogAnimation">
+                    <Event event="OnShown" action="DirectionForward" frame="$parent"/>
+                    <Event event="OnShown" action="Play" frame="$parent"/>
+                    <Event event="DialogDismissed" action="DirectionReverse" frame="$parent"/>
+                    <Event event="DialogDismissed" action="Play" frame="$parent"/>
+                    <Controller type="Blur" end="Pause">
+                        <Key type="Curve" time="0" value="0.0" out="Auto"/>
+                        <Key type="Curve" time="0.2" value=".6" in="Auto"/>
+                    </Controller>
+                </Animation>
+            </Frame>
+
+            <Frame type="Image" name="BackgroundFrame">
+                <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+                <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+                <RenderPriority val="510"/>
+                <Texture val="@UI/Storm_UI_Promotional_Fanfare_Background"/>
+            </Frame>
+
+            <Frame type="Frame" name="TopTrianglesFrame">
+                <Anchor side="Top" relative="$parent/BackgroundFrame" pos="Min" offset="60"/>
+                <Anchor side="Left" relative="$parent/BackgroundFrame" pos="Mid" offset="0"/>
+                <Anchor side="Right" relative="$parent/BackgroundFrame" pos="Mid" offset="0"/>
+                <Height val="130"/>
+                <Width val="1000"/>
+
+                <Frame type="Image" name="TopTriangelsWipeImage">
+                    <Anchor side="Top" relative="$parent" pos="Min" offset="-20"/>
+                    <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                    <Unclipped val="True"/>
+                    <LayerCount val="2"/>
+                    <BlendMode val="Add"/>
+
+                    <Texture val="@UI/Storm_UI_Promotional_Fanfare_TopTrianglesMask" layer="0"/>
+                    <AlphaLayer val="True" layer="0"/>
+
+                    <Texture val="@UI/Storm_UI_Promotional_Fanfare_TopTrianglesShine" layer="1"/>
+                    <TextureCoords top="0" left="0" right="1" bottom="1" layer="1"/>
+                    <WrapUV val="True" layer="1"/>
+
+                    <Animation name="UVScroll">
+                        <Event event="OnShown" action="Restart,Play" frame="$parent"/>
+                        <Controller type="LayerUV" layer="1" side="Left" relative="True" sidelock="True" end="Loop" >
+                            <Key type="Curve" time="0" value="1" out="fast"/>
+                           <Key type="Curve" time="8" value="0" in="fast"/>
+                        </Controller>
+                    </Animation>
+                </Frame>
+            </Frame>
+
+            <Frame type="Frame" name="BottomTrianglesFrame">
+                <Anchor side="Bottom" relative="$parent/BackgroundFrame" pos="Max" offset="-60"/>
+                <Anchor side="Left" relative="$parent/BackgroundFrame" pos="Mid" offset="0"/>
+                <Anchor side="Right" relative="$parent/BackgroundFrame" pos="Mid" offset="0"/>
+                <Height val="130"/>
+                <Width val="1000"/>
+
+                <Frame type="Image" name="BottomTrianglesWipeImage">
+                    <Anchor side="Bottom" relative="$parent" pos="Max" offset="22"/>
+                    <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                    <Unclipped val="True"/>
+                    <LayerCount val="2"/>
+                    <BlendMode val="Add"/>
+
+                    <Texture val="@UI/Storm_UI_Promotional_Fanfare_BottomTrianglesMask" layer="0"/>
+                    <AlphaLayer val="True" layer="0"/>
+
+                    <Texture val="@UI/Storm_UI_Promotional_Fanfare_BottomTrianglesShine" layer="1"/>
+                    <TextureCoords top="0" left="0" right="1" bottom="1" layer="1"/>
+                    <WrapUV val="True" layer="1"/>
+
+                    <Animation name="UVScroll">
+                        <Event event="OnShown" action="Restart,Play" frame="$parent"/>
+                        <Controller type="LayerUV" layer="1" side="Left" relative="True" sidelock="True" end="Loop" >
+                            <Key type="Curve" time="0" value="0" out="fast"/>
+                           <Key type="Curve" time="8" value="1" in="fast"/>
+                        </Controller>
+                    </Animation>
+                </Frame>
+            </Frame>
+
+            <Animation name="Intro">
+                <Event event="OnShown" action="Restart"/>
+                <Event event="OnShown" action="Play"/>
+                <Controller type="Anchor" end="Pause" side="Left" relative="true" frame="$parent/TitleLabel">
+                    <Key type="Curve" time="0" value="120" out="Fast"/>
+                    <Key type="Curve" time=".9" value="120" out="Fast"/>
+                    <Key type="Curve" time="1.1" value="0" in="Slow"/>
+                </Controller>
+                <Controller type="Fade" end="Pause" frame="$parent/TitleLabel">
+                    <Key type="Curve" time="0" value="0" out="Slow"/>
+                    <Key type="Curve" time=".9" value="0" out="Slow"/>
+                    <Key type="Curve" time="1.1" value="255" in="Slow"/>
+                </Controller>
+                <Controller type="Fade" end="Pause" frame="$parent/UnlockedLabel">
+                    <Key type="Curve" time="0" value="0" out="Slow"/>
+                    <Key type="Curve" time="1.1" value="0" out="Slow"/>
+                    <Key type="Curve" time="1.2" value="255" in="Slow"/>
+                </Controller>
+                <Controller type="Fade" end="Pause" frame="$parent/MessageLabel">
+                    <Key type="Curve" time="0" value="0" out="Slow"/>
+                    <Key type="Curve" time="1.2" value="0" out="Slow"/>
+                    <Key type="Curve" time="1.3" value="255" in="Slow"/>
+                </Controller>
+                <Controller type="Fade" end="Pause" frame="$parent/Button">
+                    <Key type="Curve" time="0" value="0" out="Slow"/>
+                    <Key type="Curve" time="1.2" value="0" out="Slow"/>
+                    <Key type="Curve" time="1.3" value="255" in="Slow"/>
+                </Controller>
+                <Controller type="Fade" end="Pause" frame="$parent/InfoIcon">
+                    <Key type="Curve" time="0" value="0" out="Slow"/>
+                    <Key type="Curve" time="1.2" value="0" out="Slow"/>
+                    <Key type="Curve" time="1.3" value="255" in="Slow"/>
+                </Controller>
+            </Animation>
+
+            <Frame type="Frame" name="PromoImageAnchor">
+                <Anchor side="Top" relative="$parent" pos="Mid" offset="-20"/>
+                <Anchor side="Left" relative="$parent/$parent" pos="Mid" offset="0"/>
+                <Anchor side="Right" relative="$parent/$parent" pos="Mid" offset="0"/>
+                <Width val="10"/>
+                <Height val="10"/>
+            </Frame>
+            
+            <Frame type="UnlockableFrame" name="PortraitContainer" template="StandardTemplates/UnlockableFrameTemplate">
+                <Anchor side="Top" relative="$parent/PromoImageAnchor" pos="Mid" offset="0"/>
+                <Anchor side="Bottom" relative="$parent/PromoImageAnchor" pos="Mid" offset="0"/>
+                <Anchor side="Left" relative="$parent/PromoImageAnchor" pos="Mid" offset="0"/>
+                <Anchor side="Right" relative="$parent/PromoImageAnchor" pos="Mid" offset="0"/>
+                <Width val="500"/>
+                <Height val="500"/>
+                <Visible val="false"/>
+
+                <Frame type="Image" name="PortraitImageBorder">
+                    <Anchor side="Top" relative="$parent/$parent/PromoImageAnchor" pos="Mid" offset="0"/>
+                    <Anchor side="Left" relative="$parent/$parent/PromoImageAnchor" pos="Mid" offset="0"/>
+                    <Anchor side="Right" relative="$parent/$parent/PromoImageAnchor" pos="Mid" offset="0"/>
+                    <Anchor side="Bottom" relative="$parent/$parent/PromoImageAnchor" pos="Mid" offset="0"/>
+                    <Texture val="@UI/Storm_UI_Promotional_Fanfare_ImageFrame"/>
+                </Frame> 
+                
+                <Frame type="Image" name="Background">
+                    <Anchor side="Top" relative="$parent" pos="Mid" offset="-15"/>
+                    <Anchor side="Left" relative="$parent" pos="Mid" offset="10"/>
+                    <Anchor side="Bottom" relative="$parent" pos="Mid" offset="-15"/>
+                    <Anchor side="Right" relative="$parent" pos="Mid" offset="10"/>
+                    <Texture val="@UI/StormTempBlack"/>
+                    <Width val="244"/>
+                    <Height val="212"/>
+                </Frame>
+                
+                <Frame type="Image" name="UnlockableImage">
+                    <AlphaMaskTexture val="@UI/Storm_UI_Promotional_Fanfare_ImageMask"/>
+                </Frame>
+
+                <Animation name="Intro">
+                    <Event event="OnShown" action="Restart,Play"/>
+                    <Controller type="Fade" end="Pause">
+                        <Key type="Curve" time="0" value="0" out="Slow"/>
+                        <Key type="Curve" time=".5" value="0" out="Slow"/>
+                        <Key type="Curve" time=".8" value="255" in="Slow"/>
+                    </Controller>
+                </Animation>
+            </Frame>
+
+            <Frame type="HeroCutsceneFrame" name="HeroCutsceneFrame">
+                <Anchor side="Top" relative="$parent/PromoImageAnchor" pos="Mid" offset="-60"/>
+                <Anchor side="Bottom" relative="$parent/PromoImageAnchor" pos="Mid" offset="-60"/>
+                <Anchor side="Left" relative="$parent/PromoImageAnchor" pos="Mid" offset="0"/>
+                <Anchor side="Right" relative="$parent/PromoImageAnchor" pos="Mid" offset="0"/>
+                <Width val="913"/>
+                <Height val="705"/>
+                <RenderType val="LDR"/>
+                <Unclipped val="True"/>
+                <Visible val="False"/>
+                <HeroCutsceneDragEnabled val="true"/>
+                <AcceptsMouse val="True"/>
+                <Animation name="Intro">
+                    <Event event="OnShown" action="Restart,Play"/>
+                    <Controller type="Fade" end="Pause">
+                        <Key type="Curve" time="0" value="0" out="Slow"/>
+                        <Key type="Curve" time=".5" value="0" out="Slow"/>
+                        <Key type="Curve" time=".8" value="255" in="Slow"/>
+                    </Controller>
+                    <Controller type="Dimension" dimension="Width" relative="False" percentage="True" end="Pause">
+                        <Key type="Curve" time="0" value="500" in="fast" out="fast"/>
+                        <Key type="Curve" time=".5" value="500" in="fast" out="fast"/>
+                        <Key type="Curve" time=".9" value="90" in="fast" out="slow"/>
+                        <Key type="Curve" time="1" value="100" in="slow" out="fast"/>
+                    </Controller>
+                    <Controller type="Dimension" dimension="Height" relative="False" percentage="True" end="Pause">
+                        <Key type="Curve" time="0" value="500" in="fast" out="fast"/>
+                        <Key type="Curve" time=".5" value="500" in="fast" out="fast"/>
+                        <Key type="Curve" time=".9" value="90" in="fast" out="slow"/>
+                        <Key type="Curve" time="1" value="100" in="slow" out="fast"/>
+                    </Controller>
+                </Animation>
+            </Frame>
+
+            <Frame type="CutsceneFrame" name="CutsceneFrame">
+                <Anchor side="Top" relative="$parent/PromoImageAnchor" pos="Mid" offset="-30"/>
+                <Anchor side="Bottom" relative="$parent/PromoImageAnchor" pos="Mid" offset="-30"/>
+                <Anchor side="Left" relative="$parent/PromoImageAnchor" pos="Mid" offset="60"/>
+                <Anchor side="Right" relative="$parent/PromoImageAnchor" pos="Mid" offset="60"/>
+                <Width val="683"/>
+                <Height val="801"/>
+                <RenderType val="LDR"/>
+                <AutoPlay val="True"/>
+                <Visible val="False"/>
+                <Unclipped val="True"/>
+                <Animation name="Intro">
+                    <Event event="OnShown" action="Restart,Play"/>
+                    <Controller type="Fade" end="Pause">
+                        <Key type="Curve" time="0" value="0" out="Slow"/>
+                        <Key type="Curve" time=".5" value="0" out="Slow"/>
+                        <Key type="Curve" time=".8" value="255" in="Slow"/>
+                    </Controller>
+                </Animation>
+            </Frame>
+
+            <Frame type="Image" name="LargePromoArtImage">
+                <AcceptsMouse val="true"/>
+                <Anchor side="Top" relative="$parent/PromoImageAnchor" pos="Mid" offset="0"/>
+                <Anchor side="Bottom" relative="$parent/PromoImageAnchor" pos="Mid" offset="0"/>
+                <Anchor side="Left" relative="$parent/PromoImageAnchor" pos="Mid" offset="0"/>
+                <Anchor side="Right" relative="$parent/PromoImageAnchor" pos="Mid" offset="0"/>
+                <Width val="500"/>
+                <Height val="600"/>
+                <SubpixelRendering val="True"/>
+                <Visible val="false"/>
+
+                <Animation name="Intro">
+                    <Event event="OnShown" action="Restart"/>
+                    <Event event="OnShown" action="Play"/>
+                    <Controller type="Fade" end="Pause">
+                        <Key type="Curve" time="0" value="0" out="Slow"/>
+                        <Key type="Curve" time=".5" value="0" out="Slow"/>
+                        <Key type="Curve" time=".8" value="255" in="Slow"/>
+                    </Controller>
+                    <Controller type="Dimension" dimension="Width" relative="False" percentage="True" end="Pause">
+                        <Key type="Curve" time="0" value="500" in="fast" out="fast"/>
+                        <Key type="Curve" time=".5" value="500" in="fast" out="fast"/>
+                        <Key type="Curve" time=".9" value="90" in="fast" out="slow"/>
+                        <Key type="Curve" time="1" value="100" in="slow" out="fast"/>
+                    </Controller>
+                    <Controller type="Dimension" dimension="Height" relative="False" percentage="True" end="Pause">
+                        <Key type="Curve" time="0" value="500" in="fast" out="fast"/>
+                        <Key type="Curve" time=".5" value="500" in="fast" out="fast"/>
+                        <Key type="Curve" time=".9" value="90" in="fast" out="slow"/>
+                        <Key type="Curve" time="1" value="100" in="slow" out="fast"/>
+                    </Controller>
+                </Animation>
+
+                <Animation name="Boink">
+                    <Event event="OnMouseDown" action="Reset"/>
+                    <Event event="OnMouseDown" action="Play"/>
+                    <Controller type="Dimension" dimension="Width" relative="False" percentage="True" end="Pause">
+                        <Key type="Curve" time="0" value="100" in="fast" out="slow"/>
+                        <Key type="Curve" time=".05" value="93" in="fast" out="slow"/>
+                        <Key type="Curve" time=".7" value="102" in="slow" out="slow"/>
+                        <Key type="Curve" time="1.1" value="98" in="slow" out="slow"/>
+                        <Key type="Curve" time="1.5" value="100" in="slow" out="slow"/>
+                    </Controller>
+                    <Controller type="Dimension" dimension="Height" relative="False" percentage="True" end="Pause">
+                        <Key type="Curve" time="0" value="100" in="fast" out="slow"/>
+                        <Key type="Curve" time=".05" value="93" in="fast" out="slow"/>
+                        <Key type="Curve" time=".7" value="102" in="slow" out="slow"/>
+                        <Key type="Curve" time="1.1" value="98" in="slow" out="slow"/>
+                        <Key type="Curve" time="1.5" value="100" in="slow" out="slow"/>
+                    </Controller>
+                </Animation>
+            </Frame>
+        </Frame>
+        
+        <Frame type="Label" name="TitleLabel">
+            <Anchor side="Left" relative="$parent" pos="Mid" offset="-500"/>
+            <Anchor side="Bottom" relative="$parent/UnlockedLabel" pos="Min" offset="0"/>
+            <Width val="1000"/>
+
+            <RenderPriority val="530"/>
+            <Style val="RewardsFanfareTitle"/>
+        </Frame>
+        
+        <Frame type="Label" name="UnlockedLabel">
+            <Anchor side="Bottom" relative="$parent/BackgroundFrame" pos="Min" offset="20"/>
+            <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+            <Style val="RewardsFanfareSubTitle"/>
+            <Text val="@UI/PromotionalFanfareUnlocked"/>
+        </Frame>
+        
+        <Frame type="Label" name="MessageLabel">
+            <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+        </Frame>
+
+        <Frame type="Frame" name="AnchoredPopupAnchorFrame">
+            <Anchor side="Top" relative="$this" pos="Max" offset="0"/>
+            <Anchor side="Left" relative="$parent/InfoIcon" pos="Mid" offset="-8"/>
+            <Anchor side="Right" relative="$parent/InfoIcon" pos="Mid" offset="12"/>
+            <Anchor side="Bottom" relative="$parent/InfoIcon" pos="Min" offset="0"/>
+            <Width val="20"/>
+            <Height val="20"/>
+            <TooltipAnchorPosition val="TopCenter"/>
+            <Frame type="AnchoredPopup" name="RewardDescriptionPopup" template="PromotionalFanfareDialog/RewardsAnhcoredPopup"/>
+        </Frame>
+
+        <Frame type="Image" name="InfoIcon">
+            <Anchor side="Top" relative="$parent/BackgroundFrame" pos="Max" offset="-50"/>
+            <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+            <AcceptsMouse val="True"/>
+            <RenderPriority val="515"/>
+            <Texture val="@UI/Storm_UI_Promotional_Fanfare_InfoButton"/>
+        </Frame>
+
+        <!-- <Frame type="PropertyBind" name="BindDescriptionText">
+            <Anchor relative="$parent"/>
+            <Source frame="$parent" property="DescriptionText"/>
+            <Target frame="$parent/InfoIcon" property="Tooltip"/>
+        </Frame> -->
+
+        <Frame type="Button" name="Button" template="StandardTemplates/StandardButtonTemplate">
+            <Anchor side="Top" relative="$parent/InfoIcon" pos="Max" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+            <Text val="@UI/Sweet"/>
+            <Shortcut val="@UI/StandardDialog_Ok_Hotkey"/>
+            <VisibilityOnFade val="true"/>
+        </Frame>
+    </Frame>
+</Desc>

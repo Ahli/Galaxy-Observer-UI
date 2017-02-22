@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<Desc>
+    <DescFlags val="Locked"/>
+
+    <Frame type="ScreenCustomGames" name="ScreenCustomGames">
+        <Anchor relative="$parent"/>
+        <DisplayBackgroundModel val="false"/>
+        
+        <Frame type="CutsceneFrame" name="BackgroundCutsceneFrame">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+            <RenderType val="HDR"/>
+            <File val="Cutscenes/UI_Screens_Multiplayer_Background.SC2Cutscene" preloadFilters="Protoss Terran Zerg Random Ring"/>
+            <AutoPlay val="true"/>
+            
+            <Animation name="Random">
+                <Event event="OnShown" action="Reset,Play"/>
+
+                <Controller type="Cutscene" end="Stop">
+                    <Key type="Cutscene" action="AddFilter" time="0.0" filter="Random"/>
+                    <Key type="Cutscene" action="RemoveFilter" time="0.0" filter="Zerg"/>
+                    <Key type="Cutscene" action="RemoveFilter" time="0.0" filter="Protoss"/>
+                    <Key type="Cutscene" action="RemoveFilter" time="0.0" filter="Terran"/>
+                </Controller>
+            </Animation>
+        </Frame>
+        
+        <Frame type="Image" name="Vignette">
+            <Anchor relative="$parent"/>
+            <Texture val="@UI/SC2_UI_Coop_Vignette"/>
+        </Frame>
+
+        <Frame type="CustomGameListPanel" name="GameListPanel" template="CustomGameListPanel/CustomGameListPanelTemplate">
+            <Handle val="CustomGameListPanel"/>
+            <Anchor relative="$parent"/>
+            <Visible val="false"/>
+        </Frame>
+
+        <Frame type="OfflineGameListPanel" name="OfflineGameListPanel" template="OfflineGameListPanel/OfflineGameListPanelTemplate">
+            <Anchor relative="$parent"/>
+            <IsArcade val="false"/>
+            <Visible val="false"/>
+        </Frame>
+
+        <StateGroup name="OnlineStateGroup">
+            <State name="OnlineState">
+                <When type="AnimationState" frame="$this" OnlineState="Online"/>
+                <Action type="SetProperty" frame="OfflineGameListPanel" visible="false"/>
+                <Action type="SetProperty" frame="GameListPanel" visible="true"/>
+            </State>
+
+            <State name="OfflineState">
+                <When type="AnimationState" frame="$this" OnlineState="Offline"/>
+                <Action type="SetProperty" frame="GameListPanel" visible="false"/>
+                <Action type="SetProperty" frame="OfflineGameListPanel" visible="true"/>
+            </State>
+        </StateGroup>
+    </Frame>
+</Desc>

@@ -1,0 +1,467 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<Desc>
+    <DescFlags val="Locked"/>
+    
+    <Constant name="VerticalItemGap" val="-4"/>
+    
+    <Frame type="MatchmakingMapVetoTileListItem" name="MatchmakingMapVetoTileListItemTemplate">
+        <Anchor side="Left" relative="$this/NormalImage" pos="Min" offset="0"/>
+        <Anchor side="Right" relative="$this/NormalImage" pos="Max" offset="0"/>
+        <Height val="52"/>
+
+        <Animation name="HoverSound">
+            <Event event="OnMouseEnter" action="Reset, Play"/>
+            <Event event="OnMouseExit" action="Reset, Stop"/>
+            <Controller type="Sound" end="Stop">
+                <Key type="Sound" time="0" sound="@UI_HoverTick"/>
+            </Controller>
+        </Animation>
+
+        <Animation name="SecondaryClickSound">
+            <Event event="OnClick" action="Reset, Play"/>
+            <Controller type="Sound" end="Stop">
+                <Key type="Sound" time="0" sound="@UI_SecondaryClick"/>
+            </Controller>
+        </Animation>
+
+        <Frame type="Image" name="NormalImage">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+            <Anchor side="Left" relative="$parent/$parent" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent/$parent" pos="Max" offset="0"/>
+            <Texture val="@UI/Glues_Battlenet_PageAssets_ListItem_Normal"/>
+            <TextureType val="NineSlice"/>
+        </Frame>
+
+        <Frame type="Image" name="HoverImage">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+            <Anchor side="Left" relative="$parent/$parent" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent/$parent" pos="Max" offset="0"/>
+            <Texture val="@UI/Glues_Battlenet_PageAssets_ListItem_Hover"/>
+            <TextureType val="NineSlice"/>
+        </Frame>
+
+        <Frame type="Image" name="SelectedImage">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+            <Anchor side="Left" relative="$parent/$parent" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent/$parent" pos="Max" offset="0"/>
+            <Texture val="@UI/Glues_Battlenet_PageAssets_ListItem_Selected"/>
+            <TextureType val="NineSlice"/>
+        </Frame>
+
+        <Frame type="CheckBox" name="VetoCheckBox" template="StandardTemplates/StandardCheckBoxTemplate">
+            <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="20"/>
+            
+            <Frame type="Image" name="CheckMarkImage">
+                <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Left" relative="$parent" pos="Mid" offset="1"/>
+                <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Right" relative="$parent" pos="Mid" offset="1"/>
+                <Texture val="@UI/SC2_UI_Tournament_MapVeto_RedX"/>
+            </Frame>
+
+            <Animation name="Default">
+                <Event event="Active" action="Reset,Play" frame="$parent/$parent/$parent"/>
+
+                <Controller type="Visibility" end="Pause">
+                    <Key type="Bool" time="0" value="true"/>
+                </Controller>
+            </Animation>
+
+            <Animation name="NotPartyLeader">
+                <Event event="NotPartyLeader" action="Reset,Play" frame="$parent/$parent/$parent"/>
+
+                <Controller type="Visibility" end="Pause">
+                    <Key type="Bool" time="0" value="false"/>
+                </Controller>
+            </Animation>
+        </Frame>
+
+        <Frame type="Label" name="MapNameLabel">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="5"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+            <Anchor side="Left" relative="$parent/VetoCheckBox" pos="Max" offset="10"/>
+            <Text val="MapNameLabel"/>
+            <Style val="Tournament_MapVetoMapName"/>
+            <Width val="250"/>
+        </Frame>
+
+        <Frame type="Label" name="LocalRecordLabel">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="5"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+            <Anchor side="Left" relative="$parent/MapNameLabel" pos="Max" offset="15"/>
+            <Style val="Tournament_MapVetoText"/>
+            <Width val="190"/>
+            <Visible val="false"/>
+
+            <!-- Only show win records for Ranked -->
+            <StateGroup name="RankedStateGroup">
+                <DefaultState val="DefaultState"/>
+
+                <State name="ModeRankedState">
+                    <When type="AnimationState" frame="$parent/$parent/$parent/$parent/$parent" ModeState="ModeRanked"/>
+                    <Action type="SetProperty" frame="$this" Visible="true"/>
+                </State>
+
+                <State name="DefaultState">
+                    <Action type="SetProperty" frame="$this" Visible="false"/>
+                </State>
+            </StateGroup>
+        </Frame>
+    </Frame>
+
+    <Frame type="MatchmakingMapVetoFrame" name="MatchmakingMapVetoFrameTemplate">
+        <Animation name="Default">
+            <Event event="Active" action="Reset,Play"/>
+
+            <Controller type="Enabled" end="Pause" frame="AcceptButton">
+                <Key type="Bool" time="0" value="true"/>
+            </Controller>
+
+            <Controller type="Tooltip" end="Pause" frame="AcceptButton">
+                <Key type="Text" time="0" text=""/>
+            </Controller>
+
+            <Controller type="Visibility" end="Pause" frame="VetoesRemainingLabel">
+                <Key type="Bool" time="0" value="true"/>
+            </Controller>
+        </Animation>
+
+        <Animation name="NotPartyLeader">
+            <Event event="NotPartyLeader" action="Reset,Play"/>
+
+            <Controller type="Enabled" end="Pause" frame="AcceptButton">
+                <Key type="Bool" time="0" value="false"/>
+            </Controller>
+
+            <Controller type="Tooltip" end="Pause" frame="AcceptButton">
+                <Key type="Text" time="0" text="@UI/MatchmakingMapVetoFrame/NotPartyLeader"/>
+            </Controller>
+
+            <Controller type="Visibility" end="Pause" frame="VetoesRemainingLabel">
+                <Key type="Bool" time="0" value="false"/>
+            </Controller>
+        </Animation>
+
+        <Animation name="MapImageAvailable">
+            <Event event="Show" action="Reset,Play" frame="MapInfoFrame/MapImage"/>
+
+            <Controller type="Visibility" end="Pause" frame="MapInfoFrame/MapImage">
+                <Key type="Bool" time="0" value="true"/>
+            </Controller>
+        </Animation>
+
+        <Animation name="MapImageNotAvailable">
+            <Event event="Hide" action="Reset,Play" frame="MapInfoFrame/MapImage"/>
+
+            <Controller type="Visibility" end="Pause" frame="MapInfoFrame/MapImage">
+                <Key type="Bool" time="0" value="false"/>
+            </Controller>
+        </Animation>
+        
+        <!-- This tooltip is just for blocking tooltips behind this panel -->
+        <Frame type="StandardTooltip" name="MapVetoTooltip">
+            <Frame type="Label" name="Label">
+                <Anchor relative="$parent"/>
+            </Frame>
+        </Frame>
+
+        <Frame type="Image" name="BackgroundTint">
+            <Anchor relative="$parent"/>
+            <Color val="0,0,0"/>
+            <Alpha val="180"/>
+            <AcceptsMouse val="true"/>
+            <TooltipFrame val="MapVetoTooltip"/>
+        </Frame>
+
+        <Frame type="Image" name="LeftBGGlowPattern">
+            <Anchor side="Top" relative="$parent/BackgroundImage" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent/BackgroundImage" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent/BackgroundImage" pos="Min" offset="40"/>
+            <Texture val="@UI/Glues_Battlenet_DialogBox_BackGlow"/>
+        </Frame>
+        
+        <Frame type="Image" name="RightBGGlowPattern">
+            <Anchor side="Top" relative="$parent/BackgroundImage" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent/BackgroundImage" pos="Mid" offset="0"/>
+            <Anchor side="Left" relative="$parent/BackgroundImage" pos="Max" offset="-40"/>
+            <Texture val="@UI/Glues_Battlenet_DialogBox_BackGlow"/>
+            <TextureCoords top="0.0" left="1.0" bottom="1.0" right="0.0"/>
+        </Frame>
+
+        <Frame type="Image" name="BackgroundImage">
+            <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+            <Texture val="@UI/Glues_Battlenet_DialogBox_BG"/>
+            <TextureType val="HorizontalBorder"/>
+            <Tiled val="false"/>
+            <Width val="950"/>
+            <Height val="846"/>
+        </Frame>
+        
+        <Frame type="Image" name="TopHexPattern">
+            <Anchor side="Top" relative="$parent/BackgroundImage" pos="Min" offset="11"/>
+            <Anchor side="Left" relative="$parent/BackgroundImage" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent/BackgroundImage" pos="Mid" offset="0"/>
+            <Texture val="@UI/Glues_Battlenet_DialogBox_HexPattern"/>
+        </Frame>
+        
+        <Frame type="Image" name="BottomHexPattern">
+            <Anchor side="Bottom" relative="$parent/BackgroundImage" pos="Max" offset="-11"/>
+            <Anchor side="Left" relative="$parent/BackgroundImage" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent/BackgroundImage" pos="Mid" offset="0"/>
+            <Texture val="@UI/Glues_Battlenet_DialogBox_HexPattern"/>
+            <TextureCoords top="1.0" left="1.0" bottom="0.0" right="0.0"/>
+        </Frame>
+        
+        <Frame type="Label" name="Title">
+            <Anchor side="Top" relative="$parent/BackgroundImage" pos="Min" offset="50"/>
+            <Anchor side="Left" relative="$parent/BackgroundImage" pos="Min" offset="30"/>
+            <Anchor side="Right" relative="$parent/BackgroundImage" pos="Max" offset="-30"/>
+            <Style val="@BattlenetDialogTitle"/>
+            <Text val="@UI/MatchmakingMapVetoFrame/Title"/>
+        </Frame>
+
+        <Frame type="Label" name="MessageLabel">
+            <Anchor side="Top" relative="$parent/Title" pos="Max" offset="10"/>
+            <Anchor side="Left" relative="$parent/BackgroundImage" pos="Min" offset="30"/>
+            <Anchor side="Right" relative="$parent/BackgroundImage" pos="Max" offset="-30"/>
+            <Style val="@StandardDialogMessage"/>
+            <Text val="@UI/MatchmakingMapVetoFrame/Description"/>
+        </Frame>
+
+        <Frame type="Label" name="VetoesRemainingLabel">
+            <Anchor side="Top" relative="$parent/MessageLabel" pos="Max" offset="20"/>
+            <Anchor side="Left" relative="$parent/BackgroundImage" pos="Min" offset="32"/>
+            <Anchor side="Right" relative="$parent/BackgroundImage" pos="Max" offset="-30"/>
+            <Style val="Tournament_MapVetoesRemaining"/>
+        </Frame>
+        
+        <Frame type="Image" name="ListFrame">
+            <Anchor side="Top" relative="$parent/VetoesRemainingLabel" pos="Max" offset="10"/>
+            <Anchor side="Left" relative="$parent/BackgroundImage" pos="Min" offset="30"/>
+            <Anchor side="Bottom" relative="$parent/AcceptButton" pos="Min" offset="-10"/>
+            <Anchor side="Right" relative="$parent/MapInfoFrame" pos="Min" offset="-10"/>
+            <Texture val="@UI/Glues_Battlenet_PageAssets_ContainerBorder"/>
+            <TextureType val="NineSlice"/>
+        </Frame>
+        
+        <Frame type="Image" name="MapTileListHeaderBg">
+            <Anchor side="Top" relative="$parent/ListFrame" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent/ListFrame" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent/ListFrame" pos="Max" offset="0"/>
+            <Texture val="@UI/Glues_Battlenet_PageAssets_ContainerHeader"/>
+            <TextureType val="NineSlice"/>
+            <Height val="40"/>
+        </Frame>
+
+        <Frame type="Label" name="MapNameLabelTitle">
+            <Anchor side="Top" relative="$parent/MapTileListHeaderBg" pos="Min" offset="3"/>
+            <Anchor side="Left" relative="$parent/MapTileListHeaderBg" pos="Min" offset="25"/>
+            <Anchor side="Bottom" relative="$parent/MapTileListHeaderBg" pos="Max" offset="0"/>
+            <Anchor side="Right" relative="$parent/MapTileListHeaderBg" pos="Max" offset="-10"/>
+            <Text val="@UI/MatchmakingMapVetoFrame/MapNameTitle"/>
+            <Style val="BattlenetListHeader"/>
+        </Frame>
+
+        <Frame type="Label" name="LocalRecordTitle">
+            <Anchor side="Top" relative="$parent/MapTileListHeaderBg" pos="Min" offset="3"/>
+            <Anchor side="Bottom" relative="$parent/MapTileListHeaderBg" pos="Max" offset="0"/>
+            <Anchor side="Left" relative="$parent/TileList/Item0/LocalRecordLabel" pos="Min" offset="0"/>
+            <Style val="@BattlenetListHeader"/>
+            <Width val="190"/>
+            <Text val="@UI/MatchmakingMapVetoFrame/LocalRecordTitle"/>
+            <Visible val="false"/>
+
+            <!-- Only show win records for Ranked -->
+            <StateGroup name="RankedStateGroup">
+                <DefaultState val="DefaultState"/>
+
+                <State name="ModeRankedState">
+                    <When type="AnimationState" frame="$parent/$parent/$parent" ModeState="ModeRanked"/>
+                    <Action type="SetProperty" frame="$this" Visible="true"/>
+                </State>
+
+                <State name="DefaultState">
+                    <Action type="SetProperty" frame="$this" Visible="false"/>
+                </State>
+            </StateGroup>
+        </Frame>
+
+        <Frame type="Frame" name="MapInfoFrame">
+            <Anchor side="Top" relative="$parent/ListFrame" pos="Min" offset="0"/>
+            <Anchor side="Bottom" relative="$parent/AcceptButton" pos="Min" offset="-10"/>
+            <Anchor side="Right" relative="$parent/BackgroundImage" pos="Max" offset="-30"/>
+            <Width val="338"/>
+            
+            <Frame type="Image" name="MapInfoBackground">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+                <Texture val="@UI/Glues_Battlenet_PageAssets_ContainerBorder"/>
+                <TextureType val="NineSlice"/>
+            </Frame>
+            
+            <Frame type="BattleMapIcon" name="MapImage">
+                <Anchor side="Top" relative="$parent/MapInfoBackground" pos="Min" offset="11"/>
+                <Anchor side="Left" relative="$parent/MapInfoBackground" pos="Mid" offset="0"/>
+                <Anchor side="Right" relative="$parent/MapInfoBackground" pos="Mid" offset="0"/>
+                <Anchor side="Bottom" relative="$this/Image" pos="Max" offset="0"/>
+                <Width val="316"/>
+
+                <Frame type="Image" name="Image">
+                    <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                    <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                    <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+                    <ScaleHeightToTexture val="true"/>
+                    <TextureType val="Normal"/>
+                    <AutoSizeClamps maxHeight="360"/>
+                </Frame>
+            </Frame>
+
+            <Frame type="Image" name="MapImageFrame">
+                <Anchor side="Top" relative="$parent/MapImage" pos="Min" offset="-1"/>
+                <Anchor side="Left" relative="$parent/MapImage" pos="Min" offset="-1"/>
+                <Anchor side="Right" relative="$parent/MapImage" pos="Max" offset="1"/>
+                <Anchor side="Bottom" relative="$parent/MapImage" pos="Max" offset="1"/>
+                <Texture val="@UI/SC2_UI_Battlenet_Glue_Arcade_ImageBorder"/>
+                <TextureType val="NineSlice"/>
+            </Frame>
+
+            <Frame type="Label" name="MapDescriptionLabel">
+                <Anchor side="Top" relative="$parent/MapImageFrame" pos="Max" offset="20"/>
+                <Anchor side="Left" relative="$parent/MapInfoBackground" pos="Min" offset="15"/>
+                <Anchor side="Right" relative="$parent/MapInfoBackground" pos="Max" offset="-15"/>
+                <Anchor side="Bottom" relative="$parent/MapInfoBackground" pos="Max" offset="-15"/>
+                <Style val="Tournament_MapVetoDetails"/>
+                <AcceptsMouseTooltip val="true"/>
+                <Options val="Ellipsis | TooltipIfTruncated"/>
+            </Frame>
+
+            <Frame type="Image" name="ImageVertical">
+                <Anchor side="Top" relative="$parent/MapImage" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/MapImage" pos="Mid" offset="0"/>
+                <Anchor side="Right" relative="$parent/MapImage" pos="Mid" offset="0"/>
+                <Anchor side="Bottom" relative="$parent/MapImage" pos="Max" offset="0"/>
+                <ScaleWidthToTexture val="true"/>
+                <TextureType val="Normal"/>
+
+                <Frame type="PropertyBind" name="BindTexture">
+                    <Anchor relative="$parent"/>
+                    <Source frame="$parent/$parent/MapImage/Image" property="Texture"/>
+                    <Target frame="$parent" property="Texture"/>
+                </Frame>
+            </Frame>
+
+            <Frame type="Image" name="MapImageVerticalFrame">
+                <Anchor side="Top" relative="$parent/ImageVertical" pos="Min" offset="-1"/>
+                <Anchor side="Left" relative="$parent/ImageVertical" pos="Min" offset="-1"/>
+                <Anchor side="Right" relative="$parent/ImageVertical" pos="Max" offset="1"/>
+                <Anchor side="Bottom" relative="$parent/ImageVertical" pos="Max" offset="1"/>
+                <Texture val="@UI/SC2_UI_Battlenet_Glue_Arcade_ImageBorder"/>
+                <TextureType val="NineSlice"/>
+            </Frame>
+
+            <Frame type="RangeFrame" name="RangeFrame">
+                <Anchor side="Top" relative="$parent/MapImage" pos="Min" offset="0"/>
+                <Anchor side="Bottom" relative="$parent/MapImage" pos="Max" offset="0"/>
+                <Anchor side="Left" relative="$parent/ImageVertical" pos="Min" offset="0"/>
+                <Anchor side="Right" relative="$parent/MapImage" pos="Min" offset="0"/>
+                <LowerWidth val="0"/>
+
+                <StateGroup name="Crowding">
+                    <State name="Spacious">
+                        <When type="Property" frame="$this" UnderWidth="false"/>
+                        <Action type="SetProperty" frame="$parent/MapImage/Image" Visible="true"/>
+                        <Action type="SetProperty" frame="$parent/MapImageFrame" Visible="true"/>
+                        <Action type="SetProperty" frame="$parent/ImageVertical" Visible="false"/>
+                        <Action type="SetProperty" frame="$parent/MapImageVerticalFrame" Visible="false"/>
+                    </State>
+
+                    <State name="Crowded">
+                        <When type="Property" frame="$this" UnderWidth="true"/>
+                        <Action type="SetProperty" frame="$parent/MapImage/Image" Visible="false"/>
+                        <Action type="SetProperty" frame="$parent/MapImageFrame" Visible="false"/>
+                        <Action type="SetProperty" frame="$parent/ImageVertical" Visible="true"/>
+                        <Action type="SetProperty" frame="$parent/MapImageVerticalFrame" Visible="true"/>
+                    </State>
+                </StateGroup>
+            </Frame>
+        </Frame>
+
+        <Frame type="TileList" name="TileList">
+            <Anchor side="Top" relative="$parent/MapTileListHeaderBg" pos="Max" offset="3"/>
+            <Anchor side="Left" relative="$parent/ListFrame" pos="Min" offset="5"/>
+            <Anchor side="Bottom" relative="$parent/ListFrame" pos="Max" offset="-5"/>
+            <Anchor side="Right" relative="$parent/ListFrame" pos="Max" offset="-5"/>
+            <RequireSelection val="true"/>
+            <ClearSelectionIfNotVisible val="true"/>
+
+            <Frame type="MatchmakingMapVetoTileListItem" name="Item0" template="MatchmakingMapVetoFrame/MatchmakingMapVetoTileListItemTemplate">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+            </Frame>
+
+            <Frame type="MatchmakingMapVetoTileListItem" name="Item1" template="MatchmakingMapVetoFrame/MatchmakingMapVetoTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item0" pos="Max" offset="#VerticalItemGap"/>
+                <Anchor side="Left" relative="$parent/Item0" pos="Min" offset="0"/>
+            </Frame>
+
+            <Frame type="MatchmakingMapVetoTileListItem" name="Item2" template="MatchmakingMapVetoFrame/MatchmakingMapVetoTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item1" pos="Max" offset="#VerticalItemGap"/>
+                <Anchor side="Left" relative="$parent/Item1" pos="Min" offset="0"/>
+            </Frame>
+
+            <Frame type="MatchmakingMapVetoTileListItem" name="Item3" template="MatchmakingMapVetoFrame/MatchmakingMapVetoTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item2" pos="Max" offset="#VerticalItemGap"/>
+                <Anchor side="Left" relative="$parent/Item2" pos="Min" offset="0"/>
+            </Frame>
+
+            <Frame type="MatchmakingMapVetoTileListItem" name="Item4" template="MatchmakingMapVetoFrame/MatchmakingMapVetoTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item3" pos="Max" offset="#VerticalItemGap"/>
+                <Anchor side="Left" relative="$parent/Item3" pos="Min" offset="0"/>
+            </Frame>
+
+            <Frame type="MatchmakingMapVetoTileListItem" name="Item5" template="MatchmakingMapVetoFrame/MatchmakingMapVetoTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item4" pos="Max" offset="#VerticalItemGap"/>
+                <Anchor side="Left" relative="$parent/Item4" pos="Min" offset="0"/>
+            </Frame>
+
+            <Frame type="MatchmakingMapVetoTileListItem" name="Item6" template="MatchmakingMapVetoFrame/MatchmakingMapVetoTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item5" pos="Max" offset="#VerticalItemGap"/>
+                <Anchor side="Left" relative="$parent/Item5" pos="Min" offset="0"/>
+            </Frame>
+
+            <Frame type="MatchmakingMapVetoTileListItem" name="Item7" template="MatchmakingMapVetoFrame/MatchmakingMapVetoTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item6" pos="Max" offset="#VerticalItemGap"/>
+                <Anchor side="Left" relative="$parent/Item6" pos="Min" offset="0"/>
+            </Frame>
+
+            <Frame type="MatchmakingMapVetoTileListItem" name="Item8" template="MatchmakingMapVetoFrame/MatchmakingMapVetoTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item7" pos="Max" offset="#VerticalItemGap"/>
+                <Anchor side="Left" relative="$parent/Item7" pos="Min" offset="0"/>
+            </Frame>
+        </Frame>
+
+        <Frame type="Button" name="AcceptButton" template="StandardBattlenetTemplates/BattlenetAlternateButtonTemplate">
+            <Anchor side="Bottom" relative="$parent/BackgroundImage" pos="Max" offset="-40"/>
+            <Anchor side="Right" relative="$parent/BackgroundImage" pos="Mid" offset="-3"/>
+            <Text val="@UI/MatchmakingMapVetoFrame/Accept"/>
+            <Shortcut val="@UI/StandardDialog_Enter_Hotkey"/>
+        </Frame>
+
+        <Frame type="Button" name="CancelButton" template="StandardBattlenetTemplates/BattlenetStandardButtonTemplate">
+            <Anchor side="Bottom" relative="$parent/AcceptButton" pos="Max" offset="0"/>
+            <Anchor side="Left" relative="$parent/BackgroundImage" pos="Mid" offset="3"/>
+            <Text val="@UI/MatchmakingMapVetoFrame/Cancel"/>
+            <Shortcut val="@UI/Hotkey/DialogDismiss"/>
+        </Frame>
+    </Frame>
+</Desc>

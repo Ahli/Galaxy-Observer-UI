@@ -1,0 +1,305 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<Desc>
+    <DescFlags val="Locked"/>    
+
+    <Frame type="HeroDraftPickingSlotFrame" name="HeroDraftPickingSlotTemplate">
+        <Width val="1600"/>
+        <Height val="940"/>
+        <Visible val="false"/>
+
+        <Animation name="ReadyBlueSound">
+            <Event event="ReadyBlue" action="Restart,Play"/>
+                
+            <Controller type="Sound" end="Pause">
+                <Key type="Sound" time="0" sound="@UI_BNet_Draft_Pick_ConfirmBlue" direction="Forward"/>
+                <Key type="Sound" time="0" sound="@UI_BNet_Draft_Pick_RevealBlue" direction="Forward"/>
+            </Controller>
+        </Animation>
+
+        <Animation name="ReadyRedSound">
+            <Event event="ReadyRed" action="Restart,Play"/>
+                
+            <Controller type="Sound" end="Pause">
+                <Key type="Sound" time="0" sound="@UI_BNet_Draft_Pick_ConfirmRed" direction="Forward"/>
+                <Key type="Sound" time="0" sound="@UI_BNet_Draft_Pick_RevealRed" direction="Forward"/>
+            </Controller>
+        </Animation>
+
+        <Frame type="Frame" name="HeroSelected" template="HeroDraftTemplates/HeroSelectedLeftTemplate">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+            <Width val="1920"/>
+            <Height val="1200"/>
+        </Frame>
+
+        <Frame type="CutsceneFrame" name="DraftEmptyCutscene">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="-184"/>
+            <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+            <Width val="1500"/>
+            <Height val="1500"/>
+            <File val="Cutscenes/Draft_Empty.StormCutscene"/>
+            <RenderType val="HDR"/>
+            <AcceptsMouse val="false"/>
+
+            <Animation name="PickingSlotFadeEmptyCutscene">
+                <Event event="Ready" action="Restart,Play" frame="$parent"/>
+
+                <Controller type="Cutscene" end="Pause">
+                    <Key type="Cutscene" time="0" action="Bookmark" bookmark="Death Start"/>
+                </Controller>
+            </Animation>
+
+            <Animation name="PickingSlotShowEmptyCutsceneBlue">
+                <Event event="BeginBlue" action="Reset,DirectionForward,Play" frame="$parent"/>
+                <Event event="Ready" action="DirectionReverse" frame="$parent"/> <!-- handle readying before the cutscene shows -->
+
+                <Controller type="Cutscene" end="Pause">
+                    <Key type="Cutscene" time="0" action="Play"/>
+                    <Key type="Cutscene" time="0" action="Bookmark" bookmark="Death Loop Start"/>
+                    <Key type="Cutscene" time="2.2" action="RemoveFilter" filter="DraftEnemyTeam"/>
+                    <Key type="Cutscene" time="2.2" action="AddFilter" filter="DraftMyTeam"/>
+                    <Key type="Cutscene" time="2.2" action="Bookmark" bookmark="Stand Loop Start"/>
+                </Controller>
+            </Animation>
+
+            <Animation name="PickingSlotShowEmptyCutsceneRed">
+                <Event event="BeginRed" action="Reset,DirectionForward,Play" frame="$parent"/>
+                <Event event="Ready" action="DirectionReverse" frame="$parent"/> <!-- handle readying before the cutscene shows -->
+
+                <Controller type="Cutscene" end="Pause">
+                    <Key type="Cutscene" time="0" action="Play"/>
+                    <Key type="Cutscene" time="0" action="Bookmark" bookmark="Death Loop Start"/>
+                    <Key type="Cutscene" time="2.2" action="RemoveFilter" filter="DraftMyTeam"/>
+                    <Key type="Cutscene" time="2.2" action="AddFilter" filter="DraftEnemyTeam"/>
+                    <Key type="Cutscene" time="2.2" action="Bookmark" bookmark="Stand Loop Start"/>
+                </Controller>
+            </Animation>
+        </Frame>
+
+        <Frame type="Label" name="PickingLabel">
+            <Anchor side="Top" relative="$parent/NameLabel" pos="Max" offset="-5"/>
+            <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+            <Alpha val="0"/>
+
+            <!-- This will be changed to HDR when full screen blur is needed from HeroDraftPanel.  -->
+            <RenderType val="LDR"/>
+
+            <Animation name="RedAnimation">
+                <Event event="ReadyBlue" action="Stop" frame="$parent"/>
+                <Event event="ReadyRed" action="Stop" frame="$parent"/>
+                <Event event="BeginRed" action="Restart,Play" frame="$parent"/>
+                <Event event="NotReady" action="Stop" frame="$parent"/>
+
+                <Controller type="Fade" end="Pause">
+                    <Key type="Curve" time="0.0" value="0" out="Auto"/>
+                    <Key type="Curve" time="2.1" value="0" out="Auto"/>
+                    <Key type="Curve" time="2.2" value="255" out="Auto"/>
+                </Controller>
+
+                <Controller type="Property" property="Style" end="Pause">
+                    <Key type="Property" time="0" value="HeroDraftPickingHeroPicking_Red"/>
+                </Controller>
+            </Animation>
+
+            <Animation name="BlueAnimation">
+                <Event event="ReadyRed" action="Stop" frame="$parent"/>
+                <Event event="ReadyBlue" action="Stop" frame="$parent"/>
+                <Event event="BeginBlue" action="Restart,Play" frame="$parent"/>
+                <Event event="NotReady" action="Stop" frame="$parent"/>
+
+                <Controller type="Fade" end="Pause">
+                    <Key type="Curve" time="0.0" value="0" out="Auto"/>
+                    <Key type="Curve" time="2.1" value="0" out="Auto"/>
+                    <Key type="Curve" time="2.2" value="255" out="Auto"/>
+                </Controller>
+
+                <Controller type="Property" property="Style" end="Pause">
+                    <Key type="Property" time="0" value="HeroDraftPickingHeroPicking_Blue"/>
+                </Controller>
+            </Animation>
+
+            <Text val="@UI/HeroDraftPanel/Picking"/>
+        </Frame>
+
+        <Frame type="Label" name="NameLabel">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="736"/>
+            <Anchor side="Right" relative="$parent" pos="Mid" offset="500"/>
+            <Width val="1000"/>
+            
+            <!-- This will be changed to HDR when full screen blur is needed from HeroDraftPanel.  -->
+            <RenderType val="LDR"/>
+        
+            <Animation name="ReadyRedNameLabelAnim" template="HeroDraftTemplates/DraftPickingLabelAnimBaseTemplate">
+                <Event event="ReadyRed" action="Restart,Play" frame="$parent"/>
+                <Event event="BeginBlue" action="Stop" frame="$parent"/>
+                <Event event="BeginRed" action="Stop" frame="$parent"/>
+
+                <Controller type="Anchor" name="Sliding" end="Pause" side="Left" relative="true">
+                    <Key type="Curve" time="0" value="-400" out="Auto"/>
+                    <Key type="Curve" time="0.2" value="-400" out="Auto"/>
+                    <Key type="Curve" time="0.5" value="-70" in="Auto" out="Linear"/>
+                    <Key type="Curve" time="3.8" value="70" in="Linear" out="Auto"/>
+                    <Key type="Curve" time="4.0" value="300" in="Auto"/>
+                </Controller>
+
+                <Controller type="Anchor" end="Pause" side="Top" relative="true">
+                    <Key type="Curve" time="0" value="0" out="Auto"/>
+                </Controller>
+                <Controller type="Property" property="Style" end="Pause">
+                    <Key type="Property" time="0" value="HeroDraftPlayerName_Red"/>
+                </Controller>
+            </Animation>
+
+            <Animation name="ReadyBlueNameLabelAnim" template="HeroDraftTemplates/DraftPickingLabelAnimBaseTemplate">
+                <Event event="ReadyBlue" action="Restart,Play" frame="$parent"/>
+                <Event event="BeginBlue" action="Stop" frame="$parent"/>
+                <Event event="BeginRed" action="Stop" frame="$parent"/>
+
+                <Controller type="Anchor" name="Sliding" end="Pause" side="Left" relative="true">
+                    <Key type="Curve" time="0" value="-400" out="Auto"/>
+                    <Key type="Curve" time="0.2" value="-400" out="Auto"/>
+                    <Key type="Curve" time="0.5" value="-70" in="Auto" out="Linear"/>
+                    <Key type="Curve" time="3.8" value="70" in="Linear" out="Auto"/>
+                    <Key type="Curve" time="4.0" value="300" in="Auto"/>
+                </Controller>
+
+                <Controller type="Anchor" end="Pause" side="Top" relative="true">
+                    <Key type="Curve" time="0" value="0" out="Auto"/>
+                </Controller>
+                <Controller type="Property" property="Style" end="Pause">
+                    <Key type="Property" time="0" value="HeroDraftPlayerName_Blue"/>
+                </Controller>
+            </Animation>
+
+            <Animation name="TeamBlue">
+                <Event event="BeginBlue" action="Reset,Play" frame="$parent"/>
+
+                <Controller type="Property" property="Style" end="Pause">
+                    <Key type="Property" time="0" value="HeroDraftPickingHero_Blue"/>
+                </Controller>
+                <Controller type="Blur" end="Pause">
+                    <Key type="Curve" time="0" value="0" out="Fast"/>
+                </Controller>
+                <Controller type="Fade" end="Pause">
+                    <Key type="Curve" time="0.0" value="0" out="Auto"/>
+                    <Key type="Curve" time="2.1" value="0" out="Auto"/>
+                    <Key type="Curve" time="2.2" value="255" out="Auto"/>
+                </Controller>
+
+                <Controller type="Anchor" end="Pause" side="Left" relative="true">
+                    <Key type="Curve" time="0" value="0" out="Auto"/>
+                </Controller>
+                <Controller type="Anchor" end="Pause" side="Top" relative="true">
+                    <Key type="Curve" time="0" value="-107" out="Auto"/>
+                </Controller>
+            </Animation>
+
+            <Animation name="TeamRed">
+                <Event event="BeginRed" action="Reset,Play" frame="$parent"/>
+
+                <Controller type="Property" property="Style" end="Pause">
+                    <Key type="Property" time="0" value="HeroDraftPickingHero_Red"/>
+                </Controller>
+                <Controller type="Blur" end="Pause">
+                    <Key type="Curve" time="0" value="0" out="Fast"/>
+                </Controller>
+                <Controller type="Fade" end="Pause">
+                    <Key type="Curve" time="0.0" value="0" out="Auto"/>
+                    <Key type="Curve" time="2.1" value="0" out="Auto"/>
+                    <Key type="Curve" time="2.2" value="255" out="Auto"/>
+                </Controller>
+
+                <Controller type="Anchor" end="Pause" side="Left" relative="true">
+                    <Key type="Curve" time="0" value="0" out="Auto"/>
+                </Controller>
+                <Controller type="Anchor" end="Pause" side="Top" relative="true">
+                    <Key type="Curve" time="0" value="-107" out="Auto"/>
+                </Controller>
+            </Animation>
+        </Frame>
+<!--Draft_Empty to be hooked up to Team Blue | Team Red-->
+        <Frame type="Label" name="HeroLabel">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="670"/>
+            <Anchor side="Left" relative="$parent" pos="Mid" offset="-500"/>
+            <Width val="1000"/>
+            <Style val="HeroDraftHeroName_Blue"/>
+
+            <!-- This will be changed to HDR when full screen blur is needed from HeroDraftPanel. -->
+            <RenderType val="LDR"/>
+
+            <Animation name="ReadyHeroLabelAnim" template="HeroDraftTemplates/DraftPickingLabelAnimBaseTemplate">
+                <Event event="ReadyBlue" action="Restart,DirectionForward,Play" frame="$parent"/>
+                <Event event="ReadyRed" action="Restart,DirectionForward,Play" frame="$parent"/>
+
+                <Controller type="Anchor" name="Sliding" end="Pause" side="Left" relative="true">
+                    <Key type="Curve" time="0" value="350" out="Auto"/>
+                    <Key type="Curve" time="0.2" value="350" out="Auto"/>
+                    <Key type="Curve" time="0.5" value="70" in="Auto" out="Linear"/>
+                    <Key type="Curve" time="3.8" value="-70" in="Linear" out="Auto"/>
+                    <Key type="Curve" time="4.0" value="-350" in="Auto"/>
+                </Controller>
+
+                <Controller type="Sound" end="Pause">
+                    <Key type="Sound" time="3.8" sound="@UI_BNet_Draft_Reveal_VFX" direction="Forward"/>
+                </Controller>
+            </Animation>
+        
+            <Animation name="TeamBlue">
+                <Event event="TeamBlue" action="Restart,DirectionForward,Play" frame="$parent"/>
+                
+                <Controller type="Property" property="Style" end="Pause">
+                    <Key type="Property" time="0" value="HeroDraftHeroName_Blue"/>
+                </Controller>
+            </Animation>
+
+            <Animation name="TeamRed">
+                <Event event="TeamRed" action="Restart,DirectionForward,Play" frame="$parent"/>
+                
+                <Controller type="Property" property="Style" end="Pause">
+                    <Key type="Property" time="0" value="HeroDraftHeroName_Red"/>
+                </Controller>
+            </Animation>
+            
+            <Animation name="ReadyBlue">
+                <Event event="ReadyBlue" action="Restart,DirectionForward,Play" frame="$parent"/>
+                
+                <Controller type="Property" property="Style" end="Pause">
+                    <Key type="Property" time="0" value="HeroDraftHeroName_Blue"/>
+                </Controller>
+            </Animation>
+
+            <Animation name="ReadyRed">
+                <Event event="ReadyRed" action="Restart,DirectionForward,Play" frame="$parent"/>
+                
+                <Controller type="Property" property="Style" end="Pause">
+                    <Key type="Property" time="0" value="HeroDraftHeroName_Red"/>
+                </Controller>
+            </Animation>
+        </Frame>
+ 
+        <!-- This animation determines how long we see a selection before it dismisses. -->
+        <Animation name="Ready">
+            <Event event="Ready" action="Reset,Play"/>
+
+            <Controller type="Event" end="Stop">
+                <Key type="Event" time="5.5" event="ReadyComplete"/>
+            </Controller>
+        </Animation>
+
+        <!-- Remove selected states -->
+        <Animation name="Dismiss">
+            <Event event="Dismiss" action="Reset,Play"/>
+                
+            <Controller type="Visibility" end="Pause">
+                <Key type="Bool" time="0" value="false"/>
+            </Controller>
+
+            <Controller type="Event" end="Stop">
+                <Key type="Event" time="0" event="DismissComplete"/>
+            </Controller>
+        </Animation>
+    </Frame>
+</Desc>

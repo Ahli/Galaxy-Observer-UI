@@ -1,0 +1,673 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<Desc>
+    <DescFlags val="Locked"/>
+    
+    <Frame Type="BattleUserContextMenu" name="PartyPanelContextMenu" template="BattleUserContextMenu/BattleUserContextMenu" >
+        <Anchor side="Top" relative="$parent" pos="Max" offset="0"/>
+        <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+    </Frame>
+    
+    <Frame type="PartyMemberTileListItem" name="PartyMemberTileListItemTemplate">
+        <!--<Anchor side="Bottom" relative="PartyMemberName" pos="Max" offset="0"/>-->
+        <Width val="355"/>
+
+        <HideWhenCleared val="true"/>
+        <CollapseLayout val="true"/>
+        <AcceptsMouse val="true"/>
+
+        <Frame type="Image" name="BorderImage">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+            <!--<Texture val="@UI/Storm_UI_Social_ProfileFrame_Party"/>-->
+            <DesaturateOnDisable val="False"/>
+            <Alpha val="0"/>
+        </Frame>
+
+        <Frame type="AvatarFrame" name="AvatarFrame" template="StandardTemplates/AvatarFrameMediumTemplate">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+            <Visible val="True"/>
+            <Animation name="Fill">
+                <Event event="Show" action="DirectionForward" frame="$parent"/>
+                <Event event="Show" action="Play" frame="$parent"/>
+                <Event event="Hide" action="DirectionReverse" frame="$parent"/>
+                <Event event="Hide" action="Play" frame="$parent"/>
+                <Controller type="Visibility" end="Pause">
+                    <Key type="Bool" time="0" value="false"/>
+                    <Key type="Bool" time=".01" value="true"/>
+                </Controller>
+            </Animation>
+            
+            <Animation name="Hover">
+                <Event event="OnMouseEnter" action="DirectionForward" frame="$parent"/>
+                <Event event="OnMouseEnter" action="Play" frame="$parent"/>
+                <Event event="OnMouseExit" action="DirectionReverse" frame="$parent"/>
+                <Event event="OnMouseExit" action="Play" frame="$parent"/>
+                <Controller type="Fade" end="Pause" frame="HoverBorder">
+                    <Key type="Curve" time="0" value="0" out="Fast"/>
+                    <Key type="Curve" time="0.2" value="200" in="Slow"/>
+                </Controller>
+            </Animation>
+            
+            <Animation name="DarkenAvatar">
+                <Event event="OnShown" action="DirectionForward" frame="$parent/ReadyIcon"/>
+                <Event event="OnShown" action="Play" frame="$parent/ReadyIcon"/>
+                <Event event="OnHidden" action="DirectionReverse" frame="$parent/ReadyIcon"/>
+                <Event event="OnHidden" action="Play" frame="$parent/ReadyIcon"/>
+                <Event event="OnShown" action="DirectionForward" frame="$parent/PendingIcon"/>
+                <Event event="OnShown" action="Play" frame="$parent/PendingIcon"/>
+                <Event event="OnHidden" action="DirectionReverse" frame="$parent/PendingIcon"/>
+                <Event event="OnHidden" action="Play" frame="$parent/PendingIcon"/>
+                <Controller type="Fade" end="Pause" frame="AvatarDarken">
+                    <Key type="Curve" time="0" value="0" out="Fast"/>
+                    <Key type="Curve" time="0.4" value="180" in="Slow"/>
+                </Controller>
+            </Animation>
+        </Frame>
+        
+        <Frame type="Image" name="HoverBorderImage">
+            <Anchor relative="$parent/AvatarFrame/PortraitBorderImage" />
+            <Alpha val="0"/>
+            <BlendMode val="Add"/>
+            <!-- <Texture val="@UI/Storm_UI_Social_ProfileFrame_Party_Active"/>-->
+            <Animation name="FillSlot">
+                <Event event="Show" action="DirectionForward" frame="$parent"/>
+                <Event event="Show" action="Play" frame="$parent"/>
+                <Event event="Hide" action="DirectionReverse" frame="$parent"/>
+                <Event event="Hide" action="Play" frame="$parent"/>
+                <Controller type="Texture" end="Pause">
+                    <!--<Key type="Image" time="0" image="@UI/Storm_UI_Social_ProfileFrame_Party_Active_Empty"/>-->
+                    <!--<Key type="Image" time="0.01" image="@UI/Storm_UI_Social_ProfileFrame_Party_Active"/>-->
+                </Controller>
+            </Animation>
+            <Animation name="Hover">
+                <Event event="OnMouseEnter" action="DirectionForward" frame="$parent"/>
+                <Event event="OnMouseEnter" action="Play" frame="$parent"/>
+                <Event event="OnMouseExit" action="DirectionReverse" frame="$parent"/>
+                <Event event="OnMouseExit" action="Play" frame="$parent"/>
+                <Controller type="Fade" end="Pause">
+                    <Key type="Curve" time="0" value="0" out="Fast"/>
+                    <Key type="Curve" time="0.2" value="0" in="Slow"/>
+                </Controller>
+            </Animation>
+        </Frame>
+        
+        <Frame type="Image" name="AvatarDarkenImage">
+            <Anchor side="Top" relative="$parent/AvatarFrame/PortraitFrame/UnlockableImage" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent/AvatarFrame/PortraitFrame/UnlockableImage" pos="Min" offset="0"/>
+            <Anchor side="Bottom" relative="$parent/AvatarFrame/PortraitFrame/UnlockableImage" pos="Max" offset="0"/>
+            <Anchor side="Right" relative="$parent/AvatarFrame/PortraitFrame/UnlockableImage" pos="Max" offset="0"/>
+            <LayerCount val="2"/>
+            <Alpha val="0"/>
+            <Visible val="False"/>
+            <!--<Texture val="@UI/Storm_UI_PortraitBorder_DefaultMask_Medium" layer="0"/>-->
+            <AlphaLayer val="True" layer="0"/>
+            <WrapUV val="False" layer="0"/>
+         
+            <Color val="000000" layer="1"/>
+            
+            <Animation name="TeamLeague">
+                <Event event="ResetOverlay" action="Stop" frame="$parent/AvatarFrame"/>
+                <Event event="OverlayStyleLevel" action="Stop" frame="$parent/AvatarFrame"/>
+                <Event event="OverlayStyleHero" action="Play" frame="$parent/AvatarFrame"/>
+                <Event event="OverlayStyleTeam" action="Play" frame="$parent/AvatarFrame"/>
+                <Controller type="Texture" end="Pause" layer="0" name="BorderTexture">
+                    <!--<Key type="Image" time="0" image="@UI/Storm_UI_PortraitBorder_DefaultMask_Medium"/>-->
+                    <!--<Key type="Image" time="0.01" image="@UI/Storm_UI_PortraitBorder_HeroMask_Medium"/>-->
+                </Controller>
+            </Animation>
+        </Frame>
+
+        <Frame type="Image" name="LeaderIcon">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="12"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="14"/>
+            <Height val="15"/>
+            <Width val="17"/>
+            <Texture val="@UI/Glues_Icons_PartyLeader"/>
+            <DesaturateOnDisable val="False"/>
+        </Frame>
+
+        <Frame type="Image" name="ReadyIcon">
+            <Anchor side="Top" relative="$parent/AvatarFrame" pos="Mid" offset="0"/>
+            <Anchor side="Left" relative="$parent/AvatarFrame" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent/AvatarFrame" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent/AvatarFrame" pos="Mid" offset="0"/>
+            <Texture val="@UI/Glues_Icons_PartyReady_Small"/>
+            <DesaturateOnDisable val="False"/>
+            
+            <Animation name="OnShown">
+                <Event event="OnShown" action="DirectionForward"/>
+                <Event event="OnShown" action="Play"/>
+                <Event event="OnHidden" action="DirectionReverse"/>
+                <Event event="OnHidden" action="Play"/>
+                <Controller type="Fade" end="Pause" >
+                    <Key type="Curve" time="0" value="0" out="Fast"/>
+                    <Key type="Curve" time="0.6" value="255" in="Slow"/>
+                </Controller>
+                <Controller type="Dimension" dimension="Width" relative="False" percentage="True" end="Pause" >
+                    <Key type="Curve" time="0" value="50" in="linear" out="Fast"/>
+                    <Key type="Curve" time=".2" value="120" in="Slow" out="Slow"/>
+                    <Key type="Curve" time=".3" value="100" in="Fast" />
+                </Controller>
+                <Controller type="Dimension" dimension="Height" relative="False" percentage="True" end="Pause" >
+                    <Key type="Curve" time="0" value="50" in="linear" out="Fast"/>
+                    <Key type="Curve" time=".2" value="120" in="Slow" out="Slow"/>
+                    <Key type="Curve" time=".3" value="100" in="Fast" />
+                </Controller>
+            </Animation>
+            
+            <Animation name="DarkenAvatar">
+                <Event event="OnShown" action="DirectionForward"/>
+                <Event event="OnShown" action="Play"/>
+                <Event event="OnHidden" action="DirectionReverse"/>
+                <Event event="OnHidden" action="Play"/>
+                <Controller type="Fade" end="Pause" frame="$parent/AvatarFrame/AvatarDarken">
+                    <Key type="Curve" time="0" value="0" out="Fast"/>
+                    <Key type="Curve" time="0.4" value="180" in="Slow"/>
+                </Controller>
+            </Animation>
+        </Frame>
+
+        <Frame type="Image" name="OfflineIcon" template="PartyPanel/PartyMemberTileListItemTemplate/ReadyIcon">
+            <Texture val="@UI/Glues_Icons_Status_Offline"/>
+            <DesaturateOnDisable val="False"/>
+        </Frame>
+        
+        <Frame type="Image" name="InGameIcon">
+            <Anchor side="Top" relative="$parent/AvatarFrame" pos="Mid" offset="0"/>
+            <Anchor side="Left" relative="$parent/AvatarFrame" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent/AvatarFrame" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent/AvatarFrame" pos="Mid" offset="0"/>
+            <Width val="24"/>
+            <Height val="24"/>
+            <Texture val="@UI/Glues_Icons_Status_BusyInGame"/>
+            <DesaturateOnDisable val="False"/>
+        </Frame>
+
+        <Frame type="Image" name="PendingIcon">
+            <Anchor side="Top" relative="$parent/AvatarFrame" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent/AvatarFrame" pos="Mid" offset="0"/>
+            <Anchor side="Left" relative="$parent/AvatarFrame" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent/AvatarFrame" pos="Mid" offset="0"/>
+            <Texture val="@UI/Glues_Icons_Status_Pending"/>
+            <SubpixelRendering val="True"/>
+
+            <Animation name="OnShown">
+                <Event event="OnShown" action="Reset"/>
+                <Event event="OnShown" action="DirectionForward"/>
+                <Event event="OnShown" action="Play"/>
+                <Event event="OnHidden" action="DirectionReverse"/>
+                <Event event="OnHidden" action="Play"/>
+                <Controller type="Fade" end="Pause" >
+                    <Key type="Curve" time="0" value="0" out="Fast"/>
+                    <Key type="Curve" time="0.6" value="255" in="Slow"/>
+                </Controller>
+                <Controller type="Fade" end="Pause" frame="$parent/AvatarDarkenImage">
+                    <Key type="Curve" time="0" value="0" out="Fast"/>
+                    <Key type="Curve" time="0.4" value="193" in="Slow"/>
+                </Controller>
+            </Animation>
+        </Frame>
+
+        <Frame type="Label" name="PartyMemberName">
+            <Anchor side="Top" relative="$parent/AvatarFrame" pos="Min" offset="10"/>
+            <Anchor side="Left" relative="$parent/AvatarFrame" pos="Max" offset="10"/>
+            <Text val="LoremIpsum"/>
+        </Frame>
+        
+        <Frame type="Frame" name="HitTestFrame">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+            <TooltipAnchorPosition val="BottomCenter"/>
+        </Frame>
+
+        <Animation name="ClickSound">
+            <Event event="OnClick" action="Reset,Play"/>
+
+            <Controller type="Sound" end="Stop">
+                <Key type="Sound" time="0" sound="@UI_BnetDefaultClick" direction="Forward"/>
+            </Controller>
+        </Animation>
+    </Frame>
+    
+    <Frame type="PartyMemberTileListItem" name="PartyMemberExpandedTileListItem" template="PartyPanel/PartyMemberTileListItemTemplate">
+        <Height val="73"/>
+        <Width val="325"/>
+        
+        <Frame type="Image" name="BorderImage">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+            <Alpha val="0"/>
+        </Frame>
+        
+        <Frame type="Image" name="HoverBorderImage">
+            <Anchor relative="$parent/BorderImage" />
+            <Texture val="@UI/Glues_Battlenet_PageAssets_MainListItem_Over"/>
+            <TextureType val="Nineslice"/>
+        </Frame>
+        
+        <Frame type="AvatarFrame" name="AvatarFrame" template="StandardTemplates/AvatarFrameTemplate">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="5"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="5"/>
+        </Frame>
+        
+        <Frame type="Image" name="LeaderIcon">
+            <Anchor side="Top" relative="$parent/AvatarFrame" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent/AvatarFrame" pos="Min" offset="0"/>
+        </Frame>
+        
+        <Frame type="Label" name="PartyMemberName">
+            <Anchor side="Top" relative="$parent/AvatarFrame" pos="Min" offset="3"/>
+            <Anchor side="Left" relative="$parent/AvatarFrame" pos="Max" offset="10"/>
+            <Style val="SocialPartyMemberName"/>
+        </Frame>
+    </Frame>
+
+    <Frame type="PartyMemberTileListItem" name="PartyMemberTileListItem" template="PartyPanel/PartyMemberTileListItemTemplate">
+        <Height val="65"/>
+        <Width val="65"/>
+        
+        <Frame type="AvatarFrame" name="AvatarFrame" template="StandardTemplates/AvatarFrameTemplate">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+            
+            <Animation name="Hover">
+                <Event event="OnMouseEnter" action="DirectionForward" frame="$parent"/>
+                <Event event="OnMouseEnter" action="Play" frame="$parent"/>
+                <Event event="OnMouseExit" action="DirectionReverse" frame="$parent"/>
+                <Event event="OnMouseExit" action="Play" frame="$parent"/>
+                <Controller type="Fade" end="Pause" frame="HoverBorder">
+                    <Key type="Curve" time="0" value="0" out="Fast"/>
+                    <Key type="Curve" time="0.2" value="200" in="Slow"/>
+                </Controller>
+            </Animation>
+        </Frame>
+        
+         <Frame type="Image" name="LeaderIcon">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="5"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="5"/>
+        </Frame>
+        
+        <Frame type="Image" name="ActiveBorderImage">
+            <Visible val="false"/>
+        </Frame>
+        <Frame type="Image" name="HoverBorderImage">
+            <Visible val="false"/>
+            <Texture val="@UI/Glues_Avatar_LeagueBorder_Small_Hover"/>
+        </Frame>
+    </Frame>
+    
+    <Frame type="PartyMemberTileListItem" name="PartyMemberPlayer" template="PartyPanel/PartyMemberTileListItemTemplate">
+        <Height val="113"/>
+        <Width val="113"/>
+                
+        <Frame type="Image" name="InviteImage">
+            <Visible val="false"/>
+        </Frame>
+        
+        <Frame type="Label" name="PartyMemberName">
+            <Visible val="false"/>
+        </Frame>
+        
+        <Frame type="Image" name="ActiveBorderImage">
+            <Visible val="false"/>
+        </Frame>
+        
+        <Frame type="Image" name="HoverBorderImage">
+            <Visible val="true"/>
+            <Texture val="@UI/Glues_Avatar_LeagueBorder_Medium_Hover"/>
+        </Frame>
+        
+        <Frame type="Image" name="BorderImage">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Width val="124"/>
+            <Height val="124"/>
+            <DesaturateOnDisable val="False"/>
+            <Visible val="false"/>
+        </Frame>
+        
+        <Frame type="Image" name="ReadyIcon">
+            <Alpha val="0"/>
+            <Texture val="@UI/Glues_Icons_PartyReady_Large"/>
+        </Frame>
+
+        <Frame type="Image" name="OfflineIcon">
+            <Alpha val="0"/>
+        </Frame>
+        
+        <Frame type="Image" name="InGameIcon">
+            <Alpha val="0"/>
+        </Frame>
+
+        <Frame type="Image" name="PendingIcon">
+            <Alpha val="0"/>
+        </Frame>
+    </Frame>
+    
+    <Frame type="PartyPanelSC2" name="PartyPanelTemplate">
+        <Animation name="PartySizeIncreased">
+            <Event event="PartySizeIncreased" action="Reset,Play"/>
+
+            <Controller type="Sound" end="Pause">
+                <Key type="Sound" time="0.0" sound="@G_UI_Accept01" direction="Forward"/>
+            </Controller>
+        </Animation>
+        
+        <Animation name="PartySizeFull">
+            <Event event="PartySizeFull" action="Reset,Play"/>
+
+            <Controller type="Sound" end="Pause">
+                <Key type="Sound" time="0.0" sound="@G_UI_Accept01" direction="Forward"/>
+            </Controller>
+        </Animation>
+
+        <Animation name="PartyInviteSent">
+            <Event event="PartyInviteSent" action="Reset,Play"/>
+
+            <Controller type="Sound" end="Pause">
+                <Key type="Sound" time="0.0" sound="@G_UI_Invsent01" direction="Forward"/>
+            </Controller>
+        </Animation>
+
+        <Animation name="PartyPromote">
+            <Event event="PartyPromote" action="Reset,Play"/>
+
+            <Controller type="Sound" end="Pause">
+                <Key type="Sound" time="0.0" sound="@UI_BNet_Promote" direction="Forward"/>
+            </Controller>
+        </Animation>
+
+        <Animation name="PartyInviteDeclined">
+            <Event event="PartyInviteDeclined" action="Reset,Play"/>
+
+            <Controller type="Sound" end="Pause">
+                <Key type="Sound" time="0.0" sound="@G_UI_Decline01" direction="Forward"/>
+            </Controller>
+        </Animation>
+
+        <Animation name="PartyMemberLeft">
+            <Event event="PartyMemberLeft" action="Reset,Play"/>
+
+            <Controller type="Sound" end="Pause">
+                <Key type="Sound" time="0.0" sound="@G_UI_Leaver01" direction="Forward"/>
+            </Controller>
+        </Animation>
+
+        <Frame type="AvatarFrame" name="OfflineAvatarFrame" template="StandardTemplates/AvatarFrameMediumTemplate">
+            <Visible val="false"/>
+            <Anchor side="Top" relative="$parent" pos="Min" offset="4"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="-15"/>
+            
+            <Animation name="OfflinePlay">
+                <Event event="PlayingOffline" action="Reset,Play" frame="$parent"/>
+                <Event event="PlayingOnline" action="Reset,Stop" frame="$parent"/>
+
+                <Controller type="Visibility" end="Pause">
+                    <Key type="Bool" time="0" value="true"/>
+                </Controller>
+            </Animation>
+
+            <Frame type="Frame" name="RankLabelFrame">
+                <Visible val="false"/>
+            </Frame>
+        </Frame>
+
+        <Frame type="TileList" name="TileList">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="-870"/>
+
+            <Animation name="OfflinePlay">
+                <Event event="PlayingOffline" action="Reset,Play" frame="$parent"/>
+                <Event event="PlayingOnline" action="Reset,Stop" frame="$parent"/>
+
+                <Controller type="Visibility" end="Pause">
+                    <Key type="Bool" time="0" value="false"/>
+                </Controller>
+            </Animation>
+
+            <Animation name="HideOnInviteUser">
+                <Event event="OnClick" action="Reset" frame="InviteButton"/>
+                <Event event="OnClick" action="Play" frame="InviteButton"/>
+                <Event event="OnShown" action="Reset" frame="$parent/InviteUserFlyout"/>
+                <Event event="OnShown" action="Play" frame="$parent/InviteUserFlyout"/>
+
+                <Controller type="Anchor" end="Pause" side="Bottom" relative="true">
+                    <Key type="Curve" time="0.0" value="870" out="Step"/>
+                    <Key type="Curve" time="0.01" value="0" out="Step"/>
+                </Controller>
+            </Animation>
+
+            <Frame type="BlurFrame" name="BlurBehindButton">
+                <Anchor side="Top" relative="$parent/ExpandButton" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/ExpandButton" pos="Min" offset="0"/>
+                <Anchor side="Right" relative="$parent/ExpandButton" pos="Max" offset="0"/>
+                <Anchor side="Bottom" relative="$parent/ExpandButton" pos="Max" offset="0"/>
+                <BlurAmount val=".3"/>
+                <Visible val="false"/>
+
+                <Frame type="Image" name="LowImage">
+                    <Anchor relative="$parent"/>
+                    <Color val="0,0,0"/>
+                    <Alpha val="150"/>
+                </Frame>
+
+                <Animation name="ToggleHideList">
+                    <Event event="OnHidden" action="Reset" frame="$parent/ExpandButton"/>
+                    <Event event="OnHidden" action="Play" frame="$parent/ExpandButton"/>
+
+                    <Controller type="Visibility" end="Pause">
+                        <Key type="Bool" time="0" value="false"/>
+                    </Controller>
+                </Animation>
+
+                <Animation name="ToggleShowList">
+                    <Event event="OnShown" action="Reset" frame="$parent/ExpandButton"/>
+                    <Event event="OnShown" action="Play" frame="$parent/ExpandButton"/>
+
+                    <Controller type="Visibility" end="Pause">
+                        <Key type="Bool" time="0" value="true"/>
+                    </Controller>
+                </Animation>
+            </Frame>
+
+            <Frame type="Image" name="DarkenBehindButton">
+                <Anchor side="Top" relative="$parent/ExpandButton" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/ExpandButton" pos="Min" offset="0"/>
+                <Anchor side="Right" relative="$parent/ExpandButton" pos="Max" offset="0"/>
+                <Anchor side="Bottom" relative="$parent/ExpandButton" pos="Max" offset="0"/>
+                <LayerColor val="000000"/>
+                <Alpha val="150"/>
+                <Visible val="false"/>
+
+                <Animation name="ToggleHideList">
+                    <Event event="OnHidden" action="Reset" frame="$parent/ExpandButton"/>
+                    <Event event="OnHidden" action="Play" frame="$parent/ExpandButton"/>
+
+                    <Controller type="Visibility" end="Pause">
+                        <Key type="Bool" time="0" value="false"/>
+                    </Controller>
+                </Animation>
+
+                <Animation name="ToggleShowList">
+                    <Event event="OnShown" action="Reset" frame="$parent/ExpandButton"/>
+                    <Event event="OnShown" action="Play" frame="$parent/ExpandButton"/>
+
+                    <Controller type="Visibility" end="Pause">
+                        <Key type="Bool" time="0" value="true"/>
+                    </Controller>
+                </Animation>
+            </Frame>
+
+            <Frame type="PartyMemberTileListItem" name="Item4" template="PartyPanel/PartyMemberExpandedTileListItem">
+                <Anchor side="Top" relative="$parent" pos="Max" offset="10"/>
+                <Anchor side="Left" relative="$parent" pos="Max" offset="20"/>
+            </Frame>
+
+            <Frame type="Button" name="ExpandButton">
+                <Anchor side="Top" relative="$parent/InviteButton" pos="Max" offset="1"/>
+                <Anchor side="Right" relative="$parent/ButtonDivider3" pos="Max" offset="0"/>
+                <DisplayType val="ImageLayer"/>
+                <Width val="355"/>
+                <Height val="50"/>
+                <Style val="PartyPanelDropDownButton"/>
+                <Text val="Expand 4+"/>
+                <Visible val="false"/>
+
+                <Frame type="Image" name="NormalImage">
+                    <Anchor relative="$parent"/>
+                    <Texture val="@UI/Glues_Battlenet_TopNav_PartyButtonNormal"/>
+                    <TextureType val="Nineslice"/>
+                    <Tiled val="true"/>
+                </Frame>
+
+                <Frame type="Image" name="HoverImage">
+                    <Anchor relative="$parent"/>
+                    <Texture val="@UI/Glues_Battlenet_TopNav_PartyButtonHover"/>
+                    <TextureType val="Nineslice"/>
+                    <Tiled val="true"/>
+                </Frame>
+
+                <Frame type="Label" name="Label">
+                    <Anchor side="Top" relative="$parent" pos="Min" offset="5"/>
+                    <Anchor side="Left" relative="$parent" pos="Min" offset="15" />
+                    <Anchor side="Bottom" relative="$parent" pos="Max" offset="-5"/>
+                    <Anchor side="Right" relative="$parent" pos="Max" offset="-10"/>
+                    <Style val="PartyPanelDropDownButton"/>
+                </Frame>
+
+                <Frame type="Frame" name="HitTestFrame">
+                    <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                    <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+                    <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                    <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+                </Frame>
+
+                <Animation name="ShowExpand">
+                    <Event event="OnShown" action="Reset" frame="$parent/Item4"/>
+                    <Event event="OnShown" action="Play" frame="$parent/Item4"/>
+                    <Event event="OnHidden" action="Reset" frame="$parent/Item4"/>
+                    <Event event="OnHidden" action="Stop" frame="$parent/Item4"/>
+                    <Controller type="Visibility" end="Pause">
+                        <Key type="Bool" time="0" value="true"/>
+                    </Controller>
+                </Animation>
+            </Frame>
+
+            <Frame type="Image" name="ButtonDivider1">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="4"/>
+                <Anchor side="Left" relative="$parent/InviteButton" pos="Min" offset="0"/>
+                <Texture val="@UI/Glues_Battlenet_TopNav_ButtonDivider"/>
+            </Frame>
+
+            <Frame type="Image" name="ButtonDivider2">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="4"/>
+                <Anchor side="Right" relative="$parent/InviteButton" pos="Max" offset="0"/>
+                <Texture val="@UI/Glues_Battlenet_TopNav_ButtonDivider"/>
+            </Frame>
+
+            <Frame type="Image" name="ButtonDivider3">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="4"/>
+                <Anchor side="Right" relative="$parent" pos="Max" offset="-11"/>
+                <Texture val="@UI/Glues_Battlenet_TopNav_ButtonDivider"/>
+            </Frame>
+
+            <Frame type="Button" name="InviteButton" template="StandardBattlenetTemplates/BattlenetIconButtonTemplate">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Right" relative="$parent/Item3" pos="Min" offset="-10"/>
+                <Width val="45"/>
+                <Height val="73"/>
+
+                <Frame type="Image" name="NormalImage">
+                    <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+                    <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+                    <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+                    <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+                    <Texture val="@UI/Glues_Icons_AddToParty" layer="0"/>
+                    <Width val="34"/>
+                    <Height val="34"/>
+                </Frame>
+
+                <Frame type="Image" name="HoverImage">
+                    <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+                    <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+                    <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+                    <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+                    <Texture val="@UI/Glues_Icons_AddToPartyHover" layer="0"/>
+                    <Width val="34"/>
+                    <Height val="34"/>
+                </Frame>
+            </Frame>
+
+            <Frame type="PartyMemberTileListItem" name="Item3" template="PartyPanel/PartyMemberTileListItem">
+                <Anchor side="Top" relative="$parent/Item2" pos="Min" offset="0"/>
+                <Anchor side="Right" relative="$parent/Item2" pos="Min" offset="0"/>
+            </Frame>
+
+            <Frame type="PartyMemberTileListItem" name="Item2" template="PartyPanel/PartyMemberTileListItem">
+                <Anchor side="Top" relative="$parent/Item1" pos="Min" offset="0"/>
+                <Anchor side="Right" relative="$parent/Item1" pos="Min" offset="0"/>
+            </Frame>
+
+            <Frame type="PartyMemberTileListItem" name="Item1" template="PartyPanel/PartyMemberTileListItem">
+                <Anchor side="Top" relative="$parent/Item0" pos="Min" offset="4"/>
+                <Anchor side="Right" relative="$parent/Item0" pos="Min" offset="4"/>
+            </Frame>
+
+            <Frame type="PartyMemberTileListItem" name="Item0" template="PartyPanel/PartyMemberPlayer">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Right" relative="$parent/ButtonDivider3" pos="Min" offset="0"/>
+            </Frame>
+        </Frame>
+        
+        <Frame type="InviteUserFlyout" name="InviteUserFlyout" template="InviteUserFlyout/InviteUserFlyoutTemplate">
+            <Anchor side="Top" relative="$parent/TileList/InviteButton" pos="Max" offset="-5"/>
+            <Anchor side="Right" relative="$parent/TileList/ButtonDivider3" pos="Max" offset="7"/>
+            <Height val="400"/>
+            <Width val="368"/>
+            <Visible val="false"/>
+            <RenderPriority val="701"/>
+
+            <Animation name="HideFlyout">
+                <Event event="OnClick" action="Reset,Play" frame="CloseButton"/>
+            </Animation>
+
+            <!-- This is an invisible button you can't click on, so it only responds to shortcuts -->
+            <Frame type="Button" name="CloseButton" template="SocialPanel/SocialCloseButtonTemplate">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="15"/>
+                <Anchor side="Right" relative="$parent" pos="Max" offset="-15"/>
+                <Alpha val="0"/>
+                <AcceptsMouse val="false"/>
+                <Shortcut val="@UI/ScreenNavigationBack_Hotkey"/>
+            </Frame>
+        </Frame>
+
+        <Frame type="Image" name="SpawnedIcon">
+            <Anchor side="Bottom" relative="$parent/TileList/Item0" pos="Max" offset="-5"/>
+            <Anchor side="Right" relative="$parent/TileList/Item0" pos="Max" offset="-5"/>
+            <Width val="30"/>
+            <Height val="23"/>
+            <Texture val="@UI/Glues_Icons_Spawning"/>
+            <AcceptsMouseTooltip val="true"/>
+            <Visible val="false"/>
+
+            <Animation name="Show">
+                <Event event="Spawned" action="Reset,Play" frame="$parent"/>
+                <Event event="NotSpawned" action="Reset,Stop" frame="$parent"/>
+                <Event event="PartyLeft" action="Reset,Stop" frame="$parent"/>
+                <Event event="PartyJoined" action="Reset,Stop" frame="$parent"/>
+                
+                <Controller type="Visibility" end="Pause">
+                    <Key type="Bool" time="0" value="true"/>
+                </Controller>
+            </Animation>
+        </Frame>
+    </Frame>
+</Desc>

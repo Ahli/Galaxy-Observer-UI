@@ -1,0 +1,1120 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<Desc>
+    <DescFlags val="Locked"/>
+
+
+	<Frame type="Image" name="CountdownNumberTemplate">
+		<Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+		<Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+		<Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+		<Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+		<Texture val="@UI/Storm_HeroSelect_EnterGame_Countdown_5"/>
+		<SubpixelRendering val="True"/>
+		<Alpha val="0"/>
+		
+		<Frame type="Image" name="NumberGlareImage">
+			<Anchor relative="$parent"/>
+			<BlendMode val="Add"/>
+			<LayerCount val="2"/>
+			<ColorAdjustMode val="Fill"/>
+			<AdjustmentColor val="ffffff"/>
+
+			<Texture val="@UI/Storm_HeroSelect_EnterGame_Countdown_5" layer="0"/>
+			<AlphaLayer val="True" layer="0"/>
+			<WrapUV val="True" layer="0"/>
+			
+			<Texture val="@UI/Storm_UI_HeroUI_Greymane_ChromeShine_Mask" layer="1"/>
+			<TextureCoords top=".5" left="0" bottom="1" right=".25" layer="1"/>
+			<WrapUV val="True" layer="1"/>
+			
+			<Animation name="UVScroll">
+				<Event event="Trigger" action="Restart,Play" frame="$parent"/>
+			<Controller type="Fade" end="Pause">
+				<Key type="Curve" time="0" value="0" out="Fast"/>
+				<Key type="Curve" time=".2" value="255" out="Fast"/>
+				<Key type="Curve" time=".5" value="128" in="Slow"/>
+			</Controller>
+				<Controller type="LayerUV" layer="1" side="Left" relative="True" sidelock="True" end="Pause" >
+					<Key type="Curve" time="0" value="1" out="fast"/>
+					<Key type="Curve" time=".5" value="0" in="fast"/>
+				</Controller>
+			</Animation>
+		</Frame>
+		
+		<Animation name="ShowNumberAnim">
+			<Event event="Trigger" action="Restart,Play"/>
+			
+			<Controller type="Fade" end="Pause">
+				<Key type="Curve" time="0" value="0" out="Fast"/>
+				<Key type="Curve" time=".1" value="255" in="Slow"/>
+				<Key type="Curve" time=".9" value="255" out="Fast"/>
+				<Key type="Curve" time="1.01" value="0" in="Slow"/>
+			</Controller>
+			
+			<Controller type="Dimension" dimension="Width" relative="False" percentage="True" end="Pause">
+				<Key type="Curve" time="0" value="400" out="Fast"/>
+				<Key type="Curve" time=".2" value="70" inOut="Slow,Slow"/>
+				<Key type="Curve" time=".9" value="64" in="Fast"/>
+			</Controller>
+			
+			<Controller type="Dimension" dimension="Height" relative="False" percentage="True" end="Pause">
+				<Key type="Curve" time="0" value="400" out="Fast"/>
+				<Key type="Curve" time=".2" value="70" inOut="Slow,Slow"/>
+				<Key type="Curve" time=".9" value="64" in="Fast"/>
+			</Controller>
+		</Animation>
+	</Frame>
+	
+    <Frame type="EnterGamePanel" name="EnterGamePanelTemplate">
+        <Frame type="Frame" name="MainEnterGamePanel">
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+            <Width val="400"/>
+            <Height val="130"/>
+            
+            <TooltipAnchorPosition val="TopCenter"/>
+            <AcceptsMouseTooltip val="true"/>
+          
+            <Frame type="Image" name="ModeLabelBg">
+                <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+                <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+                <Texture val="@UI/Storm_UI_Holopanel_Background"/>
+                <BlendMode val="Normal"/>
+                <Animation name="Pulse">
+                    <Event event="OnShown" action="DirectionForward"/>
+                    <Event event="OnShown" action="Play"/>
+                    <Controller type="Fade" end="PingPong">
+                        <Key type="Curve" time="0" value="200" out="Slow"/>
+                        <Key type="Curve" time=".8" value="255" in="Slow"/>
+                    </Controller>
+                </Animation>
+                <Unclipped val="True"/>
+            </Frame>
+
+            <Frame type="Label" name="TitleLabel">
+                <Anchor side="Bottom" relative="$parent/Button" pos="Min" offset="-10"/>
+                <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+                <Style val="HoloPanelTitle"/>
+                <Unclipped val="True"/>
+            </Frame>
+
+            <StateGroup name="ShowPaddedAI">
+                <State name="Show">
+                    <When type="Property" frame="$ancestor[@type=EnterGamePanel]" ShowPaddedAIWarning="true"/>
+                    <Action type="SendEvent" event="ShowPadedAIPopup" on="Enter"/>
+                    <Action type="SendEvent" event="HidePadedAIPopup" on="Exit"/>
+                </State>
+            </StateGroup>
+
+            <Animation name="Hover">
+                <Event event="ShowPadedAIPopup" action="DirectionForward,Play" frame="$this"/>
+                <Event event="HidePadedAIPopup" action="DirectionReverse,Play" frame="$this"/>
+                <Controller type="Fade" end="Pause" frame="PaddedAIPopup">
+                    <Key type="Curve" time="0" value="0" out="Fast"/>
+                    <Key type="Curve" time=".2" value="255" in="Slow"/>
+                </Controller>
+                <Controller type="Property" property="AcceptsMouse" end="Pause" frame="PaddedAIPopup/TooltipBorder">
+                    <Key type="Property" time="0.0" value="false"/>
+                    <Key type="Property" time="0.2" value="true"/>
+                </Controller>
+            </Animation>
+
+            <Frame type="Frame" name="PaddedAIPopup">
+                <Anchor side="Left" relative="$parent/TitleLabel" pos="Mid" offset="0"/>
+                <Anchor side="Right" relative="$parent/TitleLabel" pos="Mid" offset="0"/>
+                <Anchor side="Bottom" relative="$parent/TitleLabel" pos="Min" offset="-35"/>
+                <Anchor side="Top" relative="BodyLabel" pos="Min" offset="0"/>
+                <Unclipped val="true"/>
+                <Width val="400"/>
+                <VisibilityOnFade val="true"/>
+                <Alpha val="0"/>
+
+                <Frame type="Frame" name="TooltipBorder" template="StandardTooltip/ArrowedBorderTemplate">
+                    <Unclipped val="true"/>
+                    <AcceptsMouse val="false"/>
+                    <Anchor relative="$parent/BodyLabel" offset="10"/>
+
+                    <Frame type="Image" name="PointerImage">
+                        <Anchor side="Top" relative="$this" pos="Max" offset="0"/>
+                        <Anchor side="Bottom" relative="$parent" pos="Max" offset="38"/>
+                        <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+                        <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+                        <Texture val="@UI/Storm_UI_Tooltip_Universal_Arrow_Down"/>
+                        <Width val="112"/>
+                        <Height val="56"/>
+                    </Frame>
+                </Frame>
+
+                <Frame type="Label" name="BodyLabel">
+                    <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                    <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+                    <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+                    <Style val="PopupTooltipCenterAligned"/>
+                    <Text val="@UI/RestrictedStatePaddedAIWarning"/>
+                    <Unclipped val="True"/>
+                </Frame>
+            </Frame>
+            
+            <Frame type="Frame" name="SearchingAnimContainer">
+                <Anchor side="Top" relative="$parent/Button" pos="Max" offset="-2"/>
+                <Anchor side="Left" relative="$parent/Button" pos="Min" offset="0"/>
+                <Anchor side="Right" relative="$parent/Button" pos="Max" offset="0"/>
+                <Width val="252"/>
+                <Height val="24"/>
+                <Visible val="False"/>
+                
+                <Frame type="Image" name="SearchingBackground">
+                    <Anchor side="Top" relative="$parent" pos="Min" offset="6"/>
+                    <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+                    <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+                    <Texture val="@UI/Storm_UI_Holopanel_SearchingBackground"/>
+                </Frame>
+                
+                <Frame type="Image" name="SearchingCenter">
+                    <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                    <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+                    <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+                    <Texture val="@UI/Storm_UI_Holopanel_Searching_Step1"/>
+                    <Animation name="Pulse">
+                        <Event event="OnShown" action="Play"/>
+                        <Event event="OnMouseEnter" action="Play" frame="$parent/$parent"/>
+                        <Controller type="Fade" end="Loop">
+                            <Key type="Curve" time="0" value="0" out="Fast"/>
+                            <Key type="Curve" time=".2" value="255" in="Slow"/>
+                            <Key type="Curve" time="1" value="255" out="Slow"/>
+                            <Key type="Curve" time="1.6" value="0" in="Fast"/>
+                        </Controller>
+                    </Animation>
+                </Frame>
+
+                <Frame type="Image" name="SearchingMiddle">
+                    <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                    <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+                    <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+                    <Texture val="@UI/Storm_UI_Holopanel_Searching_Step2"/>
+                    <Animation name="Pulse">
+                        <Event event="OnShown" action="Play"/>
+                        <Event event="OnMouseEnter" action="Play" frame="$parent/$parent"/>
+                        <Controller type="Fade" end="Loop">
+                            <Key type="Curve" time="0" value="0"/>
+                            <Key type="Curve" time=".3" value="0" out="Fast"/>
+                            <Key type="Curve" time=".5" value="255" in="Slow"/>
+                            <Key type="Curve" time="1" value="255" out="Slow"/>
+                            <Key type="Curve" time="1.6" value="0" in="Fast"/>
+                        </Controller>
+                    </Animation>
+                </Frame>
+
+                <Frame type="Image" name="SearchingOutside">
+                    <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                    <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+                    <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+                    <Texture val="@UI/Storm_UI_Holopanel_Searching_Step3"/>
+                    <Animation name="Pulse">
+                        <Event event="OnShown" action="Play"/>
+                        <Event event="OnMouseEnter" action="Play" frame="$parent/$parent"/>
+                        <Controller type="Fade" end="Loop">
+                            <Key type="Curve" time="0" value="0"/>
+                            <Key type="Curve" time=".6" value="0" out="Fast"/>
+                            <Key type="Curve" time=".8" value="255" in="Slow"/>
+                            <Key type="Curve" time="1" value="255" out="Slow"/>
+                            <Key type="Curve" time="1.6" value="0" in="Fast"/>
+                        </Controller>
+                    </Animation>
+                </Frame>
+            </Frame>
+            
+            <Frame type="Frame" name="ButtonAlertContainer">
+                <Anchor side="Top" relative="ButtonAlertBorder2" pos="Min" offset="0"/>
+                <Anchor side="Bottom" relative="ButtonAlertBorder2" pos="Max" offset="0"/>
+                <Anchor side="Left" relative="ArrowLeft" pos="Min" offset="0"/>
+                <Anchor side="Right" relative="ArrowRight" pos="Max" offset="0"/>
+                <Visible val="False"/>
+                
+                <Frame type="Image" name="ButtonAlertBorder1">
+                    <Anchor side="Top" relative="$parent/$parent/Button" pos="Min" offset="-8"/>
+                    <Anchor side="Left" relative="$parent/$parent/Button" pos="Min" offset="-6"/>
+                    <Anchor side="Right" relative="$parent/$parent/Button" pos="Max" offset="6"/>
+                    <Height val="72"/>
+                    <Texture val="@UI/Storm_UI_Holopanel_Button_Border1"/>
+                    <TextureType val="Nineslice"/>
+                    <Animation name="Neon">
+                        <Event event="OnShown" action="Play"/>
+                        <Event event="OnMouseEnter" action="Play" frame="$parent/$parent"/>
+                        <Controller type="Fade" end="Loop">
+                            <Key type="Curve" time="0" value="0" in="Step"/>
+                            <Key type="Curve" time=".2" value="255" in="Step"/>
+                            <Key type="Curve" time=".4" value="102" in="Step"/>
+                            <Key type="Curve" time=".6" value="0" in="Step"/>
+                            <Key type="Curve" time=".8" value="0" in="Step"/>
+                        </Controller>
+                    </Animation>
+                </Frame>
+    
+                <Frame type="Image" name="ButtonAlertBorder2">
+                    <Anchor side="Top" relative="$parent/$parent/Button" pos="Min" offset="-17"/>
+                    <Anchor side="Left" relative="$parent/$parent/Button" pos="Min" offset="-13"/>
+                    <Anchor side="Right" relative="$parent/$parent/Button" pos="Max" offset="13"/>
+                    <Height val="92"/>
+                    <Texture val="@UI/Storm_UI_Holopanel_Button_Border2"/>
+                    <TextureType val="Nineslice"/>
+                    <Animation name="Neon">
+                        <Event event="OnShown" action="Play"/>
+                        <Event event="OnMouseEnter" action="Play" frame="$parent/$parent"/>
+                        <Controller type="Fade" end="Loop">
+                            <Key type="Curve" time="0" value="0" in="Step"/>
+                            <Key type="Curve" time=".2" value="0" in="Step"/>
+                            <Key type="Curve" time=".4" value="255" in="Step"/>
+                            <Key type="Curve" time=".6" value="102" in="Step"/>
+                            <Key type="Curve" time=".8" value="0" in="Step"/>
+                        </Controller>
+                    </Animation>
+                </Frame>
+                
+                <Frame type="Image" name="ArrowLeft">
+                    <Anchor side="Top" relative="$parent/$parent/Button" pos="Mid" offset="0"/>
+                    <Anchor side="Bottom" relative="$parent/$parent/Button" pos="Mid" offset="0"/>
+                    <Anchor side="Right" relative="$parent/$parent/Button" pos="Min" offset="-4"/>
+                    <Texture val="@UI/Storm_UI_Holopanel_Button_ArrowLeft"/>
+                    <Animation name="ArrowLeft">
+                        <Event event="OnShown" action="Play"/>
+                        <Event event="OnMouseEnter" action="Play" frame="$parent/$parent"/>
+                        <Controller type="Fade" end="Loop">
+                            <Key type="Curve" time="0" value="255" in="Step"/>
+                            <Key type="Curve" time=".2" value="255" in="Step"/>
+                            <Key type="Curve" time=".4" value="255" in="Step"/>
+                            <Key type="Curve" time=".6" value="102" in="Step"/>
+                            <Key type="Curve" time=".8" value="0" in="Step"/>
+                        </Controller>
+                    </Animation>
+                </Frame>
+                
+                <Frame type="Image" name="ArrowRight" template="EnterGamePanel/EnterGamePanelTemplate/MainEnterGamePanel/ButtonAlertContainer/ArrowLeft">
+                    <TextureCoords top="0" left="1" bottom="1" right="0"/>
+                    <Anchor side="Right" relative="$parent/$parent/Button" pos="Max" offset="44"/>
+                    <Anchor side="Left" relative="$parent/$parent/Button" pos="Max" offset="4"/>
+                </Frame>
+            </Frame>
+
+            <Frame type="Button" name="Button" template="StandardTemplates/StandardButtonTinyTemplate">
+                <Handle val="HeroUnrankedPanel_CancelButton"/>
+                <Anchor side="Bottom" relative="$parent" pos="Max" offset="-20"/>
+                <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+                <Height val="56"/>
+                <Text val="@UI/EnterGamePanel/Button"/>
+                <ClickSound val="@UI_BNet_Cancel"/>
+
+                <Frame type="Image" name="NormalImage">
+                    <Texture val="@UI/Storm_UI_Holopanel_Button" layer="0"/>
+                    <Texture val="@UI/Storm_UI_Holopanel_Button" layer="1"/>
+                    <Texture val="@UI/Storm_UI_Holopanel_Button" layer="2"/>
+                    <Texture val="@UI/Storm_UI_Holopanel_Button" layer="3"/>
+                </Frame>
+        
+                <Frame type="Image" name="HoverImage">
+                    <Texture val="@UI/Storm_UI_Holopanel_Button_Active" layer="0"/>
+                    <Texture val="@UI/Storm_UI_Holopanel_Button_Active" layer="1"/>
+                    <Texture val="@UI/Storm_UI_Holopanel_Button_Active" layer="2"/>
+                    <Texture val="@UI/Storm_UI_Holopanel_Button_Active" layer="3"/>
+                </Frame>
+        
+                <Frame type="Label" name="Label">
+                    <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                    <Style val="HoloPanelButton"/>
+                </Frame>
+                
+                <Frame type="Frame" name="HitTestFrame">
+                    <Anchor side="Top" relative="$parent" pos="Min" offset="15"/>
+                    <Anchor side="Bottom" relative="$parent" pos="Max" offset="-15"/>
+                    <Anchor side="Left" relative="$parent" pos="Min" offset="15"/>
+                    <Anchor side="Right" relative="$parent" pos="Max" offset="-15"/>
+                </Frame>
+            </Frame>
+
+            <Frame type="Button" name="FirstButton" template="StandardTemplates/HeroSelectButton">
+                <Anchor side="Bottom" relative="$parent" pos="Max" offset="-20"/>
+                <Anchor side="Right" relative="$parent" pos="Mid" offset="12"/>
+                <Height val="68"/>
+                <Width val="203"/>
+                <ClickSound val="@UI_BNet_Cancel"/>
+
+                <Frame type="Image" name="NormalImage">
+                    <Texture val="@UI/Storm_UI_Holopanel_DualButton" layer="0"/>
+                    <Texture val="@UI/Storm_UI_Holopanel_DualButton" layer="1"/>
+                    <Texture val="@UI/Storm_UI_Holopanel_DualButton" layer="2"/>
+                    <Texture val="@UI/Storm_UI_Holopanel_DualButton" layer="3"/>
+                </Frame>
+        
+                <Frame type="Image" name="HoverImage">
+                    <Texture val="@UI/Storm_UI_Holopanel_DualButton_Active" layer="0"/>
+                    <Texture val="@UI/Storm_UI_Holopanel_DualButton_Active" layer="1"/>
+                    <Texture val="@UI/Storm_UI_Holopanel_DualButton_Active" layer="2"/>
+                    <Texture val="@UI/Storm_UI_Holopanel_DualButton_Active" layer="3"/>
+                </Frame>
+        
+                <Frame type="Label" name="Label">
+                    <Anchor side="Top" relative="$parent" pos="Min" offset="15"/>
+                    <Anchor side="Bottom" relative="$parent" pos="Max" offset="-15"/>
+                    <Anchor side="Left" relative="$parent" pos="Min" offset="15"/>
+                    <Anchor side="Right" relative="$parent" pos="Max" offset="-15"/>
+                    <Style val="HoloPanelButton"/>
+                </Frame>
+                
+                <Frame type="Frame" name="HitTestFrame">
+                    <HitTestTexture val="@UI/Storm_StandardButton_Play_Dual_HitArea"/>
+                </Frame>
+            </Frame>
+
+            <Frame type="Button" name="SecondButton" template="StandardTemplates/HeroSelectButton">
+                <Anchor side="Bottom" relative="$parent" pos="Max" offset="-20"/>
+                <Anchor side="Left" relative="$parent" pos="Mid" offset="-12"/>
+                <Height val="68"/>
+                <Width val="203"/>
+                <ClickSound val="@UI_BNet_StartGame"/>
+
+                <Frame type="Image" name="NormalImage">
+                    <Texture val="@UI/Storm_UI_Holopanel_DualButton" layer="0"/>
+                    <Texture val="@UI/Storm_UI_Holopanel_DualButton" layer="1"/>
+                    <Texture val="@UI/Storm_UI_Holopanel_DualButton" layer="2"/>
+                    <Texture val="@UI/Storm_UI_Holopanel_DualButton" layer="3"/>
+                    <TextureCoords top="0.0" left="1.0" bottom="1.0" right="0.0" layer="0"/>
+                    <TextureCoords top="0.0" left="1.0" bottom="1.0" right="0.0" layer="1"/>
+                    <TextureCoords top="0.0" left="1.0" bottom="1.0" right="0.0" layer="2"/>
+                    <TextureCoords top="0.0" left="1.0" bottom="1.0" right="0.0" layer="3"/>
+                </Frame>
+        
+                <Frame type="Image" name="HoverImage">
+                    <Texture val="@UI/Storm_UI_Holopanel_DualButton_Active" layer="0"/>
+                    <Texture val="@UI/Storm_UI_Holopanel_DualButton_Active" layer="1"/>
+                    <Texture val="@UI/Storm_UI_Holopanel_DualButton_Active" layer="2"/>
+                    <Texture val="@UI/Storm_UI_Holopanel_DualButton_Active" layer="3"/>
+                    <TextureCoords top="0.0" left="1.0" bottom="1.0" right="0.0" layer="0"/>
+                    <TextureCoords top="0.0" left="1.0" bottom="1.0" right="0.0" layer="1"/>
+                    <TextureCoords top="0.0" left="1.0" bottom="1.0" right="0.0" layer="2"/>
+                    <TextureCoords top="0.0" left="1.0" bottom="1.0" right="0.0" layer="3"/>
+                </Frame>
+        
+                <Frame type="Label" name="Label">
+                    <Anchor side="Top" relative="$parent" pos="Min" offset="15"/>
+                    <Anchor side="Bottom" relative="$parent" pos="Max" offset="-15"/>
+                    <Anchor side="Left" relative="$parent" pos="Min" offset="15"/>
+                    <Anchor side="Right" relative="$parent" pos="Max" offset="-15"/>
+                    <Style val="HoloPanelButton"/>
+                </Frame>
+                
+                <Frame type="Frame" name="HitTestFrame">
+                    <HitTestTexture val="@UI/Storm_StandardButton_Play_Dual_HitArea"/>
+                </Frame>
+            </Frame>
+        </Frame>
+        
+        <Frame type="Frame" name="MatchCountdownPanel">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+            <Height val="500"/>
+            <Width val="1920"/>
+            
+            <Frame type="Label" name="CountdownTitleLabel">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="30"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+                <Style val="EnterGameCountdownTitle"/>
+                <Text val="@UI/EnterGamePanel/CountdownTitle"/>
+            </Frame>
+            
+            <Frame type="Frame" name="CountdownFrame">
+                <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Top" relative="$parent" pos="Min" offset="-135"/>
+                <Width val="500"/>
+                <Height val="500"/>
+                
+                <Animation name="Begin">
+                    <Event event="Begin" action="Restart,Play" frame="$parent"/>
+
+                    <Controller type="Event" end="Stop" frame="Countdown5">
+							<Key type="Event" time="0" event="Trigger"/>
+					</Controller>
+					<Controller type="Event" end="Stop" frame="Countdown4">
+							<Key type="Event" time="1" event="Trigger"/>
+					</Controller>
+					<Controller type="Event" end="Stop" frame="Countdown3">
+							<Key type="Event" time="2" event="Trigger"/>
+					</Controller>
+					<Controller type="Event" end="Stop" frame="Countdown2">
+							<Key type="Event" time="3" event="Trigger"/>
+					</Controller>
+					<Controller type="Event" end="Stop" frame="Countdown1">
+							<Key type="Event" time="4" event="Trigger"/>
+					</Controller>
+                    <Controller type="Sound" end="Stop">
+                        <Key type="Sound" time="0.2" sound="@UI_BNet_Countdown"/>
+                    </Controller>
+                </Animation>
+                
+                <Frame type="Image" name="CountdownGlare5">
+                    <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+                    <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+                    <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+                    <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+                    <Texture val="@UI/Storm_HeroSelect_EnterGame_Countdown_glare"/>
+                    <TextureType val="Normal"/>
+                    <Height val="218"/>
+                    <Width val="564"/>
+                    
+                    <Animation name="ShowGlareAnim">
+                        <Event event="Begin" action="Reset" frame="$parent/$parent"/>
+                        <Event event="Begin" action="Play" frame="$parent/$parent"/>
+                        
+                        <Controller type="Fade" end="Pause">
+                            <Key type="Curve" time="0.0" value="255" out="Auto"/>
+                            <Key type="Curve" time="0.2" value="255" in="Auto"/>
+                            <Key type="Curve" time="0.4" value="255" in="linear" out="linear"/>
+                            <Key type="Curve" time="1.3" value="0" in="linear" out="linear"/>
+                        </Controller>
+
+                        <Controller type="Dimension" dimension="Width" relative="False" percentage="True" end="Pause">
+                            <Key type="Curve" time="0.0" value="23" out="Auto"/>
+                            <Key type="Curve" time="0.2" value="23" out="Auto"/>
+                            <Key type="Curve" time="0.4" value="69" in="linear" out="linear"/>
+                            <Key type="Curve" time="1.3" value="100" in="linear" out="linear"/>
+                        </Controller>
+                        
+                        <Controller type="Dimension" dimension="Height" relative="False" percentage="True" end="Pause">
+                            <Key type="Curve" time="0.0" value="31" out="Auto"/>
+                            <Key type="Curve" time="0.2" value="31" out="Auto"/>
+                            <Key type="Curve" time="0.4" value="60" in="linear" out="linear"/>
+                            <Key type="Curve" time="1.3" value="195" in="linear" out="linear"/>
+                        </Controller>               
+                    </Animation>
+                </Frame>
+                
+                <Frame type="Image" name="Countdown5" template="EnterGamePanel/CountdownNumberTemplate">
+                    <Texture val="@UI/Storm_HeroSelect_EnterGame_Countdown_5"/>
+					<Frame type="Image" name="NumberGlareImage">
+						<Texture val="@UI/Storm_HeroSelect_EnterGame_Countdown_5" layer="0"/>
+					</Frame>
+                </Frame>
+                
+                <Frame type="Image" name="LensFlare5">
+                    <Anchor side="Left" relative="$parent/Countdown5" pos="Mid" offset="-20"/>
+                    <Anchor side="Top" relative="$parent/Countdown5" pos="Mid" offset="-75"/>
+                    <Anchor side="Right" relative="$parent/Countdown5" pos="Mid" offset="-20"/>
+                    <Anchor side="Bottom" relative="$parent/Countdown5" pos="Mid" offset="-75"/>
+                    <Texture val="@UI/Storm_HeroSelect_EnterGame_Countdown_lensflare"/>
+                    <TextureType val="Normal"/>
+                    <Height val="351"/>
+                    <Width val="394"/>
+                    <BlendMode val="Add"/>
+                    
+                    <Animation name="LensFlareAnim">
+                        <Event event="Begin" action="Reset" frame="$parent/$parent"/>
+                        <Event event="Begin" action="Play" frame="$parent/$parent"/>
+                        
+                        <Controller type="Fade" end="Pause">
+                            <Key type="Curve" time="0.0" value="255" out="Auto"/>
+                            <Key type="Curve" time="0.2" value="178" in="Auto"/>
+                            <Key type="Curve" time="0.9" value="155" in="Auto"/>
+                            <Key type="Curve" time="1.0" value="0" in="Auto"/>
+                        </Controller>
+
+                        <Controller type="Anchor" end="Pause" side="Top" relative="true">
+                            <Key type="Curve" time="0.0" value="-50" out="Auto"/>
+                            <Key type="Curve" time="0.2" value="90" in="linear" out="linear"/>
+                            <Key type="Curve" time="0.9" value="160" in="linear" out="linear"/>
+                        </Controller>
+                        
+                        <Controller type="Anchor" end="Pause" side="Bottom" relative="true">
+                            <Key type="Curve" time="0.0" value="-50" out="Auto"/>
+                            <Key type="Curve" time="0.2" value="-70" in="linear" out="linear"/>
+                            <Key type="Curve" time="0.9" value="-105" in="linear" out="linear"/>
+                        </Controller>
+                        
+                        <Controller type="Anchor" end="Pause" side="Left" relative="true">
+                            <Key type="Curve" time="0.0" value="-50" out="Auto"/>
+                            <Key type="Curve" time="0.2" value="80" in="linear" out="linear"/>
+                            <Key type="Curve" time="0.9" value="190" in="linear" out="linear"/>
+                        </Controller>
+                        
+                        <Controller type="Anchor" end="Pause" side="Right" relative="true">
+                            <Key type="Curve" time="0.0" value="-20" out="Auto"/>
+                            <Key type="Curve" time="0.2" value="-40" in="linear" out="linear"/>
+                            <Key type="Curve" time="0.9" value="-90" in="linear" out="linear"/>
+                        </Controller>
+                        
+                        <Controller type="Dimension" dimension="Width" relative="False" percentage="False" end="Pause">
+                            <Key type="Curve" time="0.0" value="394" out="Auto"/>
+                            <Key type="Curve" time="0.2" value="210" in="linear" out="linear"/>
+                            <Key type="Curve" time="0.9" value="105" in="linear" out="linear"/>
+                        </Controller>
+                        
+                        <Controller type="Dimension" dimension="Height" relative="False" percentage="False" end="Pause">
+                            <Key type="Curve" time="0.0" value="351" out="Auto"/>
+                            <Key type="Curve" time="0.2" value="187" in="linear" out="linear"/>
+                            <Key type="Curve" time="0.9" value="94" in="linear" out="linear"/>
+                        </Controller>
+                    </Animation>
+                </Frame>
+                
+                <Frame type="Image" name="CountdownGlare4">
+                    <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+                    <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+                    <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+                    <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+                    <Texture val="@UI/Storm_HeroSelect_EnterGame_Countdown_glare"/>
+                    <TextureType val="Normal"/>
+                    <Height val="218"/>
+                    <Width val="564"/>
+                    
+                    <Animation name="ShowGlareAnim">
+                        <Event event="Begin" action="Reset" frame="$parent/$parent"/>
+                        <Event event="Begin" action="Play" frame="$parent/$parent"/>
+                        
+                        <Controller type="Fade" end="Pause">
+                            <Key type="Curve" time="0.0" value="0" out="Auto"/>
+                            <Key type="Curve" time="1.0" value="0" out="Auto"/>
+                            <Key type="Curve" time="1.2" value="255" in="Auto"/>
+                            <Key type="Curve" time="1.4" value="255" in="linear" out="linear"/>
+                            <Key type="Curve" time="2.3" value="0" in="linear" out="linear"/>
+                        </Controller>
+
+                        <Controller type="Dimension" dimension="Width" relative="False" percentage="True" end="Pause">
+                            <Key type="Curve" time="0.0" value="23" out="Auto"/>
+                            <Key type="Curve" time="1.2" value="23" out="Auto"/>
+                            <Key type="Curve" time="1.4" value="69" in="linear" out="linear"/>
+                            <Key type="Curve" time="2.3" value="100" in="linear" out="linear"/>
+                        </Controller>
+                        
+                        <Controller type="Dimension" dimension="Height" relative="False" percentage="True" end="Pause">
+                            <Key type="Curve" time="0.0" value="31" out="Auto"/>
+                            <Key type="Curve" time="1.2" value="31" out="Auto"/>
+                            <Key type="Curve" time="1.4" value="60" in="linear" out="linear"/>
+                            <Key type="Curve" time="2.3" value="195" in="linear" out="linear"/>
+                        </Controller>               
+                    </Animation>
+                </Frame>
+                
+                <Frame type="Image" name="Countdown4" template="EnterGamePanel/CountdownNumberTemplate">
+                    <Texture val="@UI/Storm_HeroSelect_EnterGame_Countdown_4"/>
+					<Frame type="Image" name="NumberGlareImage">
+						<Texture val="@UI/Storm_HeroSelect_EnterGame_Countdown_4" layer="0"/>
+					</Frame>
+                </Frame>
+                
+                <Frame type="Image" name="LensFlare4">
+                    <Anchor side="Left" relative="$parent/Countdown4" pos="Mid" offset="-20"/>
+                    <Anchor side="Top" relative="$parent/Countdown4" pos="Mid" offset="0"/>
+                    <Anchor side="Right" relative="$parent/Countdown4" pos="Mid" offset="-20"/>
+                    <Anchor side="Bottom" relative="$parent/Countdown4" pos="Mid" offset="0"/>
+                    <Texture val="@UI/Storm_HeroSelect_EnterGame_Countdown_lensflare"/>
+                    <TextureType val="Normal"/>
+                    <Height val="351"/>
+                    <Width val="394"/>
+                    <BlendMode val="Add"/>
+                    
+                    <Animation name="LensFlareAnim">
+                        <Event event="Begin" action="Reset" frame="$parent/$parent"/>
+                        <Event event="Begin" action="Play" frame="$parent/$parent"/>
+                        
+                        <Controller type="Fade" end="Pause">
+                            <Key type="Curve" time="0.0" value="0" out="Auto"/>
+                            <Key type="Curve" time="0.99" value="0" out="Auto"/>
+                            <Key type="Curve" time="1.0" value="255" out="Auto"/>
+                            <Key type="Curve" time="1.2" value="178" in="Auto"/>
+                            <Key type="Curve" time="1.9" value="155" in="Auto"/>
+                            <Key type="Curve" time="2.0" value="0" in="Auto"/>
+                        </Controller>
+
+                        <Controller type="Anchor" end="Pause" side="Top" relative="true">
+                            <Key type="Curve" time="0.0" value="0" out="Auto"/>
+                            <Key type="Curve" time="1.0" value="0" out="Auto"/>
+                            <Key type="Curve" time="1.2" value="-60" in="linear" out="linear"/>
+                            <Key type="Curve" time="1.4" value="-60" in="linear" out="linear"/>
+                            <Key type="Curve" time="1.9" value="-50" in="linear" out="linear"/>
+                        </Controller>
+                        
+                        <Controller type="Anchor" end="Pause" side="Bottom" relative="true">
+                            <Key type="Curve" time="0.0" value="0" out="Auto"/>
+                            <Key type="Curve" time="1.0" value="0" out="Auto"/>
+                            <Key type="Curve" time="1.2" value="-55" in="linear" out="linear"/>
+                            <Key type="Curve" time="1.4" value="-55" in="linear" out="linear"/>
+                            <Key type="Curve" time="1.9" value="-50" in="linear" out="linear"/>
+                        </Controller>
+                        
+                        <Controller type="Anchor" end="Pause" side="Left" relative="true">
+                            <Key type="Curve" time="0.0" value="-20" out="Auto"/>
+                            <Key type="Curve" time="1.0" value="-20" out="Auto"/>
+                            <Key type="Curve" time="1.2" value="20" in="linear" out="linear"/>
+                            <Key type="Curve" time="1.4" value="30" in="linear" out="linear"/>
+                            <Key type="Curve" time="1.9" value="130" in="linear" out="linear"/>
+                        </Controller>
+                        
+                        <Controller type="Anchor" end="Pause" side="Right" relative="true">
+                            <Key type="Curve" time="0.0" value="-20" out="Auto"/>
+                            <Key type="Curve" time="1.0" value="-20" out="Auto"/>
+                            <Key type="Curve" time="1.2" value="20" in="linear" out="linear"/>
+                            <Key type="Curve" time="1.4" value="30" in="linear" out="linear"/>
+                            <Key type="Curve" time="1.9" value="-50" in="linear" out="linear"/>
+                        </Controller>
+                        
+                        <Controller type="Dimension" dimension="Width" relative="False" percentage="False" end="Pause">
+                            <Key type="Curve" time="0.0" value="394" out="Auto"/>
+                            <Key type="Curve" time="1.0" value="394" out="Auto"/>
+                            <Key type="Curve" time="1.2" value="210" in="linear" out="linear"/>
+                            <Key type="Curve" time="1.9" value="105" in="linear" out="linear"/>
+                        </Controller>
+                        
+                        <Controller type="Dimension" dimension="Height" relative="False" percentage="False" end="Pause">
+                            <Key type="Curve" time="0.0" value="351" out="Auto"/>
+                            <Key type="Curve" time="1.0" value="351" out="Auto"/>
+                            <Key type="Curve" time="1.2" value="187" in="linear" out="linear"/>
+                            <Key type="Curve" time="1.9" value="94" in="linear" out="linear"/>
+                        </Controller>
+                    </Animation>
+                </Frame>
+                
+                <Frame type="Image" name="CountdownGlare3">
+                    <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+                    <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+                    <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+                    <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+                    <Texture val="@UI/Storm_HeroSelect_EnterGame_Countdown_glare"/>
+                    <TextureType val="Normal"/>
+                    <Height val="218"/>
+                    <Width val="564"/>
+                    
+                    <Animation name="ShowGlareAnim">
+                        <Event event="Begin" action="Reset" frame="$parent/$parent"/>
+                        <Event event="Begin" action="Play" frame="$parent/$parent"/>
+                        
+                        <Controller type="Fade" end="Pause">
+                            <Key type="Curve" time="0.0" value="0" out="Auto"/>
+                            <Key type="Curve" time="2.0" value="0" out="Auto"/>
+                            <Key type="Curve" time="2.2" value="255" in="Auto"/>
+                            <Key type="Curve" time="2.4" value="255" in="linear" out="linear"/>
+                            <Key type="Curve" time="3.3" value="0" in="linear" out="linear"/>
+                        </Controller>
+
+                        <Controller type="Dimension" dimension="Width" relative="False" percentage="True" end="Pause">
+                            <Key type="Curve" time="0.0" value="23" out="Auto"/>
+                            <Key type="Curve" time="2.2" value="23" out="Auto"/>
+                            <Key type="Curve" time="2.4" value="69" in="linear" out="linear"/>
+                            <Key type="Curve" time="3.3" value="100" in="linear" out="linear"/>
+                        </Controller>
+                        
+                        <Controller type="Dimension" dimension="Height" relative="False" percentage="True" end="Pause">
+                            <Key type="Curve" time="0.0" value="31" out="Auto"/>
+                            <Key type="Curve" time="2.2" value="31" out="Auto"/>
+                            <Key type="Curve" time="2.4" value="60" in="linear" out="linear"/>
+                            <Key type="Curve" time="3.3" value="195" in="linear" out="linear"/>
+                        </Controller>               
+                    </Animation>
+                </Frame>
+                
+                <Frame type="Image" name="Countdown3" template="EnterGamePanel/CountdownNumberTemplate">
+                    <Texture val="@UI/Storm_HeroSelect_EnterGame_Countdown_3"/>
+					<Frame type="Image" name="NumberGlareImage">
+						<Texture val="@UI/Storm_HeroSelect_EnterGame_Countdown_3" layer="0"/>
+					</Frame>
+                </Frame>
+                
+                <Frame type="Image" name="LensFlare3">
+                    <Anchor side="Left" relative="$parent/Countdown3" pos="Mid" offset="-30"/>
+                    <Anchor side="Top" relative="$parent/Countdown3" pos="Mid" offset="-70"/>
+                    <Anchor side="Right" relative="$parent/Countdown3" pos="Mid" offset="-30"/>
+                    <Anchor side="Bottom" relative="$parent/Countdown3" pos="Mid" offset="-70"/>
+                    <Texture val="@UI/Storm_HeroSelect_EnterGame_Countdown_lensflare"/>
+                    <TextureType val="Normal"/>
+                    <Height val="351"/>
+                    <Width val="394"/>
+                    <BlendMode val="Add"/>
+                    
+                    <Animation name="LensFlareAnim">
+                        <Event event="Begin" action="Reset" frame="$parent/$parent"/>
+                        <Event event="Begin" action="Play" frame="$parent/$parent"/>
+                        
+                        <Controller type="Fade" end="Pause">
+                            <Key type="Curve" time="0.0" value="0" out="Auto"/>
+                            <Key type="Curve" time="1.99" value="0" out="Auto"/>
+                            <Key type="Curve" time="2.0" value="255" out="Auto"/>
+                            <Key type="Curve" time="2.2" value="178" in="Auto"/>
+                            <Key type="Curve" time="2.9" value="155" in="Auto"/>
+                            <Key type="Curve" time="3.0" value="0" in="Auto"/>
+                        </Controller>
+
+                        <Controller type="Anchor" end="Pause" side="Top" relative="true">
+                            <Key type="Curve" time="0.0" value="-40" out="Auto"/>
+                            <Key type="Curve" time="2.0" value="-40" out="Auto"/>
+                            <Key type="Curve" time="2.2" value="7" in="linear" out="linear"/>
+                            <Key type="Curve" time="2.7" value="20" in="linear" out="linear"/>
+                            <Key type="Curve" time="2.9" value="35" in="linear" out="linear"/>
+                        </Controller>
+                        
+                        <Controller type="Anchor" end="Pause" side="Bottom" relative="true">
+                            <Key type="Curve" time="0.0" value="-40" out="Auto"/>
+                            <Key type="Curve" time="2.0" value="-40" out="Auto"/>
+                            <Key type="Curve" time="2.2" value="7" in="linear" out="linear"/>
+                            <Key type="Curve" time="2.7" value="20" in="linear" out="linear"/>
+                            <Key type="Curve" time="2.9" value="35" in="linear" out="linear"/>
+                        </Controller>
+                        
+                        <Controller type="Anchor" end="Pause" side="Left" relative="true">
+                            <Key type="Curve" time="0.0" value="-30" out="Auto"/>
+                            <Key type="Curve" time="2.0" value="-30" out="Auto"/>
+                            <Key type="Curve" time="2.2" value="40" in="linear" out="linear"/>
+                            <Key type="Curve" time="2.7" value="60" in="linear" out="linear"/>
+                            <Key type="Curve" time="2.9" value="65" in="linear" out="linear"/>
+                        </Controller>
+                        
+                        <Controller type="Anchor" end="Pause" side="Right" relative="true">
+                            <Key type="Curve" time="0.0" value="-30" out="Auto"/>
+                            <Key type="Curve" time="2.0" value="-30" out="Auto"/>
+                            <Key type="Curve" time="2.2" value="40" in="linear" out="linear"/>
+                            <Key type="Curve" time="2.7" value="60" in="linear" out="linear"/>
+                            <Key type="Curve" time="2.9" value="65" in="linear" out="linear"/>
+                        </Controller>
+                        
+                        <Controller type="Dimension" dimension="Width" relative="False" percentage="False" end="Pause">
+                            <Key type="Curve" time="0.0" value="394" out="Auto"/>
+                            <Key type="Curve" time="2.0" value="394" out="Auto"/>
+                            <Key type="Curve" time="2.2" value="210" in="linear" out="linear"/>
+                            <Key type="Curve" time="2.9" value="105" in="linear" out="linear"/>
+                        </Controller>
+                        
+                        <Controller type="Dimension" dimension="Height" relative="False" percentage="False" end="Pause">
+                            <Key type="Curve" time="0.0" value="351" out="Auto"/>
+                            <Key type="Curve" time="2.0" value="351" out="Auto"/>
+                            <Key type="Curve" time="2.2" value="187" in="linear" out="linear"/>
+                            <Key type="Curve" time="2.9" value="94" in="linear" out="linear"/>
+                        </Controller>
+                    </Animation>
+                </Frame>
+                
+                <Frame type="Image" name="CountdownGlare2">
+                    <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+                    <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+                    <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+                    <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+                    <Texture val="@UI/Storm_HeroSelect_EnterGame_Countdown_glare"/>
+                    <TextureType val="Normal"/>
+                    <Height val="218"/>
+                    <Width val="564"/>
+                    
+                    <Animation name="ShowGlareAnim">
+                        <Event event="Begin" action="Reset" frame="$parent/$parent"/>
+                        <Event event="Begin" action="Play" frame="$parent/$parent"/>
+                        
+                        <Controller type="Fade" end="Pause">
+                            <Key type="Curve" time="0.0" value="0" out="Auto"/>
+                            <Key type="Curve" time="3.0" value="0" out="Auto"/>
+                            <Key type="Curve" time="3.2" value="255" in="Auto"/>
+                            <Key type="Curve" time="3.4" value="255" in="linear" out="linear"/>
+                            <Key type="Curve" time="4.3" value="0" in="linear" out="linear"/>
+                        </Controller>
+
+                        <Controller type="Dimension" dimension="Width" relative="False" percentage="True" end="Pause">
+                            <Key type="Curve" time="0.0" value="23" out="Auto"/>
+                            <Key type="Curve" time="3.2" value="23" out="Auto"/>
+                            <Key type="Curve" time="3.4" value="69" in="linear" out="linear"/>
+                            <Key type="Curve" time="4.3" value="100" in="linear" out="linear"/>
+                        </Controller>
+                        
+                        <Controller type="Dimension" dimension="Height" relative="False" percentage="True" end="Pause">
+                            <Key type="Curve" time="0.0" value="31" out="Auto"/>
+                            <Key type="Curve" time="3.2" value="31" out="Auto"/>
+                            <Key type="Curve" time="3.4" value="60" in="linear" out="linear"/>
+                            <Key type="Curve" time="4.3" value="195" in="linear" out="linear"/>
+                        </Controller>               
+                    </Animation>
+                </Frame>
+                
+                <Frame type="Image" name="Countdown2" template="EnterGamePanel/CountdownNumberTemplate">
+                    <Texture val="@UI/Storm_HeroSelect_EnterGame_Countdown_2"/>
+					<Frame type="Image" name="NumberGlareImage">
+						<Texture val="@UI/Storm_HeroSelect_EnterGame_Countdown_2" layer="0"/>
+					</Frame>
+                </Frame>
+                
+                <Frame type="Image" name="LensFlare2">
+                    <Anchor side="Left" relative="$parent/Countdown2" pos="Mid" offset="-30"/>
+                    <Anchor side="Top" relative="$parent/Countdown2" pos="Mid" offset="-75"/>
+                    <Anchor side="Right" relative="$parent/Countdown2" pos="Mid" offset="-30"/>
+                    <Anchor side="Bottom" relative="$parent/Countdown2" pos="Mid" offset="-75"/>
+                    <Texture val="@UI/Storm_HeroSelect_EnterGame_Countdown_lensflare"/>
+                    <TextureType val="Normal"/>
+                    <Height val="351"/>
+                    <Width val="394"/>
+                    <BlendMode val="Add"/>
+                    
+                    <Animation name="LensFlareAnim">
+                        <Event event="Begin" action="Reset" frame="$parent/$parent"/>
+                        <Event event="Begin" action="Play" frame="$parent/$parent"/>
+                        
+                        <Controller type="Fade" end="Pause">
+                            <Key type="Curve" time="0.0" value="0" out="Auto"/>
+                            <Key type="Curve" time="2.99" value="0" out="Auto"/>
+                            <Key type="Curve" time="3.0" value="255" out="Auto"/>
+                            <Key type="Curve" time="3.2" value="178" in="Auto"/>
+                            <Key type="Curve" time="3.9" value="155" in="Auto"/>
+                            <Key type="Curve" time="4.0" value="0" in="Auto"/>
+                        </Controller>
+
+                        <Controller type="Anchor" end="Pause" side="Top" relative="true">
+                            <Key type="Curve" time="0.0" value="-40" out="Auto"/>
+                            <Key type="Curve" time="3.0" value="-40" out="Auto"/>
+                            <Key type="Curve" time="3.2" value="10" in="linear" out="linear"/>
+                            <Key type="Curve" time="3.7" value="25" in="linear" out="linear"/>
+                            <Key type="Curve" time="3.9" value="35" in="linear" out="linear"/>
+                        </Controller>
+                        
+                        <Controller type="Anchor" end="Pause" side="Bottom" relative="true">
+                            <Key type="Curve" time="0.0" value="-40" out="Auto"/>
+                            <Key type="Curve" time="3.0" value="-40" out="Auto"/>
+                            <Key type="Curve" time="3.2" value="10" in="linear" out="linear"/>
+                            <Key type="Curve" time="3.7" value="25" in="linear" out="linear"/>
+                            <Key type="Curve" time="3.9" value="35" in="linear" out="linear"/>
+                        </Controller>
+                        
+                        <Controller type="Anchor" end="Pause" side="Left" relative="true">
+                            <Key type="Curve" time="0.0" value="-30" out="Auto"/>
+                            <Key type="Curve" time="3.0" value="-30" out="Auto"/>
+                            <Key type="Curve" time="3.2" value="40" in="linear" out="linear"/>
+                            <Key type="Curve" time="3.7" value="60" in="linear" out="linear"/>
+                            <Key type="Curve" time="3.9" value="65" in="linear" out="linear"/>
+                        </Controller>
+                        
+                        <Controller type="Anchor" end="Pause" side="Right" relative="true">
+                            <Key type="Curve" time="0.0" value="-30" out="Auto"/>
+                            <Key type="Curve" time="3.0" value="-30" out="Auto"/>
+                            <Key type="Curve" time="3.2" value="40" in="linear" out="linear"/>
+                            <Key type="Curve" time="3.7" value="60" in="linear" out="linear"/>
+                            <Key type="Curve" time="3.9" value="65" in="linear" out="linear"/>
+                        </Controller>
+                        
+                        <Controller type="Dimension" dimension="Width" relative="False" percentage="False" end="Pause">
+                            <Key type="Curve" time="0.0" value="394" out="Auto"/>
+                            <Key type="Curve" time="3.0" value="394" out="Auto"/>
+                            <Key type="Curve" time="3.2" value="210" in="linear" out="linear"/>
+                            <Key type="Curve" time="3.9" value="105" in="linear" out="linear"/>
+                        </Controller>
+                        
+                        <Controller type="Dimension" dimension="Height" relative="False" percentage="False" end="Pause">
+                            <Key type="Curve" time="0.0" value="351" out="Auto"/>
+                            <Key type="Curve" time="3.0" value="351" out="Auto"/>
+                            <Key type="Curve" time="3.2" value="187" in="linear" out="linear"/>
+                            <Key type="Curve" time="3.9" value="94" in="linear" out="linear"/>
+                        </Controller>
+                    </Animation>
+                </Frame>
+                
+                <Frame type="Image" name="CountdownGlare1">
+                    <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+                    <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+                    <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+                    <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+                    <Texture val="@UI/Storm_HeroSelect_EnterGame_Countdown_glare"/>
+                    <TextureType val="Normal"/>
+                    <Height val="218"/>
+                    <Width val="564"/>
+                    
+                    <Animation name="ShowGlareAnim">
+                        <Event event="Begin" action="Reset" frame="$parent/$parent"/>
+                        <Event event="Begin" action="Play" frame="$parent/$parent"/>
+                        
+                        <Controller type="Fade" end="Pause">
+                            <Key type="Curve" time="0.0" value="0" out="Auto"/>
+                            <Key type="Curve" time="4.0" value="0" out="Auto"/>
+                            <Key type="Curve" time="4.2" value="255" in="Auto"/>
+                            <Key type="Curve" time="4.4" value="255" in="linear" out="linear"/>
+                            <Key type="Curve" time="5.3" value="0" in="linear" out="linear"/>
+                        </Controller>
+
+                        <Controller type="Dimension" dimension="Width" relative="False" percentage="True" end="Pause">
+                            <Key type="Curve" time="0.0" value="23" out="Auto"/>
+                            <Key type="Curve" time="4.2" value="23" out="Auto"/>
+                            <Key type="Curve" time="4.4" value="69" in="linear" out="linear"/>
+                            <Key type="Curve" time="5.3" value="100" in="linear" out="linear"/>
+                        </Controller>
+                        
+                        <Controller type="Dimension" dimension="Height" relative="False" percentage="True" end="Pause">
+                            <Key type="Curve" time="0.0" value="31" out="Auto"/>
+                            <Key type="Curve" time="4.2" value="31" out="Auto"/>
+                            <Key type="Curve" time="4.4" value="60" in="linear" out="linear"/>
+                            <Key type="Curve" time="5.3" value="195" in="linear" out="linear"/>
+                        </Controller>               
+                    </Animation>
+                </Frame>
+                
+                <Frame type="Image" name="Countdown1" template="EnterGamePanel/CountdownNumberTemplate">
+                    <Texture val="@UI/Storm_HeroSelect_EnterGame_Countdown_1"/>
+					<Frame type="Image" name="NumberGlareImage">
+						<Texture val="@UI/Storm_HeroSelect_EnterGame_Countdown_1" layer="0"/>
+					</Frame>
+                </Frame>
+                
+                <Frame type="Image" name="LensFlare1">
+                    <Anchor side="Left" relative="$parent/Countdown1" pos="Mid" offset="-10"/>
+                    <Anchor side="Top" relative="$parent/Countdown1" pos="Mid" offset="-55"/>
+                    <Anchor side="Right" relative="$parent/Countdown1" pos="Mid" offset="-10"/>
+                    <Anchor side="Bottom" relative="$parent/Countdown1" pos="Mid" offset="-55"/>
+                    <Texture val="@UI/Storm_HeroSelect_EnterGame_Countdown_lensflare"/>
+                    <TextureType val="Normal"/>
+                    <Height val="351"/>
+                    <Width val="394"/>
+                    <BlendMode val="Add"/>
+                    
+                    <Animation name="LensFlareAnim">
+                        <Event event="Begin" action="Reset" frame="$parent/$parent"/>
+                        <Event event="Begin" action="Play" frame="$parent/$parent"/>
+                        
+                        <Controller type="Fade" end="Pause">
+                            <Key type="Curve" time="0.0" value="0"/>
+                            <Key type="Curve" time="3.99" value="0"/>
+                            <Key type="Curve" time="4.0" value="255"/>
+                            <Key type="Curve" time="4.2" value="178"/>
+                            <Key type="Curve" time="4.9" value="130"/>
+                            <Key type="Curve" time="5" value="0"/>
+                        </Controller>
+
+                        <Controller type="Anchor" end="Pause" side="Top" relative="true">
+                            <Key type="Curve" time="0.0" value="-40" out="Auto"/>
+                            <Key type="Curve" time="4.0" value="-40" out="Auto"/>
+                            <Key type="Curve" time="4.2" value="-10" in="linear" out="linear"/>
+                            <Key type="Curve" time="4.7" value="0" in="linear" out="linear"/>
+                            <Key type="Curve" time="4.9" value="5" in="linear" out="linear"/>
+                        </Controller>
+                        
+                        <Controller type="Anchor" end="Pause" side="Bottom" relative="true">
+                            <Key type="Curve" time="0.0" value="-40" out="Auto"/>
+                            <Key type="Curve" time="4.0" value="-40" out="Auto"/>
+                            <Key type="Curve" time="4.2" value="-10" in="linear" out="linear"/>
+                            <Key type="Curve" time="4.7" value="0" in="linear" out="linear"/>
+                            <Key type="Curve" time="4.9" value="5" in="linear" out="linear"/>
+                        </Controller>
+                        
+                        <Controller type="Anchor" end="Pause" side="Left" relative="true">
+                            <Key type="Curve" time="0.0" value="-30" out="Auto"/>
+                            <Key type="Curve" time="4.0" value="-30" out="Auto"/>
+                            <Key type="Curve" time="4.2" value="15" in="linear" out="linear"/>
+                            <Key type="Curve" time="4.7" value="30" in="linear" out="linear"/>
+                            <Key type="Curve" time="4.9" value="30" in="linear" out="linear"/>
+                        </Controller>
+                        
+                        <Controller type="Anchor" end="Pause" side="Right" relative="true">
+                            <Key type="Curve" time="0.0" value="-30" out="Auto"/>
+                            <Key type="Curve" time="4.0" value="-30" out="Auto"/>
+                            <Key type="Curve" time="4.2" value="15" in="linear" out="linear"/>
+                            <Key type="Curve" time="4.7" value="30" in="linear" out="linear"/>
+                            <Key type="Curve" time="4.9" value="30" in="linear" out="linear"/>
+                        </Controller>
+                        
+                        <Controller type="Dimension" dimension="Width" relative="False" percentage="False" end="Pause">
+                            <Key type="Curve" time="0.0" value="394" out="Auto"/>
+                            <Key type="Curve" time="4.0" value="394" out="Auto"/>
+                            <Key type="Curve" time="4.2" value="210" in="linear" out="linear"/>
+                            <Key type="Curve" time="4.9" value="105" in="linear" out="linear"/>
+                        </Controller>
+                        
+                        <Controller type="Dimension" dimension="Height" relative="False" percentage="False" end="Pause">
+                            <Key type="Curve" time="0.0" value="351" out="Auto"/>
+                            <Key type="Curve" time="4.0" value="351" out="Auto"/>
+                            <Key type="Curve" time="4.2" value="187" in="linear" out="linear"/>
+                            <Key type="Curve" time="4.9" value="94" in="linear" out="linear"/>
+                        </Controller>
+                    </Animation>
+                </Frame>
+            </Frame>
+        </Frame>
+        
+        <Frame type="Image" name="WhiteOut">
+            <Anchor relative="$parent"/>
+            <Color val="ffffff"/>
+            <BlendMode val="Add"/>
+            <Alpha val="0"/>
+            <Visible val="True"/>
+			<RenderType val="LDR"/>
+			<RenderPriority val="512"/>
+            <Animation name="OnShown">
+                <Event event="OnShown" action="Restart,Play"/>
+                <Controller type="Animation" end="Stop" animation="ShowNumberAnim">
+					<Key type="Animation" time="0" action="Restart"/>
+					<Key type="Animation" time="0" action="Stop"/>
+				</Controller>
+            </Animation>
+
+            <Animation name="ShowNumberAnim">
+                <Event event="OnShown" action="Reset,Stop"/>
+                <Event event="Begin" action="Play" frame="$parent/MatchCountdownPanel"/>
+                <Controller type="Fade" end="Stop">
+                    <Key type="Curve" time="0" value="0"/>
+                    <Key type="Curve" time="5.5" value="0" out="Slow"/>
+                    <Key type="Curve" time="6" value="255" in="Fast" out="Step"/>
+                    <Key type="Curve" time="6.1" value="0"/>
+                    <Key type="Curve" time="9" value="0"/>
+                </Controller>
+				<Controller type="Fade" end="Stop" frame="$parent/DoubleWhiteoutImage">
+                    <Key type="Curve" time="0" value="0" out="Step"/>
+                    <Key type="Curve" time="6.1" value="255"/>
+                    <Key type="Curve" time="9" value="255" in="Fast"/>
+                </Controller>
+				<Controller type="Fade" end="Stop" frame="$parent/BlackoutImage">
+                    <Key type="Curve" time="0" value="0"/>
+                    <Key type="Curve" time="6" value="0" out="Slow"/>
+                    <Key type="Curve" time="7" value="255" in="Fast"/>
+					<Key type="Curve" time="9" value="255"/>
+                </Controller>
+
+            </Animation>
+        </Frame>
+		
+		<Frame type="Image" name="DoubleWhiteoutImage">
+			<Anchor relative="$parent"/>
+			<Color val="ffffff"/>
+			<Alpha val="0"/>
+			<RenderPriority val="512"/>
+			<RenderType val="LDR"/>
+		</Frame>
+		
+		<Frame type="Image" name="BlackoutImage">
+			<Anchor relative="$parent"/>
+			<Color val="000000"/>
+			<Alpha val="0"/>
+			<RenderPriority val="513"/>
+			<RenderType val="LDR"/>
+		</Frame>
+
+        <Animation name="SlideIn">
+            <Event event="Show" action="DirectionForward"/>
+            <Event event="Show" action="Play"/>
+            <Event event="Hide" action="DirectionReverse"/>
+            <Event event="Hide" action="Play"/>
+            <Controller type="Sound" end="Pause">
+                <Key type="Sound" time="0.00" sound="@UI_BNet_ActionButton_Show" direction="Forward"/>
+                <Key type="Sound" time="0.40" sound="@UI_BNet_ActionButton_Hide" direction="Reverse"/>
+            </Controller>
+
+            <Controller type="Fade" end="Pause">
+                <Key type="Curve" time="0" value="0" out="Slow"/>
+                <Key type="Curve" time=".4" value="255" in="Slow"/>
+            </Controller>
+
+            <Controller type="Anchor" end="Pause" side="Top" relative="true">
+                <Key type="Curve" time="0" value="-500" out="Auto"/>
+                <Key type="Curve" time=".4" value="0" in="Auto"/>
+            </Controller>
+        </Animation>
+
+        <Animation name="GameReady">
+            <Event event="GameReady" action="Reset"/>
+            <Event event="GameReady" action="Play"/>
+            <Controller type="Sound" end="Pause">
+                <Key type="Sound" time="0.00" sound="@UI_BNet_GameReady"/>
+            </Controller>
+        </Animation>
+    </Frame>
+</Desc>

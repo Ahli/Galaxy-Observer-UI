@@ -1,0 +1,429 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<Desc>
+    <Frame type="UnitStatusFrame" name="PunisherUnitStatusFrameTemplate" template="UnitStatus/SuperCreepUnitStatusFrameTemplate">
+        <Frame type="UnitStatusDurationBar" name="DurationBar" template="UnitStatus/UnitStatusDurationBarTemplate">
+            <Height val="7"/>
+        </Frame>
+    </Frame>
+    
+    <Frame type="Frame" name="SlashAnimationTemplate">
+        <Height val="110"/>
+        <Width val="92"/>
+
+        <Frame type="Image" name="EnemyBossHudLeftSlash1">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="39"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="60"/>
+            <Texture val="@UI/hud_minimap_boe_SliceRight"/>
+            <Alpha val="0"/>
+            
+            <Animation name="PunisherDefeated">
+                <Event event="OnShown" action="Stop"/>
+                <Event event="PunisherDefeated" action="Restart,Play" frame="$parent"/>
+                <Controller type="Fade" end="Pause">
+                    <Key type="Curve" time="0" value="0" out="Fast"/>
+                    <Key type="Curve" time=".03" value="255" out="Fast"/>
+                </Controller>
+                <Controller type="Dimension" dimension="Width" relative="False" percentage="True" end="Pause" >
+                    <Key type="Curve" time="0" value="0"/>
+                    <Key type="Curve" time=".1" value="100"/>
+                </Controller>
+                <Controller type="Dimension" dimension="Height" relative="False" percentage="True" end="Pause" >
+                    <Key type="Curve" time="0" value="0"/>
+                    <Key type="Curve" time=".1" value="100"/>
+                </Controller>
+            </Animation>
+            
+            <Animation name="PunisherRespawned">
+                <Event event="PunisherRespawned" action="Restart,Play" frame="$parent"/>
+                
+                <Controller type="Fade" end="Pause">
+                    <Key type="Curve" time="0" value="255" out="Fast"/>
+                    <Key type="Curve" time=".2" value="0" in="Slow"/>
+                </Controller>
+            </Animation>
+            
+        </Frame>
+        
+        <Frame type="Image" name="EnemyBossHudLeftSlash2">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="41"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="-12"/>
+            <Texture val="@UI/hud_minimap_boe_SliceLeft"/>
+            <Alpha val="0"/>
+            
+            <Animation name="PunisherDefeated">
+                <Event event="OnShown" action="Stop"/>
+                <Event event="PunisherDefeated" action="Restart,Play" frame="$parent"/>
+                
+                <Controller type="Fade" end="Pause">
+                    <Key type="Curve" time="0" value="0" out="Fast"/>
+                    <Key type="Curve" time=".1" value="0" out="Fast"/>
+                    <Key type="Curve" time=".13" value="255" in="Slow"/>
+                </Controller>
+                <Controller type="Dimension" dimension="Width" relative="False" percentage="True" end="Pause">
+                    <Key type="Curve" time="0" value="0"/>
+                    <Key type="Curve" time=".1" value="0"/>
+                    <Key type="Curve" time=".2" value="100"/>
+                </Controller>
+                <Controller type="Dimension" dimension="Height" relative="False" percentage="True" end="Pause">
+                    <Key type="Curve" time="0" value="0"/>
+                    <Key type="Curve" time=".1" value="0"/>
+                    <Key type="Curve" time=".2" value="100"/>
+                </Controller>
+                
+                
+            </Animation>
+            
+            <Animation name="PunisherRespawned">
+                <Event event="PunisherRespawned" action="Restart,Play" frame="$parent"/>
+                <Event event="PunisherDefeated" action="Stop" frame="$parent"/>
+
+                <Controller type="Fade" end="Pause">
+                    <Key type="Curve" time="0" value="255" out="Fast"/>
+                    <Key type="Curve" time=".2" value="0" in="Slow"/>
+                </Controller>
+            </Animation>
+        </Frame>
+    
+        <Animation name="PunisherDefeated">
+            <Event event="PunisherDefeated" action="Restart,Play" frame="$parent"/>
+            
+            <Controller type="Event" end="Stop">
+                <Key type="Event" time="0" event="PunisherDefeated"/>
+            </Controller>
+            <Controller type="Visibility" end="Pause" frame="$parent/PunisherIconOverlay">
+                <Key type="Bool" time="0" value="True"/>
+            </Controller>
+            <Controller type="Fade" end="Pause" frame="$parent/PunisherIconOverlay">
+                <Key type="Curve" time="0" value="0" out="Fast"/>
+                <Key type="Curve" time=".3" value="160" out="Slow"/>
+            </Controller>
+        </Animation>
+        
+        <Animation name="PunisherRespawned">
+            <Event event="PunisherRespawned" action="Restart,Play" frame="$parent"/>
+            
+            <Controller type="Event" end="Stop">
+                <Key type="Event" time="0" event="PunisherRespawned"/>
+            </Controller>
+            <Controller type="Visibility" end="Pause" frame="$parent/PunisherIconOverlay">
+                <Key type="Bool" time=".3" value="True"/>
+            </Controller>
+            <Controller type="Fade" end="Pause" frame="$parent/PunisherIconOverlay">
+                <Key type="Curve" time="0" value="160" out="Fast"/>
+                <Key type="Curve" time=".3" value="0" out="Slow"/>
+            </Controller>
+        </Animation>    
+    </Frame>
+    
+    <Frame type="Image" name="IconOverlayTemplate">
+        <Anchor relative="$parent/PunisherIcon"/>
+        <Texture val="{$parent/PunisherIcon/@Texture}"/>
+        <Visible val="False"/>
+        <Alpha val="0"/>
+        <ColorAdjustMode val="Fill"/> 
+        <AdjustmentColor val="000000"/>
+    </Frame>
+
+    <!--**************************************************************-->
+    <!-- Top Count Label                                              -->
+    <!--**************************************************************-->
+    <Frame type="Frame" name="ArenaPunisherScorePanel">
+        <Anchor relative="$parent"/>
+
+        <Frame type="Frame" name="SkullsFrame">
+            <Anchor relative="$parent"/>
+            
+            <!-- Switching team colors for Score Labels if needed -->
+            <StateGroup name="ScoreLabelStyles">
+                <DefaultState val="Team1IsBlue"/>
+
+                <State name="Team1IsBlue">
+                    <When type="AnimationState" frame="$ancestor[@type=GameUI]/UIContainer" TeamColors="Team1IsBlue"/>
+                    <Action type="SetProperty" frame="Team1Score" style="Storm_MapMechanicScoreAlly"/>
+                    <Action type="SetProperty" frame="Team2Score" style="Storm_MapMechanicScoreEnemy"/>
+                </State>
+                
+                <State name="Team2IsBlue">
+                    <When type="AnimationState" frame="$ancestor[@type=GameUI]/UIContainer" TeamColors="Team2IsBlue"/>
+                    <Action type="SetProperty" frame="Team1Score" style="Storm_MapMechanicScoreEnemy"/>
+                    <Action type="SetProperty" frame="Team2Score" style="Storm_MapMechanicScoreAlly"/>
+                </State>
+            </StateGroup>
+            
+            <Frame type="Image" name="VsImage">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="31"/>
+                <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+                <Texture val="@UI/Storm_UI_Brawl_HUD_Icon_Kill_Points_Purple"/>
+            </Frame>
+
+            <Frame type="Label" name="HelpText">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="90"/>
+                <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+                <Style val="Storm_MapMechanic_MechanicCounterCentered"/>
+            </Frame>
+            
+            <Frame type="Label" name="Team1Score">
+                <Anchor side="Bottom" relative="$parent" pos="Min" offset="73"/>
+                <Anchor side="Right" relative="$parent" pos="Mid" offset="-40"/>
+                <Width val="100"/>
+                <Text val="0"/>
+            </Frame>
+            
+            <Frame type="Label" name="Team2Score">
+                <Anchor side="Bottom" relative="$parent" pos="Min" offset="73"/>
+                <Anchor side="Left" relative="$parent" pos="Mid" offset="44"/>
+                <Width val="100"/>
+                <Text val="0"/>
+            </Frame>
+        </Frame>
+    </Frame>
+
+    <!--**************************************************************-->
+    <!-- Bottom Frame, Punishers info                                 -->
+    <!--**************************************************************-->
+    <Frame type="Frame" name="ArenaPunisherPanel">
+        <Width val="470"/>
+        <Height val="400"/>
+        <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+        <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+
+        <Frame type="Frame" name="PunishersSpawnContainer">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Min" offset="150"/>
+            <Visible val="False"/>
+            
+            <Frame type="Image" name="BackgroundImage">
+                <Anchor side="Top" relative="$parent" pos="Mid" offset="-15"/>
+                <Anchor side="Bottom" relative="$parent" pos="Mid" offset="-15"/>
+                <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+                <Width val="460"/>
+                <Texture val="@UI/HUD_MapMechanic_BG_CenterBar"/>
+            </Frame>
+
+            <Frame type="Image" name="PunisherIcon">
+                <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Right" relative="$parent" pos="Max" offset="-3"/>
+                <Texture val="@UI/Storm_UI_MapMechanic_Shrines_PunisherArcane_Ally"/>
+            </Frame>
+
+            <Frame type="Label" name="InfoLabel">
+                <Anchor side="Top" relative="$parent/BackgroundImage" pos="Min" offset="13"/>
+                <Anchor side="Bottom" relative="$parent/BackgroundImage" pos="Max" offset="0"/>
+                <Anchor side="Left" relative="$parent/BackgroundImage" pos="Min" offset="30"/>
+                <Style val="Storm_MapMechanic_MechanicTimerCentered_Blue"/>
+                <Text val="Summoning punishers"/>
+            </Frame>
+
+            <Frame type="Label" name="TimerLabel">
+                <Anchor side="Top" relative="$parent/BackgroundImage" pos="Min" offset="13"/>
+                <Anchor side="Bottom" relative="$parent/BackgroundImage" pos="Max" offset="0"/>
+                <Anchor side="Left" relative="$parent/InfoLabel" pos="Max" offset="5"/>
+                <Options val=""/>
+                <Style val="Storm_MapMechanic_MechanicTimerCentered_Blue"/>
+                <Text val="-:--"/>
+            </Frame>
+            
+            <Animation name="SlideInOut">
+                <Event event="OnShown" action="Restart,Play"/>
+                <Event event="SlideOut" action="DirectionReverse,Play"/>
+                 
+                <Controller type="Anchor" end="Pause" side="Right" relative="true">
+                    <Key type="Curve" time="0.0" value="500" out="Fast"/>
+                    <Key type="Curve" time="0.25" value="0" in="Fast"/>
+                </Controller>
+                <Controller type="Fade" end="Pause" side="Right" relative="true">
+                    <Key type="Curve" time="0.0" value="0" out="Fast"/>
+                    <Key type="Curve" time="0.25" value="255" in="Fast"/>
+                </Controller>
+            </Animation>
+
+        </Frame>
+        
+        <Frame type="Frame" name="PunishersHealthContainer">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+            <Width val="470"/>
+
+            <Visible val="False"/>
+            
+            <StateGroup name="PunisherHudColors">
+                <DefaultState val="Team1IsBlue"/>
+
+                <State name="Team1IsBlue">
+                    <When type="AnimationState" frame="$ancestor[@type=GameUI]/UIContainer" TeamColors="Team1IsBlue"/>
+                    <Action type="SetProperty" frame="PunisherFrame1/PunisherIcon" texture="@UI/Storm_UI_MapMechanic_Shrines_PunisherArcane_Ally"/>
+                    <Action type="SetProperty" frame="PunisherFrame2/PunisherIcon" texture="@UI/Storm_UI_MapMechanic_Shrines_PunisherArcane_Enemy"/>
+                    <Action type="SetProperty" frame="PunisherFrame1/PunisherHealthLabel" style="Storm_MapMechanic_MechanicTimerCentered_Blue"/>
+                    <Action type="SetProperty" frame="PunisherFrame2/PunisherHealthLabel" style="Storm_MapMechanic_MechanicTimerCentered_Red"/>
+                </State>
+                
+                <State name="Team2IsBlue">
+                    <When type="AnimationState"  frame="$ancestor[@type=GameUI]/UIContainer" TeamColors="Team2IsBlue"/>
+                    <Action type="SetProperty" frame="PunisherFrame1/PunisherIcon" texture="@UI/Storm_UI_MapMechanic_Shrines_PunisherArcane_Enemy"/>
+                    <Action type="SetProperty" frame="PunisherFrame2/PunisherIcon" texture="@UI/Storm_UI_MapMechanic_Shrines_PunisherArcane_Ally"/>
+                    <Action type="SetProperty" frame="PunisherFrame1/PunisherHealthLabel" style="Storm_MapMechanic_MechanicTimerCentered_Red"/>
+                    <Action type="SetProperty" frame="PunisherFrame2/PunisherHealthLabel" style="Storm_MapMechanic_MechanicTimerCentered_Blue"/>
+                </State>
+            </StateGroup>
+    
+            <Frame type="Image" name="BackgroundImage">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="19"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="6"/>
+                <Anchor side="Right" relative="$parent" pos="Max" offset="7"/>
+                <Texture val="@UI/hud_minimap_backplate_large_9s"/>
+                <TextureType val="NineSlice"/>
+            </Frame>
+            
+            <!-- Top/Left Health Frame -->
+            <Frame type="Frame" name="PunisherFrame1">
+                <Anchor side="Left" relative="$parent/BackgroundImage" pos="Min" offset="0"/>
+                <Anchor side="Right" relative="$parent/BackgroundImage" pos="Max" offset="0"/>
+                <Anchor side="Top" relative="$parent/BackgroundImage" pos="Min" offset="-20"/>
+                <Anchor side="Bottom" relative="$parent/BackgroundImage" pos="Max" offset="20"/>
+                
+                <Frame type="Image" name="HealthBarBg">
+                    <Anchor side="Left" relative="$parent/$parent/BackgroundImage" pos="Min" offset="100"/>
+                    <Anchor side="Bottom" relative="$parent/PunisherIcon" pos="Mid" offset="-25"/>
+                    <Anchor side="Top" relative="$parent/PunisherIcon" pos="Mid" offset="-25"/>
+                    <Width val="240"/>
+                    <Height val="22"/>
+                    <Texture val="@UI/HUD_MapMechanic_BG_HealthBar_Right"/>
+                    <TextureType val="NineSlice"/>
+                </Frame>
+                
+                <Frame type="UnitStatusFrame" name="HealthBarFrame" template="MapMechanicPanel/MapMechanicHealthBarTemplate">
+                    <Anchor relative="$parent/HealthBarBg"/>
+                
+                    <Frame type="UnitStatusHealthBar" name="HealthBar" template="UnitStatus/UnitStatusSegmentedHealthBarTemplate">
+                        <Anchor side="Top" relative="$parent" pos="Min" offset="6"/>
+                        <Anchor side="Left" relative="$parent" pos="Min" offset="13"/>
+                        <Height val="9"/>
+                        <Width val="216"/>
+                        <Texture val="@UI/HUD_MapMechanic_HauntedMines_HealthBarTop"/>
+                        <SegmentValue val="1000" index="0"/>
+                        <Expansion val="Right"/>
+                    </Frame>
+                    
+                    <Frame type="UnitStatusHealthLabel" name="HealthLabel">
+                        <ShowPercent val="true"/>
+                        <Visible val="False"/>
+                        <Frame type="Label" name="StatusLabel">
+                            <Anchor relative="$parent"/>
+                        </Frame>
+                    </Frame>
+                </Frame>
+                                
+                <Frame type="Image" name="PunisherIcon">
+                    <Anchor side="Top" relative="$parent" pos="Mid" offset="12"/>
+                    <Anchor side="Bottom" relative="$parent" pos="Mid" offset="12"/>
+                    <Anchor side="Left" relative="$parent" pos="Min" offset="8"/>
+                    <Texture val="@UI/Storm_UI_MapMechanic_Shrines_PunisherArcane_Ally"/>
+                    <TextureCoords top="0" bottom="1" left="1" right="0"/>
+                </Frame>
+                
+                <Frame type="Image" name="PunisherIconOverlay" template="ArenaPunisher/IconOverlayTemplate">
+                    <TextureCoords top="0" bottom="1" left="1" right="0"/>
+                </Frame>
+                
+                <Frame type="Frame" name="SlashAnimation" template="ArenaPunisher/SlashAnimationTemplate">
+                    <Anchor relative="$parent/PunisherIcon"/>
+                    <Frame type="Image" name="EnemyBossHudLeftSlash1">
+                        <Anchor side="Left" relative="$parent" pos="Min" offset="10"/>
+                    </Frame>
+                    <Frame type="Image" name="EnemyBossHudLeftSlash2">
+                        <Anchor side="Right" relative="$parent" pos="Max" offset="-60"/>
+                    </Frame>
+                </Frame>
+
+                <Frame type="Label" name="PunisherHealthLabel">
+                    <Anchor side="Bottom" relative="$parent/$parent/BackgroundImage" pos="Max" offset="18"/>
+                    <Anchor side="Left" relative="$parent/PunisherIcon" pos="Mid" offset="-26"/>
+                    <Anchor side="Right" relative="$parent/PunisherIcon" pos="Mid" offset="-26"/>
+                    <Width val="100"/>
+                    <Style val="Storm_MapMechanic_MechanicTimerCentered_Blue"/>
+                    <Text val="{$parent/HealthBarFrame/HealthLabel/StatusLabel/@Text}"/>
+                </Frame>
+                        
+                <Frame type="Label" name="PunisherTimerLabel">
+                    <Anchor relative="$parent/PunisherHealthLabel"/>
+                    <Style val="{$parent/PunisherHealthLabel/@Style}"/>
+                </Frame>
+            </Frame>
+            
+            <!-- Bottom/Right Health Frame -->
+            <Frame type="Frame" name="PunisherFrame2">
+                <Anchor side="Left" relative="$parent/BackgroundImage" pos="Min" offset="0"/>
+                <Anchor side="Right" relative="$parent/BackgroundImage" pos="Max" offset="0"/>
+                <Anchor side="Top" relative="$parent/BackgroundImage" pos="Min" offset="-20"/>
+                <Anchor side="Bottom" relative="$parent/BackgroundImage" pos="Max" offset="20"/>
+
+                <Frame type="Image" name="HealthBarBg">
+                    <Anchor side="Right" relative="$parent/$parent/BackgroundImage" pos="Max" offset="-100"/>
+                    <Anchor side="Bottom" relative="$parent/PunisherIcon" pos="Mid" offset="5"/>
+                    <Anchor side="Top" relative="$parent/PunisherIcon" pos="Mid" offset="5"/>
+                    <Width val="240"/>
+                    <Height val="24"/>
+                    <Texture val="@UI/HUD_MapMechanic_BG_HealthBar_BottomLeft"/>
+                    <TextureType val="NineSlice"/>
+                </Frame>
+                
+                <Frame type="UnitStatusFrame" name="HealthBarFrame" template="MapMechanicPanel/MapMechanicHealthBarTemplate">
+                    <Anchor relative="$parent/HealthBarBg"/>
+                    
+                    <Frame type="UnitStatusHealthBar" name="HealthBar" template="UnitStatus/UnitStatusSegmentedHealthBarTemplate">
+                        <Anchor side="Top" relative="$parent" pos="Min" offset="7"/>
+                        <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+                        <Height val="8"/>
+                        <Width val="216"/>
+                        <Texture val="@UI/HUD_MapMechanic_HauntedMines_HealthBarTop"/>
+                        <SegmentValue val="1000" index="0"/>
+                        <Expansion val="Left"/>
+                    </Frame>
+                    
+                    <Frame type="UnitStatusHealthLabel" name="HealthLabel">
+                        <ShowPercent val="true"/>
+                        <Visible val="False"/>
+                        <Frame type="Label" name="StatusLabel">
+                            <Anchor relative="$parent"/>
+                        </Frame>
+                    </Frame>
+                </Frame>
+                
+                <Frame type="Image" name="PunisherIcon">
+                    <Anchor side="Top" relative="$parent" pos="Mid" offset="10"/>
+                    <Anchor side="Bottom" relative="$parent" pos="Mid" offset="10"/>
+                    <Anchor side="Right" relative="$parent" pos="Max" offset="-6"/>
+                    <Texture val="@UI/Storm_UI_MapMechanic_Shrines_PunisherArcane_Enemy"/>
+                </Frame>
+
+                <Frame type="Image" name="PunisherIconOverlay" template="ArenaPunisher/IconOverlayTemplate"/>
+                
+                <Frame type="Frame" name="SlashAnimation" template="ArenaPunisher/SlashAnimationTemplate">
+                    <Anchor relative="$parent/PunisherIcon"/>
+                </Frame>
+                
+                <Frame type="Label" name="PunisherHealthLabel">
+                    <Anchor side="Bottom" relative="$parent/$parent/BackgroundImage" pos="Max" offset="18"/>
+                    <Anchor side="Left" relative="$parent/PunisherIcon" pos="Mid" offset="26"/>
+                    <Anchor side="Right" relative="$parent/PunisherIcon" pos="Mid" offset="26"/>
+                    <Width val="100"/>
+                    <Style val="Storm_MapMechanic_MechanicTimerCentered_Red"/>
+                    <Text val="{$parent/HealthBarFrame/HealthLabel/StatusLabel/@Text}"/>
+                </Frame>
+                
+                <Frame type="Label" name="PunisherTimerLabel">
+                    <Anchor relative="$parent/PunisherHealthLabel"/>
+                    <Style val="{$parent/PunisherHealthLabel/@Style}"/>
+                </Frame>
+            </Frame>
+        </Frame>
+
+    </Frame>
+</Desc>
+

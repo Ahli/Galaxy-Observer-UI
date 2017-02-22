@@ -1,0 +1,534 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<Desc>
+    <DescFlags val="Locked"/>
+
+    <Frame type="RankedHeroInfoDisplay" name="FavoriteHeroTemplate">
+        <Anchor side="Bottom" relative="HeroContainer" pos="Max" offset="0"/>
+        <Anchor side="Right" relative="HeroContainer" pos="Max" offset="0"/>
+        <AcceptsMouseTooltip val="false"/>
+        <AcceptsMouse val="false"/>
+
+        <Animation name="RecordResolved">
+            <Event event="HeroSlotFull" action="Reset"/>
+            <Event event="HeroSlotFull" action="Play"/>
+            <Event event="HeroSlotEmpty" action="Reset"/>
+            <Event event="HeroSlotEmpty" action="Play"/>
+
+            <Controller type="Visibility" end="Pause">
+                <Key type="Bool" time="0.00" value="true"/>
+            </Controller>
+        </Animation>
+
+        <Animation name="RecordUnresolved">
+            <Event event="HeroSlotHidden" action="Reset"/>
+            <Event event="HeroSlotHidden" action="Play"/>
+            
+            <Controller type="Visibility" end="Pause">
+                <Key type="Bool" time="0.00" value="false"/>
+            </Controller>
+        </Animation>
+
+        <Animation name="Show">
+            <Event event="HeroSlotFull" action="Reset" />
+            <Event event="HeroSlotFull" action="Play" />
+
+            <Controller type="Visibility" end="Pause" frame="HeroContainer/HeroCutscene">
+                <Key type="Bool" time="0" value="true" />
+            </Controller>
+
+            <Controller type="Visibility" end="Pause" frame="HeroContainer/EmptyHeroName">
+                <Key type="Bool" time="0.0" value="false" />
+            </Controller>
+
+            <Controller type="Visibility" end="Pause" frame="HeroContainer/HeroName">
+                <Key type="Bool" time="0.0" value="true" />
+            </Controller>
+        </Animation>
+
+        <Animation name="Hide">
+            <Event event="HeroSlotEmpty" action="Reset" />
+            <Event event="HeroSlotEmpty" action="Play" />
+
+            <Controller type="Visibility" end="Pause" frame="HeroContainer/HeroCutscene">
+                <Key type="Bool" time="0.0" value="true" />
+            </Controller>
+
+            <Controller type="Visibility" end="Pause" frame="HeroContainer/EmptyHeroName">
+                <Key type="Bool" time="0.0" value="true" />
+            </Controller>
+
+            <Controller type="Visibility" end="Pause" frame="HeroContainer/HeroName">
+                <Key type="Bool" time="0.0" value="false" />
+            </Controller>
+
+            <Controller type="Text" end="Pause" frame="HeroDataLabel">
+                <Key type="Text" time="0" text="@UI/RankedPlay/CasualLeagueEmptyHero"/>
+            </Controller>
+        </Animation>
+
+        <Frame type="Label" name="HeroDataLabel">
+            <Anchor side="Top" relative="$parent/HeroContainer/HeroName" pos="Max" offset="-10" />
+			<Anchor side="Left" relative="$parent/HeroContainer/HeroName" pos="Mid" offset="0" />
+			<Anchor side="Right" relative="$parent/HeroContainer/HeroName" pos="Mid" offset="0" />
+            <Style val="HeroLobbyRankedHeroRecord"/>
+            <RenderType val="HDR"/>
+        </Frame>
+
+        <Frame type="HeroContainerFrame" name="HeroContainer">
+            <Anchor relative="HeroCutscene"/>
+
+            <Frame type="HeroLabel" name="HeroName">
+                <Anchor side="Top" relative="$parent/$parent/$parent/$parent/FavoriteHeroBackground" pos="Min" offset="20" />
+				<Anchor side="Left" relative="$parent/$parent/$parent/$parent/FavoriteHeroBackground" pos="Mid" offset="0" />
+				<Anchor side="Right" relative="$parent/$parent/$parent/$parent/FavoriteHeroBackground" pos="Mid" offset="0" />
+                <HeroLabelType val="Name" />
+                <Style val="HeroLobbyRankedHeroName"/>
+                <RenderType val="HDR"/>
+            </Frame>
+
+            <Frame type="Label" name="EmptyHeroName">
+                <Anchor side="Top" relative="$parent/$parent/$parent/$parent/FavoriteHeroBackground" pos="Min" offset="20" />
+				<Anchor side="Left" relative="$parent/$parent/$parent/$parent/FavoriteHeroBackground" pos="Mid" offset="0" />
+				<Anchor side="Right" relative="$parent/$parent/$parent/$parent/FavoriteHeroBackground" pos="Mid" offset="0" />
+                <Style val="HeroLobbyRankedHeroName"/>
+                <RenderType val="HDR"/>
+                <Visible val="false" />
+                <Text val="@UI/RankedHeroEmptyHeroName"/>
+            </Frame>
+
+            <Frame type="HeroCutsceneFrame" name="HeroCutscene">
+                <Anchor side="Top" relative="$parent/$parent" pos="Min" offset="20"/>
+                <Anchor side="Left" relative="$parent/$parent" pos="Min" offset="-50"/>
+                <Width val="700"/>
+                <Height val="900"/>
+                <Unclipped val="True"/>
+                <HeroCutsceneType val="ShopTile"/>
+                <RenderType val="HDR"/>
+                <HeroCutsceneDragEnabled val="true"/>
+            </Frame>
+        </Frame>
+
+        <Frame type="Control" name="HitTest">
+            <Anchor relative="$parent/HeroContainer/HeroName" />
+            <AcceptsMouse val="true" />
+        </Frame>
+    </Frame>
+
+    <Frame type="HeroRankedLeagueContainer" name="RankedLeagueContainerTemplate">
+        <Width val="960"/>
+        <Height val="850"/>
+        <RenderType val="HDR"/>
+
+        <Animation name="LeaverAnimation">
+            <Event event="NotRankedPlayLeaver" action="Restart" frame="$parent/$parent"/>
+            <Event event="NotRankedPlayLeaver" action="Play" frame="$parent/$parent"/>
+            <Event event="RankedPlayLeaver" action="DirectionReverse" frame="$parent/$parent"/>
+            <Event event="RankedPlayLeaver" action="Play" frame="$parent/$parent"/>
+
+        </Animation>
+        
+        <Animation name="Selected">
+            <Event event="Selected" action="Restart"/>
+            <Event event="Selected" action="Play"/>
+            <Event event="Deselected" action="DirectionReverse"/>
+            <Event event="Deselected" action="Play"/>
+            <Controller type="Texture" end="Pause" frame="Background">
+                <Key type="Image" time="0" image="@UI/Storm_UI_Ranked_ModeBackground_Off"/>
+                <Key type="Image" time=".01" image="@UI/Storm_UI_Ranked_ModeBackground_On"/>
+            </Controller>
+            <!-- PRESEASON
+            <Controller type="Visibility" end="Pause" frame="SparkleContainer">
+                <Key type="Bool" time="0" value="False"/>
+                <Key type="Bool" time=".01" value="True"/>
+            </Controller>
+            -->
+            <Controller type="Visibility" end="Pause" frame="Glow1Image">
+                <Key type="Bool" time="0" value="False"/>
+                <Key type="Bool" time=".01" value="True"/>
+            </Controller>
+            <Controller type="Visibility" end="Pause" frame="ActiveShineImage">
+                <Key type="Bool" time="0" value="False"/>
+                <Key type="Bool" time=".01" value="True"/>
+            </Controller>
+            <Controller type="Visibility" end="Pause" frame="ActiveShine2Image">
+                <Key type="Bool" time="0" value="False"/>
+                <Key type="Bool" time=".01" value="True"/>
+            </Controller>
+            <!-- PRESEASON
+            <Controller type="Visibility" end="Pause" frame="ProgressBackground/ProgressBackgroundGlow">
+                <Key type="Bool" time="0" value="False"/>
+                <Key type="Bool" time=".01" value="True"/>
+            </Controller>
+            <Controller type="Desaturation" end="Pause" frame="ProgressBackground/HeroBackgroundContainer/ProgressBackgroundImage">
+                <Key type="Bool" time="0" value="True"/>
+                <Key type="Bool" time=".1" value="False"/>
+            </Controller>
+            <Controller type="Desaturation" end="Pause" frame="ProgressBackground/TeamBackgroundContainer/ProgressBackgroundImage">
+                <Key type="Bool" time="0" value="True"/>
+                <Key type="Bool" time=".1" value="False"/>
+            </Controller>
+            <Controller type="Desaturation" end="Pause" frame="FleurishContainer/HeroFleurishImage">
+                <Key type="Bool" time="0" value="True"/>
+                <Key type="Bool" time=".1" value="False"/>
+            </Controller>
+            <Controller type="Desaturation" end="Pause" frame="FleurishContainer/TeamFleurishImage">
+                <Key type="Bool" time="0" value="True"/>
+                <Key type="Bool" time=".1" value="False"/>
+            </Controller>
+            -->
+            <Controller type="Style" end="Pause" style1="HeroLobbyRankedHeroLeagueRecordDisabled" style2="HeroLobbyRankedHeroLeagueRecord" frame="GamesRecordLabel">
+                <Key type="Curve" time="0" value="0"/>
+                <Key type="Curve" time=".01" value="1"/>
+            </Controller>
+            <Controller type="Style" end="Pause" style1="HeroLobbyRankedHeroLeagueTitleDisabled" style2="HeroLobbyRankedHeroLeagueTitle" frame="TitleLabel">
+                <Key type="Curve" time="0" value="0"/>
+                <Key type="Curve" time=".01" value="1"/>
+            </Controller>
+
+            <!-- PRESEASON
+            <Controller type="Style" end="Pause" style1="ScoreRankDescriptionDisabled" style2="ScoreRankDescription" frame="RankInformationContainer/RankLabel">
+                <Key type="Curve" time="0" value="0"/>
+                <Key type="Curve" time=".01" value="1"/>
+            </Controller>
+            <Controller type="Style" end="Pause" style1="ScoreRankLevelDisabled" style2="ScoreRankLevel" frame="RankInformationContainer/NumericRankLabel">
+                <Key type="Curve" time="0" value="0"/>
+                <Key type="Curve" time=".01" value="1"/>
+            </Controller>
+            -->
+        </Animation>
+
+        <Frame type="Label" name="FavoriteHeroDescriptionLabel">
+            <Anchor side="Bottom" relative="$parent/FavoriteHeroBackground" pos="Min" offset="2"/>
+            <Anchor side="Right" relative="$parent/FavoriteHeroBackground" pos="Mid" offset="0"/>
+            <Anchor side="Left" relative="$parent/FavoriteHeroBackground" pos="Mid" offset="0"/>
+            <Text val="@UI/RankedPlay/FavoriteHeroLeagueHero"/>
+            <Style val="FavoriteHeroDescriptionLabel"/>
+        </Frame>
+        
+        <Frame type="BlurFrame" name="FavoriteBlurFrame" template="StandardTemplates/FullscreenBlurFrame">
+            <Anchor relative="$parent/FavoriteHeroBackground"/>
+            <BlurAmount val="0.5"/>
+        </Frame>
+
+        <Frame type="Image" name="FavoriteHeroBackground">
+            <Anchor side="Top" relative="$parent/Background" pos="Min" offset="50"/>
+            <Texture val="@UI/Storm_UI_Ranked_FavoriteBackground"/>
+        </Frame>
+        
+        <Frame type="Image" name="HeroBackgroundDarkenImage">
+            <Anchor side="Top" relative="$parent/FavoriteHeroBackground" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent/FavoriteHeroBackground" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent/FavoriteHeroBackground" pos="Max" offset="0"/>
+            <Height val="100"/>
+            <Color val="000000"/>
+            <Alpha val="25"/>
+        </Frame>
+        
+        <Frame type="Image" name="HeroBackgroundBorderImage">
+            <Anchor side="Top" relative="$parent/HeroBackgroundDarkenImage" pos="Max" offset="0"/>
+            <Anchor side="Left" relative="$parent/HeroBackgroundDarkenImage" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent/HeroBackgroundDarkenImage" pos="Max" offset="0"/>
+            <Height val="2"/>
+            <Color val="382565"/>
+        </Frame>
+        
+        <Frame type="Image" name="ActiveShineImage">
+            <Anchor side="Top" relative="$parent/Background" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent/Background" pos="Mid" offset="0"/>
+            <Anchor side="Left" relative="$parent/Background" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent/Background" pos="Mid" offset="0"/>
+            <Texture val="@UI/Storm_UI_Shine"/>
+            <Visible val="False"/>
+            <BlendMode val="Add"/>
+            <Unclipped val="True"/>
+            <Animation name="Pulse">
+                <Event event="OnShown" action="DirectionForward"/>
+                <Event event="OnShown" action="Play"/>
+                <Controller type="Dimension" dimension="Width" relative="False" percentage="True" end="Loop" >
+                    <Key type="Curve" time="0" value="90"/>
+                    <Key type="Curve" time="1.4" value="100" in="Fast" out="Slow"/>
+                    <Key type="Curve" time="2" value="105" in="Fast" out="Slow"/>
+                    <Key type="Curve" time="2.7" value="90" in="Fast"/>
+                </Controller>
+                <Controller type="Dimension" dimension="Height" relative="False" percentage="True" end="Loop" >
+                    <Key type="Curve" time="0" value="90"/>
+                    <Key type="Curve" time="1.4" value="100" in="Fast" out="Slow"/>
+                    <Key type="Curve" time="2" value="105" in="Fast" out="Slow"/>
+                    <Key type="Curve" time="2.7" value="90" in="Fast"/>
+                </Controller>
+            </Animation>
+        </Frame>
+        
+        <Frame type="Image" name="ActiveShine2Image">
+            <Anchor side="Top" relative="$parent/Background" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent/Background" pos="Mid" offset="0"/>
+            <Anchor side="Left" relative="$parent/Background" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent/Background" pos="Mid" offset="0"/>
+            <Texture val="@UI/Storm_UI_Shine"/>
+            <TextureCoords top="1" left="1" bottom="0" right="0"/>
+            <Alpha val="180"/>
+            <BlendMode val="Add"/>
+            <Unclipped val="True"/>
+            <Animation name="Pulse">
+                <Event event="OnShown" action="DirectionForward"/>
+                <Event event="OnShown" action="Play"/>
+                <Controller type="Dimension" dimension="Width" relative="False" percentage="True" end="Loop" >
+                    <Key type="Curve" time="0" value="80"/>
+                    <Key type="Curve" time="1" value="105" in="Fast" out="Slow"/>
+                    <Key type="Curve" time="2" value="110" in="Fast" out="Slow"/>
+                    <Key type="Curve" time="3" value="80" in="Fast"/>
+                </Controller>
+                <Controller type="Dimension" dimension="Height" relative="False" percentage="True" end="Loop" >
+                    <Key type="Curve" time="0" value="80"/>
+                    <Key type="Curve" time="1" value="105" in="Fast" out="Slow"/>
+                    <Key type="Curve" time="2" value="110" in="Fast" out="Slow"/>
+                    <Key type="Curve" time="3" value="80" in="Fast"/>
+                </Controller>
+            </Animation>
+        </Frame>
+
+        <Frame type="BlurFrame" name="BackgroundBlurFrame" template="StandardTemplates/FullscreenBlurFrame">
+            <Anchor side="Top" relative="$parent/Background" pos="Min" offset="20"/>
+            <Anchor side="Bottom" relative="$parent/Background" pos="Max" offset="-10"/>
+            <Anchor side="Left" relative="$parent/Background" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent/Background" pos="Max" offset="0"/>
+            <BlurAmount val="0.5"/>
+            <Frame type="Image" name="Darken">
+                <Anchor relative="$parent"/>
+                <Color val="100a22"/>
+                <Alpha val="100"/>
+            </Frame>
+        </Frame>
+        
+        <Frame type="Image" name="Background">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Texture val="@UI/Storm_UI_Ranked_ModeBackground_Off"/>
+        </Frame>
+        
+        <Frame type="Image" name="HexGlow">
+            <Anchor side="Bottom" relative="$parent/Background" pos="Max" offset="-28" />
+            <Anchor side="Left" relative="$parent/Background" pos="Min" offset="15" />
+            <Enabled val="True"/>
+            <Color val="684bfb"/>
+            <Width val="220"/>
+            <Height val="260"/>
+            <LayerCount val="3"/>
+            <BlendMode val="Add"/>
+            <Alpha val="195"/>
+            <Visible val="false"/>
+            
+            <Texture val="@UI/Storm_UI_Play_HeroPortrait_Backing_On" layer="0"/>
+            <TextureCoords top=".45" left=".45" bottom=".55" right=".55" layer="0"/>
+
+            <AlphaLayer val="True" layer="0"/>
+            <WrapUV val="True" layer="0"/>
+
+            <Texture val="@UI/Storm_UI_TeamLeague_Selected_HexMask" layer="1"/>
+            <TextureCoords top="0" left="0" bottom="1" right="1" layer="1"/>
+            <AlphaLayer val="True" layer="1"/>
+            <WrapUV val="True" layer="1"/>
+            
+            <Texture val="@UI/Storm_UI_TeamLeague_Selected_HexImage" layer="2"/>
+            <TextureCoords top="0" left="0" bottom="1" right="1" layer="1"/>
+            <WrapUV val="True" layer="1"/>
+            
+            <Animation name="UVScroll">
+                <Event event="OnShown" action="Restart" />
+                <Event event="OnShown" action="DirectionForward" />
+                <Event event="OnShown" action="Play" />
+                <Event event="OnMouseDown" action="Play" frame="$parent"/>
+                <Controller type="LayerUV" layer="1" side="Top" relative="True" sidelock="True" end="Loop" >
+                    <Key type="Curve" time="0" value="0" out="fast"/>
+                    <Key type="Curve" time="4" value="1" in="fast"/>
+                </Controller>
+            </Animation>
+            
+            <Animation name="Selected">
+                <Event event="Death" action="DirectionReverse" />
+                <Event event="Death" action="Play" />
+                <Event event="Selected" action="DirectionForward" />
+                <Event event="Selected" action="Play" />
+                <Event event="Preselected" action="DirectionForward" />
+                <Event event="Preselected" action="Play" />
+    
+                <Controller type="Visibility" end="Pause">
+                    <Key type="Bool" time="0.0" value="false"/>
+                    <Key type="Bool" time="0.01" value="true"/>
+                </Controller>
+            </Animation>
+        </Frame>
+        
+        <Frame type="RankBadge" name="RankBadge" template="RankBadgeTemplates/RankBadgeTemplate">
+            <Anchor side="Top" relative="$parent/Background" pos="Min" offset="-70"/>
+            <Anchor side="Left" relative="$parent/Background" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent/Background" pos="Mid" offset="0"/>
+        </Frame>
+
+        <Frame type="Image" name="Glow1Image">
+            <Anchor side="Top" relative="$parent/Background" pos="Min" offset="-58"/>
+            <Anchor side="Left" relative="$parent/Background" pos="Min" offset="-74"/>
+            <Width val="620"/>
+            <Height val="820"/>
+            <LayerCount val="2"/>
+            <BlendMode val="Add"/>
+            <Unclipped val="True"/>
+            
+            <Texture val="@UI/Storm_UI_Ranked_ModeBackground_Highlight_Mask" layer="0"/>
+            <TextureCoords top="0" left="0" bottom="1" right="1" layer="0"/>
+            <AlphaLayer val="True" layer="0"/>
+            <WrapUV val="False" layer="0"/>
+            
+            <Texture val="@UI/Storm_UI_Ranked_ModeBackground_Highlight" layer="1"/>
+            
+            <Animation name="UVScroll">
+                <Event event="OnShown" action="Restart" frame="$parent"/>
+                <Event event="OnShown" action="DirectionForward" frame="$parent"/>
+                <Event event="OnShown" action="Play" frame="$parent"/>
+                <Controller type="LayerUV" layer="0" side="Top" relative="False" sidelock="True" end="Loop" >
+                    <Key type="Curve" time="0" value="1" out="fast"/>
+                    <Key type="Curve" time="15" value="-2" in="fast"/>
+                </Controller>
+            </Animation>
+        </Frame>
+
+        <!-- PRESEASON
+        <Frame type="Frame" name="SparkleContainer" template="PlayerRewardsPanel/PlayerRewardsPanelTemplate/RankScoreFrame/SparkleContainer">
+            <Anchor relative="$parent"/>
+        </Frame>
+        -->
+
+        <Frame type="Label" name="TitleLabel">
+            <Anchor side="Top" relative="$parent" pos="Mid" offset="30" />
+            <Anchor side="Left" relative="$parent/Background" pos="Min" offset="0" />
+            <Anchor side="Right" relative="$parent/Background" pos="Max" offset="0" />
+            <Style val="HeroLobbyRankedHeroLeagueTitle" />
+        </Frame>
+
+        <Frame type="Image" name="TitleTooltip">
+            <Anchor side="Bottom" relative="$parent/Background" pos="Max" offset="-80"/>
+            <Anchor side="Right" relative="$parent/Background" pos="Mid" offset="0"/>
+            <Anchor side="Left" relative="$parent/Background" pos="Mid" offset="0"/>
+            <Tooltip val="@UI/RankedPlay/CasualLeagueTooltip"/>
+            <Texture val="@UI/TooltipInfoIcon"/>
+            <AcceptsMouse val="true"/>
+        </Frame>
+
+        <Frame type="Label" name="DescriptionLabel">
+            <Anchor side="Top" relative="$parent/TitleLabel" pos="Max" offset="-4"/>
+            <Anchor side="Left" relative="$parent/TitleLabel" pos="Min" offset="40"/>
+            <Anchor side="Right" relative="$parent/TitleLabel" pos="Max" offset="-40"/>
+            <Style val="HeroLobbyRankedHeroLeagueDescription" />
+            <Text val="@UI/RankedPlay/CasualLeagueDescription"/>
+        </Frame>
+
+        <StateGroup name="PromotionState">
+            <DefaultState val="None"/>
+            
+            <State name="PromotionNextGame">
+                <When type="Property" frame="RankBadge" PromotionState="PromotionNextGame"/>
+                <Action type="SetProperty" frame="DescriptionLabel" text="@UI/RankedPlay/PromotionNextGame"/>
+                <Action type="SetProperty" frame="DescriptionLabel" style="RankedBadge_Promotion_Label"/>
+            </State>
+            <State name="DemotionNextGame">
+                <When type="Property" frame="RankBadge" PromotionState="DemotionNextGame"/>
+                <Action type="SetProperty" frame="DescriptionLabel" text="@UI/RankedPlay/DemotionNextGame"/>
+                <Action type="SetProperty" frame="DescriptionLabel" style="RankedBadge_Demotion_Label"/>
+            </State>
+            <State name="None">
+                <Action type="SetProperty" frame="DescriptionLabel" text="@UI/RankedPlay/CasualLeagueDescription"/>
+                <Action type="SetProperty" frame="DescriptionLabel" style="HeroLobbyRankedHeroLeagueDescription"/>
+            </State>
+        </StateGroup>
+        
+        <Frame type="Image" name="DescriptionDividerImage">
+            <Anchor side="Top" relative="$parent/DescriptionLabel" pos="Max" offset="10"/>
+            <Anchor side="Left" relative="$parent/TitleLabel" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent/TitleLabel" pos="Mid" offset="0"/>
+            <Texture val="@UI/Storm_UI_Ranked_ModeBackground_Divider"/>
+        </Frame>
+
+        <Frame type="Label" name="GamesRecordLabel">
+            <Anchor side="Top" relative="$parent/DescriptionDividerImage" pos="Max" offset="15" />
+            <Anchor side="Left" relative="$parent/Background" pos="Mid" offset="0" />
+            <Anchor side="Right" relative="$parent/Background" pos="Mid" offset="0" />
+            <Style val="HeroLobbyRankedHeroLeagueRecord" />
+            <AcceptsMouse val="true" />
+            <TooltipAnchorPosition val="MiddleRight"/>
+        </Frame>
+
+        <Frame type="Frame" name="FavoriteHeroPanel">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="30" />
+            <Height val="1000" />
+            <Width val="800" />
+            <Unclipped val="false"/>
+
+            <Frame type="RankedHeroInfoDisplay" name="FavoriteHero0" template="HeroRankedLeagueContainer/FavoriteHeroTemplate">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="0" />
+                <Anchor side="Left" relative="$parent" pos="Min" offset="0" />
+            </Frame>
+        </Frame>
+    </Frame>
+    
+    <Frame type="HeroRankedLeagueContainer" name="HeroRankedLeagueContainerTemplate" template="HeroRankedLeagueContainer/RankedLeagueContainerTemplate">
+        <Frame type="Image" name="Background">
+            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+        </Frame>
+        
+        <Frame type="Image" name="FavoriteHeroBackground">
+            <Anchor side="Right" relative="$parent/Background" pos="Min" offset="5"/>
+        </Frame>
+        
+        <Frame type="Frame" name="FavoriteHeroPanel">
+            <Anchor side="Right" relative="$parent/FavoriteHeroBackground" pos="Max" offset="250" />
+            <Frame type="RankedHeroInfoDisplay" name="FavoriteHero0">
+                <Frame type="HeroContainerFrame" name="HeroContainer">
+                    <Frame type="HeroCutsceneFrame" name="HeroCutscene">
+                        <HeroCutsceneFilter val="RankLeft"/>
+                    </Frame>
+                </Frame>
+            </Frame>
+        </Frame>
+    </Frame>
+    
+    <Frame type="HeroRankedLeagueContainer" name="TeamRankedLeagueContainerTemplate" template="HeroRankedLeagueContainer/RankedLeagueContainerTemplate">
+        <Frame type="Image" name="Background">
+            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+        </Frame>
+        
+        <Frame type="Label" name="FavoriteHeroDescriptionLabel">
+            <Text val="@UI/RankedPlay/FavoriteTeamLeagueHero"/>
+        </Frame>
+
+        <Frame type="Image" name="FavoriteHeroBackground">
+            <Anchor side="Left" relative="$parent/Background" pos="Max" offset="-5"/>
+        </Frame>
+
+        <Frame type="Frame" name="FavoriteHeroPanel">
+            <Anchor side="Left" relative="$parent/FavoriteHeroBackground" pos="Min" offset="-75" />
+
+            <Frame type="RankedHeroInfoDisplay" name="FavoriteHero0">
+                <Frame type="HeroContainerFrame" name="HeroContainer">
+                    <Frame type="HeroCutsceneFrame" name="HeroCutscene">
+                        <HeroCutsceneFilter val="RankRight"/>
+                    </Frame>
+                </Frame>
+            </Frame>
+        </Frame>
+        
+        <Frame type="Image" name="TitleTooltip">
+            <Tooltip val="@UI/RankedPlay/TeamLeagueTooltip"/>
+        </Frame>
+
+        <Frame type="Label" name="DescriptionLabel">
+            <Text val="@UI/RankedPlay/TeamLeagueDescription"/>
+        </Frame>
+
+        <!-- Overide -->
+        <StateGroup name="PromotionState">
+            <State name="None">
+                <Action type="SetProperty" frame="DescriptionLabel" text="@UI/RankedPlay/TeamLeagueDescription"/>
+                <Action type="SetProperty" frame="DescriptionLabel" style="HeroLobbyRankedHeroLeagueDescription"/>
+            </State>
+        </StateGroup>
+    </Frame>
+</Desc>

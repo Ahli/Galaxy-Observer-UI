@@ -1,0 +1,400 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<Desc>
+    <DescFlags val="Locked"/>
+
+    <Constant name="ButtonOffset" val="-42"/>
+    <Constant name="ButtonOffsetLeft" val="-82"/>
+    
+    <Frame type="Button" name="ScreenNavigationButtonTemplate" template="StandardBattlenetTemplates/BattlenetTopNavButtonTemplate">
+        <ClickSound val="@UI_ScreenNavigation_ButtonClick01"/>
+        <HoverSound val="@UI_ScreenNavigation_MouseOver01"/>
+        
+        <Animation name="HideButton">
+            <Event event="OnShown" action="Reset" frame="$parent/BackButton"/>
+            <Event event="OnShown" action="Play" frame="$parent/BackButton"/>
+            <Event event="OnHidden" action="Reset" frame="$parent/BackButton"/>
+            <Event event="OnHidden" action="Stop" frame="$parent/BackButton"/>
+
+            <Controller name="Visibility" type="Visibility" end="Pause">
+                <Key type="Bool" time="0" value="true"/>
+                <Key type="Bool" time=".001" value="false"/>
+            </Controller>
+        </Animation>
+    </Frame>
+
+    <Frame type="Button" name="ScreenNavigationButtonVersionedTemplate" template="ScreenNavigationSC2/ScreenNavigationButtonTemplate">
+        <Frame type="VersionNotificationFrame" name="NewContentFrame">
+            <Animation name="VersionState">
+                <Event event="NewVersion" action="Reset,Play"/>
+                <Event event="OldVersion" action="Reset,Stop"/>
+                <Event event="InvalidVersion" action="Reset,Stop"/>
+
+                <Controller type="Visibility" end="Pause">
+                    <Key type="Bool" time="0" value="True"/>
+                </Controller>
+            </Animation>
+
+            <!-- The name of this animation must be "ClearNotification" -->
+            <!-- When played, it will update the version of this notification  -->
+            <Animation name="ClearNotification">
+                <Event event="OnClick" action="Reset,Play" frame="$parent"/>
+                <Event event="Toggled" action="Reset,Play" frame="$parent"/>
+
+                <Controller type="Event" end="Stop">
+                    <Key type="Event" time="0.0" event="NoOp"/>
+                    <Key type="Event" time="1.0" event="NoOp"/>
+                </Controller>
+            </Animation>
+        </Frame>
+    </Frame>
+
+    <Frame type="ScreenNavigationSC2" name="ScreenNavigationSC2">
+        <Handle val="ScreenNavigationSC2"/>
+        <Anchor relative="$parent"/>
+        <!-- This must render below ScreenBattlenet so Battle.net dialogs can cover it -->
+        <!-- but above normal content screens so it is always accessible -->
+        <RenderPriority val="600"/>
+
+        <Frame type="Frame" name="NavigationContainer">
+            <Anchor relative="$parent"/>
+
+            <Animation name="HideNav">
+                <Event event="HideNav" action="DirectionForward" frame="$parent"/>
+                <Event event="HideNav" action="Play" frame="$parent"/>
+                <Event event="ShowNav" action="DirectionReverse" frame="$parent"/>
+                <Event event="ShowNav" action="Play" frame="$parent"/>
+                <Event event="ToonOnline" action="DirectionReverse" frame="$parent"/>
+                <Event event="ToonOnline" action="Play" frame="$parent"/>
+
+                <Controller type="Fade" end="Pause">
+                    <Key type="Curve" time="0.0" value="255" out="Auto"/>
+                    <Key type="Curve" time="0.25" value="0" out="Auto"/>
+                </Controller>
+
+                <Controller type="Anchor" end="Pause" side="Top" relative="true">
+                    <Key type="Curve" time="0.0" value="0" out="Auto"/>
+                    <Key type="Curve" time="0.25" value="-30" out="Auto"/>
+                </Controller>
+
+                <Controller name="Visibility" type="Visibility" end="Pause" frame="$this/NavigationBlockFrame">
+                    <Key type="Bool" time="0" value="false"/>
+                    <Key type="Bool" time=".001" value="true"/>
+                </Controller>
+            </Animation>
+            
+            <Frame type="BlurFrame" name="BlurEffect">
+                <Anchor relative="$parent/Background"/>
+                <BlurAmount val=".3"/>
+
+                <Frame type="Image" name="LowImage">
+                    <Anchor relative="$parent"/>
+                    <Color val="0,0,0"/>
+                    <Alpha val="150"/>
+                </Frame>
+            </Frame>
+
+            <Frame type="Image" name="Background">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+                <Height val="73"/>
+                <Texture val="@UI/Glues_Battlenet_TopNav_Bg"/>
+                <TextureType val="Nineslice"/>
+                <Tiled val="true"/>
+            </Frame>
+            
+            <Frame type="Image" name="BackgroundHexShimmer">
+                <Anchor side="Top" relative="$parent/Background" pos="Min" offset="4"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+                <Anchor side="Bottom" relative="$parent/Background" pos="Max" offset="-4"/>
+                <LayerCount val="2"/>
+                
+                <Texture val="@UI/Glues_Battlenet_TopNav_HexPattern" layer="0"/>
+                <TextureType val="Normal" layer="0"/>
+                <Tiled val="true" layer="0"/>
+                <AlphaLayer val="true" layer="0"/>
+                
+                <Texture val="@UI/Glues_Battlenet_TopNav_HexShimmer" layer="1"/>
+                <TextureCoords top="0" left="0" bottom="1" right="1" layer="1"/>
+                <Alpha val="175" layer="1"/>
+                
+                <Animation name="Shimmer">
+                    <Event event="OnShown" action="DirectionForward" frame="$parent"/>
+                    <Event event="OnShown" action="Play" frame="$parent"/>
+             
+                    <Controller type="LayerUV" layer="1" side="Right" relative="False" sidelock="True" end="Loop" >
+                        <Key type="Curve" time="0" value="1" out="linear"/>
+                        <Key type="Curve" time="8" value="0" in="linear"/>
+                    </Controller>
+                    
+                    <Controller type="Fade" end="Loop">
+                        <Key type="Curve" time="0" value="0"/>
+                        <Key type="Curve" time="1" value="100"/>
+                        <Key type="Curve" time="3" value="200"/>
+                        <Key type="Curve" time="4" value="255"/>
+                        <Key type="Curve" time="6" value="200"/>
+                        <Key type="Curve" time="8" value="0"/>
+                    </Controller>
+                </Animation>
+            </Frame>
+            
+            <Frame type="Image" name="TopLineHighlightAnim">
+                <Anchor side="Top" relative="$parent/Background" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                <Texture val="@UI/Glues_Battlenet_TopNav_TopHighlightAnim"/>
+                
+                <Animation name="Highlight">
+                    <Event event="OnShown" action="DirectionForward" frame="$parent"/>
+                    <Event event="OnShown" action="Play" frame="$parent"/>
+                    
+                    <Controller type="Fade" end="Loop">
+                        <Key type="Curve" time="0" value="0"/>
+                        <Key type="Curve" time="1" value="255"/>
+                        <Key type="Curve" time="7" value="255"/>
+                        <Key type="Curve" time="8" value="0"/>
+                    </Controller>
+                    
+                    <Controller type="Anchor" end="Loop" side="Left" relative="true">
+                        <Key type="Curve" time="0" value="0" out="linear"/>
+                        <Key type="Curve" time="8" value="1920" out="linear"/>
+                    </Controller>
+                </Animation>
+            </Frame>
+            
+            <Frame type="Image" name="BottomLineHighlightAnim">
+                <Anchor side="Bottom" relative="$parent/Background" pos="Max" offset="2"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                <Texture val="@UI/Glues_Battlenet_TopNav_BottomHighlightAnim"/>
+                
+                <Animation name="Highlight">
+                    <Event event="OnShown" action="DirectionForward" frame="$parent"/>
+                    <Event event="OnShown" action="Play" frame="$parent"/>
+                    
+                    <Controller type="Fade" end="Loop">
+                        <Key type="Curve" time="0" value="0"/>
+                        <Key type="Curve" time="2" value="0"/>
+                        <Key type="Curve" time="4.5" value="255"/>
+                        <Key type="Curve" time="6" value="255"/>
+                        <Key type="Curve" time="8" value="0"/>
+                    </Controller>
+                    
+                    <Controller type="Anchor" end="Loop" side="Left" relative="true">
+                        <Key type="Curve" time="0" value="0" out="linear"/>
+                        <Key type="Curve" time="2" value="0" out="linear"/>
+                        <Key type="Curve" time="8" value="1920" out="linear"/>
+                    </Controller>
+                </Animation>
+            </Frame>
+            
+            <Frame type="Image" name="ButtonDivider1">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="4"/>
+                <Anchor side="Right" relative="$parent/HomeButton" pos="Max" offset="#ButtonOffset"/>
+                <Texture val="@UI/Glues_Battlenet_TopNav_ButtonDivider"/>
+            </Frame>
+            
+            <Frame type="Image" name="ButtonDivider2">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="4"/>
+                <Anchor side="Right" relative="$parent/CampaignButton" pos="Max" offset="#ButtonOffset"/>
+                <Texture val="@UI/Glues_Battlenet_TopNav_ButtonDivider"/>
+            </Frame>
+            
+            <Frame type="Image" name="ButtonDivider3">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="4"/>
+                <Anchor side="Right" relative="$parent/CooperativeButton" pos="Max" offset="#ButtonOffset"/>
+                <Texture val="@UI/Glues_Battlenet_TopNav_ButtonDivider"/>
+            </Frame>
+            
+            <Frame type="Image" name="ButtonDivider4">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="4"/>
+                <Anchor side="Right" relative="$parent/MultiplayerButton" pos="Max" offset="#ButtonOffset"/>
+                <Texture val="@UI/Glues_Battlenet_TopNav_ButtonDivider"/>
+            </Frame>
+            
+            <Frame type="Image" name="ButtonDivider5">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="4"/>
+                <Anchor side="Right" relative="$parent/ArcadeButton" pos="Max" offset="#ButtonOffset"/>
+                <Texture val="@UI/Glues_Battlenet_TopNav_ButtonDivider"/>
+            </Frame>
+            
+            <Frame type="Image" name="ButtonDivider6">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="4"/>
+                <Anchor side="Right" relative="$parent/CollectionButton" pos="Max" offset="#ButtonOffset"/>
+                <Texture val="@UI/Glues_Battlenet_TopNav_ButtonDivider"/>
+            </Frame>
+
+            <Frame type="Image" name="ButtonDivider7">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="4"/>
+                <Anchor side="Right" relative="$parent/ReplayButton" pos="Max" offset="#ButtonOffset"/>
+                <Texture val="@UI/Glues_Battlenet_TopNav_ButtonDivider"/>
+            </Frame>
+
+            <Frame type="Button" name="BackButton" template="StandardBattlenetTemplates/BattlenetStandardBackButtonTemplate">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+            </Frame>
+
+            <Frame type="Button" name="HomeButton" template="StandardBattlenetTemplates/BattlenetTopNavHomeButtonTemplate">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                <Shortcut val="@UI/ScreenNavigation1_Hotkey"/>
+                
+                <Animation name="HideButton">
+                    <Event event="OnShown" action="Reset" frame="$parent/BackButton"/>
+                    <Event event="OnShown" action="Play" frame="$parent/BackButton"/>
+                    <Event event="OnHidden" action="Reset" frame="$parent/BackButton"/>
+                    <Event event="OnHidden" action="Stop" frame="$parent/BackButton"/>
+
+                    <Controller name="Visibility" type="Visibility" end="Pause">
+                        <Key type="Bool" time="0" value="true"/>
+                        <Key type="Bool" time=".001" value="false"/>
+                    </Controller>
+                </Animation>
+            </Frame>
+
+            <Frame type="Button" name="CampaignButton" template="ScreenNavigationSC2/ScreenNavigationButtonTemplate">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/HomeButton" pos="Max" offset="#ButtonOffsetLeft"/>
+                <Text val="@UI/ScreenNavigationSC2/CampaignButton"/>
+                <Shortcut val="@UI/ScreenNavigation2_Hotkey"/>
+                
+                <!--  NOVA MISSION PACKS LAUNCH (not pack 2) LATEST VERSION (1) -->
+                <!--
+                <Frame type="VersionNotificationFrame" name="NewContentFrame">
+                    <Version val="1"/>
+                    <SettingName val="NavigationCampaignButton"/>
+                </Frame>
+
+                <Animation name="VersionState">
+                    <Event event="NewVersion" action="Reset,Play" frame="$this/NewContentFrame"/>
+                    <Event event="OldVersion" action="Reset,Stop" frame="$this/NewContentFrame"/>
+                    <Event event="InvalidVersion" action="Reset,Stop" frame="$this/NewContentFrame"/>
+
+                    <Controller type="Tooltip" end="Pause">
+                        <Key type="Text" time="0" text="@UI/ScreenNavigation/NewContentCampaign"/>
+                    </Controller>
+                </Animation>
+                -->
+            </Frame>
+
+            <Frame type="Button" name="CooperativeButton" template="ScreenNavigationSC2/ScreenNavigationButtonVersionedTemplate">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/CampaignButton" pos="Max" offset="#ButtonOffsetLeft"/>
+                <Text val="@UI/ScreenNavigationSC2/CooperativeButton"/>
+                <Shortcut val="@UI/ScreenNavigation3_Hotkey"/>
+                <Enabled val="{$BattleUI/@IsOnline}"/>
+                
+                <!--  ALARAK & CUSTOM MUTATORS IS LATEST VERSION (3) -->
+                <Frame type="VersionNotificationFrame" name="NewContentFrame">
+                    <Version val="3"/> 
+                    <SettingName val="NavigationCoopButton"/>
+                </Frame>
+
+                <Animation name="VersionState">
+                    <Event event="NewVersion" action="Reset,Play" frame="$this/NewContentFrame"/>
+                    <Event event="OldVersion" action="Reset,Stop" frame="$this/NewContentFrame"/>
+                    <Event event="InvalidVersion" action="Reset,Stop" frame="$this/NewContentFrame"/>
+
+                    <Controller type="Tooltip" end="Pause">
+                        <Key type="Text" time="0" text="@UI/ScreenNavigation/NewContent"/>
+                    </Controller>
+                </Animation>
+
+                <Animation Name="ButtonTooltipOffline">
+                    <Event event="Offline" action="Reset,Play" frame="$parent/$parent"/>
+                    <Controller type="Tooltip" end="Pause">
+                        <Key type="Text" time="0" text="@UI/OfflineDisabledTooltip"/>
+                    </Controller>
+                </Animation>
+
+                <Animation Name="Online">
+                    <Event event="Online" action="Reset,Play" frame="$parent/$parent"/>
+
+                    <Controller type="Tooltip" end="Pause">
+                        <Key type="Text" time="0" text=""/>
+                    </Controller>
+                </Animation>
+            </Frame>
+
+            <Frame type="Button" name="MultiplayerButton" template="ScreenNavigationSC2/ScreenNavigationButtonTemplate">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/CooperativeButton" pos="Max" offset="#ButtonOffsetLeft"/>
+                <Text val="@UI/ScreenNavigationSC2/MultiplayerButton"/>
+                <Shortcut val="@UI/ScreenNavigation4_Hotkey"/>
+                
+                <!--  LADDER REVAMP IS THE LATEST VERSION (1) -->
+                <!--
+                <Frame type="VersionNotificationFrame" name="NewContentFrame">
+                    <Version val="1"/>
+                    <SettingName val="NavigationMultiplayerButton"/>
+                </Frame>
+
+                <Animation name="VersionState">
+                    <Event event="NewVersion" action="Reset,Play" frame="$this/NewContentFrame"/>
+                    <Event event="OldVersion" action="Reset,Stop" frame="$this/NewContentFrame"/>
+                    <Event event="InvalidVersion" action="Reset,Stop" frame="$this/NewContentFrame"/>
+
+                    <Controller type="Tooltip" end="Pause">
+                        <Key type="Text" time="0" text="@UI/ScreenNavigation/NewContentLadder"/>
+                    </Controller>
+                </Animation>
+                -->
+            </Frame>
+
+            <Frame type="Button" name="ArcadeButton" template="ScreenNavigationSC2/ScreenNavigationButtonTemplate">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/MultiplayerButton" pos="Max" offset="#ButtonOffsetLeft"/>
+                <Text val="@UI/ScreenNavigationSC2/ArcadeButton"/>
+                <Shortcut val="@UI/ScreenNavigation5_Hotkey"/>
+            </Frame>
+
+            <Frame type="Button" name="CollectionButton" template="ScreenNavigationSC2/ScreenNavigationButtonTemplate">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/ArcadeButton" pos="Max" offset="#ButtonOffsetLeft"/>
+                <Text val="@UI/ScreenNavigationSC2/CollectionButton"/>
+                <Shortcut val="@UI/ScreenNavigation6_Hotkey"/>
+                <Enabled val="{$BattleUI/@IsOnline}"/>
+
+                <StateGroup name="TooltipStateGroup">
+                    <State name="DisabledState">
+                        <When type="Property" Enabled="false"/>
+                        <Action type="SetProperty" Tooltip="@UI/OfflineDisabledTooltip"/>
+                    </State>
+
+                    <State name="EnabledState">
+                        <When type="Property" Enabled="true"/>
+                        <Action type="SetProperty" Tooltip=""/>
+                    </State>
+                </StateGroup>
+            </Frame>
+
+            <Frame type="Button" name="ReplayButton" template="ScreenNavigationSC2/ScreenNavigationButtonTemplate">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/CollectionButton" pos="Max" offset="#ButtonOffsetLeft"/>
+                <Text val="@UI/ScreenNavigationSC2/ReplayButton"/>
+                <!-- F7 actually doesn't work in non-RC builds because the shortcut is overridden by a dev-cheat to repeat last cheat (Play.cpp) -->
+                <Shortcut val="@UI/ScreenNavigation7_Hotkey"/>
+            </Frame>
+
+            <Frame type="TournamentAlertFrame" name="TournamentAlertFrame" template="TournamentAlertFrame/TournamentAlertFrameTemplate">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="5"/>
+                <Anchor side="Right" relative="$parent/PartyPanel/TileList/InviteButton" pos="Min" offset="-1"/>
+            </Frame>
+            
+            <Frame type="PartyPanelSC2" name="PartyPanel" template="PartyPanel/PartyPanelTemplate">
+                <Handle val="ScreenForeground_PartyPanel"/>
+                <Anchor side="Top" relative="$parent" pos="Min" offset="0" />
+                <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+                <Height val="1000"/>
+                <Width val="700"/>
+                <Visible val="{$BattleUI/@IsOnline}"/>
+            </Frame>
+
+            <Frame type="Frame" name="NavigationBlockFrame">
+                <Anchor relative="$parent/Background"/>
+                <AcceptsMouse val="true"/>
+                <Visible val="false"/>
+            </Frame>
+        </Frame>
+    </Frame>
+</Desc>

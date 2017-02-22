@@ -1,0 +1,462 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<Desc>
+    <Constant name="ColorWhite" val="ffffff"/>
+    <Constant name="ColorBookendDesaturation" val="535583"/>
+
+    <Frame type="CommandButton" name="BaseCommandButtonTemplate" template="GameButton/GameButtonTemplate">
+
+        <Frame type="Image" name="GameButtonDefaultBorder">
+            <StateGroup name="BorderStates">
+                <DefaultState val="Normal"/>
+
+                <State name="Cleared">
+                    <When type="Property" frame="$parent" Cleared="true"/>
+                    <Action type="SetProperty" frame="$this" DesaturationColor="#ColorWhite"/>
+                </State>
+
+                <State name="Disabled">
+                    <When type="Property" frame="$parent" CommandDisabled="true"/>
+                    <Action type="SetProperty" frame="$this" Texture="@UI/ButtonBorderPassive"/>
+                    <Action type="SetProperty" frame="$this" DesaturationColor="#ColorCommandDisabled"/>
+                    <Action type="SetProperty" frame="$parent/GameButtonDefaultHoverBorder" Visible="false"/>
+                </State>
+
+                <State name="Passive">
+                    <When type="Property" frame="$parent" Passive="true"/>
+                    <Action type="SetProperty" frame="$this" Texture="@UI/ButtonBorderPassive"/>
+                    <Action type="SetProperty" frame="$parent/GameButtonDefaultHoverBorder" Visible="false"/>
+                </State>
+
+                <State name="Executing">
+                    <When type="Property" frame="$parent" Executing="true"/>
+                </State>
+
+                <State name="Unbound">
+                    <When type="Property" frame="$parent" Unbound="true"/>
+                </State>
+
+                <State name="Highlighted">
+                    <When type="Property" frame="$parent" Highlighted="true"/>
+                    <Action type="SetProperty" frame="$this" Texture="@UI/Storm_UI_InGame_AbilityButtonBorder_Hover"/>
+                </State>
+
+                <State name="Normal">
+                    <When type="Property" frame="$parent" CommandDisabled="false"/>
+                    <Action type="SetProperty" frame="$this" Texture="@UI/Storm_UI_InGame_AbilityButtonBorder"/>
+                    <Action type="SetProperty" frame="$this" DesaturationColor="#ColorCommandNormalBorder"/>
+                </State>
+            </StateGroup>
+        </Frame>
+
+        <StateGroup name="ClearedState">
+            <DefaultState val="Set"/>
+
+            <State name="Set">
+                <When type="Property" Cleared="false"/>
+                <Action type="SetProperty" frame="NormalImage" DesaturateOnDisable="true"/>
+                <Action type="SetProperty" frame="GameButtonDefaultBorder" DesaturateOnDisable="true"/>
+                <Action type="SetProperty" frame="$this" Alpha="255"/>
+                <Action type="SetProperty" frame="$this" UseTooltip="true"/>
+                <Action type="SetProperty" frame="$this" Enabled="true"/>
+            </State>
+            <State name="Cleared">
+                <When type="Property" Cleared="true"/>
+                <Action type="SetProperty" frame="NormalImage" DesaturateOnDisable="false"/>
+                <Action type="SetProperty" frame="GameButtonDefaultBorder" DesaturateOnDisable="false"/>
+                <Action type="SetProperty" frame="$this" Alpha="0"/>
+                <Action type="SetProperty" frame="$this" UseTooltip="false"/>
+                <Action type="SetProperty" frame="$this" Enabled="false"/>
+            </State>
+        </StateGroup>
+
+        <StateGroup name="DesaturationStates">
+            <DefaultState val="Normal"/>
+            
+            <State name="Cleared">
+                <When type="Property" Cleared="true"/>
+                <Action type="SetProperty" frame="NormalImage" DesaturationColor="#ColorWhite"/>
+                <Action type="SetProperty" frame="NormalImage" Desaturated="false"/>
+            </State>
+            <State name="CommandDisabled">
+                <When type="Property" CommandDisabled="true"/>
+                <Action type="SetProperty" frame="NormalImage" DesaturationColor="#ColorCommandDisabled"/>
+                <Action type="SetProperty" frame="NormalImage" Desaturated="true"/>
+            </State>
+            <State name="Executing">
+                <When type="Property" Executing="true"/>
+                <Action type="SetProperty" frame="NormalImage" DesaturationColor="#ColorCommandExecuting"/>
+                <Action type="SetProperty" frame="NormalImage" Desaturated="true"/>
+            </State>
+            <State name="NoVitals">
+                <When type="Property" NoVitals="true"/>
+                <Action type="SetProperty" frame="NormalImage" DesaturationColor="#ColorCommandEnergy"/>
+                <Action type="SetProperty" frame="NormalImage" Desaturated="true"/>
+            </State>
+            <State name="Normal">
+                <Action type="SetProperty" frame="NormalImage" DesaturationColor="#ColorCommandNormal"/>
+                <Action type="SetProperty" frame="NormalImage" Desaturated="false"/>
+            </State>
+        </StateGroup>
+
+        <StateGroup name="DisabledState">
+            <DefaultState val="CommandEnabled"/>
+
+            <State name="UIDisabled">
+                <When type="Property" frame="$parent" enabled="false"/>
+            </State>
+            <State name="CommandEnabled">
+                <When type="Property" CommandDisabled="false"/>
+                <Action type="SetProperty" frame="NormalImage" Enabled="true"/>
+            </State>
+            <State name="CommandDisabled">
+                <When type="Property" CommandDisabled="true"/>
+                <Action type="SetProperty" frame="NormalImage" Enabled="false"/>
+                <Action type="SetProperty" frame="NormalImage" OnDisableDesaturationColor="#ColorCommandEnergy"/>
+            </State>
+        </StateGroup>
+
+        <Frame type="AnnounceableFrame" name="Announcer">
+            <Anchor relative="$parent"/>
+            <AnnounceFromParent val="True"/>
+
+            <StateGroup name="AnnounceState">
+                <DefaultState val="Invalid"/>
+                
+                <!-- Special Cases -->
+                <State name="AurielRayOfHeaven">
+                    <When type="Property" AbilityLink="AurielRayOfHeaven"/>
+                    <When type="Property" frame="$parent/CooldownLabel" Visible="false"/>
+                    <Action type="SetProperty" Announcement="VitalAmount"/>
+                    <Action type="SetProperty" Vital="Energy"/>
+                </State>
+
+                <State name="TracerPulseBomb">
+                    <When type="Property" AbilityLink="TracerPulseBomb"/>
+                    <When type="Property" frame="$parent" CommandDisabled="true"/>
+                    <Action type="SetProperty" Announcement="UltimateCharging"/>
+                </State>
+                <!-- /Special Cases -->
+
+                <State name="Invalid">
+                    <When type="Property" AbilityLink="invalid"/>
+                    <When type="Property" BehaviorLink="invalid"/>
+                    <Action type="SetProperty" Announcement="Disabled"/>
+                </State>
+
+                <State name="Behavior">
+                    <When type="Property" AbilityLink="invalid"/>
+                    <Action type="SetProperty" Announcement="Behavior"/>
+                </State>
+                
+                <State name="Ability">
+                    <When type="Property" BehaviorLink="invalid"/>
+                    <Action type="SetProperty" Announcement="AbilityReady"/>
+                </State>
+            </StateGroup>
+        </Frame>
+    </Frame>
+
+    <Frame type="CommandButton" name="CommandButtonTemplate" template="CommandButton/BaseCommandButtonTemplate">
+        <TooltipFrame val="CommandTooltip"/>
+
+        <Frame type="Image" name="IconBackground">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+            <LayerColor val="000000"/>
+            <RenderPriority val="10"/>
+            <ImageMaskTexture val="@UI/HUD_BTN_BG_Ability_AlphaMask"/>
+        </Frame>
+    </Frame>
+
+    <Frame type="CommandButton" name="BookendCommandButtonTemplate" template="GameButton/GameButtonTemplate">
+        <Width val="98"/>
+        <Height val="62"/>
+        <TooltipFrame val="CommandTooltip"/>
+
+        <Frame type="Image" name="NormalImage">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+            <Texture val="@UI/HUD_BTN_Ability_Cooldown_Anim" layer="1"/>
+            <Texture val="@UI/HUD_BTN_Ability_Cooldown_Charge_Anim" layer="2"/>
+            <DesaturationColor val="#ColorBookendDesaturation"/>
+            <OnDisableDesaturationColor val="#ColorBookendDesaturation"/>
+        </Frame>
+
+        <Frame type="Image" name="HoverImage">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+            <Unclipped val="False"/>
+            <DisabledAlpha val="255"/>
+            <LayerCount val="4"/>
+
+            <!-- Layer 0 used for icon -->
+            <TextureType val="Normal" layer="0"/>
+
+            <!-- Layer 1 used for cooldown -->
+            <TextureCoords top="0.0" left="0.0" bottom="0.2" right="0.1" layer="1"/>
+            <AnimColumns val="10" layer="1"/>
+            <AnimCount val="50" layer="1"/>
+            <Animating val="True" layer="1"/>
+            <ManagedAnim val="False" layer="1"/>
+            <LayerVisible val="False" layer="1" />
+
+            <TextureCoords top="0.0" left="0.0" bottom="0.2" right="0.1" layer="2"/>
+            <AnimColumns val="10" layer="2"/>
+            <AnimCount val="50" layer="2"/>
+            <Animating val="True" layer="2"/>
+            <ManagedAnim val="False" layer="2"/>
+            <LayerVisible val="False" layer="2" />
+
+            <Texture val="@UI/HUD_BTN_Ability_Cooldown_Anim" layer="1"/>
+            <Texture val="@UI/HUD_BTN_Ability_Cooldown_Charge_Anim" layer="2"/>
+            <DesaturationColor val="#ColorBookendDesaturation"/>
+            <OnDisableDesaturationColor val="#ColorBookendDesaturation"/>
+
+            <RenderPriority val="501"/>
+        </Frame>
+
+        <Frame type="Image" name="GameButtonDefaultBorder">
+            <Visible val="False"/>
+        </Frame>
+
+        <Frame type="Image" name="GameButtonDefaultHoverBorder">
+            <Visible val="False"/>
+        </Frame>
+
+        <Frame type="Image" name="ChargeBackground">
+            <Visible val="False"/>
+        </Frame>
+        
+        <Frame type="Frame" name="HitTestFrame">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="4"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="-24"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="18"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="-16"/>
+        </Frame>
+
+        <StateGroup name="DesaturationStates">
+            <DefaultState val="Normal"/>
+
+            <State name="CommandDisabled">
+                <When type="Property" CommandDisabled="true"/>
+                <Action type="SetProperty" frame="NormalImage" DesaturationColor="#ColorCommandDisabled"/>
+                <Action type="SetProperty" frame="HoverImage" DesaturationColor="#ColorCommandDisabled"/>
+                <Action type="SetProperty" frame="NormalImage" Desaturated="true"/>
+                <Action type="SetProperty" frame="HoverImage" Desaturated="true"/>
+            </State>
+            <State name="Executing">
+                <When type="Property" Executing="true"/>
+                <Action type="SetProperty" frame="NormalImage" DesaturationColor="#ColorCommandExecuting"/>
+                <Action type="SetProperty" frame="HoverImage" DesaturationColor="#ColorCommandExecuting"/>
+                <Action type="SetProperty" frame="NormalImage" Desaturated="true"/>
+                <Action type="SetProperty" frame="HoverImage" Desaturated="true"/>
+            </State>
+            <State name="Normal">
+                <Action type="SetProperty" frame="NormalImage" DesaturationColor="#ColorCommandNormal"/>
+                <Action type="SetProperty" frame="HoverImage" DesaturationColor="#ColorCommandNormal"/>
+                <Action type="SetProperty" frame="NormalImage" Desaturated="false"/>
+                <Action type="SetProperty" frame="HoverImage" Desaturated="false"/>
+            </State>
+        </StateGroup>
+
+        <StateGroup name="DisabledState">
+            <DefaultState val="Enabled"/>
+
+            <State name="Enabled">
+                <When type="Property" CommandDisabled="false"/>
+                <Action type="SetProperty" frame="NormalImage" Enabled="true"/>
+                <Action type="SetProperty" frame="HoverImage" Enabled="true"/>
+            </State>
+            <State name="Disabled">
+                <When type="Property" CommandDisabled="true"/>
+                <Action type="SetProperty" frame="NormalImage" Enabled="false"/>
+                <Action type="SetProperty" frame="HoverImage" Enabled="false"/>
+            </State>
+        </StateGroup>
+
+        <StateGroup name="ClearedState">
+            <State name="Cleared">
+                <When type="Property" Cleared="true"/>
+                <Action type="SetProperty" frame="$this" Alpha="0"/>
+                <Action type="SetProperty" frame="$this" Enabled="false"/>
+            </State>
+
+            <State name="Set">
+                <When type="Property" Cleared="false"/>
+                <Action type="SetProperty" frame="$this" Alpha="255"/>
+                <Action type="SetProperty" frame="$this" Enabled="true"/>
+            </State>
+        </StateGroup>
+
+    </Frame>
+
+    <Frame type="CommandButton" name="MountButtonTemplate" template="CommandButton/BookendCommandButtonTemplate">
+        <Frame type="Image" name="NormalImage">
+            <Texture val="@UI/HUD_BTN_BG_Ability_BookEnd_L_Normal" layer="3"/>
+            <ImageMaskTexture val="@UI/HUD_BTN_BG_Ability_BookEnd_L_AlphaMask"/>
+        </Frame>
+
+        <Frame type="Image" name="HoverImage">
+            <Texture val="@UI/HUD_BTN_BG_Ability_BookEnd_L_Hover" layer="3"/>
+            <ImageMaskTexture val="@UI/HUD_BTN_BG_Ability_BookEnd_L_AlphaMask"/>
+        </Frame>
+        
+        <Frame type="Label" name="CooldownLabel">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="10"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="-20"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="25"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="-18"/>
+            <Style val="GameButtonCooldown_Small"/>
+        </Frame>
+        
+        <Frame type="CommandHotkeyFrame" name="HotkeyFrame">
+            <Anchor relative="HotkeyLabel"/>
+            
+            <Frame type="Label" name="HotkeyLabel">
+                <Anchor side="Top" relative="$parent/$parent" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/$parent" pos="Min" offset="23"/>
+                <Anchor side="Bottom" relative="$parent/$parent" pos="Max" offset="-6"/>
+                <Anchor side="Right" relative="$parent/$parent" pos="Max" offset="0"/>
+                <Style val="Storm_CommandButtonHotkeyLabel_Small_L"/>
+            </Frame>
+        </Frame>
+
+        <Frame type="Frame" name="HitTestFrame">
+            <Anchor side="Left" relative="$parent" pos="Min" offset="18"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="-16"/>
+        </Frame>
+
+        <Frame type="AnnounceableFrame" name="Announcer">
+            <Anchor relative="$parent/HitTestFrame"/>
+            <AnnounceFromParent val="True"/>
+            <Announcement val="AbilityReady"/>
+
+            <StateGroup name="AnnounceState">
+                <!-- Special Cases -->
+                <State name="StandardMount">
+                    <When type="Property" AbilityLink="Mount"/>
+                    <Action type="SetProperty" Announcement="Disabled"/>
+                </State>
+                
+                <State name="Dismount">
+                    <When type="Property" AbilityLink="Dismount"/>
+                    <Action type="SetProperty" Announcement="Disabled"/>
+                </State>
+                <!-- /Special Cases -->
+            </StateGroup>
+        </Frame>
+    </Frame>
+
+    <Frame type="CommandButton" name="HearthButtonTemplate" template="CommandButton/BookendCommandButtonTemplate">
+        <Frame type="Image" name="NormalImage">
+            <Texture val="@UI/HUD_BTN_BG_Ability_BookEnd_R_Normal" layer="3"/>
+            <ImageMaskTexture val="@UI/HUD_BTN_BG_Ability_BookEnd_R_AlphaMask"/>
+        </Frame>
+
+        <Frame type="Image" name="HoverImage">
+            <Texture val="@UI/HUD_BTN_BG_Ability_BookEnd_R_Hover" layer="3"/>
+            <ImageMaskTexture val="@UI/HUD_BTN_BG_Ability_BookEnd_R_AlphaMask"/>
+        </Frame>
+
+        <Frame type="CommandHotkeyFrame" name="HotkeyFrame">
+            <Anchor relative="HotkeyLabel"/>
+            
+            <Frame type="Label" name="HotkeyLabel">
+                <Anchor side="Top" relative="$parent/$parent" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/$parent" pos="Min" offset="0"/>
+                <Anchor side="Bottom" relative="$parent/$parent" pos="Max" offset="-6"/>
+                <Anchor side="Right" relative="$parent/$parent" pos="Max" offset="-23"/>
+                <Style val="Storm_CommandButtonHotkeyLabel_Small_R"/>
+            </Frame>
+        </Frame>
+
+        <Frame type="Frame" name="HitTestFrame">
+            <Anchor side="Left" relative="$parent" pos="Min" offset="16"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="-18"/>
+        </Frame>
+    </Frame>
+    
+    <Frame type="CommandButton" name="InventoryButtonTemplate" template="CommandButton/BaseCommandButtonTemplate">
+        <Width val="105"/>
+        <Height val="105"/>
+        <TooltipFrame val="CommandTooltip"/>
+
+        <Frame type="Image" name="NormalImage">
+            <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+            <Texture val="@UI/HUD_BTN_Ability_Cooldown_Anim" layer="1"/>
+            <Texture val="@UI/HUD_BTN_Ability_Cooldown_Charge_Anim" layer="2"/>
+            <Texture val="@UI/Storm_UI_Blank" layer="3"/>
+            <Width val="70"/>
+            <Height val="70"/>
+            <ImageMaskTexture val="@UI/HUD_BTN_BG_Ability_Inventory_AlphaMask"/>
+        </Frame>
+        
+        <Frame type="Image" name="GameButtonDefaultBorder">
+            <Height val="105"/>
+            <Width val="105"/>
+        </Frame>
+
+        <Frame type="Image" name="HighlightBorder">
+            <Width val="105"/>
+            <Height val="105"/>
+        </Frame>
+        
+        <Frame type="Label" name="CooldownLabel">
+            <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="11"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="-10"/>
+            <Style val="GameButtonCooldown_Inventory"/>
+        </Frame>
+
+        <Frame type="CommandHotkeyFrame" name="HotkeyFrame">
+            <Frame type="Label" name="HotkeyLabel">
+                <Anchor side="Bottom" relative="$parent/$parent/NormalImage" pos="Max" offset="8"/>
+                <Anchor side="Left" relative="$parent/$parent/NormalImage" pos="Min" offset="-8"/>
+                <Style val="Storm_CommandButtonHotkeyLabel_Small"/>
+            </Frame>
+        </Frame>
+        
+        <Frame type="Image" name="ChargeBackground">
+            <Anchor side="Bottom" relative="$parent/NormalImage" pos="Max" offset="13"/>
+            <Anchor side="Right" relative="$parent/NormalImage" pos="Max" offset="6"/>
+            <Unclipped val="True"/>
+        </Frame>
+        
+        <Frame type="Label" name="ChargeLabel">
+            <Anchor side="Top" relative="$parent/ChargeBackground" pos="Mid" offset="-2"/>
+            <Anchor side="Bottom" relative="$parent/ChargeBackground" pos="Mid" offset="-2"/>
+            <Anchor side="Left" relative="$parent/ChargeBackground" pos="Mid" offset="1"/>
+            <Anchor side="Right" relative="$parent/ChargeBackground" pos="Mid" offset="1"/>
+            <Style val="Storm_CommandButttonChargeLabel"/>
+            <Unclipped val="True"/>
+        </Frame>
+
+        <Frame type="Frame" name="HitTestFrame">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+        </Frame>
+
+        <StateGroup name="ClearedState">
+            <State name="Cleared">
+                <Action type="SetProperty" frame="$this" Alpha="255"/>
+            </State>
+        </StateGroup>
+    </Frame>
+
+    <Frame type="CommandButton" name="HiddenButtonTemplate">
+        <Width val="0"/>
+        <Height val="0"/>
+    </Frame>
+</Desc>

@@ -1,0 +1,553 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<Desc>
+    <DescFlags val="Locked"/>
+
+    <Frame type="EmoticonPackTileListItem" name="EmoticonPackTileListItemTemplate">
+        <Height val="88"/>
+        <HideWhenCleared val="true"/>
+        <SelectedSound val="@UI_FileSelectionSelect"/>
+
+        <Frame type="Frame" name="HoverSound2Frame">
+            <Anchor relative="$parent"/>
+            <Visible val="False"/>
+
+            <Animation name="HoverSound2">
+                <Event event="OnShown" action="Reset,Play" frame="$this"/>
+
+                <Controller type="Sound" end="Stop">
+                    <Key type="Sound" time="0" sound="@UI_HoverTick"/>
+                </Controller>
+            </Animation>
+
+            <StateGroup name="VisibleState">
+                <DefaultState val="NotVisible"/>
+
+                <State name="Visible">
+                    <When type="Property" frame="$parent/HoverImage" visible="true"/>
+                    <When type="Property" frame="$parent" selected="false"/>
+                    <Action type="SetProperty" frame="$this" visible="true"/>
+                </State>
+
+                <State name="NotVisible">
+                    <Action type="SetProperty" frame="$this" visible="false"/>
+                </State>
+            </StateGroup>
+        </Frame>
+
+        <!-- <Animation name="HoverSound">
+            <Event event="OnMouseEnter" action="Reset,Play"/>
+            <Event event="OnMouseExit" action="Reset, Stop"/>
+            <Controller type="Sound" end="Stop">
+                <Key type="Sound" time="0" sound="@UI_HoverTick"/>
+            </Controller>
+        </Animation> -->
+
+        <Frame type="GameContentFrame" name="GameContentFrame">
+            <Anchor relative="$parent"/>
+            <GameContent val="{$parent/@GameContent}"/>
+        </Frame>
+
+        <Frame type="Image" name="NormalImage">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+            <Texture val="@UI/SC2_UI_Battlenet_Glue_Arcade_MainListItem_Normal"/>
+            <TextureType val="NineSlice"/>
+            <Alpha val="255"/>
+        </Frame>
+
+        <Frame type="Image" name="HoverImage">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+            <Texture val="@UI/SC2_UI_Battlenet_Glue_Arcade_MainListItem_Over"/>
+            <TextureType val="NineSlice"/>
+        </Frame>
+
+        <Frame type="Image" name="SelectedImage">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+            <Texture val="@UI/SC2_UI_Battlenet_Glue_Arcade_MainListItem_Selected"/>
+            <TextureType val="NineSlice"/>
+        </Frame>
+
+        <Frame type="Image" name="Icon">
+            <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="5"/>
+            <Height val="78"/>
+            <Width val="93"/>
+            <Alpha val="130"/>
+
+            <Animation name="SelectedIconStyle">
+                <Event event="OnShown" action="DirectionForward,Play" frame="$parent/SelectedImage"/>
+                <Event event="OnHidden" action="DirectionReverse,Play" frame="$parent/SelectedImage"/>
+
+                <Controller type="Fade" end="Pause">
+                    <Key type="Curve" time="0" value="130" out="Fast"/>
+                    <Key type="Curve" time=".2" value="255" in="Slow"/>
+                </Controller>
+            </Animation>
+        </Frame>
+
+        <Frame type="Frame" name="LockIcon">
+            <Anchor side="Top" relative="$parent/Icon" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent/Icon" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent/Icon" pos="Max" offset="0"/>
+            <Anchor side="Bottom" relative="$parent/Icon" pos="Max" offset="0"/>
+            <Visible val="False"/>
+
+            <Frame type="Image" name="Background">
+                <Anchor relative="$parent"/>
+                <LayerColor val="000000"/>
+                <Alpha val="150"/>
+            </Frame>
+
+            <Frame type="Image" name="LockIcon">
+                <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+                <Texture val="@UI/Glues_Icons_SmallLock"/>
+            </Frame>
+        </Frame>
+        
+        <Frame type="Image" name="IconFrame">
+            <Anchor side="Top" relative="$parent/Icon" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent/Icon" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent/Icon" pos="Max" offset="0"/>
+            <Anchor side="Bottom" relative="$parent/Icon" pos="Max" offset="0"/>
+            <Texture val="@UI/SC2_UI_Collection_VoicePack_ImageFrame"/>
+            <TextureType val="Nineslice"/>
+        </Frame>
+
+        <Frame type="Label" name="NameLabel">
+            <Anchor side="Bottom" relative="$parent/Icon" pos="Mid" offset="0"/>
+            <Anchor side="Left" relative="$parent/Icon" pos="Max" offset="15"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="-15"/>
+            <Height val="23"/>
+            <Options val="Ellipsis | NoWrapping | TooltipIfTruncated"/>
+            <AcceptsMouseTooltip val="True"/>
+            <Style val="@Collection_ListItem_Name"/>
+            <Text val="{$parent/@Name}"/>
+            
+            <StateGroup name="ListItemTextStates">
+                <DefaultState val="NormalState"/>
+            
+                <State name="ToggledState">
+                    <When type="Property" frame="$parent/SelectedImage" visible="True"/>
+                    <Action type="SetProperty" frame="$this" Style="@Collection_ListItem_Name_Selected"/>
+                </State>
+                
+                <State name="HoverState">
+                    <When type="Property" frame="$parent/HoverImage" visible="True"/>
+                    <Action type="SetProperty" frame="$this" Style="@Collection_ListItem_Name_Selected"/>
+                </State>
+        
+                <State name="LockedState">
+                    <When type="Property" frame="$parent/LockIcon" visible="True"/>
+                    <Action type="SetProperty" frame="$this" Style="@Collection_ListItem_Name_Locked"/>
+                </State>
+
+                <State name="NormalState">
+                    <Action type="SetProperty" frame="$this" Style="@Collection_ListItem_Name"/>
+                </State>
+            </StateGroup>
+        </Frame>
+
+        <Frame type="Label" name="LockedLabel">
+            <Anchor side="Top" relative="$parent/Icon" pos="Mid" offset="2"/>
+            <Anchor side="Left" relative="$parent/NameLabel" pos="Min" offset="1"/>
+            <Anchor side="Right" relative="$parent/NameLabel" pos="Max" offset="0"/>
+            <Style val="@Collection_ListItem_Desc"/>
+            <Height val="23"/>
+
+            <StateGroup name="ListItemTextStates">
+                <DefaultState val="NormalState"/>
+            
+                <State name="ToggledState">
+                    <When type="Property" frame="$parent/SelectedImage" visible="True"/>
+                    <Action type="SetProperty" frame="$this" Style="@Collection_ListItem_Desc_Selected"/>
+                </State>
+                
+                <State name="HoverState">
+                    <When type="Property" frame="$parent/HoverImage" visible="True"/>
+                    <Action type="SetProperty" frame="$this" Style="@Collection_ListItem_Desc_Selected"/>
+                </State>
+        
+                <State name="LockedState">
+                    <When type="Property" frame="$parent/LockIcon" visible="True"/>
+                    <Action type="SetProperty" frame="$this" Style="@Collection_ListItem_Desc_Locked"/>
+                </State>
+
+                <State name="NormalState">
+                    <Action type="SetProperty" frame="$this" Style="@Collection_ListItem_Desc"/>
+                </State>
+            </StateGroup>
+        </Frame>
+
+        <Frame type="Label" name="CostLabel">
+            <Anchor side="Top" relative="$parent/Icon" pos="Mid" offset="2"/>
+            <Anchor side="Left" relative="$parent/LockedLabel" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent/LockedLabel" pos="Max" offset="0"/>
+            <Style val="@Collection_ListItem_Cost"/>
+            <Text val="{$parent/GameContentFrame/@CostText}"/>
+        </Frame>
+
+        <StateGroup name="LockedStateGroup">
+            <DefaultState val="UnlockedState"/>
+            
+            <State name="LockedStateWithCost">
+                <When type="Property" frame="$this/GameContentFrame" IsAllowed="false"/>
+                <When type="Property" frame="$this/GameContentFrame" CostText="!"/>
+                <When type="Property" frame="$this" Commander=""/>
+                <When type="Property" frame="$this" Campaign=""/>
+                <Action type="SetProperty" frame="LockIcon" Visible="false"/>
+                <Action type="SetProperty" frame="LockedLabel" Visible="false"/>
+                <Action type="SetProperty" frame="CostLabel" Visible="true"/>
+            </State>
+            
+            <State name="LockedState">
+                <When type="Property" frame="$this/GameContentFrame" IsAllowed="false"/>
+                <Action type="SetProperty" frame="LockIcon" Visible="true"/>
+                <Action type="SetProperty" frame="LockedLabel" Text="@UI/ScreenCollection/Locked"/>
+                <Action type="SetProperty" frame="LockedLabel" Visible="true"/>
+                <Action type="SetProperty" frame="CostLabel" Visible="false"/>
+            </State>
+
+            <State name="UnlockedState">
+                <Action type="SetProperty" frame="LockIcon" Visible="false"/>
+                <Action type="SetProperty" frame="LockedLabel" Text="@UI/ScreenCollection/Owned"/>
+                <Action type="SetProperty" frame="LockedLabel" Visible="true"/>
+                <Action type="SetProperty" frame="CostLabel" Visible="false"/>
+            </State>
+        </StateGroup>
+    </Frame>
+
+    <Frame type="EmoticonPackSelectionFrame" name="EmoticonPackSelectionFrameTemplate">
+        <HideOwned val="{$this/HideOwnedCheckBox/@Checked}"/>
+        <SortMethod val="{$this/SortPulldown/@SelectedSort}"/>
+
+        <Frame type="GameContentFrame" name="PrerequisiteGameContentFrame">
+            <Anchor relative="$parent"/>
+            <GameContent val="{$parent/@Prerequisite}"/>
+        </Frame>
+        
+        <Frame type="Label" name="TitleLabel">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="98"/>
+            <Anchor side="Left" relative="$Anchor_LeftHeader" pos="Max" offset="0"/>
+            <Style val="@Arcade_Title"/>
+            <Text val="@UI/ScreenCollection/Emojis/Title"/>
+        </Frame>
+
+        <Frame type="GameContentSortPulldown" name="SortPulldown" template="StandardBattlenetTemplates/BattlenetLargePulldownTemplate">
+            <Anchor side="Bottom" relative="$parent/SelectedEmoticonPackFrame" pos="Min" offset="3"/>
+            <Anchor side="Right" relative="$parent/SelectedEmoticonPackFrame" pos="Max" offset="-4"/>
+            <Animation name="HoverSound">
+                <Event event="OnMouseEnter" action="Reset,Play"/>
+                <Event event="OnMouseExit" action="Reset, Stop"/>
+                <Controller type="Sound" end="Stop">
+                    <Key type="Sound" time="0" sound="@UI_HoverTick"/>
+                </Controller>
+            </Animation>
+        </Frame>
+
+        <Frame type="CheckBox" name="HideOwnedCheckBox" template="StandardTemplates/StandardCheckBoxTemplate">
+            <Anchor side="Top" relative="$parent/SortPulldown" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent/SortPulldown" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent/SortPulldown" pos="Min" offset="-9"/>
+        </Frame>
+        
+        <Frame type="Label" name="HideOwnedLabel">
+            <Anchor side="Top" relative="$parent/HideOwnedCheckBox" pos="Mid" offset="1"/>
+            <Anchor side="Bottom" relative="$parent/HideOwnedCheckBox" pos="Mid" offset="1"/>
+            <Anchor side="Right" relative="$parent/HideOwnedCheckBox" pos="Min" offset="-5"/>
+            <Style val="@Arcade_Subtitle"/>
+            <Text val="@UI/ScreenCollection/HideOwned"/>
+        </Frame>
+        
+        <Frame type="BlurFrame" name="BackgroundBlur">
+            <Anchor side="Top" relative="$parent/TileListBackground" pos="Min" offset="4"/>
+            <Anchor side="Left" relative="$parent/TileListBackground" pos="Min" offset="4"/>
+            <Anchor side="Bottom" relative="$parent/TileListBackground" pos="Max" offset="-4"/>
+            <Anchor side="Right" relative="$parent/TileListBackground" pos="Max" offset="-4"/>
+            <BlurAmount val=".35"/>
+        </Frame>
+        
+        <Frame type="Image" name="TileListBackground">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="212"/>
+            <Anchor side="Left" relative="$Anchor_LeftStandard" pos="Max" offset="0"/>
+            <Width val="517"/>
+            <Height val="681"/>
+            <Texture val="@UI/SC2_UI_Battlenet_Glue_Arcade_MainContainer"/>
+            <TextureType val="NineSlice"/>
+        </Frame>
+        
+        <Frame type="TileList" name="TileList">
+            <Anchor side="Top" relative="$parent/TileListBackground" pos="Min" offset="21"/>
+            <Anchor side="Left" relative="$parent/TileListBackground" pos="Min" offset="24"/>
+            <Anchor side="Right" relative="$parent/TileListBackground" pos="Max" offset="-11"/>
+            <Anchor side="Bottom" relative="$this/Item6" pos="Max" offset="0"/>
+            <AcceptsMouse val="true"/>
+            <RequireSelection val="true"/>
+            
+            <Frame type="EmoticonPackTileListItem" name="Item0" template="EmoticonPackSelectionFrame/EmoticonPackTileListItemTemplate">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="4"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Right" relative="$parent/ScrollBar" pos="Min" offset="-2"/>
+            </Frame>
+
+            <Frame type="EmoticonPackTileListItem" name="Item1" template="EmoticonPackSelectionFrame/EmoticonPackTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item0" pos="Max" offset="2"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Right" relative="$parent/ScrollBar" pos="Min" offset="-2"/>
+            </Frame>
+
+            <Frame type="EmoticonPackTileListItem" name="Item2" template="EmoticonPackSelectionFrame/EmoticonPackTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item1" pos="Max" offset="2"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Right" relative="$parent/ScrollBar" pos="Min" offset="-2"/>
+            </Frame>
+
+            <Frame type="EmoticonPackTileListItem" name="Item3" template="EmoticonPackSelectionFrame/EmoticonPackTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item2" pos="Max" offset="2"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Right" relative="$parent/ScrollBar" pos="Min" offset="-2"/>
+            </Frame>
+
+            <Frame type="EmoticonPackTileListItem" name="Item4" template="EmoticonPackSelectionFrame/EmoticonPackTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item3" pos="Max" offset="2"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Right" relative="$parent/ScrollBar" pos="Min" offset="-2"/>
+            </Frame>
+            
+            <Frame type="EmoticonPackTileListItem" name="Item5" template="EmoticonPackSelectionFrame/EmoticonPackTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item4" pos="Max" offset="2"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Right" relative="$parent/ScrollBar" pos="Min" offset="-2"/>
+            </Frame>
+            
+            <Frame type="EmoticonPackTileListItem" name="Item6" template="EmoticonPackSelectionFrame/EmoticonPackTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item5" pos="Max" offset="2"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Right" relative="$parent/ScrollBar" pos="Min" offset="-2"/>
+            </Frame>
+
+            <Frame type="ScrollBar" name="ScrollBar" template="CollectionTemplates/ScrollBarTemplate">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="1"/>
+                <Anchor side="Right" relative="$parent" pos="Max" offset="-1"/>
+                <Anchor side="Bottom" relative="$parent" pos="Max" offset="3"/>
+            </Frame>
+        </Frame>
+
+        <Frame type="SelectedEmoticonPackFrame" name="SelectedEmoticonPackFrame" template="SelectedEmoticonPackFrame/SelectedEmoticonPackFrameTemplate">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="212"/>
+            <Anchor side="Left" relative="$parent/TileListBackground" pos="Max" offset="18"/>
+            <EmoticonPack val="{$parent/@EmoticonPack}"/>
+        </Frame>
+        
+        <Frame type="BuyButton" name="BuyButton" template="CollectionTemplates/BuyButtonTemplate">
+            <Anchor side="Bottom" relative="$Anchor_BottomActionButton" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$Anchor_LeftActionButton" pos="Max" offset="0"/>
+            <GameContent val="{$parent/PrerequisiteGameContentFrame/@GameContent}"/>
+            <CollapseLayout val="true"/>
+
+            <Animation name="HoverSound">
+                <Event event="OnMouseEnter" action="Reset,Play"/>
+                <Event event="OnMouseExit" action="Reset, Stop"/>
+                <Controller type="Sound" end="Stop">
+                    <Key type="Sound" time="0" sound="@UI_HoverTick"/>
+                </Controller>
+            </Animation>
+
+            <StateGroup name="BuyButtonVisibility">
+                <DefaultState val="HideState"/>
+
+                <State name="ShowState">
+                    <When type="Property" frame="$parent" RequiredCampaign=""/>
+                    <When type="Property" frame="$parent" RequiredCommander=""/>
+                    <When type="Property" frame="$parent/SelectedEmoticonPackFrame" HasProduct="true"/>
+                    <Action type="SetProperty" frame="$this" Visible="true"/>
+                </State>
+
+                <State name="HideState">
+                    <Action type="SetProperty" frame="$this" Visible="false"/>
+                </State>
+            </StateGroup>
+        </Frame>
+
+        <Frame type="Button" name="ViewBundleButton" template="StandardBattlenetTemplates/BattlenetStandardButtonTemplate">
+            <Anchor side="Bottom" relative="$Anchor_BottomActionButton" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent/BuyButton" pos="Max" offset="5"/>
+            <CollapseLayout val="true"/>
+            <Text val="@UI/ScreenCollection/Buttons/ViewBundle"/>
+
+            <Animation name="HoverSound">
+                <Event event="OnMouseEnter" action="Reset,Play"/>
+                <Event event="OnMouseExit" action="Reset, Stop"/>
+                <Controller type="Sound" end="Stop">
+                    <Key type="Sound" time="0" sound="@UI_HoverTick"/>
+                </Controller>
+            </Animation>
+
+            <StateGroup name="ViewBundleVisibilityStateGroup">
+                <DefaultState val="ViewBundleNotVisible"/>
+
+                <State name="ViewBundleVisible">
+                    <When type="AnimationState" frame="$parent/SelectedEmoticonPackFrame/GameContentFrame" PurchasedState="NotPurchased"/>
+                    <When type="Property" frame="$parent" ParentBundle="!"/>
+                    <Action type="SetProperty" frame="$this" visible="True"/>
+                </State>
+
+                <State name="ViewBundleNotVisible">
+                    <Action type="SetProperty" frame="$this" visible="false"/>
+                </State>
+            </StateGroup>
+
+            <Animation name="Event">
+                <Event event="OnClick" action="Reset,Play"/>
+
+                <Controller type="Property" frame="$parent/SelectedBundleFrame" property="Visible" end="Pause">
+                    <Key type="Property" time="0" value="false"/>
+                    <Key type="Property" time="0.01" value="true"/>
+                </Controller>
+            </Animation>
+        </Frame>
+
+        <Frame type="SelectedBundleFrame" name="SelectedBundleFrame" template="SelectedBundleFrame/SelectedBundleFrameTemplate">
+            <Anchor side="Top" relative="$parent/$parent" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent/$parent" pos="Min" offset="0"/>
+            <Anchor side="Bottom" relative="$parent/$parent" pos="Max" offset="0"/>
+            <Anchor side="Right" relative="$parent/$parent" pos="Max" offset="0"/>
+            <Bundle val="{$parent/@ParentBundle}"/>
+
+            <Frame type="BuyButton" name="BuyButton" template="CollectionTemplates/BuyButtonTemplate">
+                <Anchor side="Bottom" relative="$parent/BackgroundImage" pos="Max" offset="-50"/>
+                <Anchor side="Right" relative="$parent/BackgroundImage" pos="Mid" offset="-3"/>
+                <ShowPrice val="true"/>
+                <AlwaysShow val="true"/>
+
+                <GameContent val="{$parent/$parent/@ParentBundleContent}"/>
+                <CollapseLayout val="false"/>
+            </Frame>
+
+            <Frame type="BundleCacheFrame" name="BundleCacheFrame">
+                <Anchor relative="$parent"/>
+                <Bundle val="{$parent/$parent/@ParentBundle}"/>
+            </Frame>
+
+            <Frame type="GameContentFrame" name="GameContentFrame">
+                <Anchor relative="$parent"/>
+                <GameContent val="{$parent/$parent/@ParentBundleContent}"/>
+            </Frame>
+
+            <Animation name="Event">
+                <Event event="OnClick" frame="$this/CloseButton" action="Reset,Play"/>
+
+                <Controller type="Property" property="Visible" end="Pause">
+                    <Key type="Property" time="0" value="true"/>
+                    <Key type="Property" time="0.01" value="false"/>
+                </Controller>
+            </Animation>
+        </Frame>
+
+        <Frame type="ActivateCoopScreenButton" name="CoopScreenButton" template="StandardBattlenetTemplates/BattlenetStandardButtonTemplate">
+            <Anchor side="Bottom" relative="$Anchor_BottomActionButton" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent/ViewBundleButton" pos="Max" offset="0"/>
+            <Text val="@UI/ScreenCollection/ViewCommander"/>
+            <CommanderId val="{$parent/@RequiredCommander}"/>
+            <CollapseLayout val="true"/>
+
+            <Animation name="HoverSound">
+                <Event event="OnMouseEnter" action="Reset,Play"/>
+                <Event event="OnMouseExit" action="Reset, Stop"/>
+                <Controller type="Sound" end="Stop">
+                    <Key type="Sound" time="0" sound="@UI_HoverTick"/>
+                </Controller>
+            </Animation>
+
+            <StateGroup name="CommanderStateGroup">
+                <DefaultState val="ShowState"/>
+                
+                <State name="HideState">
+                    <When type="Property" frame="$parent" RequiredCommander=""/>
+                    <Action type="SetProperty" frame="$this" Visible="false"/>
+                </State>
+
+                <State name="ShowState">
+                    <Action type="SetProperty" frame="$this" Visible="true"/>
+                </State>
+            </StateGroup>
+        </Frame>
+
+        <Frame type="ActivateCampaignScreenButton" name="CampaignScreenButton" template="StandardBattlenetTemplates/BattlenetStandardButtonTemplate">
+            <Anchor side="Bottom" relative="$Anchor_BottomActionButton" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent/CoopScreenButton" pos="Max" offset="0"/>
+            <Text val="@UI/ScreenCollection/ViewCampaign"/>
+            <CampaignId val="{$parent/@RequiredCampaign}"/>
+            <ScreenSingleMode val="Campaign"/>
+            <CollapseLayout val="true"/>
+
+            <StateGroup name="CampaignStateGroup">
+                <DefaultState val="ShowState"/>
+                
+                <State name="HideState">
+                    <When type="Property" frame="$parent" RequiredCampaign=""/>
+                    <Action type="SetProperty" frame="$this" Visible="false"/>
+                </State>
+
+                <State name="ShowState">
+                    <Action type="SetProperty" frame="$this" Visible="true"/>
+                </State>
+            </StateGroup>
+        </Frame>
+        
+        <Frame type="Frame" name="AchievementLockedWarningContainer" template="CollectionTemplates/AchievementLockedWarningContainerTemplate">
+            <Anchor side="Bottom" relative="$Anchor_BottomActionButton" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent/CampaignScreenButton" pos="Max" offset="20"/>
+            <CollapseLayout val="true"/>
+            <PreserveAnchorOffset val="True"/>
+            
+            <StateGroup name="AchievementLockedStateGroup">
+                <DefaultState val="NotAchievementLockedState"/>
+
+                <State name="HasBundle">
+                    <When type="AnimationState" frame="$parent/SelectedEmoticonPackFrame/GameContentFrame" PurchasedState="NotPurchased"/>
+                    <When type="Property" frame="$parent" ParentBundle="!"/>
+                    <Action type="SetProperty" frame="$this" Visible="false"/>
+                </State>
+
+                <State name="NotPurchased">
+                    <When type="Property" frame="$parent" RequiredCommander=""/>
+                    <When type="AnimationState" frame="$parent/SelectedEmoticonPackFrame/GameContentFrame" PurchasedState="NotPurchased"/>
+                    <When type="Property" frame="$parent" RequiredCampaign=""/>
+                    <When type="Property" frame="$parent/SelectedEmoticonPackFrame" HasProduct="true"/>
+                    <Action type="SetProperty" frame="$this" Visible="false"/>
+                </State>
+                
+                <State name="AchievementLockedState">
+                    <When type="AnimationState" frame="$parent/SelectedEmoticonPackFrame/GameContentFrame" PurchasedState="NotPurchased"/>
+                    <When type="Property" frame="$parent/SelectedEmoticonPackFrame/GameContentFrame" IsAllowed="False"/>
+                    <When type="Property" frame="$parent/SelectedEmoticonPackFrame/GameContentFrame" IsValid="True"/>
+                    <Action type="SetProperty" frame="$this" visible="True"/>
+                </State>
+                
+                <State name="NotAchievementLockedState">
+                    <Action type="SetProperty" frame="$this" visible="False"/>
+                </State>
+            </StateGroup>
+        </Frame>
+
+        <Animation name="SelectedBundleFrameVisibility">
+            <Event event="OnHidden" action="Reset,Play"/>
+
+            <Controller type="Visibility" frame="SelectedBundleFrame" end="Pause">
+                <Key type="Bool" time="0" value="false"/>
+            </Controller>
+        </Animation>
+    </Frame>
+</Desc>

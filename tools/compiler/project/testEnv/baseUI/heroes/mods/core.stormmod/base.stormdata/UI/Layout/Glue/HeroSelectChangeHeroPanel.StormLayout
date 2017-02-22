@@ -1,0 +1,630 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<Desc>
+    <Constant name="FilterHorizontalSpace" val="-7"/>
+    <Constant name="FilterHorizontalSpaceRightOffset" val="7"/>
+    <Constant name="FilterPanelTemplateLeftOffset" val="-510"/>
+    <Constant name="FilterPanelTemplateRightOffset" val="510"/>
+
+    <Frame type="Button" name="FilterButtonBaseTemplate">
+        <RenderType val="LDR"/>
+        <Toggleable val="true"/>
+        <ClickSound val="@UI_BNet_Generic_01"/>
+        <Width val="56"/>
+        <Height val="60"/>
+        
+        <Frame type="Frame" name="HitTestFrame">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+            <TooltipAnchorPosition val="TopCenter"/>
+        </Frame>
+
+        <Frame type="BlurFrame" name="BlurFrame" template="StandardTemplates/FullscreenBlurFrame">
+            <Anchor relative="$parent"/>
+            <AlphaMaskTexture val="@UI/Storm_UI_Play_Filter_Background_Mask"/>
+            <BlurAmount val="0.2"/>
+        </Frame> 
+        
+        <Frame type="Image" name="BackplateImage">
+            <Anchor relative="$parent"/>
+            <Texture val="@UI/Storm_UI_Play_Filter_Background_Off"/>
+        </Frame>
+
+        <Frame type="Image" name="BackplateHoverImage">
+            <Anchor relative="$parent/BackplateImage"/>
+            <Texture val="@UI/Storm_UI_Play_Filter_Background_Hover"/>
+            <Alpha val="0"/>
+            <Animation name="Hover">
+                <Event event="OnMouseEnter" action="DirectionForward,Play" frame="$parent"/>
+                <Event event="OnMouseExit" action="DirectionReverse,Play" frame="$parent"/>
+                <Controller type="Fade" end="Pause">
+                    <Key type="Curve" time="0" value="0" out="Fast"/>
+                    <Key type="Curve" time=".1" value="255" in="Slow"/>
+                </Controller>
+            </Animation>
+        </Frame>
+
+        <Frame type="Image" name="BackplateOnImage">
+            <Anchor relative="$parent/BackplateImage"/>
+            <Texture val="@UI/Storm_UI_Play_Filter_Background_On"/>
+            <Alpha val="0"/>
+            <Animation name="Hover">
+                <Event event="Toggled" action="DirectionForward,Play" frame="$parent"/>
+                <Event event="Normal" action="DirectionReverse,Play" frame="$parent"/>
+                <Controller type="Fade" end="Pause">
+                    <Key type="Curve" time="0" value="0" out="Fast"/>
+                    <Key type="Curve" time=".3" value="255" in="Slow"/>
+                </Controller>
+            </Animation>
+        </Frame>
+
+        <StateGroup name="FilterState">
+            <DefaultState val="Off"/>
+            <State name="Toggled">
+                <When type="Property" Toggled="True"/>
+                <Action type="SendEvent" event="FilterToggled"/>
+            </State>
+            <State name="Hovering">
+                <When type="Property" Hovering="True"/>
+                <Action type="SendEvent" event="FilterHovered"/>
+            </State>
+            <State name="Off">
+                <Action type="SendEvent" event="FilterOff"/>
+            </State>
+        </StateGroup>
+    </Frame>
+
+    <Frame type="Button" name="FilterButtonTemplate" template="HeroSelectChangeHeroPanel/FilterButtonBaseTemplate">
+        <Frame type="Image" name="OffIconImage">
+            <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+        </Frame>
+
+        <Frame type="Image" name="HoverIconImage">
+            <Anchor relative="$parent/OffIconImage" pos="Mid" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+            <Alpha val="0"/>
+            <Animation name="Hover">
+                <Event event="OnMouseEnter" action="DirectionForward,Play" frame="$parent"/>
+                <Event event="OnMouseExit" action="DirectionReverse,Play" frame="$parent"/>
+                <Controller type="Fade" end="Pause">
+                    <Key type="Curve" time="0" value="0" out="Fast"/>
+                    <Key type="Curve" time=".3" value="255" in="Slow"/>
+                </Controller>
+            </Animation>
+        </Frame>
+
+        <Frame type="Image" name="OnIconImage">
+            <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+            <Alpha val="0"/>
+            <Animation name="Hover">
+                <Event event="Toggled" action="DirectionForward,Play" frame="$parent"/>
+                <Event event="Normal" action="DirectionReverse,Play" frame="$parent"/>
+                <Controller type="Fade" end="Pause">
+                    <Key type="Curve" time="0" value="0" out="Fast"/>
+                    <Key type="Curve" time=".5" value="255" in="Slow"/>
+                </Controller>
+            </Animation>
+        </Frame>
+    </Frame>
+
+    <Frame type="Button" name="SortTextButtonTemplate" template="HeroSelectChangeHeroPanel/FilterButtonBaseTemplate">
+        <Frame type="Image" name="SortIndicatorImage">
+            <Anchor side="Top" relative="$parent" pos="Mid" offset="17"/>
+            <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Mid" offset="17"/>
+            <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+            <Texture val="@UI/Storm_UI_Play_Filter_Arrow-Off"/>
+
+            <Animation name="FilterButtonTexture">
+                <Event event="FilterToggled" action="DirectionForward,Play" frame="$parent"/>
+                <Event event="FilterHovered" action="DirectionReverse,Play" frame="$parent"/>
+                <Event event="FilterOff" action="Stop" frame="$parent"/>
+
+                <Controller type="Texture" end="Pause">
+                    <Key type="Image" time="0" image="@UI/Storm_UI_Play_Filter_Arrow-Hover"/>
+                    <Key type="Image" time="0.01" image="@UI/Storm_UI_Play_Filter_Arrow-On"/>
+                </Controller>
+            </Animation>
+        </Frame>
+
+        <Frame type="Label" name="FilterText">
+            <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+            <Style val="HeroSelectSortButtonOff"/>
+            
+            <Animation name="Style">
+                <Event event="FilterToggled" action="DirectionForward,Play" frame="$parent"/>
+                <Event event="FilterHovered" action="DirectionReverse,Play" frame="$parent"/>
+                <Event event="FilterOff" action="Stop" frame="$parent"/>
+
+                <Controller type="Style" end="Pause" style1="HeroSelectSortButtonHover" style2="HeroSelectSortButtonOn">
+                    <Key type="Curve" time="0.0" value="0" out="Fast"/>
+                    <Key type="Curve" time=".01" value="1" in="Fast"/>
+                </Controller>
+            </Animation>
+        </Frame>
+    </Frame>
+
+    <Frame type="HeroFilterPanel" name="HeroFilterPanelTemplate">
+        <Height val="60"/>
+
+        <Frame type="HeroRoleButton" name="FilterWarriorButton" template="HeroSelectChangeHeroPanel/FilterButtonTemplate">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+
+            <HeroRole val="Warrior"/>
+            <Tooltip val="@UI/HeroFilterTooltip/Warrior"/>
+            
+            <Frame type="Image" name="OffIconImage">
+                <Texture val="@UI/Storm_UI_Play_Filter_Warrior-Off"/>
+            </Frame>
+    
+            <Frame type="Image" name="HoverIconImage">
+                <Texture val="@UI/Storm_UI_Play_Filter_Warrior-Hover"/>
+            </Frame>
+    
+            <Frame type="Image" name="OnIconImage">
+                <Texture val="@UI/Storm_UI_Play_Filter_Warrior-On"/>
+            </Frame>
+        </Frame>
+
+        <Frame type="HeroRoleButton" name="FilterDamageButton" template="HeroSelectChangeHeroPanel/FilterButtonTemplate">
+            <Anchor side="Top" relative="$parent/FilterWarriorButton" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent/FilterWarriorButton" pos="Max" offset="#FilterHorizontalSpace"/>
+            
+            <HeroRole val="Damage"/>
+            <Tooltip val="@UI/HeroFilterTooltip/Damage"/>
+            
+            <Frame type="Image" name="OffIconImage">
+                <Texture val="@UI/Storm_UI_Play_Filter_Assassin-Off"/>
+            </Frame>
+    
+            <Frame type="Image" name="HoverIconImage">
+                <Texture val="@UI/Storm_UI_Play_Filter_Assassin-Hover"/>
+            </Frame>
+    
+            <Frame type="Image" name="OnIconImage">
+                <Texture val="@UI/Storm_UI_Play_Filter_Assassin-On"/>
+            </Frame>
+        </Frame>
+
+        <Frame type="HeroRoleButton" name="FilterSupportButton" template="HeroSelectChangeHeroPanel/FilterButtonTemplate">
+            <Anchor side="Top" relative="$parent/FilterDamageButton" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent/FilterDamageButton" pos="Max" offset="#FilterHorizontalSpace"/>
+            
+            <HeroRole val="Support"/>
+            <Tooltip val="@UI/HeroFilterTooltip/Support"/>
+            
+            <Frame type="Image" name="OffIconImage">
+                <Texture val="@UI/Storm_UI_Play_Filter_Support-Off"/>
+            </Frame>
+    
+            <Frame type="Image" name="HoverIconImage">
+                <Texture val="@UI/Storm_UI_Play_Filter_Support-Hover"/>
+            </Frame>
+    
+            <Frame type="Image" name="OnIconImage">
+                <Texture val="@UI/Storm_UI_Play_Filter_Support-On"/>
+            </Frame>
+        </Frame>
+
+        <Frame type="HeroRoleButton" name="FilterSpecialistButton" template="HeroSelectChangeHeroPanel/FilterButtonTemplate">
+            <Anchor side="Top" relative="$parent/FilterSupportButton" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent/FilterSupportButton" pos="Max" offset="#FilterHorizontalSpace"/>
+
+            <HeroRole val="Specialist"/>
+            <Tooltip val="@UI/HeroFilterTooltip/Specialist"/>
+            
+            <Frame type="Image" name="OffIconImage">
+                <Texture val="@UI/Storm_UI_Play_Filter_Specialist-Off"/>
+            </Frame>
+    
+            <Frame type="Image" name="HoverIconImage">
+                <Texture val="@UI/Storm_UI_Play_Filter_Specialist-Hover"/>
+            </Frame>
+    
+            <Frame type="Image" name="OnIconImage">
+                <Texture val="@UI/Storm_UI_Play_Filter_Specialist-On"/>
+            </Frame>
+        </Frame>
+
+        <Frame type="HeroRoleButton" name="FilterMulticlassButton" template="HeroSelectChangeHeroPanel/FilterButtonTemplate">
+            <Anchor side="Top" relative="$parent/FilterSpecialistButton" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent/FilterSpecialistButton" pos="Max" offset="#FilterHorizontalSpace"/>
+
+            <HeroRole val="Multiclass"/>
+            <Tooltip val="@UI/HeroFilterTooltip/Multiclass"/>
+
+            <Frame type="Image" name="OffIconImage">
+                <Texture val="@UI/Storm_UI_Play_Filter_Multiclass-Off"/>
+            </Frame>
+
+            <Frame type="Image" name="HoverIconImage">
+                <Texture val="@UI/Storm_UI_Play_Filter_Multiclass-Hover"/>
+            </Frame>
+
+            <Frame type="Image" name="OnIconImage">
+                <Texture val="@UI/Storm_UI_Play_Filter_Multiclass-On"/>
+            </Frame>
+        </Frame>
+
+        <Frame type="Button" name="FilterWarcraftButton" template="HeroSelectChangeHeroPanel/FilterButtonTemplate">
+            <Anchor side="Top" relative="$parent/FilterMulticlassButton" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent/FilterMulticlassButton" pos="Max" offset="27"/>
+
+            <Tooltip val="@UI/HeroFilterTooltip/Universe/Warcraft"/>
+            
+            <Frame type="Image" name="OffIconImage">
+                <Texture val="@UI/Storm_UI_Play_Filter_WC-Off"/>
+            </Frame>
+    
+            <Frame type="Image" name="HoverIconImage">
+                <Texture val="@UI/Storm_UI_Play_Filter_WC-Hover"/>
+            </Frame>
+    
+            <Frame type="Image" name="OnIconImage">
+                <Texture val="@UI/Storm_UI_Play_Filter_WC-On"/>
+            </Frame>
+        </Frame>
+
+        <Frame type="Button" name="FilterStarCraftButton" template="HeroSelectChangeHeroPanel/FilterButtonTemplate">
+            <Anchor side="Top" relative="$parent/FilterWarcraftButton" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent/FilterWarcraftButton" pos="Max" offset="#FilterHorizontalSpace"/>
+
+            <Tooltip val="@UI/HeroFilterTooltip/Universe/Starcraft"/>
+            
+            <Frame type="Image" name="OffIconImage">
+                <Texture val="@UI/Storm_UI_Play_Filter_SC-Off"/>
+            </Frame>
+    
+            <Frame type="Image" name="HoverIconImage">
+                <Texture val="@UI/Storm_UI_Play_Filter_SC-Hover"/>
+            </Frame>
+    
+            <Frame type="Image" name="OnIconImage">
+                <Texture val="@UI/Storm_UI_Play_Filter_SC-On"/>
+            </Frame>
+        </Frame>
+
+        <Frame type="Button" name="FilterDiabloButton" template="HeroSelectChangeHeroPanel/FilterButtonTemplate">
+            <Anchor side="Top" relative="$parent/FilterStarCraftButton" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent/FilterStarCraftButton" pos="Max" offset="#FilterHorizontalSpace"/>
+            
+            <Tooltip val="@UI/HeroFilterTooltip/Universe/Diablo"/>
+            
+            <Frame type="Image" name="OffIconImage">
+                <Texture val="@UI/Storm_UI_Play_Filter_D-Off"/>
+            </Frame>
+    
+            <Frame type="Image" name="HoverIconImage">
+                <Texture val="@UI/Storm_UI_Play_Filter_D-Hover"/>
+            </Frame>
+    
+            <Frame type="Image" name="OnIconImage">
+                <Texture val="@UI/Storm_UI_Play_Filter_D-On"/>
+            </Frame>
+        </Frame>
+
+        <Frame type="Button" name="FilterOverwatchButton" template="HeroSelectChangeHeroPanel/FilterButtonTemplate">
+            <Anchor side="Top" relative="$parent/FilterDiabloButton" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent/FilterDiabloButton" pos="Max" offset="#FilterHorizontalSpace"/>
+
+            <Tooltip val="@UI/HeroFilterTooltip/Universe/Overwatch"/>
+
+            <Frame type="Image" name="OffIconImage">
+                <Texture val="@UI/Storm_UI_Play_Filter_OW-Off"/>
+            </Frame>
+
+            <Frame type="Image" name="HoverIconImage">
+                <Texture val="@UI/Storm_UI_Play_Filter_OW-Hover"/>
+            </Frame>
+
+            <Frame type="Image" name="OnIconImage">
+                <Texture val="@UI/Storm_UI_Play_Filter_OW-On"/>
+            </Frame>
+        </Frame>
+
+        <Frame type="Button" name="FilterRetroButton" template="HeroSelectChangeHeroPanel/FilterButtonTemplate">
+            <Anchor side="Top" relative="$parent/FilterOverwatchButton" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent/FilterOverwatchButton" pos="Max" offset="#FilterHorizontalSpace"/>
+
+            <Tooltip val="@UI/HeroFilterTooltip/Universe/Classic"/>
+            
+            <Frame type="Image" name="OffIconImage">
+                <Texture val="@UI/Storm_UI_Play_Filter_B-Off"/>
+            </Frame>
+    
+            <Frame type="Image" name="HoverIconImage">
+                <Texture val="@UI/Storm_UI_Play_Filter_B-Hover"/>
+            </Frame>
+    
+            <Frame type="Image" name="OnIconImage">
+                <Texture val="@UI/Storm_UI_Play_Filter_B-On"/>
+            </Frame>
+        </Frame>
+
+        <Frame type="Frame" name="SortButtonGroups">
+            <Anchor side="Top" relative="$parent/FilterOverwatchButton" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent/FilterOverwatchButton" pos="Mid" offset="0"/>
+            <Anchor side="Left" relative="SortByFavoriteButton" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="SortByLevelButton" pos="Max" offset="0"/>
+            <Height val="100"/>
+
+            <Frame type="Button" name="SortByFavoriteButton" template="HeroSelectChangeHeroPanel/FilterButtonTemplate">
+                <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Right" relative="$parent/SortDividerImage" pos="Min" offset="5"/>
+
+                <Tooltip val="@UI/HeroFilterTooltip/SortFavoritesFirst"/>
+                
+                <Frame type="Image" name="OffIconImage">
+                    <Texture val="@UI/Storm_UI_Play_Filter_Favorite-Off"/>
+                </Frame>
+
+                <Frame type="Image" name="HoverIconImage">
+                    <Texture val="@UI/Storm_UI_Play_Filter_Favorite-Hover"/>
+                </Frame>
+
+                <Frame type="Image" name="OnIconImage">
+                    <Texture val="@UI/Storm_UI_Play_Filter_Favorite-On"/>
+                </Frame>
+            </Frame>
+
+            <Frame type="Image" name="SortDividerImage">
+                <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Right" relative="$parent/SortByAplhabetButton" pos="Min" offset="5"/>
+                <Texture val="@UI/Storm_UI_Play_Filter_Divider"/>
+            </Frame>
+
+            <Frame type="Button" name="SortByAplhabetButton" template="HeroSelectChangeHeroPanel/SortTextButtonTemplate">
+                <Toggleable val="false"/>
+                <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Right" relative="$parent/SortByLevelButton" pos="Min" offset="#FilterHorizontalSpaceRightOffset"/>
+
+                <Tooltip val="@UI/HeroFilterTooltip/SortAlphabetically"/>
+                
+                <Frame type="Label" name="FilterText">
+                    <Text val="@UI/HeroFilterButtonText/SortAlphabetically"/>
+                </Frame>
+            </Frame>
+
+            <Frame type="Button" name="SortByLevelButton" template="HeroSelectChangeHeroPanel/SortTextButtonTemplate">
+                <Toggleable val="false"/>
+                <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Right" relative="$parent/$parent/FilterEditBox" pos="Min" offset="#FilterHorizontalSpaceRightOffset"/>
+
+                <Tooltip val="@UI/HeroFilterTooltip/SortByLevel"/>
+
+                <Frame type="Label" name="FilterText">
+                    <Text val="@UI/HeroFilterButtonText/SortByLevel"/>
+                </Frame>
+            </Frame>
+        </Frame>
+        
+        <Frame type="EditBox" name="FilterEditBox" template="StandardTemplates/StandardSearchEditBoxTemplate">
+            <Anchor side="Top" relative="$parent/FilterRetroButton" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent/FilterRetroButton" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="-10"/>
+            <Width val="330"/>
+            <LoseFocusOnEnterOrEsc val="true"/>
+            
+            <Frame type="Label" name="SearchTextLabel">
+                <Text val="@UI/HeroSelect/FilterText"/>
+            </Frame>
+
+            <Frame type="Button" name="ClearTextButton">
+                <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Right" relative="$parent" pos="Max" offset="-21"/>
+                <Height val="24"/>
+                <Width val="24"/>
+
+                <Frame type="Image" name="NormalImage">
+                    <Texture val="@UI/Storm_UI_Icon_CloseSearch_Disabled" layer="0"/>
+                </Frame>
+
+                <Frame type="Image" name="HoverImage">
+                    <Texture val="@UI/Storm_UI_Icon_CloseSearch_Hover" layer="0"/>
+                </Frame>
+            </Frame>            
+        </Frame>
+        
+        <Frame type="Image" name="FilterSearchImage">
+            <Anchor side="Top" relative="$parent/FilterEditBox" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent/FilterEditBox" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent/FilterEditBox" pos="Max" offset="-21"/>
+            <Texture val="@UI/Storm_UI_Icon_SearchGlass_Dark"/>
+
+            <Animation name="FilterSearchImage">
+                <Event event="OnShown" action="DirectionForward" frame="$parent/FilterEditBox/ClearTextButton"/>
+                <Event event="OnShown" action="Play" frame="$parent/FilterEditBox/ClearTextButton"/>
+                <Event event="OnHidden" action="DirectionReverse" frame="$parent/FilterEditBox/ClearTextButton"/>
+                <Event event="OnHidden" action="Play" frame="$parent/FilterEditBox/ClearTextButton"/>
+                <Controller type="Fade" end="Pause">
+                    <Key type="Curve" time="0" value="255" out="Slow"/>
+                    <Key type="Curve" time=".1" value="0" in="Slow"/>
+                </Controller>
+            </Animation>
+        </Frame>
+    </Frame>
+    
+    <Frame type="HeroSelectChangeHeroPanel" name="HeroSelectChangeHeroPanelTemplate" template="HeroSelectCustomizePanel/HeroSelectCustomizePanelTemplate">
+        <VisibilityOnFade val="true"/>
+
+        <Animation name="ShowPurchasableError">
+            <Event event="HideCannotPurchaseError" action="Stop" frame="PurchaseInfoPanel"/>
+            <Event event="ShowCannotPurchaseError" action="Play" frame="PurchaseInfoPanel"/>
+
+            <Controller type="Visibility" end="Pause" frame="PurchaseInfoPanel/HeroNotPurchaseable">
+                <Key type="Bool" time="0" value="true"/>
+            </Controller>
+            <Controller type="Visibility" end="Pause" frame="PurchaseInfoPanel/DescriptionLabel">
+                <Key type="Bool" time="0" value="true"/>
+            </Controller>
+        </Animation>
+
+        <Frame type="PurchaseInfoPanel" name="PurchaseInfoPanel">
+            <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Top" relative="$parent" pos="Min" offset="80"/>
+            <Anchor side="Bottom" relative="$parent" pos="Min" offset="270"/>
+            <Width val="500"/>
+            
+            <Frame type="BlurFrame" name="BlurBackground">
+                <Anchor relative="$parent"/>
+                <Visible val="false"/>
+            </Frame>
+            <Frame type="Image" name="BorderImage">
+                <Visible val="false"/>
+            </Frame>
+            
+            <Frame type="Image" name="CustomizeBorderImage">
+                <Visible val="false"/>
+            </Frame>
+
+            <Frame type="Label" name="NameLabel">
+                <Visible val="False"/>
+                <RenderPriority val="501"/>
+            </Frame>
+
+            <Frame type="Image" name="HeroNotPurchaseable">
+                <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+                <Texture val="@UI/Storm_UI_Play_HeroAttributes_HeroNotPurchaseable"/>
+                <RenderPriority val="500"/>
+                <Visible val="false"/>
+            </Frame>
+
+            <Frame type="Label" name="DescriptionLabel">
+                <Anchor side="Top" relative="$parent/HeroNotPurchaseable" pos="Mid" offset="11"/>
+                <Anchor side="Bottom" relative="$parent/HeroNotPurchaseable" pos="Mid" offset="11"/>
+                <Anchor side="Left" relative="$parent/HeroNotPurchaseable" pos="Mid" offset="0"/>
+                <Anchor side="Right" relative="$parent/HeroNotPurchaseable" pos="Mid" offset="0"/>
+                <Visible val="false"/>
+                <Style val="HeroSelectHeroPanelPurchaseError"/>
+            </Frame>
+
+            <Animation name="ShowAnchor">
+                <Event event="OnShown" action="Reset"/>
+                <Event event="OnShown" action="Play"/>
+                <Controller type="Anchor" end="Pause" side="Bottom" relative="true">
+                    <Key type="Curve" time="0" value="40" out="Fast"/>
+                    <Key type="Curve" time=".3" value="10" in="Slow"/>
+                </Controller>
+            </Animation>
+        </Frame>
+        
+        <Frame type="PurchaseCurrencySelectPanel" name="PurchaseCurrencySelectPanel">
+            <RenderPriority val="515"/>
+            <Visible val="False"/>
+
+            <Frame type="Image" name="ShopIconImage">
+                <Anchor side="Bottom" relative="$parent" pos="Max" offset="-30"/>
+                <AcceptsMouse val="True"/>
+            </Frame>
+        </Frame>
+        
+        <Frame type="PurchaseConfirmPanel" name="PurchaseConfirmPanel">
+            <RenderPriority val="515"/>
+            <Frame type="Button" name="ConfirmButton">
+                <Anchor side="Top" relative="$parent/ShopIconImage" pos="Mid" offset="0"/>
+                <Anchor side="Bottom" relative="$parent/ShopIconImage" pos="Mid" offset="0"/>
+                <Width val="0"/>
+            </Frame>
+
+            <Frame type="Button" name="CancelButton">
+                <Anchor side="Top" relative="$parent/ShopIconImage" pos="Mid" offset="0"/>
+                <Anchor side="Bottom" relative="$parent/ShopIconImage" pos="Mid" offset="0"/>
+                <Width val="0"/>
+            </Frame>
+            
+            <Frame type="Button" name="ShopIconImage">
+                <Anchor side="Top" relative="$parent/$parent/PurchaseCurrencySelectPanel/ShopIconImage" pos="Mid" offset="0"/>
+                <Anchor side="Bottom" relative="$parent/$parent/PurchaseCurrencySelectPanel/ShopIconImage" pos="Mid" offset="0"/>
+            </Frame>
+        </Frame>
+
+        <Frame type="BlurFrame" name="BlurBackground">
+            <Anchor side="Left" relative="$parent/BorderImage" pos="Min" offset="52"/>
+            <Anchor side="Top" relative="$parent/BorderImage" pos="Min" offset="24"/>
+            <Anchor side="Right" relative="$parent/BorderImage" pos="Max" offset="-25"/>
+            <Anchor side="Bottom" relative="$parent/BorderImage" pos="Max" offset="-47"/>
+            <BlurAmount val="0.8"/>
+            <RenderPriority val="399"/>
+            <Visible val="false"/>
+            
+            <Frame type="Image" name="LowImage">
+                <Anchor relative="$parent" />
+                <TextureType val="Normal"/>
+                <Texture val="@UI/Storm_Generic_Background_Low"/>
+            </Frame>
+        </Frame>
+
+        <Frame type="Image" name="BorderImage">
+            <Anchor relative="$parent"/>
+            <Texture val="@UI/Storm_UI_Play_HeroAttributes_PanelBorder"/>
+            <TextureType val="Nineslice"/>
+            <AcceptsMouse val="true"/>
+            <RenderPriority val="400"/>
+            <Visible val="false"/>
+        </Frame>
+
+        <Frame type="Button" name="CloseButton">
+            <Visible val="false"/>
+        </Frame>
+        
+        <Frame type="Label" name="RoleFilterLabel">
+            <Anchor side="Bottom" relative="$parent/HeroFilterPanel/FilterWarriorButton" pos="Min" offset="-4"/>
+            <Anchor side="Left" relative="$parent/HeroFilterPanel/FilterWarriorButton" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent/HeroFilterPanel/FilterMulticlassButton" pos="Max" offset="0"/>
+            <Style val="HeroSelectFilterLabel"/>
+            <Text val="@UI/HeroSelect/Role"/>
+        </Frame>
+        
+        <Frame type="Label" name="UniverseFilterLabel">
+            <Anchor side="Bottom" relative="$parent/RoleFilterLabel" pos="Max" offset="0"/>
+            <Anchor side="Left" relative="$parent/HeroFilterPanel/FilterWarcraftButton" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent/HeroFilterPanel/FilterRetroButton" pos="Max" offset="0"/>
+            <Style val="HeroSelectFilterLabel"/>
+            <Text val="@UI/HeroSelect/Universe"/>
+        </Frame>
+
+        <Frame type="Label" name="SortLabel">
+            <Anchor side="Bottom" relative="$parent/HeroFilterPanel/SortButtonGroups/SortByAplhabetButton" pos="Min" offset="-4"/>
+            <Anchor side="Left" relative="$parent/HeroFilterPanel/SortButtonGroups/SortByAplhabetButton" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent/HeroFilterPanel/SortButtonGroups/SortByAplhabetButton" pos="Mid" offset="0"/>
+            <Style val="HeroSelectFilterLabel"/>
+            <Text val="@UI/HeroSelect/Sort"/>
+        </Frame>
+
+        <Frame type="Button" name="ConfirmButton" template="StandardTemplates/HeroSelectChooseButtonTemplate">
+            <Anchor relative="$parent/$parent/$parent/HeroBasicSlotPanel/HeroSlotFrame0"/>
+            <Visible val="false"/>
+        </Frame>
+
+        <Animation name="SlideInSound">
+            <Event event="Show" action="DirectionForward,Play"/>
+            <Event event="Hide" action="DirectionReverse,Play"/>
+            <Controller type="Sound" end="Pause">
+                <Key type="Sound" time="0.00" sound="@UI_BNet_HeroChange_Open" direction="Forward"/>
+                <Key type="Sound" time="0.175" sound="@UI_BNet_HeroChange_Close" direction="Reverse"/>
+            </Controller>
+        </Animation>
+    </Frame>
+</Desc>

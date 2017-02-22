@@ -1,0 +1,2838 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<Desc>
+
+    <!-- TODO:
+        clear up color setting confusion 
+            (getting set by states, animation states, triggers, animations? no clear flow)
+        property binding can take the place of several stategroups
+        try red/blue via team color (unitstatuscolor frame)
+            - not sure how easy it is to override with yellow
+        clean out things that don't need to be in triggers
+    -->
+
+
+    <Constant name="AwardHeroContainerWidth" val="250"/>
+    <Constant name="MVPStatGapX" val="22"/>
+    <Constant name="MVPStatGapY" val="35"/>
+    <Constant name="MVPStatLabelWidth" val="297"/><!-- set a little wide to prevent truncation in other languages -->
+    <Constant name="VoteButtonSize" val="96"/>
+    <Constant name="MVPCountdownStart" val="10"/>
+
+    <Frame type="Frame" name="BestInGameTemplate">
+        <Height val="44"/>
+        <Visible val="false"/>
+        
+        <Frame type="Image" name="Star">
+            <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="-10"/>
+            <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+            <Unclipped val="True"/>
+            
+            <SubpixelRendering val="True"/>
+            <Texture val="@UI/eom_mvp_star"/>
+        </Frame>
+        
+        <Frame type="Label" name="Label">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent/Star" pos="Max" offset="-10"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+            
+            <SubpixelRendering val="True"/>
+            <Text val=""/>
+            <Style val="MVP_BestInGame"/>
+        </Frame>
+    </Frame>
+    
+    <Frame type="Frame" name="SecondaryAwardBaseTemplate">
+        <RenderType val="LDR"/>
+        
+        <Frame type="Image" name="SeparatorImage_Blue">
+            <Anchor side="Top" relative="$parent/PlayerNameLabel" pos="Max" offset="-5"/>
+            <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+            <Width val="200"/>
+            <Height val="10"/>
+            
+            <Visible val="False"/>
+            <Texture val="@UI/eom_separator_blue"/>
+        </Frame>
+        
+        <Frame type="Image" name="SeparatorImage_Red">
+            <Anchor relative="$parent/SeparatorImage_Blue"/>
+            
+            <Visible val="False"/>
+            <Texture val="@UI/eom_separator_red"/>
+        </Frame>
+        
+        <Frame type="Image" name="SeparatorImage_Yellow">
+            <Anchor relative="$parent/SeparatorImage_Blue"/>
+            
+            <Visible val="False"/>
+            <Texture val="@UI/eom_separator_yellow"/>
+        </Frame>
+
+        <Frame type="CutsceneFrame" name="BadgeCutsceneEffects">
+            <Anchor side="Top" relative="$parent/AwardIcon" pos="Mid" offset="0"/>
+            <Anchor side="Left" relative="$parent/AwardIcon" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent/AwardIcon" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent/AwardIcon" pos="Mid" offset="0"/>
+            <Width val="315"/>
+            <Height val="640"/>
+            <UseAlternateTime val="true"/>
+            
+            <Unclipped val="true"/>
+            <File val="Cutscenes/EndOfMatch_Badge_FX.StormCutscene"/>
+            <AutoPlay val="true"/>
+            
+            <!-- BG Effect color settings -->
+            <Animation name="BlueFilter">
+                <Event event="BlueFilter" frame="$this" action="Reset,Play"/>
+                
+                <Controller type="Cutscene" end="Stop">
+                    <Key type="Cutscene" time="0.0" action="ClearFilters"/>
+                    <Key type="Cutscene" time="0.0" action="AddFilter" filter="Team0"/>
+                </Controller>
+            </Animation> 
+            
+            <Animation name="RedFilter">
+                <Event event="RedFilter" frame="$this" action="Reset,Play"/>
+                
+                <Controller type="Cutscene" end="Stop">
+                    <Key type="Cutscene" time="0.0" action="ClearFilters"/>
+                    <Key type="Cutscene" time="0.0" action="AddFilter" filter="Team1"/>
+                </Controller>
+            </Animation>
+            
+            <StateGroup name="SetColorFilter">
+                <State name="Blue">
+                    <When type="StateGroup" frame="$parent" ColorState="BlueTeam"/>
+                    <When type="AnimationState" CutsceneLoad="Loaded"/>
+                    <Action type="SendEvent" event="BlueFilter" frame="$this"/>
+                </State>
+                <State name="Red">
+                    <When type="StateGroup" frame="$parent" ColorState="RedTeam"/>
+                    <When type="AnimationState" CutsceneLoad="Loaded"/>
+                    <Action type="SendEvent" event="RedFilter" frame="$this"/>
+                </State>
+            </StateGroup>
+        </Frame>
+        
+        <Frame type="Image" name="AwardIcon">
+            <Anchor side="Top" relative="$parent" pos="11%" offset="5"/>
+            <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+            <Height val="110"/>
+            <Width val="110"/>
+            <UseAlternateTime val="true"/>
+            
+            <!-- Unclipped for scaling animations -->
+            <Unclipped val="True"/>
+            
+            <Texture val="@UI/Storm_UI_EOM_Icons_Rewards"/>
+            
+            <Animation name="Tier2LegendaryTransition">
+                <Event event="Tier2LegendaryTransition" frame="$this" action="Reset,Play"/>
+                
+                <Controller type="Cutscene" end="Stop" frame="$parent/BadgeCutsceneEffects">
+                    <Key type="Cutscene" time="0.0" action="Bookmark" bookmark="Legendary"/>
+                    <Key type="Cutscene" time="0.0" action="Play"/>
+                </Controller>
+            </Animation>
+            
+            <!-- movement animations -->
+            <Animation name="Entrance">
+                <Event event="OnShown" action="Reset, Play"/>
+                
+                <Controller type="Dimension" dimension="Width" relative="False" percentage="True" end="Pause">
+                    <Key type="Curve" time="0" value="800" out="Auto"/>
+                    <Key type="Curve" time="0.2" value="90" in="Auto" out="Auto"/>
+                    <Key type="Curve" time="0.35" value="100" in="Auto"/>
+                </Controller>
+                
+                <Controller type="Dimension" dimension="Height" relative="False" percentage="True" end="Pause">
+                    <Key type="Curve" time="0" value="800" out="Auto"/>
+                    <Key type="Curve" time="0.2" value="90" in="Auto" out="Auto"/>
+                    <Key type="Curve" time="0.35" value="100" in="Auto"/>
+                </Controller>
+                
+                <Controller type="Fade" end="Pause">
+                    <Key type="Curve" time="0" value="0" out="Auto"/>
+                    <Key type="Curve" time="0.1" value="255" in="Auto"/>
+                </Controller>
+            </Animation>
+            
+            <!-- Badge toggle- apply a template which gives the appropriate texture coordinate and mask -->
+            <StateGroup name="BadgeType">
+                <DefaultState val="Default"/>
+                <State name="Default">
+                    <Action type="SetProperty" visible="true"/>
+                </State>
+                <State name="000">
+                    <When type="AnimationState" IconState="000"/>
+                    <Action type="ApplyTemplate" template="EndOfGameAwardsIconTemplates/Icon000"/>
+                </State>
+                <State name="001">
+                    <When type="AnimationState" IconState="001"/>
+                    <Action type="ApplyTemplate" template="EndOfGameAwardsIconTemplates/Icon001"/>
+                </State>
+                <State name="002">
+                    <When type="AnimationState" IconState="002"/>
+                    <Action type="ApplyTemplate" template="EndOfGameAwardsIconTemplates/Icon002"/>
+                    <Action type="SendEvent" event="LegendaryIcon"/>
+                </State>
+                <State name="010">
+                    <When type="AnimationState" IconState="010"/>
+                    <Action type="ApplyTemplate" template="EndOfGameAwardsIconTemplates/Icon010"/>
+                </State>
+                <State name="011">
+                    <When type="AnimationState" IconState="011"/>
+                    <Action type="ApplyTemplate" template="EndOfGameAwardsIconTemplates/Icon011"/>
+                </State>
+                <State name="012">
+                    <When type="AnimationState" IconState="012"/>
+                    <Action type="ApplyTemplate" template="EndOfGameAwardsIconTemplates/Icon012"/>
+                    <Action type="SendEvent" event="LegendaryIcon"/>
+                </State>
+                <State name="020">
+                    <When type="AnimationState" IconState="020"/>
+                    <Action type="ApplyTemplate" template="EndOfGameAwardsIconTemplates/Icon020"/>
+                </State>
+                <State name="021">
+                    <When type="AnimationState" IconState="021"/>
+                    <Action type="ApplyTemplate" template="EndOfGameAwardsIconTemplates/Icon021"/>
+                </State>
+                <State name="022">
+                    <When type="AnimationState" IconState="022"/>
+                    <Action type="ApplyTemplate" template="EndOfGameAwardsIconTemplates/Icon022"/>
+                    <Action type="SendEvent" event="LegendaryIcon"/>
+                </State>
+                <State name="030">
+                    <When type="AnimationState" IconState="030"/>
+                    <Action type="ApplyTemplate" template="EndOfGameAwardsIconTemplates/Icon030"/>
+                </State>
+                <State name="031">
+                    <When type="AnimationState" IconState="031"/>
+                    <Action type="ApplyTemplate" template="EndOfGameAwardsIconTemplates/Icon031"/>
+                </State>
+                <State name="032">
+                    <When type="AnimationState" IconState="032"/>
+                    <Action type="ApplyTemplate" template="EndOfGameAwardsIconTemplates/Icon032"/>
+                    <Action type="SendEvent" event="LegendaryIcon"/>
+                </State>
+                <State name="040">
+                    <When type="AnimationState" IconState="040"/>
+                    <Action type="ApplyTemplate" template="EndOfGameAwardsIconTemplates/Icon040"/>
+                </State>
+                <State name="041">
+                    <When type="AnimationState" IconState="041"/>
+                    <Action type="ApplyTemplate" template="EndOfGameAwardsIconTemplates/Icon041"/>
+                </State>
+                <State name="042">
+                    <When type="AnimationState" IconState="042"/>
+                    <Action type="ApplyTemplate" template="EndOfGameAwardsIconTemplates/Icon042"/>
+                    <Action type="SendEvent" event="LegendaryIcon"/>
+                </State>
+                <State name="050">
+                    <When type="AnimationState" IconState="050"/>
+                    <Action type="ApplyTemplate" template="EndOfGameAwardsIconTemplates/Icon050"/>
+                </State>
+                <State name="051">
+                    <When type="AnimationState" IconState="051"/>
+                    <Action type="ApplyTemplate" template="EndOfGameAwardsIconTemplates/Icon051"/>
+                </State>
+                <State name="052">
+                    <When type="AnimationState" IconState="052"/>
+                    <Action type="ApplyTemplate" template="EndOfGameAwardsIconTemplates/Icon052"/>
+                    <Action type="SendEvent" event="LegendaryIcon"/>
+                </State>
+                <State name="060">
+                    <When type="AnimationState" IconState="060"/>
+                    <Action type="ApplyTemplate" template="EndOfGameAwardsIconTemplates/Icon060"/>
+                </State>
+                <State name="061">
+                    <When type="AnimationState" IconState="061"/>
+                    <Action type="ApplyTemplate" template="EndOfGameAwardsIconTemplates/Icon061"/>
+                </State>
+                <State name="062">
+                    <When type="AnimationState" IconState="062"/>
+                    <Action type="ApplyTemplate" template="EndOfGameAwardsIconTemplates/Icon062"/>
+                    <Action type="SendEvent" event="LegendaryIcon"/>
+                </State>
+                <State name="070">
+                    <When type="AnimationState" IconState="070"/>
+                    <Action type="ApplyTemplate" template="EndOfGameAwardsIconTemplates/Icon070"/>
+                </State>
+                <State name="071">
+                    <When type="AnimationState" IconState="071"/>
+                    <Action type="ApplyTemplate" template="EndOfGameAwardsIconTemplates/Icon071"/>
+                </State>
+                <State name="072">
+                    <When type="AnimationState" IconState="072"/>
+                    <Action type="ApplyTemplate" template="EndOfGameAwardsIconTemplates/Icon072"/>
+                    <Action type="SendEvent" event="LegendaryIcon"/>
+                </State>
+                <State name="080">
+                    <When type="AnimationState" IconState="080"/>
+                    <Action type="ApplyTemplate" template="EndOfGameAwardsIconTemplates/Icon080"/>
+                </State>
+                <State name="081">
+                    <When type="AnimationState" IconState="081"/>
+                    <Action type="ApplyTemplate" template="EndOfGameAwardsIconTemplates/Icon081"/>
+                </State>
+                <State name="082">
+                    <When type="AnimationState" IconState="082"/>
+                    <Action type="ApplyTemplate" template="EndOfGameAwardsIconTemplates/Icon082"/>
+                    <Action type="SendEvent" event="LegendaryIcon"/>
+                </State>
+                <State name="090">
+                    <When type="AnimationState" IconState="090"/>
+                    <Action type="ApplyTemplate" template="EndOfGameAwardsIconTemplates/Icon090"/>
+                </State>
+                <State name="091">
+                    <When type="AnimationState" IconState="091"/>
+                    <Action type="ApplyTemplate" template="EndOfGameAwardsIconTemplates/Icon091"/>
+                </State>
+                <State name="092">
+                    <When type="AnimationState" IconState="092"/>
+                    <Action type="ApplyTemplate" template="EndOfGameAwardsIconTemplates/Icon092"/>
+                    <Action type="SendEvent" event="LegendaryIcon"/>
+                </State>
+                <State name="100">
+                    <When type="AnimationState" IconState="100"/>
+                    <Action type="ApplyTemplate" template="EndOfGameAwardsIconTemplates/Icon100"/>
+                </State>
+                <State name="101">
+                    <When type="AnimationState" IconState="101"/>
+                    <Action type="ApplyTemplate" template="EndOfGameAwardsIconTemplates/Icon101"/>
+                </State>
+                <State name="102">
+                    <When type="AnimationState" IconState="102"/>
+                    <Action type="ApplyTemplate" template="EndOfGameAwardsIconTemplates/Icon102"/>
+                    <Action type="SendEvent" event="LegendaryIcon"/>
+                </State>
+                <State name="110">
+                    <When type="AnimationState" IconState="110"/>
+                    <Action type="ApplyTemplate" template="EndOfGameAwardsIconTemplates/Icon110"/>
+                </State>
+                <State name="111">
+                    <When type="AnimationState" IconState="111"/>
+                    <Action type="ApplyTemplate" template="EndOfGameAwardsIconTemplates/Icon111"/>
+                </State>
+                <State name="112">
+                    <When type="AnimationState" IconState="112"/>
+                    <Action type="ApplyTemplate" template="EndOfGameAwardsIconTemplates/Icon112"/>
+                    <Action type="SendEvent" event="LegendaryIcon"/>
+                </State>
+                <State name="120">
+                    <When type="AnimationState" IconState="120"/>
+                    <Action type="ApplyTemplate" template="EndOfGameAwardsIconTemplates/Icon120"/>
+                </State>
+                <State name="121">
+                    <When type="AnimationState" IconState="121"/>
+                    <Action type="ApplyTemplate" template="EndOfGameAwardsIconTemplates/Icon121"/>
+                </State>
+                <State name="122">
+                    <When type="AnimationState" IconState="122"/>
+                    <Action type="ApplyTemplate" template="EndOfGameAwardsIconTemplates/Icon122"/>
+                    <Action type="SendEvent" event="LegendaryIcon"/>
+                </State>
+                <State name="130">
+                    <When type="AnimationState" IconState="130"/>
+                    <Action type="ApplyTemplate" template="EndOfGameAwardsIconTemplates/Icon130"/>
+                </State>
+                <State name="131">
+                    <When type="AnimationState" IconState="131"/>
+                    <Action type="ApplyTemplate" template="EndOfGameAwardsIconTemplates/Icon131"/>
+                </State>
+                <State name="132">
+                    <When type="AnimationState" IconState="132"/>
+                    <Action type="ApplyTemplate" template="EndOfGameAwardsIconTemplates/Icon132"/>
+                    <Action type="SendEvent" event="LegendaryIcon"/>
+                </State>
+                <State name="140">
+                    <When type="AnimationState" IconState="140"/>
+                    <Action type="ApplyTemplate" template="EndOfGameAwardsIconTemplates/Icon140"/>
+                </State>
+                <State name="141">
+                    <When type="AnimationState" IconState="141"/>
+                    <Action type="ApplyTemplate" template="EndOfGameAwardsIconTemplates/Icon141"/>
+                </State>
+                <State name="142">
+                    <When type="AnimationState" IconState="142"/>
+                    <Action type="ApplyTemplate" template="EndOfGameAwardsIconTemplates/Icon142"/>
+                    <Action type="SendEvent" event="LegendaryIcon"/>
+                </State>
+                <State name="150">
+                    <When type="AnimationState" IconState="150"/>
+                    <Action type="ApplyTemplate" template="EndOfGameAwardsIconTemplates/Icon150"/>
+                </State>
+                <State name="151">
+                    <When type="AnimationState" IconState="151"/>
+                    <Action type="ApplyTemplate" template="EndOfGameAwardsIconTemplates/Icon151"/>
+                </State>
+                <State name="152">
+                    <When type="AnimationState" IconState="152"/>
+                    <Action type="ApplyTemplate" template="EndOfGameAwardsIconTemplates/Icon152"/>
+                    <Action type="SendEvent" event="LegendaryIcon"/>
+                </State>
+                <State name="160">
+                    <When type="AnimationState" IconState="160"/>
+                    <Action type="ApplyTemplate" template="EndOfGameAwardsIconTemplates/Icon160"/>
+                </State>
+                <State name="161">
+                    <When type="AnimationState" IconState="161"/>
+                    <Action type="ApplyTemplate" template="EndOfGameAwardsIconTemplates/Icon161"/>
+                </State>
+                <State name="162">
+                    <When type="AnimationState" IconState="162"/>
+                    <Action type="ApplyTemplate" template="EndOfGameAwardsIconTemplates/Icon162"/>
+                    <Action type="SendEvent" event="LegendaryIcon"/>
+                </State>
+                <State name="170">
+                    <When type="AnimationState" IconState="170"/>
+                    <Action type="ApplyTemplate" template="EndOfGameAwardsIconTemplates/Icon170"/>
+                </State>
+                <State name="171">
+                    <When type="AnimationState" IconState="171"/>
+                    <Action type="ApplyTemplate" template="EndOfGameAwardsIconTemplates/Icon171"/>
+                </State>
+                <State name="172">
+                    <When type="AnimationState" IconState="172"/>
+                    <Action type="ApplyTemplate" template="EndOfGameAwardsIconTemplates/Icon172"/>
+                    <Action type="SendEvent" event="LegendaryIcon"/>
+                </State>
+                <State name="180">
+                    <When type="AnimationState" IconState="180"/>
+                    <Action type="ApplyTemplate" template="EndOfGameAwardsIconTemplates/Icon180"/>
+                </State>
+                <State name="181">
+                    <When type="AnimationState" IconState="181"/>
+                    <Action type="ApplyTemplate" template="EndOfGameAwardsIconTemplates/Icon181"/>
+                </State>
+                <State name="182">
+                    <When type="AnimationState" IconState="182"/>
+                    <Action type="ApplyTemplate" template="EndOfGameAwardsIconTemplates/Icon182"/>
+                    <Action type="SendEvent" event="LegendaryIcon"/>
+                </State>
+                <State name="190">
+                    <When type="AnimationState" IconState="190"/>
+                    <Action type="ApplyTemplate" template="EndOfGameAwardsIconTemplates/Icon190"/>
+                </State>
+                <State name="191">
+                    <When type="AnimationState" IconState="191"/>
+                    <Action type="ApplyTemplate" template="EndOfGameAwardsIconTemplates/Icon191"/>
+                </State>
+                <State name="192">
+                    <When type="AnimationState" IconState="192"/>
+                    <Action type="ApplyTemplate" template="EndOfGameAwardsIconTemplates/Icon192"/>
+                    <Action type="SendEvent" event="LegendaryIcon"/>
+                </State>
+                <State name="200">
+                    <When type="AnimationState" IconState="200"/>
+                    <Action type="ApplyTemplate" template="EndOfGameAwardsIconTemplates/Icon200"/>
+                </State>
+                <State name="201">
+                    <When type="AnimationState" IconState="201"/>
+                    <Action type="ApplyTemplate" template="EndOfGameAwardsIconTemplates/Icon201"/>
+                </State>
+                <State name="202">
+                    <When type="AnimationState" IconState="202"/>
+                    <Action type="ApplyTemplate" template="EndOfGameAwardsIconTemplates/Icon202"/>
+                    <Action type="SendEvent" event="LegendaryIcon"/>
+                </State>
+                <State name="210">
+                    <When type="AnimationState" IconState="210"/>
+                    <Action type="ApplyTemplate" template="EndOfGameAwardsIconTemplates/Icon210"/>
+                </State>
+                <State name="211">
+                    <When type="AnimationState" IconState="211"/>
+                    <Action type="ApplyTemplate" template="EndOfGameAwardsIconTemplates/Icon211"/>
+                </State>
+                <State name="212">
+                    <When type="AnimationState" IconState="212"/>
+                    <Action type="ApplyTemplate" template="EndOfGameAwardsIconTemplates/Icon212"/>
+                    <Action type="SendEvent" event="LegendaryIcon"/>
+                </State>
+                <State name="220">
+                    <When type="AnimationState" IconState="220"/>
+                    <Action type="ApplyTemplate" template="EndOfGameAwardsIconTemplates/Icon220"/>
+                </State>
+                <State name="221">
+                    <When type="AnimationState" IconState="221"/>
+                    <Action type="ApplyTemplate" template="EndOfGameAwardsIconTemplates/Icon221"/>
+                </State>
+                <State name="222">
+                    <When type="AnimationState" IconState="222"/>
+                    <Action type="ApplyTemplate" template="EndOfGameAwardsIconTemplates/Icon222"/>
+                    <Action type="SendEvent" event="LegendaryIcon"/>
+                </State>
+                <State name="230">
+                    <When type="AnimationState" IconState="230"/>
+                    <Action type="ApplyTemplate" template="EndOfGameAwardsIconTemplates/Icon230"/>
+                </State>
+                <State name="231">
+                    <When type="AnimationState" IconState="231"/>
+                    <Action type="ApplyTemplate" template="EndOfGameAwardsIconTemplates/Icon231"/>
+                </State>
+                <State name="232">
+                    <When type="AnimationState" IconState="232"/>
+                    <Action type="ApplyTemplate" template="EndOfGameAwardsIconTemplates/Icon232"/>
+                    <Action type="SendEvent" event="LegendaryIcon"/>
+                </State>
+                <State name="240">
+                    <When type="AnimationState" IconState="240"/>
+                    <Action type="ApplyTemplate" template="EndOfGameAwardsIconTemplates/Icon240"/>
+                </State>
+                <State name="241">
+                    <When type="AnimationState" IconState="241"/>
+                    <Action type="ApplyTemplate" template="EndOfGameAwardsIconTemplates/Icon241"/>
+                </State>
+                <State name="242">
+                    <When type="AnimationState" IconState="242"/>
+                    <Action type="ApplyTemplate" template="EndOfGameAwardsIconTemplates/Icon242"/>
+                    <Action type="SendEvent" event="LegendaryIcon"/>
+                </State>
+                <State name="250">
+                    <When type="AnimationState" IconState="250"/>
+                    <Action type="ApplyTemplate" template="EndOfGameAwardsIconTemplates/Icon250"/>
+                </State>
+                <State name="251">
+                    <When type="AnimationState" IconState="251"/>
+                    <Action type="ApplyTemplate" template="EndOfGameAwardsIconTemplates/Icon251"/>
+                </State>
+                <State name="252">
+                    <When type="AnimationState" IconState="252"/>
+                    <Action type="ApplyTemplate" template="EndOfGameAwardsIconTemplates/Icon252"/>
+                    <Action type="SendEvent" event="LegendaryIcon"/>
+                </State>
+                <State name="260">
+                    <When type="AnimationState" IconState="260"/>
+                    <Action type="ApplyTemplate" template="EndOfGameAwardsIconTemplates/Icon260"/>
+                </State>
+                <State name="261">
+                    <When type="AnimationState" IconState="261"/>
+                    <Action type="ApplyTemplate" template="EndOfGameAwardsIconTemplates/Icon261"/>
+                </State>
+                <State name="262">
+                    <When type="AnimationState" IconState="262"/>
+                    <Action type="ApplyTemplate" template="EndOfGameAwardsIconTemplates/Icon262"/>
+                    <Action type="SendEvent" event="LegendaryIcon"/>
+                </State>
+                <State name="270">
+                    <When type="AnimationState" IconState="270"/>
+                    <Action type="ApplyTemplate" template="EndOfGameAwardsIconTemplates/Icon270"/>
+                </State>
+                <State name="271">
+                    <When type="AnimationState" IconState="271"/>
+                    <Action type="ApplyTemplate" template="EndOfGameAwardsIconTemplates/Icon271"/>
+                </State>
+                <State name="272">
+                    <When type="AnimationState" IconState="272"/>
+                    <Action type="ApplyTemplate" template="EndOfGameAwardsIconTemplates/Icon272"/>
+                    <Action type="SendEvent" event="LegendaryIcon"/>
+                </State>
+                <State name="280">
+                    <When type="AnimationState" IconState="280"/>
+                    <Action type="ApplyTemplate" template="EndOfGameAwardsIconTemplates/Icon280"/>
+                </State>
+                <State name="281">
+                    <When type="AnimationState" IconState="281"/>
+                    <Action type="ApplyTemplate" template="EndOfGameAwardsIconTemplates/Icon281"/>
+                </State>
+                <State name="282">
+                    <When type="AnimationState" IconState="282"/>
+                    <Action type="ApplyTemplate" template="EndOfGameAwardsIconTemplates/Icon282"/>
+                    <Action type="SendEvent" event="LegendaryIcon"/>
+                </State>
+                <State name="290">
+                    <When type="AnimationState" IconState="290"/>
+                    <Action type="ApplyTemplate" template="EndOfGameAwardsIconTemplates/Icon290"/>
+                </State>
+                <State name="291">
+                    <When type="AnimationState" IconState="291"/>
+                    <Action type="ApplyTemplate" template="EndOfGameAwardsIconTemplates/Icon291"/>
+                </State>
+                <State name="292">
+                    <When type="AnimationState" IconState="292"/>
+                    <Action type="ApplyTemplate" template="EndOfGameAwardsIconTemplates/Icon292"/>
+                    <Action type="SendEvent" event="LegendaryIcon"/>
+                </State>
+                <State name="300">
+                    <When type="AnimationState" IconState="300"/>
+                    <Action type="ApplyTemplate" template="EndOfGameAwardsIconTemplates/Icon300"/>
+                </State>
+                <State name="301">
+                    <When type="AnimationState" IconState="301"/>
+                    <Action type="ApplyTemplate" template="EndOfGameAwardsIconTemplates/Icon301"/>
+                </State>
+                <State name="302">
+                    <When type="AnimationState" IconState="302"/>
+                    <Action type="ApplyTemplate" template="EndOfGameAwardsIconTemplates/Icon302"/>
+                    <Action type="SendEvent" event="LegendaryIcon"/>
+                </State>
+                <State name="310">
+                    <When type="AnimationState" IconState="310"/>
+                    <Action type="ApplyTemplate" template="EndOfGameAwardsIconTemplates/Icon310"/>
+                </State>
+                <State name="311">
+                    <When type="AnimationState" IconState="311"/>
+                    <Action type="ApplyTemplate" template="EndOfGameAwardsIconTemplates/Icon311"/>
+                </State>
+                <State name="312">
+                    <When type="AnimationState" IconState="312"/>
+                    <Action type="ApplyTemplate" template="EndOfGameAwardsIconTemplates/Icon312"/>
+                    <Action type="SendEvent" event="LegendaryIcon"/>
+                </State>
+                <State name="320">
+                    <When type="AnimationState" IconState="320"/>
+                    <Action type="ApplyTemplate" template="EndOfGameAwardsIconTemplates/Icon320"/>
+                </State>
+                <State name="321">
+                    <When type="AnimationState" IconState="321"/>
+                    <Action type="ApplyTemplate" template="EndOfGameAwardsIconTemplates/Icon321"/>
+                </State>
+                <State name="322">
+                    <When type="AnimationState" IconState="322"/>
+                    <Action type="ApplyTemplate" template="EndOfGameAwardsIconTemplates/Icon322"/>
+                    <Action type="SendEvent" event="LegendaryIcon"/>
+                </State>
+            </StateGroup>
+        </Frame>
+        
+        <Frame type="Frame" name="AwardTooltipHitBox">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent/AwardIcon" pos="Max" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+            <Width val="200"/>
+            <AcceptsMouse val="true"/>
+            <TooltipAnchorPosition val="BottomCenter"/>
+        </Frame>
+        
+        <Frame type="Label" name="PlayerNameLabel">
+            <Anchor side="Top" relative="$parent" pos="70%" offset="-5"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+            <Height val="42"/>
+            
+            <Style val="MVP_Award_PlayerName"/>
+            <Text val=""/>
+        </Frame>
+        
+        <Frame type="Label" name="HeroNameLabel">
+            <Anchor side="Top" relative="$parent/SeparatorImage_Blue" pos="Max" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+            <Height val="30"/>
+            
+            <Style val="MVP_Award_HeroName"/>
+            <Text val=""/>
+        </Frame>
+        
+        <Frame type="Button" name="VoterButton">
+            <Anchor side="Top" relative="$parent/HeroNameLabel" pos="Max" offset="5"/>
+            <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+            <Width val="#VoteButtonSize"/>
+            <Height val="#VoteButtonSize"/>
+            <AcceptsMouse val="true"/>
+            
+            <Frame type="Frame" name="HitTestFrame">
+                <Anchor relative="$parent"/>
+                <AcceptsMouse val="true"/>
+                <RenderPriority val="1000"/>
+                
+                <Animation name="HoverEffect">
+                    <Event event="OnMouseEnter" action="DirectionForward,Play"/>
+                    <Event event="OnMouseExit" action="DirectionReverse,Reset"/>
+                    
+                    <Controller type="AdjustmentColor" end="Pause" frame="$parent/Button_Blue">
+                        <Key type="Curve" time="0" value="50,255,255,255"/>
+                    </Controller>
+                    <Controller type="AdjustmentColor" end="Pause" frame="$parent/Button_Red">
+                        <Key type="Curve" time="0" value="50,255,255,255"/>
+                    </Controller>
+                    <Controller type="AdjustmentColor" end="Pause" frame="$parent/Button_Yellow">
+                        <Key type="Curve" time="0" value="50,255,255,255"/>
+                    </Controller>
+                </Animation>
+            </Frame>
+            
+            <Frame type="CutsceneFrame" name="ButtonCutsceneEffects">
+                <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+                <Width val="315"/>
+                <Height val="500"/>
+                <UseAlternateTime val="true"/>
+                
+                <RenderType val="HDR"/>
+            
+                <Unclipped val="true"/>
+                <AutoPlay val="True"/>
+                <File val="Cutscenes/EndOfMatch_VoteButton_FX.StormCutscene"/>
+                
+                <Animation name="BlueFilter">
+                    <Event event="BlueFilter" frame="$this" action="Reset,Play"/>
+                    
+                    <Controller type="Cutscene" end="Stop">
+                        <Key type="Cutscene" time="0.0" action="ClearFilters"/>
+                        <Key type="Cutscene" time="0.0" action="AddFilter" filter="Team0"/>
+                    </Controller>
+                </Animation>
+                
+                <Animation name="RedFilter">
+                    <Event event="RedFilter" frame="$this" action="Reset,Play"/>
+                    
+                    <Controller type="Cutscene" end="Stop">
+                        <Key type="Cutscene" time="0.0" action="ClearFilters"/>
+                        <Key type="Cutscene" time="0.0" action="AddFilter" filter="Team1"/>
+                    </Controller>
+                </Animation>
+                
+                <StateGroup name="SetColorFilter">
+                    <State name="Blue">
+                        <When type="StateGroup" frame="$parent/$parent" ColorState="BlueTeam"/>
+                        <When type="AnimationState" CutsceneLoad="Loaded"/>
+                        <Action type="SendEvent" event="BlueFilter" frame="$this"/>
+                    </State>
+                    <State name="Red">
+                        <When type="StateGroup" frame="$parent/$parent" ColorState="RedTeam"/>
+                        <When type="AnimationState" CutsceneLoad="Loaded"/>
+                        <Action type="SendEvent" event="RedFilter" frame="$this"/>
+                    </State>
+                </StateGroup>
+            </Frame>
+            
+            <Frame type="Image" name="Button_Blue">
+                <Anchor relative="$parent"/>
+                <Texture val="@UI/eom_vote_default_blue"/>
+                <ColorAdjustMode val="AddSelf"/>
+                <AdjustmentColor val="0,255,255,255"/>
+                <Unclipped val="True"/>
+                <Visible val="False"/>
+                
+                <Animation name="ButtonPulse">
+                    <Event event="OnPulse" frame="$this" action="Reset,Play"/>
+                    
+                    <Controller type="AdjustmentColor" end="Stop">
+                        <Key type="Curve" time="0" value="255,255,255,255"/>
+                        <Key type="Curve" time="0.2" value="0,255,255,255" in="Auto"/>
+                    </Controller>
+                    
+                    <Controller type="Dimension" dimension="Width" relative="False" percentage="True" end="Stop">
+                        <Key type="Curve" time="0" value="120"/>
+                        <Key type="Curve" time="0.2" value="100" in="Auto"/>
+                    </Controller>
+                    
+                    <Controller type="Dimension" dimension="Height" relative="False" percentage="True" end="Stop">
+                        <Key type="Curve" time="0" value="120"/>
+                        <Key type="Curve" time="0.2" value="100" in="Auto"/>
+                    </Controller>
+                </Animation>
+            </Frame>
+            
+            <Frame type="Image" name="Button_Red" template="EndOfGameAwards/SecondaryAwardBaseTemplate/VoterButton/Button_Blue">
+                <Anchor relative="$parent/Button_Blue"/>
+                <Texture val="@UI/eom_vote_default_red"/>
+                <Visible val="False"/>
+            </Frame>
+            
+            <Frame type="Image" name="Button_Yellow" template="EndOfGameAwards/SecondaryAwardBaseTemplate/VoterButton/Button_Blue">
+                <Anchor relative="$parent/Button_Blue"/>
+                <Texture val="@UI/eom_vote_default_yellow"/>
+                <Visible val="False"/>
+            </Frame>
+            
+            <Frame type="Image" name="Button_Arrow_Blue">
+                <Anchor side="Top" relative="$parent" pos="Mid" offset="-3"/>
+                <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Bottom" relative="$parent" pos="Mid" offset="-3"/>
+                <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+                
+                <Visible val="False"/>
+                <Texture val="@UI/eom_vote_arrow_blue"/>
+                
+                <Animation name="MakeSmall">
+                    <Event event="OnShown" action="Reset" frame="$parent/$parent"/>
+                    <Event event="MakeSmall" action="Play"/>
+                    
+                    <Controller type="Anchor" end="Pause" side="Top" relative="true">
+                        <Key type="Curve" time="0" value="0" out="Fast"/>
+                        <Key type="Curve" time="0" value="-14" in="Slow"/>
+                    </Controller>
+                    
+                    <Controller type="Anchor" end="Pause" side="Bottom" relative="true">
+                        <Key type="Curve" time="0" value="0" out="Fast"/>
+                        <Key type="Curve" time="0" value="-14" in="Slow"/>
+                    </Controller>
+                    
+                    <Controller type="Texture" end="Pause">
+                        <Key type="Image" time="0" image="@UI/eom_vote_arrow_blue_sm"/>
+                    </Controller>
+                </Animation>
+                
+                <StateGroup name="Visibility">
+                    <DefaultState val="Off"/>
+                    <State name="Off">
+                        <Action type="SetProperty" visible="false"/>
+                    </State>
+                    <State name="On">
+                        <When type="StateGroup" frame="$parent/$parent" ColorState="BlueTeam"/>
+                        <Action type="SetProperty" visible="True"/>
+                    </State>
+                </StateGroup>
+            </Frame>
+            
+            <Frame type="Image" name="Button_Arrow_Red" template="EndOfGameAwards/SecondaryAwardBaseTemplate/VoterButton/Button_Arrow_Blue">
+                <Texture val="@UI/eom_vote_arrow_red"/>
+                
+                <Animation name="MakeSmall">
+                    <Event event="OnShown" action="Reset" frame="$parent/$parent"/>
+                    <Event event="MakeSmall" action="Play"/>
+                    
+                    <Controller type="Anchor" end="Pause" side="Top" relative="true">
+                        <Key type="Curve" time="0" value="0" out="Fast"/>
+                        <Key type="Curve" time="0" value="-14" in="Slow"/>
+                    </Controller>
+                    
+                    <Controller type="Anchor" end="Pause" side="Bottom" relative="true">
+                        <Key type="Curve" time="0" value="0" out="Fast"/>
+                        <Key type="Curve" time="0" value="-14" in="Slow"/>
+                    </Controller>
+                    
+                    <Controller type="Texture" end="Pause">
+                        <Key type="Image" time="0" image="@UI/eom_vote_arrow_red_sm"/>
+                    </Controller>
+                </Animation>
+                
+                <StateGroup name="Visibility">
+                    <DefaultState val="Off"/>
+                    <State name="Off">
+                        <Action type="SetProperty" visible="false"/>
+                    </State>
+                    <State name="On">
+                        <When type="StateGroup" frame="$parent/$parent" ColorState="RedTeam"/>
+                        <Action type="SetProperty" visible="True"/>
+                    </State>
+                </StateGroup>
+            </Frame>
+            
+            <Frame type="Image" name="Button_Arrow_Yellow" template="EndOfGameAwards/SecondaryAwardBaseTemplate/VoterButton/Button_Arrow_Blue">
+                <Texture val="@UI/eom_vote_arrow_yellow"/>
+                
+                <Animation name="MakeSmall">
+                    <Event event="OnShown" action="Reset" frame="$parent/$parent"/>
+                    <Event event="MakeSmall" action="Play"/>
+                    
+                    <Controller type="Anchor" end="Pause" side="Top" relative="true">
+                        <Key type="Curve" time="0" value="0" out="Fast"/>
+                        <Key type="Curve" time="0" value="-14" in="Slow"/>
+                    </Controller>
+                    
+                    <Controller type="Anchor" end="Pause" side="Bottom" relative="true">
+                        <Key type="Curve" time="0" value="0" out="Fast"/>
+                        <Key type="Curve" time="0" value="-14" in="Slow"/>
+                    </Controller>
+                    
+                    <Controller type="Texture" end="Pause">
+                        <Key type="Image" time="0" image="@UI/eom_vote_arrow_yellow_sm"/>
+                    </Controller>
+                </Animation>
+                
+                <StateGroup name="Visibility">
+                    <DefaultState val="Off"/>
+                    <State name="Off">
+                        <Action type="SetProperty" visible="false"/>
+                    </State>
+                    <State name="On">
+                        <When type="StateGroup" frame="$parent/$parent" ColorState="Legendary"/>
+                        <Action type="SetProperty" visible="True"/>
+                    </State>
+                </StateGroup>
+            </Frame>
+            
+            <Frame type="Label" name="VoteCounter">
+                <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Left" relative="$parent" pos="Mid" offset="1"/>
+                <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Right" relative="$parent" pos="Mid" offset="1"/>
+                <UseAlternateTime val="true"/>
+                
+                <Style val="MVP_Vote_Counter"/>
+                <Text val=""/>
+            </Frame>
+            
+            <!-- may need update to onvotecast- trigger change -->
+            <Animation name="ButtonPulse">
+                <Event event="OnClick" frame="$this" action="Reset,Play"/>
+                <Controller type="Event" end="Stop" frame="Button_Blue">
+                    <Key type="Event" time="0" event="OnPulse"/>
+                </Controller>
+                <Controller type="Event" end="Stop" frame="Button_Red">
+                    <Key type="Event" time="0" event="OnPulse"/>
+                </Controller>
+                <Controller type="Event" end="Stop" frame="Button_Yellow">
+                    <Key type="Event" time="0" event="OnPulse"/>
+                </Controller>
+            </Animation>
+            
+            <!-- Epic/Legendary button effects -->
+            <Animation name="Tier1EpicTransition">
+                <Event event="Tier1EpicTransition" frame="$this" action="Reset,Play"/>
+                
+                <Controller type="Cutscene" end="Stop" frame="ButtonCutsceneEffects">
+                    <Key type="Cutscene" time="0.0" action="Bookmark" bookmark="Epic"/>
+                    <Key type="Cutscene" time="0.0" action="Play"/>
+                </Controller>
+            </Animation>
+            
+            <Animation name="Tier2LegendaryTransition">
+                <Event event="Tier2LegendaryTransition" frame="$this" action="Reset,Play"/>
+                
+                <Controller type="Cutscene" end="Stop" frame="ButtonCutsceneEffects">
+                    <Key type="Cutscene" time="0.0" action="Bookmark" bookmark="Legendary"/>
+                    <Key type="Cutscene" time="0.0" action="Play"/>
+                </Controller>
+            </Animation>
+            
+            <!-- catch event from triggers- For votes >0,
+                set the vote counter to visible and change button appearance -->
+            <Animation name="TurnOnVoteCounters">
+                <Event event="TurnOnVoteCounters" action="Play"/>
+                
+                <Controller type="State" stateGroup="VoteState" end="Pause">
+                    <Key type="Identifier" time="0" value="Votes"/>
+                </Controller>
+            </Animation>
+            
+            <StateGroup name="VoteState">
+                <DefaultState val="0Votes"/>
+                <State name="0Votes">
+                    <Action type="SetProperty" frame="VoteCounter" visible="False"/>
+                </State>
+                <State name="Votes">
+                    <Action type="SetProperty" frame="VoteCounter" visible="True"/>
+                    <Action type="SendEvent" frame="Button_Arrow_Blue" event="MakeSmall"/>
+                    <Action type="SendEvent" frame="Button_Arrow_Red" event="MakeSmall"/>
+                    <Action type="SendEvent" frame="Button_Arrow_Yellow" event="MakeSmall"/>
+                </State>
+            </StateGroup>
+            
+            <!-- enable/disable if player still has a vote left- via triggers -->
+            <StateGroup name="EnableState">
+                <DefaultState val="Enabled"/>
+                
+                <State name="Enabled">
+                    <Action type="SetProperty" frame="$this" AcceptsMouse="True"/>
+                </State>
+                
+                <State name="Disabled">
+                    <Action type="SetProperty" frame="$this" AcceptsMouse="False"/>
+                    <Action type="SetProperty" frame="HitTestFrame" AcceptsMouse="False"/>
+                </State>
+            </StateGroup>
+            
+            <StateGroup name="ButtonEnableAppearance">
+                <State name="DisabledFaded">
+                    <When type="StateGroup" EnableState="Disabled"/>
+                    <When type="StateGroup" VoteState="0Votes"/>
+                    <Action type="SetProperty" frame="Button_Blue" Alpha="60"/>
+                    <!-- replace with property bind -->
+                    <Action type="SetProperty" frame="Button_Red" Alpha="60"/>
+                    <Action type="SetProperty" frame="Button_Yellow" Alpha="60"/>
+                    <Action type="SetProperty" frame="Button_Arrow_Blue" Alpha="60"/>
+                    <Action type="SetProperty" frame="Button_Arrow_Red" Alpha="60"/>
+                    <Action type="SetProperty" frame="Button_Arrow_Yellow" Alpha="60"/>
+                </State>
+                
+                <!-- change to on exit/undo -->
+                <State name="DisabledOnExit">
+                    <When type="StateGroup" EnableState="Disabled"/>
+                    <When type="StateGroup" VoteState="Votes"/>
+                    <Action type="SetProperty" frame="Button_Blue" Alpha="255"/>
+                    <!-- replace with property bind -->
+                    <Action type="SetProperty" frame="Button_Red" Alpha="255"/>
+                    <Action type="SetProperty" frame="Button_Yellow" Alpha="255"/>
+                    <Action type="SetProperty" frame="Button_Arrow_Blue" Alpha="255"/>
+                    <Action type="SetProperty" frame="Button_Arrow_Red" Alpha="255"/>
+                    <Action type="SetProperty" frame="Button_Arrow_Yellow" Alpha="255"/>
+                </State>
+            </StateGroup>
+        </Frame>
+        
+        <!-- Award winner team color for button, images, fonts and effects 
+            TODO: undo feature next branch -->
+        <StateGroup name="ColorState">
+            <DefaultState val="BlueTeam"/>
+            
+            <State name="BlueTeam">
+                <When type="AnimationState" ColorState="Blue"/>
+                <Action type="SetProperty" frame="VoterButton/Button_Blue" visible="True"/>
+                <Action type="SetProperty" frame="SeparatorImage_Blue" visible="True"/>
+            </State>
+            
+            <State name="RedTeam">
+                <When type="AnimationState" ColorState="Red"/>
+                <Action type="SetProperty" frame="VoterButton/Button_Red" visible="True"/>
+                <Action type="SetProperty" frame="SeparatorImage_Red" visible="True"/>
+                <Action type="SetProperty" frame="VoterButton/VoteCounter" style="MVP_Vote_Counter_Red"/>
+                <Action type="SetProperty" frame="PlayerNameLabel" style="MVP_Award_PlayerName_Red"/>
+                <Action type="SetProperty" frame="HeroNameLabel" style="MVP_Award_HeroName_Red"/>
+            </State>
+            
+            <State name="Legendary">
+                <When type="AnimationState" ColorState="Yellow"/>
+                <Action type="SetProperty" frame="VoterButton/Button_Blue" visible="False"/>
+                <Action type="SetProperty" frame="VoterButton/Button_Red" visible="False"/>
+                <Action type="SetProperty" frame="VoterButton/Button_Yellow" visible="True"/>
+                <Action type="SetProperty" frame="SeparatorImage_Red" visible="False"/>
+                <Action type="SetProperty" frame="SeparatorImage_Blue" visible="False"/>
+                <Action type="SetProperty" frame="SeparatorImage_Yellow" visible="True"/>
+                <Action type="SetProperty" frame="VoterButton/VoteCounter" style="MVP_Vote_Counter_Legendary"/>
+                <Action type="SetProperty" frame="PlayerNameLabel" style="MVP_Award_PlayerName_Legendary"/>
+                <Action type="SetProperty" frame="HeroNameLabel" style="MVP_Award_HeroName_Legendary"/>
+                <Action type="SendEvent" event="Tier2LegendaryTransition" frame="VoterButton"/>
+                <Action type="SendEvent" event="Tier2LegendaryTransition" frame="AwardIcon"/>
+            </State>
+        </StateGroup>
+    </Frame>
+    
+    <Frame type="Frame" name="SecondaryAwardTemplate" template="EndOfGameAwards/SecondaryAwardBaseTemplate">
+        <Visible val="false"/>
+    
+        <Frame type="Label" name="AwardTitleLabel">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+            <Width val="297"/>
+            <Height val="85"/>
+            
+            <Style val="MVP_Award_Title"/>
+            <Text val=""/>
+        </Frame>
+
+        <Frame type="Label" name="AwardStatValueLabel">
+            <Anchor side="Top" relative="$parent/AwardTitleLabel" pos="Max" offset="-2"/>
+            <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+            <!-- Width and Height geared to wrap to new line for long strings -->
+            <Height val="63"/>
+            <Width val="272"/>
+            
+            <Style val="MVP_Award_Value"/>
+            <Text val=""/>
+        </Frame>
+        
+        <!-- sets the colors based on team- including fonts, textures
+            bookmarks need to happen separately with the cutscene -->
+        <StateGroup name="AwardLabelsColor">
+            <DefaultState val="Blue"/>
+        
+            <State name="Blue">
+                <When type="AnimationState" AwardLabelsColor="Blue"/>
+                <Action type="SetProperty" frame="AwardTitleLabel" style="MVP_Award_Title"/>
+                <Action type="SetProperty" frame="AwardStatValueLabel" style="MVP_Award_Value"/>
+            </State>
+            
+            <State name="Red">
+                <When type="AnimationState" AwardLabelsColor="Red"/>
+                <Action type="SetProperty" frame="AwardTitleLabel" style="MVP_Award_Title_Red"/>
+                <Action type="SetProperty" frame="AwardStatValueLabel" style="MVP_Award_Value_Red"/>
+            </State>
+            
+            <State name="Yellow">
+                <When type="AnimationState" AwardLabelsColor="Yellow"/>
+                <Action type="SetProperty" frame="AwardTitleLabel" style="MVP_Award_Title_Legendary"/>
+                <Action type="SetProperty" frame="AwardStatValueLabel" style="MVP_Award_Value_Legendary"/>
+            </State>
+        </StateGroup>
+    </Frame>
+
+    <Frame type="Frame" name="SecondaryCutsceneTemplate">
+        <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+        <Width val="1650"/>
+        <Height val="1200"/>
+        
+        <Frame type="HeroCutsceneFrame" name="HeroCutscene">
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="50"/>
+            <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+            <Width val="1650"/>
+            <Height val="1200"/>
+            <UseAlternateTime val="true"/>
+            
+            <Unclipped val="True"/>
+            <HeroCutsceneType val="EndOfMatch"/>
+            <AutoPlay val="True"/>
+            
+            <!-- Animations for cutscene bookmarks -->
+            <Animation name="SlotReveal">
+                <Event event="Tier0Bookmark" frame="$this" action="Reset,Play"/>
+                
+                <Controller type="Cutscene" end="Stop">
+                    <Key type="Cutscene" time="0.0" action="Bookmark" bookmark="Line Up Start"/>
+                </Controller>
+            </Animation>
+            
+            <Animation name="Tier1EpicTransition">
+                <Event event="Tier1EpicTransition" frame="$this" action="Reset,Play"/>
+                
+                <Controller type="Cutscene" end="Stop">
+                    <Key type="Cutscene" time="0.0" action="Bookmark" bookmark="Epic"/>
+                    <Key type="Cutscene" time="0.0" action="AddFilter" filter="Epic"/>
+                </Controller>
+            </Animation>
+            
+            <Animation name="Tier2LegendaryTransition">
+                <Event event="Tier2LegendaryTransition" frame="$this" action="Reset,Play"/>
+                
+                <Controller type="Cutscene" end="Stop">
+                    <Key type="Cutscene" time="0.0" action="Bookmark" bookmark="Legendary"/>
+                    <Key type="Cutscene" time="0.0" action="AddFilter" filter="Legendary"/>
+                </Controller>
+            </Animation>
+            
+            <Animation name="BlueTeamEffectFilter">
+                <Event event="BlueTeamEffectFilter" frame="$this" action="Reset,Play"/>
+                
+                <Controller type="Cutscene" end="Stop">
+                    <Key type="Cutscene" time="0.0" action="AddFilter" filter="Team0"/>
+                </Controller>
+                
+                <Controller type="State" stateGroup="ReadyForSync" end="Pause">
+                    <Key type="Identifier" time="0.01" value="Ready"/>
+                </Controller>
+            </Animation>
+            
+            <Animation name="RedTeamEffectFilter">
+                <Event event="RedTeamEffectFilter" frame="$this" action="Reset,Play"/>
+                
+                <Controller type="Cutscene" end="Stop">
+                    <Key type="Cutscene" time="0.0" action="AddFilter" filter="Team1"/>
+                </Controller>
+                
+                <Controller type="State" stateGroup="ReadyForSync" end="Pause">
+                    <Key type="Identifier" time="0.01" value="Ready"/>
+                </Controller>
+            </Animation>
+            
+            <!-- Wait until Cutscene is loaded, so that filter can be applied after creation -->
+            <StateGroup name="CutsceneBookmark">
+                <DefaultState val="Tier0"/>
+                <State name="Invisible">
+                    <When type="Property" inheritedVisible="false"/>
+                </State>
+                <State name="Unloaded">
+                    <When type="AnimationState" CutsceneLoad="Unloaded"/>
+                </State>
+                <State name="Loading">
+                    <When type="AnimationState" CutsceneLoad="Loading"/>
+                </State>
+                <State name="Tier0">
+                    <Action type="SendEvent" frame="$this" event="Tier0Filter"/>
+                </State>
+                <State name="Tier1">
+                    <When type="AnimationState" AwardTier="Tier1"/>
+                    <Action type="SendEvent" frame="$this" event="Tier1EpicTransition"/>
+                </State>
+                <State name="Tier2">
+                    <When type="AnimationState" AwardTier="Tier2"/>
+                    <Action type="SendEvent" frame="$this" event="Tier2LegendaryTransition"/>
+                </State>
+            </StateGroup>
+            
+            <!-- to prevent race conditions-
+                cutscenefilters need to be cleared, and two set-
+                    team color (dependant on colorstate) and tier 0 -->
+            <StateGroup name="SemaphorThing">
+                <DefaultState val="Lock"/>
+                
+                <State name="Lock">
+                    <Action type="SendEvent" event="DummyEvent"/>
+                </State>
+                
+                <State name="Unlock">
+                    <Action type="SendEvent" event="DummyEvent"/>
+                </State>
+            </StateGroup>
+            
+            <!-- team color set as an animation state ahead of time 
+                when the slot filter has been set after the cutscene loads, we can add the team filter -->
+            <StateGroup name="CutsceneTeamColor">
+                <State name="Blue">
+                    <When type="AnimationState" TeamColor="Blue"/>
+                    <When type="StateGroup" frame="$this" SemaphorThing="Unlock"/>
+                    <Action type="SendEvent" frame="$this" event="BlueTeamEffectFilter"/>
+                </State>
+                
+                <State name="Red">
+                    <When type="AnimationState" TeamColor="Red"/>
+                    <When type="StateGroup" frame="$this" SemaphorThing="Unlock"/>
+                    <Action type="SendEvent" frame="$this" event="RedTeamEffectFilter"/>
+                </State>
+            </StateGroup>
+            
+            <StateGroup name="ReadyForSync">
+                <State name="Ready">
+                    <Action type="SendEvent" event="DummyEvent"/>
+                </State>
+            </StateGroup>
+            
+            <!-- state group waits for the cutscene to load if there is a need to update when secondaries are revealed (if votes have been cast due to earlier skip)-->
+            <StateGroup name="SkipStatusFlags">
+                <State name="Tier0">
+                    <When type="AnimationState" SkipStatusFlags="Tier0"/>
+                    <When type="StateGroup" frame="$this" ReadyForSync="Ready"/>
+                    <Action type="SendEvent" frame="$this" event="Tier0Sync"/>
+                </State>
+                
+                <State name="Tier1">
+                    <When type="AnimationState" SkipStatusFlags="Tier1"/>
+                    <When type="StateGroup" frame="$this" ReadyForSync="Ready"/>
+                    <Action type="SendEvent" frame="$this" event="Tier0Sync"/>
+                    <Action type="SendEvent" frame="$this" event="Tier1Sync"/>
+                    <Action type="SendEvent" frame="$this" event="Tier1EpicTransition"/>
+                </State>
+                
+                <State name="Tier2">
+                    <When type="AnimationState" SkipStatusFlags="Tier2"/>
+                    <When type="StateGroup" frame="$this" ReadyForSync="Ready"/>
+                    <Action type="SendEvent" frame="$this" event="Tier0Sync"/>
+                    <Action type="SendEvent" frame="$this" event="Tier2Sync"/>
+                    <Action type="SendEvent" frame="$this" event="Tier2LegendaryTransition"/>
+                </State>
+            </StateGroup>
+        </Frame>
+    </Frame>
+
+    <Frame type="CountdownLabel" name="CountdownLabelTemplate">
+        <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+        <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+        <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+        <Options val="Ellipsis | NoWrapping"/>
+
+        <Style val="MVP_EndingNotice"/>
+        <StartValue val="0"/>
+        <TargetValue val="#MVPCountdownStart"/>
+        <IntegerBias val="Ceil"/>
+        <CountdownText val="@UI/EndOfGameAwards/EndingSoon"/>
+    </Frame>
+    
+    <Frame type="EndOfGameAwardsPanel" name="EndOfGameAwardsPanelTemplate">
+        <UseAlternateTime val="true"/>
+        
+        <RenderType val="HDR"/>
+        
+        <Frame type="Image" name="BackgroundImage">
+            <Anchor relative="$parent"/>
+            
+            <RenderPriority val="200"/>
+            <Texture val="@UI/eom_bg"/>
+            
+            <StateGroup name="bgimage">
+                <DefaultState val="generic"/>
+                <State name="generic">
+                    <Action type="SetProperty" texture="@UI/eom_bg"/>
+                </State>
+                <State name="boe">
+                    <When type="AnimationState" Map="boe"/>
+                    <Action type="SetProperty" texture="@UI/eom_bg_boe"/>
+                </State>
+                <State name="bhb">
+                    <When type="AnimationState" Map="bhb"/>
+                    <Action type="SetProperty" texture="@UI/eom_bg_bhb"/>
+                </State>
+                <State name="bh">
+                    <When type="AnimationState" Map="bh"/>
+                    <Action type="SetProperty" texture="@UI/eom_bg_bh"/>
+                </State>
+                <State name="ch">
+                    <When type="AnimationState" Map="ch"/>
+                    <Action type="SetProperty" texture="@UI/eom_bg_ch"/>
+                </State>
+                <State name="ds">
+                    <When type="AnimationState" Map="ds"/>
+                    <Action type="SetProperty" texture="@UI/eom_bg_ds"/>
+                </State>
+                <State name="got">
+                    <When type="AnimationState" Map="got"/>
+                    <Action type="SetProperty" texture="@UI/eom_bg_got"/>
+                </State>
+                <State name="hm">
+                    <When type="AnimationState" Map="hm"/>
+                    <Action type="SetProperty" texture="@UI/eom_bg_hm"/>
+                </State>
+                <State name="is">
+                    <When type="AnimationState" Map="is"/>
+                    <Action type="SetProperty" texture="@UI/eom_bg_is"/>
+                </State>
+                <State name="lc">
+                    <When type="AnimationState" Map="lc"/>
+                    <Action type="SetProperty" texture="@UI/eom_bg_lc"/>
+                </State>
+                <State name="st">
+                    <When type="AnimationState" Map="st"/>
+                    <Action type="SetProperty" texture="@UI/eom_bg_st"/>
+                </State>
+                <State name="totsq">
+                    <When type="AnimationState" Map="totsq"/>
+                    <Action type="SetProperty" texture="@UI/eom_bg_totsq"/>
+                </State>
+                <State name="tod">
+                    <When type="AnimationState" Map="tod"/>
+                    <Action type="SetProperty" texture="@UI/eom_bg_tod"/>
+                </State>
+                <State name="wj">
+                    <When type="AnimationState" Map="wj"/>
+                    <Action type="SetProperty" texture="@UI/eom_bg_wj"/>
+                </State>
+            </StateGroup>
+        </Frame>
+        
+        <Frame type="Image" name="GridBackgroundImage">
+            <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+            <Width val="4000"/>
+            <Height val="2500"/>
+
+            <Alpha val="35"/>
+            <RenderPriority val="300"/> 
+            <UseAlternateTime val="true"/>
+            <ColorAdjustMode val="Fill"/>
+            <AdjustmentColor val="255,80,115,170"/>
+            <BlendMode val="Add"/>
+
+            <Texture val="@UI/eom_bg_grid"/>
+            <TextureCoords top="-4.5" left="-16" right="16" bottom="9"/>
+            <WrapUV val="True"/>
+
+            <Animation name="TileScroll">
+                <Event event="OnShown" action="Reset, Play"/>
+                <Event event="BGZoom" frame="$parent" action="Stop"/>
+
+                <Controller type="LayerUV" side="Left" relative="False" sidelock="False" end="Pause">
+                    <Key type="Curve" time="0" value="-16"/>
+                    <Key type="Curve" time="10.2" value="-16.5" out="Slow"/>
+                </Controller>
+                <Controller type="LayerUV" side="Right" relative="False" sidelock="False" end="Pause">
+                    <Key type="Curve" time="0" value="16"/>
+                    <Key type="Curve" time="10.2" value="16.5" out="Slow"/>
+                </Controller>
+                <Controller type="LayerUV" side="Top" relative="False" sidelock="False" end="Pause">
+                    <Key type="Curve" time="0" value="-4.5"/>
+                    <Key type="Curve" time="10.2" value="-5" out="Slow"/>
+                </Controller>
+                <Controller type="LayerUV" side="Bottom" relative="False" sidelock="False" end="Pause">
+                    <Key type="Curve" time="0" value="9"/>
+                    <Key type="Curve" time="10.2" value="9.4" out="Slow"/>
+                </Controller>
+            </Animation>
+            
+            <Animation name="TileZoomOut">
+                <Event event="BGZoom" frame="$parent" action="Play"/>
+
+                <Controller type="LayerUV" side="Left" relative="False" sidelock="False" end="Pause">
+                    <Key type="Curve" time="0" value="-16.5" out="Slow"/>
+                    <Key type="Curve" time="0.3" value="-24" in="Auto"/>
+                </Controller>
+                <Controller type="LayerUV" side="Right" relative="False" sidelock="False" end="Pause">
+                    <Key type="Curve" time="0" value="16.5" out="Slow"/>
+                    <Key type="Curve" time="0.3" value="24" in="Auto"/>
+                </Controller>
+                <Controller type="LayerUV" side="Top" relative="False" sidelock="False" end="Pause">
+                    <Key type="Curve" time="0" value="-5" out="Slow"/>
+                    <Key type="Curve" time="0.3" value="-7" in="Auto"/>
+                </Controller>
+                <Controller type="LayerUV" side="Bottom" relative="False" sidelock="False" end="Pause">
+                    <Key type="Curve" time="0" value="9.4" out="Slow"/>
+                    <Key type="Curve" time="0.3" value="12" in="Auto"/>
+                </Controller>
+            </Animation>
+        </Frame>
+
+        <Frame type="Image" name="GridBackgroundImageWipe">
+            <LayerCount val="2"/>
+            <Texture val="@UI/eom_Grid_Mask_Tiled" layer="0"/>
+            <TextureCoords top="-1" left="-.5" bottom="1" right=".5" layer="0"/>
+            <WrapUV val="True" layer="0"/>
+            <Texture val="@UI/eom_Grid_Glow_Tiled" layer="1"/>
+            <TextureCoords top="-4" left="-14" right="14" bottom="8" layer="1"/>
+            
+            <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+            <Width val="4000"/>
+            <Height val="2500"/>
+
+            <AlphaLayer val="True" layer="0"/>
+            <WrapUV val="True" layer="1"/>
+
+            <Alpha  layer="1" val="130"/>
+            <RenderPriority val="305"/> 
+            <UseAlternateTime val="true"/>
+            <BlendMode  layer="1" val="Add"/>
+
+            <Animation name="FullScroll">
+                <Event event="OnShown" action="Reset, Play"/>
+            
+                <!-- SCROLLING MASK -->
+                <Controller type="LayerUV" side="Top" relative="False" sidelock="True" end="Loop">
+                    <Key type="Curve" time="0" value="-4" out="Smooth" InOut="Linear"/>
+                    <Key type="Curve" time="70" value="0" out="Smooth" InOut="Linear"/>
+                </Controller>
+            </Animation>
+            
+            <Animation name="TileChange">
+                <Event event="OnShown" action="Reset, Play"/>
+                <Event event="BGZoom" frame="$parent" action="Stop"/>
+
+                <!-- GRID SCALE -->
+                <Controller type="LayerUV" layer="1" side="Left" relative="False" sidelock="False" end="Pause">
+                    <Key type="Curve" time="0" value="-16"/>
+                    <Key type="Curve" time="10.2" value="-16.5" out="Slow"/>
+                </Controller>
+                <Controller type="LayerUV" layer="1" side="Right" relative="False" sidelock="False" end="Pause">
+                    <Key type="Curve" time="0" value="16"/>
+                    <Key type="Curve" time="10.2" value="16.5" out="Slow"/>
+                </Controller>
+                <Controller type="LayerUV" layer="1" side="Top" relative="False" sidelock="False" end="Pause">
+                    <Key type="Curve" time="0" value="-4.5"/>
+                    <Key type="Curve" time="10.2" value="-5" out="Slow"/>
+                </Controller>
+                <Controller type="LayerUV" layer="1" side="Bottom" relative="False" sidelock="False" end="Pause">
+                    <Key type="Curve" time="0" value="9"/>
+                    <Key type="Curve" time="10.2" value="9.4" out="Slow"/>
+                </Controller>
+            </Animation>
+            
+            <Animation name="ScaleChange">
+                <Event event="BGZoom" frame="$parent" action="Play"/>
+                
+                <!-- GRID SCALE -->
+                <Controller type="LayerUV" layer="1" side="Left" relative="False" sidelock="False" end="Pause">
+                    <Key type="Curve" time="0" value="-16.5" out="Slow"/>
+                    <Key type="Curve" time="0.3" value="-24" in="Auto"/>
+                </Controller>
+                <Controller type="LayerUV" layer="1" side="Right" relative="False" sidelock="False" end="Pause">
+                    <Key type="Curve" time="0" value="16.5" out="Slow"/>
+                    <Key type="Curve" time="0.3" value="24" in="Auto"/>
+                </Controller>
+                <Controller type="LayerUV" layer="1" side="Top" relative="False" sidelock="False" end="Pause">
+                    <Key type="Curve" time="0" value="-5" out="Slow"/>
+                    <Key type="Curve" time="0.3" value="-7" in="Auto"/>
+                </Controller>
+                <Controller type="LayerUV" layer="1" side="Bottom" relative="False" sidelock="False" end="Pause">
+                    <Key type="Curve" time="0" value="9.4" out="Slow"/>
+                    <Key type="Curve" time="0.3" value="12" in="Auto"/>
+                </Controller>
+            </Animation>
+        </Frame>
+
+        <!-- reuse this frame for secondary-award-transition -->
+        <Frame type="Frame" name="MVPCutsceneFrame" template="EndOfGameAwards/SecondaryCutsceneTemplate">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+            <Width val="1650"/>
+            <Height val="1200"/>
+            <RenderPriority val="550"/>
+            <Handle val="EndOfGame_CutsceneFrame_MVP"/>
+            <UseAlternateTime val="true"/>
+            
+            <Frame type="HeroCutsceneFrame" name="HeroCutscene">
+				<Height val="1200"/>
+                <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Bottom" relative="$parent" pos="Max" offset="150"/>
+                <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+            
+                <Unclipped val="True"/>
+                <HeroCutsceneType val="EndOfMatch"/>
+                <HeroCutsceneFilter val="Slot0"/>
+                <RenderPriority val="520"/>
+                <AutoPlay val="True"/>
+                <UseAlternateTime val="true"/>
+                
+                <!-- Work around for a weird bug- 
+                    mvp semaphorthing seemed to affect other cutscene race condition/events -->
+                <StateGroup name="MVPLock">
+                    <DefaultState val="Lock"/>
+                    <State name="Lock">
+                        <Action type="SendEvent" frame="$this" event="DummyEvent"/>
+                    </State>
+                    <State name="Unlock">
+                        <Action type="SendEvent" frame="$this" event="DummyEvent"/>
+                    </State>
+                </StateGroup>
+                
+                <StateGroup name="MVPCutsceneTeamColor">
+                    <State name="Blue">
+                        <When type="AnimationState" TeamColor="Blue"/>
+                        <When type="StateGroup" frame="$this" MVPLock="Unlock"/>
+                        <Action type="SendEvent" frame="$this" event="BlueTeamEffectFilter"/>
+                    </State>
+                    
+                    <State name="Red">
+                        <When type="AnimationState" TeamColor="Red"/>
+                        <When type="StateGroup" frame="$this" MVPLock="Unlock"/>
+                        <Action type="SendEvent" frame="$this" event="RedTeamEffectFilter"/>
+                    </State>
+                </StateGroup>
+                
+                <!-- Animations for triggering events when skip votes need to be synced up -->
+                <Animation name="SlotSync">
+                    <Event event="Tier0Sync" frame="$this" action="Reset,Play"/>
+                    
+                    <Controller type="Event" end="Stop" frame="$parent/$parent/AwardWinnerContainerMVP/VoterButton">
+                        <Key type="Event" time="0" event="TurnOnVoteCounters"/>
+                    </Controller>
+                </Animation>
+                
+                <Animation name="SlotSyncEpic">
+                    <Event event="Tier1Sync" frame="$this" action="Reset,Play"/>
+                    
+                    <Controller type="Event" end="Stop" frame="$parent/$parent/AwardWinnerContainerMVP/VoterButton">
+                        <Key type="Event" time="0.01" event="Tier1EpicTransition"/>
+                    </Controller>
+                </Animation>
+                
+                <Animation name="SlotSyncLegendary">
+                    <Event event="Tier2Sync" frame="$this" action="Reset,Play"/>
+                    
+                    <Controller type="Event" end="Stop" frame="$parent/$parent/AwardWinnerContainerMVP/VoterButton">
+                        <Key type="Event" time="0" event="Tier2LegendaryTransition"/>
+                    </Controller>
+                    
+                    <Controller type="Event" end="Stop" frame="$parent/$parent/AwardWinnerContainerMVP/AwardIcon">
+                        <Key type="Event" time="0" event="Tier2LegendaryTransition"/>
+                    </Controller>
+                </Animation>
+            </Frame>
+            
+            <Animation name="InitialPlacement">
+                <Event event="OnShown" frame="$this" action="Restart,Play"/>
+                
+                <Controller type="Anchor" end="Pause" side="Top" relative="true">
+                    <Key type="Curve" time="0.0" value="-450" in="Slow"/>
+                    <Key type="Curve" time="5.0" value="-410" in="Slow"/>
+                </Controller>
+                
+                <Controller type="Anchor" end="Pause" side="Bottom" relative="true">
+                    <Key type="Curve" time="0.0" value="200" in="Slow"/>
+                    <Key type="Curve" time="5.0" value="160" in="Slow"/>
+                </Controller>
+                
+                <Controller type="Anchor" end="Pause" side="Right" relative="true">
+                    <Key type="Curve" time="0.0" value="960" in="Slow"/>
+                    <Key type="Curve" time="5.0" value="920" in="Slow"/>
+                </Controller>
+            </Animation>
+            
+            <Animation name="SnapToSecondaryPlace">
+                <Event event="OnShown" frame="$parent/SecondaryAwardStats" action="Reset,Play"/>
+                
+                <Controller type="Animation" end="Stop" animation="InitialPlacement">
+                    <Key type="Animation" time="0" action="Pause"/>
+                </Controller>
+                
+                <Controller type="Anchor" end="Pause" side="Top" relative="true">
+                    <Key type="Curve" time="0" value="-410" in="Fast"/>
+                    <Key type="Curve" time="0.25" value="0" in="Fast"/>
+                </Controller>
+                
+                <Controller type="Anchor" end="Pause" side="Bottom" relative="true">
+                    <Key type="Curve" time="0" value="160" in="Fast"/>
+                    <Key type="Curve" time="0.25" value="0" in="Fast"/>
+                </Controller>
+                
+                <Controller type="Anchor" end="Pause" side="Right" relative="true">
+                    <Key type="Curve" time="0" value="920" in="Fast"/>
+                    <Key type="Curve" time="0.25" value="0" in="Fast"/>
+                </Controller>
+                
+                <Controller type="State" frame="HeroCutscene" stateGroup="MVPLock" end="Pause">
+                    <Key type="Identifier" time="0.3" value="Unlock"/>
+                </Controller>
+            </Animation>
+        </Frame>
+        
+        <!-- Container for text labels, left side of initial mvp screen
+                text populated from triggers
+                anchors are messy- please excuse, its for animation purposes -->
+        <Frame type="Frame" name="MVPStats">
+            <Anchor side="Top" relative="$parent" pos="15%" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Bottom" relative="$this" pos="Min" offset="800"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+            <RenderPriority val="1000"/>
+            <RenderType val="LDR"/>
+            <UseAlternateTime val="true"/>
+        
+            <Frame type="Label" name="MVPLabel">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="-10"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+                <Height val="105"/>
+                
+                <SubpixelRendering val="True"/>
+                <Style val="MVP_Heading"/>
+                <Text val="@UI/EndOfGameAwards/MVP"/>
+            </Frame>
+            
+            <Frame type="Image" name="SeparatorImage_Blue">
+                <Anchor side="Top" relative="$parent/MVPLabel" pos="Max" offset="-15"/>
+                <Anchor side="Left" relative="$parent" pos="Mid" offset="-1060"/>
+                <Width val="512"/>
+                <Height val="10"/>
+                <BlendMode val="Add"/>
+                
+                <Texture val="@UI/eom_separator_blue"/>
+            </Frame>
+            
+            <Frame type="Image" name="SeparatorImage_Red">
+                <Anchor relative="$parent/SeparatorImage_Blue"/>
+                
+                <Visible val="false"/>
+                <Texture val="@UI/eom_separator_red"/>
+            </Frame>
+
+            <Frame type="Label" name="MVPPlayerName">
+                <Anchor side="Top" relative="$parent/SeparatorImage_Blue" pos="Max" offset="-20"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                <Height val="135"/>
+                
+                <SubpixelRendering val="True"/>
+                <Style val="MVP_PlayerNameHeading"/>
+                <Text val=""/>
+            </Frame>
+            
+            <Frame type="Label" name="MVPHeroName">
+                <Anchor side="Top" relative="$parent/MVPPlayerName" pos="Max" offset="-27"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="-50"/>
+                <Height val="70"/>
+                
+                <SubpixelRendering val="True"/>
+                <Style val="MVP_HeroNameHeading"/>
+                <Text val=""/>
+            </Frame>
+
+            <!-- horizontal labels - KDA -->
+            <Frame type="Label" name="KillsLabel">
+                <Anchor side="Top" relative="$parent/MVPHeroName" pos="Max" offset="50"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="200"/>
+                <Width val="#MVPStatLabelWidth"/>
+                
+                <SubpixelRendering val="True"/>
+                <Style val="MVP_StatHeading"/>
+                <Text val="@ScoreValue/Name/SoloKill"/>
+            </Frame>
+
+            <Frame type="Label" name="KillsValueLabel">
+                <Anchor side="Top" relative="$parent/KillsLabel" pos="Max" offset="-20"/>
+                <Anchor side="Left" relative="$parent/KillsLabel" pos="Min" offset="70"/>
+                
+                <SubpixelRendering val="True"/>
+                <Style val="MVP_KDAValue"/>
+                <Text val="88"/>
+            </Frame>
+
+            <Frame type="Label" name="AssistsLabel">
+                <Anchor side="Top" relative="$parent/MVPHeroName" pos="Max" offset="50"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="440"/>
+                <Width val="#MVPStatLabelWidth"/>
+                
+                <SubpixelRendering val="True"/>
+                <Style val="MVP_StatHeading"/>
+                <Text val="@ScoreValue/Name/Assists"/>
+            </Frame>
+
+            <Frame type="Label" name="AssistsValueLabel">
+                <Anchor side="Top" relative="$parent/AssistsLabel" pos="Max" offset="-20"/>
+                <Anchor side="Left" relative="$parent/AssistsLabel" pos="Min" offset="70"/>
+                
+                <SubpixelRendering val="True"/>
+                <Style val="MVP_KDAValue"/>
+                <Text val="88"/>
+            </Frame>
+
+            <Frame type="Label" name="DeathsLabel">
+                <Anchor side="Top" relative="$parent/MVPHeroName" pos="Max" offset="50"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="700"/>
+                <Width val="#MVPStatLabelWidth"/>
+                
+                <SubpixelRendering val="True"/>
+                <Style val="MVP_StatHeading"/>
+                <Text val="@ScoreValue/Name/Deaths"/>
+            </Frame>
+
+            <Frame type="Label" name="DeathsValueLabel">
+                <Anchor side="Top" relative="$parent/DeathsLabel" pos="Max" offset="-20"/>
+                <Anchor side="Left" relative="$parent/DeathsLabel" pos="Min" offset="70"/>
+                
+                <SubpixelRendering val="True"/>
+                <Style val="MVP_KDAValue"/>
+                <Text val="88"/>
+            </Frame>
+
+            <!-- empty frames to aid animations with anchors -->
+            <Frame type="Frame" name="MVPStat1Anchor">
+                <Anchor side="Top" relative="$parent/KillsValueLabel" pos="Max" offset="90"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="394"/>
+                <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+                <Height val="50"/>
+            </Frame>
+
+            <Frame type="Frame" name="MVPStat2Anchor">
+                <Anchor side="Top" relative="$parent/MVPStat1Anchor" pos="Max" offset="56"/>
+                <Anchor side="Left" relative="$parent/MVPStat1Anchor" pos="Min" offset="-10"/>
+                <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+                <Height val="50"/>
+            </Frame>
+
+            <Frame type="Frame" name="MVPStat3Anchor">
+                <Anchor side="Top" relative="$parent/MVPStat2Anchor" pos="Max" offset="56"/>
+                <Anchor side="Left" relative="$parent/MVPStat2Anchor" pos="Min" offset="-10"/>
+                <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+                <Height val="50"/>
+            </Frame>
+
+            <!-- most interesting stats, populated in triggers, otherwise should be blank -->
+            <Frame type="Label" name="MVPStat1ValueLabel">
+                <Anchor side="Top" relative="$parent/MVPStat1Anchor" pos="Mid" offset="0"/>
+                <Anchor side="Bottom" relative="$parent/MVPStat1Anchor" pos="Mid" offset="0"/>
+                <Anchor side="Right" relative="$parent/MVPStat1Anchor" pos="Min" offset="0"/>
+                <!-- <BaseWidth val="800"/>
+                <BaseHeight val="400"/>
+
+                <ScaleText val="True"/> -->
+                <SubpixelRendering val="True"/>
+                <Style val="MVP_StatValue"/>
+                <Text val=""/>
+            </Frame>
+            
+            <Frame type="Frame" name="BestInGame1" template="EndOfGameAwards/BestInGameTemplate">
+                <Anchor side="Top" relative="$parent/MVPStat1Anchor" pos="Min" offset="-6"/>
+                <Anchor side="Bottom" relative="$parent/MVPStat1Label" pos="Min" offset="6"/>
+                <Anchor side="Left" relative="$parent/MVPStat1Anchor" pos="Min" offset="5"/>
+                <Anchor side="Right" relative="$parent/MVPStat1Anchor" pos="Max" offset="0"/>
+            </Frame>
+            
+            <Frame type="Label" name="MVPStat1Label">
+                <Anchor side="Left" relative="$parent/MVPStat1Anchor" pos="Min" offset="0"/>
+                <Anchor side="Bottom" relative="$parent/MVPStat1Anchor" pos="Max" offset="8"/>
+                
+                <SubpixelRendering val="True"/>
+                <Style val="MVP_StatHeading_Left"/>
+                <Text val=""/>
+            </Frame>
+
+            <Frame type="Label" name="MVPStat2ValueLabel">
+                <Anchor side="Top" relative="$parent/MVPStat2Anchor" pos="Mid" offset="0"/>
+                <Anchor side="Bottom" relative="$parent/MVPStat2Anchor" pos="Mid" offset="0"/>
+                <Anchor side="Right" relative="$parent/MVPStat2Anchor" pos="Min" offset="-10"/>
+                <!-- <BaseWidth val="100"/>
+                <BaseHeight val="100"/>
+
+                <ScaleText val="True"/>  -->               
+                <SubpixelRendering val="True"/>
+                <Style val="MVP_StatValue"/>
+                <Text val=""/>
+            </Frame>
+
+            <Frame type="Frame" name="BestInGame2" template="EndOfGameAwards/BestInGameTemplate">
+                <Anchor side="Top" relative="$parent/MVPStat2Anchor" pos="Min" offset="-6"/>
+                <Anchor side="Bottom" relative="$parent/MVPStat2Label" pos="Min" offset="6"/>
+                <Anchor side="Left" relative="$parent/MVPStat2Anchor" pos="Min" offset="5"/>
+                <Anchor side="Right" relative="$parent/MVPStat2Anchor" pos="Max" offset="0"/>
+            </Frame>
+            
+            <Frame type="Label" name="MVPStat2Label">
+                <Anchor side="Left" relative="$parent/MVPStat2Anchor" pos="Min" offset="0"/>
+                <Anchor side="Bottom" relative="$parent/MVPStat2Anchor" pos="Max" offset="8"/>
+                
+                <SubpixelRendering val="True"/>
+                <Style val="MVP_StatHeading_Left"/>
+                <Text val=""/>
+            </Frame>
+
+            <Frame type="Label" name="MVPStat3ValueLabel">
+                <Anchor side="Top" relative="$parent/MVPStat3Anchor" pos="Mid" offset="0"/>
+                <Anchor side="Bottom" relative="$parent/MVPStat3Anchor" pos="Mid" offset="0"/>
+                <Anchor side="Right" relative="$parent/MVPStat3Anchor" pos="Min" offset="-10"/>
+                <!-- <BaseWidth val="100"/>
+                <BaseHeight val="100"/>
+
+                <ScaleText val="True"/> -->                
+                <SubpixelRendering val="True"/>
+                <Style val="MVP_StatValue"/>
+                <Text val=""/>
+            </Frame>
+
+            <Frame type="Frame" name="BestInGame3" template="EndOfGameAwards/BestInGameTemplate">
+                <Anchor side="Top" relative="$parent/MVPStat3Anchor" pos="Min" offset="-6"/>
+                <Anchor side="Bottom" relative="$parent/MVPStat3Label" pos="Min" offset="6"/>
+                <Anchor side="Left" relative="$parent/MVPStat3Anchor" pos="Min" offset="5"/>
+                <Anchor side="Right" relative="$parent/MVPStat3Anchor" pos="Max" offset="0"/>
+            </Frame>
+
+            <Frame type="Label" name="MVPStat3Label">
+                <Anchor side="Left" relative="$parent/MVPStat3Anchor" pos="Min" offset="0"/>
+                <Anchor side="Bottom" relative="$parent/MVPStat3Anchor" pos="Max" offset="8"/>
+                
+                <SubpixelRendering val="True"/>
+                <Style val="MVP_StatHeading_Left"/>
+                <Text val=""/>
+            </Frame>
+            
+            <!-- Hide when secondary spread appears -->
+            <StateGroup name="StatsVisibility">
+                <DefaultState val="ShowInitStats"/>
+                
+                <State name="ShowInitStats">
+                    <When type="Property" frame="$parent/SecondaryAwardStats" visible="false"/>
+                </State>
+                
+                <State name="HideInitStats">
+                    <When type="Property" frame="$parent/SecondaryAwardStats" visible="true"/>
+                    <Action type="SetProperty" frame="$this" visible="false"/>
+                </State>
+            </StateGroup>
+            
+            <!-- Animation for that overwatch-style text movement and appearance for all stats -->
+            <Animation name="ScrollEffect">
+                <Event event="OnShown" action="Reset,Play" frame="$this"/>
+                <Event event="MVPSkipEvent" action="Pause" frame="$this"/>
+                
+                <!-- Section: MVP heading/name -->
+                <Controller type="Anchor" end="Pause" side="Left" relative="true" frame="MVPLabel">
+                    <Key type="Curve" time="0.0" value="-300"/>
+                    <Key type="Curve" time="1.0" value="-300" out="Fast"/>
+                    <Key type="Curve" time="1.3" value="300" in="Slow"/>
+                    <Key type="Curve" time="9.0" value="320" out="Slow"/>
+                    <Key type="Curve" time="9.3" value="900" in="Fast"/>
+                </Controller>
+
+                <Controller type="Fade" end="Pause" frame="MVPLabel">
+                    <Key type="Curve" time="0.0" value="0"/>
+                    <Key type="Curve" time="1.0" value="0" out="Auto"/>
+                    <Key type="Curve" time="1.3" value="255"/>
+                    <Key type="Curve" time="9.0" value="255" out="Auto"/>
+                    <Key type="Curve" time="9.3" value="0"/>
+                </Controller>
+                
+                <Controller type="Anchor" end="Pause" side="Left" relative="true" frame="SeparatorImage_Blue">
+                    <Key type="Curve" time="0.0" value="-300"/>
+                    <Key type="Curve" time="1.0" value="-300" out="Fast"/>
+                    <Key type="Curve" time="1.3" value="300" in="Slow"/>
+                </Controller>
+
+                <Controller type="Fade" end="Pause" frame="SeparatorImage_Blue">
+                    <Key type="Curve" time="0.0" value="0"/>
+                    <Key type="Curve" time="1.0" value="0" out="Auto"/>
+                    <Key type="Curve" time="1.3" value="255"/>
+                    <Key type="Curve" time="9.0" value="255" out="Auto"/>
+                    <Key type="Curve" time="9.3" value="0"/>
+                </Controller>
+                
+                <Controller type="Fade" end="Pause" frame="SeparatorImage_Red">
+                    <Key type="Curve" time="0.0" value="0"/>
+                    <Key type="Curve" time="1.0" value="0" out="Auto"/>
+                    <Key type="Curve" time="1.3" value="255"/>
+                    <Key type="Curve" time="9.0" value="255" out="Auto"/>
+                    <Key type="Curve" time="9.3" value="0"/>
+                </Controller>
+                
+                <Controller type="Anchor" end="Pause" side="Left" relative="true" frame="MVPPlayerName">
+                   <Key type="Curve" time="0.0" value="900"/>
+                   <Key type="Curve" time="1.0" value="900" out="Fast"/>
+                   <Key type="Curve" time="1.3" value="250" in="Slow"/>
+                   <Key type="Curve" time="9.1" value="220" out="Slow"/>
+                   <Key type="Curve" time="9.4" value="-600" in="Fast"/>
+                </Controller>
+
+                <Controller type="Fade" end="Pause" frame="MVPPlayerName">
+                    <Key type="Curve" time="0.0" value="0"/>
+                    <Key type="Curve" time="1.0" value="0" out="Auto"/>
+                    <Key type="Curve" time="1.3" value="255"/>
+                    <Key type="Curve" time="9.1" value="255" out="Auto"/>
+                    <Key type="Curve" time="9.4" value="0"/>
+                </Controller>
+
+                <Controller type="Anchor" end="Pause" side="Left" relative="true" frame="MVPHeroName">
+                    <Key type="Curve" time="0.0" value="-320"/>
+                    <Key type="Curve" time="1.0" value="-320" out="Fast"/>
+                    <Key type="Curve" time="1.3" value="290" in="Slow"/>
+                    <Key type="Curve" time="9.2" value="310" out="Slow"/>
+                    <Key type="Curve" time="9.5" value="900" in="Fast"/>
+                </Controller>
+
+                <Controller type="Fade" end="Pause" frame="MVPHeroName">
+                    <Key type="Curve" time="0.0" value="0"/>
+                    <Key type="Curve" time="1.0" value="0" out="Auto"/>
+                    <Key type="Curve" time="1.3" value="255"/>
+                    <Key type="Curve" time="9.2" value="255" out="Auto"/>
+                    <Key type="Curve" time="9.5" value="0"/>
+                </Controller>
+                
+                
+                <!-- Section: stat visibility timing -->
+                <!-- horizonatal stats: -->
+                <Controller type="Fade" end="Pause" frame="DeathsLabel">
+                    <Key type="Curve" time="0.0" value="0"/>
+                    <Key type="Curve" time="1.0" value="0" out="Auto"/>
+                    <Key type="Curve" time="1.3" value="255"/>
+                    <Key type="Curve" time="9.0" value="255"/>
+                    <Key type="Curve" time="9.3" value="0" in="Auto"/>
+                </Controller>
+                <Controller type="Anchor" end="Pause" side="Left" relative="true" frame="DeathsLabel">
+                    <Key type="Curve" time="0.0" value="-200"/>
+                    <Key type="Curve" time="1.0" value="-200" out="Fast"/>
+                    <Key type="Curve" time="1.3" value="0" in="Slow"/>
+                    <Key type="Curve" time="9.0" value="20" out="Slow"/>
+                    <Key type="Curve" time="9.3" value="200" in="Fast"/>
+                </Controller>
+                
+                <Controller type="Fade" end="Pause" frame="DeathsValueLabel">
+                    <Key type="Curve" time="0.0" value="0"/>
+                    <Key type="Curve" time="1.0" value="0"  in="Auto"/>
+                    <Key type="Curve" time="1.3" value="255"/>
+                    <Key type="Curve" time="9.05" value="255"/>
+                    <Key type="Curve" time="9.35" value="0" in="Auto"/>
+                </Controller>
+                <Controller type="Anchor" end="Pause" side="Left" relative="true" frame="DeathsValueLabel">
+                    <Key type="Curve" time="0.0" value="-200"/>
+                    <Key type="Curve" time="1.05" value="-200" out="Fast"/>
+                    <Key type="Curve" time="1.35" value="0" in="Slow"/>
+                    <Key type="Curve" time="9.05" value="30" out="Slow"/>
+                    <Key type="Curve" time="9.35" value="200" in="Fast"/>
+                </Controller>
+                
+                <Controller type="Fade" end="Pause" frame="AssistsLabel">
+                    <Key type="Curve" time="0.0" value="0"/>
+                    <Key type="Curve" time="1.05" value="0" out="Auto"/>
+                    <Key type="Curve" time="1.35" value="255"/>
+                    <Key type="Curve" time="9.1" value="255"/>
+                    <Key type="Curve" time="9.4" value="0" in="Auto"/>
+                </Controller>
+                <Controller type="Anchor" end="Pause" side="Left" relative="true" frame="AssistsLabel">
+                   <Key type="Curve" time="0.0" value="-200"/>
+                   <Key type="Curve" time="1.05" value="-200" out="Fast"/>
+                   <Key type="Curve" time="1.35" value="0" in="Slow"/>
+                   <Key type="Curve" time="9.1" value="20" out="Slow"/>
+                   <Key type="Curve" time="9.4" value="200" in="Fast"/>
+                </Controller>
+                
+                <Controller type="Fade" end="Pause" frame="AssistsValueLabel">
+                    <Key type="Curve" time="0.0" value="0"/>
+                    <Key type="Curve" time="1.1" value="0" out="Auto"/>
+                    <Key type="Curve" time="1.4" value="255"/>
+                    <Key type="Curve" time="9.15" value="255"/>
+                    <Key type="Curve" time="9.45" value="0" in="Auto"/>
+                </Controller>
+                <Controller type="Anchor" end="Pause" side="Left" relative="true" frame="AssistsValueLabel">
+                   <Key type="Curve" time="0.0" value="-200"/>
+                   <Key type="Curve" time="1.1" value="-200" out="Fast"/>
+                   <Key type="Curve" time="1.4" value="0" in="Slow"/>
+                   <Key type="Curve" time="9.15" value="30" out="Slow"/>
+                   <Key type="Curve" time="9.45" value="200" in="Fast"/>
+                </Controller>
+                
+                <Controller type="Fade" end="Pause" frame="KillsLabel">
+                    <Key type="Curve" time="0.0" value="0"/>
+                    <Key type="Curve" time="1.1" value="0" out="Auto"/>
+                    <Key type="Curve" time="1.4" value="255"/>
+                    <Key type="Curve" time="9.2" value="255"/>
+                    <Key type="Curve" time="9.5" value="0" in="Auto"/>
+                </Controller>
+                <Controller type="Anchor" end="Pause" side="Left" relative="true" frame="KillsLabel">
+                   <Key type="Curve" time="0.0" value="-200"/>
+                   <Key type="Curve" time="1.1" value="-200" out="Fast"/>
+                   <Key type="Curve" time="1.4" value="0" in="Slow"/>
+                   <Key type="Curve" time="9.2" value="20" out="Slow"/>
+                   <Key type="Curve" time="9.5" value="600" in="Fast"/>
+                </Controller>
+                
+                <Controller type="Fade" end="Pause" frame="KillsValueLabel">
+                    <Key type="Curve" time="0.0" value="0"/>
+                    <Key type="Curve" time="1.15" value="0" out="Auto"/>
+                    <Key type="Curve" time="1.45" value="255"/>
+                    <Key type="Curve" time="9.25" value="255"/>
+                    <Key type="Curve" time="9.55" value="0" in="Auto"/>
+                </Controller>
+                <Controller type="Anchor" end="Pause" side="Left" relative="true" frame="KillsValueLabel">
+                   <Key type="Curve" time="0.0" value="-200"/>
+                   <Key type="Curve" time="1.15" value="-200" in="Fast"/>
+                   <Key type="Curve" time="1.45" value="0"/>
+                   <Key type="Curve" time="9.25" value="30"/>
+                   <Key type="Curve" time="9.55" value="600" in="Fast"/>
+                </Controller>
+                
+                <!-- VERTICAL STAT 1 -->
+                <!-- <Controller type="Dimension" dimension="Height" relative="False" percentage="True" end="Stop" frame="MVPStat1ValueLabel">
+                    <Key type="Curve" time="0.0" value="800"/>
+                    <Key type="Curve" time="0.8" value="800"/>
+                    <Key type="Curve" time="1.0" value="100" in="Auto"/>
+                </Controller>
+                <Controller type="Dimension" dimension="Width" relative="False" percentage="True" end="Stop" frame="MVPStat1ValueLabel">
+                    <Key type="Curve" time="0.0" value="800"/>
+                    <Key type="Curve" time="0.8" value="800"/>
+                    <Key type="Curve" time="1.0" value="100" in="Auto"/>
+                </Controller> -->
+                <Controller type="Anchor" end="Pause" side="Right" relative="true" frame="MVPStat1ValueLabel">
+                   <Key type="Curve" time="0" value="600"/>
+                   <Key type="Curve" time="1.2" value="600"/>
+                   <Key type="Curve" time="1.5" value="0" in="Auto"/>
+                   <Key type="Curve" time="9.0" value="-10"/>
+                   <Key type="Curve" time="9.3" value="-600" in="Auto"/>
+                </Controller>
+                <Controller type="Anchor" end="Pause" side="Left" relative="true" frame="MVPStat1Label">
+                   <Key type="Curve" time="0" value="-600"/>
+                   <Key type="Curve" time="1.2" value="-600"/>
+                   <Key type="Curve" time="1.5" value="0" in="Auto"/>
+                   <Key type="Curve" time="9.0" value="15"/>
+                   <Key type="Curve" time="9.3" value="600" in="Auto"/>
+                </Controller>
+                <Controller type="Anchor" end="Pause" side="Left" relative="true" frame="BestInGame1">
+                   <Key type="Curve" time="0" value="-600"/>
+                   <Key type="Curve" time="1.2" value="-600"/>
+                   <Key type="Curve" time="1.5" value="0" in="Auto"/>
+                   <Key type="Curve" time="9.0" value="10"/>
+                   <Key type="Curve" time="9.3" value="600" in="Auto"/>
+                </Controller>
+                <Controller type="Fade" end="Pause" frame="MVPStat1ValueLabel">
+                    <Key type="Curve" time="0" value="0"/>
+                    <Key type="Curve" time="1.2" value="0"/>
+                    <Key type="Curve" time="1.4" value="255" in="Auto"/>
+                    <Key type="Curve" time="9.0" value="255"/>
+                    <Key type="Curve" time="9.3" value="0" in="Auto"/>
+                </Controller>
+                <Controller type="Fade" end="Pause" frame="MVPStat1Label">
+                    <Key type="Curve" time="0" value="0"/>
+                    <Key type="Curve" time="1.2" value="0"/>
+                    <Key type="Curve" time="1.4" value="255" in="Auto"/>
+                    <Key type="Curve" time="9.0" value="255"/>
+                    <Key type="Curve" time="9.3" value="0" in="Auto"/>
+                </Controller>
+                <Controller type="Fade" end="Pause" frame="BestInGame1">
+                    <Key type="Curve" time="0" value="0"/>
+                    <Key type="Curve" time="1.2" value="0"/>
+                    <Key type="Curve" time="1.4" value="255" in="Auto"/>
+                    <Key type="Curve" time="9.0" value="255"/>
+                    <Key type="Curve" time="9.3" value="0" in="Auto"/>
+                </Controller>
+
+                <!-- VERTICAL STAT 2 -->
+                <!-- <Controller type="Dimension" dimension="Height" relative="False" percentage="True" end="Stop" frame="MVPStat2ValueLabel">
+                    <Key type="Curve" time="0.0" value="800"/>
+                    <Key type="Curve" time="0.9" value="800"/>
+                    <Key type="Curve" time="1.1" value="100" in="Auto"/>
+                </Controller>
+                <Controller type="Dimension" dimension="Width" relative="False" percentage="True" end="Stop" frame="MVPStat2ValueLabel">
+                    <Key type="Curve" time="0.0" value="800"/>
+                    <Key type="Curve" time="0.9" value="800"/>
+                    <Key type="Curve" time="1.1" value="100" in="Auto"/>
+                </Controller> -->
+                <Controller type="Anchor" end="Pause" side="Right" relative="true" frame="MVPStat2ValueLabel">
+                   <Key type="Curve" time="0" value="600"/>
+                   <Key type="Curve" time="1.2" value="-600"/>
+                   <Key type="Curve" time="1.5" value="0" in="Auto"/>
+                   <Key type="Curve" time="9.1" value="-10"/>
+                   <Key type="Curve" time="9.4" value="-600" in="Auto"/>
+                </Controller>
+                <Controller type="Anchor" end="Pause" side="Left" relative="true" frame="MVPStat2Label">
+                   <Key type="Curve" time="0" value="-600"/>
+                   <Key type="Curve" time="1.2" value="-600"/>
+                   <Key type="Curve" time="1.5" value="0" in="Auto"/>
+                   <Key type="Curve" time="9.1" value="15"/>
+                   <Key type="Curve" time="9.4" value="600" in="Auto"/>
+                </Controller>
+                <Controller type="Anchor" end="Pause" side="Left" relative="true" frame="BestInGame2">
+                   <Key type="Curve" time="0" value="-600"/>
+                   <Key type="Curve" time="1.2" value="-600"/>
+                   <Key type="Curve" time="1.5" value="0" in="Auto"/>
+                   <Key type="Curve" time="9.1" value="10"/>
+                   <Key type="Curve" time="9.4" value="600" in="Auto"/>
+                </Controller>
+                <Controller type="Fade" end="Pause" frame="MVPStat2ValueLabel">
+                    <Key type="Curve" time="0" value="0"/>
+                    <Key type="Curve" time="1.2" value="0"/>
+                    <Key type="Curve" time="1.4" value="255" in="Auto"/>
+                    <Key type="Curve" time="9.1" value="255"/>
+                    <Key type="Curve" time="9.4" value="0" in="Auto"/>
+                </Controller>
+                <Controller type="Fade" end="Pause" frame="MVPStat2Label">
+                    <Key type="Curve" time="0" value="0"/>
+                    <Key type="Curve" time="1.2" value="0"/>
+                    <Key type="Curve" time="1.4" value="255" in="Auto"/>
+                    <Key type="Curve" time="9.1" value="255"/>
+                    <Key type="Curve" time="9.4" value="0" in="Auto"/>
+                </Controller>
+                <Controller type="Fade" end="Pause" frame="BestInGame2">
+                    <Key type="Curve" time="0" value="0"/>
+                    <Key type="Curve" time="1.2" value="0"/>
+                    <Key type="Curve" time="1.4" value="255" in="Auto"/>
+                    <Key type="Curve" time="9.1" value="255"/>
+                    <Key type="Curve" time="9.4" value="0" in="Auto"/>
+                </Controller>
+
+                <!-- VERTICAL STAT 3 -->
+                <!-- <Controller type="Dimension" dimension="Height" relative="False" percentage="True" end="Stop" frame="MVPStat3ValueLabel">
+                    <Key type="Curve" time="0.0" value="800"/>
+                    <Key type="Curve" time="0.9" value="800"/>
+                    <Key type="Curve" time="1.1" value="100" in="Auto"/>
+                </Controller>
+                <Controller type="Dimension" dimension="Width" relative="False" percentage="True" end="Stop" frame="MVPStat3ValueLabel">
+                    <Key type="Curve" time="0.0" value="800"/>
+                    <Key type="Curve" time="0.9" value="800"/>
+                    <Key type="Curve" time="1.1" value="100" in="Auto"/>
+                </Controller> -->
+                <Controller type="Anchor" end="Pause" side="Right" relative="true" frame="MVPStat3ValueLabel">
+                   <Key type="Curve" time="0" value="600"/>
+                   <Key type="Curve" time="1.2" value="-600"/>
+                   <Key type="Curve" time="1.5" value="0" in="Auto"/>
+                   <Key type="Curve" time="9.2" value="-10"/>
+                   <Key type="Curve" time="9.5" value="-600" in="Auto"/>
+                </Controller>
+                <Controller type="Anchor" end="Pause" side="Left" relative="true" frame="MVPStat3Label">
+                   <Key type="Curve" time="0" value="-600"/>
+                   <Key type="Curve" time="1.2" value="-600"/>
+                   <Key type="Curve" time="1.5" value="0" in="Auto"/>
+                   <Key type="Curve" time="9.2" value="15"/>
+                   <Key type="Curve" time="9.5" value="600" in="Auto"/>
+                </Controller>
+                <Controller type="Anchor" end="Pause" side="Left" relative="true" frame="BestInGame3">
+                   <Key type="Curve" time="0" value="-600"/>
+                   <Key type="Curve" time="1.2" value="-600"/>
+                   <Key type="Curve" time="1.5" value="0" in="Auto"/>
+                   <Key type="Curve" time="9.2" value="10"/>
+                   <Key type="Curve" time="9.5" value="600" in="Auto"/>
+                </Controller>
+                <Controller type="Fade" end="Pause" frame="MVPStat3ValueLabel">
+                    <Key type="Curve" time="0" value="0"/>
+                    <Key type="Curve" time="1.2" value="0"/>
+                    <Key type="Curve" time="1.4" value="255" in="Auto"/>
+                    <Key type="Curve" time="9.2" value="255"/>
+                    <Key type="Curve" time="9.5" value="0" in="Auto"/>
+                </Controller>
+                <Controller type="Fade" end="Pause" frame="MVPStat3Label">
+                    <Key type="Curve" time="0" value="0"/>
+                    <Key type="Curve" time="1.2" value="0"/>
+                    <Key type="Curve" time="1.4" value="255" in="Auto"/>
+                    <Key type="Curve" time="9.2" value="255"/>
+                    <Key type="Curve" time="9.5" value="0" in="Auto"/>
+                </Controller>
+                <Controller type="Fade" end="Pause" frame="BestInGame3">
+                    <Key type="Curve" time="0" value="0"/>
+                    <Key type="Curve" time="1.2" value="0"/>
+                    <Key type="Curve" time="1.4" value="255" in="Auto"/>
+                    <Key type="Curve" time="9.2" value="255"/>
+                    <Key type="Curve" time="9.5" value="0" in="Auto"/>
+                </Controller>
+            </Animation>
+        
+            <Animation name="InterruptScrollEffect">
+                <Event event="MVPSkipEvent" action="Play" frame="$this"/>
+                
+                <Controller type="Fade" end="Pause">
+                    <Key type="Curve" time="0" value="255" out="Slow"/>
+                    <Key type="Curve" time="0.2" value="0" in="Slow"/>
+                </Controller>
+            </Animation>
+        </Frame>
+        
+        <Frame type="Frame" name="AwardWinnerContainerMVP" template="EndOfGameAwards/SecondaryAwardBaseTemplate">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="40%" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="60%" offset="0"/>
+            <RenderPriority val="810"/>
+
+            <Frame type="Image" name="MVPTitleFlare_Blue">
+                <Anchor side="Top" relative="$parent/MVPTitleLabel" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/MVPTitleLabel" pos="Min" offset="0"/>
+                <Anchor side="Bottom" relative="$parent/MVPTitleLabel" pos="Max" offset="0"/>
+                <Anchor side="Right" relative="$parent/MVPTitleLabel" pos="Max" offset="0"/>
+                <Texture val="@UI/eom_mvp_title_flare"/>
+                <Visible val="False"/>
+
+                <Alpha val="255"/>
+                <BlendMode val="Add"/>
+                <ColorAdjustMode val="Colorize"/>
+                <AdjustmentColor val="006bd9"/>
+            </Frame>
+            
+            <Frame type="Image" name="MVPTitleFlare_Red">
+                <Anchor relative="$parent/MVPTitleFlare_Blue"/>
+                <Texture val="@UI/eom_mvp_title_flare"/>
+                <Visible val="False"/>
+            
+                <Alpha val="255"/>
+                <BlendMode val="Add"/>
+                <ColorAdjustMode val="Colorize"/>
+                <AdjustmentColor val="b40000"/>
+            </Frame>
+            
+            <Frame type="Image" name="MVPTitleFlare_Yellow">
+                <Anchor relative="$parent/MVPTitleFlare_Blue"/>
+                <Texture val="@UI/eom_mvp_title_flare"/>
+                <Visible val="False"/>
+
+                <Alpha val="255"/>
+                <BlendMode val="Add"/>
+                <ColorAdjustMode val="Colorize"/>
+                <AdjustmentColor val="b47f00"/>
+            </Frame>
+            
+            <Frame type="Label" name="MVPTitleLabel">
+                <Anchor side="Top" relative="$parent" pos="5%" offset="-30"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+                <Height val="100"/>
+                
+                <Style val="MVP_Heading2"/>
+                <Text val="@UI/EndOfGameAwards/MVP"/>
+            </Frame>
+            
+            <!-- overwriting for special case mvp badge -->
+            <Frame type="Image" name="AwardIcon">
+                <Texture val="@UI/eom_badge_MVP"/>
+                <TextureCoords top="0" left="0" bottom="1" right="0.33"/>
+                
+                <Animation name="IconSpin">
+                    <Event event="OnShown" action="Play"/>
+                    
+                    <Controller type="Rotation" relative="False" end="Loop">
+                        <Key type="Curve" time="0" value="360" out="linear"/>
+                        <Key type="Curve" time="8" value="0" in="linear"/>
+                    </Controller>
+                </Animation>
+            
+                <StateGroup name="MVPBadgeType">
+                    <DefaultState val="blue"/>
+                    
+                    <State name="blue">
+                        <Action type="ApplyTemplate" template="EndOfGameAwardsIconTemplates/MVP0"/>
+                    </State>
+                    <State name="red">
+                        <Action type="ApplyTemplate" template="EndOfGameAwardsIconTemplates/MVP1"/>
+                    </State>
+                    <State name="yellow">
+                        <Action type="ApplyTemplate" template="EndOfGameAwardsIconTemplates/MVP2"/>
+                    </State>
+                </StateGroup>
+            </Frame>
+            
+            <!-- Hide until secondary stats appear -->
+            <StateGroup name="MVPSecondaryVisibility">
+                <DefaultState val="ShowInitStats"/>
+                
+                <State name="ShowInitStats">
+                    <Action type="SetProperty" frame="$this" visible="false"/>
+                </State>
+                
+                <State name="HideInitStats">
+                    <When type="Property" frame="$parent/SecondaryAwardStats" visible="true"/>
+                    <Action type="SetProperty" frame="$this" visible="true"/>
+                </State>
+            </StateGroup>
+            
+            <!-- sets mvp lineup specific colors -->
+            <StateGroup name="AwardLabelsColor">
+                <DefaultState val="Blue"/>
+            
+                <State name="Blue">
+                    <When type="AnimationState" ColorState="Blue"/>
+                    <Action type="SetProperty" frame="MVPTitleLabel" style="MVP_Heading2"/>
+                    <Action type="SetProperty" frame="MVPTitleFlare_Blue" visible="true"/>
+                    <Action type="SetState" frame="AwardIcon" group="MVPBadgeType" state="blue"/>
+                </State>
+                
+                <State name="Red">
+                    <When type="AnimationState" ColorState="Red"/>
+                    <Action type="SetProperty" frame="MVPTitleLabel" style="MVP_Heading2_Red"/>
+                    <Action type="SetProperty" frame="MVPTitleFlare_Red" visible="true"/>
+                    <Action type="SetState" frame="AwardIcon" group="MVPBadgeType" state="red"/>
+                </State>
+                
+                <State name="Yellow">
+                    <When type="AnimationState" ColorState="Yellow"/>
+                    <Action type="SetProperty" frame="MVPTitleLabel" style="MVP_Heading2_Legendary"/>
+                    <Action type="SetProperty" frame="MVPTitleFlare_Yellow" visible="true"/>
+                    <Action type="SetState" frame="AwardIcon" group="MVPBadgeType" state="yellow"/>
+                </State>
+            </StateGroup>
+        </Frame>
+        
+        <!-- secondary award layouts
+            mvp panel animates to move to the center
+            then reveal this frame in triggers -->
+        <Frame type="Frame" name="SecondaryAwardStats">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="40%" offset="-800"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="60%" offset="800"/>
+            
+            <RenderPriority val="1000"/>
+            <UseAlternateTime val="true"/>
+
+            <!-- separate award containers- set their own slot filters -->
+            <Frame type="Frame" name="AwardWinnerContainer3" template="EndOfGameAwards/SecondaryAwardTemplate">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+                <Anchor side="Right" relative="$parent" pos="18.5%" offset="233"/>
+                <Visible val="False"/>
+            </Frame>
+
+            <Frame type="Frame" name="AwardWinnerContainer1" template="EndOfGameAwards/SecondaryAwardTemplate">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent" pos="18.5%" offset="0"/>
+                <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+                <Anchor side="Right" relative="$parent" pos="37%" offset="133"/>
+                <Visible val="False"/>
+            </Frame>
+            
+            <Frame type="Frame" name="AwardWinnerContainer2" template="EndOfGameAwards/SecondaryAwardTemplate">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent" pos="63%" offset="-133"/>
+                <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+                <Anchor side="Right" relative="$parent" pos="81.5%" offset="0"/>
+                <Visible val="False"/>
+            </Frame>
+            
+            <Frame type="Frame" name="AwardWinnerContainer4" template="EndOfGameAwards/SecondaryAwardTemplate">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent" pos="81.5%" offset="-233"/>
+                <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+                <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+                <Visible val="False"/>
+            </Frame>
+            
+            <!-- handle the reveal layout side- triggers should provide the label text -->
+            <Animation name="RollOutSecondaryAwards">
+                <Event event="OnShown" action="Restart,Play"/>
+                
+                <Controller type="Visibility" end="Pause" frame="AwardWinnerContainer1">
+                    <Key type="Bool" time="0" value="False"/>
+                    <Key type="Bool" time="0.905" value="True"/>
+                </Controller>
+                
+                <Controller type="Visibility" end="Pause" frame="AwardWinnerContainer2">
+                    <Key type="Bool" time="0" value="False"/>
+                    <Key type="Bool" time="1.405" value="True"/>
+                </Controller>
+                
+                <Controller type="Visibility" end="Pause" frame="AwardWinnerContainer3">
+                    <Key type="Bool" time="0" value="False"/>
+                    <Key type="Bool" time="1.905" value="True"/>
+                </Controller>
+                
+                <Controller type="Visibility" end="Pause" frame="AwardWinnerContainer4">
+                    <Key type="Bool" time="0" value="False"/>
+                    <Key type="Bool" time="2.405" value="True"/>
+                </Controller>
+            </Animation>
+        </Frame>
+    
+        <Frame type="Frame" name="SecondaryAwardCutscenes">
+            <Anchor relative="$parent"/>
+            <RenderPriority val="500"/>
+            <Visible val="{$parent/SecondaryAwardStats/@Visible}"/>
+            
+            <!-- slot numbers: 3 1 mvp 2 4 
+                in a n awkward order to render over one another in the lineup -->
+            
+            <Frame type="Frame" name="HeroCutsceneContainer3" template="EndOfGameAwards/SecondaryCutsceneTemplate">
+                <Anchor side="Bottom" relative="$parent/HeroCutsceneContainer1" pos="Max" offset="50"/>
+                <Anchor side="Left" relative="$parent/$parent/SecondaryAwardStats/AwardWinnerContainer3" pos="Mid" offset="82"/>
+                <Anchor side="Right" relative="$parent/$parent/SecondaryAwardStats/AwardWinnerContainer3" pos="Mid" offset="82"/>
+                <Handle val="EndOfGame_CutsceneFrame_Slot3"/>
+
+                <Frame type="HeroCutsceneFrame" name="HeroCutscene">
+                    <Visible val="{$parent/$parent/$parent/SecondaryAwardStats/AwardWinnerContainer3/@Visible}"/>
+					<Height val="1350"/>
+                    
+                    <Animation name="SlotReveal">
+                        <Event event="Tier0Filter" frame="$this" action="Reset,Play"/>
+                        
+                        <Controller type="Cutscene" end="Stop">
+                            <Key type="Cutscene" time="0.0" action="ClearFilters"/>
+                            <Key type="Cutscene" time="0.0" action="AddFilter" filter="Slot4"/>
+                        </Controller>
+                        
+                        <Controller type="State" stateGroup="SemaphorThing" end="Pause">
+                            <Key type="Identifier" time="0" value="Unlock"/>
+                        </Controller>
+                    </Animation>
+                    
+                    <!-- Animations for triggering events when skip votes need to be synced up -->
+                    <Animation name="SlotSync">
+                        <Event event="Tier0Sync" frame="$this" action="Reset,Play"/>
+                        
+                        <Controller type="Event" end="Stop" frame="$parent/$parent/$parent/SecondaryAwardStats/AwardWinnerContainer3/VoterButton">
+                            <Key type="Event" time="0" event="TurnOnVoteCounters"/>
+                        </Controller>
+                    </Animation>
+                
+                    <Animation name="SlotSyncEpic">
+                        <Event event="Tier1Sync" frame="$this" action="Reset,Play"/>
+                        
+                        <Controller type="Event" end="Stop" frame="$parent/$parent/$parent/SecondaryAwardStats/AwardWinnerContainer3/VoterButton">
+                            <Key type="Event" time="0" event="Tier1EpicTransition"/>
+                        </Controller>
+                    </Animation>
+                    
+                    <Animation name="SlotSyncLegendary">
+                        <Event event="Tier2Sync" frame="$this" action="Reset,Play"/>
+                        
+                        <Controller type="Event" end="Stop" frame="$parent/$parent/$parent/SecondaryAwardStats/AwardWinnerContainer3/VoterButton">
+                            <Key type="Event" time="0" event="Tier2LegendaryTransition"/>
+                        </Controller>
+                        
+                        <Controller type="Event" end="Stop" frame="$parent/$parent/$parent/SecondaryAwardStats/AwardWinnerContainer3/AwardIcon">
+                            <Key type="Event" time="0" event="Tier2LegendaryTransition"/>
+                        </Controller>
+                    </Animation>
+                </Frame>
+            </Frame>
+            
+            <Frame type="Frame" name="HeroCutsceneContainer1" template="EndOfGameAwards/SecondaryCutsceneTemplate">
+                <Anchor side="Bottom" relative="$parent/$parent/MVPCutsceneFrame" pos="Max" offset="0"/>
+                <Anchor side="Left" relative="$parent/$parent/SecondaryAwardStats/AwardWinnerContainer1" pos="Mid" offset="27"/>
+                <Anchor side="Right" relative="$parent/$parent/SecondaryAwardStats/AwardWinnerContainer1" pos="Mid" offset="27"/>
+                <Handle val="EndOfGame_CutsceneFrame_Slot1"/>
+
+                <Frame type="HeroCutsceneFrame" name="HeroCutscene">
+                    <Anchor side="Left" relative="$parent" pos="Mid" offset="-794"/>
+                    <Anchor side="Right" relative="$parent" pos="Mid" offset="855"/>
+                
+                    <Visible val="{$parent/$parent/$parent/SecondaryAwardStats/AwardWinnerContainer1/@Visible}"/>
+                    
+                    <Animation name="SlotReveal">
+                        <Event event="Tier0Filter" frame="$this" action="Reset,Play"/>
+                        
+                        <Controller type="Cutscene" end="Stop">
+                            <Key type="Cutscene" time="0.0" action="ClearFilters"/>
+                            <Key type="Cutscene" time="0.0" action="AddFilter" filter="Slot2"/>
+                        </Controller>
+                        
+                        <Controller type="State" stateGroup="SemaphorThing" end="Pause">
+                            <Key type="Identifier" time="0" value="Unlock"/>
+                        </Controller>
+                    </Animation>
+                    
+                    <!-- Animations for triggering events when skip votes need to be synced up -->
+                    <Animation name="SlotSync">
+                        <Event event="Tier0Sync" frame="$this" action="Reset,Play"/>
+                        
+                        <Controller type="Event" end="Stop" frame="$parent/$parent/$parent/SecondaryAwardStats/AwardWinnerContainer1/VoterButton">
+                            <Key type="Event" time="0" event="TurnOnVoteCounters"/>
+                        </Controller>
+                    </Animation>
+                
+                    <Animation name="SlotSyncEpic">
+                        <Event event="Tier1Sync" frame="$this" action="Reset,Play"/>
+                        
+                        <Controller type="Event" end="Stop" frame="$parent/$parent/$parent/SecondaryAwardStats/AwardWinnerContainer1/VoterButton">
+                            <Key type="Event" time="0" event="Tier1EpicTransition"/>
+                        </Controller>
+                    </Animation>
+                    
+                    <Animation name="SlotSyncLegendary">
+                        <Event event="Tier2Sync" frame="$this" action="Reset,Play"/>
+                        
+                        <Controller type="Event" end="Stop" frame="$parent/$parent/$parent/SecondaryAwardStats/AwardWinnerContainer1/VoterButton">
+                            <Key type="Event" time="0" event="Tier2LegendaryTransition"/>
+                        </Controller>
+                        
+                        <Controller type="Event" end="Stop" frame="$parent/$parent/$parent/SecondaryAwardStats/AwardWinnerContainer1/AwardIcon">
+                            <Key type="Event" time="0" event="Tier2LegendaryTransition"/>
+                        </Controller>
+                    </Animation>
+                </Frame>
+            </Frame>
+            
+            <Frame type="Frame" name="HeroCutsceneContainer4" template="EndOfGameAwards/SecondaryCutsceneTemplate">
+                <Anchor side="Bottom" relative="$parent/HeroCutsceneContainer2" pos="Max" offset="50"/>
+                <Anchor side="Left" relative="$parent/$parent/SecondaryAwardStats/AwardWinnerContainer4" pos="Mid" offset="-96"/>
+                <Anchor side="Right" relative="$parent/$parent/SecondaryAwardStats/AwardWinnerContainer4" pos="Mid" offset="-96"/>
+                <Handle val="EndOfGame_CutsceneFrame_Slot4"/>
+
+                <Frame type="HeroCutsceneFrame" name="HeroCutscene">
+                    <Visible val="{$parent/$parent/$parent/SecondaryAwardStats/AwardWinnerContainer4/@Visible}"/>
+					<Height val="1350"/>
+                    
+                    <Animation name="SlotReveal">
+                        <Event event="Tier0Filter" frame="$this" action="Reset,Play"/>
+                        
+                        <Controller type="Cutscene" end="Stop">
+                            <Key type="Cutscene" time="0.0" action="ClearFilters"/>
+                            <Key type="Cutscene" time="0.0" action="AddFilter" filter="Slot3"/>
+                        </Controller>
+                        
+                        <Controller type="State" stateGroup="SemaphorThing" end="Pause">
+                            <Key type="Identifier" time="0" value="Unlock"/>
+                        </Controller>
+                    </Animation>
+                    
+                    <!-- Animations for triggering events when skip votes need to be synced up -->
+                    <Animation name="SlotSync">
+                        <Event event="Tier0Sync" frame="$this" action="Reset,Play"/>
+                        
+                        <Controller type="Event" end="Stop" frame="$parent/$parent/$parent/SecondaryAwardStats/AwardWinnerContainer4/VoterButton">
+                            <Key type="Event" time="0" event="TurnOnVoteCounters"/>
+                        </Controller>
+                    </Animation>
+                
+                    <Animation name="SlotSyncEpic">
+                        <Event event="Tier1Sync" frame="$this" action="Reset,Play"/>
+                        
+                        <Controller type="Event" end="Stop" frame="$parent/$parent/$parent/SecondaryAwardStats/AwardWinnerContainer4/VoterButton">
+                            <Key type="Event" time="0" event="Tier1EpicTransition"/>
+                        </Controller>
+                    </Animation>
+                    
+                    <Animation name="SlotSyncLegendary">
+                        <Event event="Tier2Sync" frame="$this" action="Reset,Play"/>
+                        
+                        <Controller type="Event" end="Stop" frame="$parent/$parent/$parent/SecondaryAwardStats/AwardWinnerContainer4/VoterButton">
+                            <Key type="Event" time="0" event="Tier2LegendaryTransition"/>
+                        </Controller>
+                        
+                        <Controller type="Event" end="Stop" frame="$parent/$parent/$parent/SecondaryAwardStats/AwardWinnerContainer4/AwardIcon">
+                            <Key type="Event" time="0" event="Tier2LegendaryTransition"/>
+                        </Controller>
+                    </Animation>
+                </Frame>
+            </Frame>
+            
+            <Frame type="Frame" name="HeroCutsceneContainer2" template="EndOfGameAwards/SecondaryCutsceneTemplate">
+                <Anchor side="Bottom" relative="$parent/$parent/MVPCutsceneFrame" pos="Max" offset="0"/>
+                <Anchor side="Left" relative="$parent/$parent/SecondaryAwardStats/AwardWinnerContainer2" pos="Mid" offset="-38"/>
+                <Anchor side="Right" relative="$parent/$parent/SecondaryAwardStats/AwardWinnerContainer2" pos="Mid" offset="-38"/>
+                <Handle val="EndOfGame_CutsceneFrame_Slot2"/>
+
+                <Frame type="HeroCutsceneFrame" name="HeroCutscene">
+                    <Anchor side="Left" relative="$parent" pos="Mid" offset="794"/>
+                    <Anchor side="Right" relative="$parent" pos="Mid" offset="-855"/>
+                    
+                    <Visible val="{$parent/$parent/$parent/SecondaryAwardStats/AwardWinnerContainer2/@Visible}"/>
+                    
+                    <Animation name="SlotReveal">
+                        <Event event="Tier0Filter" frame="$this" action="Reset,Play"/>
+                        
+                        <Controller type="Cutscene" end="Stop">
+                            <Key type="Cutscene" time="0.0" action="ClearFilters"/>
+                            <Key type="Cutscene" time="0.0" action="AddFilter" filter="Slot1"/>
+                        </Controller>
+                        
+                        <Controller type="State" stateGroup="SemaphorThing" end="Pause">
+                            <Key type="Identifier" time="0" value="Unlock"/>
+                        </Controller>
+                    </Animation>
+                    
+                    <!-- Animations for triggering events when skip votes need to be synced up -->
+                    <Animation name="SlotSync">
+                        <Event event="Tier0Sync" frame="$this" action="Reset,Play"/>
+                        
+                        <Controller type="Event" end="Stop" frame="$parent/$parent/$parent/SecondaryAwardStats/AwardWinnerContainer2/VoterButton">
+                            <Key type="Event" time="0" event="TurnOnVoteCounters"/>
+                        </Controller>
+                    </Animation>
+                
+                    <Animation name="SlotSyncEpic">
+                        <Event event="Tier1Sync" frame="$this" action="Reset,Play"/>
+                        
+                        <Controller type="Event" end="Stop" frame="$parent/$parent/$parent/SecondaryAwardStats/AwardWinnerContainer2/VoterButton">
+                            <Key type="Event" time="0" event="Tier1EpicTransition"/>
+                        </Controller>
+                    </Animation>
+                    
+                    <Animation name="SlotSyncLegendary">
+                        <Event event="Tier2Sync" frame="$this" action="Reset,Play"/>
+                        
+                        <Controller type="Event" end="Stop" frame="$parent/$parent/$parent/SecondaryAwardStats/AwardWinnerContainer2/VoterButton">
+                            <Key type="Event" time="0" event="Tier2LegendaryTransition"/>
+                        </Controller>
+                        
+                        <Controller type="Event" end="Stop" frame="$parent/$parent/$parent/SecondaryAwardStats/AwardWinnerContainer2/AwardIcon">
+                            <Key type="Event" time="0" event="Tier2LegendaryTransition"/>
+                        </Controller>
+                    </Animation>
+                </Frame>
+            </Frame>
+        </Frame>
+        
+        <Frame type="CutsceneFrame" name="SmokeVignetteCutscene">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+            <UseAlternateTime val="true"/>
+            
+            <RenderPriority val="600"/>
+            <File val="Cutscenes/EndOfMatch_Smoke.StormCutscene"/>
+            <Unclipped val="True"/>
+            <AutoPlay val="true"/>
+        </Frame>
+        
+        <Frame type="CutsceneFrame" name="ParticleBGCutscene" template="EndOfGameAwards/EndOfGameAwardsPanelTemplate/SmokeVignetteCutscene">
+            <Anchor relative="$parent"/>
+            <UseAlternateTime val="true"/>
+            
+            <RenderPriority val="450"/>
+            <File val="Cutscenes/EndOfMatch_Transition.StormCutscene"/>
+        </Frame>
+        
+        <Frame type="CutsceneFrame" name="TransitionFlashCutscene" template="EndOfGameAwards/EndOfGameAwardsPanelTemplate/SmokeVignetteCutscene">
+            <Anchor relative="$parent"/>
+			
+			<RenderPriority val="2000"/>
+            <File val="Cutscenes/EndOfMatch_TransitionFlash.StormCutscene"/>
+        </Frame>
+            
+		<Animation name="CutsceneFXTransition">
+			<Event event="FXTransition" action="Reset,Play"/>
+			
+			<Controller type="Cutscene" end="Stop" frame="SmokeVignetteCutscene">
+				<Key type="Cutscene" time="0" action="Bookmark" bookmark="Line Up Start"/>
+			</Controller>
+			
+			<Controller type="Cutscene" end="Stop" frame="ParticleBGCutscene">
+				<Key type="Cutscene" time="0" action="Bookmark" bookmark="Line Up Start"/>
+			</Controller>
+		</Animation>
+        
+        <Frame type="Image" name="VignetteBackgroundImage">
+            <Anchor relative="$parent"/>
+            <BlendMode val="Multiply"/>
+            <RenderPriority val="700"/>
+
+            <Texture val="@UI/eom_vignette"/>
+        </Frame>
+
+        <Frame type="Button" name="LeaveButton" template="StandardTemplates/StandardButtonSmallTemplate">
+            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Bottom" relative="$parent/TerminatingFrame" pos="Max" offset="0"/>
+            <RenderPriority val="910"/>
+            <VisibilityOnFade val="true"/>
+            <UseAlternateTime val="true"/>
+
+            <Frame type="Label" name="Label">
+                <Text val="@UI/EndOfGameAwards/Leave"/>
+            </Frame>
+            
+	        <Animation name="TimedEntrance">
+	            <Event event="Enter" frame="$parent" action="Restart,Play"/>
+    
+	            <Controller type="Anchor" frame="$this" end="Pause" side="Bottom" relative="true">
+	                <Key type="Curve" time="0" value="100"/>
+	                <Key type="Curve" time="1.8" value="100" out="Fast"/>
+	                <Key type="Curve" time="2.2" value="0" in="Slow"/>
+	            </Controller>
+	        </Animation>
+
+            <!-- can this flow be changed to wait a second? -->
+            <StateGroup name="DisableState">
+                <State name="Disabled">
+                    <When type="Property" frame="$parent/SecondaryAwardStats/AwardWinnerContainer4" visible="false"/>
+                    <Action type="SetProperty" AcceptsMouse="false"/>
+                    <Action type="SetProperty" alpha="0"/>
+                    <Action type="SendEvent" event="Enter" on="Exit"/>
+                </State>
+            </StateGroup>
+        </Frame>
+
+        <Frame type="Button" name="SkipButton" template="StandardTemplates/StandardButtonSmallTemplate">
+            <Anchor relative="$parent/LeaveButton"/>
+            <RenderPriority val="920"/>
+            <UseAlternateTime val="true"/>
+            <AcceptsMouse val="true"/>
+            
+            <Frame type="Frame" name="HitTestFrame">
+                <Anchor relative="$parent"/>
+                <AcceptsMouse val="true"/>
+                <RenderPriority val="1000"/>
+            </Frame>
+
+            <Frame type="Label" name="Label">
+                <Text val="@UI/EndOfGameAwards/Skip"/>
+            </Frame>
+            
+            <StateGroup name="DisableState">
+                <State name="TimedOut">
+                    <When type="Property" frame="$parent/SecondaryAwardStats" visible="true"/>
+                    <Action type="SetProperty" AcceptsMouse="false"/>
+                    <Action type="SetProperty" visible="false"/>
+                </State>
+            </StateGroup>
+        </Frame>
+
+        <Frame type="Frame" name="TerminatingFrame">
+            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="-5"/>
+            <Anchor side="Left" relative="Countdown/ProgressBar" pos="Min" offset="0"/>
+            <Height val="80"/>
+            <RenderPriority val="910"/>
+            <UseAlternateTime val="true"/>
+
+            <Frame type="Frame" name="Countdown">
+                <Anchor side="Left" relative="ProgressBar" pos="Min" offset="0"/>
+                <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+                <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+                <Height val="80"/>
+
+                <Frame type="Image" name="ImageBack">
+                    <Anchor relative="$parent/ProgressBar"/>
+                    <Texture val="@UI/eom_timer"/>
+                    <Alpha val="64"/>
+                </Frame>
+
+                <Frame type="ProgressBar" name="ProgressBar">
+                    <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+                    <Anchor side="Right" relative="$parent/CountdownLabel" pos="Min" offset="0"/>
+                    <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+                    <Width val="70"/>
+                    <Height val="70"/>
+
+                    <MinValue val="0"/>
+                    <MaxValue val="1.0"/>
+                    <!--Value val="{$parent/CountdownLabel/@Ratio}"/-->
+                    <Circular val="True"/>
+                    <CircularStart val="360"/>
+                    <CircularEndOffset val="-360"/>
+                    <FillInset val="0.0"/>
+
+                    <Frame type="Frame" name="FillImageContainer">
+                        <Anchor relative="$parent"/>
+
+                        <Frame type="Image" name="FillImage">
+                            <Anchor relative="$parent"/>
+                            <Texture val="@UI/eom_timer"/>
+                            <TextureType layer="0" val="Circular"/>
+                        </Frame>
+                    </Frame>
+                </Frame>
+
+                <!-- Dummy holds a static position at max countdown to prevent text-shifting -->
+                <Frame type="CountdownLabel" name="CountdownPlaceHolder" template="EndOfGameAwards/CountdownLabelTemplate">
+                    <Anchor side="Right" relative="$parent" pos="Max" offset="-20"/>
+                    <Visible val="false"/>
+                    <CurrentValue val="#MVPCountdownStart"/>
+                </Frame>
+
+                <Frame type="CountdownLabel" name="CountdownLabel" template="EndOfGameAwards/CountdownLabelTemplate">
+                    <Anchor side="Left" relative="$parent/CountdownPlaceHolder" pos="Min" offset="0"/>
+                </Frame>
+
+                <!-- Temp: Use PropertyBind frame until branch supports property bind syntax -->
+                <Frame type="PropertyBind" name="CountdownBinder">
+                    <Anchor relative="$parent"/>
+                    <Enabled val="true"/>
+                    <Source frame="$parent/CountdownLabel" property="Ratio"/>
+                    <Target frame="$parent/ProgressBar" property="Value"/>
+                </Frame>
+                
+            </Frame>
+
+            <Animation name="ShowCountDown">
+                <Event event="OnShown" action="Restart"/>
+                <Event event="CountDownToClosure" frame="$parent" action="Restart,Play"/>
+
+                <Controller type="Anchor" frame="Countdown" end="Pause" side="Bottom" relative="true">
+                    <Key type="Curve" time="0" value="100"/>
+                    <Key type="Curve" time="0.4" value="0"/>
+                </Controller>
+
+                <Controller type="Counter" frame="Countdown/CountdownLabel" end="Pause">
+                    <Key type="Curve" time="0.0" value="1.0" InOut="Linear"/>
+                    <Key type="Curve" time="#MVPCountdownStart" value="0.0" InOut="Linear"/>
+                </Controller>
+
+                <Controller type="Fade" frame="Countdown" end="Pause">
+                    <Key type="Curve" time="0" value="255"/>
+                    <Key type="Curve" time="#MVPCountdownStart" value="255"/>
+                    <Key type="Curve" time="11" value="0"/>
+                </Controller>
+            </Animation>
+        </Frame>
+        
+        <!-- Play effects/flash, then show bg, cutscene, then stats -->
+            <!-- flash is 0.5 sec -->
+        <Animation name="RevealPacing">
+            <Event event="OnShown" action="Reset,Play"/>
+            
+            <Controller type="Visibility" end="Pause" frame="SmokeVignetteCutscene">
+                <Key type="Bool" time="0" value="false"/>
+                <Key type="Bool" time="0" value="True"/>
+            </Controller>
+            
+            <Controller type="Visibility" end="Pause" frame="MVPCutsceneFrame">
+                <Key type="Bool" time="0" value="false"/>
+                <Key type="Bool" time="0.5" value="True"/>
+            </Controller>
+            
+            <Controller type="Visibility" end="Pause" frame="MVPStats">
+                <Key type="Bool" time="0" value="False"/>
+                <Key type="Bool" time="0.8" value="True"/>
+            </Controller>
+            
+            <Controller type="Visibility" end="Pause" frame="BackgroundImage">
+                <Key type="Bool" time="0" value="False"/>
+                <Key type="Bool" time="0" value="True"/>
+            </Controller>
+        </Animation>
+        
+        <!-- trigger all transition related animations off of one trigger event-->
+        <Animation name="WaitForTransitionSound">
+            <Event event="WaitForSound" frame="$this" action="Play"/>
+            
+            <Controller type="Event" end="Stop" frame="MVPCutsceneFrame/HeroCutscene">
+                <Key type="Event" time="0.405" event="Tier0Bookmark"/>
+            </Controller>
+            
+            <Controller type="Event" end="Stop" frame="$this">
+                <Key type="Event" time="0.405" event="FXTransition"/>
+                <Key type="Event" time="0.405" event="BGZoom"/>
+            </Controller>
+        </Animation>
+        
+        <!-- Send off the mvp skip event to whatever child frames need it -->
+        <Animation name="SkipMVPTriggered">
+            <Event event="SkipMVP" frame="MVPStats" action="Play"/>
+            
+            <Controller type="Event" end="Stop" frame="$parent">
+                <Key type="Event" time="0" event="MVPSkipEvent"/>
+            </Controller>
+        </Animation>
+        
+        <!-- State of if player has voted or not -->
+        <StateGroup name="VotingState">
+            <DefaultState val="Enabled"/>
+            
+            <State name="Enabled">
+                <Action type="SetState" frame="SecondaryAwardStats/AwardWinnerContainer1/VoterButton" group="EnableState" state="Enabled"/>
+                <Action type="SetState" frame="SecondaryAwardStats/AwardWinnerContainer2/VoterButton" group="EnableState" state="Enabled"/>
+                <Action type="SetState" frame="SecondaryAwardStats/AwardWinnerContainer3/VoterButton" group="EnableState" state="Enabled"/>
+                <Action type="SetState" frame="SecondaryAwardStats/AwardWinnerContainer4/VoterButton" group="EnableState" state="Enabled"/>
+                <Action type="SetState" frame="AwardWinnerContainerMVP/VoterButton" group="EnableState" state="Enabled"/>
+            </State>
+            
+            <State name="Disabled">
+                <When type="AnimationState" VotingState="Disabled"/>
+                <Action type="SetState" frame="SecondaryAwardStats/AwardWinnerContainer1/VoterButton" group="EnableState" state="Disabled"/>
+                <Action type="SetState" frame="SecondaryAwardStats/AwardWinnerContainer2/VoterButton" group="EnableState" state="Disabled"/>
+                <Action type="SetState" frame="SecondaryAwardStats/AwardWinnerContainer3/VoterButton" group="EnableState" state="Disabled"/>
+                <Action type="SetState" frame="SecondaryAwardStats/AwardWinnerContainer4/VoterButton" group="EnableState" state="Disabled"/>
+                <Action type="SetState" frame="AwardWinnerContainerMVP/VoterButton" group="EnableState" state="Disabled"/>
+            </State>
+        </StateGroup>
+    </Frame>
+    
+</Desc>

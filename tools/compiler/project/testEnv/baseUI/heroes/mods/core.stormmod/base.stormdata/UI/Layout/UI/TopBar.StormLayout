@@ -1,0 +1,989 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<Desc>
+
+    <!-- Core health bar templates -->
+    <Frame type="UnitStatusFrame" name="CoreUnitStatusBaseTemplate">
+        <Width val="186"/>
+        <Height val="90"/>
+        <VisibilityControlledByUnitAlliances val="false"/>
+
+        <Frame type="UnitStatusElement" name="AllyStatusElement">
+            <Anchor relative="$parent"/>
+            <VisibleToAlly val="true"/>
+            <VisibleToEnemy val="false"/>
+        </Frame>
+
+        <Frame type="Image" name="HealthBarBacking">
+            <Width val="186"/>
+            <Height val="63"/>
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+        </Frame>
+
+        <Frame type="Image" name="HealthBarInvulnerable">
+            <RenderPriority val="601"/>
+            <Anchor side="Top" relative="$parent\HealthBarBacking" pos="Min" offset="-5"/>
+            <Anchor side="Bottom" relative="$parent\HealthBarBacking" pos="Max" offset="4"/>
+            <Anchor side="Left" relative="$parent\HealthBarBacking" pos="Min" offset="-5"/>
+            <Anchor side="Right" relative="$parent\HealthBarBacking" pos="Max" offset="6"/>
+            <Texture val="@UI/HUD_Bar_CoreHealth_Invulnerable_Health"/>
+            
+            <Frame type="Image" name="Glow">
+                <Anchor relative="$parent"/>
+                <BlendMode val="Add"/>
+                <ColorAdjustMode val="Colorize"/>
+                <Texture val="@UI/HUD_Bar_CoreHealth_Invulnerable_Glow"/>                
+            </Frame>
+        </Frame>
+
+        <StateGroup name="Alliance">
+            <DefaultState val="Ally"/>
+
+            <State name="Ally">
+                <When type="Property" frame="AllyStatusElement" visible="true"/>
+                <Action type="SetProperty" frame="HealthBarBacking" texture="@UI/HUD_TopBar_CoreHealth_BackingBlue"/>
+                <Action type="SetProperty" frame="HealthBarInvulnerable/Glow" AdjustmentColor="1040c0"/>
+            </State>
+
+            <State name="Enemy">
+                <When type="Property" frame="AllyStatusElement" visible="false"/>
+                <Action type="SetProperty" frame="HealthBarBacking" texture="@UI/HUD_TopBar_CoreHealth_BackingRed"/>
+                <Action type="SetProperty" frame="HealthBarInvulnerable/Glow" AdjustmentColor="701018"/>
+            </State>
+        </StateGroup>
+
+        <Frame type="UnitStatusShieldedHealthBar" name="HealthBar" template="UnitStatus/UnitStatusShieldedHealthBarTemplate">
+            <Width val="139"/>
+            <Height val="32"/>
+            <Anchor side="Top" relative="$parent" pos="Min" offset="15"/>
+            <RenderPriority val="600"/>
+            <BackgroundShown val="false"/>
+            <BarInsetRect top="0" left="0" bottom="0" right="0"/>
+            <BackgroundInsetRect top="0" left="0" bottom="0" right="0"/>
+            <AllyColor val="00b4ff" index="0"/>
+            <EnemyColor val="ff2c59" index="0"/>
+
+            <!-- Health Bar -->
+            <Tiled val="true" index="0"/>
+
+            <!-- Shield Bar -->
+            <ReductionShown val="false" index="1"/>
+            <AllyColor val="225ac2" index="1"/>
+            <EnemyColor val="225ac2" index="1"/>
+            <Tiled val="true" index="1"/>
+
+            <!-- Expected Life Grant Bar -->
+            <Tiled val="true" index="2"/>
+
+            <!-- Expected Life Lost Bar -->
+            <Tiled val="true" index="3"/>
+
+            <Frame type="Label" name="StatusBarLabel">
+                <Anchor side="Top" relative="$parent" pos="Mid" offset="3"/>
+                <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Bottom" relative="$parent" pos="Mid" offset="3"/>
+                <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+                <Height val="0"/>
+                <Width val="0"/>
+            </Frame>
+        </Frame>
+
+        <Frame type="UnitStatusHealthLabel" name="HealthLabel">
+            <Width val="100"/>
+            <Anchor relative="$parent/HealthBarBacking"/>
+            <ShowPercent val="true"/>
+            <RenderPriority val="601"/>
+            <Frame type="Label" name="StatusLabel">
+                <Anchor relative="$parent"/>
+            </Frame>
+        </Frame>
+
+        <Frame type="UnitStatusBuffDebuffElement" name="CoreInvulnerableLabelFrame">
+            <Anchor relative="$parent"/>
+            <Alpha val="0"/>
+            <VisibilityOnFade val="False"/>
+            <RenderPriority val="602"/>
+
+            <Validator val="CoreShowInvulnerableCombineValidator"/>
+
+
+            <!-- ResetVisibility is called whenever frame gets hidden so that fading animation is not
+                resumed when unit comes out of the fog of war.
+            -->
+
+            <Animation name="FadeAnimation">
+                <Event event="ResetVisibility" action="Stop"/>
+                <Event event="Hide" action="DirectionReverse,Play"/>
+                <Event event="Show" action="DirectionForward,Play"/>
+
+                <Controller type="Fade" end="Pause">
+                    <Key type="Curve" time="0.0" value="0" out="Fast"/>
+                    <Key type="Curve" time="0.15" value="255" in="Fast"/>
+                </Controller>
+            </Animation>
+
+            <Animation name="Invulnerable">
+                <Event event="CoreShowInvulnerableCombineValidator" action="Restart,Play"/>
+                <Event event="Hide" action="DirectionReverse,Play"/>
+
+                <Controller type="Text" end="Pause" frame="DebuffLabel">
+                    <Key type="Text" time="0" text="@UI/CoreInvulnerable"/>
+                </Controller>
+
+                <Controller type="Fade" end="Pause" frame="$parent/HealthLabel/StatusLabel">
+                    <Key type="Curve" time="0.0" value="255" out="Fast"/>
+                    <Key type="Curve" time="0.15" value="0" in="Fast"/>
+                </Controller>
+
+                <Controller type="Fade" end="Pause" frame="$parent/HealthBarInvulnerable">
+                    <Key type="Curve" time="0.0" value="0" out="Fast"/>
+                    <Key type="Curve" time="0.15" value="255" in="Fast"/>
+                </Controller>
+            </Animation>
+
+            <Frame type="Label" name="DebuffLabel">
+                <Anchor side="Top" relative="$parent" pos="Max" offset="-30"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+                <Style val="Storm_TopBar_CoreLabel"/>
+            </Frame>
+        </Frame>
+    </Frame>
+
+    <!-- Core Unit Status Template (Left version) -->
+    <Frame type="UnitStatusFrame" name="CoreUnitStatusLeftTemplate" template="TopBar/CoreUnitStatusBaseTemplate">
+        <Frame type="Image" name="HealthBarBacking">
+            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+        </Frame>
+
+        <Frame type="UnitStatusShieldedHealthBar" name="HealthBar">
+            <Anchor side="Left" relative="$parent" pos="Min" offset="22"/>
+            <Texture val="@UI/HUD_TopBar_CoreHealth_BarLeft"/>
+        </Frame>
+
+        <Frame type="UnitStatusHealthLabel" name="HealthLabel">
+            <Frame type="Label" name="StatusLabel">
+                <!-- the font style for this is set to the opposite color for team 2 in script -->
+                <Style val="Storm_TopBar_CoreHealthPercentLeftBlue"/>
+            </Frame>
+        </Frame>
+
+        <Frame type="UnitStatusBuffDebuffElement" name="CoreInvulnerableLabelFrame">
+            <Frame type="Label" name="DebuffLabel">
+                <Anchor side="left" relative="$parent" pos="Min" offset="28"/>
+            </Frame>
+        </Frame>
+    </Frame>
+
+    <!-- Core Unit Status Template (Right version) -->
+    <Frame type="UnitStatusFrame" name="CoreUnitStatusRightTemplate" template="TopBar/CoreUnitStatusBaseTemplate">
+        <Frame type="Image" name="HealthBarBacking">
+            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+            <TextureCoords top="0.0" left="1.0" bottom="1.0" right="0.0"/>
+        </Frame>
+
+        <Frame type="Image" name="HealthBarInvulnerable">
+            <TextureCoords top="0.0" left="1.0" bottom="1.0" right="0.0"/>
+            <Frame type="Image" name="Glow">
+                <TextureCoords top="0.0" left="1.0" bottom="1.0" right="0.0"/>
+            </Frame>
+        </Frame>
+
+        <Frame type="UnitStatusShieldedHealthBar" name="HealthBar">
+            <Anchor side="Right" relative="$parent" pos="Max" offset="-22"/>
+            <Texture val="@UI/HUD_TopBar_CoreHealth_BarRight"/>
+            <Expansion val="Left"/>
+        </Frame>
+
+        <Frame type="UnitStatusHealthLabel" name="HealthLabel">
+            <Frame type="Label" name="StatusLabel">
+                <!-- the font style for this is set to the opposite color for team 2 in script -->
+                <Style val="Storm_TopBar_CoreHealthPercentRightRed"/>
+            </Frame>
+        </Frame>
+
+        <Frame type="UnitStatusBuffDebuffElement" name="CoreInvulnerableLabelFrame">
+            <Frame type="Label" name="DebuffLabel">
+                <Anchor side="Right" relative="$parent" pos="Max" offset="-28"/>
+            </Frame>
+        </Frame>
+    </Frame>
+
+    <!-- XP Tooltip Template -->
+    <Frame type="AnchoredPopup" name="XPContributionPopup">
+        <MinWidth val="564"/>
+        <MaxWidth val="564"/>
+
+        <Frame type="Image" name="BorderImage">
+            <Anchor side="Top" relative="$parent/Container" pos="Min" offset="2"/>
+            <Anchor side="Left" relative="$parent/Container" pos="Min" offset="2"/>
+            <Anchor side="Right" relative="$parent/Container" pos="Max" offset="-2"/>
+            <Anchor side="Bottom" relative="$parent/Container" pos="Max" offset="-2"/>
+            <Unclipped val="True"/>
+            <Texture val="@UI/storm_ui_ingame_hud_xpcontribution_background"/>
+        </Frame>
+
+        <Frame type="Frame" name="Container">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+            <Height val="216"/>
+
+            <Frame type="Label" name="Title">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="10"/>
+                <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+                <Text val="@UI/XPContribution/Title"/>
+                <Style val="Storm_TopBar_XPContributionTitle"/>
+            </Frame>
+
+            <Frame type="Image" name="Team1Background">
+                <Anchor side="Left" relative="$parent" pos="Min" offset="8"/>
+                <Anchor side="Bottom" relative="$parent" pos="Max" offset="-10"/>
+                <ColorAdjustMode val="Colorize"/>
+                <AdjustmentColor val="6169ff"/>
+                <Texture val="@UI/storm_ui_ingame_hud_xpcontribution_teambackground"/>
+
+                <Frame type="Image" name="DividerImage">
+                    <Anchor side="Top" relative="$parent/TitleLabelsFrame" pos="77.5%" offset="0"/>
+                    <Anchor side="Left" relative="$parent" pos="Min" offset="15"/>
+                    <Anchor side="Right" relative="$parent" pos="Max" offset="-15"/>
+                    <Height val="2"/>
+                    <Alpha val="80"/>
+                    <TextureType val="Normal"/>
+                    <Texture val="@UI/StormTempWhite"/>
+                    <Color val="6169ff"/>
+                </Frame>
+
+                <Frame type="Frame" name="TitleLabelsFrame">
+                    <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                    <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                    <Anchor side="Right" relative="$parent" pos="Mid" offset="30"/>
+                    <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+
+                    <Frame type="Label" name="HeroContributionTitle">
+                        <Anchor side="Top" relative="$parent" pos="6.5%" offset="0"/>
+                        <Anchor side="Left" relative="$parent" pos="Min" offset="15"/>
+                        <Style val="Storm_TopBar_BlueXPContributionCategory"/>
+                        <Text val="@UI/XPContribution/Heroes"/>
+                    </Frame>
+
+                    <Frame type="Label" name="MercenaryContributionTitle">
+                        <Anchor side="Top" relative="$parent" pos="20%" offset="0"/>
+                        <Anchor side="Left" relative="$parent/HeroContributionTitle" pos="Min" offset="0"/>
+                        <Style val="{$parent/HeroContributionTitle/@Style}"/>
+                        <Text val="@UI/XPContribution/Mercenaries"/>
+                    </Frame>
+
+                    <Frame type="Label" name="MinionContributionTitle">
+                        <Anchor side="Top" relative="$parent" pos="33.5%" offset="0"/>
+                        <Anchor side="Left" relative="$parent/HeroContributionTitle" pos="Min" offset="0"/>
+                        <Style val="{$parent/HeroContributionTitle/@Style}"/>
+                        <Text val="@UI/XPContribution/Minions"/>
+                    </Frame>
+
+                    <Frame type="Label" name="PassiveContributionTitle">
+                        <Anchor side="Top" relative="$parent" pos="47%" offset="0"/>
+                        <Anchor side="Left" relative="$parent/HeroContributionTitle" pos="Min" offset="0"/>
+                        <Style val="{$parent/HeroContributionTitle/@Style}"/>
+                        <Text val="@UI/XPContribution/Passive"/>
+                    </Frame>
+
+                    <Frame type="Label" name="StructureContributionTitle">
+                        <Anchor side="Top" relative="$parent" pos="60.5%" offset="0"/>
+                        <Anchor side="Left" relative="$parent/HeroContributionTitle" pos="Min" offset="0"/>
+                        <Style val="{$parent/HeroContributionTitle/@Style}"/>
+                        <Text val="@UI/XPContribution/Structures"/>
+                    </Frame>
+
+                    <Frame type="Label" name="TotalContributionTitle">
+                        <Anchor side="Top" relative="$parent" pos="82%" offset="0"/>
+                        <Anchor side="Left" relative="$parent/HeroContributionTitle" pos="Min" offset="0"/>
+                        <Style val="{$parent/HeroContributionTitle/@Style}"/>
+                        <Text val="@UI/XPContribution/Total"/>
+                    </Frame>
+                </Frame>
+
+                <Frame type="Frame" name="AmountLabelsFrame">
+                    <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                    <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+                    <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+                    <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+
+                    <Frame type="Label" name="HeroContributionAmount">
+                        <Anchor side="Top" relative="$parent" pos="6.5%" offset="0"/>
+                        <Anchor side="Right" relative="$parent" pos="Max" offset="-15"/>
+                        <Style val="Storm_TopBar_BlueXPContributionAmount"/>
+                        <Text val="{$NormalModeContainer/Team1XPInfoFrame/PropertyBindLabels/HeroAmountLabel/@Text}"/>
+                    </Frame>
+
+                    <Frame type="Label" name="MercenaryContributionAmount">
+                        <Anchor side="Top" relative="$parent" pos="20%" offset="0"/>
+                        <Anchor side="Right" relative="$parent/HeroContributionAmount" pos="Max" offset="0"/>
+                        <Style val="{$parent/HeroContributionAmount/@Style}"/>
+                        <Text val="{$NormalModeContainer/Team1XPInfoFrame/PropertyBindLabels/MercenaryAmountLabel/@Text}"/>
+                    </Frame>
+
+                    <Frame type="Label" name="MinionContributionAmount">
+                        <Anchor side="Top" relative="$parent" pos="33.5%" offset="0"/>
+                        <Anchor side="Right" relative="$parent/HeroContributionAmount" pos="Max" offset="0"/>
+                        <Style val="{$parent/HeroContributionAmount/@Style}"/>
+                        <Text val="{$NormalModeContainer/Team1XPInfoFrame/PropertyBindLabels/MinionAmountLabel/@Text}"/>
+                    </Frame>
+
+                    <Frame type="Label" name="PassiveContributionAmount">
+                        <Anchor side="Top" relative="$parent" pos="47%" offset="0"/>
+                        <Anchor side="Right" relative="$parent/HeroContributionAmount" pos="Max" offset="0"/>
+                        <Style val="{$parent/HeroContributionAmount/@Style}"/>
+                        <Text val="{$NormalModeContainer/Team1XPInfoFrame/PropertyBindLabels/PassiveAmountLabel/@Text}"/>
+                    </Frame>
+
+                    <Frame type="Label" name="StructureContributionAmount">
+                        <Anchor side="Top" relative="$parent" pos="60.5%" offset="0"/>
+                        <Anchor side="Right" relative="$parent/HeroContributionAmount" pos="Max" offset="0"/>
+                        <Style val="{$parent/HeroContributionAmount/@Style}"/>
+                        <Text val="{$NormalModeContainer/Team1XPInfoFrame/PropertyBindLabels/StructureAmountLabel/@Text}"/>
+                    </Frame>
+
+                    <Frame type="Label" name="TotalContributionAmount">
+                        <Anchor side="Top" relative="$parent" pos="82%" offset="0"/>
+                        <Anchor side="Right" relative="$parent/HeroContributionAmount" pos="Max" offset="0"/>
+                        <Style val="{$parent/HeroContributionAmount/@Style}"/>
+                        <Text val="{$NormalModeContainer/Team1XPInfoFrame/PropertyBindLabels/TotalAmountLabel/@Text}"/>
+                    </Frame>
+                </Frame>
+
+                <Animation name="TeamColorSwap">
+                    <Event event="EnemyColorSwap" action="Restart, DirectionForward, Play" frame="$NormalModeContainer/Team1XPInfoFrame"/>
+                    <Event event="AllyColorSwap" action="Stop" frame="$NormalModeContainer/Team1XPInfoFrame"/>
+
+                    <Controller type="AdjustmentColor" end="Pause">
+                        <Key type="Curve" time="0" value="97,105,255"/>
+                        <Key type="Curve" time=".01" value="255,97,105"/>
+                    </Controller>
+                    <Controller type="Color" end="Pause" frame="DividerImage">
+                        <Key type="Curve" time="0" value="97,105,255"/>
+                        <Key type="Curve" time=".01" value="255,97,105"/>
+                    </Controller>
+                    <Controller type="Style" end="Pause" style1="Storm_TopBar_BlueXPContributionCategory" style2="Storm_TopBar_RedXPContributionCategory" frame="TitleLabelsFrame/HeroContributionTitle">
+                        <Key type="Curve" time="0" value="0"/>
+                        <Key type="Curve" time=".01" value="1"/>
+                    </Controller>
+                    <Controller type="Style" end="Pause" style1="Storm_TopBar_BlueXPContributionAmount" style2="Storm_TopBar_RedXPContributionAmount" frame="AmountLabelsFrame/HeroContributionAmount">
+                        <Key type="Curve" time="0" value="0"/>
+                        <Key type="Curve" time=".01" value="1"/>
+                    </Controller>
+                </Animation>
+            </Frame>
+
+            <Frame type="Image" name="Team2Background">
+                <Anchor side="Right" relative="$parent" pos="Max" offset="-8"/>
+                <Anchor side="Bottom" relative="$parent" pos="Max" offset="-10"/>
+                <ColorAdjustMode val="Colorize"/>
+                <AdjustmentColor val="6169ff"/>
+                <Texture val="@UI/storm_ui_ingame_hud_xpcontribution_teambackground"/>
+
+                <Frame type="Image" name="DividerImage">
+                    <Anchor side="Top" relative="$parent/TitleLabelsFrame" pos="77.5%" offset="0"/>
+                    <Anchor side="Left" relative="$parent" pos="Min" offset="15"/>
+                    <Anchor side="Right" relative="$parent" pos="Max" offset="-15"/>
+                    <Height val="2"/>
+                    <Alpha val="80"/>
+                    <Texture val="@UI/StormTempWhite"/>
+                    <Color val="6169ff"/>
+                </Frame>
+
+                <Frame type="Frame" name="TitleLabelsFrame">
+                    <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                    <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                    <Anchor side="Right" relative="$parent" pos="Mid" offset="30"/>
+                    <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+
+                    <Frame type="Label" name="HeroContributionTitle">
+                        <Anchor side="Top" relative="$parent" pos="6.5%" offset="0"/>
+                        <Anchor side="Left" relative="$parent" pos="Min" offset="15"/>
+                        <Style val="Storm_TopBar_BlueXPContributionCategory"/>
+                        <Text val="@UI/XPContribution/Heroes"/>
+                    </Frame>
+
+                    <Frame type="Label" name="MercenaryContributionTitle">
+                        <Anchor side="Top" relative="$parent" pos="20%" offset="0"/>
+                        <Anchor side="Left" relative="$parent/HeroContributionTitle" pos="Min" offset="0"/>
+                        <Style val="{$parent/HeroContributionTitle/@Style}"/>
+                        <Text val="@UI/XPContribution/Mercenaries"/>
+                    </Frame>
+
+                    <Frame type="Label" name="MinionContributionTitle">
+                        <Anchor side="Top" relative="$parent" pos="33.5%" offset="0"/>
+                        <Anchor side="Left" relative="$parent/HeroContributionTitle" pos="Min" offset="0"/>
+                        <Style val="{$parent/HeroContributionTitle/@Style}"/>
+                        <Text val="@UI/XPContribution/Minions"/>
+                    </Frame>
+
+                    <Frame type="Label" name="PassiveContributionTitle">
+                        <Anchor side="Top" relative="$parent" pos="47%" offset="0"/>
+                        <Anchor side="Left" relative="$parent/HeroContributionTitle" pos="Min" offset="0"/>
+                        <Style val="{$parent/HeroContributionTitle/@Style}"/>
+                        <Text val="@UI/XPContribution/Passive"/>
+                    </Frame>
+
+                    <Frame type="Label" name="StructureContributionTitle">
+                        <Anchor side="Top" relative="$parent" pos="60.5%" offset="0"/>
+                        <Anchor side="Left" relative="$parent/HeroContributionTitle" pos="Min" offset="0"/>
+                        <Style val="{$parent/HeroContributionTitle/@Style}"/>
+                        <Text val="@UI/XPContribution/Structures"/>
+                    </Frame>
+
+                    <Frame type="Label" name="TotalContributionTitle">
+                        <Anchor side="Top" relative="$parent" pos="82%" offset="0"/>
+                        <Anchor side="Left" relative="$parent/HeroContributionTitle" pos="Min" offset="0"/>
+                        <Style val="{$parent/HeroContributionTitle/@Style}"/>
+                        <Text val="@UI/XPContribution/Total"/>
+                    </Frame>
+                </Frame>
+
+                <Frame type="Frame" name="AmountLabelsFrame">
+                    <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                    <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+                    <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+                    <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+
+                    <Frame type="Label" name="HeroContributionAmount">
+                        <Anchor side="Top" relative="$parent" pos="6.5%" offset="0"/>
+                        <Anchor side="Right" relative="$parent" pos="Max" offset="-15"/>
+                        <Style val="Storm_TopBar_BlueXPContributionAmount"/>
+                        <Text val="{$NormalModeContainer/Team2XPInfoFrame/PropertyBindLabels/HeroAmountLabel/@Text}"/>
+                    </Frame>
+
+                    <Frame type="Label" name="MercenaryContributionAmount">
+                        <Anchor side="Top" relative="$parent" pos="20%" offset="0"/>
+                        <Anchor side="Right" relative="$parent/HeroContributionAmount" pos="Max" offset="0"/>
+                        <Style val="{$parent/HeroContributionAmount/@Style}"/>
+                        <Text val="{$NormalModeContainer/Team2XPInfoFrame/PropertyBindLabels/MercenaryAmountLabel/@Text}"/>
+                    </Frame>
+
+                    <Frame type="Label" name="MinionContributionAmount">
+                        <Anchor side="Top" relative="$parent" pos="33.5%" offset="0"/>
+                        <Anchor side="Right" relative="$parent/HeroContributionAmount" pos="Max" offset="0"/>
+                        <Style val="{$parent/HeroContributionAmount/@Style}"/>
+                        <Text val="{$NormalModeContainer/Team2XPInfoFrame/PropertyBindLabels/MinionAmountLabel/@Text}"/>
+                    </Frame>
+
+                    <Frame type="Label" name="PassiveContributionAmount">
+                        <Anchor side="Top" relative="$parent" pos="47%" offset="0"/>
+                        <Anchor side="Right" relative="$parent/HeroContributionAmount" pos="Max" offset="0"/>
+                        <Style val="{$parent/HeroContributionAmount/@Style}"/>
+                        <Text val="{$NormalModeContainer/Team2XPInfoFrame/PropertyBindLabels/PassiveAmountLabel/@Text}"/>
+                    </Frame>
+
+                    <Frame type="Label" name="StructureContributionAmount">
+                        <Anchor side="Top" relative="$parent" pos="60.5%" offset="0"/>
+                        <Anchor side="Right" relative="$parent/HeroContributionAmount" pos="Max" offset="0"/>
+                        <Style val="{$parent/HeroContributionAmount/@Style}"/>
+                        <Text val="{$NormalModeContainer/Team2XPInfoFrame/PropertyBindLabels/StructureAmountLabel/@Text}"/>
+                    </Frame>
+
+                    <Frame type="Label" name="TotalContributionAmount">
+                        <Anchor side="Top" relative="$parent" pos="82%" offset="0"/>
+                        <Anchor side="Right" relative="$parent/HeroContributionAmount" pos="Max" offset="0"/>
+                        <Style val="{$parent/HeroContributionAmount/@Style}"/>
+                        <Text val="{$NormalModeContainer/Team2XPInfoFrame/PropertyBindLabels/TotalAmountLabel/@Text}"/>
+                    </Frame>
+                </Frame>
+
+                <Animation name="TeamColorSwap"> 
+                    <Event event="EnemyColorSwap" action="Restart, DirectionForward, Play" frame="$NormalModeContainer/Team2XPInfoFrame"/>
+                    <Event event="AllyColorSwap" action="Stop" frame="$NormalModeContainer/Team2XPInfoFrame"/>
+
+                    <Controller type="AdjustmentColor" end="Pause">
+                        <Key type="Curve" time="0" value="97,105,255"/>
+                        <Key type="Curve" time=".01" value="255,97,105"/>
+                    </Controller>
+                    <Controller type="Color" end="Pause" frame="DividerImage">
+                        <Key type="Curve" time="0" value="97,105,255"/>
+                        <Key type="Curve" time=".01" value="255,97,105"/>
+                    </Controller>
+                    <Controller type="Style" end="Pause" style1="Storm_TopBar_BlueXPContributionCategory" style2="Storm_TopBar_RedXPContributionCategory" frame="TitleLabelsFrame/HeroContributionTitle">
+                        <Key type="Curve" time="0" value="0"/>
+                        <Key type="Curve" time=".01" value="1"/>
+                    </Controller>
+                    <Controller type="Style" end="Pause" style1="Storm_TopBar_BlueXPContributionAmount" style2="Storm_TopBar_RedXPContributionAmount" frame="AmountLabelsFrame/HeroContributionAmount">
+                        <Key type="Curve" time="0" value="0"/>
+                        <Key type="Curve" time=".01" value="1"/>
+                    </Controller>
+                </Animation> 
+            </Frame>
+        </Frame>
+
+        <Animation name="ShowPopup">
+            <Event event="OnMouseEnter" action="Play" frame="$NormalModeContainer/XPContributionHitTestFrame"/>
+            <Event event="OnMouseExit" action="Stop" frame="$NormalModeContainer/XPContributionHitTestFrame"/>
+
+            <Controller type="Property" property="Show" end="Pause">
+                <Key type="Property" time=".4" value="True"/>
+            </Controller>
+        </Animation>
+
+        <Animation name="FadeUp">
+            <Event event="OnShown" action="Reset, Play"/>
+
+            <Controller type="Fade" end="Pause">
+                <Key type="Curve" time="0" value="0"/>
+                <Key type="Curve" time=".2" value="255"/>
+            </Controller>
+        </Animation>
+    </Frame>
+
+    <!--===============================================================================
+        The frame containing Normal Mode UI bits: XP bar, Team levels, core health etc. 
+        Hidden in Arena Mode. 
+    ================================================================================-->
+    <Frame type="Frame" name="NormalModeContainerTemplate">
+        <Handle val="NormalModeContainer"/>
+        
+        <Frame type="Label" name="TeamLevelVSLabel">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="40"/>
+            <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+            <Style val="Storm_TopBar_TeamLevelVS"/>
+            <Text val="@UI/VS"/>
+        </Frame>
+
+        <Frame type="Frame" name="XPContributionHitTestFrame">
+            <Anchor side="Top" relative="$parent/Team1LevelLabel" pos="Min" offset="13"/>
+            <Anchor side="Left" relative="$parent/Team1LevelLabel" pos="Min" offset="10"/>
+            <Anchor side="Right" relative="$parent/Team2LevelLabel" pos="Max" offset="10"/>
+            <Anchor side="Bottom" relative="$parent/Team1LevelLabel" pos="Max" offset="3"/>
+            <RenderPriority val="530"/>
+            <AcceptsMouse val="True"/>
+        </Frame>
+
+        <Frame type="Frame" name="XPContributionAnchoredPopupAnchorFrame">
+            <Anchor side="Top" relative="$parent/TeamLevelVSLabel" pos="Mid" offset="25"/>
+            <Anchor side="Left" relative="$parent/TeamLevelVSLabel" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent/TeamLevelVSLabel" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent/TeamLevelVSLabel" pos="Mid" offset="25"/>
+            <TooltipAnchorPosition val="BottomCenter"/>
+
+            <Frame type="AnchoredPopup" name="XPContributionAnchoredPopup" template="TopBar/XPContributionPopup"/>
+        </Frame>
+        
+        <!-- Team 1 UI -->
+        <Frame type="Label" name="Team1LevelLabel">
+            <Anchor side="Top" relative="$parent/$parent/TopBarBacking" pos="Min" offset="5"/>
+            <Anchor side="Right" relative="$parent/$parent/TopBarBacking" pos="Mid" offset="-25"/>
+            <Width val="90"/>
+            <Style val="Storm_TopBar_TeamLevelLeft"/>
+            <Text val="88"/>
+
+            <Animation name="LevelUpBlue">
+                <Event event="Team1LevelUpBlue" action="Reset" frame="$parent/$parent"/>
+                <Event event="Team1LevelUpBlue" action="Play" frame="$parent/$parent"/>
+                <Controller type="Style" end="Stop" style1="Storm_TopBar_TeamLevelLeft" style2="Storm_TopBar_TeamLevelLeftLevelUpBlue" >
+                    <Key type="Curve" time="0.00" value="0.0" out="Slow"/>
+                    <Key type="Curve" time="0.25" value="1.0" in="Slow" out="Slow"/>
+                    <Key type="Curve" time="2.75" value="1.0" in="Slow" out="Slow"/>
+                    <Key type="Curve" time="3.00" value="0.0" in="Slow"/>
+                </Controller>
+            </Animation>
+
+            <Animation name="LevelUpRed">
+                <Event event="Team1LevelUpRed" action="Reset" frame="$parent/$parent"/>
+                <Event event="Team1LevelUpRed" action="Play" frame="$parent/$parent"/>
+                <Controller type="Style" end="Stop" style1="Storm_TopBar_TeamLevelLeft" style2="Storm_TopBar_TeamLevelLeftLevelUpRed" >
+                    <Key type="Curve" time="0.00" value="0.0" out="Slow"/>
+                    <Key type="Curve" time="0.25" value="1.0" in="Slow" out="Slow"/>
+                    <Key type="Curve" time="2.75" value="1.0" in="Slow" out="Slow"/>
+                    <Key type="Curve" time="3.00" value="0.0" in="Slow"/>
+                </Controller>
+            </Animation>
+        </Frame>
+        
+        <Frame type="Frame" name="Team1XPInfoFrame">
+            <Anchor side="Top" relative="$parent/Team1LevelLabel" pos="Mid" offset="40"/>
+            <Anchor side="Left" relative="$parent/Team1LevelLabel" pos="Mid" offset="65"/>
+            <Anchor side="Right" relative="$parent/Team1LevelLabel" pos="Mid" offset="65"/>
+            <Anchor side="Bottom" relative="$parent/Team1LevelLabel" pos="Mid" offset="40"/>
+            <Height val="20"/>
+            <Width val="20"/>
+
+            <Frame type="Frame" name="PropertyBindLabels">
+                <Anchor relative="$parent"/>
+
+                <Frame type="Label" name="HeroAmountLabel">
+                    <Anchor relative="$parent"/>
+                    <Visible val="False"/>
+                </Frame>
+
+                <Frame type="Label" name="MercenaryAmountLabel">
+                    <Anchor relative="$parent"/>
+                    <Visible val="False"/>
+                </Frame>
+
+                <Frame type="Label" name="MinionAmountLabel">
+                    <Anchor relative="$parent"/>
+                    <Visible val="False"/>
+                </Frame>
+
+                <Frame type="Label" name="PassiveAmountLabel">
+                    <Anchor relative="$parent"/>
+                    <Visible val="False"/>
+                </Frame>
+
+                <Frame type="Label" name="StructureAmountLabel">
+                    <Anchor relative="$parent"/>
+                    <Visible val="False"/>
+                </Frame>
+
+                <Frame type="Label" name="TotalAmountLabel">
+                    <Anchor relative="$parent"/>
+                    <Visible val="False"/>
+                </Frame>
+            </Frame>
+        </Frame>
+
+        <Frame type="TeamVeterancyUnitStatusFrame" name="Team1XPUnitStatusFrame">
+            <Width val="117"/>
+            <Height val="19"/>
+            <Anchor side="Top" relative="$parent/$parent/Team1XPBackgroundBlue" pos="Min" offset="16"/>
+            <Anchor side="Left" relative="$parent/$parent/Team1XPBackgroundBlue" pos="Min" offset="6"/>
+            <TeamId val="0"/>
+            <Behavior val="HeroDummyVeterancy"/>
+            <Frame type="UnitStatusVeterancyBar" name="XPBar" template="UnitStatus/UnitStatusVeterancyBarTemplate">
+                <Anchor relative="$parent"/>
+                <OwnerColor val="00b4ff" index="0"/>
+                <AllyColor val="00b4ff" index="0"/>
+                <EnemyColor val="ff2c59" index="0"/>
+                <Texture val="@UI/HUD_TopBar_TeamXP_BarLeft"/>
+                <BackgroundShown val="false"/>
+            </Frame>
+        </Frame>
+        
+        <Frame type="Label" name="Team1LevelUpLabel">
+            <Anchor side="Top" relative="$parent/Team1XPUnitStatusFrame" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent/Team1XPUnitStatusFrame" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent/Team1XPUnitStatusFrame" pos="Mid" offset="0"/>
+            <!-- the font style for this is set to the opposite color for team 2 in script -->
+            <Style val="Storm_TopBar_TeamLevelUpLeftBlue"/>
+            <Text val="@UI/LevelUp"/>
+
+            <Animation name="LevelUp">
+                <Event event="Team1LevelUpBlue" action="Reset" frame="$parent/$parent"/>
+                <Event event="Team1LevelUpBlue" action="Play" frame="$parent/$parent"/>
+                <Event event="Team1LevelUpRed" action="Reset" frame="$parent/$parent"/>
+                <Event event="Team1LevelUpRed" action="Play" frame="$parent/$parent"/>
+                <Controller type="Visibility" end="Pause">
+                    <Key type="Bool" time="0" value="true"/>
+                    <Key type="Bool" time="3" value="false"/>
+                </Controller>
+                <Controller type="Fade" end="Pause">
+                    <Key type="Curve" time="0" value="0" out="Auto"/>
+                    <Key type="Curve" time="0.5" value="255" in="Auto"/>
+                    <Key type="Curve" time="2.5" value="255" out="Auto"/>
+                    <Key type="Curve" time="3" value="0" in="Auto"/>
+                </Controller>
+            </Animation>
+        </Frame>
+
+        <!-- Team 2 UI -->
+        <Frame type="Label" name="Team2LevelLabel">
+            <Anchor side="Top" relative="$parent/Team1LevelLabel" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent/$parent/TopBarBacking" pos="Mid" offset="30"/>
+            <Width val="90"/>
+            <Style val="Storm_TopBar_TeamLevelRight"/>
+            <Text val="88"/>
+
+            <Animation name="LevelUpBlue">
+                <Event event="Team2LevelUpBlue" action="Reset" frame="$parent/$parent"/>
+                <Event event="Team2LevelUpBlue" action="Play" frame="$parent/$parent"/>
+                <Controller type="Style" end="Stop" style1="Storm_TopBar_TeamLevelRight" style2="Storm_TopBar_TeamLevelRightLevelUpBlue" >
+                    <Key type="Curve" time="0.00" value="0.0" out="Slow"/>
+                    <Key type="Curve" time="0.25" value="1.0" in="Slow" out="Slow"/>
+                    <Key type="Curve" time="2.75" value="1.0" in="Slow" out="Slow"/>
+                    <Key type="Curve" time="3.00" value="0.0" in="Slow"/>
+                </Controller>
+            </Animation>
+
+            <Animation name="LevelUpRed">
+                <Event event="Team2LevelUpRed" action="Reset" frame="$parent/$parent"/>
+                <Event event="Team2LevelUpRed" action="Play" frame="$parent/$parent"/>
+                <Controller type="Style" end="Stop" style1="Storm_TopBar_TeamLevelRight" style2="Storm_TopBar_TeamLevelRightLevelUpRed" >
+                    <Key type="Curve" time="0.00" value="0.0" out="Slow"/>
+                    <Key type="Curve" time="0.25" value="1.0" in="Slow" out="Slow"/>
+                    <Key type="Curve" time="2.75" value="1.0" in="Slow" out="Slow"/>
+                    <Key type="Curve" time="3.00" value="0.0" in="Slow"/>
+                </Controller>
+            </Animation>
+        </Frame>
+        
+        <Frame type="Frame" name="Team2XPInfoFrame">
+            <Anchor side="Top" relative="$parent/Team2LevelLabel" pos="Mid" offset="40"/>
+            <Anchor side="Left" relative="$parent/Team2LevelLabel" pos="Mid" offset="-70"/>
+            <Anchor side="Right" relative="$parent/Team2LevelLabel" pos="Mid" offset="-70"/>
+            <Anchor side="Bottom" relative="$parent/Team2LevelLabel" pos="Mid" offset="40"/>
+            <Height val="20"/>
+            <Width val="20"/>
+
+            <Frame type="Frame" name="PropertyBindLabels">
+                <Anchor relative="$parent"/>
+
+                <Frame type="Label" name="HeroAmountLabel">
+                    <Anchor relative="$parent"/>
+                    <Visible val="False"/>
+                </Frame>
+
+                <Frame type="Label" name="MercenaryAmountLabel">
+                    <Anchor relative="$parent"/>
+                    <Visible val="False"/>
+                </Frame>
+
+                <Frame type="Label" name="MinionAmountLabel">
+                    <Anchor relative="$parent"/>
+                    <Visible val="False"/>
+                </Frame>
+
+                <Frame type="Label" name="PassiveAmountLabel">
+                    <Anchor relative="$parent"/>
+                    <Visible val="False"/>
+                </Frame>
+
+                <Frame type="Label" name="StructureAmountLabel">
+                    <Anchor relative="$parent"/>
+                    <Visible val="False"/>
+                </Frame>
+
+                <Frame type="Label" name="TotalAmountLabel">
+                    <Anchor relative="$parent"/>
+                    <Visible val="False"/>
+                </Frame>
+            </Frame>
+        </Frame>
+
+        <Frame type="TeamVeterancyUnitStatusFrame" name="Team2XPUnitStatusFrame">
+            <Width val="117"/>
+            <Height val="19"/>
+            <Anchor side="Top" relative="$parent/$parent/Team2XPBackgroundBlue" pos="Min" offset="16"/>
+            <Anchor side="Right" relative="$parent/$parent/Team2XPBackgroundBlue" pos="Max" offset="-7"/>
+            <TeamId val="1"/>
+            <Behavior val="HeroDummyVeterancy"/>
+            <Frame type="UnitStatusVeterancyBar" name="XPBar" template="UnitStatus/UnitStatusVeterancyBarTemplate">
+                <Anchor relative="$parent"/>
+                <OwnerColor val="00b4ff" index="0"/>
+                <AllyColor val="00b4ff" index="0"/>
+                <EnemyColor val="ff2c59" index="0"/>
+                <Texture val="@UI/HUD_TopBar_TeamXP_BarRight"/>
+                <BackgroundShown val="false"/>
+                <Expansion val="Left"/>
+            </Frame>
+        </Frame>
+        
+        <Frame type="Label" name="Team2LevelUpLabel">
+            <Anchor side="Top" relative="$parent/Team2XPUnitStatusFrame" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent/Team2XPUnitStatusFrame" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent/Team2XPUnitStatusFrame" pos="Mid" offset="0"/>
+            <!-- the font style for this is set to the opposite color for team 2 in script -->
+            <Style val="Storm_TopBar_TeamLevelUpRightRed"/>
+            <Text val="@UI/LevelUp"/>
+
+            <Animation name="LevelUp">
+                <Event event="Team2LevelUpBlue" action="Reset" frame="$parent/$parent"/>
+                <Event event="Team2LevelUpBlue" action="Play" frame="$parent/$parent"/>
+                <Event event="Team2LevelUpRed" action="Reset" frame="$parent/$parent"/>
+                <Event event="Team2LevelUpRed" action="Play" frame="$parent/$parent"/>
+                <Controller type="Visibility" end="Pause">
+                    <Key type="Bool" time="0" value="true"/>
+                    <Key type="Bool" time="3" value="false"/>
+                </Controller>
+                <Controller type="Fade" end="Pause">
+                    <Key type="Curve" time="0" value="0" out="Auto"/>
+                    <Key type="Curve" time="0.5" value="255" in="Auto"/>
+                    <Key type="Curve" time="2.5" value="255" out="Auto"/>
+                    <Key type="Curve" time="3" value="0" in="Auto"/>
+                </Controller>
+            </Animation>
+        </Frame>
+
+        <!-- Core Health -->
+        <Frame type="UnitStatusFrame" name="Team1CoreUnitStatus" template="TopBar/CoreUnitStatusLeftTemplate">
+            <Anchor side="Top" relative="$parent/Team1LevelLabel" pos="Max" offset="-15"/>
+            <Anchor side="Right" relative="$parent/$parent/TopBarBacking" pos="Mid" offset="-92"/>
+        </Frame>
+        
+        <Frame type="UnitStatusFrame" name="Team2CoreUnitStatus" template="TopBar/CoreUnitStatusRightTemplate">
+            <Anchor side="Top" relative="$parent/Team2LevelLabel" pos="Max" offset="-15"/>
+            <Anchor side="Left" relative="$parent/$parent/TopBarBacking" pos="Mid" offset="92"/>
+        </Frame>
+        
+        <Frame type="Label" name="CoreHealthLabel">
+            <Anchor side="Top" relative="$parent/$parent/TopBarBacking" pos="Max" offset="-5"/>
+            <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+            <Width val="230"/>
+            <Text val="@UI/CoreHealth"/>
+            <Style val="Storm_TopBar_CoreLabel"/>
+        </Frame>
+    
+        <!-- Tutorial frames -->
+        <Frame type="Frame" name="TutorialArrowLevel1" template="StartingExperience/HUDAlertArrow_Single">
+            <Anchor side="Left" relative="$parent/Team1LevelLabel" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent/Team1LevelLabel" pos="Mid" offset="0"/>
+            <Anchor side="Top" relative="$parent/Team1LevelLabel" pos="Max" offset="2"/>
+            <Visible val="false"/>
+            <Frame type="Image" name="ArrowImage">
+                <Rotation val="180"/>
+            </Frame>
+        </Frame>
+        
+        <Frame type="Frame" name="TutorialArrowEXP1" template="StartingExperience/HUDAlertArrow_Single">
+            <Anchor side="Left" relative="$parent/Team1XPUnitStatusFrame" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent/Team1XPUnitStatusFrame" pos="Mid" offset="0"/>
+            <Anchor side="Top" relative="$parent/Team1XPUnitStatusFrame" pos="Max" offset="2"/>
+            <Visible val="false"/>
+            <Frame type="Image" name="ArrowImage">
+                <Rotation val="180"/>
+            </Frame>
+        </Frame>
+        
+        <Frame type="Frame" name="TutorialArrowLevel2" template="StartingExperience/HUDAlertArrow_Single">
+            <Anchor side="Left" relative="$parent/Team2LevelLabel" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent/Team2LevelLabel" pos="Mid" offset="0"/>
+            <Anchor side="Top" relative="$parent/Team2LevelLabel" pos="Max" offset="2"/>
+            <Visible val="false"/>
+            <Frame type="Image" name="ArrowImage">
+                <Rotation val="180"/>
+            </Frame>
+        </Frame>
+        
+        <!-- Animations -->
+        <Animation name="TutorialLevelFlash">
+            <Event event="LevelFlashStart" action="Reset, Play"/>
+            <Event event="LevelFlashStop" action="Stop"/>
+
+            <Controller type="Visibility" end="Pause" frame="TutorialArrowLevel1">
+                <Key type="Bool" time="0" value="True"/>
+            </Controller>
+            <Controller type="Visibility" end="Pause" frame="TutorialArrowLevel2">
+                <Key type="Bool" time="0" value="True"/>
+            </Controller>
+            <Controller type="Style" end="Loop" style1="Storm_TopBar_TeamLevelLeft" style2="Storm_TopBar_TeamLevelLeftLevelUpBlue" frame="Team1LevelLabel">
+                <Key type="Curve" time="0" value="1" out="Slow"/>
+                <Key type="Curve" time=".1" value="1" out="Slow"/>
+                <Key type="Curve" time=".5" value="0" in="Slow" out="Slow"/>
+                <Key type="Curve" time=".7" value="1" in="Slow"/>
+                <Key type="Curve" time=".8" value="1" in="Slow"/>
+            </Controller>
+            <Controller type="Style" end="Loop" style1="Storm_TopBar_TeamLevelRight" style2="Storm_TopBar_TeamLevelRightLevelUpRed" frame="Team2LevelLabel">
+                <Key type="Curve" time="0" value="1" out="Slow"/>
+                <Key type="Curve" time=".1" value="1" out="Slow"/>
+                <Key type="Curve" time=".5" value="0" in="Slow" out="Slow"/>
+                <Key type="Curve" time=".7" value="1" in="Slow"/>
+                <Key type="Curve" time=".8" value="1" in="Slow"/>
+            </Controller>
+        </Animation>
+        
+        <Animation name="TutorialLevelFlashBlue">
+            <Event event="LevelFlashStartBlue" action="Reset, Play"/>
+            <Event event="LevelFlashStopBlue" action="Stop"/>
+
+            <Controller type="Visibility" end="Pause" frame="TutorialArrowLevel1">
+                <Key type="Bool" time="0" value="True"/>
+            </Controller>
+            <Controller type="Style" end="Loop" style1="Storm_TopBar_TeamLevelLeft" style2="Storm_TopBar_TeamLevelLeftLevelUpBlue" frame="Team1LevelLabel">
+                <Key type="Curve" time="0" value="1" out="Slow"/>
+                <Key type="Curve" time=".1" value="1" out="Slow"/>
+                <Key type="Curve" time=".5" value="0" in="Slow" out="Slow"/>
+                <Key type="Curve" time=".7" value="1" in="Slow"/>
+                <Key type="Curve" time=".8" value="1" in="Slow"/>
+            </Controller>
+        </Animation>
+
+        <Animation name="TutorialEXPFlash">
+            <Event event="EXPFlashStart" action="Reset, Play"/>
+            <Event event="EXPFlashStop" action="Stop"/>
+
+            <Controller type="Visibility" end="Pause" frame="TutorialArrowEXP1">
+                <Key type="Bool" time="0" value="True"/>
+            </Controller>
+        </Animation>
+    </Frame>
+    
+    <!-- Main Top Bar Panel Template -->
+    <Frame type="Frame" name="TopBarPanelTemplate">
+        <Height val="150"/>
+
+        <!-- Background -->
+        <Frame type="Image" name="TopBarBacking">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+            <Texture val="@UI/HUD_TopBar_Backing"/>
+        </Frame>
+        
+        <Frame type="BlurFrame" name="TopBarBackingBlur">
+            <Anchor side="Top" relative="$parent/TopBarBacking" pos="Min" offset="0"/>
+            <Anchor side="Bottom" relative="$parent/TopBarBacking" pos="Max" offset="-11"/>
+            <Anchor side="Left" relative="$parent/TopBarBacking" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent/TopBarBacking" pos="Max" offset="0"/>
+            <AlphaMaskTexture val="@UI/HUD_TopBar_Backing"/>
+            <BlurAmount val=".5"/>
+            <Visible val="#IngameBlur"/>
+            <RenderType val="HDR"/>
+        </Frame>
+
+        <Frame type="Label" name="GameTimerLabel">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+            <Style val="Storm_TopBar_GameTimer"/>
+            <Text val="88:88"/>
+            <Width val="120"/>
+            <Height val="34"/>
+        </Frame>
+
+        <!-- Tinted highlights -->
+        <Frame type="Image" name="Team1XPBackgroundBlue">
+            <Width val="268"/>
+            <Height val="91"/>
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent/TopBarBacking" pos="Min" offset="55"/>
+            <Texture val="@UI/HUD_TopBar_TeamXP_BackingBlue"/>
+            <TooltipAnchorPosition val="BottomCenter"/>
+            <Visible val="false"/>
+        </Frame>
+        
+        <Frame type="Image" name="Team1XPBackgroundRed">
+            <Width val="268"/>
+            <Height val="91"/>
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent/TopBarBacking" pos="Min" offset="55"/>
+            <Texture val="@UI/HUD_TopBar_TeamXP_BackingRed"/>
+            <TextureCoords top="0.0" left="1.0" bottom="1.0" right="0.0"/>
+            <TooltipAnchorPosition val="BottomCenter"/>
+            <Visible val="false"/>
+        </Frame>
+        
+        <Frame type="Image" name="Team2XPBackgroundBlue">
+            <Width val="268"/>
+            <Height val="91"/>
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent/TopBarBacking" pos="Max" offset="-55"/>
+            <Texture val="@UI/HUD_TopBar_TeamXP_BackingBlue"/>
+            <TextureCoords top="0.0" left="1.0" bottom="1.0" right="0.0"/>
+            <TooltipAnchorPosition val="BottomCenter"/>
+            <Visible val="false"/>
+        </Frame>
+        
+        <Frame type="Image" name="Team2XPBackgroundRed">
+            <Width val="268"/>
+            <Height val="91"/>
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent/TopBarBacking" pos="Max" offset="-55"/>
+            <Texture val="@UI/HUD_TopBar_TeamXP_BackingRed"/>
+            <TooltipAnchorPosition val="BottomCenter"/>
+            <Visible val="false"/>
+        </Frame>
+
+        <Frame type="Frame" name="NormalModeContainer" template="TopBar/NormalModeContainerTemplate">
+            <Anchor relative="$parent"/>
+        </Frame>
+    </Frame>
+</Desc>

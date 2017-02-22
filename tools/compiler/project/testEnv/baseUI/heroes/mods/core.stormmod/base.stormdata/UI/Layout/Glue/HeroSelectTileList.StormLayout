@@ -1,0 +1,963 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<Desc>
+    <Constant name="HeroSelectItemVerticalSpace" val="-124"/>
+    <Constant name="HeroSelectItemHorizontalSpace" val="-114"/>
+    <Constant name="HeroSelectItemHorizontalNegativeSpace" val="118"/> <!-- Only on Draft Select -->
+    <Constant name="HeroSelectItemHorizontalSpaceHalf" val="-57"/>
+    <Constant name="HeroSelectItemHorizontalNegativeSpaceHalf" val="59"/> <!-- Only on Draft Select -->
+    <Constant name="HeroSelectItemHorizontalNegativeOffset" val="-57"/>
+    <Constant name="HeroSelectItemHorizontalPositiveOffset" val="57"/>
+
+    <Animation name="SelectedBackgroundImageBaseOnShownTemplate">
+        <Event event="OnShown" action="Play"/>
+        <Controller type="Fade" end="PingPong">
+            <Key type="Curve" time="0" value="150" out="Fast"/>
+            <Key type="Curve" time=".4" value="255" in="Slow"/>
+        </Controller>
+        <Controller type="Rotation" relative="False" end="Loop" >
+            <Key type="Curve" time="0" value="0" out="linear"/>
+            <Key type="Curve" time="6" value="360" in="linear"/>
+        </Controller>
+        <Controller type="Dimension" dimension="Width" relative="False" percentage="True" end="PingPong" >
+            <Key type="Curve" time="0" value="100" out="Fast"/>
+            <Key type="Curve" time=".4" value="80" in="Slow" />
+        </Controller>
+        <Controller type="Dimension" dimension="Height" relative="False" percentage="True" end="PingPong" >
+            <Key type="Curve" time="0" value="100" out="Fast"/>
+            <Key type="Curve" time=".4" value="80" in="Slow" />
+        </Controller>
+    </Animation>
+
+    <Animation name="SelectedBackgroundImageSecondaryOnShownTemplate">
+        <Event event="OnShown" action="Play"/>
+        <Controller type="Fade" end="PingPong">
+            <Key type="Curve" time="0" value="150" out="Fast"/>
+            <Key type="Curve" time=".4" value="255" in="Slow"/>
+        </Controller>
+        <Controller type="Rotation" relative="False" end="Loop" >
+            <Key type="Curve" time="0" value="0" out="linear"/>
+            <Key type="Curve" time="4" value="-360" in="linear"/>
+        </Controller>
+        <Controller type="Dimension" dimension="Width" relative="False" percentage="True" end="PingPong" >
+            <Key type="Curve" time="0" value="80" out="Fast"/>
+            <Key type="Curve" time=".5" value="70" in="Slow" />
+        </Controller>
+        <Controller type="Dimension" dimension="Height" relative="False" percentage="True" end="PingPong" >
+            <Key type="Curve" time="0" value="80" out="Fast"/>
+            <Key type="Curve" time=".5" value="70" in="Slow" />
+        </Controller>
+    </Animation>
+
+    <Frame type="Image" name="SelectedBackgroundImageBaseTemplate">
+        <Texture val="@UI/Storm_UI_Play_HeroPortrait_Selected"/>
+        <Width val="220"/>
+        <Height val="220"/>
+        <BlendMode val="Add"/>
+        <Visible val="False"/>
+        <SubpixelRendering val="True"/>
+    </Frame>
+
+    <Frame type="Image" name="SelectedBackgroundImageTemplate" template="HeroSelectTileList/SelectedBackgroundImageBaseTemplate">       
+        <Animation name="ChangeVisibility">
+            <Event event="OnShown" action="DirectionForward,Play" frame="$parent/SelectedImage"/>
+            <Event event="OnHidden" action="DirectionReverse,Play" frame="$parent/SelectedImage"/>
+            
+            <Controller type="Visibility" end="Pause">
+                <Key type="Bool" time="0.0" value="False"/>
+                <Key type="Bool" time="0.01" value="True"/>
+            </Controller>
+        </Animation>
+    </Frame>
+
+    <Frame type="Image" name="SelectedBackgroundImageHintTemplate" template="HeroSelectTileList/SelectedBackgroundImageBaseTemplate">
+        <Texture val="@UI/Storm_UI_Play_HeroPortrait_Selected_Normal"/>
+        <ColorAdjustMode val="Colorize"/>
+        <AdjustmentColor val="00FF00"/>
+    </Frame>
+
+    <!--===========================================================================================
+    <! AnimationStates
+    <!==========================================================================================-->
+
+    <!--+ HeroBadge
+        - NoBadge
+        - FreeToPlay
+        - FullyAwarded
+        - Favorite
+    -->
+
+    <!-- Events 
+    SetStateNotAllowed
+    SetStateAllowed
+    SetStateAllowedMax
+    
+    TeamLocked
+    EnemyLocked
+    NotTeamLocked
+    
+    Empty
+    NotEmpty
+    
+    HideLevel
+    ShowLevel
+    -->
+    <!-- TileList Defaults
+    Hover
+    Selected 
+    Preselected
+    Death
+    Stop
+    -->
+    
+    <Frame type="HeroSelectTileListItem" name="HeroSelectTileListItemBaseTemplate">
+        <Height val="220"/>
+        <Width val="220"/>
+        <SelectedSound val="@UI_BNet_HeroChoose"/>
+        <HideWhenCleared val="false"/>
+        <HoveredRenderPriority val="1023"/>
+        <SelectedRenderPriority val="1023"/>
+
+<!--  Region: Animations  -->
+        <Animation name="SetStateDraftBanned">
+            <Event event="Banned" action="Reset,Play"/>
+
+            <Controller type="Texture" end="Pause" frame="$this/DraftOverlayContainer/DraftTeamLockedImage">
+                <Key type="Image" time="0.0" image="@UI/Storm_HeroSelect_Draft_Frame_Banned"/>
+            </Controller>
+            <Controller type="Texture" end="Pause" frame="$this/DraftOverlayContainer/OverlayImage">
+                <Key type="Image" time="0.0" image="@UI/Storm_UI_Play_HeroPortrait_Overlay_Ban"/>
+            </Controller>
+            <Controller type="Visibility" end="Pause" frame="$this/DraftOverlayContainer">
+                <Key type="Bool" time="0.0" value="true"/>
+            </Controller>
+            <Controller type="Visibility" end="Pause" frame="$this/DraftOverlayContainer/BanLockIcon">
+                <Key type="Bool" time="0.0" value="True"/>
+            </Controller>
+            <Controller type="Visibility" end="Pause" frame="$this/DraftTeamHintImage">
+                <Key type="Bool" time="0.0" value="false"/>
+            </Controller>
+            <Controller type="Visibility" end="Pause" frame="$this/HeroContainerFrame/HeroLevelLabel">
+                <Key type="Bool" time="0.0" value="false"/>
+            </Controller>            
+        </Animation>
+
+        <Animation name="SetStateDraftTeamBlueLocked">
+            <Event event="TeamLocked" action="Reset,Play"/>
+
+            <Controller type="Texture" end="Pause" frame="$this/DraftOverlayContainer/DraftTeamLockedImage">
+                <Key type="Image" time="0.0" image="@UI/Storm_HeroSelect_Draft_Frame_BlueTeam"/>
+            </Controller>
+            <Controller type="Texture" end="Pause" frame="$this/DraftOverlayContainer/OverlayImage">
+                <Key type="Image" time="0.0" image="@UI/Storm_UI_Play_HeroPortrait_Overlay_Blue"/>
+            </Controller>
+            <Controller type="Visibility" end="Pause" frame="$this/DraftOverlayContainer/BanLockIcon">
+                <Key type="Bool" time="0.0" value="false"/>
+            </Controller>
+            <Controller type="Visibility" end="Pause" frame="$this/DraftOverlayContainer">
+                <Key type="Bool" time="0.0" value="true"/>
+            </Controller>
+            <Controller type="Visibility" end="Pause" frame="$this/DraftTeamHintImage">
+                <Key type="Bool" time="0.0" value="false"/>
+            </Controller>
+            <Controller type="Visibility" end="Pause" frame="$this/HeroContainerFrame/HeroLevelLabel">
+                <Key type="Bool" time="0.0" value="true"/>
+            </Controller>
+        </Animation>
+        
+        <Animation name="SetStateDraftTeamRedLocked">
+            <Event event="EnemyLocked" action="Reset,Play"/>
+
+            <Controller type="Texture" end="Pause" frame="$this/DraftOverlayContainer/DraftTeamLockedImage">
+                <Key type="Image" time="0.0" image="@UI/Storm_HeroSelect_Draft_Frame_RedTeam"/>
+            </Controller>
+            <Controller type="Texture" end="Pause" frame="$this/DraftOverlayContainer/OverlayImage">
+                <Key type="Image" time="0.0" image="@UI/Storm_UI_Play_HeroPortrait_Overlay_Red"/>
+            </Controller>
+            <Controller type="Visibility" end="Pause" frame="$this/DraftOverlayContainer/BanLockIcon">
+                <Key type="Bool" time="0.0" value="false"/>
+            </Controller>
+            <Controller type="Visibility" end="Pause" frame="$this/DraftOverlayContainer">
+                <Key type="Bool" time="0.0" value="true"/>
+            </Controller>
+            <Controller type="Visibility" end="Pause" frame="$this/DraftTeamHintImage">
+                <Key type="Bool" time="0.0" value="false"/>
+            </Controller>
+            <Controller type="Visibility" end="Pause" frame="$this/HeroContainerFrame/HeroLevelLabel">
+                <Key type="Bool" time="0.0" value="true"/>
+            </Controller>
+        </Animation>
+
+        <Animation name="SetStateDraftNotTeamLocked">
+            <Event event="NotTeamLocked" action="Reset,Play"/>
+            <Event event="Empty" action="Reset,Play"/>
+
+            <Controller type="Visibility" end="Pause" frame="$this/DraftOverlayContainer">
+                <Key type="Bool" time="0.0" value="false"/>
+            </Controller>
+            <Controller type="Visibility" end="Pause" frame="$this/DraftTeamHintImage">
+                <Key type="Bool" time="0.0" value="false"/>
+            </Controller>
+            <Controller type="Visibility" end="Pause" frame="$this/HeroContainerFrame/HeroLevelLabel">
+                <Key type="Bool" time="0.0" value="true"/>
+            </Controller>
+        </Animation>
+
+        <Animation name="SetStateDraftSelectionHint">
+            <Event event="SelectionHint" action="Reset,Play"/>
+
+            <Controller type="Visibility" end="Pause" frame="$this/DraftOverlayContainer">
+                <Key type="Bool" time="0.0" value="false"/>
+            </Controller>
+            <Controller type="Visibility" end="Pause" frame="$this/DraftTeamHintImage">
+                <Key type="Bool" time="0.0" value="true"/>
+            </Controller>
+            <Controller type="Visibility" end="Pause" frame="$this/HeroContainerFrame/HeroLevelLabel">
+                <Key type="Bool" time="0.0" value="true"/>
+            </Controller>
+        </Animation>
+        
+        <Animation name="FilterVisibility">
+            <Event event="FilterFail" action="DirectionReverse"/>
+            <Event event="FilterFail" action="Play"/>
+            <Event event="FilterPass" action="DirectionForward"/>
+            <Event event="FilterPass" action="Play"/>
+            <Event event="FilterNone" action="DirectionForward"/>
+            <Event event="FilterNone" action="Play"/>
+            <Controller type="Fade" end="Pause">
+                <Key type="Curve" time="0" value="50" out="Fast"/>
+                <Key type="Curve" time=".4" value="255" in="Slow"/>
+            </Controller>
+            
+            <!--
+            <Controller type="Dimension" dimension="Width" relative="False" percentage="True" end="Pause" frame="HeroContainerFrame">
+                <Key type="Curve" time="0" value="80" out="Fast"/>
+                <Key type="Curve" time=".1" value="100" out="Fast"/>
+                <Key type="Curve" time=".15" value="105" in="Slow" out="Slow"/>
+                <Key type="Curve" time=".2" value="100" in="Fast"/>
+            </Controller>
+            <Controller type="Dimension" dimension="Height" relative="False" percentage="True" end="Pause"  frame="HeroContainerFrame">
+                <Key type="Curve" time="0" value="80" out="Fast"/>
+                <Key type="Curve" time=".1" value="100" out="Fast"/>
+                <Key type="Curve" time=".15" value="105" in="Slow" out="Slow"/>
+                <Key type="Curve" time=".2" value="100" in="Fast"/>
+            </Controller>
+        -->
+        </Animation>
+        
+        <Animation name="IntroDimension">
+            <Event event="Show" action="DirectionForward,Play" frame="$parent/$parent"/>
+            <Event event="Hide" action="DirectionReverse,Play" frame="$parent/$parent"/>
+            <!-- <Controller type="Dimension" dimension="Width" relative="False" percentage="True" end="Pause" frame="HeroContainerFrame">
+                <Key type="Curve" time="0" value="200" out="Fast"/>
+                <Key type="Curve" time=".2" value="100" in="Slow"/>
+            </Controller>
+            <Controller type="Dimension" dimension="Height" relative="False" percentage="True" end="Pause"  frame="HeroContainerFrame">
+                <Key type="Curve" time="0" value="200" out="Fast"/>
+                <Key type="Curve" time=".2" value="100" in="Slow"/>
+            </Controller>
+            <Controller type="Anchor" end="Pause" side="Top" relative="true">
+                <Key type="Curve" time="0" value="-10" out="Fast"/>
+                <Key type="Curve" time=".4" value="0" in="Slow"/>
+            </Controller> -->
+        </Animation>
+        
+<!--  EndRegion: Animations  -->
+
+        <Frame type="Frame" name="HitTestFrame">
+            <Anchor side="Top" relative="$parent/HeroContainerFrame" pos="Min" offset="-8"/>
+            <Anchor side="Bottom" relative="$parent/HeroContainerFrame" pos="Max" offset="8"/>
+            <Anchor side="Left" relative="$parent/HeroContainerFrame" pos="Min" offset="-8"/>
+            <Anchor side="Right" relative="$parent/HeroContainerFrame" pos="Max" offset="8"/>
+            <HitTestTexture val="@UI/HUD_BTN_BG_Ability_AlphaMask"/>
+            <TooltipAnchorPosition val="BottomRight"/>
+        </Frame>
+
+        <Frame type="Image" name="EmptyImage">
+            <Anchor side="Top" relative="$parent/HeroContainerFrame" pos="Mid" offset="0"/>
+            <Anchor side="Left" relative="$parent/HeroContainerFrame" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent/HeroContainerFrame" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent/HeroContainerFrame" pos="Mid" offset="0"/>
+            <Texture val="@UI/Storm_UI_Play_HeroPortrait_Empty"/>
+            <Visible val="False"/>
+        </Frame>
+    
+        <Frame type="Image" name="SelectedBackgroundImage" template="HeroSelectTileList/SelectedBackgroundImageTemplate">
+            <Anchor side="Top" relative="$parent/HeroContainerFrame" pos="Mid" offset="0"/>
+            <Anchor side="Left" relative="$parent/HeroContainerFrame" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent/HeroContainerFrame" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent/HeroContainerFrame" pos="Mid" offset="0"/>
+            
+            <Animation name="OnShown" template="HeroSelectTileList/SelectedBackgroundImageBaseOnShownTemplate"/>
+        </Frame>
+        
+        <Frame type="Image" name="SelectedBackground2Image" template="HeroSelectTileList/SelectedBackgroundImageTemplate">
+            <Anchor relative="$parent/SelectedBackgroundImage" />
+            <TextureCoords top="1" left="1" bottom="0" right="0"/>
+            <SubpixelRendering val="True"/>
+
+            <Animation name="OnShown" template="HeroSelectTileList/SelectedBackgroundImageSecondaryOnShownTemplate"/>
+        </Frame>
+
+        <Frame type="Image" name="DraftTeamHintImage" template="HeroSelectTileList/SelectedBackgroundImageHintTemplate">
+            <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+
+            <Animation name="OnShown" template="HeroSelectTileList/SelectedBackgroundImageBaseOnShownTemplate"/>
+        </Frame>
+
+        <Frame type="Image" name="DraftTeamHintImage2" template="HeroSelectTileList/SelectedBackgroundImageHintTemplate">
+            <Anchor relative="$parent/DraftTeamHintImage" />
+            <TextureCoords top="1" left="1" bottom="0" right="0"/>
+
+            <Animation name="OnDraftHintVisibilityChange">
+                <Event event="OnShown" action="Play" frame="$parent/DraftTeamHintImage"/>
+                <Event event="OnHidden" action="Stop" frame="$parent/DraftTeamHintImage"/>
+
+                <Controller type="Visibility" end="Pause">
+                    <Key type="Bool" time="0.0" value="True"/>
+                </Controller>
+            </Animation>
+
+            <Animation name="OnShown" template="HeroSelectTileList/SelectedBackgroundImageSecondaryOnShownTemplate"/>
+        </Frame>
+
+        <!-- Hero Container and Empty State -->
+        <Frame type="HeroContainerFrame" name="HeroContainerFrame" template="HeroStandardTemplate/HeroItemTemplate">
+            <Visible val="False"/>
+        </Frame>
+        
+        <StateGroup name="TileListState">
+            <DefaultState val="NotEmpty"/>
+            
+            <State name="Empty">
+                <When type="Property" hasData="false"/>
+            </State>
+            
+            <State name="NotEmpty">
+                <Action type="SetProperty" frame="HeroContainerFrame" visible="true"/>
+            </State>
+        </StateGroup>
+
+        <Frame type="Image" name="SelectedImage">
+            <Anchor relative="$parent/HeroContainerFrame" />
+            <SubpixelRendering val="True"/>
+            <Texture val="@UI/Storm_UI_Play_HeroPortrait_ProgressBar_Selected_Gold"/>
+            
+            <Animation name="Pulse">
+                <Event event="OnShown" action="DirectionForward"/>
+                <Event event="OnShown" action="Play"/>
+                <Controller type="Fade" end="PingPong">
+                    <Key type="Curve" time="0" value="150" out="Fast"/>
+                    <Key type="Curve" time=".4" value="255" in="Slow"/>
+                </Controller>
+            </Animation>
+        </Frame>
+        
+        <!-- Hover image and state -->
+        <Frame type="Image" name="HoverImage" template="HeroStandardTemplate/HeroTileListBaseTemplate/HoverImage"/>
+
+        <StateGroup name="HeroStates">
+            <DefaultState val="Gold"/>
+            
+            <State name="Locked">
+                <When type="Property" frame="HeroContainerFrame/HeroState" isAllowed="false"/>
+                <Action type="SetProperty" frame="HoverImage" texture="@UI/Storm_UI_Play_HeroPortrait_ProgressBar_Hover_Off"/>
+                <Action type="SetProperty" frame="SelectedImage" texture="@UI/Storm_UI_Play_HeroPortrait_ProgressBar_Selected_Off"/>
+                <Action type="SetProperty" frame="SelectedBackgroundImage" texture="@UI/Storm_UI_Play_HeroPortrait_Selected_Disabled"/>
+                <Action type="SetProperty" frame="SelectedBackground2Image" texture="@UI/Storm_UI_Play_HeroPortrait_Selected_Disabled"/>
+            </State>
+
+            <State name="AllowedNormal">
+                <!-- Allowed == false -->
+                <When type="Property" frame="HeroContainerFrame/HeroState" levelType="Normal"/>
+                <Action type="SetProperty" frame="HoverImage" texture="@UI/Storm_UI_Play_HeroPortrait_ProgressBar_Hover_On"/>
+                <Action type="SetProperty" frame="SelectedImage" texture="@UI/Storm_UI_Play_HeroPortrait_ProgressBar_Selected_On"/>
+                <Action type="SetProperty" frame="SelectedBackgroundImage" texture="@UI/Storm_UI_Play_HeroPortrait_Selected_Normal"/>
+                <Action type="SetProperty" frame="SelectedBackground2Image" texture="@UI/Storm_UI_Play_HeroPortrait_Selected_Normal"/>
+            </State>
+
+            <State name="Gold">
+                <!-- Allowed == false -->
+                <!-- LevelType == Gold || Max -->
+                <Action type="SetProperty" frame="HoverImage" texture="@UI/Storm_UI_Play_HeroPortrait_ProgressBar_Hover_Gold"/>
+                <Action type="SetProperty" frame="SelectedImage" texture="@UI/Storm_UI_Play_HeroPortrait_ProgressBar_Selected_Gold"/>
+                <Action type="SetProperty" frame="SelectedBackgroundImage" texture="@UI/Storm_UI_Play_HeroPortrait_Selected_Gold"/>
+                <Action type="SetProperty" frame="SelectedBackground2Image" texture="@UI/Storm_UI_Play_HeroPortrait_Selected_Gold"/>
+            </State>
+        </StateGroup>
+
+        <Frame type="Frame" name="DraftOverlayContainer">
+            <Anchor relative="$parent"/>
+            <Visible val="false"/>
+
+            <Frame type="Image" name="OverlayImage">
+                <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+                <Texture val="@UI/Storm_UI_Play_HeroPortrait_Overlay_Blue"/>
+                <Alpha val="170"/>
+            </Frame>
+
+            <Frame type="Image" name="DraftTeamLockedImage">
+                <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+                <Texture val="@UI/Storm_HeroSelect_Draft_Frame_BlueTeam"/>
+            </Frame>
+
+            <Frame type="Image" name="BanLockIcon">
+                <Visible val="false"/>
+                <Anchor side="Left" relative="$parent" pos="Mid" offset="2"/>
+                <Anchor side="Right" relative="$parent" pos="Mid" offset="2"/>
+                <Anchor side="Bottom" relative="$parent/$parent/HeroContainerFrame" pos="Max" offset="10"/>
+                <Texture val="@UI/storm_ui_draft_ban_lock_selected"/>
+                <TextureType val="Normal"/>                
+            </Frame>
+        </Frame>       
+
+        <!-- Badge frame and State -->
+        <Frame type="Frame" name="HeroBadgeContainer" template="HeroStandardTemplate/HeroBadgeContainerTemplate">
+            <RenderPriority val="1200"/>
+            <Anchor relative="$parent" />
+        </Frame>
+
+        <StateGroup name="HeroBadge">
+            <DefaultState val="Empty"/>
+            
+            <State name="Favorite_FreeToPlay">
+                <When type="Property" frame="HeroContainerFrame/HeroState" isFavorite="true"/>
+                <When type="Property" frame="HeroContainerFrame/HeroState" IsFreeToPlay="true"/>
+                <Action type="SetState" frame="HeroBadgeContainer" group="State" state="Favorite_FreeToPlay"/>
+            </State>
+
+            <State name="Favorite_IGR">
+                <When type="Property" frame="HeroContainerFrame/HeroState" isFavorite="true"/>
+                <When type="Property" frame="HeroContainerFrame/HeroState" IsFullyAwarded="true"/>
+                <Action type="SetState" frame="HeroBadgeContainer" group="State" state="Favorite_IGR"/>
+            </State>
+
+            <State name="IGR_FreeToPlay">
+                <When type="Property" frame="HeroContainerFrame/HeroState" IsFullyAwarded="true"/>
+                <When type="Property" frame="HeroContainerFrame/HeroState" IsFreeToPlay="true"/>
+                <Action type="SetState" frame="HeroBadgeContainer" group="State" state="IGR_FreeToPlay"/>
+            </State>
+
+            <State name="Favorite">
+                <When type="Property" frame="HeroContainerFrame/HeroState" isFavorite="true"/>
+                <Action type="SetState" frame="HeroBadgeContainer" group="State" state="Favorite"/>
+            </State>
+
+            <State name="FreeToPlay">
+                <When type="Property" frame="HeroContainerFrame/HeroState" IsFreeToPlay="true"/>
+                <Action type="SetState" frame="HeroBadgeContainer" group="State" state="FreeToPlay"/>
+            </State>
+
+            <State name="IGR">
+                <When type="Property" frame="HeroContainerFrame/HeroState" IsFullyAwarded="true"/>
+                <Action type="SetState" frame="HeroBadgeContainer" group="State" state="IGR"/>
+            </State>
+
+            <State name="AutoSelectBonus">
+                <When type="Property" frame="HeroContainerFrame/HeroState" HasAutoSelectBonus="true"/>
+                <Action type="SetState" frame="HeroBadgeContainer" group="State" state="AutoSelectBonus"/>
+            </State>
+
+            <State name="Empty">
+                <Action type="SetState" frame="HeroBadgeContainer" group="State" state="Empty"/>
+            </State>
+        </StateGroup>
+
+    </Frame>
+    
+    <Frame type="HeroSelectTileListItem" name="HeroSelectTileListItemTemplate" template="HeroSelectTileList/HeroSelectTileListItemBaseTemplate">
+        <TooltipFrame val="HeroSelectTooltip"/>
+    </Frame>
+
+    <Frame type="HeroSelectTileListItem" name="HeroSelectTileListLeftItemTemplate" template="HeroSelectTileList/HeroSelectTileListItemTemplate">
+        <Animation name="Intro">
+            <Event event="Show" action="DirectionForward,Play" frame="$parent/$parent"/>
+            <Event event="Hide" action="DirectionReverse,Play" frame="$parent/$parent"/>
+            <Controller type="Anchor" end="Pause" side="Right" relative="true">
+                <Key type="Curve" time="0" value="-50" out="Fast"/>
+                <Key type="Curve" time=".5" value="0" in="Slow"/>
+            </Controller>
+        </Animation>
+    </Frame>
+    
+    <Frame type="HeroSelectTileListItem" name="HeroSelectTileListRightItemTemplate" template="HeroSelectTileList/HeroSelectTileListItemTemplate">
+        <Animation name="Intro">
+            <Event event="Show" action="DirectionForward,Play" frame="$parent/$parent"/>
+            <Event event="Hide" action="DirectionReverse,Play" frame="$parent/$parent"/>
+            <Controller type="Anchor" end="Pause" side="Left" relative="true">
+                <Key type="Curve" time="0" value="50" out="Fast"/>
+                <Key type="Curve" time=".5" value="0" in="Slow"/>
+            </Controller>
+        </Animation>
+    </Frame>
+    
+    <Frame type="HeroSelectTileListItem" name="DraftHeroSelectTileListItemTemplate" template="HeroSelectTileList/HeroSelectTileListItemTemplate">
+        <Frame type="Frame" name="HitTestFrame">
+            <TooltipAnchorPosition val="TopCenter"/>
+        </Frame>
+    </Frame>
+    
+    <Frame type="HeroSelectTileList" name="ChangeHeroTileListTemplate">
+        <AcceptsMouse val="false"/>
+        
+        <Animation name="Intro">
+            <Event event="Show" action="DirectionForward,Play" frame="$parent"/>
+            <Event event="Hide" action="DirectionReverse,Play" frame="$parent"/>
+            <Controller type="Anchor" end="Pause" side="Left" relative="true" frame="Item0">
+                <Key type="Curve" time="0" value="-80" out="Fast"/>
+                <Key type="Curve" time=".4" value="0" in="Slow"/>
+            </Controller>
+            <Controller type="Anchor" end="Pause" side="Right" relative="true" frame="Item9">
+                <Key type="Curve" time="0" value="80" out="Fast"/>
+                <Key type="Curve" time=".4" value="0" in="Slow"/>
+            </Controller>
+        </Animation>
+        
+        <Frame type="HeroSelectTooltip" name="HeroSelectTooltip" template="StandardTooltip/HeroSelectTooltipTemplate"/>
+
+        <Frame type="HeroSelectTileListItem" name="Item0" template="HeroSelectTileList/HeroSelectTileListLeftItemTemplate">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="170"/>
+        </Frame>
+
+        <Frame type="HeroSelectTileListItem" name="Item1" template="HeroSelectTileList/HeroSelectTileListLeftItemTemplate">
+            <Anchor side="Top" relative="$parent/Item0" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent/Item0" pos="Max" offset="#HeroSelectItemHorizontalSpace"/>
+        </Frame>
+
+        <Frame type="HeroSelectTileListItem" name="Item2" template="HeroSelectTileList/HeroSelectTileListLeftItemTemplate">
+            <Anchor side="Top" relative="$parent/Item1" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent/Item1" pos="Max" offset="#HeroSelectItemHorizontalSpace"/>
+        </Frame>
+
+        <Frame type="HeroSelectTileListItem" name="Item3" template="HeroSelectTileList/HeroSelectTileListLeftItemTemplate">
+            <Anchor side="Top" relative="$parent/Item2" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent/Item2" pos="Max" offset="#HeroSelectItemHorizontalSpace"/>
+        </Frame>
+
+        <Frame type="HeroSelectTileListItem" name="Item4" template="HeroSelectTileList/HeroSelectTileListLeftItemTemplate">
+            <Anchor side="Top" relative="$parent/Item3" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent/Item3" pos="Max" offset="#HeroSelectItemHorizontalSpace"/>
+        </Frame>
+
+<!-- Right Side -->
+        <Frame type="HeroSelectTileListItem" name="Item5" template="HeroSelectTileList/HeroSelectTileListRightItemTemplate">
+            <Anchor side="Top" relative="$parent/Item6" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent/Item6" pos="Min" offset="#HeroSelectItemHorizontalNegativeSpace"/>
+        </Frame>
+        
+        <Frame type="HeroSelectTileListItem" name="Item6" template="HeroSelectTileList/HeroSelectTileListRightItemTemplate">
+            <Anchor side="Top" relative="$parent/Item7" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent/Item7" pos="Min" offset="#HeroSelectItemHorizontalNegativeSpace"/>
+        </Frame>
+
+        <Frame type="HeroSelectTileListItem" name="Item7" template="HeroSelectTileList/HeroSelectTileListRightItemTemplate">
+            <Anchor side="Top" relative="$parent/Item8" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent/Item8" pos="Min" offset="#HeroSelectItemHorizontalNegativeSpace"/>
+        </Frame>
+
+        <Frame type="HeroSelectTileListItem" name="Item8" template="HeroSelectTileList/HeroSelectTileListRightItemTemplate">
+            <Anchor side="Top" relative="$parent/Item9" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent/Item9" pos="Min" offset="#HeroSelectItemHorizontalNegativeSpace"/>
+        </Frame>
+
+        <Frame type="HeroSelectTileListItem" name="Item9" template="HeroSelectTileList/HeroSelectTileListRightItemTemplate">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="-170"/>
+        </Frame>
+
+<!-- End Row 1 -->
+
+        <Frame type="HeroSelectTileListItem" name="Item10" template="HeroSelectTileList/HeroSelectTileListLeftItemTemplate">
+            <Anchor side="Top" relative="$parent/Item0" pos="Max" offset="#HeroSelectItemVerticalSpace"/>
+            <Anchor side="Right" relative="$parent/Item0" pos="Mid" offset="#HeroSelectItemHorizontalPositiveOffset"/>
+        </Frame>
+
+        <Frame type="HeroSelectTileListItem" name="Item11" template="HeroSelectTileList/HeroSelectTileListLeftItemTemplate">
+            <Anchor side="Top" relative="$parent/Item10" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent/Item10" pos="Max" offset="#HeroSelectItemHorizontalSpace"/>
+        </Frame>
+        
+        <Frame type="HeroSelectTileListItem" name="Item12" template="HeroSelectTileList/HeroSelectTileListLeftItemTemplate">
+            <Anchor side="Top" relative="$parent/Item11" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent/Item11" pos="Max" offset="#HeroSelectItemHorizontalSpace"/>
+        </Frame>
+
+        <Frame type="HeroSelectTileListItem" name="Item13" template="HeroSelectTileList/HeroSelectTileListLeftItemTemplate">
+            <Anchor side="Top" relative="$parent/Item12" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent/Item12" pos="Max" offset="#HeroSelectItemHorizontalSpace"/>
+        </Frame>
+
+        <Frame type="HeroSelectTileListItem" name="Item14" template="HeroSelectTileList/HeroSelectTileListLeftItemTemplate">
+            <Anchor side="Top" relative="$parent/Item13" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent/Item13" pos="Max" offset="#HeroSelectItemHorizontalSpace"/>
+        </Frame>
+<!-- Right Side Row 2-->
+
+        <Frame type="HeroSelectTileListItem" name="Item15" template="HeroSelectTileList/HeroSelectTileListRightItemTemplate">
+            <Anchor side="Top" relative="$parent/Item16" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent/Item16" pos="Min" offset="#HeroSelectItemHorizontalNegativeSpace"/>
+        </Frame>
+
+        <Frame type="HeroSelectTileListItem" name="Item16" template="HeroSelectTileList/HeroSelectTileListRightItemTemplate">
+            <Anchor side="Top" relative="$parent/Item17" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent/Item17" pos="Min" offset="#HeroSelectItemHorizontalNegativeSpace"/>
+        </Frame>
+
+        <Frame type="HeroSelectTileListItem" name="Item17" template="HeroSelectTileList/HeroSelectTileListRightItemTemplate">
+            <Anchor side="Top" relative="$parent/Item18" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent/Item18" pos="Min" offset="#HeroSelectItemHorizontalNegativeSpace"/>
+        </Frame>
+
+        <Frame type="HeroSelectTileListItem" name="Item18" template="HeroSelectTileList/HeroSelectTileListRightItemTemplate">
+            <Anchor side="Top" relative="$parent/Item19" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent/Item19" pos="Min" offset="#HeroSelectItemHorizontalNegativeSpace"/>
+        </Frame>
+            
+        <Frame type="HeroSelectTileListItem" name="Item19" template="HeroSelectTileList/HeroSelectTileListRightItemTemplate">
+            <Anchor side="Top" relative="$parent/Item9" pos="Max" offset="#HeroSelectItemVerticalSpace"/>
+            <Anchor side="Left" relative="$parent/Item9" pos="Mid" offset="#HeroSelectItemHorizontalNegativeOffset"/>
+        </Frame>
+            
+<!-- End Row 2-->
+        <Frame type="HeroSelectTileListItem" name="Item20" template="HeroSelectTileList/HeroSelectTileListLeftItemTemplate">
+            <Anchor side="Top" relative="$parent/Item10" pos="Max" offset="#HeroSelectItemVerticalSpace"/>
+            <Anchor side="Right" relative="$parent/Item10" pos="Mid" offset="#HeroSelectItemHorizontalPositiveOffset"/>
+        </Frame>
+            
+        <Frame type="HeroSelectTileListItem" name="Item21" template="HeroSelectTileList/HeroSelectTileListLeftItemTemplate">
+            <Anchor side="Top" relative="$parent/Item20" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent/Item20" pos="Max" offset="#HeroSelectItemHorizontalSpace"/>
+        </Frame>
+            
+        <Frame type="HeroSelectTileListItem" name="Item22" template="HeroSelectTileList/HeroSelectTileListLeftItemTemplate">
+            <Anchor side="Top" relative="$parent/Item21" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent/Item21" pos="Max" offset="#HeroSelectItemHorizontalSpace"/>
+        </Frame>
+            
+        <Frame type="HeroSelectTileListItem" name="Item23" template="HeroSelectTileList/HeroSelectTileListLeftItemTemplate">
+            <Anchor side="Top" relative="$parent/Item22" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent/Item22" pos="Max" offset="#HeroSelectItemHorizontalSpace"/>
+        </Frame>
+            
+        <Frame type="HeroSelectTileListItem" name="Item24" template="HeroSelectTileList/HeroSelectTileListLeftItemTemplate">
+            <Anchor side="Top" relative="$parent/Item23" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent/Item23"  pos="Max" offset="#HeroSelectItemHorizontalSpace"/>
+        </Frame>
+            
+<!-- Right Side Row 3-->
+        <Frame type="HeroSelectTileListItem" name="Item25" template="HeroSelectTileList/HeroSelectTileListRightItemTemplate">
+            <Anchor side="Top" relative="$parent/Item26" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent/Item26" pos="Min" offset="#HeroSelectItemHorizontalNegativeSpace"/>
+        </Frame>
+            
+        <Frame type="HeroSelectTileListItem" name="Item26" template="HeroSelectTileList/HeroSelectTileListRightItemTemplate">
+            <Anchor side="Top" relative="$parent/Item27" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent/Item27" pos="Min" offset="#HeroSelectItemHorizontalNegativeSpace"/>
+        </Frame>
+            
+        <Frame type="HeroSelectTileListItem" name="Item27" template="HeroSelectTileList/HeroSelectTileListRightItemTemplate">
+            <Anchor side="Top" relative="$parent/Item28" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent/Item28" pos="Min" offset="#HeroSelectItemHorizontalNegativeSpace"/>
+        </Frame>
+            
+        <Frame type="HeroSelectTileListItem" name="Item28" template="HeroSelectTileList/HeroSelectTileListRightItemTemplate">
+            <Anchor side="Top" relative="$parent/Item29" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent/Item29" pos="Min" offset="#HeroSelectItemHorizontalNegativeSpace"/>
+        </Frame>
+            
+        <Frame type="HeroSelectTileListItem" name="Item29" template="HeroSelectTileList/HeroSelectTileListRightItemTemplate">
+            <Anchor side="Top" relative="$parent/Item19" pos="Max" offset="#HeroSelectItemVerticalSpace"/>
+            <Anchor side="Left" relative="$parent/Item19" pos="Mid" offset="#HeroSelectItemHorizontalNegativeOffset"/>
+        </Frame>
+            
+<!-- End Row 3-->
+        <Frame type="HeroSelectTileListItem" name="Item30" template="HeroSelectTileList/HeroSelectTileListLeftItemTemplate">
+            <Anchor side="Top" relative="$parent/Item20" pos="Max" offset="#HeroSelectItemVerticalSpace"/>
+            <Anchor side="Right" relative="$parent/Item20" pos="Mid" offset="#HeroSelectItemHorizontalPositiveOffset"/>
+        </Frame>
+            
+        <Frame type="HeroSelectTileListItem" name="Item31" template="HeroSelectTileList/HeroSelectTileListLeftItemTemplate">
+            <Anchor side="Top" relative="$parent/Item30" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent/Item30" pos="Max" offset="#HeroSelectItemHorizontalSpace"/>
+        </Frame>
+
+        <Frame type="HeroSelectTileListItem" name="Item32" template="HeroSelectTileList/HeroSelectTileListLeftItemTemplate">
+            <Anchor side="Top" relative="$parent/Item31" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent/Item31" pos="Max" offset="#HeroSelectItemHorizontalSpace"/>
+        </Frame>
+            
+        <Frame type="HeroSelectTileListItem" name="Item33" template="HeroSelectTileList/HeroSelectTileListLeftItemTemplate">
+            <Anchor side="Top" relative="$parent/Item32" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent/Item32" pos="Max" offset="#HeroSelectItemHorizontalSpace"/>
+        </Frame>
+            
+        <Frame type="HeroSelectTileListItem" name="Item34" template="HeroSelectTileList/HeroSelectTileListLeftItemTemplate">
+            <Anchor side="Top" relative="$parent/Item33" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent/Item33" pos="Max" offset="#HeroSelectItemHorizontalSpace"/>
+        </Frame>
+            
+<!-- Right Side Row 4-->
+        <Frame type="HeroSelectTileListItem" name="Item35" template="HeroSelectTileList/HeroSelectTileListRightItemTemplate">
+            <Anchor side="Top" relative="$parent/Item36" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent/Item36" pos="Min" offset="#HeroSelectItemHorizontalNegativeSpace"/>
+        </Frame>
+            
+        <Frame type="HeroSelectTileListItem" name="Item36" template="HeroSelectTileList/HeroSelectTileListRightItemTemplate">
+            <Anchor side="Top" relative="$parent/Item37" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent/Item37" pos="Min" offset="#HeroSelectItemHorizontalNegativeSpace"/>
+        </Frame>
+            
+        <Frame type="HeroSelectTileListItem" name="Item37" template="HeroSelectTileList/HeroSelectTileListRightItemTemplate">
+            <Anchor side="Top" relative="$parent/Item38" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent/Item38" pos="Min" offset="#HeroSelectItemHorizontalNegativeSpace"/>
+        </Frame>
+
+        <Frame type="HeroSelectTileListItem" name="Item38" template="HeroSelectTileList/HeroSelectTileListRightItemTemplate">
+            <Anchor side="Top" relative="$parent/Item39" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent/Item39" pos="Min" offset="#HeroSelectItemHorizontalNegativeSpace"/>
+        </Frame>
+            
+        <Frame type="HeroSelectTileListItem" name="Item39" template="HeroSelectTileList/HeroSelectTileListRightItemTemplate">
+            <Anchor side="Top" relative="$parent/Item29" pos="Max" offset="#HeroSelectItemVerticalSpace"/>
+            <Anchor side="Left" relative="$parent/Item29" pos="Mid" offset="#HeroSelectItemHorizontalNegativeOffset"/>
+        </Frame>
+            
+<!-- End Row 4-->
+        <Frame type="HeroSelectTileListItem" name="Item40" template="HeroSelectTileList/HeroSelectTileListLeftItemTemplate">
+            <Anchor side="Top" relative="$parent/Item30" pos="Max" offset="#HeroSelectItemVerticalSpace"/>
+            <Anchor side="Left" relative="$parent/Item30" pos="Mid" offset="#HeroSelectItemHorizontalNegativeOffset"/>
+        </Frame>
+            
+        <Frame type="HeroSelectTileListItem" name="Item41" template="HeroSelectTileList/HeroSelectTileListLeftItemTemplate">
+            <Anchor side="Top" relative="$parent/Item40" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent/Item40" pos="Max" offset="#HeroSelectItemHorizontalSpace"/>
+        </Frame>
+
+        <Frame type="HeroSelectTileListItem" name="Item42" template="HeroSelectTileList/HeroSelectTileListLeftItemTemplate">
+            <Anchor side="Top" relative="$parent/Item41" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent/Item41" pos="Max" offset="#HeroSelectItemHorizontalSpace"/>
+        </Frame>
+            
+        <Frame type="HeroSelectTileListItem" name="Item43" template="HeroSelectTileList/HeroSelectTileListLeftItemTemplate">
+            <Anchor side="Top" relative="$parent/Item42" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent/Item42" pos="Max" offset="#HeroSelectItemHorizontalSpace"/>
+        </Frame>
+            
+<!-- Right Side Row 5-->
+        <Frame type="HeroSelectTileListItem" name="Item44" template="HeroSelectTileList/HeroSelectTileListRightItemTemplate">
+            <Anchor side="Top" relative="$parent/Item45" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent/Item45" pos="Min" offset="#HeroSelectItemHorizontalNegativeSpace"/>
+        </Frame>
+            
+        <Frame type="HeroSelectTileListItem" name="Item45" template="HeroSelectTileList/HeroSelectTileListRightItemTemplate">
+            <Anchor side="Top" relative="$parent/Item46" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent/Item46" pos="Min" offset="#HeroSelectItemHorizontalNegativeSpace"/>
+        </Frame>
+            
+        <Frame type="HeroSelectTileListItem" name="Item46" template="HeroSelectTileList/HeroSelectTileListRightItemTemplate">
+            <Anchor side="Top" relative="$parent/Item47" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent/Item47" pos="Min" offset="#HeroSelectItemHorizontalNegativeSpace"/>
+        </Frame>
+            
+        <Frame type="HeroSelectTileListItem" name="Item47" template="HeroSelectTileList/HeroSelectTileListRightItemTemplate">
+            <Anchor side="Top" relative="$parent/Item39" pos="Max" offset="#HeroSelectItemVerticalSpace"/>
+            <Anchor side="Right" relative="$parent/Item39" pos="Mid" offset="#HeroSelectItemHorizontalPositiveOffset"/>
+        </Frame>
+
+<!-- End Row 5-->
+        <Frame type="HeroSelectTileListItem" name="Item48" template="HeroSelectTileList/HeroSelectTileListLeftItemTemplate">
+            <Anchor side="Top" relative="$parent/Item41" pos="Max" offset="#HeroSelectItemVerticalSpace"/>
+            <Anchor side="Right" relative="$parent/Item41" pos="Mid" offset="#HeroSelectItemHorizontalPositiveOffset"/>
+        </Frame>
+            
+        <Frame type="HeroSelectTileListItem" name="Item49" template="HeroSelectTileList/HeroSelectTileListLeftItemTemplate">
+            <Anchor side="Top" relative="$parent/Item48" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent/Item48" pos="Max" offset="#HeroSelectItemHorizontalSpace"/>
+        </Frame>
+            
+        <Frame type="HeroSelectTileListItem" name="Item50" template="HeroSelectTileList/HeroSelectTileListLeftItemTemplate">
+            <Anchor side="Top" relative="$parent/Item49" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent/Item49" pos="Max" offset="#HeroSelectItemHorizontalSpace"/>
+        </Frame>
+            
+        <Frame type="HeroSelectTileListItem" name="Item51" template="HeroSelectTileList/HeroSelectTileListLeftItemTemplate">
+            <Anchor side="Top" relative="$parent/Item50" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent/Item50" pos="Max" offset="#HeroSelectItemHorizontalSpace"/>
+        </Frame>
+        
+<!-- Right Side Row 6-->
+        <Frame type="HeroSelectTileListItem" name="Item52" template="HeroSelectTileList/HeroSelectTileListRightItemTemplate">
+            <Anchor side="Top" relative="$parent/Item53" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent/Item53" pos="Min" offset="#HeroSelectItemHorizontalNegativeSpace"/>
+        </Frame>
+            
+        <Frame type="HeroSelectTileListItem" name="Item53" template="HeroSelectTileList/HeroSelectTileListRightItemTemplate">
+            <Anchor side="Top" relative="$parent/Item54" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent/Item54" pos="Min" offset="#HeroSelectItemHorizontalNegativeSpace"/>
+        </Frame>
+            
+        <Frame type="HeroSelectTileListItem" name="Item54" template="HeroSelectTileList/HeroSelectTileListRightItemTemplate">
+            <Anchor side="Top" relative="$parent/Item55" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent/Item55" pos="Min" offset="#HeroSelectItemHorizontalNegativeSpace"/>
+        </Frame>
+            
+        <Frame type="HeroSelectTileListItem" name="Item55" template="HeroSelectTileList/HeroSelectTileListRightItemTemplate">
+            <Anchor side="Top" relative="$parent/Item47" pos="Max" offset="#HeroSelectItemVerticalSpace"/>
+            <Anchor side="Right" relative="$parent/Item47" pos="Mid" offset="#HeroSelectItemHorizontalPositiveOffset"/>
+        </Frame>
+
+<!-- End Row 6-->
+
+        <Frame type="HeroSelectTileListItem" name="Item56" template="HeroSelectTileList/HeroSelectTileListItemTemplate">
+            <Anchor side="Top" relative="$parent/Item49" pos="Max" offset="#HeroSelectItemVerticalSpace"/>
+            <Anchor side="Right" relative="$parent/Item49" pos="Mid" offset="#HeroSelectItemHorizontalPositiveOffset"/>
+        </Frame>
+            
+        <Frame type="HeroSelectTileListItem" name="Item57" template="HeroSelectTileList/HeroSelectTileListItemTemplate">
+            <Anchor side="Top" relative="$parent/Item56" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent/Item56" pos="Max" offset="#HeroSelectItemHorizontalSpace"/>
+        </Frame>
+        
+        <Frame type="HeroSelectTileListItem" name="Item58" template="HeroSelectTileList/HeroSelectTileListItemTemplate">
+            <Anchor side="Top" relative="$parent/Item50" pos="Max" offset="#HeroSelectItemVerticalSpace"/>
+            <Anchor side="Left" relative="$parent/Item50" pos="Mid" offset="#HeroSelectItemHorizontalNegativeOffset"/>
+        </Frame>
+            
+        <Frame type="HeroSelectTileListItem" name="Item59" template="HeroSelectTileList/HeroSelectTileListItemTemplate">
+            <Anchor side="Top" relative="$parent/Item58" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent/Item58" pos="Max" offset="#HeroSelectItemHorizontalSpace"/>
+        </Frame>
+            
+<!-- Right Side Row 7 -->
+
+        <Frame type="HeroSelectTileListItem" name="Item60" template="HeroSelectTileList/HeroSelectTileListItemTemplate">
+            <Anchor side="Top" relative="$parent/Item61" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent/Item61" pos="Min" offset="#HeroSelectItemHorizontalNegativeSpace"/>
+        </Frame>
+            
+        <Frame type="HeroSelectTileListItem" name="Item61" template="HeroSelectTileList/HeroSelectTileListItemTemplate">
+            <Anchor side="Top" relative="$parent/Item62" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent/Item62" pos="Min" offset="#HeroSelectItemHorizontalNegativeSpace"/>
+        </Frame>
+
+        <Frame type="HeroSelectTileListItem" name="Item62" template="HeroSelectTileList/HeroSelectTileListItemTemplate">
+            <Anchor side="Top" relative="$parent/Item63" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent/Item63" pos="Min" offset="#HeroSelectItemHorizontalNegativeSpace"/>
+        </Frame>
+            
+        <Frame type="HeroSelectTileListItem" name="Item63" template="HeroSelectTileList/HeroSelectTileListItemTemplate">
+            <Anchor side="Top" relative="$parent/Item55" pos="Max" offset="#HeroSelectItemVerticalSpace"/>
+            <Anchor side="Right" relative="$parent/Item55" pos="Mid" offset="#HeroSelectItemHorizontalPositiveOffset"/>
+        </Frame>
+            
+<!-- End Row 7 -->
+
+<!--
+        <Frame type="HeroSelectTileListItem" name="Item64" template="HeroSelectTileList/HeroSelectTileListItemTemplate">
+            <Anchor side="Top" relative="$parent/Item57" pos="Max" offset="#HeroSelectItemVerticalSpace"/>
+            <Anchor side="Right" relative="$parent/Item57" pos="Mid" offset="#HeroSelectItemHorizontalPositiveOffset"/>
+        </Frame>
+            
+        <Frame type="HeroSelectTileListItem" name="Item65" template="HeroSelectTileList/HeroSelectTileListItemTemplate">
+            <Anchor side="Top" relative="$parent/Item64" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent/Item64" pos="Max" offset="#HeroSelectItemHorizontalSpace"/>
+        </Frame>
+
+        <Frame type="HeroSelectTileListItem" name="Item66" template="HeroSelectTileList/HeroSelectTileListItemTemplate">
+            <Anchor side="Top" relative="$parent/Item57" pos="Max" offset="#HeroSelectItemVerticalSpace"/>
+            <Anchor side="Left" relative="$parent/Item57" pos="Mid" offset="#HeroSelectItemHorizontalNegativeOffset"/>
+        </Frame>
+            
+        <Frame type="HeroSelectTileListItem" name="Item67" template="HeroSelectTileList/HeroSelectTileListItemTemplate">
+            <Anchor side="Top" relative="$parent/Item66" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent/Item66" pos="Max" offset="#HeroSelectItemHorizontalSpace"/>
+        </Frame>
+            
+        <Frame type="HeroSelectTileListItem" name="Item68" template="HeroSelectTileList/HeroSelectTileListItemTemplate">
+            <Anchor side="Top" relative="$parent/Item67" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent/Item67" pos="Max" offset="#HeroSelectItemHorizontalSpace"/>
+        </Frame>
+            
+        <Frame type="HeroSelectTileListItem" name="Item69" template="HeroSelectTileList/HeroSelectTileListItemTemplate">
+            <Anchor side="Top" relative="$parent/Item68" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent/Item68" pos="Max" offset="#HeroSelectItemHorizontalSpace"/>
+        </Frame>
+-->
+
+<!-- End Hero List Items -->
+        <Frame type="PageSelectorButtonList" name="PageSelector">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="300"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+
+            <Frame type="Button" name="IncrementButton" template="StandardTemplates/StandardFloatingArrowButtonTemplate_Right">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+            </Frame>
+
+            <Frame type="Button" name="DecrementButton" template="StandardTemplates/StandardFloatingArrowButtonTemplate_Left">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+            </Frame>
+        </Frame>
+    </Frame>
+    
+    <Frame type="HeroSelectTileList" name="DraftHeroTileListTemplate">
+        <Width val="1100"/>
+        <Height val="320"/>
+        <AcceptsMouse val="true"/>
+
+        <Frame type="HeroSelectTooltip" name="HeroSelectTooltip" template="StandardTooltip/HeroSelectTooltipTemplate"/>
+
+<!--DRAFT FAVORITES-->
+        <Frame type="HeroSelectTileListItem" name="Item0" template="HeroSelectTileList/DraftHeroSelectTileListItemTemplate">
+            <Anchor side="Top" relative="$parent/Item1" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent/Item1" pos="Mid" offset="0"/>
+        </Frame>
+
+        <Frame type="HeroSelectTileListItem" name="Item1" template="HeroSelectTileList/DraftHeroSelectTileListItemTemplate">
+            <Anchor side="Top" relative="$parent/Item2" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent/Item2" pos="Mid" offset="0"/>
+        </Frame>
+
+        <Frame type="HeroSelectTileListItem" name="Item2" template="HeroSelectTileList/DraftHeroSelectTileListItemTemplate">
+            <Anchor side="Top" relative="$parent/Item3" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent/Item3" pos="Mid" offset="0"/>
+        </Frame>
+
+        <Frame type="HeroSelectTileListItem" name="Item3" template="HeroSelectTileList/DraftHeroSelectTileListItemTemplate">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="10"/>
+            <Anchor side="Right" relative="$parent" pos="Mid" offset="55"/>
+        </Frame>
+
+        <Frame type="HeroSelectTileListItem" name="Item4" template="HeroSelectTileList/DraftHeroSelectTileListItemTemplate">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="10"/>
+            <Anchor side="Left" relative="$parent" pos="Mid" offset="-55"/>
+        </Frame>
+
+        <Frame type="HeroSelectTileListItem" name="Item5" template="HeroSelectTileList/DraftHeroSelectTileListItemTemplate">
+            <Anchor side="Top" relative="$parent/Item4" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent/Item4" pos="Mid" offset="0"/>
+        </Frame>
+        
+        <Frame type="HeroSelectTileListItem" name="Item6" template="HeroSelectTileList/DraftHeroSelectTileListItemTemplate">
+            <Anchor side="Top" relative="$parent/Item5" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent/Item5" pos="Mid" offset="0"/>
+        </Frame>
+
+        <Frame type="HeroSelectTileListItem" name="Item7" template="HeroSelectTileList/DraftHeroSelectTileListItemTemplate">
+            <Anchor side="Top" relative="$parent/Item6" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent/Item6" pos="Mid" offset="0"/>
+        </Frame>
+    </Frame>
+
+</Desc>

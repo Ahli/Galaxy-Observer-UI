@@ -1,0 +1,421 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<Desc>
+    <DescFlags val="Locked"/>
+    
+    <Constant name="MapListItemVerticalGap" val="-4"/>
+    
+    <Frame type="Image" name="ScrollBarBackgroundImage">
+        <Texture val="Assets/Textures/UI_Battlenet_Glue_ChatPanelScrollBarLine.dds"/>
+        <TextureType val="Nineslice"/>
+        <Tiled val="true"/>
+        <Alpha val="0"/>
+        <DescFlags val="Internal"/>
+    </Frame>
+
+    <Frame type="Button" name="ScrollBarButtonTemplate">
+        <NormalImage val="NormalImage"/>
+        <HoverImage val="HoverImage"/>
+        <DescFlags val="Internal"/>
+
+        <Frame type="Image" name="NormalImage">
+            <Texture val="@UI/ChatPanelScrollBarGrabber_Normal"/>
+            <TextureType val="Nineslice"/>
+            <Tiled val="true"/>
+            <DescFlags val="Internal"/>
+        </Frame>
+
+        <Frame type="Image" name="HoverImage">
+            <Texture val="@UI/ChatPanelScrollBarGrabber_Hover"/>
+            <TextureType val="Nineslice"/>
+            <Tiled val="true"/>
+            <DescFlags val="Internal"/>
+        </Frame>
+    </Frame>
+
+    <Frame type="ScrollBar" name="TileListScrollBarTemplate">
+        <Image val="$root/CoopCampaignMapSelectionPanel/ScrollBarBackgroundImage"/>
+        <Button val="$root/CoopCampaignMapSelectionPanel/ScrollBarButtonTemplate"/>
+        <Orientation val="Vertical"/>
+        <Width val="16"/>
+        <CollapseLayout val="true"/>
+    </Frame>
+
+    <Frame type="CoopCampaignMapTileListItem" name="CoopCampaignMapTileListItemTemplate">
+        <Height val="52"/>
+        
+        <Frame type="Image" name="NormalImage">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+            <Texture val="@UI/Glues_Battlenet_PageAssets_ListItem_Normal"/>
+            <TextureType val="NineSlice"/>
+        </Frame>
+
+        <Frame type="Image" name="HoverImage">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+            <Texture val="@UI/Glues_Battlenet_PageAssets_ListItem_Hover"/>
+            <TextureType val="NineSlice"/>
+        </Frame>
+
+        <Frame type="Image" name="SelectedImage">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+            <Texture val="@UI/Glues_Battlenet_PageAssets_ListItem_Selected"/>
+            <TextureType val="NineSlice"/>
+            <Animation name="Show">
+                <Event event="OnShown" action="Reset,Play"/>
+                <Controller type="Sound" end="Stop">
+                    <Key type="Sound" time="0" sound="@AC_UI_MapSelect"/>
+                </Controller>
+            </Animation>
+        </Frame>
+
+        <Frame type="Label" name="MapNameLabel">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="5"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="20"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+            <Text val="MapNameLabel"/>
+            <Style val="BattlenetListItem"/>
+            
+            <Animation name="SelectedFontStyle">
+                <Event event="OnShown" action="Reset" frame="$parent/SelectedImage"/>
+                <Event event="OnShown" action="Play" frame="$parent/SelectedImage"/>
+                
+                <Controller type="Style" end="Pause" style1="BattlenetListItem" style2="BattlenetListItemSelected">
+                    <Key type="Curve" time="0" value="1"/>
+                </Controller>
+            </Animation>
+            
+            <Animation name="NormalFontStyle">
+                <Event event="OnHidden" action="Reset" frame="$parent/SelectedImage"/>
+                <Event event="OnHidden" action="Play" frame="$parent/SelectedImage"/>
+                
+                <Controller type="Style" end="Pause" style1="BattlenetListItem" style2="BattlenetListItemSelected">
+                    <Key type="Curve" time="0" value="0"/>
+                </Controller>
+            </Animation>
+        </Frame>
+    </Frame>
+
+    <Frame type="CoopCampaignMapSelectionPanel" name="CoopCampaignMapSelectionPanelTemplate">
+    
+        <Frame type="Button" name="MapButton" template="StandardBattlenetTemplates/BattlenetStandardButtonTemplate">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+            <Width val="248"/>
+        </Frame>
+        
+        <Frame type="Label" name="SelectMapLabel">
+            <Anchor side="Top" relative="$parent/MapButton" pos="Min" offset="-20"/>
+            <Anchor side="Left" relative="$parent/MapButton" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent/MapButton" pos="Max" offset="0"/>
+            <Style val="Coop_MapDifficultyLabel"/>
+            <Text val="@UI/ScreenCoopCampaign/SelectMap"/>
+            <Visible val="False"/>
+        </Frame>
+
+        <Frame type="Label" name="MapBonusLabel">
+            <Anchor side="Top" relative="$parent/MapButton" pos="Max" offset="5"/>
+            <Anchor side="Left" relative="$parent/MapButton" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent/MapButton" pos="Max" offset="0"/>
+            <Style val="Coop_MapDifficultyLabel"/>
+        </Frame>
+
+        <Frame type="Frame" name="SelectionContainer">
+            <Anchor relative="$parent"/>
+            <Visible val="false"/>
+            
+            <Animation name="Show">
+                <Event event="OnHidden" action="Reset,Stop" frame="$parent"/>
+                <Event event="OnClick" action="Reset,Play" frame="$parent/MapButton"/>
+                <Event event="OnClick" action="DirectionReverse,Play" frame="AcceptButton"/>
+                <Event event="OnClick" action="DirectionReverse,Play" frame="CloseButton"/>
+                <Event event="OnDisabled" action="Reset,Stop" frame="$parent/MapButton"/>
+                <Event event="UISlideOut" action="Reset,Stop" frame="$parent/$parent"/>
+
+                <Controller type="Fade" end="Pause">
+                    <Key type="Curve" time="0" value="0" out="Slow"/>
+                    <Key type="Curve" time=".175" value="255" in="Auto"/>
+                </Controller>
+
+                <Controller type="Visibility" end="Pause">
+                    <Key type="Bool" time="0" value="false"/>
+                    <Key type="Bool" time=".001" value="true"/>
+                    <Key type="Bool" time=".175" value="true"/>
+                </Controller>
+            </Animation>
+            
+            <!-- This tooltip is just for blocking tooltips behind this panel -->
+            <Frame type="StandardTooltip" name="CoopCampaignTooltip">
+                <Frame type="Label" name="Label">
+                    <Anchor relative="$parent"/>
+                </Frame>
+            </Frame>
+
+            <Frame type="Image" name="FullscreenBlackoutImage">
+                <Anchor relative="$parent"/>
+                <Color val="0,0,0"/>
+                <Alpha val="180"/>
+                <AcceptsMouse val="true"/>
+                <TooltipFrame val="CoopCampaignTooltip"/>
+            </Frame>
+        
+            <Frame type="Image" name="LeftBGGlowPattern">
+                <Anchor side="Top" relative="$parent/BackgroundImage" pos="Mid" offset="0"/>
+                <Anchor side="Bottom" relative="$parent/BackgroundImage" pos="Mid" offset="0"/>
+                <Anchor side="Right" relative="$parent/BackgroundImage" pos="Min" offset="40"/>
+                <Texture val="@UI/Glues_Battlenet_DialogBox_BackGlow"/>
+            </Frame>
+        
+            <Frame type="Image" name="RightBGGlowPattern">
+                <Anchor side="Top" relative="$parent/BackgroundImage" pos="Mid" offset="0"/>
+                <Anchor side="Bottom" relative="$parent/BackgroundImage" pos="Mid" offset="0"/>
+                <Anchor side="Left" relative="$parent/BackgroundImage" pos="Max" offset="-40"/>
+                <Texture val="@UI/Glues_Battlenet_DialogBox_BackGlow"/>
+                <TextureCoords top="0.0" left="1.0" bottom="1.0" right="0.0"/>
+            </Frame>
+
+            <Frame type="Image" name="BackgroundImage">
+                <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+                <Texture val="@UI/Glues_Battlenet_DialogBox_BG"/>
+                <TextureType val="HorizontalBorder"/>
+                <Tiled val="false"/>
+                <Width val="860"/>
+                <Height val="754"/>
+            </Frame>
+        
+            <Frame type="Image" name="TopHexPattern">
+                <Anchor side="Top" relative="$parent/BackgroundImage" pos="Min" offset="11"/>
+                <Anchor side="Left" relative="$parent/BackgroundImage" pos="Mid" offset="0"/>
+                <Anchor side="Right" relative="$parent/BackgroundImage" pos="Mid" offset="0"/>
+                <Texture val="@UI/Glues_Battlenet_DialogBox_HexPattern"/>
+            </Frame>
+        
+            <Frame type="Image" name="BottomHexPattern">
+                <Anchor side="Bottom" relative="$parent/BackgroundImage" pos="Max" offset="-11"/>
+                <Anchor side="Left" relative="$parent/BackgroundImage" pos="Mid" offset="0"/>
+                <Anchor side="Right" relative="$parent/BackgroundImage" pos="Mid" offset="0"/>
+                <Texture val="@UI/Glues_Battlenet_DialogBox_HexPattern"/>
+                <TextureCoords top="1.0" left="1.0" bottom="0.0" right="0.0"/>
+            </Frame>
+
+            <Frame type="Label" name="TitleLabel">
+                <Anchor side="Top" relative="$parent/BackgroundImage" pos="Min" offset="50"/>
+                <Anchor side="Left" relative="$parent/BackgroundImage" pos="Min" offset="30"/>
+                <Anchor side="Right" relative="$parent/BackgroundImage" pos="Max" offset="-30"/>
+                <Style val="@BattlenetDialogTitle"/>
+                <Text val="@UI/ScreenCoopCampaign/MapSelectionPanel/Title"/>
+            </Frame>
+
+            <Frame type="Label" name="DescriptionLabel">
+                <Anchor side="Top" relative="$parent/TitleLabel" pos="Max" offset="10"/>
+                <Anchor side="Left" relative="$parent/BackgroundImage" pos="Min" offset="30"/>
+                <Anchor side="Right" relative="$parent/BackgroundImage" pos="Max" offset="-30"/>
+                <Style val="@Coop_SelectMissionDescription"/>
+            </Frame>
+        
+            <Frame type="Image" name="MapTileListBg">
+                <Anchor side="Top" relative="$parent/DescriptionLabel" pos="Max" offset="20"/>
+                <Anchor side="Left" relative="$parent/BackgroundImage" pos="Min" offset="30"/>
+                <Anchor side="Bottom" relative="$parent/AcceptButton" pos="Min" offset="-10"/>
+                <Anchor side="Right" relative="$parent/MapDescriptionBg" pos="Min" offset="-10"/>
+                <Texture val="@UI/Glues_Battlenet_PageAssets_ContainerBorder"/>
+                <TextureType val="NineSlice"/>
+            </Frame>
+        
+            <Frame type="Image" name="MapTileListHeaderBg">
+                <Anchor side="Top" relative="$parent/MapTileListBg" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/MapTileListBg" pos="Min" offset="0"/>
+                <Anchor side="Right" relative="$parent/MapTileListBg" pos="Max" offset="0"/>
+                <Texture val="@UI/Glues_Battlenet_PageAssets_ContainerHeader"/>
+                <TextureType val="NineSlice"/>
+                <Height val="40"/>
+            </Frame>
+        
+            <Frame type="Label" name="MapTileListHeader">
+                <Anchor side="Top" relative="$parent/MapTileListHeaderBg" pos="Min" offset="3"/>
+                <Anchor side="Left" relative="$parent/MapTileListHeaderBg" pos="Min" offset="25"/>
+                <Anchor side="Bottom" relative="$parent/MapTileListHeaderBg" pos="Max" offset="0"/>
+                <Anchor side="Right" relative="$parent/MapTileListHeaderBg" pos="Max" offset="-10"/>
+                <Text val="@UI/ScreenCoopCampaign/MapSelectionPanel/MissionName"/>
+                <Style val="BattlenetListHeader"/>
+            </Frame>
+
+            <Frame type="TileList" name="MapTileList">
+                <Anchor side="Top" relative="$parent/MapTileListHeaderBg" pos="Max" offset="3"/>
+                <Anchor side="Left" relative="$parent/MapTileListBg" pos="Min" offset="5"/>
+                <Anchor side="Bottom" relative="$parent/MapTileListBg" pos="Max" offset="-5"/>
+                <Anchor side="Right" relative="$parent/MapTileListBg" pos="Max" offset="-5"/>
+                <ClearSelectionIfNotVisible val="true"/>
+                <AcceptsMouse val="true"/>
+
+                <Frame type="CoopCampaignMapTileListItem" name="Item0" template="CoopCampaignMapSelectionPanel/CoopCampaignMapTileListItemTemplate">
+                    <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                    <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                    <Anchor side="Right" relative="$parent/ScrollBar" pos="Min" offset="0"/>
+                </Frame>
+
+                <Frame type="CoopCampaignMapTileListItem" name="Item1" template="CoopCampaignMapSelectionPanel/CoopCampaignMapTileListItemTemplate">
+                    <Anchor side="Top" relative="$parent/Item0" pos="Max" offset="#MapListItemVerticalGap"/>
+                    <Anchor side="Left" relative="$parent/Item0" pos="Min" offset="0"/>
+                    <Anchor side="Right" relative="$parent/ScrollBar" pos="Min" offset="0"/>
+                </Frame>
+
+                <Frame type="CoopCampaignMapTileListItem" name="Item2" template="CoopCampaignMapSelectionPanel/CoopCampaignMapTileListItemTemplate">
+                    <Anchor side="Top" relative="$parent/Item1" pos="Max" offset="#MapListItemVerticalGap"/>
+                    <Anchor side="Left" relative="$parent/Item1" pos="Min" offset="0"/>
+                    <Anchor side="Right" relative="$parent/ScrollBar" pos="Min" offset="0"/>
+                </Frame>
+
+                <Frame type="CoopCampaignMapTileListItem" name="Item3" template="CoopCampaignMapSelectionPanel/CoopCampaignMapTileListItemTemplate">
+                    <Anchor side="Top" relative="$parent/Item2" pos="Max" offset="#MapListItemVerticalGap"/>
+                    <Anchor side="Left" relative="$parent/Item2" pos="Min" offset="0"/>
+                    <Anchor side="Right" relative="$parent/ScrollBar" pos="Min" offset="0"/>
+                </Frame>
+
+                <Frame type="CoopCampaignMapTileListItem" name="Item4" template="CoopCampaignMapSelectionPanel/CoopCampaignMapTileListItemTemplate">
+                    <Anchor side="Top" relative="$parent/Item3" pos="Max" offset="#MapListItemVerticalGap"/>
+                    <Anchor side="Left" relative="$parent/Item3" pos="Min" offset="0"/>
+                    <Anchor side="Right" relative="$parent/ScrollBar" pos="Min" offset="0"/>
+                </Frame>
+
+                <Frame type="CoopCampaignMapTileListItem" name="Item5" template="CoopCampaignMapSelectionPanel/CoopCampaignMapTileListItemTemplate">
+                    <Anchor side="Top" relative="$parent/Item4" pos="Max" offset="#MapListItemVerticalGap"/>
+                    <Anchor side="Left" relative="$parent/Item4" pos="Min" offset="0"/>
+                    <Anchor side="Right" relative="$parent/ScrollBar" pos="Min" offset="0"/>
+                </Frame>
+
+                <Frame type="CoopCampaignMapTileListItem" name="Item6" template="CoopCampaignMapSelectionPanel/CoopCampaignMapTileListItemTemplate">
+                    <Anchor side="Top" relative="$parent/Item5" pos="Max" offset="#MapListItemVerticalGap"/>
+                    <Anchor side="Left" relative="$parent/Item5" pos="Min" offset="0"/>
+                    <Anchor side="Right" relative="$parent/ScrollBar" pos="Min" offset="0"/>
+                </Frame>
+            
+                <Frame type="CoopCampaignMapTileListItem" name="Item7" template="CoopCampaignMapSelectionPanel/CoopCampaignMapTileListItemTemplate">
+                    <Anchor side="Top" relative="$parent/Item6" pos="Max" offset="#MapListItemVerticalGap"/>
+                    <Anchor side="Left" relative="$parent/Item6" pos="Min" offset="0"/>
+                    <Anchor side="Right" relative="$parent/ScrollBar" pos="Min" offset="0"/>
+                </Frame>
+
+                <Frame type="CoopCampaignMapTileListItem" name="Item8" template="CoopCampaignMapSelectionPanel/CoopCampaignMapTileListItemTemplate">
+                    <Anchor side="Top" relative="$parent/Item7" pos="Max" offset="#MapListItemVerticalGap"/>
+                    <Anchor side="Left" relative="$parent/Item7" pos="Min" offset="0"/>
+                    <Anchor side="Right" relative="$parent/ScrollBar" pos="Min" offset="0"/>
+                </Frame>
+
+                <Frame type="ScrollBar" name="ScrollBar" template="CoopCampaignMapSelectionPanel/TileListScrollBarTemplate">
+                    <Anchor side="Top" relative="$parent" pos="Min" offset="-4"/>
+                    <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+                    <Anchor side="Bottom" relative="$parent" pos="Max" offset="-1"/>
+                </Frame>
+            </Frame>
+        
+            <Frame type="Image" name="MapDescriptionBg">
+                <Anchor side="Top" relative="$parent/DescriptionLabel" pos="Max" offset="20"/>
+                <Anchor side="Bottom" relative="$parent/AcceptButton" pos="Min" offset="-10"/>
+                <Anchor side="Right" relative="$parent/BackgroundImage" pos="Max" offset="-30"/>
+                <Width val="338"/>
+                <Texture val="@UI/Glues_Battlenet_PageAssets_ContainerBorder"/>
+                <TextureType val="NineSlice"/>
+            </Frame>
+        
+            <Frame type="Image" name="MapImageRandom">
+                <Anchor side="Top" relative="$parent/MapDescriptionBg" pos="Min" offset="11"/>
+                <Anchor side="Left" relative="$parent/MapDescriptionBg" pos="Mid" offset="0"/>
+                <Anchor side="Right" relative="$parent/MapDescriptionBg" pos="Mid" offset="0"/>
+                <Width val="316"/>
+                <Height val="184"/>
+                <TextureType val="Normal"/>
+                <CollapseLayout val="true"/>
+                <Visible val="False"/>
+                <Texture val="@UI/SC2_UI_Coop_MapIcon_Random"/>
+
+                <!-- Display random map icon -->
+                <Animation name="MapSelection">
+                    <Event event="Random" action="Reset,Play" frame="$parent/$parent"/>
+                    <Event event="NotRandom" action="Reset,Stop" frame="$parent/$parent"/>
+                
+                    <Controller type="Visibility" end="Pause">
+                        <Key type="Bool" time="0" value="true"/>
+                    </Controller>
+                </Animation>
+            </Frame>
+
+            <Frame type="BattleMapIcon" name="MapImage">
+                <Anchor side="Top" relative="$parent/MapDescriptionBg" pos="Min" offset="11"/>
+                <Anchor side="Left" relative="$parent/MapDescriptionBg" pos="Mid" offset="0"/>
+                <Anchor side="Right" relative="$parent/MapDescriptionBg" pos="Mid" offset="0"/>
+                <Width val="316"/>
+                <Height val="184"/>
+                <CollapseLayout val="true"/>
+                <Alpha val="0"/>
+
+                <Frame type="Image" name="Image">
+                    <Anchor relative="$parent"/>
+                    <TextureType val="Normal"/>
+                </Frame>
+
+                <!-- Display normal map icon -->
+                <Animation name="MapSelection">
+                    <Event event="Random" action="Reset,Play" frame="$parent/$parent"/>
+                    <Event event="NotRandom" action="Reset,Stop" frame="$parent/$parent"/>
+                
+                    <Controller type="Visibility" end="Pause">
+                        <Key type="Bool" time="0" value="false"/>
+                    </Controller>
+                </Animation>
+            
+                <Animation name="IconState">
+                    <Event event="Show" action="Reset,Play" frame="$this"/>
+                    <Event event="Hide" action="Reset,Stop" frame="$this"/>
+
+                    <Controller type="Fade" end="Pause">
+                        <Key type="Curve" time="0" value="0" out="Auto"/>
+                        <Key type="Curve" time="0.2" value="255" in="Auto"/>
+                    </Controller>
+                </Animation>
+            </Frame>
+        
+            <Frame type="Image" name="MapImageBorder">
+                <Anchor side="Top" relative="$parent/MapDescriptionBg" pos="Min" offset="10"/>
+                <Anchor side="Left" relative="$parent/MapDescriptionBg" pos="Mid" offset="0"/>
+                <Anchor side="Right" relative="$parent/MapDescriptionBg" pos="Mid" offset="0"/>
+                <Width val="318"/>
+                <Height val="186"/>
+                <Texture val="@UI/SC2_UI_Battlenet_Glue_Arcade_ImageBorder"/>
+                <TextureType val="NineSlice"/>
+            </Frame>
+
+            <Frame type="Label" name="MapDescriptionLabel">
+                <Anchor side="Top" relative="$parent/MapImageBorder" pos="Max" offset="20"/>
+                <Anchor side="Left" relative="$parent/MapDescriptionBg" pos="Min" offset="15"/>
+                <Anchor side="Right" relative="$parent/MapDescriptionBg" pos="Max" offset="-15"/>
+                <Style val="Tournament_MapVetoDetails"/>
+            </Frame>
+
+            <Frame type="Button" name="AcceptButton" template="StandardBattlenetTemplates/BattlenetAlternateButtonTemplate">
+                <Anchor side="Bottom" relative="$parent/BackgroundImage" pos="Max" offset="-40"/>
+                <Anchor side="Right" relative="$parent/BackgroundImage" pos="Mid" offset="-3"/>
+                <Text val="@UI/StandardDialog_Ok_Control"/>
+                <Shortcut val="@UI/StandardDialog_Enter_Hotkey"/>
+            </Frame>
+
+            <Frame type="Button" name="CloseButton" template="StandardBattlenetTemplates/BattlenetStandardButtonTemplate">
+                <Anchor side="Bottom" relative="$parent/AcceptButton" pos="Max" offset="0"/>
+                <Anchor side="Left" relative="$parent/BackgroundImage" pos="Mid" offset="3"/>
+                <Text val="@UI/StandardDialog_Cancel_Control"/>
+                <Shortcut val="@UI/ScreenNavigationBack_Hotkey"/>
+            </Frame>
+        </Frame>
+    </Frame>
+</Desc>

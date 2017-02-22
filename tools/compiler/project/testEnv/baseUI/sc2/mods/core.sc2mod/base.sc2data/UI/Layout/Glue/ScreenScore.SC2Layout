@@ -1,0 +1,587 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<Desc>
+    <DescFlags val="Locked"/>
+
+    <Frame type="Button" name="TabButtonTemplate" template="StandardBattlenetTemplates/BattlenetMediumTabButtonTemplate">
+        <Anchor side="Right" relative="$this/Label" pos="Max" offset="20"/>
+        <Width val="0"/>
+        <Toggleable val="true"/>
+
+        <Frame type="Label" name="Label">
+            <Anchor side="Right" relative="$this" pos="Min" offset="0"/>
+        </Frame>
+    </Frame>
+
+    <Frame type="Button" name="TabButtonExpandedTemplate" template="StandardBattlenetTemplates/BattlenetMediumTabButtonTemplate">
+        <Anchor side="Right" relative="$this/Label" pos="Max" offset="40"/>
+        <Width val="0"/>
+        <Toggleable val="true"/>
+
+        <Frame type="Label" name="Label">
+            <Anchor side="Left" relative="$parent" pos="Min" offset="40"/>
+            <Anchor side="Right" relative="$this" pos="Min" offset="0"/>
+        </Frame>
+    </Frame>
+
+    <Frame type="ScreenScore" name="ScreenScore">
+        <Anchor relative="$parent"/>
+        <!-- This must render below ScreenBattlenet so fanfares and profile can appear above it -->
+        <!-- But render above ScreenNavigation and other content screens so you can't navigate or interact with other things -->
+        <RenderPriority val="650"/>
+        
+        <!-- This tooltip is just for blocking tooltips behind this panel -->
+        <Frame type="StandardTooltip" name="ScoreScreenTooltip">
+            <Frame type="Label" name="Label">
+                <Anchor relative="$parent"/>
+            </Frame>
+        </Frame>
+
+        <Frame type="Image" name="FullscreenBlackoutImage">
+            <Anchor relative="$parent"/>
+            <Color val="0,0,0"/>
+            <Alpha val="180"/>
+            <AcceptsMouse val="true"/>
+            <TooltipFrame val="MapProfileTooltip"/>
+        </Frame>
+
+        <Frame type="Image" name="LeftBGGlowPattern">
+            <Anchor side="Top" relative="$parent/BackgroundImage" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent/BackgroundImage" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent/BackgroundImage" pos="Min" offset="20"/>
+            <Texture val="@UI/Glues_Battlenet_DialogBox_BackGlow"/>
+        </Frame>
+
+        <Frame type="Image" name="RightBGGlowPattern">
+            <Anchor side="Top" relative="$parent/BackgroundImage" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent/BackgroundImage" pos="Mid" offset="0"/>
+            <Anchor side="Left" relative="$parent/BackgroundImage" pos="Max" offset="-20"/>
+            <Texture val="@UI/Glues_Battlenet_DialogBox_BackGlow"/>
+            <TextureCoords top="0.0" left="1.0" bottom="1.0" right="0.0"/>
+        </Frame>
+
+        <Frame type="BlurFrame" name="BlurEffect">
+            <Anchor side="Top" relative="$parent/BackgroundImage" pos="Min" offset="13"/>
+            <Anchor side="Bottom" relative="$parent/BackgroundImage" pos="Max" offset="-14"/>
+            <Anchor side="Left" relative="$parent/BackgroundImage" pos="Min" offset="16"/>
+            <Anchor side="Right" relative="$parent/BackgroundImage" pos="Max" offset="-16"/>
+            <BlurAmount val=".3"/>
+            
+            <Frame type="Image" name="LowImage">
+                <Anchor relative="$parent"/>
+                <Color val="0,0,0"/>
+                <Alpha val="150"/>
+            </Frame>
+        </Frame>
+
+        <Frame type="Image" name="BackgroundImage">
+            <Anchor side="Top" relative="$parent" pos="Mid" offset="-48"/>
+            <Anchor side="Bottom" relative="$parent" pos="Mid" offset="-48"/>
+            <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+            <Texture val="@UI/Glues_ExtendedXP_Background"/>
+            <TextureType val="Nineslice"/>
+            <Tiled val="true"/>
+            <Width val="1559"/>
+            <Height val="1005"/>
+        </Frame>
+
+        <!--
+            HEADER LABELS
+        -->
+
+        <Frame type="Button" name="BackButton" template="StandardBattlenetTemplates/BattlenetStandardBackButtonTemplate">
+            <Anchor side="Top" relative="$parent/HeaderContainer/ResultLabel" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent/HeaderContainer/ResultLabel" pos="Mid" offset="0"/>
+            <Anchor side="Left" relative="$parent/HeaderContainer/BackButtonAnchor" pos="Max" offset="0"/>
+            <CollapseLayout val="true"/>
+        </Frame>
+        
+        <Frame type="Frame" name="HeaderContainer">
+            <Anchor relative="$parent/BackgroundImage"/>
+
+            <Frame type="Frame" name="BackButtonAnchor">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="35"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="28"/>
+                <Width val="10"/>
+                <Height val="1"/>
+            </Frame>
+
+            <Frame type="Frame" name="ResultAnchor">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="35"/>
+                <Anchor side="Left" relative="$parent/$parent/BackButton" pos="Max" offset="0"/>
+                <Width val="10"/>
+                <Height val="1"/>
+                <Visible val="True"/>
+                <CollapseLayout val="true"/>
+
+                <StateGroup name="ShowAnchor">
+                    <State name="Show">
+                        <When type="Property" frame="$parent/$parent/BackButton" Visible="True"/>
+                        <Action type="SetProperty" frame="$this" Visible="True"/>
+                    </State>
+                    <State name="Hide">
+                        <When type="Property" frame="$parent/$parent/BackButton" Visible="False"/>
+                        <Action type="SetProperty" frame="$this" Visible="False"/>
+                    </State>
+                </StateGroup>
+            </Frame>
+
+            <Frame type="Frame" name="ResultLabelAnchor">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="35"/>
+                <Anchor side="Left" relative="$parent/ResultAnchor" pos="Max" offset="0"/>
+                <Width val="5"/>
+                <Height val="1"/>
+            </Frame>
+        
+            <Frame type="Label" name="ResultLabel">
+                <Anchor side="Top" relative="$parent/UserNameLabel" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/ResultLabelAnchor" pos="Max" offset="0"/>
+                <Style val="@ScoreScreenResultLabel"/>
+                <Text val="{$parent/$parent/@ResultText}"/>
+            </Frame>
+            
+            <Frame type="BattleMapFrame" name="MapFrame">
+                <Anchor relative="$parent"/>
+                <MapHandle val="{$parent/$parent/@MapHandle}"/>
+            </Frame>
+
+            <Frame type="Label" name="MapNameLabel">
+                <Anchor side="Top" relative="$parent/ResultLabel" pos="Max" offset="2"/>
+                <Anchor side="Left" relative="$parent/ResultLabel" pos="Min" offset="2"/>
+                <AutoSizeClamps maxWidth="265"/>
+                <Style val="@ScoreScreenMapNameLabel"/>
+                <AcceptsMouseTooltip val="true"/>
+                <Options val="Ellipsis | TooltipIfTruncated | NoWrapping"/>
+                <Text val="{$parent/MapFrame/@Name}"/>
+            </Frame>
+        
+            <Frame type="Label" name="ModSeparatorLabel">
+                <Anchor side="Top" relative="$parent/ModNameLabel" pos="Mid" offset="0"/>
+                <Anchor side="Bottom" relative="$parent/ModNameLabel" pos="Mid" offset="0"/>
+                <Anchor side="Left" relative="$parent/MapNameLabel" pos="Max" offset="5"/>
+                <Style val="@ScoreScreenModNameLabel"/>
+                <Text val="|"/>
+                <CollapseLayout val="true"/>
+                <Visible val="{$parent/ModNameLabel/@Visible}"/>
+            </Frame>
+            
+            <Frame type="BattleMapFrame" name="ModFrame">
+                <Anchor relative="$parent"/>
+                <MapHandle val="{$parent/$parent/@ModHandle}"/>
+            </Frame>
+
+            <Frame type="Label" name="ModNameLabel">
+                <Anchor side="Top" relative="$parent/MapNameLabel" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/ModSeparatorLabel" pos="Max" offset="5"/>
+                <AutoSizeClamps maxWidth="265"/>
+                <Style val="@ScoreScreenModNameLabel"/>
+                <AcceptsMouseTooltip val="true"/>
+                <Options val="Ellipsis | TooltipIfTruncated | NoWrapping"/>
+                <Text val="{$parent/ModFrame/@Name}"/>
+                <CollapseLayout val="true"/>
+
+                <StateGroup name="ModNameStateGroup">
+                    <DefaultState val="Default"/>
+
+                    <State name="NoMod">
+                        <When type="Property" Text=""/>
+                        <Action type="SetProperty" Visible="false"/>
+                    </State>
+
+                    <State name="Default">
+                        <Action type="SetProperty" Visible="true"/>
+                    </State>
+                </StateGroup>
+            </Frame>
+
+            <Frame type="Label" name="MatchLengthSeparatorLabel">
+                <Anchor side="Top" relative="$parent/MatchLengthLabel" pos="Mid" offset="0"/>
+                <Anchor side="Bottom" relative="$parent/MatchLengthLabel" pos="Mid" offset="0"/>
+                <Anchor side="Left" relative="$parent/ModNameLabel" pos="Max" offset="5"/>
+                <Style val="@ScoreScreenMatchLengthLabel"/>
+                <Text val="|"/>
+                <Visible val="{$parent/MatchLengthLabel/@Visible}"/>
+            </Frame>
+
+            <Frame type="Label" name="MatchLengthLabel">
+                <Anchor side="Top" relative="$parent/ModNameLabel" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/MatchLengthSeparatorLabel" pos="Max" offset="5"/>
+                <Style val="@ScoreScreenMatchLengthLabel"/>
+                <Text val="{$parent/$parent/@MatchLength}"/>
+            </Frame>
+
+            <Frame type="Button" name="OptionsButton" template="StandardBattlenetTemplates/OptionsButton">
+                <Anchor side="Top" relative="$parent/MatchLengthLabel" pos="Mid" offset="-1"/>
+                <Anchor side="Bottom" relative="$parent/MatchLengthLabel" pos="Mid" offset="-1"/>
+                <Anchor side="Left" relative="$parent/MatchLengthLabel" pos="Max" offset="5"/>
+                <ContextMenu val="$parent/MapContextMenu"/>
+                <ContextMenuButtons val="Left"/>
+            </Frame>
+
+            <Frame type="BattleMapContextMenu" name="MapContextMenu" template="StandardTemplates/StandardContextMenuTemplate">
+                <Anchor side="Top" relative="$parent/OptionsButton" pos="Max" offset="0"/>
+                <Anchor side="Left" relative="$parent/OptionsButton" pos="Min" offset="0"/>
+                <UseAnchors val="true"/>
+                <ShowMapInfo val="true"/>
+                <MapHandle val="{$parent/$parent/@MapHandle}"/>
+                <ModHandle val="{$parent/$parent/@ModHandle}"/>
+            </Frame>
+
+            <Frame type="AvatarFrame" name="AvatarFrame" template="StandardTemplates/AvatarFrameMediumTemplate">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="35"/>
+                <Anchor side="Right" relative="$parent" pos="Max" offset="-80"/>
+                <PresenceId val="{$parent/$parent/@PresenceId}"/>
+                <BypassOnlineChecks val="true"/>
+            </Frame>
+
+            <Frame type="Label" name="UserNameLabel">
+                <Anchor side="Bottom" relative="$parent/AvatarFrame" pos="Mid" offset="-3"/>
+                <Anchor side="Right" relative="$parent/AvatarFrame" pos="Min" offset="-8"/>
+                <Style val="ScoreScreenPlayerName"/>
+                <Text val="{$parent/UserFrame/@DisplayNameExcludeClan}"/>
+            </Frame>
+
+            <Frame type="Label" name="ClanLabel">
+                <Anchor side="Top" relative="$parent/AvatarFrame" pos="Mid" offset="5"/>
+                <Anchor side="Right" relative="$parent/AvatarFrame" pos="Min" offset="-8"/>
+                <Style val="ScoreScreenClanName"/>
+                <Text val="{$parent/UserFrame/@ClanTag}"/>
+            </Frame>
+
+            <Frame type="BattleUserFrame" name="UserFrame">
+                <Anchor relative="$parent"/>
+                <PresenceId val="{$parent/$parent/@PresenceId}"/>
+            </Frame>
+        </Frame>
+        
+        <!--
+            CONTENT TABS AND PANELS
+        -->
+
+        <Frame type="TabControl" name="TabControl">
+            <Anchor side="Top" relative="$parent/BackgroundImage" pos="Min" offset="165"/>
+            <Anchor side="Left" relative="$parent/BackgroundImage" pos="Min" offset="0"/>
+            <Anchor side="Bottom" relative="$parent/BackgroundImage" pos="Max" offset="0"/>
+            <Anchor side="Right" relative="$parent/BackgroundImage" pos="Max" offset="0"/>
+            <TabListItem val="InvalidButton"/>
+            <TabListItem val="LadderButton"/>
+            <TabListItem val="ExperienceButton"/>
+            <TabListItem val="PerformanceButton"/>
+            <TabListItem val="ScoreSummaryButton"/>
+            <TabListItem val="UnitsButton"/>
+            <TabListItem val="BuildOrderButton"/>
+            <TabListItem val="GraphsButton"/>
+            <PanelListItem val="InvalidFrame"/>
+            <PanelListItem val="TabFrame0"/>
+            <PanelListItem val="TabFrame1"/>
+            <PanelListItem val="TabFrame2"/>
+            <PanelListItem val="TabFrame3"/>
+            <PanelListItem val="TabFrame4"/>
+            <PanelListItem val="TabFrame5"/>
+            <PanelListItem val="TabFrame6"/>
+            
+            <Frame type="Button" name="InvalidButton" template="ScreenScore/TabButtonTemplate">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="40"/>
+                <Visible val="false"/>
+            </Frame>
+                
+            <Frame type="Button" name="LadderButton" template="ScreenScore/TabButtonTemplate">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="37"/>
+                <Text val="@UI/ScreenScore/LadderButton"/>
+                <Enabled val="{$parent/$parent/@LadderEnabled}"/>
+
+                <StateGroup name="DisabledStateGroup">
+                    <DefaultState val="DefaultState"/>
+                
+                    <State name="Disabled">
+                        <When type="Property" Enabled="false"/>
+                        <Action type="SetProperty" Tooltip="@UI/ScreenScore/LadderButtonTooltip"/>
+                    </State>
+                
+                    <State name="DefaultState">
+                        <Action type="SetProperty" Tooltip=""/>
+                    </State>
+                </StateGroup>
+            </Frame>
+
+            <Frame type="Button" name="ExperienceButton" template="ScreenScore/TabButtonTemplate">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/LadderButton" pos="Max" offset="-4"/>
+                <Text val="@UI/ScreenScore/ExperienceButton"/>
+                <Enabled val="{$parent/$parent/@ExperienceEnabled}"/>
+
+                <StateGroup name="DisabledStateGroup">
+                    <DefaultState val="DefaultState"/>
+                
+                    <State name="DisabledCAIS">
+                        <When type="Property" Enabled="false"/>
+                        <When type="Property" IsCAISTired="true"/>
+                        <Action type="SetProperty" Tooltip="@UI/ScreenScore/ExperienceButtonCAIS"/>
+                    </State>
+
+                    <State name="Disabled">
+                        <When type="Property" Enabled="false"/>
+                        <Action type="SetProperty" Tooltip="@UI/ScreenScore/ExperienceButtonTooltip"/>
+                    </State>
+                
+                    <State name="DefaultState">
+                        <Action type="SetProperty" Tooltip=""/>
+                    </State>
+                </StateGroup>
+            </Frame>
+
+            <Frame type="Button" name="PerformanceButton" template="ScreenScore/TabButtonTemplate">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/ExperienceButton" pos="Max" offset="-4"/>
+                <Anchor side="Right" relative="$this/Label" pos="Max" offset="20"/>
+                <Text val="@UI/ScreenScore/PerformanceButton"/>
+                <PreserveAnchorOffset val="true"/>
+                
+                <Frame type="Image" name="ImprovedIcon">
+                    <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                    <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+                    <Texture val="@UI/Glues_Battlenet_TopNav_NewContent"/>
+                    <Width val="32"/>
+                    <Height val="31"/>
+                    <AcceptsMouseTooltip val="true"/>
+                    <Tooltip val="@UI/ScoreScreenPerformance/Improved"/>
+                    <Visible val="false"/>
+                    <CollapseLayout val="true"/>
+                
+                    <Animation name="Improved">
+                        <Event event="IsImproved" action="Reset,Play" frame="$parent/$parent/TabFrame2"/>
+
+                        <Controller type="Visibility" end="Pause">
+                            <Key type="Bool" time="0" value="true"/>
+                        </Controller>
+                    </Animation>
+                </Frame>
+            </Frame>
+
+            <Frame type="Button" name="ScoreSummaryButton" template="ScreenScore/TabButtonTemplate">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/PerformanceButton" pos="Max" offset="-4"/>
+                <Text val="@UI/ScreenScore/ScoreSummaryButton"/>
+            </Frame>
+
+            <Frame type="Button" name="UnitsButton" template="ScreenScore/TabButtonTemplate">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/ScoreSummaryButton" pos="Max" offset="-4"/>
+                <Text val="@UI/ScreenScore/UnitsButton"/>
+            </Frame>
+
+            <Frame type="Button" name="BuildOrderButton" template="ScreenScore/TabButtonTemplate">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/UnitsButton" pos="Max" offset="-4"/>
+                <Text val="@UI/ScreenScore/BuildOrderButton"/>
+            </Frame>
+
+            <Frame type="Button" name="GraphsButton" template="ScreenScore/TabButtonTemplate">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/BuildOrderButton" pos="Max" offset="-4"/>
+                <Text val="@UI/ScreenScore/GraphsButton"/>
+            </Frame>
+
+            <Frame type="Frame" name="InvalidFrame">
+                <Anchor relative="$parent"/>
+                <Visible val="false"/>
+            </Frame>
+
+            <Frame type="ScoreScreenLadderFrame" name="TabFrame0" template="ScoreScreenLadderFrame/ScoreScreenLadderFrameTemplate">
+                <Anchor side="Top" relative="$parent/LadderButton" pos="Max" offset="3"/>
+                <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+                <Width val="1500"/>
+                <Height val="667"/>
+                <Visible val="false"/>
+            </Frame>
+
+            <Frame type="ScoreScreenExperienceFrame" name="TabFrame1" template="ScoreScreenExperienceFrame/ScoreScreenExperienceFrameTemplate">
+                <Anchor side="Top" relative="$parent/LadderButton" pos="Max" offset="3"/>
+                <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+                <Width val="1500"/>
+                <Height val="667"/>
+                <Visible val="false"/>
+            </Frame>
+
+            <Frame type="ScoreScreenPerformanceFrame" name="TabFrame2" template="ScoreScreenPerformanceFrame/ScoreScreenPerformanceFrameTemplate">
+                <Anchor side="Top" relative="$parent/LadderButton" pos="Max" offset="3"/>
+                <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+                <Width val="1500"/>
+                <Height val="667"/>
+                <Visible val="false"/>
+            </Frame>
+
+            <Frame type="ScoreScreenStatsFrame" name="TabFrame3" template="ScoreScreenSummaryFrame/ScoreScreenSummaryFrameTemplate">
+                <Anchor side="Top" relative="$parent/LadderButton" pos="Max" offset="3"/>
+                <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+                <Width val="1500"/>
+                <Height val="667"/>
+                <Visible val="false"/>
+            </Frame>
+
+            <Frame type="ScoreScreenStatsFrame" name="TabFrame4" template="ScoreScreenUnitsFrame/ScoreScreenUnitsFrameTemplate">
+                <Anchor side="Top" relative="$parent/LadderButton" pos="Max" offset="3"/>
+                <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+                <Width val="1500"/>
+                <Height val="667"/>
+                <Visible val="false"/>
+            </Frame>
+
+            <Frame type="ScoreScreenBuildOrderFrame" name="TabFrame5" template="ScoreScreenBuildOrderFrame/ScoreScreenBuildOrderFrameTemplate">
+                <Anchor side="Top" relative="$parent/LadderButton" pos="Max" offset="3"/>
+                <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+                <Width val="1500"/>
+                <Height val="667"/>
+                <Visible val="false"/>
+            </Frame>
+
+            <Frame type="ScoreScreenGraphsFrame" name="TabFrame6" template="ScoreScreenGraphsFrame/ScoreScreenGraphsFrameTemplate">
+                <Anchor side="Top" relative="$parent/LadderButton" pos="Max" offset="3"/>
+                <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+                <Width val="1500"/>
+                <Height val="667"/>
+                <Visible val="false"/>
+            </Frame>
+
+            <StateGroup name="TabsStateGroup">
+                <DefaultState val="DefaultState"/>
+                
+                <State name="LadderExperienceDisabled">
+                    <When type="Property" frame="$parent" LadderEnabled="false"/>
+                    <When type="Property" frame="$parent" ExperienceEnabled="false"/>
+                    <Action type="SetProperty" SelectedIndex="3"/>
+                </State>
+                
+                <State name="LadderDisabled">
+                    <When type="Property" frame="$parent" LadderEnabled="false"/>
+                    <Action type="SetProperty" SelectedIndex="2"/>
+                </State>
+
+                <State name="LadderEnabled">
+                    <When type="Property" frame="$parent" LadderEnabled="true"/>
+                    <Action type="SetProperty" SelectedIndex="1"/>
+                </State>
+                
+                <State name="DefaultState">
+                    <Action type="SetProperty" SelectedIndex="0"/>
+                </State>
+            </StateGroup>
+        </Frame>
+        
+        <Frame type="Frame" name="ErrorContainer">
+            <Anchor relative="$parent/BackgroundImage"/>
+        
+            <Frame type="Label" name="ErrorLabel">
+                <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+                <Style val="@Tournament_Title"/>
+                <Text val="@UI/ScreenScore/ErrorTitle"/>
+            </Frame>
+            
+            <Frame type="Label" name="MessageLabel">
+                <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+                <Style val="@Tournament_Subtitle"/>
+                <Text val="@UI/ScreenScore/ErrorMessage"/>
+            </Frame>
+        </Frame>
+
+        <!--
+            BOTTOM BUTTONS
+        -->
+
+        <Frame type="GlueButton" name="PlayAgainButton" template="StandardBattlenetTemplates/BattlenetAlternateButtonTemplate">
+            <Anchor side="Bottom" relative="$parent/BackgroundImage" pos="Max" offset="-40"/>
+            <Anchor side="Left" relative="$parent/BackgroundImage" pos="Min" offset="38"/>
+            <Width val="310"/>
+            <Text val="@UI/ScreenScore/PlayAgain"/>
+        </Frame>
+
+        <Frame type="GlueButton" name="WatchReplayButton" template="StandardBattlenetTemplates/BattlenetStandardButtonTemplate">
+            <Anchor side="Bottom" relative="$parent/PlayAgainButton" pos="Max" offset="0"/>
+            <Anchor side="Left" relative="$parent/PlayAgainButton" pos="Max" offset="5"/>
+            <Width val="310"/>
+            <Text val="@UI/ScreenScore/WatchReplay"/>
+        </Frame>
+
+        <Frame type="Button" name="RenameReplayButton" template="StandardBattlenetTemplates/BattlenetStandardButtonTemplate">
+            <Anchor side="Bottom" relative="$parent/WatchReplayButton" pos="Max" offset="0"/>
+            <Anchor side="Left" relative="$parent/WatchReplayButton" pos="Max" offset="5"/>
+            <Width val="310"/>
+            <Text val="@UI/ScreenScore/RenameReplay"/>
+        </Frame>
+
+        <Frame type="Button" name="CloseButton" template="StandardBattlenetTemplates/CloseButton">
+            <Anchor side="Top" relative="$parent/BackgroundImage" pos="Min" offset="11"/>
+            <Anchor side="Right" relative="$parent/BackgroundImage" pos="Max" offset="-14"/>
+            <Shortcut val="@UI/ScreenNavigationBack_Hotkey"/>
+            <ClickSound val="@UI_BnetDefaultClick"/>
+        </Frame>
+
+        <Frame type="Frame" name="IdleSpinner" template="StandardBattlenetTemplates/IdleSpinnerTemplate">
+            <Anchor relative="$parent/BackgroundImage"/>
+        </Frame>
+
+        <StateGroup name="ScreenScoreStateGroup">
+            <State name="Loading">
+                <When type="AnimationState" frame="$this" ScreenScoreState="Loading"/>
+                <Action type="SetProperty" frame="ErrorContainer" Visible="false"/>
+                <Action type="SetProperty" frame="HeaderContainer" Visible="false"/>
+                <Action type="SetProperty" frame="TabControl" Visible="false"/>
+                <Action type="SetProperty" frame="PlayAgainButton" Visible="false"/>
+                <Action type="SetProperty" frame="WatchReplayButton" Visible="false"/>
+                <Action type="SetProperty" frame="RenameReplayButton" Visible="false"/>
+                <Action type="SetProperty" frame="IdleSpinner" Visible="true"/>
+                <Action type="SetProperty" frame="BackButton" Visible="false"/>
+            </State>
+
+            <State name="LoadedMatchHistory">
+                <When type="AnimationState" frame="$this" ScreenScoreState="Loaded"/>
+                <When type="Property" frame="$this" IsMatchHistory="true"/>
+                <Action type="SetProperty" frame="ErrorContainer" Visible="false"/>
+                <Action type="SetProperty" frame="HeaderContainer" Visible="true"/>
+                <Action type="SetProperty" frame="TabControl" Visible="true"/>
+                <Action type="SetProperty" frame="PlayAgainButton" Visible="false"/>
+                <Action type="SetProperty" frame="WatchReplayButton" Visible="false"/>
+                <Action type="SetProperty" frame="RenameReplayButton" Visible="false"/>
+                <Action type="SetProperty" frame="IdleSpinner" Visible="false"/>
+                <Action type="SetProperty" frame="BackButton" Visible="true"/>
+            </State>
+            
+            <State name="Loaded">
+                <When type="AnimationState" frame="$this" ScreenScoreState="Loaded"/>
+                <Action type="SetProperty" frame="ErrorContainer" Visible="false"/>
+                <Action type="SetProperty" frame="HeaderContainer" Visible="true"/>
+                <Action type="SetProperty" frame="TabControl" Visible="true"/>
+                <Action type="SetProperty" frame="PlayAgainButton" Visible="true"/>
+                <Action type="SetProperty" frame="WatchReplayButton" Visible="true"/>
+                <Action type="SetProperty" frame="RenameReplayButton" Visible="true"/>
+                <Action type="SetProperty" frame="IdleSpinner" Visible="false"/>
+                <Action type="SetProperty" frame="BackButton" Visible="false"/>
+            </State>
+
+            <State name="Error">
+                <When type="AnimationState" frame="$this" ScreenScoreState="Error"/>
+                <Action type="SetProperty" frame="ErrorContainer" Visible="true"/>
+                <Action type="SetProperty" frame="HeaderContainer" Visible="false"/>
+                <Action type="SetProperty" frame="TabControl" Visible="false"/>
+                <Action type="SetProperty" frame="PlayAgainButton" Visible="false"/>
+                <Action type="SetProperty" frame="WatchReplayButton" Visible="false"/>
+                <Action type="SetProperty" frame="RenameReplayButton" Visible="false"/>
+                <Action type="SetProperty" frame="IdleSpinner" Visible="false"/>
+                <Action type="SetProperty" frame="BackButton" Visible="false"/>
+            </State>
+        </StateGroup>
+    </Frame>
+</Desc>

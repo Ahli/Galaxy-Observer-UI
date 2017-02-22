@@ -1,0 +1,723 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<Desc>
+    <DescFlags val="Locked"/>
+    
+    <Animation name="OfflineDisabledAnimation">
+        <Event event="PlayOffline" action="Reset" frame="$parent/$parent"/>
+        <Event event="PlayOffline" action="Play" frame="$parent/$parent"/>
+        <Event event="PlayOnline" action="Reset" frame="$parent/$parent"/>
+        <Event event="PlayOnline" action="Stop" frame="$parent/$parent"/>
+
+        <Controller type="Enabled" end="Pause">
+            <Key type="Bool" time="0" value="false"/>
+        </Controller>
+
+        <Controller type="Tooltip" end="Pause">
+            <Key type="Text" time="0" text="@UI/OfflineDisabledTooltip"/>
+        </Controller>
+    </Animation>
+
+    <Frame type="ScreenForegroundSC2" name="ScreenForegroundSC2">
+        <Anchor relative="$parent"/>
+        <RenderPriority val="3200"/>
+        <Frame type="LogMessagePanel" name="LogMessagePanel" template="LogMessagePanel/LogMessagePanelTemplate">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="130"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="10"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="-100"/>
+            <Height val="230"/>
+        </Frame>
+
+        <Frame type="TrophyCollectionFrame" name="TrophyCollectionFrame" template="TrophyCollectionFrame/TrophyCollectionFrameTemplate">
+            <Anchor side="Top" relative="$parent" pos="Mid" offset="-390"/>
+            <Anchor side="Left" relative="$parent" pos="Mid" offset="-366"/>
+            <Width val="1117"/>
+            <Height val="801"/>
+
+            <StateGroup name="TrophyCollectionVisibleState">
+                <DefaultState val="DefaultState"/>
+                
+                <State name="TrophyCollectionStateEmpty">
+                    <When type="AnimationState" DefaultState="Empty"/>
+                    <Action type="SetProperty" Visible="false"/>
+                </State>
+
+                <State name="TrophyCollectionStateHideForeground">
+                    <When type="AnimationState" frame="$parent" ShowForeground="NotVisible"/>
+                    <Action type="SetProperty" Visible="false"/>
+                </State>
+
+                <State name="DefaultState">
+                    <Action type="SetProperty" Visible="true"/>
+                </State>
+            </StateGroup>
+        </Frame>
+
+        <Frame type="BattleMapProfilePanel" name="MapProfilePanel" template="BattleMapProfilePanel/BattleMapProfilePanelTemplate">
+            <Anchor relative="$parent"/>
+            <Visible val="false"/>
+
+            <Animation name="Show">
+                <Event event="OnHidden" action="Reset,Stop" frame="$this"/>
+                <Event event="Show" action="DirectionForward,Play" frame="$this"/>
+                <Event event="Hide" action="Reset,Stop" frame="$this"/>
+                <Event event="OnClick" action="Reset,Stop" frame="CloseButton"/>
+                <Event event="ToonOffline" action="Reset,Stop" frame="$parent"/>
+
+                <Controller type="Visibility" end="Pause">
+                    <Key type="Bool" time="0.000" value="false"/>
+                    <Key type="Bool" time="0.001" value="true"/>
+                    <Key type="Bool" time="0.175" value="true"/>
+                </Controller>
+
+                <Controller type="Fade" end="Pause">
+                    <Key type="Curve" time="0.000" value="0" out="Slow"/>
+                    <Key type="Curve" time="0.175" value="255" in="Auto"/>
+                </Controller>
+            </Animation>
+        </Frame>
+
+        <Frame type="MatchmakingInvitePanel" name="MatchmakingInvitePanel" template="MatchmakingInvitePanel/MatchmakingInvitePanelTemplate">
+            <Anchor relative="$parent"/>
+        </Frame>
+
+        <Frame type="CustomGameInvitePanel" name="CustomGameInvitePanel" template="CustomGameInvitePanel/CustomGameInvitePanelTemplate">
+            <Anchor relative="$parent"/>
+        </Frame>
+
+        <StateGroup name="ShowForegroundStateGroup">
+            <State name="ShowForegroundState">
+                <When type="AnimationState" frame="$this" ShowForeground="Visible"/>
+                <Action type="SetProperty" frame="SocialContainer" Visible="true"/>
+            </State>
+
+            <State name="HideForegroundState">
+                <When type="AnimationState" frame="$this" ShowForeground="NotVisible"/>
+                <Action type="SetProperty" frame="SocialContainer" Visible="false"/>
+                <Action type="SendEvent" frame="MapProfilePanel" event="Hide"/>
+            </State>
+        </StateGroup>
+
+        <Frame type="Frame" name="SocialContainer">
+            <Handle val="ScreenForegroundSC2_SocialContainer"/>
+            <Anchor relative="$parent"/>
+
+            <!-- This control is here just to block auto-focusing the chat panel when the flash frame unlocks -->
+            <Frame type="Control" name="HitBlocker">
+                <Anchor relative="$parent"/>
+                <AcceptsMouse val="false"/>
+                <RejectsFocus val="false"/>
+            </Frame>
+
+            <Frame type="Button" Name="ExtendedExperienceCloseButton" template="MenuPanel/MenuPanelButtonTemplate">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                <AcceptsMouse val="false"/>
+                <Alpha val="0"/>
+                <Visible val="false"/>
+                <Shortcut val="@UI/ScreenNavigationBack_Hotkey"/>
+            </Frame>
+            
+            <Frame type="BlurFrame" name="MenuButtonBlur">
+                <Anchor side="Left" relative="$parent/MenuButton" pos="Min" offset="8"/>
+                <Anchor side="Top" relative="$parent/MenuButton" pos="Min" offset="8"/>
+                <Anchor side="Right" relative="$parent/MenuButton" pos="Max" offset="-8"/>
+                <Anchor side="Bottom" relative="$parent/MenuButton" pos="Max" offset="-8"/>
+                <BlurAmount val=".3"/>
+
+                <Frame type="Image" name="LowImage">
+                    <Anchor relative="$parent" offset="0"/>
+                    <Color val="0,0,0"/>
+                    <Alpha val="150"/>
+                </Frame>
+            </Frame>
+            
+            <Frame type="BlurFrame" name="GlueClockBlur">
+                <Anchor side="Left" relative="$parent/GlueClock" pos="Min" offset="8"/>
+                <Anchor side="Top" relative="$parent/GlueClock" pos="Min" offset="8"/>
+                <Anchor side="Right" relative="$parent/GlueClock" pos="Max" offset="-8"/>
+                <Anchor side="Bottom" relative="$parent/GlueClock" pos="Max" offset="-8"/>
+                <BlurAmount val=".3"/>
+
+                <Frame type="Image" name="LowImage">
+                    <Anchor relative="$parent" offset="0"/>
+                    <Color val="0,0,0"/>
+                    <Alpha val="150"/>
+                </Frame>
+            </Frame>
+            
+            <Frame type="BlurFrame" name="SocialButtonBlur">
+                <Anchor side="Left" relative="$parent/SocialButton" pos="Min" offset="8"/>
+                <Anchor side="Top" relative="$parent/SocialButton" pos="Min" offset="8"/>
+                <Anchor side="Right" relative="$parent/SocialButton" pos="Max" offset="-8"/>
+                <Anchor side="Bottom" relative="$parent/SocialButton" pos="Max" offset="-8"/>
+                <BlurAmount val=".3"/>
+
+                <Frame type="Image" name="LowImage">
+                    <Anchor relative="$parent" offset="0"/>
+                    <Color val="0,0,0"/>
+                    <Alpha val="150"/>
+                </Frame>
+            </Frame>
+
+            <Frame type="BlurFrame" name="ClubListButtonBlur">
+                <Anchor side="Left" relative="$parent/ClubListButton" pos="Min" offset="8"/>
+                <Anchor side="Top" relative="$parent/ClubListButton" pos="Min" offset="8"/>
+                <Anchor side="Right" relative="$parent/ClubListButton" pos="Max" offset="-8"/>
+                <Anchor side="Bottom" relative="$parent/ClubListButton" pos="Max" offset="-8"/>
+                <BlurAmount val=".3"/>
+
+                <Frame type="Image" name="LowImage">
+                    <Anchor relative="$parent" offset="0"/>
+                    <Color val="0,0,0"/>
+                    <Alpha val="150"/>
+                </Frame>
+            </Frame>
+            
+            <Frame type="BlurFrame" name="ChatEntryBlur">
+                <Anchor side="Left" relative="$parent/ChatPanel/ChatEditBoxFrame" pos="Min" offset="8"/>
+                <Anchor side="Top" relative="$parent/ChatPanel/ChatEditBoxFrame" pos="Min" offset="8"/>
+                <Anchor side="Right" relative="$parent/ChatPanel/ChatEditBoxFrame" pos="Max" offset="-8"/>
+                <Anchor side="Bottom" relative="$parent/ChatPanel/ChatEditBoxFrame" pos="Max" offset="-8"/>
+                <BlurAmount val=".3"/>
+
+                <Frame type="Image" name="LowImage">
+                    <Anchor relative="$parent" offset="0"/>
+                    <Color val="0,0,0"/>
+                    <Alpha val="150"/>
+                </Frame>
+            </Frame>
+
+            <Frame type="Button" Name="MenuButton" template="MenuPanel/MenuPanelButtonTemplate">
+                <Handle val="ScreenForegroundSC2_SocialContainer_MenuButton"/>
+                <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+                <Anchor side="Right" relative="$parent/GlueClock" pos="Min" offset="7"/>
+                <Text val="@UI/Menu"/>
+                <Shortcut val="@UI/ScreenForegroundToggleMenu_Hotkey"/>
+                <Shortcut val="@UI/ScreenForegroundToggleMenuAlternate_Hotkey"/>
+            </Frame>
+
+            <Frame type="GlueClock" Name="GlueClock" template="StandardBattlenetTemplates/StandardGlueClock">
+                <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+                <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+            </Frame>
+
+            <Frame type="Button" Name="ClubListButton" template="ClubListPanel/ClubListPanelButtonTemplate">
+                <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+                <Anchor side="Right" relative="$parent/MenuButton" pos="Min" offset="7"/>
+                <Shortcut val="@UI/ScreenForegroundToggleClub_Hotkey"/>
+                <Shortcut val="@UI/ScreenForegroundToggleClubAlternate_Hotkey"/>
+                
+                <Animation name="OfflineDisabled" template="ScreenForegroundSC2/OfflineDisabledAnimation"/>
+            </Frame>
+            
+            <Frame type="AspectRatioFrame" name="Chat16x9Anchor">
+                <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+                <Anchor side="Right" relative="$parent" pos="Max" offset="-753"/>
+                <Width val="213"/>
+                <CollapseLayout val="true"/>
+                <MinVisibleAspectRatio val="1.75"/>
+            </Frame>
+
+            <Frame type="ChatPanel" name="ChatPanel" template="ChatPanel/ChatPanelTemplate">
+                <Anchor side="Left" relative="$parent/Chat16x9Anchor" pos="Min" offset="0"/>
+                <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+                <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+
+                <Animation name="MaximizeButtonClick">
+                    <Event event="OnClick" action="DirectionForward,Play" frame="ChatManagerPanel/MaximizeChatButton"/>
+                    <Event event="OnClick" action="DirectionReverse,Play" frame="ChatManagerPanel/MinimizeChatButton"/>
+
+                    <Controller type="Property" property="Maximized" end="Pause">
+                        <Key type="Property" time="0.00" value="false"/>
+                        <Key type="Property" time="0.01" value="true"/>
+                    </Controller>
+                </Animation>
+                
+                <StateGroup name="MaximizeButtonStateGroup">
+                    <State name="MaximizedState">
+                        <When type="Property" frame="$this" Maximized="true"/>
+                        <Action type="SetProperty" frame="ChatManagerPanel/MaximizeChatButton" Visible="false"/>
+                        <Action type="SetProperty" frame="ChatManagerPanel/MinimizeChatButton" Visible="true"/>
+                        <Action type="SendEvent" frame="$this" event="MaximizeChat"/>
+                    </State>
+
+                    <State name="MinimizedState">
+                        <When type="Property" frame="$this" Maximized="false"/>
+                        <Action type="SetProperty" frame="ChatManagerPanel/MaximizeChatButton" Visible="true"/>
+                        <Action type="SetProperty" frame="ChatManagerPanel/MinimizeChatButton" Visible="false"/>
+                        <Action type="SendEvent" frame="$this" event="MinimizeChat"/>
+                    </State>
+                </StateGroup>
+
+                <Animation name="MaximizeChat">
+                    <Event event="MaximizeChat" action="DirectionForward,Play"/>
+                    <Event event="MinimizeChat" action="DirectionReverse,Play"/>
+                    <Event event="EditBoxFocusLostImmediate" action="Reset,Stop"/>
+
+                    <Controller type="Anchor" end="Pause" side="Top" relative="true">
+                        <Key type="Curve" time="0.0" value="0" out="Step"/>
+                        <Key type="Curve" time="0.1" value="-426" out="Step"/>
+                    </Controller>
+
+                    <Controller type="Event" end="Pause">
+                        <Key type="Event" time="0.0" event="ChatMaximizeStart"/>
+                        <Key type="Event" time="0.1" event="ChatMaximizeEnd"/>
+                    </Controller>
+                </Animation>
+
+                <!-- The Fade Lock Animation -->
+                
+                <Animation name="LockFadeButtonClick">
+                    <Event event="OnClick" action="DirectionForward,Play" frame="ChatManagerPanel/LockFadeButton"/>
+                    <Event event="OnClick" action="DirectionReverse,Play" frame="ChatManagerPanel/UnlockFadeButton"/>
+
+                    <Controller type="Property" property="FadeLocked" end="Pause">
+                        <Key type="Property" time="0.00" value="false"/>
+                        <Key type="Property" time="0.01" value="true"/>
+                    </Controller>
+                </Animation>
+
+                <StateGroup name="LockFadeButtonStateGroup">
+                    <State name="FadeLockedState">
+                        <When type="Property" frame="$this" FadeLocked="true"/>
+                        <Action type="SetProperty" frame="ChatManagerPanel/LockFadeButton" Visible="false"/>
+                        <Action type="SetProperty" frame="ChatManagerPanel/UnlockFadeButton" Visible="true"/>
+                    </State>
+
+                    <State name="FadeUnlockedState">
+                        <When type="Property" frame="$this" FadeLocked="false"/>
+                        <Action type="SetProperty" frame="ChatManagerPanel/LockFadeButton" Visible="true"/>
+                        <Action type="SetProperty" frame="ChatManagerPanel/UnlockFadeButton" Visible="false"/>
+                    </State>
+                </StateGroup>
+
+                <Frame type="ChatManagerPanel" name="ChatManagerPanel">
+                    <Frame type="Button" name="MaximizeChatButton" template="StandardBattlenetTemplates/BattlenetIconButtonTemplate">
+                        <Anchor side="Right" relative="$parent" pos="Max" offset="-13"/>
+                        <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+                        <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+                        <Width val="36"/>
+                        <Height val="34"/>
+
+                        <Frame type="Image" name="NormalImage">
+                            <Texture val="@UI/Glues_Icons_Fullscreen"/>
+                        </Frame>
+
+                        <Frame type="Image" name="HoverImage">
+                            <Texture val="@UI/Glues_Icons_Fullscreen_Hover"/>
+                        </Frame>
+                    </Frame>
+
+                    <Frame type="Button" name="MinimizeChatButton" template="StandardBattlenetTemplates/BattlenetIconButtonTemplate">
+                        <Anchor relative="$parent/MaximizeChatButton"/>
+                        <Visible val="false"/>
+
+                        <Frame type="Image" name="NormalImage">
+                            <Texture val="@UI/Glues_Icons_Minimize"/>
+                        </Frame>
+
+                        <Frame type="Image" name="HoverImage">
+                            <Texture val="@UI/Glues_Icons_Minimize_Hover"/>
+                        </Frame>
+                    </Frame>
+                    
+                    <Frame type="Button" name="LockFadeButton" template="StandardBattlenetTemplates/BattlenetIconButtonTemplate">
+                        <Anchor side="Right" relative="$parent/MinimizeChatButton" pos="Min" offset="-2"/>
+                        <Anchor side="Top" relative="$parent/MinimizeChatButton" pos="Min" offset="1"/>
+                        <Width val="32"/>
+                        <Height val="31"/>
+
+                        <Frame type="Image" name="NormalImage">
+                            <Texture val="@UI/Glues_Icons_Pin"/>
+                        </Frame>
+
+                        <Frame type="Image" name="HoverImage">
+                            <Texture val="@UI/Glues_Icons_Pin_Hover"/>
+                        </Frame>
+                    </Frame>
+
+                    <Frame type="Button" name="UnlockFadeButton" template="StandardBattlenetTemplates/BattlenetIconButtonTemplate">
+                        <Anchor relative="$parent/LockFadeButton"/>
+                        <Visible val="false"/>
+
+                        <Frame type="Image" name="NormalImage">
+                            <Texture val="@UI/Glues_Icons_Unpin"/>
+                        </Frame>
+
+                        <Frame type="Image" name="HoverImage">
+                            <Texture val="@UI/Glues_Icons_Unpin_Hover"/>
+                        </Frame>
+                    </Frame>
+                </Frame>
+
+                <!-- Align edit box with rest of buttons -->
+                <Frame type="Frame" name="ChatEditBoxFrame">
+                    <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                    <Anchor side="Right" relative="$parent/$parent/SocialButton" pos="Min" offset="7"/>
+                    <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+                </Frame>
+
+                <Frame type="Frame" name="HitTestFrame">
+                    <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                    <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                    <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+                    <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+
+                    <!-- Hacky anim to change the chat panel hit area when hovered over the emoticon button -->
+                    <Animation name="Unhovered">
+                        <Event event="OnMouseExit" action="Reset,Play" frame="$parent/$parent/EmoticonButton"/>
+                        <Event event="ItemMouseExit" action="Reset,Play" frame="$parent/$parent/EmoticonPanel"/>
+                        <Event event="OnMouseExit" action="Reset,Play" frame="$parent/$parent/EmoticonPanel/TileList"/>
+                        <Event event="Hovered" action="Reset,Stop" frame="$this"/>
+
+                        <Controller type="Event" end="Pause">
+                            <Key type="Event" time="0.0" event="NoOp"/>
+                            <Key type="Event" time="0.1" event="Unhovered"/>
+                        </Controller>
+                    </Animation>
+                    
+                    <Animation name="Hovered">
+                        <Event event="OnMouseEnter" action="Reset,Play" frame="$parent/$parent/EmoticonButton"/>
+                        <Event event="ItemMouseEnter" action="Reset,Play" frame="$parent/$parent/EmoticonPanel"/>
+                        <Event event="OnMouseEnter" action="Reset,Play" frame="$parent/$parent/EmoticonPanel/TileList"/>
+
+                        <Controller type="Event" end="Pause">
+                            <Key type="Event" time="0.0" event="Hovered"/>
+                        </Controller>
+                    </Animation>
+
+                    <Animation name="OnHoverList">
+                        <Event event="Hovered" action="Play" frame="$this"/>
+                        <Event event="Unhovered" action="Reset,Stop" frame="$this"/>
+
+                        <Controller type="Anchor" side="Left" relative="True" relativeFrame="$parent/$parent/EmoticonPanel" pos="Min" end="Pause">
+                            <Key type="Curve" time="0.0" value="0" out="Auto"/>
+                        </Controller>
+
+                        <Controller type="Anchor" side="Top" relative="True" relativeFrame="$parent/$parent/EmoticonPanel" pos="Min" end="Pause">
+                            <Key type="Curve" time="0.0" value="0" out="Auto"/>
+                        </Controller>
+                    </Animation>
+                </Frame>
+            </Frame>
+
+            <Frame type="EmoticonSelectionPanel" name="EmoticonPanel" template="EmoticonSelectionPanel/EmoticonSelectionPanelTemplate">
+                <Anchor side="Bottom" relative="$parent/EmoticonButton" pos="Min" offset="5"/>
+                <Anchor side="Right" relative="$parent/ChatPanel" pos="Min" offset="7"/>
+                <Visible val="false"/>
+                
+                <Animation name="ToggleVisibility">
+                    <Event event="FadeIn" action="DirectionForward,Play" frame="$this"/>
+                    <Event event="FadeOut" action="DirectionReverse,Play" frame="$this"/>
+
+                    <Controller type="Fade" end="Pause">
+                        <Key type="Curve" time="0.0" value="0" out="Auto"/>
+                        <Key type="Curve" time="0.2" value="255" out="Auto"/>
+                    </Controller>
+                    
+                    <Controller type="Visibility" end="Pause">
+                        <Key type="Bool" time="0" value="False"/>
+                        <Key type="Bool" time="0.01" value="True"/>
+                        <Key type="Bool" time="0.2" value="True"/>
+                    </Controller>
+                </Animation>
+
+                <StateGroup name="ToggledStateGroup">
+                    <State name="VisibleState">
+                        <When type="Property" frame="$parent/EmoticonButton" Toggled="true"/>
+                        <Action type="SendEvent" frame="$this" event="FadeIn"/>
+                    </State>
+                    
+                    <State name="NotVisibleState">
+                        <When type="Property" frame="$parent/EmoticonButton" Toggled="false"/>
+                        <Action type="SendEvent" frame="$this" event="FadeOut"/>
+                    </State>
+                </StateGroup>
+            </Frame>
+
+            <!-- This property bind actually inserts the selected emoticon into the chat edit box -->
+            <Frame type="PropertyBind" name="BindEmoticon">
+                <Anchor relative="$parent/EmoticonPanel"/>
+                <Source frame="$parent/EmoticonPanel" property="SelectedEmoticon"/>
+                <Target frame="$parent/ChatPanel" property="InsertEmoticon"/>
+            </Frame>
+
+            <Frame type="Button" name="EmoticonButton"  template="EmoticonSelectionPanel/EmoticonButtonTemplate">
+                <Anchor side="Bottom" relative="$parent/ChatPanel" pos="Max" offset="0"/>
+                <Anchor side="Right" relative="$parent/ChatPanel" pos="Min" offset="7"/>
+                <Toggleable val="true"/>
+                
+                <Animation name="UntoggleAnim">
+                    <Event event="OnFocusLost" action="Restart,Play" frame="$parent/ChatPanel/ChatEditBoxFrame/ChatEditBox"/>
+                    
+                    <Controller name="Name1" type="Property" property="Toggled" end="Pause">
+                        <Key type="Property" time="0" value="false"/>
+                    </Controller>
+                </Animation>
+
+                <Animation name="GainChatFocusAnim">
+                    <Event event="OnClick" action="Restart,Play" frame="$this"/>
+
+                    <Controller name="Name1" type="Property" property="Focused" frame="$parent/ChatPanel/ChatEditBoxFrame/ChatEditBox" end="Pause">
+                        <Key type="Property" time="0" value="true"/>
+                    </Controller>
+                </Animation>
+            </Frame>
+
+            <Frame type="SocialPanel" name="SocialPanel" template="SocialPanel/SocialPanelTemplate">
+                <Anchor side="Bottom" relative="$parent/$parent" pos="Max" offset="-56"/>
+                <Anchor side="Right" relative="$parent/$parent" pos="Max" offset="0"/>
+                <Height val="910"/>
+                <Width val="422"/>
+                <Visible val="false"/>
+
+                <Animation name="ToggleSocialPanelVisibility">
+                    <Event event="OnClick" action="DirectionForward" frame="CloseButton"/>
+                    <Event event="OnClick" action="Play" frame="CloseButton"/>
+                    <Event event="OnClick" action="ToggleDirection" frame="$parent/SocialButton"/>
+                    <Event event="OnClick" action="Play" frame="$parent/SocialButton"/>
+                    <Event event="OnClick" action="DirectionForward" frame="$parent/ClubListButton"/>
+                    <Event event="OnClick" action="Play" frame="$parent/ClubListButton"/>
+                    <Event event="HideSocial" action="DirectionForward" frame="$parent/$parent"/>
+                    <Event event="HideSocial" action="Play" frame="$parent/$parent"/>
+                    <Event event="Hide" action="DirectionForward"/>
+                    <Event event="Hide" action="Play"/>
+                    <Controller name="Name1" type="Visibility" end="Pause">
+                        <Key type="Bool" time="0" value="true"/>
+                        <Key type="Bool" time=".01" value="false"/>
+                    </Controller>
+                </Animation>
+            </Frame>
+
+            <Frame type="ClubListPanel" name="ClubListPanel" template="ClubListPanel/ClubListPanelTemplate">
+                <Anchor side="Bottom" relative="$parent/$parent" pos="Max" offset="-56"/>
+                <Anchor side="Right" relative="$parent/$parent" pos="Max" offset="0"/>-->
+                <!--<Anchor side="Right" relative="$parent/$parent" pos="Max" offset="-425"/>-->
+                <Height val="910"/>
+                <Width val="422"/>
+                <Visible val="false"/>
+
+                <Animation name="ToggleClubListPanelVisibility">
+                    <Event event="OnClick" action="DirectionForward" frame="CloseButton"/>
+                    <Event event="OnClick" action="Play" frame="CloseButton"/>
+                    <Event event="OnClick" action="ToggleDirection" frame="$parent/ClubListButton"/>
+                    <Event event="OnClick" action="Play" frame="$parent/ClubListButton"/>
+                    <Event event="OnClick" action="DirectionForward" frame="$parent/SocialButton"/>
+                    <Event event="OnClick" action="Play" frame="$parent/SocialButton"/>
+                    <Event event="HideClubList" action="DirectionForward" frame="$parent/$parent"/>
+                    <Event event="HideClubList" action="Play" frame="$parent/$parent"/>
+                    <Event event="Hide" action="DirectionForward"/>
+                    <Event event="Hide" action="Play"/>
+                    <Controller name="Name1" type="Visibility" end="Pause">
+                        <Key type="Bool" time="0" value="true"/>
+                        <Key type="Bool" time=".01" value="false"/>
+                    </Controller>
+                </Animation>
+            </Frame>
+            
+            <Frame type="FriendsButton" Name="SocialButton" template="SocialPanel/SocialPanelButtonTemplate">
+                <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+                <Anchor side="Right" relative="$parent/ClubListButton" pos="Min" offset="7"/>
+                <Shortcut val="@UI/ScreenForegroundToggleSocial_Hotkey"/>
+
+                <Animation name="OfflineDisabled" template="ScreenForegroundSC2/OfflineDisabledAnimation"/>
+            </Frame>
+
+            <Frame type="Frame" name="IGRBenefitsPanel" template="IGRBenefitsPanel/IGRBenefitsPanelTemplate">
+                <Anchor side="Bottom" relative="$parent" pos="Max" offset="3"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="-1"/>
+
+                <Frame type="IGRBenefitsPanel" name="IGRBenefitHeaderPanel" template="IGRBenefitsPanel/IGRBenefitHeaderTemplate">
+                    <Frame type="Label" name="IGRBenefitTitle">
+                        <Visible val="False"/>
+                    </Frame>
+
+                    <Frame type="Label" name="IGRBenefitDescription">
+                        <Visible val="False"/>
+                    </Frame>
+                </Frame>
+            </Frame>
+
+            <Frame type="ToastNotificationPanel" name="ToastNotificationPanel" template="StandardBattlenetTemplates/ToastNotificationPanelTemplate">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="110"/>
+                <Anchor side="Right" relative="$parent" pos="Max" offset="-10"/>
+                <CollapseLayout val="true"/>
+            </Frame>
+
+            <Frame type="PartyInvitePanel" name="PartyInvitePanel" template="StandardBattlenetTemplates/PartyInvitePanel">
+                <Anchor side="Top" relative="$parent/ToastNotificationPanel" pos="Max" offset="5"/>
+                <Anchor side="Right" relative="$parent" pos="Max" offset="-15"/>
+
+                <Animation name="SlideIn">
+                    <Controller name="Move" type="Anchor" side="Left" relative="true" end="Pause">
+                        <Key type="Curve" time="0" value="412" out="Fast"/>
+                        <Key type="Curve" time="0.3" value="0" in="Fast"/>
+                    </Controller>
+                </Animation>
+            </Frame>
+
+            <!-- State group shows only one panel at a time in priority order -->
+            <StateGroup name="HoloPanelStateGroup">
+                <State name="CountdownState">
+                    <When type="AnimationState" frame="LobbyStatusPanel" LobbyStatus="Countdown"/>
+                    <Action type="SetProperty" frame="LobbyStatusPanel" visible="true"/>
+                    <Action type="SetProperty" frame="PartyReadyStatusPanel" visible="false"/>
+                    <Action type="SetProperty" frame="DownloadPanel" visible="false"/>
+                    <Action type="SetProperty" frame="MatchmakingSearchPanel" visible="false"/>
+                </State>
+
+                <State name="SearchState">
+                    <When type="AnimationState" frame="MatchmakingSearchPanel" SearchState="Show"/>
+                    <Action type="SetProperty" frame="MatchmakingSearchPanel" visible="true"/>
+                    <Action type="SetProperty" frame="DownloadPanel" visible="false"/>
+                    <Action type="SetProperty" frame="PartyReadyStatusPanel" visible="false"/>
+                    <Action type="SetProperty" frame="LobbyStatusPanel" visible="false"/>
+                </State>
+
+                <State name="DownloadState">
+                    <When type="AnimationState" frame="DownloadPanel" DownloadState="Show"/>
+                    <Action type="SetProperty" frame="DownloadPanel" visible="true"/>
+                    <Action type="SetProperty" frame="MatchmakingSearchPanel" visible="false"/>
+                    <Action type="SetProperty" frame="PartyReadyStatusPanel" visible="false"/>
+                    <Action type="SetProperty" frame="LobbyStatusPanel" visible="false"/>
+                </State>
+
+                <State name="PartyReadyState">
+                    <When type="AnimationState" frame="PartyReadyStatusPanel" ReadyState="Show"/>
+                    <Action type="SetProperty" frame="PartyReadyStatusPanel" visible="true"/>
+                    <Action type="SetProperty" frame="DownloadPanel" visible="false"/>
+                    <Action type="SetProperty" frame="MatchmakingSearchPanel" visible="false"/>
+                    <Action type="SetProperty" frame="LobbyStatusPanel" visible="false"/>
+                </State>
+
+                <State name="LobbyJoiningState">
+                    <When type="AnimationState" frame="LobbyStatusPanel" LobbyStatus="Joining"/>
+                    <Action type="SetProperty" frame="LobbyStatusPanel" visible="true"/>
+                    <Action type="SetProperty" frame="PartyReadyStatusPanel" visible="false"/>
+                    <Action type="SetProperty" frame="DownloadPanel" visible="false"/>
+                    <Action type="SetProperty" frame="MatchmakingSearchPanel" visible="false"/>
+                </State>
+
+                <State name="LobbyMinimizedState">
+                    <When type="AnimationState" frame="LobbyStatusPanel" LobbyStatus="InLobby"/>
+                    <When type="AnimationState" frame="LobbyStatusPanel" MinimizedState="Minimized"/>
+                    <Action type="SetProperty" frame="LobbyStatusPanel" visible="true"/>
+                    <Action type="SetProperty" frame="PartyReadyStatusPanel" visible="false"/>
+                    <Action type="SetProperty" frame="DownloadPanel" visible="false"/>
+                    <Action type="SetProperty" frame="MatchmakingSearchPanel" visible="false"/>
+                </State>
+
+                <State name="ReadyHiddenState">
+                    <When type="AnimationState" frame="PartyReadyStatusPanel" ReadyState="Hide"/>
+                    <Action type="SetProperty" frame="MatchmakingSearchPanel" Visible="false"/>
+                    <Action type="SetProperty" frame="DownloadPanel" Visible="false"/>
+                    <Action type="SetProperty" frame="PartyReadyStatusPanel" Visible="false"/>
+                    <Action type="SetProperty" frame="LobbyStatusPanel" visible="false"/>
+                </State>
+                
+                <State name="DefaultState">
+                    <Action type="SetProperty" frame="MatchmakingSearchPanel" Visible="false"/>
+                    <Action type="SetProperty" frame="DownloadPanel" Visible="false"/>
+                    <Action type="SetProperty" frame="PartyReadyStatusPanel" Visible="false"/>
+                    <Action type="SetProperty" frame="LobbyStatusPanel" visible="false"/>
+                </State>
+            </StateGroup>
+
+            <Frame type="Frame" name="HolopanelSoundFrame">
+                <Anchor relative="$parent/LobbyStatusPanel"/>
+                <Visible val="false"/>
+                
+                <StateGroup name="HoloPanelStateGroup">
+                    <State name="SearchState">
+                        <When type="Property" frame="$parent/MatchmakingSearchPanel" Visible="true"/>
+                        <Action type="SetProperty" frame="$this" visible="true"/>
+                    </State>
+
+                    <State name="DownloadState">
+                        <When type="Property" frame="$parent/DownloadPanel" Visible="true"/>
+                        <Action type="SetProperty" frame="$this" visible="true"/>
+                    </State>
+
+                    <State name="PartyReadyState">
+                        <When type="Property" frame="$parent/PartyReadyStatusPanel" Visible="true"/>
+                        <Action type="SetProperty" frame="$this" visible="true"/>
+                    </State>
+
+                    <State name="LobbyStatusState">
+                        <When type="Property" frame="$parent/LobbyStatusPanel" Visible="true"/>
+                        <Action type="SetProperty" frame="$this" visible="true"/>
+                    </State>
+                </StateGroup>
+
+                <Animation name="ShowSound">
+                    <Event event="OnShown" frame="$this" action="DirectionForward,Play"/>
+                    <Event event="OnHidden" frame="$this" action="DirectionReverse,Play"/>
+
+                    <Controller type="Sound" end="Pause">
+                        <Key type="Sound" time="0" sound="@UI_BnetSearchTransition" direction="Forward"/>
+                        <Key type="Sound" time="0.5" sound="@UI_BnetSearchClose" direction="Reverse"/>
+                        <Key type="Sound" time="0.75" sound=""/>
+                    </Controller>
+                </Animation>
+            </Frame>
+
+            <Frame type="MatchmakingSearchPanel" name="MatchmakingSearchPanel" template="MatchmakingSearchPanel/MatchmakingSearchPanelTemplate">
+                <Anchor side="Bottom" relative="$parent" pos="Max" offset="52"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="84"/>
+                <Visible val="false"/>
+            </Frame>
+
+            <Frame type="DownloadPanel" name="DownloadPanel" template="DownloadPanel/DownloadPanelTemplate">
+                <Anchor side="Bottom" relative="$parent/MatchmakingSearchPanel" pos="Max" offset="0"/>
+                <Anchor side="Left" relative="$parent/MatchmakingSearchPanel" pos="Min" offset="0"/>
+                <Visible val="false"/>
+            </Frame>
+
+            <Frame type="PartyReadyStatusPanel" name="PartyReadyStatusPanel" template="PartyReadyStatusPanel/PartyReadyStatusPanelTemplate">
+                <Anchor side="Bottom" relative="$parent/MatchmakingSearchPanel" pos="Max" offset="0"/>
+                <Anchor side="Left" relative="$parent/MatchmakingSearchPanel" pos="Min" offset="0"/>
+                <Visible val="false"/>
+            </Frame>
+
+            <Frame type="LobbyStatusPanel" name="LobbyStatusPanel" template="LobbyStatusPanel/LobbyStatusPanelTemplate">
+                <Anchor side="Bottom" relative="$parent/MatchmakingSearchPanel" pos="Max" offset="0"/>
+                <Anchor side="Left" relative="$parent/MatchmakingSearchPanel" pos="Min" offset="0"/>
+                <Visible val="false"/>
+            </Frame>
+            
+            <Frame type="MenuPanelSC2" name="MenuPanel" template="MenuPanel/MenuPanelTemplate">
+                <Handle val="ScreenForegroundSC2_SocialContainer_MenuPanel"/>
+                <Anchor relative="$parent"/>
+                <Visible val="false"/>
+                <Alpha val="0"/>
+
+                <Animation name="Show">
+                    <Event event="OnShown" action="DirectionReverse" frame="$parent/$parent"/>
+                    <Event event="ToonOffline" action="Reset" frame="$parent/$parent"/>
+                    <Event event="ToonOffline" action="Stop" frame="$parent/$parent"/>
+                    <Event event="ToonOffline" action="DirectionReverse" frame="$parent/$parent"/>
+                    <Event event="HideSocial" action="DirectionReverse" frame="$parent/$parent"/>
+                    <Event event="HideSocial" action="Play" frame="$parent/$parent"/>
+                    <Event event="OnClick" action="DirectionReverse" frame="$this/CloseButton"/>
+                    <Event event="OnClick" action="Play" frame="$this/CloseButton"/>
+                    <Event event="OnClick" action="ToggleDirection" frame="$parent/MenuButton"/>
+                    <Event event="OnClick" action="Play" frame="$parent/MenuButton"/>
+                    <Event event="HidePanel" action="Reset"/>
+                    <Event event="HidePanel" action="Stop"/>
+                    <Event event="HidePanel" action="DirectionReverse"/>
+                    
+                    <Controller name="Visibility" type="Visibility" end="Pause">
+                        <Key type="Bool" time="0.00" value="false"/>
+                        <Key type="Bool" time="0.01" value="true"/>
+                        <Key type="Bool" time="0.20" value="true"/>
+                    </Controller>
+
+                    <Controller type="Fade" end="Pause">
+                        <Key type="Curve" time="0.0" value="0" out="Auto"/>
+                        <Key type="Curve" time="0.2" value="255" out="Auto"/>
+                    </Controller>
+                </Animation>
+            </Frame>
+        </Frame>
+    </Frame>
+</Desc>

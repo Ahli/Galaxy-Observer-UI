@@ -1,0 +1,696 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<Desc>
+    <DescFlags val="Locked"/>
+
+    <Frame type="BattleMapScreenshotTileListItem" name="BattleMapScreenshotTileListItemTemplate">
+        <AcceptsMouse val="False"/>
+        
+        <Frame type="Image" name="ScreenshotImage">
+            <Anchor side="Top" relative="$parent/$parent" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent/$parent" pos="Mid" offset="0"/>
+            <Anchor side="Left" relative="$parent/$parent" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent/$parent" pos="Mid" offset="0"/>
+            <Width val="880"/>
+            <Height val="660"/>
+        </Frame>
+
+        <Frame type="Label" name="CaptionLabel">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="5"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="5"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="-5"/>
+            <Style val="@GlueLabel"/>
+            <Visible val="False"/>
+        </Frame>
+    </Frame>
+
+    <Frame type="CoopCampaignMutatorIconFrame" name="CoopCampaignMutatorIconFrameTemplate">
+        <Width val="100"/>
+        <Height val="100"/>
+        <AcceptsMouseTooltip val="true"/>
+        <Visible val="false"/>
+        <CollapseLayout val="false"/>
+
+        <Frame type="Image" name="Background">
+            <Anchor relative="$parent"/>
+            <Color val="255,0,255"/>
+            <Visible val="False"/>
+        </Frame>
+
+        <Frame type="BattleMapIcon" name="IconImage">
+            <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+            <Width val="72"/>
+            <Height val="72"/>
+            <AlphaMaskTexture val="@UI/SC2_UI_Coop_AbilityFrame_Mask"/>
+
+            <Frame type="Image" name="Image">
+                <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+                <Width val="62"/>
+                <Height val="62"/>
+            </Frame>
+        </Frame>
+        
+        <Frame type="Image" name="IconFrame">
+            <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+            <Width val="72"/>
+            <Height val="72"/>
+            <Texture val="@UI/SC2_UI_Coop_AbilityFrame"/>
+        </Frame>
+
+        <Frame type="Label" name="NameLabel">
+            <Anchor side="Top" relative="$parent/IconFrame" pos="Min" offset="3"/>
+            <Anchor side="Left" relative="$parent/IconImage" pos="Max" offset="14"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+            <Style val="@Coop_CommanderMutatorIndividualTitle"/>
+            <Visible val="False"/>
+        </Frame>
+
+        <Frame type="Label" name="DescriptionLabel">
+            <Anchor side="Top" relative="$parent/NameLabel" pos="Max" offset="0"/>
+            <Anchor side="Left" relative="$parent/IconImage" pos="Max" offset="14"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+            <Height val="45"/>
+            <Style val="@Coop_CommanderMutatorIndividualDescription"/>
+            <AcceptsMouseTooltip val="True"/>
+            <Options val="Ellipsis | TooltipIfTruncated"/>
+            <Visible val="False"/>
+        </Frame>
+
+        <Animation name="Show">
+            <Event event="Show" action="Reset,Play"/>
+            <Event event="Hide" action="Reset,Stop"/>
+
+            <Controller type="Visibility" end="Pause">
+                <Key type="Bool" time="0" value="true"/>
+            </Controller>
+        </Animation>
+    </Frame>
+    
+    <Frame type="Frame" name="CoopCampaignMutatorIconTooltipTemplate">
+        <Anchor side="Top" relative="$this/MutatorTitle" pos="Min" offset="-16"/>
+        <Width val="440"/>
+        <Visible val="false"/>
+        <RenderPriority val="800"/>
+        
+        <Frame type="Image" name="BackgroundImage">
+            <Anchor relative="$parent"/>
+            <TextureType val="NineSlice"/>
+            <Texture val="@UI/SC2_UI_Coop_Mutators_Badges_TooltipBG"/>
+        </Frame>
+        
+        <Frame type="Label" name="MutatorTitle">
+            <Anchor side="Bottom" relative="$parent/MutatorDescription" pos="Min" offset="-13"/>
+            <Anchor side="Left" relative="$parent/MutatorDescription" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent/MutatorDescription" pos="Max" offset="0"/>
+            <Style val="Coop_CommanderMutatorBountiesTooltipTitle"/>
+        </Frame>
+        
+        <Frame type="Label" name="MutatorDescription">
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="-20"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="20"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="-20"/>
+            <Style val="Coop_CommanderMutatorBountiesTooltipNote"/>
+            <Alpha val="255"/>
+        </Frame>
+    </Frame>
+
+    <Frame type="CoopCampaignMutatorInfoPanel" name="CoopCampaignMutatorInfoPanelTemplate">
+        <Width val="1600"/>
+        <Height val="740"/>
+        <RemainingTimeUnitThreshold val="1"/>
+        
+        <!-- This tooltip is just for blocking tooltips behind this panel -->
+        <Frame type="StandardTooltip" name="CoopCampaignTooltip">
+            <Frame type="Label" name="Label">
+                <Anchor relative="$parent"/>
+            </Frame>
+        </Frame>
+
+        <Frame type="Frame" name="InfoContainer">
+            <Anchor relative="$parent"/>
+
+            <Animation name="Show">
+                <Event event="Show" action="Reset,Play" frame="$parent"/>
+
+                <Controller type="Property" end="Pause" property="Toggled" frame="$parent/Button">
+                    <Key type="Property" time="0" value="true"/>
+                </Controller>
+            </Animation>
+
+            <Animation name="Hide">
+                <Event event="OnClick" action="Reset,Play" frame="CloseButton"/>
+                <Event event="Inactive" action="Reset,Play" frame="$parent"/>
+                <Event event="UISlideOut" action="Reset,Play" frame="$parent/$parent"/>
+
+                <Controller type="Property" end="Pause" property="Toggled" frame="$parent/Button">
+                    <Key type="Property" time="0" value="false"/>
+                </Controller>
+            </Animation>
+            
+            <StateGroup name="ShowStateGroup">
+                <State name="ToggledState">
+                    <When type="Property" frame="$parent/Button" Toggled="true"/>
+                    <Action type="SetProperty" frame="$this" Visible="true"/>
+                </State>
+                
+                <State name="UntoggledState">
+                    <When type="Property" frame="$parent/Button" Toggled="false"/>
+                    <Action type="SetProperty" frame="$this" Visible="false"/>
+                </State>
+            </StateGroup>
+            
+            <StateGroup name="LoadingStateGroup">
+                <State name="Loading1">
+                    <When type="AnimationState" frame="$parent" InfoPanelDescriptionState="Loading"/>
+                    <When type="AnimationState" frame="$parent" InfoPanelMapState="Loading"/>
+                    <When type="AnimationState" frame="$parent" InfoPanelState="Active"/>
+                    <Action type="SetProperty" frame="ScreenshotTileList" visible="False"/>
+                    <Action type="SetProperty" frame="MutatorOverlay" visible="False"/>
+                    <Action type="SetProperty" frame="TitleLabel" visible="False"/>
+                    <Action type="SetProperty" frame="DescriptionLabel" visible="False"/>
+                    <Action type="SetProperty" frame="MapLabel" visible="False"/>
+                    <Action type="SetProperty" frame="BadgeContainer" visible="False"/>
+                    <Action type="SetProperty" frame="Loading" visible="True"/>
+                </State>
+                
+                <State name="Loading2">
+                    <When type="AnimationState" frame="$parent" InfoPanelDescriptionState="Loaded"/>
+                    <When type="AnimationState" frame="$parent" InfoPanelMapState="Loading"/>
+                    <When type="AnimationState" frame="$parent" InfoPanelState="Active"/>
+                    <Action type="SetProperty" frame="ScreenshotTileList" visible="False"/>
+                    <Action type="SetProperty" frame="MutatorOverlay" visible="False"/>
+                    <Action type="SetProperty" frame="TitleLabel" visible="False"/>
+                    <Action type="SetProperty" frame="DescriptionLabel" visible="False"/>
+                    <Action type="SetProperty" frame="MapLabel" visible="False"/>
+                    <Action type="SetProperty" frame="BadgeContainer" visible="False"/>
+                    <Action type="SetProperty" frame="Loading" visible="True"/>
+                </State>
+                
+                <State name="Loading3">
+                    <When type="AnimationState" frame="$parent" InfoPanelDescriptionState="Loading"/>
+                    <When type="AnimationState" frame="$parent" InfoPanelMapState="Loaded"/>
+                    <When type="AnimationState" frame="$parent" InfoPanelState="Active"/>
+                    <Action type="SetProperty" frame="ScreenshotTileList" visible="False"/>
+                    <Action type="SetProperty" frame="MutatorOverlay" visible="False"/>
+                    <Action type="SetProperty" frame="TitleLabel" visible="False"/>
+                    <Action type="SetProperty" frame="DescriptionLabel" visible="False"/>
+                    <Action type="SetProperty" frame="MapLabel" visible="False"/>
+                    <Action type="SetProperty" frame="BadgeContainer" visible="False"/>
+                    <Action type="SetProperty" frame="Loading" visible="True"/>
+                </State>
+
+                <State name="Loaded">
+                    <When type="AnimationState" frame="$parent" InfoPanelDescriptionState="Loaded"/>
+                    <When type="AnimationState" frame="$parent" InfoPanelMapState="Loaded"/>
+                    <When type="AnimationState" frame="$parent" InfoPanelState="Active"/>
+                    <Action type="SetProperty" frame="ScreenshotTileList" visible="True"/>
+                    <Action type="SetProperty" frame="MutatorOverlay" visible="True"/>
+                    <Action type="SetProperty" frame="TitleLabel" visible="True"/>
+                    <Action type="SetProperty" frame="DescriptionLabel" visible="True"/>
+                    <Action type="SetProperty" frame="MapLabel" visible="True"/>
+                    <Action type="SetProperty" frame="BadgeContainer" visible="True"/>
+                    <Action type="SetProperty" frame="Loading" visible="False"/>
+                </State>
+                
+                <State name="Inactive">
+                    <When type="AnimationState" frame="$parent" InfoPanelState="Inactive"/>
+                    <Action type="SetProperty" frame="Loading" visible="False"/>
+                </State>
+            </StateGroup>
+            
+            <Frame type="Image" name="BackgroundImage">
+                <Anchor side="Top" relative="$parent" pos="Mid" offset="55"/>
+                <Anchor side="Bottom" relative="$parent" pos="Mid" offset="55"/>
+                <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+                <Width val="880"/>
+                <Height val="424"/>
+                <Texture val="@UI/SC2_UI_Coop_InfoPanel_Mask"/>
+                <TooltipFrame val="CoopCampaignTooltip"/>
+                <Color val="0,0,0"/>
+            </Frame>
+            
+            <Frame type="BattleMapGameInfoScreenshotTileList" name="ScreenshotTileList">
+                <Anchor side="Top" relative="$parent/BackgroundImage" pos="Mid" offset="0"/>
+                <Anchor side="Bottom" relative="$parent/BackgroundImage" pos="Mid" offset="0"/>
+                <Anchor side="Left" relative="$parent/BackgroundImage" pos="Mid" offset="0"/>
+                <Anchor side="Right" relative="$parent/BackgroundImage" pos="Mid" offset="0"/>
+                <Width val="880"/>
+                <Height val="424"/>
+                <AcceptsMouse val="False"/>
+                <AlphaMaskTexture val="@UI/SC2_UI_Coop_InfoPanel_Mask"/>
+
+                <Frame type="BattleMapScreenshotTileListItem" name="Item0" template="CoopCampaignMutatorInfoPanel/BattleMapScreenshotTileListItemTemplate">
+                    <Anchor side="Top" relative="$this/ScreenshotImage" pos="Min" offset="0"/>
+                    <Anchor side="Bottom" relative="$this/ScreenshotImage" pos="Max" offset="0"/>
+                    <Anchor side="Left" relative="$this/ScreenshotImage" pos="Min" offset="0"/>
+                    <Anchor side="Right" relative="$this/ScreenshotImage" pos="Max" offset="0"/>
+                </Frame>
+            </Frame>
+            
+            <Frame type="Image" name="MutatorOverlay">
+                <Anchor side="Top" relative="$parent/BackgroundImage" pos="Mid" offset="0"/>
+                <Anchor side="Bottom" relative="$parent/BackgroundImage" pos="Mid" offset="0"/>
+                <Anchor side="Left" relative="$parent/BackgroundImage" pos="Mid" offset="0"/>
+                <Anchor side="Right" relative="$parent/BackgroundImage" pos="Mid" offset="0"/>
+                <Width val="880"/>
+                <Height val="424"/>
+                <Texture val="@UI/SC2_UI_Coop_InfoPanel_Overlay_Mutator"/>
+            </Frame>
+            
+            <Frame type="Image" name="Border">
+                <Anchor side="Top" relative="$parent/BackgroundImage" pos="Mid" offset="0"/>
+                <Anchor side="Bottom" relative="$parent/BackgroundImage" pos="Mid" offset="0"/>
+                <Anchor side="Left" relative="$parent/BackgroundImage" pos="Mid" offset="0"/>
+                <Anchor side="Right" relative="$parent/BackgroundImage" pos="Mid" offset="0"/>
+                <Width val="898"/>
+                <Height val="439"/>
+                <Texture val="@UI/SC2_UI_Coop_InfoPanel_Border"/>
+            </Frame>
+
+            <Frame type="Button" name="CloseButton" template="StandardBattlenetTemplates/CloseButton">
+                <Anchor side="Top" relative="$parent/BackgroundImage" pos="Min" offset="1"/>
+                <Anchor side="Right" relative="$parent/BackgroundImage" pos="Max" offset="1"/>
+                <Shortcut val="@UI/ScreenNavigationBack_Hotkey"/>
+                <ClickSound val="@UI_ActionButtonSelect"/>
+            </Frame>
+            
+            <Frame type="Label" name="TitleLabel">
+                <Anchor side="Top" relative="$parent/BackgroundImage" pos="Min" offset="40"/>
+                <Anchor side="Left" relative="$parent/BackgroundImage" pos="Min" offset="41"/>
+                <Anchor side="Right" relative="$parent/BackgroundImage" pos="Max" offset="-52"/>
+                <Style val="@Coop_CommanderMutatorTitle"/>
+            </Frame>
+
+            <Frame type="Label" name="DescriptionLabel">
+                <Anchor side="Top" relative="$parent/TitleLabel" pos="Max" offset="12"/>
+                <Anchor side="Left" relative="$parent/TitleLabel" pos="Min" offset="0"/>
+                <Anchor side="Right" relative="$parent/BadgeContainer" pos="Min" offset="-40"/>
+                <Style val="@Coop_CommanderMutatorDescription"/>
+            </Frame>
+
+            <Frame type="Label" name="MapLabel">
+                <Anchor side="Bottom" relative="$parent/Icon0" pos="Min" offset="-1"/>
+                <Anchor side="Left" relative="$parent/Icon0" pos="Min" offset="2"/>
+                <Style val="@Coop_CommanderMutatorMapTitle"/>
+            </Frame>
+
+            <Frame type="CoopCampaignMutatorIconFrame" name="Icon0" template="CoopCampaignMutatorInfoPanel/CoopCampaignMutatorIconFrameTemplate">
+                <Anchor side="Bottom" relative="$parent/BackgroundImage" pos="Max" offset="-44"/>
+                <Anchor side="Left" relative="$parent/BackgroundImage" pos="Min" offset="36"/>
+                <AcceptsMouse val="True"/>
+            </Frame>
+            
+            <Frame type="Frame" name="IconTooltip0" template="CoopCampaignMutatorInfoPanel/CoopCampaignMutatorIconTooltipTemplate">
+                <Anchor side="Bottom" relative="$parent/Icon0" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Icon0" pos="Mid" offset="0"/>
+                
+                <Frame type="PropertyBind" name="BindMutatorTitle">
+                    <Anchor relative="$parent"/>
+                    <Enabled val="true"/>
+                    <Source frame="$parent/$parent/Icon0" property="NameText"/>
+                    <Target frame="$parent/MutatorTitle" property="Text"/>
+                </Frame>
+                
+                <Frame type="PropertyBind" name="BindMutatorDescription">
+                    <Anchor relative="$parent"/>
+                    <Enabled val="true"/>
+                    <Source frame="$parent/$parent/Icon0" property="DescriptionText"/>
+                    <Target frame="$parent/MutatorDescription" property="Text"/>
+                </Frame>
+                
+                <Animation name="Show">
+                    <Event event="OnMouseEnter" action="Reset,Play" frame="$parent/Icon0"/>
+                    <Event event="OnMouseExit" action="Reset,Stop" frame="$parent/Icon0"/>
+
+                    <Controller type="Visibility" end="Pause">
+                        <Key type="Bool" time="0" value="true"/>
+                    </Controller>
+                </Animation>
+            </Frame>
+
+            <Frame type="CoopCampaignMutatorIconFrame" name="Icon1" template="CoopCampaignMutatorInfoPanel/CoopCampaignMutatorIconFrameTemplate">
+                <Anchor side="Bottom" relative="$parent/Icon0" pos="Max" offset="0"/>
+                <Anchor side="Left" relative="$parent/Icon0" pos="Max" offset="-10"/>
+                <AcceptsMouse val="True"/>
+            </Frame>
+            
+            <Frame type="Frame" name="IconTooltip1" template="CoopCampaignMutatorInfoPanel/CoopCampaignMutatorIconTooltipTemplate">
+                <Anchor side="Bottom" relative="$parent/Icon1" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Icon1" pos="Mid" offset="0"/>
+                
+                <Frame type="PropertyBind" name="BindMutatorTitle">
+                    <Anchor relative="$parent"/>
+                    <Enabled val="true"/>
+                    <Source frame="$parent/$parent/Icon1" property="NameText"/>
+                    <Target frame="$parent/MutatorTitle" property="Text"/>
+                </Frame>
+                
+                <Frame type="PropertyBind" name="BindMutatorDescription">
+                    <Anchor relative="$parent"/>
+                    <Enabled val="true"/>
+                    <Source frame="$parent/$parent/Icon1" property="DescriptionText"/>
+                    <Target frame="$parent/MutatorDescription" property="Text"/>
+                </Frame>
+                
+                <Animation name="Show">
+                    <Event event="OnMouseEnter" action="Reset,Play" frame="$parent/Icon1"/>
+                    <Event event="OnMouseExit" action="Reset,Stop" frame="$parent/Icon1"/>
+
+                    <Controller type="Visibility" end="Pause">
+                        <Key type="Bool" time="0" value="true"/>
+                    </Controller>
+                </Animation>
+            </Frame>
+
+            <Frame type="CoopCampaignMutatorIconFrame" name="Icon2" template="CoopCampaignMutatorInfoPanel/CoopCampaignMutatorIconFrameTemplate">
+                <Anchor side="Bottom" relative="$parent/Icon1" pos="Max" offset="0"/>
+                <Anchor side="Left" relative="$parent/Icon1" pos="Max" offset="-10"/>
+                <AcceptsMouse val="True"/>
+            </Frame>
+            
+            <Frame type="Frame" name="IconTooltip2" template="CoopCampaignMutatorInfoPanel/CoopCampaignMutatorIconTooltipTemplate">
+                <Anchor side="Bottom" relative="$parent/Icon2" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Icon2" pos="Mid" offset="0"/>
+                
+                <Frame type="PropertyBind" name="BindMutatorTitle">
+                    <Anchor relative="$parent"/>
+                    <Enabled val="true"/>
+                    <Source frame="$parent/$parent/Icon2" property="NameText"/>
+                    <Target frame="$parent/MutatorTitle" property="Text"/>
+                </Frame>
+                
+                <Frame type="PropertyBind" name="BindMutatorDescription">
+                    <Anchor relative="$parent"/>
+                    <Enabled val="true"/>
+                    <Source frame="$parent/$parent/Icon2" property="DescriptionText"/>
+                    <Target frame="$parent/MutatorDescription" property="Text"/>
+                </Frame>
+                
+                <Animation name="Show">
+                    <Event event="OnMouseEnter" action="Reset,Play" frame="$parent/Icon2"/>
+                    <Event event="OnMouseExit" action="Reset,Stop" frame="$parent/Icon2"/>
+
+                    <Controller type="Visibility" end="Pause">
+                        <Key type="Bool" time="0" value="true"/>
+                    </Controller>
+                </Animation>
+            </Frame>
+
+            <Frame type="CoopCampaignMutatorIconFrame" name="Icon3" template="CoopCampaignMutatorInfoPanel/CoopCampaignMutatorIconFrameTemplate">
+                <Anchor side="Bottom" relative="$parent/Icon2" pos="Max" offset="0"/>
+                <Anchor side="Left" relative="$parent/Icon2" pos="Max" offset="-10"/>
+                <AcceptsMouse val="True"/>
+            </Frame>
+            
+            <Frame type="Frame" name="IconTooltip3" template="CoopCampaignMutatorInfoPanel/CoopCampaignMutatorIconTooltipTemplate">
+                <Anchor side="Bottom" relative="$parent/Icon3" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Icon3" pos="Mid" offset="0"/>
+                
+                <Frame type="PropertyBind" name="BindMutatorTitle">
+                    <Anchor relative="$parent"/>
+                    <Enabled val="true"/>
+                    <Source frame="$parent/$parent/Icon3" property="NameText"/>
+                    <Target frame="$parent/MutatorTitle" property="Text"/>
+                </Frame>
+                
+                <Frame type="PropertyBind" name="BindMutatorDescription">
+                    <Anchor relative="$parent"/>
+                    <Enabled val="true"/>
+                    <Source frame="$parent/$parent/Icon3" property="DescriptionText"/>
+                    <Target frame="$parent/MutatorDescription" property="Text"/>
+                </Frame>
+                
+                <Animation name="Show">
+                    <Event event="OnMouseEnter" action="Reset,Play" frame="$parent/Icon3"/>
+                    <Event event="OnMouseExit" action="Reset,Stop" frame="$parent/Icon3"/>
+
+                    <Controller type="Visibility" end="Pause">
+                        <Key type="Bool" time="0" value="true"/>
+                    </Controller>
+                </Animation>
+            </Frame>
+
+            <Frame type="CoopCampaignMutatorIconFrame" name="Icon4" template="CoopCampaignMutatorInfoPanel/CoopCampaignMutatorIconFrameTemplate">
+                <Anchor side="Bottom" relative="$parent/Icon3" pos="Max" offset="0"/>
+                <Anchor side="Left" relative="$parent/Icon3" pos="Max" offset="-10"/>
+                <AcceptsMouse val="True"/>
+            </Frame>
+            
+            <Frame type="Frame" name="IconTooltip4" template="CoopCampaignMutatorInfoPanel/CoopCampaignMutatorIconTooltipTemplate">
+                <Anchor side="Bottom" relative="$parent/Icon4" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Icon4" pos="Mid" offset="0"/>
+                
+                <Frame type="PropertyBind" name="BindMutatorTitle">
+                    <Anchor relative="$parent"/>
+                    <Enabled val="true"/>
+                    <Source frame="$parent/$parent/Icon4" property="NameText"/>
+                    <Target frame="$parent/MutatorTitle" property="Text"/>
+                </Frame>
+                
+                <Frame type="PropertyBind" name="BindMutatorDescription">
+                    <Anchor relative="$parent"/>
+                    <Enabled val="true"/>
+                    <Source frame="$parent/$parent/Icon4" property="DescriptionText"/>
+                    <Target frame="$parent/MutatorDescription" property="Text"/>
+                </Frame>
+                
+                <Animation name="Show">
+                    <Event event="OnMouseEnter" action="Reset,Play" frame="$parent/Icon4"/>
+                    <Event event="OnMouseExit" action="Reset,Stop" frame="$parent/Icon4"/>
+
+                    <Controller type="Visibility" end="Pause">
+                        <Key type="Bool" time="0" value="true"/>
+                    </Controller>
+                </Animation>
+            </Frame>
+            
+            <Frame type="Frame" name="BadgeContainer">
+                <Anchor side="Bottom" relative="$parent/BackgroundImage" pos="Max" offset="-57"/>
+                <Anchor side="Right" relative="$parent/BackgroundImage" pos="Max" offset="-27"/>
+                <Width val="250"/>
+                <Height val="300"/>
+                <AcceptsMouseTooltip val="true"/>
+                <TooltipAnchorPosition val="MiddleRight"/>
+                
+                <Frame type="Image" name="BadgeBackgroundDarken">
+                    <Anchor side="Top" relative="$parent/BadgeBackground" pos="Min" offset="2"/>
+                    <Anchor side="Bottom" relative="$parent/BadgeBackground" pos="Max" offset="-4"/>
+                    <Anchor side="Left" relative="$parent/BadgeBackground" pos="Min" offset="3"/>
+                    <Anchor side="Right" relative="$parent/BadgeBackground" pos="Max" offset="-4"/>
+                    <Color val="0,0,0"/>
+                    <Alpha val="100"/>
+                </Frame>
+                
+                <Frame type="BlurFrame" name="BadgeBackgroundBlur">
+                    <Anchor side="Top" relative="$parent/BadgeBackground" pos="Min" offset="2"/>
+                    <Anchor side="Bottom" relative="$parent/BadgeBackground" pos="Max" offset="-4"/>
+                    <Anchor side="Left" relative="$parent/BadgeBackground" pos="Min" offset="3"/>
+                    <Anchor side="Right" relative="$parent/BadgeBackground" pos="Max" offset="-4"/>
+
+                    <Animation name="Blur">
+                        <Event event="OnShown" action="Reset,Play" frame="$parent" />
+
+                        <Controller type="Blur" end="Pause">
+                            <Key type="Curve" time="0" value=".35" in="Slow"/>
+                        </Controller>
+                    </Animation>
+                </Frame>
+                
+                <Frame type="Image" name="BadgeBackground">
+                    <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+                    <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+                    <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+                    <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+                    <Alpha val="128"/>
+                    <Texture val="@UI/SC2_UI_Coop_Mutators_Badges_Background"/>
+                    <AcceptsMouse val="True"/>
+                </Frame>
+                
+                <Frame type="Image" name="BadgeIcon">
+                    <Anchor side="Top" relative="$parent/BadgeBackground" pos="Mid" offset="-13"/>
+                    <Anchor side="Bottom" relative="$parent/BadgeBackground" pos="Mid" offset="-13"/>
+                    <Anchor side="Left" relative="$parent/BadgeBackground" pos="Mid" offset="-1"/>
+                    <Anchor side="Right" relative="$parent/BadgeBackground" pos="Mid" offset="-1"/>
+                    <Texture val="@UI/SC2_UI_Coop_Mutators_Badges_Rank_0"/>
+
+                    <StateGroup name="RankStateGroup">
+                        <State name="WonVyEyState">
+                            <When type="AnimationState" frame="$parent/$parent/$parent" ProfileStatsState="WonVyEy"/>
+                            <Action type="SetProperty" frame="$this" Texture="@UI/SC2_UI_Coop_Mutators_Badges_Rank_1"/>
+                        </State>
+
+                        <State name="WonEasyState">
+                            <When type="AnimationState" frame="$parent/$parent/$parent" ProfileStatsState="WonEasy"/>
+                            <Action type="SetProperty" frame="$this" Texture="@UI/SC2_UI_Coop_Mutators_Badges_Rank_2"/>
+                        </State>
+
+                        <State name="WonMediState">
+                            <When type="AnimationState" frame="$parent/$parent/$parent" ProfileStatsState="WonMedi"/>
+                            <Action type="SetProperty" frame="$this" Texture="@UI/SC2_UI_Coop_Mutators_Badges_Rank_3"/>
+                        </State>
+
+                        <State name="WonMdHdState">
+                            <When type="AnimationState" frame="$parent/$parent/$parent" ProfileStatsState="WonMdHd"/>
+                            <Action type="SetProperty" frame="$this" Texture="@UI/SC2_UI_Coop_Mutators_Badges_Rank_4"/>
+                        </State>
+                        
+                        <State name="DefaultState">
+                            <Action type="SetProperty" frame="$this" Texture="@UI/SC2_UI_Coop_Mutators_Badges_Rank_0"/>
+                        </State>
+                    </StateGroup>
+                </Frame>
+            </Frame>
+            
+            <Frame type="Frame" name="Loading">
+                <Anchor relative="$parent/BackgroundImage"/>
+                <Visible val="False"/>
+                
+                <Frame type="Frame" name="IdleSpinner" template="StandardBattlenetTemplates/IdleSpinnerTemplate">
+                    <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+                    <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+                    <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+                    <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+                </Frame>
+            </Frame>
+            
+            <Frame type="Frame" name="BadgeInfoContainer">
+                <Anchor side="Top" relative="$this/BountiesTitle" pos="Min" offset="-16"/>
+                <Anchor side="Bottom" relative="$parent/BackgroundImage" pos="Max" offset="-28"/>
+                <Anchor side="Left" relative="$parent/BackgroundImage" pos="Max" offset="10"/>
+                <Width val="350"/>
+                <Visible val="false"/>
+                <RenderPriority val="800"/>
+                
+                <Frame type="Image" name="BackgroundImage">
+                    <Anchor relative="$parent"/>
+                    <TextureType val="NineSlice"/>
+                    <Texture val="@UI/SC2_UI_Coop_Mutators_Badges_TooltipBG"/>
+                </Frame>
+                
+                <Frame type="Label" name="BountiesTitle">
+                    <Anchor side="Bottom" relative="$parent/BountiesInfo" pos="Min" offset="-13"/>
+                    <Anchor side="Left" relative="$parent/BountiesNote" pos="Min" offset="0"/>
+                    <Anchor side="Right" relative="$parent/BountiesNote" pos="Max" offset="0"/>
+                    <Style val="Coop_CommanderMutatorBountiesTooltipTitle"/>
+                    <Text val="@UI/ScreenCoopCampaign/MutatorRewardBounties"/>
+                </Frame>
+
+                <Frame type="PropertyBind" name="BindBountiesInfo">
+                    <Anchor relative="$parent"/>
+                    <Source frame="$parent/$parent/$parent" property="RewardBonusInfo"/>
+                    <Target frame="$parent/BountiesInfo" property="Text"/>
+                </Frame>
+                
+                <Frame type="Label" name="BountiesInfo">
+                    <Anchor side="Bottom" relative="$parent/Divider" pos="Min" offset="-15"/>
+                    <Anchor side="Left" relative="$parent/BountiesNote" pos="Min" offset="0"/>
+                    <Anchor side="Right" relative="$parent/BountiesNote" pos="Max" offset="0"/>
+                </Frame>
+                
+                <Frame type="Image" name="Divider">
+                    <Anchor side="Bottom" relative="$parent/BountiesWarning" pos="Min" offset="-15"/>
+                    <Anchor side="Left" relative="$parent" pos="Min" offset="4"/>
+                    <Anchor side="Right" relative="$parent" pos="Max" offset="-4"/>
+                    <Height val="2"/>
+                    <Color val="44,149,229"/>
+                    <Alpha val="77"/>
+                </Frame>
+                
+                <Frame type="Label" name="BountiesWarning">
+                    <Anchor side="Bottom" relative="$parent/BountiesNote" pos="Min" offset="-5"/>
+                    <Anchor side="Left" relative="$parent/BountiesNote" pos="Min" offset="0"/>
+                    <Anchor side="Right" relative="$parent/BountiesNote" pos="Max" offset="0"/>
+                    <Style val="Coop_CommanderMutatorBountiesTooltipWarning"/>
+                    <Text val="@UI/ScreenCoopCampaign/MutatorRewardWarning"/>
+                    <Alpha val="255"/>
+                </Frame>
+                
+                <Frame type="Label" name="BountiesNote">
+                    <Anchor side="Bottom" relative="$parent" pos="Max" offset="-20"/>
+                    <Anchor side="Left" relative="$parent" pos="Min" offset="20"/>
+                    <Anchor side="Right" relative="$parent" pos="Max" offset="-20"/>
+                    <Style val="Coop_CommanderMutatorBountiesTooltipNote"/>
+                    <Text val="@UI/ScreenCoopCampaign/MutatorRewardNote"/>
+                    <Alpha val="128"/>
+                </Frame>
+
+                <Animation name="Show">
+                    <Event event="OnMouseEnter" action="Reset,Play" frame="$parent/BadgeContainer/BadgeBackground"/>
+                    <Event event="OnMouseExit" action="Reset,Stop" frame="$parent/BadgeContainer/BadgeBackground"/>
+
+                    <Controller type="Visibility" end="Pause">
+                        <Key type="Bool" time="0" value="true"/>
+                    </Controller>
+                </Animation>
+            </Frame>
+        </Frame>
+        
+        <Frame type="Button" name="MutatorMapButton" template="StandardBattlenetTemplates/BattlenetStandardButtonTemplate">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+            <Width val="258"/>
+            <Enabled val="False"/>
+            <Text val="{$parent/InfoContainer/MapLabel/@Text}"/>
+            
+            <StateGroup name="MutatorButtonStateGroup">
+                <State name="InactiveState">
+                    <When type="AnimationState" frame="$parent" InfoPanelState="Inactive"/>
+                    <Action type="SetProperty" frame="$this" Text="@UI/ScreenCoopCampaign/MutatorInactive"/>
+                </State>
+                
+                <State name="DefaultState">
+                </State>
+            </StateGroup>
+        </Frame>
+
+        <Frame type="Button" name="Button" template="StandardBattlenetTemplates/BattlenetLargeIconButtonTemplate">
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="-20"/>
+            <Anchor side="Left" relative="$parent/$parent/DifficultyButton" pos="Max" offset="6"/>
+            <Toggleable val="true"/>
+            
+            <Frame type="Image" name="Icon">
+                <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+                <DesaturateOnDisable val="False"/>
+                <Texture val="@UI/Glues_Icons_Info_Highlight"/>
+                
+                <Animation name="Disable">
+                    <Event event="OnDisabled" action="Reset,Play" frame="$parent"/>
+                    <Event event="OnEnabled" action="Reset" frame="$parent"/>
+                     
+                    <Controller type="Texture" end="Pause">
+                        <Key type="Image" time="0" image="@UI/Glues_Icons_Info_Disabled"/>
+                    </Controller>
+                </Animation>
+            </Frame>
+
+            <StateGroup name="MutatorButtonStateGroup">
+                <State name="InactiveState">
+                    <When type="AnimationState" frame="$parent" InfoPanelState="Inactive"/>
+                    <Action type="SetProperty" frame="$this" Enabled="false"/>
+                </State>
+                
+                <State name="DefaultState">
+                    <Action type="SetProperty" frame="$this" Enabled="true"/>
+                </State>
+            </StateGroup>
+        </Frame>
+
+        <Frame type="Label" name="RemainingTimeLabel">
+            <Anchor side="Top" relative="$parent/MutatorMapButton" pos="Max" offset="5"/>
+            <Anchor side="Left" relative="$parent/MutatorMapButton" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent/MutatorMapButton" pos="Mid" offset="0"/>
+            <Style val="Coop_MapDifficultyLabel"/>
+            <Text val="@UI/ScreenCoopCampaign/RemainingTime"/>
+        </Frame>
+    </Frame>
+</Desc>

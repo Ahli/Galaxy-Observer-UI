@@ -1,0 +1,256 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<Desc>
+    <DescFlags val="Locked"/>
+
+    <Frame type="Frame" name="LoadingBarDownloadingFrameTemplate">
+        <Height val="50"/>
+        <Width val="350"/>
+        <Visible val="false"/>
+
+        <Frame type="Label" name="LoadingBarDownloadingLabel">
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+            <Style val="LoadingBarDownloadLabel"/>
+        </Frame>
+    </Frame>
+
+    <Frame type="LoadingBar" name="LoadingBarTemplate">
+        <Anchor side="Bottom" relative="$parent" pos="Max" offset="-15"/>
+        <Anchor side="Left" relative="$parent" pos="Mid" offset="-748"/>
+        <Anchor side="Right" relative="$parent" pos="Mid" offset="748"/>
+        <Height val="70"/>
+
+        <Frame type="ProgressBar" name="LoadingProgressBar">
+            <Anchor side="Top" relative="$parent" pos="Max" offset="-50"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="-2"/>
+            <Width val="1500"/>
+            <Height val="36"/>
+
+            <UseFillContainer val="true" />
+
+            <FillInset val="0.0"/>
+            <MinValue val="-5.0"/>
+            <MaxValue val="100.00"/>
+            <Value val="100.0"/>
+
+            <Frame type="Image" name="ProgressBarBackground">
+                <Anchor relative="$parent"/>
+                <Texture val="@UI/Storm_UI_Global_ProgressBar_Background"/>
+                <TextureType val="Nineslice"/>
+                <Alpha val="160"/>
+            </Frame>
+
+            <Frame type="Frame" name="FillImageContainer">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+
+                <Frame type="Image" name="FillImage">
+                    <Anchor relative="$parent"/>
+                    <Texture val="@UI/Storm_UI_Global_ProgressBar"/>
+                    <TextureType val="Nineslice"/>
+                </Frame>
+
+                <Frame type="Image" name="SeasonProgressBarSubGlowImage">
+                    <Anchor side="Top" relative="$parent/FillImage" pos="Mid" offset="0"/>
+                    <Anchor side="Bottom" relative="$parent/FillImage" pos="Mid" offset="0"/>
+                    <Anchor side="Right" relative="$parent/FillImage" pos="Max" offset="23"/>
+                    <Unclipped val="true"/>
+                    <Texture val="@UI/Storm_UI_Global_ProgressBar_Glow"/>
+                    <BlendMode val="Add"/>
+                </Frame>
+            </Frame>
+
+            <Frame type="PropertyBind" name="BindValue">
+                <Anchor relative="$parent"/>
+                <Source frame="$ancestor[@type=LoadingBar]" property="ProgressValue"/>
+                <Target frame="$parent" property="Value"/>
+            </Frame>
+
+            <Frame type="PropertyBind" name="BindVisibility">
+                <Anchor relative="$parent"/>
+                <Source frame="$ancestor[@type=LoadingBar]" property="ShowLoadingBar"/>
+                <Target frame="$parent" property="Visible"/>
+            </Frame>
+
+            <StateGroup name="Type">
+                <DefaultState val="Loading"/>
+                <State name="Complete">
+                    <When type="Property" frame="$ancestor[@type=LoadingBar]" IsComplete="True"/>
+                    <Action type="SendEvent" frame="$this" event="StartPulse"/>
+                    <Action type="SetProperty" frame="FillImageContainer/SeasonProgressBarSubGlowImage" visible="false"/>
+                </State>
+                <State name="Loading">
+                    <Action type="SendEvent" frame="$this" event="StopPulse"/>
+                    <Action type="SetProperty" frame="FillImageContainer/SeasonProgressBarSubGlowImage" visible="true"/>
+                </State>
+            </StateGroup>
+
+            <Animation name="Pulse">
+                <Event event="StartPulse" action="Play"/>
+                <Event event="StopPulse" action="Stop"/>
+                <Controller type="Fade" end="PingPong">
+                    <Key type="Curve" time="0" value="150" out="Slow"/>
+                    <Key type="Curve" time=".6" value="255" in="Slow"/>
+                </Controller>
+            </Animation>
+        </Frame>
+
+        <Frame type="Label" name="LoadingBarLabel">
+            <Anchor side="Bottom" relative="$parent/LoadingProgressBar" pos="Min" offset="8"/>
+            <Anchor side="Left" relative="$parent/LoadingProgressBar" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent/LoadingProgressBar" pos="Max" offset="-20"/>
+            <Style val="LoadingStartup"/>
+        </Frame>
+
+        <Frame type="Button" name="LoadingBarCancelButton" template="StandardTemplates/StandardButtonSmallTemplate">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="-90"/>
+            <Visible val="false"/>
+            <Text val="@UI/Cancel"/>
+        </Frame>
+
+        <Frame type="Frame" name="LoadingBarDownloadingFrame" template="ScreenLoading/LoadingBarDownloadingFrameTemplate">
+            <Anchor side="Bottom" relative="$parent/LoadingBarCancelButton" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent/LoadingBarCancelButton" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent/LoadingBarCancelButton" pos="Mid" offset="0"/>
+        </Frame>
+    </Frame>
+
+    <Frame type="ScreenLoading" name="ScreenLoading">
+        <Anchor relative="$parent"/>
+        <StartupTexture val="@UI/StartupLoadingImage_Storm"/>
+        <DefaultTexture val="@UI/DefaultLoadingImage_Storm"/>
+
+        <Frame type="Image" name="BackgroundImage">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+            <TextureType val="None"/>
+            <Color val="0,0,0"/>
+        </Frame>
+
+        <Frame type="Image" name="LoadingImage">
+            <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+            <TextureType val="Normal"/>
+        </Frame>
+
+        <Frame type="Frame" name="MeleePanel">
+            <Anchor relative="$parent"/>
+
+            <!-- Heroes don't use Melee loading panel. This is commented out to prevent warning 
+            for missing image textures in Core.StormMod. HeroLoadingPanelTemplate uses image
+            textures from HerosData.
+
+            <Frame type="HeroLoadingPanel" name="HeroLoadingPanel" template="HeroLoadingPanel/HeroLoadingPanelTemplate">
+                <Anchor relative="$parent"/>
+            </Frame>
+            -->
+        </Frame>
+
+        <Frame type="Frame" name="CampaignPanel">
+            <Anchor relative="$parent"/>
+
+            <Frame type="Label" name="CampaignTextLabel">
+                <Style val="LoadingCampaignText"/>
+                <Anchor side="Top" relative="$parent" pos="Min" offset="110"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="20"/>
+                <Width val="800"/>
+                <Height val="600"/>
+            </Frame>
+
+            <Frame type="Label" name="CampaignSubtitleLabel">
+                <Style val="LoadingCampaignSubtitle"/>
+                <Anchor side="Bottom" relative="$parent/CampaignTextLabel" pos="Min" offset="-20"/>
+                <Anchor side="Left" relative="$parent/CampaignTextLabel" pos="Min" offset="0"/>
+                <Anchor side="Right" relative="$parent/CampaignTextLabel" pos="Max" offset="0"/>
+            </Frame>
+
+            <Frame type="Label" name="CampaignTitleLabel">
+                <Style val="LoadingCampaignTitle"/>
+                <Anchor side="Bottom" relative="$parent/CampaignSubtitleLabel" pos="Min" offset="-10"/>
+                <Anchor side="Left" relative="$parent/CampaignTextLabel" pos="Min" offset="0"/>
+                <Anchor side="Right" relative="$parent/CampaignTextLabel" pos="Max" offset="0"/>
+            </Frame>
+        </Frame>
+
+        <Frame type="CustomLoadingPanel" name="CustomLoadingPanel">
+            <Anchor relative="$parent"/>
+        </Frame>
+
+        <Frame type="LoadingBar" name="LoadingBar" template="ScreenLoading/LoadingBarTemplate">
+            <Visible val="false"/>
+        </Frame>
+
+        <Frame type="Label" name="PressToContinue">
+            <Anchor side="Left" pos="Mid" relative="$parent" offset="0"/>
+            <Anchor side="Bottom" pos="Min" relative="$parent/LoadingBar" offset="0"/>
+            <Anchor side="Right" pos="Mid" relative="$parent" offset="0"/>
+
+            <Text val="@UI/CampaignLoadingComplete"/>
+            <Style val="Storm_VeteranTutorial_Loading_SubHeader"/>
+
+            <StateGroup name="LoadProgress">
+                <State name="Loading">
+                    <When type="Property" frame="$parent/LoadingBar" IsComplete="false"/>
+                    <Action type="SetProperty" frame="$this" visible="false"/>
+                </State>
+                <State name="Complete">
+                    <When type="Property" frame="$parent/LoadingBar" IsComplete="true"/>
+                    <Action type="SetProperty" frame="$this" visible="true"/>
+                    <Action type="SetProperty" frame="$parent/LoadingBar/LoadingBarLabel" visible="false"/>
+                </State>
+            </StateGroup>
+
+            <Animation name="Pulse">
+                <Event event="OnShown" action="Play"/>
+                <Controller type="Fade" end="PingPong">
+                    <Key type="Curve" time="0" value="255" out="Slow"/>
+                    <Key type="Curve" time=".6" value="150" in="Slow"/>
+                </Controller>
+            </Animation>
+        </Frame>
+
+        <Frame type="Image" name="LoadingHelpBackgroundImage">
+            <Visible val="false"/>
+        </Frame>
+
+        <Frame type="Label" name="LoadingHelpLabel">
+            <Visible val="false"/>
+        </Frame>
+
+        <Frame type="Image" name="LoadingLegalBackgroundImageKRNGL">
+            <Anchor side="Top" relative="$parent/LoadingLegalLabelKRNGL" pos="Min" offset="-20"/>
+            <Anchor side="Bottom" relative="$parent/LoadingLegalLabelKRNGL" pos="Max" offset="20"/>
+            <Anchor side="Left" relative="$parent/LoadingLegalLabelKRNGL" pos="Min" offset="-20"/>
+            <Anchor side="Right" relative="$parent/LoadingLegalLabelKRNGL" pos="Max" offset="20"/>
+            <TextureType val="Nineslice"/>
+            <Texture val="@UI/StormTooltipFrame"/>
+            <CollapseLayout val="true"/>
+        </Frame>
+
+        <Frame type="Label" name="LoadingLegalLabelKRNGL">
+            <Style val="LoadingHelpLabel"/>
+            <Text val="@UI/ScreenLoadingLegalTextKRNGL"/>
+            <Anchor side="Top" relative="$parent" pos="Mid" offset="-100"/>
+            <Anchor side="Bottom" relative="$parent" pos="Mid" offset="-100"/>
+            <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+            <Width val="500"/>
+            <CollapseLayout val="true"/>
+        </Frame>
+
+        <Frame type="Label" name="LoadingStartupLabel">
+            <Style val="LoadingBarLabel"/>
+            <Text val="@UI/ScreenLoadingStartup"/>
+            <Anchor side="Top" relative="$parent/LoadingBar/LoadingProgressBar" pos="Min" offset="-35"/>
+            <Anchor side="Left" relative="$parent/LoadingBar/LoadingProgressBar" pos="Min" offset="8"/>
+            <Width val="880"/>
+        </Frame>
+    </Frame>
+</Desc>

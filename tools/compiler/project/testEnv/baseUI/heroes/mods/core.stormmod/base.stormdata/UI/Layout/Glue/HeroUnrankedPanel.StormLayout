@@ -1,0 +1,387 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<Desc>
+    <DescFlags val="Locked"/>
+
+    <Frame type="Button" name="RadioButtonTemplate">
+        <!-- Button that's used as Radio button should have Toggleable property set to false -->
+        <Toggleable val="false"/>
+        <TooltipAnchorPosition val="MiddleRight"/>
+
+        <ClickSound val="@UI_BNet_Generic_03"/>
+        <Height val="64"/>
+
+        <Frame type="Image" name="Image">
+            <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+            <Texture val="@UI/Storm_ExclusiveButton_Normal"/>
+            <TextureType val="NineSlice"/>
+        </Frame>
+
+        <StateGroup name="RadioState">
+            <DefaultState val="Off"/>
+            <State name="Toggled">
+                <When type="Property" Toggled="True"/>
+                <Action type="SetProperty" frame="Image" texture="@UI/Storm_ExclusiveButton_Selected"/>
+                <Action type="SetProperty" frame="Label" style="RadioButtonSelected"/>
+            </State>
+            <State name="Hovering">
+                <When type="Property" Hovering="True"/>
+                <Action type="SetProperty" frame="Image" texture="@UI/Storm_ExclusiveButton_Hover"/>
+                <Action type="SetProperty" frame="Label" style="RadioButtonLabel"/>
+            </State>
+            <State name="Off">
+                <Action type="SetProperty" frame="Image" texture="@UI/Storm_ExclusiveButton_Normal"/>
+                <Action type="SetProperty" frame="Label" style="RadioButtonLabel"/>
+            </State>
+        </StateGroup>
+
+        <Frame type="Label" name="Label">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="21"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="-20"/>
+        </Frame>
+    </Frame>
+
+    <Frame type="VersusAIPanel" name="VersusAIPanelTemplate">
+        <Anchor side="Bottom" relative="TrainingButton" pos="Max" offset="20"/>
+        <Anchor side="Right" relative="Header" pos="Max" offset="20"/>
+        <RenderType val="HDR"/>
+        <Visible val="False"/>
+
+        <Animation name="OnShown">
+            <Event event="OnShown" action="DirectionForward"/>
+            <Event event="OnShown" action="Play"/>
+            <Event event="OnHidden" action="DirectionReverse"/>
+            <Event event="OnHidden" action="Play"/>
+            <Controller type="Fade" end="Pause">
+                <Key type="Curve" time="0" value="0" out="Fast"/>
+                <Key type="Curve" time=".4" value="255" in="Slow"/>
+            </Controller>
+            <Controller type="Anchor" end="Pause" side="Top" relative="true">
+                <Key type="Curve" time="0" value="400" out="Fast"/>
+                <Key type="Curve" time=".4" value="0" in="Slow"/>
+            </Controller>
+        </Animation>
+        
+        <Animation name="HeroSelectToggle">
+            <Event event="Show" action="DirectionForward,Play" frame="$parent/HeroAttributesGroup/ChangeHeroPanel"/>
+            <Event event="Hide" action="DirectionReverse,Play" frame="$parent/HeroAttributesGroup/ChangeHeroPanel"/>
+            <Controller type="Fade" end="Pause">
+                <Key type="Curve" time="0" value="255" out="Fast"/>
+                <Key type="Curve" time=".2" value="0" in="Slow"/>
+            </Controller>
+            <Controller type="Visibility" end="Pause" frame="MouseBlocker">
+                <Key type="Bool" time="0.0" value="false"/>
+                <Key type="Bool" time="0.199" value="false"/>
+                <Key type="Bool" time="0.200" value="true"/>
+            </Controller>
+        </Animation>
+
+        <Frame type="BlurFrame" name="BlurBackground">
+            <Anchor relative="$parent/VersusAIPanelBg" />
+            <BlurAmount val="0.8"/>
+                
+            <Frame type="Image" name="LowImage">
+                <Anchor relative="$parent" />
+                <Texture val="@UI/Storm_Generic_Background_Low"/>
+            </Frame>
+        </Frame>
+
+        <Frame type="Image" name="VersusAIPanelBg">
+            <Anchor relative="$parent"/>
+            <Texture val="@UI/Storm_Replays_PanelBg"/>
+            <TextureType val="Nineslice"/>
+        </Frame>
+
+        <Frame type="Frame" name="Header" template="StandardTemplates/SummarySubHeaderTemplate">
+            <Anchor side="Top" relative="$parent/VersusAIPanelBg" pos="Min" offset="16"/>
+            <Anchor side="Left" relative="$parent/VersusAIPanelBg" pos="Min" offset="25"/>
+            <Anchor side="Right" relative="$this/HeaderLabel" pos="Max" offset="15"/>
+
+            <Frame type="Label" name="HeaderLabel">
+                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                <Text val="@UI/ScreenPlay/AIOptionsTitle"/>
+                <Style val="PlayerProfileTitle"/>
+                <AutoSizeClamps minWidth="228"/>
+            </Frame>
+        </Frame>
+
+        <Frame type="Label" name="HeaderLabel">
+            <Anchor side="Top" relative="$parent/Header" pos="Max" offset="10"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="23"/>
+            <Text val="@UI/Difficulty_Colon"/>
+            <Style val="RadioButtonLabel"/>
+        </Frame>
+
+        <Frame type="Label" name="DifficultyLabel">
+            <Anchor side="Top" relative="$parent/Header" pos="Max" offset="10"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="-23"/>
+            <Text val="{$parent/@DifficultyText}"/>
+            <Style val="RadioButtonLabel"/>
+        </Frame>
+
+        <Frame type="Slider" name="DifficultySlider" template="StandardTemplates/StandardSliderTemplate">
+            <Handle val="HeroUnrankedPanel_DifficultySlider"/>
+            <Anchor side="Top" relative="$parent/DifficultyLabel" pos="Max" offset="5"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="21"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="-23"/>
+            <Tooltip val="@UI/GameplayOptionsTooltips/AIDifficulty"/>
+            <TooltipAnchorPosition val="MiddleRight"/>
+            <Continuous val="false"/>
+        </Frame>
+        
+        <Frame type="RadioGroup" name="RadioGroup">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="17"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="-17"/>
+            <ButtonFrame val="$parent/TrainingButton"/>
+            <ButtonFrame val="$parent/AIAlliesButton"/>
+            <ButtonFrame val="$parent/CoopButton"/>
+        </Frame>
+
+        <Frame type="Button" name="CoopButton" template="HeroUnrankedPanel/RadioButtonTemplate">
+            <Handle val="HeroUnrankedPanel_CoopCheckbox"/>
+            <Anchor side="Top" relative="$parent/DifficultySlider" pos="Max" offset="5"/>
+            <Anchor side="Left" relative="$parent/RadioGroup" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent/RadioGroup" pos="Max" offset="0"/>
+            <Tooltip val="@UI/GameplayOptionsTooltips/Coop"/>
+            <Text val="@UI/ScreenPlay/Coop"/>
+        </Frame>
+
+        <Frame type="Button" name="AIAlliesButton" template="HeroUnrankedPanel/RadioButtonTemplate">
+            <Handle val="HeroUnrankedPanel_AIAlliesCheckbox"/>
+            <Anchor side="Top" relative="$parent/CoopButton" pos="Max" offset="-4"/>
+            <Anchor side="Left" relative="$parent/RadioGroup" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent/RadioGroup" pos="Max" offset="0"/>
+            <Tooltip val="@UI/GameplayOptionsTooltips/AITeammates"/>
+            <Text val="@UI/ScreenPlay/AITeammates"/>
+        </Frame>
+
+        <Frame type="Button" name="TrainingButton" template="HeroUnrankedPanel/RadioButtonTemplate">
+            <Handle val="HeroUnrankedPanel_TrainingCheckbox"/>
+            <Anchor side="Top" relative="$parent/AIAlliesButton" pos="Max" offset="-4"/>
+            <Anchor side="Left" relative="$parent/RadioGroup" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent/RadioGroup" pos="Max" offset="0"/>
+            <Tooltip val="@UI/GameplayOptionsTooltips/Training"/>
+            <Text val="@UI/ScreenPlay/PracticeButton"/>
+        </Frame>
+
+        <Frame type="Frame" name="MouseBlocker">
+            <Anchor relative="$parent"/>
+            <AcceptsMouse val="true"/>
+            <Visible val="false"/>
+        </Frame>
+    </Frame>
+
+    <Frame type="HeroUnrankedPanel" name="HeroUnrankedPanel">
+        <Handle val="HeroUnrankedPanel"/>
+        <Anchor relative="$parent"/>
+        <RenderType val="HDR"/>
+
+        <Animation name="Transition">
+            <Event event="Show" action="Reset"/>
+            <Event event="Show" action="Play"/>
+            <Event event="Hide" action="DirectionReverse"/>
+            <Event event="Hide" action="Play"/>
+            <Controller type="Fade" end="Pause">
+                <Key type="Curve" time="0.0" value="0" out="Slow"/>
+                <Key type="Curve" time="0.4" value="255" in="Slow" out="Slow"/>
+            </Controller>
+        </Animation>
+
+        <Frame type="HeroSelectPanel" name="HeroSelectPanel" template="HeroSelectPanel/HeroSelectPanelTemplate">
+            <Handle val="ScreenHeroMatchmaking_HeroSelectPanel"/>
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+            <Visible val="true"/>
+
+            <Frame type="HeroSlotPanel" name="HeroBasicSlotPanel">
+                <DisplayAllies val="true"/>
+                <DisplayLobby val="false"/>
+                <DisplayMatchmaking val="true"/>
+                <DisplayLocal val="true"/>
+            </Frame>
+
+            <Frame type="HeroSlotPanel" name="HeroLabelSlotPanel">
+                <DisplayAllies val="true"/>
+                <DisplayLobby val="false"/>
+                <DisplayMatchmaking val="true"/>
+                <DisplayLocal val="true"/>
+            </Frame>
+
+            <Frame type="VersusAIPanel" name="VersusAIPanel" template="HeroUnrankedPanel/VersusAIPanelTemplate">
+                <Anchor side="Top" relative="$parent/HeroAttributesGroup/SkinsButton" pos="Min" offset="-322"/>
+                <Anchor side="Left" relative="$parent/HeroAttributesGroup/SkinsButton" pos="Min" offset="35"/>
+            </Frame>
+
+            <Frame type="Frame" name="HeroAttributesGroup">
+                <Frame type="HeroSelectSkinsPanel" name="SkinsPanel">
+                    <Frame type="PurchaseCurrencySelectPanel" name="PurchaseCurrencySelectPanel">
+                        <Frame type="BuyButton" name="GoldPurchaseButton">
+                            <ReportsStats val="True"/>
+                            <Handle val="UnrankedSkinSelect_GoldCurrencyButton"/>
+                        </Frame>
+
+                        <Frame type="BuyButton" name="RealPurchaseButton">
+                            <ReportsStats val="True"/>
+                            <Handle val="UnrankedSkinSelect_RealCurrencyButton"/>
+                        </Frame>
+                    </Frame>
+                </Frame>
+
+                <Frame type="HeroSelectMountsPanel" name="MountsPanel">
+                    <Frame type="PurchaseCurrencySelectPanel" name="PurchaseCurrencySelectPanel">
+                        <Frame type="BuyButton" name="GoldPurchaseButton">
+                            <ReportsStats val="True"/>
+                            <Handle val="UnrankedMountSelect_GoldCurrencyButton"/>
+                        </Frame>
+
+                        <Frame type="BuyButton" name="RealPurchaseButton">
+                            <ReportsStats val="True"/>
+                            <Handle val="UnrankedMountSelect_RealCurrencyButton"/>
+                        </Frame>
+                    </Frame>
+                </Frame>
+                
+                <Frame type="HeroSelectArtifactsPanel" name="ArtifactsPanel">
+                    <Frame type="BuyButton" name="BuyButton">
+                        <ReportsStats val="true"/>
+                        <Handle val="ScreenHeroMatchmaking_HeroSelectPanel_HeroSelectArtifactsPanel_BuyButton"/>
+                    </Frame>
+                </Frame>
+                <Frame type="HeroSelectChangeHeroPanel" name="ChangeHeroPanel">
+                    <Frame type="HeroSelectTileList" name="HeroTileList" template="HeroSelectTileList/ChangeHeroTileListTemplate">
+                        <Anchor side="Top" relative="$parent" pos="Min" offset="180"/>
+                        <Anchor side="Left" relative="$parent" pos="Min" offset="22"/>
+                        <Anchor side="Right" relative="$parent" pos="Max" offset="-14"/>
+                        <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+                        <RenderPriority val="401"/>
+                        <!--This is a Temporary Trunk Fix-->
+                        <Frame type="PageSelectorButtonList" name="PageSelector">
+                            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+                            <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+                            <DisabledAlpha val="0"/>
+                        </Frame>
+                        
+                        <Frame Type="HeroContextMenu" name="ContextMenu" template="StandardTemplates/StandardContextMenuTemplate" >
+                            <Anchor side="Top" relative="$parent" pos="Max" offset="0"/>
+                            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+                        </Frame> 
+                    </Frame>
+
+                    <Frame type="HeroFilterPanel" name="HeroFilterPanel" template="HeroSelectChangeHeroPanel/HeroFilterPanelTemplate">
+                        <Anchor side="Left" relative="$parent/PurchaseCurrencySelectPanel" pos="Min" offset="#FilterPanelTemplateLeftOffset"/>
+                        <Anchor side="Top" relative="$parent" pos="Min" offset="150"/>
+                        <Anchor side="Right" relative="$parent/PurchaseCurrencySelectPanel" pos="Max" offset="#FilterPanelTemplateRightOffset"/>
+                        <FilterTarget val="$parent/HeroTileList"/>
+                    </Frame>
+
+                    <Frame type="PurchaseCurrencySelectPanel" name="PurchaseCurrencySelectPanel">
+                        <Frame type="BuyButton" name="GoldPurchaseButton">
+                            <ReportsStats val="True"/>
+                            <Handle val="UnrankedHeroSelect_GoldCurrencyButton"/>
+                        </Frame>
+
+                        <Frame type="BuyButton" name="RealPurchaseButton">
+                            <ReportsStats val="True"/>
+                            <Handle val="UnrankedHeroSelect_RealCurrencyButton"/>
+                        </Frame>
+                    </Frame>
+                    
+                    <Frame type="PurchaseInfoPanel" name="PurchaseInfoPanel">
+                        <Handle val="UnrankedHeroSelect_PurchasePanel"/>
+                    </Frame>
+                </Frame>
+            </Frame>
+        </Frame>
+
+        <Frame type="AutoSelectFilterPanel" name="AutoSelectFilter" template="AutoSelectFilterPanel/AutoSelectFilterPanelTemplate">
+            <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent/ReadyButton" pos="Mid" offset="-50"/>
+            <CollapseLayout val="True"/>
+            <Visible val="False"/>
+
+            <Frame type="Button" name="FilterMulticlassButton">
+                <Visible val="False"/>
+            </Frame>
+        </Frame>
+
+        <!-- ==========================================================
+            Ready button
+        =========================================================== -->
+        <Frame type="Button" name="ReadyButton" template="StandardTemplates/ReadyButtonTemplate_Middle">
+            <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="-20"/>
+            <Handle val="ScreenHeroMatchmaking_ReadyButton"/>
+            <ClickSound val="@UI_BNet_Ready"/>
+            <Text val="@UI/ScreenHeroMatchmaking/ReadyButton"/>
+
+            <Frame type="Frame" name="HitTestFrame">
+                <AcceptsMouseTooltip val="true"/>
+                <TooltipAnchorPosition val="TopCenter"/>
+                <Tooltip val="{$ancestor[@type=HeroUnrankedPanel]/@ReadyRequirementsText}"/>
+            </Frame>
+        </Frame>
+
+        <!-- ========================================================================================== -->
+        <!-- AVAILABLE / UNAVAILABLE IMAGES -->
+        <!-- ========================================================================================== -->
+        <!-- HERO AVAILABLE / UNAVAILABLE TOOLTIP -->
+
+        <Frame type="StandardTooltip" name="HeroNotificationTooltip">
+            <MinWidth val="548"/>
+            <MaxWidth val="548"/>
+            <MinHeight val="500"/>
+            <MaxHeight val="800"/>
+            <Insets left="10" top="10" right="10" bottom="10" />
+
+            <Visible val="false" />
+
+            <Frame type="Image" name="HeroNotificationImage">
+                <Anchor side="Left" relative="$parent/Label" pos="Min" offset="-40"/>
+                <Anchor side="Top" relative="$parent/Label" pos="Min" offset="-30"/>
+                <Anchor side="Right" relative="$parent/Label" pos="Max" offset="30"/>
+                <Anchor side="Bottom" relative="$parent/Label" pos="Max" offset="55"/>
+
+                <Texture val="@UI/Storm_HeroSelect_NotificationTooltip"/>
+                <TextureType val="Nineslice"/>
+
+                <Frame type="Image" name="HeroNotificationImageGrid">
+                    <Anchor side="Top" relative="$parent" pos="Min" offset="19"/>
+                    <Anchor side="Left" relative="$parent" pos="Min" offset="22"/>
+                    <Anchor side="Right" relative="$parent" pos="Max" offset="-22"/>
+
+                    <Texture val="@UI/Storm_HeroSelect_NotificationTooltipBg"/>
+                    <BlendMode val="Add"/>
+                </Frame>
+            </Frame>
+
+            <Frame type="Label" name="Label">
+                <Anchor side="Bottom" relative="$parent" pos="Max" offset="-50"/>
+                <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+                <Width val="500"/>
+
+                <Text val="@UI/Select_HeroNotification_Error"/>
+                <Style val="@HeroSelectedNotificationErrorTooltip"/>
+            </Frame>
+        </Frame>
+
+        <Frame type="Frame" name="ReadyButtonNotificationContainer" template="StandardTemplates/ReadyButtonNotificationContainerTemplate">
+            <Anchor side="Bottom" relative="$parent/AutoSelectFilter" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent/ReadyButton" pos="Min" offset="-100"/>
+            <Anchor side="Right" relative="$parent/ReadyButton" pos="Max" offset="100"/>
+        </Frame>
+    </Frame>
+</Desc>
+
