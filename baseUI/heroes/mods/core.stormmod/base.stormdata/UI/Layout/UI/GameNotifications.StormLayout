@@ -2,25 +2,31 @@
 <Desc>
     
     <Frame type="Frame" name="InGameNotificationsTemplate">
-        <Anchor side="Top" relative="$parent" pos="Min" offset="300"/>
         <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
         <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
-        <Height val="248"/>
+        <Height val="200"/>
         
         <!-- Standard Notification animation -->
         <Frame type="Frame" name="StandardNotificationTemplate">
-            <Anchor side="Top" relative="$parent" pos="Min" offset="40"/>
+            <Anchor side="Top" relative="$parent" pos="Min" offset="54"/>
             <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
             <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
             <Height val="168"/>
             <Width val="1300"/>
             
             <Animation name="Begin">
-                <Event event="ShowStandardNotification" action="DirectionForward" frame="$parent"/>
+                <Event event="ShowStandardNotification" action="Reset" frame="$parent"/>
                 <Event event="ShowStandardNotification" action="Play" frame="$parent"/>
+                <Controller type="Visibility" end="Pause">
+                    <Key type="Bool" time="0" value="False"/>
+                    <Key type="Bool" time=".001" value="True"/>
+                </Controller>
+
                 <Controller type="Fade" end="Pause">
                     <Key type="Curve" time="0.0" value="0" out="Slow"/>
                     <Key type="Curve" time="0.1" value="255" in="Fast"/>
+                    <Key type="Curve" time="2.79" value="255" out="Slow"/>
+                    <Key type="Curve" time="2.8" value="0" in="Fast"/>
                 </Controller>
                 
                 <Controller type="Sound" end="Stop">
@@ -29,21 +35,53 @@
             </Animation>
             
             <Animation name="End">
-                <Event event="ShowTimedNotification_Tier1" action="DirectionForward" frame="$parent"/>
+                <Event event="ShowTimedNotification_Tier0" action="Reset" frame="$parent"/>
+                <Event event="ShowTimedNotification_Tier0" action="Play" frame="$parent"/>
+                <Event event="ShowTimedNotification_Tier1" action="Reset" frame="$parent"/>
                 <Event event="ShowTimedNotification_Tier1" action="Play" frame="$parent"/>
-                <Event event="ShowTimedNotification_Tier2" action="DirectionForward" frame="$parent"/>
+                <Event event="ShowTimedNotification_Tier2" action="Reset" frame="$parent"/>
                 <Event event="ShowTimedNotification_Tier2" action="Play" frame="$parent"/>
-                <Event event="ShowTimedNotification_Tier3" action="DirectionForward" frame="$parent"/>
+                <Event event="ShowTimedNotification_Tier3" action="Reset" frame="$parent"/>
                 <Event event="ShowTimedNotification_Tier3" action="Play" frame="$parent"/>
-                <Event event="ShowTimedNotification_Tier4" action="DirectionForward" frame="$parent"/>
+                <Event event="ShowTimedNotification_Tier4" action="Reset" frame="$parent"/>
                 <Event event="ShowTimedNotification_Tier4" action="Play" frame="$parent"/>
-                <Event event="ShowEnemyNotification" action="DirectionForward" frame="$parent"/>
+                <Event event="ShowEnemyNotification" action="Reset" frame="$parent"/>
                 <Event event="ShowEnemyNotification" action="Play" frame="$parent"/>
-                <Controller type="Fade" end="Pause">
-                    <Key type="Curve" time="0.0" value="255" out="Slow"/>
-                    <Key type="Curve" time="0.05" value="0" in="Fast"/>
+                <Controller type="Visibility" end="Pause">
+                    <Key type="Bool" time="0" value="True"/>
+                    <Key type="Bool" time=".001" value="false"/>
                 </Controller>
             </Animation>
+
+            <Frame type="CutsceneFrame" name="AllyBackgroundCutscene">
+                <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+                <Width val="1600"/>
+                <Height val="550"/>
+                <File val="Cutscenes/GameUI_KillCallout.StormCutscene"/>
+                <RenderType val="HDR"/>
+                <Unclipped val="True"/>
+                <Visible val="False"/>
+
+                <Animation name="PlayAllyBg">
+                    <Event event="ShowStandardNotification" action="Reset" frame="$parent/$parent"/>
+                    <Event event="ShowStandardNotification" action="Play" frame="$parent/$parent"/>
+
+                    <Controller type="Visibility" end="Pause">
+                        <Key type="Bool" time="0" value="False"/>
+                        <Key type="Bool" time=".001" value="True"/>
+                    </Controller>
+                        
+                    <Controller type="Cutscene" end="Stop">
+                        <Key type="Cutscene" time="0.001" action="Play"/>
+                        <Key type="Cutscene" time="0.002" action="Bookmark" bookmark="0"/>
+                        <Key type="Cutscene" time="0.003" action="RemoveFilter" filter="Enemy"/>
+                        <Key type="Cutscene" time="0.004" action="AddFilter" filter="Ally"/>
+                    </Controller>
+                </Animation>
+            </Frame>
             
             <Frame type="Image" name="NotificationBackground">
                 <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
@@ -60,16 +98,49 @@
                     
                     <Controller type="Fade" end="Pause">
                         <Key type="Curve" time="0.0" value="0" out="Auto"/>
-                        <Key type="Curve" time="0.3" value="255" in="Auto"/>
-                        <Key type="Curve" time="2.5" value="255" in="Auto"/>
+                        <Key type="Curve" time="0.3" value="0" in="Auto"/>
+                        <Key type="Curve" time="2.5" value="0" in="Auto"/>
                         <Key type="Curve" time="2.8" value="0" out="Auto"/>
+                    </Controller>
+                </Animation>
+            </Frame>
+
+            <Frame type="Label" name="NotificationTitle_Blur">
+                <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+                <Anchor side="Bottom" relative="$parent" pos="Min" offset="94"/>
+                <Height val="69"/>
+                <Width val="1300"/>
+                <Style val="Storm_InGame_Notification_Title_Glow"/>
+                <Text val="{$parent/NotificationTitle/@Text}"/>
+                <Alpha val="0"/>
+                <Blur val="true"/>
+                <BlurAmount val="2"/>
+                
+                <Animation name="ShowTitle">
+                    <Event event="ShowStandardNotification" action="Reset" frame="$parent/$parent"/>
+                    <Event event="ShowStandardNotification" action="Play" frame="$parent/$parent"/>
+                    
+                    <Controller type="Fade" end="Pause">
+                        <Key type="Curve" time="0.0" value="0" out="Auto"/>
+                        <Key type="Curve" time="0.1" value="0" out="Auto"/>
+                        <Key type="Curve" time="0.4" value="255" in="Auto"/>
+                        <Key type="Curve" time="2.6" value="255" in="Auto"/>
+                        <Key type="Curve" time="2.8" value="0" out="Auto"/>
+                    </Controller>
+                
+                    <Controller type="Anchor" end="Pause" side="Right" relative="true">
+                        <Key type="Curve" time="0.0" value="-365" out="Auto"/>
+                        <Key type="Curve" time="0.1" value="-365" out="Auto"/>
+                        <Key type="Curve" time="0.4" value="0" in="Auto" out="Linear"/>
+                        <Key type="Curve" time="2.6" value="35" in="Linear" out="Auto"/>
+                        <Key type="Curve" time="2.8" value="355" in="Auto"/>
                     </Controller>
                 </Animation>
             </Frame>
             
             <Frame type="Label" name="NotificationTitle">
                 <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
-                <Anchor side="Bottom" relative="$parent" pos="Min" offset="104"/>
+                <Anchor side="Bottom" relative="$parent" pos="Min" offset="94"/>
                 <Height val="69"/>
                 <Width val="1300"/>
                 <Style val="Storm_InGame_Notification_Title"/>
@@ -104,11 +175,44 @@
                     </Controller>
                 </Animation>
             </Frame>
+
+            <Frame type="Label" name="NotificationLabel_Blur">
+                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Top" relative="$parent" pos="Min" offset="82"/>
+                <Height val="40"/>
+                <Width val="1300"/>
+                <Style val="Storm_InGame_Notification_Label_Blur"/>
+                <Text val="{$parent/NotificationLabel/@Text}"/>
+                <Alpha val="0"/>
+                <Blur val="true"/>
+                <BlurAmount val="2"/>
+                
+                <Animation name="ShowLabel">
+                    <Event event="ShowStandardNotification" action="Reset" frame="$parent/$parent"/>
+                    <Event event="ShowStandardNotification" action="Play" frame="$parent/$parent"/>
+                    
+                    <Controller type="Fade" end="Pause">
+                        <Key type="Curve" time="0.0" value="0" out="Auto"/>
+                        <Key type="Curve" time="0.1" value="0" out="Auto"/>
+                        <Key type="Curve" time="0.4" value="255" in="Auto"/>
+                        <Key type="Curve" time="2.6" value="255" in="Auto"/>
+                        <Key type="Curve" time="2.8" value="0" out="Auto"/>
+                    </Controller>
+                    
+                    <Controller type="Anchor" end="Pause" side="Left" relative="true">
+                        <Key type="Curve" time="0.0" value="330" out="Auto"/>
+                        <Key type="Curve" time="0.1" value="330" out="Auto"/>
+                        <Key type="Curve" time="0.4" value="0" in="Auto" out="Linear"/>
+                        <Key type="Curve" time="2.6" value="-35" in="Linear" out="Auto"/>
+                        <Key type="Curve" time="2.8" value="-320" in="Auto"/>
+                    </Controller>
+                </Animation>
+            </Frame>
             
             <Frame type="Label" name="NotificationLabel">
                 <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
-                <Anchor side="Top" relative="$parent" pos="Min" offset="97"/>
-                <Height val="39"/>
+                <Anchor side="Top" relative="$parent" pos="Min" offset="82"/>
+                <Height val="40"/>
                 <Width val="1300"/>
                 <Style val="Storm_InGame_Notification_Label"/>
                 <Text val="[Hero Name]"/>
@@ -136,21 +240,28 @@
                 </Animation>
             </Frame>
         </Frame>
-        
+          
         <!-- Enemy Notification animation -->
         <Frame type="Frame" name="StandardEnemyNotificationTemplate">
-            <Anchor side="Top" relative="$parent" pos="Min" offset="35"/>
+            <Anchor side="Top" relative="$parent" pos="Min" offset="49"/>
             <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
             <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
             <Height val="173"/>
             <Width val="1300"/>
             
             <Animation name="Begin">
-                <Event event="ShowEnemyNotification" action="DirectionForward" frame="$parent"/>
+                <Event event="ShowEnemyNotification" action="Reset" frame="$parent"/>
                 <Event event="ShowEnemyNotification" action="Play" frame="$parent"/>
+                <Controller type="Visibility" end="Pause">
+                    <Key type="Bool" time="0" value="False"/>
+                    <Key type="Bool" time=".001" value="True"/>
+                </Controller>
+
                 <Controller type="Fade" end="Pause">
                     <Key type="Curve" time="0.0" value="0" out="Slow"/>
                     <Key type="Curve" time="0.1" value="255" in="Fast"/>
+                    <Key type="Curve" time="2.79" value="255" out="Slow"/>
+                    <Key type="Curve" time="2.8" value="0" in="Fast"/>
                 </Controller>
                 
                 <Controller type="Sound" end="Stop">
@@ -159,22 +270,54 @@
             </Animation>
             
             <Animation name="End">
-                <Event event="ShowStandardNotification" action="DirectionForward" frame="$parent"/>
+                <Event event="ShowStandardNotification" action="Reset" frame="$parent"/>
                 <Event event="ShowStandardNotification" action="Play" frame="$parent"/>
-                <Event event="ShowTimedNotification_Tier1" action="DirectionForward" frame="$parent"/>
+                <Event event="ShowTimedNotification_Tier0" action="Reset" frame="$parent"/>
+                <Event event="ShowTimedNotification_Tier0" action="Play" frame="$parent"/>
+                <Event event="ShowTimedNotification_Tier1" action="Reset" frame="$parent"/>
                 <Event event="ShowTimedNotification_Tier1" action="Play" frame="$parent"/>
-                <Event event="ShowTimedNotification_Tier2" action="DirectionForward" frame="$parent"/>
+                <Event event="ShowTimedNotification_Tier2" action="Reset" frame="$parent"/>
                 <Event event="ShowTimedNotification_Tier2" action="Play" frame="$parent"/>
-                <Event event="ShowTimedNotification_Tier3" action="DirectionForward" frame="$parent"/>
+                <Event event="ShowTimedNotification_Tier3" action="Reset" frame="$parent"/>
                 <Event event="ShowTimedNotification_Tier3" action="Play" frame="$parent"/>
-                <Event event="ShowTimedNotification_Tier4" action="DirectionForward" frame="$parent"/>
+                <Event event="ShowTimedNotification_Tier4" action="Reset" frame="$parent"/>
                 <Event event="ShowTimedNotification_Tier4" action="Play" frame="$parent"/>
-                <Controller type="Fade" end="Pause">
-                    <Key type="Curve" time="0.0" value="255" out="Slow"/>
-                    <Key type="Curve" time="0.05" value="0" in="Fast"/>
+                <Controller type="Visibility" end="Pause">
+                    <Key type="Bool" time="0" value="True"/>
+                    <Key type="Bool" time=".001" value="False"/>
                 </Controller>
             </Animation>
             
+            <Frame type="CutsceneFrame" name="EnemyBackgroundCutscene">
+                <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+                <Width val="1600"/>
+                <Height val="550"/>
+                <File val="Cutscenes/GameUI_KillCallout.StormCutscene"/>
+                <RenderType val="HDR"/>
+                <Unclipped val="True"/>
+                <Visible val="False"/>
+
+                <Animation name="PlayEnemyBg">
+                    <Event event="ShowEnemyNotification" action="Reset" frame="$parent/$parent"/>
+                    <Event event="ShowEnemyNotification" action="Play" frame="$parent/$parent"/>
+
+                    <Controller type="Visibility" end="Pause">
+                        <Key type="Bool" time="0" value="False"/>
+                        <Key type="Bool" time=".001" value="True"/>
+                    </Controller>
+                        
+                    <Controller type="Cutscene" end="Stop">
+                        <Key type="Cutscene" time="0.001" action="Play"/>
+                        <Key type="Cutscene" time="0.002" action="Bookmark" bookmark="0"/>
+                        <Key type="Cutscene" time="0.003" action="RemoveFilter" filter="Ally"/>
+                        <Key type="Cutscene" time="0.004" action="AddFilter" filter="Enemy"/>
+                    </Controller>
+                </Animation>
+            </Frame>
+
             <Frame type="Image" name="NotificationBackground">
                 <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
                 <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
@@ -190,16 +333,49 @@
                     
                     <Controller type="Fade" end="Pause">
                         <Key type="Curve" time="0.0" value="0" out="Auto"/>
-                        <Key type="Curve" time="0.3" value="255" in="Auto"/>
-                        <Key type="Curve" time="2.5" value="255" in="Auto"/>
+                        <Key type="Curve" time="0.3" value="0" in="Auto"/>
+                        <Key type="Curve" time="2.5" value="0" in="Auto"/>
                         <Key type="Curve" time="2.8" value="0" out="Auto"/>
                     </Controller>
                 </Animation>
             </Frame>
             
+            <Frame type="Label" name="NotificationTitle_Blur">
+                <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+                <Anchor side="Bottom" relative="$parent" pos="Min" offset="99"/>
+                <Height val="69"/>
+                <Width val="1300"/>
+                <Style val="Storm_InGame_Notification_Title_Red_Glow"/>
+                <Text val="{$parent/NotificationTitle/@Text}"/>
+                <Alpha val="0"/>
+                <Blur val="true"/>
+                <BlurAmount val="2"/>
+                
+                <Animation name="ShowTitle">
+                    <Event event="ShowEnemyNotification" action="Reset" frame="$parent/$parent"/>
+                    <Event event="ShowEnemyNotification" action="Play" frame="$parent/$parent"/>
+                    
+                    <Controller type="Fade" end="Pause">
+                        <Key type="Curve" time="0.0" value="0" out="Auto"/>
+                        <Key type="Curve" time="0.1" value="0" out="Auto"/>
+                        <Key type="Curve" time="0.4" value="255" in="Auto"/>
+                        <Key type="Curve" time="2.6" value="255" in="Auto"/>
+                        <Key type="Curve" time="2.8" value="0" out="Auto"/>
+                    </Controller>
+
+                    <Controller type="Anchor" end="Pause" side="Right" relative="true">
+                        <Key type="Curve" time="0.0" value="-365" out="Auto"/>
+                        <Key type="Curve" time="0.1" value="-365" out="Auto"/>
+                        <Key type="Curve" time="0.4" value="0" in="Auto" out="Linear"/>
+                        <Key type="Curve" time="2.6" value="35" in="Linear" out="Auto"/>
+                        <Key type="Curve" time="2.8" value="355" in="Auto"/>
+                    </Controller>
+                </Animation>
+            </Frame>
+
             <Frame type="Label" name="NotificationTitle">
                 <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
-                <Anchor side="Bottom" relative="$parent" pos="Min" offset="104"/>
+                <Anchor side="Bottom" relative="$parent" pos="Min" offset="99"/>
                 <Height val="69"/>
                 <Width val="1300"/>
                 <Style val="Storm_InGame_Notification_Title_Red"/>
@@ -235,10 +411,43 @@
                 </Animation>
             </Frame>
             
+            <Frame type="Label" name="NotificationLabel_Blur">
+                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Top" relative="$parent" pos="Min" offset="87"/>
+                <Height val="40"/>
+                <Width val="1300"/>
+                <Style val="Storm_InGame_Notification_Label_Red_Blur"/>
+                <Text val="{$parent/NotificationLabel/@Text}"/>
+                <Alpha val="0"/>
+                <Blur val="true"/>
+                <BlurAmount val="2"/>
+                
+                <Animation name="ShowLabel">
+                    <Event event="ShowEnemyNotification" action="Reset" frame="$parent/$parent"/>
+                    <Event event="ShowEnemyNotification" action="Play" frame="$parent/$parent"/>
+                    
+                    <Controller type="Fade" end="Pause">
+                        <Key type="Curve" time="0.0" value="0" out="Auto"/>
+                        <Key type="Curve" time="0.1" value="0" out="Auto"/>
+                        <Key type="Curve" time="0.4" value="255" in="Auto"/>
+                        <Key type="Curve" time="2.6" value="255" in="Auto"/>
+                        <Key type="Curve" time="2.8" value="0" out="Auto"/>
+                    </Controller>
+                    
+                    <Controller type="Anchor" end="Pause" side="Left" relative="true">
+                        <Key type="Curve" time="0.0" value="330" out="Auto"/>
+                        <Key type="Curve" time="0.1" value="330" out="Auto"/>
+                        <Key type="Curve" time="0.4" value="0" in="Auto" out="Linear"/>
+                        <Key type="Curve" time="2.6" value="-35" in="Linear" out="Auto"/>
+                        <Key type="Curve" time="2.8" value="-320" in="Auto"/>
+                    </Controller>
+                </Animation>
+            </Frame>
+
             <Frame type="Label" name="NotificationLabel">
                 <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
-                <Anchor side="Top" relative="$parent" pos="Min" offset="100"/>
-                <Height val="36"/>
+                <Anchor side="Top" relative="$parent" pos="Min" offset="87"/>
+                <Height val="40"/>
                 <Width val="1300"/>
                 <Style val="Storm_InGame_Notification_Label_Red"/>
                 <Text val="[Hero Name]"/>
@@ -269,15 +478,21 @@
         
         <!-- Tutorial Notification animation -->
         <Frame type="Frame" name="TutorialNotificationTemplate">
-            <Anchor side="Top" relative="$parent" pos="Min" offset="40"/>
+            <Anchor side="Top" relative="$parent" pos="Min" offset="54"/>
             <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
             <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
             <Height val="168"/>
             <Width val="1300"/>
+            <Visible val="False"/>
             
             <Animation name="Begin">
                 <Event event="ShowTutorialNotification" action="DirectionForward" frame="$parent"/>
                 <Event event="ShowTutorialNotification" action="Play" frame="$parent"/>
+                <Controller type="Visibility" end="Pause">
+                    <Key type="Bool" time="0" value="False"/>
+                    <Key type="Bool" time=".001" value="True"/>
+                </Controller>
+
                 <Controller type="Fade" end="Pause">
                     <Key type="Curve" time="0.0" value="0" out="Slow"/>
                     <Key type="Curve" time="0.1" value="255" in="Fast"/>
@@ -287,6 +502,36 @@
                     <Key type="Sound" time="0.1" sound="@UI_Game_Flyin_EnemyKilled1"/>
                 </Controller>
             </Animation>
+
+            <Frame type="CutsceneFrame" name="AllyBackgroundCutscene">
+                <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+                <Width val="1600"/>
+                <Height val="550"/>
+                <File val="Cutscenes/GameUI_KillCallout.StormCutscene"/>
+                <RenderType val="HDR"/>
+                <Unclipped val="True"/>
+                <Visible val="False"/>
+
+                <Animation name="PlayAllyBg">
+                    <Event event="ShowTutorialNotification" action="Reset" frame="$parent/$parent"/>
+                    <Event event="ShowTutorialNotification" action="Play" frame="$parent/$parent"/>
+
+                    <Controller type="Visibility" end="Pause">
+                        <Key type="Bool" time="0" value="False"/>
+                        <Key type="Bool" time=".001" value="True"/>
+                    </Controller>
+                        
+                    <Controller type="Cutscene" end="Stop">
+                        <Key type="Cutscene" time="0.001" action="Play"/>
+                        <Key type="Cutscene" time="0.002" action="Bookmark" bookmark="0"/>
+                        <Key type="Cutscene" time="0.003" action="RemoveFilter" filter="Enemy"/>
+                        <Key type="Cutscene" time="0.004" action="AddFilter" filter="Ally"/>
+                    </Controller>
+                </Animation>
+            </Frame>
             
             <Frame type="Image" name="NotificationBackground">
                 <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
@@ -389,74 +634,340 @@
             <Height val="248"/>
 
             <Frame type="CutsceneFrame" name="BackgroundCutscene">
-                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
-                <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
-                <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
-                <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
-                <File val="Cutscenes/GameUI_MultiKill.StormCutscene"/>
+                <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Top" relative="$parent" pos="Mid" offset="37"/>
+                <Anchor side="Bottom" relative="$parent" pos="Mid" offset="37"/>
+                <File val="Cutscenes/GameUI_KillCallout.StormCutscene"/>
                 <RenderType val="HDR"/>
-                    
+                <Width val="1600"/>
+                <Height val="550"/>
+                <Unclipped val="True"/>
+                <Visible val="False"/>
+
+                <Animation name="HideWhenNotInUse">
+                    <Event event="OnBookmark[0 End]" action="Reset,Play"/>
+                    <Event event="OnBookmark[1 End]" action="Reset,Play"/>
+                    <Event event="OnBookmark[2 End]" action="Reset,Play"/>
+
+                    <Controller type="Visibility" end="Pause">
+                        <Key type="Bool" time="0" value="True"/>
+                        <Key type="Bool" time=".001" value="False"/>
+                    </Controller>
+                </Animation>
+
+                <Animation name="PlayTier0">
+                    <Event event="ShowTimedNotification_Tier0" action="Reset" frame="$parent/$parent"/>
+                    <Event event="ShowTimedNotification_Tier0" action="Play" frame="$parent/$parent"/>
+
+                    <Controller type="Visibility" end="Pause">
+                        <Key type="Bool" time="0" value="False"/>
+                        <Key type="Bool" time=".001" value="True"/>
+                    </Controller>
+                        
+                    <Controller type="Cutscene" end="Stop">
+                        <Key type="Cutscene" time="0.0" action="Play"/>
+                        <Key type="Cutscene" time="0.0" action="Bookmark" bookmark="0"/>
+                        <Key type="Cutscene" time="0.001" action="RemoveFilter" filter="Enemy"/>
+                        <Key type="Cutscene" time="0.001" action="AddFilter" filter="Ally"/>
+                    </Controller>
+                </Animation>
+                
                 <Animation name="PlayTier1">
                     <Event event="ShowTimedNotification_Tier1" action="Reset" frame="$parent/$parent"/>
                     <Event event="ShowTimedNotification_Tier1" action="Play" frame="$parent/$parent"/>
+
+                    <Controller type="Visibility" end="Pause">
+                        <Key type="Bool" time="0" value="False"/>
+                        <Key type="Bool" time=".001" value="True"/>
+                    </Controller>
                         
-                    <Controller type="Cutscene" end="Pause">
+                    <Controller type="Cutscene" end="Stop">
                         <Key type="Cutscene" time="0.0" action="Play"/>
-                        <Key type="Cutscene" time="0.0" action="Bookmark" bookmark="Tier1 Start"/>
+                        <Key type="Cutscene" time="0.0" action="Bookmark" bookmark="0"/>
+                        <Key type="Cutscene" time="0.001" action="RemoveFilter" filter="Enemy"/>
+                        <Key type="Cutscene" time="0.001" action="AddFilter" filter="Ally"/>
                     </Controller>
                 </Animation>
 
                 <Animation name="PlayTier2">
                     <Event event="ShowTimedNotification_Tier2" action="Reset" frame="$parent/$parent"/>
                     <Event event="ShowTimedNotification_Tier2" action="Play" frame="$parent/$parent"/>
+
+                    <Controller type="Visibility" end="Pause">
+                        <Key type="Bool" time="0" value="False"/>
+                        <Key type="Bool" time=".001" value="True"/>
+                    </Controller>
                         
-                    <Controller type="Cutscene" end="Pause">
+                    <Controller type="Cutscene" end="Stop">
                         <Key type="Cutscene" time="0.0" action="Play"/>
-                        <Key type="Cutscene" time="0.0" action="Bookmark" bookmark="Tier2 Start"/>
+                        <Key type="Cutscene" time="0.0" action="Bookmark" bookmark="1"/>
+                        <Key type="Cutscene" time="0.001" action="RemoveFilter" filter="Enemy"/>
+                        <Key type="Cutscene" time="0.001" action="AddFilter" filter="Ally"/>
                     </Controller>
                 </Animation>
 
                 <Animation name="PlayTier3">
                     <Event event="ShowTimedNotification_Tier3" action="Reset" frame="$parent/$parent"/>
                     <Event event="ShowTimedNotification_Tier3" action="Play" frame="$parent/$parent"/>
+
+                    <Controller type="Visibility" end="Pause">
+                        <Key type="Bool" time="0" value="False"/>
+                        <Key type="Bool" time=".001" value="True"/>
+                    </Controller>
                         
-                    <Controller type="Cutscene" end="Pause">
+                    <Controller type="Cutscene" end="Stop">
                         <Key type="Cutscene" time="0.0" action="Play"/>
-                        <Key type="Cutscene" time="0.0" action="Bookmark" bookmark="Tier3 Start"/>
+                        <Key type="Cutscene" time="0.0" action="Bookmark" bookmark="1"/>
+                        <Key type="Cutscene" time="0.001" action="RemoveFilter" filter="Enemy"/>
+                        <Key type="Cutscene" time="0.001" action="AddFilter" filter="Ally"/>
                     </Controller>
                 </Animation>
 
                 <Animation name="PlayTier4">
                     <Event event="ShowTimedNotification_Tier4" action="Reset" frame="$parent/$parent"/>
                     <Event event="ShowTimedNotification_Tier4" action="Play" frame="$parent/$parent"/>
+
+                    <Controller type="Visibility" end="Pause">
+                        <Key type="Bool" time="0" value="False"/>
+                        <Key type="Bool" time=".001" value="True"/>
+                    </Controller>
                         
-                    <Controller type="Cutscene" end="Pause">
+                    <Controller type="Cutscene" end="Stop">
                         <Key type="Cutscene" time="0.0" action="Play"/>
-                        <Key type="Cutscene" time="0.0" action="Bookmark" bookmark="Tier4 Start"/>
+                        <Key type="Cutscene" time="0.0" action="Bookmark" bookmark="2"/>
+                        <Key type="Cutscene" time="0.001" action="RemoveFilter" filter="Enemy"/>
+                        <Key type="Cutscene" time="0.001" action="AddFilter" filter="Ally"/>
                     </Controller>
                 </Animation>
 
                 <Animation name="PlayTier5">
                     <Event event="ShowTimedNotification_Tier5" action="Reset" frame="$parent/$parent"/>
                     <Event event="ShowTimedNotification_Tier5" action="Play" frame="$parent/$parent"/>
+
+                    <Controller type="Visibility" end="Pause">
+                        <Key type="Bool" time="0" value="False"/>
+                        <Key type="Bool" time=".001" value="True"/>
+                    </Controller>
                         
-                    <Controller type="Cutscene" end="Pause">
+                    <Controller type="Cutscene" end="Stop">
                         <Key type="Cutscene" time="0.0" action="Play"/>
-                        <Key type="Cutscene" time="0.0" action="Bookmark" bookmark="Tier5 Start"/>
+                        <Key type="Cutscene" time="0.0" action="Bookmark" bookmark="2"/>
+                        <Key type="Cutscene" time="0.001" action="RemoveFilter" filter="Enemy"/>
+                        <Key type="Cutscene" time="0.001" action="AddFilter" filter="Ally"/>
                     </Controller>
                 </Animation>
             </Frame>
-            
-            <!-- Timed Kills - Tier 1-->
-            <Frame type="Frame" name="TimedKillNotification_Tier1">
-                <Anchor side="Top" relative="$parent" pos="Min" offset="40"/>
+  
+            <!-- Timed Kills - Tier 0 - Single Kill -->
+            <Frame type="Frame" name="TimedKillNotification_Tier0">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="54"/>
                 <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
                 <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
                 <Height val="168"/>
                 
                 <Animation name="Begin">
-                    <Event event="ShowTimedNotification_Tier1" action="DirectionForward" frame="$parent/$parent"/>
+                    <Event event="ShowTimedNotification_Tier0" action="Reset" frame="$parent/$parent"/>
+                    <Event event="ShowTimedNotification_Tier0" action="Play" frame="$parent/$parent"/>
+                    <Controller type="Visibility" end="Pause">
+                        <Key type="Bool" time="0" value="False"/>
+                        <Key type="Bool" time=".001" value="True"/>
+                    </Controller>
+
+                    <Controller type="Fade" end="Pause">
+                        <Key type="Curve" time="0.0" value="0" out="Slow"/>
+                        <Key type="Curve" time="0.1" value="255" in="Fast"/>
+                    </Controller>
+                    
+                    <Controller type="Sound" end="Stop">
+                        <Key type="Sound" time="0.1" sound="@UI_Game_Flyin_EnemyKilled1"/>
+                    </Controller>
+                </Animation>
+                
+                <Animation name="End">
+                    <Event event="ShowTimedNotification_Tier1" action="Reset" frame="$parent/$parent"/>
                     <Event event="ShowTimedNotification_Tier1" action="Play" frame="$parent/$parent"/>
+                    <Event event="ShowEnemyNotification" action="Reset" frame="$parent/$parent"/>
+                    <Event event="ShowEnemyNotification" action="Play" frame="$parent/$parent"/>
+                    <Controller type="Visibility" end="Pause">
+                        <Key type="Bool" time="0" value="True"/>
+                        <Key type="Bool" time=".001" value="false"/>
+                    </Controller>
+                </Animation>
+                
+                <Frame type="Image" name="NotificationBackground">
+                    <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+                    <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+                    <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                    <Width val="517"/>
+                    <Height val="168"/>
+                    <Texture val="@UI/HUD_Notifications_BG_Blue"/>
+                    <Alpha val="0"/>
+                    
+                    <Animation name="ShowBackground">
+                        <Event event="ShowTimedNotification_Tier0" action="Reset" frame="$parent/$parent/$parent"/>
+                        <Event event="ShowTimedNotification_Tier0" action="Play" frame="$parent/$parent/$parent"/>
+                        
+                        <Controller type="Fade" end="Pause">
+                            <Key type="Curve" time="0.0" value="0" out="Auto"/>
+                            <Key type="Curve" time="0.3" value="0" in="Auto"/>
+                            <Key type="Curve" time="2.5" value="0" in="Auto"/>
+                            <Key type="Curve" time="2.8" value="0" out="Auto"/>
+                        </Controller>
+                    </Animation>
+                </Frame>
+
+                <Frame type="Label" name="NotificationTitle_Blur">
+                    <Anchor side="Right" relative="$parent" pos="Mid" offset="800"/>
+                    <Anchor side="Bottom" relative="$parent" pos="Min" offset="117"/>
+                    <Height val="69"/>
+                    <Width val="1600"/>
+                    <Style val="Storm_InGame_Notification_Title_Glow"/>
+                    <Text val="{$parent/NotificationTitle/@Text}"/>
+                    <Alpha val="0"/>
+                    <Blur val="true"/>
+                    <BlurAmount val="2"/>
+                    
+                    <Animation name="ShowTitle">
+                        <Event event="ShowTimedNotification_Tier0" action="Reset" frame="$parent/$parent/$parent"/>
+                        <Event event="ShowTimedNotification_Tier0" action="Play" frame="$parent/$parent/$parent"/>
+                        
+                        <Controller type="Fade" end="Pause">
+                            <Key type="Curve" time="0.0" value="0" out="Auto"/>
+                            <Key type="Curve" time="0.1" value="0" out="Auto"/>
+                            <Key type="Curve" time="0.4" value="255" in="Auto"/>
+                            <Key type="Curve" time="2.6" value="255" in="Auto"/>
+                            <Key type="Curve" time="2.8" value="0" out="Auto"/>
+                        </Controller>
+
+                        <Controller type="Anchor" end="Pause" side="Right" relative="true">
+                            <Key type="Curve" time="0.0" value="-365" out="Auto"/>
+                            <Key type="Curve" time="0.1" value="-365" out="Auto"/>
+                            <Key type="Curve" time="0.4" value="0" in="Auto" out="Linear"/>
+                            <Key type="Curve" time="2.6" value="20" in="Linear" out="Auto"/>
+                            <Key type="Curve" time="2.8" value="355" in="Auto"/>
+                        </Controller>
+                    </Animation>
+                </Frame>
+                
+                <Frame type="Label" name="NotificationTitle">
+                    <Anchor side="Right" relative="$parent" pos="Mid" offset="800"/>
+                    <Anchor side="Bottom" relative="$parent" pos="Min" offset="117"/>
+                    <Height val="69"/>
+                    <Width val="1600"/>
+                    <Style val="Storm_InGame_Notification_Title"/>
+                    <Text val="[Timed Notification Text]"/>
+                    <Alpha val="0"/>
+                    
+                    <Animation name="ShowTitle">
+                        <Event event="ShowTimedNotification_Tier0" action="Reset" frame="$parent/$parent/$parent"/>
+                        <Event event="ShowTimedNotification_Tier0" action="Play" frame="$parent/$parent/$parent"/>
+                        
+                        <Controller type="Fade" end="Pause">
+                            <Key type="Curve" time="0.0" value="0" out="Auto"/>
+                            <Key type="Curve" time="0.1" value="0" out="Auto"/>
+                            <Key type="Curve" time="0.4" value="255" in="Auto"/>
+                            <Key type="Curve" time="2.6" value="255" in="Auto"/>
+                            <Key type="Curve" time="2.8" value="0" out="Auto"/>
+                        </Controller>
+                        
+                        <Controller type="Blur" end="Pause">
+                            <Key type="Curve" time="0.0" value="0.5" out="Linear"/>
+                            <Key type="Curve" time="0.4" value="0" out="Linear"/>
+                            <Key type="Curve" time="2.6" value="0" out="Linear"/>
+                            <Key type="Curve" time="2.8" value="0.5" out="Linear"/>
+                        </Controller>
+                    
+                        <Controller type="Anchor" end="Pause" side="Right" relative="true">
+                            <Key type="Curve" time="0.0" value="-365" out="Auto"/>
+                            <Key type="Curve" time="0.1" value="-365" out="Auto"/>
+                            <Key type="Curve" time="0.4" value="0" in="Auto" out="Linear"/>
+                            <Key type="Curve" time="2.6" value="20" in="Linear" out="Auto"/>
+                            <Key type="Curve" time="2.8" value="355" in="Auto"/>
+                        </Controller>
+                    </Animation>
+                </Frame>
+
+                <Frame type="Label" name="NotificationLabel_Blur">
+                    <Anchor side="Left" relative="$parent" pos="Mid" offset="-800"/>
+                    <Anchor side="Top" relative="$parent" pos="Min" offset="105"/>
+                    <Height val="40"/>
+                    <Width val="1600"/>
+                    <Style val="Storm_InGame_Notification_Label_Blur"/>
+                    <Text val="{$parent/NotificationLabel/@Text}"/>
+                    <Alpha val="0"/>
+                    <Blur val="true"/>
+                    <BlurAmount val="2"/>
+                    
+                    <Animation name="ShowLabel">
+                        <Event event="ShowTimedNotification_Tier0" action="Reset" frame="$parent/$parent/$parent"/>
+                        <Event event="ShowTimedNotification_Tier0" action="Play" frame="$parent/$parent/$parent"/>
+                        
+                        <Controller type="Fade" end="Pause">
+                            <Key type="Curve" time="0.0" value="0" out="Auto"/>
+                            <Key type="Curve" time="0.1" value="0" out="Auto"/>
+                            <Key type="Curve" time="0.4" value="255" in="Auto"/>
+                            <Key type="Curve" time="2.6" value="255" in="Auto"/>
+                            <Key type="Curve" time="2.8" value="0" out="Auto"/>
+                        </Controller>
+                        
+                        <Controller type="Anchor" end="Pause" side="Left" relative="true">
+                            <Key type="Curve" time="0.0" value="330" out="Auto"/>
+                            <Key type="Curve" time="0.1" value="330" out="Auto"/>
+                            <Key type="Curve" time="0.4" value="0" in="Auto" out="Linear"/>
+                            <Key type="Curve" time="2.6" value="-20" in="Linear" out="Auto"/>
+                            <Key type="Curve" time="2.8" value="-320" in="Auto"/>
+                        </Controller>
+                    </Animation>
+                </Frame>
+                
+                <Frame type="Label" name="NotificationLabel">
+                    <Anchor side="Left" relative="$parent" pos="Mid" offset="-800"/>
+                    <Anchor side="Top" relative="$parent" pos="Min" offset="105"/>
+                    <Height val="40"/>
+                    <Width val="1600"/>
+                    <Style val="Storm_InGame_Notification_Label"/>
+                    <Text val="[Tier 0]"/>
+                    <Alpha val="0"/>
+                    
+                    <Animation name="ShowLabel">
+                        <Event event="ShowTimedNotification_Tier0" action="Reset" frame="$parent/$parent/$parent"/>
+                        <Event event="ShowTimedNotification_Tier0" action="Play" frame="$parent/$parent/$parent"/>
+                        
+                        <Controller type="Fade" end="Pause">
+                            <Key type="Curve" time="0.0" value="0" out="Auto"/>
+                            <Key type="Curve" time="0.1" value="0" out="Auto"/>
+                            <Key type="Curve" time="0.4" value="255" in="Auto"/>
+                            <Key type="Curve" time="2.6" value="255" in="Auto"/>
+                            <Key type="Curve" time="2.8" value="0" out="Auto"/>
+                        </Controller>
+                        
+                        <Controller type="Anchor" end="Pause" side="Left" relative="true">
+                            <Key type="Curve" time="0.0" value="330" out="Auto"/>
+                            <Key type="Curve" time="0.1" value="330" out="Auto"/>
+                            <Key type="Curve" time="0.4" value="0" in="Auto" out="Linear"/>
+                            <Key type="Curve" time="2.6" value="-20" in="Linear" out="Auto"/>
+                            <Key type="Curve" time="2.8" value="-320" in="Auto"/>
+                        </Controller>
+                    </Animation>
+                </Frame>
+            </Frame>
+  
+            <!-- Timed Kills - Tier 1 - Double Kill -->
+            <Frame type="Frame" name="TimedKillNotification_Tier1">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="54"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+                <Height val="168"/>
+                
+                <Animation name="Begin">
+                    <Event event="ShowTimedNotification_Tier1" action="Reset" frame="$parent/$parent"/>
+                    <Event event="ShowTimedNotification_Tier1" action="Play" frame="$parent/$parent"/>
+                    <Controller type="Visibility" end="Pause">
+                        <Key type="Bool" time="0" value="False"/>
+                        <Key type="Bool" time=".001" value="True"/>
+                    </Controller>
+
                     <Controller type="Fade" end="Pause">
                         <Key type="Curve" time="0.0" value="0" out="Slow"/>
                         <Key type="Curve" time="0.1" value="255" in="Fast"/>
@@ -468,13 +979,13 @@
                 </Animation>
                 
                 <Animation name="End">
-                    <Event event="ShowTimedNotification_Tier2" action="DirectionForward" frame="$parent/$parent"/>
+                    <Event event="ShowTimedNotification_Tier2" action="Reset" frame="$parent/$parent"/>
                     <Event event="ShowTimedNotification_Tier2" action="Play" frame="$parent/$parent"/>
-                    <Event event="ShowEnemyNotification" action="DirectionForward" frame="$parent/$parent"/>
+                    <Event event="ShowEnemyNotification" action="Reset" frame="$parent/$parent"/>
                     <Event event="ShowEnemyNotification" action="Play" frame="$parent/$parent"/>
-                    <Controller type="Fade" end="Pause">
-                        <Key type="Curve" time="0.0" value="255" out="Slow"/>
-                        <Key type="Curve" time="0.05" value="0" in="Fast"/>
+                    <Controller type="Visibility" end="Pause">
+                        <Key type="Bool" time="0" value="True"/>
+                        <Key type="Bool" time=".001" value="false"/>
                     </Controller>
                 </Animation>
                 
@@ -493,16 +1004,49 @@
                         
                         <Controller type="Fade" end="Pause">
                             <Key type="Curve" time="0.0" value="0" out="Auto"/>
-                            <Key type="Curve" time="0.3" value="255" in="Auto"/>
-                            <Key type="Curve" time="2.5" value="255" in="Auto"/>
+                            <Key type="Curve" time="0.3" value="0" in="Auto"/>
+                            <Key type="Curve" time="2.5" value="0" in="Auto"/>
                             <Key type="Curve" time="2.8" value="0" out="Auto"/>
+                        </Controller>
+                    </Animation>
+                </Frame>
+
+                <Frame type="Label" name="NotificationTitle_Blur">
+                    <Anchor side="Right" relative="$parent" pos="Mid" offset="800"/>
+                    <Anchor side="Bottom" relative="$parent" pos="Min" offset="117"/>
+                    <Height val="69"/>
+                    <Width val="1600"/>
+                    <Style val="Storm_InGame_Notification_Title_Glow"/>
+                    <Text val="{$parent/NotificationTitle/@Text}"/>
+                    <Alpha val="0"/>
+                    <Blur val="true"/>
+                    <BlurAmount val="2"/>
+                    
+                    <Animation name="ShowTitle">
+                        <Event event="ShowTimedNotification_Tier1" action="Reset" frame="$parent/$parent/$parent"/>
+                        <Event event="ShowTimedNotification_Tier1" action="Play" frame="$parent/$parent/$parent"/>
+                        
+                        <Controller type="Fade" end="Pause">
+                            <Key type="Curve" time="0.0" value="0" out="Auto"/>
+                            <Key type="Curve" time="0.1" value="0" out="Auto"/>
+                            <Key type="Curve" time="0.4" value="255" in="Auto"/>
+                            <Key type="Curve" time="2.6" value="255" in="Auto"/>
+                            <Key type="Curve" time="2.8" value="0" out="Auto"/>
+                        </Controller>
+
+                        <Controller type="Anchor" end="Pause" side="Right" relative="true">
+                            <Key type="Curve" time="0.0" value="-365" out="Auto"/>
+                            <Key type="Curve" time="0.1" value="-365" out="Auto"/>
+                            <Key type="Curve" time="0.4" value="0" in="Auto" out="Linear"/>
+                            <Key type="Curve" time="2.6" value="20" in="Linear" out="Auto"/>
+                            <Key type="Curve" time="2.8" value="355" in="Auto"/>
                         </Controller>
                     </Animation>
                 </Frame>
                 
                 <Frame type="Label" name="NotificationTitle">
-                    <Anchor side="Right" relative="$parent" pos="Max" offset="-200"/>
-                    <Anchor side="Bottom" relative="$parent" pos="Min" offset="100"/>
+                    <Anchor side="Right" relative="$parent" pos="Mid" offset="800"/>
+                    <Anchor side="Bottom" relative="$parent" pos="Min" offset="117"/>
                     <Height val="69"/>
                     <Width val="1600"/>
                     <Style val="Storm_InGame_Notification_Title"/>
@@ -532,16 +1076,49 @@
                             <Key type="Curve" time="0.0" value="-365" out="Auto"/>
                             <Key type="Curve" time="0.1" value="-365" out="Auto"/>
                             <Key type="Curve" time="0.4" value="0" in="Auto" out="Linear"/>
-                            <Key type="Curve" time="2.6" value="35" in="Linear" out="Auto"/>
+                            <Key type="Curve" time="2.6" value="20" in="Linear" out="Auto"/>
                             <Key type="Curve" time="2.8" value="355" in="Auto"/>
+                        </Controller>
+                    </Animation>
+                </Frame>
+
+                <Frame type="Label" name="NotificationLabel_Blur">
+                    <Anchor side="Left" relative="$parent" pos="Mid" offset="-800"/>
+                    <Anchor side="Top" relative="$parent" pos="Min" offset="105"/>
+                    <Height val="40"/>
+                    <Width val="1600"/>
+                    <Style val="Storm_InGame_Notification_Label_Blur"/>
+                    <Text val="{$parent/NotificationLabel/@Text}"/>
+                    <Alpha val="0"/>
+                    <Blur val="true"/>
+                    <BlurAmount val="2"/>
+                    
+                    <Animation name="ShowLabel">
+                        <Event event="ShowTimedNotification_Tier1" action="Reset" frame="$parent/$parent/$parent"/>
+                        <Event event="ShowTimedNotification_Tier1" action="Play" frame="$parent/$parent/$parent"/>
+                        
+                        <Controller type="Fade" end="Pause">
+                            <Key type="Curve" time="0.0" value="0" out="Auto"/>
+                            <Key type="Curve" time="0.1" value="0" out="Auto"/>
+                            <Key type="Curve" time="0.4" value="255" in="Auto"/>
+                            <Key type="Curve" time="2.6" value="255" in="Auto"/>
+                            <Key type="Curve" time="2.8" value="0" out="Auto"/>
+                        </Controller>
+                        
+                        <Controller type="Anchor" end="Pause" side="Left" relative="true">
+                            <Key type="Curve" time="0.0" value="330" out="Auto"/>
+                            <Key type="Curve" time="0.1" value="330" out="Auto"/>
+                            <Key type="Curve" time="0.4" value="0" in="Auto" out="Linear"/>
+                            <Key type="Curve" time="2.6" value="-20" in="Linear" out="Auto"/>
+                            <Key type="Curve" time="2.8" value="-320" in="Auto"/>
                         </Controller>
                     </Animation>
                 </Frame>
                 
                 <Frame type="Label" name="NotificationLabel">
-                    <Anchor side="Left" relative="$parent" pos="Min" offset="200"/>
-                    <Anchor side="Top" relative="$parent" pos="Min" offset="100"/>
-                    <Height val="38"/>
+                    <Anchor side="Left" relative="$parent" pos="Mid" offset="-800"/>
+                    <Anchor side="Top" relative="$parent" pos="Min" offset="105"/>
+                    <Height val="40"/>
                     <Width val="1600"/>
                     <Style val="Storm_InGame_Notification_Label"/>
                     <Text val="[Tier 1]"/>
@@ -563,7 +1140,7 @@
                             <Key type="Curve" time="0.0" value="330" out="Auto"/>
                             <Key type="Curve" time="0.1" value="330" out="Auto"/>
                             <Key type="Curve" time="0.4" value="0" in="Auto" out="Linear"/>
-                            <Key type="Curve" time="2.6" value="-35" in="Linear" out="Auto"/>
+                            <Key type="Curve" time="2.6" value="-20" in="Linear" out="Auto"/>
                             <Key type="Curve" time="2.8" value="-320" in="Auto"/>
                         </Controller>
                     </Animation>
@@ -572,14 +1149,19 @@
             
             <!-- Animation for Timed Kills Tier 2 - Triple Kill -->
             <Frame type="Frame" name="TimedKillNotification_Tier2">
-                <Anchor side="Top" relative="$parent" pos="Min" offset="40"/>
+                <Anchor side="Top" relative="$parent" pos="Min" offset="54"/>
                 <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
                 <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
                 <Height val="168"/>
                 
                 <Animation name="Begin">
-                    <Event event="ShowTimedNotification_Tier2" action="DirectionForward" frame="$parent/$parent"/>
+                    <Event event="ShowTimedNotification_Tier2" action="Reset" frame="$parent/$parent"/>
                     <Event event="ShowTimedNotification_Tier2" action="Play" frame="$parent/$parent"/>
+                    <Controller type="Visibility" end="Pause">
+                        <Key type="Bool" time="0" value="False"/>
+                        <Key type="Bool" time=".001" value="True"/>
+                    </Controller>
+
                     <Controller type="Fade" end="Pause">
                         <Key type="Curve" time="0.0" value="0" out="Slow"/>
                         <Key type="Curve" time="0.1" value="255" in="Fast"/>
@@ -591,14 +1173,14 @@
                 </Animation>
                 
                 <Animation name="End">
-                    <Event event="ShowTimedNotification_Tier3" action="DirectionForward" frame="$parent/$parent"/>
+                    <Event event="ShowTimedNotification_Tier3" action="Reset" frame="$parent/$parent"/>
                     <Event event="ShowTimedNotification_Tier3" action="Play" frame="$parent/$parent"/>
-                    <Event event="ShowEnemyNotification" action="DirectionForward" frame="$parent/$parent"/>
+                    <Event event="ShowEnemyNotification" action="Reset" frame="$parent/$parent"/>
                     <Event event="ShowEnemyNotification" action="Play" frame="$parent/$parent"/>
 
-                    <Controller type="Fade" end="Pause">
-                        <Key type="Curve" time="0.0" value="255" out="Slow"/>
-                        <Key type="Curve" time="0.05" value="0" in="Fast"/>
+                    <Controller type="Visibility" end="Pause">
+                        <Key type="Bool" time="0" value="True"/>
+                        <Key type="Bool" time=".001" value="False"/>
                     </Controller>
                 </Animation>
                 
@@ -617,16 +1199,49 @@
                         
                         <Controller type="Fade" end="Pause">
                             <Key type="Curve" time="0.0" value="0" out="Auto"/>
-                            <Key type="Curve" time="0.3" value="255" in="Auto"/>
-                            <Key type="Curve" time="2.5" value="255" in="Auto"/>
+                            <Key type="Curve" time="0.3" value="0" in="Auto"/>
+                            <Key type="Curve" time="2.5" value="0" in="Auto"/>
                             <Key type="Curve" time="2.8" value="0" out="Auto"/>
+                        </Controller>
+                    </Animation>
+                </Frame>
+
+                <Frame type="Label" name="NotificationTitle_Blur">
+                    <Anchor side="Right" relative="$parent" pos="Mid" offset="800"/>
+                    <Anchor side="Bottom" relative="$parent" pos="Min" offset="121"/>
+                    <Height val="87"/>
+                    <Width val="1600"/>
+                    <Style val="Storm_InGame_Notification_Title_Tier2_Blur"/>
+                    <Text val="{$parent/NotificationTitle/@Text}"/>
+                    <Alpha val="0"/>
+                    <Blur val="true"/>
+                    <BlurAmount val="2"/>
+                    
+                    <Animation name="ShowTitle">
+                        <Event event="ShowTimedNotification_Tier2" action="Reset" frame="$parent/$parent/$parent"/>
+                        <Event event="ShowTimedNotification_Tier2" action="Play" frame="$parent/$parent/$parent"/>
+                        
+                        <Controller type="Fade" end="Pause">
+                            <Key type="Curve" time="0.0" value="0" out="Auto"/>
+                            <Key type="Curve" time="0.1" value="0" out="Auto"/>
+                            <Key type="Curve" time="0.4" value="255" in="Auto"/>
+                            <Key type="Curve" time="2.6" value="255" in="Auto"/>
+                            <Key type="Curve" time="2.8" value="0" out="Auto"/>
+                        </Controller>
+
+                        <Controller type="Anchor" end="Pause" side="Right" relative="true">
+                            <Key type="Curve" time="0.0" value="-365" out="Auto"/>
+                            <Key type="Curve" time="0.1" value="-365" out="Auto"/>
+                            <Key type="Curve" time="0.4" value="0" in="Auto" out="Linear"/>
+                            <Key type="Curve" time="2.6" value="20" in="Linear" out="Auto"/>
+                            <Key type="Curve" time="2.8" value="355" in="Auto"/>
                         </Controller>
                     </Animation>
                 </Frame>
                 
                 <Frame type="Label" name="NotificationTitle">
-                    <Anchor side="Right" relative="$parent" pos="Max" offset="-200"/>
-                    <Anchor side="Bottom" relative="$parent" pos="Min" offset="115"/>
+                    <Anchor side="Right" relative="$parent" pos="Mid" offset="800"/>
+                    <Anchor side="Bottom" relative="$parent" pos="Min" offset="121"/>
                     <Height val="87"/>
                     <Width val="1600"/>
                     <Style val="Storm_InGame_Notification_Title_Tier2"/>
@@ -656,16 +1271,49 @@
                             <Key type="Curve" time="0.0" value="-365" out="Auto"/>
                             <Key type="Curve" time="0.1" value="-365" out="Auto"/>
                             <Key type="Curve" time="0.4" value="0" in="Auto" out="Linear"/>
-                            <Key type="Curve" time="2.6" value="35" in="Linear" out="Auto"/>
+                            <Key type="Curve" time="2.6" value="20" in="Linear" out="Auto"/>
                             <Key type="Curve" time="2.8" value="355" in="Auto"/>
+                        </Controller>
+                    </Animation>
+                </Frame>
+
+                <Frame type="Label" name="NotificationLabel_Blur">
+                    <Anchor side="Left" relative="$parent" pos="Mid" offset="-800"/>
+                    <Anchor side="Top" relative="$parent" pos="Min" offset="105"/>
+                    <Height val="40"/>
+                    <Width val="1600"/>
+                    <Style val="Storm_InGame_Notification_Label_Blur"/>
+                    <Text val="{$parent/NotificationLabel/@Text}"/>
+                    <Alpha val="0"/>
+                    <Blur val="true"/>
+                    <BlurAmount val="2"/>
+                    
+                    <Animation name="ShowLabel">
+                        <Event event="ShowTimedNotification_Tier2" action="Reset" frame="$parent/$parent/$parent"/>
+                        <Event event="ShowTimedNotification_Tier2" action="Play" frame="$parent/$parent/$parent"/>
+                        
+                        <Controller type="Fade" end="Pause">
+                            <Key type="Curve" time="0.0" value="0" out="Auto"/>
+                            <Key type="Curve" time="0.1" value="0" out="Auto"/>
+                            <Key type="Curve" time="0.4" value="255" in="Auto"/>
+                            <Key type="Curve" time="2.6" value="255" in="Auto"/>
+                            <Key type="Curve" time="2.8" value="0" out="Auto"/>
+                        </Controller>
+                        
+                        <Controller type="Anchor" end="Pause" side="Left" relative="true">
+                            <Key type="Curve" time="0.0" value="330" out="Auto"/>
+                            <Key type="Curve" time="0.1" value="330" out="Auto"/>
+                            <Key type="Curve" time="0.4" value="0" in="Auto" out="Linear"/>
+                            <Key type="Curve" time="2.6" value="-20" in="Linear" out="Auto"/>
+                            <Key type="Curve" time="2.8" value="-320" in="Auto"/>
                         </Controller>
                     </Animation>
                 </Frame>
                 
                 <Frame type="Label" name="NotificationLabel">
-                    <Anchor side="Left" relative="$parent" pos="Min" offset="200"/>
-                    <Anchor side="Top" relative="$parent" pos="Min" offset="108"/>
-                    <Height val="38"/>
+                    <Anchor side="Left" relative="$parent" pos="Mid" offset="-800"/>
+                    <Anchor side="Top" relative="$parent" pos="Min" offset="105"/>
+                    <Height val="40"/>
                     <Width val="1600"/>
                     <Style val="Storm_InGame_Notification_Label"/>
                     <Text val="[Tier 2]"/>
@@ -687,7 +1335,7 @@
                             <Key type="Curve" time="0.0" value="330" out="Auto"/>
                             <Key type="Curve" time="0.1" value="330" out="Auto"/>
                             <Key type="Curve" time="0.4" value="0" in="Auto" out="Linear"/>
-                            <Key type="Curve" time="2.6" value="-35" in="Linear" out="Auto"/>
+                            <Key type="Curve" time="2.6" value="-20" in="Linear" out="Auto"/>
                             <Key type="Curve" time="2.8" value="-320" in="Auto"/>
                         </Controller>
                     </Animation>
@@ -696,14 +1344,19 @@
             
             <!-- Animation for Timed Kills Tier 3 - Quad Kill -->
             <Frame type="Frame" name="TimedKillNotification_Tier3">
-                <Anchor side="Top" relative="$parent" pos="Min" offset="40"/>
+                <Anchor side="Top" relative="$parent" pos="Min" offset="54"/>
                 <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
                 <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
                 <Height val="168"/>
                 
                 <Animation name="Begin">
-                    <Event event="ShowTimedNotification_Tier3" action="DirectionForward" frame="$parent/$parent"/>
+                    <Event event="ShowTimedNotification_Tier3" action="Reset" frame="$parent/$parent"/>
                     <Event event="ShowTimedNotification_Tier3" action="Play" frame="$parent/$parent"/>
+                    <Controller type="Visibility" end="Pause">
+                        <Key type="Bool" time="0" value="False"/>
+                        <Key type="Bool" time=".001" value="True"/>
+                    </Controller>
+
                     <Controller type="Fade" end="Pause">
                         <Key type="Curve" time="0.0" value="0" out="Slow"/>
                         <Key type="Curve" time="0.1" value="255" in="Fast"/>
@@ -715,13 +1368,13 @@
                 </Animation>
                 
                 <Animation name="End">
-                    <Event event="ShowTimedNotification_Tier4" action="DirectionForward" frame="$parent/$parent"/>
+                    <Event event="ShowTimedNotification_Tier4" action="Reset" frame="$parent/$parent"/>
                     <Event event="ShowTimedNotification_Tier4" action="Play" frame="$parent/$parent"/>
-                    <Event event="ShowEnemyNotification" action="DirectionForward" frame="$parent/$parent"/>
+                    <Event event="ShowEnemyNotification" action="Reset" frame="$parent/$parent"/>
                     <Event event="ShowEnemyNotification" action="Play" frame="$parent/$parent"/>
-                    <Controller type="Fade" end="Pause">
-                        <Key type="Curve" time="0.0" value="255" out="Slow"/>
-                        <Key type="Curve" time="0.05" value="0" in="Fast"/>
+                    <Controller type="Visibility" end="Pause">
+                        <Key type="Bool" time="0" value="True"/>
+                        <Key type="Bool" time=".001" value="False"/>
                     </Controller>
                 </Animation>
                 
@@ -740,16 +1393,49 @@
                         
                         <Controller type="Fade" end="Pause">
                             <Key type="Curve" time="0.0" value="0" out="Auto"/>
-                            <Key type="Curve" time="0.3" value="255" in="Auto"/>
-                            <Key type="Curve" time="2.5" value="255" in="Auto"/>
+                            <Key type="Curve" time="0.3" value="0" in="Auto"/>
+                            <Key type="Curve" time="2.5" value="0" in="Auto"/>
                             <Key type="Curve" time="2.8" value="0" out="Auto"/>
+                        </Controller>
+                    </Animation>
+                </Frame>
+
+                <Frame type="Label" name="NotificationTitle_Blur">
+                    <Anchor side="Right" relative="$parent" pos="Mid" offset="800"/>
+                    <Anchor side="Bottom" relative="$parent" pos="Min" offset="120"/>
+                    <Height val="87"/>
+                    <Width val="1600"/>
+                    <Style val="Storm_InGame_Notification_Title_Tier2_Blur"/>
+                    <Text val="{$parent/NotificationTitle/@Text}"/>
+                    <Alpha val="0"/>
+                    <Blur val="true"/>
+                    <BlurAmount val="2"/>
+                    
+                    <Animation name="ShowTitle">
+                        <Event event="ShowTimedNotification_Tier3" action="Reset" frame="$parent/$parent/$parent"/>
+                        <Event event="ShowTimedNotification_Tier3" action="Play" frame="$parent/$parent/$parent"/>
+                        
+                        <Controller type="Fade" end="Pause">
+                            <Key type="Curve" time="0.0" value="0" out="Auto"/>
+                            <Key type="Curve" time="0.1" value="0" out="Auto"/>
+                            <Key type="Curve" time="0.4" value="255" in="Auto"/>
+                            <Key type="Curve" time="2.6" value="255" in="Auto"/>
+                            <Key type="Curve" time="2.8" value="0" out="Auto"/>
+                        </Controller>
+                    
+                        <Controller type="Anchor" end="Pause" side="Right" relative="true">
+                            <Key type="Curve" time="0.0" value="-365" out="Auto"/>
+                            <Key type="Curve" time="0.1" value="-365" out="Auto"/>
+                            <Key type="Curve" time="0.4" value="0" in="Auto" out="Linear"/>
+                            <Key type="Curve" time="2.6" value="20" in="Linear" out="Auto"/>
+                            <Key type="Curve" time="2.8" value="355" in="Auto"/>
                         </Controller>
                     </Animation>
                 </Frame>
                 
                 <Frame type="Label" name="NotificationTitle">
-                    <Anchor side="Right" relative="$parent" pos="Max" offset="-200"/>
-                    <Anchor side="Bottom" relative="$parent" pos="Min" offset="115"/>
+                    <Anchor side="Right" relative="$parent" pos="Mid" offset="800"/>
+                    <Anchor side="Bottom" relative="$parent" pos="Min" offset="120"/>
                     <Height val="87"/>
                     <Width val="1600"/>
                     <Style val="Storm_InGame_Notification_Title_Tier2"/>
@@ -779,16 +1465,49 @@
                             <Key type="Curve" time="0.0" value="-365" out="Auto"/>
                             <Key type="Curve" time="0.1" value="-365" out="Auto"/>
                             <Key type="Curve" time="0.4" value="0" in="Auto" out="Linear"/>
-                            <Key type="Curve" time="2.6" value="35" in="Linear" out="Auto"/>
+                            <Key type="Curve" time="2.6" value="20" in="Linear" out="Auto"/>
                             <Key type="Curve" time="2.8" value="355" in="Auto"/>
+                        </Controller>
+                    </Animation>
+                </Frame>
+
+                <Frame type="Label" name="NotificationLabel_Blur">
+                    <Anchor side="Left" relative="$parent" pos="Mid" offset="-800"/>
+                    <Anchor side="Top" relative="$parent" pos="Min" offset="105"/>
+                    <Height val="40"/>
+                    <Width val="1600"/>
+                    <Style val="Storm_InGame_Notification_Label_Blur"/>
+                    <Text val="{$parent/NotificationLabel/@Text}"/>
+                    <Alpha val="0"/>
+                    <Blur val="true"/>
+                    <BlurAmount val="2"/>
+                    
+                    <Animation name="ShowLabel">
+                        <Event event="ShowTimedNotification_Tier3" action="Reset" frame="$parent/$parent/$parent"/>
+                        <Event event="ShowTimedNotification_Tier3" action="Play" frame="$parent/$parent/$parent"/>
+                        
+                        <Controller type="Fade" end="Pause">
+                            <Key type="Curve" time="0.0" value="0" out="Auto"/>
+                            <Key type="Curve" time="0.1" value="0" out="Auto"/>
+                            <Key type="Curve" time="0.4" value="255" in="Auto"/>
+                            <Key type="Curve" time="2.6" value="255" in="Auto"/>
+                            <Key type="Curve" time="2.8" value="0" out="Auto"/>
+                        </Controller>
+                        
+                        <Controller type="Anchor" end="Pause" side="Left" relative="true">
+                            <Key type="Curve" time="0.0" value="330" out="Auto"/>
+                            <Key type="Curve" time="0.1" value="330" out="Auto"/>
+                            <Key type="Curve" time="0.4" value="0" in="Auto" out="Linear"/>
+                            <Key type="Curve" time="2.6" value="-20" in="Linear" out="Auto"/>
+                            <Key type="Curve" time="2.8" value="-320" in="Auto"/>
                         </Controller>
                     </Animation>
                 </Frame>
                 
                 <Frame type="Label" name="NotificationLabel">
-                    <Anchor side="Left" relative="$parent" pos="Min" offset="200"/>
-                    <Anchor side="Top" relative="$parent" pos="Min" offset="108"/>
-                    <Height val="38"/>
+                    <Anchor side="Left" relative="$parent" pos="Mid" offset="-800"/>
+                    <Anchor side="Top" relative="$parent" pos="Min" offset="105"/>
+                    <Height val="40"/>
                     <Width val="1600"/>
                     <Style val="Storm_InGame_Notification_Label"/>
                     <Text val="[Tier 3]"/>
@@ -810,7 +1529,7 @@
                             <Key type="Curve" time="0.0" value="330" out="Auto"/>
                             <Key type="Curve" time="0.1" value="330" out="Auto"/>
                             <Key type="Curve" time="0.4" value="0" in="Auto" out="Linear"/>
-                            <Key type="Curve" time="2.6" value="-35" in="Linear" out="Auto"/>
+                            <Key type="Curve" time="2.6" value="-20" in="Linear" out="Auto"/>
                             <Key type="Curve" time="2.8" value="-320" in="Auto"/>
                         </Controller>
                     </Animation>
@@ -819,14 +1538,18 @@
             
             <!-- Animation for Timed Kills Tier 4 - Mega Kill -->
             <Frame type="Frame" name="TimedKillNotification_Tier4">
-                <Anchor side="Top" relative="$parent" pos="Min" offset="40"/>
+                <Anchor side="Top" relative="$parent" pos="Min" offset="54"/>
                 <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
                 <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
                 <Height val="168"/>
                 
                 <Animation name="Begin">
-                    <Event event="ShowTimedNotification_Tier4" action="DirectionForward" frame="$parent/$parent"/>
+                    <Event event="ShowTimedNotification_Tier4" action="Reset" frame="$parent/$parent"/>
                     <Event event="ShowTimedNotification_Tier4" action="Play" frame="$parent/$parent"/>
+                    <Controller type="Visibility" end="Pause">
+                        <Key type="Bool" time="0" value="False"/>
+                        <Key type="Bool" time=".001" value="True"/>
+                    </Controller>
                     
                     <Controller type="Fade" end="Pause">
                         <Key type="Curve" time="0.0" value="0" out="Slow"/>
@@ -839,13 +1562,13 @@
                 </Animation>
                 
                 <Animation name="End">
-                    <Event event="ShowStandardNotification" action="DirectionForward" frame="$parent/$parent"/>
+                    <Event event="ShowStandardNotification" action="Reset" frame="$parent/$parent"/>
                     <Event event="ShowStandardNotification" action="Play" frame="$parent/$parent"/>
-                    <Event event="ShowEnemyNotification" action="DirectionForward" frame="$parent/$parent"/>
+                    <Event event="ShowEnemyNotification" action="Reset" frame="$parent/$parent"/>
                     <Event event="ShowEnemyNotification" action="Play" frame="$parent/$parent"/>
-                    <Controller type="Fade" end="Pause">
-                        <Key type="Curve" time="0.0" value="255" out="Slow"/>
-                        <Key type="Curve" time="0.05" value="0" in="Fast"/>
+                    <Controller type="Visibility" end="Pause">
+                        <Key type="Bool" time="0" value="True"/>
+                        <Key type="Bool" time=".001" value="False"/>
                     </Controller>
                 </Animation>
                 
@@ -864,15 +1587,48 @@
                         
                         <Controller type="Fade" end="Pause">
                             <Key type="Curve" time="0.0" value="0" out="Auto"/>
-                            <Key type="Curve" time="0.3" value="255" in="Auto"/>
-                            <Key type="Curve" time="2.5" value="255" in="Auto"/>
+                            <Key type="Curve" time="0.3" value="0" in="Auto"/>
+                            <Key type="Curve" time="2.5" value="0" in="Auto"/>
                             <Key type="Curve" time="2.8" value="0" out="Auto"/>
+                        </Controller>
+                    </Animation>
+                </Frame>
+
+                <Frame type="Label" name="NotificationTitle_Blur">
+                    <Anchor side="Right" relative="$parent" pos="Mid" offset="800"/>
+                    <Anchor side="Bottom" relative="$parent" pos="Min" offset="125"/>
+                    <Height val="112"/>
+                    <Width val="1600"/>
+                    <Style val="Storm_InGame_Notification_Title_Tier3_Blur"/>
+                    <Text val="{$parent/NotificationTitle/@Text}"/>
+                    <Alpha val="0"/>
+                    <Blur val="true"/>
+                    <BlurAmount val="2"/>
+                    
+                    <Animation name="ShowTitle">
+                        <Event event="ShowTimedNotification_Tier4" action="Reset" frame="$parent/$parent/$parent"/>
+                        <Event event="ShowTimedNotification_Tier4" action="Play" frame="$parent/$parent/$parent"/>
+                        
+                        <Controller type="Fade" end="Pause">
+                            <Key type="Curve" time="0.0" value="0" out="Auto"/>
+                            <Key type="Curve" time="0.1" value="0" out="Auto"/>
+                            <Key type="Curve" time="0.4" value="255" in="Auto"/>
+                            <Key type="Curve" time="2.6" value="255" in="Auto"/>
+                            <Key type="Curve" time="2.8" value="0" out="Auto"/>
+                        </Controller>
+                    
+                        <Controller type="Anchor" end="Pause" side="Right" relative="true">
+                            <Key type="Curve" time="0.0" value="-365" out="Auto"/>
+                            <Key type="Curve" time="0.1" value="-365" out="Auto"/>
+                            <Key type="Curve" time="0.4" value="0" in="Auto" out="Linear"/>
+                            <Key type="Curve" time="2.6" value="20" in="Linear" out="Auto"/>
+                            <Key type="Curve" time="2.8" value="355" in="Auto"/>
                         </Controller>
                     </Animation>
                 </Frame>
                 
                 <Frame type="Label" name="NotificationTitle">
-                    <Anchor side="Right" relative="$parent" pos="Max" offset="-200"/>
+                    <Anchor side="Right" relative="$parent" pos="Mid" offset="800"/>
                     <Anchor side="Bottom" relative="$parent" pos="Min" offset="125"/>
                     <Height val="112"/>
                     <Width val="1600"/>
@@ -903,16 +1659,49 @@
                             <Key type="Curve" time="0.0" value="-365" out="Auto"/>
                             <Key type="Curve" time="0.1" value="-365" out="Auto"/>
                             <Key type="Curve" time="0.4" value="0" in="Auto" out="Linear"/>
-                            <Key type="Curve" time="2.6" value="35" in="Linear" out="Auto"/>
+                            <Key type="Curve" time="2.6" value="20" in="Linear" out="Auto"/>
                             <Key type="Curve" time="2.8" value="355" in="Auto"/>
+                        </Controller>
+                    </Animation>
+                </Frame>
+
+                <Frame type="Label" name="NotificationLabel_Blur">
+                    <Anchor side="Left" relative="$parent" pos="Mid" offset="-800"/>
+                    <Anchor side="Top" relative="$parent" pos="Min" offset="105"/>
+                    <Height val="40"/>
+                    <Width val="1600"/>
+                    <Style val="Storm_InGame_Notification_Label_Blur"/>
+                    <Text val="{$parent/NotificationLabel/@Text}"/>
+                    <Alpha val="0"/>
+                    <Blur val="true"/>
+                    <BlurAmount val="2"/>
+                    
+                    <Animation name="ShowLabel">
+                        <Event event="ShowTimedNotification_Tier4" action="Reset" frame="$parent/$parent/$parent"/>
+                        <Event event="ShowTimedNotification_Tier4" action="Play" frame="$parent/$parent/$parent"/>
+                        
+                        <Controller type="Fade" end="Pause">
+                            <Key type="Curve" time="0.0" value="0" out="Auto"/>
+                            <Key type="Curve" time="0.1" value="0" out="Auto"/>
+                            <Key type="Curve" time="0.4" value="255" in="Auto"/>
+                            <Key type="Curve" time="2.6" value="255" in="Auto"/>
+                            <Key type="Curve" time="2.8" value="0" out="Auto"/>
+                        </Controller>
+                        
+                        <Controller type="Anchor" end="Pause" side="Left" relative="true">
+                            <Key type="Curve" time="0.0" value="330" out="Auto"/>
+                            <Key type="Curve" time="0.1" value="330" out="Auto"/>
+                            <Key type="Curve" time="0.4" value="0" in="Auto" out="Linear"/>
+                            <Key type="Curve" time="2.6" value="-20" in="Linear" out="Auto"/>
+                            <Key type="Curve" time="2.8" value="-320" in="Auto"/>
                         </Controller>
                     </Animation>
                 </Frame>
                 
                 <Frame type="Label" name="NotificationLabel">
-                    <Anchor side="Left" relative="$parent" pos="Min" offset="200"/>
-                    <Anchor side="Top" relative="$parent" pos="Min" offset="118"/>
-                    <Height val="38"/>
+                    <Anchor side="Left" relative="$parent" pos="Mid" offset="-800"/>
+                    <Anchor side="Top" relative="$parent" pos="Min" offset="105"/>
+                    <Height val="40"/>
                     <Width val="1600"/>
                     <Style val="Storm_InGame_Notification_Label"/>
                     <Text val="[Tier 4]"/>
@@ -934,7 +1723,7 @@
                             <Key type="Curve" time="0.0" value="330" out="Auto"/>
                             <Key type="Curve" time="0.1" value="330" out="Auto"/>
                             <Key type="Curve" time="0.4" value="0" in="Auto" out="Linear"/>
-                            <Key type="Curve" time="2.6" value="-35" in="Linear" out="Auto"/>
+                            <Key type="Curve" time="2.6" value="-20" in="Linear" out="Auto"/>
                             <Key type="Curve" time="2.8" value="-320" in="Auto"/>
                         </Controller>
                     </Animation>
@@ -944,15 +1733,15 @@
         
         <!-- Kill Counter Animations -->
         <Frame type="Frame" name="KillCounterTemplate">
-            <Anchor side="Top" relative="$parent" pos="Min" offset="40"/>
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
             <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
-            <Height val="168"/>
-            <Width val="450"/>
+            <Height val="140"/>
+            <Width val="500"/>
             <Alpha val="0"/>
             
             <Animation name="Begin">
-                <Event event="ShowTimedNotification_Tier1" action="Reset" frame="$parent"/>
-                <Event event="ShowTimedNotification_Tier1" action="Play" frame="$parent"/>
+                <Event event="ShowTimedNotification_Tier0" action="Reset" frame="$parent"/>
+                <Event event="ShowTimedNotification_Tier0" action="Play" frame="$parent"/>
                 
                 <Controller type="Fade" end="Pause">
                     <Key type="Curve" time="0.0" value="0" out="Slow"/>
@@ -961,8 +1750,10 @@
             </Animation>
             
             <Animation name="End">
+                <!--
                 <Event event="ShowTimedNotification_Tier4" action="Reset" frame="$parent"/>
-                <Event event="ShowTimedNotification_Tier4" action="Play" frame="$parent"/>
+                <Event event="ShowTimedNotification_Tier4" action="Play" frame="$parent"/> 
+                -->
                 <Event event="ShowTimedNotification_Expire" action="Reset" frame="$parent"/>
                 <Event event="ShowTimedNotification_Expire" action="Play" frame="$parent"/>
                 
@@ -973,7 +1764,7 @@
             </Animation>
             
             <Frame type="Image" name="TimerBackground">
-                <Anchor side="Left" relative="$parent" pos="Min" offset="37"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="22"/>
                 <Anchor side="Top" relative="$parent" pos="Min" offset="37"/>
                 <Width val="74"/>
                 <Height val="74"/>
@@ -981,8 +1772,8 @@
                 <Alpha val="0"/>
                 
                 <Animation name="ShowBackground">
-                    <Event event="ShowTimedNotification_Tier1" action="Reset" frame="$parent/$parent"/>
-                    <Event event="ShowTimedNotification_Tier1" action="Play" frame="$parent/$parent"/>
+                    <Event event="ShowTimedNotification_Tier0" action="Reset" frame="$parent/$parent"/>
+                    <Event event="ShowTimedNotification_Tier0" action="Play" frame="$parent/$parent"/>
                     
                     <Controller type="Fade" end="Pause">
                         <Key type="Curve" time="0.0" value="255" out="Auto"/>
@@ -1012,8 +1803,10 @@
             </Frame>
             
             <Frame type="Image" name="TimerCountdown">
-                <Anchor side="Left" relative="$parent" pos="Min" offset="33"/>
-                <Anchor side="Top" relative="$parent" pos="Min" offset="33"/>
+                <Anchor side="Left" relative="$parent/TimerBackground" pos="Mid" offset="0"/>
+                <Anchor side="Right" relative="$parent/TimerBackground" pos="Mid" offset="0"/>
+                <Anchor side="Top" relative="$parent/TimerBackground" pos="Mid" offset="0"/>
+                <Anchor side="Bottom" relative="$parent/TimerBackground" pos="Mid" offset="0"/>
                 <Width val="82"/>
                 <Height val="82"/>
                 <TextureCoords top="0.0" left="0.0" bottom="0.125" right="0.083333333333333333333"/>
@@ -1027,8 +1820,8 @@
                 <Alpha val="0"/>
                 
                 <Animation name="ShowFill">
-                    <Event event="ShowTimedNotification_Tier1" action="Reset" frame="$parent/$parent"/>
-                    <Event event="ShowTimedNotification_Tier1" action="Play" frame="$parent/$parent"/>
+                    <Event event="ShowTimedNotification_Tier0" action="Reset" frame="$parent/$parent"/>
+                    <Event event="ShowTimedNotification_Tier0" action="Play" frame="$parent/$parent"/>
                     
                     <Controller type="Fade" end="Pause">
                         <Key type="Curve" time="0.0" value="0" out="Auto"/>
@@ -1038,18 +1831,28 @@
             </Frame>
             
             <Frame type="Image" name="SkullsIndicator">
-                <Anchor side="Left" relative="$parent" pos="Min" offset="45"/>
-                <Anchor side="Top" relative="$parent" pos="Min" offset="45"/>
-                <Width val="58"/>
-                <Height val="58"/>
+                <Anchor side="Left" relative="$parent/TimerBackground" pos="Mid" offset="0"/>
+                <Anchor side="Right" relative="$parent/TimerBackground" pos="Mid" offset="0"/>
+                <Anchor side="Top" relative="$parent/TimerBackground" pos="Mid" offset="2"/>
+                <Anchor side="Bottom" relative="$parent/TimerBackground" pos="Mid" offset="2"/>
+                <Width val="64"/>
+                <Height val="64"/>
                 <Texture val="@UI/HUD_Notifications_KillStreak_Skulls1"/>
                 <Alpha val="0"/>
+
+                <Animation name="ShowSkullTier0">
+                    <Event event="ShowTimedNotification_Tier0" action="Reset" frame="$parent/$parent"/>
+                    <Event event="ShowTimedNotification_Tier0" action="Play" frame="$parent/$parent"/>
+                    <Controller type="Texture" end="Pause">
+                        <Key type="Image" time="0.0" image="@UI/HUD_Notifications_KillStreak_Skulls1"/>
+                    </Controller>
+                </Animation>
                 
                 <Animation name="ShowSkullTier1">
                     <Event event="ShowTimedNotification_Tier1" action="Reset" frame="$parent/$parent"/>
                     <Event event="ShowTimedNotification_Tier1" action="Play" frame="$parent/$parent"/>
                     <Controller type="Texture" end="Pause">
-                        <Key type="Image" time="0.0" image="@UI/HUD_Notifications_KillStreak_Skulls1"/>
+                        <Key type="Image" time="0.0" image="@UI/HUD_Notifications_KillStreak_Skulls2"/>
                     </Controller>
                 </Animation>
                 
@@ -1057,7 +1860,7 @@
                     <Event event="ShowTimedNotification_Tier2" action="Reset" frame="$parent/$parent"/>
                     <Event event="ShowTimedNotification_Tier2" action="Play" frame="$parent/$parent"/>
                     <Controller type="Texture" end="Pause">
-                        <Key type="Image" time="0.0" image="@UI/HUD_Notifications_KillStreak_Skulls2"/>
+                        <Key type="Image" time="0.0" image="@UI/HUD_Notifications_KillStreak_Skulls3"/>
                     </Controller>
                 </Animation>
                 
@@ -1065,17 +1868,29 @@
                     <Event event="ShowTimedNotification_Tier3" action="Reset" frame="$parent/$parent"/>
                     <Event event="ShowTimedNotification_Tier3" action="Play" frame="$parent/$parent"/>
                     <Controller type="Texture" end="Pause">
-                        <Key type="Image" time="0.0" image="@UI/HUD_Notifications_KillStreak_Skulls3"/>
+                        <Key type="Image" time="0.0" image="@UI/HUD_Notifications_KillStreak_Skulls4"/>
+                    </Controller>
+                </Animation>
+
+                <Animation name="ShowSkullTier4">
+                    <Event event="ShowTimedNotification_Tier4" action="Reset" frame="$parent/$parent"/>
+                    <Event event="ShowTimedNotification_Tier4" action="Play" frame="$parent/$parent"/>
+                    <Controller type="Texture" end="Pause">
+                        <Key type="Image" time="0.0" image="@UI/HUD_Notifications_KillStreak_Skulls5"/>
                     </Controller>
                 </Animation>
                 
                 <Animation name="ShowSkulls">
+                    <Event event="ShowTimedNotification_Tier0" action="Reset" frame="$parent/$parent"/>
+                    <Event event="ShowTimedNotification_Tier0" action="Play" frame="$parent/$parent"/>
                     <Event event="ShowTimedNotification_Tier1" action="Reset" frame="$parent/$parent"/>
                     <Event event="ShowTimedNotification_Tier1" action="Play" frame="$parent/$parent"/>
                     <Event event="ShowTimedNotification_Tier2" action="Reset" frame="$parent/$parent"/>
                     <Event event="ShowTimedNotification_Tier2" action="Play" frame="$parent/$parent"/>
                     <Event event="ShowTimedNotification_Tier3" action="Reset" frame="$parent/$parent"/>
                     <Event event="ShowTimedNotification_Tier3" action="Play" frame="$parent/$parent"/>
+                    <Event event="ShowTimedNotification_Tier4" action="Reset" frame="$parent/$parent"/>
+                    <Event event="ShowTimedNotification_Tier4" action="Play" frame="$parent/$parent"/>
                     
                     <Controller type="Fade" end="Pause">
                         <Key type="Curve" time="0.0" value="255" out="Auto"/>
@@ -1088,7 +1903,7 @@
                     </Controller>
                     
                     <Controller type="Anchor" end="Pause" side="Right" relative="true">
-                        <Key type="Curve" time="0.0" value="40" out="Auto"/>
+                        <Key type="Curve" time="0.0" value="20" out="Auto"/>
                         <Key type="Curve" time="0.3" value="0" in="Auto"/>
                     </Controller>
                     
@@ -1098,7 +1913,7 @@
                     </Controller>
                     
                     <Controller type="Anchor" end="Pause" side="Bottom" relative="true">
-                        <Key type="Curve" time="0.0" value="40" out="Auto"/>
+                        <Key type="Curve" time="0.0" value="20" out="Auto"/>
                         <Key type="Curve" time="0.3" value="0" in="Auto"/>
                     </Controller>
                 </Animation>
@@ -1107,20 +1922,24 @@
             <Frame type="Label" name="KillCountLabel">
                 <Anchor side="Left" relative="$parent/TimerBackground" pos="Max" offset="10"/>
                 <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
-                <Anchor side="Top" relative="$parent/TimerBackground" pos="Min" offset="-4"/>
-                <Height val="31"/>
+                <Anchor side="Top" relative="$parent/TimerBackground" pos="Min" offset="8"/>
+                <Height val="26"/>
                 <Style val="Storm_InGame_KillCount_Label"/>
                 <Text val="[Tier 1 Kills]"/>
                 <Alpha val="0"/>
                 
                 <Animation name="ShowLabel">
+                    <Event event="ShowTimedNotification_Tier0" action="Reset" frame="$parent/$parent"/>
+                    <Event event="ShowTimedNotification_Tier0" action="Play" frame="$parent/$parent"/>
                     <Event event="ShowTimedNotification_Tier1" action="Reset" frame="$parent/$parent"/>
                     <Event event="ShowTimedNotification_Tier1" action="Play" frame="$parent/$parent"/>
                     <Event event="ShowTimedNotification_Tier2" action="Reset" frame="$parent/$parent"/>
                     <Event event="ShowTimedNotification_Tier2" action="Play" frame="$parent/$parent"/>
                     <Event event="ShowTimedNotification_Tier3" action="Reset" frame="$parent/$parent"/>
                     <Event event="ShowTimedNotification_Tier3" action="Play" frame="$parent/$parent"/>
-                    
+                    <Event event="ShowTimedNotification_Tier4" action="Reset" frame="$parent/$parent"/>
+                    <Event event="ShowTimedNotification_Tier4" action="Play" frame="$parent/$parent"/>
+
                     <Controller type="Fade" end="Pause">
                         <Key type="Curve" time="0.0" value="0" out="Auto"/>
                         <Key type="Curve" time="0.1" value="0" out="Auto"/>
@@ -1136,21 +1955,25 @@
             </Frame>
             
             <Frame type="Label" name="KillCountAmount">
-                <Anchor side="Left" relative="$parent/KillCountLabel" pos="Min" offset="-2"/>
+                <Anchor side="Left" relative="$parent/KillCountLabel" pos="Min" offset="0"/>
                 <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
-                <Anchor side="Top" relative="$parent/KillCountLabel" pos="Max" offset="0"/>
-                <Height val="56"/>
+                <Anchor side="Top" relative="$parent/KillCountLabel" pos="Max" offset="-8"/>
+                <Height val="48"/>
                 <Style val="Storm_InGame_KillCount_Amount"/>
                 <Text val="[Number X]"/>
                 <Alpha val="0"/>
                 
                 <Animation name="ShowLabel">
+                    <Event event="ShowTimedNotification_Tier0" action="Reset" frame="$parent/$parent"/>
+                    <Event event="ShowTimedNotification_Tier0" action="Play" frame="$parent/$parent"/>
                     <Event event="ShowTimedNotification_Tier1" action="Reset" frame="$parent/$parent"/>
                     <Event event="ShowTimedNotification_Tier1" action="Play" frame="$parent/$parent"/>
                     <Event event="ShowTimedNotification_Tier2" action="Reset" frame="$parent/$parent"/>
                     <Event event="ShowTimedNotification_Tier2" action="Play" frame="$parent/$parent"/>
                     <Event event="ShowTimedNotification_Tier3" action="Reset" frame="$parent/$parent"/>
                     <Event event="ShowTimedNotification_Tier3" action="Play" frame="$parent/$parent"/>
+                    <Event event="ShowTimedNotification_Tier4" action="Reset" frame="$parent/$parent"/>
+                    <Event event="ShowTimedNotification_Tier4" action="Play" frame="$parent/$parent"/>
                     
                     <Controller type="Fade" end="Pause">
                         <Key type="Curve" time="0.0" value="0" out="Auto"/>
