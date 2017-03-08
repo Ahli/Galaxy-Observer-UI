@@ -1,0 +1,916 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<Desc>
+    <DescFlags val="Locked"/>
+    
+    <Constant name="PlayerSlotHeight" val="69"/>
+    <Constant name="DragRenderPriority" val="800"/>
+
+    <Frame type="LobbyPlayerSlotsAttributeTileListItem" name="LobbyPlayerSlotsAttributeTileListItemTemplate">
+        <Width val="130"/>
+        <CollapseLayout val="true"/>
+        
+        <Frame type="LobbyAttributePulldown" name="Pulldown"  template="LobbyAttributePulldown/LobbyAttributePulldownTemplate">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+            <Width val="130"/>
+            <Enabled val="true"/>
+            <Tooltip val="{$parent/@Name}"/>
+            <MenuMaxHeight val="240"/>
+            
+            <!-- The state group is organized this way to set Enabled false rather than true because -->
+            <!-- Otherwise the pulldown scrollbar gets disabled by default -->
+            <StateGroup name="EnabledStateGroup">
+                <State name="CountdownState">
+                    <When type="Property" frame="$ScreenBattleLobby" IsCountdownLocked="true"/>
+                    <Action type="SetProperty" Enabled="false"/>
+                </State>
+                
+                <State name="ChangeableState">
+                    <When type="Property" frame="$parent" IsChangeable="false"/>
+                    <Action type="SetProperty" Enabled="false"/>
+                </State>
+            </StateGroup>
+        </Frame>
+    </Frame>
+
+    <Frame type="LobbyPlayerSlotsPlayerFrame" name="LobbyPlayerSlotsPlayerFrameTemplate">
+        <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+        <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+        <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+        <Height val="#PlayerSlotHeight"/>
+        <Draggable val="{$ScreenBattleLobby/@IsHost}"/>
+        <DragConstraintFrame val="$parent/$parent/$parent/$parent/ConstraintFrame"/>
+        <DragCursor val="GripClosed"/>
+        <DragHoverCursor val="GripOpen"/>
+        <AcceptsMouseDropTarget val="true"/>
+        <ContextMenu val="$this/ContextMenu"/>
+
+        <!-- Set the player slot and the container team frame to render above when dragging -->
+        <!-- Also unclip the dragged frame so it can break outside all the containers -->
+        <!-- Set the render priority of the team frame through animation events -->
+        <!-- Because layout complains when setting it as a property in template heirarchy -->
+        <StateGroup name="RenderPriorityStateGroup">
+            <State name="DragState">
+                <When type="Property" frame="$this" IsDraggingSlot="true"/>
+                <Action type="SetProperty" frame="$this" Unclipped="true"/>
+                <Action type="SetProperty" frame="$this" AcceptsMouseDropTarget="false"/>
+                <Action type="SendEvent" frame="$parent" Event="DragStart"/>
+                <Action type="SendEvent" frame="$parent/$parent" Event="DragStart"/>
+                <Action type="SendEvent" frame="$parent/$parent/$parent/$parent" Event="DragStart"/>
+            </State>
+
+            <State name="DragEndState">
+                <When type="Property" frame="$this" IsDraggingSlot="false"/>
+                <Action type="SendEvent" frame="$parent" Event="DragEnd"/>
+                <Action type="SendEvent" frame="$parent/$parent" Event="DragEnd"/>
+                <Action type="SendEvent" frame="$parent/$parent/$parent/$parent" Event="DragEnd"/>
+            </State>
+        </StateGroup>
+        
+        <Frame type="LobbyTandemContextMenu" name="TandemContextMenu" template="StandardTemplates/StandardContextMenuTemplate">
+            <Anchor side="Top" relative="$parent" pos="Max" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+            <Scope val="{$parent/@Scope}"/>
+        </Frame>
+        
+        <Frame type="LobbySlotContextMenu" name="ContextMenu" template="BattleUserContextMenu/BattleUserContextMenu">
+            <Anchor side="Top" relative="$parent" pos="Max" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+            <Scope val="{$parent/@Scope}"/>
+            <PresenceId val="{$parent/@PresenceId}"/>
+            <NewTeamId val="{$LobbyPlayerSlotsFrame/@NewTeamId}"/>
+            <HasNewTeam val="{$LobbyPlayerSlotsFrame/@HasNewTeam}"/>
+        </Frame>
+        
+        <Frame type="BattleUserFrame" name="UserFrame">
+            <Anchor relative="$parent"/>
+            <PresenceId val="{$parent/@PresenceId}"/>
+        </Frame>
+
+        <Frame type="Image" name="TandemIcon">
+            <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="5"/>
+            <Width val="40"/>
+            <Height val="40"/>
+            <CollapseLayout val="true"/>
+            <Visible val="{$parent/@IsTandemFollower}"/>
+            <Texture val="@UI/Battlenet_Glue_Multiplayer_Custom_ArchonSlot_Empty"/>
+            
+            <StateGroup name="SlotStatus">
+                <DefaultState val="OccupiedSlot"/>
+                
+                <State name="EmptySlot">
+                    <When type="Property" frame="$parent" Controller="Open"/>
+                    <Action type="SetProperty" frame="$this" texture="@UI/Battlenet_Glue_Multiplayer_Custom_ArchonSlot_Empty"/>
+                </State>
+            
+                <State name="OccupiedSlot">
+                    <Action type="SetProperty" frame="$this" texture="@UI/Battlenet_Glue_Multiplayer_Custom_ArchonSlot_Occupied"/>
+                </State>
+            </StateGroup>
+        </Frame>
+
+        <Frame type="Image" name="BackgroundImage">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="5"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="-5"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="4"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="-4"/>
+            <PreserveAnchorOffset val="False"/>
+            <Texture val="@UI/SC2_UI_Battlenet_Glue_Arcade_MainListItem_Normal"/>
+            <TextureType val="NineSlice"/>
+            
+            <StateGroup name="SlotStatus">
+                <DefaultState val="OccupiedSlot"/>
+                
+                <State name="EmptySlot">
+                    <When type="Property" frame="$parent" Controller="Open"/>
+                    <Action type="SetProperty" frame="$this" texture="@UI/SC2_UI_Battlenet_Glue_Arcade_MainListItem_Normal"/>
+                </State>
+            
+                <State name="OccupiedSlot">
+                    <Action type="SetProperty" frame="$this" texture="@UI/SC2_UI_Battlenet_Glue_Arcade_MainListItem_Over"/>
+                </State>
+            </StateGroup>
+            
+            <StateGroup name="AnchorState">
+                <DefaultState val="NoAvatar"/>
+                
+                <State name="AvatarPresent">
+                    <When type="Property" frame="$parent/AvatarFrame" visible="True"/>
+                    <Action type="SetAnchor" frame="$this" side="Left" relative="$parent/AvatarFrame" pos="Min" offset="20"/>
+                </State>
+                
+                <State name="ComputerPresent">
+                    <When type="Property" frame="$parent/ComputerIcon" visible="True"/>
+                    <Action type="SetAnchor" frame="$this" side="Left" relative="$parent/ComputerIcon" pos="Min" offset="20"/>
+                </State>
+                
+                <State name="TandemFollowerEmpty">
+                    <When type="Property" frame="$parent/TandemIcon" visible="True"/>
+                    <Action type="SetAnchor" frame="$this" side="Left" relative="$parent/TandemIcon" pos="Max" offset="2"/>
+                </State>
+                
+                <State name="NoAvatar">
+                    <Action type="SetAnchor" frame="$this" side="Left" relative="$parent" pos="Min" offset="4"/>
+                </State>
+            </StateGroup>
+        </Frame>
+        
+        <Frame type="Frame" name="AvatarSpacer">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="-4"/>
+            <Width val="44"/>
+            <Visible val="{$parent/@IsTandemFollower}"/>
+            <CollapseLayout val="True"/>
+        </Frame>
+
+        <Frame type="AvatarFrame" name="AvatarFrame" template="StandardTemplates/AvatarFrameLobbyTemplate">
+            <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Left" relative="$parent/AvatarSpacer" pos="Max" offset="0"/>
+            <PresenceId val="{$parent/@PresenceId}"/>
+            <CollapseLayout val="True"/>
+        </Frame>
+        
+        <Frame type="Frame" name="ComputerIcon">
+            <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Left" relative="$parent/AvatarFrame" pos="Min" offset="0"/>
+            <Width val="75"/>
+            <Height val="75"/>
+            
+            <Frame type="Image" name="Icon">
+                <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+                <Width val="49"/>
+                <Height val="49"/>
+                <Texture val="@UI/Glues_Icons_AI_Small"/>
+            </Frame>
+
+            <Frame type="Image" name="Frame">
+                <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+                <Texture val="@UI/Glues_Avatar_LeagueBorder_Small_Unranked"/>
+                <Alpha val="255"/>
+            </Frame>
+        </Frame>
+
+        <Frame type="Label" name="BuildVersionLabel">
+            <Anchor side="Top" relative="$parent/NameLabel" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent/NameLabel" pos="Mid" offset="0"/>
+            <Anchor side="Left" relative="$parent/AvatarFrame" pos="Max" offset="5"/>
+            <Style val="@Lobby_PlayerName"/>
+            <Text val="{$parent/@BuildVersion}"/>
+            <CollapseLayout val="true"/>
+
+            <StateGroup name="BuildVersionStateGroup">
+                <State name="NoVersionState">
+                    <When type="Property" frame="$parent" BuildVersion="0"/>
+                    <Action type="SetProperty" Visible="false"/>
+                </State>
+            </StateGroup>
+        </Frame>
+
+        <Frame type="Label" name="NameLabel">
+            <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Left" relative="$parent/BuildVersionLabel" pos="Max" offset="5"/>
+            <Style val="@Lobby_PlayerName"/>
+            <Text val="{$parent/UserFrame/@DisplayNameExcludeClan}"/>
+            
+            <StateGroup name="ClanTagState">
+                <DefaultState val="ClanPresent"/>
+                
+                <State name="ClanNotPresent">
+                    <When type="Property" frame="$parent/UserFrame" clanTag=""/>
+                    <Action type="SetAnchor" frame="$this" side="Top" relative="$parent" pos="Mid" offset="0"/>
+                    <Action type="SetAnchor" frame="$this" side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+                </State>
+                
+                <State name="ClanPresent">
+                    <Action type="SetAnchor" frame="$this" side="Top" relative="$parent" pos="Mid" offset="-10"/>
+                    <Action type="SetAnchor" frame="$this" side="Bottom" relative="$parent" pos="Mid" offset="-10"/>
+                </State>
+            </StateGroup>
+        </Frame>
+        
+        <Frame type="Label" name="ClanLabel">
+            <Anchor side="Top" relative="$parent/NameLabel" pos="Max" offset="0"/>
+            <Anchor side="Left" relative="$parent/BuildVersionLabel" pos="Max" offset="5"/>
+            <Style val="@Lobby_ClanName"/>
+            <Text val="{$parent/UserFrame/@ClanTag}"/>
+        </Frame>
+
+        <Frame type="Label" name="HostLabel">
+            <Anchor side="Top" relative="$parent/NameLabel" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent/NameLabel" pos="Mid" offset="0"/>
+            <Anchor side="Left" relative="$parent/NameLabel" pos="Max" offset="0"/>
+            <Style val="@Lobby_PlayerName"/>
+            <Text val="@UI/ScreenBattleLobby/Host"/>
+            <Visible val="{$parent/@IsHost}"/>
+            <CollapseLayout val="true"/>
+        </Frame>
+
+        <Frame type="Label" name="ComputerLabel">
+            <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Left" relative="$parent/ComputerIcon" pos="Max" offset="5"/>
+            <Style val="@Lobby_PlayerName"/>
+            <Text val="@UI/ScreenBattleLobby/ComputerName"/>
+        </Frame>
+
+        <Frame type="TileList" name="TileList">
+            <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent/BackgroundImage" pos="Max" offset="-5"/>
+            <Width val="726"/>
+            <Height val="48"/>
+            <AcceptsMouse val="False"/>
+
+            <Frame type="LobbyPlayerSlotsAttributeTileListItem" name="Item0" template="LobbyPlayerSlotsFrame/LobbyPlayerSlotsAttributeTileListItemTemplate">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+                <Anchor side="Right" relative="$parent/Item1" pos="Min" offset="5"/>
+            </Frame>
+
+            <Frame type="LobbyPlayerSlotsAttributeTileListItem" name="Item1" template="LobbyPlayerSlotsFrame/LobbyPlayerSlotsAttributeTileListItemTemplate">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+                <Anchor side="Right" relative="$parent/Item2" pos="Min" offset="5"/>
+            </Frame>
+            
+            <Frame type="LobbyPlayerSlotsAttributeTileListItem" name="Item2" template="LobbyPlayerSlotsFrame/LobbyPlayerSlotsAttributeTileListItemTemplate">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+                <Anchor side="Right" relative="$parent/Item3" pos="Min" offset="5"/>
+            </Frame>
+
+            <Frame type="LobbyPlayerSlotsAttributeTileListItem" name="Item3" template="LobbyPlayerSlotsFrame/LobbyPlayerSlotsAttributeTileListItemTemplate">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+                <Anchor side="Right" relative="$parent/Item4" pos="Min" offset="5"/>
+            </Frame>
+
+            <Frame type="LobbyPlayerSlotsAttributeTileListItem" name="Item4" template="LobbyPlayerSlotsFrame/LobbyPlayerSlotsAttributeTileListItemTemplate">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+                <Anchor side="Right" relative="$parent/PageSelector" pos="Min" offset="0"/>
+            </Frame>
+            
+            <Frame type="PageSelectorButtonList" name="PageSelector">
+                <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+                <Anchor side="Left" relative="DecrementButton" pos="Min" offset="0"/>
+                <Height val="44"/>
+                <Visible val="False"/>
+                <CollapseLayout val="True"/>
+                <Enabled val="False"/>
+                
+                <StateGroup name="PageSelectorVisibility">
+                    <State name="Visible">
+                        <When type="Property" frame="$parent/$parent" operator="NotEqual" Controller="Open"/>
+                        <When type="Property" frame="$LobbyPlayerSlotsFrame" operator="GreaterThan" MaxAttributeCount="5"/>
+                        <Action type="SetProperty" frame="$this" visible="True"/>
+                    </State>
+                </StateGroup>
+                
+                <Frame type="Button" name="DecrementButton" template="StandardBattlenetTemplates/BattlenetSquareIconButtonTemplate">
+                    <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                    <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+                    <Anchor side="Right" relative="$parent/IncrementButton" pos="Min" offset="0"/>
+                    <Height val="44"/>
+                    
+                    <Frame type="Image" name="Icon">
+                        <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+                        <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+                        <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+                        <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+                        <Texture val="@UI/Glues_Icons_SingleArrow"/>
+                        <DesaturateOnDisable val="false"/>
+                        <DisabledAlpha val="255"/>
+                    </Frame>
+                    
+                    <StateGroup name="DisabledStateGroup">
+                        <State name="BlizzStateDisabled">
+                            <When type="Property" frame="$this" enabled="false"/>
+                            <Action type="SetProperty" frame="Icon" texture="@UI/Glues_Icons_SingleArrowDisabled"/>
+                        </State>
+                        
+                        <State name="BlizzStateEnabled">
+                            <When type="Property" frame="$this" enabled="true"/>
+                            <Action type="SetProperty" frame="Icon" texture="@UI/Glues_Icons_SingleArrow"/>
+                        </State>
+                    </StateGroup>
+                </Frame>
+                
+                <Frame type="Button" name="IncrementButton" template="StandardBattlenetTemplates/BattlenetSquareIconButtonTemplate">
+                    <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                    <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+                    <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+                    <Height val="44"/>
+                    
+                     <Frame type="Image" name="Icon">
+                        <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+                        <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+                        <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+                        <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+                        <Texture val="@UI/Glues_Icons_SingleArrow"/>
+                        <TextureCoords top="0.0" left="1.0" bottom="1.0" right="0.0"/>
+                        <DesaturateOnDisable val="false"/>
+                        <DisabledAlpha val="255"/>
+                    </Frame>
+                    
+                    <StateGroup name="DisabledStateGroup">
+                        <State name="BlizzStateDisabled">
+                            <When type="Property" frame="$this" enabled="false"/>
+                            <Action type="SetProperty" frame="Icon" texture="@UI/Glues_Icons_SingleArrowDisabled"/>
+                        </State>
+                        
+                        <State name="BlizzStateEnabled">
+                            <When type="Property" frame="$this" enabled="true"/>
+                            <Action type="SetProperty" frame="Icon" texture="@UI/Glues_Icons_SingleArrow"/>
+                        </State>
+                    </StateGroup>
+                </Frame>
+            </Frame>
+        </Frame>
+
+        <Frame type="Label" name="StatusLabel">
+            <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+            <Style val="@Lobby_EmptySlot"/>
+            <Text val="@UI/ScreenBattleLobby/EmptySlot"/>
+
+            <StateGroup name="StatusStateGroup">
+                <State name="HoveredState">
+                    <When type="Property" frame="$parent" Controller="Open"/>
+                    <When type="Property" frame="$parent" DragHovered="true"/>
+                    <Action type="SetProperty" Text="@UI/ScreenBattleLobby/EmptySlotHovered"/>
+                </State>
+            </StateGroup>
+        </Frame>
+
+        <Frame type="Label" name="PendingLabel">
+            <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+            <Text val="@UI/ScreenBattleLobby/Pending"/>
+            <Visible val="false"/>
+        </Frame>
+
+        <Frame type="Label" name="PendingAnimation">
+            <Anchor side="Top" relative="$parent/PendingLabel" pos="Mid" offset="0"/>
+            <Anchor side="Left" relative="$parent/PendingLabel" pos="Max" offset="0"/>
+            <Anchor side="Bottom" relative="$parent/PendingLabel" pos="Mid" offset="0"/>
+            <Visible val="false"/>
+        
+            <Animation name="PendingAnim">
+                <Event event="OnShown" action="Play"/>
+                
+                <Controller type="Property" property="Text" end="Loop">
+                    <Key type="Property" time="0" value=""/>
+                    <Key type="Property" time="0.4" value="."/>
+                    <Key type="Property" time="0.8" value=".."/>
+                    <Key type="Property" time="1.2" value="..."/>
+                    <Key type="Property" time="1.6" value="..."/>
+                </Controller>
+            </Animation>
+        </Frame>
+
+        <Frame type="Image" name="ObserverInterfaceIcon">
+            <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="-20"/>
+            <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+            <Width val="35"/>
+            <Height val="31"/>
+            <Visible val="false"/>
+            <AcceptsMouseTooltip val="true"/>
+            <Tooltip val="@UI/ScreenBattleLobby/CustomObserverInterfaceTooltip"/>
+            <Texture val="@UI/Glues_Icons_Warning_Small"/>
+
+            <!-- Show this icon for non-Resume replay lobbies if this player has a custom observer interface -->
+            <StateGroup name="VisibleStateGroup">
+                <State name="VisibleState">
+                    <When type="Property" frame="$parent" HasCustomObserverInterface="true"/>
+                    <When type="Property" frame="$ScreenBattleLobby" IsReplayLobby="true"/>
+                    <When type="Property" frame="$ScreenBattleLobby" IsResumeReplay="false"/>
+                    <Action type="SetProperty" Visible="true"/>
+                </State>
+            </StateGroup>
+        </Frame>
+
+        <StateGroup name="ControllerStateGroup">
+            <State name="PendingState">
+                <When type="Property" IsPending="true"/>
+                <Action type="SetProperty" frame="StatusLabel" Visible="false"/>
+                <Action type="SetProperty" frame="AvatarFrame" Visible="true"/>
+                <Action type="SetProperty" frame="NameLabel" Visible="true"/>
+                <Action type="SetProperty" frame="ClanLabel" Visible="true"/>
+                <Action type="SetProperty" frame="ComputerIcon" Visible="false"/>
+                <Action type="SetProperty" frame="ComputerLabel" Visible="false"/>
+                <Action type="SetProperty" frame="TileList" Visible="false"/>
+                <Action type="SetProperty" frame="PendingLabel" Visible="true"/>
+                <Action type="SetProperty" frame="PendingAnimation" Visible="true"/>
+            </State>
+            
+            <State name="OpenState">
+                <When type="Property" Controller="Open"/>
+                <Action type="SetProperty" frame="StatusLabel" Visible="true"/>
+                <Action type="SetProperty" frame="AvatarFrame" Visible="false"/>
+                <Action type="SetProperty" frame="NameLabel" Visible="false"/>
+                <Action type="SetProperty" frame="ClanLabel" Visible="false"/>
+                <Action type="SetProperty" frame="ComputerIcon" Visible="false"/>
+                <Action type="SetProperty" frame="ComputerLabel" Visible="false"/>
+            </State>
+            
+            <State name="TandemHumanState">
+                <When type="Property" IsTandemFollower="true"/>
+                <When type="Property" Controller="Human"/>
+                <Action type="SetProperty" frame="StatusLabel" Visible="false"/>
+                <Action type="SetProperty" frame="AvatarFrame" Visible="true"/>
+                <Action type="SetProperty" frame="NameLabel" Visible="true"/>
+                <Action type="SetProperty" frame="ClanLabel" Visible="true"/>
+                <Action type="SetProperty" frame="ComputerIcon" Visible="false"/>
+                <Action type="SetProperty" frame="ComputerLabel" Visible="false"/>
+                <Action type="SetProperty" frame="TileList" Visible="false"/>
+            </State>
+            
+            <State name="HumanState">
+                <When type="Property" Controller="Human"/>
+                <Action type="SetProperty" frame="StatusLabel" Visible="false"/>
+                <Action type="SetProperty" frame="AvatarFrame" Visible="true"/>
+                <Action type="SetProperty" frame="NameLabel" Visible="true"/>
+                <Action type="SetProperty" frame="ClanLabel" Visible="true"/>
+                <Action type="SetProperty" frame="ComputerIcon" Visible="false"/>
+                <Action type="SetProperty" frame="ComputerLabel" Visible="false"/>
+            </State>
+
+            <State name="ComputerState">
+                <When type="Property" Controller="Computer"/>
+                <Action type="SetProperty" frame="StatusLabel" Visible="false"/>
+                <Action type="SetProperty" frame="AvatarFrame" Visible="false"/>
+                <Action type="SetProperty" frame="NameLabel" Visible="false"/>
+                <Action type="SetProperty" frame="ClanLabel" Visible="false"/>
+                <Action type="SetProperty" frame="ComputerIcon" Visible="true"/>
+                <Action type="SetProperty" frame="ComputerLabel" Visible="true"/>
+            </State>
+        </StateGroup>
+    </Frame>
+
+    <Frame type="LobbyPlayerSlotsPlayerContainerFrame" name="PlayerFrameContainerTemplate">
+        <Anchor side="Left" relative="$parent" pos="Min" offset="16"/>
+        <Anchor side="Right" relative="$parent" pos="Max" offset="-16"/>
+        <Height val="#PlayerSlotHeight"/>
+        <Visible val="true"/>
+        <CollapseLayout val="true"/>
+        <ItemDesc val="LobbyPlayerSlotsFrame/LobbyPlayerSlotsPlayerFrameTemplate"/>
+        
+        <!-- This container frame will create the PlayerFrame on demand in code, to avoid creating -->
+        <!-- tens of thousands of frames on startup. This means you won't be able to use StateGroups to -->
+        <!-- reference the player frame heirarchy.  But you may be able to use Animations. -->
+        
+        <StateGroup name="VisibleStateGroup">
+            <State name="ScopeState">
+                <When type="Property" frame="$this" HasScope="false"/>
+                <Action type="SetProperty" frame="$this" Visible="false"/>
+            </State>
+            
+            <State name="TandemComputerState">
+                <When type="Property" frame="$this" IsTandemFollower="true"/>
+                <When type="Property" frame="$this" Controller="Computer"/>
+                <Action type="SetProperty" frame="$this" Visible="false"/>
+            </State>
+        </StateGroup>
+    
+        <!-- Set the player slot and the container team frame to render above when dragging -->
+        <!-- Also unclip the dragged frame so it can break outside all the containers -->
+        <!-- Set the render priority of the team frame through animation events -->
+        <!-- Because layout complains when setting it as a property in template heirarchy -->
+        <Animation name="DragAnim">
+            <Event event="DragStart" action="Reset,Play"/>
+            <Event event="DragEnd" action="Reset,Stop"/>
+            <Controller type="Property" property="RenderPriority" end="Pause">
+                <Key type="Property" time="0" value="#DragRenderPriority"/>
+            </Controller>
+        
+            <Controller type="Property" property="AcceptsMouseDropTarget" end="Pause">
+                <Key type="Property" time="0" value="true"/>
+            </Controller>
+        </Animation>
+    </Frame>
+
+    <Frame type="LobbyPlayerSlotsTeamFrame" name="LobbyPlayerSlotsTeamFrameTemplate">
+        <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+        <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+        <Anchor side="Bottom" relative="$this/BottomPaddingFrame" pos="Max" offset="0"/>
+        <Visible val="{$this/PlayerFrame0/@Visible}"/>
+        <CollapseLayout val="true"/>
+        <AcceptsMouseDropTarget val="{$this/@CanAddSlot}"/>
+        
+        <Animation name="DragAnim">
+            <Event event="DragStart" action="Reset,Play"/>
+            <Event event="DragEnd" action="Reset,Stop"/>
+            <Controller type="Property" property="RenderPriority" end="Pause">
+                <Key type="Property" time="0" value="#DragRenderPriority"/>
+            </Controller>
+        </Animation>
+
+        <Frame type="Image" name="BackgroundImage">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+            <Texture val="@UI/Glues_ExtendedXP_InnerContainer_1"/>
+            <TextureType val="NineSlice"/>
+        </Frame>
+
+        <Frame type="Frame" name="HitTestFrame">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+        </Frame>
+        
+        <Frame type="Label" name="TeamNameLabel">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="15"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="15"/>
+            <Style val="@Lobby_TeamTitle"/>
+            <Text val="{$parent/@TeamName}"/>
+        </Frame>
+        
+        <!-- TODO: Make this highlight the team background or something else? -->
+        <!--
+        <Frame type="Label" name="DragHoverLabel">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="5"/>
+            <Anchor side="Left" relative="$parent/TeamNameLabel" pos="Max" offset="10"/>
+            <Visible val="{$parent/@DragHovered}"/>
+            <Text val="@UI/ScreenBattleLobby/EmptySlotHovered"/>
+        </Frame>
+        -->
+
+        <Frame type="LobbyPlayerSlotsPlayerContainerFrame" name="PlayerFrame0" template="LobbyPlayerSlotsFrame/PlayerFrameContainerTemplate">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="51"/>
+            <Scope val="{$parent/@PlayerScope[0]}"/>
+        </Frame>
+
+        <Frame type="LobbyPlayerSlotsPlayerContainerFrame" name="PlayerFrame1" template="LobbyPlayerSlotsFrame/PlayerFrameContainerTemplate">
+            <Anchor side="Top" relative="$parent/PlayerFrame0" pos="Max" offset="0"/>
+            <Scope val="{$parent/@PlayerScope[1]}"/>
+        </Frame>
+
+        <Frame type="LobbyPlayerSlotsPlayerContainerFrame" name="PlayerFrame2" template="LobbyPlayerSlotsFrame/PlayerFrameContainerTemplate">
+            <Anchor side="Top" relative="$parent/PlayerFrame1" pos="Max" offset="0"/>
+            <Scope val="{$parent/@PlayerScope[2]}"/>
+        </Frame>
+
+        <Frame type="LobbyPlayerSlotsPlayerContainerFrame" name="PlayerFrame3" template="LobbyPlayerSlotsFrame/PlayerFrameContainerTemplate">
+            <Anchor side="Top" relative="$parent/PlayerFrame2" pos="Max" offset="0"/>
+            <Scope val="{$parent/@PlayerScope[3]}"/>
+        </Frame>
+
+        <Frame type="LobbyPlayerSlotsPlayerContainerFrame" name="PlayerFrame4" template="LobbyPlayerSlotsFrame/PlayerFrameContainerTemplate">
+            <Anchor side="Top" relative="$parent/PlayerFrame3" pos="Max" offset="0"/>
+            <Scope val="{$parent/@PlayerScope[4]}"/>
+        </Frame>
+
+        <Frame type="LobbyPlayerSlotsPlayerContainerFrame" name="PlayerFrame5" template="LobbyPlayerSlotsFrame/PlayerFrameContainerTemplate">
+            <Anchor side="Top" relative="$parent/PlayerFrame4" pos="Max" offset="0"/>
+            <Scope val="{$parent/@PlayerScope[5]}"/>
+        </Frame>
+
+        <Frame type="LobbyPlayerSlotsPlayerContainerFrame" name="PlayerFrame6" template="LobbyPlayerSlotsFrame/PlayerFrameContainerTemplate">
+            <Anchor side="Top" relative="$parent/PlayerFrame5" pos="Max" offset="0"/>
+            <Scope val="{$parent/@PlayerScope[6]}"/>
+        </Frame>
+
+        <Frame type="LobbyPlayerSlotsPlayerContainerFrame" name="PlayerFrame7" template="LobbyPlayerSlotsFrame/PlayerFrameContainerTemplate">
+            <Anchor side="Top" relative="$parent/PlayerFrame6" pos="Max" offset="0"/>
+            <Scope val="{$parent/@PlayerScope[7]}"/>
+        </Frame>
+
+        <Frame type="LobbyPlayerSlotsPlayerContainerFrame" name="PlayerFrame8" template="LobbyPlayerSlotsFrame/PlayerFrameContainerTemplate">
+            <Anchor side="Top" relative="$parent/PlayerFrame7" pos="Max" offset="0"/>
+            <Scope val="{$parent/@PlayerScope[8]}"/>
+        </Frame>
+
+        <Frame type="LobbyPlayerSlotsPlayerContainerFrame" name="PlayerFrame9" template="LobbyPlayerSlotsFrame/PlayerFrameContainerTemplate">
+            <Anchor side="Top" relative="$parent/PlayerFrame8" pos="Max" offset="0"/>
+            <Scope val="{$parent/@PlayerScope[9]}"/>
+        </Frame>
+
+        <Frame type="LobbyPlayerSlotsPlayerContainerFrame" name="PlayerFrame10" template="LobbyPlayerSlotsFrame/PlayerFrameContainerTemplate">
+            <Anchor side="Top" relative="$parent/PlayerFrame9" pos="Max" offset="0"/>
+            <Scope val="{$parent/@PlayerScope[10]}"/>
+        </Frame>
+
+        <Frame type="LobbyPlayerSlotsPlayerContainerFrame" name="PlayerFrame11" template="LobbyPlayerSlotsFrame/PlayerFrameContainerTemplate">
+            <Anchor side="Top" relative="$parent/PlayerFrame10" pos="Max" offset="0"/>
+            <Scope val="{$parent/@PlayerScope[11]}"/>
+        </Frame>
+
+        <Frame type="LobbyPlayerSlotsPlayerContainerFrame" name="PlayerFrame12" template="LobbyPlayerSlotsFrame/PlayerFrameContainerTemplate">
+            <Anchor side="Top" relative="$parent/PlayerFrame11" pos="Max" offset="0"/>
+            <Scope val="{$parent/@PlayerScope[12]}"/>
+        </Frame>
+
+        <Frame type="LobbyPlayerSlotsPlayerContainerFrame" name="PlayerFrame13" template="LobbyPlayerSlotsFrame/PlayerFrameContainerTemplate">
+            <Anchor side="Top" relative="$parent/PlayerFrame12" pos="Max" offset="0"/>
+            <Scope val="{$parent/@PlayerScope[13]}"/>
+        </Frame>
+
+        <Frame type="LobbyPlayerSlotsPlayerContainerFrame" name="PlayerFrame14" template="LobbyPlayerSlotsFrame/PlayerFrameContainerTemplate">
+            <Anchor side="Top" relative="$parent/PlayerFrame13" pos="Max" offset="0"/>
+            <Scope val="{$parent/@PlayerScope[14]}"/>
+        </Frame>
+
+        <Frame type="LobbyPlayerSlotsPlayerContainerFrame" name="PlayerFrame15" template="LobbyPlayerSlotsFrame/PlayerFrameContainerTemplate">
+            <Anchor side="Top" relative="$parent/PlayerFrame14" pos="Max" offset="0"/>
+            <Scope val="{$parent/@PlayerScope[15]}"/>
+        </Frame>
+    
+        <Frame type="Frame" name="BottomPaddingFrame">
+            <Anchor side="Top" relative="$parent/PlayerFrame15" pos="Max" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+            <Height val="18"/>
+        </Frame>
+    </Frame>
+        
+    <Frame type="LobbyPlayerSlotsFrame" name="LobbyPlayerSlotsFrameTemplate">
+        <Handle val="LobbyPlayerSlotsFrame"/>
+        
+        <Frame type="BlurFrame" name="BackgroundBlur">
+            <Anchor side="Top" relative="$parent/BackgroundImage" pos="Min" offset="4"/>
+            <Anchor side="Left" relative="$parent/BackgroundImage" pos="Min" offset="4"/>
+            <Anchor side="Bottom" relative="$parent/BackgroundImage" pos="Max" offset="-4"/>
+            <Anchor side="Right" relative="$parent/BackgroundImage" pos="Max" offset="-4"/>
+            <BlurAmount val="0"/>
+        </Frame>
+
+        <Frame type="Image" name="BackgroundImage">
+            <Anchor relative="$parent"/>
+            <Texture val="@UI/SC2_UI_Battlenet_Glue_Arcade_MainContainer"/>
+            <TextureType val="NineSlice"/>
+            <Alpha val="0"/>
+        </Frame>
+
+        <Frame type="ScrollableFrame" name="ScrollableFrame">
+            <Anchor side="Top" relative="$parent/BackgroundImage" pos="Min" offset="20"/>
+            <Anchor side="Left" relative="$parent/BackgroundImage" pos="Min" offset="20"/>
+            <Anchor side="Bottom" relative="$parent/BackgroundImage" pos="Max" offset="-20"/>
+            <Anchor side="Right" relative="$parent/BackgroundImage" pos="Max" offset="-10"/>
+            <AcceptsMouse val="true"/>
+            <EdgeScrollPerSecond val="600"/>
+            <EdgeScrollIncrement val="{$this/IncrementFrame/@Hovering}"/>
+            <EdgeScrollDecrement val="{$this/DecrementFrame/@Hovering}"/>
+            
+            <Frame type="Frame" name="ConstraintFrame">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Right" relative="$parent/ContainerFrame" pos="Max" offset="0"/>
+                <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+            </Frame>
+            
+            <Frame type="Frame" name="ContainerFrame">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Right" relative="$parent/ScrollBar" pos="Min" offset="0"/>
+                <Anchor side="Bottom" relative="$this/BottomPaddingFrame" pos="Max" offset="0"/>
+                
+                <Frame type="LobbyPlayerSlotsTeamFrame" name="TeamFrame0" template="LobbyPlayerSlotsFrame/LobbyPlayerSlotsTeamFrameTemplate">
+                    <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                    <TeamId val="0"/>
+                </Frame>
+
+                <Frame type="LobbyPlayerSlotsTeamFrame" name="TeamFrame1" template="LobbyPlayerSlotsFrame/LobbyPlayerSlotsTeamFrameTemplate">
+                    <Anchor side="Top" relative="$parent/TeamFrame0" pos="Max" offset="0"/>
+                    <TeamId val="1"/>
+                </Frame>
+
+                <Frame type="LobbyPlayerSlotsTeamFrame" name="TeamFrame2" template="LobbyPlayerSlotsFrame/LobbyPlayerSlotsTeamFrameTemplate">
+                    <Anchor side="Top" relative="$parent/TeamFrame1" pos="Max" offset="0"/>
+                    <TeamId val="2"/>
+                </Frame>
+
+                <Frame type="LobbyPlayerSlotsTeamFrame" name="TeamFrame3" template="LobbyPlayerSlotsFrame/LobbyPlayerSlotsTeamFrameTemplate">
+                    <Anchor side="Top" relative="$parent/TeamFrame2" pos="Max" offset="0"/>
+                    <TeamId val="3"/>
+                </Frame>
+
+                <Frame type="LobbyPlayerSlotsTeamFrame" name="TeamFrame4" template="LobbyPlayerSlotsFrame/LobbyPlayerSlotsTeamFrameTemplate">
+                    <Anchor side="Top" relative="$parent/TeamFrame3" pos="Max" offset="0"/>
+                    <TeamId val="4"/>
+                </Frame>
+
+                <Frame type="LobbyPlayerSlotsTeamFrame" name="TeamFrame5" template="LobbyPlayerSlotsFrame/LobbyPlayerSlotsTeamFrameTemplate">
+                    <Anchor side="Top" relative="$parent/TeamFrame4" pos="Max" offset="0"/>
+                    <TeamId val="5"/>
+                </Frame>
+
+                <Frame type="LobbyPlayerSlotsTeamFrame" name="TeamFrame6" template="LobbyPlayerSlotsFrame/LobbyPlayerSlotsTeamFrameTemplate">
+                    <Anchor side="Top" relative="$parent/TeamFrame5" pos="Max" offset="0"/>
+                    <TeamId val="6"/>
+                </Frame>
+
+                <Frame type="LobbyPlayerSlotsTeamFrame" name="TeamFrame7" template="LobbyPlayerSlotsFrame/LobbyPlayerSlotsTeamFrameTemplate">
+                    <Anchor side="Top" relative="$parent/TeamFrame6" pos="Max" offset="0"/>
+                    <TeamId val="7"/>
+                </Frame>
+
+                <Frame type="LobbyPlayerSlotsTeamFrame" name="TeamFrame8" template="LobbyPlayerSlotsFrame/LobbyPlayerSlotsTeamFrameTemplate">
+                    <Anchor side="Top" relative="$parent/TeamFrame7" pos="Max" offset="0"/>
+                    <TeamId val="8"/>
+                </Frame>
+
+                <Frame type="LobbyPlayerSlotsTeamFrame" name="TeamFrame9" template="LobbyPlayerSlotsFrame/LobbyPlayerSlotsTeamFrameTemplate">
+                    <Anchor side="Top" relative="$parent/TeamFrame8" pos="Max" offset="0"/>
+                    <TeamId val="9"/>
+                </Frame>
+
+                <Frame type="LobbyPlayerSlotsTeamFrame" name="TeamFrame10" template="LobbyPlayerSlotsFrame/LobbyPlayerSlotsTeamFrameTemplate">
+                    <Anchor side="Top" relative="$parent/TeamFrame9" pos="Max" offset="0"/>
+                    <TeamId val="10"/>
+                </Frame>
+
+                <Frame type="LobbyPlayerSlotsTeamFrame" name="TeamFrame11" template="LobbyPlayerSlotsFrame/LobbyPlayerSlotsTeamFrameTemplate">
+                    <Anchor side="Top" relative="$parent/TeamFrame10" pos="Max" offset="0"/>
+                    <TeamId val="11"/>
+                </Frame>
+
+                <Frame type="LobbyPlayerSlotsTeamFrame" name="TeamFrame12" template="LobbyPlayerSlotsFrame/LobbyPlayerSlotsTeamFrameTemplate">
+                    <Anchor side="Top" relative="$parent/TeamFrame11" pos="Max" offset="0"/>
+                    <TeamId val="12"/>
+                </Frame>
+
+                <Frame type="LobbyPlayerSlotsTeamFrame" name="TeamFrame13" template="LobbyPlayerSlotsFrame/LobbyPlayerSlotsTeamFrameTemplate">
+                    <Anchor side="Top" relative="$parent/TeamFrame12" pos="Max" offset="0"/>
+                    <TeamId val="13"/>
+                </Frame>
+
+                <Frame type="LobbyPlayerSlotsTeamFrame" name="TeamFrame14" template="LobbyPlayerSlotsFrame/LobbyPlayerSlotsTeamFrameTemplate">
+                    <Anchor side="Top" relative="$parent/TeamFrame13" pos="Max" offset="0"/>
+                    <TeamId val="14"/>
+                </Frame>
+
+                <Frame type="LobbyPlayerSlotsTeamFrame" name="TeamFrame15" template="LobbyPlayerSlotsFrame/LobbyPlayerSlotsTeamFrameTemplate">
+                    <Anchor side="Top" relative="$parent/TeamFrame14" pos="Max" offset="0"/>
+                    <TeamId val="15"/>
+                </Frame>
+
+                <Frame type="LobbyPlayerSlotsTeamFrame" name="NewTeamFrame" template="LobbyPlayerSlotsFrame/LobbyPlayerSlotsTeamFrameTemplate">
+                    <Anchor side="Top" relative="$parent/TeamFrame15" pos="Max" offset="0"/>
+                    <TeamId val="{$LobbyPlayerSlotsFrame/@NewTeamId}"/>
+                    <Visible val="{$LobbyPlayerSlotsFrame/@HasNewTeam}"/>
+                    <AcceptsMouseDropTarget val="true"/>
+
+                    <Frame type="Frame" name="HitTestFrame">
+                        <Anchor side="Bottom" relative="$parent/PlayerFrame0" pos="Max" offset="0"/>
+                    </Frame>
+
+                    <Frame type="Label" name="TeamNameLabel">
+                        <Text val="@UI/ScreenBattleLobby/TeamNew"/>
+                    </Frame>
+
+                    <Frame type="Frame" name="PlayerFrame0">
+                        <CollapseLayout val="false"/>
+                    </Frame>
+                </Frame>
+
+                <Frame type="LobbyPlayerSlotsTeamFrame" name="TeamFrameObserver" template="LobbyPlayerSlotsFrame/LobbyPlayerSlotsTeamFrameTemplate">
+                    <Anchor side="Top" relative="$parent/NewTeamFrame" pos="Max" offset="0"/>
+                    <ObserverTeam val="true"/>
+
+                    <Frame type="Label" name="TeamNameLabel">
+                        <Text val="@UI/ScreenBattleLobby/TeamObserver"/>
+                    </Frame>
+                </Frame>
+
+                <Frame type="LobbyPlayerSlotsTeamFrame" name="TeamFrameReplay" template="LobbyPlayerSlotsFrame/LobbyPlayerSlotsTeamFrameTemplate">
+                    <Anchor side="Top" relative="$parent/TeamFrameObserver" pos="Max" offset="0"/>
+                    <TeamId val="255"/>
+                    
+                    <Frame type="Label" name="TeamNameLabel">
+                        <Text val="@UI/ScreenBattleLobby/TeamReplay"/>
+                    </Frame>
+                </Frame>
+    
+                <Frame type="Frame" name="BottomPaddingFrame">
+                    <Anchor side="Top" relative="$parent/TeamFrameReplay" pos="Max" offset="0"/>
+                    <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                    <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+                    <Height val="1"/>
+                </Frame>
+            </Frame>
+
+            <Frame type="ScrollBar" name="ScrollBar">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Bottom" relative="$parent" pos="Max" offset="2"/>
+                <Anchor side="Right" relative="$parent" pos="Max" offset="-14"/>
+                <Orientation val="Vertical"/>
+                <StepValue val="50.000000"/>
+                <Continuous val="true"/>
+                <Width val="16.000000"/>
+
+                <Frame type="Image" name="Image">
+                    <Anchor relative="$parent"/>
+                    <Texture val="Assets/Textures/UI_Battlenet_Glue_ChatPanelScrollBarLine.dds"/>
+                    <TextureType val="Nineslice"/>
+                    <Tiled val="true"/>
+                    <Alpha val="0"/>
+                </Frame>
+
+                <Frame type="Button" name="Button">
+                    <Frame type="Image" name="NormalImage">
+                        <Anchor relative="$parent"/>
+                        <Texture val="@UI/ChatPanelScrollBarGrabber_Normal"/>
+                        <TextureType val="NineSlice"/>
+                        <StateCount val="2"/>
+                        <Tiled val="true"/>
+                    </Frame>
+
+                    <Frame type="Image" name="HoverImage">
+                        <Anchor relative="$parent"/>
+                        <Texture val="@UI/ChatPanelScrollBarGrabber_Hover"/>
+                        <TextureType val="NineSlice"/>
+                        <StateCount val="2"/>
+                        <Tiled val="true"/>
+                    </Frame>
+                </Frame>
+            </Frame>
+            
+            <Frame type="Control" name="IncrementFrame">
+                <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+                <Height val="50"/>
+                <Visible val="false"/>
+        
+                <Animation name="DragAnim">
+                    <Event event="DragStart" frame="$parent" action="Reset,Play"/>
+                    <Event event="DragEnd" frame="$parent" action="Reset,Stop"/>
+                    <Controller type="Property" property="Visible" end="Pause">
+                        <Key type="Property" time="0" value="true"/>
+                    </Controller>
+                </Animation>
+            </Frame>
+            
+            <Frame type="Control" name="DecrementFrame">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+                <Height val="50"/>
+                <Visible val="{$parent/IncrementFrame/@Visible}"/>
+            </Frame>
+        </Frame>
+    </Frame>
+</Desc>

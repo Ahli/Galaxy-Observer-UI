@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<Desc>
+    <DescFlags val="Locked"/>
+    
+    <Constant name="TileListItemOffsetRight" val="-2"/>
+    <Constant name="TileListItemOffsetTop" val="4"/>
+
+    <Frame type="ScrollBar" name="ScrollBarTemplate">
+        <Image val="$root/CustomGameListPanel/ScrollBarBackgroundImage"/>
+        <Button val="$root/CustomGameListPanel/ScrollBarButtonTemplate"/>
+        <Orientation val="Vertical"/>
+        <Width val="16"/>
+    </Frame>
+    
+    <Frame type="LobbyMatchOptionsTileListItem" name="LobbyMatchOptionsTileListItemTemplate">
+        <Height val="54"/>
+
+        <Frame type="Image" name="BackgroundImage">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+            <Texture val="@UI/SC2_UI_Battlenet_Glue_Arcade_MainListItem_Normal"/>
+            <TextureType val="NineSlice"/>
+            <Alpha val="0"/>
+        </Frame>
+
+        <!-- This shows for category/genre/mode -->
+        <Frame type="Label" name="NameLabel">
+            <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="10"/>
+            <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent/Pulldown" pos="Min" offset="-5"/>
+            <Style val="@Lobby_MapOptionsAttributeTitle"/>
+            <Options val="Ellipsis | TooltipIfTruncated | NoWrapping"/>
+            <AcceptsMouseTooltip val="true"/>
+        </Frame>
+        
+        <!-- This shows for attributes -->
+        <Frame type="Label" name="AttributeNameLabel">
+            <Anchor relative="$parent/NameLabel"/>
+            <Style val="@Lobby_MapOptionsAttributeTitle"/>
+            <Text val="{$parent/@AttributeName}"/>
+            <Options val="Ellipsis | TooltipIfTruncated | NoWrapping"/>
+            <AcceptsMouseTooltip val="true"/>
+        </Frame>
+
+        <Frame type="LobbyAttributePulldown" name="Pulldown" template="LobbyAttributePulldown/LobbyAttributePulldownTemplate">
+            <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="-5"/>
+            <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+            <Tooltip val="{$parent/@AttributeTooltip}"/>
+            <Enabled val="true"/>
+            <Width val="188"/>
+            <MenuMaxHeight val="240"/>
+
+            <!-- The state group is organized this way to set Enabled false rather than true because -->
+            <!-- Otherwise the pulldown scrollbar gets disabled by default -->
+            <StateGroup name="EnabledStateGroup">
+                <State name="HostCategoryState">
+                    <When type="Property" frame="$ScreenBattleLobby" IsHost="false"/>
+                    <When type="Property" frame="$parent" OptionType="Category"/>
+                    <Action type="SetProperty" Enabled="false"/>
+                </State>
+                
+                <State name="HostVariantState">
+                    <When type="Property" frame="$ScreenBattleLobby" IsHost="false"/>
+                    <When type="Property" frame="$parent" OptionType="Variant"/>
+                    <Action type="SetProperty" Enabled="false"/>
+                </State>
+                
+                <State name="OpenPublicState">
+                    <When type="Property" frame="$ScreenBattleLobby" IsOpenToPublic="true"/>
+                    <Action type="SetProperty" Enabled="false"/>
+                </State>
+
+                <State name="CountdownState">
+                    <When type="Property" frame="$ScreenBattleLobby" IsCountdownLocked="true"/>
+                    <Action type="SetProperty" Enabled="false"/>
+                </State>
+
+                <State name="ChangeableState">
+                    <When type="Property" frame="$parent" IsChangeable="false"/>
+                    <Action type="SetProperty" Enabled="false"/>
+                </State>
+            </StateGroup>
+        </Frame>
+
+        <StateGroup name="TypeStateGroup">
+            <State name="CategoryState">
+                <When type="Property" OptionType="Category"/>
+                <When type="Property" frame="$parent/$parent/$parent/MapFrame" IsArcade="false"/>
+                <Action type="SetProperty" frame="NameLabel" Text="@UI/ScreenBattleLobby/MatchOptionsCategory"/>
+                <Action type="SetProperty" frame="NameLabel" Visible="true"/>
+                <Action type="SetProperty" frame="AttributeNameLabel" Visible="false"/>
+            </State>
+            
+            <State name="GenreState">
+                <When type="Property" OptionType="Category"/>
+                <Action type="SetProperty" frame="NameLabel" Text="@UI/ScreenBattleLobby/MatchOptionsGenre"/>
+                <Action type="SetProperty" frame="NameLabel" Visible="true"/>
+                <Action type="SetProperty" frame="AttributeNameLabel" Visible="false"/>
+            </State>
+            
+            <State name="VariantState">
+                <When type="Property" OptionType="Variant"/>
+                <Action type="SetProperty" frame="NameLabel" Text="@UI/ScreenBattleLobby/MatchOptionsVariant"/>
+                <Action type="SetProperty" frame="NameLabel" Visible="true"/>
+                <Action type="SetProperty" frame="AttributeNameLabel" Visible="false"/>
+            </State>
+
+            <State name="OptionState">
+                <When type="Property" OptionType="Attribute"/>
+                <Action type="SetProperty" frame="NameLabel" Visible="false"/>
+                <Action type="SetProperty" frame="AttributeNameLabel" Visible="true"/>
+            </State>
+        </StateGroup>
+    </Frame>
+
+    <Frame type="LobbyMatchOptionsFrame" name="LobbyMatchOptionsFrameTemplate">
+
+        <Frame type="Label" name="TitleLabel">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="15"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="20"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="-15"/>
+            <Style val="@Lobby_TeamTitle"/>
+            <Text val="@UI/ScreenBattleLobby/MatchOptionsTitle"/>
+        </Frame>
+        
+        <Frame type="TileList" name="OptionsTileList">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="55"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="20"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="-15"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="-15"/>
+            <AcceptsMouse val="true"/>
+
+            <Frame type="LobbyMatchOptionsTileListItem" name="Item0" template="LobbyMatchOptionsFrame/LobbyMatchOptionsTileListItemTemplate">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Right" relative="$parent/ScrollBar" pos="Min" offset="#TileListItemOffsetRight"/>
+            </Frame>
+
+            <Frame type="LobbyMatchOptionsTileListItem" name="Item1" template="LobbyMatchOptionsFrame/LobbyMatchOptionsTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item0" pos="Max" offset="#TileListItemOffsetTop"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Right" relative="$parent/ScrollBar" pos="Min" offset="#TileListItemOffsetRight"/>
+                <!-- This binding is an assumption that the category will only be in item0 and the variant in item1 -->
+                <CategoryId val="{$parent/Item0/@CategoryId}"/>
+            </Frame>
+
+            <Frame type="LobbyMatchOptionsTileListItem" name="Item2" template="LobbyMatchOptionsFrame/LobbyMatchOptionsTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item1" pos="Max" offset="#TileListItemOffsetTop"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Right" relative="$parent/ScrollBar" pos="Min" offset="#TileListItemOffsetRight"/>
+            </Frame>
+
+            <Frame type="LobbyMatchOptionsTileListItem" name="Item3" template="LobbyMatchOptionsFrame/LobbyMatchOptionsTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item2" pos="Max" offset="#TileListItemOffsetTop"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Right" relative="$parent/ScrollBar" pos="Min" offset="#TileListItemOffsetRight"/>
+            </Frame>
+
+            <Frame type="LobbyMatchOptionsTileListItem" name="Item4" template="LobbyMatchOptionsFrame/LobbyMatchOptionsTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item3" pos="Max" offset="#TileListItemOffsetTop"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Right" relative="$parent/ScrollBar" pos="Min" offset="#TileListItemOffsetRight"/>
+            </Frame>
+
+            <Frame type="LobbyMatchOptionsTileListItem" name="Item5" template="LobbyMatchOptionsFrame/LobbyMatchOptionsTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item4" pos="Max" offset="#TileListItemOffsetTop"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Right" relative="$parent/ScrollBar" pos="Min" offset="#TileListItemOffsetRight"/>
+            </Frame>
+
+            <Frame type="LobbyMatchOptionsTileListItem" name="Item6" template="LobbyMatchOptionsFrame/LobbyMatchOptionsTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item5" pos="Max" offset="#TileListItemOffsetTop"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Right" relative="$parent/ScrollBar" pos="Min" offset="#TileListItemOffsetRight"/>
+            </Frame>
+
+            <Frame type="ScrollBar" name="ScrollBar" template="LobbyMatchOptionsFrame/ScrollBarTemplate">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="2"/>
+                <Anchor side="Right" relative="$parent" pos="Max" offset="-6"/>
+                <Anchor side="Bottom" relative="$parent" pos="Max" offset="-6"/>
+            </Frame>
+        </Frame>
+    </Frame>
+</Desc>

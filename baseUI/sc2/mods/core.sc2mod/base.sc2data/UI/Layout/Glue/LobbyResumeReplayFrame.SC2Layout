@@ -1,0 +1,321 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<Desc>
+    <DescFlags val="Locked"/>
+    
+    <Constant name="TileListItemOffsetRight" val="-6"/>
+    <Constant name="TileListItemOffsetTop" val="4"/>
+
+    <Frame type="ScrollBar" name="ScrollBarTemplate">
+        <Image val="$root/CustomGameListPanel/ScrollBarBackgroundImage"/>
+        <Button val="$root/CustomGameListPanel/ScrollBarButtonTemplate"/>
+        <Orientation val="Vertical"/>
+        <Width val="16"/>
+    </Frame>
+    
+    <Frame type="LobbyResumeReplayTileListItem" name="LobbyResumeReplayTileListItemTemplate">
+        <Height val="40"/>
+
+        <Frame type="Image" name="NormalImage">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+            <Texture val="@UI/SC2_UI_Battlenet_Glue_Arcade_MainListItem_Normal"/>
+            <TextureType val="NineSlice"/>
+        </Frame>
+
+        <Frame type="Image" name="HoverImage">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+            <Texture val="@UI/SC2_UI_Battlenet_Glue_Arcade_MainListItem_Over"/>
+            <TextureType val="NineSlice"/>
+        </Frame>
+
+        <Frame type="Image" name="SelectedImage">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+            <Texture val="@UI/SC2_UI_Battlenet_Glue_Arcade_MainListItem_Normal"/>
+            <TextureType val="NineSlice"/>
+        </Frame>
+
+        <Frame type="Label" name="TypeLabel">
+            <Anchor side="Top" relative="$parent" pos="Mid" offset="1"/>
+            <Anchor side="Bottom" relative="$parent" pos="Mid" offset="1"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="12"/>
+            <Style val="@Arcade_GameInfo_Author"/>
+
+            <StateGroup name="TypeStateGroup">
+                <State name="GameStartedState">
+                    <When type="Property" frame="$parent" EventType="GameStarted"/>
+                    <Action type="SetProperty" Text="@UI/LobbyResumeReplayFrame/TypeGameStarted"/>
+                </State>
+
+                <State name="GameEndedState">
+                    <When type="Property" frame="$parent" EventType="GameEnded"/>
+                    <Action type="SetProperty" Text="@UI/LobbyResumeReplayFrame/TypeGameEnded"/>
+                </State>
+
+                <State name="PlayerPausedState">
+                    <When type="Property" frame="$parent" EventType="PlayerPaused"/>
+                    <Action type="SetProperty" Text="@UI/LobbyResumeReplayFrame/TypePlayerPaused"/>
+                </State>
+
+                <State name="PlayerLeftState">
+                    <When type="Property" frame="$parent" EventType="PlayerLeft"/>
+                    <Action type="SetProperty" Text="@UI/LobbyResumeReplayFrame/TypePlayerLeft"/>
+                </State>
+
+                <State name="PlayerUnresponsiveState">
+                    <When type="Property" frame="$parent" EventType="PlayerUnresponsive"/>
+                    <Action type="SetProperty" Text="@UI/LobbyResumeReplayFrame/TypePlayerUnresponsive"/>
+                </State>
+
+                <State name="EndOfReplayFileState">
+                    <When type="Property" frame="$parent" EventType="EndOfReplayFile"/>
+                    <Action type="SetProperty" Text="@UI/LobbyResumeReplayFrame/TypeEndOfReplayFile"/>
+                </State>
+            </StateGroup>
+        </Frame>
+
+        <Frame type="Label" name="SeparatorLabel">
+            <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Left" relative="$parent/TypeLabel" pos="Max" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+            <Style val="@Arcade_GameInfo_Description_Top"/>
+            <Text val=" - "/>
+        </Frame>
+
+        <Frame type="Label" name="TimeLabel">
+            <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Left" relative="$parent/SeparatorLabel" pos="Max" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+            <Style val="@Arcade_GameInfo_Description_Top"/>
+            <Text val="{$parent/@TimeText}"/>
+        </Frame>
+    </Frame>
+
+    <Frame type="LobbyResumeReplayFrame" name="LobbyResumeReplayFrameTemplate">
+        <SelectedTime val="{$this/Slider/@Value}"/>
+        
+        <!-- This tooltip is just for blocking tooltips behind this panel -->
+        <Frame type="StandardTooltip" name="LobbyResumeReplayTooltip">
+            <Frame type="Label" name="Label">
+                <Anchor relative="$parent"/>
+            </Frame>
+        </Frame>
+        
+        <Frame type="Frame" name="BackgroundFrame">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+            
+            <Frame type="Image" name="FullscreenBlackoutImage">
+                <Anchor relative="$parent"/>
+                <Color val="0,0,0"/>
+                <Alpha val="180"/>
+                <AcceptsMouse val="true"/>
+                <TooltipFrame val="MapProfileTooltip"/>
+            </Frame>
+        
+            <Frame type="Image" name="LeftBGGlowPattern">
+                <Anchor side="Top" relative="$parent/BackgroundContainer" pos="Mid" offset="0"/>
+                <Anchor side="Bottom" relative="$parent/BackgroundContainer" pos="Mid" offset="0"/>
+                <Anchor side="Right" relative="$parent/BackgroundContainer" pos="Min" offset="40"/>
+                <Texture val="@UI/Glues_Battlenet_DialogBox_BackGlow"/>
+            </Frame>
+
+            <Frame type="Image" name="RightBGGlowPattern">
+                <Anchor side="Top" relative="$parent/BackgroundContainer" pos="Mid" offset="0"/>
+                <Anchor side="Bottom" relative="$parent/BackgroundContainer" pos="Mid" offset="0"/>
+                <Anchor side="Left" relative="$parent/BackgroundContainer" pos="Max" offset="-40"/>
+                <Texture val="@UI/Glues_Battlenet_DialogBox_BackGlow"/>
+                <TextureCoords top="0.0" left="1.0" bottom="1.0" right="0.0"/>
+            </Frame>
+
+            <Frame type="Image" name="BackgroundContainer">
+                <Anchor side="Top" relative="$parent" pos="Mid" offset="-80"/>
+                <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Bottom" relative="$parent" pos="Mid" offset="-80"/>
+                <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+                <Texture val="@UI/Glues_Battlenet_DialogBox_BG"/>
+                <TextureType val="HorizontalBorder"/>
+                <Tiled val="false"/>
+                <Width val="700"/>
+                <Height val="800"/>
+            </Frame>
+
+            <Frame type="Image" name="TopHexPattern">
+                <Anchor side="Top" relative="$parent/BackgroundContainer" pos="Min" offset="11"/>
+                <Anchor side="Left" relative="$parent/BackgroundContainer" pos="Mid" offset="0"/>
+                <Anchor side="Right" relative="$parent/BackgroundContainer" pos="Mid" offset="0"/>
+                <Texture val="@UI/Glues_Battlenet_DialogBox_HexPattern"/>
+            </Frame>
+
+            <Frame type="Image" name="BottomHexPattern">
+                <Anchor side="Bottom" relative="$parent/BackgroundContainer" pos="Max" offset="-11"/>
+                <Anchor side="Left" relative="$parent/BackgroundContainer" pos="Mid" offset="0"/>
+                <Anchor side="Right" relative="$parent/BackgroundContainer" pos="Mid" offset="0"/>
+                <Texture val="@UI/Glues_Battlenet_DialogBox_HexPattern"/>
+                <TextureCoords top="1.0" left="1.0" bottom="0.0" right="0.0"/>
+            </Frame>
+        </Frame>
+
+        <Frame type="Label" name="TitleLabel">
+            <Anchor side="Top" relative="$parent/BackgroundFrame/BackgroundContainer" pos="Min" offset="50"/>
+            <Anchor side="Left" relative="$parent/BackgroundFrame/BackgroundContainer" pos="Min" offset="30"/>
+            <Anchor side="Right" relative="$parent/BackgroundFrame/BackgroundContainer" pos="Max" offset="-30"/>
+            <Text val="@UI/LobbyResumeReplayFrame/Title"/>
+            <Style val="@StandardDialogTitle"/>
+        </Frame>
+
+        <Frame type="Image" name="BackgroundImage">
+            <Anchor side="Top" relative="$parent/TitleLabel" pos="Max" offset="10"/>
+            <Anchor side="Left" relative="$parent/BackgroundFrame/BackgroundContainer" pos="Min" offset="70"/>
+            <Anchor side="Right" relative="$parent/BackgroundFrame/BackgroundContainer" pos="Max" offset="-70"/>
+            <Anchor side="Bottom" relative="$parent/TimeLabel" pos="Min" offset="-20"/>
+            <Texture val="Assets/Textures/White.dds"/>
+            <Color val="0,0,0"/>
+            <Alpha val="190"/>
+        </Frame>
+        
+        <Frame type="Image" name="BackgroundBorder">
+            <Anchor side="Top" relative="$parent/TitleLabel" pos="Max" offset="10"/>
+            <Anchor side="Left" relative="$parent/BackgroundFrame/BackgroundContainer" pos="Min" offset="70"/>
+            <Anchor side="Right" relative="$parent/BackgroundFrame/BackgroundContainer" pos="Max" offset="-70"/>
+            <Anchor side="Bottom" relative="$parent/TimeLabel" pos="Min" offset="-20"/>
+            <Texture val="@UI/SC2_UI_Battlenet_Glue_Arcade_ImageBorder"/>
+            <TextureType val="NineSlice"/>
+        </Frame>
+
+        <Frame type="TileList" name="TileList">
+            <Anchor side="Top" relative="$parent/BackgroundImage" pos="Min" offset="15"/>
+            <Anchor side="Left" relative="$parent/BackgroundImage" pos="Min" offset="15"/>
+            <Anchor side="Bottom" relative="$parent/BackgroundImage" pos="Max" offset="-15"/>
+            <Anchor side="Right" relative="$parent/BackgroundImage" pos="Max" offset="-15"/>
+            <AcceptsMouse val="true"/>
+
+            <Frame type="LobbyResumeReplayTileListItem" name="Item0" template="LobbyResumeReplayFrame/LobbyResumeReplayTileListItemTemplate">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Right" relative="$parent/ScrollBar" pos="Min" offset="#TileListItemOffsetRight"/>
+            </Frame>
+
+            <Frame type="LobbyResumeReplayTileListItem" name="Item1" template="LobbyResumeReplayFrame/LobbyResumeReplayTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item0" pos="Max" offset="#TileListItemOffsetTop"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Right" relative="$parent/ScrollBar" pos="Min" offset="#TileListItemOffsetRight"/>
+            </Frame>
+
+            <Frame type="LobbyResumeReplayTileListItem" name="Item2" template="LobbyResumeReplayFrame/LobbyResumeReplayTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item1" pos="Max" offset="#TileListItemOffsetTop"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Right" relative="$parent/ScrollBar" pos="Min" offset="#TileListItemOffsetRight"/>
+            </Frame>
+
+            <Frame type="LobbyResumeReplayTileListItem" name="Item3" template="LobbyResumeReplayFrame/LobbyResumeReplayTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item2" pos="Max" offset="#TileListItemOffsetTop"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Right" relative="$parent/ScrollBar" pos="Min" offset="#TileListItemOffsetRight"/>
+            </Frame>
+
+            <Frame type="LobbyResumeReplayTileListItem" name="Item4" template="LobbyResumeReplayFrame/LobbyResumeReplayTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item3" pos="Max" offset="#TileListItemOffsetTop"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Right" relative="$parent/ScrollBar" pos="Min" offset="#TileListItemOffsetRight"/>
+            </Frame>
+
+            <Frame type="LobbyResumeReplayTileListItem" name="Item5" template="LobbyResumeReplayFrame/LobbyResumeReplayTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item4" pos="Max" offset="#TileListItemOffsetTop"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Right" relative="$parent/ScrollBar" pos="Min" offset="#TileListItemOffsetRight"/>
+            </Frame>
+
+            <Frame type="LobbyResumeReplayTileListItem" name="Item6" template="LobbyResumeReplayFrame/LobbyResumeReplayTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item5" pos="Max" offset="#TileListItemOffsetTop"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Right" relative="$parent/ScrollBar" pos="Min" offset="#TileListItemOffsetRight"/>
+            </Frame>
+
+            <Frame type="LobbyResumeReplayTileListItem" name="Item7" template="LobbyResumeReplayFrame/LobbyResumeReplayTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item6" pos="Max" offset="#TileListItemOffsetTop"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Right" relative="$parent/ScrollBar" pos="Min" offset="#TileListItemOffsetRight"/>
+            </Frame>
+
+            <Frame type="LobbyResumeReplayTileListItem" name="Item8" template="LobbyResumeReplayFrame/LobbyResumeReplayTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item7" pos="Max" offset="#TileListItemOffsetTop"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Right" relative="$parent/ScrollBar" pos="Min" offset="#TileListItemOffsetRight"/>
+            </Frame>
+
+            <Frame type="LobbyResumeReplayTileListItem" name="Item9" template="LobbyResumeReplayFrame/LobbyResumeReplayTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item8" pos="Max" offset="#TileListItemOffsetTop"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Right" relative="$parent/ScrollBar" pos="Min" offset="#TileListItemOffsetRight"/>
+            </Frame>
+
+            <Frame type="ScrollBar" name="ScrollBar" template="LobbyResumeReplayFrame/ScrollBarTemplate">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="-4"/>
+                <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+                <Anchor side="Bottom" relative="$parent" pos="Max" offset="-1"/>
+                <CollapseLayout val="True"/>
+            </Frame>
+        </Frame>
+
+        <Frame type="Label" name="TimeLabel">
+            <Anchor side="Bottom" relative="$parent/Slider" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent/BackgroundFrame/BackgroundContainer" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent/BackgroundFrame/BackgroundContainer" pos="Mid" offset="0"/>
+            <Style val="@Coop_DownloadPanelTitle"/>
+            <Text val="{$parent/@SelectedTimeText}"/>
+        </Frame>
+
+        <Frame type="Slider" name="Slider" template="StandardTemplates/StandardSliderTemplate">
+            <Anchor side="Bottom" relative="$parent/StartButton" pos="Min" offset="-10"/>
+            <Anchor side="Left" relative="$parent/BackgroundFrame/BackgroundContainer" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent/BackgroundFrame/BackgroundContainer" pos="Max" offset="0"/>
+            <Width val="566"/>
+            <StepValue val="1"/>
+            <MinValue val="0"/>
+            <MaxValue val="{$parent/@MaxTime}"/>
+            <Value val="{$parent/@SelectedTime}"/>
+        </Frame>
+        
+        <Frame type="Button" name="StartButton" template="StandardBattlenetTemplates/BattlenetAlternateButtonTemplate">
+            <Anchor side="Bottom" relative="$parent/BackgroundFrame/BackgroundContainer" pos="Max" offset="-40"/>
+            <Anchor side="Right" relative="$parent" pos="Mid" offset="-3"/>
+            <Text val="@UI/LobbyResumeReplayFrame/Start"/>
+
+            <StateGroup name="ButtonStateGroup">
+                <State name="HasOriginalParticipantState">
+                    <When type="Property" frame="$parent" HasOriginalParticipant="false"/>
+                    <Action type="SetProperty" Enabled="false"/>
+                    <Action type="SetProperty" Tooltip="@UI/LobbyResumeReplayFrame/RequiresParticipantTooltip"/>
+                </State>
+
+                <State name="CountdownState">
+                    <When type="Property" frame="$parent/$parent" IsCountdown="true"/>
+                    <Action type="SetProperty" Enabled="false"/>
+                    <Action type="SetProperty" Tooltip=""/>
+                </State>
+
+                <State name="HostState">
+                    <When type="Property" frame="$parent/$parent" IsHost="false"/>
+                    <Action type="SetProperty" Enabled="false"/>
+                    <Action type="SetProperty" Tooltip=""/>
+                </State>
+            </StateGroup>
+        </Frame>
+
+        <Frame type="Button" name="CancelButton" template="StandardBattlenetTemplates/BattlenetStandardButtonTemplate">
+            <Anchor side="Top" relative="$parent/StartButton" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Mid" offset="2"/>
+            <Text val="@UI/LobbyResumeReplayFrame/Cancel"/>
+        </Frame>
+    </Frame>
+</Desc>
