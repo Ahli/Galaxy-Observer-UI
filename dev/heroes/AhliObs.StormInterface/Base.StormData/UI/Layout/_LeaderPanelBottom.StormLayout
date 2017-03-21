@@ -53,9 +53,6 @@
 			<Frame type="Image" name="HexImage">
 				<Visible val="false"/>
 			</Frame>
-			<Frame type="Image" name="HexOverlayImage">
-				<Visible val="false"/>
-			</Frame>
 			<Frame type="Frame" name="BorderContainer">
 				<Visible val="false"/>
 			</Frame>
@@ -66,6 +63,9 @@
 				<Visible val="false"/>
 			</Frame>
 			<Frame type="Frame" name="RedTeamStats">
+				<Visible val="false"/>
+			</Frame>
+			<Frame type="Label" name="VSLabel">
 				<Visible val="false"/>
 			</Frame>
 			
@@ -300,28 +300,33 @@
 			<RenderPriority val="511"/>
 			<!-- Set texture via propertybind. -->
 		</Frame>
-		<!-- override left anchor of default namelabel -->
+		<!-- @override left anchor of default namelabel -->
 		<Frame type="Label" name="NameLabel">
             <Anchor side="Top" relative="$parent" pos="Min" offset="25"/>
             <Anchor side="Left" relative="$parent/IconImage" pos="Max" offset="0"/>
             <Anchor side="Right" relative="$parent/HeroPortrait" pos="Min" offset="0"/>
             <Style val="BottomPanelTalentTooltipHeader"/>
 		</Frame>
-		<!-- override top anchor of default VitalAnchorFrame to move it to proper position again -->
+		<!-- @override top and left anchor of default VitalAnchorFrame to move it to proper position again -->
         <Frame type="Frame" name="VitalAnchorFrame">
             <Anchor side="Top" relative="$parent" pos="Min" offset="65"/>
+			<Anchor side="Left" relative="$parent" pos="Min" offset="31"/>
 		</Frame>
-		<!-- override left anchor of default CooldownLabel to move it to proper position again -->
+		<!-- @override left anchor of default CooldownLabel to move it to proper position again -->
         <Frame type="Label" name="CooldownLabel">
             <Anchor side="Left" relative="$parent" pos="Min" offset="31"/>
             <Anchor side="Right" relative="$parent" pos="Max" offset="-30"/>
 		</Frame>
-		<!-- override left anchor of default DescriptionLabel to move it to proper position again -->
+		<!-- @override left anchor of default DescriptionLabel to move it to proper position again -->
         <Frame type="Label" name="DescriptionLabel">
             <Anchor side="Left" relative="$parent" pos="Min" offset="31"/>
             <Anchor side="Right" relative="$parent" pos="Max" offset="-30"/>
 		</Frame>
-		
+		<!-- @override -->
+        <Frame type="Frame" name="BottomFrame">
+            <Anchor side="Left" relative="$parent" pos="Min" offset="30"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="-30"/>
+		</Frame>
 		
 		<Frame type="Image" name="UnfilledProgressImage">
 			<Anchor side="Top" relative="$parent/IconImage" pos="Mid" offset="0"/>
@@ -368,18 +373,7 @@
 				</Frame>
 			</Frame>
 		</Frame>
-		<Frame type="Image" name="QuestCompleteImage">
-			<Anchor side="Top" relative="$parent/IconImage" pos="Mid" offset="0"/>
-			<Anchor side="Left" relative="$parent/IconImage" pos="Mid" offset="0"/>
-			<Anchor side="Right" relative="$parent/IconImage" pos="Mid" offset="0"/>
-			<Anchor side="Bottom" relative="$parent/IconImage" pos="Mid" offset="0"/>
-			<Width val="50"/>
-			<Height val="50"/>
-			<Unclipped val="true"/>
-			<RenderPriority val="537"/>
-			<Texture val="_Assets\Textures\talentQuestProgressBarComplete.dds"/>
-		</Frame>
-
+		<!-- DEBUG
 		<Frame type="Label" name="ProgressLabel1">
 			<Anchor side="Top" relative="$parent/QuestProgressBar" pos="Max" offset="-10"/>
 			<Anchor side="Left" relative="$parent/QuestProgressBar" pos="Max" offset="2"/>
@@ -394,7 +388,31 @@
 			<Anchor side="Top" relative="$parent/ProgressLabel1" pos="Min" offset="0"/>
 			<Anchor side="Left" relative="$parent/ProgressLabel2" pos="Max" offset="5"/>
 			<Text val="{$parent/QuestProgressBar/@MaxValue}"/>
+		</Frame>-->
+		<Frame type="Image" name="QuestCompleteImage">
+			<Anchor side="Top" relative="$parent/IconImage" pos="Mid" offset="0"/>
+			<Anchor side="Left" relative="$parent/IconImage" pos="Mid" offset="0"/>
+			<Anchor side="Right" relative="$parent/IconImage" pos="Mid" offset="0"/>
+			<Anchor side="Bottom" relative="$parent/IconImage" pos="Mid" offset="0"/>
+			<Width val="50"/>
+			<Height val="50"/>
+			<Unclipped val="true"/>
+			<RenderPriority val="537"/>
+			<Texture val="_Assets\Textures\talentQuestProgressBarComplete.dds"/>
 		</Frame>
+        <Frame type="Label" name="QuestProgressStackLabel">
+            <Anchor side="Top" relative="$parent/QuestProgressBar" pos="Max" offset="-4"/>
+            <Anchor side="Bottom" relative="$parent/QuestProgressBar" pos="Max" offset="-4"/>
+            <Anchor side="Left" relative="$parent/QuestProgressBar" pos="Max" offset="-8"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+			<Height val="20"/>
+            <Style val="BottomPanel_TalentTooltipQuestStack"/>
+            <Visible val="false"/>
+            <RenderPriority val="538"/>
+			<Unclipped val="true"/>
+			<!-- TODO once above questprogressbar works, this can be used...
+			<Text val="{$parent/QuestProgressBar/@Value}"/>-->
+        </Frame>
 		
 		<!-- adapted from GameStatsPanel/SelectedTalentTreeIconImageTemplate/TalentQuestProgress -->
         <StateGroup name="TalentQuestProgress">
@@ -404,23 +422,27 @@
                 <Action type="SetProperty" frame="QuestProgressBar" visible="True"/>
                 <Action type="SetProperty" frame="UnfilledProgressImage" visible="True"/>
                 <Action type="SetProperty" frame="QuestCompleteImage" visible="False"/>
+                <Action type="SetProperty" frame="QuestProgressStackLabel" visible="True"/>
             </State>
             <State name="HasUntrackedQuest">
                 <When type="Property" frame="$OVERRIDE_ME" QuestProgress="ProgressUntracked"/>
-                <Action type="SetProperty" frame="QuestProgressBar" visible="false"/>
+                <Action type="SetProperty" frame="QuestProgressBar" visible="False"/>
                 <Action type="SetProperty" frame="UnfilledProgressImage" visible="True"/>
                 <Action type="SetProperty" frame="QuestCompleteImage" visible="False"/>
+                <Action type="SetProperty" frame="QuestProgressStackLabel" visible="False"/>
             </State>
             <State name="FinishedQuest">
                 <When type="Property" frame="$OVERRIDE_ME" QuestProgress="FinishedQuest"/>
                 <Action type="SetProperty" frame="QuestProgressBar" visible="False"/>
                 <Action type="SetProperty" frame="UnfilledProgressImage" visible="True"/>
                 <Action type="SetProperty" frame="QuestCompleteImage" visible="True"/>
+                <Action type="SetProperty" frame="QuestProgressStackLabel" visible="False"/>
             </State>
             <State name="NoQuest">
                 <Action type="SetProperty" frame="QuestProgressBar" visible="False"/>
                 <Action type="SetProperty" frame="UnfilledProgressImage" visible="False"/>
                 <Action type="SetProperty" frame="QuestCompleteImage" visible="False"/>
+                <Action type="SetProperty" frame="QuestProgressStackLabel" visible="False"/>
             </State>
         </StateGroup>
 	</Frame>
@@ -429,27 +451,14 @@
 	<Frame type="UnitStatusTalentIcon" name="TalentTreeIconTemplate">
 		<Unclipped val="true"/>
 		
-		<Animation name="MouseHighlight">
-			<Event event="OnMouseEnter" action="DirectionForward,Play"/>
-			<Event event="OnMouseExit" action="DirectionReverse,Play"/>
-			
-			<Controller type="Fade" end="Pause" frame="IconBorderImageHighlight">
-				<Key type="Curve" time="0" value="0"/>
-				<Key type="Curve" time="0.25" value="0"/>
-				<Key type="Curve" time="0.5" value="255"/>
-				<Key type="Curve" time="1.0" value="255"/>
-			</Controller>
-		</Animation>
-		
-		<Frame type="Image" name="IconImage">
+        <Frame type="Image" name="IconBackgroundImage">
 			<Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
 			<Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
 			<Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
 			<Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
-			<Width val="40"/>
-			<Height val="40"/>
-			<ImageMaskTexture val="_Assets\Textures\talentIconAlphaMask.dds"/>
-			<RenderPriority val="531"/>
+			<Width val="36"/>
+			<Height val="36"/>
+			<RenderPriority val="510"/>
 		</Frame>
 		
 		<Frame type="Image" name="IconBorderImage">
@@ -462,18 +471,20 @@
 			<Alpha val="#talentBorderAlpha2"/>
 			<Unclipped val="true"/>
 			<RenderPriority val="530"/>
-			
-			<Animation name="TalentAvailable2">
-				<Event event="NotAvailable" action="DirectionReverse,Play"/>
-				<Event event="Available" action="Restart,Play"/>
-				
-				<Controller type="Visibility" end="Pause" frame="$parent/IconBorderImageHighlight">
-					<Key type="Bool" time="0" value="false"/>
-					<Key type="Bool" time="0" value="true"/>
-				</Controller>
-			</Animation>
 		</Frame>
 		
+		<Frame type="Image" name="IconImage">
+			<Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+			<Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+			<Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+			<Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+			<Width val="40"/>
+			<Height val="40"/>
+			<ImageMaskTexture val="_Assets\Textures\talentIconAlphaMask.dds"/>
+			<RenderPriority val="531"/>
+		</Frame>
+		
+		<!-- Custom highlight image that should be blended in when mouse hovers over the time. -->
 		<Frame type="Image" name="IconBorderImageHighlight">
 			<Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
 			<Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
@@ -488,34 +499,69 @@
 			<IgnoreParentColor val="true"/>
 			<Unclipped val="true"/>
 		</Frame>
-		
-		<!-- safely-extends StandardTemplates/UnitStatusTalentIconTemplate/TalentTierState -->
-		<StateGroup name="TalentTierState2">
-			<DefaultState val="TierNotAvailable"/>
+		<Animation name="MouseHighlight">
+			<Event event="OnMouseEnter" action="DirectionForward,Play"/>
+			<Event event="OnMouseExit" action="DirectionReverse,Play"/>
 			
+			<Controller type="Fade" end="Pause" frame="IconBorderImageHighlight">
+				<Key type="Curve" time="0" value="0"/>
+				<Key type="Curve" time="0.25" value="0"/>
+				<Key type="Curve" time="0.5" value="255"/>
+				<Key type="Curve" time="1.0" value="255"/>
+			</Controller>
+		</Animation>
+		
+		<!-- @Override -->
+		<StateGroup name="TalentTierState">
+			<DefaultState val="TierNotAvailable"/>
 			<State name="TierHidden">
 				<When type="AnimationState" frame="$this" TalentTierState="TierHidden"/>
-				<Action type="SendEvent" frame="IconBorderImage" event="NotAvailable"/>
 				<Action type="SetProperty" frame="$this" visible="false"/>
 			</State>
-			
 			<State name="TierNotAvailable">
 				<When type="AnimationState" frame="$this" TalentTierState="TierNotAvailable"/>
-				<Action type="SendEvent" frame="IconBorderImage" event="NotAvailable"/>
-				<Action type="SetProperty" frame="$this" visible="false"/>
+				<Action type="SetProperty" frame="$this/IconImage" visible="false"/>
+				<Action type="SetProperty" frame="$this" visible="true"/>
+				<Action type="SetProperty" frame="IconBorderImageHighlight" visible="false"/>
 			</State>
-			
 			<State name="TierAvailable">
 				<When type="AnimationState" frame="$this" TalentTierState="TierAvailable"/>
-				<Action type="SendEvent" frame="IconBorderImage" event="Available"/>
 				<Action type="SetProperty" frame="$this" visible="true"/>
+				<Action type="SetProperty" frame="IconBorderImageHighlight" visible="true"/>
+				<Action type="SetProperty" frame="$this/IconImage" visible="true"/>
+				<Action type="SetProperty" frame="$this/IconImage" texture="@UI/Storm_UI_InGame_Leader_Talent_Unselected"/>
 			</State>
-			
 			<State name="TierSelected">
 				<When type="AnimationState" frame="$this" TalentTierState="TierSelected"/>
-				<Action type="SendEvent" frame="IconBorderImage" event="Available"/>
 				<Action type="SetProperty" frame="$this" visible="true"/>
+				<Action type="SetProperty" frame="IconBorderImageHighlight" visible="true"/>
+				<Action type="SetProperty" frame="$this/IconImage" visible="true"/>
+                <!-- IconImage Texture taken care of by code -->
 			</State>
+		</StateGroup>
+		
+		<!-- @Override -->
+        <StateGroup name="TalentTypeState1">
+			<State name="TypeTalent_Unavailable">
+				<When type="AnimationState" frame="$this" TalentTypeState="TypeTalent"/>
+				<When type="AnimationState" frame="$this" TalentTierState="TierNotAvailable"/>
+				<Action type="SetProperty" frame="$this/IconBorderImage" alpha="#lockedTalentBorderAlpha"/>
+				<Action type="SetProperty" frame="$this/IconBorderImage" desaturated="true"/>
+				<Action type="SetProperty" frame="$this/IconBackgroundImage" alpha="100"/>
+			</State>
+			<State name="TypeTalent_Available">
+				<When type="AnimationState" frame="$this" TalentTypeState="TypeTalent"/>
+				<When type="AnimationState" frame="$this" TalentTierState="TierAvailable"/>
+				<Action type="SetProperty" frame="$this/IconBorderImage" alpha="255"/>
+				<Action type="SetProperty" frame="$this/IconBorderImage" desaturated="false"/>
+				<Action type="SetProperty" frame="$this/IconBackgroundImage" alpha="255"/>
+			</State>
+			<!--<State name="TypeUltimate_Unavailable">
+			</State>
+			<State name="TypeUltimate_Available">
+			</State>
+			<State name="TierSelected">
+			</State>-->
 		</StateGroup>
 		
 		<Frame type="Image" name="UnfilledProgressImage">
@@ -547,6 +593,7 @@
 			
 			<Frame type="Frame" name="FillImageContainer">
 				<Frame type="Image" name="FillImage">
+					<Anchor relative="$parent"/>
 					<Unclipped val="true"/>
 					<TextureType val="Circular"/>
 					<RenderPriority val="536"/>
@@ -565,32 +612,51 @@
 			<RenderPriority val="537"/>
 			<Texture val="_Assets\Textures\talentQuestProgressBarComplete.dds"/>
 		</Frame>
-
-		<!-- safely-extends GameStatsPanel/SelectedTalentTreeIconImageTemplate/TalentQuestProgress -->
-		<StateGroup name="TalentQuestProgress2">
+        <Frame type="Label" name="QuestProgressStackLabel">
+            <Anchor side="Bottom" relative="$parent/QuestProgressBar" pos="Max" offset="4"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="15"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+            <Style val="BottomPanel_TalentQuestStack"/>
+        </Frame>
+		
+		<!-- @override GameStatsPanel/SelectedTalentTreeIconImageTemplate/TalentQuestProgress -->
+		<StateGroup name="TalentQuestProgress">
 			<DefaultState val="NoQuest"/>
-			
 			<State name="HasQuest">
 				<When type="Property" frame="$this" QuestProgress="QuestInProgress"/>
+                <Action type="SetProperty" frame="QuestProgressBar" visible="True"/>
+                <Action type="SetProperty" frame="UnfilledProgressImage" visible="True"/>
+                <Action type="SetProperty" frame="QuestCompleteImage" visible="False"/>
+                <Action type="SetProperty" frame="QuestProgressStackLabel" visible="True"/>
 				<Action type="SetProperty" frame="IconBorderImage" visible="True"/>
 			</State>
-			
 			<State name="HasUntrackedQuest">
 				<When type="Property" frame="$this" QuestProgress="ProgressUntracked"/>
+                <Action type="SetProperty" frame="QuestProgressBar" visible="false"/>
+                <Action type="SetProperty" frame="UnfilledProgressImage" visible="True"/>
+                <Action type="SetProperty" frame="QuestCompleteImage" visible="False"/>
+                <Action type="SetProperty" frame="QuestProgressStackLabel" visible="False"/>
 				<Action type="SetProperty" frame="IconBorderImage" visible="True"/>
 			</State>
-			
 			<State name="FinishedQuest">
 				<When type="Property" frame="$this" QuestProgress="FinishedQuest"/>
+                <Action type="SetProperty" frame="QuestProgressBar" visible="False"/>
+                <Action type="SetProperty" frame="UnfilledProgressImage" visible="True"/>
+                <Action type="SetProperty" frame="QuestCompleteImage" visible="True"/>
+                <Action type="SetProperty" frame="QuestProgressStackLabel" visible="False"/>
 				<Action type="SetProperty" frame="IconBorderImage" visible="False"/>
 			</State>
-			
 			<State name="NoQuest">
+                <Action type="SetProperty" frame="QuestProgressBar" visible="False"/>
+                <Action type="SetProperty" frame="UnfilledProgressImage" visible="False"/>
+                <Action type="SetProperty" frame="QuestCompleteImage" visible="False"/>
+                <Action type="SetProperty" frame="QuestProgressStackLabel" visible="False"/>
 				<Action type="SetProperty" frame="IconBorderImage" visible="True"/>
 			</State>
 		</StateGroup>
 	</Frame>
 	<Frame type="UnitStatusTalentIcon" name="TalentTreeIconTemplate_R" template="_LeaderPanelBottom/TalentTreeIconTemplate">
+		<!-- @Override -->
 		<StateGroup name="TalentTypeState">
 			<State name="TypeTalent">
 				<Action type="SetProperty" frame="$this/IconBorderImage" texture="Assets\Textures\storm_ui_ingame_obs_talents_highlight_red.dds"/>
@@ -601,6 +667,7 @@
 		</StateGroup>
 	</Frame>
 	<Frame type="UnitStatusTalentIcon" name="TalentTreeIconTemplate_L" template="_LeaderPanelBottom/TalentTreeIconTemplate">
+		<!-- @Override -->
 		<StateGroup name="TalentTypeState">
 			<State name="TypeTalent">
 				<Action type="SetProperty" frame="$this/IconBorderImage" texture="Assets\Textures\storm_ui_ingame_obs_talents_highlight_blue.dds"/>
@@ -614,17 +681,15 @@
 	<Frame type="UnitStatusTalentIcon" name="TalentTreeIconHeroicTemplate">
 		<Unclipped val="true"/>
 		
-		<Animation name="MouseHighlight">
-			<Event event="OnMouseEnter" action="DirectionForward,Play"/>
-			<Event event="OnMouseExit" action="DirectionReverse,Play"/>
-			
-			<Controller type="Fade" end="Pause" frame="IconBorderImageHighlight">
-				<Key type="Curve" time="0" value="0"/>
-				<Key type="Curve" time="0.25" value="0"/>
-				<Key type="Curve" time="0.5" value="255"/>
-				<Key type="Curve" time="1.0" value="255"/>
-			</Controller>
-		</Animation>
+        <Frame type="Image" name="IconBackgroundImage">
+			<Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+			<Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+			<Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+			<Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+			<Width val="36"/>
+			<Height val="36"/>
+			<RenderPriority val="510"/>
+		</Frame>
 		
 		<Frame type="Image" name="IconBorderImage">
 			<Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
@@ -633,24 +698,17 @@
 			<Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
 			<Width val="48"/>
 			<Height val="48"/>
-			<!-- <ImageMaskTexture val="_Assets\Textures\heroicTalentAlphaMask.dds"/> -->
 			<Alpha val="#ultimateTalentBorderAlpha2"/>
-			<IgnoreParentColor val="true"/>
 			<Unclipped val="true"/>
+			<RenderPriority val="532"/>
 			<Rotation val="45"/>
+			<DesaturationColor val="ffffff"/>
 			
-			<Animation name="TalentAvailable2">
-				<Event event="NotAvailable" action="DirectionReverse,Play"/>
-				<Event event="Available" action="Restart,Play"/>
-				<Controller type="Visibility" end="Pause" frame="$parent/IconBorderImageHighlight">
-					<Key type="Bool" time="0" value="false"/>
-					<Key type="Bool" time="0" value="true"/>
-				</Controller>
-			</Animation>
 			<Animation name="Rotation">
-				<Event event="OnHidden" action="Stop"/>
-				<Event event="OnShown" action="Play"/>
+				<!--<Event event="OnHidden" action="Stop"/>
+				<Event event="OnShown" action="Play"/>-->
 				<Event event="StopRotation" action="Stop"/>
+				<Event event="StartRotation" action="Play"/>
 				<Controller type="Rotation" relative="False" end="Loop">
 					<Key type="Curve" time="0" value="45" out="linear"/>
 					<Key type="Curve" time="16" value="405" out="linear"/>
@@ -658,6 +716,18 @@
 			</Animation>
 		</Frame>
 		
+		<Frame type="Image" name="IconImage">
+			<Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+			<Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+			<Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+			<Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+			<Width val="40"/>
+			<Height val="40"/>
+			<ImageMaskTexture val="_Assets\Textures\talentIconAlphaMask.dds"/>
+			<RenderPriority val="531"/>
+		</Frame>
+		
+		<!-- Custom highlight image that should be blended in when mouse hovers over the time. -->
 		<Frame type="Image" name="IconBorderImageHighlight">
 			<Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
 			<Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
@@ -672,36 +742,97 @@
 			<IgnoreParentColor val="true"/>
 			<Unclipped val="true"/>
 		</Frame>
-		
-		<!-- extends StandardTemplates/UnitStatusTalentIconTemplate/TalentTierState -->
-		<StateGroup name="TalentTierState2">
-			<DefaultState val="TierNotAvailable"/>
+		<Animation name="MouseHighlight">
+			<Event event="OnMouseEnter" action="DirectionForward,Play"/>
+			<Event event="OnMouseExit" action="DirectionReverse,Play"/>
 			
+			<Controller type="Fade" end="Pause" frame="IconBorderImageHighlight">
+				<Key type="Curve" time="0" value="0"/>
+				<Key type="Curve" time="0.25" value="0"/>
+				<Key type="Curve" time="0.5" value="255"/>
+				<Key type="Curve" time="1.0" value="255"/>
+			</Controller>
+		</Animation>
+		
+		<!-- @Override -->
+		<StateGroup name="TalentTierState">
+			<DefaultState val="TierNotAvailable"/>
 			<State name="TierHidden">
 				<When type="AnimationState" frame="$this" TalentTierState="TierHidden"/>
-				<Action type="SendEvent" frame="IconBorderImage" event="NotAvailable"/>
 				<Action type="SetProperty" frame="$this" visible="false"/>
 			</State>
-			
 			<State name="TierNotAvailable">
 				<When type="AnimationState" frame="$this" TalentTierState="TierNotAvailable"/>
-				<Action type="SendEvent" frame="IconBorderImage" event="NotAvailable"/>
-				<Action type="SetProperty" frame="$this" visible="false"/>
+				<Action type="SetProperty" frame="$this/IconImage" visible="false"/>
+				<Action type="SetProperty" frame="$this/" visible="true"/>
+				<Action type="SetProperty" frame="IconBorderImageHighlight" visible="false"/>
 			</State>
-			
 			<State name="TierAvailable">
 				<When type="AnimationState" frame="$this" TalentTierState="TierAvailable"/>
-				<Action type="SendEvent" frame="IconBorderImage" event="Available"/>
 				<Action type="SetProperty" frame="$this" visible="true"/>
+				<Action type="SetProperty" frame="IconBorderImageHighlight" visible="true"/>
+				<Action type="SetProperty" frame="$this/IconImage" visible="true"/>
+				<Action type="SetProperty" frame="$this/IconImage" texture="@UI/Storm_UI_InGame_Leader_Talent_Unselected"/>
 			</State>
-			
 			<State name="TierSelected">
 				<When type="AnimationState" frame="$this" TalentTierState="TierSelected"/>
-				<Action type="SendEvent" frame="IconBorderImage" event="Available"/>
 				<Action type="SetProperty" frame="$this" visible="true"/>
+				<Action type="SetProperty" frame="IconBorderImageHighlight" visible="true"/>
+				<Action type="SetProperty" frame="$this/IconImage" visible="true"/>
+                <!-- IconImage Texture taken care of by code -->
 			</State>
 		</StateGroup>
 
+		<!-- @Override -->
+        <StateGroup name="TalentTypeState1">
+            <DefaultState val="TypeUltimate_Unavailable"/>
+			<State name="TypeUltimate_Unavailable">
+				<When type="AnimationState" frame="$this" TalentTypeState="TypeUltimate"/>
+				<When type="AnimationState" frame="$this" TalentTierState="TierNotAvailable"/>
+				<Action type="SetProperty" frame="$this/IconBorderImage" alpha="#ultimatelockedTalentBorderAlpha"/>
+				<Action type="SetProperty" frame="$this/IconBorderImage" desaturated="true"/>
+				<Action type="SendEvent" frame="$this/IconBorderImage" event="StopRotation"/>
+				<Action type="SetProperty" frame="$this/IconBorderImage" rotation="45"/>
+				<Action type="SetProperty" frame="$this/IconBackgroundImage" alpha="100"/>
+			</State>
+			<State name="TypeUltimate_Available">
+				<When type="AnimationState" frame="$this" TalentTypeState="TypeUltimate"/>
+				<When type="AnimationState" frame="$this" TalentTierState="TierAvailable"/>
+				<Action type="SetProperty" frame="$this/IconImage" visible="true"/>
+				<Action type="SetProperty" frame="$this/IconBorderImage" alpha="255"/>
+				<Action type="SetProperty" frame="$this/IconBorderImage" desaturated="false"/>
+				<Action type="SendEvent" frame="$this/IconBorderImage" event="StartRotation"/>
+				<Action type="SetProperty" frame="$this/IconBackgroundImage" alpha="255"/>
+			</State>
+			<!-- Lvl 20 talents are considered normal talents, not heroics
+				=> copy of above heroic settings unless specific changes occur -->
+			<State name="TypeTalent_Unavailable">
+				<When type="AnimationState" frame="$this" TalentTypeState="TypeUltimate"/>
+				<When type="AnimationState" frame="$this" TalentTierState="TierNotAvailable"/>
+				<Action type="SetProperty" frame="$this/IconBorderImage" alpha="#ultimatelockedTalentBorderAlpha"/>
+				<Action type="SetProperty" frame="$this/IconBorderImage" desaturated="true"/>
+				<Action type="SendEvent" frame="$this/IconBorderImage" event="StopRotation"/>
+				<Action type="SetProperty" frame="$this/IconBorderImage" rotation="45"/>
+				<Action type="SetProperty" frame="$this/IconBackgroundImage" alpha="100"/>
+			</State>
+			<State name="TypeTalent_Available">
+				<When type="AnimationState" frame="$this" TalentTypeState="TypeUltimate"/>
+				<When type="AnimationState" frame="$this" TalentTierState="TierAvailable"/>
+				<Action type="SetProperty" frame="$this/IconImage" visible="true"/>
+				<Action type="SetProperty" frame="$this/IconBorderImage" alpha="255"/>
+				<Action type="SetProperty" frame="$this/IconBorderImage" desaturated="false"/>
+				<Action type="SendEvent" frame="$this/IconBorderImage" event="StartRotation"/>
+				<Action type="SetProperty" frame="$this/IconBackgroundImage" alpha="255"/>
+			</State>
+			<!-- Overridden to fix the Rotation animation not starting in lvl 20 talent -->
+			<State name="TierSelected">
+                <When type="AnimationState" frame="$this" TalentTierState="TierSelected"/>
+                <!-- IconImage Texture taken care of by code -->
+                <Action type="SetProperty" frame="$this/IconImage" visible="true"/>
+				<Action type="SendEvent" frame="$this/IconBorderImage" event="StartRotation"/>
+			</State>
+		</StateGroup>
+		
 		<Frame type="Image" name="UnfilledProgressImage">
 			<Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
 			<Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
@@ -731,6 +862,7 @@
 			
 			<Frame type="Frame" name="FillImageContainer">
 				<Frame type="Image" name="FillImage">
+					<Anchor relative="$parent"/>
 					<Unclipped val="true"/>
 					<TextureType val="Circular"/>
 					<RenderPriority val="536"/>
@@ -749,10 +881,16 @@
 			<RenderPriority val="537"/>
 			<Texture val="_Assets\Textures\talentQuestProgressBarComplete.dds"/>
 		</Frame>
-
-
+        <Frame type="Label" name="QuestProgressStackLabel">
+            <Anchor side="Bottom" relative="$parent/QuestProgressBar" pos="Max" offset="4"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="15"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+            <Style val="BottomPanel_TalentQuestStack"/>
+        </Frame>
+		
 	</Frame>
 	<Frame type="UnitStatusTalentIcon" name="TalentTreeIconHeroicTemplate_R" template="_LeaderPanelBottom/TalentTreeIconHeroicTemplate">
+		<!-- @Override -->
 		<StateGroup name="TalentTypeState">
 			<State name="TypeTalent">
 				<Action type="SetProperty" frame="$this/IconBorderImage" texture="_Assets\Textures\talentHeroicBorderRed.dds"/>
@@ -762,33 +900,33 @@
 			</State>
 		</StateGroup>
 		<!-- safely-extends GameStatsPanel/SelectedTalentTreeIconImageTemplate/TalentQuestProgress -->
-		<StateGroup name="TalentQuestProgress2">
+		<StateGroup name="TalentQuestProgress_Ahli">
 			<DefaultState val="NoQuest"/>
-			
 			<State name="HasQuest">
 				<When type="Property" frame="$this" QuestProgress="QuestInProgress"/>
 				<Action type="SetProperty" frame="IconBorderImage" visible="True"/>
 				<Action type="SetProperty" frame="IconBorderImage" texture="Assets\Textures\storm_ui_ingame_obs_talents_highlight_red.dds"/>
 				<Action type="SendEvent" frame="IconBorderImage" event="StopRotation"/>
 				<Action type="SetProperty" frame="IconBorderImage" rotation="0"/>
+				<Action type="SetProperty" frame="IconBorderImage" renderPriority="531"/>
 			</State>
-			
 			<State name="HasUntrackedQuest">
 				<When type="Property" frame="$this" QuestProgress="ProgressUntracked"/>
 				<Action type="SetProperty" frame="IconBorderImage" visible="True"/>
+				<Action type="SetProperty" frame="IconBorderImage" renderPriority="532"/>
 			</State>
-			
 			<State name="FinishedQuest">
 				<When type="Property" frame="$this" QuestProgress="FinishedQuest"/>
 				<Action type="SetProperty" frame="IconBorderImage" visible="False"/>
 			</State>
-			
 			<State name="NoQuest">
 				<Action type="SetProperty" frame="IconBorderImage" visible="True"/>
+				<Action type="SetProperty" frame="IconBorderImage" renderPriority="532"/>
 			</State>
 		</StateGroup>
 	</Frame>
 	<Frame type="UnitStatusTalentIcon" name="TalentTreeIconHeroicTemplate_L" template="_LeaderPanelBottom/TalentTreeIconHeroicTemplate">
+		<!-- @Override -->
 		<StateGroup name="TalentTypeState">
 			<State name="TypeTalent">
 				<Action type="SetProperty" frame="$this/IconBorderImage" texture="_Assets\Textures\talentHeroicBorderBlue.dds"/>
@@ -798,29 +936,28 @@
 			</State>
 		</StateGroup>
 		<!-- safely-extends GameStatsPanel/SelectedTalentTreeIconImageTemplate/TalentQuestProgress -->
-		<StateGroup name="TalentQuestProgress2">
+		<StateGroup name="TalentQuestProgress_Ahli">
 			<DefaultState val="NoQuest"/>
-			
 			<State name="HasQuest">
 				<When type="Property" frame="$this" QuestProgress="QuestInProgress"/>
 				<Action type="SetProperty" frame="IconBorderImage" visible="True"/>
 				<Action type="SetProperty" frame="IconBorderImage" texture="Assets\Textures\storm_ui_ingame_obs_talents_highlight_blue.dds"/>
 				<Action type="SendEvent" frame="IconBorderImage" event="StopRotation"/>
 				<Action type="SetProperty" frame="IconBorderImage" rotation="0"/>
+				<Action type="SetProperty" frame="IconBorderImage" renderPriority="531"/>
 			</State>
-			
 			<State name="HasUntrackedQuest">
 				<When type="Property" frame="$this" QuestProgress="ProgressUntracked"/>
 				<Action type="SetProperty" frame="IconBorderImage" visible="True"/>
+				<Action type="SetProperty" frame="IconBorderImage" renderPriority="532"/>
 			</State>
-			
 			<State name="FinishedQuest">
 				<When type="Property" frame="$this" QuestProgress="FinishedQuest"/>
 				<Action type="SetProperty" frame="IconBorderImage" visible="False"/>
 			</State>
-			
 			<State name="NoQuest">
 				<Action type="SetProperty" frame="IconBorderImage" visible="True"/>
+				<Action type="SetProperty" frame="IconBorderImage" renderPriority="532"/>
 			</State>
 		</StateGroup>
 	</Frame>
@@ -829,17 +966,9 @@
 	<Frame type="HeroLeaderPanelPlayerFrame" name="HeroLeaderPanelPlayerFrameTemplate_Base">
 		<Frame type="Image" name="Background">
 			<Visible val="false"/>
-			<Anchor side="Top" relative="$parent" pos="Min" offset="9999"/>
-			<Anchor side="Left" relative="$parent" pos="Min" offset="9999"/>
-			<Anchor side="Bottom" relative="$parent" pos="Min" offset="9999"/>
-			<Anchor side="Right" relative="$parent" pos="Min" offset="9999"/>
 		</Frame>
-		<Frame type="Image" name="SelfBackground">
+		<Frame type="Image" name="BottomBorderHighlight">
 			<Visible val="false"/>
-			<Anchor side="Top" relative="$parent" pos="Min" offset="9999"/>
-			<Anchor side="Left" relative="$parent" pos="Min" offset="9999"/>
-			<Anchor side="Bottom" relative="$parent" pos="Min" offset="9999"/>
-			<Anchor side="Right" relative="$parent" pos="Min" offset="9999"/>
 		</Frame>
 		<Frame type="BattleUserContextMenu" name="PlayerContextMenu">
 			<Visible val="false"/>
@@ -856,10 +985,16 @@
 				<Frame type="ScoreValueLabelFrame" name="ScoreValueFrame0">
 					<Visible val="false"/>
 				</Frame>
+				<Frame type="ScoreValueLabelFrame" name="ScoreValueFrame1">
+					<Visible val="false"/>
+				</Frame>
 			</Frame>
 			<Frame type="PlayerScoreValueFrame" name="AssistsScoreValueFrame">
 				<Visible val="false"/>
 				<Frame type="ScoreValueLabelFrame" name="ScoreValueFrame0">
+					<Visible val="false"/>
+				</Frame>
+				<Frame type="ScoreValueLabelFrame" name="ScoreValueFrame1">
 					<Visible val="false"/>
 				</Frame>
 			</Frame>
@@ -874,10 +1009,16 @@
 				<Frame type="ScoreValueLabelFrame" name="ScoreValueFrame0">
 					<Visible val="false"/>
 				</Frame>
+				<Frame type="ScoreValueLabelFrame" name="ScoreValueFrame1">
+					<Visible val="false"/>
+				</Frame>
 			</Frame>
 			<Frame type="PlayerScoreValueFrame" name="HeroDamageScoreValueFrame">
 				<Visible val="false"/>
 				<Frame type="ScoreValueLabelFrame" name="ScoreValueFrame0">
+					<Visible val="false"/>
+				</Frame>
+				<Frame type="ScoreValueLabelFrame" name="ScoreValueFrame1">
 					<Visible val="false"/>
 				</Frame>
 			</Frame>
@@ -886,7 +1027,10 @@
 				<Frame type="ScoreValueLabelFrame" name="ScoreValueFrame0">
 					<Visible val="false"/>
 				</Frame>
-				<Frame type="ScoreValueImageFrame" name="ScoreValueFrame1">
+				<Frame type="ScoreValueLabelFrame" name="ScoreValueFrame1">
+					<Visible val="false"/>
+				</Frame>
+				<Frame type="ScoreValueLabelFrame" name="ScoreValueFrame2">
 					<Visible val="false"/>
 				</Frame>
 			</Frame>
@@ -895,9 +1039,82 @@
 				<Frame type="ScoreValueLabelFrame" name="ScoreValueFrame0">
 					<Visible val="false"/>
 				</Frame>
-				<Frame type="ScoreValueImageFrame" name="ScoreValueFrame1">
+				<Frame type="ScoreValueLabelFrame" name="ScoreValueFrame1">
 					<Visible val="false"/>
 				</Frame>
+			</Frame>
+			<!-- DISABLE ONFIRE ANIMS -->
+			<Frame type="Frame" name="SoloKillOnFireEffect">
+                <StateGroup name="OnFireState">
+                    <State name="OnFireOn">
+                        <When type="Property" frame="$this" visible="true"/>
+                        <When type="Property" frame="$this" visible="false"/>
+                    </State>
+                    <State name="OnFireOff">
+                        <When type="Property" frame="$this" visible="true"/>
+                        <When type="Property" frame="$this" visible="false"/>
+                    </State>
+                </StateGroup>
+			</Frame>
+			<Frame type="Frame" name="AssistsOnFireEffect">
+                <StateGroup name="OnFireState">
+                    <State name="OnFireOn">
+                        <When type="Property" frame="$this" visible="true"/>
+                        <When type="Property" frame="$this" visible="false"/>
+                    </State>
+                    <State name="OnFireOff">
+                        <When type="Property" frame="$this" visible="true"/>
+                        <When type="Property" frame="$this" visible="false"/>
+                    </State>
+                </StateGroup>
+			</Frame>
+			<Frame type="Frame" name="SiegeDamageOnFireEffect">
+                <StateGroup name="OnFireState">
+                    <State name="OnFireOn">
+                        <When type="Property" frame="$this" visible="true"/>
+                        <When type="Property" frame="$this" visible="false"/>
+                    </State>
+                    <State name="OnFireOff">
+                        <When type="Property" frame="$this" visible="true"/>
+                        <When type="Property" frame="$this" visible="false"/>
+                    </State>
+                </StateGroup>
+			</Frame>
+			<Frame type="Frame" name="HeroDamageOnFireEffect">
+                <StateGroup name="OnFireState">
+                    <State name="OnFireOn">
+                        <When type="Property" frame="$this" visible="true"/>
+                        <When type="Property" frame="$this" visible="false"/>
+                    </State>
+                    <State name="OnFireOff">
+                        <When type="Property" frame="$this" visible="true"/>
+                        <When type="Property" frame="$this" visible="false"/>
+                    </State>
+                </StateGroup>
+			</Frame>
+			<Frame type="Frame" name="HealingOnFireEffect">
+                <StateGroup name="OnFireState">
+                    <State name="OnFireOn">
+                        <When type="Property" frame="$this" visible="true"/>
+                        <When type="Property" frame="$this" visible="false"/>
+                    </State>
+                    <State name="OnFireOff">
+                        <When type="Property" frame="$this" visible="true"/>
+                        <When type="Property" frame="$this" visible="false"/>
+                    </State>
+                </StateGroup>
+			</Frame>
+			<Frame type="Frame" name="ExperienceOnFireEffect">
+                <StateGroup name="OnFireState">
+                    <State name="OnFireOn">
+                        <When type="Property" frame="$this" visible="true"/>
+                        <When type="Property" frame="$this" visible="false"/>
+                    </State>
+                    <State name="OnFireOff">
+                        <When type="Property" frame="$this" visible="true"/>
+                        <When type="Property" frame="$this" visible="false"/>
+                    </State>
+                </StateGroup>
 			</Frame>
 		</Frame>
 		<!-- added duplicate because I cannot undo the death's animation transparency anymore -->
@@ -935,6 +1152,10 @@
 				<ImageMaskTexture val="_Assets\Textures\storm_ui_leader_portrait_fademask.dds"/>
 				<IgnoreParentColor val="true"/>
 			</Frame>
+		</Frame>
+		<Frame type="Image" name="SelfBackground">
+			<Visible val="false"/>
+			<Alpha val="0"/>
 		</Frame>
 		<Frame type="PlayerDeathIndicatorFrame" name="PlayerDeathIndicatorFrame">
 			<Visible val="false"/>
@@ -1021,7 +1242,7 @@
 			</Frame>
 		</Frame>
 	</Frame>
-	
+	<!-- Progress bar settings -->
 	<Frame type="PlayerHeroSelectedTalentTreeFrame" name="ChromieTalents">
 		<Frame type="PlayerScoreValueFrame" name="PlayerScoreValueProgressBar0">
 			<Frame type="ScoreValueProgressBarFrame" name="ScoreValueFrame0">
@@ -1153,16 +1374,6 @@
 							<Anchor side="Left" relative="$parent" pos="Min" offset="#talent_Bottom_LeftOffset"/>
 							<Anchor side="Right" relative="$this" pos="Min" offset="0"/>
 							<Anchor side="Bottom" relative="$this" pos="Min" offset="0"/>
-							
-							<Animation name="Visibility">
-								<Event event="OnShown" action="DirectionForward,Play"/>
-								<Event event="OnHidden" action="DirectionReverse,Play"/>
-								
-								<Controller type="Visibility" end="Pause" frame="$parent/CustomBorder1NoColor">
-									<Key type="Bool" time="0.0" value="true"/>
-									<Key type="Bool" time="0.0" value="false"/>
-								</Controller>
-							</Animation>
 						</Frame>
 						
 						<Frame type="UnitStatusTalentIcon" name="TalentTreeIcon2" template="_LeaderPanelBottom/TalentTreeIconTemplate_L">
@@ -1170,16 +1381,6 @@
 							<Anchor side="Left" relative="$parent\TalentTreeIcon1" pos="Max" offset="#talent_Bottom_HorizontalGap"/>
 							<Anchor side="Right" relative="$this" pos="Min" offset="0"/>
 							<Anchor side="Bottom" relative="$this" pos="Min" offset="0"/>
-							
-							<Animation name="Visibility">
-								<Event event="OnShown" action="DirectionForward,Play"/>
-								<Event event="OnHidden" action="DirectionReverse,Play"/>
-								
-								<Controller type="Visibility" end="Pause" frame="$parent/CustomBorder2NoColor">
-									<Key type="Bool" time="0.0" value="true"/>
-									<Key type="Bool" time="0.0" value="false"/>
-								</Controller>
-							</Animation>
 						</Frame>
 						
 						<Frame type="UnitStatusTalentIcon" name="TalentTreeIcon3" template="_LeaderPanelBottom/TalentTreeIconTemplate_L">
@@ -1187,16 +1388,6 @@
 							<Anchor side="Left" relative="$parent\TalentTreeIcon2" pos="Max" offset="#talent_Bottom_HorizontalGap"/>
 							<Anchor side="Right" relative="$this" pos="Min" offset="0"/>
 							<Anchor side="Bottom" relative="$this" pos="Min" offset="0"/>
-							
-							<Animation name="Visibility">
-								<Event event="OnShown" action="DirectionForward,Play"/>
-								<Event event="OnHidden" action="DirectionReverse,Play"/>
-								
-								<Controller type="Visibility" end="Pause" frame="$parent/CustomBorder3NoColor">
-									<Key type="Bool" time="0.0" value="true"/>
-									<Key type="Bool" time="0.0" value="false"/>
-								</Controller>
-							</Animation>
 						</Frame>
 						
 						<Frame type="UnitStatusTalentIcon" name="TalentTreeIcon4" template="_LeaderPanelBottom/TalentTreeIconHeroicTemplate_L">
@@ -1204,16 +1395,6 @@
 							<Anchor side="Left" relative="$parent\TalentTreeIcon3" pos="Max" offset="#talent_Bottom_HorizontalGap"/>
 							<Anchor side="Right" relative="$this" pos="Min" offset="0"/>
 							<Anchor side="Bottom" relative="$this" pos="Min" offset="0"/>
-							
-							<Animation name="Visibility">
-								<Event event="OnShown" action="DirectionForward,Play"/>
-								<Event event="OnHidden" action="DirectionReverse,Play"/>
-								
-								<Controller type="Visibility" end="Pause" frame="$parent/CustomBorder4NoColor">
-									<Key type="Bool" time="0.0" value="true"/>
-									<Key type="Bool" time="0.0" value="false"/>
-								</Controller>
-							</Animation>
 						</Frame>
 						
 						<Frame type="UnitStatusTalentIcon" name="TalentTreeIcon5" template="_LeaderPanelBottom/TalentTreeIconTemplate_L">
@@ -1221,16 +1402,6 @@
 							<Anchor side="Left" relative="$parent\TalentTreeIcon4" pos="Max" offset="#talent_Bottom_HorizontalGap"/>
 							<Anchor side="Right" relative="$this" pos="Min" offset="0"/>
 							<Anchor side="Bottom" relative="$this" pos="Min" offset="0"/>
-							
-							<Animation name="Visibility">
-								<Event event="OnShown" action="DirectionForward,Play"/>
-								<Event event="OnHidden" action="DirectionReverse,Play"/>
-								
-								<Controller type="Visibility" end="Pause" frame="$parent/CustomBorder5NoColor">
-									<Key type="Bool" time="0.0" value="true"/>
-									<Key type="Bool" time="0.0" value="false"/>
-								</Controller>
-							</Animation>
 						</Frame>
 						
 						<Frame type="UnitStatusTalentIcon" name="TalentTreeIcon6" template="_LeaderPanelBottom/TalentTreeIconTemplate_L">
@@ -1238,16 +1409,6 @@
 							<Anchor side="Left" relative="$parent\TalentTreeIcon5" pos="Max" offset="#talent_Bottom_HorizontalGap"/>
 							<Anchor side="Right" relative="$this" pos="Min" offset="0"/>
 							<Anchor side="Bottom" relative="$this" pos="Min" offset="0"/>
-							
-							<Animation name="Visibility">
-								<Event event="OnShown" action="DirectionForward,Play"/>
-								<Event event="OnHidden" action="DirectionReverse,Play"/>
-								
-								<Controller type="Visibility" end="Pause" frame="$parent/CustomBorder6NoColor">
-									<Key type="Bool" time="0.0" value="true"/>
-									<Key type="Bool" time="0.0" value="false"/>
-								</Controller>
-							</Animation>
 						</Frame>
 						
 						<Frame type="UnitStatusTalentIcon" name="TalentTreeIcon7" template="_LeaderPanelBottom/TalentTreeIconHeroicTemplate_L">
@@ -1255,77 +1416,6 @@
 							<Anchor side="Left" relative="$parent\TalentTreeIcon6" pos="Max" offset="#talent_Bottom_HorizontalGap"/>
 							<Anchor side="Right" relative="$this" pos="Min" offset="0"/>
 							<Anchor side="Bottom" relative="$this" pos="Min" offset="0"/>
-							<ImageMaskTexture val="_Assets\Textures\heroicTalentAlphaMask.dds"/>
-							<Unclipped val="true"/>
-							
-							<Animation name="Visibility">
-								<Event event="OnShown" action="DirectionForward,Play"/>
-								<Event event="OnHidden" action="DirectionReverse,Play"/>
-								
-								<Controller type="Visibility" end="Pause" frame="$parent/CustomBorder7NoColor">
-									<Key type="Bool" time="0.0" value="true"/>
-									<Key type="Bool" time="0.0" value="false"/>
-								</Controller>
-							</Animation>
-						</Frame>
-						
-						<Frame type="Image" name="CustomBorder1NoColor">
-							<Anchor relative="$parent/TalentTreeIcon1/IconBorderImage"/>
-							<Texture val="Assets\Textures\storm_ui_ingame_obs_talents_highlight_red.dds"/>
-							<IgnoreParentColor val="true"/>
-							<Unclipped val="true"/>
-							<Alpha val="#lockedTalentBorderAlpha"/>
-							<Desaturated val="true"/>
-						</Frame>
-						<Frame type="Image" name="CustomBorder2NoColor">
-							<Anchor relative="$parent/TalentTreeIcon2/IconBorderImage"/>
-							<Texture val="Assets\Textures\storm_ui_ingame_obs_talents_highlight_red.dds"/>
-							<IgnoreParentColor val="true"/>
-							<Unclipped val="true"/>
-							<Alpha val="#lockedTalentBorderAlpha"/>
-							<Desaturated val="true"/>
-						</Frame>
-						<Frame type="Image" name="CustomBorder3NoColor">
-							<Anchor relative="$parent/TalentTreeIcon3/IconBorderImage"/>
-							<Texture val="Assets\Textures\storm_ui_ingame_obs_talents_highlight_red.dds"/>
-							<IgnoreParentColor val="true"/>
-							<Unclipped val="true"/>
-							<Alpha val="#lockedTalentBorderAlpha"/>
-							<Desaturated val="true"/>
-						</Frame>
-						<Frame type="Image" name="CustomBorder4NoColor">
-							<Anchor relative="$parent/TalentTreeIcon4/IconBorderImage"/>
-							<Texture val="_Assets\Textures\talentHeroicBorderBlue.dds"/>
-							<IgnoreParentColor val="true"/>
-							<Unclipped val="true"/>
-							<Alpha val="#ultimatelockedTalentBorderAlpha"/>
-							<Desaturated val="true"/>
-							<Rotation val="45"/>
-						</Frame>
-						<Frame type="Image" name="CustomBorder5NoColor">
-							<Anchor relative="$parent/TalentTreeIcon5/IconBorderImage"/>
-							<Texture val="Assets\Textures\storm_ui_ingame_obs_talents_highlight_red.dds"/>
-							<IgnoreParentColor val="true"/>
-							<Unclipped val="true"/>
-							<Alpha val="#lockedTalentBorderAlpha"/>
-							<Desaturated val="true"/>
-						</Frame>
-						<Frame type="Image" name="CustomBorder6NoColor">
-							<Anchor relative="$parent/TalentTreeIcon6/IconBorderImage"/>
-							<Texture val="Assets\Textures\storm_ui_ingame_obs_talents_highlight_red.dds"/>
-							<IgnoreParentColor val="true"/>
-							<Unclipped val="true"/>
-							<Alpha val="#lockedTalentBorderAlpha"/>
-							<Desaturated val="true"/>
-						</Frame>
-						<Frame type="Image" name="CustomBorder7NoColor">
-							<Anchor relative="$parent/TalentTreeIcon7/IconBorderImage"/>
-							<Texture val="_Assets\Textures\talentHeroicBorderBlue.dds"/>
-							<IgnoreParentColor val="true"/>
-							<Unclipped val="true"/>
-							<Alpha val="#ultimatelockedTalentBorderAlpha"/>
-							<Desaturated val="true"/>
-							<Rotation val="45"/>
 						</Frame>
 						
 						<Frame type="PlayerScoreValueFrame" name="PlayerScoreValueProgressBar0" template="_LeaderPanelBottom/TalentTreeProgressBarTemplate_L">
@@ -1359,7 +1449,7 @@
 								<!-- Condition to override with correct path: -->
 								<!--<When type="Property" frame="$GameUI/UIContainer/FullscreenUpperContainer/ObserverHeroOverviewPanel/Team1HeroOverview/HeroOverview1/HeroStatus/ChromieDetector/State" visible="true"/>
 								-->
-						<!-- this won't be overwritten for some reason... -> moved entire stategroup into instances...
+						<!-- BUG: this won't be overwritten for some reason... -> moved entire stategroup into instances...
 						<StateGroup name="HeroSpecificChanges">
 							<DefaultState val="Default"/>
 							<State name="Chromie">
@@ -1378,6 +1468,19 @@
 						<Anchor side="Right" relative="$parent" pos="Max" offset="9999"/>
 						<Anchor side="Bottom" relative="$parent" pos="Max" offset="9999"/>
 						<Visible val="false"/>
+						
+						<!-- Override stategroup -->
+						<StateGroup name="ShowCooldownFrame">
+							<State name="OnCooldown">
+								<When type="Property" frame="$this" Visible="true"/>
+								<When type="Property" frame="$this" Visible="false"/>
+							</State>
+							<State name="OnAvailable">
+								<When type="Property" frame="$this" Visible="true"/>
+								<When type="Property" frame="$this" Visible="false"/>
+							</State>
+						</StateGroup>
+						
 					</Frame>
 					
 				</Frame>
@@ -1388,7 +1491,6 @@
 		<!-- edit hero icon for right side -->
 		<Frame type="PlayerHeroIconFrame" name="PlayerHeroIconFrame2" template="_LeaderPanelBottom/PlayerHeroIconFrameTemplate_R">
 		</Frame>
-		
 		
 		<Frame type="Frame" name="TalentsContainerFrame">
 			
@@ -1792,7 +1894,7 @@
 						<Anchor side="Left" relative="$parent" pos="Min" offset="10"/>
 					</Frame>
 				</Frame>
-				<Frame type="ScoreValueImageFrame" name="ScoreValueFrame1">
+				<Frame type="ScoreValueLabelFrame" name="ScoreValueFrame2">
 					<Anchor side="Left" relative="$parent/ScoreValueFrame0/Label" pos="Min" offset="-10"/>
 					<Visible val="true"/>
 				</Frame>
@@ -1884,7 +1986,7 @@
 			<Anchor side="Bottom" relative="$parent" pos="16.6667%" offset="0"/>
 			<Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
 			<Width val="200"/>
-			<Text val="{$NormalModeContainer/Team1XPInfoFrame/PropertyBindLabels/HeroAmountLabel/@Text}"/>
+			<Text val="{$TopBarPanelTemplate/Team1XPInfoFrame/PropertyBindLabels/HeroAmountLabel/@Text}"/>
 			<Style val="BottomPanel_ValueNormalBottom_L"/>
 		</Frame>
 		<Frame type="Label" name="MercenaryContributionAmount">
@@ -1896,7 +1998,7 @@
 			<Anchor side="Bottom" relative="$parent/MinionContributionAmount" pos="Min" offset="0"/>
 			<Anchor side="Right" relative="$parent/HeroContributionAmount" pos="Max" offset="0"/>
 			<Width val="200"/>
-			<Text val="{$NormalModeContainer/Team1XPInfoFrame/PropertyBindLabels/MercenaryAmountLabel/@Text}"/>
+			<Text val="{$TopBarPanelTemplate/Team1XPInfoFrame/PropertyBindLabels/MercenaryAmountLabel/@Text}"/>
 			<Style val="BottomPanel_ValueNormalBottom_L"/>
 		</Frame>
 		<Frame type="Label" name="MinionContributionAmount">
@@ -1904,7 +2006,7 @@
 			<Anchor side="Bottom" relative="$parent" pos="50%" offset="0"/>
 			<Anchor side="Right" relative="$parent/HeroContributionAmount" pos="Max" offset="0"/>
 			<Width val="200"/>
-			<Text val="{$NormalModeContainer/Team1XPInfoFrame/PropertyBindLabels/MinionAmountLabel/@Text}"/>
+			<Text val="{$TopBarPanelTemplate/Team1XPInfoFrame/PropertyBindLabels/MinionAmountLabel/@Text}"/>
 			<Style val="BottomPanel_ValueNormalBottom_L"/>
 		</Frame>
 		<Frame type="Label" name="PassiveContributionAmount">
@@ -1912,7 +2014,7 @@
 			<Anchor side="Bottom" relative="$parent" pos="66.6667%" offset="0"/>
 			<Anchor side="Right" relative="$parent/HeroContributionAmount" pos="Max" offset="0"/>
 			<Width val="200"/>
-			<Text val="{$NormalModeContainer/Team1XPInfoFrame/PropertyBindLabels/PassiveAmountLabel/@Text}"/>
+			<Text val="{$TopBarPanelTemplate/Team1XPInfoFrame/PropertyBindLabels/PassiveAmountLabel/@Text}"/>
 			<Style val="BottomPanel_ValueNormalBottom_L"/>
 		</Frame>
 		<Frame type="Label" name="StructureContributionAmount">
@@ -1923,7 +2025,7 @@
 			<Anchor side="Bottom" relative="$parent/TotalContributionAmount" pos="Min" offset="0"/>
 			<Anchor side="Right" relative="$parent/HeroContributionAmount" pos="Max" offset="0"/>
 			<Width val="200"/>
-			<Text val="{$NormalModeContainer/Team1XPInfoFrame/PropertyBindLabels/StructureAmountLabel/@Text}"/>
+			<Text val="{$TopBarPanelTemplate/Team1XPInfoFrame/PropertyBindLabels/StructureAmountLabel/@Text}"/>
 			<Style val="BottomPanel_ValueNormalBottom_L"/>
 		</Frame>
 		<Frame type="Label" name="TotalContributionAmount">
@@ -1931,7 +2033,7 @@
 			<Anchor side="Bottom" relative="$parent" pos="100%" offset="0"/>
 			<Anchor side="Right" relative="$parent/HeroContributionAmount" pos="Max" offset="0"/>
 			<Width val="200"/>
-			<Text val="{$NormalModeContainer/Team1XPInfoFrame/PropertyBindLabels/TotalAmountLabel/@Text}"/>
+			<Text val="{$TopBarPanelTemplate/Team1XPInfoFrame/PropertyBindLabels/TotalAmountLabel/@Text}"/>
 			<Style val="BottomPanel_ValueNormalBottom_L"/>
 		</Frame>
 		
@@ -1951,37 +2053,37 @@
 		<Frame type="Label" name="HeroContributionAmount">
 			<Anchor side="Right" relative="$this" pos="Max" offset="0"/>
 			<Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
-			<Text val="{$NormalModeContainer/Team2XPInfoFrame/PropertyBindLabels/HeroAmountLabel/@Text}"/>
+			<Text val="{$TopBarPanelTemplate/Team2XPInfoFrame/PropertyBindLabels/HeroAmountLabel/@Text}"/>
 			<Style val="BottomPanel_ValueNormalBottom_R"/>
 		</Frame>
 		<Frame type="Label" name="MercenaryContributionAmount">
 			<Anchor side="Right" relative="$this" pos="Max" offset="0"/>
 			<Anchor side="Left" relative="$parent/HeroContributionAmount" pos="Min" offset="0"/>
-			<Text val="{$NormalModeContainer/Team2XPInfoFrame/PropertyBindLabels/MercenaryAmountLabel/@Text}"/>
+			<Text val="{$TopBarPanelTemplate/Team2XPInfoFrame/PropertyBindLabels/MercenaryAmountLabel/@Text}"/>
 			<Style val="BottomPanel_ValueNormalBottom_R"/>
 		</Frame>
 		<Frame type="Label" name="MinionContributionAmount">
 			<Anchor side="Right" relative="$this" pos="Max" offset="0"/>
 			<Anchor side="Left" relative="$parent/HeroContributionAmount" pos="Min" offset="0"/>
-			<Text val="{$NormalModeContainer/Team2XPInfoFrame/PropertyBindLabels/MinionAmountLabel/@Text}"/>
+			<Text val="{$TopBarPanelTemplate/Team2XPInfoFrame/PropertyBindLabels/MinionAmountLabel/@Text}"/>
 			<Style val="BottomPanel_ValueNormalBottom_R"/>
 		</Frame>
 		<Frame type="Label" name="PassiveContributionAmount">
 			<Anchor side="Right" relative="$this" pos="Max" offset="0"/>
 			<Anchor side="Left" relative="$parent/HeroContributionAmount" pos="Min" offset="0"/>
-			<Text val="{$NormalModeContainer/Team2XPInfoFrame/PropertyBindLabels/PassiveAmountLabel/@Text}"/>
+			<Text val="{$TopBarPanelTemplate/Team2XPInfoFrame/PropertyBindLabels/PassiveAmountLabel/@Text}"/>
 			<Style val="BottomPanel_ValueNormalBottom_R"/>
 		</Frame>
 		<Frame type="Label" name="StructureContributionAmount">
 			<Anchor side="Right" relative="$this" pos="Max" offset="0"/>
 			<Anchor side="Left" relative="$parent/HeroContributionAmount" pos="Min" offset="0"/>
-			<Text val="{$NormalModeContainer/Team2XPInfoFrame/PropertyBindLabels/StructureAmountLabel/@Text}"/>
+			<Text val="{$TopBarPanelTemplate/Team2XPInfoFrame/PropertyBindLabels/StructureAmountLabel/@Text}"/>
 			<Style val="BottomPanel_ValueNormalBottom_R"/>
 		</Frame>
 		<Frame type="Label" name="TotalContributionAmount">
 			<Anchor side="Right" relative="$this" pos="Max" offset="0"/>
 			<Anchor side="Left" relative="$parent/HeroContributionAmount" pos="Min" offset="0"/>
-			<Text val="{$NormalModeContainer/Team2XPInfoFrame/PropertyBindLabels/TotalAmountLabel/@Text}"/>
+			<Text val="{$TopBarPanelTemplate/Team2XPInfoFrame/PropertyBindLabels/TotalAmountLabel/@Text}"/>
 			<Style val="BottomPanel_ValueNormalBottom_R"/>
 		</Frame>
 		
@@ -2338,6 +2440,9 @@
 					<MaxValue val="{$TalentTreeIcon1_L0/QuestProgressBar/@MaxValue}"/>
 					<Value val="{$TalentTreeIcon1_L0/QuestProgressBar/@Value}"/>
 				</Frame>
+				<Frame type="Label" name="QuestProgressStackLabel">
+					<Text val="{$TalentTreeIcon1_L0/QuestProgressBar/@Value}"/>
+				</Frame>
 			</Frame>
 			<Frame type="TalentTooltip" name="HeroTalentTooltip_L0_T2" template="_LeaderPanelBottom/HeroTalentTooltip_L0_Base">
 				<Frame type="Image" name="IconImage">
@@ -2357,6 +2462,9 @@
 				<Frame type="ProgressBar" name="QuestProgressBar">
 					<Value val="{$TalentTreeIcon2_L0/QuestProgressBar/@Value}"/>
 					<MaxValue val="{$TalentTreeIcon2_L0/QuestProgressBar/@MaxValue}"/>
+				</Frame>
+				<Frame type="Label" name="QuestProgressStackLabel">
+					<Text val="{$TalentTreeIcon2_L0/QuestProgressBar/@Value}"/>
 				</Frame>
 			</Frame>
 			<Frame type="TalentTooltip" name="HeroTalentTooltip_L0_T3" template="_LeaderPanelBottom/HeroTalentTooltip_L0_Base">
@@ -2378,6 +2486,9 @@
 					<Value val="{$TalentTreeIcon3_L0/QuestProgressBar/@Value}"/>
 					<MaxValue val="{$TalentTreeIcon3_L0/QuestProgressBar/@MaxValue}"/>
 				</Frame>
+				<Frame type="Label" name="QuestProgressStackLabel">
+					<Text val="{$TalentTreeIcon3_L0/QuestProgressBar/@Value}"/>
+				</Frame>
 			</Frame>
 			<Frame type="TalentTooltip" name="HeroTalentTooltip_L0_T4" template="_LeaderPanelBottom/HeroTalentTooltip_L0_Base">
 				<Frame type="Image" name="IconImage">
@@ -2397,6 +2508,9 @@
 				<Frame type="ProgressBar" name="QuestProgressBar">
 					<Value val="{$TalentTreeIcon4_L0/QuestProgressBar/@Value}"/>
 					<MaxValue val="{$TalentTreeIcon4_L0/QuestProgressBar/@MaxValue}"/>
+				</Frame>
+				<Frame type="Label" name="QuestProgressStackLabel">
+					<Text val="{$TalentTreeIcon4_L0/QuestProgressBar/@Value}"/>
 				</Frame>
 			</Frame>
 			<Frame type="TalentTooltip" name="HeroTalentTooltip_L0_T5" template="_LeaderPanelBottom/HeroTalentTooltip_L0_Base">
@@ -2418,6 +2532,9 @@
 					<Value val="{$TalentTreeIcon5_L0/QuestProgressBar/@Value}"/>
 					<MaxValue val="{$TalentTreeIcon5_L0/QuestProgressBar/@MaxValue}"/>
 				</Frame>
+				<Frame type="Label" name="QuestProgressStackLabel">
+					<Text val="{$TalentTreeIcon5_L0/QuestProgressBar/@Value}"/>
+				</Frame>
 			</Frame>
 			<Frame type="TalentTooltip" name="HeroTalentTooltip_L0_T6" template="_LeaderPanelBottom/HeroTalentTooltip_L0_Base">
 				<Frame type="Image" name="IconImage">
@@ -2437,6 +2554,9 @@
 				<Frame type="ProgressBar" name="QuestProgressBar">
 					<Value val="{$TalentTreeIcon6_L0/QuestProgressBar/@Value}"/>
 					<MaxValue val="{$TalentTreeIcon6_L0/QuestProgressBar/@MaxValue}"/>
+				</Frame>
+				<Frame type="Label" name="QuestProgressStackLabel">
+					<Text val="{$TalentTreeIcon6_L0/QuestProgressBar/@Value}"/>
 				</Frame>
 			</Frame>
 			<Frame type="TalentTooltip" name="HeroTalentTooltip_L0_T7" template="_LeaderPanelBottom/HeroTalentTooltip_L0_Base">
@@ -2458,6 +2578,9 @@
 					<Value val="{$TalentTreeIcon7_L0/QuestProgressBar/@Value}"/>
 					<MaxValue val="{$TalentTreeIcon7_L0/QuestProgressBar/@MaxValue}"/>
 				</Frame>
+				<Frame type="Label" name="QuestProgressStackLabel">
+					<Text val="{$TalentTreeIcon7_L0/QuestProgressBar/@Value}"/>
+				</Frame>
 			</Frame>
 			<Frame type="TalentTooltip" name="HeroTalentTooltip_L1_T1" template="_LeaderPanelBottom/HeroTalentTooltip_L1_Base">
 				<Frame type="Image" name="IconImage">
@@ -2477,6 +2600,9 @@
 				<Frame type="ProgressBar" name="QuestProgressBar">
 					<Value val="{$TalentTreeIcon1_L1/QuestProgressBar/@Value}"/>
 					<MaxValue val="{$TalentTreeIcon1_L1/QuestProgressBar/@MaxValue}"/>
+				</Frame>
+				<Frame type="Label" name="QuestProgressStackLabel">
+					<Text val="{$TalentTreeIcon1_L1/QuestProgressBar/@Value}"/>
 				</Frame>
 			</Frame>
 			<Frame type="TalentTooltip" name="HeroTalentTooltip_L1_T2" template="_LeaderPanelBottom/HeroTalentTooltip_L1_Base">
@@ -2498,6 +2624,9 @@
 					<Value val="{$TalentTreeIcon2_L1/QuestProgressBar/@Value}"/>
 					<MaxValue val="{$TalentTreeIcon2_L1/QuestProgressBar/@MaxValue}"/>
 				</Frame>
+				<Frame type="Label" name="QuestProgressStackLabel">
+					<Text val="{$TalentTreeIcon2_L1/QuestProgressBar/@Value}"/>
+				</Frame>
 			</Frame>
 			<Frame type="TalentTooltip" name="HeroTalentTooltip_L1_T3" template="_LeaderPanelBottom/HeroTalentTooltip_L1_Base">
 				<Frame type="Image" name="IconImage">
@@ -2517,6 +2646,9 @@
 				<Frame type="ProgressBar" name="QuestProgressBar">
 					<Value val="{$TalentTreeIcon3_L1/QuestProgressBar/@Value}"/>
 					<MaxValue val="{$TalentTreeIcon3_L1/QuestProgressBar/@MaxValue}"/>
+				</Frame>
+				<Frame type="Label" name="QuestProgressStackLabel">
+					<Text val="{$TalentTreeIcon3_L1/QuestProgressBar/@Value}"/>
 				</Frame>
 			</Frame>
 			<Frame type="TalentTooltip" name="HeroTalentTooltip_L1_T4" template="_LeaderPanelBottom/HeroTalentTooltip_L1_Base">
@@ -2538,6 +2670,9 @@
 					<Value val="{$TalentTreeIcon4_L1/QuestProgressBar/@Value}"/>
 					<MaxValue val="{$TalentTreeIcon4_L1/QuestProgressBar/@MaxValue}"/>
 				</Frame>
+				<Frame type="Label" name="QuestProgressStackLabel">
+					<Text val="{$TalentTreeIcon4_L1/QuestProgressBar/@Value}"/>
+				</Frame>
 			</Frame>
 			<Frame type="TalentTooltip" name="HeroTalentTooltip_L1_T5" template="_LeaderPanelBottom/HeroTalentTooltip_L1_Base">
 				<Frame type="Image" name="IconImage">
@@ -2557,6 +2692,9 @@
 				<Frame type="ProgressBar" name="QuestProgressBar">
 					<Value val="{$TalentTreeIcon5_L1/QuestProgressBar/@Value}"/>
 					<MaxValue val="{$TalentTreeIcon5_L1/QuestProgressBar/@MaxValue}"/>
+				</Frame>
+				<Frame type="Label" name="QuestProgressStackLabel">
+					<Text val="{$TalentTreeIcon5_L1/QuestProgressBar/@Value}"/>
 				</Frame>
 			</Frame>
 			<Frame type="TalentTooltip" name="HeroTalentTooltip_L1_T6" template="_LeaderPanelBottom/HeroTalentTooltip_L1_Base">
@@ -2578,6 +2716,9 @@
 					<Value val="{$TalentTreeIcon6_L1/QuestProgressBar/@Value}"/>
 					<MaxValue val="{$TalentTreeIcon6_L1/QuestProgressBar/@MaxValue}"/>
 				</Frame>
+				<Frame type="Label" name="QuestProgressStackLabel">
+					<Text val="{$TalentTreeIcon6_L1/QuestProgressBar/@Value}"/>
+				</Frame>
 			</Frame>
 			<Frame type="TalentTooltip" name="HeroTalentTooltip_L1_T7" template="_LeaderPanelBottom/HeroTalentTooltip_L1_Base">
 				<Frame type="Image" name="IconImage">
@@ -2597,6 +2738,9 @@
 				<Frame type="ProgressBar" name="QuestProgressBar">
 					<Value val="{$TalentTreeIcon7_L1/QuestProgressBar/@Value}"/>
 					<MaxValue val="{$TalentTreeIcon7_L1/QuestProgressBar/@MaxValue}"/>
+				</Frame>
+				<Frame type="Label" name="QuestProgressStackLabel">
+					<Text val="{$TalentTreeIcon7_L1/QuestProgressBar/@Value}"/>
 				</Frame>
 			</Frame>
 			<Frame type="TalentTooltip" name="HeroTalentTooltip_L2_T1" template="_LeaderPanelBottom/HeroTalentTooltip_L2_Base">
@@ -2618,6 +2762,9 @@
 					<Value val="{$TalentTreeIcon1_L2/QuestProgressBar/@Value}"/>
 					<MaxValue val="{$TalentTreeIcon1_L2/QuestProgressBar/@MaxValue}"/>
 				</Frame>
+				<Frame type="Label" name="QuestProgressStackLabel">
+					<Text val="{$TalentTreeIcon1_L2/QuestProgressBar/@Value}"/>
+				</Frame>
 			</Frame>
 			<Frame type="TalentTooltip" name="HeroTalentTooltip_L2_T2" template="_LeaderPanelBottom/HeroTalentTooltip_L2_Base">
 				<Frame type="Image" name="IconImage">
@@ -2637,6 +2784,9 @@
 				<Frame type="ProgressBar" name="QuestProgressBar">
 					<Value val="{$TalentTreeIcon2_L2/QuestProgressBar/@Value}"/>
 					<MaxValue val="{$TalentTreeIcon2_L2/QuestProgressBar/@MaxValue}"/>
+				</Frame>
+				<Frame type="Label" name="QuestProgressStackLabel">
+					<Text val="{$TalentTreeIcon2_L2/QuestProgressBar/@Value}"/>
 				</Frame>
 			</Frame>
 			<Frame type="TalentTooltip" name="HeroTalentTooltip_L2_T3" template="_LeaderPanelBottom/HeroTalentTooltip_L2_Base">
@@ -2658,6 +2808,9 @@
 					<Value val="{$TalentTreeIcon3_L2/QuestProgressBar/@Value}"/>
 					<MaxValue val="{$TalentTreeIcon3_L2/QuestProgressBar/@MaxValue}"/>
 				</Frame>
+				<Frame type="Label" name="QuestProgressStackLabel">
+					<Text val="{$TalentTreeIcon3_L2/QuestProgressBar/@Value}"/>
+				</Frame>
 			</Frame>
 			<Frame type="TalentTooltip" name="HeroTalentTooltip_L2_T4" template="_LeaderPanelBottom/HeroTalentTooltip_L2_Base">
 				<Frame type="Image" name="IconImage">
@@ -2677,6 +2830,9 @@
 				<Frame type="ProgressBar" name="QuestProgressBar">
 					<Value val="{$TalentTreeIcon4_L2/QuestProgressBar/@Value}"/>
 					<MaxValue val="{$TalentTreeIcon4_L2/QuestProgressBar/@MaxValue}"/>
+				</Frame>
+				<Frame type="Label" name="QuestProgressStackLabel">
+					<Text val="{$TalentTreeIcon4_L2/QuestProgressBar/@Value}"/>
 				</Frame>
 			</Frame>
 			<Frame type="TalentTooltip" name="HeroTalentTooltip_L2_T5" template="_LeaderPanelBottom/HeroTalentTooltip_L2_Base">
@@ -2698,6 +2854,9 @@
 					<Value val="{$TalentTreeIcon5_L2/QuestProgressBar/@Value}"/>
 					<MaxValue val="{$TalentTreeIcon5_L2/QuestProgressBar/@MaxValue}"/>
 				</Frame>
+				<Frame type="Label" name="QuestProgressStackLabel">
+					<Text val="{$TalentTreeIcon5_L2/QuestProgressBar/@Value}"/>
+				</Frame>
 			</Frame>
 			<Frame type="TalentTooltip" name="HeroTalentTooltip_L2_T6" template="_LeaderPanelBottom/HeroTalentTooltip_L2_Base">
 				<Frame type="Image" name="IconImage">
@@ -2717,6 +2876,9 @@
 				<Frame type="ProgressBar" name="QuestProgressBar">
 					<Value val="{$TalentTreeIcon6_L2/QuestProgressBar/@Value}"/>
 					<MaxValue val="{$TalentTreeIcon6_L2/QuestProgressBar/@MaxValue}"/>
+				</Frame>
+				<Frame type="Label" name="QuestProgressStackLabel">
+					<Text val="{$TalentTreeIcon6_L2/QuestProgressBar/@Value}"/>
 				</Frame>
 			</Frame>
 			<Frame type="TalentTooltip" name="HeroTalentTooltip_L2_T7" template="_LeaderPanelBottom/HeroTalentTooltip_L2_Base">
@@ -2738,6 +2900,9 @@
 					<Value val="{$TalentTreeIcon7_L2/QuestProgressBar/@Value}"/>
 					<MaxValue val="{$TalentTreeIcon7_L2/QuestProgressBar/@MaxValue}"/>
 				</Frame>
+				<Frame type="Label" name="QuestProgressStackLabel">
+					<Text val="{$TalentTreeIcon7_L2/QuestProgressBar/@Value}"/>
+				</Frame>
 			</Frame>
 			<Frame type="TalentTooltip" name="HeroTalentTooltip_L3_T1" template="_LeaderPanelBottom/HeroTalentTooltip_L3_Base">
 				<Frame type="Image" name="IconImage">
@@ -2757,6 +2922,9 @@
 				<Frame type="ProgressBar" name="QuestProgressBar">
 					<Value val="{$TalentTreeIcon1_L3/QuestProgressBar/@Value}"/>
 					<MaxValue val="{$TalentTreeIcon1_L3/QuestProgressBar/@MaxValue}"/>
+				</Frame>
+				<Frame type="Label" name="QuestProgressStackLabel">
+					<Text val="{$TalentTreeIcon1_L3/QuestProgressBar/@Value}"/>
 				</Frame>
 			</Frame>
 			<Frame type="TalentTooltip" name="HeroTalentTooltip_L3_T2" template="_LeaderPanelBottom/HeroTalentTooltip_L3_Base">
@@ -2778,6 +2946,9 @@
 					<Value val="{$TalentTreeIcon2_L3/QuestProgressBar/@Value}"/>
 					<MaxValue val="{$TalentTreeIcon2_L3/QuestProgressBar/@MaxValue}"/>
 				</Frame>
+				<Frame type="Label" name="QuestProgressStackLabel">
+					<Text val="{$TalentTreeIcon2_L3/QuestProgressBar/@Value}"/>
+				</Frame>
 			</Frame>
 			<Frame type="TalentTooltip" name="HeroTalentTooltip_L3_T3" template="_LeaderPanelBottom/HeroTalentTooltip_L3_Base">
 				<Frame type="Image" name="IconImage">
@@ -2797,6 +2968,9 @@
 				<Frame type="ProgressBar" name="QuestProgressBar">
 					<Value val="{$TalentTreeIcon3_L3/QuestProgressBar/@Value}"/>
 					<MaxValue val="{$TalentTreeIcon3_L3/QuestProgressBar/@MaxValue}"/>
+				</Frame>
+				<Frame type="Label" name="QuestProgressStackLabel">
+					<Text val="{$TalentTreeIcon3_L3/QuestProgressBar/@Value}"/>
 				</Frame>
 			</Frame>
 			<Frame type="TalentTooltip" name="HeroTalentTooltip_L3_T4" template="_LeaderPanelBottom/HeroTalentTooltip_L3_Base">
@@ -2818,6 +2992,9 @@
 					<Value val="{$TalentTreeIcon4_L3/QuestProgressBar/@Value}"/>
 					<MaxValue val="{$TalentTreeIcon4_L3/QuestProgressBar/@MaxValue}"/>
 				</Frame>
+				<Frame type="Label" name="QuestProgressStackLabel">
+					<Text val="{$TalentTreeIcon4_L3/QuestProgressBar/@Value}"/>
+				</Frame>
 			</Frame>
 			<Frame type="TalentTooltip" name="HeroTalentTooltip_L3_T5" template="_LeaderPanelBottom/HeroTalentTooltip_L3_Base">
 				<Frame type="Image" name="IconImage">
@@ -2837,6 +3014,9 @@
 				<Frame type="ProgressBar" name="QuestProgressBar">
 					<Value val="{$TalentTreeIcon5_L3/QuestProgressBar/@Value}"/>
 					<MaxValue val="{$TalentTreeIcon5_L3/QuestProgressBar/@MaxValue}"/>
+				</Frame>
+				<Frame type="Label" name="QuestProgressStackLabel">
+					<Text val="{$TalentTreeIcon5_L3/QuestProgressBar/@Value}"/>
 				</Frame>
 			</Frame>
 			<Frame type="TalentTooltip" name="HeroTalentTooltip_L3_T6" template="_LeaderPanelBottom/HeroTalentTooltip_L3_Base">
@@ -2858,6 +3038,9 @@
 					<Value val="{$TalentTreeIcon6_L3/QuestProgressBar/@Value}"/>
 					<MaxValue val="{$TalentTreeIcon6_L3/QuestProgressBar/@MaxValue}"/>
 				</Frame>
+				<Frame type="Label" name="QuestProgressStackLabel">
+					<Text val="{$TalentTreeIcon6_L3/QuestProgressBar/@Value}"/>
+				</Frame>
 			</Frame>
 			<Frame type="TalentTooltip" name="HeroTalentTooltip_L3_T7" template="_LeaderPanelBottom/HeroTalentTooltip_L3_Base">
 				<Frame type="Image" name="IconImage">
@@ -2877,6 +3060,9 @@
 				<Frame type="ProgressBar" name="QuestProgressBar">
 					<Value val="{$TalentTreeIcon7_L3/QuestProgressBar/@Value}"/>
 					<MaxValue val="{$TalentTreeIcon7_L3/QuestProgressBar/@MaxValue}"/>
+				</Frame>
+				<Frame type="Label" name="QuestProgressStackLabel">
+					<Text val="{$TalentTreeIcon7_L3/QuestProgressBar/@Value}"/>
 				</Frame>
 			</Frame>
 			<Frame type="TalentTooltip" name="HeroTalentTooltip_L4_T1" template="_LeaderPanelBottom/HeroTalentTooltip_L4_Base">
@@ -2898,6 +3084,9 @@
 					<Value val="{$TalentTreeIcon1_L4/QuestProgressBar/@Value}"/>
 					<MaxValue val="{$TalentTreeIcon1_L4/QuestProgressBar/@MaxValue}"/>
 				</Frame>
+				<Frame type="Label" name="QuestProgressStackLabel">
+					<Text val="{$TalentTreeIcon1_L4/QuestProgressBar/@Value}"/>
+				</Frame>
 			</Frame>
 			<Frame type="TalentTooltip" name="HeroTalentTooltip_L4_T2" template="_LeaderPanelBottom/HeroTalentTooltip_L4_Base">
 				<Frame type="Image" name="IconImage">
@@ -2917,6 +3106,9 @@
 				<Frame type="ProgressBar" name="QuestProgressBar">
 					<Value val="{$TalentTreeIcon2_L4/QuestProgressBar/@Value}"/>
 					<MaxValue val="{$TalentTreeIcon2_L4/QuestProgressBar/@MaxValue}"/>
+				</Frame>
+				<Frame type="Label" name="QuestProgressStackLabel">
+					<Text val="{$TalentTreeIcon2_L4/QuestProgressBar/@Value}"/>
 				</Frame>
 			</Frame>
 			<Frame type="TalentTooltip" name="HeroTalentTooltip_L4_T3" template="_LeaderPanelBottom/HeroTalentTooltip_L4_Base">
@@ -2938,6 +3130,9 @@
 					<Value val="{$TalentTreeIcon3_L4/QuestProgressBar/@Value}"/>
 					<MaxValue val="{$TalentTreeIcon3_L4/QuestProgressBar/@MaxValue}"/>
 				</Frame>
+				<Frame type="Label" name="QuestProgressStackLabel">
+					<Text val="{$TalentTreeIcon3_L4/QuestProgressBar/@Value}"/>
+				</Frame>
 			</Frame>
 			<Frame type="TalentTooltip" name="HeroTalentTooltip_L4_T4" template="_LeaderPanelBottom/HeroTalentTooltip_L4_Base">
 				<Frame type="Image" name="IconImage">
@@ -2957,6 +3152,9 @@
 				<Frame type="ProgressBar" name="QuestProgressBar">
 					<Value val="{$TalentTreeIcon4_L4/QuestProgressBar/@Value}"/>
 					<MaxValue val="{$TalentTreeIcon4_L4/QuestProgressBar/@MaxValue}"/>
+				</Frame>
+				<Frame type="Label" name="QuestProgressStackLabel">
+					<Text val="{$TalentTreeIcon4_L4/QuestProgressBar/@Value}"/>
 				</Frame>
 			</Frame>
 			<Frame type="TalentTooltip" name="HeroTalentTooltip_L4_T5" template="_LeaderPanelBottom/HeroTalentTooltip_L4_Base">
@@ -2978,6 +3176,9 @@
 					<Value val="{$TalentTreeIcon5_L4/QuestProgressBar/@Value}"/>
 					<MaxValue val="{$TalentTreeIcon5_L4/QuestProgressBar/@MaxValue}"/>
 				</Frame>
+				<Frame type="Label" name="QuestProgressStackLabel">
+					<Text val="{$TalentTreeIcon5_L4/QuestProgressBar/@Value}"/>
+				</Frame>
 			</Frame>
 			<Frame type="TalentTooltip" name="HeroTalentTooltip_L4_T6" template="_LeaderPanelBottom/HeroTalentTooltip_L4_Base">
 				<Frame type="Image" name="IconImage">
@@ -2997,6 +3198,9 @@
 				<Frame type="ProgressBar" name="QuestProgressBar">
 					<Value val="{$TalentTreeIcon6_L4/QuestProgressBar/@Value}"/>
 					<MaxValue val="{$TalentTreeIcon6_L4/QuestProgressBar/@MaxValue}"/>
+				</Frame>
+				<Frame type="Label" name="QuestProgressStackLabel">
+					<Text val="{$TalentTreeIcon6_L4/QuestProgressBar/@Value}"/>
 				</Frame>
 			</Frame>
 			<Frame type="TalentTooltip" name="HeroTalentTooltip_L4_T7" template="_LeaderPanelBottom/HeroTalentTooltip_L4_Base">
@@ -3018,6 +3222,9 @@
 					<Value val="{$TalentTreeIcon7_L4/QuestProgressBar/@Value}"/>
 					<MaxValue val="{$TalentTreeIcon7_L4/QuestProgressBar/@MaxValue}"/>
 				</Frame>
+				<Frame type="Label" name="QuestProgressStackLabel">
+					<Text val="{$TalentTreeIcon7_L4/QuestProgressBar/@Value}"/>
+				</Frame>
 			</Frame>
 			<Frame type="TalentTooltip" name="HeroTalentTooltip_R0_T1" template="_LeaderPanelBottom/HeroTalentTooltip_R0_Base">
 				<Frame type="Image" name="IconImage">
@@ -3037,6 +3244,9 @@
 				<Frame type="ProgressBar" name="QuestProgressBar">
 					<Value val="{$TalentTreeIcon1_R0/QuestProgressBar/@Value}"/>
 					<MaxValue val="{$TalentTreeIcon1_R0/QuestProgressBar/@MaxValue}"/>
+				</Frame>
+				<Frame type="Label" name="QuestProgressStackLabel">
+					<Text val="{$TalentTreeIcon1_R0/QuestProgressBar/@Value}"/>
 				</Frame>
 			</Frame>
 			<Frame type="TalentTooltip" name="HeroTalentTooltip_R0_T2" template="_LeaderPanelBottom/HeroTalentTooltip_R0_Base">
@@ -3058,6 +3268,9 @@
 					<Value val="{$TalentTreeIcon2_R0/QuestProgressBar/@Value}"/>
 					<MaxValue val="{$TalentTreeIcon2_R0/QuestProgressBar/@MaxValue}"/>
 				</Frame>
+				<Frame type="Label" name="QuestProgressStackLabel">
+					<Text val="{$TalentTreeIcon2_R0/QuestProgressBar/@Value}"/>
+				</Frame>
 			</Frame>
 			<Frame type="TalentTooltip" name="HeroTalentTooltip_R0_T3" template="_LeaderPanelBottom/HeroTalentTooltip_R0_Base">
 				<Frame type="Image" name="IconImage">
@@ -3077,6 +3290,9 @@
 				<Frame type="ProgressBar" name="QuestProgressBar">
 					<Value val="{$TalentTreeIcon3_R0/QuestProgressBar/@Value}"/>
 					<MaxValue val="{$TalentTreeIcon3_R0/QuestProgressBar/@MaxValue}"/>
+				</Frame>
+				<Frame type="Label" name="QuestProgressStackLabel">
+					<Text val="{$TalentTreeIcon3_R0/QuestProgressBar/@Value}"/>
 				</Frame>
 			</Frame>
 			<Frame type="TalentTooltip" name="HeroTalentTooltip_R0_T4" template="_LeaderPanelBottom/HeroTalentTooltip_R0_Base">
@@ -3098,6 +3314,9 @@
 					<Value val="{$TalentTreeIcon4_R0/QuestProgressBar/@Value}"/>
 					<MaxValue val="{$TalentTreeIcon4_R0/QuestProgressBar/@MaxValue}"/>
 				</Frame>
+				<Frame type="Label" name="QuestProgressStackLabel">
+					<Text val="{$TalentTreeIcon4_R0/QuestProgressBar/@Value}"/>
+				</Frame>
 			</Frame>
 			<Frame type="TalentTooltip" name="HeroTalentTooltip_R0_T5" template="_LeaderPanelBottom/HeroTalentTooltip_R0_Base">
 				<Frame type="Image" name="IconImage">
@@ -3117,6 +3336,9 @@
 				<Frame type="ProgressBar" name="QuestProgressBar">
 					<Value val="{$TalentTreeIcon5_R0/QuestProgressBar/@Value}"/>
 					<MaxValue val="{$TalentTreeIcon5_R0/QuestProgressBar/@MaxValue}"/>
+				</Frame>
+				<Frame type="Label" name="QuestProgressStackLabel">
+					<Text val="{$TalentTreeIcon5_R0/QuestProgressBar/@Value}"/>
 				</Frame>
 			</Frame>
 			<Frame type="TalentTooltip" name="HeroTalentTooltip_R0_T6" template="_LeaderPanelBottom/HeroTalentTooltip_R0_Base">
@@ -3138,6 +3360,9 @@
 					<Value val="{$TalentTreeIcon6_R0/QuestProgressBar/@Value}"/>
 					<MaxValue val="{$TalentTreeIcon6_R0/QuestProgressBar/@MaxValue}"/>
 				</Frame>
+				<Frame type="Label" name="QuestProgressStackLabel">
+					<Text val="{$TalentTreeIcon6_R0/QuestProgressBar/@Value}"/>
+				</Frame>
 			</Frame>
 			<Frame type="TalentTooltip" name="HeroTalentTooltip_R0_T7" template="_LeaderPanelBottom/HeroTalentTooltip_R0_Base">
 				<Frame type="Image" name="IconImage">
@@ -3157,6 +3382,9 @@
 				<Frame type="ProgressBar" name="QuestProgressBar">
 					<Value val="{$TalentTreeIcon7_R0/QuestProgressBar/@Value}"/>
 					<MaxValue val="{$TalentTreeIcon7_R0/QuestProgressBar/@MaxValue}"/>
+				</Frame>
+				<Frame type="Label" name="QuestProgressStackLabel">
+					<Text val="{$TalentTreeIcon7_R0/QuestProgressBar/@Value}"/>
 				</Frame>
 			</Frame>
 			<Frame type="TalentTooltip" name="HeroTalentTooltip_R1_T1" template="_LeaderPanelBottom/HeroTalentTooltip_R1_Base">
@@ -3178,6 +3406,9 @@
 					<Value val="{$TalentTreeIcon1_R1/QuestProgressBar/@Value}"/>
 					<MaxValue val="{$TalentTreeIcon1_R1/QuestProgressBar/@MaxValue}"/>
 				</Frame>
+				<Frame type="Label" name="QuestProgressStackLabel">
+					<Text val="{$TalentTreeIcon1_R1/QuestProgressBar/@Value}"/>
+				</Frame>
 			</Frame>
 			<Frame type="TalentTooltip" name="HeroTalentTooltip_R1_T2" template="_LeaderPanelBottom/HeroTalentTooltip_R1_Base">
 				<Frame type="Image" name="IconImage">
@@ -3197,6 +3428,9 @@
 				<Frame type="ProgressBar" name="QuestProgressBar">
 					<Value val="{$TalentTreeIcon2_R1/QuestProgressBar/@Value}"/>
 					<MaxValue val="{$TalentTreeIcon2_R1/QuestProgressBar/@MaxValue}"/>
+				</Frame>
+				<Frame type="Label" name="QuestProgressStackLabel">
+					<Text val="{$TalentTreeIcon2_R1/QuestProgressBar/@Value}"/>
 				</Frame>
 			</Frame>
 			<Frame type="TalentTooltip" name="HeroTalentTooltip_R1_T3" template="_LeaderPanelBottom/HeroTalentTooltip_R1_Base">
@@ -3218,6 +3452,9 @@
 					<Value val="{$TalentTreeIcon3_R1/QuestProgressBar/@Value}"/>
 					<MaxValue val="{$TalentTreeIcon3_R1/QuestProgressBar/@MaxValue}"/>
 				</Frame>
+				<Frame type="Label" name="QuestProgressStackLabel">
+					<Text val="{$TalentTreeIcon3_R1/QuestProgressBar/@Value}"/>
+				</Frame>
 			</Frame>
 			<Frame type="TalentTooltip" name="HeroTalentTooltip_R1_T4" template="_LeaderPanelBottom/HeroTalentTooltip_R1_Base">
 				<Frame type="Image" name="IconImage">
@@ -3237,6 +3474,9 @@
 				<Frame type="ProgressBar" name="QuestProgressBar">
 					<Value val="{$TalentTreeIcon4_R1/QuestProgressBar/@Value}"/>
 					<MaxValue val="{$TalentTreeIcon4_R1/QuestProgressBar/@MaxValue}"/>
+				</Frame>
+				<Frame type="Label" name="QuestProgressStackLabel">
+					<Text val="{$TalentTreeIcon4_R1/QuestProgressBar/@Value}"/>
 				</Frame>
 			</Frame>
 			<Frame type="TalentTooltip" name="HeroTalentTooltip_R1_T5" template="_LeaderPanelBottom/HeroTalentTooltip_R1_Base">
@@ -3258,6 +3498,9 @@
 					<Value val="{$TalentTreeIcon5_R1/QuestProgressBar/@Value}"/>
 					<MaxValue val="{$TalentTreeIcon5_R1/QuestProgressBar/@MaxValue}"/>
 				</Frame>
+				<Frame type="Label" name="QuestProgressStackLabel">
+					<Text val="{$TalentTreeIcon5_R1/QuestProgressBar/@Value}"/>
+				</Frame>
 			</Frame>
 			<Frame type="TalentTooltip" name="HeroTalentTooltip_R1_T6" template="_LeaderPanelBottom/HeroTalentTooltip_R1_Base">
 				<Frame type="Image" name="IconImage">
@@ -3277,6 +3520,9 @@
 				<Frame type="ProgressBar" name="QuestProgressBar">
 					<Value val="{$TalentTreeIcon6_R1/QuestProgressBar/@Value}"/>
 					<MaxValue val="{$TalentTreeIcon6_R1/QuestProgressBar/@MaxValue}"/>
+				</Frame>
+				<Frame type="Label" name="QuestProgressStackLabel">
+					<Text val="{$TalentTreeIcon6_R1/QuestProgressBar/@Value}"/>
 				</Frame>
 			</Frame>
 			<Frame type="TalentTooltip" name="HeroTalentTooltip_R1_T7" template="_LeaderPanelBottom/HeroTalentTooltip_R1_Base">
@@ -3298,6 +3544,9 @@
 					<Value val="{$TalentTreeIcon7_R1/QuestProgressBar/@Value}"/>
 					<MaxValue val="{$TalentTreeIcon7_R1/QuestProgressBar/@MaxValue}"/>
 				</Frame>
+				<Frame type="Label" name="QuestProgressStackLabel">
+					<Text val="{$TalentTreeIcon7_R1/QuestProgressBar/@Value}"/>
+				</Frame>
 			</Frame>
 			<Frame type="TalentTooltip" name="HeroTalentTooltip_R2_T1" template="_LeaderPanelBottom/HeroTalentTooltip_R2_Base">
 				<Frame type="Image" name="IconImage">
@@ -3317,6 +3566,9 @@
 				<Frame type="ProgressBar" name="QuestProgressBar">
 					<Value val="{$TalentTreeIcon1_R2/QuestProgressBar/@Value}"/>
 					<MaxValue val="{$TalentTreeIcon1_R2/QuestProgressBar/@MaxValue}"/>
+				</Frame>
+				<Frame type="Label" name="QuestProgressStackLabel">
+					<Text val="{$TalentTreeIcon1_R2/QuestProgressBar/@Value}"/>
 				</Frame>
 			</Frame>
 			<Frame type="TalentTooltip" name="HeroTalentTooltip_R2_T2" template="_LeaderPanelBottom/HeroTalentTooltip_R2_Base">
@@ -3338,6 +3590,9 @@
 					<Value val="{$TalentTreeIcon2_R2/QuestProgressBar/@Value}"/>
 					<MaxValue val="{$TalentTreeIcon2_R2/QuestProgressBar/@MaxValue}"/>
 				</Frame>
+				<Frame type="Label" name="QuestProgressStackLabel">
+					<Text val="{$TalentTreeIcon2_R2/QuestProgressBar/@Value}"/>
+				</Frame>
 			</Frame>
 			<Frame type="TalentTooltip" name="HeroTalentTooltip_R2_T3" template="_LeaderPanelBottom/HeroTalentTooltip_R2_Base">
 				<Frame type="Image" name="IconImage">
@@ -3357,6 +3612,9 @@
 				<Frame type="ProgressBar" name="QuestProgressBar">
 					<Value val="{$TalentTreeIcon3_R2/QuestProgressBar/@Value}"/>
 					<MaxValue val="{$TalentTreeIcon3_R2/QuestProgressBar/@MaxValue}"/>
+				</Frame>
+				<Frame type="Label" name="QuestProgressStackLabel">
+					<Text val="{$TalentTreeIcon3_R2/QuestProgressBar/@Value}"/>
 				</Frame>
 			</Frame>
 			<Frame type="TalentTooltip" name="HeroTalentTooltip_R2_T4" template="_LeaderPanelBottom/HeroTalentTooltip_R2_Base">
@@ -3378,6 +3636,9 @@
 					<Value val="{$TalentTreeIcon4_R2/QuestProgressBar/@Value}"/>
 					<MaxValue val="{$TalentTreeIcon4_R2/QuestProgressBar/@MaxValue}"/>
 				</Frame>
+				<Frame type="Label" name="QuestProgressStackLabel">
+					<Text val="{$TalentTreeIcon4_R2/QuestProgressBar/@Value}"/>
+				</Frame>
 			</Frame>
 			<Frame type="TalentTooltip" name="HeroTalentTooltip_R2_T5" template="_LeaderPanelBottom/HeroTalentTooltip_R2_Base">
 				<Frame type="Image" name="IconImage">
@@ -3397,6 +3658,9 @@
 				<Frame type="ProgressBar" name="QuestProgressBar">
 					<Value val="{$TalentTreeIcon5_R2/QuestProgressBar/@Value}"/>
 					<MaxValue val="{$TalentTreeIcon5_R2/QuestProgressBar/@MaxValue}"/>
+				</Frame>
+				<Frame type="Label" name="QuestProgressStackLabel">
+					<Text val="{$TalentTreeIcon5_R2/QuestProgressBar/@Value}"/>
 				</Frame>
 			</Frame>
 			<Frame type="TalentTooltip" name="HeroTalentTooltip_R2_T6" template="_LeaderPanelBottom/HeroTalentTooltip_R2_Base">
@@ -3418,6 +3682,9 @@
 					<Value val="{$TalentTreeIcon6_R2/QuestProgressBar/@Value}"/>
 					<MaxValue val="{$TalentTreeIcon6_R2/QuestProgressBar/@MaxValue}"/>
 				</Frame>
+				<Frame type="Label" name="QuestProgressStackLabel">
+					<Text val="{$TalentTreeIcon6_R2/QuestProgressBar/@Value}"/>
+				</Frame>
 			</Frame>
 			<Frame type="TalentTooltip" name="HeroTalentTooltip_R2_T7" template="_LeaderPanelBottom/HeroTalentTooltip_R2_Base">
 				<Frame type="Image" name="IconImage">
@@ -3437,6 +3704,9 @@
 				<Frame type="ProgressBar" name="QuestProgressBar">
 					<Value val="{$TalentTreeIcon7_R2/QuestProgressBar/@Value}"/>
 					<MaxValue val="{$TalentTreeIcon7_R2/QuestProgressBar/@MaxValue}"/>
+				</Frame>
+				<Frame type="Label" name="QuestProgressStackLabel">
+					<Text val="{$TalentTreeIcon7_R2/QuestProgressBar/@Value}"/>
 				</Frame>
 			</Frame>
 			<Frame type="TalentTooltip" name="HeroTalentTooltip_R3_T1" template="_LeaderPanelBottom/HeroTalentTooltip_R3_Base">
@@ -3458,6 +3728,9 @@
 					<Value val="{$TalentTreeIcon1_R3/QuestProgressBar/@Value}"/>
 					<MaxValue val="{$TalentTreeIcon1_R3/QuestProgressBar/@MaxValue}"/>
 				</Frame>
+				<Frame type="Label" name="QuestProgressStackLabel">
+					<Text val="{$TalentTreeIcon1_R3/QuestProgressBar/@Value}"/>
+				</Frame>
 			</Frame>
 			<Frame type="TalentTooltip" name="HeroTalentTooltip_R3_T2" template="_LeaderPanelBottom/HeroTalentTooltip_R3_Base">
 				<Frame type="Image" name="IconImage">
@@ -3477,6 +3750,9 @@
 				<Frame type="ProgressBar" name="QuestProgressBar">
 					<Value val="{$TalentTreeIcon2_R3/QuestProgressBar/@Value}"/>
 					<MaxValue val="{$TalentTreeIcon2_R3/QuestProgressBar/@MaxValue}"/>
+				</Frame>
+				<Frame type="Label" name="QuestProgressStackLabel">
+					<Text val="{$TalentTreeIcon2_R3/QuestProgressBar/@Value}"/>
 				</Frame>
 			</Frame>
 			<Frame type="TalentTooltip" name="HeroTalentTooltip_R3_T3" template="_LeaderPanelBottom/HeroTalentTooltip_R3_Base">
@@ -3498,6 +3774,9 @@
 					<Value val="{$TalentTreeIcon3_R3/QuestProgressBar/@Value}"/>
 					<MaxValue val="{$TalentTreeIcon3_R3/QuestProgressBar/@MaxValue}"/>
 				</Frame>
+				<Frame type="Label" name="QuestProgressStackLabel">
+					<Text val="{$TalentTreeIcon3_R3/QuestProgressBar/@Value}"/>
+				</Frame>
 			</Frame>
 			<Frame type="TalentTooltip" name="HeroTalentTooltip_R3_T4" template="_LeaderPanelBottom/HeroTalentTooltip_R3_Base">
 				<Frame type="Image" name="IconImage">
@@ -3517,6 +3796,9 @@
 				<Frame type="ProgressBar" name="QuestProgressBar">
 					<Value val="{$TalentTreeIcon4_R3/QuestProgressBar/@Value}"/>
 					<MaxValue val="{$TalentTreeIcon4_R3/QuestProgressBar/@MaxValue}"/>
+				</Frame>
+				<Frame type="Label" name="QuestProgressStackLabel">
+					<Text val="{$TalentTreeIcon4_R3/QuestProgressBar/@Value}"/>
 				</Frame>
 			</Frame>
 			<Frame type="TalentTooltip" name="HeroTalentTooltip_R3_T5" template="_LeaderPanelBottom/HeroTalentTooltip_R3_Base">
@@ -3538,6 +3820,9 @@
 					<Value val="{$TalentTreeIcon5_R3/QuestProgressBar/@Value}"/>
 					<MaxValue val="{$TalentTreeIcon5_R3/QuestProgressBar/@MaxValue}"/>
 				</Frame>
+				<Frame type="Label" name="QuestProgressStackLabel">
+					<Text val="{$TalentTreeIcon5_R3/QuestProgressBar/@Value}"/>
+				</Frame>
 			</Frame>
 			<Frame type="TalentTooltip" name="HeroTalentTooltip_R3_T6" template="_LeaderPanelBottom/HeroTalentTooltip_R3_Base">
 				<Frame type="Image" name="IconImage">
@@ -3557,6 +3842,9 @@
 				<Frame type="ProgressBar" name="QuestProgressBar">
 					<Value val="{$TalentTreeIcon6_R3/QuestProgressBar/@Value}"/>
 					<MaxValue val="{$TalentTreeIcon6_R3/QuestProgressBar/@MaxValue}"/>
+				</Frame>
+				<Frame type="Label" name="QuestProgressStackLabel">
+					<Text val="{$TalentTreeIcon6_R3/QuestProgressBar/@Value}"/>
 				</Frame>
 			</Frame>
 			<Frame type="TalentTooltip" name="HeroTalentTooltip_R3_T7" template="_LeaderPanelBottom/HeroTalentTooltip_R3_Base">
@@ -3578,6 +3866,9 @@
 					<Value val="{$TalentTreeIcon7_R3/QuestProgressBar/@Value}"/>
 					<MaxValue val="{$TalentTreeIcon7_R3/QuestProgressBar/@MaxValue}"/>
 				</Frame>
+				<Frame type="Label" name="QuestProgressStackLabel">
+					<Text val="{$TalentTreeIcon7_R3/QuestProgressBar/@Value}"/>
+				</Frame>
 			</Frame>
 			<Frame type="TalentTooltip" name="HeroTalentTooltip_R4_T1" template="_LeaderPanelBottom/HeroTalentTooltip_R4_Base">
 				<Frame type="Image" name="IconImage">
@@ -3597,6 +3888,9 @@
 				<Frame type="ProgressBar" name="QuestProgressBar">
 					<Value val="{$TalentTreeIcon1_R4/QuestProgressBar/@Value}"/>
 					<MaxValue val="{$TalentTreeIcon1_R4/QuestProgressBar/@MaxValue}"/>
+				</Frame>
+				<Frame type="Label" name="QuestProgressStackLabel">
+					<Text val="{$TalentTreeIcon1_R4/QuestProgressBar/@Value}"/>
 				</Frame>
 			</Frame>
 			<Frame type="TalentTooltip" name="HeroTalentTooltip_R4_T2" template="_LeaderPanelBottom/HeroTalentTooltip_R4_Base">
@@ -3618,6 +3912,9 @@
 					<Value val="{$TalentTreeIcon2_R4/QuestProgressBar/@Value}"/>
 					<MaxValue val="{$TalentTreeIcon2_R4/QuestProgressBar/@MaxValue}"/>
 				</Frame>
+				<Frame type="Label" name="QuestProgressStackLabel">
+					<Text val="{$TalentTreeIcon2_R4/QuestProgressBar/@Value}"/>
+				</Frame>
 			</Frame>
 			<Frame type="TalentTooltip" name="HeroTalentTooltip_R4_T3" template="_LeaderPanelBottom/HeroTalentTooltip_R4_Base">
 				<Frame type="Image" name="IconImage">
@@ -3637,6 +3934,9 @@
 				<Frame type="ProgressBar" name="QuestProgressBar">
 					<Value val="{$TalentTreeIcon3_R4/QuestProgressBar/@Value}"/>
 					<MaxValue val="{$TalentTreeIcon3_R4/QuestProgressBar/@MaxValue}"/>
+				</Frame>
+				<Frame type="Label" name="QuestProgressStackLabel">
+					<Text val="{$TalentTreeIcon3_R4/QuestProgressBar/@Value}"/>
 				</Frame>
 			</Frame>
 			<Frame type="TalentTooltip" name="HeroTalentTooltip_R4_T4" template="_LeaderPanelBottom/HeroTalentTooltip_R4_Base">
@@ -3658,6 +3958,9 @@
 					<Value val="{$TalentTreeIcon4_R4/QuestProgressBar/@Value}"/>
 					<MaxValue val="{$TalentTreeIcon4_R4/QuestProgressBar/@MaxValue}"/>
 				</Frame>
+				<Frame type="Label" name="QuestProgressStackLabel">
+					<Text val="{$TalentTreeIcon4_R4/QuestProgressBar/@Value}"/>
+				</Frame>
 			</Frame>
 			<Frame type="TalentTooltip" name="HeroTalentTooltip_R4_T5" template="_LeaderPanelBottom/HeroTalentTooltip_R4_Base">
 				<Frame type="Image" name="IconImage">
@@ -3677,6 +3980,9 @@
 				<Frame type="ProgressBar" name="QuestProgressBar">
 					<Value val="{$TalentTreeIcon5_R4/QuestProgressBar/@Value}"/>
 					<MaxValue val="{$TalentTreeIcon5_R4/QuestProgressBar/@MaxValue}"/>
+				</Frame>
+				<Frame type="Label" name="QuestProgressStackLabel">
+					<Text val="{$TalentTreeIcon5_R4/QuestProgressBar/@Value}"/>
 				</Frame>
 			</Frame>
 			<Frame type="TalentTooltip" name="HeroTalentTooltip_R4_T6" template="_LeaderPanelBottom/HeroTalentTooltip_R4_Base">
@@ -3698,6 +4004,9 @@
 					<Value val="{$TalentTreeIcon6_R4/QuestProgressBar/@Value}"/>
 					<MaxValue val="{$TalentTreeIcon6_R4/QuestProgressBar/@MaxValue}"/>
 				</Frame>
+				<Frame type="Label" name="QuestProgressStackLabel">
+					<Text val="{$TalentTreeIcon6_R4/QuestProgressBar/@Value}"/>
+				</Frame>
 			</Frame>
 			<Frame type="TalentTooltip" name="HeroTalentTooltip_R4_T7" template="_LeaderPanelBottom/HeroTalentTooltip_R4_Base">
 				<Frame type="Image" name="IconImage">
@@ -3717,6 +4026,9 @@
 				<Frame type="ProgressBar" name="QuestProgressBar">
 					<Value val="{$TalentTreeIcon7_R4/QuestProgressBar/@Value}"/>
 					<MaxValue val="{$TalentTreeIcon7_R4/QuestProgressBar/@MaxValue}"/>
+				</Frame>
+				<Frame type="Label" name="QuestProgressStackLabel">
+					<Text val="{$TalentTreeIcon7_R4/QuestProgressBar/@Value}"/>
 				</Frame>
 			</Frame>
 			
