@@ -27,6 +27,7 @@ import javafx.stage.Stage;
 import javafx.util.Duration;
 import javafx.scene.Scene;
 import javafx.scene.control.TextArea;
+import javafx.scene.image.Image;
 import javafx.scene.layout.BorderPane;
 
 /**
@@ -98,6 +99,11 @@ public class Main extends Application {
 
 			BorderPane root = new BorderPane();
 			primaryStage.setTitle("Compiling Interfaces...");
+			System.out.println("TEST1");
+			primaryStage.getIcons().add( 
+					new Image( 
+							Main.class.getResourceAsStream( "/ahli.png" )));
+			System.out.println("TEST2");
 
 			txtArea = new TextArea();
 			txtArea.setText("Initializing App...");
@@ -630,7 +636,7 @@ public class Main extends Application {
 	 * not like nobody would need that or it is trivial to create...
 	 * 
 	 * @param aclass
-	 * @return
+	 * @return File at base path
 	 */
 	public File getJarDir(Class<Main> aclass) {
 		System.out.println("_FINDING JAR'S PATH");
@@ -671,7 +677,7 @@ public class Main extends Application {
 			// chosen
 			if (!url.toString().startsWith("rsrc:./")) {
 				// wild guess that we are in test environment
-				str += "/testEnv/baseUI/";
+				str += "/testEnv/dev/";
 				System.out.println("_Assuming Test Environment: " + str);
 				addLogMessage("_Assuming Test Environment: " + str);
 			}
