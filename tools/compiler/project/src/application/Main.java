@@ -20,6 +20,7 @@ import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.filefilter.TrueFileFilter;
 import org.xml.sax.SAXException;
 
+import application.baseUI.DefaultUICatalog;
 import application.integration.SettingsInterface;
 import javafx.animation.PauseTransition;
 import javafx.application.Application;
@@ -141,6 +142,21 @@ public class Main extends Application {
 			// init MPQ stuff
 			mpqi = new MpqInterface();
 			initMpqInterface(mpqi);
+
+			// TEST DefaultUICatalog
+			String baseUIpath = basePath.getParent() + File.separator + "baseUI";
+			System.out.println("BaseUI path: " + baseUIpath);
+			DefaultUICatalog catalogSC2 = new DefaultUICatalog();
+			try {
+				catalogSC2.processFile(new File(baseUIpath + File.separator + "sc2" + File.separator + "mods"
+						+ File.separator + "core.sc2mod" + File.separator + "base.sc2data" + File.separator + "UI"
+						+ File.separator + "Layout" + File.separator + "UI" + File.separator + "GameUI.SC2Layout"));
+			} catch (ParserConfigurationException | SAXException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			if (true)
+				return;
 
 			// WORK WORK WORK
 			if (!hasParamCompilePath) {

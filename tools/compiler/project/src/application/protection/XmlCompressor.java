@@ -75,7 +75,6 @@ public class XmlCompressor {
 				// WORKAROUND -> provide Inputstream
 				is = new FileInputStream(curFile);
 				doc = dBuilder.parse(is);
-				is.close();
 
 			} catch (SAXParseException | MalformedByteSequenceException e) {
 				// couldn't parse, most likely no XML file
@@ -83,6 +82,10 @@ public class XmlCompressor {
 					is.close();
 				}
 				continue x;
+			} finally {
+				if (is != null) {
+					is.close();
+				}
 			}
 
 			System.out.println("compression - processing file: " + curFile.getPath());
