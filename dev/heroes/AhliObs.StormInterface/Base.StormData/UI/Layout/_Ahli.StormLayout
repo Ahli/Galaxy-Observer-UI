@@ -1009,7 +1009,6 @@ UI/Storm_UI_InGame_AbilityButton_ActivateBorder_Add=Assets\Textures\storm_ui_ing
 	
 	
 	
-	
 	<!-- UI modifications -->
 	<Frame type="GameUI" name="GameUI" file="GameUI">
 		<Handle val="GameUI"/>
@@ -1130,26 +1129,25 @@ UI/Storm_UI_InGame_AbilityButton_ActivateBorder_Add=Assets\Textures\storm_ui_ing
 				<!-- BUG: shortcut is hijacked -->
 				<!-- FIX: added new HeroLeaderPanel to ConsoleUIContainer which reroutes the animation event -->
 				<!-- FIX: close button was not working, neither -->
+				<!-- TODO: remaining problem: after pressing the button, TAB still needs to be hit twice to make it re-appear -->
 				<Frame type="HeroLeaderPanel" name="HeroLeaderPanel">
 					<RenderPriority val="600"/>
+					<Handle val="HeroLeaderPanel"/>
 					
 					<Frame type="Frame" name="HeroLeaderPanelContainer">
-						
 						<Frame type="Button" name="CloseButton">
 							<Animation name="Click">
 								<Event event="OnMouseUp" action="Play"/>
 								<Controller type="Event" end="Stop" frame="$parent/$parent">
 									<Key type="Event" time="0" event="Hide"/>
 								</Controller>
-								<Controller type="Event" end="Stop" frame="$parent/$parent/$parent/$parent/ConsoleUIContainer/HeroLeaderPanelCOPY">
+								<Controller type="Visibility" end="Stop" frame="$HeroLeaderPanelHotkeyHijackFIX">
 									<Key type="Event" time="0" event="Hide"/>
 								</Controller>
 							</Animation>
 						</Frame>
-						
 					</Frame>
 				</Frame>
-				
 				
 				<!-- team map score -->
 				<Frame type="Frame" name="TeamPanel" template="_MapScore/MapScoreTemplate">
@@ -1219,6 +1217,13 @@ UI/Storm_UI_InGame_AbilityButton_ActivateBorder_Add=Assets\Textures\storm_ui_ing
 					<Anchor side="Left" relative="$parent" pos="Min" offset="85"/>
 					<Anchor side="Top" relative="$parent" pos="Min" offset="9999"/>
 					<Visible val="false"/>
+					
+					<Animation name="KeepHidden">
+						<Event event="OnShown" action="Reset,Play"/>
+						<Controller type="Visibility" end="Pause">
+							<Key type="Bool" time="0" value="false"/>
+						</Controller>
+					</Animation>
 				</Frame>
 				
 			</Frame>
@@ -1227,30 +1232,38 @@ UI/Storm_UI_InGame_AbilityButton_ActivateBorder_Add=Assets\Textures\storm_ui_ing
 				
 				<!-- BUG FIX: Second HeroLeaderPanel which will react to TAB due to Blizzard's non-static implementation -->
 				<!-- TODO: remaining bug is that you hit TAB twice after using the close button -->
-				<Frame type="HeroLeaderPanel" name="HeroLeaderPanelCOPY" template="HeroLeaderPanel/HeroLeaderPanelTemplate">
+				<Frame type="HeroLeaderPanel" name="HeroLeaderPanelHotkeyHijackFIX" template="HeroLeaderPanel/HeroLeaderPanelTemplate">
 					<Anchor relative="$parent"/>
+					<Handle val="HeroLeaderPanelHotkeyHijackFIX"/>
 					<Frame type="Frame" name="HeroLeaderPanelContainer">
 						<Anchor side="Top" relative="$parent" pos="Max" offset="9999"/>
 						<Anchor side="Left" relative="$parent" pos="Max" offset="9999"/>
 						<Anchor side="Bottom" relative="$parent" pos="Max" offset="9999"/>
 						<Anchor side="Right" relative="$parent" pos="Max" offset="9999"/>
 						<Visible val="false"/>
+						<!-- always hidden content for performance -->
+						<Animation name="KeepHidden">
+							<Event event="OnShown" action="Reset,Play"/>
+							<Controller type="Visibility" end="Pause">
+								<Key type="Bool" time="0" value="false"/>
+							</Controller>
+						</Animation>
 						
+						<!-- transfer visibility -->
 						<Animation name="BUGFIXanimationShow">
 							<Event event="Show" action="Play" frame="$parent"/>
 
-							<Controller type="Event" end="Stop" frame="$parent/$parent/$parent/FullscreenUpperContainer/HeroLeaderPanel">
+							<Controller type="Event" end="Stop" frame="$HeroLeaderPanel">
 								<Key type="Event" time="0" event="Show"/>
 							</Controller>
 						</Animation>
 						<Animation name="BUGFIXanimationHide">
 							<Event event="Hide" action="Play" frame="$parent"/>
 
-							<Controller type="Event" end="Stop" frame="$parent/$parent/$parent/FullscreenUpperContainer/HeroLeaderPanel">
+							<Controller type="Event" end="Stop" frame="$HeroLeaderPanel">
 								<Key type="Event" time="0" event="Hide"/>
 							</Controller>
 						</Animation>
-						
 					</Frame>
 				</Frame>
 
@@ -1651,6 +1664,57 @@ UI/Storm_UI_InGame_AbilityButton_ActivateBorder_Add=Assets\Textures\storm_ui_ing
 							<RenderPriority val="100"/>
 							<Unclipped val="true"/>
 						</Frame>
+						
+						<!-- PlayerHeroSelectedTalentTreeFrame not functional
+						<Frame type="PlayerHeroSelectedTalentTreeFrame" name="HeroSelectedTalentTreeFrame" template="HeroLeaderPanel/PlayerHeroSelectedTalentTreeFrameTemplate">
+							<Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+							<Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+							<Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+							<Anchor side="Bottom" relative="$this" pos="Min" offset="0"/>
+							<Height val="80"/>
+							<Frame type="UnitStatusTalentIcon" name="TalentTreeIcon1">
+								<Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+								<Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+								<Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+								<Anchor side="Right" relative="$this" pos="Min" offset="0"/>
+							</Frame>
+							<Frame type="UnitStatusTalentIcon" name="TalentTreeIcon2">
+								<Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+								<Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+								<Anchor side="Left" relative="$parent" pos="Min" offset="80"/>
+								<Anchor side="Right" relative="$this" pos="Min" offset="0"/>
+							</Frame>
+							<Frame type="UnitStatusTalentIcon" name="TalentTreeIcon3">
+								<Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+								<Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+								<Anchor side="Left" relative="$parent" pos="Min" offset="160"/>
+								<Anchor side="Right" relative="$this" pos="Min" offset="0"/>
+							</Frame>
+							<Frame type="UnitStatusTalentIcon" name="TalentTreeIcon4">
+								<Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+								<Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+								<Anchor side="Left" relative="$parent" pos="Min" offset="240"/>
+								<Anchor side="Right" relative="$this" pos="Min" offset="0"/>
+							</Frame>
+							<Frame type="UnitStatusTalentIcon" name="TalentTreeIcon5">
+								<Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+								<Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+								<Anchor side="Left" relative="$parent" pos="Min" offset="320"/>
+								<Anchor side="Right" relative="$this" pos="Min" offset="0"/>
+							</Frame>
+							<Frame type="UnitStatusTalentIcon" name="TalentTreeIcon6">
+								<Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+								<Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+								<Anchor side="Left" relative="$parent" pos="Min" offset="400"/>
+								<Anchor side="Right" relative="$this" pos="Min" offset="0"/>
+							</Frame>
+							<Frame type="UnitStatusTalentIcon" name="TalentTreeIcon7">
+								<Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+								<Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+								<Anchor side="Left" relative="$parent" pos="Min" offset="480"/>
+								<Anchor side="Right" relative="$this" pos="Min" offset="0"/>
+							</Frame>
+						</Frame> -->
 						
 						<!-- Hero-specific UI when selected -->
 						<Frame type="Frame" name="HeroSpecificPanel">
