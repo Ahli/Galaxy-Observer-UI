@@ -4,6 +4,8 @@ import java.io.File;
 import java.io.IOException;
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.xml.sax.SAXException;
 
 import application.protection.XmlCompressor;
@@ -14,6 +16,7 @@ import application.protection.XmlCompressor;
  *
  */
 public class MpqInterface {
+	static Logger LOGGER = LogManager.getLogger(MpqInterface.class);
 
 	private String MPQ_EDITOR = "plugins" + File.separator + "mpq" + File.separator + "MPQEditor.exe";
 	// private String MPQ_EDITOR_OLD = "plugins" + File.separator + "mpq" +
@@ -77,7 +80,9 @@ public class MpqInterface {
 				File fup = new File(unprotectedAbsolutePath);
 				if (fup.exists() && fup.isFile()) {
 					if (!fup.delete()) {
-						throw new IOException("ERROR: Could not delete file " + unprotectedAbsolutePath);
+						String msg = "ERROR: Could not delete file " + unprotectedAbsolutePath;
+						LOGGER.debug(msg);
+						throw new IOException(msg);
 					}
 				}
 
@@ -91,7 +96,9 @@ public class MpqInterface {
 			File f = new File(absolutePath);
 			if (f.exists() && f.isFile()) {
 				if (!f.delete()) {
-					throw new IOException("ERROR: Could not delete file " + absolutePath);
+					String msg = "ERROR: Could not delete file " + absolutePath;
+					LOGGER.debug(msg);
+					throw new IOException(msg);
 				}
 			}
 
@@ -127,7 +134,9 @@ public class MpqInterface {
 			File f = new File(absolutePath);
 			if (f.exists() && f.isFile()) {
 				if (!f.delete()) {
-					throw new IOException("ERROR: Could not delete file " + absolutePath);
+					String msg = "ERROR: Could not delete file " + absolutePath;
+					LOGGER.debug(msg);
+					throw new IOException(msg);
 				}
 			}
 
@@ -179,8 +188,8 @@ public class MpqInterface {
 	 * @throws IOException
 	 */
 	public void extractEntireMPQ(String mpqSourcePath) throws InterruptedException, IOException {
-		System.out.println(mpqCachePath);
-		System.out.println(mpqSourcePath);
+		LOGGER.trace("mpqCachePath: " + mpqCachePath);
+		LOGGER.trace("mpqCachePath: " + mpqSourcePath);
 
 		clearCacheExtractedMpq();
 
@@ -221,10 +230,10 @@ public class MpqInterface {
 		File f = new File(mpqCachePath);
 		if (f.exists()) {
 			if (deleteDir(f)) {
-				System.out.println("clearing Cache succeeded");
+				LOGGER.debug("clearing Cache succeeded");
 				return true;
 			} else {
-				System.out.println("ERROR: clearing Cache FAILED");
+				LOGGER.error("clearing Cache FAILED");
 				return false;
 			}
 		} else
@@ -249,7 +258,7 @@ public class MpqInterface {
 		}
 		boolean result = f.delete();
 		if (!result) {
-			System.out.println("ERROR: Deleting file/folder " + f.getPath() + " failed.");
+			LOGGER.error("Deleting file/folder " + f.getPath() + " failed.");
 		}
 		return result;
 	}
@@ -262,9 +271,9 @@ public class MpqInterface {
 	 * @throws IOException
 	 */
 	public void newMpq(String mpqPath, int maxFileCount) throws InterruptedException, IOException {
-		Runtime.getRuntime().exec("cmd /C " + MPQ_EDITOR + " /n " + "\"" + mpqPath + "\"" + " " + maxFileCount)
-				.waitFor();
-		System.out.println("cmd /C " + MPQ_EDITOR + " /n " + "\"" + mpqPath + "\"" + " " + maxFileCount);
+		String cmd = "cmd /C " + MPQ_EDITOR + " /n " + "\"" + mpqPath + "\"" + " " + maxFileCount;
+		LOGGER.debug("executing: " + cmd);
+		Runtime.getRuntime().exec(cmd).waitFor();
 	}
 
 	/**
@@ -277,10 +286,10 @@ public class MpqInterface {
 	 */
 	public void addToMpq(String mpqPath, String sourceFilePath, String targetName)
 			throws InterruptedException, IOException {
-		Runtime.getRuntime().exec("cmd /C " + MPQ_EDITOR + " /a " + "\"" + mpqPath + "\"" + " " + "\"" + sourceFilePath
-				+ "\"" + " " + "\"" + targetName + "\"" + " /r").waitFor();
-		System.out.println("cmd /C " + MPQ_EDITOR + " /a " + "\"" + mpqPath + "\"" + " " + "\"" + sourceFilePath + "\""
-				+ " " + "\"" + targetName + "\"" + "/auto /r");
+		String cmd = "cmd /C " + MPQ_EDITOR + " /a " + "\"" + mpqPath + "\"" + " " + "\"" + sourceFilePath + "\"" + " "
+				+ "\"" + targetName + "\"" + " /r";
+		LOGGER.debug("executing: " + cmd);
+		Runtime.getRuntime().exec(cmd).waitFor();
 	}
 
 	/**
@@ -294,8 +303,10 @@ public class MpqInterface {
 	 */
 	public void extractFromMpq(String mpqPath, String fileName, String targetPath, boolean inclSubFolders)
 			throws InterruptedException, IOException {
-		Runtime.getRuntime().exec("cmd /C " + MPQ_EDITOR + " /e " + "\"" + mpqPath + "\"" + " " + "\"" + fileName + "\""
-				+ " " + "\"" + targetPath + "\"" + " " + (inclSubFolders ? "/fp" : "")).waitFor();
+		String cmd = "cmd /C " + MPQ_EDITOR + " /e " + "\"" + mpqPath + "\"" + " " + "\"" + fileName + "\"" + " " + "\""
+				+ targetPath + "\"" + " " + (inclSubFolders ? "/fp" : "");
+		LOGGER.debug("executing: " + cmd);
+		Runtime.getRuntime().exec(cmd).waitFor();
 	}
 
 	/**
@@ -305,7 +316,10 @@ public class MpqInterface {
 	 * @throws IOException
 	 */
 	public void compactMpq(String mpqPath) throws InterruptedException, IOException {
-		Runtime.getRuntime().exec("cmd /C " + MPQ_EDITOR + " /compact " + "\"" + mpqPath + "\"").waitFor();
+		String cmd = "cmd /C " + MPQ_EDITOR + " /compact " + "\"" + mpqPath + "\"";
+		LOGGER.debug("executing: " + cmd);
+		Runtime.getRuntime().exec(cmd).waitFor();
+
 	}
 
 	/**
@@ -316,9 +330,9 @@ public class MpqInterface {
 	 * @throws IOException
 	 */
 	public void scriptMpq(String mpqPath, String scriptPath) throws InterruptedException, IOException {
-		Runtime.getRuntime()
-				.exec("cmd /C " + MPQ_EDITOR + " /s " + "\"" + mpqPath + "\"" + " " + "\"" + scriptPath + "\"")
-				.waitFor();
+		String cmd = "cmd /C " + MPQ_EDITOR + " /s " + "\"" + mpqPath + "\"" + " " + "\"" + scriptPath + "\"";
+		LOGGER.debug("executing: " + cmd);
+		Runtime.getRuntime().exec(cmd).waitFor();
 	}
 
 	/**
@@ -329,8 +343,9 @@ public class MpqInterface {
 	 * @throws IOException
 	 */
 	public void deleteFileInMpq(String mpqPath, String filePath) throws InterruptedException, IOException {
-		Runtime.getRuntime()
-				.exec("cmd /C " + MPQ_EDITOR + " /d " + "\"" + mpqPath + "\"" + " " + "\"" + filePath + "\"").waitFor();
+		String cmd = "cmd /C " + MPQ_EDITOR + " /d " + "\"" + mpqPath + "\"" + " " + "\"" + filePath + "\"";
+		LOGGER.debug("executing: " + cmd);
+		Runtime.getRuntime().exec(cmd).waitFor();
 	}
 
 	/**
@@ -343,8 +358,10 @@ public class MpqInterface {
 	 */
 	public void renameFileInMpq(String mpqPath, String oldfilePath, String newFilePath)
 			throws InterruptedException, IOException {
-		Runtime.getRuntime().exec("cmd /C " + MPQ_EDITOR + " /r " + "\"" + mpqPath + "\"" + " " + "\"" + oldfilePath
-				+ "\"" + " " + "\"" + newFilePath + "\"").waitFor();
+		String cmd = "cmd /C " + MPQ_EDITOR + " /r " + "\"" + mpqPath + "\"" + " " + "\"" + oldfilePath + "\"" + " "
+				+ "\"" + newFilePath + "\"";
+		LOGGER.debug("executing: " + cmd);
+		Runtime.getRuntime().exec(cmd).waitFor();
 	}
 
 	/**
@@ -380,7 +397,7 @@ public class MpqInterface {
 			if (!f.exists() || f.isDirectory()) {
 				return false;
 			}
-			System.out.println("failed path: " + f.getAbsolutePath());
+			LOGGER.error("Failed path: " + f.getAbsolutePath());
 			// throw new MpqException("ERROR: cannot identify if file belongs to
 			// Heroes or SC2");
 			return false;
@@ -388,90 +405,91 @@ public class MpqInterface {
 		return true;
 	}
 
-	public void deleteListFile(String absolutePath) throws InterruptedException, IOException {
-		// MPQ Editor does not allow tinkering with listfile
-
-		// Runtime.getRuntime()
-		// .exec("cmd /C " + MPQ_EDITOR_OLD + " /d " + "\"" + absolutePath +
-		// "\"" + " " + "\"" + "(listfile)" + "\"")
-		// .waitFor();
-
-		// String sourceFilePath = "plugins" + File.separator + "mpq" +
-		// File.separator + "listfile";
-		// addToMpq(MPQ_EDITOR, sourceFilePath, absolutePath);
-
-		// Runtime.getRuntime()
-		// .exec("cmd /C " + MPQ_EDITOR + " /rename " + "\"" + absolutePath +
-		// "\"" + " " + "\"" + "(listfile)" + "\"" + " " + "\"" + "(listfile2)"
-		// + "\"")
-		// .waitFor();
-
-	}
-
-//	public void writeWrongFileAmount(String readAbsolutePath, String writeAbsolutePath) {
-//		// DOES NOT WORK, GAME DOES NOT READ MPQ ANYMORE
-//		FileInputStream fis = null;
-//		OutputStream out = null;
+//	public void deleteListFile(String absolutePath) throws InterruptedException, IOException {
+//		// MPQ Editor does not allow tinkering with listfile
 //
-//		try {
-//			fis = new FileInputStream(new File(readAbsolutePath));
-//			out = new FileOutputStream(new File(writeAbsolutePath));
+//		// Runtime.getRuntime()
+//		// .exec("cmd /C " + MPQ_EDITOR_OLD + " /d " + "\"" + absolutePath +
+//		// "\"" + " " + "\"" + "(listfile)" + "\"")
+//		// .waitFor();
 //
-//			//// print hex
-//			// char[] line = new char[16];
-//			// for (int i=0; i < 16; i++) {
-//			// int readByte = fis.read();
-//			// String paddingZero = (readByte < 16) ? "0" : "";
-//			// System.out.print(paddingZero + Integer.toHexString(readByte)
-//			// + " ");
-//			// line[i] = (readByte >= 33 && readByte <= 126) ? (char)
-//			// readByte : '.';
-//			// }
-//			// System.out.println(new String(line));
+//		// String sourceFilePath = "plugins" + File.separator + "mpq" +
+//		// File.separator + "listfile";
+//		// addToMpq(MPQ_EDITOR, sourceFilePath, absolutePath);
 //
-//			// skip parts of header
-//			for (int i = 0; i < 25; i++) {
-//				int readByte = fis.read();
-//				out.write(readByte);
-//			}
-//			// read file count bytes
-//			int[] fileCountByte = new int[4];
-//			for (int i = 0; i < 4; i++) {
-//				fileCountByte[i] = fis.read();
-//			}
-//			// increment bytes
-//			for (int i = 3; i > 0; i--) {
-//				if (fileCountByte[i] == 255) {
-//					fileCountByte[i] = 0;
-//					fileCountByte[i - 1]++;
-//				} else {
-//					fileCountByte[i]++;
-//				}
-//			}
-//			// write filecount bytes
-//			for (int i = 0; i < 4; i++) {
-//				out.write(fileCountByte[i]);
-//			}
-//			// write rest of file
-//			while (fis.available() > 0) {
-//				out.write(fis.read());
-//			}
-//		} catch (Exception e1) {
-//			e1.printStackTrace();
-//		} finally {
-//			// close streams no matter what
-//			if (fis != null)
-//				try {
-//					fis.close();
-//				} catch (Exception e) {
-//				}
-//			if (out != null)
-//				try {
-//					out.close();
-//				} catch (Exception e) {
-//				}
-//		}
+//		// Runtime.getRuntime()
+//		// .exec("cmd /C " + MPQ_EDITOR + " /rename " + "\"" + absolutePath +
+//		// "\"" + " " + "\"" + "(listfile)" + "\"" + " " + "\"" + "(listfile2)"
+//		// + "\"")
+//		// .waitFor();
+//
 //	}
+
+	// public void writeWrongFileAmount(String readAbsolutePath, String
+	// writeAbsolutePath) {
+	// // DOES NOT WORK, GAME DOES NOT READ MPQ ANYMORE
+	// FileInputStream fis = null;
+	// OutputStream out = null;
+	//
+	// try {
+	// fis = new FileInputStream(new File(readAbsolutePath));
+	// out = new FileOutputStream(new File(writeAbsolutePath));
+	//
+	// //// print hex
+	// // char[] line = new char[16];
+	// // for (int i=0; i < 16; i++) {
+	// // int readByte = fis.read();
+	// // String paddingZero = (readByte < 16) ? "0" : "";
+	// // System.out.print(paddingZero + Integer.toHexString(readByte)
+	// // + " ");
+	// // line[i] = (readByte >= 33 && readByte <= 126) ? (char)
+	// // readByte : '.';
+	// // }
+	// // System.out.println(new String(line));
+	//
+	// // skip parts of header
+	// for (int i = 0; i < 25; i++) {
+	// int readByte = fis.read();
+	// out.write(readByte);
+	// }
+	// // read file count bytes
+	// int[] fileCountByte = new int[4];
+	// for (int i = 0; i < 4; i++) {
+	// fileCountByte[i] = fis.read();
+	// }
+	// // increment bytes
+	// for (int i = 3; i > 0; i--) {
+	// if (fileCountByte[i] == 255) {
+	// fileCountByte[i] = 0;
+	// fileCountByte[i - 1]++;
+	// } else {
+	// fileCountByte[i]++;
+	// }
+	// }
+	// // write filecount bytes
+	// for (int i = 0; i < 4; i++) {
+	// out.write(fileCountByte[i]);
+	// }
+	// // write rest of file
+	// while (fis.available() > 0) {
+	// out.write(fis.read());
+	// }
+	// } catch (Exception e1) {
+	// e1.printStackTrace();
+	// } finally {
+	// // close streams no matter what
+	// if (fis != null)
+	// try {
+	// fis.close();
+	// } catch (Exception e) {
+	// }
+	// if (out != null)
+	// try {
+	// out.close();
+	// } catch (Exception e) {
+	// }
+	// }
+	// }
 
 	// public void batchFileExecutionExample() throws IOException,
 	// InterruptedException{

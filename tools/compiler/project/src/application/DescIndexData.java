@@ -9,6 +9,8 @@ import java.util.Iterator;
 
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.xml.sax.SAXException;
 
 //import javafx.util.Pair;
@@ -19,6 +21,8 @@ import org.xml.sax.SAXException;
  *
  */
 public class DescIndexData {
+	static Logger LOGGER = LogManager.getLogger(DescIndexData.class);
+
 	private String descIndexIntPath = null;
 	private ArrayList<Pair<File, String>> fileIntPathList = new ArrayList<>();
 	private Main main;
@@ -53,10 +57,8 @@ public class DescIndexData {
 		}
 		Pair<File, String> p = new Pair<>(f, intPath2);
 		fileIntPathList.add(p);
-		System.out.println("added Layout path: " + intPath2);
-		// main.addLogMessage("added Layout path: " + intPath2);
-		System.out.println("added File path: " + f.getAbsolutePath());
-		// main.addLogMessage("added File path: " + f.getAbsolutePath());
+		LOGGER.debug("added Layout path: " + intPath2);
+		LOGGER.debug("added File path: " + f.getAbsolutePath());
 	}
 
 	public boolean removeLayoutIntPath(String intPath) {
@@ -123,12 +125,9 @@ public class DescIndexData {
 
 			bw.write("</Desc>\r\n");
 		} catch (IOException e) {
-			e.printStackTrace();
+			LOGGER.error("ERROR writing DescIndex to disc" + e);
 			main.reportErrorEncounter();
-			main.addLogMessage(Main.errorLine);
-			main.addLogMessage("ERROR writing DescIndex to disc:\n    " + e + "\n    " + e.getMessage() + "\n    "
-					+ e.getLocalizedMessage() + "\n    " + e.getCause());
-			main.addLogMessage(Main.errorLine);
+			e.printStackTrace();
 		} finally {
 			if (bw != null) {
 				try {
@@ -160,7 +159,7 @@ public class DescIndexData {
 
 			// add calculated list of dependencies from layout file
 			layoutDeps = LayoutReader.getDependencyLayouts(pair.getKey(), curConstants);
-			System.out.println("Dependencies found: " + layoutDeps);
+			LOGGER.debug("Dependencies found: " + layoutDeps);
 
 			ownConstants.add(curConstants);
 			dependencies.add(layoutDeps);
@@ -168,7 +167,7 @@ public class DescIndexData {
 
 		boolean insertOccurred = true;
 		for (int counter = 0; insertOccurred && counter < Math.pow(fileIntPathList.size(), 4); counter++) {
-			System.out.println(counter);
+			LOGGER.trace("counter=" + counter);
 			insertOccurred = false;
 			for (int i = 0; i < dependencies.size(); i++) {
 
@@ -180,7 +179,7 @@ public class DescIndexData {
 					String curDependencyTo = curLayoutDepList.get(j);
 
 					if (curDependencyTo.startsWith("#")) {
-						System.out.println("DEPENDENCY: " + curDependencyTo);
+						LOGGER.trace("DEPENDENCY: " + curDependencyTo);
 						while (curDependencyTo.startsWith("#")) {
 							curDependencyTo = curDependencyTo.substring(1);
 						}
@@ -209,10 +208,10 @@ public class DescIndexData {
 								fileName = fileName.substring(0, fileName.lastIndexOf('.'));
 								for (String constant : ownConstants.get(i2)) {
 									if (constant.equals(curDependencyTo)) {
-										System.out.println("Cchecked " + fileIntPathList.get(i).getKey().getName()
+										LOGGER.trace("checked " + fileIntPathList.get(i).getKey().getName()
 												+ " with dependency " + curDependencyTo + " and " + constant + " i=" + i
 												+ " j=" + j + " i2=" + i2);
-										System.out.println(fileIntPathList);
+										LOGGER.trace("fileIntPathList:" + fileIntPathList);
 										// i's needs to be inserted after i2
 										dependencies.remove(i);
 										fileIntPathList.remove(i);
@@ -220,12 +219,12 @@ public class DescIndexData {
 										dependencies.add(i, curLayoutDepList);
 										fileIntPathList.add(i, pair);
 										constantDefinedBefore = true;
-										System.out.println("Cinserted " + fileIntPathList.get(i).getKey().getName()
-												+ " after " + fileName);
-										System.out.println(fileIntPathList);
+										LOGGER.trace("inserted " + fileIntPathList.get(i).getKey().getName() + " after "
+												+ fileName);
+										LOGGER.trace("fileIntPathList: " + fileIntPathList);
 										break y;
 									} else {
-										System.out.println("Cchecked " + fileIntPathList.get(i).getKey().getName()
+										LOGGER.trace("checked " + fileIntPathList.get(i).getKey().getName()
 												+ " with dependency " + curDependencyTo + " and " + constant + " i=" + i
 												+ " j=" + j + " i2=" + i2);
 									}
@@ -243,7 +242,7 @@ public class DescIndexData {
 		// change order according to templates
 		insertOccurred = true;
 		for (int counter = 0; insertOccurred && counter < Math.pow(fileIntPathList.size(), 4); counter++) {
-			System.out.println(counter);
+			LOGGER.trace("counter=" + counter);
 			insertOccurred = false;
 			x: for (int i = 0; i < dependencies.size(); i++) {
 
@@ -264,10 +263,10 @@ public class DescIndexData {
 							fileName = fileName.substring(0, fileName.lastIndexOf('.'));
 
 							if (fileName.equals(curDependencyTo)) {
-								System.out.println("checked " + fileIntPathList.get(i).getKey().getName()
+								LOGGER.trace("checked " + fileIntPathList.get(i).getKey().getName()
 										+ " with dependency " + curDependencyTo + " and " + fileName + " i=" + i + " j="
 										+ j + " i2=" + i2);
-								System.out.println(fileIntPathList);
+								LOGGER.trace("fileIntPathList:" + fileIntPathList);
 								// i's needs to be inserted after i2
 								dependencies.remove(i);
 								fileIntPathList.remove(i);
@@ -275,12 +274,12 @@ public class DescIndexData {
 								dependencies.add(i, curLayoutDepList);
 								fileIntPathList.add(i, pair);
 								insertOccurred = true;
-								System.out.println(
+								LOGGER.trace(
 										"inserted " + fileIntPathList.get(i).getKey().getName() + " after " + fileName);
-								System.out.println(fileIntPathList);
+								LOGGER.trace("fileIntPathList: " + fileIntPathList);
 								break x;
 							} else {
-								System.out.println("checked " + fileIntPathList.get(i).getKey().getName()
+								LOGGER.trace("checked " + fileIntPathList.get(i).getKey().getName()
 										+ " with dependency " + curDependencyTo + " and " + fileName + " i=" + i + " j="
 										+ j + " i2=" + i2);
 							}

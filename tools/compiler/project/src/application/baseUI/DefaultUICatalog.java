@@ -10,6 +10,8 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -19,14 +21,20 @@ import org.xml.sax.SAXParseException;
 
 import com.sun.org.apache.xerces.internal.impl.io.MalformedByteSequenceException;
 
+@SuppressWarnings("restriction")
 public class DefaultUICatalog {
 
+	// Logger
+	//private final static Logger LOGGER = Logger.getLogger(DefaultUICatalog.class.getName());
+	private final static Logger LOGGER = LogManager.getLogger(DefaultUICatalog.class);
+	
+	// members
 	ArrayList<DefaultUIElement> elements = new ArrayList<>();
 
 	public void processFile(File f) throws SAXException, IOException, ParserConfigurationException {
 
 		DocumentBuilder dBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-
+		
 		InputStream is = null;
 
 		Document doc = null;
@@ -44,12 +52,20 @@ public class DefaultUICatalog {
 			DefaultUIElement gameUI = new DefaultUIElement("GameUI", "GameUI");
 			elements.add(gameUI);
 			
+			LOGGER.debug("retrieving Desc node");
 			Node desc = doc.getChildNodes().item(0);
 			
+			if(doc.getChildNodes().getLength() > 1){
+				LOGGER.error("Unhandled root nodes in file: " + f);
+			}
+
+			// parse all content like frames, etc...
 			parse(desc.getChildNodes(), gameUI);
 
 		} catch (SAXParseException | MalformedByteSequenceException e) {
+			LOGGER.error("Failed to parse file: " + f, e);
 			// couldn't parse, most likely no XML file
+			// -> do nothing
 		} finally {
 			if (is != null) {
 				is.close();
@@ -57,6 +73,11 @@ public class DefaultUICatalog {
 		}
 	}
 
+	/**
+	 * 
+	 * @param childNodes
+	 * @param parent
+	 */
 	private void parse(NodeList childNodes, DefaultUIElement parent) {
 		if (childNodes != null) {
 			Node curNode = null, curAttribute = null;
@@ -64,6 +85,7 @@ public class DefaultUICatalog {
 			boolean hasType = false, hasName = false, isFrame = false;
 			DefaultUIElement elem = null;
 
+			LOGGER.debug("checking childNodes, length: " + childNodes.getLength());
 			// process all childNodes
 			for (int i = 0; i < childNodes.getLength(); i++) {
 				curNode = childNodes.item(i);
@@ -72,7 +94,7 @@ public class DefaultUICatalog {
 
 				// skip boring elements
 				if (curNodeType != Node.ELEMENT_NODE) {
-					System.out.println("SKIP node type " + curNodeType);
+					LOGGER.debug("Skipping node type " + curNodeType);
 					continue;
 				}
 
@@ -82,11 +104,10 @@ public class DefaultUICatalog {
 				hasName = false;
 				isFrame = false;
 
-				// attributes
+				// process attributes
 				NamedNodeMap attributes = curNode.getAttributes();
 				if (attributes != null) {
-
-					System.out.println("checking attributes, length: " + attributes.getLength());
+					LOGGER.debug("checking attributes, length: " + attributes.getLength());
 
 					for (int j = 0; j < attributes.getLength(); j++) {
 						curAttribute = attributes.item(j);
@@ -94,14 +115,14 @@ public class DefaultUICatalog {
 						if (attrName.equalsIgnoreCase("name")) {
 							name = curAttribute.getNodeValue();
 							hasName = true;
-							System.out.println("found attr name: " + name);
+							LOGGER.debug("found attr name: " + name);
 						} else if (attrName.equalsIgnoreCase("type")) {
 							type = curAttribute.getNodeValue();
 							hasType = true;
-							System.out.println("found attr type: " + type);
+							LOGGER.debug("found attr type: " + type);
 						} else {
 							// TODO
-							System.out.println("found attribute: " + attrName);
+							LOGGER.debug("found attribute: " + attrName);
 						}
 					}
 
@@ -110,7 +131,7 @@ public class DefaultUICatalog {
 							// Frame
 							elem = new DefaultUIElement(name, type);
 							parent.addChild(elem);
-							System.out.println("Frame, name: " + name + ", type: " + type);
+							LOGGER.debug("Frame, name: " + name + ", type: " + type);
 							parse(curNode.getChildNodes(), elem);
 							isFrame = true;
 						} else {
@@ -118,15 +139,15 @@ public class DefaultUICatalog {
 								// Animation
 								elem = new DefaultUIElement(name, "Animation");
 								parent.addChild(elem);
-								System.out.println("Animation, name: " + name);
+								LOGGER.debug("Animation, name: " + name);
 							} else if (curNode.getNodeName().equalsIgnoreCase("Constant")) {
 								// Constant
 								elem = new DefaultUIElement(name, "Constant");
 								parent.addChild(elem);
-								System.out.println("Constant, name: " + name);
+								LOGGER.debug("Constant, name: " + name);
 							} else {
 								// Other
-								System.out.println("other: " + curNode.getNodeName());
+								LOGGER.debug("other: " + curNode.getNodeName());
 							}
 						}
 					} else {

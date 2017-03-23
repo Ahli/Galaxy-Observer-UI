@@ -7,7 +7,12 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 public class SettingsInterface {
+	static Logger LOGGER = LogManager.getLogger(SettingsInterface.class);
+	
 	private String SETTINGS_FILE = "";
 	private String SC2_Path = "", HEROES_Path = "", HEROES_PTR_Path = "";
 	private boolean ptrActive = false, SC2_64bit = false, HEROES_64bit = false, HEROES_PTR_64bit = false,

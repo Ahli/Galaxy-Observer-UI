@@ -26,16 +26,20 @@ import org.xml.sax.ErrorHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 import org.apache.commons.io.FileUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import com.sun.org.apache.xerces.internal.impl.io.MalformedByteSequenceException;
 
 @SuppressWarnings("restriction")
 public class XmlCompressor {
+	static Logger LOGGER = LogManager.getLogger(XmlCompressor.class);
 
 	public static void processCache(String cachePath, int ignoreCommentCountPerFile)
 			throws ParserConfigurationException, SAXException, IOException {
 
-		System.out.println("Processing Cache for custom compression");
-		System.out.println("cachePath: " + cachePath);
+		LOGGER.info("Compressing XML files...");
+		LOGGER.debug("cachePath: " + cachePath);
 
 		File cache = new File(cachePath);
 		boolean recursive = true;
@@ -88,7 +92,7 @@ public class XmlCompressor {
 				}
 			}
 
-			System.out.println("compression - processing file: " + curFile.getPath());
+			LOGGER.debug("compression - processing file: " + curFile.getPath());
 
 			// process all nodes
 			NodeList nodes = doc.getElementsByTagName("*");
@@ -112,7 +116,7 @@ public class XmlCompressor {
 				xformer = TransformerFactory.newInstance().newTransformer();
 				xformer.transform(source, result);
 			} catch (TransformerFactoryConfigurationError | TransformerException e) {
-				// TODO Auto-generated catch block
+				LOGGER.error("Transforming to generate XML file failed.", e);
 				e.printStackTrace();
 			}
 
@@ -125,7 +129,6 @@ public class XmlCompressor {
 			Node curNode = childNodes.item(i);
 
 			if (curNode.getNodeType() == Node.COMMENT_NODE) {
-				System.out.println("found Comment node: " + curNode.getTextContent());
 				if (ignoreCount == 0) {
 					curNode.getParentNode().removeChild(curNode);
 				} else {
@@ -143,7 +146,6 @@ public class XmlCompressor {
 			Node child = childNodes.item(i);
 			if (child.getNodeType() == Node.TEXT_NODE) {
 				child.setTextContent(child.getTextContent().trim());
-				// System.out.println(child.getTextContent());
 			}
 			trimWhitespace(child);
 		}

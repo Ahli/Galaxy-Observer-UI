@@ -9,6 +9,8 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -21,6 +23,7 @@ import org.xml.sax.SAXException;
  *
  */
 public class LayoutReader {
+	static Logger LOGGER = LogManager.getLogger(LayoutReader.class);
 
 	public static ArrayList<String> getDependencyLayouts(File f, ArrayList<String> ownConstants)
 			throws ParserConfigurationException, SAXException, IOException {
@@ -58,7 +61,7 @@ public class LayoutReader {
 							String layoutName = dependency.substring(0, firstIndex);
 							if (!layoutName.equalsIgnoreCase(nameWOfileEnding)) {
 								if (!doesNameAppearInList(layoutName, list)) {
-									System.out.println(nameWOfileEnding + " has dependency to " + layoutName);
+									LOGGER.trace(nameWOfileEnding + " has dependency to " + layoutName);
 									list.add(layoutName);
 								}
 							}
@@ -75,7 +78,7 @@ public class LayoutReader {
 		if (ownConstants == null) {
 			ownConstants = getLayoutsConstantDefinitions(doc);
 			for (String str : ownConstants) {
-				System.out.println(nameWOfileEnding + " defines constant " + str);
+				LOGGER.trace(nameWOfileEnding + " defines constant " + str);
 			}
 		}
 
@@ -107,7 +110,7 @@ public class LayoutReader {
 					String constName = attrName;
 					if (!doesNameAppearInList(constName, usedConstants)
 							&& !doesConstantNameAppearInList(constName, ownConstants)) {
-						System.out.println(nameWOfileEnding + " uses undefined constant " + constName);
+						LOGGER.trace(nameWOfileEnding + " uses undefined constant " + constName);
 						usedConstants.add(constName);
 						list.add(constName);
 					}
@@ -117,13 +120,11 @@ public class LayoutReader {
 					String constName = attrValue;
 					if (!doesNameAppearInList(constName, usedConstants)
 							&& !doesConstantNameAppearInList(constName, ownConstants)) {
-						System.out.println(nameWOfileEnding + " uses undefined constant " + constName);
+						LOGGER.trace(nameWOfileEnding + " uses undefined constant " + constName);
 						usedConstants.add(constName);
 						list.add(constName);
 					}
 				}
-				// System.out.println("Attribute Name: "+attrName);
-				// System.out.println("Attribute Value: "+attrValue);
 			}
 			// }
 
@@ -233,7 +234,7 @@ public class LayoutReader {
 				// attribute is Template
 				if (attr.getNodeName().equalsIgnoreCase("name")) {
 					ownConstants.add(attr.getNodeValue());
-					System.out.println("FOUND CONSTANT DEFINITION: " + attr.getNodeValue());
+					LOGGER.trace("FOUND CONSTANT DEFINITION: " + attr.getNodeValue());
 				}
 //				else
 //					System.out.println("REJECTED CONSTANT ATTR: " + attr.getNodeName());

@@ -8,6 +8,8 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -19,7 +21,8 @@ import org.xml.sax.SAXException;
  *
  */
 public class ComponentsListReader {
-
+	static Logger LOGGER = LogManager.getLogger(ComponentsListReader.class);
+	
 	/**
 	 * Returns the internal path of DescIndex of the mpq file.
 	 * 
@@ -57,7 +60,6 @@ public class ComponentsListReader {
 			if (attrZero.getNodeName().equals("Type") && attrZero.getNodeValue().equals(typeVal)) {
 				// the text is the value between the tags
 				return node.getTextContent();
-				// System.out.println("descIndex: "+descIndexIntPath);
 			}
 		}
 
