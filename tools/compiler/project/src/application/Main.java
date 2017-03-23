@@ -10,6 +10,7 @@ import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
@@ -44,15 +45,22 @@ import javafx.scene.layout.BorderPane;
 public class Main extends Application {
 	static Logger LOGGER = LogManager.getLogger(Main.class);
 
-	private MpqInterface mpqi;
+	private MpqInterface baseMpqInterface = null;
 	private SettingsInterface settings = new SettingsInterface();
-	private DescIndexData descIndex = new DescIndexData(this);
 	private boolean namespaceHeroes = true;
 	private String documentsPath = new JFileChooser().getFileSystemView().getDefaultDirectory().toString();
 	private File basePath = null;
+
+	// GUI
 	private TextArea txtArea = null;
 	private boolean encounteredError = false;
+
+	// performance
 	private static long startTime;
+
+	// Builder
+	private HashMap<Integer, Thread> builders = new HashMap<>();
+	private int nextFreeBuilderID = 0;
 
 	// Command Line Parameter
 	private boolean hasParamCompilePath = false;
@@ -128,8 +136,8 @@ public class Main extends Application {
 		}
 
 		// init MPQ stuff
-		mpqi = new MpqInterface();
-		initMpqInterface(mpqi);
+		baseMpqInterface = new MpqInterface();
+		initMpqInterface(baseMpqInterface);
 
 		// TEST DefaultUICatalog
 		String baseUIpath = basePath.getParent() + File.separator + "baseUI";
@@ -154,32 +162,37 @@ public class Main extends Application {
 		// return;
 
 		// WORK WORK WORK
-		Thread buildThread = new Thread() {
-			public void run() {
-				try {
-					if (!hasParamCompilePath) {
-						// compile all
-						buildGamesUIs("heroes", true);
-						buildGamesUIs("sc2", false);
-					} else {
-						// compile param
-						boolean isHeroes = paramCompilePath.contains("heroes" + File.separator);
-						buildSpecificUI(new File(paramCompilePath), isHeroes);
-					}
-				} catch (IOException e) {
-					LOGGER.error("IOException while building UIs", e);
-					e.printStackTrace();
-				}
+		if (!hasParamCompilePath) {
+			// compile all
+			try {
+				buildGamesUIs("heroes", true);
+				buildGamesUIs("sc2", false);
+			} catch (IOException e) {
+				LOGGER.error("IOException while building UIs", e);
+				reportErrorEncounter();
+				e.printStackTrace();
 			}
-		};
-		buildThread.start();
-		try {
-			buildThread.join();
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-			LOGGER.error("waiting for build thread failed", e);
+		} else {
+			// build specific file due to param
+			boolean isHeroes = paramCompilePath.contains("heroes" + File.separator);
+			try {
+				buildSpecificUI(new File(paramCompilePath), isHeroes);
+			} catch (IOException e) {
+				LOGGER.error("IOException while building UIs", e);
+				reportErrorEncounter();
+				e.printStackTrace();
+			}
 		}
 
+		// wait for all threads to finish
+		for (Thread buildThread : builders.values()) {
+			try {
+				buildThread.join();
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+				LOGGER.error("waiting for build thread to join failed", e);
+			}
+		}
 		primaryStage.setTitle("Compiling Interfaces... done.");
 		printLogMessage("All done.");
 
@@ -199,6 +212,18 @@ public class Main extends Application {
 		}
 	}
 
+	/**
+	 * 
+	 * @return
+	 */
+	private int getUnusedThreadID() {
+		// return val, then increment
+		return nextFreeBuilderID++;
+	}
+
+	/**
+	 * 
+	 */
 	private void initParams() {
 		// named params
 		// e.g. "--paramname=value".
@@ -410,10 +435,12 @@ public class Main extends Application {
 			File[] directoryListing = dir.listFiles();
 			if (directoryListing != null) {
 				for (File child : directoryListing) {
+					// build UI
 					buildSpecificUI(child, isHeroes);
 				}
 			}
 		}
+
 	}
 
 	/**
@@ -425,7 +452,28 @@ public class Main extends Application {
 	 */
 	public void buildSpecificUI(File interfaceFolder, boolean isHeroes) throws IOException {
 		if (interfaceFolder.isDirectory()) {
-			buildFile(interfaceFolder, isHeroes);
+			// build according to param
+			final int threadID = getUnusedThreadID();
+
+			// create unique cache path
+			final MpqInterface threadsMpqInterface = (MpqInterface) baseMpqInterface.clone();
+			threadsMpqInterface.setMpqCachePath(baseMpqInterface.getMpqCachePath() + threadID);
+
+			Thread buildThread = new Thread() {
+				public void run() {
+					this.setName("Builder" + threadID);
+					// work
+					try {
+						buildFile(interfaceFolder, isHeroes, threadsMpqInterface);
+					} catch (IOException e) {
+						LOGGER.error("IOException while building UIs", e);
+						reportErrorEncounter();
+						e.printStackTrace();
+					}
+				}
+			};
+			builders.put(threadID, buildThread);
+			buildThread.start();
 		}
 	}
 
@@ -445,14 +493,20 @@ public class Main extends Application {
 	}
 
 	/**
-	 * Builds MPQ Archive File.
+	 * Builds MPQ Archive File. Run this in its own thread!
+	 * 
+	 * Conditions: - Specified MpqInterface requires a unique cache path for
+	 * multithreading.
 	 * 
 	 * @param file
+	 *            folder location
 	 * @param isHeroes
+	 *            set to true, if Heroes
+	 * @param mpqi
+	 *            MpqInterface with unique cache path
 	 * @throws IOException
 	 */
-	@SuppressWarnings("static-access")
-	private void buildFile(File file, boolean isHeroes) throws IOException {
+	private void buildFile(File file, boolean isHeroes, MpqInterface mpqi) throws IOException {
 		String buildPath = documentsPath + File.separator;
 
 		LOGGER.info("Starting to build file: " + file.getPath());
@@ -478,7 +532,7 @@ public class Main extends Application {
 			if (!mpqi.clearCacheExtractedMpq()) {
 				// sleep and hope the file gets released soon
 				try {
-					Thread.currentThread().sleep(500);
+					Thread.sleep(500);
 				} catch (InterruptedException e1) {
 					e1.printStackTrace();
 				}
@@ -505,14 +559,14 @@ public class Main extends Application {
 					LOGGER.warn("Attempt to copy directory failed.", e);
 				} else if (copyAttempts >= 100) {
 					reportErrorEncounter();
-					String msg = "Unable to copy directory after 100 copy attempts";
+					String msg = "Unable to copy directory after 100 copy attempts: " + e.getMessage();
 					LOGGER.error(msg, e);
 					e.printStackTrace();
-					throw new IOException(msg, e);
+					throw new FileSystemException(msg);
 				}
 				// sleep and hope the file gets released soon
 				try {
-					Thread.currentThread().sleep(500);
+					Thread.sleep(500);
 				} catch (InterruptedException e1) {
 					LOGGER.error("Thread sleep was interrupted with exception.", e);
 				}
@@ -535,6 +589,9 @@ public class Main extends Application {
 		LOGGER.debug("retrieving componentList");
 		File componentListFile = mpqi.getComponentListFile();
 		LOGGER.debug("retrieving descIndex - set path and clear");
+		
+		DescIndexData descIndex = new DescIndexData(this, mpqi);
+		
 		try {
 			descIndex.setDescIndexPathAndClear(ComponentsListReader.getDescIndexPath(componentListFile));
 		} catch (ParserConfigurationException | SAXException | IOException e) {
@@ -558,7 +615,7 @@ public class Main extends Application {
 		LOGGER.info("Compiling... " + file.getName());
 
 		// perform checks/improvements on code
-		compile();
+		compile(descIndex);
 
 		LOGGER.info("Building... " + file.getName());
 
@@ -578,21 +635,21 @@ public class Main extends Application {
 		}
 	}
 
-	/**
-	 * Returns the Mpq Interface.
-	 * 
-	 * @return
-	 */
-	public MpqInterface getMpqInterface() {
-		return mpqi;
-	}
+//	/**
+//	 * Returns the Mpq Interface.
+//	 * 
+//	 * @return
+//	 */
+//	public MpqInterface getMpqInterface() {
+//		return baseMpqInterface;
+//	}
 
 	/**
 	 * Is called when the App is closing.
 	 */
 	public void stop() {
 		LOGGER.info("App is about to shut down.");
-		mpqi.clearCacheExtractedMpq();
+		baseMpqInterface.clearCacheExtractedMpq();
 		LOGGER.info("App waves Goodbye!");
 		long executionTime = (System.currentTimeMillis() - startTime);
 		LOGGER.info("Execution time: " + String.format("%d min, %d sec", TimeUnit.MILLISECONDS.toMinutes(executionTime),
@@ -638,18 +695,9 @@ public class Main extends Application {
 	}
 
 	/**
-	 * Returns the DescIndex data of the opened document.
-	 * 
-	 * @return
-	 */
-	public DescIndexData getDescIndexData() {
-		return descIndex;
-	}
-
-	/**
 	 * Compiles and updates the data in the cache.
 	 */
-	public void compile() {
+	public void compile(DescIndexData descIndex) {
 		try {
 			// manage order of layout files in DescIndex
 			descIndex.orderLayoutFiles();

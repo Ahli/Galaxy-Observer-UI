@@ -18,10 +18,8 @@ import application.protection.XmlCompressor;
 public class MpqInterface {
 	static Logger LOGGER = LogManager.getLogger(MpqInterface.class);
 
-	private String MPQ_EDITOR = "plugins" + File.separator + "mpq" + File.separator + "MPQEditor.exe";
-	// private String MPQ_EDITOR_OLD = "plugins" + File.separator + "mpq" +
-	// File.separator + "MPQEditorOLD.exe";
 	private final String TEMP_DIR = System.getProperty("java.io.tmpdir");
+	private String MPQ_EDITOR = "plugins" + File.separator + "mpq" + File.separator + "MPQEditor.exe";
 	private String mpqCachePath = TEMP_DIR + "InterfaceBuilder" + File.separator + "_ExtractedMpq";
 
 	public String getMpqCachePath() {
@@ -36,6 +34,16 @@ public class MpqInterface {
 		this.MPQ_EDITOR = editorPath;
 	}
 
+	/**
+	 * Returns a cloned instance of this.
+	 */
+	protected Object clone(){
+		MpqInterface clone = new MpqInterface();
+		clone.setMpqCachePath(this.mpqCachePath);
+		clone.setMpqEditorPath(this.MPQ_EDITOR);
+		return clone;
+	}
+	
 	/**
 	 * Build MPQ from cache.
 	 * 

@@ -13,7 +13,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.xml.sax.SAXException;
 
-//import javafx.util.Pair;
+import javafx.util.Pair;
 
 /**
  * 
@@ -26,9 +26,11 @@ public class DescIndexData {
 	private String descIndexIntPath = null;
 	private ArrayList<Pair<File, String>> fileIntPathList = new ArrayList<>();
 	private Main main;
+	private MpqInterface mpqi;
 
-	public DescIndexData(Main main) {
+	public DescIndexData(Main main, MpqInterface mpqi) {
 		this.main = main;
+		this.mpqi = mpqi;
 		fileIntPathList = new ArrayList<>();
 	}
 
@@ -46,11 +48,11 @@ public class DescIndexData {
 
 	public void addLayoutIntPath(String intPath) {
 		String intPath2 = intPath;
-		File f = main.getMpqInterface().getCachedFile(intPath);
+		File f = mpqi.getCachedFile(intPath);
 		if (!f.exists()) {
 			// add base folder to the path
 			intPath2 = (main.isHeroesFile() ? "Base.StormData" : "Base.SC2Data") + "/" + intPath;
-			f = main.getMpqInterface().getCachedFile(intPath2);
+			f = mpqi.getCachedFile(intPath2);
 		}
 		if (!f.exists()) {
 			return;
@@ -111,7 +113,7 @@ public class DescIndexData {
 	}
 
 	public void persistDescIndexFile() {
-		File f = main.getMpqInterface().getCachedFile(descIndexIntPath);
+		File f = mpqi.getCachedFile(descIndexIntPath);
 		OutputStreamWriter bw = null;
 		try {
 			bw = new OutputStreamWriter(new FileOutputStream(f, false), "UTF-8");
