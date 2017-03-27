@@ -24,7 +24,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.xml.sax.SAXException;
 
-import application.baseUI.DefaultUICatalog;
+import application.baseUI.UICatalog;
+import application.baseUI.UIException;
 import application.integration.SettingsInterface;
 import application.util.logger.log4j2plugin.TextAreaAppender;
 import javafx.animation.PauseTransition;
@@ -142,7 +143,7 @@ public class Main extends Application {
 		// TEST DefaultUICatalog
 		String baseUIpath = basePath.getParent() + File.separator + "baseUI";
 		LOGGER.info("BaseUI path: " + baseUIpath);
-		DefaultUICatalog catalogSC2 = new DefaultUICatalog();
+		UICatalog catalogSC2 = new UICatalog();
 
 		new Thread() {
 			public void run() {
@@ -151,15 +152,17 @@ public class Main extends Application {
 							+ File.separator + "core.sc2mod" + File.separator + "base.sc2data" + File.separator + "UI"
 							+ File.separator + "Layout" + File.separator + "UI" + File.separator + "GameUI.SC2Layout"));
 				} catch (ParserConfigurationException | SAXException | IOException e) {
-					LOGGER.error("Error creating base UI catalog.", e);
-					// TODO Auto-generated catch block
+					LOGGER.error("Error parsing base UI catalog due to a technical problem.", e);
+					e.printStackTrace();
+				} catch (UIException e) {
+					LOGGER.error("Error parsing base UI due to a logical problem.", e);
 					e.printStackTrace();
 				}
 			}
 		}.start();
 
-		// if (true)
-		// return;
+		 if (true)
+		 return;
 
 		// WORK WORK WORK
 		if (!hasParamCompilePath) {
