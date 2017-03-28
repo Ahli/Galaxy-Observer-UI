@@ -143,18 +143,26 @@ public class Main extends Application {
 		// TEST DefaultUICatalog
 		String baseUIpath = basePath.getParent() + File.separator + "baseUI";
 		LOGGER.info("BaseUI path: " + baseUIpath);
-		//UICatalog catalogSC2 = new UICatalog();
+		// UICatalog catalogSC2 = new UICatalog();
 		UICatalog catalogHeroes = new UICatalog();
 
 		new Thread() {
 			public void run() {
 				try {
-//					catalogSC2.processDescIndex(new File(baseUIpath + File.separator + "sc2" + File.separator + "mods"
-//							+ File.separator + "core.sc2mod" + File.separator + "base.sc2data" + File.separator + "UI"
-//							+ File.separator + "Layout" + File.separator + "DescIndex.SC2Layout"));
-					catalogHeroes.processDescIndex(new File(baseUIpath + File.separator + "heroes" + File.separator + "mods"
-							+ File.separator + "core.stormmod" + File.separator + "base.stormdata" + File.separator + "UI"
-							+ File.separator + "Layout" + File.separator + "DescIndex.StormLayout"));
+					// catalogSC2.processDescIndex(new File(baseUIpath +
+					// File.separator + "sc2" + File.separator + "mods"
+					// + File.separator + "core.sc2mod" + File.separator +
+					// "base.sc2data" + File.separator + "UI"
+					// + File.separator + "Layout" + File.separator +
+					// "DescIndex.SC2Layout"));
+					catalogHeroes.processDescIndex(
+							new File(baseUIpath + File.separator + "heroes" + File.separator + "mods" + File.separator
+									+ "core.stormmod" + File.separator + "base.stormdata" + File.separator + "UI"
+									+ File.separator + "Layout" + File.separator + "DescIndex.StormLayout"));
+					catalogHeroes.processDescIndex(
+							new File(basePath.getAbsolutePath() + File.separator + "heroes" + File.separator
+									+ "AhliObs.StormInterface" + File.separator + "Base.StormData" + File.separator
+									+ "UI" + File.separator + "Layout" + File.separator + "DescIndex.StormLayout"));
 				} catch (ParserConfigurationException | SAXException | IOException e) {
 					LOGGER.error("Error parsing base UI catalog due to a technical problem.", e);
 					e.printStackTrace();
@@ -165,8 +173,8 @@ public class Main extends Application {
 			}
 		}.start();
 
-		 if (true)
-		 return;
+		if (true)
+			return;
 
 		// WORK WORK WORK
 		if (!hasParamCompilePath) {
@@ -596,9 +604,9 @@ public class Main extends Application {
 		LOGGER.debug("retrieving componentList");
 		File componentListFile = mpqi.getComponentListFile();
 		LOGGER.debug("retrieving descIndex - set path and clear");
-		
+
 		DescIndexData descIndex = new DescIndexData(this, mpqi);
-		
+
 		try {
 			descIndex.setDescIndexPathAndClear(ComponentsListReader.getDescIndexPath(componentListFile));
 		} catch (ParserConfigurationException | SAXException | IOException e) {
@@ -642,14 +650,14 @@ public class Main extends Application {
 		}
 	}
 
-//	/**
-//	 * Returns the Mpq Interface.
-//	 * 
-//	 * @return
-//	 */
-//	public MpqInterface getMpqInterface() {
-//		return baseMpqInterface;
-//	}
+	// /**
+	// * Returns the Mpq Interface.
+	// *
+	// * @return
+	// */
+	// public MpqInterface getMpqInterface() {
+	// return baseMpqInterface;
+	// }
 
 	/**
 	 * Is called when the App is closing.
