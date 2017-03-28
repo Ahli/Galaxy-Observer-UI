@@ -3,32 +3,53 @@
     <DescFlags val="Locked"/>
 
     <Constant name="InvalidTileListIndex" val="4294967295"/>
+    <Constant name="Offset_Horizontal_PossibleUnitTileListItem" val="1"/>
+    <Constant name="Offset_Vertical_PossibleUnitTileListItem" val="-1"/>
 
     <Frame type="UnitCacheTileListItem" name="PossibleUnitCacheTileListItemTemplate">
-        <Height val="80"/>
-        <Width val="100"/>
-
-        <Frame type="Frame" name="NormalImage" template="StandardGreyboxTemplates/StandardContainerInnerTemplate">
+        <Height val="69"/>
+        <Width val="69"/>
+        <HideWhenCleared val="True"/>
+        <CollapseLayout val="True"/>
+        
+        <Frame type="Image" name="EmptyImage">
             <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
             <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
             <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
             <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+            <Texture val="@UI/SC2_UI_Collection_Skins_ExpandedSelection_Item"/>
+            <TextureType val="NineSlice"/>
+            <ColorAdjustMode val="Fill"/>
+            <LightAdjustColor val="15,49,77"/>
         </Frame>
 
-        <Frame type="Image" name="HoverImage" template="StandardGreyboxTemplates/StandardContainerInnerTemplate">
+        <Frame type="Image" name="NormalImage">
             <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
             <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
             <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
             <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
-            <Alpha val="150"/>
+            <Texture val="@UI/SC2_UI_Collection_Skins_ExpandedSelection_Item"/>
+            <TextureType val="NineSlice"/>
         </Frame>
 
-        <Frame type="Image" name="SelectedImage" template="StandardGreyboxTemplates/StandardContainerInnerTemplate">
+        <Frame type="Image" name="HoverImage">
             <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
             <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
             <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
             <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
-            <Alpha val="50"/>
+            <Texture val="@UI/SC2_UI_Collection_Skins_ExpandedSelection_Item"/>
+            <TextureType val="NineSlice"/>
+            <ColorAdjustMode val="Fill"/>
+            <LightAdjustColor val="42,113,167"/>
+        </Frame>
+
+        <Frame type="Image" name="SelectedImage">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+            <Texture val="@UI/SC2_UI_Collection_Skins_ExpandedSelection_Item_Selected"/>
+            <TextureType val="NineSlice"/>
         </Frame>
 
         <Frame type="UnitCacheFrame" name="UnitCacheFrame">
@@ -42,62 +63,123 @@
         <Frame type="Image" name="IconImage">
             <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
             <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
-            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
             <Texture val="{$parent/UnitCacheFrame/@Icon}"/>
-            <Height val="64"/>
-            <Width val="64"/>
+            <Height val="55"/>
+            <Width val="55"/>
         </Frame>
 
         <Frame type="Image" name="InvalidIconImage">
             <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
             <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
-            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
-            <Texture val="@UI/Glues_Icons_AddToParty"/>
-            <Height val="64"/>
-            <Width val="64"/>
+            <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+            <Width val="25"/>
+            <Height val="5"/>
+            <Texture val="Assets/Textures/White.dds"/>
+            <Color val="22,77,120"/>
+            
+            <StateGroup name="HoverState">
+                <DefaultState val="NoHover"/>
+
+                <State name="Hover">
+                    <When type="Property" frame="$parent/HoverImage" Visible="True"/>
+                    <Action type="SetProperty" frame="$this" Color="42,113,167"/>
+                </State>
+
+                <State name="NoHover">
+                    <Action type="SetProperty" frame="$this" Color="22,77,120"/>
+                </State>
+            </StateGroup>
         </Frame>
+        
+        <StateGroup name="DisplayState">
+            <DefaultState val="Empty"/>
 
-        <StateGroup name="UnitSetStateGroup">
-            <DefaultState val="UnitNotValid"/>
-
-            <State name="UnitValid">
-                <When type="Property" frame="UnitCacheFrame" Valid="true"/>
-                <Action type="SetProperty" frame="IconImage" visible="true"/>
-                <Action type="SetProperty" frame="InvalidIconImage" visible="false"/>
+            <State name="UnitButton">
+                <When type="Property" frame="$this" HasData="True"/>
+                <When type="Property" frame="UnitCacheFrame" Valid="True"/>
+                <Action type="SetProperty" frame="IconImage" Visible="True"/>
+                <Action type="SetProperty" frame="InvalidIconImage" Visible="False"/>
+                <Action type="SetProperty" frame="EmptyImage" Visible="False"/>
             </State>
 
-            <State name="UnitNotValid">
-                <Action type="SetProperty" frame="IconImage" visible="false"/>
-                <Action type="SetProperty" frame="InvalidIconImage" visible="true"/>
+            <State name="ClearButton">
+                <When type="Property" frame="$this" HasData="True"/>
+                <When type="Property" frame="UnitCacheFrame" Valid="False"/>
+                <Action type="SetProperty" frame="IconImage" Visible="False"/>
+                <Action type="SetProperty" frame="InvalidIconImage" Visible="True"/>
+                <Action type="SetProperty" frame="EmptyImage" Visible="False"/>
+            </State>
+            
+            <State name="Empty">
+                <When type="Property" frame="$this" HasData="False"/>
+                <When type="Property" frame="UnitCacheFrame" Valid="False"/>
+                <Action type="SetProperty" frame="IconImage" Visible="False"/>
+                <Action type="SetProperty" frame="InvalidIconImage" Visible="False"/>
+                <Action type="SetProperty" frame="EmptyImage" Visible="True"/>
             </State>
         </StateGroup>
     </Frame>
 
     <Frame type="UnitCacheTileListItem" name="SelectedUnitCacheTileListItemTemplate">
-        <Height val="80"/>
-        <Width val="100"/>
+        <Width val="115"/>
+        <Height val="89"/>
 
-        <Frame type="Frame" name="NormalImage" template="StandardGreyboxTemplates/StandardContainerInnerTemplate">
-            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
-            <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
-            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
-            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+        <Frame type="Image" name="NormalImage">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="5"/>
+            <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+            <Width val="105"/>
+            <Height val="80"/>
+            <Texture val="@UI/SC2_UI_Collection_Skins_LargeFormatButton_Normal"/>
+            <TextureType val="EndCap"/>
+            <Tiled val="True"/>
+            <DesaturateOnDisable val="False"/>
         </Frame>
 
-        <Frame type="Image" name="HoverImage" template="StandardGreyboxTemplates/StandardContainerInnerTemplate">
-            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
-            <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
-            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
-            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
-            <Alpha val="150"/>
+        <Frame type="Image" name="HoverImage">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="5"/>
+            <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+            <Width val="105"/>
+            <Height val="80"/>
+            <Texture val="@UI/SC2_UI_Collection_Skins_LargeFormatButton_Hover"/>
+            <TextureType val="EndCap"/>
+            <Tiled val="True"/>
+            <DesaturateOnDisable val="False"/>
         </Frame>
 
-        <Frame type="Image" name="SelectedImage" template="StandardGreyboxTemplates/StandardContainerInnerTemplate">
-            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
-            <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
-            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
-            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
-            <Alpha val="50"/>
+        <Frame type="Image" name="SelectedImage">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="-15"/>
+            <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+            <Texture val="@UI/SC2_UI_Collection_Skins_ExpandedSelection_Border"/>
+            <TextureType val="NineSlice"/>
+            <Width val="115"/>
+            <Height val="104"/>
+            <DesaturateOnDisable val="False"/>
+            
+            <Frame type="Image" name="TabOverlay">
+                <Anchor side="Bottom" relative="$parent" pos="Max" offset="-9"/>
+                <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+                <Texture val="@UI/SC2_UI_Collection_Skins_ExpandedSelection_Tab_Overlay"/>
+            </Frame>
+        </Frame>
+        
+        <Frame type="Image" name="DisabledImage">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="5"/>
+            <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+            <Width val="105"/>
+            <Height val="80"/>
+            <Texture val="@UI/SC2_UI_Collection_Skins_LargeFormatButton_Empty_Disabled"/>
+            <TextureType val="EndCap"/>
+            <Tiled val="True"/>
+            <DesaturateOnDisable val="False"/>
+            <Visible val="False"/>
         </Frame>
 
         <Frame type="UnitCacheFrame" name="UnitCacheFrame">
@@ -109,21 +191,25 @@
         </Frame>
 
         <Frame type="Image" name="IconImage">
-            <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
-            <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
-            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Top" relative="$parent/NormalImage" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent/NormalImage" pos="Mid" offset="0"/>
+            <Anchor side="Left" relative="$parent/NormalImage" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent/NormalImage" pos="Mid" offset="0"/>
             <Texture val="{$parent/UnitCacheFrame/@Icon}"/>
             <Height val="64"/>
             <Width val="64"/>
+            <DesaturateOnDisable val="False"/>
         </Frame>
 
         <Frame type="Image" name="InvalidIconImage">
-            <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
-            <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
-            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
-            <Texture val="@UI/Glues_Icons_AddToParty"/>
-            <Height val="64"/>
-            <Width val="64"/>
+            <Anchor side="Top" relative="$parent/NormalImage" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent/NormalImage" pos="Mid" offset="0"/>
+            <Anchor side="Left" relative="$parent/NormalImage" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent/NormalImage" pos="Mid" offset="0"/>
+            <Height val="29"/>
+            <Width val="29"/>
+            <Texture val="@UI/SC2_UI_Collection_Skins_Icon_Add"/>
+            <DesaturateOnDisable val="False"/>
         </Frame>
 
         <StateGroup name="UnitSetStateGroup">
@@ -133,67 +219,795 @@
                 <When type="Property" frame="UnitCacheFrame" Valid="true"/>
                 <Action type="SetProperty" frame="IconImage" visible="true"/>
                 <Action type="SetProperty" frame="InvalidIconImage" visible="false"/>
+                <Action type="SetProperty" frame="NormalImage" texture="@UI/SC2_UI_Collection_Skins_LargeFormatButton_Normal"/>
+                <Action type="SetProperty" frame="HoverImage" texture="@UI/SC2_UI_Collection_Skins_LargeFormatButton_Hover"/>
             </State>
 
             <State name="UnitNotValid">
                 <Action type="SetProperty" frame="IconImage" visible="false"/>
                 <Action type="SetProperty" frame="InvalidIconImage" visible="true"/>
+                <Action type="SetProperty" frame="NormalImage" texture="@UI/SC2_UI_Collection_Skins_LargeFormatButton_Empty"/>
+                <Action type="SetProperty" frame="HoverImage" texture="@UI/SC2_UI_Collection_Skins_LargeFormatButton_Empty_Hover"/>
+            </State>
+        </StateGroup>
+        
+        <StateGroup name="EnabledType">
+            <State name="Enabled"/>
+            <State name="Disabled_PreviousSlotEmpty"/>
+            <!--
+            <State name="Disabled_NoSkinsEquipped"/>
+            <State name="Disabled_AllEquippedSkinsInUse"/>
+            -->
+        </StateGroup>
+        
+        <StateGroup name="ReturnButtonVisibleState">
+            <State name="Visible"/>
+            <State name="NotVisible"/>
+        </StateGroup>
+        
+        <StateGroup name="SelectedType">
+            <State name="Selected">
+                <When type="Property" frame="$this/SelectedImage" Visible="True"/>
+            </State>
+            <State name="Unselected">
+                <When type="Property" frame="$this/SelectedImage" Visible="False"/>
+            </State>
+        </StateGroup>
+        
+        <StateGroup name="DisplayState">
+            
+            <State name="Disabled_PreviousSlotEmpty">
+                <When type="StateGroup" frame="$this" EnabledType="Disabled_PreviousSlotEmpty"/>
+                <Action type="SetProperty" frame="$this" Enabled="False"/>
+                <Action type="SetProperty" frame="$this" AcceptsMouse="False"/>
+                <Action type="SetProperty" frame="$this" Tooltip=""/>
+                <Action type="SetProperty" frame="$this/InvalidIconImage" Alpha="0"/>
+                <Action type="SetProperty" frame="$this/DisabledImage" Visible="True"/>
+                <Action type="SetState" frame="$this" group="ReturnButtonVisibleState" state="Visible"/>
+            </State>
+            
+            <!--
+            <State name="Disabled_NoSkinsEquipped">
+                <When type="StateGroup" frame="$this" EnabledType="Disabled_NoSkinsEquipped"/>
+                <Action type="SetProperty" frame="$this" Enabled="False"/>
+                <Action type="SetProperty" frame="$this" Tooltip="Disabled_NoSkinsEquipped"/>
+                <Action type="SetProperty" frame="$this/InvalidIconImage" Alpha="0"/>
+                <Action type="SetProperty" frame="$this/DisabledImage" Visible="True"/>
+                <Action type="SetState" frame="$this" group="ReturnButtonVisibleState" state="Visible"/>
+            </State>
+            
+            <State name="Disabled_AllEquippedSkinsInUse">
+                <When type="StateGroup" frame="$this" EnabledType="Disabled_AllEquippedSkinsInUse"/>
+                <Action type="SetProperty" frame="$this" Enabled="False"/>
+                <Action type="SetProperty" frame="$this" Tooltip="Disabled_AllEquippedSkinsInUse"/>
+                <Action type="SetProperty" frame="$this/InvalidIconImage" Alpha="0"/>
+                <Action type="SetProperty" frame="$this/DisabledImage" Visible="True"/>
+                <Action type="SetState" frame="$this" group="ReturnButtonVisibleState" state="Visible"/>
+            </State>
+            -->
+
+            <State name="Enabled_Selected">
+                <When type="Property" frame="$this/SelectedImage" Visible="True"/>
+                <Action type="SetProperty" frame="$this" Enabled="True"/>
+                <Action type="SetProperty" frame="$this" AcceptsMouse="True"/>
+                <Action type="SetProperty" frame="$this/InvalidIconImage" Alpha="0"/>
+                <Action type="SetProperty" frame="$this/DisabledImage" Visible="False"/>
+                <Action type="SetState" frame="$this" group="ReturnButtonVisibleState" state="Visible"/>
+            </State>
+            
+            <State name="Normal">
+                <When type="Property" frame="$this/HoverImage" Visible="False"/>
+                <Action type="SetProperty" frame="$this" Enabled="True"/>
+                <Action type="SetProperty" frame="$this" AcceptsMouse="True"/>
+                <Action type="SetProperty" frame="$this/InvalidIconImage" Texture="@UI/SC2_UI_Collection_Skins_Icon_Add"/>
+                <Action type="SetProperty" frame="$this/DisabledImage" Visible="False"/>
+                <Action type="SetState" frame="$this" group="ReturnButtonVisibleState" state="NotVisible"/>
+            </State>
+
+            <State name="Hover">
+                <When type="Property" frame="$this/HoverImage" Visible="True"/>
+                <Action type="SetProperty" frame="$this" Enabled="True"/>
+                <Action type="SetProperty" frame="$this" AcceptsMouse="True"/>
+                <Action type="SetProperty" frame="$this/InvalidIconImage" Texture="@UI/SC2_UI_Collection_Skins_Icon_Add_Hover"/>
+                <Action type="SetProperty" frame="$this/DisabledImage" Visible="False"/>
+                <Action type="SetState" frame="$this" group="ReturnButtonVisibleState" state="NotVisible"/>
             </State>
         </StateGroup>
     </Frame>
 
     <Frame type="TileList" name="LargeFormatPossibleUnitTileListTemplate">
-        <Frame type="Frame" name="BackgroundImage" template="StandardGreyboxTemplates/StandardContainerInnerTemplate">
-            <Anchor side="Top" relative="$parent/Item0" pos="Min" offset="0"/>
+        
+        <Frame type="Frame" name="BackgroundContainer">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
             <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
             <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
-            <Anchor side="Right" relative="$parent/Item3" pos="Max" offset="0"/>
-        </Frame>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+            
+            <Frame type="Frame" name="LeftContainer">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Right" relative="$parent/CenterContainer" pos="Min" offset="0"/>
+                
+                <Frame type="Image" name="LeftImage">
+                    <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                    <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+                    <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                    <Anchor side="Right" relative="$parent" pos="Max" offset="30"/>
+                    <Texture val="@UI/SC2_UI_Collection_Skins_ExpandedSelection_Border"/>
+                    <TextureType val="NineSlice"/>
+                </Frame>
+            </Frame>
+            
+            <Frame type="Frame" name="RightContainer">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+                <Anchor side="Left" relative="$parent/CenterContainer" pos="Max" offset="0"/>
+                <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+                
+                <Frame type="Image" name="RightImage">
+                    <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                    <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+                    <Anchor side="Left" relative="$parent" pos="Min" offset="-30"/>
+                    <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+                    <Texture val="@UI/SC2_UI_Collection_Skins_ExpandedSelection_Border"/>
+                    <TextureType val="NineSlice"/>
+                </Frame>
+            </Frame>
+            
+            <Frame type="Frame" name="CenterContainer">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+                
+                <Frame type="Image" name="CenterImage">
+                    <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                    <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+                    <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                    <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+                    <Texture val="@UI/SC2_UI_Collection_Skins_ExpandedSelection_Tab_Opening"/>
+                    <TextureType val="NineSlice"/>
+                </Frame>
+            </Frame>
+            
+            <StateGroup name="SelectedItemState">
+                <State name="Item0">
+                    <When type="Property" frame="$parent/$parent/SelectedUnitTileList/Item0" Selected="True"/>
+                    <Action type="SetAnchor" frame="$this/CenterContainer" side="Left" relative="$parent/$parent/$parent/SelectedUnitTileList/Item0" pos="Min" offset="0"/>
+                    <Action type="SetAnchor" frame="$this/CenterContainer" side="Right" relative="$parent/$parent/$parent/SelectedUnitTileList/Item0" pos="Max" offset="0"/>
+                </State>
+                
+                <State name="Item1">
+                    <When type="Property" frame="$parent/$parent/SelectedUnitTileList/Item1" Selected="True"/>
+                    <Action type="SetAnchor" frame="$this/CenterContainer" side="Left" relative="$parent/$parent/$parent/SelectedUnitTileList/Item1" pos="Min" offset="0"/>
+                    <Action type="SetAnchor" frame="$this/CenterContainer" side="Right" relative="$parent/$parent/$parent/SelectedUnitTileList/Item1" pos="Max" offset="0"/>
+                </State>
 
+                <State name="Item2">
+                    <When type="Property" frame="$parent/$parent/SelectedUnitTileList/Item2" Selected="True"/>
+                    <Action type="SetAnchor" frame="$this/CenterContainer" side="Left" relative="$parent/$parent/$parent/SelectedUnitTileList/Item2" pos="Min" offset="0"/>
+                    <Action type="SetAnchor" frame="$this/CenterContainer" side="Right" relative="$parent/$parent/$parent/SelectedUnitTileList/Item2" pos="Max" offset="0"/>
+                </State>
+                
+                <State name="Item3">
+                    <When type="Property" frame="$parent/$parent/SelectedUnitTileList/Item3" Selected="True"/>
+                    <Action type="SetAnchor" frame="$this/CenterContainer" side="Left" relative="$parent/$parent/$parent/SelectedUnitTileList/Item3" pos="Min" offset="0"/>
+                    <Action type="SetAnchor" frame="$this/CenterContainer" side="Right" relative="$parent/$parent/$parent/SelectedUnitTileList/Item3" pos="Max" offset="0"/>
+                </State>
+            </StateGroup>
+        </Frame>
+        
+        <Frame type="Image" name="TopGradient">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="8"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="8"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="-8"/>
+            <Height val="60"/>
+            <Texture val="@UI/SC2_UI_Collection_Bundle_Skin_LineFade"/>
+            <TextureCoords top=".45" left="0" bottom="1" right="1"/>
+            <Color val="45,112,168"/>
+            <Alpha val="51"/>
+        </Frame>
+        
+        <Frame type="Label" name="SelectionTitleLabel">
+            <Anchor side="Bottom" relative="$parent/Item0" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="23"/>
+            <Style val="@Collection_Skins_LargeFormatGames_SelectionHeader"/>
+            <Text val="@UI/ScreenCollection/Skins/LargeFormatWidgetInfo"/>
+        </Frame>
+        
+        <!-- Row 1 -->
         <Frame type="UnitCacheTileListItem" name="Item0" template="SkinPackLargeFormatUnitSelectionFrame/PossibleUnitCacheTileListItemTemplate">
-            <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
-            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
-        </Frame>
+            <Anchor side="Bottom" relative="$parent/Item1" pos="Max" offset="0"/>
+            <Anchor side="Right" relative="$parent/Item1" pos="Min" offset="#Offset_Horizontal_PossibleUnitTileListItem"/>
+            
+            <StateGroup name="HasDataState">
+                <DefaultState val="HasDataTrue"/>
+                
+                <State name="HasDataTrue">
+                    <!--
+                    <When type="Property" frame="$this" HasData="True"/>
+                    -->
+                    <Action type="SetProperty" frame="$this" HideWhenCleared="False"/>
+                    <Action type="SetProperty" frame="$parent/Item1" HideWhenCleared="False"/>
+                    <Action type="SetProperty" frame="$parent/Item2" HideWhenCleared="False"/>
+                    <Action type="SetProperty" frame="$parent/Item3" HideWhenCleared="False"/>
+                    <Action type="SetProperty" frame="$parent/Item4" HideWhenCleared="False"/>
+                    <Action type="SetProperty" frame="$parent/Item5" HideWhenCleared="False"/>
+                    <Action type="SetProperty" frame="$parent/Item6" HideWhenCleared="False"/>
+                </State>
 
+                <!--
+                <State name="HasDataFalse">
+                    <When type="Property" frame="$this" HasData="False"/>
+                    <Action type="SetProperty" frame="$this" HideWhenCleared="True"/>
+                    <Action type="SetProperty" frame="$parent/Item1" HideWhenCleared="True"/>
+                    <Action type="SetProperty" frame="$parent/Item2" HideWhenCleared="True"/>
+                    <Action type="SetProperty" frame="$parent/Item3" HideWhenCleared="True"/>
+                    <Action type="SetProperty" frame="$parent/Item4" HideWhenCleared="True"/>
+                    <Action type="SetProperty" frame="$parent/Item5" HideWhenCleared="True"/>
+                    <Action type="SetProperty" frame="$parent/Item6" HideWhenCleared="True"/>
+                </State>
+                -->
+            </StateGroup>
+        </Frame>
+        
         <Frame type="UnitCacheTileListItem" name="Item1" template="SkinPackLargeFormatUnitSelectionFrame/PossibleUnitCacheTileListItemTemplate">
-            <Anchor side="Top" relative="$parent/Item0" pos="Min" offset="0"/>
-            <Anchor side="Left" relative="$parent/Item0" pos="Max" offset="0"/>
+            <Anchor side="Bottom" relative="$parent/Item2" pos="Max" offset="0"/>
+            <Anchor side="Right" relative="$parent/Item2" pos="Min" offset="#Offset_Horizontal_PossibleUnitTileListItem"/>
         </Frame>
-
+        
         <Frame type="UnitCacheTileListItem" name="Item2" template="SkinPackLargeFormatUnitSelectionFrame/PossibleUnitCacheTileListItemTemplate">
-            <Anchor side="Top" relative="$parent/Item1" pos="Min" offset="0"/>
-            <Anchor side="Left" relative="$parent/Item1" pos="Max" offset="0"/>
+            <Anchor side="Bottom" relative="$parent/Item3" pos="Max" offset="0"/>
+            <Anchor side="Right" relative="$parent/Item3" pos="Min" offset="#Offset_Horizontal_PossibleUnitTileListItem"/>
+        </Frame>
+        
+        <Frame type="UnitCacheTileListItem" name="Item3" template="SkinPackLargeFormatUnitSelectionFrame/PossibleUnitCacheTileListItemTemplate">
+            <Anchor side="Bottom" relative="$parent/Item4" pos="Max" offset="0"/>
+            <Anchor side="Right" relative="$parent/Item4" pos="Min" offset="#Offset_Horizontal_PossibleUnitTileListItem"/>
+        </Frame>
+        
+        <Frame type="UnitCacheTileListItem" name="Item4" template="SkinPackLargeFormatUnitSelectionFrame/PossibleUnitCacheTileListItemTemplate">
+            <Anchor side="Bottom" relative="$parent/Item5" pos="Max" offset="0"/>
+            <Anchor side="Right" relative="$parent/Item5" pos="Min" offset="#Offset_Horizontal_PossibleUnitTileListItem"/>
+        </Frame>
+        
+        <Frame type="UnitCacheTileListItem" name="Item5" template="SkinPackLargeFormatUnitSelectionFrame/PossibleUnitCacheTileListItemTemplate">
+            <Anchor side="Bottom" relative="$parent/Item6" pos="Max" offset="0"/>
+            <Anchor side="Right" relative="$parent/Item6" pos="Min" offset="#Offset_Horizontal_PossibleUnitTileListItem"/>
+        </Frame>
+        
+        <Frame type="UnitCacheTileListItem" name="Item6" template="SkinPackLargeFormatUnitSelectionFrame/PossibleUnitCacheTileListItemTemplate">
+            <Anchor side="Bottom" relative="$parent/Item13" pos="Min" offset="#Offset_Vertical_PossibleUnitTileListItem"/>
+            <Anchor side="Right" relative="$parent/Item13" pos="Max" offset="0"/>
+        </Frame>
+        
+        <!-- Row 2 -->
+        <Frame type="UnitCacheTileListItem" name="Item7" template="SkinPackLargeFormatUnitSelectionFrame/PossibleUnitCacheTileListItemTemplate">
+            <Anchor side="Bottom" relative="$parent/Item8" pos="Max" offset="0"/>
+            <Anchor side="Right" relative="$parent/Item8" pos="Min" offset="#Offset_Horizontal_PossibleUnitTileListItem"/>
+            
+            <StateGroup name="HasDataState">
+                <State name="HasDataTrue">
+                    <When type="Property" frame="$this" HasData="True"/>
+                    <Action type="SetProperty" frame="$this" HideWhenCleared="False"/>
+                    <Action type="SetProperty" frame="$parent/Item8" HideWhenCleared="False"/>
+                    <Action type="SetProperty" frame="$parent/Item9" HideWhenCleared="False"/>
+                    <Action type="SetProperty" frame="$parent/Item10" HideWhenCleared="False"/>
+                    <Action type="SetProperty" frame="$parent/Item11" HideWhenCleared="False"/>
+                    <Action type="SetProperty" frame="$parent/Item12" HideWhenCleared="False"/>
+                    <Action type="SetProperty" frame="$parent/Item13" HideWhenCleared="False"/>
+                </State>
+
+                <State name="HasDataFalse">
+                    <When type="Property" frame="$this" HasData="False"/>
+                    <Action type="SetProperty" frame="$this" HideWhenCleared="True"/>
+                    <Action type="SetProperty" frame="$parent/Item8" HideWhenCleared="True"/>
+                    <Action type="SetProperty" frame="$parent/Item9" HideWhenCleared="True"/>
+                    <Action type="SetProperty" frame="$parent/Item10" HideWhenCleared="True"/>
+                    <Action type="SetProperty" frame="$parent/Item11" HideWhenCleared="True"/>
+                    <Action type="SetProperty" frame="$parent/Item12" HideWhenCleared="True"/>
+                    <Action type="SetProperty" frame="$parent/Item13" HideWhenCleared="True"/>
+                </State>
+            </StateGroup>
+        </Frame>
+        
+        <Frame type="UnitCacheTileListItem" name="Item8" template="SkinPackLargeFormatUnitSelectionFrame/PossibleUnitCacheTileListItemTemplate">
+            <Anchor side="Bottom" relative="$parent/Item9" pos="Max" offset="0"/>
+            <Anchor side="Right" relative="$parent/Item9" pos="Min" offset="#Offset_Horizontal_PossibleUnitTileListItem"/>
+        </Frame>
+        
+        <Frame type="UnitCacheTileListItem" name="Item9" template="SkinPackLargeFormatUnitSelectionFrame/PossibleUnitCacheTileListItemTemplate">
+            <Anchor side="Bottom" relative="$parent/Item10" pos="Max" offset="0"/>
+            <Anchor side="Right" relative="$parent/Item10" pos="Min" offset="#Offset_Horizontal_PossibleUnitTileListItem"/>
+        </Frame>
+        
+        <Frame type="UnitCacheTileListItem" name="Item10" template="SkinPackLargeFormatUnitSelectionFrame/PossibleUnitCacheTileListItemTemplate">
+            <Anchor side="Bottom" relative="$parent/Item11" pos="Max" offset="0"/>
+            <Anchor side="Right" relative="$parent/Item11" pos="Min" offset="#Offset_Horizontal_PossibleUnitTileListItem"/>
+        </Frame>
+        
+        <Frame type="UnitCacheTileListItem" name="Item11" template="SkinPackLargeFormatUnitSelectionFrame/PossibleUnitCacheTileListItemTemplate">
+            <Anchor side="Bottom" relative="$parent/Item12" pos="Max" offset="0"/>
+            <Anchor side="Right" relative="$parent/Item12" pos="Min" offset="#Offset_Horizontal_PossibleUnitTileListItem"/>
+        </Frame>
+        
+        <Frame type="UnitCacheTileListItem" name="Item12" template="SkinPackLargeFormatUnitSelectionFrame/PossibleUnitCacheTileListItemTemplate">
+            <Anchor side="Bottom" relative="$parent/Item13" pos="Max" offset="0"/>
+            <Anchor side="Right" relative="$parent/Item13" pos="Min" offset="#Offset_Horizontal_PossibleUnitTileListItem"/>
+        </Frame>
+        
+        <Frame type="UnitCacheTileListItem" name="Item13" template="SkinPackLargeFormatUnitSelectionFrame/PossibleUnitCacheTileListItemTemplate">
+            <Anchor side="Bottom" relative="$parent/Item20" pos="Min" offset="#Offset_Vertical_PossibleUnitTileListItem"/>
+            <Anchor side="Right" relative="$parent/Item20" pos="Max" offset="0"/>
+        </Frame>
+        
+        <!-- Row 3 -->
+        <Frame type="UnitCacheTileListItem" name="Item14" template="SkinPackLargeFormatUnitSelectionFrame/PossibleUnitCacheTileListItemTemplate">
+            <Anchor side="Bottom" relative="$parent/Item15" pos="Max" offset="0"/>
+            <Anchor side="Right" relative="$parent/Item15" pos="Min" offset="#Offset_Horizontal_PossibleUnitTileListItem"/>
+            
+            <StateGroup name="HasDataState">
+                <State name="HasDataTrue">
+                    <When type="Property" frame="$this" HasData="True"/>
+                    <Action type="SetProperty" frame="$this" HideWhenCleared="False"/>
+                    <Action type="SetProperty" frame="$parent/Item15" HideWhenCleared="False"/>
+                    <Action type="SetProperty" frame="$parent/Item16" HideWhenCleared="False"/>
+                    <Action type="SetProperty" frame="$parent/Item17" HideWhenCleared="False"/>
+                    <Action type="SetProperty" frame="$parent/Item18" HideWhenCleared="False"/>
+                    <Action type="SetProperty" frame="$parent/Item19" HideWhenCleared="False"/>
+                    <Action type="SetProperty" frame="$parent/Item20" HideWhenCleared="False"/>
+                </State>
+
+                <State name="HasDataFalse">
+                    <When type="Property" frame="$this" HasData="False"/>
+                    <Action type="SetProperty" frame="$this" HideWhenCleared="True"/>
+                    <Action type="SetProperty" frame="$parent/Item15" HideWhenCleared="True"/>
+                    <Action type="SetProperty" frame="$parent/Item16" HideWhenCleared="True"/>
+                    <Action type="SetProperty" frame="$parent/Item17" HideWhenCleared="True"/>
+                    <Action type="SetProperty" frame="$parent/Item18" HideWhenCleared="True"/>
+                    <Action type="SetProperty" frame="$parent/Item19" HideWhenCleared="True"/>
+                    <Action type="SetProperty" frame="$parent/Item20" HideWhenCleared="True"/>
+                </State>
+            </StateGroup>
+        </Frame>
+        
+        <Frame type="UnitCacheTileListItem" name="Item15" template="SkinPackLargeFormatUnitSelectionFrame/PossibleUnitCacheTileListItemTemplate">
+            <Anchor side="Bottom" relative="$parent/Item16" pos="Max" offset="0"/>
+            <Anchor side="Right" relative="$parent/Item16" pos="Min" offset="#Offset_Horizontal_PossibleUnitTileListItem"/>
+        </Frame>
+        
+        <Frame type="UnitCacheTileListItem" name="Item16" template="SkinPackLargeFormatUnitSelectionFrame/PossibleUnitCacheTileListItemTemplate">
+            <Anchor side="Bottom" relative="$parent/Item17" pos="Max" offset="0"/>
+            <Anchor side="Right" relative="$parent/Item17" pos="Min" offset="#Offset_Horizontal_PossibleUnitTileListItem"/>
+        </Frame>
+        
+        <Frame type="UnitCacheTileListItem" name="Item17" template="SkinPackLargeFormatUnitSelectionFrame/PossibleUnitCacheTileListItemTemplate">
+            <Anchor side="Bottom" relative="$parent/Item18" pos="Max" offset="0"/>
+            <Anchor side="Right" relative="$parent/Item18" pos="Min" offset="#Offset_Horizontal_PossibleUnitTileListItem"/>
+        </Frame>
+        
+        <Frame type="UnitCacheTileListItem" name="Item18" template="SkinPackLargeFormatUnitSelectionFrame/PossibleUnitCacheTileListItemTemplate">
+            <Anchor side="Bottom" relative="$parent/Item19" pos="Max" offset="0"/>
+            <Anchor side="Right" relative="$parent/Item19" pos="Min" offset="#Offset_Horizontal_PossibleUnitTileListItem"/>
+        </Frame>
+        
+        <Frame type="UnitCacheTileListItem" name="Item19" template="SkinPackLargeFormatUnitSelectionFrame/PossibleUnitCacheTileListItemTemplate">
+            <Anchor side="Bottom" relative="$parent/Item20" pos="Max" offset="0"/>
+            <Anchor side="Right" relative="$parent/Item20" pos="Min" offset="#Offset_Horizontal_PossibleUnitTileListItem"/>
+        </Frame>
+        
+        <Frame type="UnitCacheTileListItem" name="Item20" template="SkinPackLargeFormatUnitSelectionFrame/PossibleUnitCacheTileListItemTemplate">
+            <Anchor side="Bottom" relative="$parent/Item27" pos="Min" offset="#Offset_Vertical_PossibleUnitTileListItem"/>
+            <Anchor side="Right" relative="$parent/Item27" pos="Max" offset="0"/>
+        </Frame>
+        
+        <!-- Row 4 -->
+        <Frame type="UnitCacheTileListItem" name="Item21" template="SkinPackLargeFormatUnitSelectionFrame/PossibleUnitCacheTileListItemTemplate">
+            <Anchor side="Bottom" relative="$parent/Item22" pos="Max" offset="0"/>
+            <Anchor side="Right" relative="$parent/Item22" pos="Min" offset="#Offset_Horizontal_PossibleUnitTileListItem"/>
+            
+            <StateGroup name="HasDataState">
+                <State name="HasDataTrue">
+                    <When type="Property" frame="$this" HasData="True"/>
+                    <Action type="SetProperty" frame="$this" HideWhenCleared="False"/>
+                    <Action type="SetProperty" frame="$parent/Item22" HideWhenCleared="False"/>
+                    <Action type="SetProperty" frame="$parent/Item23" HideWhenCleared="False"/>
+                    <Action type="SetProperty" frame="$parent/Item24" HideWhenCleared="False"/>
+                    <Action type="SetProperty" frame="$parent/Item25" HideWhenCleared="False"/>
+                    <Action type="SetProperty" frame="$parent/Item26" HideWhenCleared="False"/>
+                    <Action type="SetProperty" frame="$parent/Item27" HideWhenCleared="False"/>
+                </State>
+
+                <State name="HasDataFalse">
+                    <When type="Property" frame="$this" HasData="False"/>
+                    <Action type="SetProperty" frame="$this" HideWhenCleared="True"/>
+                    <Action type="SetProperty" frame="$parent/Item22" HideWhenCleared="True"/>
+                    <Action type="SetProperty" frame="$parent/Item23" HideWhenCleared="True"/>
+                    <Action type="SetProperty" frame="$parent/Item24" HideWhenCleared="True"/>
+                    <Action type="SetProperty" frame="$parent/Item25" HideWhenCleared="True"/>
+                    <Action type="SetProperty" frame="$parent/Item26" HideWhenCleared="True"/>
+                    <Action type="SetProperty" frame="$parent/Item27" HideWhenCleared="True"/>
+                </State>
+            </StateGroup>
+        </Frame>
+        
+        <Frame type="UnitCacheTileListItem" name="Item22" template="SkinPackLargeFormatUnitSelectionFrame/PossibleUnitCacheTileListItemTemplate">
+            <Anchor side="Bottom" relative="$parent/Item23" pos="Max" offset="0"/>
+            <Anchor side="Right" relative="$parent/Item23" pos="Min" offset="#Offset_Horizontal_PossibleUnitTileListItem"/>
+        </Frame>
+        
+        <Frame type="UnitCacheTileListItem" name="Item23" template="SkinPackLargeFormatUnitSelectionFrame/PossibleUnitCacheTileListItemTemplate">
+            <Anchor side="Bottom" relative="$parent/Item24" pos="Max" offset="0"/>
+            <Anchor side="Right" relative="$parent/Item24" pos="Min" offset="#Offset_Horizontal_PossibleUnitTileListItem"/>
+        </Frame>
+        
+        <Frame type="UnitCacheTileListItem" name="Item24" template="SkinPackLargeFormatUnitSelectionFrame/PossibleUnitCacheTileListItemTemplate">
+            <Anchor side="Bottom" relative="$parent/Item25" pos="Max" offset="0"/>
+            <Anchor side="Right" relative="$parent/Item25" pos="Min" offset="#Offset_Horizontal_PossibleUnitTileListItem"/>
+        </Frame>
+        
+        <Frame type="UnitCacheTileListItem" name="Item25" template="SkinPackLargeFormatUnitSelectionFrame/PossibleUnitCacheTileListItemTemplate">
+            <Anchor side="Bottom" relative="$parent/Item26" pos="Max" offset="0"/>
+            <Anchor side="Right" relative="$parent/Item26" pos="Min" offset="#Offset_Horizontal_PossibleUnitTileListItem"/>
+        </Frame>
+        
+        <Frame type="UnitCacheTileListItem" name="Item26" template="SkinPackLargeFormatUnitSelectionFrame/PossibleUnitCacheTileListItemTemplate">
+            <Anchor side="Bottom" relative="$parent/Item27" pos="Max" offset="0"/>
+            <Anchor side="Right" relative="$parent/Item27" pos="Min" offset="#Offset_Horizontal_PossibleUnitTileListItem"/>
+        </Frame>
+        
+        <Frame type="UnitCacheTileListItem" name="Item27" template="SkinPackLargeFormatUnitSelectionFrame/PossibleUnitCacheTileListItemTemplate">
+            <Anchor side="Bottom" relative="$parent/Item34" pos="Min" offset="#Offset_Vertical_PossibleUnitTileListItem"/>
+            <Anchor side="Right" relative="$parent/Item34" pos="Max" offset="0"/>
+        </Frame>
+        
+        <!-- Row 5 -->
+        <Frame type="UnitCacheTileListItem" name="Item28" template="SkinPackLargeFormatUnitSelectionFrame/PossibleUnitCacheTileListItemTemplate">
+            <Anchor side="Bottom" relative="$parent/Item29" pos="Max" offset="0"/>
+            <Anchor side="Right" relative="$parent/Item29" pos="Min" offset="#Offset_Horizontal_PossibleUnitTileListItem"/>
+            
+            <StateGroup name="HasDataState">
+                <State name="HasDataTrue">
+                    <When type="Property" frame="$this" HasData="True"/>
+                    <Action type="SetProperty" frame="$this" HideWhenCleared="False"/>
+                    <Action type="SetProperty" frame="$parent/Item29" HideWhenCleared="False"/>
+                    <Action type="SetProperty" frame="$parent/Item30" HideWhenCleared="False"/>
+                    <Action type="SetProperty" frame="$parent/Item31" HideWhenCleared="False"/>
+                    <Action type="SetProperty" frame="$parent/Item32" HideWhenCleared="False"/>
+                    <Action type="SetProperty" frame="$parent/Item33" HideWhenCleared="False"/>
+                    <Action type="SetProperty" frame="$parent/Item34" HideWhenCleared="False"/>
+                </State>
+
+                <State name="HasDataFalse">
+                    <When type="Property" frame="$this" HasData="False"/>
+                    <Action type="SetProperty" frame="$this" HideWhenCleared="True"/>
+                    <Action type="SetProperty" frame="$parent/Item29" HideWhenCleared="True"/>
+                    <Action type="SetProperty" frame="$parent/Item30" HideWhenCleared="True"/>
+                    <Action type="SetProperty" frame="$parent/Item31" HideWhenCleared="True"/>
+                    <Action type="SetProperty" frame="$parent/Item32" HideWhenCleared="True"/>
+                    <Action type="SetProperty" frame="$parent/Item33" HideWhenCleared="True"/>
+                    <Action type="SetProperty" frame="$parent/Item34" HideWhenCleared="True"/>
+                </State>
+            </StateGroup>
+        </Frame>
+        
+        <Frame type="UnitCacheTileListItem" name="Item29" template="SkinPackLargeFormatUnitSelectionFrame/PossibleUnitCacheTileListItemTemplate">
+            <Anchor side="Bottom" relative="$parent/Item30" pos="Max" offset="0"/>
+            <Anchor side="Right" relative="$parent/Item30" pos="Min" offset="#Offset_Horizontal_PossibleUnitTileListItem"/>
+        </Frame>
+        
+        <Frame type="UnitCacheTileListItem" name="Item30" template="SkinPackLargeFormatUnitSelectionFrame/PossibleUnitCacheTileListItemTemplate">
+            <Anchor side="Bottom" relative="$parent/Item31" pos="Max" offset="0"/>
+            <Anchor side="Right" relative="$parent/Item31" pos="Min" offset="#Offset_Horizontal_PossibleUnitTileListItem"/>
+        </Frame>
+        
+        <Frame type="UnitCacheTileListItem" name="Item31" template="SkinPackLargeFormatUnitSelectionFrame/PossibleUnitCacheTileListItemTemplate">
+            <Anchor side="Bottom" relative="$parent/Item32" pos="Max" offset="0"/>
+            <Anchor side="Right" relative="$parent/Item32" pos="Min" offset="#Offset_Horizontal_PossibleUnitTileListItem"/>
+        </Frame>
+        
+        <Frame type="UnitCacheTileListItem" name="Item32" template="SkinPackLargeFormatUnitSelectionFrame/PossibleUnitCacheTileListItemTemplate">
+            <Anchor side="Bottom" relative="$parent/Item33" pos="Max" offset="0"/>
+            <Anchor side="Right" relative="$parent/Item33" pos="Min" offset="#Offset_Horizontal_PossibleUnitTileListItem"/>
+        </Frame>
+        
+        <Frame type="UnitCacheTileListItem" name="Item33" template="SkinPackLargeFormatUnitSelectionFrame/PossibleUnitCacheTileListItemTemplate">
+            <Anchor side="Bottom" relative="$parent/Item34" pos="Max" offset="0"/>
+            <Anchor side="Right" relative="$parent/Item34" pos="Min" offset="#Offset_Horizontal_PossibleUnitTileListItem"/>
+        </Frame>
+        
+        <Frame type="UnitCacheTileListItem" name="Item34" template="SkinPackLargeFormatUnitSelectionFrame/PossibleUnitCacheTileListItemTemplate">
+            <Anchor side="Bottom" relative="$parent/Item41" pos="Min" offset="#Offset_Vertical_PossibleUnitTileListItem"/>
+            <Anchor side="Right" relative="$parent/Item41" pos="Max" offset="0"/>
         </Frame>
 
-        <Frame type="UnitCacheTileListItem" name="Item3" template="SkinPackLargeFormatUnitSelectionFrame/PossibleUnitCacheTileListItemTemplate">
-            <Anchor side="Top" relative="$parent/Item2" pos="Min" offset="0"/>
-            <Anchor side="Left" relative="$parent/Item2" pos="Max" offset="0"/>
+        <!-- Row 6 -->
+        <Frame type="UnitCacheTileListItem" name="Item35" template="SkinPackLargeFormatUnitSelectionFrame/PossibleUnitCacheTileListItemTemplate">
+            <Anchor side="Bottom" relative="$parent/Item36" pos="Max" offset="0"/>
+            <Anchor side="Right" relative="$parent/Item36" pos="Min" offset="#Offset_Horizontal_PossibleUnitTileListItem"/>
+            
+            <StateGroup name="HasDataState">
+                <State name="HasDataTrue">
+                    <When type="Property" frame="$this" HasData="True"/>
+                    <Action type="SetProperty" frame="$this" HideWhenCleared="False"/>
+                    <Action type="SetProperty" frame="$parent/Item36" HideWhenCleared="False"/>
+                    <Action type="SetProperty" frame="$parent/Item37" HideWhenCleared="False"/>
+                    <Action type="SetProperty" frame="$parent/Item38" HideWhenCleared="False"/>
+                    <Action type="SetProperty" frame="$parent/Item39" HideWhenCleared="False"/>
+                    <Action type="SetProperty" frame="$parent/Item40" HideWhenCleared="False"/>
+                    <Action type="SetProperty" frame="$parent/Item41" HideWhenCleared="False"/>
+                </State>
+
+                <State name="HasDataFalse">
+                    <When type="Property" frame="$this" HasData="False"/>
+                    <Action type="SetProperty" frame="$this" HideWhenCleared="True"/>
+                    <Action type="SetProperty" frame="$parent/Item36" HideWhenCleared="True"/>
+                    <Action type="SetProperty" frame="$parent/Item37" HideWhenCleared="True"/>
+                    <Action type="SetProperty" frame="$parent/Item38" HideWhenCleared="True"/>
+                    <Action type="SetProperty" frame="$parent/Item39" HideWhenCleared="True"/>
+                    <Action type="SetProperty" frame="$parent/Item40" HideWhenCleared="True"/>
+                    <Action type="SetProperty" frame="$parent/Item41" HideWhenCleared="True"/>
+                </State>
+            </StateGroup>
+        </Frame>
+        
+        <Frame type="UnitCacheTileListItem" name="Item36" template="SkinPackLargeFormatUnitSelectionFrame/PossibleUnitCacheTileListItemTemplate">
+            <Anchor side="Bottom" relative="$parent/Item37" pos="Max" offset="0"/>
+            <Anchor side="Right" relative="$parent/Item37" pos="Min" offset="#Offset_Horizontal_PossibleUnitTileListItem"/>
+        </Frame>
+        
+        <Frame type="UnitCacheTileListItem" name="Item37" template="SkinPackLargeFormatUnitSelectionFrame/PossibleUnitCacheTileListItemTemplate">
+            <Anchor side="Bottom" relative="$parent/Item38" pos="Max" offset="0"/>
+            <Anchor side="Right" relative="$parent/Item38" pos="Min" offset="#Offset_Horizontal_PossibleUnitTileListItem"/>
+        </Frame>
+        
+        <Frame type="UnitCacheTileListItem" name="Item38" template="SkinPackLargeFormatUnitSelectionFrame/PossibleUnitCacheTileListItemTemplate">
+            <Anchor side="Bottom" relative="$parent/Item39" pos="Max" offset="0"/>
+            <Anchor side="Right" relative="$parent/Item39" pos="Min" offset="#Offset_Horizontal_PossibleUnitTileListItem"/>
+        </Frame>
+        
+        <Frame type="UnitCacheTileListItem" name="Item39" template="SkinPackLargeFormatUnitSelectionFrame/PossibleUnitCacheTileListItemTemplate">
+            <Anchor side="Bottom" relative="$parent/Item40" pos="Max" offset="0"/>
+            <Anchor side="Right" relative="$parent/Item40" pos="Min" offset="#Offset_Horizontal_PossibleUnitTileListItem"/>
+        </Frame>
+        
+        <Frame type="UnitCacheTileListItem" name="Item40" template="SkinPackLargeFormatUnitSelectionFrame/PossibleUnitCacheTileListItemTemplate">
+            <Anchor side="Bottom" relative="$parent/Item41" pos="Max" offset="0"/>
+            <Anchor side="Right" relative="$parent/Item41" pos="Min" offset="#Offset_Horizontal_PossibleUnitTileListItem"/>
+        </Frame>
+        
+        <Frame type="UnitCacheTileListItem" name="Item41" template="SkinPackLargeFormatUnitSelectionFrame/PossibleUnitCacheTileListItemTemplate">
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="-20"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="-20"/>
         </Frame>
     </Frame>
 
     <Frame type="TileList" name="LargeFormatSelectedUnitTileListTemplate">
         <Frame type="UnitCacheTileListItem" name="Item0" template="SkinPackLargeFormatUnitSelectionFrame/SelectedUnitCacheTileListItemTemplate">
-            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
-            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="18"/>
+            
+            <StateGroup name="EnabledState">
+                <DefaultState val="Enabled"/>
+                
+                <!--
+                <State name="Disabled_NoSkinsEquipped">
+                    <When type="Property" frame="$parent/Item0" unit=""/>
+                    <When type="Property" frame="$parent/$parent/PossibleUnitTileList" DataCount="0"/>
+                    <Action type="SetState" frame="$this" group="EnabledType" state="Disabled_NoSkinsEquipped"/>
+                </State>
+                -->
+                
+                <State name="Enabled">
+                    <Action type="SetState" frame="$this" group="EnabledType" state="Enabled"/>
+                </State>
+            </StateGroup>
         </Frame>
 
         <Frame type="UnitCacheTileListItem" name="Item1" template="SkinPackLargeFormatUnitSelectionFrame/SelectedUnitCacheTileListItemTemplate">
             <Anchor side="Top" relative="$parent/Item0" pos="Min" offset="0"/>
-            <Anchor side="Left" relative="$parent/Item0" pos="Max" offset="10"/>
+            <Anchor side="Left" relative="$parent/Item0" pos="Max" offset="7"/>
+            
+            <StateGroup name="EnabledState">
+                <DefaultState val="Enabled"/>
+                
+                <!--
+                <State name="Disabled_NoSkinsEquipped">
+                    <When type="Property" frame="$parent/Item0" unit=""/>
+                    <When type="Property" frame="$parent/$parent/PossibleUnitTileList" DataCount="0"/>
+                    <Action type="SetState" frame="$this" group="EnabledType" state="Disabled_NoSkinsEquipped"/>
+                </State>
+                
+                <State name="Disabled_AllEquippedSkinsInUse">
+                    <When type="Property" frame="$parent/Item0" operator="NotEqual" unit=""/>
+                    <When type="Property" frame="$parent/$parent/PossibleUnitTileList" DataCount="0"/>
+                    <Action type="SetState" frame="$this" group="EnabledType" state="Disabled_AllEquippedSkinsInUse"/>
+                </State>
+                -->
+                
+                <State name="Disabled_PreviousSlotEmpty">
+                    <When type="Property" frame="$parent/Item0" unit=""/>
+                    <Action type="SetState" frame="$this" group="EnabledType" state="Disabled_PreviousSlotEmpty"/>
+                </State>
+                
+                <State name="Enabled">
+                    <Action type="SetState" frame="$this" group="EnabledType" state="Enabled"/>
+                </State>
+            </StateGroup>
         </Frame>
 
         <Frame type="UnitCacheTileListItem" name="Item2" template="SkinPackLargeFormatUnitSelectionFrame/SelectedUnitCacheTileListItemTemplate">
             <Anchor side="Top" relative="$parent/Item1" pos="Min" offset="0"/>
-            <Anchor side="Left" relative="$parent/Item1" pos="Max" offset="10"/>
+            <Anchor side="Left" relative="$parent/Item1" pos="Max" offset="7"/>
+            
+            <StateGroup name="EnabledState">
+                <DefaultState val="Enabled"/>
+                
+                <!--
+                <State name="Disabled_NoSkinsEquipped">
+                    <When type="Property" frame="$parent/Item0" unit=""/>
+                    <When type="Property" frame="$parent/$parent/PossibleUnitTileList" DataCount="0"/>
+                    <Action type="SetState" frame="$this" group="EnabledType" state="Disabled_NoSkinsEquipped"/>
+                </State>
+                
+                <State name="Disabled_AllEquippedSkinsInUse">
+                    <When type="Property" frame="$parent/Item0" operator="NotEqual" unit=""/>
+                    <When type="Property" frame="$parent/$parent/PossibleUnitTileList" DataCount="0"/>
+                    <Action type="SetState" frame="$this" group="EnabledType" state="Disabled_AllEquippedSkinsInUse"/>
+                </State>
+                -->
+                
+                <State name="Disabled_PreviousSlotEmpty">
+                    <When type="Property" frame="$parent/Item1" unit=""/>
+                    <Action type="SetState" frame="$this" group="EnabledType" state="Disabled_PreviousSlotEmpty"/>
+                </State>
+                
+                <State name="Enabled">
+                    <Action type="SetState" frame="$this" group="EnabledType" state="Enabled"/>
+                </State>
+            </StateGroup>
         </Frame>
 
         <Frame type="UnitCacheTileListItem" name="Item3" template="SkinPackLargeFormatUnitSelectionFrame/SelectedUnitCacheTileListItemTemplate">
             <Anchor side="Top" relative="$parent/Item2" pos="Min" offset="0"/>
-            <Anchor side="Left" relative="$parent/Item2" pos="Max" offset="10"/>
+            <Anchor side="Left" relative="$parent/Item2" pos="Max" offset="7"/>
+            
+            <StateGroup name="EnabledState">
+                <DefaultState val="Enabled"/>
+                
+                <!--
+                <State name="Disabled_NoSkinsEquipped">
+                    <When type="Property" frame="$parent/Item0" unit=""/>
+                    <When type="Property" frame="$parent/$parent/PossibleUnitTileList" DataCount="0"/>
+                    <Action type="SetState" frame="$this" group="EnabledType" state="Disabled_NoSkinsEquipped"/>
+                </State>
+                
+                <State name="Disabled_AllEquippedSkinsInUse">
+                    <When type="Property" frame="$parent/Item0" operator="NotEqual" unit=""/>
+                    <When type="Property" frame="$parent/$parent/PossibleUnitTileList" DataCount="0"/>
+                    <Action type="SetState" frame="$this" group="EnabledType" state="Disabled_AllEquippedSkinsInUse"/>
+                </State>
+                -->
+                
+                <State name="Disabled_PreviousSlotEmpty">
+                    <When type="Property" frame="$parent/Item2" unit=""/>
+                    <Action type="SetState" frame="$this" group="EnabledType" state="Disabled_PreviousSlotEmpty"/>
+                </State>
+                
+                <State name="Enabled">
+                    <Action type="SetState" frame="$this" group="EnabledType" state="Enabled"/>
+                </State>
+            </StateGroup>
+        </Frame>
+        
+        <Frame type="Button" name="ReturnButton0">
+            <Anchor relative="$parent/Item0"/>
+            <Visible val="False"/>
+            
+            <Animation name="ClearSelection">
+                <Event event="OnClick" action="Reset,Play"/>
+
+                <Controller type="Property" frame="$parent" property="SelectedIndex" end="Pause">
+                    <Key type="Property" time="0" value="#InvalidTileListIndex"/>
+                </Controller>
+            </Animation>
+            
+            <StateGroup name="VisibleState">
+                <DefaultState val="NotVisible"/>
+                
+                <State name="Visible">
+                    <When type="StateGroup" frame="$parent/Item0" ReturnButtonVisibleState="Visible"/>
+                    <Action type="SetProperty" frame="$this" Visible="True"/>
+                </State>
+                
+                <State name="NotVisible">
+                    <Action type="SetProperty" frame="$this" Visible="False"/>
+                </State>
+            </StateGroup>
+        </Frame>
+        
+        <Frame type="Button" name="ReturnButton1">
+            <Anchor relative="$parent/Item1"/>
+            <Visible val="False"/>
+            
+            <Animation name="ClearSelection">
+                <Event event="OnClick" action="Reset,Play"/>
+
+                <Controller type="Property" frame="$parent" property="SelectedIndex" end="Pause">
+                    <Key type="Property" time="0" value="#InvalidTileListIndex"/>
+                </Controller>
+            </Animation>
+            
+            <StateGroup name="VisibleState">
+                <DefaultState val="NotVisible"/>
+                
+                <State name="Visible">
+                    <When type="StateGroup" frame="$parent/Item1" ReturnButtonVisibleState="Visible"/>
+                    <Action type="SetProperty" frame="$this" Visible="True"/>
+                </State>
+                
+                <State name="NotVisible">
+                    <Action type="SetProperty" frame="$this" Visible="False"/>
+                </State>
+            </StateGroup>
+        </Frame>
+        
+        <Frame type="Button" name="ReturnButton2">
+            <Anchor relative="$parent/Item2"/>
+            <Visible val="False"/>
+            
+            <Animation name="ClearSelection">
+                <Event event="OnClick" action="Reset,Play"/>
+
+                <Controller type="Property" frame="$parent" property="SelectedIndex" end="Pause">
+                    <Key type="Property" time="0" value="#InvalidTileListIndex"/>
+                </Controller>
+            </Animation>
+            
+            <StateGroup name="VisibleState">
+                <DefaultState val="NotVisible"/>
+                
+                <State name="Visible">
+                    <When type="StateGroup" frame="$parent/Item2" ReturnButtonVisibleState="Visible"/>
+                    <Action type="SetProperty" frame="$this" Visible="True"/>
+                </State>
+                
+                <State name="NotVisible">
+                    <Action type="SetProperty" frame="$this" Visible="False"/>
+                </State>
+            </StateGroup>
+        </Frame>
+        
+        <Frame type="Button" name="ReturnButton3">
+            <Anchor relative="$parent/Item3"/>
+            <Visible val="False"/>
+            
+            <Animation name="ClearSelection">
+                <Event event="OnClick" action="Reset,Play"/>
+
+                <Controller type="Property" frame="$parent" property="SelectedIndex" end="Pause">
+                    <Key type="Property" time="0" value="#InvalidTileListIndex"/>
+                </Controller>
+            </Animation>
+            
+            <StateGroup name="VisibleState">
+                <DefaultState val="NotVisible"/>
+                
+                <State name="Visible">
+                    <When type="StateGroup" frame="$parent/Item3" ReturnButtonVisibleState="Visible"/>
+                    <Action type="SetProperty" frame="$this" Visible="True"/>
+                </State>
+                
+                <State name="NotVisible">
+                    <Action type="SetProperty" frame="$this" Visible="False"/>
+                </State>
+            </StateGroup>
         </Frame>
     </Frame>
 
     <Frame type="SkinPackLargeFormatUnitSelectionFrame" name="SkinPackLargeFormatUnitSelectionFrameTemplate">
+    
         <Frame type="Control" name="ClickFrame">
             <Anchor side="Top" relative="$GlueUI" pos="Min" offset="0"/>
             <Anchor side="Bottom" relative="$GlueUI" pos="Max" offset="0"/>
@@ -211,16 +1025,50 @@
                 </Controller>
             </Animation>
         </Frame>
+        
+        <Frame type="Image" name="SectionBreakLine">
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="-163"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="8"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="-8"/>
+            <Height val="2"/>
+            <Texture val="Assets/Textures/White.dds"/>
+            <Color val="33,49,75"/>
+        </Frame>
+        
+        <Frame type="Image" name="SectionBreakGradient">
+            <Anchor side="Top" relative="$parent/SectionBreakLine" pos="Max" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="8"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="-8"/>
+            <Height val="60"/>
+            <Texture val="@UI/SC2_UI_Collection_Bundle_Skin_LineFade"/>
+            <TextureCoords top=".45" left="0" bottom="1" right="1"/>
+            <Color val="45,112,168"/>
+            <Alpha val="51"/>
+        </Frame>
 
         <Frame type="Label" name="TitleLabel">
-            <Anchor side="Bottom" relative="$parent/SelectedUnitTileList" pos="Min" offset="0"/>
-            <Anchor side="Left" relative="$parent/SelectedUnitTileList" pos="Min" offset="0"/>
-            <Text val="PH- Large Format Skins"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="-117"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="23"/>
+            <Anchor side="Right" relative="$parent/InfoIcon" pos="Min" offset="-15"/>
+            <Style val="@Collection_Skins_LargeFormatGames_Header"/>
+            <Text val="@UI/ScreenCollection/Skins/LargeFormatWidgetTitle"/>
+        </Frame>
+        
+        <Frame type="Image" name="InfoIcon">
+            <Anchor side="Top" relative="$parent/TitleLabel" pos="Mid" offset="-2"/>
+            <Anchor side="Bottom" relative="$parent/TitleLabel" pos="Mid" offset="-2"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="-23"/>
+            <Handle val="LargeFormatGamesInfoIcon"/>
+            <Width val="25"/>
+            <Height val="25"/>
+            <Texture val="@UI/Glues_Icons_GenericInfo"/>
+            <AcceptsMouse val="True"/>
+            <Tooltip val="@UI/ScreenCollection/Skins/LargeFormatInfoTooltip"/>
         </Frame>
 
         <Frame type="TileList" name="PossibleUnitTileList" template="SkinPackLargeFormatUnitSelectionFrame/LargeFormatPossibleUnitTileListTemplate">
-            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
-            <Anchor side="Bottom" relative="$parent/SelectedUnitTileList" pos="Min" offset="-10"/>
+            <Anchor side="Top" relative="$this/SelectionTitleLabel" pos="Min" offset="-19"/>
+            <Anchor side="Bottom" relative="$parent/SelectedUnitTileList" pos="Min" offset="0"/>
             <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
             <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
         </Frame>
@@ -228,10 +1076,44 @@
         <Frame type="TileList" name="SelectedUnitTileList" template="SkinPackLargeFormatUnitSelectionFrame/LargeFormatSelectedUnitTileListTemplate">
             <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
             <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
-            <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
-            <Height val="80"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="-18"/>
+            <Height val="89"/>
         </Frame>
 
+        <StateGroup name="PossibleUnitTileListVisibility">
+            <DefaultState val="NoSelectedItem"/>
+
+            <State name="SelectedItem0">
+                <When type="Property" frame="SelectedUnitTileList/Item0" Selected="True"/>
+                <Action type="SetProperty" frame="ClickFrame" visible="true"/>
+                <Action type="SetProperty" frame="PossibleUnitTileList" visible="true"/>
+            </State>
+
+            <State name="SelectedItem1">
+                <When type="Property" frame="SelectedUnitTileList/Item1" Selected="True"/>
+                <Action type="SetProperty" frame="ClickFrame" visible="true"/>
+                <Action type="SetProperty" frame="PossibleUnitTileList" visible="true"/>
+            </State>
+
+            <State name="SelectedItem2">
+                <When type="Property" frame="SelectedUnitTileList/Item2" Selected="True"/>
+                <Action type="SetProperty" frame="ClickFrame" visible="true"/>
+                <Action type="SetProperty" frame="PossibleUnitTileList" visible="true"/>
+            </State>
+
+            <State name="SelectedItem3">
+                <When type="Property" frame="SelectedUnitTileList/Item3" Selected="True"/>
+                <Action type="SetProperty" frame="ClickFrame" visible="true"/>
+                <Action type="SetProperty" frame="PossibleUnitTileList" visible="true"/>
+            </State>
+
+            <State name="NoSelectedItem">
+                <Action type="SetProperty" frame="ClickFrame" visible="false"/>
+                <Action type="SetProperty" frame="PossibleUnitTileList" visible="false"/>
+            </State>
+        </StateGroup>
+
+        <!--
         <StateGroup name="SelectedUnitSelectedStateGroup">
             <DefaultState val="SelectedUnitNotSelected"/>
 
@@ -246,5 +1128,6 @@
                 <Action type="SetProperty" frame="PossibleUnitTileList" visible="false"/>
             </State>
         </StateGroup>
+        -->
     </Frame>
 </Desc>

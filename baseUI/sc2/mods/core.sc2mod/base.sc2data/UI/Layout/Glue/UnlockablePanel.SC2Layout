@@ -259,58 +259,66 @@
             <AcceptsMouseTooltip val="True"/>
             
             <StateGroup name="TitleTextStates">
-                <DefaultState val="NormalState"/>
-            
-                <State name="ToggledState">
+                <DefaultState val="NormalStateUnequipped"/>
+                
+                <!-- The first two states are here to deal with a problem where animations cannot be equipped but one is equipped by default anyways, just making the item look normal in that case -->
+                <State name="ToggledStateEquippedAnimations">
                     <When type="Property" frame="$parent/SelectedImage" visible="True"/>
+                    <When type="AnimationState" frame="$parent" SelectedState="Selected"/>
+                    <When type="StateGroup" frame="$parent/UnlockableFrame" UnlockableTypeStateGroup="Animations"/>
                     <Action type="SetProperty" frame="$this" Style="@Collection_SelectionItem_Name_Highlight"/>
                 </State>
                 
-                <State name="HoverState">
+                <State name="NormalStateEquippedAnimations">
+                    <When type="Property" frame="$parent/SelectedImage" visible="False"/>
+                    <When type="AnimationState" frame="$parent" SelectedState="Selected"/>
+                    <When type="StateGroup" frame="$parent/UnlockableFrame" UnlockableTypeStateGroup="Animations"/>
+                    <Action type="SetProperty" frame="$this" Style="@Collection_SelectionItem_Name_Normal"/>
+                </State>
+            
+                <State name="ToggledStateUnequipped">
+                    <When type="Property" frame="$parent/SelectedImage" visible="True"/>
+                    <When type="AnimationState" frame="$parent" SelectedState="Deselected"/>
+                    <Action type="SetProperty" frame="$this" Style="@Collection_SelectionItem_Name_Highlight"/>
+                </State>
+                
+                <State name="HoverStateUnequipped">
                     <When type="Property" frame="$parent/HoverImage" visible="True"/>
+                    <When type="AnimationState" frame="$parent" SelectedState="Deselected"/>
                     <Action type="SetProperty" frame="$this" Style="@Collection_SelectionItem_Name_Highlight"/>
                 </State>
         
-                <State name="LockedState">
+                <State name="LockedStateUnequipped">
                     <When type="AnimationState" frame="$parent" LockedState="Locked"/>
+                    <When type="AnimationState" frame="$parent" SelectedState="Deselected"/>
                     <Action type="SetProperty" frame="$this" Style="@Collection_SelectionItem_Name_Disabled"/>
                 </State>
 
-                <State name="NormalState">
+                <State name="NormalStateUnequipped">
+                    <When type="AnimationState" frame="$parent" SelectedState="Deselected"/>
                     <Action type="SetProperty" frame="$this" Style="@Collection_SelectionItem_Name_Normal"/>
                 </State>
-            </StateGroup>
-        </Frame>
-        
-        <Frame type="Label" name="EquippedTitleLabel">
-            <Anchor side="Top" relative="$parent/UnlockableFrame" pos="Max" offset="0"/>
-            <Anchor side="Bottom" relative="$parent" pos="Max" offset="-10"/>
-            <Anchor side="Left" relative="$parent" pos="Min" offset="16"/>
-            <Anchor side="Right" relative="$parent" pos="Max" offset="-16"/>
-            <Style val="@Collection_SelectionItem_Name_Normal"/>
-            <Options val="Ellipsis | TooltipIfTruncated"/>
-            <AcceptsMouseTooltip val="True"/>
-            <Text val="{$parent/TitleLabel/@Text}"/>
-            
-            <StateGroup name="TitleTextStates">
-                <DefaultState val="NormalState"/>
-            
-                <State name="ToggledState">
+                
+                <State name="ToggledStateEquipped">
                     <When type="Property" frame="$parent/SelectedImage" visible="True"/>
+                    <When type="AnimationState" frame="$parent" SelectedState="Selected"/>
                     <Action type="SetProperty" frame="$this" Style="@Collection_SelectionItem_NameEquipped_Highlight"/>
                 </State>
                 
-                <State name="HoverState">
+                <State name="HoverStateEquipped">
                     <When type="Property" frame="$parent/HoverImage" visible="True"/>
+                    <When type="AnimationState" frame="$parent" SelectedState="Selected"/>
                     <Action type="SetProperty" frame="$this" Style="@Collection_SelectionItem_NameEquipped_Highlight"/>
                 </State>
         
-                <State name="LockedState">
+                <State name="LockedStateEquipped">
                     <When type="AnimationState" frame="$parent" LockedState="Locked"/>
+                    <When type="AnimationState" frame="$parent" SelectedState="Selected"/>
                     <Action type="SetProperty" frame="$this" Style="@Collection_SelectionItem_NameEquipped_Disabled"/>
                 </State>
 
-                <State name="NormalState">
+                <State name="NormalStateEquipped">
+                    <When type="AnimationState" frame="$parent" SelectedState="Selected"/>
                     <Action type="SetProperty" frame="$this" Style="@Collection_SelectionItem_NameEquipped_Normal"/>
                 </State>
             </StateGroup>
@@ -385,16 +393,12 @@
                 <When type="Property" frame="$parent/$parent/AnimationsActive" visible="False"/>
                 <Action type="SetProperty" frame="CheckMarkImage" Visible="true"/>
                 <Action type="SetProperty" frame="EquippedBorder" Visible="true"/>
-                <Action type="SetProperty" frame="EquippedTitleLabel" Visible="true"/>
-                <Action type="SetProperty" frame="TitleLabel" Visible="false"/>
             </State>
 
             <State name="DeselectedState">
                 <When type="AnimationState" frame="$this" SelectedState="Deselected"/>
                 <Action type="SetProperty" frame="CheckMarkImage" Visible="false"/>
                 <Action type="SetProperty" frame="EquippedBorder" Visible="false"/>
-                <Action type="SetProperty" frame="EquippedTitleLabel" Visible="false"/>
-                <Action type="SetProperty" frame="TitleLabel" Visible="true"/>
             </State>
         </StateGroup>
         

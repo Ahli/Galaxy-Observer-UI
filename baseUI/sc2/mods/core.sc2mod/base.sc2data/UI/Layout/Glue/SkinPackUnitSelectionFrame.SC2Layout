@@ -113,50 +113,10 @@
                 </State>
             </StateGroup>
         </Frame>
-
-        <Frame type="Image" name="CheckMarkImage">
-            <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
-            <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
-            <Anchor side="Right" relative="$parent" pos="Max" offset="-6"/>
-            <Texture val="@UI/Glues_Icons_LargeFormatGame_Normal"/>
-            
-            <StateGroup name="IconStates">
-                <DefaultState val="NormalState"/>
-            
-                <State name="ToggledState">
-                    <When type="Property" frame="$parent/SelectedImage" visible="True"/>
-                    <Action type="SetProperty" frame="$this" texture="@UI/Glues_Icons_LargeFormatGame_Highlight"/>
-                </State>
-                
-                <State name="HoverState">
-                    <When type="Property" frame="$parent/HoverImage" visible="True"/>
-                    <Action type="SetProperty" frame="$this" texture="@UI/Glues_Icons_LargeFormatGame_Highlight"/>
-                </State>
-
-                <State name="NormalState">
-                    <Action type="SetProperty" frame="$this" texture="@UI/Glues_Icons_LargeFormatGame_Normal"/>
-                </State>
-            </StateGroup>
-        </Frame>
-
-        <StateGroup name="IsLargeFormatStateGroup">
-            <DefaultState val="NotLargeFormat"/>
-
-            <State name="IsLargeFormat">
-                <When type="Property" frame="$this" IsLargeFormat="true"/>
-                <Action type="SetProperty" frame="CheckMarkImage" visible="true"/>
-            </State>
-
-            <State name="NotLargeFormat">
-                <Action type="SetProperty" frame="CheckMarkImage" visible="false"/>
-            </State>
-        </StateGroup>
     </Frame>
 
     <Frame type="TileList" name="UnitTileListTemplate">
         <Width val="517"/>
-        <!-- Different height when we have large format selection -->
-        <!--<Height val="601"/>-->
         <Height val="681"/>
         <AcceptsMouse val="true"/>
         <RequireSelection val="true"/>
@@ -223,25 +183,10 @@
             <Anchor side="Left" relative="$parent/Item7" pos="Min" offset="0"/>
         </Frame>
 
-        <Frame type="SkinPackUnitCacheTileListItem" name="Item9" template="SkinPackUnitSelectionFrame/SkinPackUnitCacheTileListItemTemplate">
-            <Anchor side="Top" relative="$parent/Item8" pos="Max" offset="5"/>
-            <Anchor side="Left" relative="$parent/Item8" pos="Min" offset="0"/>
-        </Frame>
-
-        <Frame type="SkinPackUnitCacheTileListItem" name="Item10" template="SkinPackUnitSelectionFrame/SkinPackUnitCacheTileListItemTemplate">
-            <Anchor side="Top" relative="$parent/Item9" pos="Max" offset="5"/>
-            <Anchor side="Left" relative="$parent/Item9" pos="Min" offset="0"/>
-        </Frame>
-
-        <Frame type="SkinPackUnitCacheTileListItem" name="Item11" template="SkinPackUnitSelectionFrame/SkinPackUnitCacheTileListItemTemplate">
-            <Anchor side="Top" relative="$parent/Item10" pos="Max" offset="5"/>
-            <Anchor side="Left" relative="$parent/Item10" pos="Min" offset="0"/>
-        </Frame>
-
         <Frame type="ScrollBar" name="ScrollBar" template="CollectionTemplates/ScrollBarTemplate">
             <Anchor side="Top" relative="$parent" pos="Min" offset="-4"/>
             <Anchor side="Right" relative="$parent" pos="Max" offset="-12"/>
-            <Anchor side="Bottom" relative="$parent" pos="Max" offset="-1"/>
+            <Anchor side="Bottom" relative="$parent/Item8" pos="Max" offset="0"/>
         </Frame>
     </Frame>
 
@@ -479,6 +424,15 @@
             <Camera val="{$parent/SkinCacheFrame/@Camera}"/>
             <Rotation val="{$parent/SkinCacheFrame/@Rotation}"/>
             <TurningEnabled val="True"/>
+            
+            <Animation name="HellionStart">
+                <Event event="HellionStart" frame="$this" action="Reset,Play"/>
+                
+                <Controller type="ActorMsg" end="Loop">
+                    <Key type="Identifier" time="5" value="Signal Interact"/>
+                    <Key type="Identifier" time="10" value=""/>
+                </Controller>
+            </Animation>
 
             <Frame type="Model" name="Model">
                 <Anchor relative="$parent"/>
@@ -790,103 +744,148 @@
             </State>
         </StateGroup>
         
-        <StateGroup name="UnitStateGroup">
+        <StateGroup name="SelectedUnit">
         
             <!-- TERRAN -->
             <State name="Ghost">
                 <When type="Property" frame="$UnitSkinSelectionFrame" Unit="Ghost"/>
-                <Action type="SendEvent" frame="$this" event="Ghost"/>
+                <Action type="SetAnchor" frame="$this/UnitModelFrame/Model" side="Top" relative="$parent" pos="Min" offset="0"/>
+                <Action type="SetAnchor" frame="$this/UnitModelFrame/Model" side="Bottom" relative="$parent" pos="Max" offset="100"/>
+                <Action type="SetAnchor" frame="$this/UnitModelFrame/Model" side="Left" relative="$parent" pos="Min" offset="-90"/>
+                <Action type="SetAnchor" frame="$this/UnitModelFrame/Model" side="Right" relative="$parent" pos="Max" offset="90"/>
+            </State>
+            
+            <State name="Hellion">
+                <When type="Property" frame="$UnitSkinSelectionFrame" Unit="Hellion"/>
+                <Action type="SetAnchor" frame="$this/UnitModelFrame/Model" side="Top" relative="$parent" pos="Min" offset="-80"/>
+                <Action type="SetAnchor" frame="$this/UnitModelFrame/Model" side="Bottom" relative="$parent" pos="Max" offset="140"/>
+                <Action type="SetAnchor" frame="$this/UnitModelFrame/Model" side="Left" relative="$parent" pos="Min" offset="-120"/>
+                <Action type="SetAnchor" frame="$this/UnitModelFrame/Model" side="Right" relative="$parent" pos="Max" offset="120"/>
+                <Action type="SendEvent" frame="$this/UnitModelFrame" event="HellionStart"/>
             </State>
             
             <State name="Marauder">
                 <When type="Property" frame="$UnitSkinSelectionFrame" Unit="Marauder"/>
-                <Action type="SendEvent" frame="$this" event="Marauder"/>
+                <Action type="SetAnchor" frame="$this/UnitModelFrame/Model" side="Top" relative="$parent" pos="Min" offset="0"/>
+                <Action type="SetAnchor" frame="$this/UnitModelFrame/Model" side="Bottom" relative="$parent" pos="Max" offset="80"/>
+                <Action type="SetAnchor" frame="$this/UnitModelFrame/Model" side="Left" relative="$parent" pos="Min" offset="-40"/>
+                <Action type="SetAnchor" frame="$this/UnitModelFrame/Model" side="Right" relative="$parent" pos="Max" offset="40"/>
             </State>
             
             <State name="Marine">
                 <When type="Property" frame="$UnitSkinSelectionFrame" Unit="Marine"/>
-                <Action type="SendEvent" frame="$this" event="Marine"/>
+                <Action type="SetAnchor" frame="$this/UnitModelFrame/Model" side="Top" relative="$parent" pos="Min" offset="0"/>
+                <Action type="SetAnchor" frame="$this/UnitModelFrame/Model" side="Bottom" relative="$parent" pos="Max" offset="40"/>
+                <Action type="SetAnchor" frame="$this/UnitModelFrame/Model" side="Left" relative="$parent" pos="Min" offset="-30"/>
+                <Action type="SetAnchor" frame="$this/UnitModelFrame/Model" side="Right" relative="$parent" pos="Max" offset="30"/>
             </State>
             
             <State name="SupplyDepot">
                 <When type="Property" frame="$UnitSkinSelectionFrame" Unit="SupplyDepot"/>
-                <Action type="SendEvent" frame="$this" event="SupplyDepot"/>
+                <Action type="SetAnchor" frame="$this/UnitModelFrame/Model" side="Top" relative="$parent" pos="Min" offset="0"/>
+                <Action type="SetAnchor" frame="$this/UnitModelFrame/Model" side="Bottom" relative="$parent" pos="Max" offset="0"/>
+                <Action type="SetAnchor" frame="$this/UnitModelFrame/Model" side="Left" relative="$parent" pos="Min" offset="-20"/>
+                <Action type="SetAnchor" frame="$this/UnitModelFrame/Model" side="Right" relative="$parent" pos="Max" offset="20"/>
             </State>
             
             <State name="Thor">
                 <When type="Property" frame="$UnitSkinSelectionFrame" Unit="Thor"/>
-                <Action type="SendEvent" frame="$this" event="Thor"/>
+                <Action type="SetAnchor" frame="$this/UnitModelFrame/Model" side="Top" relative="$parent" pos="Min" offset="0"/>
+                <Action type="SetAnchor" frame="$this/UnitModelFrame/Model" side="Bottom" relative="$parent" pos="Max" offset="45"/>
+                <Action type="SetAnchor" frame="$this/UnitModelFrame/Model" side="Left" relative="$parent" pos="Min" offset="-30"/>
+                <Action type="SetAnchor" frame="$this/UnitModelFrame/Model" side="Right" relative="$parent" pos="Max" offset="30"/>
             </State>
             
             <!-- ZERG -->
             <State name="Overlord">
                 <When type="Property" frame="$UnitSkinSelectionFrame" Unit="Overlord"/>
-                <Action type="SendEvent" frame="$this" event="Overlord"/>
+                <Action type="SetAnchor" frame="$this/UnitModelFrame/Model" side="Top" relative="$parent" pos="Min" offset="0"/>
+                <Action type="SetAnchor" frame="$this/UnitModelFrame/Model" side="Bottom" relative="$parent" pos="Max" offset="80"/>
+                <Action type="SetAnchor" frame="$this/UnitModelFrame/Model" side="Left" relative="$parent" pos="Min" offset="-30"/>
+                <Action type="SetAnchor" frame="$this/UnitModelFrame/Model" side="Right" relative="$parent" pos="Max" offset="30"/>
+            </State>
+            
+            <State name="Ravager">
+                <When type="Property" frame="$UnitSkinSelectionFrame" Unit="Ravager"/>
+                <Action type="SetAnchor" frame="$this/UnitModelFrame/Model" side="Top" relative="$parent" pos="Min" offset="0"/>
+                <Action type="SetAnchor" frame="$this/UnitModelFrame/Model" side="Bottom" relative="$parent" pos="Max" offset="60"/>
+                <Action type="SetAnchor" frame="$this/UnitModelFrame/Model" side="Left" relative="$parent" pos="Min" offset="-160"/>
+                <Action type="SetAnchor" frame="$this/UnitModelFrame/Model" side="Right" relative="$parent" pos="Max" offset="160"/>
             </State>
             
             <State name="Roach">
                 <When type="Property" frame="$UnitSkinSelectionFrame" Unit="Roach"/>
-                <Action type="SendEvent" frame="$this" event="Roach"/>
+                <Action type="SetAnchor" frame="$this/UnitModelFrame/Model" side="Top" relative="$parent" pos="Min" offset="0"/>
+                <Action type="SetAnchor" frame="$this/UnitModelFrame/Model" side="Bottom" relative="$parent" pos="Max" offset="15"/>
+                <Action type="SetAnchor" frame="$this/UnitModelFrame/Model" side="Left" relative="$parent" pos="Min" offset="-30"/>
+                <Action type="SetAnchor" frame="$this/UnitModelFrame/Model" side="Right" relative="$parent" pos="Max" offset="30"/>
             </State>
             
             <State name="Ultralisk">
                 <When type="Property" frame="$UnitSkinSelectionFrame" Unit="Ultralisk"/>
-                <Action type="SendEvent" frame="$this" event="Ultralisk"/>
+                <Action type="SetAnchor" frame="$this/UnitModelFrame/Model" side="Top" relative="$parent" pos="Min" offset="0"/>
+                <Action type="SetAnchor" frame="$this/UnitModelFrame/Model" side="Bottom" relative="$parent" pos="Max" offset="50"/>
+                <Action type="SetAnchor" frame="$this/UnitModelFrame/Model" side="Left" relative="$parent" pos="Min" offset="-30"/>
+                <Action type="SetAnchor" frame="$this/UnitModelFrame/Model" side="Right" relative="$parent" pos="Max" offset="30"/>
             </State>
             
             <State name="Zergling">
                 <When type="Property" frame="$UnitSkinSelectionFrame" Unit="Zergling"/>
-                <Action type="SendEvent" frame="$this" event="Zergling"/>
+                <Action type="SetAnchor" frame="$this/UnitModelFrame/Model" side="Top" relative="$parent" pos="Min" offset="0"/>
+                <Action type="SetAnchor" frame="$this/UnitModelFrame/Model" side="Bottom" relative="$parent" pos="Max" offset="0"/>
+                <Action type="SetAnchor" frame="$this/UnitModelFrame/Model" side="Left" relative="$parent" pos="Min" offset="-30"/>
+                <Action type="SetAnchor" frame="$this/UnitModelFrame/Model" side="Right" relative="$parent" pos="Max" offset="30"/>
             </State>
             
             <!-- PROTOSS -->
             <State name="Adept">
                 <When type="Property" frame="$UnitSkinSelectionFrame" Unit="Adept"/>
-                <Action type="SendEvent" frame="$this" event="Adept"/>
+                <Action type="SetAnchor" frame="$this/UnitModelFrame/Model" side="Top" relative="$parent" pos="Min" offset="0"/>
+                <Action type="SetAnchor" frame="$this/UnitModelFrame/Model" side="Bottom" relative="$parent" pos="Max" offset="110"/>
+                <Action type="SetAnchor" frame="$this/UnitModelFrame/Model" side="Left" relative="$parent" pos="Min" offset="-65"/>
+                <Action type="SetAnchor" frame="$this/UnitModelFrame/Model" side="Right" relative="$parent" pos="Max" offset="65"/>
             </State>
             
             <State name="Colossus">
                 <When type="Property" frame="$UnitSkinSelectionFrame" Unit="Colossus"/>
-                <Action type="SendEvent" frame="$this" event="Colossus"/>
+                <Action type="SetAnchor" frame="$this/UnitModelFrame/Model" side="Top" relative="$parent" pos="Min" offset="0"/>
+                <Action type="SetAnchor" frame="$this/UnitModelFrame/Model" side="Bottom" relative="$parent" pos="Max" offset="170"/>
+                <Action type="SetAnchor" frame="$this/UnitModelFrame/Model" side="Left" relative="$parent" pos="Min" offset="-70"/>
+                <Action type="SetAnchor" frame="$this/UnitModelFrame/Model" side="Right" relative="$parent" pos="Max" offset="70"/>
+            </State>
+            
+            <State name="Immortal">
+                <When type="Property" frame="$UnitSkinSelectionFrame" Unit="Immortal"/>
+                <Action type="SetAnchor" frame="$this/UnitModelFrame/Model" side="Top" relative="$parent" pos="Min" offset="0"/>
+                <Action type="SetAnchor" frame="$this/UnitModelFrame/Model" side="Bottom" relative="$parent" pos="Max" offset="30"/>
+                <Action type="SetAnchor" frame="$this/UnitModelFrame/Model" side="Left" relative="$parent" pos="Min" offset="-150"/>
+                <Action type="SetAnchor" frame="$this/UnitModelFrame/Model" side="Right" relative="$parent" pos="Max" offset="150"/>
             </State>
             
             <State name="Pylon">
                 <When type="Property" frame="$UnitSkinSelectionFrame" Unit="Pylon"/>
-                <Action type="SendEvent" frame="$this" event="Pylon"/>
+                <Action type="SetAnchor" frame="$this/UnitModelFrame/Model" side="Top" relative="$parent" pos="Min" offset="0"/>
+                <Action type="SetAnchor" frame="$this/UnitModelFrame/Model" side="Bottom" relative="$parent" pos="Max" offset="80"/>
+                <Action type="SetAnchor" frame="$this/UnitModelFrame/Model" side="Left" relative="$parent" pos="Min" offset="-40"/>
+                <Action type="SetAnchor" frame="$this/UnitModelFrame/Model" side="Right" relative="$parent" pos="Max" offset="40"/>
             </State>
             
             <State name="Stalker">
                 <When type="Property" frame="$UnitSkinSelectionFrame" Unit="Stalker"/>
-                <Action type="SendEvent" frame="$this" event="Stalker"/>
+                <Action type="SetAnchor" frame="$this/UnitModelFrame/Model" side="Top" relative="$parent" pos="Min" offset="0"/>
+                <Action type="SetAnchor" frame="$this/UnitModelFrame/Model" side="Bottom" relative="$parent" pos="Max" offset="110"/>
+                <Action type="SetAnchor" frame="$this/UnitModelFrame/Model" side="Left" relative="$parent" pos="Min" offset="-70"/>
+                <Action type="SetAnchor" frame="$this/UnitModelFrame/Model" side="Right" relative="$parent" pos="Max" offset="70"/>
             </State>
             
             <State name="Zealot">
                 <When type="Property" frame="$UnitSkinSelectionFrame" Unit="Zealot"/>
-                <Action type="SendEvent" frame="$this" event="Zealot"/>
+                <Action type="SetAnchor" frame="$this/UnitModelFrame/Model" side="Top" relative="$parent" pos="Min" offset="0"/>
+                <Action type="SetAnchor" frame="$this/UnitModelFrame/Model" side="Bottom" relative="$parent" pos="Max" offset="70"/>
+                <Action type="SetAnchor" frame="$this/UnitModelFrame/Model" side="Left" relative="$parent" pos="Min" offset="-50"/>
+                <Action type="SetAnchor" frame="$this/UnitModelFrame/Model" side="Right" relative="$parent" pos="Max" offset="50"/>
             </State>
         </StateGroup>
-        
-        <!-- UNIT ANIMATIONS -->
-        
-        <!-- Terran -->
-        <Animation name="Ghost" template="SkinPackUnitAnimationTemplates/Ghost"/>
-        <Animation name="Marauder" template="SkinPackUnitAnimationTemplates/Marauder"/>
-        <Animation name="Marine" template="SkinPackUnitAnimationTemplates/Marine"/>
-        <Animation name="SupplyDepot" template="SkinPackUnitAnimationTemplates/SupplyDepot"/>
-        <Animation name="Thor" template="SkinPackUnitAnimationTemplates/Thor"/>
-        
-        <!-- Zerg -->
-        <Animation name="Overlord" template="SkinPackUnitAnimationTemplates/Overlord"/>
-        <Animation name="Roach" template="SkinPackUnitAnimationTemplates/Roach"/>
-        <Animation name="Ultralisk" template="SkinPackUnitAnimationTemplates/Ultralisk"/>
-        <Animation name="Zergling" template="SkinPackUnitAnimationTemplates/Zergling"/>
-        
-        <!-- Protoss -->
-        <Animation name="Adept" template="SkinPackUnitAnimationTemplates/Adept"/>
-        <Animation name="Colossus" template="SkinPackUnitAnimationTemplates/Colossus"/>
-        <Animation name="Pylon" template="SkinPackUnitAnimationTemplates/Pylon"/>
-        <Animation name="Stalker" template="SkinPackUnitAnimationTemplates/Stalker"/>
-        <Animation name="Zealot" template="SkinPackUnitAnimationTemplates/Zealot"/>
     </Frame>
 
     <Frame type="TileList" name="SkinTileListTemplate">
@@ -1069,15 +1068,11 @@
 
         <Frame type="SkinPackLargeFormatUnitSelectionFrame" name="LargeFormatUnitSelectionFrame" template="SkinPackLargeFormatUnitSelectionFrame/SkinPackLargeFormatUnitSelectionFrameTemplate">
             <Anchor side="Top" relative="$parent/UnitTileList" pos="Min" offset="0"/>
-            <Anchor side="Bottom" relative="$parent/UnitTileList" pos="Max" offset="80"/>
+            <Anchor side="Bottom" relative="$parent/UnitTileList" pos="Max" offset="0"/>
             <Anchor side="Left" relative="$parent/UnitTileList" pos="Min" offset="0"/>
             <Anchor side="Right" relative="$parent/UnitTileList" pos="Max" offset="0"/>
             <PresenceId val="{$BattleUI/@LocalToonPresenceId}"/>
             <Race val="{$parent/RaceTabControl/@SelectedRace}"/>
-            <!-- Remove once we have large format selection -->
-            <Visible val="false"/>
-            <!-- Also add this to RewardData.xml -->
-            <!-- <Flags index="ExcludeInLargeFormatGame" value="1"/> -->
         </Frame>
     </Frame>
 </Desc>
