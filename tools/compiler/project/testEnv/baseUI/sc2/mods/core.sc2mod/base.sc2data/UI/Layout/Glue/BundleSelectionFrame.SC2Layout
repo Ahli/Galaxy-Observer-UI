@@ -2,8 +2,8 @@
 <Desc>
     <DescFlags val="Locked"/>
 
-    <Constant name="TileListItemHeight" val="676"/>
-    <Constant name="TileListItemWidth" val="511"/>
+    <Constant name="TileListItemHeight" val="674"/>
+    <Constant name="TileListItemWidth" val="510"/>
 
     <Constant name="TileListItemSmallHeight" val="333"/>
     <Constant name="TileListItemSmallWidth" val="250"/>
@@ -17,6 +17,7 @@
     <Frame type="BundleTileListItem" name="BundleTileListItemTemplate">
         <Height val="#TileListItemHeight"/>
         <Width val="#TileListItemWidth"/>
+        <HideWhenCleared val="False"/>
         
         <Animation name="ClickSound">
             <Event event="OnClick" action="Reset,Play"/>
@@ -32,6 +33,48 @@
                 <Key type="Sound" time="0" sound="@UI_Large_MouseOver"/>
             </Controller>
         </Animation>
+        
+        <!-- Base States -->
+        <StateGroup name="ItemTypeState">
+            <State name="Empty">
+                <When type="Property" frame="$this" HasData="False"/>
+            </State>
+            <State name="IndividualItem">
+                <When type="Property" frame="$this/BundleCacheFrame" ProductCount="1"/>
+            </State>
+            <State name="DynamicBundle">
+                <When type="Property" frame="$this/BundleCacheFrame" ShowDynamicBundle="True"/>
+            </State>
+            <State name="StandardBundle">
+                <When type="Property" frame="$this/GameContentFrame" IsBundle="True"/>
+                <When type="Property" frame="$this/BundleCacheFrame" ShowDynamicBundle="False"/>
+            </State>
+        </StateGroup>
+        
+        <StateGroup name="ItemOwnedState">
+            <State name="Purchased">
+                <When type="Property" frame="$this/GameContentFrame" IsPurchased="True"/>
+            </State>
+            <State name="NotPurchased">
+                <When type="Property" frame="$this/GameContentFrame" IsPurchased="False"/>
+            </State>
+        </StateGroup>
+        
+        <Frame type="BundleCacheFrame" name="BundleCacheFrame">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+            <Bundle val="{$parent/@Bundle}"/>
+        </Frame>
+
+        <Frame type="GameContentFrame" name="GameContentFrame">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+            <GameContent val="{$parent/BundleCacheFrame/@GameContent}"/>
+        </Frame>
 
         <Frame type="BlurFrame" name="BackgroundBlur">
             <Anchor side="Top" relative="$parent/NormalImage" pos="Min" offset="8"/>
@@ -59,24 +102,40 @@
             <Texture val="@UI/SC2_UI_Collection_StandardItemFrame_Hover"/>
             <TextureType val="NineSlice"/>
         </Frame>
-
-        <Frame type="Image" name="HoverGlow">
-            <Anchor side="Bottom" relative="$parent" pos="Max" offset="-12"/>
-            <Anchor side="Left" relative="$parent" pos="Min" offset="12"/>
-            <Anchor side="Right" relative="$parent" pos="Max" offset="-12"/>
-            <Height val="102"/>
-            <Texture val="@UI/SC2_UI_Collection_StandardItemFrame_InnerGlowEndCap"/>
-            <TextureType val="EndCap"/>
-            <Visible val="{$parent/HoverImage/@Visible}"/>
-        </Frame>
-
+        
         <Frame type="Image" name="SelectedImage">
             <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
             <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
             <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
             <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
-            <Texture val="@UI/SC2_UI_Collection_StandardItemFrame_Toggled"/>
+            <Texture val="@UI/SC2_UI_Collection_StandardItemFrame_Normal"/>
             <TextureType val="NineSlice"/>
+            <Alpha val="0"/>
+        </Frame>
+        
+        <Frame type="Image" name="SelectedImageFake">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+            <Texture val="@UI/SC2_UI_Collection_StandardItemFrame_Normal"/>
+            <TextureType val="NineSlice"/>
+            <Alpha val="255"/>
+            <Visible val="False"/>
+            
+            <StateGroup name="VisibleState">
+                <DefaultState val="NotVisible"/>
+
+                <State name="Visible">
+                    <When type="Property" frame="$parent/SelectedImage" Visible="True"/>
+                    <When type="Property" frame="$parent/HoverImage" Visible="False"/>
+                    <Action type="SetProperty" frame="$this" Visible="True"/>
+                </State>
+
+                <State name="NotVisible">
+                    <Action type="SetProperty" frame="$this" Visible="False"/>
+                </State>
+            </StateGroup>
         </Frame>
 
         <Frame type="Image" name="EmptyImage">
@@ -89,254 +148,187 @@
             <Visible val="False"/>
             <Alpha val="180"/>
         </Frame>
-
-        <Frame type="BundleCacheFrame" name="BundleCacheFrame">
-            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
-            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
-            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
-            <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
-            <Bundle val="{$parent/@Bundle}"/>
-        </Frame>
-
-        <Frame type="GameContentFrame" name="GameContentFrame">
-            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
-            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
-            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
-            <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
-            <GameContent val="{$parent/BundleCacheFrame/@GameContent}"/>
-        </Frame>
-
-        <Frame type="Image" name="IconImage">
+        
+        <Frame type="Frame" name="IconImageContainer">
             <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
             <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
             <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
             <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
-            <Height val="650"/>
-            <Width val="485"/>
-            <Texture val="{$parent/BundleCacheFrame/@IconFilePath}"/>
-        </Frame>
-
-        <Frame type="Image" name="IconFrame">
-            <Anchor side="Top" relative="$parent/IconImage" pos="Min" offset="0"/>
-            <Anchor side="Left" relative="$parent/IconImage" pos="Min" offset="0"/>
-            <Anchor side="Right" relative="$parent/IconImage" pos="Max" offset="0"/>
-            <Anchor side="Bottom" relative="$parent/IconImage" pos="Max" offset="0"/>
-            <!--<Texture val="@UI/SC2_UI_Collection_Bundle_ImageFrame"/>-->
-            <TextureType val="Nineslice"/>
-            <Visible val="false"/>
+            <Height val="648"/>
+            <Width val="484"/>
+            
+            <Frame type="Image" name="IconImage">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                <Height val="648"/>
+                <Width val="484"/>
+                <Texture val="{$parent/$parent/BundleCacheFrame/@IconFilePath}"/>
+            </Frame>
         </Frame>
 
         <Frame type="Image" name="TextBackground">
             <Anchor side="Bottom" relative="$parent" pos="Max" offset="-13"/>
-            <Anchor side="Left" relative="$parent" pos="Min" offset="13"/>
-            <Anchor side="Right" relative="$parent" pos="Max" offset="-13"/>
-            <Height val="91"/>
-            <Color val="0,0,0"/>
-            <Alpha val="180"/>
+            <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+            <Width val="484"/>
+            <Height val="188"/>
             <Visible val="True"/>
+            <Texture val="@UI/SC2_UI_Collection_Featured_TextUnderlay_Large"/>
         </Frame>
-
-        <Frame type="Frame" name="BundleIconAnchor">
-            <Anchor side="Top" relative="$parent/TextBackground" pos="Mid" offset="0"/>
-            <Anchor side="Bottom" relative="$parent/TextBackground" pos="Mid" offset="0"/>
-            <Anchor side="Left" relative="$parent/TextBackground" pos="Min" offset="12"/>
-            <Width val="15"/>
-            <Height val="1"/>
-            <CollapseLayout val="true"/>
+        
+        <Frame type="Image" name="DiscountPercentageTab">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="24"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="13"/>
+            <Width val="144"/>
+            <Height val="48"/>
+            <Texture val="@UI/SC2_UI_Collection_Featured_DiscountTab"/>
+            <TextureType val="EndCap"/>
+            <Tiled val="True"/>
+            <Visible val="{$parent/DiscountPercentageLabel/@Visible}"/>
+        </Frame>
+        
+        <Frame type="TextFormatFrame" name="DiscountPercentageFormat">
+            <Anchor relative="$parent/DiscountPercentageTab"/>
+            <Visible val="False"/>
+            <FormatText val="@UI/ScreenCollection/DiscountPercentFormat"/>
+            <Replacement index="0" val="{$parent/GameContentFrame/@DiscountPercent}"/>
+        </Frame>
+        
+        <Frame type="Label" name="DiscountPercentageLabelShadow">
+            <Anchor side="Top" relative="$parent/DiscountPercentageLabel" pos="Min" offset="2"/>
+            <Anchor side="Left" relative="$parent/DiscountPercentageLabel" pos="Min" offset="1"/>
+            <Style val="@Collection_Bundle_TileList_Discount"/>
+            <Color val="0,0,0"/>
+            <Alpha val="128"/>
+            <Text val="{$parent/DiscountPercentageLabel/@Text}"/>
+            <Visible val="{$parent/DiscountPercentageLabel/@Visible}"/>
+        </Frame>
+        
+        <Frame type="Label" name="DiscountPercentageLabel">
+            <Anchor side="Top" relative="$parent/DiscountPercentageTab" pos="Mid" offset="2"/>
+            <Anchor side="Bottom" relative="$parent/DiscountPercentageTab" pos="Mid" offset="2"/>
+            <Anchor side="Left" relative="$parent/DiscountPercentageTab" pos="Min" offset="14"/>
+            <Style val="@Collection_Bundle_TileList_Discount"/>
+            <Text val="{$parent/DiscountPercentageFormat/@Text}"/>
+            <Visible val="False"/>
+        </Frame>
+        
+        <Frame type="Image" name="LockedItemBackgroundGlow">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="13"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="-13"/>
+            <Width val="160"/>
+            <Height val="185"/>
+            <Visible val="{$parent/LockedItemIcon/@Visible}"/>
+            <Texture val="@UI/SC2_UI_Battlenet_Glue_Campaign_Purchase_GlowBG"/>
+            <ColorAdjustMode val="Colorize"/>
+            <AdjustmentColor val="22,150,255"/>
+            <Alpha val="235"/>
+            <TextureCoords top=".53" left="0" bottom="1" right=".28"/>
+        </Frame>
+        
+        <Frame type="Image" name="LockedItemIcon">
+            <Anchor side="Top" relative="$parent/LockedItemBackgroundGlow" pos="Min" offset="8"/>
+            <Anchor side="Right" relative="$parent/LockedItemBackgroundGlow" pos="Max" offset="-3"/>
+            <Width val="63"/>
+            <ScaleHeightToTexture val="True"/>
+            <Texture val="@UI/SC2_UI_Collection_Icon_Locked"/>
+            <Alpha val="191"/>
             <Visible val="False"/>
         </Frame>
 
-        <Frame type="Image" name="BundleIcon">
-            <Anchor side="Top" relative="$parent/TextBackground" pos="Mid" offset="0"/>
-            <Anchor side="Bottom" relative="$parent/TextBackground" pos="Mid" offset="0"/>
-            <Anchor side="Left" relative="$parent/BundleIconAnchor" pos="Max" offset="0"/>
-            <Texture val="@UI/SC2_UI_Collection_BundleIcon"/>
-            <CollapseLayout val="True"/>
-        </Frame>
-
-        <Frame type="Label" name="BundleCountLabel">
-            <Anchor side="Top" relative="$parent/BundleIcon" pos="Min" offset="3"/>
-            <Anchor side="Left" relative="$parent/BundleIcon" pos="Min" offset="2"/>
-            <Anchor side="Bottom" relative="$parent/BundleIcon" pos="Max" offset="0"/>
-            <Anchor side="Right" relative="$parent/BundleIcon" pos="Max" offset="0"/>
-            <Style val="@Collection_Bundle_TileList_Count"/>
-            <Text val="{$parent/BundleCacheFrame/@ProductCount}"/>
-        </Frame>
-
         <Frame type="Label" name="NameLabel">
-            <Anchor side="Bottom" relative="$parent/TextBackground" pos="Mid" offset="3"/>
-            <Anchor side="Left" relative="$parent/BundleIcon" pos="Max" offset="15"/>
-            <Anchor side="Right" relative="$parent/TextBackground" pos="Max" offset="-15"/>
-            <Height val="23"/>
+            <Anchor side="Bottom" relative="$parent/CurrentPriceLabel" pos="Min" offset="1"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="36"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="-36"/>
             <AcceptsMouseTooltip val="True"/>
-            <Options val="Ellipsis | NoWrapping | TooltipIfTruncated"/>
+            <Options val="Ellipsis | TooltipIfTruncated"/>
             <Style val="@Collection_Bundle_TileListName"/>
             <Text val="{$parent/BundleCacheFrame/@NameText}"/>
-
-            <Animation name="SelectedFontStyle">
-                <Event event="OnShown" action="Reset" frame="$parent/SelectedImage"/>
-                <Event event="OnShown" action="Play" frame="$parent/SelectedImage"/>
-
-                <Controller type="Style" end="Pause" style1="Collection_Bundle_TileListName" style2="Collection_Bundle_TileListName_Selected">
-                    <Key type="Curve" time="0" value="1"/>
-                </Controller>
-            </Animation>
-
-            <Animation name="NormalFontStyle">
-                <Event event="OnHidden" action="Reset" frame="$parent/SelectedImage"/>
-                <Event event="OnHidden" action="Play" frame="$parent/SelectedImage"/>
-                
-                <Controller type="Style" end="Pause" style1="Collection_Bundle_TileListName" style2="Collection_Bundle_TileListName_Selected">
-                    <Key type="Curve" time="0" value="0"/>
-                </Controller>
-            </Animation>
         </Frame>
 
-        <Frame type="Label" name="CostLabel">
-            <Anchor side="Top" relative="$parent/NameLabel" pos="Max" offset="0"/>
-            <Anchor side="Left" relative="$parent/NameLabel" pos="Min" offset="1"/>
-            <Anchor side="Right" relative="$parent/NameLabel" pos="Max" offset="0"/>
+        <Frame type="Label" name="CurrentPriceLabel">
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="-29"/>
+            <Anchor side="Left" relative="$parent/NameLabel" pos="Min" offset="0"/>
             <Style val="@Collection_ListItem_Cost"/>
             <Height val="25"/>
             <Text val="{$parent/GameContentFrame/@CostText}"/>
+            <Visible val="False"/>
         </Frame>
-
-        <Frame type="Label" name="DynamicBundleLabel">
-            <Anchor side="Top" relative="$parent/NameLabel" pos="Max" offset="0"/>
-            <Anchor side="Left" relative="$parent/NameLabel" pos="Min" offset="1"/>
-            <Anchor side="Right" relative="$parent/NameLabel" pos="Max" offset="0"/>
-            <Style val="@Collection_Bundle_TileListDesc"/>
-            <AcceptsMouseTooltip val="True"/>
-            <Options val="Ellipsis | NoWrapping | TooltipIfTruncated"/>
+        
+        <Frame type="Label" name="OriginalPriceLabel">
+            <Anchor side="Bottom" relative="$parent/CurrentPriceLabel" pos="Max" offset="0"/>
+            <Anchor side="Left" relative="$parent/CurrentPriceLabel" pos="Max" offset="10"/>
+            <Style val="@Collection_ListItem_CostOriginal"/>
             <Height val="25"/>
-            <Text val=""/>
-
-            <Animation name="SelectedFontStyle">
-                <Event event="OnShown" action="Reset" frame="$parent/SelectedImage"/>
-                <Event event="OnShown" action="Play" frame="$parent/SelectedImage"/>
-
-                <Controller type="Style" end="Pause" style1="Collection_Bundle_TileListDesc" style2="Collection_Bundle_TileListNameDesc_Selected">
-                    <Key type="Curve" time="0" value="1"/>
-                </Controller>
-            </Animation>
-
-            <Animation name="NormalFontStyle">
-                <Event event="OnHidden" action="Reset" frame="$parent/SelectedImage"/>
-                <Event event="OnHidden" action="Play" frame="$parent/SelectedImage"/>
-
-                <Controller type="Style" end="Pause" style1="Collection_Bundle_TileListDesc" style2="Collection_Bundle_TileListNameDesc_Selected">
-                    <Key type="Curve" time="0" value="0"/>
-                </Controller>
-            </Animation>
+            <Text val="{$parent/GameContentFrame/@RetailCostText}"/>
+            <Visible val="False"/>
+        </Frame>
+        
+        <Frame type="Image" name="DiscountSlash">
+            <Anchor side="Top" relative="$parent/OriginalPriceLabel" pos="Mid" offset="-1"/>
+            <Anchor side="Bottom" relative="$parent/OriginalPriceLabel" pos="Mid" offset="-1"/>
+            <Anchor side="Left" relative="$parent/OriginalPriceLabel" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent/OriginalPriceLabel" pos="Mid" offset="0"/>
+            <Width val="60"/>
+            <Height val="16"/>
+            <Texture val="@UI/SC2_UI_Collection_DiscountSlash"/>
+            <Visible val="False"/>
         </Frame>
 
         <Frame type="Label" name="StateLabel">
-            <Anchor side="Top" relative="$parent/NameLabel" pos="Max" offset="0"/>
-            <Anchor side="Left" relative="$parent/NameLabel" pos="Min" offset="1"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="-30"/>
+            <Anchor side="Left" relative="$parent/NameLabel" pos="Min" offset="0"/>
             <Anchor side="Right" relative="$parent/NameLabel" pos="Max" offset="0"/>
             <Style val="@Collection_Bundle_TileListDesc"/>
             <Height val="25"/>
             <Text val="@UI/ScreenCollection/Owned"/>
             <Visible val="False"/>
-
-            <Animation name="SelectedFontStyle">
-                <Event event="OnShown" action="Reset" frame="$parent/SelectedImage"/>
-                <Event event="OnShown" action="Play" frame="$parent/SelectedImage"/>
-
-                <Controller type="Style" end="Pause" style1="Collection_Bundle_TileListDesc" style2="Collection_Bundle_TileListNameDesc_Selected">
-                    <Key type="Curve" time="0" value="1"/>
-                </Controller>
-            </Animation>
-
-            <Animation name="NormalFontStyle">
-                <Event event="OnHidden" action="Reset" frame="$parent/SelectedImage"/>
-                <Event event="OnHidden" action="Play" frame="$parent/SelectedImage"/>
-
-                <Controller type="Style" end="Pause" style1="Collection_Bundle_TileListDesc" style2="Collection_Bundle_TileListNameDesc_Selected">
-                    <Key type="Curve" time="0" value="0"/>
-                </Controller>
-            </Animation>
         </Frame>
-
-        <StateGroup name="BundleDisplayState">
-            <DefaultState val="IsStandardBundle"/>
-
-            <State name="NotBundle">
-                <When type="Property" frame="$this/BundleCacheFrame" ProductCount="1"/>
-                <Action type="SetProperty" frame="BundleCountLabel" visible="false"/>
-                <Action type="SetProperty" frame="BundleIcon" visible="false"/>
-                <Action type="SetProperty" frame="BundleIconAnchor" visible="true"/>
-                <Action type="SetProperty" frame="DynamicBundleLabel" text=""/>
-            </State>
-
-            <State name="NotPurchasedDynamicBundle">
-                <When type="Property" frame="$this/BundleCacheFrame" ShowDynamicBundle="true"/>
-                <Action type="SetProperty" frame="BundleCountLabel" visible="true"/>
-                <Action type="SetProperty" frame="BundleIcon" visible="true"/>
-                <Action type="SetProperty" frame="BundleIconAnchor" visible="false"/>
-                <Action type="SetProperty" frame="DynamicBundleLabel" text="@UI/ScreenCollection/DynamicBundleTile"/>
-            </State>
-
-            <State name="IsStandardBundle">
-                <Action type="SetProperty" frame="BundleCountLabel" visible="true"/>
-                <Action type="SetProperty" frame="BundleIcon" visible="true"/>
-                <Action type="SetProperty" frame="BundleIconAnchor" visible="false"/>
-                <Action type="SetProperty" frame="DynamicBundleLabel" text="@UI/ScreenCollection/StandardBundleTitle"/>
-            </State>
-        </StateGroup>
         
-        <StateGroup name="GameContentOwnedStateGroup">
-            <DefaultState val="GameContentNotOwned"/>
+        <StateGroup name="ItemDisplayState">
 
-            <State name="GameContentPurchased">
-                <When type="AnimationState" frame="$this/GameContentFrame" PurchasedState="Purchased"/>
-                <Action type="SetProperty" frame="CostLabel" visible="false"/>
-                <Action type="SetProperty" frame="StateLabel" visible="true"/>
-                <Action type="SetProperty" frame="DynamicBundleLabel" visible="false"/>
-            </State>
-            
-            <State name="NotPurchasedNotBundle">
-                <When type="Property" frame="$this/BundleCacheFrame" ProductCount="1"/>
-                <Action type="SetProperty" frame="CostLabel" visible="true"/>
-                <Action type="SetProperty" frame="StateLabel" visible="false"/>
-                <Action type="SetProperty" frame="DynamicBundleLabel" visible="false"/>
-            </State>
-            
-            <State name="NotPurchasedDynamicBundle">
-                <When type="Property" frame="$this/BundleCacheFrame" ShowDynamicBundle="true"/>
-                <Action type="SetProperty" frame="CostLabel" visible="false"/>
-                <Action type="SetProperty" frame="StateLabel" visible="false"/>
-                <Action type="SetProperty" frame="DynamicBundleLabel" visible="true"/>
-            </State>
-            
-            <State name="GameContentNotOwned">
-                <Action type="SetProperty" frame="CostLabel" visible="true"/>
-                <Action type="SetProperty" frame="StateLabel" visible="false"/>
-                <Action type="SetProperty" frame="DynamicBundleLabel" visible="false"/>
-            </State>
-        </StateGroup>
-
-        <StateGroup name="HasDataStateGroup">
-            <State name="NoDataState">
-                <When type="Property" frame="$this" HasData="False"/>
-                <Action type="SetProperty" frame="EmptyImage" Visible="true"/>
-                <Action type="SetProperty" frame="TextBackground" Alpha="0"/>
-                <Action type="SetProperty" frame="NameLabel" Alpha="0"/>
-                <Action type="SetProperty" frame="CostLabel" Alpha="0"/>
-                <Action type="SetProperty" frame="StateLabel" Alpha="0"/>
-                <Action type="SetProperty" frame="DynamicBundleLabel" Alpha="0"/>
+            <State name="Empty">
+                <When type="StateGroup" frame="$this" ItemTypeState="Empty"/>
+                <Action type="SetProperty" frame="EmptyImage" Visible="True"/>
+                <Action type="SetProperty" frame="IconImageContainer" Visible="False"/>
+                <Action type="SetProperty" frame="TextBackground" Visible="False"/>
+                <Action type="SetProperty" frame="NameLabel" Visible="False"/>
+                <Action type="SetProperty" frame="CurrentPriceLabel" Visible="False"/>
+                <Action type="SetProperty" frame="StateLabel" Visible="False"/>
                 <Action type="SetProperty" frame="BackgroundBlur" BlurAmount=".1"/>
             </State>
 
-            <State name="HasDataState">
-                <When type="Property" frame="$this" HasData="True"/>
-                <Action type="SetProperty" frame="EmptyImage" Visible="false"/>
-                <Action type="SetProperty" frame="TextBackground" Alpha="180"/>
-                <Action type="SetProperty" frame="NameLabel" Alpha="255"/>
-                <Action type="SetProperty" frame="CostLabel" Alpha="255"/>
-                <Action type="SetProperty" frame="StateLabel" Alpha="255"/>
-                <Action type="SetProperty" frame="DynamicBundleLabel" Alpha="255"/>
-                <Action type="SetProperty" frame="BackgroundBlur" BlurAmount=".35"/>
+            <State name="Owned">
+                <When type="StateGroup" frame="$this" ItemOwnedState="Purchased"/>
+                <Action type="SetProperty" frame="StateLabel" Visible="True"/>
+            </State>
+
+            <State name="UnpurchasedIndividualItem">
+                <When type="StateGroup" frame="$this" ItemTypeState="IndividualItem"/>
+                <When type="StateGroup" frame="$this" ItemOwnedState="NotPurchased"/>
+                <Action type="SetProperty" frame="LockedItemIcon" Visible="True"/>
+                <Action type="SetProperty" frame="CurrentPriceLabel" Visible="True"/>
+                <Action type="SetProperty" frame="OriginalPriceLabel" Visible="False"/>
+                <Action type="SetProperty" frame="DiscountSlash" Visible="False"/>
+            </State>
+            
+            <State name="UnpurchasedStandardBundle">
+                <When type="StateGroup" frame="$this" ItemTypeState="StandardBundle"/>
+                <When type="StateGroup" frame="$this" ItemOwnedState="NotPurchased"/>
+                <Action type="SetProperty" frame="LockedItemIcon" Visible="True"/>
+                <Action type="SetProperty" frame="CurrentPriceLabel" Visible="True"/>
+                <Action type="SetProperty" frame="OriginalPriceLabel" Visible="False"/>
+                <Action type="SetProperty" frame="DiscountSlash" Visible="False"/>
+            </State>
+            
+            <State name="UnpurchasedDynamicBundle">
+                <When type="StateGroup" frame="$this" ItemTypeState="DynamicBundle"/>
+                <When type="StateGroup" frame="$this" ItemOwnedState="NotPurchased"/>
+                <Action type="SetProperty" frame="DiscountPercentageLabel" Visible="True"/>
+                <Action type="SetProperty" frame="LockedItemIcon" Visible="True"/>
+                <Action type="SetProperty" frame="CurrentPriceLabel" Visible="True"/>
+                <Action type="SetProperty" frame="OriginalPriceLabel" Visible="True"/>
+                <Action type="SetProperty" frame="DiscountSlash" Visible="True"/>
             </State>
         </StateGroup>
     </Frame>
@@ -344,132 +336,64 @@
     <Frame type="BundleTileListItem" name="BundleTileListItemTemplateSmall" template="BundleSelectionFrame/BundleTileListItemTemplate">
         <Height val="#TileListItemSmallHeight"/>
         <Width val="#TileListItemSmallWidth"/>
-
-        <Frame type="Image" name="IconImage">
+        
+        <Frame type="Frame" name="IconImageContainer">
             <Height val="307"/>
             <Width val="224"/>
+            
+            <Frame type="Image" name="IconImage">
+                <Height val="308"/>
+                <Width val="224"/>
+            </Frame>
         </Frame>
 
         <Frame type="Image" name="TextBackground">
-            <Height val="59"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="-13"/>
+            <Width val="224"/>
+            <Height val="88"/>
+            <Texture val="@UI/SC2_UI_Collection_Featured_TextUnderlay_Small"/>
         </Frame>
-
-        <Frame type="Frame" name="BundleIconAnchor">
-            <Anchor side="Top" relative="$parent/TextBackground" pos="Mid" offset="0"/>
-            <Anchor side="Bottom" relative="$parent/TextBackground" pos="Mid" offset="0"/>
-            <Anchor side="Left" relative="$parent/TextBackground" pos="Min" offset="10"/>
-            <Width val="15"/>
-            <Height val="1"/>
-            <CollapseLayout val="true"/>
-            <Visible val="False"/>
+        
+        <Frame type="Image" name="DiscountPercentageTab">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="20"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="13"/>
+            <Width val="133"/>
+            <Height val="48"/>
+            <Texture val="@UI/SC2_UI_Collection_Featured_DiscountTab"/>
+            <TextureType val="EndCap"/>
+            <Tiled val="True"/>
+            <Visible val="{$parent/DiscountPercentageLabel/@Visible}"/>
         </Frame>
-
-        <Frame type="Image" name="BundleIcon">
-            <Anchor side="Top" relative="$parent/TextBackground" pos="Mid" offset="0"/>
-            <Anchor side="Bottom" relative="$parent/TextBackground" pos="Mid" offset="0"/>
-            <Anchor side="Left" relative="$parent/BundleIconAnchor" pos="Min" offset="0"/>
-            <Texture val="@UI/SC2_UI_Collection_BundleIcon"/>
-            <Width val="43"/>
-            <Height val="42"/>
-            <CollapseLayout val="True"/>
-        </Frame>
-
-        <Frame type="Label" name="BundleCountLabel">
-            <Anchor side="Top" relative="$parent/BundleIcon" pos="Min" offset="3"/>
-            <Anchor side="Left" relative="$parent/BundleIcon" pos="Min" offset="2"/>
-            <Anchor side="Bottom" relative="$parent/BundleIcon" pos="Max" offset="0"/>
-            <Anchor side="Right" relative="$parent/BundleIcon" pos="Max" offset="0"/>
-            <Style val="@Collection_Bundle_TileList_Count_Small"/>
-        </Frame>
-
+        
         <Frame type="Label" name="NameLabel">
-            <Anchor side="Bottom" relative="$parent/TextBackground" pos="Mid" offset="4"/>
-            <Anchor side="Left" relative="$parent/BundleIcon" pos="Max" offset="10"/>
-            <Anchor side="Right" relative="$parent/TextBackground" pos="Max" offset="-10"/>
+            <Anchor side="Bottom" relative="$parent/CurrentPriceLabel" pos="Min" offset="2"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="23"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="-23"/>
             <Style val="@Collection_Bundle_TileListName_Small"/>
-            <Height val="23"/>
             <AcceptsMouseTooltip val="True"/>
-            <Options val="Ellipsis | NoWrapping | TooltipIfTruncated"/>
-
-            <Animation name="SelectedFontStyle">
-                <Event event="OnShown" action="Reset" frame="$parent/SelectedImage"/>
-                <Event event="OnShown" action="Play" frame="$parent/SelectedImage"/>
-
-                <Controller type="Style" end="Pause" style1="Collection_Bundle_TileListName_Small" style2="Collection_Bundle_TileListName_Small_Selected">
-                    <Key type="Curve" time="0" value="1"/>
-                </Controller>
-            </Animation>
-
-            <Animation name="NormalFontStyle">
-                <Event event="OnHidden" action="Reset" frame="$parent/SelectedImage"/>
-                <Event event="OnHidden" action="Play" frame="$parent/SelectedImage"/>
-                
-                <Controller type="Style" end="Pause" style1="Collection_Bundle_TileListName_Small" style2="Collection_Bundle_TileListName_Small_Selected">
-                    <Key type="Curve" time="0" value="0"/>
-                </Controller>
-            </Animation>
+            <Options val="Ellipsis | TooltipIfTruncated"/>
         </Frame>
-
-        <Frame type="Label" name="CostLabel">
-            <Anchor side="Top" relative="$parent/NameLabel" pos="Max" offset="-2"/>
-            <Anchor side="Left" relative="$parent/NameLabel" pos="Min" offset="1"/>
-            <Anchor side="Right" relative="$parent/NameLabel" pos="Max" offset="0"/>
+        
+        <Frame type="Label" name="CurrentPriceLabel">
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="-17"/>
             <Style val="@Collection_ListItem_Cost_Small"/>
             <Height val="23"/>
         </Frame>
-
-        <Frame type="Label" name="DynamicBundleLabel">
-            <Anchor side="Top" relative="$parent/NameLabel" pos="Max" offset="0"/>
-            <Anchor side="Left" relative="$parent/NameLabel" pos="Min" offset="1"/>
-            <Anchor side="Right" relative="$parent/NameLabel" pos="Max" offset="0"/>
-            <Style val="@Collection_Bundle_TileListDesc_Small"/>
+        
+        <Frame type="Label" name="OriginalPriceLabel">
+            <Style val="@Collection_ListItem_CostOriginal_Small"/>
             <Height val="23"/>
-            <AcceptsMouseTooltip val="True"/>
-            <Options val="Ellipsis | NoWrapping | TooltipIfTruncated"/>
-
-            <Animation name="SelectedFontStyle">
-                <Event event="OnShown" action="Reset" frame="$parent/SelectedImage"/>
-                <Event event="OnShown" action="Play" frame="$parent/SelectedImage"/>
-
-                <Controller type="Style" end="Pause" style1="Collection_Bundle_TileListDesc_Small" style2="Collection_Bundle_TileListDesc_Small_Selected">
-                    <Key type="Curve" time="0" value="1"/>
-                </Controller>
-            </Animation>
-
-            <Animation name="NormalFontStyle">
-                <Event event="OnHidden" action="Reset" frame="$parent/SelectedImage"/>
-                <Event event="OnHidden" action="Play" frame="$parent/SelectedImage"/>
-
-                <Controller type="Style" end="Pause" style1="Collection_Bundle_TileListDesc_Small" style2="Collection_Bundle_TileListDesc_Small_Selected">
-                    <Key type="Curve" time="0" value="0"/>
-                </Controller>
-            </Animation>
         </Frame>
-
+        
+        <Frame type="Image" name="DiscountSlash">
+            <Width val="48"/>
+            <TextureCoords top="0" left=".1" bottom="1" right=".9"/>
+        </Frame>
+        
         <Frame type="Label" name="StateLabel">
-            <Anchor side="Top" relative="$parent/NameLabel" pos="Max" offset="-2"/>
-            <Anchor side="Left" relative="$parent/NameLabel" pos="Min" offset="1"/>
-            <Anchor side="Right" relative="$parent/NameLabel" pos="Max" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="-17"/>
             <Style val="@Collection_Bundle_TileListDesc_Small"/>
             <Height val="23"/>
-
-            <Animation name="SelectedFontStyle">
-                <Event event="OnShown" action="Reset" frame="$parent/SelectedImage"/>
-                <Event event="OnShown" action="Play" frame="$parent/SelectedImage"/>
-
-                <Controller type="Style" end="Pause" style1="Collection_Bundle_TileListDesc_Small" style2="Collection_Bundle_TileListDesc_Small_Selected">
-                    <Key type="Curve" time="0" value="1"/>
-                </Controller>
-            </Animation>
-
-            <Animation name="NormalFontStyle">
-                <Event event="OnHidden" action="Reset" frame="$parent/SelectedImage"/>
-                <Event event="OnHidden" action="Play" frame="$parent/SelectedImage"/>
-
-                <Controller type="Style" end="Pause" style1="Collection_Bundle_TileListDesc_Small" style2="Collection_Bundle_TileListDesc_Small_Selected">
-                    <Key type="Curve" time="0" value="0"/>
-                </Controller>
-            </Animation>
         </Frame>
     </Frame>
 
@@ -581,7 +505,7 @@
 
         <Frame type="Label" name="TitleLabel">
             <Anchor side="Top" relative="$parent" pos="Min" offset="98"/>
-            <Anchor side="Left" relative="$parent" pos="Min" offset="118"/>
+            <Anchor side="Left" relative="$Anchor_LeftHeader" pos="Max" offset="0"/>
             <Style val="@Arcade_Title"/>
             <Text val="@UI/ScreenCollection/Featured/Title"/>
         </Frame>
@@ -609,12 +533,12 @@
 
             <Frame type="BundleTileListItem" name="Item1" template="BundleSelectionFrame/BundleTileListItemTemplate">
                 <Anchor side="Top" relative="$parent/Item0" pos="Min" offset="0"/>
-                <Anchor side="Left" relative="$parent/Item0" pos="Max" offset="25"/>
+                <Anchor side="Left" relative="$parent/Item0" pos="Max" offset="15"/>
             </Frame>
 
             <Frame type="BundleTileListItem" name="Item2" template="BundleSelectionFrame/BundleTileListItemTemplateSmall">
                 <Anchor side="Top" relative="$parent/Item1" pos="Min" offset="0"/>
-                <Anchor side="Left" relative="$parent/Item1" pos="Max" offset="25"/>
+                <Anchor side="Left" relative="$parent/Item1" pos="Max" offset="15"/>
             </Frame>
 
             <Frame type="BundleTileListItem" name="Item3" template="BundleSelectionFrame/BundleTileListItemTemplateSmall">
@@ -623,12 +547,12 @@
             </Frame>
 
             <Frame type="BundleTileListItem" name="Item4" template="BundleSelectionFrame/BundleTileListItemTemplateSmall">
-                <Anchor side="Top" relative="$parent/Item2" pos="Max" offset="11"/>
+                <Anchor side="Top" relative="$parent/Item2" pos="Max" offset="8"/>
                 <Anchor side="Left" relative="$parent/Item2" pos="Min" offset="0"/>
             </Frame>
 
             <Frame type="BundleTileListItem" name="Item5" template="BundleSelectionFrame/BundleTileListItemTemplateSmall">
-                <Anchor side="Top" relative="$parent/Item2" pos="Max" offset="11"/>
+                <Anchor side="Top" relative="$parent/Item2" pos="Max" offset="8"/>
                 <Anchor side="Left" relative="$parent/Item4" pos="Max" offset="10"/>
             </Frame>
 
@@ -657,17 +581,17 @@
         </Frame>
 
         <StateGroup name="SelectedBundleVisibility">
-            <DefaultState val="SelectedBundleVisible"/>
-
-            <State name="SelectedBundleNotVisible">
-                <When type="Property" frame="SelectedBundleFrame" Bundle=""/>
-                <Action type="SetProperty" frame="SelectedBundleFrame" visible="false"/>
-                <Action type="SetProperty" frame="BundleTileList" visible="true"/>
-            </State>
-
+            <DefaultState val="SelectedBundleNotVisible"/>
+            
             <State name="SelectedBundleVisible">
+                <When type="Property" frame="SelectedBundleFrame" operator="NotEqual" Bundle=""/>
                 <Action type="SetProperty" frame="SelectedBundleFrame" visible="true"/>
                 <Action type="SetProperty" frame="BundleTileList" visible="false"/>
+            </State>
+            
+            <State name="SelectedBundleNotVisible">
+                <Action type="SetProperty" frame="SelectedBundleFrame" visible="false"/>
+                <Action type="SetProperty" frame="BundleTileList" visible="true"/>
             </State>
         </StateGroup>
     </Frame>

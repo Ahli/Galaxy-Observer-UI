@@ -1,9 +1,6 @@
 package application.baseUI;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Map.Entry;
 
 /**
  * 
@@ -11,10 +8,10 @@ import java.util.Map.Entry;
  *
  */
 public class UIState extends UIElement {
-
 	private ArrayList<UIAttribute> whens = new ArrayList<>();
 	private ArrayList<UIAttribute> actions = new ArrayList<>();
-	private boolean nextAdditionShouldOverride = false;
+	private boolean nextAdditionShouldOverrideWhens = false;
+	private boolean nextAdditionShouldOverrideActions = false;
 
 	/**
 	 * 
@@ -55,18 +52,33 @@ public class UIState extends UIElement {
 	}
 
 	/**
-	 * @return the nextAdditionShouldOverride
+	 * @return the nextAdditionShouldOverrideWhens
 	 */
-	public boolean isNextAdditionShouldOverride() {
-		return nextAdditionShouldOverride;
+	public boolean isNextAdditionShouldOverrideWhens() {
+		return nextAdditionShouldOverrideWhens;
 	}
 
 	/**
-	 * @param nextAdditionShouldOverride
-	 *            the nextAdditionShouldOverride to set
+	 * @param nextAdditionShouldOverrideWhens
+	 *            the nextAdditionShouldOverrideWhens to set
 	 */
-	public void setNextAdditionShouldOverride(boolean nextAdditionShouldOverride) {
-		this.nextAdditionShouldOverride = nextAdditionShouldOverride;
+	public void setNextAdditionShouldOverrideWhens(boolean nextAdditionShouldOverrideWhens) {
+		this.nextAdditionShouldOverrideWhens = nextAdditionShouldOverrideWhens;
+	}
+
+	/**
+	 * @return the nextAdditionShouldOverrideActions
+	 */
+	public boolean isNextAdditionShouldOverrideActions() {
+		return nextAdditionShouldOverrideActions;
+	}
+
+	/**
+	 * @param nextAdditionShouldOverrideActions
+	 *            the nextAdditionShouldOverrideActions to set
+	 */
+	public void setNextAdditionShouldOverrideActions(boolean nextAdditionShouldOverrideActions) {
+		this.nextAdditionShouldOverrideActions = nextAdditionShouldOverrideActions;
 	}
 
 	/**
@@ -81,20 +93,22 @@ public class UIState extends UIElement {
 
 	/**
 	 * 
+	 * @return
 	 */
 	@Override
-	public Object clone() {
-		UIState clone = (UIState) super.clone();
-		clone.setNextAdditionShouldOverride(nextAdditionShouldOverride);
+	public Object deepClone() {
+		UIState clone = new UIState(name);
+		clone.setNextAdditionShouldOverrideWhens(nextAdditionShouldOverrideWhens);
+		clone.setNextAdditionShouldOverrideActions(nextAdditionShouldOverrideActions);
 
 		// clone whens
 		for (UIElement when : whens) {
-			clone.getWhens().add((UIAttribute) when.clone());
+			clone.getWhens().add((UIAttribute) when.deepClone());
 		}
 
 		// clone actions
 		for (UIElement action : actions) {
-			clone.getActions().add((UIAttribute) action.clone());
+			clone.getActions().add((UIAttribute) action.deepClone());
 		}
 
 		return clone;

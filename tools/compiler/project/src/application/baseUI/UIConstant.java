@@ -43,10 +43,11 @@ public class UIConstant extends UIElement {
 
 	/**
 	 * 
+	 * @return
 	 */
 	@Override
-	public Object clone() {
-		UIConstant clone = (UIConstant) super.clone();
+	public Object deepClone() {
+		UIConstant clone = new UIConstant(name);
 		clone.setValue(value);
 
 		return clone;

@@ -23,9 +23,6 @@ import com.sun.org.apache.xerces.internal.impl.io.MalformedByteSequenceException
 
 import application.DescIndexReader;
 
-// TODO: apply templates
-// TODO: override events, keys, whens, actions, ...
-
 /**
  * 
  * @author Ahli
@@ -81,7 +78,7 @@ public class UICatalog {
 	 * @throws UIException
 	 */
 	public void processLayoutFile(File f) throws SAXException, IOException, ParserConfigurationException, UIException {
-		LOGGER.debug("Processing layout file " + f.getAbsolutePath());
+		LOGGER.info("Processing layout file " + f.getAbsolutePath());
 
 		DocumentBuilder dBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
 
@@ -145,6 +142,11 @@ public class UICatalog {
 		}
 	}
 
+	/**
+	 * 
+	 * @param node
+	 * @return
+	 */
 	private boolean isTrashNodeType(Node node) {
 		short nodeType = node.getNodeType();
 		// only Node.ELEMENT_NODE is good to use and not trash
@@ -160,6 +162,12 @@ public class UICatalog {
 	private void parse(Node node, UIElement parent, String fileName) throws UIException {
 		String nodeName = node.getNodeName().toLowerCase(Locale.ROOT);
 		LOGGER.debug("node name: " + nodeName);
+
+		// do not load, if requiredtoload
+		if (getNamedItemIgnoreCase(node.getAttributes(), "requiredtoload") != null) {
+			LOGGER.debug("Encountered 'requiredToLoad=' attribute.");
+			return;
+		}
 
 		// use lowercase for cases!
 		switch (nodeName) {
@@ -245,7 +253,9 @@ public class UICatalog {
 		} else {
 			LOGGER.debug("name = " + name);
 		}
-		UIController thisElem = new UIController(name);
+		String template = readTemplate(node.getAttributes());
+		UIController thisElem = template == null ? new UIController(name)
+				: (UIController) instanciateTemplate(template, name);
 		thisElem.setNameIsImplicit(nameIsImplicit);
 
 		// parse other settings in that line
@@ -298,7 +308,8 @@ public class UICatalog {
 		}
 		String name = getConstantValue(nameAttrNode.getNodeValue());
 		LOGGER.debug("name = " + name);
-		UIState thisElem = new UIState(name);
+		String template = readTemplate(node.getAttributes());
+		UIState thisElem = template == null ? new UIState(name) : (UIState) instanciateTemplate(template, name);
 
 		// register with Animation/templates
 		if (parent == null) {
@@ -314,7 +325,8 @@ public class UICatalog {
 		parse(node.getChildNodes(), thisElem, fileName);
 
 		// after parsing children
-		thisElem.setNextAdditionShouldOverride(true);
+		thisElem.setNextAdditionShouldOverrideWhens(true);
+		thisElem.setNextAdditionShouldOverrideActions(true);
 	}
 
 	/**
@@ -425,6 +437,11 @@ public class UICatalog {
 				throw new UIException("Parent element (Frame) expects 'Event' attribute instead of '" + id + "'");
 			}
 			UIAnimation p = (UIAnimation) parent;
+			// override all animation events
+			if(p.isNextEventsAdditionShouldOverride()){
+				p.getEvents().clear();
+				p.setNextEventsAdditionShouldOverride(false);
+			}
 			p.getEvents().put(id, thisElem);
 		} else if (parent instanceof UIStateGroup) {
 			if (id.compareToIgnoreCase("defaultstate") != 0) {
@@ -444,10 +461,20 @@ public class UICatalog {
 			switch (id.toLowerCase(Locale.ROOT)) {
 			case "when":
 				p = (UIState) parent;
+				// override all state whens
+				if(p.isNextAdditionShouldOverrideWhens()){
+					p.getWhens().clear();
+					p.setNextAdditionShouldOverrideWhens(false);
+				}
 				p.getWhens().add(thisElem);
 				break;
 			case "action":
 				p = (UIState) parent;
+				// override all state actions
+				if(p.isNextAdditionShouldOverrideActions()){
+					p.getWhens().clear();
+					p.setNextAdditionShouldOverrideActions(false);
+				}
 				p.getActions().add(thisElem);
 				break;
 			default:
@@ -459,6 +486,11 @@ public class UICatalog {
 				throw new UIException("Parent element (UIController) expects 'key' attribute instead of '" + id + "'");
 			}
 			UIController p = (UIController) parent;
+			// override all controller keys
+			if(p.isNextAdditionShouldOverride()){
+				p.getKeys().clear();
+				p.setNextAdditionShouldOverride(false);
+			}
 			p.getKeys().add(thisElem);
 		} else {
 			throw new UIException("Parent element does not allow an Attribute to be defined here.");
@@ -518,7 +550,9 @@ public class UICatalog {
 		}
 		String name = getConstantValue(nameAttrNode.getNodeValue());
 		LOGGER.debug("name = " + name);
-		UIStateGroup thisElem = new UIStateGroup(name);
+		String template = readTemplate(node.getAttributes());
+		UIStateGroup thisElem = template == null ? new UIStateGroup(name)
+				: (UIStateGroup) instanciateTemplate(template, name);
 
 		// register with parent/templates
 		if (parent == null) {
@@ -548,7 +582,9 @@ public class UICatalog {
 		}
 		String name = getConstantValue(nameAttrNode.getNodeValue());
 		LOGGER.debug("name = " + name);
-		UIAnimation thisElem = new UIAnimation(name);
+		String template = readTemplate(node.getAttributes());
+		UIAnimation thisElem = template == null ? new UIAnimation(name)
+				: (UIAnimation) instanciateTemplate(template, name);
 
 		// register with parent/templates
 		if (parent == null) {
@@ -636,7 +672,9 @@ public class UICatalog {
 		}
 		String name = getConstantValue(nameAttrNode.getNodeValue());
 		LOGGER.debug("name = " + name);
-		UIConstant thisElem = new UIConstant(name);
+		String template = readTemplate(node.getAttributes());
+		UIConstant thisElem = template == null ? new UIConstant(name)
+				: (UIConstant) instanciateTemplate(template, name);
 
 		Node valAttrNode = getNamedItemIgnoreCase(node.getAttributes(), "val");
 		if (valAttrNode == null) {
@@ -682,11 +720,11 @@ public class UICatalog {
 		LOGGER.debug("type = " + type);
 
 		String template = readTemplate(node.getAttributes());
-		UIFrame thisElem = template == null ? new UIFrame(name, type) : (UIFrame) instanciateTemplate(template);
+		UIFrame thisElem = template == null ? new UIFrame(name, type) : (UIFrame) instanciateTemplate(template, name);
 
 		// register with parent/templates
 		if (parent == null) {
-			LOGGER.debug("Adding new template Frame named "+fileName+"/"+thisElem.getName());
+			LOGGER.debug("Adding new template Frame named " + fileName + "/" + thisElem.getName());
 			templates.add(new UITemplate(fileName, thisElem));
 		} else if (parent instanceof UIFrame) {
 			UIFrame p = (UIFrame) parent;
@@ -703,10 +741,10 @@ public class UICatalog {
 	 * 
 	 * @param template
 	 * @return
-	 * @throws UIException 
+	 * @throws UIException
 	 */
-	private UIElement instanciateTemplate(String path) throws UIException {
-		LOGGER.debug("Instanciating Template of path "+path);
+	private UIElement instanciateTemplate(String path, String newName) throws UIException {
+		LOGGER.debug("Instanciating Template of path " + path);
 		path = path.replace('\\', '/');
 		String fileName = path.substring(0, path.indexOf("/"));
 		for (UITemplate curTemplate : templates) {
@@ -714,16 +752,17 @@ public class UICatalog {
 				// found template file
 				String newPath = UIElement.removeLeftPathLevel(path);
 				UIElement frameFromPath = curTemplate.receiveFrameFromPath(newPath);
-				
-				if(frameFromPath == null){
+
+				if (frameFromPath == null) {
 					// not the correct template
 					continue;
 				}
-				
-				return (UIElement) frameFromPath.clone();
+				UIElement clone = (UIElement) frameFromPath.deepClone();
+				clone.setName(newName);
+				return clone;
 			}
 		}
-		String msg = "Template of path '"+path+"' could not be found";
+		String msg = "Template of path '" + path + "' could not be found";
 		LOGGER.error(msg);
 		throw new UIException(msg);
 	}

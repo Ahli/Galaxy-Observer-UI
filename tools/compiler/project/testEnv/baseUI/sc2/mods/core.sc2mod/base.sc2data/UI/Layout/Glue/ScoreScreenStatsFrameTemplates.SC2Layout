@@ -65,17 +65,7 @@
             <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
             <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
             <Style val="ScoreScreenPlayerLabel"/>
-        </Frame>
-        
-        <Frame type="Label" name="ColorLabel">
-            <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
-            <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
-            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
-            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
-            <Style val="ScoreScreenPlayerLabel"/>
-            <Text val="{$parent/Label/@Text}"/>
             <Color val="{$parent/$parent/$parent/@PlayerColor}"/>
-            <Visible val="false"/>
         </Frame>
     </Frame>
         
@@ -182,6 +172,18 @@
             <FormatNumber val="true"/>
             <Text val="0"/>
             <TargetValue val="{$parent/@Value}"/>
+            
+            <StateGroup name="SortScoreStateGroup">
+                <State name="Sorted">
+                    <When type="Property" frame="$parent" IsSorted="true"/>
+                    <Action type="SetProperty" frame="$this" Style="ScoreScreenProgressLabelHighlight"/>
+                </State>
+                
+                <State name="Unsorted">
+                    <When type="Property" frame="$parent" IsSorted="False"/>
+                    <Action type="SetProperty" frame="$this" Style="ScoreScreenProgressLabel"/>
+                </State>
+            </StateGroup>
 
             <Animation name="CountUp">
                 <Event event="OnShown" action="Reset,Play" frame="$parent"/>
@@ -285,16 +287,6 @@
                 <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
                 <Anchor side="Left" relative="$parent/RaceIcon" pos="Max" offset="0"/>
                 <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
-            
-                <StateGroup name="SortStateGroup">
-                    <State name="SortValue">
-                        <When type="Property" frame="$parent/$parent/$parent/$parent" SortScoreValueLink="Player"/>
-                        <Action type="SetProperty" frame="ComputerLabel" Visible="false"/>
-                        <Action type="SetProperty" frame="ScopeLabel" Visible="false"/>
-                        <Action type="SetProperty" frame="ComputerColorLabel" Visible="true"/>
-                        <Action type="SetProperty" frame="ScopeColorLabel" Visible="true"/>
-                    </State>
-                </StateGroup>
                 
                 <Frame type="Label" name="ComputerLabel">
                     <Anchor side="Top" relative="$parent" pos="Min" offset="3"/>
@@ -302,6 +294,7 @@
                     <Anchor side="Left" relative="$parent" pos="Min" offset="10"/>
                     <Style val="ScoreScreenStatsAILabel"/>
                     <Text val="@UI/ScreenScore/ComputerName"/>
+                    <Color val="{$parent/$parent/$parent/@PlayerColor}"/>
                 </Frame>
 
                 <Frame type="Label" name="ScopeLabel">
@@ -310,26 +303,7 @@
                     <Anchor side="Left" relative="$parent/ComputerLabel" pos="Max" offset="0"/>
                     <Style val="ScoreScreenStatsAILabel"/>
                     <Text val="{$parent/$parent/$parent/@PlayerScope}"/>
-                </Frame>
-                
-                <Frame type="Label" name="ComputerColorLabel">
-                    <Anchor side="Top" relative="$parent" pos="Min" offset="3"/>
-                    <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
-                    <Anchor side="Left" relative="$parent" pos="Min" offset="10"/>
-                    <Style val="ScoreScreenStatsAILabel"/>
-                    <Text val="@UI/ScreenScore/ComputerName"/>
                     <Color val="{$parent/$parent/$parent/@PlayerColor}"/>
-                    <Visible val="false"/>
-                </Frame>
-
-                <Frame type="Label" name="ScopeColorLabel">
-                    <Anchor side="Top" relative="$parent" pos="Min" offset="3"/>
-                    <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
-                    <Anchor side="Left" relative="$parent/ComputerLabel" pos="Max" offset="0"/>
-                    <Style val="ScoreScreenStatsAILabel"/>
-                    <Text val="{$parent/$parent/$parent/@PlayerScope}"/>
-                    <Color val="{$parent/$parent/$parent/@PlayerColor}"/>
-                    <Visible val="false"/>
                 </Frame>
             </Frame>
 
@@ -341,14 +315,6 @@
                 <Text val="{$parent/@DisplayName}"/>
                 <ContextMenuButtons val="Left"/>
                 <ContextMenu val="$parent/UserContextMenu"/>
-            
-                <StateGroup name="SortStateGroup">
-                    <State name="SortValue">
-                        <When type="Property" frame="$parent/$parent/$parent/$parent" SortScoreValueLink="Player"/>
-                        <Action type="SetProperty" frame="Label" Visible="false"/>
-                        <Action type="SetProperty" frame="ColorLabel" Visible="true"/>
-                    </State>
-                </StateGroup>
             </Frame>
             
             <StateGroup name="ComputerStateGroup">
@@ -422,8 +388,9 @@
 
             <Frame type="ScrollBar" name="ScrollBar" template="ScoreScreenStatsFrameTemplates/ScrollBarTemplate">
                 <Anchor side="Top" relative="$parent" pos="Min" offset="-3"/>
-                <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+                <Anchor side="Right" relative="$parent" pos="Max" offset="-5"/>
                 <Anchor side="Bottom" relative="$parent" pos="Max" offset="3"/>
+                <CollapseLayout val="True"/>
             </Frame>
         </Frame>
     </Frame>

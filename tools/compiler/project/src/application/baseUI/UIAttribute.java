@@ -45,10 +45,11 @@ public class UIAttribute extends UIElement {
 
 	/**
 	 * 
+	 * @return
 	 */
 	@Override
-	public Object clone() {
-		UIAttribute clone = (UIAttribute) super.clone();
+	public Object deepClone() {
+		UIAttribute clone = new UIAttribute(name);
 
 		// clone values
 		Map<String, String> clonedValues = new HashMap<>();
@@ -56,7 +57,7 @@ public class UIAttribute extends UIElement {
 			clonedValues.put(entry.getKey(), entry.getValue());
 		}
 		clone.setValues(clonedValues);
-		
+
 		return clone;
 	}
 }

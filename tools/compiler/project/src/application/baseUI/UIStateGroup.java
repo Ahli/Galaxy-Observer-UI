@@ -62,8 +62,9 @@ public class UIStateGroup extends UIElement {
 			return this;
 		} else {
 			// go deeper
+			String curName = UIElement.getLeftPathLevel(path);
 			for (UIElement curElem : states) {
-				if (path.equalsIgnoreCase(curElem.getName())) {
+				if (curName.equalsIgnoreCase(curElem.getName())) {
 					// found right frame -> cut path
 					String newPath = UIElement.removeLeftPathLevel(path);
 					return curElem.receiveFrameFromPath(newPath);
@@ -77,13 +78,13 @@ public class UIStateGroup extends UIElement {
 	 * 
 	 */
 	@Override
-	public Object clone() {
-		UIStateGroup clone = (UIStateGroup) super.clone();
+	public Object deepClone() {
+		UIStateGroup clone = new UIStateGroup(name);
 		clone.setDefaultState(defaultState);
 
 		// clone states
 		for (UIState state : states) {
-			clone.getStates().add((UIState) state.clone());
+			clone.getStates().add((UIState) state.deepClone());
 		}
 
 		return clone;

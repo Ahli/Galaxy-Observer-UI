@@ -5,12 +5,17 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 /**
  * 
  * @author Ahli
  *
  */
 public class UIFrame extends UIElement {
+	private final static Logger LOGGER = LogManager.getLogger(UIFrame.class);
+
 	String type = "";
 	ArrayList<UIElement> children = new ArrayList<>();
 	private Map<String, UIAttribute> attributes = new HashMap<>();
@@ -70,7 +75,7 @@ public class UIFrame extends UIElement {
 	public void setChildren(ArrayList<UIElement> children) {
 		this.children = children;
 	}
-	
+
 	/**
 	 * @return the attributes
 	 */
@@ -190,10 +195,15 @@ public class UIFrame extends UIElement {
 			return this;
 		} else {
 			// go deeper
+			String curName = UIElement.getLeftPathLevel(path);
+			LOGGER.debug("curName: "+curName);
+			LOGGER.debug("children to check: "+children.size());
 			for (UIElement curElem : children) {
-				if (path.equalsIgnoreCase(curElem.getName())) {
+				LOGGER.debug("checking child: "+curElem.getName());
+				if (curName.equalsIgnoreCase(curElem.getName())) {
 					// found right frame -> cut path
 					String newPath = UIElement.removeLeftPathLevel(path);
+					LOGGER.debug("match! newPath:"+newPath);
 					return curElem.receiveFrameFromPath(newPath);
 				}
 			}
@@ -205,14 +215,13 @@ public class UIFrame extends UIElement {
 	 * 
 	 */
 	@Override
-	public Object clone() {
-		UIFrame clone = (UIFrame) super.clone();
-		clone.setType(type);
+	public Object deepClone() {
+		UIFrame clone = new UIFrame(name, type);
 
 		// clone attributes
 		Map<String, UIAttribute> clonedAttributes = new HashMap<>();
 		for (Entry<String, UIAttribute> entry : attributes.entrySet()) {
-			UIAttribute clonedValue = (UIAttribute) entry.getValue().clone();
+			UIAttribute clonedValue = (UIAttribute) entry.getValue().deepClone();
 			clonedAttributes.put(entry.getKey(), clonedValue);
 		}
 		clone.setAttributes(clonedAttributes);
@@ -231,15 +240,8 @@ public class UIFrame extends UIElement {
 		clone.setAnchorRelative(UIAnchorSide.Bottom, pos[2]);
 		clone.setAnchorRelative(UIAnchorSide.Right, pos[3]);
 
-		// clone children
-		if(!children.isEmpty()){
-			if(name.equals("ButtonStandardBorderExtraLargeTemplate")){
-				System.out.println("dummy");
-			}
-			
-			for (UIElement child : children) {
-				clone.getChildren().add((UIElement) child.clone());
-			}
+		for (UIElement child : children) {
+			clone.getChildren().add((UIElement) child.deepClone());
 		}
 
 		return clone;

@@ -77,10 +77,12 @@ public class UITemplate {
 	 */
 	public UIElement receiveFrameFromPath(String path){
 		LOGGER.debug("receive Frame from path: "+path);
-		LOGGER.debug("element's name: "+element.getName());
-		if(path.equalsIgnoreCase(element.getName())){
-			int i = path.indexOf('/');
-			String newPath = i >= 0 ? path.substring(i+1) : null;
+		LOGGER.debug("template's element name: "+element.getName());
+		String curName = UIElement.getLeftPathLevel(path);
+		LOGGER.debug("searched name: "+curName);
+		if(curName.equalsIgnoreCase(element.getName())){
+			String newPath = UIElement.removeLeftPathLevel(path);
+			LOGGER.debug("match! new Path: "+newPath);
 			
 			return element.receiveFrameFromPath(newPath);
 		}

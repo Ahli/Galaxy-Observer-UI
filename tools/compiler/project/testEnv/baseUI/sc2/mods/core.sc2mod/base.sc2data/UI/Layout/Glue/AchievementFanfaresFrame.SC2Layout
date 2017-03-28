@@ -1,0 +1,386 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+
+<Desc>
+    <DescFlags val="Locked"/>
+    
+    <Animation name="FanfareAnimationTemplate">
+        <Event event="ShowItem" action="Reset,Play"/>
+        <Event event="OnHidden" action="Reset,Stop" frame="$parent/$parent"/>
+
+        <!-- Make sure to update the length of the CompleteAnimation to be greater than the total time here if this changes -->
+        <Controller type="Fade" end="Pause">
+            <Key type="Curve" time="0" value="0" out="Slow"/>
+            <Key type="Curve" time="0.25" value="0" out="Slow"/>
+            <Key type="Curve" time="0.50" value="255" in="Slow"/>
+            <Key type="Curve" time="2.50" value="255" in="Slow"/>
+            <Key type="Curve" time="2.75" value="0" in="Slow"/>
+        </Controller>
+                
+        <Controller type="Sound" end="Stop">
+            <Key type="Sound" time="0" sound="@UI_BNet_Achievement"/>
+        </Controller>
+
+        <!-- This animation is to let the parent frame know when the last fanfare is complete -->
+        <Controller type="Event" end="Stop" frame="$parent/$parent">
+            <Key type="Event" time="0" event="ItemStart"/>
+        </Controller>
+    </Animation>
+    
+    <Frame type="Frame" name="FanfareFrameTemplate">
+        <Width val="500"/>
+        <Height val="150"/>
+        <Alpha val="0"/>
+        <CollapseLayout val="true"/>
+        
+        <Frame type="Image" name="BackgroundImage">
+            <Anchor relative="$parent"/>
+        </Frame>
+
+        <Frame type="Image" name="Icon">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="13"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="15"/>
+            <Width val="82"/>
+            <Height val="82"/>
+        </Frame>
+
+        <Frame type="Image" name="IconBorder">
+            <Anchor side="Top" relative="$parent/Icon" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent/Icon" pos="Mid" offset="0"/>
+            <Anchor side="Left" relative="$parent/Icon" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent/Icon" pos="Mid" offset="0"/>
+            <Width val="94"/>
+            <Height val="94"/>
+            <TextureType val="NineSlice"/>
+            <Texture val="@UI/SC2_UI_Collection_AchievementIconFrame_Normal"/>
+        </Frame>
+
+        <Frame type="Label" name="Title">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="9"/>
+            <Anchor side="Left" relative="$parent/IconBorder" pos="Max" offset="9"/>
+            <Style val="@Collection_ItemFrame_AchievementInfo_Name"/>
+        </Frame>
+
+        <Frame type="Label" name="Description">
+            <Anchor side="Top" relative="$parent/Title" pos="Max" offset="3"/>
+            <Anchor side="Left" relative="$parent/Title" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="-9"/>
+            <Style val="@Collection_ItemFrame_AchievementInfo_Desc"/>
+        </Frame>
+
+        <Animation name="ShowAnimation" template="AchievementFanfaresFrame/FanfareAnimationTemplate"/>
+
+        <!-- State group to change the fanfare racial art style -->
+        <StateGroup name="StyleStateGroup">
+            <State name="TerranState">
+                <When type="Property" frame="$parent/$parent" AchievementStyle="Terran"/>
+                <Action type="SetProperty" frame="BackgroundImage" Color="150,150,150"/>
+            </State>
+
+            <State name="ZergState">
+                <When type="Property" frame="$parent/$parent" AchievementStyle="Zerg"/>
+                <Action type="SetProperty" frame="BackgroundImage" Color="150,255,150"/>
+            </State>
+            
+            <State name="ProtossState">
+                <When type="Property" frame="$parent/$parent" AchievementStyle="Protoss"/>
+                <Action type="SetProperty" frame="BackgroundImage" Color="255,255,0"/>
+            </State>
+        </StateGroup>
+    </Frame>
+
+    <Frame type="AchievementInfoFrame" name="AchievementInfoFrameTemplate" template="AchievementFanfaresFrame/FanfareFrameTemplate">
+        <PresenceId val="{$BattleUI/@LocalToonPresenceId}"/>
+
+        <Frame type="Label" name="Title">
+            <Text val="@UI/AchievementFanfaresFrame/AchievementTitle"/>
+        </Frame>
+
+        <Frame type="Label" name="Description">
+            <Text val="{$parent/@TitleText}"/>
+        </Frame>
+
+        <Frame type="Label" name="PointsLabel">
+            <Anchor side="Top" relative="$parent/IconBorder" pos="Max" offset="9"/>
+            <Anchor side="Left" relative="$parent/IconBorder" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent/IconBorder" pos="Mid" offset="0"/>
+            <Style val="@Collection_ItemFrame_AchievementInfo_Unearned"/>
+            <Text val="{$parent/@PointsText}"/>
+
+            <StateGroup name="PointsGroup">
+                <DefaultState val="HasPoints"/>
+
+                <State name="NoPoints">
+                    <When type="Property" frame="$parent" PointsText="0"/>
+                    <Action type="SetProperty" frame="$this" Visible="false"/>
+                </State>
+
+                <State name="HasPoints">
+                    <Action type="SetProperty" frame="$this" Visible="true"/>
+                </State>
+            </StateGroup>
+        </Frame>
+        
+        <StateGroup name="EmptyStateGroup">
+            <State name="EmptyState">
+                <When type="AnimationState" AchievementInfoFrame="Empty"/>
+                <Action type="SetProperty" Visible="false"/>
+            </State>
+        </StateGroup>
+    </Frame>
+    
+    <Frame type="RewardCacheFrame" name="RewardFrameTemplate" template="AchievementFanfaresFrame/FanfareFrameTemplate">
+        <PresenceId val="{$BattleUI/@LocalToonPresenceId}"/>
+
+        <Frame type="Image" name="Icon">
+            <Texture val="{$parent/@Texture}"/>
+            <TextureCoords val="{$parent/@TextureCoords}"/>
+        </Frame>
+
+        <Frame type="TextFormatFrame" name="TitleFormatter">
+            <Anchor relative="$parent"/>
+            <FormatText val="@UI/AchievementFanfaresFrame/RewardTitle"/>
+            <Replacement index="0" val="{$parent/@TypeText}"/>
+        </Frame>
+        
+        <Frame type="Label" name="Title">
+            <Text val="{$parent/TitleFormatter/@Text}"/>
+        </Frame>
+
+        <Frame type="Label" name="Description">
+            <Text val="{$parent/@Name}"/>
+        </Frame>
+        
+        <StateGroup name="EmptyStateGroup">
+            <State name="EmptyState">
+                <When type="Property" UnlockableTagValue="0"/>
+                <Action type="SetProperty" Visible="false"/>
+            </State>
+        </StateGroup>
+    </Frame>
+
+    <Frame type="AchievementFanfaresFrame" name="AchievementFanfaresFrameTemplate">
+        <AcceptsMouse val="true"/>
+        <DisplayCount val="5"/>
+        <Visible val="false"/>
+
+        <Animation name="ShowAnimation">
+            <Event event="Show" action="DirectionForward,Play"/>
+            <Event event="Hide" action="DirectionReverse,Play"/>
+
+            <Controller type="Fade" end="Pause">
+                <Key type="Curve" time="0" value="0" out="Slow"/>
+                <Key type="Curve" time="0.25" value="255" in="Slow"/>
+            </Controller>
+
+            <Controller type="Visibility" end="Pause">
+                <Key type="Bool" time="0.00" value="false"/>
+                <Key type="Bool" time="0.01" value="true"/>
+                <Key type="Bool" time="0.25" value="true"/>
+            </Controller>
+        </Animation>
+
+        <Animation name="CompleteAnimation">
+            <Event event="Begin" action="Reset,Stop"/>
+            <Event event="ItemStart" action="Reset,Play"/>
+
+            <!-- This animation will reset over and over until the final fanfare completes -->
+            <!-- It's important that the time it takes to become True be longer than the fanfare animation -->
+            <Controller type="Property" property="AnimationComplete" end="Stop">
+                <Key type="Property" time="0" value="false"/>
+                <Key type="Property" time="3" value="true"/>
+            </Controller>
+        </Animation>
+
+        <Frame type="Button" name="CloseButton">
+            <Anchor relative="$parent"/>
+            <Shortcut val="@UI/Hotkey/DialogDismiss"/>
+            <AcceptsMouse val="false"/>
+
+            <Animation name="ShowAnimation">
+                <Event event="OnClick" action="Reset,Play"/>
+
+                <Controller type="Event" end="Stop" frame="$parent">
+                    <Key type="Event" time="0.0" event="Hide"/>
+                </Controller>
+            </Animation>
+        </Frame>
+
+        <Frame type="Image" name="Blackout">
+            <Anchor relative="$parent"/>
+            <LayerColor val="000000"/>
+            <Alpha val="170"/>
+        </Frame>
+
+        <Frame type="ParentCenteredFrame" name="CenteredFrame">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Bottom" relative="$this/RewardFrame4" pos="Max" offset="0"/>
+            <Width val="500"/>
+
+            <!-- This animation resets the fanfare animations, in case there is more than one page of fanfares -->
+            <Animation name="Begin">
+                <Event event="Begin" action="Reset,Play" frame="$parent"/>
+
+                <Controller type="Visibility" end="Pause">
+                    <Key type="Bool" time="0.00" value="false"/>
+                    <Key type="Bool" time="0.01" value="true"/>
+                </Controller>
+            </Animation>
+            
+            <Frame type="AchievementInfoFrame" name="AchievementFrame0" template="AchievementFanfaresFrame/AchievementInfoFrameTemplate">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                <AchievementId val="{$parent/$parent/@AchievementId[0]}"/>
+
+                <Animation name="DelayShow">
+                    <Event event="OnShown" action="Reset,Play"/>
+                    <Event event="OnHidden" action="Reset,Stop"/>
+
+                    <Controller type="Event" end="Stop">
+                        <Key type="Event" time="0.0" event="ShowItem"/>
+                    </Controller>
+                </Animation>
+            </Frame>
+            
+            <Frame type="RewardCacheFrame" name="RewardFrame0" template="AchievementFanfaresFrame/RewardFrameTemplate">
+                <Anchor side="Top" relative="$parent/AchievementFrame0" pos="Max" offset="10"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                <UnlockableTagValue val="{$parent/$parent/@UnlockableTag[0]}"/>
+                <UnlockableIndex val="{$parent/$parent/@UnlockableIndex[0]}"/>
+
+                <Animation name="DelayShow">
+                    <Event event="OnShown" action="Reset,Play"/>
+                    <Event event="OnHidden" action="Reset,Stop"/>
+
+                    <Controller type="Event" end="Stop">
+                        <Key type="Event" time="0.0" event="ShowItem"/>
+                    </Controller>
+                </Animation>
+            </Frame>
+
+            <Frame type="AchievementInfoFrame" name="AchievementFrame1" template="AchievementFanfaresFrame/AchievementInfoFrameTemplate">
+                <Anchor side="Top" relative="$parent/RewardFrame0" pos="Max" offset="10"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                <AchievementId val="{$parent/$parent/@AchievementId[1]}"/>
+
+                <Animation name="DelayShow">
+                    <Event event="OnShown" action="Reset,Play"/>
+                    <Event event="OnHidden" action="Reset,Stop"/>
+
+                    <Controller type="Event" end="Stop">
+                        <Key type="Event" time="0.5" event="ShowItem"/>
+                    </Controller>
+                </Animation>
+            </Frame>
+            
+            <Frame type="RewardCacheFrame" name="RewardFrame1" template="AchievementFanfaresFrame/RewardFrameTemplate">
+                <Anchor side="Top" relative="$parent/AchievementFrame1" pos="Max" offset="10"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                <UnlockableTagValue val="{$parent/$parent/@UnlockableTag[1]}"/>
+                <UnlockableIndex val="{$parent/$parent/@UnlockableIndex[1]}"/>
+
+                <Animation name="DelayShow">
+                    <Event event="OnShown" action="Reset,Play"/>
+                    <Event event="OnHidden" action="Reset,Stop"/>
+
+                    <Controller type="Event" end="Stop">
+                        <Key type="Event" time="0.5" event="ShowItem"/>
+                    </Controller>
+                </Animation>
+            </Frame>
+
+            <Frame type="AchievementInfoFrame" name="AchievementFrame2" template="AchievementFanfaresFrame/AchievementInfoFrameTemplate">
+                <Anchor side="Top" relative="$parent/RewardFrame1" pos="Max" offset="10"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                <AchievementId val="{$parent/$parent/@AchievementId[2]}"/>
+
+                <Animation name="DelayShow">
+                    <Event event="OnShown" action="Reset,Play"/>
+                    <Event event="OnHidden" action="Reset,Stop"/>
+
+                    <Controller type="Event" end="Stop">
+                        <Key type="Event" time="1.0" event="ShowItem"/>
+                    </Controller>
+                </Animation>
+            </Frame>
+            
+            <Frame type="RewardCacheFrame" name="RewardFrame2" template="AchievementFanfaresFrame/RewardFrameTemplate">
+                <Anchor side="Top" relative="$parent/AchievementFrame2" pos="Max" offset="10"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                <UnlockableTagValue val="{$parent/$parent/@UnlockableTag[2]}"/>
+                <UnlockableIndex val="{$parent/$parent/@UnlockableIndex[2]}"/>
+
+                <Animation name="DelayShow">
+                    <Event event="OnShown" action="Reset,Play"/>
+                    <Event event="OnHidden" action="Reset,Stop"/>
+
+                    <Controller type="Event" end="Stop">
+                        <Key type="Event" time="1.0" event="ShowItem"/>
+                    </Controller>
+                </Animation>
+            </Frame>
+
+            <Frame type="AchievementInfoFrame" name="AchievementFrame3" template="AchievementFanfaresFrame/AchievementInfoFrameTemplate">
+                <Anchor side="Top" relative="$parent/RewardFrame2" pos="Max" offset="10"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                <AchievementId val="{$parent/$parent/@AchievementId[3]}"/>
+
+                <Animation name="DelayShow">
+                    <Event event="OnShown" action="Reset,Play"/>
+                    <Event event="OnHidden" action="Reset,Stop"/>
+
+                    <Controller type="Event" end="Stop">
+                        <Key type="Event" time="1.5" event="ShowItem"/>
+                    </Controller>
+                </Animation>
+            </Frame>
+            
+            <Frame type="RewardCacheFrame" name="RewardFrame3" template="AchievementFanfaresFrame/RewardFrameTemplate">
+                <Anchor side="Top" relative="$parent/AchievementFrame3" pos="Max" offset="10"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                <UnlockableTagValue val="{$parent/$parent/@UnlockableTag[3]}"/>
+                <UnlockableIndex val="{$parent/$parent/@UnlockableIndex[3]}"/>
+
+                <Animation name="DelayShow">
+                    <Event event="OnShown" action="Reset,Play"/>
+                    <Event event="OnHidden" action="Reset,Stop"/>
+
+                    <Controller type="Event" end="Stop">
+                        <Key type="Event" time="1.5" event="ShowItem"/>
+                    </Controller>
+                </Animation>
+            </Frame>
+
+            <Frame type="AchievementInfoFrame" name="AchievementFrame4" template="AchievementFanfaresFrame/AchievementInfoFrameTemplate">
+                <Anchor side="Top" relative="$parent/RewardFrame3" pos="Max" offset="10"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                <AchievementId val="{$parent/$parent/@AchievementId[4]}"/>
+
+                <Animation name="DelayShow">
+                    <Event event="OnShown" action="Reset,Play"/>
+                    <Event event="OnHidden" action="Reset,Stop"/>
+
+                    <Controller type="Event" end="Stop">
+                        <Key type="Event" time="2.0" event="ShowItem"/>
+                    </Controller>
+                </Animation>
+            </Frame>
+            
+            <Frame type="RewardCacheFrame" name="RewardFrame4" template="AchievementFanfaresFrame/RewardFrameTemplate">
+                <Anchor side="Top" relative="$parent/AchievementFrame4" pos="Max" offset="10"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                <UnlockableTagValue val="{$parent/$parent/@UnlockableTag[4]}"/>
+                <UnlockableIndex val="{$parent/$parent/@UnlockableIndex[4]}"/>
+
+                <Animation name="DelayShow">
+                    <Event event="OnShown" action="Reset,Play"/>
+                    <Event event="OnHidden" action="Reset,Stop"/>
+
+                    <Controller type="Event" end="Stop">
+                        <Key type="Event" time="2.0" event="ShowItem"/>
+                    </Controller>
+                </Animation>
+            </Frame>
+        </Frame>
+    </Frame>
+</Desc>

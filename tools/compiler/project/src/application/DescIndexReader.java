@@ -3,7 +3,6 @@ package application;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -42,21 +41,43 @@ public class DescIndexReader {
 		Document doc = dBuilder.parse(f);
 
 		// must be in a DataComponent node
-		NodeList nodeList = doc.getElementsByTagName("Include");
+		NodeList nodeList = doc.getElementsByTagName("*");
 		for (int i = 0; i < nodeList.getLength(); i++) {
 			Node node = nodeList.item(i);
-			NamedNodeMap attributes = node.getAttributes();
-			String path = attributes.item(0).getNodeValue();
+			if (node.getNodeName().equalsIgnoreCase("Include")) {
+				NamedNodeMap attributes = node.getAttributes();
+				String path = attributes.item(0).getNodeValue();
 
-			if (ignoreRequiredToLoadEntries && attributes.getLength() > 1
-					&& attributes.item(1).getNodeName().equalsIgnoreCase("requiredtoload")) {
-				// ignore
-				continue;
+				// ignore requiredtoload if desired
+				if (ignoreRequiredToLoadEntries && attributes.getLength() > 1
+						&& attributes.item(1).getNodeName().equalsIgnoreCase("requiredtoload")) {
+					continue;
+				}
+
+				list.add(path);
+				LOGGER.info("Adding layout path to layoutPathList: " + path);
 			}
-
-			list.add(path);
 		}
 		return list;
 	}
 
+	// private List<Node> getElementsByTagNameIgnoreCase(Document doc, String
+	// tag) {
+	// NodeList children = doc.getChildNodes();
+	// return getElementsByTagNameIgnoreCase(children, tag);
+	// }
+	//
+	// private List<Node> getElementsByTagNameIgnoreCase(NodeList children,
+	// String tag) {
+	// List<Node> list = new ArrayList<Node>();
+	// int len = children.getLength();
+	// for (int i = 0; i < len; i++) {
+	// Node node = children.item(i);
+	// if (tag.equalsIgnoreCase(node.getNodeName())) {
+	// list.add(node);
+	// list.addAll(getElementsByTagNameIgnoreCase(node.getChildNodes(), tag));
+	// }
+	// }
+	// return list;
+	// }
 }

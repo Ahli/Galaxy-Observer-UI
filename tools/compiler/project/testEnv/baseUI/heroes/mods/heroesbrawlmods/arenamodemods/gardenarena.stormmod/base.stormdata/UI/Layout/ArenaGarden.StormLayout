@@ -1,10 +1,27 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <Desc>
+
+    <Constant name="TeamAllyBackingColor" val="0048eb"/>
+    <Constant name="TeamEnemyBackingColor" val="eb0011"/>
+    
     <!--**************************************************************-->
     <!-- Top Count Label                                              -->
     <!--**************************************************************-->
     <Frame type="Frame" name="ArenaGardenScorePanel">
         <Anchor relative="$parent"/>
+        
+        <Frame type="Image" name="Team1LevelColorBacking">
+            <Anchor relative="$ancestor[@name=PartyFramePanel]/Team1LevelInfo/TeamLevelColorBacking"/>
+            <Texture val="@UI/HUD_TopBar_TeamXP_ColorBacking"/>
+            <BlendMode val="Add"/>
+        </Frame>
+
+        <Frame type="Image" name="Team2LevelColorBacking">
+            <Anchor relative="$ancestor[@name=PartyFramePanel]/Team2LevelInfo/TeamLevelColorBacking"/>
+            <Texture val="@UI/HUD_TopBar_TeamXP_ColorBacking"/>
+            <TextureCoords top="0" left="1" bottom="1" right="0"/>
+            <BlendMode val="Add"/>
+        </Frame>
         
         <Frame type="Image" name="VsImage">
             <Anchor side="Top" relative="$parent" pos="Min" offset="31"/>
@@ -21,31 +38,35 @@
         </Frame>
         
         <Frame type="Label" name="Team1Score">
-            <Anchor side="Bottom" relative="$parent" pos="Min" offset="73"/>
-            <Anchor side="Right" relative="$parent" pos="Mid" offset="-40"/>
-            <Width val="100"/>
-            <Text val="0"/>
+            <Anchor relative="$ancestor[@name=PartyFramePanel]/Team1LevelInfo/TeamLevelLabel" side="Top" pos="Min" offset="-20"/>
+            <Anchor relative="$ancestor[@name=PartyFramePanel]/Team1LevelInfo/TeamLevelLabel" side="Bottom" pos="Max" offset="0"/>
+            <Anchor relative="$ancestor[@name=PartyFramePanel]/Team1LevelInfo/TeamLevelLabel" side="Left" pos="Min" offset="3"/>
+            <Anchor relative="$ancestor[@name=PartyFramePanel]/Team1LevelInfo/TeamLevelLabel" side="Right" pos="Max" offset="11"/>
         </Frame>
         
         <Frame type="Label" name="Team2Score">
-            <Anchor side="Bottom" relative="$parent" pos="Min" offset="73"/>
-            <Anchor side="Left" relative="$parent" pos="Mid" offset="44"/>
-            <Width val="100"/>
-            <Text val="0"/>
+            <Anchor relative="$ancestor[@name=PartyFramePanel]/Team2LevelInfo/TeamLevelLabel" side="Top" pos="Min" offset="-20"/>
+            <Anchor relative="$ancestor[@name=PartyFramePanel]/Team2LevelInfo/TeamLevelLabel" side="Bottom" pos="Max" offset="0"/>
+            <Anchor relative="$ancestor[@name=PartyFramePanel]/Team2LevelInfo/TeamLevelLabel" side="Left" pos="Min" offset="-8"/>
+            <Anchor relative="$ancestor[@name=PartyFramePanel]/Team2LevelInfo/TeamLevelLabel" side="Right" pos="Max" offset="0"/>
         </Frame>
 
         <!-- Switching team colors for Score Labels if needed -->
-        <StateGroup name="TeamColor">
-            <DefaultState val="Team1IsBlue"/>
-            <State name="Team1IsBlue">
+        <StateGroup name="SetTeamColors">
+            <State name="SetLeftAlly">
                 <When type="AnimationState" frame="$ancestor[@type=GameUI]/UIContainer" TeamColors="Team1IsBlue"/>
-                <Action type="SetProperty" frame="Team1Score" style="Storm_MapMechanicScoreAlly"/>
-                <Action type="SetProperty" frame="Team2Score" style="Storm_MapMechanicScoreEnemy"/>
+                <Action type="SetProperty" frame="Team1LevelColorBacking" color="#TeamAllyBackingColor"/>
+                <Action type="SetProperty" frame="Team1Score" style="PartyFrame_TeamLevel"/>
+                <Action type="SetProperty" frame="Team2LevelColorBacking" color="#TeamEnemyBackingColor"/>
+                <Action type="SetProperty" frame="Team2Score" style="PartyFrame_TeamLevel_Enemy"/>
             </State>
-            <State name="Team2IsBlue">
+
+            <State name="SetRightAlly">
                 <When type="AnimationState" frame="$ancestor[@type=GameUI]/UIContainer" TeamColors="Team2IsBlue"/>
-                <Action type="SetProperty" frame="Team1Score" style="Storm_MapMechanicScoreEnemy"/>
-                <Action type="SetProperty" frame="Team2Score" style="Storm_MapMechanicScoreAlly"/>
+                <Action type="SetProperty" frame="Team2LevelColorBacking" color="#TeamAllyBackingColor"/>
+                <Action type="SetProperty" frame="Team2Score" style="PartyFrame_TeamLevel"/>
+                <Action type="SetProperty" frame="Team1LevelColorBacking" color="#TeamEnemyBackingColor"/>
+                <Action type="SetProperty" frame="Team1Score" style="PartyFrame_TeamLevel_Enemy"/>
             </State>
         </StateGroup>
     </Frame>
@@ -157,20 +178,31 @@
             <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
             <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
         </Frame>
+        <Frame type="Label" name="NotificationLabel_Blur">
+            <Visible val="False"/>
+        </Frame>
         <Frame type="Label" name="NotificationLabel">
             <Visible val="False"/>
+        </Frame>
+        <Frame type="Label" name="NotificationTitle_Blur">
+            <Anchor side="Top" relative="$parent" pos="Mid" offset="-60"/>
+            <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+            <Height val="200"/>
+            <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+            <Width val="775"/>
         </Frame>
         <Frame type="Label" name="NotificationTitle">
             <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
             <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
             <Height val="200"/>
             <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
-            <Width val="875"/>
+            <Width val="775"/>
         </Frame>
     </Frame>
     
     <!-- Notification template override -->
     <Frame type="Frame" name="ProgressAnnouncementTemplate" template="GameNotifications/InGameNotificationsTemplate">    
+        <Anchor side="Top" relative="$parent/$parent/ConsoleUIContainer/TopPanel" pos="Max" offset="-20"/>
         <Frame type="Frame" name="StandardNotificationTemplate" template="ArenaGarden/NotificationOverride"/>
         <Frame type="Frame" name="StandardEnemyNotificationTemplate" template="ArenaGarden/NotificationOverride"/>
     </Frame>
@@ -202,12 +234,34 @@
                         </Controller>
                     </Animation>
                 </Frame>
+                <Frame type="Label" name="NotificationTitle_Blur">
+                    <Animation name="ShowTitle">
+                        <Controller type="Anchor" end="Pause" side="Right" relative="true">
+                            <Key type="Curve" time="0.0" value="75" out="Auto"/>
+                            <Key type="Curve" time="0.1" value="75" out="Auto"/>
+                            <Key type="Curve" time="0.4" value="325" in="Auto" out="Linear"/>
+                            <Key type="Curve" time="2.6" value="375" in="Linear" out="Auto"/>
+                            <Key type="Curve" time="2.8" value="625" in="Auto"/>
+                        </Controller>
+                    </Animation>
+                </Frame>
             </Frame>
             <!-- Enemy animation override -->
             <Frame type="Frame" name="StandardEnemyNotificationTemplate">
                 <Frame type="Label" name="NotificationTitle">
                     <Style val="Storm_InGame_Notification_Title_Red_Mid"/>
                     <Text val="{$parent/$parent/StandardNotificationTemplate/NotificationTitle/@Text}"/>
+                    <Animation name="ShowTitle">
+                        <Controller type="Anchor" end="Pause" side="Right" relative="true">
+                            <Key type="Curve" time="0.0" value="75" out="Auto"/>
+                            <Key type="Curve" time="0.1" value="75" out="Auto"/>
+                            <Key type="Curve" time="0.4" value="325" in="Auto" out="Linear"/>
+                            <Key type="Curve" time="2.6" value="375" in="Linear" out="Auto"/>
+                            <Key type="Curve" time="2.8" value="625" in="Auto"/>
+                        </Controller>
+                    </Animation>
+                </Frame>
+                <Frame type="Label" name="NotificationTitle_Blur">
                     <Animation name="ShowTitle">
                         <Controller type="Anchor" end="Pause" side="Right" relative="true">
                             <Key type="Curve" time="0.0" value="75" out="Auto"/>
@@ -241,12 +295,34 @@
                         </Controller>
                     </Animation>
                 </Frame>
+                <Frame type="Label" name="NotificationTitle_Blur">
+                    <Animation name="ShowTitle">
+                        <Controller type="Anchor" end="Pause" side="Right" relative="true">
+                            <Key type="Curve" time="0.0" value="775" out="Auto"/>
+                            <Key type="Curve" time="0.1" value="775" out="Auto"/>
+                            <Key type="Curve" time="0.4" value="525" in="Auto" out="Linear"/>
+                            <Key type="Curve" time="2.6" value="475" in="Linear" out="Auto"/>
+                            <Key type="Curve" time="2.8" value="225" in="Auto"/>
+                        </Controller>
+                    </Animation>
+                </Frame>
             </Frame>
             <!-- Enemy animation override -->
             <Frame type="Frame" name="StandardEnemyNotificationTemplate">
                 <Frame type="Label" name="NotificationTitle">
                     <Style val="Storm_InGame_Notification_Title_Red_Mid"/>
                     <Text val="{$parent/$parent/StandardNotificationTemplate/NotificationTitle/@Text}"/>
+                    <Animation name="ShowTitle">
+                        <Controller type="Anchor" end="Pause" side="Right" relative="true">
+                            <Key type="Curve" time="0.0" value="775" out="Auto"/>
+                            <Key type="Curve" time="0.1" value="775" out="Auto"/>
+                            <Key type="Curve" time="0.4" value="525" in="Auto" out="Linear"/>
+                            <Key type="Curve" time="2.6" value="475" in="Linear" out="Auto"/>
+                            <Key type="Curve" time="2.8" value="225" in="Auto"/>
+                        </Controller>
+                    </Animation>
+                </Frame>
+                <Frame type="Label" name="NotificationTitle_Blur">
                     <Animation name="ShowTitle">
                         <Controller type="Anchor" end="Pause" side="Right" relative="true">
                             <Key type="Curve" time="0.0" value="775" out="Auto"/>

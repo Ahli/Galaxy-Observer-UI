@@ -259,25 +259,67 @@
             <AcceptsMouseTooltip val="True"/>
             
             <StateGroup name="TitleTextStates">
-                <DefaultState val="NormalState"/>
-            
-                <State name="ToggledState">
+                <DefaultState val="NormalStateUnequipped"/>
+                
+                <!-- The first two states are here to deal with a problem where animations cannot be equipped but one is equipped by default anyways, just making the item look normal in that case -->
+                <State name="ToggledStateEquippedAnimations">
                     <When type="Property" frame="$parent/SelectedImage" visible="True"/>
+                    <When type="AnimationState" frame="$parent" SelectedState="Selected"/>
+                    <When type="StateGroup" frame="$parent/UnlockableFrame" UnlockableTypeStateGroup="Animations"/>
                     <Action type="SetProperty" frame="$this" Style="@Collection_SelectionItem_Name_Highlight"/>
                 </State>
                 
-                <State name="HoverState">
+                <State name="NormalStateEquippedAnimations">
+                    <When type="Property" frame="$parent/SelectedImage" visible="False"/>
+                    <When type="AnimationState" frame="$parent" SelectedState="Selected"/>
+                    <When type="StateGroup" frame="$parent/UnlockableFrame" UnlockableTypeStateGroup="Animations"/>
+                    <Action type="SetProperty" frame="$this" Style="@Collection_SelectionItem_Name_Normal"/>
+                </State>
+            
+                <State name="ToggledStateUnequipped">
+                    <When type="Property" frame="$parent/SelectedImage" visible="True"/>
+                    <When type="AnimationState" frame="$parent" SelectedState="Deselected"/>
+                    <Action type="SetProperty" frame="$this" Style="@Collection_SelectionItem_Name_Highlight"/>
+                </State>
+                
+                <State name="HoverStateUnequipped">
                     <When type="Property" frame="$parent/HoverImage" visible="True"/>
+                    <When type="AnimationState" frame="$parent" SelectedState="Deselected"/>
                     <Action type="SetProperty" frame="$this" Style="@Collection_SelectionItem_Name_Highlight"/>
                 </State>
         
-                <State name="LockedState">
+                <State name="LockedStateUnequipped">
                     <When type="AnimationState" frame="$parent" LockedState="Locked"/>
+                    <When type="AnimationState" frame="$parent" SelectedState="Deselected"/>
                     <Action type="SetProperty" frame="$this" Style="@Collection_SelectionItem_Name_Disabled"/>
                 </State>
 
-                <State name="NormalState">
+                <State name="NormalStateUnequipped">
+                    <When type="AnimationState" frame="$parent" SelectedState="Deselected"/>
                     <Action type="SetProperty" frame="$this" Style="@Collection_SelectionItem_Name_Normal"/>
+                </State>
+                
+                <State name="ToggledStateEquipped">
+                    <When type="Property" frame="$parent/SelectedImage" visible="True"/>
+                    <When type="AnimationState" frame="$parent" SelectedState="Selected"/>
+                    <Action type="SetProperty" frame="$this" Style="@Collection_SelectionItem_NameEquipped_Highlight"/>
+                </State>
+                
+                <State name="HoverStateEquipped">
+                    <When type="Property" frame="$parent/HoverImage" visible="True"/>
+                    <When type="AnimationState" frame="$parent" SelectedState="Selected"/>
+                    <Action type="SetProperty" frame="$this" Style="@Collection_SelectionItem_NameEquipped_Highlight"/>
+                </State>
+        
+                <State name="LockedStateEquipped">
+                    <When type="AnimationState" frame="$parent" LockedState="Locked"/>
+                    <When type="AnimationState" frame="$parent" SelectedState="Selected"/>
+                    <Action type="SetProperty" frame="$this" Style="@Collection_SelectionItem_NameEquipped_Disabled"/>
+                </State>
+
+                <State name="NormalStateEquipped">
+                    <When type="AnimationState" frame="$parent" SelectedState="Selected"/>
+                    <Action type="SetProperty" frame="$this" Style="@Collection_SelectionItem_NameEquipped_Normal"/>
                 </State>
             </StateGroup>
         </Frame>
@@ -292,11 +334,20 @@
             <Texture val="@UI/SC2_UI_Collection_Icon_Locked"/>
             <DesaturateOnDisable val="false"/>
         </Frame>
+        
+        <Frame type="Image" name="EquippedBorder">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="11"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="-11"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="11"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="-11"/>
+            <Texture val="@UI/SC2_UI_Collection_Equipped_Border"/>
+            <TextureType val="NineSlice"/>
+        </Frame>
 
         <Frame type="Image" name="CheckMarkImage">
             <Anchor side="Top" relative="$parent" pos="Min" offset="11"/>
             <Anchor side="Right" relative="$parent" pos="Max" offset="-11"/>
-            <Texture val="@UI/SC2_UI_Collection_Icon_Equipped"/>
+            <Texture val="@UI/SC2_UI_Collection_Equipped_Checkmark"/>
         </Frame>
         
         <StateGroup name="ToggledStateGroup">
@@ -341,11 +392,13 @@
                 <When type="AnimationState" frame="$this" SelectedState="Selected"/>
                 <When type="Property" frame="$parent/$parent/AnimationsActive" visible="False"/>
                 <Action type="SetProperty" frame="CheckMarkImage" Visible="true"/>
+                <Action type="SetProperty" frame="EquippedBorder" Visible="true"/>
             </State>
 
             <State name="DeselectedState">
                 <When type="AnimationState" frame="$this" SelectedState="Deselected"/>
                 <Action type="SetProperty" frame="CheckMarkImage" Visible="false"/>
+                <Action type="SetProperty" frame="EquippedBorder" Visible="false"/>
             </State>
         </StateGroup>
         
@@ -356,6 +409,7 @@
                 <Action type="SetProperty" frame="LockIcon" Alpha="0"/>
                 <Action type="SetProperty" frame="Darken" Alpha="0"/>
                 <Action type="SetProperty" frame="CheckMarkImage" Alpha="0"/>
+                <Action type="SetProperty" frame="EquippedBorder" Alpha="0"/>
                 <Action type="SetProperty" frame="ItemBorder" Alpha="0"/>
                 <Action type="SetProperty" frame="UnlockableFrame/UnlockableBackground" Alpha="0"/>
                 <Action type="SetProperty" frame="BackgroundBlur" BlurAmount=".1"/>
@@ -367,6 +421,7 @@
                 <Action type="SetProperty" frame="LockIcon" Alpha="255"/>
                 <Action type="SetProperty" frame="Darken" Alpha="158"/>
                 <Action type="SetProperty" frame="CheckMarkImage" Alpha="255"/>
+                <Action type="SetProperty" frame="EquippedBorder" Alpha="255"/>
                 <Action type="SetProperty" frame="ItemBorder" Alpha="255"/>
                 <Action type="SetProperty" frame="UnlockableFrame/UnlockableBackground" Alpha="255"/>
                 <Action type="SetProperty" frame="BackgroundBlur" BlurAmount=".35"/>
@@ -376,6 +431,7 @@
 
     <Frame type="UnlockablePanel" name="UnlockablePanelTemplate">
         <PresenceId val="{$BattleUI/@LocalToonPresenceId}"/>
+        <FilterText val="{$this/FilterEditBox/@Text}"/>
         
         <Frame type="Label" name="TitleLabel">
             <Anchor side="Top" relative="$parent" pos="Min" offset="98"/>
@@ -383,9 +439,55 @@
             <Style val="@Arcade_Title"/>
         </Frame>
 
-        <Frame type="Pulldown" name="FilterPulldown" template="StandardBattlenetTemplates/BattlenetLargePulldownTemplate">
-            <Anchor side="Bottom" relative="$parent/InfoContainer" pos="Min" offset="3"/>
+        <Frame type="EditBox" name="FilterEditBox" template="StandardBattlenetTemplates/BattlenetEditBoxTemplate">
+            <Anchor side="Bottom" relative="$Collection_DropdownAnchor" pos="Max" offset="0"/>
             <Anchor side="Right" relative="$parent/InfoContainer" pos="Max" offset="-4"/>
+            <Width val="377"/>
+            <Height val="68"/>
+            <LoseFocusOnEnterOrEsc val="true"/>
+            <Tooltip val="@UI/UnlockablePanel/SearchTooltip"/>
+            <Insets top="20" left="25" bottom="15" right="45"/>
+            
+            <Frame type="Label" name="SearchTextLabel">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="15"/>
+                <Anchor side="Bottom" relative="$parent" pos="Max" offset="-11"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="25"/>
+                <Anchor side="Right" relative="$parent" pos="Max" offset="25"/>
+                <Style val="BattlenetGlueEditBoxDefault"/>
+            </Frame>
+
+            <Frame type="Image" name="SearchIcon">
+                <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Right" relative="$parent" pos="Max" offset="-20"/>
+                <Texture val="@UI/Glues_Icons_SearchIcon"/>
+            </Frame>
+
+            <Frame type="Button" name="ClearTextButton" template="StandardBattlenetTemplates/BattlenetIconButtonTemplate">
+                <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Right" relative="$parent" pos="Max" offset="-15"/>
+
+                <Frame type="Image" name="NormalImage">
+                    <Texture val="@UI/Glues_Icons_CloseButton" layer="0"/>
+                </Frame>
+
+                <Frame type="Image" name="HoverImage">
+                    <Texture val="@UI/Glues_Icons_CloseButtonHover" layer="0"/>
+                </Frame>
+            </Frame>
+
+            <StateGroup name="ClearTextStateGroup">
+                <State name="FilteringState">
+                    <When type="Property" frame="ClearTextButton" Visible="true"/>
+                    <Action type="SetProperty" frame="SearchIcon" Visible="false"/>
+                </State>
+            </StateGroup>
+        </Frame>
+
+        <Frame type="Pulldown" name="FilterPulldown" template="StandardBattlenetTemplates/BattlenetLargePulldownTemplate">
+            <Anchor side="Bottom" relative="$Collection_DropdownAnchor" pos="Max" offset="0"/>
+            <Anchor side="Right" relative="$parent/FilterEditBox" pos="Min" offset="-4"/>
             <Animation name="HoverSound">
                 <Event event="OnMouseEnter" action="Reset,Play"/>
                 <Event event="OnMouseExit" action="Reset, Stop"/>
@@ -949,6 +1051,12 @@
 
     <Frame type="UnlockablePanel" name="PortraitSelectionPanelTemplate" template="UnlockablePanel/UnlockableSelectionPanelTemplate">
         <UnlockableTag val="PORT"/>
+
+        <Frame type="EditBox" name="FilterEditBox">
+            <Frame type="Label" name="SearchTextLabel">
+                <Text val="@UI/UnlockablePanel/SearchPortraits"/>
+            </Frame>
+        </Frame>
         
         <Frame type="CheckBox" name="PortraitInGameCheckBox" template="UnlockablePanel/PortraitInGameCheckboxTemplate">
             <Anchor side="Top" relative="$parent/FilterPulldown" pos="Mid" offset="0"/>

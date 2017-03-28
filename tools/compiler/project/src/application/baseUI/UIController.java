@@ -96,10 +96,11 @@ public class UIController extends UIElement {
 
 	/**
 	 * 
+	 * @return
 	 */
 	@Override
-	public Object clone() {
-		UIController clone = (UIController) super.clone();
+	public Object deepClone() {
+		UIController clone = new UIController(name);
 		clone.setNameIsImplicit(nameIsImplicit);
 		clone.setNextAdditionShouldOverride(nextAdditionShouldOverride);
 
@@ -112,7 +113,7 @@ public class UIController extends UIElement {
 
 		// clone keys
 		for (UIElement key : keys) {
-			clone.getKeys().add((UIAttribute) key.clone());
+			clone.getKeys().add((UIAttribute) key.deepClone());
 		}
 
 		return clone;

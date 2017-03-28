@@ -5,7 +5,7 @@ package application.baseUI;
  * @author Ahli
  *
  */
-public abstract class UIElement implements Cloneable {
+public abstract class UIElement {
 	String name = "";
 
 	public UIElement(String name) {
@@ -47,19 +47,24 @@ public abstract class UIElement implements Cloneable {
 		String newPath = path.substring(i + 1);
 		return newPath;
 	}
-	
+
 	/**
 	 * 
+	 * @param path
+	 * @return
 	 */
-	@Override
-	public Object clone(){
-		try {
-			UIElement clone = (UIElement) super.clone();
-			clone.setName(name);
-			return clone;
-		} catch (CloneNotSupportedException e) {
-			e.printStackTrace();
+	public static String getLeftPathLevel(String path) {
+		int i = path.indexOf('/');
+		if (i == -1) {
+			return path;
 		}
-		return null;
+		return path.substring(0, i);
 	}
+
+	/**
+	 * 
+	 * @return
+	 */
+	public abstract Object deepClone();
+
 }
