@@ -1,6 +1,9 @@
 package application.baseUI;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
 
 /**
  * 
@@ -11,7 +14,7 @@ public class UIState extends UIElement {
 
 	private ArrayList<UIAttribute> whens = new ArrayList<>();
 	private ArrayList<UIAttribute> actions = new ArrayList<>();
-	private boolean nextAdditionShouldOverride = false; // TODO implement & keep when/action management within this class to auto-override all whens/actions
+	private boolean nextAdditionShouldOverride = false;
 
 	/**
 	 * 
@@ -59,10 +62,41 @@ public class UIState extends UIElement {
 	}
 
 	/**
-	 * @param nextAdditionShouldOverride the nextAdditionShouldOverride to set
+	 * @param nextAdditionShouldOverride
+	 *            the nextAdditionShouldOverride to set
 	 */
 	public void setNextAdditionShouldOverride(boolean nextAdditionShouldOverride) {
 		this.nextAdditionShouldOverride = nextAdditionShouldOverride;
 	}
 
+	/**
+	 * 
+	 * @param path
+	 * @return
+	 */
+	@Override
+	public UIElement receiveFrameFromPath(String path) {
+		return (path == null || path.isEmpty()) ? this : null;
+	}
+
+	/**
+	 * 
+	 */
+	@Override
+	public Object clone() {
+		UIState clone = (UIState) super.clone();
+		clone.setNextAdditionShouldOverride(nextAdditionShouldOverride);
+
+		// clone whens
+		for (UIElement when : whens) {
+			clone.getWhens().add((UIAttribute) when.clone());
+		}
+
+		// clone actions
+		for (UIElement action : actions) {
+			clone.getActions().add((UIAttribute) action.clone());
+		}
+
+		return clone;
+	}
 }

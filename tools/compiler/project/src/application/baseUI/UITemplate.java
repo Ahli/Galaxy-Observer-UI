@@ -1,14 +1,18 @@
 package application.baseUI;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 /**
  * 
  * @author Ahli
  *
  */
 public class UITemplate {
+	private final static Logger LOGGER = LogManager.getLogger(UITemplate.class);
 
 	private String fileName = "";
-	private UIFrame frame = null;
+	private UIElement element = null;
 	private boolean isLocked = false;
 
 	/**
@@ -16,9 +20,9 @@ public class UITemplate {
 	 * @param fileName
 	 * @param frame
 	 */
-	public UITemplate(String fileName, UIFrame frame) {
+	public UITemplate(String fileName, UIElement element) {
 		this.fileName = fileName;
-		this.frame = frame;
+		this.element = element;
 	}
 
 	/**
@@ -37,18 +41,18 @@ public class UITemplate {
 	}
 
 	/**
-	 * @return the frame
+	 * @return the element
 	 */
-	public UIFrame getFrame() {
-		return frame;
+	public UIElement getElement() {
+		return element;
 	}
 
 	/**
 	 * @param frame
 	 *            the frame to set
 	 */
-	public void setFrame(UIFrame frame) {
-		this.frame = frame;
+	public void setElement(UIElement element) {
+		this.element = element;
 	}
 
 	/**
@@ -66,4 +70,21 @@ public class UITemplate {
 		this.isLocked = isLocked;
 	}
 
+	/**
+	 * 
+	 * @param path
+	 * @return
+	 */
+	public UIElement receiveFrameFromPath(String path){
+		LOGGER.debug("receive Frame from path: "+path);
+		LOGGER.debug("element's name: "+element.getName());
+		if(path.equalsIgnoreCase(element.getName())){
+			int i = path.indexOf('/');
+			String newPath = i >= 0 ? path.substring(i+1) : null;
+			
+			return element.receiveFrameFromPath(newPath);
+		}
+		LOGGER.debug("did not find template: "+path);
+		return null;
+	}
 }

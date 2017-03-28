@@ -1,5 +1,5 @@
 package application.baseUI;
 
-public enum UIAnchor {
+public enum UIAnchorSide {
 	Top, Left, Bottom, Right
 }

@@ -3,6 +3,7 @@ package application.baseUI;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 
 /**
  * 
@@ -12,9 +13,9 @@ import java.util.Map;
 public class UIController extends UIElement {
 	private Map<String, String> values = new HashMap<>();
 	private ArrayList<UIAttribute> keys = new ArrayList<>();
-	private boolean nextAdditionShouldOverride = false; // TODO implement & keep key management within this class to auto-override all keys
+	private boolean nextAdditionShouldOverride = false;
 	private boolean nameIsImplicit = true;
-	
+
 	/**
 	 * 
 	 * @param name
@@ -46,7 +47,8 @@ public class UIController extends UIElement {
 	}
 
 	/**
-	 * @param nextAdditionShouldOverride the nextAdditionShouldOverride to set
+	 * @param nextAdditionShouldOverride
+	 *            the nextAdditionShouldOverride to set
 	 */
 	public void setNextAdditionShouldOverride(boolean nextAdditionShouldOverride) {
 		this.nextAdditionShouldOverride = nextAdditionShouldOverride;
@@ -60,7 +62,8 @@ public class UIController extends UIElement {
 	}
 
 	/**
-	 * @param values the values to set
+	 * @param values
+	 *            the values to set
 	 */
 	public void setValues(Map<String, String> values) {
 		this.values = values;
@@ -74,10 +77,44 @@ public class UIController extends UIElement {
 	}
 
 	/**
-	 * @param nameIsImplicit the nameIsImplicit to set
+	 * @param nameIsImplicit
+	 *            the nameIsImplicit to set
 	 */
 	public void setNameIsImplicit(boolean nameIsImplicit) {
 		this.nameIsImplicit = nameIsImplicit;
 	}
 
+	/**
+	 * 
+	 * @param path
+	 * @return
+	 */
+	@Override
+	public UIElement receiveFrameFromPath(String path) {
+		return (path == null || path.isEmpty()) ? this : null;
+	}
+
+	/**
+	 * 
+	 */
+	@Override
+	public Object clone() {
+		UIController clone = (UIController) super.clone();
+		clone.setNameIsImplicit(nameIsImplicit);
+		clone.setNextAdditionShouldOverride(nextAdditionShouldOverride);
+
+		// clone values
+		Map<String, String> clonedValues = new HashMap<>();
+		for (Entry<String, String> entry : values.entrySet()) {
+			clonedValues.put(entry.getKey(), entry.getValue());
+		}
+		clone.setValues(clonedValues);
+
+		// clone keys
+		for (UIElement key : keys) {
+			clone.getKeys().add((UIAttribute) key.clone());
+		}
+
+		return clone;
+	}
 }

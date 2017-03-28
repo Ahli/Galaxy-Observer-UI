@@ -2,6 +2,7 @@ package application.baseUI;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 
 /**
  * Basic Attribute implementation to describe default UI's attribute.
@@ -32,4 +33,30 @@ public class UIAttribute extends UIElement {
 		this.values = values;
 	}
 
+	/**
+	 * 
+	 * @param path
+	 * @return
+	 */
+	@Override
+	public UIElement receiveFrameFromPath(String path) {
+		return (path == null || path.isEmpty()) ? this : null;
+	}
+
+	/**
+	 * 
+	 */
+	@Override
+	public Object clone() {
+		UIAttribute clone = (UIAttribute) super.clone();
+
+		// clone values
+		Map<String, String> clonedValues = new HashMap<>();
+		for (Entry<String, String> entry : values.entrySet()) {
+			clonedValues.put(entry.getKey(), entry.getValue());
+		}
+		clone.setValues(clonedValues);
+		
+		return clone;
+	}
 }

@@ -11,6 +11,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.w3c.dom.Document;
+import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
@@ -29,11 +30,12 @@ public class DescIndexReader {
 	 * @param f
 	 *            descIndex file
 	 * @return
-	 * @throws IOException 
-	 * @throws SAXException 
-	 * @throws ParserConfigurationException 
+	 * @throws IOException
+	 * @throws SAXException
+	 * @throws ParserConfigurationException
 	 */
-	public static ArrayList<String> getLayoutPathList(File f) throws SAXException, IOException, ParserConfigurationException {
+	public static ArrayList<String> getLayoutPathList(File f, boolean ignoreRequiredToLoadEntries)
+			throws SAXException, IOException, ParserConfigurationException {
 		ArrayList<String> list = new ArrayList<>();
 
 		DocumentBuilder dBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
@@ -43,7 +45,15 @@ public class DescIndexReader {
 		NodeList nodeList = doc.getElementsByTagName("Include");
 		for (int i = 0; i < nodeList.getLength(); i++) {
 			Node node = nodeList.item(i);
-			String path = node.getAttributes().item(0).getNodeValue();
+			NamedNodeMap attributes = node.getAttributes();
+			String path = attributes.item(0).getNodeValue();
+
+			if (ignoreRequiredToLoadEntries && attributes.getLength() > 1
+					&& attributes.item(1).getNodeName().equalsIgnoreCase("requiredtoload")) {
+				// ignore
+				continue;
+			}
+
 			list.add(path);
 		}
 		return list;

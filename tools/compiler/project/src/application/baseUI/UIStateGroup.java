@@ -50,4 +50,42 @@ public class UIStateGroup extends UIElement {
 		this.states = states;
 	}
 
+	/**
+	 * 
+	 * @param path
+	 * @return
+	 */
+	@Override
+	public UIElement receiveFrameFromPath(String path) {
+		if (path == null || path.isEmpty()) {
+			// end here
+			return this;
+		} else {
+			// go deeper
+			for (UIElement curElem : states) {
+				if (path.equalsIgnoreCase(curElem.getName())) {
+					// found right frame -> cut path
+					String newPath = UIElement.removeLeftPathLevel(path);
+					return curElem.receiveFrameFromPath(newPath);
+				}
+			}
+			return null;
+		}
+	}
+
+	/**
+	 * 
+	 */
+	@Override
+	public Object clone() {
+		UIStateGroup clone = (UIStateGroup) super.clone();
+		clone.setDefaultState(defaultState);
+
+		// clone states
+		for (UIState state : states) {
+			clone.getStates().add((UIState) state.clone());
+		}
+
+		return clone;
+	}
 }

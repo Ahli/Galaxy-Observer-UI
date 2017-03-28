@@ -148,9 +148,9 @@ public class Main extends Application {
 		new Thread() {
 			public void run() {
 				try {
-					catalogSC2.processFile(new File(baseUIpath + File.separator + "sc2" + File.separator + "mods"
+					catalogSC2.processDescIndex(new File(baseUIpath + File.separator + "sc2" + File.separator + "mods"
 							+ File.separator + "core.sc2mod" + File.separator + "base.sc2data" + File.separator + "UI"
-							+ File.separator + "Layout" + File.separator + "UI" + File.separator + "GameUI.SC2Layout"));
+							+ File.separator + "Layout" + File.separator + "DescIndex.SC2Layout"));
 				} catch (ParserConfigurationException | SAXException | IOException e) {
 					LOGGER.error("Error parsing base UI catalog due to a technical problem.", e);
 					e.printStackTrace();
@@ -607,7 +607,7 @@ public class Main extends Application {
 		File descIndexFile = mpqi.getCachedFile(descIndex.getDescIndexIntPath());
 		LOGGER.debug("adding layouts from descIndexFile: " + descIndexFile.getAbsolutePath());
 		try {
-			descIndex.addLayoutIntPath(DescIndexReader.getLayoutPathList(descIndexFile));
+			descIndex.addLayoutIntPath(DescIndexReader.getLayoutPathList(descIndexFile, false));
 		} catch (SAXException | ParserConfigurationException | IOException e) {
 			String msg = "unable to read Layout paths";
 			LOGGER.error(msg);

@@ -31,4 +31,24 @@ public class UIConstant extends UIElement {
 		this.value = value;
 	}
 
+	/**
+	 * 
+	 * @param path
+	 * @return
+	 */
+	@Override
+	public UIElement receiveFrameFromPath(String path) {
+		return (path == null || path.isEmpty()) ? this : null;
+	}
+
+	/**
+	 * 
+	 */
+	@Override
+	public Object clone() {
+		UIConstant clone = (UIConstant) super.clone();
+		clone.setValue(value);
+
+		return clone;
+	}
 }
