@@ -14,6 +14,7 @@ public class UIAnimation extends UIElement {
 	private ArrayList<UIController> controllers = new ArrayList<>();
 	private Map<String, UIAttribute> events = new HashMap<>();
 	private boolean nextEventsAdditionShouldOverride = false;
+	private UIAttribute driver = null;
 
 	/**
 	 * 
@@ -70,6 +71,21 @@ public class UIAnimation extends UIElement {
 	}
 
 	/**
+	 * @return the driver
+	 */
+	public UIAttribute getDriver() {
+		return driver;
+	}
+
+	/**
+	 * @param driver
+	 *            the driver to set
+	 */
+	public void setDriver(UIAttribute driver) {
+		this.driver = driver;
+	}
+
+	/**
 	 * 
 	 * @param path
 	 * @return
@@ -115,6 +131,11 @@ public class UIAnimation extends UIElement {
 			clone.getControllers().add((UIController) controller.deepClone());
 		}
 
+		// clone driver
+		if(driver != null){
+			clone.setDriver((UIAttribute) driver.deepClone());
+		}
+		
 		return clone;
 	}
 }

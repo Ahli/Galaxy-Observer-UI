@@ -284,7 +284,11 @@ public class UICatalog {
 			UIAnimation p = (UIAnimation) parent;
 			p.getControllers().add(thisElem);
 		} else {
-			throw new UIException("Parent element does not allow a Controller to be defined here.");
+			// TODO disabled exception
+			//throw new UIException("Parent element does not allow a Controller to be defined here.");
+			LOGGER.error("Parent element does not allow a Controller to be defined here.");
+			thisElem.setNextAdditionShouldOverride(true);
+			return;
 		}
 
 		// go deeper
@@ -433,16 +437,20 @@ public class UICatalog {
 			UIFrame p = (UIFrame) parent;
 			p.getAttributes().put(id, thisElem);
 		} else if (parent instanceof UIAnimation) {
-			if (id.compareToIgnoreCase("event") != 0) {
+			if (id.equalsIgnoreCase("event")) {
+				UIAnimation p = (UIAnimation) parent;
+				// override all animation events
+				if (p.isNextEventsAdditionShouldOverride()) {
+					p.getEvents().clear();
+					p.setNextEventsAdditionShouldOverride(false);
+				}
+				p.getEvents().put(id, thisElem);
+			} else if(id.equalsIgnoreCase("driver")){
+				UIAnimation p = (UIAnimation) parent;
+				p.setDriver(thisElem);
+			}else{
 				throw new UIException("Parent element (Frame) expects 'Event' attribute instead of '" + id + "'");
 			}
-			UIAnimation p = (UIAnimation) parent;
-			// override all animation events
-			if(p.isNextEventsAdditionShouldOverride()){
-				p.getEvents().clear();
-				p.setNextEventsAdditionShouldOverride(false);
-			}
-			p.getEvents().put(id, thisElem);
 		} else if (parent instanceof UIStateGroup) {
 			if (id.compareToIgnoreCase("defaultstate") != 0) {
 				throw new UIException(
@@ -462,7 +470,7 @@ public class UICatalog {
 			case "when":
 				p = (UIState) parent;
 				// override all state whens
-				if(p.isNextAdditionShouldOverrideWhens()){
+				if (p.isNextAdditionShouldOverrideWhens()) {
 					p.getWhens().clear();
 					p.setNextAdditionShouldOverrideWhens(false);
 				}
@@ -471,7 +479,7 @@ public class UICatalog {
 			case "action":
 				p = (UIState) parent;
 				// override all state actions
-				if(p.isNextAdditionShouldOverrideActions()){
+				if (p.isNextAdditionShouldOverrideActions()) {
 					p.getWhens().clear();
 					p.setNextAdditionShouldOverrideActions(false);
 				}
@@ -487,7 +495,7 @@ public class UICatalog {
 			}
 			UIController p = (UIController) parent;
 			// override all controller keys
-			if(p.isNextAdditionShouldOverride()){
+			if (p.isNextAdditionShouldOverride()) {
 				p.getKeys().clear();
 				p.setNextAdditionShouldOverride(false);
 			}
@@ -762,9 +770,13 @@ public class UICatalog {
 				return clone;
 			}
 		}
+
 		String msg = "Template of path '" + path + "' could not be found";
 		LOGGER.error(msg);
-		throw new UIException(msg);
+		// throw new UIException(msg);
+		// TODO handle this case better... heroes default UI uses template of
+		// not-loaded frame
+		return new UIFrame(newName, "Frame");
 	}
 
 	/**
@@ -802,7 +814,7 @@ public class UICatalog {
 				return c.getValue();
 			}
 		}
-		LOGGER.info("Did not find a constant definition. ID is used instead.");
+		LOGGER.info("Did not find a constant definition. ID is used instead. id = " + constantID);
 		return prefix + constantName;
 	}
 
