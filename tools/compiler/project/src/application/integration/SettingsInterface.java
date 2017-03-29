@@ -78,6 +78,15 @@ public class SettingsInterface {
 		} else if (line.startsWith("StarCraft2_use64bit")) {
 			val = getValFromIniLine(line);
 			SC2_64bit = Boolean.parseBoolean(val);
+		} else if (line.startsWith("Heroes_protectMPQ")) {
+			val = getValFromIniLine(line);
+			HEROES_protectMPQ = Boolean.parseBoolean(val);
+		} else if (line.startsWith("StarCraft2_protectMPQ")) {
+			val = getValFromIniLine(line);
+			SC2_protectMPQ = Boolean.parseBoolean(val);
+		} else if (line.startsWith("buildUnprotectedToo")) {
+			val = getValFromIniLine(line);
+			buildUnprotectedToo = Boolean.parseBoolean(val);
 		}
 	}
 
@@ -120,10 +129,12 @@ public class SettingsInterface {
 	}
 
 	public boolean isHeroesProtectMPQ() {
+		LOGGER.debug("Heroes protection is: "+HEROES_protectMPQ);
 		return HEROES_protectMPQ;
 	}
 
 	public boolean isSC2ProtectMPQ() {
+		LOGGER.debug("SC2 protection is: "+SC2_protectMPQ);
 		return SC2_protectMPQ;
 	}
 

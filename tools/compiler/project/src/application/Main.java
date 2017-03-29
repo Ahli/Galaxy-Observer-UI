@@ -140,41 +140,40 @@ public class Main extends Application {
 		baseMpqInterface = new MpqInterface();
 		initMpqInterface(baseMpqInterface);
 
-		// TEST DefaultUICatalog
-		String baseUIpath = basePath.getParent() + File.separator + "baseUI";
-		LOGGER.info("BaseUI path: " + baseUIpath);
-		// UICatalog catalogSC2 = new UICatalog();
-		UICatalog catalogHeroes = new UICatalog();
-
-		new Thread() {
-			public void run() {
-				try {
-					// catalogSC2.processDescIndex(new File(baseUIpath +
-					// File.separator + "sc2" + File.separator + "mods"
-					// + File.separator + "core.sc2mod" + File.separator +
-					// "base.sc2data" + File.separator + "UI"
-					// + File.separator + "Layout" + File.separator +
-					// "DescIndex.SC2Layout"));
-					catalogHeroes.processDescIndex(
-							new File(baseUIpath + File.separator + "heroes" + File.separator + "mods" + File.separator
-									+ "core.stormmod" + File.separator + "base.stormdata" + File.separator + "UI"
-									+ File.separator + "Layout" + File.separator + "DescIndex.StormLayout"));
-					catalogHeroes.processDescIndex(
-							new File(basePath.getAbsolutePath() + File.separator + "heroes" + File.separator
-									+ "AhliObs.StormInterface" + File.separator + "Base.StormData" + File.separator
-									+ "UI" + File.separator + "Layout" + File.separator + "DescIndex.StormLayout"));
-				} catch (ParserConfigurationException | SAXException | IOException e) {
-					LOGGER.error("Error parsing base UI catalog due to a technical problem.", e);
-					e.printStackTrace();
-				} catch (UIException e) {
-					LOGGER.error("Error parsing base UI due to a logical problem.", e);
-					e.printStackTrace();
-				}
-			}
-		}.start();
-
-		if (true)
-			return;
+//		// TEST DefaultUICatalog
+//		String baseUIpath = basePath.getParent() + File.separator + "baseUI";
+//		LOGGER.info("BaseUI path: " + baseUIpath);
+//		// UICatalog catalogSC2 = new UICatalog();
+//		UICatalog catalogHeroes = new UICatalog();
+//
+//		new Thread() {
+//			public void run() {
+//				try {
+//					// catalogSC2.processDescIndex(new File(baseUIpath +
+//					// File.separator + "sc2" + File.separator + "mods"
+//					// + File.separator + "core.sc2mod" + File.separator +
+//					// "base.sc2data" + File.separator + "UI"
+//					// + File.separator + "Layout" + File.separator +
+//					// "DescIndex.SC2Layout"));
+//					catalogHeroes.processDescIndex(
+//							new File(baseUIpath + File.separator + "heroes" + File.separator + "mods" + File.separator
+//									+ "core.stormmod" + File.separator + "base.stormdata" + File.separator + "UI"
+//									+ File.separator + "Layout" + File.separator + "DescIndex.StormLayout"));
+//					catalogHeroes.processDescIndex(
+//							new File(basePath.getAbsolutePath() + File.separator + "heroes" + File.separator
+//									+ "AhliObs.StormInterface" + File.separator + "Base.StormData" + File.separator
+//									+ "UI" + File.separator + "Layout" + File.separator + "DescIndex.StormLayout"));
+//				} catch (ParserConfigurationException | SAXException | IOException e) {
+//					LOGGER.error("Error parsing base UI catalog due to a technical problem.", e);
+//					e.printStackTrace();
+//				} catch (UIException e) {
+//					LOGGER.error("Error parsing base UI due to a logical problem.", e);
+//					e.printStackTrace();
+//				}
+//			}
+//		}.start();
+//		if (true)
+//			return;
 
 		// WORK WORK WORK
 		if (!hasParamCompilePath) {
@@ -766,7 +765,7 @@ public class Main extends Application {
 	 * @param aclass
 	 * @return File at base path
 	 */
-	public File getJarDir(Class<Main> aclass) {
+	public static File getJarDir(Class<Main> aclass) {
 		LOGGER.debug("_FINDING JAR'S PATH");
 
 		// ATTEMPT #1

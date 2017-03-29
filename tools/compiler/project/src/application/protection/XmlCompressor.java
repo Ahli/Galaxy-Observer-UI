@@ -35,6 +35,14 @@ import com.sun.org.apache.xerces.internal.impl.io.MalformedByteSequenceException
 public class XmlCompressor {
 	static Logger LOGGER = LogManager.getLogger(XmlCompressor.class);
 
+	/**
+	 * 
+	 * @param cachePath
+	 * @param ignoreCommentCountPerFile
+	 * @throws ParserConfigurationException
+	 * @throws SAXException
+	 * @throws IOException
+	 */
 	public static void processCache(String cachePath, int ignoreCommentCountPerFile)
 			throws ParserConfigurationException, SAXException, IOException {
 
