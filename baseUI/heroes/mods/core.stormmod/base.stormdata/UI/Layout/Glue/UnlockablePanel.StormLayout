@@ -2,64 +2,68 @@
 <Desc>
     <DescFlags val="Locked"/>
 
-    <Constant name="UnlockableTileItemSpacing" val="4"/>
+    <Constant name="UnlockableTileItemSpacing" val="17"/>
 
-    <Frame type="UnlockableTileListItem" name="UnlockableTileListItemTemplate">
-        <Height val="110"/>
-        <Width val="110"/>
+    <!-- Portrait selector template -->
+    <Frame type="UnlockableTileListItem" name="UnlockablePortraitFrameTemplate">
+        <Height val="170"/>
+        <Width val="170"/>
         <SelectedSound val="@UI_BNet_ShopTileSelect"/>
         <HideWhenCleared val="false"/>
 
-        <Animation name="Locked">
-            <Event event="Locked" action="Restart"/>
-            <Event event="Locked" action="Play"/>
-            <Event event="Unlocked" action="Stop"/>
-            <Controller type="Fade" end="Pause" frame="UnlockableFrame/UnlockableImage">
-                <Key type="Curve" time="0" value="255" out="Auto"/>
-                <Key type="Curve" time=".01" value="60" out="Auto"/>
-            </Controller>
-            <Controller type="Desaturation" end="Pause" frame="UnlockableFrame/UnlockableImage">
-                <Key type="Bool" time="0" value="False"/>
-                <Key type="Bool" time=".01" value="True"/>
-            </Controller>
-            <Controller type="Visibility" end="Pause" frame="LockedImage">
-                <Key type="Bool" time="0" value="false"/>
-                <Key type="Bool" time="0" value="true"/>
-            </Controller>
-            <Controller type="Texture" end="Pause" frame="NormalImage">
-                <Key type="Image" time="0" image="@UI/Storm_UI_Profile_PortraitBorder"/>
-                <Key type="Image" time=".01" image="@UI/Storm_UI_Profile_PortraitBorder_Off"/>
-            </Controller>
-            <Controller type="Style" end="Pause" style1="PlayerProfileFrameTitle" style2="PlayerProfileFrameTitleOff" frame="TitleLabel">
-                <Key type="Curve" time="0" value="0" out="Auto"/>
-                <Key type="Curve" time=".01" value="1" in="Auto"/>
-            </Controller>
-            <Controller type="Style" end="Pause" style1="PlayerProfileFrameDescription" style2="PlayerProfileFrameDescriptionOff" frame="DescriptionLabel">
-                <Key type="Curve" time="0" value="0" out="Auto"/>
-                <Key type="Curve" time=".01" value="1" in="Auto"/>
-            </Controller>
-        </Animation>
+        <Frame type="RewardCacheFrame" name="RewardCacheFrame">
+            <Anchor relative="$parent"/>
+            <PresenceId val="{$BattleUI/@LocalToonPresenceId}"/>
+            <UnlockableTag val="{$parent/UnlockableFrame/@UnlockableTag}"/>
+            <UnlockableIndex val="{$parent/UnlockableFrame/@UnlockableIndex}"/>
+        </Frame>
+
+        <StateGroup name="ClickableStateGroup">
+            <State name="CanClickState">
+                <When type="Property" frame="RewardCacheFrame" Allowed="true"/>
+                <Action type="SetProperty" AllowedButtons="Left"/>
+            </State>
+            <State name="CanNotClickState">
+                <When type="Property" frame="RewardCacheFrame" Allowed="false"/>
+                <Action type="SetProperty" AllowedButtons=""/>
+            </State>
+        </StateGroup>
+
+        <Frame type="GameContentFrame" name="GameContentFrame">
+            <Anchor relative="$parent"/>
+            <GameContent val="{$parent/RewardCacheFrame/@PrerequisiteContent}"/>
+        </Frame>
+
+        <Frame type="Image" name="EmptyImage">
+            <Anchor relative="$parent/NormalImage" offset="-4"/>
+            <Texture val="@UI/Storm_UI_Store_PortraitFrame_Off"/>
+            <RenderPriority val="509"/>
+            <Unclipped val="True"/>
+            <Alpha val="100"/>
+        </Frame>
 
         <Frame type="Image" name="NormalImage">
-            <Anchor relative="$parent" offset="4"/>
+            <Anchor relative="$parent" offset="18"/>
             <Unclipped val="True"/>
-            <Texture val="@UI/Storm_UI_Profile_PortraitBorder"/>
+            <Texture val="@UI/Storm_UI_Store_PortraitFrame_Off"/>
             <TextureType val="NineSlice"/>
         </Frame>
 
         <Frame type="Image" name="HoverImage">
             <Anchor relative="$parent/NormalImage" offset="0"/>
-            <Texture val="@UI/Storm_UI_Profile_PortraitBorder"/>
+            <Texture val="@UI/Storm_UI_Store_PortraitFrame_Off"/>
             <TextureType val="NineSlice"/>
         </Frame>
-        
+
         <Frame type="Image" name="HoverFrameImage">
             <Anchor relative="$parent/NormalImage" offset="0"/>
             <Unclipped val="True"/>
-            <Texture val="@UI/Storm_UI_Profile_PortraitBorder"/>
+            <Texture val="@UI/Storm_UI_Store_PortraitFrame_Off"/>
             <TextureType val="NineSlice"/>
             <BlendMode val="Add"/>
             <Alpha val="0"/>
+            <RenderPriority val="600"/>
+
             <Animation name="Hover">
                 <Event event="OnMouseEnter" action="DirectionForward" frame="$parent"/>
                 <Event event="OnMouseEnter" action="Play" frame="$parent"/>
@@ -70,65 +74,331 @@
                     <Key type="Curve" time=".2" value="255" in="Slow"/>
                 </Controller>
             </Animation>
+
+            <StateGroup name="HoverSelected">
+                <State name="HoverSelected">
+                    <When type="Property" frame="$parent" Selected="true"/>
+                    <Action type="SetProperty" Texture="@UI/Storm_UI_Store_SmallFrameGlow"/>
+                    <Action type="SetProperty" ColorAdjustMode="Colorize"/>
+                    <Action type="SetProperty" AdjustmentColor="006cff"/>
+                </State>
+            </StateGroup>
+        </Frame>
+
+        <Frame type="UnlockableFrame" name="UnlockableFrame" template="StandardTemplates/UnlockableFrameTemplate">
+            <Anchor relative="$parent"/>
+        </Frame>
+
+        <Frame type="BuyButton" name="BuyButton" template="StoreTemplates/QuickBuyButtonTemplate">
+            <Anchor side="Left" relative="$parent" pos="Min" offset="-11"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="14"/>
+            <Width val="120"/>
+            <Height val="74"/>
+            <GameContent val="{$parent/GameContentFrame/@GameContent}"/>
+            <Currency val="{$parent/GameContentFrame/@Currency[0]}"/>
+            <AlwaysShow val="false"/>
+
+            <Animation name="HideButton">
+                <Event event="Hide" action="Reset,Play" frame="$parent"/>
+                <Controller type="Visibility" end="Pause">
+                    <Key type="Bool" time="0" value="true"/>
+                    <Key type="Bool" time=".01" value="false"/>
+                </Controller>
+            </Animation>
+
+            <Frame type="Label" name="Label">
+                <Anchor side="Left" relative="$parent" pos="Mid" offset="-5"/>
+                <Anchor side="Right" relative="$parent" pos="Mid" offset="-5"/>
+            </Frame>
+        </Frame>
+
+        <Frame type="Frame" name="UnseenItemFrame">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="-21"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="-21"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="21"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="23"/>
+            <Unclipped val="True"/>
+            <Visible val="False"/>
+
+            <Frame type="Image" name="ShardFX1">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="2"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="2"/>
+                <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+                <Anchor side="Bottom" relative="$parent" pos="Max" offset="-2"/>
+                <LayerCount val="2"/>
+                <BlendMode val="Add"/>
+                <ColorAdjustMode val="Colorize"/>
+                <LightAdjustColor val="47e3ff"/>
+                <DarkAdjustColor val="002aff"/>
+
+                <Texture val="@UI/Storm_UI_Store_PortraitFrameShineMask" layer="0"/>
+                <TextureCoords top="0" left="0" right="1" bottom="1" layer="0"/>
+                <AlphaLayer val="True" layer="0"/>
+
+                <Texture val="@UI/Storm_UI_Store_Shards" layer="1"/>
+                <TextureCoords top="-1" left="-1" right="1" bottom="1" layer="1"/>
+                <WrapUV val="True" layer="1"/>
+
+                <Animation name="ShardAnimations">
+                    <Event event="OnShown" action="Reset, Play"/>
+
+                    <Controller type="LayerUV" side="Top" sidelock="False" relative="False" end="Loop" layer="1">
+                        <Key type="Curve" time="0" value="-.25"/>
+                        <Key type="Curve" time="4" value="0"/>
+                    </Controller>
+                    <Controller type="LayerUV" side="Left" sidelock="False" relative="False" end="Loop" layer="1">
+                        <Key type="Curve" time="0" value="-.25"/>
+                        <Key type="Curve" time="4" value="-0"/>
+                    </Controller>
+                    <Controller type="LayerUV" side="Right" sidelock="False" relative="False" end="Loop" layer="1">
+                        <Key type="Curve" time="0" value="1.25"/>
+                        <Key type="Curve" time="4" value="1"/>
+                    </Controller>
+                    <Controller type="LayerUV" side="Bottom" sidelock="False" relative="False" end="Loop" layer="1">
+                        <Key type="Curve" time="0" value="1.25"/>
+                        <Key type="Curve" time="4" value="1"/>
+                    </Controller>
+                    <Controller type="Fade" end="Loop">
+                        <Key type="Curve" time="0" value="0"/>
+                        <Key type="Curve" time=".3" value="255"/>
+                        <Key type="Curve" time="3.6 " value="255"/>
+                        <Key type="Curve" time="4" value="0"/>
+                    </Controller>
+                </Animation>
+            </Frame>
+
+            <Frame type="Image" name="ShardFX2">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="2"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="2"/>
+                <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+                <Anchor side="Bottom" relative="$parent" pos="Max" offset="-2"/>
+                <LayerCount val="2"/>
+                <BlendMode val="Add"/>
+                <ColorAdjustMode val="Colorize"/>
+                <LightAdjustColor val="47e3ff"/>
+                <DarkAdjustColor val="002aff"/>
+
+                <Texture val="@UI/Storm_UI_Store_PortraitFrameShineMask" layer="0"/>
+                <TextureCoords top="0" left="0" right="1" bottom="1" layer="0"/>
+                <AlphaLayer val="True" layer="0"/>
+
+                <Texture val="@UI/Storm_UI_Store_Shards" layer="1"/>
+                <TextureCoords top="-2" left="-2" right="2" bottom="2" layer="1"/>
+                <WrapUV val="True" layer="1"/>
+
+                <Animation name="ShardAnimations">
+                    <Event event="OnShown" action="Reset, Play"/>
+
+                    <Controller type="LayerUV" side="Top" sidelock="False" relative="False" end="Loop" layer="1">
+                        <Key type="Curve" time="0" value="-.42"/>
+                        <Key type="Curve" time="7.5" value="-.17"/>
+                    </Controller>
+                    <Controller type="LayerUV" side="Left" sidelock="False" relative="False" end="Loop" layer="1">
+                        <Key type="Curve" time="0" value="-.42"/>
+                        <Key type="Curve" time="7.5" value="-.17"/>
+                    </Controller>
+                    <Controller type="LayerUV" side="Right" sidelock="False" relative="False" end="Loop" layer="1">
+                        <Key type="Curve" time="0" value="1.42"/>
+                        <Key type="Curve" time="7.5" value="1.17"/>
+                    </Controller>
+                    <Controller type="LayerUV" side="Bottom" sidelock="False" relative="False" end="Loop" layer="1">
+                        <Key type="Curve" time="0" value="1.42"/>
+                        <Key type="Curve" time="7.5" value="1.17"/>
+                    </Controller>
+                    <Controller type="Fade" end="Loop">
+                        <Key type="Curve" time="0" value="0"/>
+                        <Key type="Curve" time=".3" value="255"/>
+                        <Key type="Curve" time="7.1" value="255"/>
+                        <Key type="Curve" time="7.5" value="0"/>
+                    </Controller>
+                </Animation>
+            </Frame>
+
+            <Frame type="Image" name="ClockwiseGlow">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="2"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="2"/>
+                <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+                <Anchor side="Bottom" relative="$parent" pos="Max" offset="-2"/>
+                <BlendMode val="Add"/>
+                <ColorAdjustMode val="Colorize"/>
+                <LightAdjustColor val="47e3ff"/>
+                <DarkAdjustColor val="002aff"/>
+                <LayerCount val="4"/>
+                <Texture val="@UI/storm_ui_hud_fx_valeera_smoke" layer="0"/>
+                <WrapUV val="True" layer="0"/>
+                <AlphaLayer val="True" layer="0"/>
+                <Texture val="@UI/storm_ui_hud_fx_valeera_smoke" layer="1"/>
+                <WrapUV val="True" layer="1"/>
+                <AlphaLayer val="True" layer="1"/>
+                <Texture val="@UI/Storm_UI_Store_PortraitFrameShineMask" layer="2"/>
+                <AlphaLayer val="True" layer="2"/>
+                <TextureCoords top="0" left="0" right="1" bottom="1" layer="2"/>
+                <Texture val="@UI/Storm_UI_GenFX_Flare" layer="3"/>
+                <TextureCoords top=".3" left=".3" right=".7" bottom=".7" layer="3"/>
+
+                <Animation name="MaskAnimations">
+                    <Event event="OnShown" action="Reset, Play"/>
+
+                    <Controller type="LayerUV" side="Left" relative="False" sidelock="True" end="Loop" layer="0">
+                        <Key type="Curve" time="0" value="-1"/>
+                        <Key type="Curve" time="6" value="1"/>
+                    </Controller>
+                    <Controller type="LayerUV" side="Top" relative="False" sidelock="True" end="Loop" layer="1">
+                        <Key type="Curve" time="0" value="-1"/>
+                        <Key type="Curve" time="9" value="1"/>
+                    </Controller>
+                </Animation>
+            </Frame>
+
+            <Frame type="Image" name="WiddershinsGlow">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="2"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="2"/>
+                <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+                <Anchor side="Bottom" relative="$parent" pos="Max" offset="-2"/>
+                <BlendMode val="Add"/>
+                <ColorAdjustMode val="Colorize"/>
+                <LightAdjustColor val="47e3ff"/>
+                <DarkAdjustColor val="002aff"/>
+                <LayerCount val="4"/>
+                <Texture val="@UI/storm_ui_hud_fx_valeera_smoke" layer="0"/>
+                <WrapUV val="True" layer="0"/>
+                <AlphaLayer val="True" layer="0"/>
+                <Texture val="@UI/storm_ui_hud_fx_valeera_smoke" layer="1"/>
+                <WrapUV val="True" layer="1"/>
+                <AlphaLayer val="True" layer="1"/>
+                <Texture val="@UI/Storm_UI_Store_PortraitFrameShineMask" layer="2"/>
+                <AlphaLayer val="True" layer="2"/>
+                <TextureCoords top="0" left="0" right="1" bottom="1" layer="2"/>
+                <Texture val="@UI/Storm_UI_GenFX_Flare" layer="3"/>
+                <TextureCoords top=".3" left=".3" right=".7" bottom=".7" layer="3"/>
+
+
+                <Animation name="MaskAnimations">
+                    <Event event="OnShown" action="Reset, Play"/>
+
+                    <Controller type="LayerUV" side="Left" relative="False" sidelock="True" end="Loop" layer="0">
+                        <Key type="Curve" time="0" value="1"/>
+                        <Key type="Curve" time="6" value="-1"/>
+                    </Controller>
+                    <Controller type="LayerUV" side="Top" relative="False" sidelock="True" end="Loop" layer="1">
+                        <Key type="Curve" time="0" value="1"/>
+                        <Key type="Curve" time="9" value="-1"/>
+                    </Controller>
+                </Animation>
+            </Frame>
+
+            <Frame type="Image" name="BorderGlow">
+                <Anchor side="Top" relative="$parent/$parent/NormalImage" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/$parent/NormalImage" pos="Min" offset="0"/>
+                <Anchor side="Right" relative="$parent/$parent/NormalImage" pos="Max" offset="0"/>
+                <Anchor side="Bottom" relative="$parent/$parent/NormalImage" pos="Max" offset="0"/>
+                <TextureType val="Nineslice"/>
+                <BlendMode val="Add"/>
+                <ColorAdjustMode val="Colorize"/>
+                <LightAdjustColor val="47e3ff"/>
+                <DarkAdjustColor val="002aff"/>
+                <Texture val="@UI/Storm_UI_Store_SmallFrameGlow"/>
+            </Frame>
+
+            <StateGroup name="UnseenStates">
+                <State name="Seen">
+                    <When type="Property" frame="$parent" Unseen="false"/>
+                    <Action type="SetProperty" Visible="false"/>
+                </State>
+                <State name="Unseen">
+                    <When type="Property" frame="$parent" Unseen="true"/>
+                    <Action type="SetProperty" Visible="true"/>
+                </State>
+            </StateGroup>
+
+            <Animation name="GlowFade">
+                <Event event="OnMouseEnter" frame="$parent" action="Play"/>
+
+                <Controller type="Fade" end="Stop">
+                    <Key type="Curve" time="0" value="255"/>
+                    <Key type="Curve" time=".25" value="0" in="Slow"/>
+                </Controller>
+                <Controller type="Event" end="Stop">
+                    <Key type="Event" time=".25" event="MarkAsSeen"/>
+                </Controller>
+            </Animation>
+
+            <Animation name="MarkAsSeen">
+                <Event event="MarkAsSeen" action="Reset, Play"/>
+
+                <Controller type="Property" property="Unseen" frame="$parent" end="Pause">
+                    <Key type="Property" time="0" value="False"/>
+                </Controller>
+            </Animation>
+        </Frame>
+
+        <Frame type="Image" name="OwnedCheckImage">
+            <Anchor side="Top" relative="$parent/UnlockableFrame" pos="Min" offset="-4"/>
+            <Anchor side="Right" relative="$parent/UnlockableFrame" pos="Max" offset="9"/>
+            <Texture val="@UI/Storm_UI_Store_OwnedCheck"/>
+            <Visible val="false"/>
+
+            <Frame type="Image" name="UnseenCheckImage">
+                <Anchor relative="$parent"/>
+                <Texture val="@UI/Storm_UI_Store_OwnedCheckNew"/>
+                <Alpha val="{$parent/$parent/UnseenItemFrame/@Alpha}"/>
+                <Visible val="False"/>
+            </Frame>
+
+            <StateGroup name="NewlyAcquiredCheckMarkOverride">
+                <State name="Normal">
+                    <When type="Property" frame="$parent/UnseenItemFrame" Visible="false"/>
+                    <Action type="SetProperty" frame="UnseenCheckImage" Visible="false"/>
+                </State>
+                <State name="NewlyAcquired">
+                    <When type="Property" frame="$parent/UnseenItemFrame" Visible="true"/>
+                    <Action type="SetProperty" frame="UnseenCheckImage" Visible="true"/>
+                </State>
+            </StateGroup>
+
+            <StateGroup name="OwnedCheckVisible">
+                <State name="UnlockOwned">
+                    <When type="Property" frame="$parent/RewardCacheFrame" Allowed="true"/>
+                    <When type="Property" frame="$parent/GameContentFrame" CanPurchase="false"/>
+                    <Action type="SetProperty" visible="true"/>
+                </State>
+                <State name="PurchaseOwned">
+                    <When type="Property" frame="$parent/RewardCacheFrame" Allowed="true"/>
+                    <When type="Property" frame="$parent/GameContentFrame" IsPurchased="true"/>
+                    <Action type="SetProperty" visible="true"/>
+                    <Action type="SendEvent" frame="$parent/BuyButton" event="Hide" on="enter"/>
+                </State>
+            </StateGroup>
         </Frame>
 
         <Frame type="Image" name="SelectedImage">
             <Anchor relative="$parent/NormalImage" offset="0"/>
             <Unclipped val="True"/>
-            <Texture val="@UI/Storm_UI_Profile_PortraitBorder_Selected"/>
+            <Texture val="@UI/Storm_UI_Store_SmallFrameGlow"/>
             <TextureType val="NineSlice"/>
+            <ColorAdjustMode val="Colorize"/>
+            <AdjustmentColor val="006cff"/>
             <Tiled val="false"/>
-        </Frame>
-        
-        <Frame type="UnlockableFrame" name="UnlockableFrame" template="StandardTemplates/UnlockableFrameTemplate">
-            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
-            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
-        </Frame>
-        
-        <Frame type="Label" name="TitleLabel">
-            <Anchor side="Top" relative="$parent" pos="Min" offset="24"/>
-            <Anchor side="Left" relative="$parent/UnlockableFrame" pos="Max" offset="10"/>
-            <Anchor side="Right" relative="$parent" pos="Max" offset="-21"/>
-            <Style val="PlayerProfileFrameTitle"/>
-        </Frame>
-
-        <Frame type="Label" name="DescriptionLabel">
-            <Anchor side="Top" relative="$parent/TitleLabel" pos="Max" offset="2"/>
-            <Anchor side="Left" relative="$parent/TitleLabel" pos="Min" offset="0"/>
-            <Anchor side="Right" relative="$parent/TitleLabel" pos="Max" offset="0"/>
-            <Style val="PlayerProfileFrameDescription"/>
-        </Frame>
-
-        <Frame type="Image" name="LockedImage">
-            <Anchor side="Top" relative="$parent" pos="Min" offset="55"/>
-            <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
-            <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
-            <Texture val="@UI/Storm_UI_Minilock"/>
-            <TextureType val="Normal"/>
-            <Tiled val="false"/>
-            <Visible val="False"/>
         </Frame>
     </Frame>
 
-    <Frame type="UnlockableTileListItem" name="UnlockableFrameItemTemplate" template="UnlockablePanel/UnlockableTileListItemTemplate">
-        <Width val="300"/>
-        <Height val="150"/>
-        
-        <Frame type="UnlockableFrame" name="UnlockableFrame" template="StandardTemplates/UnlockableFrameTemplate">
-            <Anchor side="Top" relative="$parent" pos="Min" offset="17"/>
-            <Anchor side="Left" relative="$parent" pos="Min" offset="12"/>
-            <Width val="124"/>
-            <Height val="124"/>
-        </Frame>
-        
-        <Frame type="Image" name="LockedImage">
-            <Anchor side="Top" relative="$parent" pos="Min" offset="83"/>
-            <Anchor side="Left" relative="$parent" pos="Min" offset="45"/>
-            <Anchor side="Right" relative="$this" pos="Min" offset="0"/>
-        </Frame>
-    </Frame>
-    
     <Frame type="UnlockablePanel" name="UnlockablePanelTemplate">
+        <OwnershipFilter val="{OwnershipFilterPulldown/@SelectedFilter}"/>
+        <FilterString val="{SearchEditBox/@Text}"/>
+
+        <Frame type="EditBox" name="SearchEditBox" template="CollectionTemplates/SearchEditBoxTemplate">
+            <Frame type="Label" name="SearchTextLabel">
+                <Text val="@UI/ScreenStore/SearchEditBox/Portraits"/>
+            </Frame>
+        </Frame>
+
+        <Frame type="GameContentOwnershipFilterPulldown" name="OwnershipFilterPulldown" template="StandardTemplates/StandardPulldownTemplate">
+            <Anchor side="Top" relative="$parent/SearchEditBox" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent/SearchEditBox" pos="Min" offset="-5"/>
+            <Anchor side="Bottom" relative="$parent/SearchEditBox" pos="Max" offset="0"/>
+            <Width val="256"/>
+            <ShowContentType val="false"/>
+         </Frame>
 
         <Animation name="Show">
             <Event event="OnShown" action="DirectionForward"/>
@@ -143,265 +413,282 @@
         </Animation>
 
         <Frame type="TileList" name="UnlockableTileList">
-            <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
-            <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
-            <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
-            <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
-            <Width val="1050"/>
-            <Height val="530"/>
             <ReportsStats val="true"/>
             <Handle val="UnlockablePanel_TileList"/>
             <AcceptsMouse val="true"/>
+            <RenderPriority val="601"/>
 
-            <Frame type="PageSelectorButtonList" name="PageSelector" template="StandardTemplates/PageSelectorButtonListTemplate">
-                <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
-                <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
-                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
-                <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
-                <Height val="550"/>
-                
-                <Frame type="Button" name="DecrementButton" template="StandardTemplates/StandardFloatingArrowButtonTemplate_Left">
-                    <Anchor side="Top" relative="$parent/$parent" pos="Min" offset="175"/>
-                    <Anchor side="Left" relative="$parent/$parent" pos="Min" offset="0"/>
-                    <ClickSound val="@UI_BNet_Decrement"/>
-                    <Visible val="true"/>
-                </Frame>
+            <ScrollStepValue val="6"/>
+            <MaxItemPerPage val="24"/>
 
-                <Frame type="Button" name="IncrementButton" template="StandardTemplates/StandardFloatingArrowButtonTemplate_Right">
-                    <Anchor side="Top" relative="$parent/DecrementButton" pos="Min" offset="0"/>
-                    <Anchor side="Right" relative="$parent/$parent" pos="Max" offset="0"/>
-                    <ClickSound val="@UI_BNet_Increment"/>
-                    <Visible val="true"/>
-                </Frame>
-                
-                <Frame type="Button" name="PageButton0" template="StandardTemplates/StandardPipButtonTemplate">
-                    <Anchor side="Top" relative="$parent/$parent" pos="Max" offset="-75"/>
-                    <Anchor side="Left" relative="$parent/$parent" pos="Mid" offset="-114"/>
-                    <CollapseLayout val="true"/>
-                </Frame>
+            <Frame type="ScrollBar" name="ScrollBar" template="StandardTemplates/ScrollableBarTemplate">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="-5"/>
+                <Anchor side="Bottom" relative="$parent/Item23" pos="Max" offset="5"/>
+                <Anchor side="Right" relative="$parent/Item5" pos="Max" offset="21"/>
+                <IncrementSound val=""/>
+                <Unclipped val="true"/>
             </Frame>
 
             <!-- First row -->
-            <Frame type="UnlockableTileListItem" name="Item0" template="UnlockablePanel/UnlockableTileListItemTemplate">
+            <Frame type="UnlockableTileListItem" name="Item0" template="UnlockablePanel/UnlockablePortraitFrameTemplate">
                 <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
-                <Anchor side="Left" relative="$parent" pos="Min" offset="70"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
             </Frame>
 
-            <Frame type="UnlockableTileListItem" name="Item1" template="UnlockablePanel/UnlockableTileListItemTemplate">
+            <Frame type="UnlockableTileListItem" name="Item1" template="UnlockablePanel/UnlockablePortraitFrameTemplate">
                 <Anchor side="Top" relative="$parent/Item0" pos="Min" offset="0"/>
                 <Anchor side="Left" relative="$parent/Item0" pos="Max" offset="#UnlockableTileItemSpacing"/>
             </Frame>
 
-            <Frame type="UnlockableTileListItem" name="Item2" template="UnlockablePanel/UnlockableTileListItemTemplate">
+            <Frame type="UnlockableTileListItem" name="Item2" template="UnlockablePanel/UnlockablePortraitFrameTemplate">
                 <Anchor side="Top" relative="$parent/Item1" pos="Min" offset="0"/>
                 <Anchor side="Left" relative="$parent/Item1" pos="Max" offset="#UnlockableTileItemSpacing"/>
             </Frame>
 
-            <Frame type="UnlockableTileListItem" name="Item3" template="UnlockablePanel/UnlockableTileListItemTemplate">
+            <Frame type="UnlockableTileListItem" name="Item3" template="UnlockablePanel/UnlockablePortraitFrameTemplate">
                 <Anchor side="Top" relative="$parent/Item2" pos="Min" offset="0"/>
                 <Anchor side="Left" relative="$parent/Item2" pos="Max" offset="#UnlockableTileItemSpacing"/>
             </Frame>
 
-            <Frame type="UnlockableTileListItem" name="Item4" template="UnlockablePanel/UnlockableTileListItemTemplate">
+            <Frame type="UnlockableTileListItem" name="Item4" template="UnlockablePanel/UnlockablePortraitFrameTemplate">
                 <Anchor side="Top" relative="$parent/Item3" pos="Min" offset="0"/>
                 <Anchor side="Left" relative="$parent/Item3" pos="Max" offset="#UnlockableTileItemSpacing"/>
             </Frame>
 
-            <Frame type="UnlockableTileListItem" name="Item5" template="UnlockablePanel/UnlockableTileListItemTemplate">
+            <Frame type="UnlockableTileListItem" name="Item5" template="UnlockablePanel/UnlockablePortraitFrameTemplate">
                 <Anchor side="Top" relative="$parent/Item4" pos="Min" offset="0"/>
                 <Anchor side="Left" relative="$parent/Item4" pos="Max" offset="#UnlockableTileItemSpacing"/>
             </Frame>
 
-            <Frame type="UnlockableTileListItem" name="Item6" template="UnlockablePanel/UnlockableTileListItemTemplate">
-                <Anchor side="Top" relative="$parent/Item5" pos="Min" offset="0"/>
-                <Anchor side="Left" relative="$parent/Item5" pos="Max" offset="#UnlockableTileItemSpacing"/>
-            </Frame>
-
-            <Frame type="UnlockableTileListItem" name="Item7" template="UnlockablePanel/UnlockableTileListItemTemplate">
-                <Anchor side="Top" relative="$parent/Item6" pos="Min" offset="0"/>
-                <Anchor side="Left" relative="$parent/Item6" pos="Max" offset="#UnlockableTileItemSpacing"/>
-            </Frame>
-
             <!-- Second row -->
-            <Frame type="UnlockableTileListItem" name="Item8" template="UnlockablePanel/UnlockableTileListItemTemplate">
+            <Frame type="UnlockableTileListItem" name="Item6" template="UnlockablePanel/UnlockablePortraitFrameTemplate">
                 <Anchor side="Top" relative="$parent/Item0" pos="Max" offset="#UnlockableTileItemSpacing"/>
                 <Anchor side="Left" relative="$parent/Item0" pos="Min" offset="0"/>
             </Frame>
 
-            <Frame type="UnlockableTileListItem" name="Item9" template="UnlockablePanel/UnlockableTileListItemTemplate">
+            <Frame type="UnlockableTileListItem" name="Item7" template="UnlockablePanel/UnlockablePortraitFrameTemplate">
+                <Anchor side="Top" relative="$parent/Item6" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item6" pos="Max" offset="#UnlockableTileItemSpacing"/>
+            </Frame>
+
+            <Frame type="UnlockableTileListItem" name="Item8" template="UnlockablePanel/UnlockablePortraitFrameTemplate">
+                <Anchor side="Top" relative="$parent/Item7" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item7" pos="Max" offset="#UnlockableTileItemSpacing"/>
+            </Frame>
+
+            <Frame type="UnlockableTileListItem" name="Item9" template="UnlockablePanel/UnlockablePortraitFrameTemplate">
                 <Anchor side="Top" relative="$parent/Item8" pos="Min" offset="0"/>
                 <Anchor side="Left" relative="$parent/Item8" pos="Max" offset="#UnlockableTileItemSpacing"/>
             </Frame>
 
-            <Frame type="UnlockableTileListItem" name="Item10" template="UnlockablePanel/UnlockableTileListItemTemplate">
+            <Frame type="UnlockableTileListItem" name="Item10" template="UnlockablePanel/UnlockablePortraitFrameTemplate">
                 <Anchor side="Top" relative="$parent/Item9" pos="Min" offset="0"/>
                 <Anchor side="Left" relative="$parent/Item9" pos="Max" offset="#UnlockableTileItemSpacing"/>
             </Frame>
 
-            <Frame type="UnlockableTileListItem" name="Item11" template="UnlockablePanel/UnlockableTileListItemTemplate">
+            <Frame type="UnlockableTileListItem" name="Item11" template="UnlockablePanel/UnlockablePortraitFrameTemplate">
                 <Anchor side="Top" relative="$parent/Item10" pos="Min" offset="0"/>
                 <Anchor side="Left" relative="$parent/Item10" pos="Max" offset="#UnlockableTileItemSpacing"/>
             </Frame>
 
-            <Frame type="UnlockableTileListItem" name="Item12" template="UnlockablePanel/UnlockableTileListItemTemplate">
-                <Anchor side="Top" relative="$parent/Item11" pos="Min" offset="0"/>
-                <Anchor side="Left" relative="$parent/Item11" pos="Max" offset="#UnlockableTileItemSpacing"/>
+            <!-- Third row -->
+            <Frame type="UnlockableTileListItem" name="Item12" template="UnlockablePanel/UnlockablePortraitFrameTemplate">
+                <Anchor side="Top" relative="$parent/Item6" pos="Max" offset="#UnlockableTileItemSpacing"/>
+                <Anchor side="Left" relative="$parent/Item6" pos="Min" offset="0"/>
             </Frame>
 
-            <Frame type="UnlockableTileListItem" name="Item13" template="UnlockablePanel/UnlockableTileListItemTemplate">
+            <Frame type="UnlockableTileListItem" name="Item13" template="UnlockablePanel/UnlockablePortraitFrameTemplate">
                 <Anchor side="Top" relative="$parent/Item12" pos="Min" offset="0"/>
                 <Anchor side="Left" relative="$parent/Item12" pos="Max" offset="#UnlockableTileItemSpacing"/>
             </Frame>
 
-            <Frame type="UnlockableTileListItem" name="Item14" template="UnlockablePanel/UnlockableTileListItemTemplate">
+            <Frame type="UnlockableTileListItem" name="Item14" template="UnlockablePanel/UnlockablePortraitFrameTemplate">
                 <Anchor side="Top" relative="$parent/Item13" pos="Min" offset="0"/>
                 <Anchor side="Left" relative="$parent/Item13" pos="Max" offset="#UnlockableTileItemSpacing"/>
             </Frame>
 
-            <Frame type="UnlockableTileListItem" name="Item15" template="UnlockablePanel/UnlockableTileListItemTemplate">
+            <Frame type="UnlockableTileListItem" name="Item15" template="UnlockablePanel/UnlockablePortraitFrameTemplate">
                 <Anchor side="Top" relative="$parent/Item14" pos="Min" offset="0"/>
                 <Anchor side="Left" relative="$parent/Item14" pos="Max" offset="#UnlockableTileItemSpacing"/>
             </Frame>
 
-            <!-- Third row -->
-            <Frame type="UnlockableTileListItem" name="Item16" template="UnlockablePanel/UnlockableTileListItemTemplate">
-                <Anchor side="Top" relative="$parent/Item8" pos="Max" offset="#UnlockableTileItemSpacing"/>
-                <Anchor side="Left" relative="$parent/Item8" pos="Min" offset="0"/>
+            <Frame type="UnlockableTileListItem" name="Item16" template="UnlockablePanel/UnlockablePortraitFrameTemplate">
+                <Anchor side="Top" relative="$parent/Item15" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item15" pos="Max" offset="#UnlockableTileItemSpacing"/>
             </Frame>
 
-            <Frame type="UnlockableTileListItem" name="Item17" template="UnlockablePanel/UnlockableTileListItemTemplate">
+            <Frame type="UnlockableTileListItem" name="Item17" template="UnlockablePanel/UnlockablePortraitFrameTemplate">
                 <Anchor side="Top" relative="$parent/Item16" pos="Min" offset="0"/>
                 <Anchor side="Left" relative="$parent/Item16" pos="Max" offset="#UnlockableTileItemSpacing"/>
             </Frame>
 
-            <Frame type="UnlockableTileListItem" name="Item18" template="UnlockablePanel/UnlockableTileListItemTemplate">
-                <Anchor side="Top" relative="$parent/Item17" pos="Min" offset="0"/>
-                <Anchor side="Left" relative="$parent/Item17" pos="Max" offset="#UnlockableTileItemSpacing"/>
+            <!-- Fourth row -->
+            <Frame type="UnlockableTileListItem" name="Item18" template="UnlockablePanel/UnlockablePortraitFrameTemplate">
+                <Anchor side="Top" relative="$parent/Item12" pos="Max" offset="#UnlockableTileItemSpacing"/>
+                <Anchor side="Left" relative="$parent/Item12" pos="Min" offset="0"/>
             </Frame>
 
-            <Frame type="UnlockableTileListItem" name="Item19" template="UnlockablePanel/UnlockableTileListItemTemplate">
+            <Frame type="UnlockableTileListItem" name="Item19" template="UnlockablePanel/UnlockablePortraitFrameTemplate">
                 <Anchor side="Top" relative="$parent/Item18" pos="Min" offset="0"/>
                 <Anchor side="Left" relative="$parent/Item18" pos="Max" offset="#UnlockableTileItemSpacing"/>
             </Frame>
 
-            <Frame type="UnlockableTileListItem" name="Item20" template="UnlockablePanel/UnlockableTileListItemTemplate">
+            <Frame type="UnlockableTileListItem" name="Item20" template="UnlockablePanel/UnlockablePortraitFrameTemplate">
                 <Anchor side="Top" relative="$parent/Item19" pos="Min" offset="0"/>
                 <Anchor side="Left" relative="$parent/Item19" pos="Max" offset="#UnlockableTileItemSpacing"/>
             </Frame>
 
-            <Frame type="UnlockableTileListItem" name="Item21" template="UnlockablePanel/UnlockableTileListItemTemplate">
+            <Frame type="UnlockableTileListItem" name="Item21" template="UnlockablePanel/UnlockablePortraitFrameTemplate">
                 <Anchor side="Top" relative="$parent/Item20" pos="Min" offset="0"/>
                 <Anchor side="Left" relative="$parent/Item20" pos="Max" offset="#UnlockableTileItemSpacing"/>
             </Frame>
 
-            <Frame type="UnlockableTileListItem" name="Item22" template="UnlockablePanel/UnlockableTileListItemTemplate">
+            <Frame type="UnlockableTileListItem" name="Item22" template="UnlockablePanel/UnlockablePortraitFrameTemplate">
                 <Anchor side="Top" relative="$parent/Item21" pos="Min" offset="0"/>
                 <Anchor side="Left" relative="$parent/Item21" pos="Max" offset="#UnlockableTileItemSpacing"/>
             </Frame>
 
-            <Frame type="UnlockableTileListItem" name="Item23" template="UnlockablePanel/UnlockableTileListItemTemplate">
+            <Frame type="UnlockableTileListItem" name="Item23" template="UnlockablePanel/UnlockablePortraitFrameTemplate">
                 <Anchor side="Top" relative="$parent/Item22" pos="Min" offset="0"/>
                 <Anchor side="Left" relative="$parent/Item22" pos="Max" offset="#UnlockableTileItemSpacing"/>
             </Frame>
 
-            <!-- Fourth row -->
-            <Frame type="UnlockableTileListItem" name="Item24" template="UnlockablePanel/UnlockableTileListItemTemplate">
-                <Anchor side="Top" relative="$parent/Item16" pos="Max" offset="#UnlockableTileItemSpacing"/>
-                <Anchor side="Left" relative="$parent/Item16" pos="Min" offset="0"/>
+            <!-- Extras for when search is active -->
+            <Frame type="UnlockableTileListItem" name="Item24" template="UnlockablePanel/UnlockablePortraitFrameTemplate">
+                <Anchor side="Top" relative="$parent/Item23" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item23" pos="Max" offset="#UnlockableTileItemSpacing"/>
             </Frame>
 
-            <Frame type="UnlockableTileListItem" name="Item25" template="UnlockablePanel/UnlockableTileListItemTemplate">
-                <Anchor side="Top" relative="$parent/Item24" pos="Min" offset="0"/>
-                <Anchor side="Left" relative="$parent/Item24" pos="Max" offset="#UnlockableTileItemSpacing"/>
+            <Frame type="UnlockableTileListItem" name="Item25" template="UnlockablePanel/UnlockablePortraitFrameTemplate">
+                <Anchor side="Top" relative="$parent/Item23" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item23" pos="Max" offset="#UnlockableTileItemSpacing"/>
             </Frame>
 
-            <Frame type="UnlockableTileListItem" name="Item26" template="UnlockablePanel/UnlockableTileListItemTemplate">
-                <Anchor side="Top" relative="$parent/Item25" pos="Min" offset="0"/>
-                <Anchor side="Left" relative="$parent/Item25" pos="Max" offset="#UnlockableTileItemSpacing"/>
+            <Frame type="UnlockableTileListItem" name="Item26" template="UnlockablePanel/UnlockablePortraitFrameTemplate">
+                <Anchor side="Top" relative="$parent/Item23" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item23" pos="Max" offset="#UnlockableTileItemSpacing"/>
             </Frame>
 
-            <Frame type="UnlockableTileListItem" name="Item27" template="UnlockablePanel/UnlockableTileListItemTemplate">
-                <Anchor side="Top" relative="$parent/Item26" pos="Min" offset="0"/>
-                <Anchor side="Left" relative="$parent/Item26" pos="Max" offset="#UnlockableTileItemSpacing"/>
+            <Frame type="UnlockableTileListItem" name="Item27" template="UnlockablePanel/UnlockablePortraitFrameTemplate">
+                <Anchor side="Top" relative="$parent/Item23" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item23" pos="Max" offset="#UnlockableTileItemSpacing"/>
             </Frame>
 
-            <Frame type="UnlockableTileListItem" name="Item28" template="UnlockablePanel/UnlockableTileListItemTemplate">
-                <Anchor side="Top" relative="$parent/Item27" pos="Min" offset="0"/>
-                <Anchor side="Left" relative="$parent/Item27" pos="Max" offset="#UnlockableTileItemSpacing"/>
+            <Frame type="UnlockableTileListItem" name="Item28" template="UnlockablePanel/UnlockablePortraitFrameTemplate">
+                <Anchor side="Top" relative="$parent/Item23" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item23" pos="Max" offset="#UnlockableTileItemSpacing"/>
             </Frame>
 
-            <Frame type="UnlockableTileListItem" name="Item29" template="UnlockablePanel/UnlockableTileListItemTemplate">
-                <Anchor side="Top" relative="$parent/Item28" pos="Min" offset="0"/>
-                <Anchor side="Left" relative="$parent/Item28" pos="Max" offset="#UnlockableTileItemSpacing"/>
+            <Frame type="UnlockableTileListItem" name="Item29" template="UnlockablePanel/UnlockablePortraitFrameTemplate">
+                <Anchor side="Top" relative="$parent/Item23" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item23" pos="Max" offset="#UnlockableTileItemSpacing"/>
             </Frame>
 
-            <Frame type="UnlockableTileListItem" name="Item30" template="UnlockablePanel/UnlockableTileListItemTemplate">
-                <Anchor side="Top" relative="$parent/Item29" pos="Min" offset="0"/>
-                <Anchor side="Left" relative="$parent/Item29" pos="Max" offset="#UnlockableTileItemSpacing"/>
+            <Frame type="UnlockableTileListItem" name="Item30" template="UnlockablePanel/UnlockablePortraitFrameTemplate">
+                <Anchor side="Top" relative="$parent/Item23" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item23" pos="Max" offset="#UnlockableTileItemSpacing"/>
             </Frame>
 
-            <Frame type="UnlockableTileListItem" name="Item31" template="UnlockablePanel/UnlockableTileListItemTemplate">
-                <Anchor side="Top" relative="$parent/Item30" pos="Min" offset="0"/>
-                <Anchor side="Left" relative="$parent/Item30" pos="Max" offset="#UnlockableTileItemSpacing"/>
-            </Frame>
-        </Frame>
-    </Frame>
-    
-    <Frame type="UnlockablePanel" name="UnlockableFramePanelTemplate">
-
-        <Frame type="TileList" name="UnlockableTileList">
-            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
-            <Anchor side="Bottom" relative="Item0" pos="Max" offset="0"/>
-            <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
-            <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
-            <Width val="1050"/>
-            <ReportsStats val="true"/>
-            <Handle val="UnlockablePanel_TileList"/>
-            <AcceptsMouse val="true"/>
-
-            <Frame type="PageSelectorButtonList" name="PageSelector" template="StandardTemplates/PageSelectorButtonListTemplate">
-                <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
-                <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
-                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
-                <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
-                <Height val="550"/>
-                
-                <Frame type="Button" name="DecrementButton" template="StandardTemplates/StandardFloatingArrowButtonTemplate_Left">
-                    <Anchor side="Top" relative="$parent/$parent" pos="Min" offset="175"/>
-                    <Anchor side="Left" relative="$parent/$parent" pos="Min" offset="0"/>
-                    <ClickSound val="@UI_BNet_Decrement"/>
-                    <Visible val="true"/>
-                </Frame>
-
-                <Frame type="Button" name="IncrementButton" template="StandardTemplates/StandardFloatingArrowButtonTemplate_Right">
-                    <Anchor side="Top" relative="$parent/DecrementButton" pos="Min" offset="0"/>
-                    <Anchor side="Right" relative="$parent/$parent" pos="Max" offset="0"/>
-                    <ClickSound val="@UI_BNet_Increment"/>
-                    <Visible val="true"/>
-                </Frame>
-                
-                <Frame type="Button" name="PageButton0" template="StandardTemplates/StandardPipButtonTemplate">
-                    <Anchor side="Top" relative="$parent/$parent" pos="Max" offset="-75"/>
-                    <Anchor side="Left" relative="$parent/$parent" pos="Mid" offset="-65"/>
-                    <CollapseLayout val="true"/>
-                </Frame>
+            <Frame type="UnlockableTileListItem" name="Item31" template="UnlockablePanel/UnlockablePortraitFrameTemplate">
+                <Anchor side="Top" relative="$parent/Item23" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item23" pos="Max" offset="#UnlockableTileItemSpacing"/>
             </Frame>
 
-            <!-- First row -->
-            <Frame type="UnlockableTileListItem" name="Item0" template="UnlockablePanel/UnlockableFrameItemTemplate">
-                <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
-                <Anchor side="Left" relative="$parent" pos="Min" offset="70"/>
+            <Frame type="UnlockableTileListItem" name="Item32" template="UnlockablePanel/UnlockablePortraitFrameTemplate">
+                <Anchor side="Top" relative="$parent/Item23" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item23" pos="Max" offset="#UnlockableTileItemSpacing"/>
             </Frame>
 
-            <Frame type="UnlockableTileListItem" name="Item1" template="UnlockablePanel/UnlockableFrameItemTemplate">
-                <Anchor side="Top" relative="$parent/Item0" pos="Min" offset="0"/>
-                <Anchor side="Left" relative="$parent/Item0" pos="Max" offset="5"/>
+            <Frame type="UnlockableTileListItem" name="Item33" template="UnlockablePanel/UnlockablePortraitFrameTemplate">
+                <Anchor side="Top" relative="$parent/Item23" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item23" pos="Max" offset="#UnlockableTileItemSpacing"/>
             </Frame>
 
-            <Frame type="UnlockableTileListItem" name="Item2" template="UnlockablePanel/UnlockableFrameItemTemplate">
-                <Anchor side="Top" relative="$parent/Item1" pos="Min" offset="0"/>
-                <Anchor side="Left" relative="$parent/Item1" pos="Max" offset="5"/>
+            <Frame type="UnlockableTileListItem" name="Item34" template="UnlockablePanel/UnlockablePortraitFrameTemplate">
+                <Anchor side="Top" relative="$parent/Item23" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item23" pos="Max" offset="#UnlockableTileItemSpacing"/>
             </Frame>
+
+            <Frame type="UnlockableTileListItem" name="Item35" template="UnlockablePanel/UnlockablePortraitFrameTemplate">
+                <Anchor side="Top" relative="$parent/Item23" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item23" pos="Max" offset="#UnlockableTileItemSpacing"/>
+            </Frame>
+
+            <!-- Search reanchoring -->
+            <StateGroup name="VariousMaxItemStates">
+                <State name="36TileListItems">
+                    <When type="Property" maxItemPerPage="36"/>
+                    <Action type="SetProperty" ScrollStepValue="9"/>
+
+                    <!-- First Row -->
+                    <Action type="SetAnchor" frame="Item6" side="Top" relative="$parent/Item5" pos="Min" offset="0"/>
+                    <Action type="SetAnchor" frame="Item6" side="Left" relative="$parent/Item5" pos="Max" offset="#UnlockableTileItemSpacing"/>
+                    <Action type="SetAnchor" frame="Item7" side="Top" relative="$parent/Item6" pos="Min" offset="0"/>
+                    <Action type="SetAnchor" frame="Item7" side="Left" relative="$parent/Item6" pos="Max" offset="#UnlockableTileItemSpacing"/>
+                    <Action type="SetAnchor" frame="Item8" side="Top" relative="$parent/Item7" pos="Min" offset="0"/>
+                    <Action type="SetAnchor" frame="Item8" side="Left" relative="$parent/Item7" pos="Max" offset="#UnlockableTileItemSpacing"/>
+
+                    <!-- Second Row -->
+                    <Action type="SetAnchor" frame="Item9" side="Top" relative="$parent/Item0" pos="Max" offset="#UnlockableTileItemSpacing"/>
+                    <Action type="SetAnchor" frame="Item9" side="Left" relative="$parent/Item0" pos="Min" offset="0"/>
+                    <Action type="SetAnchor" frame="Item10" side="Top" relative="$parent/Item9" pos="Min" offset="0"/>
+                    <Action type="SetAnchor" frame="Item10" side="Left" relative="$parent/Item9" pos="Max" offset="#UnlockableTileItemSpacing"/>
+                    <Action type="SetAnchor" frame="Item11" side="Top" relative="$parent/Item10" pos="Min" offset="0"/>
+                    <Action type="SetAnchor" frame="Item11" side="Left" relative="$parent/Item10" pos="Max" offset="#UnlockableTileItemSpacing"/>
+                    <Action type="SetAnchor" frame="Item12" side="Top" relative="$parent/Item11" pos="Min" offset="0"/>
+                    <Action type="SetAnchor" frame="Item12" side="Left" relative="$parent/Item11" pos="Max" offset="#UnlockableTileItemSpacing"/>
+                    <Action type="SetAnchor" frame="Item13" side="Top" relative="$parent/Item12" pos="Min" offset="0"/>
+                    <Action type="SetAnchor" frame="Item13" side="Left" relative="$parent/Item12" pos="Max" offset="#UnlockableTileItemSpacing"/>
+                    <Action type="SetAnchor" frame="Item14" side="Top" relative="$parent/Item13" pos="Min" offset="0"/>
+                    <Action type="SetAnchor" frame="Item14" side="Left" relative="$parent/Item13" pos="Max" offset="#UnlockableTileItemSpacing"/>
+                    <Action type="SetAnchor" frame="Item15" side="Top" relative="$parent/Item14" pos="Min" offset="0"/>
+                    <Action type="SetAnchor" frame="Item15" side="Left" relative="$parent/Item14" pos="Max" offset="#UnlockableTileItemSpacing"/>
+                    <Action type="SetAnchor" frame="Item16" side="Top" relative="$parent/Item15" pos="Min" offset="0"/>
+                    <Action type="SetAnchor" frame="Item16" side="Left" relative="$parent/Item15" pos="Max" offset="#UnlockableTileItemSpacing"/>
+                    <Action type="SetAnchor" frame="Item17" side="Top" relative="$parent/Item16" pos="Min" offset="0"/>
+                    <Action type="SetAnchor" frame="Item17" side="Left" relative="$parent/Item16" pos="Max" offset="#UnlockableTileItemSpacing"/>
+
+                    <!-- Third Row -->
+                    <Action type="SetAnchor" frame="Item18" side="Top" relative="$parent/Item9" pos="Max" offset="#UnlockableTileItemSpacing"/>
+                    <Action type="SetAnchor" frame="Item18" side="Left" relative="$parent/Item9" pos="Min" offset="0"/>
+                    <Action type="SetAnchor" frame="Item19" side="Top" relative="$parent/Item18" pos="Min" offset="0"/>
+                    <Action type="SetAnchor" frame="Item19" side="Left" relative="$parent/Item18" pos="Max" offset="#UnlockableTileItemSpacing"/>
+                    <Action type="SetAnchor" frame="Item20" side="Top" relative="$parent/Item19" pos="Min" offset="0"/>
+                    <Action type="SetAnchor" frame="Item20" side="Left" relative="$parent/Item19" pos="Max" offset="#UnlockableTileItemSpacing"/>
+                    <Action type="SetAnchor" frame="Item21" side="Top" relative="$parent/Item20" pos="Min" offset="0"/>
+                    <Action type="SetAnchor" frame="Item21" side="Left" relative="$parent/Item20" pos="Max" offset="#UnlockableTileItemSpacing"/>
+                    <Action type="SetAnchor" frame="Item22" side="Top" relative="$parent/Item21" pos="Min" offset="0"/>
+                    <Action type="SetAnchor" frame="Item22" side="Left" relative="$parent/Item21" pos="Max" offset="#UnlockableTileItemSpacing"/>
+                    <Action type="SetAnchor" frame="Item23" side="Top" relative="$parent/Item22" pos="Min" offset="0"/>
+                    <Action type="SetAnchor" frame="Item23" side="Left" relative="$parent/Item22" pos="Max" offset="#UnlockableTileItemSpacing"/>
+                    <Action type="SetAnchor" frame="Item24" side="Top" relative="$parent/Item23" pos="Min" offset="0"/>
+                    <Action type="SetAnchor" frame="Item24" side="Left" relative="$parent/Item23" pos="Max" offset="#UnlockableTileItemSpacing"/>
+                    <Action type="SetAnchor" frame="Item25" side="Top" relative="$parent/Item24" pos="Min" offset="0"/>
+                    <Action type="SetAnchor" frame="Item25" side="Left" relative="$parent/Item24" pos="Max" offset="#UnlockableTileItemSpacing"/>
+                    <Action type="SetAnchor" frame="Item26" side="Top" relative="$parent/Item25" pos="Min" offset="0"/>
+                    <Action type="SetAnchor" frame="Item26" side="Left" relative="$parent/Item25" pos="Max" offset="#UnlockableTileItemSpacing"/>
+
+                    <!-- Fourth Row -->
+                    <Action type="SetAnchor" frame="Item27" side="Top" relative="$parent/Item18" pos="Max" offset="#UnlockableTileItemSpacing"/>
+                    <Action type="SetAnchor" frame="Item27" side="Left" relative="$parent/Item18" pos="Min" offset="0"/>
+                    <Action type="SetAnchor" frame="Item28" side="Top" relative="$parent/Item27" pos="Min" offset="0"/>
+                    <Action type="SetAnchor" frame="Item28" side="Left" relative="$parent/Item27" pos="Max" offset="#UnlockableTileItemSpacing"/>
+                    <Action type="SetAnchor" frame="Item29" side="Top" relative="$parent/Item28" pos="Min" offset="0"/>
+                    <Action type="SetAnchor" frame="Item29" side="Left" relative="$parent/Item28" pos="Max" offset="#UnlockableTileItemSpacing"/>
+                    <Action type="SetAnchor" frame="Item30" side="Top" relative="$parent/Item29" pos="Min" offset="0"/>
+                    <Action type="SetAnchor" frame="Item30" side="Left" relative="$parent/Item29" pos="Max" offset="#UnlockableTileItemSpacing"/>
+                    <Action type="SetAnchor" frame="Item31" side="Top" relative="$parent/Item30" pos="Min" offset="0"/>
+                    <Action type="SetAnchor" frame="Item31" side="Left" relative="$parent/Item30" pos="Max" offset="#UnlockableTileItemSpacing"/>
+                    <Action type="SetAnchor" frame="Item32" side="Top" relative="$parent/Item31" pos="Min" offset="0"/>
+                    <Action type="SetAnchor" frame="Item32" side="Left" relative="$parent/Item31" pos="Max" offset="#UnlockableTileItemSpacing"/>
+                    <Action type="SetAnchor" frame="Item33" side="Top" relative="$parent/Item32" pos="Min" offset="0"/>
+                    <Action type="SetAnchor" frame="Item33" side="Left" relative="$parent/Item32" pos="Max" offset="#UnlockableTileItemSpacing"/>
+                    <Action type="SetAnchor" frame="Item34" side="Top" relative="$parent/Item33" pos="Min" offset="0"/>
+                    <Action type="SetAnchor" frame="Item34" side="Left" relative="$parent/Item33" pos="Max" offset="#UnlockableTileItemSpacing"/>
+                    <Action type="SetAnchor" frame="Item35" side="Top" relative="$parent/Item34" pos="Min" offset="0"/>
+                    <Action type="SetAnchor" frame="Item35" side="Left" relative="$parent/Item34" pos="Max" offset="#UnlockableTileItemSpacing"/>
+                </State>
+            </StateGroup>
         </Frame>
     </Frame>
 </Desc>

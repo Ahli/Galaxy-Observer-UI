@@ -14,8 +14,54 @@
         <ConsoleWorldBottomOffset val="0"/>
         <SuppressEnemyConnectionEvents val="true" />
         <DeactivateChatBarOnClick val="true" />
+        <Handle val="GameUI"/>
 
         <Frame type="StandardTooltip" name="StormStandardTooltip" template="StandardTooltip/StandardTooltip"/>
+
+        <!-- BEGIN Property bindable Colors -->
+        <Frame type="UnitStatusColor" name="TeamOrderColors">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+            <Width val="3"/>
+            <Height val="3"/>
+
+            <ForcedTeam val="0"/>
+
+            <ColorStyle val="MinimapTeams"/>
+            <AdditionalColorStyle val="PrimaryLight" index="0"/>
+        </Frame>
+        <Frame type="UnitStatusColor" name="TeamChaosColors">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent/TeamOrderColors" pos="Max" offset="0"/>
+            <Width val="3"/>
+            <Height val="3"/>
+
+            <ForcedTeam val="1"/>
+
+            <ColorStyle val="MinimapTeams"/>
+            <AdditionalColorStyle val="PrimaryLight" index="0"/>
+        </Frame>
+        <Frame type="UnitStatusColor" name="AllyColors">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent/TeamChaosColors" pos="Min" offset="0"/>
+            <Width val="3"/>
+            <Height val="3"/>
+
+            <ForcedRelation val="Ally"/>
+            <ColorStyle val="MinimapTeams"/>
+            <AdditionalColorStyle val="PrimaryLight" index="0"/>
+        </Frame>
+        <Frame type="UnitStatusColor" name="EnemyColors">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent/AllyColors" pos="Min" offset="0"/>
+            <Width val="3"/>
+            <Height val="3"/>
+
+            <ForcedRelation val="Enemy"/>
+            <ColorStyle val="MinimapTeams"/>
+            <AdditionalColorStyle val="PrimaryLight" index="0"/>
+        </Frame>
+        <!-- END Property bindable Colors -->
 
         <Frame type="WorldPanel" name="WorldPanel">
             <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
@@ -138,6 +184,10 @@
                     <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
                     <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
                 </Frame>
+
+                <Frame type="Frame" name="GameNotificationsPanel" template="GameNotifications/InGameNotificationsTemplate">
+                    <Anchor side="Top" relative="$parent/$parent/ConsoleUIContainer/PartyFramePanel" pos="Max" offset="-34"/>
+                </Frame>
             </Frame>
 
             <!-- Console Panel - actual model frame which makes up the console -->
@@ -176,6 +226,43 @@
                     <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
                     <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
                     <Width val="600"/>
+
+                    <Frame type="UnitStatusColor" name="AllyColors">
+                        <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                        <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                        <Width val="3"/>
+                        <Height val="3"/>
+
+                        <ForcedRelation val="Ally"/>
+
+                        <ColorStyle val="MedKillLog"/>
+                        <AdditionalColorStyle val="LightKillLog" index="0"/>
+                        <AdditionalColorStyle val="DarkKillLog" index="1"/>
+                    </Frame>
+                    <Frame type="UnitStatusColor" name="EnemyColors">
+                        <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                        <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                        <Width val="3"/>
+                        <Height val="3"/>
+
+                        <ForcedRelation val="Enemy"/>
+
+                        <ColorStyle val="MedKillLog"/>
+                        <AdditionalColorStyle val="LightKillLog" index="0"/>
+                        <AdditionalColorStyle val="DarkKillLog" index="1"/>
+                    </Frame>
+                    <Frame type="UnitStatusColor" name="NexusColors">
+                        <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                        <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                        <Width val="3"/>
+                        <Height val="3"/>
+
+                        <ForcedRelation val="DefaultNeutral"/>
+
+                        <ColorStyle val="MedKillLog"/>
+                        <AdditionalColorStyle val="LightKillLog" index="0"/>
+                        <AdditionalColorStyle val="DarkKillLog" index="1"/>
+                    </Frame>
                 </Frame>
             </Frame>
 
@@ -770,10 +857,6 @@
                     <Height val="200"/>
                     <Width val="800"/>
                 </Frame>
-                
-                <Frame type="Frame" name="GameNotificationsPanel" template="GameNotifications/InGameNotificationsTemplate">
-                    <Anchor side="Top" relative="$parent/$parent/ConsoleUIContainer/PartyFramePanel" pos="Max" offset="-34"/>
-                </Frame>
 
                 <Frame type="HeroLeaderPanel" name="HeroLeaderPanel" template="HeroLeaderPanel/HeroLeaderPanelTemplate">
                     <Anchor relative="$parent"/>
@@ -856,7 +939,7 @@
                     <Visible val="false"/>
                 </Frame>
 
-                <Frame type="PingPanel" name="EmotePanel" template="EmotePanel/EmotePanelTemplate">
+                <Frame type="PingPanel" name="EmotePanel" template="WheelPanel/WheelPanelTemplate">
                     <Anchor relative="$parent"/>
                     <Visible val="false"/>
                 </Frame>
@@ -878,7 +961,7 @@
 
                     <Frame type="ObserverPanel" name="ObserverPanel" template="ObserverPanel/ObserverPanelTemplate">
                         <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
-                        <Anchor side="Top" relative="$parent/$parent/GameNotificationsPanel/KillCounterTemplate" pos="Max" offset="-35"/>
+                        <Anchor side="Top" relative="$ancestor[@name=UIContainer]/FullscreenLowerContainer/GameNotificationsPanel/KillCounterTemplate" pos="Max" offset="-35"/>
                         <Width val="400"/>
                         <Height val="68"/>
                     </Frame>
@@ -908,7 +991,7 @@
                     <Anchor side="Top" relative="$parent" pos="Min" offset="400"/>
                     <Style val="@@ReplayLabel"/>
                 </Frame>
-
+                
                 <Frame type="ChatBar" name="ChatBar" template="ChatBar/ChatBarTemplate">
                     <Handle val="GameUI_ChatBar"/>
                     <Anchor side="Bottom" relative="$parent/$parent/ConsoleUIContainer/HeroDeathStunFrame" pos="Min" offset="-15"/>
@@ -925,6 +1008,10 @@
                             <Key type="Curve" time=".01" value="180"/>
                         </Controller>
                     </Animation>
+                </Frame>
+
+                <Frame type="Frame" name="ChatEmojiPanelManager" template="ChatBar/EmojiManagerTemplate">
+                    <Anchor relative="$parent/ChatDisplay"/>
                 </Frame>
 
                 <Frame type="Label" name="ChatHelpLabel">

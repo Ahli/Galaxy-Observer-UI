@@ -1,11 +1,13 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <Desc>
     <DescFlags val="Locked"/>
-
+    
     <!-- AVATAR BORDER CONTAINER TEMPLATE -->
     <Frame type="Image" name="AvatarBorderImageTemplate">
         <Texture val="@UI/portrait_border_bronze_lg"/>
         <SubpixelRendering val="true"/>
+        <ColorAdjustMode val="AddSelf"/>
+        <AdjustmentColor val="0,255,255,255"/>
 
         <Frame type="Frame" name="RankAnchor">
             <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
@@ -157,17 +159,22 @@
             <ColorAdjustMode val="AddSelf"/>
             <AdjustmentColor val="0,255,255,255"/>
             <SubpixelRendering val="true"/>
+            <Visible val="false"/>
         </Frame>
+
+        <!-- Progression 2.0 -->
+        <Frame type="AscensionFrame" name="AscensionBadge" template="AscensionBadge/AscensionBadgeTemplate">
+            <Visible val="false"/>
+        </Frame>
+
         <Frame type="Label" name="RankLabel">
             <Anchor side="Top" relative="$parent/RankAnchor" pos="Mid" offset="0"/>
             <Anchor side="Bottom" relative="$parent/RankAnchor" pos="Mid" offset="0"/>
             <Anchor side="Left" relative="$parent/RankAnchor" pos="Mid" offset="0"/>
             <Anchor side="Right" relative="$parent/RankAnchor" pos="Mid" offset="0"/>
             <SubpixelRendering val="true"/>
-        </Frame>
-
-        <ColorAdjustMode val="AddSelf"/>
-        <AdjustmentColor val="0,255,255,255"/>
+            <RenderPriority val="520"/>
+        </Frame>        
 
         <Animation name="Hover">
             <Event event="OnMouseEnter" action="DirectionForward,Play" frame="$parent/$parent/$parent"/>
@@ -214,7 +221,10 @@
 
             <!-- Layer: Hero Portrait -->
             <Frame type="UnlockableFrame" name="PortraitFrame">
-                <Anchor relative="$parent/PortraitBackground"/>
+                <Anchor side="Top" relative="$parent/PortraitBackground" pos="Min" offset="0"/>
+                <Anchor side="Bottom" relative="$parent/PortraitBackground" pos="Max" offset="0"/>
+                <Anchor side="Left" relative="$parent/PortraitBackground" pos="Min" offset="0"/>
+                <Anchor side="Right" relative="$parent/PortraitBackground" pos="Max" offset="0"/>
 
                 <Frame type="RewardSpecificContainerPanel" name="RewardSpecificContainer0">
                     <Anchor relative="$parent"/>
@@ -316,6 +326,46 @@
                 <When type="Property" rankType="GrandMaster"/>
             </State>
         </StateGroup>
+
+        <StateGroup name="RankBorderType">
+            <DefaultState val="PlayerLevelBorder"/>
+            <State name="PlayerLevelBorder"/>
+            <State name="LeagueBadgeBorder"/>
+            <State name="GrandMasterBorder"/>
+            <State name="HiddenBorder"/>
+        </StateGroup>
+
+        <Frame type="Frame" name="PortraitContainer">
+            <Frame type="Image" name="AvatarBorderImage">
+                <Frame type="AscensionFrame" name="AscensionBadge" template="AscensionBadge/AscensionBadgeTemplate">
+                    <AccountLevel val="{$ancestor[@type=AvatarFrame]/@PlayerLevel}"/>
+                </Frame>
+            </Frame>
+
+            <Frame type="Image" name="AvatarBorderImage" template="AvatarFrameTemplates/AvatarBorderImageTemplate">
+                <StateGroup name="AnchorUpdate">
+                    <DefaultState val="PlayerLevelBorder"/>
+                    <State name="AscensionBadge">
+                        <When type="StateGroup" frame="$ancestor[@name=PortraitContainer]/$parent" RankBorderType="PlayerLevelBorder"/>
+                        <Action type="SetProperty" frame="AscensionBadge" visible="true"/>
+                        <Action type="SetProperty" frame="RankLabel" visible="false"/>
+                    </State>
+                    <State name="PlayerLevelBorder">
+                        <When type="StateGroup" frame="$ancestor[@name=PortraitContainer]/$parent" RankBorderType="PlayerLevelBorder"/>
+                    </State>
+                    <State name="LeagueBadgeBorder">
+                        <When type="StateGroup" frame="$ancestor[@name=PortraitContainer]/$parent" RankBorderType="LeagueBadgeBorder"/>
+                    </State>
+                    <State name="GrandMasterBorder">
+                        <When type="StateGroup" frame="$ancestor[@name=PortraitContainer]/$parent" RankBorderType="GrandMasterBorder"/>
+                    </State>
+                    <State name="HiddenBorder">
+                        <When type="StateGroup" frame="$ancestor[@name=PortraitContainer]/$parent" RankBorderType="HiddenBorder"/>
+                        <Action type="SetProperty" frame="RankLabel" visible="false"/>
+                    </State>
+                </StateGroup>
+            </Frame>
+        </Frame>
     </Frame>
 
     <Frame type="AvatarFrame" name="AvatarStateTemplate_Profile" template="AvatarFrameTemplates/AvatarStateTemplate">
@@ -327,39 +377,38 @@
             <Height val="208"/>
         </Frame>
         <Frame type="Frame" name="PortraitContainer">
+            <Frame type="Image" name="AvatarBorderImage">
+                <Frame type="AscensionFrame" name="AscensionBadge">
+                    <Anchor side="Left" relative="$parent" pos=".24" offset="0"/>
+                    <Anchor side="Right" relative="$parent" pos=".24" offset="0"/>
+                    <Width val="92"/>
+                    <Height val="92"/>
+                </Frame>
+            </Frame>
+        
             <Frame type="Image" name="PortraitBackground">
                 <Width val="138"/>
                 <Height val="138"/>
             </Frame>
 
             <Frame type="Image" name="AvatarBorderImage">
+                <StateGroup name="AnchorUpdate">
+                    <State name="LeagueBadgeBorder">
+                        <Action type="SetAnchor" frame="RankAnchor" side="Top" relative="$this" pos="Mid" offset="52"/>
+                        <Action type="SetAnchor" frame="RankAnchor" side="Left" relative="$parent" pos="Mid" offset="-57"/>
+                        <Action type="SetProperty" frame="RankBadgeImage" visible="true"/>
+                    </State>
+                    <State name="GrandMasterBorder">
+                        <When type="StateGroup" frame="$ancestor[@name=PortraitContainer]/$parent" RankBorderType="GrandMasterBorder"/>
+                        <Action type="SetAnchor" frame="RankAnchor" side="Top" relative="$this" pos="Mid" offset="62"/>
+                        <Action type="SetAnchor" frame="RankAnchor" side="Left" relative="$parent" pos="Mid" offset="0"/>
+                        <Action type="SetProperty" frame="GrandMasterBorder" visible="true"/>
+                    </State>
+                </StateGroup>
+
                 <Frame type="Frame" name="RankAnchor">
                     <Anchor side="Top" relative="$parent" pos="Mid" offset="46"/>
                     <Anchor side="Left" relative="$parent" pos="Mid" offset="42"/>
-
-                    <Animation name="League">
-                        <Event event="League" action="Play" frame="$parent/$parent/$parent"/>
-                        <Event event="PlayerLevel" action="Stop" frame="$parent/$parent/$parent"/>
-
-                        <Controller type="Anchor" end="Pause" side="Top" relative="false">
-                            <Key type="Curve" time="0" value="52" out="Fast"/>
-                        </Controller>
-                        <Controller type="Anchor" end="Pause" side="Left" relative="false">
-                            <Key type="Curve" time="0" value="-57" out="Fast"/>
-                        </Controller>
-                    </Animation>
-
-                    <Animation name="GrandMaster">
-                        <Event event="GrandMaster" action="Play" frame="$parent/$parent/$parent"/>
-                        <Event event="PlayerLevel" action="Stop" frame="$parent/$parent/$parent"/>
-
-                        <Controller type="Anchor" end="Pause" side="Top" relative="false">
-                            <Key type="Curve" time="0" value="62" out="Fast"/>
-                        </Controller>
-                        <Controller type="Anchor" end="Pause" side="Left" relative="false">
-                            <Key type="Curve" time="0" value="0" out="Fast"/>
-                        </Controller>
-                    </Animation>
                 </Frame>
                 
                 <Frame type="Label" name="RankLabel">
@@ -369,6 +418,24 @@
                     <Anchor side="Right" relative="$parent/RankAnchor" pos="Mid" offset="0"/>
                     <Width val="208"/>
                 </Frame>
+
+                <Animation name="Hover">
+                    <Event event="OnMouseEnter" action="Reset,Stop" frame="$parent/$parent/$parent"/>
+                    <Event event="OnMouseExit" action="Reset,Stop" frame="$parent/$parent/$parent"/>
+
+                    <Controller type="AdjustmentColor" end="Pause" >
+                        <Key type="Curve" time="0" value="0,255,255,255" out="Fast"/>
+                        <Key type="Curve" time="0.2" value="0,255,255,255" in="Slow"/>
+                    </Controller>
+                    <Controller type="AdjustmentColor" end="Pause" frame="GrandMasterBorder">
+                        <Key type="Curve" time="0" value="0,255,255,255" out="Fast"/>
+                        <Key type="Curve" time="0.2" value="0,255,255,255" in="Slow"/>
+                    </Controller>
+                    <Controller type="AdjustmentColor" end="Pause" frame="RankBadgeImage">
+                        <Key type="Curve" time="0" value="0,255,255,255" out="Fast"/>
+                        <Key type="Curve" time="0.2" value="0,255,255,255" in="Slow"/>
+                    </Controller>
+                </Animation>
             </Frame>
 
             <Frame type="Frame" name="IconContainer">
@@ -382,59 +449,54 @@
 
         <StateGroup name="Type">
             <State name="Standard">
-                <Action type="SetProperty" frame="PortraitContainer/AvatarBorderImage" texture="@UI/portrait_border_standard_lg"/>
-                <Action type="SetProperty" frame="PortraitContainer/AvatarBorderImage/RankBadgeImage" visible="false"/>
+                <Action type="SetProperty" frame="PortraitContainer/AvatarBorderImage" texture="{AscensionBadge/ImagePathFormatter/@Text}"/>
                 <Action type="SetProperty" frame="PortraitContainer/AvatarBorderImage/RankLabel" style="RankedDivision_Standard_Large"/>
-                <Action type="SendEvent" frame="$this" event="PlayerLevel"/>
+                <Action type="SetState" frame="$this" group="RankBorderType" state="PlayerLevelBorder"/>
             </State>
             <State name="Placement">
                 <Action type="SetProperty" frame="PortraitContainer/AvatarBorderImage" texture="@UI/portrait_border_placement_lg"/>
-                <Action type="SetProperty" frame="PortraitContainer/AvatarBorderImage/RankBadgeImage" visible="false"/>
-                <Action type="SetProperty" frame="PortraitContainer/AvatarBorderImage/RankLabel" visible="false"/>
+                <Action type="SetState" frame="$this" group="RankBorderType" state="HiddenBorder"/>
             </State>
             <State name="Bronze">
                 <Action type="SetProperty" frame="PortraitContainer/AvatarBorderImage" texture="@UI/portrait_border_bronze_lg"/>
                 <Action type="SetProperty" frame="PortraitContainer/AvatarBorderImage/RankBadgeImage" texture="@UI/portrait_division_bronze_lg"/>
                 <Action type="SetProperty" frame="PortraitContainer/AvatarBorderImage/RankLabel" style="RankedDivision_Bronze_Large"/>
-                <Action type="SendEvent" frame="$this" event="League"/>
+                <Action type="SetState" frame="$this" group="RankBorderType" state="LeagueBadgeBorder"/>
             </State>
             <State name="Silver">
                 <Action type="SetProperty" frame="PortraitContainer/AvatarBorderImage" texture="@UI/portrait_border_silver_lg"/>
                 <Action type="SetProperty" frame="PortraitContainer/AvatarBorderImage/RankBadgeImage" texture="@UI/portrait_division_silver_lg"/>
                 <Action type="SetProperty" frame="PortraitContainer/AvatarBorderImage/RankLabel" style="RankedDivision_Silver_Large"/>
-                <Action type="SendEvent" frame="$this" event="League"/>
+                <Action type="SetState" frame="$this" group="RankBorderType" state="LeagueBadgeBorder"/>
             </State>
             <State name="Gold">
                 <Action type="SetProperty" frame="PortraitContainer/AvatarBorderImage" texture="@UI/portrait_border_gold_lg"/>
                 <Action type="SetProperty" frame="PortraitContainer/AvatarBorderImage/RankBadgeImage" texture="@UI/portrait_division_gold_lg"/>
                 <Action type="SetProperty" frame="PortraitContainer/AvatarBorderImage/RankLabel" style="RankedDivision_Gold_Large"/>
-                <Action type="SendEvent" frame="$this" event="League"/>
+                <Action type="SetState" frame="$this" group="RankBorderType" state="LeagueBadgeBorder"/>
             </State>
             <State name="Platinum">
                 <Action type="SetProperty" frame="PortraitContainer/AvatarBorderImage" texture="@UI/portrait_border_platinum_lg"/>
                 <Action type="SetProperty" frame="PortraitContainer/AvatarBorderImage/RankBadgeImage" texture="@UI/portrait_division_platinum_lg"/>
                 <Action type="SetProperty" frame="PortraitContainer/AvatarBorderImage/RankLabel" style="RankedDivision_Platinum_Large"/>
-                <Action type="SendEvent" frame="$this" event="League"/>
+                <Action type="SetState" frame="$this" group="RankBorderType" state="LeagueBadgeBorder"/>
             </State>
             <State name="Diamond">
                 <Action type="SetProperty" frame="PortraitContainer/AvatarBorderImage" texture="@UI/portrait_border_diamond_lg"/>
                 <Action type="SetProperty" frame="PortraitContainer/AvatarBorderImage/RankBadgeImage" texture="@UI/portrait_division_diamond_lg"/>
                 <Action type="SetProperty" frame="PortraitContainer/AvatarBorderImage/RankLabel" style="RankedDivision_Diamond_Large"/>
-                <Action type="SendEvent" frame="$this" event="League"/>
+                <Action type="SetState" frame="$this" group="RankBorderType" state="LeagueBadgeBorder"/>
             </State>
             <State name="Master">
                 <Action type="SetProperty" frame="PortraitContainer/AvatarBorderImage" texture="@UI/portrait_border_master_lg"/>
-                <Action type="SetProperty" frame="PortraitContainer/AvatarBorderImage/RankBadgeImage" visible="false"/>
-                <Action type="SetProperty" frame="PortraitContainer/AvatarBorderImage/RankLabel" visible="false"/>
-                <Action type="SendEvent" frame="$this" event="Master"/>
+                <Action type="SetState" frame="$this" group="RankBorderType" state="HiddenBorder"/>
             </State>
             <State name="GrandMaster">
                 <Action type="SetProperty" frame="PortraitContainer/AvatarBorderImage" texture="@UI/portrait_border_master_lg"/>
-                <Action type="SetProperty" frame="PortraitContainer/AvatarBorderImage/RankBadgeImage" visible="false"/>
                 <Action type="SetProperty" frame="PortraitContainer/AvatarBorderImage/RankLabel" style="RankedDivision_GrandMaster_Large"/>
                 <Action type="SetProperty" frame="PortraitContainer/AvatarBorderImage/GrandMasterBorder" visible="true"/>
                 <Action type="SetProperty" frame="PortraitContainer/AvatarBorderImage/GrandMasterBorder" texture="@UI/portrait_border_grandmaster_lg"/>
-                <Action type="SendEvent" frame="$this" event="GrandMaster"/>
+                <Action type="SetState" frame="$this" group="RankBorderType" state="GrandMasterBorder"/>
             </State>
         </StateGroup>
     </Frame>
@@ -449,39 +511,37 @@
         </Frame>
 
         <Frame type="Frame" name="PortraitContainer">
+            <Frame type="Image" name="AvatarBorderImage">
+                <Frame type="AscensionFrame" name="AscensionBadge">
+                    <Width val="74"/>
+                    <Height val="74"/>
+                </Frame>
+            </Frame>
+
             <Frame type="Image" name="PortraitBackground">
                 <Width val="108"/>
                 <Height val="108"/>
             </Frame>
 
             <Frame type="Image" name="AvatarBorderImage">
+                <StateGroup name="AnchorUpdate">
+                    <State name="LeagueBadgeBorder">
+                        <When type="StateGroup" frame="$ancestor[@name=PortraitContainer]/$parent" RankBorderType="LeagueBadgeBorder"/>
+                        <Action type="SetAnchor" frame="RankAnchor" side="Top" relative="$this" pos="Mid" offset="47"/>
+                        <Action type="SetAnchor" frame="RankAnchor" side="Left" relative="$parent" pos="Mid" offset="-45"/>
+                        <Action type="SetProperty" frame="RankBadgeImage" visible="true"/>
+                    </State>
+                    <State name="GrandMasterBorder">
+                        <When type="StateGroup" frame="$ancestor[@name=PortraitContainer]/$parent" RankBorderType="GrandMasterBorder"/>
+                        <Action type="SetAnchor" frame="RankAnchor" side="Top" relative="$this" pos="Mid" offset="50"/>
+                        <Action type="SetAnchor" frame="RankAnchor" side="Left" relative="$parent" pos="Mid" offset="0"/>
+                        <Action type="SetProperty" frame="GrandMasterBorder" visible="true"/>
+                    </State>
+                </StateGroup>
+
                 <Frame type="Frame" name="RankAnchor">
                     <Anchor side="Top" relative="$parent" pos="Mid" offset="40"/>
                     <Anchor side="Left" relative="$parent" pos="Mid" offset="36"/>
-
-                    <Animation name="League">
-                        <Event event="League" action="Play" frame="$parent/$parent/$parent"/>
-                        <Event event="PlayerLevel" action="Stop" frame="$parent/$parent/$parent"/>
-
-                        <Controller type="Anchor" end="Pause" side="Top" relative="false">
-                            <Key type="Curve" time="0" value="47" out="Fast"/>
-                        </Controller>
-                        <Controller type="Anchor" end="Pause" side="Left" relative="false">
-                            <Key type="Curve" time="0" value="-45" out="Fast"/>
-                        </Controller>
-                    </Animation>
-
-                    <Animation name="GrandMaster">
-                        <Event event="GrandMaster" action="Play" frame="$parent/$parent/$parent"/>
-                        <Event event="PlayerLevel" action="Stop" frame="$parent/$parent/$parent"/>
-
-                        <Controller type="Anchor" end="Pause" side="Top" relative="false">
-                            <Key type="Curve" time="0" value="50" out="Fast"/>
-                        </Controller>
-                        <Controller type="Anchor" end="Pause" side="Left" relative="false">
-                            <Key type="Curve" time="0" value="0" out="Fast"/>
-                        </Controller>
-                    </Animation>
                 </Frame>
 
                 <Frame type="Image" name="RankBadgeImage">
@@ -512,194 +572,59 @@
 
         <StateGroup name="Type">
             <State name="Standard">
-                <Action type="SetProperty" frame="PortraitContainer/AvatarBorderImage" texture="@UI/portrait_border_standard_med"/>
-                <Action type="SetProperty" frame="PortraitContainer/AvatarBorderImage/RankBadgeImage" visible="false"/>
+                <Action type="SetProperty" frame="PortraitContainer/AvatarBorderImage" texture="{AscensionBadge/ImagePathFormatter/@Text}"/>
                 <Action type="SetProperty" frame="PortraitContainer/AvatarBorderImage/RankLabel" style="RankedDivision_Standard_Medium"/>
-                <Action type="SendEvent" frame="$this" event="PlayerLevel"/>
+                <Action type="SetState" frame="$this" group="RankBorderType" state="PlayerLevelBorder"/>
             </State>
             <State name="Placement">
                 <Action type="SetProperty" frame="PortraitContainer/AvatarBorderImage" texture="@UI/portrait_border_placement_med"/>
-                <Action type="SetProperty" frame="PortraitContainer/AvatarBorderImage/RankBadgeImage" visible="false"/>
-                <Action type="SetProperty" frame="PortraitContainer/AvatarBorderImage/RankLabel" visible="false"/>
+                <Action type="SetState" frame="$this" group="RankBorderType" state="HiddenBorder"/>
             </State>
             <State name="Bronze">
                 <Action type="SetProperty" frame="PortraitContainer/AvatarBorderImage" texture="@UI/portrait_border_bronze_med"/>
                 <Action type="SetProperty" frame="PortraitContainer/AvatarBorderImage/RankBadgeImage" texture="@UI/portrait_division_bronze_med"/>
                 <Action type="SetProperty" frame="PortraitContainer/AvatarBorderImage/RankLabel" style="RankedDivision_Bronze_Medium"/>
-                <Action type="SendEvent" frame="$this" event="League"/>
+                <Action type="SetState" frame="$this" group="RankBorderType" state="LeagueBadgeBorder"/>
             </State>
             <State name="Silver">
                 <Action type="SetProperty" frame="PortraitContainer/AvatarBorderImage" texture="@UI/portrait_border_silver_med"/>
                 <Action type="SetProperty" frame="PortraitContainer/AvatarBorderImage/RankBadgeImage" texture="@UI/portrait_division_silver_med"/>
                 <Action type="SetProperty" frame="PortraitContainer/AvatarBorderImage/RankLabel" style="RankedDivision_Silver_Medium"/>
-                <Action type="SendEvent" frame="$this" event="League"/>
+                <Action type="SetState" frame="$this" group="RankBorderType" state="LeagueBadgeBorder"/>
             </State>
             <State name="Gold">
                 <Action type="SetProperty" frame="PortraitContainer/AvatarBorderImage" texture="@UI/portrait_border_gold_med"/>
                 <Action type="SetProperty" frame="PortraitContainer/AvatarBorderImage/RankBadgeImage" texture="@UI/portrait_division_gold_med"/>
                 <Action type="SetProperty" frame="PortraitContainer/AvatarBorderImage/RankLabel" style="RankedDivision_Gold_Medium"/>
-                <Action type="SendEvent" frame="$this" event="League"/>
+                <Action type="SetState" frame="$this" group="RankBorderType" state="LeagueBadgeBorder"/>
             </State>
             <State name="Platinum">
                 <Action type="SetProperty" frame="PortraitContainer/AvatarBorderImage" texture="@UI/portrait_border_platinum_med"/>
                 <Action type="SetProperty" frame="PortraitContainer/AvatarBorderImage/RankBadgeImage" texture="@UI/portrait_division_platinum_med"/>
                 <Action type="SetProperty" frame="PortraitContainer/AvatarBorderImage/RankLabel" style="RankedDivision_Platinum_Medium"/>
-                <Action type="SendEvent" frame="$this" event="League"/>
+                <Action type="SetState" frame="$this" group="RankBorderType" state="LeagueBadgeBorder"/>
             </State>
             <State name="Diamond">
                 <Action type="SetProperty" frame="PortraitContainer/AvatarBorderImage" texture="@UI/portrait_border_diamond_med"/>
                 <Action type="SetProperty" frame="PortraitContainer/AvatarBorderImage/RankBadgeImage" texture="@UI/portrait_division_diamond_med"/>
                 <Action type="SetProperty" frame="PortraitContainer/AvatarBorderImage/RankLabel" style="RankedDivision_Diamond_Medium"/>
-                <Action type="SendEvent" frame="$this" event="League"/>
+                <Action type="SetState" frame="$this" group="RankBorderType" state="LeagueBadgeBorder"/>
             </State>
             <State name="Master">
                 <Action type="SetProperty" frame="PortraitContainer/AvatarBorderImage" texture="@UI/portrait_border_master_med"/>
-                <Action type="SetProperty" frame="PortraitContainer/AvatarBorderImage/RankBadgeImage" visible="false"/>
-                <Action type="SetProperty" frame="PortraitContainer/AvatarBorderImage/RankLabel" visible="false"/>
-                <Action type="SendEvent" frame="$this" event="Master"/>
+                <Action type="SetState" frame="$this" group="RankBorderType" state="HiddenBorder"/>
             </State>
             <State name="GrandMaster">
                 <Action type="SetProperty" frame="PortraitContainer/AvatarBorderImage" texture="@UI/portrait_border_master_med"/>
-                <Action type="SetProperty" frame="PortraitContainer/AvatarBorderImage/RankBadgeImage" visible="false"/>
                 <Action type="SetProperty" frame="PortraitContainer/AvatarBorderImage/RankLabel" style="RankedDivision_GrandMaster_Medium"/>
                 <Action type="SetProperty" frame="PortraitContainer/AvatarBorderImage/GrandMasterBorder" visible="true"/>
                 <Action type="SetProperty" frame="PortraitContainer/AvatarBorderImage/GrandMasterBorder" texture="@UI/portrait_border_grandmaster_med"/>
-                <Action type="SendEvent" frame="$this" event="GrandMaster"/>
+                <Action type="SetState" frame="$this" group="RankBorderType" state="GrandMasterBorder"/>
             </State>
         </StateGroup>
     </Frame>
 
-    <Frame type="AvatarFrame" name="AvatarStateTemplate_Friend" template="AvatarFrameTemplates/AvatarStateTemplate">
-        <Width val="84"/>
-        <Height val="84"/>
-
-        <Frame type="Frame" name="AnchorFrame">
-            <Width val="84"/>
-            <Height val="84"/>
-        </Frame>
-
-        <Frame type="Frame" name="PortraitContainer">
-            <Frame type="Image" name="PortraitBackground">
-                <Width val="52"/>
-                <Height val="52"/>
-            </Frame>
-
-            <Frame type="Image" name="AvatarBorderImage">
-                <Frame type="Frame" name="RankAnchor">
-                    <Anchor side="Top" relative="$parent" pos="Mid" offset="16"/>
-                    <Anchor side="Left" relative="$parent" pos="Mid" offset="19"/>
-
-                    <Animation name="League">
-                        <Event event="League" action="Play" frame="$parent/$parent/$parent"/>
-                        <Event event="PlayerLevel" action="Stop" frame="$parent/$parent/$parent"/>
-
-                        <Controller type="Anchor" end="Pause" side="Top" relative="false">
-                            <Key type="Curve" time="0" value="20" out="Fast"/>
-                        </Controller>
-                        <Controller type="Anchor" end="Pause" side="Left" relative="false">
-                            <Key type="Curve" time="0" value="-21" out="Fast"/>
-                        </Controller>
-                    </Animation>
-
-                    <Animation name="GrandMaster">
-                        <Event event="GrandMaster" action="Play" frame="$parent/$parent/$parent"/>
-                        <Event event="PlayerLevel" action="Stop" frame="$parent/$parent/$parent"/>
-
-                        <Controller type="Anchor" end="Pause" side="Top" relative="false">
-                            <Key type="Curve" time="0" value="24" out="Fast"/>
-                        </Controller>
-                        <Controller type="Anchor" end="Pause" side="Left" relative="false">
-                            <Key type="Curve" time="0" value="0" out="Fast"/>
-                        </Controller>
-                    </Animation>
-                </Frame>
-
-                <Frame type="Image" name="RankBadgeImage">
-                    <Anchor side="Top" relative="$parent/RankAnchor" pos="Mid" offset="3"/>
-                    <Anchor side="Bottom" relative="$parent/RankAnchor" pos="Mid" offset="3"/>
-                    <Anchor side="Left" relative="$parent/RankAnchor" pos="Mid" offset="0"/>
-                    <Anchor side="Right" relative="$parent/RankAnchor" pos="Mid" offset="0"/>
-                    <Width val="20"/>
-                </Frame>
-
-                <Frame type="Label" name="RankLabel">
-                    <Anchor side="Top" relative="$parent/RankAnchor" pos="Mid" offset="1"/>
-                    <Anchor side="Bottom" relative="$parent/RankAnchor" pos="Mid" offset="1"/>
-                    <Anchor side="Left" relative="$parent/RankAnchor" pos="Mid" offset="0"/>
-                    <Anchor side="Right" relative="$parent/RankAnchor" pos="Mid" offset="0"/>
-                    <Width val="84"/>
-                </Frame>
-            </Frame>
-
-            <Frame type="Frame" name="IconContainer">
-                <Frame type="Image" name="SilencedIcon">
-                    <Anchor side="Top" relative="$parent" pos="Min" offset="6"/>
-                    <Anchor side="Right" relative="$parent" pos="Max" offset="-5"/>
-                    <Width val="34"/>
-                </Frame>
-            </Frame>
-        </Frame>
-
-        <StateGroup name="Type">
-            <State name="Standard">
-                <Action type="SetProperty" frame="PortraitContainer/AvatarBorderImage" texture="@UI/portrait_border_standard_sm"/>
-                <Action type="SetProperty" frame="PortraitContainer/AvatarBorderImage/RankBadgeImage" visible="false"/>
-                <Action type="SetProperty" frame="PortraitContainer/AvatarBorderImage/RankLabel" style="RankedDivision_Standard_Small"/>
-                <Action type="SendEvent" frame="$this" event="PlayerLevel"/>
-            </State>
-            <State name="Placement">
-                <Action type="SetProperty" frame="PortraitContainer/AvatarBorderImage" texture="@UI/portrait_border_placement_sm"/>
-                <Action type="SetProperty" frame="PortraitContainer/AvatarBorderImage/RankBadgeImage" visible="false"/>
-                <Action type="SetProperty" frame="PortraitContainer/AvatarBorderImage/RankLabel" visible="false"/>
-            </State>            
-            <State name="Bronze">
-                <Action type="SetProperty" frame="PortraitContainer/AvatarBorderImage" texture="@UI/portrait_border_bronze_sm"/>
-                <Action type="SetProperty" frame="PortraitContainer/AvatarBorderImage/RankBadgeImage" texture="@UI/portrait_division_bronze_sm"/>
-                <Action type="SetProperty" frame="PortraitContainer/AvatarBorderImage/RankLabel" style="RankedDivision_Bronze_Small"/>
-                <Action type="SendEvent" frame="$this" event="League"/>
-            </State>
-            <State name="Silver">
-                <Action type="SetProperty" frame="PortraitContainer/AvatarBorderImage" texture="@UI/portrait_border_silver_sm"/>
-                <Action type="SetProperty" frame="PortraitContainer/AvatarBorderImage/RankBadgeImage" texture="@UI/portrait_division_silver_sm"/>
-                <Action type="SetProperty" frame="PortraitContainer/AvatarBorderImage/RankLabel" style="RankedDivision_Silver_Small"/>
-                <Action type="SendEvent" frame="$this" event="League"/>
-            </State>
-            <State name="Gold">
-                <Action type="SetProperty" frame="PortraitContainer/AvatarBorderImage" texture="@UI/portrait_border_gold_sm"/>
-                <Action type="SetProperty" frame="PortraitContainer/AvatarBorderImage/RankBadgeImage" texture="@UI/portrait_division_gold_sm"/>
-                <Action type="SetProperty" frame="PortraitContainer/AvatarBorderImage/RankLabel" style="RankedDivision_Gold_Small"/>
-                <Action type="SendEvent" frame="$this" event="League"/>
-            </State>
-            <State name="Platinum">
-                <Action type="SetProperty" frame="PortraitContainer/AvatarBorderImage" texture="@UI/portrait_border_platinum_sm"/>
-                <Action type="SetProperty" frame="PortraitContainer/AvatarBorderImage/RankBadgeImage" texture="@UI/portrait_division_platinum_sm"/>
-                <Action type="SetProperty" frame="PortraitContainer/AvatarBorderImage/RankLabel" style="RankedDivision_Platinum_Small"/>
-                <Action type="SendEvent" frame="$this" event="League"/>
-            </State>
-            <State name="Diamond">
-                <Action type="SetProperty" frame="PortraitContainer/AvatarBorderImage" texture="@UI/portrait_border_diamond_sm"/>
-                <Action type="SetProperty" frame="PortraitContainer/AvatarBorderImage/RankBadgeImage" texture="@UI/portrait_division_diamond_sm"/>
-                <Action type="SetProperty" frame="PortraitContainer/AvatarBorderImage/RankLabel" style="RankedDivision_Diamond_Small"/>
-                <Action type="SendEvent" frame="$this" event="League"/>
-            </State>
-            <State name="Master">
-                <Action type="SetProperty" frame="PortraitContainer/AvatarBorderImage" texture="@UI/portrait_border_master_sm"/>
-                <Action type="SetProperty" frame="PortraitContainer/AvatarBorderImage/RankBadgeImage" visible="false"/>
-                <Action type="SetProperty" frame="PortraitContainer/AvatarBorderImage/RankLabel" visible="false"/>
-                <Action type="SendEvent" frame="$this" event="Master"/>
-            </State>
-            <State name="GrandMaster">
-                <Action type="SetProperty" frame="PortraitContainer/AvatarBorderImage" texture="@UI/portrait_border_master_sm"/>
-                <Action type="SetProperty" frame="PortraitContainer/AvatarBorderImage/RankBadgeImage" visible="false"/>
-                <Action type="SetProperty" frame="PortraitContainer/AvatarBorderImage/RankLabel" style="RankedDivision_GrandMaster_Small"/>
-                <Action type="SetProperty" frame="PortraitContainer/AvatarBorderImage/GrandMasterBorder" visible="true"/>
-                <Action type="SetProperty" frame="PortraitContainer/AvatarBorderImage/GrandMasterBorder" texture="@UI/portrait_border_grandmaster_sm"/>
-                <Action type="SendEvent" frame="$this" event="GrandMaster"/>
-            </State>
-        </StateGroup>
-    </Frame>
-
-    <Frame type="AvatarFrame" name="AvatarStateTemplate_PartyMember" template="AvatarFrameTemplates/AvatarStateTemplate">
+    <Frame type="AvatarFrame" name="AvatarStateTemplate_Loading" template="AvatarFrameTemplates/AvatarStateTemplate">
         <Width val="124"/>
         <Height val="124"/>
 
@@ -709,39 +634,37 @@
         </Frame>
 
         <Frame type="Frame" name="PortraitContainer">
+            <Frame type="Image" name="AvatarBorderImage">
+                <Frame type="AscensionFrame" name="AscensionBadge">
+                    <Width val="55"/>
+                    <Height val="55"/>
+                </Frame>
+            </Frame>
+        
             <Frame type="Image" name="PortraitBackground">
                 <Width val="81"/>
                 <Height val="81"/>
             </Frame>
 
             <Frame type="Image" name="AvatarBorderImage">
+                <StateGroup name="AnchorUpdate">
+                    <State name="LeagueBadgeBorder">
+                        <When type="StateGroup" frame="$ancestor[@name=PortraitContainer]/$parent" RankBorderType="LeagueBadgeBorder"/>
+                        <Action type="SetAnchor" frame="RankAnchor" side="Top" relative="$this" pos="Mid" offset="30"/>
+                        <Action type="SetAnchor" frame="RankAnchor" side="Left" relative="$parent" pos="Mid" offset="-32"/>
+                        <Action type="SetProperty" frame="RankBadgeImage" visible="true"/>
+                    </State>
+                    <State name="GrandMasterBorder">
+                        <When type="StateGroup" frame="$ancestor[@name=PortraitContainer]/$parent" RankBorderType="GrandMasterBorder"/>
+                        <Action type="SetAnchor" frame="RankAnchor" side="Top" relative="$this" pos="Mid" offset="37"/>
+                        <Action type="SetAnchor" frame="RankAnchor" side="Left" relative="$parent" pos="Mid" offset="0"/>
+                        <Action type="SetProperty" frame="GrandMasterBorder" visible="true"/>
+                    </State>
+                </StateGroup>
+
                 <Frame type="Frame" name="RankAnchor">
                     <Anchor side="Top" relative="$parent" pos="Mid" offset="28"/>
                     <Anchor side="Left" relative="$parent" pos="Mid" offset="25"/>
-
-                    <Animation name="League">
-                        <Event event="League" action="Play" frame="$parent/$parent/$parent"/>
-                        <Event event="PlayerLevel" action="Stop" frame="$parent/$parent/$parent"/>
-
-                        <Controller type="Anchor" end="Pause" side="Top" relative="false">
-                            <Key type="Curve" time="0" value="30" out="Fast"/>
-                        </Controller>
-                        <Controller type="Anchor" end="Pause" side="Left" relative="false">
-                            <Key type="Curve" time="0" value="-32" out="Fast"/>
-                        </Controller>
-                    </Animation>
-
-                    <Animation name="GrandMaster">
-                        <Event event="GrandMaster" action="Play" frame="$parent/$parent/$parent"/>
-                        <Event event="PlayerLevel" action="Stop" frame="$parent/$parent/$parent"/>
-
-                        <Controller type="Anchor" end="Pause" side="Top" relative="false">
-                            <Key type="Curve" time="0" value="37" out="Fast"/>
-                        </Controller>
-                        <Controller type="Anchor" end="Pause" side="Left" relative="false">
-                            <Key type="Curve" time="0" value="0" out="Fast"/>
-                        </Controller>
-                    </Animation>
                 </Frame>
 
                 <Frame type="Image" name="RankBadgeImage">
@@ -772,59 +695,300 @@
 
         <StateGroup name="Type">
             <State name="Standard">
-                <Action type="SetProperty" frame="PortraitContainer/AvatarBorderImage" texture="@UI/portrait_border_standard_med"/>
-                <Action type="SetProperty" frame="PortraitContainer/AvatarBorderImage/RankBadgeImage" visible="false"/>
+                <Action type="SetProperty" frame="PortraitContainer/AvatarBorderImage" texture="{AscensionBadge/ImagePathFormatter/@Text}"/>
                 <Action type="SetProperty" frame="PortraitContainer/AvatarBorderImage/RankLabel" style="RankedDivision_Standard_SmallMedium"/>
-                <Action type="SendEvent" frame="$this" event="PlayerLevel"/>
+                <Action type="SetState" frame="$this" group="RankBorderType" state="PlayerLevelBorder"/>
             </State>
             <State name="Placement">
                 <Action type="SetProperty" frame="PortraitContainer/AvatarBorderImage" texture="@UI/portrait_border_placement_med"/>
-                <Action type="SetProperty" frame="PortraitContainer/AvatarBorderImage/RankBadgeImage" visible="false"/>
-                <Action type="SetProperty" frame="PortraitContainer/AvatarBorderImage/RankLabel" visible="false"/>
+                <Action type="SetState" frame="$this" group="RankBorderType" state="HiddenBorder"/>
             </State>
             <State name="Bronze">
                 <Action type="SetProperty" frame="PortraitContainer/AvatarBorderImage" texture="@UI/portrait_border_bronze_med"/>
                 <Action type="SetProperty" frame="PortraitContainer/AvatarBorderImage/RankBadgeImage" texture="@UI/portrait_division_bronze_med"/>
                 <Action type="SetProperty" frame="PortraitContainer/AvatarBorderImage/RankLabel" style="RankedDivision_Bronze_SmallMedium"/>
-                <Action type="SendEvent" frame="$this" event="League"/>
+                <Action type="SetState" frame="$this" group="RankBorderType" state="LeagueBadgeBorder"/>
             </State>
             <State name="Silver">
                 <Action type="SetProperty" frame="PortraitContainer/AvatarBorderImage" texture="@UI/portrait_border_silver_med"/>
                 <Action type="SetProperty" frame="PortraitContainer/AvatarBorderImage/RankBadgeImage" texture="@UI/portrait_division_silver_med"/>
                 <Action type="SetProperty" frame="PortraitContainer/AvatarBorderImage/RankLabel" style="RankedDivision_Silver_SmallMedium"/>
-                <Action type="SendEvent" frame="$this" event="League"/>
+                <Action type="SetState" frame="$this" group="RankBorderType" state="LeagueBadgeBorder"/>
             </State>
             <State name="Gold">
                 <Action type="SetProperty" frame="PortraitContainer/AvatarBorderImage" texture="@UI/portrait_border_gold_med"/>
                 <Action type="SetProperty" frame="PortraitContainer/AvatarBorderImage/RankBadgeImage" texture="@UI/portrait_division_gold_med"/>
                 <Action type="SetProperty" frame="PortraitContainer/AvatarBorderImage/RankLabel" style="RankedDivision_Gold_SmallMedium"/>
-                <Action type="SendEvent" frame="$this" event="League"/>
+                <Action type="SetState" frame="$this" group="RankBorderType" state="LeagueBadgeBorder"/>
             </State>
             <State name="Platinum">
                 <Action type="SetProperty" frame="PortraitContainer/AvatarBorderImage" texture="@UI/portrait_border_platinum_med"/>
                 <Action type="SetProperty" frame="PortraitContainer/AvatarBorderImage/RankBadgeImage" texture="@UI/portrait_division_platinum_med"/>
                 <Action type="SetProperty" frame="PortraitContainer/AvatarBorderImage/RankLabel" style="RankedDivision_Platinum_SmallMedium"/>
-                <Action type="SendEvent" frame="$this" event="League"/>
+                <Action type="SetState" frame="$this" group="RankBorderType" state="LeagueBadgeBorder"/>
             </State>
             <State name="Diamond">
                 <Action type="SetProperty" frame="PortraitContainer/AvatarBorderImage" texture="@UI/portrait_border_diamond_med"/>
                 <Action type="SetProperty" frame="PortraitContainer/AvatarBorderImage/RankBadgeImage" texture="@UI/portrait_division_diamond_med"/>
                 <Action type="SetProperty" frame="PortraitContainer/AvatarBorderImage/RankLabel" style="RankedDivision_Diamond_SmallMedium"/>
-                <Action type="SendEvent" frame="$this" event="League"/>
+                <Action type="SetState" frame="$this" group="RankBorderType" state="LeagueBadgeBorder"/>
             </State>
             <State name="Master">
                 <Action type="SetProperty" frame="PortraitContainer/AvatarBorderImage" texture="@UI/portrait_border_master_med"/>
-                <Action type="SetProperty" frame="PortraitContainer/AvatarBorderImage/RankBadgeImage" visible="false"/>
-                <Action type="SetProperty" frame="PortraitContainer/AvatarBorderImage/RankLabel" visible="false"/>
-                <Action type="SendEvent" frame="$this" event="Master"/>
+                <Action type="SetState" frame="$this" group="RankBorderType" state="HiddenBorder"/>
             </State>
             <State name="GrandMaster">
                 <Action type="SetProperty" frame="PortraitContainer/AvatarBorderImage" texture="@UI/portrait_border_master_med"/>
-                <Action type="SetProperty" frame="PortraitContainer/AvatarBorderImage/RankBadgeImage" visible="false"/>
                 <Action type="SetProperty" frame="PortraitContainer/AvatarBorderImage/RankLabel" style="RankedDivision_GrandMaster_SmallMedium"/>
                 <Action type="SetProperty" frame="PortraitContainer/AvatarBorderImage/GrandMasterBorder" visible="true"/>
                 <Action type="SetProperty" frame="PortraitContainer/AvatarBorderImage/GrandMasterBorder" texture="@UI/portrait_border_grandmaster_med"/>
-                <Action type="SendEvent" frame="$this" event="GrandMaster"/>
+                <Action type="SetState" frame="$this" group="RankBorderType" state="GrandMasterBorder"/>
+            </State>
+        </StateGroup>
+    </Frame>
+
+    <Frame type="AvatarFrame" name="AvatarStateTemplate_PartyMember" template="AvatarFrameTemplates/AvatarStateTemplate">
+        <Width val="107"/>
+        <Height val="107"/>
+
+        <Frame type="Frame" name="AnchorFrame">
+            <Width val="107"/>
+            <Height val="107"/>
+        </Frame>
+
+        <Frame type="Frame" name="PortraitContainer">
+            <Frame type="Image" name="AvatarBorderImage">
+                <Frame type="AscensionFrame" name="AscensionBadge">
+                    <Width val="56"/>
+                    <Height val="56"/>
+                </Frame>
+            </Frame>
+        
+            <Frame type="Image" name="PortraitBackground">
+                <Width val="70"/>
+                <Height val="70"/>
+            </Frame>
+
+            <Frame type="Image" name="AvatarBorderImage">
+                <StateGroup name="AnchorUpdate">
+                    <State name="LeagueBadgeBorder">
+                        <When type="StateGroup" frame="$ancestor[@name=PortraitContainer]/$parent" RankBorderType="LeagueBadgeBorder"/>
+                        <Action type="SetAnchor" frame="RankAnchor" side="Top" relative="$this" pos="Mid" offset="30"/>
+                        <Action type="SetAnchor" frame="RankAnchor" side="Left" relative="$parent" pos="Mid" offset="-32"/>
+                        <Action type="SetProperty" frame="RankBadgeImage" visible="true"/>
+                    </State>
+                    <State name="GrandMasterBorder">
+                        <When type="StateGroup" frame="$ancestor[@name=PortraitContainer]/$parent" RankBorderType="GrandMasterBorder"/>
+                        <Action type="SetAnchor" frame="RankAnchor" side="Top" relative="$this" pos="Mid" offset="37"/>
+                        <Action type="SetAnchor" frame="RankAnchor" side="Left" relative="$parent" pos="Mid" offset="0"/>
+                        <Action type="SetProperty" frame="GrandMasterBorder" visible="true"/>
+                    </State>
+                </StateGroup>
+
+                <Frame type="Frame" name="RankAnchor">
+                    <Anchor side="Top" relative="$parent" pos="Mid" offset="24"/>
+                    <Anchor side="Left" relative="$parent" pos="Mid" offset="21"/>
+                </Frame>
+
+                <Frame type="Image" name="RankBadgeImage">
+                    <Anchor side="Top" relative="$parent/RankAnchor" pos="Mid" offset="3"/>
+                    <Anchor side="Bottom" relative="$parent/RankAnchor" pos="Mid" offset="3"/>
+                    <Anchor side="Left" relative="$parent/RankAnchor" pos="Mid" offset="0"/>
+                    <Anchor side="Right" relative="$parent/RankAnchor" pos="Mid" offset="0"/>
+                    <Width val="35"/>
+                </Frame>
+
+                <Frame type="Label" name="RankLabel">
+                    <Anchor side="Top" relative="$parent/RankAnchor" pos="Mid" offset="0"/>
+                    <Anchor side="Bottom" relative="$parent/RankAnchor" pos="Mid" offset="0"/>
+                    <Anchor side="Left" relative="$parent/RankAnchor" pos="Mid" offset="0"/>
+                    <Anchor side="Right" relative="$parent/RankAnchor" pos="Mid" offset="0"/>
+                    <Width val="107"/>
+                </Frame>
+            </Frame>
+
+            <Frame type="Frame" name="IconContainer">
+                <Frame type="Image" name="SilencedIcon">
+                    <Anchor side="Top" relative="$parent" pos="Min" offset="8"/>
+                    <Anchor side="Right" relative="$parent" pos="Max" offset="-7"/>
+                    <Width val="46"/>
+                </Frame>
+            </Frame>
+        </Frame>
+
+        <StateGroup name="Type">
+            <State name="Standard">
+                <Action type="SetProperty" frame="PortraitContainer/AvatarBorderImage" texture="{AscensionBadge/ImagePathFormatter/@Text}"/>
+                <Action type="SetProperty" frame="PortraitContainer/AvatarBorderImage/RankLabel" style="RankedDivision_Standard_SmallMedium"/>
+                <Action type="SetState" frame="$this" group="RankBorderType" state="PlayerLevelBorder"/>
+            </State>
+            <State name="Placement">
+                <Action type="SetProperty" frame="PortraitContainer/AvatarBorderImage" texture="@UI/portrait_border_placement_med"/>
+                <Action type="SetState" frame="$this" group="RankBorderType" state="HiddenBorder"/>
+            </State>
+            <State name="Bronze">
+                <Action type="SetProperty" frame="PortraitContainer/AvatarBorderImage" texture="@UI/portrait_border_bronze_med"/>
+                <Action type="SetProperty" frame="PortraitContainer/AvatarBorderImage/RankBadgeImage" texture="@UI/portrait_division_bronze_med"/>
+                <Action type="SetProperty" frame="PortraitContainer/AvatarBorderImage/RankLabel" style="RankedDivision_Bronze_SmallMedium"/>
+                <Action type="SetState" frame="$this" group="RankBorderType" state="LeagueBadgeBorder"/>
+            </State>
+            <State name="Silver">
+                <Action type="SetProperty" frame="PortraitContainer/AvatarBorderImage" texture="@UI/portrait_border_silver_med"/>
+                <Action type="SetProperty" frame="PortraitContainer/AvatarBorderImage/RankBadgeImage" texture="@UI/portrait_division_silver_med"/>
+                <Action type="SetProperty" frame="PortraitContainer/AvatarBorderImage/RankLabel" style="RankedDivision_Silver_SmallMedium"/>
+                <Action type="SetState" frame="$this" group="RankBorderType" state="LeagueBadgeBorder"/>
+            </State>
+            <State name="Gold">
+                <Action type="SetProperty" frame="PortraitContainer/AvatarBorderImage" texture="@UI/portrait_border_gold_med"/>
+                <Action type="SetProperty" frame="PortraitContainer/AvatarBorderImage/RankBadgeImage" texture="@UI/portrait_division_gold_med"/>
+                <Action type="SetProperty" frame="PortraitContainer/AvatarBorderImage/RankLabel" style="RankedDivision_Gold_SmallMedium"/>
+                <Action type="SetState" frame="$this" group="RankBorderType" state="LeagueBadgeBorder"/>
+            </State>
+            <State name="Platinum">
+                <Action type="SetProperty" frame="PortraitContainer/AvatarBorderImage" texture="@UI/portrait_border_platinum_med"/>
+                <Action type="SetProperty" frame="PortraitContainer/AvatarBorderImage/RankBadgeImage" texture="@UI/portrait_division_platinum_med"/>
+                <Action type="SetProperty" frame="PortraitContainer/AvatarBorderImage/RankLabel" style="RankedDivision_Platinum_SmallMedium"/>
+                <Action type="SetState" frame="$this" group="RankBorderType" state="LeagueBadgeBorder"/>
+            </State>
+            <State name="Diamond">
+                <Action type="SetProperty" frame="PortraitContainer/AvatarBorderImage" texture="@UI/portrait_border_diamond_med"/>
+                <Action type="SetProperty" frame="PortraitContainer/AvatarBorderImage/RankBadgeImage" texture="@UI/portrait_division_diamond_med"/>
+                <Action type="SetProperty" frame="PortraitContainer/AvatarBorderImage/RankLabel" style="RankedDivision_Diamond_SmallMedium"/>
+                <Action type="SetState" frame="$this" group="RankBorderType" state="LeagueBadgeBorder"/>
+            </State>
+            <State name="Master">
+                <Action type="SetProperty" frame="PortraitContainer/AvatarBorderImage" texture="@UI/portrait_border_master_med"/>
+                <Action type="SetState" frame="$this" group="RankBorderType" state="HiddenBorder"/>
+            </State>
+            <State name="GrandMaster">
+                <Action type="SetProperty" frame="PortraitContainer/AvatarBorderImage" texture="@UI/portrait_border_master_med"/>
+                <Action type="SetProperty" frame="PortraitContainer/AvatarBorderImage/RankLabel" style="RankedDivision_GrandMaster_SmallMedium"/>
+                <Action type="SetProperty" frame="PortraitContainer/AvatarBorderImage/GrandMasterBorder" visible="true"/>
+                <Action type="SetProperty" frame="PortraitContainer/AvatarBorderImage/GrandMasterBorder" texture="@UI/portrait_border_grandmaster_med"/>
+                <Action type="SetState" frame="$this" group="RankBorderType" state="GrandMasterBorder"/>
+            </State>
+        </StateGroup>
+    </Frame>
+
+    <Frame type="AvatarFrame" name="AvatarStateTemplate_Friend" template="AvatarFrameTemplates/AvatarStateTemplate">
+        <Width val="84"/>
+        <Height val="84"/>
+
+        <Frame type="Frame" name="AnchorFrame">
+            <Width val="84"/>
+            <Height val="84"/>
+        </Frame>
+
+        <Frame type="Frame" name="PortraitContainer">
+            <Frame type="Image" name="AvatarBorderImage">
+                <Frame type="AscensionFrame" name="AscensionBadge">
+                    <Width val="37"/>
+                    <Height val="37"/>
+                </Frame>
+            </Frame>
+            
+            <Frame type="Image" name="PortraitBackground">
+                <Width val="52"/>
+                <Height val="52"/>
+            </Frame>
+
+            <Frame type="Image" name="AvatarBorderImage">
+                <StateGroup name="AnchorUpdate">
+                    <State name="LeagueBadgeBorder">
+                        <When type="StateGroup" frame="$ancestor[@name=PortraitContainer]/$parent" RankBorderType="LeagueBadgeBorder"/>
+                        <Action type="SetAnchor" frame="RankAnchor" side="Top" relative="$this" pos="Mid" offset="20"/>
+                        <Action type="SetAnchor" frame="RankAnchor" side="Left" relative="$parent" pos="Mid" offset="-21"/>
+                        <Action type="SetProperty" frame="RankBadgeImage" visible="true"/>
+                    </State>
+                    <State name="GrandMasterBorder">
+                        <When type="StateGroup" frame="$ancestor[@name=PortraitContainer]/$parent" RankBorderType="GrandMasterBorder"/>
+                        <Action type="SetAnchor" frame="RankAnchor" side="Top" relative="$this" pos="Mid" offset="24"/>
+                        <Action type="SetAnchor" frame="RankAnchor" side="Left" relative="$parent" pos="Mid" offset="0"/>
+                        <Action type="SetProperty" frame="GrandMasterBorder" visible="true"/>
+                    </State>
+                </StateGroup>
+
+                <Frame type="Frame" name="RankAnchor">
+                    <Anchor side="Top" relative="$parent" pos="Mid" offset="16"/>
+                    <Anchor side="Left" relative="$parent" pos="Mid" offset="19"/>
+                </Frame>
+
+                <Frame type="Image" name="RankBadgeImage">
+                    <Anchor side="Top" relative="$parent/RankAnchor" pos="Mid" offset="3"/>
+                    <Anchor side="Bottom" relative="$parent/RankAnchor" pos="Mid" offset="3"/>
+                    <Anchor side="Left" relative="$parent/RankAnchor" pos="Mid" offset="0"/>
+                    <Anchor side="Right" relative="$parent/RankAnchor" pos="Mid" offset="0"/>
+                    <Width val="20"/>
+                </Frame>
+
+                <Frame type="Label" name="RankLabel">
+                    <Anchor side="Top" relative="$parent/RankAnchor" pos="Mid" offset="1"/>
+                    <Anchor side="Bottom" relative="$parent/RankAnchor" pos="Mid" offset="1"/>
+                    <Anchor side="Left" relative="$parent/RankAnchor" pos="Mid" offset="0"/>
+                    <Anchor side="Right" relative="$parent/RankAnchor" pos="Mid" offset="0"/>
+                    <Width val="84"/>
+                </Frame>
+            </Frame>
+
+            <Frame type="Frame" name="IconContainer">
+                <Frame type="Image" name="SilencedIcon">
+                    <Anchor side="Top" relative="$parent" pos="Min" offset="6"/>
+                    <Anchor side="Right" relative="$parent" pos="Max" offset="-5"/>
+                    <Width val="34"/>
+                </Frame>
+            </Frame>
+        </Frame>
+
+        <StateGroup name="Type">
+            <State name="Standard">
+                <Action type="SetProperty" frame="PortraitContainer/AvatarBorderImage" texture="{AscensionBadge/ImagePathFormatter/@Text}"/>
+                <Action type="SetProperty" frame="PortraitContainer/AvatarBorderImage/RankLabel" style="RankedDivision_Standard_Small"/>
+                <Action type="SetState" frame="$this" group="RankBorderType" state="PlayerLevelBorder"/>
+            </State>
+            <State name="Placement">
+                <Action type="SetProperty" frame="PortraitContainer/AvatarBorderImage" texture="@UI/portrait_border_placement_sm"/>
+                <Action type="SetState" frame="$this" group="RankBorderType" state="HiddenBorder"/>
+            </State>            
+            <State name="Bronze">
+                <Action type="SetProperty" frame="PortraitContainer/AvatarBorderImage" texture="@UI/portrait_border_bronze_sm"/>
+                <Action type="SetProperty" frame="PortraitContainer/AvatarBorderImage/RankBadgeImage" texture="@UI/portrait_division_bronze_sm"/>
+                <Action type="SetProperty" frame="PortraitContainer/AvatarBorderImage/RankLabel" style="RankedDivision_Bronze_Small"/>
+                <Action type="SetState" frame="$this" group="RankBorderType" state="LeagueBadgeBorder"/>
+            </State>
+            <State name="Silver">
+                <Action type="SetProperty" frame="PortraitContainer/AvatarBorderImage" texture="@UI/portrait_border_silver_sm"/>
+                <Action type="SetProperty" frame="PortraitContainer/AvatarBorderImage/RankBadgeImage" texture="@UI/portrait_division_silver_sm"/>
+                <Action type="SetProperty" frame="PortraitContainer/AvatarBorderImage/RankLabel" style="RankedDivision_Silver_Small"/>
+                <Action type="SetState" frame="$this" group="RankBorderType" state="LeagueBadgeBorder"/>
+            </State>
+            <State name="Gold">
+                <Action type="SetProperty" frame="PortraitContainer/AvatarBorderImage" texture="@UI/portrait_border_gold_sm"/>
+                <Action type="SetProperty" frame="PortraitContainer/AvatarBorderImage/RankBadgeImage" texture="@UI/portrait_division_gold_sm"/>
+                <Action type="SetProperty" frame="PortraitContainer/AvatarBorderImage/RankLabel" style="RankedDivision_Gold_Small"/>
+                <Action type="SetState" frame="$this" group="RankBorderType" state="LeagueBadgeBorder"/>
+            </State>
+            <State name="Platinum">
+                <Action type="SetProperty" frame="PortraitContainer/AvatarBorderImage" texture="@UI/portrait_border_platinum_sm"/>
+                <Action type="SetProperty" frame="PortraitContainer/AvatarBorderImage/RankBadgeImage" texture="@UI/portrait_division_platinum_sm"/>
+                <Action type="SetProperty" frame="PortraitContainer/AvatarBorderImage/RankLabel" style="RankedDivision_Platinum_Small"/>
+                <Action type="SetState" frame="$this" group="RankBorderType" state="LeagueBadgeBorder"/>
+            </State>
+            <State name="Diamond">
+                <Action type="SetProperty" frame="PortraitContainer/AvatarBorderImage" texture="@UI/portrait_border_diamond_sm"/>
+                <Action type="SetProperty" frame="PortraitContainer/AvatarBorderImage/RankBadgeImage" texture="@UI/portrait_division_diamond_sm"/>
+                <Action type="SetProperty" frame="PortraitContainer/AvatarBorderImage/RankLabel" style="RankedDivision_Diamond_Small"/>
+                <Action type="SetState" frame="$this" group="RankBorderType" state="LeagueBadgeBorder"/>
+            </State>
+            <State name="Master">
+                <Action type="SetProperty" frame="PortraitContainer/AvatarBorderImage" texture="@UI/portrait_border_master_sm"/>
+                <Action type="SetState" frame="$this" group="RankBorderType" state="HiddenBorder"/>
+            </State>
+            <State name="GrandMaster">
+                <Action type="SetProperty" frame="PortraitContainer/AvatarBorderImage" texture="@UI/portrait_border_master_sm"/>
+                <Action type="SetProperty" frame="PortraitContainer/AvatarBorderImage/RankLabel" style="RankedDivision_GrandMaster_Small"/>
+                <Action type="SetProperty" frame="PortraitContainer/AvatarBorderImage/GrandMasterBorder" visible="true"/>
+                <Action type="SetProperty" frame="PortraitContainer/AvatarBorderImage/GrandMasterBorder" texture="@UI/portrait_border_grandmaster_sm"/>
+                <Action type="SetState" frame="$this" group="RankBorderType" state="GrandMasterBorder"/>
             </State>
         </StateGroup>
     </Frame>
@@ -839,12 +1003,31 @@
         </Frame>
 
         <Frame type="Frame" name="PortraitContainer">
+            <Frame type="Image" name="AvatarBorderImage">
+                <Frame type="AscensionFrame" name="AscensionBadge">
+                    <Width val="30"/>
+                    <Height val="30"/>
+
+                    <Frame type="TextFormatFrame" name="ImagePathFormatter">
+                        <FormatText val="Assets\Textures\Storm_UI_Badge_Ascension_Border_C%1%_T%0%_Sm.dds"/>
+                    </Frame>
+                </Frame>
+            </Frame>
+            
             <Frame type="Image" name="PortraitBackground">
                 <Width val="42"/>
                 <Height val="42"/>
             </Frame>
 
             <Frame type="Image" name="AvatarBorderImage">
+
+                <!-- Progression 2.0 - Always hide Ascension Badge -->
+                <StateGroup name="AnchorUpdate">
+                    <State name="AscensionBadge">
+                        <Action type="SetProperty" frame="AscensionBadge" visible="false"/>
+                    </State>
+                </StateGroup>
+
                 <Frame type="Image" name="RankBadgeImage">
                     <Visible val="false"/>
                 </Frame>
@@ -864,7 +1047,7 @@
 
         <StateGroup name="Type">
             <State name="Standard">
-                <Action type="SetProperty" frame="PortraitContainer/AvatarBorderImage" texture="@UI/portrait_border_standard_tiny"/>
+                <Action type="SetProperty" frame="PortraitContainer/AvatarBorderImage" texture="{AscensionBadge/ImagePathFormatter/@Text}"/>
             </State>
             <State name="Placement">
                 <Action type="SetProperty" frame="PortraitContainer/AvatarBorderImage" texture="@UI/portrait_border_placement_tiny"/>
@@ -889,8 +1072,8 @@
             </State>
             <State name="GrandMaster">
                 <Action type="SetProperty" frame="PortraitContainer/AvatarBorderImage" texture="@UI/portrait_border_master_tiny"/>
-                <Action type="SetProperty" frame="PortraitContainer/AvatarBorderImage/GrandMasterBorder" visible="true"/>
                 <Action type="SetProperty" frame="PortraitContainer/AvatarBorderImage/GrandMasterBorder" texture="@UI/portrait_border_grandmaster_tiny"/>
+                <Action type="SetState" frame="$this" group="RankBorderType" state="GrandMasterBorder"/>
             </State>
         </StateGroup>
     </Frame>

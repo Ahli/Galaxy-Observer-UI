@@ -2,22 +2,754 @@
 <Desc>
     <DescFlags val="Locked"/>
 
-    <Constant name="StoreTileItemSpacing" val="12"/>
-    <Constant name="StoreTileItemSpacingRight" val="-12"/>
-
     <Constant name="StoreSmallTileIconContainerWidth" val="55"/>
     <Constant name="StoreBigTileIconContainerWidth" val="100"/>
 
     <!--===========================================================================================
+    <! QuickBuyButtonTemplate
+    <!==========================================================================================-->
+    <Frame type="BuyButton" name="QuickBuyButtonTemplate" template="StandardTemplates/StandardButtonMiniTemplate">
+        <Width val="157"/>
+        <Height val="74"/>
+        <ClickSound val="@UI_BNet_PageSelect"/>
+        <ReportsStats val="true"/>
+        <AlwaysShow val="true"/>
+        <ShowPrice val="true"/>
+        <CollapseLayout val="true"/>
+        <PositionHint val="StoreItem"/>
+
+        <Frame type="Image" name="ShineImage">
+            <Anchor relative="$parent"/>
+            <BlendMode val="Add"/>
+            <LayerCount val="2"/>
+            <Texture val="@UI/Storm_UI_Glues_Draft_Portrait_Selecting_Glow_Mask" layer="0"/>
+            <AlphaLayer val="True" layer="0"/>
+            <Texture val="@UI/Storm_standardButtonMini_Blue_Normal" layer="1"/>
+            <TextureType val="Nineslice" layer="1"/>
+
+            <Animation name="ShineAnim">
+                <Event event="OnShown" action="DirectionForward, Play"/>
+            </Animation>
+
+            <StateGroup name="VisibilityStates">
+                <State name="ButtonDisabled">
+                    <When type="Property" frame="$parent" Enabled="false"/>
+                    <Action type="SetProperty" Visible="false"/>
+                </State>
+            </StateGroup>
+        </Frame>
+
+        <Frame type="Label" name="Label">
+            <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+            <Style val="StoreQuickPurchaseButtonGold"/>
+        </Frame>
+
+        <Frame type="Frame" name="HitTestFrame">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="21"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="22"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="-22"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="-22"/>
+
+            <TooltipAnchorPosition val="TopCenter"/>
+        </Frame>
+
+        <StateGroup name="CurrencyStyleStates">
+            <State name="Gold">
+                <When type="Property" currency="XHG"/>
+                <Action type="SetProperty" frame="Label" style="StoreQuickPurchaseButtonGold"/>
+            </State>
+            <State name="RMT">
+                <When type="Property" currency="USD"/>
+                <Action type="SetProperty" frame="Label" style="StoreQuickPurchaseButtonGems"/>
+            </State>
+            <State name="Gems">
+                <When type="Property" currency="XHC"/>
+                <Action type="SetProperty" frame="Label" style="StoreQuickPurchaseButtonGems"/>
+            </State>
+            <State name="Shards">
+                <When type="Property" currency="XHS"/>
+                <Action type="SetProperty" frame="Label" style="StoreQuickPurchaseButtonShards"/>
+            </State>
+        </StateGroup>
+
+        <StateGroup name="HoveringState">
+            <State name="Hovering">
+                <When type="Property" hovering="True"/>
+                <Action type="SetProperty" frame="$parent" hovered="True"/>
+            </State>
+        </StateGroup>
+
+        <StateGroup name="DiscountStates">
+            <State name="Discount">
+                <Action type="SetProperty" frame="NormalImage" index="0" texture="@UI/Storm_StandardButtonMini_Sale_Normal"/>
+                <Action type="SetProperty" frame="NormalImage" index="1" texture="@UI/Storm_StandardButtonMini_Sale_Down"/>
+                <Action type="SetProperty" frame="NormalImage" index="2" texture="@UI/Storm_StandardButtonMini_Sale_Down"/>
+                <Action type="SetProperty" frame="HoverImage" index="0" texture="@UI/Storm_StandardButtonMini_Sale_Hover"/>
+                <Action type="SetProperty" frame="HoverImage" index="1" texture="@UI/Storm_StandardButtonMini_Sale_Down"/>
+                <Action type="SetProperty" frame="HoverImage" index="2" texture="@UI/Storm_StandardButtonMini_Sale_Down"/>
+                <Action type="SetProperty" frame="ShineImage" index="1" texture="@UI/Storm_StandardButtonMini_Sale_Normal"/>
+            </State>
+        </StateGroup>
+
+
+        <StateGroup name="ClickSounds">
+            <DefaultState val="NotGems"/>
+            <State name="GemsCannotAfford">
+                <When type="Property" currency="XHC"/>
+                <When type="Property" CanAfford="False"/>
+                <Action type="SetProperty" ClickSound=""/>
+            </State>
+            <State name="GemsCanAfford">
+                <When type="Property" currency="XHC"/>
+                <Action type="SetProperty" ClickSound="@UI_BNet_PageSelect"/>
+            </State>
+            <State name="NotGems">
+                <Action type="SetProperty" ClickSound="@UI_BNet_PageSelect"/>
+            </State>
+        </StateGroup>
+    </Frame>
+
+    <!--===========================================================================================
+    <! BuyButtonTemplate
+    <!==========================================================================================-->
+    <Frame type="BuyButton" name="BuyButtonTemplate" template="StandardTemplates/StandardButtonTemplate">
+        <StateGroup name="ClickSounds">
+            <DefaultState val="NotGems"/>
+            <State name="GemsCannotAfford">
+                <When type="Property" currency="XHC"/>
+                <When type="Property" CanAfford="False"/>
+                <Action type="SetProperty" ClickSound=""/>
+            </State>
+            <State name="GemsCanAfford">
+                <When type="Property" currency="XHC"/>
+                <Action type="SetProperty" ClickSound="@UI_BNet_PageSelect"/>
+            </State>
+            <State name="NotGems">
+                <Action type="SetProperty" ClickSound="@UI_BNet_PageSelect"/>
+            </State>
+        </StateGroup>
+    </Frame>
+
+    <!--===========================================================================================
+    <! BuyButtonSmallTemplate
+    <!==========================================================================================-->
+    <Frame type="BuyButton" name="BuyButtonSmallTemplate" template="StandardTemplates/StandardButtonSmallTemplate">
+        <StateGroup name="ClickSounds">
+            <DefaultState val="NotGems"/>
+            <State name="GemsCannotAfford">
+                <When type="Property" currency="XHC"/>
+                <When type="Property" CanAfford="False"/>
+                <Action type="SetProperty" ClickSound=""/>
+            </State>
+            <State name="GemsCanAfford">
+                <When type="Property" currency="XHC"/>
+                <Action type="SetProperty" ClickSound="@UI_BNet_PageSelect"/>
+            </State>
+            <State name="NotGems">
+                <Action type="SetProperty" ClickSound="@UI_BNet_PageSelect"/>
+            </State>
+        </StateGroup>
+    </Frame>
+
+    <!--===========================================================================================
+    <! GameContentPurchaseDialogTileListItemTemplate
+    <!==========================================================================================-->
+    <Constant name="RecommendedLightAdjustColor" val="ff771d"/>
+    <Constant name="RecommendedDarkAdjustColor" val="ae5114"/>
+    <Constant name="BestValueLightAdjustColor" val="ff28d0"/>
+    <Constant name="BestValueDarkAdjustColor" val="aa1b8b"/>
+    <Constant name="MinimumRequiredLightAdjustColor" val="00ec69"/>
+    <Constant name="MinimumRequiredDarkAdjustColor" val="00632f"/>
+
+    <Frame type="GameContentPurchaseDialogTileListItem" name="GameContentPurchaseDialogTileListItemTemplate">
+        <Width val="255"/>
+        <Height val="462"/>
+        <SelectedSound val="@UI_BNet_ShopTileSelect"/>
+        <HoveredRenderPriority val="1024"/>
+        <SelectedRenderPriority val="1023"/>
+        <CollapseLayout val="true"/>
+
+        <Frame type="GameContentFrame" name="GameContentFrame">
+            <Anchor relative="$parent"/>
+            <GameContent val="{$parent/@GameContent}"/>
+        </Frame>
+
+        <Frame type="Frame" name="HitTestFrame">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="25"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="-25"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="25"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="-25"/>
+
+            <Animation name="Expand">
+                <Event event="OnMouseEnter" frame="$parent" action="DirectionForward,Play"/>
+                <Event event="OnMouseExit" frame="$parent" action="DirectionReverse,Play"/>
+
+                <Controller type="Anchor" end="Pause" side="Top" relative="true">
+                    <Key type="Curve" time="0" value="0" in="Slow" out="Slow"/>
+                    <Key type="Curve" time="0.1" value="-10" in="Slow"/>
+                </Controller>
+
+                <Controller type="Anchor" end="Pause" side="Left" relative="true">
+                    <Key type="Curve" time="0" value="0" in="Slow" out="Slow"/>
+                    <Key type="Curve" time="0.1" value="-10" in="Slow"/>
+                </Controller>
+
+                <Controller type="Anchor" end="Pause" side="Right" relative="true">
+                    <Key type="Curve" time="0" value="0" in="Slow" out="Slow"/>
+                    <Key type="Curve" time="0.1" value="10" in="Slow"/>
+                </Controller>
+
+                <Controller type="Anchor" end="Pause" side="Bottom" relative="true">
+                    <Key type="Curve" time="0" value="0" in="Slow" out="Slow"/>
+                    <Key type="Curve" time="0.1" value="10" in="Slow"/>
+                </Controller>
+            </Animation>
+        </Frame>
+
+        <Frame type="Image" name="EmptyImage">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="10"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="-10"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="10"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="-10"/>
+            <Texture val="@UI/Storm_UI_Store_SmallFrame_Off"/>
+            <TextureType val="NineSlice"/>
+            <Unclipped val="True"/>
+            <RenderType val="LDR" />
+            <Alpha val="100"/>
+        </Frame>
+
+        <Frame type="Image" name="BottomImage">
+            <Anchor relative="$parent/NormalImage"/>
+            <Texture val="@UI/Storm_UI_Store_SmallFrame_Off"/>
+            <TextureType val="NineSlice"/>
+            <Alpha val="255"/>
+            <RenderType val="LDR"/>
+            <Visible val="False"/>
+
+            <StateGroup name="Toggled">
+                <State name="HideSelected">
+                    <When type="Property" frame="$parent" Selected="True"/>
+                    <Action type="SetProperty" frame="$this" Visible="True"/>
+                </State>
+
+                <State name="HideSelected">
+                    <When type="Property" frame="$parent" Selected="False"/>
+                    <Action type="SetProperty" frame="$this" Visible="False"/>
+                </State>
+            </StateGroup>
+        </Frame>
+
+        <Frame type="Image" name="NormalImage">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="10"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="-10"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="10"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="-10"/>
+            <Texture val="@UI/Storm_UI_Store_SmallFrame_Off"/>
+            <TextureType val="NineSlice"/>
+            <RenderType val="LDR" />
+
+            <Animation name="Expand">
+                <Event event="OnMouseEnter" frame="$parent" action="DirectionForward,Play"/>
+                <Event event="OnMouseExit" frame="$parent" action="DirectionReverse,Play"/>
+
+                <Controller type="Anchor" end="Pause" side="Top" relative="true">
+                    <Key type="Curve" time="0" value="0" in="Slow" out="Slow"/>
+                    <Key type="Curve" time="0.1" value="-10" in="Slow" out="Slow"/>
+                </Controller>
+
+                <Controller type="Anchor" end="Pause" side="Left" relative="true">
+                    <Key type="Curve" time="0" value="0" in="Slow" out="Slow"/>
+                    <Key type="Curve" time="0.1" value="-10" in="Slow" out="Slow"/>
+                </Controller>
+
+                <Controller type="Anchor" end="Pause" side="Right" relative="true">
+                    <Key type="Curve" time="0" value="0" in="Slow" out="Slow"/>
+                    <Key type="Curve" time="0.1" value="10" in="Slow" out="Slow"/>
+                </Controller>
+
+                <Controller type="Anchor" end="Pause" side="Bottom" relative="true">
+                    <Key type="Curve" time="0" value="0" in="Slow" out="Slow"/>
+                    <Key type="Curve" time="0.1" value="10" in="Slow" out="Slow"/>
+                </Controller>
+            </Animation>
+        </Frame>
+
+        <Frame type="Image" name="HoverImage">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="10"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="-10"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="10"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="-10"/>
+            <Texture val="@UI/Storm_UI_Store_SmallFrame_Off"/>
+            <TextureType val="NineSlice"/>
+            <RenderType val="LDR" />
+
+            <Animation name="Expand">
+                <Event event="OnMouseEnter" frame="$parent" action="DirectionForward,Play"/>
+                <Event event="OnMouseExit" frame="$parent" action="DirectionReverse,Play"/>
+
+                <Controller type="Anchor" end="Pause" side="Top" relative="true">
+                    <Key type="Curve" time="0" value="0" in="Slow" out="Slow"/>
+                    <Key type="Curve" time="0.1" value="-10" in="Slow" out="Slow"/>
+                </Controller>
+
+                <Controller type="Anchor" end="Pause" side="Left" relative="true">
+                    <Key type="Curve" time="0" value="0" in="Slow" out="Slow"/>
+                    <Key type="Curve" time="0.1" value="-10" in="Slow" out="Slow"/>
+                </Controller>
+
+                <Controller type="Anchor" end="Pause" side="Right" relative="true">
+                    <Key type="Curve" time="0" value="0" in="Slow" out="Slow"/>
+                    <Key type="Curve" time="0.1" value="10" in="Slow" out="Slow"/>
+                </Controller>
+
+                <Controller type="Anchor" end="Pause" side="Bottom" relative="true">
+                    <Key type="Curve" time="0" value="0" in="Slow" out="Slow"/>
+                    <Key type="Curve" time="0.1" value="10" in="Slow" out="Slow"/>
+                </Controller>
+            </Animation>
+        </Frame>
+
+        <Frame type="Image" name="SelectedImage">
+            <Anchor relative="$parent/HoverImage"/>
+            <Texture val="@UI/Storm_UI_Store_SmallFrame_Off"/>
+            <TextureType val="NineSlice"/>
+            <Alpha val="0"/>
+            <RenderType val="LDR"/>
+        </Frame>
+
+        <Frame type="Image" name="InnerBackground">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="22"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="22"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="-23"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="-172"/>
+
+            <Texture val="@UI/Storm_UI_Store_SmallFrame_Off"/>
+
+            <Animation name="Expand">
+                <Event event="OnMouseEnter" frame="$parent" action="DirectionForward,Play"/>
+                <Event event="OnMouseExit" frame="$parent" action="DirectionReverse,Play"/>
+
+                <Controller type="Anchor" end="Pause" side="Top" relative="true">
+                    <Key type="Curve" time="0" value="0" in="Slow" out="Slow"/>
+                    <Key type="Curve" time="0.1" value="-10" in="Slow" out="Slow"/>
+                </Controller>
+
+                <Controller type="Anchor" end="Pause" side="Left" relative="true">
+                    <Key type="Curve" time="0" value="0" in="Slow" out="Slow"/>
+                    <Key type="Curve" time="0.1" value="-10" in="Slow" out="Slow"/>
+                </Controller>
+
+                <Controller type="Anchor" end="Pause" side="Right" relative="true">
+                    <Key type="Curve" time="0" value="0" in="Slow" out="Slow"/>
+                    <Key type="Curve" time="0.1" value="10" in="Slow" out="Slow"/>
+                </Controller>
+
+                <Controller type="Anchor" end="Pause" side="Bottom" relative="true">
+                    <Key type="Curve" time="0" value="0" in="Slow" out="Slow"/>
+                    <Key type="Curve" time="0.1" value="5" in="Slow" out="Slow"/>
+                </Controller>
+            </Animation>
+        </Frame>
+
+        <Frame type="Frame" name="PortraitImage">
+            <Anchor side="Bottom" relative="$parent/InnerBackground" pos="Max" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+            <Width val="400"/>
+            <Height val="334"/>
+            <Unclipped val="True"/>
+
+            <Frame type="Image" name="Image">
+                <Anchor relative="$parent"/>
+                <Texture val="{$parent/$parent/GameContentFrame/@PortraitTexture}"/>
+                <TextureType val="Normal"/>
+
+                <StateGroup name="PortraitVisibility">
+                    <DefaultState val="PortraitHidden"/>
+
+                    <State name="PortraitTextureInvalid">
+                        <When type="Property" frame="$this" Texture=""/>
+                        <Action type="SetProperty" Visible="false"/>
+                    </State>
+
+                    <State name="PortraitIsSpray">
+                        <When type="Property" frame="$parent/$parent/GameContentFrame" ContentType="Spray"/>
+                        <Action type="SetProperty" Visible="true"/>
+                    </State>
+
+                    <State name="PortraitIsBundle">
+                        <When type="Property" frame="$parent/$parent/GameContentFrame" ContentType="Bundle"/>
+                        <Action type="SetProperty" Visible="true"/>
+                    </State>
+
+                    <State name="PortraitIsBoost">
+                        <When type="Property" frame="$parent/$parent/GameContentFrame" ContentType="Boost"/>
+                        <Action type="SetProperty" Visible="true"/>
+                    </State>
+
+                    <State name="PortraitHidden">
+                        <Action type="SetProperty" Visible="false"/>
+                    </State>
+                </StateGroup>
+            </Frame>
+
+            <Animation name="Expand">
+                <Event event="OnMouseEnter" frame="$parent" action="DirectionForward,Play"/>
+                <Event event="OnMouseExit" frame="$parent" action="DirectionReverse,Play"/>
+
+                <Controller type="Anchor" end="Pause" side="Top" relative="true">
+                    <Key type="Curve" time="0" value="0" in="Slow" out="Slow"/>
+                    <Key type="Curve" time="0.1" value="-10" in="Slow" out="Slow"/>
+                </Controller>
+
+                <Controller type="Anchor" end="Pause" side="Left" relative="true">
+                    <Key type="Curve" time="0" value="0" in="Slow" out="Slow"/>
+                    <Key type="Curve" time="0.1" value="-10" in="Slow" out="Slow"/>
+                </Controller>
+
+                <Controller type="Anchor" end="Pause" side="Right" relative="true">
+                    <Key type="Curve" time="0" value="0" in="Slow" out="Slow"/>
+                    <Key type="Curve" time="0.1" value="10" in="Slow" out="Slow"/>
+                </Controller>
+
+                <Controller type="Anchor" end="Pause" side="Bottom" relative="true">
+                    <Key type="Curve" time="0" value="0" in="Slow" out="Slow"/>
+                    <Key type="Curve" time="0.1" value="0" in="Slow" out="Slow"/>
+                </Controller>
+            </Animation>
+        </Frame>
+
+        <Frame type="Image" name="RecommendedItem">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="25"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="15"/>
+            <Anchor side="Right" relative="RecommendedItemLabel" pos="Max" offset="25"/>
+            <Texture val="@UI/Storm_UI_Store_GemItem_Banner"/>
+            <TextureType val="NineSlice"/>
+            <Visible val="False"/>
+            <ColorAdjustMode val="Colorize"/>
+
+            <Frame type="Label" name="RecommendedItemLabel">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="20"/>
+                <Anchor side="Bottom" relative="$parent" pos="Max" offset="-1"/>
+                <Style val="GemPurchaseDialogRecommendedLabel"/>
+                <Text val="@UI/GemPackPurchase/Recommended"/>
+            </Frame>
+
+            <Animation name="Expand">
+                <Event event="OnMouseEnter" frame="$parent" action="DirectionForward,Play"/>
+                <Event event="OnMouseExit" frame="$parent" action="DirectionReverse,Play"/>
+
+                <Controller type="Anchor" end="Pause" side="Top" relative="true">
+                    <Key type="Curve" time="0" value="0" in="Slow" out="Slow"/>
+                    <Key type="Curve" time="0.1" value="-10" in="Slow" out="Slow"/>
+                </Controller>
+
+                <Controller type="Anchor" end="Pause" side="Left" relative="true">
+                    <Key type="Curve" time="0" value="0" in="Slow" out="Slow"/>
+                    <Key type="Curve" time="0.1" value="-10" in="Slow" out="Slow"/>
+                </Controller>
+
+                <Controller type="Anchor" end="Pause" side="Right" relative="true">
+                    <Key type="Curve" time="0" value="0" in="Slow" out="Slow"/>
+                    <Key type="Curve" time="0.1" value="0" in="Slow" out="Slow"/>
+                </Controller>
+            </Animation>
+        </Frame>
+
+        <Frame type="Label" name="TotalAwardLabel">
+            <Anchor side="Top" relative="$parent/InnerBackground" pos="Max" offset="5"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="22"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="-22"/>
+            <Style val="GemPurchaseDialogTotalLabel"/>
+            <Text val=""/>
+            <Options val="ScaleToPreventTruncation"/>
+
+            <Animation name="Expand">
+                <Event event="OnMouseEnter" frame="$parent" action="DirectionForward,Play"/>
+                <Event event="OnMouseExit" frame="$parent" action="DirectionReverse,Play"/>
+
+                <Controller type="Anchor" end="Pause" side="Top" relative="true">
+                    <Key type="Curve" time="0" value="0" in="Slow" out="Slow"/>
+                    <Key type="Curve" time="0.1" value="0" in="Slow" out="Slow"/>
+                </Controller>
+            </Animation>
+        </Frame>
+
+        <Frame type="Label" name="BaseAwardLabel">
+            <Anchor side="Top" relative="$parent/TotalAwardLabel" pos="Max" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="22"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="-22"/>
+            <Height val="30"/>
+            <Style val="GemPurchaseDialogBaseGemsLabel"/>
+            <Text val=""/>
+        </Frame>
+
+        <Frame type="Label" name="BonusAwardLabel">
+            <Anchor side="Top" relative="$parent/BaseAwardLabel" pos="Max" offset="-9"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="22"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="-22"/>
+            <Height val="30"/>
+            <Style val="GemPurchaseDialogBonusGemsLabel"/>
+            <Text val=""/>
+        </Frame>
+
+        <Frame type="Label" name="CostLabel">
+            <Anchor side="Left" relative="$parent" pos="Min" offset="22"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="-22"/>
+            <Anchor side="Top" relative="$parent/BonusAwardLabel" pos="Max" offset="0"/>
+            <Style val="GemPurchaseDialogCostLabel"/>
+            <Text val=""/>
+        </Frame>
+
+        <Animation name="ItemFade">
+            <Event event="OnShown" action="Restart, Play"/>
+
+            <Controller type="Fade" end="Pause">
+                <Key type="Curve" time="0" value="0" out="Slow"/>
+                <Key type="Curve" time=".25" value="255" in="Fast"/>
+            </Controller>
+        </Animation>
+
+        <StateGroup name="BonusAwardState">
+            <State name="NoBonusAward">
+                <When type="Property" BonusAward="0"/>
+
+                <Action type="SetProperty" frame="BonusAwardLabel" Visible="false"/>
+            </State>
+
+            <State name="BonusAward">
+                <Action type="SetProperty" frame="BonusAwardLabel" Visible="true"/>
+            </State>
+        </StateGroup>
+    </Frame>
+
+    <Frame type="GameContentPurchaseDialog" name="GameContentPurchaseDialogTemplate" template="StandardDialog/GridPulseDialogTemplate">
+        <Visible val="true"/>
+
+        <Frame type="Frame" name="SelectionBackgroundFrame">
+            <Anchor relative="$parent"/>
+
+            <Frame type="BlurFrame" name="BackgroundBlur">
+                <Anchor side="Top" relative="$parent/BackgroundImage" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/BackgroundImage" pos="Min" offset="0"/>
+                <Anchor side="Right" relative="$parent/BackgroundImage" pos="Max" offset="0"/>
+                <Anchor side="Bottom" relative="$parent/BackgroundImage" pos="Max" offset="0"/>
+                <BlurAmount val="0.9"/>
+
+                <Frame type="Image" name="LowImage">
+                    <Anchor relative="$parent"/>
+                    <Color val="17,25,50"/>
+                    <Alpha val="220"/>
+                </Frame>
+            </Frame>
+
+            <Frame type="Image" name="BackgroundImage">
+                <Anchor side="Top" relative="$parent" pos="Mid" offset="-310"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+                <Anchor side="Bottom" relative="$parent" pos="Mid" offset="310"/>
+                <Texture val="@UI/Storm_UI_Season_Roll_Gradient_BG_Middle"/>
+
+                <Animation name="BackgroundImageAdjust">
+                    <Event event="Hide" action="DirectionForward, Play" frame="$parent/$parent/Content/ContentTileList"/>
+                    <Event event="Show" action="DirectionReverse, Play" frame="$parent/$parent/Content/ContentTileList"/>
+
+                    <Controller type="Fade" end="Pause" frame="$parent/$parent/TitleLabel">
+                        <Key type="Curve" time="0" value="255" in="Slow" out="Fast"/>
+                        <Key type="Curve" time=".1" value="0" in="Slow" out="Fast"/>
+                    </Controller>
+
+                    <Controller type="Fade" end="Pause" frame="$parent/$parent/DescriptionLabel">
+                        <Key type="Curve" time="0" value="255" in="Slow" out="Fast"/>
+                        <Key type="Curve" time=".1" value="0" in="Slow" out="Fast"/>
+                    </Controller>
+                </Animation>
+            </Frame>
+
+            <Frame type="Image" name="PurpleBg">
+                <Anchor relative="$parent/BackgroundImage"/>
+                <ImageMaskTexture val="@UI/Storm_UI_Season_Roll_Gradient_BG_Middle"/>
+                <LayerColor val="100723"/>
+                <Alpha val="200"/>
+            </Frame>
+
+            <Frame type="Image" name="BackgroundTopBorderImage">
+                <Anchor side="Top" relative="$parent/BackgroundImage" pos="Min" offset="-60"/>
+                <Anchor side="Left" relative="$parent/BackgroundImage" pos="Mid" offset="0"/>
+                <Anchor side="Right" relative="$parent/BackgroundImage" pos="Mid" offset="0"/>
+                <Texture val="@UI/Storm_UI_Season_Roll_Gradient_BG_TopLine"/>
+            </Frame>
+
+            <!-- Frame for top triangles and wipe animation -->
+            <Frame type="Frame" name="TopTrianglesFrame">
+                <Anchor side="Top" relative="$parent/BackgroundTopBorderImage" pos="Min" offset="60"/>
+                <Anchor side="Left" relative="$parent/BackgroundTopBorderImage" pos="Mid" offset="0"/>
+                <Anchor side="Right" relative="$parent/BackgroundTopBorderImage" pos="Mid" offset="0"/>
+                <Height val="130"/>
+                <Width val="1000"/>
+
+                <Frame type="Image" name="TopTriangelsWipeImage">
+                    <Anchor side="Top" relative="$parent" pos="Min" offset="-20"/>
+                    <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                    <Unclipped val="true"/>
+                    <LayerCount val="2"/>
+                    <BlendMode val="Add"/>
+
+                    <Texture val="@UI/Storm_UI_Promotional_Fanfare_TopTrianglesMask" layer="0"/>
+                    <AlphaLayer val="true" layer="0"/>
+
+                    <Texture val="@UI/Storm_UI_Promotional_Fanfare_TopTrianglesShine" layer="1"/>
+                    <TextureCoords top="0" left="0" right="1" bottom="1" layer="1"/>
+                    <WrapUV val="true" layer="1"/>
+
+                    <Animation name="UVScroll">
+                        <Event event="OnShown" action="Restart,Play" frame="$parent"/>
+                        <Controller type="LayerUV" layer="1" side="Left" relative="true" sidelock="true" end="Loop" >
+                            <Key type="Curve" time="0" value="1" out="fast"/>
+                           <Key type="Curve" time="8" value="0" in="fast"/>
+                        </Controller>
+                    </Animation>
+                </Frame>
+            </Frame>
+
+            <Frame type="Image" name="BackgroundBottomBorderImage">
+                <Anchor side="Left" relative="$parent/BackgroundImage" pos="Mid" offset="0"/>
+                <Anchor side="Right" relative="$parent/BackgroundImage" pos="Mid" offset="0"/>
+                <Anchor side="Bottom" relative="$parent/BackgroundImage" pos="Max" offset="60"/>
+                <Texture val="@UI/Storm_UI_Season_Roll_Gradient_BG_BottomLine"/>
+            </Frame>
+
+            <!-- Frame for bottom triangles and wipe animation -->
+            <Frame type="Frame" name="BottomTrianglesFrame">
+                <Anchor side="Bottom" relative="$parent/BackgroundBottomBorderImage" pos="Max" offset="-60"/>
+                <Anchor side="Left" relative="$parent/BackgroundBottomBorderImage" pos="Mid" offset="0"/>
+                <Anchor side="Right" relative="$parent/BackgroundBottomBorderImage" pos="Mid" offset="0"/>
+                <Height val="130"/>
+                <Width val="1000"/>
+
+                <Frame type="Image" name="BottomTrianglesWipeImage">
+                    <Anchor side="Bottom" relative="$parent" pos="Max" offset="22"/>
+                    <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                    <Unclipped val="true"/>
+                    <LayerCount val="2"/>
+                    <BlendMode val="Add"/>
+
+                    <Texture val="@UI/Storm_UI_Promotional_Fanfare_BottomTrianglesMask" layer="0"/>
+                    <AlphaLayer val="true" layer="0"/>
+
+                    <Texture val="@UI/Storm_UI_Promotional_Fanfare_BottomTrianglesShine" layer="1"/>
+                    <TextureCoords top="0" left="0" right="1" bottom="1" layer="1"/>
+                    <WrapUV val="true" layer="1"/>
+
+                    <Animation name="UVScroll">
+                        <Event event="OnShown" action="Restart,Play" frame="$parent"/>
+                        <Controller type="LayerUV" layer="1" side="Left" relative="true" sidelock="true" end="Loop" >
+                            <Key type="Curve" time="0" value="0" out="fast"/>
+                           <Key type="Curve" time="8" value="1" in="fast"/>
+                        </Controller>
+                    </Animation>
+                </Frame>
+            </Frame>
+        </Frame>
+
+        <Frame type="Label" name="TitleLabel">
+            <Anchor side="Bottom" relative="$parent/DescriptionLabel" pos="Min" offset="0"/>
+            <Style val="RewardsFanfareTitle"/>
+            <Text val=""/>
+        </Frame>
+
+        <Frame type="Label" name="DescriptionLabel">
+            <Anchor side="Bottom" relative="$parent/SelectionBackgroundFrame/BackgroundBlur" pos="Min" offset="-25"/>
+            <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+            <Style val="GemPurchaseDialogSubTitleLabel"/>
+        </Frame>
+
+        <Frame type="BalanceLabel" name="GemBalanceLabel">
+            <Anchor side="Top" relative="$parent/SelectionBackgroundFrame/BackgroundBlur" pos="Min" offset="25"/>
+            <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+            <Style val="GemPurchaseDialogPriceLabel"/>
+            <Currency val="XHC"/>
+            <CurrencyIconSize val="Medium"/>
+            <FormatString val="@UI/GemPackPurchase/GemPackBalanceFormat"/>
+        </Frame>
+
+        <Frame type="ParentCenteredFrame" name="Content">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="ContentTileList" pos="Max" offset="0"/>
+            <Anchor side="Bottom" relative="ContentTileList" pos="Max" offset="0"/>
+
+            <Frame type="TileList" name="ContentTileList">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Right" relative="Item7" pos="Max" offset="0"/>
+                <Anchor side="Bottom" relative="Item0" pos="Max" offset="0"/>
+                <RenderPriority val="514"/>
+                <RequireSelection val="false"/>
+                <Visible val="true"/>
+                <PreserveAnchorOffset val="true"/>
+
+                <Animation name="ShowHideTileList">
+                    <Event event="Show" action="Reset, Play"/>
+                    <Event event="Hide" action="DirectionReverse, Play"/>
+
+                    <Controller type="Visibility" end="Pause">
+                        <Key type="Bool" time="0" value="False"/>
+                        <Key type="Bool" time="0.01" value="True"/>
+                    </Controller>
+
+                    <Controller type="Visibility" end="Pause" frame="$parent/$parent/Button">
+                        <Key type="Bool" time="0" value="False"/>
+                        <Key type="Bool" time="0.01" value="True"/>
+                    </Controller>
+                </Animation>
+            </Frame>
+        </Frame>
+
+        <Frame type="Button" name="Button">
+            <Anchor side="Top" relative="$parent/SelectionBackgroundFrame/BackgroundBlur" pos="Max" offset="15"/>
+            <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+            <Shortcut val="@UI/ScreenNavigationBack_Hotkey"/>
+
+            <Frame type="Label" name="Label">
+                <Text val="@UI/GemPackPurchase/GemPackDialogCloseButton"/>
+            </Frame>
+        </Frame>
+
+        <StateGroup name="SuspendedFrameStates">
+            <DefaultState val="NotSuspended"/>
+
+            <State name="Suspended">
+                <When type="Property" IsSuspended="True"/>
+
+                <Action type="SetProperty" frame="Button" Visible="False"/>
+                <Action type="SetProperty" frame="GemBalanceLabel" Visible="False"/>
+                <Action type="SetProperty" frame="Content/ContentTileList" Visible="False"/>
+            </State>
+
+            <State name="NotSuspended">
+                <Action type="SetProperty" frame="Button" Visible="True"/>
+                <Action type="SetProperty" frame="GemBalanceLabel" Visible="True"/>
+                <Action type="SetProperty" frame="Content/ContentTileList" Visible="True"/>
+                <Action type="SetProperty" frame="Content/ContentTileList" SelectedIndex="#InvalidIndex" undo="false"/>
+            </State>
+        </StateGroup>
+    </Frame>
+
+    <!--===========================================================================================
     <! StoreTileListItem
     <!=============================================================================================
-    <! Events : ProductOwned / ProductNotOwned
-    <! Events : NewProduct / NotNewProduct
     <! Events : NotSkin / Common / Master / Epic / Legendary
-    <! Events : ShowBundle / HideBundle
     <! Events : Discount
     <!==========================================================================================-->
-    <Frame type="StoreTileListItem" name="StoreTileListBaseTemplate">
+    <Frame type="StoreTileListItem" name="StoreTileListItemTemplate">
         <Width val="268"/>
         <Height val="361"/>
         <SelectedSound val="@UI_BNet_ShopTileSelect"/>
@@ -32,9 +764,15 @@
             <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
         </Frame>
 
+        <Frame type="GameContentFrame" name="GameContentFrame">
+            <Anchor relative="$parent"/>
+            <GameContent val="{$parent/@GameContent}"/>
+        </Frame>
+
         <Frame type="Image" name="EmptyImage">
             <Anchor relative="$parent/NormalImage" />
             <Texture val="@UI/Storm_UI_Store_SmallFrame_Off"/>
+            <RenderPriority val="509"/>
             <Unclipped val="True"/>
             <RenderType val="HDR"/>
             <Alpha val="100"/>
@@ -64,8 +802,8 @@
             <RenderType val="HDR"/>
             <Alpha val="0"/>
             <Animation name="Hover">
-                <Event event="OnMouseEnter" action="DirectionForward,Play" frame="$parent"/>
-                <Event event="OnMouseExit" action="DirectionReverse,Play" frame="$parent"/>
+                <Event event="MouseOver" action="DirectionForward,Play" frame="$parent"/>
+                <Event event="MouseOut" action="DirectionReverse,Play" frame="$parent"/>
                 <Controller type="Fade" end="Pause">
                     <Key type="Curve" time="0" value="0" out="Fast"/>
                     <Key type="Curve" time=".2" value="255" in="Slow"/>
@@ -81,7 +819,36 @@
 
         <Frame type="Image" name="PortraitImage">
             <Anchor relative="$parent/PortraitCutscene"/>
+            <Texture val="{$parent/GameContentFrame/@PortraitTexture}"/>
             <TextureType val="Normal"/>
+
+            <StateGroup name="PortraitVisibility">
+                <DefaultState val="PortraitHidden"/>
+
+                <State name="PortraitTextureInvalid">
+                    <When type="Property" frame="$this" Texture=""/>
+                    <Action type="SetProperty" Visible="false"/>
+                </State>
+
+                <State name="PortraitIsSpray">
+                    <When type="Property" frame="$parent/GameContentFrame" ContentType="Spray"/>
+                    <Action type="SetProperty" Visible="true"/>
+                </State>
+
+                <State name="PortraitIsBundle">
+                    <When type="Property" frame="$parent/GameContentFrame" ContentType="Bundle"/>
+                    <Action type="SetProperty" Visible="true"/>
+                </State>
+
+                <State name="PortraitIsBoost">
+                    <When type="Property" frame="$parent/GameContentFrame" ContentType="Boost"/>
+                    <Action type="SetProperty" Visible="true"/>
+                </State>
+
+                <State name="PortraitHidden">
+                    <Action type="SetProperty" Visible="false"/>
+                </State>
+            </StateGroup>
         </Frame>
 
         <Frame type="Image" name="LockedIconImage">
@@ -92,11 +859,67 @@
             <TextureType val="Normal"/>
             <Height val="151"/>
             <Width val="131"/>
-            <Visible val="false"/>
+
+            <StateGroup name="LockedIconVisibility">
+                <DefaultState val="LockedIconHidden"/>
+
+                <State name="LockedIconShown_CantPurchase">
+                    <When type="Property" frame="$parent/GameContentFrame" IsValid="true"/>
+                    <When type="Property" frame="$parent/GameContentFrame" CanPurchase="false"/>
+                    <When type="Property" frame="$parent/GameContentFrame" IsFreeToPlay="false"/>
+                    <When type="Property" frame="$parent/GameContentFrame" IsOwned="false"/>
+                    <Action type="SetProperty" Visible="true"/>
+                </State>
+
+                <State name="LockedIconShown_NoValidProduct">
+                    <When type="Property" frame="$parent/GameContentFrame" IsValid="true"/>
+                    <When type="Property" frame="$parent/GameContentFrame" HasValidProduct="false"/>
+                    <When type="Property" frame="$parent/GameContentFrame" IsFreeToPlay="false"/>
+                    <When type="Property" frame="$parent/GameContentFrame" IsOwned="false"/>
+                    <Action type="SetProperty" Visible="true"/>
+                </State>
+
+                <State name="LockedIconShown_NotProductVisible">
+                    <When type="Property" frame="$parent/GameContentFrame" IsValid="true"/>
+                    <When type="Property" frame="$parent/GameContentFrame" IsProductVisible="false"/>
+                    <When type="Property" frame="$parent/GameContentFrame" IsFreeToPlay="false"/>
+                    <When type="Property" frame="$parent/GameContentFrame" IsOwned="false"/>
+                    <Action type="SetProperty" Visible="true"/>
+                </State>
+
+                <State name="LockedIconHidden">
+                    <Action type="SetProperty" Visible="false"/>
+                </State>
+            </StateGroup>
+        </Frame>
+
+        <Frame type="Image" name="BaseSkinIconImage">
+            <Anchor side="Right" relative="$parent" pos="Max" offset="-5"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="-5"/>
+            <Texture val="@UI/TooltipInfoIcon"/>
+            <AcceptsMouseTooltip val="True"/>
+            <Visible val="False"/>
+            <RenderPriority val="515"/>
+            <Width val="45"/>
+            <Height val="45"/>
+
+            <Tooltip val="@UI/ScreenStore/SkinBaseSkinNotification"/>
+
+
+            <StateGroup name="BaseSkinIconVisibility">
+
+                <State name="BaseSkinIconShown">
+                    <When type="Property" frame="$parent/GameContentFrame" IsBaseSkinVariation="true"/>
+                    <Action type="SetProperty" Visible="true"/>
+                </State>
+            </StateGroup>
         </Frame>
 
         <Frame type="Image" name="QualityGlow">
-            <Anchor relative="$parent/QualityFrameImage" offset="-4"/>
+            <Anchor side="Top" relative="$parent/NormalImage" pos="Min" offset="24"/>
+            <Anchor side="Left" relative="$parent/NormalImage" pos="Min" offset="24"/>
+            <Anchor side="Right" relative="$parent/NormalImage" pos="Max" offset="-24"/>
+            <Anchor side="Bottom" relative="$parent/NormalImage" pos="Max" offset="-25"/>
             <LayerCount val="2"/>
             <BlendMode val="Add"/>
             <RenderType val="HDR"/>
@@ -209,23 +1032,29 @@
 
         <!-- Filter is set based on the tile size. BigTile / SmallTile -->
         <Frame type="HeroCutsceneFrame" name="PortraitCutscene">
-            <Anchor relative="$parent/CutsceneCoverImage"/>
+            <Anchor side="Top" relative="$parent/CutsceneCoverImage" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent/CutsceneCoverImage" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent/CutsceneCoverImage" pos="Max" offset="0"/>
+            <Anchor side="Bottom" relative="$parent/CutsceneCoverImage" pos="Max" offset="0"/>
+
             <Unclipped val="False"/>
             <RenderType val="HDR"/>
             <TimeScale val="0.5"/>
             <Visible val="True"/>
+            <BookmarkOffsetMinMS val="0"/>
+            <BookmarkOffsetMaxMS val="2500"/>
             <HeroCutsceneType val="ShopTileZoomed"/>
             <Animation name="ToggleHoverSpeed">
-                <Event event="OnMouseEnter" action="DirectionForward,Play" frame="$parent"/>
-                <Event event="OnMouseExit" action="DirectionReverse,Play" frame="$parent"/>
+                <Event event="MouseOver" action="DirectionForward,Play" frame="$parent"/>
+                <Event event="MouseOut" action="DirectionReverse,Play" frame="$parent"/>
                 <Controller type="Cutscene" end="Pause">
                     <Key type="Cutscene" time="0.0" action="TimeScale" value=".5" out="Fast"/>
-                    <Key type="Cutscene" time=".25" action="TimeScale" value="1.5" in="Slow"/>
+                    <Key type="Cutscene" time=".25" action="TimeScale" value="1" in="Slow"/>
                 </Controller>
             </Animation>
 
             <Animation name="HoverLightOn">
-                <Event event="OnMouseEnter" action="Play" frame="$parent"/>
+                <Event event="MouseOver" action="Play" frame="$parent"/>
                 <Controller type="Animation" end="Stop" animation="HoverLightOff">
                     <Key type="Animation" time="0" action="Stop"/>
                 </Controller>
@@ -237,7 +1066,7 @@
             </Animation>
 
             <Animation name="HoverLightOff">
-                <Event event="OnMouseExit" action="Play" frame="$parent"/>
+                <Event event="MouseOut" action="Play" frame="$parent"/>
                 <Controller type="Animation" end="Stop" animation="HoverLightOn">
                     <Key type="Animation" time="0" action="Stop"/>
                 </Controller>
@@ -277,6 +1106,7 @@
             <Width val="#StoreSmallTileIconContainerWidth"/>
             <Height val="44"/>
             <CollapseLayout val="true"/>
+            <Visible val="{$parent/GameContentFrame/@IsBundle}"/>
 
             <Frame type="Image" name="BundleIconImage">
                 <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
@@ -296,21 +1126,9 @@
                 <Anchor side="Bottom" relative="$parent/CountAnchor" pos="Mid" offset="-4"/>
                 <Anchor side="Left" relative="$parent/CountAnchor" pos="Mid" offset="0"/>
                 <Anchor side="Right" relative="$parent/CountAnchor" pos="Mid" offset="0"/>
-                <Text val="99"/>
+                <Text val="{$parent/$parent/GameContentFrame/@ProductCount}"/>
                 <Style val="StoreBundleCountSmallLabel"/>
             </Frame>
-
-            <Animation name="BundleVisibility">
-                <Event event="ShowBundle" action="DirectionForward" frame="$parent"/>
-                <Event event="ShowBundle" action="Play" frame="$parent"/>
-                <Event event="HideBundle" action="DirectionReverse" frame="$parent"/>
-                <Event event="HideBundle" action="Play" frame="$parent"/>
-
-                <Controller type="Visibility" end="Pause">
-                    <Key type="Bool" time="0" value="false"/>
-                    <Key type="Bool" time="0" value="true"/>
-                </Controller>
-            </Animation>
         </Frame>
 
         <Frame type="HeroContainerFrame" name="HeroContainerFrame">
@@ -320,7 +1138,7 @@
             <Height val="80"/>
             <CollapseLayout val="True"/>
             <PreserveAnchorOffset val="False"/>
-            <Hero val="Sylvanas"/>
+            <Hero val="{$parent/GameContentFrame/@HeroLink}"/>
 
             <Frame type="HeroImage" name="UniverseIcon">
                 <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
@@ -334,21 +1152,143 @@
                 <SubpixelRendering val="True"/>
             </Frame>
 
+            <StateGroup name="ShouldMoveUp">
+                <DefaultState val="MoveDown"/>
+                <State name="MoveUp1">
+                    <When type="Property" frame="$parent" hovered="true"/>
+                    <When type="Property" frame="$parent/BuyButton0" Visible="true"/>
+                    <Action type="SendEvent" event="MoveUp"/>
+                </State>
+                <State name="MoveUp2">
+                    <When type="Property" frame="$parent/BuyButton0" hovering="true"/>
+                    <When type="Property" frame="$parent/BuyButton0" Visible="true"/>
+                    <Action type="SendEvent" event="MoveUp"/>
+                </State>
+                <State name="MoveUp3">
+                    <When type="Property" frame="$parent/BuyButton1" hovering="true"/>
+                    <When type="Property" frame="$parent/BuyButton0" Visible="true"/>
+                    <Action type="SendEvent" event="MoveUp"/>
+                </State>
+                <State name="MoveDown">
+                    <Action type="SendEvent" event="MoveDown"/>
+                </State>
+            </StateGroup>
+
+            <StateGroup name="HeroContainerVisibility">
+                <DefaultState val="HeroContainerHidden"/>
+
+                <State name="GameContentIsHero">
+                    <When type="Property" frame="$parent/GameContentFrame" ContentType="Hero"/>
+                    <Action type="SetProperty" Visible="true"/>
+                </State>
+
+                <State name="HeroContainerHidden">
+                    <Action type="SetProperty" Visible="false"/>
+                </State>
+            </StateGroup>
+
+            <Animation name="BuyButtonsShown">
+                <Event event="MoveUp" action="DirectionForward, Play"/>
+                <Event event="MoveDown" action="DirectionReverse, Play"/>
+
+                <Controller type="Anchor" side="Bottom" end="Pause">
+                    <Key type="Curve" time="0" value="0" out="Fast"/>
+                    <Key type="Curve" time=".15" value="-34"/>
+                </Controller>
+            </Animation>
         </Frame>
 
-        <Frame type="Label" name="NameLabel">
-            <Anchor side="Top" relative="$parent" pos="Min" offset="100"/>
-            <Anchor side="Bottom" relative="$parent/DescriptionLabel" pos="Min" offset="2"/>
-            <Anchor side="Left" relative="$parent/HeroContainerFrame" pos="Max" offset="5"/>
-            <Anchor side="Right" relative="$parent/DescriptionLabel" pos="Max" offset="0"/>
-            <PreserveAnchorOffset val="True"/>
-            <Style val="StoreItemNameLabel"/>
+        <Frame type="BuyButton" name="BuyButton0" template="StoreTemplates/QuickBuyButtonTemplate">
+            <Anchor side="Left" relative="$parent" pos="Min" offset="-4"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="-35"/>
+            <PositionHint val="QuickBuy"/>
+
+            <Animation name="ShowButton">
+                <Event event="MouseOver" frame="$parent" action="DirectionForward, Play"/>
+                <Event event="MouseOut" frame="$parent" action="DirectionReverse, Play"/>
+
+                <Controller type="Anchor" side="Bottom" end="Pause">
+                    <Key type="Curve" time="0" value="80" out="Fast"/>
+                    <Key type="Curve" time=".15" value="40" out="Fast"/>
+                </Controller>
+                <Controller type="Fade" end="Pause">
+                    <Key type="Curve" time="0" value="0"/>
+                    <Key type="Curve" time=".05" value="0"/>
+                    <Key type="Curve" time=".15" value="255"/>
+                </Controller>
+            </Animation>
+
+            <Frame type="Image" name="ShineImage">
+                <Animation name="ShineAnim">
+                    <Controller type="LayerUV" side="Left" sidelock="True" end="Loop" layer="0">
+                        <Key type="Curve" time="0" value="1"/>
+                        <Key type="Curve" time=".35" value="-1"/>
+                        <Key type="Curve" time="15" value="-1"/>
+                    </Controller>
+                </Animation>
+            </Frame>
+
+            <StateGroup name="DiscountStates">
+                <State name="Discount">
+                    <When type="Property" frame="$parent/DiscountIndicatorImage" visible="True"/>
+                    <!-- TODO: Change to XHC once prices are converted to gems in PMT -->
+                    <When type="Property" currency="USD"/>
+                </State>
+            </StateGroup>
+            <StateGroup name="ShowButtonAnimStates">
+                <State name="DisableForVoiceLine">
+                    <When type="Property" frame="$parent/GameContentFrame" ContentType="VoiceLine"/>
+                    <Action type="SetAnimationProperty" animation="ShowButton" enabled="false"/>
+                </State>
+            </StateGroup>
         </Frame>
 
-        <Frame type="Label" name="CostLabel">
-            <Anchor relative="$parent/DescriptionLabel"/>
-            <Style val="StoreItemGoldLabel"/>
+        <Frame type="BuyButton" name="BuyButton1" template="StoreTemplates/QuickBuyButtonTemplate">
+            <Anchor side="Left" relative="$parent/BuyButton0" pos="Max" offset="-37"/>
+            <Anchor side="Bottom" relative="$parent/BuyButton0" pos="Max" offset="0"/>
+            <PositionHint val="QuickBuy"/>
+
+            <Animation name="ShowButton">
+                <Event event="MouseOver" frame="$parent" action="DirectionForward, Play"/>
+                <Event event="MouseOut" frame="$parent" action="DirectionReverse, Play"/>
+
+                <Controller type="Fade" end="Pause">
+                    <Key type="Curve" time="0" value="0"/>
+                    <Key type="Curve" time=".05" value="0"/>
+                    <Key type="Curve" time=".15" value="255"/>
+                </Controller>
+            </Animation>
+
+            <Frame type="Image" name="ShineImage">
+                <Animation name="ShineAnim">
+                    <Controller type="LayerUV" side="Left" sidelock="True" end="Loop" layer="0">
+                        <Key type="Curve" time="0" value="1"/>
+                        <Key type="Curve" time=".2" value="1"/>
+                        <Key type="Curve" time=".55" value="-1" in="Slow"/>
+                        <Key type="Curve" time="15" value="-1" in="Slow"/>
+                    </Controller>
+                </Animation>
+            </Frame>
+
+            <StateGroup name="DiscountStates">
+                <State name="Discount">
+                    <When type="Property" frame="$parent/DiscountIndicatorImage" visible="True"/>
+                    <!-- TODO: Change to XHC once prices are converted to gems in PMT -->
+                    <When type="Property" currency="USD"/>
+                </State>
+            </StateGroup>
         </Frame>
+
+        <StateGroup name="TileListHoveredStates">
+            <State name="Hovered">
+                <When type="Property" hovered="True"/>
+                <Action type="SendEvent" event="MouseOver"/>
+            </State>
+            <State name="NotHovered">
+                <When type="Property" hovered="False"/>
+                <Action type="SendEvent" event="MouseOut"/>
+            </State>
+        </StateGroup>
 
         <!-- <Frame type="Frame" name="NewIconImageContainer">
             <Width val="30"/>
@@ -357,7 +1297,7 @@
             <Anchor side="Bottom" relative="$parent/DescriptionLabel" pos="Mid" offset="0"/>
             <Anchor side="Left" relative="$parent/NameLabel" pos="Min" offset="0"/>
             <CollapseLayout val="True"/>
-            
+
             <Frame type="Image" name="NewIconImage">
                 <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
                 <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
@@ -382,108 +1322,460 @@
             </Animation>
         </Frame> -->
 
-        <Frame type="Label" name="DescriptionLabel">
-            <Anchor side="Bottom" relative="$parent" pos="Max" offset="-16"/>
-            <Anchor side="Left" relative="$parent/NameLabel" pos="Min" offset="0"/>
+        <Frame type="SoundButton" name="PreviewButton">
+            <!--Only Used in Voice Line and Announcer-->
+            <Visible val="false"/>
+        </Frame>
+
+        <Frame type="Frame" name="InfoFrame">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="100"/>
+            <Anchor side="Left" relative="$parent/HeroContainerFrame" pos="Max" offset="5"/>
             <Anchor side="Right" relative="$parent" pos="Max" offset="-15"/>
-            <Style val="StoreItemDescriptionLabel"/>
-            <Options val="Ellipsis | NoWrapping"/>
-            <Text val="Item Type"/>
-            <Height val="24"/>
-            <!--
-            <Animation name="Hover">
-                <Event event="OnMouseEnter" action="Restart" frame="$parent"/>
-                <Event event="OnMouseEnter" action="Play" frame="$parent"/>
-                <Event event="OnMouseExit" action="Reset" frame="$parent"/>
-                <Controller type="Event" end="Stop" frame="$parent">
-                    <Key type="Event" time="0.3" event="Common"/>
-                    <Key type="Event" time="0.6" event="Epic"/>
-                    <Key type="Event" time="0.9" event="Legendary"/>
-                    <Key type="Event" time="1.2" event="Master"/>
-                    <Key type="Event" time="1.5" event="Discount"/>
-                </Controller>
-            </Animation>
-            -->
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="-16"/>
 
-            <Animation name="OwnedLabel">
-                <Event event="ProductOwned" action="Reset, Play" frame="$parent"/>
+            <Frame type="Label" name="NameLabel">
+                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+                <Anchor side="Bottom" relative="$parent/DescriptionLabel" pos="Min" offset="3"/>
+                <Style val="StoreItemNameLabel"/>
+                <Text val="{$parent/$parent/GameContentFrame/@StoreName}"/>
+            </Frame>
 
-                <Controller type="Text" end="Pause">
-                    <Key type="Text" time="0.01" text="@UI/Store/Owned"/>
+            <Frame type="Label" name="DescriptionLabel">
+                <Anchor side="Left" relative="$parent/NameLabel" pos="Min" offset="0"/>
+                <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+                <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+                <Options val="Ellipsis | NoWrapping"/>
+                <Style val="StoreItemDescriptionLabel"/>
+                <Height val="24"/>
+
+                <StateGroup name="OwnedLabel">
+                    <State name="BaseSkin">
+                        <When type="Property" frame="$parent/$parent/GameContentFrame" IsBaseSkinVariation="true"/>
+                        <Action type="SetProperty" Text="@UI/ScreenStore/SkinBaseSkin"/>
+                    </State>
+                    <State name="ProductOwned">
+                        <When type="Property" frame="$parent/$parent/GameContentFrame" IsOwned="true"/>
+                        <Action type="SetProperty" Text="@UI/Store/Owned"/>
+                    </State>
+                    <State name="ProductUnowned">
+                        <When type="Property" frame="$parent/$parent/GameContentFrame" IsOwned="false"/>
+                        <Action type="SetProperty" Text="{$parent/$parent/GameContentFrame/@Description}"/>
+                    </State>
+                </StateGroup>
+
+                <StateGroup name="StyleStates">
+                    <State name="NotSkin">
+                        <When type="AnimationState" frame="$parent/$parent" SkinState="NotSkin"/>
+                        <Action type="SetProperty" Style="StoreItemDescriptionLabel"/>
+                    </State>
+                    <State name="BaseSkin">
+                        <When type="Property" frame="$parent/$parent/GameContentFrame" IsBaseSkinVariation="true"/>
+                        <Action type="SetProperty" Style="StoreItemDescriptionLabel"/>
+                    </State>
+                    <State name="Normal">
+                        <When type="AnimationState" frame="$parent/$parent" SkinState="Normal"/>
+                        <Action type="SetProperty" Style="StoreNormalDescriptionLabel"/>
+                    </State>
+                    <State name="Epic">
+                        <When type="AnimationState" frame="$parent/$parent" SkinState="Epic"/>
+                        <Action type="SetProperty" Style="StoreEpicDescriptionLabel"/>
+                    </State>
+                    <State name="Legendary">
+                        <When type="AnimationState" frame="$parent/$parent" SkinState="Legendary"/>
+                        <Action type="SetProperty" Style="StoreLegendaryDescriptionLabel"/>
+                    </State>
+                    <State name="Master">
+                        <When type="AnimationState" frame="$parent/$parent" SkinState="Master"/>
+                        <Action type="SetProperty" Style="StoreMasterDescriptionLabel"/>
+                    </State>
+                </StateGroup>
+            </Frame>
+
+            <StateGroup name="NoDataStates">
+                <State name="DoesNotHaveData">
+                    <When type="Property" frame="$parent" HasData="false"/>
+                    <Action type="SetProperty" Visible="false"/>
+                </State>
+            </StateGroup>
+
+            <StateGroup name="ShouldMoveUp">
+                <State name="Ignore">
+                    <When type="Property" frame="$parent/GameContentFrame" ContentType="VoiceLine"/>
+                </State>
+                <DefaultState val="MoveDown"/>
+                <State name="MoveUp1">
+                    <When type="Property" frame="$parent" hovered="true"/>
+                    <When type="Property" frame="$parent/BuyButton0" Visible="true"/>
+                    <When type="Property" frame="$parent/GameContentFrame" operator="NotEqual" ContentType="VoiceLine"/>
+                    <Action type="SendEvent" event="MoveUp"/>
+                </State>
+                <State name="MoveUp2">
+                    <When type="Property" frame="$parent/BuyButton0" hovering="true"/>
+                    <When type="Property" frame="$parent/BuyButton0" Visible="true"/>
+                    <When type="Property" frame="$parent/GameContentFrame" operator="NotEqual" ContentType="VoiceLine"/>
+                    <Action type="SendEvent" event="MoveUp"/>
+                </State>
+                <State name="MoveUp3">
+                    <When type="Property" frame="$parent/BuyButton1" hovering="true"/>
+                    <When type="Property" frame="$parent/BuyButton0" Visible="true"/>
+                    <When type="Property" frame="$parent/GameContentFrame" operator="NotEqual" ContentType="VoiceLine"/>
+                    <Action type="SendEvent" event="MoveUp"/>
+                </State>
+                <State name="MoveUp4">
+                    <When type="Property" frame="$parent/PreviewButton" hovering="true"/>
+                    <When type="Property" frame="$parent/BuyButton0" Visible="true"/>
+                    <When type="Property" frame="$parent/GameContentFrame" operator="NotEqual" ContentType="VoiceLine"/>
+                    <Action type="SendEvent" event="MoveUp"/>
+                </State>
+                <State name="MoveDown">
+                    <When type="Property" frame="$parent/GameContentFrame" operator="NotEqual" ContentType="VoiceLine"/>
+                    <Action type="SendEvent" event="MoveDown"/>
+                </State>
+            </StateGroup>
+
+            <Animation name="BuyButtonsShown">
+                <Event event="MoveUp" action="DirectionForward, Play"/>
+                <Event event="MoveDown" action="DirectionReverse, Play"/>
+
+                <Controller type="Anchor" side="Bottom" end="Pause">
+                    <Key type="Curve" time="0" value="0" out="Fast"/>
+                    <Key type="Curve" time=".15" value="-34"/>
                 </Controller>
             </Animation>
         </Frame>
 
-        <Frame type="Image" name="QualityFrameImage">
-            <Anchor side="Top" relative="$parent/NormalImage" pos="Min" offset="22"/>
-            <Anchor side="Left" relative="$parent/NormalImage" pos="Min" offset="22"/>
-            <Anchor side="Bottom" relative="$parent/NormalImage" pos="Max" offset="-23"/>
-            <Anchor side="Right" relative="$parent/NormalImage" pos="Max" offset="-23"/>
-            <Texture val="@UI/Storm_UI_Store_QualityFrame_Normal"/>
-            <TextureType val="NineSlice"/>
+        <Frame type="Image" name="QualityBadgeImage">
+            <Anchor side="Left" relative="$parent" pos="Min" offset="9"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="-15"/>
+            <Texture val="@UI/Storm_UI_Store_Quality_Badge_Normal"/>
             <Visible val="False"/>
-            <Animation name="ShowHide">
-                <Event event="NotSkin" action="Stop" frame="$parent"/>
-                <Event event="Normal" action="Play" frame="$parent"/>
-                <Event event="Epic" action="Play" frame="$parent"/>
-                <Event event="Legendary" action="Play" frame="$parent"/>
-                <Event event="Master" action="Play" frame="$parent"/>
-                <Controller type="Visibility" end="Pause">
-                    <Key type="Bool" time="0" value="false"/>
-                    <Key type="Bool" time=".01" value="true"/>
-                </Controller>
-                <Controller type="Visibility" end="Pause" frame="$parent/SkinOffsetAnchor">
-                    <Key type="Bool" time="0" value="false"/>
-                    <Key type="Bool" time=".001" value="true"/>
+
+            <StateGroup name="SkinQualityStates">
+                <DefaultState val="NotSkin"/>
+
+                <State name="NotSkin">
+                    <When type="AnimationState" frame="$parent" SkinState="NotSkin"/>
+                    <Action type="SetProperty" frame="$parent/SkinOffsetAnchor" visible="False"/>
+                    <Action type="SetProperty" visible="False"/>
+                </State>
+                <State name="BaseSkin">
+                    <When type="Property" frame="$parent/GameContentFrame" IsBaseSkinVariation="true"/>
+                    <Action type="SetProperty" frame="$parent/SkinOffsetAnchor" Visible="false"/>
+                    <Action type="SetProperty" Visible="false"/>
+                </State>
+                <State name="Normal">
+                    <When type="AnimationState" frame="$parent" SkinState="Normal"/>
+                    <Action type="SetProperty" frame="$parent/SkinOffsetAnchor" visible="True"/>
+                    <Action type="SetProperty" visible="True"/>
+                    <Action type="SetProperty" texture="@UI/Storm_UI_Store_Quality_Badge_Normal"/>
+                </State>
+                <State name="Epic">
+                    <When type="AnimationState" frame="$parent" SkinState="Epic"/>
+                    <Action type="SetProperty" frame="$parent/SkinOffsetAnchor" visible="True"/>
+                    <Action type="SetProperty" visible="True"/>
+                    <Action type="SetProperty" texture="@UI/Storm_UI_Store_Quality_Badge_Epic"/>
+                </State>
+                <State name="Legendary">
+                    <When type="AnimationState" frame="$parent" SkinState="Legendary"/>
+                    <Action type="SetProperty" frame="$parent/SkinOffsetAnchor" visible="True"/>
+                    <Action type="SetProperty" visible="True"/>
+                    <Action type="SetProperty" texture="@UI/Storm_UI_Store_Quality_Badge_Legendary"/>
+                </State>
+                <State name="Master">
+                    <When type="AnimationState" frame="$parent" SkinState="Master"/>
+                    <Action type="SetProperty" frame="$parent/SkinOffsetAnchor" visible="True"/>
+                    <Action type="SetProperty" visible="True"/>
+                    <Action type="SetProperty" texture="@UI/Storm_UI_Store_Quality_Badge_Master"/>
+                </State>
+            </StateGroup>
+
+            <StateGroup name="ShouldMoveUp">
+                <DefaultState val="MoveDown"/>
+                <State name="MoveUp1">
+                    <When type="Property" frame="$parent" hovered="true"/>
+                    <When type="Property" frame="$parent/BuyButton0" Visible="true"/>
+                    <Action type="SendEvent" event="MoveUp"/>
+                </State>
+                <State name="MoveUp2">
+                    <When type="Property" frame="$parent/BuyButton0" hovering="true"/>
+                    <When type="Property" frame="$parent/BuyButton0" Visible="true"/>
+                    <Action type="SendEvent" event="MoveUp"/>
+                </State>
+                <State name="MoveUp3">
+                    <When type="Property" frame="$parent/BuyButton1" hovering="true"/>
+                    <When type="Property" frame="$parent/BuyButton0" Visible="true"/>
+                    <Action type="SendEvent" event="MoveUp"/>
+                </State>
+                <State name="MoveDown">
+                    <Action type="SendEvent" event="MoveDown"/>
+                </State>
+            </StateGroup>
+
+            <Animation name="BuyButtonsShown">
+                <Event event="MoveUp" action="DirectionForward, Play"/>
+                <Event event="MoveDown" action="DirectionReverse, Play"/>
+
+                <Controller type="Anchor" side="Bottom" end="Pause">
+                    <Key type="Curve" time="0" value="0" out="Fast"/>
+                    <Key type="Curve" time=".15" value="-38"/>
                 </Controller>
             </Animation>
-            <Animation name="Normal">
-                <Event event="Normal" action="Reset" frame="$parent"/>
-                <Event event="Normal" action="Play" frame="$parent"/>
-                <Controller type="Texture" end="Pause">
-                    <Key type="Image" time="0.01" image="@UI/Storm_UI_Store_QualityFrame_Normal"/>
+        </Frame>
+
+        <Frame type="Frame" name="UnseenItemFrame">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="-19"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="-19"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="19"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="19"/>
+            <RenderPriority val="400"/>
+            <Unclipped val="True"/>
+            <Visible val="False"/>
+
+            <Frame type="Image" name="ShardFX1">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="2"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="2"/>
+                <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+                <Anchor side="Bottom" relative="$parent" pos="Max" offset="-2"/>
+                <LayerCount val="2"/>
+                <BlendMode val="Add"/>
+                <ColorAdjustMode val="Colorize"/>
+                <LightAdjustColor val="47e3ff"/>
+                <DarkAdjustColor val="002aff"/>
+
+                <Texture val="@UI/Storm_UI_Store_SmallFrameShineMask" layer="0"/>
+                <TextureCoords top="0" left="0" right="1" bottom="1" layer="0"/>
+                <AlphaLayer val="True" layer="0"/>
+
+                <Texture val="@UI/Storm_UI_Store_Shards" layer="1"/>
+                <TextureCoords top="-1" left="-1" right="1" bottom="1" layer="1"/>
+                <WrapUV val="True" layer="1"/>
+
+                <Animation name="ShardAnimations">
+                    <Event event="OnShown" action="Reset, Play"/>
+
+                    <Controller type="LayerUV" side="Top" sidelock="False" relative="False" end="Loop" layer="1">
+                        <Key type="Curve" time="0" value="-.5"/>
+                        <Key type="Curve" time="4" value="0"/>
+                    </Controller>
+                    <Controller type="LayerUV" side="Left" sidelock="False" relative="False" end="Loop" layer="1">
+                        <Key type="Curve" time="0" value="-.5"/>
+                        <Key type="Curve" time="4" value="-0"/>
+                    </Controller>
+                    <Controller type="LayerUV" side="Right" sidelock="False" relative="False" end="Loop" layer="1">
+                        <Key type="Curve" time="0" value="1.5"/>
+                        <Key type="Curve" time="4" value="1"/>
+                    </Controller>
+                    <Controller type="LayerUV" side="Bottom" sidelock="False" relative="False" end="Loop" layer="1">
+                        <Key type="Curve" time="0" value="1.5"/>
+                        <Key type="Curve" time="4" value="1"/>
+                    </Controller>
+                    <Controller type="Fade" end="Loop">
+                        <Key type="Curve" time="0" value="0"/>
+                        <Key type="Curve" time=".3" value="255"/>
+                        <Key type="Curve" time="3.6 " value="255"/>
+                        <Key type="Curve" time="4" value="0"/>
+                    </Controller>
+                </Animation>
+            </Frame>
+
+            <Frame type="Image" name="ShardFX2">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="2"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="2"/>
+                <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+                <Anchor side="Bottom" relative="$parent" pos="Max" offset="-2"/>
+                <LayerCount val="2"/>
+                <BlendMode val="Add"/>
+                <ColorAdjustMode val="Colorize"/>
+                <LightAdjustColor val="47e3ff"/>
+                <DarkAdjustColor val="002aff"/>
+
+                <Texture val="@UI/Storm_UI_Store_SmallFrameShineMask" layer="0"/>
+                <TextureCoords top="0" left="0" right="1" bottom="1" layer="0"/>
+                <AlphaLayer val="True" layer="0"/>
+
+                <Texture val="@UI/Storm_UI_Store_Shards" layer="1"/>
+                <TextureCoords top="-2" left="-2" right="2" bottom="2" layer="1"/>
+                <WrapUV val="True" layer="1"/>
+
+                <Animation name="ShardAnimations">
+                    <Event event="OnShown" action="Reset, Play"/>
+
+                    <Controller type="LayerUV" side="Top" sidelock="False" relative="False" end="Loop" layer="1">
+                        <Key type="Curve" time="0" value="-.85"/>
+                        <Key type="Curve" time="7.5" value="-.35"/>
+                    </Controller>
+                    <Controller type="LayerUV" side="Left" sidelock="False" relative="False" end="Loop" layer="1">
+                        <Key type="Curve" time="0" value="-.85"/>
+                        <Key type="Curve" time="7.5" value="-.35"/>
+                    </Controller>
+                    <Controller type="LayerUV" side="Right" sidelock="False" relative="False" end="Loop" layer="1">
+                        <Key type="Curve" time="0" value="1.85"/>
+                        <Key type="Curve" time="7.5" value="1.35"/>
+                    </Controller>
+                    <Controller type="LayerUV" side="Bottom" sidelock="False" relative="False" end="Loop" layer="1">
+                        <Key type="Curve" time="0" value="1.85"/>
+                        <Key type="Curve" time="7.5" value="1.35"/>
+                    </Controller>
+                    <Controller type="Fade" end="Loop">
+                        <Key type="Curve" time="0" value="0"/>
+                        <Key type="Curve" time=".3" value="255"/>
+                        <Key type="Curve" time="7.1" value="255"/>
+                        <Key type="Curve" time="7.5" value="0"/>
+                    </Controller>
+                </Animation>
+            </Frame>
+
+            <Frame type="Image" name="ClockwiseGlow">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="2"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="2"/>
+                <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+                <Anchor side="Bottom" relative="$parent" pos="Max" offset="-2"/>
+                <BlendMode val="Add"/>
+                <ColorAdjustMode val="Colorize"/>
+                <LightAdjustColor val="47e3ff"/>
+                <DarkAdjustColor val="002aff"/>
+                <LayerCount val="4"/>
+                <Texture val="@UI/storm_ui_hud_fx_valeera_smoke" layer="0"/>
+                <WrapUV val="True" layer="0"/>
+                <AlphaLayer val="True" layer="0"/>
+                <Texture val="@UI/storm_ui_hud_fx_valeera_smoke" layer="1"/>
+                <WrapUV val="True" layer="1"/>
+                <AlphaLayer val="True" layer="1"/>
+                <Texture val="@UI/Storm_UI_Store_SmallFrameShineMask" layer="2"/>
+                <AlphaLayer val="True" layer="2"/>
+                <TextureCoords top="0" left="0" right="1" bottom="1" layer="2"/>
+                <Texture val="@UI/Storm_UI_GenFX_Flare" layer="3"/>
+                <TextureCoords top=".3" left=".3" right=".7" bottom=".7" layer="3"/>
+
+                <Animation name="MaskAnimations">
+                    <Event event="OnShown" action="Reset, Play"/>
+
+                    <Controller type="LayerUV" side="Left" relative="False" sidelock="True" end="Loop" layer="0">
+                        <Key type="Curve" time="0" value="-1"/>
+                        <Key type="Curve" time="6" value="1"/>
+                    </Controller>
+                    <Controller type="LayerUV" side="Top" relative="False" sidelock="True" end="Loop" layer="1">
+                        <Key type="Curve" time="0" value="-1"/>
+                        <Key type="Curve" time="9" value="1"/>
+                    </Controller>
+                </Animation>
+            </Frame>
+
+            <Frame type="Image" name="WiddershinsGlow">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="2"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="2"/>
+                <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+                <Anchor side="Bottom" relative="$parent" pos="Max" offset="-2"/>
+                <BlendMode val="Add"/>
+                <ColorAdjustMode val="Colorize"/>
+                <LightAdjustColor val="47e3ff"/>
+                <DarkAdjustColor val="002aff"/>
+                <LayerCount val="4"/>
+                <Texture val="@UI/storm_ui_hud_fx_valeera_smoke" layer="0"/>
+                <WrapUV val="True" layer="0"/>
+                <AlphaLayer val="True" layer="0"/>
+                <Texture val="@UI/storm_ui_hud_fx_valeera_smoke" layer="1"/>
+                <WrapUV val="True" layer="1"/>
+                <AlphaLayer val="True" layer="1"/>
+                <Texture val="@UI/Storm_UI_Store_SmallFrameShineMask" layer="2"/>
+                <AlphaLayer val="True" layer="2"/>
+                <TextureCoords top="0" left="0" right="1" bottom="1" layer="2"/>
+                <Texture val="@UI/Storm_UI_GenFX_Flare" layer="3"/>
+                <TextureCoords top=".3" left=".3" right=".7" bottom=".7" layer="3"/>
+
+
+                <Animation name="MaskAnimations">
+                    <Event event="OnShown" action="Reset, Play"/>
+
+                    <Controller type="LayerUV" side="Left" relative="False" sidelock="True" end="Loop" layer="0">
+                        <Key type="Curve" time="0" value="1"/>
+                        <Key type="Curve" time="6" value="-1"/>
+                    </Controller>
+                    <Controller type="LayerUV" side="Top" relative="False" sidelock="True" end="Loop" layer="1">
+                        <Key type="Curve" time="0" value="1"/>
+                        <Key type="Curve" time="9" value="-1"/>
+                    </Controller>
+                </Animation>
+            </Frame>
+
+            <Frame type="Image" name="BorderGlow">
+                <Anchor side="Top" relative="$parent/$parent/NormalImage" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/$parent/NormalImage" pos="Min" offset="0"/>
+                <Anchor side="Right" relative="$parent/$parent/NormalImage" pos="Max" offset="0"/>
+                <Anchor side="Bottom" relative="$parent/$parent/NormalImage" pos="Max" offset="0"/>
+                <TextureType val="Nineslice"/>
+                <BlendMode val="Add"/>
+                <ColorAdjustMode val="Colorize"/>
+                <LightAdjustColor val="47e3ff"/>
+                <DarkAdjustColor val="002aff"/>
+                <Texture val="@UI/Storm_UI_Store_SmallFrameGlow"/>
+            </Frame>
+
+            <StateGroup name="UnseenStates">
+                <State name="Seen">
+                    <When type="Property" frame="$parent" Unseen="false"/>
+                    <Action type="SetProperty" Visible="false"/>
+                </State>
+                <State name="Unseen">
+                    <When type="Property" frame="$parent" Unseen="true"/>
+                    <Action type="SetProperty" Visible="true"/>
+                </State>
+            </StateGroup>
+
+            <Animation name="GlowFade">
+                <Event event="OnMouseEnter" frame="$parent" action="Play"/>
+
+                <Controller type="Fade" end="Stop">
+                    <Key type="Curve" time="0" value="255"/>
+                    <Key type="Curve" time=".25" value="0" in="Slow"/>
+                </Controller>
+                <Controller type="Event" end="Stop">
+                    <Key type="Event" time=".25" event="MarkAsSeen"/>
                 </Controller>
             </Animation>
-            <Animation name="Epic">
-                <Event event="Epic" action="Reset" frame="$parent"/>
-                <Event event="Epic" action="Play" frame="$parent"/>
-                <Controller type="Texture" end="Pause">
-                    <Key type="Image" time="0.01" image="@UI/Storm_UI_Store_QualityFrame_Epic"/>
+
+            <Animation name="MarkAsSeen">
+                <Event event="MarkAsSeen" action="Reset, Play"/>
+
+                <Controller type="Property" property="Unseen" frame="$parent" end="Pause">
+                    <Key type="Property" time="0" value="False"/>
                 </Controller>
             </Animation>
-            <Animation name="Legendary">
-                <Event event="Legendary" action="Reset" frame="$parent"/>
-                <Event event="Legendary" action="Play" frame="$parent"/>
-                <Controller type="Texture" end="Pause">
-                    <Key type="Image" time="0.01" image="@UI/Storm_UI_Store_QualityFrame_Legendary"/>
-                </Controller>
-            </Animation>
-            <Animation name="Master">
-                <Event event="Master" action="Reset" frame="$parent"/>
-                <Event event="Master" action="Play" frame="$parent"/>
-                <Controller type="Texture" end="Pause">
-                    <Key type="Image" time="0.01" image="@UI/Storm_UI_Store_QualityFrame_Master"/>
-                </Controller>
-            </Animation>
+        </Frame>
+
+        <Frame type="TextFormatFrame" name="CheckImageTextFormatFrame">
+            <Anchor relative="$parent"/>
+            <FormatText val="@UI/Store/OwnedTooltipFormat"/>
+            <Replacement val="{$parent/GameContentFrame/@Description}" index="0"/>
         </Frame>
 
         <Frame type="Image" name="OwnedCheckImage">
             <Anchor side="Top" relative="$parent" pos="Min" offset="1"/>
             <Anchor side="Right" relative="$parent" pos="Max" offset="5"/>
             <Texture val="@UI/Storm_UI_Store_OwnedCheck"/>
-            <Visible val="False"/>
+            <Visible val="{$parent/GameContentFrame/@IsOwned}"/>
             <AcceptsMouseTooltip val="True"/>
-            <Tooltip val="@UI/Store/OwnedTooltipFormat"/>
+            <Tooltip val="{$parent/CheckImageTextFormatFrame/@Text}"/>
             <TooltipAnchorPosition val="TopCenter"/>
 
-            <Animation name="ShowHide">
-                <Event event="ProductNotOwned" action="Stop" frame="$parent"/>
-                <Event event="ProductOwned" action="Play" frame="$parent"/>
-                <Controller type="Visibility" end="Pause">
-                    <Key type="Bool" time="0" value="false"/>
-                    <Key type="Bool" time=".01" value="true"/>
-                </Controller>
-            </Animation>
+            <Frame type="Image" name="UnseenCheckImage">
+                <Anchor relative="$parent"/>
+                <Texture val="@UI/Storm_UI_Store_OwnedCheckNew"/>
+                <Alpha val="{$parent/$parent/UnseenItemFrame/@Alpha}"/>
+                <Visible val="False"/>
+            </Frame>
+
+            <StateGroup name="NewlyAcquiredCheckMarkOverride">
+                <State name="Normal">
+                    <When type="Property" frame="$parent/UnseenItemFrame" Visible="false"/>
+                    <Action type="SetProperty" frame="UnseenCheckImage" Visible="false"/>
+                </State>
+                <State name="NewlyAcquired">
+                    <When type="Property" frame="$parent/UnseenItemFrame" Visible="true"/>
+                    <Action type="SetProperty" frame="UnseenCheckImage" Visible="true"/>
+                </State>
+            </StateGroup>
         </Frame>
 
         <Frame type="Image" name="NewBadgeImage">
@@ -492,21 +1784,10 @@
             <CollapseLayout val="True"/>
             <Unclipped val="True"/>
             <Texture val="@UI/Storm_UI_Store_NewBadge"/>
-            <Visible val="false"/>
+            <Visible val="{$parent/@NewProduct}"/>
             <AcceptsMouseTooltip val="True"/>
             <Tooltip val="@UI/HeroCustomizationNewAbility"/>
             <TooltipAnchorPosition val="TopCenter"/>
-            <Animation name="NewProduct">
-                <Event event="NewProduct" action="Restart" frame="$parent"/>
-                <Event event="NewProduct" action="Play" frame="$parent"/>
-                <Event event="NotNewProduct" action="DirectionReverse" frame="$parent"/>
-                <Event event="NotNewProduct" action="Play" frame="$parent"/>
-
-                <Controller type="Visibility" end="Pause">
-                    <Key type="Bool" time="0" value="false"/>
-                    <Key type="Bool" time="0" value="true"/>
-                </Controller>
-            </Animation>
         </Frame>
 
         <Frame type="Image" name="FreePlayImage">
@@ -515,21 +1796,40 @@
             <CollapseLayout val="True"/>
             <Unclipped val="True"/>
             <Texture val="@UI/Storm_UI_Store_FreeToPlay"/>
-            <Visible val="false"/>
             <AcceptsMouseTooltip val="True"/>
             <Tooltip val="@UI/HeroSelect/FreeToPlayDescription"/>
             <TooltipAnchorPosition val="TopCenter"/>
+            <Visible val="{$parent/GameContentFrame/@IsFreeToPlay}"/>
         </Frame>
 
         <Frame type="Image" name="DiscountIndicatorImage">
             <Anchor side="Top" relative="$parent/FreePlayImage" pos="Max" offset="0"/>
             <Anchor side="Left" relative="$parent/FreePlayImage" pos="Min" offset="0"/>
+            <Unclipped val="True"/>
+            <CollapseLayout val="True"/>
             <Texture val="@UI/Storm_UI_Store_DiscountTag"/>
             <TextureType val="Normal"/>
-            <Visible val="false"/>
             <AcceptsMouseTooltip val="False"/>
             <Tooltip val="@UI/Store/DescriptionFormat"/>
             <TooltipAnchorPosition val="TopCenter"/>
+
+            <StateGroup name="DiscountState">
+                <State name="DiscountExists">
+                    <When type="Property" frame="$parent/GameContentFrame" operator="NotEqual" DiscountPercent="0"/>
+                    <Action type="SetProperty" frame="$this" Visible="true"/>
+                </State>
+
+                <State name="NoDiscount">
+                    <When type="Property" frame="$parent/GameContentFrame" operator="Equal" DiscountPercent="0"/>
+                    <Action type="SetProperty" frame="$this" Visible="false"/>
+                </State>
+            </StateGroup>
+
+            <Frame type="TextFormatFrame" name="DiscountTextFormatFrame">
+                <Anchor relative="$parent"/>
+                <FormatText val="@UI/Store/DiscountTag"/>
+                <Replacement val="{$parent/$parent/GameContentFrame/@DiscountPercent}" index="0"/>
+            </Frame>
 
             <Frame type="Label" name="DiscountLabel">
                 <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
@@ -537,7 +1837,74 @@
                 <Anchor side="Left" relative="$parent" pos="Min" offset="10"/>
                 <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
                 <Style val="StoreDiscountValue"/>
+                <Text val="{$parent/DiscountTextFormatFrame/@Text}"/>
             </Frame>
+        </Frame>
+
+        <Frame type="Button" name="ViewInBundleButton">
+            <Anchor side="Top" relative="$parent/DiscountIndicatorImage" pos="Max" offset="0"/>
+            <Anchor side="Left" relative="$parent/DiscountIndicatorImage" pos="Min" offset="0"/>
+            <Visible val="False"/>
+            <Width val="68"/>
+            <Height val="52"/>
+            <AcceptsMouse val="True"/>
+            <Tooltip val="@UI/StorePage/ViewInBundles"/>
+            <TooltipAnchorPosition val="TopCenter"/>
+            <DisplayType val="ImageLayer"/>
+            <ClickSound val="@UI_BNet_Generic_01"/>
+
+            <Frame type="Image" name="NormalImage">
+                <Anchor relative="$parent"/>
+                <Unclipped val="True"/>
+                <StateCount val="1"/>
+                <LayerCount val="4"/>
+                <Texture val="@UI/Storm_UI_Store_BundleBadge_Normal" layer="0"/>
+                <Texture val="@UI/Storm_UI_Store_BundleBadge_Down" layer="1"/>
+            </Frame>
+
+            <Frame type="Image" name="HoverImage">
+                <Anchor relative="$parent"/>
+                <Unclipped val="True"/>
+                <StateCount val="1"/>
+                <LayerCount val="4"/>
+                <Texture val="@UI/Storm_UI_Store_BundleBadge_Hover" layer="0"/>
+                <Texture val="@UI/Storm_UI_Store_BundleBadge_Down" layer="1"/>
+            </Frame>
+
+            <Frame type="Image" name="ShineImage">
+                <Anchor relative="$parent"/>
+                <BlendMode val="Add"/>
+                <LayerCount val="2"/>
+                <Texture val="@UI/Storm_UI_Glues_Draft_Portrait_Selecting_Glow_Mask" layer="0"/>
+                <AlphaLayer val="True" layer="0"/>
+                <Texture val="@UI/Storm_UI_Store_BundleBadge_Normal" layer="1"/>
+                <TextureType val="Nineslice" layer="1"/>
+
+                <Animation name="ShineAnim">
+                    <Event event="OnShown" action="DirectionForward, Play"/>
+
+                    <Controller type="LayerUV" side="Left" sidelock="True" end="Loop" layer="0">
+                        <Key type="Curve" time="0" value="1"/>
+                        <Key type="Curve" time="5.1" value="1"/>
+                        <Key type="Curve" time="5.6" value="-1" in="Slow"/>
+                        <Key type="Curve" time="20" value="-1" in="Slow"/>
+                    </Controller>
+                </Animation>
+            </Frame>
+
+            <StateGroup name="HoveringState">
+                <State name="Hovering">
+                    <When type="Property" hovering="True"/>
+                    <Action type="SetProperty" frame="$parent" hovered="True"/>
+                </State>
+            </StateGroup>
+
+            <StateGroup name="VisibilityState">
+                <State name="Visible">
+                    <When type="Property" frame="$parent" InBundle="true"/>
+                    <Action type="SetProperty" Visible="true"/>
+                </State>
+            </StateGroup>
         </Frame>
 
         <Frame type="Label" name="DebugLabel">
@@ -546,64 +1913,47 @@
             <Anchor side="Right" relative="$parent" pos="Max" offset="-15"/>
             <Style val="DebugOverlay"/>
         </Frame>
-    </Frame>
 
-    <Frame type="StoreTileListItem" name="StoreTileListItemTemplate" template="StoreTemplates/StoreTileListBaseTemplate">
-        <Frame type="Label" name="DescriptionLabel">
-            <Animation name="NotSkin">
-                <Event event="NotSkin" action="Play" frame="$parent"/>
-                <Controller type="Style" end="Pause" style1="StoreItemDescriptionLabel" style2="StoreItemDescriptionLabel">
-                    <Key type="Curve" time="0" value="1"/>
-                </Controller>
-            </Animation>
-            <Animation name="Normal">
-                <Event event="Normal" action="Play" frame="$parent"/>
-                <Controller type="Style" end="Pause" style1="StoreItemDescriptionLabel" style2="StoreNormalDescriptionLabel">
-                    <Key type="Curve" time="0" value="1"/>
-                </Controller>
-            </Animation>
-            <Animation name="Epic">
-                <Event event="Epic" action="Play" frame="$parent"/>
-                <Controller type="Style" end="Pause" style1="StoreItemDescriptionLabel" style2="StoreEpicDescriptionLabel">
-                    <Key type="Curve" time="0" value="1"/>
-                </Controller>
-            </Animation>
-            <Animation name="Legendary">
-                <Event event="Legendary" action="Play" frame="$parent"/>
-                <Controller type="Style" end="Pause" style1="StoreItemDescriptionLabel" style2="StoreLegendaryDescriptionLabel">
-                    <Key type="Curve" time="0" value="1"/>
-                </Controller>
-            </Animation>
-            <Animation name="Master">
-                <Event event="Master" action="Play" frame="$parent"/>
-                <Controller type="Style" end="Pause" style1="StoreItemDescriptionLabel" style2="StoreMasterDescriptionLabel">
-                    <Key type="Curve" time="0" value="1"/>
-                </Controller>
-            </Animation>
-            <Animation name="Discount">
-                <Event event="Discount" action="Play" frame="$parent"/>
-                <Controller type="Style" end="Pause" style1="StoreItemDescriptionLabel" style2="StoreDiscountDescriptionLabel">
-                    <Key type="Curve" time="0" value="1"/>
-                </Controller>
-            </Animation>
-            <!--
-            <Animation name="Hover">
-                <Event event="OnMouseEnter" action="Restart" frame="$parent"/>
-                <Event event="OnMouseEnter" action="Play" frame="$parent"/>
-                <Event event="OnMouseExit" action="Reset" frame="$parent"/>
-                <Controller type="Event" end="Stop" frame="$parent">
-                    <Key type="Event" time="0.3" event="Common"/>
-                    <Key type="Event" time="0.6" event="Epic"/>
-                    <Key type="Event" time="0.9" event="Legendary"/>
-                    <Key type="Event" time="1.2" event="Master"/>
-                    <Key type="Event" time="1.5" event="Discount"/>
-                </Controller>
-            </Animation>
-            -->
+        <Frame type="Image" name="LTOBadgeImage">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="15"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="-8"/>
+            <Anchor side="Right" relative="LTODateLabel" pos="Max" offset="65"/>
+            <TextureType val="NineSlice"/>
+            <CollapseLayout val="True"/>
+            <Unclipped val="True"/>
+            <Height val="52"/>
+            <AcceptsMouseTooltip val="True"/>
+            <TooltipAnchorPosition val="TopCenter"/>
+            <Texture val="@UI/Storm_UI_Store_LTOBadge"/>
+
+            <Frame type="Label" name="LTOTitleLabel">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="9"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="14"/>
+                <Style val="StoreLTOTitle"/>
+                <Text val="@UI/Store/LTODescription"/>
+            </Frame>
+
+            <Frame type="Label" name="LTODateLabel">
+                <Anchor side="Top" relative="$parent/LTOTitleLabel" pos="Max" offset="-8"/>
+                <Anchor side="Left" relative="$parent/LTOTitleLabel" pos="Min" offset="0"/>
+                <Style val="StoreLTODate"/>
+                <Text val="{$parent/$parent/GameContentFrame/@LTOExpireDateText}"/>
+            </Frame>
         </Frame>
+
+        <StateGroup name="LTOStates">
+            <DefaultState val="NotLTO"/>
+            <State name="IsLTO">
+                <When type="Property" frame="GameContentFrame" operator="NotEqual" LTOExpireDateText=""/>
+                <Action type="SetProperty" frame="LTOBadgeImage" Visible="True"/>
+            </State>
+            <State name="NotLTO">
+                <Action type="SetProperty" frame="LTOBadgeImage" Visible="False"/>
+            </State>
+        </StateGroup>
     </Frame>
 
-    <Frame type="StoreTileListItem" name="StoreBigTileListItemTemplate" template="StoreTemplates/StoreTileListBaseTemplate">
+    <Frame type="StoreTileListItem" name="StoreBigTileListItemTemplate" template="StoreTemplates/StoreTileListItemTemplate">
         <HideWhenCleared val="false"/>
         <Width val="548"/>
         <Height val="737"/>
@@ -654,7 +2004,7 @@
         </Frame>
 
         <Frame type="HeroCutsceneFrame" name="PortraitCutscene">
-            <Width val="#StoreBigTileIconContainerWidth"/>
+            <Anchor relative="$parent/CutsceneCoverImage"/>
             <HeroCutsceneType val="ShopTileBig"/>
         </Frame>
 
@@ -664,16 +2014,6 @@
             <Anchor side="Bottom" relative="$parent" pos="Max" offset="-8"/>
             <Anchor side="Right" relative="$parent" pos="Max" offset="-8"/>
             <Texture val="@UI/Storm_UI_Store_SmallFrame_Top"/>
-        </Frame>
-
-        <Frame type="Label" name="NameLabel">
-            <Anchor side="Left" relative="$parent/HeroContainerFrame" pos="Max" offset="8"/>
-            <Anchor side="Bottom" relative="$parent/DescriptionLabel" pos="Min" offset="6"/>
-            <Style val="StoreFeaturedNameLabel"/>
-        </Frame>
-
-        <Frame type="Label" name="CostLabel">
-            <Style val="StoreFeaturedGoldLabel"/>
         </Frame>
 
         <!-- <Frame type="Frame" name="NewIconImageContainer">
@@ -689,51 +2029,520 @@
              </Frame>
         </Frame> -->
 
-        <Frame type="Label" name="DescriptionLabel">
+        <Frame type="Frame" name="InfoFrame">
             <Anchor side="Bottom" relative="$parent" pos="Max" offset="-22"/>
-            <Style val="StoreFeaturedDescriptionLabel"/>
-            <Height val="31"/>
-            <Alpha val="255"/>
+            <Anchor side="Left" relative="$parent/HeroContainerFrame" pos="Max" offset="12"/>
 
-            <Animation name="NotSkin">
-                <Event event="NotSkin" action="Play" frame="$parent"/>
-                <Controller type="Style" end="Pause" style1="StoreFeaturedDescriptionLabel" style2="StoreFeaturedDescriptionLabel">
-                    <Key type="Curve" time="0" value="1"/>
-                </Controller>
-            </Animation>
-            <Animation name="Normal">
-                <Event event="Normal" action="Play" frame="$parent"/>
-                <Controller type="Style" end="Pause" style1="StoreFeaturedDescriptionLabel" style2="StoreNormalFeaturedDescriptionLabel">
-                    <Key type="Curve" time="0" value="1"/>
-                </Controller>
-            </Animation>
-            <Animation name="Epic">
-                <Event event="Epic" action="Play" frame="$parent"/>
-                <Controller type="Style" end="Pause" style1="StoreFeaturedDescriptionLabel" style2="StoreEpicFeaturedDescriptionLabel">
-                    <Key type="Curve" time="0" value="1"/>
-                </Controller>
-            </Animation>
-            <Animation name="Legendary">
-                <Event event="Legendary" action="Play" frame="$parent"/>
-                <Controller type="Style" end="Pause" style1="StoreFeaturedDescriptionLabel" style2="StoreLegendaryFeaturedDescriptionLabel">
-                    <Key type="Curve" time="0" value="1"/>
-                </Controller>
-            </Animation>
-            <Animation name="Master">
-                <Event event="Master" action="Play" frame="$parent"/>
-                <Controller type="Style" end="Pause" style1="StoreFeaturedDescriptionLabel" style2="StoreMasterFeaturedDescriptionLabel">
-                    <Key type="Curve" time="0" value="1"/>
-                </Controller>
-            </Animation>
-            <Animation name="Discount">
-                <Event event="Discount" action="Play" frame="$parent"/>
-                <Controller type="Style" end="Pause" style1="StoreFeaturedDescriptionLabel" style2="StoreDiscountFeaturedDescriptionLabel">
-                    <Key type="Curve" time="0" value="1"/>
-                </Controller>
-            </Animation>
+            <Frame type="Label" name="NameLabel">
+                <Anchor side="Bottom" relative="$parent/DescriptionLabel" pos="Min" offset="4"/>
+                <Style val="StoreFeaturedNameLabel"/>
+            </Frame>
+
+            <Frame type="Label" name="DescriptionLabel">
+                <Height val="31"/>
+                <Style val="StoreFeaturedDescriptionLabel"/>
+
+                <StateGroup name="StyleStates">
+                    <State name="NotSkin">
+                        <Action type="SetProperty" Style="StoreFeaturedDescriptionLabel"/>
+                    </State>
+                    <State name="BaseSkin">
+                        <Action type="SetProperty" Style="StoreFeaturedDescriptionLabel"/>
+                    </State>
+                    <State name="Normal">
+                        <Action type="SetProperty" Style="StoreNormalFeaturedDescriptionLabel"/>
+                    </State>
+                    <State name="Epic">
+                        <Action type="SetProperty" Style="StoreEpicFeaturedDescriptionLabel"/>
+                    </State>
+                    <State name="Legendary">
+                        <Action type="SetProperty" Style="StoreLegendaryFeaturedDescriptionLabel"/>
+                    </State>
+                    <State name="Master">
+                        <Action type="SetProperty" Style="StoreMasterFeaturedDescriptionLabel"/>
+                    </State>
+                </StateGroup>
+            </Frame>
         </Frame>
 
+        <Frame type="Frame" name="UnseenItemFrame">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="-39"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="-39"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="39"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="39"/>
+
+            <Frame type="Image" name="ShardFX1">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="6"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="4"/>
+                <Anchor side="Right" relative="$parent" pos="Max" offset="-1"/>
+                <Anchor side="Bottom" relative="$parent" pos="Max" offset="-4"/>
+            </Frame>
+
+            <Frame type="Image" name="ShardFX2">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="6"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="4"/>
+                <Anchor side="Right" relative="$parent" pos="Max" offset="-1"/>
+                <Anchor side="Bottom" relative="$parent" pos="Max" offset="-4"/>
+            </Frame>
+
+            <Frame type="Image" name="ClockwiseGlow">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="6"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="4"/>
+                <Anchor side="Right" relative="$parent" pos="Max" offset="-1"/>
+                <Anchor side="Bottom" relative="$parent" pos="Max" offset="-4"/>
+            </Frame>
+
+            <Frame type="Image" name="WiddershinsGlow">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="6"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="4"/>
+                <Anchor side="Right" relative="$parent" pos="Max" offset="-1"/>
+                <Anchor side="Bottom" relative="$parent" pos="Max" offset="-4"/>
+            </Frame>
+
+            <Frame type="Image" name="BorderGlow">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="19"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="19"/>
+                <Anchor side="Right" relative="$parent" pos="Max" offset="-19"/>
+                <Anchor side="Bottom" relative="$parent" pos="Max" offset="-19"/>
+            </Frame>
+        </Frame>
     </Frame>
 
+    <Frame type="PurchasedIndicatorFrame" name="PurchasedIndicatorFrameTemplate">
+        <PreserveAnchorOffset val="True"/>
+        <Height val="80"/>
+        <Width val="820"/>
+
+        <Frame type="Image" name="Image">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="44"/>
+            <Texture val="@UI/Storm_UI_Store_OwnedBanner"/>
+            <TextureType val="Normal"/>
+        </Frame>
+
+        <Frame type="Label" name="Label">
+            <Anchor side="Top" relative="$parent/Image" pos="Min" offset="0"/>
+            <Anchor side="Bottom" relative="$parent/Image" pos="Max" offset="0"/>
+            <Anchor side="Left" relative="$parent/Image" pos="Min" offset="85"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="-20"/>
+            <Style val="Storm_OwnedLabel"/>
+        </Frame>
+    </Frame>
+
+    <!-- Category filter tile list items -->
+    <Frame type="Button" name="FeaturedCategoryTemplate">
+        <AcceptsMouse val="True"/>
+        <ClickSound val="@UI_BNet_Generic_01"/>
+        <DisplayType val="ImageLayer"/>
+        <Width val="524"/>
+        <Height val="80"/>
+        <Toggleable val="true"/>
+        <Toggled val="true"/>
+
+        <Frame type="Image" name="NormalImage">
+            <Anchor relative="$parent"/>
+            <LayerCount val="4"/>
+            <Texture val="@UI/Storm_UI_Store_LargeTabFeature_Normal" layer="0"/>
+            <Texture val="@UI/Storm_UI_Store_LargeTabFeature_Normal" layer="1"/>
+            <Texture val="@UI/Storm_UI_Store_LargeTabFeature_Selected" layer="2"/>
+            <Texture val="@UI/Storm_UI_Store_LargeTabFeature_Normal" layer="3"/>
+        </Frame>
+
+        <Frame type="Image" name="HoverImage">
+            <Anchor relative="$parent"/>
+            <LayerCount val="4"/>
+            <Texture val="@UI/Storm_UI_Store_LargeTabFeature_Hover" layer="0"/>
+            <Texture val="@UI/Storm_UI_Store_LargeTabFeature_Hover" layer="1"/>
+            <Texture val="@UI/Storm_UI_Store_LargeTabFeature_Selected" layer="2"/>
+            <Texture val="@UI/Storm_UI_Store_LargeTabFeature_Hover" layer="3"/>
+        </Frame>
+
+        <Frame type="Image" name="SelectedPatternImage">
+            <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="16"/>
+            <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+            <Visible val="{$parent/@Toggled}"/>
+            <Texture val="@UI/Storm_UI_Store_LargeTab_Selected_Pattern"/>
+        </Frame>
+
+        <Frame type="Label" name="FeaturedLabel">
+            <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="30"/>
+            <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+            <Style val="StoreFeaturedSkinHeroListButtonLabel"/>
+            <Text val="@UI/Collection/Featured/Skins"/>
+        </Frame>
+
+        <StateGroup name="FontStates">
+            <State name="NonHovered">
+                <When type="Property" hovering="False"/>
+                <When type="Property" toggled="False"/>
+                <Action type="SetProperty" frame="FeaturedLabel" style="StoreFeaturedSkinHeroListButtonLabel"/>
+            </State>
+            <State name="Hovered">
+                <When type="Property" hovering="True"/>
+                <When type="Property" toggled="False"/>
+                <Action type="SetProperty" frame="FeaturedLabel" style="StoreFeaturedSkinHeroListButtonSelectedLabel"/>
+            </State>
+            <State name="Toggled">
+                <When type="Property" toggled="True"/>
+                <Action type="SetProperty" frame="FeaturedLabel" style="StoreFeaturedSkinHeroListButtonSelectedLabel"/>
+            </State>
+        </StateGroup>
+    </Frame>
+
+    <Frame type="CollectionCategoryTileListItem" name="NormalCategoryTileListItem">
+        <AcceptsMouse val="True"/>
+        <SelectedSound val="@UI_BNet_Generic_01"/>
+        <Width val="524"/>
+        <Height val="80"/>
+
+        <Frame type="GameContentFrame" name="GameContentFrame">
+            <Anchor relative="$parent"/>
+            <GameContent val="{$parent/@GameContent}"/>
+        </Frame>
+
+        <Frame type="Image" name="NormalImage">
+            <Anchor relative="$parent"/>
+            <Texture val="@UI/Storm_UI_Store_LargeTab_Normal"/>
+        </Frame>
+
+        <Frame type="Image" name="SelectedImage">
+            <Anchor relative="$parent"/>
+            <Texture val="@UI/Storm_UI_Store_LargeTab_Selected"/>
+        </Frame>
+
+        <Frame type="Image" name="HoverImage">
+            <Anchor relative="$parent"/>
+            <Texture val="@UI/Storm_UI_Store_LargeTab_Hover"/>
+        </Frame>
+
+        <Frame type="Image" name="SelectedPatternImage">
+            <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Left" relative="$parent/ItemPortraitBorder" pos="Max" offset="-7"/>
+            <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+            <Visible val="{$parent/SelectedImage/@Visible}"/>
+            <Texture val="@UI/Storm_UI_Store_LargeTab_Selected_Pattern"/>
+        </Frame>
+
+        <Frame type="Image" name="ItemPortraitImage">
+            <Anchor side="Top" relative="$parent/ItemPortraitBorder" pos="Min" offset="10"/>
+            <Anchor side="Left" relative="$parent/ItemPortraitBorder" pos="Min" offset="10"/>
+            <Anchor side="Right" relative="$parent/ItemPortraitBorder" pos="Max" offset="-10"/>
+            <Anchor side="Bottom" relative="$parent/ItemPortraitBorder" pos="Max" offset="-10"/>
+            <Texture val="{$parent/@ImagePath}"/>
+        </Frame>
+
+        <Frame type="Image" name="ItemPortraitBorder">
+            <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="4"/>
+            <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+            <Width val="85"/>
+            <Height val="85"/>
+            <TextureType val="NineSlice"/>
+            <Texture val="@UI/Storm_UI_Store_LargeTabFrame_Normal"/>
+        </Frame>
+
+        <Frame type="Label" name="CategoryLabel">
+            <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Left" relative="$parent/ItemPortraitBorder" pos="Max" offset="14"/>
+            <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+            <Style val="StoreSkinHeroListButtonLabel"/>
+            <Text val="{$parent/GameContentFrame/@StoreName}"/>
+
+            <StateGroup name="CollectionImageStates">
+                <State name="NoCollectionImage">
+                    <When type="Property" frame="$parent/ItemPortraitBorder" visible="False"/>
+                    <When type="Property" frame="$parent/ItemPortraitImage" visible="False"/>
+                    <Action type="SetAnchor" side="Left" relative="$parent" pos="Min" offset="30"/>
+                </State>
+            </StateGroup>
+        </Frame>
+
+        <Frame type="TextFormatFrame" name="CountTextFormatFrame">
+            <Anchor relative="$parent"/>
+            <FormatText val="@UI/Collection/Category/Count"/>
+            <Replacement val="{$parent/@Owned}" index="0"/>
+            <Replacement val="{$parent/@Total}" index="1"/>
+        </Frame>
+
+        <Frame type="Label" name="CountTextLabel">
+            <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="-38"/>
+            <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+            <Style val="StoreSkinsOwnedTileListLabel"/>
+            <Text val="{$parent/CountTextFormatFrame/@Text}"/>
+        </Frame>
+
+        <Frame type="Image" name="NewItemNotificationBox" template="StandardTemplates/ItemNotificationBoxTemplate">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Max" offset="-38"/>
+            <Tooltip val="{TooltipTextFormatFrame/@Text}"/>
+            <Visible val="False"/>
+
+            <Frame type="Label" name="ItemQuantityLabel">
+                <Text val="{$parent/$parent/@UnseenItemsCount}"/>
+            </Frame>
+
+            <Frame type="TextFormatFrame" name="TooltipTextFormatFrame">
+                <Anchor relative="$parent"/>
+                <FormatText val="@UI/ScreenNavigation/StoreButtonCountTooltip"/>
+                <Replacement val="{$parent/ItemQuantityLabel/@Text}"/>
+            </Frame>
+
+            <StateGroup name="VisibilityStates">
+                <State name="HasUnseenItems">
+                    <When type="Property" frame="$parent" operator="NotEqual" UnseenItemsCount="0"/>
+                    <Action type="SetProperty" visible="True"/>
+                </State>
+            </StateGroup>
+        </Frame>
+
+        <Frame type="Frame" name="HitTestFrame">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="5"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="13"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="-13"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="-5"/>
+        </Frame>
+
+        <StateGroup name="SelectedStates">
+            <State name="NonSelectedHovered">
+                <When type="Property" selected="False"/>
+                <When type="Property" hovered="True"/>
+                <Action type="SetProperty" frame="ItemPortraitBorder" texture="@UI/Storm_UI_Store_LargeTabFrame_Selected"/>
+            </State>
+            <State name="NotSelected">
+                <When type="Property" selected="False"/>
+                <Action type="SetProperty" frame="ItemPortraitBorder" texture="@UI/Storm_UI_Store_LargeTabFrame_Normal"/>
+            </State>
+            <State name="Selected">
+                <When type="Property" selected="True"/>
+                <Action type="SetProperty" frame="ItemPortraitBorder" texture="@UI/Storm_UI_Store_LargeTabFrame_Selected"/>
+            </State>
+        </StateGroup>
+
+        <StateGroup name="FontStates">
+            <State name="NonHovered">
+                <When type="Property" hovered="False"/>
+                <When type="Property" selected="False"/>
+                <Action type="SetProperty" frame="CategoryLabel" style="StoreSkinHeroListButtonLabel"/>
+                <Action type="SetProperty" frame="CountTextLabel" style="StoreSkinsOwnedTileListLabel"/>
+            </State>
+            <State name="Hovered">
+                <When type="Property" hovered="True"/>
+                <When type="Property" selected="False"/>
+                <Action type="SetProperty" frame="CategoryLabel" style="StoreSkinHeroListButtonSelectedLabel"/>
+                <Action type="SetProperty" frame="CountTextLabel" style="StoreSkinsOwnedTileListSelectedLabel"/>
+            </State>
+            <State name="Toggled">
+                <When type="Property" selected="True"/>
+                <Action type="SetProperty" frame="CategoryLabel" style="StoreSkinHeroListButtonSelectedLabel"/>
+                <Action type="SetProperty" frame="CountTextLabel" style="StoreSkinsOwnedTileListSelectedLabel"/>
+            </State>
+        </StateGroup>
+
+        <Animation name="ResetPageLocation">
+            <Event event="OnClick" action="Reset, Play"/>
+
+            <Controller type="Property" property="Value" frame="$parent/$parent/ContentTileList/ScrollBar" end="Pause">
+                <Key type="Property" time="0" value="0"/>
+            </Controller>
+        </Animation>
+    </Frame>
+
+    <Frame type="CollectionCategoryTileListItem" name="UniverseCategoryTileListItem" template="StoreTemplates/NormalCategoryTileListItem">
+        <Frame type="Image" name="SelectedPatternImage">
+            <Anchor side="Left" relative="$parent" pos="Min" offset="16"/>
+        </Frame>
+        <Frame type="Image" name="ItemPortraitImage">
+            <Anchor side="Top" relative="$parent/ItemPortraitBorder" pos="Mid" offset="0"/>
+            <Anchor side="Left" relative="$parent/ItemPortraitBorder" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent/ItemPortraitBorder" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent/ItemPortraitBorder" pos="Mid" offset="0"/>
+            <Width val="100"/>
+            <Height val="100"/>
+        </Frame>
+        <Frame type="Image" name="ItemPortraitBorder">
+            <Visible val="False"/>
+        </Frame>
+    </Frame>
+
+    <Frame type="CollectionCategoryTileListItem" name="NoImageCategoryTileListItem" template="StoreTemplates/NormalCategoryTileListItem">
+        <Frame type="Image" name="SelectedPatternImage">
+            <Anchor side="Left" relative="$parent" pos="Min" offset="16"/>
+        </Frame>
+        <Frame type="Image" name="ItemPortraitImage">
+            <Visible val="False"/>
+        </Frame>
+        <Frame type="Image" name="ItemPortraitBorder">
+            <Visible val="False"/>
+        </Frame>
+    </Frame>
+
+    <Frame type="Frame" name="ScreenStoreItem">
+        <Animation name="Transition">
+            <Event event="Show" action="Reset,Play"/>
+            <Event event="Hide" action="DirectionReverse,Play"/>
+            <Event event="End" action="Stop"/>
+            <Controller type="Fade" end="Pause">
+                <Key type="Curve" time="0.0" value="0" out="Slow"/>
+                <Key type="Curve" time="0.4" value="255" in="Slow" out="Slow"/>
+            </Controller>
+        </Animation>
+
+        <Frame type="Frame" name="TopNavContainer" template="StandardTemplates/TopNavContainer">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+            <Height val="100"/>
+        </Frame>
+
+        <Frame type="Frame" name="SpacingFrame">
+            <Anchor side="Top" relative="$parent/TopNavContainer" pos="Min" offset="0"/>
+            <Anchor side="Bottom" relative="$parent/TopNavContainer" pos="Max" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Mid" offset="-798"/>
+        </Frame>
+
+        <Frame type="Frame" name="ButtonAnchor">
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="-55"/>
+            <Anchor side="Left" relative="$parent/SpacingFrame" pos="40%" offset="140"/>
+            <Height val="108"/>
+        </Frame>
+
+        <Frame type="GlueButton" name="TryButton" template="StandardTemplates/StandardButtonTemplate">
+            <Anchor side="Bottom" relative="$parent/ButtonAnchor" pos="Max" offset="0"/>
+            <Anchor side="Left" relative="$parent/ButtonAnchor" pos="Min" offset="0"/>
+            <EnabledWhileInParty val="false"/>
+            <ReportsStats val="true"/>
+            <CollapseLayout val="true"/>
+            <Visible val="false"/>
+
+            <Frame type="Frame" name="HitTestFrame">
+                <TooltipAnchorPosition val="TopCenter"/>
+            </Frame>
+        </Frame>
+
+        <Frame type="BuyButton" name="BuyButton0" template="StoreTemplates/BuyButtonTemplate">
+            <Anchor side="Bottom" relative="$parent/TryButton" pos="Max" offset="0"/>
+            <Anchor side="Left" relative="$parent/TryButton" pos="Max" offset="-35"/>
+            <ReportsStats val="true"/>
+            <AlwaysShow val="true"/>
+            <ClickSound val="@UI_BNet_PageSelect"/>
+            <CollapseLayout val="true"/>
+            <PositionHint val="StoreItem"/>
+
+            <Frame type="Frame" name="HitTestFrame">
+                <TooltipAnchorPosition val="TopCenter"/>
+            </Frame>
+
+            <Frame type="ProductDiscountFrame" name="DiscountFrame" template="StandardTemplates/ProductDiscountFrameTemplate">
+                <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="12"/>
+                <Anchor side="Right" relative="$parent" pos="Max" offset="-12"/>
+            </Frame>
+        </Frame>
+
+        <Frame type="BuyButton" name="BuyButton1" template="StoreTemplates/BuyButtonTemplate">
+            <Anchor side="Bottom" relative="$parent/BuyButton0" pos="Max" offset="0"/>
+            <Anchor side="Left" relative="$parent/BuyButton0" pos="Max" offset="-35"/>
+            <ReportsStats val="true"/>
+            <AlwaysShow val="true"/>
+            <ClickSound val="@UI_BNet_PageSelect"/>
+            <CollapseLayout val="true"/>
+            <PositionHint val="StoreItem"/>
+
+            <Frame type="ProductDiscountFrame" name="DiscountFrame" template="StandardTemplates/ProductDiscountFrameTemplate">
+                <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="12"/>
+                <Anchor side="Right" relative="$parent" pos="Max" offset="-12"/>
+            </Frame>
+
+            <Frame type="Frame" name="HitTestFrame">
+                <TooltipAnchorPosition val="TopCenter"/>
+            </Frame>
+        </Frame>
+
+        <Frame type="BuyButton" name="BuyButton2" template="StoreTemplates/BuyButtonTemplate">
+            <Anchor side="Top" relative="$parent/BuyButton0" pos="Max" offset="-20"/>
+            <Anchor side="Left" relative="$parent/BuyButton0" pos="Min" offset="0"/>
+            <ReportsStats val="true"/>
+            <AlwaysShow val="true"/>
+            <ClickSound val="@UI_BNet_PageSelect"/>
+            <CollapseLayout val="true"/>
+            <PositionHint val="StoreItem"/>
+
+            <Frame type="ProductDiscountFrame" name="DiscountFrame" template="StandardTemplates/ProductDiscountFrameTemplate">
+                <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="12"/>
+                <Anchor side="Right" relative="$parent" pos="Max" offset="-12"/>
+            </Frame>
+
+            <Frame type="Frame" name="HitTestFrame">
+                <TooltipAnchorPosition val="TopCenter"/>
+            </Frame>
+        </Frame>
+
+        <Frame type="BuyButton" name="BuyButton3" template="StoreTemplates/BuyButtonTemplate">
+            <Anchor side="Top" relative="$parent/BuyButton2" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent/BuyButton0" pos="Max" offset="-35"/>
+            <ReportsStats val="true"/>
+            <AlwaysShow val="true"/>
+            <ClickSound val="@UI_BNet_PageSelect"/>
+            <CollapseLayout val="true"/>
+            <PositionHint val="StoreItem"/>
+
+            <Frame type="ProductDiscountFrame" name="DiscountFrame" template="StandardTemplates/ProductDiscountFrameTemplate">
+                <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="12"/>
+                <Anchor side="Right" relative="$parent" pos="Max" offset="-12"/>
+            </Frame>
+
+            <Frame type="Frame" name="HitTestFrame">
+                <TooltipAnchorPosition val="TopCenter"/>
+            </Frame>
+        </Frame>
+
+        <Frame type="PurchasedIndicatorFrame" name="PurchasedIndicatorFrame" template="StoreTemplates/PurchasedIndicatorFrameTemplate">
+            <Anchor side="Bottom" relative="$parent/ButtonAnchor" pos="Min" offset="20"/>
+            <Anchor side="Left" relative="$parent/ButtonAnchor" pos="Min" offset="-30"/>
+        </Frame>
+
+        <Frame type="PurchasedIndicatorFrame" name="PurchasedIndicatorFrame" template="StoreTemplates/PurchasedIndicatorFrameTemplate">
+            <Anchor side="Bottom" relative="$parent/ButtonAnchor" pos="Min" offset="20"/>
+            <Anchor side="Left" relative="$parent/ButtonAnchor" pos="Min" offset="-30"/>
+        </Frame>
+    </Frame>
+
+    <Frame type="PurchaseRewardPanel" name="PurchaseRewardPanelTemplate">
+        <Frame type="Image" name="Background">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="93"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="-15"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="71"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+            <Texture val="@UI/Storm_Store_Note_Background"/>
+            <TextureType val="Nineslice"/>
+        </Frame>
+
+        <Frame type="Label" name="RewardLabel">
+            <Anchor side="Top" relative="$parent/Background" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent/Background" pos="Mid" offset="0"/>
+            <Anchor side="Left" relative="$parent/MountRewardImage" pos="Max" offset="-50"/>
+            <Anchor side="Right" relative="$parent/Background" pos="Max" offset="-25"/>
+            <Text val="@UI/ProductPurchase/PurchaseRewardCelestialHorse"/>
+            <Style val="PurchaseFlowAside"/>
+        </Frame>
+
+        <Frame type="Image" name="MountRewardImage">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+            <Texture val="@UI/Storm_UI_Promotional_Fanfare_CelestialHorse"/>
+            <Width val="284"/>
+            <Height val="261"/>
+        </Frame>
+    </Frame>
 </Desc>
- 

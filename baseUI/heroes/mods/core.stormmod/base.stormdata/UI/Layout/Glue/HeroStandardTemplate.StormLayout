@@ -122,16 +122,15 @@
     <!==========================================================================================-->
     <Frame type="HeroContainerFrame" name="HeroItemBaseTemplate">
         <Anchor relative="$parent" offset="-54"/>
+        
         <Height val="112"/>
         <Width val="112"/>
 
         <Frame type="Image" name="PortraitBackingImage">
-            <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
-            <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
-            <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
-            <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor relative="$parent"/>
             <Texture val="@UI/Storm_UI_Play_HeroPortrait_Backing_Off"/>
             <IgnoreParentAlpha val="false"/>
+            <SubpixelRendering val="True"/>
         </Frame>
 
         <!-- HERO PORTRAIT ICON -->
@@ -208,6 +207,19 @@
             <State name="AlwaysAllowed">
                 <Action type="ApplyTemplate" template="HeroStandardTemplate/HeroItemAllowedTemplate"/>
             </State>
+
+            <State name="LockedGold">
+                <!-- Allowed == false -->
+                <When type="Property" frame="HeroState" levelType="Gold"/>
+                <When type="Property" frame="HeroState" isAllowed="false"/>
+                <Action type="ApplyTemplate" template="HeroStandardTemplate/HeroItemLockedGoldTemplate"/>
+            </State>
+
+            <State name="LockedMax">
+                <When type="Property" frame="HeroState" levelType="Max"/>
+                <When type="Property" frame="HeroState" isAllowed="false"/>
+                <Action type="ApplyTemplate" template="HeroStandardTemplate/HeroItemNotAllowedMaxTemplate"/>
+            </State>
             
             <State name="Locked">
                 <When type="Property" frame="HeroState" isAllowed="false"/>
@@ -251,12 +263,14 @@
 
                     <Texture val="@UI/Storm_UI_Play_HeroPortrait_ProgressBar_Top_Off" layer="0"/>
                     <Texture val="@UI/Storm_UI_Play_HeroPortrait_ProgressBar_Off" layer="1"/>
+                    <ColorAdjustMode val="None"/>
                 </Frame>
             </Frame>
         </Frame>
 
         <Frame type="HeroLabel" name="HeroLevelLabel">
             <Style val="HeroSelectHeroLevelUnownedLabel"/>
+            <Alpha val="255"/>
         </Frame>
     </Frame>
 
@@ -305,6 +319,32 @@
     </Frame>
 
     <!--===========================================================================================
+    <! Template for StateGroup - HeroItemLockedGoldTemplate 
+    <!==========================================================================================-->
+    <Frame type="HeroContainerFrame" name="HeroItemLockedGoldTemplate" template="HeroStandardTemplate/HeroItemNotAllowedTemplate">
+        <Frame type="HeroImage" name="IconImage">
+            <Desaturated val="true"/>
+        </Frame>
+
+        <Frame type="HeroExperienceBar" name="HeroExperienceBar">
+            <Frame type="Frame" name="FillImageContainer">
+                <Frame type="Image" name="FillImage">
+                    <Texture val="@UI/Storm_UI_Play_HeroPortrait_ProgressBar_Top_On" layer="0"/>
+                    <Texture val="@UI/Storm_UI_Play_HeroPortrait_ProgressBar_On" layer="1"/>
+                    <ColorAdjustMode val="Colorize"/>
+                    <AdjustmentColor val="634428"/>
+                    <!-- <AdjustmentColor val="9E6734"/> -->
+                </Frame>
+            </Frame>
+        </Frame>
+
+        <Frame type="HeroLabel" name="HeroLevelLabel">
+            <Style val="HeroSelectHeroLevelUnownedCompleteLabel"/>
+            <Alpha val="160"/>
+        </Frame>
+    </Frame>
+
+    <!--===========================================================================================
     <! Template for StateGroup - HeroItemAllowedMaxTemplate 
     <!==========================================================================================-->
     <Frame type="HeroContainerFrame" name="HeroItemAllowedMaxTemplate" template="HeroStandardTemplate/HeroItemNotAllowedTemplate">
@@ -323,6 +363,31 @@
 
         <Frame type="HeroLabel" name="HeroLevelLabel">
             <Style val="HeroSelectHeroLevelCompleteLabel"/>
+        </Frame>
+    </Frame>
+
+    <!--===========================================================================================
+    <! Template for StateGroup - HeroItemNotAllowedMaxTemplate 
+    <!==========================================================================================-->
+    <Frame type="HeroContainerFrame" name="HeroItemNotAllowedMaxTemplate" template="HeroStandardTemplate/HeroItemNotAllowedTemplate">
+        <Frame type="HeroImage" name="IconImage">
+            <Desaturated val="true"/>
+        </Frame>
+
+        <Frame type="HeroExperienceBar" name="HeroExperienceBar">
+            <Frame type="Frame" name="FillImageContainer">
+                <Frame type="Image" name="FillImage">
+                    <Texture val="@UI/Storm_UI_Play_HeroPortrait_ProgressBar_Gold" layer="0"/>
+                    <Texture val="@UI/Storm_UI_Play_HeroPortrait_ProgressBar_Top_Gold" layer="1"/>
+                    <ColorAdjustMode val="Colorize"/>
+                    <AdjustmentColor val="64350b"/>
+                </Frame>
+            </Frame>
+        </Frame>
+
+        <Frame type="HeroLabel" name="HeroLevelLabel">
+            <Style val="HeroSelectHeroLevelUnownedCompleteLabel"/>
+            <Alpha val="128"/>
         </Frame>
     </Frame>
 
@@ -346,11 +411,12 @@
         </Frame>
 
         <Frame type="Image" name="EmptyImage">
-            <Anchor side="Top" relative="$parent/HeroContainerFrame" pos="Mid" offset="0"/>
-            <Anchor side="Left" relative="$parent/HeroContainerFrame" pos="Mid" offset="0"/>
-            <Anchor side="Bottom" relative="$parent/HeroContainerFrame" pos="Mid" offset="0"/>
-            <Anchor side="Right" relative="$parent/HeroContainerFrame" pos="Mid" offset="0"/>
+            <Anchor side="Top" relative="$parent/HeroContainerFrame" pos="Min" offset="1"/>
+            <Anchor side="Bottom" relative="$parent/HeroContainerFrame" pos="Max" offset="1"/>
+            <Anchor side="Left" relative="$parent/HeroContainerFrame" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent/HeroContainerFrame" pos="Max" offset="0"/>
             <Texture val="@UI/Storm_UI_Play_HeroPortrait_Empty"/>
+            <SubpixelRendering val="true"/>
             <Visible val="False"/>
         </Frame>
 
@@ -401,10 +467,23 @@
         <!-- HERO STATE -->
         <StateGroup name="HeroStates">
             <DefaultState val="Gold"/>
-            
+
             <State name="Locked">
+                <When type="Property" frame="HeroContainerFrame/HeroState" levelType="Normal"/>
                 <When type="Property" frame="HeroContainerFrame/HeroState" isAllowed="false"/>
                 <Action type="SetProperty" frame="HoverImage" texture="@UI/Storm_UI_Play_HeroPortrait_ProgressBar_Hover_Off"/>
+            </State>
+
+            <State name="LockedGold">
+                <When type="Property" frame="HeroContainerFrame/HeroState" levelType="Gold"/>
+                <When type="Property" frame="HeroContainerFrame/HeroState" isAllowed="false"/>
+                <Action type="SetProperty" frame="HoverImage" texture="@UI/Storm_UI_Play_HeroPortrait_ProgressBar_Hover_Gold"/>
+            </State>
+
+            <State name="LockedMax">
+                <When type="Property" frame="HeroContainerFrame/HeroState" levelType="Max"/>
+                <When type="Property" frame="HeroContainerFrame/HeroState" isAllowed="false"/>
+                <Action type="SetProperty" frame="HoverImage" texture="@UI/Storm_UI_Play_HeroPortrait_ProgressBar_Hover_Gold"/>
             </State>
 
             <State name="AllowedNormal">

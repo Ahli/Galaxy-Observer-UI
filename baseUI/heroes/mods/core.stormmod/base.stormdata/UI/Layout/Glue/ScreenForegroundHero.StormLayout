@@ -90,6 +90,95 @@
             </Controller>
         </Animation>
 
+        <Frame type="Button" name="MenuButton" template="StandardTemplates/StandardSocialButtonTemplate">
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="-6"/>
+            <Anchor side="Right" relative="$parent/StandardGlueClock" pos="Min" offset="4"/>
+            <Handle val="ScreenForeground_MenuButton"/>
+            <Shortcut val="@UI/ScreenNavigationBack_Hotkey"/>
+            <Toggleable val="true"/>
+            <Frame type="Image" name="CountBg">
+                <Visible val="False"/>
+            </Frame>
+            <Frame type="Image" name="IconImage">
+                <Texture val="@UI/Storm_UI_Taskbar_ButtonIcon_Menu"/>
+            </Frame>
+            <Frame type="Image" name="IconImageHover">
+                <Texture val="@UI/Storm_UI_Taskbar_ButtonIcon_Menu_Hover"/>
+            </Frame>
+
+            <Frame type="Image" name="IconImageDisabled">
+                <Texture val="@UI/Storm_UI_Taskbar_ButtonIcon_Menu_Disabled"/>
+            </Frame>
+        </Frame>
+
+        <Frame type="Button" name="QuestButton" template="StandardTemplates/StandardSocialButtonTemplate">
+            <Anchor side="Bottom" relative="$parent/MenuButton" pos="Max" offset="0"/>
+            <Anchor side="Right" relative="$parent/MenuButton" pos="Min" offset="4"/>
+            <ReportsStats val="True"/>
+            <Handle val="ScreenForeground_QuestButton"/>
+            <Toggleable val="true"/>
+
+            <Frame type="Image" name="IconImage">
+                <Texture val="@UI/Storm_UI_Taskbar_ButtonIcon_Quests"/>
+                <DesaturateOnDisable val="True"/>
+                <DesaturationColor val="726890"/>
+                <OnDisableDesaturationColor val="726890"/>
+            </Frame>
+
+            <Frame type="Image" name="IconImageHover">
+                <Texture val="@UI/Storm_UI_Taskbar_ButtonIcon_Quests_Hover"/>
+            </Frame>
+
+            <Frame type="Image" name="IconImageDisabled">
+                <Texture val="@UI/Storm_UI_Taskbar_ButtonIcon_Quests_Disabled"/>
+            </Frame>
+        </Frame>
+
+        <Frame type="Image" name="NotificationFrame">
+            <Anchor side="Bottom" relative="$parent/QuestButton" pos="Mid" offset="4"/>
+            <Anchor side="Left" relative="$parent/QuestButton" pos="Mid" offset="0"/>
+            <Anchor side="Top" relative="$parent/QuestButton" pos="Mid" offset="4"/>
+            <Anchor side="Right" relative="$parent/QuestButton" pos="Mid" offset="0"/>
+
+            <Texture val="@UI/Storm_UI_Taskbar_Notification"/>
+            <TextureType val="Normal"/>
+            <Visible val="false"/>
+
+            <Animation name="Pulse">
+                <Event event="OnShown" action="DirectionForward,Play"/>
+                <Event event="OnHidden" action="Stop"/>
+
+                <Controller type="Fade" end="Loop">
+                    <Key type="Curve" time="0" value="50" out="Fast"/>
+                    <Key type="Curve" time="1" value="255" inout="Slow"/>
+                    <Key type="Curve" time="2" value="50" in="Fast"/>
+                </Controller>
+            </Animation>
+
+            <StateGroup name="QuestEnabled">
+                <State name="ShowNotification">
+                    <When type="Property" frame="$ScreenForeground_QuestPanel/QuestLogPanel" ShowNotification="true"/>
+                    <Action type="SetProperty" frame="$this" visible="true"/>
+                </State>
+            </StateGroup>
+
+            <Animation name="NotificationSound">
+                <Event event="OnShown" action="DirectionForward,Play"/>
+                <Event event="OnHidden" action="Reset,Stop"/>
+                <Controller type="Sound" end="Pause">
+                    <Key type="Sound" time="0.00" sound="@UI_BNet_Quest_Nexus_Challenge_Received" direction="Forward"/>
+                </Controller>
+            </Animation>
+        </Frame>
+
+
+        <Frame type="ToastPanel" name="ToastPanel" template="ToastPanel/ToastPanelTemplate">
+            <Width val="600"/>
+            <Anchor side="Top" relative="$parent" pos="Min" offset="160"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="-200"/>
+        </Frame>
+
         <Frame type="Frame" name="SocialContainerFrame">
             <Anchor relative="$parent"/>
 
@@ -120,22 +209,22 @@
 
             <Frame type="ChatPanel" name="ChatPanel" template="ChatPanel/ChatPanelTemplate">
                 <Height val="550"/>
-                <Anchor side="Left" relative="$parent" pos="Mid" offset="210"/>
-                <Anchor side="Bottom" relative="$parent/$parent/MenuButton" pos="Max" offset="-3"/>
-                <Anchor side="Right" relative="$parent/$parent/MenuButton" pos="Max" offset="6"/>
+                <Anchor side="Left" relative="$parent" pos="Mid" offset="-257"/>
+                <Anchor side="Bottom" relative="$parent/$parent/MenuButton" pos="Max" offset="0"/>
+                <Anchor side="Right" relative="$parent/$parent/StandardGlueClock" pos="Max" offset="0"/>
             </Frame>
 
             <Frame type="SocialPanel" name="SocialPanel" template="SocialPanel/SocialPanelTemplate">
                 <Handle val="ScreenForeground_SocialPanel"/>
-                <Anchor side="Right" relative="$parent" pos="Max" offset="-24"/>
-                <Anchor side="Bottom" relative="$parent/SocialButton" pos="Min" offset="-30"/>
+                <Anchor side="Right" relative="$parent/$parent/StandardGlueClock" pos="Max" offset="-3"/>
+                <Anchor side="Bottom" relative="$parent/$parent/MenuButton" pos="Max" offset="-85"/>
                 <Visible val="False"/>
             </Frame>
 
             <Frame type="FriendsButton" name="SocialButton" template="StandardTemplates/StandardSocialButtonTemplate">
                 <Handle val="ScreenForeground_SocialButton"/>
                 <Anchor side="Bottom" relative="$parent/$parent/MenuButton" pos="Max" offset="0"/>
-                <Anchor side="Right" relative="$parent/$parent/QuestButton" pos="Min" offset="8"/>
+                <Anchor side="Right" relative="$parent/$parent/QuestButton" pos="Min" offset="4"/>
                 <Shortcut val="@UI/ScreenForegroundToggleSocial_Hotkey"/>
                 <Toggleable val="true"/>
 
@@ -172,6 +261,14 @@
                     <Texture val="@UI/Storm_UI_Taskbar_ButtonIcon_Social"/>
                 </Frame>
 
+                <Frame type="Image" name="IconImageHover">
+                    <Texture val="@UI/Storm_UI_Taskbar_ButtonIcon_Social_Hover"/>
+                </Frame>
+
+                <Frame type="Image" name="IconImageDisabled">
+                    <Texture val="@UI/Storm_UI_Taskbar_ButtonIcon_Social_Disabled"/>
+                </Frame>
+
                 <Frame type="Image" name="FriendRequestIcon">
                     <Anchor side="Top" relative="$parent/IconImage" pos="Mid" offset="0"/>
                     <Anchor side="Left" relative="$parent/IconImage" pos="Mid" offset="0"/>
@@ -186,8 +283,8 @@
                 <Frame type="Image" name="CountBg">
                     <Anchor side="Top" relative="$parent/Label" pos="Mid" offset="-1"/>
                     <Anchor side="Bottom" relative="$parent/Label" pos="Mid" offset="-1"/>
-                    <Anchor side="Left" relative="$parent/Label" pos="Min" offset="-15"/>
-                    <Anchor side="Right" relative="$parent/Label" pos="Max" offset="15"/>
+                    <Anchor side="Left" relative="$parent/Label" pos="Min" offset="-10"/>
+                    <Anchor side="Right" relative="$parent/Label" pos="Max" offset="8"/>
                     <Texture val="@UI/Storm_Taskbar_SocialButton_Countbg"/>
                     <TextureType val="Nineslice"/>
                     <Unclipped val="True"/>
@@ -201,40 +298,75 @@
             <Handle val="ScreenForegroundHero_EnterGamePanel"/>
         </Frame>
 
-        <Frame type="ToastPanel" name="ToastPanel" template="ToastPanel/ToastPanelTemplate">
-            <Width val="600"/>
-            <Anchor side="Top" relative="$parent" pos="Min" offset="160"/>
-            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
-            <Anchor side="Bottom" relative="$parent" pos="Max" offset="-200"/>
-        </Frame>
 
         <Frame type="NewUserPopupPanel" name="NewUserPopupPanel" template="NewUserPopupPanel/NewUserPopupPanelTemplate"/>
 
         <Frame type="MenuPanelHero" name="MenuPanel" template="MenuPanel/MenuPanelTemplate">
             <Handle val="ScreenForeground_MenuPanel"/>
-            <Anchor side="Right" relative="$parent/MenuButton" pos="Max" offset="-8"/>
-            <Anchor side="Bottom" relative="$parent/MenuButton" pos="Max" offset="-65"/>
+            <Anchor side="Right" relative="$parent/StandardGlueClock" pos="Max" offset="-3"/>
+            <Anchor side="Bottom" relative="$parent/MenuButton" pos="Max" offset="-85"/>
             <Visible val="false"/>
         </Frame>
 
-        <Frame type="Button" name="MenuButton" template="StandardTemplates/StandardSocialButtonTemplate">
-            <Anchor side="Bottom" relative="$parent" pos="Max" offset="-14"/>
-            <Anchor side="Right" relative="$parent" pos="Max" offset="-14"/>
-            <Handle val="ScreenForeground_MenuButton"/>
-            <Shortcut val="@UI/ScreenNavigationBack_Hotkey"/>
-            <Toggleable val="true"/>
-            <Frame type="Image" name="CountBg">
-                <Visible val="False"/>
+        <!-- Standard Glues Clock -->
+        <Frame type="GlueClock" name="StandardGlueClock">
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="-6"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="-6"/>
+            <Width val="108"/>
+            <Height val="62"/>
+            
+            <Frame type="BlurFrame" name="BlurBackground">
+                <Anchor side="Left" relative="$parent" pos="Min" offset="4"/>
+                <Anchor side="Right" relative="$parent" pos="Max" offset="-4"/>
+                <Anchor side="Top" relative="$parent" pos="Min" offset="4"/>
+                <Anchor side="Bottom" relative="$parent" pos="Max" offset="-4"/>
+                <BlurAmount val="0.6"/>
+                <RenderType val="HDR"/>
             </Frame>
-            <Frame type="Image" name="IconImage">
-                <Texture val="@UI/Storm_UI_Taskbar_ButtonIcon_Menu"/>
+
+            <Frame type="Image" name="BackgroundImage">
+                <Anchor relative="$parent"/>
+                <TextureType val="Nineslice"/>
+                <Texture val="@UI/Storm_Taskbar_ClockBg"/>
             </Frame>
+    
+            <Frame type="Label" name="Label">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="3"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="1"/>
+                <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+                <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+                <Style val="BattlenetGlueClock"/>
+            </Frame>
+
+            <Animation name="Presence">
+                <Event event="ShowClock" action="DirectionForward,Play"/>
+                <Event event="HideClock" action="DirectionReverse,Play"/>
+                <Controller type="Fade" end="Pause">
+                    <Key type="Curve" time="0" value="0" out="Slow"/>
+                    <Key type="Curve" time=".3" value="255" in="Slow"/>
+                </Controller>
+                <Controller type="Anchor" end="Pause" side="Left" relative="true">
+                    <Key type="Curve" time="0" value="30" out="Slow"/>
+                    <Key type="Curve" time=".3" value="0" in="Slow"/>
+                </Controller>
+            </Animation>
+
+            <StateGroup name="ShowHideClock">
+                <State name="HideClock">
+                    <When type="Property" frame="$parent/MenuButton" visible="false"/>
+                    <Action type="SetProperty" frame="$this" visible="false"/>
+                </State>
+                <State name="ShowClock">
+                    <When type="Property" frame="$parent/MenuButton" visible="true"/>
+                    <Action type="SetProperty" frame="$this" visible="true"/>
+                </State>
+            </StateGroup>
         </Frame>
 
         <Frame type="PopupPanel" name="QuestPopupPanel" template="QuestPopupPanel/QuestPopupPanelTemplate">
             <Handle val="ScreenForeground_QuestPanel"/>
-            <Anchor side="Right" relative="$parent/QuestButton" pos="Max" offset="52"/>
-            <Anchor side="Bottom" relative="$parent/MenuButton" pos="Max" offset="-55"/>
+            <Anchor side="Right" relative="$parent/StandardGlueClock" pos="Max" offset="-3"/>
+            <Anchor side="Bottom" relative="$parent/MenuButton" pos="Max" offset="-85"/>
             <Visible val="False"/>
 
             <Frame type="Frame" name="AnchoredPopupAnchorFrame">
@@ -249,58 +381,7 @@
             </Frame>
         </Frame>
 
-        <Frame type="Button" name="QuestButton" template="StandardTemplates/StandardSocialButtonTemplate">
-            <Anchor side="Bottom" relative="$parent/MenuButton" pos="Max" offset="0"/>
-            <Anchor side="Right" relative="$parent/MenuButton" pos="Min" offset="8"/>
-            <Handle val="ScreenForeground_QuestButton"/>
-            <Toggleable val="true"/>
-
-            <Frame type="Image" name="IconImage">
-                <Texture val="@UI/Storm_UI_Taskbar_ButtonIcon_Quests"/>
-                <DesaturateOnDisable val="True"/>
-                <DesaturationColor val="726890"/>
-                <OnDisableDesaturationColor val="726890"/>
-            </Frame>
-        </Frame>
-
-        <Frame type="Image" name="NotificationFrame">
-            <Anchor side="Bottom" relative="$parent/QuestButton" pos="Mid" offset="0"/>
-            <Anchor side="Left" relative="$parent/QuestButton" pos="Mid" offset="0"/>
-            <Anchor side="Top" relative="$parent/QuestButton" pos="Mid" offset="0"/>
-            <Anchor side="Right" relative="$parent/QuestButton" pos="Mid" offset="0"/>
-
-            <Texture val="@UI/Storm_UI_Taskbar_Notification"/>
-            <TextureType val="Normal"/>
-            <Visible val="false"/>
-
-            <Animation name="Pulse">
-                <Event event="OnShown" action="DirectionForward,Play"/>
-                <Event event="OnHidden" action="Stop"/>
-
-                <Controller type="Fade" end="Loop">
-                    <Key type="Curve" time="0" value="50" out="Fast"/>
-                    <Key type="Curve" time="1" value="255" inout="Slow"/>
-                    <Key type="Curve" time="2" value="50" in="Fast"/>
-                </Controller>
-            </Animation>
-
-            <StateGroup name="QuestEnabled">
-                <State name="ShowNotification">
-                    <When type="Property" frame="$ScreenForeground_QuestPanel/QuestLogPanel" ShowNotification="true"/>
-                    <Action type="SetProperty" frame="$this" visible="true"/>
-                </State>
-            </StateGroup>
-
-            <Animation name="NotificationSound">
-                <Event event="OnShown" action="DirectionForward,Play"/>
-                <Event event="OnHidden" action="Reset,Stop"/>
-                <Controller type="Sound" end="Pause">
-                    <Key type="Sound" time="0.00" sound="@UI_BNet_Quest_Nexus_Challenge_Received" direction="Forward"/>
-                </Controller>
-            </Animation>
-
-        </Frame>
-
+        
         <Frame type="Label" name="VersionLabel">
             <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
             <Anchor side="Left" relative="$parent" pos="Min" offset="5"/>
@@ -319,7 +400,7 @@
             <Anchor side="Top" relative="$parent" pos="Min" offset="130"/>
             <Anchor side="Left" relative="$parent" pos="Min" offset="10"/>
             <Anchor side="Right" relative="$parent" pos="Max" offset="-200"/>
-            <Height val="200"/>
+            <Height val="250"/>
         </Frame>
     </Frame>
 </Desc>

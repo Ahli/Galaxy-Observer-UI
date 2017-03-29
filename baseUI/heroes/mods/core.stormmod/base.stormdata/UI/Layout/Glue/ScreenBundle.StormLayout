@@ -12,53 +12,7 @@
         <Height val="92"/>
         <Width val="260"/>
         <SelectedSound val="@UI_BNet_Generic_04"/>
-            
-        <Animation name="ShowProduct">
-            <Event event="ShowProduct" action="Reset,Play"/>
 
-            <Controller type="Fade" end="Pause" frame="NormalImage">
-                <Key type="Curve" time="0.0" value="255"/>
-            </Controller>
-            <Controller type="Fade" end="Pause" frame="HoverImage">
-                <Key type="Curve" time="0.0" value="255"/>
-            </Controller>
-            <Controller type="Fade" end="Pause" frame="SelectedImage">
-                <Key type="Curve" time="0.0" value="255"/>
-            </Controller>
-            <Controller type="Fade" end="Pause" frame="IconImage">
-                <Key type="Curve" time="0.0" value="255"/>
-            </Controller>
-            <Controller type="Fade" end="Pause" frame="Label">
-                <Key type="Curve" time="0.0" value="255"/>
-            </Controller>
-            <Controller type="Fade" end="Pause" frame="HeaderLabel">
-                <Key type="Curve" time="0.0" value="0"/>
-            </Controller>
-        </Animation>
-            
-        <Animation name="HideProduct">
-            <Event event="HideProduct" action="Reset,Play"/>
-
-            <Controller type="Fade" end="Pause" frame="NormalImage">
-                <Key type="Curve" time="0.0" value="0"/>
-            </Controller>
-            <Controller type="Fade" end="Pause" frame="HoverImage">
-                <Key type="Curve" time="0.0" value="0"/>
-            </Controller>
-            <Controller type="Fade" end="Pause" frame="SelectedImage">
-                <Key type="Curve" time="0.0" value="0"/>
-            </Controller>
-            <Controller type="Fade" end="Pause" frame="IconImage">
-                <Key type="Curve" time="0.0" value="0"/>
-            </Controller>
-            <Controller type="Fade" end="Pause" frame="Label">
-                <Key type="Curve" time="0.0" value="0"/>
-            </Controller>
-            <Controller type="Fade" end="Pause" frame="HeaderLabel">
-                <Key type="Curve" time="0.0" value="255"/>
-            </Controller>
-        </Animation>
-            
         <Frame type="Image" name="NormalImage">
             <Anchor relative="$parent"/>
             <Texture val="@UI/Storm_UI_Store_Bundles_ListItem_Normal"/>
@@ -163,6 +117,26 @@
             <Anchor side="Bottom" relative="$parent/IconFrame" pos="Mid" offset="0"/>
             <Anchor side="Right" relative="$parent/IconFrame" pos="Mid" offset="0"/>
             <TextureType val="Normal"/>
+
+            <StateGroup name="BonusItemStates">
+
+                <State name="GemsBonus">
+                    <When type="Property" frame="$parent" BonusType="Gems"/>
+                    <Action type="SetProperty" Texture="@UI/Storm_UI_Store_Bundle_Reward_Icons_Gems"/>
+                </State>
+                <State name="GoldBonus">
+                    <When type="Property" frame="$parent" BonusType="Gold"/>
+                    <Action type="SetProperty" Texture="@UI/Storm_UI_Store_Bundle_Reward_Icons_Gold"/>
+                </State>
+                <State name="BoostBonus">
+                    <When type="Property" frame="$parent" BonusType="Boost"/>
+                    <Action type="SetProperty" Texture="@UI/Storm_UI_Store_Bundle_Reward_Icons_Stimpack"/>
+                </State>
+                <State name="LootChestBonus">
+                    <When type="Property" frame="$parent" BonusType="LootChest"/>
+                    <Action type="SetProperty" Texture="@UI/Storm_UI_Store_Bundle_Reward_Icons_Lootchest"/>
+                </State>
+            </StateGroup>
         </Frame>
 
         <Frame type="Label" name="Label">
@@ -173,6 +147,15 @@
             <Style val="StoreBundleListItemLabel"/>
             <Options val="Ellipsis | NoWrapping | TooltipIfTruncated"/>
             <Height val="40"/>
+
+            <StateGroup name="BonusLabelStates">
+                <State name="IsBonus">
+                    <When type="Property" frame="$parent" IsBonus="true"/>
+                    <Action type="SetProperty" Text="{$parent/@HeaderText}"/>
+                    <Action type="SetAnchor" side="Left" relative="$parent/IconFrame" pos="Max" offset="10"/>
+                    <Action type="SetAnchor" side="Right" relative="$parent" pos="Max" offset="0"/>
+                </State>
+            </StateGroup>
         </Frame>
 
         <Frame type="Label" name="HeaderLabel">
@@ -182,7 +165,40 @@
             <Style val="StandardHeroSubHeaderLabel"/>
             <Options val="Ellipsis | NoWrapping | TooltipIfTruncated"/>
             <Unclipped val="true"/>
+            <Text val="{$parent/@HeaderText}"/>
         </Frame>
+
+        <StateGroup name="TileStates">
+            <State name="Product">
+                <When type="Property" IsBonus="false"/>
+                <When type="Property" HeaderText=""/>
+                <Action type="SetProperty" frame="NormalImage" Alpha="255"/>
+                <Action type="SetProperty" frame="HoverImage" Alpha="255"/>
+                <Action type="SetProperty" frame="SelectedImage" Alpha="255"/>
+                <Action type="SetProperty" frame="IconImage" Alpha="255"/>
+                <Action type="SetProperty" frame="Label" Alpha="255"/>
+                <Action type="SetProperty" frame="HeaderLabel" Alpha="0"/>
+            </State>
+            <State name="Header">
+                <When type="Property" IsBonus="false"/>
+                <When type="Property" operator="NotEqual" HeaderText=""/>
+                <Action type="SetProperty" frame="NormalImage" Alpha="0"/>
+                <Action type="SetProperty" frame="HoverImage" Alpha="0"/>
+                <Action type="SetProperty" frame="SelectedImage" Alpha="0"/>
+                <Action type="SetProperty" frame="IconImage" Alpha="0"/>
+                <Action type="SetProperty" frame="Label" Alpha="0"/>
+                <Action type="SetProperty" frame="HeaderLabel" Alpha="255"/>
+            </State>
+            <State name="Bonus">
+                <When type="Property" IsBonus="true"/>
+                <Action type="SetProperty" frame="NormalImage" Alpha="0"/>
+                <Action type="SetProperty" frame="HoverImage" Alpha="0"/>
+                <Action type="SetProperty" frame="SelectedImage" Alpha="0"/>
+                <Action type="SetProperty" frame="IconImage" Alpha="255"/>
+                <Action type="SetProperty" frame="Label" Alpha="255"/>
+                <Action type="SetProperty" frame="HeaderLabel" Alpha="0"/>
+            </State>
+        </StateGroup>
     </Frame>
 
     <Frame type="TileList" name="BundleTileListTemplate">
@@ -340,7 +356,7 @@
         </Frame>
     </Frame>
 
-    <Frame type="ScreenBundle" name="ScreenBundle" template="StandardTemplates/GlueScreen">
+    <Frame type="ScreenBundle" name="ScreenBundle" template="StoreTemplates/ScreenStoreItem">
         <Anchor relative="$parent"/>
 
         <Animation name="Transition">
@@ -354,23 +370,39 @@
                 <Key type="Curve" time="0.4" value="255" in="Slow" out="Slow"/>
             </Controller>
         </Animation>
-        
-        <Frame type="Frame" name="TopNavContainer" template="StandardTemplates/TopNavContainer">
-            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
-            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
-            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
-            <Height val="100"/>
-        </Frame>
+
+        <StateGroup name="BuyButtonTrigger">
+            <State name="DynamicBundle">
+                <When type="Property" IsDynamicBundle="true"/>
+                <Action type="SetProperty" frame="BuyButton0" ValidationTrigger="Updated"/>
+                <Action type="SetProperty" frame="BuyButton1" ValidationTrigger="Updated"/>
+                <Action type="SetProperty" frame="BuyButton2" ValidationTrigger="Updated"/>
+                <Action type="SetProperty" frame="BuyButton3" ValidationTrigger="Updated"/>
+            </State>
+            <State name="StaticBundle">
+                <When type="Property" IsDynamicBundle="false"/>
+                <Action type="SetProperty" frame="BuyButton0" ValidationTrigger="Clicked"/>
+                <Action type="SetProperty" frame="BuyButton1" ValidationTrigger="Clicked"/>
+                <Action type="SetProperty" frame="BuyButton2" ValidationTrigger="Clicked"/>
+                <Action type="SetProperty" frame="BuyButton3" ValidationTrigger="Clicked"/>
+            </State>
+        </StateGroup>
 
         <Frame type="Button" name="BackButton" template="ScreenHero/ScreenHero/BackButton">
             <Handle val="ScreenBundle_BackButton"/>
-        </Frame>
 
-        <Frame type="Frame" name="SpacingFrame">
-            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
-            <Anchor side="Bottom" relative="$parent/TopNavContainer" pos="Max" offset="0"/>
-            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
-            <Anchor side="Right" relative="$parent" pos="Mid" offset="-798"/>
+            <StateGroup name="PreviousScreen">
+                <DefaultState val="Default"/>
+
+                <State name="BundleList">
+                    <When type="Property" frame="$parent" PreviousScreen="ScreenBundleList"/>
+                    <Action type="SetProperty" Text="@UI/ScreenStore/BackToBundleList"/>
+                </State>
+
+                <State name="Default">
+                    <Action type="SetProperty" Text="@UI/ScreenStore/Back"/>
+                </State>
+            </StateGroup>
         </Frame>
 
         <Frame type="Image" name="ItemCountIconImage">
@@ -414,37 +446,23 @@
             <Text val="@UI/ScreenBundle/BundleScreenDescription"/>
         </Frame>
 
+        <Frame type="Label" name="InfoLabel">
+            <Anchor side="Top" relative="$parent/TitleLabel" pos="Max" offset="10"/>
+            <Anchor side="Left" relative="$parent/TitleLabel" pos="Min" offset="0"/>
+            <Width val="650"/>
+            <Style val="StandardHeroBodyLabel"/>
+            <CollapseLayout val="True"/>
+        </Frame>
+
         <Frame type="TileList" name="ProductTileList" template="ScreenBundle/BundleTileListTemplate">
-            <Anchor side="Top" relative="$parent/NameLabel" pos="Max" offset="45"/>
+            <Anchor side="Top" relative="$parent/InfoLabel" pos="Max" offset="10"/>
             <Anchor side="Left" relative="$parent/ItemCountIconImage" pos="Mid" offset="0"/>
-        </Frame>
-
-        <Frame type="Label" name="BonusTitleLabel">
-            <Anchor side="Top" relative="$parent/RealCurrencyButton" pos="Min" offset="30"/>
-            <Anchor side="Left" relative="$parent/RealCurrencyButton" pos="Max" offset="0"/>
-            <Style val="StandardBodyHeaderLabelSmall"/>
-            <Text val="@UI/ScreenBundle/BonusGrantedTitle"/>
-        </Frame>
-
-        <Frame type="Label" name="GoldGrantedLabel">
-            <Anchor side="Top" relative="$parent/BonusTitleLabel" pos="Max" offset="10"/>
-            <Anchor side="Left" relative="$parent/BonusTitleLabel" pos="Min" offset="0"/>
-            <Style val="StandardBodyHeaderLabel"/>
-            <Text val="@UI/ScreenBundle/GoldBonus"/>
-            <CollapseLayout val="true"/>
-        </Frame>
-
-        <Frame type="Label" name="BoostGrantedLabel">
-            <Anchor side="Top" relative="$parent/BonusTitleLabel" pos="Max" offset="0"/>
-            <Anchor side="Left" relative="$parent/GoldGrantedLabel" pos="Max" offset="30"/>
-            <Style val="StandardBodyHeaderLabelSmall"/>
-            <Text val="@UI/ScreenBundle/BoostBonus"/>
         </Frame>
 
         <Frame type="Frame" name="DynamicBundleFrame">
             <Anchor side="Top" relative="DynamicBundleImage" pos="Min" offset="0"/>
-            <Anchor side="Bottom" relative="$parent/RealCurrencyButton" pos="Min" offset="15"/>
-            <Anchor side="Left" relative="$parent/RealCurrencyButton" pos="Min" offset="10"/>
+            <Anchor side="Bottom" relative="$parent/BuyButton0" pos="Min" offset="15"/>
+            <Anchor side="Left" relative="$parent/BuyButton0" pos="Min" offset="10"/>
             <Anchor side="Right" relative="CountLabel" pos="Max" offset="0"/>
             
             <Frame type="Image" name="DynamicBundleImage">
@@ -505,37 +523,11 @@
             </Animation>
         </Frame>
 
-        <Frame type="BuyButton" name="RealCurrencyButton" template="StandardTemplates/StandardButtonTemplate">
-            <Anchor side="Bottom" relative="$parent" pos="Max" offset="-55"/>
-            <Anchor side="Left" relative="$parent/ItemCountIconImage" pos="Min" offset="62"/>
-            <ReportsStats val="true"/>
-            <AlwaysShow val="true"/>
-            <Handle val="ScreenBundle_RealCurrencyButton"/>
-            <ClickSound val="@UI_BNet_PageSelect"/>
-            <CollapseLayout val="true"/>
-            
-            <Frame type="Frame" name="HitTestFrame">
-                <TooltipAnchorPosition val="TopCenter"/>
-            </Frame>
-        </Frame>
-        
-        <Frame type="ProductDiscountFrame" name="DiscountFrame" template="StandardTemplates/ProductDiscountFrameTemplate">
-            <Anchor side="Top" relative="$parent/RealCurrencyButton" pos="Mid" offset="0"/>
-            <Anchor side="Bottom" relative="$parent/RealCurrencyButton" pos="Mid" offset="0"/>
-            <Anchor side="Left" relative="$parent/RealCurrencyButton" pos="Min" offset="0"/>
-            <Anchor side="Right" relative="$parent/RealCurrencyButton" pos="Max" offset="-12"/>
-        </Frame>
-
-        <Frame type="PurchasedIndicatorFrame" name="PurchasedIndicatorFrame" template="ScreenHero/PurchasedIndicatorFrameTemplate">
-            <Anchor side="Bottom" relative="$parent/RealCurrencyButton" pos="Min" offset="20"/>
-            <Anchor side="Left" relative="$parent/RealCurrencyButton" pos="Min" offset="-30"/>
-        </Frame>
-
         <Frame type="Control" name="PriceLowWarningIcon" template="ProductPurchasePanel/PriceTooLowIconTemplate">
-            <Anchor side="Top" relative="$parent/RealCurrencyButton" pos="Mid" offset="0"/>
-            <Anchor side="Bottom" relative="$parent/RealCurrencyButton" pos="Mid" offset="0"/>
-            <Anchor side="Right" relative="$parent/RealCurrencyButton" pos="Min" offset="20"/>
-            <Visible val="{$parent/RealCurrencyButton/@ShowMinimumPriceWarning}"/>
+            <Anchor side="Top" relative="$parent/BuyButton0" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent/BuyButton0" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent/BuyButton0" pos="Min" offset="20"/>
+            <Visible val="{$parent/BuyButton0/@ShowMinimumPriceWarning}"/>
         </Frame>
 
         <Frame type="Button" name="PreviousItemButton" template="StandardTemplates/StandardLongArrowButtonTemplate_Left">
@@ -555,5 +547,33 @@
             <Handle val="ScreenBundle_NextItemButton"/>
             <Shortcut val="@UI/ScreenNavigationRight_Hotkey"/>
         </Frame>
+
+        <StateGroup name="TitleTextState">
+            <DefaultState val="NotBundleData"/>
+            
+            <State name="BundleData">
+                <When type="Property" Operator="NotEqual" BundleTitleText=""/>
+                <Action type="SetProperty" frame="TitleLabel" Text="{$parent/@BundleTitleText}"/>
+            </State>
+
+            <State name="NotBundleData">
+                <Action type="SetProperty" frame="TitleLabel" Text="@UI/ScreenBundle/BundleScreenDescription"/>
+            </State>
+        </StateGroup>
+
+        <StateGroup name="DescriptionTextState">
+            <DefaultState val="NotBundleDataDescription"/>
+
+            <State name="BundleDataDescription">
+                <When type="Property" Operator="NotEqual" BundleDescriptionText=""/>
+                <Action type="SetProperty" frame="InfoLabel" Text="{$parent/@BundleDescriptionText}"/>
+                <Action type="SetProperty" frame="InfoLabel" Visible="True"/>
+            </State>
+
+            <State name="NotBundleDataDescription">
+                <Action type="SetProperty" frame="InfoLabel" Text=""/>
+                <Action type="SetProperty" frame="InfoLabel" Visible="True"/>
+            </State>
+        </StateGroup>
     </Frame>
 </Desc>

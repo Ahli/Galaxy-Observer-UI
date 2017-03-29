@@ -5,6 +5,7 @@
     <Constant name="PageTransitionDuration" val="0.2"/>
     <Constant name="PageTabWidth" val="45"/>
     <Constant name="PageTabSkew" val="-30"/>
+    <Constant name="PageTabOffset" val="-10"/>
 
 <!-- Region: Tile List Item Templates -->
     <!--  TutorialMap  -->
@@ -232,24 +233,49 @@
             </Frame>
 
             <Frame type="HeroLabel" name="RoleLabel">
-                <Anchor relative="$parent/$parent/DescriptionLabel"/>
+                <Anchor relative="$parent/$parent/InfoFrame/DescriptionLabel"/>
                 <Style val="StoreItemDescriptionLabel"/>
                 <HeroLabelType val="Role"/>
             </Frame>
         </Frame>
 
-        <Frame type="Label" name="NameLabel">
+        <Frame type="Frame" name="InfoFrame">
             <Anchor side="Left" relative="$parent/HeroContainerFrame/RoleIcon" pos="Max" offset="-5"/>
-            <Visible val="true"/>
+
+            <Frame type="Label" name="DescriptionLabel">
+                <Visible val="False"/>
+            </Frame>
         </Frame>
 
-        <Frame type="Label" name="CostLabel">
-            <Visible val="false"/>
-        </Frame>
+        <!-- This overrides the Quick Buy button states from the StoreTileList template -->
+        <StateGroup name="TileListHoveredStates">
+            <DefaultState val="BuyButtonOverride"/>
 
-        <Frame type="Label" name="DescriptionLabel">
-            <Visible val="false"/>
-        </Frame>
+            <State name="BuyButtonOverride">
+                <When type="Property" visible="True"/>
+                <Action type="SendEvent" event="MouseOut"/>
+                <Action type="SetProperty" frame="BuyButton0" visible="False"/>
+                <Action type="SetProperty" frame="BuyButton1" visible="False"/>
+            </State>
+            <State name="Hovered">
+                <When type="Property" visible="False"/>
+            </State>
+            <State name="Button0Hovered">
+                <When type="Property" visible="False"/>
+            </State>
+            <State name="Button1Hovered">
+                <When type="Property" visible="False"/>
+            </State>
+            <State name="NotHovered">
+                <When type="Property" visible="False"/>
+            </State>
+        </StateGroup>
+
+        <StateGroup name="VisibilityState">
+            <State name="Visible">
+                <Action type="SetProperty" Visible="false"/>
+            </State>
+        </StateGroup>
     </Frame>
     <!-- End: Hero -->
     
@@ -819,6 +845,9 @@
 
     <!-- Promotional Slide Template -->
     <Frame type="Frame" name="PromotionalSlideTemplate">
+        <Anchor relative="$parent"/>
+        <Visible val="False"/>
+
         <Animation name="Visibility">
             <Event event="Show" action="DirectionForward,Play"/>
             <Event event="Hide" action="DirectionReverse,Play"/>
@@ -1508,9 +1537,31 @@
                     </Controller>
                 </Animation>
             </Frame>
+            
+            <Frame type="Image" name="RewardFrame">
+                <Anchor side="Top" relative="$parent/HeroTileList" pos="Max" offset="30"/>
+                <Anchor side="Left" relative="$parent/HeroTileList/Item0" pos="Min" offset="-3"/>
+                <Anchor side="Right" relative="$parent/HeroTileList/Item2" pos="Max" offset="3"/>
+                <Height val="100"/>
+
+                <Texture val="@UI/StormTooltipFrame"/>
+                <TextureType val="Nineslice"/>
+
+                <Frame type="Label" name="RewardLabel">
+                    <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                    <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+                    <Anchor side="Left" relative="$parent" pos="Min" offset="5"/>
+                    <Anchor side="Right" relative="$parent" pos="Max" offset="-5"/>
+
+                    <Text val="@UI/NewUserPopup/TutorialReward"/>
+                    <Style val="QuestionnaireReward"/>
+                </Frame>
+            </Frame>
+            
+
 
             <Frame type="Button" name="PlayButton" template="StandardTemplates/StandardButtonTemplate">
-                <Anchor side="Top" relative="$parent/HeroTileList" pos="Max" offset="50"/>
+                <Anchor side="Top" relative="$parent/RewardFrame" pos="Max" offset="10"/>
                 <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
                 <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
                 <Visible val="false"/>
@@ -1524,6 +1575,7 @@
         <Frame type="Frame" name="NewUserPromotionalPanel">
             <Anchor relative="$parent"/>
             <Visible val="false"/>
+            <AcceptsMouse val="True"/>
             
             <Frame type="Label" name="Header">
                 <Anchor side="Bottom" relative="$parent/Slides" pos="Min" offset="0"/>
@@ -1543,10 +1595,7 @@
                     <Anchor relative="$parent"/>
                 </Frame>
 
-                <Frame type="Frame" name="Slide_Shop" template="NewUserPopupPanel/PromotionalSlideTemplate">
-                    <Anchor relative="$parent"/>
-                    <Visible val="false"/>
-                    
+                <Frame type="Frame" name="Slide_Shop" template="NewUserPopupPanel/PromotionalSlideTemplate">                    
                     <Frame type="Label" name="Subtitle">
                         <Anchor side="Top" relative="$parent" pos="Max" offset="-200"/>
                         <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
@@ -1566,9 +1615,6 @@
                 </Frame>
 
                 <Frame type="Frame" name="Slide_Modes" template="NewUserPopupPanel/PromotionalSlideTemplate">
-                    <Anchor relative="$parent"/>
-                    <Visible val="false"/>
-                    
                     <Frame type="Label" name="Subtitle_AI">
                         <Anchor side="Top" relative="$parent" pos="Max" offset="-250"/>
                         <Anchor side="Left" relative="$parent" pos="Mid" offset="-440"/>
@@ -1647,9 +1693,6 @@
                 </Frame>
 
                 <Frame type="Frame" name="Slide_Battlegrounds" template="NewUserPopupPanel/PromotionalSlideTemplate">
-                    <Anchor relative="$parent"/>
-                    <Visible val="false"/>
-
                     <Frame type="Label" name="Subtitle">
                         <Anchor side="Top" relative="$parent" pos="Max" offset="-200"/>
                         <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
@@ -1668,14 +1711,46 @@
                     -->
                 </Frame>
 
+                <Frame type="Frame" name="Slide_Loot" template="NewUserPopupPanel/PromotionalSlideTemplate">
+                    <Frame type="Label" name="Subtitle_LootChests1">
+                        <Anchor side="Top" relative="$parent" pos="Max" offset="-250"/>
+                        <Anchor side="Left" relative="$parent" pos="Mid" offset="-440"/>
+                        <Anchor side="Right" relative="$parent" pos="Mid" offset="-440"/>
+                        <Text val="@UI/NewUser/PromoDialog/Loot/Subtitle1"/>
+                        <Style val="NewUserPromoTitle"/>
+                    </Frame>
+                    <Frame type="Label" name="Description_LootChests1">
+                        <Anchor side="Top" relative="$parent/Subtitle_LootChests1" pos="Max" offset="0"/>
+                        <Anchor side="Left" relative="$parent/Subtitle_LootChests1" pos="Mid" offset="-200"/>
+                        <Anchor side="Right" relative="$parent/Subtitle_LootChests1" pos="Mid" offset="200"/>
+                        <Text val="@UI/NewUser/PromoDialog/Loot/Description1"/>
+                        <Style val="NewUserBody"/>
+                    </Frame>
+
+                    <Frame type="Label" name="Subtitle_LootChests2">
+                        <Anchor side="Top" relative="$parent" pos="Max" offset="-250"/>
+                        <Anchor side="Left" relative="$parent" pos="Mid" offset="460"/>
+                        <Anchor side="Right" relative="$parent" pos="Mid" offset="460"/>
+                        <Text val="@UI/NewUser/PromoDialog/Loot/Subtitle2"/>
+                        <Style val="NewUserPromoTitle"/>
+                    </Frame>
+                    <Frame type="Label" name="Description_LootChests2">
+                        <Anchor side="Top" relative="$parent/Subtitle_LootChests2" pos="Max" offset="0"/>
+                        <Anchor side="Left" relative="$parent/Subtitle_LootChests2" pos="Mid" offset="-200"/>
+                        <Anchor side="Right" relative="$parent/Subtitle_LootChests2" pos="Mid" offset="200"/>
+                        <Text val="@UI/NewUser/PromoDialog/Loot/Description2"/>
+                        <Style val="NewUserBody"/>
+                    </Frame>
+                </Frame>
+
                 <StateGroup name="SlideState">
                     <State name="Slide1">
                         <Action type="SendEvent" frame="Slide_Shop" event="Show"/>
                         <Action type="SendEvent" frame="Slide_Shop" event="Hide" on="Exit"/>
                         <Action type="SetProperty" frame="SlideImage" texture="@UI/Storm_NewUser_Tutorial_Promotional_1" undo="false"/>
                         <Action type="SetProperty" frame="$parent/Header" text="@UI/NewUser/PromoDialog/Shop/Title" undo="false"/>
-                        <Action type="SetState" frame="$parent/Tabs/Tab1" group="ActiveState" state="Active"/>
-                        <Action type="SetState" frame="$parent/Tabs/Tab1" group="ActiveState" state="Inactive" on="Exit"/>
+                        <Action type="SetState" frame="$parent/TabsCenterFrame/Tabs/Tab1" group="ActiveState" state="Active"/>
+                        <Action type="SetState" frame="$parent/TabsCenterFrame/Tabs/Tab1" group="ActiveState" state="Inactive" on="Exit"/>
                         <Action type="SendEvent" event="ChangeSlide"/>
                     </State>
                     <State name="Slide2">
@@ -1683,8 +1758,8 @@
                         <Action type="SendEvent" frame="Slide_Battlegrounds" event="Hide" on="Exit"/>
                         <Action type="SetProperty" frame="SlideImage" texture="@UI/Storm_NewUser_Tutorial_Promotional_3" undo="false"/>
                         <Action type="SetProperty" frame="$parent/Header" text="@UI/NewUser/PromoDialog/Battlegrounds/Half1" undo="false"/>
-                        <Action type="SetState" frame="$parent/Tabs/Tab2" group="ActiveState" state="Active"/>
-                        <Action type="SetState" frame="$parent/Tabs/Tab2" group="ActiveState" state="Inactive" on="Exit"/>
+                        <Action type="SetState" frame="$parent/TabsCenterFrame/Tabs/Tab2" group="ActiveState" state="Active"/>
+                        <Action type="SetState" frame="$parent/TabsCenterFrame/Tabs/Tab2" group="ActiveState" state="Inactive" on="Exit"/>
                         <Action type="SendEvent" event="ChangeSlide"/>
                     </State>
                     <State name="Slide3">
@@ -1692,8 +1767,17 @@
                         <Action type="SendEvent" frame="Slide_Modes" event="Hide" on="Exit"/>
                         <Action type="SetProperty" frame="SlideImage" texture="@UI/Storm_NewUser_Tutorial_Promotional_2" undo="false"/>
                         <Action type="SetProperty" frame="$parent/Header" text="@UI/NewUser/PromoDialog/GameModes/Title" undo="false"/>
-                        <Action type="SetState" frame="$parent/Tabs/Tab3" group="ActiveState" state="Active"/>
-                        <Action type="SetState" frame="$parent/Tabs/Tab3" group="ActiveState" state="Inactive" on="Exit"/>
+                        <Action type="SetState" frame="$parent/TabsCenterFrame/Tabs/Tab3" group="ActiveState" state="Active"/>
+                        <Action type="SetState" frame="$parent/TabsCenterFrame/Tabs/Tab3" group="ActiveState" state="Inactive" on="Exit"/>
+                        <Action type="SendEvent" event="ChangeSlide"/>
+                    </State>
+                    <State name="Slide4">
+                        <Action type="SendEvent" frame="Slide_Loot" event="Show"/>
+                        <Action type="SendEvent" frame="Slide_Loot" event="Hide" on="Exit"/>
+                        <Action type="SetProperty" frame="SlideImage" texture="@UI/Storm_NewUser_Tutorial_Promotional_4" undo="false"/>
+                        <Action type="SetProperty" frame="$parent/Header" text="@UI/NewUser/PromoDialog/Loot/Title" undo="false"/>
+                        <Action type="SetState" frame="$parent/TabsCenterFrame/Tabs/Tab4" group="ActiveState" state="Active"/>
+                        <Action type="SetState" frame="$parent/TabsCenterFrame/Tabs/Tab4" group="ActiveState" state="Inactive" on="Exit"/>
                         <Action type="SendEvent" event="ChangeSlide"/>
                     </State>
                     <State name="Done">
@@ -1703,34 +1787,42 @@
                 </StateGroup>
             </Frame>
 
-            <Frame type="Frame" name="Tabs">
-                <Anchor side="Bottom" relative="$parent/Slides" pos="Max" offset="0"/>
-                <Anchor side="Left" relative="$parent" pos="Mid" offset="-80"/>
-                <Anchor side="Right" relative="$parent" pos="Mid" offset="80"/>
-                <Height val="30"/>
+            <Frame type="ParentCenteredFrame" name="TabsCenterFrame">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Right" relative="Tabs" pos="Max" offset="0"/>
+                <Anchor side="Bottom" relative="Tabs" pos="Max" offset="0"/>
 
-                <Frame type="Frame" name="Tab1" template="NewUserPopupPanel/PageTabTemplate">
-                    <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+                <Frame type="Frame" name="Tabs">
+                    <Anchor side="Top" relative="$parent/$parent/Slides" pos="Max" offset="-35"/>
                     <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
-                    <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
-                </Frame>
+                    <Anchor side="Right" relative="Tab4" pos="Max" offset="0"/>
+                    <Anchor side="Bottom" relative="Tab1" pos="Max" offset="0"/>
 
-                <Frame type="Frame" name="Tab2" template="NewUserPopupPanel/PageTabTemplate">
-                    <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
-                    <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
-                    <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
-                    <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
-                </Frame>
+                    <Frame type="Frame" name="Tab1" template="NewUserPopupPanel/PageTabTemplate">
+                        <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                        <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                    </Frame>
 
-                <Frame type="Frame" name="Tab3" template="NewUserPopupPanel/PageTabTemplate">
-                    <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
-                    <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
-                    <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+                    <Frame type="Frame" name="Tab2" template="NewUserPopupPanel/PageTabTemplate">
+                        <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                        <Anchor side="Left" relative="$parent/Tab1" pos="Max" offset="#PageTabOffset"/>
+                    </Frame>
+
+                    <Frame type="Frame" name="Tab3" template="NewUserPopupPanel/PageTabTemplate">
+                        <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                        <Anchor side="Left" relative="$parent/Tab2" pos="Max" offset="#PageTabOffset"/>
+                    </Frame>
+
+                    <Frame type="Frame" name="Tab4" template="NewUserPopupPanel/PageTabTemplate">
+                        <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                        <Anchor side="Left" relative="$parent/Tab3" pos="Max" offset="#PageTabOffset"/>
+                    </Frame>
                 </Frame>
             </Frame>
             
             <Frame type="Button" name="Next" template="StandardTemplates/StandardButtonTemplate">
-                <Anchor side="Top" relative="$parent/Tabs" pos="Max" offset="0"/>
+                <Anchor side="Top" relative="$parent/TabsCenterFrame" pos="Max" offset="0"/>
                 <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
                 <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
 
@@ -1761,7 +1853,8 @@
                     <Key type="Identifier" time="0.0" value="Slide1"/>
                     <Key type="Identifier" time="0.1" value="Slide2"/>
                     <Key type="Identifier" time="0.2" value="Slide3"/>
-                    <Key type="Identifier" time="0.3" value="Done"/>
+                    <Key type="Identifier" time="0.3" value="Slide4"/>
+                    <Key type="Identifier" time="0.4" value="Done"/>
                 </Controller>
             </Animation>
 

@@ -185,16 +185,20 @@
         </Frame> 
 
         <Frame type="Image" name="GridBackgroundImage">
-            <Anchor relative="$parent"/>
+            <Anchor side="Top" relative="$parent" pos="Min" offset="-25"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="-25"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="25"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="25"/>
             <BlendMode val="Add"/>
-            <Alpha val="50"/>
+            <LayerColor val="9999ff"/>
+            <Alpha val="75"/>
 
-            <Texture val="@UI/Storm_UI_Season_Roll_Grid_Tiled"/>
-            <TextureCoords top="0" left="0" right="21" bottom="8"/>
-            <WrapUV val="True"/>
+            <Texture val="@UI/Storm_UI_Store_GemDialog_trianglepattern"/>
+            <Tiled val="True"/>
         </Frame> 
 
         <Frame type="Frame" name="TriangleFlashFrame">
+            <Visible val="False"/>
             <Anchor relative="$parent"/>
 
             <Frame type="Image" name="TriangleFlash1">
@@ -494,6 +498,7 @@
             <WrapUV val="True" layer="0"/>
             <Texture val="@UI/Storm_UI_Season_Roll_Grid_Glow" layer="1"/>
             <TextureCoords top="-1" left="-1" bottom="2" right="2" layer="1"/>
+            <Visible val="False"/>
             
             <AlphaLayer val="True" layer="0"/>
 
@@ -531,7 +536,7 @@
 
         <Frame type="Image" name="FullscreenVignetteImage">
             <Anchor relative="$parent"/>
-            <Texture val="@UI/Storm_UI_Season_Roll_Vignette"/>
+            <Texture val="@UI/Storm_UI_GemDialog_Vignette"/>
             <BlendMode val="Normal"/>
         </Frame>
 
@@ -550,7 +555,7 @@
             <Style val="DialogMessageLabel"/>
         </Frame>
 
-        <Frame type="Button" name="Button" template="StandardTemplates/StandardButtonSmallTemplate">
+        <Frame type="Button" name="Button" template="StandardTemplates/StandardButtonTemplate">
             <Anchor side="Top" relative="$parent/MessageLabel" pos="Max" offset="20"/>
             <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
             <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
@@ -678,6 +683,17 @@
                 <Anchor side="Left" relative="$parent" pos="Min" offset="3"/>
                 <Anchor side="Bottom" relative="$parent" pos="Max" offset="-3"/>
                 <Anchor side="Right" relative="$parent" pos="Max" offset="-3"/>
+              
+                <StateGroup name="HideBrowserImage">
+                    <State name="HasError">
+                        <When type="Property" frame="$parent" Error="True"/>
+                        <Action type="SetProperty" Visible="False"/>
+                    </State>
+                    <State name="IsNavigating">
+                        <When type="Property" frame="$parent" Navigating="True"/>
+                        <Action type="SetProperty" Visible="False"/>
+                    </State>
+                </StateGroup>
             </Frame>
 
             <Frame type="EditBox" name="AddressEditBox" template="StandardTemplates/StandardEditBoxTemplate">
@@ -752,6 +768,45 @@
                 <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
                 <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
                 <Visible val="{$parent/@Loading}"/>
+            </Frame>
+
+            <Frame type="Frame" name="ErrorContainer">
+                <Anchor relative="$parent" />
+                <Visible val="{$parent/@Error}"/>
+
+                <Frame type="Image" name="MismatchImage">
+                    <Anchor side="Bottom" relative="$parent" pos="Mid" offset="-25"/>
+                    <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+                    <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+                    <Texture val="@UI/Storm_UI_TeamLeague_PartyMismatch_Background"/>
+                </Frame>
+            
+                <Frame type="Label" name="PartyMismatchLabel">
+                    <Anchor side="Top" relative="$parent/MismatchImage" pos="Min" offset="60" />
+                    <Anchor side="Left" relative="$parent" pos="Mid" offset="0" />
+                    <Anchor side="Right" relative="$parent" pos="Mid" offset="0" />
+                    <Style val="PartyMismatchLabel"/>
+                    <Text val="@UI/ProfileDialog/ErrorTitle"/>
+                </Frame>
+
+                <Frame type="Label" name="DescriptionLabel">
+                    <Anchor side="Top" relative="$parent/MismatchImage" pos="Max" offset="25"/>
+                    <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                    <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+                    <Text val="@UI/ProfileDialog/ErrorDescription"/>
+                    <Style val="PlayerExceptionLabel"/>
+                </Frame>
+
+                <Animation name="OnShown">
+                    <Event event="OnShown" action="Reset"/>
+                    <Event event="OnShown" action="Play"/>
+                    <Controller type="Fade" end="Pause">
+                        <Key type="Curve" time="0" value="0" out="Slow"/>
+                        <Key type="Curve" time="0.5" value="0" out="Slow"/>
+                        <Key type="Curve" time=".9" value="255" in="Slow"/>
+                    </Controller>
+                </Animation>
+            
             </Frame>
         </Frame>
     </Frame>

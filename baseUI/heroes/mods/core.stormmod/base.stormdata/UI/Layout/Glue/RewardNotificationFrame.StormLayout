@@ -16,15 +16,42 @@
         <Width val="539"/>
         <HideWhenCleared val="true"/>
         <Preload val="false"/>
+        <ShowAsFanfare val="true"/>
+
+        <StateGroup name="SoundPlayer">
+            <DefaultState val="Hidden"/>
+            <!-- Sounds for non progression rewards are handled in animation events -->
+            <State name="IsNotProgressionreward">
+                <When type="Property" ProgressionRewardType="Unknown"/>
+            </State>
+            <!-- Wait until this becomes visible -->
+            <State name="Hidden">
+                <When type="Property" visible="false"/>
+            </State>
+            <State name="AccountGem">
+                <When type="Property" ProgressionRewardType="AccountGem"/>
+                <Action type="PlaySound" sound="*@UI_BNet_Progression_Levelup_Gems"/>
+            </State>
+            <State name="AccountOneTimeGem">
+                <When type="Property" ProgressionRewardType="AccountOneTimeGem"/>
+                <Action type="PlaySound" sound="*@UI_BNet_Progression_Levelup_Gems"/>
+            </State>
+            <State name="HeroGold">
+                <When type="Property" ProgressionRewardType="HeroGold"/>
+                <Action type="PlaySound" sound="*@UI_BNet_Progression_Levelup_HeroGold"/>
+            </State>
+            <State name="AllOtherProgressionRewards">
+                <When type="Property" operator="NotEqual" ProgressionRewardType="Unknown" />
+                <Action type="PlaySound" sound="*@UI_BNet_Progression_Bonus01"/>
+            </State>
+        </StateGroup>
 
         <!-- Sound for ProgressionHeroRank / ProgressionPlayerRank rewards are played through ScoreFrame -->
         <Animation name="QuestCompletedSound">
-            <Event event="QuestDaily" action="Reset"/>
-            <Event event="QuestDaily" action="Play"/>
-            <Event event="QuestSpecialEvent" action="Reset"/>
-            <Event event="QuestSpecialEvent" action="Play"/>
+            <Event event="QuestDaily" action="Reset,Play"/>
+            <Event event="QuestSpecialEvent" action="Reset,Play"/>
             <Controller type="Sound" end="Stop">
-                <Key type="Sound" time="0.0" sound="@UI_BNet_Progression_Levelup01"/>
+                <Key type="Sound" time="0.0" sound="*@UI_BNet_Progression_Quest_Complete"/>
             </Controller>
         </Animation>
 
@@ -385,6 +412,7 @@
             <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
             <Texture val="@UI/Storm_UI_Scorescreen_QuestComplete_Shine"/>
             <BlendMode val="Add"/>
+            <Unclipped val="True"/>
             <Visible val="False"/>
             <Animation name="Pulse">
                 <Event event="OnShown" action="DirectionForward"/>
@@ -520,16 +548,6 @@
 
         <Frame type="TileList" name="RewardList">
             <Anchor relative="$parent"/>
-
-            <!-- These animations control how long rewards appear for -->
-            <Animation name="UnlockReward">
-                <Event event="Begin" action="Reset"/>
-                <Event event="Begin" action="Play"/>
-                <Controller type="Sound" end="Stop">
-                    <Key type="Sound" time="0.1" sound="@UI_BNet_Progression_Bonus01"/>
-                </Controller>
-            </Animation>
-
           
             <Frame type="RewardTileListItem" name="Item0" template="RewardNotificationFrame/UnlockRewardTileListItemTemplate">
                 <Anchor side="Bottom" relative="$parent/Item1" pos="Max" offset="0"/>
