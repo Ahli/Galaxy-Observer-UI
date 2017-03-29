@@ -5,6 +5,8 @@ Author: Ahli
 
 Execute compile.jar without parameters to build all Interfaces.
 
+A log file is created in your system's user.home path. For example: C:\Users\Ahli\.GalaxyObsUI\logs
+
 =============================================================================================================================================
 Parameters:
 --compile="pathToInterfaceSourceFolder"
