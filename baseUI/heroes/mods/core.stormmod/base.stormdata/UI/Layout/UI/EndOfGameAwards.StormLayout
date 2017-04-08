@@ -1027,19 +1027,31 @@
             <Width val="1650"/>
             <Height val="1200"/>
             <UseAlternateTime val="true"/>
-            
             <Unclipped val="True"/>
             <HeroCutsceneType val="EndOfMatch"/>
             <AutoPlay val="True"/>
             
-            <!-- Animations for cutscene bookmarks -->
+            <!-- Set the starting bookmark on visible -->
             <Animation name="SlotReveal">
-                <Event event="Tier0Bookmark" frame="$this" action="Reset,Play"/>
+                <Event event="OnShown" action="Reset,Play"/>
                 
                 <Controller type="Cutscene" end="Stop">
                     <Key type="Cutscene" time="0.0" action="Bookmark" bookmark="Line Up Start"/>
                 </Controller>
             </Animation>
+            
+            <!-- Apply filters and bookmarks on tier++;
+                    Animation state is sent from triggers -->
+            <StateGroup name="CutsceneTierFilterState">
+                <State name="Tier1">
+                    <When type="AnimationState" AwardTier="Tier1"/>
+                    <Action type="SendEvent" event="Tier1EpicTransition"/>
+                </State>
+                <State name="Tier2">
+                    <When type="AnimationState" AwardTier="Tier2"/>
+                    <Action type="SendEvent" event="Tier2LegendaryTransition"/>
+                </State>
+            </StateGroup>
             
             <Animation name="Tier1EpicTransition">
                 <Event event="Tier1EpicTransition" frame="$this" action="Reset,Play"/>
@@ -1059,15 +1071,24 @@
                 </Controller>
             </Animation>
             
+            <!-- team color set as an animation state ahead of time 
+                when the slot filter has been set after the cutscene loads, we can add the team filter -->
+            <StateGroup name="CutsceneApplyTeamColor">
+                <State name="Blue">
+                    <When type="AnimationState" TeamColor="Blue"/> 
+                    <Action type="SendEvent" frame="$this" event="BlueTeamEffectFilter"/> 
+                </State>
+                <State name="Red">
+                    <When type="AnimationState" TeamColor="Red"/>
+                    <Action type="SendEvent" frame="$this" event="RedTeamEffectFilter"/>
+                </State>
+            </StateGroup>
+            
             <Animation name="BlueTeamEffectFilter">
                 <Event event="BlueTeamEffectFilter" frame="$this" action="Reset,Play"/>
                 
                 <Controller type="Cutscene" end="Stop">
                     <Key type="Cutscene" time="0.0" action="AddFilter" filter="Team0"/>
-                </Controller>
-                
-                <Controller type="State" stateGroup="ReadyForSync" end="Pause">
-                    <Key type="Identifier" time="0.01" value="Ready"/>
                 </Controller>
             </Animation>
             
@@ -1077,96 +1098,30 @@
                 <Controller type="Cutscene" end="Stop">
                     <Key type="Cutscene" time="0.0" action="AddFilter" filter="Team1"/>
                 </Controller>
-                
-                <Controller type="State" stateGroup="ReadyForSync" end="Pause">
-                    <Key type="Identifier" time="0.01" value="Ready"/>
-                </Controller>
             </Animation>
-            
-            <!-- Wait until Cutscene is loaded, so that filter can be applied after creation -->
-            <StateGroup name="CutsceneBookmark">
-                <DefaultState val="Tier0"/>
-                <State name="Invisible">
-                    <When type="Property" inheritedVisible="false"/>
-                </State>
-                <State name="Unloaded">
-                    <When type="AnimationState" CutsceneLoad="Unloaded"/>
-                </State>
-                <State name="Loading">
-                    <When type="AnimationState" CutsceneLoad="Loading"/>
-                </State>
-                <State name="Tier0">
-                    <Action type="SendEvent" frame="$this" event="Tier0Filter"/>
-                </State>
-                <State name="Tier1">
-                    <When type="AnimationState" AwardTier="Tier1"/>
-                    <Action type="SendEvent" frame="$this" event="Tier1EpicTransition"/>
-                </State>
-                <State name="Tier2">
-                    <When type="AnimationState" AwardTier="Tier2"/>
-                    <Action type="SendEvent" frame="$this" event="Tier2LegendaryTransition"/>
-                </State>
-            </StateGroup>
-            
-            <!-- to prevent race conditions-
-                cutscenefilters need to be cleared, and two set-
-                    team color (dependant on colorstate) and tier 0 -->
-            <StateGroup name="SemaphorThing">
-                <DefaultState val="Lock"/>
-                
-                <State name="Lock">
-                    <Action type="SendEvent" event="DummyEvent"/>
-                </State>
-                
-                <State name="Unlock">
-                    <Action type="SendEvent" event="DummyEvent"/>
-                </State>
-            </StateGroup>
-            
-            <!-- team color set as an animation state ahead of time 
-                when the slot filter has been set after the cutscene loads, we can add the team filter -->
-            <StateGroup name="CutsceneTeamColor">
-                <State name="Blue">
-                    <When type="AnimationState" TeamColor="Blue"/>
-                    <When type="StateGroup" frame="$this" SemaphorThing="Unlock"/>
-                    <Action type="SendEvent" frame="$this" event="BlueTeamEffectFilter"/>
-                </State>
-                
-                <State name="Red">
-                    <When type="AnimationState" TeamColor="Red"/>
-                    <When type="StateGroup" frame="$this" SemaphorThing="Unlock"/>
-                    <Action type="SendEvent" frame="$this" event="RedTeamEffectFilter"/>
-                </State>
-            </StateGroup>
-            
-            <StateGroup name="ReadyForSync">
-                <State name="Ready">
-                    <Action type="SendEvent" event="DummyEvent"/>
-                </State>
-            </StateGroup>
             
             <!-- state group waits for the cutscene to load if there is a need to update when secondaries are revealed (if votes have been cast due to earlier skip)-->
             <StateGroup name="SkipStatusFlags">
                 <State name="Tier0">
                     <When type="AnimationState" SkipStatusFlags="Tier0"/>
-                    <When type="StateGroup" frame="$this" ReadyForSync="Ready"/>
-                    <Action type="SendEvent" frame="$this" event="Tier0Sync"/>
+                    <When type="Property" Visible="True"/>
+                    <Action type="SendEvent" event="Tier0Sync"/>
                 </State>
                 
                 <State name="Tier1">
                     <When type="AnimationState" SkipStatusFlags="Tier1"/>
-                    <When type="StateGroup" frame="$this" ReadyForSync="Ready"/>
-                    <Action type="SendEvent" frame="$this" event="Tier0Sync"/>
-                    <Action type="SendEvent" frame="$this" event="Tier1Sync"/>
-                    <Action type="SendEvent" frame="$this" event="Tier1EpicTransition"/>
+                    <When type="Property" Visible="True"/>
+                    <Action type="SendEvent" event="Tier0Sync"/>
+                    <Action type="SendEvent" event="Tier1Sync"/>
+                    <Action type="SendEvent" event="Tier1EpicTransition"/>
                 </State>
                 
                 <State name="Tier2">
                     <When type="AnimationState" SkipStatusFlags="Tier2"/>
-                    <When type="StateGroup" frame="$this" ReadyForSync="Ready"/>
-                    <Action type="SendEvent" frame="$this" event="Tier0Sync"/>
-                    <Action type="SendEvent" frame="$this" event="Tier2Sync"/>
-                    <Action type="SendEvent" frame="$this" event="Tier2LegendaryTransition"/>
+                    <When type="Property" Visible="True"/>
+                    <Action type="SendEvent" event="Tier0Sync"/>
+                    <Action type="SendEvent" event="Tier2Sync"/>
+                    <Action type="SendEvent" event="Tier2LegendaryTransition"/>
                 </State>
             </StateGroup>
         </Frame>
@@ -1187,73 +1142,12 @@
     
     <Frame type="EndOfGameAwardsPanel" name="EndOfGameAwardsPanelTemplate">
         <UseAlternateTime val="true"/>
-        
         <RenderType val="HDR"/>
         
         <Frame type="Image" name="BackgroundImage">
             <Anchor relative="$parent"/>
-            
             <RenderPriority val="200"/>
             <Texture val="@UI/eom_bg"/>
-            
-            <StateGroup name="bgimage">
-                <DefaultState val="generic"/>
-                <State name="generic">
-                    <Action type="SetProperty" texture="@UI/eom_bg"/>
-                </State>
-                <State name="boe">
-                    <When type="AnimationState" Map="boe"/>
-                    <Action type="SetProperty" texture="@UI/eom_bg_boe"/>
-                </State>
-                <State name="bhb">
-                    <When type="AnimationState" Map="bhb"/>
-                    <Action type="SetProperty" texture="@UI/eom_bg_bhb"/>
-                </State>
-                <State name="bh">
-                    <When type="AnimationState" Map="bh"/>
-                    <Action type="SetProperty" texture="@UI/eom_bg_bh"/>
-                </State>
-                <State name="ch">
-                    <When type="AnimationState" Map="ch"/>
-                    <Action type="SetProperty" texture="@UI/eom_bg_ch"/>
-                </State>
-                <State name="ds">
-                    <When type="AnimationState" Map="ds"/>
-                    <Action type="SetProperty" texture="@UI/eom_bg_ds"/>
-                </State>
-                <State name="got">
-                    <When type="AnimationState" Map="got"/>
-                    <Action type="SetProperty" texture="@UI/eom_bg_got"/>
-                </State>
-                <State name="hm">
-                    <When type="AnimationState" Map="hm"/>
-                    <Action type="SetProperty" texture="@UI/eom_bg_hm"/>
-                </State>
-                <State name="is">
-                    <When type="AnimationState" Map="is"/>
-                    <Action type="SetProperty" texture="@UI/eom_bg_is"/>
-                </State>
-                <State name="lc">
-                    <When type="AnimationState" Map="lc"/>
-                    <Action type="SetProperty" texture="@UI/eom_bg_lc"/>
-                </State>
-                <State name="st">
-                    <When type="AnimationState" Map="st"/>
-                    <Action type="SetProperty" texture="@UI/eom_bg_st"/>
-                </State>
-                <State name="totsq">
-                    <When type="AnimationState" Map="totsq"/>
-                    <Action type="SetProperty" texture="@UI/eom_bg_totsq"/>
-                </State>
-                <State name="tod">
-                    <When type="AnimationState" Map="tod"/>
-                    <Action type="SetProperty" texture="@UI/eom_bg_tod"/>
-                </State>
-                <State name="wj">
-                    <When type="AnimationState" Map="wj"/>
-                    <Action type="SetProperty" texture="@UI/eom_bg_wj"/>
-                </State>
-            </StateGroup>
         </Frame>
         
         <Frame type="Image" name="GridBackgroundImage">
@@ -1438,29 +1332,16 @@
                 <AutoPlay val="True"/>
                 <UseAlternateTime val="true"/>
                 
-                <!-- Work around for a weird bug- 
-                    mvp semaphorthing seemed to affect other cutscene race condition/events -->
-                <StateGroup name="MVPLock">
-                    <DefaultState val="Lock"/>
-                    <State name="Lock">
-                        <Action type="SendEvent" frame="$this" event="DummyEvent"/>
-                    </State>
-                    <State name="Unlock">
-                        <Action type="SendEvent" frame="$this" event="DummyEvent"/>
-                    </State>
-                </StateGroup>
-                
                 <StateGroup name="MVPCutsceneTeamColor">
                     <State name="Blue">
                         <When type="AnimationState" TeamColor="Blue"/>
-                        <When type="StateGroup" frame="$this" MVPLock="Unlock"/>
-                        <Action type="SendEvent" frame="$this" event="BlueTeamEffectFilter"/>
+                        <When type="Property" frame="$parent/$parent/SecondaryAwardCutscenes" Visible="true"/>
+                        <Action type="SendEvent" event="BlueTeamEffectFilter"/>
                     </State>
-                    
                     <State name="Red">
                         <When type="AnimationState" TeamColor="Red"/>
-                        <When type="StateGroup" frame="$this" MVPLock="Unlock"/>
-                        <Action type="SendEvent" frame="$this" event="RedTeamEffectFilter"/>
+                        <When type="Property" frame="$parent/$parent/SecondaryAwardCutscenes" Visible="true"/>
+                        <Action type="SendEvent" event="RedTeamEffectFilter"/>
                     </State>
                 </StateGroup>
                 
@@ -1534,10 +1415,6 @@
                     <Key type="Curve" time="0" value="920" in="Fast"/>
                     <Key type="Curve" time="0.25" value="0" in="Fast"/>
                 </Controller>
-                
-                <Controller type="State" frame="HeroCutscene" stateGroup="MVPLock" end="Pause">
-                    <Key type="Identifier" time="0.3" value="Unlock"/>
-                </Controller>
             </Animation>
         </Frame>
         
@@ -1558,7 +1435,6 @@
                 <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
                 <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
                 <Height val="105"/>
-                
                 <SubpixelRendering val="True"/>
                 <Style val="MVP_Heading"/>
                 <Text val="@UI/EndOfGameAwards/MVP"/>
@@ -1570,13 +1446,11 @@
                 <Width val="512"/>
                 <Height val="10"/>
                 <BlendMode val="Add"/>
-                
                 <Texture val="@UI/eom_separator_blue"/>
             </Frame>
             
             <Frame type="Image" name="SeparatorImage_Red">
                 <Anchor relative="$parent/SeparatorImage_Blue"/>
-                
                 <Visible val="false"/>
                 <Texture val="@UI/eom_separator_red"/>
             </Frame>
@@ -1585,7 +1459,6 @@
                 <Anchor side="Top" relative="$parent/SeparatorImage_Blue" pos="Max" offset="-20"/>
                 <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
                 <Height val="135"/>
-                
                 <SubpixelRendering val="True"/>
                 <Style val="MVP_PlayerNameHeading"/>
                 <Text val=""/>
@@ -1595,7 +1468,6 @@
                 <Anchor side="Top" relative="$parent/MVPPlayerName" pos="Max" offset="-27"/>
                 <Anchor side="Left" relative="$parent" pos="Min" offset="-50"/>
                 <Height val="70"/>
-                
                 <SubpixelRendering val="True"/>
                 <Style val="MVP_HeroNameHeading"/>
                 <Text val=""/>
@@ -1686,10 +1558,6 @@
                 <Anchor side="Top" relative="$parent/MVPStat1Anchor" pos="Mid" offset="0"/>
                 <Anchor side="Bottom" relative="$parent/MVPStat1Anchor" pos="Mid" offset="0"/>
                 <Anchor side="Right" relative="$parent/MVPStat1Anchor" pos="Min" offset="0"/>
-                <!-- <BaseWidth val="800"/>
-                <BaseHeight val="400"/>
-
-                <ScaleText val="True"/> -->
                 <SubpixelRendering val="True"/>
                 <Style val="MVP_StatValue"/>
                 <Text val=""/>
@@ -1705,7 +1573,6 @@
             <Frame type="Label" name="MVPStat1Label">
                 <Anchor side="Left" relative="$parent/MVPStat1Anchor" pos="Min" offset="0"/>
                 <Anchor side="Bottom" relative="$parent/MVPStat1Anchor" pos="Max" offset="8"/>
-                
                 <SubpixelRendering val="True"/>
                 <Style val="MVP_StatHeading_Left"/>
                 <Text val=""/>
@@ -1714,11 +1581,7 @@
             <Frame type="Label" name="MVPStat2ValueLabel">
                 <Anchor side="Top" relative="$parent/MVPStat2Anchor" pos="Mid" offset="0"/>
                 <Anchor side="Bottom" relative="$parent/MVPStat2Anchor" pos="Mid" offset="0"/>
-                <Anchor side="Right" relative="$parent/MVPStat2Anchor" pos="Min" offset="-10"/>
-                <!-- <BaseWidth val="100"/>
-                <BaseHeight val="100"/>
-
-                <ScaleText val="True"/>  -->               
+                <Anchor side="Right" relative="$parent/MVPStat2Anchor" pos="Min" offset="-10"/>     
                 <SubpixelRendering val="True"/>
                 <Style val="MVP_StatValue"/>
                 <Text val=""/>
@@ -1743,11 +1606,7 @@
             <Frame type="Label" name="MVPStat3ValueLabel">
                 <Anchor side="Top" relative="$parent/MVPStat3Anchor" pos="Mid" offset="0"/>
                 <Anchor side="Bottom" relative="$parent/MVPStat3Anchor" pos="Mid" offset="0"/>
-                <Anchor side="Right" relative="$parent/MVPStat3Anchor" pos="Min" offset="-10"/>
-                <!-- <BaseWidth val="100"/>
-                <BaseHeight val="100"/>
-
-                <ScaleText val="True"/> -->                
+                <Anchor side="Right" relative="$parent/MVPStat3Anchor" pos="Min" offset="-10"/>           
                 <SubpixelRendering val="True"/>
                 <Style val="MVP_StatValue"/>
                 <Text val=""/>
@@ -1859,7 +1718,6 @@
                     <Key type="Curve" time="9.5" value="0"/>
                 </Controller>
                 
-                
                 <!-- Section: stat visibility timing -->
                 <!-- horizonatal stats: -->
                 <Controller type="Fade" end="Pause" frame="DeathsLabel">
@@ -1953,16 +1811,6 @@
                 </Controller>
                 
                 <!-- VERTICAL STAT 1 -->
-                <!-- <Controller type="Dimension" dimension="Height" relative="False" percentage="True" end="Stop" frame="MVPStat1ValueLabel">
-                    <Key type="Curve" time="0.0" value="800"/>
-                    <Key type="Curve" time="0.8" value="800"/>
-                    <Key type="Curve" time="1.0" value="100" in="Auto"/>
-                </Controller>
-                <Controller type="Dimension" dimension="Width" relative="False" percentage="True" end="Stop" frame="MVPStat1ValueLabel">
-                    <Key type="Curve" time="0.0" value="800"/>
-                    <Key type="Curve" time="0.8" value="800"/>
-                    <Key type="Curve" time="1.0" value="100" in="Auto"/>
-                </Controller> -->
                 <Controller type="Anchor" end="Pause" side="Right" relative="true" frame="MVPStat1ValueLabel">
                    <Key type="Curve" time="0" value="600"/>
                    <Key type="Curve" time="1.2" value="600"/>
@@ -2007,16 +1855,6 @@
                 </Controller>
 
                 <!-- VERTICAL STAT 2 -->
-                <!-- <Controller type="Dimension" dimension="Height" relative="False" percentage="True" end="Stop" frame="MVPStat2ValueLabel">
-                    <Key type="Curve" time="0.0" value="800"/>
-                    <Key type="Curve" time="0.9" value="800"/>
-                    <Key type="Curve" time="1.1" value="100" in="Auto"/>
-                </Controller>
-                <Controller type="Dimension" dimension="Width" relative="False" percentage="True" end="Stop" frame="MVPStat2ValueLabel">
-                    <Key type="Curve" time="0.0" value="800"/>
-                    <Key type="Curve" time="0.9" value="800"/>
-                    <Key type="Curve" time="1.1" value="100" in="Auto"/>
-                </Controller> -->
                 <Controller type="Anchor" end="Pause" side="Right" relative="true" frame="MVPStat2ValueLabel">
                    <Key type="Curve" time="0" value="600"/>
                    <Key type="Curve" time="1.2" value="-600"/>
@@ -2061,16 +1899,6 @@
                 </Controller>
 
                 <!-- VERTICAL STAT 3 -->
-                <!-- <Controller type="Dimension" dimension="Height" relative="False" percentage="True" end="Stop" frame="MVPStat3ValueLabel">
-                    <Key type="Curve" time="0.0" value="800"/>
-                    <Key type="Curve" time="0.9" value="800"/>
-                    <Key type="Curve" time="1.1" value="100" in="Auto"/>
-                </Controller>
-                <Controller type="Dimension" dimension="Width" relative="False" percentage="True" end="Stop" frame="MVPStat3ValueLabel">
-                    <Key type="Curve" time="0.0" value="800"/>
-                    <Key type="Curve" time="0.9" value="800"/>
-                    <Key type="Curve" time="1.1" value="100" in="Auto"/>
-                </Controller> -->
                 <Controller type="Anchor" end="Pause" side="Right" relative="true" frame="MVPStat3ValueLabel">
                    <Key type="Curve" time="0" value="600"/>
                    <Key type="Curve" time="1.2" value="-600"/>
@@ -2336,19 +2164,7 @@
                 <Frame type="HeroCutsceneFrame" name="HeroCutscene">
                     <Visible val="{$parent/$parent/$parent/SecondaryAwardStats/AwardWinnerContainer3/@Visible}"/>
 					<Height val="1350"/>
-                    
-                    <Animation name="SlotReveal">
-                        <Event event="Tier0Filter" frame="$this" action="Reset,Play"/>
-                        
-                        <Controller type="Cutscene" end="Stop">
-                            <Key type="Cutscene" time="0.0" action="ClearFilters"/>
-                            <Key type="Cutscene" time="0.0" action="AddFilter" filter="Slot4"/>
-                        </Controller>
-                        
-                        <Controller type="State" stateGroup="SemaphorThing" end="Pause">
-                            <Key type="Identifier" time="0" value="Unlock"/>
-                        </Controller>
-                    </Animation>
+                    <HeroCutsceneFilter val="Slot4"/>
                     
                     <!-- Animations for triggering events when skip votes need to be synced up -->
                     <Animation name="SlotSync">
@@ -2390,21 +2206,8 @@
                 <Frame type="HeroCutsceneFrame" name="HeroCutscene">
                     <Anchor side="Left" relative="$parent" pos="Mid" offset="-794"/>
                     <Anchor side="Right" relative="$parent" pos="Mid" offset="855"/>
-                
                     <Visible val="{$parent/$parent/$parent/SecondaryAwardStats/AwardWinnerContainer1/@Visible}"/>
-                    
-                    <Animation name="SlotReveal">
-                        <Event event="Tier0Filter" frame="$this" action="Reset,Play"/>
-                        
-                        <Controller type="Cutscene" end="Stop">
-                            <Key type="Cutscene" time="0.0" action="ClearFilters"/>
-                            <Key type="Cutscene" time="0.0" action="AddFilter" filter="Slot2"/>
-                        </Controller>
-                        
-                        <Controller type="State" stateGroup="SemaphorThing" end="Pause">
-                            <Key type="Identifier" time="0" value="Unlock"/>
-                        </Controller>
-                    </Animation>
+                    <HeroCutsceneFilter val="Slot2"/>
                     
                     <!-- Animations for triggering events when skip votes need to be synced up -->
                     <Animation name="SlotSync">
@@ -2446,19 +2249,7 @@
                 <Frame type="HeroCutsceneFrame" name="HeroCutscene">
                     <Visible val="{$parent/$parent/$parent/SecondaryAwardStats/AwardWinnerContainer4/@Visible}"/>
 					<Height val="1350"/>
-                    
-                    <Animation name="SlotReveal">
-                        <Event event="Tier0Filter" frame="$this" action="Reset,Play"/>
-                        
-                        <Controller type="Cutscene" end="Stop">
-                            <Key type="Cutscene" time="0.0" action="ClearFilters"/>
-                            <Key type="Cutscene" time="0.0" action="AddFilter" filter="Slot3"/>
-                        </Controller>
-                        
-                        <Controller type="State" stateGroup="SemaphorThing" end="Pause">
-                            <Key type="Identifier" time="0" value="Unlock"/>
-                        </Controller>
-                    </Animation>
+                    <HeroCutsceneFilter val="Slot3"/>
                     
                     <!-- Animations for triggering events when skip votes need to be synced up -->
                     <Animation name="SlotSync">
@@ -2500,21 +2291,8 @@
                 <Frame type="HeroCutsceneFrame" name="HeroCutscene">
                     <Anchor side="Left" relative="$parent" pos="Mid" offset="794"/>
                     <Anchor side="Right" relative="$parent" pos="Mid" offset="-855"/>
-                    
                     <Visible val="{$parent/$parent/$parent/SecondaryAwardStats/AwardWinnerContainer2/@Visible}"/>
-                    
-                    <Animation name="SlotReveal">
-                        <Event event="Tier0Filter" frame="$this" action="Reset,Play"/>
-                        
-                        <Controller type="Cutscene" end="Stop">
-                            <Key type="Cutscene" time="0.0" action="ClearFilters"/>
-                            <Key type="Cutscene" time="0.0" action="AddFilter" filter="Slot1"/>
-                        </Controller>
-                        
-                        <Controller type="State" stateGroup="SemaphorThing" end="Pause">
-                            <Key type="Identifier" time="0" value="Unlock"/>
-                        </Controller>
-                    </Animation>
+                    <HeroCutsceneFilter val="Slot1"/>
                     
                     <!-- Animations for triggering events when skip votes need to be synced up -->
                     <Animation name="SlotSync">
@@ -2577,7 +2355,7 @@
         </Frame>
             
 		<Animation name="CutsceneFXTransition">
-			<Event event="FXTransition" action="Reset,Play"/>
+			<Event event="OnShown" action="Reset,Play"/>
 			
 			<Controller type="Cutscene" end="Stop" frame="SmokeVignetteCutscene">
 				<Key type="Cutscene" time="0" action="Bookmark" bookmark="Line Up Start"/>
@@ -2683,7 +2461,6 @@
 
                     <MinValue val="0"/>
                     <MaxValue val="1.0"/>
-                    <!--Value val="{$parent/CountdownLabel/@Ratio}"/-->
                     <Circular val="True"/>
                     <CircularStart val="360"/>
                     <CircularEndOffset val="-360"/>
@@ -2766,20 +2543,6 @@
             <Controller type="Visibility" end="Pause" frame="BackgroundImage">
                 <Key type="Bool" time="0" value="False"/>
                 <Key type="Bool" time="0" value="True"/>
-            </Controller>
-        </Animation>
-        
-        <!-- trigger all transition related animations off of one trigger event-->
-        <Animation name="WaitForTransitionSound">
-            <Event event="WaitForSound" frame="$this" action="Play"/>
-            
-            <Controller type="Event" end="Stop" frame="MVPCutsceneFrame/HeroCutscene">
-                <Key type="Event" time="0.405" event="Tier0Bookmark"/>
-            </Controller>
-            
-            <Controller type="Event" end="Stop" frame="$this">
-                <Key type="Event" time="0.405" event="FXTransition"/>
-                <Key type="Event" time="0.405" event="BGZoom"/>
             </Controller>
         </Animation>
         

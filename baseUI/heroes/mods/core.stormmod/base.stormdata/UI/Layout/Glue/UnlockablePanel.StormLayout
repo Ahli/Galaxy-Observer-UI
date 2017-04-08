@@ -4,7 +4,11 @@
 
     <Constant name="UnlockableTileItemSpacing" val="17"/>
 
-    <!-- Portrait selector template -->
+    <!--===============================================================================================
+    <! Templates
+    <!==============================================================================================-->
+
+    <!-- Portrait Selection Tile List Item template -->
     <Frame type="UnlockableTileListItem" name="UnlockablePortraitFrameTemplate">
         <Height val="170"/>
         <Width val="170"/>
@@ -18,57 +22,59 @@
             <UnlockableIndex val="{$parent/UnlockableFrame/@UnlockableIndex}"/>
         </Frame>
 
-        <StateGroup name="ClickableStateGroup">
-            <State name="CanClickState">
-                <When type="Property" frame="RewardCacheFrame" Allowed="true"/>
-                <Action type="SetProperty" AllowedButtons="Left"/>
-            </State>
-            <State name="CanNotClickState">
-                <When type="Property" frame="RewardCacheFrame" Allowed="false"/>
-                <Action type="SetProperty" AllowedButtons=""/>
-            </State>
-        </StateGroup>
-
         <Frame type="GameContentFrame" name="GameContentFrame">
             <Anchor relative="$parent"/>
             <GameContent val="{$parent/RewardCacheFrame/@PrerequisiteContent}"/>
         </Frame>
 
         <Frame type="Image" name="EmptyImage">
-            <Anchor relative="$parent/NormalImage" offset="-4"/>
+            <Anchor relative="$parent/NormalImage"/>
             <Texture val="@UI/Storm_UI_Store_PortraitFrame_Off"/>
-            <RenderPriority val="509"/>
             <Unclipped val="True"/>
             <Alpha val="100"/>
         </Frame>
 
         <Frame type="Image" name="NormalImage">
-            <Anchor relative="$parent" offset="18"/>
+            <Anchor side="Top" relative="$parent" pos="Min" offset="-15"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="-15"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="17"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="17"/>
             <Unclipped val="True"/>
             <Texture val="@UI/Storm_UI_Store_PortraitFrame_Off"/>
             <TextureType val="NineSlice"/>
         </Frame>
 
         <Frame type="Image" name="HoverImage">
-            <Anchor relative="$parent/NormalImage" offset="0"/>
+            <Anchor relative="$parent/NormalImage"/>
+            <Unclipped val="True"/>
             <Texture val="@UI/Storm_UI_Store_PortraitFrame_Off"/>
             <TextureType val="NineSlice"/>
         </Frame>
 
-        <Frame type="Image" name="HoverFrameImage">
-            <Anchor relative="$parent/NormalImage" offset="0"/>
+        <Frame type="Image" name="SelectedImage">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="-15"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="-15"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="15"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="15"/>
             <Unclipped val="True"/>
-            <Texture val="@UI/Storm_UI_Store_PortraitFrame_Off"/>
+            <ColorAdjustMode val="Colorize"/>
+            <AdjustmentColor val="006cff"/>
             <TextureType val="NineSlice"/>
+            <Texture val="@UI/Storm_UI_Store_SmallFrameGlow"/>
+        </Frame>
+
+        <Frame type="Image" name="HoverFrameImage">
+            <Anchor relative="$parent/NormalImage"/>
+            <Unclipped val="True"/>
             <BlendMode val="Add"/>
             <Alpha val="0"/>
-            <RenderPriority val="600"/>
+            <TextureType val="NineSlice"/>
+            <Texture val="@UI/Storm_UI_Store_PortraitFrame_Off"/>
 
             <Animation name="Hover">
-                <Event event="OnMouseEnter" action="DirectionForward" frame="$parent"/>
-                <Event event="OnMouseEnter" action="Play" frame="$parent"/>
-                <Event event="OnMouseExit" action="DirectionReverse" frame="$parent"/>
-                <Event event="OnMouseExit" action="Play" frame="$parent"/>
+                <Event event="MouseOver" frame="$parent" action="DirectionForward, Play"/>
+                <Event event="MouseOut" frame="$parent" action="DirectionReverse, Play"/>
+
                 <Controller type="Fade" end="Pause">
                     <Key type="Curve" time="0" value="0" out="Fast"/>
                     <Key type="Curve" time=".2" value="255" in="Slow"/>
@@ -85,8 +91,52 @@
             </StateGroup>
         </Frame>
 
+        <Frame type="Image" name="OwnedBorderImage">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="-15"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="-15"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="15"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="15"/>
+            <ColorAdjustMode val="Colorize"/>
+            <DarkAdjustColor val="290cff"/>
+            <LightAdjustColor val="47c2ff"/>
+            <TextureType val="Nineslice"/>
+            <Visible val="false"/>
+            <Alpha val="155"/>
+            <Texture val="@UI/Storm_UI_Store_SmallFrameGlow"/>
+
+            <Animation name="HoverAnim">
+                <Event event="OnShown" frame="$parent/HoverImage" action="DirectionForward, Play"/>
+                <Event event="OnHidden" frame="$parent/HoverImage" action="DirectionReverse, Play"/>
+
+                <Controller type="Fade" end="Pause">
+                    <Key type="Curve" time="0" value="155"/>
+                    <Key type="Curve" time=".1" value="255"/>
+                </Controller>
+            </Animation>
+
+            <StateGroup name="VisibilityStates">
+                <State name="Selected">
+                    <When type="Property" frame="$parent/SelectedImage" Visible="true"/>
+                    <Action type="SetProperty" Visible="false"/>
+                </State>
+                <State name="Owned">
+                    <When type="Property" frame="$parent/OwnedCheckImage" Visible="true"/>
+                    <Action type="SetProperty" Visible="true"/>
+                </State>
+            </StateGroup>
+        </Frame>
+
         <Frame type="UnlockableFrame" name="UnlockableFrame" template="StandardTemplates/UnlockableFrameTemplate">
             <Anchor relative="$parent"/>
+
+            <Frame type="Image" name="Background">
+                <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+                <Width val="155"/>
+                <Height val="155"/>
+            </Frame>
         </Frame>
 
         <Frame type="BuyButton" name="BuyButton" template="StoreTemplates/QuickBuyButtonTemplate">
@@ -97,6 +147,31 @@
             <GameContent val="{$parent/GameContentFrame/@GameContent}"/>
             <Currency val="{$parent/GameContentFrame/@Currency[0]}"/>
             <AlwaysShow val="false"/>
+
+            <Animation name="ShowButton">
+                <Event event="MouseOver" frame="$parent" action="DirectionForward, Play"/>
+                <Event event="MouseOut" frame="$parent" action="DirectionReverse, Play"/>
+
+                <Controller type="Anchor" side="Bottom" end="Pause">
+                    <Key type="Curve" time="0" value="40" out="Fast"/>
+                    <Key type="Curve" time=".15" value="0" out="Fast"/>
+                </Controller>
+                <Controller type="Fade" end="Pause">
+                    <Key type="Curve" time="0" value="0"/>
+                    <Key type="Curve" time=".05" value="0"/>
+                    <Key type="Curve" time=".15" value="255"/>
+                </Controller>
+            </Animation>
+
+            <Frame type="Image" name="ShineImage">
+                <Animation name="ShineAnim">
+                    <Controller type="LayerUV" side="Left" sidelock="True" end="Loop" layer="0">
+                        <Key type="Curve" time="0" value="1"/>
+                        <Key type="Curve" time=".35" value="-1"/>
+                        <Key type="Curve" time="15" value="-1"/>
+                    </Controller>
+                </Animation>
+            </Frame>
 
             <Animation name="HideButton">
                 <Event event="Hide" action="Reset,Play" frame="$parent"/>
@@ -113,10 +188,10 @@
         </Frame>
 
         <Frame type="Frame" name="UnseenItemFrame">
-            <Anchor side="Top" relative="$parent" pos="Min" offset="-21"/>
-            <Anchor side="Left" relative="$parent" pos="Min" offset="-21"/>
-            <Anchor side="Right" relative="$parent" pos="Max" offset="21"/>
-            <Anchor side="Bottom" relative="$parent" pos="Max" offset="23"/>
+            <Anchor side="Top" relative="$parent" pos="Min" offset="-19"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="-19"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="19"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="19"/>
             <Unclipped val="True"/>
             <Visible val="False"/>
 
@@ -288,10 +363,10 @@
             </Frame>
 
             <Frame type="Image" name="BorderGlow">
-                <Anchor side="Top" relative="$parent/$parent/NormalImage" pos="Min" offset="0"/>
-                <Anchor side="Left" relative="$parent/$parent/NormalImage" pos="Min" offset="0"/>
-                <Anchor side="Right" relative="$parent/$parent/NormalImage" pos="Max" offset="0"/>
-                <Anchor side="Bottom" relative="$parent/$parent/NormalImage" pos="Max" offset="0"/>
+                <Anchor side="Top" relative="$parent/$parent/SelectedImage" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/$parent/SelectedImage" pos="Min" offset="0"/>
+                <Anchor side="Right" relative="$parent/$parent/SelectedImage" pos="Max" offset="0"/>
+                <Anchor side="Bottom" relative="$parent/$parent/SelectedImage" pos="Max" offset="0"/>
                 <TextureType val="Nineslice"/>
                 <BlendMode val="Add"/>
                 <ColorAdjustMode val="Colorize"/>
@@ -333,8 +408,8 @@
         </Frame>
 
         <Frame type="Image" name="OwnedCheckImage">
-            <Anchor side="Top" relative="$parent/UnlockableFrame" pos="Min" offset="-4"/>
-            <Anchor side="Right" relative="$parent/UnlockableFrame" pos="Max" offset="9"/>
+            <Anchor side="Top" relative="$parent/UnlockableFrame" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent/UnlockableFrame" pos="Max" offset="6"/>
             <Texture val="@UI/Storm_UI_Store_OwnedCheck"/>
             <Visible val="false"/>
 
@@ -371,17 +446,32 @@
             </StateGroup>
         </Frame>
 
-        <Frame type="Image" name="SelectedImage">
-            <Anchor relative="$parent/NormalImage" offset="0"/>
-            <Unclipped val="True"/>
-            <Texture val="@UI/Storm_UI_Store_SmallFrameGlow"/>
-            <TextureType val="NineSlice"/>
-            <ColorAdjustMode val="Colorize"/>
-            <AdjustmentColor val="006cff"/>
-            <Tiled val="false"/>
-        </Frame>
+        <StateGroup name="ClickableStateGroup">
+            <State name="CanClickState">
+                <When type="Property" frame="RewardCacheFrame" Allowed="true"/>
+                <Action type="SetProperty" AllowedButtons="Left"/>
+            </State>
+            <State name="CanNotClickState">
+                <When type="Property" frame="RewardCacheFrame" Allowed="false"/>
+                <Action type="SetProperty" AllowedButtons=""/>
+            </State>
+        </StateGroup>
+
+        <StateGroup name="TileListHoveredStates">
+            <State name="Hovered">
+                <When type="Property" hovered="True"/>
+                <Action type="SendEvent" event="MouseOver"/>
+            </State>
+            <State name="NotHovered">
+                <When type="Property" hovered="False"/>
+                <Action type="SendEvent" event="MouseOut"/>
+            </State>
+        </StateGroup>
     </Frame>
 
+    <!--===============================================================================================
+    <! Main Frame
+    <!==============================================================================================-->
     <Frame type="UnlockablePanel" name="UnlockablePanelTemplate">
         <OwnershipFilter val="{OwnershipFilterPulldown/@SelectedFilter}"/>
         <FilterString val="{SearchEditBox/@Text}"/>
@@ -397,7 +487,7 @@
             <Anchor side="Right" relative="$parent/SearchEditBox" pos="Min" offset="-5"/>
             <Anchor side="Bottom" relative="$parent/SearchEditBox" pos="Max" offset="0"/>
             <Width val="256"/>
-            <ShowContentType val="false"/>
+            <GameContentType val="PortraitPack"/>
          </Frame>
 
         <Animation name="Show">
