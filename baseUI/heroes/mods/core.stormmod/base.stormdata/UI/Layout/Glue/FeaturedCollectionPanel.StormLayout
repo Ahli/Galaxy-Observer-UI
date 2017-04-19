@@ -2,6 +2,132 @@
 <Desc>
     <DescFlags val="Locked"/>
 
+    <Frame type="StoreTileListItem" name="FeaturedStoreTileListItemTemplate" template="StoreTemplates/StoreTileListItemTemplate">
+        <Frame type="Frame" name="BundleIconContainer">
+            <Height val="57"/>
+
+            <Frame type="Image" name="BundleIconImage">
+                <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+            </Frame>
+            <Frame type="Frame" name="CountAnchor">
+                <Anchor side="Top" relative="$parent/BundleIconImage" pos="Max" offset="-20"/>
+                <Anchor side="Left" relative="$parent/BundleIconImage" pos="Mid" offset="2"/>
+            </Frame>
+            <Frame type="Label" name="BundleCountLabel">
+                <Anchor side="Top" relative="$parent/CountAnchor" pos="Mid" offset="0"/>
+                <Anchor side="Bottom" relative="$parent/CountAnchor" pos="Mid" offset="0"/>
+            </Frame>
+        </Frame>
+
+        <Frame type="Frame" name="MegabundleBorder" template="StoreTemplates/StoreTileListItemTemplate/UnseenItemFrame">
+            <Anchor relative="$parent" offset="19"/>
+            <Visible val="false"/>
+            <RenderPriority val="400"/>
+            <Unclipped val="True"/>
+
+            <Frame type="Image" name="BorderGlow">
+                <ColorAdjustMode val="None"/>
+                <BlendMode val="Normal"/>
+                <Texture val="@UI/Storm_UI_Store_SmallFrame_Gold"/>
+            </Frame>
+
+            <Frame type="Image" name="ShardFX1">
+                <LightAdjustColor val="ff532b"/>
+                <DarkAdjustColor val="55006e"/>
+            </Frame>
+
+            <Frame type="Image" name="ShardFX2">
+                <LightAdjustColor val="ff532b"/>
+                <DarkAdjustColor val="55006e"/>
+            </Frame>
+
+            <Frame type="Image" name="ClockwiseGlow">
+                <LightAdjustColor val="ff532b"/>
+                <DarkAdjustColor val="55006e"/>
+            </Frame>
+
+            <Frame type="Image" name="WiddershinsGlow">
+                <LightAdjustColor val="ff532b"/>
+                <DarkAdjustColor val="55006e"/>
+            </Frame>
+
+            <Frame type="TextFormatFrame" name="TextFormatFrame">
+                <Anchor relative="$parent"/>
+                <FormatText val="@UI/Store/ExclusiveMegabundleTooltip"/>
+                <Replacement val="{$parent/$parent/GameContentFrame/@ProductSet[Name]}" index="0"/>
+            </Frame>
+
+            <Animation name="GlowFade">
+                <Event event="OnMouseEnter" frame="$parent" action="Stop"/>
+            </Animation>
+
+            <StateGroup name="Megabundle">
+                <State name="IsMega">
+                    <When type="Property" frame="$parent/GameContentFrame" ProductSetMutuallyExclusive="true"/>
+                    <Action type="SetProperty" frame="$parent/BundleIconContainer/BundleIconImage" Texture="@UI/Storm_UI_Storm_MegaBundle"/>
+                    <Action type="SetProperty" frame="$parent/BundleIconContainer/BundleCountLabel" Style="StoreMegabundleCountSmallLabel"/>
+                    <Action type="SetProperty" frame="$parent" Tooltip="{MegabundleBorder/TextFormatFrame/@Text}"/>
+                    <Action type="SetProperty" frame="$parent/HitTestFrame" TooltipAnchorPosition="TopCenter"/>
+                    <Action type="SetAnchor" frame="$parent/HitTestFrame" side="Top" relative="$parent" pos="Min" offset="-10"/>
+                    <Action type="SetProperty" frame="$this" Visible="true"/>
+                </State>
+            </StateGroup>
+
+            <StateGroup name="MegabundleLTO">
+                <State name="IsLTO">
+                    <When type="Property" frame="$parent/GameContentFrame" ProductSetMutuallyExclusive="true"/>
+                    <When type="Property" frame="$parent/LTOBadgeImage" Visible="true"/>
+
+                    <Action type="SetProperty" frame="$parent/NewBadgeImage" Visible="False"/>
+                    <Action type="SetProperty" frame="$parent/LTOBadgeImage/LTOTitleLabel" style="StoreDiscountValue"/>
+                    <Action type="SetProperty" frame="$parent/LTOBadgeImage/LTOTitleLabel" text="{$parent/$parent/DiscountIndicatorImage/DiscountTextFormatFrame/@Text}"/>
+                    <Action type="SetAnchor" frame="$parent/LTOBadgeImage/LTOTitleLabel" side="Top" relative="$parent" pos="Min" offset="5"/>
+                    <Action type="SetAnchor" frame="$parent/LTOBadgeImage/LTODateLabel" side="Top" relative="$parent/LTOTitleLabel" pos="Max" offset="-5"/>
+                    <Action type="SetProperty" frame="$parent/LTOBadgeImage/LTODateLabel" style="StoreDiscountValuDescription"/>
+                </State>
+            </StateGroup>
+
+            <StateGroup name="ProductSetExclusion">
+                <State name="Excluded">
+                    <When type="Property" frame="$parent/GameContentFrame" ProductSetMutuallyExclusive="true"/>
+                    <When type="Property" frame="$parent" Hovered="false"/>
+                    <When type="Property" frame="$parent/$parent" HoveredProductSet="{$parent/GameContentFrame/@ProductSet}"/>
+                    <Action type="SendEvent" frame="$parent" event="Exclude"/>
+                    <Action type="SendEvent" frame="$parent" event="Include" on="exit"/>
+                </State>
+            </StateGroup>
+
+            <StateGroup name="UnseenStates">
+                <State name="Unseen">
+                    <Action type="SetProperty" Visible="false"/>
+                </State>
+            </StateGroup>
+
+            <Animation name="MutualExclusion">
+                <Event event="Exclude" action="DirectionForward,Play" frame="$parent"/>
+                <Event event="Include" action="DirectionReverse,Play" frame="$parent"/>
+                <Controller type="Fade" frame="$parent" end="Pause">
+                    <Key type="Curve" time="0" value="255"/>
+                    <Key type="Curve" time=".25" value="52"/>
+                </Controller>
+            </Animation>
+        </Frame>
+    </Frame>
+
+    <Frame type="StoreTileListItem" name="FeaturedStoreBigTileListItemTemplate" template="StoreTemplates/StoreBigTileListItemTemplate">
+        <Frame type="Frame" name="BundleIconContainer">
+            <Frame type="Image" name="BundleIconImage">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+                <ScaleWidthToTexture val="true"/>
+            </Frame>
+        </Frame>
+        
+        <Frame type="Frame" name="MegabundleBorder" template="FeaturedCollectionPanel/FeaturedStoreTileListItemTemplate/MegabundleBorder">
+            <Anchor relative="$parent" offset="19"/>
+        </Frame>
+    </Frame>
+    
     <!--===============================================================================================
     <! Main Frame
     <!==============================================================================================-->
@@ -48,11 +174,10 @@
         <Frame type="GameContentTileList" name="BigTileList" template="CollectionTemplates/BigTileListTemplate">
             <Anchor side="Left" relative="$parent" pos="Mid" offset="#CollectionTileListLeftMidOffset"/>
             <Handle val="ScreenCollection_Featured_BigTileList"/>
-            <DebugInclude val="debugStoreFeaturedProduct"/>
+            <DebugInclude index="0" val="debugStoreFeaturedProduct"/>
+            <DebugInclude index="1" val="debugStoreLTOProduct"/>
             <UpdateWhenLicensesChange val="true"/>
             <Visible val="true"/>
-
-            <FilterFlag_Owned val="false"/>
 
             <GameContentType index="0" val="Hero"/>
             <GameContentType index="1" val="Skin"/>
@@ -71,21 +196,21 @@
 
             <ProductAttribute val="shop-featured-large"/>
 
-            <Frame type="StoreTileListItem" name="Item0" template="StoreTemplates/StoreBigTileListItemTemplate">
+            <Frame type="StoreTileListItem" name="Item0" template="FeaturedCollectionPanel/FeaturedStoreBigTileListItemTemplate">
                 <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
                 <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
                 <HideWhenCleared val="true"/>
                 <CollapseLayout val="true"/>
             </Frame>
 
-            <Frame type="StoreTileListItem" name="Item1" template="StoreTemplates/StoreBigTileListItemTemplate">
+            <Frame type="StoreTileListItem" name="Item1" template="FeaturedCollectionPanel/FeaturedStoreBigTileListItemTemplate">
                 <Anchor side="Top" relative="$parent/Item0" pos="Min" offset="0"/>
                 <Anchor side="Left" relative="$parent/$parent" pos="Mid" offset="270"/>
                 <HideWhenCleared val="true"/>
                 <CollapseLayout val="true"/>
             </Frame>
 
-            <Frame type="StoreTileListItem" name="Item2" template="StoreTemplates/StoreBigTileListItemTemplate">
+            <Frame type="StoreTileListItem" name="Item2" template="FeaturedCollectionPanel/FeaturedStoreBigTileListItemTemplate">
                 <HideWhenCleared val="true"/>
             </Frame>
         </Frame>
@@ -96,6 +221,7 @@
 
         <Frame type="GameContentTileList" name="ContentTileList" template="CollectionTemplates/ContentTileListTemplate">
             <Handle val="ScreenCollection_Featured_ContentTileList"/>
+            <UpdateWhenLicensesChange val="true"/>
 
             <RequireParentHeroFilter val="false"/>
 
@@ -113,8 +239,18 @@
 
             <ProductAttribute index="0" val="shop-featured-small"/>
 
-            <ExcludedGameContentTable index="0" val="{$parent/BigTileList/@GameContentTable[0]}"/>
-            <ExcludedGameContentTable index="1" val="{$parent/BigTileList/@GameContentTable[1]}"/>
+            <Frame type="StoreTileListItem" name="Item0" template="FeaturedCollectionPanel/FeaturedStoreTileListItemTemplate"/>
+            <Frame type="StoreTileListItem" name="Item1" template="FeaturedCollectionPanel/FeaturedStoreTileListItemTemplate"/>
+            <Frame type="StoreTileListItem" name="Item2" template="FeaturedCollectionPanel/FeaturedStoreTileListItemTemplate"/>
+            <Frame type="StoreTileListItem" name="Item3" template="FeaturedCollectionPanel/FeaturedStoreTileListItemTemplate"/>
+            <Frame type="StoreTileListItem" name="Item4" template="FeaturedCollectionPanel/FeaturedStoreTileListItemTemplate"/>
+            <Frame type="StoreTileListItem" name="Item5" template="FeaturedCollectionPanel/FeaturedStoreTileListItemTemplate"/>
+            <Frame type="StoreTileListItem" name="Item6" template="FeaturedCollectionPanel/FeaturedStoreTileListItemTemplate"/>
+            <Frame type="StoreTileListItem" name="Item7" template="FeaturedCollectionPanel/FeaturedStoreTileListItemTemplate"/>
+            <Frame type="StoreTileListItem" name="Item8" template="FeaturedCollectionPanel/FeaturedStoreTileListItemTemplate"/>
+            <Frame type="StoreTileListItem" name="Item9" template="FeaturedCollectionPanel/FeaturedStoreTileListItemTemplate"/>
+            <Frame type="StoreTileListItem" name="Item10" template="FeaturedCollectionPanel/FeaturedStoreTileListItemTemplate"/>
+            <Frame type="StoreTileListItem" name="Item11" template="FeaturedCollectionPanel/FeaturedStoreTileListItemTemplate"/>
 
             <Frame type="ScrollBar" name="ScrollBar" template="StandardTemplates/ScrollableBarTemplate">
                 <Anchor side="Top" relative="$parent/Item0" pos="Min" offset="-2"/>

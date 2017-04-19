@@ -228,7 +228,7 @@
                 <!-- Chest InfoFrame for Left Chest -->
                 <Frame type="Frame" name="LeftChestInfoFrame">
                     <Anchor side="Top" relative="$parent/ActiveChestInfoFrame" pos="Mid" offset="-3"/>
-                    <Anchor side="Left" relative="$parent" pos="Mid" offset="-630"/> 
+                    <Anchor side="Left" relative="$parent" pos="Mid" offset="-630"/>
                     <Anchor side="Right" relative="$parent" pos="Mid" offset="-630"/>
                     <Anchor side="Bottom" relative="$parent/ActiveChestInfoFrame" pos="Mid" offset="-3"/>
                     <Width val="280"/>
@@ -642,7 +642,7 @@
             <! Action Buttons
             <!======================================================================================-->
             <Frame type="Button" name="BuyButton" template="StandardTemplates/StandardButtonTemplate">
-                <Anchor side="Bottom" relative="$parent" pos="Max" offset="-100"/>
+                <Anchor side="Bottom" relative="$parent" pos="Max" offset="-120"/>
                 <Anchor side="Left" relative="$parent" pos="Mid" offset="135"/>
                 <Anchor side="Right" relative="$parent" pos="Mid" offset="135"/>
                 <DisabledAlpha val="0"/>
@@ -664,13 +664,23 @@
             </Frame>
 
             <Frame type="Button" name="OpenButton" template="StandardTemplates/StandardButtonTemplate">
-                <Anchor side="Bottom" relative="$parent" pos="Max" offset="-100"/>
+                <Anchor side="Bottom" relative="$parent" pos="Max" offset="-120"/>
                 <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
                 <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
                 <Width val="300"/>
                 <Height val="100"/>
 
                 <Text val="@UI/LootChest/Action/Open"/>
+
+                <Frame type="TextFormatFrame" name="LoadTimeoutTextFrame">
+                    <Anchor relative="$parent"/>
+                    <FormatText val="@UI/LootChest/Warning/SystemUnderLoadTooltip"/>
+                    <Replacement index="0" val="{$ancestor[@type=LootChestCarouselPanel]/@RemainingLoadoutTimeoutSeconds}"/>
+                </Frame>
+
+                <Frame type="Frame" name="HitTestFrame">
+                    <TooltipAnchorPosition val="TopCenter"/>
+                </Frame>
 
                 <Animation name="CarouselMove">
                     <Event event="MoveStart" action="DirectionForward, Play" frame="$parent/$parent"/>
@@ -692,11 +702,16 @@
                 </StateGroup>
 
                 <StateGroup name="OpenButtonActiveStates">
-                    <State name="Disabled">
+                    <State name="NoChests">
                         <When type="Property" frame="$parent/TopValues/ActiveChestInfoFrame/ActiveChestCountLabel" Text="0"/>
                         <Action type="SetProperty" Enabled="false"/>
                     </State>
-                </StateGroup> 
+                    <State name="TimeoutActive">
+                        <When type="Property" frame="$ancestor[@type=LootChestCarouselPanel]" LoadTimeoutActive="true"/>
+                        <Action type="SetProperty" Enabled="false"/>
+                        <Action type="SetProperty" Tooltip="{$this/LoadTimeoutTextFrame/@Text}"/>
+                    </State>
+                </StateGroup>
             </Frame>
 
             <!-- In Queue/Lobby warning message -->
@@ -718,6 +733,12 @@
                     <Text val="@UI/LootChest/Warning/InQueue"/>
                 </Frame>
 
+                <Frame type="TextFormatFrame" name="LoadTimeoutTextFrame">
+                    <Anchor relative="$parent"/>
+                    <FormatText val="@UI/LootChest/Warning/SystemUnderLoadWarning"/>
+                    <Replacement index="0" val="{$ancestor[@type=LootChestCarouselPanel]/@RemainingLoadoutTimeoutSeconds}"/>
+                </Frame>
+
                 <Animation name="OnShown">
                     <Event event="OnShown" action="Reset, Play"/>
 
@@ -729,21 +750,26 @@
                 </Animation>
 
                 <StateGroup name="WarningStates">
-                    <State name="NotInQueue">
-                        <When type="Property" frame="$ancestor[@type=LootChestCarouselPanel]" SearchingForGame="False"/>
-                        <When type="Property" frame="$ancestor[@type=LootChestCarouselPanel]" InLobbyOrGame="False"/>
-                        <When type="Property" frame="$ancestor[@type=LootChestCarouselPanel]" ActiveChestIsBuyPreview="False"/>
-                        <Action type="SetProperty" frame="$this" visible="False"/>
+                    <State name="NoWarning">
+                        <When type="Property" frame="$ancestor[@type=LootChestCarouselPanel]" SearchingForGame="false"/>
+                        <When type="Property" frame="$ancestor[@type=LootChestCarouselPanel]" InLobbyOrGame="false"/>
+                        <When type="Property" frame="$ancestor[@type=LootChestCarouselPanel]" LoadTimeoutActive="false"/>
+                        <Action type="SetProperty" frame="$this" Visible="false"/>
                     </State>
                     <State name="InQueue">
-                        <When type="Property" frame="$ancestor[@type=LootChestCarouselPanel]" SearchingForGame="True"/>
-                        <Action type="SetProperty" frame="$this" visible="True"/>
-                        <Action type="SetProperty" frame="WarningLabel" text="@UI/LootChest/Warning/InQueue"/>
+                        <When type="Property" frame="$ancestor[@type=LootChestCarouselPanel]" SearchingForGame="true"/>
+                        <Action type="SetProperty" frame="$this" Visible="true"/>
+                        <Action type="SetProperty" frame="WarningLabel" Text="@UI/LootChest/Warning/InQueue"/>
                     </State>
                     <State name="InLobby">
-                        <When type="Property" frame="$ancestor[@type=LootChestCarouselPanel]" InLobbyOrGame="True"/>
-                        <Action type="SetProperty" frame="$this" visible="True"/>
-                        <Action type="SetProperty" frame="WarningLabel" text="@UI/LootChest/Warning/InLobby"/>
+                        <When type="Property" frame="$ancestor[@type=LootChestCarouselPanel]" InLobbyOrGame="true"/>
+                        <Action type="SetProperty" frame="$this" Visible="true"/>
+                        <Action type="SetProperty" frame="WarningLabel" Text="@UI/LootChest/Warning/InLobby"/>
+                    </State>
+                    <State name="TimeoutActive">
+                        <When type="Property" frame="$ancestor[@type=LootChestCarouselPanel]" LoadTimeoutActive="true"/>
+                        <Action type="SetProperty" frame="$this" Visible="true"/>
+                        <Action type="SetProperty" frame="WarningLabel" Text="{$parent/LoadTimeoutTextFrame/@Text}"/>
                     </State>
                 </StateGroup>
             </Frame>

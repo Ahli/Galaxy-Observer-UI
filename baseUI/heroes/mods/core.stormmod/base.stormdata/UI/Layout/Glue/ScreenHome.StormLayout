@@ -50,14 +50,46 @@
             <Visible val="false"/>
         </Frame>
 
+        <StateGroup name="ContentTakeoverState">
+            <State name="WaitingForData">
+                <When type="Property" WaitingForData="True"/>
+                <Action type="SetState" frame="HeroHomeInfoPanel" group="ShowingHero" state="Hidden"/>
+            </State>
+
+            <State name="ShowContent">
+                <When type="Property" WaitingForData="False"/>
+                <When type="Property" ShowContent="True"/>
+                <Action type="SendEvent" event="ShowContent"/>
+                <Action type="SetState" frame="HeroHomeInfoPanel" group="ShowingHero" state="Hidden"/>
+            </State>
+
+            <State name="ShowHero">
+                <When type="Property" WaitingForData="False"/>
+                <When type="Property" ShowContent="False"/>
+                <Action type="SendEvent" event="HideContent"/>
+                <Action type="SetState" frame="HeroHomeInfoPanel" group="ShowingHero" state="Shown"/>
+            </State>
+        </StateGroup>
+
         <Frame type="HeroHomeInfoPanel" name="HeroHomeInfoPanel">
             <Anchor relative="$parent"/>
+            <Visible val="False"/>
 
-            <Animation name="ShowContent">
-                <Event event="ShowContent" action="DirectionForward, Play" frame="$parent"/>
-                <Event event="HideContent" action="DirectionReverse, Play" frame="$parent"/>
+            <StateGroup name="ShowingHero">
+                <State name="Shown">
+                    <Action type="SetProperty" Visible="True" undo="false"/>
+                    <Action type="SendEvent" event="Reset"/>
+                    <Action type="SendEvent" event="Hide" on="Exit"/>
+                </State>
 
-                <Controller type="Visibility" end="Pause">
+                <State name="Hidden"/>
+            </StateGroup>
+
+            <Animation name="HideHero">
+                <Event event="Hide" action="Play"/>
+                <Event event="Reset" action="Pause, Restart"/>
+
+                <Controller type="Visibility" end="Stop">
                     <Key type="Bool" time="0.00" value="true"/>
                     <Key type="Bool" time="0.99" value="true"/>
                     <Key type="Bool" time="1" value="false"/>
@@ -450,6 +482,18 @@
                 </Animation>
                 <Visible val="False"/>
             </Frame>
+            <Frame type="HeroContainerFrame" name="GenjiFrame" template="Home25/GenjiFrameTemplate">
+                <Animation name="ChangeHomeScreenHero">
+                    <Event event="ResetHero" action="Stop" frame="$parent"/>
+                    <Event event="Genji" action="Restart,Play" frame="$parent"/>
+                    <Controller type="Visibility" end="Pause">
+                        <Key type="Bool" time="0" value="false"/>
+                        <Key type="Bool" time=".01" value="true"/>
+                    </Controller>
+                </Animation>
+                <Visible val="False"/>
+            </Frame>
+        
             <Frame type="HeroGlueButton" name="HomeDebugButton" template="StandardTemplates/StandardButtonMiniTemplate" requiredtoload="IS_SCREEN_MAIN_MENU_ENABLED">
                 <Anchor side="Bottom" relative="$parent" pos="Max" offset="-112"/>
                 <Anchor side="Left" relative="$parent" pos="Min" offset="-12"/>
@@ -543,8 +587,20 @@
                             </Controller>
                         </Animation>
                     </Frame>
-                    <Frame type="Button" name="AmazonButton" template="ScreenHome/HomeDebugButtonTemplate">
+                    <Frame type="Button" name="GenjiButton" template="ScreenHome/HomeDebugButtonTemplate">
                         <Anchor side="Top" relative="$parent/DiabloPrimeButton" pos="Max" offset="-40"/>
+                        <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                        <Text val="Genji"/>
+                        <Animation name="Click">
+                            <Event event="OnMouseDown" action="Restart,Play"/>
+                            <Controller type="Event" end="Stop" frame="$parent/$parent/$parent">
+                                <Key type="Event" time="0" event="HomeReset"/>
+                                <Key type="Event" time="0.01" event="Genji"/>
+                            </Controller>
+                        </Animation>
+                    </Frame>
+                    <Frame type="Button" name="AmazonButton" template="ScreenHome/HomeDebugButtonTemplate">
+                        <Anchor side="Top" relative="$parent/GenjiButton" pos="Max" offset="-40"/>
                         <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
                         <Text val="Cassia"/>
                         <Animation name="Click">

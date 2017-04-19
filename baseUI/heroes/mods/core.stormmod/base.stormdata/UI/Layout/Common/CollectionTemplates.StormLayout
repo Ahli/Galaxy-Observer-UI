@@ -118,7 +118,7 @@
     <!==============================================================================================-->
     <Frame type="EditBox" name="SearchEditBoxTemplate" template="StandardTemplates/StandardSearchEditBoxTemplate">
         <PreserveAnchorOffset val="False"/>
-        <Width val="270"/>
+        <Width val="290"/>
 
         <Frame type="Image" name="FilterSearchImage">
             <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
@@ -493,7 +493,7 @@
 
         <RequireParentHeroFilter val="false"/>
 
-        <FilterFlags val="Default|!ProductHidden|!NoValidProduct"/>
+        <FilterFlags val="Default|!ProductHidden|!NoValidProduct|!Owned"/>
         <SearchFlags val=""/>
         <GenerationMode val="Store"/>
         <SortMethod index="0" val="ReleaseDate"/>
@@ -787,6 +787,7 @@
 
             <MaxItemPerPage val="1"/>
             <Visible val="false"/>
+            <UpdateWhenHidden val="{$parent/CategoryTileList/FeaturedItem/@Toggled}"/>
 
             <StateGroup name="ShowBigTileList">
                 <State name="ShowTileList">
@@ -799,6 +800,10 @@
 
         <Frame type="GameContentTileList" name="ContentTileList" template="CollectionTemplates/ContentTileListTemplate">
             <CollectionCategoryFilter val="{$parent/CategoryTileList/@SelectedCollectionCategory}"/>
+
+            <ExcludedGameContentTable index="0" val="{$parent/BigTileList/@GameContentTable[0]}"/>
+            <ExcludedGameContentTable index="1" val="{$parent/BigTileList/@GameContentTable[1]}"/>
+            <ExcludedGameContentTable index="2" val="{$parent/BigTileList/@GameContentTable[2]}"/>
 
             <StateGroup name="ItemsPerPageStates">
                 <State name="SearchInactive_WithBigTileList">
@@ -879,13 +884,18 @@
             <ParentHeroFilter val="{$parent/CategoryTileList/GameContentData/@HeroLink}"/>
             <CollectionCategoryFilter val=""/>
 
-            <StateGroup name="DontRequireParentHeroOnSearchOrFeatured">
+            <StateGroup name="DontRequireParentHero">
                 <State name="SearchActive">
                     <When type="Property" frame="$parent/SearchEditBox" Text="" operator="NotEqual"/>
                     <Action type="SetProperty" RequireParentHeroFilter="false"/>
                 </State>
                 <State name="FeaturedShown">
                     <When type="StateGroup" frame="$parent/CategoryTileList" FeaturedToggle="ShowFeatured"/>
+                    <Action type="SetProperty" RequireParentHeroFilter="false"/>
+                </State>
+                <State name="AllSelectionChosen">
+                    <When type="Property" frame="$parent/CategoryTileList" SelectedIndex="#InvalidIndex" operator="NotEqual"/>
+                    <When type="Property" frame="$parent/CategoryTileList/GameContentData" IsValid="false"/>
                     <Action type="SetProperty" RequireParentHeroFilter="false"/>
                 </State>
             </StateGroup>

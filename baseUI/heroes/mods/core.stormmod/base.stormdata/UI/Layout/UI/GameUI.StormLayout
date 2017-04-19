@@ -1,11 +1,64 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <Desc>
 
+    <!-- Region: Templates -->
     <Frame type="Frame" name="PortraitMaskFrameTemplate">
         <AlphaMaskTexture val="@UI/HUD_BG_PortraitFrame_InverseAlphaMask"/>
         <AlphaMaskSiblings val="true"/>
         <RenderPriority val="1"/>
     </Frame>
+
+    <Frame type="UnitStatusColor" name="TeamColoringTemplate">
+        <Width val="3"/>
+        <Height val="3"/>
+
+        <ColorStyle val="MinimapTeams"/>
+        <AdditionalColorStyle val="PrimaryLight" index="0"/>
+
+        <StateGroup name="ReadRelation">
+            <State name="Ally">
+                <When type="Property" frame="$this" CurrentRelation="Ally"/>
+                <Action type="SetState" frame="$this" group="RedBlue" state="Blue"/>
+            </State>
+            <State name="TeamOrder">
+                <When type="Property" frame="$this" CurrentRelation="TeamOrder"/>
+                <Action type="SetState" frame="$this" group="RedBlue" state="Blue"/>
+            </State>
+            <State name="Enemy">
+                <When type="Property" frame="$this" CurrentRelation="Enemy"/>
+                <Action type="SetState" frame="$this" group="RedBlue" state="Red"/>
+            </State>
+            <State name="TeamChaos">
+                <When type="Property" frame="$this" CurrentRelation="TeamChaos"/>
+                <Action type="SetState" frame="$this" group="RedBlue" state="Red"/>
+            </State>
+        </StateGroup>
+        <StateGroup name="RedBlue">
+            <DefaultState val="Blue"/>
+            <State name="Red"/>
+            <State name="Blue"/>
+        </StateGroup>
+
+        <StateGroup name="TextureColor">
+            <DefaultState val="TextureBlue"/>
+            <State name="TextureOrange">
+                <When type="StateGroup" frame="$this" RedBlue="Red"/>
+                <When type="Option" colorblind="True"/>
+            </State>
+            <State name="TextureCyan">
+                <When type="StateGroup" frame="$this" RedBlue="Blue"/>
+                <When type="Option" colorblind="True"/>
+            </State>
+            <State name="TextureRed">
+                <When type="StateGroup" frame="$this" RedBlue="Red"/>
+            </State>
+            <State name="TextureBlue">
+                <When type="StateGroup" frame="$this" RedBlue="Blue"/>
+            </State>
+        </StateGroup>
+    </Frame>
+    <!-- EndRegion: Templates -->
+
 
     <Frame type="GameUI" name="GameUI">
         <Anchor relative="$parent"/>
@@ -19,27 +72,17 @@
         <Frame type="StandardTooltip" name="StormStandardTooltip" template="StandardTooltip/StandardTooltip"/>
 
         <!-- BEGIN Property bindable Colors -->
-        <Frame type="UnitStatusColor" name="TeamOrderColors">
+        <Frame type="UnitStatusColor" name="TeamOrderColors" template="GameUI/TeamColoringTemplate">
             <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
             <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
-            <Width val="3"/>
-            <Height val="3"/>
 
             <ForcedTeam val="0"/>
-
-            <ColorStyle val="MinimapTeams"/>
-            <AdditionalColorStyle val="PrimaryLight" index="0"/>
         </Frame>
-        <Frame type="UnitStatusColor" name="TeamChaosColors">
+        <Frame type="UnitStatusColor" name="TeamChaosColors" template="GameUI/TeamColoringTemplate">
             <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
             <Anchor side="Left" relative="$parent/TeamOrderColors" pos="Max" offset="0"/>
-            <Width val="3"/>
-            <Height val="3"/>
 
             <ForcedTeam val="1"/>
-
-            <ColorStyle val="MinimapTeams"/>
-            <AdditionalColorStyle val="PrimaryLight" index="0"/>
         </Frame>
         <Frame type="UnitStatusColor" name="AllyColors">
             <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
@@ -97,12 +140,6 @@
                 </Frame>
             </Frame>
         </Frame>
-
-
-        <Frame type="Frame" name="SeasonalEventSplashPanel" template="StarCraftEventHelpPanel/StarCraftEventHelpPanelTemplate">
-            <Anchor relative="$parent"/>
-        </Frame>
-
         
         <Frame type="Image" name="OverlayImage">
             <TextureType val="Normal" layer="0"/>
@@ -450,14 +487,6 @@
                     <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
                 </Frame>
                 
-                <!--Frame type="Frame" name="LunarNewYearPanel" template="LunarNewYear/LunarNewYearTemplate">
-                    <Anchor relative="$parent"/>
-                </Frame-->
-                
-                <Frame type="Frame" name="SeasonalEventPanel" template="LunarNewYearRooster/LunarNewYearRoosterTemplate">
-                    <Anchor relative="$parent"/>
-                </Frame>
-                
                 <Frame type="Frame" name="MutatorPanel">
                     <Anchor relative="$parent"/>
                     <Visible val="False"/>
@@ -524,15 +553,7 @@
                     <Height val="165"/>
                     <DisplayCancelCommandCard val="false"/>
                     <Batch val="true"/>
-                </Frame>
- 
-                <Frame type="HeroSpecificContainerPanel" name="HeroSpecificCommandCardPanel">
-                    <Anchor side="Bottom" relative="$parent/CommandPanel" pos="Max" offset="0"/>
-                    <Anchor side="Left" relative="$parent/CommandPanel" pos="Mid" offset="0"/>
-                    <Anchor side="Right" relative="$parent/CommandPanel" pos="Mid" offset="0"/>
-                    <Height val="165"/>
-                    <Width val="826"/>
-                    <HeroSpecificLocation val="ConsoleUICommandCardStatus"/>
+                    <Handle val="GameUICommandPanel"/>
                 </Frame>
 
                 <Frame type="ControlGroupPanel" name="ControlGroupPanel" template="ControlGroupPanel/ControlGroupPanelTemplate">
@@ -562,6 +583,15 @@
                     <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
                     <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
                     <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+                </Frame>
+                
+                <Frame type="HeroSpecificContainerPanel" name="HeroSpecificCommandCardPanel">
+                    <Anchor side="Bottom" relative="$parent/CommandPanel" pos="Max" offset="0"/>
+                    <Anchor side="Left" relative="$parent/CommandPanel" pos="Mid" offset="0"/>
+                    <Anchor side="Right" relative="$parent/CommandPanel" pos="Mid" offset="0"/>
+                    <Height val="165"/>
+                    <Width val="826"/>
+                    <HeroSpecificLocation val="ConsoleUICommandCardStatus"/>
                 </Frame>
 
                 <Frame type="Frame" name="HeroConsolePanel" template="HeroConsole/HeroConsolePanelTemplate">
@@ -632,7 +662,7 @@
                     <PreserveAnchorOffset val="True"/>
                 </Frame>
                 <Frame type="UnitStatusFrame" name="HeroBehaviorChannelBarFrameRight" template="ChannelBars/HeroBehaviorChannelBarFrameTemplate">
-                    <Anchor side="Bottom" relative="$parent/HeroBehaviorChannelBarFrame" pos="Max" offset="0"/>
+                    <Anchor side="Bottom" relative="$parent/ControlGroupPanel" pos="Min" offset="-20"/>
                     <Anchor side="Left" relative="$parent/$parent/ConsolePanel/GameHudBackFill" pos="Mid" offset="#ChannelBarHalfWidthNeg"/>
                     <Anchor side="Right" relative="$parent/$parent/ConsolePanel/GameHudBackFill" pos="Mid" offset="#ChannelBarHalfWidth"/>
                     <CollapseLayout val="True"/>
@@ -672,16 +702,18 @@
                 <!--  EndRegion: Channel Bars -->
 
                 <Frame type="UnitStatusFrame" name="HeroDeathStunFrame" template="ChannelBars/HeroDeathStunFrameTemplate">
-                    <Anchor side="Bottom" relative="$parent/HeroCastChannelBarFrame" pos="Min" offset="-8"/>
+                    <Anchor side="Bottom" relative="$parent/HeroCastChannelBarFrame" pos="Min" offset="5"/>
                     <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
                     <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
                     <PreserveAnchorOffset val="True"/>
                 </Frame>
                 
-                <Frame type="Frame" name="PartyFramePanel" template="PartyFrame/PartyFrameOverview">
+                <Frame type="PartyFramePanel" name="PartyFramePanel" template="PartyFrame/PartyFrameOverview">
                     <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
                     <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
                     <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+                    <OverrideVisibilityForObservers val="True"/>
+                    <OverriddenObserverVisibility val="False"/>
                 </Frame>
                 
 
@@ -967,9 +999,9 @@
                     </Frame>
 
                     <Frame type="ReplayPanel" name="ReplayPanel" template="ReplayPanel/ReplayPanelTemplate">
-                        <Anchor side="Right" relative="$parent" pos="Max" offset="-40"/>
-                        <Anchor side="Bottom" relative="$parent" pos="Max" offset="-490"/>
-                        <Height val="468"/>
+                        <Anchor side="Right" relative="$parent" pos="Max" offset="-10"/>
+                        <Anchor side="Top" relative="$parent" pos="Min" offset="120"/>
+                        <Height val="170"/>
                         <Width val="420"/>
                         <Handle val="ScreenReplay_ReplayPanel"/>
                     </Frame>
@@ -994,7 +1026,7 @@
                 
                 <Frame type="ChatBar" name="ChatBar" template="ChatBar/ChatBarTemplate">
                     <Handle val="GameUI_ChatBar"/>
-                    <Anchor side="Bottom" relative="$parent/$parent/ConsoleUIContainer/HeroDeathStunFrame" pos="Min" offset="-15"/>
+                    <Anchor side="Bottom" relative="$parent/$parent/ConsoleUIContainer/HeroDeathStunFrame" pos="Min" offset="10"/>
                     <Anchor side="Left" relative="$parent/ChatDisplay" pos="Min" offset="0"/>
                     <Anchor side="Right" relative="$parent/ChatDisplay" pos="Max" offset="0"/>
                     <RenderPriority val="600"/>

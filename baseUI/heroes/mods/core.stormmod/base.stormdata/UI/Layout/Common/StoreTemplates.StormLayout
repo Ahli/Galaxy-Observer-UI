@@ -462,11 +462,11 @@
 
         <Frame type="Label" name="TotalAwardLabel">
             <Anchor side="Top" relative="$parent/InnerBackground" pos="Max" offset="5"/>
-            <Anchor side="Left" relative="$parent" pos="Min" offset="22"/>
-            <Anchor side="Right" relative="$parent" pos="Max" offset="-22"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="30"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="-30"/>
             <Style val="GemPurchaseDialogTotalLabel"/>
             <Text val=""/>
-            <Options val="ScaleToPreventTruncation"/>
+            <Options val="NoWrapping | ScaleToPreventTruncation"/>
 
             <Animation name="Expand">
                 <Event event="OnMouseEnter" frame="$parent" action="DirectionForward,Play"/>
@@ -844,6 +844,84 @@
             </Animation>
         </Frame>
 
+        <Frame type="Frame" name="BackgroundFrame">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="8"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="8"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="-8"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="-8"/>
+
+            <Frame type="Image" name="BackgrounGradient">
+                <Anchor relative="$parent"/>
+                <RenderType val="HDR"/>
+                <ColorAdjustMode val="Desaturate"/>
+                <LightAdjustColor val="{$parent/AdjustmentColorFrame/@LightAdjustColor}"/>
+                <DarkAdjustColor val="{$parent/AdjustmentColorFrame/@DarkAdjustColor}"/>
+                <Texture val="@UI/Storm_UI_Store_BGGradient"/>
+            </Frame>
+
+            <Frame type="Image" name="BackgroundPattern">
+                <Anchor relative="$parent"/>
+                <Alpha val="150"/>
+                <RenderType val="HDR"/>
+                <LayerCount val="2"/>
+                <ColorAdjustMode val="Desaturate"/>
+                <LightAdjustColor val="{$parent/AdjustmentColorFrame/@LightAdjustColor}"/>
+                <DarkAdjustColor val="{$parent/AdjustmentColorFrame/@DarkAdjustColor}"/>
+                <Texture val="@UI/Storm_UI_Store_BGGradient" layer="0"/>
+                <AlphaLayer val="true" layer="0"/>
+                <AlphaChannel val="Red" layer="0"/>
+                <Texture val="@UI/Storm_UI_Store_TrianglePattern" layer="1"/>
+                <BlendMode val="Add" layer="1"/>
+                <WrapUV val="true" layer="1"/>
+                <Tiled val="true" layer="1"/>
+
+                <Animation name="UVScroll">
+                    <Event event="OnShown" action="DirectionForward, Play"/>
+
+                    <Controller type="LayerUV" side="Top" sidelock="true" layer="1" end="Loop">
+                        <Key type="Curve" time="0" value="0"/>
+                        <Key type="Curve" time="14" value="1"/>
+                    </Controller>
+                </Animation>
+            </Frame>
+
+            <Frame type="Image" name="AdjustmentColorFrame">
+                <Anchor relative="$parent"/>
+                <Visible val="false"/>
+                <LightAdjustColor val="0070f0"/>
+                <DarkAdjustColor val="070f19"/>
+
+                <StateGroup name="AdjustmentColorStates">
+                    <State name="Heroes">
+                        <When type="Property" frame="$parent/$parent/GameContentFrame" ContentType="Hero"/>
+                        <Action type="SetProperty" LightAdjustColor="41cdf0"/>
+                        <Action type="SetProperty" DarkAdjustColor="001546"/>
+                        <Action type="SetProperty" frame="$parent/BackgroundPattern" Alpha="115"/>
+                    </State>
+                    <State name="Emojis">
+                        <When type="Property" frame="$parent/$parent/GameContentFrame" ContentType="EmoticonPack"/>
+                        <Action type="SetProperty" LightAdjustColor="3a1a8b"/>
+                        <Action type="SetProperty" DarkAdjustColor="150741"/>
+                        <Action type="SetProperty" frame="$parent/BackgroundPattern" Alpha="175"/>
+                    </State>
+                    <State name="VoiceLine">
+                        <When type="Property" frame="$parent/$parent/GameContentFrame" ContentType="VoiceLine"/>
+                        <Action type="SetProperty" LightAdjustColor="5f39be"/>
+                        <Action type="SetProperty" DarkAdjustColor="0b022e"/>
+                        <Action type="SetProperty" frame="$parent/BackgroundPattern" Alpha="50"/>
+                        <Action type="SetProperty" frame="$parent/BackgrounGradient" Alpha="85"/>
+                    </State>
+                    <State name="Unknown">
+                        <When type="Property" frame="$parent/$parent/GameContentFrame" Name=""/>
+                        <Action type="SetProperty" LightAdjustColor="5f39be"/>
+                        <Action type="SetProperty" DarkAdjustColor="0b022e"/>
+                        <Action type="SetProperty" frame="$parent/BackgroundPattern" Alpha="50"/>
+                        <Action type="SetProperty" frame="$parent/BackgrounGradient" Alpha="85"/>
+                    </State>
+                </StateGroup>
+            </Frame>
+        </Frame>
+
         <Frame type="Image" name="SelectedImage">
             <Anchor relative="$parent"/>
             <Visible val="False"/>
@@ -1112,7 +1190,7 @@
         </Frame>
 
         <Frame type="Image" name="CutsceneCoverImage">
-            <Anchor side="Top" relative="$parent" pos="Min" offset="8"/>
+            <Anchor side="Top" relative="$parent" pos="Min" offset="9"/>
             <Anchor side="Left" relative="$parent" pos="Min" offset="8"/>
             <Texture val="@UI/Storm_UI_Store_SmallFrame_Top"/>
         </Frame>
@@ -1142,12 +1220,11 @@
             <Visible val="{$parent/GameContentFrame/@IsBundle}"/>
 
             <Frame type="Image" name="BundleIconImage">
-                <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
-                <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
                 <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
                 <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
                 <Width val="51"/>
-                <Height val="43"/>
+                <ScaleHeightToTexture val="true"/>
                 <Texture val="@UI/Storm_UI_Storm_Bundle"/>
             </Frame>
             <Frame type="Frame" name="CountAnchor">
@@ -2249,12 +2326,22 @@
             <Anchor side="Left" relative="$parent/ItemPortraitBorder" pos="Max" offset="14"/>
             <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
             <Style val="StoreSkinHeroListButtonLabel"/>
-            <Text val="{$parent/GameContentFrame/@StoreName}"/>
+
+            <StateGroup name="CategoryText">
+                <State name="FromContent">
+                    <When type="Property" frame="$parent/GameContentFrame" IsValid="true"/>
+                    <Action type="SetProperty" Text="{$parent/GameContentFrame/@StoreName}"/>
+                </State>
+                <State name="AllCategory">
+                    <When type="Property" frame="$parent/GameContentFrame" IsValid="false"/>
+                    <Action type="SetProperty" Text="@UI/Collection/Category/AllHeroes"/>
+                </State>
+            </StateGroup>
 
             <StateGroup name="CollectionImageStates">
                 <State name="NoCollectionImage">
-                    <When type="Property" frame="$parent/ItemPortraitBorder" visible="False"/>
-                    <When type="Property" frame="$parent/ItemPortraitImage" visible="False"/>
+                    <When type="Property" frame="$parent/ItemPortraitBorder" Visible="false"/>
+                    <When type="Property" frame="$parent/ItemPortraitImage" Visible="false"/>
                     <Action type="SetAnchor" side="Left" relative="$parent" pos="Min" offset="30"/>
                 </State>
             </StateGroup>
@@ -2422,6 +2509,33 @@
             <Frame type="Frame" name="HitTestFrame">
                 <TooltipAnchorPosition val="TopCenter"/>
             </Frame>
+        </Frame>
+
+        <Frame type="Frame" name="ProductBundleFrame" template="StandardTemplates/ProductBundleFrameTemplate">
+            <Anchor side="Bottom" relative="$parent/PurchasedIndicatorFrame" pos="Max" offset="23"/>
+            <Anchor side="Left" relative="$parent/PurchasedIndicatorFrame" pos="Min" offset="35"/>
+            <Animation name="Toggle">
+                <Event event="OnShown" action="DirectionForward,Play" frame="$parent/ViewInBundleButton"/>
+                <Event event="OnHidden" action="DirectionReverse,Play" frame="$parent/ViewInBundleButton"/>
+                <Controller type="Visibility" end="Pause">
+                    <Key type="Bool" time="0" value="False"/>
+                    <Key type="Bool" time=".01" value="True"/>
+                </Controller>
+            </Animation>
+        </Frame>
+
+        <Frame type="Button" name="ViewInBundleButton" template="StandardTemplates/StandardButtonMiniTemplate">
+            <Anchor side="Top" relative="$parent/ProductBundleFrame/BundleButtonAnchor" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent/ProductBundleFrame/BundleButtonAnchor" pos="Min" offset="0"/>
+            <ClickSound val="@UI_BNet_PageSelect"/>
+            <Text val="@UI/ScreenStore/View"/>
+
+            <StateGroup name="PurchasedStates">
+                <State name="Purchased">
+                    <When type="Property" frame="$parent/PurchasedIndicatorFrame" Visible="true"/>
+                    <Action type="SetProperty" Visible="false" undo="false"/>
+                </State>
+            </StateGroup>
         </Frame>
 
         <Frame type="BuyButton" name="BuyButton0" template="StoreTemplates/BuyButtonTemplate">

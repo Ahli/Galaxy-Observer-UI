@@ -163,8 +163,130 @@
         </Frame>
 
         <!-- Progression 2.0 -->
-        <Frame type="AscensionFrame" name="AscensionBadge" template="AscensionBadge/AscensionBadgeTemplate">
+        <Frame type="AscensionFrame" name="AscensionBadge" template="AscensionBadge/AscensionFrameTemplate">
+            <Anchor relative="$parent"/>
             <Visible val="false"/>
+
+            <Frame type="Frame" name="BadgeContainer">
+                <Frame type="Image" name="LogoImage">
+                    <Anchor side="Top" relative="$parent" pos="0.44" offset="0"/>
+                    <Anchor side="Bottom" relative="$parent" pos="0.99" offset="0"/>
+                    <Anchor side="Left" relative="$parent" pos="0.0" offset="0"/>
+                    <Anchor side="Right" relative="$parent" pos="0.58" offset="0"/>\
+                </Frame>
+
+                <Frame type="Image" name="MaxCapImage">
+                    <Anchor side="Top" relative="$parent" pos="0.44" offset="0"/>
+                    <Anchor side="Bottom" relative="$parent" pos="0.99" offset="0"/>
+                    <Anchor side="Left" relative="$parent" pos="0.02" offset="0"/>
+                    <Anchor side="Right" relative="$parent" pos="0.56" offset="0"/>
+                </Frame>
+            </Frame> 
+
+            <Frame type="Label" name="ProgressionBadgeText">
+                <Anchor side="Left" relative="$parent" pos="0.21" offset="0"/>
+                <Anchor side="Bottom" relative="$parent" pos="0.82" offset="0"/>
+                <Style val="{$ancestor[@type=AscensionFrame]/FontStyle/@Text}"/>
+            </Frame>
+
+            <Frame type="TextFormatFrame" name="FontStyle">
+                <Anchor relative="$parent"/>
+                <Replacement val="{$ancestor[@type=AscensionFrame]/@AscensionTier}" index="0"/>
+            </Frame>
+
+            <Frame type="TextFormatFrame" name="BorderImagePathFormatter">
+                <Anchor relative="$parent"/>
+                <Replacement val="{$ancestor[@type=AscensionFrame]/@AscensionTier}" index="0"/>
+                <Replacement val="{$ancestor[@type=AscensionFrame]/@AscensionCycle}" index="1"/>
+            </Frame>
+
+            <Frame type="TextFormatFrame" name="GemsImagePathFormatter">
+                <Anchor relative="$parent"/>
+                <Replacement val="{$ancestor[@type=AscensionFrame]/@AscensionCycle}" index="0"/>
+            </Frame>
+
+            <Frame type="TextFormatFrame" name="GemsCappedImagePathFormatter">
+                <Anchor relative="$parent"/>
+            </Frame>
+ 
+            <Frame type="TextFormatFrame" name="BannerImagePathFormatter">
+                <Anchor relative="$parent"/>
+                <Replacement val="{$ancestor[@type=AscensionFrame]/@AscensionTier}" index="0"/>
+            </Frame>
+
+            <Frame type="Image" name="BannerImage">
+                <Anchor relative="$parent"/>
+                <Visible val="true"/>
+                <Texture val="{$parent/BannerImagePathFormatter/@Text}"/>
+                
+                <StateGroup name="DisplayBanner">
+                    <State name="Hide">
+                        <When type="StateGroup" frame="$parent" BannerState="NoBanner"/>
+                        <Action type="SetProperty" visible="false" undo="true"/>
+                    </State>
+                    <State name="Show"/>
+                </StateGroup>
+            </Frame>
+
+            <Frame type="Image" name="GemsImage">
+                <Anchor relative="$parent"/>
+                <Visible val="true"/>
+                <ColorAdjustMode val="Colorize"/>
+
+                <StateGroup name="Colorization">
+                    <State name="Tier0">
+                        <When type="Property" frame="$ancestor[@type=AscensionFrame]" AscensionTier="0"/>
+                        <Action type="SetProperty" AdjustmentColor="5400ff"/>
+                    </State>
+                    <State name="Tier1">
+                        <When type="Property" frame="$ancestor[@type=AscensionFrame]" AscensionTier="1"/>
+                        <Action type="SetProperty" AdjustmentColor="3cffbc"/>
+                    </State>
+                    <State name="Tier2">
+                        <When type="Property" frame="$ancestor[@type=AscensionFrame]" AscensionTier="2"/>
+                        <Action type="SetProperty" AdjustmentColor="009cff"/>
+                    </State>
+                    <State name="Tier3">
+                        <When type="Property" frame="$ancestor[@type=AscensionFrame]" AscensionTier="3"/>
+                        <Action type="SetProperty" AdjustmentColor="d200ff"/>
+                    </State>
+                    <State name="Tier4">
+                        <When type="Property" frame="$ancestor[@type=AscensionFrame]" AscensionTier="4"/>
+                        <Action type="SetProperty" AdjustmentColor="ff3c00"/>
+                    </State>
+                    <State name="Tier5">
+                        <When type="Property" frame="$ancestor[@type=AscensionFrame]" AscensionTier="5"/>
+                        <Action type="SetProperty" AdjustmentColor="e19501"/>
+                    </State>
+                </StateGroup>
+
+                <StateGroup name="GemsCount">
+                    <State name="Normal">
+                        <When type="Property" frame="$parent" AscensionLayer="0"/>
+                        <Action type="SetProperty" texture="{$parent/GemsImagePathFormatter/@Text}"/>
+                    </State>
+                    <State name="Always5Gems">
+                        <When type="Property" frame="$parent" operator="GreaterThan" AscensionLayer="0"/>
+                        <Action type="SetProperty" texture="{$parent/GemsCappedImagePathFormatter/@Text}"/>
+                    </State>
+                </StateGroup>
+            </Frame>
+
+            <StateGroup name="BannerState">
+                <DefaultState val="NoBanner"/>
+                <State name="NoBanner">
+                    <When type="Property" AscensionLayer="0"/>
+                    <Action type="SetProperty" frame="BannerImagePathFormatter" FormatText=""/>
+                </State>
+                <State name="BasicBanner">
+                    <When type="Property" AscensionLayer="1"/>
+                    <Action type="SetProperty" frame="BannerImagePathFormatter" FormatText="Assets\Textures\Storm_UI_Badge_Ascension_Border_Banner_Basic_T%0%_%1%.dds"/>
+                </State>
+                <State name="MainBanner">
+                    <When type="Property" AscensionLayer="2"/>
+                    <Action type="SetProperty" frame="BannerImagePathFormatter" FormatText="Assets\Textures\Storm_UI_Badge_Ascension_Border_Banner_Main_T%0%_%1%.dds"/>
+                </State>
+            </StateGroup>
         </Frame>
 
         <Frame type="Label" name="RankLabel">
@@ -205,7 +327,6 @@
             <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
             <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
         </Frame>
-
 
         <!-- Anchor frame for portrait image  -->
         <Frame type="Frame" name="PortraitContainer">
@@ -337,12 +458,10 @@
 
         <Frame type="Frame" name="PortraitContainer">
             <Frame type="Image" name="AvatarBorderImage">
-                <Frame type="AscensionFrame" name="AscensionBadge" template="AscensionBadge/AscensionBadgeTemplate">
+                <Frame type="AscensionFrame" name="AscensionBadge">
                     <AccountLevel val="{$ancestor[@type=AvatarFrame]/@PlayerLevel}"/>
                 </Frame>
-            </Frame>
 
-            <Frame type="Image" name="AvatarBorderImage" template="AvatarFrameTemplates/AvatarBorderImageTemplate">
                 <StateGroup name="AnchorUpdate">
                     <DefaultState val="PlayerLevelBorder"/>
                     <State name="AscensionBadge">
@@ -379,10 +498,25 @@
         <Frame type="Frame" name="PortraitContainer">
             <Frame type="Image" name="AvatarBorderImage">
                 <Frame type="AscensionFrame" name="AscensionBadge">
-                    <Anchor side="Left" relative="$parent" pos=".24" offset="0"/>
-                    <Anchor side="Right" relative="$parent" pos=".24" offset="0"/>
-                    <Width val="92"/>
-                    <Height val="92"/>
+                    <Frame type="TextFormatFrame" name="FontStyle">
+                        <FormatText val="AscensionBadgeAvatar_Profile_T%0%"/>
+                    </Frame>
+
+                    <Frame type="TextFormatFrame" name="BorderImagePathFormatter">
+                        <FormatText val="Assets\Textures\Storm_UI_Badge_Ascension_Border_C%1%_T%0%_Lg.dds"/>
+                    </Frame>
+
+                    <Frame type="TextFormatFrame" name="GemsImagePathFormatter">
+                        <FormatText val="Assets\Textures\Storm_UI_Badge_Ascension_Border_Gem_C%0%_Lg.dds"/>
+                    </Frame>
+
+                    <Frame type="TextFormatFrame" name="GemsCappedImagePathFormatter">
+                        <FormatText val="Assets\Textures\Storm_UI_Badge_Ascension_Border_Gem_Full_Lg.dds"/>
+                    </Frame>
+         
+                    <Frame type="TextFormatFrame" name="BannerImagePathFormatter">
+                        <Replacement val="lg" index="1"/>
+                    </Frame>
                 </Frame>
             </Frame>
         
@@ -449,7 +583,7 @@
 
         <StateGroup name="Type">
             <State name="Standard">
-                <Action type="SetProperty" frame="PortraitContainer/AvatarBorderImage" texture="{AscensionBadge/ImagePathFormatter/@Text}"/>
+                <Action type="SetProperty" frame="PortraitContainer/AvatarBorderImage" texture="{AscensionBadge/BorderImagePathFormatter/@Text}"/>
                 <Action type="SetProperty" frame="PortraitContainer/AvatarBorderImage/RankLabel" style="RankedDivision_Standard_Large"/>
                 <Action type="SetState" frame="$this" group="RankBorderType" state="PlayerLevelBorder"/>
             </State>
@@ -494,7 +628,6 @@
             <State name="GrandMaster">
                 <Action type="SetProperty" frame="PortraitContainer/AvatarBorderImage" texture="@UI/portrait_border_master_lg"/>
                 <Action type="SetProperty" frame="PortraitContainer/AvatarBorderImage/RankLabel" style="RankedDivision_GrandMaster_Large"/>
-                <Action type="SetProperty" frame="PortraitContainer/AvatarBorderImage/GrandMasterBorder" visible="true"/>
                 <Action type="SetProperty" frame="PortraitContainer/AvatarBorderImage/GrandMasterBorder" texture="@UI/portrait_border_grandmaster_lg"/>
                 <Action type="SetState" frame="$this" group="RankBorderType" state="GrandMasterBorder"/>
             </State>
@@ -513,8 +646,25 @@
         <Frame type="Frame" name="PortraitContainer">
             <Frame type="Image" name="AvatarBorderImage">
                 <Frame type="AscensionFrame" name="AscensionBadge">
-                    <Width val="74"/>
-                    <Height val="74"/>
+                    <Frame type="TextFormatFrame" name="FontStyle">
+                        <FormatText val="AscensionBadgeAvatar_Party_T%0%"/>
+                    </Frame>
+
+                    <Frame type="TextFormatFrame" name="BorderImagePathFormatter">
+                        <FormatText val="Assets\Textures\Storm_UI_Badge_Ascension_Border_C%1%_T%0%_Lg.dds"/>
+                    </Frame>
+
+                    <Frame type="TextFormatFrame" name="GemsImagePathFormatter">
+                        <FormatText val="Assets\Textures\Storm_UI_Badge_Ascension_Border_Gem_C%0%_Lg.dds"/>
+                    </Frame>
+
+                    <Frame type="TextFormatFrame" name="GemsCappedImagePathFormatter">
+                        <FormatText val="Assets\Textures\Storm_UI_Badge_Ascension_Border_Gem_Full_Lg.dds"/>
+                    </Frame>
+         
+                    <Frame type="TextFormatFrame" name="BannerImagePathFormatter">
+                        <Replacement val="lg" index="1"/>
+                    </Frame>
                 </Frame>
             </Frame>
 
@@ -572,7 +722,7 @@
 
         <StateGroup name="Type">
             <State name="Standard">
-                <Action type="SetProperty" frame="PortraitContainer/AvatarBorderImage" texture="{AscensionBadge/ImagePathFormatter/@Text}"/>
+                <Action type="SetProperty" frame="PortraitContainer/AvatarBorderImage" texture="{AscensionBadge/BorderImagePathFormatter/@Text}"/>
                 <Action type="SetProperty" frame="PortraitContainer/AvatarBorderImage/RankLabel" style="RankedDivision_Standard_Medium"/>
                 <Action type="SetState" frame="$this" group="RankBorderType" state="PlayerLevelBorder"/>
             </State>
@@ -617,7 +767,6 @@
             <State name="GrandMaster">
                 <Action type="SetProperty" frame="PortraitContainer/AvatarBorderImage" texture="@UI/portrait_border_master_med"/>
                 <Action type="SetProperty" frame="PortraitContainer/AvatarBorderImage/RankLabel" style="RankedDivision_GrandMaster_Medium"/>
-                <Action type="SetProperty" frame="PortraitContainer/AvatarBorderImage/GrandMasterBorder" visible="true"/>
                 <Action type="SetProperty" frame="PortraitContainer/AvatarBorderImage/GrandMasterBorder" texture="@UI/portrait_border_grandmaster_med"/>
                 <Action type="SetState" frame="$this" group="RankBorderType" state="GrandMasterBorder"/>
             </State>
@@ -636,8 +785,25 @@
         <Frame type="Frame" name="PortraitContainer">
             <Frame type="Image" name="AvatarBorderImage">
                 <Frame type="AscensionFrame" name="AscensionBadge">
-                    <Width val="55"/>
-                    <Height val="55"/>
+                    <Frame type="TextFormatFrame" name="FontStyle">
+                        <FormatText val="AscensionBadgeAvatar_Loading_T%0%"/>
+                    </Frame>
+
+                    <Frame type="TextFormatFrame" name="BorderImagePathFormatter">
+                        <FormatText val="Assets\Textures\Storm_UI_Badge_Ascension_Border_C%1%_T%0%_Med.dds"/>
+                    </Frame>
+
+                    <Frame type="TextFormatFrame" name="GemsImagePathFormatter">
+                        <FormatText val="Assets\Textures\Storm_UI_Badge_Ascension_Border_Gem_C%0%_Med.dds"/>
+                    </Frame>
+
+                    <Frame type="TextFormatFrame" name="GemsCappedImagePathFormatter">
+                        <FormatText val="Assets\Textures\Storm_UI_Badge_Ascension_Border_Gem_Full_Med.dds"/>
+                    </Frame>
+         
+                    <Frame type="TextFormatFrame" name="BannerImagePathFormatter">
+                        <Replacement val="med" index="1"/>
+                    </Frame>
                 </Frame>
             </Frame>
         
@@ -695,7 +861,7 @@
 
         <StateGroup name="Type">
             <State name="Standard">
-                <Action type="SetProperty" frame="PortraitContainer/AvatarBorderImage" texture="{AscensionBadge/ImagePathFormatter/@Text}"/>
+                <Action type="SetProperty" frame="PortraitContainer/AvatarBorderImage" texture="{AscensionBadge/BorderImagePathFormatter/@Text}"/>
                 <Action type="SetProperty" frame="PortraitContainer/AvatarBorderImage/RankLabel" style="RankedDivision_Standard_SmallMedium"/>
                 <Action type="SetState" frame="$this" group="RankBorderType" state="PlayerLevelBorder"/>
             </State>
@@ -740,7 +906,6 @@
             <State name="GrandMaster">
                 <Action type="SetProperty" frame="PortraitContainer/AvatarBorderImage" texture="@UI/portrait_border_master_med"/>
                 <Action type="SetProperty" frame="PortraitContainer/AvatarBorderImage/RankLabel" style="RankedDivision_GrandMaster_SmallMedium"/>
-                <Action type="SetProperty" frame="PortraitContainer/AvatarBorderImage/GrandMasterBorder" visible="true"/>
                 <Action type="SetProperty" frame="PortraitContainer/AvatarBorderImage/GrandMasterBorder" texture="@UI/portrait_border_grandmaster_med"/>
                 <Action type="SetState" frame="$this" group="RankBorderType" state="GrandMasterBorder"/>
             </State>
@@ -759,8 +924,25 @@
         <Frame type="Frame" name="PortraitContainer">
             <Frame type="Image" name="AvatarBorderImage">
                 <Frame type="AscensionFrame" name="AscensionBadge">
-                    <Width val="56"/>
-                    <Height val="56"/>
+                    <Frame type="TextFormatFrame" name="FontStyle">
+                        <FormatText val="AscensionBadgeAvatar_PartyMember_T%0%"/>
+                    </Frame>
+
+                    <Frame type="TextFormatFrame" name="BorderImagePathFormatter">
+                        <FormatText val="Assets\Textures\Storm_UI_Badge_Ascension_Border_C%1%_T%0%_Med.dds"/>
+                    </Frame>
+
+                    <Frame type="TextFormatFrame" name="GemsImagePathFormatter">
+                        <FormatText val="Assets\Textures\Storm_UI_Badge_Ascension_Border_Gem_C%0%_Med.dds"/>
+                    </Frame>
+
+                    <Frame type="TextFormatFrame" name="GemsCappedImagePathFormatter">
+                        <FormatText val="Assets\Textures\Storm_UI_Badge_Ascension_Border_Gem_Full_Med.dds"/>
+                    </Frame>
+         
+                    <Frame type="TextFormatFrame" name="BannerImagePathFormatter">
+                        <Replacement val="med" index="1"/>
+                    </Frame>
                 </Frame>
             </Frame>
         
@@ -818,7 +1000,7 @@
 
         <StateGroup name="Type">
             <State name="Standard">
-                <Action type="SetProperty" frame="PortraitContainer/AvatarBorderImage" texture="{AscensionBadge/ImagePathFormatter/@Text}"/>
+                <Action type="SetProperty" frame="PortraitContainer/AvatarBorderImage" texture="{AscensionBadge/BorderImagePathFormatter/@Text}"/>
                 <Action type="SetProperty" frame="PortraitContainer/AvatarBorderImage/RankLabel" style="RankedDivision_Standard_SmallMedium"/>
                 <Action type="SetState" frame="$this" group="RankBorderType" state="PlayerLevelBorder"/>
             </State>
@@ -882,8 +1064,25 @@
         <Frame type="Frame" name="PortraitContainer">
             <Frame type="Image" name="AvatarBorderImage">
                 <Frame type="AscensionFrame" name="AscensionBadge">
-                    <Width val="37"/>
-                    <Height val="37"/>
+                    <Frame type="TextFormatFrame" name="FontStyle">
+                        <FormatText val="AscensionBadgeAvatar_Friend_T%0%"/>
+                    </Frame>
+
+                    <Frame type="TextFormatFrame" name="BorderImagePathFormatter">
+                        <FormatText val="Assets\Textures\Storm_UI_Badge_Ascension_Border_C%1%_T%0%_Sm.dds"/>
+                    </Frame>
+
+                    <Frame type="TextFormatFrame" name="GemsImagePathFormatter">
+                        <FormatText val="Assets\Textures\Storm_UI_Badge_Ascension_Border_Gem_C%0%_Sm.dds"/>
+                    </Frame>
+
+                    <Frame type="TextFormatFrame" name="GemsCappedImagePathFormatter">
+                        <FormatText val="Assets\Textures\Storm_UI_Badge_Ascension_Border_Gem_Full_Sm.dds"/>
+                    </Frame>
+         
+                    <Frame type="TextFormatFrame" name="BannerImagePathFormatter">
+                        <Replacement val="sm" index="1"/>
+                    </Frame>
                 </Frame>
             </Frame>
             
@@ -941,7 +1140,7 @@
 
         <StateGroup name="Type">
             <State name="Standard">
-                <Action type="SetProperty" frame="PortraitContainer/AvatarBorderImage" texture="{AscensionBadge/ImagePathFormatter/@Text}"/>
+                <Action type="SetProperty" frame="PortraitContainer/AvatarBorderImage" texture="{AscensionBadge/BorderImagePathFormatter/@Text}"/>
                 <Action type="SetProperty" frame="PortraitContainer/AvatarBorderImage/RankLabel" style="RankedDivision_Standard_Small"/>
                 <Action type="SetState" frame="$this" group="RankBorderType" state="PlayerLevelBorder"/>
             </State>
@@ -986,7 +1185,6 @@
             <State name="GrandMaster">
                 <Action type="SetProperty" frame="PortraitContainer/AvatarBorderImage" texture="@UI/portrait_border_master_sm"/>
                 <Action type="SetProperty" frame="PortraitContainer/AvatarBorderImage/RankLabel" style="RankedDivision_GrandMaster_Small"/>
-                <Action type="SetProperty" frame="PortraitContainer/AvatarBorderImage/GrandMasterBorder" visible="true"/>
                 <Action type="SetProperty" frame="PortraitContainer/AvatarBorderImage/GrandMasterBorder" texture="@UI/portrait_border_grandmaster_sm"/>
                 <Action type="SetState" frame="$this" group="RankBorderType" state="GrandMasterBorder"/>
             </State>
@@ -1005,11 +1203,20 @@
         <Frame type="Frame" name="PortraitContainer">
             <Frame type="Image" name="AvatarBorderImage">
                 <Frame type="AscensionFrame" name="AscensionBadge">
-                    <Width val="30"/>
-                    <Height val="30"/>
-
-                    <Frame type="TextFormatFrame" name="ImagePathFormatter">
+                    <Frame type="TextFormatFrame" name="BorderImagePathFormatter">
                         <FormatText val="Assets\Textures\Storm_UI_Badge_Ascension_Border_C%1%_T%0%_Sm.dds"/>
+                    </Frame>
+
+                    <Frame type="TextFormatFrame" name="GemsImagePathFormatter">
+                        <FormatText val="Assets\Textures\Storm_UI_Badge_Ascension_Border_Gem_C%0%_Sm.dds"/>
+                    </Frame>
+
+                    <Frame type="TextFormatFrame" name="GemsCappedImagePathFormatter">
+                        <FormatText val="Assets\Textures\Storm_UI_Badge_Ascension_Border_Gem_Full_Sm.dds"/>
+                    </Frame>
+
+                    <Frame type="TextFormatFrame" name="BannerImagePathFormatter">
+                        <Replacement val="sm" index="1"/>
                     </Frame>
                 </Frame>
             </Frame>
@@ -1047,7 +1254,7 @@
 
         <StateGroup name="Type">
             <State name="Standard">
-                <Action type="SetProperty" frame="PortraitContainer/AvatarBorderImage" texture="{AscensionBadge/ImagePathFormatter/@Text}"/>
+                <Action type="SetProperty" frame="PortraitContainer/AvatarBorderImage" texture="{AscensionBadge/BorderImagePathFormatter/@Text}"/>
             </State>
             <State name="Placement">
                 <Action type="SetProperty" frame="PortraitContainer/AvatarBorderImage" texture="@UI/portrait_border_placement_tiny"/>

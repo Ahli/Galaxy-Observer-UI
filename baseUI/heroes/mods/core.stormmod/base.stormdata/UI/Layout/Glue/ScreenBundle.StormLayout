@@ -159,11 +159,12 @@
         </Frame>
 
         <Frame type="Label" name="HeaderLabel">
-            <Anchor side="Top" relative="$parent" pos="Min" offset="30"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="-20"/>
             <Anchor side="Left" relative="$parent" pos="Min" offset="15"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
             <AcceptsMouseTooltip val="true"/>
             <Style val="StandardHeroSubHeaderLabel"/>
-            <Options val="Ellipsis | NoWrapping | TooltipIfTruncated"/>
+            <Options val="Ellipsis | NoWrapping | ScaleToPreventTruncation"/>
             <Unclipped val="true"/>
             <Text val="{$parent/@HeaderText}"/>
         </Frame>
@@ -406,16 +407,16 @@
         </Frame>
 
         <Frame type="Image" name="ItemCountIconImage">
-            <Anchor side="Top" relative="$parent" pos="Min" offset="152"/>
+            <Anchor side="Bottom" relative="$parent" pos="Min" offset="265"/>
             <Anchor side="Left" relative="$parent/SpacingFrame" pos="40%" offset="0"/>
             <TextureType val="Normal"/>
-            <Height val="113"/>
             <Width val="139"/>
+            <ScaleHeightToTexture val="true"/>
             <Texture val="@UI/Storm_UI_Store_Bundles_ItemCountBg"/>
         </Frame>
         
         <Frame type="Label" name="ItemCountLabel">
-            <Anchor side="Top" relative="$parent/ItemCountIconImage" pos="Min" offset="22"/>
+            <Anchor side="Top" relative="$parent/ItemCountIconImage" pos="Max" offset="-91"/>
             <Anchor side="Left" relative="$parent/ItemCountIconImage" pos="Mid" offset="0"/>
             <Anchor side="Right" relative="$parent/ItemCountIconImage" pos="Mid" offset="0"/>
             <Style val="StandardPageHeaderLabel"/>
@@ -431,7 +432,7 @@
         </Frame>
 
         <Frame type="Label" name="NameLabel">
-            <Anchor side="Top" relative="$parent/ItemCountIconImage" pos="Min" offset="0"/>
+            <Anchor side="Top" relative="$parent" pos="Min" offset="152"/>
             <Anchor side="Left" relative="$parent/ItemCountIconImage" pos="Max" offset="20"/>
             <Height val="85"/>
             <Style val="StandardLargePageHeaderLabel"/>
@@ -522,6 +523,45 @@
                 </Controller>
             </Animation>
         </Frame>
+        
+        <Frame type="Frame" name="MegaBundleFrame">
+            <Anchor side="Top" relative="MegaBundleImage" pos="Min" offset="0"/>
+            <Anchor side="Bottom" relative="$parent/InvalidBundleFrame" pos="Max" offset="0"/>
+            <Anchor side="Left" relative="$parent/InvalidBundleFrame" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Mid" offset="10"/>
+            <Visible val="false"/>
+
+            <Frame type="Image" name="MegaBundleImage">
+                <Anchor side="Bottom" relative="$parent" pos="Max" offset="-5"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                <Height val="85"/>
+                <ScaleWidthToTexture val="true"/>
+                <Texture val="@UI/Storm_UI_Storm_MegaBundle"/>
+            </Frame>
+
+            <Frame type="Label" name="AlertLabel">
+                <Anchor side="Top" relative="$parent/MegaBundleImage" pos="Mid" offset="-16"/>
+                <Anchor side="Left" relative="$parent/MegaBundleImage" pos="Mid" offset="2"/>
+                <Anchor side="Right" relative="$parent/MegaBundleImage" pos="Mid" offset="2"/>
+                <Style val="StorePageHeaderGoldLabel"/>
+                <Text val="!"/>
+            </Frame>
+            
+            <Frame type="TextFormatFrame" name="TextFormatFrame">
+                <Anchor relative="$parent"/>
+                <FormatText val="@UI/Store/ExclusiveMegabundleWarning"/>
+                <Replacement val="{$parent/$parent/GameContentFrame/@ProductSet[Name]}" index="0"/>
+            </Frame>
+
+            <Frame type="Label" name="ExclusiveWarningLabel">
+                <Anchor side="Top" relative="$parent/AlertLabel" pos="Mid" offset="0"/>
+                <Anchor side="Bottom" relative="$parent/AlertLabel" pos="Mid" offset="0"/>
+                <Anchor side="Left" relative="$parent/MegaBundleImage" pos="Max" offset="10"/>
+                <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+                <Text val="{$parent/TextFormatFrame/@Text}"/>
+                <Style val="StoreGoldHeaderLabel"/>
+            </Frame>
+        </Frame>
 
         <Frame type="Control" name="PriceLowWarningIcon" template="ProductPurchasePanel/PriceTooLowIconTemplate">
             <Anchor side="Top" relative="$parent/BuyButton0" pos="Mid" offset="0"/>
@@ -548,6 +588,30 @@
             <Shortcut val="@UI/ScreenNavigationRight_Hotkey"/>
         </Frame>
 
+        <Frame type="GameContentFrame" name="GameContentFrame">
+            <Anchor relative="$parent" offset="0"/>
+            <GameContent val="{$ancestor[@type=ScreenBundle]/@GameContent}"/>
+            <Visible val="false"/>
+        </Frame>
+
+        <StateGroup name="MegaBundle">
+            <State name="IsMega">
+                <When type="Property" frame="GameContentFrame" ProductSetMutuallyExclusive="true"/>
+                <Action type="SetProperty" frame="ItemCountIconImage" Texture="@UI/Storm_UI_Storm_MegaBundle"/>
+                <Action type="SetProperty" frame="ItemCountLabel" Style="StorePageHeaderGoldLabel"/>
+                <Action type="SetProperty" frame="ItemCountTitleLabel" Style="StoreGoldHeaderLabel"/>
+            </State>
+        </StateGroup>
+
+        <StateGroup name="MegaBundlePurchaseable">
+            <State name="CanPurchase">
+                <When type="StateGroup" MegaBundle="IsMega"/>
+                <When type="Property" frame="PurchasedIndicatorFrame" Visible="False"/>
+                <When type="Property" frame="InvalidBundleFrame" Visible="False"/>
+                <Action type="SetProperty" frame="MegaBundleFrame" Visible="true"/>
+            </State>
+        </StateGroup>
+
         <StateGroup name="TitleTextState">
             <DefaultState val="NotBundleData"/>
             
@@ -572,7 +636,7 @@
 
             <State name="NotBundleDataDescription">
                 <Action type="SetProperty" frame="InfoLabel" Text=""/>
-                <Action type="SetProperty" frame="InfoLabel" Visible="True"/>
+                <Action type="SetProperty" frame="InfoLabel" Visible="False"/>
             </State>
         </StateGroup>
     </Frame>
