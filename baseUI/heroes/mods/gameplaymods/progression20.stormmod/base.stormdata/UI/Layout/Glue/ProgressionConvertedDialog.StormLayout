@@ -47,7 +47,7 @@
             <Event event="OnShown" action="Reset,Play"/>
             <Controller type="Sound" end="Pause">
                 <Key type="Sound" time="0" sound="@UI_BNet_Menu_Show" />
-                <Key type="Sound" time="0" sound="@UI_BNet_Ranked_SeasonRoll_PreSeason" />
+                <Key type="Sound" time="0" sound="@UI_BNet_RewardUnlocked" />
             </Controller>
         </Animation>
 
@@ -83,7 +83,7 @@
 
             <Animation name="StartAnimation">
                 <Event event="OnShown" action="Reset,Play"/>
-                <Controller type="Fade" end="Pause" frame="AscensionBadge">
+                <Controller type="Fade" end="Pause" frame="AscensionFrame">
                     <Key type="Curve" time="0" value="0"/>
                     <Key type="Curve" time="1.2" value="255" In="Auto"/>
                 </Controller>
@@ -99,14 +99,6 @@
                 <Text val="@UI/ProgressionConverted/Dialog/Page1/Subtitle"/>
             </Frame>
 
-            <Frame type="Label" name="PlayerLevelLabel">
-                <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
-                <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
-                <Anchor side="Top" relative="$parent/SubtitleLabel" pos="Max" offset="0"/>
-                <Style val="ConversionDialog_Title"/>
-                <Text val="{$ProgressionConvertedDialog/@PlayerLevel}"/>
-            </Frame>            
-<!-- 
             <Frame type="CountdownLabel" name="PlayerLevelLabel">
                 <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
                 <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
@@ -116,29 +108,28 @@
                 <StartValue val="0"/>
                 <TargetValue val="{$ProgressionConvertedDialog/@PlayerLevel}"/>
 
-                <StateGroup name="HeroProgressSound">
-                    <State name="StartCounting">
-                        <When type="Property" Counting="true"/>
-                        <When type="Property" inheritedVisible="true"/>
-                        <Action type="PlaySound" sound="*@UI_BNet_ProgressionCounter_Badge"/>
-                        <Action type="PlaySound" sound="*@UI_BNet_ProgressionCounter_Badge_End" on="Exit"/>
-                    </State>
-                </StateGroup>
                 <Animation name="CountUp">
                     <Event event="Start" action="Reset,Play"/>
+                    <Event event="OnHidden" action="Reset"/>
                     <Controller type="Counter" end="Pause">
-                        <Key type="Curve" time="0.0" value="0.0" out="Slow"/>
-                        <Key type="Curve" time="6.0" value="1.0" in="Slow"/>
+                        <Key type="Curve" time="0.0" value="0.0" in="linear" out="linear"/>
+                        <Key type="Curve" time="1.75" value="1.0" in="linear" out="linear"/>
+                    </Controller>
+                    <Controller type="Sound" end="Stop">
+                        <Key type="Sound" time="0.001" sound="*@UI_BNet_Progression_Levelup_Rank100"/>
+                    </Controller>
+                    <Controller type="Event" frame="$parent/AscensionFrame" end="Stop">
+                        <Key type="Event" time="0" event="BadgeTransitionFlash"/>
                     </Controller>
                 </Animation>
             </Frame>
--->
 
-            <Frame type="AscensionFrame" name="AscensionBadge" template="AscensionBadge/AscensionBigBadgeTemplate">
+            <Frame type="AscensionFrame" name="AscensionFrame" template="AscensionBadge/AscensionScoreBadgeBigTemplate">
                 <Anchor side="Top" relative="$ProgressionConvertedDialog/BackgroundFrame" pos="Mid" offset="0"/>
                 <Anchor side="Left" relative="$ProgressionConvertedDialog/BackgroundFrame" pos="Mid" offset="0"/>
                 <Anchor side="Right" relative="$ProgressionConvertedDialog/BackgroundFrame" pos="Mid" offset="0"/>
                 <Anchor side="Bottom" relative="$ProgressionConvertedDialog/BackgroundFrame" pos="Mid" offset="0"/>
+
                 <AccountLevel val="{$parent/PlayerLevelLabel/@Text}"/>
             </Frame>
         </Frame>

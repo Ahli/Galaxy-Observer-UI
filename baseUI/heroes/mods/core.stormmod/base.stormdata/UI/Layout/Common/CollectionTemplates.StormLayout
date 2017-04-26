@@ -767,17 +767,14 @@
             <StateGroup name="FeaturedToggle">
                 <State name="ShowFeatured">
                     <When type="Property" frame="FeaturedItem" Toggled="true"/>
-                    <Action type="SetProperty" frame="$this" RequireSelection="false" undo="false"/>
-                    <Action type="SetProperty" frame="$this" SelectedIndex="#InvalidIndex" undo="false"/>
+                    <Action type="SetProperty" RequireSelection="false" undo="false"/>
+                    <Action type="SetProperty" SelectedIndex="#InvalidIndex" undo="false"/>
                     <Action type="SetProperty" frame="FeaturedItem" AcceptsMouse="false" undo="false"/>
-                    <Action type="SetProperty" frame="$parent/ContentTileList" CollectionCategoryFilter="" undo="false"/>
                 </State>
                 <State name="ShowNormal">
                     <When type="Property" frame="FeaturedItem" Toggled="false"/>
-                    <Action type="SetProperty" frame="$this" RequireSelection="true" undo="false"/>
+                    <Action type="SetProperty" RequireSelection="true" undo="false"/>
                     <Action type="SetProperty" frame="FeaturedItem" AcceptsMouse="true" undo="false"/>
-                    <Action type="SetProperty" frame="$parent/ContentTileList" CollectionCategoryFilter="{$parent/CategoryTileList/@SelectedCollectionCategory}" undo="false"/>
-                    <Action type="SetProperty" frame="$parent/ContentTileList" ProductAttribute="" index="0"/>
                 </State>
             </StateGroup>
         </Frame>
@@ -799,11 +796,18 @@
         </Frame>
 
         <Frame type="GameContentTileList" name="ContentTileList" template="CollectionTemplates/ContentTileListTemplate">
-            <CollectionCategoryFilter val="{$parent/CategoryTileList/@SelectedCollectionCategory}"/>
-
-            <ExcludedGameContentTable index="0" val="{$parent/BigTileList/@GameContentTable[0]}"/>
-            <ExcludedGameContentTable index="1" val="{$parent/BigTileList/@GameContentTable[1]}"/>
-            <ExcludedGameContentTable index="2" val="{$parent/BigTileList/@GameContentTable[2]}"/>
+            <StateGroup name="FeaturedToggle">
+                <State name="ShowFeatured">
+                    <When type="Property" frame="$parent/CategoryTileList/FeaturedItem" Toggled="true"/>
+                    <Action type="SetProperty" CollectionCategoryFilter="" undo="false"/>
+                    <Action type="SetProperty" ExcludedGameContentTable="{$parent/BigTileList/@GameContentTable}"/>
+                </State>
+                <State name="ShowNormal">
+                    <When type="Property" frame="$parent/CategoryTileList/FeaturedItem" Toggled="false"/>
+                    <Action type="SetProperty" CollectionCategoryFilter="{$parent/CategoryTileList/@SelectedCollectionCategory}" undo="false"/>
+                    <Action type="SetProperty" index="0" ProductAttribute=""/>
+                </State>
+            </StateGroup>
 
             <StateGroup name="ItemsPerPageStates">
                 <State name="SearchInactive_WithBigTileList">
@@ -857,7 +861,6 @@
                 <State name="ShowNormal">
                     <Action type="SetProperty" frame="$this" RequireSelection="true" undo="false"/>
                     <Action type="SetProperty" frame="FeaturedItem" AcceptsMouse="true" undo="false"/>
-                    <Action type="SetProperty" frame="$parent/ContentTileList" ProductAttribute="" index="0"/>
                 </State>
             </StateGroup>
 
@@ -883,6 +886,12 @@
         <Frame type="GameContentTileList" name="ContentTileList" template="CollectionTemplates/ContentTileListTemplate">
             <ParentHeroFilter val="{$parent/CategoryTileList/GameContentData/@HeroLink}"/>
             <CollectionCategoryFilter val=""/>
+
+            <StateGroup name="FeaturedToggle">
+                <State name="ShowNormal">
+                    <Action type="SetProperty" index="0" ProductAttribute=""/>
+                </State>
+            </StateGroup>
 
             <StateGroup name="DontRequireParentHero">
                 <State name="SearchActive">
