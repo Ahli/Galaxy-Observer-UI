@@ -52,36 +52,34 @@
             </StateGroup>
         </Frame>
 
-        <Frame type="BattleMapProfilePanel" name="MapProfilePanel" template="BattleMapProfilePanel/BattleMapProfilePanelTemplate">
-            <Anchor relative="$parent"/>
-            <Visible val="false"/>
-
-            <Animation name="Show">
-                <Event event="OnHidden" action="Reset,Stop" frame="$this"/>
-                <Event event="Show" action="DirectionForward,Play" frame="$this"/>
-                <Event event="Hide" action="Reset,Stop" frame="$this"/>
-                <Event event="OnClick" action="Reset,Stop" frame="CloseButton"/>
-                <Event event="ToonOffline" action="Reset,Stop" frame="$parent"/>
-
-                <Controller type="Visibility" end="Pause">
-                    <Key type="Bool" time="0.000" value="false"/>
-                    <Key type="Bool" time="0.001" value="true"/>
-                    <Key type="Bool" time="0.175" value="true"/>
-                </Controller>
-
-                <Controller type="Fade" end="Pause">
-                    <Key type="Curve" time="0.000" value="0" out="Slow"/>
-                    <Key type="Curve" time="0.175" value="255" in="Auto"/>
-                </Controller>
-            </Animation>
-        </Frame>
-
         <Frame type="MatchmakingInvitePanel" name="MatchmakingInvitePanel" template="MatchmakingInvitePanel/MatchmakingInvitePanelTemplate">
             <Anchor relative="$parent"/>
         </Frame>
 
         <Frame type="CustomGameInvitePanel" name="CustomGameInvitePanel" template="CustomGameInvitePanel/CustomGameInvitePanelTemplate">
             <Anchor relative="$parent"/>
+        </Frame>
+
+        <Frame type="ClubSearchFrame" name="ClubSearchFrame" template="ClubSearchFrame/ClubSearchFrameTemplate">
+            <Anchor relative="$parent"/>
+            <Visible val="false"/>
+
+            <Animation name="Show">
+                <Event event="FindGroupClicked" action="Reset,Play" frame="$parent/SocialContainer/ClubListPanel"/>
+                <Event event="OnClick" action="DirectionReverse,Play" frame="CloseButton"/>
+                <Event event="OnClick" action="DirectionReverse,Play" frame="ViewInfoButton"/>
+
+                <Controller type="Fade" end="Pause">
+                    <Key type="Curve" time="0" value="0" out="Slow"/>
+                    <Key type="Curve" time=".175" value="255" in="Auto"/>
+                </Controller>
+
+                <Controller type="Visibility" end="Pause">
+                    <Key type="Bool" time="0" value="false"/>
+                    <Key type="Bool" time=".001" value="true"/>
+                    <Key type="Bool" time=".175" value="true"/>
+                </Controller>
+            </Animation>
         </Frame>
 
         <StateGroup name="ShowForegroundStateGroup">
@@ -93,7 +91,6 @@
             <State name="HideForegroundState">
                 <When type="AnimationState" frame="$this" ShowForeground="NotVisible"/>
                 <Action type="SetProperty" frame="SocialContainer" Visible="false"/>
-                <Action type="SendEvent" frame="MapProfilePanel" event="Hide"/>
             </State>
         </StateGroup>
 
@@ -222,6 +219,9 @@
                 <Anchor side="Left" relative="$parent/Chat16x9Anchor" pos="Min" offset="0"/>
                 <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
                 <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+
+                <!-- This property bind actually inserts the selected emoticon into the chat edit box -->
+                <InsertEmoticon val="{$parent/EmoticonPanel/@SelectedEmoticon}"/>
 
                 <Animation name="MaximizeButtonClick">
                     <Event event="OnClick" action="DirectionForward,Play" frame="ChatManagerPanel/MaximizeChatButton"/>
@@ -435,13 +435,6 @@
                 </StateGroup>
             </Frame>
 
-            <!-- This property bind actually inserts the selected emoticon into the chat edit box -->
-            <Frame type="PropertyBind" name="BindEmoticon">
-                <Anchor relative="$parent/EmoticonPanel"/>
-                <Source frame="$parent/EmoticonPanel" property="SelectedEmoticon"/>
-                <Target frame="$parent/ChatPanel" property="InsertEmoticon"/>
-            </Frame>
-
             <Frame type="Button" name="EmoticonButton"  template="EmoticonSelectionPanel/EmoticonButtonTemplate">
                 <Anchor side="Bottom" relative="$parent/ChatPanel" pos="Max" offset="0"/>
                 <Anchor side="Right" relative="$parent/ChatPanel" pos="Min" offset="7"/>
@@ -546,6 +539,19 @@
 
             <Frame type="PartyInvitePanel" name="PartyInvitePanel" template="StandardBattlenetTemplates/PartyInvitePanel">
                 <Anchor side="Top" relative="$parent/ToastNotificationPanel" pos="Max" offset="5"/>
+                <Anchor side="Right" relative="$parent" pos="Max" offset="-15"/>
+                <CollapseLayout val="true"/>
+
+                <Animation name="SlideIn">
+                    <Controller name="Move" type="Anchor" side="Left" relative="true" end="Pause">
+                        <Key type="Curve" time="0" value="412" out="Fast"/>
+                        <Key type="Curve" time="0.3" value="0" in="Fast"/>
+                    </Controller>
+                </Animation>
+            </Frame>
+
+            <Frame type="ClubInvitePanel" name="ClubInvitePanel" template="StandardBattlenetTemplates/ClubInvitePanel">
+                <Anchor side="Top" relative="$parent/PartyInvitePanel" pos="Max" offset="5"/>
                 <Anchor side="Right" relative="$parent" pos="Max" offset="-15"/>
 
                 <Animation name="SlideIn">

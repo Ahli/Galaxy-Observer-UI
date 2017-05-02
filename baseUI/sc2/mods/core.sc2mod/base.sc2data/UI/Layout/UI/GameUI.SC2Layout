@@ -21,6 +21,12 @@
             <Controller type="Sound" end="Pause">
                 <Key type="Sound" time="0.6" sound="*@UI_Rewind_Button_AS" direction="Forward"/>
             </Controller>
+
+            <Controller type="Visibility" frame="ConvertToReplayAnim" end="Pause">
+                <Key type="Bool" time="0" value="False"/>
+                <Key type="Bool" time=".1" value="True"/>
+                <Key type="Bool" time="1.5" value="False"/>
+            </Controller>
         </Animation>
 
         <Frame type="WorldPanel" name="WorldPanel">
@@ -624,48 +630,8 @@
                         <Width val="#ChatPanelWidth"/>
                         <Height val="#ChatPanelHeight"/>
                     </Frame>
-                    
-                    <!--
-
-                    <Frame type="EmoticonSelectionPanel" name="EmoticonPanel" template="EmoticonSelectionPanel/EmoticonSelectionPanelTemplate">
-                        <Anchor side="Bottom" relative="$parent/EmoticonButton" pos="Min" offset="5"/>
-                        <Anchor side="Right" relative="$parent/ChatPanel" pos="Min" offset="7"/>
-                        <CollapseLayout val="true"/>
-                    </Frame>
-                    
-                    -->
-
-                    <!-- This property bind actually inserts the selected emoticon into the chat edit box -->
-                    
-                    <!--
-                    
-                    <Frame type="PropertyBind" name="BindEmoticon">
-                        <Anchor relative="$parent/EmoticonPanel"/>
-                        <Source frame="$parent/EmoticonPanel" property="SelectedEmoticon"/>
-                        <Target frame="$parent/ChatPanel" property="InsertEmoticon"/>
-                    </Frame>
-
-                    <Frame type="Button" name="EmoticonButton"  template="EmoticonSelectionPanel/EmoticonButtonTemplate">
-                        <Anchor side="Bottom" relative="$parent/ChatPanel" pos="Max" offset="0"/>
-                        <Anchor side="Right" relative="$parent/ChatPanel" pos="Min" offset="7"/>
-                        <Toggleable val="true"/>
-
-                        <StateGroup name="VisibilityStateGroup">
-                            <State name="VisibleState">
-                                <When type="Property" frame="$this" Toggled="true"/>
-                                <Action type="SetProperty" frame="$parent/EmoticonPanel" Visible="true"/>
-                            </State>
-
-                            <State name="InvisibleState">
-                                <When type="Property" frame="$this" Toggled="false"/>
-                                <Action type="SetProperty" frame="$parent/EmoticonPanel" Visible="false"/>
-                            </State>
-                        </StateGroup>
-                    </Frame>
-                    
-                    -->
                 </Frame>
-                
+
                 <Frame type="Frame" name="FriendsPanel">
                     <Anchor relative="$parent"/>
                     <Visible val="false"/>
@@ -954,6 +920,190 @@
                 <Frame type="Image" name="Blackout">
                     <Visible val="false"/>
                 </Frame>
+            </Frame>
+        </Frame>
+
+        <Frame type="Frame" name="ConvertToReplayAnim">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+            <Visible val="False"/>
+
+            <Frame type="Image" name="DarkBg">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+                <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+                <LayerColor val="000000"/>
+                <Alpha val="180"/>
+            </Frame>
+
+            <Frame type="Image" name="Scanlines">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+                <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+                <Texture val="@UI/SC2_InGame_Replay_Effect_Scanlines"/>
+                <Tiled val="True"/>
+                <Alpha val="85"/>
+            </Frame>
+
+            <Frame type="Label" name="RewindLabel">
+                <Anchor side="Left" relative="$parent" pos="Mid" offset="50"/>
+                <Anchor side="Right" relative="$parent" pos="Mid" offset="50"/>
+                <Anchor side="Bottom" relative="$parent" pos="Mid" offset="-70"/>
+                <Text val="@UI/ScreenReplay/ConvertToReplay"/>
+                <Style val="ReplayConvertTitle"/>
+
+                <Animation name="DistortionAnim">
+                    <Event event="OnShown" frame="$parent" action="Reset,Play"/>
+
+                    <Controller type="Fade" end="Pause">
+                        <Key type="Curve" time="0" value="0" out="Fast"/>
+                        <Key type="Curve" time=".25" value="255" in="Slow"/>
+                        <Key type="Curve" time="1.4" value="255" in="Slow"/>
+                        <Key type="Curve" time="1.5" value="0" out="Fast"/>
+                    </Controller>
+                </Animation>
+            </Frame>
+
+            <Frame type="Image" name="Underline">
+                <Anchor side="Bottom" relative="$parent/RewindLabel" pos="Max" offset="10"/>
+                <Anchor side="Left" relative="$parent/RewindLabel" pos="Min" offset="-45"/>
+                <Anchor side="Right" relative="$parent/RewindLabel" pos="Max" offset="55"/>
+                <Texture val="@UI/SC2_InGame_Replay_Effect_Underline"/>
+                <TextureType val="Nineslice"/>
+                <Tiled val="True"/>
+                <Alpha val="0"/>
+
+                <Animation name="DistortionAnim">
+                    <Event event="OnShown" frame="$parent" action="Reset,Play"/>
+
+                    <Controller type="Fade" end="Pause">
+                        <Key type="Curve" time="0" value="0" out="Fast"/>
+                        <Key type="Curve" time=".25" value="255" in="Slow"/>
+                        <Key type="Curve" time="1.4" value="255" in="Slow"/>
+                        <Key type="Curve" time="1.5" value="0" out="Fast"/>
+                    </Controller>
+                </Animation>
+            </Frame>
+
+            <Frame type="Image" name="Arrow1">
+                <Anchor side="Bottom" relative="$parent/Underline" pos="Max" offset="10"/>
+                <Anchor side="Right" relative="$parent/Underline" pos="Min" offset="10"/>
+                <Texture val="@UI/SC2_InGame_Replay_Effect_Arrow"/>
+                <Alpha val="0"/>
+
+                <Animation name="StaticAnim1">
+                    <Event event="OnShown" frame="$parent" action="Reset,Play"/>
+
+                    <Controller type="Fade" end="Pause">
+                        <Key type="Curve" time="0" value="0" out="Fast"/>
+                        <Key type="Curve" time=".25" value="255" in="Slow"/>
+                        <Key type="Curve" time="1.4" value="255" in="Slow"/>
+                        <Key type="Curve" time="1.5" value="0" out="Fast"/>
+                    </Controller>
+                </Animation>
+            </Frame>
+
+            <Frame type="Image" name="Arrow1_Highlight">
+                <Anchor relative="$parent/Arrow1"/>
+                <Texture val="@UI/SC2_InGame_Replay_Effect_Arrow_Highlight"/>
+                <Alpha val="0"/>
+
+                <Animation name="StaticAnim1">
+                    <Event event="OnShown" frame="$parent" action="Reset,Play"/>
+
+                    <Controller type="Fade" end="Pause">
+                        <Key type="Curve" time="0" value="0" out="Fast"/>
+                        <Key type="Curve" time=".30" value="0" in="Slow"/>
+                        <Key type="Curve" time="0.35" value="255" in="Slow"/>
+                        <Key type="Curve" time="0.4" value="0" out="Fast"/>
+                        <Key type="Curve" time=".6" value="0" in="Slow"/>
+                        <Key type="Curve" time="0.65" value="255" in="Slow"/>
+                        <Key type="Curve" time="0.7" value="0" out="Fast"/>
+                        <Key type="Curve" time="1.5" value="0" out="Fast"/>
+                    </Controller>
+                </Animation>
+            </Frame>
+
+            <Frame type="Image" name="Arrow2">
+                <Anchor side="Top" relative="$parent/Arrow1" pos="Min" offset="0"/>
+                <Anchor side="Right" relative="$parent/Arrow1" pos="Min" offset="25"/>
+                <Texture val="@UI/SC2_InGame_Replay_Effect_Arrow"/>
+                <Alpha val="0"/>
+
+                <Animation name="StaticAnim2">
+                    <Event event="OnShown" frame="$parent" action="Reset,Play"/>
+
+                    <Controller type="Fade" end="Pause">
+                        <Key type="Curve" time="0" value="0" out="Fast"/>
+                        <Key type="Curve" time=".25" value="255" in="Slow"/>
+                        <Key type="Curve" time="1.4" value="255" in="Slow"/>
+                        <Key type="Curve" time="1.5" value="0" out="Fast"/>
+                    </Controller>
+                </Animation>
+            </Frame>
+
+            <Frame type="Image" name="Arrow2_Highlight">
+                <Anchor relative="$parent/Arrow2"/>
+                <Texture val="@UI/SC2_InGame_Replay_Effect_Arrow_Highlight"/>
+                <Alpha val="0"/>
+
+                <Animation name="StaticAnim1">
+                    <Event event="OnShown" frame="$parent" action="Reset,Play"/>
+
+                    <Controller type="Fade" end="Pause">
+                        <Key type="Curve" time="0" value="0" out="Fast"/>
+                        <Key type="Curve" time=".35" value="0" in="Slow"/>
+                        <Key type="Curve" time="0.4" value="255" in="Slow"/>
+                        <Key type="Curve" time="0.45" value="0" out="Fast"/>
+                        <Key type="Curve" time=".65" value="0" in="Slow"/>
+                        <Key type="Curve" time="0.7" value="255" in="Slow"/>
+                        <Key type="Curve" time="0.75" value="0" out="Fast"/>
+                        <Key type="Curve" time="1.5" value="0" out="Fast"/>
+                    </Controller>
+                </Animation>
+            </Frame>
+
+            <Frame type="Image" name="Arrow3">
+                <Anchor side="Top" relative="$parent/Arrow2" pos="Min" offset="0"/>
+                <Anchor side="Right" relative="$parent/Arrow2" pos="Min" offset="25"/>
+                <Texture val="@UI/SC2_InGame_Replay_Effect_Arrow"/>
+                <Alpha val="0"/>
+
+                <Animation name="StaticAnim3">
+                    <Event event="OnShown" frame="$parent" action="Reset,Play"/>
+
+                    <Controller type="Fade" end="Pause">
+                        <Key type="Curve" time="0" value="0" out="Fast"/>
+                        <Key type="Curve" time=".25" value="255" in="Slow"/>
+                        <Key type="Curve" time="1.4" value="255" in="Slow"/>
+                        <Key type="Curve" time="1.5" value="0" out="Fast"/>
+                    </Controller>
+                </Animation>
+            </Frame>
+
+            <Frame type="Image" name="Arrow3_Highlight">
+                <Anchor relative="$parent/Arrow3"/>
+                <Texture val="@UI/SC2_InGame_Replay_Effect_Arrow_Highlight"/>
+                <Alpha val="0"/>
+
+                <Animation name="StaticAnim1">
+                    <Event event="OnShown" frame="$parent" action="Reset,Play"/>
+
+                    <Controller type="Fade" end="Pause">
+                        <Key type="Curve" time="0" value="0" out="Fast"/>
+                        <Key type="Curve" time=".40" value="0" in="Slow"/>
+                        <Key type="Curve" time="0.45" value="255" in="Slow"/>
+                        <Key type="Curve" time="0.5" value="0" out="Fast"/>
+                        <Key type="Curve" time=".7" value="0" in="Slow"/>
+                        <Key type="Curve" time="0.75" value="255" in="Slow"/>
+                        <Key type="Curve" time="0.8" value="0" out="Fast"/>
+                        <Key type="Curve" time="1.5" value="0" out="Fast"/>
+                    </Controller>
+                </Animation>
             </Frame>
         </Frame>
 

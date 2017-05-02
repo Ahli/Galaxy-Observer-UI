@@ -2,9 +2,22 @@
 <Desc>
     <DescFlags val="Locked"/>
     
-    <Frame type="BattleMapProfilePanel" name="BattleMapProfilePanelTemplate">
+    <Frame type="ScreenBattleMapProfile" name="ScreenBattleMapProfile">
         <Anchor relative="$parent"/>
-        <Visible val="false"/>
+        <Handle val="ScreenBattleMapProfile"/>
+        <!-- This must render below ScreenBattlenet so fanfares and profile can appear above it -->
+        <!-- But render above ScreenNavigation and other content screens so you can't navigate or interact with other things -->
+        <RenderPriority val="650"/>
+
+        <Animation name="Show">
+            <Event event="OnHidden" action="Reset,Stop" frame="$this"/>
+            <Event event="OnShown" action="Reset,Play" frame="$this"/>
+
+            <Controller type="Fade" end="Pause">
+                <Key type="Curve" time="0.000" value="0" out="Slow"/>
+                <Key type="Curve" time="0.175" value="255" in="Auto"/>
+            </Controller>
+        </Animation>
 
         <!-- This tooltip is just for blocking tooltips behind this panel -->
         <Frame type="StandardTooltip" name="MapProfileTooltip">
@@ -184,14 +197,9 @@
             <Style val="@Arcade_GameInfo_Title"/>
             <Options val="NoWrapping"/>
             <Visible val="false"/>
-
-            <Frame type="PropertyBind" name="BindName">
-                <Anchor relative="$parent"/>
-                <Source frame="$parent/$parent/MapNameLabel" property="Text"/>
-                <Target frame="$parent" property="Text"/>
-            </Frame>
+            <Text val="{$parent/MapNameLabel/@Text}"/>
         </Frame>
-        
+
         <Frame type="RangeFrame" name="NameRangeFrame">
             <Anchor side="Top" relative="$parent/MapNameLabelTruncate" pos="Min" offset="0"/>
             <Anchor side="Left" relative="$parent/MapNameLabelTruncate" pos="Max" offset="0"/>

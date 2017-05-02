@@ -284,51 +284,101 @@
             <Text val="@UI/ScreenCollection/Owned"/>
             <Visible val="False"/>
         </Frame>
-        
-        <StateGroup name="ItemDisplayState">
 
+        <StateGroup name="EmptyState">
+            <DefaultState val="NotEmpty"/>
+            
             <State name="Empty">
                 <When type="StateGroup" frame="$this" ItemTypeState="Empty"/>
-                <Action type="SetProperty" frame="EmptyImage" Visible="True"/>
+                <Action type="SetProperty" frame="NameLabel" Visible="False"/>
                 <Action type="SetProperty" frame="IconImageContainer" Visible="False"/>
                 <Action type="SetProperty" frame="TextBackground" Visible="False"/>
-                <Action type="SetProperty" frame="NameLabel" Visible="False"/>
-                <Action type="SetProperty" frame="CurrentPriceLabel" Visible="False"/>
-                <Action type="SetProperty" frame="StateLabel" Visible="False"/>
+                <Action type="SetProperty" frame="EmptyImage" Visible="True"/>
                 <Action type="SetProperty" frame="BackgroundBlur" BlurAmount=".1"/>
+            </State>
+
+            <State name="NotEmpty">
+                <Action type="SetProperty" frame="NameLabel" Visible="True"/>
+                <Action type="SetProperty" frame="IconImageContainer" Visible="True"/>
+                <Action type="SetProperty" frame="TextBackground" Visible="True"/>
+                <Action type="SetProperty" frame="EmptyImage" Visible="False"/>
+                <Action type="SetProperty" frame="BackgroundBlur" BlurAmount=".35"/>
+            </State>
+        </StateGroup>
+
+        <StateGroup name="OwnedLabelState">
+            <DefaultState val="NotOwned"/>
+            
+            <State name="Empty">
+                <When type="StateGroup" frame="$this" ItemTypeState="Empty"/>
+                <Action type="SetProperty" frame="StateLabel" Visible="False"/>
+                <Action type="SetProperty" frame="LockedItemIcon" Visible="False"/>
+            </State>
+    
+            <State name="Owned">
+                <When type="StateGroup" frame="$this" ItemOwnedState="Purchased"/>
+                <Action type="SetProperty" frame="StateLabel" Visible="True"/>
+                <Action type="SetProperty" frame="LockedItemIcon" Visible="False"/>
+            </State>
+
+            <State name="NotOwned">
+                <Action type="SetProperty" frame="StateLabel" Visible="False"/>
+                <Action type="SetProperty" frame="LockedItemIcon" Visible="True"/>
+            </State>
+        </StateGroup>
+        
+        <StateGroup name="ItemDiscountState">
+            <State name="Empty">
+                <When type="StateGroup" frame="$this" ItemTypeState="Empty"/>
+                
+                <Action type="SetProperty" frame="CurrentPriceLabel" Visible="False"/>
+                <Action type="SetProperty" frame="OriginalPriceLabel" Visible="False"/>
+                <Action type="SetProperty" frame="DiscountSlash" Visible="False"/>
+                <Action type="SetProperty" frame="DiscountPercentageLabel" Visible="False"/>
             </State>
 
             <State name="Owned">
                 <When type="StateGroup" frame="$this" ItemOwnedState="Purchased"/>
-                <Action type="SetProperty" frame="StateLabel" Visible="True"/>
+                
+                <Action type="SetProperty" frame="CurrentPriceLabel" Visible="False"/>
+                <Action type="SetProperty" frame="OriginalPriceLabel" Visible="False"/>
+                <Action type="SetProperty" frame="DiscountSlash" Visible="False"/>
+                <Action type="SetProperty" frame="DiscountPercentageLabel" Visible="False"/>
             </State>
 
-            <State name="UnpurchasedIndividualItem">
-                <When type="StateGroup" frame="$this" ItemTypeState="IndividualItem"/>
-                <When type="StateGroup" frame="$this" ItemOwnedState="NotPurchased"/>
-                <Action type="SetProperty" frame="LockedItemIcon" Visible="True"/>
+            <State name="NoDiscount">
+                <When type="Property" frame="GameContentFrame" DiscountPercent="0"/>
+                
                 <Action type="SetProperty" frame="CurrentPriceLabel" Visible="True"/>
                 <Action type="SetProperty" frame="OriginalPriceLabel" Visible="False"/>
                 <Action type="SetProperty" frame="DiscountSlash" Visible="False"/>
+                <Action type="SetProperty" frame="DiscountPercentageLabel" Visible="False"/>
             </State>
-            
-            <State name="UnpurchasedStandardBundle">
+
+            <State name="UnpurchasedStandardBundleCanPurchase">
                 <When type="StateGroup" frame="$this" ItemTypeState="StandardBundle"/>
-                <When type="StateGroup" frame="$this" ItemOwnedState="NotPurchased"/>
-                <Action type="SetProperty" frame="LockedItemIcon" Visible="True"/>
-                <Action type="SetProperty" frame="CurrentPriceLabel" Visible="True"/>
-                <Action type="SetProperty" frame="OriginalPriceLabel" Visible="False"/>
-                <Action type="SetProperty" frame="DiscountSlash" Visible="False"/>
-            </State>
-            
-            <State name="UnpurchasedDynamicBundle">
-                <When type="StateGroup" frame="$this" ItemTypeState="DynamicBundle"/>
-                <When type="StateGroup" frame="$this" ItemOwnedState="NotPurchased"/>
-                <Action type="SetProperty" frame="DiscountPercentageLabel" Visible="True"/>
-                <Action type="SetProperty" frame="LockedItemIcon" Visible="True"/>
+                <When type="Property" frame="GameContentFrame" CanPurchase="True"/>
+
                 <Action type="SetProperty" frame="CurrentPriceLabel" Visible="True"/>
                 <Action type="SetProperty" frame="OriginalPriceLabel" Visible="True"/>
                 <Action type="SetProperty" frame="DiscountSlash" Visible="True"/>
+                <Action type="SetProperty" frame="DiscountPercentageLabel" Visible="True"/>
+            </State>
+
+            <State name="UnpurchasedDynamicBundle">
+                <When type="StateGroup" frame="$this" ItemTypeState="DynamicBundle"/>
+
+                <Action type="SetProperty" frame="CurrentPriceLabel" Visible="True"/>
+                <Action type="SetProperty" frame="OriginalPriceLabel" Visible="True"/>
+                <Action type="SetProperty" frame="DiscountSlash" Visible="True"/>
+                <Action type="SetProperty" frame="DiscountPercentageLabel" Visible="True"/>
+            </State>
+
+            <State name="UnpurchasedItem">
+                <Action type="SetProperty" frame="CurrentPriceLabel" Visible="True"/>
+                <Action type="SetProperty" frame="OriginalPriceLabel" Visible="False"/>
+                <Action type="SetProperty" frame="DiscountSlash" Visible="False"/>
+                <Action type="SetProperty" frame="DiscountPercentageLabel" Visible="False"/>
             </State>
         </StateGroup>
     </Frame>
@@ -586,12 +636,10 @@
             <State name="SelectedBundleVisible">
                 <When type="Property" frame="SelectedBundleFrame" operator="NotEqual" Bundle=""/>
                 <Action type="SetProperty" frame="SelectedBundleFrame" visible="true"/>
-                <Action type="SetProperty" frame="BundleTileList" visible="false"/>
             </State>
             
             <State name="SelectedBundleNotVisible">
                 <Action type="SetProperty" frame="SelectedBundleFrame" visible="false"/>
-                <Action type="SetProperty" frame="BundleTileList" visible="true"/>
             </State>
         </StateGroup>
     </Frame>

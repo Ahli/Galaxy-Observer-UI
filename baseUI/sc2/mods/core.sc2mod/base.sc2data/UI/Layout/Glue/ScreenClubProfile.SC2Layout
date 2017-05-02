@@ -26,7 +26,54 @@
             </Frame>
         </Frame>
 
-        <Frame type="Frame" name="ExtendedExperienceBG" template="StandardBattlenetTemplates/BattlenetScaleableExetendedExperienceTemplate"/>
+        <Frame type="Image" name="FullscreenBlackoutImage">
+            <Anchor relative="$parent"/>
+            <Color val="0,0,0"/>
+            <Alpha val="180"/>
+            <AcceptsMouse val="true"/>
+            <TooltipFrame val="MapProfileTooltip"/>
+        </Frame>
+
+        <Frame type="Image" name="LeftBGGlowPattern">
+            <Anchor side="Top" relative="$parent/BackgroundImage" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent/BackgroundImage" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent/BackgroundImage" pos="Min" offset="20"/>
+            <Texture val="@UI/Glues_Battlenet_DialogBox_BackGlow"/>
+        </Frame>
+
+        <Frame type="Image" name="RightBGGlowPattern">
+            <Anchor side="Top" relative="$parent/BackgroundImage" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent/BackgroundImage" pos="Mid" offset="0"/>
+            <Anchor side="Left" relative="$parent/BackgroundImage" pos="Max" offset="-20"/>
+            <Texture val="@UI/Glues_Battlenet_DialogBox_BackGlow"/>
+            <TextureCoords top="0.0" left="1.0" bottom="1.0" right="0.0"/>
+        </Frame>
+
+        <Frame type="BlurFrame" name="BlurEffect">
+            <Anchor side="Top" relative="$parent/BackgroundImage" pos="Min" offset="13"/>
+            <Anchor side="Bottom" relative="$parent/BackgroundImage" pos="Max" offset="-14"/>
+            <Anchor side="Left" relative="$parent/BackgroundImage" pos="Min" offset="16"/>
+            <Anchor side="Right" relative="$parent/BackgroundImage" pos="Max" offset="-16"/>
+            <BlurAmount val=".3"/>
+
+            <Frame type="Image" name="LowImage">
+                <Anchor relative="$parent"/>
+                <Color val="0,0,0"/>
+                <Alpha val="150"/>
+            </Frame>
+        </Frame>
+
+        <Frame type="Image" name="BackgroundImage">
+            <Anchor side="Top" relative="$parent" pos="Mid" offset="-48"/>
+            <Anchor side="Bottom" relative="$parent" pos="Mid" offset="-48"/>
+            <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+            <Texture val="@UI/Glues_ExtendedXP_Background"/>
+            <TextureType val="Nineslice"/>
+            <Tiled val="true"/>
+            <Width val="1559"/>
+            <Height val="1005"/>
+        </Frame>
 
         <Frame type="BattleClubFrame" name="ClubFrame">
             <Anchor relative="$parent"/>
@@ -34,8 +81,8 @@
         </Frame>
         
         <Frame type="Image" name="TitleBackground">
-            <Anchor side="Top" relative="$parent/ExtendedExperienceBG/BackgroundContainer" pos="Min" offset="57"/>
-            <Anchor side="Left" relative="$parent/ExtendedExperienceBG/BackgroundContainer" pos="Min" offset="32"/>
+            <Anchor side="Top" relative="$parent/BackgroundImage" pos="Min" offset="57"/>
+            <Anchor side="Left" relative="$parent/BackgroundImage" pos="Min" offset="32"/>
             <Width val="376"/>
             <Height val="53"/>
             <Texture val="@UI/Glues_Battlenet_PageAssets_ListHeaderBg"/>
@@ -49,12 +96,12 @@
             <Anchor side="Left" relative="$parent/TitleBackground" pos="Min" offset="20"/>
             <Anchor side="Right" relative="$parent/TitleBackground" pos="Max" offset="-20"/>
             <Style val="@Arcade_Title"/>
-            <Text val="[ph]Group"/>
+            <Text val="@UI/ScreenClubProfile/Group"/>
             
             <StateGroup name="TitleStateGroup">
                 <State name="ClanState">
                     <When type="Property" frame="$parent/ClubFrame" IsClan="true"/>
-                    <Action type="SetProperty" frame="$this" Text="[ph]Clan"/>
+                    <Action type="SetProperty" frame="$this" Text="@UI/ScreenClubProfile/Clan"/>
                 </State>
             </StateGroup>
         </Frame>
@@ -180,7 +227,7 @@
             <Text val="{$parent/ClubFrame/@DisplayName}"/>
         </Frame>
 
-        <Frame type="BattleClubContextMenu" name="ClubContextMenu" template="StandardTemplates/StandardContextMenuTemplate">
+        <Frame type="BattleClubContextMenu" name="ClubContextMenu" template="BattleClubContextMenu/BattleClubContextMenu">
             <Anchor side="Top" relative="$parent/OptionsButton" pos="Max" offset="0"/>
             <Anchor side="Left" relative="$parent/OptionsButton" pos="Min" offset="0"/>
             <UseAnchors val="true"/>
@@ -199,9 +246,17 @@
             <Anchor side="Top" relative="$parent/PageHeaderBackground" pos="Mid" offset="0"/>
             <Anchor side="Bottom" relative="$parent/PageHeaderBackground" pos="Mid" offset="0"/>
             <Anchor side="Right" relative="$parent/PageHeaderBackground" pos="Max" offset="-20"/>
-            <Text val="[ph]Join Chat"/>
+            <Text val="@UI/ScreenClubProfile/JoinChat"/>
             <Width val="175"/>
             <HoverSound val="@UI_HoverTick"/>
+
+            <StateGroup name="EnabledStateGroup">
+                <State name="MemberState">
+                    <When type="Property" frame="$parent/ClubFrame" IsPrivate="true"/>
+                    <When type="Property" frame="$parent/ClubFrame" IsLocalMember="false"/>
+                    <Action type="SetProperty" frame="$this" Enabled="false"/>
+                </State>
+            </StateGroup>
         </Frame>
 
         <Frame type="Button" name="InviteButton" template="StandardBattlenetTemplates/BattlenetSmallButtonTemplate">
@@ -227,6 +282,7 @@
             <Text val="@UI/Club/JoinGroup"/>
             <Width val="175"/>
             <HoverSound val="@UI_HoverTick"/>
+            <CollapseLayout val="true"/>
 
             <StateGroup name="VisibleStateGroup">
                 <State name="MemberState">
@@ -236,12 +292,12 @@
                 
                 <State name="BannedState">
                     <When type="Property" frame="$parent/ClubFrame" IsLocalBanned="true"/>
-                    <Action type="SetProperty" frame="$this" Visible="false"/>
+                    <Action type="SetProperty" frame="$this" Enabled="false"/>
                 </State>
 
                 <State name="PrivateState">
                     <When type="Property" frame="$parent/ClubFrame" IsPrivate="true"/>
-                    <Action type="SetProperty" frame="$this" Visible="false"/>
+                    <Action type="SetProperty" frame="$this" Enabled="false"/>
                 </State>
             </StateGroup>
 
@@ -253,9 +309,26 @@
             </StateGroup>
         </Frame>
 
+        <Frame type="Button" name="LeaveClubButton" template="StandardBattlenetTemplates/BattlenetSmallButtonTemplate">
+            <Anchor side="Top" relative="$parent/JoinClubButton" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent/JoinClubButton" pos="Min" offset="0"/>
+            <Text val="@UI/Club/LeaveGroup"/>
+            <Width val="175"/>
+            <HoverSound val="@UI_HoverTick"/>
+            <Visible val="{$parent/ClubFrame/@IsLocalMember}"/>
+            <CollapseLayout val="true"/>
+
+            <StateGroup name="TitleStateGroup">
+                <State name="ClanState">
+                    <When type="Property" frame="$parent/ClubFrame" IsClan="true"/>
+                    <Action type="SetProperty" frame="$this" Text="@UI/Club/LeaveClan"/>
+                </State>
+            </StateGroup>
+        </Frame>
+
         <Frame type="Button" name="CloseButton" template="StandardBattlenetTemplates/CloseButton">
-            <Anchor side="Top" relative="$parent/ExtendedExperienceBG/BackgroundContainer" pos="Min" offset="11"/>
-            <Anchor side="Right" relative="$parent/ExtendedExperienceBG/BackgroundContainer" pos="Max" offset="-14"/>
+            <Anchor side="Top" relative="$parent/BackgroundImage" pos="Min" offset="11"/>
+            <Anchor side="Right" relative="$parent/BackgroundImage" pos="Max" offset="-14"/>
             <Shortcut val="@UI/ScreenNavigationBack_Hotkey"/>
             <ClickSound val="@UI_BnetDefaultClick"/>
         </Frame>
@@ -264,10 +337,12 @@
             <Anchor relative="$parent"/>
             <TabListItem val="NewsButton"/>
             <TabListItem val="EventsButton"/>
+            <TabListItem val="MessageBoardButton"/>
             <TabListItem val="InfoButton"/>
             <TabListItem val="RosterButton"/>
             <PanelListItem val="NewsFrame"/>
             <PanelListItem val="EventsFrame"/>
+            <PanelListItem val="MessageBoardFrame"/>
             <PanelListItem val="InfoFrame"/>
             <PanelListItem val="RosterFrame"/>
 
@@ -276,29 +351,31 @@
                     <When type="Property" frame="$parent/ClubFrame" IsLocalBanned="true"/>
                     <Action type="SetProperty" frame="NewsButton" Enabled="false"/>
                     <Action type="SetProperty" frame="EventsButton" Enabled="false"/>
-                    <Action type="SetProperty" frame="$this" SelectedIndex="2"/>
+                    <Action type="SetProperty" frame="MessageBoardButton" Enabled="false"/>
+                    <Action type="SetProperty" frame="$this" SelectedIndex="3"/>
                 </State>
                 
                 <State name="PrivateState">
                     <When type="Property" frame="$parent/ClubFrame" IsLocalMember="false"/>
-                    <When type="Property" frame="$parent/ClubFrame" IsPrivate="false"/>
+                    <When type="Property" frame="$parent/ClubFrame" IsPrivate="true"/>
                     <Action type="SetProperty" frame="NewsButton" Enabled="false"/>
                     <Action type="SetProperty" frame="EventsButton" Enabled="false"/>
-                    <Action type="SetProperty" frame="$this" SelectedIndex="2"/>
+                    <Action type="SetProperty" frame="MessageBoardButton" Enabled="false"/>
+                    <Action type="SetProperty" frame="$this" SelectedIndex="3"/>
                 </State>
             </StateGroup>
 
             <Frame type="Frame" name="AnchorFrame">
                 <Anchor side="Top" relative="$parent/$parent/TitleBackground" pos="Max" offset="-1"/>
                 <Anchor side="Left" relative="$parent/$parent/TitleBackground" pos="Min" offset="4"/>
-                <Anchor side="Bottom" relative="$parent/$parent/ExtendedExperienceBG/BackgroundContainer" pos="Max" offset="-30"/>
-                <Anchor side="Right" relative="$parent/$parent/ExtendedExperienceBG/BackgroundContainer" pos="Max" offset="-30"/>
+                <Anchor side="Bottom" relative="$parent/$parent/BackgroundImage" pos="Max" offset="-30"/>
+                <Anchor side="Right" relative="$parent/$parent/BackgroundImage" pos="Max" offset="-30"/>
             </Frame>
 
             <Frame type="Button" name="NewsButton" template="StandardBattlenetTemplates/BattlenetVerticalTabButtonTemplate">
                 <Anchor side="Top" relative="$parent/AnchorFrame" pos="Min" offset="0"/>
                 <Anchor side="Left" relative="$parent/AnchorFrame" pos="Min" offset="0"/>
-                <Text val="[ph]News"/>
+                <Text val="@UI/ScreenClubProfile/TabNews"/>
                 <Width val="370"/>
                 <HoverSound val="@UI_HoverTick"/>
                 <Toggleable val="true"/>
@@ -307,16 +384,25 @@
             <Frame type="Button" name="EventsButton" template="StandardBattlenetTemplates/BattlenetVerticalTabButtonTemplate">
                 <Anchor side="Top" relative="$parent/NewsButton" pos="Max" offset="0"/>
                 <Anchor side="Left" relative="$parent/NewsButton" pos="Min" offset="0"/>
-                <Text val="[ph]Events"/>
+                <Text val="@UI/ScreenClubProfile/TabEvents"/>
+                <Width val="370"/>
+                <HoverSound val="@UI_HoverTick"/>
+                <Toggleable val="true"/>
+            </Frame>
+
+            <Frame type="Button" name="MessageBoardButton" template="StandardBattlenetTemplates/BattlenetVerticalTabButtonTemplate">
+                <Anchor side="Top" relative="$parent/EventsButton" pos="Max" offset="0"/>
+                <Anchor side="Left" relative="$parent/EventsButton" pos="Min" offset="0"/>
+                <Text val="@UI/ScreenClubProfile/TabMessageBoard"/>
                 <Width val="370"/>
                 <HoverSound val="@UI_HoverTick"/>
                 <Toggleable val="true"/>
             </Frame>
 
             <Frame type="Button" name="InfoButton" template="StandardBattlenetTemplates/BattlenetVerticalTabButtonTemplate">
-                <Anchor side="Top" relative="$parent/EventsButton" pos="Max" offset="0"/>
-                <Anchor side="Left" relative="$parent/EventsButton" pos="Min" offset="0"/>
-                <Text val="[ph]Info"/>
+                <Anchor side="Top" relative="$parent/MessageBoardButton" pos="Max" offset="0"/>
+                <Anchor side="Left" relative="$parent/MessageBoardButton" pos="Min" offset="0"/>
+                <Text val="@UI/ScreenClubProfile/TabInfo"/>
                 <Width val="370"/>
                 <HoverSound val="@UI_HoverTick"/>
                 <Toggleable val="true"/>
@@ -324,8 +410,8 @@
 
             <Frame type="Button" name="RosterButton" template="StandardBattlenetTemplates/BattlenetVerticalTabButtonTemplate">
                 <Anchor side="Top" relative="$parent/InfoButton" pos="Max" offset="0"/>
-                <Anchor side="Left" relative="$parent/NewsButton" pos="Min" offset="0"/>
-                <Text val="[ph]Roster"/>
+                <Anchor side="Left" relative="$parent/InfoButton" pos="Min" offset="0"/>
+                <Text val="@UI/ScreenClubProfile/TabRoster"/>
                 <Width val="370"/>
                 <HoverSound val="@UI_HoverTick"/>
                 <Toggleable val="true"/>
@@ -346,11 +432,28 @@
                 </Frame>
             </Frame>
 
-            <Frame type="Frame" name="EventsFrame">
-                <Anchor side="Top" relative="$parent/$parent/PageHeaderBackground" pos="Max" offset="0"/>
-                <Anchor side="Left" relative="$parent/NewsButton" pos="Max" offset="0"/>
-                <Anchor side="Right" relative="$parent/AnchorFrame" pos="Max" offset="0"/>
-                <Anchor side="Bottom" relative="$parent/AnchorFrame" pos="Max" offset="0"/>
+            <Frame type="ClubProfileEventsFrame" name="EventsFrame" template="ClubProfileEventsFrame/ClubProfileEventsFrameTemplate">
+                <Anchor relative="$parent"/>
+                <ClubId val="{$ScreenClubProfile/@ClubId}"/>
+
+                <Frame type="Image" name="Background">
+                    <Anchor side="Top" relative="$parent/$parent/$parent/PageHeaderBackground" pos="Max" offset="0"/>
+                    <Anchor side="Left" relative="$parent/$parent/NewsButton" pos="Max" offset="0"/>
+                    <Anchor side="Right" relative="$parent/$parent/AnchorFrame" pos="Max" offset="0"/>
+                    <Anchor side="Bottom" relative="$parent/$parent/AnchorFrame" pos="Max" offset="0"/>
+                </Frame>
+            </Frame>
+
+            <Frame type="ClubProfileMessageBoardFrame" name="MessageBoardFrame" template="ClubProfileMessageBoardFrame/ClubProfileMessageBoardFrameTemplate">
+                <Anchor relative="$parent"/>
+                <ClubId val="{$ScreenClubProfile/@ClubId}"/>
+
+                <Frame type="Frame" name="Background">
+                    <Anchor side="Top" relative="$parent/$parent/$parent/PageHeaderBackground" pos="Max" offset="0"/>
+                    <Anchor side="Left" relative="$parent/$parent/NewsButton" pos="Max" offset="0"/>
+                    <Anchor side="Right" relative="$parent/$parent/AnchorFrame" pos="Max" offset="0"/>
+                    <Anchor side="Bottom" relative="$parent/$parent/AnchorFrame" pos="Max" offset="0"/>
+                </Frame>
             </Frame>
 
             <Frame type="Frame" name="InfoFrame" template="ClubProfileInfoFrame/ClubProfileInfoFrameTemplate">
@@ -360,10 +463,7 @@
                     <Anchor side="Top" relative="$parent/$parent/$parent/PageHeaderBackground" pos="Max" offset="0"/>
                     <Anchor side="Left" relative="$parent/$parent/NewsButton" pos="Max" offset="0"/>
                     <Anchor side="Right" relative="$parent/$parent/AnchorFrame" pos="Max" offset="0"/>
-                    <Anchor side="Bottom" relative="$parent/$parent/AnchorFrame" pos="Max" offset="0"/>
-                    <Texture val="@UI/Glues_Battlenet_PageAssets_TableLargeHeaderBg"/>
-                    <TextureType val="NineSlice"/>
-                    <Tiled val="True"/>
+                    <Anchor side="Bottom" relative="$parent/$parent/AnchorFrame" pos="Max" offset="0"/>>
                 </Frame>
             </Frame>
 
