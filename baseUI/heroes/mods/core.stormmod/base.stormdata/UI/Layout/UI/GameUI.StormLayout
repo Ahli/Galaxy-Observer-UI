@@ -91,7 +91,7 @@
             <Height val="3"/>
 
             <ForcedRelation val="Ally"/>
-            <ColorStyle val="MinimapTeams"/>
+            <ColorStyle val="Primary"/>
             <AdditionalColorStyle val="PrimaryLight" index="0"/>
         </Frame>
         <Frame type="UnitStatusColor" name="EnemyColors">
@@ -101,7 +101,7 @@
             <Height val="3"/>
 
             <ForcedRelation val="Enemy"/>
-            <ColorStyle val="MinimapTeams"/>
+            <ColorStyle val="Primary"/>
             <AdditionalColorStyle val="PrimaryLight" index="0"/>
         </Frame>
         <!-- END Property bindable Colors -->
@@ -1038,6 +1038,58 @@
                         <Controller type="Anchor" end="Pause" side="Bottom" relative="true">
                             <Key type="Curve" time="0" value="0"/>
                             <Key type="Curve" time=".01" value="180"/>
+                        </Controller>
+                    </Animation>
+                </Frame>
+
+                <Frame type="Frame" name="ChatWarning" template="StandardTooltip/StandardTooltip">
+                    <Anchor side="Top" relative="$parent/ChatBar" pos="Max" offset="10"/>
+                    <Anchor side="Left" relative="$parent/ChatBar" pos="Min" offset="0"/>
+                    <Anchor side="Right" relative="$parent/ChatBar" pos="Max" offset="0"/>
+                    <Anchor side="Bottom" relative="TopBorder" pos="Max" offset="0"/>
+                    <Alpha val="0"/>
+                    <VisibilityOnFade val="true"/>
+                    
+                    <Frame type="Label" name="Label">
+                        <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+                        <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+                        <Width val="0"/>
+                    </Frame>
+                    
+                    <Frame type="Image" name="TopBorder">
+                        <Anchor relative="$parent/Label" offset="20"/>
+                    </Frame>
+                    
+                    <Frame type="BlurFrame" name="BlurBackground">
+                        <Anchor relative="$parent/Label" offset="11"/>
+                    </Frame>
+
+                    <StateGroup name="Warnings">
+                        <DefaultState val="NoProblem"/>
+                        
+                        <State name="AtMaxEmojis">
+                            <When type="Property" frame="$parent/ChatBar" SupportsEmojis="true"/>
+                            <When type="Property" frame="$parent/ChatBar" EmojisRemaining="0"/>
+                            <Action type="SetProperty" frame="Label" text="@UI/BattleChat/EmoticonMaxReached"/>
+                            <Action type="SendEvent" event="Show"/>
+                        </State>
+                        <State name="OverMaxEmojis">
+                            <When type="Property" frame="$parent/ChatBar" EmojisRemaining="0" operator="LessThan"/>
+                            <Action type="SetProperty" frame="Label" text="@UI/BattleChat/EmoticonMaxExceeded"/>
+                            <Action type="SendEvent" event="Show"/>
+                        </State>
+                        <State name="NoProblem">
+                            <Action type="SendEvent" event="Hide"/>
+                        </State>
+                    </StateGroup>
+
+                    <Animation name="Fade">
+                        <Event event="Show" action="DirectionForward,Play"/>
+                        <Event event="Hide" action="DirectionReverse,Play"/>
+                        
+                        <Controller type="Fade" end="Pause">
+                            <Key type="Curve" time="0" value="0"/>
+                            <Key type="Curve" time=".2" value="255"/>
                         </Controller>
                     </Animation>
                 </Frame>

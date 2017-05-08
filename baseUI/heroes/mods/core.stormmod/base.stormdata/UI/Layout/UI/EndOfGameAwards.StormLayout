@@ -1442,6 +1442,7 @@
             <RenderPriority val="1000"/>
             <RenderType val="LDR"/>
             <UseAlternateTime val="true"/>
+            <Alpha val="0"/>
         
             <Frame type="Label" name="MVPLabel">
                 <Anchor side="Top" relative="$parent" pos="Min" offset="-10"/>
@@ -1453,7 +1454,7 @@
                 <Text val="@UI/EndOfGameAwards/MVP"/>
             </Frame>
             
-            <Frame type="Image" name="SeparatorImage_Blue">
+            <Frame type="Image" name="SeparatorImage">
                 <Anchor side="Top" relative="$parent/MVPLabel" pos="Max" offset="-15"/>
                 <Anchor side="Left" relative="$parent" pos="Mid" offset="-1060"/>
                 <Width val="512"/>
@@ -1461,15 +1462,9 @@
                 <BlendMode val="Add"/>
                 <Texture val="@UI/eom_separator_blue"/>
             </Frame>
-            
-            <Frame type="Image" name="SeparatorImage_Red">
-                <Anchor relative="$parent/SeparatorImage_Blue"/>
-                <Visible val="false"/>
-                <Texture val="@UI/eom_separator_red"/>
-            </Frame>
 
             <Frame type="Label" name="MVPPlayerName">
-                <Anchor side="Top" relative="$parent/SeparatorImage_Blue" pos="Max" offset="-20"/>
+                <Anchor side="Top" relative="$parent/SeparatorImage" pos="Max" offset="-20"/>
                 <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
                 <Height val="135"/>
                 <SubpixelRendering val="True"/>
@@ -1643,22 +1638,46 @@
             
             <!-- Hide when secondary spread appears -->
             <StateGroup name="StatsVisibility">
-                <DefaultState val="ShowInitStats"/>
-                
-                <State name="ShowInitStats">
-                    <When type="Property" frame="$parent/SecondaryAwardStats" visible="false"/>
-                </State>
-                
                 <State name="HideInitStats">
                     <When type="Property" frame="$parent/SecondaryAwardStats" visible="true"/>
                     <Action type="SetProperty" frame="$this" visible="false"/>
                 </State>
             </StateGroup>
             
+            <!-- team coloring. default = no state = blue -->
+            <StateGroup name="TeamColor">
+                <State name="Red">
+                    <When type="AnimationState" TeamColor="Red"/>
+                    <Action type="SetProperty" frame="SeparatorImage" Texture="@UI/eom_separator_red"/>
+                    <Action type="SetProperty" frame="MVPLabel" Style="MVP_Heading_Red"/>
+                    <Action type="SetProperty" frame="MVPPlayerName" Style="MVP_PlayerNameHeading_Red"/>
+                    <Action type="SetProperty" frame="MVPHeroName" Style="MVP_HeroNameHeading_Red"/>
+                    <Action type="SetProperty" frame="MVPStat1ValueLabel" Style="MVP_StatValue_Red"/>
+                    <Action type="SetProperty" frame="MVPStat2ValueLabel" Style="MVP_StatValue_Red"/>
+                    <Action type="SetProperty" frame="MVPStat3ValueLabel" Style="MVP_StatValue_Red"/>
+                    <Action type="SetProperty" frame="MVPStat1Label" Style="MVP_StatHeading_Left_Red"/>
+                    <Action type="SetProperty" frame="MVPStat2Label" Style="MVP_StatHeading_Left_Red"/>
+                    <Action type="SetProperty" frame="MVPStat3Label" Style="MVP_StatHeading_Left_Red"/>
+                    <Action type="SetProperty" frame="KillsLabel" Style="MVP_StatHeading_Red"/>
+                    <Action type="SetProperty" frame="AssistsLabel" Style="MVP_StatHeading_Red"/>
+                    <Action type="SetProperty" frame="DeathsLabel" Style="MVP_StatHeading_Red"/>
+                    <Action type="SetProperty" frame="KillsValueLabel" Style="MVP_KDAValue_Red"/>
+                    <Action type="SetProperty" frame="AssistsValueLabel" Style="MVP_KDAValue_Red"/>
+                    <Action type="SetProperty" frame="DeathsValueLabel" Style="MVP_KDAValue_Red"/>
+                </State>
+            </StateGroup>
+            
             <!-- Animation for that overwatch-style text movement and appearance for all stats -->
             <Animation name="ScrollEffect">
-                <Event event="OnShown" action="Reset,Play" frame="$this"/>
-                <Event event="MVPSkipEvent" action="Pause" frame="$this"/>
+                <Event event="OnShown" action="Reset,Play"/>
+                <Event event="MVPSkipEvent" action="Pause"/>
+                
+                <!-- full panel alpha to dodge blinking bug from invisible-animation-update change -->
+                <Controller type="Fade" end="Pause">
+                    <Key type="Curve" time="0.0" value="0"/>
+                    <Key type="Curve" time="0.9" value="0"/>
+                    <Key type="Curve" time="1.0" value="255"/>
+                </Controller>
                 
                 <!-- Section: MVP heading/name -->
                 <Controller type="Anchor" end="Pause" side="Left" relative="true" frame="MVPLabel">
@@ -1677,21 +1696,13 @@
                     <Key type="Curve" time="9.3" value="0"/>
                 </Controller>
                 
-                <Controller type="Anchor" end="Pause" side="Left" relative="true" frame="SeparatorImage_Blue">
+                <Controller type="Anchor" end="Pause" side="Left" relative="true" frame="SeparatorImage">
                     <Key type="Curve" time="0.0" value="-300"/>
                     <Key type="Curve" time="1.0" value="-300" out="Fast"/>
                     <Key type="Curve" time="1.3" value="300" in="Slow"/>
                 </Controller>
 
-                <Controller type="Fade" end="Pause" frame="SeparatorImage_Blue">
-                    <Key type="Curve" time="0.0" value="0"/>
-                    <Key type="Curve" time="1.0" value="0" out="Auto"/>
-                    <Key type="Curve" time="1.3" value="255"/>
-                    <Key type="Curve" time="9.0" value="255" out="Auto"/>
-                    <Key type="Curve" time="9.3" value="0"/>
-                </Controller>
-                
-                <Controller type="Fade" end="Pause" frame="SeparatorImage_Red">
+                <Controller type="Fade" end="Pause" frame="SeparatorImage">
                     <Key type="Curve" time="0.0" value="0"/>
                     <Key type="Curve" time="1.0" value="0" out="Auto"/>
                     <Key type="Curve" time="1.3" value="255"/>
@@ -1972,6 +1983,7 @@
             <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
             <Anchor side="Right" relative="$parent" pos="60%" offset="0"/>
             <RenderPriority val="810"/>
+            <Visible val="{$parent/SecondaryAwardStats/@Visible}"/>
 
             <Frame type="Image" name="MVPTitleFlare_Blue">
                 <Anchor side="Top" relative="$parent/MVPTitleLabel" pos="Min" offset="0"/>
@@ -2048,20 +2060,6 @@
                 </StateGroup>
             </Frame>
             
-            <!-- Hide until secondary stats appear -->
-            <StateGroup name="MVPSecondaryVisibility">
-                <DefaultState val="ShowInitStats"/>
-                
-                <State name="ShowInitStats">
-                    <Action type="SetProperty" frame="$this" visible="false"/>
-                </State>
-                
-                <State name="HideInitStats">
-                    <When type="Property" frame="$parent/SecondaryAwardStats" visible="true"/>
-                    <Action type="SetProperty" frame="$this" visible="true"/>
-                </State>
-            </StateGroup>
-            
             <!-- sets mvp lineup specific colors -->
             <StateGroup name="AwardLabelsColor">
                 <DefaultState val="Blue"/>
@@ -2097,7 +2095,6 @@
             <Anchor side="Left" relative="$parent" pos="40%" offset="-800"/>
             <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
             <Anchor side="Right" relative="$parent" pos="60%" offset="800"/>
-            
             <RenderPriority val="1000"/>
             <UseAlternateTime val="true"/>
 

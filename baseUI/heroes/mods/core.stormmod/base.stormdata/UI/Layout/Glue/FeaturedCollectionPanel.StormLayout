@@ -122,12 +122,12 @@
                 <ScaleWidthToTexture val="true"/>
             </Frame>
         </Frame>
-        
+
         <Frame type="Frame" name="MegabundleBorder" template="FeaturedCollectionPanel/FeaturedStoreTileListItemTemplate/MegabundleBorder">
             <Anchor relative="$parent" offset="19"/>
         </Frame>
     </Frame>
-    
+
     <!--===============================================================================================
     <! Main Frame
     <!==============================================================================================-->
@@ -136,20 +136,20 @@
             <Anchor side="Left" relative="$parent" pos="Mid" offset="-874"/>
             <Anchor side="Bottom" relative="$parent/ContentTileList" pos="Min" offset="-24"/>
 
-            <StateGroup name="TitleStates">
-                <State name="BigTileList">
-                    <When type="Property" frame="$parent/BigTileList" operator="GreaterThan" DataCount="0"/>
-                    <Action type="SetProperty" frame="TitleLabel" text="@UI/ScreenStore/BigSectionTitle/Featured"/>
-                </State>
-                <State name="SmallTileList">
-                    <When type="Property" frame="$parent/BigTileList" DataCount="0"/>
-                    <Action type="SetProperty" frame="TitleLabel" text="@UI/ScreenStore/SmallSectionTitle/Featured"/>
-                </State>
-            </StateGroup>
+            <Frame type="Image" name="TitleIcon">
+                <Texture val="@UI/Storm_UI_Store_TitleIcon_Featured"/>
+            </Frame>
+
+            <Frame type="Label" name="TitleLabel">
+                <Text val="@UI/ScreenStore/SmallSectionTitle/Featured"/>
+            </Frame>
         </Frame>
 
         <Frame type="Frame" name="FilterOptions" template="CollectionTemplates/FilterOptionsTemplate">
-            <Frame type="GameContentOwnershipFilterPulldown" name="OwnershipFilterPulldown" template="StandardTemplates/StandardPulldownTemplate">
+            <Frame type="Button" name="FilterNewlyAquired" template="StandardTemplates/FilterButtonTemplate">
+                <Visible val="false"/>
+            </Frame>
+            <Frame type="GameContentOwnershipFilterPulldown" name="OwnershipFilterPulldown" template="CollectionTemplates/OwnershipFilterPulldownTemplate">
                 <Visible val="false"/>
                 <GameContentType val="{$parent/$parent/ContentTileList/@GameContentType}"/>
             </Frame>
@@ -159,16 +159,6 @@
             <Frame type="Label" name="SearchTextLabel">
                 <Text val="@UI/ScreenStore/SearchEditBox/Featured"/>
             </Frame>
-
-            <!-- Override these states to have conditions that will never happen -->
-            <StateGroup name="SearchHideContent">
-                 <State name="SearchInactive">
-                    <When type="Property" frame="$parent/BigTileList" DataCount="#InvalidIndex"/>
-                </State>
-                <State name="SearchActive">
-                    <When type="Property" frame="$parent/BigTileList" DataCount="#InvalidIndex"/>
-                </State>
-            </StateGroup>
         </Frame>
 
         <Frame type="GameContentTileList" name="BigTileList" template="CollectionTemplates/BigTileListTemplate">
@@ -177,7 +167,6 @@
             <DebugInclude index="0" val="debugStoreFeaturedProduct"/>
             <DebugInclude index="1" val="debugStoreLTOProduct"/>
             <UpdateWhenLicensesChange val="true"/>
-            <Visible val="true"/>
 
             <GameContentType index="0" val="Hero"/>
             <GameContentType index="1" val="Skin"/>
@@ -213,6 +202,21 @@
             <Frame type="StoreTileListItem" name="Item2" template="FeaturedCollectionPanel/FeaturedStoreBigTileListItemTemplate">
                 <HideWhenCleared val="true"/>
             </Frame>
+
+            <StateGroup name="4x3SizeStates">
+                <State name="Not4x3">
+                    <When type="Property" frame="$parent/4x3AspectRatioFrame" Visible="true"/>
+                    <Action type="SetProperty" frame="Item0" Width="548"/>
+                    <Action type="SetProperty" frame="Item1" Width="548"/>
+                    <Action type="SetProperty" frame="Item2" Width="548"/>
+                </State>
+                <State name="Is4x3">
+                    <When type="Property" frame="$parent/4x3AspectRatioFrame" Visible="false"/>
+                    <Action type="SetProperty" frame="Item0" Width="490"/>
+                    <Action type="SetProperty" frame="Item1" Width="490"/>
+                    <Action type="SetProperty" frame="Item2" Width="490"/>
+                </State>
+            </StateGroup>
         </Frame>
 
         <Frame type="CollectionCategoryTileList" name="CategoryTileList" template="CollectionTemplates/CategoryTileListTemplate">
@@ -271,25 +275,34 @@
                 </StateGroup>
             </Frame>
 
-            <!-- Override these states to have conditions that will never happen -->
-            <StateGroup name="FeaturedToggle">
-                <State name="ShowFeatured">
+            <StateGroup name="ItemsPerPageStates">
+                <State name="Normal_WithBigTileList_Not4x3">
                     <When type="Property" DataCount="#InvalidIndex"/>
                 </State>
-                <State name="ShowNormal">
+                <State name="Normal_WithBigTileList_Is4x3">
+                    <When type="Property" DataCount="#InvalidIndex"/>
+                </State>
+                <State name="Normal_NoBigTileList_Not4x3">
+                    <When type="Property" DataCount="#InvalidIndex"/>
+                </State>
+                <State name="Normal_NoBigTileList_Is4x3">
+                    <When type="Property" DataCount="#InvalidIndex"/>
+                </State>
+                <State name="Wide_Not4x3">
+                    <When type="Property" DataCount="#InvalidIndex"/>
+                </State>
+                <State name="Wide_Is4x3">
                     <When type="Property" DataCount="#InvalidIndex"/>
                 </State>
             </StateGroup>
 
-            <StateGroup name="ItemsPerPageStates">
-                <State name="SearchInactive_WithBigTileList">
-                    <When type="Property" DataCount="#InvalidIndex"/>
-                </State>
-                <State name="SearchInactive_NoBigTileList">
-                    <When type="Property" DataCount="#InvalidIndex"/>
-                </State>
-                <State name="SearchActive">
-                    <When type="Property" DataCount="#InvalidIndex"/>
+            <StateGroup name="ExpandStates">
+                <State name="Wide">
+                    <Action type="SetProperty" frame="$parent/BigTileList" Visible="false"/>
+                    <Action type="SetProperty" CollectionCategoryFilter="" undo="false"/>
+                    <Action type="SetProperty" ParentHeroFilter=""/>
+                    <Action type="SetProperty" ParentSkinFilter=""/>
+                    <Action type="SetProperty" ProductAttribute="shop-featured-small" index="0"/>
                 </State>
             </StateGroup>
         </Frame>
@@ -297,19 +310,29 @@
         <!-- Override these states to have conditions that will never happen -->
         <Frame type="AspectRatioFrame" name="4x3AspectRatioFrame" template="CollectionTemplates/CategoryTileListAspectRatioFrameTemplate">
             <StateGroup name="AspectRatioStates">
-                <State name="Not4x3">
-                    <When type="Property" Alpha="#InvalidIndex"/>
+                <State name="Not4x3_Normal">
+                    <When type="Property" frame="$parent/BigTileList" DataCount="#InvalidIndex"/>
                 </State>
-                <State name="Is4x3">
-                    <When type="Property" Alpha="#InvalidIndex"/>
+                <State name="Not4x3_Wide">
+                    <When type="Property" frame="$parent/BigTileList" DataCount="#InvalidIndex"/>
+                </State>
+                <State name="Is4x3_Normal">
+                    <When type="Property" frame="$parent/BigTileList" DataCount="#InvalidIndex"/>
+                </State>
+                <State name="Is4x3_Wide">
+                    <When type="Property" frame="$parent/BigTileList" DataCount="#InvalidIndex"/>
                 </State>
             </StateGroup>
         </Frame>
 
         <StateGroup name="MultipleTileListStates">
-            <State name="SmallTileListOnly">
-                <When type="Property" frame="BigTileList" DataCount="0"/>
+            <State name="SmallTileListOnly_Not4x3">
+                <When type="Property" frame="BigTileList" Visible="false"/>
+                <When type="Property" frame="4x3AspectRatioFrame" Visible="true"/>
                 <Action type="SetProperty" frame="ContentTileList" MaxItemPerPage="12"/>
+
+                <Action type="SetAnchor" side="Left" frame="BigSectionHeader" relative="$parent" pos="Mid" offset="-874"/>
+                <Action type="SetAnchor" side="Right" frame="SearchEditBox" relative="$parent" pos="Mid" offset="#SearchEditBoxNormalRightOffset"/>
 
                 <Action type="SetAnchor" side="Left" frame="ContentTileList" relative="$parent" pos="Mid" offset="#CollectionTileListLeftMidOffset"/>
                 <Action type="SetAnchor" side="Right" frame="ContentTileList" relative="$parent" pos="Max" offset="0"/>
@@ -325,9 +348,40 @@
 
                 <Action type="SetAnchor" side="Right" frame="ContentTileList/ScrollBar" relative="$parent/Item5" pos="Max" offset="26"/>
             </State>
-            <State name="OneBigTileList">
+
+            <State name="SmallTileListOnly_Is4x3">
+                <When type="Property" frame="BigTileList" Visible="false"/>
+                <When type="Property" frame="4x3AspectRatioFrame" Visible="false"/>
+                <Action type="SetProperty" frame="ContentTileList" MaxItemPerPage="10"/>
+
+                <Action type="SetAnchor" side="Left" frame="BigSectionHeader" relative="$parent" pos="Mid" offset="-763"/>
+                <Action type="SetAnchor" side="Right" frame="SearchEditBox" relative="$parent" pos="Mid" offset="#SearchEditBox4x3RightOffset"/>
+
+                <Action type="SetAnchor" side="Left" frame="ContentTileList" relative="$parent" pos="Mid" offset="-700"/>
+                <Action type="SetAnchor" side="Right" frame="ContentTileList" relative="$parent" pos="Max" offset="0"/>
+
+                <Action type="SetAnchor" side="Top" frame="ContentTileList/Item0" relative="$parent" pos="Min" offset="0"/>
+                <Action type="SetAnchor" side="Left" frame="ContentTileList/Item0" relative="$parent" pos="0" offset="0"/>
+
+                <Action type="SetAnchor" side="Top" frame="ContentTileList/Item2" relative="$parent/Item0" pos="Min" offset="0"/>
+                <Action type="SetAnchor" side="Left" frame="ContentTileList/Item2" relative="$parent/Item1" pos="Max" offset="#StoreTileItemSpacing"/>
+
+                <Action type="SetAnchor" side="Top" frame="ContentTileList/Item4" relative="$parent/Item3" pos="Min" offset="0"/>
+                <Action type="SetAnchor" side="Left" frame="ContentTileList/Item4" relative="$parent/Item3" pos="Max" offset="#StoreTileItemSpacing"/>
+
+                <Action type="SetAnchor" side="Right" frame="ContentTileList/ScrollBar" relative="$parent/Item4" pos="Max" offset="26"/>
+            </State>
+
+            <State name="OneBigTileList_Not4x3">
                 <When type="Property" frame="BigTileList" DataCount="1"/>
+                <When type="Property" frame="BigTileList" Visible="true"/>
                 <Action type="SetProperty" frame="ContentTileList" MaxItemPerPage="8"/>
+                <When type="Property" frame="4x3AspectRatioFrame" Visible="true"/>
+
+                <Action type="SetAnchor" side="Left" frame="BigSectionHeader" relative="$parent" pos="Mid" offset="-874"/>
+                <Action type="SetAnchor" side="Right" frame="SearchEditBox" relative="$parent" pos="Mid" offset="#SearchEditBoxNormalRightOffset"/>
+
+                <Action type="SetAnchor" side="Left" frame="BigTileList" relative="$parent" pos="Mid" offset="#CollectionTileListLeftMidOffset"/>
 
                 <Action type="SetAnchor" side="Left" frame="ContentTileList" relative="$parent" pos="Mid" offset="-290"/>
                 <Action type="SetAnchor" side="Right" frame="ContentTileList" relative="$parent" pos="Max" offset="0"/>
@@ -343,9 +397,67 @@
 
                 <Action type="SetAnchor" side="Right" frame="ContentTileList/ScrollBar" relative="$parent/Item7" pos="Max" offset="26"/>
             </State>
-            <State name="TwoBigTileList">
+
+            <State name="OneBigTileList_Is4x3">
+                <When type="Property" frame="BigTileList" DataCount="1"/>
+                <When type="Property" frame="BigTileList" Visible="true"/>
+                <Action type="SetProperty" frame="ContentTileList" MaxItemPerPage="6"/>
+                <When type="Property" frame="4x3AspectRatioFrame" Visible="false"/>
+
+                <Action type="SetAnchor" side="Left" frame="BigSectionHeader" relative="$parent" pos="Mid" offset="-763"/>
+                <Action type="SetAnchor" side="Right" frame="SearchEditBox" relative="$parent" pos="Mid" offset="#SearchEditBox4x3RightOffset"/>
+
+                <Action type="SetAnchor" side="Left" frame="BigTileList" relative="$parent" pos="Mid" offset="-660"/>
+
+                <Action type="SetAnchor" side="Left" frame="ContentTileList" relative="$parent" pos="Mid" offset="-150"/>
+                <Action type="SetAnchor" side="Right" frame="ContentTileList" relative="$parent" pos="Max" offset="0"/>
+
+                <Action type="SetAnchor" side="Top" frame="ContentTileList/Item0" relative="$parent" pos="Min" offset="0"/>
+                <Action type="SetAnchor" side="Left" frame="ContentTileList/Item0" relative="$parent" pos="0" offset="0"/>
+
+                <Action type="SetAnchor" side="Top" frame="ContentTileList/Item2" relative="$parent/Item0" pos="Min" offset="0"/>
+                <Action type="SetAnchor" side="Left" frame="ContentTileList/Item2" relative="$parent/Item1" pos="Max" offset="#StoreTileItemSpacing"/>
+
+                <Action type="SetAnchor" side="Top" frame="ContentTileList/Item4" relative="$parent/Item0" pos="Max" offset="#StoreTileItemVerticalSpacing"/>
+                <Action type="SetAnchor" side="Left" frame="ContentTileList/Item4" relative="$parent/Item3" pos="Max" offset="#StoreTileItemSpacing"/>
+
+                <Action type="SetAnchor" side="Right" frame="ContentTileList/ScrollBar" relative="$parent/Item5" pos="Max" offset="26"/>
+            </State>
+
+            <State name="TwoBigTileList_Not4x3">
                 <When type="Property" frame="BigTileList" operator="GreaterThan" DataCount="1"/>
+                <When type="Property" frame="BigTileList" Visible="true"/>
                 <Action type="SetProperty" frame="ContentTileList" MaxItemPerPage="4"/>
+                <When type="Property" frame="4x3AspectRatioFrame" Visible="true"/>
+
+                <Action type="SetAnchor" side="Left" frame="BigSectionHeader" relative="$parent" pos="Mid" offset="-874"/>
+                <Action type="SetAnchor" side="Right" frame="SearchEditBox" relative="$parent" pos="Mid" offset="#SearchEditBoxNormalRightOffset"/>
+
+                <Action type="SetAnchor" side="Left" frame="ContentTileList" relative="$parent" pos="Mid" offset="-290"/>
+                <Action type="SetAnchor" side="Right" frame="ContentTileList" relative="$parent" pos="Mid" offset="290"/>
+
+                <Action type="SetAnchor" side="Top" frame="ContentTileList/Item0" relative="$parent" pos="Min" offset="0"/>
+                <Action type="SetAnchor" side="Left" frame="ContentTileList/Item0" relative="$parent" pos="0" offset="0"/>
+
+                <Action type="SetAnchor" side="Top" frame="ContentTileList/Item2" relative="$parent/Item0" pos="Max" offset="#StoreTileItemVerticalSpacing"/>
+                <Action type="SetAnchor" side="Left" frame="ContentTileList/Item2" relative="$parent" pos="Min" offset="0"/>
+
+                <Action type="SetAnchor" side="Top" frame="ContentTileList/Item4" relative="$parent/Item3" pos="Min" offset="0"/>
+                <Action type="SetAnchor" side="Left" frame="ContentTileList/Item4" relative="$parent/Item3" pos="Max" offset="#StoreTileItemSpacing"/>
+
+                <Action type="SetAnchor" side="Right" frame="ContentTileList/ScrollBar" relative="$parent/Item3" pos="Max" offset="23"/>
+            </State>
+
+            <State name="TwoBigTileList_Is4x3">
+                <When type="Property" frame="BigTileList" operator="GreaterThan" DataCount="1"/>
+                <When type="Property" frame="BigTileList" Visible="true"/>
+                <Action type="SetProperty" frame="ContentTileList" MaxItemPerPage="4"/>
+                <When type="Property" frame="4x3AspectRatioFrame" Visible="false"/>
+
+                <Action type="SetAnchor" side="Left" frame="BigSectionHeader" relative="$parent" pos="Mid" offset="-763"/>
+                <Action type="SetAnchor" side="Right" frame="SearchEditBox" relative="$parent" pos="Mid" offset="#SearchEditBox4x3RightOffset"/>
+
+                <Action type="SetAnchor" side="Left" frame="BigTileList/Item0" relative="$parent" pos="Min" offset="55"/>
 
                 <Action type="SetAnchor" side="Left" frame="ContentTileList" relative="$parent" pos="Mid" offset="-290"/>
                 <Action type="SetAnchor" side="Right" frame="ContentTileList" relative="$parent" pos="Mid" offset="290"/>

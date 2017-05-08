@@ -1,23 +1,30 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <Desc>
     <DescFlags val="Locked"/>
-    
+
     <Constant name="ListItemVerticalSpacing" val="-24"/>
     <Constant name="MaxRowCount" val="10"/>
-    
-    <!-- 
-    Events : Owned / NotOwned 
+
+    <!--
+    Events : Owned / NotOwned
     -->
     <Frame type="ScreenBundleTileListItem" name="BundleTileListItemTemplate">
         <Height val="92"/>
         <Width val="260"/>
         <SelectedSound val="@UI_BNet_Generic_04"/>
+        <TooltipAnchorPosition val="MiddleRight"/>
+
+        <Frame type="GameContentFrame" name="GameContentFrame">
+            <Anchor relative="$parent"/>
+            <Visible val="false"/>
+            <GameContent val="{$parent/@GameContent}"/>
+        </Frame>
 
         <Frame type="Image" name="NormalImage">
             <Anchor relative="$parent"/>
             <Texture val="@UI/Storm_UI_Store_Bundles_ListItem_Normal"/>
             <TextureType val="NineSlice"/>
-            
+
             <Animation name="NotOwned">
                 <Event event="NotOwned" action="Play" frame="$parent"/>
                 <Event event="Reset" action="Stop" frame="$parent"/>
@@ -33,7 +40,7 @@
                     <Key type="Image" time="0.0" image="@UI/Storm_UI_Store_Bundles_OwnedListItem_Normal"/>
                 </Controller>
             </Animation>
-            
+
              <Animation name="Unavailable">
                 <Event event="Unavailable" action="Play" frame="$parent"/>
                 <Event event="Reset" action="Stop" frame="$parent"/>
@@ -42,12 +49,12 @@
                 </Controller>
             </Animation>
         </Frame>
-        
+
         <Frame type="Image" name="HoverImage">
             <Anchor relative="$parent/NormalImage"/>
             <Texture val="@UI/Storm_UI_Store_Bundles_ListItem_Hover"/>
             <TextureType val="NineSlice"/>
-            
+
             <Animation name="NotOwned">
                 <Event event="NotOwned" action="Play" frame="$parent"/>
                 <Event event="Reset" action="Stop" frame="$parent"/>
@@ -63,7 +70,7 @@
                     <Key type="Image" time="0.0" image="@UI/Storm_UI_Store_Bundles_OwnedListItem_Hover"/>
                 </Controller>
             </Animation>
-            
+
             <Animation name="Unavailable">
                 <Event event="Unavailable" action="Play" frame="$parent"/>
                 <Event event="Reset" action="Stop" frame="$parent"/>
@@ -72,12 +79,12 @@
                 </Controller>
             </Animation>
         </Frame>
-        
+
         <Frame type="Image" name="SelectedImage">
             <Anchor relative="$parent/NormalImage"/>
             <Texture val="@UI/Storm_UI_Store_Bundles_ListItem_Selected"/>
             <TextureType val="NineSlice"/>
-            
+
             <Animation name="NotOwned">
                 <Event event="NotOwned" action="Play" frame="$parent"/>
                 <Event event="Reset" action="Stop" frame="$parent"/>
@@ -93,7 +100,7 @@
                     <Key type="Image" time="0.0" image="@UI/Storm_UI_Store_Bundles_OwnedListItem_Selected"/>
                 </Controller>
             </Animation>
-            
+
             <Animation name="Unavailable">
                 <Event event="Unavailable" action="Play" frame="$parent"/>
                 <Event event="Reset" action="Stop" frame="$parent"/>
@@ -102,7 +109,7 @@
                 </Controller>
             </Animation>
         </Frame>
-        
+
         <Frame type="Image" name="IconFrame">
             <Anchor side="Top" relative="$parent" pos="Min" offset="11"/>
             <Anchor side="Left" relative="$parent" pos="Min" offset="15"/>
@@ -110,33 +117,15 @@
             <Width val="64"/>
             <Alpha val="0"/>
         </Frame>
-        
+
         <Frame type="Image" name="IconImage">
             <Anchor side="Top" relative="$parent/IconFrame" pos="Mid" offset="0"/>
             <Anchor side="Left" relative="$parent/IconFrame" pos="Mid" offset="0"/>
             <Anchor side="Bottom" relative="$parent/IconFrame" pos="Mid" offset="0"/>
             <Anchor side="Right" relative="$parent/IconFrame" pos="Mid" offset="0"/>
             <TextureType val="Normal"/>
-
-            <StateGroup name="BonusItemStates">
-
-                <State name="GemsBonus">
-                    <When type="Property" frame="$parent" BonusType="Gems"/>
-                    <Action type="SetProperty" Texture="@UI/Storm_UI_Store_Bundle_Reward_Icons_Gems"/>
-                </State>
-                <State name="GoldBonus">
-                    <When type="Property" frame="$parent" BonusType="Gold"/>
-                    <Action type="SetProperty" Texture="@UI/Storm_UI_Store_Bundle_Reward_Icons_Gold"/>
-                </State>
-                <State name="BoostBonus">
-                    <When type="Property" frame="$parent" BonusType="Boost"/>
-                    <Action type="SetProperty" Texture="@UI/Storm_UI_Store_Bundle_Reward_Icons_Stimpack"/>
-                </State>
-                <State name="LootChestBonus">
-                    <When type="Property" frame="$parent" BonusType="LootChest"/>
-                    <Action type="SetProperty" Texture="@UI/Storm_UI_Store_Bundle_Reward_Icons_Lootchest"/>
-                </State>
-            </StateGroup>
+            <Width val="64"/>
+            <Height val="64"/>
         </Frame>
 
         <Frame type="Label" name="Label">
@@ -148,12 +137,29 @@
             <Options val="Ellipsis | NoWrapping | TooltipIfTruncated"/>
             <Height val="40"/>
 
-            <StateGroup name="BonusLabelStates">
-                <State name="IsBonus">
-                    <When type="Property" frame="$parent" IsBonus="true"/>
+            <StateGroup name="TextState">
+                <State name="Header">
+                    <When type="Property" frame="$parent" BundleItemType="GameContent" operator="NotEqual"/>
                     <Action type="SetProperty" Text="{$parent/@HeaderText}"/>
+                </State>
+
+                <State name="Product">
+                    <When type="Property" frame="$parent" BundleItemType="GameContent"/>
+                    <Action type="SetProperty" Text="{$parent/GameContentFrame/@StoreName}"/>
+                </State>
+            </StateGroup>
+
+            <StateGroup name="AlignState">
+                <DefaultState val="NonInteractive"/>
+
+                <State name="NonInteractive">
+                    <When type="Property" frame="$parent" CanPreview="false"/>
                     <Action type="SetAnchor" side="Left" relative="$parent/IconFrame" pos="Max" offset="10"/>
                     <Action type="SetAnchor" side="Right" relative="$parent" pos="Max" offset="0"/>
+                </State>
+
+                <State name="Interactive">
+                    <When type="Property" frame="$parent" CanPreview="true"/>
                 </State>
             </StateGroup>
         </Frame>
@@ -162,7 +168,6 @@
             <Anchor side="Bottom" relative="$parent" pos="Max" offset="-20"/>
             <Anchor side="Left" relative="$parent" pos="Min" offset="15"/>
             <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
-            <AcceptsMouseTooltip val="true"/>
             <Style val="StandardHeroSubHeaderLabel"/>
             <Options val="Ellipsis | NoWrapping | ScaleToPreventTruncation"/>
             <Unclipped val="true"/>
@@ -171,8 +176,7 @@
 
         <StateGroup name="TileStates">
             <State name="Product">
-                <When type="Property" IsBonus="false"/>
-                <When type="Property" HeaderText=""/>
+                <When type="Property" CanPreview="true"/>
                 <Action type="SetProperty" frame="NormalImage" Alpha="255"/>
                 <Action type="SetProperty" frame="HoverImage" Alpha="255"/>
                 <Action type="SetProperty" frame="SelectedImage" Alpha="255"/>
@@ -181,8 +185,7 @@
                 <Action type="SetProperty" frame="HeaderLabel" Alpha="0"/>
             </State>
             <State name="Header">
-                <When type="Property" IsBonus="false"/>
-                <When type="Property" operator="NotEqual" HeaderText=""/>
+                <When type="Property" BundleItemType="Header"/>
                 <Action type="SetProperty" frame="NormalImage" Alpha="0"/>
                 <Action type="SetProperty" frame="HoverImage" Alpha="0"/>
                 <Action type="SetProperty" frame="SelectedImage" Alpha="0"/>
@@ -190,8 +193,8 @@
                 <Action type="SetProperty" frame="Label" Alpha="0"/>
                 <Action type="SetProperty" frame="HeaderLabel" Alpha="255"/>
             </State>
-            <State name="Bonus">
-                <When type="Property" IsBonus="true"/>
+            <State name="NonInteractive">
+                <When type="Property" CanPreview="false"/>
                 <Action type="SetProperty" frame="NormalImage" Alpha="0"/>
                 <Action type="SetProperty" frame="HoverImage" Alpha="0"/>
                 <Action type="SetProperty" frame="SelectedImage" Alpha="0"/>
@@ -206,6 +209,7 @@
         <Height val="725"/>
         <Width val="800"/>
 
+        <!-- Column 1 -->
         <Frame type="ScreenBundleTileListItem" name="Item0" template="ScreenBundle/BundleTileListItemTemplate">
             <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
             <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
@@ -240,22 +244,23 @@
             <Anchor side="Top" relative="$parent\Item5" pos="Max" offset="#ListItemVerticalSpacing"/>
             <Anchor side="Left" relative="$parent\Item5" pos="Min" offset="0"/>
         </Frame>
-        
+
         <Frame type="ScreenBundleTileListItem" name="Item7" template="ScreenBundle/BundleTileListItemTemplate">
             <Anchor side="Top" relative="$parent\Item6" pos="Max" offset="#ListItemVerticalSpacing"/>
             <Anchor side="Left" relative="$parent\Item6" pos="Min" offset="0"/>
         </Frame>
-        
+
         <Frame type="ScreenBundleTileListItem" name="Item8" template="ScreenBundle/BundleTileListItemTemplate">
             <Anchor side="Top" relative="$parent\Item7" pos="Max" offset="#ListItemVerticalSpacing"/>
             <Anchor side="Left" relative="$parent\Item7" pos="Min" offset="0"/>
         </Frame>
-        
+
         <Frame type="ScreenBundleTileListItem" name="Item9" template="ScreenBundle/BundleTileListItemTemplate">
             <Anchor side="Top" relative="$parent\Item8" pos="Max" offset="#ListItemVerticalSpacing"/>
             <Anchor side="Left" relative="$parent\Item8" pos="Min" offset="0"/>
         </Frame>
-        
+
+        <!-- Column 2 -->
         <Frame type="ScreenBundleTileListItem" name="Item10" template="ScreenBundle/BundleTileListItemTemplate">
             <Anchor side="Top" relative="$parent\Item0" pos="Min" offset="0"/>
             <Anchor side="Left" relative="$parent\Item0" pos="Max" offset="0"/>
@@ -265,92 +270,93 @@
             <Anchor side="Top" relative="$parent\Item10" pos="Max" offset="#ListItemVerticalSpacing"/>
             <Anchor side="Left" relative="$parent\Item10" pos="Min" offset="0"/>
         </Frame>
-        
+
         <Frame type="ScreenBundleTileListItem" name="Item12" template="ScreenBundle/BundleTileListItemTemplate">
             <Anchor side="Top" relative="$parent\Item11" pos="Max" offset="#ListItemVerticalSpacing"/>
             <Anchor side="Left" relative="$parent\Item11" pos="Min" offset="0"/>
         </Frame>
-        
+
         <Frame type="ScreenBundleTileListItem" name="Item13" template="ScreenBundle/BundleTileListItemTemplate">
             <Anchor side="Top" relative="$parent\Item12" pos="Max" offset="#ListItemVerticalSpacing"/>
             <Anchor side="Left" relative="$parent\Item12" pos="Min" offset="0"/>
         </Frame>
-        
+
         <Frame type="ScreenBundleTileListItem" name="Item14" template="ScreenBundle/BundleTileListItemTemplate">
             <Anchor side="Top" relative="$parent\Item13" pos="Max" offset="#ListItemVerticalSpacing"/>
             <Anchor side="Left" relative="$parent\Item13" pos="Min" offset="0"/>
         </Frame>
-        
+
         <Frame type="ScreenBundleTileListItem" name="Item15" template="ScreenBundle/BundleTileListItemTemplate">
             <Anchor side="Top" relative="$parent\Item14" pos="Max" offset="#ListItemVerticalSpacing"/>
             <Anchor side="Left" relative="$parent\Item14" pos="Min" offset="0"/>
         </Frame>
-        
+
         <Frame type="ScreenBundleTileListItem" name="Item16" template="ScreenBundle/BundleTileListItemTemplate">
             <Anchor side="Top" relative="$parent\Item15" pos="Max" offset="#ListItemVerticalSpacing"/>
             <Anchor side="Left" relative="$parent\Item15" pos="Min" offset="0"/>
         </Frame>
-        
+
         <Frame type="ScreenBundleTileListItem" name="Item17" template="ScreenBundle/BundleTileListItemTemplate">
             <Anchor side="Top" relative="$parent\Item16" pos="Max" offset="#ListItemVerticalSpacing"/>
             <Anchor side="Left" relative="$parent\Item16" pos="Min" offset="0"/>
         </Frame>
-        
+
         <Frame type="ScreenBundleTileListItem" name="Item18" template="ScreenBundle/BundleTileListItemTemplate">
             <Anchor side="Top" relative="$parent\Item17" pos="Max" offset="#ListItemVerticalSpacing"/>
             <Anchor side="Left" relative="$parent\Item17" pos="Min" offset="0"/>
         </Frame>
-        
+
         <Frame type="ScreenBundleTileListItem" name="Item19" template="ScreenBundle/BundleTileListItemTemplate">
             <Anchor side="Top" relative="$parent\Item18" pos="Max" offset="#ListItemVerticalSpacing"/>
             <Anchor side="Left" relative="$parent\Item18" pos="Min" offset="0"/>
         </Frame>
-        
+
+        <!-- Column 3 -->
         <Frame type="ScreenBundleTileListItem" name="Item20" template="ScreenBundle/BundleTileListItemTemplate">
             <Anchor side="Top" relative="$parent\Item10" pos="Min" offset="0"/>
             <Anchor side="Left" relative="$parent\Item10" pos="Max" offset="0"/>
         </Frame>
-        
+
         <Frame type="ScreenBundleTileListItem" name="Item21" template="ScreenBundle/BundleTileListItemTemplate">
             <Anchor side="Top" relative="$parent\Item20" pos="Max" offset="#ListItemVerticalSpacing"/>
             <Anchor side="Left" relative="$parent\Item20" pos="Min" offset="0"/>
         </Frame>
-        
+
         <Frame type="ScreenBundleTileListItem" name="Item22" template="ScreenBundle/BundleTileListItemTemplate">
             <Anchor side="Top" relative="$parent\Item21" pos="Max" offset="#ListItemVerticalSpacing"/>
             <Anchor side="Left" relative="$parent\Item21" pos="Min" offset="0"/>
         </Frame>
-        
+
         <Frame type="ScreenBundleTileListItem" name="Item23" template="ScreenBundle/BundleTileListItemTemplate">
             <Anchor side="Top" relative="$parent\Item22" pos="Max" offset="#ListItemVerticalSpacing"/>
             <Anchor side="Left" relative="$parent\Item22" pos="Min" offset="0"/>
         </Frame>
-        
+
         <Frame type="ScreenBundleTileListItem" name="Item24" template="ScreenBundle/BundleTileListItemTemplate">
             <Anchor side="Top" relative="$parent\Item23" pos="Max" offset="#ListItemVerticalSpacing"/>
             <Anchor side="Left" relative="$parent\Item23" pos="Min" offset="0"/>
         </Frame>
-        
+
         <Frame type="ScreenBundleTileListItem" name="Item25" template="ScreenBundle/BundleTileListItemTemplate">
             <Anchor side="Top" relative="$parent\Item24" pos="Max" offset="#ListItemVerticalSpacing"/>
             <Anchor side="Left" relative="$parent\Item24" pos="Min" offset="0"/>
         </Frame>
-        
+
         <Frame type="ScreenBundleTileListItem" name="Item26" template="ScreenBundle/BundleTileListItemTemplate">
             <Anchor side="Top" relative="$parent\Item25" pos="Max" offset="#ListItemVerticalSpacing"/>
             <Anchor side="Left" relative="$parent\Item25" pos="Min" offset="0"/>
         </Frame>
-        
+
         <Frame type="ScreenBundleTileListItem" name="Item27" template="ScreenBundle/BundleTileListItemTemplate">
             <Anchor side="Top" relative="$parent\Item26" pos="Max" offset="#ListItemVerticalSpacing"/>
             <Anchor side="Left" relative="$parent\Item26" pos="Min" offset="0"/>
         </Frame>
-        
+
         <Frame type="ScreenBundleTileListItem" name="Item28" template="ScreenBundle/BundleTileListItemTemplate">
             <Anchor side="Top" relative="$parent\Item27" pos="Max" offset="#ListItemVerticalSpacing"/>
             <Anchor side="Left" relative="$parent\Item27" pos="Min" offset="0"/>
         </Frame>
-        
+
         <Frame type="ScreenBundleTileListItem" name="Item29" template="ScreenBundle/BundleTileListItemTemplate">
             <Anchor side="Top" relative="$parent\Item28" pos="Max" offset="#ListItemVerticalSpacing"/>
             <Anchor side="Left" relative="$parent\Item28" pos="Min" offset="0"/>
@@ -414,7 +420,7 @@
             <ScaleHeightToTexture val="true"/>
             <Texture val="@UI/Storm_UI_Store_Bundles_ItemCountBg"/>
         </Frame>
-        
+
         <Frame type="Label" name="ItemCountLabel">
             <Anchor side="Top" relative="$parent/ItemCountIconImage" pos="Max" offset="-91"/>
             <Anchor side="Left" relative="$parent/ItemCountIconImage" pos="Mid" offset="0"/>
@@ -422,7 +428,7 @@
             <Style val="StandardPageHeaderLabel"/>
             <Text val="00"/>
         </Frame>
-        
+
         <Frame type="Label" name="ItemCountTitleLabel">
             <Anchor side="Top" relative="$parent/ItemCountLabel" pos="Max" offset="-12"/>
             <Anchor side="Left" relative="$parent/ItemCountIconImage" pos="Mid" offset="0"/>
@@ -438,7 +444,7 @@
             <Style val="StandardLargePageHeaderLabel"/>
             <Handle val="ScreenBundle_NameLabel"/>
         </Frame>
-        
+
         <Frame type="Label" name="TitleLabel">
             <Anchor side="Top" relative="$parent/NameLabel" pos="Max" offset="-2"/>
             <Anchor side="Left" relative="$parent/NameLabel" pos="Min" offset="4"/>
@@ -458,6 +464,32 @@
         <Frame type="TileList" name="ProductTileList" template="ScreenBundle/BundleTileListTemplate">
             <Anchor side="Top" relative="$parent/InfoLabel" pos="Max" offset="10"/>
             <Anchor side="Left" relative="$parent/ItemCountIconImage" pos="Mid" offset="0"/>
+
+            <StateGroup name="TileListItemSizeStates">
+                <State name="WelcomeBundle">
+                    <When type="Property" frame="$parent/GameContentFrame" BundleLink="WelcomeBundle"/>
+                    <Action type="SetProperty" frame="Item0" Width="350"/>
+                    <Action type="SetProperty" frame="Item1" Width="350"/>
+                    <Action type="SetProperty" frame="Item2" Width="350"/>
+                    <Action type="SetProperty" frame="Item3" Width="350"/>
+                    <Action type="SetProperty" frame="Item4" Width="350"/>
+                    <Action type="SetProperty" frame="Item5" Width="350"/>
+                    <Action type="SetProperty" frame="Item6" Width="350"/>
+                    <Action type="SetProperty" frame="Item7" Width="350"/>
+                    <Action type="SetProperty" frame="Item8" Width="350"/>
+                    <Action type="SetProperty" frame="Item9" Width="350"/>
+                    <Action type="SetProperty" frame="Item10" Width="320"/>
+                    <Action type="SetProperty" frame="Item11" Width="320"/>
+                    <Action type="SetProperty" frame="Item12" Width="320"/>
+                    <Action type="SetProperty" frame="Item13" Width="320"/>
+                    <Action type="SetProperty" frame="Item14" Width="320"/>
+                    <Action type="SetProperty" frame="Item15" Width="320"/>
+                    <Action type="SetProperty" frame="Item16" Width="320"/>
+                    <Action type="SetProperty" frame="Item17" Width="320"/>
+                    <Action type="SetProperty" frame="Item18" Width="320"/>
+                    <Action type="SetProperty" frame="Item19" Width="320"/>
+                </State>
+            </StateGroup>
         </Frame>
 
         <Frame type="Frame" name="DynamicBundleFrame">
@@ -465,7 +497,7 @@
             <Anchor side="Bottom" relative="$parent/BuyButton0" pos="Min" offset="15"/>
             <Anchor side="Left" relative="$parent/BuyButton0" pos="Min" offset="10"/>
             <Anchor side="Right" relative="CountLabel" pos="Max" offset="0"/>
-            
+
             <Frame type="Image" name="DynamicBundleImage">
                 <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
                 <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
@@ -485,13 +517,13 @@
                 <Style val="StoreBundleDescription"/>
             </Frame>
         </Frame>
-        
+
         <Frame type="Frame" name="InvalidBundleFrame">
             <Anchor side="Top" relative="InvalidBundleImage" pos="Min" offset="0"/>
             <Anchor side="Bottom" relative="$parent/DynamicBundleFrame" pos="Max" offset="0"/>
             <Anchor side="Left" relative="$parent/DynamicBundleFrame" pos="Min" offset="0"/>
             <Anchor side="Right" relative="OwnedCountLabel" pos="Max" offset="0"/>
-            
+
             <Visible val="false"/>
 
             <Frame type="Image" name="InvalidBundleImage">
@@ -513,17 +545,17 @@
                 <Text val="@UI/ScreenBundle/InvalidBundleCount"/>
                 <Style val="StoreBundleDescription"/>
             </Frame>
-            
+
             <Animation name="Show">
                 <Event event="ShowInvalidStaticBundle" action="Play" frame="$parent"/>
                 <Event event="HideInvalidStaticBundle" action="Stop" frame="$parent"/>
-                
+
                 <Controller type="Visibility" end="Pause">
                     <Key type="Bool" time="0" value="true"/>
                 </Controller>
             </Animation>
         </Frame>
-        
+
         <Frame type="Frame" name="MegaBundleFrame">
             <Anchor side="Top" relative="MegaBundleImage" pos="Min" offset="0"/>
             <Anchor side="Bottom" relative="$parent/InvalidBundleFrame" pos="Max" offset="0"/>
@@ -546,7 +578,7 @@
                 <Style val="StorePageHeaderGoldLabel"/>
                 <Text val="!"/>
             </Frame>
-            
+
             <Frame type="TextFormatFrame" name="TextFormatFrame">
                 <Anchor relative="$parent"/>
                 <FormatText val="@UI/Store/ExclusiveMegabundleWarning"/>
@@ -614,7 +646,7 @@
 
         <StateGroup name="TitleTextState">
             <DefaultState val="NotBundleData"/>
-            
+
             <State name="BundleData">
                 <When type="Property" Operator="NotEqual" BundleTitleText=""/>
                 <Action type="SetProperty" frame="TitleLabel" Text="{$parent/@BundleTitleText}"/>
