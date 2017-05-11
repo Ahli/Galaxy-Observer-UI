@@ -282,6 +282,9 @@
 		<Frame type="Image" name="TipGradient">
 			<RenderPriority val="510"/>
 		</Frame>
+		<Frame type="Image" name="TopBorder">
+			<RenderPriority val="510"/>
+		</Frame>
 		
 		<!-- New Portrait behind text -->
 		<Frame type="Image" name="HeroPortrait">
@@ -513,57 +516,48 @@
 		
 		<!-- @Override -->
 		<StateGroup name="TalentTierState">
-			<DefaultState val="TierNotAvailable"/>
+			<DefaultState val="TalentTierNotAvailable"/>
 			<State name="TierHidden">
 				<When type="AnimationState" frame="$this" TalentTierState="TierHidden"/>
 				<Action type="SetProperty" frame="$this" visible="false"/>
 				<Action type="SetProperty" frame="$this/IconImage" texture="_Assets\Textures\transparent.dds"/>
-			</State>
-			<State name="TierNotAvailable">
-				<When type="AnimationState" frame="$this" TalentTierState="TierNotAvailable"/>
-				<Action type="SetProperty" frame="$this/IconImage" visible="false"/>
-				<Action type="SetProperty" frame="$this/IconImage" texture="_Assets\Textures\transparent.dds"/>
-				<Action type="SetProperty" frame="$this" visible="true"/>
-				<Action type="SetProperty" frame="IconBorderImageHighlight" visible="false"/>
-			</State>
-			<State name="TierAvailable">
-				<When type="AnimationState" frame="$this" TalentTierState="TierAvailable"/>
-				<Action type="SetProperty" frame="$this" visible="true"/>
-				<Action type="SetProperty" frame="IconBorderImageHighlight" visible="true"/>
-				<Action type="SetProperty" frame="$this/IconImage" visible="true"/>
-				<Action type="SetProperty" frame="$this/IconImage" texture="@UI/Storm_UI_InGame_Leader_Talent_Unselected"/>
-			</State>
-			<State name="TierSelected">
-				<When type="AnimationState" frame="$this" TalentTierState="TierSelected"/>
-				<Action type="SetProperty" frame="$this" visible="true"/>
-				<Action type="SetProperty" frame="IconBorderImageHighlight" visible="true"/>
-				<Action type="SetProperty" frame="$this/IconImage" visible="true"/>
-                <!-- IconImage Texture taken care of by code -->
-			</State>
-		</StateGroup>
-		
-		<!-- @Override -->
-        <StateGroup name="TalentTypeState1">
-			<State name="TypeTalent_Unavailable">
-				<When type="AnimationState" frame="$this" TalentTypeState="TypeTalent"/>
-				<When type="AnimationState" frame="$this" TalentTierState="TierNotAvailable"/>
 				<Action type="SetProperty" frame="$this/IconBorderImage" alpha="#lockedTalentBorderAlpha"/>
 				<Action type="SetProperty" frame="$this/IconBorderImage" desaturated="true"/>
 				<Action type="SetProperty" frame="$this/IconBackgroundImage" alpha="100"/>
 			</State>
-			<State name="TypeTalent_Available">
-				<When type="AnimationState" frame="$this" TalentTypeState="TypeTalent"/>
+			<State name="TalentTierNotAvailable">
+				<When type="AnimationState" frame="$this" TalentTierState="TierNotAvailable"/>
+                <When type="AnimationState" frame="$this" TalentTypeState="TypeTalent"/>
+				<Action type="SetProperty" frame="$this/IconImage" visible="false"/>
+				<Action type="SetProperty" frame="$this/IconImage" texture="_Assets\Textures\transparent.dds"/>
+				<Action type="SetProperty" frame="$this" visible="true"/>
+				<Action type="SetProperty" frame="IconBorderImageHighlight" visible="false"/>
+				<Action type="SetProperty" frame="$this/IconBorderImage" alpha="#lockedTalentBorderAlpha"/>
+				<Action type="SetProperty" frame="$this/IconBorderImage" desaturated="true"/>
+				<Action type="SetProperty" frame="$this/IconBackgroundImage" alpha="100"/>
+			</State>
+			<State name="TalentTierAvailable">
 				<When type="AnimationState" frame="$this" TalentTierState="TierAvailable"/>
+                <When type="AnimationState" frame="$this" TalentTypeState="TypeTalent"/>
+				<Action type="SetProperty" frame="$this" visible="true"/>
+				<Action type="SetProperty" frame="IconBorderImageHighlight" visible="true"/>
+				<Action type="SetProperty" frame="$this/IconImage" visible="true"/>
+				<Action type="SetProperty" frame="$this/IconImage" texture="@UI/Storm_UI_InGame_Leader_Talent_Unselected"/>
 				<Action type="SetProperty" frame="$this/IconBorderImage" alpha="255"/>
 				<Action type="SetProperty" frame="$this/IconBorderImage" desaturated="false"/>
 				<Action type="SetProperty" frame="$this/IconBackgroundImage" alpha="255"/>
 			</State>
-			<!--<State name="TypeUltimate_Unavailable">
+			<State name="TalentTierSelected">
+				<When type="AnimationState" frame="$this" TalentTierState="TierSelected"/>
+                <When type="AnimationState" frame="$this" operator="NotEqual" TalentTypeState="TypeUltimate"/>
+				<Action type="SetProperty" frame="$this" visible="true"/>
+				<Action type="SetProperty" frame="IconBorderImageHighlight" visible="true"/>
+				<Action type="SetProperty" frame="$this/IconImage" visible="true"/>
+				<Action type="SetProperty" frame="$this/IconBorderImage" alpha="255"/>
+				<Action type="SetProperty" frame="$this/IconBorderImage" desaturated="false"/>
+				<Action type="SetProperty" frame="$this/IconBackgroundImage" alpha="255"/>
+                <!-- IconImage Texture taken care of by code -->
 			</State>
-			<State name="TypeUltimate_Available">
-			</State>
-			<State name="TierSelected">
-			</State>-->
 		</StateGroup>
 		
 		<Frame type="Image" name="UnfilledProgressImage">
@@ -660,10 +654,13 @@
 	<Frame type="UnitStatusTalentIcon" name="TalentTreeIconTemplate_R" template="_LeaderPanelBottom/TalentTreeIconTemplate">
 		<!-- @Override -->
 		<StateGroup name="TalentTypeState">
+            <DefaultState val="TypeTalent"/>
 			<State name="TypeTalent">
+				<When type="AnimationState" frame="$this" TalentTypeState="TypeTalent"/>
 				<Action type="SetProperty" frame="$this/IconBorderImage" texture="Assets\Textures\storm_ui_ingame_obs_talents_highlight_red.dds"/>
 			</State>
 			<State name="TypeUltimate">
+				<When type="AnimationState" frame="$this" TalentTypeState="TypeUltimate"/>
 				<Action type="SetProperty" frame="$this/IconBorderImage" texture="Assets\Textures\storm_ui_ingame_obs_talents_highlight_red.dds"/>
 			</State>
 		</StateGroup>
@@ -671,10 +668,13 @@
 	<Frame type="UnitStatusTalentIcon" name="TalentTreeIconTemplate_L" template="_LeaderPanelBottom/TalentTreeIconTemplate">
 		<!-- @Override -->
 		<StateGroup name="TalentTypeState">
+            <DefaultState val="TypeTalent"/>
 			<State name="TypeTalent">
+				<When type="AnimationState" frame="$this" TalentTypeState="TypeTalent"/>
 				<Action type="SetProperty" frame="$this/IconBorderImage" texture="Assets\Textures\storm_ui_ingame_obs_talents_highlight_blue.dds"/>
 			</State>
 			<State name="TypeUltimate">
+				<When type="AnimationState" frame="$this" TalentTypeState="TypeUltimate"/>
 				<Action type="SetProperty" frame="$this/IconBorderImage" texture="Assets\Textures\storm_ui_ingame_obs_talents_highlight_blue.dds"/>
 			</State>
 		</StateGroup>
@@ -759,92 +759,104 @@
 		
 		<!-- @Override -->
 		<StateGroup name="TalentTierState">
-			<DefaultState val="TierNotAvailable"/>
+			<DefaultState val="UltimateTierNotAvailable"/>
 			<State name="TierHidden">
 				<When type="AnimationState" frame="$this" TalentTierState="TierHidden"/>
 				<Action type="SetProperty" frame="$this" visible="false"/>
 				<Action type="SetProperty" frame="$this/IconImage" texture="_Assets\Textures\transparent.dds"/>
+				<Action type="SetProperty" frame="$this/IconBorderImage" alpha="#ultimatelockedTalentBorderAlpha"/>
+				<Action type="SetProperty" frame="$this/IconBorderImage" desaturated="true"/>
+				<Action type="SendEvent" frame="$this/IconBorderImage" event="StopRotation"/>
+				<Action type="SetProperty" frame="$this/IconBorderImage" rotation="45"/>
+				<Action type="SetProperty" frame="$this/IconBackgroundImage" alpha="100"/>
 			</State>
-			<State name="TierNotAvailable">
-				<When type="AnimationState" frame="$this" TalentTierState="TierNotAvailable"/>
+			<State name="UltimateTierNotAvailable">
+                <When type="AnimationState" frame="$this" TalentTierState="TierNotAvailable"/>
+                <When type="AnimationState" frame="$this" TalentTypeState="TypeUltimate"/>
 				<Action type="SetProperty" frame="$this/IconImage" visible="false"/>
 				<Action type="SetProperty" frame="$this/IconImage" texture="_Assets\Textures\transparent.dds"/>
 				<Action type="SetProperty" frame="$this" visible="true"/>
 				<Action type="SetProperty" frame="IconBorderImageHighlight" visible="false"/>
+				<Action type="SetProperty" frame="$this/IconBorderImage" alpha="#ultimatelockedTalentBorderAlpha"/>
+				<Action type="SetProperty" frame="$this/IconBorderImage" desaturated="true"/>
+				<Action type="SendEvent" frame="$this/IconBorderImage" event="StopRotation"/>
+				<Action type="SetProperty" frame="$this/IconBorderImage" rotation="45"/>
+				<Action type="SetProperty" frame="$this/IconBackgroundImage" alpha="100"/>
 			</State>
-			<State name="TierAvailable">
-				<When type="AnimationState" frame="$this" TalentTierState="TierAvailable"/>
+            <State name="TalentTierNotAvailable"> <!-- lvl 20 is not ultimate tier -->
+                <When type="AnimationState" frame="$this" TalentTierState="TierNotAvailable"/>
+                <When type="AnimationState" frame="$this" TalentTypeState="TypeTalent"/>
+				<Action type="SetProperty" frame="$this/IconImage" visible="false"/>
+				<Action type="SetProperty" frame="$this/IconImage" texture="_Assets\Textures\transparent.dds"/>
+				<Action type="SetProperty" frame="$this" visible="true"/>
+				<Action type="SetProperty" frame="IconBorderImageHighlight" visible="false"/>
+				<Action type="SetProperty" frame="$this/IconBorderImage" alpha="#ultimatelockedTalentBorderAlpha"/>
+				<Action type="SetProperty" frame="$this/IconBorderImage" desaturated="true"/>
+				<Action type="SendEvent" frame="$this/IconBorderImage" event="StopRotation"/>
+				<Action type="SetProperty" frame="$this/IconBorderImage" rotation="45"/>
+				<Action type="SetProperty" frame="$this/IconBackgroundImage" alpha="100"/>
+            </State>
+			<State name="UltimateTierAvailable">
+                <When type="AnimationState" frame="$this" TalentTierState="TierAvailable"/>
+                <When type="AnimationState" frame="$this" TalentTypeState="TypeUltimate"/>
 				<Action type="SetProperty" frame="$this" visible="true"/>
 				<Action type="SetProperty" frame="IconBorderImageHighlight" visible="true"/>
 				<Action type="SetProperty" frame="$this/IconImage" visible="true"/>
 				<Action type="SetProperty" frame="$this/IconImage" texture="@UI/Storm_UI_InGame_Leader_Talent_Unselected"/>
+				<Action type="SetProperty" frame="$this/IconImage" visible="true"/>
+				<Action type="SetProperty" frame="$this/IconBorderImage" alpha="255"/>
+				<Action type="SetProperty" frame="$this/IconBorderImage" desaturated="false"/>
+				<Action type="SendEvent" frame="$this/IconBorderImage" event="StartRotation"/>
+				<Action type="SetProperty" frame="$this/IconBackgroundImage" alpha="255"/>
 			</State>
-			<State name="TierSelected">
-				<When type="AnimationState" frame="$this" TalentTierState="TierSelected"/>
+            <State name="TalentTierAvailable"> <!-- lvl 20 is not ultimate tier -->
+                <When type="AnimationState" frame="$this" TalentTierState="TierAvailable"/>
+                <When type="AnimationState" frame="$this" TalentTypeState="TypeTalent"/>
 				<Action type="SetProperty" frame="$this" visible="true"/>
 				<Action type="SetProperty" frame="IconBorderImageHighlight" visible="true"/>
 				<Action type="SetProperty" frame="$this/IconImage" visible="true"/>
+				<Action type="SetProperty" frame="$this/IconImage" texture="@UI/Storm_UI_InGame_Leader_Talent_Unselected"/>
+				<Action type="SetProperty" frame="$this/IconImage" visible="true"/>
+				<Action type="SetProperty" frame="$this/IconBorderImage" alpha="255"/>
+				<Action type="SetProperty" frame="$this/IconBorderImage" desaturated="false"/>
+				<Action type="SendEvent" frame="$this/IconBorderImage" event="StartRotation"/>
+				<Action type="SetProperty" frame="$this/IconBackgroundImage" alpha="255"/>
+            </State>
+			<State name="UltimateTierSelected">
+                <When type="AnimationState" frame="$this" TalentTierState="TierSelected"/>
+                <When type="AnimationState" frame="$this" TalentTypeState="TypeUltimate"/>
+				<Action type="SetProperty" frame="$this" visible="true"/>
+				<Action type="SetProperty" frame="IconBorderImageHighlight" visible="true"/>
+				<Action type="SetProperty" frame="$this/IconImage" visible="true"/>
+				<Action type="SetProperty" frame="$this/IconImage" visible="true"/>
+				<Action type="SetProperty" frame="$this/IconBorderImage" alpha="255"/>
+				<Action type="SetProperty" frame="$this/IconBorderImage" desaturated="false"/>
+				<Action type="SendEvent" frame="$this/IconBorderImage" event="StartRotation"/>
+				<Action type="SetProperty" frame="$this/IconBackgroundImage" alpha="255"/>
                 <!-- IconImage Texture taken care of by code -->
 			</State>
+            <State name="TalentTierSelected"> <!-- lvl 20 is not ultimate tier -->
+                <When type="AnimationState" frame="$this" TalentTierState="TierSelected"/>
+                <When type="AnimationState" frame="$this" operator="NotEqual" TalentTypeState="TypeUltimate"/>
+				<Action type="SetProperty" frame="$this" visible="true"/>
+				<Action type="SetProperty" frame="IconBorderImageHighlight" visible="true"/>
+				<Action type="SetProperty" frame="$this/IconImage" visible="true"/>
+				<Action type="SetProperty" frame="$this/IconImage" visible="true"/>
+				<Action type="SetProperty" frame="$this/IconBorderImage" alpha="255"/>
+				<Action type="SetProperty" frame="$this/IconBorderImage" desaturated="false"/>
+				<Action type="SendEvent" frame="$this/IconBorderImage" event="StartRotation"/>
+				<Action type="SetProperty" frame="$this/IconBackgroundImage" alpha="255"/>
+                <!-- IconImage Texture taken care of by code -->
+            </State>
 		</StateGroup>
 
-		<!-- @Override -->
-        <StateGroup name="TalentTypeState1">
-            <DefaultState val="TypeUltimate_Unavailable"/>
-			<State name="TypeUltimate_Unavailable">
-				<When type="AnimationState" frame="$this" TalentTypeState="TypeUltimate"/>
-				<When type="AnimationState" frame="$this" TalentTierState="TierNotAvailable"/>
-				<Action type="SetProperty" frame="$this/IconBorderImage" alpha="#ultimatelockedTalentBorderAlpha"/>
-				<Action type="SetProperty" frame="$this/IconBorderImage" desaturated="true"/>
-				<Action type="SendEvent" frame="$this/IconBorderImage" event="StopRotation"/>
-				<Action type="SetProperty" frame="$this/IconBorderImage" rotation="45"/>
-				<Action type="SetProperty" frame="$this/IconBackgroundImage" alpha="100"/>
-			</State>
-			<State name="TypeUltimate_Available">
-				<When type="AnimationState" frame="$this" TalentTypeState="TypeUltimate"/>
-				<When type="AnimationState" frame="$this" TalentTierState="TierAvailable"/>
-				<Action type="SetProperty" frame="$this/IconImage" visible="true"/>
-				<Action type="SetProperty" frame="$this/IconBorderImage" alpha="255"/>
-				<Action type="SetProperty" frame="$this/IconBorderImage" desaturated="false"/>
-				<Action type="SendEvent" frame="$this/IconBorderImage" event="StartRotation"/>
-				<Action type="SetProperty" frame="$this/IconBackgroundImage" alpha="255"/>
-			</State>
-			<!-- Lvl 20 talents are considered normal talents, not heroics
-				=> copy of above heroic settings unless specific changes occur -->
-			<State name="TypeTalent_Unavailable">
-				<When type="AnimationState" frame="$this" TalentTypeState="TypeUltimate"/>
-				<When type="AnimationState" frame="$this" TalentTierState="TierNotAvailable"/>
-				<Action type="SetProperty" frame="$this/IconBorderImage" alpha="#ultimatelockedTalentBorderAlpha"/>
-				<Action type="SetProperty" frame="$this/IconBorderImage" desaturated="true"/>
-				<Action type="SendEvent" frame="$this/IconBorderImage" event="StopRotation"/>
-				<Action type="SetProperty" frame="$this/IconBorderImage" rotation="45"/>
-				<Action type="SetProperty" frame="$this/IconBackgroundImage" alpha="100"/>
-			</State>
-			<State name="TypeTalent_Available">
-				<When type="AnimationState" frame="$this" TalentTypeState="TypeUltimate"/>
-				<When type="AnimationState" frame="$this" TalentTierState="TierAvailable"/>
-				<Action type="SetProperty" frame="$this/IconImage" visible="true"/>
-				<Action type="SetProperty" frame="$this/IconBorderImage" alpha="255"/>
-				<Action type="SetProperty" frame="$this/IconBorderImage" desaturated="false"/>
-				<Action type="SendEvent" frame="$this/IconBorderImage" event="StartRotation"/>
-				<Action type="SetProperty" frame="$this/IconBackgroundImage" alpha="255"/>
-			</State>
-			<!-- Overridden to fix the Rotation animation not starting in lvl 20 talent -->
-			<State name="TierSelected">
-                <When type="AnimationState" frame="$this" TalentTierState="TierSelected"/>
-                <!-- IconImage Texture taken care of by code -->
-                <Action type="SetProperty" frame="$this/IconImage" visible="true"/>
-				<Action type="SendEvent" frame="$this/IconBorderImage" event="StartRotation"/>
-			</State>
-		</StateGroup>
-		
 		<Frame type="Image" name="UnfilledProgressImage">
 			<Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
 			<Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
 			<Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
 			<Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
-			<Width val="40"/>
-			<Height val="40"/>
+			<Width val="48"/>
+			<Height val="48"/>
 			<Unclipped val="true"/>
 			<RenderPriority val="535"/>
 			<Alpha val="42"/>
@@ -855,8 +867,8 @@
 			<Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
 			<Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
 			<Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
-			<Width val="40"/>
-			<Height val="40"/>
+			<Width val="48"/>
+			<Height val="48"/>
 			<Unclipped val="true"/>
 			<RenderPriority val="536"/>
 			<Vertical val="False"/>
@@ -880,8 +892,8 @@
 			<Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
 			<Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
 			<Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
-			<Width val="40"/>
-			<Height val="40"/>
+			<Width val="48"/>
+			<Height val="48"/>
 			<Unclipped val="true"/>
 			<RenderPriority val="537"/>
 			<Texture val="_Assets\Textures\talentQuestProgressBarComplete.dds"/>
@@ -897,10 +909,13 @@
 	<Frame type="UnitStatusTalentIcon" name="TalentTreeIconHeroicTemplate_R" template="_LeaderPanelBottom/TalentTreeIconHeroicTemplate">
 		<!-- @Override -->
 		<StateGroup name="TalentTypeState">
+            <DefaultState val="TypeTalent"/>
 			<State name="TypeTalent">
+				<When type="AnimationState" frame="$this" TalentTypeState="TypeTalent"/>
 				<Action type="SetProperty" frame="$this/IconBorderImage" texture="_Assets\Textures\talentHeroicBorderRed.dds"/>
 			</State>
 			<State name="TypeUltimate">
+				<When type="AnimationState" frame="$this" TalentTypeState="TypeUltimate"/>
 				<Action type="SetProperty" frame="$this/IconBorderImage" texture="_Assets\Textures\talentHeroicBorderRed.dds"/>
 			</State>
 		</StateGroup>
@@ -933,10 +948,13 @@
 	<Frame type="UnitStatusTalentIcon" name="TalentTreeIconHeroicTemplate_L" template="_LeaderPanelBottom/TalentTreeIconHeroicTemplate">
 		<!-- @Override -->
 		<StateGroup name="TalentTypeState">
+            <DefaultState val="TypeTalent"/>
 			<State name="TypeTalent">
+				<When type="AnimationState" frame="$this" TalentTypeState="TypeTalent"/>
 				<Action type="SetProperty" frame="$this/IconBorderImage" texture="_Assets\Textures\talentHeroicBorderBlue.dds"/>
 			</State>
 			<State name="TypeUltimate">
+				<When type="AnimationState" frame="$this" TalentTypeState="TypeUltimate"/>
 				<Action type="SetProperty" frame="$this/IconBorderImage" texture="_Assets\Textures\talentHeroicBorderBlue.dds"/>
 			</State>
 		</StateGroup>
@@ -2308,7 +2326,7 @@
 		<RenderPriority val="550"/>
 		<AutoSizeClamps minWidth="50" maxWidth="96"/>
 		<Alpha val="0"/>
-		<Options val="Ellipsis | TooltipIfTruncated"/>
+		<Options val="ScaleToPreventTruncation"/>
 		<AcceptsMouseTooltip val="True"/>
 		<AcceptsMouse val="False"/>
 	</Frame>
