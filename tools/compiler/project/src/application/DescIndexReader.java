@@ -55,7 +55,7 @@ public class DescIndexReader {
 				}
 
 				list.add(path);
-				LOGGER.info("Adding layout path to layoutPathList: " + path);
+				LOGGER.debug("Adding layout path to layoutPathList: " + path);
 			}
 		}
 		return list;

@@ -1,10 +1,14 @@
 package application;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.URI;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.FileSystemException;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
@@ -24,8 +28,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.xml.sax.SAXException;
 
-import application.baseUI.UICatalog;
-import application.baseUI.UIException;
 import application.integration.SettingsInterface;
 import application.util.logger.log4j2plugin.TextAreaAppender;
 import javafx.animation.PauseTransition;
@@ -113,7 +115,7 @@ public class Main extends Application {
 	 */
 	public void start(Stage primaryStage) {
 		// shorter thread name for application
-		Thread.currentThread().setName("JFX");
+		Thread.currentThread().setName("UI");
 
 		initParams();
 
@@ -140,40 +142,48 @@ public class Main extends Application {
 		baseMpqInterface = new MpqInterface();
 		initMpqInterface(baseMpqInterface);
 
-//		// TEST DefaultUICatalog
-//		String baseUIpath = basePath.getParent() + File.separator + "baseUI";
-//		LOGGER.info("BaseUI path: " + baseUIpath);
-//		// UICatalog catalogSC2 = new UICatalog();
-//		UICatalog catalogHeroes = new UICatalog();
-//
-//		new Thread() {
-//			public void run() {
-//				try {
-//					// catalogSC2.processDescIndex(new File(baseUIpath +
-//					// File.separator + "sc2" + File.separator + "mods"
-//					// + File.separator + "core.sc2mod" + File.separator +
-//					// "base.sc2data" + File.separator + "UI"
-//					// + File.separator + "Layout" + File.separator +
-//					// "DescIndex.SC2Layout"));
-//					catalogHeroes.processDescIndex(
-//							new File(baseUIpath + File.separator + "heroes" + File.separator + "mods" + File.separator
-//									+ "core.stormmod" + File.separator + "base.stormdata" + File.separator + "UI"
-//									+ File.separator + "Layout" + File.separator + "DescIndex.StormLayout"));
-//					catalogHeroes.processDescIndex(
-//							new File(basePath.getAbsolutePath() + File.separator + "heroes" + File.separator
-//									+ "AhliObs.StormInterface" + File.separator + "Base.StormData" + File.separator
-//									+ "UI" + File.separator + "Layout" + File.separator + "DescIndex.StormLayout"));
-//				} catch (ParserConfigurationException | SAXException | IOException e) {
-//					LOGGER.error("Error parsing base UI catalog due to a technical problem.", e);
-//					e.printStackTrace();
-//				} catch (UIException e) {
-//					LOGGER.error("Error parsing base UI due to a logical problem.", e);
-//					e.printStackTrace();
-//				}
-//			}
-//		}.start();
-//		if (true)
-//			return;
+		// // TEST DefaultUICatalog
+		// String baseUIpath = basePath.getParent() + File.separator + "baseUI";
+		// LOGGER.info("BaseUI path: " + baseUIpath);
+		// // UICatalog catalogSC2 = new UICatalog();
+		// UICatalog catalogHeroes = new UICatalog();
+		//
+		// new Thread() {
+		// public void run() {
+		// try {
+		// // catalogSC2.processDescIndex(new File(baseUIpath +
+		// // File.separator + "sc2" + File.separator + "mods"
+		// // + File.separator + "core.sc2mod" + File.separator +
+		// // "base.sc2data" + File.separator + "UI"
+		// // + File.separator + "Layout" + File.separator +
+		// // "DescIndex.SC2Layout"));
+		// catalogHeroes.processDescIndex(
+		// new File(baseUIpath + File.separator + "heroes" + File.separator +
+		// "mods" + File.separator
+		// + "core.stormmod" + File.separator + "base.stormdata" +
+		// File.separator + "UI"
+		// + File.separator + "Layout" + File.separator +
+		// "DescIndex.StormLayout"));
+		// catalogHeroes.processDescIndex(
+		// new File(basePath.getAbsolutePath() + File.separator + "heroes" +
+		// File.separator
+		// + "AhliObs.StormInterface" + File.separator + "Base.StormData" +
+		// File.separator
+		// + "UI" + File.separator + "Layout" + File.separator +
+		// "DescIndex.StormLayout"));
+		// } catch (ParserConfigurationException | SAXException | IOException e)
+		// {
+		// LOGGER.error("Error parsing base UI catalog due to a technical
+		// problem.", e);
+		// e.printStackTrace();
+		// } catch (UIException e) {
+		// LOGGER.error("Error parsing base UI due to a logical problem.", e);
+		// e.printStackTrace();
+		// }
+		// }
+		// }.start();
+		// if (true)
+		// return;
 
 		// WORK WORK WORK
 		if (!hasParamCompilePath) {
@@ -296,6 +306,7 @@ public class Main extends Application {
 	private void attemptToRunGameWithReplay(String paramRunPath, boolean compileAndRun, String paramCompilePath) {
 		new Thread() {
 			public void run() {
+				this.setName(this.getName().replaceFirst("Thread", "GameRunner"));
 				boolean isHeroes = false;
 				String gamePath = null;
 
@@ -343,9 +354,18 @@ public class Main extends Application {
 					}
 				}
 
-				File replay = getNewestReplay(isHeroes);
-				if (replay != null) {
-					LOGGER.info("Starting game with replay...");
+				File replay = null;
+//				try {
+//					replay = getLastUsedReplay(isHeroes);
+//				} catch (IOException e) {
+//					/* nothing */
+//				}
+				if (replay == null || !replay.exists() || !replay.isFile()) {
+					LOGGER.debug("Last used replay is invalid, getting newest replay instead.");
+					replay = getNewestReplay(isHeroes);
+				}
+				if (replay != null && replay.exists() && replay.isFile()) {
+					LOGGER.info("Starting game with replay: " + replay.getName());
 					String cmd = "cmd /C start \"\" \"" + gamePath + "\" \"" + replay.getAbsolutePath() + "\"";
 					LOGGER.debug("executing: " + cmd);
 					try {
@@ -354,6 +374,8 @@ public class Main extends Application {
 					} catch (IOException e) {
 						e.printStackTrace();
 					}
+				} else {
+					LOGGER.warn("Failed to find any replay.");
 				}
 			}
 		}.start();
@@ -433,6 +455,49 @@ public class Main extends Application {
 			LOGGER.info("newest Replay: " + newestReplay.getName());
 		}
 		return newestReplay;
+	}
+
+	/**
+	 * Returns the last used replay file read from the game's Variables.txt.
+	 * 
+	 * @param isHeroes
+	 * @return
+	 * @throws IOException
+	 */
+	private File getLastUsedReplay(boolean isHeroes) throws IOException {
+		String basePath = documentsPath + File.separator;
+		if (isHeroes) {
+			basePath += "Heroes of the Storm";
+		} else {
+			basePath += "StarCraft II";
+		}
+		basePath += File.separator + "Variables.txt";
+		LOGGER.debug(basePath);
+
+		BufferedReader br = null;
+		String line, replayPath = null;
+		try {
+			InputStreamReader is = new InputStreamReader(new FileInputStream(new File(basePath)),
+					StandardCharsets.UTF_8);
+			br = new BufferedReader(is);
+			boolean found = false;
+			String searchToken = "lastReplayFilePath=";
+			while ((line = br.readLine()) != null && !found) {
+				if (line.startsWith(searchToken)) {
+					found = true;
+					replayPath = line.substring(searchToken.length());
+				}
+			}
+		} finally {
+			if (br != null) {
+				br.close();
+			}
+		}
+		LOGGER.debug("replayPath: " + replayPath);
+		if (replayPath == null) {
+			return null;
+		}
+		return new File(replayPath);
 	}
 
 	/**
