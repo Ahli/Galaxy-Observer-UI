@@ -2,91 +2,11 @@
 <Desc>
     <DescFlags val="Locked"/>
 
-    <Frame type="AscensionFrame" name="AscensionFrameTemplate">
-        <Frame type="TextFormatFrame" name="FontStyle">
-            <Anchor relative="$parent"/>
-            <FormatText val="AscensionBadge_RewardMap_T%0%"/>
-            <Replacement val="{$ancestor[@type=AscensionFrame]/@AscensionTier}" index="0"/>
-        </Frame>
-
-        <Frame type="Label" name="ProgressionBadgeText">
-            <Text val="{$parent/@AscensionLevel}"/>
-            <Style val="{$parent/FontStyle/@Text}"/>
-            <SubpixelRendering val="true"/>
-            <RenderPriority val="513"/>
-        </Frame>
-
-        <Frame type="Frame" name="BadgeContainer">
-            <Anchor relative="$parent"/>
-
-            <Frame type="Image" name="LogoImage">
-                <Texture val="Assets\Textures\Storm_UI_Badge_Ascension_ZeroLogo.dds"/>
-                <SubpixelRendering val="true"/>
-                <ColorAdjustMode val="Colorize"/>
-                <Visible val="false"/>
-                <RenderPriority val="513"/>
-
-                <StateGroup name="Colorization">
-                    <State name="Tier0">
-                        <When type="Property" frame="$ancestor[@type=AscensionFrame]" AscensionTier="0"/>
-                        <Action type="SetProperty" LightAdjustColor="8ebcff"/>
-                        <Action type="SetProperty" DarkAdjustColor="d5e8fd"/>
-                    </State>
-                    <State name="Tier1">
-                        <When type="Property" frame="$ancestor[@type=AscensionFrame]" AscensionTier="1"/>
-                        <Action type="SetProperty" LightAdjustColor="abffb8"/>
-                        <Action type="SetProperty" DarkAdjustColor="caffec"/>
-                    </State>
-                    <State name="Tier2">
-                        <When type="Property" frame="$ancestor[@type=AscensionFrame]" AscensionTier="2"/>
-                        <Action type="SetProperty" LightAdjustColor="3cf0db"/>
-                        <Action type="SetProperty" DarkAdjustColor="9affff"/>
-                    </State>
-                    <State name="Tier3">
-                        <When type="Property" frame="$ancestor[@type=AscensionFrame]" AscensionTier="3"/>
-                        <Action type="SetProperty" LightAdjustColor="f9baff"/>
-                        <Action type="SetProperty" DarkAdjustColor="f9e5ff"/>
-                    </State>
-                    <State name="Tier4">
-                        <When type="Property" frame="$ancestor[@type=AscensionFrame]" AscensionTier="4"/>
-                        <Action type="SetProperty" LightAdjustColor="ffc4ba"/>
-                        <Action type="SetProperty" DarkAdjustColor="fff5e5"/>
-                    </State>
-                    <State name="Tier5">
-                        <When type="Property" frame="$ancestor[@type=AscensionFrame]" AscensionTier="5"/>
-                        <Action type="SetProperty" LightAdjustColor="fff6ba"/>
-                        <Action type="SetProperty" DarkAdjustColor="fffde5"/>
-                    </State>
-                </StateGroup>
-            </Frame>
-
-            <Frame type="Image" name="MaxCapImage">
-                <Texture val="Assets\Textures\Storm_UI_Badge_Ascension_Star_Cap.dds"/>
-                <SubpixelRendering val="true"/>
-                <Visible val="false"/>
-                <RenderPriority val="513"/>
-            </Frame>
-
-            <StateGroup name="LevelLogo">
-                <State name="MaxLevel">
-                    <When type="Property" frame="$ancestor[@type=AscensionFrame]" IsAtMaxBadgeLevel="true"/>
-                    <Action type="SetProperty" frame="MaxCapImage" visible="true"/>
-                    <Action type="SetProperty" frame="$parent/ProgressionBadgeText" visible="false"/>
-                </State>
-                <State name="ZeroLevel">
-                    <When type="Property" frame="$ancestor[@type=AscensionFrame]" AscensionLevel="0"/>
-                    <Action type="SetProperty" frame="LogoImage" visible="true"/>
-                    <Action type="SetProperty" frame="$parent/ProgressionBadgeText" visible="false"/>
-                </State>
-            </StateGroup>
-        </Frame>
-    </Frame>
-
     <!--=======================================================================================
     <! PROFILE SCREEN BADGE
     <!======================================================================================-->
 
-    <Frame type="AscensionFrame" name="AscensionBigBadgeTemplate" template="AscensionBadge/AscensionFrameTemplate">
+    <Frame type="AscensionFrame" name="AscensionBigBadgeTemplate">
         <Width val="520"/>
         <Height val="520"/>
         
@@ -97,11 +17,44 @@
             <Anchor side="Right" relative="$parent/BadgeContainer" pos="0.507" offset="0"/>
             <Height val="520"/>
             <Width val="520"/>
+
+            <Text val="{$parent/@AccountLevel}"/>
             <Style val="{$parent/FontStyle/@Text}"/>
+            <SubpixelRendering val="false"/>
+            <RenderPriority val="513"/>
             <ScaleText val="True"/>
         </Frame>
 
+        <Frame type="TextFormatFrame" name="FontStyle">
+            <Anchor relative="$parent"/>
+            <Replacement val="{$ancestor[@type=AscensionFrame]/@AscensionTier}" index="0"/>
+
+            <StateGroup name="SelectFontSize">
+                <DefaultState val="Default"/>
+                <State name="FourDigit">
+                    <When type="Property" frame="$ancestor[@type=AscensionFrame]" AccountLevel="999" operator="GreaterThan"/>
+                    <Action type="SetProperty" FormatText="AscensionBadge_Big_T%0%_Narrow"/>
+                </State>
+                <State name="Default">
+                    <Action type="SetProperty" FormatText="AscensionBadge_Big_T%0%"/>
+                </State>
+            </StateGroup>
+        </Frame>
+
         <Frame type="Frame" name="BadgeContainer">
+            <Anchor relative="$parent"/>
+
+            <Frame type="Image" name="LogoImage">
+                <Anchor relative="$parent"/>
+                <Texture val="Assets\Textures\Storm_UI_Badge_Ascension_ZeroLogo.dds"/>
+                <SubpixelRendering val="true"/>
+                <ColorAdjustMode val="Colorize"/>
+                <Visible val="false"/>
+                <RenderPriority val="513"/>
+                <LightAdjustColor val="8ebcff"/>
+                <DarkAdjustColor val="d5e8fd"/>
+            </Frame>
+
             <Frame type="TextFormatFrame" name="BadgeImagePathFormatter">
                 <Anchor relative="$parent"/>
                 <FormatText val="Assets\Textures\Storm_UI_Badge_Ascension_Frame_C%0%_T%1%.dds"/>
@@ -126,14 +79,6 @@
 
             <Frame type="TextFormatFrame" name="GemBigPathFormatter" template="AscensionBadge/AscensionBigBadgeTemplate/BadgeContainer/BadgeImagePathFormatter">
                 <FormatText val="Assets\Textures\Storm_UI_Badge_Ascension_Gem_T%1%.dds"/>
-            </Frame>
-
-            <Frame type="Image" name="LogoImage">
-                <Anchor relative="$parent"/>
-            </Frame>
-
-            <Frame type="Image" name="MaxCapImage">
-                <Anchor relative="$parent"/>
             </Frame>
 
             <Frame type="Image" name="WreathImage">
@@ -359,12 +304,14 @@
                 </State>
                 <State name="Normal"/>
             </StateGroup>
-        </Frame>
 
-        <Frame type="TextFormatFrame" name="FontStyle">
-            <Anchor relative="$parent"/>
-            <FormatText val="AscensionBadge_Big_T%0%"/>
-            <Replacement val="{$ancestor[@type=AscensionFrame]/@AscensionTier}" index="0"/>
+            <StateGroup name="LogoVisibility">
+                <State name="ZeroLevel">
+                    <When type="Property" frame="$ancestor[@type=AscensionFrame]" AccountLevel="0"/>
+                    <Action type="SetProperty" frame="LogoImage" visible="true"/>
+                    <Action type="SetProperty" frame="$parent/ProgressionBadgeText" visible="false"/>
+                </State>
+            </StateGroup>
         </Frame>
     </Frame>
 
@@ -465,7 +412,6 @@
 
         <Frame type="Frame" name="BadgeContainer">
             <Frame type="Image" name="LogoImage" template="AscensionBadge/AddGlowOverride"/>
-            <Frame type="Image" name="MaxCapImage" template="AscensionBadge/AddFullGlowOverride"/>
             <Frame type="Image" name="WreathImage" template="AscensionBadge/AddFullGlowOverride"/>
             <Frame type="Image" name="BannerImage" template="AscensionBadge/AddFullGlowOverride"/>
             <Frame type="Image" name="BadgeBgImage" template="AscensionBadge/AddFullGlowOverride"/>
@@ -613,7 +559,14 @@
         <Height val="320"/>
 
         <Frame type="TextFormatFrame" name="FontStyle">
-            <FormatText val="AscensionBadge_Score_T%0%"/>
+            <StateGroup name="SelectFontSize">
+                <State name="FourDigit">
+                    <Action type="SetProperty" FormatText="AscensionBadge_Score_T%0%_Narrow"/>
+                </State>
+                <State name="Default">
+                    <Action type="SetProperty" FormatText="AscensionBadge_Score_T%0%"/>
+                </State>
+            </StateGroup>
         </Frame>
     </Frame>
 
@@ -622,7 +575,14 @@
         <Height val="224"/>
 
         <Frame type="TextFormatFrame" name="FontStyle">
-            <FormatText val="AscensionBadge_ScoreRanked_T%0%"/>
+            <StateGroup name="SelectFontSize">
+                <State name="FourDigit">
+                    <Action type="SetProperty" FormatText="AscensionBadge_ScoreRank_T%0%_Narrow"/>
+                </State>
+                <State name="Default">
+                    <Action type="SetProperty" FormatText="AscensionBadge_ScoreRank_T%0%"/>
+                </State>
+            </StateGroup>
         </Frame>
     </Frame>
 
@@ -634,7 +594,14 @@
         <Width val="128"/>
         <Height val="128"/>
         <Frame type="TextFormatFrame" name="FontStyle">
-            <FormatText val="AscensionBadge_Profile_T%0%"/>
+            <StateGroup name="SelectFontSize">
+                <State name="FourDigit">
+                    <Action type="SetProperty" FormatText="AscensionBadge_Profile_T%0%_Narrow"/>
+                </State>
+                <State name="Default">
+                    <Action type="SetProperty" FormatText="AscensionBadge_Profile_T%0%"/>
+                </State>
+            </StateGroup>
         </Frame>
 
         <Frame type="Frame" name="BadgeContainer">
@@ -657,10 +624,6 @@
 
             <Frame type="Image" name="LogoImage">
                 <Texture val="Assets\Textures\Storm_UI_Badge_Ascension_ZeroLogo_small.dds"/>
-            </Frame>
-
-            <Frame type="Image" name="MaxCapImage">
-                <Texture val="Assets\Textures\Storm_UI_Badge_Ascension_Star_Cap_small.dds"/>
             </Frame>
 
             <StateGroup name="BannerState">
@@ -687,7 +650,14 @@
         <Width val="68"/>
         <Height val="68"/>
         <Frame type="TextFormatFrame" name="FontStyle">
-            <FormatText val="AscensionBadge_RewardMap_T%0%"/>
+            <StateGroup name="SelectFontSize">
+                <State name="FourDigit">
+                    <Action type="SetProperty" FormatText="AscensionBadge_RewardMap_T%0%_Narrow"/>
+                </State>
+                <State name="Default">
+                    <Action type="SetProperty" FormatText="AscensionBadge_RewardMap_T%0%"/>
+                </State>
+            </StateGroup>
         </Frame>
     </Frame>
 </Desc>
