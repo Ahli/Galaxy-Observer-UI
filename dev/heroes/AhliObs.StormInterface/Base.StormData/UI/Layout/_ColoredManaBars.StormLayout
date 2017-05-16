@@ -14,6 +14,7 @@
     <Constant name="ValeeraEnergyColor" val="254, 210, 16"/>
     <Constant name="TracerAmmoColor" val="00a4f0"/>
     <Constant name="ZaryaEnergyColor" val="255, 105, 180"/>
+    <Constant name="DVaEnergyColor" val="255, 105, 180"/>
 	
 	<Frame type="UnitStatusEnergyType" name="EnergyBarMagicWidthTemplate">
 		<Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
@@ -108,6 +109,14 @@
 		<AllyColor val="#ValeeraEnergyColor" index="1"/>
 		<EnemyColor val="#ValeeraEnergyColor" index="1"/>
 	</Frame>
+	<Frame type="UnitStatusEnergyBar" name="DVaEnergyBarConsoleTemplate" template="_ColoredManaBars/BaseEnergyConsoleTemplate">
+		<OwnerColor val="#DVaEnergyColor" index="0"/>
+		<AllyColor val="#DVaEnergyColor" index="0"/>
+		<EnemyColor val="#DVaEnergyColor" index="0"/>
+		<OwnerColor val="#DVaEnergyColor" index="1"/>
+		<AllyColor val="#DVaEnergyColor" index="1"/>
+		<EnemyColor val="#DVaEnergyColor" index="1"/>
+	</Frame>
 	<!-- Observer templates -->
 	<Frame type="UnitStatusEnergyBar" name="ManaBarObserverOverviewTemplate">
 		<!-- unique colors -->
@@ -172,6 +181,15 @@
 		<OwnerColor val="#ValeeraEnergyColor" index="1"/>
 		<AllyColor val="#ValeeraEnergyColor" index="1"/>
 		<EnemyColor val="#ValeeraEnergyColor" index="1"/>
+		<Segmented val="false" index="0"/>
+	</Frame>
+	<Frame type="UnitStatusEnergyBar" name="DVaEnergyBarObserverOverviewTemplate">
+		<OwnerColor val="#DVaEnergyColor" index="0"/>
+		<AllyColor val="#DVaEnergyColor" index="0"/>
+		<EnemyColor val="#DVaEnergyColor" index="0"/>
+		<OwnerColor val="#DVaEnergyColor" index="1"/>
+		<AllyColor val="#DVaEnergyColor" index="1"/>
+		<EnemyColor val="#DVaEnergyColor" index="1"/>
 		<Segmented val="false" index="0"/>
 	</Frame>
 	
@@ -342,7 +360,24 @@
 				</Frame>
 			</Frame>
 		</Frame>
-		
+		<Frame type="SelectionUnitStatusPanel" name="DVaMechEnergy">
+			<Anchor relative="$parent"/>
+			<SpecificUnit val="HeroDVaMech"/>
+			<Frame type="UnitStatusFrame" name="UnitStatusFrame0">
+				<Anchor relative="$parent"/>
+				<Frame type="UnitStatusEnergyBar" name="ManaBar" template="_ColoredManaBars/DVaEnergyBarConsoleTemplate">
+				</Frame>
+			</Frame>
+		</Frame>
+		<Frame type="SelectionUnitStatusPanel" name="DVaPilotEnergy">
+			<Anchor relative="$parent"/>
+			<SpecificUnit val="HeroDVaPilot"/>
+			<Frame type="UnitStatusFrame" name="UnitStatusFrame0">
+				<Anchor relative="$parent"/>
+				<Frame type="UnitStatusEnergyBar" name="ManaBar" template="_ColoredManaBars/DVaEnergyBarConsoleTemplate">
+				</Frame>
+			</Frame>
+		</Frame>
 	</Frame>
 
 	<Frame type="Frame" name="ObserverManaBarSwitchTemplate_L">
@@ -513,7 +548,45 @@
 				</Controller>
 			</Animation>
 		</Frame>
+		<Frame type="UnitStatusBehaviorAnim" name="DVaMechFatalDamageResponse">
+			<Anchor relative="$parent"/>
+			<Behavior val="DVaMechFatalDamageResponse"/>
+			
+			<Frame type="Frame" name="DVaMechFatalDamageResponseState">
+				<Anchor relative="$parent"/>
+				<Visible val="false"/>
+			</Frame>
+			
+			<Animation name="BehaviorControlAnim">
+				<Event event="BehaviorCreate" action="Reset,DirectionForward,Play"/>
+				<Event event="BehaviorDestroy" action="DirectionReverse,Play"/>
 
+				<Controller type="Visibility" end="Pause" frame="DVaMechFatalDamageResponseState">
+					<Key type="Bool" time="0" value="false"/>
+					<Key type="Bool" time="0" value="true"/>
+				</Controller>
+			</Animation>
+		</Frame>
+		<Frame type="UnitStatusBehaviorAnim" name="DVaPilotMechAbilityDisablerCarry">
+			<Anchor relative="$parent"/>
+			<Behavior val="DVaPilotMechAbilityDisablerCarry"/>
+			
+			<Frame type="Frame" name="DVaPilotMechAbilityDisablerCarryState">
+				<Anchor relative="$parent"/>
+				<Visible val="false"/>
+			</Frame>
+			
+			<Animation name="BehaviorControlAnim">
+				<Event event="BehaviorCreate" action="Reset,DirectionForward,Play"/>
+				<Event event="BehaviorDestroy" action="DirectionReverse,Play"/>
+
+				<Controller type="Visibility" end="Pause" frame="DVaPilotMechAbilityDisablerCarryState">
+					<Key type="Bool" time="0" value="false"/>
+					<Key type="Bool" time="0" value="true"/>
+				</Controller>
+			</Animation>
+		</Frame>
+		
 		<!-- switch colors -->
 		<StateGroup name="ManaBarColorSwitcher">
 			<DefaultState val="BlueMana"/>
@@ -542,11 +615,18 @@
 				<When type="Property" frame="ValeeraComboPointsToken/ValeeraComboPointsTokenState" visible="true"/>
 				<Action type="ApplyTemplate" frame="ManaBar" template="_ColoredManaBars/ValeeraEnergyObserverOverviewTemplate"/>
 			</State>
+			<State name="DVaMechEnergy">
+				<When type="Property" frame="DVaMechFatalDamageResponse/DVaMechFatalDamageResponseState" visible="true"/>
+				<Action type="ApplyTemplate" frame="ManaBar" template="_ColoredManaBars/DVaEnergyBarObserverOverviewTemplate"/>
+			</State>
+			<State name="DVaPilotEnergy">
+				<When type="Property" frame="DVaPilotMechAbilityDisablerCarry/DVaPilotMechAbilityDisablerCarryState" visible="true"/>
+				<Action type="ApplyTemplate" frame="ManaBar" template="_ColoredManaBars/DVaEnergyBarObserverOverviewTemplate"/>
+			</State>
 			<State name="BlueMana">
 				<Action type="ApplyTemplate" frame="ManaBar" template="_ColoredManaBars/ManaBarObserverOverviewTemplate"/>
 			</State>
 		</StateGroup>
-		
 	</Frame>
 	<Frame type="Frame" name="ObserverManaBarSwitchTemplate_R" template="_ColoredManaBars/ObserverManaBarSwitchTemplate_L">
 		<Frame type="UnitStatusEnergyBar" name="ManaBar">
