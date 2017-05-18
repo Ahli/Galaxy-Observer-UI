@@ -6,18 +6,40 @@
 
     <!-- created by Ahli -->
     <Frame type="Frame" name="GameUI/UIContainer/FullscreenUpperContainer" file="GameUI">
-
-        <Frame type="ToggleControl" name="MapScorePanel">
+        <Frame type="Frame" name="MapScorePanel">
             <Anchor side="Left" relative="$parent/$parent/ConsoleUIContainer/MinimapPanel" pos="Max" offset="-5"/>
             <Anchor side="Top" relative="$parent/ResourcePanel/ResourceFrame1" pos="Min" offset="0"/>
             <Anchor side="Bottom" relative="$parent/ResourcePanel/ResourceFrame4" pos="Max" offset="0"/>
             <Width val="#MapScoreWidth"/>
             <CollapseLayout val="true"/>
-            <Shortcut val="#Toggle Map Score - Hotkey"/>
-            <AcceptsMouse val="false"/>
-
-            <Frame type="Frame" name="ToggledContent">
+			<Handle val="MapScorePanel"/>
+			
+			<StateGroup name="VisibilityControl">
+				<DefaultState val="Visible"/>
+				<!-- Hide when toggle is disabled, e.g. when game mode is unknown -->
+				<State name="DisabledToggleControl">
+					<When type="Property" frame="ToggleControl" enabled="false"/>
+					<Action type="SetProperty" visible="false"/>
+				</State>
+				<!-- Hide during replay time jumps -->
+				<State name="ReplayLabel">
+					<When type="Property" frame="$ReplayLabel" visible="true"/>
+					<Action type="SetProperty" visible="false"/>
+				</State>
+				<State name="Visible">
+					<Action type="SetProperty" visible="true"/>
+				</State>
+			</StateGroup>
+			
+			<Frame type="ToggleControl" name="ToggleControl">
+				<Anchor relative="$parent"/>
+				<Shortcut val="#Toggle Map Score - Hotkey"/>
+				<AcceptsMouse val="false"/>
+			</Frame>
+			
+            <Frame type="Frame" name="Container">
                 <Anchor relative="$parent"/>
+				<Visible val="{$parent/ToggleControl/@Visible}"/>
 
                 <Frame type="Frame" name="ToggledContent_L">
                     <Anchor side="Top" relative="$parent" pos="Min" offset="2"/>
