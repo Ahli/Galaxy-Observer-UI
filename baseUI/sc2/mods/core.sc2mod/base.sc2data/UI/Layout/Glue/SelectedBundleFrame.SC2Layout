@@ -1109,6 +1109,12 @@
                 <Action type="SetAnchor" frame="CharacterFrame_Container/CharacterImage" side="Left" relative="$parent" pos="Min" offset="0"/>
             </State>
 
+            <State name="Tastosis">
+                <When type="Property" frame="$this" VoicePack="Tastosis"/>
+                <Action type="SetProperty" frame="CharacterFrame_Container/CharacterImage" texture="@UI/SC2_UI_Collection_VoicePack_CharacterFrame_Tastosis"/>
+                <Action type="SetAnchor" frame="CharacterFrame_Container/CharacterImage" side="Left" relative="$parent" pos="Min" offset="-25"/>
+            </State>
+
             <State name="TotalBiscuit">
                 <When type="Property" frame="$this" VoicePack="TotalBiscuit"/>
                 <Action type="SetProperty" frame="CharacterFrame_Container/CharacterImage" texture="@UI/SC2_UI_Collection_VoicePack_CharacterFrame_TB"/>
@@ -1580,7 +1586,23 @@
                 <Action type="SetAnchor" frame="$this/UnitModelFrame/Model" side="Right" relative="$parent" pos="Max" offset="0"/>
             </State>
             
+            <State name="Viking">
+                <When type="Property" frame="$ancestor[@type=SelectedBundleFrame]" Unit="VikingSkinPreview"/>
+                <Action type="SetAnchor" frame="$this/UnitModelFrame/Model" side="Top" relative="$parent" pos="Min" offset="-70"/>
+                <Action type="SetAnchor" frame="$this/UnitModelFrame/Model" side="Bottom" relative="$parent" pos="Max" offset="0"/>
+                <Action type="SetAnchor" frame="$this/UnitModelFrame/Model" side="Left" relative="$parent" pos="Min" offset="-150"/>
+                <Action type="SetAnchor" frame="$this/UnitModelFrame/Model" side="Right" relative="$parent" pos="Max" offset="150"/>
+            </State>
+            
             <!-- ZERG -->
+            <State name="BroodLord">
+                <When type="Property" frame="$ancestor[@type=SelectedBundleFrame]" Unit="BroodLord"/>
+                <Action type="SetAnchor" frame="$this/UnitModelFrame/Model" side="Top" relative="$parent" pos="Min" offset="0"/>
+                <Action type="SetAnchor" frame="$this/UnitModelFrame/Model" side="Bottom" relative="$parent" pos="Max" offset="70"/>
+                <Action type="SetAnchor" frame="$this/UnitModelFrame/Model" side="Left" relative="$parent" pos="Min" offset="50"/>
+                <Action type="SetAnchor" frame="$this/UnitModelFrame/Model" side="Right" relative="$parent" pos="Max" offset="-50"/>
+            </State>
+            
             <State name="Overlord">
                 <When type="Property" frame="$ancestor[@type=SelectedBundleFrame]" Unit="Overlord"/>
                 <Action type="SetAnchor" frame="$this/UnitModelFrame/Model" side="Top" relative="$parent" pos="Min" offset="0"/>
@@ -1628,6 +1650,14 @@
                 <Action type="SetAnchor" frame="$this/UnitModelFrame/Model" side="Bottom" relative="$parent" pos="Max" offset="0"/>
                 <Action type="SetAnchor" frame="$this/UnitModelFrame/Model" side="Left" relative="$parent" pos="Min" offset="0"/>
                 <Action type="SetAnchor" frame="$this/UnitModelFrame/Model" side="Right" relative="$parent" pos="Max" offset="0"/>
+            </State>
+            
+            <State name="Carrier">
+                <When type="Property" frame="$ancestor[@type=SelectedBundleFrame]" Unit="Carrier"/>
+                <Action type="SetAnchor" frame="$this/UnitModelFrame/Model" side="Top" relative="$parent" pos="Min" offset="-300"/>
+                <Action type="SetAnchor" frame="$this/UnitModelFrame/Model" side="Bottom" relative="$parent" pos="Max" offset="0"/>
+                <Action type="SetAnchor" frame="$this/UnitModelFrame/Model" side="Left" relative="$parent" pos="Min" offset="-250"/>
+                <Action type="SetAnchor" frame="$this/UnitModelFrame/Model" side="Right" relative="$parent" pos="Max" offset="250"/>
             </State>
             
             <State name="Colossus">
@@ -1915,13 +1945,20 @@
             <Texture val="@UI/SC2_UI_Collection_DiscountBadge"/>
         </Frame>
 
+        <Frame type="TextFormatFrame" name="DiscountPercentageFormat">
+            <Anchor relative="$parent"/>
+            <Visible val="False"/>
+            <FormatText val="@UI/ScreenCollection/DiscountPercentFormat"/>
+            <Replacement index="0" val="{$parent/StoreCacheFrame/@DiscountPercent}"/>
+        </Frame>
+
         <Frame type="Label" name="BundleDiscountPercentLabel">
             <Anchor side="Top" relative="$parent/BundleDiscountBadge" pos="Min" offset="1"/>
             <Anchor side="Bottom" relative="$parent/BundleDiscountBadge" pos="Max" offset="0"/>
             <Anchor side="Left" relative="$parent/BundleDiscountBadge" pos="Min" offset="0"/>
             <Anchor side="Right" relative="$parent/BundleDiscountBadge" pos="Max" offset="0"/>
             <Style val="@Collection_Bundle_DynamicBundleDiscountLabel"/>
-            <Text val="{$parent/@DiscountPercentStr}"/>
+            <Text val="{$parent/DiscountPercentageFormat/@Text}"/>
         </Frame>
 
         <Frame type="Button" name="CloseButton" template="StandardBattlenetTemplates/BattlenetStandardButtonTemplate">
@@ -1941,19 +1978,24 @@
             <Anchor relative="$parent"/>
             <GameContent val="{$parent/$parent/@GameContent}"/>
         </Frame>
+
+        <Frame type="StoreCacheFrame" name="StoreCacheFrame">
+            <Anchor relative="$parent"/>
+            <GameContent val="{$parent/$parent/@GameContent}"/>
+        </Frame>
         
         <StateGroup name="OwnedLabelVisibility">
             <DefaultState val="NotOwned"/>
         
             <State name="OwnedNotBundle">
-                <When type="AnimationState" frame="GameContentFrame" PurchasedState="Purchased"/>
+                <When type="Property" frame="StoreCacheFrame" IsPurchased="True"/>
                 <When type="Property" frame="BundleCacheFrame" ProductCount="1"/>
                 <Action type="SetProperty" frame="OwnedBundleTitleLabel" visible="true"/>
                 <Action type="SetProperty" frame="OwnedBundleTitleLabel" Text="@UI/ScreenCollection/Item/Owned"/>
             </State>
 
             <State name="OwnedBundle">
-                <When type="AnimationState" frame="GameContentFrame" PurchasedState="Purchased"/>
+                <When type="Property" frame="StoreCacheFrame" IsPurchased="True"/>
                 <Action type="SetProperty" frame="OwnedBundleTitleLabel" visible="true"/>
                 <Action type="SetProperty" frame="OwnedBundleTitleLabel" Text="@UI/ScreenCollection/Bundle/Owned"/>
             </State>
@@ -2065,13 +2107,13 @@
             <DefaultState val="HasDiscount"/>
 
             <State name="Owned">
-                <When type="AnimationState" frame="GameContentFrame" PurchasedState="Purchased"/>
+                <When type="Property" frame="StoreCacheFrame" IsPurchased="True"/>
                 <Action type="SetProperty" frame="BundleDiscountPercentLabel" visible="false"/>
                 <Action type="SetProperty" frame="BundleDiscountBadge" visible="false"/>
             </State>
 
             <State name="NoDiscount">
-                <When type="Property" DiscountPercentStr=""/>
+                <When type="Property" frame="StoreCacheFrame" DiscountPercent="0"/>
                 <Action type="SetProperty" frame="BundleDiscountPercentLabel" visible="false"/>
                 <Action type="SetProperty" frame="BundleDiscountBadge" visible="false"/>
             </State>
@@ -2087,7 +2129,7 @@
 
             <State name="AlreadyOwnedDynamicBundle">
                 <When type="Property" frame="BundleCacheFrame" ShowDynamicBundle="true"/>
-                <When type="AnimationState" frame="GameContentFrame" PurchasedState="Purchased"/>
+                <When type="Property" frame="StoreCacheFrame" IsPurchased="True"/>
                 <Action type="SetProperty" frame="DynamicBundleTitleLabel" visible="false"/>
                 <Action type="SetProperty" frame="DynamicBundleItemCountLabel" visible="false"/>
                 <Action type="SetProperty" frame="BundleSubLabel" visible="true"/>
@@ -2095,7 +2137,7 @@
             </State>
 
             <State name="AlreadyOwnedSingleItem">
-                <When type="AnimationState" frame="GameContentFrame" PurchasedState="Purchased"/>
+                <When type="Property" frame="StoreCacheFrame" IsPurchased="True"/>
                 <When type="Property" frame="BundleCacheFrame" ProductCount="1"/>
                 <Action type="SetProperty" frame="DynamicBundleTitleLabel" visible="false"/>
                 <Action type="SetProperty" frame="DynamicBundleItemCountLabel" visible="false"/>
@@ -2104,7 +2146,7 @@
             </State>
 
             <State name="AlreadyOwnedNonDynamicBundle">
-                <When type="AnimationState" frame="GameContentFrame" PurchasedState="Purchased"/>
+                <When type="Property" frame="StoreCacheFrame" IsPurchased="True"/>
                 <Action type="SetProperty" frame="DynamicBundleTitleLabel" visible="false"/>
                 <Action type="SetProperty" frame="DynamicBundleItemCountLabel" visible="false"/>
                 <Action type="SetProperty" frame="BundleSubLabel" visible="true"/>

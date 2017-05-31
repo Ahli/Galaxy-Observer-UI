@@ -198,35 +198,23 @@
             <Anchor relative="$parent"/>
         </Frame>
 
-        <Frame type="GameContentFrame" name="GameContentFrame">
-            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
-            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
-            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
-            <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+        <Frame type="StoreCacheFrame" name="StoreCacheFrame">
+            <Anchor relative="$parent"/>
             <GameContent val="{$parent/@GameContent}"/>
         </Frame>
 
         <Frame type="RewardCacheFrame" name="RewardCacheFrame">
-            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
-            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
-            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
-            <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+            <Anchor relative="$parent"/>
             <Reward val="{$parent/@RelativeProperty}"/>
         </Frame>
 
         <Frame type="SkinCacheFrame" name="SkinCacheFrame">
-            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
-            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
-            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
-            <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+            <Anchor relative="$parent"/>
             <Skin val="{$parent/RewardCacheFrame/@Skin}"/>
         </Frame>
 
         <Frame type="AchievementInfoFrame" name="AchievementInfoFrame">
-            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
-            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
-            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
-            <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+            <Anchor relative="$parent"/>
             <AchievementId val="{$parent/RewardCacheFrame/@AchievementId}"/>
             <PresenceId val="{$BattleUI/@LocalToonPresenceId}"/>
         </Frame>
@@ -298,7 +286,7 @@
             <State name="AchievementShown">
                 <When type="Property" frame="RewardCacheFrame" Default="false"/>
                 <When type="Property" frame="AchievementInfoFrame" Awarded="false"/>
-                <When type="Property" frame="GameContentFrame" CanPurchase="false"/>
+                <When type="Property" frame="StoreCacheFrame" CanPurchase="false"/>
                 <Action type="SetProperty" frame="HoriztonalBorder" visible="true"/>
                 <Action type="SetProperty" frame="UnlockTitleLabel" visible="true"/>
                 <Action type="SetProperty" frame="AchievementTitleLabel" visible="true"/>
@@ -425,8 +413,8 @@
             <Rotation val="{$parent/SkinCacheFrame/@Rotation}"/>
             <TurningEnabled val="True"/>
             
-            <Animation name="HellionStart">
-                <Event event="HellionStart" frame="$this" action="Reset,Play"/>
+            <Animation name="SpecialAnimations">
+                <Event event="OnShown" frame="$this" action="Reset,Play"/>
                 
                 <Controller type="ActorMsg" end="Loop">
                     <Key type="Identifier" time="5" value="Signal Interact"/>
@@ -492,11 +480,8 @@
             <PresenceId val="{$parent/$parent/$parent/@PresenceId}"/>
         </Frame>
 
-        <Frame type="GameContentFrame" name="GameContentFrame">
-            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
-            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
-            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
-            <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+        <Frame type="StoreCacheFrame" name="StoreCacheFrame">
+            <Anchor relative="$parent"/>
             <GameContent val="{$parent/@GameContent}"/>
         </Frame>
         
@@ -543,7 +528,7 @@
             <Anchor side="Bottom" relative="$parent" pos="Max" offset="-22"/>
             <Anchor side="Left" relative="$parent/NameLabel" pos="Min" offset="0"/>
             <Style val="@Collection_ListItem_Cost"/>
-            <Text val="{$parent/GameContentFrame/@CostText}"/>
+            <Text val="{$parent/StoreCacheFrame/@CostText}"/>
         </Frame>
         
         <Frame type="Frame" name="StateLabelContainer">
@@ -672,7 +657,7 @@
             <DefaultState val="GameContentNotOwned"/>
 
             <State name="GameContentPurchased">
-                <When type="AnimationState" frame="GameContentFrame" PurchasedState="Purchased"/>
+                <When type="Property" frame="StoreCacheFrame" IsPurchased="True"/>
                 <Action type="SetProperty" frame="StateLabelContainer" visible="true"/>
                 <Action type="SetProperty" frame="StateLabelContainer/StateLabel" text="@UI/ScreenCollection/Owned"/>
                 <Action type="SetProperty" frame="CostLabel" visible="false"/>
@@ -696,7 +681,7 @@
             </State>
 
             <State name="GameContentLocked">
-                <When type="Property" frame="GameContentFrame" CanPurchase="false"/>
+                <When type="Property" frame="StoreCacheFrame" CanPurchase="false"/>
                 <Action type="SetProperty" frame="StateLabelContainer" visible="true"/>
                 <Action type="SetProperty" frame="StateLabelContainer/StateLabel" text="@UI/ScreenCollection/Locked"/>
                 <Action type="SetProperty" frame="CostLabel" visible="false"/>
@@ -761,7 +746,6 @@
                 <Action type="SetAnchor" frame="$this/UnitModelFrame/Model" side="Bottom" relative="$parent" pos="Max" offset="140"/>
                 <Action type="SetAnchor" frame="$this/UnitModelFrame/Model" side="Left" relative="$parent" pos="Min" offset="-120"/>
                 <Action type="SetAnchor" frame="$this/UnitModelFrame/Model" side="Right" relative="$parent" pos="Max" offset="120"/>
-                <Action type="SendEvent" frame="$this/UnitModelFrame" event="HellionStart"/>
             </State>
             
             <State name="Marauder">
@@ -796,7 +780,23 @@
                 <Action type="SetAnchor" frame="$this/UnitModelFrame/Model" side="Right" relative="$parent" pos="Max" offset="30"/>
             </State>
             
+            <State name="Viking">
+                <When type="Property" frame="$UnitSkinSelectionFrame" Unit="VikingSkinPreview"/>
+                <Action type="SetAnchor" frame="$this/UnitModelFrame/Model" side="Top" relative="$parent" pos="Min" offset="-80"/>
+                <Action type="SetAnchor" frame="$this/UnitModelFrame/Model" side="Bottom" relative="$parent" pos="Max" offset="80"/>
+                <Action type="SetAnchor" frame="$this/UnitModelFrame/Model" side="Left" relative="$parent" pos="Min" offset="-80"/>
+                <Action type="SetAnchor" frame="$this/UnitModelFrame/Model" side="Right" relative="$parent" pos="Max" offset="80"/>
+            </State>
+            
             <!-- ZERG -->
+            <State name="BroodLord">
+                <When type="Property" frame="$UnitSkinSelectionFrame" Unit="BroodLord"/>
+                <Action type="SetAnchor" frame="$this/UnitModelFrame/Model" side="Top" relative="$parent" pos="Min" offset="-23"/>
+                <Action type="SetAnchor" frame="$this/UnitModelFrame/Model" side="Bottom" relative="$parent" pos="Max" offset="23"/>
+                <Action type="SetAnchor" frame="$this/UnitModelFrame/Model" side="Left" relative="$parent" pos="Min" offset="-23"/>
+                <Action type="SetAnchor" frame="$this/UnitModelFrame/Model" side="Right" relative="$parent" pos="Max" offset="23"/>
+            </State>
+			
             <State name="Overlord">
                 <When type="Property" frame="$UnitSkinSelectionFrame" Unit="Overlord"/>
                 <Action type="SetAnchor" frame="$this/UnitModelFrame/Model" side="Top" relative="$parent" pos="Min" offset="0"/>
@@ -844,6 +844,14 @@
                 <Action type="SetAnchor" frame="$this/UnitModelFrame/Model" side="Bottom" relative="$parent" pos="Max" offset="110"/>
                 <Action type="SetAnchor" frame="$this/UnitModelFrame/Model" side="Left" relative="$parent" pos="Min" offset="-65"/>
                 <Action type="SetAnchor" frame="$this/UnitModelFrame/Model" side="Right" relative="$parent" pos="Max" offset="65"/>
+            </State>
+            
+            <State name="Carrier">
+                <When type="Property" frame="$UnitSkinSelectionFrame" Unit="Carrier"/>
+                <Action type="SetAnchor" frame="$this/UnitModelFrame/Model" side="Top" relative="$parent" pos="Min" offset="-105"/>
+                <Action type="SetAnchor" frame="$this/UnitModelFrame/Model" side="Bottom" relative="$parent" pos="Max" offset="-60"/>
+                <Action type="SetAnchor" frame="$this/UnitModelFrame/Model" side="Left" relative="$parent" pos="Min" offset="-180"/>
+                <Action type="SetAnchor" frame="$this/UnitModelFrame/Model" side="Right" relative="$parent" pos="Max" offset="180"/>
             </State>
             
             <State name="Colossus">
@@ -969,6 +977,10 @@
             <Frame type="GameContentFrame" name="GameContentFrame">
                 <GameContent val="{$parent/$parent/@SelectedGameContent}"/>
             </Frame>
+
+            <Frame type="StoreCacheFrame" name="StoreCacheFrame">
+                <GameContent val="{$parent/$parent/@SelectedGameContent}"/>
+            </Frame>
             
             <StateGroup name="PurchaseableState">
 
@@ -1016,9 +1028,9 @@
                 <DefaultState val="NotAchievementLockedState"/>
             
                 <State name="AchievementLockedState">
-                    <When type="AnimationState" frame="$parent/SelectUnlockableButton/GameContentFrame" PurchasedState="NotPurchased"/>
+                    <When type="Property" frame="$parent/SelectUnlockableButton/StoreCacheFrame" IsPurchased="False"/>
                     <When type="Property" frame="$parent/SelectUnlockableButton/RewardCacheFrame" Default="False"/>
-                    <When type="Property" frame="$parent/SelectUnlockableButton/GameContentFrame" CanPurchase="False"/>
+                    <When type="Property" frame="$parent/SelectUnlockableButton/StoreCacheFrame" CanPurchase="False"/>
                     <When type="AnimationState" frame="$parent/SelectUnlockableButton/RewardCacheFrame" AllowedState="NotAllowed"/>
                     <Action type="SetProperty" frame="$this" visible="True"/>
                 </State>

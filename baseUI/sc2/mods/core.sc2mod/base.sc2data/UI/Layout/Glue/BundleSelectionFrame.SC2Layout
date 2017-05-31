@@ -11,8 +11,10 @@
     <Constant name="TileListItemOffsetRight" val="-2"/>
     <Constant name="TileListItemOffsetTop" val="2"/>
 
-    <Constant name="Collection_Spacing_StandardItem_Horizontal" val="15"/>
-    <Constant name="Collection_Spacing_StandardItem_Vertical" val="9"/>
+    <Constant name="Collection_Spacing_StandardItem_Horizontal" val="10"/>
+    <Constant name="Collection_Spacing_StandardItem_Vertical" val="8"/>
+
+    <Constant name="InvalidTileListIndex" val="4294967295"/>
 
     <Frame type="BundleTileListItem" name="BundleTileListItemTemplate">
         <Height val="#TileListItemHeight"/>
@@ -46,34 +48,19 @@
                 <When type="Property" frame="$this/BundleCacheFrame" ShowDynamicBundle="True"/>
             </State>
             <State name="StandardBundle">
-                <When type="Property" frame="$this/GameContentFrame" IsBundle="True"/>
+                <When type="Property" frame="$this/StoreCacheFrame" IsBundle="True"/>
                 <When type="Property" frame="$this/BundleCacheFrame" ShowDynamicBundle="False"/>
             </State>
         </StateGroup>
-        
-        <StateGroup name="ItemOwnedState">
-            <State name="Purchased">
-                <When type="Property" frame="$this/GameContentFrame" IsPurchased="True"/>
-            </State>
-            <State name="NotPurchased">
-                <When type="Property" frame="$this/GameContentFrame" IsPurchased="False"/>
-            </State>
-        </StateGroup>
+
+        <Frame type="StoreCacheFrame" name="StoreCacheFrame">
+            <Anchor relative="$parent"/>
+            <GameContent val="{$parent/BundleCacheFrame/@GameContent}"/>
+        </Frame>
         
         <Frame type="BundleCacheFrame" name="BundleCacheFrame">
-            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
-            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
-            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
-            <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+            <Anchor relative="$parent"/>
             <Bundle val="{$parent/@Bundle}"/>
-        </Frame>
-
-        <Frame type="GameContentFrame" name="GameContentFrame">
-            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
-            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
-            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
-            <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
-            <GameContent val="{$parent/BundleCacheFrame/@GameContent}"/>
         </Frame>
 
         <Frame type="BlurFrame" name="BackgroundBlur">
@@ -162,7 +149,17 @@
                 <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
                 <Height val="648"/>
                 <Width val="484"/>
-                <Texture val="{$parent/$parent/BundleCacheFrame/@IconFilePath}"/>
+                            
+                <StateGroup name="IconImageState">
+                    <DefaultState val="SmallIcon"/>
+                    <State name="LargeIcon">
+                        <When type="Property" frame="$parent/$parent/BundleCacheFrame" operator="NotEqual" LargeIconFilePath=""/>
+                        <Action type="SetProperty" frame="$this" Texture="{$parent/$parent/BundleCacheFrame/@LargeIconFilePath}"/>
+                    </State>
+                    <State name="SmallIcon">
+                        <Action type="SetProperty" frame="$this" Texture="{$parent/$parent/BundleCacheFrame/@IconFilePath}"/>
+                    </State>
+                </StateGroup>
             </Frame>
         </Frame>
 
@@ -191,7 +188,7 @@
             <Anchor relative="$parent/DiscountPercentageTab"/>
             <Visible val="False"/>
             <FormatText val="@UI/ScreenCollection/DiscountPercentFormat"/>
-            <Replacement index="0" val="{$parent/GameContentFrame/@DiscountPercent}"/>
+            <Replacement index="0" val="{$parent/StoreCacheFrame/@DiscountPercent}"/>
         </Frame>
         
         <Frame type="Label" name="DiscountPercentageLabelShadow">
@@ -251,7 +248,7 @@
             <Anchor side="Left" relative="$parent/NameLabel" pos="Min" offset="0"/>
             <Style val="@Collection_ListItem_Cost"/>
             <Height val="25"/>
-            <Text val="{$parent/GameContentFrame/@CostText}"/>
+            <Text val="{$parent/StoreCacheFrame/@CostText}"/>
             <Visible val="False"/>
         </Frame>
         
@@ -260,7 +257,7 @@
             <Anchor side="Left" relative="$parent/CurrentPriceLabel" pos="Max" offset="10"/>
             <Style val="@Collection_ListItem_CostOriginal"/>
             <Height val="25"/>
-            <Text val="{$parent/GameContentFrame/@RetailCostText}"/>
+            <Text val="{$parent/StoreCacheFrame/@RetailCostText}"/>
             <Visible val="False"/>
         </Frame>
         
@@ -316,7 +313,8 @@
             </State>
     
             <State name="Owned">
-                <When type="StateGroup" frame="$this" ItemOwnedState="Purchased"/>
+                <When type="Property" frame="StoreCacheFrame" IsPurchased="True"/>
+                
                 <Action type="SetProperty" frame="StateLabel" Visible="True"/>
                 <Action type="SetProperty" frame="LockedItemIcon" Visible="False"/>
             </State>
@@ -338,7 +336,7 @@
             </State>
 
             <State name="Owned">
-                <When type="StateGroup" frame="$this" ItemOwnedState="Purchased"/>
+                <When type="Property" frame="StoreCacheFrame" IsPurchased="True"/> 
                 
                 <Action type="SetProperty" frame="CurrentPriceLabel" Visible="False"/>
                 <Action type="SetProperty" frame="OriginalPriceLabel" Visible="False"/>
@@ -347,7 +345,7 @@
             </State>
 
             <State name="NoDiscount">
-                <When type="Property" frame="GameContentFrame" DiscountPercent="0"/>
+                <When type="Property" frame="StoreCacheFrame" DiscountPercent="0"/>
                 
                 <Action type="SetProperty" frame="CurrentPriceLabel" Visible="True"/>
                 <Action type="SetProperty" frame="OriginalPriceLabel" Visible="False"/>
@@ -357,7 +355,7 @@
 
             <State name="UnpurchasedStandardBundleCanPurchase">
                 <When type="StateGroup" frame="$this" ItemTypeState="StandardBundle"/>
-                <When type="Property" frame="GameContentFrame" CanPurchase="True"/>
+                <When type="Property" frame="StoreCacheFrame" CanPurchase="True"/>
 
                 <Action type="SetProperty" frame="CurrentPriceLabel" Visible="True"/>
                 <Action type="SetProperty" frame="OriginalPriceLabel" Visible="True"/>
@@ -447,86 +445,13 @@
         </Frame>
     </Frame>
 
-    <Frame type="Frame" name="BundleFrameTemplate">
-        <Frame type="BlurFrame" name="BundleFrameBgBlur">
-            <Anchor side="Top" relative="$parent/BundleFrameBg" pos="Min" offset="4"/>
-            <Anchor side="Left" relative="$parent/BundleFrameBg" pos="Min" offset="4"/>
-            <Anchor side="Bottom" relative="$parent/BundleFrameBg" pos="Max" offset="-4"/>
-            <Anchor side="Right" relative="$parent/BundleFrameBg" pos="Max" offset="-4"/>
-
-            <Animation name="Blur">
-                <Event event="OnShown" action="Reset,Play" frame="$parent" />
-
-                <Controller type="Blur" end="Pause">
-                    <Key type="Curve" time="0" value=".35" out="Fast"/>
-                </Controller>
-            </Animation>
-        </Frame>
-
-        <Frame type="Image" name="BundleFrameBg">
-            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
-            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
-            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
-            <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
-            <Texture val="@UI/SC2_UI_Battlenet_Glue_Arcade_MainContainer"/>
-            <TextureType val="NineSlice"/>
-        </Frame>
-
-        <Frame type="Image" name="IconImage">
-            <Anchor side="Top" relative="$parent" pos="Min" offset="25"/>
-            <Anchor side="Bottom" relative="$parent" pos="Max" offset="-25"/>
-            <Anchor side="Left" relative="$parent" pos="Min" offset="24"/>
-            <TextureType val="Normal"/>
-            <Texture val="{$parent/@IconFilePath}"/>
-            <Width val="483"/>
-            <Visible val="False"/>
-        </Frame>
-
-        <Frame type="Image" name="IconFrame">
-            <Anchor side="Top" relative="$parent/CharacterFrame_Background" pos="Min" offset="0"/>
-            <Anchor side="Left" relative="$parent/CharacterFrame_Background" pos="Min" offset="0"/>
-            <Anchor side="Right" relative="$parent/CharacterFrame_Background" pos="Max" offset="0"/>
-            <Anchor side="Bottom" relative="$parent/CharacterFrame_Background" pos="Max" offset="0"/>
-            <Texture val="@UI/SC2_UI_Collection_Bundle_ImageFrame"/>
-            <TextureType val="Nineslice"/>
-        </Frame>
-
-        <Frame type="Label" name="TypeLabel">
-            <Anchor side="Top" relative="$parent/IconFrame" pos="Min" offset="10"/>
-            <Anchor side="Left" relative="$parent/IconImage" pos="Max" offset="35"/>
-            <Anchor side="Right" relative="$parent" pos="Max" offset="-24"/>
-            <Style val="@Collection_ItemFrame_Type"/>
-            <Text val="@UI/ScreenCollection/Bundle/Type"/>
-        </Frame>
-
-        <Frame type="Label" name="NameLabel">
-            <Anchor side="Top" relative="$parent/TypeLabel" pos="Max" offset="0"/>
-            <Anchor side="Left" relative="$parent/TypeLabel" pos="Min" offset="0"/>
-            <Anchor side="Right" relative="$parent" pos="Max" offset="-24"/>
-            <Style val="@Collection_ItemFrame_Name"/>
-            <Text val="{$parent/@NameText}"/>
-        </Frame>
-
-        <Frame type="Label" name="DescriptionLabel">
-            <Anchor side="Top" relative="$parent/NameLabel" pos="Max" offset="30"/>
-            <Anchor side="Left" relative="$parent/NameLabel" pos="Min" offset="0"/>
-            <Anchor side="Right" relative="$parent" pos="Max" offset="-24"/>
-            <Style val="@Collection_ItemFrame_Desc"/>
-            <Text val="{$parent/@DescriptionText}"/>
-            <Height val="175"/>
-        </Frame>
-
-        <Frame type="Label" name="ExampleLineTitle">
-            <Anchor side="Top" relative="$parent/DescriptionLabel" pos="Max" offset="15"/>
-            <Anchor side="Left" relative="$parent/NameLabel" pos="Min" offset="0"/>
-            <Anchor side="Right" relative="$parent" pos="Max" offset="-24"/>
-            <Text val="@UI/ScreenCollection/Bundle/ExampleLineTitle"/>
-            <Style val="@Bundle_ItemFrame_SoundPreview"/>
-        </Frame>
-    </Frame>
 
     <Frame type="BundleSelectionFrame" name="BundleSelectionFrameTemplate">
         <SortMethod val="{$this/SortPulldown/@SelectedSort}"/>
+
+        <Frame type="StoreCacheFrame" name="StoreCacheFrame">
+            <Anchor relative="$parent"/>
+        </Frame>
         
         <Frame type="Frame" name="AnchorFrame">
             <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
@@ -561,12 +486,43 @@
         </Frame>
 
         <Frame type="GameContentSortPulldown" name="SortPulldown" template="StandardBattlenetTemplates/BattlenetLargePulldownTemplate">
-            <Anchor side="Bottom" relative="$parent/BundleTileList" pos="Min" offset="3"/>
-            <Anchor side="Right" relative="$parent/BundleTileList/Item3" pos="Max" offset="0"/>
+            <Anchor side="Bottom" relative="$parent/ContentTileList" pos="Min" offset="3"/>
+            <Anchor side="Right" relative="$parent/ContentTileList/Item3" pos="Max" offset="0"/>
             <Visible val="false"/>
         </Frame>
 
-        <Frame type="TileList" name="BundleTileList">
+        <Frame type="TileList" name="BigTileList">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="217"/>
+            <Anchor side="Left" relative="$Anchor_LeftStandard" pos="Max" offset="0"/>
+            <Anchor side="Right" relative="Item1" pos="Max" offset="0"/>
+
+            <Height val="676"/>
+            <ClearSelectionIfNotVisible val="true"/>
+            <RequireSelection val="false"/>
+
+            <MaxItemPerPage val="2"/>
+
+            <AcceptsMouse val="true"/>
+            <Frame type="BundleTileListItem" name="Item0" template="BundleSelectionFrame/BundleTileListItemTemplate">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                <HideWhenCleared val="true"/>
+            </Frame>
+
+            <Frame type="BundleTileListItem" name="Item1" template="BundleSelectionFrame/BundleTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item0" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item0" pos="Max" offset="#Collection_Spacing_StandardItem_Horizontal"/>
+                <HideWhenCleared val="true"/>
+            </Frame>
+            
+            <Frame type="BundleTileListItem" name="Item2" template="BundleSelectionFrame/BundleTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item1" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item1" pos="Max" offset="#Collection_Spacing_StandardItem_Horizontal"/>
+                <HideWhenCleared val="true"/>
+            </Frame>
+        </Frame>
+        
+        <Frame type="TileList" name="ContentTileList">
             <Anchor side="Top" relative="$parent" pos="Min" offset="217"/>
             <Anchor side="Left" relative="$Anchor_LeftStandard" pos="Max" offset="0"/>
             <Width val="1597"/>
@@ -576,34 +532,64 @@
 
             <AcceptsMouse val="true"/>
 
-            <Frame type="BundleTileListItem" name="Item0" template="BundleSelectionFrame/BundleTileListItemTemplate">
+            <Frame type="BundleTileListItem" name="Item0" template="BundleSelectionFrame/BundleTileListItemTemplateSmall">
                 <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
                 <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
             </Frame>
 
-            <Frame type="BundleTileListItem" name="Item1" template="BundleSelectionFrame/BundleTileListItemTemplate">
+            <Frame type="BundleTileListItem" name="Item1" template="BundleSelectionFrame/BundleTileListItemTemplateSmall">
                 <Anchor side="Top" relative="$parent/Item0" pos="Min" offset="0"/>
-                <Anchor side="Left" relative="$parent/Item0" pos="Max" offset="15"/>
+                <Anchor side="Left" relative="$parent/Item0" pos="Max" offset="#Collection_Spacing_StandardItem_Horizontal"/>
             </Frame>
 
             <Frame type="BundleTileListItem" name="Item2" template="BundleSelectionFrame/BundleTileListItemTemplateSmall">
                 <Anchor side="Top" relative="$parent/Item1" pos="Min" offset="0"/>
-                <Anchor side="Left" relative="$parent/Item1" pos="Max" offset="15"/>
+                <Anchor side="Left" relative="$parent/Item1" pos="Max" offset="#Collection_Spacing_StandardItem_Horizontal"/>
             </Frame>
 
             <Frame type="BundleTileListItem" name="Item3" template="BundleSelectionFrame/BundleTileListItemTemplateSmall">
                 <Anchor side="Top" relative="$parent/Item2" pos="Min" offset="0"/>
-                <Anchor side="Left" relative="$parent/Item2" pos="Max" offset="10"/>
+                <Anchor side="Left" relative="$parent/Item2" pos="Max" offset="#Collection_Spacing_StandardItem_Horizontal"/>
             </Frame>
 
             <Frame type="BundleTileListItem" name="Item4" template="BundleSelectionFrame/BundleTileListItemTemplateSmall">
-                <Anchor side="Top" relative="$parent/Item2" pos="Max" offset="8"/>
-                <Anchor side="Left" relative="$parent/Item2" pos="Min" offset="0"/>
+                <Anchor side="Top" relative="$parent/Item3" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item3" pos="Max" offset="#Collection_Spacing_StandardItem_Horizontal"/>
             </Frame>
 
             <Frame type="BundleTileListItem" name="Item5" template="BundleSelectionFrame/BundleTileListItemTemplateSmall">
-                <Anchor side="Top" relative="$parent/Item2" pos="Max" offset="8"/>
-                <Anchor side="Left" relative="$parent/Item4" pos="Max" offset="10"/>
+                <Anchor side="Top" relative="$parent/Item4" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item4" pos="Max" offset="#Collection_Spacing_StandardItem_Horizontal"/>
+            </Frame>
+
+            <Frame type="BundleTileListItem" name="Item6" template="BundleSelectionFrame/BundleTileListItemTemplateSmall">
+                <Anchor side="Top" relative="$parent/Item0" pos="Max" offset="#Collection_Spacing_StandardItem_Vertical"/>
+                <Anchor side="Left" relative="$parent/Item0" pos="Min" offset="0"/>
+            </Frame>
+
+            <Frame type="BundleTileListItem" name="Item7" template="BundleSelectionFrame/BundleTileListItemTemplateSmall">
+                <Anchor side="Top" relative="$parent/Item6" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item6" pos="Max" offset="#Collection_Spacing_StandardItem_Horizontal"/>
+            </Frame>
+                        
+            <Frame type="BundleTileListItem" name="Item8" template="BundleSelectionFrame/BundleTileListItemTemplateSmall">
+                <Anchor side="Top" relative="$parent/Item7" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item7" pos="Max" offset="#Collection_Spacing_StandardItem_Horizontal"/>
+            </Frame>
+
+            <Frame type="BundleTileListItem" name="Item9" template="BundleSelectionFrame/BundleTileListItemTemplateSmall">
+                <Anchor side="Top" relative="$parent/Item8" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item8" pos="Max" offset="#Collection_Spacing_StandardItem_Horizontal"/>
+            </Frame>
+
+            <Frame type="BundleTileListItem" name="Item10" template="BundleSelectionFrame/BundleTileListItemTemplateSmall">
+                <Anchor side="Top" relative="$parent/Item9" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item9" pos="Max" offset="#Collection_Spacing_StandardItem_Horizontal"/>
+            </Frame>
+
+            <Frame type="BundleTileListItem" name="Item11" template="BundleSelectionFrame/BundleTileListItemTemplateSmall">
+                <Anchor side="Top" relative="$parent/Item10" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item10" pos="Max" offset="#Collection_Spacing_StandardItem_Horizontal"/>
             </Frame>
 
             <Frame type="ScrollBar" name="ScrollBar" template="CollectionTemplates/ScrollBarTemplate">
@@ -626,9 +612,32 @@
                     <Controller type="Property" frame="$parent" property="Bundle" end="Pause">
                         <Key type="Property" time="0" value=""/>
                     </Controller>
+
+                    <Controller type="Property" frame="$parent/$parent/BigTileList" property="SelectedIndex" end="Pause">
+                        <Key type="Property" time="0" value="#InvalidTileListIndex"/>
+                    </Controller>
+
+                    <Controller type="Property" frame="$parent/$parent/ContentTileList" property="SelectedIndex" end="Pause">
+                        <Key type="Property" time="0" value="#InvalidTileListIndex"/>
+                    </Controller>
                 </Animation>
             </Frame>
         </Frame>
+
+        <StateGroup name="StoreStatusStates">
+            <DefaultState val="StoreDown"/>
+            
+            <State name="StoreAvailable">
+                <When type="Property" frame="StoreCacheFrame" IsStoreAvailable="True"/>
+                <Action type="SetProperty" frame="ContentTileList" Visible="True"/>
+                <Action type="SetProperty" frame="BigTileList" Visible="True"/>
+            </State>
+            
+            <State name="StoreDown">
+                <Action type="SetProperty" frame="ContentTileList" Visible="False"/>
+                <Action type="SetProperty" frame="BigTileList" Visible="False"/>
+            </State>
+        </StateGroup>
 
         <StateGroup name="SelectedBundleVisibility">
             <DefaultState val="SelectedBundleNotVisible"/>
@@ -642,5 +651,75 @@
                 <Action type="SetProperty" frame="SelectedBundleFrame" visible="false"/>
             </State>
         </StateGroup>
+
+        <StateGroup name="MultipleTileListStates">
+            <State name="SmallTileListOnly">
+                <When type="Property" frame="BigTileList" DataCount="0"/>
+                <Action type="SetProperty" frame="ContentTileList" MaxItemPerPage="12"/>
+
+                <Action type="SetAnchor" side="Left" frame="ContentTileList" relative="$parent/BigTileList/Item0" pos="Min" offset="0"/>
+                <Action type="SetAnchor" side="Right" frame="ContentTileList" relative="$parent" pos="Max" offset="0"/>
+
+                <Action type="SetAnchor" side="Top" frame="ContentTileList/Item0" relative="$parent" pos="Min" offset="0"/>
+                <Action type="SetAnchor" side="Left" frame="ContentTileList/Item0" relative="$parent" pos="0" offset="0"/>
+
+                <Action type="SetAnchor" side="Top" frame="ContentTileList/Item2" relative="$parent/Item0" pos="Min" offset="0"/>
+                <Action type="SetAnchor" side="Left" frame="ContentTileList/Item2" relative="$parent/Item1" pos="Max" offset="#Collection_Spacing_StandardItem_Horizontal"/>
+
+                <Action type="SetAnchor" side="Top" frame="ContentTileList/Item4" relative="$parent/Item3" pos="Min" offset="0"/>
+                <Action type="SetAnchor" side="Left" frame="ContentTileList/Item4" relative="$parent/Item3" pos="Max" offset="#Collection_Spacing_StandardItem_Horizontal"/>
+
+                <Action type="SetAnchor" side="Top" frame="ContentTileList/Item5" relative="$parent/Item4" pos="Min" offset="0"/>
+                <Action type="SetAnchor" side="Left" frame="ContentTileList/Item5" relative="$parent/Item4" pos="Max" offset="#Collection_Spacing_StandardItem_Horizontal"/>
+
+                <Action type="SetAnchor" side="Top" frame="ContentTileList/Item6" relative="$parent/Item0" pos="Max" offset="#Collection_Spacing_StandardItem_Vertical"/>
+                <Action type="SetAnchor" side="Left" frame="ContentTileList/Item6" relative="$parent/Item0" pos="Min" offset="0"/>
+
+                <Action type="SetAnchor" side="Right" frame="ContentTileList/ScrollBar" relative="$parent/Item5" pos="Max" offset="26"/>
+            </State>
+            <State name="OneBigTileList">
+                <When type="Property" frame="BigTileList" DataCount="1"/>
+                <Action type="SetProperty" frame="ContentTileList" MaxItemPerPage="8"/>
+
+                <Action type="SetAnchor" side="Left" frame="ContentTileList" relative="$parent/BigTileList/Item0" pos="Max" offset="#Collection_Spacing_StandardItem_Horizontal"/>
+                <Action type="SetAnchor" side="Right" frame="ContentTileList" relative="$parent" pos="Max" offset="0"/>
+
+                <Action type="SetAnchor" side="Top" frame="ContentTileList/Item0" relative="$parent" pos="Min" offset="0"/>
+                <Action type="SetAnchor" side="Left" frame="ContentTileList/Item0" relative="$parent" pos="0" offset="0"/>
+
+                <Action type="SetAnchor" side="Top" frame="ContentTileList/Item2" relative="$parent/Item0" pos="Min" offset="0"/>
+                <Action type="SetAnchor" side="Left" frame="ContentTileList/Item2" relative="$parent/Item1" pos="Max" offset="#Collection_Spacing_StandardItem_Horizontal"/>
+
+                <Action type="SetAnchor" side="Top" frame="ContentTileList/Item4" relative="$parent/Item0" pos="Max" offset="#Collection_Spacing_StandardItem_Vertical"/>
+                <Action type="SetAnchor" side="Left" frame="ContentTileList/Item4" relative="$parent" pos="Min" offset="0"/>
+
+                <Action type="SetAnchor" side="Top" frame="ContentTileList/Item5" relative="$parent/Item4" pos="Min" offset="0"/>
+                <Action type="SetAnchor" side="Left" frame="ContentTileList/Item5" relative="$parent/Item4" pos="Max" offset="#Collection_Spacing_StandardItem_Horizontal"/>
+
+                <Action type="SetAnchor" side="Top" frame="ContentTileList/Item6" relative="$parent/Item5" pos="Min" offset="0"/>
+                <Action type="SetAnchor" side="Left" frame="ContentTileList/Item6" relative="$parent/Item5" pos="Max" offset="#Collection_Spacing_StandardItem_Horizontal"/>
+
+                <Action type="SetAnchor" side="Right" frame="ContentTileList/ScrollBar" relative="$parent/Item7" pos="Max" offset="26"/>
+            </State>
+            <State name="TwoBigTileList">
+                <When type="Property" frame="BigTileList" operator="GreaterThan" DataCount="1"/>
+                <Action type="SetProperty" frame="ContentTileList" MaxItemPerPage="4"/>
+
+                <Action type="SetAnchor" side="Left" frame="ContentTileList" relative="$parent/BigTileList/Item1" pos="Max" offset="#Collection_Spacing_StandardItem_Horizontal"/>
+                <Action type="SetAnchor" side="Right" frame="ContentTileList" relative="$parent" pos="Max" offset="0"/>
+
+                <Action type="SetAnchor" side="Top" frame="ContentTileList/Item0" relative="$parent" pos="Min" offset="0"/>
+                <Action type="SetAnchor" side="Left" frame="ContentTileList/Item0" relative="$parent" pos="0" offset="0"/>
+
+                <Action type="SetAnchor" side="Top" frame="ContentTileList/Item2" relative="$parent/Item0" pos="Max" offset="#Collection_Spacing_StandardItem_Horizontal"/>
+                <Action type="SetAnchor" side="Left" frame="ContentTileList/Item2" relative="$parent" pos="Min" offset="0"/>
+
+                <Action type="SetAnchor" side="Top" frame="ContentTileList/Item4" relative="$parent/Item3" pos="Min" offset="0"/>
+                <Action type="SetAnchor" side="Left" frame="ContentTileList/Item4" relative="$parent/Item3" pos="Max" offset="#Collection_Spacing_StandardItem_Horizontal"/>
+
+                <Action type="SetAnchor" side="Right" frame="ContentTileList/ScrollBar" relative="$parent/Item3" pos="Max" offset="23"/>
+            </State>
+        </StateGroup>
+       
     </Frame>
 </Desc>

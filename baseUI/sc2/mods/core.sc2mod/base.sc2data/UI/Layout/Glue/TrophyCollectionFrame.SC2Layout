@@ -165,11 +165,32 @@
             </Animation>
         </Frame>
 
+        <!-- Bug 194401 [SG Migration] Tournament Trophies and Brackets are missing data.
+            Normally, the STournamentTrophyData which is loaded from profile should have a valid tournament_id.
+            the tournamentNameResolver will then get the queueName, league, and then build up the tournamentNameLabel.
+            If the tournament_id is invalid, the TrophyCollectionFrame will use IsTournamentValid and LeagueName
+            to build up a Tournament Name that doesn't require resolving the Tournament.
+        -->
         <Frame type="Label" name="TournamentNameLabel">
             <Anchor side="Bottom" relative="$parent/PlaceLabel" pos="Min" offset="0"/>
             <Anchor side="Left" relative="$parent" pos="Min" offset="10"/>
             <Anchor side="Right" relative="$parent" pos="Max" offset="-10"/>
             <Style val="Tournament_TrophySelectedTitle"/>
+        </Frame>
+
+        <Frame type="Label" name="InvalidTournamentNameLabel">
+            <Anchor side="Bottom" relative="$parent/PlaceLabel" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="10"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="-10"/>
+            <Style val="Tournament_TrophySelectedTitle"/>
+            <Visible val="false"/>
+            <Text val="{$parent/InvalidTournamentNameFormatFrame/@Text}"/>
+        </Frame>
+
+        <Frame type="TextFormatFrame" name="InvalidTournamentNameFormatFrame">
+            <Anchor relative="$parent"/>
+            <FormatText val="@UI/TournamentLeagueNameTemplate"/>
+            <Replacement index="0" val="{$parent/@LeagueName}"/>
         </Frame>
 
         <Frame type="Label" name="PlaceLabel">
@@ -192,6 +213,24 @@
             <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
             <Text val="@UI/ScreenTournament/ViewTrophy"/>
         </Frame>
+
+        <StateGroup name="InvalidTournamentVisibility">
+            <DefaultState val="ValidTournament"/>
+
+            <State name="InvalidTournament">
+                <When type="Property" IsTournamentValid="False"/>
+                      
+                <Action type="SetProperty" frame="TournamentNameLabel" Visible="False"/>
+                <Action type="SetProperty" frame="InvalidTournamentNameLabel" Visible="True"/>
+                <Action type="SetProperty" frame="Button" Visible="False"/>
+            </State>
+
+            <State name="ValidTournament">
+                <Action type="SetProperty" frame="TournamentNameLabel" Visible="True"/>
+                <Action type="SetProperty" frame="InvalidTournamentNameLabel" Visible="False"/>
+                <Action type="SetProperty" frame="Button" Visible="True"/>
+            </State>
+        </StateGroup>
     </Frame>
 
     <Frame type="TrophyTileListItem" name="TrophyTileListItemTemplate">
