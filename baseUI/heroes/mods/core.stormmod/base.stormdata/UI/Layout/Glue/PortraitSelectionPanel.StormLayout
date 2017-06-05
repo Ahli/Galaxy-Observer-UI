@@ -418,27 +418,63 @@
             <StateGroup name="AspectRatioStates">
                 <State name="Not4x3_Normal">
                     <When type="Property" Visible="true"/>
-                    <Action type="SetAnchor" frame="$parent/UnlockablePortraitPanel/SearchEditBox" side="Right" relative="$parent" pos="Mid" offset="#SearchEditBoxNormalRightOffset"/>
-                    <Action type="SetAnchor" frame="$parent/UnlockablePortraitPanel/BigSectionHeader" side="Left" relative="$parent" pos="Min" offset="#BigSectionHeaderNormalLeftOffset"/>
+                    <Action type="SetAnchor" frame="$parent/SearchEditBox" side="Right" relative="$parent" pos="Mid" offset="#SearchEditBoxNormalRightOffset"/>
+                    <Action type="SetAnchor" frame="$parent/BigSectionHeader" side="Left" relative="$parent" pos="Min" offset="#BigSectionHeaderNormalLeftOffset"/>
                     <Action type="SetAnchor" frame="$parent/UnlockableCategoryTileList" side="Left" relative="$parent" pos="Mid" offset="#CollectionCategoryNormalLeftOffset"/>
                 </State>
                 <State name="Not4x3_Wide">
                     <When type="Property" Visible="true"/>
-                    <Action type="SetAnchor" frame="$parent/UnlockablePortraitPanel/SearchEditBox" side="Right" relative="$parent" pos="Mid" offset="#SearchEditBoxNormalRightOffset"/>
-                    <Action type="SetAnchor" frame="$parent/UnlockablePortraitPanel/BigSectionHeader" side="Left" relative="$parent" pos="Min" offset="#BigSectionHeaderNormalLeftOffset"/>
+                    <Action type="SetAnchor" frame="$parent/SearchEditBox" side="Right" relative="$parent" pos="Mid" offset="#SearchEditBoxNormalRightOffset"/>
+                    <Action type="SetAnchor" frame="$parent/BigSectionHeader" side="Left" relative="$parent" pos="Min" offset="#BigSectionHeaderNormalLeftOffset"/>
                     <Action type="SetAnchor" frame="$parent/UnlockableCategoryTileList" side="Left" relative="$parent" pos="Mid" offset="#CollectionCategoryNormalLeftOffset"/>
                 </State>
                 <State name="Is4x3_Normal">
                     <When type="Property" Visible="false"/>
-                    <Action type="SetAnchor" frame="$parent/UnlockablePortraitPanel/SearchEditBox" side="Right" relative="$parent" pos="Mid" offset="#SearchEditBox4x3RightOffset"/>
-                    <Action type="SetAnchor" frame="$parent/UnlockablePortraitPanel/BigSectionHeader" side="Left" relative="$parent" pos="Min" offset="#BigSectionHeader4x3LeftOffset"/>
+                    <Action type="SetAnchor" frame="$parent/SearchEditBox" side="Right" relative="$parent" pos="Mid" offset="#SearchEditBox4x3RightOffset"/>
+                    <Action type="SetAnchor" frame="$parent/BigSectionHeader" side="Left" relative="$parent" pos="Min" offset="#BigSectionHeader4x3LeftOffset"/>
                     <Action type="SetAnchor" frame="$parent/UnlockableCategoryTileList" side="Left" relative="$parent" pos="Mid" offset="#CollectionCategory4x3LeftOffset"/>
                 </State>
                 <State name="Is4x3_Wide">
                     <When type="Property" Visible="false"/>
-                    <Action type="SetAnchor" frame="$parent/UnlockablePortraitPanel/SearchEditBox" side="Right" relative="$parent" pos="Mid" offset="#SearchEditBox4x3RightOffset"/>
-                    <Action type="SetAnchor" frame="$parent/UnlockablePortraitPanel/BigSectionHeader" side="Left" relative="$parent" pos="Min" offset="#BigSectionHeader4x3LeftOffset"/>
+                    <Action type="SetAnchor" frame="$parent/SearchEditBox" side="Right" relative="$parent" pos="Mid" offset="#SearchEditBox4x3RightOffset"/>
+                    <Action type="SetAnchor" frame="$parent/BigSectionHeader" side="Left" relative="$parent" pos="Min" offset="#BigSectionHeader4x3LeftOffset"/>
                     <Action type="SetAnchor" frame="$parent/UnlockableCategoryTileList" side="Left" relative="$parent" pos="Mid" offset="#CollectionCategory4x3LeftOffset"/>
+                </State>
+            </StateGroup>
+        </Frame>
+
+        <Frame type="Frame" name="BigSectionHeader" template="CollectionTemplates/SectionHeaderTemplate">
+            <Anchor side="Top" relative="$parent/$parent" pos="Min" offset="20"/>
+            <Anchor side="Left" relative="$parent/UnlockableCategoryTileList" pos="Min" offset="16"/>
+            <Anchor side="Right" relative="$parent/SearchEditBox" pos="Max" offset="0"/>
+
+            <Frame type="Image" name="TitleIcon">
+                <Texture val="@UI/Storm_UI_Store_TitleIcon_Portraits"/>
+            </Frame>
+            <Frame type="Label" name="TitleLabel">
+                <Text val="@UI/ScreenStore/BigSectionTitle/Portraits"/>
+            </Frame>
+        </Frame>
+        
+        <Frame type="EditBox" name="SearchEditBox" template="CollectionTemplates/SearchEditBoxTemplate">
+            <Anchor side="Top" relative="$parent/BigSectionHeader/TitleLabel" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent/BigSectionHeader/TitleLabel" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Mid" offset="822"/>
+        </Frame>
+
+        <!-- proxy for ScreenCollection hookups -->
+        <Frame type="GameContentTileList" name="ContentTileList">
+            <Anchor relative="$parent"/>
+            <Visible val="false"/>
+            <StateGroup name="ExactMatch">
+                <State name="Exact">
+                    <When type="Property" SearchFlags="UseExactMatchForNames"/>
+                    <When type="Property" frame="$parent/SearchEditBox" operator="NotEqual" Text=""/>
+                    <Action type="SetProperty" frame="$parent/UnlockablePortraitPanel" UseExactMatchForNames="true"/>
+                    <Action type="SetProperty" frame="$parent/UnlockablePortraitPanel" OwnershipFilter="AllContent"/>
+                    <Action type="SetProperty" frame="$parent/UnlockablePortraitPanel" OnlyShowUnseen="false"/>
+                    <Action type="SetProperty" frame="$parent/UnlockablePortraitPanel/OwnershipFilterPulldown" Visible="false"/>
+                    <Action type="SetProperty" frame="$parent/UnlockablePortraitPanel/FilterNewlyAcquired" Visible="false"/>
                 </State>
             </StateGroup>
         </Frame>
@@ -448,25 +484,12 @@
             <Anchor relative="$parent"/>
             <UnlockableTag val="PORT"/>
             <CollectionCategoryFilter val="{$parent/UnlockableCategoryTileList/@SelectedCollectionCategory}"/>
-            <OnlyShowUnseen val="{FilterNewlyAquired/@Toggled}"/>
-
-            <Frame type="Frame" name="BigSectionHeader" template="CollectionTemplates/SectionHeaderTemplate">
-                <Anchor side="Top" relative="$parent/$parent/$parent" pos="Min" offset="20"/>
-                <Anchor side="Left" relative="$parent/$parent/UnlockableCategoryTileList" pos="Min" offset="16"/>
-                <Anchor side="Right" relative="$parent/SearchEditBox" pos="Max" offset="0"/>
-
-                <Frame type="Image" name="TitleIcon">
-                    <Texture val="@UI/Storm_UI_Store_TitleIcon_Portraits"/>
-                </Frame>
-                <Frame type="Label" name="TitleLabel">
-                    <Text val="@UI/ScreenStore/BigSectionTitle/Portraits"/>
-                </Frame>
-            </Frame>
-
-            <Frame type="EditBox" name="SearchEditBox" template="CollectionTemplates/SearchEditBoxTemplate">
-                <Anchor side="Top" relative="$parent/BigSectionHeader/TitleLabel" pos="Mid" offset="0"/>
-                <Anchor side="Bottom" relative="$parent/BigSectionHeader/TitleLabel" pos="Mid" offset="0"/>
-                <Anchor side="Right" relative="$parent" pos="Mid" offset="822"/>
+            <OnlyShowUnseen val="{FilterNewlyAcquired/@Toggled}"/>
+            <FilterString val="{$parent/SearchEditBox/@Text}"/>
+            
+            <Frame type="EditBox" name="SearchEditBox">
+                <Anchor relative="$parent/$parent/SearchEditBox"/>
+                <Visible val="false"/>
             </Frame>
 
             <Frame type="TileList" name="UnlockableTileList">
@@ -494,23 +517,23 @@
 
             <StateGroup name="NewlyAcquiredAndSearchStates">
                 <State name="Inactive">
-                    <When type="Property" frame="SearchEditBox" Text=""/>
-                    <When type="Property" frame="FilterNewlyAquired" Toggled="false"/>
+                    <When type="Property" frame="$parent/SearchEditBox" Text=""/>
+                    <When type="Property" frame="FilterNewlyAcquired" Toggled="false"/>
                     <Action type="SetState" group="NormalOrWideState" state="Normal"/>
                 </State>
                 <State name="SearchActive">
-                    <When type="Property" frame="SearchEditBox" operator="NotEqual" Text=""/>
-                    <When type="Property" frame="FilterNewlyAquired" Toggled="false"/>
+                    <When type="Property" frame="$parent/SearchEditBox" operator="NotEqual" Text=""/>
+                    <When type="Property" frame="FilterNewlyAcquired" Toggled="false"/>
                     <Action type="SetState" group="NormalOrWideState" state="Wide"/>
                 </State>
-                <State name="NewlyAquiredActive">
-                    <When type="Property" frame="SearchEditBox" Text=""/>
-                    <When type="Property" frame="FilterNewlyAquired" Toggled="true"/>
+                <State name="NewlyAcquiredActive">
+                    <When type="Property" frame="$parent/SearchEditBox" Text=""/>
+                    <When type="Property" frame="FilterNewlyAcquired" Toggled="true"/>
                     <Action type="SetState" group="NormalOrWideState" state="Wide"/>
                 </State>
                 <State name="BothActive">
-                    <When type="Property" frame="SearchEditBox" operator="NotEqual" Text=""/>
-                    <When type="Property" frame="FilterNewlyAquired" Toggled="true"/>
+                    <When type="Property" frame="$parent/SearchEditBox" operator="NotEqual" Text=""/>
+                    <When type="Property" frame="FilterNewlyAcquired" Toggled="true"/>
                     <Action type="SetState" group="NormalOrWideState" state="Wide"/>
                 </State>
             </StateGroup>

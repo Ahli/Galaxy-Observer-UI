@@ -174,18 +174,31 @@
             </Frame>
         </Frame>
 
+        <!-- HERO LEVEL BG -->
+        <Frame type="Image" name="MasteryBg">
+            <Anchor side="Top" relative="$parent/PortraitBackingImage" pos="0.28" offset="0"/>
+            <Anchor side="Bottom" relative="$parent/PortraitBackingImage" pos="1.42" offset="0"/>
+            <Anchor side="Left" relative="$parent/PortraitBackingImage" pos="-0.1" offset="1"/>
+            <Anchor side="Right" relative="$parent/PortraitBackingImage" pos="1.1" offset="1"/>
+            <Visible val="False"/>
+            <ColorAdjustMode val="None"/>
+            <AdjustmentColor val="127,0,0,0"/>
+            <Unclipped val="True"/>
+        </Frame>
+
         <!-- HERO LEVEL TEXT -->
         <Frame type="HeroLabel" name="HeroLevelLabel">
-            <Anchor side="Bottom" relative="$parent" pos="Max" offset="5"/>
-            <Anchor side="Left" relative="$parent" pos="Min" offset="4"/>
-            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+            <Anchor side="Top" relative="$parent/MasteryBg" pos=".53" offset="0"/>
+            <Anchor side="Bottom" relative="$parent/MasteryBg" pos=".53" offset="0"/>
+            <Anchor side="Left" relative="$parent/MasteryBg" pos="Mid" offset="1"/>
+            <Anchor side="Right" relative="$parent/MasteryBg" pos="Mid" offset="1"/>
             <Style val="HeroSelectHeroLevelLabel"/>
             <HeroLabelType val="Level"/>
         </Frame>
     </Frame>
 
     <!--===========================================================================================
-    <! HeroItemTemplate - This has StateGroup that utilizes barebone templates to apply different states
+    <! HeroItemTemplate - This has StateGroups that utilize barebone templates to apply different states
     <!==========================================================================================-->
     <Frame type="HeroContainerFrame" name="HeroItemTemplate" template="HeroStandardTemplate/HeroItemBaseTemplate">
 
@@ -194,6 +207,7 @@
         <!=========================================================================================
         <! Allowed: true / false
         <! LevelType: Normal / Gold / Max
+        <! MasteryIndex: 0-5
         <!======================================================================================-->
         <Frame type="HeroState" name="HeroState">
             <Anchor relative="$parent"/>
@@ -208,6 +222,7 @@
 
             <State name="AlwaysAllowed">
                 <Action type="ApplyTemplate" template="HeroStandardTemplate/HeroItemAllowedTemplate"/>
+                <Action type="SetProperty" frame="HeroLevelLabel" style="HeroSelectHeroLevelLabel"/> 
             </State>
 
             <State name="LockedGold">
@@ -215,37 +230,60 @@
                 <When type="Property" frame="HeroState" levelType="Gold"/>
                 <When type="Property" frame="HeroState" isAllowed="false"/>
                 <Action type="ApplyTemplate" template="HeroStandardTemplate/HeroItemLockedGoldTemplate"/>
+                <Action type="SetProperty" frame="HeroLevelLabel" style="HeroSelectHeroLevelUnownedCompleteLabel"/> 
             </State>
 
             <State name="LockedMax">
                 <When type="Property" frame="HeroState" levelType="Max"/>
                 <When type="Property" frame="HeroState" isAllowed="false"/>
                 <Action type="ApplyTemplate" template="HeroStandardTemplate/HeroItemNotAllowedMaxTemplate"/>
+                <Action type="SetProperty" frame="HeroLevelLabel" style="HeroSelectHeroLevelUnownedCompleteLabel"/> 
             </State>
             
             <State name="Locked">
                 <When type="Property" frame="HeroState" isAllowed="false"/>
                 <Action type="ApplyTemplate" template="HeroStandardTemplate/HeroItemNotAllowedTemplate"/>
+                <Action type="SetProperty" frame="HeroLevelLabel" style="HeroSelectHeroLevelUnownedLabel"/> 
             </State>
 
             <State name="AllowedNormal">
-                <!-- Allowed == false -->
                 <When type="Property" frame="HeroState" levelType="Normal"/>
                 <Action type="ApplyTemplate" template="HeroStandardTemplate/HeroItemAllowedTemplate"/>
+                <Action type="SetProperty" frame="HeroLevelLabel" style="HeroSelectHeroLevelLabel"/> 
             </State>
 
             <State name="Gold">
                 <!-- Allowed == false -->
                 <When type="Property" frame="HeroState" levelType="Gold"/>
                 <Action type="ApplyTemplate" template="HeroStandardTemplate/HeroItemAllowedGoldTemplate"/>
+                <Action type="SetProperty" frame="HeroLevelLabel" style="HeroSelectHeroLevelCompleteLabel"/> 
             </State>
 
             <State name="Max">
                 <!-- Allowed == false -->
                 <!-- LevelType == Max -->
                 <Action type="ApplyTemplate" template="HeroStandardTemplate/HeroItemAllowedMaxTemplate"/>
+                <Action type="SetProperty" frame="HeroLevelLabel" style="HeroSelectHeroLevelCompleteLabel"/> 
             </State>
         </StateGroup>
+
+        <!-- HERO LEVEL BG -->
+        <Frame type="Image" name="MasteryBg">
+            <Texture val="{TextureFormatter/@Text}"/>
+
+            <Frame type="TextFormatFrame" name="TextureFormatter">
+                <Anchor relative="$parent"/>
+                <FormatText val="Assets\Textures\storm_ui_icon_master_taunt_%0%.dds"/>
+                <Replacement val="{$ancestor[@type=HeroContainerFrame]/HeroState/@MasteryIndex}" index="0"/>
+            </Frame>
+
+            <StateGroup name="Mastery">
+                <State name="Hidden">
+                    <When type="Property" frame="$ancestor[@type=HeroContainerFrame]/HeroState" MasteryIndex="0" operator="NotEqual"/>
+                    <Action type="SetProperty" visible="True"/>
+                </State>
+            </StateGroup>
+        </Frame>
     </Frame>
 
     <!--===========================================================================================
@@ -271,8 +309,11 @@
         </Frame>
 
         <Frame type="HeroLabel" name="HeroLevelLabel">
-            <Style val="HeroSelectHeroLevelUnownedLabel"/>
             <Alpha val="255"/>
+        </Frame>
+
+        <Frame type="Image" name="MasteryBg">
+            <ColorAdjustMode val="Fill"/>
         </Frame>
     </Frame>
 
@@ -294,14 +335,18 @@
         </Frame>
 
         <Frame type="HeroLabel" name="HeroLevelLabel">
-            <Style val="HeroSelectHeroLevelLabel"/>
+            <Alpha val="255"/>
+        </Frame>
+
+        <Frame type="Image" name="MasteryBg">
+            <ColorAdjustMode val="None"/>
         </Frame>
     </Frame>
 
     <!--===========================================================================================
     <! Template for StateGroup - HeroItemAllowedGoldTemplate 
     <!==========================================================================================-->
-    <Frame type="HeroContainerFrame" name="HeroItemAllowedGoldTemplate" template="HeroStandardTemplate/HeroItemNotAllowedTemplate">
+    <Frame type="HeroContainerFrame" name="HeroItemAllowedGoldTemplate" template="HeroStandardTemplate/HeroItemAllowedTemplate">
         <Frame type="HeroImage" name="IconImage">
             <Desaturated val="false"/>
         </Frame>
@@ -316,7 +361,11 @@
         </Frame>
 
         <Frame type="HeroLabel" name="HeroLevelLabel">
-            <Style val="HeroSelectHeroLevelCompleteLabel"/>
+            <Alpha val="255"/>
+        </Frame>
+
+        <Frame type="Image" name="MasteryBg">
+            <ColorAdjustMode val="None"/>
         </Frame>
     </Frame>
 
@@ -341,15 +390,18 @@
         </Frame>
 
         <Frame type="HeroLabel" name="HeroLevelLabel">
-            <Style val="HeroSelectHeroLevelUnownedCompleteLabel"/>
-            <Alpha val="160"/>
+            <Alpha val="127"/>
+        </Frame>
+
+        <Frame type="Image" name="MasteryBg">
+            <ColorAdjustMode val="Fill"/>
         </Frame>
     </Frame>
 
     <!--===========================================================================================
     <! Template for StateGroup - HeroItemAllowedMaxTemplate 
     <!==========================================================================================-->
-    <Frame type="HeroContainerFrame" name="HeroItemAllowedMaxTemplate" template="HeroStandardTemplate/HeroItemNotAllowedTemplate">
+    <Frame type="HeroContainerFrame" name="HeroItemAllowedMaxTemplate" template="HeroStandardTemplate/HeroItemAllowedTemplate">
         <Frame type="HeroImage" name="IconImage">
             <Desaturated val="false"/>
         </Frame>
@@ -364,7 +416,11 @@
         </Frame>
 
         <Frame type="HeroLabel" name="HeroLevelLabel">
-            <Style val="HeroSelectHeroLevelCompleteLabel"/>
+            <Alpha val="255"/>
+        </Frame>
+
+        <Frame type="Image" name="MasteryBg">
+            <ColorAdjustMode val="None"/>
         </Frame>
     </Frame>
 
@@ -388,8 +444,11 @@
         </Frame>
 
         <Frame type="HeroLabel" name="HeroLevelLabel">
-            <Style val="HeroSelectHeroLevelUnownedCompleteLabel"/>
-            <Alpha val="128"/>
+            <Alpha val="127"/>
+        </Frame>
+
+        <Frame type="Image" name="MasteryBg">
+            <ColorAdjustMode val="Fill"/>
         </Frame>
     </Frame>
 

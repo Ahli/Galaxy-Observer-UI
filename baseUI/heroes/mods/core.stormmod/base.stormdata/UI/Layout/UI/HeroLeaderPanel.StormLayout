@@ -762,33 +762,6 @@
         <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
         <Anchor side="Left" relative="MutePingCheckbox" pos="Min" offset="0"/>
 
-        <Frame type="CheckBox" name="MutePingCheckbox" template="StandardTemplates/StandardCheckBoxTemplate">
-            <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
-            <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
-            <Anchor side="Right" relative="$parent/MuteChatCheckbox" pos="Min" offset="8"/>
-            <Width val="24"/>
-            <Height val="24"/>
-            <IgnoreParentColor val="true"/>
-            <ReportsStats val="True"/>  <!-- Handle provided in code -->
-
-            <Frame type="Button" name="Button">
-                <RenderPriority val="#RenderPriorityLevel_3"/>
-                <Frame type="Image" name="NormalImage">
-                    <Texture val="@UI/HUD_BTN_Ping_Normal"/>
-                    <TextureCoords top=".173" left=".269" bottom=".827" right=".923"/>
-                </Frame>
-                <Frame type="Image" name="HoverImage">
-                    <Texture val="@UI/HUD_BTN_Ping_Hover"/>
-                    <TextureCoords top="0" left="0" bottom="1.0" right="1"/>
-                    <TextureCoords top=".173" left=".269" bottom=".827" right=".923"/>
-                </Frame>
-            </Frame>
-            <Frame type="Image" name="CheckImage">
-                <RenderPriority val="#RenderPriorityLevel_4"/>
-                <Texture val="@UI/Storm_UI_InGame_Leader_mute_checkmark"/>
-            </Frame>
-        </Frame>
-
         <Frame type="CheckBox" name="MuteChatCheckbox" template="StandardTemplates/StandardCheckBoxTemplate">
             <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
             <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
@@ -803,6 +776,34 @@
                 </Frame>
                 <Frame type="Image" name="HoverImage">
                     <Texture val="@UI/Storm_UI_InGame_Leader_mute_checkbox_hover"/>
+                </Frame>
+            </Frame>
+            <Frame type="Image" name="CheckImage">
+                <RenderPriority val="#RenderPriorityLevel_4"/>
+                <Texture val="@UI/Storm_UI_InGame_Leader_mute_checkmark"/>
+            </Frame>
+        </Frame>
+    
+        <Frame type="CheckBox" name="MutePingCheckbox" template="StandardTemplates/StandardCheckBoxTemplate">
+            <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent/MuteChatCheckbox" pos="Min" offset="8"/>
+            <Width val="24"/>
+            <Height val="24"/>
+            <IgnoreParentColor val="true"/>
+            <ReportsStats val="True"/>
+            <!-- Handle provided in code -->
+
+            <Frame type="Button" name="Button">
+                <RenderPriority val="#RenderPriorityLevel_3"/>
+                <Frame type="Image" name="NormalImage">
+                    <Texture val="@UI/HUD_BTN_Ping_Normal"/>
+                    <TextureCoords top=".173" left=".269" bottom=".827" right=".923"/>
+                </Frame>
+                <Frame type="Image" name="HoverImage">
+                    <Texture val="@UI/HUD_BTN_Ping_Hover"/>
+                    <TextureCoords top="0" left="0" bottom="1.0" right="1"/>
+                    <TextureCoords top=".173" left=".269" bottom=".827" right=".923"/>
                 </Frame>
             </Frame>
             <Frame type="Image" name="CheckImage">
@@ -1556,6 +1557,54 @@
                     </State>
                 </StateGroup>
             </Frame>
+            
+            <Frame type="Frame" name="DamageTakenOnFireEffect">
+                <Anchor relative="$parent/DamageTakenScoreValueFrame"/>
+                <Visible val="False"/>
+
+                <Frame type="Image" name="FireImage">
+                    <Anchor relative="$parent"/>
+                    <Color val="000000"/>
+                    <Alpha val="0"/>
+                </Frame>
+
+                <Frame type="Frame" name="OnFireAnim" template="HeroLeaderPanel/OnFireAnimTemplate">
+                    <Anchor relative="$parent"/>
+                </Frame>
+
+                <Animation name="EnemyPlayer">
+                    <Event event="EnemyPlayer" frame="$parent/$parent" action="Reset,Play"/>
+                    <Controller type="Event" end="Pause" frame="OnFireAnim">
+                        <Key type="Event" time="0" event="SetRed"/>
+                    </Controller>
+                </Animation>
+
+                <Animation name="AllyPlayer">
+                    <Event event="AllyPlayer" frame="$parent/$parent" action="Reset,Play"/>
+                    <Controller type="Event" end="Pause" frame="OnFireAnim">
+                        <Key type="Event" time="0" event="SetBlue"/>
+                    </Controller>
+                </Animation>
+
+                <Animation name="LocalPlayer">
+                    <Event event="LocalPlayer" frame="$parent/$parent" action="Reset,Play"/>
+                    <Controller type="Event" end="Pause" frame="OnFireAnim">
+                        <Key type="Event" time="0" event="SetBlue"/>
+                    </Controller>
+                </Animation>
+
+                <StateGroup name="OnFireState">
+                    <State name="OnFireOn">
+                        <When type="Property" frame="$parent/DamageTakenScoreValueFrame/ScoreValueFrame1" CurrentValue="1"/>
+                        <Action type="SetProperty" Visible="true"/>
+                        <Action type="SetProperty" frame="OnFireAnim" Visible="true"/>
+                    </State>
+                    <State name="OnFireOff">
+                        <Action type="SetProperty" Visible="false"/>
+                        <Action type="SetProperty" frame="OnFireAnim" Visible="false"/>
+                    </State>
+                </StateGroup>
+            </Frame>
 
             <Frame type="Frame" name="ExperienceOnFireEffect">
                 <Anchor relative="$parent/ExperienceScoreValueFrame"/>
@@ -1698,7 +1747,7 @@
 
                 <Frame type="ScoreValueFrame" name="ScoreValueFrame1">
                     <Anchor relative="$parent"/>
-                    <ScoreValueLink val="OnFireHighlightRoleSpecificBoolean"/>
+                    <ScoreValueLink val="OnFireHighlightHealingBoolean"/>
                     <BestValueGrouping val="None"/>
                 </Frame>
             </Frame>
@@ -1717,7 +1766,7 @@
 
                 <Frame type="ScoreValueFrame" name="ScoreValueFrame1">
                     <Anchor relative="$parent"/>
-                    <ScoreValueLink val="OnFireHighlightRoleSpecificBoolean"/>
+                    <ScoreValueLink val="OnFireHighlightDamageTakenBoolean"/>
                     <BestValueGrouping val="None"/>
                 </Frame>
             </Frame>
@@ -1764,17 +1813,29 @@
                         <Anchor side="Right" relative="$parent/HeroSelectedTalentTreeFrame/TalentTreeIcon4/IconImage" pos="Max" offset="10"/>
                         <Anchor side="Bottom" relative="$parent/HeroSelectedTalentTreeFrame/TalentTreeIcon4/IconImage" pos="Max" offset="0"/>
 
-                        <StateGroup name="ShowCooldownFrame">
+                        <StateGroup name="UpdateCooldownAndBorder">
+                            <State name="OnAvailableEnemy">
+                                <When type="StateGroup" frame="$ancestor[@type=HeroLeaderPanelPlayerFrame]" PlayerTypeState="EnemyPlayer"/>
+                                <When type="StateGroup" frame="$parent/HeroSelectedTalentTreeFrame/TalentTreeIcon4" TalentTierState="UltimateTierAvailable"/>
+                                <Action type="SetProperty" frame="$parent/HeroSelectedTalentTreeFrame/TalentTreeIcon4/CooldownBorderImage" Visible="true"/>
+                                <Action type="SetProperty" frame="$parent/HeroSelectedTalentTreeFrame/TalentTreeIcon4/IconBorderImage" Visible="False"/>
+                            </State>
+                            <State name="OnSelectedEnemy">
+                                <When type="StateGroup" frame="$ancestor[@type=HeroLeaderPanelPlayerFrame]" PlayerTypeState="EnemyPlayer"/>
+                                <When type="StateGroup" frame="$parent/HeroSelectedTalentTreeFrame/TalentTreeIcon4" TalentTierState="UltimateTierSelected"/>
+                                <Action type="SetProperty" frame="$parent/HeroSelectedTalentTreeFrame/TalentTreeIcon4/CooldownBorderImage" Visible="false"/>
+                                <Action type="SetProperty" frame="$parent/HeroSelectedTalentTreeFrame/TalentTreeIcon4/IconBorderImage" Visible="true"/>
+                            </State>
                             <State name="OnCooldown">
                                 <When type="Property" frame="AbilIcon/CooldownImage" Visible="true"/>
                                 <Action type="SetProperty" frame="$parent/HeroSelectedTalentTreeFrame/TalentTreeIcon4/CooldownBorderImage" Visible="true"/>
                                 <Action type="SetProperty" frame="$parent/HeroSelectedTalentTreeFrame/TalentTreeIcon4/IconBorderImage" Visible="False"/>
                             </State>
                             <State name="OnAvailable">
-                                <When type="Property" frame="AbilIcon/CooldownImage" Visible="false"/>
                                 <Action type="SetProperty" frame="$parent/HeroSelectedTalentTreeFrame/TalentTreeIcon4/CooldownBorderImage" Visible="false"/>
                                 <Action type="SetProperty" frame="$parent/HeroSelectedTalentTreeFrame/TalentTreeIcon4/IconBorderImage" Visible="true"/>
                             </State>
+                            <DefaultState val="OnAvailable"/>
                         </StateGroup>
 
                         <Frame type="AbilIcon" name="AbilIcon">
@@ -2006,7 +2067,7 @@
             </Frame>
 
             <Frame type="TabControl" name="TabControl">
-                <Anchor side="Top" relative="$parent" pos="Min" offset="25"/>
+                <Anchor side="Top" relative="$parent" pos="Min" offset="10"/>
                 <Anchor side="Left" relative="$parent" pos="Min" offset="25"/>
                 <Anchor side="Bottom" relative="$parent" pos="Max" offset="-15"/>
                 <Anchor side="Right" relative="$parent" pos="Max" offset="-25"/>

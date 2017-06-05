@@ -266,7 +266,7 @@
         <Frame type="CheckBox" name="DebugShowHiddenCheckBox" template="StandardTemplates/StandardCheckBoxLabelTemplate">
             <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
             <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
-            <Anchor side="Right" relative="$parent/FilterNewlyAquired" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent/FilterNewlyAcquired" pos="Min" offset="0"/>
             <Width val="225"/>
             <Height val="36"/>
             <CollapseLayout val="true"/>
@@ -279,7 +279,7 @@
             </Frame>
         </Frame>
 
-        <Frame type="Button" name="FilterNewlyAquired" template="StandardTemplates/FilterButtonTemplate">
+        <Frame type="Button" name="FilterNewlyAcquired" template="StandardTemplates/FilterButtonTemplate">
             <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
             <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
             <Anchor side="Right" relative="$parent/OwnershipFilterPulldown" pos="Min" offset="0"/>
@@ -381,6 +381,12 @@
         </StateGroup>
 
         <StateGroup name="OwnershipFilter">
+            <State name="ExactMatch">
+                <When type="Property" frame="$parent/ContentTileList" SearchFlags="UseExactMatchForNames"/>
+                <Action type="SetProperty" frame="$parent/FilterOptions/OwnershipFilterPulldown" Visible="false"/>
+                <Action type="SetProperty" FilterFlag_Owned="true"/>
+                <Action type="SetProperty" FilterFlag_Owned="true"/>
+            </State>
             <State name="AllContent">
                 <When type="Property" frame="$parent/FilterOptions/OwnershipFilterPulldown" SelectedFilter="AllContent"/>
                 <Action type="SetProperty" FilterFlag_Owned="true"/>
@@ -877,12 +883,17 @@
             </StateGroup>
 
             <StateGroup name="NewlyAcquiredToggle">
+                <State name="ExactMatch">
+                    <When type="Property" SearchFlags="UseExactMatchForNames"/>
+                    <Action type="SetProperty" frame="$parent/FilterOptions/FilterNewlyAcquired" Visible="false"/>
+                    <Action type="SetProperty" FilterFlag_Seen="true"/>
+                </State>
                 <State name="ShowOnlyNewlyAcquired">
-                    <When type="Property" frame="$parent/FilterOptions/FilterNewlyAquired" Toggled="true"/>
+                    <When type="Property" frame="$parent/FilterOptions/FilterNewlyAcquired" Toggled="true"/>
                     <Action type="SetProperty" FilterFlag_Seen="false"/>
                 </State>
                 <State name="ShowAll">
-                    <When type="Property" frame="$parent/FilterOptions/FilterNewlyAquired" Toggled="false"/>
+                    <When type="Property" frame="$parent/FilterOptions/FilterNewlyAcquired" Toggled="false"/>
                     <Action type="SetProperty" FilterFlag_Seen="true"/>
                 </State>
             </StateGroup>
@@ -939,22 +950,22 @@
             <StateGroup name="NewlyAcquiredAndSearchStates">
                 <State name="Inactive">
                     <When type="Property" frame="$parent/SearchEditBox" Text=""/>
-                    <When type="Property" frame="$parent/FilterOptions/FilterNewlyAquired" Toggled="false"/>
+                    <When type="Property" frame="$parent/FilterOptions/FilterNewlyAcquired" Toggled="false"/>
                     <Action type="SetState" group="NormalOrWideState" state="Normal"/>
                 </State>
                 <State name="SearchActive">
                     <When type="Property" frame="$parent/SearchEditBox" operator="NotEqual" Text=""/>
-                    <When type="Property" frame="$parent/FilterOptions/FilterNewlyAquired" Toggled="false"/>
+                    <When type="Property" frame="$parent/FilterOptions/FilterNewlyAcquired" Toggled="false"/>
                     <Action type="SetState" group="NormalOrWideState" state="Wide"/>
                 </State>
-                <State name="NewlyAquiredActive">
+                <State name="NewlyAcquiredActive">
                     <When type="Property" frame="$parent/SearchEditBox" Text=""/>
-                    <When type="Property" frame="$parent/FilterOptions/FilterNewlyAquired" Toggled="true"/>
+                    <When type="Property" frame="$parent/FilterOptions/FilterNewlyAcquired" Toggled="true"/>
                     <Action type="SetState" group="NormalOrWideState" state="Wide"/>
                 </State>
                 <State name="BothActive">
                     <When type="Property" frame="$parent/SearchEditBox" operator="NotEqual" Text=""/>
-                    <When type="Property" frame="$parent/FilterOptions/FilterNewlyAquired" Toggled="true"/>
+                    <When type="Property" frame="$parent/FilterOptions/FilterNewlyAcquired" Toggled="true"/>
                     <Action type="SetState" group="NormalOrWideState" state="Wide"/>
                 </State>
             </StateGroup>
@@ -962,7 +973,7 @@
             <StateGroup name="ExpandStates">
                 <State name="Normal">
                     <When type="StateGroup" NormalOrWideState="Normal"/>
-                    <Action type="SetProperty" SearchFlags=""/>
+                    <Action type="SetProperty" SearchFlags="" undo="false"/>
                     <Action type="SetProperty" CollectionCategoryFilter="{$parent/CategoryTileList/@SelectedCollectionCategory}" undo="false"/>
                 </State>
                 <State name="Wide">
@@ -986,7 +997,7 @@
     <!==============================================================================================-->
     <Frame type="Frame" name="GameContentCollectionPanelHeroCategoryTemplate" template="CollectionTemplates/GameContentCollectionPanelTemplate">
         <Frame type="Frame" name="FilterOptions" template="CollectionTemplates/FilterOptionsTemplate">
-            <Frame type="Button" name="FilterNewlyAquired" template="StandardTemplates/FilterButtonTemplate">
+            <Frame type="Button" name="FilterNewlyAcquired" template="StandardTemplates/FilterButtonTemplate">
                 <Anchor side="Right" relative="$parent/HeroOwnershipFilterPulldown" pos="Min" offset="0"/>
             </Frame>
 
@@ -1050,7 +1061,7 @@
                     <Action type="SetProperty" RequireParentHeroFilter="false"/>
                 </State>
                 <State name="NewlyAcquiredActive">
-                    <When type="Property" frame="$parent/FilterOptions/FilterNewlyAquired" Toggled="true"/>
+                    <When type="Property" frame="$parent/FilterOptions/FilterNewlyAcquired" Toggled="true"/>
                     <Action type="SetProperty" RequireParentHeroFilter="false"/>
                 </State>
                 <State name="FeaturedShown">
