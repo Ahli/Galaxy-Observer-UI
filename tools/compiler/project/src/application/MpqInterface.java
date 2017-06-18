@@ -197,7 +197,7 @@ public class MpqInterface {
 	 */
 	public void extractEntireMPQ(String mpqSourcePath) throws InterruptedException, IOException {
 		LOGGER.trace("mpqCachePath: " + mpqCachePath);
-		LOGGER.trace("mpqCachePath: " + mpqSourcePath);
+		LOGGER.trace("mpqSourcePath: " + mpqSourcePath);
 
 		clearCacheExtractedMpq();
 
