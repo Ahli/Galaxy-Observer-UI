@@ -355,11 +355,11 @@ public class Main extends Application {
 				}
 
 				File replay = null;
-//				try {
-//					replay = getLastUsedReplay(isHeroes);
-//				} catch (IOException e) {
-//					/* nothing */
-//				}
+				// try {
+				// replay = getLastUsedReplay(isHeroes);
+				// } catch (IOException e) {
+				// /* nothing */
+				// }
 				if (replay == null || !replay.exists() || !replay.isFile()) {
 					LOGGER.debug("Last used replay is invalid, getting newest replay instead.");
 					replay = getNewestReplay(isHeroes);
@@ -457,48 +457,49 @@ public class Main extends Application {
 		return newestReplay;
 	}
 
-	/**
-	 * Returns the last used replay file read from the game's Variables.txt.
-	 * 
-	 * @param isHeroes
-	 * @return
-	 * @throws IOException
-	 */
-	private File getLastUsedReplay(boolean isHeroes) throws IOException {
-		String basePath = documentsPath + File.separator;
-		if (isHeroes) {
-			basePath += "Heroes of the Storm";
-		} else {
-			basePath += "StarCraft II";
-		}
-		basePath += File.separator + "Variables.txt";
-		LOGGER.debug(basePath);
-
-		BufferedReader br = null;
-		String line, replayPath = null;
-		try {
-			InputStreamReader is = new InputStreamReader(new FileInputStream(new File(basePath)),
-					StandardCharsets.UTF_8);
-			br = new BufferedReader(is);
-			boolean found = false;
-			String searchToken = "lastReplayFilePath=";
-			while ((line = br.readLine()) != null && !found) {
-				if (line.startsWith(searchToken)) {
-					found = true;
-					replayPath = line.substring(searchToken.length());
-				}
-			}
-		} finally {
-			if (br != null) {
-				br.close();
-			}
-		}
-		LOGGER.debug("replayPath: " + replayPath);
-		if (replayPath == null) {
-			return null;
-		}
-		return new File(replayPath);
-	}
+	// /**
+	// * Returns the last used replay file read from the game's Variables.txt.
+	// *
+	// * @param isHeroes
+	// * @return
+	// * @throws IOException
+	// */
+	// private File getLastUsedReplay(boolean isHeroes) throws IOException {
+	// String basePath = documentsPath + File.separator;
+	// if (isHeroes) {
+	// basePath += "Heroes of the Storm";
+	// } else {
+	// basePath += "StarCraft II";
+	// }
+	// basePath += File.separator + "Variables.txt";
+	// LOGGER.debug(basePath);
+	//
+	// BufferedReader br = null;
+	// String line, replayPath = null;
+	// try {
+	// InputStreamReader is = new InputStreamReader(new FileInputStream(new
+	// File(basePath)),
+	// StandardCharsets.UTF_8);
+	// br = new BufferedReader(is);
+	// boolean found = false;
+	// String searchToken = "lastReplayFilePath=";
+	// while ((line = br.readLine()) != null && !found) {
+	// if (line.startsWith(searchToken)) {
+	// found = true;
+	// replayPath = line.substring(searchToken.length());
+	// }
+	// }
+	// } finally {
+	// if (br != null) {
+	// br.close();
+	// }
+	// }
+	// LOGGER.debug("replayPath: " + replayPath);
+	// if (replayPath == null) {
+	// return null;
+	// }
+	// return new File(replayPath);
+	// }
 
 	/**
 	 * Build all Interfaces for game subfolders.

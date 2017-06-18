@@ -5,6 +5,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;
+import java.util.Locale;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -18,6 +19,7 @@ import javax.xml.transform.TransformerFactoryConfigurationError;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
+import org.w3c.dom.Comment;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -138,7 +140,16 @@ public class XmlCompressor {
 
 			if (curNode.getNodeType() == Node.COMMENT_NODE) {
 				if (ignoreCount == 0) {
-					curNode.getParentNode().removeChild(curNode);
+
+					// keep hotkeys/settings definition alive
+					Comment comment = (Comment) curNode;
+					String text = comment.getData().trim().toLowerCase(Locale.ENGLISH);
+					if (!text.contains("@hotkey") && !text.contains("@setting")) {
+
+						curNode.getParentNode().removeChild(curNode);
+
+					}
+
 				} else {
 					ignoreCount--;
 				}
