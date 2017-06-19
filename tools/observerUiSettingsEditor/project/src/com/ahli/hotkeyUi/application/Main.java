@@ -69,7 +69,7 @@ public class Main extends Application {
 
 			// if it fails to load the resource in as a jar, check the eclipse
 			// settings
-			this.primaryStage.getIcons().add(new Image(this.getClass().getResourceAsStream("/ahliLogo.png")));
+			this.primaryStage.getIcons().add(new Image(this.getClass().getResourceAsStream("/res/ahliLogo.png")));
 
 			initRootLayout();
 

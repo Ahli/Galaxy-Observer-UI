@@ -115,7 +115,7 @@ public class MenuBarController {
 		alert.setHeaderText("Observer UI Settings Editor");
 		alert.setContentText("version: \t\t\t\t" + "alpha" + "\n\n" + "created by:" + "\t\t\t" + "Ahli");
 
-		URL imgUrl = this.getClass().getResource("/ahliLogo.png");
+		URL imgUrl = Main.class.getResource("/res/ahliLogo.png");
 		alert.setGraphic(new ImageView(imgUrl.toString()));
 		alert.showAndWait();
 	}
