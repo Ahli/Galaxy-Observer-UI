@@ -65,15 +65,17 @@ public class Main extends Application {
 		try {
 			Thread.currentThread().setName("UI");
 			this.primaryStage = primaryStage;
+			primaryStage.setMaximized(true);
+
+			// if it fails to load the resource in as a jar, check the eclipse
+			// settings
 			this.primaryStage.getIcons().add(new Image(this.getClass().getResourceAsStream("/ahliLogo.png")));
-			this.primaryStage.setMaximized(true);
 
 			initRootLayout();
 
 			// Load Tab layout from fxml file
 			FXMLLoader loader = new FXMLLoader();
-			loader.setLocation(Main.class.getResource("view" + File.separator + "TabsLayout.fxml"));
-			TabPane tabPane = (TabPane) loader.load();
+			TabPane tabPane = (TabPane) loader.load(this.getClass().getResourceAsStream("view/TabsLayout.fxml"));
 			rootLayout.setCenter(tabPane);
 			tabsCtrl = loader.getController();
 			tabsCtrl.setMainApp(this);
@@ -118,6 +120,15 @@ public class Main extends Application {
 	 * @param args
 	 */
 	public static void main(String[] args) {
+		LOGGER.trace("trace log visible");
+		LOGGER.debug("debug log visible");
+		LOGGER.info("info log visible");
+		LOGGER.warn("warn log visible");
+		LOGGER.error("error log visible");
+		LOGGER.fatal("fatal log visible");
+
+		LOGGER.trace("Configuration File of System: " + System.getProperty("log4j.configurationFile"));
+
 		launch(args);
 	}
 
@@ -238,8 +249,12 @@ public class Main extends Application {
 	public void initRootLayout() throws IOException {
 		// Load root layout from fxml file.
 		FXMLLoader loader = new FXMLLoader();
-		loader.setLocation(Main.class.getResource("view" + File.separator + "RootLayout.fxml"));
-		rootLayout = (BorderPane) loader.load();
+		/*
+		 * works only in eclipse, not in jar:
+		 * loader.setLocation(this.getClass().getResource("view/RootLayout.fxml"
+		 * )); rootLayout = (BorderPane) loader.load();
+		 */
+		rootLayout = (BorderPane) loader.load(this.getClass().getResourceAsStream("view/RootLayout.fxml"));
 
 		// get Controller
 		mbarCtrl = loader.getController();
@@ -247,8 +262,7 @@ public class Main extends Application {
 
 		// Show the scene containing the root layout.
 		Scene scene = new Scene(rootLayout);
-		scene.getStylesheets()
-				.add(getClass().getResource("view" + File.separator + "application.css").toExternalForm());
+		scene.getStylesheets().add(this.getClass().getResource("view/application.css").toExternalForm());
 		primaryStage.setScene(scene);
 		primaryStage.show();
 
