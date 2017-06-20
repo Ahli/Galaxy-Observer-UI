@@ -2,10 +2,8 @@ package com.ahli.hotkeyUi.application.controller;
 
 import java.net.URL;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
 import com.ahli.hotkeyUi.application.Main;
+import com.ahli.hotkeyUi.application.Messages;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -23,7 +21,7 @@ import javafx.scene.input.KeyCombination;
  *
  */
 public class MenuBarController {
-	static Logger LOGGER = LogManager.getLogger("MenuBarController");
+//	static Logger LOGGER = LogManager.getLogger("MenuBarController"); //$NON-NLS-1$
 
 	private Main main;
 
@@ -39,13 +37,14 @@ public class MenuBarController {
 	/**
 	 * Automatically called on Controller initialization.
 	 */
-	public void initialize(){
+	public void initialize() {
 		menuOpen.setAccelerator(new KeyCodeCombination(KeyCode.O, KeyCombination.CONTROL_DOWN));
 		menuSave.setAccelerator(new KeyCodeCombination(KeyCode.S, KeyCombination.CONTROL_DOWN));
-		menuSaveAs.setAccelerator(new KeyCodeCombination(KeyCode.S, KeyCombination.CONTROL_DOWN, KeyCombination.ALT_DOWN));
+		menuSaveAs.setAccelerator(
+				new KeyCodeCombination(KeyCode.S, KeyCombination.CONTROL_DOWN, KeyCombination.ALT_DOWN));
 		menuClose.setAccelerator(new KeyCodeCombination(KeyCode.W, KeyCombination.CONTROL_DOWN));
 	}
-	
+
 	/**
 	 * 
 	 * @param main
@@ -111,11 +110,11 @@ public class MenuBarController {
 	@FXML
 	public void aboutClicked() {
 		Alert alert = new Alert(AlertType.INFORMATION);
-		alert.setTitle("About");
-		alert.setHeaderText("Observer UI Settings Editor");
-		alert.setContentText("version: \t\t\t\t" + "alpha" + "\n\n" + "created by:" + "\t\t\t" + "Ahli");
+		alert.setTitle(Messages.getString("MenuBarController.About")); //$NON-NLS-1$
+		alert.setHeaderText(Messages.getString("MenuBarController.ObserverUISettingsEditor")); //$NON-NLS-1$
+		alert.setContentText(String.format(Messages.getString("MenuBarController.AboutText"), Main.VERSION)); //$NON-NLS-1$
 
-		URL imgUrl = Main.class.getResource("/res/ahliLogo.png");
+		URL imgUrl = Main.class.getResource("/res/ahliLogo.png"); //$NON-NLS-1$
 		alert.setGraphic(new ImageView(imgUrl.toString()));
 		alert.showAndWait();
 	}

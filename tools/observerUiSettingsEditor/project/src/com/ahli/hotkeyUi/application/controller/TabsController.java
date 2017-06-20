@@ -25,17 +25,10 @@ public class TabsController {
 	static Logger LOGGER = LogManager.getLogger("TabsController");
 
 	private Main main;
-	
-	private final ObservableList<ValueDef> hotkeysData = FXCollections.observableArrayList(
-	// new ValueDef(
-	// "Hotkey - Toggle Talents", "Control+1", "TEST Toggle bottom panel's
-	// talent tab.", "Control+1")
-	);
 
-	private final ObservableList<ValueDef> settingsData = FXCollections.observableArrayList(
-	// new ValueDef("LeaderPanelBottom - VerticalOffset", "0", "TEST Vertical
-	// Offset of the bottom panel", "0")
-	);
+	private final ObservableList<ValueDef> hotkeysData = FXCollections.observableArrayList();
+
+	private final ObservableList<ValueDef> settingsData = FXCollections.observableArrayList();
 
 	@FXML
 	private Tab hotkeysTab;
@@ -76,9 +69,11 @@ public class TabsController {
 		hotkeysKeyCol.setCellValueFactory(new PropertyValueFactory<>("value"));
 		hotkeysKeyCol.setCellFactory(TextFieldTableCell.<ValueDef>forTableColumn());
 		hotkeysKeyCol.setOnEditCommit((CellEditEvent<ValueDef, String> t) -> {
-			((ValueDef) t.getTableView().getItems().get(t.getTablePosition().getRow())).setValue(t.getNewValue());
-			LOGGER.debug("write hotkey val: "+t.getNewValue());
-			main.notifyFileDataWasChanged();
+			if (!t.getOldValue().equals(t.getNewValue())) {
+				((ValueDef) t.getTableView().getItems().get(t.getTablePosition().getRow())).setValue(t.getNewValue());
+				LOGGER.debug("write hotkey val: " + t.getNewValue());
+				main.notifyFileDataWasChanged();
+			}
 		});
 
 		settingsNameCol.setCellValueFactory(new PropertyValueFactory<>("id"));
@@ -87,15 +82,17 @@ public class TabsController {
 		settingsValueCol.setCellValueFactory(new PropertyValueFactory<>("value"));
 		settingsValueCol.setCellFactory(TextFieldTableCell.<ValueDef>forTableColumn());
 		settingsValueCol.setOnEditCommit((CellEditEvent<ValueDef, String> t) -> {
-			((ValueDef) t.getTableView().getItems().get(t.getTablePosition().getRow())).setValue(t.getNewValue());
-			LOGGER.debug("write setting val: "+t.getNewValue());
-			main.notifyFileDataWasChanged();
+			if (!t.getOldValue().equals(t.getNewValue())) {
+				((ValueDef) t.getTableView().getItems().get(t.getTablePosition().getRow())).setValue(t.getNewValue());
+				LOGGER.debug("write setting val: " + t.getNewValue());
+				main.notifyFileDataWasChanged();
+			}
 		});
 
 		hotkeysTable.setItems(hotkeysData);
 		settingsTable.setItems(settingsData);
 	}
-	
+
 	/**
 	 * 
 	 * @param main

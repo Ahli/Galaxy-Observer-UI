@@ -2,8 +2,6 @@ package com.ahli.hotkeyUi.application;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URI;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Optional;
@@ -20,6 +18,7 @@ import com.ahli.hotkeyUi.application.controller.MenuBarController;
 import com.ahli.hotkeyUi.application.controller.TabsController;
 import com.ahli.hotkeyUi.application.model.ValueDef;
 import com.ahli.mpq.MpqInterface;
+import com.ahli.util.JarHelper;
 
 import javafx.application.Application;
 import javafx.event.EventHandler;
@@ -43,7 +42,9 @@ import javafx.scene.layout.BorderPane;
  *
  */
 public class Main extends Application {
-	static Logger LOGGER = LogManager.getLogger("Main");
+	static Logger LOGGER = LogManager.getLogger("Main"); //$NON-NLS-1$
+
+	public final static String VERSION = "alpha";
 
 	private Stage primaryStage;
 	private BorderPane rootLayout;
@@ -63,19 +64,20 @@ public class Main extends Application {
 	@Override
 	public void start(Stage primaryStage) {
 		try {
-			Thread.currentThread().setName("UI");
+			Thread.currentThread().setName("UI"); //$NON-NLS-1$
 			this.primaryStage = primaryStage;
 			primaryStage.setMaximized(true);
 
 			// if it fails to load the resource in as a jar, check the eclipse
 			// settings
-			this.primaryStage.getIcons().add(new Image(this.getClass().getResourceAsStream("/res/ahliLogo.png")));
+			this.primaryStage.getIcons().add(new Image(Main.class.getResourceAsStream("/res/ahliLogo.png"))); //$NON-NLS-1$
 
 			initRootLayout();
 
 			// Load Tab layout from fxml file
 			FXMLLoader loader = new FXMLLoader();
-			TabPane tabPane = (TabPane) loader.load(this.getClass().getResourceAsStream("view/TabsLayout.fxml"));
+			loader.setResources(Messages.getBundle());
+			TabPane tabPane = (TabPane) loader.load(Main.class.getResourceAsStream("view/TabsLayout.fxml")); //$NON-NLS-1$
 			rootLayout.setCenter(tabPane);
 			tabsCtrl = loader.getController();
 			tabsCtrl.setMainApp(this);
@@ -86,10 +88,10 @@ public class Main extends Application {
 				public void handle(WindowEvent event) {
 					if (hasUnsavedFileChanges()) {
 						// ask to save changes in the file
-						Alert alert = new Alert(AlertType.CONFIRMATION, "Unsaved changes", ButtonType.YES,
-								ButtonType.NO, ButtonType.CANCEL);
-						alert.setContentText(openedDocPath + " has unsaved changes. Save them?");
-						alert.setHeaderText("Unsaved Changes");
+						Alert alert = new Alert(AlertType.CONFIRMATION, Messages.getString("Main.unsavedChangesTitle"), //$NON-NLS-1$
+								ButtonType.YES, ButtonType.NO, ButtonType.CANCEL);
+						alert.setContentText(openedDocPath + Messages.getString("Main.hasUnsavedChanges")); //$NON-NLS-1$
+						alert.setHeaderText(Messages.getString("Main.unsavedChangesTitle")); //$NON-NLS-1$
 						Optional<ButtonType> result = alert.showAndWait();
 
 						if ((result.isPresent())) {
@@ -109,7 +111,7 @@ public class Main extends Application {
 			initMpqInterface(mpqi);
 
 		} catch (Exception e) {
-			LOGGER.error("App Error: " + ExceptionUtils.getStackTrace(e), e);
+			LOGGER.error("App Error: " + ExceptionUtils.getStackTrace(e), e); //$NON-NLS-1$
 			e.printStackTrace();
 		}
 	}
@@ -120,14 +122,17 @@ public class Main extends Application {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		LOGGER.trace("trace log visible");
-		LOGGER.debug("debug log visible");
-		LOGGER.info("info log visible");
-		LOGGER.warn("warn log visible");
-		LOGGER.error("error log visible");
-		LOGGER.fatal("fatal log visible");
+		LOGGER.trace("trace log visible"); //$NON-NLS-1$
+		LOGGER.debug("debug log visible"); //$NON-NLS-1$
+		LOGGER.info("info log visible"); //$NON-NLS-1$
+		LOGGER.warn("warn log visible"); //$NON-NLS-1$
+		LOGGER.error("error log visible"); //$NON-NLS-1$
+		LOGGER.fatal("fatal log visible"); //$NON-NLS-1$
 
-		LOGGER.trace("Configuration File of System: " + System.getProperty("log4j.configurationFile"));
+		LOGGER.trace("Configuration File of System: " + System.getProperty("log4j.configurationFile")); //$NON-NLS-1$ //$NON-NLS-2$
+
+		// TEST Locale
+		// Messages.setBundle(Locale.GERMANY);
 
 		launch(args);
 	}
@@ -139,7 +144,7 @@ public class Main extends Application {
 	 * @return
 	 */
 	public boolean isValidOpenedDocPath() {
-		return openedDocPath != null && !openedDocPath.equals("");
+		return openedDocPath != null && !openedDocPath.equals(""); //$NON-NLS-1$
 	}
 
 	/**
@@ -147,14 +152,15 @@ public class Main extends Application {
 	 */
 	public void openUiMpq() {
 		FileChooser fileChooser = new FileChooser();
-		fileChooser.setTitle("Open Observer Interface...");
+		fileChooser.setTitle(Messages.getString("Main.openObserverInterfaceTitle")); //$NON-NLS-1$
 
-		ExtensionFilter genExtFilter = new ExtensionFilter("SC2/Heroes Observer Interface", "*.SC2Interface",
-				"*.StormInterface");
+		ExtensionFilter genExtFilter = new ExtensionFilter(
+				Messages.getString("Main.sc2HeroesObserverInterfaceExtFilter"), "*.SC2Interface", //$NON-NLS-1$ //$NON-NLS-2$
+				"*.StormInterface"); //$NON-NLS-1$
 
-		fileChooser.getExtensionFilters().addAll(new ExtensionFilter("All Files", "*.*"), genExtFilter,
-				new ExtensionFilter("SC2 Interface", "*.SC2Interface"),
-				new ExtensionFilter("Heroes Interface", "*.StormInterface"));
+		fileChooser.getExtensionFilters().addAll(new ExtensionFilter(Messages.getString("Main.allFilesFilter"), "*.*"), //$NON-NLS-1$ //$NON-NLS-2$
+				genExtFilter, new ExtensionFilter(Messages.getString("Main.sc2InterfaceFilter"), "*.SC2Interface"), //$NON-NLS-1$ //$NON-NLS-2$
+				new ExtensionFilter(Messages.getString("Main.heroesInterfaceFilter"), "*.StormInterface")); //$NON-NLS-1$ //$NON-NLS-2$
 		fileChooser.setSelectedExtensionFilter(genExtFilter);
 		File f = fileChooser.showOpenDialog(primaryStage);
 
@@ -200,23 +206,25 @@ public class Main extends Application {
 				ArrayList<ValueDef> settings = layoutExtReader.getSettings();
 				tabsCtrl.getSettingsData().addAll(settings);
 
+			} catch (RuntimeException e) {
+			    throw e;
 			} catch (Exception e) {
 				// opening failed as namespace could not be read
 				// TODO improve
-				LOGGER.error("File could not be opened. Error: " + ExceptionUtils.getStackTrace(e), e);
+				LOGGER.error("File could not be opened. Error: " + ExceptionUtils.getStackTrace(e), e); //$NON-NLS-1$
 				e.printStackTrace();
 				openedDocPath = null;
 				updateAppTitle();
 				Alert alert = new Alert(AlertType.ERROR);
-				alert.setTitle("Error opening file");
-				alert.setHeaderText("Error opening file");
-				alert.setContentText("An error occurred:\n" + e.getMessage());
+				alert.setTitle(Messages.getString("Main.errorOpeningFileTitle")); //$NON-NLS-1$
+				alert.setHeaderText(Messages.getString("Main.errorOpeningFileTitle")); //$NON-NLS-1$
+				alert.setContentText(Messages.getString("Main.anErrorOccured") + e.getMessage()); //$NON-NLS-1$
 				alert.showAndWait();
 			}
 			updateMenuBar();
 
 		} else {
-			LOGGER.trace("File to open was null, most likely due to 'cancel'.");
+			LOGGER.trace("File to open was null, most likely due to 'cancel'."); //$NON-NLS-1$
 		}
 	}
 
@@ -249,12 +257,8 @@ public class Main extends Application {
 	public void initRootLayout() throws IOException {
 		// Load root layout from fxml file.
 		FXMLLoader loader = new FXMLLoader();
-		/*
-		 * works only in eclipse, not in jar:
-		 * loader.setLocation(this.getClass().getResource("view/RootLayout.fxml"
-		 * )); rootLayout = (BorderPane) loader.load();
-		 */
-		rootLayout = (BorderPane) loader.load(this.getClass().getResourceAsStream("view/RootLayout.fxml"));
+		loader.setResources(Messages.getBundle());
+		rootLayout = (BorderPane) loader.load(Main.class.getResourceAsStream("view/RootLayout.fxml")); //$NON-NLS-1$
 
 		// get Controller
 		mbarCtrl = loader.getController();
@@ -262,11 +266,11 @@ public class Main extends Application {
 
 		// Show the scene containing the root layout.
 		Scene scene = new Scene(rootLayout);
-		scene.getStylesheets().add(this.getClass().getResource("view/application.css").toExternalForm());
+		scene.getStylesheets().add(Main.class.getResource("view/application.css").toExternalForm()); //$NON-NLS-1$
 		primaryStage.setScene(scene);
 		primaryStage.show();
 
-		primaryStage.setTitle("Observer UI Settings Editor");
+		primaryStage.setTitle(Messages.getString("Main.observerUiSettingsEditorTitle")); //$NON-NLS-1$
 		updateMenuBar();
 	}
 
@@ -309,14 +313,15 @@ public class Main extends Application {
 		}
 
 		FileChooser fileChooser = new FileChooser();
-		fileChooser.setTitle("Save UI...");
+		fileChooser.setTitle(Messages.getString("Main.saveUiTitle")); //$NON-NLS-1$
 
-		ExtensionFilter genExtFilter = new ExtensionFilter("SC2/Heroes Observer Interface", "*.SC2Interface",
-				"*.StormInterface");
+		ExtensionFilter genExtFilter = new ExtensionFilter(
+				Messages.getString("Main.sc2HeroesObserverInterfaceExtFilter"), "*.SC2Interface", //$NON-NLS-1$ //$NON-NLS-2$
+				"*.StormInterface"); //$NON-NLS-1$
 
-		fileChooser.getExtensionFilters().addAll(new ExtensionFilter("All Files", "*.*"), genExtFilter,
-				new ExtensionFilter("SC2 Interface", "*.SC2Interface"),
-				new ExtensionFilter("Heroes Interface", "*.StormInterface"));
+		fileChooser.getExtensionFilters().addAll(new ExtensionFilter(Messages.getString("Main.allFilesFilter"), "*.*"), //$NON-NLS-1$ //$NON-NLS-2$
+				genExtFilter, new ExtensionFilter(Messages.getString("Main.sc2InterfaceFilter"), "*.SC2Interface"), //$NON-NLS-1$ //$NON-NLS-2$
+				new ExtensionFilter(Messages.getString("Main.heroesInterfaceFilter"), "*.StormInterface")); //$NON-NLS-1$ //$NON-NLS-2$
 		fileChooser.setSelectedExtensionFilter(genExtFilter);
 
 		File loadedF = new File(this.getOpenedDocPath());
@@ -359,7 +364,7 @@ public class Main extends Application {
 	public void compile() throws ParserConfigurationException, SAXException, IOException {
 		File cache = new File(mpqi.getMpqCachePath());
 		boolean recursive = true;
-		String[] extensions = new String[] { "StormLayout", "SC2Layout" };
+		String[] extensions = new String[] { "StormLayout", "SC2Layout" }; //$NON-NLS-1$ //$NON-NLS-2$
 		Collection<File> layoutFiles = FileUtils.listFiles(cache, extensions, recursive);
 		layoutExtReader.updateLayoutFiles(layoutFiles);
 	}
@@ -376,7 +381,7 @@ public class Main extends Application {
 	 * Initialize Paths
 	 */
 	private void initPaths() {
-		basePath = getJarDir(Main.class);
+		basePath = JarHelper.getJarDir(Main.class);
 	}
 
 	/**
@@ -386,132 +391,7 @@ public class Main extends Application {
 	 */
 	private void initMpqInterface(MpqInterface mpqi) {
 		mpqi.setMpqEditorPath(
-				basePath + File.separator + "plugins" + File.separator + "mpq" + File.separator + "MPQEditor.exe");
-	}
-
-	/**
-	 * from stackoverflow because why doesn't java have this functionality? It's
-	 * not like nobody would need that or it is trivial to create...
-	 * 
-	 * @param aclass
-	 * @return File at base path
-	 */
-	public static File getJarDir(Class<Main> aclass) {
-		LOGGER.debug("_FINDING JAR'S PATH");
-
-		// ATTEMPT #1
-		File f = new File(System.getProperty("java.class.path"));
-		File dir = f.getAbsoluteFile().getParentFile();
-		String str = dir.toString();
-		LOGGER.debug("Attempt#1 java.class.path: " + str);
-
-		// check if started in eclipse
-		if (str.contains("tools" + File.separator + "observerUiSettingsEditor" + File.separator + "project"
-				+ File.separator + "target" + File.separator + "classes;")) {
-			// get current working directory
-			URI uri = new File(".").toURI();
-			// results in: "file:/D:/GalaxyObsUI/dev/./"
-			// but maybe results in something completely different like
-			// notepad++'s directory...
-			// addLogMessage("METHOD TEST: " + new File(".").toURI());
-
-			str = uri.getPath();
-			LOGGER.debug("_URI path:" + str);
-
-			if (str.startsWith("file:/")) {
-				str = str.substring(6);
-			}
-			if (str.startsWith("/")) {
-				str = str.substring(1);
-			}
-			if (str.endsWith("/./")) {
-				str = str.substring(0, str.length() - 3);
-			}
-
-			URL url = aclass.getProtectionDomain().getCodeSource().getLocation();
-			// class returns "rsrc:./", if 2nd option during jar export was
-			// chosen
-			if (!url.toString().startsWith("rsrc:./")) {
-				// wild guess that we are in test environment
-				str += "/testEnv/dev/";
-				LOGGER.debug("assuming Test Environment: " + str);
-			}
-
-		}
-		LOGGER.debug("_RESULT PATH: " + str);
-
-		return new File(str);
-
-		// URL url;
-		// String extURL; // url.toExternalForm();
-		//
-		// // get an url
-		// try {
-		// addLogMessage("attempting to get URL");
-		// url = aclass.getProtectionDomain().getCodeSource().getLocation();
-		// // url is in one of two forms
-		// // ./build/classes/ NetBeans test
-		// // jardir/JarName.jar froma jar
-		// } catch (SecurityException ex) {
-		// addLogMessage("attempting to get URL - had exception");
-		// url = aclass.getResource(aclass.getSimpleName() + ".class");
-		// // url is in one of two forms, both ending
-		// // "/com/physpics/tools/ui/PropNode.class"
-		// // file:/U:/Fred/java/Tools/UI/build/classes
-		// // jar:file:/U:/Fred/java/Tools/UI/dist/UI.jar!
-		// }
-		// addLogMessage("URL: "+url);
-		//
-		// // convert to external form
-		// extURL = url.toExternalForm();
-		// addLogMessage("URL external form: "+extURL);
-		//
-		// // prune for various cases
-		// if (extURL.endsWith(".jar")) { // from getCodeSource
-		// addLogMessage("URL ends with jar");
-		//
-		// extURL = extURL.substring(0, extURL.lastIndexOf("/"));
-		// addLogMessage("extURL: "+extURL);
-		// } else { // from getResource
-		// addLogMessage("get URL from resource");
-		// String suffix = "/" + (aclass.getName()).replace(".", "/") +
-		// ".class";
-		// extURL = extURL.replace(suffix, "");
-		// addLogMessage("extURL: "+extURL);
-		// if (extURL.startsWith("jar:") && extURL.endsWith(".jar!")) {
-		// addLogMessage("JAR path cutting");
-		// extURL = extURL.substring(4, extURL.lastIndexOf("/"));
-		// addLogMessage("extURL: "+extURL);
-		// } else {
-		// addLogMessage("not JAR");
-		// //hack for dev environment => move up two levels
-		// if(extURL.endsWith("/classes/")){
-		// addLogMessage("URL ends with classes");
-		// extURL = extURL.substring(0, extURL.lastIndexOf("/"));
-		// extURL = extURL.substring(0, extURL.lastIndexOf("/"));
-		// extURL = extURL.substring(0, extURL.lastIndexOf("/"));
-		// extURL += "/testEnv/baseUI/";
-		// addLogMessage("extURL: "+extURL);
-		// }
-		// }
-		// }
-		//
-		// // convert back to url
-		// try {
-		// url = new URL(extURL);
-		// addLogMessage("URL: "+url);
-		// } catch (MalformedURLException mux) {
-		// // leave url unchanged; probably does not happen
-		// addLogMessage("leave url unchanged; probably does not happen");
-		// }
-		//
-		// // convert url to File
-		// try {
-		// return new File(url.toURI());
-		// } catch (URISyntaxException ex) {
-		// addLogMessage("catched URISyntaxException");
-		// return new File(url.getPath());
-		// }
+				basePath + File.separator + "plugins" + File.separator + "mpq" + File.separator + "MPQEditor.exe"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	}
 
 	/**
@@ -537,12 +417,12 @@ public class Main extends Application {
 	 * Updates the title of the App.
 	 */
 	public void updateAppTitle() {
-		String title = "Observer UI Settings Editor";
+		String title = Messages.getString("Main.observerUiSettingsEditorTitle"); //$NON-NLS-1$
 		if (openedDocPath != null) {
-			title += "- [" + openedDocPath + "]";
+			title += "- [" + openedDocPath + "]"; //$NON-NLS-1$ //$NON-NLS-2$
 		}
 		if (hasUnsavedFileChanges) {
-			title += "*";
+			title += "*"; //$NON-NLS-1$
 		}
 		primaryStage.setTitle(title);
 	}

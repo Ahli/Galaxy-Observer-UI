@@ -1,0 +1,54 @@
+package com.ahli.hotkeyUi.application;
+
+import java.util.Locale;
+import java.util.MissingResourceException;
+import java.util.ResourceBundle;
+
+/**
+ * Class to internationalize messages.
+ * 
+ * Hint: FXML files can be localized via text="%key", if the FxmlLoader receives the correct resource bundle.
+ * 
+ * @author Ahli
+ *
+ */
+public class Messages {
+	private static final String BUNDLE_NAME = "com.ahli.hotkeyUi.application.messages"; //$NON-NLS-1$
+
+	private static ResourceBundle resourceBundle = ResourceBundle.getBundle(BUNDLE_NAME);
+
+	private Messages() {
+	}
+
+	/**
+	 * Returns the String of the key.
+	 * 
+	 * @param key
+	 * @return
+	 */
+	public static String getString(String key) {
+		try {
+			return resourceBundle.getString(key);
+		} catch (MissingResourceException e) {
+			return '!' + key + '!';
+		}
+	}
+
+	/**
+	 * Sets a bundle based on the specified Locale.
+	 * 
+	 * @param loc
+	 */
+	public static void setBundle(Locale loc) {
+		resourceBundle = ResourceBundle.getBundle(BUNDLE_NAME, loc);
+	}
+
+	/**
+	 * Returns the currently used bundle.
+	 * 
+	 * @return
+	 */
+	public static ResourceBundle getBundle() {
+		return resourceBundle;
+	}
+}

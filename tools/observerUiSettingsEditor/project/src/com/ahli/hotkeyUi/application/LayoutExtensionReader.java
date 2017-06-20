@@ -28,11 +28,11 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-import org.xml.sax.ErrorHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
 import com.ahli.hotkeyUi.application.model.ValueDef;
+import com.ahli.util.SilentXmlSaxErrorHandler;
 import com.sun.org.apache.xerces.internal.impl.io.MalformedByteSequenceException;
 
 public class LayoutExtensionReader {
@@ -88,21 +88,7 @@ public class LayoutExtensionReader {
 		DocumentBuilder dBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
 		// provide error handler that does not print incompatible files into
 		// console
-		dBuilder.setErrorHandler(new ErrorHandler() {
-			@Override
-			public void warning(SAXParseException e) throws SAXException {
-			}
-
-			@Override
-			public void fatalError(SAXParseException e) throws SAXException {
-				throw e;
-			}
-
-			@Override
-			public void error(SAXParseException e) throws SAXException {
-				throw e;
-			}
-		});
+		dBuilder.setErrorHandler(new SilentXmlSaxErrorHandler());
 
 		InputStream is = null;
 
@@ -218,8 +204,8 @@ public class LayoutExtensionReader {
 				description = "";
 				defaultValue = "";
 
-				boolean isHotkey = text.toLowerCase().startsWith("@hotkey");
-				boolean isSetting = text.toLowerCase().startsWith("@setting");
+				boolean isHotkey = text.toLowerCase(Locale.ROOT).startsWith("@hotkey");
+				boolean isSetting = text.toLowerCase(Locale.ROOT).startsWith("@setting");
 
 				if (isHotkey || isSetting) {
 					LOGGER.debug("detected hotkey or setting");
@@ -233,7 +219,7 @@ public class LayoutExtensionReader {
 					// split at keyword
 					for (String part : toProcess.split("(?i)(?=(constant|default|description)[\\s]*=)")) {
 						part = part.trim();
-						String partLower = part.toLowerCase();
+						String partLower = part.toLowerCase(Locale.ROOT);
 						LOGGER.debug("part: " + part);
 						if (partLower.startsWith("constant")) {
 							// move beyond '='
@@ -262,6 +248,8 @@ public class LayoutExtensionReader {
 					}
 				}
 			}
+		} catch (RuntimeException e) {
+			throw e;
 		} catch (Exception e) {
 			LOGGER.debug("Parsing Comment failed.", e);
 		}
@@ -348,21 +336,7 @@ public class LayoutExtensionReader {
 		DocumentBuilder dBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
 		// provide error handler that does not print incompatible files into
 		// console
-		dBuilder.setErrorHandler(new ErrorHandler() {
-			@Override
-			public void warning(SAXParseException e) throws SAXException {
-			}
-
-			@Override
-			public void fatalError(SAXParseException e) throws SAXException {
-				throw e;
-			}
-
-			@Override
-			public void error(SAXParseException e) throws SAXException {
-				throw e;
-			}
-		});
+		dBuilder.setErrorHandler(new SilentXmlSaxErrorHandler());
 
 		InputStream is = null;
 
@@ -443,13 +417,13 @@ public class LayoutExtensionReader {
 
 		for (ValueDef item : hotkeys) {
 			if (item.getId().equalsIgnoreCase(name)) {
-				LOGGER.debug("updating hotkey constant: " + name + ", with val: "+val);
+				LOGGER.debug("updating hotkey constant: " + name + ", with val: " + val);
 				valAttrNode.setNodeValue(item.getValue());
 			}
 		}
 		for (ValueDef item : settings) {
 			if (item.getId().equalsIgnoreCase(name)) {
-				LOGGER.debug("updating setting constant:" + name + ", with val: "+val);
+				LOGGER.debug("updating setting constant:" + name + ", with val: " + val);
 				valAttrNode.setNodeValue(item.getValue());
 			}
 		}
