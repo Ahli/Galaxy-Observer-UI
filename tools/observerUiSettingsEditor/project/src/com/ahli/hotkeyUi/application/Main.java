@@ -71,6 +71,8 @@ public class Main extends Application {
 			this.primaryStage = primaryStage;
 			primaryStage.setMaximized(true);
 
+			setUserAgentStylesheet(STYLESHEET_MODENA);
+
 			// if it fails to load the resource in as a jar, check the eclipse
 			// settings
 			this.primaryStage.getIcons().add(new Image(Main.class.getResourceAsStream("/res/ahliLogo.png"))); //$NON-NLS-1$
@@ -95,6 +97,8 @@ public class Main extends Application {
 								ButtonType.YES, ButtonType.NO, ButtonType.CANCEL);
 						alert.setContentText(openedDocPath + Messages.getString("Main.hasUnsavedChanges")); //$NON-NLS-1$
 						alert.setHeaderText(Messages.getString("Main.unsavedChangesTitle")); //$NON-NLS-1$
+						Stage stage = (Stage) alert.getDialogPane().getScene().getWindow();
+						stage.getIcons().add(new Image(Main.class.getResourceAsStream("/res/ahliLogo.png")));
 						Optional<ButtonType> result = alert.showAndWait();
 
 						if ((result.isPresent())) {
@@ -368,7 +372,8 @@ public class Main extends Application {
 		Alert alert = new Alert(AlertType.ERROR, e.getMessage(), okButton);
 		alert.setTitle(Messages.getString("Main.anErrorOccured")); //$NON-NLS-1$
 		alert.setHeaderText(Messages.getString("Main.anErrorOccured")); //$NON-NLS-1$
-
+		Stage stage = (Stage) alert.getDialogPane().getScene().getWindow();
+		stage.getIcons().add(new Image(Main.class.getResourceAsStream("/res/ahliLogo.png")));
 		alert.showAndWait();
 	}
 

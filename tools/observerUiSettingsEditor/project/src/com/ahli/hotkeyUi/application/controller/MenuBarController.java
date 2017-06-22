@@ -12,10 +12,12 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.control.MenuItem;
+import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
+import javafx.stage.Stage;
 
 /**
  * 
@@ -117,6 +119,8 @@ public class MenuBarController {
 		Alert alert = new Alert(AlertType.INFORMATION, content, okButton);
 		alert.setTitle(Messages.getString("MenuBarController.About")); //$NON-NLS-1$
 		alert.setHeaderText(Messages.getString("MenuBarController.ObserverUISettingsEditor")); //$NON-NLS-1$
+		Stage stage = (Stage) alert.getDialogPane().getScene().getWindow();
+		stage.getIcons().add(new Image(Main.class.getResourceAsStream("/res/ahliLogo.png")));
 
 		URL imgUrl = Main.class.getResource("/res/ahliLogo.png"); //$NON-NLS-1$
 		alert.setGraphic(new ImageView(imgUrl.toString()));
