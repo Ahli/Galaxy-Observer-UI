@@ -3,7 +3,7 @@ package com.ahli.hotkeyUi.application.controller;
 import java.net.URL;
 
 import com.ahli.hotkeyUi.application.Main;
-import com.ahli.hotkeyUi.application.Messages;
+import com.ahli.hotkeyUi.application.i18n.Messages;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;

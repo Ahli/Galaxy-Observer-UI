@@ -1,4 +1,4 @@
-package com.ahli.hotkeyUi.application;
+package com.ahli.hotkeyUi.application.i18n;
 
 import java.util.Locale;
 import java.util.MissingResourceException;
@@ -13,7 +13,7 @@ import java.util.ResourceBundle;
  *
  */
 public class Messages {
-	private static final String BUNDLE_NAME = "com.ahli.hotkeyUi.application.messages"; //$NON-NLS-1$
+	private static final String BUNDLE_NAME = "com.ahli.hotkeyUi.application.i18n.messages"; //$NON-NLS-1$
 
 	private static ResourceBundle resourceBundle = ResourceBundle.getBundle(BUNDLE_NAME);
 

@@ -16,6 +16,7 @@ import org.xml.sax.SAXException;
 
 import com.ahli.hotkeyUi.application.controller.MenuBarController;
 import com.ahli.hotkeyUi.application.controller.TabsController;
+import com.ahli.hotkeyUi.application.i18n.Messages;
 import com.ahli.hotkeyUi.application.model.ValueDef;
 import com.ahli.mpq.MpqInterface;
 import com.ahli.util.JarHelper;
