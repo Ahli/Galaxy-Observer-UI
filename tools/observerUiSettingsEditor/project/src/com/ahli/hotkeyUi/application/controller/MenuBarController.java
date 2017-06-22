@@ -21,7 +21,8 @@ import javafx.scene.input.KeyCombination;
  *
  */
 public class MenuBarController {
-//	static Logger LOGGER = LogManager.getLogger("MenuBarController"); //$NON-NLS-1$
+	// static Logger LOGGER = LogManager.getLogger("MenuBarController");
+	// //$NON-NLS-1$
 
 	private Main main;
 

@@ -12,7 +12,7 @@ import javafx.scene.control.TableCell;
 
 public class ResetDefaultButtonTableCell extends TableCell<ValueDef, Boolean> {
 	static Logger LOGGER = LogManager.getLogger("ButtonTableCell");
-	
+
 	final Button cellButton = new Button();
 
 	public ResetDefaultButtonTableCell() {

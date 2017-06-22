@@ -7,7 +7,8 @@ import java.util.ResourceBundle;
 /**
  * Class to internationalize messages.
  * 
- * Hint: FXML files can be localized via text="%key", if the FxmlLoader receives the correct resource bundle.
+ * Hint: FXML files can be localized via text="%key", if the FxmlLoader receives
+ * the correct resource bundle.
  * 
  * @author Ahli
  *

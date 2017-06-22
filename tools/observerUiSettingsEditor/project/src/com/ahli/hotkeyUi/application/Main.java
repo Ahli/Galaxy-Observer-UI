@@ -18,6 +18,7 @@ import com.ahli.hotkeyUi.application.controller.MenuBarController;
 import com.ahli.hotkeyUi.application.controller.TabsController;
 import com.ahli.hotkeyUi.application.i18n.Messages;
 import com.ahli.hotkeyUi.application.model.ValueDef;
+import com.ahli.mpq.MpqException;
 import com.ahli.mpq.MpqInterface;
 import com.ahli.util.JarHelper;
 
@@ -114,6 +115,7 @@ public class Main extends Application {
 		} catch (Exception e) {
 			LOGGER.error("App Error: " + ExceptionUtils.getStackTrace(e), e); //$NON-NLS-1$
 			e.printStackTrace();
+			showErrorPopup(e);
 		}
 	}
 
@@ -185,6 +187,9 @@ public class Main extends Application {
 				boolean ignoreRequiredToLoadEntries = true;
 
 				File componentListFile = mpqi.getComponentListFile();
+				if (componentListFile == null) {
+					throw new Exception("Opened file does not contain a ComponentList file.");
+				}
 				descIndex.setDescIndexPathAndClear(ComponentsListReader.getDescIndexPath(componentListFile));
 
 				File descIndexFile = mpqi.getCachedFile(descIndex.getDescIndexIntPath());
@@ -207,8 +212,6 @@ public class Main extends Application {
 				ArrayList<ValueDef> settings = layoutExtReader.getSettings();
 				tabsCtrl.getSettingsData().addAll(settings);
 
-			} catch (RuntimeException e) {
-			    throw e;
 			} catch (Exception e) {
 				// opening failed as namespace could not be read
 				// TODO improve
@@ -216,11 +219,15 @@ public class Main extends Application {
 				e.printStackTrace();
 				openedDocPath = null;
 				updateAppTitle();
-				Alert alert = new Alert(AlertType.ERROR);
-				alert.setTitle(Messages.getString("Main.errorOpeningFileTitle")); //$NON-NLS-1$
-				alert.setHeaderText(Messages.getString("Main.errorOpeningFileTitle")); //$NON-NLS-1$
-				alert.setContentText(Messages.getString("Main.anErrorOccured") + e.getMessage()); //$NON-NLS-1$
-				alert.showAndWait();
+				// Alert alert = new Alert(AlertType.ERROR);
+				// alert.setTitle(Messages.getString("Main.errorOpeningFileTitle"));
+				// //$NON-NLS-1$
+				// alert.setHeaderText(Messages.getString("Main.errorOpeningFileTitle"));
+				// //$NON-NLS-1$
+				// alert.setContentText(Messages.getString("Main.anErrorOccured")
+				// + e.getMessage()); //$NON-NLS-1$
+				// alert.showAndWait();
+				showErrorPopup(e);
 			}
 			updateMenuBar();
 
@@ -298,9 +305,10 @@ public class Main extends Application {
 			mpqi.buildMpq(openedDocPath, false, false);
 			hasUnsavedFileChanges = false;
 			updateAppTitle();
-		} catch (IOException | InterruptedException | ParserConfigurationException | SAXException e) {
+		} catch (IOException | InterruptedException | ParserConfigurationException | SAXException | MpqException e) {
 			LOGGER.error(ExceptionUtils.getStackTrace(e), e);
 			e.printStackTrace();
+			showErrorPopup(e);
 		}
 	}
 
@@ -338,12 +346,28 @@ public class Main extends Application {
 				hasUnsavedFileChanges = false;
 				openedDocPath = f.getAbsolutePath();
 				updateAppTitle();
-			} catch (IOException | InterruptedException | ParserConfigurationException | SAXException e) {
+			} catch (IOException | InterruptedException | ParserConfigurationException | SAXException
+					| MpqException e) {
 				LOGGER.error(ExceptionUtils.getStackTrace(e), e);
 				e.printStackTrace();
+				showErrorPopup(e);
 			}
 		}
 		updateMenuBar();
+	}
+
+	/**
+	 * Shows an Error popup with the specified message.
+	 * 
+	 * @param message
+	 */
+	private void showErrorPopup(Exception e) {
+		LOGGER.trace("showing error popup");
+		Alert alert = new Alert(AlertType.ERROR);
+		alert.setTitle(Messages.getString("Main.anErrorOccured")); //$NON-NLS-1$
+		alert.setHeaderText(Messages.getString("Main.anErrorOccured")); //$NON-NLS-1$
+		alert.setContentText(e.getMessage());
+		alert.showAndWait();
 	}
 
 	/**
