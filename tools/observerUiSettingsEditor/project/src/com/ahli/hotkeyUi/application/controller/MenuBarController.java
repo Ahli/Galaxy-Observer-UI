@@ -8,7 +8,9 @@ import com.ahli.hotkeyUi.application.i18n.Messages;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.control.MenuItem;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
@@ -110,10 +112,11 @@ public class MenuBarController {
 	 */
 	@FXML
 	public void aboutClicked() {
-		Alert alert = new Alert(AlertType.INFORMATION);
+		ButtonType okButton = new ButtonType(Messages.getString("MenuBarController.OkButton"), ButtonData.OK_DONE); //$NON-NLS-1$
+		String content = String.format(Messages.getString("MenuBarController.AboutText"), Main.VERSION); //$NON-NLS-1$
+		Alert alert = new Alert(AlertType.INFORMATION, content, okButton);
 		alert.setTitle(Messages.getString("MenuBarController.About")); //$NON-NLS-1$
 		alert.setHeaderText(Messages.getString("MenuBarController.ObserverUISettingsEditor")); //$NON-NLS-1$
-		alert.setContentText(String.format(Messages.getString("MenuBarController.AboutText"), Main.VERSION)); //$NON-NLS-1$
 
 		URL imgUrl = Main.class.getResource("/res/ahliLogo.png"); //$NON-NLS-1$
 		alert.setGraphic(new ImageView(imgUrl.toString()));

@@ -33,6 +33,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.control.ButtonType;
 import javafx.scene.image.Image;
 import javafx.scene.layout.BorderPane;
@@ -135,7 +136,7 @@ public class Main extends Application {
 		LOGGER.trace("Configuration File of System: " + System.getProperty("log4j.configurationFile")); //$NON-NLS-1$ //$NON-NLS-2$
 
 		// TEST Locale
-//		Messages.setBundle(Locale.CHINA);
+		// Messages.setBundle(Locale.CHINA);
 
 		launch(args);
 	}
@@ -188,7 +189,7 @@ public class Main extends Application {
 
 				File componentListFile = mpqi.getComponentListFile();
 				if (componentListFile == null) {
-					throw new Exception("Opened file does not contain a ComponentList file.");
+					throw new Exception(Messages.getString("Main.OpenedFileNoComponentList")); //$NON-NLS-1$
 				}
 				descIndex.setDescIndexPathAndClear(ComponentsListReader.getDescIndexPath(componentListFile));
 
@@ -363,10 +364,11 @@ public class Main extends Application {
 	 */
 	private void showErrorPopup(Exception e) {
 		LOGGER.trace("showing error popup");
-		Alert alert = new Alert(AlertType.ERROR);
+		ButtonType okButton = new ButtonType(Messages.getString("Main.OkButton"), ButtonData.OK_DONE); //$NON-NLS-1$
+		Alert alert = new Alert(AlertType.ERROR, e.getMessage(), okButton);
 		alert.setTitle(Messages.getString("Main.anErrorOccured")); //$NON-NLS-1$
 		alert.setHeaderText(Messages.getString("Main.anErrorOccured")); //$NON-NLS-1$
-		alert.setContentText(e.getMessage());
+
 		alert.showAndWait();
 	}
 
