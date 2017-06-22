@@ -9,7 +9,7 @@ import java.util.Optional;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang.exception.ExceptionUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.xml.sax.SAXException;
@@ -135,7 +135,7 @@ public class Main extends Application {
 		LOGGER.trace("Configuration File of System: " + System.getProperty("log4j.configurationFile")); //$NON-NLS-1$ //$NON-NLS-2$
 
 		// TEST Locale
-		//Messages.setBundle(Locale.CHINA);
+//		Messages.setBundle(Locale.CHINA);
 
 		launch(args);
 	}

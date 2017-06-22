@@ -33,7 +33,6 @@ import org.xml.sax.SAXParseException;
 
 import com.ahli.hotkeyUi.application.model.ValueDef;
 import com.ahli.util.SilentXmlSaxErrorHandler;
-import com.sun.org.apache.xerces.internal.impl.io.MalformedByteSequenceException;
 
 public class LayoutExtensionReader {
 	static Logger LOGGER = LogManager.getLogger("LayoutExtensionReader");
@@ -105,7 +104,7 @@ public class LayoutExtensionReader {
 				is = new FileInputStream(curFile);
 				doc = dBuilder.parse(is);
 
-			} catch (SAXParseException | MalformedByteSequenceException e) {
+			} catch (SAXParseException | IOException e) {
 				// couldn't parse, most likely no XML file
 				if (is != null) {
 					is.close();
@@ -140,7 +139,7 @@ public class LayoutExtensionReader {
 				is = new FileInputStream(curFile);
 				doc = dBuilder.parse(is);
 
-			} catch (SAXParseException | MalformedByteSequenceException e) {
+			} catch (SAXParseException | IOException e) {
 				// couldn't parse, most likely no XML file
 				if (is != null) {
 					is.close();
@@ -353,7 +352,7 @@ public class LayoutExtensionReader {
 				is = new FileInputStream(curFile);
 				doc = dBuilder.parse(is);
 
-			} catch (SAXParseException | MalformedByteSequenceException e) {
+			} catch (SAXParseException | IOException e) {
 				// couldn't parse, most likely no XML file
 				if (is != null) {
 					is.close();
