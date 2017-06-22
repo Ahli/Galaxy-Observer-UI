@@ -4,6 +4,7 @@ import javafx.beans.property.SimpleStringProperty;
 
 /**
  * Class that defines a Hotkey or Settings value to be used in UI.
+ * 
  * @author Ahli
  *
  */
@@ -50,6 +51,26 @@ public class ValueDef {
 
 	public void setDefaultValue(String defaultValue) {
 		this.defaultValue.set(defaultValue);
+	}
+
+	// required to make UI track changes
+	public SimpleStringProperty valueProperty() {
+		return value;
+	}
+
+	// required to make UI track changes
+	public SimpleStringProperty defaultValueProperty() {
+		return defaultValue;
+	}
+
+	// required to make UI track changes
+	public SimpleStringProperty descriptionProperty() {
+		return description;
+	}
+
+	// required to make UI track changes
+	public SimpleStringProperty idProperty() {
+		return id;
 	}
 
 }
