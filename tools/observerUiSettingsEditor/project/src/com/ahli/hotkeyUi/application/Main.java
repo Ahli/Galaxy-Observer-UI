@@ -135,7 +135,7 @@ public class Main extends Application {
 		LOGGER.trace("Configuration File of System: " + System.getProperty("log4j.configurationFile")); //$NON-NLS-1$ //$NON-NLS-2$
 
 		// TEST Locale
-		// Messages.setBundle(Locale.GERMANY);
+		//Messages.setBundle(Locale.CHINA);
 
 		launch(args);
 	}
