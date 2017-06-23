@@ -46,6 +46,7 @@ Files that are created and perist:
 
 Credits:
 --------
+- @tinkoliu for translating the editor to Chinese and Taiwanese
 - Ladislav "Ladik" Zezula for creating his MpqEditor. It is used to open and create the Observer Interface files.
 
 

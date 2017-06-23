@@ -23,7 +23,7 @@ import org.xml.sax.SAXException;
  *
  */
 public class LayoutReader {
-	static Logger LOGGER = LogManager.getLogger(LayoutReader.class);
+	static Logger LOGGER = LogManager.getLogger("LayoutReader");
 
 	public static ArrayList<String> getDependencyLayouts(File f, ArrayList<String> ownConstants)
 			throws ParserConfigurationException, SAXException, IOException {
