@@ -8,11 +8,13 @@ import com.ahli.hotkeyUi.application.ResetDefaultButtonTableCell;
 import com.ahli.hotkeyUi.application.i18n.Messages;
 import com.ahli.hotkeyUi.application.model.ValueDef;
 
+import javafx.application.Platform;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import javafx.scene.control.Label;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
@@ -20,6 +22,7 @@ import javafx.scene.control.TableColumn.CellEditEvent;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
+import javafx.scene.layout.VBox;
 import javafx.util.Callback;
 
 /**
@@ -66,6 +69,41 @@ public class TabsController {
 	@FXML
 	private TableColumn<ValueDef, Boolean> settingsActionsCol;
 
+	// from
+	// http://jluger.de/blog/20160731_javafx_text_rendering_in_tableview.html
+	public static final Callback<TableColumn<ValueDef, String>, TableCell<ValueDef, String>> WRAPPING_CELL_FACTORY = new Callback<TableColumn<ValueDef, String>, TableCell<ValueDef, String>>() {
+
+		@Override
+		public TableCell<ValueDef, String> call(TableColumn<ValueDef, String> param) {
+			TableCell<ValueDef, String> tableCell = new TableCell<ValueDef, String>() {
+				@Override
+				protected void updateItem(String item, boolean empty) {
+					if (item == null) {
+						super.updateItem(null, empty);
+						super.setText(null);
+						super.setGraphic(null);
+					} else {
+						if (item.equals(getItem())) {
+							return;
+						}
+
+						super.updateItem(item, empty);
+						super.setText(null);
+						Label l = new Label(item);
+						l.setWrapText(true);
+						VBox box = new VBox(l);
+						l.heightProperty().addListener((observable, oldValue, newValue) -> {
+							box.setPrefHeight(newValue.doubleValue() + 7);
+							Platform.runLater(() -> this.getTableRow().requestLayout());
+						});
+						super.setGraphic(box);
+					}
+				}
+			};
+			return tableCell;
+		}
+	};
+
 	/**
 	 * On Controller initialization.
 	 */
@@ -75,6 +113,7 @@ public class TabsController {
 
 		hotkeysNameCol.setCellValueFactory(new PropertyValueFactory<>("id"));
 		hotkeysDescriptionCol.setCellValueFactory(new PropertyValueFactory<>("description"));
+		hotkeysDescriptionCol.setCellFactory(WRAPPING_CELL_FACTORY);
 		hotkeysDefaultCol.setCellValueFactory(new PropertyValueFactory<>("defaultValue"));
 		hotkeysKeyCol.setCellValueFactory(new PropertyValueFactory<>("value"));
 		hotkeysKeyCol.setCellFactory(TextFieldTableCell.<ValueDef>forTableColumn());
@@ -102,6 +141,7 @@ public class TabsController {
 
 		settingsNameCol.setCellValueFactory(new PropertyValueFactory<>("id"));
 		settingsDescriptionCol.setCellValueFactory(new PropertyValueFactory<>("description"));
+		settingsDescriptionCol.setCellFactory(WRAPPING_CELL_FACTORY);
 		settingsDefaultCol.setCellValueFactory(new PropertyValueFactory<>("defaultValue"));
 		settingsValueCol.setCellValueFactory(new PropertyValueFactory<>("value"));
 		settingsValueCol.setCellFactory(TextFieldTableCell.<ValueDef>forTableColumn());
