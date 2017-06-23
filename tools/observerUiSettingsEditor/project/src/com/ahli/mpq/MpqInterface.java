@@ -89,7 +89,7 @@ public class MpqInterface {
 					if (!fup.delete()) {
 						String msg = "ERROR: Could not delete file " + unprotectedAbsolutePath; //$NON-NLS-1$
 						LOGGER.error(msg);
-						throw new IOException(
+						throw new MpqException(
 								String.format(Messages.getString("MpqInterface.CouldNotOverwriteFile"), absolutePath)); //$NON-NLS-1$
 					}
 				}
@@ -106,7 +106,7 @@ public class MpqInterface {
 				if (!f.delete()) {
 					String msg = "ERROR: Could not delete file " + absolutePath; //$NON-NLS-1$
 					LOGGER.error(msg);
-					throw new IOException(
+					throw new MpqException(
 							String.format(Messages.getString("MpqInterface.CouldNotOverwriteFile"), absolutePath)); //$NON-NLS-1$
 				}
 			}
@@ -145,7 +145,7 @@ public class MpqInterface {
 				if (!f.delete()) {
 					String msg = "ERROR: Could not delete file " + absolutePath; //$NON-NLS-1$
 					LOGGER.error(msg);
-					throw new IOException(
+					throw new MpqException(
 							String.format(Messages.getString("MpqInterface.CouldNotOverwriteFile"), absolutePath)); //$NON-NLS-1$
 				}
 			}
@@ -468,6 +468,11 @@ public class MpqInterface {
 		return f;
 	}
 
+	/**
+	 * 
+	 * @return
+	 * @throws MpqException
+	 */
 	public boolean isHeroesNamespace() throws MpqException {
 		File f = new File(mpqCachePath + File.separator + "ComponentList.StormComponents"); //$NON-NLS-1$
 		if (!f.exists() || f.isDirectory()) {
@@ -475,10 +480,8 @@ public class MpqInterface {
 			if (!f.exists() || f.isDirectory()) {
 				return false;
 			}
-			LOGGER.error("Failed path: " + f.getAbsolutePath()); //$NON-NLS-1$
-			// throw new MpqException("ERROR: cannot identify if file belongs to
-			// Heroes or SC2");
-			return false;
+			LOGGER.error("ERROR: archive has no ComponentList file."); //$NON-NLS-1$
+			throw new MpqException("ERROR: Cannot identify if file belongs to Heroes or SC2."); //$NON-NLS-1$
 		}
 		return true;
 	}

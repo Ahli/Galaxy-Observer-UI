@@ -69,7 +69,7 @@ public class TabsController {
 	@FXML
 	private TableColumn<ValueDef, Boolean> settingsActionsCol;
 
-	// from
+	// based on:
 	// http://jluger.de/blog/20160731_javafx_text_rendering_in_tableview.html
 	public static final Callback<TableColumn<ValueDef, String>, TableCell<ValueDef, String>> WRAPPING_CELL_FACTORY = new Callback<TableColumn<ValueDef, String>, TableCell<ValueDef, String>>() {
 
@@ -78,25 +78,28 @@ public class TabsController {
 			TableCell<ValueDef, String> tableCell = new TableCell<ValueDef, String>() {
 				@Override
 				protected void updateItem(String item, boolean empty) {
-					if (item == null) {
-						super.updateItem(null, empty);
-						super.setText(null);
-						super.setGraphic(null);
-					} else {
-						if (item.equals(getItem())) {
-							return;
-						}
-
+					if (empty || item == null) {
+						LOGGER.trace("update wrapping table cell - null");
 						super.updateItem(item, empty);
+						super.setGraphic(null);
 						super.setText(null);
-						Label l = new Label(item);
-						l.setWrapText(true);
-						VBox box = new VBox(l);
-						l.heightProperty().addListener((observable, oldValue, newValue) -> {
-							box.setPrefHeight(newValue.doubleValue() + 7);
-							Platform.runLater(() -> this.getTableRow().requestLayout());
-						});
-						super.setGraphic(box);
+					} else {
+						// check if old value equals new value
+						boolean equals = item.equals(getItem());
+						super.updateItem(item, empty);
+						if (!equals) {
+							LOGGER.trace("update wrapping table cell - newLabel " + item);
+							Label l = new Label(item);
+							l.setWrapText(true);
+							VBox box = new VBox(l);
+							l.heightProperty().addListener((observable, oldValue, newValue) -> {
+								box.setPrefHeight(newValue.doubleValue() + 7);
+								Platform.runLater(() -> this.getTableRow().requestLayout());
+							});
+							super.setGraphic(box);
+						} else {
+							LOGGER.trace("update wrapping table cell - equal");
+						}
 					}
 				}
 			};

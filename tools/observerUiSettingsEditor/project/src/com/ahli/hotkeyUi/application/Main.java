@@ -18,11 +18,14 @@ import com.ahli.hotkeyUi.application.controller.MenuBarController;
 import com.ahli.hotkeyUi.application.controller.TabsController;
 import com.ahli.hotkeyUi.application.i18n.Messages;
 import com.ahli.hotkeyUi.application.model.ValueDef;
+import com.ahli.hotkeyUi.application.ui.ShowToUserException;
+import com.ahli.hotkeyUi.application.ui.dialogs.Alerts;
 import com.ahli.mpq.MpqException;
 import com.ahli.mpq.MpqInterface;
 import com.ahli.util.JarHelper;
 
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.stage.FileChooser;
@@ -32,8 +35,6 @@ import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.TabPane;
-import javafx.scene.control.Alert.AlertType;
-import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.control.ButtonType;
 import javafx.scene.image.Image;
 import javafx.scene.layout.BorderPane;
@@ -91,36 +92,38 @@ public class Main extends Application {
 			primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
 				@Override
 				public void handle(WindowEvent event) {
-					if (hasUnsavedFileChanges()) {
-						// ask to save changes in the file
-						Alert alert = new Alert(AlertType.CONFIRMATION, Messages.getString("Main.unsavedChangesTitle"), //$NON-NLS-1$
-								ButtonType.YES, ButtonType.NO, ButtonType.CANCEL);
-						alert.setContentText(openedDocPath + Messages.getString("Main.hasUnsavedChanges")); //$NON-NLS-1$
-						alert.setHeaderText(Messages.getString("Main.unsavedChangesTitle")); //$NON-NLS-1$
-						Stage stage = (Stage) alert.getDialogPane().getScene().getWindow();
-						stage.getIcons().add(new Image(Main.class.getResourceAsStream("/res/ahliLogo.png")));
-						Optional<ButtonType> result = alert.showAndWait();
-
-						if ((result.isPresent())) {
-							if (result.get() == ButtonType.YES) {
-								saveUiMpq();
-							} else {
-								if (result.get() == ButtonType.CANCEL) {
-									event.consume();
-								}
-							}
-						}
-					}
+					askToSaveUnsavedChanges();
 				}
 			});
 
 			initPaths();
 			initMpqInterface(mpqi);
-
+			
 		} catch (Exception e) {
 			LOGGER.error("App Error: " + ExceptionUtils.getStackTrace(e), e); //$NON-NLS-1$
 			e.printStackTrace();
-			showErrorPopup(e);
+			Alerts.buildExceptionAlert(primaryStage, e).showAndWait();
+		}
+	}
+
+	/**
+	 * Asks the user to decide on unsaved changes, if there are any.
+	 */
+	public void askToSaveUnsavedChanges() {
+		if (hasUnsavedFileChanges()) {
+			// ask to save changes in the file
+			String title = Messages.getString("Main.unsavedChangesTitle"); //$NON-NLS-1$
+			String content = String.format(Messages.getString("Main.hasUnsavedChanges"), openedDocPath); //$NON-NLS-1$
+
+			Alert alert = Alerts.buildYesNoCancelAlert(primaryStage, title, title, content);
+
+			Optional<ButtonType> result = alert.showAndWait();
+
+			if ((result.isPresent())) {
+				if (result.get() == ButtonType.YES) {
+					saveUiMpq();
+				}
+			}
 		}
 	}
 
@@ -181,70 +184,85 @@ public class Main extends Application {
 	 * @param f
 	 */
 	public void openMpqFile(File f) {
-		if (f != null) {
-			try {
-				mpqi.extractEntireMPQ(f.getAbsolutePath());
-				openedDocPath = f.getAbsolutePath();
-				updateAppTitle();
+		new Thread() {
+			public void run() {
+				this.setName(this.getName().replaceFirst("Thread", "Open")); //$NON-NLS-1$
 
-				// load desc index from mpq
-				isNamespaceHeroes = mpqi.isHeroesNamespace();
-				boolean ignoreRequiredToLoadEntries = true;
+				if (f != null) {
+					try {
+						mpqi.extractEntireMPQ(f.getAbsolutePath());
+						openedDocPath = f.getAbsolutePath();
+						updateAppTitle();
 
-				File componentListFile = mpqi.getComponentListFile();
-				if (componentListFile == null) {
-					throw new Exception(Messages.getString("Main.OpenedFileNoComponentList")); //$NON-NLS-1$
+						// load desc index from mpq
+						try {
+							isNamespaceHeroes = mpqi.isHeroesNamespace();
+						} catch (MpqException e) {
+							// special case to show readable error to user
+							throw new ShowToUserException(Messages.getString("Main.OpenedFileNoComponentList"));
+						}
+						boolean ignoreRequiredToLoadEntries = true;
+
+						File componentListFile = mpqi.getComponentListFile();
+						if (componentListFile == null) {
+							throw new ShowToUserException(Messages.getString("Main.OpenedFileNoComponentList")); //$NON-NLS-1$
+						}
+						descIndex.setDescIndexPathAndClear(ComponentsListReader.getDescIndexPath(componentListFile));
+
+						File descIndexFile = mpqi.getCachedFile(descIndex.getDescIndexIntPath());
+						descIndex.addLayoutIntPath(
+								DescIndexReader.getLayoutPathList(descIndexFile, ignoreRequiredToLoadEntries));
+
+						tabsCtrl.clearData();
+						hasUnsavedFileChanges = false;
+
+						boolean recursive = true;
+						File cache = new File(mpqi.getMpqCachePath());
+						Collection<File> layoutFiles = FileUtils.listFiles(cache, null, recursive);
+
+						layoutExtReader = new LayoutExtensionReader();
+						layoutExtReader.processLayoutFiles(layoutFiles);
+
+						ArrayList<ValueDef> hotkeys = layoutExtReader.getHotkeys();
+						tabsCtrl.getHotkeysData().addAll(hotkeys);
+
+						ArrayList<ValueDef> settings = layoutExtReader.getSettings();
+						tabsCtrl.getSettingsData().addAll(settings);
+
+					} catch (MpqException | ShowToUserException e) {
+						LOGGER.error("File could not be opened. MPQ-Error: " + ExceptionUtils.getStackTrace(e), e); //$NON-NLS-1$
+						openedDocPath = null;
+						updateAppTitle();
+						showErrorAlert(e);
+					} catch (Exception e) {
+						LOGGER.error("File could not be opened. Error: " + ExceptionUtils.getStackTrace(e), e); //$NON-NLS-1$
+						e.printStackTrace();
+						openedDocPath = null;
+						updateAppTitle();
+						// Alert alert = new Alert(AlertType.ERROR);
+						// alert.setTitle(Messages.getString("Main.errorOpeningFileTitle"));
+						// //$NON-NLS-1$
+						// alert.setHeaderText(Messages.getString("Main.errorOpeningFileTitle"));
+						// //$NON-NLS-1$
+						// alert.setContentText(Messages.getString("Main.anErrorOccured")
+						// + e.getMessage()); //$NON-NLS-1$
+						// alert.showAndWait();
+
+						showExceptionAlert(e);
+					}
+					updateMenuBar();
+				} else {
+					LOGGER.trace("File to open was null, most likely due to 'cancel'."); //$NON-NLS-1$
 				}
-				descIndex.setDescIndexPathAndClear(ComponentsListReader.getDescIndexPath(componentListFile));
-
-				File descIndexFile = mpqi.getCachedFile(descIndex.getDescIndexIntPath());
-				descIndex.addLayoutIntPath(
-						DescIndexReader.getLayoutPathList(descIndexFile, ignoreRequiredToLoadEntries));
-
-				tabsCtrl.clearData();
-				hasUnsavedFileChanges = false;
-
-				boolean recursive = true;
-				File cache = new File(mpqi.getMpqCachePath());
-				Collection<File> layoutFiles = FileUtils.listFiles(cache, null, recursive);
-
-				layoutExtReader = new LayoutExtensionReader();
-				layoutExtReader.processLayoutFiles(layoutFiles);
-
-				ArrayList<ValueDef> hotkeys = layoutExtReader.getHotkeys();
-				tabsCtrl.getHotkeysData().addAll(hotkeys);
-
-				ArrayList<ValueDef> settings = layoutExtReader.getSettings();
-				tabsCtrl.getSettingsData().addAll(settings);
-
-			} catch (Exception e) {
-				// opening failed as namespace could not be read
-				// TODO improve
-				LOGGER.error("File could not be opened. Error: " + ExceptionUtils.getStackTrace(e), e); //$NON-NLS-1$
-				e.printStackTrace();
-				openedDocPath = null;
-				updateAppTitle();
-				// Alert alert = new Alert(AlertType.ERROR);
-				// alert.setTitle(Messages.getString("Main.errorOpeningFileTitle"));
-				// //$NON-NLS-1$
-				// alert.setHeaderText(Messages.getString("Main.errorOpeningFileTitle"));
-				// //$NON-NLS-1$
-				// alert.setContentText(Messages.getString("Main.anErrorOccured")
-				// + e.getMessage()); //$NON-NLS-1$
-				// alert.showAndWait();
-				showErrorPopup(e);
 			}
-			updateMenuBar();
-
-		} else {
-			LOGGER.trace("File to open was null, most likely due to 'cancel'."); //$NON-NLS-1$
-		}
+		}.start();
 	}
 
 	/**
 	 * Closes the currently opened document.
 	 */
 	public void closeFile() {
+		askToSaveUnsavedChanges();
 		openedDocPath = null;
 		mpqi.clearCacheExtractedMpq();
 		updateAppTitle();
@@ -259,7 +277,13 @@ public class Main extends Application {
 	 * opening/closing a document to enable/disable the save buttons.
 	 */
 	private void updateMenuBar() {
-		mbarCtrl.updateMenuBar();
+		Platform.runLater(new Runnable() {
+			@Override
+			public void run() {
+				// Update UI here
+				mbarCtrl.updateMenuBar();
+			}
+		});
 	}
 
 	/**
@@ -300,21 +324,28 @@ public class Main extends Application {
 	 * Saves the currently opened document.
 	 */
 	public void saveUiMpq() {
-		// cannot save, if not valid
-		if (!isValidOpenedDocPath()) {
-			return;
-		}
+		new Thread() {
+			public void run() {
+				this.setName(this.getName().replaceFirst("Thread", "Save")); //$NON-NLS-1$
 
-		try {
-			compile();
-			mpqi.buildMpq(openedDocPath, false, false);
-			hasUnsavedFileChanges = false;
-			updateAppTitle();
-		} catch (IOException | InterruptedException | ParserConfigurationException | SAXException | MpqException e) {
-			LOGGER.error(ExceptionUtils.getStackTrace(e), e);
-			e.printStackTrace();
-			showErrorPopup(e);
-		}
+				// cannot save, if not valid
+				if (!isValidOpenedDocPath()) {
+					return;
+				}
+
+				try {
+					compile();
+					mpqi.buildMpq(openedDocPath, false, false);
+					hasUnsavedFileChanges = false;
+					updateAppTitle();
+				} catch (IOException | InterruptedException | ParserConfigurationException | SAXException
+						| MpqException e) {
+					LOGGER.error(ExceptionUtils.getStackTrace(e), e);
+					e.printStackTrace();
+					showErrorAlert(e);
+				}
+			}
+		}.start();
 	}
 
 	/**
@@ -355,26 +386,46 @@ public class Main extends Application {
 					| MpqException e) {
 				LOGGER.error(ExceptionUtils.getStackTrace(e), e);
 				e.printStackTrace();
-				showErrorPopup(e);
+				showErrorAlert(e);
 			}
 		}
 		updateMenuBar();
 	}
 
 	/**
-	 * Shows an Error popup with the specified message.
+	 * Shows an Error Alert with the specified message.
 	 * 
 	 * @param message
 	 */
-	private void showErrorPopup(Exception e) {
-		LOGGER.trace("showing error popup");
-		ButtonType okButton = new ButtonType(Messages.getString("Main.OkButton"), ButtonData.OK_DONE); //$NON-NLS-1$
-		Alert alert = new Alert(AlertType.ERROR, e.getMessage(), okButton);
-		alert.setTitle(Messages.getString("Main.anErrorOccured")); //$NON-NLS-1$
-		alert.setHeaderText(Messages.getString("Main.anErrorOccured")); //$NON-NLS-1$
-		Stage stage = (Stage) alert.getDialogPane().getScene().getWindow();
-		stage.getIcons().add(new Image(Main.class.getResourceAsStream("/res/ahliLogo.png")));
-		alert.showAndWait();
+	private void showErrorAlert(Exception e) {
+		Platform.runLater(new Runnable() {
+			@Override
+			public void run() {
+				// Update UI here
+				LOGGER.trace("showing error popup");
+				String title = Messages.getString("Main.anErrorOccured"); //$NON-NLS-1$
+				String content = e.getMessage();
+				Alert alert = Alerts.buildErrorAlert(primaryStage, title, title, content);
+				alert.showAndWait();
+			}
+		});
+	}
+
+	/**
+	 * Shows an Exception Alert.
+	 * 
+	 * @param message
+	 */
+	private void showExceptionAlert(Exception e) {
+		Platform.runLater(new Runnable() {
+			@Override
+			public void run() {
+				// Update UI here
+				LOGGER.trace("showing exception popup");
+				Alert alert = Alerts.buildExceptionAlert(primaryStage, e);
+				alert.showAndWait();
+			}
+		});
 	}
 
 	/**
@@ -449,13 +500,29 @@ public class Main extends Application {
 	 * Updates the title of the App.
 	 */
 	public void updateAppTitle() {
-		String title = Messages.getString("Main.observerUiSettingsEditorTitle"); //$NON-NLS-1$
-		if (openedDocPath != null) {
-			title += "- [" + openedDocPath + "]"; //$NON-NLS-1$ //$NON-NLS-2$
-		}
-		if (hasUnsavedFileChanges) {
-			title += "*"; //$NON-NLS-1$
-		}
-		primaryStage.setTitle(title);
+		Platform.runLater(new Runnable() {
+			@Override
+			public void run() {
+				// Update UI here
+				String title = Messages.getString("Main.observerUiSettingsEditorTitle"); //$NON-NLS-1$
+				if (openedDocPath != null) {
+					title += "- [" + openedDocPath + "]"; //$NON-NLS-1$ //$NON-NLS-2$
+				}
+				if (hasUnsavedFileChanges) {
+					title += "*"; //$NON-NLS-1$
+				}
+				primaryStage.setTitle(title);
+			}
+		});
+
+	}
+
+	/**
+	 * Returns the App's main window stage.
+	 * 
+	 * @return
+	 */
+	public Stage getPrimaryStage() {
+		return primaryStage;
 	}
 }

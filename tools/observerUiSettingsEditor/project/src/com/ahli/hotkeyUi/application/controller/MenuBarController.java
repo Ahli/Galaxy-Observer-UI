@@ -1,23 +1,16 @@
 package com.ahli.hotkeyUi.application.controller;
 
-import java.net.URL;
-
 import com.ahli.hotkeyUi.application.Main;
 import com.ahli.hotkeyUi.application.i18n.Messages;
+import com.ahli.hotkeyUi.application.ui.dialogs.Alerts;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.Alert.AlertType;
-import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.control.MenuItem;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
-import javafx.stage.Stage;
 
 /**
  * 
@@ -114,16 +107,12 @@ public class MenuBarController {
 	 */
 	@FXML
 	public void aboutClicked() {
-		ButtonType okButton = new ButtonType(Messages.getString("MenuBarController.OkButton"), ButtonData.OK_DONE); //$NON-NLS-1$
-		String content = String.format(Messages.getString("MenuBarController.AboutText"), Main.VERSION); //$NON-NLS-1$
-		Alert alert = new Alert(AlertType.INFORMATION, content, okButton);
-		alert.setTitle(Messages.getString("MenuBarController.About")); //$NON-NLS-1$
-		alert.setHeaderText(Messages.getString("MenuBarController.ObserverUISettingsEditor")); //$NON-NLS-1$
-		Stage stage = (Stage) alert.getDialogPane().getScene().getWindow();
-		stage.getIcons().add(new Image(Main.class.getResourceAsStream("/res/ahliLogo.png")));
-
-		URL imgUrl = Main.class.getResource("/res/ahliLogo.png"); //$NON-NLS-1$
-		alert.setGraphic(new ImageView(imgUrl.toString()));
+		String content = String.format(Messages.getString("MenuBarController.AboutText"), Main.VERSION)
+				+ "\n\n" + Messages.getString("MenuBarController.AboutText2"); //$NON-NLS-1$
+		String title = Messages.getString("MenuBarController.About"); //$NON-NLS-1$
+		String header = Messages.getString("MenuBarController.ObserverUISettingsEditor"); //$NON-NLS-1$
+		String imgUrl = Main.class.getResource("/res/ahliLogo.png").toString(); //$NON-NLS-1$
+		Alert alert = Alerts.buildAboutAlert(main.getPrimaryStage(), title, header, content, imgUrl);
 		alert.showAndWait();
 	}
 
