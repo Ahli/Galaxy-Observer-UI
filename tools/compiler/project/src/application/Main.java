@@ -289,7 +289,11 @@ public class Main extends Application {
 		primaryStage.setScene(scene);
 		primaryStage.show();
 		primaryStage.setTitle("Compiling Interfaces...");
-		primaryStage.getIcons().add(new Image(Main.class.getResourceAsStream("/ahli.png")));
+		try{
+			primaryStage.getIcons().add(new Image(Main.class.getResourceAsStream("/res/ahli.png")));
+		} catch(Exception e){
+			LOGGER.error("Failed to load ahli.png");
+		}
 	}
 
 	/**

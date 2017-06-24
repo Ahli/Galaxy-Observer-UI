@@ -1,4 +1,4 @@
-package com.ahli.hotkeyUi.application;
+package com.ahli.hotkeyUi.application.galaxy;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -7,6 +7,7 @@ import java.util.Iterator;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import com.ahli.hotkeyUi.application.Main;
 import com.ahli.mpq.MpqInterface;
 
 import javafx.util.Pair;

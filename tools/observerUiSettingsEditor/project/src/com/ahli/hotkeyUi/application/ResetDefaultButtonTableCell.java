@@ -10,6 +10,12 @@ import javafx.event.EventHandler;
 import javafx.scene.control.Button;
 import javafx.scene.control.TableCell;
 
+/**
+ * A table cell for ValueDef model data to reset its value to the default value.
+ * 
+ * @author Ahli
+ *
+ */
 public class ResetDefaultButtonTableCell extends TableCell<ValueDef, Boolean> {
 	static Logger LOGGER = LogManager.getLogger("ButtonTableCell");
 

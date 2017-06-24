@@ -1,5 +1,4 @@
-package com.ahli.hotkeyUi.application;
-
+package com.ahli.hotkeyUi.application.galaxy;
 
 import java.io.File;
 import java.io.IOException;
@@ -130,22 +129,18 @@ public class LayoutReader {
 
 		}
 
-//		// add all constants that are not self-defined to dependency list
-//		x:for(String constant : usedConstants){
-//			for(String own : ownConstants){
-//				if(constant.equals(own)){
-//					continue x;
-//				}
-//			}
-//			// if not self-defined => add as dependency
-//			list.add(constant);
-//			
-//		}
-			
-			
-		
-		
-		
+		// // add all constants that are not self-defined to dependency list
+		// x:for(String constant : usedConstants){
+		// for(String own : ownConstants){
+		// if(constant.equals(own)){
+		// continue x;
+		// }
+		// }
+		// // if not self-defined => add as dependency
+		// list.add(constant);
+		//
+		// }
+
 		return list;
 		// TODO what if a template uses a constant? what if it is in another
 		// TODO what if a constant is defined in a layout after its usage?
@@ -172,11 +167,11 @@ public class LayoutReader {
 
 		for (String n : list) {
 			if (n.equalsIgnoreCase(name)) {
-//				 System.out.println("check - true - "+constUsage);
+				// System.out.println("check - true - "+constUsage);
 				return true;
 			}
 		}
-//		 System.out.println("check - false - "+constUsage+" - "+name);
+		// System.out.println("check - false - "+constUsage+" - "+name);
 		return false;
 	}
 
@@ -236,8 +231,9 @@ public class LayoutReader {
 					ownConstants.add(attr.getNodeValue());
 					LOGGER.trace("FOUND CONSTANT DEFINITION: " + attr.getNodeValue());
 				}
-//				else
-//					System.out.println("REJECTED CONSTANT ATTR: " + attr.getNodeName());
+				// else
+				// System.out.println("REJECTED CONSTANT ATTR: " +
+				// attr.getNodeName());
 			}
 		}
 		return ownConstants;

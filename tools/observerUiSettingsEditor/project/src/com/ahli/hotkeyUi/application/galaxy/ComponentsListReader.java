@@ -1,4 +1,4 @@
-package com.ahli.hotkeyUi.application;
+package com.ahli.hotkeyUi.application.galaxy;
 
 import java.io.File;
 import java.io.IOException;
