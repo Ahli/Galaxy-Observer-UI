@@ -16,6 +16,10 @@ import org.xml.sax.SAXException;
 
 import com.ahli.hotkeyUi.application.controller.MenuBarController;
 import com.ahli.hotkeyUi.application.controller.TabsController;
+import com.ahli.hotkeyUi.application.galaxy.ComponentsListReader;
+import com.ahli.hotkeyUi.application.galaxy.DescIndexData;
+import com.ahli.hotkeyUi.application.galaxy.DescIndexReader;
+import com.ahli.hotkeyUi.application.galaxy.ext.LayoutExtensionReader;
 import com.ahli.hotkeyUi.application.i18n.Messages;
 import com.ahli.hotkeyUi.application.model.ValueDef;
 import com.ahli.hotkeyUi.application.ui.ShowToUserException;
@@ -46,6 +50,7 @@ import javafx.scene.layout.BorderPane;
  *
  */
 public class Main extends Application {
+	long appStartTime = System.nanoTime();
 	static Logger LOGGER = LogManager.getLogger("Main"); //$NON-NLS-1$
 
 	public final static String VERSION = "alpha";
@@ -69,8 +74,11 @@ public class Main extends Application {
 	public void start(Stage primaryStage) {
 		try {
 			Thread.currentThread().setName("UI"); //$NON-NLS-1$
+			LOGGER.warn("start function called after " + (System.nanoTime() - appStartTime) / 1000000 + "ms.");
 			this.primaryStage = primaryStage;
-			primaryStage.setMaximized(true);
+			long time = System.nanoTime();
+			primaryStage.show();
+			LOGGER.warn("showing primary stage within " + (System.nanoTime() - time) / 1000000 + "ms.");
 
 			setUserAgentStylesheet(STYLESHEET_MODENA);
 
@@ -78,15 +86,20 @@ public class Main extends Application {
 			// settings
 			this.primaryStage.getIcons().add(new Image(Main.class.getResourceAsStream("/res/ahliLogo.png"))); //$NON-NLS-1$
 
+			time = System.nanoTime();
 			initRootLayout();
+			LOGGER.warn("initialized root layout within " + (System.nanoTime() - time) / 1000000 + "ms.");
 
 			// Load Tab layout from fxml file
+			time = System.nanoTime();
 			FXMLLoader loader = new FXMLLoader();
 			loader.setResources(Messages.getBundle());
 			TabPane tabPane = (TabPane) loader.load(Main.class.getResourceAsStream("view/TabsLayout.fxml")); //$NON-NLS-1$
+			LOGGER.warn("initialized tab layout within " + (System.nanoTime() - time) / 1000000 + "ms.");
 			rootLayout.setCenter(tabPane);
 			tabsCtrl = loader.getController();
 			tabsCtrl.setMainApp(this);
+			primaryStage.setMaximized(true);
 
 			// ask to save on close
 			primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
@@ -98,7 +111,8 @@ public class Main extends Application {
 
 			initPaths();
 			initMpqInterface(mpqi);
-			
+
+			LOGGER.warn("finished app initialization after " + (System.nanoTime() - appStartTime) / 1000000 + "ms.");
 		} catch (Exception e) {
 			LOGGER.error("App Error: " + ExceptionUtils.getStackTrace(e), e); //$NON-NLS-1$
 			e.printStackTrace();
@@ -187,7 +201,7 @@ public class Main extends Application {
 		new Thread() {
 			public void run() {
 				this.setName(this.getName().replaceFirst("Thread", "Open")); //$NON-NLS-1$
-
+				long time = System.nanoTime();
 				if (f != null) {
 					try {
 						mpqi.extractEntireMPQ(f.getAbsolutePath());
@@ -254,6 +268,7 @@ public class Main extends Application {
 				} else {
 					LOGGER.trace("File to open was null, most likely due to 'cancel'."); //$NON-NLS-1$
 				}
+				LOGGER.warn("opened mpq within " + (System.nanoTime() - time) / 1000000 + "ms.");
 			}
 		}.start();
 	}
@@ -293,22 +308,34 @@ public class Main extends Application {
 	 */
 	public void initRootLayout() throws IOException {
 		// Load root layout from fxml file.
+		long time = System.nanoTime();
 		FXMLLoader loader = new FXMLLoader();
 		loader.setResources(Messages.getBundle());
 		rootLayout = (BorderPane) loader.load(Main.class.getResourceAsStream("view/RootLayout.fxml")); //$NON-NLS-1$
+		LOGGER.trace("initialized root layout fxml within " + (System.nanoTime() - time) / 1000000 + "ms.");
 
 		// get Controller
+		time = System.nanoTime();
 		mbarCtrl = loader.getController();
 		mbarCtrl.setMainApp(this);
+		LOGGER.trace("received root layout controller within " + (System.nanoTime() - time) / 1000000 + "ms.");
 
 		// Show the scene containing the root layout.
 		Scene scene = new Scene(rootLayout);
+		time = System.nanoTime();
 		scene.getStylesheets().add(Main.class.getResource("view/application.css").toExternalForm()); //$NON-NLS-1$
-		primaryStage.setScene(scene);
-		primaryStage.show();
-
+		LOGGER.trace("initialized root layout css within " + (System.nanoTime() - time) / 1000000 + "ms.");
+		time = System.nanoTime();
 		primaryStage.setTitle(Messages.getString("Main.observerUiSettingsEditorTitle")); //$NON-NLS-1$
+		primaryStage.setScene(scene);
+		LOGGER.trace("executed root layout setScene+title within " + (System.nanoTime() - time) / 1000000 + "ms.");
+		time = System.nanoTime();
+		primaryStage.show();
+		LOGGER.trace("executed root layout stage.show() within " + (System.nanoTime() - time) / 1000000 + "ms.");
+
+		time = System.nanoTime();
 		updateMenuBar();
+		LOGGER.trace("updateMenuBar within " + (System.nanoTime() - time) / 1000000 + "ms.");
 	}
 
 	/**
@@ -327,6 +354,7 @@ public class Main extends Application {
 		new Thread() {
 			public void run() {
 				this.setName(this.getName().replaceFirst("Thread", "Save")); //$NON-NLS-1$
+				long time = System.nanoTime();
 
 				// cannot save, if not valid
 				if (!isValidOpenedDocPath()) {
@@ -344,6 +372,7 @@ public class Main extends Application {
 					e.printStackTrace();
 					showErrorAlert(e);
 				}
+				LOGGER.warn("opened mpq within " + (System.nanoTime() - time) / 1000000 + "ms.");
 			}
 		}.start();
 	}

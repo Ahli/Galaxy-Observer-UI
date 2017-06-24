@@ -1,4 +1,4 @@
-package com.ahli.hotkeyUi.application;
+package com.ahli.hotkeyUi.application.galaxy.ext;
 
 import java.io.File;
 import java.io.FileInputStream;

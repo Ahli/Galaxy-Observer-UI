@@ -4,7 +4,6 @@ import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import com.ahli.hotkeyUi.application.LayoutReader;
 import com.ahli.hotkeyUi.application.i18n.Messages;
 
 import javafx.scene.control.Alert;
@@ -16,7 +15,6 @@ import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
-import javafx.scene.layout.Region;
 import javafx.stage.Window;
 
 /**
@@ -26,7 +24,7 @@ import javafx.stage.Window;
  */
 public class Alerts {
 	static Logger LOGGER = LogManager.getLogger("Alerts");
-	
+
 	/**
 	 * 
 	 * @param owner
@@ -36,6 +34,7 @@ public class Alerts {
 	 * @return
 	 */
 	public static Alert buildYesNoCancelAlert(Window owner, String title, String header, String content) {
+		long time = System.nanoTime();
 		ButtonType yesButton = new ButtonType(Messages.getString("General.YesButton"), ButtonData.YES); //$NON-NLS-1$
 		ButtonType noButton = new ButtonType(Messages.getString("General.NoButton"), ButtonData.NO); //$NON-NLS-1$
 		ButtonType cancelButton = new ButtonType(Messages.getString("General.NoButton"), ButtonData.CANCEL_CLOSE); // $NON-NLS-1$
@@ -43,6 +42,7 @@ public class Alerts {
 		alert.initOwner(owner);
 		alert.setTitle(title);
 		alert.setHeaderText(header);
+		LOGGER.warn("created yesNoCancelAlert within " + (System.nanoTime() - time) / 1000000 + "ms.");
 		return alert;
 	}
 
@@ -55,11 +55,13 @@ public class Alerts {
 	 * @return
 	 */
 	public static Alert buildErrorAlert(Window owner, String title, String header, String content) {
+		long time = System.nanoTime();
 		ButtonType okButton = new ButtonType(Messages.getString("General.OkButton"), ButtonData.YES); //$NON-NLS-1$
 		Alert alert = new Alert(AlertType.ERROR, content, okButton);
 		alert.initOwner(owner);
 		alert.setTitle(title);
 		alert.setHeaderText(header);
+		LOGGER.warn("created errorAlert within " + (System.nanoTime() - time) / 1000000 + "ms.");
 		return alert;
 	}
 
@@ -73,6 +75,7 @@ public class Alerts {
 	 * @return
 	 */
 	public static Alert buildAboutAlert(Window owner, String title, String header, String content, String imageUrl) {
+		long time = System.nanoTime();
 		ButtonType okButton = new ButtonType(Messages.getString("General.OkButton"), ButtonData.OK_DONE); //$NON-NLS-1$
 		Alert alert = new Alert(AlertType.INFORMATION, content, okButton);
 		alert.initOwner(owner);
@@ -82,6 +85,7 @@ public class Alerts {
 			alert.setGraphic(new ImageView(imageUrl));
 		}
 		alert.getDialogPane().setPrefSize(480, 360);
+		LOGGER.warn("initialized about-alert within " + (System.nanoTime() - time) / 1000000 + "ms.");
 		return alert;
 	}
 
@@ -92,6 +96,7 @@ public class Alerts {
 	 * @return
 	 */
 	public static Alert buildExceptionAlert(Window owner, Exception e) {
+		long time = System.nanoTime();
 		ButtonType okButton = new ButtonType(Messages.getString("General.OkButton"), ButtonData.OK_DONE); //$NON-NLS-1$
 		String localizedMsg = e.getLocalizedMessage();
 		Alert alert = new Alert(AlertType.ERROR, localizedMsg, okButton);
@@ -116,6 +121,7 @@ public class Alerts {
 
 		// Set expandable Exception into the dialog pane.
 		alert.getDialogPane().setExpandableContent(expContent);
+		LOGGER.warn("created exceptionAlert within " + (System.nanoTime() - time) / 1000000 + "ms.");
 
 		return alert;
 	}
