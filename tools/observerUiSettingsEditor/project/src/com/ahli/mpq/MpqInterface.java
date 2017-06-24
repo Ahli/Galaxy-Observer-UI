@@ -476,12 +476,13 @@ public class MpqInterface {
 	public boolean isHeroesNamespace() throws MpqException {
 		File f = new File(mpqCachePath + File.separator + "ComponentList.StormComponents"); //$NON-NLS-1$
 		if (!f.exists() || f.isDirectory()) {
+			LOGGER.debug("file not found in archive: " + f.getAbsolutePath());
 			f = new File(mpqCachePath + File.separator + "ComponentList.SC2Components"); //$NON-NLS-1$
 			if (!f.exists() || f.isDirectory()) {
-				return false;
+				LOGGER.error("ERROR: archive has no ComponentList file."); //$NON-NLS-1$
+				throw new MpqException("ERROR: Cannot identify if file belongs to Heroes or SC2."); //$NON-NLS-1$
 			}
-			LOGGER.error("ERROR: archive has no ComponentList file."); //$NON-NLS-1$
-			throw new MpqException("ERROR: Cannot identify if file belongs to Heroes or SC2."); //$NON-NLS-1$
+			return false;
 		}
 		return true;
 	}
