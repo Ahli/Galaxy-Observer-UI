@@ -31,9 +31,6 @@ import org.apache.commons.io.FileUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import com.sun.org.apache.xerces.internal.impl.io.MalformedByteSequenceException;
-
-@SuppressWarnings("restriction")
 public class XmlCompressor {
 	static Logger LOGGER = LogManager.getLogger(XmlCompressor.class);
 
@@ -90,7 +87,7 @@ public class XmlCompressor {
 				is = new FileInputStream(curFile);
 				doc = dBuilder.parse(is);
 
-			} catch (SAXParseException | MalformedByteSequenceException e) {
+			} catch (SAXParseException | IOException e) {
 				// couldn't parse, most likely no XML file
 				if (is != null) {
 					is.close();

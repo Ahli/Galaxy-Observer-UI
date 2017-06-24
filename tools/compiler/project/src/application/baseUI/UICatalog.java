@@ -19,8 +19,6 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
-import com.sun.org.apache.xerces.internal.impl.io.MalformedByteSequenceException;
-
 import application.DescIndexReader;
 
 /**
@@ -28,7 +26,6 @@ import application.DescIndexReader;
  * @author Ahli
  *
  */
-@SuppressWarnings("restriction")
 public class UICatalog {
 	private final static Logger LOGGER = LogManager.getLogger(UICatalog.class);
 
@@ -107,7 +104,7 @@ public class UICatalog {
 				parse(nodes, null, f.getName().substring(0, f.getName().lastIndexOf('.')));
 				LOGGER.debug("Finished parsing file.");
 			}
-		} catch (SAXParseException | MalformedByteSequenceException e) {
+		} catch (SAXParseException | IOException e) {
 			LOGGER.error("Failed to parse file: " + f, e);
 			// couldn't parse, most likely no XML file
 			// -> do nothing
