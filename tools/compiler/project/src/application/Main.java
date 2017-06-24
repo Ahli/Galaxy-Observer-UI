@@ -84,24 +84,6 @@ public class Main extends Application {
 		LOGGER.trace("Configuration File of System: " + System.getProperty("log4j.configurationFile"));
 		LOGGER.info("Launch arguments: " + Arrays.toString(args));
 
-		// // LOGGING BENCH START
-		// // Source:
-		// //
-		// http://stackoverflow.com/questions/30338034/log4j2-sync-loggers-faster-than-mixed-async-sync-loggers
-		// long start = System.currentTimeMillis();
-		// int nbLogMessages = 200000;
-		// for (int i = 0; i < nbLogMessages; i++) {
-		// LOGGER.info("Log Message " + i);
-		// }
-		// long elapsed = System.currentTimeMillis() - start;
-		// String out = "Elapsed " + elapsed + "ms " + (nbLogMessages * 1000L /
-		// elapsed) + "logs/sec.";
-		// LOGGER.info(out);
-		// if (true) {
-		// System.exit(0);
-		// }
-		// // LOGGING BENCH END
-
 		launch(args);
 	}
 
@@ -289,9 +271,9 @@ public class Main extends Application {
 		primaryStage.setScene(scene);
 		primaryStage.show();
 		primaryStage.setTitle("Compiling Interfaces...");
-		try{
+		try {
 			primaryStage.getIcons().add(new Image(Main.class.getResourceAsStream("/res/ahli.png")));
-		} catch(Exception e){
+		} catch (Exception e) {
 			LOGGER.error("Failed to load ahli.png");
 		}
 	}

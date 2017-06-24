@@ -5,15 +5,30 @@
 	<artifactId>ObserverUiSettingsEditor</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<packaging>jar</packaging>
-	
+
+
+
+
+	<!-- QUICK SETTINGS -->
+	<properties>
+		<jarName>Observer UI Settings Editor App</jarName>
+		<executableJavaClass>com.ahli.hotkeyUi.application.Main</executableJavaClass>
+		<jarTargetPath>../../release/Observer UI Settings Editor</jarTargetPath>
+	</properties>
+
+
+
+
+
+
 	<!-- deprecated by enforcer plugin, but might be read by plugins -->
 	<prerequisites>
-	  <maven>3</maven>
+		<maven>3.0</maven>
 	</prerequisites>
-	
+
 	<build>
 		<!-- name of the generated jar -->
-		<finalName>Observer UI Settings Editor App</finalName>
+		<finalName>${jarName}</finalName>
 		<sourceDirectory>src</sourceDirectory>
 		<resources>
 			<!-- copy res folder to res folder in jar -->
@@ -54,12 +69,12 @@
 					<artifactId>maven-release-plugin</artifactId>
 					<version>2.5.3</version>
 				</plugin>
-				
+
 				<!-- https://mvnrepository.com/artifact/org.codehaus.mojo/versions-maven-plugin -->
 				<plugin>
-				    <groupId>org.codehaus.mojo</groupId>
-				    <artifactId>versions-maven-plugin</artifactId>
-				    <version>2.4</version>
+					<groupId>org.codehaus.mojo</groupId>
+					<artifactId>versions-maven-plugin</artifactId>
+					<version>2.4</version>
 				</plugin>
 			</plugins>
 		</pluginManagement>
@@ -69,26 +84,26 @@
 		<plugins>
 			<!-- Force requirement of Maven version 3.0+ -->
 			<plugin>
-			  <groupId>org.apache.maven.plugins</groupId>
-			  <artifactId>maven-enforcer-plugin</artifactId>
-			  <version>1.4.1</version>
-			  <executions>
-			    <execution>
-			      <id>enforce-maven</id>
-			      <goals>
-			        <goal>enforce</goal>
-			      </goals>
-			      <configuration>
-			        <rules>
-			          <requireMavenVersion>
-			            <version>[3.0,)</version>
-			          </requireMavenVersion>
-			        </rules>    
-			      </configuration>
-			    </execution>
-			  </executions>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-enforcer-plugin</artifactId>
+				<version>1.4.1</version>
+				<executions>
+					<execution>
+						<id>enforce-maven</id>
+						<goals>
+							<goal>enforce</goal>
+						</goals>
+						<configuration>
+							<rules>
+								<requireMavenVersion>
+									<version>[3.0,)</version>
+								</requireMavenVersion>
+							</rules>
+						</configuration>
+					</execution>
+				</executions>
 			</plugin>
-		
+
 			<plugin>
 				<artifactId>maven-compiler-plugin</artifactId>
 				<version>3.6.1</version>
@@ -175,6 +190,47 @@
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-shade-plugin</artifactId>
 				<version>3.0.0</version>
+				<configuration>
+					<!-- stops generating a new pom.xml (minus its dependencies) in the 
+						project that doesn't seem to be used -->
+					<createDependencyReducedPom>false</createDependencyReducedPom>
+					<!-- minimizeJar = remove unused classes -->
+					<minimizeJar>true</minimizeJar>
+					<filters>
+						<filter>
+							<!-- do for every artifact -->
+							<artifact>*:*</artifact>
+							<excludes>
+								<!-- Removes META-INF/maven/ directory from generated jar -->
+								<exclude>META-INF/maven/**</exclude>
+							</excludes>
+						</filter>
+						<filter>
+							<artifact>org.apache.logging.log4j:*</artifact>
+							<includes>
+								<include>org.apache.commons.logging.impl.LogFactoryImpl</include>
+								<include>org/apache/logging/**</include>
+
+								<!-- <include>Log4j-*.xsd</include> -->
+								<!-- <include>Log4j-*.dtd</include> -->
+								<include>META-INF/**</include>
+								<!-- <include>**</include> -->
+							</includes>
+						</filter>
+						<filter>
+							<artifact>com.lmax:disruptor</artifact>
+							<includes>
+								<include>**</include>
+							</includes>
+						</filter>
+					</filters>
+					<transformers>
+						<transformer
+							implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+							<mainClass>${executableJavaClass}</mainClass>
+						</transformer>
+					</transformers>
+				</configuration>
 				<executions>
 					<execution>
 						<phase>package</phase>
@@ -182,26 +238,9 @@
 							<goal>shade</goal>
 						</goals>
 						<configuration>
-							<!-- stops generating a new pom.xml (minus its dependencies) in the 
-								project that doesn't seem to be used -->
-							<createDependencyReducedPom>false</createDependencyReducedPom>
-							<!-- minimizeJar = remove unused classes -->
-							<minimizeJar>true</minimizeJar>
-							<filters>
-								<filter>
-									<artifact>*:*</artifact>
-									<excludes>
-										<!-- Remove META-INF/maven/ directory from generated jar -->
-										<exclude>META-INF/maven/**</exclude>
-									</excludes>
-								</filter>
-							</filters>
-							<transformers>
-								<transformer
-									implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-									<mainClass>com.ahli.hotkeyUi.application.Main</mainClass>
-								</transformer>
-							</transformers>
+							<shadedArtifactAttached>true</shadedArtifactAttached>
+							<finalName>${jarName}</finalName>
+							<outputFile>${project.build.directory}/${jarTargetPath}/${jarName}.jar</outputFile>
 						</configuration>
 					</execution>
 				</executions>

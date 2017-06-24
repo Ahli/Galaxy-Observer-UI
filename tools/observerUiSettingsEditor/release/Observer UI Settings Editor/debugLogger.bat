@@ -2,10 +2,8 @@
 : Batch Script 
 : author: @AhliSC2
 
-java "-jar" "compile.jar"
+java -jar "Observer UI Settings Editor App.jar"
 
-: line breaks
 echo.
 echo.
-: keep window open
 pause
