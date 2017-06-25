@@ -4,6 +4,9 @@ import java.util.Locale;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 /**
  * Class to internationalize messages.
  * 
@@ -14,9 +17,13 @@ import java.util.ResourceBundle;
  *
  */
 public class Messages {
+	static Logger LOGGER = LogManager.getLogger("Messages"); //$NON-NLS-1$
+
 	private static final String BUNDLE_NAME = "com.ahli.hotkeyUi.application.i18n.messages"; //$NON-NLS-1$
 
 	private static ResourceBundle resourceBundle = ResourceBundle.getBundle(BUNDLE_NAME);
+
+	private static Locale usedLocale = Locale.getDefault();
 
 	private Messages() {
 	}
@@ -42,6 +49,7 @@ public class Messages {
 	 */
 	public static void setBundle(Locale loc) {
 		resourceBundle = ResourceBundle.getBundle(BUNDLE_NAME, loc);
+		usedLocale = loc;
 	}
 
 	/**
@@ -51,5 +59,27 @@ public class Messages {
 	 */
 	public static ResourceBundle getBundle() {
 		return resourceBundle;
+	}
+
+	/**
+	 * Returns the Locale that was used to get the bundle in effect.
+	 * 
+	 * @return
+	 */
+	public static Locale getUsedLocale() {
+		return usedLocale;
+	}
+
+	/**
+	 * Checks if the Locale's resource bundle is the one used.
+	 * 
+	 * @param locale
+	 * @return
+	 */
+	public static boolean checkIfTargetResourceIsUsed(Locale locale) {
+		boolean result = resourceBundle.equals(ResourceBundle.getBundle(BUNDLE_NAME, locale));
+		LOGGER.trace("compare used locale's resource '" + usedLocale + "' with one for locale '" + locale
+				+ "', result: " + result);
+		return result;
 	}
 }
