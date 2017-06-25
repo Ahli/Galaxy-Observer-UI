@@ -1,5 +1,6 @@
 package com.ahli.hotkeyUi.application;
 
+import java.awt.SplashScreen;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -30,13 +31,16 @@ import com.ahli.mpq.MpqException;
 import com.ahli.mpq.MpqInterface;
 import com.ahli.util.JarHelper;
 
+import javafx.animation.FadeTransition;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 import javafx.stage.WindowEvent;
+import javafx.util.Duration;
 import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
@@ -79,9 +83,8 @@ public class Main extends Application {
 			Thread.currentThread().setName("UI"); //$NON-NLS-1$
 			LOGGER.warn("start function called after " + (System.nanoTime() - appStartTime) / 1000000 + "ms.");
 			this.primaryStage = primaryStage;
-			long time = System.nanoTime();
-			primaryStage.show();
-			LOGGER.warn("showing primary stage within " + (System.nanoTime() - time) / 1000000 + "ms.");
+			this.primaryStage.setMaximized(true);
+			this.primaryStage.setOpacity(0);
 
 			setUserAgentStylesheet(STYLESHEET_MODENA);
 
@@ -89,7 +92,7 @@ public class Main extends Application {
 			// settings
 			this.primaryStage.getIcons().add(new Image(Main.class.getResourceAsStream("/res/ahliLogo.png"))); //$NON-NLS-1$
 
-			time = System.nanoTime();
+			long time = System.nanoTime();
 			initRootLayout();
 			LOGGER.warn("initialized root layout within " + (System.nanoTime() - time) / 1000000 + "ms.");
 
@@ -116,10 +119,9 @@ public class Main extends Application {
 			rootLayout.setCenter(tabPane);
 			tabsCtrl = loader.getController();
 			tabsCtrl.setMainApp(this);
-			primaryStage.setMaximized(true);
 
 			// ask to save on close
-			primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
+			this.primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
 				@Override
 				public void handle(WindowEvent event) {
 					askToSaveUnsavedChanges();
@@ -129,11 +131,35 @@ public class Main extends Application {
 			initPaths();
 			initMpqInterface(mpqi);
 
+			// Fade animation
+			FadeTransition ft = new FadeTransition(Duration.millis(750), rootLayout);
+			ft.setFromValue(0);
+			ft.setToValue(1.0);
+			ft.play();
+
+			time = System.nanoTime();
+			this.primaryStage.show();
+			this.primaryStage.setOpacity(1);
+			LOGGER.warn("executed root layout stage.show() within " + (System.nanoTime() - time) / 1000000 + "ms.");
+
+			// hide apps splash screen image
+			Platform.runLater(new Runnable() {
+				@Override
+				public void run() {
+					final SplashScreen splash = SplashScreen.getSplashScreen();
+					if (splash != null) {
+						splash.close();
+					}
+				}
+			});
+
 			LOGGER.warn("finished app initialization after " + (System.nanoTime() - appStartTime) / 1000000 + "ms.");
 		} catch (Exception e) {
 			LOGGER.error("App Error: " + ExceptionUtils.getStackTrace(e), e); //$NON-NLS-1$
 			e.printStackTrace();
-			Alerts.buildExceptionAlert(primaryStage, e).showAndWait();
+			this.primaryStage.setOpacity(1);
+			Alerts.buildExceptionAlert(this.primaryStage, e).showAndWait();
+			closeApp();
 		}
 	}
 
@@ -370,9 +396,6 @@ public class Main extends Application {
 		primaryStage.setTitle(Messages.getString("Main.observerUiSettingsEditorTitle")); //$NON-NLS-1$
 		primaryStage.setScene(scene);
 		LOGGER.warn("executed root layout setScene+title within " + (System.nanoTime() - time) / 1000000 + "ms.");
-		time = System.nanoTime();
-		primaryStage.show();
-		LOGGER.warn("executed root layout stage.show() within " + (System.nanoTime() - time) / 1000000 + "ms.");
 
 		time = System.nanoTime();
 		updateMenuBar();
