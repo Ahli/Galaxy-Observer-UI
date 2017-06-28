@@ -1,9 +1,12 @@
 package com.ahli.hotkeyUi.application;
 
+import java.awt.SplashScreen;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Locale;
 import java.util.Optional;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -28,13 +31,16 @@ import com.ahli.mpq.MpqException;
 import com.ahli.mpq.MpqInterface;
 import com.ahli.util.JarHelper;
 
+import javafx.animation.FadeTransition;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 import javafx.stage.WindowEvent;
+import javafx.util.Duration;
 import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
@@ -42,6 +48,7 @@ import javafx.scene.control.TabPane;
 import javafx.scene.control.ButtonType;
 import javafx.scene.image.Image;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.text.Font;
 
 /**
  * Application
@@ -76,9 +83,8 @@ public class Main extends Application {
 			Thread.currentThread().setName("UI"); //$NON-NLS-1$
 			LOGGER.warn("start function called after " + (System.nanoTime() - appStartTime) / 1000000 + "ms.");
 			this.primaryStage = primaryStage;
-			long time = System.nanoTime();
-			primaryStage.show();
-			LOGGER.warn("showing primary stage within " + (System.nanoTime() - time) / 1000000 + "ms.");
+			this.primaryStage.setMaximized(true);
+			this.primaryStage.setOpacity(0);
 
 			setUserAgentStylesheet(STYLESHEET_MODENA);
 
@@ -86,7 +92,7 @@ public class Main extends Application {
 			// settings
 			this.primaryStage.getIcons().add(new Image(Main.class.getResourceAsStream("/res/ahliLogo.png"))); //$NON-NLS-1$
 
-			time = System.nanoTime();
+			long time = System.nanoTime();
 			initRootLayout();
 			LOGGER.warn("initialized root layout within " + (System.nanoTime() - time) / 1000000 + "ms.");
 
@@ -94,15 +100,28 @@ public class Main extends Application {
 			time = System.nanoTime();
 			FXMLLoader loader = new FXMLLoader();
 			loader.setResources(Messages.getBundle());
-			TabPane tabPane = (TabPane) loader.load(Main.class.getResourceAsStream("view/TabsLayout.fxml")); //$NON-NLS-1$
+
+			TabPane tabPane = null;
+			InputStream is = null;
+			try {
+				is = Main.class.getResourceAsStream("view/TabsLayout.fxml");
+				tabPane = (TabPane) loader.load(is); // $NON-NLS-1$
+			} finally {
+				try {
+					if (is != null) {
+						is.close();
+					}
+				} catch (IOException e) {
+				}
+			}
+
 			LOGGER.warn("initialized tab layout within " + (System.nanoTime() - time) / 1000000 + "ms.");
 			rootLayout.setCenter(tabPane);
 			tabsCtrl = loader.getController();
 			tabsCtrl.setMainApp(this);
-			primaryStage.setMaximized(true);
 
 			// ask to save on close
-			primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
+			this.primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
 				@Override
 				public void handle(WindowEvent event) {
 					askToSaveUnsavedChanges();
@@ -112,11 +131,35 @@ public class Main extends Application {
 			initPaths();
 			initMpqInterface(mpqi);
 
+			// Fade animation
+			FadeTransition ft = new FadeTransition(Duration.millis(750), rootLayout);
+			ft.setFromValue(0);
+			ft.setToValue(1.0);
+			ft.play();
+
+			time = System.nanoTime();
+			this.primaryStage.show();
+			this.primaryStage.setOpacity(1);
+			LOGGER.warn("executed root layout stage.show() within " + (System.nanoTime() - time) / 1000000 + "ms.");
+
+			// hide apps splash screen image
+			Platform.runLater(new Runnable() {
+				@Override
+				public void run() {
+					final SplashScreen splash = SplashScreen.getSplashScreen();
+					if (splash != null) {
+						splash.close();
+					}
+				}
+			});
+
 			LOGGER.warn("finished app initialization after " + (System.nanoTime() - appStartTime) / 1000000 + "ms.");
 		} catch (Exception e) {
 			LOGGER.error("App Error: " + ExceptionUtils.getStackTrace(e), e); //$NON-NLS-1$
 			e.printStackTrace();
-			Alerts.buildExceptionAlert(primaryStage, e).showAndWait();
+			this.primaryStage.setOpacity(1);
+			Alerts.buildExceptionAlert(this.primaryStage, e).showAndWait();
+			closeApp();
 		}
 	}
 
@@ -311,31 +354,52 @@ public class Main extends Application {
 		long time = System.nanoTime();
 		FXMLLoader loader = new FXMLLoader();
 		loader.setResources(Messages.getBundle());
-		rootLayout = (BorderPane) loader.load(Main.class.getResourceAsStream("view/RootLayout.fxml")); //$NON-NLS-1$
-		LOGGER.trace("initialized root layout fxml within " + (System.nanoTime() - time) / 1000000 + "ms.");
+		InputStream is = null;
+		try {
+			is = Main.class.getResourceAsStream("view/RootLayout.fxml");
+			rootLayout = (BorderPane) loader.load(is); // $NON-NLS-1$
+		} finally {
+			try {
+				if (is != null) {
+					is.close();
+				}
+			} catch (IOException e) {
+			}
+		}
+		LOGGER.warn("initialized root layout fxml within " + (System.nanoTime() - time) / 1000000 + "ms.");
 
 		// get Controller
 		time = System.nanoTime();
 		mbarCtrl = loader.getController();
 		mbarCtrl.setMainApp(this);
-		LOGGER.trace("received root layout controller within " + (System.nanoTime() - time) / 1000000 + "ms.");
+		LOGGER.warn("received root layout controller within " + (System.nanoTime() - time) / 1000000 + "ms.");
 
 		// Show the scene containing the root layout.
 		Scene scene = new Scene(rootLayout);
 		time = System.nanoTime();
 		scene.getStylesheets().add(Main.class.getResource("view/application.css").toExternalForm()); //$NON-NLS-1$
-		LOGGER.trace("initialized root layout css within " + (System.nanoTime() - time) / 1000000 + "ms.");
+
+		LOGGER.debug("installed font families: " + Font.getFamilies());
+		LOGGER.trace("Locale dflt is '" + Locale.getDefault() + "'"); //$NON-NLS-1$
+		LOGGER.trace("Locale of Messages.class is '" + Messages.getBundle().getLocale() + "'"); //$NON-NLS-1$
+		LOGGER.trace("Locale china: " + Locale.SIMPLIFIED_CHINESE); //$NON-NLS-1$
+		if (Messages.checkIfTargetResourceIsUsed(Locale.CHINA)) {
+			LOGGER.trace("apply Chinese css"); //$NON-NLS-1$
+
+			scene.getStylesheets().add(Main.class.getResource("i18n/china.css").toExternalForm());
+			// //$NON-NLS-1$
+
+		}
+		LOGGER.warn("initialized root layout css within " + (System.nanoTime() - time) / 1000000 + "ms.");
+
 		time = System.nanoTime();
 		primaryStage.setTitle(Messages.getString("Main.observerUiSettingsEditorTitle")); //$NON-NLS-1$
 		primaryStage.setScene(scene);
-		LOGGER.trace("executed root layout setScene+title within " + (System.nanoTime() - time) / 1000000 + "ms.");
-		time = System.nanoTime();
-		primaryStage.show();
-		LOGGER.trace("executed root layout stage.show() within " + (System.nanoTime() - time) / 1000000 + "ms.");
+		LOGGER.warn("executed root layout setScene+title within " + (System.nanoTime() - time) / 1000000 + "ms.");
 
 		time = System.nanoTime();
 		updateMenuBar();
-		LOGGER.trace("updateMenuBar within " + (System.nanoTime() - time) / 1000000 + "ms.");
+		LOGGER.warn("updateMenuBar within " + (System.nanoTime() - time) / 1000000 + "ms.");
 	}
 
 	/**
