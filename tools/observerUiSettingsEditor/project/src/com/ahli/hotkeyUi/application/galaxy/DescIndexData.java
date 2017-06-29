@@ -45,11 +45,11 @@ public class DescIndexData {
 
 	public void addLayoutIntPath(String intPath) {
 		String intPath2 = intPath;
-		File f = mpqi.getCachedFile(intPath);
+		File f = mpqi.getFileFromMpq(intPath);
 		if (!f.exists()) {
 			// add base folder to the path
 			intPath2 = (main.isHeroesFile() ? "Base.StormData" : "Base.SC2Data") + "/" + intPath;
-			f = mpqi.getCachedFile(intPath2);
+			f = mpqi.getFileFromMpq(intPath2);
 		}
 		if (!f.exists()) {
 			return;

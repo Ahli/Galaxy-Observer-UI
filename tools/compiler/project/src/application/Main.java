@@ -24,6 +24,12 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.xml.sax.SAXException;
 
+import com.ahli.galaxy.ComponentsListReader;
+import com.ahli.galaxy.DescIndexData;
+import com.ahli.galaxy.DescIndexReader;
+import com.ahli.mpq.MpqEditorInterface;
+import com.ahli.mpq.MpqException;
+
 import application.integration.SettingsInterface;
 import application.util.logger.log4j2plugin.TextAreaAppender;
 import javafx.animation.PauseTransition;
@@ -44,7 +50,7 @@ import javafx.scene.layout.BorderPane;
 public class Main extends Application {
 	static Logger LOGGER = LogManager.getLogger(Main.class);
 
-	private MpqInterface baseMpqInterface = null;
+	private MpqEditorInterface baseMpqInterface = null;
 	private SettingsInterface settings = new SettingsInterface();
 	private boolean namespaceHeroes = true;
 	private String documentsPath = new JFileChooser().getFileSystemView().getDefaultDirectory().toString();
@@ -117,7 +123,7 @@ public class Main extends Application {
 		}
 
 		// init MPQ stuff
-		baseMpqInterface = new MpqInterface();
+		baseMpqInterface = new MpqEditorInterface();
 		initMpqInterface(baseMpqInterface);
 
 		// // TEST DefaultUICatalog
@@ -518,7 +524,7 @@ public class Main extends Application {
 			final int threadID = getUnusedThreadID();
 
 			// create unique cache path
-			final MpqInterface threadsMpqInterface = (MpqInterface) baseMpqInterface.clone();
+			final MpqEditorInterface threadsMpqInterface = (MpqEditorInterface) baseMpqInterface.clone();
 			threadsMpqInterface.setMpqCachePath(baseMpqInterface.getMpqCachePath() + threadID);
 
 			Thread buildThread = new Thread() {
@@ -568,7 +574,7 @@ public class Main extends Application {
 	 *            MpqInterface with unique cache path
 	 * @throws IOException
 	 */
-	private void buildFile(File file, boolean isHeroes, MpqInterface mpqi) throws IOException {
+	private void buildFile(File file, boolean isHeroes, MpqEditorInterface mpqi) throws IOException {
 		String buildPath = documentsPath + File.separator;
 
 		LOGGER.info("Starting to build file: " + file.getPath());
@@ -652,7 +658,7 @@ public class Main extends Application {
 		File componentListFile = mpqi.getComponentListFile();
 		LOGGER.debug("retrieving descIndex - set path and clear");
 
-		DescIndexData descIndex = new DescIndexData(this, mpqi);
+		DescIndexData descIndex = new DescIndexData(mpqi);
 
 		try {
 			descIndex.setDescIndexPathAndClear(ComponentsListReader.getDescIndexPath(componentListFile));
@@ -663,11 +669,11 @@ public class Main extends Application {
 		}
 
 		LOGGER.debug("retrieving descIndex - get cached file");
-		File descIndexFile = mpqi.getCachedFile(descIndex.getDescIndexIntPath());
+		File descIndexFile = mpqi.getFileFromMpq(descIndex.getDescIndexIntPath());
 		LOGGER.debug("adding layouts from descIndexFile: " + descIndexFile.getAbsolutePath());
 		try {
 			descIndex.addLayoutIntPath(DescIndexReader.getLayoutPathList(descIndexFile, false));
-		} catch (SAXException | ParserConfigurationException | IOException e) {
+		} catch (SAXException | ParserConfigurationException | IOException | MpqException e) {
 			String msg = "unable to read Layout paths";
 			LOGGER.error(msg);
 			reportErrorEncounter();
@@ -724,7 +730,7 @@ public class Main extends Application {
 	 * 
 	 * @param mpqi
 	 */
-	private void initMpqInterface(MpqInterface mpqi) {
+	private void initMpqInterface(MpqEditorInterface mpqi) {
 
 		mpqi.setMpqEditorPath(basePath.getParent() + File.separator + "tools" + File.separator + "plugins"
 				+ File.separator + "mpq" + File.separator + "MPQEditor.exe");
@@ -763,12 +769,12 @@ public class Main extends Application {
 		try {
 			// manage order of layout files in DescIndex
 			descIndex.orderLayoutFiles();
+			descIndex.persistDescIndexFile();
 		} catch (ParserConfigurationException | SAXException | IOException e) {
 			e.printStackTrace();
 			reportErrorEncounter();
 			LOGGER.error("encountered error while compiling", e);
 		}
-		descIndex.persistDescIndexFile();
 	}
 
 	/**
