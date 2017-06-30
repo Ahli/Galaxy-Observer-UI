@@ -1,4 +1,4 @@
-package com.ahli.hotkeyUi.application.ui.dialogs;
+package com.ahli.hotkeyUi.application.ui;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.logging.log4j.LogManager;

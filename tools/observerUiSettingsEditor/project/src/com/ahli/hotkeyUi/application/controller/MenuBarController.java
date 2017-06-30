@@ -2,7 +2,7 @@ package com.ahli.hotkeyUi.application.controller;
 
 import com.ahli.hotkeyUi.application.Main;
 import com.ahli.hotkeyUi.application.i18n.Messages;
-import com.ahli.hotkeyUi.application.ui.dialogs.Alerts;
+import com.ahli.hotkeyUi.application.ui.Alerts;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;

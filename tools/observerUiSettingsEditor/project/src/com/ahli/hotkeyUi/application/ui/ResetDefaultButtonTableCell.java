@@ -1,4 +1,4 @@
-package com.ahli.hotkeyUi.application;
+package com.ahli.hotkeyUi.application.ui;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;

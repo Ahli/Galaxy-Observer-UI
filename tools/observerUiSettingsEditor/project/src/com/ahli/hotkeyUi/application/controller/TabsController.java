@@ -4,9 +4,9 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.ahli.hotkeyUi.application.Main;
-import com.ahli.hotkeyUi.application.ResetDefaultButtonTableCell;
 import com.ahli.hotkeyUi.application.i18n.Messages;
 import com.ahli.hotkeyUi.application.model.ValueDef;
+import com.ahli.hotkeyUi.application.ui.ResetDefaultButtonTableCell;
 
 import javafx.application.Platform;
 import javafx.beans.property.SimpleBooleanProperty;
