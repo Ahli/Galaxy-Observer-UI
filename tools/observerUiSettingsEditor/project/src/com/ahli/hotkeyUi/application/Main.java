@@ -17,11 +17,11 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.xml.sax.SAXException;
 
+import com.ahli.galaxy.ComponentsListReader;
+import com.ahli.galaxy.DescIndexData;
+import com.ahli.galaxy.DescIndexReader;
 import com.ahli.hotkeyUi.application.controller.MenuBarController;
 import com.ahli.hotkeyUi.application.controller.TabsController;
-import com.ahli.hotkeyUi.application.galaxy.ComponentsListReader;
-import com.ahli.hotkeyUi.application.galaxy.DescIndexData;
-import com.ahli.hotkeyUi.application.galaxy.DescIndexReader;
 import com.ahli.hotkeyUi.application.galaxy.ext.LayoutExtensionReader;
 import com.ahli.hotkeyUi.application.i18n.Messages;
 import com.ahli.hotkeyUi.application.model.ValueDef;
@@ -68,7 +68,7 @@ public class Main extends Application {
 	private String openedDocPath = null;
 	private boolean isNamespaceHeroes = true;
 	private MpqEditorInterface mpqi = new MpqEditorInterface();
-	private DescIndexData descIndex = new DescIndexData(this, mpqi);
+	private DescIndexData descIndex = new DescIndexData(mpqi);
 	private File basePath = null;
 	private boolean hasUnsavedFileChanges = false;
 	private LayoutExtensionReader layoutExtReader;
