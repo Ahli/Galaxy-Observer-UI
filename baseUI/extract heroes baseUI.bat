@@ -64,11 +64,35 @@ echo echo | set /p=...clearing target directory...
 @RD /S /Q %DESTINATION%\mods
 echo 		OK.
 
-: Extract Files from CASC
+: Extract Files from CASC (parallel execution from: https://stackoverflow.com/questions/12577442/waiting-for-parallel-batch-scripts )
 echo echo | set /p=...EXTRACTING FILES...
-start /WAIT /MIN "" "%CASCPROGRAM%" *.StormLayout %DESTINATION% %LOCALE% None
-start /WAIT /MIN "" "%CASCPROGRAM%" *Assets.txt %DESTINATION% %LOCALE% None
-start /WAIT /MIN "" "%CASCPROGRAM%" *.StormStyle %DESTINATION% %LOCALE% None
+
+setlocal
+set "lock=%temp%\wait%random%.lock"
+:: Launch one and two asynchronously, with stream 9 redirected to a lock file.
+:: The lock file will remain locked until the script ends.
+ping -n 1 127.0.0.1 >nul
+start /MIN "Extracting Layouts" cmd /c 9>"%lock%1" "%CASCPROGRAM%" *.StormLayout %DESTINATION% %LOCALE% None
+ping -n 1 127.0.0.1 >nul
+start /MIN "Extracting Assets" cmd /c 9>"%lock%2" "%CASCPROGRAM%" *Assets.txt %DESTINATION% %LOCALE% None
+ping -n 1 127.0.0.1 >nul
+start /MIN "Extracting Styles" cmd /c 9>"%lock%3" "%CASCPROGRAM%" *.StormStyle %DESTINATION% %LOCALE% None
+ping -n 1 127.0.0.1 >nul
+::start /WAIT /MIN "" "%CASCPROGRAM%" *.StormLayout %DESTINATION% %LOCALE% None
+::start /WAIT /MIN "" "%CASCPROGRAM%" *Assets.txt %DESTINATION% %LOCALE% None
+::start /WAIT /MIN "" "%CASCPROGRAM%" *.StormStyle %DESTINATION% %LOCALE% None
+
+:: hack to wait 1 second to reduce chance that loop exits before all commands were started
+ping -n 1 127.0.0.1 >nul
+
+:Wait for all processes to finish (wait until lock files are no longer locked)
+1>nul 2>nul ping /n 2 ::1
+for %%F in ("%lock%*") do (
+  (call ) 9>"%%F" || goto :Wait
+) 2>nul
+::delete the lock files
+del "%lock%*"
+
 echo 	OK.
 
 : Reset Configuration File

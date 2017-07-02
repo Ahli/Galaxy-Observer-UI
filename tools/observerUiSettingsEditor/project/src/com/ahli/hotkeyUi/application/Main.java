@@ -17,18 +17,18 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.xml.sax.SAXException;
 
+import com.ahli.galaxy.ComponentsListReader;
+import com.ahli.galaxy.DescIndexData;
+import com.ahli.galaxy.DescIndexReader;
 import com.ahli.hotkeyUi.application.controller.MenuBarController;
 import com.ahli.hotkeyUi.application.controller.TabsController;
-import com.ahli.hotkeyUi.application.galaxy.ComponentsListReader;
-import com.ahli.hotkeyUi.application.galaxy.DescIndexData;
-import com.ahli.hotkeyUi.application.galaxy.DescIndexReader;
 import com.ahli.hotkeyUi.application.galaxy.ext.LayoutExtensionReader;
 import com.ahli.hotkeyUi.application.i18n.Messages;
 import com.ahli.hotkeyUi.application.model.ValueDef;
+import com.ahli.hotkeyUi.application.ui.Alerts;
 import com.ahli.hotkeyUi.application.ui.ShowToUserException;
-import com.ahli.hotkeyUi.application.ui.dialogs.Alerts;
+import com.ahli.mpq.MpqEditorInterface;
 import com.ahli.mpq.MpqException;
-import com.ahli.mpq.MpqInterface;
 import com.ahli.util.JarHelper;
 
 import javafx.animation.FadeTransition;
@@ -38,7 +38,6 @@ import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
-import javafx.stage.StageStyle;
 import javafx.stage.WindowEvent;
 import javafx.util.Duration;
 import javafx.stage.FileChooser.ExtensionFilter;
@@ -68,8 +67,8 @@ public class Main extends Application {
 	private TabsController tabsCtrl;
 	private String openedDocPath = null;
 	private boolean isNamespaceHeroes = true;
-	private MpqInterface mpqi = new MpqInterface();
-	private DescIndexData descIndex = new DescIndexData(this, mpqi);
+	private MpqEditorInterface mpqi = new MpqEditorInterface();
+	private DescIndexData descIndex = new DescIndexData(mpqi);
 	private File basePath = null;
 	private boolean hasUnsavedFileChanges = false;
 	private LayoutExtensionReader layoutExtReader;
@@ -253,7 +252,7 @@ public class Main extends Application {
 
 						// load desc index from mpq
 						try {
-							isNamespaceHeroes = mpqi.isHeroesNamespace();
+							isNamespaceHeroes = mpqi.isHeroesMpq();
 						} catch (MpqException e) {
 							// special case to show readable error to user
 							throw new ShowToUserException(Messages.getString("Main.OpenedFileNoComponentList"));
@@ -266,7 +265,7 @@ public class Main extends Application {
 						}
 						descIndex.setDescIndexPathAndClear(ComponentsListReader.getDescIndexPath(componentListFile));
 
-						File descIndexFile = mpqi.getCachedFile(descIndex.getDescIndexIntPath());
+						File descIndexFile = mpqi.getFileFromMpq(descIndex.getDescIndexIntPath());
 						descIndex.addLayoutIntPath(
 								DescIndexReader.getLayoutPathList(descIndexFile, ignoreRequiredToLoadEntries));
 
@@ -561,11 +560,11 @@ public class Main extends Application {
 	}
 
 	/**
-	 * Initializes the MPQ Interface.
+	 * Initializes the MPQ Editor Interface.
 	 * 
 	 * @param mpqi
 	 */
-	private void initMpqInterface(MpqInterface mpqi) {
+	private void initMpqInterface(MpqEditorInterface mpqi) {
 		mpqi.setMpqEditorPath(
 				basePath + File.separator + "plugins" + File.separator + "mpq" + File.separator + "MPQEditor.exe"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	}
