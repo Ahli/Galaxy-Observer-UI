@@ -321,13 +321,11 @@
             <Anchor side="Right" relative="$parent" pos="Max" offset="-15"/>
             <Texture val="@UI/Storm_UI_Icon_SearchGlass_Dark"/>
             <Animation name="FilterSearchImage">
-                <Event event="OnShown" action="DirectionForward" frame="$parent/ClearTextButton"/>
-                <Event event="OnShown" action="Play" frame="$parent/ClearTextButton"/>
-                <Event event="OnHidden" action="DirectionReverse" frame="$parent/ClearTextButton"/>
-                <Event event="OnHidden" action="Play" frame="$parent/ClearTextButton"/>
+                <Event event="OnShown" action="DirectionForward,Play" frame="$parent/ClearTextButton"/>
+                <Event event="OnHidden" action="DirectionReverse,Play" frame="$parent/ClearTextButton"/>
                 <Controller type="Fade" end="Pause">
-                    <Key type="Curve" time="0" value="255" out="Slow"/>
-                    <Key type="Curve" time=".1" value="0" in="Slow"/>
+                    <Key type="Curve" time="0" value="255" inout="Linear,Slow"/>
+                    <Key type="Curve" time=".1" value="0" inout="Slow,Linear"/>
                 </Controller>
             </Animation>
         </Frame>
@@ -833,7 +831,7 @@
         </Frame>
 
         <Frame type="CollectionCategoryTileList" name="CategoryTileList" template="CollectionTemplates/CategoryTileListTemplate">
-            <CountTextContentList val="$parent/ContentTileList"/>
+            <CountTextContentList val="$parent/CountTextContentList"/>
             <GameContentType val="Hero"/>
             <CollapseLayout val="true"/>
 
@@ -861,9 +859,11 @@
 
             <StateGroup name="ShowBigTileList">
                 <State name="ShowTileList">
+                    <When type="StateGroup" frame="$parent/ContentTileList" ExpandStates="Normal"/>
                     <When type="Property" frame="$parent/CategoryTileList/FeaturedItem" Toggled="true"/>
                     <When type="Property" frame="$this" DataCount="0" operator="GreaterThan"/>
                     <Action type="SetProperty" frame="$this" Visible="true"/>
+                    <Action type="SetProperty" frame="$this" Visible="false" on="Exit"/>
                 </State>
             </StateGroup>
         </Frame>
@@ -988,6 +988,16 @@
             </StateGroup>
         </Frame>
 
+        <Frame type="GameContentTileList" name="CountTextContentList">
+            <Anchor relative="$parent/ContentTileList"/>
+            <GameContentType val="{$parent/ContentTileList/@GameContentType}"/>
+            <FilterFlags val="{$parent/ContentTileList/@FilterFlags}"/>
+            <SearchFlags val=""/>
+            <GenerationMode val="{$parent/ContentTileList/@GenerationMode}"/>
+            <SortMethod index="0" val="Alphabetical"/>
+            <MaxItemPerPage val="10"/>
+            <Visible val="false"/>
+        </Frame>
 
         <Frame type="AspectRatioFrame" name="4x3AspectRatioFrame" template="CollectionTemplates/CategoryTileListAspectRatioFrameTemplate"/>
     </Frame>

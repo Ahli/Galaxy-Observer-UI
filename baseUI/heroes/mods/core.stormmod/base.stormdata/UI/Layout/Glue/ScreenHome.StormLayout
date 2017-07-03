@@ -6,13 +6,11 @@
         <CollapseLayout val="True"/>
         <Height val="70"/>
         <Animation name="Begin">
-            <Event event="Begin" action="DirectionForward" frame="$parent"/>
-            <Event event="Begin" action="Play" frame="$parent"/>
-            <Event event="End" action="DirectionReverse" frame="$parent"/>
-            <Event event="End" action="Play" frame="$parent"/>
+            <Event event="Begin" action="DirectionForward,Play" frame="$parent"/>
+            <Event event="End" action="DirectionReverse,Play" frame="$parent"/>
             <Controller type="Anchor" end="Pause" side="Bottom" relative="true">
-                <Key type="Curve" time="0" value="100" out="Fast"/>
-                <Key type="Curve" time=".2" value="0" in="Slow"/>
+                <Key type="Curve" time="0" value="100" inout="Linear"/>
+                <Key type="Curve" time=".2" value="0" inout="Slow,Linear"/>
             </Controller>
         </Animation>
     </Frame>
@@ -28,8 +26,8 @@
             <Event event="Show" action="Reset,Play"/>
             <Event event="Hide" action="DirectionReverse,Play"/>
             <Controller type="Fade" end="Pause">
-                <Key type="Curve" time="0.0" value="0" out="Slow"/>
-                <Key type="Curve" time="0.4" value="255" in="Slow" out="Slow"/>
+                <Key type="Curve" time="0.0" value="0" inout="Linear,Slow"/>
+                <Key type="Curve" time="0.4" value="255" inout="Slow"/>
             </Controller>
         </Animation>
 
@@ -188,7 +186,7 @@
                     </Controller>
                 </Animation>
                 <Visible val="False"/>
-            </Frame>        
+            </Frame>
             <Frame type="HeroContainerFrame" name="ChoFrame" template="HomeTowers/ChoFrameTemplate" requiredtoload="IS_SCREEN_MAIN_MENU_ENABLED">
                 <Animation name="ChangeHomeScreenHero">
                     <Event event="ResetHero" action="Stop" frame="$parent"/>
@@ -482,7 +480,7 @@
                 </Animation>
                 <Visible val="False"/>
             </Frame>
-            <Frame type="HeroContainerFrame" name="DVaFrame" template="Home25/DVaFrameTemplate">
+            <Frame type="HeroContainerFrame" name="DVaFrame" template="Home25/DVaFrameTemplate" requiredtoload="IS_SCREEN_MAIN_MENU_ENABLED">
                 <Animation name="ChangeHomeScreenHero">
                     <Event event="ResetHero" action="Stop" frame="$parent"/>
                     <Event event="DVa" action="Restart,Play" frame="$parent"/>
@@ -504,10 +502,21 @@
                 </Animation>
                 <Visible val="False"/>
             </Frame>
-            <Frame type="HeroContainerFrame" name="MalthaelFrame" template="Home26/MalthaelFrameTemplate">
+            <Frame type="HeroContainerFrame" name="MalthaelFrame" template="Home26/MalthaelFrameTemplate" requiredtoload="IS_SCREEN_MAIN_MENU_ENABLED">
                 <Animation name="ChangeHomeScreenHero">
                     <Event event="ResetHero" action="Stop" frame="$parent"/>
                     <Event event="Malthael" action="Restart,Play" frame="$parent"/>
+                    <Controller type="Visibility" end="Pause">
+                        <Key type="Bool" time="0" value="false"/>
+                        <Key type="Bool" time=".01" value="true"/>
+                    </Controller>
+                </Animation>
+                <Visible val="False"/>
+            </Frame>
+            <Frame type="HeroContainerFrame" name="StukovFrame" template="Home26/StukovFrameTemplate">
+                <Animation name="ChangeHomeScreenHero">
+                    <Event event="ResetHero" action="Stop" frame="$parent"/>
+                    <Event event="Stukov" action="Restart,Play" frame="$parent"/>
                     <Controller type="Visibility" end="Pause">
                         <Key type="Bool" time="0" value="false"/>
                         <Key type="Bool" time=".01" value="true"/>
@@ -539,8 +548,8 @@
                 <Animation name="Click">
                     <Event event="OnMouseDown" action="ToggleDirection,Play"/>
                     <Controller type="Fade" end="Pause" frame="$parent/HomeDebugContainer">
-                        <Key type="Curve" time="0" value="255" in="Slow"/>
-                        <Key type="Curve" time=".2" value="0" out="Slow"/>
+                        <Key type="Curve" time="0" value="255" inout="Slow,Linear"/>
+                        <Key type="Curve" time=".2" value="0" inout="Linear,Slow"/>
                     </Controller>
                     <Controller type="Event" end="Pause" frame="$parent/HomeDebugContainer">
                         <Key type="Event" time="0" event="Begin"/>
@@ -595,8 +604,20 @@
                     <!--  ADD NEW BUTTONS HERE  -->
                     <!--  Don't forget to update the current top button to be anchored to your new button,  -->
                     <!--  and to set your new button to be anchored to PlaceHolder.  -->
-                    <Frame type="Button" name="MalthaelButton" template="ScreenHome/HomeDebugButtonTemplate">
+                    <Frame type="Button" name="StukovButton" template="ScreenHome/HomeDebugButtonTemplate">
                         <Anchor side="Top" relative="$parent/PlaceHolder" pos="Max" offset="-40"/>
+                        <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                        <Text val="Stukov"/>
+                        <Animation name="Click">
+                            <Event event="OnMouseDown" action="Restart,Play"/>
+                            <Controller type="Event" end="Stop" frame="$parent/$parent/$parent">
+                                <Key type="Event" time="0" event="HomeReset"/>
+                                <Key type="Event" time="0.01" event="Stukov"/>
+                            </Controller>
+                        </Animation>
+                    </Frame>
+                    <Frame type="Button" name="MalthaelButton" template="ScreenHome/HomeDebugButtonTemplate">
+                        <Anchor side="Top" relative="$parent/StukovButton" pos="Max" offset="-40"/>
                         <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
                         <Text val="Malthael"/>
                         <Animation name="Click">
@@ -642,7 +663,7 @@
                                 <Key type="Event" time="0.01" event="Genji"/>
                             </Controller>
                         </Animation>
-                    </Frame> 
+                    </Frame>
                     <Frame type="Button" name="AmazonButton" template="ScreenHome/HomeDebugButtonTemplate">
                         <Anchor side="Top" relative="$parent/GenjiButton" pos="Max" offset="-40"/>
                         <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
@@ -1118,8 +1139,8 @@
                 <Event event="ShowContent" action="DirectionForward, Play" frame="$parent"/>
                 <Event event="HideContent" action="DirectionReverse, Play" frame="$parent"/>
                 <Controller type="Fade" end="Pause">
-                    <Key type="Curve" time="0.0" value="0" out="Auto"/>
-                    <Key type="Curve" time="0.5" value="255" out="Auto"/>
+                    <Key type="Curve" time="0.0" value="0" inout="Linear,Auto"/>
+                    <Key type="Curve" time="0.5" value="255" inout="Linear,Auto"/>
                 </Controller>
                 <Controller type="Visibility" end="Pause">
                     <Key type="Bool" time="0.00" value="false"/>
@@ -1179,8 +1200,8 @@
                 <Event event="ShowContent" action="DirectionReverse, Play" frame="$parent"/>
                 
                 <Controller type="Fade" end="Pause">
-                    <Key type="Curve" time="0.0" value="0" out="Auto"/>
-                    <Key type="Curve" time="0.5" value="255" out="Auto"/>
+                    <Key type="Curve" time="0.0" value="0" inout="Linear,Auto"/>
+                    <Key type="Curve" time="0.5" value="255" inout="Linear,Auto"/>
                 </Controller>
             </Animation>
         </Frame>

@@ -52,6 +52,14 @@
                     <Key type="Event" time="0.1" event="HideButtons"/>
                 </Controller>
             </Animation>
+
+            <StateGroup name="AcceptButtonActiveStates">
+                <State name="PatchAvailable">
+                    <When type="Property" frame="$GlueUI" PatchAvailable="true"/>
+                    <Action type="SetProperty" Enabled="false"/>
+                    <Action type="SetProperty" Tooltip="@UI/RestrictedStatePendingHotPatch"/>
+                </State>
+            </StateGroup>
         </Frame>
 
         <Frame type="Button" name="RerollButton" template="StandardTemplates/StandardButtonTemplate">
@@ -160,11 +168,10 @@
             <Frame type="BlurFrame" name="BlurFrame" template="StandardTemplates/FullscreenBlurFrame">
                 <Anchor relative="$parent/BackgroundFrame"/>
                 <Animation name="DialogAnimation">
-                    <Event event="OnShown" action="DirectionForward"/>
-                    <Event event="OnShown" action="Play" />
+                    <Event event="OnShown" action="DirectionForward,Play"/>
                     <Controller type="Blur" end="Pause">
-                        <Key type="Curve" time="0" value="0.0" out="Auto"/>
-                        <Key type="Curve" time="0.2" value="0.93" in="Auto"/>
+                        <Key type="Curve" time="0" value="0.0" inout="Linear,Auto"/>
+                        <Key type="Curve" time="0.2" value="0.93" inout="Auto,Linear"/>
                     </Controller>
                 </Animation>
             </Frame>
@@ -216,6 +223,14 @@
                         <Key type="Property" time="0.1" value="false"/>
                     </Controller>
                 </Animation>
+
+                <StateGroup name="RerollButtonActiveStates">
+                    <State name="PatchAvailable">
+                        <When type="Property" frame="$GlueUI" PatchAvailable="true"/>
+                        <Action type="SetProperty" Enabled="false"/>
+                        <Action type="SetProperty" Tooltip="@UI/RestrictedStatePendingHotPatch"/>
+                    </State>
+                </StateGroup>
             </Frame>
 
             <Frame type="Button" name="CancelButton" template="StandardTemplates/StandardButtonTemplate">
@@ -257,6 +272,11 @@
             <State name="CantAffordReroll">
                 <When type="Property" HasFundsForReroll="false"/>
                 <Action type="SetProperty" frame="RerollButton" Enabled="false"/>
+            </State>
+            <State name="PatchAvailable">
+                <When type="Property" frame="$GlueUI" PatchAvailable="true"/>
+                <Action type="SetProperty" frame="RerollButton" Enabled="false"/>
+                <Action type="SetProperty" Tooltip="@UI/RestrictedStatePendingHotPatch"/>
             </State>
             <State name="NotWaiting">
                 <When type="Property" WaitingForServer="false"/>
