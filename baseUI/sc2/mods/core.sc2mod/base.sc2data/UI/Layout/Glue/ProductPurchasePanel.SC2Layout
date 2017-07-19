@@ -551,6 +551,7 @@
                 <Anchor side="Bottom" relative="$parent/BottomAnchorFrame" pos="Min" offset="0"/>
                 <Anchor side="Left" relative="$parent/AnchorFrame" pos="Min" offset="60"/>
                 <Text val="@UI/ProductPurchase/ConfirmButton"/>
+                <ClickSound val="@UI_ActionButtonSelect"/>
             </Frame>
 
             <Frame type="Button" name="CancelButton" template="StandardBattlenetTemplates/BattlenetStandardButtonTemplate">
@@ -835,6 +836,7 @@
         
         <Frame type="Frame" name="PurchasedPanel">
             <Anchor relative="$parent/AnchorFrame"/>
+            <Visible val="false"/>
             
             <Frame type="Image" name="PurchaseBG">
                 <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
@@ -938,6 +940,45 @@
                 <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
                 <Text val="@UI/ProductPurchase/BackButton"/>
             </Frame>
+
+            <Frame type="GameContentFrame" name="ContentFrame">
+                <Anchor relative="$parent"/>
+                <GameContent val="{$parent/$parent/@GameContent}"/>
+            </Frame>
+
+            <Frame type="Image" name="WarChestLogo">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="34"/>
+                <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+                <Width val="640"/>
+                <Height val="356"/>
+                <Texture val="@UI/SC2_UI_Battlenet_Glue_Campaign_Purchase_WarChest_Logo"/>
+                
+                <Animation name="Sound_ThankYou">
+                    <Event event="OnShown" action="Reset,Play"/>
+                    <Event event="OnHidden" action="Stop"/>
+                    
+                    <Controller type="Sound" end="Stop">
+                        <Key type="Sound" time="0.1" sound="*@UI_WarChest_Purchased_AS"/>
+                    </Controller>
+                </Animation>
+            </Frame>
+
+            <StateGroup name="PurchaseThankYouImageState">
+                <DefaultState val="Normal"/>
+                
+                <State name="WarChest">
+                    <When type="Property" frame="ContentFrame" ContentType="WarChest"/>
+                    <When type="Property" frame="$parent" PurchaseStep="Purchased"/>
+                    <Action type="SetProperty" frame="PurchaseBG" Texture="@UI/SC2_UI_Battlenet_Glue_Campaign_Purchase_WarChest_ThankYouBG"/>
+                    <Action type="SetProperty" frame="WarChestLogo" Visible="True"/>
+                </State>
+
+                <State name="Normal">
+                    <Action type="SetProperty" frame="PurchaseBG" Texture="@UI/SC2_UI_Battlenet_Glue_Campaign_Purchase_ThankYouBG"/>
+                    <Action type="SetProperty" frame="WarChestLogo" Visible="False"/>
+                </State>
+            </StateGroup>
         </Frame>
         
         <Frame type="Frame" name="ErrorPanel">

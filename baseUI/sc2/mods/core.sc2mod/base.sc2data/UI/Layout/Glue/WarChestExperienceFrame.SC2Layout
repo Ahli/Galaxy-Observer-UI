@@ -1,0 +1,708 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<Desc>
+    <DescFlags val="Locked"/>
+    
+    <Constant name="WarChestToast_InnerSpinner_Color" val="5,115,255"/>
+    <Constant name="WarChestToast_OuterSegmentActive_Color" val="0,125,250"/>
+    <Constant name="WarChestToast_OuterSegmentInactive_Color" val="10,120,250"/>
+    <Constant name="WarChestToast_ProgressBackground_Color" val="15,150,245"/>
+    <Constant name="WarChestToast_ProgressRingCompleted_Color" val="2,170,255"/>
+    <Constant name="WarChestToast_ProgressRingHighlight_Color" val="8,125,255"/>
+    <Constant name="WarChestToast_ProgressRingBlur_Color" val="2,76,127"/>
+    <Constant name="WarChestToast_InitialMarker_Color" val="0,170,255"/>
+    <Constant name="WarChestToast_ProgressMarker_Color" val="162,210,255"/>
+    
+    <Constant name="WarChestToast_InnerSpinner_Shrink_StartTimestamp" val="1.167"/>
+    <Constant name="WarChestToast_InnerSpinner_Shrink_StopTimestamp" val="1.333"/>
+    <Constant name="WarChestToast_InnerSpinner_Grow_StartTimestamp" val="2.000"/>
+    <Constant name="WarChestToast_InnerSpinner_Grow_StopTimestamp" val="2.167"/>
+    <Constant name="WarChestToast_InnerSpinner_ShrinkAndGrow_Duration" val="4.833"/>
+    
+    <Constant name="WarChestToast_InnerSpinner_ShrinkAndGrow_TopZoom" val="-.12"/>
+    <Constant name="WarChestToast_InnerSpinner_ShrinkAndGrow_BottomZoom" val="1.12"/>
+    <Constant name="WarChestToast_InnerSpinner_ShrinkAndGrow_LeftZoom" val="-.12"/>
+    <Constant name="WarChestToast_InnerSpinner_ShrinkAndGrow_RightZoom" val="1.12"/>
+    
+    <Constant name="WarChestToast_InnerSpinner_ShrinkFlourish_StartTimestamp" val="0.000"/>
+    <Constant name="WarChestToast_InnerSpinner_ShrinkFlourish_StopTimestamp" val="0.800"/>
+    <Constant name="WarChestToast_InnerSpinner_GrowFlourish_StartTimestamp" val="1.133"/>
+    <Constant name="WarChestToast_InnerSpinner_GrowFlourish_StopTimestamp" val="1.333"/>
+    <Constant name="WarChestToast_InnerSpinner_GrowFlourish_FinishTimestamp" val="2.283"/>
+    
+    <Constant name="WarChestToast_InnerSpinner_ShrinkAndGrowFlourish_TopZoom" val="-.21"/>
+    <Constant name="WarChestToast_InnerSpinner_ShrinkAndGrowFlourish_BottomZoom" val="1.21"/>
+    <Constant name="WarChestToast_InnerSpinner_ShrinkAndGrowFlourish_LeftZoom" val="-.21"/>
+    <Constant name="WarChestToast_InnerSpinner_ShrinkAndGrowFlourish_RightZoom" val="1.21"/>
+    
+    <Frame type="Image" name="OuterSegmentTemplate">
+        <Anchor side="Bottom" relative="$parent/InnerSpinner" pos="Mid" offset="0"/>
+        <Anchor side="Left" relative="$parent/InnerSpinner" pos="Mid" offset="0"/>
+        <Anchor side="Right" relative="$parent/InnerSpinner" pos="Mid" offset="0"/>
+        <Width val="80"/>
+        <Height val="49"/>
+        <ColorAdjustMode val="Colorize"/>
+        <AdjustmentColor val="#WarChestToast_OuterSegmentInactive_Color"/>
+        <Texture val="@UI/SC2_UI_Collection_WarChest_ToastCircle_OuterSegment_Inactive"/>
+        <RotationPosition val="BottomCenter"/>
+        
+        <Animation name="RotateCounterClockwise">
+            <Event event="OnShown" action="RefreshBaseValue,Play"/>
+        
+            <Controller type="Rotation" relative="true" end="Loop">
+                <Key type="Curve" time="0" value="360" out="linear"/>
+                <Key type="Curve" time="35" value="0" in="linear"/>
+            </Controller>
+        </Animation>
+    </Frame>
+    
+    <Frame type="Image" name="FlickeringOuterSegmentTemplate" template="WarChestExperienceFrame/OuterSegmentTemplate">
+        <Animation name="Flicker">
+            <Event event="OnActivate" action="Reset,Play"/>
+            <Event event="OnDeactivate" action="Reset,Stop"/>
+        
+            <Controller type="Fade" end="Loop">
+                <Key type="Curve" time="0.000" value="255" inout="linear"/>
+                <Key type="Curve" time="2.683" value="255" inout="linear"/>
+                <Key type="Curve" time="2.717" value="178" inout="linear"/>
+                <Key type="Curve" time="2.750" value="204" inout="linear"/>
+                <Key type="Curve" time="2.783" value="153" inout="linear"/>
+                <Key type="Curve" time="2.817" value="255" inout="linear"/>
+                <Key type="Curve" time="4.833" value="255" inout="linear"/>
+            </Controller>
+        </Animation>
+    </Frame>
+    
+    <Frame type="Image" name="OuterSegmentFlashTemplate" template="WarChestExperienceFrame/OuterSegmentTemplate">
+        <Animation name="Flash">
+            <Event event="OnTierUnlock" frame="$parent" action="Reset,Play"/>
+        
+            <Controller type="Fade" end="Pause">
+                <Key type="Curve" time="0.000" value="0" out="linear"/>
+                <Key type="Curve" time="#WarChestToast_InnerSpinner_GrowFlourish_StartTimestamp" value="0" out="linear"/>
+                <Key type="Curve" time="#WarChestToast_InnerSpinner_GrowFlourish_StopTimestamp" value="255" out="linear"/>
+                <Key type="Curve" time="#WarChestToast_InnerSpinner_GrowFlourish_FinishTimestamp" value="0" out="linear"/>
+            </Controller>
+        </Animation>
+    </Frame>
+        
+    <Frame type="Image" name="InnerSpinnerTemplate">
+        <Anchor side="Top" relative="$parent/ProgressBackground" pos="Mid" offset="0"/>
+        <Anchor side="Bottom" relative="$parent/ProgressBackground" pos="Mid" offset="0"/>
+        <Anchor side="Left" relative="$parent/ProgressBackground" pos="Mid" offset="0"/>
+        <Anchor side="Right" relative="$parent/ProgressBackground" pos="Mid" offset="0"/>
+        <Width val="68"/>
+        <Height val="68"/>
+        <ColorAdjustMode val="Colorize"/>
+        <AdjustmentColor val="#WarChestToast_InnerSpinner_Color"/>
+        <Texture val="@UI/SC2_UI_Collection_WarChest_ToastCircle_InnerSpinner"/>
+            
+        <Animation name="RotateCounterClockwise">
+            <Event event="OnShown" action="RefreshBaseValue,Reset,Play"/>
+            <Event event="ResumeNormalRotation" action="RefreshBaseValue,Reset,Play"/>
+            <Event event="PauseNormalRotation" action="Pause"/>
+        
+            <Controller type="Rotation" relative="true" end="Loop">
+                <Key type="Curve" time="0" value="0" inout="linear"/>
+                <Key type="Curve" time="35 " value="360" inout="linear"/>
+            </Controller>
+        </Animation>
+            
+        <Animation name="ShrinkAndGrow">
+            <Event event="OnShown" action="Reset,Play"/> 
+            <Event event="ResumeNormalShrinkAndGrow" action="Reset,Play"/> 
+            <Event event="PauseNormalShrinkAndGrow" frame="$parent" action="Reset,Pause"/>
+            
+            <Controller type="LayerUV" layer="0" side="Top" relative="False" sidelock="false" end="Loop" >
+                <Key type="Curve" time="0.000" value="0" inOut="Linear"/>
+                <Key type="Curve" time="#WarChestToast_InnerSpinner_Shrink_StartTimestamp" value="0" inOut="Linear"/>
+                <Key type="Curve" time="#WarChestToast_InnerSpinner_Shrink_StopTimestamp" value="#WarChestToast_InnerSpinner_ShrinkAndGrow_TopZoom" inOut="Slow"/>
+                <Key type="Curve" time="#WarChestToast_InnerSpinner_Grow_StartTimestamp" value="#WarChestToast_InnerSpinner_ShrinkAndGrow_TopZoom" inOut="Slow"/>
+                <Key type="Curve" time="#WarChestToast_InnerSpinner_Grow_StopTimestamp" value="0" inOut="Linear"/>
+                <Key type="Curve" time="#WarChestToast_InnerSpinner_ShrinkAndGrow_Duration" value="0" inOut="Linear"/>
+            </Controller>
+            
+            <Controller type="LayerUV" layer="0" side="Bottom" relative="False" sidelock="false" end="Loop" >
+                <Key type="Curve" time="0.000" value="1" inOut="Linear"/>
+                <Key type="Curve" time="#WarChestToast_InnerSpinner_Shrink_StartTimestamp" value="1" inOut="Linear"/>
+                <Key type="Curve" time="#WarChestToast_InnerSpinner_Shrink_StopTimestamp" value="#WarChestToast_InnerSpinner_ShrinkAndGrow_BottomZoom" inOut="Slow"/>
+                <Key type="Curve" time="#WarChestToast_InnerSpinner_Grow_StartTimestamp" value="#WarChestToast_InnerSpinner_ShrinkAndGrow_BottomZoom" inOut="Slow"/>
+                <Key type="Curve" time="#WarChestToast_InnerSpinner_Grow_StopTimestamp" value="1" inOut="Linear"/>
+                <Key type="Curve" time="#WarChestToast_InnerSpinner_ShrinkAndGrow_Duration" value="1" inOut="Linear"/>
+            </Controller>
+            
+            <Controller type="LayerUV" layer="0" side="Left" relative="False" sidelock="false" end="Loop" >
+                <Key type="Curve" time="0.000" value="0" inOut="Linear"/>
+                <Key type="Curve" time="#WarChestToast_InnerSpinner_Shrink_StartTimestamp" value="0" inOut="Linear"/>
+                <Key type="Curve" time="#WarChestToast_InnerSpinner_Shrink_StopTimestamp" value="#WarChestToast_InnerSpinner_ShrinkAndGrow_LeftZoom" inOut="Slow"/>
+                <Key type="Curve" time="#WarChestToast_InnerSpinner_Grow_StartTimestamp" value="#WarChestToast_InnerSpinner_ShrinkAndGrow_LeftZoom" inOut="Slow"/>
+                <Key type="Curve" time="#WarChestToast_InnerSpinner_Grow_StopTimestamp" value="0" inOut="Linear"/>
+                <Key type="Curve" time="#WarChestToast_InnerSpinner_ShrinkAndGrow_Duration" value="0" inOut="Linear"/>
+            </Controller>
+            
+            <Controller type="LayerUV" layer="0" side="Right" relative="False" sidelock="false" end="Loop" >
+                <Key type="Curve" time="0.000" value="1" inOut="Linear"/>
+                <Key type="Curve" time="#WarChestToast_InnerSpinner_Shrink_StartTimestamp" value="1" inOut="Linear"/>
+                <Key type="Curve" time="#WarChestToast_InnerSpinner_Shrink_StopTimestamp" value="#WarChestToast_InnerSpinner_ShrinkAndGrow_RightZoom" inOut="Slow"/>
+                <Key type="Curve" time="#WarChestToast_InnerSpinner_Grow_StartTimestamp" value="#WarChestToast_InnerSpinner_ShrinkAndGrow_RightZoom" inOut="Slow"/>
+                <Key type="Curve" time="#WarChestToast_InnerSpinner_Grow_StopTimestamp" value="1" inOut="Linear"/>
+                <Key type="Curve" time="#WarChestToast_InnerSpinner_ShrinkAndGrow_Duration" value="1" inOut="Linear"/>
+            </Controller>
+        </Animation>
+            
+        <Animation name="UnlockFlourish">
+            <Event event="OnTierUnlock" frame="$parent" action="RefreshBaseValue,Reset,Play"/>
+        
+            <Controller type="Rotation" relative="true" end="Pause">
+                <Key type="Curve" time="0.000" value="0" inOut="Linear"/>
+                <Key type="Curve" time="#WarChestToast_InnerSpinner_ShrinkFlourish_StartTimestamp" value="0" inOut="Linear"/>
+                <Key type="Curve" time="#WarChestToast_InnerSpinner_ShrinkFlourish_StopTimestamp" value="240" inOut="Slow,Linear"/>
+                <Key type="Curve" time="#WarChestToast_InnerSpinner_GrowFlourish_StartTimestamp" value="262" inOut="Linear,Slow"/>
+                <Key type="Curve" time="#WarChestToast_InnerSpinner_GrowFlourish_StopTimestamp" value="340" inOut="Slow"/>
+            </Controller>
+            
+            <Controller type="LayerUV" layer="0" side="Top" relative="False" sidelock="false" end="Pause" >
+                <Key type="Curve" time="0.000" value="0" inOut="Linear"/>
+                <Key type="Curve" time="#WarChestToast_InnerSpinner_ShrinkFlourish_StartTimestamp" value="0" inOut="Linear"/>
+                <Key type="Curve" time="#WarChestToast_InnerSpinner_ShrinkFlourish_StopTimestamp" value="#WarChestToast_InnerSpinner_ShrinkAndGrowFlourish_TopZoom" inOut="Linear"/>
+                <Key type="Curve" time="#WarChestToast_InnerSpinner_GrowFlourish_StartTimestamp" value="#WarChestToast_InnerSpinner_ShrinkAndGrowFlourish_TopZoom" inOut="Linear"/>
+                <Key type="Curve" time="#WarChestToast_InnerSpinner_GrowFlourish_StopTimestamp" value="0" inOut="Linear"/>
+            </Controller>
+            
+            <Controller type="LayerUV" layer="0" side="Bottom" relative="False" sidelock="false" end="Pause" >
+                <Key type="Curve" time="0.000" value="1" inOut="Linear"/>
+                <Key type="Curve" time="#WarChestToast_InnerSpinner_ShrinkFlourish_StartTimestamp" value="1" inOut="Linear"/>
+                <Key type="Curve" time="#WarChestToast_InnerSpinner_ShrinkFlourish_StopTimestamp" value="#WarChestToast_InnerSpinner_ShrinkAndGrowFlourish_BottomZoom" inOut="Linear"/>
+                <Key type="Curve" time="#WarChestToast_InnerSpinner_GrowFlourish_StartTimestamp" value="#WarChestToast_InnerSpinner_ShrinkAndGrowFlourish_BottomZoom" inOut="Linear"/>
+                <Key type="Curve" time="#WarChestToast_InnerSpinner_GrowFlourish_StopTimestamp" value="1" inOut="Linear"/>
+            </Controller>
+            
+            <Controller type="LayerUV" layer="0" side="Left" relative="False" sidelock="false" end="Pause" >
+                <Key type="Curve" time="0.000" value="0" inOut="Linear"/>
+                <Key type="Curve" time="#WarChestToast_InnerSpinner_ShrinkFlourish_StartTimestamp" value="0" inOut="Linear"/>
+                <Key type="Curve" time="#WarChestToast_InnerSpinner_ShrinkFlourish_StopTimestamp" value="#WarChestToast_InnerSpinner_ShrinkAndGrowFlourish_LeftZoom" inOut="Linear"/>
+                <Key type="Curve" time="#WarChestToast_InnerSpinner_GrowFlourish_StartTimestamp" value="#WarChestToast_InnerSpinner_ShrinkAndGrowFlourish_LeftZoom" inOut="Linear"/>
+                <Key type="Curve" time="#WarChestToast_InnerSpinner_GrowFlourish_StopTimestamp" value="0" inOut="Linear"/>
+            </Controller>
+            
+            <Controller type="LayerUV" layer="0" side="Right" relative="False" sidelock="false" end="Pause" >
+                <Key type="Curve" time="0.000" value="1" inOut="Linear"/>
+                <Key type="Curve" time="#WarChestToast_InnerSpinner_ShrinkFlourish_StartTimestamp" value="1" inOut="Linear"/>
+                <Key type="Curve" time="#WarChestToast_InnerSpinner_ShrinkFlourish_StopTimestamp" value="#WarChestToast_InnerSpinner_ShrinkAndGrowFlourish_RightZoom" inOut="Linear"/>
+                <Key type="Curve" time="#WarChestToast_InnerSpinner_GrowFlourish_StartTimestamp" value="#WarChestToast_InnerSpinner_ShrinkAndGrowFlourish_RightZoom" inOut="Linear"/>
+                <Key type="Curve" time="#WarChestToast_InnerSpinner_GrowFlourish_StopTimestamp" value="1" inOut="Linear"/>
+            </Controller>
+        
+            <Controller type="Event" end="Stop">
+                <Key type="Event" time="0" event="PauseNormalRotation"/>
+                <Key type="Event" time="0" event="PauseNormalShrinkAndGrow"/>
+                <Key type="Event" time="#WarChestToast_InnerSpinner_GrowFlourish_StopTimestamp" event="ResumeNormalRotation"/>
+                <Key type="Event" time="4.750" event="ResumeNormalShrinkAndGrow"/>
+            </Controller>
+        </Animation>
+
+        <Animation name="Sound_WarchestToast_FlourishFlavor">
+            <Event event="OnTierUnlock" frame="$parent" action="Reset,Play"/>
+            <Controller type="Sound" end="Stop">
+                <Key type="Sound" time="0.0" sound="@UI_WarChestToast_FlourishFlavor"/>
+            </Controller>
+        </Animation>
+
+        <Animation name="Sound_WarchestToast_FlourishSpin">
+            <Event event="OnTierUnlock" frame="$parent" action="Reset,Play"/>
+            <Controller type="Sound" end="Stop">
+                <Key type="Sound" time="0.0" sound="@UI_WarChestToast_FlourishSpin"/>
+            </Controller>
+        </Animation>
+
+        <Animation name="Sound_WarchestToast_FlourishSpin2">
+            <Event event="OnTierUnlock" frame="$parent" action="Reset,Play"/>
+            <Controller type="Sound" end="Stop">
+                <Key type="Sound" time="0.0" sound="@UI_WarChestToast_FlourishSpin2"/>
+            </Controller>
+        </Animation>
+
+        <Animation name="Sound_WarChestToast_FlourishHit">
+            <Event event="OnTierUnlock" frame="$parent" action="Reset,Play"/>
+            <Controller type="Sound" end="Stop">
+                <Key type="Sound" time="#WarChestToast_InnerSpinner_GrowFlourish_StopTimestamp" sound="@UI_WarChestToast_FlourishHit"/>
+            </Controller>
+        </Animation>
+
+        <Animation name="Sound_WarChestToast_FlourishHit2">
+            <Event event="OnTierUnlock" frame="$parent" action="Reset,Play"/>
+            <Controller type="Sound" end="Stop">
+                <Key type="Sound" time="#WarChestToast_InnerSpinner_GrowFlourish_StartTimestamp" sound="@UI_WarChestToast_FlourishHit2"/>
+            </Controller>
+        </Animation>
+
+        <Animation name="Sound_WarChestToast_FlourishHit3">
+            <Event event="OnTierUnlock" frame="$parent" action="Reset,Play"/>
+            <Controller type="Sound" end="Stop">
+                <Key type="Sound" time="#WarChestToast_InnerSpinner_GrowFlourish_StartTimestamp" sound="@UI_WarChestToast_FlourishHit3"/>
+            </Controller>
+        </Animation>
+    </Frame>
+    
+    <Frame type="Image" name="InnerSpinnerFlashTemplate" template="WarChestExperienceFrame/InnerSpinnerTemplate">
+        <Animation name="Flash">
+            <Event event="OnTierUnlock" frame="$parent" action="Reset,Play"/>
+        
+            <Controller type="Fade" end="Pause">
+                <Key type="Curve" time="0.000" value="0" out="linear"/>
+                <Key type="Curve" time="#WarChestToast_InnerSpinner_GrowFlourish_StartTimestamp" value="0" inout="linear"/>
+                <Key type="Curve" time="#WarChestToast_InnerSpinner_GrowFlourish_StopTimestamp" value="255" inout="linear"/>
+                <Key type="Curve" time="1.550" value="255" inout="linear"/>
+                <Key type="Curve" time="#WarChestToast_InnerSpinner_GrowFlourish_FinishTimestamp" value="0" inout="linear"/>
+            </Controller>
+        </Animation>
+    </Frame>
+        
+    <Frame type="Image" name="ProgressMarkerTemplate">
+        <Anchor side="Bottom" relative="$parent/ProgressBackground" pos="Mid" offset="0"/>
+        <Anchor side="Left" relative="$parent/ProgressBackground" pos="Mid" offset="0"/>
+        <Anchor side="Right" relative="$parent/ProgressBackground" pos="Mid" offset="0"/>
+        <Width val="6"/>
+        <Height val="69"/>
+        <ColorAdjustMode val="Colorize"/>
+        <Texture val="@UI/SC2_UI_Collection_WarChest_ToastProgressMarker"/>
+        <RotationPosition val="BottomCenter"/>
+    </Frame>
+
+    <Frame type="WarChestExperienceFrame" name="WarChestExperienceFrameTemplate">
+        <Width val="432"/>
+        <Height val="164"/>
+        <Visible val="true"/>
+        <CurrentXP val="{$this/GainedXPLabel/@CurrentValue}"/>
+        <Visible val="false"/>
+
+        <Frame type="Image" name="BackgroundImage">
+            <Anchor relative="$parent"/>
+            <Texture val="@UI/SC2_UI_Collection_WarChest_ToastBackground"/>
+            <TextureType val="Normal"/>
+        </Frame>
+        
+        <Frame type="Image" name="ProgressBackground">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="12"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="11"/>
+            <Width val="140"/>
+            <Height val="140"/>
+            <ColorAdjustMode val="Colorize"/>
+            <AdjustmentColor val="#WarChestToast_ProgressBackground_Color"/>
+            <Texture val="@UI/SC2_UI_Collection_WarChest_ToastProgressBackground"/>
+        </Frame>
+        
+        <Frame type="Image" name="InnerSpinner" template="WarChestExperienceFrame/InnerSpinnerTemplate"/>
+        
+        <Frame type="Image" name="InnerSpinnerFlash" template="WarChestExperienceFrame/InnerSpinnerFlashTemplate">
+            <BlendMode val="Add"/>
+            <Alpha val="0"/>
+        </Frame>
+        
+        <Frame type="Image" name="OuterSegment1" template="WarChestExperienceFrame/FlickeringOuterSegmentTemplate">
+            <Rotation val="0"/>
+        </Frame>
+
+        <Frame type="Image" name="OuterSegment2" template="WarChestExperienceFrame/FlickeringOuterSegmentTemplate">
+            <Rotation val="120"/>
+        </Frame>
+
+        <Frame type="Image" name="OuterSegment3" template="WarChestExperienceFrame/FlickeringOuterSegmentTemplate">
+            <Rotation val="240"/>
+        </Frame>
+        
+        <Frame type="Image" name="OuterSegment1Flash" template="WarChestExperienceFrame/OuterSegmentFlashTemplate">
+            <Rotation val="0"/>
+            <BlendMode val="Add"/>
+            <Texture val="{$parent/OuterSegment1/@Texture}"/>
+            <AdjustmentColor val="{$parent/OuterSegment1/@AdjustmentColor}"/>
+            <Alpha val="0"/>
+        </Frame>
+        
+        <Frame type="Image" name="OuterSegment2Flash" template="WarChestExperienceFrame/OuterSegmentFlashTemplate">
+            <Rotation val="120"/>
+            <BlendMode val="Add"/>
+            <Texture val="{$parent/OuterSegment2/@Texture}"/>
+            <AdjustmentColor val="{$parent/OuterSegment2/@AdjustmentColor}"/>
+            <Alpha val="0"/>
+        </Frame>
+        
+        <Frame type="Image" name="OuterSegment3Flash" template="WarChestExperienceFrame/OuterSegmentFlashTemplate">
+            <Rotation val="240"/>
+            <BlendMode val="Add"/>
+            <Texture val="{$parent/OuterSegment3/@Texture}"/>
+            <AdjustmentColor val="{$parent/OuterSegment3/@AdjustmentColor}"/>
+            <Alpha val="0"/>
+        </Frame>
+
+        <Frame type="Image" name="InitialProgressMarker" template="WarChestExperienceFrame/ProgressMarkerTemplate">
+            <Rotation val="0"/>
+            <AdjustmentColor val="#WarChestToast_InitialMarker_Color"/>
+        </Frame>
+
+        <Frame type="Image" name="CurrentProgressMarker" template="WarChestExperienceFrame/ProgressMarkerTemplate">
+            <Rotation val="{$parent/WarChestProgressBarHighlight/FillImageContainer/FillImage/@EndAngle}"/>
+            <!-- <AdjustmentColor val="#WarChestToast_ProgressMarker_Color"/> -->
+            <AdjustmentColor val="#WarChestToast_InitialMarker_Color"/>
+        </Frame>
+
+        <Frame type="ProgressBar" name="WarChestProgressBarBlur">
+            <Anchor relative="$parent/ProgressBackground"/>
+            <UseFillContainer val="False"/>
+            <Circular val="True"/>
+            <CircularStart val="0"/>
+            <CircularEndOffset val="360"/>
+            <MinValue val="{$parent/@MinValue}"/>
+            <MaxValue val="{$parent/@MaxValue}"/>
+            <Value val="{$parent/@TargetValue}"/>
+            
+            <Frame type="Frame" name="FillImageContainer">
+                <Anchor relative="$parent"/>
+                
+                <Frame type="Image" name="FillImage">
+                    <Anchor relative="$parent"/>
+                    <ColorAdjustMode val="Colorize"/>
+                    <AdjustmentColor val="#WarChestToast_ProgressRingBlur_Color"/>
+                    <Texture val="@UI/SC2_UI_Collection_WarChest_ToastProgressRing_Glow"/>
+                    <TextureType val="Circular"/>
+                </Frame>
+            </Frame>
+        </Frame>
+
+        <Frame type="ProgressBar" name="WarChestProgressBarHighlight">
+            <Anchor relative="$parent/ProgressBackground"/>
+            <UseFillContainer val="False"/>
+            <Circular val="True"/>
+            <CircularStart val="{$parent/WarChestProgressBarCompleted/FillImageContainer/FillImage/@EndAngle}"/>
+            <CircularEndOffset val="{$parent/RemainingAngle/@Result}"/>
+            <MinValue val="{$parent/LastSeenXP/@Result}"/>
+            <MaxValue val="{$parent/@MaxValue}"/>
+            <Value val="{$parent/@TargetValue}"/>
+            
+            <Frame type="Frame" name="FillImageContainer">
+                <Anchor relative="$parent"/>
+                
+                <Frame type="Image" name="FillImage">
+                    <Anchor relative="$parent"/>
+                    <ColorAdjustMode val="Colorize"/>
+                    <!-- <AdjustmentColor val="#WarChestToast_ProgressRingHighlight_Color"/> -->
+                    <AdjustmentColor val="#WarChestToast_ProgressRingCompleted_Color"/>
+                    <!-- <Texture val="@UI/SC2_UI_Collection_WarChest_ToastProgressRing_Earning"/> -->
+                    <Texture val="@UI/SC2_UI_Collection_WarChest_ToastProgressRing_Completed"/>
+                    <TextureType val="Circular"/>
+                </Frame>
+            </Frame>
+        </Frame>
+
+        <Frame type="ProgressBar" name="WarChestProgressBarCompleted">
+            <Anchor relative="$parent/ProgressBackground"/>
+            <UseFillContainer val="False"/>
+            <Circular val="True"/>
+            <CircularStart val="0"/>
+            <CircularEndOffset val="360"/>
+            <MinValue val="{$parent/@MinValue}"/>
+            <MaxValue val="{$parent/@MaxValue}"/>
+            <Value val="{$parent/LastSeenXP/@Result}"/>
+            
+            <Frame type="Frame" name="FillImageContainer">
+                <Anchor relative="$parent"/>
+                
+                <Frame type="Image" name="FillImage">
+                    <Anchor relative="$parent"/>
+                    <ColorAdjustMode val="Colorize"/>
+                    <AdjustmentColor val="#WarChestToast_ProgressRingCompleted_Color"/>
+                    <Texture val="@UI/SC2_UI_Collection_WarChest_ToastProgressRing_Completed"/>
+                    <TextureType val="Circular"/>
+                </Frame>
+            </Frame>
+        </Frame>
+
+        <Frame type="Image" name="ProgressBarFlash">
+            <Anchor relative="$parent/ProgressBackground"/>
+            <Texture val="@UI/SC2_UI_Collection_WarChest_ToastProgressRing_Completed"/>
+            <TextureType val="Normal"/>
+            <BlendMode val="Add"/>
+            <ColorAdjustMode val="Colorize"/>
+            <AdjustmentColor val="#WarChestToast_ProgressRingHighlight_Color"/>
+            <Alpha val="0"/>
+            
+            <Animation name="Flash">
+                <Event event="OnTierUnlock" frame="$parent" action="RefreshBaseValue,Reset,Play"/>
+            
+                <Controller type="Fade" end="Pause">
+                    <Key type="Curve" time="0.000" value="0" inout="linear"/>
+                    <Key type="Curve" time="#WarChestToast_InnerSpinner_GrowFlourish_StartTimestamp" value="0" inout="linear"/>
+                    <Key type="Curve" time="#WarChestToast_InnerSpinner_GrowFlourish_StopTimestamp" value="255" inout="linear"/>
+                    <Key type="Curve" time="1.550" value="255" inout="linear"/>
+                    <Key type="Curve" time="#WarChestToast_InnerSpinner_GrowFlourish_FinishTimestamp" value="0" inout="linear"/>
+                </Controller>
+            </Animation>
+        </Frame>
+
+        <Frame type="CountdownLabel" name="GainedXPLabel">
+            <Anchor side="Bottom" relative="$parent" pos="Min" offset="7"/>
+            <Anchor side="Left" relative="$parent" pos="Max" offset="0"/>
+            <Style val="Coop_ScoreScreen_TotalRewardAmount"/>
+            <FormatNumber val="true"/>
+            <CountdownSound val="AC_UI_XPBarFillLoop"/>
+            <TargetValue val="{$parent/@GainedXP}"/>
+            <CurrentValue val="0"/>
+            <Text val="0"/>
+
+            <!-- NOTE: Don't use Reset actions on the counter controller -->
+            <!-- It causes the label to unset the controller -->
+            <Animation name="CountUp">
+                <Event event="Reset" action="Restart,Pause" frame="$parent"/>
+                <Event event="Begin" action="Restart,Play" frame="$parent"/>
+                <Event event="LevelUp" action="Pause" frame="$parent"/>
+                <Event event="ResumeTotalCounter" action="Play"/>
+                
+                <Controller type="Counter" end="Pause">
+                    <Key type="Curve" time="0.0" value="0.0" out="Linear"/>
+                    <Key type="Curve" time="2.0" value="1.0" in="Linear"/>
+                </Controller>
+            </Animation>
+        </Frame>
+            
+        <Frame type="MathFrame" name="LastSeenXP">
+            <Anchor relative="$parent"/>
+            <A val="{$parent/@TargetValue}"/>
+            <B val="{$parent/GainedXPLabel/@CurrentValue}"/>
+            <Operator val="Subtract"/>
+        </Frame>
+            
+        <Frame type="MathFrame" name="RemainingAngle">
+            <Anchor relative="$parent"/>
+            <A val="360"/>
+            <B val="{$parent/WarChestProgressBarCompleted/FillImageContainer/FillImage/@EndAngle}"/>
+            <Operator val="Subtract"/>
+        </Frame>
+            
+        <Frame type="MathFrame" name="TotalTargetXP">
+            <Anchor relative="$parent"/>
+            <A val="{$parent/LastSeenXP/@Result}"/>
+            <B val="{$parent/@GainedXP}"/>
+            <Operator val="Add"/>
+        </Frame>
+        
+        <Frame type="Label" name="ProgressLabel">
+            <Anchor side="Top" relative="$parent" pos="Mid" offset="-26"/>
+            <Anchor side="Bottom" relative="$parent" pos="Mid" offset="-26"/>
+            <Anchor side="Left" relative="$parent/ViewWarChestButton" pos="Min" offset="4"/>
+            <Anchor side="Right" relative="$parent/ViewWarChestButton" pos="Max" offset="0"/>
+            <Style val="Collection_WarChest_ToastLabel"/>
+            <Text val="@UI/ScreenCollection/WarChest/Toast/Progress"/>
+        </Frame>
+
+        <Frame type="GlueHyperlinkButton" name="ViewWarChestButton" template="StandardBattlenetTemplates/BattlenetSmallAlternateButtonTemplate">
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="-41"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="-66"/>
+            <Width val="212"/>
+            <Text val="@UI/ScreenCollection/WarChest/Toast/GoToWarchest"/>
+            <Hyperlink val="battlenet:://starcraft/collection/5"/>
+            <ClickSound val="@UI_ActionButtonSelect"/>
+            <HoverSound val="@UI_HoverTick"/>
+        </Frame>
+
+        <Frame type="Button" name="CloseButton" template="StandardBattlenetTemplates/CloseButton">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="27"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="-9"/>
+            <Width val="45"/>
+            <Height val="30"/>
+            <ClickSound val="@UI_ActionButtonSelect"/>
+            <HoverSound val="@UI_HoverTick"/>
+            
+            <Frame type="Image" name="NormalImage">
+                <Anchor relative="$parent"/>
+                <Texture val="@UI/SC2_UI_Collection_WarChest_ToastCloseButton" layer="0"/>
+                <Texture val="@UI/SC2_UI_Collection_WarChest_ToastCloseButton_Pressed" layer="1"/>
+                <Texture val="@UI/SC2_UI_Collection_WarChest_ToastCloseButton_Pressed" layer="2"/>
+                <Texture val="@UI/SC2_UI_Collection_WarChest_ToastCloseButton_Pressed" layer="3"/>
+            </Frame>
+            
+            <Frame type="Image" name="HoverImage">
+                <Anchor relative="$parent"/>
+                <Texture val="@UI/SC2_UI_Collection_WarChest_ToastCloseButton_Hover" layer="0"/>
+                <Texture val="@UI/SC2_UI_Collection_WarChest_ToastCloseButton_Pressed" layer="1"/>
+                <Texture val="@UI/SC2_UI_Collection_WarChest_ToastCloseButton_Pressed" layer="2"/>
+                <Texture val="@UI/SC2_UI_Collection_WarChest_ToastCloseButton_Pressed" layer="3"/>
+            </Frame>
+        </Frame>
+        
+        <Animation name="ShowAnim">
+            <Event event="Reset" action="Reset,Stop"/>
+            <Event event="OnClick" frame="ViewWarChestButton" action="Reset,Stop"/>
+            <Event event="OnClick" frame="CloseButton" action="Reset,Stop"/>
+            <Event event="Begin" action="Reset,Play"/>
+            <Event event="OnDismiss" action="DirectionReverse,Play"/>
+
+            <Controller type="Anchor" end="Pause" side="Right" relative="true">
+                <Key type="Curve" time="0.000" value="-300" inout="Linear"/>
+                <Key type="Curve" time="0.217" value="-500" inout="Slow"/>
+            </Controller>
+
+            <Controller type="Fade" end="Pause">
+                <Key type="Curve" time="0.000" value="0" inout="Linear"/>
+                <Key type="Curve" time="0.217" value="255" inout="Slow"/>
+            </Controller>
+
+            <Controller type="Visibility" end="Pause">
+                <Key type="Bool" time="0" value="false"/>
+                <Key type="Bool" time="0.01" value="true"/>
+                <Key type="Bool" time="0.217" value="true"/>
+            </Controller>
+            
+            <Controller type="Property" property="AcceptsMouse" frame="CloseButton" end="Pause">
+                <Key type="Property" time="0" value="true" direction="Forward"/>
+                <Key type="Property" time="0.217" value="false" direction="Reverse"/>
+                <Key type="Property" time="0.217" value="true" direction="Forward"/>
+            </Controller>
+            
+            <Controller type="Property" property="AcceptsMouse" frame="ViewWarChestButton" end="Pause">
+                <Key type="Property" time="0" value="true" direction="Forward"/>
+                <Key type="Property" time="0.217" value="false" direction="Reverse"/>
+                <Key type="Property" time="0.217" value="true" direction="Forward"/>
+            </Controller>
+        </Animation>
+
+        <Animation name="Sound_WarchestToast_SlideIn">
+            <Event event="Begin" action="Reset,Play"/>
+            <Event event="Test" action="Reset,Play"/>
+            <Controller type="Sound" end="Stop">
+                <Key type="Sound" time="0.0" sound="*@UI_WarChest_ToastSlideIn_AS"/>
+            </Controller>
+        </Animation>
+            
+        <Animation name="Sound_WarchestToast_SlideOut">
+            <Event event="OnDismiss" action="Reset,Play"/>
+            <Controller type="Sound" end="Stop">
+                <Key type="Sound" time="0.0" sound="*@UI_WarChest_ToastSlideOut_AS"/>
+            </Controller>
+        </Animation>
+
+        <Animation name="Sound_WarChestToast_IrisIn">
+            <Event event="Begin" action="Reset,Play"/>
+            <Event event="Test" action="Reset,Play"/>
+            <Controller type="Sound" end="Stop">
+                <Key type="Sound" time="1.0" sound="@UI_WarChestToast_IrisIn"/>
+            </Controller>
+        </Animation>
+
+        <Animation name="Sound_WarChestToast_IrisOut">
+            <Event event="Begin" action="Reset,Play"/>
+            <Event event="Test" action="Reset,Play"/>
+            <Controller type="Sound" end="Stop">
+                <Key type="Sound" time="1.9" sound="@UI_WarChestToast_IrisOut"/>
+            </Controller>
+        </Animation>
+
+        <Animation name="DismissAnim">
+            <Event event="OnShown" action="Reset,Play"/>
+            <Event event="OnHidden" action="Stop"/>
+            <Event event="OnTierUnlock" action="Stop"/>
+
+            <Controller type="Event" end="Stop">
+                <Key type="Event" time="5" event="OnDismiss"/>
+            </Controller>
+        </Animation>
+
+        <Animation name="CompleteAnim">
+            <Event event="Begin" action="Reset"/>
+            <Event event="OnDismiss" action="Play"/>
+            <Event event="OnClick" frame="CloseButton" action="Play"/>
+            <Event event="OnClick" frame="ViewWarChestButton" action="Play"/>
+
+            <Controller type="Property" property="AnimationComplete" end="Pause">
+                <Key type="Property" time="0" value="true"/>
+            </Controller>
+        </Animation>
+            
+        <Animation name="CloseAnim">
+            <Event event="OnClick" frame="CloseButton" action="Reset,Play"/>
+            <Event event="OnClick" frame="ViewWarChestButton" action="Reset,Play"/>
+
+            <Controller type="Visibility" end="Pause">
+                <Key type="Bool" time="0" value="False"/>
+            </Controller>
+        </Animation>
+
+        <StateGroup name="TierUnlockedStateGroup">
+            <DefaultState val="NotUnlocked"/>
+            
+            <State name="Hidden">
+                <When type="Property" Visible="false"/>
+            </State>
+            
+            <State name="UnlockingAnimate">
+                <When type="Property" Operator="GreaterThanOrEqual" TargetValue="{$this/@MaxValue}"/>
+                <When type="Property" Operator="GreaterThan" MaxValue="0"/>
+                <Action type="SetProperty" frame="ProgressLabel" Text="@UI/ScreenCollection/WarChest/Toast/NewTierUnlock"/>
+                <Action type="SendEvent" Event="OnTierUnlock"/>
+            </State>
+            
+            <State name="Unlocked">
+                <When type="Property" frame="TotalTargetXP" Operator="GreaterThanOrEqual" Result="{$this/@MaxValue}"/>
+                <When type="Property" frame="TotalTargetXP" Operator="GreaterThan" Result="0"/>
+                <Action type="SetProperty" frame="ProgressLabel" Text="@UI/ScreenCollection/WarChest/Toast/NewTierUnlock"/>
+                <Action type="SendEvent" Event="PauseNormalShrinkAndGrow"/>
+            </State>
+            
+            <State name="NotUnlocked">
+            </State>
+        </StateGroup>
+        
+        <StateGroup name="PhaseActivityStateGroup">
+            <DefaultState val="Inactive"/>
+            
+            <State name="ThreePhasesActive">
+                <When type="Property" Operator="GreaterThanOrEqual" CurrentRound="3"/>
+                <Action type="SetProperty" frame="OuterSegment1" Texture="@UI/SC2_UI_Collection_WarChest_ToastCircle_OuterSegment_Active"/>
+                <Action type="SetProperty" frame="OuterSegment2" Texture="@UI/SC2_UI_Collection_WarChest_ToastCircle_OuterSegment_Active"/>
+                <Action type="SetProperty" frame="OuterSegment3" Texture="@UI/SC2_UI_Collection_WarChest_ToastCircle_OuterSegment_Active"/>
+                <Action type="SetProperty" frame="OuterSegment1" AdjustmentColor="#WarChestToast_OuterSegmentActive_Color"/>
+                <Action type="SetProperty" frame="OuterSegment2" AdjustmentColor="#WarChestToast_OuterSegmentActive_Color"/>
+                <Action type="SetProperty" frame="OuterSegment3" AdjustmentColor="#WarChestToast_OuterSegmentActive_Color"/>
+                <Action type="SendEvent" frame="OuterSegment1" Event="OnActivate"/>
+                <Action type="SendEvent" frame="OuterSegment2" Event="OnActivate"/>
+                <Action type="SendEvent" frame="OuterSegment3" Event="OnActivate"/>
+            </State>
+            
+            <State name="TwoPhasesActive">
+                <When type="Property" Operator="GreaterThanOrEqual" CurrentRound="2"/>
+                <Action type="SetProperty" frame="OuterSegment1" Texture="@UI/SC2_UI_Collection_WarChest_ToastCircle_OuterSegment_Active"/>
+                <Action type="SetProperty" frame="OuterSegment2" Texture="@UI/SC2_UI_Collection_WarChest_ToastCircle_OuterSegment_Active"/>
+                <Action type="SetProperty" frame="OuterSegment3" Texture="@UI/SC2_UI_Collection_WarChest_ToastCircle_OuterSegment_Inactive"/>
+                <Action type="SetProperty" frame="OuterSegment1" AdjustmentColor="#WarChestToast_OuterSegmentActive_Color"/>
+                <Action type="SetProperty" frame="OuterSegment2" AdjustmentColor="#WarChestToast_OuterSegmentActive_Color"/>
+                <Action type="SetProperty" frame="OuterSegment3" AdjustmentColor="#WarChestToast_OuterSegmentInactive_Color"/>
+                <Action type="SendEvent" frame="OuterSegment1" Event="OnActivate"/>
+                <Action type="SendEvent" frame="OuterSegment2" Event="OnActivate"/>
+                <Action type="SendEvent" frame="OuterSegment3" Event="OnDeactivate"/>
+            </State>
+            
+            <State name="OnePhaseActive">
+                <When type="Property" Operator="GreaterThanOrEqual" CurrentRound="1"/>
+                <Action type="SetProperty" frame="OuterSegment1" Texture="@UI/SC2_UI_Collection_WarChest_ToastCircle_OuterSegment_Active"/>
+                <Action type="SetProperty" frame="OuterSegment2" Texture="@UI/SC2_UI_Collection_WarChest_ToastCircle_OuterSegment_Inactive"/>
+                <Action type="SetProperty" frame="OuterSegment3" Texture="@UI/SC2_UI_Collection_WarChest_ToastCircle_OuterSegment_Inactive"/>
+                <Action type="SetProperty" frame="OuterSegment1" AdjustmentColor="#WarChestToast_OuterSegmentActive_Color"/>
+                <Action type="SetProperty" frame="OuterSegment2" AdjustmentColor="#WarChestToast_OuterSegmentInactive_Color"/>
+                <Action type="SetProperty" frame="OuterSegment3" AdjustmentColor="#WarChestToast_OuterSegmentInactive_Color"/>
+                <Action type="SendEvent" frame="OuterSegment1" Event="OnActivate"/>
+                <Action type="SendEvent" frame="OuterSegment2" Event="OnDeactivate"/>
+                <Action type="SendEvent" frame="OuterSegment3" Event="OnDeactivate"/>
+            </State>
+            
+            <State name="Inactive">
+                <Action type="SetProperty" frame="OuterSegment1" Texture="@UI/SC2_UI_Collection_WarChest_ToastCircle_OuterSegment_Inactive"/>
+                <Action type="SetProperty" frame="OuterSegment2" Texture="@UI/SC2_UI_Collection_WarChest_ToastCircle_OuterSegment_Inactive"/>
+                <Action type="SetProperty" frame="OuterSegment3" Texture="@UI/SC2_UI_Collection_WarChest_ToastCircle_OuterSegment_Inactive"/>
+                <Action type="SetProperty" frame="OuterSegment1" AdjustmentColor="#WarChestToast_OuterSegmentInactive_Color"/>
+                <Action type="SetProperty" frame="OuterSegment2" AdjustmentColor="#WarChestToast_OuterSegmentInactive_Color"/>
+                <Action type="SetProperty" frame="OuterSegment3" AdjustmentColor="#WarChestToast_OuterSegmentInactive_Color"/>
+                <Action type="SendEvent" frame="OuterSegment1" Event="OnDeactivate"/>
+                <Action type="SendEvent" frame="OuterSegment2" Event="OnDeactivate"/>
+                <Action type="SendEvent" frame="OuterSegment3" Event="OnDeactivate"/>
+            </State>
+        </StateGroup>
+    </Frame>
+</Desc>

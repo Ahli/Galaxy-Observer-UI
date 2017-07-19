@@ -74,6 +74,11 @@
         </Frame>
 
         <StateGroup name="AchievementStateGroup">
+            <State name="HideAchievement">
+                <When type="Property" frame="$parent" HideAchievement="true"/>
+                <Action type="SetProperty" frame="$this" Visible="false"/>
+            </State>
+            
             <State name="HasProduct">
                 <When type="Property" frame="$parent" HasProduct="true"/>
                 <Action type="SetProperty" frame="$this" Visible="false"/>
@@ -184,10 +189,11 @@
 
     <Frame type="EmoticonTileListItem" name="EmoticonTileListItemTemplate">
         <Height val="44"/>
+        <Enabled val="false"/>
 
         <Frame type="Image" name="Icon">
             <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
-            <Anchor side="Left" relative="$parent" pos="Min" offset="10"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="6"/>
             <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
             <TextureType val="Normal"/>
             <ScaleWithTexCoords val="true"/>
@@ -200,7 +206,7 @@
         <Frame type="Label" name="NameLabel">
             <Anchor side="Top" relative="$parent" pos="Mid" offset="1"/>
             <Anchor side="Bottom" relative="$parent" pos="Mid" offset="1"/>
-            <Anchor side="Left" relative="$parent/Icon" pos="Max" offset="32"/>
+            <Anchor side="Left" relative="$parent/Icon" pos="Max" offset="18"/>
             <Anchor side="Right" relative="$parent" pos="Mid" offset="30"/>
             <Style val="@Collection_Emoji_SelectedTileList_Info"/>
             <Text val="{$parent/@EmoticonDescription}"/>
@@ -209,11 +215,52 @@
         <Frame type="Label" name="NameAlternateLabel">
             <Anchor side="Top" relative="$parent" pos="Mid" offset="1"/>
             <Anchor side="Bottom" relative="$parent" pos="Mid" offset="1"/>
-            <Anchor side="Left" relative="$parent/NameLabel" pos="Max" offset="27"/>
+            <Anchor side="Left" relative="$parent/NameLabel" pos="Max" offset="13"/>
             <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
             <Style val="@Collection_Emoji_SelectedTileList_Info"/>
             <Text val="{$parent/@EmoticonName}"/>
         </Frame>
+        
+        <Frame type="Image" name="LockIcon">
+            <Anchor side="Top" relative="$parent" pos="Mid" offset="2"/>
+            <Anchor side="Bottom" relative="$parent" pos="Mid" offset="2"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="-1"/>
+            <Width val="20"/>
+            <Height val="20"/>
+            <DesaturateOnDisable val="false"/>
+            <Texture val="@UI/SC2_UI_Collection_Emoji_List_LockIcon"/>
+        </Frame>
+
+        <Frame type="EmoticonAchievementFrame" name="AchievementFrame">
+            <Anchor relative="$parent"/>
+            <AcceptsMouseTooltip val="true"/>
+            <Visible val="false"/>
+            <AchievementId val="{$parent/@AchievementId}"/>
+            <MouseInside val="{$parent/@Hovered}"/>
+
+            <StateGroup name="TooltipStateGroup">
+                <State name="TooltipState">
+                    <When type="Property" frame="$parent" EmoticonAwarded="false"/>
+                    <Action type="SetProperty" frame="$this" Visible="true"/>
+                </State>
+            </StateGroup>
+        </Frame>
+            
+        <StateGroup name="DisabledStateGroup">
+            <DefaultState val="Disabled"/>
+            
+            <State name="Enabled">
+                <When type="Property" EmoticonAwarded="true"/>
+                <When type="Property" frame="$parent/$parent/GameContentFrame" IsAllowed="true"/>
+                <Action type="SetProperty" Enabled="true"/>
+                <Action type="SetProperty" frame="LockIcon" Visible="false"/>
+            </State>
+            
+            <State name="Disabled">
+                <Action type="SetProperty" Enabled="false"/>
+                <Action type="SetProperty" frame="LockIcon" Visible="true"/>
+            </State>
+        </StateGroup>
     </Frame>
 
     <Frame type="EmoticonTileListItem" name="EmoticonTileListItemDialogTemplate">
@@ -451,13 +498,15 @@
         
         <Frame type="Image" name="HeaderIcon">
             <Anchor side="Top" relative="$parent/TileListHeader" pos="Min" offset="18"/>
-            <Anchor side="Left" relative="$parent/TileListHeader" pos="Min" offset="37"/>
+            <Anchor side="Left" relative="$parent/TileListHeader" pos="Min" offset="33"/>
+            <Width val="21"/>
+            <Height val="22"/>
             <Texture val="@UI/SC2_UI_Collection_Emoji_List_Icon"/>
         </Frame>
         
         <Frame type="Label" name="HeaderName">
             <Anchor side="Top" relative="$parent/TileListHeader" pos="Min" offset="16"/>
-            <Anchor side="Left" relative="$parent/HeaderIcon" pos="Max" offset="35"/>
+            <Anchor side="Left" relative="$parent/HeaderIcon" pos="Max" offset="23"/>
             <Anchor side="Right" relative="$parent/TileListHeader" pos="Mid" offset="30"/>
             <Style val="@Collection_Emoji_SelectedTileList_Header"/>
             <Text val="@UI/ScreenCollection/Emojis/Name"/>
@@ -465,7 +514,7 @@
         
         <Frame type="Label" name="HeaderCommand">
             <Anchor side="Top" relative="$parent/TileListHeader" pos="Min" offset="16"/>
-            <Anchor side="Left" relative="$parent/HeaderName" pos="Max" offset="24"/>
+            <Anchor side="Left" relative="$parent/HeaderName" pos="Max" offset="11"/>
             <Style val="@Collection_Emoji_SelectedTileList_Header"/>
             <Text val="@UI/ScreenCollection/Emojis/Command"/>
         </Frame>
@@ -560,6 +609,8 @@
                 <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
                 <Anchor side="Bottom" relative="$parent" pos="Max" offset="-1"/>
             </Frame>
+
+            <Frame type="AchievementInfoTooltip" name="AchievementInfoTooltip" template="StandardTemplates/AchievementInfoTooltipTemplate"/>
         </Frame>
         
         <Frame type="Label" name="UnlockableTypeLabel">

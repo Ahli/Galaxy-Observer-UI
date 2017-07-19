@@ -29,7 +29,6 @@
         <Handle val="ScreenCollection"/>
         <Anchor relative="$parent"/>
         <DisplayBackgroundModel val="false"/>
-        <SelectedTabIndex val="0"/>
         
         <Frame type="CutsceneFrame" name="BackgroundCutsceneFrame">
             <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
@@ -39,38 +38,91 @@
             <RenderType val="HDR"/>
             <File val="Cutscenes/UI_Screens_CollectionsBG.SC2Cutscene"/>
             <AutoPlay val="true"/>
+            
+            <StateGroup name="WarChestVisibleState">
+                <DefaultState val="NotVisible"/>
+                
+                <State name="Visible">
+                    <When type="Property" frame="$parent/CollectionTabControl/WarChestFrame" visible="True"/>
+                    <Action type="SendEvent" frame="$this" event="PlayWarChestBackgroundAudio"/>
+                </State>
+                
+                <State name="NotVisible">
+                    <Action type="SendEvent" frame="$this" event="StopWarChestBackgroundAudio"/>
+                </State>
+            </StateGroup>
+            
+            <Animation name="PlayWarChestBackgroundAudio">
+                <Event event="PlayWarChestBackgroundAudio" action="Reset,Play"/>
+                
+                <Controller type="Cutscene" end="Stop">
+                    <Key type="Cutscene" action="AddFilter" time="0.0" filter="WarChest"/>
+                </Controller>
+            </Animation>
+            
+            <Animation name="StopWarChestBackgroundAudio">
+                <Event event="StopWarChestBackgroundAudio" action="Reset,Play"/>
+                
+                <Controller type="Cutscene" end="Stop">
+                    <Key type="Cutscene" action="RemoveFilter" time="0.0" filter="WarChest"/>
+                </Controller>
+            </Animation>
         </Frame>
         
         <Frame type="Image" name="Vignette">
             <Anchor relative="$parent"/>
             <Texture val="@UI/SC2_UI_Coop_Vignette"/>
             <Alpha val="150"/>
+            <RenderType val="HDR"/>
         </Frame>
 
         <Frame type="TabControl" name="CollectionTabControl">
-            <Anchor side="Top" relative="$parent" pos="Min" offset="72"/>
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
             <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
-            <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/> 
             <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
             <TabListItem val="FeaturedButton"/>
             <TabListItem val="SkinsButton"/>
             <TabListItem val="VoicePacksButton"/>
             <TabListItem val="EmojisButton"/>
-            <TabListItem val="PortraitsButton"/>
-            <TabListItem val="DecalsButton"/>
-            <TabListItem val="AnimationsButton"/>
+            <TabListItem val="AugmentsButton"/>
             <!--<TabListItem val="ConsoleSkinsButton"/>-->
-            <!--<TabListItem val="LootSeasonButton"/>-->
+            <TabListItem val="WarChestButton"/>
             <PanelListItem val="BundleSelectionFrame"/>
             <PanelListItem val="SkinFrame"/>
             <PanelListItem val="VoicePackFrame"/>
             <PanelListItem val="EmojiFrame"/>
-            <PanelListItem val="PortraitFrame"/>
-            <PanelListItem val="DecalFrame"/>
-            <PanelListItem val="AnimationFrame"/>
+            <PanelListItem val="AugmentsFrame"/>
             <!--<PanelListItem val="ConsoleSkinFrame"/>-->
-            <!--<PanelListItem val="LootSeasonFrame"/>-->
-            <SelectedIndex val="{$parent/@SelectedTabIndex}"/>
+            <PanelListItem val="WarChestFrame"/>
+
+            <!-- This is explicitly broken out into a state group to avoid reloading issues -->
+            <StateGroup name="SelectedTabState">
+                <State name="CollectionIndex_Featured">
+                    <When type="Property" frame="$parent" SelectedTabIndex="#CollectionIndex_Featured"/>
+                    <Action type="SetProperty" frame="$this" SelectedIndex="#CollectionIndex_Featured"/>
+                </State>
+                <State name="CollectionIndex_Skins">
+                    <When type="Property" frame="$parent" SelectedTabIndex="#CollectionIndex_Skins"/>
+                    <Action type="SetProperty" frame="$this" SelectedIndex="#CollectionIndex_Skins"/>
+                </State>
+                <State name="CollectionIndex_Announcers">
+                    <When type="Property" frame="$parent" SelectedTabIndex="#CollectionIndex_Announcers"/>
+                    <Action type="SetProperty" frame="$this" SelectedIndex="#CollectionIndex_Announcers"/>
+                </State>
+                <State name="CollectionIndex_Emoticons">
+                    <When type="Property" frame="$parent" SelectedTabIndex="#CollectionIndex_Emoticons"/>
+                    <Action type="SetProperty" frame="$this" SelectedIndex="#CollectionIndex_Emoticons"/>
+                </State>
+                <State name="CollectionIndex_Augments">
+                    <When type="Property" frame="$parent" SelectedTabIndex="#CollectionIndex_Augments"/>
+                    <Action type="SetProperty" frame="$this" SelectedIndex="#CollectionIndex_Augments"/>
+                </State>
+                <State name="CollectionIndex_WarChest">
+                    <When type="Property" frame="$parent" SelectedTabIndex="#CollectionIndex_WarChest"/>
+                    <Action type="SetProperty" frame="$this" SelectedIndex="#CollectionIndex_WarChest"/>
+                </State>
+            </StateGroup>
 
             <Animation name="HideNav">
                 <Event event="HideNav" action="DirectionForward" frame="$parent"/>
@@ -83,6 +135,34 @@
                     <Key type="Bool" time="0.1" value="false"/>
                 </Controller>
             </Animation>
+
+            <Frame type="BundleSelectionFrame" name="BundleSelectionFrame" template="BundleSelectionFrame/BundleSelectionFrameTemplate">
+                <Anchor relative="$parent"/>
+            </Frame>
+
+            <Frame type="SkinPackUnitSelectionFrame" name="SkinFrame" template="SkinPackUnitSelectionFrame/SkinPackUnitSelectionFrameTemplate">
+                <Anchor relative="$parent"/>
+            </Frame>
+
+            <Frame type="VoicePackSelectionFrame" name="VoicePackFrame" template="VoicePackSelectionFrame/VoicePackSelectionFrameTemplate">
+                <Anchor relative="$parent"/>
+            </Frame>
+
+            <Frame type="EmoticonPackSelectionFrame" name="EmojiFrame" template="EmoticonPackSelectionFrame/EmoticonPackSelectionFrameTemplate">
+                <Anchor relative="$parent"/>
+            </Frame>
+            
+            <Frame type="TabControl" name="AugmentsFrame" template="AugmentsFrame/AugmentsFrameTemplate">
+                <Anchor relative="$parent"/>
+            </Frame>
+
+            <!--<Frame type="ConsoleSkinSelectionFrame" name="ConsoleSkinFrame" template="ConsoleSkinSelectionFrame/ConsoleSkinSelectionFrameTemplate">
+                <Anchor relative="$parent"/>
+            </Frame>-->
+
+            <Frame type="WarChestFrame" name="WarChestFrame" template="WarChestFrame/WarChestFrameTemplate">
+                <Anchor relative="$parent"/>
+            </Frame>
             
             <Frame type="BlurFrame" name="BlurEffect">
                 <Anchor relative="$parent/Background"/>
@@ -96,7 +176,7 @@
             </Frame>
 
             <Frame type="Image" name="Background">
-                <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Top" relative="$parent" pos="Min" offset="72"/>
                 <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
                 <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
                 <Height val="56"/>
@@ -143,49 +223,33 @@
             </Frame>
 
             <Frame type="Image" name="ButtonDivider0" template="ScreenCollection/ButtonDividerTemplate">
-                <Anchor side="Top" relative="$parent" pos="Min" offset="16"/>
+                <Anchor side="Top" relative="$parent/FeaturedButton" pos="Min" offset="16"/>
                 <Anchor side="Right" relative="$parent/FeaturedButton" pos="Max" offset="#ButtonOffset"/>
             </Frame>
 
             <Frame type="Image" name="ButtonDivider1" template="ScreenCollection/ButtonDividerTemplate">
-                <Anchor side="Top" relative="$parent" pos="Min" offset="16"/>
+                <Anchor side="Top" relative="$parent/ButtonDivider0" pos="Min" offset="0"/>
                 <Anchor side="Right" relative="$parent/SkinsButton" pos="Max" offset="#ButtonOffset"/>
             </Frame>
 
             <Frame type="Image" name="ButtonDivider2" template="ScreenCollection/ButtonDividerTemplate">
-                <Anchor side="Top" relative="$parent" pos="Min" offset="16"/>
+                <Anchor side="Top" relative="$parent/ButtonDivider0" pos="Min" offset="0"/>
                 <Anchor side="Right" relative="$parent/VoicePacksButton" pos="Max" offset="#ButtonOffset"/>
             </Frame>
 
             <Frame type="Image" name="ButtonDivider3" template="ScreenCollection/ButtonDividerTemplate">
-                <Anchor side="Top" relative="$parent" pos="Min" offset="16"/>
+                <Anchor side="Top" relative="$parent/ButtonDivider0" pos="Min" offset="0"/>
                 <Anchor side="Right" relative="$parent/EmojisButton" pos="Max" offset="#ButtonOffset"/>
             </Frame>
 
             <Frame type="Image" name="ButtonDivider4" template="ScreenCollection/ButtonDividerTemplate">
-                <Anchor side="Top" relative="$parent" pos="Min" offset="16"/>
-                <Anchor side="Right" relative="$parent/PortraitsButton" pos="Max" offset="#ButtonOffset"/>
+                <Anchor side="Top" relative="$parent/ButtonDivider0" pos="Min" offset="0"/>
+                <Anchor side="Right" relative="$parent/AugmentsButton" pos="Max" offset="#ButtonOffset"/>
+                <Visible val="{$parent/WarChestButton/@Visible}"/>
             </Frame>
-
-            <Frame type="Image" name="ButtonDivider5" template="ScreenCollection/ButtonDividerTemplate">
-                <Anchor side="Top" relative="$parent" pos="Min" offset="16"/>
-                <Anchor side="Right" relative="$parent/DecalsButton" pos="Max" offset="#ButtonOffset"/>
-            </Frame>
-
-            <!--<Frame type="Image" name="ButtonDivider6" template="ScreenCollection/ButtonDividerTemplate">
-                <Anchor side="Top" relative="$parent" pos="Min" offset="16"/>
-                <Anchor side="Right" relative="$parent/AnimationsButton" pos="Max" offset="#ButtonOffset"/>
-            </Frame>-->
-
-            <!--
-            <Frame type="Image" name="ButtonDivider7" template="ScreenCollection/ButtonDividerTemplate">
-                <Anchor side="Top" relative="$parent" pos="Min" offset="16"/>
-                <Anchor side="Right" relative="$parent/ConsoleSkinsButton" pos="Max" offset="#ButtonOffset"/>
-            </Frame>
-            -->
             
             <Frame type="Button" name="FeaturedButton" template="ScreenCollection/ScreenCollectionButtonTemplate">
-                <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Top" relative="$parent" pos="Min" offset="72"/>
                 <Anchor side="Left" relative="$parent" pos="Min" offset="51"/>
                 <Text val="@UI/ScreenCollection/FeaturedButton"/>
 
@@ -276,10 +340,10 @@
                 </Animation>
             </Frame>
 
-            <Frame type="Button" name="PortraitsButton" template="ScreenCollection/ScreenCollectionButtonTemplate">
+            <Frame type="Button" name="AugmentsButton" template="ScreenCollection/ScreenCollectionButtonTemplate">
                 <Anchor side="Top" relative="$parent/EmojisButton" pos="Min" offset="0"/>
                 <Anchor side="Left" relative="$parent/EmojisButton" pos="Max" offset="#ButtonOffsetLeft"/>
-                <Text val="@UI/ScreenCollection/PortraitsButton"/>
+                <Text val="@UI/ScreenCollection/AugmentsButton"/>
 
                 <Animation name="FadeNav">
                     <Event event="OnShown" action="Reset"/>
@@ -288,69 +352,15 @@
                     <Controller name="FadeIn" type="Fade" end="Pause">
                         <Key type="Curve" time="0.0" value="0" in="Auto"/>
                         <Key type="Curve" time="0.3" value="0" in="Auto"/>
-                        <Key type="Curve" time="0.55" value="255" out="Auto"/>
+                        <Key type="Curve" time="0.52" value="255" out="Auto"/>
                     </Controller>
                     
                     <Controller type="Anchor" end="Pause" side="Left" relative="true">
                         <Key type="Curve" time="0" value="-10" out="Linear"/>
                         <Key type="Curve" time="0.3" value="-10" out="Linear"/>
-                        <Key type="Curve" time="0.55" value="0" out="Linear"/>
+                        <Key type="Curve" time="0.52" value="0" out="Linear"/>
                     </Controller>
                 </Animation>
-            </Frame>
-
-            <Frame type="Button" name="DecalsButton" template="ScreenCollection/ScreenCollectionButtonTemplate">
-                <Anchor side="Top" relative="$parent/PortraitsButton" pos="Min" offset="0"/>
-                <Anchor side="Left" relative="$parent/PortraitsButton" pos="Max" offset="#ButtonOffsetLeft"/>
-                <Text val="@UI/ScreenCollection/DecalsButton"/>
-
-                <Animation name="FadeNav">
-                    <Event event="OnShown" action="Reset"/>
-                    <Event event="OnShown" action="Play"/>
-
-                    <Controller name="FadeIn" type="Fade" end="Pause">
-                        <Key type="Curve" time="0.0" value="0" in="Auto"/>
-                        <Key type="Curve" time="0.3" value="0" in="Auto"/>
-                        <Key type="Curve" time="0.57" value="255" out="Auto"/>
-                    </Controller>
-                    
-                    <Controller type="Anchor" end="Pause" side="Left" relative="true">
-                        <Key type="Curve" time="0" value="-10" out="Linear"/>
-                        <Key type="Curve" time="0.3" value="-10" out="Linear"/>
-                        <Key type="Curve" time="0.57" value="0" out="Linear"/>
-                    </Controller>
-                </Animation>
-            </Frame>
-
-            <Frame type="Button" name="AnimationsButton" template="ScreenCollection/ScreenCollectionButtonTemplate">
-                <Anchor side="Top" relative="$parent/DecalsButton" pos="Min" offset="0"/>
-                <Anchor side="Left" relative="$parent/DecalsButton" pos="Max" offset="#ButtonOffsetLeft"/>
-                <Text val="@UI/ScreenCollection/AnimationsButton"/>
-
-                <Animation name="FadeNav">
-                    <Event event="OnShown" action="Reset"/>
-                    <Event event="OnShown" action="Play"/>
-
-                    <Controller name="FadeIn" type="Fade" end="Pause">
-                        <Key type="Curve" time="0.0" value="0" in="Auto"/>
-                        <Key type="Curve" time="0.3" value="0" in="Auto"/>
-                        <Key type="Curve" time="0.57" value="255" out="Auto"/>
-                    </Controller>
-
-                    <Controller type="Anchor" end="Pause" side="Left" relative="true">
-                        <Key type="Curve" time="0" value="-10" out="Linear"/>
-                        <Key type="Curve" time="0.3" value="-10" out="Linear"/>
-                        <Key type="Curve" time="0.57" value="0" out="Linear"/>
-                    </Controller>
-                </Animation>
-            </Frame>
-            
-            <Frame type="Frame" name="Collection_DropdownAnchor">
-                <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
-                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
-                <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
-                <Height val="210"/>
-                <Handle val="Collection_DropdownAnchor"/>
             </Frame>
 
             <!--<Frame type="Button" name="ConsoleSkinsButton" template="ScreenCollection/ScreenCollectionButtonTemplate">
@@ -375,16 +385,12 @@
                     </Controller>
                 </Animation>
             </Frame>-->
-
-            <Frame type="BundleSelectionFrame" name="BundleSelectionFrame" template="BundleSelectionFrame/BundleSelectionFrameTemplate">
-                <Anchor relative="$parent"/>
-            </Frame>
             
-            <!--
-            <Frame type="Button" name="LootSeasonButton" template="ScreenCollection/ScreenCollectionButtonTemplate">
-                <Anchor side="Top" relative="$parent/ConsoleSkinsButton" pos="Min" offset="0"/>
-                <Anchor side="Left" relative="$parent/ConsoleSkinsButton" pos="Max" offset="#ButtonOffsetLeft"/>
-                <Text val="@UI/ScreenCollection/LootSeasonButton"/>
+            <Frame type="Button" name="WarChestButton" template="ScreenCollection/ScreenCollectionButtonTemplate">
+                <Anchor side="Top" relative="$parent/AugmentsButton" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/AugmentsButton" pos="Max" offset="#ButtonOffsetLeft"/>
+                <Text val="@UI/ScreenCollection/WarChestButton"/>
+                <Visible val="{$WarChestFrame/@IsCurrentSeasonActive}"/>
 
                 <Animation name="FadeNav">
                     <Event event="OnShown" action="Reset"/>
@@ -403,117 +409,14 @@
                     </Controller>
                 </Animation>
             </Frame>
-            -->
-
-            <Frame type="SkinPackUnitSelectionFrame" name="SkinFrame" template="SkinPackUnitSelectionFrame/SkinPackUnitSelectionFrameTemplate">
-                <Anchor relative="$parent"/>
-            </Frame>
-
-            <Frame type="VoicePackSelectionFrame" name="VoicePackFrame" template="VoicePackSelectionFrame/VoicePackSelectionFrameTemplate">
-                <Anchor relative="$parent"/>
-            </Frame>
-
-            <Frame type="EmoticonPackSelectionFrame" name="EmojiFrame" template="EmoticonPackSelectionFrame/EmoticonPackSelectionFrameTemplate">
-                <Anchor relative="$parent"/>
-            </Frame>
-
-            <Frame type="UnlockablePanel" name="PortraitFrame" template="UnlockablePanel/PortraitSelectionPanelTemplate">
-                <Anchor relative="$parent"/>
-                
-                <Frame type="Label" name="TitleLabel">
-                    <Text val="@UI/ScreenCollection/Portraits/Title"/>
-                </Frame>
-            </Frame>
-
-            <Frame type="UnlockablePanel" name="DecalFrame" template="UnlockablePanel/UnlockableSelectionPanelTemplate">
-                <Anchor relative="$parent"/>
-                
-                <Frame type="Label" name="TitleLabel">
-                    <Text val="@UI/ScreenCollection/Decals/Title"/>
-                </Frame>
-                
-                <Frame type="Frame" name="DecalsActive">
-                    <Visible val="True"/>
-                </Frame>
-
-                <Frame type="EditBox" name="FilterEditBox" template="StandardBattlenetTemplates/BattlenetEditBoxTemplate">
-                    <Frame type="Label" name="SearchTextLabel">
-                        <Text val="@UI/UnlockablePanel/SearchDecals"/>
-                    </Frame>
-                </Frame>
-
-                <Frame type="RaceTabControl" name="RaceTabControl" template="CollectionTemplates/RaceTabControlTemplate">
-                    <Anchor side="Top" relative="$parent" pos="Min" offset="162"/>
-                    <Anchor side="Left" relative="$parent/UnlockableTileList" pos="Min" offset="3"/>
-                    <Anchor side="Bottom" relative="$this/RaceButton2" pos="Max" offset="0"/>
-                    <Anchor side="Right" relative="$this/RaceButton2" pos="Max" offset="0"/>
-                </Frame>
-                
-                <Frame type="Frame" name="InfoContainer">
-                
-                    <Frame type="Label" name="SprayHeader">
-                        <Anchor side="Left" relative="$parent" pos="Min" offset="38"/>
-                        <Anchor side="Bottom" relative="$parent/SprayInfo" pos="Min" offset="-2"/>
-                        <Style val="@Collection_ItemFrame_AchievementInfo_Unearned"/>
-                        <Text val="@UI/ScreenCollection/Decals/SprayHeader"/>
-                    </Frame>
-                    
-                    <Frame type="Label" name="SprayInfo">
-                        <Anchor side="Left" relative="$parent" pos="Min" offset="38"/>
-                        <Anchor side="Right" relative="$parent" pos="Max" offset="-35"/>
-                        <Anchor side="Bottom" relative="$parent" pos="Max" offset="-35"/>
-                        <Style val="@Collection_TooltipAchievementText"/>
-                        <Text val="@UI/ScreenCollection/Decals/SprayInfo"/>
-                    </Frame>
-                </Frame>
-
-                <StateGroup name="RaceStateGroup">
-                    <State name="TerranState">
-                        <When type="Property" frame="RaceTabControl" SelectedRace="Terr"/>
-                        <Action type="SetProperty" frame="$this" UnlockableTag="TCAL"/>
-                    </State>
-
-                    <State name="ZergState">
-                        <When type="Property" frame="RaceTabControl" SelectedRace="Zerg"/>
-                        <Action type="SetProperty" frame="$this" UnlockableTag="ZCAL"/>
-                    </State>
-
-                    <State name="ProtossState">
-                        <When type="Property" frame="RaceTabControl" SelectedRace="Prot"/>
-                        <Action type="SetProperty" frame="$this" UnlockableTag="PCAL"/>
-                    </State>
-                </StateGroup>
-            </Frame>
-
-            <Frame type="UnlockablePanel" name="AnimationFrame" template="UnlockablePanel/UnlockableNoSelectionPanelTemplate">
-                <Anchor relative="$parent"/>
-                <UnlockableTag val="Anim"/>
-
-                <Frame type="EditBox" name="FilterEditBox">
-                    <Frame type="Label" name="SearchTextLabel">
-                        <Text val="@UI/UnlockablePanel/SearchAnimations"/>
-                    </Frame>
-                </Frame>
-                
-                <Frame type="Label" name="TitleLabel">
-                    <Text val="@UI/ScreenCollection/Animations/Title"/>
-                </Frame>
-                
-                <Frame type="Frame" name="AnimationsActive">
-                    <Visible val="True"/>
-                </Frame>
-            </Frame>
-
-            <!--<Frame type="ConsoleSkinSelectionFrame" name="ConsoleSkinFrame" template="ConsoleSkinSelectionFrame/ConsoleSkinSelectionFrameTemplate">
-                <Anchor relative="$parent"/>
-            </Frame>-->
-
-            <!--
-            <Frame type="LootSeasonFrame" name="LootSeasonFrame" template="LootSeasonFrame/LootSeasonFrameTemplate">
-                <Anchor relative="$parent"/>
-            </Frame>
-            -->
             
+            <Frame type="Frame" name="Collection_DropdownAnchor">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+                <Height val="282"/>
+                <Handle val="Collection_DropdownAnchor"/>
+            </Frame>
         </Frame>
     </Frame>
 </Desc>
