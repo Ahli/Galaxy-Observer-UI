@@ -74,17 +74,14 @@ set "lock=%temp%\wait%random%.lock"
 :: The lock file will remain locked until the script ends.
 ping -n 1 127.0.0.1 >nul
 start /MIN "Extracting Layouts" cmd /c 9>"%lock%1" "%CASCPROGRAM%" *.SC2Layout %DESTINATION% %LOCALE% None
-ping -n 1 127.0.0.1 >nul
+ping -n 5 127.0.0.1 >nul
 start /MIN "Extracting Assets" cmd /c 9>"%lock%2" "%CASCPROGRAM%" *Assets.txt %DESTINATION% %LOCALE% None
-ping -n 1 127.0.0.1 >nul
+ping -n 5 127.0.0.1 >nul
 start /MIN "Extracting Styles" cmd /c 9>"%lock%3" "%CASCPROGRAM%" *.SC2Style %DESTINATION% %LOCALE% None
-ping -n 1 127.0.0.1 >nul
+ping -n 5 127.0.0.1 >nul
 ::start /WAIT /MIN "" "%CASCPROGRAM%" *.SC2Layout %DESTINATION% %LOCALE% None
 ::start /WAIT /MIN "" "%CASCPROGRAM%" *Assets.txt %DESTINATION% %LOCALE% None
 ::start /WAIT /MIN "" "%CASCPROGRAM%" *.SC2Style %DESTINATION% %LOCALE% None
-
-:: hack to wait 1 second to reduce chance that loop exits before all commands were started
-ping -n 1 127.0.0.1 >nul
 
 :Wait for all processes to finish (wait until lock files are no longer locked)
 1>nul 2>nul ping /n 2 ::1
