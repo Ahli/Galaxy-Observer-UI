@@ -247,21 +247,6 @@
 				<Frame type="SystemAlertPanel" name="SystemAlertPanel">
 					<Anchor side="Top" relative="$parent" pos="Min" offset="120"/>
 				</Frame>
-				
-				<!-- Death Recap button - moved offscreen -->
-				<Frame type="Button" name="DeathRecapButton">
-					<Anchor side="Left" relative="$parent" pos="Min" offset="85"/>
-					<Anchor side="Top" relative="$parent" pos="Min" offset="9999"/>
-					<Visible val="false"/>
-					
-					<Animation name="KeepHidden">
-						<Event event="OnShown" action="Reset,Play"/>
-						<Controller type="Visibility" end="Pause">
-							<Key type="Bool" time="0" value="false"/>
-						</Controller>
-					</Animation>
-				</Frame>
-				
 			</Frame>
 			
 			<Frame type="Frame" name="ConsoleUIContainer">
@@ -373,7 +358,7 @@
 					<Anchor side="Top" relative="$parent" pos="Min" offset="270"/>
 				</Frame>
 				
-				<!-- BUG: DOES NOT WORK?! Also, workaround at the top does not work either -->
+				<!-- BUG: muting DOES NOT WORK?! Also, workaround at the top does not work either -->
 				<Frame type="SelectionUnitStatusPanel" name="FloatingCombatUnitSelectionPanel">
 					<Frame type="UnitStatusFrame" name="UnitStatusFrame0">
 						<Frame type="HeroTalentTreeSelectionPanel" name="HeroTalentTreeSelectionPanel">
@@ -410,6 +395,18 @@
 						</Frame>
 					</Frame>
 				</Frame>
+
+				<!-- @Override -->
+				<!-- hide death recap button -->
+				<Frame type="UnitStatusFrame" name="HeroDeathStunFrame">
+					<Frame type="Button" name="DeathRecapButton">
+						<Anchor side="Bottom" relative="$parent" pos="Min" offset="999"/>
+						<Visible val="false"/>
+						<Alpha val="0"/>
+					</Frame>
+				</Frame>
+				
+				
 			</Frame>
 			
 			<Frame type="ConsolePanel" name="ConsolePanel">
@@ -461,18 +458,6 @@
 				<Controller type="Visibility" end="Pause" frame="$parent/UIContainer/ConsolePanel">
 					<Key type="Bool" time="0" value="true"/>
 				</Controller>
-				
-				<!-- TEST 
-				<Controller type="Visibility" end="Pause" frame="$parent/UIContainer/ConsolePanel/PortraitPanel">
-					<Key type="Bool" time="0" value="true"/>
-				</Controller>
-				<Controller type="Visibility" end="Pause" frame="$parent/UIContainer/ConsolePanel/PortraitPanel/Portrait">
-					<Key type="Bool" time="0" value="true"/>
-				</Controller>
-				<Controller type="Visibility" end="Pause" frame="$parent/UIContainer/ConsolePanel/PortraitPanel/BackgroundImage">
-					<Key type="Bool" time="0" value="true"/>
-				</Controller>-->
-				
 				
 				<!--<Controller type="Visibility" end="Loop" frame="$TalentTooltipL0T1">
 					<Key type="Bool" time="1" value="true"/>
@@ -1011,7 +996,11 @@
 		<Frame type="UnitStatusValidatorAnimElement" name="VitalityValueDisplayValidator" template="_Ahli/VitalityValueDisplayValidatorTemplate">
 		</Frame>
 	</Frame>
-	
+	<Frame type="UnitStatusShieldedHealthBar" name="AurielUnitStatusFrameTemplate/HeroUnitStatusParentFrame/HealthBar" file="Auriel">
+		<Frame type="UnitStatusValidatorAnimElement" name="VitalityValueDisplayValidator" template="_Ahli/VitalityValueDisplayValidatorTemplate">
+		</Frame>
+	</Frame>
+
 	<!-- TODO: possibly not necessary as healthbar not visible? which unit uses this? -->
 	<Frame type="UnitStatusShieldedHealthBar" name="HeroUnit1SegmentStatusFrame/HeroUnitStatusParentFrame/HealthBar" file="UnitStatus">
 		<Frame type="UnitStatusValidatorAnimElement" name="VitalityValueDisplayValidator" template="_Ahli/VitalityValueDisplayValidatorTemplate">
@@ -1081,60 +1070,66 @@
 	
 	<!-- FIX: KillLog victim border colors -->
 	<Frame type="Frame" name="Item" file="KillLog">
-		 <Frame type="Frame" name="TgtPortrait">
-			<StateGroup name="Source">
+		 <Frame type="Frame" name="TgtPortrait0">
+			<StateGroup name="Colors">
+				<!-- @Override -->
 				<!-- FIX: based on srccolor which works unless it is purple killing (hero dies to merc camp)-->
 				<State name="Red">
 					<When type="AnimationState" frame="$parent" SrcColor="Blue"/>
-					<Action type="SetProperty" frame="PortraitFg" LightAdjustColor="{$ancestor[@name=KillLogPanel]/EnemyColors/@AdditionalColor[0]}"/>
-					<Action type="SetProperty" frame="PortraitFg" DarkAdjustColor="{$ancestor[@name=KillLogPanel]/EnemyColors/@Color}"/>
-					<Action type="SetProperty" frame="PortraitFgGlow" LightAdjustColor="{$ancestor[@name=KillLogPanel]/EnemyColors/@AdditionalColor[1]}"/>
-					<Action type="SetProperty" frame="StrikethroughFrame/Image" DarkAdjustColor="{$ancestor[@name=KillLogPanel]/EnemyColors/@Color}"/>
+					<Action type="SetProperty" frame="PortraitBorder" LightAdjustColor="{$ancestor[@name=KillLogPanel]/EnemyColors/@AdditionalColor[0]}"/>
+					<Action type="SetProperty" frame="PortraitBorder" DarkAdjustColor="{$ancestor[@name=KillLogPanel]/EnemyColors/@Color}"/>
+					<Action type="SetProperty" frame="PortraitBorderGlow" LightAdjustColor="{$ancestor[@name=KillLogPanel]/EnemyColors/@AdditionalColor[1]}"/>
+					<!--<Action type="SetProperty" frame="StrikethroughFrame/Image" DarkAdjustColor="{$ancestor[@name=KillLogPanel]/EnemyColors/@Color}"/>
 					<Action type="SetProperty" frame="StrikethroughFrame/Glow" LightAdjustColor="{$ancestor[@name=KillLogPanel]/EnemyColors/@AdditionalColor[1]}"/>
-					<Action type="SetProperty" frame="StrikethroughFrame/Glow" DarkAdjustColor="{$ancestor[@name=KillLogPanel]/EnemyColors/@AdditionalColor[1]}"/>
+					<Action type="SetProperty" frame="StrikethroughFrame/Glow" DarkAdjustColor="{$ancestor[@name=KillLogPanel]/EnemyColors/@AdditionalColor[1]}"/>-->
 				</State>
+				<!-- @Override -->
 				<State name="Blue">
 					<When type="AnimationState" frame="$parent" SrcColor="Red"/>
-					<Action type="SetProperty" frame="PortraitFg" LightAdjustColor="{$ancestor[@name=KillLogPanel]/AllyColors/@AdditionalColor[0]}"/>
-					<Action type="SetProperty" frame="PortraitFg" DarkAdjustColor="{$ancestor[@name=KillLogPanel]/AllyColors/@Color}"/>
-					<Action type="SetProperty" frame="PortraitFgGlow" LightAdjustColor="{$ancestor[@name=KillLogPanel]/AllyColors/@AdditionalColor[1]}"/>
-					<Action type="SetProperty" frame="StrikethroughFrame/Image" DarkAdjustColor="{$ancestor[@name=KillLogPanel]/AllyColors/@Color}"/>
+					<Action type="SetProperty" frame="PortraitBorder" LightAdjustColor="{$ancestor[@name=KillLogPanel]/AllyColors/@AdditionalColor[0]}"/>
+					<Action type="SetProperty" frame="PortraitBorder" DarkAdjustColor="{$ancestor[@name=KillLogPanel]/AllyColors/@Color}"/>
+					<Action type="SetProperty" frame="PortraitBorderGlow" LightAdjustColor="{$ancestor[@name=KillLogPanel]/AllyColors/@AdditionalColor[1]}"/>
+					<!--<Action type="SetProperty" frame="StrikethroughFrame/Image" DarkAdjustColor="{$ancestor[@name=KillLogPanel]/AllyColors/@Color}"/>
 					<Action type="SetProperty" frame="StrikethroughFrame/Glow" LightAdjustColor="{$ancestor[@name=KillLogPanel]/AllyColors/@AdditionalColor[1]}"/>
-					<Action type="SetProperty" frame="StrikethroughFrame/Glow" DarkAdjustColor="{$ancestor[@name=KillLogPanel]/AllyColors/@AdditionalColor[1]}"/>
+					<Action type="SetProperty" frame="StrikethroughFrame/Glow" DarkAdjustColor="{$ancestor[@name=KillLogPanel]/AllyColors/@AdditionalColor[1]}"/>-->
 				</State>
-				<!-- Purple is buggy with player vision changes -->
+				<!-- Purple as source is buggy with player vision changes -->
 				<State name="Red2">
 					<When type="AnimationState" frame="$parent" SrcColor="Purple"/>
 					<When type="AnimationState" frame="$parent" TgtColor="Red"/>
-					<Action type="SetProperty" frame="PortraitFg" LightAdjustColor="{$ancestor[@name=KillLogPanel]/EnemyColors/@AdditionalColor[0]}"/>
-					<Action type="SetProperty" frame="PortraitFg" DarkAdjustColor="{$ancestor[@name=KillLogPanel]/EnemyColors/@Color}"/>
-					<Action type="SetProperty" frame="PortraitFgGlow" LightAdjustColor="{$ancestor[@name=KillLogPanel]/EnemyColors/@AdditionalColor[1]}"/>
-					<Action type="SetProperty" frame="StrikethroughFrame/Image" DarkAdjustColor="{$ancestor[@name=KillLogPanel]/EnemyColors/@Color}"/>
+					<Action type="SetProperty" frame="PortraitBorder" LightAdjustColor="{$ancestor[@name=KillLogPanel]/EnemyColors/@AdditionalColor[0]}"/>
+					<Action type="SetProperty" frame="PortraitBorder" DarkAdjustColor="{$ancestor[@name=KillLogPanel]/EnemyColors/@Color}"/>
+					<Action type="SetProperty" frame="PortraitBorderGlow" LightAdjustColor="{$ancestor[@name=KillLogPanel]/EnemyColors/@AdditionalColor[1]}"/>
+					<!--<Action type="SetProperty" frame="StrikethroughFrame/Image" DarkAdjustColor="{$ancestor[@name=KillLogPanel]/EnemyColors/@Color}"/>
 					<Action type="SetProperty" frame="StrikethroughFrame/Glow" LightAdjustColor="{$ancestor[@name=KillLogPanel]/EnemyColors/@AdditionalColor[1]}"/>
-					<Action type="SetProperty" frame="StrikethroughFrame/Glow" DarkAdjustColor="{$ancestor[@name=KillLogPanel]/EnemyColors/@AdditionalColor[1]}"/>
+					<Action type="SetProperty" frame="StrikethroughFrame/Glow" DarkAdjustColor="{$ancestor[@name=KillLogPanel]/EnemyColors/@AdditionalColor[1]}"/>-->
 				</State>
 				<State name="Blue2">
 					<When type="AnimationState" frame="$parent" SrcColor="Purple"/>
 					<When type="AnimationState" frame="$parent" TgtColor="Blue"/>
-					<Action type="SetProperty" frame="PortraitFg" LightAdjustColor="{$ancestor[@name=KillLogPanel]/AllyColors/@AdditionalColor[0]}"/>
-					<Action type="SetProperty" frame="PortraitFg" DarkAdjustColor="{$ancestor[@name=KillLogPanel]/AllyColors/@Color}"/>
-					<Action type="SetProperty" frame="PortraitFgGlow" LightAdjustColor="{$ancestor[@name=KillLogPanel]/AllyColors/@AdditionalColor[1]}"/>
-					<Action type="SetProperty" frame="StrikethroughFrame/Image" DarkAdjustColor="{$ancestor[@name=KillLogPanel]/AllyColors/@Color}"/>
+					<Action type="SetProperty" frame="PortraitBorder" LightAdjustColor="{$ancestor[@name=KillLogPanel]/AllyColors/@AdditionalColor[0]}"/>
+					<Action type="SetProperty" frame="PortraitBorder" DarkAdjustColor="{$ancestor[@name=KillLogPanel]/AllyColors/@Color}"/>
+					<Action type="SetProperty" frame="PortraitBorderGlow" LightAdjustColor="{$ancestor[@name=KillLogPanel]/AllyColors/@AdditionalColor[1]}"/>
+					<!--<Action type="SetProperty" frame="StrikethroughFrame/Image" DarkAdjustColor="{$ancestor[@name=KillLogPanel]/AllyColors/@Color}"/>
 					<Action type="SetProperty" frame="StrikethroughFrame/Glow" LightAdjustColor="{$ancestor[@name=KillLogPanel]/AllyColors/@AdditionalColor[1]}"/>
-					<Action type="SetProperty" frame="StrikethroughFrame/Glow" DarkAdjustColor="{$ancestor[@name=KillLogPanel]/AllyColors/@AdditionalColor[1]}"/>
+					<Action type="SetProperty" frame="StrikethroughFrame/Glow" DarkAdjustColor="{$ancestor[@name=KillLogPanel]/AllyColors/@AdditionalColor[1]}"/>-->
+				</State>
+				<!-- @Override -->
+				<State name="Purple">
 				</State>
 			</StateGroup>
-		 </Frame>
-		 <Frame type="Frame" name="TgtPortrait1" template="_Ahli/Item/TgtPortrait"/>
-		 <Frame type="Frame" name="TgtPortrait2" template="_Ahli/Item/TgtPortrait"/>
-		 <Frame type="Frame" name="TgtPortrait3" template="_Ahli/Item/TgtPortrait"/>
-		 <Frame type="Frame" name="TgtPortrait4" template="_Ahli/Item/TgtPortrait"/>
-		 <Frame type="Frame" name="TgtPortrait5" template="_Ahli/Item/TgtPortrait"/>
-		 <Frame type="Frame" name="TgtPortrait6" template="_Ahli/Item/TgtPortrait"/>
-		 <Frame type="Frame" name="TgtPortrait7" template="_Ahli/Item/TgtPortrait"/>
-		 <Frame type="Frame" name="TgtPortrait8" template="_Ahli/Item/TgtPortrait"/>
-		 <Frame type="Frame" name="TgtPortrait9" template="_Ahli/Item/TgtPortrait"/>
-		 <Frame type="Frame" name="TgtPortrait10" template="_Ahli/Item/TgtPortrait"/>
+			
+		</Frame>
+		 <Frame type="Frame" name="TgtPortrait1" template="_Ahli/Item/TgtPortrait0"/>
+		 <Frame type="Frame" name="TgtPortrait2" template="_Ahli/Item/TgtPortrait0"/>
+		 <Frame type="Frame" name="TgtPortrait3" template="_Ahli/Item/TgtPortrait0"/>
+		 <Frame type="Frame" name="TgtPortrait4" template="_Ahli/Item/TgtPortrait0"/>
+		 <Frame type="Frame" name="TgtPortrait5" template="_Ahli/Item/TgtPortrait0"/>
+		 <Frame type="Frame" name="TgtPortrait6" template="_Ahli/Item/TgtPortrait0"/>
+		 <Frame type="Frame" name="TgtPortrait7" template="_Ahli/Item/TgtPortrait0"/>
+		 <Frame type="Frame" name="TgtPortrait8" template="_Ahli/Item/TgtPortrait0"/>
+		 <Frame type="Frame" name="TgtPortrait9" template="_Ahli/Item/TgtPortrait0"/>
+		 <Frame type="Frame" name="TgtPortrait10" template="_Ahli/Item/TgtPortrait0"/>
 	</Frame>
 	
 	

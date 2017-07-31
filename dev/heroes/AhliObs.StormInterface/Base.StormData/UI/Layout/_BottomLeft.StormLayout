@@ -112,55 +112,57 @@
 		<!-- For some reason, this is necessary to make the portraitpanel appear... -->
 		<Animation name="ShowPortraitPanel">
 			<Event event="OnShown" action="Reset,Play"/>
-			<Controller type="Visibility" end="Pause" frame="PortraitPanel">
+			<Controller type="Visibility" end="Pause" frame="$PortraitPanel">
 				<Key type="Bool" time="1" value="true"/>
 			</Controller>
 		</Animation>
 		
 		<!-- portrait panel -->
 		<!-- @Override -->
-		<Frame type="PortraitPanel" name="PortraitPanel">
-            <Anchor side="Bottom" relative="$UnitSelectionInfoVerticalPositionControl" pos="Min" offset="-240"/>
-            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
-			<Handle val="PortraitPanel"/>
-			<Visible val="true"/>
-			<Animation name="KeepVisible">
-				<Event event="OnHidden" action="Reset,Play"/>
-				<Controller type="Visibility" end="Pause">
-					<Key type="Bool" time="0" value="true"/>
-				</Controller>
-			</Animation>
-			
-			<Frame type="Portrait" name="Portrait">
-				<Alpha val="60"/>
+		<Frame type="Frame" name="PortraitPanelContainer">
+			<Frame type="PortraitPanel" name="PortraitPanel">
+				<Anchor side="Bottom" relative="$UnitSelectionInfoVerticalPositionControl" pos="Min" offset="-240"/>
+				<Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+				<Handle val="PortraitPanel"/>
+				<Visible val="true"/>
+				<Animation name="KeepVisible">
+					<Event event="OnHidden" action="Reset,Play"/>
+					<Controller type="Visibility" end="Pause">
+						<Key type="Bool" time="0" value="true"/>
+					</Controller>
+				</Animation>
 				
-				<!--<Visible val="{$StatusFrameOfSingleSelectedUnit/@Visible}"/>-->
+				<Frame type="Portrait" name="Portrait">
+					<Alpha val="60"/>
+					
+					<!--<Visible val="{$StatusFrameOfSingleSelectedUnit/@Visible}"/>-->
+					
+					<StateGroup name="Visibility">
+						<DefaultState val="Hide"/>
+						<State name="Show">
+							<When type="Property" frame="$StatusFrameOfSingleSelectedUnit" visible="true"/>
+							<When type="Property" frame="$GameUI/UIContainer/FullScreenUpperContainer/ChatDisplay" visible="true"/>
+							<Action type="SetProperty" visible="true"/>
+						</State>
+						<State name="Hide">
+							<Action type="SetProperty" visible="false"/>
+						</State>
+					</StateGroup>
+					
+				</Frame>
 				
-				<StateGroup name="Visibility">
-					<DefaultState val="Hide"/>
-					<State name="Show">
-						<When type="Property" frame="$StatusFrameOfSingleSelectedUnit" visible="true"/>
-						<When type="Property" frame="$GameUI/UIContainer/FullScreenUpperContainer/ChatDisplay" visible="true"/>
-						<Action type="SetProperty" visible="true"/>
-					</State>
-					<State name="Hide">
-						<Action type="SetProperty" visible="false"/>
-					</State>
-				</StateGroup>
-				
-			</Frame>
-			
-			<Frame type="Image" name="BackgroundImage">
-				<Visible val="{$parent/Portrait/@Visible}"/>
-				<Texture val="_Assets\Textures\hud_bg_portraitframe.dds"/>
+				<Frame type="Image" name="BackgroundImage">
+					<Visible val="{$parent/Portrait/@Visible}"/>
+					<Texture val="_Assets\Textures\hud_bg_portraitframe.dds"/>
+				</Frame>
 			</Frame>
 		</Frame>
 
 		<!-- bind position to portrait -->
 		<!-- @Override -->
         <Frame type="HeroSpecificContainerPanel" name="HeroSpecificBackgroundStatusContainer">
-            <Anchor side="Bottom" relative="$parent/PortraitPanel" pos="Max" offset="0"/>
-            <Anchor side="Left" relative="$parent/PortraitPanel" pos="Min" offset="0"/>
+            <Anchor side="Bottom" relative="$PortraitPanel" pos="Max" offset="0"/>
+            <Anchor side="Left" relative="$PortraitPanel" pos="Min" offset="0"/>
 		</Frame>
 
 		
@@ -2500,6 +2502,10 @@
 					</Frame>
 
 					
+					<Frame type="SelectionUnitStatusPanel" name="Garrosh" template="Garrosh/GarroshTraitFrame">
+					</Frame>
+					
+					
 					<!-- UI Frames not automatically created by "<HeroSpecificUIArray": -->
 
 					
@@ -4117,10 +4123,10 @@
 							<Validator val="TargetIsSleeping"/>
 
 							<Frame type="Image" name="DebuffPlateBg">
-								<Color val="E00709"/>
+								<Color val="1344BF"/>
 							</Frame>
 							<Frame type="Image" name="DebuffIconLeft">
-								<Texture val="@UI/State/StunnedIcon"/>
+								<Texture val="@UI/State/SleepingIcon"/>
 							</Frame>
 							<Frame type="Label" name="DebuffLabel">
 								<Text val="@UI/State/Sleeping"/>
@@ -4384,24 +4390,22 @@
 								<Anchor relative="$parent"/>
 								<Texture val="@UI/Storm_UI_InGame_Status_HinderedHealing"/>
 								<Unclipped val="true"/>
+								
+								<StateGroup name="Colorblind">
+									<State name="Default"/>
+									<State name="ColorBlindEnabled">
+										<When type="Option" colorblind="True"/>
+										<Action type="SetProperty" Texture="@UI/Storm_UI_InGame_Status_HinderedHealing_CB"/>
+									</State>
+								</StateGroup>
 							</Frame>
 
-							<!-- ResetVisibility is called whenever frame gets hidden so that fading animation is not
-								 resumed when unit comes out of the fog of war. -->
-							<Animation name="ShowAnim">
-								<!--<Event event="ResetVisibility" action="Stop"/>-->
-								<Event event="Show" action="Reset,Play"/>
+							<Animation name="Ahlimation">
+								<Event event="HasHinderedHealingDebuff" action="Restart,Play"/>
+								<Event event="NoState" action="Stop"/>
 								
 								<Controller type="Visibility" end="Pause">
 									<Key type="Bool" time="0" value="true"/>
-								</Controller>
-							</Animation>
-							<Animation name="HideAnim">
-								<!--<Event event="ResetVisibility" action="Stop"/>-->
-								<Event event="Hide" action="Reset,Play"/>
-								
-								<Controller type="Visibility" end="Pause">
-									<Key type="Bool" time="0" value="false"/>
 								</Controller>
 							</Animation>
 						</Frame>
@@ -4550,29 +4554,14 @@
 								<Unclipped val="true"/>
 							</Frame>
 
-							<!-- ResetVisibility is called whenever frame gets hidden so that fading animation is not
-								 resumed when unit comes out of the fog of war.
-							-->
-							<Animation name="ShowAnim">
-								<!--<Event event="ResetVisibility" action="Stop"/>-->
-								<Event event="Show" action="Reset,Play"/>
+							<Animation name="Ahlimation">
+								<Event event="UserCategorySourceRevealed" action="Restart,Play"/>
+								<Event event="NoState" action="Stop"/>
 								
 								<Controller type="Visibility" end="Pause">
 									<Key type="Bool" time="0" value="true"/>
 								</Controller>
 							</Animation>
-							<Animation name="HideAnim">
-								<!--<Event event="ResetVisibility" action="Stop"/>-->
-								<Event event="Hide" action="Reset,Play"/>
-								
-								<Controller type="Visibility" end="Pause">
-									<Key type="Bool" time="0" value="false"/>
-								</Controller>
-							</Animation>
-
-							<!-- <Animation name="UserCategorySourceRevealed">
-								<Event event="UserCategorySourceRevealed" action="Restart,Play"/>
-							</Animation> -->
 						</Frame>
 
 					</Frame>
@@ -5069,9 +5058,27 @@
 			</Frame>
 		</Frame>
 	</Frame>
-
-	
-	
+	<!-- Garrosh hero UI button -->
+	<Frame type="UnitStatusFrame" name="BodyCheckButtonOverlayFrame" file="Garrosh">
+		<Frame type="Image" name="BodyCheckGlowImage">
+            <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Mid" offset="-0"/>
+            <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+            <!--<Texture val="@UI/Storm_UI_InGame_AbilityButton_Active_Add"/>-->
+			<Width val="#commandButtonActivateEffectWidth"/>
+			<Height val="#commandButtonActivateEffectHeight"/>
+		</Frame>
+        <Frame type="Image" name="BodyCheckGlowImage2">
+            <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+            <!--<Texture val="@UI/Storm_UI_InGame_AbilityButton_Active_Add"/>-->
+			<Width val="#commandButtonActivateEffectWidth"/>
+			<Height val="#commandButtonActivateEffectHeight"/>
+		</Frame>
+	</Frame>
 	
 	<!-- observer/replay tools toggle -->
 	<Frame type="Frame" name="GameUI/UIContainer/FullscreenUpperContainer" file="GameUI">
