@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <Desc>
-    
     <Frame type="Frame" name="InGameNotificationsTemplate">
         <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
         <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
@@ -40,6 +39,7 @@
                 <Event event="ShowTimedNotification_Tier3" action="Reset,Play" frame="$parent"/>
                 <Event event="ShowTimedNotification_Tier4" action="Reset,Play" frame="$parent"/>
                 <Event event="ShowEnemyNotification" action="Reset,Play" frame="$parent"/>
+                <Event event="ShowQuestNotification" action="Reset,Play" frame="$parent"/>
                 <Controller type="Visibility" end="Pause">
                     <Key type="Bool" time="0" value="True"/>
                     <Key type="Bool" time=".001" value="false"/>
@@ -57,6 +57,8 @@
                 <RenderType val="HDR"/>
                 <Unclipped val="True"/>
                 <Visible val="False"/>
+
+                <Frame type="Frame" name="CutsceneColorblindFilterSupport" template="StandardAnimationTemplates/CutsceneColorblindFilterSupportTemplate"/>
 
                 <Animation name="PlayAllyBg">
                     <Event event="ShowStandardNotification" action="Reset,Play" frame="$parent/$parent"/>
@@ -276,6 +278,8 @@
                 <Unclipped val="True"/>
                 <Visible val="False"/>
 
+                <Frame type="Frame" name="CutsceneColorblindFilterSupport" template="StandardAnimationTemplates/CutsceneColorblindFilterSupportTemplate"/>
+
                 <Animation name="PlayEnemyBg">
                     <Event event="ShowEnemyNotification" action="Reset,Play" frame="$parent/$parent"/>
 
@@ -480,6 +484,8 @@
                 <Unclipped val="True"/>
                 <Visible val="False"/>
 
+                <Frame type="Frame" name="CutsceneColorblindFilterSupport" template="StandardAnimationTemplates/CutsceneColorblindFilterSupportTemplate"/>
+
                 <Animation name="PlayAllyBg">
                     <Event event="ShowTutorialNotification" action="Reset,Play" frame="$parent/$parent"/>
 
@@ -602,6 +608,8 @@
                 <Height val="550"/>
                 <Unclipped val="True"/>
                 <Visible val="False"/>
+
+                <Frame type="Frame" name="CutsceneColorblindFilterSupport" template="StandardAnimationTemplates/CutsceneColorblindFilterSupportTemplate"/>
 
                 <Animation name="HideWhenNotInUse">
                     <Event event="OnBookmark[0 End]" action="Reset,Play"/>
@@ -1854,6 +1862,275 @@
                         <Key type="Curve" time="0.5" value="0" inout="Auto,Linear"/>
                     </Controller>
                 </Animation>
+            </Frame>
+        </Frame>
+
+        <!-- Quest Completion Animations -->
+        <Frame type="Frame" name="QuestNotificationTemplate">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="54"/>
+            <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+            <Height val="168"/>
+            <Width val="1300"/>
+            
+            <Animation name="Begin">
+                <Event event="ShowQuestNotification" action="Reset,Play" frame="$parent"/>
+                <Controller type="Visibility" end="Pause">
+                    <Key type="Bool" time="0" value="False"/>
+                    <Key type="Bool" time="0" value="True"/>
+                </Controller>
+
+                <Controller type="Fade" end="Pause">
+                    <Key type="Curve" time="0.0" value="0" inout="Linear,Slow"/>
+                    <Key type="Curve" time="0.1" value="255" inout="Linear"/>
+                    <Key type="Curve" time="2.8" value="255" inout="Linear,Slow"/>
+                    <Key type="Curve" time="2.8" value="0" inout="Linear"/>
+                </Controller>
+                
+                <Controller type="Sound" end="Stop">
+                    <Key type="Sound" time="0.1" sound="@UI_Game_Flyin_EnemyKilled1"/>
+                </Controller>
+            </Animation>
+            
+            <Animation name="End">
+                <Event event="ShowTimedNotification_Tier0" action="Reset,Play" frame="$parent"/>
+                <Event event="ShowTimedNotification_Tier1" action="Reset,Play" frame="$parent"/>
+                <Event event="ShowTimedNotification_Tier2" action="Reset,Play" frame="$parent"/>
+                <Event event="ShowTimedNotification_Tier3" action="Reset,Play" frame="$parent"/>
+                <Event event="ShowTimedNotification_Tier4" action="Reset,Play" frame="$parent"/>
+                <Event event="ShowEnemyNotification" action="Reset,Play" frame="$parent"/>
+                <Event event="ShowStandardNotification" action="Reset,Play" frame="$parent"/>
+                <Controller type="Visibility" end="Pause">
+                    <Key type="Bool" time="0" value="True"/>
+                    <Key type="Bool" time="0" value="false"/>
+                </Controller>
+            </Animation>
+
+            <Frame type="CutsceneFrame" name="AllyBackgroundCutscene">
+                <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+                <Width val="1600"/>
+                <Height val="550"/>
+                <File val="Cutscenes/GameUI_KillCallout.StormCutscene"/>
+                <RenderType val="HDR"/>
+                <Unclipped val="True"/>
+                <Visible val="False"/>
+
+                <Frame type="Frame" name="CutsceneColorblindFilterSupport" template="StandardAnimationTemplates/CutsceneColorblindFilterSupportTemplate"/>
+
+                <Animation name="PlayAllyBg">
+                    <Event event="ShowQuestNotification" action="Reset,Play" frame="$parent/$parent"/>
+
+                    <Controller type="Visibility" end="Pause">
+                        <Key type="Bool" time="0" value="False"/>
+                        <Key type="Bool" time="0" value="True"/>
+                    </Controller>
+                        
+                    <Controller type="Cutscene" end="Stop">
+                        <Key type="Cutscene" time="0" action="Play"/>
+                        <Key type="Cutscene" time="0" action="Bookmark" bookmark="0"/>
+                        <Key type="Cutscene" time="0" action="RemoveFilter" filter="Enemy"/>
+                        <Key type="Cutscene" time="0" action="AddFilter" filter="Ally"/>
+                    </Controller>
+                </Animation>
+            </Frame>
+            
+            <Frame type="Image" name="NotificationBackground">
+                <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                <Width val="517"/>
+                <Height val="168"/>
+                <Texture val="@UI/HUD_Notifications_BG_Blue"/>
+                <Alpha val="0"/>
+                
+                <Animation name="ShowBackground">
+                    <Event event="ShowQuestNotification" action="Reset,Play" frame="$parent/$parent"/>
+                    
+                    <Controller type="Fade" end="Pause">
+                        <Key type="Curve" time="0.0" value="0" inout="Linear,Auto"/>
+                        <Key type="Curve" time="0.3" value="0" inout="Auto,Linear"/>
+                        <Key type="Curve" time="2.5" value="0" inout="Auto,Linear"/>
+                        <Key type="Curve" time="2.8" value="0" inout="Linear,Auto"/>
+                    </Controller>
+                </Animation>
+            </Frame>
+
+            <Frame type="Label" name="NotificationTitle_Blur">
+                <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+                <Anchor side="Bottom" relative="$parent" pos="Min" offset="94"/>
+                <Width val="1300"/>
+                <Style val="Storm_InGame_Notification_Title_Glow"/>
+                <Text val="{$parent/NotificationTitle/@Text}"/>
+                <Alpha val="0"/>
+                <Blur val="true"/>
+                <BlurAmount val="2"/>
+                
+                <Animation name="ShowTitle">
+                    <Event event="ShowQuestNotification" action="Reset,Play" frame="$parent/$parent"/>
+                    
+                    <Controller type="Fade" end="Pause">
+                        <Key type="Curve" time="0.0" value="0" inout="Linear,Auto"/>
+                        <Key type="Curve" time="0.1" value="0" inout="Linear,Auto"/>
+                        <Key type="Curve" time="0.4" value="255" inout="Auto,Linear"/>
+                        <Key type="Curve" time="2.6" value="255" inout="Auto,Linear"/>
+                        <Key type="Curve" time="2.8" value="0" inout="Linear,Auto"/>
+                    </Controller>
+                
+                    <Controller type="Anchor" end="Pause" side="Right" relative="true">
+                        <Key type="Curve" time="0.0" value="-365" inout="Linear,Auto"/>
+                        <Key type="Curve" time="0.1" value="-365" inout="Linear,Auto"/>
+                        <Key type="Curve" time="0.4" value="0" inout="Auto,Linear"/>
+                        <Key type="Curve" time="2.6" value="35" inout="Linear,Auto"/>
+                        <Key type="Curve" time="2.8" value="355" inout="Auto,Linear"/>
+                    </Controller>
+                </Animation>
+            </Frame>
+            
+            <Frame type="Label" name="NotificationTitle">
+                <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Bottom" relative="$parent" pos="Min" offset="94"/>
+                <Style val="Storm_InGame_Notification_Title"/>
+                <Text val="[Notification Text]"/>
+                <Alpha val="0"/>
+                
+                <Animation name="ShowTitle">
+                    <Event event="ShowQuestNotification" action="Reset,Play" frame="$parent/$parent"/>
+                    
+                    <Controller type="Fade" end="Pause">
+                        <Key type="Curve" time="0.0" value="0" inout="Linear,Auto"/>
+                        <Key type="Curve" time="0.1" value="0" inout="Linear,Auto"/>
+                        <Key type="Curve" time="0.4" value="255" inout="Auto,Linear"/>
+                        <Key type="Curve" time="2.6" value="255" inout="Auto,Linear"/>
+                        <Key type="Curve" time="2.8" value="0" inout="Linear,Auto"/>
+                    </Controller>
+                    
+                    <Controller type="Blur" end="Pause">
+                        <Key type="Curve" time="0.0" value="0.5" inout="Linear"/>
+                        <Key type="Curve" time="0.4" value="0" inout="Linear"/>
+                        <Key type="Curve" time="2.6" value="0" inout="Linear"/>
+                        <Key type="Curve" time="2.8" value="0.5" inout="Linear"/>
+                    </Controller>
+                
+                    <Controller type="Anchor" end="Pause" side="Left" relative="true">
+                        <Key type="Curve" time="0.0" value="-365" inout="Linear,Auto"/>
+                        <Key type="Curve" time="0.1" value="-365" inout="Linear,Auto"/>
+                        <Key type="Curve" time="0.4" value="0" inout="Auto,Linear"/>
+                        <Key type="Curve" time="2.6" value="35" inout="Linear,Auto"/>
+                        <Key type="Curve" time="2.8" value="355" inout="Auto,Linear"/>
+                    </Controller>
+                    <Controller type="Anchor" end="Pause" side="Right" relative="true">
+                        <Key type="Curve" time="0.0" value="-365" inout="Linear,Auto"/>
+                        <Key type="Curve" time="0.1" value="-365" inout="Linear,Auto"/>
+                        <Key type="Curve" time="0.4" value="0" inout="Auto,Linear"/>
+                        <Key type="Curve" time="2.6" value="35" inout="Linear,Auto"/>
+                        <Key type="Curve" time="2.8" value="355" inout="Auto,Linear"/>
+                    </Controller>
+                </Animation>
+            </Frame>
+
+            <Frame type="Label" name="NotificationLabel_Blur">
+                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Top" relative="$parent" pos="Min" offset="82"/>
+                <Width val="1300"/>
+                <Style val="Storm_InGame_Notification_Label_Blur"/>
+                <Text val="{$parent/NotificationLabel/@Text}"/>
+                <Alpha val="0"/>
+                <Blur val="true"/>
+                <BlurAmount val="2"/>
+                
+                <Animation name="ShowLabel">
+                    <Event event="ShowQuestNotification" action="Reset,Play" frame="$parent/$parent"/>
+                    
+                    <Controller type="Fade" end="Pause">
+                        <Key type="Curve" time="0.0" value="0" inout="Linear,Auto"/>
+                        <Key type="Curve" time="0.1" value="0" inout="Linear,Auto"/>
+                        <Key type="Curve" time="0.4" value="255" inout="Auto,Linear"/>
+                        <Key type="Curve" time="2.6" value="255" inout="Auto,Linear"/>
+                        <Key type="Curve" time="2.8" value="0" inout="Linear,Auto"/>
+                    </Controller>
+                    
+                    <Controller type="Anchor" end="Pause" side="Left" relative="true">
+                        <Key type="Curve" time="0.0" value="330" inout="Linear,Auto"/>
+                        <Key type="Curve" time="0.1" value="330" inout="Linear,Auto"/>
+                        <Key type="Curve" time="0.4" value="0" inout="Auto,Linear"/>
+                        <Key type="Curve" time="2.6" value="-35" inout="Linear,Auto"/>
+                        <Key type="Curve" time="2.8" value="-320" inout="Auto,Linear"/>
+                    </Controller>
+                </Animation>
+            </Frame>
+            
+            <Frame type="Label" name="NotificationLabel">
+                <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Top" relative="$parent" pos="Min" offset="82"/>
+                <Style val="Storm_InGame_Notification_Label"/>
+                <Text val="[Quest Name]"/>
+                <Alpha val="0"/>
+                
+                <Animation name="ShowLabel">
+                    <Event event="ShowQuestNotification" action="Reset,Play" frame="$parent/$parent"/>
+                    
+                    <Controller type="Fade" end="Pause">
+                        <Key type="Curve" time="0.0" value="0" inout="Linear,Auto"/>
+                        <Key type="Curve" time="0.1" value="0" inout="Linear,Auto"/>
+                        <Key type="Curve" time="0.4" value="255" inout="Auto,Linear"/>
+                        <Key type="Curve" time="2.6" value="255" inout="Auto,Linear"/>
+                        <Key type="Curve" time="2.8" value="0" inout="Linear,Auto"/>
+                    </Controller>
+
+                    <Controller type="Anchor" end="Pause" side="Left" relative="true">
+                        <Key type="Curve" time="0.0" value="330" inout="Linear,Auto"/>
+                        <Key type="Curve" time="0.1" value="330" inout="Linear,Auto"/>
+                        <Key type="Curve" time="0.4" value="0" inout="Auto,Linear"/>
+                        <Key type="Curve" time="2.6" value="-35" inout="Linear,Auto"/>
+                        <Key type="Curve" time="2.8" value="-320" inout="Auto,Linear"/>
+                    </Controller>
+                    <Controller type="Anchor" end="Pause" side="Right" relative="true">
+                        <Key type="Curve" time="0.0" value="330" inout="Linear,Auto"/>
+                        <Key type="Curve" time="0.1" value="330" inout="Linear,Auto"/>
+                        <Key type="Curve" time="0.4" value="0" inout="Auto,Linear"/>
+                        <Key type="Curve" time="2.6" value="-35" inout="Linear,Auto"/>
+                        <Key type="Curve" time="2.8" value="-320" inout="Auto,Linear"/>
+                    </Controller>
+                </Animation>
+            </Frame>
+
+            <Frame type="Frame" name="QuestIcon">
+                <Width val="50"/>
+                <Height val="50"/>
+                <Anchor side="Right" relative="$parent/NotificationLabel" pos="Min" offset="0"/>
+                <Anchor side="Top" relative="$parent/NotificationLabel" pos="Mid" offset="0"/>
+                <Anchor side="Bottom" relative="$parent/NotificationLabel" pos="Mid" offset="0"/>
+                <Alpha val="{$parent/NotificationLabel/@Alpha}"/>
+
+                <Frame type="Image" name="IconImage">
+                    <Anchor side="Left" relative="$parent" pos="0.1923" offset="0"/>
+                    <Anchor side="Right" relative="$parent" pos="0.8077" offset="0"/>
+                    <Anchor side="Top" relative="$parent" pos="0.1923" offset="0"/>
+                    <Anchor side="Bottom" relative="$parent" pos="0.8077" offset="0"/>
+                </Frame>
+                
+                <Frame type="Image" name="IconBorder">
+                    <Anchor relative="$parent"/>
+                    <Texture val="@UI/Storm_UI_InGame_Tab_Screen_Quest_Progress_Bar"/>
+                    <TextureCoords top="0" left="0.5" bottom="1" right="1"/>
+                </Frame>
+            </Frame>
+
+            <Frame type="Image" name="QuestEmblem">
+                <Anchor side="Left" relative="$parent/NotificationTitle" pos="Max" offset="-24"/>
+                <Anchor side="Top" relative="$parent/NotificationTitle" pos="Mid" offset="5"/>
+                <Anchor side="Bottom" relative="$parent/NotificationTitle" pos="Mid" offset="5"/>
+                <Height val="80"/>
+                <Width val="95"/>
+
+                <Alpha val="{$parent/NotificationTitle/@Alpha}"/>
+                <Texture val="@UI/Storm_UI_InGame_Quest_Progress_Floating_Combat_Element"/>
+                <HSkew val="6"/> 
             </Frame>
         </Frame>
     </Frame>
