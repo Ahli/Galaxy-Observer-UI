@@ -349,8 +349,6 @@
 			<Texture val="_Assets\Textures\talentQuestProgressBarBackground.dds"/>
 		</Frame>
 		<Frame type="ProgressBar" name="QuestProgressBar">
-					<!-- TODO BUG: propertybind with maxValue does not work => hide feature for now, remove alpha=0 when working -->
-					<Alpha val="0"/>
 			<Anchor side="Top" relative="$parent/IconImage" pos="Mid" offset="0"/>
 			<Anchor side="Left" relative="$parent/IconImage" pos="Mid" offset="0"/>
 			<Anchor side="Right" relative="$parent/IconImage" pos="Mid" offset="0"/>
@@ -381,22 +379,6 @@
 				</Frame>
 			</Frame>
 		</Frame>
-		<!-- DEBUG
-		<Frame type="Label" name="ProgressLabel1">
-			<Anchor side="Top" relative="$parent/QuestProgressBar" pos="Max" offset="-10"/>
-			<Anchor side="Left" relative="$parent/QuestProgressBar" pos="Max" offset="2"/>
-			<Text val="{$parent/QuestProgressBar/@Value}"/>
-		</Frame>
-		<Frame type="Label" name="ProgressLabel2">
-			<Anchor side="Top" relative="$parent/ProgressLabel1" pos="Min" offset="0"/>
-			<Anchor side="Left" relative="$parent/ProgressLabel1" pos="Max" offset="5"/>
-			<Text val="/"/>
-		</Frame>
-		<Frame type="Label" name="ProgressLabel3">
-			<Anchor side="Top" relative="$parent/ProgressLabel1" pos="Min" offset="0"/>
-			<Anchor side="Left" relative="$parent/ProgressLabel2" pos="Max" offset="5"/>
-			<Text val="{$parent/QuestProgressBar/@MaxValue}"/>
-		</Frame>-->
 		<Frame type="Image" name="QuestCompleteImage">
 			<Anchor side="Top" relative="$parent/IconImage" pos="Mid" offset="0"/>
 			<Anchor side="Left" relative="$parent/IconImage" pos="Mid" offset="0"/>
@@ -409,17 +391,34 @@
 			<Texture val="_Assets\Textures\talentQuestProgressBarComplete.dds"/>
 		</Frame>
         <Frame type="Label" name="QuestProgressStackLabel">
-            <Anchor side="Top" relative="$parent/QuestProgressBar" pos="Max" offset="-4"/>
-            <Anchor side="Bottom" relative="$parent/QuestProgressBar" pos="Max" offset="-4"/>
-            <Anchor side="Left" relative="$parent/QuestProgressBar" pos="Max" offset="-8"/>
-            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+            <Anchor side="Top" relative="$parent/QuestProgressBar" pos="Max" offset="-2"/>
+            <Anchor side="Left" relative="$parent/QuestProgressBar" pos="Min" offset="0"/>
 			<Height val="20"/>
             <Style val="BottomPanel_TalentTooltipQuestStack"/>
             <Visible val="false"/>
             <RenderPriority val="538"/>
 			<Unclipped val="true"/>
-			<!-- TODO once above questprogressbar works, this can be used...
-			<Text val="{$parent/QuestProgressBar/@Value}"/>-->
+			<Text val="{$parent/QuestProgressBar/@Value}"/>
+        </Frame>
+        <Frame type="Label" name="QuestProgressStackLabel2">
+            <Anchor side="Top" relative="$parent/QuestProgressStackLabel" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent/QuestProgressStackLabel" pos="Max" offset="0"/>
+			<Height val="20"/>
+            <Style val="BottomPanel_TalentTooltipQuestStack"/>
+            <Visible val="false"/>
+            <RenderPriority val="538"/>
+			<Unclipped val="true"/>
+			<Text val=" / "/>
+        </Frame>
+        <Frame type="Label" name="QuestProgressStackLabel3">
+            <Anchor side="Top" relative="$parent/QuestProgressStackLabel" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent/QuestProgressStackLabel2" pos="Max" offset="0"/>
+			<Height val="20"/>
+            <Style val="BottomPanel_TalentTooltipQuestStack"/>
+            <Visible val="false"/>
+            <RenderPriority val="538"/>
+			<Unclipped val="true"/>
+			<Text val="{$parent/QuestProgressBar/@MaxValue}"/>
         </Frame>
 		
 		<!-- adapted from GameStatsPanel/SelectedTalentTreeIconImageTemplate/TalentQuestProgress -->
@@ -431,13 +430,23 @@
                 <Action type="SetProperty" frame="UnfilledProgressImage" visible="True"/>
                 <Action type="SetProperty" frame="QuestCompleteImage" visible="False"/>
                 <Action type="SetProperty" frame="QuestProgressStackLabel" visible="True"/>
+                <Action type="SetProperty" frame="QuestProgressStackLabel2" visible="True"/>
+                <Action type="SetProperty" frame="QuestProgressStackLabel3" visible="True"/>
+				<Action type="SetAnchor" frame="VitalAnchorFrame" side="Top" relative="$parent" pos="Min" offset="85"/>
+				<Action type="SetAnchor" frame="QuestProgressStackLabel" side="Top" relative="$parent/QuestProgressBar" pos="Max" offset="-2"/>
+				<Action type="SetAnchor" frame="QuestProgressStackLabel" side="Left" relative="$parent/QuestProgressBar" pos="Min" offset="0"/>
             </State>
             <State name="HasUntrackedQuest">
                 <When type="Property" frame="$OVERRIDE_ME" QuestProgress="ProgressUntracked"/>
                 <Action type="SetProperty" frame="QuestProgressBar" visible="False"/>
                 <Action type="SetProperty" frame="UnfilledProgressImage" visible="True"/>
                 <Action type="SetProperty" frame="QuestCompleteImage" visible="False"/>
-                <Action type="SetProperty" frame="QuestProgressStackLabel" visible="False"/>
+                <Action type="SetProperty" frame="QuestProgressStackLabel" visible="True"/>
+                <Action type="SetProperty" frame="QuestProgressStackLabel2" visible="False"/>
+                <Action type="SetProperty" frame="QuestProgressStackLabel3" visible="False"/>
+				<Action type="SetAnchor" frame="VitalAnchorFrame" side="Top" relative="$parent" pos="Min" offset="85"/>
+				<Action type="SetAnchor" frame="QuestProgressStackLabel" side="Top" relative="$parent/QuestProgressBar" pos="Max" offset="-2"/>
+				<Action type="SetAnchor" frame="QuestProgressStackLabel" side="Left" relative="$parent/QuestProgressBar" pos="Min" offset="0"/>
             </State>
             <State name="FinishedQuest">
                 <When type="Property" frame="$OVERRIDE_ME" QuestProgress="FinishedQuest"/>
@@ -445,12 +454,22 @@
                 <Action type="SetProperty" frame="UnfilledProgressImage" visible="True"/>
                 <Action type="SetProperty" frame="QuestCompleteImage" visible="True"/>
                 <Action type="SetProperty" frame="QuestProgressStackLabel" visible="False"/>
+                <Action type="SetProperty" frame="QuestProgressStackLabel2" visible="False"/>
+                <Action type="SetProperty" frame="QuestProgressStackLabel3" visible="False"/>
+				<Action type="SetAnchor" frame="VitalAnchorFrame" side="Top" relative="$parent" pos="Min" offset="70"/>
+				<Action type="SetAnchor" frame="QuestProgressStackLabel" side="Top" relative="$parent/QuestProgressBar" pos="Max" offset="-2"/>
+				<Action type="SetAnchor" frame="QuestProgressStackLabel" side="Left" relative="$parent/QuestProgressBar" pos="Max" offset="-8"/>
             </State>
             <State name="NoQuest">
                 <Action type="SetProperty" frame="QuestProgressBar" visible="False"/>
                 <Action type="SetProperty" frame="UnfilledProgressImage" visible="False"/>
                 <Action type="SetProperty" frame="QuestCompleteImage" visible="False"/>
                 <Action type="SetProperty" frame="QuestProgressStackLabel" visible="False"/>
+                <Action type="SetProperty" frame="QuestProgressStackLabel2" visible="False"/>
+                <Action type="SetProperty" frame="QuestProgressStackLabel3" visible="False"/>
+				<Action type="SetAnchor" frame="VitalAnchorFrame" side="Top" relative="$parent" pos="Min" offset="70"/>
+				<Action type="SetAnchor" frame="QuestProgressStackLabel" side="Top" relative="$parent/QuestProgressBar" pos="Max" offset="-2"/>
+				<Action type="SetAnchor" frame="QuestProgressStackLabel" side="Left" relative="$parent/QuestProgressBar" pos="Min" offset="0"/>
             </State>
         </StateGroup>
 	</Frame>
