@@ -1799,7 +1799,17 @@
 					</Frame>
 					
 					<!-- Mute Talent Tree Selection Panel hotkey -->
+					<!-- TODO: doesn't work -->
 					<Animation name="Show">
+						<Event event="Toggle" action="ToggleDirection, Play"/>
+						<Event event="Hide" action="DirectionReverse, Play"/>
+						<Event event="Begin" action="DirectionForward, Play"/>
+						<Event event="End" action="DirectionReverse, Play"/>
+						<Event event="Show" action="DirectionReverse, Play" frame="$parent/$parent/$parent/HeroCharacterSheetPanelContainer/HeroCharacterSheetPanel"/>
+						<Controller type="Fade" name="Fade_1" end="Pause">
+						</Controller>
+						<Controller type="Anchor" name="Anchor_1" end="Pause" side="Left" relative="true">
+						</Controller>
 						<Controller type="Sound" name="Sound_1" end="Pause">
 							<Key type="Sound" time="0" sound="@StormNoSound"/>
 						</Controller>
@@ -1811,7 +1821,6 @@
 		<!-- @Override -->
 		<Frame type="Frame" name="HeroCharacterSheetPanelContainer">
 			<!-- Mute Character Sheet Panel hotkey -->
-			<!-- TODO: doesn't work -->
 			<!-- @Override -->
 			<Frame type="HeroCharacterSheetPanel" name="HeroCharacterSheetPanel">
 				<!-- @Override -->
@@ -2603,29 +2612,6 @@
 					<Shortcut val="#Hotkey - Toggle Unit Stats"/>
 					<AcceptsMouse val="false"/>
 					<Visible val="false"/>
-					
-					<Animation name="Ahlimation">
-						<Event event="OnShown" action="DirectionForward,Play"/>
-						<Event event="OnHidden" action="DirectionReverse,Play"/>
-
-						<Controller type="Fade" end="Pause" frame="$parent/UnitStatsPanel">
-							<Key type="Curve" time="0" value="0"/>
-							<Key type="Curve" time="0.25" value="255"/>
-						</Controller>
-						<!-- VISIBILITY BUGS THE DEBUFF DISPLAY ?! (no idea why, but it does...)
-						<Controller type="Visibility" end="Pause" frame="$parent/UnitStatsPanel">
-							<Key type="Bool" time="0" value="false"/>
-							<Key type="Bool" time="0.001" value="true"/>
-							<Key type="Bool" time="0.5" value="true"/>
-						</Controller> -->
-						
-						<!-- Move ChatBar to the right -->
-						<Controller type="Dimension" dimension="Width" relative="False" percentage="False" end="Pause" frame="$parent/$parent/$parent/$parent/FullscreenUpperContainer/ChatBarHorizOffset_B">
-							<Key type="Curve" time="0" value="1" out="Fast"/>
-							<Key type="Curve" time="0.5" value="21" in="Slow"/>
-						</Controller>
-						
-					</Animation>
 				</Frame>
 				<Frame type="Frame" name="UnitStatsPanel">
 					<Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
@@ -2635,6 +2621,7 @@
 					<RenderPriority val="500"/>
 					<!-- BUGS BUFF DISPLAY, DON'T USE VISIBILITY! <Visible val="false"/> -->
 					<Alpha val="0"/>
+					<Handle val="UnitDetails"/>
 		
 					<!-- <Animation name="Visibility">
 							<Event event="Show" action="Play,ToggleDirection" frame="$parent/$parent/$parent/HeroCharacterSheetPanelContainer/HeroCharacterSheetPanel"/>
@@ -2667,26 +2654,43 @@
 						<State name="Other">
 						</State>
 					</StateGroup>-->
-					<!--<StateGroup name="Fade">
+
+					
+					<Animation name="Ahlimation">
+						<Event event="Hide" action="DirectionReverse,Play"/>
+						<Event event="Show" action="DirectionForward,Play"/>
+
+						<Controller type="Fade" end="Pause">
+							<Key type="Curve" time="0" value="0"/>
+							<Key type="Curve" time="0.25" value="255"/>
+						</Controller>
+						
+						<!-- Move ChatBar to the right -->
+						<Controller type="Dimension" dimension="Width" relative="False" percentage="False" end="Pause" frame="$parent/$parent/$parent/$parent/FullscreenUpperContainer/ChatBarHorizOffset_B">
+							<Key type="Curve" time="0" value="1" out="Fast"/>
+							<Key type="Curve" time="0.5" value="21" in="Slow"/>
+						</Controller>
+					</Animation>
+					
+					<StateGroup name="Fade">
 						<DefaultState val="Other"/>
 						<State name="ForceHide">
-							<When type="Property" frame="$GameUI_HeroTalentTreeSelectionPanel" visible="false"/>
-							<Action type="SendEvent" frame="$parent/ToggleUnitStatsPanel" event="OnHidden"/>
+							<When type="Property" frame="$GameUI_HeroTalentTreeSelectionPanel" visible="true"/>
+							<Action type="SendEvent" event="Hide"/>
 						</State>
 						<State name="Show">
-							<When type="Property" frame="$GameUI_HeroTalentTreeSelectionPanel" visible="true"/>
+							<When type="Property" frame="$GameUI_HeroTalentTreeSelectionPanel" visible="false"/>
 							<When type="Property" frame="$parent/ToggleUnitStatsPanel" visible="true"/>
-							<Action type="SendEvent" frame="$parent/ToggleUnitStatsPanel" event="OnShown"/>
+							<Action type="SendEvent" event="Show"/>
 						</State>
 						<State name="Hide">
-							<When type="Property" frame="$GameUI_HeroTalentTreeSelectionPanel" visible="true"/>
+							<When type="Property" frame="$GameUI_HeroTalentTreeSelectionPanel" visible="false"/>
 							<When type="Property" frame="$parent/ToggleUnitStatsPanel" visible="false"/>
-							<Action type="SendEvent" frame="$parent/ToggleUnitStatsPanel" event="OnHidden"/>
+							<Action type="SendEvent" event="Hide"/>
 						</State>
 						<State name="Other">
 						</State>
-					</StateGroup>-->
-					
+					</StateGroup>
 					
 					<Frame type="Image" name="BorderImage">
 						<Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
