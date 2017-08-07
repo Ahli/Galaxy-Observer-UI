@@ -42,6 +42,7 @@ public class MpqEditorInterface implements MpqInterface, Cloneable {
 	/**
 	 * Returns a cloned instance of this.
 	 */
+	@Override
 	public Object clone() {
 		try {
 			super.clone();
@@ -90,6 +91,16 @@ public class MpqEditorInterface implements MpqInterface, Cloneable {
 			throws IOException, InterruptedException, MpqException {
 		// add 2 to be sure to have enough space for listfile and attributes
 		int fileCount = 2 + getFileCountInFolder(new File(mpqCachePath));
+
+		// create parent directory
+		File targetFile = new File(absolutePath);
+		File parentFolder = targetFile.getParentFile();
+		if (!parentFolder.exists() && !parentFolder.mkdirs()) {
+			String msg = "ERROR: Could not create path " + parentFolder.getAbsolutePath(); //$NON-NLS-1$
+			LOGGER.error(msg);
+			throw new MpqException(String.format(Messages.getString("MpqInterface.CouldNotCreatePath"), //$NON-NLS-1$
+					parentFolder.getAbsolutePath()));
+		}
 
 		if (protectMPQ) {
 
@@ -154,7 +165,7 @@ public class MpqEditorInterface implements MpqInterface, Cloneable {
 			// NO PROTECTION OPTION
 
 			// make way for file
-			File f = new File(absolutePath);
+			File f = targetFile;
 			if (f.exists() && f.isFile()) {
 				if (!f.delete()) {
 					String msg = "ERROR: Could not delete file " + absolutePath; //$NON-NLS-1$
@@ -462,6 +473,7 @@ public class MpqEditorInterface implements MpqInterface, Cloneable {
 	 * @param descIndexIntPath
 	 * @return
 	 */
+	@Override
 	public File getFileFromMpq(String intPath) {
 		return new File(mpqCachePath + "//" + intPath); //$NON-NLS-1$
 	}
