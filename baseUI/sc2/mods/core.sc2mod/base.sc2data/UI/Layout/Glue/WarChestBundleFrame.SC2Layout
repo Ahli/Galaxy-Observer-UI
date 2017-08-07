@@ -2214,17 +2214,29 @@
             <Color val="#WarChestNodeColor_ProgressBar_Primary"/>
         </Frame>
         
+        <!--
+        CurrentXPVal and GoalXPVal do the subtraction math to convert absolute Min/Max XP vals into a local range (0 to 300k)
+        CurrentXP binds the result and clamps it between 0 and the max (300k)
+        CurrentXPWithCommas and GoalXPWithCommas add commas to the values and output as text
+        CurrentXPFinalBuffer evaluates the final current xp and sets it to 0 in the case that it is at or below zero. This avoids some bugs with countdown labels and property binding replacement indeces.
+        -->
         <Frame type="TextFormatFrame" name="FormattedXPText">
             <Anchor relative="$parent"/>
             <Visible val="false"/>
             <FormatText val="@UI/ScreenCollection/WarChest/Tooltip/MinMaxXP"/>
-            <Replacement val="{$this/CurrentXPWithCommas/@Text}" index="0"/>
+            <Replacement val="{$this/CurrentXPFinalBuffer/@Text}" index="0"/>
             <Replacement val="{$this/GoalXPWithCommas/@Text}" index="1"/>
             
             <Frame type="Label" name="CurrentXP">
                 <Anchor relative="$parent"/>
                 <Visible val="false"/>
                 <Text val="0"/>
+            </Frame>
+            
+            <Frame type="Label" name="CurrentXPFinalBuffer">
+                <Anchor relative="$parent"/>
+                <Visible val="false"/>
+                <Text val="{$parent/CurrentXPWithCommas/@Text}"/>
             </Frame>
             
             <Frame type="MathFrame" name="CurrentXPVal">
@@ -2264,15 +2276,18 @@
                     <When type="Property" frame="CurrentXPVal" Operator="LessThanOrEqual" Result="{$this/GoalXPVal/@Result}"/>
                     <When type="Property" frame="CurrentXPVal" Operator="GreaterThan" Result="0"/>
                     <Action type="SetProperty" frame="CurrentXP" Text="{$parent/CurrentXPVal/@ResultInt}"/>
+                    <Action type="SetProperty" frame="CurrentXPFinalBuffer" Text="{$parent/CurrentXPWithCommas/@Text}"/>
                 </State>
                 
                 <State name="AboveMax">
                     <When type="Property" frame="CurrentXPVal" Operator="GreaterThan" Result="{$this/GoalXPVal/@Result}"/>
                     <Action type="SetProperty" frame="CurrentXP" Text="{$parent/GoalXPVal/@ResultInt}"/>
+                    <Action type="SetProperty" frame="CurrentXPFinalBuffer" Text="{$parent/CurrentXPWithCommas/@Text}"/>
                 </State>
                 
                 <State name="BelowMin">
                     <Action type="SetProperty" frame="CurrentXP" Text="0"/>
+                    <Action type="SetProperty" frame="CurrentXPFinalBuffer" Text="0"/>
                 </State>
             </StateGroup>
         </Frame>

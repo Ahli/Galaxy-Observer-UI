@@ -146,7 +146,7 @@
     <Frame type="WarChestTierTooltip" name="WarChestNodeTooltipTemplate">
         <FadeTime val="0"/>
         
-        <Frame type="WarChestTierFrame" name="TierFrame">
+        <Frame type="WarChestTierFrame" name="WarChestTierFrame">
             <Anchor relative="$parent"/>
             <Season val="{$parent/@Season}"/>
             <Round val="{$parent/@Round}"/>
@@ -154,84 +154,100 @@
             <RewardGroup val="{$parent/@RewardGroup}"/>
         </Frame>
         
-        <Frame type="MathFrame" name="CurrentXP">
+        <!--
+        CurrentXPVal and GoalXPVal do the subtraction math to convert absolute Min/Max XP vals into a local range (0 to 300k)
+        CurrentXP binds the result and clamps it between 0 and the max (300k)
+        CurrentXPWithCommas and GoalXPWithCommas add commas to the values and output as text
+        CurrentXPFinalBuffer evaluates the final current xp and sets it to 0 in the case that it is at or below zero. This avoids some bugs with countdown labels and property binding replacement indeces.
+        -->
+        <Frame type="TextFormatFrame" name="FormattedXPText">
             <Anchor relative="$parent"/>
-            <A val="{$WarChestFrame/@EarnedXP}"/>
-            <B val="{$parent/TierFrame/@MinXP}"/>
-            <Operator val="Subtract"/>
             <Visible val="false"/>
-        </Frame>
-        
-        <Frame type="MathFrame" name="GoalXP">
-            <Anchor relative="$parent"/>
-            <A val="{$parent/TierFrame/@MaxXP}"/>
-            <B val="{$parent/TierFrame/@MinXP}"/>
-            <Operator val="Subtract"/>
-            <Visible val="false"/>
-        </Frame>
-        
-        <Frame type="Label" name="CurrentXPBuffer">
-            <Anchor relative="$parent"/>
-            <Text val="0"/>
-            <Visible val="false"/>
+            <FormatText val="@UI/ScreenCollection/WarChest/Tooltip/MinMaxXP"/>
+            <Replacement val="{$this/CurrentXPFinalBuffer/@Text}" index="0"/>
+            <Replacement val="{$this/GoalXPWithCommas/@Text}" index="1"/>
             
-            <StateGroup name="XPStateGroup">
-                <DefaultState val="WithinRange"/>
+            <Frame type="Label" name="CurrentXP">
+                <Anchor relative="$parent"/>
+                <Visible val="false"/>
+                <Text val="0"/>
+            </Frame>
+            
+            <Frame type="Label" name="CurrentXPFinalBuffer">
+                <Anchor relative="$parent"/>
+                <Visible val="false"/>
+                <Text val="{$parent/CurrentXPWithCommas/@Text}"/>
+            </Frame>
+            
+            <Frame type="MathFrame" name="CurrentXPVal">
+                <Anchor relative="$parent"/>
+                <Visible val="false"/>
+                <A val="{$WarChestFrame/@EarnedXP}"/>
+                <B val="{$parent/$parent/WarChestTierFrame/@MinXP}"/>
+                <Operator val="Subtract"/>
+            </Frame>
+            
+            <Frame type="MathFrame" name="GoalXPVal">
+                <Anchor relative="$parent"/>
+                <Visible val="false"/>
+                <A val="{$parent/$parent/WarChestTierFrame/@MaxXP}"/>
+                <B val="{$parent/$parent/WarChestTierFrame/@MinXP}"/>
+                <Operator val="Subtract"/>
+            </Frame>
+        
+            <Frame type="CountdownLabel" name="CurrentXPWithCommas">
+                <Anchor relative="$parent"/>
+                <Visible val="false"/>
+                <FormatNumber val="true"/>
+                <CurrentValue val="{$parent/CurrentXP/@Text}"/>
+            </Frame>
+            
+            <Frame type="CountdownLabel" name="GoalXPWithCommas">
+                <Anchor relative="$parent"/>
+                <Visible val="false"/>
+                <FormatNumber val="true"/>
+                <CurrentValue val="{$parent/GoalXPVal/@ResultInt}"/>
+            </Frame>
+            
+            <StateGroup name="CurrentXPRangeState">
+                <DefaultState val="BelowMin"/>
+                
+                <State name="BetweenMinMax">
+                    <When type="Property" frame="CurrentXPVal" Operator="LessThanOrEqual" Result="{$this/GoalXPVal/@Result}"/>
+                    <When type="Property" frame="CurrentXPVal" Operator="GreaterThan" Result="0"/>
+                    <Action type="SetProperty" frame="CurrentXP" Text="{$parent/CurrentXPVal/@ResultInt}"/>
+                    <Action type="SetProperty" frame="CurrentXPFinalBuffer" Text="{$parent/CurrentXPWithCommas/@Text}"/>
+                </State>
                 
                 <State name="AboveMax">
-                    <When type="Property" frame="$parent/CurrentXP" Operator="GreaterThan" Result="{$parent/GoalXP/@Result}"/>
-                    <Action type="SetProperty" Text="{$parent/GoalXP/@Result}"/>
+                    <When type="Property" frame="CurrentXPVal" Operator="GreaterThan" Result="{$this/GoalXPVal/@Result}"/>
+                    <Action type="SetProperty" frame="CurrentXP" Text="{$parent/GoalXPVal/@ResultInt}"/>
+                    <Action type="SetProperty" frame="CurrentXPFinalBuffer" Text="{$parent/CurrentXPWithCommas/@Text}"/>
                 </State>
                 
-                <State name="BelowZero">
-                    <When type="Property" frame="$parent/CurrentXP" Operator="LessThan" Result="0"/>
-                    <Action type="SetProperty" Text="0"/>
-                </State>
-                
-                <State name="WithinRange">
-                    <Action type="SetProperty" Text="{$parent/CurrentXP/@Result}"/>
+                <State name="BelowMin">
+                    <Action type="SetProperty" frame="CurrentXP" Text="0"/>
+                    <Action type="SetProperty" frame="CurrentXPFinalBuffer" Text="0"/>
                 </State>
             </StateGroup>
         </Frame>
         
-        <Frame type="TextFormatFrame" name="FormattedXP">
-            <Anchor relative="$parent"/>
-            <FormatText val="@UI/ScreenCollection/WarChest/Tooltip/MinMaxXP"/>
-            <Replacement val="{$parent/CurrentXPWithCommas/@Text}" index="0"/>
-            <Replacement val="{$parent/GoalXPWithCommas/@Text}" index="1"/>
-            <Visible val="false"/>
-        </Frame>
-        
-        <Frame type="CountdownLabel" name="CurrentXPWithCommas">
-            <Anchor relative="$parent"/>
-            <Visible val="false"/>
-            <FormatNumber val="true"/>
-            <CurrentValue val="{$parent/CurrentXPBuffer/@Text}"/>
-        </Frame>
-        
-        <Frame type="CountdownLabel" name="GoalXPWithCommas">
-            <Anchor relative="$parent"/>
-            <Visible val="false"/>
-            <FormatNumber val="true"/>
-            <CurrentValue val="{$parent/GoalXP/@Result}"/>
-        </Frame>
-        
         <Frame type="BundleCacheFrame" name="BundleCacheFrame">
             <Anchor relative="$parent"/>
-            <Bundle val="{$parent/TierFrame/@Bundle}"/>
+            <Bundle val="{$parent/WarChestTierFrame/@Bundle}"/>
             <Visible val="false"/>
         </Frame>
         
         <Frame type="AchievementInfoFrame" name="WarChestOwnedAchievement">
             <Anchor relative="$parent"/>
-            <AchievementId val="{$parent/TierFrame/@StartAchievementId}"/>
+            <AchievementId val="{$parent/WarChestTierFrame/@StartAchievementId}"/>
             <PresenceId val="{$BattleUI/@LocalToonPresenceId}"/>
             <Visible val="false"/>
         </Frame>
         
         <Frame type="AchievementInfoFrame" name="NodeEarnedAchievement">
             <Anchor relative="$parent"/>
-            <AchievementId val="{$parent/TierFrame/@AchievementId}"/>
+            <AchievementId val="{$parent/WarChestTierFrame/@AchievementId}"/>
             <PresenceId val="{$BattleUI/@LocalToonPresenceId}"/>
             <Visible val="false"/>
         </Frame>
@@ -308,7 +324,7 @@
             <Anchor side="Bottom" relative="$parent/TopBar" pos="Min" offset="-9"/>
             <Anchor side="Left" relative="$parent/BundleLabel" pos="Min" offset="0"/>
             <Anchor side="Right" relative="$parent/BundleLabel" pos="Max" offset="0"/>
-            <Text val="{$parent/FormattedXP/@Text}"/>
+            <Text val="{$parent/FormattedXPText/@Text}"/>
             <Style val="Collection_WarChest_TooltipXP"/>
             <Color val="#WarChestNodeColor_ProgressBar_Primary"/>
         </Frame>
@@ -568,7 +584,7 @@
             <DefaultState val="Earned"/>
             
             <State name="NotOwned_Terran">
-                <When type="Property" frame="TierFrame" RewardGroup="Terran"/>
+                <When type="Property" frame="WarChestTierFrame" RewardGroup="Terran"/>
                 <When type="Property" frame="WarChestOwnedAchievement" Awarded="false"/>
                 <Action type="SetProperty" frame="OwnedLabel" Text="@UI/ScreenCollection/WarChest/Tooltip/RequiresTerran"/>
                 <Action type="SetProperty" frame="OwnedLabel" Style="Collection_WarChest_TooltipDescription"/>
@@ -576,7 +592,7 @@
             </State>
             
             <State name="NotOwned_Zerg">
-                <When type="Property" frame="TierFrame" RewardGroup="Zerg"/>
+                <When type="Property" frame="WarChestTierFrame" RewardGroup="Zerg"/>
                 <When type="Property" frame="WarChestOwnedAchievement" Awarded="false"/>
                 <Action type="SetProperty" frame="OwnedLabel" Text="@UI/ScreenCollection/WarChest/Tooltip/RequiresZerg"/>
                 <Action type="SetProperty" frame="OwnedLabel" Style="Collection_WarChest_TooltipDescription"/>
@@ -584,7 +600,7 @@
             </State>
             
             <State name="NotOwned_Protoss">
-                <When type="Property" frame="TierFrame" RewardGroup="Protoss"/>
+                <When type="Property" frame="WarChestTierFrame" RewardGroup="Protoss"/>
                 <When type="Property" frame="WarChestOwnedAchievement" Awarded="false"/>
                 <Action type="SetProperty" frame="OwnedLabel" Text="@UI/ScreenCollection/WarChest/Tooltip/RequiresProtoss"/>
                 <Action type="SetProperty" frame="OwnedLabel" Style="Collection_WarChest_TooltipDescription"/>
@@ -615,7 +631,7 @@
         
         <Frame type="BundleCacheFrame" name="BundleCacheFrame">
             <Anchor relative="$parent"/>
-            <Bundle val="{$parent/TierFrame/@StartBundle}"/>
+            <Bundle val="{$parent/WarChestTierFrame/@StartBundle}"/>
             <Visible val="false"/>
         </Frame>
 
@@ -659,17 +675,17 @@
         
         <StateGroup name="WarChestRaceStateGroup">
             <State name="Terran">
-                <When type="Property" frame="TierFrame" RewardGroup="Terran"/>
+                <When type="Property" frame="WarChestTierFrame" RewardGroup="Terran"/>
                 <Action type="SetProperty" frame="DescriptionLabel" Text="@UI/ScreenCollection/WarChest/Tooltip/DescriptionTerr"/>
             </State>
             
             <State name="Zerg">
-                <When type="Property" frame="TierFrame" RewardGroup="Zerg"/>
+                <When type="Property" frame="WarChestTierFrame" RewardGroup="Zerg"/>
                 <Action type="SetProperty" frame="DescriptionLabel" Text="@UI/ScreenCollection/WarChest/Tooltip/DescriptionZerg"/>
             </State>
             
             <State name="Protoss">
-                <When type="Property" frame="TierFrame" RewardGroup="Protoss"/>
+                <When type="Property" frame="WarChestTierFrame" RewardGroup="Protoss"/>
                 <Action type="SetProperty" frame="DescriptionLabel" Text="@UI/ScreenCollection/WarChest/Tooltip/DescriptionProt"/>
             </State>
         </StateGroup>
@@ -678,7 +694,7 @@
             <DefaultState val="Earned"/>
             
             <State name="NotOwned_Terran">
-                <When type="Property" frame="TierFrame" RewardGroup="Terran"/>
+                <When type="Property" frame="WarChestTierFrame" RewardGroup="Terran"/>
                 <When type="Property" frame="WarChestOwnedAchievement" Awarded="false"/>
                 <Action type="SetProperty" frame="OwnedLabel" Text="@UI/ScreenCollection/WarChest/Tooltip/RequiresTerran"/>
                 <Action type="SetProperty" frame="OwnedLabel" Style="Collection_WarChest_TooltipDescription"/>
@@ -686,7 +702,7 @@
             </State>
             
             <State name="NotOwned_Zerg">
-                <When type="Property" frame="TierFrame" RewardGroup="Zerg"/>
+                <When type="Property" frame="WarChestTierFrame" RewardGroup="Zerg"/>
                 <When type="Property" frame="WarChestOwnedAchievement" Awarded="false"/>
                 <Action type="SetProperty" frame="OwnedLabel" Text="@UI/ScreenCollection/WarChest/Tooltip/RequiresZerg"/>
                 <Action type="SetProperty" frame="OwnedLabel" Style="Collection_WarChest_TooltipDescription"/>
@@ -694,7 +710,7 @@
             </State>
             
             <State name="NotOwned_Protoss">
-                <When type="Property" frame="TierFrame" RewardGroup="Protoss"/>
+                <When type="Property" frame="WarChestTierFrame" RewardGroup="Protoss"/>
                 <When type="Property" frame="WarChestOwnedAchievement" Awarded="false"/>
                 <Action type="SetProperty" frame="OwnedLabel" Text="@UI/ScreenCollection/WarChest/Tooltip/RequiresProtoss"/>
                 <Action type="SetProperty" frame="OwnedLabel" Style="Collection_WarChest_TooltipDescription"/>
