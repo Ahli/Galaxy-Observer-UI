@@ -115,12 +115,10 @@
             </Controller>
         </Animation>
     </Frame>
-    
-    <Frame type="UnitStatusTalentIcon" name="SelectedTalentTreeIconImageTemplate" template="StandardTemplates/UnitStatusTalentIconTemplate">
+
+    <Frame type="UnitStatusTalentIcon" name="QuestIconImageTemplate" template="StandardTemplates/UnitStatusTalentIconTemplate">
         <Width val="68"/>
         <Height val="68"/>
-
-        <TooltipFrame val="HeroTalentTooltip"/>
         <AcceptsMouse val="True"/>
 
         <Frame type="Image" name="IconBackgroundImage">
@@ -153,7 +151,7 @@
             <Anchor side="Left" relative="$parent" pos="Min" offset="14"/>
             <Anchor side="Right" relative="$parent" pos="Max" offset="-14"/>
             <Anchor side="Bottom" relative="$parent" pos="Max" offset="-14"/>
-            
+
             <IgnoreParentColor val="true"/>
             <RenderPriority val="520"/>
         </Frame>
@@ -173,7 +171,7 @@
             <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
             <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
             <Visible val="False"/>
-            
+
             <IgnoreParentColor val="True"/>
             <Vertical val="True"/>
             <Width val="68"/>
@@ -212,7 +210,7 @@
         </Frame>
 
         <Frame type="Label" name="QuestProgressStackLabel">
-            <Anchor side="Bottom" relative="$parent/QuestProgressBar" pos="Max" offset="0"/>
+            <Anchor side="Bottom" relative="$parent/QuestProgressBar" pos="Max" offset="-4"/>
             <Anchor side="Left" relative="$parent" pos="Min" offset="3"/>
             <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
             <Style val="Storm_LeaderTalentQuestStack"/>
@@ -221,6 +219,69 @@
             <IgnoreParentColor val="True"/>
             <Text val="{$parent/QuestProgressBar/@Value}"/>
         </Frame>
+    </Frame>
+    
+    <Frame type="UnitStatusBaselineQuestIcon" name="UnitStatusBaselineQuestIconTemplate" template="GameStatsPanel/QuestIconImageTemplate">
+        <TooltipFrame val="HeroBaselineQuestTooltip"/>
+
+        <StateGroup name="QuestState">
+            
+            <State name="QuestSelected">
+                <Action type="SetProperty" frame="$this/IconBorderImage" texture="@UI/Storm_UI_InGame_Leader_Talent_Available"/>
+                <Action type="SetProperty" frame="$this/IconBackgroundImage" alpha="255"/>
+            </State>
+
+            <State name="QuestAvailable">
+                <Action type="SetProperty" frame="$this/IconImage" texture="@UI/Storm_UI_InGame_Leader_Talent_Unselected"/>
+                <Action type="SetProperty" frame="$this/IconBorderImage" texture="@UI/Storm_UI_InGame_Leader_Talent_Available"/>
+                <Action type="SetProperty" frame="$this/IconBackgroundImage" alpha="255"/>
+            </State>
+
+            <State name="QuestNotAvailable">
+                <Action type="SetProperty" frame="$this/IconImage" visible="false"/>
+                <Action type="SetProperty" frame="$this/IconBorderImage" texture="@UI/Storm_UI_InGame_Leader_Talent_Unavailable"/>
+                <Action type="SetProperty" frame="$this/IconBackgroundImage" alpha="100"/>
+            </State>
+        </StateGroup>
+
+        <StateGroup name="BaselineQuestProgress">
+            <DefaultState val="NoQuest"/>
+
+            <State name="HasQuest">
+                <When type="Property" frame="$this" QuestProgress="QuestInProgress"/>
+                <Action type="SetProperty" frame="QuestProgressBar" visible="True"/>
+                <Action type="SetProperty" frame="UnfilledProgressImage" visible="True"/>
+                <Action type="SetProperty" frame="QuestCompleteImage" visible="False"/>
+                <Action type="SetProperty" frame="QuestProgressStackLabel" visible="True"/>
+            </State>
+
+            <State name="HasUntrackedQuest">
+                <When type="Property" frame="$this" QuestProgress="ProgressUntracked"/>
+                <Action type="SetProperty" frame="QuestProgressBar" visible="false"/>
+                <Action type="SetProperty" frame="UnfilledProgressImage" visible="True"/>
+                <Action type="SetProperty" frame="QuestCompleteImage" visible="False"/>
+                <Action type="SetProperty" frame="QuestProgressStackLabel" visible="False"/>
+            </State>
+
+            <State name="FinishedQuest">
+                <When type="Property" frame="$this" QuestProgress="FinishedQuest"/>
+                <Action type="SetProperty" frame="QuestProgressBar" visible="False"/>
+                <Action type="SetProperty" frame="UnfilledProgressImage" visible="True"/>
+                <Action type="SetProperty" frame="QuestCompleteImage" visible="True"/>
+                <Action type="SetProperty" frame="QuestProgressStackLabel" visible="False"/>
+            </State>
+
+            <State name="NoQuest">
+                <Action type="SetProperty" frame="QuestProgressBar" visible="False"/>
+                <Action type="SetProperty" frame="UnfilledProgressImage" visible="False"/>
+                <Action type="SetProperty" frame="QuestCompleteImage" visible="False"/>
+                <Action type="SetProperty" frame="QuestProgressStackLabel" visible="False"/>
+            </State>
+        </StateGroup>
+    </Frame>
+    
+    <Frame type="UnitStatusTalentIcon" name="SelectedTalentTreeIconImageTemplate" template="GameStatsPanel/QuestIconImageTemplate">
+        <TooltipFrame val="HeroTalentTooltip"/>
 
         <StateGroup name="TalentTierState">
 

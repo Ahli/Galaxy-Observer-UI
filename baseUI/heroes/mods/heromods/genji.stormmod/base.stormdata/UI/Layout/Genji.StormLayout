@@ -12,36 +12,93 @@
         <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
         <Visible val="True"/>
 
+        <!-- Animation Events to set the state of the ProgressBarVisibility State Group when genji is CCd -->
+        <Frame type="UnitStatusValidatorAnimElement" name="GenjiDeflectDragonClawProgressBarDisplay">
+            <Anchor relative="$parent"/>
+            <Validator val="ShowDragonClawProgressBar"/>
+
+            <Animation name="ShowProgressBar">
+                <Event event="ShowDragonClawProgressBar" action="Reset, Play"/>
+                <Event event="NoState" action="DirectionReverse, Play"/>
+
+                <Controller type="State" frame="$parent" stateGroup="ProgressBarVisibility" end="Pause">
+                    <Key type="Identifier" time="0.00" value="Hide"/>
+                    <Key type="Identifier" time="0.01" value="Show"/>
+                </Controller>
+            </Animation>
+        </Frame>
+
+        <!-- Animation Events to flash the ProgressBar when Dragon Claw is useable-->
         <Frame type="UnitStatusValidatorAnimElement" name="GenjiDeflectDragonClawActiveAnims">
             <Anchor relative="$parent"/>
             <Validator val="GenjiCasterHasDragonClawActive"/>
 
             <Animation name="GenjiDeflectDragonClawActiveBuffPulse">
                 <Event event="Reset" action="Stop"/>
-                <Event event="NoState" action="stop"/>
+                <Event event="NoState" action="Stop"/>
                 <Event event="GenjiCasterHasDragonClawActive" action="Restart, Play"/>
 
-                <Controller type="AdjustmentColor" end="pingpong" frame="$parent/GenjiDeflectDragonClawChargeBar/ChargeFillProgress/FillImageContainer/FillImage">
+                <Controller type="AdjustmentColor" end="pingpong" frame="$parent/ProgressBarContainer/ChargeFillProgress/FillImageContainer/FillImage">
                     <Key type="Curve" time="0" value="002573" inout="Linear"/>
                     <Key type="Curve" time=".25" value="007fc3" inout="Linear,Slow"/>
                 </Controller>
             </Animation>
         </Frame>
+        
+        <!-- Manages the visability of the ProgressBarContainer -->
+        <StateGroup name="ProgressBarVisibility">
+            <DefaultState val="Hide"/>
+            
+            <State name="Show">
+                <Action type="SetProperty" frame="ProgressBarContainer" Visible="True"/>
+            </State>
+            <State name="Hide">
+                <Action type="SetProperty" frame="ProgressBarContainer" Visible="False"/>
+            </State>
+        </StateGroup>
+        
+        <Frame type="Frame" name="ProgressBarContainer">
+            <Anchor relative="$parent"/>
+            
+            <!-- Read the score values directly from the string references -->
+            <Frame type="DataRefFrame" name="CurrentValue">
+                <Anchor relative="$parent"/>
+                <Argument name="score" val="GenericHeroRealScoreValue2"/>
+            </Frame>
 
-        <Frame type="UnitStatusInventoryAbilCharge" name="GenjiDeflectDragonClawChargeBar">
-            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
-            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
-            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
-            <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
-            <AcceptsMouse val="False"/>
-            <AbilityLink val="GenjiDeflectDragonClaw"/>
-            <ChargeLink val="Abil/GenjiDeflectDragonClaw"/>
-            <SendChargesEmptyAnimEvent val="False"/>
-            <SendChargesFullAnimEvent val="False"/>
-            <SendCurrentChangedAnimEvent val="False"/>
-            <ChargeLocation val="Player"/>
-            <Visible val="True"/>
+            <Frame type="DataRefFrame" name="MaxValue">
+                <Anchor relative="$parent"/>
+                <Argument name="ref" val="Behavior,GenjiDeflectDragonClawDamageValue,DamageResponse.ModifyLimit"/>
+            </Frame>
 
+            <!-- Manages the state transitions when we complete the Dragon Claw Damage Absorbed requirement-->
+            <Frame type="UnitStatusValidatorAnimElement" name="GenjiDeflectDragonClawActiveAnims">
+                <Anchor relative="$parent"/>
+                <Validator val="GenjiCasterHasDragonClawActive"/>
+
+                <Animation name="GenjiDeflectDragonClawProgressState">
+                    <Event event="GenjiCasterHasDragonClawActive" action="Reset, Play"/>
+                    <Event event="NoState" action="DirectionReverse, Play"/>
+
+                    <Controller type="State" frame="$parent" stateGroup="GenjiDeflectDragonClawProgressState" end="Pause">
+                        <Key type="Identifier" time="0.00" value="Partial"/>
+                        <Key type="Identifier" time="0.01" value="Full"/>
+                    </Controller>
+                </Animation>
+            </Frame>
+
+            <!-- Manages the Fullness of the Prgoress Bar if we have the Dragon Claw Active behavior already -->
+            <StateGroup name="GenjiDeflectDragonClawProgressState">
+                <DefaultState val="Partial"/>
+
+                <State name="Partial">
+                    <Action type="SetProperty" frame="ChargeFillProgress" Value="{$parent/CurrentValue/@StringValue}"/>
+                </State>
+                <State name="Full">
+                    <Action type="SetProperty" frame="ChargeFillProgress" Value="{$parent/MaxValue/@StringValue}"/>
+                </State>
+            </StateGroup>
+            
             <Frame type="ProgressBar" name="ChargeFillProgress">
                 <Anchor side="Top" relative="$parent" pos="Min" offset="20"/>
                 <Anchor side="Left" relative="$parent" pos="Min" offset="19"/>
@@ -49,8 +106,8 @@
                 <AcceptsMouse val="False"/>
                 <Visible val="True"/>
                 <MinValue val="0"/>
-                <MaxValue val="100"/>
-                <Value val="0"/>
+                <MaxValue val="{$parent/MaxValue/@StringValue}"/>
+                <Value val="{$parent/CurrentValue/@StringValue}"/>
                 <FillInset val="0.0"/>
                 <Height val="62"/>
                 <Width val="62"/>
@@ -81,13 +138,6 @@
                         <AdjustmentColor val="001f00"/>
                     </Frame>
                 </Frame>
-            </Frame>
-
-
-            <Frame type="Label" name="ChargesLabel">
-                <Anchor relative="$parent"/>
-                <Visible val="False"/>
-                <Alpha val="0"/>
             </Frame>
         </Frame>
     </Frame>
