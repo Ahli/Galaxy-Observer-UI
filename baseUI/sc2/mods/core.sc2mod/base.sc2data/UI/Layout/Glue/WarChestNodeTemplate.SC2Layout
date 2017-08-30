@@ -625,6 +625,13 @@
         </Frame>
 
         <StateGroup name="NodeState">
+            <State name="OwnedUnlockedCompleteAnimating">
+                <When type="StateGroup" frame="$parent/$parent" NodeState="OwnedUnlockedComplete"/>
+                <When type="StateGroup" frame="$parent/$parent" UnlockAnimationState="Incomplete"/>
+                <Action type="SetProperty" frame="$this/NormalImage" textureCoords="0.25,0.00,0.50,0.20" index="0"/>
+                <Action type="SetProperty" frame="$this/NormalImage" textureCoords="0.25,0.40,0.50,0.60" index="1"/>
+                <Action type="SetProperty" frame="$this/HoverImage" textureCoords="0.25,0.20,0.50,0.40" index="0"/>
+            </State>
             <State name="OwnedUnlockedComplete">
                 <When type="StateGroup" frame="$parent/$parent" NodeState="OwnedUnlockedComplete"/>
                 <Action type="SetProperty" frame="$this/NormalImage" textureCoords="0.00,0.00,0.25,0.20" index="0"/>
@@ -654,6 +661,13 @@
                 <Action type="SetProperty" frame="$this/NormalImage" textureCoords="0.50,0.00,0.75,0.20" index="0"/>
                 <Action type="SetProperty" frame="$this/NormalImage" textureCoords="0.50,0.40,0.75,0.60" index="1"/>
                 <Action type="SetProperty" frame="$this/HoverImage" textureCoords="0.50,0.20,0.75,0.40" index="0"/>
+            </State>
+            <State name="NotOwnedUnlockedCompleteAnimating">
+                <When type="StateGroup" frame="$parent/$parent" NodeState="NotOwnedUnlockedComplete"/>
+                <When type="StateGroup" frame="$parent/$parent" UnlockAnimationState="Incomplete"/>
+                <Action type="SetProperty" frame="$this/NormalImage" textureCoords="0.00,0.60,0.25,0.80" index="0"/>
+                <Action type="SetProperty" frame="$this/NormalImage" textureCoords="0.50,0.60,0.75,0.80" index="1"/>
+                <Action type="SetProperty" frame="$this/HoverImage" textureCoords="0.25,0.60,0.50,0.80" index="0"/>
             </State>
             <State name="NotOwnedUnlockedComplete">
                 <When type="StateGroup" frame="$parent/$parent" NodeState="NotOwnedUnlockedComplete"/>
@@ -731,6 +745,7 @@
         
         <Animation name="PurchaseIntroStart">
             <Event event="NodePurchaseIntroStart" action="Reset,Play" frame="$parent"/>
+            <Event event="OnShown" action="Stop,Reset" frame="$parent"/>
 
             <Controller type="Fade" end="Pause" frame="$this/PurchaseIntroNodeImage">
                 <Key type="Curve" time="0.000" value="0" inout="Linear"/>
@@ -745,6 +760,7 @@
         
         <Animation name="PurchaseIntroEnd">
             <Event event="NodePurchaseIntroEnd" action="Reset,Play" frame="$parent"/>
+            <Event event="OnShown" action="Stop,Reset" frame="$parent"/>
 
             <Controller type="Fade" end="Pause" frame="$this/PurchaseIntroNodeImage">
                 <Key type="Curve" time="0.000" value="255" inout="Linear"/>
@@ -767,11 +783,13 @@
             <DefaultState val="NotBlocked"/>
         
             <State name="BlockedOwned">
-                <When type="StateGroup" frame="$parent" NodeState="OwnedUnlockedComplete"/><!-- 
+                <When type="StateGroup" frame="$parent" NodeState="OwnedUnlockedComplete"/>
+                <When type="StateGroup" frame="$parent" UnlockAnimationState="Complete"/><!-- 
                 <When type="Property" frame="$WarChestCurrentPhaseBind" A="{$parent/WarChestTierFrame/@Round}"/> -->
             </State>
             <State name="BlockedNotOwned">
-                <When type="StateGroup" frame="$parent" NodeState="NotOwnedUnlockedComplete"/><!-- 
+                <When type="StateGroup" frame="$parent" NodeState="NotOwnedUnlockedComplete"/>
+                <When type="StateGroup" frame="$parent" UnlockAnimationState="Complete"/><!-- 
                 <When type="Property" frame="$WarChestCurrentPhaseBind" A="{$parent/WarChestTierFrame/@Round}"/> -->
             </State>
             <State name="NotBlocked"/>
@@ -2362,6 +2380,7 @@
                 <When type="StateGroup" frame="$this" OwnedState="Owned"/>
                 <When type="StateGroup" frame="$this" LockedState="Unlocked"/>
                 <When type="StateGroup" frame="$this" ActiveState="Active"/>
+                <Action type="SetState" undo="false" frame="$this" group="UnlockAnimationState" state="Incomplete"/>
             </State>
             <State name="OwnedUnlockedIncompleteInactive">
                 <When type="StateGroup" frame="$this" OwnedState="Owned"/>
@@ -2387,6 +2406,7 @@
                 <When type="StateGroup" frame="$this" OwnedState="NotOwned"/>
                 <When type="StateGroup" frame="$this" LockedState="Unlocked"/>
                 <When type="StateGroup" frame="$this" ActiveState="Active"/>
+                <Action type="SetState" undo="false" frame="$this" group="UnlockAnimationState" state="Incomplete"/>
             </State>
             <State name="NotOwnedUnlockedIncompleteInactive">
                 <When type="StateGroup" frame="$this" OwnedState="NotOwned"/>
@@ -2404,6 +2424,48 @@
                 <When type="StateGroup" frame="$this" ActiveState="Inactive"/>
             </State>
         </StateGroup>
+        
+        <!-- UNLOCK ANIMATION STATE -->
+        <!--
+        This state prevents a newly Completed node from appearing Completed until after the node unlock
+        animation has been finished. This state is flagged as Incomplete when a node is enters an Active
+        NodeState; it is returned to a Complete state when the NodeUnlockEnd event is received.
+        -->
+        <StateGroup name="UnlockAnimationState">
+            <DefaultState val="Complete"/>
+        
+            <State name="Incomplete"/>
+            <State name="Complete"/>
+        </StateGroup>
+        
+        <!-- RESET UNLOCK ANIMATION STATE -->
+        <!--
+        This state resets the UnlockAnimationState when the player navigates away from the War Chest
+        -->
+        <StateGroup name="ResetUnlockAnimationState">
+            <DefaultState val="NoReset"/>
+            
+            <State name="Reset">
+                <When type="StateGroup" ActiveState="Inactive"/>
+                <When type="StateGroup" UnlockAnimationState="Incomplete"/>
+                <Action type="SendEvent" event="OnResetUnlockAnim"/>
+            </State>
+            
+            <State name="NoReset"/>
+        </StateGroup>
+        
+        <!-- RESET UNLOCK ANIMATION -->
+        <!--
+        State groups are not allowed to switch states within the same tick, so we delay the Reset switch by a tickk
+        with an animation
+        -->
+        <Animation name="ResetUnlockAnimation">
+            <Event event="OnResetUnlockAnim" action="Play"/>
+             
+            <Controller type="State" stateGroup="UnlockAnimationState" end="Stop">
+                <Key type="Identifier" time="0.05" value="Complete"/>
+            </Controller>
+        </Animation>
         
         <!-- 
         This StateGroup starts the sequence of events which leads to the Node Unlock animation playing. It does 
@@ -2474,6 +2536,15 @@
                 </Controller>
             </Animation>
         </Frame>
+            
+        <Animation name="CompleteUnlockAnimationState">
+            <Event event="OnShown" frame="$WarChestFrame" action="Restart"/>
+            <Event event="NodeUnlockEnd" action="Play"/>
+        
+            <Controller type="State" stateGroup="UnlockAnimationState" end="Pause">
+                <Key type="Identifier" time="0" value="Complete"/>
+            </Controller>
+        </Animation>
         
         <StateGroup name="MoveLineTrigger">
             <DefaultState val="DoNotMoveLine"/>

@@ -20,6 +20,7 @@
             <Width val="108"/>
             <Height val="108"/>
             <ImageMaskTexture val="@UI/SC2_UI_Coop_CommanderIcon_Bubble_Mask"/>
+            <Texture val="{$CoopStandardGlue_CommanderSelectionPanel/@Commander[TraitIcon]}"/>
         </Frame>
         
         <Frame type="Image" name="LevelLabelBG">
@@ -30,24 +31,37 @@
             <Texture val="@UI/SC2_UI_Coop_CommanderIcon_Bubble_Normal"/>
         </Frame>
         
+        <Frame type="Image" name="MaxLevelIcon">
+            <Anchor side="Top" relative="$parent/LevelLabel" pos="Mid" offset="-1"/>
+            <Anchor side="Bottom" relative="$parent/LevelLabel" pos="Mid" offset="-1"/>
+            <Anchor side="Left" relative="$parent/LevelLabel" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent/LevelLabel" pos="Mid" offset="0"/>
+            <Width val="140"/>
+            <Height val="140"/>
+            <ImageMaskTexture val="@UI/SC2_UI_Coop_CommanderIcon_Bubble_Mask"/>
+            <Texture val="@UI/SC2_UI_Coop_CommanderIcon_MaxLevel"/>
+            <Visible val="false"/>
+        </Frame>
+        
         <Frame type="Label" name="LevelLabel">
-            <Anchor side="Top" relative="$parent" pos="Min" offset="60"/>
-            <Anchor side="Left" relative="$parent" pos="Min" offset="120"/>
+            <Anchor side="Top" relative="$parent" pos="Min" offset="61"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="121"/>
             <Width val="100"/>
             <Style val="@Coop_CommanderLevel"/>
-            <Text val="0"/>
+            <Text val="{$CoopStandardGlue_CommanderSelectionPanel/@Level}"/>
         </Frame>
 
         <Frame type="Label" name="NameLabel">
-            <Anchor side="Top" relative="$parent/LevelLabel" pos="Mid" offset="-11"/>
-            <Anchor side="Bottom" relative="$parent/LevelLabel" pos="Mid" offset="-11"/>
-            <Anchor side="Left" relative="$parent/LevelProgressBar" pos="Max" offset="20"/>
+            <Anchor side="Top" relative="$parent/LevelLabel" pos="Mid" offset="-12"/>
+            <Anchor side="Bottom" relative="$parent/LevelLabel" pos="Mid" offset="-12"/>
+            <Anchor side="Left" relative="$parent/LevelProgressBar" pos="Max" offset="19"/>
             <Style val="@Coop_CommanderTitle"/>
+            <Text val="{$CoopStandardGlue_CommanderSelectionPanel/@Commander[Name]}"/>
         </Frame>
 
         <Frame type="Label" name="FluffLabel">
-            <Anchor side="Top" relative="$parent/NameLabel" pos="Max" offset="-2"/>
-            <Anchor side="Left" relative="$parent/LevelProgressBar" pos="Max" offset="20"/>
+            <Anchor side="Top" relative="$parent/NameLabel" pos="Max" offset="-3"/>
+            <Anchor side="Left" relative="$parent/LevelProgressBar" pos="Max" offset="19"/>
             <Style val="@Coop_CommanderFluffText"/>
             <Text val="{$CoopStandardGlue_CommanderDescriptionLabel/@Text}"/>
         </Frame>
@@ -64,9 +78,11 @@
             <UseFillContainer val="False"/>
             <Circular val="True"/>
             <CircularStart val="0"/>
-            <CircularEndOffset val="-360"/>
+            <CircularEndOffset val="360"/>
             <!-- <Color val="##StandardProgressBorder"/>
             <ColorStep val="##StandardProgressFill"/> -->
+            <MaxValue val="{$CoopStandardGlue_CommanderSelectionPanel/@TotalXP}"/>
+            <Value val="{$CoopStandardGlue_CommanderSelectionPanel/@CurrentXP}"/>
             
             <Frame type="Image" name="BorderImage">
                 <Anchor relative="$parent"/>
@@ -93,22 +109,49 @@
         <StateGroup name="MaxLevelStateGroup">
             <DefaultState val="NotMaxLevelState"/>
             
+            <State name="PrestigeMaxLevelState">
+                <When type="AnimationState" frame="$CoopStandardGlue_CommanderSelectionPanel" CommanderMaxLevel="MaxLevel"/> 
+                <When type="Property" frame="$Coop_MasteryLevelFrame" operator="GreaterThanOrEqual" MasteryLevel="1000"/>
+                <Action type="SetProperty" frame="LevelLabelBG" texture="@UI/SC2_UI_Coop_CommanderIcon_Bubble_Max"/>
+                <Action type="SetProperty" frame="LevelLabel" Visible="false"/>
+                <Action type="SetProperty" frame="LevelProgressBar/BorderImage" texture="@UI/SC2_UI_Coop_CommanderIcon_CircularProgress_Border_Max"/>
+                <Action type="SetProperty" frame="LevelProgressBar/FillImageContainer/FillImage" visible="false"/>
+                <Action type="SetProperty" frame="LevelProgressBar/MaxLevelFillImage" visible="True"/>
+                <Action type="SetProperty" frame="MaxLevelIcon" Visible="true"/>
+            </State>
+            
+            <State name="MasteryMaxLevelState">
+                <When type="AnimationState" frame="$CoopStandardGlue_CommanderSelectionPanel" CommanderMaxLevel="MaxLevel"/> 
+                <When type="Property" frame="$Coop_MasteryLevelFrame" operator="GreaterThanOrEqual" MasteryLevel="91"/>
+                <Action type="SetProperty" frame="LevelLabel" style="@Coop_CommanderLevel_Max"/>
+                <Action type="SetProperty" frame="LevelLabelBG" texture="@UI/SC2_UI_Coop_CommanderIcon_Bubble_Max"/>
+                <Action type="SetProperty" frame="LevelLabel" Visible="true"/>
+                <Action type="SetProperty" frame="LevelProgressBar/BorderImage" texture="@UI/SC2_UI_Coop_CommanderIcon_CircularProgress_Border_Max"/>
+                <Action type="SetProperty" frame="LevelProgressBar/FillImageContainer/FillImage" visible="false"/>
+                <Action type="SetProperty" frame="LevelProgressBar/MaxLevelFillImage" visible="True"/>
+                <Action type="SetProperty" frame="MaxLevelIcon" Visible="false"/>
+            </State>
+            
             <State name="MaxLevelState">
                 <When type="AnimationState" frame="$CoopStandardGlue_CommanderSelectionPanel" CommanderMaxLevel="MaxLevel"/> 
                 <Action type="SetProperty" frame="LevelLabel" style="@Coop_CommanderLevel_Max"/>
                 <Action type="SetProperty" frame="LevelLabelBG" texture="@UI/SC2_UI_Coop_CommanderIcon_Bubble_Max"/>
+                <Action type="SetProperty" frame="LevelLabel" Visible="true"/>
                 <Action type="SetProperty" frame="LevelProgressBar/BorderImage" texture="@UI/SC2_UI_Coop_CommanderIcon_CircularProgress_Border_Max"/>
-                <Action type="SetProperty" frame="LevelProgressBar/FillImageContainer/FillImage" texture="Assets/Textures/Blank.dds"/>
+                <Action type="SetProperty" frame="LevelProgressBar/FillImageContainer/FillImage" visible="false"/>
                 <Action type="SetProperty" frame="LevelProgressBar/MaxLevelFillImage" visible="True"/>
+                <Action type="SetProperty" frame="MaxLevelIcon" Visible="false"/>
             </State>
 
             <State name="NotMaxLevelState">
                 <When type="AnimationState" frame="$CoopStandardGlue_CommanderSelectionPanel" CommanderMaxLevel="NotMaxLevel"/> 
                 <Action type="SetProperty" frame="LevelLabel" style="@Coop_CommanderLevel"/>
                 <Action type="SetProperty" frame="LevelLabelBG" texture="@UI/SC2_UI_Coop_CommanderIcon_Bubble_Normal"/>
+                <Action type="SetProperty" frame="LevelLabel" Visible="true"/>
                 <Action type="SetProperty" frame="LevelProgressBar/BorderImage" texture="@UI/SC2_UI_Coop_CommanderIcon_CircularProgress_Border_Normal"/>
                 <Action type="SetProperty" frame="LevelProgressBar/FillImageContainer/FillImage" texture="@UI/SC2_UI_Coop_CommanderIcon_CircularProgress_Fill_Normal"/>
                 <Action type="SetProperty" frame="LevelProgressBar/MaxLevelFillImage" visible="False"/>
+                <Action type="SetProperty" frame="MaxLevelIcon" Visible="false"/>
             </State>
         </StateGroup>
 

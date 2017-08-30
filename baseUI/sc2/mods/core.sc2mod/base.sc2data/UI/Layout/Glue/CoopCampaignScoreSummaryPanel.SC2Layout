@@ -271,6 +271,8 @@
     </Frame>
 
     <Frame type="CoopCampaignScoreSummaryPanel" name="CoopCampaignScoreSummaryPanelTemplate">
+        <!-- Mastery level caps at 90 until switching over to prestige levels -->
+        <MaxLevelMastery val="90"/>
 
         <!-- Event: MaxLevelStart = if you started already at max level -->
 
@@ -603,10 +605,40 @@
             <Anchor side="Bottom" relative="$parent" pos="Max" offset="-36"/>
             <Anchor side="Left" relative="$parent" pos="Min" offset="109"/>
             <Style val="Coop_ScoreScreen_CommanderInfo"/>
-            <Text val="@UI/ScreenCoopCampaign/ScoreSummaryPanel/LevelTitle"/>
+            <Text val="{$this/FormatFrame/@Text}"/>
             <ColorAdjustMode val="None"/>
             <DarkAdjustColor val="255,162,0"/>
             <LightAdjustColor val="255,255,255"/>
+
+            <Frame type="MathFrame" name="LevelMathFrame">
+                <Anchor relative="$parent"/>
+                <A val="{$parent/$parent/@CurrentLevel}"/>
+                <Operator val="Subtract"/>
+                <B val="0"/>
+                
+                <!-- Mastery levels are 0 based, so subtract one for mastery commanders-->
+                <StateGroup name="MasteryStateGroup">
+                    <State name="MasteryActiveState">
+                        <When type="Property" frame="$parent/$parent" CommanderId="Mastery"/>
+                        <When type="Property" frame="$parent/$parent" operator="GreaterThan" CurrentLevel="0"/>
+                        <Action type="SetProperty" frame="$this" B="1"/>
+                    </State>
+                </StateGroup>
+            </Frame>
+            
+            <Frame type="TextFormatFrame" name="FormatFrame">
+                <Anchor relative="$parent"/>
+                <FormatText val="@UI/ScreenCoopCampaign/ScoreSummaryPanel/LevelTitle"/>
+                <Replacement index="0" val="{$parent/LevelMathFrame/@ResultInt}"/>
+                <Replacement index="1" val="{$parent/$parent/@CommanderId[Name]}"/>
+                
+                <StateGroup name="AscensionStateGroup">
+                    <State name="AscensionActiveState">
+                        <When type="Property" frame="$parent/LevelMathFrame" operator="GreaterThan" ResultInt="90"/>
+                        <Action type="SetProperty" frame="$this" FormatText="@UI/ScreenCoopCampaign/ScoreSummaryPanel/LevelTitleAscension"/>
+                    </State>
+                </StateGroup>
+            </Frame>
                         
             <Animation name="LevelUp">
                 <Event event="Begin" action="Reset" frame="$parent"/>
@@ -678,6 +710,7 @@
             <Alpha val="0"/>
             <Text val="@UI/ScreenCoopCampaign/ScoreSummaryPanel/MaxLevel"/>
             
+            <!-- MaxLevelMastery - when you reach level 90 mastery, and get capped until switching to prestige -->
             <Animation name="MaxLevel">
                 <Event event="Begin" action="Reset" frame="$parent"/>
                 <Event event="MaxLevel" action="Reset" frame="$parent"/>

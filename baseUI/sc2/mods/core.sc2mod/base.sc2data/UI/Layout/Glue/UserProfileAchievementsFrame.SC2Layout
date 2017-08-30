@@ -1,0 +1,1031 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<Desc>
+    <DescFlags val="Locked"/>
+
+    <Frame type="ProgressBar" name="ProgressBarTemplate">
+        <Height val="58"/>
+        <Color val="FFFFFF"/>
+        <ColorStep val="FFFFFF"/>
+        <UseFillContainer val="true"/>
+        <CollapseLayout val="true"/>
+
+        <Frame type="Image" name="BorderImage">
+            <Anchor relative="$parent"/>
+            <Texture val="@UI/SC2_UI_Coop_XPBar"/>
+            <TextureCoords top="0.0" left="0.0" right="1.0" bottom="0.5"/>
+        </Frame>
+
+        <Frame type="Frame" name="FillImageContainer">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+
+            <Frame type="Image" name="FillImage">
+                <Anchor relative="$parent/$parent"/>
+                <Texture val="@UI/SC2_UI_Coop_XPBar"/>
+                <TextureCoords top="0.5" left="0.0" right="1.0" bottom="1.0"/>
+            </Frame>
+        </Frame>
+    </Frame>
+
+    <Frame type="AchievementCategoryFrame" name="CategoryPointsFrameTemplate">
+        <Anchor side="Bottom" relative="$this/AvatarFrame" pos="Max" offset="0"/>
+        <Width val="200"/>
+        <CategoryId val="{$parent/@CategoryId}"/>
+
+        <Frame type="BattleUserFrame" name="UserFrame">
+            <Anchor relative="$parent"/>
+            <PresenceId val="{$parent/@PresenceId}"/>
+        </Frame>
+
+        <Frame type="AvatarFrame" name="AvatarFrame" template="StandardTemplates/AvatarFrameMiniTemplate">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+            <PresenceId val="{$parent/@PresenceId}"/>
+            <BypassOnlineChecks val="true"/>
+        </Frame>
+
+        <Frame type="Label" name="NameLabel">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent/AvatarFrame" pos="Max" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+            <Text val="{$parent/UserFrame/@DisplayName}"/>
+        </Frame>
+        
+        <Frame type="ProgressBar" name="CategoryProgressBar" template="UserProfileAchievementsFrame/ProgressBarTemplate">
+            <Anchor side="Top" relative="$parent/NameLabel" pos="Max" offset="0"/>
+            <Anchor side="Left" relative="$parent/AvatarFrame" pos="Max" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+            <Anchor side="Bottom" relative="$parent/ProgressLabel" pos="Min" offset="0"/>
+            <MaxValue val="{$parent/@PointsTotal}"/>
+            <Value val="{$parent/@PointsEarned}"/>
+        </Frame>
+
+        <Frame type="Label" name="ProgressLabel">
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+            <Anchor side="Left" relative="$parent/AvatarFrame" pos="Max" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+            <Text val="{$this/FormatFrame/@Text}"/>
+
+            <Frame type="TextFormatFrame" name="FormatFrame">
+                <Anchor relative="$parent"/>
+                <FormatText val="%0%/%1%"/>
+                <Replacement index="0" val="{$parent/$parent/@PointsEarned}"/>
+                <Replacement index="1" val="{$parent/$parent/@PointsTotal}"/>
+            </Frame>
+        </Frame>
+    </Frame>
+
+    <Frame type="AchievementCriteriaFrame" name="AchievementCriteriaFrameTemplate">
+        <Width val="240"/>
+        <Height val="30"/>
+        <PresenceId val="{$parent/$parent/$parent/@PresenceId}"/>
+        <TooltipFrame val="AchievementInfoTooltip"/>
+        <AcceptsMouseTooltip val="true"/>
+        <Enabled val="{$this/@Awarded}"/>
+        <CollapseLayout val="true"/>
+
+            <!-- TODO: Show an achievement icon, or a check mark icon? -->
+        <StateGroup name="AchievementStateGroup">
+            <State name="AchievementState">
+                <When type="Property" frame="$this" AchievementId="0"/>
+                <Action type="SetProperty" frame="AchievementIcon" Visible="false"/>
+                <Action type="SetProperty" frame="$this" AcceptsMouseTooltip="false"/>
+                <Action type="SetProperty" frame="DescriptionLabel" AcceptsMouseTooltip="true"/>
+            </State>
+        </StateGroup>
+
+        <Frame type="Image" name="AchievementIcon">
+            <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+            <Width val="25"/>
+            <Height val="25"/>
+        </Frame>
+        
+        <Frame type="Label" name="DescriptionLabel">
+            <Anchor side="Top" relative="$parent/AchievementIcon" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent/AchievementIcon" pos="Max" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+            <Style val="@Collection_ItemFrame_AchievementInfo_Unearned"/>
+            <Text val="{$parent/@Description}"/>
+            <Options val="Ellipsis | TooltipIfTruncated | NoWrapping"/>
+        </Frame>
+        
+        <StateGroup name="VisibleStateGroup">
+            <State name="VisibleState">
+                <When type="Property" frame="$this" CriteriaId="0"/>
+                <Action type="SetProperty" frame="$this" Visible="false"/>
+            </State>
+        </StateGroup>
+    </Frame>
+
+    <Frame type="AchievementInfoFrame" name="AchievementSeriesFrameTemplate">
+        <Anchor side="Bottom" relative="$this/PointsLabel" pos="Max" offset="5"/>
+        <Width val="60"/>
+        <CollapseLayout val="true"/>
+        <PresenceId val="{$parent/$parent/$parent/@PresenceId}"/>
+        <TooltipFrame val="AchievementInfoTooltip"/>
+        <AcceptsMouseTooltip val="true"/>
+        <Enabled val="{$this/@Awarded}"/>
+
+        <Frame type="Image" name="Icon">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+            <Height val="50"/>
+            <Width val="50"/>
+        </Frame>
+
+        <Frame type="Label" name="PointsLabel">
+            <Anchor side="Top" relative="$parent/Icon" pos="Max" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+            <Style val="@Collection_ItemFrame_AchievementInfo_Unearned"/>
+            <Text val="{$parent/@PointsText}"/>
+
+            <StateGroup name="PointsGroup">
+                <DefaultState val="HasPoints"/>
+
+                <State name="NoPoints">
+                    <When type="Property" frame="$parent" PointsText="0"/>
+                    <Action type="SetProperty" frame="$this" Visible="false"/>
+                </State>
+
+                <State name="HasPoints">
+                    <Action type="SetProperty" frame="$this" Visible="true"/>
+                </State>
+            </StateGroup>
+        </Frame>
+
+        <StateGroup name="VisibleStateGroup">
+            <State name="VisibleState">
+                <When type="Property" frame="$this" AchievementId="0"/>
+                <Action type="SetProperty" frame="$this" Visible="false"/>
+            </State>
+        </StateGroup>
+    </Frame>
+
+    <Frame type="RewardCacheFrame" name="RewardCacheFrameTemplate">
+        <Height val="50"/>
+        <Width val="50"/>
+        <CollapseLayout val="true"/>
+        <Visible val="{$this/@Valid}"/>
+        <AcceptsMouseTooltip val="true"/>
+        <Tooltip val="{$this/NameFormatFrame/@Text}"/>
+
+        <Frame type="TextFormatFrame" name="NameFormatFrame">
+            <Anchor relative="$parent"/>
+            <FormatText val="%0%: %1%"/>
+            <Replacement index="0" val="{$parent/@TypeName}"/>
+            <Replacement index="1" val="{$parent/@Name}"/>
+        </Frame>
+
+        <Frame type="Image" name="Image">
+            <Anchor relative="$parent"/>
+            <Texture val="{$parent/@Texture}"/>
+            <TextureCoords val="{$parent/@TextureCoords}"/>
+        </Frame>
+    </Frame>
+
+    <Frame type="AchievementInfoFrame" name="AchievementInfoFrameTemplate">
+        <Anchor side="Bottom" relative="$this/RewardCountLabel" pos="Max" offset="0"/>
+        <ShortDateFormat val="true"/>
+
+        <Frame type="Image" name="Icon">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="13"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="15"/>
+            <Width val="82"/>
+            <Height val="82"/>
+        </Frame>
+
+        <Frame type="Image" name="IconBorder">
+            <Anchor side="Top" relative="$parent/Icon" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent/Icon" pos="Mid" offset="0"/>
+            <Anchor side="Left" relative="$parent/Icon" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent/Icon" pos="Mid" offset="0"/>
+            <Width val="94"/>
+            <Height val="94"/>
+            <TextureType val="NineSlice"/>
+            <Texture val="@UI/SC2_UI_Collection_AchievementIconFrame_Normal"/>
+        </Frame>
+
+        <Frame type="Label" name="Title">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="9"/>
+            <Anchor side="Left" relative="$parent/IconBorder" pos="Max" offset="9"/>
+            <Style val="@Collection_ItemFrame_AchievementInfo_Name"/>
+            <Text val="{$parent/@TitleText}"/>
+        </Frame>
+
+        <Frame type="Label" name="Description">
+            <Anchor side="Top" relative="$parent/Title" pos="Max" offset="3"/>
+            <Anchor side="Left" relative="$parent/Title" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent/PointsBorder" pos="Min" offset="-9"/>
+            <Style val="@Collection_ItemFrame_AchievementInfo_Desc"/>
+            <Text val="{$parent/@DescriptionText}"/>
+        </Frame>
+
+        <Frame type="Image" name="PointsBorder">
+            <Anchor side="Top" relative="$parent/IconBorder" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="-10"/>
+            <Width val="94"/>
+            <Height val="94"/>
+            <TextureType val="NineSlice"/>
+            <Texture val="@UI/SC2_UI_Collection_AchievementIconFrame_Normal"/>
+        </Frame>
+
+        <Frame type="Label" name="PointsLabel">
+            <Anchor side="Top" relative="$parent/PointsBorder" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent/PointsBorder" pos="Mid" offset="0"/>
+            <Anchor side="Left" relative="$parent/PointsBorder" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent/PointsBorder" pos="Mid" offset="0"/>
+            <Style val="@StandardHeaderLabel"/>
+            <Text val="{$parent/@PointsText}"/>
+
+            <StateGroup name="PointsGroup">
+                <DefaultState val="HasPoints"/>
+
+                <State name="NoPoints">
+                    <When type="Property" frame="$parent" PointsText="0"/>
+                    <Action type="SetProperty" frame="$this" Visible="false"/>
+                </State>
+
+                <State name="HasPoints">
+                    <Action type="SetProperty" frame="$this" Visible="true"/>
+                </State>
+            </StateGroup>
+        </Frame>
+
+        <Frame type="Label" name="CompletionLabel">
+            <Anchor side="Top" relative="$parent/PointsLabel" pos="Max" offset="0"/>
+            <Anchor side="Left" relative="$parent/PointsLabel" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent/PointsLabel" pos="Mid" offset="0"/>
+            <Style val="@Collection_ItemFrame_AchievementInfo_Unearned"/>
+            <Text val="{$parent/@CompletionText}"/>
+        </Frame>
+
+        <Frame type="Frame" name="ExpandFrame">
+            <Anchor side="Top" relative="$parent/IconBorder" pos="Max" offset="20"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="20"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+            <Anchor side="Bottom" relative="$this/RewardFrame0" pos="Max" offset="20"/>
+            <Visible val="{$parent/$parent/@IsExpanded}"/>
+            <CollapseLayout val="true"/>
+            
+            <Frame type="Frame" name="SeriesContainerFrame">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+                <Anchor side="Bottom" relative="$this/AchievementSeriesFrame0" pos="Max" offset="0"/>
+                
+                <!-- Last achievement in series -->
+                <Frame type="AchievementInfoFrame" name="AchievementSeriesFrame0" template="UserProfileAchievementsFrame/AchievementSeriesFrameTemplate">
+                    <Anchor side="Top" relative="$parent/AchievementSeriesFrame1" pos="Min" offset="0"/>
+                    <Anchor side="Left" relative="$parent/AchievementSeriesFrame1" pos="Max" offset="0"/>
+                    <AchievementId val="{$parent/$parent/$parent/@SeriesTailAchievementId}"/>
+                </Frame>
+
+                <Frame type="AchievementInfoFrame" name="AchievementSeriesFrame1" template="UserProfileAchievementsFrame/AchievementSeriesFrameTemplate">
+                    <Anchor side="Top" relative="$parent/AchievementSeriesFrame2" pos="Min" offset="0"/>
+                    <Anchor side="Left" relative="$parent/AchievementSeriesFrame2" pos="Max" offset="0"/>
+                    <AchievementId val="{$parent/AchievementSeriesFrame0/@SupersedesAchievementId}"/>
+                </Frame>
+
+                <Frame type="AchievementInfoFrame" name="AchievementSeriesFrame2" template="UserProfileAchievementsFrame/AchievementSeriesFrameTemplate">
+                    <Anchor side="Top" relative="$parent/AchievementSeriesFrame3" pos="Min" offset="0"/>
+                    <Anchor side="Left" relative="$parent/AchievementSeriesFrame3" pos="Max" offset="0"/>
+                    <AchievementId val="{$parent/AchievementSeriesFrame1/@SupersedesAchievementId}"/>
+                </Frame>
+
+                <Frame type="AchievementInfoFrame" name="AchievementSeriesFrame3" template="UserProfileAchievementsFrame/AchievementSeriesFrameTemplate">
+                    <Anchor side="Top" relative="$parent/AchievementSeriesFrame4" pos="Min" offset="0"/>
+                    <Anchor side="Left" relative="$parent/AchievementSeriesFrame4" pos="Max" offset="0"/>
+                    <AchievementId val="{$parent/AchievementSeriesFrame2/@SupersedesAchievementId}"/>
+                </Frame>
+
+                <Frame type="AchievementInfoFrame" name="AchievementSeriesFrame4" template="UserProfileAchievementsFrame/AchievementSeriesFrameTemplate">
+                    <Anchor side="Top" relative="$parent/AchievementSeriesFrame5" pos="Min" offset="0"/>
+                    <Anchor side="Left" relative="$parent/AchievementSeriesFrame5" pos="Max" offset="0"/>
+                    <AchievementId val="{$parent/AchievementSeriesFrame3/@SupersedesAchievementId}"/>
+                </Frame>
+
+                <Frame type="AchievementInfoFrame" name="AchievementSeriesFrame5" template="UserProfileAchievementsFrame/AchievementSeriesFrameTemplate">
+                    <Anchor side="Top" relative="$parent/AchievementSeriesFrame6" pos="Min" offset="0"/>
+                    <Anchor side="Left" relative="$parent/AchievementSeriesFrame6" pos="Max" offset="0"/>
+                    <AchievementId val="{$parent/AchievementSeriesFrame4/@SupersedesAchievementId}"/>
+                </Frame>
+
+                <Frame type="AchievementInfoFrame" name="AchievementSeriesFrame6" template="UserProfileAchievementsFrame/AchievementSeriesFrameTemplate">
+                    <Anchor side="Top" relative="$parent/AchievementSeriesFrame7" pos="Min" offset="0"/>
+                    <Anchor side="Left" relative="$parent/AchievementSeriesFrame7" pos="Max" offset="0"/>
+                    <AchievementId val="{$parent/AchievementSeriesFrame5/@SupersedesAchievementId}"/>
+                </Frame>
+
+                <Frame type="AchievementInfoFrame" name="AchievementSeriesFrame7" template="UserProfileAchievementsFrame/AchievementSeriesFrameTemplate">
+                    <Anchor side="Top" relative="$parent/AchievementSeriesFrame8" pos="Min" offset="0"/>
+                    <Anchor side="Left" relative="$parent/AchievementSeriesFrame8" pos="Max" offset="0"/>
+                    <AchievementId val="{$parent/AchievementSeriesFrame6/@SupersedesAchievementId}"/>
+                </Frame>
+
+                <Frame type="AchievementInfoFrame" name="AchievementSeriesFrame8" template="UserProfileAchievementsFrame/AchievementSeriesFrameTemplate">
+                    <Anchor side="Top" relative="$parent/AchievementSeriesFrame9" pos="Min" offset="0"/>
+                    <Anchor side="Left" relative="$parent/AchievementSeriesFrame9" pos="Max" offset="0"/>
+                    <AchievementId val="{$parent/AchievementSeriesFrame7/@SupersedesAchievementId}"/>
+                </Frame>
+
+                <Frame type="AchievementInfoFrame" name="AchievementSeriesFrame9" template="UserProfileAchievementsFrame/AchievementSeriesFrameTemplate">
+                    <Anchor side="Top" relative="$parent/AchievementSeriesFrame10" pos="Max" offset="0"/>
+                    <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                    <AchievementId val="{$parent/AchievementSeriesFrame8/@SupersedesAchievementId}"/>
+                </Frame>
+
+                <Frame type="AchievementInfoFrame" name="AchievementSeriesFrame10" template="UserProfileAchievementsFrame/AchievementSeriesFrameTemplate">
+                    <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                    <Anchor side="Left" relative="$parent/AchievementSeriesFrame11" pos="Max" offset="0"/>
+                    <AchievementId val="{$parent/AchievementSeriesFrame9/@SupersedesAchievementId}"/>
+                </Frame>
+
+                <Frame type="AchievementInfoFrame" name="AchievementSeriesFrame11" template="UserProfileAchievementsFrame/AchievementSeriesFrameTemplate">
+                    <Anchor side="Top" relative="$parent/AchievementSeriesFrame12" pos="Min" offset="0"/>
+                    <Anchor side="Left" relative="$parent/AchievementSeriesFrame12" pos="Max" offset="0"/>
+                    <AchievementId val="{$parent/AchievementSeriesFrame10/@SupersedesAchievementId}"/>
+                </Frame>
+
+                <Frame type="AchievementInfoFrame" name="AchievementSeriesFrame12" template="UserProfileAchievementsFrame/AchievementSeriesFrameTemplate">
+                    <Anchor side="Top" relative="$parent/AchievementSeriesFrame13" pos="Min" offset="0"/>
+                    <Anchor side="Left" relative="$parent/AchievementSeriesFrame13" pos="Max" offset="0"/>
+                    <AchievementId val="{$parent/AchievementSeriesFrame11/@SupersedesAchievementId}"/>
+                </Frame>
+
+                <Frame type="AchievementInfoFrame" name="AchievementSeriesFrame13" template="UserProfileAchievementsFrame/AchievementSeriesFrameTemplate">
+                    <Anchor side="Top" relative="$parent/AchievementSeriesFrame14" pos="Min" offset="0"/>
+                    <Anchor side="Left" relative="$parent/AchievementSeriesFrame14" pos="Max" offset="0"/>
+                    <AchievementId val="{$parent/AchievementSeriesFrame12/@SupersedesAchievementId}"/>
+                </Frame>
+
+                <Frame type="AchievementInfoFrame" name="AchievementSeriesFrame14" template="UserProfileAchievementsFrame/AchievementSeriesFrameTemplate">
+                    <Anchor side="Top" relative="$parent/AchievementSeriesFrame15" pos="Min" offset="0"/>
+                    <Anchor side="Left" relative="$parent/AchievementSeriesFrame15" pos="Max" offset="0"/>
+                    <AchievementId val="{$parent/AchievementSeriesFrame14/@SupersedesAchievementId}"/>
+                </Frame>
+
+                <Frame type="AchievementInfoFrame" name="AchievementSeriesFrame15" template="UserProfileAchievementsFrame/AchievementSeriesFrameTemplate">
+                    <Anchor side="Top" relative="$parent/AchievementSeriesFrame16" pos="Min" offset="0"/>
+                    <Anchor side="Left" relative="$parent/AchievementSeriesFrame16" pos="Max" offset="0"/>
+                    <AchievementId val="{$parent/AchievementSeriesFrame14/@SupersedesAchievementId}"/>
+                </Frame>
+
+                <Frame type="AchievementInfoFrame" name="AchievementSeriesFrame16" template="UserProfileAchievementsFrame/AchievementSeriesFrameTemplate">
+                    <Anchor side="Top" relative="$parent/AchievementSeriesFrame17" pos="Min" offset="0"/>
+                    <Anchor side="Left" relative="$parent/AchievementSeriesFrame17" pos="Max" offset="0"/>
+                    <AchievementId val="{$parent/AchievementSeriesFrame15/@SupersedesAchievementId}"/>
+                </Frame>
+
+                <Frame type="AchievementInfoFrame" name="AchievementSeriesFrame17" template="UserProfileAchievementsFrame/AchievementSeriesFrameTemplate">
+                    <Anchor side="Top" relative="$parent/AchievementSeriesFrame18" pos="Min" offset="0"/>
+                    <Anchor side="Left" relative="$parent/AchievementSeriesFrame18" pos="Max" offset="0"/>
+                    <AchievementId val="{$parent/AchievementSeriesFrame16/@SupersedesAchievementId}"/>
+                </Frame>
+
+                <Frame type="AchievementInfoFrame" name="AchievementSeriesFrame18" template="UserProfileAchievementsFrame/AchievementSeriesFrameTemplate">
+                    <Anchor side="Top" relative="$parent/AchievementSeriesFrame19" pos="Min" offset="0"/>
+                    <Anchor side="Left" relative="$parent/AchievementSeriesFrame19" pos="Max" offset="0"/>
+                    <AchievementId val="{$parent/AchievementSeriesFrame17/@SupersedesAchievementId}"/>
+                </Frame>
+
+                <Frame type="AchievementInfoFrame" name="AchievementSeriesFrame19" template="UserProfileAchievementsFrame/AchievementSeriesFrameTemplate">
+                    <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                    <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                    <AchievementId val="{$parent/AchievementSeriesFrame18/@SupersedesAchievementId}"/>
+                </Frame>
+            </Frame>
+
+            <Frame type="Frame" name="CriteriaContainerFrame">
+                <Anchor side="Top" relative="$parent/SeriesContainerFrame" pos="Max" offset="0"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+                <Anchor side="Bottom" relative="$this/CriteriaFrame14" pos="Max" offset="0"/>
+                <Visible val="false"/>
+                <CollapseLayout val="true"/>
+                
+                 <!-- Visible if there's more than 1 criteria and no series achievement -->
+                <StateGroup name="CriteriaVisibleStateGroup">
+                    <State name="CriteriaState">
+                        <When type="Property" frame="$parent/$parent" SeriesTailAchievementId="0"/>
+                        <When type="Property" frame="CriteriaFrame1" Visible="true"/>
+                        <Action type="SetProperty" Visible="true"/>
+                    </State>
+                </StateGroup>
+
+                <Frame type="AchievementCriteriaFrame" name="CriteriaFrame0" template="UserProfileAchievementsFrame/AchievementCriteriaFrameTemplate">
+                    <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                    <Anchor side="Right" relative="$parent" pos="Mid" offset="-10"/>
+                    <CriteriaId val="{$parent/$parent/$parent/@CriteriaId[0]}"/>
+                </Frame>
+
+                <Frame type="AchievementCriteriaFrame" name="CriteriaFrame1" template="UserProfileAchievementsFrame/AchievementCriteriaFrameTemplate">
+                    <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                    <Anchor side="Left" relative="$parent" pos="Mid" offset="10"/>
+                    <CriteriaId val="{$parent/$parent/$parent/@CriteriaId[1]}"/>
+                </Frame>
+
+                <Frame type="AchievementCriteriaFrame" name="CriteriaFrame2" template="UserProfileAchievementsFrame/AchievementCriteriaFrameTemplate">
+                    <Anchor side="Top" relative="$parent/CriteriaFrame0" pos="Max" offset="0"/>
+                    <Anchor side="Right" relative="$parent/CriteriaFrame0" pos="Max" offset="0"/>
+                    <CriteriaId val="{$parent/$parent/$parent/@CriteriaId[2]}"/>
+                </Frame>
+
+                <Frame type="AchievementCriteriaFrame" name="CriteriaFrame3" template="UserProfileAchievementsFrame/AchievementCriteriaFrameTemplate">
+                    <Anchor side="Top" relative="$parent/CriteriaFrame1" pos="Max" offset="0"/>
+                    <Anchor side="Left" relative="$parent/CriteriaFrame1" pos="Min" offset="0"/>
+                    <CriteriaId val="{$parent/$parent/$parent/@CriteriaId[3]}"/>
+                </Frame>
+
+                <Frame type="AchievementCriteriaFrame" name="CriteriaFrame4" template="UserProfileAchievementsFrame/AchievementCriteriaFrameTemplate">
+                    <Anchor side="Top" relative="$parent/CriteriaFrame2" pos="Max" offset="0"/>
+                    <Anchor side="Right" relative="$parent/CriteriaFrame2" pos="Max" offset="0"/>
+                    <CriteriaId val="{$parent/$parent/$parent/@CriteriaId[4]}"/>
+                </Frame>
+
+                <Frame type="AchievementCriteriaFrame" name="CriteriaFrame5" template="UserProfileAchievementsFrame/AchievementCriteriaFrameTemplate">
+                    <Anchor side="Top" relative="$parent/CriteriaFrame3" pos="Max" offset="0"/>
+                    <Anchor side="Left" relative="$parent/CriteriaFrame3" pos="Min" offset="0"/>
+                    <CriteriaId val="{$parent/$parent/$parent/@CriteriaId[5]}"/>
+                </Frame>
+
+                <Frame type="AchievementCriteriaFrame" name="CriteriaFrame6" template="UserProfileAchievementsFrame/AchievementCriteriaFrameTemplate">
+                    <Anchor side="Top" relative="$parent/CriteriaFrame4" pos="Max" offset="0"/>
+                    <Anchor side="Right" relative="$parent/CriteriaFrame4" pos="Max" offset="0"/>
+                    <CriteriaId val="{$parent/$parent/$parent/@CriteriaId[6]}"/>
+                </Frame>
+
+                <Frame type="AchievementCriteriaFrame" name="CriteriaFrame7" template="UserProfileAchievementsFrame/AchievementCriteriaFrameTemplate">
+                    <Anchor side="Top" relative="$parent/CriteriaFrame5" pos="Max" offset="0"/>
+                    <Anchor side="Left" relative="$parent/CriteriaFrame5" pos="Min" offset="0"/>
+                    <CriteriaId val="{$parent/$parent/$parent/@CriteriaId[7]}"/>
+                </Frame>
+
+                <Frame type="AchievementCriteriaFrame" name="CriteriaFrame8" template="UserProfileAchievementsFrame/AchievementCriteriaFrameTemplate">
+                    <Anchor side="Top" relative="$parent/CriteriaFrame6" pos="Max" offset="0"/>
+                    <Anchor side="Right" relative="$parent/CriteriaFrame6" pos="Max" offset="0"/>
+                    <CriteriaId val="{$parent/$parent/$parent/@CriteriaId[8]}"/>
+                </Frame>
+
+                <Frame type="AchievementCriteriaFrame" name="CriteriaFrame9" template="UserProfileAchievementsFrame/AchievementCriteriaFrameTemplate">
+                    <Anchor side="Top" relative="$parent/CriteriaFrame7" pos="Max" offset="0"/>
+                    <Anchor side="Left" relative="$parent/CriteriaFrame7" pos="Min" offset="0"/>
+                    <CriteriaId val="{$parent/$parent/$parent/@CriteriaId[9]}"/>
+                </Frame>
+
+                <Frame type="AchievementCriteriaFrame" name="CriteriaFrame10" template="UserProfileAchievementsFrame/AchievementCriteriaFrameTemplate">
+                    <Anchor side="Top" relative="$parent/CriteriaFrame8" pos="Max" offset="0"/>
+                    <Anchor side="Right" relative="$parent/CriteriaFrame8" pos="Max" offset="0"/>
+                    <CriteriaId val="{$parent/$parent/$parent/@CriteriaId[10]}"/>
+                </Frame>
+
+                <Frame type="AchievementCriteriaFrame" name="CriteriaFrame11" template="UserProfileAchievementsFrame/AchievementCriteriaFrameTemplate">
+                    <Anchor side="Top" relative="$parent/CriteriaFrame9" pos="Max" offset="0"/>
+                    <Anchor side="Left" relative="$parent/CriteriaFrame9" pos="Min" offset="0"/>
+                    <CriteriaId val="{$parent/$parent/$parent/@CriteriaId[11]}"/>
+                </Frame>
+
+                <Frame type="AchievementCriteriaFrame" name="CriteriaFrame12" template="UserProfileAchievementsFrame/AchievementCriteriaFrameTemplate">
+                    <Anchor side="Top" relative="$parent/CriteriaFrame10" pos="Max" offset="0"/>
+                    <Anchor side="Right" relative="$parent/CriteriaFrame10" pos="Max" offset="0"/>
+                    <CriteriaId val="{$parent/$parent/$parent/@CriteriaId[12]}"/>
+                </Frame>
+
+                <Frame type="AchievementCriteriaFrame" name="CriteriaFrame13" template="UserProfileAchievementsFrame/AchievementCriteriaFrameTemplate">
+                    <Anchor side="Top" relative="$parent/CriteriaFrame11" pos="Max" offset="0"/>
+                    <Anchor side="Left" relative="$parent/CriteriaFrame11" pos="Min" offset="0"/>
+                    <CriteriaId val="{$parent/$parent/$parent/@CriteriaId[13]}"/>
+                </Frame>
+
+                <Frame type="AchievementCriteriaFrame" name="CriteriaFrame14" template="UserProfileAchievementsFrame/AchievementCriteriaFrameTemplate">
+                    <Anchor side="Top" relative="$parent/CriteriaFrame12" pos="Max" offset="0"/>
+                    <Anchor side="Right" relative="$parent/CriteriaFrame12" pos="Max" offset="0"/>
+                    <CriteriaId val="{$parent/$parent/$parent/@CriteriaId[14]}"/>
+                </Frame>
+
+                <Frame type="AchievementCriteriaFrame" name="CriteriaFrame15" template="UserProfileAchievementsFrame/AchievementCriteriaFrameTemplate">
+                    <Anchor side="Top" relative="$parent/CriteriaFrame13" pos="Max" offset="0"/>
+                    <Anchor side="Left" relative="$parent/CriteriaFrame13" pos="Min" offset="0"/>
+                    <CriteriaId val="{$parent/$parent/$parent/@CriteriaId[15]}"/>
+                </Frame>
+            </Frame>
+
+            <Frame type="AchievementInfoFrame" name="NextAchievementFrame">
+                <Anchor side="Top" relative="$parent/CriteriaContainerFrame" pos="Max" offset="0"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+                <Anchor side="Bottom" relative="$this/ProgressBar" pos="Max" offset="0"/>
+                <AchievementId val="{$parent/$parent/$parent/@NextAchievementId}"/>
+                <PresenceId val="{$parent/$parent/@PresenceId}"/>
+                <CollapseLayout val="true"/>
+
+                <StateGroup name="NextAchievementStateGroup">
+                    <State name="NextAchievementState">
+                        <When type="Property" AchievementId="0"/>
+                        <Action type="SetProperty" Visible="false"/>
+                    </State>
+                </StateGroup>
+
+                <Frame type="Label" name="NextAchievementLabel">
+                    <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                    <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                    <Style val="@Collection_ItemFrame_AchievementInfo_Unearned"/>
+                    <Text val="{$this/FormatFrame/@Text}"/>
+                    <Visible val="false"/>
+                    <CollapseLayout val="true"/>
+
+                    <Frame type="TextFormatFrame" name="FormatFrame">
+                        <Anchor relative="$parent"/>
+                        <FormatText val="@UI/UserProfileAchievementsFrame/NextAchievement"/>
+                        <Replacement index="0" val="{$parent/$parent/@TitleText}"/>
+                    </Frame>
+                </Frame>
+
+                <Frame type="Label" name="ProgressLabel">
+                    <Anchor side="Top" relative="$parent/NextAchievementLabel" pos="Min" offset="0"/>
+                    <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+                    <Style val="@Collection_ItemFrame_AchievementInfo_Unearned"/>
+                    <Text val="{$this/FormatFrame/@Text}"/>
+                    <Visible val="{$parent/@HasProgressBar}"/>
+
+                    <Frame type="TextFormatFrame" name="FormatFrame">
+                        <Anchor relative="$parent"/>
+                        <FormatText val="%0%/%1%"/>
+                        <Replacement index="0" val="{$parent/$parent/@CriteriaEarned}"/>
+                        <Replacement index="1" val="{$parent/$parent/@CriteriaTotal}"/>
+                    </Frame>
+                </Frame>
+
+                <Frame type="ProgressBar" name="ProgressBar" template="UserProfileAchievementsFrame/ProgressBarTemplate">
+                    <Anchor side="Top" relative="$parent/NextAchievementLabel" pos="Max" offset="0"/>
+                    <Anchor side="Left" relative="$parent/NextAchievementLabel" pos="Min" offset="0"/>
+                    <Anchor side="Right" relative="$parent" pos="Max" offset="-20"/>
+                    <Visible val="{$parent/@HasProgressBar}"/>
+                    <MaxValue val="{$parent/@CriteriaTotal}"/>
+                    <Value val="{$parent/@CriteriaEarned}"/>
+                    <CollapseLayout val="true"/>
+                </Frame>
+            </Frame>
+
+            <Frame type="Label" name="ProgressLabel">
+                <Anchor side="Top" relative="$parent/NextAchievementFrame" pos="Max" offset="0"/>
+                <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+                <Style val="@Collection_ItemFrame_AchievementInfo_Unearned"/>
+                <Text val="{$this/FormatFrame/@Text}"/>
+                <Visible val="{$parent/ProgressBar/@Visible}"/>
+                <CollapseLayout val="true"/>
+
+                <Frame type="TextFormatFrame" name="FormatFrame">
+                    <Anchor relative="$parent"/>
+                    <FormatText val="%0%/%1%"/>
+                    <Replacement index="0" val="{$parent/$parent/$parent/@CriteriaEarned}"/>
+                    <Replacement index="1" val="{$parent/$parent/$parent/@CriteriaTotal}"/>
+                </Frame>
+            </Frame>
+
+            <Frame type="ProgressBar" name="ProgressBar" template="UserProfileAchievementsFrame/ProgressBarTemplate">
+                <Anchor side="Top" relative="$parent/ProgressLabel" pos="Max" offset="0"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Right" relative="$parent" pos="Max" offset="-20"/>
+                <Visible val="{$parent/$parent/@HasProgressBar}"/>
+                <MaxValue val="{$parent/$parent/@CriteriaTotal}"/>
+                <Value val="{$parent/$parent/@CriteriaEarned}"/>
+                <CollapseLayout val="true"/>
+                <Visible val="false"/>
+                
+                <StateGroup name="NextAchievementStateGroup">
+                    <State name="NextAchievementState">
+                        <When type="Property" frame="$parent/NextAchievementFrame" Visible="false"/>
+                        <When type="Property" frame="$parent/$parent" HasProgressBar="true"/>
+                        <Action type="SetProperty" Visible="true"/>
+                    </State>
+                </StateGroup>
+            </Frame>
+
+            <Frame type="RewardCacheFrame" name="RewardFrame0" template="UserProfileAchievementsFrame/RewardCacheFrameTemplate">
+                <Anchor side="Top" relative="$parent/ProgressBar" pos="Max" offset="0"/>
+                <Anchor side="Left" relative="$parent/ProgressBar" pos="Min" offset="0"/>
+                <UnlockableHandle val="{$parent/$parent/@UnlockableHandle[0]}"/>
+            </Frame>
+
+            <Frame type="RewardCacheFrame" name="RewardFrame1" template="UserProfileAchievementsFrame/RewardCacheFrameTemplate">
+                <Anchor side="Top" relative="$parent/RewardFrame0" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/RewardFrame0" pos="Max" offset="0"/>
+                <UnlockableHandle val="{$parent/$parent/@UnlockableHandle[1]}"/>
+            </Frame>
+
+            <Frame type="RewardCacheFrame" name="RewardFrame2" template="UserProfileAchievementsFrame/RewardCacheFrameTemplate">
+                <Anchor side="Top" relative="$parent/RewardFrame1" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/RewardFrame1" pos="Max" offset="0"/>
+                <UnlockableHandle val="{$parent/$parent/@UnlockableHandle[2]}"/>
+            </Frame>
+
+            <Frame type="RewardCacheFrame" name="RewardFrame3" template="UserProfileAchievementsFrame/RewardCacheFrameTemplate">
+                <Anchor side="Top" relative="$parent/RewardFrame2" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/RewardFrame2" pos="Max" offset="0"/>
+                <UnlockableHandle val="{$parent/$parent/@UnlockableHandle[3]}"/>
+            </Frame>
+        </Frame>
+
+        <Frame type="Label" name="RewardCountLabel">
+            <Anchor side="Top" relative="$parent/ExpandFrame" pos="Max" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+            <Style val="@Collection_ItemFrame_AchievementInfo_Unearned"/>
+            <Text val="{$parent/$parent/@TotalRewardCount}"/>
+            <CollapseLayout val="true"/>
+
+            <StateGroup name="RewardsGroup">
+                <State name="NoRewards">
+                    <When type="Property" frame="$parent/$parent" TotalRewardCount="0"/>
+                    <Action type="SetProperty" frame="$this" Visible="false"/>
+                </State>
+            </StateGroup>
+        </Frame>
+    </Frame>
+
+    <Frame type="AchievementInfoFrame" name="CompareAchievementFrameTemplate">
+        <Anchor side="Bottom" relative="$this/IconBorder" pos="Max" offset="10"/>
+        <ShortDateFormat val="true"/>
+
+        <Frame type="Image" name="Icon">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="13"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="15"/>
+            <Width val="82"/>
+            <Height val="82"/>
+        </Frame>
+
+        <Frame type="Image" name="IconBorder">
+            <Anchor side="Top" relative="$parent/Icon" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent/Icon" pos="Mid" offset="0"/>
+            <Anchor side="Left" relative="$parent/Icon" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent/Icon" pos="Mid" offset="0"/>
+            <Width val="94"/>
+            <Height val="94"/>
+            <TextureType val="NineSlice"/>
+            <Texture val="@UI/SC2_UI_Collection_AchievementIconFrame_Normal"/>
+        </Frame>
+
+        <Frame type="Image" name="PointsBorder">
+            <Anchor side="Top" relative="$parent/IconBorder" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="-10"/>
+            <Width val="94"/>
+            <Height val="94"/>
+            <TextureType val="NineSlice"/>
+            <Texture val="@UI/SC2_UI_Collection_AchievementIconFrame_Normal"/>
+        </Frame>
+
+        <Frame type="Label" name="PointsLabel">
+            <Anchor side="Top" relative="$parent/PointsBorder" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent/PointsBorder" pos="Mid" offset="0"/>
+            <Anchor side="Left" relative="$parent/PointsBorder" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent/PointsBorder" pos="Mid" offset="0"/>
+            <Style val="@StandardHeaderLabel"/>
+            <Text val="{$parent/@PointsText}"/>
+
+            <StateGroup name="PointsGroup">
+                <DefaultState val="HasPoints"/>
+
+                <State name="NoPoints">
+                    <When type="Property" frame="$parent" PointsText="0"/>
+                    <Action type="SetProperty" frame="$this" Visible="false"/>
+                </State>
+
+                <State name="HasPoints">
+                    <Action type="SetProperty" frame="$this" Visible="true"/>
+                </State>
+            </StateGroup>
+        </Frame>
+
+        <Frame type="Label" name="CompletionLabel">
+            <Anchor side="Top" relative="$parent/PointsLabel" pos="Max" offset="0"/>
+            <Anchor side="Left" relative="$parent/PointsLabel" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent/PointsLabel" pos="Mid" offset="0"/>
+            <Style val="@Collection_ItemFrame_AchievementInfo_Unearned"/>
+            <Text val="{$parent/@CompletionText}"/>
+        </Frame>
+    </Frame>
+
+    <Frame type="TextTreeViewItem" name="CategoryTreeViewItemTemplate">
+        <Width val="341"/>
+        <Height val="73"/>
+
+        <Frame type="Frame" name="HitTestFrame">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+        </Frame>
+
+        <Frame type="Image" name="NormalImage">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+            <Texture val="@UI/StandardBattlenetVerticalTabButtonNormal"/>
+            <TextureType val="EndCap"/>
+            <Tiled val="false"/>
+            <StateCount val="3"/>
+            <DesaturateOnDisable val="false"/>
+            <DisabledAlpha val="75"/>
+            <DesaturationColor val="1d2d33"/>
+        </Frame>
+
+        <Frame type="Label" name="ItemLabel">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="3"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="30"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="-30"/>
+        </Frame>
+    </Frame>
+
+    <Frame type="UserProfileAchievementsListBoxItem" name="AchievementsListBoxItemTemplate">
+        <Frame type="AchievementInfoFrame" name="CompareAchievementFrame" template="UserProfileAchievementsFrame/CompareAchievementFrameTemplate">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+            <Width val="200"/>
+            <AchievementId val="{$parent/@AchievementId}"/>
+            <PresenceId val="{$BattleUI/@LocalToonPresenceId}"/>
+            <CollapseLayout val="false"/>
+            <Visible val="false"/>
+        </Frame>
+        
+        <Frame type="AchievementInfoFrame" name="AchievementFrame" template="UserProfileAchievementsFrame/AchievementInfoFrameTemplate">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent/CompareAchievementFrame" pos="Min" offset="0"/>
+            <AchievementId val="{$parent/@AchievementId}"/>
+            <PresenceId val="{$UserProfileAchievementsFrame/@PresenceId}"/>
+        </Frame>
+
+        <Frame type="Frame" name="AnchorFrame">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+            <Anchor side="Bottom" relative="$parent/AchievementFrame" pos="Max" offset="0"/>
+        </Frame>
+
+        <StateGroup name="LocalUserStateGroup">
+            <State name="LocalUserState">
+                <When type="Property" frame="$BattleUI" operator="NotEqual" LocalToonPresenceId="{$UserProfileAchievementsFrame/@PresenceId}"/>
+                <Action type="SetProperty" frame="CompareAchievementFrame" Visible="true"/>
+            </State>
+        </StateGroup>
+    </Frame>
+    
+    <Frame type="UserProfileAchievementsFrame" name="UserProfileAchievementsFrameTemplate">
+        <Handle val="UserProfileAchievementsFrame"/>
+
+        <Frame type="AchievementInfoTooltip" name="AchievementInfoTooltip" template="StandardTemplates/AchievementInfoTooltipTemplate"/>
+        
+        <Frame type="Frame" name="BackgroundAnchor">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent/CategoryTreeView" pos="Max" offset="7"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+        </Frame>
+
+        <Frame type="ListBox" name="AchievementsListBox">
+            <Anchor relative="$parent/BackgroundAnchor"/>
+            <Insets top="80" left="15" bottom="10" right="12"/>
+            <ItemDesc val="UserProfileAchievementsFrame/AchievementsListBoxItemTemplate"/>
+            <SelectionToggleable val="true"/>
+            <Visible val="true"/>
+
+            <Frame type="Image" name="ListBoxBackground">
+                <Anchor relative="$parent"/>
+                <Texture val="@UI/Glues_Battlenet_PageAssets_TableLargeHeaderBg"/>
+                <TextureType val="NineSlice"/>
+                <Tiled val="True"/>
+                <Visible val="true"/>
+            </Frame>
+
+            <SelectedImage val="$root/StandardBattlenetTemplates/BattlenetSocialListBoxItemSelectedImage"/>
+            <HoverImage val="$root/StandardBattlenetTemplates/BattlenetSocialListBoxItemHoverImage"/>
+            <ScrollBar val="ScrollBar"/>
+
+            <Frame type="ScrollBar" name="ScrollBar" template="StandardBattlenetTemplates/GluesSocialScrollBarTemplate">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="76"/>
+                <Anchor side="Right" relative="$parent" pos="Max" offset="-9"/>
+                <Anchor side="Bottom" relative="$parent" pos="Max" offset="-6"/>
+            </Frame>
+        </Frame>
+
+        <Frame type="UserProfileRecentAchievementsListBox" name="RecentAchievementsListBox">
+            <Anchor side="Top" relative="$parent/BackgroundAnchor" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent/CategoriesContainerFrame" pos="Max" offset="0"/>
+            <Anchor side="Right" relative="$parent/BackgroundAnchor" pos="Max" offset="0"/>
+            <Anchor side="Bottom" relative="$parent/BackgroundAnchor" pos="Max" offset="0"/>
+            <Insets top="80" left="15" bottom="10" right="12"/>
+            <ItemDesc val="UserProfileAchievementsSummaryFrame/RecentAchievementItem"/>
+            <SelectionToggleable val="true"/>
+            <Visible val="false"/>
+            <PresenceId val="{$UserProfileAchievementsFrame/@PresenceId}"/>
+
+            <Frame type="Image" name="ListBoxBackground">
+                <Anchor relative="$parent"/>
+                <Texture val="@UI/Glues_Battlenet_PageAssets_TableLargeHeaderBg"/>
+                <TextureType val="NineSlice"/>
+                <Tiled val="True"/>
+                <Visible val="true"/>
+            </Frame>
+
+            <Frame type="Label" name="TitleLabel">
+                <Anchor side="Top" relative="$parent/ListBoxBackground" pos="Min" offset="25"/>
+                <Anchor side="Left" relative="$parent/ListBoxBackground" pos="Min" offset="20"/>
+                <Style val="@Arcade_Title"/>
+                <Text val="@UI/UserProfileAchievementsFrame/Recent"/>
+            </Frame>
+
+            <SelectedImage val="$root/StandardBattlenetTemplates/BattlenetSocialListBoxItemSelectedImage"/>
+            <HoverImage val="$root/StandardBattlenetTemplates/BattlenetSocialListBoxItemHoverImage"/>
+            <ScrollBar val="ScrollBar"/>
+
+            <Frame type="ScrollBar" name="ScrollBar" template="StandardBattlenetTemplates/GluesSocialScrollBarTemplate">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="76"/>
+                <Anchor side="Right" relative="$parent" pos="Max" offset="-9"/>
+                <Anchor side="Bottom" relative="$parent" pos="Max" offset="-6"/>
+            </Frame>
+        </Frame>
+
+        <Frame type="TreeView" name="CategoryTreeView">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Bottom" relative="$parent/BackgroundAnchor" pos="Max" offset="0"/>
+            <Width val="370"/>
+            <Insets top="0" left="0" bottom="0" right="0"/>
+            <ItemDesc val="UserProfileAchievementsFrame/CategoryTreeViewItemTemplate"/>
+            <ItemHeight val="73"/>
+            <ItemIndent val="20"/>
+            <Style val="@StandardBattlenetVerticalTabButton"/>
+
+            <SelectedImage val="$root/StandardBattlenetTemplates/BattlenetSocialListBoxItemSelectedImage"/>
+            <ScrollBar val="ScrollBar"/>
+
+            <Frame type="ScrollBar" name="ScrollBar" template="StandardBattlenetTemplates/GluesSocialScrollBarTemplate">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="-4"/>
+                <Anchor side="Right" relative="$parent" pos="Max" offset="3"/>
+                <Anchor side="Bottom" relative="$parent" pos="Max" offset="4"/>
+            </Frame>
+        </Frame>
+
+        <Frame type="Pulldown" name="FilterPulldown" template="StandardBattlenetTemplates/StandardBattlenetPulldownTemplate">
+            <Anchor side="Top" relative="$parent/BackgroundAnchor" pos="Min" offset="13"/>
+            <Anchor side="Left" relative="$parent/BackgroundAnchor" pos="Min" offset="10"/>
+            <Visible val="true"/>
+        </Frame>
+
+        <Frame type="AchievementCategoryFrame" name="CategoryPointsFrame" template="UserProfileAchievementsFrame/CategoryPointsFrameTemplate">
+            <Anchor side="Top" relative="$parent/BackgroundAnchor" pos="Min" offset="13"/>
+            <Anchor side="Right" relative="$parent/CategoryPointsCompareFrame" pos="Min" offset="-10"/>
+            <PresenceId val="{$UserProfileAchievementsFrame/@PresenceId}"/>
+            <Visible val="false"/>
+            <PointsRecurseChildren val="true"/>
+
+            <StateGroup name="CategoryStateGroup">
+                <State name="CategoryState">
+                    <When type="Property" frame="$this" operator="NotEqual" CategoryId="0"/>
+                    <Action type="SetProperty" Visible="true"/>
+                </State>
+            </StateGroup>
+        </Frame>
+
+        <Frame type="AchievementCategoryFrame" name="CategoryPointsCompareFrame" template="UserProfileAchievementsFrame/CategoryPointsFrameTemplate">
+            <Anchor side="Top" relative="$parent/BackgroundAnchor" pos="Min" offset="13"/>
+            <Anchor side="Right" relative="$parent/BackgroundAnchor" pos="Max" offset="-10"/>
+            <PresenceId val="{$BattleUI/@LocalToonPresenceId}"/>
+            <Visible val="false"/>
+            <PointsRecurseChildren val="true"/>
+
+            <StateGroup name="LocalUserStateGroup">
+                <State name="LocalUserState">
+                    <When type="Property" frame="$this" operator="NotEqual" CategoryId="0"/>
+                    <When type="Property" frame="$BattleUI" operator="NotEqual" LocalToonPresenceId="{$UserProfileAchievementsFrame/@PresenceId}"/>
+                    <Action type="SetProperty" Visible="true"/>
+                </State>
+            </StateGroup>
+        </Frame>
+
+        <Frame type="Frame" name="AchievementShowcaseContainer" template="UserProfileAchievementsSummaryFrame/AchievementShowcaseContainer">
+            <Anchor side="Top" relative="$parent/BackgroundAnchor" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent/BackgroundAnchor" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent/CategoriesContainerFrame" pos="Max" offset="0"/>
+            <Anchor side="Bottom" relative="$parent/CategoriesContainerFrame" pos="Min" offset="0"/>
+            <Visible val="false"/>
+        </Frame>
+        
+        <Frame type="Frame" name="CategoriesContainerFrame" template="UserProfileAchievementsSummaryFrame/CategoriesContainerFrameTemplate">
+            <Anchor side="Bottom" relative="$parent/BackgroundAnchor" pos="Max" offset="0"/>
+            <Anchor side="Left" relative="$parent/BackgroundAnchor" pos="Min" offset="0"/>
+            <Visible val="false"/>
+        </Frame>
+
+        <Frame type="AchievementShowcaseSelectionFrame" name="AchievementShowcaseSelectionFrame" template="UserProfileAchievementsSummaryFrame/AchievementShowcaseSelectionFrame">
+            <Anchor relative="$parent"/>
+            <ShowcaseIndex val="0"/>
+            <Visible val="false"/>
+
+            <Animation name="Show">
+                <Event event="OnClick" action="Reset,Play" frame="$parent/AchievementShowcaseContainer/ShowcaseFrame0/EditButton"/>
+                <Event event="OnClick" action="Reset,Play" frame="$parent/AchievementShowcaseContainer/ShowcaseFrame1/EditButton"/>
+                <Event event="OnClick" action="Reset,Play" frame="$parent/AchievementShowcaseContainer/ShowcaseFrame2/EditButton"/>
+                <Event event="OnClick" action="Reset,Play" frame="$parent/AchievementShowcaseContainer/ShowcaseFrame3/EditButton"/>
+                <Event event="OnClick" action="Reset,Play" frame="$parent/AchievementShowcaseContainer/ShowcaseFrame4/EditButton"/>
+                <Event event="OnClick" action="DirectionReverse,Play" frame="AcceptButton"/>
+                <Event event="OnClick" action="DirectionReverse,Play" frame="CancelButton"/>
+
+                <Controller type="Fade" end="Pause">
+                    <Key type="Curve" time="0" value="0" out="Slow"/>
+                    <Key type="Curve" time=".175" value="255" in="Auto"/>
+                </Controller>
+
+                <Controller type="Visibility" end="Pause">
+                    <Key type="Bool" time="0" value="false"/>
+                    <Key type="Bool" time=".001" value="true"/>
+                    <Key type="Bool" time=".175" value="true"/>
+                </Controller>
+            </Animation>
+
+            <Animation name="Index0">
+                <Event event="OnClick" action="Reset,Play" frame="$parent/AchievementShowcaseContainer/ShowcaseFrame0/EditButton"/>
+
+                <Controller type="Property" property="ShowcaseIndex" end="Pause">
+                    <Key type="Property" time="0" value="0"/>
+                </Controller>
+            </Animation>
+
+            <Animation name="Index1">
+                <Event event="OnClick" action="Reset,Play" frame="$parent/AchievementShowcaseContainer/ShowcaseFrame1/EditButton"/>
+
+                <Controller type="Property" property="ShowcaseIndex" end="Pause">
+                    <Key type="Property" time="0" value="1"/>
+                </Controller>
+            </Animation>
+
+            <Animation name="Index2">
+                <Event event="OnClick" action="Reset,Play" frame="$parent/AchievementShowcaseContainer/ShowcaseFrame2/EditButton"/>
+
+                <Controller type="Property" property="ShowcaseIndex" end="Pause">
+                    <Key type="Property" time="0" value="2"/>
+                </Controller>
+            </Animation>
+
+            <Animation name="Index3">
+                <Event event="OnClick" action="Reset,Play" frame="$parent/AchievementShowcaseContainer/ShowcaseFrame3/EditButton"/>
+
+                <Controller type="Property" property="ShowcaseIndex" end="Pause">
+                    <Key type="Property" time="0" value="3"/>
+                </Controller>
+            </Animation>
+
+            <Animation name="Index4">
+                <Event event="OnClick" action="Reset,Play" frame="$parent/AchievementShowcaseContainer/ShowcaseFrame4/EditButton"/>
+
+                <Controller type="Property" property="ShowcaseIndex" end="Pause">
+                    <Key type="Property" time="0" value="4"/>
+                </Controller>
+            </Animation>
+
+            <StateGroup name="IndexStateGroup">
+                <State name="Index0State">
+                    <When type="Property" frame="$this" ShowcaseIndex="0"/>
+                    <Action type="SetProperty" AchievementId="{$parent/AchievementShowcaseContainer/ShowcaseFrame0/@AchievementId}"/>
+                </State>
+
+                <State name="Index1State">
+                    <When type="Property" frame="$this" ShowcaseIndex="1"/>
+                    <Action type="SetProperty" AchievementId="{$parent/AchievementShowcaseContainer/ShowcaseFrame1/@AchievementId}"/>
+                </State>
+
+                <State name="Index2State">
+                    <When type="Property" frame="$this" ShowcaseIndex="2"/>
+                    <Action type="SetProperty" AchievementId="{$parent/AchievementShowcaseContainer/ShowcaseFrame2/@AchievementId}"/>
+                </State>
+
+                <State name="Index3State">
+                    <When type="Property" frame="$this" ShowcaseIndex="3"/>
+                    <Action type="SetProperty" AchievementId="{$parent/AchievementShowcaseContainer/ShowcaseFrame3/@AchievementId}"/>
+                </State>
+
+                <State name="Index4State">
+                    <When type="Property" frame="$this" ShowcaseIndex="4"/>
+                    <Action type="SetProperty" AchievementId="{$parent/AchievementShowcaseContainer/ShowcaseFrame4/@AchievementId}"/>
+                </State>
+            </StateGroup>
+        </Frame>
+        
+        <StateGroup name="SummaryStateGroup">
+            <State name="SummaryState">
+                <When type="Property" frame="$this" CategoryId="0"/>
+                <Action type="SetProperty" frame="CategoriesContainerFrame" Visible="true"/>
+                <Action type="SetProperty" frame="AchievementShowcaseContainer" Visible="true"/>
+                <Action type="SetProperty" frame="RecentAchievementsListBox" Visible="true"/>
+                <Action type="SetProperty" frame="AchievementsListBox" Visible="false"/>
+                <Action type="SetProperty" frame="FilterPulldown" Visible="false"/>
+            </State>
+        </StateGroup>
+    </Frame>
+</Desc>

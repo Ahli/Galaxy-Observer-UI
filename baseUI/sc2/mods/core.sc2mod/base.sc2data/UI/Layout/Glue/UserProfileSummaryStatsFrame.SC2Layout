@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<Desc>
+    <DescFlags val="Locked"/>
+    
+    <Frame type="UserProfileRaceStatsFrame" name="UserProfileRaceStatsFrame">
+        <Anchor side="Left" relative="$parent" pos="Min" offset="20"/>
+        <Anchor side="Right" relative="$parent" pos="Max" offset="-20"/>
+        <Height val="100"/>
+        <PresenceId val="{$ScreenUserProfile/@PresenceId}"/>
+        
+        <Frame type="Label" name="RaceWinsLabel">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+            <Text val="@UI/ScreenUserProfile/SummaryStats/Wins"/>
+        </Frame>
+        
+        <Frame type="Label" name="WinsLabel">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+            <Text val="{$parent/@Wins}"/>
+        </Frame>
+        
+        <Frame type="Label" name="RaceTotalLabel">
+            <Anchor side="Top" relative="$parent/RaceWinsLabel" pos="Max" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+            <Text val="@UI/ScreenUserProfile/SummaryStats/SeasonTotal"/>
+        </Frame>
+        
+        <Frame type="Label" name="TotalLabel">
+            <Anchor side="Top" relative="$parent/RaceTotalLabel" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+            <Text val="{$parent/@GamesPlayed}"/>
+        </Frame>
+    </Frame>
+    
+    <Frame type="TabControl" name="UserProfileSummaryStatsFrame">
+        <Width val="400"/>
+        <TabListItem val="TerranButton"/>
+        <TabListItem val="ZergButton"/>
+        <TabListItem val="ProtossButton"/>
+        <PanelListItem val="TerranStatsFrame"/>
+        <PanelListItem val="ZergStatsFrame"/>
+        <PanelListItem val="ProtossStatsFrame"/>
+        
+        <Frame type="Image" name="Background">
+            <Anchor relative="$parent"/>
+            <Texture val="@UI/Glues_Battlenet_PageAssets_TableLargeHeaderBg"/>
+            <TextureType val="NineSlice"/>
+            <Tiled val="True"/>
+            <Visible val="true"/>
+        </Frame>
+            
+        <Frame type="Button" name="TerranButton" template="StandardBattlenetTemplates/BattlenetMediumTabButtonTemplate">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="10"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+            <Toggleable val="true"/>
+            <Text val="@UI/Race/Terran"/>
+            <Width val="140"/>
+        </Frame>
+
+        <Frame type="Button" name="ZergButton" template="StandardBattlenetTemplates/BattlenetMediumTabButtonTemplate">
+            <Anchor side="Top" relative="$parent/TerranButton" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent/TerranButton" pos="Max" offset="-4"/>
+            <Toggleable val="true"/>
+            <Text val="@UI/Race/Zerg"/>
+            <Width val="140"/>
+        </Frame>
+
+        <Frame type="Button" name="ProtossButton" template="StandardBattlenetTemplates/BattlenetMediumTabButtonTemplate">
+            <Anchor side="Top" relative="$parent/ZergButton" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent/ZergButton" pos="Max" offset="-4"/>
+            <Toggleable val="true"/>
+            <Text val="@UI/Race/Protoss"/>
+            <Width val="140"/>
+        </Frame>
+        
+        <Frame type="UserProfileRaceStatsFrame" name="TerranStatsFrame" template="UserProfileSummaryStatsFrame/UserProfileRaceStatsFrame">
+            <Anchor side="Top" relative="$parent/TerranButton" pos="Max" offset="30"/>
+            <FilterSeason val="{$parent/SeasonFrame/@CurrentSeasonId}"/>
+            <FilterMyRace val="Terr"/>
+        </Frame>
+    
+        <Frame type="UserProfileRaceStatsFrame" name="ZergStatsFrame" template="UserProfileSummaryStatsFrame/UserProfileRaceStatsFrame">
+            <Anchor side="Top" relative="$parent/TerranStatsFrame" pos="Min" offset="0"/>
+            <FilterSeason val="{$parent/SeasonFrame/@CurrentSeasonId}"/>
+            <FilterMyRace val="Zerg"/>
+        </Frame>
+    
+        <Frame type="UserProfileRaceStatsFrame" name="ProtossStatsFrame" template="UserProfileSummaryStatsFrame/UserProfileRaceStatsFrame">
+            <Anchor side="Top" relative="$parent/TerranStatsFrame" pos="Min" offset="0"/>
+            <FilterSeason val="{$parent/SeasonFrame/@CurrentSeasonId}"/>
+            <FilterMyRace val="Prot"/>
+        </Frame>
+    
+        <Frame type="UserProfileRaceStatsFrame" name="AllStatsFrame">
+            <Anchor side="Top" relative="$parent/TerranStatsFrame" pos="Max" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="20"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="-20"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="-10"/>
+            <PresenceId val="{$ScreenUserProfile/@PresenceId}"/>
+        
+            <Frame type="Label" name="CareerTotalLabel">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                <Text val="@UI/ScreenUserProfile/SummaryStats/CareerTotal"/>
+            </Frame>
+        
+            <Frame type="Label" name="TotalLabel">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+                <Text val="{$parent/@GamesPlayed}"/>
+            </Frame>
+        </Frame>
+        
+        <Frame type="MatchmakingSeasonFrame" name="SeasonFrame">
+            <Anchor relative="$parent"/>
+        </Frame>
+        
+        <!-- Set the initial tab selection based on the most played race -->
+        <StateGroup name="MostPlayedRaceStateGroup">
+            <State name="TerranState">
+                <When type="Property" frame="TerranStatsFrame" operator="GreaterThan" GamesPlayed="{$this/ZergStatsFrame/@GamesPlayed}"/>
+                <When type="Property" frame="TerranStatsFrame" operator="GreaterThan" GamesPlayed="{$this/ProtossStatsFrame/@GamesPlayed}"/>
+                <Action type="SetProperty" frame="$this" SelectedIndex="0"/>
+            </State>
+        
+            <State name="ZergState">
+                <When type="Property" frame="ZergStatsFrame" operator="GreaterThan" GamesPlayed="{$this/TerranStatsFrame/@GamesPlayed}"/>
+                <When type="Property" frame="ZergStatsFrame" operator="GreaterThan" GamesPlayed="{$this/ProtossStatsFrame/@GamesPlayed}"/>
+                <Action type="SetProperty" frame="$this" SelectedIndex="1"/>
+            </State>
+        
+            <State name="ProtossState">
+                <When type="Property" frame="ProtossStatsFrame" operator="GreaterThan" GamesPlayed="{$this/TerranStatsFrame/@GamesPlayed}"/>
+                <When type="Property" frame="ProtossStatsFrame" operator="GreaterThan" GamesPlayed="{$this/ZergStatsFrame/@GamesPlayed}"/>
+                <Action type="SetProperty" frame="$this" SelectedIndex="2"/>
+            </State>
+        </StateGroup>
+    </Frame>
+</Desc>
