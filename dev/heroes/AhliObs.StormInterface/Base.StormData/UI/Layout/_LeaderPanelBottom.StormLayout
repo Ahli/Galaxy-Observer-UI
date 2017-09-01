@@ -19,8 +19,9 @@
 	<Constant name="slotHeight" val="40"/>
 	<!-- talent icon settings -->
 	<Constant name="talent_Bottom_TopOffset" val="-17"/>
-	<Constant name="talent_Bottom_LeftOffset" val="32"/>
+	<Constant name="talent_Bottom_LeftOffset" val="66"/>
 	<Constant name="talent_Bottom_HorizontalGap" val="-20"/>
+	<Constant name="talent_TraitQuest_HorizontalOffset" val="8"/>
 	<Constant name="lockedTalentBorderAlpha" val="25"/>
 	<Constant name="talentBorderAlpha2" val="255"/>
 	<Constant name="ultimatelockedTalentBorderAlpha" val="25"/>
@@ -1103,6 +1104,217 @@
 		</StateGroup>
 	</Frame>
 	
+	<Frame type="UnitStatusTalentIcon" name="QuestIconTemplate">
+		<Unclipped val="true"/>
+		
+        <Frame type="Image" name="IconBackgroundImage">
+			<Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+			<Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+			<Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+			<Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+			<Width val="36"/>
+			<Height val="36"/>
+			<RenderPriority val="510"/>
+		</Frame>
+		
+		<Frame type="Image" name="IconBorderImage">
+			<Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+			<Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+			<Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+			<Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+			<Width val="40"/>
+			<Height val="40"/>
+			<Alpha val="#talentBorderAlpha2"/>
+			<Unclipped val="true"/>
+			<RenderPriority val="530"/>
+		</Frame>
+		
+		<Frame type="Image" name="IconImage">
+			<Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+			<Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+			<Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+			<Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+			<Width val="40"/>
+			<Height val="40"/>
+			<ImageMaskTexture val="_Assets\Textures\talentIconAlphaMask.dds"/>
+			<RenderPriority val="531"/>
+		</Frame>
+		
+		<!-- Custom highlight image that should be blended in when mouse hovers over the time. -->
+		<Frame type="Image" name="IconBorderImageHighlight">
+			<Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+			<Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+			<Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+			<Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+			<Width val="48"/>
+			<Height val="48"/>
+			<Texture val="_Assets\Textures\talentIconHighlight.dds"/>
+			<Alpha val="0"/>
+			<RenderPriority val="700"/>
+			<IgnoreParentColor val="true"/>
+			<Unclipped val="true"/>
+		</Frame>
+		<Animation name="MouseHighlight">
+			<Event event="OnMouseEnter" action="DirectionForward,Play"/>
+			<Event event="OnMouseExit" action="DirectionReverse,Play"/>
+			
+			<Controller type="Fade" end="Pause" frame="IconBorderImageHighlight">
+				<Key type="Curve" time="0" value="0"/>
+				<Key type="Curve" time="0.25" value="0"/>
+				<Key type="Curve" time="0.5" value="255"/>
+				<Key type="Curve" time="1.0" value="255"/>
+			</Controller>
+		</Animation>
+		
+		<Frame type="Image" name="UnfilledProgressImage">
+			<Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+			<Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+			<Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+			<Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+			<Width val="40"/>
+			<Height val="40"/>
+			<Unclipped val="true"/>
+			<RenderPriority val="535"/>
+			<Alpha val="42"/>
+			<Texture val="_Assets\Textures\talentQuestProgressBarBackground.dds"/>
+		</Frame>
+		<Frame type="ProgressBar" name="QuestProgressBar">
+			<Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+			<Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+			<Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+			<Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+			<Width val="40"/>
+			<Height val="40"/>
+			<Unclipped val="true"/>
+			<RenderPriority val="536"/>
+			<Vertical val="False"/>
+			<Circular val="true"/>
+			<CircularStart val="0"/>
+			<CircularEndOffset val="360"/>
+			<FillInset val="0.0"/>
+			
+			<Frame type="Frame" name="FillImageContainer">
+				<Frame type="Image" name="FillImage">
+					<Anchor relative="$parent"/>
+					<Unclipped val="true"/>
+					<TextureType val="Circular"/>
+					<RenderPriority val="536"/>
+                    <LayerCount val="1"/>
+					<Texture val="_Assets\Textures\talentQuestProgressBar.dds"/>
+                    <TextureCoords top="0" left="0" bottom="1" right="1"/>
+				</Frame>
+			</Frame>
+		</Frame>
+		<Frame type="Image" name="QuestCompleteImage">
+			<Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+			<Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+			<Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+			<Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+			<Width val="40"/>
+			<Height val="40"/>
+			<Unclipped val="true"/>
+			<RenderPriority val="537"/>
+			<Texture val="_Assets\Textures\talentQuestProgressBarComplete.dds"/>
+			
+			<StateGroup name="Colorblind">
+				<State name="Default"/>
+				<State name="ColorBlindEnabled">
+					<When type="Option" colorblind="True"/>
+					<Action type="SetProperty" Texture="_Assets\Textures\talentQuestProgressBarComplete_CB.dds"/>
+				</State>
+			</StateGroup>
+		</Frame>
+        <Frame type="Label" name="QuestProgressStackLabel">
+            <Anchor side="Bottom" relative="$parent/QuestProgressBar" pos="Max" offset="4"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="15"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+            <Style val="BottomPanel_TalentQuestStack"/>
+        </Frame>
+		
+		<!-- @override GameStatsPanel/UnitStatusBaselineQuestIconTemplate/QuestState -->
+		<StateGroup name="QuestState">
+            <State name="QuestSelected">
+                <Action type="SetProperty" frame="$this/IconBorderImage" texture="@UI/Storm_UI_InGame_Leader_Talent_Available"/>
+                <Action type="SetProperty" frame="$this/IconBackgroundImage" alpha="255"/>
+            </State>
+            <State name="QuestAvailable">
+                <Action type="SetProperty" frame="$this/IconImage" texture="@UI/Storm_UI_InGame_Leader_Talent_Unselected"/>
+                <Action type="SetProperty" frame="$this/IconBorderImage" texture="@UI/Storm_UI_InGame_Leader_Talent_Available"/>
+                <Action type="SetProperty" frame="$this/IconBackgroundImage" alpha="255"/>
+            </State>
+            <State name="QuestNotAvailable">
+                <Action type="SetProperty" frame="$this/IconImage" visible="false"/>
+                <Action type="SetProperty" frame="$this/IconBorderImage" texture="@UI/Storm_UI_InGame_Leader_Talent_Unavailable"/>
+                <Action type="SetProperty" frame="$this/IconBackgroundImage" alpha="100"/>
+            </State>
+        </StateGroup>
+		
+		<!-- @override GameStatsPanel/UnitStatusBaselineQuestIconTemplate/BaselineQuestProgress -->
+		<StateGroup name="BaselineQuestProgress">
+			<DefaultState val="NoQuest"/>
+			<State name="HasQuest">
+				<When type="Property" frame="$this" QuestProgress="QuestInProgress"/>
+                <Action type="SetProperty" frame="QuestProgressBar" visible="True"/>
+                <Action type="SetProperty" frame="UnfilledProgressImage" visible="True"/>
+                <Action type="SetProperty" frame="QuestCompleteImage" visible="False"/>
+                <Action type="SetProperty" frame="QuestProgressStackLabel" visible="True"/>
+				<Action type="SetProperty" frame="IconBorderImage" visible="True"/>
+			</State>
+			<State name="HasUntrackedQuest">
+				<When type="Property" frame="$this" QuestProgress="ProgressUntracked"/>
+                <Action type="SetProperty" frame="QuestProgressBar" visible="false"/>
+                <Action type="SetProperty" frame="UnfilledProgressImage" visible="True"/>
+                <Action type="SetProperty" frame="QuestCompleteImage" visible="False"/>
+                <Action type="SetProperty" frame="QuestProgressStackLabel" visible="False"/>
+				<Action type="SetProperty" frame="IconBorderImage" visible="True"/>
+			</State>
+			<State name="FinishedQuest">
+				<When type="Property" frame="$this" QuestProgress="FinishedQuest"/>
+                <Action type="SetProperty" frame="QuestProgressBar" visible="False"/>
+                <Action type="SetProperty" frame="UnfilledProgressImage" visible="True"/>
+                <Action type="SetProperty" frame="QuestCompleteImage" visible="True"/>
+                <Action type="SetProperty" frame="QuestProgressStackLabel" visible="False"/>
+				<Action type="SetProperty" frame="IconBorderImage" visible="False"/>
+			</State>
+			<State name="NoQuest">
+                <Action type="SetProperty" frame="QuestProgressBar" visible="False"/>
+                <Action type="SetProperty" frame="UnfilledProgressImage" visible="False"/>
+                <Action type="SetProperty" frame="QuestCompleteImage" visible="False"/>
+                <Action type="SetProperty" frame="QuestProgressStackLabel" visible="False"/>
+				<Action type="SetProperty" frame="IconBorderImage" visible="True"/>
+			</State>
+		</StateGroup>
+	</Frame>
+	<Frame type="UnitStatusTalentIcon" name="QuestIconTemplate_R" template="_LeaderPanelBottom/QuestIconTemplate">
+		<!-- @Override -->
+		<StateGroup name="TalentTypeState">
+            <DefaultState val="TypeTalent"/>
+			<State name="TypeTalent">
+				<When type="Option" colorblind="False"/>
+				<Action type="SetProperty" frame="$this/IconBorderImage" texture="_Assets\Textures\talentBorder_red.dds"/>
+			</State>
+			<State name="TypeUltimate">
+				<When type="Option" colorblind="True"/>
+				<Action type="SetProperty" frame="$this/IconBorderImage" texture="_Assets\Textures\talentBorder_orange.dds"/>
+			</State>
+		</StateGroup>
+	</Frame>
+	<Frame type="UnitStatusTalentIcon" name="QuestIconTemplate_L" template="_LeaderPanelBottom/QuestIconTemplate">
+		<!-- @Override -->
+		<StateGroup name="TalentTypeState">
+            <DefaultState val="TypeTalent"/>
+			<State name="TypeTalent">
+				<When type="Option" colorblind="False"/>
+				<Action type="SetProperty" frame="$this/IconBorderImage" texture="_Assets\Textures\talentBorder_blue.dds"/>
+			</State>
+			<State name="TypeUltimate">
+				<When type="Option" colorblind="True"/>
+				<Action type="SetProperty" frame="$this/IconBorderImage" texture="_Assets\Textures\talentBorder_cyan.dds"/>
+			</State>
+		</StateGroup>
+	</Frame>
+
+	
 	<!-- Base version of a player frame -->
 	<Frame type="HeroLeaderPanelPlayerFrame" name="HeroLeaderPanelPlayerFrameTemplate_CleanedDefault">
 		<Frame type="Image" name="Background">
@@ -1669,6 +1881,32 @@
 							<Anchor side="Bottom" relative="$this" pos="Min" offset="0"/>
 						</Frame>
 						
+						<Frame type="Frame" name="QuestContainerContainerFrame">
+							<Anchor side="Top" relative="$parent" pos="Min" offset="#talent_Bottom_TopOffset"/>
+							<Anchor side="Left" relative="$this" pos="Min" offset="0"/>
+							<Anchor side="Right" relative="$parent/TalentTreeIcon1" pos="Min" offset="#talent_TraitQuest_HorizontalOffset"/>
+							<Anchor side="Bottom" relative="$this" pos="Min" offset="0"/>
+							<Width val="48"/>
+							<Height val="48"/>
+							
+							<Frame type="ParentCenteredFrame" name="BaseQuestCenterFrame">
+								<Anchor relative="$parent"/>
+								
+								<Frame type="UnitStatusBaselineQuestIcon" name="BaseQuestIcon0" template="_LeaderPanelBottom/QuestIconTemplate_L">
+									<Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+									<Anchor side="Bottom" relative="$this" pos="Max" offset="0"/>
+									<Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+									<Anchor side="Right" relative="$this" pos="Min" offset="0"/>
+								</Frame>
+								<Frame type="UnitStatusBaselineQuestIcon" name="BaseQuestIcon1" template="_LeaderPanelBottom/QuestIconTemplate_L">
+									<Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+									<Anchor side="Bottom" relative="$this" pos="Max" offset="0"/>
+									<Anchor side="Left" relative="$parent/BaseQuestIcon0" pos="Max" offset="-20"/>
+									<Anchor side="Right" relative="$parent/BaseQuestIcon0" pos="Max" offset="68"/>
+								</Frame>
+							</Frame>
+						</Frame>
+						
 						<Frame type="PlayerScoreValueFrame" name="PlayerScoreValueProgressBar0" template="_LeaderPanelBottom/TalentTreeProgressBarTemplate_L">
 							<Anchor side="Left" relative="$parent/TalentTreeIcon1" pos="Mid" offset="18"/>
 							<Anchor side="Right" relative="$parent/TalentTreeIcon2" pos="Mid" offset="-18"/>
@@ -1756,6 +1994,15 @@
 			<Frame type="SelectionUnitStatusPanel" name="SelectionUnitStatusPanel">
 				<Frame type="UnitStatusFrame" name="UnitStatusFrame0">
 					<Frame type="PlayerHeroSelectedTalentTreeFrame" name="HeroSelectedTalentTreeFrame">
+					
+						<Frame type="Frame" name="QuestContainerContainerFrame">
+							<Frame type="ParentCenteredFrame" name="BaseQuestCenterFrame">
+								<Frame type="UnitStatusBaselineQuestIcon" name="BaseQuestIcon0" template="_LeaderPanelBottom/QuestIconTemplate_R">
+								</Frame>
+								<Frame type="UnitStatusBaselineQuestIcon" name="BaseQuestIcon1" template="_LeaderPanelBottom/QuestIconTemplate_R">
+								</Frame>
+							</Frame>
+						</Frame>
 						
 						<Frame type="UnitStatusTalentIcon" name="TalentTreeIcon1" template="_LeaderPanelBottom/TalentTreeIconTemplate_R">
 						</Frame>
@@ -3134,6 +3381,58 @@
 		</Frame>
 		<Frame type="HeroLeaderPanel" name="TalentOverview" template="_LeaderPanelBottom/CleanLeaderPanelBottomTemplate">
 			<!-- Custom Tooltips containing hero portrait -->
+			<Frame type="TalentTooltip" name="HeroTalentTooltip_L0_T0_A" template="_LeaderPanelBottom/HeroTalentTooltip_L0_Base">
+				<Frame type="Image" name="HeroPortrait">
+					<Texture val="{$BottomPanelTalentsL0/PlayerHeroIconFrame/HeroIconImage/@Texture}"/>
+				</Frame>
+				<Frame type="Image" name="IconImage">
+					<Texture val="{$TalentTreeIcon0_A_L0/IconImage/@Texture}"/>
+				</Frame>
+				<StateGroup name="TalentQuestProgress">
+					<State name="HasQuest">
+						<When type="Property" frame="$TalentTreeIcon0_A_L0" QuestProgress="QuestInProgress"/>
+					</State>
+					<State name="HasUntrackedQuest">
+						<When type="Property" frame="$TalentTreeIcon0_A_L0" QuestProgress="ProgressUntracked"/>
+					</State>
+					<State name="FinishedQuest">
+						<When type="Property" frame="$TalentTreeIcon0_A_L0" QuestProgress="FinishedQuest"/>
+					</State>
+				</StateGroup>
+				<Frame type="ProgressBar" name="QuestProgressBar">
+					<MaxValue val="{$TalentTreeIcon0_A_L0/QuestProgressBar/@MaxValue}"/>
+					<Value val="{$TalentTreeIcon0_A_L0/QuestProgressBar/@Value}"/>
+				</Frame>
+				<Frame type="Label" name="QuestProgressStackLabel">
+					<Text val="{$TalentTreeIcon0_A_L0/QuestProgressBar/@Value}"/>
+				</Frame>
+			</Frame>
+			<Frame type="TalentTooltip" name="HeroTalentTooltip_L0_T0_B" template="_LeaderPanelBottom/HeroTalentTooltip_L0_Base">
+				<Frame type="Image" name="HeroPortrait">
+					<Texture val="{$BottomPanelTalentsL0/PlayerHeroIconFrame/HeroIconImage/@Texture}"/>
+				</Frame>
+				<Frame type="Image" name="IconImage">
+					<Texture val="{$TalentTreeIcon0_B_L0/IconImage/@Texture}"/>
+				</Frame>
+				<StateGroup name="TalentQuestProgress">
+					<State name="HasQuest">
+						<When type="Property" frame="$TalentTreeIcon0_B_L0" QuestProgress="QuestInProgress"/>
+					</State>
+					<State name="HasUntrackedQuest">
+						<When type="Property" frame="$TalentTreeIcon0_B_L0" QuestProgress="ProgressUntracked"/>
+					</State>
+					<State name="FinishedQuest">
+						<When type="Property" frame="$TalentTreeIcon0_B_L0" QuestProgress="FinishedQuest"/>
+					</State>
+				</StateGroup>
+				<Frame type="ProgressBar" name="QuestProgressBar">
+					<MaxValue val="{$TalentTreeIcon0_B_L0/QuestProgressBar/@MaxValue}"/>
+					<Value val="{$TalentTreeIcon0_B_L0/QuestProgressBar/@Value}"/>
+				</Frame>
+				<Frame type="Label" name="QuestProgressStackLabel">
+					<Text val="{$TalentTreeIcon0_B_L0/QuestProgressBar/@Value}"/>
+				</Frame>
+			</Frame>
 			<Frame type="TalentTooltip" name="HeroTalentTooltip_L0_T1" template="_LeaderPanelBottom/HeroTalentTooltip_L0_Base">
 				<Handle val="TalentTooltipL0T1"/> <!-- TEST NOTIFICATIONS -->
 				<Frame type="Image" name="HeroPortrait">
@@ -3299,6 +3598,58 @@
 					<Text val="{$TalentTreeIcon7_L0/QuestProgressBar/@Value}"/>
 				</Frame>
 			</Frame>
+			<Frame type="TalentTooltip" name="HeroTalentTooltip_L1_T0_A" template="_LeaderPanelBottom/HeroTalentTooltip_L1_Base">
+				<Frame type="Image" name="HeroPortrait">
+					<Texture val="{$BottomPanelTalentsL1/PlayerHeroIconFrame/HeroIconImage/@Texture}"/>
+				</Frame>
+				<Frame type="Image" name="IconImage">
+					<Texture val="{$TalentTreeIcon0_A_L1/IconImage/@Texture}"/>
+				</Frame>
+				<StateGroup name="TalentQuestProgress">
+					<State name="HasQuest">
+						<When type="Property" frame="$TalentTreeIcon0_A_L1" QuestProgress="QuestInProgress"/>
+					</State>
+					<State name="HasUntrackedQuest">
+						<When type="Property" frame="$TalentTreeIcon0_A_L1" QuestProgress="ProgressUntracked"/>
+					</State>
+					<State name="FinishedQuest">
+						<When type="Property" frame="$TalentTreeIcon0_A_L1" QuestProgress="FinishedQuest"/>
+					</State>
+				</StateGroup>
+				<Frame type="ProgressBar" name="QuestProgressBar">
+					<MaxValue val="{$TalentTreeIcon0_A_L1/QuestProgressBar/@MaxValue}"/>
+					<Value val="{$TalentTreeIcon0_A_L1/QuestProgressBar/@Value}"/>
+				</Frame>
+				<Frame type="Label" name="QuestProgressStackLabel">
+					<Text val="{$TalentTreeIcon0_A_L1/QuestProgressBar/@Value}"/>
+				</Frame>
+			</Frame>
+			<Frame type="TalentTooltip" name="HeroTalentTooltip_L1_T0_B" template="_LeaderPanelBottom/HeroTalentTooltip_L1_Base">
+				<Frame type="Image" name="HeroPortrait">
+					<Texture val="{$BottomPanelTalentsL1/PlayerHeroIconFrame/HeroIconImage/@Texture}"/>
+				</Frame>
+				<Frame type="Image" name="IconImage">
+					<Texture val="{$TalentTreeIcon0_B_L1/IconImage/@Texture}"/>
+				</Frame>
+				<StateGroup name="TalentQuestProgress">
+					<State name="HasQuest">
+						<When type="Property" frame="$TalentTreeIcon0_B_L1" QuestProgress="QuestInProgress"/>
+					</State>
+					<State name="HasUntrackedQuest">
+						<When type="Property" frame="$TalentTreeIcon0_B_L1" QuestProgress="ProgressUntracked"/>
+					</State>
+					<State name="FinishedQuest">
+						<When type="Property" frame="$TalentTreeIcon0_B_L1" QuestProgress="FinishedQuest"/>
+					</State>
+				</StateGroup>
+				<Frame type="ProgressBar" name="QuestProgressBar">
+					<MaxValue val="{$TalentTreeIcon0_B_L1/QuestProgressBar/@MaxValue}"/>
+					<Value val="{$TalentTreeIcon0_B_L1/QuestProgressBar/@Value}"/>
+				</Frame>
+				<Frame type="Label" name="QuestProgressStackLabel">
+					<Text val="{$TalentTreeIcon0_B_L1/QuestProgressBar/@Value}"/>
+				</Frame>
+			</Frame>
 			<Frame type="TalentTooltip" name="HeroTalentTooltip_L1_T1" template="_LeaderPanelBottom/HeroTalentTooltip_L1_Base">
 				<Frame type="Image" name="IconImage">
 					<Texture val="{$TalentTreeIcon1_L1/IconImage/@Texture}"/>
@@ -3458,6 +3809,58 @@
 				</Frame>
 				<Frame type="Label" name="QuestProgressStackLabel">
 					<Text val="{$TalentTreeIcon7_L1/QuestProgressBar/@Value}"/>
+				</Frame>
+			</Frame>
+			<Frame type="TalentTooltip" name="HeroTalentTooltip_L2_T0_A" template="_LeaderPanelBottom/HeroTalentTooltip_L2_Base">
+				<Frame type="Image" name="HeroPortrait">
+					<Texture val="{$BottomPanelTalentsL2/PlayerHeroIconFrame/HeroIconImage/@Texture}"/>
+				</Frame>
+				<Frame type="Image" name="IconImage">
+					<Texture val="{$TalentTreeIcon0_A_L2/IconImage/@Texture}"/>
+				</Frame>
+				<StateGroup name="TalentQuestProgress">
+					<State name="HasQuest">
+						<When type="Property" frame="$TalentTreeIcon0_A_L2" QuestProgress="QuestInProgress"/>
+					</State>
+					<State name="HasUntrackedQuest">
+						<When type="Property" frame="$TalentTreeIcon0_A_L2" QuestProgress="ProgressUntracked"/>
+					</State>
+					<State name="FinishedQuest">
+						<When type="Property" frame="$TalentTreeIcon0_A_L2" QuestProgress="FinishedQuest"/>
+					</State>
+				</StateGroup>
+				<Frame type="ProgressBar" name="QuestProgressBar">
+					<MaxValue val="{$TalentTreeIcon0_A_L2/QuestProgressBar/@MaxValue}"/>
+					<Value val="{$TalentTreeIcon0_A_L2/QuestProgressBar/@Value}"/>
+				</Frame>
+				<Frame type="Label" name="QuestProgressStackLabel">
+					<Text val="{$TalentTreeIcon0_A_L2/QuestProgressBar/@Value}"/>
+				</Frame>
+			</Frame>
+			<Frame type="TalentTooltip" name="HeroTalentTooltip_L2_T0_B" template="_LeaderPanelBottom/HeroTalentTooltip_L2_Base">
+				<Frame type="Image" name="HeroPortrait">
+					<Texture val="{$BottomPanelTalentsL2/PlayerHeroIconFrame/HeroIconImage/@Texture}"/>
+				</Frame>
+				<Frame type="Image" name="IconImage">
+					<Texture val="{$TalentTreeIcon0_B_L2/IconImage/@Texture}"/>
+				</Frame>
+				<StateGroup name="TalentQuestProgress">
+					<State name="HasQuest">
+						<When type="Property" frame="$TalentTreeIcon0_B_L2" QuestProgress="QuestInProgress"/>
+					</State>
+					<State name="HasUntrackedQuest">
+						<When type="Property" frame="$TalentTreeIcon0_B_L2" QuestProgress="ProgressUntracked"/>
+					</State>
+					<State name="FinishedQuest">
+						<When type="Property" frame="$TalentTreeIcon0_B_L2" QuestProgress="FinishedQuest"/>
+					</State>
+				</StateGroup>
+				<Frame type="ProgressBar" name="QuestProgressBar">
+					<MaxValue val="{$TalentTreeIcon0_B_L2/QuestProgressBar/@MaxValue}"/>
+					<Value val="{$TalentTreeIcon0_B_L2/QuestProgressBar/@Value}"/>
+				</Frame>
+				<Frame type="Label" name="QuestProgressStackLabel">
+					<Text val="{$TalentTreeIcon0_B_L2/QuestProgressBar/@Value}"/>
 				</Frame>
 			</Frame>
 			<Frame type="TalentTooltip" name="HeroTalentTooltip_L2_T1" template="_LeaderPanelBottom/HeroTalentTooltip_L2_Base">
@@ -3621,6 +4024,58 @@
 					<Text val="{$TalentTreeIcon7_L2/QuestProgressBar/@Value}"/>
 				</Frame>
 			</Frame>
+			<Frame type="TalentTooltip" name="HeroTalentTooltip_L3_T0_A" template="_LeaderPanelBottom/HeroTalentTooltip_L3_Base">
+				<Frame type="Image" name="HeroPortrait">
+					<Texture val="{$BottomPanelTalentsL3/PlayerHeroIconFrame/HeroIconImage/@Texture}"/>
+				</Frame>
+				<Frame type="Image" name="IconImage">
+					<Texture val="{$TalentTreeIcon0_A_L3/IconImage/@Texture}"/>
+				</Frame>
+				<StateGroup name="TalentQuestProgress">
+					<State name="HasQuest">
+						<When type="Property" frame="$TalentTreeIcon0_A_L3" QuestProgress="QuestInProgress"/>
+					</State>
+					<State name="HasUntrackedQuest">
+						<When type="Property" frame="$TalentTreeIcon0_A_L3" QuestProgress="ProgressUntracked"/>
+					</State>
+					<State name="FinishedQuest">
+						<When type="Property" frame="$TalentTreeIcon0_A_L3" QuestProgress="FinishedQuest"/>
+					</State>
+				</StateGroup>
+				<Frame type="ProgressBar" name="QuestProgressBar">
+					<MaxValue val="{$TalentTreeIcon0_A_L3/QuestProgressBar/@MaxValue}"/>
+					<Value val="{$TalentTreeIcon0_A_L3/QuestProgressBar/@Value}"/>
+				</Frame>
+				<Frame type="Label" name="QuestProgressStackLabel">
+					<Text val="{$TalentTreeIcon0_A_L3/QuestProgressBar/@Value}"/>
+				</Frame>
+			</Frame>
+			<Frame type="TalentTooltip" name="HeroTalentTooltip_L3_T0_B" template="_LeaderPanelBottom/HeroTalentTooltip_L3_Base">
+				<Frame type="Image" name="HeroPortrait">
+					<Texture val="{$BottomPanelTalentsL3/PlayerHeroIconFrame/HeroIconImage/@Texture}"/>
+				</Frame>
+				<Frame type="Image" name="IconImage">
+					<Texture val="{$TalentTreeIcon0_B_L3/IconImage/@Texture}"/>
+				</Frame>
+				<StateGroup name="TalentQuestProgress">
+					<State name="HasQuest">
+						<When type="Property" frame="$TalentTreeIcon0_B_L3" QuestProgress="QuestInProgress"/>
+					</State>
+					<State name="HasUntrackedQuest">
+						<When type="Property" frame="$TalentTreeIcon0_B_L3" QuestProgress="ProgressUntracked"/>
+					</State>
+					<State name="FinishedQuest">
+						<When type="Property" frame="$TalentTreeIcon0_B_L3" QuestProgress="FinishedQuest"/>
+					</State>
+				</StateGroup>
+				<Frame type="ProgressBar" name="QuestProgressBar">
+					<MaxValue val="{$TalentTreeIcon0_B_L3/QuestProgressBar/@MaxValue}"/>
+					<Value val="{$TalentTreeIcon0_B_L3/QuestProgressBar/@Value}"/>
+				</Frame>
+				<Frame type="Label" name="QuestProgressStackLabel">
+					<Text val="{$TalentTreeIcon0_B_L3/QuestProgressBar/@Value}"/>
+				</Frame>
+			</Frame>
 			<Frame type="TalentTooltip" name="HeroTalentTooltip_L3_T1" template="_LeaderPanelBottom/HeroTalentTooltip_L3_Base">
 				<Frame type="Image" name="IconImage">
 					<Texture val="{$TalentTreeIcon1_L3/IconImage/@Texture}"/>
@@ -3780,6 +4235,58 @@
 				</Frame>
 				<Frame type="Label" name="QuestProgressStackLabel">
 					<Text val="{$TalentTreeIcon7_L3/QuestProgressBar/@Value}"/>
+				</Frame>
+			</Frame>
+			<Frame type="TalentTooltip" name="HeroTalentTooltip_L4_T0_A" template="_LeaderPanelBottom/HeroTalentTooltip_L4_Base">
+				<Frame type="Image" name="HeroPortrait">
+					<Texture val="{$BottomPanelTalentsL4/PlayerHeroIconFrame/HeroIconImage/@Texture}"/>
+				</Frame>
+				<Frame type="Image" name="IconImage">
+					<Texture val="{$TalentTreeIcon0_A_L4/IconImage/@Texture}"/>
+				</Frame>
+				<StateGroup name="TalentQuestProgress">
+					<State name="HasQuest">
+						<When type="Property" frame="$TalentTreeIcon0_A_L4" QuestProgress="QuestInProgress"/>
+					</State>
+					<State name="HasUntrackedQuest">
+						<When type="Property" frame="$TalentTreeIcon0_A_L4" QuestProgress="ProgressUntracked"/>
+					</State>
+					<State name="FinishedQuest">
+						<When type="Property" frame="$TalentTreeIcon0_A_L4" QuestProgress="FinishedQuest"/>
+					</State>
+				</StateGroup>
+				<Frame type="ProgressBar" name="QuestProgressBar">
+					<MaxValue val="{$TalentTreeIcon0_A_L4/QuestProgressBar/@MaxValue}"/>
+					<Value val="{$TalentTreeIcon0_A_L4/QuestProgressBar/@Value}"/>
+				</Frame>
+				<Frame type="Label" name="QuestProgressStackLabel">
+					<Text val="{$TalentTreeIcon0_A_L4/QuestProgressBar/@Value}"/>
+				</Frame>
+			</Frame>
+			<Frame type="TalentTooltip" name="HeroTalentTooltip_L4_T0_B" template="_LeaderPanelBottom/HeroTalentTooltip_L4_Base">
+				<Frame type="Image" name="HeroPortrait">
+					<Texture val="{$BottomPanelTalentsL4/PlayerHeroIconFrame/HeroIconImage/@Texture}"/>
+				</Frame>
+				<Frame type="Image" name="IconImage">
+					<Texture val="{$TalentTreeIcon0_B_L4/IconImage/@Texture}"/>
+				</Frame>
+				<StateGroup name="TalentQuestProgress">
+					<State name="HasQuest">
+						<When type="Property" frame="$TalentTreeIcon0_B_L4" QuestProgress="QuestInProgress"/>
+					</State>
+					<State name="HasUntrackedQuest">
+						<When type="Property" frame="$TalentTreeIcon0_B_L4" QuestProgress="ProgressUntracked"/>
+					</State>
+					<State name="FinishedQuest">
+						<When type="Property" frame="$TalentTreeIcon0_B_L4" QuestProgress="FinishedQuest"/>
+					</State>
+				</StateGroup>
+				<Frame type="ProgressBar" name="QuestProgressBar">
+					<MaxValue val="{$TalentTreeIcon0_B_L4/QuestProgressBar/@MaxValue}"/>
+					<Value val="{$TalentTreeIcon0_B_L4/QuestProgressBar/@Value}"/>
+				</Frame>
+				<Frame type="Label" name="QuestProgressStackLabel">
+					<Text val="{$TalentTreeIcon0_B_L4/QuestProgressBar/@Value}"/>
 				</Frame>
 			</Frame>
 			<Frame type="TalentTooltip" name="HeroTalentTooltip_L4_T1" template="_LeaderPanelBottom/HeroTalentTooltip_L4_Base">
@@ -3943,6 +4450,58 @@
 					<Text val="{$TalentTreeIcon7_L4/QuestProgressBar/@Value}"/>
 				</Frame>
 			</Frame>
+			<Frame type="TalentTooltip" name="HeroTalentTooltip_R0_T0_A" template="_LeaderPanelBottom/HeroTalentTooltip_R0_Base">
+				<Frame type="Image" name="HeroPortrait">
+					<Texture val="{$BottomPanelTalentsR0/PlayerHeroIconFrame/HeroIconImage/@Texture}"/>
+				</Frame>
+				<Frame type="Image" name="IconImage">
+					<Texture val="{$TalentTreeIcon0_A_R0/IconImage/@Texture}"/>
+				</Frame>
+				<StateGroup name="TalentQuestProgress">
+					<State name="HasQuest">
+						<When type="Property" frame="$TalentTreeIcon0_A_R0" QuestProgress="QuestInProgress"/>
+					</State>
+					<State name="HasUntrackedQuest">
+						<When type="Property" frame="$TalentTreeIcon0_A_R0" QuestProgress="ProgressUntracked"/>
+					</State>
+					<State name="FinishedQuest">
+						<When type="Property" frame="$TalentTreeIcon0_A_R0" QuestProgress="FinishedQuest"/>
+					</State>
+				</StateGroup>
+				<Frame type="ProgressBar" name="QuestProgressBar">
+					<MaxValue val="{$TalentTreeIcon0_A_R0/QuestProgressBar/@MaxValue}"/>
+					<Value val="{$TalentTreeIcon0_A_R0/QuestProgressBar/@Value}"/>
+				</Frame>
+				<Frame type="Label" name="QuestProgressStackLabel">
+					<Text val="{$TalentTreeIcon0_A_R0/QuestProgressBar/@Value}"/>
+				</Frame>
+			</Frame>
+			<Frame type="TalentTooltip" name="HeroTalentTooltip_R0_T0_B" template="_LeaderPanelBottom/HeroTalentTooltip_R0_Base">
+				<Frame type="Image" name="HeroPortrait">
+					<Texture val="{$BottomPanelTalentsR0/PlayerHeroIconFrame/HeroIconImage/@Texture}"/>
+				</Frame>
+				<Frame type="Image" name="IconImage">
+					<Texture val="{$TalentTreeIcon0_B_R0/IconImage/@Texture}"/>
+				</Frame>
+				<StateGroup name="TalentQuestProgress">
+					<State name="HasQuest">
+						<When type="Property" frame="$TalentTreeIcon0_B_R0" QuestProgress="QuestInProgress"/>
+					</State>
+					<State name="HasUntrackedQuest">
+						<When type="Property" frame="$TalentTreeIcon0_B_R0" QuestProgress="ProgressUntracked"/>
+					</State>
+					<State name="FinishedQuest">
+						<When type="Property" frame="$TalentTreeIcon0_B_R0" QuestProgress="FinishedQuest"/>
+					</State>
+				</StateGroup>
+				<Frame type="ProgressBar" name="QuestProgressBar">
+					<MaxValue val="{$TalentTreeIcon0_B_R0/QuestProgressBar/@MaxValue}"/>
+					<Value val="{$TalentTreeIcon0_B_R0/QuestProgressBar/@Value}"/>
+				</Frame>
+				<Frame type="Label" name="QuestProgressStackLabel">
+					<Text val="{$TalentTreeIcon0_B_R0/QuestProgressBar/@Value}"/>
+				</Frame>
+			</Frame>
 			<Frame type="TalentTooltip" name="HeroTalentTooltip_R0_T1" template="_LeaderPanelBottom/HeroTalentTooltip_R0_Base">
 				<Frame type="Image" name="IconImage">
 					<Texture val="{$TalentTreeIcon1_R0/IconImage/@Texture}"/>
@@ -4102,6 +4661,58 @@
 				</Frame>
 				<Frame type="Label" name="QuestProgressStackLabel">
 					<Text val="{$TalentTreeIcon7_R0/QuestProgressBar/@Value}"/>
+				</Frame>
+			</Frame>
+			<Frame type="TalentTooltip" name="HeroTalentTooltip_R1_T0_A" template="_LeaderPanelBottom/HeroTalentTooltip_R1_Base">
+				<Frame type="Image" name="HeroPortrait">
+					<Texture val="{$BottomPanelTalentsR1/PlayerHeroIconFrame/HeroIconImage/@Texture}"/>
+				</Frame>
+				<Frame type="Image" name="IconImage">
+					<Texture val="{$TalentTreeIcon0_A_R1/IconImage/@Texture}"/>
+				</Frame>
+				<StateGroup name="TalentQuestProgress">
+					<State name="HasQuest">
+						<When type="Property" frame="$TalentTreeIcon0_A_R1" QuestProgress="QuestInProgress"/>
+					</State>
+					<State name="HasUntrackedQuest">
+						<When type="Property" frame="$TalentTreeIcon0_A_R1" QuestProgress="ProgressUntracked"/>
+					</State>
+					<State name="FinishedQuest">
+						<When type="Property" frame="$TalentTreeIcon0_A_R1" QuestProgress="FinishedQuest"/>
+					</State>
+				</StateGroup>
+				<Frame type="ProgressBar" name="QuestProgressBar">
+					<MaxValue val="{$TalentTreeIcon0_A_R1/QuestProgressBar/@MaxValue}"/>
+					<Value val="{$TalentTreeIcon0_A_R1/QuestProgressBar/@Value}"/>
+				</Frame>
+				<Frame type="Label" name="QuestProgressStackLabel">
+					<Text val="{$TalentTreeIcon0_A_R1/QuestProgressBar/@Value}"/>
+				</Frame>
+			</Frame>
+			<Frame type="TalentTooltip" name="HeroTalentTooltip_R1_T0_B" template="_LeaderPanelBottom/HeroTalentTooltip_R1_Base">
+				<Frame type="Image" name="HeroPortrait">
+					<Texture val="{$BottomPanelTalentsR1/PlayerHeroIconFrame/HeroIconImage/@Texture}"/>
+				</Frame>
+				<Frame type="Image" name="IconImage">
+					<Texture val="{$TalentTreeIcon0_B_R1/IconImage/@Texture}"/>
+				</Frame>
+				<StateGroup name="TalentQuestProgress">
+					<State name="HasQuest">
+						<When type="Property" frame="$TalentTreeIcon0_B_R1" QuestProgress="QuestInProgress"/>
+					</State>
+					<State name="HasUntrackedQuest">
+						<When type="Property" frame="$TalentTreeIcon0_B_R1" QuestProgress="ProgressUntracked"/>
+					</State>
+					<State name="FinishedQuest">
+						<When type="Property" frame="$TalentTreeIcon0_B_R1" QuestProgress="FinishedQuest"/>
+					</State>
+				</StateGroup>
+				<Frame type="ProgressBar" name="QuestProgressBar">
+					<MaxValue val="{$TalentTreeIcon0_B_R1/QuestProgressBar/@MaxValue}"/>
+					<Value val="{$TalentTreeIcon0_B_R1/QuestProgressBar/@Value}"/>
+				</Frame>
+				<Frame type="Label" name="QuestProgressStackLabel">
+					<Text val="{$TalentTreeIcon0_B_R1/QuestProgressBar/@Value}"/>
 				</Frame>
 			</Frame>
 			<Frame type="TalentTooltip" name="HeroTalentTooltip_R1_T1" template="_LeaderPanelBottom/HeroTalentTooltip_R1_Base">
@@ -4265,6 +4876,58 @@
 					<Text val="{$TalentTreeIcon7_R1/QuestProgressBar/@Value}"/>
 				</Frame>
 			</Frame>
+			<Frame type="TalentTooltip" name="HeroTalentTooltip_R2_T0_A" template="_LeaderPanelBottom/HeroTalentTooltip_R2_Base">
+				<Frame type="Image" name="HeroPortrait">
+					<Texture val="{$BottomPanelTalentsR2/PlayerHeroIconFrame/HeroIconImage/@Texture}"/>
+				</Frame>
+				<Frame type="Image" name="IconImage">
+					<Texture val="{$TalentTreeIcon0_A_R2/IconImage/@Texture}"/>
+				</Frame>
+				<StateGroup name="TalentQuestProgress">
+					<State name="HasQuest">
+						<When type="Property" frame="$TalentTreeIcon0_A_R2" QuestProgress="QuestInProgress"/>
+					</State>
+					<State name="HasUntrackedQuest">
+						<When type="Property" frame="$TalentTreeIcon0_A_R2" QuestProgress="ProgressUntracked"/>
+					</State>
+					<State name="FinishedQuest">
+						<When type="Property" frame="$TalentTreeIcon0_A_R2" QuestProgress="FinishedQuest"/>
+					</State>
+				</StateGroup>
+				<Frame type="ProgressBar" name="QuestProgressBar">
+					<MaxValue val="{$TalentTreeIcon0_A_R2/QuestProgressBar/@MaxValue}"/>
+					<Value val="{$TalentTreeIcon0_A_R2/QuestProgressBar/@Value}"/>
+				</Frame>
+				<Frame type="Label" name="QuestProgressStackLabel">
+					<Text val="{$TalentTreeIcon0_A_R2/QuestProgressBar/@Value}"/>
+				</Frame>
+			</Frame>
+			<Frame type="TalentTooltip" name="HeroTalentTooltip_R2_T0_B" template="_LeaderPanelBottom/HeroTalentTooltip_R2_Base">
+				<Frame type="Image" name="HeroPortrait">
+					<Texture val="{$BottomPanelTalentsR2/PlayerHeroIconFrame/HeroIconImage/@Texture}"/>
+				</Frame>
+				<Frame type="Image" name="IconImage">
+					<Texture val="{$TalentTreeIcon0_B_R2/IconImage/@Texture}"/>
+				</Frame>
+				<StateGroup name="TalentQuestProgress">
+					<State name="HasQuest">
+						<When type="Property" frame="$TalentTreeIcon0_B_R2" QuestProgress="QuestInProgress"/>
+					</State>
+					<State name="HasUntrackedQuest">
+						<When type="Property" frame="$TalentTreeIcon0_B_R2" QuestProgress="ProgressUntracked"/>
+					</State>
+					<State name="FinishedQuest">
+						<When type="Property" frame="$TalentTreeIcon0_B_R2" QuestProgress="FinishedQuest"/>
+					</State>
+				</StateGroup>
+				<Frame type="ProgressBar" name="QuestProgressBar">
+					<MaxValue val="{$TalentTreeIcon0_B_R2/QuestProgressBar/@MaxValue}"/>
+					<Value val="{$TalentTreeIcon0_B_R2/QuestProgressBar/@Value}"/>
+				</Frame>
+				<Frame type="Label" name="QuestProgressStackLabel">
+					<Text val="{$TalentTreeIcon0_B_R2/QuestProgressBar/@Value}"/>
+				</Frame>
+			</Frame>
 			<Frame type="TalentTooltip" name="HeroTalentTooltip_R2_T1" template="_LeaderPanelBottom/HeroTalentTooltip_R2_Base">
 				<Frame type="Image" name="IconImage">
 					<Texture val="{$TalentTreeIcon1_R2/IconImage/@Texture}"/>
@@ -4426,6 +5089,58 @@
 					<Text val="{$TalentTreeIcon7_R2/QuestProgressBar/@Value}"/>
 				</Frame>
 			</Frame>
+			<Frame type="TalentTooltip" name="HeroTalentTooltip_R3_T0_A" template="_LeaderPanelBottom/HeroTalentTooltip_R3_Base">
+				<Frame type="Image" name="HeroPortrait">
+					<Texture val="{$BottomPanelTalentsR3/PlayerHeroIconFrame/HeroIconImage/@Texture}"/>
+				</Frame>
+				<Frame type="Image" name="IconImage">
+					<Texture val="{$TalentTreeIcon0_A_R3/IconImage/@Texture}"/>
+				</Frame>
+				<StateGroup name="TalentQuestProgress">
+					<State name="HasQuest">
+						<When type="Property" frame="$TalentTreeIcon0_A_R3" QuestProgress="QuestInProgress"/>
+					</State>
+					<State name="HasUntrackedQuest">
+						<When type="Property" frame="$TalentTreeIcon0_A_R3" QuestProgress="ProgressUntracked"/>
+					</State>
+					<State name="FinishedQuest">
+						<When type="Property" frame="$TalentTreeIcon0_A_R3" QuestProgress="FinishedQuest"/>
+					</State>
+				</StateGroup>
+				<Frame type="ProgressBar" name="QuestProgressBar">
+					<MaxValue val="{$TalentTreeIcon0_A_R3/QuestProgressBar/@MaxValue}"/>
+					<Value val="{$TalentTreeIcon0_A_R3/QuestProgressBar/@Value}"/>
+				</Frame>
+				<Frame type="Label" name="QuestProgressStackLabel">
+					<Text val="{$TalentTreeIcon0_A_R3/QuestProgressBar/@Value}"/>
+				</Frame>
+			</Frame>
+			<Frame type="TalentTooltip" name="HeroTalentTooltip_R3_T0_B" template="_LeaderPanelBottom/HeroTalentTooltip_R3_Base">
+				<Frame type="Image" name="HeroPortrait">
+					<Texture val="{$BottomPanelTalentsR3/PlayerHeroIconFrame/HeroIconImage/@Texture}"/>
+				</Frame>
+				<Frame type="Image" name="IconImage">
+					<Texture val="{$TalentTreeIcon0_B_R3/IconImage/@Texture}"/>
+				</Frame>
+				<StateGroup name="TalentQuestProgress">
+					<State name="HasQuest">
+						<When type="Property" frame="$TalentTreeIcon0_B_R3" QuestProgress="QuestInProgress"/>
+					</State>
+					<State name="HasUntrackedQuest">
+						<When type="Property" frame="$TalentTreeIcon0_B_R3" QuestProgress="ProgressUntracked"/>
+					</State>
+					<State name="FinishedQuest">
+						<When type="Property" frame="$TalentTreeIcon0_B_R3" QuestProgress="FinishedQuest"/>
+					</State>
+				</StateGroup>
+				<Frame type="ProgressBar" name="QuestProgressBar">
+					<MaxValue val="{$TalentTreeIcon0_B_R3/QuestProgressBar/@MaxValue}"/>
+					<Value val="{$TalentTreeIcon0_B_R3/QuestProgressBar/@Value}"/>
+				</Frame>
+				<Frame type="Label" name="QuestProgressStackLabel">
+					<Text val="{$TalentTreeIcon0_B_R3/QuestProgressBar/@Value}"/>
+				</Frame>
+			</Frame>
 			<Frame type="TalentTooltip" name="HeroTalentTooltip_R3_T1" template="_LeaderPanelBottom/HeroTalentTooltip_R3_Base">
 				<Frame type="Image" name="IconImage">
 					<Texture val="{$TalentTreeIcon1_R3/IconImage/@Texture}"/>
@@ -4585,6 +5300,58 @@
 				</Frame>
 				<Frame type="Label" name="QuestProgressStackLabel">
 					<Text val="{$TalentTreeIcon7_R3/QuestProgressBar/@Value}"/>
+				</Frame>
+			</Frame>
+			<Frame type="TalentTooltip" name="HeroTalentTooltip_R4_T0_A" template="_LeaderPanelBottom/HeroTalentTooltip_R4_Base">
+				<Frame type="Image" name="HeroPortrait">
+					<Texture val="{$BottomPanelTalentsR4/PlayerHeroIconFrame/HeroIconImage/@Texture}"/>
+				</Frame>
+				<Frame type="Image" name="IconImage">
+					<Texture val="{$TalentTreeIcon0_A_R4/IconImage/@Texture}"/>
+				</Frame>
+				<StateGroup name="TalentQuestProgress">
+					<State name="HasQuest">
+						<When type="Property" frame="$TalentTreeIcon0_A_R4" QuestProgress="QuestInProgress"/>
+					</State>
+					<State name="HasUntrackedQuest">
+						<When type="Property" frame="$TalentTreeIcon0_A_R4" QuestProgress="ProgressUntracked"/>
+					</State>
+					<State name="FinishedQuest">
+						<When type="Property" frame="$TalentTreeIcon0_A_R4" QuestProgress="FinishedQuest"/>
+					</State>
+				</StateGroup>
+				<Frame type="ProgressBar" name="QuestProgressBar">
+					<MaxValue val="{$TalentTreeIcon0_A_R4/QuestProgressBar/@MaxValue}"/>
+					<Value val="{$TalentTreeIcon0_A_R4/QuestProgressBar/@Value}"/>
+				</Frame>
+				<Frame type="Label" name="QuestProgressStackLabel">
+					<Text val="{$TalentTreeIcon0_A_R4/QuestProgressBar/@Value}"/>
+				</Frame>
+			</Frame>
+			<Frame type="TalentTooltip" name="HeroTalentTooltip_R4_T0_B" template="_LeaderPanelBottom/HeroTalentTooltip_R4_Base">
+				<Frame type="Image" name="HeroPortrait">
+					<Texture val="{$BottomPanelTalentsR4/PlayerHeroIconFrame/HeroIconImage/@Texture}"/>
+				</Frame>
+				<Frame type="Image" name="IconImage">
+					<Texture val="{$TalentTreeIcon0_B_R4/IconImage/@Texture}"/>
+				</Frame>
+				<StateGroup name="TalentQuestProgress">
+					<State name="HasQuest">
+						<When type="Property" frame="$TalentTreeIcon0_B_R4" QuestProgress="QuestInProgress"/>
+					</State>
+					<State name="HasUntrackedQuest">
+						<When type="Property" frame="$TalentTreeIcon0_B_R4" QuestProgress="ProgressUntracked"/>
+					</State>
+					<State name="FinishedQuest">
+						<When type="Property" frame="$TalentTreeIcon0_B_R4" QuestProgress="FinishedQuest"/>
+					</State>
+				</StateGroup>
+				<Frame type="ProgressBar" name="QuestProgressBar">
+					<MaxValue val="{$TalentTreeIcon0_B_R4/QuestProgressBar/@MaxValue}"/>
+					<Value val="{$TalentTreeIcon0_B_R4/QuestProgressBar/@Value}"/>
+				</Frame>
+				<Frame type="Label" name="QuestProgressStackLabel">
+					<Text val="{$TalentTreeIcon0_B_R4/QuestProgressBar/@Value}"/>
 				</Frame>
 			</Frame>
 			<Frame type="TalentTooltip" name="HeroTalentTooltip_R4_T1" template="_LeaderPanelBottom/HeroTalentTooltip_R4_Base">
@@ -4757,6 +5524,18 @@
 							<Frame type="SelectionUnitStatusPanel" name="SelectionUnitStatusPanel">
 								<Frame type="UnitStatusFrame" name="UnitStatusFrame0">
 									<Frame type="PlayerHeroSelectedTalentTreeFrame" name="HeroSelectedTalentTreeFrame">
+										<Frame type="Frame" name="QuestContainerContainerFrame">
+											<Frame type="ParentCenteredFrame" name="BaseQuestCenterFrame">
+												<Frame type="UnitStatusBaselineQuestIcon" name="BaseQuestIcon0">
+													<TooltipFrame val="HeroTalentTooltip_L0_T0_A"/>
+													<Handle val="TalentTreeIcon0_A_L0"/>
+												</Frame>
+												<Frame type="UnitStatusBaselineQuestIcon" name="BaseQuestIcon1">
+													<TooltipFrame val="HeroTalentTooltip_L0_T0_B"/>
+													<Handle val="TalentTreeIcon0_B_L0"/>
+												</Frame>
+											</Frame>
+										</Frame>
 										<Frame type="UnitStatusTalentIcon" name="TalentTreeIcon1">
 											<TooltipFrame val="HeroTalentTooltip_L0_T1"/>
 											<Handle val="TalentTreeIcon1_L0"/>
@@ -4807,6 +5586,18 @@
 							<Frame type="SelectionUnitStatusPanel" name="SelectionUnitStatusPanel">
 								<Frame type="UnitStatusFrame" name="UnitStatusFrame0">
 									<Frame type="PlayerHeroSelectedTalentTreeFrame" name="HeroSelectedTalentTreeFrame">
+										<Frame type="Frame" name="QuestContainerContainerFrame">
+											<Frame type="ParentCenteredFrame" name="BaseQuestCenterFrame">
+												<Frame type="UnitStatusBaselineQuestIcon" name="BaseQuestIcon0">
+													<TooltipFrame val="HeroTalentTooltip_L1_T0_A"/>
+													<Handle val="TalentTreeIcon0_A_L1"/>
+												</Frame>
+												<Frame type="UnitStatusBaselineQuestIcon" name="BaseQuestIcon1">
+													<TooltipFrame val="HeroTalentTooltip_L1_T0_B"/>
+													<Handle val="TalentTreeIcon0_B_L1"/>
+												</Frame>
+											</Frame>
+										</Frame>
 										<Frame type="UnitStatusTalentIcon" name="TalentTreeIcon1">
 											<TooltipFrame val="HeroTalentTooltip_L1_T1"/>
 											<Handle val="TalentTreeIcon1_L1"/>
@@ -4857,6 +5648,18 @@
 							<Frame type="SelectionUnitStatusPanel" name="SelectionUnitStatusPanel">
 								<Frame type="UnitStatusFrame" name="UnitStatusFrame0">
 									<Frame type="PlayerHeroSelectedTalentTreeFrame" name="HeroSelectedTalentTreeFrame">
+										<Frame type="Frame" name="QuestContainerContainerFrame">
+											<Frame type="ParentCenteredFrame" name="BaseQuestCenterFrame">
+												<Frame type="UnitStatusBaselineQuestIcon" name="BaseQuestIcon0">
+													<TooltipFrame val="HeroTalentTooltip_L2_T0_A"/>
+													<Handle val="TalentTreeIcon0_A_L2"/>
+												</Frame>
+												<Frame type="UnitStatusBaselineQuestIcon" name="BaseQuestIcon1">
+													<TooltipFrame val="HeroTalentTooltip_L2_T0_B"/>
+													<Handle val="TalentTreeIcon0_B_L2"/>
+												</Frame>
+											</Frame>
+										</Frame>
 										<Frame type="UnitStatusTalentIcon" name="TalentTreeIcon1">
 											<TooltipFrame val="HeroTalentTooltip_L2_T1"/>
 											<Handle val="TalentTreeIcon1_L2"/>
@@ -4907,6 +5710,18 @@
 							<Frame type="SelectionUnitStatusPanel" name="SelectionUnitStatusPanel">
 								<Frame type="UnitStatusFrame" name="UnitStatusFrame0">
 									<Frame type="PlayerHeroSelectedTalentTreeFrame" name="HeroSelectedTalentTreeFrame">
+										<Frame type="Frame" name="QuestContainerContainerFrame">
+											<Frame type="ParentCenteredFrame" name="BaseQuestCenterFrame">
+												<Frame type="UnitStatusBaselineQuestIcon" name="BaseQuestIcon0">
+													<TooltipFrame val="HeroTalentTooltip_L3_T0_A"/>
+													<Handle val="TalentTreeIcon0_A_L3"/>
+												</Frame>
+												<Frame type="UnitStatusBaselineQuestIcon" name="BaseQuestIcon1">
+													<TooltipFrame val="HeroTalentTooltip_L3_T0_B"/>
+													<Handle val="TalentTreeIcon0_B_L3"/>
+												</Frame>
+											</Frame>
+										</Frame>
 										<Frame type="UnitStatusTalentIcon" name="TalentTreeIcon1">
 											<TooltipFrame val="HeroTalentTooltip_L3_T1"/>
 											<Handle val="TalentTreeIcon1_L3"/>
@@ -4957,6 +5772,18 @@
 							<Frame type="SelectionUnitStatusPanel" name="SelectionUnitStatusPanel">
 								<Frame type="UnitStatusFrame" name="UnitStatusFrame0">
 									<Frame type="PlayerHeroSelectedTalentTreeFrame" name="HeroSelectedTalentTreeFrame">
+										<Frame type="Frame" name="QuestContainerContainerFrame">
+											<Frame type="ParentCenteredFrame" name="BaseQuestCenterFrame">
+												<Frame type="UnitStatusBaselineQuestIcon" name="BaseQuestIcon0">
+													<TooltipFrame val="HeroTalentTooltip_L4_T0_A"/>
+													<Handle val="TalentTreeIcon0_A_L4"/>
+												</Frame>
+												<Frame type="UnitStatusBaselineQuestIcon" name="BaseQuestIcon1">
+													<TooltipFrame val="HeroTalentTooltip_L4_T0_B"/>
+													<Handle val="TalentTreeIcon0_B_L4"/>
+												</Frame>
+											</Frame>
+										</Frame>
 										<Frame type="UnitStatusTalentIcon" name="TalentTreeIcon1">
 											<TooltipFrame val="HeroTalentTooltip_L4_T1"/>
 											<Handle val="TalentTreeIcon1_L4"/>
@@ -5007,6 +5834,18 @@
 							<Frame type="SelectionUnitStatusPanel" name="SelectionUnitStatusPanel">
 								<Frame type="UnitStatusFrame" name="UnitStatusFrame0">
 									<Frame type="PlayerHeroSelectedTalentTreeFrame" name="HeroSelectedTalentTreeFrame">
+										<Frame type="Frame" name="QuestContainerContainerFrame">
+											<Frame type="ParentCenteredFrame" name="BaseQuestCenterFrame">
+												<Frame type="UnitStatusBaselineQuestIcon" name="BaseQuestIcon0">
+													<TooltipFrame val="HeroTalentTooltip_R0_T0_A"/>
+													<Handle val="TalentTreeIcon0_A_R0"/>
+												</Frame>
+												<Frame type="UnitStatusBaselineQuestIcon" name="BaseQuestIcon1">
+													<TooltipFrame val="HeroTalentTooltip_R0_T0_B"/>
+													<Handle val="TalentTreeIcon0_B_R0"/>
+												</Frame>
+											</Frame>
+										</Frame>
 										<Frame type="UnitStatusTalentIcon" name="TalentTreeIcon1">
 											<TooltipFrame val="HeroTalentTooltip_R0_T1"/>
 											<Handle val="TalentTreeIcon1_R0"/>
@@ -5057,6 +5896,18 @@
 							<Frame type="SelectionUnitStatusPanel" name="SelectionUnitStatusPanel">
 								<Frame type="UnitStatusFrame" name="UnitStatusFrame0">
 									<Frame type="PlayerHeroSelectedTalentTreeFrame" name="HeroSelectedTalentTreeFrame">
+										<Frame type="Frame" name="QuestContainerContainerFrame">
+											<Frame type="ParentCenteredFrame" name="BaseQuestCenterFrame">
+												<Frame type="UnitStatusBaselineQuestIcon" name="BaseQuestIcon0">
+													<TooltipFrame val="HeroTalentTooltip_R1_T0_A"/>
+													<Handle val="TalentTreeIcon0_A_R1"/>
+												</Frame>
+												<Frame type="UnitStatusBaselineQuestIcon" name="BaseQuestIcon1">
+													<TooltipFrame val="HeroTalentTooltip_R1_T0_B"/>
+													<Handle val="TalentTreeIcon0_B_R1"/>
+												</Frame>
+											</Frame>
+										</Frame>
 										<Frame type="UnitStatusTalentIcon" name="TalentTreeIcon1">
 											<TooltipFrame val="HeroTalentTooltip_R1_T1"/>
 											<Handle val="TalentTreeIcon1_R1"/>
@@ -5108,6 +5959,18 @@
 							<Frame type="SelectionUnitStatusPanel" name="SelectionUnitStatusPanel">
 								<Frame type="UnitStatusFrame" name="UnitStatusFrame0">
 									<Frame type="PlayerHeroSelectedTalentTreeFrame" name="HeroSelectedTalentTreeFrame">
+										<Frame type="Frame" name="QuestContainerContainerFrame">
+											<Frame type="ParentCenteredFrame" name="BaseQuestCenterFrame">
+												<Frame type="UnitStatusBaselineQuestIcon" name="BaseQuestIcon0">
+													<TooltipFrame val="HeroTalentTooltip_R2_T0_A"/>
+													<Handle val="TalentTreeIcon0_A_R2"/>
+												</Frame>
+												<Frame type="UnitStatusBaselineQuestIcon" name="BaseQuestIcon1">
+													<TooltipFrame val="HeroTalentTooltip_R2_T0_B"/>
+													<Handle val="TalentTreeIcon0_B_R2"/>
+												</Frame>
+											</Frame>
+										</Frame>
 										<Frame type="UnitStatusTalentIcon" name="TalentTreeIcon1">
 											<TooltipFrame val="HeroTalentTooltip_R2_T1"/>
 											<Handle val="TalentTreeIcon1_R2"/>
@@ -5158,6 +6021,18 @@
 							<Frame type="SelectionUnitStatusPanel" name="SelectionUnitStatusPanel">
 								<Frame type="UnitStatusFrame" name="UnitStatusFrame0">
 									<Frame type="PlayerHeroSelectedTalentTreeFrame" name="HeroSelectedTalentTreeFrame">
+										<Frame type="Frame" name="QuestContainerContainerFrame">
+											<Frame type="ParentCenteredFrame" name="BaseQuestCenterFrame">
+												<Frame type="UnitStatusBaselineQuestIcon" name="BaseQuestIcon0">
+													<TooltipFrame val="HeroTalentTooltip_R3_T0_A"/>
+													<Handle val="TalentTreeIcon0_A_R3"/>
+												</Frame>
+												<Frame type="UnitStatusBaselineQuestIcon" name="BaseQuestIcon1">
+													<TooltipFrame val="HeroTalentTooltip_R3_T0_B"/>
+													<Handle val="TalentTreeIcon0_B_R3"/>
+												</Frame>
+											</Frame>
+										</Frame>
 										<Frame type="UnitStatusTalentIcon" name="TalentTreeIcon1">
 											<TooltipFrame val="HeroTalentTooltip_R3_T1"/>
 											<Handle val="TalentTreeIcon1_R3"/>
@@ -5208,6 +6083,18 @@
 							<Frame type="SelectionUnitStatusPanel" name="SelectionUnitStatusPanel">
 								<Frame type="UnitStatusFrame" name="UnitStatusFrame0">
 									<Frame type="PlayerHeroSelectedTalentTreeFrame" name="HeroSelectedTalentTreeFrame">
+										<Frame type="Frame" name="QuestContainerContainerFrame">
+											<Frame type="ParentCenteredFrame" name="BaseQuestCenterFrame">
+												<Frame type="UnitStatusBaselineQuestIcon" name="BaseQuestIcon0">
+													<TooltipFrame val="HeroTalentTooltip_R4_T0_A"/>
+													<Handle val="TalentTreeIcon0_A_R4"/>
+												</Frame>
+												<Frame type="UnitStatusBaselineQuestIcon" name="BaseQuestIcon1">
+													<TooltipFrame val="HeroTalentTooltip_R4_T0_B"/>
+													<Handle val="TalentTreeIcon0_B_R4"/>
+												</Frame>
+											</Frame>
+										</Frame>
 										<Frame type="UnitStatusTalentIcon" name="TalentTreeIcon1">
 											<TooltipFrame val="HeroTalentTooltip_R4_T1"/>
 											<Handle val="TalentTreeIcon1_R4"/>
