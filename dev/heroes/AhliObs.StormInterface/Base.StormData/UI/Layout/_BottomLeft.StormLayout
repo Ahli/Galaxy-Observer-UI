@@ -146,9 +146,11 @@
 							<When type="Property" frame="$PreviewMinimapBackgroundImage" visible="false"/>
 							<When type="Property" frame="$ConsoleUIContainer" visible="true"/>
 							<Action type="SetProperty" visible="true"/>
+							<Action type="SetProperty" frame="$PortraitMaskFrame" visible="true"/>
 						</State>
 						<State name="Hide">
 							<Action type="SetProperty" visible="false"/>
+							<Action type="SetProperty" frame="$PortraitMaskFrame" visible="false"/>
 						</State>
 					</StateGroup>
 					
@@ -1813,6 +1815,10 @@
 			<!-- Mute Character Sheet Panel hotkey -->
 			<!-- @Override -->
 			<Frame type="HeroCharacterSheetPanel" name="HeroCharacterSheetPanel">
+				<Frame type="Frame" name="PortraitMaskFrame">
+					<Visible val="false"/>
+				</Frame>
+				
 				<!-- @Override -->
 				<Animation name="Show">
 					<Controller type="Sound" name="Sound_1" end="Pause">
@@ -5466,11 +5472,24 @@
 	
 	
 	<!-- Show 2D UI at portrait spot when portrait invisible -->
-	<Frame type="Frame" name="GameUI/WorldPanel/UnitStatusPanel/PortraitMaskFrame" file="GameUI">
-		<Visible val="{$PortraitPanel/Portrait/@Visible}"/>
-		<Anchor relative="$PortraitPanel" offset="4"/>
+	<Frame type="Frame" name="GameUI/WorldPanel/UnitStatusPanel" file="GameUI">
+		<Frame type="Frame" name="PortraitMaskFrame">
+			<Anchor relative="$INVALID" offset="4"/>
+			<!-- BUG: propertybinding portrait's visibility is buggy when switching from player to everyone vision (-> internal code overriding UI's logic?).
+					The propertybinding is overridden.
+				attempt 2: Using Portrait's stategroup or a new one here does not work, either.
+			<Visible val="{$PortraitPanel/Portrait/@Visible}"/>
+			attempt 3: use different portraitMaskFrame and destroy this one.
+			-->
+		</Frame>
+		<Frame type="Frame" name="PortraitMaskFrame2" template="GameUI/PortraitMaskFrameTemplate">
+			<Anchor relative="$PortraitPanel" offset="4"/>
+			<Handle val="PortraitMaskFrame"/>
+			<!-- Visibility controlled by Portrait -->
+		</Frame>
 	</Frame>
-	
-	
+	<Frame type="Frame" name="GameUI/UIContainer/ConsoleUIContainer/HeroCharacterSheetPanelContainer/HeroCharacterSheetPanel/HeroCharacterSheetPanelContainer/PortraitMaskFrame" file="GameUI">
+		<Visible val="false"/>
+	</Frame>
 	
 </Desc>
