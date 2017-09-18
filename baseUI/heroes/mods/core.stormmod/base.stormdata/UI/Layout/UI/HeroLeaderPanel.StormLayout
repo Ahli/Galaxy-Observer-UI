@@ -742,7 +742,7 @@
         <Frame type="CheckBox" name="MuteChatCheckbox" template="StandardTemplates/StandardCheckBoxTemplate">
             <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
             <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
-            <Anchor side="Right" relative="$parent/ContextMenuButton" pos="Min" offset="15"/>
+            <Anchor side="Right" relative="$parent/VoiceContextMenuButton" pos="Min" offset="10"/>
             <IgnoreParentColor val="true"/>
             <AcceptsMouseTooltip val="False"/>
             <ReportsStats val="True"/>  <!-- Handle provided in code -->
@@ -832,12 +832,27 @@
             </Frame>
         </Frame>
 
+        <Frame type="BattleUserVoiceFrame" name="VoiceContextMenuButton" template="BattleUserVoiceFrame/BattleUserVoiceFrame_ContextMenuButton_Template" requiredtoload="IS_VOICECHAT_ENABLED">
+            <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent/ContextMenuButton" pos="Min" offset="15"/>
+
+            <CollapseLayout val="True"/>
+            <IgnoreParentColor val="true"/>
+            <RenderPriority val="#RenderPriorityLevel_4"/>
+            <ContextMenu val="$ancestor[@type=TabControl]/PlayerContextMenu"/>
+
+            <ChannelType val="{$VoiceChatUI/@ActiveChannelType}"/>
+            <PresenceId val="{$ancestor[@oftype=HeroLeaderPanelPlayerFrame]/@PresenceId}"/>
+        </Frame>
+
         <Frame type="Button" name="ContextMenuButton" template="StandardTemplates/ContextMenuButtonTemplate">
             <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
             <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
             <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
             <IgnoreParentColor val="true"/>
             <RenderPriority val="#RenderPriorityLevel_4"/>
+            <ContextMenu val="$ancestor[@type=TabControl]/PlayerContextMenu"/>
         </Frame>
     </Frame>
     
@@ -1243,13 +1258,54 @@
     </Frame>
 
     <Frame type="HeroLeaderPanelPlayerFrame" name="HeroLeaderPanelAllyFrameTemplate">
-        <Width val="1294"/>
+        <Width val="1314"/>
         <Height val="68"/>
         <Batch val="False"/>
 
+        <Frame type="BattleUserVoiceFrame" name="VoiceFrame_PlayerSelf" template="BattleUserVoiceFrame/BattleUserVoiceFrame_PlayerSelf_Template" requiredtoload="IS_VOICECHAT_ENABLED">
+            <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="9"/>
+            <Anchor side="Right" relative="$parent" pos="Min" offset="9"/>
+
+            <ChannelType val="{$VoiceChatUI/@ActiveChannelType}"/>
+            <PresenceId val="{$ancestor[@oftype=HeroLeaderPanelPlayerFrame]/@PresenceId}"/>
+
+            <Visible val="False"/>
+            <StateGroup name="VoiceChatState">
+                <DefaultState val="Inactive"/>
+                <State name="Inactive"/>
+                <State name="Active">
+                    <When type="Property" IsLocalUser="True"/>
+                    <When type="Property" IsActive="True"/>
+                    <Action type="SetProperty" Visible="True"/>
+                </State>
+            </StateGroup>
+        </Frame>
+        <Frame type="BattleUserVoiceFrame" name="VoiceFrame_PlayerOther" template="BattleUserVoiceFrame/BattleUserVoiceFrame_PlayerOther_Template" requiredtoload="IS_VOICECHAT_ENABLED">
+            <Anchor side="Top" relative="$parent/VoiceFrame_PlayerSelf" pos="Mid" offset="0"/>
+            <Anchor side="Left" relative="$parent/VoiceFrame_PlayerSelf" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent/VoiceFrame_PlayerSelf" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent/VoiceFrame_PlayerSelf" pos="Mid" offset="0"/>
+
+            <ChannelType val="{$VoiceChatUI/@ActiveChannelType}"/>
+            <PresenceId val="{$parent/@PresenceId}"/>
+
+            <Visible val="False"/>
+            <StateGroup name="VoiceChatState">
+                <DefaultState val="Inactive"/>
+                <State name="Inactive"/>
+                <State name="Active">
+                    <When type="Property" IsLocalUser="False"/>
+                    <When type="Property" IsActive="True"/>
+                    <Action type="SetProperty" Visible="True"/>
+                </State>
+            </StateGroup>
+        </Frame>
+
         <Frame type="Image" name="Background">
             <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
-            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="20"/>
             <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
             <Anchor side="Right" relative="$parent" pos="Max" offset="-8"/>
             <RenderPriority val="511"/>
@@ -1271,18 +1327,11 @@
             <BlendMode val="Normal"/>
             <Color val="8493ff"/>
         </Frame>
-    
-        <Frame type="BattleUserContextMenu" name="PlayerContextMenu" template="BattleUserContextMenu/BattleUserContextMenu" >
-            <Anchor side="Top" relative="$parent" pos="Max" offset="0"/>
-            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
-            <RenderPriority val="#RenderPriorityLevel_4"/>
-            <ReportsStats val="True"/>  <!-- Handle provided in code -->
-        </Frame>
 
         <Frame type="PlayerHeroIconFrame" name="PlayerHeroIconFrame">
             <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
             <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
-            <Anchor side="Left" relative="$parent" pos="Min" offset="17"/>
+            <Anchor side="Left" relative="$parent/Background" pos="Min" offset="17"/>
             <Width val="100"/>
             <Height val="54"/>
 
@@ -1330,7 +1379,7 @@
         <Frame type="PlayerDeathIndicatorFrame" name="PlayerDeathIndicatorFrame" template="HeroLeaderPanel/PlayerDeathIndicatorFrameTemplate">
             <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
             <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
-            <Anchor side="Left" relative="$parent" pos="Min" offset="7"/>
+            <Anchor side="Left" relative="$parent/Background" pos="Min" offset="7"/>
             <IgnoreParentColor val="True"/>
             <RenderPriority val="#RenderPriorityLevel_2"/>
         </Frame>
@@ -1385,8 +1434,8 @@
         </StateGroup>
 
         <Frame type="PlayerScoreValueFrame" name="CarriedMechanicScoreValueFrame" template="HeroLeaderPanel/PlayerScoreValueLabelFrameTemplate">
-            <Anchor side="Right" relative="$parent/StatsContainerFrame/SoloKillScoreValueFrame" pos="Min" offset="10"/>
-            <Width val="110"/>
+            <Anchor side="Right" relative="$parent/StatsContainerFrame/SoloKillScoreValueFrame" pos="Min" offset="0"/>
+            <Width val="88"/>
 
             <Frame type="ScoreValueLabelFrame" name="ScoreValueFrame0">
                 <ScoreValueLink val="CarriedMechanic"/>
@@ -2144,9 +2193,9 @@
 
             <Frame type="TabControl" name="TabControl">
                 <Anchor side="Top" relative="$parent" pos="Min" offset="10"/>
-                <Anchor side="Left" relative="$parent" pos="Min" offset="25"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
                 <Anchor side="Bottom" relative="$parent" pos="Max" offset="-15"/>
-                <Anchor side="Right" relative="$parent" pos="Max" offset="-25"/>
+                <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
 
                 <!--===========================================================================================
                 <! TAB BUTTONS
@@ -2581,6 +2630,13 @@
                     </Frame>
 
                     <Text val="Hero"/>
+                </Frame>
+
+                <Frame type="BattleUserContextMenu" name="PlayerContextMenu" template="BattleUserContextMenu/BattleUserContextMenu" >
+                    <Anchor side="Top" relative="$parent" pos="Max" offset="0"/>
+                    <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+                    <RenderPriority val="#RenderPriorityLevel_4"/>
+                    <ReportsStats val="True"/>  <!-- Handle provided in code -->
                 </Frame>
 
                 <Frame type="HeroLeaderPanelPlayerFrame" name="PlayerFrame0" template="HeroLeaderPanel/HeroLeaderPanelAllyFrameTemplate">

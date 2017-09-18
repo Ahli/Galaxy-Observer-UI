@@ -988,6 +988,57 @@
         </StateGroup>
     </Frame>
 
+    <!-- Unit Stacking Debuff Template-->
+
+    <Frame type="UnitStatusUnitStackingDebuffElement" name="SingleBehaviorTemplate">
+        <Anchor relative="$parent"/>
+        <ShowForOwner val="False"/>
+        <BehaviorStackOffset val="0"/>
+        <ShowForBehaviorOwner val="True"/>
+        <DebuffType val="BehaviorCounter"/>
+        
+        <Frame type="Image" name="StacksFull">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+            <Visible val="{$parent/@AtMaxStacks}"/>
+        </Frame>
+    </Frame>
+    
+    <Frame type="UnitStatusUnitStackingDebuffElement" name="StackingBehaviorTemplate" template="UnitStatus/SingleBehaviorTemplate">
+
+        <Frame type="ProgressBar" name="StacksProgressBar">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+            <AcceptsMouse val="False"/>
+            <Visible val="True"/>
+            <MinValue val="0"/>
+            <MaxValue val="{$parent/@MaxValue}"/>
+            <Value val="{$parent/@CurrentValue}"/>
+            <Horizontal val="True"/>
+            <Debugging val="True"/>
+
+            <Frame type="Frame" name="FillImageContainer">
+                <Anchor relative="$parent"/>
+
+                <Frame type="Image" name="FillImage">
+                    <Anchor relative="$parent"/>
+                    <Texture val="{$parent/$parent/$parent/Stacking/@Texture}"/>
+                </Frame>
+            </Frame>
+        </Frame>
+
+        <Frame type="Image" name="Stacking">
+            <Anchor side="Top" relative="$parent/StacksProgressBar" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent/StacksProgressBar" pos="Min" offset="0"/>
+            <Visible val="False"/>
+        </Frame>
+        
+        <Frame type="Image" name="StacksFull">
+            <Anchor side="Top" relative="$parent/StacksProgressBar" pos="Min" offset="-9"/>
+            <Anchor side="Left" relative="$parent/StacksProgressBar" pos="Min" offset="-9"/>
+        </Frame>
+    </Frame>
+
     <!-- Armor Display -->
     <Frame type="UnitStatusUnitArmor" name="UnitArmorStatusDisplayTemplate">
         <Anchor side="Bottom" relative="StatusImage" pos="Max" offset="0"/>
@@ -1085,49 +1136,133 @@
     </Frame>
     <!-- End Armor Display -->
 
-    <!-- MortalStrike Display -->
-    <Frame type="UnitStatusBuffDebuffElement" name="UnitStatusHinderedHealingDisplayTemplate">
+    <!-- Healing Status Display -->
+    <Frame type="UnitStatusUnitHealingModifier" name="UnitStatusHealingDisplayTemplate">
         <Anchor side="Right" relative="StatusImage" pos="Max" offset="0"/>
         <Anchor side="Bottom" relative="StatusImage" pos="Max" offset="0"/>
-        <Alpha val="0"/>
-        <VisibilityOnFade val="False"/>
+
+        <Frame type="Image" name="BackgroundImage">
+            <Anchor relative="$parent/StatusImage"/>
+            <Texture val="{$parent/DurationBar/FillImageContainer/FillImage/@Texture}"/>
+            <Alpha val="50"/>
+        </Frame>
+
+        <Frame type="ProgressBar" name="DurationBar">
+            <Anchor relative="$parent/StatusImage"/>
+
+            <Circular val="True"/>
+            <CircularStart val="0"/>
+            <CircularEndOffset val="360"/>
+
+            <AcceptsMouse val="False"/>
+            <MaxValue val="{$parent/@DurationMax}"/>
+            <Value val="{$parent/@DurationRemaining}"/>
+
+            <Frame type="Frame" name="FillImageContainer">
+                <Anchor relative="$parent"/>
+
+                <Frame type="Image" name="FillImage">
+                    <Anchor relative="$parent"/>
+                    <Texture val="@UI/Storm_UI_Ingame_Armor_DurationBar"/>
+                    <TextureType val="Circular"/>
+                </Frame>
+            </Frame>
+        </Frame>
 
         <Frame type="Image" name="StatusImage">
             <Anchor side="Top" relative="$parent" pos="Min" offset="-12"/>
             <Anchor side="Left" relative="$parent" pos="Min" offset="-12"/>
             <Width val="64"/>
             <Height val="64"/>
-            <Texture val="@UI/Storm_UI_InGame_Status_HinderedHealing"/>
-            
-            <StateGroup name="Colorblind">
-                <State name="Default"/>
-                <State name="ColorBlindEnabled">
-                    <When type="Option" colorblind="True"/>
-                    <Action type="SetProperty" Texture="@UI/Storm_UI_InGame_Status_HinderedHealing_CB"/>
-                </State>
-            </StateGroup>
+            <Texture val="@UI/Storm_UI_InGame_Status_Healing"/>
         </Frame>
 
-        <Validator val="HasHinderedHealingDebuff"/>
+        <Frame type="TextFormatFrame" name="StatusLabelFormatSign">
+            <FormatText val="+%0%"/>
+            <Replacement index="0" val="{$parent/@HealingModification}"/>
+        </Frame>
 
-        <!-- ResetVisibility is called whenever frame gets hidden so that fading animation is not
-             resumed when unit comes out of the fog of war. -->
-        <Animation name="FadeAnimation">
-            <Event event="ResetVisibility" action="Stop"/>
-            <Event event="Hide" action="DirectionReverse,Play"/>
-            <Event event="Show" action="DirectionForward,Play"/>
+        <Frame type="Image" name="TextFlareImage">
+            <Anchor side="Top" relative="$parent" pos="Mid" offset="-22"/>
+            <Anchor side="Left" relative="$parent" pos="Mid" offset="-82"/>
+            <Width val="152"/>
+            <Height val="84"/>
+            <Texture val="@UI/HealingDisplay/None/TextFlare"/>
+            <BlendMode val="Add"/>
+            <RenderPriority val="600"/>
+            <Visible val="false"/>
+        </Frame>
+        
+        <Frame type="Label" name="StatusLabel">
+            <Anchor side="Top" relative="$parent/StatusImage" pos="Max" offset="-23"/>
+            <Anchor side="Left" relative="$parent/StatusImage" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent/StatusImage" pos="Max" offset="0"/>
+            <Height val="33"/>
+            <Text val="{$parent/StatusLabelFormatSign/@Text}"/>
+            <Style val="UnitStatusPositiveArmor"/>
+            <RenderPriority val="601"/>
+        </Frame>
 
-            <Controller type="Fade" end="Pause">
-                <Key type="Curve" time="0.0" value="0" inout="Linear"/>
-                <Key type="Curve" time="0.15" value="255" inout="Linear"/>
-            </Controller>
-            <Controller type="Visibility" end="Pause" frame="StatusImage">
-                <Key type="Bool" time="0" value="False"/>
-                <Key type="Bool" time="0.001" value="True"/>
-            </Controller>
-        </Animation>
+        <StateGroup name="HealingBonusIconController">
+            <DefaultState val="Neutral"/>
+            <State name="TemporaryBuff">
+                <When type="Property" HealingModification="0" operator="GreaterThan"/>
+                <When type="Property" DurationMax="0" operator="GreaterThan"/>
+            </State>
+            <State name="Buff">
+                <When type="Property" HealingModification="0" operator="GreaterThan"/>
+                <When type="Property" DurationMax="0"/>
+            </State>
+            <State name="Debuff">
+                <When type="Property" HealingModification="0" operator="LessThan"/>
+                <When type="Property" HealingModification="-100" operator="GreaterThan"/>
+                <When type="Property" DurationMax="0" operator="GreaterThan"/>
+                <When type="Option" colorblind="False"/>
+                <Action type="SetProperty" frame="StatusLabel" Style="UnitStatusNegativeArmor"/>
+                <Action type="SetProperty" frame="StatusLabelFormatSign" FormatText="%0%"/>
+                <Action type="SetProperty" frame="StatusImage" Texture="@UI/Storm_UI_InGame_Status_HinderedHealing"/>
+                <Action type="SetProperty" frame="DurationBar/FillImageContainer/FillImage" Texture="@UI/Storm_UI_InGame_Status_HinderedHealing_Negative"/>
+            </State>
+            <State name="DebuffMax">
+                <When type="Property" HealingModification="-100"/>
+                <When type="Property" DurationMax="0" operator="GreaterThan"/>
+                <When type="Option" colorblind="False"/>
+                <Action type="SetProperty" frame="StatusLabel" Style="UnitStatusNoHealing"/>
+                <Action type="SetProperty" frame="StatusLabelFormatSign" FormatText="%0%"/>
+                <Action type="SetProperty" frame="StatusImage" Texture="@UI/HealingDisplay/None/Icon"/>
+                <Action type="SetProperty" frame="DurationBar/FillImageContainer/FillImage" Texture="@UI/HealingDisplay/None/DurationRing"/>
+                <Action type="SetProperty" frame="TextFlareImage" Visible="true"/>
+            </State>
+            <State name="ColorblindDebuff">
+                <When type="Property" HealingModification="0" operator="LessThan"/>
+                <When type="Property" HealingModification="-100" operator="GreaterThan"/>
+                <When type="Property" DurationMax="0" operator="GreaterThan"/>
+                <When type="Option" colorblind="True"/>
+                <Action type="SetProperty" frame="StatusLabel" Style="UnitStatusNegativeArmorColorblind"/>
+                <Action type="SetProperty" frame="StatusLabelFormatSign" FormatText="%0%"/>
+                <Action type="SetProperty" frame="StatusImage" Texture="@UI/Storm_UI_InGame_Status_HinderedHealing_CB"/>
+                <Action type="SetProperty" frame="DurationBar/FillImageContainer/FillImage" Texture="@UI/Storm_UI_InGame_Status_HinderedHealing_Negative_CB"/>
+            </State>
+            <State name="ColorblindDebuffMax">
+                <When type="Property" HealingModification="-100"/>
+                <When type="Property" DurationMax="0" operator="GreaterThan"/>
+                <When type="Option" colorblind="True"/>
+                <Action type="SetProperty" frame="StatusLabel" Style="UnitStatusNoHealingColorblind"/>
+                <Action type="SetProperty" frame="StatusLabelFormatSign" FormatText="%0%"/>
+                <Action type="SetProperty" frame="TextFlareImage" Texture="@UI/HealingDisplay/None/TextFlareCB"/>
+                <Action type="SetProperty" frame="StatusImage" Texture="@UI/HealingDisplay/None/IconCB"/>
+                <Action type="SetProperty" frame="DurationBar/FillImageContainer/FillImage" Texture="@UI/HealingDisplay/None/DurationRingCB"/>
+                <Action type="SetProperty" frame="TextFlareImage" Visible="true"/>
+            </State>
+            <State name="Neutral">
+                <Action type="SetProperty" frame="StatusImage" Visible="false"/>
+                <Action type="SetProperty" frame="StatusLabel" Visible="false"/>
+                <Action type="SetProperty" frame="BackgroundImage" Visible="false"/>
+                <Action type="SetProperty" frame="DurationBar" Visible="false"/>
+            </State>
+        </StateGroup>
     </Frame>
-    <!-- MortalStrike Display -->
+    <!-- Healing Status Display -->
 
     <!-- Hero Health/Energy Bar -->
     <Frame type="UnitStatusFrame" name="HeroUnitStatusFrameNoEnergyTemplate">
@@ -1724,6 +1859,15 @@
                 <Height val="4"/>
             </Frame>
 
+            <Frame type="HeroSpecificContainerPanel" name="HeroSpecificStackingBuffsPanel">
+                <Anchor side="Top" relative="$parent/DurationBar" pos="Max" offset="3"/>
+                <Anchor side="Left" relative="$parent/DurationBar" pos="Min" offset="0"/>
+                <CollapseLayout val="true"/>
+                <Width val="136"/>
+                <Height val="20"/>
+                <HeroSpecificLocation val="HeroSpecificStackingBuffsStatus"/>
+            </Frame>
+
             <Frame type="UnitStatusTalentAvailableIndicator" name="TalentAvailableIndicator" template="UnitStatus/TalentAvailableIndicatorTemplate">
                 <Anchor side="Bottom" relative="$parent/HeroFrameBackgroundContainer" pos="Min" offset="11"/>
                 <Anchor side="Left" relative="TalentAvailableBg" pos="Min" offset="0"/>
@@ -1750,15 +1894,22 @@
                 <Height val="64"/>
             </Frame>
 
-            <Frame type="UnitStatusBuffDebuffElement" name="UnitStatusHinderedHealingDisplay" template="UnitStatus/UnitStatusHinderedHealingDisplayTemplate">
+            <Frame type="UnitStatusUnitHealingModifier" name="UnitStatusHealingDisplay" template="UnitStatus/UnitStatusHealingDisplayTemplate">
                 <Anchor side="Top" relative="$parent/HeroFrameBackgroundContainer" pos="Mid" offset="-16"/>
                 <Anchor side="Left" relative="$parent/HeroFrameBackgroundContainer" pos="Max" offset="0"/>
-                <CollapseLayout val="true"/>
             </Frame>
 
             <Frame type="UnitStatusUnitArmor" name="UnitArmorStatusDisplay" template="UnitStatus/UnitArmorStatusDisplayTemplate">
                 <Anchor side="Top" relative="$parent/HeroFrameBackgroundContainer" pos="Mid" offset="-36"/>
-                <Anchor side="Left" relative="$parent/UnitStatusHinderedHealingDisplay" pos="Max" offset="-12"/>
+                <Anchor side="Left" relative="$parent/UnitStatusHealingDisplay" pos="Max" offset="-12"/>
+                
+                <!-- Can't use collapselayout to shift the frames; they need to be "visible" at all times for everything to work -->
+                <StateGroup name="AnchorShift">
+                    <State name="NoPotions">
+                        <When type="StateGroup" frame="$parent/UnitStatusHealingDisplay" HealingBonusIconController="Neutral"/>
+                        <Action type="SetAnchor" side="Left" relative="$parent/HeroFrameBackgroundContainer" pos="Max" offset="0"/>
+                    </State>
+                </StateGroup>
             </Frame>
 
             <Frame type="Image" name="DimmingFrame">
@@ -3240,26 +3391,6 @@
         </Frame>
     </Frame>
     
-    <Frame type="UnitStatusFrame" name="MinionUnitStatusFrameWith10Ammo" template="UnitStatus/MinionUnitStatusFrameTemplate">
-        <Width val="80"/>
-        <Frame type="UnitStatusShieldedHealthBar" name="HealthBar">
-            <Width val="80"/>
-        </Frame>
-
-        <Frame type="UnitStatusProgressBar" name="ProgressBar">
-            <Width val="78"/>
-        </Frame>
-
-        <Frame type="UnitStatusDurationBar" name="DurationBar">
-            <Width val="78"/>
-        </Frame>
-
-        <Frame type="UnitStatusAmmo" name="AmmoFrame" template="UnitStatus/UnitStatusAmmoTemplate10">
-            <Anchor side="Top" relative="$parent/HealthBar" pos="Max" offset="0"/>
-            <Anchor side="Left" relative="$parent/HealthBar" pos="Mid" offset="0"/>
-            <Anchor side="Right" relative="$parent/HealthBar" pos="Mid" offset="0"/>
-        </Frame>
-    </Frame>
 
     <Frame type="UnitStatusFrame" name="MinionUnitStatusFrameOnlyDurationBars" template="UnitStatus/MinionUnitStatusFrameTemplate">
     
@@ -3754,12 +3885,103 @@
             <Style val="Storm_DebugAIStatusLabel"/>
         </Frame>
         
-        <Frame type="UnitStatusBuffDebuffElement" name="UnitStatusHinderedHealingDisplay" template="UnitStatus/UnitStatusHinderedHealingDisplayTemplate">
+        <Frame type="UnitStatusUnitHealingModifier" name="UnitStatusHealingDisplay" template="UnitStatus/UnitStatusHealingDisplayTemplate">
             <Anchor side="Top" relative="$parent/HealthBar" pos="Mid" offset="-16"/>
             <Anchor side="Left" relative="$parent/HealthBar" pos="Max" offset="15"/>
         </Frame>
         
     </Frame>
+
+    <Frame type="UnitStatusFrame" name="SuperCreepUnitStatusFrameTemplateSmaller" template="UnitStatus/SuperCreepUnitStatusFrameTemplate">
+        <Width val="133.5"/>
+        <Height val="24.75"/>
+
+        <Frame type="Frame" name="BGImageContainer">
+            <Anchor relative="$parent"/>
+
+            <Frame type="Image" name="BGImage">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+                <Width val="108"/>
+                <Height val="24"/>
+                <Texture val="@UI/Storm_UI_Ingame_BossBar_Border"/>
+                <SubpixelRendering val="True"/>
+                <RenderPriority val="#RenderPriority_Background"/>
+            </Frame>
+
+            <Frame type="Image" name="BGImageLeft">
+                <Anchor side="Top" relative="$parent/BGImage" pos="Mid" offset="0"/>
+                <Anchor side="Bottom" relative="$parent/BGImage" pos="Mid" offset="0"/>
+                <Anchor side="Right" relative="$parent/BGImage" pos="Min" offset="10"/>
+                <Texture val="@UI/Storm_UI_Ingame_BossBar_HorizLights"/>
+                <SubpixelRendering val="True"/>
+                <RenderPriority val="#RenderPriority_Background"/>
+                <ColorAdjustMode val="Desaturate"/>
+                <LightAdjustColor val="{$parent/$parent/PrimaryHighlightColorFrame/@Color}"/>
+                <DarkAdjustColor val="{$parent/$parent/PrimaryColorFrame/@Color}"/>
+            </Frame>
+            <Frame type="Image" name="BGImageRight">
+                <Anchor side="Top" relative="$parent/BGImage" pos="Mid" offset="0"/>
+                <Anchor side="Bottom" relative="$parent/BGImage" pos="Mid" offset="0"/>
+                <Anchor side="Left" relative="$parent/BGImage" pos="Max" offset="-10"/>
+                <Texture val="@UI/Storm_UI_Ingame_BossBar_HorizLights"/>
+                <TextureCoords top="0" left="1" bottom="1" right="0"/>
+                <SubpixelRendering val="True"/>
+                <RenderPriority val="#RenderPriority_Background"/>
+                <ColorAdjustMode val="Desaturate"/>
+                <LightAdjustColor val="{$parent/$parent/PrimaryHighlightColorFrame/@Color}"/>
+                <DarkAdjustColor val="{$parent/$parent/PrimaryColorFrame/@Color}"/>
+            </Frame>
+        </Frame>
+
+        <Frame type="UnitStatusHealthBar" name="HealthBar" template="UnitStatus/UnitStatusSegmentedHealthBarTemplate">
+            <Width val="100.5"/>
+            <Height val="10.5"/>
+            <Anchor side="Top" relative="$parent/BGImageContainer" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent/BGImageContainer" pos="Mid" offset="0"/>
+            <Anchor side="Left" relative="$parent/BGImageContainer" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent/BGImageContainer" pos="Mid" offset="0"/>
+            <ReductionShown val="false"/>
+            <DecreaseDuration val="#DecreaseDuration_NoReduction"/>
+            <SegmentValue val="2000"/>
+        </Frame>
+
+        <Frame type="UnitStatusProgressBar" name="ProgressBar" template="UnitStatus/UnitStatusProgressBarTemplate">
+            <Width val="102"/>
+            <Height val="3"/>
+            <Anchor side="Top" relative="$parent/HealthBar" pos="Max" offset="3"/>
+            <Anchor side="Left" relative="$parent/HealthBar" pos="Min" offset="0"/>
+            <VisibleToOwner val="true"/>
+            <VisibleToAlly val="true"/>
+            <VisibleToEnemy val="true"/>
+        </Frame>
+
+        <Frame type="UnitStatusDurationBar" name="DurationBar" template="UnitStatus/UnitStatusDurationBarTemplate">
+            <Width val="102"/>
+            <Height val="3"/>
+            <Anchor side="Top" relative="$parent/HealthBar" pos="Max" offset="3"/>
+            <Anchor side="Left" relative="$parent/HealthBar" pos="Min" offset="0"/>
+            <VisibleToOwner val="true"/>
+            <VisibleToAlly val="true"/>
+            <VisibleToEnemy val="true"/>
+        </Frame>
+
+        <Frame type="Label" name="BotStatusLabel">
+            <Anchor side="Top" relative="$parent" pos="Max" offset="4"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="6"/>
+            <Height val="54"/>
+            <Width val="200"/>
+            <Style val="Storm_DebugAIStatusLabel"/>
+        </Frame>
+
+        <Frame type="UnitStatusUnitHealingModifier" name="UnitStatusHealingDisplay" template="UnitStatus/UnitStatusHealingDisplayTemplate">
+            <Anchor side="Top" relative="$parent/HealthBar" pos="Mid" offset="-16"/>
+            <Anchor side="Left" relative="$parent/HealthBar" pos="Max" offset="15"/>
+        </Frame>
+        
+    </Frame>
+    
     
     <Frame type="UnitStatusFrame" name="SuperCreepNeutralUnitStatusFrameTemplate" template="UnitStatus/SuperCreepUnitStatusFrameTemplate">
         <Frame type="UnitStatusHealthBar" name="HealthBar">
@@ -3817,6 +4039,11 @@
             <Anchor side="Left" relative="$parent" pos="min" offset="5"/>
         </Frame>
 
+        <Frame type="UnitStatusUnitArmor" name="UnitArmorStatusDisplay" template="UnitStatus/UnitArmorStatusDisplayTemplate">
+            <Anchor side="Top" relative="$parent/HealthBar" pos="Mid" offset="-30"/>
+            <Anchor side="Left" relative="$parent/HealthBar" pos="Max" offset="0"/>
+        </Frame>
+
         <Frame type="UnitStatusAmmo" name="TowerAmmoCount" template="UnitStatus/UnitStatusAmmoTemplate">
             <Anchor side="Top" relative="$parent/HealthBar" pos="Max" offset="0"/>
             <Anchor side="Left" relative="$parent/HealthBar" pos="Min" offset="0"/>
@@ -3845,6 +4072,11 @@
             <VisibleToEnemy val="true"/>
             <Width val="193"/>
             <Height val="64"/>
+        </Frame>
+
+        <Frame type="UnitStatusUnitArmor" name="UnitArmorStatusDisplay" template="UnitStatus/UnitArmorStatusDisplayTemplate">
+            <Anchor side="Top" relative="$parent/HealthBar" pos="Mid" offset="-30"/>
+            <Anchor side="Left" relative="$parent/HealthBar" pos="Max" offset="0"/>
         </Frame>
 
         <Frame type="UnitStatusShieldedHealthBar" name="HealthBar" template="UnitStatus/UnitStatusShieldedHealthBarTemplate">
@@ -4809,7 +5041,7 @@
         <Frame type="Label" name="DepartSecondsLabel">
             <Anchor side="Bottom" relative="$parent/MedivacBackground" pos="Max" offset="10"/>
             <Anchor side="Right" relative="$parent/MedivacBackground" pos="Mid" offset="5"/>
-            <Text val="9"/>
+            <Text val="@UI/Tooltip/MedicMedivacDropshipAcceptingPassengersCountdown"/>
             <Width val="170"/>
             <Style val="MedivacCountDownSeconds"/>
             

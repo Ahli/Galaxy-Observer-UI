@@ -170,13 +170,6 @@
         </Frame>
 
 
-        <Frame type="ToastPanel" name="ToastPanel" template="ToastPanel/ToastPanelTemplate">
-            <Width val="600"/>
-            <Anchor side="Top" relative="$parent" pos="Min" offset="160"/>
-            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
-            <Anchor side="Bottom" relative="$parent" pos="Max" offset="-200"/>
-        </Frame>
-
         <Frame type="EnterGamePanel" name="EnterGamePanel" template="EnterGamePanel/EnterGamePanelTemplate">
             <Anchor relative="$parent"/>
             <Handle val="ScreenForegroundHero_EnterGamePanel"/>
@@ -191,6 +184,61 @@
 
         <Frame type="Frame" name="SocialContainerFrame">
             <Anchor relative="$parent"/>
+
+            <Frame type="Button" name="DebugLFPButton" template="StandardTemplates/StandardButtonMiniTemplate">
+                <Anchor side="Left" relative="$parent/DebugLookingForPartyPanel" pos="Mid" offset="41"/>
+                <Anchor side="Right" relative="$parent/DebugLookingForPartyPanel" pos="Mid" offset="41"/>
+                <Anchor side="Bottom" relative="$parent/DebugLookingForPartyPanel" pos="Min" offset="-8"/>
+                <Visible val="{$ScreenMainMenu/@Visible}"/>
+                <Height val="74"/>
+                <Toggleable val="true"/>
+                <Text val="Debug LFP"/>
+
+                <StateGroup name="DebugStates">
+                    <State name="HideDebugLFPPanel">
+                        <When type="Property" Toggled="false"/>
+                        <Action type="SetProperty" frame="$parent/DebugSuggestedPlayerLFPButton" Visible="false"/>
+                        <Action type="SetProperty" frame="$parent/DebugLookingForPartyPanel" Visible="false"/>
+                        <Action type="SetProperty" frame="$parent/DebugSuggestedPlayerLookingForPartyPanel" Visible="false"/>
+                        <Action type="SetProperty" frame="$ScreenHome_Main/LookingForPartyPanel" Visible="true"/>
+                    </State>
+                    <State name="ShowDebugLFPPanel">
+                        <When type="Property" Toggled="true"/>
+                        <When type="Property" frame="$parent/DebugSuggestedPlayerLFPButton" Toggled="false"/>
+                        <Action type="SetProperty" frame="$parent/DebugSuggestedPlayerLFPButton" Visible="true"/>
+                        <Action type="SetProperty" frame="$parent/DebugLookingForPartyPanel" Visible="true"/>
+                        <Action type="SetProperty" frame="$parent/DebugSuggestedPlayerLookingForPartyPanel" Visible="false"/>
+                        <Action type="SetProperty" frame="$ScreenHome_Main/LookingForPartyPanel" Visible="false"/>
+                    </State>
+                    <State name="ShowSuggestedPlayerLFPPanel">
+                        <When type="Property" Toggled="true"/>
+                        <When type="Property" frame="$parent/DebugSuggestedPlayerLFPButton" Toggled="true"/>
+                        <Action type="SetProperty" frame="$parent/DebugSuggestedPlayerLFPButton" Visible="true"/>
+                        <Action type="SetProperty" frame="$parent/DebugLookingForPartyPanel" Visible="false"/>
+                        <Action type="SetProperty" frame="$parent/DebugSuggestedPlayerLookingForPartyPanel" Visible="true"/>
+                        <Action type="SetProperty" frame="$ScreenHome_Main/LookingForPartyPanel" Visible="false"/>
+                    </State>
+                </StateGroup>
+            </Frame>
+
+            <Frame type="Button" name="DebugSuggestedPlayerLFPButton" template="StandardTemplates/StandardButtonMiniTemplate">
+                <Anchor side="Top" relative="$parent/DebugLFPButton" pos="Min" offset="0"/>
+                <Anchor side="Right" relative="$parent/DebugLFPButton" pos="Min" offset="0"/>
+                <Visible val="false"/>
+                <Height val="74"/>
+                <Toggleable val="true"/>
+                <Text val="Suggested Player"/>
+            </Frame>
+
+            <Frame type="Frame" name="DebugLookingForPartyPanel" template="LookingForPartyPanel/NewLookingForPartyPanelTemplate">
+                <Anchor side="Top" relative="$parent/PartyPanel" pos="Max" offset="-510"/>
+                <Anchor side="Right" relative="$parent" pos="Max" offset="-20"/>
+            </Frame>
+
+            <Frame type="Frame" name="DebugSuggestedPlayerLookingForPartyPanel" template="LookingForPartyPanel/SuggestedPlayerPartyFinderTemplate">
+                <Anchor side="Top" relative="$parent/DebugLookingForPartyPanel" pos="Min" offset="0"/>
+                <Anchor side="Right" relative="$parent/DebugLookingForPartyPanel" pos="Max" offset="-35"/>
+            </Frame>
 
             <Frame type="PartyPanelHero" name="PartyPanel" template="PartyPanel/PartyPanelTemplate">
                 <Handle val="ScreenNavigation_PartyPanel"/>
@@ -295,6 +343,13 @@
             </Frame>
         </Frame>
 
+        <Frame type="ToastPanel" name="ToastPanel" template="ToastPanel/ToastPanelTemplate">
+            <Width val="600"/>
+            <Anchor side="Top" relative="$parent" pos="Min" offset="160"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="-200"/>
+        </Frame>
+        
         <Frame type="NewUserPopupPanel" name="NewUserPopupPanel" template="NewUserPopupPanel/NewUserPopupPanelTemplate"/>
 
         <Frame type="MenuPanelHero" name="MenuPanel" template="MenuPanel/MenuPanelTemplate">
@@ -411,6 +466,24 @@
             <Frame type="Button" name="ClearButton">
                 <Handle val="LogMessagePanel_ClearButton"/>
             </Frame>
+        </Frame>
+
+        <Frame type="BattleUserVoiceFrame" name="BattleUserVoiceFrame_PlayerMenu" template="BattleUserVoiceFrame/BattleUserVoiceFrame_PlayerMenu_Template" requiredtoload="IS_VOICECHAT_ENABLED">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+
+            <ChannelType val="{$VoiceChatUI/@ActiveChannelType}"/>
+            <PresenceId val="{$BattleUI/@LocalToonPresenceId}"/>
+
+            <Visible val="False"/>
+            <StateGroup name="VoiceChatState">
+                <DefaultState val="Inactive"/>
+                <State name="Inactive"/>
+                <State name="Active">
+                    <When type="Property" IsActive="True"/>
+                    <Action type="SetProperty" Visible="True"/>
+                </State>
+            </StateGroup>
         </Frame>
     </Frame>
 </Desc>

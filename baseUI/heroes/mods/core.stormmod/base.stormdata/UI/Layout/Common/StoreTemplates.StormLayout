@@ -2,8 +2,24 @@
 <Desc>
     <DescFlags val="Locked"/>
 
+    <!--===========================================================================================
+    <! Constants
+    <!==========================================================================================-->
     <Constant name="StoreSmallTileIconContainerWidth" val="55"/>
     <Constant name="StoreBigTileIconContainerWidth" val="100"/>
+    <!-- Background Rarity Colors -->
+    <Constant name="StoreTileListItem_OwnedColor_Common" val="6500f0"/>
+    <Constant name="StoreTileListItem_UnownedColor_Common" val="4600a6"/>
+    <Constant name="StoreTileListItem_OwnedColor_Rare" val="1c57ff"/>
+    <Constant name="StoreTileListItem_UnownedColor_Rare" val="0034c9"/>
+    <Constant name="StoreTileListItem_OwnedColor_Epic" val="bb00f1"/>
+    <Constant name="StoreTileListItem_UnownedColor_Epic" val="7a009d"/>
+    <Constant name="StoreTileListItem_OwnedColor_Legendary" val="9b2700"/>
+    <Constant name="StoreTileListItem_UnownedColor_Legendary" val="5c1700"/>
+
+    <Constant name="StoreTileListItem_EffectColor_Rare" val="0066ff"/>
+    <Constant name="StoreTileListItem_EffectColor_Epic" val="b64dff"/>
+    <Constant name="StoreTileListItem_EffectColor_Legendary" val="c86400"/>
 
     <!--===========================================================================================
     <! QuickBuyButtonTemplate
@@ -758,10 +774,7 @@
         <SelectedRenderPriority val="1023"/>
 
         <Frame type="Frame" name="HitTestFrame">
-            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
-            <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
-            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
-            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+            <Anchor relative="$parent"/>
         </Frame>
 
         <Frame type="GameContentFrame" name="GameContentFrame">
@@ -772,66 +785,38 @@
         <Frame type="Image" name="EmptyImage">
             <Anchor relative="$parent/NormalImage" />
             <Texture val="@UI/Storm_UI_Store_SmallFrame_Off"/>
+            <TextureType val="Nineslice"/>
             <RenderPriority val="509"/>
             <Unclipped val="True"/>
-            <RenderType val="HDR"/>
+            <RenderType val="LDR"/>
             <Alpha val="100"/>
         </Frame>
 
         <Frame type="Image" name="NormalImage">
-            <Anchor side="Top" relative="$parent" pos="Min" offset="-13"/>
-            <Anchor side="Left" relative="$parent" pos="Min" offset="-13"/>
-            <Anchor side="Right" relative="$parent" pos="Max" offset="13"/>
-            <Anchor side="Bottom" relative="$parent" pos="Max" offset="13"/>
+            <Anchor side="Top" relative="$parent" pos="Min" offset="-8"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="-8"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="8"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="8"/>
             <Texture val="@UI/Storm_UI_Store_SmallFrame_Off"/>
+            <TextureType val="Nineslice"/>
             <Unclipped val="true"/>
-            <RenderType val="HDR"/>
+            <RenderType val="LDR"/>
         </Frame>
 
         <Frame type="Image" name="HoverImage">
             <Anchor relative="$parent/NormalImage" />
             <Texture val="@UI/Storm_UI_Store_SmallFrame_Off"/>
-            <RenderType val="HDR"/>
-        </Frame>
-
-        <Frame type="Image" name="OwnedBorderImage">
-            <Anchor side="Top" relative="$parent" pos="Min" offset="-15"/>
-            <Anchor side="Left" relative="$parent" pos="Min" offset="-15"/>
-            <Anchor side="Right" relative="$parent" pos="Max" offset="15"/>
-            <Anchor side="Bottom" relative="$parent" pos="Max" offset="14"/>
-            <ColorAdjustMode val="Colorize"/>
-            <DarkAdjustColor val="290cff"/>
-            <LightAdjustColor val="47c2ff"/>
             <TextureType val="Nineslice"/>
-            <Visible val="false"/>
-            <Alpha val="155"/>
-            <Texture val="@UI/Storm_UI_Store_SmallFrameGlow"/>
-
-            <Animation name="HoverAnim">
-                <Event event="OnShown" action="DirectionForward, Play" frame="$parent/HoverImage"/>
-                <Event event="OnHidden" action="DirectionReverse, Play" frame="$parent/HoverImage"/>
-
-                <Controller type="Fade" end="Pause">
-                    <Key type="Curve" time="0" value="155"/>
-                    <Key type="Curve" time=".1" value="255"/>
-                </Controller>
-            </Animation>
-
-            <StateGroup name="VisibilityStates">
-                <State name="IsOwned">
-                    <When type="Property" frame="$parent/GameContentFrame" IsOwned="true"/>
-                    <When type="Property" frame="$parent/GameContentFrame" ProductSetMutuallyExclusive="false"/>
-                    <Action type="SetProperty" Visible="true"/>
-                </State>
-            </StateGroup>
+            <RenderType val="LDR"/>
+            <Alpha val="255"/>
         </Frame>
 
         <Frame type="Image" name="HoverFrameImage">
             <Anchor relative="$parent/NormalImage" />
-            <Texture val="@UI/Storm_UI_Store_SmallFrame_Off"/>
-            <BlendMode val="Add"/>
+            <Texture val="@UI/Storm_UI_Store_SmallFrame_Off_Hover"/>
+            <TextureType val="Nineslice"/>
             <Unclipped val="true"/>
-            <RenderType val="HDR"/>
+            <RenderType val="LDR"/>
             <Alpha val="0"/>
             <Animation name="Hover">
                 <Event event="MouseOver" action="DirectionForward,Play" frame="$parent"/>
@@ -843,19 +828,58 @@
             </Animation>
         </Frame>
 
-        <Frame type="Frame" name="BackgroundFrame">
-            <Anchor side="Top" relative="$parent" pos="Min" offset="8"/>
-            <Anchor side="Left" relative="$parent" pos="Min" offset="8"/>
-            <Anchor side="Right" relative="$parent" pos="Max" offset="-8"/>
-            <Anchor side="Bottom" relative="$parent" pos="Max" offset="-8"/>
+        <Frame type="Image" name="OwnedBorderImage">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="-8"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="-8"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="8"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="8"/>
+            <TextureType val="Nineslice"/>
+            <RenderType val="LDR"/>
+            <Visible val="false"/>
+            <Texture val="@UI/Storm_UI_Store_SmallFrameGlow"/>
 
-            <Frame type="Image" name="BackgrounGradient">
+            <Animation name="HoverAnim">
+                <Event event="OnShown" action="DirectionForward, Play" frame="$parent/HoverImage"/>
+                <Event event="OnHidden" action="DirectionReverse, Play" frame="$parent/HoverImage"/>
+
+                <Controller type="Fade" frame="OwnedBorderHoverImage" end="Pause">
+                    <Key type="Curve" time="0" value="0"/>
+                    <Key type="Curve" time=".1" value="255"/>
+                </Controller>
+            </Animation>
+
+            <Frame type="Image" name="OwnedBorderHoverImage">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+                <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+                <Alpha val="0"/>
+                <TextureType val="Nineslice"/>
+                <RenderType val="LDR"/>
+                <Texture val="@UI/Storm_UI_Store_SmallFrameGlow_Hover"/>
+            </Frame>
+
+            <StateGroup name="VisibilityStates">
+                <State name="IsOwned">
+                    <When type="Property" frame="$parent/GameContentFrame" IsOwned="true"/>
+                    <When type="Property" frame="$parent/GameContentFrame" ProductSetMutuallyExclusive="false"/>
+                    <Action type="SetProperty" Visible="true"/>
+                </State>
+            </StateGroup>
+        </Frame>
+
+        <Frame type="Frame" name="BackgroundFrame">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="6"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="6"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="-6"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="-6"/>
+
+            <Frame type="Image" name="BackgroundImage">
                 <Anchor relative="$parent"/>
                 <RenderType val="HDR"/>
-                <ColorAdjustMode val="Desaturate"/>
-                <LightAdjustColor val="{$parent/AdjustmentColorFrame/@LightAdjustColor}"/>
-                <DarkAdjustColor val="{$parent/AdjustmentColorFrame/@DarkAdjustColor}"/>
-                <Texture val="@UI/Storm_UI_Store_BGGradient"/>
+                <ColorAdjustMode val="Colorize"/>
+                <AdjustmentColor val="#StoreTileListItem_OwnedColor_Common"/>
+                <Texture val="@UI/Storm_UI_Store_Tile_GradientBackground"/>
             </Frame>
 
             <Frame type="Image" name="BackgroundPattern">
@@ -863,13 +887,11 @@
                 <Alpha val="150"/>
                 <RenderType val="HDR"/>
                 <LayerCount val="2"/>
-                <ColorAdjustMode val="Desaturate"/>
-                <LightAdjustColor val="{$parent/AdjustmentColorFrame/@LightAdjustColor}"/>
-                <DarkAdjustColor val="{$parent/AdjustmentColorFrame/@DarkAdjustColor}"/>
+                <ColorAdjustMode val="Colorize"/>
                 <Texture val="@UI/Storm_UI_Store_BGGradient" layer="0"/>
                 <AlphaLayer val="true" layer="0"/>
-                <AlphaChannel val="Red" layer="0"/>
-                <Texture val="@UI/Storm_UI_Store_TrianglePattern" layer="1"/>
+                <Texture val="@UI/Storm_UI_Store_GemDialog_trianglepattern_small" layer="1"/>
+                <Tiled val="True" layer="1"/>
                 <BlendMode val="Add" layer="1"/>
                 <WrapUV val="true" layer="1"/>
                 <Tiled val="true" layer="1"/>
@@ -879,46 +901,77 @@
 
                     <Controller type="LayerUV" side="Top" sidelock="true" layer="1" end="Loop">
                         <Key type="Curve" time="0" value="0"/>
-                        <Key type="Curve" time="14" value="1"/>
+                        <Key type="Curve" time="12" value="1"/>
                     </Controller>
                 </Animation>
             </Frame>
 
-            <Frame type="Image" name="AdjustmentColorFrame">
+            <Frame type="Image" name="BackgroundVignette">
                 <Anchor relative="$parent"/>
-                <Visible val="false"/>
-                <LightAdjustColor val="0070f0"/>
-                <DarkAdjustColor val="070f19"/>
-
-                <StateGroup name="AdjustmentColorStates">
-                    <State name="Heroes">
-                        <When type="Property" frame="$parent/$parent/GameContentFrame" ContentType="Hero"/>
-                        <Action type="SetProperty" LightAdjustColor="41cdf0"/>
-                        <Action type="SetProperty" DarkAdjustColor="001546"/>
-                        <Action type="SetProperty" frame="$parent/BackgroundPattern" Alpha="115"/>
-                    </State>
-                    <State name="Emojis">
-                        <When type="Property" frame="$parent/$parent/GameContentFrame" ContentType="EmoticonPack"/>
-                        <Action type="SetProperty" LightAdjustColor="3a1a8b"/>
-                        <Action type="SetProperty" DarkAdjustColor="150741"/>
-                        <Action type="SetProperty" frame="$parent/BackgroundPattern" Alpha="175"/>
-                    </State>
-                    <State name="VoiceLine">
-                        <When type="Property" frame="$parent/$parent/GameContentFrame" ContentType="VoiceLine"/>
-                        <Action type="SetProperty" LightAdjustColor="5f39be"/>
-                        <Action type="SetProperty" DarkAdjustColor="0b022e"/>
-                        <Action type="SetProperty" frame="$parent/BackgroundPattern" Alpha="50"/>
-                        <Action type="SetProperty" frame="$parent/BackgrounGradient" Alpha="85"/>
-                    </State>
-                    <State name="Unknown">
-                        <When type="Property" frame="$parent/$parent/GameContentFrame" Name=""/>
-                        <Action type="SetProperty" LightAdjustColor="5f39be"/>
-                        <Action type="SetProperty" DarkAdjustColor="0b022e"/>
-                        <Action type="SetProperty" frame="$parent/BackgroundPattern" Alpha="50"/>
-                        <Action type="SetProperty" frame="$parent/BackgrounGradient" Alpha="85"/>
-                    </State>
-                </StateGroup>
+                <RenderType val="HDR"/>
+                <Alpha val="80"/>
+                <Texture val="@UI/Storm_UI_Store_Tile_BackgroundVignette"/>
             </Frame>
+
+            <StateGroup name="ColorStates">
+                <DefaultState val="Empty"/>
+
+                <State name="CommonOwned">
+                    <When type="Property" frame="$parent/GameContentFrame" Rarity="Common"/>
+                    <When type="Property" frame="$parent/GameContentFrame" IsOwned="true"/>
+                    <Action type="SetProperty" frame="BackgroundImage" AdjustmentColor="#StoreTileListItem_OwnedColor_Common"/>
+                    <Action type="SetProperty" frame="BackgroundPattern" AdjustmentColor="#StoreTileListItem_OwnedColor_Common"/>
+                </State>
+                <State name="CommonUnowned">
+                    <When type="Property" frame="$parent/GameContentFrame" Rarity="Common"/>
+                    <When type="Property" frame="$parent/GameContentFrame" IsOwned="false"/>
+                    <Action type="SetProperty" frame="BackgroundImage" AdjustmentColor="#StoreTileListItem_UnownedColor_Common"/>
+                    <Action type="SetProperty" frame="BackgroundPattern" AdjustmentColor="#StoreTileListItem_UnownedColor_Common"/>
+                </State>
+                <State name="RareOwned">
+                    <When type="Property" frame="$parent/GameContentFrame" Rarity="Rare"/>
+                    <When type="Property" frame="$parent/GameContentFrame" IsOwned="true"/>
+                    <Action type="SetProperty" frame="BackgroundImage" AdjustmentColor="#StoreTileListItem_OwnedColor_Rare"/>
+                    <Action type="SetProperty" frame="BackgroundPattern" AdjustmentColor="#StoreTileListItem_EffectColor_Rare"/>
+                </State>
+                <State name="RareUnOwned">
+                    <When type="Property" frame="$parent/GameContentFrame" Rarity="Rare"/>
+                    <When type="Property" frame="$parent/GameContentFrame" IsOwned="false"/>
+                    <Action type="SetProperty" frame="BackgroundImage" AdjustmentColor="#StoreTileListItem_UnownedColor_Rare"/>
+                    <Action type="SetProperty" frame="BackgroundPattern" AdjustmentColor="#StoreTileListItem_EffectColor_Rare"/>
+                </State>
+                <State name="EpicOwned">
+                    <When type="Property" frame="$parent/GameContentFrame" Rarity="Epic"/>
+                    <When type="Property" frame="$parent/GameContentFrame" IsOwned="true"/>
+                    <Action type="SetProperty" frame="BackgroundImage" AdjustmentColor="#StoreTileListItem_OwnedColor_Epic"/>
+                    <Action type="SetProperty" frame="BackgroundPattern" AdjustmentColor="#StoreTileListItem_EffectColor_Epic"/>
+                </State>
+                <State name="EpicUnOwned">
+                    <When type="Property" frame="$parent/GameContentFrame" Rarity="Epic"/>
+                    <When type="Property" frame="$parent/GameContentFrame" IsOwned="false"/>
+                    <Action type="SetProperty" frame="BackgroundImage" AdjustmentColor="#StoreTileListItem_UnownedColor_Epic"/>
+                    <Action type="SetProperty" frame="BackgroundPattern" AdjustmentColor="#StoreTileListItem_EffectColor_Epic"/>
+                </State>
+                <State name="LegendaryOwned">
+                    <When type="Property" frame="$parent/GameContentFrame" Rarity="Legendary"/>
+                    <When type="Property" frame="$parent/GameContentFrame" IsOwned="true"/>
+                    <Action type="SetProperty" frame="BackgroundImage" AdjustmentColor="#StoreTileListItem_OwnedColor_Legendary"/>
+                    <Action type="SetProperty" frame="BackgroundPattern" AdjustmentColor="#StoreTileListItem_EffectColor_Legendary"/>
+                </State>
+                <State name="LegendaryUnOwned">
+                    <When type="Property" frame="$parent/GameContentFrame" Rarity="Legendary"/>
+                    <When type="Property" frame="$parent/GameContentFrame" IsOwned="false"/>
+                    <Action type="SetProperty" frame="BackgroundImage" AdjustmentColor="#StoreTileListItem_UnownedColor_Legendary"/>
+                    <Action type="SetProperty" frame="BackgroundPattern" AdjustmentColor="#StoreTileListItem_EffectColor_Legendary"/>
+                </State>
+                <State name="Empty">
+                    <Action type="SetProperty" frame="BackgroundImage" Alpha="128"/>
+                    <Action type="SetProperty" frame="BackgroundPattern" Alpha="0"/>
+                    <Action type="SetProperty" frame="BackgroundVignette" Alpha="0"/>
+                    <Action type="SetProperty" frame="BackgroundImage" AdjustmentColor="#StoreTileListItem_OwnedColor_Common"/>
+                    <Action type="SetProperty" frame="BackgroundPattern" AdjustmentColor="#StoreTileListItem_OwnedColor_Common"/>
+                </State>
+            </StateGroup>
         </Frame>
 
         <Frame type="Image" name="SelectedImage">
@@ -928,7 +981,10 @@
         </Frame>
 
         <Frame type="Image" name="PortraitImage">
-            <Anchor relative="$parent/PortraitCutscene"/>
+            <Anchor side="Top" relative="$parent" pos="Min" offset="6"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="6"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="-6"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="-6"/>
             <Texture val="{$parent/GameContentFrame/@PortraitTexture}"/>
             <TextureType val="Normal"/>
 
@@ -1020,16 +1076,18 @@
 
                 <State name="BaseSkinIconShown">
                     <When type="Property" frame="$parent/GameContentFrame" IsBaseSkinVariation="true"/>
+                    <When type="Property" frame="$parent/GameContentFrame" IsOwned="false"/>
                     <Action type="SetProperty" Visible="true"/>
                 </State>
             </StateGroup>
         </Frame>
 
         <Frame type="Image" name="QualityGlow">
-            <Anchor side="Top" relative="$parent/NormalImage" pos="Min" offset="24"/>
-            <Anchor side="Left" relative="$parent/NormalImage" pos="Min" offset="24"/>
-            <Anchor side="Right" relative="$parent/NormalImage" pos="Max" offset="-24"/>
-            <Anchor side="Bottom" relative="$parent/NormalImage" pos="Max" offset="-25"/>
+            <Anchor side="Top" relative="$parent/NormalImage" pos="Min" offset="10"/>
+            <Anchor side="Left" relative="$parent/NormalImage" pos="Min" offset="10"/>
+            <Anchor side="Right" relative="$parent/NormalImage" pos="Max" offset="-10"/>
+            <Anchor side="Bottom" relative="$parent/NormalImage" pos="Max" offset="-10"/>
+            <Alpha val="0"/>
             <LayerCount val="2"/>
             <BlendMode val="Add"/>
             <RenderType val="HDR"/>
@@ -1040,47 +1098,134 @@
             <AlphaLayer val="True" layer="0"/>
             <WrapUV val="True" layer="0"/>
 
-            <Texture val="@UI/Storm_UI_Store_QualityGlow_Legendary" layer="1"/>
+            <ColorAdjustMode val="Colorize"/>
+            <AdjustmentColor val="c86400"/>
+
+            <Texture val="@UI/Storm_UI_Store_QualityGlow" layer="1"/>
             <TextureType val="Nineslice" layer="1"/>
             <WrapUV val="True" layer="1"/>
 
             <StateGroup name="QualityGlowVisibility">
                 <State name="Show">
-                    <When type="Property" frame="$ancestor[@type=StoreTileListItem]/GameContentFrame" Rarity="Legendary"/>
+                    <When type="Property" frame="$ancestor[@type=StoreTileListItem]/GameContentFrame" operator="NotEqual" Rarity="Common"/>
+                    <When type="Property" frame="$parent/GameContentFrame" IsValid="true"/>
                     <Action type="SetProperty" frame="$this" Visible="true"/>
                     <Action type="SetProperty" frame="$parent/QualityGlow2" Visible="true"/>
                 </State>
             </StateGroup>
 
-            <Animation name="UVScroll">
-                <Event event="OnShown" action="Restart,Play" frame="$parent"/>
+            <Animation name="StartBackgroundAnim">
+                <Event event="OnShown" action="Reset, Play"/>
+
+                <Controller type="Event" end="Stop">
+                    <Key type="Event" time=".01" event="StartAnim"/>
+                </Controller>
+            </Animation>
+
+            <Animation name="OwnedAnim">
+                <Event event="StartAnim" action="Reset, Play"/>
+                <Event event="OnShown" action="Stop"/>
+
                 <Controller type="Fade" end="Loop">
                     <Key type="Curve" time="0" value="0" inout="Linear"/>
-                    <Key type="Curve" time="1" value="255" inout="Slow,Linear"/>
-                    <Key type="Curve" time="4" value="255" inout="Linear"/>
-                    <Key type="Curve" time="5" value="0" inout="Slow,Linear"/>
+                    <Key type="Curve" time="1" value="255" inout="Linear"/>
+                    <Key type="Curve" time="7" value="255" inout="Linear"/>
+                    <Key type="Curve" time="8" value="0" inout="Linear"/>
                 </Controller>
                 <Controller type="LayerUV" layer="0" side="Left" relative="False" sidelock="False" end="Loop" >
                     <Key type="Curve" time="0" value="-1" inout="Linear,linear"/>
-                    <Key type="Curve" time="5" value="0"  inout="linear,Linear"/>
+                    <Key type="Curve" time="8" value="0"  inout="linear,Linear"/>
                 </Controller>
                 <Controller type="LayerUV" layer="0" side="Right" relative="False" sidelock="False" end="Loop" >
                     <Key type="Curve" time="0" value="1" inout="Linear,linear"/>
-                    <Key type="Curve" time="5" value="0"  inout="linear,Linear"/>
+                    <Key type="Curve" time="8" value="0"  inout="linear,Linear"/>
                 </Controller>
                 <Controller type="LayerUV" layer="0" side="Top" relative="False" sidelock="False" end="Loop" >
                     <Key type="Curve" time="0" value="-1" inout="Linear,linear"/>
-                    <Key type="Curve" time="5" value="0"  inout="linear,Linear"/>
+                    <Key type="Curve" time="8" value="0"  inout="linear,Linear"/>
                 </Controller>
                 <Controller type="LayerUV" layer="0" side="Bottom" relative="False" sidelock="False" end="Loop" >
                     <Key type="Curve" time="0" value="1" inout="Linear,linear"/>
-                    <Key type="Curve" time="5" value="0"  inout="linear,Linear"/>
+                    <Key type="Curve" time="8" value="0"  inout="linear,Linear"/>
                 </Controller>
             </Animation>
+
+            <Animation name="UnOwnedAnim">
+                <Event event="StartAnim" action="Reset, Play"/>
+                <Event event="OnShown" action="Stop"/>
+
+                <Controller type="Fade" end="Loop">
+                    <Key type="Curve" time="0" value="0" inout="Linear"/>
+                    <Key type="Curve" time="1" value="200" inout="Linear"/>
+                    <Key type="Curve" time="7" value="200" inout="Linear"/>
+                    <Key type="Curve" time="8" value="0" inout="Linear"/>
+                </Controller>
+                <Controller type="LayerUV" layer="0" side="Left" relative="False" sidelock="False" end="Loop" >
+                    <Key type="Curve" time="0" value="-1" inout="Linear,linear"/>
+                    <Key type="Curve" time="8" value="0"  inout="linear,Linear"/>
+                </Controller>
+                <Controller type="LayerUV" layer="0" side="Right" relative="False" sidelock="False" end="Loop" >
+                    <Key type="Curve" time="0" value="1" inout="Linear,linear"/>
+                    <Key type="Curve" time="8" value="0"  inout="linear,Linear"/>
+                </Controller>
+                <Controller type="LayerUV" layer="0" side="Top" relative="False" sidelock="False" end="Loop" >
+                    <Key type="Curve" time="0" value="-1" inout="Linear,linear"/>
+                    <Key type="Curve" time="8" value="0"  inout="linear,Linear"/>
+                </Controller>
+                <Controller type="LayerUV" layer="0" side="Bottom" relative="False" sidelock="False" end="Loop" >
+                    <Key type="Curve" time="0" value="1" inout="Linear,linear"/>
+                    <Key type="Curve" time="8" value="0"  inout="linear,Linear"/>
+                </Controller>
+            </Animation>
+
+            <StateGroup name="ColorStates">
+                <State name="RareOwned">
+                    <When type="Property" frame="$parent/GameContentFrame" Rarity="Rare"/>
+                    <When type="Property" frame="$parent/GameContentFrame" IsOwned="true"/>
+                    <Action type="SetAnimationProperty" animation="OwnedAnim" enabled="true"/>
+                    <Action type="SetAnimationProperty" animation="UnOwnedAnim" enabled="false"/>
+                    <Action type="SetProperty" AdjustmentColor="#StoreTileListItem_EffectColor_Rare"/>
+                </State>
+                <State name="RareUnowned">
+                    <When type="Property" frame="$parent/GameContentFrame" Rarity="Rare"/>
+                    <When type="Property" frame="$parent/GameContentFrame" IsOwned="false"/>
+                    <Action type="SetAnimationProperty" animation="OwnedAnim" enabled="false"/>
+                    <Action type="SetAnimationProperty" animation="UnOwnedAnim" enabled="true"/>
+                    <Action type="SetProperty" AdjustmentColor="#StoreTileListItem_EffectColor_Rare"/>
+                </State>
+                <State name="EpicOwned">
+                    <When type="Property" frame="$parent/GameContentFrame" Rarity="Epic"/>
+                    <When type="Property" frame="$parent/GameContentFrame" IsOwned="true"/>
+                    <Action type="SetAnimationProperty" animation="OwnedAnim" enabled="true"/>
+                    <Action type="SetAnimationProperty" animation="UnOwnedAnim" enabled="false"/>
+                    <Action type="SetProperty" AdjustmentColor="#StoreTileListItem_EffectColor_Epic"/>
+                </State>
+                <State name="EpicUnowned">
+                    <When type="Property" frame="$parent/GameContentFrame" Rarity="Epic"/>
+                    <When type="Property" frame="$parent/GameContentFrame" IsOwned="false"/>
+                    <Action type="SetAnimationProperty" animation="OwnedAnim" enabled="false"/>
+                    <Action type="SetAnimationProperty" animation="UnOwnedAnim" enabled="true"/>
+                    <Action type="SetProperty" AdjustmentColor="#StoreTileListItem_EffectColor_Epic"/>
+                </State>
+                <State name="LegendaryOwned">
+                    <When type="Property" frame="$parent/GameContentFrame" Rarity="Legendary"/>
+                    <When type="Property" frame="$parent/GameContentFrame" IsOwned="true"/>
+                    <Action type="SetAnimationProperty" animation="OwnedAnim" enabled="true"/>
+                    <Action type="SetAnimationProperty" animation="UnOwnedAnim" enabled="false"/>
+                    <Action type="SetProperty" AdjustmentColor="#StoreTileListItem_EffectColor_Legendary"/>
+                </State>
+                <State name="LegendaryUnowned">
+                    <When type="Property" frame="$parent/GameContentFrame" Rarity="Legendary"/>
+                    <When type="Property" frame="$parent/GameContentFrame" IsOwned="false"/>
+                    <Action type="SetAnimationProperty" animation="OwnedAnim" enabled="false"/>
+                    <Action type="SetAnimationProperty" animation="UnOwnedAnim" enabled="true"/>
+                    <Action type="SetProperty" AdjustmentColor="#StoreTileListItem_EffectColor_Legendary"/>
+                </State>
+            </StateGroup>
         </Frame>
 
         <Frame type="Image" name="QualityGlow2">
-            <Anchor relative="$parent/QualityGlow" offset="0"/>
+            <Anchor relative="$parent/QualityGlow"/>
             <LayerCount val="2"/>
             <BlendMode val="Add"/>
             <Alpha val="0"/>
@@ -1092,51 +1237,129 @@
             <AlphaLayer val="True" layer="0"/>
             <WrapUV val="True" layer="0"/>
 
-            <Texture val="@UI/Storm_UI_Store_QualityGlow_Legendary" layer="1"/>
+            <ColorAdjustMode val="Colorize"/>
+            <AdjustmentColor val="c86400"/>
+
+            <Texture val="@UI/Storm_UI_Store_QualityGlow" layer="1"/>
             <TextureType val="Nineslice" layer="1"/>
             <WrapUV val="True" layer="1"/>
 
-            <Animation name="Trigger">
-                <Event event="OnShown" action="Restart,Play" frame="$parent"/>
+            <Animation name="StartBackgroundAnim">
+                <Event event="OnShown" action="Reset, Play"/>
+
                 <Controller type="Event" end="Stop">
-                    <Key type="Event" time="2.5" event="Trigger"/>
+                    <Key type="Event" time="4" event="StartAnim"/>
                 </Controller>
             </Animation>
 
-            <Animation name="UVScroll">
-                <Event event="Trigger" action="Restart,Play"/>
+            <Animation name="OwnedAnim">
+                <Event event="StartAnim" action="Reset, Play"/>
+                <Event event="OnShown" action="Stop"/>
+
                 <Controller type="Fade" end="Loop">
                     <Key type="Curve" time="0" value="0" inout="Linear"/>
-                    <Key type="Curve" time="1" value="255" inout="Slow,Linear"/>
-                    <Key type="Curve" time="4" value="255" inout="Linear"/>
-                    <Key type="Curve" time="5" value="0" inout="Slow,Linear"/>
-                </Controller>
-                <Controller type="LayerUV" layer="0" side="Left" relative="False" sidelock="False" end="Loop" >
-                    <Key type="Curve" time="0" value="-1" inout="Linear,linear"/>
-                    <Key type="Curve" time="5" value="0"  inout="linear,Linear"/>
-                </Controller>
-                <Controller type="LayerUV" layer="0" side="Right" relative="False" sidelock="False" end="Loop" >
-
-                    <Key type="Curve" time="0" value="1" inout="Linear,linear"/>
-                    <Key type="Curve" time="5" value="0"  inout="linear,Linear"/>
+                    <Key type="Curve" time="1" value="255" inout="Linear"/>
+                    <Key type="Curve" time="7" value="255" inout="Linear"/>
+                    <Key type="Curve" time="8" value="0" inout="Linear"/>
                 </Controller>
                 <Controller type="LayerUV" layer="0" side="Top" relative="False" sidelock="False" end="Loop" >
                     <Key type="Curve" time="0" value="-1" inout="Linear,linear"/>
-                    <Key type="Curve" time="5" value="0"  inout="linear,Linear"/>
+                    <Key type="Curve" time="8" value="0"  inout="linear,Linear"/>
+                </Controller>
+                <Controller type="LayerUV" layer="0" side="Left" relative="False" sidelock="False" end="Loop" >
+                    <Key type="Curve" time="0" value="-1" inout="Linear,linear"/>
+                    <Key type="Curve" time="8" value="0"  inout="linear,Linear"/>
+                </Controller>
+                <Controller type="LayerUV" layer="0" side="Right" relative="False" sidelock="False" end="Loop" >
+                    <Key type="Curve" time="0" value="1" inout="Linear,linear"/>
+                    <Key type="Curve" time="8" value="0"  inout="linear,Linear"/>
                 </Controller>
                 <Controller type="LayerUV" layer="0" side="Bottom" relative="False" sidelock="False" end="Loop" >
                     <Key type="Curve" time="0" value="1" inout="Linear,linear"/>
-                    <Key type="Curve" time="5" value="0"  inout="linear,Linear"/>
+                    <Key type="Curve" time="8" value="0"  inout="linear,Linear"/>
                 </Controller>
             </Animation>
+
+            <Animation name="UnOwnedAnim">
+                <Event event="StartAnim" action="Reset, Play"/>
+                <Event event="OnShown" action="Stop"/>
+
+                <Controller type="Fade" end="Loop">
+                    <Key type="Curve" time="0" value="0" inout="Linear"/>
+                    <Key type="Curve" time="1" value="200" inout="Linear"/>
+                    <Key type="Curve" time="7" value="200" inout="Linear"/>
+                    <Key type="Curve" time="8" value="0" inout="Linear"/>
+                </Controller>
+                <Controller type="LayerUV" layer="0" side="Top" relative="False" sidelock="False" end="Loop" >
+                    <Key type="Curve" time="0" value="-1" inout="Linear,linear"/>
+                    <Key type="Curve" time="8" value="0"  inout="linear,Linear"/>
+                </Controller>
+                <Controller type="LayerUV" layer="0" side="Left" relative="False" sidelock="False" end="Loop" >
+                    <Key type="Curve" time="0" value="-1" inout="Linear,linear"/>
+                    <Key type="Curve" time="8" value="0"  inout="linear,Linear"/>
+                </Controller>
+                <Controller type="LayerUV" layer="0" side="Right" relative="False" sidelock="False" end="Loop" >
+                    <Key type="Curve" time="0" value="1" inout="Linear,linear"/>
+                    <Key type="Curve" time="8" value="0"  inout="linear,Linear"/>
+                </Controller>
+                <Controller type="LayerUV" layer="0" side="Bottom" relative="False" sidelock="False" end="Loop" >
+                    <Key type="Curve" time="0" value="1" inout="Linear,linear"/>
+                    <Key type="Curve" time="8" value="0"  inout="linear,Linear"/>
+                </Controller>
+            </Animation>
+
+            <StateGroup name="ColorStates">
+                <State name="RareOwned">
+                    <When type="Property" frame="$parent/GameContentFrame" Rarity="Rare"/>
+                    <When type="Property" frame="$parent/GameContentFrame" IsOwned="true"/>
+                    <Action type="SetAnimationProperty" animation="OwnedAnim" enabled="true"/>
+                    <Action type="SetAnimationProperty" animation="UnOwnedAnim" enabled="false"/>
+                    <Action type="SetProperty" AdjustmentColor="#StoreTileListItem_EffectColor_Rare"/>
+                </State>
+                <State name="RareUnowned">
+                    <When type="Property" frame="$parent/GameContentFrame" Rarity="Rare"/>
+                    <When type="Property" frame="$parent/GameContentFrame" IsOwned="false"/>
+                    <Action type="SetAnimationProperty" animation="OwnedAnim" enabled="false"/>
+                    <Action type="SetAnimationProperty" animation="UnOwnedAnim" enabled="true"/>
+                    <Action type="SetProperty" AdjustmentColor="#StoreTileListItem_EffectColor_Rare"/>
+                </State>
+                <State name="EpicOwned">
+                    <When type="Property" frame="$parent/GameContentFrame" Rarity="Epic"/>
+                    <When type="Property" frame="$parent/GameContentFrame" IsOwned="true"/>
+                    <Action type="SetAnimationProperty" animation="OwnedAnim" enabled="true"/>
+                    <Action type="SetAnimationProperty" animation="UnOwnedAnim" enabled="false"/>
+                    <Action type="SetProperty" AdjustmentColor="#StoreTileListItem_EffectColor_Epic"/>
+                </State>
+                <State name="EpicUnowned">
+                    <When type="Property" frame="$parent/GameContentFrame" Rarity="Epic"/>
+                    <When type="Property" frame="$parent/GameContentFrame" IsOwned="false"/>
+                    <Action type="SetAnimationProperty" animation="OwnedAnim" enabled="false"/>
+                    <Action type="SetAnimationProperty" animation="UnOwnedAnim" enabled="true"/>
+                    <Action type="SetProperty" AdjustmentColor="#StoreTileListItem_EffectColor_Epic"/>
+                </State>
+                <State name="LegendaryOwned">
+                    <When type="Property" frame="$parent/GameContentFrame" Rarity="Legendary"/>
+                    <When type="Property" frame="$parent/GameContentFrame" IsOwned="true"/>
+                    <Action type="SetAnimationProperty" animation="OwnedAnim" enabled="true"/>
+                    <Action type="SetAnimationProperty" animation="UnOwnedAnim" enabled="false"/>
+                    <Action type="SetProperty" AdjustmentColor="#StoreTileListItem_EffectColor_Legendary"/>
+                </State>
+                <State name="LegendaryUnowned">
+                    <When type="Property" frame="$parent/GameContentFrame" Rarity="Legendary"/>
+                    <When type="Property" frame="$parent/GameContentFrame" IsOwned="false"/>
+                    <Action type="SetAnimationProperty" animation="OwnedAnim" enabled="false"/>
+                    <Action type="SetAnimationProperty" animation="UnOwnedAnim" enabled="true"/>
+                    <Action type="SetProperty" AdjustmentColor="#StoreTileListItem_EffectColor_Legendary"/>
+                </State>
+            </StateGroup>
         </Frame>
 
         <!-- Filter is set based on the tile size. BigTile / SmallTile -->
         <Frame type="HeroCutsceneFrame" name="PortraitCutscene">
-            <Anchor side="Top" relative="$parent/CutsceneCoverImage" pos="Min" offset="0"/>
-            <Anchor side="Left" relative="$parent/CutsceneCoverImage" pos="Min" offset="0"/>
-            <Anchor side="Right" relative="$parent/CutsceneCoverImage" pos="Max" offset="0"/>
-            <Anchor side="Bottom" relative="$parent/CutsceneCoverImage" pos="Max" offset="0"/>
+            <Anchor side="Top" relative="$parent" pos="Min" offset="4"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="4"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="-4"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="-4"/>
 
             <Unclipped val="False"/>
             <RenderType val="HDR"/>
@@ -1179,10 +1402,15 @@
             </Animation>
         </Frame>
 
-        <Frame type="Image" name="CutsceneCoverImage">
-            <Anchor side="Top" relative="$parent" pos="Min" offset="9"/>
-            <Anchor side="Left" relative="$parent" pos="Min" offset="8"/>
-            <Texture val="@UI/Storm_UI_Store_SmallFrame_Top"/>
+        <Frame type="Image" name="Vignette">
+            <Anchor side="Left" relative="$parent" pos="Min" offset="7"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="-6"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="-7"/>
+            <Texture val="@UI/Storm_UI_Store_Tile_SmallFrame_Vignette"/>
+            <Alpha val="255"/>
+            <Tiled val="True"/>
+            <Height val="172"/>
+            <RenderType val="LDR"/>
         </Frame>
 
         <Frame type="Frame" name="IconAnchor">
@@ -1202,7 +1430,7 @@
         </Frame>
 
         <Frame type="Frame" name="BundleIconContainer">
-            <Anchor side="Bottom" relative="$parent" pos="Max" offset="-15"/>
+            <Anchor side="Bottom" relative="$parent/InfoFrame" pos="Max" offset="0"/>
             <Anchor side="Left" relative="$parent/BadgeOffsetAnchor" pos="Max" offset="0"/>
             <Width val="#StoreSmallTileIconContainerWidth"/>
             <Height val="44"/>
@@ -1231,92 +1459,10 @@
             </Frame>
         </Frame>
 
-        <Frame type="HeroContainerFrame" name="HeroContainerFrame">
-            <Anchor side="Bottom" relative="$parent" pos="Max" offset="-2"/>
-            <Anchor side="Left" relative="$parent/BundleIconContainer" pos="Max" offset="0"/>
-            <Width val="#StoreSmallTileIconContainerWidth"/>
-            <Height val="80"/>
-            <CollapseLayout val="True"/>
-            <PreserveAnchorOffset val="False"/>
-            <Hero val="{$parent/GameContentFrame/@HeroLink}"/>
-
-            <Frame type="HeroImage" name="UniverseIcon">
-                <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
-                <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
-                <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
-                <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
-                <Height val="80"/>
-                <Width val="79"/>
-                <HeroImageType val="UniverseIcon"/>
-                <Visible val="True"/>
-                <SubpixelRendering val="True"/>
-            </Frame>
-
-            <StateGroup name="ShouldMoveUp">
-                <DefaultState val="MoveDown"/>
-                <State name="MoveUp1">
-                    <When type="Property" frame="$parent" hovered="true"/>
-                    <When type="Property" frame="$parent/BuyButton0" Visible="true"/>
-                    <Action type="SendEvent" event="MoveUp"/>
-                </State>
-                <State name="MoveUp2">
-                    <When type="Property" frame="$parent/BuyButton0" hovering="true"/>
-                    <When type="Property" frame="$parent/BuyButton0" Visible="true"/>
-                    <Action type="SendEvent" event="MoveUp"/>
-                </State>
-                <State name="MoveUp3">
-                    <When type="Property" frame="$parent/BuyButton1" hovering="true"/>
-                    <When type="Property" frame="$parent/BuyButton0" Visible="true"/>
-                    <Action type="SendEvent" event="MoveUp"/>
-                </State>
-                <State name="MoveDown">
-                    <Action type="SendEvent" event="MoveDown"/>
-                </State>
-            </StateGroup>
-
-            <StateGroup name="HeroContainerVisibility">
-                <DefaultState val="HeroContainerHidden"/>
-
-                <State name="GameContentIsHero">
-                    <When type="Property" frame="$parent/GameContentFrame" ContentType="Hero"/>
-                    <Action type="SetProperty" Visible="true"/>
-                </State>
-
-                <State name="HeroContainerHidden">
-                    <Action type="SetProperty" Visible="false"/>
-                </State>
-            </StateGroup>
-
-            <Animation name="BuyButtonsShown">
-                <Event event="MoveUp" action="DirectionForward, Play"/>
-                <Event event="MoveDown" action="DirectionReverse, Play"/>
-
-                <Controller type="Anchor" side="Bottom" end="Pause">
-                    <Key type="Curve" time="0" value="0" inout="Linear"/>
-                    <Key type="Curve" time=".15" value="-34"/>
-                </Controller>
-            </Animation>
-        </Frame>
-
         <Frame type="BuyButton" name="BuyButton0" template="StoreTemplates/QuickBuyButtonTemplate">
             <Anchor side="Left" relative="$parent" pos="Min" offset="-4"/>
-            <Anchor side="Bottom" relative="$parent" pos="Max" offset="-35"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="5"/>
             <PositionHint val="QuickBuy"/>
-
-            <Animation name="ShowButton">
-                <Event event="MouseOver" action="DirectionForward, Play" frame="$parent"/>
-                <Event event="MouseOut" action="DirectionReverse, Play" frame="$parent"/>
-
-                <Controller type="Anchor" side="Bottom" end="Pause">
-                    <Key type="Curve" time="0" value="80" inout="Linear"/>
-                    <Key type="Curve" time=".15" value="40" inout="Linear"/>
-                </Controller>
-                <Controller type="Fade" end="Pause">
-                    <Key type="Curve" time="0" value="0"/>
-                    <Key type="Curve" time=".05" value="0"/>
-                    <Key type="Curve" time=".15" value="255"/>
-                </Controller>
-            </Animation>
 
             <Frame type="Image" name="ShineImage">
                 <Animation name="ShineAnim">
@@ -1335,29 +1481,12 @@
                     <When type="Property" currency="USD"/>
                 </State>
             </StateGroup>
-            <StateGroup name="ShowButtonAnimStates">
-                <State name="DisableForVoiceLine">
-                    <When type="Property" frame="$parent/GameContentFrame" ContentType="VoiceLine"/>
-                    <Action type="SetAnimationProperty" animation="ShowButton" enabled="false"/>
-                </State>
-            </StateGroup>
         </Frame>
 
         <Frame type="BuyButton" name="BuyButton1" template="StoreTemplates/QuickBuyButtonTemplate">
             <Anchor side="Left" relative="$parent/BuyButton0" pos="Max" offset="-37"/>
             <Anchor side="Bottom" relative="$parent/BuyButton0" pos="Max" offset="0"/>
             <PositionHint val="QuickBuy"/>
-
-            <Animation name="ShowButton">
-                <Event event="MouseOver" action="DirectionForward, Play" frame="$parent"/>
-                <Event event="MouseOut" action="DirectionReverse, Play" frame="$parent"/>
-
-                <Controller type="Fade" end="Pause">
-                    <Key type="Curve" time="0" value="0"/>
-                    <Key type="Curve" time=".05" value="0"/>
-                    <Key type="Curve" time=".15" value="255"/>
-                </Controller>
-            </Animation>
 
             <Frame type="Image" name="ShineImage">
                 <Animation name="ShineAnim">
@@ -1375,6 +1504,55 @@
                     <When type="Property" frame="$parent/DiscountIndicatorImage" visible="True"/>
                     <!-- TODO: Change to XHC once prices are converted to gems in PMT -->
                     <When type="Property" currency="USD"/>
+                </State>
+            </StateGroup>
+        </Frame>
+
+        <Frame type="Button" name="BundleBuyButton" template="StandardTemplates/StandardButtonMiniTemplate">
+            <Anchor side="Left" relative="$parent" pos="Min" offset="-4"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="5"/>
+            <AcceptsMouse val="false"/>
+            <Width val="157"/>
+            <Height val="74"/>
+            <Visible val="false"/>
+            <ClickSound val="@UI_BNet_PageSelect"/>
+
+            <Frame type="Image" name="ShineImage">
+                <Anchor relative="$parent"/>
+                <BlendMode val="Add"/>
+                <LayerCount val="2"/>
+                <Texture val="@UI/Storm_UI_Glues_Draft_Portrait_Selecting_Glow_Mask" layer="0"/>
+                <AlphaLayer val="True" layer="0"/>
+                <Texture val="@UI/Storm_standardButtonMini_Blue_Normal" layer="1"/>
+                <TextureType val="Nineslice" layer="1"/>
+
+                <Animation name="ShineAnim">
+                    <Event event="OnShown" action="DirectionForward, Play"/>
+
+                    <Controller type="LayerUV" side="Left" sidelock="true" end="Loop" layer="0">
+                        <Key type="Curve" time="0" value="1"/>
+                        <Key type="Curve" time=".35" value="-1"/>
+                        <Key type="Curve" time="15" value="-1"/>
+                    </Controller>
+                </Animation>
+
+                <StateGroup name="VisibilityStates">
+                    <State name="ButtonDisabled">
+                        <When type="Property" frame="$parent" Enabled="false"/>
+                        <Action type="SetProperty" Visible="false"/>
+                    </State>
+                </StateGroup>
+            </Frame>
+
+            <Frame type="Label" name="Label">
+                <Text val="@UI/Buy"/>
+            </Frame>
+
+            <StateGroup name="BundleBuyButtonVisibilityStates">
+                <State name="ShowButton">
+                    <When type="Property" frame="$parent/GameContentFrame" ContentType="Bundle"/>
+                    <When type="Property" frame="$parent/GameContentFrame" IsOwned="false"/>
+                    <Action type="SetProperty" Visible="true"/>
                 </State>
             </StateGroup>
         </Frame>
@@ -1397,7 +1575,7 @@
 
         <Frame type="Frame" name="InfoFrame">
             <Anchor side="Top" relative="$parent" pos="Min" offset="100"/>
-            <Anchor side="Left" relative="$parent/HeroContainerFrame" pos="Max" offset="5"/>
+            <Anchor side="Left" relative="$parent/BundleIconContainer" pos="Max" offset="5"/>
             <Anchor side="Right" relative="$parent" pos="Max" offset="-15"/>
             <Anchor side="Bottom" relative="$parent" pos="Max" offset="-16"/>
 
@@ -1405,6 +1583,7 @@
                 <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
                 <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
                 <Anchor side="Bottom" relative="$parent/DescriptionLabel" pos="Min" offset="3"/>
+                <Options val="ScaleToPreventTruncation"/>
                 <Style val="StoreItemNameLabel"/>
                 <Text val="{$parent/$parent/GameContentFrame/@StoreName}"/>
             </Frame>
@@ -1421,6 +1600,7 @@
                 <StateGroup name="OwnedLabel">
                     <State name="BaseSkin">
                         <When type="Property" frame="$parent/$parent/GameContentFrame" IsBaseSkinVariation="true"/>
+                        <When type="Property" frame="$parent/$parent/GameContentFrame" IsOwned="false"/>
                         <Action type="SetProperty" Text="@UI/ScreenStore/SkinBaseSkin"/>
                     </State>
                     <State name="ProductOwned">
@@ -1465,58 +1645,26 @@
                 </State>
             </StateGroup>
 
-            <StateGroup name="ShouldMoveUp">
-                <State name="Ignore">
-                    <When type="Property" frame="$parent/GameContentFrame" ContentType="VoiceLine"/>
+            <StateGroup name="OwnedUnOwnedStates">
+                <State name="UnOwned">
+                    <When type="Property" frame="$parent/GameContentFrame" IsOwned="false"/>
+                    <When type="Property" frame="$parent/GameContentFrame" CanPurchase="true"/>
+                    <When type="Property" frame="$parent/GameContentFrame" IsBaseSkinVariation="false"/>
+                    <Action type="SetAnchor" side="Bottom" relative="$parent" pos="Max" offset="-50"/>
                 </State>
-                <DefaultState val="MoveDown"/>
-                <State name="MoveUp1">
-                    <When type="Property" frame="$parent" hovered="true"/>
-                    <When type="Property" frame="$parent/BuyButton0" Visible="true"/>
-                    <When type="Property" frame="$parent/GameContentFrame" operator="NotEqual" ContentType="VoiceLine"/>
-                    <Action type="SendEvent" event="MoveUp"/>
-                </State>
-                <State name="MoveUp2">
-                    <When type="Property" frame="$parent/BuyButton0" hovering="true"/>
-                    <When type="Property" frame="$parent/BuyButton0" Visible="true"/>
-                    <When type="Property" frame="$parent/GameContentFrame" operator="NotEqual" ContentType="VoiceLine"/>
-                    <Action type="SendEvent" event="MoveUp"/>
-                </State>
-                <State name="MoveUp3">
-                    <When type="Property" frame="$parent/BuyButton1" hovering="true"/>
-                    <When type="Property" frame="$parent/BuyButton0" Visible="true"/>
-                    <When type="Property" frame="$parent/GameContentFrame" operator="NotEqual" ContentType="VoiceLine"/>
-                    <Action type="SendEvent" event="MoveUp"/>
-                </State>
-                <State name="MoveUp4">
-                    <When type="Property" frame="$parent/PreviewButton" hovering="true"/>
-                    <When type="Property" frame="$parent/BuyButton0" Visible="true"/>
-                    <When type="Property" frame="$parent/GameContentFrame" operator="NotEqual" ContentType="VoiceLine"/>
-                    <Action type="SendEvent" event="MoveUp"/>
-                </State>
-                <State name="MoveDown">
-                    <When type="Property" frame="$parent/GameContentFrame" operator="NotEqual" ContentType="VoiceLine"/>
-                    <Action type="SendEvent" event="MoveDown"/>
+                <State name="Owned">
+                    <When type="Property" frame="$parent/GameContentFrame" IsOwned="true"/>
+                    <Action type="SetAnchor" side="Bottom" relative="$parent" pos="Max" offset="-16"/>
                 </State>
             </StateGroup>
-
-            <Animation name="BuyButtonsShown">
-                <Event event="MoveUp" action="DirectionForward, Play"/>
-                <Event event="MoveDown" action="DirectionReverse, Play"/>
-
-                <Controller type="Anchor" side="Bottom" end="Pause">
-                    <Key type="Curve" time="0" value="0" inout="Linear"/>
-                    <Key type="Curve" time=".15" value="-34"/>
-                </Controller>
-            </Animation>
         </Frame>
 
         <Frame type="Frame" name="UnseenItemFrame">
-            <Anchor side="Top" relative="$parent" pos="Min" offset="-19"/>
-            <Anchor side="Left" relative="$parent" pos="Min" offset="-19"/>
-            <Anchor side="Right" relative="$parent" pos="Max" offset="19"/>
-            <Anchor side="Bottom" relative="$parent" pos="Max" offset="19"/>
-            <RenderPriority val="400"/>
+            <Anchor side="Top" relative="$parent" pos="Min" offset="-16"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="-16"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="16"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="16"/>
+            <RenderPriority val="569"/>
             <Unclipped val="True"/>
             <Visible val="False"/>
 
@@ -1530,6 +1678,7 @@
                 <ColorAdjustMode val="Colorize"/>
                 <LightAdjustColor val="47e3ff"/>
                 <DarkAdjustColor val="002aff"/>
+                <RenderType val="LDR"/>
 
                 <Texture val="@UI/Storm_UI_Store_SmallFrameShineMask" layer="0"/>
                 <TextureCoords top="0" left="0" right="1" bottom="1" layer="0"/>
@@ -1577,6 +1726,7 @@
                 <ColorAdjustMode val="Colorize"/>
                 <LightAdjustColor val="47e3ff"/>
                 <DarkAdjustColor val="002aff"/>
+                <RenderType val="LDR"/>
 
                 <Texture val="@UI/Storm_UI_Store_SmallFrameShineMask" layer="0"/>
                 <TextureCoords top="0" left="0" right="1" bottom="1" layer="0"/>
@@ -1620,6 +1770,7 @@
                 <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
                 <Anchor side="Bottom" relative="$parent" pos="Max" offset="-2"/>
                 <BlendMode val="Add"/>
+                <RenderType val="LDR"/>
                 <ColorAdjustMode val="Colorize"/>
                 <LightAdjustColor val="47e3ff"/>
                 <DarkAdjustColor val="002aff"/>
@@ -1656,6 +1807,7 @@
                 <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
                 <Anchor side="Bottom" relative="$parent" pos="Max" offset="-2"/>
                 <BlendMode val="Add"/>
+                <RenderType val="LDR"/>
                 <ColorAdjustMode val="Colorize"/>
                 <LightAdjustColor val="47e3ff"/>
                 <DarkAdjustColor val="002aff"/>
@@ -1693,11 +1845,8 @@
                 <Anchor side="Right" relative="$parent/$parent/NormalImage" pos="Max" offset="0"/>
                 <Anchor side="Bottom" relative="$parent/$parent/NormalImage" pos="Max" offset="0"/>
                 <TextureType val="Nineslice"/>
-                <BlendMode val="Add"/>
-                <ColorAdjustMode val="Colorize"/>
-                <LightAdjustColor val="47e3ff"/>
-                <DarkAdjustColor val="002aff"/>
-                <Texture val="@UI/Storm_UI_Store_SmallFrameGlow"/>
+                <RenderType val="LDR"/>
+                <Texture val="@UI/Storm_UI_Store_SmallFrame_NewItem_Glow"/>
             </Frame>
 
             <StateGroup name="UnseenStates">
@@ -1738,7 +1887,7 @@
             <Replacement val="{$parent/GameContentFrame/@Description}" index="0"/>
         </Frame>
 
-        <Frame type="Image" name="OwnedCheckImage">
+        <!-- <Frame type="Image" name="OwnedCheckImage">
             <Anchor side="Top" relative="$parent" pos="Min" offset="1"/>
             <Anchor side="Right" relative="$parent" pos="Max" offset="5"/>
             <Texture val="@UI/Storm_UI_Store_OwnedCheck"/>
@@ -1764,7 +1913,7 @@
                     <Action type="SetProperty" frame="UnseenCheckImage" Visible="true"/>
                 </State>
             </StateGroup>
-        </Frame>
+        </Frame> -->
 
         <Frame type="Image" name="NewBadgeImage">
             <Anchor side="Top" relative="$parent" pos="Min" offset="15"/>
@@ -1776,6 +1925,32 @@
             <AcceptsMouseTooltip val="True"/>
             <Tooltip val="@UI/Store/DescriptionFormat/New"/>
             <TooltipAnchorPosition val="TopCenter"/>
+
+            <Frame type="Image" name="NewBadgeShineImage">
+                <Anchor relative="$parent"/>
+                <BlendMode val="Add"/>
+                <LayerCount val="2"/>
+                <Alpha val="170"/>
+
+                <Texture val="@UI/Storm_UI_Store_NewBadge" layer="0"/>
+                <TextureType val="Normal" layer="0"/>
+                <AlphaLayer val="true" layer="0"/>
+
+                <Texture val="@UI/Storm_UI_Store_NewBadgeShimmer" layer="1"/>
+                <TextureCoords top="0" left="0" bottom="1" right="1" layer="1"/>
+
+                <Animation name="Shimmer">
+                    <Event event="OnShown" action="DirectionForward"/>
+                    <Event event="OnShown" action="Play"/>
+
+                    <Controller type="LayerUV" layer="1" side="Left" relative="False" sidelock="True" end="Loop" >
+                        <Key type="Curve" time="0" value="1" inout="linear,fast"/>
+                        <Key type="Curve" time="2" value="1" inout="linear,fast"/>
+                        <Key type="Curve" time="2.30" value="-1" inout="fast,linear"/>
+                        <Key type="Curve" time="9" value="-1" inout="fast,linear"/>
+                    </Controller>
+                </Animation>
+            </Frame>
         </Frame>
 
         <Frame type="Image" name="FreePlayImage">
@@ -1868,19 +2043,24 @@
                 <Anchor relative="$parent"/>
                 <BlendMode val="Add"/>
                 <LayerCount val="2"/>
-                <Texture val="@UI/Storm_UI_Glues_Draft_Portrait_Selecting_Glow_Mask" layer="0"/>
-                <AlphaLayer val="True" layer="0"/>
-                <Texture val="@UI/Storm_UI_Store_BundleBadge_Normal" layer="1"/>
-                <TextureType val="Nineslice" layer="1"/>
+                <Alpha val="170"/>
 
-                <Animation name="ShineAnim">
-                    <Event event="OnShown" action="DirectionForward, Play"/>
+                <Texture val="@UI/Storm_UI_Store_BundleBadge_Normal" layer="0"/>
+                <TextureType val="Nineslice" layer="0"/>
+                <AlphaLayer val="true" layer="0"/>
 
-                    <Controller type="LayerUV" side="Left" sidelock="True" end="Loop" layer="0">
-                        <Key type="Curve" time="0" value="1"/>
-                        <Key type="Curve" time="5.1" value="1"/>
-                        <Key type="Curve" time="5.6" value="-1" inout="Slow,Linear"/>
-                        <Key type="Curve" time="20" value="-1" inout="Slow,Linear"/>
+                <Texture val="@UI/Storm_UI_Store_NewBadgeShimmer" layer="1"/>
+                <TextureCoords top="0" left="0" bottom="1" right="1" layer="1"/>
+
+                <Animation name="Shimmer">
+                    <Event event="OnShown" action="DirectionForward"/>
+                    <Event event="OnShown" action="Play"/>
+
+                    <Controller type="LayerUV" layer="1" side="Left" relative="False" sidelock="True" end="Loop" >
+                        <Key type="Curve" time="0" value="1" inout="linear,fast"/>
+                        <Key type="Curve" time="2" value="1" inout="linear,fast"/>
+                        <Key type="Curve" time="2.30" value="-1" inout="fast,linear"/>
+                        <Key type="Curve" time="9" value="-1" inout="fast,linear"/>
                     </Controller>
                 </Animation>
             </Frame>
@@ -1952,31 +2132,38 @@
         <Height val="737"/>
 
         <Frame type="Image" name="EmptyImage">
-            <Texture val="@UI/Storm_UI_Store_LargeFrame_Off"/>
+            <Texture val="@UI/Storm_UI_Store_SmallFrame_Off"/>
         </Frame>
 
         <Frame type="Image" name="NormalImage">
-            <Texture val="@UI/Storm_UI_Store_LargeFrame_Off"/>
+            <Texture val="@UI/Storm_UI_Store_SmallFrame_Off"/>
         </Frame>
 
         <Frame type="Image" name="HoverImage">
-            <Texture val="@UI/Storm_UI_Store_LargeFrame_Off"/>
+            <Texture val="@UI/Storm_UI_Store_SmallFrame_Off"/>
         </Frame>
 
         <Frame type="Image" name="HoverFrameImage">
-            <Texture val="@UI/Storm_UI_Store_LargeFrame_Off"/>
+            <Texture val="@UI/Storm_UI_Store_SmallFrame_Off_Hover"/>
         </Frame>
 
         <Frame type="Frame" name="IconAnchor">
             <Width val="20"/>
         </Frame>
+        
+        <Frame type="Frame" name="BackgroundFrame">
+            <Frame type="Image" name="BackgroundPattern">
+                <Alpha val="120"/>
+                <Texture val="@UI/Storm_UI_Store_GemDialog_trianglepattern" layer="1"/>
+                
+                <Animation name="UVScroll">
+                    <Event event="OnShown" action="DirectionForward, Play"/>
 
-        <Frame type="HeroContainerFrame" name="HeroContainerFrame">
-            <Width val="#StoreBigTileIconContainerWidth"/>
-            <Height val="110"/>
-            <Frame type="HeroImage" name="UniverseIcon">
-                <Height val="155"/>
-                <Width val="153"/>
+                    <Controller type="LayerUV" side="Top" sidelock="true" layer="1" end="Loop">
+                        <Key type="Curve" time="0" value="0"/>
+                        <Key type="Curve" time="18" value="1"/>
+                    </Controller>
+                </Animation>
             </Frame>
         </Frame>
 
@@ -1997,16 +2184,11 @@
         </Frame>
 
         <Frame type="HeroCutsceneFrame" name="PortraitCutscene">
-            <Anchor relative="$parent/CutsceneCoverImage"/>
-            <HeroCutsceneType val="ShopTileBig"/>
-        </Frame>
-
-        <Frame type="Image" name="CutsceneCoverImage">
             <Anchor side="Top" relative="$parent" pos="Min" offset="8"/>
             <Anchor side="Left" relative="$parent" pos="Min" offset="8"/>
             <Anchor side="Bottom" relative="$parent" pos="Max" offset="-8"/>
             <Anchor side="Right" relative="$parent" pos="Max" offset="-8"/>
-            <Texture val="@UI/Storm_UI_Store_SmallFrame_Top"/>
+            <HeroCutsceneType val="ShopTileBig"/>
         </Frame>
 
         <!-- <Frame type="Frame" name="NewIconImageContainer">
@@ -2024,7 +2206,7 @@
 
         <Frame type="Frame" name="InfoFrame">
             <Anchor side="Bottom" relative="$parent" pos="Max" offset="-22"/>
-            <Anchor side="Left" relative="$parent/HeroContainerFrame" pos="Max" offset="12"/>
+            <Anchor side="Left" relative="$parent/BundleIconContainer" pos="Max" offset="12"/>
 
             <Frame type="Label" name="NameLabel">
                 <Anchor side="Bottom" relative="$parent/DescriptionLabel" pos="Min" offset="4"/>
@@ -2609,14 +2791,14 @@
             <Anchor side="Bottom" relative="$parent/Background" pos="Mid" offset="0"/>
             <Anchor side="Left" relative="$parent/MountRewardImage" pos="Max" offset="-50"/>
             <Anchor side="Right" relative="$parent/Background" pos="Max" offset="-25"/>
-            <Text val="@UI/ProductPurchase/PurchaseRewardCelestialHorse"/>
+            <Text val="@UI/ProductPurchase/PurchaseRewardCelestialRaptor"/>
             <Style val="PurchaseFlowAside"/>
         </Frame>
 
         <Frame type="Image" name="MountRewardImage">
-            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Top" relative="$parent" pos="Min" offset="-18"/>
             <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
-            <Texture val="@UI/Storm_UI_Promotional_Fanfare_CelestialHorse"/>
+            <Texture val="@UI/Storm_UI_Promotional_Fanfare_CelestialRaptor"/>
             <Width val="284"/>
             <Height val="261"/>
         </Frame>

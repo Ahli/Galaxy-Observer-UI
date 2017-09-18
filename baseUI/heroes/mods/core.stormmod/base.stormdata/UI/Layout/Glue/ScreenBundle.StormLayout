@@ -439,7 +439,9 @@
         <Frame type="Label" name="NameLabel">
             <Anchor side="Top" relative="$parent" pos="Min" offset="152"/>
             <Anchor side="Left" relative="$parent/ItemCountIconImage" pos="Max" offset="20"/>
+            <Options val="NoWrapping|ScaleToPreventTruncation"/>
             <Height val="85"/>
+            <Width val="980"/>
             <Style val="StandardLargePageHeaderLabel"/>
             <Handle val="ScreenBundle_NameLabel"/>
         </Frame>
@@ -513,8 +515,35 @@
             <Frame type="Label" name="CountLabel">
                 <Anchor side="Top" relative="$parent/BundleCountHeaderLabel" pos="Max" offset="-5"/>
                 <Anchor side="Left" relative="$parent/BundleCountHeaderLabel" pos="Min" offset="0"/>
+                <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
                 <Style val="StoreBundleDescription"/>
             </Frame>
+
+            <Frame type="TextFormatFrame" name="NoItemsOwnedFormatFrame">
+                <Anchor relative="$parent/CountLabel"/>
+
+                <FormatText val="@UI/ScreenBundle/CountFormatNoItemsOwned"/>
+                <Replacement val="{$parent/$parent/@PurchasableCount}"/>
+            </Frame>
+
+            <Frame type="TextFormatFrame" name="ItemsOwnedFormatFrame">
+                <Anchor relative="$parent/CountLabel"/>
+
+                <FormatText val="@UI/ScreenBundle/CountFormatItemsOwned"/>
+                <Replacement val="{$parent/$parent/@OwnedCount}" index="0"/>
+                <Replacement val="{$parent/$parent/@PurchasableCount}" index="1"/>
+            </Frame>
+
+            <StateGroup name="OwnedItemStates">
+                <State name="NoItemsOwned">
+                    <When type="Property" frame="$parent" OwnedCount="0"/>
+                    <Action type="SetProperty" frame="CountLabel" Text="{$parent/NoItemsOwnedFormatFrame/@Text}"/>
+                </State>
+                <State name="ItemsOwned">
+                    <When type="Property" frame="$parent" operator="NotEqual" OwnedCount="0"/>
+                    <Action type="SetProperty" frame="CountLabel" Text="{$parent/ItemsOwnedFormatFrame/@Text}"/>
+                </State>
+            </StateGroup>
         </Frame>
 
         <Frame type="Frame" name="InvalidBundleFrame">

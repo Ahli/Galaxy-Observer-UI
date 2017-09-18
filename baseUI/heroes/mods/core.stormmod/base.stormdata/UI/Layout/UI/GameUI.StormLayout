@@ -123,8 +123,8 @@
 
             <Controller type="Fade" end="Stop">
                 <Key type="Curve" time="0" value="255"/>
-                <Key type="Curve" time=".4" value="255" out="Slow"/>
-                <Key type="Curve" time=".7" value="0" in="Fast"/>
+                <Key type="Curve" time=".4" value="255" inout="Linear,Slow"/>
+                <Key type="Curve" time=".7" value="0" inout="Fast,Linear"/>
             </Controller>
             <Controller type="Visibility" end="Pause">
                 <Key type="Bool" time=".7" value="false"/>
@@ -267,6 +267,10 @@
         <!-- <Frame type="Frame" name="SeasonalEventSplashPanel" template="StarCraftEventHelpPanel/StarCraftEventHelpPanelTemplate">
             <Anchor relative="$parent"/>
         </Frame> -->
+
+        <Frame type="Frame" name="SeasonalEventSplashPanel" template="OverwatchEventHelpPanel/OverwatchEventHelpPanelTemplate">
+            <Anchor relative="$parent"/>
+        </Frame>
         
         <Frame type="Image" name="OverlayImage">
             <TextureType val="Normal" layer="0"/>
@@ -662,6 +666,10 @@
                 <!-- <Frame type="Frame" name="SeasonalEventPanel" template="LunarNewYearRooster/LunarNewYearRoosterTemplate">
                     <Anchor relative="$parent"/>
                 </Frame> -->
+
+                <Frame type="Frame" name="SeasonalEventPanel" template="OverwatchEvent/OverwatchEventTemplate">
+                    <Anchor relative="$parent"/>
+                </Frame>
                 
                 <Frame type="Frame" name="MutatorPanel">
                     <Anchor relative="$parent"/>
@@ -1008,12 +1016,30 @@
             <Frame type="Frame" name="FullscreenUpperContainer">
                 <Anchor relative="$parent"/>
 
-                <Frame type="TalkerPanel" name="TalkerPanel" template="TalkerPanel/TalkerPanelTemplate">
-                    <Anchor side="Top" relative="$parent" pos="Min" offset="100"/>
-                    <Anchor side="Right" relative="$parent" pos="Max" offset="-10"/>
-                    <Height val="800"/>
-                    <Width val="375"/>
+                <!-- Voice Chat -->
+                <Frame type="BattleUserVoiceFrame" name="BattleUserVoiceFrame_PlayerMenu" template="BattleUserVoiceFrame/BattleUserVoiceFrame_PlayerMenu_Template" requiredtoload="IS_VOICECHAT_ENABLED">
+                    <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                    <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+                    <ChannelType val="{$VoiceChatUI/@ActiveChannelType}"/>
+                    <PresenceId val="{$BattleUI/@LocalToonPresenceId}"/>
+                    <Visible val="{$parent/HeroLeaderPanel/HeroLeaderPanelContainer/@Visible}"/>
                 </Frame>
+
+                <Frame type="TalkerPanel" name="TalkerPanel" template="TalkerPanel/TalkerPanel_Template" requiredtoload="IS_VOICECHAT_ENABLED">
+                    <Anchor side="Top" relative="$parent/BattleUserVoiceFrame_PlayerMenu" pos="Max" offset="-2"/>
+                    <Anchor side="Right" relative="$parent/BattleUserVoiceFrame_PlayerMenu" pos="Max" offset="0"/>
+                    <ChannelType val="{$VoiceChatUI/@ActiveChannelType}"/>
+
+                    <StateGroup name="ExcludeFilterFlagsStates">
+                        <DefaultState val="DefaultFlags"/>
+                        <State name="DefaultFlags"/>
+                        <State name="DisplaySelf">
+                            <When type="Property" frame="$parent/BattleUserVoiceFrame_PlayerMenu" visible="False"/>
+                            <Action type="SetProperty" ExcludeFilterFlags="NonSpeaking"/>
+                        </State>
+                    </StateGroup>
+                </Frame>
+
 
                 <Frame type="GameMessageDisplay" name="ObjectiveDisplay">
                     <MessageArea val="Objective"/>

@@ -1,0 +1,257 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<Desc>
+    
+    <Frame type="SelectionUnitStatusPanel" name="AnaShrikeStacksFrameContainer">
+        <Anchor relative="$parent"/>
+        <SpecificUnit val="HeroAna"/>
+
+        <Frame type="UnitStatusUnitStackingDebuffElement" name="AnaShrikeStacksFrame">
+            <Anchor relative="$parent"/>
+            <BuffBehavior val="AnaBasicAttackPoisonTrait"/>
+            <StackBehavior val="AnaBasicAttackPoisonTraitDotDamageToken"/>
+            <BehaviorStackOffset val="1"/>
+            <ShowForOwner val="False"/>
+            <ShowForBehaviorOwner val="True"/>
+
+            <Frame type="ProgressBar" name="AnaShrikeStacksProgressBar">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                <Width val="64"/>
+                <Height val="16"/>
+                <AcceptsMouse val="False"/>
+                <Visible val="True"/>
+                <MinValue val="0"/>
+                <MaxValue val="{$parent/@MaxValue}"/>
+                <Value val="{$parent/@CurrentValue}"/>
+                <Horizontal val="True"/>
+
+                <Frame type="Frame" name="FillImageContainer">
+                    <Anchor relative="$parent"/>
+                    <Visible val="True"/>
+
+                    <Frame type="Image" name="FillImage">
+                        <Anchor relative="$parent"/>
+                        <Visible val="True"/>
+                        <Alpha val="255"/>
+
+                        <Texture val="@UI/Storm_UI_HeroUI_Ana_PoisonStack"/>
+                    </Frame>
+                </Frame>
+            </Frame>
+
+            <Frame type="Image" name="AnaShrikeStacksFull">
+                <Anchor side="Top" relative="$parent/AnaShrikeStacksProgressBar" pos="Min" offset="-9"/>
+                <Anchor side="Left" relative="$parent/AnaShrikeStacksProgressBar" pos="Min" offset="-9"/>
+                <Width val="82"/>
+                <Height val="34"/>
+                <Alpha val="255"/>
+                <Visible val="False"/>
+                <Texture val="@UI/Storm_UI_HeroUI_Ana_PoisonStack_Full" layer="0"/>
+            </Frame>
+
+            <Frame type="UnitStatusValidatorAnimElement" name="AnaPoisonedDartsTargetMaxStacks">
+                <Validator val="AnaPoisonedDartsTargetMaxStacks"/>
+
+                <Animation name="HasMaxStacks">
+                    <Event event="AnaPoisonedDartsTargetMaxStacks" action="Reset, Play"/>
+                    <Event event="NoState" action="Stop"/>
+
+                    <Controller type="Visibility" end="Pause" frame="$parent/AnaShrikeStacksProgressBar">
+                        <Key type="Bool" time="0" value="False"/>
+                    </Controller>
+                    <Controller type="Visibility" end="Pause" frame="$parent/AnaShrikeStacksFull">
+                        <Key type="Bool" time="0" value="True"/>
+                    </Controller>
+                </Animation>
+            </Frame>
+        </Frame>
+    </Frame>
+
+    <Frame type="SelectionUnitStatusPanel" name="AnaEyeOfHorusFrame">
+        <SpecificUnit val="HeroAna"/>
+        <Anchor relative="$parent"/>
+        <BatchImages val="false"/>
+        <RenderPriority val="450"/>
+
+        <Frame type="MouseAnchoredFrame" name="AnchorFrame">
+            <Anchor relative="$parent"/>
+            <Frame type="Frame" name="CursorAnchorFrame">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                <Height val="0"/>
+                <Width val="0"/>
+            </Frame>
+        </Frame>
+
+        <Frame type="UnitStatusValidatorAnimElement" name="AnaEyeOfHorusActiveAnimation">
+            <Anchor relative="$parent"/>
+
+            <Validator val="AnaHaveEyeOfHorus"/>
+
+            <Animation name="AnaEyeOfHorusActive">
+                <Event event="AnaHaveEyeOfHorus" action="Reset, Play"/>
+                <Event event="NoState" action="Stop"/>
+
+                <Controller type="Visibility" end="Pause" frame="$EyeOfHorusTargetFrame">
+                    <Key type="Bool" time="0" value="True"/>
+                </Controller>
+            </Animation>
+        </Frame>
+
+        <Frame type="Frame" name="EyeOfHorusTargetFrame">
+            <Anchor side="Top" relative="$parent/AnchorFrame/CursorAnchorFrame" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent/AnchorFrame/CursorAnchorFrame" pos="Min" offset="12"/>
+            <Width val="164"/>
+            <Height val="164"/>
+            <Visible val="False"/>
+            <Handle val="EyeOfHorusTargetFrame"/>
+
+            <Frame type="Label" name="TargetTeamAlliance">
+                <Anchor relative="$parent"/>
+                <Visible val="False"/>
+            </Frame>
+
+            <Frame type="Frame" name="PortraitContainerFrame">
+                <Anchor relative="$parent" />
+                <AlphaMaskTexture val="@UI/Storm_UI_HUD_Ana_LoS_Indicator_Mask"/>
+
+                <Frame type="Image" name="PortraitImage">
+                    <Anchor side="Top" relative="$parent" pos="Min" offset="44"/>
+                    <Anchor side="Left" relative="$parent" pos="Min" offset="44"/>
+                    <Width val="76"/>
+                    <Height val="76"/>
+                    <Texture val="NOIMAGE"/>
+                    <RenderPriority val="450"/>
+
+                    <Animation name="Show">
+                        <Event event="Visible" action="Reset,Play"/>
+                        <Event event="Wait" action="Reset,Play"/>
+
+                        <Controller type="Visibility" end="Pause">
+                            <Key type="Bool" time="0" value="True"/>
+                            <Key type="Bool" time=".125" value="False"/>
+                        </Controller>
+                        <Controller type="Text" frame="$EyeOfHorusTargetFrame/TargetTeamAlliance" end="Pause">
+                            <Key type="Text" time=".125" text="0"/>
+                        </Controller>
+                    </Animation>
+
+                    <Frame type="Image" name="CBImage">
+                        <Anchor relative="$parent"/>
+                        <Texture val="Assets\Textures\ui_targetportrait_structure_cb.dds"/>
+                        <RenderPriority val="451"/>
+                        <Visible val="False"/>
+                    </Frame>
+                </Frame>
+
+                <StateGroup name="PortraitCB">
+                    <DefaultState val="Normal"/>
+
+                    <State name="Normal"/>
+                    <State name="ColorBlind">
+                        <When type="Property" frame="PortraitImage" texture="Assets\Textures\ui_targetportrait_structure.dds"/>
+                        <When type="Option" colorblind="True"/>
+
+                        <Action type="SetProperty" frame="PortraitImage/CBImage" Visible="true"/>
+                    </State>
+                </StateGroup>
+            </Frame>
+
+            <Frame type="Image" name="PortraitBg">
+                <Anchor relative="$parent" offset="0"/>
+                <RenderPriority val="450"/>
+                <Texture val="@UI/Storm_UI_HUD_Ana_LoS_Indicator"/>
+                <ColorAdjustMode val="Colorize"/>
+            </Frame>
+
+            <StateGroup name="ColorController">
+                <DefaultState val="NoColor"/>
+
+                <State name="NoColor"/>
+                <State name="AllyColor">
+                    <When type="Property" frame="TargetTeamAlliance" Text="Ally"/>
+                    <Action type="SetProperty" frame="PortraitBg" LightAdjustColor="44CCFF"/>
+                    <Action type="SetProperty" frame="PortraitBg" DarkAdjustColor="0057A0"/>
+                </State>
+                <State name="EnemyColor">
+                    <When type="Property" frame="TargetTeamAlliance" Text="Enemy"/>
+                    <When type="Option" colorblind="False"/>
+                    <Action type="SetProperty" frame="PortraitBg" LightAdjustColor="FF5569"/>
+                    <Action type="SetProperty" frame="PortraitBg" DarkAdjustColor="7A000E"/>
+                </State>
+                <State name="EnemyColor_CB">
+                    <When type="Property" frame="TargetTeamAlliance" Text="Enemy"/>
+                    <When type="Option" colorblind="True"/>
+                    <Action type="SetProperty" frame="PortraitBg" LightAdjustColor="FF6A2F"/>
+                    <Action type="SetProperty" frame="PortraitBg" DarkAdjustColor="6B1E00"/>
+                </State>
+            </StateGroup>
+        </Frame>
+
+        <Frame type="UnitStatusFrame" name="UnitStatusFrame0">
+            <Frame type="UnitStatusValidatorAnimElement" name="AnaEyeOfHorusActiveAnimation">
+                <Anchor relative="$parent"/>
+
+                <Validator val="AnaHaveEyeOfHorus"/>
+
+                <Animation name="AnaEyeOfHorusActive">
+                    <Event event="AnaHaveEyeOfHorus" action="Reset, Play"/>
+                    <Event event="NoState" action="Stop"/>
+
+                    <Controller type="Visibility" end="Pause" frame="$EyeOfHorusTargetFrame">
+                        <Key type="Bool" time="0" value="True"/>
+                    </Controller>
+                </Animation>
+            </Frame>
+        </Frame>
+    </Frame>
+
+    <Frame type="SelectionUnitStatusPanel" name="AnaDynamicShootingBackplate" template="StandardHeroUITemplates/CircularHeroUIBackplateTemplate">
+        <SpecificUnit val="HeroAna"/>
+    </Frame>
+        
+    <Frame type="SelectionUnitStatusPanel" name="AnaDynamicShootingFrame" template="StandardHeroUITemplates/CircularHeroUITemplate">
+        <SpecificUnit val="HeroAna"/>
+
+        <Frame type="UnitStatusFrame" name="UnitStatusFrame0"> 
+            
+            <Frame type="Image" name="MechanicTexture">
+                <Visible val="False"/>
+                <Texture val="Assets\Textures\storm_ui_icon_talent_autoattack_speed.dds"/>
+                
+                <Frame type="BehaviorIcon" name="AnaDynamicShootingTooltip">
+                    <Anchor relative="$parent"/>
+                    <TooltipFrame val="StandardNameTooltip"/>
+                    <Behavior val="AnaDynamicShooting"/>
+                </Frame>
+                
+            </Frame>
+
+            <Frame type="UnitStatusBehaviorIcon" name="AnaDynamicShootingStackCountFrame" template="StandardHeroUITemplates/SmallCicularBehaviorStackCountTemplate">
+                <Behavior val="AnaDynamicShooting"/>
+                <Visible val="False"/>
+                
+                <Animation name="PulseOut" template="StandardHeroUITemplates/PulseOutAnimTemplate">
+                    <Event event="OnHidden" action="Reset, Play"/>
+                </Animation>
+            </Frame>
+
+            <Frame type="UnitStatusBehaviorIcon" name="AnaDynamicShootingCountdownFrame" template="StandardHeroUITemplates/CircularBehaviorCountdownBarTemplate">
+                <Behavior val="AnaDynamicShooting"/>
+            </Frame>
+            
+            <Frame type="UnitStatusBehaviorAnim" name="AnaHasDynamicShooting" template="StandardHeroUITemplates/BehaviorAnimTemplate">
+                <Behavior val="AnaDynamicShootingCarryBehavior"/>
+
+                <Animation name="ShowMechanicTexture">
+                    <Event event="BehaviorCreate" action="Reset, Play"/>
+                    <Event event="BehaviorDestroy" action="Stop"/>
+
+                    <Controller type="Visibility" end="Pause" frame="$parent/MechanicTexture">
+                        <Key type="Bool" time="0" value="True"/>
+                    </Controller>
+                </Animation>
+            </Frame>
+        </Frame>
+    </Frame>
+</Desc>
