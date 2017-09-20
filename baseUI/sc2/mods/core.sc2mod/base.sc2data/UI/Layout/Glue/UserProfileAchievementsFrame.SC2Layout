@@ -189,8 +189,14 @@
     </Frame>
 
     <Frame type="AchievementInfoFrame" name="AchievementInfoFrameTemplate">
-        <Anchor side="Bottom" relative="$this/RewardCountLabel" pos="Max" offset="0"/>
+        <Anchor side="Bottom" relative="$this/ExpandFrame" pos="Max" offset="0"/>
         <ShortDateFormat val="true"/>
+        
+        <Frame type="Image" name="BackgroundImage">
+            <Anchor relative="$parent"/>
+            <Texture val="@UI/Glues_Achievements_MetalFrame_Prot"/>
+            <TextureType val="EndCap"/>
+        </Frame>
 
         <Frame type="Image" name="Icon">
             <Anchor side="Top" relative="$parent" pos="Min" offset="13"/>
@@ -265,7 +271,7 @@
         </Frame>
 
         <Frame type="Frame" name="ExpandFrame">
-            <Anchor side="Top" relative="$parent/IconBorder" pos="Max" offset="20"/>
+            <Anchor side="Top" relative="$parent" pos="Min" offset="158"/>
             <Anchor side="Left" relative="$parent" pos="Min" offset="20"/>
             <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
             <Anchor side="Bottom" relative="$this/RewardFrame0" pos="Max" offset="20"/>
@@ -408,12 +414,19 @@
                 <Visible val="false"/>
                 <CollapseLayout val="true"/>
                 
-                 <!-- Visible if there's more than 1 criteria and no series achievement -->
-                <StateGroup name="CriteriaVisibleStateGroup">
-                    <State name="CriteriaState">
+                 <!-- Visible if there's more than 1 criteria and no series achievement and no progress bar -->
+                <StateGroup name="CriteriaVisibleState">
+                    <DefaultState val="NotVisible"/>
+                    
+                    <State name="Visible">
                         <When type="Property" frame="$parent/$parent" SeriesTailAchievementId="0"/>
+                        <When type="Property" frame="$parent/$parent" HasProgressBar="false"/>
                         <When type="Property" frame="CriteriaFrame1" Visible="true"/>
                         <Action type="SetProperty" Visible="true"/>
+                    </State>
+                    
+                    <State name="NotVisible">
+                        <Action type="SetProperty" Visible="false"/>
                     </State>
                 </StateGroup>
 
@@ -632,7 +645,7 @@
         </Frame>
 
         <Frame type="Label" name="RewardCountLabel">
-            <Anchor side="Top" relative="$parent/ExpandFrame" pos="Max" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
             <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
             <Style val="@Collection_ItemFrame_AchievementInfo_Unearned"/>
             <Text val="{$parent/$parent/@TotalRewardCount}"/>

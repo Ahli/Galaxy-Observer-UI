@@ -1,0 +1,892 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<Desc>
+    <DescFlags val="Locked"/>
+    
+    <!--
+    ======================
+    UNIT MODEL DISPLAY TEMPLATE
+    ======================
+    
+    This is used to display units and unit skins
+    
+    Top and Bottom anchors need to be set externally (or defaults to Min/Max of $parent)
+    DO NOT SET Left or Right anchors. They're handled by the AnchorFrame.
+    RewardCacheFrame/@Reward needs to be set externally
+    -->
+    <Frame type="UnitModelFrame" name="UnitModelFrameTemplate">
+        <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+        <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+        <Anchor side="Left" relative="AnchorFrame" pos="Min" offset="0"/>
+        <Anchor side="Right" relative="AnchorFrame" pos="Max" offset="0"/>
+        <Visible val="True"/>
+
+        <TurningEnabled val="True"/>
+        <Rotation val="335"/>
+        
+        <UnitLink val="{$this/SkinCacheFrame/@CollectionDisplayUnit}"/>
+        <CustomModelLink val="{$this/SkinCacheFrame/@CollectionDisplayModel}"/>
+        <Camera val="Star2CameraMid05"/>
+        
+        <UnitWorldX val="{$this/CombinedXOffset/@Result}"/>
+        <UnitWorldY val="{$this/CombinedYOffset/@Result}"/>
+        <UnitWorldZ val="{$this/CombinedZOffset/@Result}"/>
+        
+        <!-- This anchor frame enforces a 1.6 aspect ratio -->
+        <Frame type="Image" name="AnchorFrame">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+            <Anchor side="Left" relative="$parent/$parent" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent/$parent" pos="Mid" offset="0"/>
+            <ScaleWidthToTexture val="true"/>
+            <Texture val="@UI/SC2_UI_Glues_UnitSkinDisplay_AspectRatio"/>
+            <Visible val="false"/>
+        </Frame>
+
+        <Frame type="SkinCacheFrame" name="SkinCacheFrame">
+            <Anchor relative="$parent"/>
+        </Frame>
+    
+        <!-- Placeholder skin data to use if real skin data is empty -->
+        <Frame type="SkinCacheFrame" name="PlaceholderSkinCacheFrame">
+            <Anchor relative="$parent"/>
+        </Frame>
+        
+        <Frame type="ListBox" name="DebugCameraListBox" template="StandardTemplates/StandardListBoxTemplate">
+            <Anchor relative="$parent"/>
+            <Visible val="False"/>
+            <Unclipped val="true"/>
+        </Frame>
+        
+        <!--
+        =========
+        ANIMATIONS
+        =========
+        
+        Animations that can be called by UnitState to force units to play non-idle animations
+        -->
+        <Animation name="WalkAnim">
+            <Event event="PlayWalk" action="Reset,Play" frame="$this"/>
+            
+            <Controller type="ActorMsg" end="Pause" frame="$this" ModelFrameName="Model" SendToScope="False">
+                <Key type="Identifier" time="0.05" value="AnimPlay Walk Walk PlayForever"/>
+            </Controller>
+        </Animation>
+        
+        <Animation name="AttackReadyChannelAnim">
+            <Event event="PlayAttackReadyChannel" action="Reset,Play" frame="$this"/>
+            
+            <Controller type="ActorMsg" end="Pause" frame="$this" ModelFrameName="Model" SendToScope="False">
+                <Key type="Identifier" time="0.05" value="AnimPlay Attack Ready Channel"/>
+            </Controller>
+        </Animation>
+        
+        <Animation name="BirthAnim">
+            <Event event="PlayBirth" action="Reset,Play" frame="$this"/>
+            
+            <Controller type="ActorMsg" end="Pause" frame="$this" ModelFrameName="Model" SendToScope="False">
+                <Key type="Identifier" time="0.05" value="AnimPlay Birth Birth PlayForever"/>
+            </Controller>
+        </Animation>
+
+        <Frame type="Model" name="Model">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+            <UseAlternateTime val="false"/>
+            <UseAspectScaling val="false"/>
+        </Frame>
+        
+        <!--
+        ===========
+        OFFSET FRAMES
+        ===========
+        
+        These offset frames are used so that we can set a default centering value (A) here in the base template
+        while allowing child templates to fine tune that positioning by using the tuning value (B) without having to
+        overwrite or look up the original centering value
+        
+        The base values are adjusted to suit the needs of the UnitModelFrames in the skins tab of the collection
+        -->
+        
+        <Frame type="MathFrame" name="CombinedXOffset">
+            <A val="0"/>
+            <B val="0"/>
+            <Operator val="Add"/>
+        </Frame>
+        
+        <Frame type="MathFrame" name="CombinedYOffset">
+            <A val="0"/>
+            <B val="0"/>
+            <Operator val="Add"/>
+        </Frame>
+        
+        <Frame type="MathFrame" name="CombinedZOffset">
+            <A val="0"/>
+            <B val="0"/>
+            <Operator val="Add"/>
+        </Frame>
+        
+        <!-- If the UnitModelFrame has no data, populates with a dummy Marine model to keep rotations synced -->
+        <StateGroup name="HasDataState">
+            <DefaultState val="HasData"/>
+        
+            <State name="AlternateNoPlaceholderData">
+                <When type="StateGroup" frame="$this" AlternateState="Alternate"/>
+                <When type="Property" frame="$this/SkinCacheFrame" CollectionDisplayUnitAlternate=""/>
+                <When type="Property" frame="$this/PlaceholderSkinCacheFrame" CollectionDisplayUnitAlternate=""/>
+                <Action type="SetProperty" frame="$this" UnitLink="Marine"/>
+                <Action type="SetProperty" frame="$this" CustomModelLink="Marine"/>
+            </State>
+        
+            <State name="AlternatePlaceholderData">
+                <When type="StateGroup" frame="$this" AlternateState="Alternate"/>
+                <When type="Property" frame="$this/SkinCacheFrame" CollectionDisplayUnitAlternate=""/>
+                <Action type="SetProperty" frame="$this" UnitLink="{$this/PlaceholderSkinCacheFrame/@CollectionDisplayUnitAlternate}"/>
+                <Action type="SetProperty" frame="$this" CustomModelLink="{$this/PlaceholderSkinCacheFrame/@CollectionDisplayModelAlternate}"/>
+            </State>
+        
+            <State name="NoPlaceholderData">
+                <When type="Property" frame="$this/SkinCacheFrame" CollectionDisplayUnit=""/>
+                <When type="Property" frame="$this/PlaceholderSkinCacheFrame" CollectionDisplayUnit=""/>
+                <Action type="SetProperty" frame="$this" UnitLink="Marine"/>
+                <Action type="SetProperty" frame="$this" CustomModelLink="Marine"/>
+            </State>
+        
+            <State name="PlaceholderData">
+                <When type="Property" frame="$this/SkinCacheFrame" CollectionDisplayUnit=""/>
+                <Action type="SetProperty" frame="$this" UnitLink="{$this/PlaceholderSkinCacheFrame/@CollectionDisplayUnit}"/>
+                <Action type="SetProperty" frame="$this" CustomModelLink="{$this/PlaceholderSkinCacheFrame/@CollectionDisplayModel}"/>
+            </State>
+
+            <State name="AlternateHasData">
+                <When type="StateGroup" frame="$this" AlternateState="Alternate"/>
+                <Action type="SetProperty" frame="$this" UnitLink="{$this/SkinCacheFrame/@CollectionDisplayUnitAlternate}"/>
+                <Action type="SetProperty" frame="$this" CustomModelLink="{$this/SkinCacheFrame/@CollectionDisplayModelAlternate}"/>
+            </State>
+
+            <State name="HasData">
+                <Action type="SetProperty" frame="$this" UnitLink="{$this/SkinCacheFrame/@CollectionDisplayUnit}"/>
+                <Action type="SetProperty" frame="$this" CustomModelLink="{$this/SkinCacheFrame/@CollectionDisplayModel}"/>
+            </State>
+        </StateGroup>
+        
+        <!-- If this is set to Alternate, this will display the alternate model rather than the main model -->
+        <StateGroup name="AlternateState">
+            <DefaultState val="NotAlternate"/>
+            
+            <State name="Alternate"/>
+            <State name="NotAlternate"/>
+        </StateGroup>
+                
+        <!--
+        =============
+        UNIT STATE GROUP
+        =============
+        
+        Controls the camera view and unit position for each dispalyed unit
+        -->
+        <StateGroup name="UnitState">
+            <!-- Terran --> 
+            <State name="Banshee">
+                <When type="Property" frame="$this" UnitLink="Banshee"/>
+                <Action type="SetProperty" frame="$this" Camera="Star2CameraMid08"/>
+                <Action type="SetProperty" frame="CombinedZOffset" A="0.3"/>
+            </State>
+            
+            <State name="Battlecruiser">
+                <When type="Property" frame="$this" UnitLink="Battlecruiser"/>
+                <Action type="SetProperty" frame="$this" Camera="Star2CameraMid12"/>
+                <Action type="SetProperty" frame="CombinedZOffset" A="0.3"/>
+            </State>
+            
+            <State name="Cyclone">
+                <When type="Property" frame="$this" UnitLink="Cyclone"/>
+                <Action type="SetProperty" frame="$this" Camera="Star2CameraMid07"/>
+                <Action type="SetProperty" frame="CombinedZOffset" A="-0.3"/>
+            </State>
+            
+            <State name="Ghost">
+                <When type="Property" frame="$this" UnitLink="Ghost"/>
+                <Action type="SetProperty" frame="$this" Camera="Star2CameraMid04"/>
+                <Action type="SetProperty" frame="CombinedZOffset" A="-0.3"/>
+            </State>
+            
+            <State name="Hellion">
+                <When type="Property" frame="$this" UnitLink="Hellion"/>
+                <Action type="SetProperty" frame="$this" Camera="Star2CameraMid08"/>
+                <Action type="SetProperty" frame="CombinedZOffset" A="-0.2"/>
+            </State>
+            
+            <State name="HellionTank">
+                <When type="Property" frame="$this" UnitLink="HellionTank"/>
+                <Action type="SetProperty" frame="$this" Camera="Star2CameraMid08"/>
+                <Action type="SetProperty" frame="CombinedZOffset" A="-0.6"/>
+            </State>
+            
+            <State name="Liberator">
+                <When type="Property" frame="$this" UnitLink="Liberator"/>
+                <Action type="SetProperty" frame="$this" Camera="Star2CameraMid08"/>
+                <Action type="SetProperty" frame="CombinedZOffset" A="0.35"/>
+            </State>
+            
+            <State name="LiberatorAG">
+                <When type="Property" frame="$this" UnitLink="LiberatorAG"/>
+                <Action type="SetProperty" frame="$this" Camera="Star2CameraMid08"/>
+                <Action type="SetProperty" frame="CombinedZOffset" A="0.55"/>
+            </State>
+            
+            <State name="Marauder">
+                <When type="Property" frame="$this" UnitLink="Marauder"/>
+                <Action type="SetProperty" frame="$this" Camera="Star2CameraMid05"/>
+                <Action type="SetProperty" frame="CombinedZOffset" A="-0.25"/>
+            </State>
+            
+            <State name="Marine">
+                <When type="Property" frame="$this" UnitLink="Marine"/>
+                <Action type="SetProperty" frame="$this" Camera="Star2CameraMid03"/>
+                <Action type="SetProperty" frame="CombinedZOffset" A="-0.1"/>
+            </State>
+            
+            <State name="Medivac">
+                <When type="Property" frame="$this" UnitLink="Medivac"/>
+                <Action type="SetProperty" frame="$this" Camera="Star2CameraMid10"/>
+                <Action type="SetProperty" frame="CombinedZOffset" A="0.3"/>
+            </State>
+            
+            <State name="Raven">
+                <When type="Property" frame="$this" UnitLink="Raven"/>
+                <Action type="SetProperty" frame="$this" Camera="Star2CameraMid08"/>
+                <Action type="SetProperty" frame="CombinedZOffset" A="0.1"/>
+            </State>
+            
+            <State name="Reaper">
+                <When type="Property" frame="$this" UnitLink="Reaper"/>
+                <Action type="SetProperty" frame="$this" Camera="Star2CameraMid05"/>
+                <Action type="SetProperty" frame="CombinedZOffset" A="0.0"/>
+            </State>
+            
+            <State name="SCV">
+                <When type="Property" frame="$this" UnitLink="SCV"/>
+                <Action type="SetProperty" frame="$this" Camera="Star2CameraMid05"/>
+                <Action type="SetProperty" frame="CombinedZOffset" A="-0.3"/>
+            </State>
+            
+            <State name="SiegeTank">
+                <When type="Property" frame="$this" UnitLink="SiegeTank"/>
+                <Action type="SetProperty" frame="$this" Camera="Star2CameraMid09"/>
+                <Action type="SetProperty" frame="CombinedZOffset" A="-0.3"/>
+                <!-- <Action type="SendEvent" frame="$this" On="Enter" Event="PlayWalk"/> -->
+            </State>
+            
+            <State name="SiegeTankSieged">
+                <When type="Property" frame="$this" UnitLink="SiegeTankSieged"/>
+                <Action type="SetProperty" frame="$this" Camera="Star2CameraMid09"/>
+                <Action type="SetProperty" frame="CombinedZOffset" A="-0.3"/>
+            </State>
+            
+            <State name="SupplyDepot">
+                <When type="Property" frame="$this" UnitLink="SupplyDepot"/>
+                <Action type="SetProperty" frame="$this" Camera="Star2CameraMid12"/>
+                <Action type="SetProperty" frame="CombinedZOffset" A="0.0"/>
+            </State>
+            
+            <State name="Thor">
+                <When type="Property" frame="$this" UnitLink="Thor"/>
+                <Action type="SetProperty" frame="$this" Camera="Star2CameraMid18"/>
+                <Action type="SetProperty" frame="CombinedZOffset" A="-1.9"/>
+            </State>
+            
+            <State name="Viking">
+                <When type="Property" frame="$this" UnitLink="VikingFighter"/>
+                <Action type="SetProperty" frame="$this" Camera="Star2CameraMid08"/>
+                <Action type="SetProperty" frame="CombinedZOffset" A="0.25"/>
+            </State>
+            
+            <State name="VikingAssault">
+                <When type="Property" frame="$this" UnitLink="VikingAssault"/>
+                <Action type="SetProperty" frame="$this" Camera="Star2CameraMid08"/>
+                <Action type="SetProperty" frame="CombinedZOffset" A="-0.45"/>
+            </State>
+            
+            <State name="WidowMine">
+                <When type="Property" frame="$this" UnitLink="WidowMine"/>
+                <Action type="SetProperty" frame="$this" Camera="Star2CameraMid07"/>
+                <Action type="SetProperty" frame="CombinedZOffset" A="-0.2"/>
+            </State>
+
+            <!-- Zerg -->
+            <State name="Baneling">
+                <When type="Property" frame="$this" UnitLink="Baneling"/>
+                <Action type="SetProperty" frame="$this" Camera="Star2CameraMid05"/>
+                <Action type="SetProperty" frame="CombinedZOffset" A="-0.25"/>
+            </State>
+            
+            <State name="BroodLord">
+                <When type="Property" frame="$this" UnitLink="BroodLord"/>
+                <Action type="SetProperty" frame="$this" Camera="Star2CameraMid10"/>
+                <Action type="SetProperty" frame="CombinedZOffset" A="0.5"/>
+            </State>
+            
+            <State name="Corruptor">
+                <When type="Property" frame="$this" UnitLink="Corruptor"/>
+                <Action type="SetProperty" frame="$this" Camera="Star2CameraMid09"/>
+                <Action type="SetProperty" frame="CombinedZOffset" A="0.05"/>
+            </State>
+            
+            <State name="Drone">
+                <When type="Property" frame="$this" UnitLink="Drone"/>
+                <Action type="SetProperty" frame="$this" Camera="Star2CameraMid05"/>
+                <Action type="SetProperty" frame="CombinedZOffset" A="-0.2"/>
+            </State>
+            
+            <State name="Hydralisk">
+                <When type="Property" frame="$this" UnitLink="Hydralisk"/>
+                <Action type="SetProperty" frame="$this" Camera="Star2CameraMid08"/>
+                <Action type="SetProperty" frame="CombinedZOffset" A="-0.6"/>
+            </State>
+            
+            <State name="Infestor">
+                <When type="Property" frame="$this" UnitLink="Infestor"/>
+                <Action type="SetProperty" frame="$this" Camera="Star2CameraMid09"/>
+                <Action type="SetProperty" frame="CombinedZOffset" A="-0.4"/>
+            </State>
+            
+            <State name="Lurker">
+                <When type="Property" frame="$this" UnitLink="LurkerMP"/>
+                <Action type="SetProperty" frame="$this" Camera="Star2CameraMid06"/>
+                <Action type="SetProperty" frame="CombinedZOffset" A="-0.1"/>
+            </State>
+            
+            <State name="Mutalisk">
+                <When type="Property" frame="$this" UnitLink="Mutalisk"/>
+                <Action type="SetProperty" frame="$this" Camera="Star2CameraMid11"/>
+                <Action type="SetProperty" frame="CombinedZOffset" A="-0.45"/>
+            </State>
+            
+            <State name="Overlord">
+                <When type="Property" frame="$this" UnitLink="Overlord"/>
+                <Action type="SetProperty" frame="$this" Camera="Star2CameraMid09"/>
+                <Action type="SetProperty" frame="CombinedZOffset" A="0.0"/>
+            </State>
+            
+            <State name="Overseer">
+                <When type="Property" frame="$this" UnitLink="Overseer"/>
+                <Action type="SetProperty" frame="$this" Camera="Star2CameraMid09"/>
+                <Action type="SetProperty" frame="CombinedZOffset" A="0.2"/>
+            </State>
+            
+            <State name="Queen">
+                <When type="Property" frame="$this" UnitLink="Queen"/>
+                <Action type="SetProperty" frame="$this" Camera="Star2CameraMid10"/>
+                <Action type="SetProperty" frame="CombinedZOffset" A="-0.5"/>
+            </State>
+            
+            <State name="Ravager">
+                <When type="Property" frame="$this" UnitLink="Ravager"/>
+                <Action type="SetProperty" frame="$this" Camera="Star2CameraMid09"/>
+                <Action type="SetProperty" frame="CombinedZOffset" A="-0.5"/>
+            </State>
+            
+            <State name="Roach">
+                <When type="Property" frame="$this" UnitLink="Roach"/>
+                <Action type="SetProperty" frame="$this" Camera="Star2CameraMid05"/>
+                <Action type="SetProperty" frame="CombinedZOffset" A="-0.2"/>
+            </State>
+            
+            <State name="SwarmHost">
+                <When type="Property" frame="$this" UnitLink="SwarmHostMP"/>
+                <Action type="SetProperty" frame="$this" Camera="Star2CameraMid08"/>
+                <Action type="SetProperty" frame="CombinedZOffset" A="-0.45"/>
+            </State>
+            
+            <State name="Ultralisk">
+                <When type="Property" frame="$this" UnitLink="Ultralisk"/>
+                <Action type="SetProperty" frame="$this" Camera="Star2CameraMid12"/>
+                <Action type="SetProperty" frame="CombinedZOffset" A="-0.8"/>
+            </State>
+            
+            <State name="Viper">
+                <When type="Property" frame="$this" UnitLink="Viper"/>
+                <Action type="SetProperty" frame="$this" Camera="Star2CameraMid10"/>
+                <Action type="SetProperty" frame="CombinedZOffset" A="0.3"/>
+            </State>
+            
+            <State name="Zergling">
+                <When type="Property" frame="$this" UnitLink="Zergling"/>
+                <Action type="SetProperty" frame="$this" Camera="Star2CameraMid05"/>
+                <Action type="SetProperty" frame="CombinedZOffset" A="-0.2"/>
+            </State>
+
+            <!-- Protoss -->
+            <State name="Adept">
+                <When type="Property" frame="$this" UnitLink="Adept"/>
+                <Action type="SetProperty" frame="$this" Camera="Star2CameraMid05"/>
+                <Action type="SetProperty" frame="CombinedZOffset" A="-0.4"/>
+            </State>
+            
+            <State name="Archon">
+                <When type="Property" frame="$this" UnitLink="Archon"/>
+                <Action type="SetProperty" frame="$this" Camera="Star2CameraMid09"/>
+                <Action type="SetProperty" frame="CombinedZOffset" A="-1.5"/>
+            </State>
+            
+            <State name="Carrier">
+                <When type="Property" frame="$this" UnitLink="Carrier"/>
+                <Action type="SetProperty" frame="$this" Camera="Star2CameraMid11"/>
+                <Action type="SetProperty" frame="CombinedZOffset" A="0.5"/>
+            </State>
+            
+            <State name="Colossus">
+                <When type="Property" frame="$this" UnitLink="Colossus"/>
+                <Action type="SetProperty" frame="$this" Camera="Star2CameraMid12"/>
+                <Action type="SetProperty" frame="CombinedZOffset" A="-4.3"/>
+            </State>
+            
+            <State name="DarkTemplar">
+                <When type="Property" frame="$this" UnitLink="DarkTemplar"/>
+                <Action type="SetProperty" frame="$this" Camera="Star2CameraMid06"/>
+                <Action type="SetProperty" frame="CombinedZOffset" A="-0.35"/>
+            </State>
+            
+            <State name="Disruptor">
+                <When type="Property" frame="$this" UnitLink="Disruptor"/>
+                <Action type="SetProperty" frame="$this" Camera="Star2CameraMid05"/>
+                <Action type="SetProperty" frame="CombinedZOffset" A="-0.5"/>
+            </State>
+            
+            <State name="HighTemplar">
+                <When type="Property" frame="$this" UnitLink="HighTemplar"/>
+                <Action type="SetProperty" frame="$this" Camera="Star2CameraMid06"/>
+                <Action type="SetProperty" frame="CombinedZOffset" A="-0.7"/>
+            </State>
+            
+            <State name="Immortal">
+                <When type="Property" frame="$this" UnitLink="Immortal"/>
+                <Action type="SetProperty" frame="$this" Camera="Star2CameraMid10"/>
+                <Action type="SetProperty" frame="CombinedZOffset" A="-0.7"/>
+            </State>
+            
+            <State name="Mothership">
+                <When type="Property" frame="$this" UnitLink="Mothership"/>
+                <Action type="SetProperty" frame="$this" Camera="Star2CameraMid14"/>
+                <Action type="SetProperty" frame="CombinedZOffset" A="-1.5"/>
+            </State>
+            
+            <State name="MothershipCore">
+                <When type="Property" frame="$this" UnitLink="MothershipCore"/>
+                <Action type="SetProperty" frame="$this" Camera="Star2CameraMid10"/>
+                <Action type="SetProperty" frame="CombinedZOffset" A="-0.7"/>
+            </State>
+            
+            <State name="Observer">
+                <When type="Property" frame="$this" UnitLink="Observer"/>
+                <Action type="SetProperty" frame="$this" Camera="Star2CameraMid06"/>
+                <Action type="SetProperty" frame="CombinedZOffset" A="0.35"/>
+            </State>
+            
+            <State name="Oracle">
+                <When type="Property" frame="$this" UnitLink="Oracle"/>
+                <Action type="SetProperty" frame="$this" Camera="Star2CameraMid10"/>
+                <Action type="SetProperty" frame="CombinedZOffset" A="0.2"/>
+            </State>
+            
+            <State name="Phoenix">
+                <When type="Property" frame="$this" UnitLink="Phoenix"/>
+                <Action type="SetProperty" frame="$this" Camera="Star2CameraMid07"/>
+                <Action type="SetProperty" frame="CombinedZOffset" A="0.2"/>
+            </State>
+            
+            <State name="Probe">
+                <When type="Property" frame="$this" UnitLink="Probe"/>
+                <Action type="SetProperty" frame="$this" Camera="Star2CameraMid05"/>
+                <Action type="SetProperty" frame="CombinedZOffset" A="-0.3"/>
+            </State>
+            
+            <State name="Pylon">
+                <When type="Property" frame="$this" UnitLink="Pylon"/>
+                <Action type="SetProperty" frame="$this" Camera="Star2CameraMid09"/>
+                <Action type="SetProperty" frame="CombinedZOffset" A="-1.1"/>
+            </State>
+            
+            <State name="Sentry">
+                <When type="Property" frame="$this" UnitLink="Sentry"/>
+                <Action type="SetProperty" frame="$this" Camera="Star2CameraMid09"/>
+                <Action type="SetProperty" frame="CombinedZOffset" A="-0.8"/>
+            </State>
+            
+            <State name="Stalker">
+                <When type="Property" frame="$this" UnitLink="Stalker"/>
+                <Action type="SetProperty" frame="$this" Camera="Star2CameraMid11"/>
+                <Action type="SetProperty" frame="CombinedZOffset" A="-0.6"/>
+            </State>
+            
+            <State name="Tempest">
+                <When type="Property" frame="$this" UnitLink="Tempest"/>
+                <Action type="SetProperty" frame="$this" Camera="Star2CameraMid09"/>
+                <Action type="SetProperty" frame="CombinedZOffset" A="0.6"/>
+            </State>
+            
+            <State name="VoidRay">
+                <When type="Property" frame="$this" UnitLink="VoidRay"/>
+                <Action type="SetProperty" frame="$this" Camera="Star2CameraMid10"/>
+                <Action type="SetProperty" frame="CombinedZOffset" A="0.1"/>
+            </State>
+            
+            <State name="WarpPrism">
+                <When type="Property" frame="$this" UnitLink="WarpPrismPhasing"/>
+                <Action type="SetProperty" frame="$this" Camera="Star2CameraMid12"/>
+                <Action type="SetProperty" frame="CombinedZOffset" A="0.5"/>
+            </State>
+            
+            <State name="WarpPrismPhasing">
+                <When type="Property" frame="$this" UnitLink="WarpPrism"/>
+                <Action type="SetProperty" frame="$this" Camera="Star2CameraMid12"/>
+                <Action type="SetProperty" frame="CombinedZOffset" A="0.9"/>
+            </State>
+            
+            <State name="Zealot">
+                <When type="Property" frame="$this" UnitLink="Zealot"/>
+                <Action type="SetProperty" frame="$this" Camera="Star2CameraMid05"/>
+                <Action type="SetProperty" frame="CombinedZOffset" A="-0.35"/>
+            </State>
+        </StateGroup>
+    </Frame>
+    
+    <!--
+    =========================
+    ALTERNATE UNIT MODEL FRAME TEMPLATE
+    =========================
+    
+    A version of UnitModelFrameTemplate that toggles alternate on by default
+    -->
+    
+    <Frame type="UnitModelFrame" name="AlternateUnitModelFrameTemplate" template="StandardUnitModelTemplates/UnitModelFrameTemplate">
+        <Alpha val="0"/>
+        
+        <!-- If this is set to Alternate, this will display the alternate model rather than the main model -->
+        <StateGroup name="AlternateState">
+            <DefaultState val="Alternate"/>
+            
+            <State name="NotAlternate"/>
+            <State name="Alternate"/>
+        </StateGroup>
+    </Frame>
+    
+    <!--
+    =========================
+    ALTERNATE MODEL SWAP ANIMATION TEMPLATE
+    =========================
+    
+    Swaps between main and alternate models
+    -->
+        
+    <Animation name="AlternateModelSwapTemplate">
+        <Event event="OnAlternateSkin" action="Reset,Play"/>
+        <Event event="OnNoAlternateSkin" action="Reset,Stop"/>
+        
+        <Controller type="Fade" frame="UnitModelFrame" end="Loop">
+            <Key type="Curve" time="0" value="255" inOut="Linear"/>
+            <Key type="Curve" time="9.600" value="255" inOut="Linear"/>
+            <Key type="Curve" time="9.650" value="128" inOut="Linear"/>
+            <Key type="Curve" time="9.700" value="191" inOut="Linear"/>
+            <Key type="Curve" time="9.750" value="64" inOut="Linear"/>
+            <Key type="Curve" time="9.800" value="128" inOut="Linear"/>
+            <Key type="Curve" time="9.850" value="0" inOut="Linear"/>
+            <Key type="Curve" time="19.750" value="0" inOut="Linear"/>
+            <Key type="Curve" time="19.800" value="128" inOut="Linear"/>
+            <Key type="Curve" time="19.850" value="64" inOut="Linear"/>
+            <Key type="Curve" time="19.900" value="191" inOut="Linear"/>
+            <Key type="Curve" time="19.950" value="128" inOut="Linear"/>
+            <Key type="Curve" time="20.000" value="255" inOut="Linear"/>
+        </Controller>
+        
+        <Controller type="Fade" frame="AlternateUnitModelFrame" end="Loop">
+            <Key type="Curve" time="0" value="0" inOut="Linear"/>
+            <Key type="Curve" time="9.750" value="0" inOut="Linear"/>
+            <Key type="Curve" time="9.800" value="128" inOut="Linear"/>
+            <Key type="Curve" time="9.850" value="64" inOut="Linear"/>
+            <Key type="Curve" time="9.900" value="191" inOut="Linear"/>
+            <Key type="Curve" time="9.950" value="128" inOut="Linear"/>
+            <Key type="Curve" time="10.000" value="255" inOut="Linear"/>
+            <Key type="Curve" time="19.600" value="255" inOut="Linear"/>
+            <Key type="Curve" time="19.650" value="128" inOut="Linear"/>
+            <Key type="Curve" time="19.700" value="191" inOut="Linear"/>
+            <Key type="Curve" time="19.750" value="64" inOut="Linear"/>
+            <Key type="Curve" time="19.800" value="128" inOut="Linear"/>
+            <Key type="Curve" time="19.850" value="0" inOut="Linear"/>
+            <Key type="Curve" time="20.000" value="0" inOut="Linear"/>
+        </Controller>
+    </Animation>
+    
+    <!--
+    =========================
+    UNIT MODEL CONTAINER TEMPLATE
+    =========================
+    
+    Swaps between main and alternate models
+    -->
+
+    <Frame type="RewardCacheFrame" name="UnitModelContainerTemplate">
+        
+        <Frame type="UnitModelFrame" name="UnitModelFrame" template="StandardUnitModelTemplates/UnitModelFrameTemplate">
+            <Frame type="SkinCacheFrame" name="SkinCacheFrame">
+                <Skin val="{$parent/$parent/@Skin}"/>
+            </Frame>
+        </Frame>
+        
+        <Frame type="UnitModelFrame" name="AlternateUnitModelFrame" template="StandardUnitModelTemplates/AlternateUnitModelFrameTemplate">
+            <Anchor side="Top" relative="$parent/UnitModelFrame" pos="Min" offset="0"/>
+            <Anchor side="Bottom" relative="$parent/UnitModelFrame" pos="Max" offset="0"/>
+        
+            <Frame type="SkinCacheFrame" name="SkinCacheFrame">
+                <Skin val="{$parent/$parent/@Skin}"/>
+            </Frame>
+        </Frame>
+        
+        <Animation name="AlternateModelSwap" template="StandardUnitModelTemplates/AlternateModelSwapTemplate"/>
+        
+        <StateGroup name="HasDataState">
+            <State name="NoData">
+                <When type="StateGroup" frame="UnitModelFrame" HasDataState="NoData"/>
+                <Action type="SendEvent" frame="$this" Event="OnNoAlternateSkin"/>
+                <Action type="SetProperty" frame="UnitModelFrame" Alpha="0"/>
+                <Action type="SetProperty" frame="AlternateUnitModelFrame" Alpha="0"/>
+            </State>
+            
+            <State name="HasAlternateData">
+                <When type="StateGroup" frame="AlternateUnitModelFrame" HasDataState="AlternateHasData"/>
+                <Action type="SendEvent" frame="$this" Event="OnAlternateSkin"/>
+                <Action type="SetProperty" frame="UnitModelFrame" Alpha="255"/>
+                <Action type="SetProperty" frame="AlternateUnitModelFrame" Alpha="0"/>
+            </State>
+
+            <State name="HasData">
+                <When type="StateGroup" frame="UnitModelFrame" HasDataState="HasData"/>
+                <Action type="SendEvent" frame="$this" Event="OnNoAlternateSkin"/>
+                <Action type="SetProperty" frame="UnitModelFrame" Alpha="255"/>
+                <Action type="SetProperty" frame="AlternateUnitModelFrame" Alpha="0"/>
+            </State>
+        </StateGroup>
+    </Frame>
+    
+    <!--
+    =========================
+    UNIT EFFECT MODEL FRAME TEMPLATE
+    =========================
+    
+    This is used to display units and unit skins with special effects, such as the War Chest Holo
+    -->
+    <Frame type="UnitEffectModelFrame" name="UnitEffectModelFrameTemplate" template="StandardUnitModelTemplates/UnitModelFrameTemplate">
+        <RenderType val="RTT"/>
+
+        <TurningEnabled val="False"/>
+
+        <ModelOffscreen val="False"/>
+        
+        <LightLink val="{$this/SkinCacheFrame/@WarChestUILight}"/>
+
+        <EffectModel val="RTTChannel1HoloPortrait"/>
+        <EffectCamera val="Star2Camera01"/>
+        
+        <Frame type="Model" name="EffectModel">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+            <RenderType val="HDR"/>
+            <UseAlternateTime val="false"/>
+            <UseAspectScaling val="false"/>
+        </Frame>
+
+        <Frame type="Model" name="Model">
+            <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+            <Width val="200"/>
+            <Height val="200"/>
+            <RenderType val="HDR"/>
+            <UseAlternateTime val="false"/>
+            <UseAspectScaling val="false"/>
+        </Frame>
+        
+        <!-- These adjustments nudge units into a more appealing position than their defaults for the holo display -->
+        <StateGroup name="UnitWorldCoordAdjustmentState">
+            <DefaultState val="Default"/>
+            
+            <!-- Terran -->
+            
+            <State name="Banshee">
+                <When type="Property" frame="$this" UnitLink="Banshee"/>
+                <Action type="SetProperty" frame="CombinedXOffset" B="-0.2"/>
+                <Action type="SetProperty" frame="CombinedZOffset" B="-0.2"/>
+            </State>
+            
+            <State name="Battlecruiser">
+                <When type="Property" frame="$this" UnitLink="Battlecruiser"/>
+                <Action type="SetProperty" frame="CombinedXOffset" B="-0.2"/>
+                <Action type="SetProperty" frame="CombinedZOffset" B="0.0"/>
+            </State>
+            
+            <State name="Ghost">
+                <When type="Property" frame="$this" UnitLink="Ghost"/>
+                <Action type="SetProperty" frame="CombinedXOffset" B="-0.1"/>
+                <Action type="SetProperty" frame="CombinedZOffset" B="0.0"/>
+            </State>
+            
+            <State name="Hellion">
+                <When type="Property" frame="$this" UnitLink="Hellion"/>
+                <Action type="SetProperty" frame="CombinedXOffset" B="-0.2"/>
+                <Action type="SetProperty" frame="CombinedZOffset" B="-0.1"/>
+            </State>
+            
+            <State name="Liberator">
+                <When type="Property" frame="$this" UnitLink="Liberator"/>
+                <Action type="SetProperty" frame="CombinedXOffset" B="-0.3"/>
+                <Action type="SetProperty" frame="CombinedZOffset" B="-0.25"/>
+            </State>
+            
+            <State name="Raven">
+                <When type="Property" frame="$this" UnitLink="Raven"/>
+                <Action type="SetProperty" frame="CombinedXOffset" B="-0.35"/>
+                <Action type="SetProperty" frame="CombinedZOffset" B="-0.25"/>
+            </State>
+            
+            <State name="SiegeTank">
+                <When type="Property" frame="$this" UnitLink="SiegeTank"/>
+                <Action type="SetProperty" frame="CombinedXOffset" B="-0.05"/>
+                <Action type="SetProperty" frame="CombinedZOffset" B="0.3"/>
+            </State>
+            
+            <State name="Viking">
+                <When type="Property" frame="$this" UnitLink="VikingFighter"/>
+                <Action type="SetProperty" frame="CombinedXOffset" B="-0.05"/>
+                <Action type="SetProperty" frame="CombinedZOffset" B="-0.1"/>
+            </State>
+            
+            <!-- Zerg -->
+            
+            <State name="Baneling">
+                <When type="Property" frame="$this" UnitLink="Baneling"/>
+                <Action type="SetProperty" frame="CombinedXOffset" B="-0.1"/>
+                <Action type="SetProperty" frame="CombinedZOffset" B="0.2"/>
+            </State>
+            
+            <State name="BroodLord">
+                <When type="Property" frame="$this" UnitLink="BroodLord"/>
+                <Action type="SetProperty" frame="CombinedXOffset" B="-0.05"/>
+                <Action type="SetProperty" frame="CombinedZOffset" B="-0.3"/>
+            </State>
+            
+            <State name="Corruptor">
+                <When type="Property" frame="$this" UnitLink="Corruptor"/>
+                <Action type="SetProperty" frame="CombinedXOffset" B="-0.1"/>
+                <Action type="SetProperty" frame="CombinedZOffset" B="0.0"/>
+            </State>
+            
+            <State name="Infestor">
+                <When type="Property" frame="$this" UnitLink="Infestor"/>
+                <Action type="SetProperty" frame="CombinedXOffset" B="-0.15"/>
+                <Action type="SetProperty" frame="CombinedZOffset" B="-0.05"/>
+            </State>
+            
+            <State name="Ravager">
+                <When type="Property" frame="$this" UnitLink="Ravager"/>
+                <Action type="SetProperty" frame="CombinedXOffset" B="-0.1"/>
+                <Action type="SetProperty" frame="CombinedZOffset" B="0.0"/>
+            </State>
+            
+            <State name="Roach">
+                <When type="Property" frame="$this" UnitLink="Roach"/>
+                <Action type="SetProperty" frame="CombinedXOffset" B="0.0"/>
+                <Action type="SetProperty" frame="CombinedZOffset" B="0.2"/>
+            </State>
+            
+            <State name="Ultralisk">
+                <When type="Property" frame="$this" UnitLink="Ultralisk"/>
+                <Action type="SetProperty" frame="CombinedXOffset" B="0.1"/>
+                <Action type="SetProperty" frame="CombinedZOffset" B="0.0"/>
+            </State>
+            
+            <State name="Zergling">
+                <When type="Property" frame="$this" UnitLink="Zergling"/>
+                <Action type="SetProperty" frame="CombinedXOffset" B="0.05"/>
+                <Action type="SetProperty" frame="CombinedZOffset" B="0.2"/>
+            </State>
+            
+            <!-- Protoss -->
+            
+            <State name="Colossus">
+                <When type="Property" frame="$this" UnitLink="Colossus"/>
+                <Action type="SetProperty" frame="CombinedXOffset" B="-0.1"/>
+                <Action type="SetProperty" frame="CombinedZOffset" B="-0.2"/>
+            </State>
+            
+            <State name="Immortal">
+                <When type="Property" frame="$this" UnitLink="Immortal"/>
+                <Action type="SetProperty" frame="CombinedXOffset" B="-0.1"/>
+                <Action type="SetProperty" frame="CombinedZOffset" B="0.0"/>
+            </State>
+            
+            <State name="Mothership">
+                <When type="Property" frame="$this" UnitLink="Mothership"/>
+                <Action type="SetProperty" frame="CombinedXOffset" B="0.0"/>
+                <Action type="SetProperty" frame="CombinedZOffset" B="0.2"/>
+            </State>
+            
+            <State name="Observer">
+                <When type="Property" frame="$this" UnitLink="Observer"/>
+                <Action type="SetProperty" frame="CombinedXOffset" B="-0.15"/>
+                <Action type="SetProperty" frame="CombinedZOffset" B="-0.2"/>
+            </State>
+            
+            <State name="Oracle">
+                <When type="Property" frame="$this" UnitLink="Oracle"/>
+                <Action type="SetProperty" frame="CombinedXOffset" B="-0.2"/>
+                <Action type="SetProperty" frame="CombinedZOffset" B="-0.2"/>
+            </State>
+            
+            <State name="Phoenix">
+                <When type="Property" frame="$this" UnitLink="Phoenix"/>
+                <Action type="SetProperty" frame="CombinedXOffset" B="0.0"/>
+                <Action type="SetProperty" frame="CombinedZOffset" B="0.0"/>
+            </State>
+            
+            <State name="Sentry">
+                <When type="Property" frame="$this" UnitLink="Sentry"/>
+                <Action type="SetProperty" frame="CombinedXOffset" B="0.05"/>
+                <Action type="SetProperty" frame="CombinedZOffset" B="0.4"/>
+            </State>
+            
+            <State name="Tempest">
+                <When type="Property" frame="$this" UnitLink="Tempest"/>
+                <Action type="SetProperty" frame="CombinedXOffset" B="0.15"/>
+                <Action type="SetProperty" frame="CombinedZOffset" B="0.0"/>
+            </State>
+            
+            <State name="VoidRay">
+                <When type="Property" frame="$this" UnitLink="VoidRay"/>
+                <Action type="SetProperty" frame="CombinedXOffset" B="-0.25"/>
+                <Action type="SetProperty" frame="CombinedZOffset" B="-0.2"/>
+            </State>
+            
+            <State name="WarpPrism">
+                <When type="Property" frame="$this" UnitLink="WarpPrismPhasing"/>
+                <Action type="SetProperty" frame="CombinedXOffset" B="-0.15"/>
+                <Action type="SetProperty" frame="CombinedZOffset" B="-0.4"/>
+            </State>
+            
+            <State name="Zealot">
+                <When type="Property" frame="$this" UnitLink="Zealot"/>
+                <Action type="SetProperty" frame="CombinedXOffset" B="-0.05"/>
+                <Action type="SetProperty" frame="CombinedZOffset" B="0.1"/>
+            </State>
+            
+            <State name="Default">
+                <Action type="SetProperty" frame="CombinedXOffset" B="-0.05"/>
+                <Action type="SetProperty" frame="CombinedZOffset" B="0.0"/>
+            </State>
+        </StateGroup>
+    </Frame>
+</Desc>

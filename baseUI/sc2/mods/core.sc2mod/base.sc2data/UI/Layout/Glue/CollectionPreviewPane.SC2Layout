@@ -1,0 +1,1247 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<Desc>
+    <DescFlags val="Locked"/>
+    
+    <Constant name="VoiceLineLeftOffset" val="3"/>
+    <Constant name="VoiceLineLeftOffset16x9" val="4"/>
+    
+    <!--
+    ===========
+    Grid Animations
+    ===========
+    
+    Some shared animations for the background grid
+    -->
+                
+    <Animation name="GridWipeTemplate">
+        <Event event="OnShown" action="Play"/>
+        
+        <Controller type="LayerUV" layer="0" side="Top" relative="true" sidelock="false" end="Loop" >
+            <Key type="Curve" time="0.000" value="0.000" inOut="Linear"/>
+            <Key type="Curve" time="1.667" value="0.000" inOut="Linear"/>
+            <Key type="Curve" time="5.000" value="8.250" inOut="Linear"/>
+            <Key type="Curve" time="8.000" value="8.250" inOut="Linear"/>
+        </Controller>
+        
+        <Controller type="LayerUV" layer="0" side="Bottom" relative="true" sidelock="false" end="Loop" >
+            <Key type="Curve" time="0.000" value="0.000" inOut="Linear"/>
+            <Key type="Curve" time="1.667" value="0.000" inOut="Linear"/>
+            <Key type="Curve" time="5.000" value="8.250" inOut="Linear"/>
+            <Key type="Curve" time="8.000" value="8.250" inOut="Linear"/>
+        </Controller>
+    </Animation>
+    
+    <!--
+    ====================
+    Background Streak Animations
+    ====================
+    -->
+    
+    <Animation name="StreakLeftToRightTemplate">
+        <Event event="OnShown" action="Stop"/>
+        <Event event="PlayStreak" action="Reset,Play"/>
+        
+        <Controller type="Anchor" side="Right" relative="true" end="Pause">
+            <Key type="Curve" time="0" value="0" inOut="Linear"/>
+            <Key type="Curve" time="8" value="4112" inOut="Linear"/>
+        </Controller>
+    </Animation>
+    
+    <Animation name="StreakRightToLeftTemplate">
+        <Event event="OnShown" action="Stop"/>
+        <Event event="PlayStreak" action="Reset,Play"/>
+        
+        <Controller type="Anchor" side="Left" relative="true" end="Pause">
+            <Key type="Curve" time="0" value="0" inOut="Linear"/>
+            <Key type="Curve" time="8" value="-4112" inOut="Linear"/>
+        </Controller>
+    </Animation>
+    
+    <Animation name="StreakTopToBottomTemplate">
+        <Event event="OnShown" action="Stop"/>
+        <Event event="PlayStreak" action="Reset,Play"/>
+        
+        <Controller type="Anchor" side="Bottom" relative="true" end="Pause">
+            <Key type="Curve" time="0" value="0" inOut="Linear"/>
+            <Key type="Curve" time="8" value="4112" inOut="Linear"/>
+        </Controller>
+    </Animation>
+    
+    <Animation name="StreakBottomToTopTemplate">
+        <Event event="OnShown" action="Stop"/>
+        <Event event="PlayStreak" action="Reset,Play"/>
+        
+        <Controller type="Anchor" side="Top" relative="true" end="Pause">
+            <Key type="Curve" time="0" value="0" inOut="Linear"/>
+            <Key type="Curve" time="8" value="-4112" inOut="Linear"/>
+        </Controller>
+    </Animation>
+    
+    <Frame type="Image" name="BackgroundStreakHorizontalTemplate">
+        <Width val="180"/>
+        <Height val="2"/>
+        <RotationPosition val="MiddleCenter"/>
+        <Texture val="@UI/SC2_UI_Collection_Announcers_Background_Streak"/>
+        <Color val="6,82,117"/>
+        <Alpha val="64"/>
+        <BlendMode val="Add"/>
+    </Frame>
+    
+    <Frame type="Image" name="BackgroundStreakVerticalTemplate" template="CollectionPreviewPane/BackgroundStreakHorizontalTemplate">
+        <Rotation val="90"/>
+    </Frame>
+    
+    <!--
+    ==========================
+    Collection Preview Pane Template
+    ==========================
+    -->
+        
+    <Frame type="Frame" name="CollectionPreviewPaneTemplate">
+            
+        <!-- Outer background -->
+        
+        <Frame type="BlurFrame" name="BackgroundBlur">
+            <Anchor relative="$parent/BackgroundFill"/>
+            <BlurAmount val="0.35"/>
+            <Alpha val="255"/>
+        </Frame>
+        
+        <Frame type="Image" name="BackgroundFill">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="4"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="-4"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="4"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="-4"/>
+            <Texture val="Assets/Textures/white.dds"/>
+            <Color val="9,12,21"/>
+            <Alpha val="225"/>
+        </Frame>
+    
+        <Frame type="Image" name="BorderImage">
+            <Anchor relative="$parent"/>
+            <RenderPriority val="530"/>
+            <LayerCount val="2"/>
+            
+            <Texture val="@UI/Glues_Battlenet_PageAssets_GraphicListItem_Border_Outer" layer="0"/>
+            <TextureType val="NineSlice" layer="0"/>
+            <LayerColor val="0,0,0" layer="0"/>
+            
+            <Texture val="@UI/Glues_Battlenet_PageAssets_GraphicListItem_Border_Inner" layer="1"/>
+            <TextureType val="NineSlice" layer="1"/>
+            <LayerColor val="29,46,69" layer="1"/>
+            
+            <StateGroup name="AspectRatioState">
+                <DefaultState val="Not16x9"/>
+                
+                <State name="16x9">
+                    <When type="StateGroup" frame="$GlueUI" AspectRatioState="16x9"/>
+                    <Action type="SetProperty" Texture="@UI/Glues_Battlenet_PageAssets_GraphicListItem_Border_Outer_16x9" index="0"/>
+                    <Action type="SetProperty" Texture="@UI/Glues_Battlenet_PageAssets_GraphicListItem_Border_Inner_16x9" index="1"/>
+                </State>
+                
+                <State name="Not16x9">
+                    <Action type="SetProperty" Texture="@UI/Glues_Battlenet_PageAssets_GraphicListItem_Border_Outer" index="0"/>
+                    <Action type="SetProperty" Texture="@UI/Glues_Battlenet_PageAssets_GraphicListItem_Border_Inner" index="1"/>
+                </State>
+            </StateGroup>
+        </Frame>
+            
+        <!-- Inner container, houses the visible content space -->
+        
+        <Frame type="Frame" name="DisplayContainer">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+            
+            <!--
+            ============
+            Preview Container
+            ============
+            
+            The content being previewed should be placed in this frame
+            -->
+            
+            <Frame type="Frame" name="PreviewContainer">
+                <Anchor relative="$parent"/>
+            </Frame>
+        </Frame>
+    </Frame>
+    
+    <!--
+    ================================
+    Collection Preview Pane Header Template
+    ================================
+    -->
+        
+    <Frame type="Frame" name="CollectionPreviewPaneHeaderTemplate" template="CollectionPreviewPane/CollectionPreviewPaneTemplate">
+            
+        <!-- Outer background -->
+        
+        <Frame type="Image" name="HeaderFill">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="4"/>
+            <Anchor side="Bottom" relative="$parent/DividerImage" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="4"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="-4"/>
+            <Texture val="Assets/Textures/white.dds"/>
+            <Color val="46,112,168"/>
+            <Alpha val="51"/>
+        </Frame>
+        
+        <Frame type="Image" name="DividerImage">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="39"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="4"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="-4"/>
+            <Height val="4"/>
+            <RenderPriority val="530"/>
+            <LayerCount val="2"/>
+                
+            <Texture val="Assets/Textures/white.dds" layer="0"/>
+            <LayerColor val="0,0,0" layer="0"/>
+            
+            <Texture val="Assets/Textures/white.dds" layer="1"/>
+            <LayerColor val="0,0,0" layer="1"/>
+            <LayerVisible val="false" layer="1"/>
+                
+            <StateGroup name="AspectRatioState">
+                <DefaultState val="Not16x9"/>
+                
+                <State name="16x9">
+                    <When type="StateGroup" frame="$GlueUI" AspectRatioState="16x9"/>
+                    <Action type="SetProperty" LayerVisible="true" index="1"/>
+                    <Action type="SetProperty" Height="5"/>
+                </State>
+                
+                <State name="Not16x9">
+                    <Action type="SetProperty" LayerVisible="false" index="1"/>
+                    <Action type="SetProperty" Height="4"/>
+                </State>
+            </StateGroup>
+        </Frame>
+        
+        <Frame type="Image" name="DividerInnerImage">
+            <Anchor side="Top" relative="$parent/DividerImage" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent/DividerImage" pos="Mid" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="3"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="-3"/>
+            <Height val="2"/>
+            <RenderPriority val="530"/>
+            <LayerCount val="2"/>
+            
+            <Texture val="Assets/Textures/white.dds" layer="0"/>
+            <LayerColor val="29,46,69" layer="0"/>
+            
+            <Texture val="Assets/Textures/white.dds" layer="1"/>
+            <LayerColor val="29,46,69" layer="1"/>
+            <LayerVisible val="false" layer="1"/>
+                
+            <StateGroup name="AspectRatioState">
+                <DefaultState val="Not16x9"/>
+                
+                <State name="16x9">
+                    <When type="StateGroup" frame="$GlueUI" AspectRatioState="16x9"/>
+                    <Action type="SetProperty" LayerVisible="true" index="1"/>
+                </State>
+                
+                <State name="Not16x9">
+                    <Action type="SetProperty" LayerVisible="false" index="1"/>
+                </State>
+            </StateGroup>
+        </Frame>
+            
+        <!-- Inner container, houses the visible content space -->
+        
+        <Frame type="Frame" name="HeaderContainer">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="5"/>
+            <Anchor side="Bottom" relative="$parent/DividerImage" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="5"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="-5"/>
+        </Frame>
+        
+        <Frame type="Frame" name="DisplayContainer">
+            <Anchor side="Top" relative="$parent/DividerImage" pos="Max" offset="0"/>
+        </Frame>
+    </Frame>
+    
+    <!--
+    ==============================
+    Collection Preview Pane Animated Template
+    ==============================
+    -->
+        
+    <Frame type="Frame" name="CollectionPreviewPaneAnimatedTemplate" template="CollectionPreviewPane/CollectionPreviewPaneTemplate">
+            
+        <!-- Outer background -->
+    
+        <Frame type="Frame" name="DisplayContainer">
+            
+            <!-- Inner container, houses the visible content space -->
+            
+            <Frame type="Frame" name="BackgroundContainer">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="5"/>
+                <Anchor side="Bottom" relative="$parent" pos="Max" offset="-5"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="5"/>
+                <Anchor side="Right" relative="$parent" pos="Max" offset="-5"/>
+                <RenderPriority val="508"/>
+            
+                <Frame type="Image" name="BackgroundFill">
+                    <Anchor relative="$parent"/>
+                    <Texture val="Assets/Textures/white.dds"/>
+                    <Color val="0,4,10"/>
+                </Frame>
+                
+                <!-- Background glows-->
+                
+                <Frame type="Image" name="BackgroundBottomGlow">
+                    <Anchor side="Top" relative="$parent" pos="-20%" offset="0"/>
+                    <Anchor side="Bottom" relative="$parent" pos="340%" offset="0"/>
+                    <Anchor side="Left" relative="$parent" pos="-80%" offset="0"/>
+                    <Anchor side="Right" relative="$parent" pos="180%" offset="0"/>
+                    <Texture val="@UI/SC2_UI_Collection_VoicePack_CharacterFrame_GenericEffect_RadialGradient_256x256"/>
+                    <Alpha val="120"/>
+                    <Color val="38,83,148"/>
+                    
+                    <Animation name="GlowPulse">
+                        <Event event="OnShown" action="Reset,Play"/>
+                            
+                        <Controller type="Property" property="LayerAlpha" curve="True" index="0" end="Loop">
+                            <Key type="Property" time="0.000" value="120" inOut="Slow"/>
+                            <Key type="Property" time="2.000" value="200" inOut="Slow"/>
+                            <Key type="Property" time="4.000" value="120" inOut="Slow"/>
+                            <Key type="Property" time="6.000" value="200" inOut="Slow"/>
+                            <Key type="Property" time="8.000" value="120" inOut="Slow"/>
+                        </Controller>
+                    </Animation>
+                    
+                </Frame>
+                
+                <Frame type="Image" name="BackgroundTopLeftGlow">
+                    <Anchor side="Top" relative="$parent" pos="-185%" offset="0"/>
+                    <Anchor side="Bottom" relative="$parent" pos="65%" offset="0"/>
+                    <Anchor side="Left" relative="$parent" pos="-355%" offset="0"/>
+                    <Anchor side="Right" relative="$parent" pos="235%" offset="0"/>
+                    <Texture val="@UI/SC2_UI_Collection_VoicePack_CharacterFrame_GenericEffect_RadialGradient_256x256"/>
+                    <Alpha val="180"/>
+                    <Color val="68,83,125"/>
+                </Frame>
+                
+                <!-- Background smoke -->
+            
+                <Frame type="Image" name="BackgroundSmoke">
+                    <Anchor relative="$parent"/>
+                    <LayerCount val="3"/>
+                    
+                    <Texture val="@UI/SC2_UI_Collection_Announcers_Background_Masks_01" layer="0"/>
+                    <AlphaChannel val="Red" layer="0"/>
+                    <AlphaLayer val="true" layer="0"/>
+                    <TextureCoords top="0" left="0" bottom="1" right="1" layer="0"/>
+                    <WrapUV val="true" layer="0"/>
+                    
+                    <Texture val="@UI/SC2_UI_Collection_Announcers_Background_Masks_01" layer="1"/>
+                    <AlphaChannel val="InverseRed" layer="1"/>
+                    <AlphaLayer val="true" layer="1"/>
+                    <TextureCoords top="0" left="0" bottom="0.7" right="0.5" layer="1"/>
+                    <WrapUV val="true" layer="1"/>
+                    
+                    <Texture val="Assets/Textures/white.dds" layer="2"/>
+                    <LayerColor val="24,66,96" layer="2"/>
+                    <LayerAlpha val="102" layer="2"/>
+                    
+                    <Animation name="SmokeBillow">
+                        <Event event="OnShown" action="Play"/>
+                        
+                        <Controller type="LayerUV" layer="0" side="Top" relative="true" sidelock="false" end="Loop" >
+                            <Key type="Curve" time="0" value="0" inOut="Linear"/>
+                            <Key type="Curve" time="15" value="1" inOut="Linear"/>
+                        </Controller>
+                        
+                        <Controller type="LayerUV" layer="0" side="Bottom" relative="true" sidelock="false" end="Loop" >
+                            <Key type="Curve" time="0" value="0" inOut="Linear"/>
+                            <Key type="Curve" time="15" value="1" inOut="Linear"/>
+                        </Controller>
+                        
+                        <Controller type="LayerUV" layer="1" side="Top" relative="true" sidelock="false" end="Loop" >
+                            <Key type="Curve" time="0" value="0" inOut="Linear"/>
+                            <Key type="Curve" time="20" value="-1" inOut="Linear"/>
+                        </Controller>
+                        
+                        <Controller type="LayerUV" layer="1" side="Bottom" relative="true" sidelock="false" end="Loop" >
+                            <Key type="Curve" time="0" value="0" inOut="Linear"/>
+                            <Key type="Curve" time="20" value="-1" inOut="Linear"/>
+                        </Controller>
+                    </Animation>
+                </Frame>
+                
+                <!-- Static background grid -->
+            
+                <Frame type="Image" name="BackgroundGridSmall">
+                    <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+                    <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+                    <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+                    <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+                    <Width val="720"/>
+                    <Height val="720"/>
+                    <LayerCount val="2"/>
+                    
+                    <Texture val="@UI/SC2_UI_Collection_Announcers_Background_GridPattern_Mask" layer="0"/>
+                    <AlphaChannel val="Alpha" layer="0"/>
+                    <AlphaLayer val="true" layer="0"/>
+                    <Tiled val="true" layer="0"/>
+                    
+                    <Texture val="Assets/Textures/white.dds" layer="1"/>
+                    <LayerAlpha val="20" layer="1"/>
+                    <LayerColor val="62,146,181" layer="1"/>
+                </Frame>
+            
+                <Frame type="Image" name="BackgroundGridLargeGlow">
+                    <Anchor relative="$parent/BackgroundGridSmall"/>
+                    <LayerCount val="2"/>
+                    
+                    <Texture val="@UI/SC2_UI_Collection_Announcers_Background_GridPattern_Mask" layer="0"/>
+                    <AlphaChannel val="Red" layer="0"/>
+                    <AlphaLayer val="true" layer="0"/>
+                    <Tiled val="true" layer="0"/>
+                    
+                    <Texture val="Assets/Textures/white.dds" layer="1"/>
+                    <LayerAlpha val="10" layer="1"/>
+                    <LayerColor val="255,255,255" layer="1"/>
+                </Frame>
+                
+                <!-- The wave that moves across the large grid -->
+            
+                <Frame type="Image" name="BackgroundGridLargeWave">
+                    <Anchor relative="$parent/BackgroundGridSmall"/>
+                    <LayerCount val="3"/>
+                    
+                    <Texture val="@UI/SC2_UI_Collection_Announcers_Background_Masks_01" layer="0"/>
+                    <AlphaLayer val="true" layer="0"/>
+                    <AlphaChannel val="Blue" layer="0"/>
+                    <TextureCoords top="-.75" left="1" bottom="0" right="1.5" layer="0"/>
+                    <WrapUV val="false" layer="0"/>
+                    <LayerAlpha val="128" layer="0"/>
+                    
+                    <Texture val="@UI/SC2_UI_Collection_Announcers_Background_GridPattern_Mask" layer="1"/>
+                    <AlphaChannel val="Green" layer="1"/>
+                    <AlphaLayer val="true" layer="1"/>
+                    <Tiled val="true" layer="1"/>
+                    
+                    <Texture val="Assets/Textures/white.dds" layer="2"/>
+                    <LayerAlpha val="64" layer="2"/>
+                    <LayerColor val="52,135,209" layer="2"/>
+                    <BlendMode val="Add"/>
+                    
+                    <Animation name="LargeGridWave">
+                        <Event event="OnShown" action="Play"/>
+                        
+                        <Controller type="LayerUV" layer="0" side="Top" relative="true" sidelock="false" end="Loop" >
+                            <Key type="Curve" time="0" value="0" inOut="Linear"/>
+                            <Key type="Curve" time="5.333" value="1.75" inOut="Linear"/>
+                            <Key type="Curve" time="9.167" value="1.75" inOut="Linear"/>
+                        </Controller>
+                        
+                        <Controller type="LayerUV" layer="0" side="Bottom" relative="true" sidelock="false" end="Loop" >
+                            <Key type="Curve" time="0" value="0" inOut="Linear"/>
+                            <Key type="Curve" time="5.333" value="1.75" inOut="Linear"/>
+                            <Key type="Curve" time="9.167" value="1.75" inOut="Linear"/>
+                        </Controller>
+                        
+                        <Controller type="LayerUV" layer="0" side="Left" relative="true" sidelock="false" end="Loop" >
+                            <Key type="Curve" time="0" value="0" inOut="Linear"/>
+                            <Key type="Curve" time="5.333" value="-1.5" inOut="Linear"/>
+                            <Key type="Curve" time="9.167" value="-1.5" inOut="Linear"/>
+                        </Controller>
+                        
+                        <Controller type="LayerUV" layer="0" side="Right" relative="true" sidelock="false" end="Loop" >
+                            <Key type="Curve" time="0" value="0" inOut="Linear"/>
+                            <Key type="Curve" time="5.333" value="-1.5" inOut="Linear"/>
+                            <Key type="Curve" time="9.167" value="-1.5" inOut="Linear"/>
+                        </Controller>
+                    </Animation>
+                </Frame>
+                
+                <!-- Background dots -->
+            
+                <Frame type="Image" name="BackgroundGridDots">
+                    <Anchor relative="$parent/BackgroundGridSmall"/>
+                    <LayerCount val="2"/>
+                    <BlendMode val="Add"/>
+                    
+                    <Texture val="@UI/SC2_UI_Collection_Announcers_Background_GridPattern_Mask" layer="0"/>
+                    <AlphaChannel val="Blue" layer="0"/>
+                    <AlphaLayer val="true" layer="0"/>
+                    <Tiled val="true" layer="0"/>
+                    
+                    <Texture val="Assets/Textures/white.dds" layer="1"/>
+                    <LayerAlpha val="102" layer="1"/>
+                    <LayerColor val="7,15,33" layer="1"/>
+                </Frame>
+            
+                <Frame type="Image" name="BackgroundGridDotsTwinkle">
+                    <Anchor relative="$parent/BackgroundGridDots"/>
+                    <BlendMode val="Add"/>
+                    <LayerCount val="3"/>
+                    
+                    <Texture val="@UI/SC2_UI_Collection_Announcers_Background_Masks_01" layer="0"/>
+                    <AlphaLayer val="true" layer="0"/>
+                    <AlphaChannel val="Green" layer="0"/>
+                    <TextureCoords top="0" left="0" bottom="2" right="1" layer="0"/>
+                    <WrapUV val="true" layer="0"/>
+                    
+                    <Texture val="@UI/SC2_UI_Collection_Announcers_Background_GridPattern_Mask" layer="1"/>
+                    <AlphaChannel val="Blue" layer="1"/>
+                    <AlphaLayer val="true" layer="1"/>
+                    <Tiled val="true" layer="1"/>
+                    
+                    <Texture val="Assets/Textures/white.dds" layer="2"/>
+                    <LayerAlpha val="63" layer="2"/>
+                    <LayerColor val="18,39,85" layer="2"/>
+                    
+                    <Animation name="TwinkleDots">
+                        <Event event="OnShown" action="Play"/>
+                        
+                        <Controller type="LayerUV" layer="0" side="Top" relative="true" sidelock="false" end="Loop" >
+                            <Key type="Curve" time="0" value="0" out="fast"/>
+                            <Key type="Curve" time="8" value="-2" in="fast"/>
+                        </Controller>
+                        
+                        <Controller type="LayerUV" layer="0" side="Bottom" relative="true" sidelock="false" end="Loop" >
+                            <Key type="Curve" time="0" value="0" out="fast"/>
+                            <Key type="Curve" time="8" value="-2" in="fast"/>
+                        </Controller>
+                        
+                        <Controller type="LayerUV" layer="0" side="Left" relative="true" sidelock="false" end="Loop" >
+                            <Key type="Curve" time="0" value="0" out="fast"/>
+                            <Key type="Curve" time="8" value="-1" in="fast"/>
+                        </Controller>
+                        
+                        <Controller type="LayerUV" layer="0" side="Right" relative="true" sidelock="false" end="Loop" >
+                            <Key type="Curve" time="0" value="0" out="fast"/>
+                            <Key type="Curve" time="8" value="-1" in="fast"/>
+                        </Controller>
+                    </Animation>
+                </Frame>
+                
+                <!--
+                ================
+                Background Streaks
+                ================
+                
+                These are the streaks in the background. They streak when given the PlayStreak event
+                -->
+                
+                <!-- Horizontal streaks -->
+                
+                <Frame type="Image" name="BackgroundStreakHorizontal1" template="CollectionPreviewPane/BackgroundStreakHorizontalTemplate">
+                    <Anchor side="Top" relative="$ancestor[@name=DisplayContainer]" pos="Mid" offset="-240"/>
+                    <Anchor side="Bottom" relative="$ancestor[@name=DisplayContainer]" pos="Mid" offset="-240"/>
+                    <Anchor side="Right" relative="$ancestor[@name=DisplayContainer]" pos="Min" offset="0"/>
+                    
+                    <Animation name="PlayStreak" template="CollectionPreviewPane/StreakLeftToRightTemplate"/>
+                </Frame>
+                
+                <Frame type="Image" name="BackgroundStreakHorizontal2" template="CollectionPreviewPane/BackgroundStreakHorizontalTemplate">
+                    <Anchor side="Top" relative="$ancestor[@name=DisplayContainer]" pos="Mid" offset="-180"/>
+                    <Anchor side="Bottom" relative="$ancestor[@name=DisplayContainer]" pos="Mid" offset="-180"/>
+                    <Anchor side="Left" relative="$ancestor[@name=DisplayContainer]" pos="Max" offset="0"/>
+                    
+                    <Animation name="PlayStreak" template="CollectionPreviewPane/StreakRightToLeftTemplate"/>
+
+                    <Animation name="StreakInitial">
+                        <Event event="PlayStreak" action="Stop"/>
+                        <Event event="OnShown" action="Reset,Play"/>
+                        
+                        <Controller type="Anchor" side="Left" relative="true" end="Pause">
+                            <Key type="Curve" time="0" value="-292" inOut="Linear"/>
+                            <Key type="Curve" time="7.432" value="-4112" inOut="Linear"/>
+                        </Controller>
+                    </Animation>
+                </Frame>
+                
+                <Frame type="Image" name="BackgroundStreakHorizontal3" template="CollectionPreviewPane/BackgroundStreakHorizontalTemplate">
+                    <Anchor side="Top" relative="$ancestor[@name=DisplayContainer]" pos="Mid" offset="-120"/>
+                    <Anchor side="Bottom" relative="$ancestor[@name=DisplayContainer]" pos="Mid" offset="-120"/>
+                    <Anchor side="Left" relative="$ancestor[@name=DisplayContainer]" pos="Max" offset="0"/>
+                    
+                    <Animation name="PlayStreak" template="CollectionPreviewPane/StreakRightToLeftTemplate"/>
+                </Frame>
+                
+                <Frame type="Image" name="BackgroundStreakHorizontal4" template="CollectionPreviewPane/BackgroundStreakHorizontalTemplate">
+                    <Anchor side="Top" relative="$ancestor[@name=DisplayContainer]" pos="Mid" offset="60"/>
+                    <Anchor side="Bottom" relative="$ancestor[@name=DisplayContainer]" pos="Mid" offset="60"/>
+                    <Anchor side="Right" relative="$ancestor[@name=DisplayContainer]" pos="Min" offset="0"/>
+                    
+                    <Animation name="PlayStreak" template="CollectionPreviewPane/StreakLeftToRightTemplate" speed="1.2"/>
+                </Frame>
+                
+                <Frame type="Image" name="BackgroundStreakHorizontal5" template="CollectionPreviewPane/BackgroundStreakHorizontalTemplate">
+                    <Anchor side="Top" relative="$ancestor[@name=DisplayContainer]" pos="Mid" offset="120"/>
+                    <Anchor side="Bottom" relative="$ancestor[@name=DisplayContainer]" pos="Mid" offset="120"/>
+                    <Anchor side="Left" relative="$ancestor[@name=DisplayContainer]" pos="Max" offset="0"/>
+                    
+                    <Animation name="PlayStreak" template="CollectionPreviewPane/StreakRightToLeftTemplate"/>
+                </Frame>
+                
+                <Frame type="Image" name="BackgroundStreakHorizontal6" template="CollectionPreviewPane/BackgroundStreakHorizontalTemplate">
+                    <Anchor side="Top" relative="$ancestor[@name=DisplayContainer]" pos="Mid" offset="240"/>
+                    <Anchor side="Bottom" relative="$ancestor[@name=DisplayContainer]" pos="Mid" offset="240"/>
+                    <Anchor side="Right" relative="$ancestor[@name=DisplayContainer]" pos="Min" offset="0"/>
+                    
+                    <Animation name="PlayStreak" template="CollectionPreviewPane/StreakLeftToRightTemplate" speed="1.5"/>
+                </Frame>
+                
+                <!-- Vertical streaks -->
+                
+                <Frame type="Image" name="BackgroundStreakVertical1" template="CollectionPreviewPane/BackgroundStreakVerticalTemplate">
+                    <Anchor side="Top" relative="$ancestor[@name=DisplayContainer]" pos="Max" offset="89"/>
+                    <Anchor side="Left" relative="$ancestor[@name=DisplayContainer]" pos="Mid" offset="-180"/>
+                    <Anchor side="Right" relative="$ancestor[@name=DisplayContainer]" pos="Mid" offset="-180"/>
+                    
+                    <Animation name="PlayStreak" template="CollectionPreviewPane/StreakBottomToTopTemplate"/>
+                </Frame>
+                
+                <Frame type="Image" name="BackgroundStreakVertical2" template="CollectionPreviewPane/BackgroundStreakVerticalTemplate">
+                    <Anchor side="Top" relative="$ancestor[@name=DisplayContainer]" pos="Max" offset="89"/>
+                    <Anchor side="Left" relative="$ancestor[@name=DisplayContainer]" pos="Mid" offset="0"/>
+                    <Anchor side="Right" relative="$ancestor[@name=DisplayContainer]" pos="Mid" offset="0"/>
+                    
+                    <Animation name="PlayStreak" template="CollectionPreviewPane/StreakBottomToTopTemplate"/>
+                </Frame>
+                
+                <Frame type="Image" name="BackgroundStreakVertical3" template="CollectionPreviewPane/BackgroundStreakVerticalTemplate">
+                    <Anchor side="Bottom" relative="$ancestor[@name=DisplayContainer]" pos="Min" offset="-89"/>
+                    <Anchor side="Left" relative="$ancestor[@name=DisplayContainer]" pos="Mid" offset="60"/>
+                    <Anchor side="Right" relative="$ancestor[@name=DisplayContainer]" pos="Mid" offset="60"/>
+                    
+                    <Animation name="PlayStreak" template="CollectionPreviewPane/StreakTopToBottomTemplate"/>
+                </Frame>
+                
+                <Frame type="Image" name="BackgroundStreakVertical4" template="CollectionPreviewPane/BackgroundStreakVerticalTemplate">
+                    <Anchor side="Bottom" relative="$ancestor[@name=DisplayContainer]" pos="Min" offset="-89"/>
+                    <Anchor side="Left" relative="$ancestor[@name=DisplayContainer]" pos="Mid" offset="120"/>
+                    <Anchor side="Right" relative="$ancestor[@name=DisplayContainer]" pos="Mid" offset="120"/>
+                    
+                    <Animation name="PlayStreak" template="CollectionPreviewPane/StreakTopToBottomTemplate"/>
+                </Frame>
+                
+                <Frame type="Image" name="BackgroundStreakVertical5" template="CollectionPreviewPane/BackgroundStreakVerticalTemplate">
+                    <Anchor side="Bottom" relative="$ancestor[@name=DisplayContainer]" pos="Min" offset="-89"/>
+                    <Anchor side="Left" relative="$ancestor[@name=DisplayContainer]" pos="Mid" offset="180"/>
+                    <Anchor side="Right" relative="$ancestor[@name=DisplayContainer]" pos="Mid" offset="180"/>
+                    
+                    <Animation name="PlayStreak" template="CollectionPreviewPane/StreakTopToBottomTemplate"/>
+                </Frame>
+                
+                <Frame type="Image" name="BackgroundStreakVertical6" template="CollectionPreviewPane/BackgroundStreakVerticalTemplate">
+                    <Anchor side="Top" relative="$ancestor[@name=DisplayContainer]" pos="Max" offset="89"/>
+                    <Anchor side="Left" relative="$ancestor[@name=DisplayContainer]" pos="Mid" offset="240"/>
+                    <Anchor side="Right" relative="$ancestor[@name=DisplayContainer]" pos="Mid" offset="240"/>
+                    
+                    <Animation name="PlayStreak" template="CollectionPreviewPane/StreakBottomToTopTemplate"/>
+
+                    <Animation name="StreakInitial">
+                        <Event event="PlayStreak" action="Stop"/>
+                        <Event event="OnShown" action="Reset,Play"/>
+                        
+                        <Controller type="Anchor" side="Top" relative="true" end="Pause">
+                            <Key type="Curve" time="0" value="-385" inOut="Linear"/>
+                            <Key type="Curve" time="7.251" value="-4112" inOut="Linear"/>
+                        </Controller>
+                    </Animation>
+                </Frame>
+                
+                <!--
+                ================
+                Streak Timing Animation
+                ================
+                
+                This animation controls when each background streak should fire and the duration of its loop
+                -->
+                
+                <Animation name="BackgroundStreaksTimingAnimation">
+                    <Event event="OnShown" action="Play"/>
+                    
+                    <!-- Horizontal streak timings -->
+                    
+                    <Controller type="Event" frame="BackgroundStreakHorizontal1" end="Loop">
+                        <Key type="Event" time="3" event="PlayStreak"/>
+                        <Key type="Event" time="8" event="Nothing"/>
+                    </Controller>
+                    
+                    <Controller type="Event" frame="BackgroundStreakHorizontal2" end="Loop">
+                        <Key type="Event" time="7.5" event="PlayStreak"/>
+                        <Key type="Event" time="8" event="Nothing"/>
+                    </Controller>
+                    
+                    <Controller type="Event" frame="BackgroundStreakHorizontal3" end="Loop">
+                        <Key type="Event" time="4.25" event="PlayStreak"/>
+                        <Key type="Event" time="8" event="Nothing"/>
+                    </Controller>
+                    
+                    <Controller type="Event" frame="BackgroundStreakHorizontal4" end="Loop">
+                        <Key type="Event" time="4.6" event="PlayStreak"/>
+                        <Key type="Event" time="8" event="Nothing"/>
+                    </Controller>
+                    
+                    <Controller type="Event" frame="BackgroundStreakHorizontal5" end="Loop">
+                        <Key type="Event" time="6.1" event="PlayStreak"/>
+                        <Key type="Event" time="8" event="Nothing"/>
+                    </Controller>
+                    
+                    <Controller type="Event" frame="BackgroundStreakHorizontal6" end="Loop">
+                        <Key type="Event" time="2.5" event="PlayStreak"/>
+                        <Key type="Event" time="8" event="Nothing"/>
+                    </Controller>
+                    
+                    <!-- Vertical streak timings -->
+                    
+                    <Controller type="Event" frame="BackgroundStreakVertical1" end="Loop">
+                        <Key type="Event" time="3.8" event="PlayStreak"/>
+                        <Key type="Event" time="8" event="Nothing"/>
+                    </Controller>
+                    
+                    <Controller type="Event" frame="BackgroundStreakVertical2" end="Loop">
+                        <Key type="Event" time="3.25" event="PlayStreak"/>
+                        <Key type="Event" time="8" event="Nothing"/>
+                    </Controller>
+                    
+                    <Controller type="Event" frame="BackgroundStreakVertical3" end="Loop">
+                        <Key type="Event" time="2" event="PlayStreak"/>
+                        <Key type="Event" time="8" event="Nothing"/>
+                    </Controller>
+                    
+                    <Controller type="Event" frame="BackgroundStreakVertical4" end="Loop">
+                        <Key type="Event" time="0.35" event="PlayStreak"/>
+                        <Key type="Event" time="6.55" event="Nothing"/>
+                    </Controller>
+                    
+                    <Controller type="Event" frame="BackgroundStreakVertical5" end="Loop">
+                        <Key type="Event" time="3.9" event="PlayStreak"/>
+                        <Key type="Event" time="8" event="Nothing"/>
+                    </Controller>
+                    
+                    <Controller type="Event" frame="BackgroundStreakVertical6" end="Loop">
+                        <Key type="Event" time="7.25" event="PlayStreak"/>
+                        <Key type="Event" time="8" event="Nothing"/>
+                    </Controller>
+                </Animation>
+            </Frame>
+            
+            <!--
+            ============
+            Preview Container
+            ============
+            
+            The content being previewed should be placed in this frame
+            -->
+            
+            <Frame type="Frame" name="PreviewContainer">
+                <Anchor relative="$parent"/>
+            </Frame>
+            
+            <!--
+            ============
+            Surface Accent Container
+            ============
+            
+            This is the grid animation on top of the content.
+            -->
+            
+            <Frame type="Frame" name="SurfaceAccentContainer">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="4"/>
+                <Anchor side="Bottom" relative="$parent" pos="Max" offset="-4"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="4"/>
+                <Anchor side="Right" relative="$parent" pos="Max" offset="-4"/>
+                
+                <!--
+                =======
+                Grid Wipe
+                =======
+                
+                These frames drag the bottom-to-top wipe over the content
+                -->
+            
+                <Frame type="Image" name="BackgroundGridSmallWipe">
+                    <Anchor relative="$parent/$parent/BackgroundContainer/BackgroundGridSmall"/>
+                    <BlendMode val="Add"/>
+                    <LayerCount val="3"/>
+                    
+                    <Texture val="@UI/SC2_UI_Collection_Announcers_Overlay_Wipe" layer="0"/>
+                    <AlphaLayer val="true" layer="0"/>
+                    <TextureCoords top="-7.64" left="0" bottom="0" right="1" layer="0"/>
+                    <WrapUV val="false" layer="0"/>
+                    
+                    <Texture val="@UI/SC2_UI_Collection_Announcers_Background_GridPattern_Mask" layer="1"/>
+                    <AlphaChannel val="Alpha" layer="1"/>
+                    <AlphaLayer val="true" layer="1"/>
+                    <Tiled val="true" layer="1"/>
+                    
+                    <Texture val="Assets/Textures/white.dds" layer="2"/>
+                    <LayerAlpha val="30" layer="2"/>
+                    <LayerColor val="62,146,181" layer="2"/>
+                    
+                    <Animation name="GridWipe" template="CollectionPreviewPane/GridWipeTemplate"/>
+                </Frame>
+            
+                <Frame type="Image" name="BackgroundGridLargeGlowWipe">
+                    <Anchor relative="$parent/$parent/BackgroundContainer/BackgroundGridSmall"/>
+                    <BlendMode val="Add"/>
+                    <LayerCount val="3"/>
+                    
+                    <Texture val="@UI/SC2_UI_Collection_Announcers_Overlay_Wipe" layer="0"/>
+                    <AlphaLayer val="true" layer="0"/>
+                    <TextureCoords top="-7.64" left="0" bottom="0" right="1" layer="0"/>
+                    <WrapUV val="false" layer="0"/>
+                    
+                    <Texture val="@UI/SC2_UI_Collection_Announcers_Background_GridPattern_Mask" layer="1"/>
+                    <AlphaChannel val="Red" layer="1"/>
+                    <AlphaLayer val="true" layer="1"/>
+                    <Tiled val="true" layer="1"/>
+                    
+                    <Texture val="Assets/Textures/white.dds" layer="2"/>
+                    <LayerAlpha val="30" layer="2"/>
+                    <LayerColor val="62,146,181" layer="2"/>
+                    
+                    <Animation name="GridWipe" template="CollectionPreviewPane/GridWipeTemplate"/>
+                </Frame>
+            
+                <Frame type="Image" name="OverlayVignette">
+                    <Anchor relative="$parent"/>
+                    <Texture val="@UI/SC2_UI_Collection_Announcers_Overlay_Vignette"/>
+                    <Alpha val="242"/>
+                </Frame>
+            </Frame>
+        </Frame>
+    </Frame>
+    
+    <!--
+    ==========================
+    Collection Preview Pane Wide Template
+    ==========================
+    -->
+        
+    <Frame type="Frame" name="CollectionPreviewPaneWideTemplate" template="CollectionPreviewPane/CollectionPreviewPaneAnimatedTemplate">
+            
+        <Frame type="Frame" name="DisplayContainer">
+        
+            <Frame type="Frame" name="BackgroundContainer">
+                
+                <Frame type="Image" name="BackgroundStreakVertical7" template="CollectionPreviewPane/BackgroundStreakVerticalTemplate">
+                    <Anchor side="Top" relative="$ancestor[@name=DisplayContainer]" pos="Max" offset="89"/>
+                    <Anchor side="Left" relative="$ancestor[@name=DisplayContainer]" pos="Mid" offset="360"/>
+                    <Anchor side="Right" relative="$ancestor[@name=DisplayContainer]" pos="Mid" offset="360"/>
+                    
+                    <Animation name="PlayStreak" template="CollectionPreviewPane/StreakBottomToTopTemplate"/>
+                </Frame>
+                
+                <Frame type="Image" name="BackgroundStreakVertical8" template="CollectionPreviewPane/BackgroundStreakVerticalTemplate">
+                    <Anchor side="Bottom" relative="$ancestor[@name=DisplayContainer]" pos="Min" offset="-89"/>
+                    <Anchor side="Left" relative="$ancestor[@name=DisplayContainer]" pos="Mid" offset="-360"/>
+                    <Anchor side="Right" relative="$ancestor[@name=DisplayContainer]" pos="Mid" offset="-360"/>
+                    
+                    <Animation name="PlayStreak" template="CollectionPreviewPane/StreakTopToBottomTemplate"/>
+                </Frame>
+                
+                <Frame type="Image" name="BackgroundStreakVertical9" template="CollectionPreviewPane/BackgroundStreakVerticalTemplate">
+                    <Anchor side="Bottom" relative="$ancestor[@name=DisplayContainer]" pos="Min" offset="-89"/>
+                    <Anchor side="Left" relative="$ancestor[@name=DisplayContainer]" pos="Mid" offset="-300"/>
+                    <Anchor side="Right" relative="$ancestor[@name=DisplayContainer]" pos="Mid" offset="-300"/>
+                    
+                    <Animation name="PlayStreak" template="CollectionPreviewPane/StreakTopToBottomTemplate"/>
+                </Frame>
+                
+                <Frame type="Image" name="BackgroundStreakVertical10" template="CollectionPreviewPane/BackgroundStreakVerticalTemplate">
+                    <Anchor side="Top" relative="$ancestor[@name=DisplayContainer]" pos="Max" offset="89"/>
+                    <Anchor side="Left" relative="$ancestor[@name=DisplayContainer]" pos="Mid" offset="-360"/>
+                    <Anchor side="Right" relative="$ancestor[@name=DisplayContainer]" pos="Mid" offset="-360"/>
+                    
+                    <Animation name="PlayStreak" template="CollectionPreviewPane/StreakBottomToTopTemplate"/>
+                </Frame>
+                
+                
+                <Animation name="BackgroundStreaksTimingAnimationWide">
+                    <Event event="OnShown" action="Play"/>
+                    
+                    <Controller type="Event" frame="BackgroundStreakVertical7" end="Loop">
+                        <Key type="Event" time="3" event="PlayStreak"/>
+                        <Key type="Event" time="8" event="Nothing"/>
+                    </Controller>
+                    
+                    <Controller type="Event" frame="BackgroundStreakVertical8" end="Loop">
+                        <Key type="Event" time="5" event="PlayStreak"/>
+                        <Key type="Event" time="8" event="Nothing"/>
+                    </Controller>
+                    
+                    <Controller type="Event" frame="BackgroundStreakVertical9" end="Loop">
+                        <Key type="Event" time="7" event="PlayStreak"/>
+                        <Key type="Event" time="8" event="Nothing"/>
+                    </Controller>
+                    
+                    <Controller type="Event" frame="BackgroundStreakVertical10" end="Loop">
+                        <Key type="Event" time="4" event="PlayStreak"/>
+                        <Key type="Event" time="8" event="Nothing"/>
+                    </Controller>
+                    
+                </Animation>
+                
+                <Frame type="Image" name="BackgroundGridSmall">
+                    <Width val="840"/>
+                    <Height val="840"/>
+                </Frame>
+            
+                <Frame type="Image" name="BackgroundSmoke">
+                    <TextureCoords top=".15" left="-.85" bottom=".85" right="0.25" layer="0"/>
+                    <TextureCoords top=".15" left="-.85" bottom=".85" right="0.55" layer="1"/>
+                    <LayerAlpha val="102" layer="2"/>
+                </Frame>
+            </Frame>
+        
+            <Frame type="Frame" name="SurfaceAccentContainer">
+            
+                <Frame type="Frame" name="OverlayVignette">
+                    <Visible val="false"/>
+                </Frame>
+            </Frame>
+        </Frame>
+    </Frame>
+    
+    <!--
+    ==========================
+    Voice Pack Preview Pane Template
+    ==========================
+    -->
+        
+    <Frame type="VoicePackFrame" name="VoicePackPreviewPaneTemplate" template="CollectionPreviewPane/CollectionPreviewPaneAnimatedTemplate">
+    
+        <Frame type="Frame" name="DisplayContainer">
+        
+            <Frame type="Frame" name="PreviewContainer">
+                
+                <Frame type="Frame" name="ClippingContainer">
+                    <Anchor side="Top" relative="$parent" pos="Min" offset="4"/>
+                    <Anchor side="Bottom" relative="$parent" pos="Max" offset="-4"/>
+                    <Anchor side="Left" relative="$parent" pos="Min" offset="4"/>
+                    <Anchor side="Right" relative="$parent" pos="Max" offset="-4"/>
+                        
+                    <Frame type="Image" name="AnnouncerPortrait">
+                        <Anchor side="Top" relative="$parent/$parent" pos="Mid" offset="0"/>
+                        <Anchor side="Bottom" relative="$parent/$parent" pos="Mid" offset="0"/>
+                        <Anchor side="Left" relative="$parent/$parent" pos="Min" offset="0"/>
+                        <Anchor side="Right" relative="$parent/$parent" pos="Max" offset="0"/>
+                        <ScaleHeightToTexture val="True"/>
+                        <LayerCount val="1"/>
+                        
+                        <Texture val="{$ancestor[@type=VoicePackFrame]/@ImageTexture}" layer="0"/>
+                        
+                        <Animation name="Flicker">
+                            <Event event="OnShown" action="Reset,Play"/>
+                            
+                            <Controller type="Property" property="LayerAlpha" curve="True" index="0" end="Loop">
+                                <Key type="Property" time="0.000" value="255" inOut="Linear"/>
+                                <Key type="Property" time="3.850" value="255" inOut="Linear"/>
+                                <Key type="Property" time="3.900" value="230" inOut="Linear"/>
+                                <Key type="Property" time="3.950" value="242" inOut="Linear"/>
+                                <Key type="Property" time="4.000" value="216" inOut="Linear"/>
+                                <Key type="Property" time="4.050" value="242" inOut="Linear"/>
+                                <Key type="Property" time="4.100" value="230" inOut="Linear"/>
+                                <Key type="Property" time="4.150" value="255" inOut="Linear"/>
+                                <Key type="Property" time="8.000" value="255" inOut="Linear"/>
+                            </Controller>
+                        </Animation>
+                        
+                    </Frame>
+                    
+                    <Frame type="Image" name="AnnouncerPortraitGlow">
+                        <Anchor relative="$parent/AnnouncerPortrait"/>
+                        <BlendMode val="Add"/>
+                        <LayerCount val="1"/>
+                        
+                        <Texture val="{$ancestor[@type=VoicePackFrame]/@ImageTexture}" layer="0"/>
+                        <LayerAlpha val="40" layer="0"/>
+                        
+                        <Animation name="GlowAdjust">
+                            <Event event="OnShown" action="Reset,Play"/>
+                            
+                            <Controller type="Property" property="LayerAlpha" curve="True" index="0" end="Loop">
+                                <Key type="Property" time="0.000" value="0" inOut="Slow"/>
+                                <Key type="Property" time="2.000" value="40" inOut="Slow"/>
+                                <Key type="Property" time="4.000" value="0" inOut="Slow"/>
+                                <Key type="Property" time="6.000" value="40" inOut="Slow"/>
+                                <Key type="Property" time="8.000" value="0" inOut="Slow"/>
+                            </Controller>
+                        </Animation>
+                    </Frame>
+                </Frame>
+            </Frame>
+
+            <Frame type="Frame" name="VoiceModuleAnimation">
+                <Anchor side="Right" relative="$parent" pos="Max" offset="-10"/>
+                <Anchor side="Bottom" relative="$parent" pos="Max" offset="-6"/>
+                <Width val="119"/>
+                <Height val="66"/>
+                <Alpha val="150"/>
+
+                <Frame type="Image" name="Line1">
+                    <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+                    <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+                    <Anchor side="Left" relative="$parent" pos="Min" offset="20"/>
+                    <Height val="10"/>
+                    <Width val="4"/>
+                    <Texture val="Assets/Textures/white.dds"/>
+                    <Color val="46,124,175"/>
+                    <TextureType val="Nineslice"/>
+                </Frame>
+
+                <Frame type="Image" name="Line2">
+                    <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+                    <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+                    <Anchor side="Left" relative="$parent/Line1" pos="Max" offset="#VoiceLineLeftOffset"/>
+                    <Height val="10"/>
+                    <Width val="4"/>
+                    <Texture val="Assets/Textures/white.dds"/>
+                    <Color val="46,124,175"/>
+                    <TextureType val="Nineslice"/>
+                </Frame>    
+
+                <Frame type="Image" name="Line3">
+                    <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+                    <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+                    <Anchor side="Left" relative="$parent/Line2" pos="Max" offset="#VoiceLineLeftOffset"/>
+                    <Height val="10"/>
+                    <Width val="4"/>
+                    <Texture val="Assets/Textures/white.dds"/>
+                    <Color val="46,124,175"/>
+                    <TextureType val="Nineslice"/>
+                </Frame>
+
+                <Frame type="Image" name="Line4">
+                    <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+                    <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+                    <Anchor side="Left" relative="$parent/Line3" pos="Max" offset="#VoiceLineLeftOffset"/>
+                    <Height val="10"/>
+                    <Width val="4"/>
+                    <Texture val="Assets/Textures/white.dds"/>
+                    <Color val="46,124,175"/>
+                    <TextureType val="Nineslice"/>
+                </Frame>    
+
+                <Frame type="Image" name="Line5">
+                    <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+                    <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+                    <Anchor side="Left" relative="$parent/Line4" pos="Max" offset="#VoiceLineLeftOffset"/>
+                    <Height val="10"/>
+                    <Width val="4"/>
+                    <Texture val="Assets/Textures/white.dds"/>
+                    <Color val="46,124,175"/>
+                    <TextureType val="Nineslice"/>
+                </Frame>    
+
+                <Frame type="Image" name="Line6">
+                    <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+                    <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+                    <Anchor side="Left" relative="$parent/Line5" pos="Max" offset="#VoiceLineLeftOffset"/>
+                    <Height val="10"/>
+                    <Width val="4"/>
+                    <Texture val="Assets/Textures/white.dds"/>
+                    <Color val="46,124,175"/>
+                    <TextureType val="Nineslice"/>
+                </Frame>    
+
+                <Frame type="Image" name="Line7">
+                    <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+                    <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+                    <Anchor side="Left" relative="$parent/Line6" pos="Max" offset="#VoiceLineLeftOffset"/>
+                    <Height val="10"/>
+                    <Width val="4"/>
+                    <Texture val="Assets/Textures/white.dds"/>
+                    <Color val="46,124,175"/>
+                    <TextureType val="Nineslice"/>
+                </Frame>
+
+                <Frame type="Image" name="Line8">
+                    <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+                    <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+                    <Anchor side="Left" relative="$parent/Line7" pos="Max" offset="#VoiceLineLeftOffset"/>
+                    <Height val="10"/>
+                    <Width val="4"/>
+                    <Texture val="Assets/Textures/white.dds"/>
+                    <Color val="46,124,175"/>
+                    <TextureType val="Nineslice"/>
+                </Frame>   
+
+                <Frame type="Image" name="Line9">
+                    <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+                    <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+                    <Anchor side="Left" relative="$parent/Line8" pos="Max" offset="#VoiceLineLeftOffset"/>
+                    <Height val="10"/>
+                    <Width val="4"/>
+                    <Texture val="Assets/Textures/white.dds"/>
+                    <Color val="46,124,175"/>
+                    <TextureType val="Nineslice"/>
+                </Frame>   
+
+                <Frame type="Image" name="Line10">
+                    <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+                    <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+                    <Anchor side="Left" relative="$parent/Line9" pos="Max" offset="#VoiceLineLeftOffset"/>
+                    <Height val="10"/>
+                    <Width val="4"/>
+                    <Texture val="Assets/Textures/white.dds"/>
+                    <Color val="46,124,175"/>
+                    <TextureType val="Nineslice"/>
+                </Frame>   
+
+                <Frame type="Image" name="Line11">
+                    <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+                    <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+                    <Anchor side="Left" relative="$parent/Line10" pos="Max" offset="#VoiceLineLeftOffset"/>
+                    <Height val="10"/>
+                    <Width val="4"/>
+                    <Texture val="Assets/Textures/white.dds"/>
+                    <Color val="46,124,175"/>
+                    <TextureType val="Nineslice"/>
+                </Frame>   
+
+                <Frame type="Image" name="Line12">
+                    <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+                    <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+                    <Anchor side="Left" relative="$parent/Line11" pos="Max" offset="#VoiceLineLeftOffset"/>
+                    <Height val="10"/>
+                    <Width val="4"/>
+                    <Texture val="Assets/Textures/white.dds"/>
+                    <Color val="46,124,175"/>
+                    <TextureType val="Nineslice"/>
+                </Frame>
+                
+                <StateGroup name="AspectRatioState">
+                    <DefaultState val="Not16x9"/>
+                    
+                    <State name="16x9">
+                        <When type="StateGroup" frame="$GlueUI" AspectRatioState="16x9"/>
+                        <Action type="SetProperty" frame="Line3" Width="5"/>
+                        <Action type="SetProperty" frame="Line4" Width="5"/>
+                        <Action type="SetProperty" frame="Line8" Width="5"/>
+                        <Action type="SetProperty" frame="Line9" Width="5"/>
+                        <Action type="SetProperty" frame="Line12" Width="5"/>
+                        <Action type="SetAnchor" frame="Line1" side="Left" relative="$parent" pos="Min" offset="10"/>
+                        <Action type="SetAnchor" frame="Line2" side="Left" relative="$parent/Line1" pos="Max" offset="#VoiceLineLeftOffset16x9"/>
+                        <Action type="SetAnchor" frame="Line6" side="Left" relative="$parent/Line5" pos="Max" offset="#VoiceLineLeftOffset16x9"/>
+                        <Action type="SetAnchor" frame="Line7" side="Left" relative="$parent/Line6" pos="Max" offset="#VoiceLineLeftOffset16x9"/>
+                        <Action type="SetAnchor" frame="Line11" side="Left" relative="$parent/Line10" pos="Max" offset="#VoiceLineLeftOffset16x9"/>
+                    </State>
+                    
+                    <State name="Not16x9">
+                        <Action type="SetProperty" frame="Line3" Width="4"/>
+                        <Action type="SetProperty" frame="Line4" Width="4"/>
+                        <Action type="SetProperty" frame="Line8" Width="4"/>
+                        <Action type="SetProperty" frame="Line9" Width="4"/>
+                        <Action type="SetProperty" frame="Line12" Width="4"/>
+                        <Action type="SetAnchor" frame="Line1" side="Left" relative="$parent" pos="Min" offset="20"/>
+                        <Action type="SetAnchor" frame="Line2" side="Left" relative="$parent/Line1" pos="Max" offset="#VoiceLineLeftOffset"/>
+                        <Action type="SetAnchor" frame="Line6" side="Left" relative="$parent/Line5" pos="Max" offset="#VoiceLineLeftOffset"/>
+                        <Action type="SetAnchor" frame="Line7" side="Left" relative="$parent/Line6" pos="Max" offset="#VoiceLineLeftOffset"/>
+                        <Action type="SetAnchor" frame="Line11" side="Left" relative="$parent/Line10" pos="Max" offset="#VoiceLineLeftOffset"/>
+                    </State>
+                </StateGroup>
+
+                <Animation name="VoiceModAnim">
+                    <Event event="OnShown" action="Reset,Play"/>
+
+                    <Controller type="Dimension" dimension="Height" relative="True" percentage="False" end="Loop" frame="Line1">
+                        <Key type="Curve" time="0.000" value="0" inOut="Slow"/>
+                        <Key type="Curve" time="0.400" value="10" inOut="Slow"/>
+                        <Key type="Curve" time="0.500" value="12" inOut="Slow"/>
+                        <Key type="Curve" time="0.700" value="0" inOut="Slow"/>
+                    </Controller>
+
+                    <Controller type="Dimension" dimension="Height" relative="True" percentage="False" end="Loop" frame="Line2">
+                        <Key type="Curve" time="0" value="0" inOut="Slow"/>
+                        <Key type="Curve" time="0.25" value="0" inOut="Slow"/>
+                        <Key type="Curve" time="0.65" value="8" inOut="Slow"/>
+                        <Key type="Curve" time="0.85" value="10" inOut="Slow"/>
+                        <Key type="Curve" time="1.05" value="0" inOut="Slow"/>
+                    </Controller>
+
+                    <Controller type="Dimension" dimension="Height" relative="True" percentage="False" end="Loop" frame="Line3">
+                        <Key type="Curve" time="0" value="0" inOut="Slow"/>
+                        <Key type="Curve" time="0.6" value="0" inOut="Slow"/>
+                        <Key type="Curve" time="0.8" value="6" inOut="Slow"/>
+                        <Key type="Curve" time="0.9" value="12" inOut="Slow"/>
+                        <Key type="Curve" time="1.0" value="0" inOut="Slow"/>
+                    </Controller>
+
+                    <Controller type="Dimension" dimension="Height" relative="True" percentage="False" end="Loop" frame="Line4">
+                        <Key type="Curve" time="0" value="0" inOut="Slow"/>
+                        <Key type="Curve" time="0.1" value="0" inOut="Slow"/>
+                        <Key type="Curve" time="0.3" value="10" inOut="Slow"/>
+                        <Key type="Curve" time="0.5" value="12" inOut="Slow"/>
+                        <Key type="Curve" time="0.75" value="0" inOut="Slow"/>
+                    </Controller>
+
+                    <Controller type="Dimension" dimension="Height" relative="True" percentage="False" end="Loop" frame="Line5">
+                        <Key type="Curve" time="0" value="0" inOut="Slow"/>
+                        <Key type="Curve" time="0.55" value="0" inOut="Slow"/>
+                        <Key type="Curve" time="0.85" value="12" inOut="Slow"/>
+                        <Key type="Curve" time="1.0" value="6" inOut="Slow"/>
+                        <Key type="Curve" time="1.1" value="0" inOut="Slow"/>
+                    </Controller>
+
+                    <Controller type="Dimension" dimension="Height" relative="True" percentage="False" end="Loop" frame="Line6">
+                        <Key type="Curve" time="0" value="0" inOut="Slow"/>
+                        <Key type="Curve" time="0.25" value="0" inOut="Slow"/>
+                        <Key type="Curve" time="0.55" value="9" inOut="Slow"/>
+                        <Key type="Curve" time="0.85" value="12" inOut="Slow"/>
+                        <Key type="Curve" time="0.95" value="0" inOut="Slow"/>
+                    </Controller>
+
+                    <Controller type="Dimension" dimension="Height" relative="True" percentage="False" end="Loop" frame="Line7">
+                        <Key type="Curve" time="0" value="0" inOut="Slow"/>
+                        <Key type="Curve" time="0.35" value="0" inOut="Slow"/>
+                        <Key type="Curve" time="0.65" value="11" inOut="Slow"/>
+                        <Key type="Curve" time="0.85" value="7" inOut="Slow"/>
+                        <Key type="Curve" time="1.0" value="0" inOut="Slow"/>
+                    </Controller>
+
+                    <Controller type="Dimension" dimension="Height" relative="True" percentage="False" end="Loop" frame="Line8">
+                        <Key type="Curve" time="0" value="0" inOut="Slow"/>
+                        <Key type="Curve" time="0.45" value="0" inOut="Slow"/>
+                        <Key type="Curve" time="0.75" value="6" inOut="Slow"/>
+                        <Key type="Curve" time="1.05" value="12" inOut="Slow"/>
+                        <Key type="Curve" time="1.2" value="0" inOut="Slow"/>
+                    </Controller>
+
+                    <Controller type="Dimension" dimension="Height" relative="True" percentage="False" end="Loop" frame="Line9">
+                        <Key type="Curve" time="0" value="0" inOut="Slow"/>
+                        <Key type="Curve" time="0.15" value="0" inOut="Slow"/>
+                        <Key type="Curve" time="0.30" value="8" inOut="Slow"/>
+                        <Key type="Curve" time="0.55" value="12" inOut="Slow"/>
+                        <Key type="Curve" time="0.8" value="0" inOut="Slow"/>
+                    </Controller>
+
+                    <Controller type="Dimension" dimension="Height" relative="True" percentage="False" end="Loop" frame="Line10">
+                        <Key type="Curve" time="0" value="0" inOut="Slow"/>
+                        <Key type="Curve" time="0.25" value="0" inOut="Slow"/>
+                        <Key type="Curve" time="0.6" value="10" inOut="Slow"/>
+                        <Key type="Curve" time="0.85" value="12" inOut="Slow"/>
+                        <Key type="Curve" time="1.0" value="0" inOut="Slow"/>
+                    </Controller>
+
+                    <Controller type="Dimension" dimension="Height" relative="True" percentage="False" end="Loop" frame="Line11">
+                        <Key type="Curve" time="0" value="0" inOut="Slow"/>
+                        <Key type="Curve" time="0.75" value="0" inOut="Slow"/>
+                        <Key type="Curve" time="0.90" value="7" inOut="Slow"/>
+                        <Key type="Curve" time="1.15" value="12" inOut="Slow"/>
+                        <Key type="Curve" time="1.3" value="0" inOut="Slow"/>
+                    </Controller>
+
+                    <Controller type="Dimension" dimension="Height" relative="True" percentage="False" end="Loop" frame="Line12">
+                        <Key type="Curve" time="0" value="0" inOut="Slow"/>
+                        <Key type="Curve" time="0.20" value="0" inOut="Slow"/>
+                        <Key type="Curve" time="0.5" value="10" inOut="Slow"/>
+                        <Key type="Curve" time="0.75" value="12" inOut="Slow"/>
+                        <Key type="Curve" time="1.05" value="0" inOut="Slow"/>
+                    </Controller>
+                </Animation>
+            </Frame>
+        </Frame>
+    </Frame>
+</Desc>

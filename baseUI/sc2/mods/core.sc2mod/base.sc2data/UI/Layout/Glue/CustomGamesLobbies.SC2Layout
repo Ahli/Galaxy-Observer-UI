@@ -1,0 +1,911 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<Desc>
+    <DescFlags val="Locked"/>
+    
+    <Constant name="TileListItem_Height" val="40"/>
+    <Constant name="TileListItem_Spacing_Vertical" val="2"/>
+    <Constant name="CustomGamesLobbies_LobbyPreview_TeamList_Spacing_Vertical" val="7"/>
+    <Constant name="CustomGamesLobbies_LobbyPreview_TeamList_Spacing_Horizontal" val="#CustomGamesLobbies_LobbyPreview_TeamList_Spacing_Vertical"/>
+    
+    <!-- 
+    ========================
+    FILTER EDITBOX TEMPLATE
+    ========================
+    -->
+    
+    <Frame type="EditBox" name="FilterEditBoxTemplate" template="StandardBattlenetTemplates/BattlenetEditBoxTemplate">
+        <Anchor side="Top" relative="$parent" pos="Min" offset="8"/>
+        <Anchor side="Left" relative="$parent" pos="Min" offset="9"/>
+        <Anchor side="Right" relative="$parent/ToggleMapTypeButton" pos="Min" offset="-4"/>
+        <Height val="38"/>
+        <LoseFocusOnEnterOrEsc val="true"/>
+        <Tooltip val="@UI/ScreenArcadeJoin/FilterTooltip"/>
+        <TooltipAnchorPosition val="TopCenter"/>
+        <Insets top="5" left="15" bottom="5" right="30"/>
+        <Visible val="True"/>
+        <RenderPriority val="600"/>
+        
+        <Frame type="Image" name="Image">
+            <Anchor relative="$parent"/>
+            <Texture val="@UI/SC2_UI_Battlenet_Glue_Arcade_FilterBG"/>
+            <TextureType val="Nineslice"/>
+            <StateCount val="1"/>
+            <Tiled val="true"/>
+        </Frame>
+
+        <Frame type="Frame" name="LabelContainerFrame">
+            <Frame type="Label" name="Label">
+                <Style val="ArcadeFilterInput"/>
+            </Frame>
+        </Frame>
+
+        <Frame type="Label" name="SearchTextLabel">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="8"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="-5"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="15"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="-10"/>
+            <Style val="ArcadeFilterInfo"/>
+            <Text val="@UI/ScreenArcadeJoin/FilterText"/>
+        </Frame>
+
+        <Frame type="Button" name="ClearTextButton">
+            <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="-5"/>
+            <Height val="31"/>
+            <Width val="30"/>
+
+            <Frame type="Image" name="NormalImage">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+                <Texture val="@UI/Glues_Icons_CloseButton" layer="0"/>
+                <TextureType val="Normal"/>
+                <Tiled val="false"/>
+                <StateCount val="1"/>
+            </Frame>
+
+            <Frame type="Image" name="HoverImage">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+                <Texture val="@UI/Glues_Icons_CloseButtonHover" layer="0"/>
+                <TextureType val="Normal"/>
+                <Tiled val="false"/>
+                <StateCount val="1"/>
+            </Frame>
+
+            <Frame type="Frame" name="HitTestFrame">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+            </Frame>
+        </Frame>
+
+        <!-- Doing the edit box animation this way because apparently you lose focus on the edit box otherwise -->
+        <Animation name="ListEmptyFilterPrep">
+            <Event event="EmptyFilter" action="DirectionForward,Play" frame="$parent"/>
+            <Event event="NotEmpty" action="DirectionForward,Play" frame="$parent"/>
+            <Event event="Empty" action="DirectionReverse,Play" frame="$parent"/>
+            <Event event="Loading" action="DirectionReverse,Play" frame="$parent"/>
+
+            <Controller type="Visibility" end="Pause">
+                <Key type="Bool" time="0.00" value="False"/>
+                <Key type="Bool" time="0.01" value="True"/>
+            </Controller>
+        </Animation>
+    </Frame>
+    
+    <!-- 
+    ========================
+    LOBBY LIST ITEM TEMPLATE
+    ========================
+    -->
+    <Frame type="LobbyTileListItem" name="LobbyListItemTemplate" template="StandardTileListTemplates/StandardSmallTileListItemTemplate">
+        <HideWhenCleared val="False"/>
+        
+        <Frame type="Frame" name="AnchorFrame">
+            <Anchor side="Left" relative="$parent/$parent" pos="Min" offset="16"/>
+            <Anchor side="Right" relative="$parent/$parent/ScrollBar" pos="Min" offset="-2"/>
+        </Frame>
+
+        <Frame type="BattleMapFrame" name="BattleMapFrame">
+            <Anchor relative="$parent"/>
+            <MapHandle val="{$parent/@MapHandle}"/>
+        </Frame>
+    
+        <!-- <Frame type="Image" name="NormalImage">
+            <Anchor side="Left" relative="$parent/MapTypeIconContainer" pos="Max" offset="-6"/>
+        </Frame> -->
+        
+        <!-- Melee/Arcade Icon -->
+        <!-- <Frame type="Frame" name="MapTypeIconContainer">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+            <Width val="34"/>
+            
+            <Frame type="Image" name="NormalImage">
+                <Anchor relative="$parent"/>
+                <Texture val="@UI/Glues_Battlenet_PageAssets_StandardListItem_Normal"/>
+                <TextureType val="NineSlice"/>
+                <Visible val="{$parent/$parent/NormalImage/@Visible}"/>
+            </Frame>
+
+            <Frame type="Image" name="HoverImage">
+                <Anchor relative="$parent"/>
+                <Texture val="@UI/Glues_Battlenet_PageAssets_StandardListItem_Hover"/>
+                <TextureType val="NineSlice"/>
+                <Visible val="{$parent/$parent/HoverImage/@Visible}"/>
+            </Frame>
+
+            <Frame type="Image" name="SelectedImage">
+                <Anchor relative="$parent"/>
+                <Texture val="@UI/Glues_Battlenet_PageAssets_StandardListItem_Selected"/>
+                <TextureType val="NineSlice"/>
+                <Visible val="{$parent/$parent/SelectedImage/@Visible}"/>
+            </Frame>
+        
+            <Frame type="Image" name="MapTypeIcon">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="6"/>
+                <Anchor side="Bottom" relative="$parent" pos="Max" offset="-6"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="6"/>
+                <Anchor side="Right" relative="$parent" pos="Max" offset="-6"/>
+                <Alpha val="100"/>
+                <Color val="60,120,200"/>
+            </Frame>
+        </Frame>
+
+        <StateGroup name="MapTypeStateGroup">
+            <DefaultState val="Melee"/>
+
+            <State name="Arcade">
+                <When type="Property" frame="BattleMapFrame" IsArcade="True"/>
+                <Action type="SetProperty" frame="MapTypeIconContainer/MapTypeIcon" Color="200,60,100"/>
+            </State>
+
+            <State name="Melee">
+                <Action type="SetProperty" frame="MapTypeIconContainer/MapTypeIcon" Color="60,120,200"/>
+            </State>
+        </StateGroup> -->
+        
+        <!-- Map/Game Icon -->
+        <Frame type="BattleMapIcon" name="BattleMapIcon">
+            <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="6"/>
+            <Width val="54"/>
+            <Height val="36"/>
+            <Alpha val="170"/>
+            <Color val="255,255,255"/>
+            <MapHandle val="{$parent/@MapHandle}"/>
+
+            <Frame type="Image" name="Image">
+                <Anchor relative="$parent"/>
+            </Frame>
+        </Frame>
+        
+        <!-- Map/Game Name -->
+         <Frame type="Label" name="MapName">
+            <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Left" relative="$parent/$parent/$parent/MapName" pos="Min" offset="0"/>
+            <Width val="200"/>
+            <Height val="20"/>
+            <Style val="@CustomGames_ListItem_Normal"/>
+            <Text val="{$parent/BattleMapFrame/@Name}"/>
+        </Frame>
+        
+        <!-- Lobby Name -->
+         <Frame type="Label" name="LobbyName">
+            <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Left" relative="$parent/$parent/$parent/LobbyName" pos="Min" offset="0"/>
+            <Width val="200"/>
+            <Height val="20"/>
+            <Style val="@CustomGames_ListItem_Normal"/>
+            <Text val="{$parent/@LobbyName}"/>
+        </Frame>
+ 
+        <Frame type="TextFormatFrame" name="PlayerCountFormatFrame">
+            <Anchor relative="$parent"/>
+            <FormatText val="%0%/%1%"/>
+            <Replacement index="0" val="{$parent/@PlayerCount}"/>
+            <Replacement index="1" val="{$parent/@PlayerCapacity}"/>
+        </Frame>
+        
+        <!-- Player Count -->
+         <Frame type="Label" name="PlayerCount">
+            <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Left" relative="$parent/$parent/$parent/PlayerCountIcon" pos="Min" offset="0"/>
+            <Width val="200"/>
+            <Height val="20"/>
+            <Style val="@CustomGames_ListItem_Normal"/>
+            <Text val="{$parent/PlayerCountFormatFrame/@Text}"/>
+        </Frame>
+        
+        <!-- Host Name -->
+         <Frame type="Label" name="HostName">
+            <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Left" relative="$parent/$parent/$parent/HostName" pos="Min" offset="0"/>
+            <Width val="200"/>
+            <Height val="20"/>
+            <Style val="@CustomGames_ListItem_Normal"/>
+            <Text val="{$parent/@HostName}"/>
+        </Frame>
+
+        <!-- <StateGroup name="SelectedState">
+            <State name="Selected">
+                <When type="Property" frame="$this" Toggled="True"/>
+                <Action type="SetProperty" frame="$this/Icon" Alpha="255"/>
+                <Action type="SetProperty" frame="$this/MapName" Style="@CustomGames_ListItem_Selected"/>
+                <Action type="SetProperty" frame="$this/LobbyName" Style="@CustomGames_ListItem_Selected"/>
+                <Action type="SetProperty" frame="$this/PlayerCount" Style="@CustomGames_ListItem_Selected"/>
+                <Action type="SetProperty" frame="$this/HostName" Style="@CustomGames_ListItem_Selected"/>
+            </State>
+        
+            <State name="Hover">
+                <When type="Property" frame="$this/HoverImage" Visible="True"/>
+                <Action type="SetProperty" frame="$this/Icon" Alpha="255"/>
+                <Action type="SetProperty" frame="$this/MapName" Style="@CustomGames_ListItem_Hover"/>
+                <Action type="SetProperty" frame="$this/LobbyName" Style="@CustomGames_ListItem_Hover"/>
+                <Action type="SetProperty" frame="$this/PlayerCount" Style="@CustomGames_ListItem_Hover"/>
+                <Action type="SetProperty" frame="$this/HostName" Style="@CustomGames_ListItem_Hover"/>
+            </State>
+            
+            <State name="Normal">
+                <When type="Property" frame="$this" Toggled="False"/>
+                <Action type="SetProperty" frame="$this/Icon" Alpha="120"/>
+                <Action type="SetProperty" frame="$this/MapName" Style="@CustomGames_ListItem_Normal"/>
+                <Action type="SetProperty" frame="$this/LobbyName" Style="@CustomGames_ListItem_Normal"/>
+                <Action type="SetProperty" frame="$this/PlayerCount" Style="@CustomGames_ListItem_Normal"/>
+                <Action type="SetProperty" frame="$this/HostName" Style="@CustomGames_ListItem_Normal"/>
+            </State>
+        </StateGroup> -->
+    </Frame>
+    
+    <!-- 
+    ========================
+    LOBBY LIST TEMPLATE
+    ========================
+    -->
+    <Frame type="Frame" name="LobbyListTemplate">
+        <Anchor side="Top" relative="$parent" pos="Min" offset="6"/>
+        <Anchor side="Bottom" relative="$parent" pos="Max" offset="-10"/>
+        <Anchor side="Left" relative="$parent" pos="Min" offset="12"/>
+        <Anchor side="Right" relative="$parent" pos="Max" offset="-12"/>
+
+        <Frame type="Label" name="MapName">
+            <Anchor side="Bottom" relative="$parent/LobbyListTileList" pos="Min" offset="-2"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="108"/>
+            <Text val="@UI/ScreenCustomGames/Lobbies/MapName"/>
+            <Style val="@CustomGames_ListInfoCategoryTitle"/>
+        </Frame>
+
+        <Frame type="Label" name="LobbyName">
+            <Anchor side="Bottom" relative="$parent/MapName" pos="Max" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="430"/>
+            <Text val="@UI/ScreenCustomGames/Lobbies/LobbyName"/>
+            <Style val="@CustomGames_ListInfoCategoryTitle"/>
+        </Frame>
+        
+        <Frame type="Image" name="PlayerCountIcon">
+            <Anchor side="Top" relative="$parent/MapName" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent/MapName" pos="Mid" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="810"/>
+            <Texture val="@UI/Glues_Icons_NumPlayers"/>
+        </Frame>
+        
+        <Frame type="Label" name="HostName">
+            <Anchor side="Bottom" relative="$parent/MapName" pos="Max" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="860"/>
+            <Text val="@UI/ScreenCustomGames/Lobbies/HostName"/>
+            <Style val="@CustomGames_ListInfoCategoryTitle"/>
+        </Frame>
+
+        <Frame type="TileList" name="LobbyListTileList">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="29"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+            
+            <Frame type="LobbyTileListItem" name="Item0" template="CustomGamesLobbies/LobbyListItemTemplate">
+                <Frame type="Frame" name="AnchorFrame">
+                    <Anchor side="Top" relative="$parent/$parent" pos="Min" offset="16"/>
+                </Frame>
+            </Frame>
+
+            <Frame type="LobbyTileListItem" name="Item1" template="CustomGamesLobbies/LobbyListItemTemplate">
+                <Frame type="Frame" name="AnchorFrame">
+                    <Anchor side="Top" relative="$parent/$parent/Item0/AnchorFrame" pos="Max" offset="2"/>
+                </Frame>
+            </Frame>
+
+            <Frame type="LobbyTileListItem" name="Item2" template="CustomGamesLobbies/LobbyListItemTemplate">
+                <Frame type="Frame" name="AnchorFrame">
+                    <Anchor side="Top" relative="$parent/$parent/Item1/AnchorFrame" pos="Max" offset="2"/>
+                </Frame>
+            </Frame>
+
+            <Frame type="LobbyTileListItem" name="Item3" template="CustomGamesLobbies/LobbyListItemTemplate">
+                <Frame type="Frame" name="AnchorFrame">
+                    <Anchor side="Top" relative="$parent/$parent/Item2/AnchorFrame" pos="Max" offset="2"/>
+                </Frame>
+            </Frame>
+
+            <Frame type="LobbyTileListItem" name="Item4" template="CustomGamesLobbies/LobbyListItemTemplate">
+                <Frame type="Frame" name="AnchorFrame">
+                    <Anchor side="Top" relative="$parent/$parent/Item3/AnchorFrame" pos="Max" offset="2"/>
+                </Frame>
+            </Frame>
+
+            <Frame type="LobbyTileListItem" name="Item5" template="CustomGamesLobbies/LobbyListItemTemplate">
+                <Frame type="Frame" name="AnchorFrame">
+                    <Anchor side="Top" relative="$parent/$parent/Item4/AnchorFrame" pos="Max" offset="2"/>
+                </Frame>
+            </Frame>
+
+            <Frame type="LobbyTileListItem" name="Item6" template="CustomGamesLobbies/LobbyListItemTemplate">
+                <Frame type="Frame" name="AnchorFrame">
+                    <Anchor side="Top" relative="$parent/$parent/Item5/AnchorFrame" pos="Max" offset="2"/>
+                </Frame>
+            </Frame>
+
+            <Frame type="LobbyTileListItem" name="Item7" template="CustomGamesLobbies/LobbyListItemTemplate">
+                <Frame type="Frame" name="AnchorFrame">
+                    <Anchor side="Top" relative="$parent/$parent/Item6/AnchorFrame" pos="Max" offset="2"/>
+                </Frame>
+            </Frame>
+
+            <Frame type="LobbyTileListItem" name="Item8" template="CustomGamesLobbies/LobbyListItemTemplate">
+                <Frame type="Frame" name="AnchorFrame">
+                    <Anchor side="Top" relative="$parent/$parent/Item7/AnchorFrame" pos="Max" offset="2"/>
+                </Frame>
+            </Frame>
+
+            <Frame type="LobbyTileListItem" name="Item9" template="CustomGamesLobbies/LobbyListItemTemplate">
+                <Frame type="Frame" name="AnchorFrame">
+                    <Anchor side="Top" relative="$parent/$parent/Item8/AnchorFrame" pos="Max" offset="2"/>
+                </Frame>
+            </Frame>
+
+            <Frame type="LobbyTileListItem" name="Item10" template="CustomGamesLobbies/LobbyListItemTemplate">
+                <Frame type="Frame" name="AnchorFrame">
+                    <Anchor side="Top" relative="$parent/$parent/Item9/AnchorFrame" pos="Max" offset="2"/>
+                </Frame>
+            </Frame>
+
+            <Frame type="LobbyTileListItem" name="Item11" template="CustomGamesLobbies/LobbyListItemTemplate">
+                <Frame type="Frame" name="AnchorFrame">
+                    <Anchor side="Top" relative="$parent/$parent/Item10/AnchorFrame" pos="Max" offset="2"/>
+                </Frame>
+            </Frame>
+
+            <Frame type="LobbyTileListItem" name="Item12" template="CustomGamesLobbies/LobbyListItemTemplate">
+                <Frame type="Frame" name="AnchorFrame">
+                    <Anchor side="Top" relative="$parent/$parent/Item11/AnchorFrame" pos="Max" offset="2"/>
+                </Frame>
+            </Frame>
+
+            <Frame type="LobbyTileListItem" name="Item13" template="CustomGamesLobbies/LobbyListItemTemplate">
+                <Frame type="Frame" name="AnchorFrame">
+                    <Anchor side="Top" relative="$parent/$parent/Item12/AnchorFrame" pos="Max" offset="2"/>
+                </Frame>
+            </Frame>
+
+            <Frame type="LobbyTileListItem" name="Item14" template="CustomGamesLobbies/LobbyListItemTemplate">
+                <Frame type="Frame" name="AnchorFrame">
+                    <Anchor side="Top" relative="$parent/$parent/Item13/AnchorFrame" pos="Max" offset="2"/>
+                </Frame>
+            </Frame>
+
+            <Frame type="ScrollBar" name="ScrollBar" template="StandardTileListTemplates/StandardTileListScrollBarTemplate">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+                <Anchor side="Bottom" relative="$parent/Item14" pos="Max" offset="0"/>
+            </Frame>
+        </Frame>
+    </Frame>
+    
+    <!-- 
+    ========================
+    LOBBY PREVIEW TEMPLATES
+    ========================
+    -->
+    
+    <Frame type="LobbyPreviewTileListItem" name="LobbyPreviewPlayerSlotTemplate">
+        <Anchor side="Left" relative="$parent" pos="Min" offset="7"/>
+        <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+        <Height val="20"/>
+        
+        <Frame type="Label" name="Label">
+            <Anchor relative="$parent"/>
+            <Style val="@CustomGames_Lobby_Preview_PlayerSlot_Inactive"/>
+            <Text val="{$parent/@PlayerName}"/>
+        </Frame>
+
+        <StateGroup name="LobbyActiveState">
+            <DefaultState val="PlayerSlotNotOpen"/>
+            
+            <State name="PlayerSlotOccupied">
+                <When type="Property" LobbySlotPreviewState="OCCUPIED"/>
+                <Action type="SetProperty" frame="Label" Style="@CustomGames_Lobby_Preview_PlayerSlot_Inactive"/>
+                <Action type="SetProperty" frame="Label" Text="{$parent/@PlayerName}"/>
+            </State>
+            <State name="PlayerSlotOpen">
+                <When type="Property" LobbySlotPreviewState="OPEN"/>
+                <Action type="SetProperty" frame="Label" Style="@CustomGames_Lobby_Preview_PlayerSlot_Active"/>
+                <Action type="SetProperty" frame="Label" Text="@UI/Lobby/Open"/>
+            </State>
+            <State name="PlayerSlotNotOpen">
+                <Action type="SetProperty" frame="Label" Style="@CustomGames_Lobby_Preview_PlayerSlot_Inactive"/>
+                <Action type="SetProperty" frame="Label" Text="@UI/Lobby/Closed"/>
+            </State>
+        </StateGroup>
+    </Frame>
+    
+    <Frame type="TileList" name="LobbyPreviewTeamTemplate">
+        <Width val="190"/>
+        <Height val="202"/>
+        
+        <StateGroup name="AspectRatioState">
+            <DefaultState val="Not16x9"/>
+            
+            <State name="16x9">
+                <When type="StateGroup" frame="$GlueUI" AspectRatioState="16x9"/>
+                <Action type="SetProperty" frame="$this" Width="194"/>
+            </State>
+            
+            <State name="Not16x9">
+                <Action type="SetProperty" frame="$this" Width="240"/>
+            </State>
+        </StateGroup>
+            
+        <Frame type="Image" name="Background">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+            <Texture val="@UI/SC2_UI_Battlenet_Glue_Arcade_MainListItem_Normal"/>
+            <TextureType val="NineSlice"/>
+        </Frame>
+        
+        <Frame type="Label" name="TeamID">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="7"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="7"/>
+            <Height val="20"/>
+            <Style val="@CustomGames_Lobby_Preview_TeamID"/>
+        </Frame>
+    
+        <Frame type="LobbyPreviewTileListItem" name="Item0" template="CustomGamesLobbies/LobbyPreviewPlayerSlotTemplate">
+            <Anchor side="Top" relative="$parent/TeamID" pos="Max" offset="5"/>
+        </Frame>
+    
+        <Frame type="LobbyPreviewTileListItem" name="Item1" template="CustomGamesLobbies/LobbyPreviewPlayerSlotTemplate">
+            <Anchor side="Top" relative="$parent/Item0" pos="Max" offset="1"/>
+        </Frame>
+    
+        <Frame type="LobbyPreviewTileListItem" name="Item2" template="CustomGamesLobbies/LobbyPreviewPlayerSlotTemplate">
+            <Anchor side="Top" relative="$parent/Item1" pos="Max" offset="1"/>
+        </Frame>
+    
+        <Frame type="LobbyPreviewTileListItem" name="Item3" template="CustomGamesLobbies/LobbyPreviewPlayerSlotTemplate">
+            <Anchor side="Top" relative="$parent/Item2" pos="Max" offset="1"/>
+        </Frame>
+    
+        <Frame type="LobbyPreviewTileListItem" name="Item4" template="CustomGamesLobbies/LobbyPreviewPlayerSlotTemplate">
+            <Anchor side="Top" relative="$parent/Item3" pos="Max" offset="1"/>
+        </Frame>
+    
+        <Frame type="LobbyPreviewTileListItem" name="Item5" template="CustomGamesLobbies/LobbyPreviewPlayerSlotTemplate">
+            <Anchor side="Top" relative="$parent/Item4" pos="Max" offset="1"/>
+        </Frame>
+    
+        <Frame type="LobbyPreviewTileListItem" name="Item6" template="CustomGamesLobbies/LobbyPreviewPlayerSlotTemplate">
+            <Anchor side="Top" relative="$parent/Item5" pos="Max" offset="1"/>
+        </Frame>
+    
+        <Frame type="LobbyPreviewTileListItem" name="Item7" template="CustomGamesLobbies/LobbyPreviewPlayerSlotTemplate">
+            <Anchor side="Top" relative="$parent/Item6" pos="Max" offset="1"/>
+        </Frame>
+    </Frame>
+    
+    <Frame type="LobbyPreviewFrame" name="LobbyPreviewTemplate">
+        <Anchor relative="$parent"/>
+        
+        <Frame type="Label" name="LobbyName">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="16"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="20"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="-20"/>
+            <Height val="36"/>
+            <Style val="@Arcade_GameInfo_Title"/>
+        </Frame>
+        
+        <Frame type="ScrollableFrame" name="TeamsContainer">
+            <Anchor side="Top" relative="$parent/LobbyName" pos="Max" offset="5"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="-20"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="20"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="-20"/>
+            <AcceptsMouse val="true"/>
+            
+            <Frame type="Frame" name="ContainerFrame">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Bottom" relative="$this/Team15" pos="Max" offset="5"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Right" relative="$parent/ScrollBar" pos="Min" offset="-2"/>
+        
+                <StateGroup name="AspectRatioState">
+                    <DefaultState val="Not16x9"/>
+                    
+                    <State name="16x9">
+                        <When type="StateGroup" frame="$GlueUI" AspectRatioState="16x9"/>
+                        <Action type="SetAnchor" frame="$this/Team3" side="Top" relative="$parent/Team1" pos="Min" offset="0"/>
+                        <Action type="SetAnchor" frame="$this/Team3" side="Left" relative="$parent/Team2" pos="Max" offset="#CustomGamesLobbies_LobbyPreview_TeamList_Spacing_Horizontal"/>
+                    </State>
+                    
+                    <State name="Not16x9">
+                        <Action type="SetAnchor" frame="$this/Team3" side="Top" relative="$parent/Team1" pos="Max" offset="#CustomGamesLobbies_LobbyPreview_TeamList_Spacing_Vertical"/>
+                        <Action type="SetAnchor" frame="$this/Team3" side="Left" relative="$parent/Team1" pos="Min" offset="0"/>
+                    </State>
+                </StateGroup>
+                
+                <Frame type="TileList" name="Team0" template="CustomGamesLobbies/LobbyPreviewTeamTemplate">
+                    <Anchor side="Top" relative="$parent" pos="Min" offset="2"/>
+                    <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                
+                    <Frame type="Label" name="TeamID">
+                        <Text val="@UI/ScreenCustomGames/Lobbies/Team1"/>
+                    </Frame>
+                </Frame>
+                
+                <Frame type="TileList" name="Team1" template="CustomGamesLobbies/LobbyPreviewTeamTemplate">
+                    <Anchor side="Top" relative="$parent/Team0" pos="Min" offset="0"/>
+                    <Anchor side="Left" relative="$parent/Team0" pos="Max" offset="#CustomGamesLobbies_LobbyPreview_TeamList_Spacing_Horizontal"/>
+                
+                    <Frame type="Label" name="TeamID">
+                        <Text val="@UI/ScreenCustomGames/Lobbies/Team2"/>
+                    </Frame>
+                </Frame>
+
+                <Frame type="TileList" name="Team2" template="CustomGamesLobbies/LobbyPreviewTeamTemplate">
+                    <Anchor side="Top" relative="$parent/Team0" pos="Min" offset="0"/>
+                    <Anchor side="Left" relative="$parent/Team1" pos="Max" offset="#CustomGamesLobbies_LobbyPreview_TeamList_Spacing_Horizontal"/>
+                
+                    <Frame type="Label" name="TeamID">
+                        <Text val="@UI/ScreenCustomGames/Lobbies/Team3"/>
+                    </Frame>
+                </Frame>
+                
+                <Frame type="TileList" name="Team3" template="CustomGamesLobbies/LobbyPreviewTeamTemplate">
+                    <Anchor side="Top" relative="$parent/Team0" pos="Min" offset="0"/>
+                    <Anchor side="Left" relative="$parent/Team2" pos="Max" offset="#CustomGamesLobbies_LobbyPreview_TeamList_Spacing_Horizontal"/>
+                
+                    <Frame type="Label" name="TeamID">
+                        <Text val="@UI/ScreenCustomGames/Lobbies/Team4"/>
+                    </Frame>
+                </Frame>
+                
+                <Frame type="TileList" name="Team4" template="CustomGamesLobbies/LobbyPreviewTeamTemplate">
+                    <Anchor side="Top" relative="$parent/Team0" pos="Max" offset="#CustomGamesLobbies_LobbyPreview_TeamList_Spacing_Vertical"/>
+                    <Anchor side="Left" relative="$parent/Team0" pos="Min" offset="0"/>
+                
+                    <Frame type="Label" name="TeamID">
+                        <Text val="@UI/ScreenCustomGames/Lobbies/Team5"/>
+                    </Frame>
+                </Frame>
+                
+                <Frame type="TileList" name="Team5" template="CustomGamesLobbies/LobbyPreviewTeamTemplate">
+                    <Anchor side="Top" relative="$parent/Team4" pos="Min" offset="0"/>
+                    <Anchor side="Left" relative="$parent/Team4" pos="Max" offset="#CustomGamesLobbies_LobbyPreview_TeamList_Spacing_Horizontal"/>
+                
+                    <Frame type="Label" name="TeamID">
+                        <Text val="@UI/ScreenCustomGames/Lobbies/Team6"/>
+                    </Frame>
+                </Frame>
+                
+                <Frame type="TileList" name="Team6" template="CustomGamesLobbies/LobbyPreviewTeamTemplate">
+                    <Anchor side="Top" relative="$parent/Team4" pos="Min" offset="0"/>
+                    <Anchor side="Left" relative="$parent/Team5" pos="Max" offset="#CustomGamesLobbies_LobbyPreview_TeamList_Spacing_Horizontal"/>
+                
+                    <Frame type="Label" name="TeamID">
+                        <Text val="@UI/ScreenCustomGames/Lobbies/Team7"/>
+                    </Frame>
+                </Frame>
+                
+                <Frame type="TileList" name="Team7" template="CustomGamesLobbies/LobbyPreviewTeamTemplate">
+                    <Anchor side="Top" relative="$parent/Team4" pos="Min" offset="0"/>
+                    <Anchor side="Left" relative="$parent/Team6" pos="Max" offset="#CustomGamesLobbies_LobbyPreview_TeamList_Spacing_Horizontal"/>
+                
+                    <Frame type="Label" name="TeamID">
+                        <Text val="@UI/ScreenCustomGames/Lobbies/Team8"/>
+                    </Frame>
+                </Frame>
+                
+                <Frame type="TileList" name="Team8" template="CustomGamesLobbies/LobbyPreviewTeamTemplate">
+                    <Anchor side="Top" relative="$parent/Team4" pos="Max" offset="#CustomGamesLobbies_LobbyPreview_TeamList_Spacing_Vertical"/>
+                    <Anchor side="Left" relative="$parent/Team4" pos="Min" offset="0"/>
+                
+                    <Frame type="Label" name="TeamID">
+                        <Text val="@UI/ScreenCustomGames/Lobbies/Team9"/>
+                    </Frame>
+                </Frame>
+                
+                <Frame type="TileList" name="Team9" template="CustomGamesLobbies/LobbyPreviewTeamTemplate">
+                    <Anchor side="Top" relative="$parent/Team8" pos="Min" offset="0"/>
+                    <Anchor side="Left" relative="$parent/Team8" pos="Max" offset="#CustomGamesLobbies_LobbyPreview_TeamList_Spacing_Horizontal"/>
+                
+                    <Frame type="Label" name="TeamID">
+                        <Text val="@UI/ScreenCustomGames/Lobbies/Team10"/>
+                    </Frame>
+                </Frame>
+                
+                <Frame type="TileList" name="Team10" template="CustomGamesLobbies/LobbyPreviewTeamTemplate">
+                    <Anchor side="Top" relative="$parent/Team8" pos="Min" offset="0"/>
+                    <Anchor side="Left" relative="$parent/Team9" pos="Max" offset="#CustomGamesLobbies_LobbyPreview_TeamList_Spacing_Horizontal"/>
+                
+                    <Frame type="Label" name="TeamID">
+                        <Text val="@UI/ScreenCustomGames/Lobbies/Team11"/>
+                    </Frame>
+                </Frame>
+                
+                <Frame type="TileList" name="Team11" template="CustomGamesLobbies/LobbyPreviewTeamTemplate">
+                    <Anchor side="Top" relative="$parent/Team8" pos="Min" offset="0"/>
+                    <Anchor side="Left" relative="$parent/Team10" pos="Max" offset="#CustomGamesLobbies_LobbyPreview_TeamList_Spacing_Horizontal"/>
+                
+                    <Frame type="Label" name="TeamID">
+                        <Text val="@UI/ScreenCustomGames/Lobbies/Team12"/>
+                    </Frame>
+                </Frame>
+                
+                <Frame type="TileList" name="Team12" template="CustomGamesLobbies/LobbyPreviewTeamTemplate">
+                    <Anchor side="Top" relative="$parent/Team8" pos="Max" offset="#CustomGamesLobbies_LobbyPreview_TeamList_Spacing_Vertical"/>
+                    <Anchor side="Left" relative="$parent/Team8" pos="Min" offset="0"/>
+                
+                    <Frame type="Label" name="TeamID">
+                        <Text val="@UI/ScreenCustomGames/Lobbies/Team13"/>
+                    </Frame>
+                </Frame>
+                
+                <Frame type="TileList" name="Team13" template="CustomGamesLobbies/LobbyPreviewTeamTemplate">
+                    <Anchor side="Top" relative="$parent/Team12" pos="Min" offset="0"/>
+                    <Anchor side="Left" relative="$parent/Team12" pos="Max" offset="#CustomGamesLobbies_LobbyPreview_TeamList_Spacing_Horizontal"/>
+                
+                    <Frame type="Label" name="TeamID">
+                        <Text val="@UI/ScreenCustomGames/Lobbies/Team14"/>
+                    </Frame>
+                </Frame>
+                
+                <Frame type="TileList" name="Team14" template="CustomGamesLobbies/LobbyPreviewTeamTemplate">
+                    <Anchor side="Top" relative="$parent/Team12" pos="Min" offset="0"/>
+                    <Anchor side="Left" relative="$parent/Team13" pos="Max" offset="#CustomGamesLobbies_LobbyPreview_TeamList_Spacing_Horizontal"/>
+                
+                    <Frame type="Label" name="TeamID">
+                        <Text val="@UI/ScreenCustomGames/Lobbies/Team15"/>
+                    </Frame>
+                </Frame>
+                
+                <Frame type="TileList" name="Team15" template="CustomGamesLobbies/LobbyPreviewTeamTemplate">
+                    <Anchor side="Top" relative="$parent/Team12" pos="Min" offset="0"/>
+                    <Anchor side="Left" relative="$parent/Team14" pos="Max" offset="#CustomGamesLobbies_LobbyPreview_TeamList_Spacing_Horizontal"/>
+                
+                    <Frame type="Label" name="TeamID">
+                        <Text val="@UI/ScreenCustomGames/Lobbies/Team16"/>
+                    </Frame>
+                </Frame>
+            </Frame>
+            
+            <Frame type="ScrollBar" name="ScrollBar" template="StandardTileListTemplates/StandardTileListScrollBarTemplate">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+                <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+            </Frame>
+        </Frame>
+    </Frame>
+    
+    <!-- 
+    ===========================================================
+    
+    CUSTOM GAMES LOBBIES TEMPLATE
+    
+    ===========================================================
+    -->
+    <Frame type="LobbyListFrame" name="CustomGamesLobbies" template="CustomGamesTemplates/CustomGamesBaseTemplate">
+        <Anchor relative="$parent"/>
+        <HookupAlias original="LobbyListTileList" alias="ContentContainer/PrimaryPanel/LobbyList/LobbyListTileList"/>
+        <HookupAlias original="LobbyListTileList/ScrollBar" alias="ContentContainer/PrimaryPanel/LobbyList/LobbyListTileList/ScrollBar"/>
+        <HookupAlias original="LobbyListFilterPulldown" alias="ContentContainer/HeaderPanel/LobbyListFilterPulldown"/>
+        
+        <Frame type="Label" name="TitleLabel">
+            <Text val="@UI/ScreenCustomGames/Lobbies/Title"/>
+        </Frame>
+        
+        <Frame type="Label" name="SubtitleLabel">
+            <Text val="@UI/ScreenCustomGames/Lobbies/Subtitle"/>
+        </Frame>
+
+        <Frame type="Frame" name="ContentContainer">
+
+            <Frame type="Frame" name="HeaderPanel">
+            
+                <Frame type="Pulldown" name="LobbyListFilterPulldown" template="StandardSmallButtonTemplates/StandardSmallPulldownTemplate">
+                
+                    <Frame type="Frame" name="AnchorFrame">
+                        <Anchor side="Top" relative="$parent/$parent/FilterEditBox" pos="Mid" offset="0"/>
+                        <Anchor side="Bottom" relative="$parent/$parent/FilterEditBox" pos="Mid" offset="0"/>
+                        <Anchor side="Right" relative="$parent/$parent/RefreshButton/AnchorFrame" pos="Min" offset="-12"/>
+                    </Frame>
+                </Frame>
+                
+                <Frame type="EditBox" name="FilterEditBox" template="CustomGamesTemplates/SearchEditBoxTemplate">
+    
+                    <Frame type="Frame" name="AnchorFrame">
+                        <Anchor side="Right" relative="$parent/$parent/LobbyListFilterPulldown/AnchorFrame" pos="Min" offset="-9"/>
+                    </Frame>
+                </Frame>
+
+                <Frame type="Button" name="RefreshButton" template="StandardSmallButtonTemplates/StandardSmallIconButtonTemplate">
+                
+                    <Frame type="Frame" name="AnchorFrame">
+                        <Anchor side="Top" relative="$parent/$parent/FilterEditBox" pos="Mid" offset="0"/>
+                        <Anchor side="Bottom" relative="$parent/$parent/FilterEditBox" pos="Mid" offset="0"/>
+                        <Anchor side="Right" relative="$parent/$parent" pos="Max" offset="-12"/>
+                    </Frame>
+
+                    <Frame type="Image" name="Icon">
+                        <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+                        <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+                        <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+                        <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+                        <Texture val="@UI/SC2_UI_Battlenet_Glue_Arcade_RefreshIcon"/>
+                    </Frame>
+        
+                    <Animation name="RefreshLobbyList">
+                        <Event event="OnClick" frame="$this" action="Reset,Play"/>
+
+                        <Controller type="Event" end="Pause" frame="$ancestor[@type=LobbyListFrame]">
+                            <Key type="Event" time="0.0" event="RequestRefreshOpenLobbyList"/>
+                        </Controller>
+                    </Animation>
+                </Frame>
+            </Frame>
+
+            <Frame type="Frame" name="PrimaryPanel">
+                <Frame type="Frame" name="LobbyList" template="CustomGamesLobbies/LobbyListTemplate"/>
+            </Frame>
+
+            <Frame type="Frame" name="SecondaryPanel">
+                <Frame type="BattleMapFrame" name="BattleMapFrame">
+                    <Anchor relative="$parent"/>
+                    <MapHandle val="{$ancestor[@type=LobbyListFrame]/@SelectedMapHandle}"/>
+                </Frame>
+
+                <Frame type="BattleMapInfoPanel" name="BattleMapInfoPanel">
+                    <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                    <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+                    <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                    <Anchor side="Right" relative="$parent/ScreenShotTileList" pos="Min" offset="0"/>
+                    <MapHandle val="{$ancestor[@type=LobbyListFrame]/@SelectedMapHandle}"/>
+
+                    <Frame type="Label" name="MapNameLabel">
+                        <Anchor side="Top" relative="$parent" pos="Min" offset="18"/>
+                        <Anchor side="Left" relative="$parent" pos="Min" offset="20"/>
+                        <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+                        <Style val="@Arcade_Featured_Title"/>
+                        <Text val="{$parent/$parent/BattleMapFrame/@Name}"/>
+                    </Frame>
+
+                    <Frame type="Label" name="AuthorLabel">
+                        <Anchor side="Top" relative="$parent/MapNameLabel" pos="Max" offset="18"/>
+                        <Anchor side="Left" relative="$parent" pos="Min" offset="20"/>
+                        <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+                    </Frame>
+
+                    <Frame type="Label" name="ModeLabel">
+                        <Anchor side="Top" relative="$parent/AuthorLabel" pos="Max" offset="18"/>
+                        <Anchor side="Left" relative="$parent" pos="Min" offset="20"/>
+                        <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+                    </Frame>
+
+                    <Frame type="Label" name="PlayerLabel">
+                        <Anchor side="Top" relative="$parent/ModeLabel" pos="Max" offset="18"/>
+                        <Anchor side="Left" relative="$parent" pos="Min" offset="20"/>
+                        <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+                    </Frame>
+
+                    <Frame type="Label" name="DescriptionLabel">
+                        <Anchor side="Top" relative="$parent/PlayerLabel" pos="Max" offset="18"/>
+                        <Anchor side="Left" relative="$parent" pos="Min" offset="20"/>
+                        <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+                        <Height val="70"/>
+                        <Text val="{$parent/$parent/BattleMapFrame/@Description}"/>
+                    </Frame>
+
+                    <Frame type="Label" name="WebsiteLabel">
+                        <Anchor side="Top" relative="$parent/DescriptionLabel" pos="Max" offset="18"/>
+                        <Anchor side="Left" relative="$parent" pos="Min" offset="20"/>
+                        <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+                    </Frame>
+
+                    <Frame Type="BattleUserContextMenu" name="UserContextMenu" template="BattleUserContextMenu/BattleUserContextMenu">
+                        <Anchor side="Top" relative="$parent" pos="Max" offset="0"/>
+                        <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+                        <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+                    </Frame>
+                </Frame>
+                
+                <Frame type="BattleMapGameInfoScreenshotTileList" name="ScreenshotTileList">
+                    <Anchor side="Top" relative="$parent" pos="Min" offset="18"/>
+                    <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+                    <Width val="372"/>
+                    <Height val="305"/>
+                    <MapHandle val="{$ancestor[@type=LobbyListFrame]/@SelectedMapHandle}"/>
+
+                    <Frame type="Image" name="BattleMapInfoBg">
+                        <Anchor side="Top" relative="$parent/Item0" pos="Min" offset="0"/>
+                        <Anchor side="Bottom" relative="$parent/Item0" pos="Max" offset="0"/>
+                        <Anchor side="Left" relative="$parent/Item0" pos="Min" offset="0"/>
+                        <Anchor side="Right" relative="$parent/Item0" pos="Max" offset="0"/>
+                        <LayerColor val="02060b"/>
+                        <Alpha val="190"/>
+                    </Frame>
+
+                    <!-- This shows if the map has no screenshots -->
+                    <Frame type="BattleMapIcon" name="MapIcon">
+                        <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                        <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                        <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+                        <Height val="279"/>
+
+                        <Frame type="Image" name="Image">
+                            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                            <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+                            <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+                            <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+                            <ScaleWidthToTexture val="true"/>
+                            <TextureType val="Normal"/>
+                            <AutoSizeClamps maxWidth="372"/>
+                        </Frame>
+                    </Frame>
+
+                    <Frame type="BattleMapScreenshotTileListItem" name="Item0" template="BattleMapInfoPanel/BattleMapScreenshotTileListItemTemplate">
+                        <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                        <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+                        <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+                    </Frame>
+
+                    <Frame type="PageSelectorButtonList" name="PageSelector" template="BattleMapInfoPanel/ScreenshotPageSelectorButtonListTemplate">
+                        <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+                        <Anchor side="Left" relative="$parent/Item0" pos="Min" offset="5"/>
+                        <Anchor side="Right" relative="$parent/Item0" pos="Max" offset="0"/>
+
+                        <Animation name="HideDisabled">
+                            <Event event="OnEnabled" action="Reset,Stop"/>
+                            <Event event="OnDisabled" action="Reset,Play"/>
+
+                            <Controller type="Visibility" end="Pause">
+                                <Key type="Bool" time="0" value="false"/>
+                            </Controller>
+                        </Animation>
+                    </Frame>
+                </Frame>
+            </Frame>
+            
+            <Frame type="Frame" name="TertiaryPanel">
+                <Frame type="LobbyPreviewFrame" name="LobbyPreview" template="CustomGamesLobbies/LobbyPreviewTemplate">
+                    <AdvertHandleServerLabel val="{$ancestor[@type=LobbyListFrame]/@SelectedAdvertHandleServerLabel}"/>
+                    <AdvertHandleServerEpoch val="{$ancestor[@type=LobbyListFrame]/@SelectedAdvertHandleServerEpoch}"/>
+                    <AdvertHandleAdvertId val="{$ancestor[@type=LobbyListFrame]/@SelectedAdvertHandleAdvertId}"/>
+
+                    <Frame type="Label" name="LobbyName">
+                        <Text val="{$ancestor[@type=LobbyListFrame]/@SelectedLobbyName}"/>
+                    </Frame>
+                </Frame>
+            </Frame>
+        </Frame>
+    </Frame>
+</Desc>

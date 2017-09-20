@@ -1,0 +1,1585 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<Desc>
+    <DescFlags val="Locked"/>
+    
+    <!-- 
+    ================================================================
+    
+    
+    STANDARD SMALL GLUE BUTTON TEMPLATES
+    
+    
+    ================================================================
+    
+    These templates are for our standard small "Glue" screen buttons (main menu/battle.net).
+    
+    These buttons are generally 38px height ignoring outer glow.  They are setup with an "AnchorFrame"
+    which is a child frame you use to do the actual anchoring of these buttons.  This is so they can have
+    a glow which expands past their anchoring easily, and that glow can be adjusted without having
+    to re-anchor everywhere these buttons are used in the UI.
+    
+    These buttons were first created as part of a Collection UI update for patch 3.18 in August of 2017.  
+    The goal was to create fresh UI elements that refined the standard Glue button style and would look
+    crisp in 16x9 resolutions which older buttons do not.
+    
+    To achieve the crisp quality in 16x9 there are a number of tricks being used.  Rather than using the
+    "EndCap" texturetype and "ImageLayer" button type like our Glue buttons created for LotV these
+    buttons are constructed from multiple images that are broken up components such as "Inner Border",
+    "Outer Border" and "Background".  Usually these assets are texturetype "NineSlice" but for the tabs
+    they are still "EndCap".  By breaking these components up it gives us more flexibility to abuse how
+    the SC2 UI grid and image rendering systems handle the display of images to create the crisp look
+    we are looking for in 16x9.
+    
+    Primarily we are just rendering our "Inner" and "Outer" borders with two identical layers each so they
+    double up where they become transparent due to image rendering in SC2 UI in 16x9.  This helps
+    them to feel more crisp and less blurry.  In rare cases we may even switch out assets in 16x9 as
+    we have done with some of the new StandardTileListTemplates.
+    
+    There are other benefits to breaking these buttons up into components.  It means we only need a 
+    small handful of assets to build ALL of our small glue buttons, instead of requiring several assets for
+    each type.  It also means if we ever want to make changes to the borders or glows or colors it will be
+    very easy to do so across the board with minimal work.
+    -->
+    
+    <!--
+    ================================================================
+    
+    
+    STANDARD SMALL BUTTON TEMPLATES
+    
+    
+    ================================================================
+    -->
+    
+    <!--
+    =======================================
+    Standard Small Base Button Template
+    =======================================
+    -->
+    <Frame type="Control" name="StandardSmallBaseButtonTemplate">        
+        <Anchor side="Top" relative="$this/AnchorFrame" pos="Min" offset="-8"/>
+        <Anchor side="Bottom" relative="$this/AnchorFrame" pos="Max" offset="8"/>
+        <Anchor side="Left" relative="$this/AnchorFrame" pos="Min" offset="-8"/>
+        <Anchor side="Right" relative="$this/AnchorFrame" pos="Max" offset="8"/>
+        
+        <!-- Anchor Frame -->
+        <Frame type="Frame" name="AnchorFrame">
+            <Height val="38"/>
+        </Frame>
+
+        <!-- Hit Test Frame -->
+        <Frame type="Frame" name="HitTestFrame">
+            <Anchor relative="$parent/AnchorFrame"/>
+        </Frame>
+        
+        <!-- Background -->
+        <Frame type="Image" name="Background">
+            <Anchor side="Top" relative="$parent/AnchorFrame" pos="Min" offset="-3"/>
+            <Anchor side="Bottom" relative="$parent/AnchorFrame" pos="Max" offset="3"/>
+            <Anchor side="Left" relative="$parent/AnchorFrame" pos="Min" offset="-3"/>
+            <Anchor side="Right" relative="$parent/AnchorFrame" pos="Max" offset="3"/>
+            <DesaturateOnDisable val="False"/>
+            <RenderPriority val="510"/>
+            <LayerCount val="4"/>
+            
+            <Texture val="@UI/Glues_Battlenet_StandardButtons_Small_Mask" layer="0"/>
+            <TextureType val="NineSlice" layer="0"/>
+            <AlphaLayer val="True" layer="0"/>
+            
+            <Texture val="Assets/Textures/White.dds" layer="1"/>
+            <LayerAlpha val="230" layer="1"/>
+            <LayerColor val="3,11,21" layer="1"/>
+            
+            <Texture val="@UI/Glues_Battlenet_StandardButtons_Small_Mask" layer="2"/>
+            <TextureType val="NineSlice" layer="2"/>
+            <AlphaLayer val="True" layer="2"/>
+            
+            <Texture val="@UI/Glues_Battlenet_StandardButtons_Small_Background_Gradient" layer="3"/>
+            <LayerAlpha val="170" layer="3"/>
+            <LayerColor val="12,43,82" layer="3"/>
+            <TextureCoords top="-0.35" left="0" bottom="1.1" right="1" layer="3"/>
+            
+            <StateGroup name="ColorState">
+                <DefaultState val="Normal"/>
+                
+                <State name="Disabled">
+                    <When type="StateGroup" frame="$parent" DisabledState="Disabled"/>
+                    <Action type="SetProperty" frame="$this" LayerColor="10,12,15" index="1"/>
+                    <Action type="SetProperty" frame="$this" LayerAlpha="191" index="1"/>
+                    <Action type="SetProperty" frame="$this" LayerColor="22,29,37" index="3"/>
+                    <Action type="SetProperty" frame="$this" LayerAlpha="191" index="3"/>
+                </State>
+            
+                <State name="Pressed">
+                    <When type="StateGroup" frame="$parent" PressedState="Pressed"/>
+                    <Action type="SetProperty" frame="$this" LayerColor="0,0,0" index="1"/>
+                    <Action type="SetProperty" frame="$this" LayerAlpha="255" index="1"/>
+                    <Action type="SetProperty" frame="$this" LayerColor="0,25,56" index="3"/>
+                    <Action type="SetProperty" frame="$this" LayerAlpha="255" index="3"/>
+                </State>
+            
+                <State name="Selected">
+                    <When type="StateGroup" frame="$parent" ToggledState="Toggled"/>
+                    <Action type="SetProperty" frame="$this" LayerColor="59,140,192" index="1"/>
+                    <Action type="SetProperty" frame="$this" LayerAlpha="255" index="1"/>
+                    <Action type="SetProperty" frame="$this" LayerColor="179,225,255" index="3"/>
+                    <Action type="SetProperty" frame="$this" LayerAlpha="255" index="3"/>
+                </State>
+                
+                <State name="Hover">
+                    <When type="StateGroup" frame="$parent" HoveredState="Hovered"/>
+                    <Action type="SetProperty" frame="$this" LayerColor="5,20,38" index="1"/>
+                    <Action type="SetProperty" frame="$this" LayerAlpha="230" index="1"/>
+                    <Action type="SetProperty" frame="$this" LayerColor="11,55,110" index="3"/>
+                    <Action type="SetProperty" frame="$this" LayerAlpha="180" index="3"/>
+                </State>
+
+                <State name="Normal">
+                    <Action type="SetProperty" frame="$this" LayerColor="3,11,21" index="1"/>
+                    <Action type="SetProperty" frame="$this" LayerAlpha="230" index="1"/>
+                    <Action type="SetProperty" frame="$this" LayerColor="12,43,82" index="3"/>
+                    <Action type="SetProperty" frame="$this" LayerAlpha="170" index="3"/>
+                </State>
+            </StateGroup>
+        </Frame>
+        
+        <!-- Glow Border -->
+        <Frame type="Image" name="BorderGlow">
+            <Anchor side="Top" relative="$parent/AnchorFrame" pos="Min" offset="-3"/>
+            <Anchor side="Bottom" relative="$parent/AnchorFrame" pos="Max" offset="3"/>
+            <Anchor side="Left" relative="$parent/AnchorFrame" pos="Min" offset="-3"/>
+            <Anchor side="Right" relative="$parent/AnchorFrame" pos="Max" offset="3"/>
+            <DesaturateOnDisable val="False"/>
+            <Color val="0,102,255"/>
+            <Texture val="@UI/Glues_Battlenet_StandardButtons_Small_Border_Glow"/>
+            <TextureType val="NineSlice"/>
+            <Alpha val="128"/>
+            
+            <StateGroup name="VisibleState">
+                <DefaultState val="Normal"/>
+            
+                <State name="Pressed">
+                    <When type="StateGroup" frame="$parent" PressedState="Pressed"/>
+                    <Action type="SetProperty" frame="$this" Visible="True"/>
+                </State>
+
+                <State name="Normal">
+                    <Action type="SetProperty" frame="$this" Visible="False"/>
+                </State>
+            </StateGroup>
+        </Frame>
+        
+        <!-- Outer Border -->
+        <Frame type="Image" name="BorderOuter">
+            <Anchor side="Top" relative="$parent/AnchorFrame" pos="Min" offset="-3"/>
+            <Anchor side="Bottom" relative="$parent/AnchorFrame" pos="Max" offset="3"/>
+            <Anchor side="Left" relative="$parent/AnchorFrame" pos="Min" offset="-3"/>
+            <Anchor side="Right" relative="$parent/AnchorFrame" pos="Max" offset="3"/>
+            <DesaturateOnDisable val="False"/>
+            <Color val="0,0,0"/>
+            <LayerCount val="4"/>
+            
+            <Texture val="Assets/Textures/White.dds" layer="0"/>
+            <TextureType val="NineSlice" layer="0"/>
+            <AlphaLayer val="True" layer="0"/>
+            <AlphaChannel val="Alpha" layer="0"/>
+            
+            <Texture val="@UI/Glues_Battlenet_StandardButtons_Small_Border_Outer" layer="1"/>
+            <TextureType val="NineSlice" layer="1"/>
+            
+            <Texture val="Assets/Textures/White.dds" layer="2"/>
+            <TextureType val="NineSlice" layer="2"/>
+            <AlphaLayer val="True" layer="2"/>
+            <AlphaChannel val="Alpha" layer="2"/>
+            
+            <Texture val="@UI/Glues_Battlenet_StandardButtons_Small_Border_Outer" layer="3"/>
+            <TextureType val="NineSlice" layer="3"/>
+            
+            <StateGroup name="VisibleState">
+                <DefaultState val="Normal"/>
+            
+                <State name="Pressed">
+                    <When type="StateGroup" frame="$parent" PressedState="Pressed"/>
+                    <Action type="SetProperty" frame="$this" Visible="False"/>
+                </State>
+
+                <State name="Normal">
+                    <Action type="SetProperty" frame="$this" Visible="True"/>
+                </State>
+            </StateGroup>
+        </Frame>
+        
+        <!-- Inner Border -->
+        <Frame type="Image" name="BorderInner">
+            <Anchor side="Top" relative="$parent/AnchorFrame" pos="Min" offset="-3"/>
+            <Anchor side="Bottom" relative="$parent/AnchorFrame" pos="Max" offset="3"/>
+            <Anchor side="Left" relative="$parent/AnchorFrame" pos="Min" offset="-3"/>
+            <Anchor side="Right" relative="$parent/AnchorFrame" pos="Max" offset="3"/>
+            <DesaturateOnDisable val="False"/>
+            <Color val="36,107,169"/>
+            <RenderPriority val="513"/>
+            <LayerCount val="2"/>
+            
+            <Texture val="@UI/Glues_Battlenet_StandardButtons_Small_Border_Inner" layer="0"/>
+            <TextureType val="NineSlice" layer="0"/>
+            
+            <Texture val="@UI/Glues_Battlenet_StandardButtons_Small_Border_Inner" layer="1"/>
+            <TextureType val="NineSlice" layer="1"/>
+            
+            <StateGroup name="ColorState">
+                <DefaultState val="Normal"/>
+                
+                <State name="Disabled">
+                    <When type="StateGroup" frame="$parent" DisabledState="Disabled"/>
+                    <Action type="SetProperty" frame="$this" Color="29,57,86"/>
+                </State>
+            
+                <State name="Pressed">
+                    <When type="StateGroup" frame="$parent" PressedState="Pressed"/>
+                    <Action type="SetProperty" frame="$this" Color="189,223,255"/>
+                </State>
+            
+                <State name="Selected">
+                    <When type="StateGroup" frame="$parent" ToggledState="Toggled"/>
+                    <Action type="SetProperty" frame="$this" Color="217,241,255"/>
+                </State>
+                
+                <State name="Hover">
+                    <When type="StateGroup" frame="$parent" HoveredState="Hovered"/>
+                    <Action type="SetProperty" frame="$this" Color="88,163,234"/>
+                </State>
+
+                <State name="Normal">
+                    <Action type="SetProperty" frame="$this" Color="36,107,169"/>
+                </State>
+            </StateGroup>
+        </Frame>
+        
+        <!-- Border Highlight -->
+        <Frame type="Image" name="BorderHighlight">
+            <Anchor side="Top" relative="$parent/AnchorFrame" pos="Min" offset="-3"/>
+            <Anchor side="Bottom" relative="$parent/AnchorFrame" pos="Max" offset="3"/>
+            <Anchor side="Left" relative="$parent/AnchorFrame" pos="Min" offset="-3"/>
+            <Anchor side="Right" relative="$parent/AnchorFrame" pos="Max" offset="3"/>
+            <DesaturateOnDisable val="False"/>
+            <RenderPriority val="525"/>
+            <LayerCount val="2"/>
+            <Color val="65,131,199"/>
+            
+            <Texture val="{$parent/BorderInner/@Texture[0]}" layer="0"/>
+            <TextureType val="NineSlice" layer="0"/>
+            <AlphaLayer val="True" layer="0"/>
+            
+            <Texture val="@UI/Glues_Battlenet_PageAssets_GraphicListItem_Border_Highlight" layer="1"/>
+            
+            <StateGroup name="ColorState">
+                <DefaultState val="Normal"/>
+                
+                <State name="Disabled">
+                    <When type="StateGroup" frame="$parent" DisabledState="Disabled"/>
+                    <Action type="SetProperty" frame="$this" Color="29,57,86"/>
+                </State>
+            
+                <State name="Pressed">
+                    <When type="StateGroup" frame="$parent" PressedState="Pressed"/>
+                    <Action type="SetProperty" frame="$this" Color="255,255,255"/>
+                </State>
+            
+                <State name="Selected">
+                    <When type="StateGroup" frame="$parent" ToggledState="Toggled"/>
+                    <Action type="SetProperty" frame="$this" Color="255,255,255"/>
+                </State>
+                
+                <State name="Hover">
+                    <When type="StateGroup" frame="$parent" HoveredState="Hovered"/>
+                    <Action type="SetProperty" frame="$this" Color="141,208,255"/>
+                </State>
+
+                <State name="Normal">
+                    <Action type="SetProperty" frame="$this" Color="65,131,199"/>
+                </State>
+            </StateGroup>
+        </Frame>
+        
+        <!--
+        
+        STANDARD STATEGROUPS
+        
+        -->
+                
+        <!-- ToggledState -->
+        <StateGroup name="ToggledState">
+            <DefaultState val="NotToggled"/>
+            <State name="Toggled">
+                <When type="Property" frame="$this" Toggled="True"/>
+            </State>
+            <State name="NotToggled">
+            </State>
+        </StateGroup>
+                
+        <!-- HoveredState -->
+        <StateGroup name="HoveredState">
+            <DefaultState val="NotHovered"/>
+            <State name="Hovered">
+                <When type="Property" frame="$this" Hovering="True"/>
+            </State>
+            <State name="NotHovered"/>
+        </StateGroup>
+                
+        <!-- PressedState -->
+        <StateGroup name="PressedState">
+            <DefaultState val="NotPressed"/>
+            <State name="Pressed">
+                <When type="Property" frame="$this" Pushed="True"/>
+            </State>
+            <State name="NotPressed">
+            </State>
+        </StateGroup>
+                
+        <!-- DisabledState -->
+        <StateGroup name="DisabledState">
+            <DefaultState val="NotDisabled"/>
+            <State name="Disabled">
+                <When type="Property" frame="$this" Enabled="False"/>
+            </State>
+            <State name="NotDisabled"/>
+        </StateGroup>
+    </Frame>
+    
+    
+    <!--
+    =======================================
+    Standard Mini Base Button Template
+    =======================================
+    -->
+    
+    <Frame type="Button" name="StandardMiniBaseButtonTemplate" template="StandardSmallButtonTemplates/StandardSmallBaseButtonTemplate">
+        <ClickSound val="@UI_ActionButtonSelect"/>
+        
+        <!-- Anchor Frame -->
+        <Frame type="Frame" name="AnchorFrame">
+            <Width val="26"/>
+            <Height val="26"/>
+        </Frame>
+        
+        <!-- Background -->
+        <Frame type="Image" name="Background">
+            <Anchor side="Top" relative="$parent/AnchorFrame" pos="Min" offset="0"/>
+            <Anchor side="Bottom" relative="$parent/AnchorFrame" pos="Max" offset="0"/>
+            <Anchor side="Left" relative="$parent/AnchorFrame" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent/AnchorFrame" pos="Max" offset="0"/>
+            <Texture val="@UI/Glues_Battlenet_StandardButtons_Mini_Mask" layer="0"/>
+            <Texture val="@UI/Glues_Battlenet_StandardButtons_Mini_Mask" layer="2"/>
+        </Frame>
+        
+        <!-- Glow Border -->
+        <Frame type="Image" name="BorderGlow">
+            <Anchor side="Top" relative="$parent/AnchorFrame" pos="Min" offset="-2"/>
+            <Anchor side="Bottom" relative="$parent/AnchorFrame" pos="Max" offset="2"/>
+            <Anchor side="Left" relative="$parent/AnchorFrame" pos="Min" offset="-2"/>
+            <Anchor side="Right" relative="$parent/AnchorFrame" pos="Max" offset="2"/>
+            <Texture val="@UI/Glues_Battlenet_StandardButtons_Mini_Border_Glow"/>
+        </Frame>
+        
+        <!-- Outer Border -->
+        <Frame type="Image" name="BorderOuter">
+            <Anchor side="Top" relative="$parent/AnchorFrame" pos="Min" offset="0"/>
+            <Anchor side="Bottom" relative="$parent/AnchorFrame" pos="Max" offset="0"/>
+            <Anchor side="Left" relative="$parent/AnchorFrame" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent/AnchorFrame" pos="Max" offset="0"/>
+            <Texture val="@UI/Glues_Battlenet_StandardButtons_Mini_Border_Outer" layer="1"/>
+            <Texture val="@UI/Glues_Battlenet_StandardButtons_Mini_Border_Outer" layer="3"/>
+        </Frame>
+        
+        <!-- Inner Border -->
+        <Frame type="Image" name="BorderInner">
+            <Anchor side="Top" relative="$parent/AnchorFrame" pos="Min" offset="0"/>
+            <Anchor side="Bottom" relative="$parent/AnchorFrame" pos="Max" offset="0"/>
+            <Anchor side="Left" relative="$parent/AnchorFrame" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent/AnchorFrame" pos="Max" offset="0"/>
+            <Texture val="@UI/Glues_Battlenet_StandardButtons_Mini_Border_Inner" layer="0"/>
+            <Texture val="@UI/Glues_Battlenet_StandardButtons_Mini_Border_Inner" layer="1"/>
+        </Frame>
+        
+        <!-- Border Highlight -->
+        <Frame type="Image" name="BorderHighlight">
+            <Anchor side="Top" relative="$parent/AnchorFrame" pos="Min" offset="0"/>
+            <Anchor side="Bottom" relative="$parent/AnchorFrame" pos="Max" offset="0"/>
+            <Anchor side="Left" relative="$parent/AnchorFrame" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent/AnchorFrame" pos="Max" offset="0"/>
+            <Texture val="@UI/Glues_Battlenet_StandardButtons_Mini_Border_Inner" layer="0"/>
+            <LayerAlpha val="255" layer="1"/>
+        </Frame>
+    </Frame>
+    
+    <!--
+    =======================================
+    Standard Small Icon Button Template
+    =======================================
+    -->
+    
+    <Frame type="Button" name="StandardSmallIconButtonTemplate" template="StandardSmallButtonTemplates/StandardSmallBaseButtonTemplate">
+        <ClickSound val="@UI_ActionButtonSelect"/>
+        
+        <!-- Anchor Frame -->
+        <Frame type="Frame" name="AnchorFrame">
+            <Width val="38"/>
+        </Frame>
+    </Frame>
+    
+    <!--
+    =======================================
+    Standard Small Icon TileList Template
+    =======================================
+    -->
+    
+    <Frame type="TileListItem" name="StandardSmallIconTileListItemTemplate" template="StandardSmallButtonTemplates/StandardSmallBaseButtonTemplate">
+        
+        <!-- Anchor Frame -->
+        <Frame type="Frame" name="AnchorFrame">
+            <Width val="38"/>
+        </Frame>
+    </Frame>
+    
+    
+    
+    
+    
+    <!-- EditBox -->
+    <Frame type="EditBox" name="StandardSmallEditBoxTemplate" template="StandardSmallButtonTemplates/StandardSmallBaseButtonTemplate">
+        <LoseFocusOnEnterOrEsc val="true"/>
+        <TooltipAnchorPosition val="TopCenter"/>
+        <Insets top="18" left="19" bottom="11" right="42"/>
+
+        <Frame type="Label" name="SearchTextLabel">
+            <Anchor side="Top" relative="$parent" pos="Mid" offset="1"/>
+            <Anchor side="Bottom" relative="$parent" pos="Mid" offset="1"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="21"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="-21"/>
+            <Style val="StandardSmallEditBoxItem_Normal"/>
+            <Text val=""/>
+            
+            <StateGroup name="StyleState">
+                <DefaultState val="Normal"/>
+            
+                <State name="Disabled">
+                    <When type="StateGroup" frame="$parent" DisabledState="Disabled"/>
+                    <Action type="SetProperty" frame="$this" Style="StandardSmallListBoxItem_Disabled"/>
+                    <Action type="SetProperty" frame="$this" Alpha="128"/>
+                </State>
+                
+                <State name="Hover">
+                    <When type="StateGroup" frame="$parent" HoveredState="Hovered"/>
+                    <Action type="SetProperty" frame="$this" Style="StandardSmallEditBoxItem_Hovered"/>
+                    <Action type="SetProperty" frame="$this" Alpha="255"/>
+                </State>
+
+                <State name="Normal">
+                    <Action type="SetProperty" frame="$this" Style="StandardSmallEditBoxItem_Normal"/>
+                    <Action type="SetProperty" frame="$this" Alpha="128"/>
+                </State>
+            </StateGroup>
+        </Frame>
+
+        <Frame type="Frame" name="LabelContainerFrame">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+            
+            <Frame type="Label" name="Label">
+                <Anchor relative="$parent"/>
+                <Style val="StandardSmallEditBoxItem_Selected"/>
+                <Options val="Ellipsis | IgnoreFormatTags"/>
+            
+                <StateGroup name="StyleState">
+                    <DefaultState val="Normal"/>
+                
+                    <State name="Disabled">
+                        <When type="StateGroup" frame="$parent/$parent" DisabledState="Disabled"/>
+                        <Action type="SetProperty" frame="$this" Style="StandardSmallListBoxItem_Disabled"/>
+                        <Action type="SetProperty" frame="$this" Alpha="128"/>
+                    </State>
+                    
+                    <State name="Selected">
+                        <When type="StateGroup" frame="$parent/$parent" PressedState="Pressed"/>
+                        <Action type="SetProperty" frame="$this" Style="StandardSmallEditBoxItem_Selected"/>
+                        <Action type="SetProperty" frame="$this" Alpha="255"/>
+                    </State>
+                    
+                    <State name="Hover">
+                        <When type="StateGroup" frame="$parent/$parent" HoveredState="Hovered"/>
+                        <Action type="SetProperty" frame="$this" Style="StandardSmallEditBoxItem_Hovered"/>
+                        <Action type="SetProperty" frame="$this" Alpha="255"/>
+                    </State>
+
+                    <State name="Normal">
+                        <Action type="SetProperty" frame="$this" Style="StandardSmallEditBoxItem_Normal"/>
+                        <Action type="SetProperty" frame="$this" Alpha="128"/>
+                    </State>
+                </StateGroup>
+            </Frame>
+        </Frame>
+
+        <Frame type="Button" name="ClearTextButton">
+            <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent/AnchorFrame" pos="Max" offset="-4"/>
+            <Width val="30"/>
+            <Height val="30"/>
+    
+            <Frame type="Image" name="ClearTextImage">
+                <Anchor relative="$parent"/>
+                <Texture val="@UI/Glues_Battlenet_StandardButtons_Small_Icon_Clear_Normal"/>
+                
+                <StateGroup name="DisplayState">
+                    <DefaultState val="Normal"/>
+                
+                    <State name="Disabled">
+                        <When type="StateGroup" frame="$parent/$parent" DisabledState="Disabled"/>
+                        <Action type="SetProperty" frame="$this" Texture="@UI/Glues_Battlenet_StandardButtons_Small_Icon_Clear_Normal"/>
+                        <Action type="SetProperty" frame="$this" Color="64,95,113"/>
+                    </State>
+                    
+                    <State name="Pressed">
+                        <When type="StateGroup" frame="$parent/$parent" PressedState="Pressed"/>
+                        <Action type="SetProperty" frame="$this" Texture="@UI/Glues_Battlenet_StandardButtons_Small_Icon_Clear_Pressed"/>
+                        <Action type="SetProperty" frame="$this" Color="255,255,255"/>
+                    </State>
+                    
+                    <State name="Hover"> 
+                        <When type="StateGroup" frame="$parent/$parent" HoveredState="Hovered"/>
+                        <Action type="SetProperty" frame="$this" Texture="@UI/Glues_Battlenet_StandardButtons_Small_Icon_Clear_Normal"/>
+                        <Action type="SetProperty" frame="$this" Color="204,231,255"/>
+                    </State>
+
+                    <State name="Normal">
+                        <Action type="SetProperty" frame="$this" Texture="@UI/Glues_Battlenet_StandardButtons_Small_Icon_Clear_Normal"/>
+                        <Action type="SetProperty" frame="$this" Color="141,191,234"/>
+                    </State>
+                </StateGroup>
+            </Frame>
+
+            <Frame type="Frame" name="HitTestFrame">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+            </Frame>
+                
+            <!-- HoveredState -->
+            <StateGroup name="HoveredState">
+                <DefaultState val="NotHovered"/>
+                <State name="Hovered">
+                    <When type="Property" frame="$this" Hovering="True"/>
+                </State>
+                <State name="NotHovered">
+                </State>
+            </StateGroup>
+        </Frame>
+                
+        <!-- PressedState -->
+        <StateGroup name="PressedState">
+            <DefaultState val="NotPressed"/>
+            <State name="Pressed">
+                <When type="Property" frame="$this" HasFocus="True"/>
+            </State>
+            <State name="NotPressed">
+            </State>
+        </StateGroup>
+                
+        <!-- HoveringCheck -->
+        <StateGroup name="HoveringCheck">
+            <DefaultState val="NotHovered"/>
+            <State name="HoveringThis">
+                <When type="Property" frame="$this" Hovering="True"/>
+                <Action type="SetProperty" frame="$this/HoveringCheckFrame" Visible="True"/>
+            </State>
+            <State name="HoveringClearTextButton">
+                <When type="Property" frame="$this/ClearTextButton" Hovering="True"/>
+                <Action type="SetProperty" frame="$this/HoveringCheckFrame" Visible="True"/>
+            </State>
+            <State name="NotHovered">
+                <Action type="SetProperty" frame="$this/HoveringCheckFrame" Visible="False"/>
+            </State>
+        </StateGroup>
+        
+        <Frame type="Frame" name="HoveringCheckFrame">
+            <Anchor relative="$parent"/>
+            <Visible val="False"/>
+        </Frame>
+                
+        <!-- HoveredState -->
+        <StateGroup name="HoveredState">
+            <DefaultState val="NotHovered"/>
+            <State name="Hovered">
+                <When type="Property" frame="$this/HoveringCheckFrame" Visible="True"/>
+            </State>
+            <State name="NotHovered">
+            </State>
+        </StateGroup>
+    </Frame>
+    
+    
+    <!-- SearchBox -->
+    <Frame type="EditBox" name="StandardSmallSearchBoxTemplate" template="StandardSmallButtonTemplates/StandardSmallEditBoxTemplate">
+    
+        <Frame type="Image" name="SearchImage">
+            <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent/ClearTextButton" pos="Max" offset="0"/>
+            <Width val="30"/>
+            <Height val="30"/>
+            <Texture val="@UI/Glues_Battlenet_StandardButtons_Small_Icon_Search_Normal"/>
+            
+            <StateGroup name="DisplayState">
+                <DefaultState val="Normal"/>
+            
+                <State name="NotVisible">
+                    <When type="Property" frame="$parent/ClearTextButton" Visible="True"/>
+                    <Action type="SetProperty" frame="$this" Visible="False"/>
+                </State>
+            
+                <State name="Disabled">
+                    <When type="StateGroup" frame="$parent" DisabledState="Disabled"/>
+                    <Action type="SetProperty" frame="$this" Texture="@UI/Glues_Battlenet_StandardButtons_Small_Icon_Search_Normal"/>
+                    <Action type="SetProperty" frame="$this" Color="64,95,113"/>
+                    <Action type="SetProperty" frame="$this" Visible="True"/>
+                </State>
+                
+                <State name="Pressed">
+                    <When type="StateGroup" frame="$parent" PressedState="Pressed"/>
+                    <Action type="SetProperty" frame="$this" Texture="@UI/Glues_Battlenet_StandardButtons_Small_Icon_Search_Pressed"/>
+                    <Action type="SetProperty" frame="$this" Color="255,255,255"/>
+                    <Action type="SetProperty" frame="$this" Visible="True"/>
+                </State>
+                
+                <State name="Hover"> 
+                    <When type="StateGroup" frame="$parent" HoveredState="Hovered"/>
+                    <Action type="SetProperty" frame="$this" Texture="@UI/Glues_Battlenet_StandardButtons_Small_Icon_Search_Normal"/>
+                    <Action type="SetProperty" frame="$this" Color="204,231,255"/>
+                    <Action type="SetProperty" frame="$this" Visible="True"/>
+                </State>
+
+                <State name="Normal">
+                    <Action type="SetProperty" frame="$this" Texture="@UI/Glues_Battlenet_StandardButtons_Small_Icon_Search_Normal"/>
+                    <Action type="SetProperty" frame="$this" Color="141,191,234"/>
+                    <Action type="SetProperty" frame="$this" Visible="True"/>
+                </State>
+            </StateGroup>
+        </Frame>
+    </Frame>
+    
+    
+    
+    <!--
+    ================================================================
+    
+    
+    STANDARD SMALL PULLDOWN TEMPLATES
+    
+    
+    ================================================================
+    -->
+    
+    
+    <!-- Pulldown -->
+
+    
+    <Frame type="ScrollBar" name="GluesSocialScrollBarTemplate">
+        <Image val="$root/StandardBattlenetTemplates/GluesSocialScrollBarBackgroundImage"/>
+        <Button val="$root/StandardBattlenetTemplates/GluesSocialScrollBarButtonTemplate"/>
+        <Orientation val="Vertical"/>
+        <Width val="16"/>
+        <IncrementSound val="@UI_ScrollButtonSelect"/>
+        <DescFlags val="Internal"/>
+    </Frame>
+    
+    
+    
+    <Frame type="TextListBoxItem" name="StandardSmallPulldownListBoxItem">
+        <RenderPriority val="600"/>
+    
+        <Frame type="Label" name="ItemLabel">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="3"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="10"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="-10"/>
+            <RenderPriority val="600"/>
+        </Frame>
+            
+        <StateGroup name="StyleState">
+            <DefaultState val="Normal"/>
+        
+            <State name="Selected">
+                <When type="AnimationState" frame="$this" SelectedState="Selected"/>
+                <Action type="SetProperty" frame="$this/ItemLabel" Style="StandardSmallListBoxItem_Selected"/>
+            </State>
+            
+            <State name="Hover">
+                <When type="Property" frame="$this" Hovering="True"/>
+                <Action type="SetProperty" frame="$this/ItemLabel" Style="StandardSmallListBoxItem_Hovered"/>
+            </State>
+
+            <State name="Normal">
+                <Action type="SetProperty" frame="$this/ItemLabel" Style="StandardSmallListBoxItem_Normal"/>
+            </State>
+        </StateGroup>
+    </Frame>
+
+    <Frame type="Image" name="StandardSmallPulldownListBoxItemSelected">
+        <Texture val="Assets/Textures/White.dds"/>
+        <TextureType val="Nineslice"/>
+        <Color val="5,38,77"/>
+        <Alpha val="204"/>
+        <RenderPriority val="511"/>
+    </Frame>
+
+    <Frame type="Image" name="StandardSmallPulldownListBoxItemHovered">
+        <Texture val="Assets/Textures/White.dds"/>
+        <TextureType val="Nineslice"/>
+        <Color val="5,38,77"/>
+        <Alpha val="102"/>
+        <RenderPriority val="511"/>
+    </Frame>
+
+    
+
+    <Frame type="Frame" name="StandardSmallPulldownListBoxBackground">
+        
+        <Frame type="Image" name="Background">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="1"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="-1"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="1"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="-1"/>
+            <LayerCount val="2"/>
+            
+            <Texture val="@UI/Glues_Battlenet_StandardButtons_Small_Mask" layer="0"/>
+            <TextureType val="NineSlice" layer="0"/>
+            <AlphaLayer val="True" layer="0"/>
+            
+            <Texture val="Assets/Textures/White.dds" layer="1"/>
+            <LayerAlpha val="255" layer="1"/>
+            <LayerColor val="2,12,26" layer="1"/>
+        </Frame>
+        
+        <Frame type="Image" name="BorderGlow">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="1"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="-1"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="1"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="-1"/>
+            <Color val="0,102,255"/>
+            <Alpha val="128"/>
+            <Texture val="@UI/Glues_Battlenet_StandardButtons_Small_Border_Glow"/>
+            <TextureType val="NineSlice"/>
+            <RenderPriority val="514"/>
+        </Frame>
+        
+        <Frame type="Image" name="BorderInner">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="1"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="-1"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="1"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="-1"/>
+            <Texture val="@UI/Glues_Battlenet_StandardButtons_Small_Border_Inner"/>
+            <TextureType val="NineSlice"/>
+            <IgnoreParentAlpha val="True"/>
+            <Color val="189,223,255"/>
+            <RenderPriority val="514"/>
+        </Frame>
+    </Frame>
+
+    <Frame type="ListBox" name="StandardSmallPulldownListBoxTemplate">
+        <ItemHeight val="22"/>
+        <ItemGap val="2"/>
+        <Insets top="10" left="11" bottom="10" right="11"/>
+        <HighlightInsets top="0" left="3" bottom="0" right="3"/>
+        <HighlightOnHover val="true"/>
+        <ItemClickSound val="@UI_DropdownListSelect"/>
+        <ItemDesc val="StandardSmallButtonTemplates/StandardSmallPulldownListBoxItem"/>
+
+        <Frame type="Frame" name="BackgroundImage" template="StandardSmallButtonTemplates/StandardSmallPulldownListBoxBackground">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="4"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="-4"/>
+            <RenderPriority val="508"/>
+            <Alpha val="255"/>
+        </Frame>
+        
+        <Frame type="Image" name="SelectedImage" template="StandardSmallButtonTemplates/StandardSmallPulldownListBoxItemSelected"/>
+        <Frame type="Image" name="HoverImage" template="StandardSmallButtonTemplates/StandardSmallPulldownListBoxItemHovered"/>
+        <Frame type="ScrollBar" name="ScrollBar" template="StandardSmallButtonTemplates/GluesSocialScrollBarTemplate"/>
+    </Frame>
+    
+    
+    
+    
+    
+    <Frame type="Pulldown" name="StandardSmallPulldownTemplate" template="StandardSmallButtonTemplates/StandardSmallBaseButtonTemplate">
+        <Style val="@StandardSmallButton_Normal"/>
+        <HighlightOnHover val="true"/>
+        <MenuGap val="-10"/>
+        <MenuShownSound val="@UI_DropdownSelect"/>
+        <MenuHiddenSound val="@UI_DropdownClose"/>
+            
+        <StateGroup name="StyleState">
+            <DefaultState val="Normal"/>
+        
+            <State name="Pressed">
+                <When type="StateGroup" frame="$this" PressedState="Pressed"/>
+                <Action type="SetProperty" frame="$this" Style="StandardSmallButton_Pressed"/>
+            </State>
+        
+            <State name="Selected">
+                <When type="StateGroup" frame="$this" ToggledState="Toggled"/>
+                <Action type="SetProperty" frame="$this" Style="StandardSmallButton_Selected"/>
+            </State>
+            
+            <State name="Hover">
+                <When type="StateGroup" frame="$this" HoveredState="Hovered"/>
+                <Action type="SetProperty" frame="$this" Style="StandardSmallButton_Hovered"/>
+            </State>
+            
+            <State name="Disabled">
+                <When type="StateGroup" frame="$this" DisabledState="Disabled"/>
+                <Action type="SetProperty" frame="$this" Style="StandardSmallButton_Disabled"/>
+            </State>
+
+            <State name="Normal">
+                <Action type="SetProperty" frame="$this" Style="StandardSmallButton_Normal"/>
+            </State>
+        </StateGroup>
+                
+        <!-- PressedState -->
+        <StateGroup name="PressedState">
+            <DefaultState val="NotPressed"/>
+            <State name="Pressed">
+                <When type="Property" frame="$this" MenuShowing="True"/>
+            </State>
+            <State name="NotPressed">
+            </State>
+        </StateGroup>
+        
+        <!-- Anchor Frame -->
+        <Frame type="Frame" name="AnchorFrame">
+            <Width val="194"/>
+        </Frame>
+        
+        <!-- Standard Images (Hidden) -->
+        <Frame type="Image" name="NormalImage">
+            <Anchor relative="$parent"/>
+            <Alpha val="0"/>
+        </Frame>
+
+        <Frame type="Image" name="HoverImage">
+            <Anchor relative="$parent"/>
+            <Alpha val="0"/>
+        </Frame>
+
+        <Frame type="Image" name="ArrowImage">
+            <Anchor relative="$parent"/>
+            <Alpha val="0"/>
+        </Frame>
+
+        <Frame type="Image" name="ArrowHoverImage">
+            <Anchor relative="$parent"/>
+            <Alpha val="0"/>
+        </Frame>
+        
+        <!-- Label Glow -->
+        <Frame type="Image" name="LabelGlow">
+            <Anchor side="Top" relative="$parent/AnchorFrame" pos="Min" offset="0"/>
+            <Anchor side="Bottom" relative="$parent/AnchorFrame" pos="Max" offset="0"/>
+            <Anchor side="Left" relative="$parent/AnchorFrame" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent/AnchorFrame" pos="Max" offset="0"/>
+            <RenderPriority val="511"/>
+            <LayerCount val="2"/>
+            
+            <Texture val="@UI/Glues_Battlenet_TabsStandard_Left_Mask" layer="0"/>
+            <TextureType val="EndCap" layer="0"/>
+            <AlphaLayer val="True" layer="0"/>
+            
+            <Texture val="@UI/Glues_Battlenet_StandardButtons_Small_TextGlow" layer="1"/>
+            <TextureCoords top=".1" left="0.35" bottom="1" right="1.25" layer="1"/>
+            
+            <StateGroup name="ColorState">
+                <DefaultState val="Normal"/>
+            
+                <State name="Pressed">
+                    <When type="StateGroup" frame="$parent" PressedState="Pressed"/>
+                    <Action type="SetProperty" frame="$this" LayerColor="255,255,255" index="1"/>
+                    <Action type="SetProperty" frame="$this" LayerAlpha="0" index="1"/>
+                </State>
+            
+                <State name="Selected">
+                    <When type="StateGroup" frame="$parent" ToggledState="Toggled"/>
+                    <Action type="SetProperty" frame="$this" LayerColor="255,255,255" index="1"/>
+                    <Action type="SetProperty" frame="$this" LayerAlpha="0" index="1"/>
+                </State>
+                
+                <State name="Hover">
+                    <When type="StateGroup" frame="$parent" HoveredState="Hovered"/>
+                    <Action type="SetProperty" frame="$this" LayerColor="19,141,255" index="1"/>
+                    <Action type="SetProperty" frame="$this" LayerAlpha="255" index="1"/>
+                </State>
+                
+                <State name="Disabled">
+                    <When type="StateGroup" frame="$parent" DisabledState="Disabled"/>
+                    <Action type="SetProperty" frame="$this" LayerColor="255,255,255" index="1"/>
+                    <Action type="SetProperty" frame="$this" LayerAlpha="0" index="1"/>
+                </State>
+
+                <State name="Normal">
+                    <Action type="SetProperty" frame="$this" LayerColor="0,138,255" index="1"/>
+                    <Action type="SetProperty" frame="$this" LayerAlpha="179" index="1"/>
+                </State>
+            </StateGroup>
+        </Frame>
+        
+        <Frame type="Image" name="ArrowIcon">
+            <Anchor side="Top" relative="$parent/AnchorFrame" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent/AnchorFrame" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent/AnchorFrame" pos="Max" offset="-11"/>
+            <Width val="24"/>
+            <Height val="18"/>
+            <DesaturateOnDisable val="False"/>
+            <Texture val="@UI/Glues_Battlenet_StandardButtons_Small_Icon_PulldownArow_Normal"/>
+            
+            <StateGroup name="ColorState">
+                <DefaultState val="Normal"/>
+            
+                <State name="Pressed">
+                    <When type="StateGroup" frame="$parent" PressedState="Pressed"/>
+                    <Action type="SetProperty" frame="$this" Color="255,255,255"/>
+                    <Action type="SetProperty" frame="$this" Texture="@UI/Glues_Battlenet_StandardButtons_Small_Icon_PulldownArow_Pressed"/>
+                </State>
+            
+                <State name="Selected">
+                    <When type="StateGroup" frame="$parent" ToggledState="Toggled"/>
+                    <Action type="SetProperty" frame="$this" Color="255,255,255"/>
+                    <Action type="SetProperty" frame="$this" Texture="@UI/Glues_Battlenet_StandardButtons_Small_Icon_PulldownArow_Normal"/>
+                </State>
+                
+                <State name="Hover">
+                    <When type="StateGroup" frame="$parent" HoveredState="Hovered"/>
+                    <Action type="SetProperty" frame="$this" Color="204,231,255"/>
+                    <Action type="SetProperty" frame="$this" Texture="@UI/Glues_Battlenet_StandardButtons_Small_Icon_PulldownArow_Normal"/>
+                </State>
+                
+                <State name="Disabled">
+                    <When type="StateGroup" frame="$parent" DisabledState="Disabled"/>
+                    <Action type="SetProperty" frame="$this" Color="64,95,113"/>
+                    <Action type="SetProperty" frame="$this" Texture="@UI/Glues_Battlenet_StandardButtons_Small_Icon_PulldownArow_Normal"/>
+                </State>
+
+                <State name="Normal">
+                    <Action type="SetProperty" frame="$this" Color="141,191,234"/>
+                    <Action type="SetProperty" frame="$this" Texture="@UI/Glues_Battlenet_StandardButtons_Small_Icon_PulldownArow_Normal"/>
+                </State>
+            </StateGroup>
+        </Frame>
+
+        <Frame type="Frame" name="ItemContainer">
+            <Anchor side="Top" relative="$parent/AnchorFrame" pos="Min" offset="3"/>
+            <Anchor side="Bottom" relative="$parent/AnchorFrame" pos="Max" offset="0"/>
+            <Anchor side="Left" relative="$parent/AnchorFrame" pos="Min" offset="13"/>
+            <Anchor side="Right" relative="$parent/ArrowIcon" pos="Min" offset="-5"/>
+        </Frame>
+
+        <Frame type="ListBox" name="Menu" template="StandardSmallButtonTemplates/StandardSmallPulldownListBoxTemplate"/>
+    </Frame>
+    
+    
+    
+    
+    
+    <!--
+    ================================================================
+    
+    
+    STANDARD SMALL PULLDOWN TEMPLATES
+    
+    
+    ================================================================
+    -->
+    
+    <!-- Small CheckBox Button Component Template -->
+    <Frame type="Button" name="StandardSmallCheckboxButtonComponentTemplate" template="StandardSmallButtonTemplates/StandardMiniBaseButtonTemplate">
+            
+        <!-- Anchor Frame -->
+        <Frame type="Frame" name="AnchorFrame">
+            <Anchor side="Top" relative="$parent/$parent" pos="Mid" offset="0"/>
+            <Anchor side="Left" relative="$parent/$parent" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent/$parent" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent/$parent" pos="Mid" offset="0"/>
+            <Height val="26"/>
+            <Width val="26"/>
+        </Frame>
+
+        <Frame type="Image" name="CheckMarkIcon">
+            <Anchor side="Top" relative="$parent/AnchorFrame" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent/AnchorFrame" pos="Mid" offset="0"/>
+            <Anchor side="Left" relative="$parent/AnchorFrame" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent/AnchorFrame" pos="Mid" offset="0"/>
+            <Width val="24"/>
+            <Height val="20"/>
+            <Texture val="@UI/Glues_Battlenet_StandardButtons_Small_Icon_CheckMark_Normal"/>
+            <Alpha val="255"/>
+        
+            <StateGroup name="VisibleState">
+                <DefaultState val="Normal"/>
+            
+                <State name="Checked">
+                    <When type="StateGroup" frame="$parent" CheckedState="Checked"/>
+                    <Action type="SetProperty" frame="$this" Visible="True"/>
+                </State>
+
+                <State name="Normal">
+                    <Action type="SetProperty" frame="$this" Visible="False"/>
+                </State>
+            </StateGroup>
+            
+            <StateGroup name="ColorState">
+                <DefaultState val="Normal"/>
+            
+                <State name="Pressed">
+                    <When type="StateGroup" frame="$parent" PressedState="Pressed"/>
+                    <Action type="SetProperty" frame="$this" Color="255,255,255"/>
+                    <Action type="SetProperty" frame="$this" Texture="@UI/Glues_Battlenet_StandardButtons_Small_Icon_CheckMark_Pressed"/>
+                </State>
+            
+                <State name="Selected">
+                    <When type="StateGroup" frame="$parent" ToggledState="Toggled"/>
+                    <Action type="SetProperty" frame="$this" Color="255,255,255"/>
+                    <Action type="SetProperty" frame="$this" Texture="@UI/Glues_Battlenet_StandardButtons_Small_Icon_CheckMark_Normal"/>
+                </State>
+                
+                <State name="Hover">
+                    <When type="StateGroup" frame="$parent" HoveredState="Hovered"/>
+                    <Action type="SetProperty" frame="$this" Color="204,231,255"/>
+                    <Action type="SetProperty" frame="$this" Texture="@UI/Glues_Battlenet_StandardButtons_Small_Icon_CheckMark_Normal"/>
+                </State>
+                
+                <State name="Disabled">
+                    <When type="StateGroup" frame="$parent" DisabledState="Disabled"/>
+                    <Action type="SetProperty" frame="$this" Color="64,95,113"/>
+                    <Action type="SetProperty" frame="$this" Texture="@UI/Glues_Battlenet_StandardButtons_Small_Icon_CheckMark_Normal"/>
+                </State>
+
+                <State name="Normal">
+                    <Action type="SetProperty" frame="$this" Color="141,191,234"/>
+                    <Action type="SetProperty" frame="$this" Texture="@UI/Glues_Battlenet_StandardButtons_Small_Icon_CheckMark_Normal"/>
+                </State>
+            </StateGroup>
+        </Frame>
+        
+        <!-- CheckedState -->
+        <StateGroup name="CheckedState">
+            <DefaultState val="NotChecked"/>
+            <State name="Checked">
+                <When type="Property" frame="$parent" Checked="True"/>
+            </State>
+            <State name="NotChecked">
+            </State>
+        </StateGroup>
+    </Frame>
+    
+    <!--
+    =======================================
+    Standard Small Checkbox Template
+    =======================================
+    -->
+
+    <Frame type="CheckBox" name="StandardSmallCheckBoxTemplate">
+        <CheckImage val="CheckImage"/>
+        <Button val="Button"/>
+        <CheckSound val="@UI_CheckboxSelect"/>
+        <Width val="42"/>
+        <Height val="42"/>
+        
+        <Frame type="Button" name="Button" template="StandardSmallButtonTemplates/StandardSmallCheckboxButtonComponentTemplate"/>
+
+        <Frame type="Image" name="CheckImage">
+            <Anchor relative="$parent"/>
+            <Alpha val="0"/>
+        </Frame>
+    </Frame>
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    <!--
+    ================================================================
+    
+    STANDARD TAB BUTTON TEMPLATES
+    
+    ================================================================
+    -->
+    
+    <!-- Standard Tab Left Button -->
+    <Frame type="Button" name="StandardSmallTabButtonLeftTemplate">
+        <Width val="100"/>
+        <Height val="38"/>
+        <ClickSound val="@AC_UI_OnClick01"/>
+        <HoverSound val="@UI_HoverTick"/>
+        <Style val="@BattlenetSmallTabButton"/>
+        
+        <Frame type="Frame" name="AnchorFrame">
+            <Anchor relative="$parent"/>
+        </Frame>
+        
+        <!-- Background -->
+        <Frame type="Image" name="Background">
+            <Anchor relative="$parent/AnchorFrame"/>
+            <RenderPriority val="510"/>
+            <LayerCount val="4"/>
+            
+            <Texture val="@UI/Glues_Battlenet_TabsStandard_Left_Mask" layer="0"/>
+            <TextureType val="EndCap" layer="0"/>
+            <AlphaLayer val="True" layer="0"/>
+            
+            <Texture val="Assets/Textures/White.dds" layer="1"/>
+            <LayerAlpha val="230" layer="1"/>
+            <LayerColor val="3,11,21" layer="1"/>
+            
+            <Texture val="@UI/Glues_Battlenet_TabsStandard_Left_Mask" layer="2"/>
+            <TextureType val="EndCap" layer="2"/>
+            <AlphaLayer val="True" layer="2"/>
+            
+            <Texture val="@UI/Glues_Battlenet_TabsStandard_Background_Gradient" layer="3"/>
+            <LayerAlpha val="230" layer="3"/>
+            <LayerColor val="12,43,82" layer="3"/>
+            
+            <StateGroup name="ColorState">
+                <DefaultState val="Normal"/>
+            
+                <State name="Selected">
+                    <When type="StateGroup" frame="$parent" ToggledState="Toggled"/>
+                    <Action type="SetProperty" frame="$this" LayerColor="59,140,192" index="1"/>
+                    <Action type="SetProperty" frame="$this" LayerAlpha="255" index="1"/>
+                    <Action type="SetProperty" frame="$this" LayerColor="179,225,255" index="3"/>
+                    <Action type="SetProperty" frame="$this" LayerAlpha="255" index="3"/>
+                </State>
+                
+                <State name="Hover">
+                    <When type="StateGroup" frame="$parent" HoveredState="Hovered"/>
+                    <Action type="SetProperty" frame="$this" LayerColor="5,20,38" index="1"/>
+                    <Action type="SetProperty" frame="$this" LayerAlpha="230" index="1"/>
+                    <Action type="SetProperty" frame="$this" LayerColor="11,55,110" index="3"/>
+                    <Action type="SetProperty" frame="$this" LayerAlpha="230" index="3"/>
+                </State>
+                
+                <State name="Disabled">
+                    <When type="StateGroup" frame="$parent" DisabledState="Disabled"/>
+                    <Action type="SetProperty" frame="$this" LayerColor="3,11,21" index="1"/>
+                    <Action type="SetProperty" frame="$this" LayerAlpha="230" index="1"/>
+                    <Action type="SetProperty" frame="$this" LayerColor="12,43,82" index="3"/>
+                    <Action type="SetProperty" frame="$this" LayerAlpha="230" index="3"/>
+                </State>
+
+                <State name="Normal">
+                    <Action type="SetProperty" frame="$this" LayerColor="3,11,21" index="1"/>
+                    <Action type="SetProperty" frame="$this" LayerAlpha="230" index="1"/>
+                    <Action type="SetProperty" frame="$this" LayerColor="12,43,82" index="3"/>
+                    <Action type="SetProperty" frame="$this" LayerAlpha="230" index="3"/>
+                </State>
+            </StateGroup>
+        </Frame>
+        
+        <!-- Outer Border -->
+        <Frame type="Image" name="BorderOuter">
+            <Anchor relative="$parent/AnchorFrame"/>
+            <Color val="0,0,0"/>
+            <LayerCount val="4"/>
+            
+            <Texture val="@UI/Glues_Battlenet_TabsStandard_Left_Mask" layer="0"/>
+            <TextureType val="EndCap" layer="0"/>
+            <AlphaLayer val="True" layer="0"/>
+            <AlphaChannel val="InverseAlpha" layer="0"/>
+            
+            <Texture val="@UI/Glues_Battlenet_TabsStandard_Left_Border_Outer" layer="1"/>
+            <TextureType val="EndCap" layer="1"/>
+            
+            <Texture val="@UI/Glues_Battlenet_TabsStandard_Left_Mask" layer="2"/>
+            <TextureType val="EndCap" layer="2"/>
+            <AlphaLayer val="True" layer="2"/>
+            <AlphaChannel val="InverseAlpha" layer="2"/>
+            
+            <Texture val="@UI/Glues_Battlenet_TabsStandard_Left_Border_Outer" layer="3"/>
+            <TextureType val="EndCap" layer="3"/>
+            
+            <StateGroup name="CropState">
+                <DefaultState val="Normal"/>
+            
+                <State name="Selected">
+                    <When type="StateGroup" frame="$parent" ToggledState="Toggled"/>
+                    <Action type="SetProperty" frame="$this" Texture="@UI/Glues_Battlenet_TabsStandard_Left_Mask" index="0"/>
+                    <Action type="SetProperty" frame="$this" Texture="@UI/Glues_Battlenet_TabsStandard_Left_Mask" index="2"/>
+                    <Action type="SetProperty" frame="$this" AlphaChannel="InverseAlpha" index="0"/>
+                    <Action type="SetProperty" frame="$this" AlphaChannel="InverseAlpha" index="2"/>
+                </State>
+
+                <State name="Normal">
+                    <Action type="SetProperty" frame="$this" Texture="Assets/Textures/White.dds" index="0"/>
+                    <Action type="SetProperty" frame="$this" Texture="Assets/Textures/White.dds" index="2"/>
+                    <Action type="SetProperty" frame="$this" AlphaChannel="Alpha" index="0"/>
+                    <Action type="SetProperty" frame="$this" AlphaChannel="Alpha" index="2"/>
+                </State>
+            </StateGroup>
+        </Frame>
+        
+        <!-- Inner Border -->
+        <Frame type="Image" name="BorderInner">
+            <Anchor relative="$parent/AnchorFrame"/>
+            <Color val="36,107,169"/>
+            <RenderPriority val="513"/>
+            <LayerCount val="2"/>
+            
+            <Texture val="@UI/Glues_Battlenet_TabsStandard_Left_Border_Inner" layer="0"/>
+            <TextureType val="EndCap" layer="0"/>
+            
+            <Texture val="@UI/Glues_Battlenet_TabsStandard_Left_Border_Inner" layer="1"/>
+            <TextureType val="EndCap" layer="1"/>
+            
+            <StateGroup name="ColorState">
+                <DefaultState val="Normal"/>
+            
+                <State name="Selected">
+                    <When type="StateGroup" frame="$parent" ToggledState="Toggled"/>
+                    <Action type="SetProperty" frame="$this" Color="217,241,255"/>
+                </State>
+                
+                <State name="Hover">
+                    <When type="StateGroup" frame="$parent" HoveredState="Hovered"/>
+                    <Action type="SetProperty" frame="$this" Color="88,163,234"/>
+                </State>
+                
+                <State name="Disabled">
+                    <When type="StateGroup" frame="$parent" DisabledState="Disabled"/>
+                    <Action type="SetProperty" frame="$this" Color="59,140,192"/>
+                </State>
+
+                <State name="Normal">
+                    <Action type="SetProperty" frame="$this" Color="36,107,169"/>
+                </State>
+            </StateGroup>
+        </Frame>
+        
+        <!-- Border Highlight -->
+        <Frame type="Image" name="BorderHighlight">
+            <Anchor relative="$parent/AnchorFrame"/>
+            <RenderPriority val="525"/>
+            <LayerCount val="2"/>
+            <Color val="65,131,199"/>
+            
+            <Texture val="{$parent/BorderInner/@Texture[0]}" layer="0"/>
+            <TextureType val="EndCap" layer="0"/>
+            <AlphaLayer val="True" layer="0"/>
+            
+            <Texture val="@UI/Glues_Battlenet_PageAssets_GraphicListItem_Border_Highlight" layer="1"/>
+            
+            <StateGroup name="ColorState">
+                <DefaultState val="Normal"/>
+            
+                <State name="Selected">
+                    <When type="StateGroup" frame="$parent" ToggledState="Toggled"/>
+                    <Action type="SetProperty" frame="$this" Color="255,255,255"/>
+                </State>
+                
+                <State name="Hover">
+                    <When type="StateGroup" frame="$parent" HoveredState="Hovered"/>
+                    <Action type="SetProperty" frame="$this" Color="141,208,255"/>
+                </State>
+                
+                <State name="Disabled">
+                    <When type="StateGroup" frame="$parent" DisabledState="Disabled"/>
+                    <Action type="SetProperty" frame="$this" Color="59,140,192"/>
+                </State>
+
+                <State name="Normal">
+                    <Action type="SetProperty" frame="$this" Color="65,131,199"/>
+                </State>
+            </StateGroup>
+        </Frame>
+        
+        <!-- Label Glow -->
+        <Frame type="Image" name="LabelGlow">
+            <Anchor side="Top" relative="$parent/AnchorFrame" pos="Min" offset="0"/>
+            <Anchor side="Bottom" relative="$parent/AnchorFrame" pos="Max" offset="0"/>
+            <Anchor side="Left" relative="$parent/AnchorFrame" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent/AnchorFrame" pos="Max" offset="0"/>
+            <RenderPriority val="511"/>
+            <LayerCount val="2"/>
+            
+            <Texture val="@UI/Glues_Battlenet_TabsStandard_Left_Mask" layer="0"/>
+            <TextureType val="EndCap" layer="0"/>
+            <AlphaLayer val="True" layer="0"/>
+            
+            <Texture val="@UI/Glues_Battlenet_StandardButtons_Small_TextGlow" layer="1"/>
+            
+            <StateGroup name="ColorState">
+                <DefaultState val="Normal"/>
+            
+                <State name="Selected">
+                    <When type="StateGroup" frame="$parent" ToggledState="Toggled"/>
+                    <Action type="SetProperty" frame="$this" LayerColor="255,255,255" index="1"/>
+                    <Action type="SetProperty" frame="$this" LayerAlpha="0" index="1"/>
+                </State>
+                
+                <State name="Hover">
+                    <When type="StateGroup" frame="$parent" HoveredState="Hovered"/>
+                    <Action type="SetProperty" frame="$this" LayerColor="19,141,255" index="1"/>
+                    <Action type="SetProperty" frame="$this" LayerAlpha="255" index="1"/>
+                </State>
+                
+                <State name="Disabled">
+                    <When type="StateGroup" frame="$parent" DisabledState="Disabled"/>
+                    <Action type="SetProperty" frame="$this" LayerColor="255,255,255" index="1"/>
+                    <Action type="SetProperty" frame="$this" LayerAlpha="230" index="1"/>
+                </State>
+
+                <State name="Normal">
+                    <Action type="SetProperty" frame="$this" LayerColor="0,138,255" index="1"/>
+                    <Action type="SetProperty" frame="$this" LayerAlpha="179" index="1"/>
+                </State>
+            </StateGroup>
+        </Frame>
+
+        <!-- Label Shadow -->
+        <Frame type="Label" name="LabelShadow">
+            <Anchor side="Top" relative="$parent/Label" pos="Min" offset="1"/>
+            <Anchor side="Bottom" relative="$parent/Label" pos="Max" offset="1"/>
+            <Anchor side="Left" relative="$parent/Label" pos="Min" offset="1"/>
+            <Anchor side="Right" relative="$parent/Label" pos="Max" offset="1"/>
+            <Style val="StandardTabButton_Normal"/>
+            <Text val="{$parent/Label/@Text}"/>
+            <Color val="0,0,0"/>
+            <Alpha val="191"/>
+            
+            <StateGroup name="VisibleState">
+                <DefaultState val="Normal"/>
+            
+                <State name="Selected">
+                    <When type="StateGroup" frame="$parent" ToggledState="Toggled"/>
+                    <Action type="SetProperty" frame="$this" Visible="False"/>
+                </State>
+
+                <State name="Normal">
+                    <Action type="SetProperty" frame="$this" Visible="True"/>
+                </State>
+            </StateGroup>
+        </Frame>
+
+        <!-- Label -->
+        <Frame type="Label" name="Label">
+            <Anchor side="Top" relative="$parent/AnchorFrame" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent/AnchorFrame" pos="Mid" offset="0"/>
+            <Anchor side="Left" relative="$parent/AnchorFrame" pos="Min" offset="15"/>
+            <Anchor side="Right" relative="$parent/AnchorFrame" pos="Max" offset="-25"/>
+            <Style val="StandardTabButton_Normal"/>
+            
+            <StateGroup name="StyleState">
+                <DefaultState val="Normal"/>
+            
+                <State name="Selected">
+                    <When type="StateGroup" frame="$parent" ToggledState="Toggled"/>
+                    <Action type="SetProperty" frame="$this" Style="StandardTabButton_Selected"/>
+                </State>
+                
+                <State name="Hover">
+                    <When type="StateGroup" frame="$parent" HoveredState="Hovered"/>
+                    <Action type="SetProperty" frame="$this" Style="StandardTabButton_Hovered"/>
+                </State>
+                
+                <State name="Disabled">
+                    <When type="StateGroup" frame="$parent" DisabledState="Disabled"/>
+                    <Action type="SetProperty" frame="$this" Style="StandardTabButton_Normal"/>
+                </State>
+
+                <State name="Normal">
+                    <Action type="SetProperty" frame="$this" Style="StandardTabButton_Normal"/>
+                </State>
+            </StateGroup>
+        </Frame>
+
+        <Frame type="Frame" name="HitTestFrame">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+        </Frame>
+        
+        <!--
+        ===============
+        STATEGROUPS
+        ===============
+        -->
+                
+        <!-- ToggledState -->
+        <StateGroup name="ToggledState">
+            <DefaultState val="NotToggled"/>
+            <State name="Toggled">
+                <When type="Property" frame="$this" Toggled="True"/>
+                <Action type="SetProperty" frame="$this" RenderPriority="515"/>
+                <Action type="SetProperty" ClickSound=""/>
+                <Action type="SetProperty" HoverSound=""/>
+            </State>
+            <State name="NotToggled">
+                <Action type="SetProperty" frame="$this" RenderPriority="512"/>
+            </State>
+        </StateGroup>
+                
+        <!-- HoveredState -->
+        <StateGroup name="HoveredState">
+            <DefaultState val="NotHovered"/>
+            <State name="Hovered">
+                <When type="Property" frame="$this" Hovering="True"/>
+            </State>
+            <State name="NotHovered"/>
+        </StateGroup>
+                
+        <!-- DisabledState -->
+        <StateGroup name="DisabledState">
+            <DefaultState val="NotDisabled"/>
+            <State name="Disabled">
+            </State>
+            <State name="NotDisabled"/>
+        </StateGroup>
+    </Frame>
+    
+    <!-- Standard Tab Right Button -->
+    <Frame type="Button" name="StandardSmallTabButtonRightTemplate" template="StandardSmallButtonTemplates/StandardSmallTabButtonLeftTemplate">
+        
+        <!-- Background -->
+        <Frame type="Image" name="Background">
+            <Texture val="@UI/Glues_Battlenet_TabsStandard_Right_Mask" layer="0"/>
+            <Texture val="@UI/Glues_Battlenet_TabsStandard_Right_Mask" layer="2"/>
+        </Frame>
+        
+        <!-- Outer Border -->
+        <Frame type="Image" name="BorderOuter">
+            <Texture val="@UI/Glues_Battlenet_TabsStandard_Right_Mask" layer="0"/>
+            <Texture val="@UI/Glues_Battlenet_TabsStandard_Right_Border_Outer" layer="1"/>
+            <Texture val="@UI/Glues_Battlenet_TabsStandard_Right_Mask" layer="2"/>
+            <Texture val="@UI/Glues_Battlenet_TabsStandard_Right_Border_Outer" layer="3"/>
+            
+            <StateGroup name="CropState">
+                <DefaultState val="Normal"/>
+            
+                <State name="Selected">
+                    <Action type="SetProperty" frame="$this" Texture="@UI/Glues_Battlenet_TabsStandard_Right_Mask" index="0"/>
+                    <Action type="SetProperty" frame="$this" Texture="@UI/Glues_Battlenet_TabsStandard_Right_Mask" index="2"/>
+                    <Action type="SetProperty" frame="$this" AlphaChannel="InverseAlpha" index="0"/>
+                    <Action type="SetProperty" frame="$this" AlphaChannel="InverseAlpha" index="2"/>
+                </State>
+            </StateGroup>
+        </Frame>
+        
+        <!-- Inner Border -->
+        <Frame type="Image" name="BorderInner">            
+            <Texture val="@UI/Glues_Battlenet_TabsStandard_Right_Border_Inner" layer="0"/>
+            <Texture val="@UI/Glues_Battlenet_TabsStandard_Right_Border_Inner" layer="1"/>
+        </Frame>
+        
+        <!-- Label Glow -->
+        <Frame type="Image" name="LabelGlow">            
+            <Texture val="@UI/Glues_Battlenet_TabsStandard_Right_Mask" layer="0"/>
+        </Frame>
+
+        <!-- Label -->
+        <Frame type="Label" name="Label">
+            <Anchor side="Left" relative="$parent/AnchorFrame" pos="Min" offset="25"/>
+            <Anchor side="Right" relative="$parent/AnchorFrame" pos="Max" offset="-15"/>
+        </Frame>
+    </Frame>
+    
+    <!-- Standard Tab Middle Button -->
+    <Frame type="Button" name="StandardSmallTabButtonMiddleTemplate" template="StandardSmallButtonTemplates/StandardSmallTabButtonLeftTemplate">
+        
+        <!-- Background -->
+        <Frame type="Image" name="Background">
+            <Texture val="@UI/Glues_Battlenet_TabsStandard_Middle_Mask" layer="0"/>
+            <Texture val="@UI/Glues_Battlenet_TabsStandard_Middle_Mask" layer="2"/>
+        </Frame>
+        
+        <!-- Outer Border -->
+        <Frame type="Image" name="BorderOuter">
+            <Texture val="@UI/Glues_Battlenet_TabsStandard_Middle_Mask" layer="0"/>
+            <Texture val="@UI/Glues_Battlenet_TabsStandard_Middle_Border_Outer" layer="1"/>
+            <Texture val="@UI/Glues_Battlenet_TabsStandard_Middle_Mask" layer="2"/>
+            <Texture val="@UI/Glues_Battlenet_TabsStandard_Middle_Border_Outer" layer="3"/>
+            
+            <StateGroup name="CropState">
+                <DefaultState val="Normal"/>
+            
+                <State name="Selected">
+                    <Action type="SetProperty" frame="$this" Texture="@UI/Glues_Battlenet_TabsStandard_Middle_Mask" index="0"/>
+                    <Action type="SetProperty" frame="$this" Texture="@UI/Glues_Battlenet_TabsStandard_Middle_Mask" index="2"/>
+                    <Action type="SetProperty" frame="$this" AlphaChannel="InverseAlpha" index="0"/>
+                    <Action type="SetProperty" frame="$this" AlphaChannel="InverseAlpha" index="2"/>
+                </State>
+            </StateGroup>
+        </Frame>
+        
+        <!-- Inner Border -->
+        <Frame type="Image" name="BorderInner">            
+            <Texture val="@UI/Glues_Battlenet_TabsStandard_Middle_Border_Inner" layer="0"/>
+            <Texture val="@UI/Glues_Battlenet_TabsStandard_Middle_Border_Inner" layer="1"/>
+        </Frame>
+        
+        <!-- Label Glow -->
+        <Frame type="Image" name="LabelGlow">            
+            <Texture val="@UI/Glues_Battlenet_TabsStandard_Middle_Mask" layer="0"/>
+        </Frame>
+
+        <!-- Label -->
+        <Frame type="Label" name="Label">
+            <Anchor side="Left" relative="$parent/AnchorFrame" pos="Min" offset="25"/>
+            <Anchor side="Right" relative="$parent/AnchorFrame" pos="Max" offset="-25"/>
+        </Frame>
+    </Frame>
+</Desc>
