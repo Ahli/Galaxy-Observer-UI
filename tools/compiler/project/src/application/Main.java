@@ -35,12 +35,12 @@ import application.util.logger.log4j2plugin.TextAreaAppender;
 import javafx.animation.PauseTransition;
 import javafx.application.Application;
 import javafx.application.Platform;
-import javafx.stage.Stage;
-import javafx.util.Duration;
 import javafx.scene.Scene;
 import javafx.scene.control.TextArea;
 import javafx.scene.image.Image;
 import javafx.scene.layout.BorderPane;
+import javafx.stage.Stage;
+import javafx.util.Duration;
 
 /**
  * 
@@ -293,6 +293,7 @@ public class Main extends Application {
 	 */
 	private void attemptToRunGameWithReplay(String paramRunPath, boolean compileAndRun, String paramCompilePath) {
 		new Thread() {
+			@Override
 			public void run() {
 				this.setName(this.getName().replaceFirst("Thread", "GameRunner"));
 				boolean isHeroes = false;
@@ -371,8 +372,8 @@ public class Main extends Application {
 	}
 
 	/**
-	 * Param path might be some layout or folder within the interface, so we cut
-	 * it down to the interface base path.
+	 * Param path might be some layout or folder within the interface, so we cut it
+	 * down to the interface base path.
 	 * 
 	 * @param paramPath
 	 * @return
@@ -528,6 +529,7 @@ public class Main extends Application {
 			threadsMpqInterface.setMpqCachePath(baseMpqInterface.getMpqCachePath() + threadID);
 
 			Thread buildThread = new Thread() {
+				@Override
 				public void run() {
 					this.setName("Builder" + threadID);
 					// work
@@ -553,6 +555,7 @@ public class Main extends Application {
 	public void printLogMessage(String msg) {
 
 		Platform.runLater(new Runnable() {
+			@Override
 			public void run() {
 				// console.print(msg + "\n");
 				txtArea.appendText(msg + "\n");
@@ -715,6 +718,7 @@ public class Main extends Application {
 	/**
 	 * Is called when the App is closing.
 	 */
+	@Override
 	public void stop() {
 		LOGGER.info("App is about to shut down.");
 		baseMpqInterface.clearCacheExtractedMpq();
@@ -813,8 +817,8 @@ public class Main extends Application {
 	}
 
 	/**
-	 * from stackoverflow because why doesn't java have this functionality? It's
-	 * not like nobody would need that or it is trivial to create...
+	 * from stackoverflow because why doesn't java have this functionality? It's not
+	 * like nobody would need that or it is trivial to create...
 	 * 
 	 * @param aclass
 	 * @return File at base path
