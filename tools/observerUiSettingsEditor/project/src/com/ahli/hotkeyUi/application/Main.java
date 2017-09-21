@@ -36,18 +36,18 @@ import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
-import javafx.stage.FileChooser;
-import javafx.stage.Stage;
-import javafx.stage.WindowEvent;
-import javafx.util.Duration;
-import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
-import javafx.scene.control.TabPane;
 import javafx.scene.control.ButtonType;
+import javafx.scene.control.TabPane;
 import javafx.scene.image.Image;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.text.Font;
+import javafx.stage.FileChooser;
+import javafx.stage.FileChooser.ExtensionFilter;
+import javafx.stage.Stage;
+import javafx.stage.WindowEvent;
+import javafx.util.Duration;
 
 /**
  * Application
@@ -123,7 +123,11 @@ public class Main extends Application {
 			this.primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
 				@Override
 				public void handle(WindowEvent event) {
-					askToSaveUnsavedChanges();
+					boolean notCancelled = askToSaveUnsavedChanges();
+					if (!notCancelled) {
+						// cancel closing
+						event.consume();
+					}
 				}
 			});
 
@@ -142,15 +146,7 @@ public class Main extends Application {
 			LOGGER.warn("executed root layout stage.show() within " + (System.nanoTime() - time) / 1000000 + "ms.");
 
 			// hide apps splash screen image
-			Platform.runLater(new Runnable() {
-				@Override
-				public void run() {
-					final SplashScreen splash = SplashScreen.getSplashScreen();
-					if (splash != null) {
-						splash.close();
-					}
-				}
-			});
+			Platform.runLater(new SplashScreenHider());
 
 			LOGGER.warn("finished app initialization after " + (System.nanoTime() - appStartTime) / 1000000 + "ms.");
 		} catch (Exception e) {
@@ -164,8 +160,10 @@ public class Main extends Application {
 
 	/**
 	 * Asks the user to decide on unsaved changes, if there are any.
+	 * 
+	 * @return false if the user pressed cancel, else true
 	 */
-	public void askToSaveUnsavedChanges() {
+	public boolean askToSaveUnsavedChanges() {
 		if (hasUnsavedFileChanges()) {
 			// ask to save changes in the file
 			String title = Messages.getString("Main.unsavedChangesTitle"); //$NON-NLS-1$
@@ -178,9 +176,14 @@ public class Main extends Application {
 			if ((result.isPresent())) {
 				if (result.get() == ButtonType.YES) {
 					saveUiMpq();
+				} else {
+					if (result.get() == ButtonType.CANCEL) {
+						return false;
+					}
 				}
 			}
 		}
+		return true;
 	}
 
 	/**
@@ -205,8 +208,8 @@ public class Main extends Application {
 	}
 
 	/**
-	 * Returns true, if the path of the current opened document is valid.
-	 * Invalid usually means that no document has been opened.
+	 * Returns true, if the path of the current opened document is valid. Invalid
+	 * usually means that no document has been opened.
 	 * 
 	 * @return
 	 */
@@ -241,6 +244,7 @@ public class Main extends Application {
 	 */
 	public void openMpqFile(File f) {
 		new Thread() {
+			@Override
 			public void run() {
 				this.setName(this.getName().replaceFirst("Thread", "Open")); //$NON-NLS-1$
 				long time = System.nanoTime();
@@ -319,14 +323,16 @@ public class Main extends Application {
 	 * Closes the currently opened document.
 	 */
 	public void closeFile() {
-		askToSaveUnsavedChanges();
-		openedDocPath = null;
-		mpqi.clearCacheExtractedMpq();
-		updateAppTitle();
-		updateMenuBar();
-		tabsCtrl.clearData();
-		layoutExtReader.clearData();
-		hasUnsavedFileChanges = false;
+		if (askToSaveUnsavedChanges()) {
+			// user did not press cancel
+			openedDocPath = null;
+			mpqi.clearCacheExtractedMpq();
+			updateAppTitle();
+			updateMenuBar();
+			tabsCtrl.clearData();
+			layoutExtReader.clearData();
+			hasUnsavedFileChanges = false;
+		}
 	}
 
 	/**
@@ -415,6 +421,7 @@ public class Main extends Application {
 	 */
 	public void saveUiMpq() {
 		new Thread() {
+			@Override
 			public void run() {
 				this.setName(this.getName().replaceFirst("Thread", "Save")); //$NON-NLS-1$
 				long time = System.nanoTime();
@@ -545,8 +552,7 @@ public class Main extends Application {
 	}
 
 	/**
-	 * Causes the App to shut down. This includes asking to save unsaved
-	 * changes.
+	 * Causes the App to shut down. This includes asking to save unsaved changes.
 	 */
 	public void closeApp() {
 		primaryStage.fireEvent(new WindowEvent(primaryStage, WindowEvent.WINDOW_CLOSE_REQUEST));
@@ -617,4 +623,21 @@ public class Main extends Application {
 	public Stage getPrimaryStage() {
 		return primaryStage;
 	}
+
+	/**
+	 * Hides the Splash Screen.
+	 * 
+	 * @author Ahli
+	 *
+	 */
+	static class SplashScreenHider implements Runnable {
+		@Override
+		public void run() {
+			final SplashScreen splash = SplashScreen.getSplashScreen();
+			if (splash != null) {
+				splash.close();
+			}
+		}
+	}
+
 }

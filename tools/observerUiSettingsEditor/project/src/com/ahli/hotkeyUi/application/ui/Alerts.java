@@ -7,11 +7,11 @@ import org.apache.logging.log4j.Logger;
 import com.ahli.hotkeyUi.application.i18n.Messages;
 
 import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
-import javafx.scene.control.Alert.AlertType;
-import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
@@ -37,7 +37,7 @@ public class Alerts {
 		long time = System.nanoTime();
 		ButtonType yesButton = new ButtonType(Messages.getString("General.YesButton"), ButtonData.YES); //$NON-NLS-1$
 		ButtonType noButton = new ButtonType(Messages.getString("General.NoButton"), ButtonData.NO); //$NON-NLS-1$
-		ButtonType cancelButton = new ButtonType(Messages.getString("General.NoButton"), ButtonData.CANCEL_CLOSE); // $NON-NLS-1$
+		ButtonType cancelButton = new ButtonType(Messages.getString("General.CancelButton"), ButtonData.CANCEL_CLOSE); // $NON-NLS-1$
 		Alert alert = new Alert(AlertType.INFORMATION, content, yesButton, noButton, cancelButton);
 		alert.initOwner(owner);
 		alert.setTitle(title);

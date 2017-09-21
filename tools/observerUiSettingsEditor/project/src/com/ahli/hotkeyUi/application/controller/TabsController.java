@@ -18,6 +18,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableColumn.CellDataFeatures;
 import javafx.scene.control.TableColumn.CellEditEvent;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
@@ -71,7 +72,7 @@ public class TabsController {
 
 	// based on:
 	// http://jluger.de/blog/20160731_javafx_text_rendering_in_tableview.html
-	public static final Callback<TableColumn<ValueDef, String>, TableCell<ValueDef, String>> WRAPPING_CELL_FACTORY = new Callback<TableColumn<ValueDef, String>, TableCell<ValueDef, String>>() {
+	private static final Callback<TableColumn<ValueDef, String>, TableCell<ValueDef, String>> WRAPPING_CELL_FACTORY = new Callback<TableColumn<ValueDef, String>, TableCell<ValueDef, String>>() {
 
 		@Override
 		public TableCell<ValueDef, String> call(TableColumn<ValueDef, String> param) {
@@ -107,6 +108,20 @@ public class TabsController {
 		}
 	};
 
+	private static final Callback<CellDataFeatures<ValueDef, Boolean>, ObservableValue<Boolean>> ActionColumnCellValueFactory = new Callback<TableColumn.CellDataFeatures<ValueDef, Boolean>, ObservableValue<Boolean>>() {
+		@Override
+		public ObservableValue<Boolean> call(TableColumn.CellDataFeatures<ValueDef, Boolean> p) {
+			return new SimpleBooleanProperty(p.getValue() != null);
+		}
+	};
+
+	private static final Callback<TableColumn<ValueDef, Boolean>, TableCell<ValueDef, Boolean>> ActionColumnCellFactoryReset = new Callback<TableColumn<ValueDef, Boolean>, TableCell<ValueDef, Boolean>>() {
+		@Override
+		public TableCell<ValueDef, Boolean> call(TableColumn<ValueDef, Boolean> p) {
+			return new ResetDefaultButtonTableCell(Messages.getString("TabsController.Reset")); //$NON-NLS-1$
+		}
+	};
+
 	/**
 	 * On Controller initialization.
 	 */
@@ -122,25 +137,14 @@ public class TabsController {
 		hotkeysKeyCol.setCellFactory(TextFieldTableCell.<ValueDef>forTableColumn());
 		hotkeysKeyCol.setOnEditCommit((CellEditEvent<ValueDef, String> t) -> {
 			if (!t.getOldValue().equals(t.getNewValue())) {
-				((ValueDef) t.getTableView().getItems().get(t.getTablePosition().getRow())).setValue(t.getNewValue());
+				t.getTableView().getItems().get(t.getTablePosition().getRow()).setValue(t.getNewValue());
 				LOGGER.debug("write hotkey val: " + t.getNewValue());
 				main.notifyFileDataWasChanged();
 			}
 		});
 		hotkeysActionsCol.setSortable(false);
-		hotkeysActionsCol.setCellValueFactory(
-				new Callback<TableColumn.CellDataFeatures<ValueDef, Boolean>, ObservableValue<Boolean>>() {
-					@Override
-					public ObservableValue<Boolean> call(TableColumn.CellDataFeatures<ValueDef, Boolean> p) {
-						return new SimpleBooleanProperty(p.getValue() != null);
-					}
-				});
-		hotkeysActionsCol.setCellFactory(new Callback<TableColumn<ValueDef, Boolean>, TableCell<ValueDef, Boolean>>() {
-			@Override
-			public TableCell<ValueDef, Boolean> call(TableColumn<ValueDef, Boolean> p) {
-				return new ResetDefaultButtonTableCell(Messages.getString("TabsController.Reset")); //$NON-NLS-1$
-			}
-		});
+		hotkeysActionsCol.setCellValueFactory(ActionColumnCellValueFactory);
+		hotkeysActionsCol.setCellFactory(ActionColumnCellFactoryReset);
 
 		settingsNameCol.setCellValueFactory(new PropertyValueFactory<>("id"));
 		settingsDescriptionCol.setCellValueFactory(new PropertyValueFactory<>("description"));
@@ -150,25 +154,14 @@ public class TabsController {
 		settingsValueCol.setCellFactory(TextFieldTableCell.<ValueDef>forTableColumn());
 		settingsValueCol.setOnEditCommit((CellEditEvent<ValueDef, String> t) -> {
 			if (!t.getOldValue().equals(t.getNewValue())) {
-				((ValueDef) t.getTableView().getItems().get(t.getTablePosition().getRow())).setValue(t.getNewValue());
+				t.getTableView().getItems().get(t.getTablePosition().getRow()).setValue(t.getNewValue());
 				LOGGER.debug("write setting val: " + t.getNewValue());
 				main.notifyFileDataWasChanged();
 			}
 		});
 		settingsActionsCol.setSortable(false);
-		settingsActionsCol.setCellValueFactory(
-				new Callback<TableColumn.CellDataFeatures<ValueDef, Boolean>, ObservableValue<Boolean>>() {
-					@Override
-					public ObservableValue<Boolean> call(TableColumn.CellDataFeatures<ValueDef, Boolean> p) {
-						return new SimpleBooleanProperty(p.getValue() != null);
-					}
-				});
-		settingsActionsCol.setCellFactory(new Callback<TableColumn<ValueDef, Boolean>, TableCell<ValueDef, Boolean>>() {
-			@Override
-			public TableCell<ValueDef, Boolean> call(TableColumn<ValueDef, Boolean> p) {
-				return new ResetDefaultButtonTableCell(Messages.getString("TabsController.Reset")); //$NON-NLS-1$
-			}
-		});
+		settingsActionsCol.setCellValueFactory(ActionColumnCellValueFactory);
+		settingsActionsCol.setCellFactory(ActionColumnCellFactoryReset);
 
 		hotkeysTable.setItems(hotkeysData);
 		settingsTable.setItems(settingsData);

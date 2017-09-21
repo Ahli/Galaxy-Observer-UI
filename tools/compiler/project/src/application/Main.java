@@ -349,10 +349,10 @@ public class Main extends Application {
 				// } catch (IOException e) {
 				// /* nothing */
 				// }
-				if (replay == null || !replay.exists() || !replay.isFile()) {
-					LOGGER.debug("Last used replay is invalid, getting newest replay instead.");
-					replay = getNewestReplay(isHeroes);
-				}
+				// if (replay == null || !replay.exists() || !replay.isFile()) {
+				// LOGGER.debug("Last used replay is invalid, getting newest replay instead.");
+				replay = getNewestReplay(isHeroes);
+				// }
 				if (replay != null && replay.exists() && replay.isFile()) {
 					LOGGER.info("Starting game with replay: " + replay.getName());
 					String cmd = "cmd /C start \"\" \"" + gamePath + "\" \"" + replay.getAbsolutePath() + "\"";
