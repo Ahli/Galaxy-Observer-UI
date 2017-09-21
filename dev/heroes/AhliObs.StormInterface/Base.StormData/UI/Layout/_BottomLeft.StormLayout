@@ -122,7 +122,7 @@
 		<Frame type="Frame" name="PortraitPanelContainer">
 			<Frame type="PortraitPanel" name="PortraitPanel">
 				<Anchor side="Bottom" relative="$UnitSelectionInfoVerticalPositionControl" pos="Min" offset="-240"/>
-				<Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+				<Anchor side="Left" relative="$parent" pos="Min" offset="0"/> <!-- Left anchor controlled by stategroup -->
 				<Handle val="PortraitPanel"/>
 				<Visible val="true"/>
 				<Animation name="KeepVisible">
@@ -131,6 +131,23 @@
 						<Key type="Bool" time="0" value="true"/>
 					</Controller>
 				</Animation>
+				
+				<!-- FIX: because the portrait is sometimes shown and you cannot properly detect that it should be hidden -->
+				<StateGroup name="MovePortraitPanelOffscreen">
+					<DefaultState val="Other"/>
+					<State name="OffScreen_noSelection">
+						<When type="Property" frame="$StatusPanelOfSingleSelectedUnit" visible="false"/>
+						<Action type="SetAnchor" frame="$PortraitPanel" undo="False" side="Left" relative="$parent" pos="Min" offset="-9999"/>
+					</State>
+					<State name="OffScreen_replayJump">
+						<When type="Property" frame="$ReplayPanel/PreviewMinimapFrame" visible="true"/>
+						<Action type="SetAnchor" frame="$PortraitPanel" undo="False" side="Left" relative="$parent" pos="Min" offset="-9999"/>
+					</State>
+					<State name="Other">
+						<Action type="SetAnchor" frame="$PortraitPanel" undo="False" side="Left" relative="$parent" pos="Min" offset="0"/>
+					</State>
+				</StateGroup>
+				
 				
 				<Frame type="Portrait" name="Portrait">
 					<Alpha val="60"/>
@@ -143,7 +160,7 @@
 							<When type="Property" frame="$StatusPanelOfSingleSelectedUnit" visible="true"/>
 							<!-- check if UI was hidden e.g. via Control+E -->
 							<When type="Property" frame="$GameUI/UIContainer/FullScreenUpperContainer/ChatDisplay" visible="true"/>
-							<When type="Property" frame="$PreviewMinimapBackgroundImage" visible="false"/>
+							<When type="Property" frame="$ReplayPanel/PreviewMinimapFrame" visible="false"/> <!-- does not work, the game seems to override that case -->
 							<When type="Property" frame="$ConsoleUIContainer" visible="true"/>
 							<Action type="SetProperty" visible="true"/>
 							<Action type="SetProperty" frame="$PortraitMaskFrame" visible="true"/>
@@ -5468,6 +5485,7 @@
 			<Anchor side="Right" relative="$this" pos="Max" offset="0"/>
 			<Width val="420"/>
 			<Height val="0"/>
+			<Handle val="ReplayPanel"/>
 			
 			<!-- default offset top: -60 -->	
 			<Frame type="Image" name="BackgroundImage">
@@ -5485,10 +5503,6 @@
 				<Anchor side="Bottom" relative="$parent/ProgressSlider" pos="Min" offset="-3"/>
 			</Frame>
 
-			<Frame type="Image" name="PreviewMinimapBackgroundImage">
-				<Handle val="PreviewMinimapBackgroundImage"/>
-			</Frame>
-			
 			<Frame type="Button" name="IncSpeedButton">
 				<Anchor side="Left" relative="$parent/$parent/ObserverPanel/ViewPulldown" pos="Max" offset="0"/>
 			</Frame>
