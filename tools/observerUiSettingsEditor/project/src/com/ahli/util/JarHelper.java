@@ -60,6 +60,15 @@ public class JarHelper {
 				LOGGER.debug("assuming Test Environment: " + str); //$NON-NLS-1$
 			}
 
+		} else {
+			if(str.contains(".jar;")) {
+				str = str.substring(0, str.indexOf(".jar"));
+				LOGGER.debug("path before .jar: "+str);
+				str = str.substring(0, str.lastIndexOf(File.separator));
+			}
+			
+			
+			
 		}
 		LOGGER.debug("_RESULT PATH: " + str); //$NON-NLS-1$
 
