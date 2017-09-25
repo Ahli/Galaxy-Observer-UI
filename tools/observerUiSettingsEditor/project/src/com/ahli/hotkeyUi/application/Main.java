@@ -132,7 +132,6 @@ public class Main extends Application {
 			});
 
 			initPaths();
-			initMpqInterface(mpqi);
 
 			// Fade animation
 			FadeTransition ft = new FadeTransition(Duration.millis(750), rootLayout);
@@ -149,6 +148,9 @@ public class Main extends Application {
 			Platform.runLater(new SplashScreenHider());
 
 			LOGGER.warn("finished app initialization after " + (System.nanoTime() - appStartTime) / 1000000 + "ms.");
+
+			initMpqInterface(mpqi);
+
 		} catch (Exception e) {
 			LOGGER.error("App Error: " + ExceptionUtils.getStackTrace(e), e); //$NON-NLS-1$
 			e.printStackTrace();
@@ -571,8 +573,16 @@ public class Main extends Application {
 	 * @param mpqi
 	 */
 	private void initMpqInterface(MpqEditorInterface mpqi) {
-		mpqi.setMpqEditorPath(
-				basePath + File.separator + "plugins" + File.separator + "mpq" + File.separator + "MPQEditor.exe"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		String path = basePath + File.separator + "plugins" + File.separator + "mpq" + File.separator + "MPQEditor.exe"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		mpqi.setMpqEditorPath(path);
+		File f = new File(path);
+		if (!f.exists() || !f.isFile()) {
+			LOGGER.error("Could not find MPQEditor.exe within its expected path: " + path);
+			String title = Messages.getString("Main.warningAlertTitle"); //$NON-NLS-1$
+			String content = String.format(Messages.getString("Main.couldNotFindMpqEditor"), path); //$NON-NLS-1$
+			Alert alert = Alerts.buildWarningAlert(primaryStage, title, title, content);
+			alert.showAndWait();
+		}
 	}
 
 	/**

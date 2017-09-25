@@ -71,6 +71,44 @@ public class Alerts {
 	 * @param title
 	 * @param header
 	 * @param content
+	 * @return
+	 */
+	public static Alert buildInfoAlert(Window owner, String title, String header, String content) {
+		long time = System.nanoTime();
+		ButtonType okButton = new ButtonType(Messages.getString("General.OkButton"), ButtonData.YES); //$NON-NLS-1$
+		Alert alert = new Alert(AlertType.INFORMATION, content, okButton);
+		alert.initOwner(owner);
+		alert.setTitle(title);
+		alert.setHeaderText(header);
+		LOGGER.warn("created infoAlert within " + (System.nanoTime() - time) / 1000000 + "ms.");
+		return alert;
+	}
+
+	/**
+	 * 
+	 * @param owner
+	 * @param title
+	 * @param header
+	 * @param content
+	 * @return
+	 */
+	public static Alert buildWarningAlert(Window owner, String title, String header, String content) {
+		long time = System.nanoTime();
+		ButtonType okButton = new ButtonType(Messages.getString("General.OkButton"), ButtonData.YES); //$NON-NLS-1$
+		Alert alert = new Alert(AlertType.WARNING, content, okButton);
+		alert.initOwner(owner);
+		alert.setTitle(title);
+		alert.setHeaderText(header);
+		LOGGER.warn("created warningAlert within " + (System.nanoTime() - time) / 1000000 + "ms.");
+		return alert;
+	}
+
+	/**
+	 * 
+	 * @param owner
+	 * @param title
+	 * @param header
+	 * @param content
 	 * @param imageUrl
 	 * @return
 	 */
