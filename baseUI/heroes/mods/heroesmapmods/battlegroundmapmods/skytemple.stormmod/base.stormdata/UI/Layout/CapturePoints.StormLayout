@@ -1,32 +1,10 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <Desc>
+    <Constant name="ColorSkyTempleNeutral" val="9f9189"/>
+    <Constant name="ColorSkyTempleNeutralDark" val="6c625c"/>
 
-    <Frame type="Frame" name="BulletContainerTemplate">
-        <Frame type="Image" name="Bullet1">
-            <Anchor side="Top" relative="$parent" pos="Min" offset="5"/>
-            <Anchor side="Left" relative="$parent" pos="Min" offset="7"/>
-            <Texture val="@UI/Storm_UI_HUD_MapMechanic_SkyTemple_TempleBullet"/>
-        </Frame>
-        <Frame type="Image" name="Bullet2">
-            <Anchor side="Top" relative="$parent/Bullet1" pos="Min" offset="0"/>
-            <Anchor side="Left" relative="$parent/Bullet1" pos="Max" offset="-1"/>
-            <Texture val="@UI/Storm_UI_HUD_MapMechanic_SkyTemple_TempleBullet"/>
-        </Frame>
-        <Frame type="Image" name="Bullet3">
-            <Anchor side="Top" relative="$parent/Bullet1" pos="Min" offset="0"/>
-            <Anchor side="Left" relative="$parent/Bullet2" pos="Max" offset="-1"/>
-            <Texture val="@UI/Storm_UI_HUD_MapMechanic_SkyTemple_TempleBullet"/>
-        </Frame>
-        <Frame type="Image" name="Bullet4">
-            <Anchor side="Top" relative="$parent/Bullet1" pos="Min" offset="0"/>
-            <Anchor side="Left" relative="$parent/Bullet3" pos="Max" offset="-1"/>
-            <Texture val="@UI/Storm_UI_HUD_MapMechanic_SkyTemple_TempleBullet"/>
-        </Frame>
-        <Frame type="Image" name="Bullet5">
-            <Anchor side="Top" relative="$parent/Bullet1" pos="Min" offset="0"/>
-            <Anchor side="Left" relative="$parent/Bullet4" pos="Max" offset="-1"/>
-            <Texture val="@UI/Storm_UI_HUD_MapMechanic_SkyTemple_TempleBullet"/>
-        </Frame>
+    <Frame type="Image" name="BulletTemplate">
+        <Texture val="@UI/Storm_UI_HUD_MapMechanic_SkyTemple_TempleBullet"/>
     </Frame>
     
     <Frame type="Frame" name="AlertRingTemplate">
@@ -110,37 +88,143 @@
         <Text val="250"/>
         <Width val="100"/>
     </Frame>
+    
+   <Frame type="Frame" name="ShrineIconContainerTemplate">
+        <Anchor relative="FireEffect"/>
+        
+        <!-- Contested effect; hides/shows with triggers
+            Sorry this is obscure and It also obscures the dims of the parent frame
+                Reworks are hard -->
+        <Frame type="Frame" name="FireEffect" template="StandardTemplates/RoundFireTemplate">
+            <Anchor side="Top" relative="$parent/ShrineIcon" pos="Min" offset="-50"/>
+            <Anchor side="Left" relative="$parent/ShrineIcon" pos="Min" offset="-20"/>
+        </Frame>
+        
+        <!-- Main icon: enabled, disabled, colored capture progress indicator -->
+        <Frame type="Image" name="ShrineIcon">
+            <Texture val="@UI/HUD_MapMechanic_SkyTemple_Gator"/>
+            <ColorAdjustMode val="Colorize"/>
+            <DarkAdjustColor val="#ColorSkyTempleNeutral"/>
+            
+            <Frame type="Frame" name="ShrineCaptureProgressMask">
+                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+                <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+                <Height val="0"/>
+                
+                <Frame type="Image" name="ProgressFill">
+                    <Anchor relative="$parent/$parent"/>
+                    <Texture val="$parent/@Texture"/>
+                    <ColorAdjustMode val="Colorize"/>
+                    <LightAdjustColor val="#ColorWhite"/>
+                    <DarkAdjustColor val="{$GameUI/AllyColors/@Color}"/>
+                </Frame>
+            </Frame>
+            
+            <StateGroup name="ShrineIconStateControl">
+                <DefaultState val="Disable"/>
+                <State name="Disable">
+                    <Action type="SetProperty" LightAdjustColor="#ColorSkyTempleNeutral"/>
+                    <Action type="SetProperty" DarkAdjustColor="#ColorSkyTempleNeutralDark"/>
+                    <Action type="SetProperty" frame="ShrineCaptureProgressMask" Visible="False"/>
+                </State>
+                <State name="TriggerDisable">
+                    <When type="AnimationState" Ownership="Disable"/>
+                    <Action type="SetProperty" LightAdjustColor="#ColorSkyTempleNeutral"/>
+                    <Action type="SetProperty" DarkAdjustColor="#ColorSkyTempleNeutralDark"/>
+                    <Action type="SetProperty" frame="ShrineCaptureProgressMask" Visible="False"/>
+                </State>
+                <State name="EnableBlueTeam">
+                    <When type="AnimationState" Ownership="Order"/>
+                    <Action type="SetProperty" LightAdjustColor="#ColorWhite"/>
+                    <Action type="SetProperty" DarkAdjustColor="#ColorSkyTempleNeutral"/>
+                    <Action type="SetProperty" frame="ShrineCaptureProgressMask/ProgressFill" DarkAdjustColor="{$GameUI/AllyColors/@Color}"/>
+                </State>
+                <State name="EnableRedTeam">
+                    <When type="AnimationState" Ownership="Chaos"/>
+                    <Action type="SetProperty" LightAdjustColor="#ColorWhite"/>
+                    <Action type="SetProperty" DarkAdjustColor="#ColorSkyTempleNeutral"/>
+                    <Action type="SetProperty" frame="ShrineCaptureProgressMask/ProgressFill" DarkAdjustColor="{$GameUI/EnemyColors/@Color}"/>
+                </State>
+            </StateGroup>
+        </Frame>
+        
+        <!-- Shot progress bar -->
+        <Frame type="ProgressBar" name="ShrineProgress">
+            <Anchor side="Bottom" relative="$parent/ShrineIcon" pos="Max" offset="-15"/>
+            <Anchor side="Left" relative="$parent/ShrineIcon" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent/ShrineIcon" pos="Mid" offset="0"/>
+            <Width val="77"/>
+            <Height val="11"/>
+            
+            <Texture val="@UI/HUD_MapMechanic_ProgressBarGrey"/>
+            <ColorAdjustMode val="Colorize"/>
+            <LightAdjustColor val="#ColorWhite"/>
+            <DarkAdjustColor val="#ColorSkyTempleNeutral"/>
+            
+            <!-- Animation States set by triggers; accounting for colorblind mode
+                must be separate from capture progress color state -->
+            <StateGroup name="OwnershipStatus">
+                <DefaultState val="Neutral"/>
+                <State name="Neutral">
+                    <When type="AnimationState" Ownership="Neutral"/>
+                    <Action type="SetProperty" LightAdjustColor="#ColorWhite" undo="false"/>
+                    <Action type="SetProperty" DarkAdjustColor="#ColorSkyTempleNeutral" undo="false"/>
+                </State>
+                
+                <State name="Order">
+                    <When type="AnimationState" Ownership="Order"/>
+                    <Action type="SetProperty" LightAdjustColor="{$GameUI/TeamOrderColors/@AdditionalColor}" undo="false"/>
+                    <Action type="SetProperty" DarkAdjustColor="{$GameUI/TeamOrderColors/@Color}" undo="false"/>
+                </State>
+                
+                <State name="Chaos">
+                    <When type="AnimationState" Ownership="Chaos"/>
+                    <Action type="SetProperty" LightAdjustColor="{$GameUI/TeamChaosColors/@AdditionalColor}" undo="false"/>
+                    <Action type="SetProperty" DarkAdjustColor="{$GameUI/TeamChaosColors/@Color}" undo="false"/>
+                </State>
+            </StateGroup>
+        </Frame>
 
-    <Frame type="ProgressBar" name="ShrineProgressTemplate">
-        <Texture val="@UI/HUD_MapMechanic_ProgressBarGrey"/>
-        <Width val="77"/>
-        <Height val="11"/>
-    </Frame>
-    
-    <Frame type="Image" name="ShrineBracketTemplate">
-        <Texture val="null"/>
-        <Width val="89"/>
-        <Height val="23"/>
-        <Alpha val="0"/>
-        <Animation name="FadeIn">
-            <Event event="FadeIn" action="Reset,Play,DirectionForward"/>
-            <Event event="FadeOut" action="Play,DirectionReverse"/>
-            <Controller type="Anchor" end="Pause" side="Bottom" relative="true">
-                <Key type="Curve" time="0.0" value="20" inout="Linear"/>
-                <Key type="Curve" time="1.0" value="0" inout="Slow,Linear"/>
-            </Controller>
-        </Animation>
-        <Visible val="false"/>
-    </Frame>
-    
-    <Frame type="Frame" name="ShrineBackgroundContainerTemplate">
-        <Frame type="Image" name="ShrineBackground">
-            <Anchor side="Bottom" relative="$parent" pos="Max" offset="0" />
-            <Anchor side="Left" relative="$parent" pos="Min" offset="0" />
-            <Anchor side="Right" relative="$parent" pos="Max" offset="0" />
+        <Frame type="Frame" name="BulletContainer">
+            <Anchor relative="$parent/ShrineProgress"/>
+            
+            <Frame type="Image" name="Bullet1" template="CapturePoints/BulletTemplate">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+            </Frame>
+            
+            <Frame type="Image" name="Bullet2" template="CapturePoints/BulletTemplate">
+                <Anchor side="Top" relative="$parent/Bullet1" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Bullet1" pos="Max" offset="-1"/>
+            </Frame>
+            
+            <Frame type="Image" name="Bullet3" template="CapturePoints/BulletTemplate">
+                <Anchor side="Top" relative="$parent/Bullet1" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Bullet2" pos="Max" offset="-1"/>
+            </Frame>
+            
+            <Frame type="Image" name="Bullet4" template="CapturePoints/BulletTemplate">
+                <Anchor side="Top" relative="$parent/Bullet1" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Bullet3" pos="Max" offset="-1"/>
+            </Frame>
+            
+            <Frame type="Image" name="Bullet5" template="CapturePoints/BulletTemplate">
+                <Anchor side="Top" relative="$parent/Bullet1" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Bullet4" pos="Max" offset="-1"/>
+            </Frame>
+        </Frame>
+
+        <Frame type="Label" name="CooldownLabel">
+            <Anchor side="Bottom" relative="$parent/ShrineIcon" pos="Max" offset="-15"/>
+            <Anchor side="Left" relative="$parent/ShrineIcon" pos="Min" offset="8"/>
+            <Anchor side="Right" relative="$parent/ShrineIcon" pos="Max" offset="0"/>
+            <Style val="Storm_MapMechanic_MechanicSmallCounter"/>
+            <Text val=""/>
         </Frame>
     </Frame>
-            
+    
+    
     <!--**************************************************************-->
     <!-- Sky Temple                                                   -->
     <!--**************************************************************-->
@@ -297,206 +381,54 @@
                 <Style val="Storm_MapMechanic_MechanicTimerLeft"/>
                 <Width val="0"/>
             </Frame>
-         
         </Frame>
         
         <Frame type="Frame" name="TempleModeFrame">
             <Anchor relative="$parent"/>
             
-            <!-- Top Shrine -->
-            
-            <Frame type="Frame" name="TopFireEffect" template="StandardTemplates/RoundFireTemplate">
-                <Anchor side="Top" relative="$parent/TopShrineDisabled" pos="Min" offset="-50"/>
-                <Anchor side="Left" relative="$parent/TopShrineDisabled" pos="Min" offset="-20"/>
-            </Frame>
-            
-<!--            <Frame type="Frame" name="TopAlertRing" template="CapturePoints/AlertRingTemplate">
-                <Anchor side="Top" relative="$parent/TopShrineDisabled" pos="Mid" offset="0"/>
-                <Anchor side="Bottom" relative="$parent/TopShrineDisabled" pos="Mid" offset="0"/>
-                <Anchor side="Left" relative="$parent/TopShrineDisabled" pos="Mid" offset="0"/>
-                <Anchor side="Right" relative="$parent/TopShrineDisabled" pos="Mid" offset="0"/>
-            </Frame>
-            -->
-            <Frame type="Image" name="TopShrineDisabled">
-                <Anchor side="Bottom" relative="$parent" pos="Max" offset="-5"/>
-                <Anchor side="Left" relative="$parent" pos="Min" offset="110"/>
-                <Texture val="@UI/HUD_MapMechanic_SkyTemple_Gator_Off"/>
-            </Frame>
-            
-            <Frame type="Image" name="TopShrineEnabled">
-                <Anchor relative="$parent/TopShrineDisabled"/>
-                <Texture val="@UI/HUD_MapMechanic_SkyTemple_Gator"/>
-            </Frame>
-            
-            <Frame type="Frame" name="TopShrineBackgroundBlue" template="CapturePoints/ShrineBackgroundContainerTemplate">
-                <Anchor side="Bottom" relative="$parent/TopShrineDisabled" pos="Max" offset="0"/>
-                <Anchor side="Left" relative="$parent/TopShrineDisabled" pos="Min" offset="0"/>
-                <Anchor side="Right" relative="$parent/TopShrineDisabled" pos="Max" offset="0"/>
-                <Height val="112"/>
-                <Frame type="Image" name="ShrineBackground">
-                    <Texture val="@UI/HUD_MapMechanic_SkyTemple_Gator_Blue"/>
+            <Frame type="Frame" name="ShrineIndicators1" template="CapturePoints/ShrineIconContainerTemplate">
+                <Frame type="Image" name="ShrineIcon">
+                    <Anchor side="Left" relative="$parent/$parent" pos="Min" offset="110"/>
+                    <Anchor side="Bottom" relative="$parent/$parent" pos="Max" offset="-5"/>
+                    <Texture val="@UI/HUD_MapMechanic_SkyTemple_Gator"/>
+                    
+                    <Frame type="Frame" name="ShrineCaptureProgressMask">
+                        <Frame type="Image" name="ProgressFill">
+                            <Texture val="@UI/HUD_MapMechanic_SkyTemple_Gator"/>
+                        </Frame>
+                    </Frame>
                 </Frame>
             </Frame>
             
-            <Frame type="Frame" name="TopShrineBackgroundRed" template="CapturePoints/ShrineBackgroundContainerTemplate">
-                <Anchor side="Bottom" relative="$parent/TopShrineDisabled" pos="Max" offset="0"/>
-                <Anchor side="Left" relative="$parent/TopShrineDisabled" pos="Min" offset="0"/>
-                <Anchor side="Right" relative="$parent/TopShrineDisabled" pos="Max" offset="0"/>
-                <Height val="112"/>
-                <Frame type="Image" name="ShrineBackground">
-                    <Texture val="@UI/HUD_MapMechanic_SkyTemple_Gator_Red"/>
-                </Frame>
-            </Frame>
-
-            <Frame type="Image" name="TopShrineBracket" template="CapturePoints/ShrineBracketTemplate">
-                <Anchor side="Bottom" relative="$parent/TopShrineDisabled" pos="Max" offset="-15"/>
-                <Anchor side="Left" relative="$parent/TopShrineDisabled" pos="Mid" offset="0"/>
-                <Anchor side="Right" relative="$parent/TopShrineDisabled" pos="Mid" offset="0"/>
-            </Frame>
-            
-            <Frame type="ProgressBar" name="TopShrineProgress1" template="CapturePoints/ShrineProgressTemplate">
-                <Anchor side="Top" relative="$parent/TopShrineBracket" pos="Min" offset="6"/>
-                <Anchor side="Left" relative="$parent/TopShrineBracket" pos="Min" offset="7"/>
-            </Frame>
-
-            <Frame type="Frame" name="TopBulletContainer" template="CapturePoints/BulletContainerTemplate">
-                <Anchor relative="$parent/TopShrineBracket"/>
-            </Frame>
-
-            <Frame type="Label" name="TopCooldownLabel">
-                <Anchor side="Bottom" relative="$parent/TopShrineDisabled" pos="Max" offset="-15"/>
-                <Anchor side="Left" relative="$parent/TopShrineDisabled" pos="Min" offset="8"/>
-                <Anchor side="Right" relative="$parent/TopShrineDisabled" pos="Max" offset="0"/>
-                <Style val="Storm_MapMechanic_MechanicSmallCounter"/>
-                <Text val="24s"/>
-                <Visible val="false"/>
-            </Frame>
-
-            <!-- Mid Shrine -->
-
-            <Frame type="Frame" name="MidFireEffect" template="StandardTemplates/RoundFireTemplate">
-                <Anchor side="Top" relative="$parent/MidShrineDisabled" pos="Min" offset="-50"/>
-                <Anchor side="Left" relative="$parent/MidShrineDisabled" pos="Min" offset="-20"/>
-            </Frame>
-            
-            <Frame type="Image" name="MidShrineDisabled">
-                <Anchor side="Top" relative="$parent/TopShrineDisabled" pos="Min" offset="0"/>
-                <Anchor side="Left" relative="$parent/TopShrineDisabled" pos="Max" offset="25"/>
-                <Texture val="@UI/HUD_MapMechanic_SkyTemple_Cobra_Off"/>
-            </Frame>
-            
-            <Frame type="Image" name="MidShrineEnabled">
-                <Anchor relative="$parent/MidShrineDisabled"/>
-                <Texture val="@UI/HUD_MapMechanic_SkyTemple_Cobra"/>
-            </Frame>
-            
-            <Frame type="Frame" name="MidShrineBackgroundBlue" template="CapturePoints/ShrineBackgroundContainerTemplate">
-                <Anchor side="Bottom" relative="$parent/MidShrineDisabled" pos="Max" offset="0"/>
-                <Anchor side="Left" relative="$parent/MidShrineDisabled" pos="Min" offset="0"/>
-                <Anchor side="Right" relative="$parent/MidShrineDisabled" pos="Max" offset="0"/>
-                <Height val="112"/>
-                <Frame type="Image" name="ShrineBackground">
-                    <Texture val="@UI/HUD_MapMechanic_SkyTemple_Cobra_Blue"/>
+            <Frame type="Frame" name="ShrineIndicators2" template="CapturePoints/ShrineIconContainerTemplate">
+                <Frame type="Image" name="ShrineIcon">
+                    <Anchor side="Left" relative="$parent/$parent/ShrineIndicators1" pos="Max" offset="5"/>
+                    <Anchor side="Bottom" relative="$parent/$parent/ShrineIndicators1" pos="Max" offset="0"/>
+                    <Texture val="@UI/HUD_MapMechanic_SkyTemple_Cobra"/>
+                    
+                    <Frame type="Frame" name="ShrineCaptureProgressMask">
+                        <Frame type="Image" name="ProgressFill">
+                            <Texture val="@UI/HUD_MapMechanic_SkyTemple_Cobra"/>
+                        </Frame>
+                    </Frame>
                 </Frame>
             </Frame>
             
-            <Frame type="Frame" name="MidShrineBackgroundRed" template="CapturePoints/ShrineBackgroundContainerTemplate">
-                <Anchor side="Bottom" relative="$parent/MidShrineDisabled" pos="Max" offset="0"/>
-                <Anchor side="Left" relative="$parent/MidShrineDisabled" pos="Min" offset="0"/>
-                <Anchor side="Right" relative="$parent/MidShrineDisabled" pos="Max" offset="0"/>
-                <Height val="112"/>
-                <Frame type="Image" name="ShrineBackground">
-                    <Texture val="@UI/HUD_MapMechanic_SkyTemple_Cobra_Red"/>
+            <Frame type="Frame" name="ShrineIndicators3" template="CapturePoints/ShrineIconContainerTemplate">
+                <Frame type="Image" name="ShrineIcon">
+                    <Anchor side="Left" relative="$parent/$parent/ShrineIndicators2" pos="Max" offset="5"/>
+                    <Anchor side="Bottom" relative="$parent/$parent/ShrineIndicators2" pos="Max" offset="0"/>
+                    <Texture val="@UI/HUD_MapMechanic_SkyTemple_Anubis"/>
+                    
+                    <Frame type="Frame" name="ShrineCaptureProgressMask">
+                        <Frame type="Image" name="ProgressFill">
+                            <Texture val="@UI/HUD_MapMechanic_SkyTemple_Anubis"/>
+                        </Frame>
+                    </Frame>
                 </Frame>
             </Frame>
-
-            <Frame type="Image" name="MidShrineBracket" template="CapturePoints/ShrineBracketTemplate">
-                <Anchor side="Bottom" relative="$parent/MidShrineDisabled" pos="Max" offset="-15"/>
-                <Anchor side="Left" relative="$parent/MidShrineDisabled" pos="Mid" offset="0"/>
-                <Anchor side="Right" relative="$parent/MidShrineDisabled" pos="Mid" offset="0"/>
-            </Frame>
-            
-            <Frame type="ProgressBar" name="MidShrineProgress1" template="CapturePoints/ShrineProgressTemplate">
-                <Anchor side="Top" relative="$parent/MidShrineBracket" pos="Min" offset="6"/>
-                <Anchor side="Left" relative="$parent/MidShrineBracket" pos="Min" offset="7"/>
-            </Frame>
-
-            <Frame type="Frame" name="MidBulletContainer" template="CapturePoints/BulletContainerTemplate">
-                <Anchor relative="$parent/MidShrineBracket"/>
-            </Frame>
-            
-            <Frame type="Label" name="MidCooldownLabel">
-                <Anchor side="Bottom" relative="$parent/MidShrineDisabled" pos="Max" offset="-15"/>
-                <Anchor side="Left" relative="$parent/MidShrineDisabled" pos="Min" offset="8"/>
-                <Anchor side="Right" relative="$parent/MidShrineDisabled" pos="Max" offset="0"/>
-                <Style val="Storm_MapMechanic_MechanicSmallCounter"/>
-                <Text val="24s"/>
-                <Visible val="false"/>
-            </Frame>
-
-            <!-- Bottom Shrine -->
-            
-            <Frame type="Frame" name="BotFireEffect" template="StandardTemplates/RoundFireTemplate">
-                <Anchor side="Top" relative="$parent/BotShrineDisabled" pos="Min" offset="-50"/>
-                <Anchor side="Left" relative="$parent/BotShrineDisabled" pos="Min" offset="-20"/>
-            </Frame>
-            
-            <Frame type="Image" name="BotShrineDisabled">
-                <Anchor side="Top" relative="$parent/MidShrineDisabled" pos="Min" offset="0"/>
-                <Anchor side="Left" relative="$parent/MidShrineDisabled" pos="Max" offset="25"/>
-                <Texture val="@UI/HUD_MapMechanic_SkyTemple_Anubis_Off"/>
-            </Frame>
-            
-            <Frame type="Image" name="BotShrineEnabled">
-                <Anchor relative="$parent/BotShrineDisabled"/>
-                <Texture val="@UI/HUD_MapMechanic_SkyTemple_Anubis"/>
-            </Frame>
-
-            <Frame type="Frame" name="BotShrineBackgroundBlue" template="CapturePoints/ShrineBackgroundContainerTemplate">
-                <Anchor side="Bottom" relative="$parent/BotShrineDisabled" pos="Max" offset="0"/>
-                <Anchor side="Left" relative="$parent/BotShrineDisabled" pos="Min" offset="0"/>
-                <Anchor side="Right" relative="$parent/BotShrineDisabled" pos="Max" offset="0"/>
-                <Height val="112"/>
-                <Frame type="Image" name="ShrineBackground">
-                    <Texture val="@UI/HUD_MapMechanic_SkyTemple_Anubis_Blue"/>
-                </Frame>
-            </Frame>
-            
-            <Frame type="Frame" name="BotShrineBackgroundRed" template="CapturePoints/ShrineBackgroundContainerTemplate">
-                <Anchor side="Bottom" relative="$parent/BotShrineDisabled" pos="Max" offset="0"/>
-                <Anchor side="Left" relative="$parent/BotShrineDisabled" pos="Min" offset="0"/>
-                <Anchor side="Right" relative="$parent/BotShrineDisabled" pos="Max" offset="0"/>
-                <Height val="112"/>
-                <Frame type="Image" name="ShrineBackground">
-                    <Texture val="@UI/HUD_MapMechanic_SkyTemple_Anubis_Red"/>
-                </Frame>
-            </Frame>
-
-            <Frame type="Image" name="BotShrineBracket" template="CapturePoints/ShrineBracketTemplate">
-                <Anchor side="Bottom" relative="$parent/BotShrineDisabled" pos="Max" offset="-15"/>
-                <Anchor side="Left" relative="$parent/BotShrineDisabled" pos="Mid" offset="0"/>
-                <Anchor side="Right" relative="$parent/BotShrineDisabled" pos="Mid" offset="0"/>
-            </Frame>
-
-            <Frame type="ProgressBar" name="BotShrineProgress1" template="CapturePoints/ShrineProgressTemplate">
-                <Anchor side="Top" relative="$parent/BotShrineBracket" pos="Min" offset="6"/>
-                <Anchor side="Left" relative="$parent/BotShrineBracket" pos="Min" offset="7"/>
-            </Frame>
-
-            <Frame type="Frame" name="BotBulletContainer" template="CapturePoints/BulletContainerTemplate">
-                <Anchor relative="$parent/BotShrineBracket"/>
-            </Frame>
-            
-            <Frame type="Label" name="BotCooldownLabel">
-                <Anchor side="Bottom" relative="$parent/BotShrineDisabled" pos="Max" offset="-15"/>
-                <Anchor side="Left" relative="$parent/BotShrineDisabled" pos="Min" offset="8"/>
-                <Anchor side="Right" relative="$parent/BotShrineDisabled" pos="Max" offset="0"/>
-                <Style val="Storm_MapMechanic_MechanicSmallCounter"/>
-                <Text val="24s"/>
-                <Visible val="false"/>
-            </Frame>
-
         </Frame>
+        
     </Frame>
 
 </Desc>
