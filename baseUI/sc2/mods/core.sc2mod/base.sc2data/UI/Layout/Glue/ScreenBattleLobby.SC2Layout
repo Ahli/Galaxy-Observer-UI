@@ -113,8 +113,8 @@
         </Frame>
 
         <Frame type="Label" name="MapNameLabel">
-            <Anchor side="Top" relative="$parent/ExpansionAnchorFrame" pos="Mid" offset="0"/>
-            <Anchor side="Bottom" relative="$parent/ExpansionAnchorFrame" pos="Mid" offset="0"/>
+            <Anchor side="Top" relative="$parent/ExpansionAnchorFrame" pos="Mid" offset="-9"/>
+            <Anchor side="Bottom" relative="$parent/ExpansionAnchorFrame" pos="Mid" offset="-9"/>
             <Anchor side="Left" relative="$parent/ExpansionIconFrame" pos="Max" offset="10"/>
             <AutoSizeClamps maxWidth="430"/>
             <Style val="@Lobby_Title"/>
@@ -128,8 +128,8 @@
             <Anchor side="Top" relative="$parent/ModNameLabel" pos="Mid" offset="0"/>
             <Anchor side="Bottom" relative="$parent/ModNameLabel" pos="Mid" offset="0"/>
             <Anchor side="Left" relative="$parent/MapNameLabel" pos="Max" offset="5"/>
-            <Style val="@Lobby_Title"/>
-            <Text val="|"/>
+            <Style val="@Lobby_ModTitle"/>
+            <Text val="+"/>
             <CollapseLayout val="true"/>
             <Visible val="{$parent/ModNameLabel/@Visible}"/>
         </Frame>
@@ -176,7 +176,7 @@
         </Frame>
 
         <Frame type="Label" name="LobbyNameLabel">
-            <Anchor side="Top" relative="$parent/MapNameLabel" pos="Max" offset="-2"/>
+            <Anchor side="Top" relative="$parent/MapNameLabel" pos="Max" offset="0"/>
             <Anchor side="Left" relative="$parent/ExpansionIconFrame" pos="Max" offset="10"/>
             <AutoSizeClamps maxWidth="430"/>
             <Style val="@Lobby_Name"/>
@@ -184,13 +184,83 @@
             <Options val="Ellipsis | TooltipIfTruncated | NoWrapping"/>
             <Text val="{$parent/@LobbyName}"/>
             <PreserveAnchorOffset val="True"/>
+                
+            <StateGroup name="VisibleState">
+                <DefaultState val="NotVisible"/>
+            
+                <State name="Visible">
+                    <When type="Property" frame="$ancestor[@type=ScreenBattleLobby]" IsOpenToPublic="True"/>
+                    <Action type="SetProperty" frame="$this" Visible="True"/>
+                </State>
+                
+                <State name="NotVisible">
+                    <Action type="SetProperty" frame="$this" Visible="False"/>
+                </State>
+            </StateGroup>
         </Frame>
 
-        <Frame type="Button" name="EditLobbyNameButton" template="StandardBattlenetTemplates/BattlenetMiniIconButtonTemplate">
-            <Anchor side="Top" relative="$parent/LobbyNameLabel" pos="Mid" offset="0"/>
-            <Anchor side="Bottom" relative="$parent/LobbyNameLabel" pos="Mid" offset="0"/>
+        <Frame type="Button" name="EditLobbyNameButton">
+            <Anchor side="Top" relative="$parent/MapNameLabel" pos="Max" offset="-5"/>
             <Anchor side="Left" relative="$parent/LobbyNameLabel" pos="Max" offset="0"/>
-            <Visible val="False"/>
+            <Anchor side="Right" relative="$this/EditLobbyNameLabel" pos="Max" offset="0"/>
+            <Height val="32"/>
+            
+            <Frame type="Image" name="Image">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                <Width val="32"/>
+                <Height val="32"/>
+                <Texture val="@UI/Glues_Icons_Edit"/>
+            </Frame>
+
+            <Frame type="Label" name="EditLobbyNameLabel">
+                <Anchor side="Top" relative="$parent/$parent/MapNameLabel" pos="Max" offset="3"/>
+                <Anchor side="Left" relative="$parent/Image" pos="Max" offset="-1"/>
+                <Style val="@Lobby_NameEdit"/>
+                <Text val="@UI/Lobby/EditLobbyName"/>
+                
+                <StateGroup name="VisibleState">
+                    <DefaultState val="NotVisible"/>
+                
+                    <State name="Visible">
+                        <When type="Property" frame="$ancestor[@type=ScreenBattleLobby]" LobbyName=""/>
+                        <Action type="SetProperty" frame="$this" Visible="True"/>
+                    </State>
+                    
+                    <State name="NotVisible">
+                        <Action type="SetProperty" frame="$this" Visible="False"/>
+                    </State>
+                </StateGroup>
+            </Frame>
+            
+            <StateGroup name="LobbyNamedState">
+                <DefaultState val="LobbyNamed"/>
+            
+                <State name="LobbyUnnamed">
+                    <When type="Property" frame="$ancestor[@type=ScreenBattleLobby]" LobbyName=""/>
+                    <Action type="SetAnchor" frame="$this" side="Left" relative="$parent/ExpansionIconFrame" pos="Max" offset="2"/>
+                    <Action type="SetAnchor" frame="$this" side="Right" relative="$this/EditLobbyNameLabel" pos="Max" offset="0"/>
+                </State>
+                
+                <State name="LobbyNamed">
+                    <Action type="SetAnchor" frame="$this" side="Left" relative="$parent/LobbyNameLabel" pos="Max" offset="0"/>
+                    <Action type="SetAnchor" frame="$this" side="Right" relative="$this/Image" pos="Max" offset="0"/>
+                </State>
+            </StateGroup>
+                
+            <StateGroup name="VisibleState">
+                <DefaultState val="NotVisible"/>
+            
+                <State name="Visible">
+                    <When type="Property" frame="$ancestor[@type=ScreenBattleLobby]" IsHost="True"/>
+                    <When type="Property" frame="$ancestor[@type=ScreenBattleLobby]" IsOpenToPublic="True"/>
+                    <Action type="SetProperty" frame="$this" Visible="True"/>
+                </State>
+                
+                <State name="NotVisible">
+                    <Action type="SetProperty" frame="$this" Visible="False"/>
+                </State>
+            </StateGroup>
         </Frame>
 
         <Frame type="Button" name="InvitePlayerButton" template="StandardBattlenetTemplates/BattlenetSmallButtonTemplate">

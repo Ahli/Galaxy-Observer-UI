@@ -18,9 +18,10 @@
     a glow which expands past their anchoring easily, and that glow can be adjusted without having
     to re-anchor everywhere these buttons are used in the UI.
     
-    These buttons were first created as part of a Collection UI update for patch 3.18 in August of 2017.  
-    The goal was to create fresh UI elements that refined the standard Glue button style and would look
-    crisp in 16x9 resolutions which older buttons do not.
+    These buttons were first created as part of a Collection UI update for patch 3.18 in August of 2017
+    with the 3.19 Arcade/Custom Games update in mind as well.  The goal was to create fresh UI 
+    elements that refined the standard Glue button style and would look crisp in 16x9 resolutions which
+    older buttons do not.
     
     To achieve the crisp quality in 16x9 there are a number of tricks being used.  Rather than using the
     "EndCap" texturetype and "ImageLayer" button type like our Glue buttons created for LotV these
@@ -61,6 +62,13 @@
         <Anchor side="Bottom" relative="$this/AnchorFrame" pos="Max" offset="8"/>
         <Anchor side="Left" relative="$this/AnchorFrame" pos="Min" offset="-8"/>
         <Anchor side="Right" relative="$this/AnchorFrame" pos="Max" offset="8"/>
+                    
+        <Animation name="HoverSound">
+            <Event event="OnMouseEnter" action="Reset,Play"/>
+            <Controller type="Sound" end="Stop">
+                <Key type="Sound" time="0" sound="@UI_HoverTick"/>
+            </Controller>
+        </Animation>
         
         <!-- Anchor Frame -->
         <Frame type="Frame" name="AnchorFrame">
@@ -425,6 +433,56 @@
         <Frame type="Frame" name="AnchorFrame">
             <Width val="38"/>
         </Frame>
+        
+        <!-- Background Glow -->
+        <Frame type="Image" name="BackgroundGlow">
+            <Anchor side="Top" relative="$parent/AnchorFrame" pos="Min" offset="-3"/>
+            <Anchor side="Bottom" relative="$parent/AnchorFrame" pos="Max" offset="3"/>
+            <Anchor side="Left" relative="$parent/AnchorFrame" pos="Min" offset="-3"/>
+            <Anchor side="Right" relative="$parent/AnchorFrame" pos="Max" offset="3"/>
+            <RenderPriority val="511"/>
+            <LayerCount val="2"/>
+            
+            <Texture val="@UI/Glues_Battlenet_StandardButtons_Small_Mask" layer="0"/>
+            <TextureType val="NineSlice" layer="0"/>
+            <AlphaLayer val="True" layer="0"/>
+            
+            <Texture val="@UI/Glues_Battlenet_StandardButtons_Small_TextGlow" layer="1"/>
+            <TextureCoords top=".1" left="0.25" bottom="1" right="0.75" layer="1"/>
+            
+            <StateGroup name="ColorState">
+                <DefaultState val="Normal"/>
+                
+                <State name="Disabled">
+                    <When type="StateGroup" frame="$parent" DisabledState="Disabled"/>
+                    <Action type="SetProperty" frame="$this" LayerColor="255,255,255" index="1"/>
+                    <Action type="SetProperty" frame="$this" LayerAlpha="0" index="1"/>
+                </State>
+            
+                <State name="Pressed">
+                    <When type="StateGroup" frame="$parent" PressedState="Pressed"/>
+                    <Action type="SetProperty" frame="$this" LayerColor="255,255,255" index="1"/>
+                    <Action type="SetProperty" frame="$this" LayerAlpha="0" index="1"/>
+                </State>
+            
+                <State name="Selected">
+                    <When type="StateGroup" frame="$parent" ToggledState="Toggled"/>
+                    <Action type="SetProperty" frame="$this" LayerColor="255,255,255" index="1"/>
+                    <Action type="SetProperty" frame="$this" LayerAlpha="0" index="1"/>
+                </State>
+                
+                <State name="Hover">
+                    <When type="StateGroup" frame="$parent" HoveredState="Hovered"/>
+                    <Action type="SetProperty" frame="$this" LayerColor="19,141,255" index="1"/>
+                    <Action type="SetProperty" frame="$this" LayerAlpha="255" index="1"/>
+                </State>
+
+                <State name="Normal">
+                    <Action type="SetProperty" frame="$this" LayerColor="0,138,255" index="1"/>
+                    <Action type="SetProperty" frame="$this" LayerAlpha="179" index="1"/>
+                </State>
+            </StateGroup>
+        </Frame>
     </Frame>
     
     <!--
@@ -671,6 +729,56 @@
     </Frame>
     
     
+    <!-- FilterBox -->
+    <Frame type="EditBox" name="StandardSmallFilterBoxTemplate" template="StandardSmallButtonTemplates/StandardSmallEditBoxTemplate">
+    
+        <Frame type="Image" name="FilterImage">
+            <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent/ClearTextButton" pos="Max" offset="0"/>
+            <Width val="30"/>
+            <Height val="30"/>
+            <Texture val="@UI/Glues_Battlenet_StandardButtons_Small_Icon_Filter_Normal"/>
+            
+            <StateGroup name="DisplayState">
+                <DefaultState val="Normal"/>
+            
+                <State name="NotVisible">
+                    <When type="Property" frame="$parent/ClearTextButton" Visible="True"/>
+                    <Action type="SetProperty" frame="$this" Visible="False"/>
+                </State>
+            
+                <State name="Disabled">
+                    <When type="StateGroup" frame="$parent" DisabledState="Disabled"/>
+                    <Action type="SetProperty" frame="$this" Texture="@UI/Glues_Battlenet_StandardButtons_Small_Icon_Filter_Normal"/>
+                    <Action type="SetProperty" frame="$this" Color="64,95,113"/>
+                    <Action type="SetProperty" frame="$this" Visible="True"/>
+                </State>
+                
+                <State name="Pressed">
+                    <When type="StateGroup" frame="$parent" PressedState="Pressed"/>
+                    <Action type="SetProperty" frame="$this" Texture="@UI/Glues_Battlenet_StandardButtons_Small_Icon_Filter_Pressed"/>
+                    <Action type="SetProperty" frame="$this" Color="255,255,255"/>
+                    <Action type="SetProperty" frame="$this" Visible="True"/>
+                </State>
+                
+                <State name="Hover"> 
+                    <When type="StateGroup" frame="$parent" HoveredState="Hovered"/>
+                    <Action type="SetProperty" frame="$this" Texture="@UI/Glues_Battlenet_StandardButtons_Small_Icon_Filter_Normal"/>
+                    <Action type="SetProperty" frame="$this" Color="204,231,255"/>
+                    <Action type="SetProperty" frame="$this" Visible="True"/>
+                </State>
+
+                <State name="Normal">
+                    <Action type="SetProperty" frame="$this" Texture="@UI/Glues_Battlenet_StandardButtons_Small_Icon_Filter_Normal"/>
+                    <Action type="SetProperty" frame="$this" Color="141,191,234"/>
+                    <Action type="SetProperty" frame="$this" Visible="True"/>
+                </State>
+            </StateGroup>
+        </Frame>
+    </Frame>
+    
+    
     
     <!--
     ================================================================
@@ -824,6 +932,11 @@
             
         <StateGroup name="StyleState">
             <DefaultState val="Normal"/>
+            
+            <State name="Disabled">
+                <When type="StateGroup" frame="$this" DisabledState="Disabled"/>
+                <Action type="SetProperty" frame="$this" Style="StandardSmallButton_Disabled"/>
+            </State>
         
             <State name="Pressed">
                 <When type="StateGroup" frame="$this" PressedState="Pressed"/>
@@ -838,11 +951,6 @@
             <State name="Hover">
                 <When type="StateGroup" frame="$this" HoveredState="Hovered"/>
                 <Action type="SetProperty" frame="$this" Style="StandardSmallButton_Hovered"/>
-            </State>
-            
-            <State name="Disabled">
-                <When type="StateGroup" frame="$this" DisabledState="Disabled"/>
-                <Action type="SetProperty" frame="$this" Style="StandardSmallButton_Disabled"/>
             </State>
 
             <State name="Normal">
@@ -904,6 +1012,12 @@
             
             <StateGroup name="ColorState">
                 <DefaultState val="Normal"/>
+                
+                <State name="Disabled">
+                    <When type="StateGroup" frame="$parent" DisabledState="Disabled"/>
+                    <Action type="SetProperty" frame="$this" LayerColor="255,255,255" index="1"/>
+                    <Action type="SetProperty" frame="$this" LayerAlpha="0" index="1"/>
+                </State>
             
                 <State name="Pressed">
                     <When type="StateGroup" frame="$parent" PressedState="Pressed"/>
@@ -921,12 +1035,6 @@
                     <When type="StateGroup" frame="$parent" HoveredState="Hovered"/>
                     <Action type="SetProperty" frame="$this" LayerColor="19,141,255" index="1"/>
                     <Action type="SetProperty" frame="$this" LayerAlpha="255" index="1"/>
-                </State>
-                
-                <State name="Disabled">
-                    <When type="StateGroup" frame="$parent" DisabledState="Disabled"/>
-                    <Action type="SetProperty" frame="$this" LayerColor="255,255,255" index="1"/>
-                    <Action type="SetProperty" frame="$this" LayerAlpha="0" index="1"/>
                 </State>
 
                 <State name="Normal">
@@ -947,6 +1055,12 @@
             
             <StateGroup name="ColorState">
                 <DefaultState val="Normal"/>
+                
+                <State name="Disabled">
+                    <When type="StateGroup" frame="$parent" DisabledState="Disabled"/>
+                    <Action type="SetProperty" frame="$this" Color="64,95,113"/>
+                    <Action type="SetProperty" frame="$this" Texture="@UI/Glues_Battlenet_StandardButtons_Small_Icon_PulldownArow_Normal"/>
+                </State>
             
                 <State name="Pressed">
                     <When type="StateGroup" frame="$parent" PressedState="Pressed"/>
@@ -963,12 +1077,6 @@
                 <State name="Hover">
                     <When type="StateGroup" frame="$parent" HoveredState="Hovered"/>
                     <Action type="SetProperty" frame="$this" Color="204,231,255"/>
-                    <Action type="SetProperty" frame="$this" Texture="@UI/Glues_Battlenet_StandardButtons_Small_Icon_PulldownArow_Normal"/>
-                </State>
-                
-                <State name="Disabled">
-                    <When type="StateGroup" frame="$parent" DisabledState="Disabled"/>
-                    <Action type="SetProperty" frame="$this" Color="64,95,113"/>
                     <Action type="SetProperty" frame="$this" Texture="@UI/Glues_Battlenet_StandardButtons_Small_Icon_PulldownArow_Normal"/>
                 </State>
 
@@ -1041,6 +1149,12 @@
             
             <StateGroup name="ColorState">
                 <DefaultState val="Normal"/>
+                
+                <State name="Disabled">
+                    <When type="StateGroup" frame="$parent" DisabledState="Disabled"/>
+                    <Action type="SetProperty" frame="$this" Color="64,95,113"/>
+                    <Action type="SetProperty" frame="$this" Texture="@UI/Glues_Battlenet_StandardButtons_Small_Icon_CheckMark_Normal"/>
+                </State>
             
                 <State name="Pressed">
                     <When type="StateGroup" frame="$parent" PressedState="Pressed"/>
@@ -1057,12 +1171,6 @@
                 <State name="Hover">
                     <When type="StateGroup" frame="$parent" HoveredState="Hovered"/>
                     <Action type="SetProperty" frame="$this" Color="204,231,255"/>
-                    <Action type="SetProperty" frame="$this" Texture="@UI/Glues_Battlenet_StandardButtons_Small_Icon_CheckMark_Normal"/>
-                </State>
-                
-                <State name="Disabled">
-                    <When type="StateGroup" frame="$parent" DisabledState="Disabled"/>
-                    <Action type="SetProperty" frame="$this" Color="64,95,113"/>
                     <Action type="SetProperty" frame="$this" Texture="@UI/Glues_Battlenet_StandardButtons_Small_Icon_CheckMark_Normal"/>
                 </State>
 
@@ -1175,6 +1283,7 @@
         <!-- Background -->
         <Frame type="Image" name="Background">
             <Anchor relative="$parent/AnchorFrame"/>
+            <DesaturateOnDisable val="False"/>
             <RenderPriority val="510"/>
             <LayerCount val="4"/>
             
@@ -1196,6 +1305,14 @@
             
             <StateGroup name="ColorState">
                 <DefaultState val="Normal"/>
+                
+                <State name="Disabled">
+                    <When type="StateGroup" frame="$parent" DisabledState="Disabled"/>
+                    <Action type="SetProperty" frame="$this" LayerColor="10,12,15" index="1"/>
+                    <Action type="SetProperty" frame="$this" LayerAlpha="191" index="1"/>
+                    <Action type="SetProperty" frame="$this" LayerColor="22,29,37" index="3"/>
+                    <Action type="SetProperty" frame="$this" LayerAlpha="191" index="3"/>
+                </State>
             
                 <State name="Selected">
                     <When type="StateGroup" frame="$parent" ToggledState="Toggled"/>
@@ -1212,14 +1329,6 @@
                     <Action type="SetProperty" frame="$this" LayerColor="11,55,110" index="3"/>
                     <Action type="SetProperty" frame="$this" LayerAlpha="230" index="3"/>
                 </State>
-                
-                <State name="Disabled">
-                    <When type="StateGroup" frame="$parent" DisabledState="Disabled"/>
-                    <Action type="SetProperty" frame="$this" LayerColor="3,11,21" index="1"/>
-                    <Action type="SetProperty" frame="$this" LayerAlpha="230" index="1"/>
-                    <Action type="SetProperty" frame="$this" LayerColor="12,43,82" index="3"/>
-                    <Action type="SetProperty" frame="$this" LayerAlpha="230" index="3"/>
-                </State>
 
                 <State name="Normal">
                     <Action type="SetProperty" frame="$this" LayerColor="3,11,21" index="1"/>
@@ -1233,6 +1342,7 @@
         <!-- Outer Border -->
         <Frame type="Image" name="BorderOuter">
             <Anchor relative="$parent/AnchorFrame"/>
+            <DesaturateOnDisable val="False"/>
             <Color val="0,0,0"/>
             <LayerCount val="4"/>
             
@@ -1275,6 +1385,7 @@
         <!-- Inner Border -->
         <Frame type="Image" name="BorderInner">
             <Anchor relative="$parent/AnchorFrame"/>
+            <DesaturateOnDisable val="False"/>
             <Color val="36,107,169"/>
             <RenderPriority val="513"/>
             <LayerCount val="2"/>
@@ -1287,6 +1398,11 @@
             
             <StateGroup name="ColorState">
                 <DefaultState val="Normal"/>
+                
+                <State name="Disabled">
+                    <When type="StateGroup" frame="$parent" DisabledState="Disabled"/>
+                    <Action type="SetProperty" frame="$this" Color="29,57,86"/>
+                </State>
             
                 <State name="Selected">
                     <When type="StateGroup" frame="$parent" ToggledState="Toggled"/>
@@ -1296,11 +1412,6 @@
                 <State name="Hover">
                     <When type="StateGroup" frame="$parent" HoveredState="Hovered"/>
                     <Action type="SetProperty" frame="$this" Color="88,163,234"/>
-                </State>
-                
-                <State name="Disabled">
-                    <When type="StateGroup" frame="$parent" DisabledState="Disabled"/>
-                    <Action type="SetProperty" frame="$this" Color="59,140,192"/>
                 </State>
 
                 <State name="Normal">
@@ -1312,6 +1423,7 @@
         <!-- Border Highlight -->
         <Frame type="Image" name="BorderHighlight">
             <Anchor relative="$parent/AnchorFrame"/>
+            <DesaturateOnDisable val="False"/>
             <RenderPriority val="525"/>
             <LayerCount val="2"/>
             <Color val="65,131,199"/>
@@ -1324,24 +1436,28 @@
             
             <StateGroup name="ColorState">
                 <DefaultState val="Normal"/>
+                
+                <State name="Disabled">
+                    <When type="StateGroup" frame="$parent" DisabledState="Disabled"/>
+                    <Action type="SetProperty" frame="$this" Color="59,140,192"/>
+                    <Action type="SetProperty" frame="$this" LayerAlpha="0" index="1"/>
+                </State>
             
                 <State name="Selected">
                     <When type="StateGroup" frame="$parent" ToggledState="Toggled"/>
                     <Action type="SetProperty" frame="$this" Color="255,255,255"/>
+                    <Action type="SetProperty" frame="$this" LayerAlpha="255" index="1"/>
                 </State>
                 
                 <State name="Hover">
                     <When type="StateGroup" frame="$parent" HoveredState="Hovered"/>
                     <Action type="SetProperty" frame="$this" Color="141,208,255"/>
-                </State>
-                
-                <State name="Disabled">
-                    <When type="StateGroup" frame="$parent" DisabledState="Disabled"/>
-                    <Action type="SetProperty" frame="$this" Color="59,140,192"/>
+                    <Action type="SetProperty" frame="$this" LayerAlpha="255" index="1"/>
                 </State>
 
                 <State name="Normal">
                     <Action type="SetProperty" frame="$this" Color="65,131,199"/>
+                    <Action type="SetProperty" frame="$this" LayerAlpha="255" index="1"/>
                 </State>
             </StateGroup>
         </Frame>
@@ -1352,6 +1468,7 @@
             <Anchor side="Bottom" relative="$parent/AnchorFrame" pos="Max" offset="0"/>
             <Anchor side="Left" relative="$parent/AnchorFrame" pos="Min" offset="0"/>
             <Anchor side="Right" relative="$parent/AnchorFrame" pos="Max" offset="0"/>
+            <DesaturateOnDisable val="False"/>
             <RenderPriority val="511"/>
             <LayerCount val="2"/>
             
@@ -1363,6 +1480,12 @@
             
             <StateGroup name="ColorState">
                 <DefaultState val="Normal"/>
+                
+                <State name="Disabled">
+                    <When type="StateGroup" frame="$parent" DisabledState="Disabled"/>
+                    <Action type="SetProperty" frame="$this" LayerColor="255,255,255" index="1"/>
+                    <Action type="SetProperty" frame="$this" LayerAlpha="0" index="1"/>
+                </State>
             
                 <State name="Selected">
                     <When type="StateGroup" frame="$parent" ToggledState="Toggled"/>
@@ -1374,12 +1497,6 @@
                     <When type="StateGroup" frame="$parent" HoveredState="Hovered"/>
                     <Action type="SetProperty" frame="$this" LayerColor="19,141,255" index="1"/>
                     <Action type="SetProperty" frame="$this" LayerAlpha="255" index="1"/>
-                </State>
-                
-                <State name="Disabled">
-                    <When type="StateGroup" frame="$parent" DisabledState="Disabled"/>
-                    <Action type="SetProperty" frame="$this" LayerColor="255,255,255" index="1"/>
-                    <Action type="SetProperty" frame="$this" LayerAlpha="230" index="1"/>
                 </State>
 
                 <State name="Normal">
@@ -1424,6 +1541,11 @@
             
             <StateGroup name="StyleState">
                 <DefaultState val="Normal"/>
+                
+                <State name="Disabled">
+                    <When type="StateGroup" frame="$parent" DisabledState="Disabled"/>
+                    <Action type="SetProperty" frame="$this" Style="StandardTabButton_Disabled"/>
+                </State>
             
                 <State name="Selected">
                     <When type="StateGroup" frame="$parent" ToggledState="Toggled"/>
@@ -1434,14 +1556,24 @@
                     <When type="StateGroup" frame="$parent" HoveredState="Hovered"/>
                     <Action type="SetProperty" frame="$this" Style="StandardTabButton_Hovered"/>
                 </State>
-                
-                <State name="Disabled">
-                    <When type="StateGroup" frame="$parent" DisabledState="Disabled"/>
-                    <Action type="SetProperty" frame="$this" Style="StandardTabButton_Normal"/>
-                </State>
 
                 <State name="Normal">
                     <Action type="SetProperty" frame="$this" Style="StandardTabButton_Normal"/>
+                </State>
+            </StateGroup>
+            
+            <StateGroup name="DisplayState">
+                <DefaultState val="Not16x9"/>
+                
+                <State name="16x9">
+                    <When type="StateGroup" frame="$GlueUI" AspectRatioState="16x9"/>
+                    <Action type="SetAnchor" frame="$this" side="Top" relative="$parent/AnchorFrame" pos="Mid" offset="1"/>
+                    <Action type="SetAnchor" frame="$this" side="Bottom" relative="$parent/AnchorFrame" pos="Mid" offset="1"/>
+                </State>
+
+                <State name="Not16x9">
+                    <Action type="SetAnchor" frame="$this" side="Top" relative="$parent/AnchorFrame" pos="Mid" offset="0"/>
+                    <Action type="SetAnchor" frame="$this" side="Bottom" relative="$parent/AnchorFrame" pos="Mid" offset="0"/>
                 </State>
             </StateGroup>
         </Frame>
@@ -1486,6 +1618,7 @@
         <StateGroup name="DisabledState">
             <DefaultState val="NotDisabled"/>
             <State name="Disabled">
+                <When type="Property" frame="$this" Enabled="False"/>
             </State>
             <State name="NotDisabled"/>
         </StateGroup>
