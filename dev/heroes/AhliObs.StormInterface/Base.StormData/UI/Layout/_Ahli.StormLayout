@@ -22,11 +22,11 @@
 	<Frame type="GameUI" name="GameUI" file="GameUI">
 		<Handle val="GameUI"/>
 		
-		<!--<Frame type="Label" name="AHLI_DEBUG">
+		<Frame type="Label" name="AHLI_DEBUG">
 			<Anchor side="Top" relative="$parent" pos="Min" offset="200"/>
 			<Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
 			<Handle val="AHLI_DEBUG"/>
-		</Frame>-->
+		</Frame>
 		
 		<Frame type="Frame" name="UIContainer">
 			
@@ -553,9 +553,34 @@
 				<!--<Controller type="Visibility" end="Loop" frame="$TalentTooltipL0T1">
 					<Key type="Bool" time="1" value="true"/>
 				</Controller>-->
-				
 			</Animation>
-
+			
+			<!-- failed attempt to override tooltips of baseline quests
+			<Frame type="Frame" name="DelayedVisible">
+				<Anchor relative="$parent"/>
+				<Visible val="false"/>
+			</Frame>
+			<Animation name="DelayVisible">
+				<Event event="OnShown" action="Reset,DirectionForward,Play"/>
+				<Event event="OnHidden" action="DirectionReverse,Play"/>
+				<Controller type="Visibility" end="Pause" frame="$this/DelayedVisible">
+					<Key type="Bool" time="10.5" value="False"/>
+					<Key type="Bool" time="10.5" value="True"/>
+				</Controller>
+			</Animation>
+			<StateGroup name="Test">
+				<DefaultState val="Other"/>
+				<State name="Visible">
+					<When type="Property" frame="DelayedVisible" Visible="true"/>
+					<Action type="SetProperty" frame="$AHLI_DEBUG" text="visible"/>
+					DOESNT WORK <Action type="ApplyTemplate" frame="$LeaderPanelBottom/TalentOverview/HeroLeaderPanelContainer/TabControl" template="_LeaderPanelBottom/LeaderPanelBottomTemplate/TalentOverview/HeroLeaderPanelContainer/TabControl"/>
+					DOESNT WORK <Action type="SetProperty" frame="$TalentTreeIcon0_A_L0" TooltipFrame="HeroTalentTooltip_L0_T0_A"/>
+				</State>
+				<State name="Other">
+					<Action type="SetProperty" frame="$AHLI_DEBUG" text="hidden"/>
+				</State>
+			</StateGroup>-->
+			
 		</Frame>
 		
 		<!-- Homescreen cutscene test
@@ -1138,6 +1163,10 @@
 		<Frame type="UnitStatusValidatorAnimElement" name="VitalityValueDisplayValidator" template="_Ahli/VitalityValueDisplayValidatorTemplate">
 		</Frame>
 	</Frame>
+	<Frame type="UnitStatusShieldedHealthBar" name="HeroUnitStatusFrameJunkrat/HeroUnitStatusParentFrame/HealthBar" file="Junkrat">
+		<Frame type="UnitStatusValidatorAnimElement" name="VitalityValueDisplayValidator" template="_Ahli/VitalityValueDisplayValidatorTemplate">
+		</Frame>
+	</Frame>
 
 	<!-- TODO: possibly not necessary as healthbar not visible? which unit uses this? -->
 	<Frame type="UnitStatusShieldedHealthBar" name="HeroUnit1SegmentStatusFrame/HeroUnitStatusParentFrame/HealthBar" file="UnitStatus">
@@ -1191,24 +1220,9 @@
 		</StateGroup>
 	</Frame>
 	
-	
-	<!-- BUG FIX: make broken KillLog item visible that seems to occupy the first slot in everyone vision until player vision changes fix the issue
-	<Frame type="Frame" name="Item" file="KillLog">
-		<StateGroup name="OUTBREAK">
-			<DefaultState val="CAPTIVE"/>
-			<State name="UNLEASHED">
-				<When type="Property" frame="$WorldPanel" visible="True"/>
-				<Action type="SendEvent" frame="$this" event="FadeIn"/>
-			</State>
-			<State name="CAPTIVE">
-			</State>
-		</StateGroup>
-	</Frame> -->
-	
-	
 	<!-- FIX: KillLog victim border colors -->
 	<Frame type="Frame" name="Item" file="KillLog">
-		 <Frame type="Frame" name="TgtPortrait0">
+		<Frame type="Frame" name="TgtPortrait0">
 			<StateGroup name="Colors">
 				<!-- @Override -->
 				<!-- FIX: based on srccolor which works unless it is purple killing (hero dies to merc camp)-->
@@ -1244,40 +1258,31 @@
 				<State name="Purple">
 				</State>
 			</StateGroup>
-			
-			<!-- TODO: fix bug with switching to everyone vision
-			<Animation name="KeepVisible">
-				<Event event="OnHidden" action="Reset,Play"/>
-
-				<Controller type="Visibility" end="Pause">
-					<Key type="Bool" time="0" value="True"/>
+		</Frame>
+		<Frame type="Frame" name="TgtPortrait1" template="_Ahli/Item/TgtPortrait0"/>
+		<Frame type="Frame" name="TgtPortrait2" template="_Ahli/Item/TgtPortrait0"/>
+		<Frame type="Frame" name="TgtPortrait3" template="_Ahli/Item/TgtPortrait0"/>
+		<Frame type="Frame" name="TgtPortrait4" template="_Ahli/Item/TgtPortrait0"/>
+		<Frame type="Frame" name="TgtPortrait5" template="_Ahli/Item/TgtPortrait0"/>
+		<Frame type="Frame" name="TgtPortrait6" template="_Ahli/Item/TgtPortrait0"/>
+		<Frame type="Frame" name="TgtPortrait7" template="_Ahli/Item/TgtPortrait0"/>
+		<Frame type="Frame" name="TgtPortrait8" template="_Ahli/Item/TgtPortrait0"/>
+		<Frame type="Frame" name="TgtPortrait9" template="_Ahli/Item/TgtPortrait0"/>
+		<Frame type="Frame" name="TgtPortrait10" template="_Ahli/Item/TgtPortrait0"/>
+		
+		<!-- failed attempt to fix first slot taking up space when not shown (it is used after going into player vision and back to everyone vision)
+		<Frame type="Frame" name="SrcPortrait">
+			<Animation name="OnShown">
+				<Event event="OnShown" action="DirectionForward,Play"/>
+				<Event event="OnHidden" action="DirectionReverse,Play"/>
+				<Controller type="Dimension" dimension="Height" relative="False" percentage="True" end="Pause" frame="$parent">
+					<Key type="Curve" time="0" value="0"/>
+					<Key type="Curve" time=".1" value="100"/>
 				</Controller>
 			</Animation>
-
-			<Animation name="IconFade">
-				<Controller type="Anchor" name="Anchor_1" end="Pause" side="Left" relative="True">
-					<Key type="Curve" time="0" value="0"/>
-					<Key type="Curve" time=".25" value="0" inout="Fast"/>
-				</Controller>
-				<Controller type="Fade" name="Fade_1" end="Pause">
-					<Key type="Curve" time="0" value="255"/>
-					<Key type="Curve" time=".25" value="255"/>
-				</Controller>
-			</Animation>-->
-		</Frame>
-		 <Frame type="Frame" name="TgtPortrait1" template="_Ahli/Item/TgtPortrait0"/>
-		 <Frame type="Frame" name="TgtPortrait2" template="_Ahli/Item/TgtPortrait0"/>
-		 <Frame type="Frame" name="TgtPortrait3" template="_Ahli/Item/TgtPortrait0"/>
-		 <Frame type="Frame" name="TgtPortrait4" template="_Ahli/Item/TgtPortrait0"/>
-		 <Frame type="Frame" name="TgtPortrait5" template="_Ahli/Item/TgtPortrait0"/>
-		 <Frame type="Frame" name="TgtPortrait6" template="_Ahli/Item/TgtPortrait0"/>
-		 <Frame type="Frame" name="TgtPortrait7" template="_Ahli/Item/TgtPortrait0"/>
-		 <Frame type="Frame" name="TgtPortrait8" template="_Ahli/Item/TgtPortrait0"/>
-		 <Frame type="Frame" name="TgtPortrait9" template="_Ahli/Item/TgtPortrait0"/>
-		 <Frame type="Frame" name="TgtPortrait10" template="_Ahli/Item/TgtPortrait0"/>
+		</Frame>-->
+		<!--<CollapseLayout val="true"/> breaks the source portrait -->
 	</Frame>
-	
-	
 	
 	<!-- edit pause notifications -->
 	<Frame type="SystemAlertListBoxItem" name="SystemAlertListBoxItemTemplate" file="SystemAlertPanel">
