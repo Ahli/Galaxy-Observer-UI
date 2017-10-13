@@ -158,7 +158,7 @@
             <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
             <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
             <Anchor side="Left" relative="$parent/BattleMapIcon" pos="Max" offset="10"/>
-            <Anchor side="Right" relative="$parent/TitleLabel" pos="Min" offset="-10"/>
+            <Anchor side="Right" relative="$parent/TitleLabel" pos="Min" offset="-20"/>
             <Height val="20"/>
             <AcceptsMouseTooltip val="True"/>
             <Options val="Ellipsis | TooltipIfTruncated | NoWrapping"/>
@@ -223,7 +223,7 @@
             <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
             <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
             <Anchor side="Left" relative="$parent/$parent/$parent/LobbyName" pos="Min" offset="0"/>
-            <Anchor side="Right" relative="$parent/$parent/$parent/PlayerCountIcon" pos="Min" offset="-30"/>
+            <Anchor side="Right" relative="$parent/$parent/$parent/ModeName" pos="Min" offset="-20"/>
             <Height val="20"/>
             <Style val="@CustomGames_ListItem_Normal"/>
             <Text val="{$parent/@LobbyName}"/>
@@ -271,7 +271,26 @@
                 </State>
             </StateGroup>
         </Frame>
- 
+        
+        <!-- Mode Name -->
+         <Frame type="Label" name="ModeName">
+            <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Left" relative="$parent/$parent/$parent/ModeName" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent/PlayerCount" pos="Min" offset="-20"/>
+            <Height val="20"/>
+            <Style val="{$parent/TitleLabel/@Style}"/>
+            <Text val="{$parent/BattleMapVariantFrame/@ModeName}"/>
+        </Frame>
+
+        <Frame type="BattleMapVariantFrame" name="BattleMapVariantFrame">
+            <Anchor relative="$parent"/>
+
+            <MapHandle val="{$parent/@MapHandle}"/>
+            <VariantIndex val="{$parent/@MapVariantIndex}"/>
+        </Frame>
+        
+        <!-- Player Count -->
         <Frame type="TextFormatFrame" name="PlayerCountFormatFrame">
             <Anchor relative="$parent"/>
             <FormatText val="%0%/%1%"/>
@@ -279,7 +298,6 @@
             <Replacement index="1" val="{$parent/@PlayerCapacity}"/>
         </Frame>
         
-        <!-- Player Count -->
          <Frame type="Label" name="PlayerCount">
             <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
             <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
@@ -308,7 +326,7 @@
             <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
             <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
             <Anchor side="Left" relative="$parent/$parent/$parent/HostName" pos="Min" offset="0"/>
-            <Anchor side="Right" relative="$parent/AnchorFrame" pos="Max" offset="-15"/>
+            <Anchor side="Right" relative="$parent/EquippedIcon" pos="Min" offset="-20"/>
             <Height val="20"/>
             <Style val="{$parent/TitleLabel/@Style}"/>
             <Text val="{$parent/@HostName}"/>
@@ -351,15 +369,22 @@
 
         <Frame type="Label" name="LobbyName">
             <Anchor side="Bottom" relative="$parent/MapName" pos="Max" offset="0"/>
-            <Anchor side="Left" relative="$parent" pos="Min" offset="448"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="390"/>
             <Text val="@UI/ScreenCustomGames/Lobbies/LobbyName"/>
+            <Style val="@CustomGames_ListInfoCategoryTitle"/>
+        </Frame>
+
+        <Frame type="Label" name="ModeName">
+            <Anchor side="Bottom" relative="$parent/MapName" pos="Max" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="680"/>
+            <Text val="@UI/ScreenCustomGames/Lobbies/ModeName"/>
             <Style val="@CustomGames_ListInfoCategoryTitle"/>
         </Frame>
         
         <Frame type="Image" name="PlayerCountIcon">
             <Anchor side="Top" relative="$parent/MapName" pos="Mid" offset="0"/>
             <Anchor side="Bottom" relative="$parent/MapName" pos="Mid" offset="0"/>
-            <Anchor side="Left" relative="$parent" pos="Min" offset="773"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="810"/>
             <Width val="20"/>
             <Height val="24"/>
             <Texture val="@UI/Glues_Icons_NumPlayers"/>
@@ -368,7 +393,7 @@
         
         <Frame type="Label" name="HostName">
             <Anchor side="Bottom" relative="$parent/MapName" pos="Max" offset="0"/>
-            <Anchor side="Left" relative="$parent" pos="Min" offset="866"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="870"/>
             <Text val="@UI/ScreenCustomGames/Lobbies/HostName"/>
             <Style val="@CustomGames_ListInfoCategoryTitle"/>
         </Frame>
@@ -495,6 +520,7 @@
         <HookupAlias original="LobbyListTileList" alias="ContentContainer/PrimaryPanel/LobbyList/LobbyListTileList"/>
         <HookupAlias original="LobbyListTileList/ScrollBar" alias="ContentContainer/PrimaryPanel/LobbyList/LobbyListTileList/ScrollBar"/>
         <HookupAlias original="LobbyListFilterPulldown" alias="ContentContainer/HeaderPanel/LobbyListFilterPulldown"/>
+        <FilterText val="{$this/ContentContainer/HeaderPanel/FilterEditBox/@Text}"/>
 
         <Frame type="Label" name="TitleLabel">
             <Text val="@UI/ScreenCustomGames/Lobbies/Title"/>
@@ -518,6 +544,13 @@
                 </Frame>
                 
                 <Frame type="EditBox" name="FilterEditBox" template="CustomGamesTemplates/FilterEditBoxTemplate">
+                    <Animation name="ClearLobbyList">
+                        <Event event="OnEnterPressed" frame="$this" action="Reset,Play"/>
+
+                        <Controller type="Event" end="Pause" frame="$ancestor[@type=LobbyListFrame]">
+                            <Key type="Event" time="0.0" event="RequestFilterOpenLobbyList"/>
+                        </Controller>
+                    </Animation>
                     
                     <Frame type="Label" name="SearchTextLabel">
                         <Text val="@UI/ScreenCustomGames/Lobbies/SearchText"/>
@@ -525,6 +558,16 @@
     
                     <Frame type="Frame" name="AnchorFrame">
                         <Anchor side="Right" relative="$parent/$parent/LobbyListFilterPulldown/AnchorFrame" pos="Min" offset="-13"/>
+                    </Frame>
+
+                    <Frame type="Button" name="ClearTextButton">
+                        <Animation name="ClearLobbyList">
+                            <Event event="OnClick" frame="$this" action="Reset,Play"/>
+
+                            <Controller type="Event" end="Pause" frame="$ancestor[@type=LobbyListFrame]">
+                                <Key type="Event" time="0.1" event="RequestFilterOpenLobbyList"/>
+                            </Controller>
+                        </Animation>
                     </Frame>
                 </Frame>
 
