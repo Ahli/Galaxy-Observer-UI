@@ -187,7 +187,7 @@
 			<Anchor side="Left" relative="$PortraitPanel" pos="Min" offset="0"/>
 		</Frame>
 
-		
+		<!--
 		<Frame type="Frame" name="ObserverHeroSpecificBackgroundStatusContainer">
 			<Anchor relative="$GameUI/UIContainer/ConsolePanel/HeroSpecificBackgroundStatusContainer"/>
 			<RenderPriority val="99"/>
@@ -267,7 +267,7 @@
 			<Frame type="SelectionUnitStatusPanel" name="Ana" template="Ana/AnaDynamicShootingBackplate">
 				<DisplayMode val="Single"/>
 			</Frame>
-		</Frame>
+		</Frame>-->
 		
 	</Frame>
 	
@@ -2584,7 +2584,7 @@
 					</Frame>-->
 					<!--<Frame type="SelectionUnitStatusPanel" name="Butcher" template="Butcher/ButcherFrame">
 					</Frame>-->
-					<!-- TODO: fix progress bar with new dataref tech? -->
+					<!-- TODO: fix progress bar with new dataref tech?
 					<Frame type="SelectionUnitStatusPanel" name="Alarak" template="Alarak/AlarakFrame">
 						<Frame type="UnitStatusFrame" name="UnitStatusFrame0">
 							<Frame type="Image" name="AlarakSadismMeterBackGround">
@@ -2620,7 +2620,7 @@
 								<Anchor side="Bottom" relative="$parent/SadismLabelPercent" pos="Max" offset="0"/>
 							</Frame>
 						</Frame>
-					</Frame>
+					</Frame> -->
 					<!-- cutscene frame + name label are not updated
 					<Frame type="SelectionUnitStatusPanel" name="Auriel" template="Auriel/AurielBestowHopeFrame">
 					</Frame> -->
@@ -4779,8 +4779,6 @@
 			<Alpha val="128"/>
 		</Frame> -->
 	</Frame>
-	<Frame type="SelectionUnitStatusPanel" name="AmazonCommandCardFrame" file="Amazon">
-	</Frame>
 	<!-- DVa hero UI -->
 	<Frame type="SelectionUnitStatusPanel" name="DVaMechCommandCardFrame" file="DVa">
 		<Height val="56"/>
@@ -4930,8 +4928,6 @@
 				</Animation>
 			</Frame>
 		</Frame>
-	</Frame>
-	<Frame type="SelectionUnitStatusPanel" name="DVaPilotEnterFrame" file="DVa">
 	</Frame>
 	<!-- Tracer hero UI -->
 	<Frame type="SelectionUnitStatusPanel" name="TracerPulseBombChargeButtonOverrideFrame" file="Tracer">
@@ -5083,10 +5079,6 @@
 			</Frame>
 		</Frame>
 	</Frame>
-	<Frame type="SelectionUnitStatusPanel" name="TracerReloadFrame" file="Tracer">
-	</Frame>
-	<Frame type="SelectionUnitStatusPanel" name="TracerPulseBombFrame" file="Tracer">
-	</Frame>
 	<!-- Valeera hero UI - ValeeraSubtletyButtonOverride - TODO: does not seem to be created -->
 	<Frame type="SelectionUnitStatusPanel" name="ValeeraSubtletyButtonOverride" file="Valeera">
 		<Height val="56"/>
@@ -5107,10 +5099,6 @@
 				</Frame>
 			</Frame>
 		</Frame>
-	</Frame>
-	<Frame type="SelectionUnitStatusPanel" name="ValeeraCommandCardFrame" file="Valeera">
-	</Frame>
-	<Frame type="SelectionUnitStatusPanel" name="ValeeraSmokeFrame" file="Valeera">
 	</Frame>
 	<!-- Li Ming command card hero UI -->
 	<Frame type="SelectionUnitStatusPanel" name="LiMingFrame" file="LiMing">
@@ -5227,19 +5215,83 @@
 			<Height val="1"/>
 			<DisplayMode val="Single"/>
 			<SpecificUnit val="HeroJaina"/>
-			
-			<!--<StateGroup name="Visibility">
-				<DefaultState val="Other"/>
-				<State name="Visible">
-					<When type="Property" frame="$this" visible="true"/>
-					<Action type="SetProperty" frame="$parent" alpha="255"/>
-				</State>
-				<State name="Other">
-					<Action type="SetProperty" frame="$parent" alpha="0"/>
-				</State>
-			</StateGroup>-->
 		</Frame>
 	</Frame>
+	<!-- Zul'jin - fix guillotine visibility + damage approximation (updates faster than actual dmg value) -->
+	<Frame type="SelectionUnitStatusPanel" name="ZuljinTraitFrame" file="Zuljin">
+		<Frame type="UnitStatusFrame" name="UnitStatusFrame0">
+			<Frame type="Label" name="ZuljinGuillotineValueLabel">
+				<Text val="@Ahli/ZuljinGuillotineDamage"/>
+			</Frame>
+			<Frame type="UnitStatusValidatorAnimElement" name="GuillotineDetector">
+				<Anchor relative="$parent"/>
+				<Validator val="ZuljinHasNotGuillotineandBelow50Health"/>
+				<Validator val="ZuljinHasNotGuillotineandAbove50Health"/>
+				<Validator val="ZuljinHasGuillotineandBelow50Health"/>
+				<Validator val="ZuljinHasGuillotineandAbove50Health"/>
+				
+				<Animation name="ShowGuillotine">
+					<Event event="Reset" action="Stop"/>
+					<Event event="ZuljinHasNotGuillotineandBelow50Health" action="Stop"/>
+					<Event event="ZuljinHasNotGuillotineandAbove50Health" action="Stop"/>
+					<Event event="ZuljinHasGuillotineandBelow50Health" action="Restart, Play"/>
+					<Event event="ZuljinHasGuillotineandAbove50Health" action="Restart, Play"/>
+					
+					<Controller type="Visibility" end="Pause" frame="$parent/ZuljinGuillotineParent">
+						<Key type="Bool" time="0" value="True"/>
+					</Controller>
+					<Controller type="Visibility" end="Pause" frame="$parent/ZuljinGuillotineValueLabel">
+						<Key type="Bool" time="0" value="True"/>
+					</Controller>
+				</Animation>
+			</Frame>
+		</Frame>
+	</Frame>
+	<!-- Zarya - fix label value -->
+	<Frame type="SelectionUnitStatusPanel" name="ZaryaTraitFrame" file="Zarya">
+		<Frame type="UnitStatusFrame" name="UnitStatusFrame0">
+			<Frame type="Label" name="ZaryaTraitLabel">
+				<Text val="@Ahli/ZaryaTraitDamageBoostFix"/>
+			</Frame>
+		</Frame>
+	</Frame>
+	<!-- Alarak - fix label value,  -->
+	<!-- TODO: fix progress bar with new dataref tech? -->
+	<Frame type="SelectionUnitStatusPanel" name="AlarakFrame" file="Alarak">
+		<Frame type="UnitStatusFrame" name="UnitStatusFrame0">
+			<Frame type="Image" name="AlarakSadismMeterBackGround">
+				<Alpha val="0"/>
+			</Frame>
+			<Frame type="ProgressBar" name="AlarakSadismProgressBar">
+				<Alpha val="0"/>
+			</Frame>
+			<Frame type="Frame" name="ProgressMask">
+				<Alpha val="0"/>
+			</Frame>
+			<Frame type="Frame" name="ProgressGlowMask1">
+				<Alpha val="0"/>
+			</Frame>
+			<Frame type="Frame" name="ProgressGlowMask2">
+				<Alpha val="0"/>
+			</Frame>
+			<Frame type="Frame" name="ProgressGlowMask3">
+				<Alpha val="0"/>
+			</Frame>
+			<Frame type="Image" name="ExtraGlowImage">
+				<Alpha val="0"/>
+			</Frame>
+			<Frame type="Label" name="SadismLabel">
+				<Text val="@Ahli/AlarakSadismLabel"/>
+			</Frame>
+			<Frame type="BehaviorIcon" name="SadismTooltipFrame">
+				<Anchor side="Top" relative="$parent/SadismLabel" pos="Min" offset="0"/>
+				<Anchor side="Left" relative="$parent/SadismLabel" pos="Min" offset="0"/>
+				<Anchor side="Right" relative="$parent/SadismLabelPercent" pos="Max" offset="0"/>
+				<Anchor side="Bottom" relative="$parent/SadismLabelPercent" pos="Max" offset="0"/>
+			</Frame>
+		</Frame>
+	</Frame>
+
 
 	<!-- observer/replay tools toggle -->
 	<Frame type="Frame" name="GameUI/UIContainer/FullscreenUpperContainer" file="GameUI">
