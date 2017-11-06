@@ -26,6 +26,8 @@
     <Constant name="TauntedColor" val="D28400"/>
     <Constant name="SilencedColor" val="3176E7"/>
     <Constant name="BlindedColor" val="7F7F7F"/>
+
+    <Constant name="TrackedUnitFrameSize" val="34"/>
     
     <!--===========================================================================================
     <! UnitStatusFrame
@@ -342,7 +344,7 @@
         <UseNameTypeVisibilityRules val="true"/>
 
         <Frame type="Label" name="Label">
-            <Anchor side="Top" relative="$parent" pos="Min" offset="2"/>
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
             <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
             <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
             <Style val="Storm_UnitNameLabel"/>
@@ -689,7 +691,7 @@
         <DisplayPriority name="NameSlot" val="3"/>
 
         <Frame type="Image" name="TalentAvailableBg">
-            <Anchor side="Bottom" relative="$parent/TalentAvailableLabel" pos="Max" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
             <Anchor side="Left" relative="$parent/TalentAvailableLabel" pos="Mid" offset="0"/>
             <Anchor side="Right" relative="$parent/TalentAvailableLabel" pos="Mid" offset="0"/>
             <Texture val="@UI/State/GenericStateBG"/>
@@ -700,8 +702,7 @@
         </Frame>
         
         <Frame type="Label" name="TalentAvailableLabel">
-            <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
-            <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="-2"/>
             <Anchor side="Left" relative="$parent/$parent/HeroFrameBackgroundContainer" pos="Mid" offset="0"/>
             <Anchor side="Right" relative="$parent/$parent/HeroFrameBackgroundContainer" pos="Mid" offset="0"/>
             <Text val="@UI/Talents/Available"/>
@@ -998,8 +999,8 @@
         <DebuffType val="BehaviorCounter"/>
         
         <Frame type="Image" name="StacksFull">
-            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
-            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Top" relative="$parent" pos="Min" offset="-7"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="-7"/>
             <Visible val="{$parent/@AtMaxStacks}"/>
         </Frame>
     </Frame>
@@ -1007,15 +1008,16 @@
     <Frame type="UnitStatusUnitStackingDebuffElement" name="StackingBehaviorTemplate" template="UnitStatus/SingleBehaviorTemplate">
 
         <Frame type="ProgressBar" name="StacksProgressBar">
-            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
-            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Top" relative="$parent/StacksFull" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent/StacksFull" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent/StacksFull" pos="Mid" offset="0"/>
             <AcceptsMouse val="False"/>
-            <Visible val="True"/>
             <MinValue val="0"/>
             <MaxValue val="{$parent/@MaxValue}"/>
             <Value val="{$parent/@CurrentValue}"/>
             <Horizontal val="True"/>
-            <Debugging val="True"/>
+            <Height val="36"/>
+            <Width val="{$parent/Stacking/@Width}"/>
 
             <Frame type="Frame" name="FillImageContainer">
                 <Anchor relative="$parent"/>
@@ -1028,15 +1030,21 @@
         </Frame>
 
         <Frame type="Image" name="Stacking">
-            <Anchor side="Top" relative="$parent/StacksProgressBar" pos="Min" offset="0"/>
-            <Anchor side="Left" relative="$parent/StacksProgressBar" pos="Min" offset="0"/>
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
             <Visible val="False"/>
         </Frame>
-        
-        <Frame type="Image" name="StacksFull">
-            <Anchor side="Top" relative="$parent/StacksProgressBar" pos="Min" offset="-9"/>
-            <Anchor side="Left" relative="$parent/StacksProgressBar" pos="Min" offset="-9"/>
-        </Frame>
+
+        <!-- Hides the stacking progress bar when the stacks are Max -->
+        <StateGroup name="HideStackingImage">
+            <State name="Default">
+                <Action type="SetProperty" Visible="true" frame="StacksProgressBar"/>
+            </State>
+            <State name="Full">
+                <When type="Property" Visible="true"  frame="StacksFull"/>
+                <Action type="SetProperty" Visible="false" frame="StacksProgressBar"/>
+            </State>
+        </StateGroup>
     </Frame>
 
     <!-- Armor Display -->
@@ -1095,21 +1103,33 @@
         <StateGroup name="ArmorBonusIconController">
             <DefaultState val="Neutral"/>
 
+            <State name="Unraisable">
+                <When type="Property" AllArmorBonus="0"/>
+                <When type="Property" MaximumArmor="0"/>
+                <Action type="SetProperty" frame="ArmorLabel" visible ="False"/>
+                <Action type="SetProperty" frame="StatusImage" Texture="@UI/Storm_UI_Ingame_Armor_Icon_Unraisable"/>
+                <Action type="SetProperty" frame="DurationBar/FillImageContainer/FillImage" Texture="@UI/Storm_UI_Ingame_Armor_DurationBar_Negative_CB"/>
+            </State>
+
             <State name="Buffed">
-                <When type="Property" HasAllArmorBonus="True"/>
+                <When type="Property" ShowArmorBuff="True"/>
                 <When type="Property" AllArmorBonus="0" operator="GreaterThanOrEqual"/>
                 <When type="Property" DurationMax="0" operator="GreaterThan"/>
+                <Action type="SetProperty" frame="ArmorLabel" visible ="True"/>
             </State>
             
             <State name="UnTimedBuffed">
+                <When type="Property" ShowArmorBuff="True"/>
                 <When type="Property" AllArmorBonus="0" operator="GreaterThan"/>
                 <When type="Property" DurationMax="0"/>
+                <Action type="SetProperty" frame="ArmorLabel" visible ="True"/>
             </State>
             
             <State name="Debuffed">
                 <When type="Property" AllArmorBonus="0" operator="LessThan"/>
                 <When type="Property" DurationMax="0" operator="GreaterThan"/>
                 <When type="Option" colorblind="False"/>
+                <Action type="SetProperty" frame="ArmorLabel" visible ="True"/>
                 <Action type="SetProperty" frame="ArmorLabel" style="UnitStatusNegativeArmor"/>
                 <Action type="SetProperty" frame="ArmorLabelFormatSign" FormatText="%0%"/>
                 <Action type="SetProperty" frame="StatusImage" Texture="@UI/Storm_UI_Ingame_Armor_Icon_Negative"/>
@@ -1120,6 +1140,7 @@
                 <When type="Property" AllArmorBonus="0" operator="LessThan"/>
                 <When type="Property" DurationMax="0" operator="GreaterThan"/>
                 <When type="Option" colorblind="True"/>
+                <Action type="SetProperty" frame="ArmorLabel" visible ="True"/>
                 <Action type="SetProperty" frame="ArmorLabel" style="UnitStatusNegativeArmorColorblind"/>
                 <Action type="SetProperty" frame="ArmorLabelFormatSign" FormatText="%0%"/>
                 <Action type="SetProperty" frame="StatusImage" Texture="@UI/Storm_UI_Ingame_Armor_Icon_Negative_CB"/>
@@ -1635,9 +1656,9 @@
             </Frame>
 
             <Frame type="UnitStatusPlayerName" name="PlayerNameLabel" template="UnitStatus/UnitStatusPlayerNameTemplate">
-                <Anchor side="Bottom" relative="$parent/HealthBar" pos="Min" offset="-3"/>
-                <Anchor side="Left" relative="$parent/HealthBar" pos="Mid" offset="0"/>
-                <Anchor side="Right" relative="$parent/HealthBar" pos="Mid" offset="0"/>
+                <Anchor side="Bottom" relative="$parent/HeroFrameBackgroundContainer" pos="Min" offset="-2"/>
+                <Anchor side="Left" relative="$parent/HeroFrameBackgroundContainer" pos="Mid" offset="0"/>
+                <Anchor side="Right" relative="$parent/HeroFrameBackgroundContainer" pos="Mid" offset="0"/>
 
                 <!-- Use a fade animation to hide the PlayerNameLabel when the TalentAvailableIndicator is shown -->
                 <Animation name="Fade">
@@ -1652,17 +1673,17 @@
             </Frame>
 
             <Frame type="UnitStatusUnitName" name="UnitNameLabel" template="UnitStatus/UnitStatusUnitNameTemplate">
-                <Anchor side="Bottom" relative="$parent/HeroFrameBackgroundContainer" pos="Min" offset="0"/>
+                <Anchor side="Bottom" relative="$parent/PlayerNameLabel" pos="Max" offset="0"/>
                 <Anchor side="Left" relative="$parent/HeroFrameBackgroundContainer" pos="Mid" offset="0"/>
                 <Anchor side="Right" relative="$parent/HeroFrameBackgroundContainer" pos="Mid" offset="0"/>
             </Frame>
 
             <Frame type="Label" name="BotDifficultyLabel">
-                <Width val="220"/>
-                <Height val="24"/>
                 <Anchor side="Bottom" relative="$parent/PlayerNameLabel" pos="Min" offset="0"/>
                 <Anchor side="Left" relative="$parent/PlayerNameLabel" pos="Mid" offset="0"/>
                 <Anchor side="Right" relative="$parent/PlayerNameLabel" pos="Mid" offset="0"/>
+                <Width val="220"/>
+                <Height val="24"/>
                 <Style val="Storm_UnitNameLabel"/>
             </Frame>
             
@@ -1870,10 +1891,9 @@
             </Frame>
 
             <Frame type="UnitStatusTalentAvailableIndicator" name="TalentAvailableIndicator" template="UnitStatus/TalentAvailableIndicatorTemplate">
-                <Anchor side="Bottom" relative="$parent/HeroFrameBackgroundContainer" pos="Min" offset="11"/>
+                <Anchor side="Bottom" relative="$parent/HeroFrameBackgroundContainer" pos="Min" offset="0"/>
                 <Anchor side="Left" relative="TalentAvailableBg" pos="Min" offset="0"/>
                 <Anchor side="Right" relative="TalentAvailableBg" pos="Max" offset="0"/>
-                <Width val="0"/>
                 <Height val="50"/>
                 <AnchorUseDeviceOffset val="True"/>
                 <CollapseLayout val="true"/>
@@ -2611,15 +2631,15 @@
             </Frame>
 
             <Frame type="UnitStatusShieldedHealthBar" name="IllusionHealthBar" template="UnitStatus/UnitStatusShieldedHealthBarTemplate">
-                <VisibleToOwner val="true"/>
-                <VisibleToAlly val="true"/>
-                <VisibleToEnemy val="false"/>
-                <Height val="7"/>
-                <Width val="59"/>
                 <Anchor side="Top" relative="$parent/HeroFrameBackgroundContainer" pos="Mid" offset="0"/>
                 <Anchor side="Bottom" relative="$parent/HeroFrameBackgroundContainer" pos="Mid" offset="0"/>
                 <Anchor side="Left" relative="$parent/HeroFrameBackgroundContainer" pos="Mid" offset="0"/>
                 <Anchor side="Right" relative="$parent/HeroFrameBackgroundContainer" pos="Mid" offset="0"/>
+                <Height val="7"/>
+                <Width val="59"/>
+                <VisibleToOwner val="true"/>
+                <VisibleToAlly val="true"/>
+                <VisibleToEnemy val="false"/>
                 <BackgroundColor val="127, 0, 0, 0"/>
                 <BarInsetRect top="1" left="1" bottom="1" right="1"/>
                 <BackgroundInsetRect top="1" left="1" bottom="1" right="1"/>
@@ -2872,11 +2892,11 @@
     <!-- Heroes without a Mana/Resource (Illidan/Murky/etc) -->
     <Frame type="UnitStatusFrame" name="HeroUnitStatusConsoleFrameNoEnergyTemplate" template="UnitStatus/HeroUnitStatusConsoleFrameTemplate">
         <Frame type="UnitStatusShieldedHealthBar" name="HealthBar" template="UnitStatus/UnitStatusShieldedHealthBarTemplate">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
             <Width val="244"/>
             <Height val="39"/>
             <Texture val="@UI/Storm_UI_InGame_hud_Bar_Health_Generic_NoResource"/>
-            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
-            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
             <BackgroundColor val="0, 0, 0, 0"/>
             <VisibleToAlly val="true"/>
             <VisibleToEnemy val="true"/>
@@ -2979,18 +2999,18 @@
         </Frame>
 
         <Frame type="UnitStatusValidatorAnimElement" name="FullManaAnims">
-                <Anchor relative="$parent"/>
-                <Validator val="EnergyFullCaster"/>
+            <Anchor relative="$parent"/>
+            <Validator val="EnergyFullCaster"/>
                     
-                <Animation name="EnergyFull">
-                    <Event event="EnergyFullCaster" action="Reset,Play"/>
+            <Animation name="EnergyFull">
+                <Event event="EnergyFullCaster" action="Reset,Play"/>
                     
-                    <Controller type="Visibility" end="Pause"  frame="$parent/EnergyBar/FullManaFlash">
-                        <Key type="Bool" time="0" value="true"/>
-                        <Key type="Bool" time="0.3" value="false"/>
-                    </Controller>
-                </Animation>
-            </Frame>
+                <Controller type="Visibility" end="Pause"  frame="$parent/EnergyBar/FullManaFlash">
+                    <Key type="Bool" time="0" value="true"/>
+                    <Key type="Bool" time="0.3" value="false"/>
+                </Controller>
+            </Animation>
+        </Frame>
     
         <Frame type="UnitStatusEnergyBar" name="EnergyBar" template="UnitStatus/UnitStatusEnergyBarTemplate">
             <Width val="232"/>
@@ -3330,10 +3350,10 @@
         </Frame>
 
         <Frame type="UnitStatusShieldedHealthBar" name="HealthBar" template="UnitStatus/UnitStatusShieldedHealthBarTemplate">
-            <Height val="7"/>
-            <Width val="60"/>
             <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
             <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+            <Height val="7"/>
+            <Width val="60"/>
             <BackgroundColor val="127,0,0,0"/>
             <SnapToDevicePixels val="True"/>
             <BorderWidth val="1"/>
@@ -3345,22 +3365,23 @@
         </Frame>
 
         <Frame type="UnitStatusProgressBar" name="ProgressBar" template="UnitStatus/UnitStatusProgressBarTemplate">
-            <Width val="58"/>
-            <Height val="3"/>
             <Anchor side="Top" relative="$parent/HealthBar" pos="Max" offset="0"/>
             <Anchor side="Left" relative="$parent/HealthBar" pos="Min" offset="1"/>
+            <Width val="58"/>
+            <Height val="3"/>
             <CollapseLayout val="true"/>
         </Frame>
 
         <Frame type="UnitStatusDurationBar" name="DurationBar" template="UnitStatus/UnitStatusDurationBarTemplate">
+            <Anchor side="Top" relative="$parent/ProgressBar" pos="Max" offset="0"/>
+            <Anchor side="Left" relative="$parent/ProgressBar" pos="Min" offset="1"/>
             <Width val="58"/>
             <Height val="3"/>
+            <CollapseLayout val="true"/>
+
             <VisibleToOwner val="false"/>
             <VisibleToAlly val="false"/>
             <VisibleToEnemy val="false"/>
-            <Anchor side="Top" relative="$parent/ProgressBar" pos="Max" offset="0"/>
-            <Anchor side="Left" relative="$parent/ProgressBar" pos="Min" offset="1"/>
-            <CollapseLayout val="true"/>
         </Frame>
 
         <Frame type="UnitStatusPreselectionIndicator" name="UnitStatusFramePreselectionIndicator">
@@ -3420,10 +3441,10 @@
         </Frame>
 
         <Frame type="UnitStatusShieldedHealthBar" name="HealthBar" template="UnitStatus/UnitStatusShieldedHealthBarTemplate">
-            <Height val="12"/>
-            <Width val="150"/>
             <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
             <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+            <Height val="12"/>
+            <Width val="150"/>
             <SnapToDevicePixels val="True"/>
             <BackgroundColor val="127, 0, 0, 0"/>
             <BorderWidth val="1"/>
@@ -3434,21 +3455,21 @@
         </Frame>
 
         <Frame type="UnitStatusProgressBar" name="ProgressBar" template="UnitStatus/UnitStatusProgressBarTemplate">
-            <Width val="148"/>
-            <Height val="4"/>
             <Anchor side="Top" relative="$parent/HealthBar" pos="Max" offset="0"/>
             <Anchor side="Left" relative="$parent/HealthBar" pos="Min" offset="1"/>
+            <Width val="148"/>
+            <Height val="4"/>
             <CollapseLayout val="true"/>
         </Frame>
 
         <Frame type="UnitStatusDurationBar" name="DurationBar" template="UnitStatus/UnitStatusDurationBarTemplate">
+            <Anchor side="Top" relative="$parent/ProgressBar" pos="Max" offset="0"/>
+            <Anchor side="Left" relative="$parent/ProgressBar" pos="Min" offset="1"/>
             <Width val="148"/>
             <Height val="4"/>
             <VisibleToOwner val="true"/>
             <VisibleToAlly val="true"/>
             <VisibleToEnemy val="true"/>
-            <Anchor side="Top" relative="$parent/ProgressBar" pos="Max" offset="0"/>
-            <Anchor side="Left" relative="$parent/ProgressBar" pos="Min" offset="1"/>
             <CollapseLayout val="true"/>
         </Frame>
 
@@ -3485,10 +3506,11 @@
         </Frame>
 
         <Frame type="UnitStatusShieldedHealthBar" name="HealthBar" template="UnitStatus/UnitStatusShieldedHealthBarTemplate">
-            <Height val="12"/>
-            <Width val="75"/>
             <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
             <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+            <Height val="12"/>
+            <Width val="75"/>
+
             <BackgroundColor val="127, 0, 0, 0"/>
             <SnapToDevicePixels val="True"/>
             <BorderWidth val="1"/>
@@ -3499,21 +3521,22 @@
         </Frame>
 
         <Frame type="UnitStatusProgressBar" name="ProgressBar" template="UnitStatus/UnitStatusProgressBarTemplate">
-            <Width val="74"/>
-            <Height val="4"/>
             <Anchor side="Top" relative="$parent/HealthBar" pos="Max" offset="0"/>
             <Anchor side="Left" relative="$parent/HealthBar" pos="Min" offset="1"/>
+            <Width val="74"/>
+            <Height val="4"/>
             <CollapseLayout val="true"/>
         </Frame>
 
         <Frame type="UnitStatusDurationBar" name="DurationBar" template="UnitStatus/UnitStatusDurationBarTemplate">
+            <Anchor side="Top" relative="$parent/ProgressBar" pos="Max" offset="0"/>
+            <Anchor side="Left" relative="$parent/ProgressBar" pos="Min" offset="1"/>
             <Width val="74"/>
             <Height val="4"/>
+
             <VisibleToOwner val="true"/>
             <VisibleToAlly val="true"/>
             <VisibleToEnemy val="true"/>
-            <Anchor side="Top" relative="$parent/ProgressBar" pos="Max" offset="0"/>
-            <Anchor side="Left" relative="$parent/ProgressBar" pos="Min" offset="1"/>
             <CollapseLayout val="true"/>
         </Frame>
 
@@ -3550,10 +3573,11 @@
         </Frame>
 
         <Frame type="UnitStatusShieldedHealthBar" name="HealthBar" template="UnitStatus/UnitStatusShieldedHealthBarTemplate">
-            <Height val="11"/>
-            <Width val="100"/>
             <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
             <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+            <Height val="11"/>
+            <Width val="100"/>
+
             <BackgroundColor val="127, 0, 0, 0"/>
             <BorderWidth val="1"/>
             <SnapToDevicePixels val="True"/>
@@ -3566,22 +3590,23 @@
         </Frame>
 
         <Frame type="UnitStatusProgressBar" name="ProgressBar" template="UnitStatus/UnitStatusProgressBarTemplate">
-            <Width val="97"/>
-            <Height val="3"/>
             <Anchor side="Top" relative="$parent/HealthBar" pos="Max" offset="0"/>
             <Anchor side="Left" relative="$parent/HealthBar" pos="Min" offset="2"/>
+            <Width val="97"/>
+            <Height val="3"/>
             <CollapseLayout val="true"/>
         </Frame>
 
         <Frame type="UnitStatusDurationBar" name="DurationBar" template="UnitStatus/UnitStatusDurationBarTemplate">
+            <Anchor side="Top" relative="$parent/ProgressBar" pos="Max" offset="0"/>
+            <Anchor side="Left" relative="$parent/ProgressBar" pos="Min" offset="2"/>
             <Width val="97"/>
             <Height val="3"/>
+            <CollapseLayout val="true"/>
+
             <VisibleToOwner val="true"/>
             <VisibleToAlly val="true"/>
             <VisibleToEnemy val="true"/>
-            <Anchor side="Top" relative="$parent/ProgressBar" pos="Max" offset="0"/>
-            <Anchor side="Left" relative="$parent/ProgressBar" pos="Min" offset="2"/>
-            <CollapseLayout val="true"/>
         </Frame>
 
         <Frame type="UnitStatusPreselectionIndicator" name="UnitStatusFramePreselectionIndicator">
@@ -3617,10 +3642,11 @@
         </Frame>
         
         <Frame type="UnitStatusHealthBar" name="HealthBar" template="UnitStatus/UnitStatusSegmentedHealthBarTemplate">
-            <Width val="50"/>
-            <Height val="5"/>
             <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
             <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+            <Width val="50"/>
+            <Height val="5"/>
+
             <ReductionShown val="false"/>
             <DecreaseDuration val="#DecreaseDuration_NoReduction"/>
             <SnapToDevicePixels val="True"/>
@@ -3630,12 +3656,13 @@
         </Frame>
         
         <Frame type="UnitStatusDurationBar" name="DurationBar" template="UnitStatus/UnitStatusDurationBarTemplate">
-            <Height val="3"/>
-            <Width val="50"/>
-            <VisibleToOwner val="true"/>
-            <VisibleToEnemy val="false"/>
             <Anchor side="Top" relative="$parent/HealthBar" pos="Max" offset="0"/>
             <Anchor side="Left" relative="$parent/HealthBar" pos="Min" offset="0"/>
+            <Height val="3"/>
+            <Width val="50"/>
+
+            <VisibleToOwner val="true"/>
+            <VisibleToEnemy val="false"/>
             <BarInsetRect top="0" left="1" bottom="0" right="1"/>
         </Frame>
     </Frame>
@@ -3652,13 +3679,53 @@
         </Frame>
         
         <Frame type="UnitStatusDurationBar" name="DurationBar" template="UnitStatus/UnitStatusDurationBarTemplate">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+
             <Height val="6"/>
             <Width val="70"/>
             <VisibleToOwner val="true"/>
             <VisibleToAlly val="true"/>
             <VisibleToEnemy val="true"/>
+        </Frame>
+    </Frame>
+    
+    <Frame type="UnitStatusFrame" name="IndestructibleTimedUnitTeamColorIndicatedDurationTemplate">
+        <Height val="14"/>
+        <Width val="70"/>
+        
+        <Frame type="Frame" name="AttachPointFrame">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="15"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="35"/>
+            <Height val="0"/>
+            <Width val="0"/>
+        </Frame>
+
+        <Frame type="UnitStatusColor" name="TeamColor">
+            <Anchor relative="$parent"/>
+            <ColorStyle val="PrimaryLight"/>
+
+            <Frame type="Image" name="TeamIndicator">
+                <Anchor side="Bottom" relative="$parent/$parent/DurationBG" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/$parent" pos="Min" offset="0"/>
+                <Height val="10"/>
+                <Width val="70"/>
+                <Texture val="@UI/State/GenericStateBG"/>
+            </Frame>
+        </Frame>
+
+        <Frame type="Image" name="DurationBG">
             <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
             <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+            <Height val="6"/>
+            <Width val="70"/>
+
+            <Color val="000000"/>
+            <Alpha val="127"/>
+
+            <Frame type="UnitStatusDurationBar" name="DurationBar" template="UnitStatus/UnitStatusDurationBarTemplate">
+                <Anchor relative="$parent"/>
+            </Frame>
         </Frame>
     </Frame>
     
@@ -4187,86 +4254,100 @@
     </Frame>
     
     <Frame type="UnitStatusFrame" name="CaptureBeaconUnitStatusFrame">
-        <Width val="195"/>
-        <Height val="19"/>
+        <Width val="210"/>
+        <Height val="52"/>
 
         <Frame type="Frame" name="AttachPointFrame">
-            <Anchor side="Top" relative="$parent" pos="Min" offset="200"/>
-            <Anchor side="Left" relative="$parent" pos="Min" offset="90"/>
+            <Anchor side="Top" relative="$parent" pos="Min" offset="220"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="95"/>
             <Height val="0"/>
             <Width val="0"/>
         </Frame>
         
         <Frame type="Image" name="CaptureProgressBGImage">
-            <Anchor side="Top" relative="$parent/CaptureBarBG" pos="Mid" offset="0"/>
-            <Anchor side="Bottom" relative="$parent/CaptureBarBG" pos="Mid" offset="0"/>
-            <Anchor side="Left" relative="$parent/CaptureBarBG" pos="Min" offset="0"/>
-            <Width val="195"/>
-            <Height val="18"/>
+            <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
             <Texture val="@UI/CaptureBar_Fill"/>
-
-            <ColorAdjustMode val="Colorize"/>
-            <DarkAdjustColor val="{$GameUI/TeamChaosColors/@Color}"/>
+            <Color val="{$GameUI/TeamChaosColors/@Color}"/>
         </Frame>
         
         <Frame type="UnitStatusBar" name="CaptureProgressBar">
-            <Width val="195"/>
-            <Height val="18"/>
-            <Anchor side="Top" relative="$parent/CaptureBarBG" pos="Mid" offset="0"/>
-            <Anchor side="Bottom" relative="$parent/CaptureBarBG" pos="Mid" offset="0"/>
-            <Anchor side="Left" relative="$parent/CaptureBarBG" pos="Min" offset="1"/>
+            <Anchor relative="$parent/CaptureProgressBGImage"/>
             <Texture val="@UI/CaptureBar_Fill"/>
-            <Tiled val="true" index="0"/>
-            <BackgroundShown val="false"/>
-            <BackgroundColor val="150, 39, 4, 49"/>
-            <BackgroundInsetRect top="0" left="0" bottom="0" right="0"/>
-            <BarInsetRect top="0" left="0" bottom="0" right="1"/>
 
+            <!-- UnitStatusBar has some weird interaction with colorstyle and ColorAdjustMode -->
             <ColorStyle val="AllWhite"/>
             <ColorAdjustMode val="Colorize"/>
-            <DarkAdjustColor val="{$GameUI/TeamOrderColors/@Color}"/>
+            <LightAdjustColor val="{$GameUI/TeamOrderColors/@Color}"/>
         </Frame>
         
         <Frame type="Image" name="CaptureBarBG">
-            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
-            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
-            <Width val="195"/>
-            <Height val="19"/>
+            <Anchor side="Left" relative="$parent/CaptureProgressBar" pos="Min" offset="-1"/>
+            <Anchor side="Top" relative="$parent/CaptureProgressBar" pos="Min" offset="-1"/>
+            <Anchor side="Right" relative="$parent/CaptureProgressBar" pos="Max" offset="1"/>
+            <Anchor side="Bottom" relative="$parent/CaptureProgressBar" pos="Max" offset="1"/>
             <Texture val="@UI/CaptureBar_BGPlain"/>
         </Frame>
         
+        <Frame type="Image" name="ContestedBorder">
+            <Anchor side="Top" relative="$parent/CaptureBarBG" pos="Mid" offset="0"/>
+            <Anchor side="Left" relative="$parent/CaptureBarBG" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent/CaptureBarBG" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent/CaptureBarBG" pos="Mid" offset="0"/>
+            <Texture val="@UI/CaptureBar_Contested"/>
+            <Visible val="false"/>
+            
+            <Animation name="Pulse">
+                <Event event="OnShown" action="Reset,Play"/>
+                
+                <Controller type="Fade" end="PingPong">
+                    <Key type="Curve" time="0" value="255" inout="Fast"/>
+                    <Key type="Curve" time="0.4" value="110" inout="Fast"/>
+                </Controller>
+            </Animation>
+        </Frame>
+        
+        <Frame type="Label" name="ContestedLabel">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Bottom" relative="$parent/ContestedBorder" pos="Min" offset="6"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+            <Visible val="{$parent/ContestedBorder/@Visible}"/>
+            <Text val="@UI/CapturePointContested"/>
+            <Style val="Storm_UnitStatus_CaptureBeaconContested"/>
+        </Frame>
+        
+        <StateGroup name="IsContested">
+            <State name="Contested">
+                <When type="AnimationState" frame="CaptureProgressBar" IsContested="Contested"/>
+                <Action type="SetProperty" frame="ContestedBorder" visible="True"/>
+            </State>
+        </StateGroup>
+        
         <Frame type="Image" name="DimmingFrame">
-            <Anchor relative="$parent"/>
-            <Width val="143"/>
-            <Height val="16"/>
+            <Anchor relative="$parent/CaptureProgressBGImage"/>
             <Texture val="@UI/StormTempWhite"/>
             <Color val="000000"/>
             <Alpha val="160"/>
             <Visible val="false"/>
-            <Animation name="DimmedOn">
-                <Event event="DimmedOn" action="Reset,Play"/>
-                <Controller type="Visibility" end="Pause">
-                    <Key type="Bool" time="0.0" value="true"/>
-                </Controller>
-            </Animation>
-            <Animation name="DimmedOff">
-                <Event event="DimmedOff" action="Reset,Play"/>
-                <Controller type="Visibility" end="Pause">
-                    <Key type="Bool" time="0.0" value="false"/>
-                </Controller>
-            </Animation>
+        
+            <StateGroup name="IsDim">
+                <State name="DimmedOn">
+                    <When type="AnimationState" IsDim="DimmedOn"/>
+                    <Action type="SetProperty" visible="True"/>
+                </State>
+            </StateGroup>
         </Frame>
     </Frame>
 
     <Frame type="UnitStatusFrame" name="CaptureBeaconSingleNotchUnitStatusFrame" template="UnitStatus/CaptureBeaconUnitStatusFrame">
-        <Frame type="Image" name="CaptureBarBG">
+        <Frame type="Image" name="CaptureBarNotch">
+            <Anchor side="Top" relative="$parent/CaptureBarBG" pos="Min" offset="1"/>
+            <Anchor side="Left" relative="$parent/CaptureBarBG" pos="Mid" offset="1"/>
+            <Anchor side="Right" relative="$parent/CaptureBarBG" pos="Mid" offset="1"/>
             <Texture val="@UI/CaptureBar_BGSingleNotch"/>
-        </Frame>
-    </Frame>
-
-    <Frame type="UnitStatusFrame" name="CaptureBeaconOvercaptureNotchUnitStatusFrame" template="UnitStatus/CaptureBeaconUnitStatusFrame">
-        <Frame type="Image" name="CaptureBarBG">
-            <Texture val="@UI/CaptureBar_BGNotches"/>
+            <RenderPriority val="700"/>
         </Frame>
     </Frame>
 
@@ -5027,6 +5108,31 @@
                     <Key type="Curve" time=".1" value="85" inout="Slow,Linear"/>
                 </Controller>
             </Animation>
+        </Frame>
+    </Frame>
+
+    <Frame type="UnitStatusFrame" name="TrackedUnitStatusFrameTemplate">
+        <Width val="#TrackedUnitFrameSize"/>
+        <Height val="#TrackedUnitFrameSize"/>
+
+        <CollapseLayout val="True"/>
+
+        <Frame type="UnitStatusMinimapIcon" name="UnitStatusMinimapIcon">
+            <Anchor relative="$parent"/>
+            <ColorStyle val="Primary"/>
+
+            <Frame type="Image" name="IconImage">
+                <LayerCount val="2"/>
+                <Anchor relative="$parent" offset="0"/>
+
+                <!-- Layer 0: Border -->
+                <Texture val="@UI/StormHeroConsoleCircleButtonMask" layer="0"/>
+                <LayerColor val="{$parent/@Color}" layer="0"/>
+
+                <!-- Layer 1: Icon -->
+                <Texture val="{$parent/@MinimapIcon}" layer="1"/>
+                <TextureCoords top="-.03125" left="-.03125" bottom="1.03125" right="1.03125" layer="1"/>
+            </Frame>
         </Frame>
     </Frame>
 </Desc>

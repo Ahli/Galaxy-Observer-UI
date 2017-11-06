@@ -1034,6 +1034,7 @@
                     <When type="Property" frame="$parent/GameContentFrame" CanPurchase="false"/>
                     <When type="Property" frame="$parent/GameContentFrame" IsFreeToPlay="false"/>
                     <When type="Property" frame="$parent/GameContentFrame" IsOwned="false"/>
+                    <When type="Property" frame="$parent" GemOnlyProduct="false"/>
                     <Action type="SetProperty" Visible="true"/>
                 </State>
 
@@ -1508,6 +1509,33 @@
             </StateGroup>
         </Frame>
 
+        <Frame type="Button" name="GemOnlyBundleButton" template="StandardTemplates/StandardButtonMiniTemplate">
+            <Anchor side="Left" relative="$parent" pos="Min" offset="-4"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="5"/>
+            <Width val="240"/>
+            <Height val="74"/>
+            <ClickSound val="@UI_BNet_PageSelect"/>
+            <Text val="@UI/Store/GemOnlyViewInBundle"/>
+
+            <StateGroup name="VisibilityStates">
+                <DefaultState val="Hidden"/>
+
+                <State name="Visible">
+                    <When type="Property" frame="$parent" GemBundleExclusive="true"/>
+                    <When type="Property" frame="$parent/GameContentFrame" IsOwned="false"/>
+                    <Action type="SetProperty" Visible="true"/>
+                </State>
+                <State name="Owned">
+                    <When type="Property" frame="$parent" GemBundleExclusive="true"/>
+                    <When type="Property" frame="$parent/GameContentFrame" IsOwned="true"/>
+                    <Action type="SetProperty" Visible="false"/>
+                </State>
+                <State name="Hidden">
+                    <Action type="SetProperty" Visible="false"/>
+                </State>
+            </StateGroup>
+        </Frame>
+
         <Frame type="Button" name="BundleBuyButton" template="StandardTemplates/StandardButtonMiniTemplate">
             <Anchor side="Left" relative="$parent" pos="Min" offset="-4"/>
             <Anchor side="Bottom" relative="$parent" pos="Max" offset="5"/>
@@ -1546,6 +1574,13 @@
 
             <Frame type="Label" name="Label">
                 <Text val="@UI/Buy"/>
+
+                <StateGroup name="BundleLabelStates">
+                    <State name="GemOnlyBundle">
+                        <When type="Property" frame="$parent/$parent" GemOnlyProduct="true"/>
+                        <Action type="SetProperty" Text="@UI/Store/GemOnlyBuyBundle"/>
+                    </State>
+                </StateGroup>
             </Frame>
 
             <StateGroup name="BundleBuyButtonVisibilityStates">
@@ -1689,6 +1724,13 @@
                 <State name="Owned">
                     <When type="Property" frame="$parent/GameContentFrame" IsOwned="true"/>
                     <Action type="SetAnchor" side="Bottom" relative="$parent" pos="Max" offset="-16"/>
+                </State>
+                <!-- This state is used to properly anchor the InfoFrame for inactive debug bundles -->
+                <State name="InvalidBundle">
+                    <When type="Property" frame="$parent/GameContentFrame" IsOwned="false"/>
+                    <When type="Property" frame="$parent/GameContentFrame" CanPurchase="false"/>
+                    <When type="Property" frame="$parent/GameContentFrame" IsBaseSkinVariation="false"/>
+                    <Action type="SetAnchor" side="Bottom" relative="$parent" pos="Max" offset="-50"/>
                 </State>
             </StateGroup>
         </Frame>
@@ -2049,6 +2091,7 @@
             <Visible val="False"/>
             <Width val="68"/>
             <Height val="52"/>
+            <CollapseLayout val="True"/>
             <AcceptsMouse val="True"/>
             <Tooltip val="@UI/StorePage/ViewInBundles"/>
             <TooltipAnchorPosition val="TopCenter"/>
@@ -2110,6 +2153,57 @@
                 <State name="Visible">
                     <When type="Property" frame="$parent" InBundle="true"/>
                     <Action type="SetProperty" Visible="true"/>
+                </State>
+            </StateGroup>
+        </Frame>
+
+        <Frame type="Image" name="GemOnlyBadgeImage">
+            <Anchor side="Top" relative="$parent/ViewInBundleButton" pos="Max" offset="0"/>
+            <Anchor side="Left" relative="$parent/ViewInBundleButton" pos="Min" offset="0"/>
+            <CollapseLayout val="True"/>
+            <Unclipped val="True"/>
+            <!-- Using this as a Placeholder texture -->
+            <Texture val="@UI/Storm_UI_Store_GemBadge"/>
+            <Visible val="{$parent/@GemOnlyProduct}"/>
+            <AcceptsMouseTooltip val="True"/>
+            <Tooltip val="@UI/Store/GemOnlyTooltip"/>
+            <TooltipAnchorPosition val="TopCenter"/>
+
+            <Frame type="Image" name="GemOnlyBadgeShineImage">
+                <Anchor relative="$parent"/>
+                <BlendMode val="Add"/>
+                <LayerCount val="2"/>
+                <Alpha val="170"/>
+
+                <!-- Using this as a Placeholder texture -->
+                <Texture val="@UI/Storm_UI_Store_GemBadge" layer="0"/>
+                <TextureType val="Normal" layer="0"/>
+                <AlphaLayer val="true" layer="0"/>
+
+                <Texture val="@UI/Storm_UI_Store_NewBadgeShimmer" layer="1"/>
+                <TextureCoords top="0" left="0" bottom="1" right="1" layer="1"/>
+
+                <Animation name="Shimmer">
+                    <Event event="OnShown" action="DirectionForward"/>
+                    <Event event="OnShown" action="Play"/>
+
+                    <Controller type="LayerUV" layer="1" side="Left" relative="False" sidelock="True" end="Loop" >
+                        <Key type="Curve" time="0" value="1" inout="linear,fast"/>
+                        <Key type="Curve" time="2" value="1" inout="linear,fast"/>
+                        <Key type="Curve" time="2.30" value="-1" inout="fast,linear"/>
+                        <Key type="Curve" time="9" value="-1" inout="fast,linear"/>
+                    </Controller>
+                </Animation>
+            </Frame>
+
+            <StateGroup name="TooltipStates">
+                <State name="NotBundle">
+                    <When type="Property" frame="$parent/GameContentFrame" IsBundle="false"/>
+                    <Action type="SetProperty" Tooltip="@UI/Store/GemOnlyTooltip"/>
+                </State>
+                <State name="IsBundle">
+                    <When type="Property" frame="$parent/GameContentFrame" IsBundle="true"/>
+                    <Action type="SetProperty" Tooltip="@UI/Store/GemOnlyBundleTooltip"/>
                 </State>
             </StateGroup>
         </Frame>
@@ -2593,19 +2687,8 @@
 
             <Frame type="TextFormatFrame" name="TooltipTextFormatFrame">
                 <Anchor relative="$parent"/>
-                <FormatText val=""/>
+                <FormatText val="@UI/ScreenNavigation/StoreButtonCountTooltip"/>
                 <Replacement val="{$parent/ItemQuantityLabel/@Text}"/>
-
-                <StateGroup name="ForceUpdate">
-                    <DefaultState val="Invisible"/>
-                    <State name="Visible">
-                        <When type="Property" frame="$this" InheritedVisible="true"/>
-                        <Action type="SetProperty" frame="$this" FormatText="@{NavAB}UI/ScreenNavigation/StoreButtonCountTooltip" undo="false"/>
-                    </State>
-                    <State name="Invisible">
-                        <Action type="SetProperty" frame="$this" FormatText="" undo="false"/>
-                    </State>
-                </StateGroup>
             </Frame>
 
             <StateGroup name="VisibilityStates">

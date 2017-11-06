@@ -4,6 +4,7 @@
     <Frame type="UnitStatusFrame" name="SteelTrapTemplate">
         <Anchor relative="$parent"/>
 
+
         <Frame type="Image" name="SteelTrapInactiveFrame">
             <Anchor side="Left" relative="$parent" pos="Min" offset="16"/>
             <Anchor side="Bottom" relative="$parent" pos="Max" offset="10"/>
@@ -16,19 +17,12 @@
                 <Texture val="@UI/storm_ui_junkrat_steel_trap_inactive_icon"/>
             </Frame>
         </Frame>
-
-        <Frame type="Image" name="SteelTrapActivatingFrame">
-            <Anchor side="Left" relative="$parent/SteelTrapInactiveFrame" pos="Min" offset="0"/>
-            <Anchor side="Bottom" relative="$parent/SteelTrapInactiveFrame" pos="Max" offset="0"/>
-            <Texture val="@UI/storm_ui_junkrat_steel_trap_activating_frame"/>
-            <Visible val="False"/>
-        </Frame>
         
         <Frame type="UnitStatusBehaviorIcon" name="SteelTrapActivatingBehaviorIcon">
-            <Anchor side="Top" relative="$parent/SteelTrapActivatingFrame" pos="Min" offset="15"/>
-            <Anchor side="Left" relative="$parent/SteelTrapActivatingFrame" pos="Min" offset="15"/>
-            <Anchor side="Bottom" relative="$parent/SteelTrapActivatingFrame" pos="Max" offset="-18"/>
-            <Anchor side="Right" relative="$parent/SteelTrapActivatingFrame" pos="Max" offset="-14"/>
+            <Anchor side="Top" relative="$parent/SteelTrapInactiveFrame" pos="Min" offset="15"/>
+            <Anchor side="Left" relative="$parent/SteelTrapInactiveFrame" pos="Min" offset="15"/>
+            <Anchor side="Bottom" relative="$parent/SteelTrapInactiveFrame" pos="Max" offset="-18"/>
+            <Anchor side="Right" relative="$parent/SteelTrapInactiveFrame" pos="Max" offset="-14"/>
             <Behavior val="JunkratSteelTrapArming"/>
             <AcceptsMouse val="False"/>
 
@@ -58,14 +52,14 @@
             </Frame>
 
             <Frame type="Image" name="SteelTrapActivatingIcon">
-                <Anchor side="Top" relative="$parent/$parent/SteelTrapActivatingFrame" pos="Min" offset="0"/>
-                <Anchor side="Left" relative="$parent/$parent/SteelTrapActivatingFrame" pos="Min" offset="0"/>
+                <Anchor side="Top" relative="$parent/$parent/SteelTrapInactiveFrame" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/$parent/SteelTrapInactiveFrame" pos="Min" offset="0"/>
                 <Texture val="@UI/storm_ui_junkrat_steel_trap_activating_icon"/>
             </Frame>
         </Frame>
 
         <Frame type="UnitStatusBehaviorIcon" name="SteelTrapArmedBehaviorIcon">
-            <Anchor relative="$parent/SteelTrapActivatingFrame"/>
+            <Anchor relative="$parent/SteelTrapInactiveFrame"/>
             <Behavior val="JunkratSteelTrapScan"/>
             <AcceptsMouse val="False"/>
 
@@ -97,6 +91,7 @@
             <ColorAdjustMode val="None"/>
             <Texture val="@UI/storm_ui_junkrat_steel_trap_active_frame"/>
 
+            <!--
             <AcceptsMouse val="True"/>
             <Animation name="Click">
                 <Event event="OnMouseDown" action="Restart,Play"/>
@@ -104,6 +99,7 @@
                     <Key type="Event" time="0" event="PulseAnim"/>
                 </Controller>
             </Animation>
+            -->
 
             <Animation name="PulseAnim">
                 <Event event="PulseAnim" action="Restart, Play"/>
@@ -229,6 +225,32 @@
                 <Width val="300"/>
                 <Texture val="@UI/storm_ui_junkrat_steel_trap_flare"/>
             </Frame>
+        </Frame>
+
+        <Frame type="Frame" name="TooltipOverlay">
+            <Anchor relative="$parent/SteelTrapInactiveFrame" offset="-10"/>
+
+            <AcceptsMouseTooltip val="True"/>
+            <Tooltip val="@UI/Junkrat/SteelTrapAvailable"/>
+
+            <StateGroup name="SteelTrapState">
+                <DefaultState val="Available"/>
+                <State name="Arming">
+                    <When type="Property" frame="$parent/SteelTrapActivatingBehaviorIcon" Visible="True"/>
+                    <Action type="SetProperty" frame="$this" Tooltip="@UI/Junkrat/SteelTrapArming"/>
+                </State>
+                <State name="Armed">
+                    <When type="Property" frame="$parent/SteelTrapArmedBehaviorIcon" Visible="True"/>
+                    <Action type="SetProperty" frame="$this" Tooltip="@UI/Junkrat/SteelTrapArmed"/>
+                </State>
+                <State name="Activated">
+                    <When type="Property" frame="$parent/SteelTrapActiveFrame" Visible="True"/>
+                    <Action type="SetProperty" frame="$this" Tooltip="@UI/Junkrat/SteelTrapActivated"/>
+                </State>
+                <State name="Available">
+                    <Action type="SetProperty" frame="$this" Tooltip="@UI/Junkrat/SteelTrapAvailable"/>
+                </State>
+            </StateGroup>
         </Frame>
     </Frame>
 
