@@ -198,47 +198,7 @@
 				
 				<!-- player vision UI changes -->
 				<Frame type="ObserverPreviewFrame" name="ObserverPreviewFrame">
-					<Frame type="Frame" name="ContainerFrame">
-						
-						<!--
-						<Animation name="Ahlimation">
-							<Event event="OnHidden" action="Reset"/>
-							<Event event="OnHidden" action="DirectionForward"/>
-							<Event event="OnHidden" action="Play"/>
-							<Event event="OnShown" action="Reset"/>
-							<Event event="OnShown" action="DirectionForward"/>
-							<Event event="OnShown" action="Play"/>
-							
-							<Controller type="Visibility" end="Pause" frame="$parent/$parent/$parent/ConsoleUIContainer/CommandPanel">
-								<Key type="Bool" time="0.00" value="true"/>
-								<Key type="Bool" time="0.05" value="true"/>
-								<Key type="Bool" time="0.10" value="true"/>
-								<Key type="Bool" time="0.15" value="true"/>
-								<Key type="Bool" time="0.20" value="true"/>
-							</Controller>
-							<Controller type="Visibility" end="Pause" frame="$parent/$parent/$parent/ConsoleUIContainer/InventoryPanel">
-								<Key type="Bool" time="0.00" value="true"/>
-								<Key type="Bool" time="0.05" value="true"/>
-								<Key type="Bool" time="0.10" value="true"/>
-								<Key type="Bool" time="0.15" value="true"/>
-								<Key type="Bool" time="0.20" value="true"/>
-							</Controller>
-						</Animation>
-						-->
-						
-						<Frame type="Label" name="NameLabel">
-							<Animation name="Ahlimation">
-								<Event event="OnShown" action="DirectionForward,Play"/>
-								<Event event="OnHidden" action="DirectionReverse,Play"/>
-
-								<Controller type="Visibility" end="Pause" frame="$parent/$parent/$parent/$parent/ConsoleUIContainer/LeaderPanelBottom">
-									<Key type="Bool" time="0.0" value="true"/>
-									<Key type="Bool" time="0.0" value="false"/>
-								</Controller>
-							</Animation>
-						</Frame>
-						
-					</Frame>
+					<Handle val="ObserverPreviewFrame"/>
 				</Frame>
 
 				<!-- Interface control menu -->
@@ -299,6 +259,25 @@
 					<Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
 					<Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
 					<Handle val="LeaderPanelBottom"/>
+					
+					<StateGroup name="VisibilityController">
+						<DefaultState val="Show"/>
+						<State name="Hide_ToggleUI">
+							<When type="Property" frame="$ToggleUI" visible="true"/>
+							<Action type="SetAnchor" frame="$this" undo="False" side="Bottom" relative="$parent" pos="Max" offset="999"/>
+						</State>
+						<State name="Hide_PlayerVisionPreview">
+							<When type="Property" frame="$ObserverPreviewFrame/ContainerFrame" visible="true"/>
+							<Action type="SetAnchor" frame="$this" undo="False" side="Bottom" relative="$parent" pos="Max" offset="999"/>
+						</State>
+						<State name="Hide_SettingsUI">
+							<When type="Property" frame="$Menu_Animator" visible="true"/>
+							<Action type="SetAnchor" frame="$this" undo="False" side="Bottom" relative="$parent" pos="Max" offset="999"/>
+						</State>
+						<State name="Show">
+							<Action type="SetAnchor" frame="$this" undo="False" side="Bottom" relative="$parent" pos="Max" offset="#LeaderPanelBottom - VerticalOffset"/>
+						</State>
+					</StateGroup>
 				</Frame>
 
 
@@ -434,6 +413,7 @@
 				
 				<Frame type="Frame" name="KillLogPanel">
 					<Anchor side="Top" relative="$parent" pos="Min" offset="150"/>
+					<Handle val="KillLogPanel"/>
 				</Frame>
 			</Frame>
 
@@ -550,36 +530,7 @@
 					<Key type="Bool" time="0" value="true"/>
 				</Controller>
 				
-				<!--<Controller type="Visibility" end="Loop" frame="$TalentTooltipL0T1">
-					<Key type="Bool" time="1" value="true"/>
-				</Controller>-->
 			</Animation>
-			
-			<!-- failed attempt to override tooltips of baseline quests
-			<Frame type="Frame" name="DelayedVisible">
-				<Anchor relative="$parent"/>
-				<Visible val="false"/>
-			</Frame>
-			<Animation name="DelayVisible">
-				<Event event="OnShown" action="Reset,DirectionForward,Play"/>
-				<Event event="OnHidden" action="DirectionReverse,Play"/>
-				<Controller type="Visibility" end="Pause" frame="$this/DelayedVisible">
-					<Key type="Bool" time="10.5" value="False"/>
-					<Key type="Bool" time="10.5" value="True"/>
-				</Controller>
-			</Animation>
-			<StateGroup name="Test">
-				<DefaultState val="Other"/>
-				<State name="Visible">
-					<When type="Property" frame="DelayedVisible" Visible="true"/>
-					<Action type="SetProperty" frame="$AHLI_DEBUG" text="visible"/>
-					DOESNT WORK <Action type="ApplyTemplate" frame="$LeaderPanelBottom/TalentOverview/HeroLeaderPanelContainer/TabControl" template="_LeaderPanelBottom/LeaderPanelBottomTemplate/TalentOverview/HeroLeaderPanelContainer/TabControl"/>
-					DOESNT WORK <Action type="SetProperty" frame="$TalentTreeIcon0_A_L0" TooltipFrame="HeroTalentTooltip_L0_T0_A"/>
-				</State>
-				<State name="Other">
-					<Action type="SetProperty" frame="$AHLI_DEBUG" text="hidden"/>
-				</State>
-			</StateGroup>-->
 			
 		</Frame>
 		
@@ -613,206 +564,249 @@
 			<Anchor relative="$parent"/>
 			<Shortcut val="#Hotkey - Toggle all UI"/>
 			<AcceptsMouse val="false"/>
-			<CollapseLayout val="true"/>
 			<Visible val="false"/>
-			
-			<Animation name="Ahlimation">
-				<Event event="OnShown" action="DirectionForward,Play"/>
-				<Event event="OnHidden" action="DirectionReverse,Play"/>
-				
-				<Controller type="Anchor" end="Pause" side="Top" relative="true" frame="$parent/UIContainer">
-					<Key type="Curve" time="0" value="0" inout="Fast"/>
-					<Key type="Curve" time="0.01" value="9999" inout="Fast"/>
-				</Controller>
-				<Controller type="Anchor" end="Pause" side="Left" relative="true" frame="$parent/UIContainer">
-					<Key type="Curve" time="0" value="0" inout="Fast"/>
-					<Key type="Curve" time="0.01" value="9999" inout="Fast"/>
-				</Controller>
-				<Controller type="Anchor" end="Pause" side="Top" relative="true" frame="$parent/WorldPanel/UnitStatusPanel">
-					<Key type="Curve" time="0" value="0" inout="Fast"/>
-					<Key type="Curve" time="0.01" value="9999" inout="Fast"/>
-				</Controller>
-				<Controller type="Anchor" end="Pause" side="Left" relative="true" frame="$parent/WorldPanel/UnitStatusPanel">
-					<Key type="Curve" time="0" value="0" inout="Fast"/>
-					<Key type="Curve" time="0.01" value="9999" inout="Fast"/>
-				</Controller>
-				<Controller type="Anchor" end="Pause" side="Top" relative="true" frame="$parent/OverlayImage">
-					<Key type="Curve" time="0" value="0" inout="Fast"/>
-					<Key type="Curve" time="0.01" value="9999" inout="Fast"/>
-				</Controller>
-				<Controller type="Anchor" end="Pause" side="Left" relative="true" frame="$parent/OverlayImage">
-					<Key type="Curve" time="0" value="0" inout="Fast"/>
-					<Key type="Curve" time="0.01" value="9999" inout="Fast"/>
-				</Controller>
-				<Controller type="Anchor" end="Pause" side="Top" relative="true" frame="$parent/FadeImage">
-					<Key type="Curve" time="0" value="0" inout="Fast"/>
-					<Key type="Curve" time="0.01" value="9999" inout="Fast"/>
-				</Controller>
-				<Controller type="Anchor" end="Pause" side="Left" relative="true" frame="$parent/FadeImage">
-					<Key type="Curve" time="0" value="0" inout="Fast"/>
-					<Key type="Curve" time="0.01" value="9999" inout="Fast"/>
-				</Controller>
-				<Controller type="Anchor" end="Pause" side="Top" relative="true" frame="$parent/FadeImagePlayer">
-					<Key type="Curve" time="0" value="0" inout="Fast"/>
-					<Key type="Curve" time="0.01" value="9999" inout="Fast"/>
-				</Controller>
-				<Controller type="Anchor" end="Pause" side="Left" relative="true" frame="$parent/FadeImagePlayer">
-					<Key type="Curve" time="0" value="0" inout="Fast"/>
-					<Key type="Curve" time="0.01" value="9999" inout="Fast"/>
-				</Controller>
-
-				<Controller type="Visibility" end="Pause" frame="$parent/UIContainer/ConsoleUIContainer/MinimapPanel">
-					<Key type="Bool" time="0" value="true"/>
-					<Key type="Bool" time="0" value="false"/>
-				</Controller>
-				
-			</Animation>
+			<Handle val="ToggleAllUI"/>
 		</Frame>
-		
 		<Frame type="ToggleControl" name="ToggleUI">
 			<Anchor relative="$parent"/>
 			<Shortcut val="#Hotkey - Toggle UI"/>
 			<AcceptsMouse val="false"/>
-			<CollapseLayout val="true"/>
 			<Visible val="false"/>
-			
-			<Animation name="Ahlimation">
-				<Event event="OnShown" action="DirectionForward,Play"/>
-				<Event event="OnHidden" action="DirectionReverse,Play"/>
-				
-				<Controller type="Visibility" end="Pause" frame="$parent/UIContainer/ConsoleUIContainer/MinimapPanel">
-					<Key type="Bool" time="0" value="true"/>
-					<Key type="Bool" time="0" value="false"/>
-					<Key type="Bool" time="0.2" value="false"/>
-				</Controller>
-				<Controller type="Fade" end="Pause" frame="$parent/UIContainer/FullScreenUpperContainer/ObserverHeroOverviewPanel">
-					<Key type="Curve" time="0" value="255"/>
-					<Key type="Curve" time="0.2" value="0"/>
-				</Controller>
-				<Controller type="Visibility" end="Pause" frame="$parent/UIContainer/FullScreenUpperContainer/ObserverHeroOverviewPanel">
-					<Key type="Bool" time="0" value="true"/>
-					<Key type="Bool" time="0" value="false"/>
-					<Key type="Bool" time="0.2" value="false"/>
-				</Controller>
-<!-- bugs with hidechat feature		<Controller type="Fade" end="Pause" frame="$parent/UIContainer/FullScreenUpperContainer/ChatDisplay">
-					<Key type="Curve" time="0" value="255"/>
-					<Key type="Curve" time="0.2" value="0"/>
-				</Controller> -->
-				<Controller type="Visibility" end="Pause" frame="$parent/UIContainer/FullScreenUpperContainer/ChatDisplay">
-					<Key type="Bool" time="0" value="true"/>
-					<Key type="Bool" time="0" value="false"/>
-					<Key type="Bool" time="0.2" value="false"/>
-				</Controller>
-				<Controller type="Fade" end="Pause" frame="$parent/UIContainer/FullScreenUpperContainer/TeamPanel/TeamScorePanel">
-					<Key type="Curve" time="0" value="255"/>
-					<Key type="Curve" time="0.2" value="0"/>
-				</Controller>
-				<Controller type="Visibility" end="Pause" frame="$parent/UIContainer/FullScreenUpperContainer/TeamPanel/TeamScorePanel">
-					<Key type="Bool" time="0" value="true"/>
-					<Key type="Bool" time="0" value="false"/>
-					<Key type="Bool" time="0.2" value="false"/>
-				</Controller>
-				<Controller type="Fade" end="Pause" frame="$parent/UIContainer/ConsoleUIContainer/LeaderPanelBottom">
-					<Key type="Curve" time="0" value="255"/>
-					<Key type="Curve" time="0.2" value="0"/>
-				</Controller>
-				<Controller type="Visibility" end="Pause" frame="$parent/UIContainer/ConsoleUIContainer/LeaderPanelBottom">
-					<Key type="Bool" time="0" value="true"/>
-					<Key type="Bool" time="0" value="false"/>
-					<Key type="Bool" time="0.2" value="false"/>
-				</Controller>
-				<Controller type="Fade" end="Pause" frame="$parent/UIContainer/ConsoleUIContainer/SelectionUnitStatusPanel">
-					<Key type="Curve" time="0" value="255"/>
-					<Key type="Curve" time="0.2" value="0"/>
-				</Controller>
-<!--				<Controller type="Visibility" end="Pause" frame="$parent/UIContainer/ConsoleUIContainer/SelectionUnitStatusPanel">
-					<Key type="Bool" time="0" value="true"/>
-					<Key type="Bool" time="0" value="false"/>
-					<Key type="Bool" time="0.2" value="false"/>
-				</Controller> -->
-				<Controller type="Visibility" end="Pause" frame="$parent/UIContainer/ConsoleUIContainer/SelectionUnitStatusPanel/UnitStatusFrame0/HealthEnergyContainer">
-					<Key type="Bool" time="0" value="true"/>
-					<Key type="Bool" time="0" value="false"/>
-					<Key type="Bool" time="0.2" value="false"/>
-				</Controller>
-				<Controller type="Fade" end="Pause" frame="$parent/UIContainer/ConsoleUIContainer/CommandPanel">
-					<Key type="Curve" time="0" value="255"/>
-					<Key type="Curve" time="0.2" value="0"/>
-				</Controller>
-<!--bugs			<Controller type="Visibility" end="Pause" frame="$parent/UIContainer/ConsoleUIContainer/CommandPanel">
-					<Key type="Bool" time="0" value="true"/>
-					<Key type="Bool" time="0" value="false"/>
-					<Key type="Bool" time="0.2" value="false"/>
-				</Controller> -->
-				<Controller type="Fade" end="Pause" frame="$parent/UIContainer/ConsoleUIContainer/InventoryPanel">
-					<Key type="Curve" time="0" value="255"/>
-					<Key type="Curve" time="0.2" value="0"/>
-				</Controller>
-				<Controller type="Visibility" end="Pause" frame="$parent/UIContainer/ConsoleUIContainer/InventoryPanel">
-					<Key type="Bool" time="0" value="true"/>
-					<Key type="Bool" time="0" value="false"/>
-					<Key type="Bool" time="0.2" value="false"/>
-				</Controller>
-				<Controller type="Fade" end="Pause" frame="$parent/UIContainer/ConsoleUIContainer/KhaldorPanel/SelectionUnitStatusPanelSingle">
-					<Key type="Curve" time="0" value="255"/>
-					<Key type="Curve" time="0.2" value="0"/>
-				</Controller>
-				<Controller type="Visibility" end="Pause" frame="$parent/UIContainer/ConsoleUIContainer/KhaldorPanel/SelectionUnitStatusPanelSingle">
-					<Key type="Bool" time="0" value="true"/>
-					<Key type="Bool" time="0" value="false"/>
-					<Key type="Bool" time="0.2" value="false"/>
-				</Controller>
-				<Controller type="Fade" end="Pause" frame="$parent/UIContainer/ConsoleUIContainer/TopPanel">
-					<Key type="Curve" time="0" value="255"/>
-					<Key type="Curve" time="0.2" value="0"/>
-				</Controller>
-				<Controller type="Visibility" end="Pause" frame="$parent/UIContainer/ConsoleUIContainer/TopPanel">
-					<Key type="Bool" time="0" value="true"/>
-					<Key type="Bool" time="0" value="false"/>
-					<Key type="Bool" time="0.2" value="false"/>
-				</Controller>
-				<Controller type="Fade" end="Pause" frame="$parent/UIContainer/ConsoleUIContainer/MapMechanicPanel">
-					<Key type="Curve" time="0" value="255"/>
-					<Key type="Curve" time="0.2" value="0"/>
-				</Controller>
-				<Controller type="Visibility" end="Pause" frame="$parent/UIContainer/ConsoleUIContainer/MapMechanicPanel">
-					<Key type="Bool" time="0" value="true"/>
-					<Key type="Bool" time="0" value="false"/>
-					<Key type="Bool" time="0.2" value="false"/>
-				</Controller>
-				<Controller type="Fade" end="Pause" frame="$parent/UIContainer/FullscreenUpperContainer/ObserverPanelMovingContainer">
-					<Key type="Curve" time="0" value="255"/>
-					<Key type="Curve" time="0.2" value="0"/>
-				</Controller>
-<!--				<Controller type="Visibility" end="Pause" frame="$parent/UIContainer/FullscreenUpperContainer/ObserverPanelMovingContainer">
-					<Key type="Bool" time="0" value="true"/>
-					<Key type="Bool" time="0" value="false"/>
-					<Key type="Bool" time="0.2" value="false"/>
-				</Controller>-->
-				<Controller type="Fade" end="Pause" frame="$parent/UIContainer/FullScreenUpperContainer/InterfaceControl">
-					<Key type="Curve" time="0" value="255"/>
-					<Key type="Curve" time="0.2" value="0"/>
-				</Controller>
-				<!--Controller type="Visibility" end="Pause" frame="$parent/UIContainer/FullScreenUpperContainer/InterfaceControl">
-					<Key type="Bool" time="0" value="true"/>
-					<Key type="Bool" time="0" value="false"/>
-					<Key type="Bool" time="0.2" value="false"/>
-				</Controller>-->
-				<!--<Controller type="Visibility" end="Pause" frame="$parent/UIContainer/FullScreenUpperContainer/NotificationsPanel/NotificationsContainer">
-					<Key type="Bool" time="0" value="true"/>
-					<Key type="Bool" time="0" value="false"/>
-					<Key type="Bool" time="0.2" value="false"/>
-				</Controller>-->
-				<Controller type="Fade" end="Pause" frame="$parent/UIContainer/FullScreenUpperContainer/NotificationsPanel/NotificationsContainer">
-					<Key type="Curve" time="0" value="255"/>
-					<Key type="Curve" time="0.2" value="0"/>
-				</Controller>
-				<Controller type="Fade" end="Pause" frame="$ObserverHeroSpecificBackgroundStatusContainer">
-					<Key type="Curve" time="0" value="255"/>
-					<Key type="Curve" time="0.2" value="0"/>
-				</Controller>
-			</Animation>
+			<Handle val="ToggleUI"/>
 		</Frame>
+			
+		<Animation name="AhllUiToggle">
+			<Event event="HideAll" action="DirectionForward,Play"/>
+			<Event event="ShowAll" action="DirectionReverse,Play"/>
+			
+			<Controller type="Anchor" end="Pause" side="Top" relative="true" frame="UIContainer">
+				<Key type="Curve" time="0" value="0" inout="Fast"/>
+				<Key type="Curve" time="0.01" value="9999" inout="Fast"/>
+			</Controller>
+			<Controller type="Anchor" end="Pause" side="Left" relative="true" frame="UIContainer">
+				<Key type="Curve" time="0" value="0" inout="Fast"/>
+				<Key type="Curve" time="0.01" value="9999" inout="Fast"/>
+			</Controller>
+			<Controller type="Anchor" end="Pause" side="Top" relative="true" frame="WorldPanel/UnitStatusPanel">
+				<Key type="Curve" time="0" value="0" inout="Fast"/>
+				<Key type="Curve" time="0.01" value="9999" inout="Fast"/>
+			</Controller>
+			<Controller type="Anchor" end="Pause" side="Left" relative="true" frame="WorldPanel/UnitStatusPanel">
+				<Key type="Curve" time="0" value="0" inout="Fast"/>
+				<Key type="Curve" time="0.01" value="9999" inout="Fast"/>
+			</Controller>
+			<Controller type="Anchor" end="Pause" side="Top" relative="true" frame="OverlayImage">
+				<Key type="Curve" time="0" value="0" inout="Fast"/>
+				<Key type="Curve" time="0.01" value="9999" inout="Fast"/>
+			</Controller>
+			<Controller type="Anchor" end="Pause" side="Left" relative="true" frame="OverlayImage">
+				<Key type="Curve" time="0" value="0" inout="Fast"/>
+				<Key type="Curve" time="0.01" value="9999" inout="Fast"/>
+			</Controller>
+			<Controller type="Anchor" end="Pause" side="Top" relative="true" frame="FadeImage">
+				<Key type="Curve" time="0" value="0" inout="Fast"/>
+				<Key type="Curve" time="0.01" value="9999" inout="Fast"/>
+			</Controller>
+			<Controller type="Anchor" end="Pause" side="Left" relative="true" frame="FadeImage">
+				<Key type="Curve" time="0" value="0" inout="Fast"/>
+				<Key type="Curve" time="0.01" value="9999" inout="Fast"/>
+			</Controller>
+			<Controller type="Anchor" end="Pause" side="Top" relative="true" frame="FadeImagePlayer">
+				<Key type="Curve" time="0" value="0" inout="Fast"/>
+				<Key type="Curve" time="0.01" value="9999" inout="Fast"/>
+			</Controller>
+			<Controller type="Anchor" end="Pause" side="Left" relative="true" frame="FadeImagePlayer">
+				<Key type="Curve" time="0" value="0" inout="Fast"/>
+				<Key type="Curve" time="0.01" value="9999" inout="Fast"/>
+			</Controller>
+		</Animation>
+		<Animation name="SomeUiToggle">
+			<Event event="HideSome" action="DirectionForward,Play"/>
+			<Event event="ShowSome" action="DirectionReverse,Play"/>
+			
+			<Controller type="Visibility" end="Pause" frame="UIContainer/ConsoleUIContainer/MinimapPanel">
+				<Key type="Bool" time="0" value="true"/>
+				<Key type="Bool" time="0" value="false"/>
+				<Key type="Bool" time="0.2" value="false"/>
+			</Controller>
+			<Controller type="Fade" end="Pause" frame="UIContainer/FullScreenUpperContainer/ObserverHeroOverviewPanel">
+				<Key type="Curve" time="0" value="255"/>
+				<Key type="Curve" time="0.2" value="0"/>
+			</Controller>
+			<!-- spawns my talent notifications <Controller type="Visibility" end="Pause" frame="UIContainer/FullScreenUpperContainer/ObserverHeroOverviewPanel">
+				<Key type="Bool" time="0" value="true"/>
+				<Key type="Bool" time="0" value="false"/>
+				<Key type="Bool" time="0.2" value="false"/>
+			</Controller>-->
+<!-- bugs with hidechat feature		<Controller type="Fade" end="Pause" frame="UIContainer/FullScreenUpperContainer/ChatDisplay">
+				<Key type="Curve" time="0" value="255"/>
+				<Key type="Curve" time="0.2" value="0"/>
+			</Controller> -->
+			<Controller type="Visibility" end="Pause" frame="UIContainer/FullScreenUpperContainer/ChatDisplay">
+				<Key type="Bool" time="0" value="true"/>
+				<Key type="Bool" time="0" value="false"/>
+				<Key type="Bool" time="0.2" value="false"/>
+			</Controller>
+			<Controller type="Fade" end="Pause" frame="UIContainer/FullScreenUpperContainer/TeamPanel/TeamScorePanel">
+				<Key type="Curve" time="0" value="255"/>
+				<Key type="Curve" time="0.2" value="0"/>
+			</Controller>
+			<Controller type="Visibility" end="Pause" frame="UIContainer/FullScreenUpperContainer/TeamPanel/TeamScorePanel">
+				<Key type="Bool" time="0" value="true"/>
+				<Key type="Bool" time="0" value="false"/>
+				<Key type="Bool" time="0.2" value="false"/>
+			</Controller>
+			<!--<Controller type="Fade" end="Pause" frame="UIContainer/ConsoleUIContainer/LeaderPanelBottom">
+				<Key type="Curve" time="0" value="255"/>
+				<Key type="Curve" time="0.2" value="0"/>
+			</Controller>
+			<Controller type="Visibility" end="Pause" frame="UIContainer/ConsoleUIContainer/LeaderPanelBottom">
+				<Key type="Bool" time="0" value="true"/>
+				<Key type="Bool" time="0" value="false"/>
+				<Key type="Bool" time="0.2" value="false"/>
+			</Controller>-->
+			<Controller type="Fade" end="Pause" frame="UIContainer/ConsoleUIContainer/SelectionUnitStatusPanel">
+				<Key type="Curve" time="0" value="255"/>
+				<Key type="Curve" time="0.2" value="0"/>
+			</Controller>
+<!--				<Controller type="Visibility" end="Pause" frame="UIContainer/ConsoleUIContainer/SelectionUnitStatusPanel">
+				<Key type="Bool" time="0" value="true"/>
+				<Key type="Bool" time="0" value="false"/>
+				<Key type="Bool" time="0.2" value="false"/>
+			</Controller> -->
+			<Controller type="Visibility" end="Pause" frame="UIContainer/ConsoleUIContainer/SelectionUnitStatusPanel/UnitStatusFrame0/HealthEnergyContainer">
+				<Key type="Bool" time="0" value="true"/>
+				<Key type="Bool" time="0" value="false"/>
+				<Key type="Bool" time="0.2" value="false"/>
+			</Controller>
+			<Controller type="Fade" end="Pause" frame="UIContainer/ConsoleUIContainer/CommandPanel">
+				<Key type="Curve" time="0" value="255"/>
+				<Key type="Curve" time="0.2" value="0"/>
+			</Controller>
+<!--bugs			<Controller type="Visibility" end="Pause" frame="UIContainer/ConsoleUIContainer/CommandPanel">
+				<Key type="Bool" time="0" value="true"/>
+				<Key type="Bool" time="0" value="false"/>
+				<Key type="Bool" time="0.2" value="false"/>
+			</Controller> -->
+			<Controller type="Fade" end="Pause" frame="UIContainer/ConsoleUIContainer/InventoryPanel">
+				<Key type="Curve" time="0" value="255"/>
+				<Key type="Curve" time="0.2" value="0"/>
+			</Controller>
+			<Controller type="Visibility" end="Pause" frame="UIContainer/ConsoleUIContainer/InventoryPanel">
+				<Key type="Bool" time="0" value="true"/>
+				<Key type="Bool" time="0" value="false"/>
+				<Key type="Bool" time="0.2" value="false"/>
+			</Controller>
+			<Controller type="Fade" end="Pause" frame="UIContainer/ConsoleUIContainer/KhaldorPanel/SelectionUnitStatusPanelSingle">
+				<Key type="Curve" time="0" value="255"/>
+				<Key type="Curve" time="0.2" value="0"/>
+			</Controller>
+			<Controller type="Visibility" end="Pause" frame="UIContainer/ConsoleUIContainer/KhaldorPanel/SelectionUnitStatusPanelSingle">
+				<Key type="Bool" time="0" value="true"/>
+				<Key type="Bool" time="0" value="false"/>
+				<Key type="Bool" time="0.2" value="false"/>
+			</Controller>
+			<Controller type="Fade" end="Pause" frame="UIContainer/ConsoleUIContainer/TopPanel">
+				<Key type="Curve" time="0" value="255"/>
+				<Key type="Curve" time="0.2" value="0"/>
+			</Controller>
+			<Controller type="Visibility" end="Pause" frame="UIContainer/ConsoleUIContainer/TopPanel">
+				<Key type="Bool" time="0" value="true"/>
+				<Key type="Bool" time="0" value="false"/>
+				<Key type="Bool" time="0.2" value="false"/>
+			</Controller>
+			<Controller type="Fade" end="Pause" frame="UIContainer/ConsoleUIContainer/MapMechanicPanel">
+				<Key type="Curve" time="0" value="255"/>
+				<Key type="Curve" time="0.2" value="0"/>
+			</Controller>
+			<Controller type="Visibility" end="Pause" frame="UIContainer/ConsoleUIContainer/MapMechanicPanel">
+				<Key type="Bool" time="0" value="true"/>
+				<Key type="Bool" time="0" value="false"/>
+				<Key type="Bool" time="0.2" value="false"/>
+			</Controller>
+			<Controller type="Fade" end="Pause" frame="UIContainer/FullscreenUpperContainer/ObserverPanelMovingContainer">
+				<Key type="Curve" time="0" value="255"/>
+				<Key type="Curve" time="0.2" value="0"/>
+			</Controller>
+<!--				<Controller type="Visibility" end="Pause" frame="UIContainer/FullscreenUpperContainer/ObserverPanelMovingContainer">
+				<Key type="Bool" time="0" value="true"/>
+				<Key type="Bool" time="0" value="false"/>
+				<Key type="Bool" time="0.2" value="false"/>
+			</Controller>-->
+			<Controller type="Fade" end="Pause" frame="UIContainer/FullScreenUpperContainer/InterfaceControl">
+				<Key type="Curve" time="0" value="255"/>
+				<Key type="Curve" time="0.2" value="0"/>
+			</Controller>
+			<!--Controller type="Visibility" end="Pause" frame="UIContainer/FullScreenUpperContainer/InterfaceControl">
+				<Key type="Bool" time="0" value="true"/>
+				<Key type="Bool" time="0" value="false"/>
+				<Key type="Bool" time="0.2" value="false"/>
+			</Controller>-->
+			<!--<Controller type="Visibility" end="Pause" frame="UIContainer/FullScreenUpperContainer/NotificationsPanel/NotificationsContainer">
+				<Key type="Bool" time="0" value="true"/>
+				<Key type="Bool" time="0" value="false"/>
+				<Key type="Bool" time="0.2" value="false"/>
+			</Controller>-->
+			<Controller type="Fade" end="Pause" frame="UIContainer/FullScreenUpperContainer/NotificationsPanel/NotificationsContainer">
+				<Key type="Curve" time="0" value="255"/>
+				<Key type="Curve" time="0.2" value="0"/>
+			</Controller>
+			<Controller type="Fade" end="Pause" frame="$ObserverHeroSpecificBackgroundStatusContainer">
+				<Key type="Curve" time="0" value="255"/>
+				<Key type="Curve" time="0.2" value="0"/>
+			</Controller>
+			<Controller type="Fade" end="Pause" frame="$HeroSpecificStatusContainer">
+				<Key type="Curve" time="0" value="255"/>
+				<Key type="Curve" time="0.2" value="0"/>
+			</Controller>
+			<Controller type="Fade" end="Pause" frame="$KillLogPanel">
+				<Key type="Curve" time="0" value="255"/>
+				<Key type="Curve" time="0.2" value="0"/>
+			</Controller>
+			<Controller type="Fade" end="Pause" frame="UIContainer/ConsolePanel">
+				<Key type="Curve" time="0" value="255"/>
+				<Key type="Curve" time="0.2" value="0"/>
+			</Controller>
+			<Controller type="Visibility" end="Pause" frame="$GameUI_HeroTalentTreeSelectionPanel/CustomBackgroundImage">
+				<Key type="Bool" time="0" value="true"/>
+				<Key type="Bool" time="0" value="false"/>
+				<Key type="Bool" time="0.2" value="false"/>
+			</Controller>
+			<Controller type="Visibility" end="Pause" frame="$GameUI_HeroTalentTreeSelectionPanel/TalentTreePanel">
+				<Key type="Bool" time="0" value="true"/>
+				<Key type="Bool" time="0" value="false"/>
+				<Key type="Bool" time="0.2" value="false"/>
+			</Controller>
+			<Controller type="Visibility" end="Pause" frame="$LeftTeamXpBar">
+				<Key type="Bool" time="0" value="true"/>
+				<Key type="Bool" time="0" value="false"/>
+				<Key type="Bool" time="0.2" value="false"/>
+			</Controller>
+			<Controller type="Visibility" end="Pause" frame="$RightTeamXpBar">
+				<Key type="Bool" time="0" value="true"/>
+				<Key type="Bool" time="0" value="false"/>
+				<Key type="Bool" time="0.2" value="false"/>
+			</Controller>
+		</Animation>
+
+		<StateGroup name="UiVisibilityController">
+			<DefaultState val="Show"/>
+			<State name="HideSome">
+				<When type="Property" frame="ToggleAllUI" visible="false"/>
+				<When type="Property" frame="ToggleUI" visible="true"/>
+				<Action type="SendEvent" frame="$this" event="ShowAll"/>
+				<Action type="SendEvent" frame="$this" event="HideSome"/>
+			</State>
+			<State name="HideAll">
+				<When type="Property" frame="ToggleAllUI" visible="true"/>
+				<Action type="SendEvent" frame="$this" event="HideSome"/>
+				<Action type="SendEvent" frame="$this" event="HideAll"/>
+			</State>
+			<State name="Show">
+				<Action type="SendEvent" frame="$this" event="ShowSome"/>
+				<Action type="SendEvent" frame="$this" event="ShowAll"/>
+			</State>
+		</StateGroup>
 		
 		<!-- TODO: needs to do something else than width... width doesn't seem to change anything for some reason
 		<Frame type="AspectRatioFrame" name="AspectRatioControl">
@@ -1207,17 +1201,11 @@
 		<AllyColor val="ff9204"/>
 		<EnemyColor val="ff9204"/>
 		
-		<StateGroup name="ColorOverride">
-			<DefaultState val="Purple"/>
-			<State name="Purple">
-				<When type="Option" colorblind="true"/>
-				<Action type="ApplyTemplate" template="_Ahli/DurationBar_Purple"/>
-			</State>
-			<State name="Orange">
-				<When type="Option" colorblind="false"/>
-				<Action type="ApplyTemplate" template="_Ahli/DurationBar_Orange"/>
-			</State>
-		</StateGroup>
+
+				<Controller type="Fade" end="Pause" frame="$parent/UIContainer/ConsolePanel">
+					<Key type="Curve" time="0" value="255"/>
+					<Key type="Curve" time="0.2" value="0"/>
+				</Controller>
 	</Frame>
 	
 	<!-- FIX: KillLog victim border colors -->

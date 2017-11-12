@@ -125,6 +125,7 @@
 				<Anchor side="Left" relative="$parent" pos="Min" offset="0"/> <!-- Left anchor controlled by stategroup -->
 				<Handle val="PortraitPanel"/>
 				<Visible val="true"/>
+				
 				<Animation name="KeepVisible">
 					<Event event="OnHidden" action="Reset,Play"/>
 					<Controller type="Visibility" end="Pause">
@@ -141,6 +142,10 @@
 					</State>
 					<State name="OffScreen_replayJump">
 						<When type="Property" frame="$ReplayPanel/PreviewMinimapFrame" visible="true"/>
+						<Action type="SetAnchor" frame="$PortraitPanel" undo="False" side="Left" relative="$parent" pos="Min" offset="-9999"/>
+					</State>
+					<State name="OffScreen_hideAllUI">
+						<When type="Property" frame="$ToggleAllUI" visible="true"/>
 						<Action type="SetAnchor" frame="$PortraitPanel" undo="False" side="Left" relative="$parent" pos="Min" offset="-9999"/>
 					</State>
 					<State name="Other">
@@ -276,11 +281,13 @@
 		<!-- one area for hero specific UI -->
 		<!-- @Override -->
 		<Frame type="HeroSpecificContainerPanel" name="HeroSpecificStatusContainer">
+			<Handle val="HeroSpecificStatusContainer"/>
 			<!--<Visible val="false"/>-->
 		</Frame>
 		<!-- hero specific fullscreen UI -->
 		<!-- @Override -->
 		<Frame type="Frame" name="HeroSpecificFullUIModContainer">
+			<Handle val="HeroSpecificFullUIModContainer"/>
 			<!--<Visible val="false"/>-->
 		</Frame>
 		
@@ -2361,7 +2368,7 @@
 					<Anchor side="Left" relative="$parent/AbilityArmorImage" pos="Min" offset="2"/>
 					<Anchor side="Right" relative="$parent/AbilityArmorImage" pos="Max" offset="2"/>
 					<Anchor side="Bottom" relative="$parent/AbilityArmorImage" pos="Max" offset="0"/>
-					<CurrentValue val="{$this/ArmorValue/@CurrentArmor}"/>
+					<CurrentValue val="{$this/ArmorValue/@CurrentAbilityArmor}"/>
 					<MaxValue val="1000"/>
 					<HideMax val="True"/>
 					<ShowGrouping val="true"/>
@@ -2379,7 +2386,7 @@
 					<StateGroup name="ValueCheck">
 						<DefaultState val="other"/>
 						<State name="isZero">
-							<When type="Property" frame="$this/ArmorValue" CurrentArmor="0"/>
+							<When type="Property" frame="$this/ArmorValue" CurrentAbilityArmor="0"/>
 							<Action type="SetProperty" frame="$parent/AbilityArmorImage" visible="false"/>
 							<Action type="SetProperty" frame="$this/StatusLabel" visible="false"/>
 						</State>
@@ -2408,7 +2415,7 @@
 					<Anchor side="Left" relative="$parent/PhysicalHeroArmorImage" pos="Min" offset="2"/>
 					<Anchor side="Right" relative="$parent/PhysicalHeroArmorImage" pos="Max" offset="2"/>
 					<Anchor side="Bottom" relative="$parent/PhysicalHeroArmorImage" pos="Max" offset="0"/>
-					<CurrentValue val="{$this/ArmorValue/@CurrentArmor}"/>
+					<CurrentValue val="{$this/ArmorValue/@CurrentPhysicalArmor}"/>
 					<MaxValue val="1000"/>
 					<HideMax val="True"/>
 					<ShowGrouping val="true"/>
@@ -2426,7 +2433,7 @@
 					<StateGroup name="ValueCheck">
 						<DefaultState val="other"/>
 						<State name="isZero">
-							<When type="Property" frame="$this/ArmorValue" CurrentArmor="0"/>
+							<When type="Property" frame="$this/ArmorValue" CurrentPhysicalArmor="0"/>
 							<Action type="SetProperty" frame="$parent/PhysicalHeroArmorImage" visible="false"/>
 							<Action type="SetProperty" frame="$this/StatusLabel" visible="false"/>
 						</State>
@@ -2543,8 +2550,8 @@
 				
 				<!-- Hero-specific UI when selected -->
 				<!-- HeroSpecificUIArray Location="Status" -->
-				<Frame type="Frame" name="HeroSpecificStatusContainer">
-					<Anchor relative="$GameUI/UIContainer/ConsoleUIContainer/HeroSpecificStatusContainer"/>
+	<!--			<Frame type="Frame" name="HeroSpecificStatusContainer">
+					<Anchor relative="$GameUI/UIContainer/ConsoleUIContainer/HeroSpecificStatusContainer"/>-->
 					
 					<!--<Frame type="SelectionUnitStatusPanel" name="Tyrande" template="Tyrande/TyrandeFrame">
 					</Frame>
@@ -2795,8 +2802,9 @@
 					<!-- game does not use it
 					<Frame type="SelectionUnitStatusPanel" name="Falstad" template="Falstad/FalstadFrame">
 					</Frame>-->
-
-				</Frame>
+				<!--</Frame>-->
+				
+				
 				<!-- stats panel -->
 				<Frame type="ToggleControl" name="ToggleUnitStatsPanel">
 					<Anchor relative="$parent"/>
@@ -3266,7 +3274,7 @@
 					</Frame>
 					<Frame type="UnitStatusLabel" name="AbilityArmorValueLabel" template="HeroCharacterSheetPanel/UnitStatusLabelTemplate">
 						<Anchor side="Top" relative="$parent/AbilityArmorLabel" pos="Min" offset="0"/>
-						<CurrentValue val="{$this/ArmorValue/@CurrentArmor}"/>
+						<CurrentValue val="{$this/ArmorValue/@CurrentAbilityArmor}"/>
 						<MaxValue val="1000"/>
 						<HideMax val="True"/>
 						<Frame type="Label" name="StatusLabel">
@@ -3280,7 +3288,7 @@
 						<StateGroup name="ValueCheck">
 							<DefaultState val="other"/>
 							<State name="isZero">
-								<When type="Property" frame="$this/ArmorValue" CurrentArmor="0"/>
+								<When type="Property" frame="$this/ArmorValue" CurrentAbilityArmor="0"/>
 								<Action type="SetProperty" frame="$parent/AbilityArmorLabel" visible="false"/>
 								<Action type="SetProperty" frame="$this/StatusLabel" visible="false"/>
 							</State>
@@ -3300,7 +3308,7 @@
 					</Frame>
 					<Frame type="UnitStatusLabel" name="PhysicalArmorValueLabel" template="HeroCharacterSheetPanel/UnitStatusLabelTemplate">
 						<Anchor side="Top" relative="$parent/PhysicalArmorLabel" pos="Min" offset="0"/>
-						<CurrentValue val="{$this/ArmorValue/@CurrentArmor}"/>
+						<CurrentValue val="{$this/ArmorValue/@CurrentPhysicalArmor}"/>
 						<MaxValue val="1000"/>
 						<HideMax val="True"/>
 						<Frame type="Label" name="StatusLabel">
@@ -3314,7 +3322,7 @@
 						<StateGroup name="ValueCheck">
 							<DefaultState val="other"/>
 							<State name="isZero">
-								<When type="Property" frame="$this/ArmorValue" CurrentArmor="0"/>
+								<When type="Property" frame="$this/ArmorValue" CurrentPhysicalArmor="0"/>
 								<Action type="SetProperty" frame="$parent/PhysicalArmorLabel" visible="false"/>
 								<Action type="SetProperty" frame="$this/StatusLabel" visible="false"/>
 							</State>
@@ -3333,7 +3341,7 @@
 					</Frame>
 					<Frame type="UnitStatusLabel" name="PhysicalArmorHeroOnlyValueLabel" template="HeroCharacterSheetPanel/UnitStatusLabelTemplate">
 						<Anchor side="Top" relative="$parent/PhysicalArmorHeroOnlyLabel" pos="Min" offset="0"/>
-						<CurrentValue val="{$this/ArmorValue/@CurrentArmor}"/>
+						<CurrentValue val="{$this/ArmorValue/@CurrentPhysicalArmor}"/>
 						<MaxValue val="1000"/>
 						<HideMax val="True"/>
 						<Frame type="Label" name="StatusLabel">
@@ -3347,463 +3355,463 @@
 						<StateGroup name="ValueCheck">
 							<DefaultState val="other"/>
 							<State name="isZero">
-								<When type="Property" frame="$this/ArmorValue" CurrentArmor="0"/>
+								<When type="Property" frame="$this/ArmorValue" CurrentPhysicalArmor="0"/>
 								<Action type="SetProperty" frame="$parent/PhysicalArmorHeroOnlyLabel" visible="false"/>
 								<Action type="SetProperty" frame="$this/StatusLabel" visible="false"/>
 							</State>
 							<!--<State name="equalToGenericArmor">
-								<When type="Property" frame="$this/ArmorValue" operator="notEqual" CurrentArmor="0"/>
-								<When type="Property" frame="$this/ArmorValue" operator="Equal" CurrentArmor="{($parent/PhysicalArmorValueLabel/ArmorValue/@CurrentArmor)}"/>
+								<When type="Property" frame="$this/ArmorValue" operator="notEqual" CurrentPhysicalArmor="0"/>
+								<When type="Property" frame="$this/ArmorValue" operator="Equal" CurrentPhysicalArmor="{($parent/PhysicalArmorValueLabel/ArmorValue/@CurrentPhysicalArmor)}"/>
 								<Action type="SetProperty" frame="$parent/PhysicalArmorHeroOnlyLabel" visible="false"/>
 								<Action type="SetProperty" frame="$this/StatusLabel" visible="false"/>
 							</State>-->
 							<State name="equalToGenericArmor1">
-								<When type="Property" frame="$this/ArmorValue"								CurrentArmor="1"/>
-								<When type="Property" frame="$parent/PhysicalArmorValueLabel/ArmorValue"	CurrentArmor="1"/>
+								<When type="Property" frame="$this/ArmorValue"								CurrentPhysicalArmor="1"/>
+								<When type="Property" frame="$parent/PhysicalArmorValueLabel/ArmorValue"	CurrentPhysicalArmor="1"/>
 								<Action type="SetProperty" frame="$parent/PhysicalArmorHeroOnlyLabel" visible="false"/>
 								<Action type="SetProperty" frame="$this/StatusLabel" visible="false"/>
 							</State>
 							<State name="equalToGenericArmor2">
-								<When type="Property" frame="$this/ArmorValue"								CurrentArmor="2"/>
-								<When type="Property" frame="$parent/PhysicalArmorValueLabel/ArmorValue"	CurrentArmor="2"/>
+								<When type="Property" frame="$this/ArmorValue"								CurrentPhysicalArmor="2"/>
+								<When type="Property" frame="$parent/PhysicalArmorValueLabel/ArmorValue"	CurrentPhysicalArmor="2"/>
 								<Action type="SetProperty" frame="$parent/PhysicalArmorHeroOnlyLabel" visible="false"/>
 								<Action type="SetProperty" frame="$this/StatusLabel" visible="false"/>
 							</State>
 							<State name="equalToGenericArmor3">
-								<When type="Property" frame="$this/ArmorValue"								CurrentArmor="3"/>
-								<When type="Property" frame="$parent/PhysicalArmorValueLabel/ArmorValue"	CurrentArmor="3"/>
+								<When type="Property" frame="$this/ArmorValue"								CurrentPhysicalArmor="3"/>
+								<When type="Property" frame="$parent/PhysicalArmorValueLabel/ArmorValue"	CurrentPhysicalArmor="3"/>
 								<Action type="SetProperty" frame="$parent/PhysicalArmorHeroOnlyLabel" visible="false"/>
 								<Action type="SetProperty" frame="$this/StatusLabel" visible="false"/>
 							</State>
 							<State name="equalToGenericArmor4">
-								<When type="Property" frame="$this/ArmorValue"								CurrentArmor="4"/>
-								<When type="Property" frame="$parent/PhysicalArmorValueLabel/ArmorValue"	CurrentArmor="4"/>
+								<When type="Property" frame="$this/ArmorValue"								CurrentPhysicalArmor="4"/>
+								<When type="Property" frame="$parent/PhysicalArmorValueLabel/ArmorValue"	CurrentPhysicalArmor="4"/>
 								<Action type="SetProperty" frame="$parent/PhysicalArmorHeroOnlyLabel" visible="false"/>
 								<Action type="SetProperty" frame="$this/StatusLabel" visible="false"/>
 							</State>
 							<State name="equalToGenericArmor5">
-								<When type="Property" frame="$this/ArmorValue"								CurrentArmor="5"/>
-								<When type="Property" frame="$parent/PhysicalArmorValueLabel/ArmorValue"	CurrentArmor="5"/>
+								<When type="Property" frame="$this/ArmorValue"								CurrentPhysicalArmor="5"/>
+								<When type="Property" frame="$parent/PhysicalArmorValueLabel/ArmorValue"	CurrentPhysicalArmor="5"/>
 								<Action type="SetProperty" frame="$parent/PhysicalArmorHeroOnlyLabel" visible="false"/>
 								<Action type="SetProperty" frame="$this/StatusLabel" visible="false"/>
 							</State>
 							<State name="equalToGenericArmor6">
-								<When type="Property" frame="$this/ArmorValue"								CurrentArmor="6"/>
-								<When type="Property" frame="$parent/PhysicalArmorValueLabel/ArmorValue"	CurrentArmor="6"/>
+								<When type="Property" frame="$this/ArmorValue"								CurrentPhysicalArmor="6"/>
+								<When type="Property" frame="$parent/PhysicalArmorValueLabel/ArmorValue"	CurrentPhysicalArmor="6"/>
 								<Action type="SetProperty" frame="$parent/PhysicalArmorHeroOnlyLabel" visible="false"/>
 								<Action type="SetProperty" frame="$this/StatusLabel" visible="false"/>
 							</State>
 							<State name="equalToGenericArmor7">
-								<When type="Property" frame="$this/ArmorValue"								CurrentArmor="7"/>
-								<When type="Property" frame="$parent/PhysicalArmorValueLabel/ArmorValue"	CurrentArmor="7"/>
+								<When type="Property" frame="$this/ArmorValue"								CurrentPhysicalArmor="7"/>
+								<When type="Property" frame="$parent/PhysicalArmorValueLabel/ArmorValue"	CurrentPhysicalArmor="7"/>
 								<Action type="SetProperty" frame="$parent/PhysicalArmorHeroOnlyLabel" visible="false"/>
 								<Action type="SetProperty" frame="$this/StatusLabel" visible="false"/>
 							</State>
 							<State name="equalToGenericArmor8">
-								<When type="Property" frame="$this/ArmorValue"								CurrentArmor="8"/>
-								<When type="Property" frame="$parent/PhysicalArmorValueLabel/ArmorValue"	CurrentArmor="8"/>
+								<When type="Property" frame="$this/ArmorValue"								CurrentPhysicalArmor="8"/>
+								<When type="Property" frame="$parent/PhysicalArmorValueLabel/ArmorValue"	CurrentPhysicalArmor="8"/>
 								<Action type="SetProperty" frame="$parent/PhysicalArmorHeroOnlyLabel" visible="false"/>
 								<Action type="SetProperty" frame="$this/StatusLabel" visible="false"/>
 							</State>
 							<State name="equalToGenericArmor9">
-								<When type="Property" frame="$this/ArmorValue"								CurrentArmor="9"/>
-								<When type="Property" frame="$parent/PhysicalArmorValueLabel/ArmorValue"	CurrentArmor="9"/>
+								<When type="Property" frame="$this/ArmorValue"								CurrentPhysicalArmor="9"/>
+								<When type="Property" frame="$parent/PhysicalArmorValueLabel/ArmorValue"	CurrentPhysicalArmor="9"/>
 								<Action type="SetProperty" frame="$parent/PhysicalArmorHeroOnlyLabel" visible="false"/>
 								<Action type="SetProperty" frame="$this/StatusLabel" visible="false"/>
 							</State>
 							<State name="equalToGenericArmor10">
-								<When type="Property" frame="$this/ArmorValue"								CurrentArmor="10"/>
-								<When type="Property" frame="$parent/PhysicalArmorValueLabel/ArmorValue"	CurrentArmor="10"/>
+								<When type="Property" frame="$this/ArmorValue"								CurrentPhysicalArmor="10"/>
+								<When type="Property" frame="$parent/PhysicalArmorValueLabel/ArmorValue"	CurrentPhysicalArmor="10"/>
 								<Action type="SetProperty" frame="$parent/PhysicalArmorHeroOnlyLabel" visible="false"/>
 								<Action type="SetProperty" frame="$this/StatusLabel" visible="false"/>
 							</State>
 							<State name="equalToGenericArmor11">
-								<When type="Property" frame="$this/ArmorValue"								CurrentArmor="11"/>
-								<When type="Property" frame="$parent/PhysicalArmorValueLabel/ArmorValue"	CurrentArmor="11"/>
+								<When type="Property" frame="$this/ArmorValue"								CurrentPhysicalArmor="11"/>
+								<When type="Property" frame="$parent/PhysicalArmorValueLabel/ArmorValue"	CurrentPhysicalArmor="11"/>
 								<Action type="SetProperty" frame="$parent/PhysicalArmorHeroOnlyLabel" visible="false"/>
 								<Action type="SetProperty" frame="$this/StatusLabel" visible="false"/>
 							</State>
 							<State name="equalToGenericArmor12">
-								<When type="Property" frame="$this/ArmorValue"								CurrentArmor="12"/>
-								<When type="Property" frame="$parent/PhysicalArmorValueLabel/ArmorValue"	CurrentArmor="12"/>
+								<When type="Property" frame="$this/ArmorValue"								CurrentPhysicalArmor="12"/>
+								<When type="Property" frame="$parent/PhysicalArmorValueLabel/ArmorValue"	CurrentPhysicalArmor="12"/>
 								<Action type="SetProperty" frame="$parent/PhysicalArmorHeroOnlyLabel" visible="false"/>
 								<Action type="SetProperty" frame="$this/StatusLabel" visible="false"/>
 							</State>
 							<State name="equalToGenericArmor13">
-								<When type="Property" frame="$this/ArmorValue"								CurrentArmor="13"/>
-								<When type="Property" frame="$parent/PhysicalArmorValueLabel/ArmorValue"	CurrentArmor="13"/>
+								<When type="Property" frame="$this/ArmorValue"								CurrentPhysicalArmor="13"/>
+								<When type="Property" frame="$parent/PhysicalArmorValueLabel/ArmorValue"	CurrentPhysicalArmor="13"/>
 								<Action type="SetProperty" frame="$parent/PhysicalArmorHeroOnlyLabel" visible="false"/>
 								<Action type="SetProperty" frame="$this/StatusLabel" visible="false"/>
 							</State>
 							<State name="equalToGenericArmor14">
-								<When type="Property" frame="$this/ArmorValue"								CurrentArmor="14"/>
-								<When type="Property" frame="$parent/PhysicalArmorValueLabel/ArmorValue"	CurrentArmor="14"/>
+								<When type="Property" frame="$this/ArmorValue"								CurrentPhysicalArmor="14"/>
+								<When type="Property" frame="$parent/PhysicalArmorValueLabel/ArmorValue"	CurrentPhysicalArmor="14"/>
 								<Action type="SetProperty" frame="$parent/PhysicalArmorHeroOnlyLabel" visible="false"/>
 								<Action type="SetProperty" frame="$this/StatusLabel" visible="false"/>
 							</State>
 							<State name="equalToGenericArmor15">
-								<When type="Property" frame="$this/ArmorValue"								CurrentArmor="15"/>
-								<When type="Property" frame="$parent/PhysicalArmorValueLabel/ArmorValue"	CurrentArmor="15"/>
+								<When type="Property" frame="$this/ArmorValue"								CurrentPhysicalArmor="15"/>
+								<When type="Property" frame="$parent/PhysicalArmorValueLabel/ArmorValue"	CurrentPhysicalArmor="15"/>
 								<Action type="SetProperty" frame="$parent/PhysicalArmorHeroOnlyLabel" visible="false"/>
 								<Action type="SetProperty" frame="$this/StatusLabel" visible="false"/>
 							</State>
 							<State name="equalToGenericArmor16">
-								<When type="Property" frame="$this/ArmorValue"								CurrentArmor="16"/>
-								<When type="Property" frame="$parent/PhysicalArmorValueLabel/ArmorValue"	CurrentArmor="16"/>
+								<When type="Property" frame="$this/ArmorValue"								CurrentPhysicalArmor="16"/>
+								<When type="Property" frame="$parent/PhysicalArmorValueLabel/ArmorValue"	CurrentPhysicalArmor="16"/>
 								<Action type="SetProperty" frame="$parent/PhysicalArmorHeroOnlyLabel" visible="false"/>
 								<Action type="SetProperty" frame="$this/StatusLabel" visible="false"/>
 							</State>
 							<State name="equalToGenericArmor17">
-								<When type="Property" frame="$this/ArmorValue"								CurrentArmor="17"/>
-								<When type="Property" frame="$parent/PhysicalArmorValueLabel/ArmorValue"	CurrentArmor="17"/>
+								<When type="Property" frame="$this/ArmorValue"								CurrentPhysicalArmor="17"/>
+								<When type="Property" frame="$parent/PhysicalArmorValueLabel/ArmorValue"	CurrentPhysicalArmor="17"/>
 								<Action type="SetProperty" frame="$parent/PhysicalArmorHeroOnlyLabel" visible="false"/>
 								<Action type="SetProperty" frame="$this/StatusLabel" visible="false"/>
 							</State>
 							<State name="equalToGenericArmor18">
-								<When type="Property" frame="$this/ArmorValue"								CurrentArmor="18"/>
-								<When type="Property" frame="$parent/PhysicalArmorValueLabel/ArmorValue"	CurrentArmor="18"/>
+								<When type="Property" frame="$this/ArmorValue"								CurrentPhysicalArmor="18"/>
+								<When type="Property" frame="$parent/PhysicalArmorValueLabel/ArmorValue"	CurrentPhysicalArmor="18"/>
 								<Action type="SetProperty" frame="$parent/PhysicalArmorHeroOnlyLabel" visible="false"/>
 								<Action type="SetProperty" frame="$this/StatusLabel" visible="false"/>
 							</State>
 							<State name="equalToGenericArmor19">
-								<When type="Property" frame="$this/ArmorValue"								CurrentArmor="19"/>
-								<When type="Property" frame="$parent/PhysicalArmorValueLabel/ArmorValue"	CurrentArmor="19"/>
+								<When type="Property" frame="$this/ArmorValue"								CurrentPhysicalArmor="19"/>
+								<When type="Property" frame="$parent/PhysicalArmorValueLabel/ArmorValue"	CurrentPhysicalArmor="19"/>
 								<Action type="SetProperty" frame="$parent/PhysicalArmorHeroOnlyLabel" visible="false"/>
 								<Action type="SetProperty" frame="$this/StatusLabel" visible="false"/>
 							</State>
 							<State name="equalToGenericArmor20">
-								<When type="Property" frame="$this/ArmorValue"								CurrentArmor="20"/>
-								<When type="Property" frame="$parent/PhysicalArmorValueLabel/ArmorValue"	CurrentArmor="20"/>
+								<When type="Property" frame="$this/ArmorValue"								CurrentPhysicalArmor="20"/>
+								<When type="Property" frame="$parent/PhysicalArmorValueLabel/ArmorValue"	CurrentPhysicalArmor="20"/>
 								<Action type="SetProperty" frame="$parent/PhysicalArmorHeroOnlyLabel" visible="false"/>
 								<Action type="SetProperty" frame="$this/StatusLabel" visible="false"/>
 							</State>
 							<State name="equalToGenericArmor21">
-								<When type="Property" frame="$this/ArmorValue"								CurrentArmor="21"/>
-								<When type="Property" frame="$parent/PhysicalArmorValueLabel/ArmorValue"	CurrentArmor="21"/>
+								<When type="Property" frame="$this/ArmorValue"								CurrentPhysicalArmor="21"/>
+								<When type="Property" frame="$parent/PhysicalArmorValueLabel/ArmorValue"	CurrentPhysicalArmor="21"/>
 								<Action type="SetProperty" frame="$parent/PhysicalArmorHeroOnlyLabel" visible="false"/>
 								<Action type="SetProperty" frame="$this/StatusLabel" visible="false"/>
 							</State>
 							<State name="equalToGenericArmor22">
-								<When type="Property" frame="$this/ArmorValue"								CurrentArmor="22"/>
-								<When type="Property" frame="$parent/PhysicalArmorValueLabel/ArmorValue"	CurrentArmor="22"/>
+								<When type="Property" frame="$this/ArmorValue"								CurrentPhysicalArmor="22"/>
+								<When type="Property" frame="$parent/PhysicalArmorValueLabel/ArmorValue"	CurrentPhysicalArmor="22"/>
 								<Action type="SetProperty" frame="$parent/PhysicalArmorHeroOnlyLabel" visible="false"/>
 								<Action type="SetProperty" frame="$this/StatusLabel" visible="false"/>
 							</State>
 							<State name="equalToGenericArmor23">
-								<When type="Property" frame="$this/ArmorValue"								CurrentArmor="23"/>
-								<When type="Property" frame="$parent/PhysicalArmorValueLabel/ArmorValue"	CurrentArmor="23"/>
+								<When type="Property" frame="$this/ArmorValue"								CurrentPhysicalArmor="23"/>
+								<When type="Property" frame="$parent/PhysicalArmorValueLabel/ArmorValue"	CurrentPhysicalArmor="23"/>
 								<Action type="SetProperty" frame="$parent/PhysicalArmorHeroOnlyLabel" visible="false"/>
 								<Action type="SetProperty" frame="$this/StatusLabel" visible="false"/>
 							</State>
 							<State name="equalToGenericArmor24">
-								<When type="Property" frame="$this/ArmorValue"								CurrentArmor="24"/>
-								<When type="Property" frame="$parent/PhysicalArmorValueLabel/ArmorValue"	CurrentArmor="24"/>
+								<When type="Property" frame="$this/ArmorValue"								CurrentPhysicalArmor="24"/>
+								<When type="Property" frame="$parent/PhysicalArmorValueLabel/ArmorValue"	CurrentPhysicalArmor="24"/>
 								<Action type="SetProperty" frame="$parent/PhysicalArmorHeroOnlyLabel" visible="false"/>
 								<Action type="SetProperty" frame="$this/StatusLabel" visible="false"/>
 							</State>
 							<State name="equalToGenericArmor25">
-								<When type="Property" frame="$this/ArmorValue"								CurrentArmor="25"/>
-								<When type="Property" frame="$parent/PhysicalArmorValueLabel/ArmorValue"	CurrentArmor="25"/>
+								<When type="Property" frame="$this/ArmorValue"								CurrentPhysicalArmor="25"/>
+								<When type="Property" frame="$parent/PhysicalArmorValueLabel/ArmorValue"	CurrentPhysicalArmor="25"/>
 								<Action type="SetProperty" frame="$parent/PhysicalArmorHeroOnlyLabel" visible="false"/>
 								<Action type="SetProperty" frame="$this/StatusLabel" visible="false"/>
 							</State>
 							<State name="equalToGenericArmor26">
-								<When type="Property" frame="$this/ArmorValue"								CurrentArmor="26"/>
-								<When type="Property" frame="$parent/PhysicalArmorValueLabel/ArmorValue"	CurrentArmor="26"/>
+								<When type="Property" frame="$this/ArmorValue"								CurrentPhysicalArmor="26"/>
+								<When type="Property" frame="$parent/PhysicalArmorValueLabel/ArmorValue"	CurrentPhysicalArmor="26"/>
 								<Action type="SetProperty" frame="$parent/PhysicalArmorHeroOnlyLabel" visible="false"/>
 								<Action type="SetProperty" frame="$this/StatusLabel" visible="false"/>
 							</State>
 							<State name="equalToGenericArmor27">
-								<When type="Property" frame="$this/ArmorValue"								CurrentArmor="27"/>
-								<When type="Property" frame="$parent/PhysicalArmorValueLabel/ArmorValue"	CurrentArmor="27"/>
+								<When type="Property" frame="$this/ArmorValue"								CurrentPhysicalArmor="27"/>
+								<When type="Property" frame="$parent/PhysicalArmorValueLabel/ArmorValue"	CurrentPhysicalArmor="27"/>
 								<Action type="SetProperty" frame="$parent/PhysicalArmorHeroOnlyLabel" visible="false"/>
 								<Action type="SetProperty" frame="$this/StatusLabel" visible="false"/>
 							</State>
 							<State name="equalToGenericArmor28">
-								<When type="Property" frame="$this/ArmorValue"								CurrentArmor="28"/>
-								<When type="Property" frame="$parent/PhysicalArmorValueLabel/ArmorValue"	CurrentArmor="28"/>
+								<When type="Property" frame="$this/ArmorValue"								CurrentPhysicalArmor="28"/>
+								<When type="Property" frame="$parent/PhysicalArmorValueLabel/ArmorValue"	CurrentPhysicalArmor="28"/>
 								<Action type="SetProperty" frame="$parent/PhysicalArmorHeroOnlyLabel" visible="false"/>
 								<Action type="SetProperty" frame="$this/StatusLabel" visible="false"/>
 							</State>
 							<State name="equalToGenericArmor29">
-								<When type="Property" frame="$this/ArmorValue"								CurrentArmor="29"/>
-								<When type="Property" frame="$parent/PhysicalArmorValueLabel/ArmorValue"	CurrentArmor="29"/>
+								<When type="Property" frame="$this/ArmorValue"								CurrentPhysicalArmor="29"/>
+								<When type="Property" frame="$parent/PhysicalArmorValueLabel/ArmorValue"	CurrentPhysicalArmor="29"/>
 								<Action type="SetProperty" frame="$parent/PhysicalArmorHeroOnlyLabel" visible="false"/>
 								<Action type="SetProperty" frame="$this/StatusLabel" visible="false"/>
 							</State>
 							<State name="equalToGenericArmor30">
-								<When type="Property" frame="$this/ArmorValue"								CurrentArmor="30"/>
-								<When type="Property" frame="$parent/PhysicalArmorValueLabel/ArmorValue"	CurrentArmor="30"/>
+								<When type="Property" frame="$this/ArmorValue"								CurrentPhysicalArmor="30"/>
+								<When type="Property" frame="$parent/PhysicalArmorValueLabel/ArmorValue"	CurrentPhysicalArmor="30"/>
 								<Action type="SetProperty" frame="$parent/PhysicalArmorHeroOnlyLabel" visible="false"/>
 								<Action type="SetProperty" frame="$this/StatusLabel" visible="false"/>
 							</State>
 							<State name="equalToGenericArmor31">
-								<When type="Property" frame="$this/ArmorValue"								CurrentArmor="31"/>
-								<When type="Property" frame="$parent/PhysicalArmorValueLabel/ArmorValue"	CurrentArmor="31"/>
+								<When type="Property" frame="$this/ArmorValue"								CurrentPhysicalArmor="31"/>
+								<When type="Property" frame="$parent/PhysicalArmorValueLabel/ArmorValue"	CurrentPhysicalArmor="31"/>
 								<Action type="SetProperty" frame="$parent/PhysicalArmorHeroOnlyLabel" visible="false"/>
 								<Action type="SetProperty" frame="$this/StatusLabel" visible="false"/>
 							</State>
 							<State name="equalToGenericArmor32">
-								<When type="Property" frame="$this/ArmorValue"								CurrentArmor="32"/>
-								<When type="Property" frame="$parent/PhysicalArmorValueLabel/ArmorValue"	CurrentArmor="32"/>
+								<When type="Property" frame="$this/ArmorValue"								CurrentPhysicalArmor="32"/>
+								<When type="Property" frame="$parent/PhysicalArmorValueLabel/ArmorValue"	CurrentPhysicalArmor="32"/>
 								<Action type="SetProperty" frame="$parent/PhysicalArmorHeroOnlyLabel" visible="false"/>
 								<Action type="SetProperty" frame="$this/StatusLabel" visible="false"/>
 							</State>
 							<State name="equalToGenericArmor33">
-								<When type="Property" frame="$this/ArmorValue"								CurrentArmor="33"/>
-								<When type="Property" frame="$parent/PhysicalArmorValueLabel/ArmorValue"	CurrentArmor="33"/>
+								<When type="Property" frame="$this/ArmorValue"								CurrentPhysicalArmor="33"/>
+								<When type="Property" frame="$parent/PhysicalArmorValueLabel/ArmorValue"	CurrentPhysicalArmor="33"/>
 								<Action type="SetProperty" frame="$parent/PhysicalArmorHeroOnlyLabel" visible="false"/>
 								<Action type="SetProperty" frame="$this/StatusLabel" visible="false"/>
 							</State>
 							<State name="equalToGenericArmor34">
-								<When type="Property" frame="$this/ArmorValue"								CurrentArmor="34"/>
-								<When type="Property" frame="$parent/PhysicalArmorValueLabel/ArmorValue"	CurrentArmor="34"/>
+								<When type="Property" frame="$this/ArmorValue"								CurrentPhysicalArmor="34"/>
+								<When type="Property" frame="$parent/PhysicalArmorValueLabel/ArmorValue"	CurrentPhysicalArmor="34"/>
 								<Action type="SetProperty" frame="$parent/PhysicalArmorHeroOnlyLabel" visible="false"/>
 								<Action type="SetProperty" frame="$this/StatusLabel" visible="false"/>
 							</State>
 							<State name="equalToGenericArmor35">
-								<When type="Property" frame="$this/ArmorValue"								CurrentArmor="35"/>
-								<When type="Property" frame="$parent/PhysicalArmorValueLabel/ArmorValue"	CurrentArmor="35"/>
+								<When type="Property" frame="$this/ArmorValue"								CurrentPhysicalArmor="35"/>
+								<When type="Property" frame="$parent/PhysicalArmorValueLabel/ArmorValue"	CurrentPhysicalArmor="35"/>
 								<Action type="SetProperty" frame="$parent/PhysicalArmorHeroOnlyLabel" visible="false"/>
 								<Action type="SetProperty" frame="$this/StatusLabel" visible="false"/>
 							</State>
 							<State name="equalToGenericArmor36">
-								<When type="Property" frame="$this/ArmorValue"								CurrentArmor="36"/>
-								<When type="Property" frame="$parent/PhysicalArmorValueLabel/ArmorValue"	CurrentArmor="36"/>
+								<When type="Property" frame="$this/ArmorValue"								CurrentPhysicalArmor="36"/>
+								<When type="Property" frame="$parent/PhysicalArmorValueLabel/ArmorValue"	CurrentPhysicalArmor="36"/>
 								<Action type="SetProperty" frame="$parent/PhysicalArmorHeroOnlyLabel" visible="false"/>
 								<Action type="SetProperty" frame="$this/StatusLabel" visible="false"/>
 							</State>
 							<State name="equalToGenericArmor37">
-								<When type="Property" frame="$this/ArmorValue"								CurrentArmor="37"/>
-								<When type="Property" frame="$parent/PhysicalArmorValueLabel/ArmorValue"	CurrentArmor="37"/>
+								<When type="Property" frame="$this/ArmorValue"								CurrentPhysicalArmor="37"/>
+								<When type="Property" frame="$parent/PhysicalArmorValueLabel/ArmorValue"	CurrentPhysicalArmor="37"/>
 								<Action type="SetProperty" frame="$parent/PhysicalArmorHeroOnlyLabel" visible="false"/>
 								<Action type="SetProperty" frame="$this/StatusLabel" visible="false"/>
 							</State>
 							<State name="equalToGenericArmor38">
-								<When type="Property" frame="$this/ArmorValue"								CurrentArmor="38"/>
-								<When type="Property" frame="$parent/PhysicalArmorValueLabel/ArmorValue"	CurrentArmor="38"/>
+								<When type="Property" frame="$this/ArmorValue"								CurrentPhysicalArmor="38"/>
+								<When type="Property" frame="$parent/PhysicalArmorValueLabel/ArmorValue"	CurrentPhysicalArmor="38"/>
 								<Action type="SetProperty" frame="$parent/PhysicalArmorHeroOnlyLabel" visible="false"/>
 								<Action type="SetProperty" frame="$this/StatusLabel" visible="false"/>
 							</State>
 							<State name="equalToGenericArmor39">
-								<When type="Property" frame="$this/ArmorValue"								CurrentArmor="39"/>
-								<When type="Property" frame="$parent/PhysicalArmorValueLabel/ArmorValue"	CurrentArmor="39"/>
+								<When type="Property" frame="$this/ArmorValue"								CurrentPhysicalArmor="39"/>
+								<When type="Property" frame="$parent/PhysicalArmorValueLabel/ArmorValue"	CurrentPhysicalArmor="39"/>
 								<Action type="SetProperty" frame="$parent/PhysicalArmorHeroOnlyLabel" visible="false"/>
 								<Action type="SetProperty" frame="$this/StatusLabel" visible="false"/>
 							</State>
 							<State name="equalToGenericArmor40">
-								<When type="Property" frame="$this/ArmorValue"								CurrentArmor="40"/>
-								<When type="Property" frame="$parent/PhysicalArmorValueLabel/ArmorValue"	CurrentArmor="40"/>
+								<When type="Property" frame="$this/ArmorValue"								CurrentPhysicalArmor="40"/>
+								<When type="Property" frame="$parent/PhysicalArmorValueLabel/ArmorValue"	CurrentPhysicalArmor="40"/>
 								<Action type="SetProperty" frame="$parent/PhysicalArmorHeroOnlyLabel" visible="false"/>
 								<Action type="SetProperty" frame="$this/StatusLabel" visible="false"/>
 							</State>
 							<State name="equalToGenericArmor41">
-								<When type="Property" frame="$this/ArmorValue"								CurrentArmor="41"/>
-								<When type="Property" frame="$parent/PhysicalArmorValueLabel/ArmorValue"	CurrentArmor="41"/>
+								<When type="Property" frame="$this/ArmorValue"								CurrentPhysicalArmor="41"/>
+								<When type="Property" frame="$parent/PhysicalArmorValueLabel/ArmorValue"	CurrentPhysicalArmor="41"/>
 								<Action type="SetProperty" frame="$parent/PhysicalArmorHeroOnlyLabel" visible="false"/>
 								<Action type="SetProperty" frame="$this/StatusLabel" visible="false"/>
 							</State>
 							<State name="equalToGenericArmor42">
-								<When type="Property" frame="$this/ArmorValue"								CurrentArmor="42"/>
-								<When type="Property" frame="$parent/PhysicalArmorValueLabel/ArmorValue"	CurrentArmor="42"/>
+								<When type="Property" frame="$this/ArmorValue"								CurrentPhysicalArmor="42"/>
+								<When type="Property" frame="$parent/PhysicalArmorValueLabel/ArmorValue"	CurrentPhysicalArmor="42"/>
 								<Action type="SetProperty" frame="$parent/PhysicalArmorHeroOnlyLabel" visible="false"/>
 								<Action type="SetProperty" frame="$this/StatusLabel" visible="false"/>
 							</State>
 							<State name="equalToGenericArmor43">
-								<When type="Property" frame="$this/ArmorValue"								CurrentArmor="43"/>
-								<When type="Property" frame="$parent/PhysicalArmorValueLabel/ArmorValue"	CurrentArmor="43"/>
+								<When type="Property" frame="$this/ArmorValue"								CurrentPhysicalArmor="43"/>
+								<When type="Property" frame="$parent/PhysicalArmorValueLabel/ArmorValue"	CurrentPhysicalArmor="43"/>
 								<Action type="SetProperty" frame="$parent/PhysicalArmorHeroOnlyLabel" visible="false"/>
 								<Action type="SetProperty" frame="$this/StatusLabel" visible="false"/>
 							</State>
 							<State name="equalToGenericArmor44">
-								<When type="Property" frame="$this/ArmorValue"								CurrentArmor="44"/>
-								<When type="Property" frame="$parent/PhysicalArmorValueLabel/ArmorValue"	CurrentArmor="44"/>
+								<When type="Property" frame="$this/ArmorValue"								CurrentPhysicalArmor="44"/>
+								<When type="Property" frame="$parent/PhysicalArmorValueLabel/ArmorValue"	CurrentPhysicalArmor="44"/>
 								<Action type="SetProperty" frame="$parent/PhysicalArmorHeroOnlyLabel" visible="false"/>
 								<Action type="SetProperty" frame="$this/StatusLabel" visible="false"/>
 							</State>
 							<State name="equalToGenericArmor45">
-								<When type="Property" frame="$this/ArmorValue"								CurrentArmor="45"/>
-								<When type="Property" frame="$parent/PhysicalArmorValueLabel/ArmorValue"	CurrentArmor="45"/>
+								<When type="Property" frame="$this/ArmorValue"								CurrentPhysicalArmor="45"/>
+								<When type="Property" frame="$parent/PhysicalArmorValueLabel/ArmorValue"	CurrentPhysicalArmor="45"/>
 								<Action type="SetProperty" frame="$parent/PhysicalArmorHeroOnlyLabel" visible="false"/>
 								<Action type="SetProperty" frame="$this/StatusLabel" visible="false"/>
 							</State>
 							<State name="equalToGenericArmor46">
-								<When type="Property" frame="$this/ArmorValue"								CurrentArmor="46"/>
-								<When type="Property" frame="$parent/PhysicalArmorValueLabel/ArmorValue"	CurrentArmor="46"/>
+								<When type="Property" frame="$this/ArmorValue"								CurrentPhysicalArmor="46"/>
+								<When type="Property" frame="$parent/PhysicalArmorValueLabel/ArmorValue"	CurrentPhysicalArmor="46"/>
 								<Action type="SetProperty" frame="$parent/PhysicalArmorHeroOnlyLabel" visible="false"/>
 								<Action type="SetProperty" frame="$this/StatusLabel" visible="false"/>
 							</State>
 							<State name="equalToGenericArmor47">
-								<When type="Property" frame="$this/ArmorValue"								CurrentArmor="47"/>
-								<When type="Property" frame="$parent/PhysicalArmorValueLabel/ArmorValue"	CurrentArmor="47"/>
+								<When type="Property" frame="$this/ArmorValue"								CurrentPhysicalArmor="47"/>
+								<When type="Property" frame="$parent/PhysicalArmorValueLabel/ArmorValue"	CurrentPhysicalArmor="47"/>
 								<Action type="SetProperty" frame="$parent/PhysicalArmorHeroOnlyLabel" visible="false"/>
 								<Action type="SetProperty" frame="$this/StatusLabel" visible="false"/>
 							</State>
 							<State name="equalToGenericArmor48">
-								<When type="Property" frame="$this/ArmorValue"								CurrentArmor="48"/>
-								<When type="Property" frame="$parent/PhysicalArmorValueLabel/ArmorValue"	CurrentArmor="48"/>
+								<When type="Property" frame="$this/ArmorValue"								CurrentPhysicalArmor="48"/>
+								<When type="Property" frame="$parent/PhysicalArmorValueLabel/ArmorValue"	CurrentPhysicalArmor="48"/>
 								<Action type="SetProperty" frame="$parent/PhysicalArmorHeroOnlyLabel" visible="false"/>
 								<Action type="SetProperty" frame="$this/StatusLabel" visible="false"/>
 							</State>
 							<State name="equalToGenericArmor49">
-								<When type="Property" frame="$this/ArmorValue"								CurrentArmor="49"/>
-								<When type="Property" frame="$parent/PhysicalArmorValueLabel/ArmorValue"	CurrentArmor="49"/>
+								<When type="Property" frame="$this/ArmorValue"								CurrentPhysicalArmor="49"/>
+								<When type="Property" frame="$parent/PhysicalArmorValueLabel/ArmorValue"	CurrentPhysicalArmor="49"/>
 								<Action type="SetProperty" frame="$parent/PhysicalArmorHeroOnlyLabel" visible="false"/>
 								<Action type="SetProperty" frame="$this/StatusLabel" visible="false"/>
 							</State>
 							<State name="equalToGenericArmor50">
-								<When type="Property" frame="$this/ArmorValue"								CurrentArmor="50"/>
-								<When type="Property" frame="$parent/PhysicalArmorValueLabel/ArmorValue"	CurrentArmor="50"/>
+								<When type="Property" frame="$this/ArmorValue"								CurrentPhysicalArmor="50"/>
+								<When type="Property" frame="$parent/PhysicalArmorValueLabel/ArmorValue"	CurrentPhysicalArmor="50"/>
 								<Action type="SetProperty" frame="$parent/PhysicalArmorHeroOnlyLabel" visible="false"/>
 								<Action type="SetProperty" frame="$this/StatusLabel" visible="false"/>
 							</State>
 							<State name="equalToGenericArmor51">
-								<When type="Property" frame="$this/ArmorValue"								CurrentArmor="51"/>
-								<When type="Property" frame="$parent/PhysicalArmorValueLabel/ArmorValue"	CurrentArmor="51"/>
+								<When type="Property" frame="$this/ArmorValue"								CurrentPhysicalArmor="51"/>
+								<When type="Property" frame="$parent/PhysicalArmorValueLabel/ArmorValue"	CurrentPhysicalArmor="51"/>
 								<Action type="SetProperty" frame="$parent/PhysicalArmorHeroOnlyLabel" visible="false"/>
 								<Action type="SetProperty" frame="$this/StatusLabel" visible="false"/>
 							</State>
 							<State name="equalToGenericArmor52">
-								<When type="Property" frame="$this/ArmorValue"								CurrentArmor="52"/>
-								<When type="Property" frame="$parent/PhysicalArmorValueLabel/ArmorValue"	CurrentArmor="52"/>
+								<When type="Property" frame="$this/ArmorValue"								CurrentPhysicalArmor="52"/>
+								<When type="Property" frame="$parent/PhysicalArmorValueLabel/ArmorValue"	CurrentPhysicalArmor="52"/>
 								<Action type="SetProperty" frame="$parent/PhysicalArmorHeroOnlyLabel" visible="false"/>
 								<Action type="SetProperty" frame="$this/StatusLabel" visible="false"/>
 							</State>
 							<State name="equalToGenericArmor53">
-								<When type="Property" frame="$this/ArmorValue"								CurrentArmor="53"/>
-								<When type="Property" frame="$parent/PhysicalArmorValueLabel/ArmorValue"	CurrentArmor="53"/>
+								<When type="Property" frame="$this/ArmorValue"								CurrentPhysicalArmor="53"/>
+								<When type="Property" frame="$parent/PhysicalArmorValueLabel/ArmorValue"	CurrentPhysicalArmor="53"/>
 								<Action type="SetProperty" frame="$parent/PhysicalArmorHeroOnlyLabel" visible="false"/>
 								<Action type="SetProperty" frame="$this/StatusLabel" visible="false"/>
 							</State>
 							<State name="equalToGenericArmor54">
-								<When type="Property" frame="$this/ArmorValue"								CurrentArmor="54"/>
-								<When type="Property" frame="$parent/PhysicalArmorValueLabel/ArmorValue"	CurrentArmor="54"/>
+								<When type="Property" frame="$this/ArmorValue"								CurrentPhysicalArmor="54"/>
+								<When type="Property" frame="$parent/PhysicalArmorValueLabel/ArmorValue"	CurrentPhysicalArmor="54"/>
 								<Action type="SetProperty" frame="$parent/PhysicalArmorHeroOnlyLabel" visible="false"/>
 								<Action type="SetProperty" frame="$this/StatusLabel" visible="false"/>
 							</State>
 							<State name="equalToGenericArmor55">
-								<When type="Property" frame="$this/ArmorValue"								CurrentArmor="55"/>
-								<When type="Property" frame="$parent/PhysicalArmorValueLabel/ArmorValue"	CurrentArmor="55"/>
+								<When type="Property" frame="$this/ArmorValue"								CurrentPhysicalArmor="55"/>
+								<When type="Property" frame="$parent/PhysicalArmorValueLabel/ArmorValue"	CurrentPhysicalArmor="55"/>
 								<Action type="SetProperty" frame="$parent/PhysicalArmorHeroOnlyLabel" visible="false"/>
 								<Action type="SetProperty" frame="$this/StatusLabel" visible="false"/>
 							</State>
 							<State name="equalToGenericArmor56">
-								<When type="Property" frame="$this/ArmorValue"								CurrentArmor="56"/>
-								<When type="Property" frame="$parent/PhysicalArmorValueLabel/ArmorValue"	CurrentArmor="56"/>
+								<When type="Property" frame="$this/ArmorValue"								CurrentPhysicalArmor="56"/>
+								<When type="Property" frame="$parent/PhysicalArmorValueLabel/ArmorValue"	CurrentPhysicalArmor="56"/>
 								<Action type="SetProperty" frame="$parent/PhysicalArmorHeroOnlyLabel" visible="false"/>
 								<Action type="SetProperty" frame="$this/StatusLabel" visible="false"/>
 							</State>
 							<State name="equalToGenericArmor57">
-								<When type="Property" frame="$this/ArmorValue"								CurrentArmor="57"/>
-								<When type="Property" frame="$parent/PhysicalArmorValueLabel/ArmorValue"	CurrentArmor="57"/>
+								<When type="Property" frame="$this/ArmorValue"								CurrentPhysicalArmor="57"/>
+								<When type="Property" frame="$parent/PhysicalArmorValueLabel/ArmorValue"	CurrentPhysicalArmor="57"/>
 								<Action type="SetProperty" frame="$parent/PhysicalArmorHeroOnlyLabel" visible="false"/>
 								<Action type="SetProperty" frame="$this/StatusLabel" visible="false"/>
 							</State>
 							<State name="equalToGenericArmor58">
-								<When type="Property" frame="$this/ArmorValue"								CurrentArmor="58"/>
-								<When type="Property" frame="$parent/PhysicalArmorValueLabel/ArmorValue"	CurrentArmor="58"/>
+								<When type="Property" frame="$this/ArmorValue"								CurrentPhysicalArmor="58"/>
+								<When type="Property" frame="$parent/PhysicalArmorValueLabel/ArmorValue"	CurrentPhysicalArmor="58"/>
 								<Action type="SetProperty" frame="$parent/PhysicalArmorHeroOnlyLabel" visible="false"/>
 								<Action type="SetProperty" frame="$this/StatusLabel" visible="false"/>
 							</State>
 							<State name="equalToGenericArmor59">
-								<When type="Property" frame="$this/ArmorValue"								CurrentArmor="59"/>
-								<When type="Property" frame="$parent/PhysicalArmorValueLabel/ArmorValue"	CurrentArmor="59"/>
+								<When type="Property" frame="$this/ArmorValue"								CurrentPhysicalArmor="59"/>
+								<When type="Property" frame="$parent/PhysicalArmorValueLabel/ArmorValue"	CurrentPhysicalArmor="59"/>
 								<Action type="SetProperty" frame="$parent/PhysicalArmorHeroOnlyLabel" visible="false"/>
 								<Action type="SetProperty" frame="$this/StatusLabel" visible="false"/>
 							</State>
 							<State name="equalToGenericArmor60">
-								<When type="Property" frame="$this/ArmorValue"								CurrentArmor="60"/>
-								<When type="Property" frame="$parent/PhysicalArmorValueLabel/ArmorValue"	CurrentArmor="60"/>
+								<When type="Property" frame="$this/ArmorValue"								CurrentPhysicalArmor="60"/>
+								<When type="Property" frame="$parent/PhysicalArmorValueLabel/ArmorValue"	CurrentPhysicalArmor="60"/>
 								<Action type="SetProperty" frame="$parent/PhysicalArmorHeroOnlyLabel" visible="false"/>
 								<Action type="SetProperty" frame="$this/StatusLabel" visible="false"/>
 							</State>
 							<State name="equalToGenericArmor61">
-								<When type="Property" frame="$this/ArmorValue"								CurrentArmor="61"/>
-								<When type="Property" frame="$parent/PhysicalArmorValueLabel/ArmorValue"	CurrentArmor="61"/>
+								<When type="Property" frame="$this/ArmorValue"								CurrentPhysicalArmor="61"/>
+								<When type="Property" frame="$parent/PhysicalArmorValueLabel/ArmorValue"	CurrentPhysicalArmor="61"/>
 								<Action type="SetProperty" frame="$parent/PhysicalArmorHeroOnlyLabel" visible="false"/>
 								<Action type="SetProperty" frame="$this/StatusLabel" visible="false"/>
 							</State>
 							<State name="equalToGenericArmor62">
-								<When type="Property" frame="$this/ArmorValue"								CurrentArmor="62"/>
-								<When type="Property" frame="$parent/PhysicalArmorValueLabel/ArmorValue"	CurrentArmor="62"/>
+								<When type="Property" frame="$this/ArmorValue"								CurrentPhysicalArmor="62"/>
+								<When type="Property" frame="$parent/PhysicalArmorValueLabel/ArmorValue"	CurrentPhysicalArmor="62"/>
 								<Action type="SetProperty" frame="$parent/PhysicalArmorHeroOnlyLabel" visible="false"/>
 								<Action type="SetProperty" frame="$this/StatusLabel" visible="false"/>
 							</State>
 							<State name="equalToGenericArmor63">
-								<When type="Property" frame="$this/ArmorValue"								CurrentArmor="63"/>
-								<When type="Property" frame="$parent/PhysicalArmorValueLabel/ArmorValue"	CurrentArmor="63"/>
+								<When type="Property" frame="$this/ArmorValue"								CurrentPhysicalArmor="63"/>
+								<When type="Property" frame="$parent/PhysicalArmorValueLabel/ArmorValue"	CurrentPhysicalArmor="63"/>
 								<Action type="SetProperty" frame="$parent/PhysicalArmorHeroOnlyLabel" visible="false"/>
 								<Action type="SetProperty" frame="$this/StatusLabel" visible="false"/>
 							</State>
 							<State name="equalToGenericArmor64">
-								<When type="Property" frame="$this/ArmorValue"								CurrentArmor="64"/>
-								<When type="Property" frame="$parent/PhysicalArmorValueLabel/ArmorValue"	CurrentArmor="64"/>
+								<When type="Property" frame="$this/ArmorValue"								CurrentPhysicalArmor="64"/>
+								<When type="Property" frame="$parent/PhysicalArmorValueLabel/ArmorValue"	CurrentPhysicalArmor="64"/>
 								<Action type="SetProperty" frame="$parent/PhysicalArmorHeroOnlyLabel" visible="false"/>
 								<Action type="SetProperty" frame="$this/StatusLabel" visible="false"/>
 							</State>
 							<State name="equalToGenericArmor65">
-								<When type="Property" frame="$this/ArmorValue"								CurrentArmor="65"/>
-								<When type="Property" frame="$parent/PhysicalArmorValueLabel/ArmorValue"	CurrentArmor="65"/>
+								<When type="Property" frame="$this/ArmorValue"								CurrentPhysicalArmor="65"/>
+								<When type="Property" frame="$parent/PhysicalArmorValueLabel/ArmorValue"	CurrentPhysicalArmor="65"/>
 								<Action type="SetProperty" frame="$parent/PhysicalArmorHeroOnlyLabel" visible="false"/>
 								<Action type="SetProperty" frame="$this/StatusLabel" visible="false"/>
 							</State>
 							<State name="equalToGenericArmor66">
-								<When type="Property" frame="$this/ArmorValue"								CurrentArmor="66"/>
-								<When type="Property" frame="$parent/PhysicalArmorValueLabel/ArmorValue"	CurrentArmor="66"/>
+								<When type="Property" frame="$this/ArmorValue"								CurrentPhysicalArmor="66"/>
+								<When type="Property" frame="$parent/PhysicalArmorValueLabel/ArmorValue"	CurrentPhysicalArmor="66"/>
 								<Action type="SetProperty" frame="$parent/PhysicalArmorHeroOnlyLabel" visible="false"/>
 								<Action type="SetProperty" frame="$this/StatusLabel" visible="false"/>
 							</State>
 							<State name="equalToGenericArmor67">
-								<When type="Property" frame="$this/ArmorValue"								CurrentArmor="67"/>
-								<When type="Property" frame="$parent/PhysicalArmorValueLabel/ArmorValue"	CurrentArmor="67"/>
+								<When type="Property" frame="$this/ArmorValue"								CurrentPhysicalArmor="67"/>
+								<When type="Property" frame="$parent/PhysicalArmorValueLabel/ArmorValue"	CurrentPhysicalArmor="67"/>
 								<Action type="SetProperty" frame="$parent/PhysicalArmorHeroOnlyLabel" visible="false"/>
 								<Action type="SetProperty" frame="$this/StatusLabel" visible="false"/>
 							</State>
 							<State name="equalToGenericArmor68">
-								<When type="Property" frame="$this/ArmorValue"								CurrentArmor="68"/>
-								<When type="Property" frame="$parent/PhysicalArmorValueLabel/ArmorValue"	CurrentArmor="68"/>
+								<When type="Property" frame="$this/ArmorValue"								CurrentPhysicalArmor="68"/>
+								<When type="Property" frame="$parent/PhysicalArmorValueLabel/ArmorValue"	CurrentPhysicalArmor="68"/>
 								<Action type="SetProperty" frame="$parent/PhysicalArmorHeroOnlyLabel" visible="false"/>
 								<Action type="SetProperty" frame="$this/StatusLabel" visible="false"/>
 							</State>
 							<State name="equalToGenericArmor69">
-								<When type="Property" frame="$this/ArmorValue"								CurrentArmor="69"/>
-								<When type="Property" frame="$parent/PhysicalArmorValueLabel/ArmorValue"	CurrentArmor="69"/>
+								<When type="Property" frame="$this/ArmorValue"								CurrentPhysicalArmor="69"/>
+								<When type="Property" frame="$parent/PhysicalArmorValueLabel/ArmorValue"	CurrentPhysicalArmor="69"/>
 								<Action type="SetProperty" frame="$parent/PhysicalArmorHeroOnlyLabel" visible="false"/>
 								<Action type="SetProperty" frame="$this/StatusLabel" visible="false"/>
 							</State>
 							<State name="equalToGenericArmor70">
-								<When type="Property" frame="$this/ArmorValue"								CurrentArmor="70"/>
-								<When type="Property" frame="$parent/PhysicalArmorValueLabel/ArmorValue"	CurrentArmor="70"/>
+								<When type="Property" frame="$this/ArmorValue"								CurrentPhysicalArmor="70"/>
+								<When type="Property" frame="$parent/PhysicalArmorValueLabel/ArmorValue"	CurrentPhysicalArmor="70"/>
 								<Action type="SetProperty" frame="$parent/PhysicalArmorHeroOnlyLabel" visible="false"/>
 								<Action type="SetProperty" frame="$this/StatusLabel" visible="false"/>
 							</State>
 							<State name="equalToGenericArmor71">
-								<When type="Property" frame="$this/ArmorValue"								CurrentArmor="71"/>
-								<When type="Property" frame="$parent/PhysicalArmorValueLabel/ArmorValue"	CurrentArmor="71"/>
+								<When type="Property" frame="$this/ArmorValue"								CurrentPhysicalArmor="71"/>
+								<When type="Property" frame="$parent/PhysicalArmorValueLabel/ArmorValue"	CurrentPhysicalArmor="71"/>
 								<Action type="SetProperty" frame="$parent/PhysicalArmorHeroOnlyLabel" visible="false"/>
 								<Action type="SetProperty" frame="$this/StatusLabel" visible="false"/>
 							</State>
 							<State name="equalToGenericArmor72">
-								<When type="Property" frame="$this/ArmorValue"								CurrentArmor="72"/>
-								<When type="Property" frame="$parent/PhysicalArmorValueLabel/ArmorValue"	CurrentArmor="72"/>
+								<When type="Property" frame="$this/ArmorValue"								CurrentPhysicalArmor="72"/>
+								<When type="Property" frame="$parent/PhysicalArmorValueLabel/ArmorValue"	CurrentPhysicalArmor="72"/>
 								<Action type="SetProperty" frame="$parent/PhysicalArmorHeroOnlyLabel" visible="false"/>
 								<Action type="SetProperty" frame="$this/StatusLabel" visible="false"/>
 							</State>
 							<State name="equalToGenericArmor73">
-								<When type="Property" frame="$this/ArmorValue"								CurrentArmor="73"/>
-								<When type="Property" frame="$parent/PhysicalArmorValueLabel/ArmorValue"	CurrentArmor="73"/>
+								<When type="Property" frame="$this/ArmorValue"								CurrentPhysicalArmor="73"/>
+								<When type="Property" frame="$parent/PhysicalArmorValueLabel/ArmorValue"	CurrentPhysicalArmor="73"/>
 								<Action type="SetProperty" frame="$parent/PhysicalArmorHeroOnlyLabel" visible="false"/>
 								<Action type="SetProperty" frame="$this/StatusLabel" visible="false"/>
 							</State>
 							<State name="equalToGenericArmor74">
-								<When type="Property" frame="$this/ArmorValue"								CurrentArmor="74"/>
-								<When type="Property" frame="$parent/PhysicalArmorValueLabel/ArmorValue"	CurrentArmor="74"/>
+								<When type="Property" frame="$this/ArmorValue"								CurrentPhysicalArmor="74"/>
+								<When type="Property" frame="$parent/PhysicalArmorValueLabel/ArmorValue"	CurrentPhysicalArmor="74"/>
 								<Action type="SetProperty" frame="$parent/PhysicalArmorHeroOnlyLabel" visible="false"/>
 								<Action type="SetProperty" frame="$this/StatusLabel" visible="false"/>
 							</State>
 							<State name="equalToGenericArmor75">
-								<When type="Property" frame="$this/ArmorValue"								CurrentArmor="75"/>
-								<When type="Property" frame="$parent/PhysicalArmorValueLabel/ArmorValue"	CurrentArmor="75"/>
+								<When type="Property" frame="$this/ArmorValue"								CurrentPhysicalArmor="75"/>
+								<When type="Property" frame="$parent/PhysicalArmorValueLabel/ArmorValue"	CurrentPhysicalArmor="75"/>
 								<Action type="SetProperty" frame="$parent/PhysicalArmorHeroOnlyLabel" visible="false"/>
 								<Action type="SetProperty" frame="$this/StatusLabel" visible="false"/>
 							</State>
