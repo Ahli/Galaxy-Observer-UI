@@ -205,6 +205,8 @@
     </Frame>
     
     <Frame type="CustomGameModListPanel" name="CustomGameModListPanelTemplate">
+        <SearchText val="{$this/SearchEditBox/@Text}"/>
+        
         <!-- This tooltip is just for blocking tooltips behind this panel -->
         <Frame type="StandardTooltip" name="MapProfileTooltip">
             <Frame type="Label" name="Label">
@@ -277,6 +279,12 @@
             <Options val="Ellipsis | TooltipIfTruncated | NoWrapping"/>
             <AcceptsMouseTooltip val="true"/>
             <Style val="@Arcade_GameInfo_Title"/>
+            <Text val="{$this/BattleMapFrame/@Name}"/>
+
+            <Frame type="BattleMapFrame" name="BattleMapFrame">
+                <Anchor relative="$parent"/>
+                <MapHandle val="{$parent/$parent/@MapHandle}"/>
+            </Frame>
         </Frame>
 
         <Frame type="Pulldown" name="FilterPulldown" template="StandardTemplates/StandardPulldownTemplate">
@@ -293,9 +301,16 @@
             <Options val="Ellipsis | TooltipIfTruncated | NoWrapping"/>
             <AcceptsMouseTooltip val="true"/>
             <Style val="@Arcade_SearchResultsText"/>
+            <Text val="{$this/FormatFrame/@Text}"/>
+
+            <Frame type="TextFormatFrame" name="FormatFrame">
+                <FormatText val="@UI/ScreenCustomGames/SearchResults"/>
+                <Replacement index="0" val="{$parent/$parent/SearchEditBox/@Text}"/>
+                <ReplacedName index="0" val="name"/>
+            </Frame>
         </Frame>
         
-        <Frame type="EditBox" name="SearchEditBox" template="StandardBattlenetTemplates/BattlenetEditBoxTemplate">
+        <Frame type="EditBox" name="SearchEditBox" template="StandardBattlenetTemplates/BattlenetSearchEditBoxTemplate">
             <Anchor side="Bottom" relative="$parent/MapInfoBackground" pos="Min" offset="-3"/>
             <Anchor side="Left" relative="$parent/MapInfoBackground" pos="Min" offset="50"/>
             <Anchor side="Right" relative="$parent/MapInfoBackground" pos="Max" offset="-5"/>
@@ -305,35 +320,26 @@
             <Tooltip val="@UI/ScreenCustomGames/SearchTooltip"/>
             <Insets top="20" left="25" bottom="15" right="45"/>
 
+            <Animation name="RequestSearch">
+                <Event event="OnEnterPressed" frame="$this" action="Reset,Play"/>
+
+                <Controller type="Event" end="Pause" frame="$ancestor[@type=CustomGameModListPanel]">
+                    <Key type="Event" time="0.0" event="RequestEditBoxSearch"/>
+                </Controller>
+            </Animation>
+
             <Frame type="Label" name="SearchTextLabel">
-                <Anchor side="Top" relative="$parent" pos="Min" offset="15"/>
-                <Anchor side="Bottom" relative="$parent" pos="Max" offset="-11"/>
-                <Anchor side="Left" relative="$parent" pos="Min" offset="25"/>
-                <Anchor side="Right" relative="$parent" pos="Max" offset="25"/>
-                <Style val="BattlenetGlueEditBoxDefault"/>
                 <Text val="@UI/ScreenCustomGames/SearchModsText"/>
             </Frame>
 
-            <Frame type="Image" name="SearchIcon">
-                <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
-                <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
-                <Anchor side="Right" relative="$parent" pos="Max" offset="-20"/>
-                <Texture val="@UI/Glues_Icons_SearchIcon"/>
-            </Frame>
-        </Frame>
+            <Frame type="Button" name="ClearTextButton">
+                <Animation name="ClearLobbyList">
+                    <Event event="OnClick" frame="$this" action="Reset,Play"/>
 
-        <Frame type="Button" name="SearchBackButton" template="StandardBattlenetTemplates/BattlenetIconButtonTemplate">
-            <Anchor side="Top" relative="$parent/SearchEditBox" pos="Mid" offset="0"/>
-            <Anchor side="Bottom" relative="$parent/SearchEditBox" pos="Mid" offset="0"/>
-            <Anchor side="Right" relative="$parent/SearchEditBox" pos="Max" offset="-15"/>
-            <Tooltip val="@UI/ScreenCustomGames/SearchClearTooltip"/>
-
-            <Frame type="Image" name="NormalImage">
-                <Texture val="@UI/Glues_Icons_CloseButton" layer="0"/>
-            </Frame>
-
-            <Frame type="Image" name="HoverImage">
-                <Texture val="@UI/Glues_Icons_CloseButtonHover" layer="0"/>
+                    <Controller type="Event" end="Pause" frame="$ancestor[@type=CustomGameModListPanel]">
+                        <Key type="Event" time="0.1" event="RequestEditBoxSearch"/>
+                    </Controller>
+                </Animation>
             </Frame>
         </Frame>
 
@@ -342,15 +348,11 @@
             
             <State name="SearchingState">
                 <When type="AnimationState" frame="$this" SearchState="Searching"/>
-                <Action type="SetProperty" frame="SearchBackButton" Visible="true"/>
-                <Action type="SetProperty" frame="SearchEditBox/SearchIcon" Visible="false"/>
                 <Action type="SetProperty" frame="FilterPulldown" Visible="false"/>
                 <Action type="SetProperty" frame="SearchResultsLabel" Visible="true"/>
             </State>
 
             <State name="NotSearchingState">
-                <Action type="SetProperty" frame="SearchBackButton" Visible="false"/>
-                <Action type="SetProperty" frame="SearchEditBox/SearchIcon" Visible="true"/>
                 <Action type="SetProperty" frame="FilterPulldown" Visible="true"/>
                 <Action type="SetProperty" frame="SearchResultsLabel" Visible="false"/>
             </State>
@@ -543,11 +545,21 @@
             <Visible val="true"/>
         </Frame>
 
-        <Frame type="GlueButton" name="CreateButton" template="StandardBattlenetTemplates/BattlenetAlternateButtonTemplate">
+        <Frame type="CustomGamePlayButton" name="CreateButton" template="StandardBattlenetTemplates/BattlenetAlternateButtonTemplate">
             <Anchor side="Bottom" relative="$parent/BackgroundImage" pos="Max" offset="-40"/>
             <Anchor side="Left" relative="$parent/JoinListBG" pos="Min" offset="4"/>
             <Text val="@UI/ScreenCustomGames/CreateButton"/>
             <Width val ="288"/>
+            <MapHandle val="{$parent/@MapHandle}"/>
+            <ModHandle val="{$parent/@SelectedMaphandle}"/>
+
+            <Animation name="ItemDoubleClicked">
+                <Event event="OnItemDoubleClicked" action="Reset,Play" frame="$parent/GamesTileList"/>
+
+                <Controller type="Event" end="Pause">
+                    <Key type="Event" time="0" event="ControlClickRequest"/>
+                </Controller>
+            </Animation>
         </Frame>
         
         <Frame type="Button" name="CloseButton" template="StandardBattlenetTemplates/BattlenetStandardButtonTemplate">
@@ -556,45 +568,6 @@
             <Text val="@UI/Close"/>
             <Shortcut val="@UI/ScreenNavigationBack_Hotkey"/>
             <Width val="288"/>
-        </Frame>
-
-        <Frame type="ExpansionLevelFrame" name="ExpansionIconFrame">
-            <Width val="82"/>
-            <Height val="87"/>
-            <Anchor side="Top" relative="$parent/CreateButton" pos="Mid" offset="0"/>
-            <Anchor side="Bottom" relative="$parent/CreateButton" pos="Mid" offset="0"/>
-            <Anchor side="Left" relative="$parent/CloseButton" pos="Max" offset="10"/>
-            <AcceptsMouseTooltip val="true"/>
-
-            <Frame type="Image" name="ExpansionIcon">
-                <Anchor relative="$parent"/>
-            </Frame>
-
-            <StateGroup name="ExpansionStateGroup">
-                <State name="StarterEditionState">
-                    <When type="AnimationState" frame="$this" ExpansionLevel="ExpansionLevel0"/>
-                    <Action type="SetProperty" frame="ExpansionIcon" Texture="@UI/Glues_Icons_ExpansionLevel_Large_SE"/>
-                    <Action type="SetProperty" frame="$this" Tooltip=""/>
-                </State>
-
-                <State name="WoLState">
-                    <When type="AnimationState" frame="$this" ExpansionLevel="ExpansionLevel1"/>
-                    <Action type="SetProperty" frame="ExpansionIcon" Texture="@UI/Glues_Icons_ExpansionLevel_Large_WoL"/>
-                    <Action type="SetProperty" frame="$this" Tooltip="@UI/ExpansionLevelIcon/TooltipWoL"/>
-                </State>
-
-                <State name="HotSState">
-                    <When type="AnimationState" frame="$this" ExpansionLevel="ExpansionLevel2"/>
-                    <Action type="SetProperty" frame="ExpansionIcon" Texture="@UI/Glues_Icons_ExpansionLevel_Large_HoTS"/>
-                    <Action type="SetProperty" frame="$this" Tooltip="@UI/ExpansionLevelIcon/TooltipHotS"/>
-                </State>
-
-                <State name="LotVState">
-                    <When type="AnimationState" frame="$this" ExpansionLevel="ExpansionLevel3"/>
-                    <Action type="SetProperty" frame="ExpansionIcon" Texture="@UI/Glues_Icons_ExpansionLevel_Large_LotV"/>
-                    <Action type="SetProperty" frame="$this" Tooltip="@UI/ExpansionLevelIcon/TooltipLotV"/>
-                </State>
-            </StateGroup>
         </Frame>
 
         <Frame type="BattleMapContextMenu" name="ItemContextMenu" template="StandardTemplates/StandardContextMenuTemplate">

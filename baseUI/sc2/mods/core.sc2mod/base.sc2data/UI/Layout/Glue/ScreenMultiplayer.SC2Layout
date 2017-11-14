@@ -4,34 +4,236 @@
     
     <Constant name="ButtonOffset" val="-42"/>
     <Constant name="ButtonOffsetLeft" val="-84"/>
+    <Constant name="TestingTabIndex" val="5"/>
+    <Constant name="TournamentTabIndex" val="4"/>
+    <Constant name="SoloTabIndex" val="3"/>
 
     <Frame type="Button" name="ScreenMultiplayerButtonTemplate" template="StandardBattlenetTemplates/BattlenetSubNavButtonTemplate">
+        <Toggleable val="true"/>
     </Frame>
 
     <Frame type="ScreenMultiplayer" name="ScreenMultiplayer">
         <Handle val="ScreenMultiplayer"/>
         <Anchor relative="$parent"/>
-        <!-- This must render below ScreenBattlenet so Battle.net dialogs can cover it -->
-        <!-- but above normal content screens so it is always accessible -->
+        <DisplayBackgroundModel val="false"/>
+        <!-- This must render above normal content screens so it is always accessible -->
         <RenderPriority val="599"/>
+        <SelectedTabIndex val="{$this/TabControl/@SelectedIndex}"/>
 
+        <Frame type="TabControl" name="TabControl">
+            <Anchor relative="$parent"/>
+            <TabListItem val="$parent/NavigationContainer/TrainingButton"/>
+            <TabListItem val="$parent/NavigationContainer/VersusAIButton"/>
+            <TabListItem val="$parent/NavigationContainer/TeamButton"/>
+            <TabListItem val="$parent/NavigationContainer/SoloButton"/>
+            <TabListItem val="$parent/NavigationContainer/TournamentButton"/>
+            <TabListItem val="$parent/NavigationContainer/TestingButton"/>
+            <PanelListItem val="TrainingFrame"/>
+            <PanelListItem val="VersusAIFrame"/>
+            <PanelListItem val="TeamFrame"/>
+            <PanelListItem val="SoloFrame"/>
+            <PanelListItem val="TournamentFrame"/>
+            <PanelListItem val="TestingFrame"/>
+            <SelectedIndex val="{$parent/@SelectedTabIndex}"/>
+
+            <Animation name="ViewTournament">
+                <Event event="ViewTournament" action="Reset,Play" frame="$parent"/>
+
+                <Controller type="Property" property="SelectedIndex" frame="$this" end="Pause">
+                    <Key type="Property" time="0" value="#TournamentTabIndex"/>
+                </Controller>
+            </Animation>
+
+            <StateGroup name="TestingInactiveStateGroup">
+                <State name="TestingInactiveState">
+                    <When type="Property" frame="TestingFrame" Visible="true"/>
+                    <When type="Property" frame="$parent/NavigationContainer/TestingButton" Enabled="false"/>
+                    <Action type="SetProperty" frame="$this" SelectedIndex="#SoloTabIndex" Undo="false"/>
+                </State>
+            </StateGroup>
+
+            <Frame type="Frame" name="MatchmakingCutsceneContainer">
+                <Anchor relative="$parent"/>
+                <Handle val="MatchmakingCutsceneContainer"/>
+
+                <StateGroup name="VisibleStateGroup">
+                    <State name="TournamentState">
+                        <When type="Property" frame="$parent" SelectedIndex="#TournamentTabIndex"/>
+                        <Action type="SetProperty" frame="$this" Visible="false"/>
+                    </State>
+                </StateGroup>
+
+                <Frame type="CutsceneFrame" name="BackgroundCutscene">
+                    <Anchor relative="$parent"/>
+                    <File val="Cutscenes/UI_Screens_Multiplayer_Background.SC2Cutscene" preloadFilters="Protoss Terran Zerg Random Ring"/>
+                    <AutoPlay val="false"/>
+                    <RenderType val="HDR"/>
+                </Frame>
+
+                <Frame type="CutsceneFrame" name="ForegroundCutscene">
+                    <Anchor relative="$parent"/>
+                    <File val="Cutscenes/UI_Screens_Multiplayer_ForeGround.SC2Cutscene" preloadFilters="Protoss Terran Zerg Random"/>
+                    <AutoPlay val="false"/>
+                    <RenderType val="HDR"/>
+                </Frame>
+
+                <StateGroup name="RaceEventStateGroup">
+                    <State name="TerranState">
+                        <Action type="SendEvent" frame="$this" event="Terran"/>
+                    </State>
+                    <State name="ZergState">
+                        <Action type="SendEvent" frame="$this" event="Zerg"/>
+                    </State>
+                    <State name="ProtossState">
+                        <Action type="SendEvent" frame="$this" event="Protoss"/>
+                    </State>
+                    <State name="RandomState">
+                        <Action type="SendEvent" frame="$this" event="Random"/>
+                    </State>
+                </StateGroup>
+
+                <Animation name="Terran">
+                    <Event event="Terran" action="Reset,Play" frame="$this"/>
+
+                    <Controller type="Cutscene" end="Stop" frame="ForegroundCutscene">
+                        <Key type="Cutscene" action="AddFilter" time="0.0" filter="Terran"/>
+                        <Key type="Cutscene" action="RemoveFilter" time="0.0" filter="Zerg"/>
+                        <Key type="Cutscene" action="RemoveFilter" time="0.0" filter="Protoss"/>
+                        <Key type="Cutscene" action="RemoveFilter" time="0.0" filter="Random"/>
+                    </Controller>
+
+                    <Controller type="Cutscene" end="Stop" frame="BackgroundCutscene">
+                        <Key type="Cutscene" action="AddFilter" time="0.0" filter="Terran"/>
+                        <Key type="Cutscene" action="RemoveFilter" time="0.0" filter="Zerg"/>
+                        <Key type="Cutscene" action="RemoveFilter" time="0.0" filter="Random"/>
+                        <Key type="Cutscene" action="RemoveFilter" time="0.0" filter="Protoss"/>
+                        <Key type="Cutscene" action="Play" time="0.0"/>
+                    </Controller>
+                </Animation>
+
+                <Animation name="Zerg">
+                    <Event event="Zerg" action="Reset,Play" frame="$this"/>
+
+                    <Controller type="Cutscene" end="Stop" frame="ForegroundCutscene">
+                        <Key type="Cutscene" action="AddFilter" time="0.0" filter="Zerg"/>
+                        <Key type="Cutscene" action="RemoveFilter" time="0.0" filter="Terran"/>
+                        <Key type="Cutscene" action="RemoveFilter" time="0.0" filter="Protoss"/>
+                        <Key type="Cutscene" action="RemoveFilter" time="0.0" filter="Random"/>
+                    </Controller>
+
+                    <Controller type="Cutscene" end="Stop" frame="BackgroundCutscene">
+                        <Key type="Cutscene" action="AddFilter" time="0.0" filter="Zerg"/>
+                        <Key type="Cutscene" action="RemoveFilter" time="0.0" filter="Random"/>
+                        <Key type="Cutscene" action="RemoveFilter" time="0.0" filter="Protoss"/>
+                        <Key type="Cutscene" action="RemoveFilter" time="0.0" filter="Terran"/>
+                        <Key type="Cutscene" action="Play" time="0.0"/>
+                    </Controller>
+                </Animation>
+
+                <Animation name="Protoss">
+                    <Event event="Protoss" action="Reset,Play" frame="$this"/>
+
+                    <Controller type="Cutscene" end="Stop" frame="ForegroundCutscene">
+                        <Key type="Cutscene" action="AddFilter" time="0.0" filter="Protoss"/>
+                        <Key type="Cutscene" action="RemoveFilter" time="0.0" filter="Terran"/>
+                        <Key type="Cutscene" action="RemoveFilter" time="0.0" filter="Zerg"/>
+                        <Key type="Cutscene" action="RemoveFilter" time="0.0" filter="Random"/>
+                    </Controller>
+
+                    <Controller type="Cutscene" end="Stop" frame="BackgroundCutscene">
+                        <Key type="Cutscene" action="AddFilter" time="0.0" filter="Protoss"/>
+                        <Key type="Cutscene" action="RemoveFilter" time="0.0" filter="Zerg"/>
+                        <Key type="Cutscene" action="RemoveFilter" time="0.0" filter="Random"/>
+                        <Key type="Cutscene" action="RemoveFilter" time="0.0" filter="Terran"/>
+                        <Key type="Cutscene" action="Play" time="0.0"/>
+                    </Controller>
+                </Animation>
+
+                <Animation name="Random">
+                    <Event event="Random" action="Reset,Play" frame="$this"/>
+
+                    <Controller type="Cutscene" end="Stop" frame="ForegroundCutscene">
+                        <Key type="Cutscene" action="AddFilter" time="0.0" filter="Random"/>
+                        <Key type="Cutscene" action="RemoveFilter" time="0.0" filter="Zerg"/>
+                        <Key type="Cutscene" action="RemoveFilter" time="0.0" filter="Protoss"/>
+                        <Key type="Cutscene" action="RemoveFilter" time="0.0" filter="Terran"/>
+                    </Controller>
+
+                    <Controller type="Cutscene" end="Stop" frame="BackgroundCutscene">
+                        <Key type="Cutscene" action="AddFilter" time="0.0" filter="Random"/>
+                        <Key type="Cutscene" action="RemoveFilter" time="0.0" filter="Zerg"/>
+                        <Key type="Cutscene" action="RemoveFilter" time="0.0" filter="Protoss"/>
+                        <Key type="Cutscene" action="RemoveFilter" time="0.0" filter="Terran"/>
+                        <Key type="Cutscene" action="Play" time="0.0"/>
+                    </Controller>
+                </Animation>
+
+                <Animation name="PlayBirth">
+                    <Event event="Terran" action="Reset,Play" frame="$this"/>
+                    <Event event="Zerg" action="Reset,Play" frame="$this"/>
+                    <Event event="Protoss" action="Reset,Play" frame="$this"/>
+                    <Event event="Random" action="Reset,Play" frame="$this"/>
+
+                    <Controller type="Cutscene" end="Stop" frame="ForegroundCutscene">
+                        <Key type="Cutscene" action="Bookmark" time="0.0" bookmark="CharacterBirthEnd"/>
+                        <Key type="Cutscene" action="Bookmark" time="0.0" bookmark="CharacterBirthStart"/>
+                        <Key type="Cutscene" action="Play" time="0.0"/>
+                    </Controller>
+                </Animation>
+
+                <Animation name="PlayIdle">
+                    <Event event="PlayIdle" action="Reset,Play" frame="$parent/$parent"/>
+
+                    <Controller type="Cutscene" end="Stop" frame="ForegroundCutscene">
+                        <Key type="Cutscene" action="Bookmark" time="0.0" bookmark="CharacterLoopStart"/>
+                        <Key type="Cutscene" action="Play" time="0.0"/>
+                    </Controller>
+                </Animation>
+            </Frame>
+
+            <Frame type="Frame" name="TrainingFrame" template="MultiplayerMatchmakingFrame/MultiplayerTrainingFrameTemplate">
+                <Anchor relative="$parent"/>
+                <Visible val="false"/>
+            </Frame>
+
+            <Frame type="Frame" name="VersusAIFrame" template="MultiplayerMatchmakingFrame/MultiplayerVersusAIFrameTemplate">
+                <Anchor relative="$parent"/>
+                <Visible val="false"/>
+            </Frame>
+
+            <Frame type="Frame" name="TeamFrame" template="MultiplayerMatchmakingFrame/MultiplayerTeamFrameTemplate">
+                <Anchor relative="$parent"/>
+                <Visible val="false"/>
+            </Frame>
+
+            <Frame type="Frame" name="SoloFrame" template="MultiplayerMatchmakingFrame/MultiplayerSoloFrameTemplate">
+                <Anchor relative="$parent"/>
+                <Visible val="false"/>
+            </Frame>
+
+            <Frame type="MultiplayerTournamentFrame" name="TournamentFrame" template="MultiplayerTournamentFrame/MultiplayerTournamentFrame">
+                <Anchor relative="$parent"/>
+                <Visible val="false"/>
+            </Frame>
+
+            <Frame type="Frame" name="TestingFrame" template="MultiplayerMatchmakingFrame/MultiplayerTestingFrameTemplate">
+                <Anchor relative="$parent"/>
+                <Visible val="false"/>
+            </Frame>
+        </Frame>
+        
         <Frame type="Frame" name="NavigationContainer">
             <Anchor side="Top" relative="$Anchor_SubNav" pos="Max" offset="0"/>
             <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
             <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
             <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
 
-            <Animation name="HideNav">
-                <Event event="HideNav" action="DirectionForward" frame="$parent"/>
-                <Event event="HideNav" action="Play" frame="$parent"/>
-                <Event event="ShowNav" action="DirectionReverse" frame="$parent"/>
-                <Event event="ShowNav" action="Play" frame="$parent"/>
-
-                <Controller name="Visibility" type="Visibility" end="Pause">
-                    <Key type="Bool" time="0.0" value="true"/>
-                    <Key type="Bool" time="0.1" value="false"/>
-                </Controller>
-            </Animation>
+            <StateGroup name="HideNavigationStateGroup">
+                <State name="ScreenNewUserVisibleState">
+                    <When type="Property" frame="$ScreenNewUser" Visible="true"/>
+                    <Action type="SetProperty" frame="$this" Visible="false"/>
+                </State>
+            </StateGroup>
             
             <Frame type="BlurFrame" name="BlurEffect">
                 <Anchor relative="$parent/Background"/>
@@ -127,7 +329,7 @@
             
             <Frame type="Image" name="ButtonDivider3">
                 <Anchor side="Top" relative="$parent" pos="Min" offset="15"/>
-                <Anchor side="Right" relative="$parent/UnrankedButton" pos="Max" offset="#ButtonOffset"/>
+                <Anchor side="Right" relative="$parent/TeamButton" pos="Max" offset="#ButtonOffset"/>
                 <Texture val="@UI/Glues_Battlenet_SubNav_ButtonDivider"/>
                 <Alpha val="0"/>
                 
@@ -144,7 +346,7 @@
             
             <Frame type="Image" name="ButtonDivider4">
                 <Anchor side="Top" relative="$parent" pos="Min" offset="15"/>
-                <Anchor side="Right" relative="$parent/RankedButton" pos="Max" offset="#ButtonOffset"/>
+                <Anchor side="Right" relative="$parent/SoloButton" pos="Max" offset="#ButtonOffset"/>
                 <Texture val="@UI/Glues_Battlenet_SubNav_ButtonDivider"/>
                 <Alpha val="0"/>
                 
@@ -224,10 +426,10 @@
                 </Animation>
             </Frame>
 
-            <Frame type="Button" name="UnrankedButton" template="ScreenMultiplayer/ScreenMultiplayerButtonTemplate">
+            <Frame type="Button" name="TeamButton" template="ScreenMultiplayer/ScreenMultiplayerButtonTemplate">
                 <Anchor side="Top" relative="$parent/VersusAIButton" pos="Min" offset="0"/>
                 <Anchor side="Left" relative="$parent/VersusAIButton" pos="Max" offset="#ButtonOffsetLeft"/>
-                <Text val="@UI/ScreenMultiplayer/UnrankedButton"/>
+                <Text val="@UI/ScreenMultiplayer/TeamButton"/>
                 <Alpha val="0"/>
                 
                 <Animation name="FadeNav">
@@ -248,10 +450,10 @@
                 </Animation>
             </Frame>
 
-            <Frame type="Button" name="RankedButton" template="ScreenMultiplayer/ScreenMultiplayerButtonTemplate">
-                <Anchor side="Top" relative="$parent/UnrankedButton" pos="Min" offset="0"/>
-                <Anchor side="Left" relative="$parent/UnrankedButton" pos="Max" offset="#ButtonOffsetLeft"/>
-                <Text val="@UI/ScreenMultiplayer/RankedButton"/>
+            <Frame type="Button" name="SoloButton" template="ScreenMultiplayer/ScreenMultiplayerButtonTemplate">
+                <Anchor side="Top" relative="$parent/TeamButton" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/TeamButton" pos="Max" offset="#ButtonOffsetLeft"/>
+                <Text val="@UI/ScreenMultiplayer/SoloButton"/>
                 <Alpha val="0"/>
                 
                 <Animation name="FadeNav">
@@ -292,8 +494,8 @@
                     </Controller>
                 </Animation>
 
-                <Anchor side="Top" relative="$parent/RankedButton" pos="Min" offset="0"/>
-                <Anchor side="Left" relative="$parent/RankedButton" pos="Max" offset="#ButtonOffsetLeft"/>
+                <Anchor side="Top" relative="$parent/SoloButton" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/SoloButton" pos="Max" offset="#ButtonOffsetLeft"/>
                 <Text val="@UI/ScreenMultiplayer/TournamentButton"/>
             </Frame>
 
@@ -305,24 +507,12 @@
                 <Enabled val="false"/>
 
                 <StateGroup name="TestingModeStateGroup">
-                    <State name="TestingDisabledState">
-                        <When type="AnimationState" frame="$parent/$parent" TestingMode="Disabled"/>
-                        <Action type="SetProperty" frame="$this" Enabled="false"/>
-                        <Action type="SetProperty" frame="$this" Tooltip="@UI/ScreenTournament/ExpansionLevelErrorText"/>
-                    </State>
-                    
-                    <State name="TestingNotAllowedState">
-                        <When type="AnimationState" frame="$parent/$parent" TestingMode="NotAllowed"/>
-                        <Action type="SetProperty" frame="$this" Enabled="false"/>
-                        <Action type="SetProperty" frame="$this" Tooltip="@UI/ScreenMatchmaking/QueueNotAllowedTooltip"/>
-                    </State>
-                    
                     <State name="TestingActiveState">
                         <When type="AnimationState" frame="$parent/$parent" TestingMode="Active"/>
                         <Action type="SetProperty" frame="$this" Enabled="true"/>
                         <Action type="SetProperty" frame="$this" Tooltip=""/>
                     </State>
-                    
+
                     <State name="TestingInactiveState">
                         <When type="AnimationState" frame="$parent/$parent" TestingMode="Inactive"/>
                         <Action type="SetProperty" frame="$this" Enabled="false"/>
@@ -346,92 +536,6 @@
                         <Key type="Curve" time="0.57" value="0" out="Linear"/>
                     </Controller>
                 </Animation>
-            </Frame>
-            
-            <Frame type="VersionNotificationFrame" name="RankedNewContentIndicator">
-                <Anchor side="Bottom" relative="$parent/RankedButton" pos="Max" offset="11"/>
-                <Anchor side="Right" relative="$parent/RankedButton/Label" pos="Max" offset="21"/>
-                <Width val="36"/>
-                <Height val="36"/>
-                <Visible val="False"/>
-                <Version val="0"/>
-                <SettingName val="MultiplayerRankedButton"/>
-                
-                <Animation name="VersionState">
-                    <Event event="NewVersion" action="Reset,Play"/>
-                    <Event event="OldVersion" action="Reset,Stop"/>
-                    <Event event="InvalidVersion" action="Reset,Stop"/>
-                    <Controller type="Visibility" end="Pause">
-                        <Key type="Bool" time="0" value="True"/>
-                    </Controller>
-                    <Controller type="Tooltip" end="Pause" frame="$parent/RankedButton">
-                        <Key type="Text" time="0" text="@UI/ScreenNavigation/NewContentLadder"/>
-                    </Controller>
-                </Animation>
-             
-                <!-- The name of this animation must be "ClearNotification" -->
-                <!-- When played, it will update the version of this notification  -->
-                <Animation name="ClearNotification">
-                    <Event event="OnClick" action="Reset,Play" frame="$parent/RankedButton"/>
-                    <Event event="Toggled" action="Reset,Play" frame="$parent/RankedButton"/>
-             
-                    <Controller type="Event" end="Stop">
-                        <Key type="Event" time="0.0" event="NoOp"/>
-                        <Key type="Event" time="1.0" event="NoOp"/>
-                    </Controller>
-                </Animation>
-                    
-                <Frame type="Image" name="NewContentFlagBg">
-                    <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
-                    <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
-                    <Texture val="@UI/Glues_Battlenet_TopNav_NewContentGlow"/>
-                    <Width val="36"/>
-                    <Height val="36"/>
-
-                    <Animation name="FlagGlow">
-                        <Event event="OnShown" action="Reset,Play" frame="$parent"/>
-                        <Event event="OnHidden" action="Stop" frame="$parent"/>
-
-                        <Controller type="Rotation" relative="False" end="Loop">
-                            <Key type="Curve" time="0" value="0" out="Linear"/>
-                            <Key type="Curve" time="5" value="360" in="Linear"/>
-                        </Controller>
-                    </Animation>
-                </Frame>
-
-                <Frame type="Image" name="NewContentFlag">
-                    <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
-                    <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
-                    <Texture val="@UI/Glues_Battlenet_TopNav_NewContent"/>
-                    <Width val="36"/>
-                    <Height val="36"/>
-                </Frame>
-                
-                <Frame type="Image" name="NewContentFlagGlow">
-                    <Anchor side="Bottom" relative="$parent/NewContentFlag" pos="Max" offset="0"/>
-                    <Anchor side="Left" relative="$parent/NewContentFlag" pos="Mid" offset="0"/>
-                    <Anchor side="Right" relative="$parent/NewContentFlag" pos="Mid" offset="0"/>
-                    <Texture val="@UI/Glues_Battlenet_TopNav_NewContentBg"/>
-                    <Width val="36"/>
-                    <Height val="36"/>
-                    <Alpha val="0"/>
-                    
-                    <Animation name="FlagGlow">
-                        <Event event="OnShown" action="Reset,Play" frame="$parent"/>
-                        <Event event="OnHidden" action="Stop" frame="$parent"/>
-
-                        <Controller type="Rotation" relative="False" end="Loop">
-                            <Key type="Curve" time="0" value="0" out="Linear"/>
-                            <Key type="Curve" time="5" value="360" in="Linear"/>
-                        </Controller>
-
-                        <Controller type="Fade" end="Loop">
-                            <Key type="Curve" time="0" value="255" out="Fast"/>
-                            <Key type="Curve" time="2" value="0" in="Slow"/>
-                            <Key type="Curve" time="4" value="255" out="Fast"/>
-                        </Controller>
-                    </Animation>
-                </Frame>
             </Frame>
         </Frame>
     </Frame>

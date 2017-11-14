@@ -803,12 +803,12 @@
                     
                     <Animation name="GridWipe" template="CollectionPreviewPane/GridWipeTemplate"/>
                 </Frame>
+            </Frame>
             
-                <Frame type="Image" name="OverlayVignette">
-                    <Anchor relative="$parent"/>
-                    <Texture val="@UI/SC2_UI_Collection_Announcers_Overlay_Vignette"/>
-                    <Alpha val="242"/>
-                </Frame>
+            <Frame type="Image" name="OverlayVignette">
+                <Anchor relative="$parent"/>
+                <Texture val="@UI/SC2_UI_Collection_Announcers_Overlay_Vignette"/>
+                <Alpha val="242"/>
             </Frame>
         </Frame>
     </Frame>
@@ -910,9 +910,66 @@
     ==========================
     -->
         
-    <Frame type="VoicePackFrame" name="VoicePackPreviewPaneTemplate" template="CollectionPreviewPane/CollectionPreviewPaneAnimatedTemplate">
+    <Frame type="Frame" name="VoicePackPreviewPaneTemplate" template="CollectionPreviewPane/CollectionPreviewPaneAnimatedTemplate">
     
         <Frame type="Frame" name="DisplayContainer">
+        
+            <Frame type="Frame" name="CasterBackgroundContainer">
+                <Anchor relative="$parent/BackgroundContainer"/>
+                <RenderPriority val="511"/>
+                <Visible val="False"/>
+                
+                <Frame type="Image" name="BackgroundImage">
+                    <Anchor relative="$parent"/>
+                    <Texture val="@UI/SC2_UI_Collection_Announcers_Caster_Background"/>
+                </Frame>
+                
+                <Frame type="Image" name="Lightray">
+                    <Anchor side="Top" relative="$parent" pos="-10%" offset="0"/>
+                    <Anchor side="Bottom" relative="$parent" pos="90%" offset="0"/>
+                    <Anchor side="Left" relative="$parent" pos="-25%" offset="0"/>
+                    <ScaleWidthToTexture val="True"/>
+                    <Texture val="@UI/SC2_UI_Collection_Announcers_Caster_Lightray"/>
+                    <Color val="45,60,114"/>
+                    <BlendMode val="Add"/>
+                    
+                    <Animation name="LightrayPulse">
+                        <Event event="OnShown" action="Reset,Play"/>
+                            
+                        <Controller type="Property" property="LayerAlpha" curve="True" index="0" end="Loop">
+                            <Key type="Property" time="0.000" value="128" inOut="Slow"/>
+                            <Key type="Property" time="3.000" value="80" inOut="Slow"/>
+                            <Key type="Property" time="6.000" value="160" inOut="Slow"/>
+                            <Key type="Property" time="9.000" value="80" inOut="Slow"/>
+                            <Key type="Property" time="11.000" value="128" inOut="Slow"/>
+                        </Controller>
+                    </Animation>
+                </Frame>
+                
+                <!-- Background glows-->
+                
+                <Frame type="Image" name="BackgroundBottomGlow">
+                    <Anchor side="Top" relative="$parent" pos="-20%" offset="0"/>
+                    <Anchor side="Bottom" relative="$parent" pos="340%" offset="0"/>
+                    <Anchor side="Left" relative="$parent" pos="-80%" offset="0"/>
+                    <Anchor side="Right" relative="$parent" pos="180%" offset="0"/>
+                    <Texture val="@UI/SC2_UI_Collection_VoicePack_CharacterFrame_GenericEffect_RadialGradient_256x256"/>
+                    <Alpha val="120"/>
+                    <Color val="47,205,255"/>
+                    
+                    <Animation name="CasterGlowPulse">
+                        <Event event="OnShown" action="Reset,Play"/>
+                            
+                        <Controller type="Property" property="LayerAlpha" curve="True" index="0" end="Loop">
+                            <Key type="Property" time="0.000" value="76" inOut="Slow"/>
+                            <Key type="Property" time="3.000" value="156" inOut="Slow"/>
+                            <Key type="Property" time="5.000" value="80" inOut="Slow"/>
+                            <Key type="Property" time="8.000" value="120" inOut="Slow"/>
+                            <Key type="Property" time="10.000" value="76" inOut="Slow"/>
+                        </Controller>
+                    </Animation>
+                </Frame>
+            </Frame>
         
             <Frame type="Frame" name="PreviewContainer">
                 
@@ -933,7 +990,8 @@
                         <Texture val="{$ancestor[@type=VoicePackFrame]/@ImageTexture}" layer="0"/>
                         
                         <Animation name="Flicker">
-                            <Event event="OnShown" action="Reset,Play"/>
+                            <Event event="OnLoreAnnouncer" frame="$ancestor[@name=DisplayContainer]" action="Reset,Play"/>
+                            <Event event="OnCaster" frame="$ancestor[@name=DisplayContainer]" action="Reset,Stop"/>
                             
                             <Controller type="Property" property="LayerAlpha" curve="True" index="0" end="Loop">
                                 <Key type="Property" time="0.000" value="255" inOut="Linear"/>
@@ -959,7 +1017,21 @@
                         <LayerAlpha val="40" layer="0"/>
                         
                         <Animation name="GlowAdjust">
-                            <Event event="OnShown" action="Reset,Play"/>
+                            <Event event="OnLoreAnnouncer" frame="$ancestor[@name=DisplayContainer]" action="Reset,Play"/>
+                            <Event event="OnCaster" frame="$ancestor[@name=DisplayContainer]" action="Reset,Stop"/>
+                            
+                            <Controller type="Property" property="LayerAlpha" curve="True" index="0" end="Loop">
+                                <Key type="Property" time="0.000" value="0" inOut="Slow"/>
+                                <Key type="Property" time="2.000" value="40" inOut="Slow"/>
+                                <Key type="Property" time="4.000" value="0" inOut="Slow"/>
+                                <Key type="Property" time="6.000" value="40" inOut="Slow"/>
+                                <Key type="Property" time="8.000" value="0" inOut="Slow"/>
+                            </Controller>
+                        </Animation>
+                        
+                        <Animation name="GlowAdjustCaster">
+                            <Event event="OnLoreAnnouncer" frame="$ancestor[@name=DisplayContainer]" action="Reset,Stop"/>
+                            <Event event="OnCaster" frame="$ancestor[@name=DisplayContainer]" action="Reset,Play"/>
                             
                             <Controller type="Property" property="LayerAlpha" curve="True" index="0" end="Loop">
                                 <Key type="Property" time="0.000" value="0" inOut="Slow"/>
@@ -1243,5 +1315,28 @@
                 </Animation>
             </Frame>
         </Frame>
+        
+        <StateGroup name="AnnouncerState">
+            <DefaultState val="NotVisible"/>
+            
+            <State name="LoreAnnouncer">
+                <When type="Property" Visible="True"/>
+                <When type="Property" frame="$parent" LocaleRestriction=""/>
+                <Action type="SetProperty" frame="DisplayContainer/BackgroundContainer" Visible="True"/>
+                <Action type="SetProperty" frame="DisplayContainer/CasterBackgroundContainer" Visible="False"/>
+                <Action type="SetProperty" frame="DisplayContainer/SurfaceAccentContainer" Visible="True"/>
+                <Action type="SendEvent" frame="DisplayContainer" Event="OnLoreAnnouncer"/>
+            </State>
+            
+            <State name="Caster">
+                <When type="Property" Visible="True"/>
+                <Action type="SetProperty" frame="DisplayContainer/BackgroundContainer" Visible="False"/>
+                <Action type="SetProperty" frame="DisplayContainer/CasterBackgroundContainer" Visible="True"/>
+                <Action type="SetProperty" frame="DisplayContainer/SurfaceAccentContainer" Visible="False"/>
+                <Action type="SendEvent" frame="DisplayContainer" Event="OnCaster"/>
+            </State>
+            
+            <State name="NotVisible"/>
+        </StateGroup>
     </Frame>
 </Desc>

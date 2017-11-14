@@ -3,34 +3,38 @@
     <DescFlags val="Locked"/>
 
     <Frame type="BattleUserFrame" name="BattleUserFrame">
-        <Anchor side="Right" relative="$this/NameLabel" pos="Max" offset="0"/>
-        <CollapseLayout val="true"/>
-
+        <Width val="130"/>
+        
         <StateGroup name="VisibleStateGroup">
             <State name="VisibleState">
                 <When type="Property" frame="$this" PresenceId="0"/>
                 <Action type="SetProperty" Visible="false"/>
             </State>
         </StateGroup>
-
+        
         <Frame type="RaceCacheFrame" name="RaceFrame">
-            <Anchor relative="$parent"/>
+            <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
         </Frame>
-
+        
         <Frame type="Image" name="RaceIcon">
             <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
             <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
             <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
             <Width val="30"/>
             <Height val="30"/>
-            <Texture val="{$parent/RaceFrame/@RaceIcon}"/>
+            <Texture val="@UI/SC2_UI_UserProfile_Ladders_Race_Icon_Random"/>
         </Frame>
-
+        
         <Frame type="Label" name="NameLabel">
             <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
             <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
             <Anchor side="Left" relative="$parent/RaceIcon" pos="Max" offset="5"/>
-            <Text val="{$parent/@DisplayName}"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+            <Style val="Profile_Ladders_Description"/>
+            <Text val="{$parent/@DisplayNameExcludeClan}"/>
+            <Options val="NoWrapping"/>
             <AcceptsMouse val="true"/>
             <ContextMenu val="$parent/UserContextMenu"/>
             <ContextMenuButtons val="Left|Right"/>
@@ -41,10 +45,33 @@
             <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
             <PresenceId val="{$parent/@PresenceId}"/>
         </Frame>
+        
+        <StateGroup name="RaceState">
+            <DefaultState val="Random"/>
+            
+            <State name="Protoss">
+                <When type="Property" frame="RaceFrame" Race="Prot"/>
+                <Action type="SetProperty" frame="RaceIcon" Texture="@UI/SC2_UI_UserProfile_Ladders_Race_Icon_Protoss"/>
+            </State>
+            
+            <State name="Terran">
+                <When type="Property" frame="RaceFrame" Race="Terran"/>
+                <Action type="SetProperty" frame="RaceIcon" Texture="@UI/SC2_UI_UserProfile_Ladders_Race_Icon_Terran"/>
+            </State>
+            
+            <State name="Zerg">
+                <When type="Property" frame="RaceFrame" Race="Zerg"/>
+                <Action type="SetProperty" frame="RaceIcon" Texture="@UI/SC2_UI_UserProfile_Ladders_Race_Icon_Zerg"/>
+            </State>
+            
+            <State name="Random">
+                <Action type="SetProperty" frame="RaceIcon" Texture="@UI/SC2_UI_UserProfile_Ladders_Race_Icon_Random"/>
+            </State>
+        </StateGroup>
     </Frame>
 
     <Frame type="LadderTeamTileListItem" name="UserProfileLadderFriendsTileListItem">
-        <Height val="50"/>
+        <Height val="60"/>
 
         <Frame type="Image" name="NormalImage">
             <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
@@ -75,9 +102,9 @@
         </Frame>
 
         <Frame type="MatchmakingLeagueIcon" name="LeagueIcon" template="MatchmakingLeagueIcon/MatchmakingLeagueIconMiniTemplate">
-            <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
-            <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
-            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Top" relative="$parent" pos="Mid" offset="3"/>
+            <Anchor side="Bottom" relative="$parent" pos="Mid" offset="3"/>
+            <Anchor side="Left" relative="$ancestor[@type=UserProfileLadderFriendsFrame]/HeaderContainer/ModeLabel" pos="Min" offset="-7"/>
             <League val="{$parent/@League}"/>
             <LeagueTier val="{$parent/@Tier}"/>
         </Frame>
@@ -85,8 +112,8 @@
         <Frame type="Label" name="QueueLabel">
             <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
             <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
-            <Anchor side="Left" relative="$parent/LeagueIcon" pos="Max" offset="0"/>
-            <Width val="70"/>
+            <Anchor side="Left" relative="$parent/LeagueIcon" pos="Max" offset="3"/>
+            <Style val="Profile_Ladders_CareerSeason"/>
             <Text val="{$this/QueueFrame/@ShortName}"/>
 
             <Frame type="BattleQueueFrame" name="QueueFrame">
@@ -98,8 +125,9 @@
         <Frame type="Label" name="RankLabel">
             <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
             <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
-            <Anchor side="Left" relative="$parent/QueueLabel" pos="Max" offset="10"/>
-            <Width val="70"/>
+            <Anchor side="Left" relative="$ancestor[@type=UserProfileLadderFriendsFrame]/HeaderContainer/RankLabel" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$ancestor[@type=UserProfileLadderFriendsFrame]/HeaderContainer/RankLabel" pos="Mid" offset="0"/>
+            <Style val="Profile_Ladders_RaceReport_ColumnValue"/>
             <Text val="{$parent/@Rank}"/>
         </Frame>
 
@@ -108,7 +136,7 @@
         <Frame type="BattleUserFrame" name="PlayerFrame0" template="UserProfileLadderFriendsFrame/BattleUserFrame">
             <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
             <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
-            <Anchor side="Left" relative="$parent/RankLabel" pos="Max" offset="10"/>
+            <Anchor side="Left" relative="$ancestor[@type=UserProfileLadderFriendsFrame]/HeaderContainer/TeamLabel" pos="Min" offset="0"/>
             <PresenceId val="{$parent/@PresenceId[0]}"/>
 
             <Frame type="RaceCacheFrame" name="RaceFrame">
@@ -153,6 +181,7 @@
             <Anchor side="Top" relative="$parent/PlayerFrame3" pos="Mid" offset="0"/>
             <Anchor side="Bottom" relative="$parent/PlayerFrame3" pos="Mid" offset="0"/>
             <Anchor side="Left" relative="$parent/PlayerFrame3" pos="Max" offset="0"/>
+            <Style val="Profile_Ladders_Description"/>
             <Text val="@UI/UserProfileLadderFriendsFrame/Random"/>
             <Visible val="false"/>
 
@@ -167,100 +196,167 @@
         <Frame type="Label" name="DivisionLabel">
             <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
             <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
-            <Anchor side="Right" relative="$parent" pos="Max" offset="-20"/>
+            <Anchor side="Left" relative="$ancestor[@type=UserProfileLadderFriendsFrame]/HeaderContainer/DivisionLabel" pos="Min" offset="0"/>
+            <Style val="Profile_Ladders_Description"/>
             <Text val="{$parent/@DivisionName}"/>
         </Frame>
+            
+        <StateGroup name="PlayerCountState">
+            <DefaultState val="One"/>
+            
+            <State name="Four">
+                <When type="Property" frame="PlayerFrame3" Visible="True"/>
+                 <Action type="SetProperty" frame="PlayerFrame0" Width="80"/>
+                 <Action type="SetProperty" frame="PlayerFrame1" Width="80"/>
+                 <Action type="SetProperty" frame="PlayerFrame2" Width="80"/>
+                 <Action type="SetProperty" frame="PlayerFrame3" Width="80"/>
+            </State>
+            
+            <State name="Three">
+                <When type="Property" frame="PlayerFrame2" Visible="True"/>
+                 <Action type="SetProperty" frame="PlayerFrame0" Width="160"/>
+                 <Action type="SetProperty" frame="PlayerFrame1" Width="160"/>
+                 <Action type="SetProperty" frame="PlayerFrame2" Width="160"/>
+            </State>
+            
+            <State name="Two">
+                <When type="Property" frame="PlayerFrame1" Visible="True"/>
+                 <Action type="SetProperty" frame="PlayerFrame0" Width="240"/>
+                 <Action type="SetProperty" frame="PlayerFrame1" Width="240"/>
+            </State>
+            
+            <State name="One">
+                 <Action type="SetProperty" frame="PlayerFrame0" Width="480"/>
+            </State>
+        </StateGroup>
     </Frame>
     
     <Frame type="UserProfileLadderFriendsFrame" name="UserProfileLadderFriendsFrameTemplate">
         <Handle val="UserProfileLadderFriendsFrame"/>
         <PresenceId val="{$ScreenUserProfile/@PresenceId}"/>
-
-        <Frame type="Image" name="Background">
-            <Anchor relative="$parent"/>
-            <Texture val="@UI/Glues_Battlenet_PageAssets_TableLargeHeaderBg"/>
-            <TextureType val="NineSlice"/>
-            <Tiled val="True"/>
-            <Visible val="true"/>
+        
+        <Frame type="Frame" name="BackgroundContainer" template="UserProfileTemplates/SegmentedListBackgroundTemplate">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
         </Frame>
 
         <Frame type="TileList" name="TileList">
-            <Anchor side="Top" relative="$parent" pos="Min" offset="80"/>
-            <Anchor side="Left" relative="$parent" pos="Min" offset="15"/>
-            <Anchor side="Bottom" relative="$parent" pos="Max" offset="-10"/>
+            <Anchor side="Top" relative="$parent" pos="Min" offset="112"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="14"/>
             <Anchor side="Right" relative="$parent" pos="Max" offset="-12"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="-10"/>
 
             <Frame type="LadderTeamTileListItem" name="Item0" template="UserProfileLadderFriendsFrame/UserProfileLadderFriendsTileListItem">
-                <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Top" relative="$parent" pos="Min" offset="1"/>
                 <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
-                <Anchor side="Right" relative="$parent/ScrollBar" pos="Min" offset="-2"/>
+                <Anchor side="Right" relative="$parent" pos="Max" offset="-22"/>
             </Frame>
 
             <Frame type="LadderTeamTileListItem" name="Item1" template="UserProfileLadderFriendsFrame/UserProfileLadderFriendsTileListItem">
-                <Anchor side="Top" relative="$parent/Item0" pos="Max" offset="0"/>
-                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
-                <Anchor side="Right" relative="$parent/ScrollBar" pos="Min" offset="-2"/>
+                <Anchor side="Top" relative="$parent/Item0" pos="Max" offset="2"/>
+                <Anchor side="Left" relative="$parent/Item0" pos="Min" offset="0"/>
+                <Anchor side="Right" relative="$parent/Item0" pos="Max" offset="0"/>
             </Frame>
 
             <Frame type="LadderTeamTileListItem" name="Item2" template="UserProfileLadderFriendsFrame/UserProfileLadderFriendsTileListItem">
-                <Anchor side="Top" relative="$parent/Item1" pos="Max" offset="0"/>
-                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
-                <Anchor side="Right" relative="$parent/ScrollBar" pos="Min" offset="-2"/>
+                <Anchor side="Top" relative="$parent/Item1" pos="Max" offset="2"/>
+                <Anchor side="Left" relative="$parent/Item0" pos="Min" offset="0"/>
+                <Anchor side="Right" relative="$parent/Item0" pos="Max" offset="0"/>
             </Frame>
 
             <Frame type="LadderTeamTileListItem" name="Item3" template="UserProfileLadderFriendsFrame/UserProfileLadderFriendsTileListItem">
-                <Anchor side="Top" relative="$parent/Item2" pos="Max" offset="0"/>
-                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
-                <Anchor side="Right" relative="$parent/ScrollBar" pos="Min" offset="-2"/>
+                <Anchor side="Top" relative="$parent/Item2" pos="Max" offset="2"/>
+                <Anchor side="Left" relative="$parent/Item0" pos="Min" offset="0"/>
+                <Anchor side="Right" relative="$parent/Item0" pos="Max" offset="0"/>
             </Frame>
 
             <Frame type="LadderTeamTileListItem" name="Item4" template="UserProfileLadderFriendsFrame/UserProfileLadderFriendsTileListItem">
-                <Anchor side="Top" relative="$parent/Item3" pos="Max" offset="0"/>
-                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
-                <Anchor side="Right" relative="$parent/ScrollBar" pos="Min" offset="-2"/>
+                <Anchor side="Top" relative="$parent/Item3" pos="Max" offset="2"/>
+                <Anchor side="Left" relative="$parent/Item0" pos="Min" offset="0"/>
+                <Anchor side="Right" relative="$parent/Item0" pos="Max" offset="0"/>
             </Frame>
-            
+
+            <Frame type="LadderTeamTileListItem" name="Item5" template="UserProfileLadderFriendsFrame/UserProfileLadderFriendsTileListItem">
+                <Anchor side="Top" relative="$parent/Item4" pos="Max" offset="2"/>
+                <Anchor side="Left" relative="$parent/Item0" pos="Min" offset="0"/>
+                <Anchor side="Right" relative="$parent/Item0" pos="Max" offset="0"/>
+            </Frame>
+
+            <Frame type="LadderTeamTileListItem" name="Item6" template="UserProfileLadderFriendsFrame/UserProfileLadderFriendsTileListItem">
+                <Anchor side="Top" relative="$parent/Item5" pos="Max" offset="2"/>
+                <Anchor side="Left" relative="$parent/Item0" pos="Min" offset="0"/>
+                <Anchor side="Right" relative="$parent/Item0" pos="Max" offset="0"/>
+            </Frame>
+
+            <Frame type="LadderTeamTileListItem" name="Item7" template="UserProfileLadderFriendsFrame/UserProfileLadderFriendsTileListItem">
+                <Anchor side="Top" relative="$parent/Item6" pos="Max" offset="2"/>
+                <Anchor side="Left" relative="$parent/Item0" pos="Min" offset="0"/>
+                <Anchor side="Right" relative="$parent/Item0" pos="Max" offset="0"/>
+            </Frame>
+
+            <Frame type="LadderTeamTileListItem" name="Item8" template="UserProfileLadderFriendsFrame/UserProfileLadderFriendsTileListItem">
+                <Anchor side="Top" relative="$parent/Item7" pos="Max" offset="2"/>
+                <Anchor side="Left" relative="$parent/Item0" pos="Min" offset="0"/>
+                <Anchor side="Right" relative="$parent/Item0" pos="Max" offset="0"/>
+            </Frame>
+
+            <Frame type="LadderTeamTileListItem" name="Item9" template="UserProfileLadderFriendsFrame/UserProfileLadderFriendsTileListItem">
+                <Anchor side="Top" relative="$parent/Item8" pos="Max" offset="2"/>
+                <Anchor side="Left" relative="$parent/Item0" pos="Min" offset="0"/>
+                <Anchor side="Right" relative="$parent/Item0" pos="Max" offset="0"/>
+            </Frame>
+
+            <Frame type="LadderTeamTileListItem" name="Item10" template="UserProfileLadderFriendsFrame/UserProfileLadderFriendsTileListItem">
+                <Anchor side="Top" relative="$parent/Item9" pos="Max" offset="2"/>
+                <Anchor side="Left" relative="$parent/Item0" pos="Min" offset="0"/>
+                <Anchor side="Right" relative="$parent/Item0" pos="Max" offset="0"/>
+            </Frame>
+
             <Frame type="ScrollBar" name="ScrollBar" template="CollectionTemplates/ScrollBarTemplate">
-                <Anchor side="Top" relative="$parent" pos="Min" offset="-4"/>
-                <Anchor side="Right" relative="$parent" pos="Max" offset="-6"/>
-                <Anchor side="Bottom" relative="$parent" pos="Max" offset="-1"/>
+                <Anchor side="Top" relative="$parent" pos="Min" offset="-3"/>
+                <Anchor side="Right" relative="$parent" pos="Max" offset="2"/>
+                <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
                 <CollapseLayout val="true"/>
             </Frame>
         </Frame>
 
         <Frame type="Frame" name="HeaderContainer">
-            <Anchor side="Top" relative="$parent/Background" pos="Min" offset="10"/>
-            <Anchor side="Left" relative="$parent/Background" pos="Min" offset="0"/>
-            <Anchor side="Right" relative="$parent/Background" pos="Max" offset="-22"/>
+            <Anchor side="Top" relative="$parent/BackgroundContainer" pos="Min" offset="58"/>
+            <Anchor side="Left" relative="$parent/BackgroundContainer" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent/BackgroundContainer" pos="Max" offset="-22"/>
             <Height val="60"/>
 
             <Frame type="Label" name="ModeLabel">
                 <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
-                <Anchor side="Left" relative="$parent" pos="Min" offset="20"/>
                 <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
-                <Width val="70"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="26"/>
+                <Style val="Profile_Ladders_RaceReport_ColumnHeader"/>
                 <Text val="@UI/UserProfileLadderFriendsFrame/Mode"/>
             </Frame>
 
             <Frame type="Label" name="RankLabel">
                 <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
-                <Anchor side="Left" relative="$parent/ModeLabel" pos="Max" offset="20"/>
                 <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
-                <Width val="70"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="160"/>
+                <Style val="Profile_Ladders_RaceReport_ColumnHeader"/>
                 <Text val="@UI/UserProfileLadderFriendsFrame/Rank"/>
             </Frame>
 
             <Frame type="Label" name="TeamLabel">
                 <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
-                <Anchor side="Left" relative="$parent/RankLabel" pos="Max" offset="20"/>
                 <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="240"/>
+                <Style val="Profile_Ladders_RaceReport_ColumnHeader"/>
                 <Text val="@UI/UserProfileLadderFriendsFrame/Team"/>
             </Frame>
 
             <Frame type="Label" name="DivisionLabel">
                 <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
-                <Anchor side="Right" relative="$parent" pos="Max" offset="-20"/>
                 <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="800"/>
+                <Style val="Profile_Ladders_RaceReport_ColumnHeader"/>
                 <Text val="@UI/UserProfileLadderFriendsFrame/Division"/>
             </Frame>
         </Frame>

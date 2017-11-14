@@ -65,16 +65,15 @@
             </Frame>
 
             <Frame type="CoopCampaignMutatorInfoPanel" name="MutatorInfoPanel" template="CoopCampaignMutatorInfoPanel/CoopCampaignMutatorInfoPanelTemplate">
-                <Anchor side="Bottom" relative="Button" pos="Max" offset="31"/>
-                <Anchor side="Left" relative="$parent/ReadyButton" pos="Min" offset="-361"/>
+                <Anchor relative="$parent"/>
                 <Handle val="MutatorInfoPanel"/>
                 
                 <Animation name="UISlideOut" template="CommanderSelectionPanel/UISlideOutAnimationTemplate"/>
                 <Animation name="UISlideIn" template="CommanderSelectionPanel/UISlideInAnimationTemplate"/>
                 
                 <Frame type="Button" name="MutatorMapButton" template="StandardBattlenetTemplates/BattlenetStandardButtonTemplate">
-                    <Anchor side="Top" relative="$parent/$parent/ReadyButton" pos="Min" offset="0"/>
-                    <Anchor side="Left" relative="$parent/$parent/ReadyButton" pos="Max" offset="6"/>
+                    <Anchor side="Top" relative="$parent/$parent/MapSelectionPanel/MapButton" pos="Min" offset="0"/>
+                    <Anchor side="Left" relative="$parent/$parent/MapSelectionPanel/MapButton" pos="Min" offset="0"/>
                     <Width val="258"/>
                     <HoverSound val="@UI_HoverTick"/>
 
@@ -85,22 +84,9 @@
                         <AcceptsMouseTooltip val="True"/>
                     </Frame>
                 </Frame>
-                
-                <Frame type="Button" name="Button">
-                    <Anchor side="Bottom" relative="$parent/$parent/MutatorReadyButton" pos="Max" offset="-4"/>
-                    <HoverSound val="@UI_HoverTick"/>
-                </Frame>
             </Frame>
             
-            <Frame type="Frame" name="CustomMutatorInfoPanel" template="CoopCampaignCustomMutatorInfoPanel/CoopCampaignCustomMutatorInfoPanelTemplate">
-                <Anchor side="Bottom" relative="Button" pos="Max" offset="31"/>
-                <Anchor side="Left" relative="$parent/ReadyButton" pos="Min" offset="-361"/>
-                <Handle val="CustomMutatorInfoPanel"/>
-                
-                <Frame type="Button" name="Button">
-                    <Anchor side="Bottom" relative="$parent/$parent/MutatorReadyButton" pos="Max" offset="-4"/>
-                </Frame>
-            </Frame>
+            <Frame type="Frame" name="CustomMutatorInfoPanel" template="CoopCampaignCustomMutatorInfoPanel/CoopCampaignCustomMutatorInfoPanelTemplate"/>
             
             <Frame type="Frame" name="StandardInfoPanel" template="CoopCampaignStandardInfoPanel/CoopCampaignStandardInfoPanelTemplate">
                 <Anchor side="Bottom" relative="Button" pos="Max" offset="31"/>
@@ -110,6 +96,7 @@
                 <Frame type="Button" name="Button">
                     <Anchor side="Bottom" relative="$parent/$parent/MutatorReadyButton" pos="Max" offset="-4"/>
                     <HoverSound val="@UI_HoverTick"/>
+                    <Visible val="False"/>
                 </Frame>
             </Frame>
 
@@ -117,9 +104,9 @@
                 <Anchor relative="$parent"/>
                 
                 <Frame type="Button" name="MapButton" template="StandardBattlenetTemplates/BattlenetStandardButtonTemplate">
-                    <Anchor side="Top" relative="$parent/$parent/ReadyButton" pos="Min" offset="0"/>
-                    <Anchor side="Left" relative="$parent/$parent/ReadyButton" pos="Max" offset="6"/>
-                    <Width val="258"/>
+                    <Anchor side="Top" relative="$parent/$parent/CommanderPurchaseButton" pos="Min" offset="0"/>
+                    <Anchor side="Left" relative="$parent/$parent/CommanderPurchaseButton" pos="Max" offset="8"/>
+                    <Width val="260"/>
                     <HoverSound val="@UI_HoverTick"/>
 
                     <Frame type="Label" name="Label">
@@ -135,42 +122,12 @@
             </Frame>
 
             <Frame type="Button" name="DifficultyButton" template="StandardBattlenetTemplates/BattlenetStandardButtonTemplate">
-                <Anchor side="Left" relative="$parent/MapSelectionPanel/MapButton" pos="Max" offset="6"/>
-                <Width val="258"/>
+                <Anchor side="Left" relative="$parent/MapSelectionPanel/MapButton" pos="Max" offset="8"/>
+                <Width val="260"/>
                 <HoverSound val="@UI_HoverTick"/>
             </Frame>
-            
-            <StateGroup name="ButtonWarningVisibilty">
-                <State name="ShowCampaignPurchaseWarning">
-                    <When type="AnimationState" CommanderCampaignPurchase="ShowCampaignPurchase"/>
-                    <Action type="SetProperty" frame="MapSelectionPanel" visible="False"/>
-                    <Action type="SetProperty" frame="DifficultyButton" visible="False"/>
-                    <Action type="SetProperty" frame="DifficultyLabel" visible="False"/>
-                    <Action type="SetProperty" frame="DifficultyBonusLabel" visible="False"/>
-                    <Action type="SetProperty" frame="StandardInfoPanel" visible="False"/>
-                    <Action type="SetProperty" frame="MutatorInfoPanel" visible="False"/>
-                    <Action type="SetProperty" frame="CustomMutatorInfoPanel" visible="False"/>
 
-                    <Action type="SetProperty" frame="CampaignPurchaseButton" visible="True"/>
-                    <Action type="SetProperty" frame="UpsellInfo" visible="True"/>
-                    <Action type="SetProperty" frame="PurchaseWarningGlow" visible="True"/>
-                </State>
-
-                <State name="ShowCommanderPurchaseWarning">
-                    <When type="AnimationState" CommanderPurchase="ShowCommanderPurchase"/>
-                    <Action type="SetProperty" frame="MapSelectionPanel" visible="False"/>
-                    <Action type="SetProperty" frame="DifficultyButton" visible="False"/>
-                    <Action type="SetProperty" frame="DifficultyLabel" visible="False"/>
-                    <Action type="SetProperty" frame="DifficultyBonusLabel" visible="False"/>
-                    <Action type="SetProperty" frame="StandardInfoPanel" visible="False"/>
-                    <Action type="SetProperty" frame="MutatorInfoPanel" visible="False"/>
-                    <Action type="SetProperty" frame="CustomMutatorInfoPanel" visible="False"/>
-
-                    <Action type="SetProperty" frame="CommanderPurchaseButton" visible="True"/>
-                    <Action type="SetProperty" frame="CommanderPurchaseInfo" visible="True"/>
-                    <Action type="SetProperty" frame="CommanderPurchaseWarningGlow" visible="True"/>
-                </State>
-                
+            <StateGroup name="ButtonModeVisibilty">
                 <State name="ButtonModeStandard">
                     <When type="AnimationState" frame="$parent" ModeState="ModeStandard"/>
                     <Action type="SetProperty" frame="MapSelectionPanel" visible="True"/>
@@ -226,6 +183,8 @@
             </StateGroup>
 
             <StateGroup name="ReadyButtonStateGroup">
+                <!-- Commanders are always playable even if they're not purchased now. -->
+                <!--
                 <State name="CampaignPurchaseState">
                     <When type="AnimationState" CommanderCampaignPurchase="ShowCampaignPurchase"/>
                     <Action type="SetProperty" frame="ReadyButton" Visible="false"/>
@@ -241,6 +200,7 @@
                     <Action type="SetProperty" frame="CancelButton" Visible="false"/>
                     <Action type="SetProperty" frame="MutatorReadyButton" Visible="false"/>
                 </State>
+                -->
                 
                 <State name="MutatorDisabledState">
                     <When type="AnimationState" frame="MutatorInfoPanel" InfoPanelState="Inactive"/>
@@ -1050,6 +1010,13 @@
             <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
             <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
             <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+
+            <StateGroup name="HideNavigationStateGroup">
+                <State name="ScreenNewUserVisibleState">
+                    <When type="Property" frame="$ScreenNewUser" Visible="true"/>
+                    <Action type="SetProperty" frame="$this" Visible="false"/>
+                </State>
+            </StateGroup>
             
             <Frame type="BlurFrame" name="BlurEffect">
                 <Anchor relative="$parent/Background"/>

@@ -1269,12 +1269,26 @@
     -->
     
     <!-- Standard Tab Left Button -->
-    <Frame type="Button" name="StandardSmallTabButtonLeftTemplate">
+    <Frame type="Control" name="StandardSmallTabBaseLeftTemplate">
         <Width val="100"/>
         <Height val="38"/>
-        <ClickSound val="@AC_UI_OnClick01"/>
+        <!-- <ClickSound val="@AC_UI_OnClick01"/>
         <HoverSound val="@UI_HoverTick"/>
-        <Style val="@BattlenetSmallTabButton"/>
+        <Style val="@BattlenetSmallTabButton"/> -->
+        <!-- <Toggleable val="True"/> -->
+            
+        <StateGroup name="HoverSound">
+            <DefaultState val="NoSound"/>
+            
+            <State name="HoverSound">
+                <When type="StateGroup" frame="$this" HoveredState="Hovered"/>
+                <When type="StateGroup" frame="$this" ToggledState="NotToggled"/>
+                <When type="StateGroup" frame="$this" DisabledState="NotDisabled"/>
+                <Action type="PlaySound" sound="@UI_HoverTick" on="Enter"/>
+            </State>
+
+            <State name="NoSound"/>
+        </StateGroup>
         
         <Frame type="Frame" name="AnchorFrame">
             <Anchor relative="$parent"/>
@@ -1508,10 +1522,10 @@
 
         <!-- Label Shadow -->
         <Frame type="Label" name="LabelShadow">
-            <Anchor side="Top" relative="$parent/Label" pos="Min" offset="1"/>
-            <Anchor side="Bottom" relative="$parent/Label" pos="Max" offset="1"/>
-            <Anchor side="Left" relative="$parent/Label" pos="Min" offset="1"/>
-            <Anchor side="Right" relative="$parent/Label" pos="Max" offset="1"/>
+            <Anchor side="Top" relative="$parent/TitleLabel" pos="Min" offset="1"/>
+            <Anchor side="Bottom" relative="$parent/TitleLabel" pos="Max" offset="1"/>
+            <Anchor side="Left" relative="$parent/TitleLabel" pos="Min" offset="1"/>
+            <Anchor side="Right" relative="$parent/TitleLabel" pos="Max" offset="1"/>
             <Style val="StandardTabButton_Normal"/>
             <Text val="{$parent/Label/@Text}"/>
             <Color val="0,0,0"/>
@@ -1538,6 +1552,32 @@
             <Anchor side="Left" relative="$parent/AnchorFrame" pos="Min" offset="15"/>
             <Anchor side="Right" relative="$parent/AnchorFrame" pos="Max" offset="-25"/>
             <Style val="StandardTabButton_Normal"/>
+            <Alpha val="0"/>
+            
+            <StateGroup name="DisplayState">
+                <DefaultState val="Not16x9"/>
+                
+                <State name="16x9">
+                    <When type="StateGroup" frame="$GlueUI" AspectRatioState="16x9"/>
+                    <Action type="SetAnchor" frame="$this" side="Top" relative="$parent/AnchorFrame" pos="Mid" offset="1"/>
+                    <Action type="SetAnchor" frame="$this" side="Bottom" relative="$parent/AnchorFrame" pos="Mid" offset="1"/>
+                </State>
+
+                <State name="Not16x9">
+                    <Action type="SetAnchor" frame="$this" side="Top" relative="$parent/AnchorFrame" pos="Mid" offset="0"/>
+                    <Action type="SetAnchor" frame="$this" side="Bottom" relative="$parent/AnchorFrame" pos="Mid" offset="0"/>
+                </State>
+            </StateGroup>
+        </Frame>
+
+        <!-- Label -->
+        <Frame type="Label" name="TitleLabel">
+            <Anchor side="Top" relative="$parent/Label" pos="Min" offset="0"/>
+            <Anchor side="Bottom" relative="$parent/Label" pos="Max" offset="0"/>
+            <Anchor side="Left" relative="$parent/Label" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent/Label" pos="Max" offset="0"/>
+            <Style val="StandardTabButton_Normal"/>
+            <Text val="{$parent/Label/@Text}"/>
             
             <StateGroup name="StyleState">
                 <DefaultState val="Normal"/>
@@ -1561,21 +1601,6 @@
                     <Action type="SetProperty" frame="$this" Style="StandardTabButton_Normal"/>
                 </State>
             </StateGroup>
-            
-            <StateGroup name="DisplayState">
-                <DefaultState val="Not16x9"/>
-                
-                <State name="16x9">
-                    <When type="StateGroup" frame="$GlueUI" AspectRatioState="16x9"/>
-                    <Action type="SetAnchor" frame="$this" side="Top" relative="$parent/AnchorFrame" pos="Mid" offset="1"/>
-                    <Action type="SetAnchor" frame="$this" side="Bottom" relative="$parent/AnchorFrame" pos="Mid" offset="1"/>
-                </State>
-
-                <State name="Not16x9">
-                    <Action type="SetAnchor" frame="$this" side="Top" relative="$parent/AnchorFrame" pos="Mid" offset="0"/>
-                    <Action type="SetAnchor" frame="$this" side="Bottom" relative="$parent/AnchorFrame" pos="Mid" offset="0"/>
-                </State>
-            </StateGroup>
         </Frame>
 
         <Frame type="Frame" name="HitTestFrame">
@@ -1595,10 +1620,10 @@
         <StateGroup name="ToggledState">
             <DefaultState val="NotToggled"/>
             <State name="Toggled">
-                <When type="Property" frame="$this" Toggled="True"/>
+                <!-- <When type="Property" frame="$this" Toggled="True"/> -->
                 <Action type="SetProperty" frame="$this" RenderPriority="515"/>
-                <Action type="SetProperty" ClickSound=""/>
-                <Action type="SetProperty" HoverSound=""/>
+                <!-- <Action type="SetProperty" ClickSound=""/>
+                <Action type="SetProperty" HoverSound=""/> -->
             </State>
             <State name="NotToggled">
                 <Action type="SetProperty" frame="$this" RenderPriority="512"/>
@@ -1625,7 +1650,7 @@
     </Frame>
     
     <!-- Standard Tab Right Button -->
-    <Frame type="Button" name="StandardSmallTabButtonRightTemplate" template="StandardSmallButtonTemplates/StandardSmallTabButtonLeftTemplate">
+    <Frame type="Button" name="StandardSmallTabBaseRightTemplate" template="StandardSmallButtonTemplates/StandardSmallTabBaseLeftTemplate">
         
         <!-- Background -->
         <Frame type="Image" name="Background">
@@ -1671,7 +1696,7 @@
     </Frame>
     
     <!-- Standard Tab Middle Button -->
-    <Frame type="Button" name="StandardSmallTabButtonMiddleTemplate" template="StandardSmallButtonTemplates/StandardSmallTabButtonLeftTemplate">
+    <Frame type="Button" name="StandardSmallTabBaseMiddleTemplate" template="StandardSmallButtonTemplates/StandardSmallTabBaseLeftTemplate">
         
         <!-- Background -->
         <Frame type="Image" name="Background">
@@ -1714,5 +1739,109 @@
             <Anchor side="Left" relative="$parent/AnchorFrame" pos="Min" offset="25"/>
             <Anchor side="Right" relative="$parent/AnchorFrame" pos="Max" offset="-25"/>
         </Frame>
+    </Frame>
+    
+    
+    <!-- Small Tab Button Templates -->
+    
+    
+    <!-- Standard Tab Button Left -->
+    <Frame type="Button" name="StandardSmallTabButtonLeftTemplate" template="StandardSmallButtonTemplates/StandardSmallTabBaseLeftTemplate">
+        <Toggleable val="True"/>
+                
+        <!-- ToggledState -->
+        <StateGroup name="ToggledState">
+            <DefaultState val="NotToggled"/>
+            <State name="Toggled">
+                <When type="Property" frame="$this" Toggled="True"/>
+                <!-- <Action type="SetProperty" frame="$this" RenderPriority="515"/> -->
+<!--                 <Action type="SetProperty" ClickSound=""/>
+                <Action type="SetProperty" HoverSound=""/> -->
+                <Action type="SetProperty" ClickSound=""/>
+            </State>
+            <State name="NotToggled">
+                <!-- <Action type="SetProperty" frame="$this" RenderPriority="512"/> -->
+                <Action type="SetProperty" ClickSound="@UI_FileSelectionSelect"/>
+            </State>
+        </StateGroup>
+    </Frame>
+    
+    <!-- Standard Tab Button Right -->
+    <Frame type="Button" name="StandardSmallTabButtonRightTemplate" template="StandardSmallButtonTemplates/StandardSmallTabBaseRightTemplate">
+        <Toggleable val="True"/>
+                
+        <!-- ToggledState -->
+        <StateGroup name="ToggledState">
+            <DefaultState val="NotToggled"/>
+            <State name="Toggled">
+                <When type="Property" frame="$this" Toggled="True"/>
+                <Action type="SetProperty" ClickSound=""/>
+            </State>
+            <State name="NotToggled">
+                <Action type="SetProperty" ClickSound="@UI_FileSelectionSelect"/>
+            </State>
+        </StateGroup>
+    </Frame>
+    
+    <!-- Standard Tab Button Middle -->
+    <Frame type="Button" name="StandardSmallTabButtonMiddleTemplate" template="StandardSmallButtonTemplates/StandardSmallTabBaseMiddleTemplate">
+        <Toggleable val="True"/>
+                
+        <!-- ToggledState -->
+        <StateGroup name="ToggledState">
+            <DefaultState val="NotToggled"/>
+            <State name="Toggled">
+                <When type="Property" frame="$this" Toggled="True"/>
+                <Action type="SetProperty" ClickSound=""/>
+            </State>
+            <State name="NotToggled">
+                <Action type="SetProperty" ClickSound="@UI_FileSelectionSelect"/>
+            </State>
+        </StateGroup>
+    </Frame>
+    
+    
+    <!-- Small Tab List Item Templates -->
+    
+    
+    <!-- Standard Tab List Item Left -->
+    <Frame type="TileListItem" name="StandardSmallTabListItemLeftTemplate" template="StandardSmallButtonTemplates/StandardSmallTabBaseLeftTemplate">
+                
+        <!-- ToggledState -->
+        <StateGroup name="ToggledState">
+            <DefaultState val="NotToggled"/>
+            <State name="Toggled">
+                <When type="Property" frame="$this" Selected="True"/>
+            </State>
+            <State name="NotToggled"/>
+        </StateGroup>
+    </Frame>
+    
+    
+    <!-- Standard Tab List Item Right -->
+    <Frame type="TileListItem" name="StandardSmallTabListItemRightTemplate" template="StandardSmallButtonTemplates/StandardSmallTabBaseRightTemplate">
+                
+        <!-- ToggledState -->
+        <StateGroup name="ToggledState">
+            <DefaultState val="NotToggled"/>
+            <State name="Toggled">
+                <When type="Property" frame="$this" Selected="True"/>
+            </State>
+            <State name="NotToggled"/>
+        </StateGroup>
+    </Frame>
+    
+    
+    <!-- Standard Tab List Item Middle -->
+    <Frame type="TileListItem" name="StandardSmallTabListItemMiddleTemplate" template="StandardSmallButtonTemplates/StandardSmallTabBaseMiddleTemplate">
+                
+        <!-- ToggledState -->
+        <StateGroup name="ToggledState">
+            <DefaultState val="NotToggled"/>
+            <State name="Toggled">
+                <When type="Property" frame="$this" Selected="True"/>
+            </State>
+            <State name="NotToggled"/>
+        </StateGroup>
     </Frame>
 </Desc>

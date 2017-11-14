@@ -78,6 +78,7 @@
         <Frame type="StoreCacheFrame" name="StoreCacheFrame">
             <Anchor relative="$parent"/>
             <GameContent val="{$parent/BundleCacheFrame/@GameContent}"/>
+            <UseRawCost val="true"/>
         </Frame>
        
             
@@ -168,7 +169,7 @@
         <!-- TITLELABEL -->
         <Frame type="Label" name="TitleLabel">
             <Anchor side="Bottom" relative="$parent/SubtitleLabel" pos="Min" offset="0"/>
-            <Anchor side="Left" relative="$parent/OriginalPriceLabel" pos="Min" offset="-1"/>
+            <Anchor side="Left" relative="$parent/CurrencyLabel" pos="Min" offset="-1"/>
             <Anchor side="Right" relative="$parent/SubtitleLabel" pos="Max" offset="0"/>
             <Text val="{$parent/BundleCacheFrame/@NameText}"/>
             
@@ -370,10 +371,46 @@
             </StateGroup>
         </Frame>
         
-        <!-- ORIGINAL PRICE LABEL -->
-        <Frame type="Label" name="OriginalPriceLabel">
+        <Frame type="Label" name="CurrencyLabel">
             <Anchor side="Bottom" relative="$parent/AnchorFrame" pos="Max" offset="-13"/>
             <Anchor side="Left" relative="$parent/AnchorFrame" pos="Min" offset="18"/>
+            <Style val="{$parent/SubtitleLabel/@Style}"/>
+            <Text val="{$parent/StoreCacheFrame/@CurrencyText}"/>
+            <RenderPriority val="530"/>
+            <CollapseLayout val="True"/>
+        
+            <StateGroup name="SizeState">
+                <DefaultState val="Normal"/>
+                
+                <State name="Large">
+                    <When type="StateGroup" frame="$parent" SizeState="Large"/>
+                    <Action type="SetAnchor" frame="$this" side="Bottom" relative="$parent/AnchorFrame" pos="Max" offset="-20"/>
+                    <Action type="SetAnchor" frame="$this" side="Left" relative="$parent/AnchorFrame" pos="Min" offset="27"/>
+                </State>
+                <State name="Normal">
+                    <Action type="SetAnchor" frame="$this" side="Bottom" relative="$parent/AnchorFrame" pos="Max" offset="-13"/>
+                    <Action type="SetAnchor" frame="$this" side="Left" relative="$parent/AnchorFrame" pos="Min" offset="18"/>
+                </State>
+            </StateGroup>
+            
+            <StateGroup name="VisibilityState">
+                <DefaultState val="NotVisible"/>
+            
+                <State name="Visible">
+                    <When type="StateGroup" frame="$parent" PurchasableState="Purchasable"/>
+                    <Action type="SetProperty" frame="$this" Visible="True"/>
+                </State>
+
+                <State name="NotVisible">
+                    <Action type="SetProperty" frame="$this" Visible="False"/>
+                </State>
+            </StateGroup>
+        </Frame>
+        
+        <!-- ORIGINAL PRICE LABEL -->
+        <Frame type="Label" name="OriginalPriceLabel">
+            <Anchor side="Bottom" relative="$parent/CurrencyLabel" pos="Max" offset="0"/>
+            <Anchor side="Left" relative="$parent/CurrencyLabel" pos="Max" offset="0"/>
             <Style val="@StandardListItemSubtitle_Medium_Purchasable_Locked"/>
             <Text val="{$parent/StoreCacheFrame/@RetailCostText}"/>
             <RenderPriority val="530"/>
@@ -386,12 +423,10 @@
                 <State name="Large">
                     <When type="StateGroup" frame="$parent" SizeState="Large"/>
                     <Action type="SetAnchor" frame="$this" side="Bottom" relative="$parent/AnchorFrame" pos="Max" offset="-20"/>
-                    <Action type="SetAnchor" frame="$this" side="Left" relative="$parent/AnchorFrame" pos="Min" offset="27"/>
                     <Action type="SetProperty" frame="$this" Style="@StandardListItemSubtitle_Large_Purchasable_Locked"/>
                 </State>
                 <State name="Normal">
                     <Action type="SetAnchor" frame="$this" side="Bottom" relative="$parent/AnchorFrame" pos="Max" offset="-13"/>
-                    <Action type="SetAnchor" frame="$this" side="Left" relative="$parent/AnchorFrame" pos="Min" offset="18"/>
                     <Action type="SetProperty" frame="$this" Style="@StandardListItemSubtitle_Medium_Purchasable_Locked"/>
                 </State>
             </StateGroup>
@@ -436,6 +471,11 @@
                     <When type="StateGroup" frame="$parent" SizeState="Large"/>
                     <Action type="SetAnchor" frame="$this" side="Bottom" relative="$parent/AnchorFrame" pos="Max" offset="-20"/>
                     <Action type="SetAnchor" frame="$this" side="Right" relative="$parent/AnchorFrame" pos="Max" offset="-27"/>
+                </State>
+                <State name="Normal_deDE">
+                    <When type="Option" localeiddata="deDE"/>
+                    <Action type="SetAnchor" frame="$this" side="Bottom" relative="$parent/AnchorFrame" pos="Max" offset="-13"/>
+                    <Action type="SetAnchor" frame="$this" side="Right" relative="$parent/AnchorFrame" pos="Max" offset="-12"/>
                 </State>
                 <State name="Normal">
                     <Action type="SetAnchor" frame="$this" side="Bottom" relative="$parent/AnchorFrame" pos="Max" offset="-13"/>
@@ -595,6 +635,25 @@
             </StateGroup>
         </Frame>
         
+        <!-- Used to detect when the price label would truncate -->
+        <Frame type="Label" name="DummyOriginalPriceLabel">
+            <Anchor side="Bottom" relative="$parent/AnchorFrame" pos="Max" offset="100"/>
+            <Anchor side="Left" relative="$parent/CurrencyLabel" pos="Max" offset="0"/>
+            <Style val="{$parent/OriginalPriceLabel/@Style}"/>
+            <Text val="{$parent/OriginalPriceLabel/@Text}"/>
+        </Frame>
+        
+        <!-- Used to detect when the price label would truncate -->
+        <Frame type="Label" name="DummySubtitleLabel">
+            <Anchor side="Top" relative="$this" pos="Max" offset="0"/>
+            <Anchor side="Bottom" relative="$parent/AnchorFrame" pos="Max" offset="100"/>
+            <Anchor side="Left" relative="$parent/DummyOriginalPriceLabel" pos="Max" offset="5"/>
+            <Anchor side="Right" relative="$parent/SubtitleLabel" pos="Max" offset="0"/>
+            <Style val="{$parent/SubtitleLabel/@Style}"/>
+            <Text val="{$parent/SubtitleLabel/@Text}"/>
+            <Options val="Ellipsis | NoWrapping | TooltipIfTruncated"/>
+        </Frame>
+        
         <Frame type="Frame" name="DiscountTabContainer">
             <Anchor relative="$parent/AnchorFrame"/>
             <Visible val="False"/>
@@ -646,7 +705,7 @@
         
         <Frame type="Label" name="TitleLabel">
             <Options val="TooltipIfTruncated"/>
-            <AutoSizeClamps height="41"/>
+            <AutoSizeClamps maxHeight="41"/>
         </Frame>
                 
         <!-- SelectedState -->
@@ -679,6 +738,13 @@
         <!-- DiscountedState -->
         <StateGroup name="DiscountedState">
             <DefaultState val="NotDiscounted"/>
+            <State name="DiscountedWithTextOverflow">
+                <When type="StateGroup" frame="$this" PurchasableState="Purchasable"/>
+                <When type="Property" frame="StoreCacheFrame" operator="NotEqual" DiscountPercent="0"/>
+                <When type="Property" frame="DummySubtitleLabel" IsTextTruncated="True"/>
+                <Action type="SetProperty" frame="DiscountTabContainer" Visible="False"/>
+                <Action type="SetProperty" frame="OriginalPriceLabel" Visible="False"/>
+            </State>
             <State name="Discounted">
                 <When type="StateGroup" frame="$this" PurchasableState="Purchasable"/>
                 <When type="Property" frame="StoreCacheFrame" operator="NotEqual" DiscountPercent="0"/>
@@ -815,7 +881,7 @@
         <Frame type="Label" name="TitleLabel">
             <Text val="@UI/ScreenCollection/WarChest/FeaturedPageTitle"/>
             <Options val="TooltipIfTruncated"/>
-            <AutoSizeClamps height="60"/>
+            <AutoSizeClamps maxHeight="60"/>
         </Frame>
         
         <Frame type="Label" name="SubtitleLabel">
@@ -958,7 +1024,7 @@
             </Frame>
         
         <Frame type="Label" name="TitleLabel">
-            <AutoSizeClamps height="60"/>
+            <AutoSizeClamps maxHeight="60"/>
         </Frame>
             
             <StateGroup name="SizeState">
@@ -1029,7 +1095,7 @@
         
             <Frame type="Label" name="TitleLabel">
                 <Options val="TooltipIfTruncated"/>
-                <AutoSizeClamps height="50"/>
+                <AutoSizeClamps maxHeight="50"/>
             </Frame>
             
             <Frame type="Image" name="TextBackground">

@@ -17,7 +17,7 @@
     
     <Frame type="Button" name="TabButtonTemplate">
         <Anchor side="Right" relative="$this/Label" pos="Max" offset="30"/>
-        <Height val="36"/>
+        <Height val="38"/>
 		<ClickSound val="@AC_UI_OnClick01"/>
 		<HoverSound val="@AC_UI_MouseOver01"/>
         
@@ -191,70 +191,117 @@
     -->
 
     <Frame type="CommanderUnitTileListItem" name="CommanderUnitTileListItemTemplate">
-        <Width val="94"/>
-        <Height val="94"/>
+        <Width val="78"/>
+        <Height val="78"/>
         <HideWhenCleared val="true"/>
         
-        <Animation name="LockState">
-            <Event event="Locked" action="Reset,Play"/>
-            <Event event="LockedUpgrade" action="Reset,Stop"/>
-            <Event event="Unlocked" action="Reset,Stop"/>
-            <Event event="UnlockedUpgrade" action="Reset,Stop"/>
-            
-            <Controller type="Desaturation" end="Pause" frame="Icon">
-                <Key type="Bool" time="0" value="true"/>
-            </Controller>
-            
-            <Controller type="Desaturation" end="Pause" frame="BorderImage">
-                <Key type="Bool" time="0" value="true"/>
-            </Controller>
-            
-            <Controller type="Desaturation" end="Pause" frame="BackgroundImage">
-                <Key type="Bool" time="0" value="true"/>
-            </Controller>
-            
-            <Controller type="Visibility" end="Pause" frame="LockIcon">
-                <Key type="Bool" time="0" value="true"/>
-            </Controller>
-            
-            <Controller type="Fade" end="Pause">
-                <Key type="Curve" time="0" value="255" out="Auto"/>
-            </Controller>
-        </Animation>
-        
         <Frame type="Image" name="BackgroundImage">
-            <Anchor relative="$parent"/>
-            <RenderPriority val="509"/>
-            <Texture val="@UI/SC2_UI_Coop_UnitFrame_Mask"/>
-            <Visible val="True"/>
-            <DesaturationColor val="2a3b50"/>
+            <Anchor side="Top" relative="$parent" pos="Min" offset="3"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="-3"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="3"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="-3"/>
+            <Texture val="Assets/Textures/white.dds"/>
+            <Alpha val="179"/>
+            <Color val="6,15,25"/>
+            <!-- <DesaturationColor val="2a3b50"/> -->
         </Frame>
 
         <Frame type="Image" name="Icon">
-            <Anchor side="Top" relative="$parent" pos="Min" offset="10"/>
-            <Anchor side="Left" relative="$parent" pos="Min" offset="10"/>
-            <Anchor side="Right" relative="$parent" pos="Max" offset="-10"/>
-            <Anchor side="Bottom" relative="$parent" pos="Max" offset="-10"/>
-            <DesaturationColor val="213b4e"/>
+            <Anchor side="Top" relative="$parent" pos="Min" offset="5"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="-5"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="5"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="-5"/>
+            <!-- <DesaturationColor val="213b4e"/> -->
         </Frame>
         
-        <Frame type="Image" name="BorderImage">
+        <Frame type="Image" name="LockedOverlay">
+            <Anchor relative="$parent/Icon"/>
+            <Visible val="False"/>
+            <LayerCount val="2"/>
+            
+            <Texture val="{$parent/Icon/@Texture}" layer="0"/>
+            <AlphaLayer val="True" layer="0"/>
+            
+            <Texture val="Assets/Textures/white.dds" layer="1"/>
+            <LayerAlpha val="153" layer="1"/>
+            <LayerColor val="0,0,0" layer="1"/>
+        </Frame>
+        
+        <Frame type="Image" name="LockedGlow">
+            <Anchor relative="$parent/BackgroundImage"/>
+            <Texture val="@UI/SC2_UI_Collection_VoicePack_CharacterFrame_GenericEffect_RadialGradient_256x256"/>
+            <TextureCoords top=".55" bottom="1.5" left="-.5" right=".45"/>
+            <Alpha val="128"/>
+            <Color val="54,94,131"/>
+            <Visible val="{$parent/LockedOverlay/@Visible}"/>
+        </Frame>
+        
+        <!-- BORDER OUTER -->
+        <Frame type="Image" name="BorderOuter">
             <Anchor relative="$parent"/>
-            <RenderPriority val="510"/>
-            <Texture val="@UI/SC2_UI_Coop_UnitFrame"/>
-            <Visible val="True"/>
-            <DesaturationColor val="213b4e"/>
+            <Texture val="@UI/Glues_Battlenet_PageAssets_GraphicListItem_Border_Outer"/>
+            <TextureType val="NineSlice"/>
+            <Color val="0,0,0"/>
+        </Frame>
+        
+        <!-- BORDER INNER -->
+        <Frame type="Image" name="BorderInner">
+            <Anchor relative="$parent"/>
+            <Texture val="@UI/Glues_Battlenet_PageAssets_GraphicListItem_Border_Inner"/>
+            <TextureType val="NineSlice"/>
+            <Color val="37,107,169"/>
         </Frame>
         
         <Frame type="Image" name="LockIcon">
-            <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
-            <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
-            <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
-            <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Top" relative="$parent" pos="Min" offset="10"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="-10"/>
             <Texture val="@UI/SC2_UI_Coop_LockIcon_Upgrade"/>
-            <Visible val="False"/>
             <DesaturateOnDisable val="False"/>
+            <Visible val="{$parent/LockedOverlay/@Visible}"/>
         </Frame>
+        
+        <StateGroup name="LockedState">
+            <DefaultState val="Unlocked"/>
+            
+            <State name="Locked">
+                <When type="AnimationState" LockState="Locked"/>
+                <Action type="SetProperty" frame="BackgroundImage" Color="6,15,25"/>
+                <Action type="SetProperty" frame="Icon" Alpha="153"/>
+                <Action type="SetProperty" frame="BorderInner" Color="29,57,86"/>
+                <Action type="SetProperty" frame="LockedOverlay" Visible="True"/>
+            </State>
+            
+            <State name="LockedUpgrade">
+                <When type="AnimationState" LockState="LockedUpgrade"/>
+                <Action type="SetProperty" frame="BackgroundImage" Color="6,15,25"/>
+                <Action type="SetProperty" frame="Icon" Alpha="153"/>
+                <Action type="SetProperty" frame="BorderInner" Color="29,57,86"/>
+                <Action type="SetProperty" frame="LockedOverlay" Visible="True"/>
+            </State>
+            
+            <State name="Unlocked">
+                <Action type="SetProperty" frame="Icon" Alpha="255"/>
+                <Action type="SetProperty" frame="BackgroundImage" Color="12,18,25"/>
+                <Action type="SetProperty" frame="BorderInner" Color="37,107,169"/>
+                <Action type="SetProperty" frame="LockedOverlay" Visible="False"/>
+            </State>
+        </StateGroup>
+    
+        <!-- AspectRatioState-->
+        <StateGroup name="AspectRatioState">
+            <DefaultState val="Default"/>
+            
+            <State name="16x9">
+                <When type="StateGroup" frame="$GlueUI" AspectRatioState="16x9"/>
+                <Action type="SetProperty" frame="BorderOuter" Texture="@UI/Glues_Battlenet_PageAssets_GraphicListItem_Border_Outer_16x9"/>
+                <Action type="SetProperty" frame="BorderInner" Texture="@UI/Glues_Battlenet_PageAssets_GraphicListItem_Border_Inner_16x9"/>
+            </State>
+            
+            <State name="Default">
+                <Action type="SetProperty" frame="BorderOuter" Texture="@UI/Glues_Battlenet_PageAssets_GraphicListItem_Border_Outer"/>
+                <Action type="SetProperty" frame="BorderInner" Texture="@UI/Glues_Battlenet_PageAssets_GraphicListItem_Border_Inner"/>
+            </State>
+        </StateGroup>
     </Frame>
     
     
@@ -302,123 +349,135 @@
     -->
 
     <Frame type="CommanderTalentTileListItem" name="CommanderTalentTileListItemTemplate">
-        <Height val="72"/>
-        <Width val="72"/>
+        <Width val="78"/>
+        <Height val="78"/>
         <HideWhenCleared val="true"/>
+        
+        <Frame type="Image" name="BackgroundImage">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="3"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="-3"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="3"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="-3"/>
+            <Texture val="Assets/Textures/white.dds"/>
+            <Alpha val="179"/>
+            <Color val="0,0,0"/>
+            <!-- <DesaturationColor val="2a3b50"/> -->
+        </Frame>
 
         <Frame type="Image" name="Icon">
-            <Anchor relative="$parent"/>
-            <DesaturationColor val="213b4e"/>
-            <AlphaMaskTexture val="@UI/SC2_UI_Coop_AbilityFrame_Mask"/>
+            <Anchor side="Top" relative="$parent" pos="Min" offset="1"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="-1"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="1"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="-1"/>
+            <ColorAdjustMode val="Colorize"/>
+            <AdjustmentColor val="255,54,107,181"/>
+            <LightAdjustColor val="255,129,156,203"/>
         </Frame>
         
-        <Frame type="Image" name="BorderImage">
-            <Anchor relative="$parent"/>
-            <Color val="255,255,255"/>
-            <Texture val="@UI/SC2_UI_Coop_AbilityFrame"/>
-            <DesaturationColor val="213b4e"/>
+        <Frame type="Image" name="LockedOverlay">
+            <Anchor relative="$parent/Icon"/>
+            <Visible val="False"/>
+            <LayerCount val="2"/>
+            
+            <Texture val="{$parent/Icon/@Texture}" layer="0"/>
+            <AlphaLayer val="True" layer="0"/>
+            
+            <Texture val="Assets/Textures/white.dds" layer="1"/>
+            <LayerAlpha val="153" layer="1"/>
+            <LayerColor val="0,0,0" layer="1"/>
         </Frame>
         
-        <Frame type="Image" name="LevelLabelBG">
-            <Anchor side="Top" relative="$parent/LevelLabel" pos="Min" offset="-5"/>
-            <Anchor side="Left" relative="$parent/LevelLabel" pos="Min" offset="-9"/>
-            <Anchor side="Right" relative="$parent/LevelLabel" pos="Max" offset="7"/>
-            <Anchor side="Bottom" relative="$parent/LevelLabel" pos="Max" offset="2"/>
+        <Frame type="Image" name="LockedGlow">
+            <Anchor relative="$parent/BackgroundImage"/>
+            <Texture val="@UI/SC2_UI_Collection_VoicePack_CharacterFrame_GenericEffect_RadialGradient_256x256"/>
+            <TextureCoords top=".55" bottom="1.5" left="-.5" right=".45"/>
+            <Alpha val="128"/>
+            <Color val="54,94,131"/>
+            <Visible val="{$parent/LockedOverlay/@Visible}"/>
+        </Frame>
+        
+        <!-- BORDER OUTER -->
+        <Frame type="Image" name="BorderOuter">
+            <Anchor relative="$parent"/>
+            <Texture val="@UI/Glues_Battlenet_PageAssets_GraphicListItem_Border_Outer"/>
+            <TextureType val="NineSlice"/>
+            <Color val="0,0,0"/>
+        </Frame>
+        
+        <!-- BORDER INNER -->
+        <Frame type="Image" name="BorderInner">
+            <Anchor relative="$parent"/>
+            <Texture val="@UI/Glues_Battlenet_PageAssets_GraphicListItem_Border_Inner"/>
+            <TextureType val="NineSlice"/>
+            <Color val="37,107,169"/>
+        </Frame>
+        
+        <Frame type="Image" name="LevelBackground">
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="-1"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="1"/>
+            <Width val="25"/>
+            <Height val="22"/>
             <Texture val="@UI/SC2_UI_Coop_AbilityFrame_LevelBG"/>
             <TextureType val="NineSlice"/>
-            <DesaturationColor val="213b4e"/>
         </Frame>
         
         <Frame type="Label" name="LevelLabel">
-            <Anchor side="Bottom" relative="$parent" pos="Max" offset="-3"/>
-            <Anchor side="Left" relative="$parent" pos="Min" offset="9"/>
-            <Style val="@Coop_CommanderTalentLevel_Earned"/>
-        </Frame>
-        
-        <Frame type="Image" name="RewardImage">
-            <Anchor relative="$parent"/>
-            <Visible val="False"/>
-            <Texture val="@UI/SC2_UI_Coop_AbilityFrame_Highlight"/>
-
-            <Animation name="RewardState">
-                <Event event="NotReward" action="Reset,Stop" frame="$parent"/>
-                <Event event="Reward" action="Reset,Play" frame="$parent"/>
-
-                <Controller type="Visibility" end="Pause">
-                    <Key type="Bool" time="0" value="true"/>
-                </Controller>
-                
-                <Controller type="Fade" end="Pause">
-                    <Key type="Curve" time="0" value="0" out="Auto"/>
-                    <Key type="Curve" time="1" value="255" in="Auto"/>
-                </Controller>
-            </Animation>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="-1"/>
+            <Anchor side="Left" relative="$parent/LevelBackground" pos="Mid" offset="1"/>
+            <Anchor side="Right" relative="$parent/LevelBackground" pos="Mid" offset="1"/>
+            <Style val="Coop_CommanderTalentLevel_Earned"/>
+            
+            <Frame type="MathFrame" name="ConvertToInt">
+                <Anchor relative="$parent"/>
+                <A val="{$parent/@Text}"/>
+                <B val="0"/>
+                <Operator val="Add"/>
+            </Frame>
         </Frame>
         
         <Frame type="Image" name="LockIcon">
-            <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
-            <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
-            <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
-            <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Top" relative="$parent" pos="Min" offset="10"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="-10"/>
             <Texture val="@UI/SC2_UI_Coop_LockIcon_Upgrade"/>
-            <Visible val="False"/>
+            <DesaturateOnDisable val="False"/>
+            <Visible val="{$parent/LockedOverlay/@Visible}"/>
         </Frame>
+            
+        <StateGroup name="LevelState">
+            <DefaultState val="Below10"/>
+            
+            <State name="AtOrAbove10">
+                <When type="Property" frame="LevelLabel/ConvertToInt" operator="GreaterThanOrEqual" ResultInt="10"/>
+                <Action type="SetProperty" frame="LevelBackground" Width="36"/>
+            </State>
+            
+            <State name="Below10">
+                <Action type="SetProperty" frame="LevelBackground" Width="25"/>
+            </State>
+        </StateGroup>
         
-        <Animation name="Unearned">
-            <Event event="Unearned" action="Reset,Play"/>
-
-            <Controller type="Desaturation" end="Pause" frame="Icon">
-                <Key type="Bool" time="0" value="true"/>
-            </Controller>
+        <StateGroup name="EarnedState">
+            <DefaultState val="Unearned"/>
             
-            <Controller type="Desaturation" end="Pause" frame="BorderImage">
-                <Key type="Bool" time="0" value="true"/>
-            </Controller>
+            <State name="Earned">
+                <When type="AnimationState" EarnedState="Earned"/>
+                <Action type="SetProperty" frame="Icon" Desaturated="False"/>
+                <Action type="SetProperty" frame="Icon" ColorAdjustMode="None"/>
+                <Action type="SetProperty" frame="BorderInner" Color="37,107,169"/>
+                <Action type="SetProperty" frame="LockedOverlay" Visible="False"/>
+                <Action type="SetProperty" frame="LevelLabel" Style="Coop_CommanderTalentLevel_Earned"/>
+                <Action type="SetProperty" frame="LevelBackground" Texture="@UI/SC2_UI_Coop_AbilityFrame_LevelBG"/>
+            </State>
             
-            <Controller type="Desaturation" end="Pause" frame="LevelLabelBG">
-                <Key type="Bool" time="0" value="true"/>
-            </Controller>
-            
-            <Controller type="Visibility" end="Pause" frame="LockIcon">
-                <Key type="Bool" time="0" value="true"/>
-            </Controller>
-            
-            <Controller type="Style" end="Pause" style1="Coop_CommanderTalentLevel_Unearned" style2="Coop_CommanderTalentLevel_Unearned" frame="LevelLabel">
-                <Key type="Curve" time="0" value="0"/>
-            </Controller>
-            
-            <Controller type="Fade" end="Pause">
-                <Key type="Curve" time="0" value="200" out="Auto"/>
-            </Controller>
-        </Animation>
-        
-        <Animation name="Earned">
-            <Event event="Earned" action="Reset,Play"/>
-
-            <Controller type="Desaturation" end="Pause" frame="Icon">
-                <Key type="Bool" time="0" value="false"/>
-            </Controller>
-            
-            <Controller type="Desaturation" end="Pause" frame="BorderImage">
-                <Key type="Bool" time="0" value="false"/>
-            </Controller>
-            
-            <Controller type="Desaturation" end="Pause" frame="LevelLabelBG">
-                <Key type="Bool" time="0" value="false"/>
-            </Controller>
-            
-            <Controller type="Visibility" end="Pause" frame="LockIcon">
-                <Key type="Bool" time="0" value="false"/>
-            </Controller>
-            
-            <Controller type="Style" end="Pause" style1="Coop_CommanderTalentLevel_Earned" style2="Coop_CommanderTalentLevel_Earned" frame="LevelLabel">
-                <Key type="Curve" time="0" value="0"/>
-            </Controller>
-            
-            <Controller type="Fade" end="Pause">
-                <Key type="Curve" time="0" value="255" out="Auto"/>
-            </Controller>
-        </Animation>
+            <State name="Unearned">
+                <Action type="SetProperty" frame="Icon" Desaturated="True"/>
+                <Action type="SetProperty" frame="Icon" ColorAdjustMode="Colorize"/>
+                <Action type="SetProperty" frame="BorderInner" Color="29,57,86"/>
+                <Action type="SetProperty" frame="LockedOverlay" Visible="True"/>
+                <Action type="SetProperty" frame="LevelLabel" Style="Coop_CommanderTalentLevel_Unearned"/>
+                <Action type="SetProperty" frame="LevelBackground" Texture="@UI/SC2_UI_Coop_AbilityFrame_LevelBG_Disabled"/>
+            </State>
+        </StateGroup>
         
         <!-- Note: There are animation events for the different talent types: TalentTypePassive, TalentTypeAbility, TalentTypeBundle, TalentTypeUnit -->
     </Frame>

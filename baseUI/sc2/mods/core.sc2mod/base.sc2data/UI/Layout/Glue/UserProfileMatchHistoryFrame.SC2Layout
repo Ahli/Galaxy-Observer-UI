@@ -5,7 +5,9 @@
     <Constant name="PageButtonSpacing" val="12"/>
 
     <Frame type="UserProfileMatchHistoryTileListItem" name="UserProfileMatchHistoryTileListItemTemplate">
-        <Height val="52"/>
+        <Height val="39"/>
+        <AcceptsMouse val="true"/>
+        <Tooltip val="{$this/@ResultText}"/>
 
         <Frame type="Image" name="NormalImage">
             <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
@@ -59,28 +61,6 @@
             <MapHandle val="{$parent/@ModHandle[3]}"/>
         </Frame>
 
-        <Frame type="Image" name="GameResultsIcon">
-            <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
-            <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
-            <Anchor side="Left" relative="$parent" pos="Min" offset="9"/>
-            <Width val="43"/>
-            <Height val="43"/>
-            <Texture val="@UI/Glues_Icons_GenericInfo"/>
-            <AcceptsMouse val="true"/>
-            <Tooltip val="{$parent/@ResultText}"/>
-
-            <!-- This adds a delay before resolving the match history results -->
-            <Animation name="Hover">
-                <Event event="OnMouseEnter" action="Reset,Play"/>
-                <Event event="OnMouseExit" action="Reset,Stop"/>
-
-                <Controller type="Property" property="ResolveResults" frame="$parent" end="Pause">
-                    <Key type="Property" time="0" value="false"/>
-                    <Key type="Property" time="1" value="true"/>
-                </Controller>
-            </Animation>
-        </Frame>
-
         <!-- This label exists just to get the correct mod name, and isn't actually displayed -->
         <Frame type="Label" name="ModNameLabel">
             <Anchor relative="$parent"/>
@@ -126,23 +106,23 @@
         </Frame>
 
         <Frame type="Label" name="NameLabel">
-            <Anchor side="Left" relative="$parent/GameResultsIcon" pos="Max" offset="5"/>
+            <Anchor side="Top" relative="$parent" pos="Mid" offset="2"/>
+            <Anchor side="Bottom" relative="$parent" pos="Mid" offset="2"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="16"/>
             <Anchor side="Right" relative="$parent/ModeLabel" pos="Min" offset="-10"/>
-            <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
-            <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
-            <Style val="@Arcade_ListTitle_Normal"/>
-            <AcceptsMouseTooltip val="true"/>
+            <Style val="Profile_MatchHistory_ListItem_Title"/>
+            <AcceptsMouseTooltip val="false"/>
             <Options val="Ellipsis | TooltipIfTruncated | NoWrapping"/>
             <Text val="{$parent/NameFormatFrame/@Text}"/>
         </Frame>
 
         <Frame type="Label" name="ModeLabel">
-            <Anchor side="Left" relative="$parent" pos="Min" offset="450"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="400"/>
             <Anchor side="Right" relative="$parent/ResultLabel" pos="Min" offset="-10"/>
-            <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
-            <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
-            <Style val="@Arcade_ListTitle_Normal"/>
-            <AcceptsMouseTooltip val="true"/>
+            <Anchor side="Top" relative="$parent" pos="Mid" offset="1"/>
+            <Anchor side="Bottom" relative="$parent" pos="Mid" offset="1"/>
+            <Style val="Profile_MatchHistory_ListItem_Base"/>
+            <AcceptsMouseTooltip val="false"/>
             <Options val="Ellipsis | TooltipIfTruncated | NoWrapping"/>
             <Text val="{$parent/@ModeName}"/>
         </Frame>
@@ -172,7 +152,7 @@
 
         <Frame type="TextFormatFrame" name="ResultFormatFrame">
             <Anchor relative="$parent"/>
-            <FormatText val="%0%%1%"/>
+            <FormatText val="%0% %1%"/>
             <Replacement index="1" val="{$parent/PointsFormatFrame/@Text}"/>
 
             <StateGroup name="ResultStateGroup">
@@ -219,33 +199,66 @@
         </Frame>
         
         <Frame type="Label" name="ResultLabel">
-            <Anchor side="Left" relative="$parent" pos="Min" offset="700"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="623"/>
             <Anchor side="Right" relative="$parent/TimeLabel" pos="Min" offset="-10"/>
-            <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
-            <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
-            <Style val="@Arcade_ListTitle_Normal"/>
-            <AcceptsMouseTooltip val="true"/>
+            <Anchor side="Top" relative="$parent" pos="Mid" offset="1"/>
+            <Anchor side="Bottom" relative="$parent" pos="Mid" offset="1"/>
+            <Style val="Profile_MatchHistory_ListItem_Win"/>
+            <AcceptsMouseTooltip val="false"/>
             <Options val="Ellipsis | TooltipIfTruncated | NoWrapping"/>
             <Text val="{$parent/ResultFormatFrame/@Text}"/>
+            
+            <StateGroup name="ResultState">
+                <DefaultState val="Other"/>
+                
+                <State name="Win">
+                    <When type="Property" frame="$parent" PlayerResult="Win"/>
+                    <Action type="SetProperty" style="Profile_MatchHistory_ListItem_Win"/>
+                </State>
+                
+                <State name="Other">
+                    <Action type="SetProperty" style="Profile_MatchHistory_ListItem_Loss"/>
+                </State>
+            </StateGroup>
         </Frame>
 
         <Frame type="Label" name="TimeLabel">
-            <Anchor side="Left" relative="$parent" pos="Min" offset="900"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="820"/>
             <Anchor side="Right" relative="$parent/TournamentButton" pos="Min" offset="-10"/>
-            <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
-            <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
-            <Style val="@Arcade_ListTitle_Normal"/>
-            <AcceptsMouseTooltip val="true"/>
+            <Anchor side="Top" relative="$parent" pos="Mid" offset="1"/>
+            <Anchor side="Bottom" relative="$parent" pos="Mid" offset="1"/>
+            <Style val="Profile_MatchHistory_ListItem_Base"/>
+            <AcceptsMouseTooltip val="false"/>
             <Options val="Ellipsis | TooltipIfTruncated | NoWrapping"/>
             <Text val="{$parent/@TimeText}"/>
         </Frame>
 
-        <Frame type="Button" name="TournamentButton" template="StandardBattlenetTemplates/BattlenetMiniIconButtonTemplate">
+        <Frame type="Button" name="TournamentButton">
             <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
             <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
             <Anchor side="Right" relative="$parent" pos="Max" offset="-10"/>
+            <Width val="34"/>
+            <Height val="34"/>
             <CollapseLayout val="true"/>
             <Visible val="false"/>
+            
+            <Frame type="Image" name="NormalImage">
+                <Anchor relative="$parent"/>
+                <Texture val="@UI/SC2_UI_Tournament_Alert_Icon_Blue"/>
+            </Frame>
+            
+            <Frame type="Image" name="HoverImage">
+                <Anchor relative="$parent"/>
+                <Texture val="@UI/SC2_UI_Tournament_Alert_Icon_Blue"/>
+            </Frame>
+            
+            <Frame type="Image" name="ImageAdd">
+                <Anchor relative="$parent/NormalImage"/>
+                <Texture val="{$parent/NormalImage/@Texture}"/>
+                <BlendMode val="Add"/>
+                <Alpha val="70"/>
+                <Visible val="{$parent/@Hovering}"/>
+            </Frame>
 
             <StateGroup name="TournamentStateGroup">
                 <State name="TournamentState">
@@ -255,114 +268,175 @@
                 </State>
             </StateGroup>
         </Frame>
+
+        <!-- This adds a delay before resolving the match history results -->
+        <Animation name="ShowResults">
+            <Event event="OnMouseEnter" action="Reset,Play"/>
+            <Event event="OnMouseExit" action="Reset,Stop"/>
+
+            <Controller type="Property" property="ResolveResults" frame="$this" end="Pause">
+                <Key type="Property" time="0" value="false"/>
+                <Key type="Property" time="1" value="true"/>
+            </Controller>
+        </Animation>
     </Frame>
 
     <Frame type="UserProfileMatchHistoryFrame" name="UserProfileMatchHistoryFrameTemplate">
-        <Frame type="Image" name="ListBoxBackground">
+        
+        <Frame type="Frame" name="BackgroundContainer" template="UserProfileTemplates/SegmentedListBackgroundTemplate">
             <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
             <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
             <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
             <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
-            <Texture val="@UI/Glues_Battlenet_PageAssets_TableLargeHeaderBg"/>
-            <TextureType val="NineSlice"/>
-            <Tiled val="True"/>
+        </Frame>
+        
+        <Frame type="Label" name="FilterLabel">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="28"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="26"/>
+            <Style val="Profile_MatchHistory_SectionHeader"/>
+            <Text val="@UI/ScreenUserProfile/MatchHistory/FilterGameType"/>
+        </Frame>
+
+        <Frame type="Pulldown" name="MatchHistoryFilterPulldown" template="StandardTemplates/StandardPulldownTemplate">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="11"/>
+            <Anchor side="Left" relative="$parent/FilterLabel" pos="Max" offset="5"/>
+        </Frame>
+        
+        <Frame type="Label" name="MapLabel">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="77"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="28"/>
+            <Style val="Profile_MatchHistory_ColumnHeader"/>
+            <Text val="@UI/ScreenUserProfile/MatchHistory/MapName"/>
+        </Frame>
+        
+        <Frame type="Label" name="TypeLabel">
+            <Anchor side="Top" relative="$parent/MapLabel" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="414"/>
+            <Style val="Profile_MatchHistory_ColumnHeader"/>
+            <Text val="@UI/ScreenUserProfile/MatchHistory/MapType"/>
+        </Frame>
+        
+        <Frame type="Label" name="ResultLabel">
+            <Anchor side="Top" relative="$parent/MapLabel" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="635"/>
+            <Style val="Profile_MatchHistory_ColumnHeader"/>
+            <Text val="@UI/ScreenUserProfile/MatchHistory/MapResult"/>
+        </Frame>
+        
+        <Frame type="Label" name="DateLabel">
+            <Anchor side="Top" relative="$parent/MapLabel" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="830"/>
+            <Style val="Profile_MatchHistory_ColumnHeader"/>
+            <Text val="@UI/ScreenUserProfile/MatchHistory/MapDate"/>
         </Frame>
 
         <Frame type="TileList" name="MatchHistoryTileList">
-            <Anchor side="Top" relative="$parent" pos="Min" offset="80"/>
-            <Anchor side="Left" relative="$parent" pos="Min" offset="15"/>
-            <Anchor side="Right" relative="$parent" pos="Max" offset="-12"/>
-            <Anchor side="Bottom" relative="$parent" pos="Max" offset="-10"/>
+            <Anchor side="Top" relative="$parent/BackgroundContainer/CenterJunction" pos="Max" offset="-2"/>
+            <Anchor side="Left" relative="$parent/BackgroundContainer/LeftJunction" pos="Max" offset="-2"/>
+            <Anchor side="Right" relative="$parent/BackgroundContainer/RightJunction" pos="Min" offset="6"/>
+            <Anchor side="Bottom" relative="$parent/BackgroundContainer/BottomJunction" pos="Min" offset="5"/>
             <AcceptsMouse val="true"/>
 
             <Frame type="UserProfileMatchHistoryTileListItem" name="Item0" template="UserProfileMatchHistoryFrame/UserProfileMatchHistoryTileListItemTemplate">
                 <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
                 <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
-                <Anchor side="Right" relative="$parent/ScrollBar" pos="Min" offset="-2"/>
+                <Anchor side="Right" relative="$parent/ScrollBar" pos="Min" offset="-8"/>
             </Frame>
 
             <Frame type="UserProfileMatchHistoryTileListItem" name="Item1" template="UserProfileMatchHistoryFrame/UserProfileMatchHistoryTileListItemTemplate">
-                <Anchor side="Top" relative="$parent/Item0" pos="Max" offset="0"/>
+                <Anchor side="Top" relative="$parent/Item0" pos="Max" offset="3"/>
                 <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
-                <Anchor side="Right" relative="$parent/ScrollBar" pos="Min" offset="-2"/>
+                <Anchor side="Right" relative="$parent/ScrollBar" pos="Min" offset="-8"/>
             </Frame>
 
             <Frame type="UserProfileMatchHistoryTileListItem" name="Item2" template="UserProfileMatchHistoryFrame/UserProfileMatchHistoryTileListItemTemplate">
-                <Anchor side="Top" relative="$parent/Item1" pos="Max" offset="0"/>
+                <Anchor side="Top" relative="$parent/Item1" pos="Max" offset="3"/>
                 <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
-                <Anchor side="Right" relative="$parent/ScrollBar" pos="Min" offset="-2"/>
+                <Anchor side="Right" relative="$parent/ScrollBar" pos="Min" offset="-8"/>
             </Frame>
 
             <Frame type="UserProfileMatchHistoryTileListItem" name="Item3" template="UserProfileMatchHistoryFrame/UserProfileMatchHistoryTileListItemTemplate">
-                <Anchor side="Top" relative="$parent/Item2" pos="Max" offset="0"/>
+                <Anchor side="Top" relative="$parent/Item2" pos="Max" offset="3"/>
                 <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
-                <Anchor side="Right" relative="$parent/ScrollBar" pos="Min" offset="-2"/>
+                <Anchor side="Right" relative="$parent/ScrollBar" pos="Min" offset="-8"/>
             </Frame>
 
             <Frame type="UserProfileMatchHistoryTileListItem" name="Item4" template="UserProfileMatchHistoryFrame/UserProfileMatchHistoryTileListItemTemplate">
-                <Anchor side="Top" relative="$parent/Item3" pos="Max" offset="0"/>
+                <Anchor side="Top" relative="$parent/Item3" pos="Max" offset="3"/>
                 <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
-                <Anchor side="Right" relative="$parent/ScrollBar" pos="Min" offset="-2"/>
+                <Anchor side="Right" relative="$parent/ScrollBar" pos="Min" offset="-8"/>
             </Frame>
 
             <Frame type="UserProfileMatchHistoryTileListItem" name="Item5" template="UserProfileMatchHistoryFrame/UserProfileMatchHistoryTileListItemTemplate">
-                <Anchor side="Top" relative="$parent/Item4" pos="Max" offset="0"/>
+                <Anchor side="Top" relative="$parent/Item4" pos="Max" offset="3"/>
                 <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
-                <Anchor side="Right" relative="$parent/ScrollBar" pos="Min" offset="-2"/>
+                <Anchor side="Right" relative="$parent/ScrollBar" pos="Min" offset="-8"/>
             </Frame>
 
             <Frame type="UserProfileMatchHistoryTileListItem" name="Item6" template="UserProfileMatchHistoryFrame/UserProfileMatchHistoryTileListItemTemplate">
-                <Anchor side="Top" relative="$parent/Item5" pos="Max" offset="0"/>
+                <Anchor side="Top" relative="$parent/Item5" pos="Max" offset="3"/>
                 <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
-                <Anchor side="Right" relative="$parent/ScrollBar" pos="Min" offset="-2"/>
+                <Anchor side="Right" relative="$parent/ScrollBar" pos="Min" offset="-8"/>
             </Frame>
 
             <Frame type="UserProfileMatchHistoryTileListItem" name="Item7" template="UserProfileMatchHistoryFrame/UserProfileMatchHistoryTileListItemTemplate">
-                <Anchor side="Top" relative="$parent/Item6" pos="Max" offset="0"/>
+                <Anchor side="Top" relative="$parent/Item6" pos="Max" offset="3"/>
                 <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
-                <Anchor side="Right" relative="$parent/ScrollBar" pos="Min" offset="-2"/>
+                <Anchor side="Right" relative="$parent/ScrollBar" pos="Min" offset="-8"/>
             </Frame>
 
             <Frame type="UserProfileMatchHistoryTileListItem" name="Item8" template="UserProfileMatchHistoryFrame/UserProfileMatchHistoryTileListItemTemplate">
-                <Anchor side="Top" relative="$parent/Item7" pos="Max" offset="0"/>
+                <Anchor side="Top" relative="$parent/Item7" pos="Max" offset="3"/>
                 <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
-                <Anchor side="Right" relative="$parent/ScrollBar" pos="Min" offset="-2"/>
+                <Anchor side="Right" relative="$parent/ScrollBar" pos="Min" offset="-8"/>
             </Frame>
 
             <Frame type="UserProfileMatchHistoryTileListItem" name="Item9" template="UserProfileMatchHistoryFrame/UserProfileMatchHistoryTileListItemTemplate">
-                <Anchor side="Top" relative="$parent/Item8" pos="Max" offset="0"/>
+                <Anchor side="Top" relative="$parent/Item8" pos="Max" offset="3"/>
                 <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
-                <Anchor side="Right" relative="$parent/ScrollBar" pos="Min" offset="-2"/>
+                <Anchor side="Right" relative="$parent/ScrollBar" pos="Min" offset="-8"/>
             </Frame>
 
             <Frame type="UserProfileMatchHistoryTileListItem" name="Item10" template="UserProfileMatchHistoryFrame/UserProfileMatchHistoryTileListItemTemplate">
-                <Anchor side="Top" relative="$parent/Item9" pos="Max" offset="0"/>
+                <Anchor side="Top" relative="$parent/Item9" pos="Max" offset="3"/>
                 <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
-                <Anchor side="Right" relative="$parent/ScrollBar" pos="Min" offset="-2"/>
+                <Anchor side="Right" relative="$parent/ScrollBar" pos="Min" offset="-8"/>
             </Frame>
 
             <Frame type="UserProfileMatchHistoryTileListItem" name="Item11" template="UserProfileMatchHistoryFrame/UserProfileMatchHistoryTileListItemTemplate">
-                <Anchor side="Top" relative="$parent/Item10" pos="Max" offset="0"/>
+                <Anchor side="Top" relative="$parent/Item10" pos="Max" offset="3"/>
                 <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
-                <Anchor side="Right" relative="$parent/ScrollBar" pos="Min" offset="-2"/>
+                <Anchor side="Right" relative="$parent/ScrollBar" pos="Min" offset="-8"/>
             </Frame>
 
             <Frame type="UserProfileMatchHistoryTileListItem" name="Item12" template="UserProfileMatchHistoryFrame/UserProfileMatchHistoryTileListItemTemplate">
-                <Anchor side="Top" relative="$parent/Item11" pos="Max" offset="0"/>
+                <Anchor side="Top" relative="$parent/Item11" pos="Max" offset="3"/>
                 <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
-                <Anchor side="Right" relative="$parent/ScrollBar" pos="Min" offset="-2"/>
+                <Anchor side="Right" relative="$parent/ScrollBar" pos="Min" offset="-8"/>
             </Frame>
 
             <Frame type="UserProfileMatchHistoryTileListItem" name="Item13" template="UserProfileMatchHistoryFrame/UserProfileMatchHistoryTileListItemTemplate">
-                <Anchor side="Top" relative="$parent/Item12" pos="Max" offset="0"/>
+                <Anchor side="Top" relative="$parent/Item12" pos="Max" offset="3"/>
                 <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
-                <Anchor side="Right" relative="$parent/ScrollBar" pos="Min" offset="-2"/>
+                <Anchor side="Right" relative="$parent/ScrollBar" pos="Min" offset="-8"/>
+            </Frame>
+
+            <Frame type="UserProfileMatchHistoryTileListItem" name="Item14" template="UserProfileMatchHistoryFrame/UserProfileMatchHistoryTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item13" pos="Max" offset="3"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Right" relative="$parent/ScrollBar" pos="Min" offset="-8"/>
+            </Frame>
+
+            <Frame type="UserProfileMatchHistoryTileListItem" name="Item15" template="UserProfileMatchHistoryFrame/UserProfileMatchHistoryTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item14" pos="Max" offset="3"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Right" relative="$parent/ScrollBar" pos="Min" offset="-8"/>
             </Frame>
 
             <Frame type="ScrollBar" name="ScrollBar">
-                <Anchor side="Top" relative="$parent" pos="Min" offset="-3"/>
+                <Anchor side="Top" relative="$parent" pos="Min" offset="-4"/>
                 <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
-                <Anchor side="Bottom" relative="$parent" pos="Max" offset="-3"/>
+                <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
 
                 <Image val="$root/StandardBattlenetTemplates/GluesSocialScrollBarBackgroundImage"/>
                 <Button val="$root/StandardBattlenetTemplates/GluesSocialScrollBarButtonTemplate"/>
@@ -380,11 +454,11 @@
         </Frame>
 
         <Frame type="Label" name="NoResultsLabel">
-            <Anchor side="Top" relative="$parent/MatchHistoryTileList" pos="Mid" offset="0"/>
-            <Anchor side="Bottom" relative="$parent/MatchHistoryTileList" pos="Mid" offset="0"/>
+            <Anchor side="Top" relative="$parent/MatchHistoryTileList" pos="Mid" offset="-52"/>
+            <Anchor side="Bottom" relative="$parent/MatchHistoryTileList" pos="Mid" offset="-52"/>
             <Anchor side="Left" relative="$parent/MatchHistoryTileList" pos="Min" offset="0"/>
-            <Anchor side="Right" relative="$parent/MatchHistoryTileList" pos="Max" offset="0"/>
-            <Style val="@ClubProfileNoResultsLabel"/>
+            <Anchor side="Right" relative="$parent/MatchHistoryTileList" pos="Max" offset="-20"/>
+            <Style val="Profile_NoResults"/>
             <Text val="@UI/UserProfileMatchHistoryFrame/NoResults"/>
             <Visible val="false"/>
         </Frame>
@@ -400,10 +474,5 @@
                 <Action type="SetProperty" frame="NoResultsLabel" Visible="true"/>
             </State>
         </StateGroup>
-
-        <Frame type="Pulldown" name="MatchHistoryFilterPulldown" template="StandardTemplates/StandardPulldownTemplate">
-            <Anchor side="Top" relative="$parent" pos="Min" offset="13"/>
-            <Anchor side="Left" relative="$parent" pos="Min" offset="10"/>
-        </Frame>
     </Frame>
 </Desc>

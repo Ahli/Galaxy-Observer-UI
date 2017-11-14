@@ -4,6 +4,131 @@
     
     <Constant name="Collection_Spacing_StandardItem_Horizontal" val="10"/>
     <Constant name="Collection_Spacing_StandardItem_Vertical" val="10"/>
+    
+    <Frame type="Image" name="CampaignScreenshotTemplate">
+        <Anchor side="Top" relative="$parent" pos="Min" offset="3"/>
+        <Anchor side="Bottom" relative="$parent" pos="Max" offset="-3"/>
+        <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+        <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+        <ScaleWidthToTexture val="true"/>
+        
+        <StateGroup name="ContentState">
+            <DefaultState val="NoContent"/>
+            
+            <State name="HasContent">
+                <When type="Property" operator="NotEqual" Texture=""/>
+            </State>
+            
+            <State name="NoContent"/>
+        </StateGroup>
+    </Frame>
+    
+    <Frame type="Button" name="ScreenshotPipTemplate">
+        <Width val="18"/>
+        <Height val="18"/>
+        <Toggleable val="True"/>
+        <CollapseLayout val="True"/>
+
+        <Frame type="Image" name="NormalImage">
+            <Anchor relative="$parent"/>
+            <Texture val="@UI/SC2_UI_Battlenet_Glue_EmoticonPanel_InGame_PagePip_Inactive"/>
+            <ColorAdjustMode val="Colorize"/>
+            <AdjustmentColor val="60,170,255"/>
+        </Frame>
+
+        <Frame type="Image" name="HoverImage">
+            <Anchor relative="$parent"/>
+            <Texture val="@UI/SC2_UI_Battlenet_Glue_EmoticonPanel_InGame_PagePip_Active"/>
+            <ColorAdjustMode val="Colorize"/>
+            <AdjustmentColor val="60,170,255"/>
+        </Frame>
+        
+        <Frame type="Image" name="SelectedImage">
+            <Anchor relative="$parent"/>
+            <Texture val="@UI/SC2_UI_Battlenet_Glue_EmoticonPanel_InGame_PagePip_Active"/>
+            <ColorAdjustMode val="Colorize"/>
+            <AdjustmentColor val="60,170,255"/>
+            <Visible val="false"/>
+        </Frame>
+    
+        <Animation name="ClickAnim">
+            <Event event="OnClick" action="Reset,Play"/>
+            
+            <Controller type="Event" frame="$parent" end="Stop">
+                <Key type="Event" time="0" event="OnPipClick"/>
+            </Controller>
+        </Animation>
+        
+        <StateGroup name="ToggleState">
+            <DefaultState val="NotToggled"/>
+            
+            <State name="Toggled">
+                <When type="Property" Toggled="True"/>
+                <Action type="SetProperty" frame="SelectedImage" Visible="True"/>
+                <Action type="SetProperty" frame="NormalImage" Alpha="0"/>
+                <Action type="SetProperty" frame="HoverImage" Alpha="0"/>
+            </State>
+            
+            <State name="NotToggled">
+                <Action type="SetProperty" frame="SelectedImage" Visible="False"/>
+                <Action type="SetProperty" frame="NormalImage" Alpha="255"/>
+                <Action type="SetProperty" frame="HoverImage" Alpha="255"/>
+            </State>
+        </StateGroup>
+    </Frame>
+    
+    <Frame type="TabControl" name="ScreenshotTabControlTemplate">
+        <Anchor relative="$parent"/>
+        <AcceptsMouse val="True"/>
+        <Wrap val="True"/>
+                
+        <Frame type="Button" name="Pip5" template="SelectedBundleFrame/ScreenshotPipTemplate">
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="-8"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="-8"/>
+        </Frame>
+        
+        <Frame type="Button" name="Pip4" template="SelectedBundleFrame/ScreenshotPipTemplate">
+            <Anchor side="Bottom" relative="$parent/Pip5" pos="Max" offset="0"/>
+            <Anchor side="Right" relative="$parent/Pip5" pos="Min" offset="2"/>
+        </Frame>
+        
+        <Frame type="Button" name="Pip3" template="SelectedBundleFrame/ScreenshotPipTemplate">
+            <Anchor side="Bottom" relative="$parent/Pip4" pos="Max" offset="0"/>
+            <Anchor side="Right" relative="$parent/Pip4" pos="Min" offset="2"/>
+        </Frame>
+        
+        <Frame type="Button" name="Pip2" template="SelectedBundleFrame/ScreenshotPipTemplate">
+            <Anchor side="Bottom" relative="$parent/Pip3" pos="Max" offset="0"/>
+            <Anchor side="Right" relative="$parent/Pip3" pos="Min" offset="2"/>
+        </Frame>
+        
+        <Frame type="Button" name="Pip1" template="SelectedBundleFrame/ScreenshotPipTemplate">
+            <Anchor side="Bottom" relative="$parent/Pip2" pos="Max" offset="0"/>
+            <Anchor side="Right" relative="$parent/Pip2" pos="Min" offset="2"/>
+        </Frame>
+    
+        <Animation name="ScreenshotRotationAnim">
+            <Event event="OnShown" action="Reset,Play"/>
+            <Event event="OnHidden" action="Pause"/>
+            <Event event="OnSelectedBundleItemClick" frame="$ancestor[@type=SelectedBundleFrame]" action="Reset"/>
+            <Event event="OnMouseEnter" action="Pause"/>
+            <Event event="OnMouseExit" action="Play"/>
+            <Event event="OnPipClick" action="Stop,Reset"/>
+            
+            <Controller type="Event" end="Loop">
+                <Key type="Event" time="3" event="IncrementSelectedIndex"/>
+            </Controller>
+        </Animation>
+        
+        <Animation name="ScreenshotResetAnim">
+            <Event event="OnShown" action="Reset,Play"/>
+            <Event event="OnSelectedBundleItemClick" frame="$ancestor[@type=SelectedBundleFrame]" action="Reset,Play"/>
+            
+            <Controller type="Property" property="SelectedIndex" end="Stop">
+                <Key type="Property" time="0" value="0"/>
+            </Controller>
+        </Animation>
+    </Frame>
 
     <Frame type="RewardItemTileListItem" name="RewardItemTileListItemTemplate" template="StandardTileListTemplates/UnlockableTileListItemTemplate">
         <Frame type="Frame" name="AnchorFrame">
@@ -269,79 +394,154 @@
     </Frame>
 
     <Frame type="CampaignCacheFrame" name="SelectedCampaignFrameTemplate">
-        <Width val="770"/>
-        <Height val="494"/>
-
-        <Frame type="Frame" name="ImageFrame">
-            <Anchor side="Top" relative="$parent" pos="Min" offset="20"/>
-            <Anchor side="Left" relative="$parent" pos="Min" offset="20"/>
-            <Width val="363"/>
-            <Height val="453"/>
-
-            <Frame type="Image" name="Image">
-                <Anchor relative="$parent"/>
-                <Texture val="{$parent/$parent/@FeaturedImagePath}"/>
+        
+        <Frame type="Frame" name="CampaignPreviewPane" template="CollectionPreviewPane/CollectionPreviewPaneTemplate">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+            <Width val="416"/>
+            <Height val="518"/>
+            
+            <Frame type="Image" name="DisplayContainer">
+                <Frame type="Image" name="CampaignPortrait">
+                    <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                    <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+                    <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+                    <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+                    <ScaleWidthToTexture val="true"/>
+                    <Texture val="{$ancestor[@type=CampaignCacheFrame]/@FeaturedImagePath}"/>
+                </Frame>
             </Frame>
         </Frame>
-
-        <Frame type="Image" name="IconFrame">
-            <Anchor side="Top" relative="$parent/ImageFrame" pos="Min" offset="-2"/>
-            <Anchor side="Left" relative="$parent/ImageFrame" pos="Min" offset="-2"/>
-            <Anchor side="Right" relative="$parent/ImageFrame" pos="Max" offset="2"/>
-            <Anchor side="Bottom" relative="$parent/ImageFrame" pos="Max" offset="2"/>
-            <Texture val="@UI/SC2_UI_Collection_VoicePack_ImageFrame"/>
-            <TextureType val="Nineslice"/>
+        
+        <Frame type="Frame" name="ScreenshotPreviewPane" template="CollectionPreviewPane/CollectionPreviewPaneTemplate">
+            <Anchor side="Bottom" relative="$parent/CampaignPreviewPane" pos="Max" offset="0"/>
+            <Anchor side="Left" relative="$parent/CampaignPreviewPane" pos="Max" offset="20"/>
+            <Width val="384"/>
+            <Height val="234"/>
+            
+            <Frame type="Image" name="DisplayContainer">
+                <Frame type="Image" name="Screenshot1" template="SelectedBundleFrame/CampaignScreenshotTemplate">
+                    <Texture val="{$ancestor[@type=CampaignCacheFrame]/@Campaign[ScreenshotImage1]}"/>
+                </Frame>
+                
+                <Frame type="Image" name="Screenshot2" template="SelectedBundleFrame/CampaignScreenshotTemplate">
+                    <Texture val="{$ancestor[@type=CampaignCacheFrame]/@Campaign[ScreenshotImage2]}"/>
+                </Frame>
+                
+                <Frame type="Image" name="Screenshot3" template="SelectedBundleFrame/CampaignScreenshotTemplate">
+                    <Texture val="{$ancestor[@type=CampaignCacheFrame]/@Campaign[ScreenshotImage3]}"/>
+                </Frame>
+                
+                <Frame type="Image" name="Screenshot4" template="SelectedBundleFrame/CampaignScreenshotTemplate">
+                    <Texture val="{$ancestor[@type=CampaignCacheFrame]/@Campaign[ScreenshotImage4]}"/>
+                </Frame>
+                
+                <Frame type="Image" name="Screenshot5" template="SelectedBundleFrame/CampaignScreenshotTemplate">
+                    <Texture val="{$ancestor[@type=CampaignCacheFrame]/@Campaign[ScreenshotImage5]}"/>
+                </Frame>
+                
+                <Frame type="TabControl" name="ScreenshotTabControl5" template="SelectedBundleFrame/ScreenshotTabControlTemplate">
+                    <TabListItem val="Pip1"/>
+                    <TabListItem val="Pip2"/>
+                    <TabListItem val="Pip3"/>
+                    <TabListItem val="Pip4"/>
+                    <TabListItem val="Pip5"/>
+                    <PanelListItem val="$parent/Screenshot1"/>
+                    <PanelListItem val="$parent/Screenshot2"/>
+                    <PanelListItem val="$parent/Screenshot3"/>
+                    <PanelListItem val="$parent/Screenshot4"/>
+                    <PanelListItem val="$parent/Screenshot5"/>
+                </Frame>
+                
+                <Frame type="TabControl" name="ScreenshotTabControl4" template="SelectedBundleFrame/ScreenshotTabControlTemplate">
+                    <TabListItem val="Pip1"/>
+                    <TabListItem val="Pip2"/>
+                    <TabListItem val="Pip3"/>
+                    <TabListItem val="Pip4"/>
+                    <PanelListItem val="$parent/Screenshot1"/>
+                    <PanelListItem val="$parent/Screenshot2"/>
+                    <PanelListItem val="$parent/Screenshot3"/>
+                    <PanelListItem val="$parent/Screenshot4"/>
+                    
+                    <Frame type="Button" name="Pip5">
+                        <Visible val="False"/>
+                    </Frame>
+                </Frame>
+                
+                <StateGroup name="ScreenshotCountState">
+                    <DefaultState val="Zero"/>
+                    
+                    <State name="Five">
+                        <When type="Property" frame="Screenshot5" operator="NotEqual" Texture=""/>
+                        <Action type="SetProperty" frame="ScreenshotTabControl5" Visible="True"/>
+                        <Action type="SetProperty" frame="ScreenshotTabControl4" Visible="False"/>
+                    </State>
+                    
+                    <State name="Four">
+                        <When type="Property" frame="Screenshot4" operator="NotEqual" Texture=""/>
+                        <Action type="SetProperty" frame="ScreenshotTabControl5" Visible="False"/>
+                        <Action type="SetProperty" frame="ScreenshotTabControl4" Visible="True"/>
+                    </State>
+                    
+                    <State name="Zero">
+                        <Action type="SetProperty" frame="ScreenshotTabControl5" Visible="False"/>
+                        <Action type="SetProperty" frame="ScreenshotTabControl4" Visible="False"/>
+                    </State>
+                </StateGroup>
+            </Frame>
+            
+            <StateGroup name="VisibilityState">
+                <DefaultState val="NotVisible"/>
+                
+                <State name="NoScreenshots">
+                    <When type="StateGroup" frame="DisplayContainer" ScreenshotCountState="Zero"/>
+                    <Action type="SetProperty" Visible="False"/>
+                </State>
+                
+                <State name="Visible">
+                    <When type="Property" frame="$ancestor[@type=CampaignCacheFrame]" operator="NotEqual" Campaign="WingsOfLibertyCollectorLicense"/>
+                    <When type="Property" frame="$ancestor[@type=CampaignCacheFrame]" operator="NotEqual" Campaign="HeartOfTheSwarmCollectorLicense"/>
+                    <When type="Property" frame="$ancestor[@type=CampaignCacheFrame]" operator="NotEqual" Campaign="LegacyOfTheVoidCollectorLicense"/>
+                    <Action type="SetProperty" Visible="True"/>
+                </State>
+                
+                <State name="NotVisible">
+                    <Action type="SetProperty" Visible="False"/>
+                </State>
+            </StateGroup>
+        </Frame>
+        
+        <Frame type="StoreCacheFrame" name="StoreCacheFrame">
+            <Anchor relative="$parent"/>
+            <GameContent val="{$ancestor[@type=SelectedBundleFrame]/@GameContent}"/>
         </Frame>
 
-        <Frame type="Label" name="TypeLabel">
-            <Anchor side="Top" relative="$parent" pos="Min" offset="41"/>
-            <Anchor side="Left" relative="$parent/ImageFrame" pos="Max" offset="22"/>
-            <Anchor side="Right" relative="$parent" pos="Max" offset="-24"/>
-            <Style val="@Collection_ItemFrame_Type_Small"/>
-            <Text val="@UI/Store/DescriptionFormat/Type/Campaign"/>
-        </Frame>
-
-        <Frame type="Label" name="MissionNameLabel">
-            <Anchor side="Top" relative="$parent/TypeLabel" pos="Max" offset="0"/>
-            <Anchor side="Left" relative="$parent/TypeLabel" pos="Min" offset="0"/>
-            <Anchor side="Right" relative="$parent" pos="Max" offset="-24"/>
+        <Frame type="Label" name="NameLabel">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="16"/>
+            <Anchor side="Left" relative="$parent/CampaignPreviewPane" pos="Max" offset="21"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="-10"/>
             <Style val="@Collection_ItemFrame_Name_Small"/>
             <Text val="{$parent/@ShortName}"/>
-            <Options val="Ellipsis | TooltipIfTruncated"/>
-            <AcceptsMouse val="True"/>
+        </Frame>
+        
+        <Frame type="Label" name="TypeLabel">
+            <Anchor side="Top" relative="$parent/NameLabel" pos="Max" offset="-2"/>
+            <Anchor side="Left" relative="$parent/NameLabel" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent/NameLabel" pos="Max" offset="0"/>
+            <Style val="@Collection_ItemFrame_Type_Small"/>
+            <Text val="{$parent/StoreCacheFrame/@StoreTypeName}"/>
         </Frame>
 
         <Frame type="Label" name="DescriptionLabel">
-            <Anchor side="Top" relative="$parent/MissionNameLabel" pos="Max" offset="20"/>
-            <Anchor side="Left" relative="$parent/MissionNameLabel" pos="Min" offset="0"/>
-            <Anchor side="Right" relative="$parent" pos="Max" offset="-24"/>
-            <Style val="@Collection_ItemFrame_Desc_Small"/>
+            <Anchor side="Top" relative="$parent/TypeLabel" pos="Max" offset="14"/>
+            <Anchor side="Left" relative="$parent/TypeLabel" pos="Min" offset="-3"/>
+            <Anchor side="Right" relative="$parent/NameLabel" pos="Max" offset="0"/>
+            <Style val="@Collection_CommanderFrame_Desc_Small"/>
             <Text val="{$parent/@FeaturedDescription}"/>
         </Frame>
     </Frame>
 
     <Frame type="CommanderCacheFrame" name="SelectedCommanderFrameTemplate">
-
-        <!-- <Frame type="Frame" name="ImageFrame"> -->
-            <!-- <Anchor side="Top" relative="$parent" pos="Min" offset="21"/> -->
-            <!-- <Anchor side="Left" relative="$parent" pos="Min" offset="21"/> -->
-            <!-- <Width val="360"/> -->
-            <!-- <Height val="452"/> -->
-
-            <!-- <Frame type="Image" name="Image"> -->
-                <!-- <Anchor relative="$parent"/> -->
-                <!-- <Texture val="{$parent/$parent/@FeaturedImagePath}"/> -->
-            <!-- </Frame> -->
-        <!-- </Frame> -->
-
-        <!-- <Frame type="Image" name="IconFrame"> -->
-            <!-- <Anchor side="Top" relative="$parent/ImageFrame" pos="Min" offset="-2"/> -->
-            <!-- <Anchor side="Left" relative="$parent/ImageFrame" pos="Min" offset="-2"/> -->
-            <!-- <Anchor side="Right" relative="$parent/ImageFrame" pos="Max" offset="2"/> -->
-            <!-- <Anchor side="Bottom" relative="$parent/ImageFrame" pos="Max" offset="2"/> -->
-            <!-- <Texture val="@UI/SC2_UI_Collection_VoicePack_ImageFrame"/> -->
-            <!-- <TextureType val="Nineslice"/> -->
-        <!-- </Frame> -->
         
         <Frame type="Frame" name="CommanderPreviewPane" template="CollectionPreviewPane/CollectionPreviewPaneTemplate">
             <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
@@ -550,343 +750,9 @@
             <Anchor side="Right" relative="$parent/VoicePackExampleLineAnchorFrame" pos="Max" offset="0"/>
             <LineIndex val="3"/>
         </Frame>
-        
-        <!-- Set all the frame visibilities of each commander based on what's currently selected -->
-        <!-- <StateGroup name="VoicePackIdStateGroup"> -->
-            <!-- <DefaultState val="Default"/> -->
-
-            <!-- <State name="Abathur"> -->
-                <!-- <When type="Property" frame="$this" VoicePack="Abathur"/> -->
-                <!-- <Action type="SetProperty" frame="CharacterFrame_Container/CharacterImage" texture="@UI/SC2_UI_Collection_VoicePack_CharacterFrame_Abathur"/> -->
-                <!-- <Action type="SetAnchor" frame="CharacterFrame_Container/CharacterImage" side="Left" relative="$parent" pos="Min" offset="0"/> -->
-            <!-- </State> -->
-
-            <!-- <State name="Alarak"> -->
-                <!-- <When type="Property" frame="$this" VoicePack="Alarak"/> -->
-                <!-- <Action type="SetProperty" frame="CharacterFrame_Container/CharacterImage" texture="@UI/SC2_UI_Collection_VoicePack_CharacterFrame_Alarak"/> -->
-                <!-- <Action type="SetAnchor" frame="CharacterFrame_Container/CharacterImage" side="Left" relative="$parent" pos="Min" offset="0"/> -->
-            <!-- </State> -->
-
-            <!-- <State name="Artanis"> -->
-                <!-- <When type="Property" frame="$this" VoicePack="Artanis"/> -->
-                <!-- <Action type="SetProperty" frame="CharacterFrame_Container/CharacterImage" texture="@UI/SC2_UI_Collection_VoicePack_CharacterFrame_Artanis"/> -->
-                <!-- <Action type="SetAnchor" frame="CharacterFrame_Container/CharacterImage" side="Left" relative="$parent" pos="Min" offset="0"/> -->
-            <!-- </State> -->
-            
-            <!-- <State name="Day9"> -->
-                <!-- <When type="Property" frame="$this" VoicePack="Day9"/> -->
-                <!-- <Action type="SetProperty" frame="CharacterFrame_Container/CharacterImage" texture="@UI/SC2_UI_Collection_VoicePack_CharacterFrame_Day9"/> -->
-                <!-- <Action type="SetAnchor" frame="CharacterFrame_Container/CharacterImage" side="Left" relative="$parent" pos="Min" offset="-25"/> -->
-            <!-- </State> -->
-
-            <!-- <State name="Dva"> -->
-                <!-- <When type="Property" frame="$this" VoicePack="BlizzConDVa"/> -->
-                <!-- <Action type="SetProperty" frame="CharacterFrame_Container/CharacterImage" texture="@UI/SC2_UI_Collection_VoicePack_CharacterFrame_Dva"/> -->
-                <!-- <Action type="SetAnchor" frame="CharacterFrame_Container/CharacterImage" side="Left" relative="$parent" pos="Min" offset="-35"/> -->
-                <!-- <Action type="SetProperty" frame="CharacterFrame_Container/Dva_Hair1" visible="True"/> -->
-                <!-- <Action type="SetProperty" frame="CharacterFrame_Container/Dva_Hair2" visible="True"/> -->
-                <!-- <Action type="SetProperty" frame="CharacterFrame_Container/Dva_Hair3" visible="True"/> -->
-            <!-- </State> -->
-            
-            <!-- <State name="Dehaka"> -->
-                <!-- <When type="Property" frame="$this" VoicePack="Dehaka"/> -->
-                <!-- <Action type="SetProperty" frame="CharacterFrame_Container/CharacterImage" texture="@UI/SC2_UI_Collection_VoicePack_CharacterFrame_Dehaka"/> -->
-                <!-- <Action type="SetAnchor" frame="CharacterFrame_Container/CharacterImage" side="Left" relative="$parent" pos="Min" offset="0"/> -->
-            <!-- </State> -->
-            
-            <!-- <State name="Fenix"> -->
-                <!-- <When type="Property" frame="$this" VoicePack="Fenix"/> -->
-                <!-- <Action type="SetProperty" frame="CharacterFrame_Container/CharacterImage" texture="@UI/SC2_UI_Collection_VoicePack_CharacterFrame_Fenix"/> -->
-                <!-- <Action type="SetAnchor" frame="CharacterFrame_Container/CharacterImage" side="Left" relative="$parent" pos="Min" offset="0"/> -->
-            <!-- </State> -->
-            
-            <!-- <State name="iNcontrol"> -->
-                <!-- <When type="Property" frame="$this" VoicePack="iNcontrol"/> -->
-                <!-- <Action type="SetProperty" frame="CharacterFrame_Container/CharacterImage" texture="@UI/SC2_UI_Collection_VoicePack_CharacterFrame_iNcontroL"/> -->
-                <!-- <Action type="SetAnchor" frame="CharacterFrame_Container/CharacterImage" side="Left" relative="$parent" pos="Min" offset="-25"/> -->
-            <!-- </State> -->
-
-            <!-- <State name="Kerrigan"> -->
-                <!-- <When type="Property" frame="$this" VoicePack="Kerrigan"/> -->
-                <!-- <Action type="SetProperty" frame="CharacterFrame_Container/CharacterImage" texture="@UI/SC2_UI_Collection_VoicePack_CharacterFrame_Kerrigan"/> -->
-                <!-- <Action type="SetAnchor" frame="CharacterFrame_Container/CharacterImage" side="Left" relative="$parent" pos="Min" offset="0"/> -->
-            <!-- </State> -->
-
-            <!-- <State name="Nathanias"> -->
-                <!-- <When type="Property" frame="$this" VoicePack="Nathanias"/> -->
-                <!-- <Action type="SetProperty" frame="CharacterFrame_Container/CharacterImage" texture="@UI/SC2_UI_Collection_VoicePack_CharacterFrame_Nathanias"/> -->
-                <!-- <Action type="SetAnchor" frame="CharacterFrame_Container/CharacterImage" side="Left" relative="$parent" pos="Min" offset="-25"/> -->
-            <!-- </State> -->
-
-            <!-- <State name="Nova"> -->
-                <!-- <When type="Property" frame="$this" VoicePack="Nova"/> -->
-                <!-- <Action type="SetProperty" frame="CharacterFrame_Container/CharacterImage" texture="@UI/SC2_UI_Collection_VoicePack_CharacterFrame_Nova"/> -->
-                <!-- <Action type="SetAnchor" frame="CharacterFrame_Container/CharacterImage" side="Left" relative="$parent" pos="Min" offset="0"/> -->
-            <!-- </State> -->
-
-            <!-- <State name="Park"> -->
-                <!-- <When type="Property" frame="$this" VoicePack="Park"/> -->
-                <!-- <Action type="SetProperty" frame="CharacterFrame_Container/CharacterImage" texture="@UI/SC2_UI_Collection_VoicePack_CharacterFrame_Park"/> -->
-                <!-- <Action type="SetAnchor" frame="CharacterFrame_Container/CharacterImage" side="Left" relative="$parent" pos="Min" offset="-25"/> -->
-            <!-- </State> -->
-
-            <!-- <State name="Raynor"> -->
-                <!-- <When type="Property" frame="$this" VoicePack="Raynor"/> -->
-                <!-- <Action type="SetProperty" frame="CharacterFrame_Container/CharacterImage" texture="@UI/SC2_UI_Collection_VoicePack_CharacterFrame_Raynor"/> -->
-                <!-- <Action type="SetAnchor" frame="CharacterFrame_Container/CharacterImage" side="Left" relative="$parent" pos="Min" offset="0"/> -->
-            <!-- </State> -->
-            
-            <!-- <State name="scboy"> -->
-                <!-- <When type="Property" frame="$this" VoicePack="scboy"/> -->
-                <!-- <Action type="SetProperty" frame="CharacterFrame_Container/CharacterImage" texture="@UI/SC2_UI_Collection_VoicePack_CharacterFrame_SCBoy"/> -->
-                <!-- <Action type="SetAnchor" frame="CharacterFrame_Container/CharacterImage" side="Left" relative="$parent" pos="Min" offset="-25"/> -->
-            <!-- </State> -->
-
-            <!-- <State name="Swann"> -->
-                <!-- <When type="Property" frame="$this" VoicePack="Swann"/> -->
-                <!-- <Action type="SetProperty" frame="CharacterFrame_Container/CharacterImage" texture="@UI/SC2_UI_Collection_VoicePack_CharacterFrame_Swann"/> -->
-                <!-- <Action type="SetAnchor" frame="CharacterFrame_Container/CharacterImage" side="Left" relative="$parent" pos="Min" offset="0"/> -->
-            <!-- </State> -->
-
-            <!-- <State name="Tastosis"> -->
-                <!-- <When type="Property" frame="$this" VoicePack="Tastosis"/> -->
-                <!-- <Action type="SetProperty" frame="CharacterFrame_Container/CharacterImage" texture="@UI/SC2_UI_Collection_VoicePack_CharacterFrame_Tastosis"/> -->
-                <!-- <Action type="SetAnchor" frame="CharacterFrame_Container/CharacterImage" side="Left" relative="$parent" pos="Min" offset="-25"/> -->
-            <!-- </State> -->
-
-            <!-- <State name="TotalBiscuit"> -->
-                <!-- <When type="Property" frame="$this" VoicePack="TotalBiscuit"/> -->
-                <!-- <Action type="SetProperty" frame="CharacterFrame_Container/CharacterImage" texture="@UI/SC2_UI_Collection_VoicePack_CharacterFrame_TB"/> -->
-                <!-- <Action type="SetAnchor" frame="CharacterFrame_Container/CharacterImage" side="Left" relative="$parent" pos="Min" offset="-25"/> -->
-            <!-- </State> -->
-
-            <!-- <State name="Default"> -->
-                <!-- <Action type="SetProperty" frame="CharacterFrame_Container/CharacterImage" texture="Assets/Textures/Blank.dds"/> -->
-            <!-- </State> -->
-        <!-- </StateGroup> -->
     </Frame>
 
     <Frame type="SkinCacheFrame" name="SelectedSkinPackFrameTemplate">
-        <!-- <Frame type="Image" name="Background"> -->
-            <!-- <Anchor side="Top" relative="$parent" pos="Min" offset="0"/> -->
-            <!-- <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/> -->
-            <!-- <Anchor side="Left" relative="$parent" pos="Min" offset="0"/> -->
-            <!-- <Anchor side="Right" relative="$parent" pos="Max" offset="0"/> -->
-            <!-- <Texture val="@UI/SC2_UI_Battlenet_Glue_Arcade_MainContainer"/> -->
-            <!-- <TextureType val="NineSlice"/> -->
-        <!-- </Frame> -->
-        
-        <!-- <Frame type="Frame" name="BackgroundOverlayContainer"> -->
-            <!-- <Anchor side="Top" relative="$parent/Background" pos="Min" offset="8"/> -->
-            <!-- <Anchor side="Bottom" relative="$parent/Background" pos="Max" offset="-8"/> -->
-            <!-- <Anchor side="Left" relative="$parent/Background" pos="Min" offset="8"/> -->
-            <!-- <Anchor side="Right" relative="$parent/Background" pos="Max" offset="-8"/> -->
-            
-            <!-- <Frame type="Image" name="BackgroundOverlay"> -->
-                <!-- <Anchor relative="$parent"/> -->
-                <!-- <Texture val="Assets/Textures/White.dds"/> -->
-                <!-- <Color val="3,6,8"/> -->
-            <!-- </Frame> -->
-            
-            <!-- <Frame type="Image" name="StarField"> -->
-                <!-- <Anchor side="Bottom" relative="$parent" pos="Max" offset="580"/> -->
-                <!-- <Anchor side="Left" relative="$parent" pos="Min" offset="-40"/> -->
-                <!-- <Anchor side="Right" relative="$parent" pos="Max" offset="40"/> -->
-                <!-- <Texture val="@UI/SC2_UI_Collection_VoicePack_CharacterFrame_Background"/> -->
-                <!-- <ScaleHeightToTexture val="True"/> -->
-                <!-- <Alpha val="51"/> -->
-            <!-- </Frame> -->
-            
-            <!-- <Frame type="BlurFrame" name="BackgroundBlur"> -->
-                <!-- <Anchor relative="$parent"/> -->
-                <!-- <BlurAmount val=".35"/> -->
-            <!-- </Frame> -->
-        <!-- </Frame> -->
-        
-        <!-- <Frame type="Frame" name="BackgroundGridContainer"> -->
-            <!-- <Anchor side="Top" relative="$parent/Background" pos="Min" offset="10"/> -->
-            <!-- <Anchor side="Bottom" relative="$parent/Background" pos="Max" offset="-10"/> -->
-            <!-- <Anchor side="Left" relative="$parent/Background" pos="Min" offset="10"/> -->
-            <!-- <Anchor side="Right" relative="$parent/Background" pos="Max" offset="-10"/> -->
-            
-            <!-- <Frame type="Image" name="BackgroundGrid"> -->
-                <!-- <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/> -->
-                <!-- <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/> -->
-                <!-- <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/> -->
-                <!-- <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/> -->
-                <!-- <Width val="816"/> -->
-                <!-- <Height val="816"/> -->
-                <!-- <Texture val="@UI/SC2_UI_Collection_Bundle_Skin_Grid"/> -->
-                <!-- <TextureCoords top="0" left="0" bottom="16" right="16"/> -->
-                <!-- <WrapUV val="True"/> -->
-                <!-- <Alpha val="64"/> -->
-                <!-- <Color val="27,52,79"/> -->
-            <!-- </Frame> -->
-            
-            <!-- <Frame type="Image" name="HorizontalShimmer_01"> -->
-                <!-- <Anchor side="Top" relative="$parent" pos="Min" offset="10"/> -->
-                <!-- <Anchor side="Left" relative="$parent" pos="Min" offset="-500"/> -->
-                <!-- <Width val="2"/> -->
-                <!-- <Texture val="@UI/SC2_UI_Collection_Bundle_Skin_LineShimmer"/> -->
-                <!-- <Rotation val="90"/> -->
-                <!-- <Alpha val="30"/> -->
-                
-                <!-- <Animation name="Slide"> -->
-                    <!-- <Event event="OnShown" action="Reset,Play"/> -->
-                     
-                    <!-- <Controller name="Anchor" type="Anchor" end="Loop" side="Left" relative="true"> -->
-                        <!-- <Key type="Curve" time="0" value="0" out="Linear"/> -->
-                        <!-- <Key type="Curve" time="14" value="3000" in="Linear"/> -->
-                    <!-- </Controller> -->
-                <!-- </Animation> -->
-            <!-- </Frame> -->
-			
-			<!-- <Frame type="Image" name="HorizontalShimmer_02" template="SelectedBundleFrame/SelectedSkinPackFrameTemplate/BackgroundGridContainer/HorizontalShimmer_01"> -->
-                <!-- <Anchor side="Top" relative="$parent" pos="Min" offset="61"/> -->
-                <!-- <Anchor side="Left" relative="$parent" pos="Max" offset="1900"/> -->
-				
-				<!-- <Animation name="Slide"> -->
-                    <!-- <Event event="OnShown" action="Reset,Play"/> -->
-                     
-                    <!-- <Controller name="Anchor" type="Anchor" end="Loop" side="Left" relative="true"> -->
-                        <!-- <Key type="Curve" time="0" value="0" out="Linear"/> -->
-                        <!-- <Key type="Curve" time="14" value="-3000" in="Linear"/> -->
-                    <!-- </Controller> -->
-                <!-- </Animation> -->
-            <!-- </Frame> -->
-			      
-            <!-- <Frame type="Image" name="HorizontalShimmer_03" template="SelectedBundleFrame/SelectedSkinPackFrameTemplate/BackgroundGridContainer/HorizontalShimmer_01"> -->
-                <!-- <Anchor side="Top" relative="$parent" pos="Min" offset="214"/> -->
-                <!-- <Anchor side="Left" relative="$parent" pos="Max" offset="-2900"/> -->
-            <!-- </Frame> -->
-            
-            <!-- <Frame type="Image" name="HorizontalShimmer_04" template="SelectedBundleFrame/SelectedSkinPackFrameTemplate/BackgroundGridContainer/HorizontalShimmer_01"> -->
-                <!-- <Anchor side="Top" relative="$parent" pos="Min" offset="265"/> -->
-                <!-- <Anchor side="Left" relative="$parent" pos="Min" offset="-200"/> -->
-            <!-- </Frame> -->
-			
-			<!-- <Frame type="Image" name="HorizontalShimmer_05" template="SelectedBundleFrame/SelectedSkinPackFrameTemplate/BackgroundGridContainer/HorizontalShimmer_01"> -->
-                <!-- <Anchor side="Top" relative="$parent" pos="Min" offset="316"/> -->
-                <!-- <Anchor side="Left" relative="$parent" pos="Max" offset="300"/> -->
-				
-				<!-- <Animation name="Slide"> -->
-                    <!-- <Event event="OnShown" action="Reset,Play"/> -->
-                     
-                    <!-- <Controller name="Anchor" type="Anchor" end="Loop" side="Left" relative="true"> -->
-                        <!-- <Key type="Curve" time="0" value="0" out="Linear"/> -->
-                        <!-- <Key type="Curve" time="13" value="-3000" in="Linear"/> -->
-                    <!-- </Controller> -->
-                <!-- </Animation> -->
-            <!-- </Frame> -->
-            
-            <!-- <Frame type="Image" name="HorizontalShimmer_06" template="SelectedBundleFrame/SelectedSkinPackFrameTemplate/BackgroundGridContainer/HorizontalShimmer_01"> -->
-                <!-- <Anchor side="Top" relative="$parent" pos="Min" offset="316"/> -->
-                <!-- <Anchor side="Left" relative="$parent" pos="Min" offset="-1600"/> -->
-            <!-- </Frame> -->
-			
-            <!-- <Frame type="Image" name="VerticalShimmer_01"> -->
-                <!-- <Anchor side="Top" relative="$parent" pos="Min" offset="-500"/> -->
-                <!-- <Anchor side="Left" relative="$parent" pos="Min" offset="68"/> -->
-                <!-- <Width val="2"/> -->
-                <!-- <Texture val="@UI/SC2_UI_Collection_Bundle_Skin_LineShimmer"/> -->
-                <!-- <Alpha val="30"/> -->
-                
-                <!-- <Animation name="Slide"> -->
-                    <!-- <Event event="OnShown" action="Reset,Play"/> -->
-                     
-                    <!-- <Controller name="Anchor" type="Anchor" end="Loop" side="Top" relative="true"> -->
-                        <!-- <Key type="Curve" time="0" value="0" out="Linear"/> -->
-                        <!-- <Key type="Curve" time="14" value="3000" in="Linear"/> -->
-                    <!-- </Controller> -->
-                <!-- </Animation> -->
-            <!-- </Frame> -->
-			
-			<!-- <Frame type="Image" name="VerticalShimmer_02" template="SelectedBundleFrame/SelectedSkinPackFrameTemplate/BackgroundGridContainer/VerticalShimmer_01"> -->
-                <!-- <Anchor side="Top" relative="$parent" pos="Max" offset="1100"/> -->
-                <!-- <Anchor side="Left" relative="$parent" pos="Min" offset="170"/> -->
-				
-				<!-- <Animation name="Slide"> -->
-                    <!-- <Event event="OnShown" action="Reset,Play"/> -->
-                     
-                    <!-- <Controller name="Anchor" type="Anchor" end="Loop" side="Top" relative="true"> -->
-                        <!-- <Key type="Curve" time="0" value="0" out="Linear"/> -->
-                        <!-- <Key type="Curve" time="14" value="-3000" in="Linear"/> -->
-                    <!-- </Controller> -->
-                <!-- </Animation> -->
-            <!-- </Frame> -->
-            
-            <!-- <Frame type="Image" name="VerticalShimmer_03" template="SelectedBundleFrame/SelectedSkinPackFrameTemplate/BackgroundGridContainer/VerticalShimmer_01"> -->
-                <!-- <Anchor side="Top" relative="$parent" pos="Min" offset="-2000"/> -->
-                <!-- <Anchor side="Left" relative="$parent" pos="Min" offset="323"/> -->
-            <!-- </Frame> -->
-            
-            <!-- <Frame type="Image" name="VerticalShimmer_04" template="SelectedBundleFrame/SelectedSkinPackFrameTemplate/BackgroundGridContainer/VerticalShimmer_01"> -->
-                <!-- <Anchor side="Top" relative="$parent" pos="Min" offset="-1100"/> -->
-                <!-- <Anchor side="Left" relative="$parent" pos="Min" offset="425"/> -->
-            <!-- </Frame> -->
-			       
-            <!-- <Frame type="Image" name="VerticalShimmer_05" template="SelectedBundleFrame/SelectedSkinPackFrameTemplate/BackgroundGridContainer/VerticalShimmer_01"> -->
-                <!-- <Anchor side="Top" relative="$parent" pos="Min" offset="-1700"/> -->
-                <!-- <Anchor side="Left" relative="$parent" pos="Min" offset="476"/> -->
-            <!-- </Frame> -->
-            
-            <!-- <Frame type="Image" name="VerticalShimmer_06" template="SelectedBundleFrame/SelectedSkinPackFrameTemplate/BackgroundGridContainer/VerticalShimmer_01"> -->
-                <!-- <Anchor side="Top" relative="$parent" pos="Min" offset="-1900"/> -->
-                <!-- <Anchor side="Left" relative="$parent" pos="Min" offset="578"/> -->
-            <!-- </Frame> -->
-			
-			<!-- <Frame type="Image" name="VerticalShimmer_07" template="SelectedBundleFrame/SelectedSkinPackFrameTemplate/BackgroundGridContainer/VerticalShimmer_01"> -->
-                <!-- <Anchor side="Top" relative="$parent" pos="Max" offset="400"/> -->
-                <!-- <Anchor side="Left" relative="$parent" pos="Min" offset="578"/> -->
-				
-				<!-- <Animation name="Slide"> -->
-                    <!-- <Event event="OnShown" action="Reset,Play"/> -->
-                     
-                    <!-- <Controller name="Anchor" type="Anchor" end="Loop" side="Top" relative="true"> -->
-                        <!-- <Key type="Curve" time="0" value="0" out="Linear"/> -->
-                        <!-- <Key type="Curve" time="13" value="-3000" in="Linear"/> -->
-                    <!-- </Controller> -->
-                <!-- </Animation> -->
-            <!-- </Frame> -->
-			
-			<!-- <Frame type="Image" name="VerticalShimmer_08" template="SelectedBundleFrame/SelectedSkinPackFrameTemplate/BackgroundGridContainer/VerticalShimmer_01"> -->
-                <!-- <Anchor side="Top" relative="$parent" pos="Min" offset="-700"/> -->
-                <!-- <Anchor side="Left" relative="$parent" pos="Min" offset="629"/> -->
-            <!-- </Frame> -->
-        <!-- </Frame> -->
-        
-        <!-- <Frame type="Frame" name="BackgroundGlowContainer"> -->
-            <!-- <Anchor side="Top" relative="$parent/Background" pos="Min" offset="8"/> -->
-            <!-- <Anchor side="Bottom" relative="$parent/Background" pos="Max" offset="-8"/> -->
-            <!-- <Anchor side="Left" relative="$parent/Background" pos="Min" offset="8"/> -->
-            <!-- <Anchor side="Right" relative="$parent/Background" pos="Max" offset="-8"/> -->
-            
-            <!-- <Frame type="Image" name="BackgroundGlow"> -->
-                <!-- <Anchor side="Top" relative="$parent" pos="Max" offset="0"/> -->
-                <!-- <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/> -->
-                <!-- <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/> -->
-                <!-- <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/> -->
-                <!-- <Width val="960"/> -->
-                <!-- <Height val="900"/> -->
-                <!-- <Texture val="@UI/SC2_UI_Battlenet_Glue_Campaign_Purchase_GlowBG"/> -->
-                <!-- <ColorAdjustMode val="Colorize"/> -->
-                <!-- <AdjustmentColor val="33,126,221"/> -->
-                <!-- <Alpha val="64"/> -->
-            <!-- </Frame> -->
-            
-            <!-- <Frame type="Image" name="CornerGlow"> -->
-                <!-- <Anchor side="Top" relative="$parent" pos="Min" offset="-60"/> -->
-                <!-- <Anchor side="Bottom" relative="$parent" pos="Min" offset="-60"/> -->
-                <!-- <Anchor side="Left" relative="$parent" pos="Min" offset="90"/> -->
-                <!-- <Anchor side="Right" relative="$parent" pos="Min" offset="90"/> -->
-                <!-- <Width val="1080"/> -->
-                <!-- <Height val="614"/> -->
-                <!-- <Texture val="@UI/SC2_UI_Battlenet_Glue_Campaign_Purchase_GlowBG"/> -->
-                <!-- <ColorAdjustMode val="Colorize"/> -->
-                <!-- <AdjustmentColor val="109,98,255"/> -->
-                <!-- <Alpha val="46"/> -->
-            <!-- </Frame> -->
-        <!-- </Frame> -->
     
         <Frame type="Frame" name="SkinPreviewPane" template="CollectionPreviewPane/CollectionPreviewPaneWideTemplate">
             <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
@@ -952,6 +818,11 @@
                 <State name="Name">
                     <When type="Property" frame="$parent/GameContentFrame" ShortName=""/>
                     <Action type="SetProperty" frame="$this" Text="{$parent/GameContentFrame/@Name}"/>
+                </State>
+                
+                <State name="Campaign">
+                    <When type="Property" frame="$parent" TypeName="Campaign"/>
+                    <Action type="SetProperty" frame="$this" Text="{$parent/GameContentFrame/@ShortName}"/>
                 </State>
                 
                 <State name="ShortName">
@@ -1056,6 +927,14 @@
             <GameContent val="{$parent/@GameContent}"/>
         </Frame>
         
+        <Animation name="ClickAnim">
+            <Event event="OnClick" action="Reset,Play"/>
+            
+            <Controller type="Event" frame="$ancestor[@type=SelectedBundleFrame]" end="Stop">
+                <Key type="Event" time="0" event="OnSelectedBundleItemClick"/>
+            </Controller>
+        </Animation>
+        
         <StateGroup name="PurchasableState">
             <DefaultState val="NotPurchasable"/>
             
@@ -1083,229 +962,6 @@
             <State name="NotOwned">
             </State>
         </StateGroup>
-
-        <!-- <PresenceId val="{$parent/$parent/$parent/SecondaryPanel/UnitSkinSelectionFrame/@PresenceId}"/> -->
-
-        <!-- <Frame type="UnitCacheFrame" name="UnitCacheFrame"> -->
-            <!-- <Anchor side="Top" relative="$parent" pos="Min" offset="0"/> -->
-            <!-- <Anchor side="Left" relative="$parent" pos="Min" offset="0"/> -->
-            <!-- <Anchor side="Right" relative="$parent" pos="Max" offset="0"/> -->
-            <!-- <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/> -->
-            <!-- <Unit val="{$parent/@Unit}"/> -->
-        <!-- </Frame> -->
-
-        <!-- <Frame type="SkinCacheFrame" name="SkinCacheFrame"> -->
-            <!-- <Anchor side="Top" relative="$parent" pos="Min" offset="0"/> -->
-            <!-- <Anchor side="Left" relative="$parent" pos="Min" offset="0"/> -->
-            <!-- <Anchor side="Right" relative="$parent" pos="Max" offset="0"/> -->
-            <!-- <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/> -->
-            <!-- <Skin val="{$parent/@Skin}"/> -->
-        <!-- </Frame> -->
-
-        <!-- <Frame type="Label" name="NameLabel"> -->
-            <!-- <Text val="{$parent/UnitCacheFrame/@NameText}"/> -->
-        <!-- </Frame> -->
-        
-        
-        
-        
-        <!-- <Height val="84"/> -->
-        <!-- <HideWhenCleared val="false"/> -->
-        <!-- <SelectedSound val="@UI_FileSelectionSelect"/> -->
-
-        <!-- <Animation name="HoverSound"> -->
-            <!-- <Event event="OnMouseEnter" action="Reset,Play"/> -->
-            <!-- <Event event="OnMouseExit" action="Reset, Stop"/> -->
-            <!-- <Controller type="Sound" end="Stop"> -->
-                <!-- <Key type="Sound" time="0" sound="@UI_HoverTick"/> -->
-            <!-- </Controller> -->
-        <!-- </Animation> -->
-
-        <!-- <Frame type="Image" name="NormalImage"> -->
-            <!-- <Anchor side="Top" relative="$parent" pos="Min" offset="0"/> -->
-            <!-- <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/> -->
-            <!-- <Anchor side="Left" relative="$parent" pos="Min" offset="0"/> -->
-            <!-- <Anchor side="Right" relative="$parent" pos="Max" offset="0"/> -->
-            <!-- <Texture val="@UI/SC2_UI_Battlenet_Glue_Arcade_MainListItem_Normal"/> -->
-            <!-- <TextureType val="NineSlice"/> -->
-        <!-- </Frame> -->
-
-        <!-- <Frame type="Image" name="HoverImage"> -->
-            <!-- <Anchor side="Top" relative="$parent" pos="Min" offset="0"/> -->
-            <!-- <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/> -->
-            <!-- <Anchor side="Left" relative="$parent" pos="Min" offset="0"/> -->
-            <!-- <Anchor side="Right" relative="$parent" pos="Max" offset="0"/> -->
-            <!-- <Texture val="@UI/SC2_UI_Battlenet_Glue_Arcade_MainListItem_Over"/> -->
-            <!-- <TextureType val="NineSlice"/> -->
-        <!-- </Frame> -->
-
-        <!-- <Frame type="Image" name="SelectedImage"> -->
-            <!-- <Anchor side="Top" relative="$parent" pos="Min" offset="0"/> -->
-            <!-- <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/> -->
-            <!-- <Anchor side="Left" relative="$parent" pos="Min" offset="0"/> -->
-            <!-- <Anchor side="Right" relative="$parent" pos="Max" offset="0"/> -->
-            <!-- <Texture val="@UI/SC2_UI_Battlenet_Glue_Arcade_MainListItem_Selected"/> -->
-            <!-- <TextureType val="NineSlice"/> -->
-        <!-- </Frame> -->
-
-        <!-- <Frame type="Image" name="EmptyImage"> -->
-            <!-- <Anchor side="Top" relative="$parent" pos="Min" offset="0"/> -->
-            <!-- <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/> -->
-            <!-- <Anchor side="Left" relative="$parent" pos="Min" offset="0"/> -->
-            <!-- <Anchor side="Right" relative="$parent" pos="Max" offset="0"/> -->
-            <!-- <Texture val="@UI/SC2_UI_Battlenet_Glue_Arcade_MainListItem_Normal"/> -->
-            <!-- <TextureType val="NineSlice"/> -->
-            <!-- <Visible val="False"/> -->
-            <!-- <Alpha val="80"/> -->
-        <!-- </Frame> -->
-        
-        <!-- <Frame type="TextFormatFrame" name="TypeLabelFormatFrame"> -->
-            <!-- <Anchor relative="$parent"/> -->
-            <!-- <Replacement index="0" val="{$parent/GameContentFrame/@Name}"/> -->
-            
-            <!-- <StateGroup name="ItemType"> -->
-                <!-- <DefaultState val="Default"/> -->
-
-                <!-- <State name="Announcer"> -->
-                    <!-- <When type="Property" frame="$parent" TypeName="VoicePack"/> -->
-                    <!-- <Action type="SetProperty" frame="$this" FormatText="@UI/Generic/GenderFormattedAnnouncerTitle"/> -->
-                <!-- </State> -->
-                
-                <!-- <State name="Commander"> -->
-                    <!-- <When type="Property" frame="$parent" TypeName="Commander"/> -->
-                    <!-- <Action type="SetProperty" frame="$this" FormatText="@UI/Generic/GenderFormattedCommanderTitle"/> -->
-                <!-- </State> -->
-                
-                <!-- <State name="Default"> -->
-                    <!-- <Action type="SetProperty" frame="$this" FormatText="{$parent/@TypeNameStr}"/> -->
-                <!-- </State> -->
-            <!-- </StateGroup> -->
-        <!-- </Frame> -->
-
-        <!-- <Frame type="Label" name="TypeLabel"> -->
-            <!-- <Anchor side="Top" relative="$parent" pos="Min" offset="15"/> -->
-            <!-- <Anchor side="Left" relative="$parent" pos="Min" offset="15"/> -->
-            <!-- <Anchor side="Right" relative="$parent" pos="Max" offset="-15"/> -->
-            <!-- <Style val="@Collection_Bundle_ItemTypeLabel"/> -->
-            <!-- <Text val="{$parent/TypeLabelFormatFrame/@Text}"/> -->
-        <!-- </Frame> -->
-
-        <!-- <Frame type="Label" name="NameLabel"> -->
-            <!-- <Anchor side="Top" relative="$parent/TypeLabel" pos="Max" offset="0"/> -->
-            <!-- <Anchor side="Left" relative="$parent" pos="Min" offset="15"/> -->
-            <!-- <Anchor side="Right" relative="$parent" pos="Max" offset="-15"/> -->
-            <!-- <Height val="23"/> -->
-            <!-- <Style val="@Collection_ListItem_Name"/> -->
-            <!-- <AcceptsMouseTooltip val="True"/> -->
-            <!-- <Options val="Ellipsis |NoWrapping | TooltipIfTruncated"/> -->
-
-            <!-- <StateGroup name="ListItemText"> -->
-                <!-- <DefaultState val="HasShortName"/> -->
-                
-                <!-- <State name="NoShortName"> -->
-                    <!-- <When type="Property" frame="$parent/GameContentFrame" ShortName=""/> -->
-                    <!-- <Action type="SetProperty" frame="$this" Text="{$parent/GameContentFrame/@Name}"/> -->
-                <!-- </State> -->
-
-                <!-- <State name="HasShortName"> -->
-                    <!-- <Action type="SetProperty" frame="$this" Text="{$parent/GameContentFrame/@ShortName}"/> -->
-                <!-- </State> -->
-            <!-- </StateGroup> -->
-
-            <!-- <StateGroup name="ListItemTextStates"> -->
-                <!-- <DefaultState val="NormalState"/> -->
-            
-                <!-- <State name="ToggledState"> -->
-                    <!-- <When type="Property" frame="$parent/SelectedImage" visible="True"/> -->
-                    <!-- <Action type="SetProperty" frame="$this" Style="@Collection_ListItem_Name_Selected"/> -->
-                <!-- </State> -->
-                
-                <!-- <State name="HoverState"> -->
-                    <!-- <When type="Property" frame="$parent/HoverImage" visible="True"/> -->
-                    <!-- <Action type="SetProperty" frame="$this" Style="@Collection_ListItem_Name_Selected"/> -->
-                <!-- </State> -->
-        
-                <!-- <State name="LockedState"> -->
-                    <!-- <When type="Property" frame="$parent" Allowed="false"/> -->
-                    <!-- <Action type="SetProperty" frame="$this" Style="@Collection_ListItem_Name_Locked"/> -->
-                <!-- </State> -->
-
-                <!-- <State name="NormalState"> -->
-                    <!-- <Action type="SetProperty" frame="$this" Style="@Collection_ListItem_Name"/> -->
-                <!-- </State> -->
-            <!-- </StateGroup> -->
-        <!-- </Frame> -->
-
-        <!-- <Frame type="Label" name="StatusLabel"> -->
-            <!-- <Anchor side="Top" relative="$parent/NameLabel" pos="Max" offset="0"/> -->
-            <!-- <Anchor side="Left" relative="$parent" pos="Min" offset="15"/> -->
-            <!-- <Anchor side="Right" relative="$parent" pos="Max" offset="-15"/> -->
-            <!-- <Style val="@Collection_ListItem_Desc"/> -->
-
-            <!-- <StateGroup name="ListItemTextStates"> -->
-                <!-- <DefaultState val="NormalState"/> -->
-            
-                <!-- <State name="ToggledState"> -->
-                    <!-- <When type="Property" frame="$parent/SelectedImage" visible="True"/> -->
-                    <!-- <Action type="SetProperty" frame="$this" Style="@Collection_ListItem_Desc_Selected"/> -->
-                <!-- </State> -->
-                
-                <!-- <State name="HoverState"> -->
-                    <!-- <When type="Property" frame="$parent/HoverImage" visible="True"/> -->
-                    <!-- <Action type="SetProperty" frame="$this" Style="@Collection_ListItem_Desc_Selected"/> -->
-                <!-- </State> -->
-        
-                <!-- <State name="LockedState"> -->
-                    <!-- <When type="Property" frame="$parent" Allowed="false"/> -->
-                    <!-- <Action type="SetProperty" frame="$this" Style="@Collection_ListItem_Desc_Locked"/> -->
-                <!-- </State> -->
-
-                <!-- <State name="NormalState"> -->
-                    <!-- <Action type="SetProperty" frame="$this" Style="@Collection_ListItem_Desc"/> -->
-                <!-- </State> -->
-            <!-- </StateGroup> -->
-             
-            <!-- <StateGroup name="ListItemOwnershipState"> -->
-                <!-- <DefaultState val="NotOwnedState"/> -->
-            
-                <!-- <State name="OwnedState"> -->
-                    <!-- <When type="Property" frame="$parent" IsPurchased="True"/> -->
-                    <!-- <Action type="SetProperty" frame="$this" Text="@UI/ScreenCollection/Owned"/> -->
-                <!-- </State> -->
-
-                <!-- <State name="NotOwnedState"> -->
-                    <!-- <Action type="SetProperty" frame="$this" Text="@UI/ScreenCollection/Unowned"/> -->
-                <!-- </State> -->
-            <!-- </StateGroup> -->
-        <!-- </Frame> -->
-        
-        <!-- <Frame type="GameContentFrame" name="GameContentFrame"> -->
-            <!-- <Anchor side="Top" relative="$parent" pos="Min" offset="0"/> -->
-            <!-- <Anchor side="Left" relative="$parent" pos="Min" offset="0"/> -->
-            <!-- <Anchor side="Right" relative="$parent" pos="Max" offset="0"/> -->
-            <!-- <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/> -->
-            <!-- <GameContent val="{$parent/@GameContent}"/> -->
-        <!-- </Frame> -->
- 
-        <!-- <StateGroup name="HasDataStateGroup"> -->
-            <!-- <State name="NoDataState"> -->
-                <!-- <When type="Property" frame="$this" HasData="False"/> -->
-                <!-- <Action type="SetProperty" frame="EmptyImage" Visible="true"/> -->
-                <!-- <Action type="SetProperty" frame="NormalImage" Alpha="0"/> -->
-                <!-- <Action type="SetProperty" frame="NameLabel" Alpha="0"/> -->
-                <!-- <Action type="SetProperty" frame="TypeLabel" Alpha="0"/> -->
-                <!-- <Action type="SetProperty" frame="StatusLabel" Alpha="0"/> -->
-            <!-- </State> -->
-
-            <!-- <State name="HasDataState"> -->
-                <!-- <When type="Property" frame="$this" HasData="True"/> -->
-                <!-- <Action type="SetProperty" frame="EmptyImage" Visible="false"/> -->
-                <!-- <Action type="SetProperty" frame="NormalImage" Alpha="255"/> -->
-                <!-- <Action type="SetProperty" frame="NameLabel" Alpha="255"/> -->
-                <!-- <Action type="SetProperty" frame="TypeLabel" Alpha="255"/> -->
-                <!-- <Action type="SetProperty" frame="StatusLabel" Alpha="255"/> -->
-            <!-- </State> -->
-        <!-- </StateGroup> -->
     </Frame>
 
     <Frame type="TileList" name="SelectedBundleTileListTemplate">
@@ -1543,8 +1199,10 @@
         </Frame>
 
         <Frame type="CampaignCacheFrame" name="SelectedCampaignFrame" template="SelectedBundleFrame/SelectedCampaignFrameTemplate">
-            <Anchor side="Top" relative="$parent/TileList" pos="Min" offset="-7"/>
-            <Anchor side="Left" relative="$parent/TileList" pos="Max" offset="20"/>
+            <Anchor side="Top" relative="$parent/Anchor_RightContent" pos="Min" offset="-2"/>
+            <Anchor side="Bottom" relative="$parent/Anchor_RightContent" pos="Max" offset="1"/>
+            <Anchor side="Left" relative="$parent/Anchor_RightContent" pos="Min" offset="-2"/>
+            <Anchor side="Right" relative="$parent/Anchor_RightContent" pos="Max" offset="2"/>
             <Campaign val ="{$parent/@Campaign}"/>
         </Frame>
 

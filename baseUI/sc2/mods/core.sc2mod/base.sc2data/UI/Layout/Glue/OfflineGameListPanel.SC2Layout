@@ -193,6 +193,9 @@
     </Frame>
     
     <Frame type="OfflineGameListPanel" name="OfflineGameListPanelTemplate">
+        <ExpansionTag val="{$this/ExpansionPulldown/@ExpansionTag}"/>
+        <SearchText val="{$this/FilterEditBox/@Text}"/>
+        
         <Frame type="Label" name="TitleLabel">
             <Anchor side="Top" relative="$parent" pos="Min" offset="170"/>
             <Anchor side="Left" relative="$parent" pos="Min" offset="118"/>
@@ -254,6 +257,12 @@
                     <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
                 </Frame>
             </Frame>
+        </Frame>
+        
+        <Frame type="ExpansionPulldown" name="ExpansionPulldown" template="StandardTemplates/StandardPulldownTemplate">
+            <Anchor side="Top" relative="$parent/FilterEditBox" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent/FilterEditBox" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent/FilterEditBox" pos="Min" offset="-10"/>
         </Frame>
         
         <Frame type="Frame" name="AnchorFrame">
@@ -426,11 +435,23 @@
             <Visible val="true"/>
         </Frame>
 
-        <Frame type="GlueButton" name="CreateButton" template="StandardBattlenetTemplates/BattlenetAlternateButtonTemplate">
+        <Frame type="CustomGamePlayButton" name="CreateButton" template="StandardBattlenetTemplates/BattlenetAlternateButtonTemplate">
             <Anchor side="Top" relative="$parent/JoinListBG" pos="Max" offset="31"/>
             <Anchor side="Left" relative="$parent/JoinListBG" pos="Min" offset="4"/>
             <Text val="@UI/ScreenCustomGames/CreateButton"/>
             <Width val ="288"/>
+            <MapHandle val="{$parent/@SelectedMapHandle}"/>
+            <ExpansionTag val="{$parent/@ExpansionTag}"/>
+            <UseDefaultVariant val="true"/>
+            <PlayMode val="CreateOffline"/>
+
+            <Animation name="ItemDoubleClicked">
+                <Event event="OnItemDoubleClicked" action="Reset,Play" frame="$parent/GamesTileList"/>
+
+                <Controller type="Event" end="Pause">
+                    <Key type="Event" time="0" event="ControlClickRequest"/>
+                </Controller>
+            </Animation>
         </Frame>
 
         <Frame type="GlueButton" name="LoadButton" template="StandardBattlenetTemplates/BattlenetStandardButtonTemplate">
@@ -438,45 +459,6 @@
             <Anchor side="Left" relative="$parent/CreateButton" pos="Max" offset="5"/>
             <Text val="@UI/ScreenCustomGames/LoadButton"/>
             <Width val ="288"/>
-        </Frame>
-
-        <Frame type="ExpansionLevelFrame" name="ExpansionIconFrame">
-            <Width val="82"/>
-            <Height val="87"/>
-            <Anchor side="Top" relative="$parent/LoadButton" pos="Mid" offset="0"/>
-            <Anchor side="Bottom" relative="$parent/LoadButton" pos="Mid" offset="0"/>
-            <Anchor side="Left" relative="$parent/LoadButton" pos="Max" offset="10"/>
-            <AcceptsMouseTooltip val="true"/>
-
-            <Frame type="Image" name="ExpansionIcon">
-                <Anchor relative="$parent"/>
-            </Frame>
-
-            <StateGroup name="ExpansionStateGroup">
-                <State name="StarterEditionState">
-                    <When type="AnimationState" frame="$this" ExpansionLevel="ExpansionLevel0"/>
-                    <Action type="SetProperty" frame="ExpansionIcon" Texture="@UI/Glues_Icons_ExpansionLevel_Large_SE"/>
-                    <Action type="SetProperty" frame="$this" Tooltip=""/>
-                </State>
-
-                <State name="WoLState">
-                    <When type="AnimationState" frame="$this" ExpansionLevel="ExpansionLevel1"/>
-                    <Action type="SetProperty" frame="ExpansionIcon" Texture="@UI/Glues_Icons_ExpansionLevel_Large_WoL"/>
-                    <Action type="SetProperty" frame="$this" Tooltip="@UI/ExpansionLevelIcon/TooltipWoL"/>
-                </State>
-
-                <State name="HotSState">
-                    <When type="AnimationState" frame="$this" ExpansionLevel="ExpansionLevel2"/>
-                    <Action type="SetProperty" frame="ExpansionIcon" Texture="@UI/Glues_Icons_ExpansionLevel_Large_HoTS"/>
-                    <Action type="SetProperty" frame="$this" Tooltip="@UI/ExpansionLevelIcon/TooltipHotS"/>
-                </State>
-
-                <State name="LotVState">
-                    <When type="AnimationState" frame="$this" ExpansionLevel="ExpansionLevel3"/>
-                    <Action type="SetProperty" frame="ExpansionIcon" Texture="@UI/Glues_Icons_ExpansionLevel_Large_LotV"/>
-                    <Action type="SetProperty" frame="$this" Tooltip="@UI/ExpansionLevelIcon/TooltipLotV"/>
-                </State>
-            </StateGroup>
         </Frame>
         
         <StateGroup name="LoadingStateGroup">

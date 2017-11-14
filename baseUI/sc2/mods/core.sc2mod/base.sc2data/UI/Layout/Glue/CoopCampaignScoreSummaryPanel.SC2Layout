@@ -537,6 +537,7 @@
             <ColorAdjustMode val="None"/>
             <DarkAdjustColor val="255,162,0"/>
             <LightAdjustColor val="255,255,255"/>
+            <Visible val="{$parent/TotalXPBar/@Visible}"/>
             
             <Animation name="LevelUp">
                 <Event event="Begin" action="Reset" frame="$parent"/>
@@ -661,13 +662,14 @@
             <DarkAdjustColor val="255,162,0"/>
             <LightAdjustColor val="255,255,255"/>
             <Visible val="False"/>
-            
-            <Animation name="ShowMaxLevelText">
-                <Event event="MaxLevelStart" action="Reset,Play" frame="$parent"/>
-                <Controller type="Visibility" end="Pause">
-                    <Key type="Bool" time="0" value="True"/>
-                </Controller>
-            </Animation>
+
+            <StateGroup name="MaxLevelState">
+                <State name="MaxLevel">
+                    <When type="StateGroup" frame="$parent" XPState="NotCapped"/>
+                    <When type="AnimationState" frame="$parent" MaxLevelState="MaxLevelStart"/>
+                    <Action type="SetProperty" frame="$this" Visible="True"/>
+                </State>
+            </StateGroup>
         </Frame>
 
         <Frame type="Label" name="LevelUpLabel">
@@ -721,6 +723,31 @@
                     <Key type="Curve" time="0.25" value="255" in="Auto"/>
                 </Controller>
             </Animation>
+        </Frame>
+        
+        <Frame type="Image" name="CappedXPBar">
+            <Anchor relative="$parent/TotalXPBar"/>
+            <Texture val="@UI/SC2_UI_Coop_XPBar_Capped"/>
+            <TextureType val="EndCap"/>
+        </Frame>
+        
+        <Frame type="Label" name="CappedXPBarLabel">
+            <Anchor side="Top" relative="$parent/CappedXPBar" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent/CappedXPBar" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent/CappedXPBar" pos="Max" offset="-36"/>
+            <Style val="Coop_CappedXPBar"/>
+            <Text val="@UI/ScreenCoopCampaign/XPCapped"/>
+            <Visible val="{$parent/CappedXPBar/@Visible}"/>
+        </Frame>
+        
+        <Frame type="Image" name="CappedXPBarWarning">
+            <Anchor side="Top" relative="$parent/CappedXPBar" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent/CappedXPBar" pos="Mid" offset="0"/>
+            <Anchor side="Left" relative="$parent/CappedXPBar" pos="Max" offset="-17"/>
+            <AcceptsMouse val="True"/>
+            <Tooltip val="@UI/ScreenCoopCampaign/XPCappedHint"/>
+            <Texture val="@UI/SC2_UI_Coop_CappedIcon"/>
+            <Visible val="{$parent/CappedXPBar/@Visible}"/>
         </Frame>
 
         <Frame type="TileList" name="NextTalentTileList">
@@ -1203,5 +1230,27 @@
                 <ScoreValueLink val="BonusObjectiveXP"/>
             </Frame>
         </Frame>
+        
+        <StateGroup name="XPState">
+            <DefaultState val="NotCapped"/>
+            
+            <State name="Capped">
+                <When type="AnimationState" MaxLevelState="MaxLevelTrial"/>
+                <Action type="SetProperty" frame="TotalXPBar" Visible="False"/>
+                <Action type="SetProperty" frame="CappedXPBar" Visible="True"/>
+            </State>
+            
+            <State name="CappedStart">
+                <When type="Property" frame="$parent/$parent/CommanderSelectionPanel" SelectedCommanderIsTrial="True"/>
+                <When type="AnimationState" MaxLevelState="MaxLevelStart"/>
+                <Action type="SetProperty" frame="TotalXPBar" Visible="False"/>
+                <Action type="SetProperty" frame="CappedXPBar" Visible="True"/>
+            </State>
+            
+            <State name="NotCapped">
+                <Action type="SetProperty" frame="TotalXPBar" Visible="True"/>
+                <Action type="SetProperty" frame="CappedXPBar" Visible="False"/>
+            </State>
+        </StateGroup>
     </Frame>
 </Desc>

@@ -39,8 +39,7 @@
 
     <Frame type="ScreenScore" name="ScreenScore">
         <Anchor relative="$parent"/>
-        <!-- This must render below ScreenBattlenet so fanfares and profile can appear above it -->
-        <!-- But render above ScreenNavigation and other content screens so you can't navigate or interact with other things -->
+        <!-- This must render above ScreenNavigation and other content screens so you can't navigate or interact with other things -->
         <RenderPriority val="650"/>
         
         <!-- This tooltip is just for blocking tooltips behind this panel -->
@@ -489,17 +488,47 @@
             BOTTOM BUTTONS
         -->
 
-        <Frame type="GlueButton" name="PlayAgainButton" template="StandardBattlenetTemplates/BattlenetAlternateButtonTemplate">
+        <Frame type="MatchmakingPlayButton" name="MatchmakingPlayAgainButton" template="StandardBattlenetTemplates/BattlenetAlternateButtonTemplate">
             <Anchor side="Bottom" relative="$parent/ExtendedExperienceBG/AnchorFrame" pos="Max" offset="-40"/>
             <Anchor side="Left" relative="$parent/ExtendedExperienceBG/AnchorFrame" pos="Min" offset="38"/>
             <Width val="310"/>
             <Text val="@UI/ScreenScore/PlayAgain"/>
             <CollapseLayout val="true"/>
+            <QueueHandle val="{$parent/@QueueHandle}"/>
+            <IsRanked val="{$parent/@IsRanked}"/>
+            <Tooltip val="{$this/@PartyTooltipId}"/>
+            <Enabled val="{$this/@PartyEnabled}"/>
         </Frame>
 
-        <Frame type="ViewMapProfileButton" name="MapInfoButton" template="StandardBattlenetTemplates/BattlenetAlternateButtonTemplate">
-            <Anchor side="Bottom" relative="$parent/PlayAgainButton" pos="Max" offset="0"/>
-            <Anchor side="Left" relative="$parent/PlayAgainButton" pos="Max" offset="5"/>
+        <Frame type="CustomGamePlayButton" name="CustomGamePlayAgainButton" template="StandardBattlenetTemplates/BattlenetAlternateButtonTemplate">
+            <Anchor side="Bottom" relative="$parent/MatchmakingPlayAgainButton" pos="Max" offset="0"/>
+            <Anchor side="Left" relative="$parent/MatchmakingPlayAgainButton" pos="Max" offset="5"/>
+            <Width val="310"/>
+            <Text val="@UI/ScreenScore/PlayAgain"/>
+            <CollapseLayout val="true"/>
+            <MapHandle val="{$parent/@MapHandle}"/>
+            <ModHandle val="{$parent/@ModHandle}"/>
+            <VariantIndex val="{$parent/@VariantIndex}"/>
+            <GameSpeed val="{$parent/@GameSpeed}"/>
+            <ExpansionLevel val="{$this/BattleMapFrame/@ExpansionLevel}"/>
+            <PlayMode val="JoinOrCreate"/>
+
+            <StateGroup name="PlayModeStateGroup">
+                <State name="CreateState">
+                    <When type="Property" frame="$parent" IsCreateGame="true"/>
+                    <Action type="SetProperty" frame="$this" PlayMode="Create"/>
+                </State>
+            </StateGroup>
+
+            <Frame type="BattleMapFrame" name="BattleMapFrame">
+                <Anchor relative="$parent"/>
+                <MapHandle val="{$parent/$parent/@MultiModHandle}"/>
+            </Frame>
+        </Frame>
+
+        <Frame type="ViewMapProfileButton" name="MapInfoButton" template="StandardBattlenetTemplates/BattlenetStandardButtonTemplate">
+            <Anchor side="Bottom" relative="$parent/CustomGamePlayAgainButton" pos="Max" offset="0"/>
+            <Anchor side="Left" relative="$parent/CustomGamePlayAgainButton" pos="Max" offset="5"/>
             <Width val="310"/>
             <Text val="@UI/ScreenCustomGames/MapInfoButton"/>
             <HoverSound val="@UI_HoverTick"/>
@@ -539,7 +568,8 @@
                 <Action type="SetProperty" frame="HeaderContainer" Visible="false"/>
                 <Action type="SetProperty" frame="TabControl" Visible="false"/>
                 <Action type="SetProperty" frame="CoopCampaignPanel" Visible="false"/>
-                <Action type="SetProperty" frame="PlayAgainButton" Visible="false"/>
+                <Action type="SetProperty" frame="MatchmakingPlayAgainButton" Visible="false"/>
+                <Action type="SetProperty" frame="CustomGamePlayAgainButton" Visible="false"/>
                 <Action type="SetProperty" frame="MapInfoButton" Visible="false"/>
                 <Action type="SetProperty" frame="WatchReplayButton" Visible="false"/>
                 <Action type="SetProperty" frame="RenameReplayButton" Visible="false"/>
@@ -556,7 +586,8 @@
                 <Action type="SetProperty" frame="HeaderContainer/OptionsButton" Visible="false"/>
                 <Action type="SetProperty" frame="TabControl" Visible="false"/>
                 <Action type="SetProperty" frame="CoopCampaignPanel" Visible="true"/>
-                <Action type="SetProperty" frame="PlayAgainButton" Visible="false"/>
+                <Action type="SetProperty" frame="MatchmakingPlayAgainButton" Visible="false"/>
+                <Action type="SetProperty" frame="CustomGamePlayAgainButton" Visible="false"/>
                 <Action type="SetProperty" frame="MapInfoButton" Visible="false"/>
                 <Action type="SetProperty" frame="WatchReplayButton" Visible="false"/>
                 <Action type="SetProperty" frame="RenameReplayButton" Visible="false"/>
@@ -571,7 +602,8 @@
                 <Action type="SetProperty" frame="HeaderContainer" Visible="true"/>
                 <Action type="SetProperty" frame="TabControl" Visible="true"/>
                 <Action type="SetProperty" frame="CoopCampaignPanel" Visible="false"/>
-                <Action type="SetProperty" frame="PlayAgainButton" Visible="false"/>
+                <Action type="SetProperty" frame="MatchmakingPlayAgainButton" Visible="false"/>
+                <Action type="SetProperty" frame="CustomGamePlayAgainButton" Visible="false"/>
                 <Action type="SetProperty" frame="MapInfoButton" Visible="false"/>
                 <Action type="SetProperty" frame="WatchReplayButton" Visible="false"/>
                 <Action type="SetProperty" frame="RenameReplayButton" Visible="false"/>
@@ -586,7 +618,8 @@
                 <Action type="SetProperty" frame="HeaderContainer" Visible="true"/>
                 <Action type="SetProperty" frame="TabControl" Visible="true"/>
                 <Action type="SetProperty" frame="CoopCampaignPanel" Visible="false"/>
-                <Action type="SetProperty" frame="PlayAgainButton" Visible="false"/>
+                <Action type="SetProperty" frame="MatchmakingPlayAgainButton" Visible="false"/>
+                <Action type="SetProperty" frame="CustomGamePlayAgainButton" Visible="true"/>
                 <Action type="SetProperty" frame="MapInfoButton" Visible="true"/>
                 <Action type="SetProperty" frame="WatchReplayButton" Visible="true"/>
                 <Action type="SetProperty" frame="RenameReplayButton" Visible="true"/>
@@ -600,12 +633,29 @@
                 <Action type="SetProperty" frame="HeaderContainer" Visible="true"/>
                 <Action type="SetProperty" frame="TabControl" Visible="true"/>
                 <Action type="SetProperty" frame="CoopCampaignPanel" Visible="false"/>
-                <Action type="SetProperty" frame="PlayAgainButton" Visible="true"/>
+                <Action type="SetProperty" frame="MatchmakingPlayAgainButton" Visible="true"/>
+                <Action type="SetProperty" frame="CustomGamePlayAgainButton" Visible="false"/>
                 <Action type="SetProperty" frame="MapInfoButton" Visible="false"/>
                 <Action type="SetProperty" frame="WatchReplayButton" Visible="true"/>
                 <Action type="SetProperty" frame="RenameReplayButton" Visible="true"/>
                 <Action type="SetProperty" frame="IdleSpinner" Visible="false"/>
                 <Action type="SetProperty" frame="BackButton" Visible="false"/>
+            </State>
+
+            <State name="ErrorMatchHistory">
+                <When type="AnimationState" frame="$this" ScreenScoreState="Error"/>
+                <When type="Property" frame="$this" IsMatchHistory="true"/>
+                <Action type="SetProperty" frame="ErrorContainer" Visible="true"/>
+                <Action type="SetProperty" frame="HeaderContainer" Visible="false"/>
+                <Action type="SetProperty" frame="TabControl" Visible="false"/>
+                <Action type="SetProperty" frame="CoopCampaignPanel" Visible="false"/>
+                <Action type="SetProperty" frame="MatchmakingPlayAgainButton" Visible="false"/>
+                <Action type="SetProperty" frame="CustomGamePlayAgainButton" Visible="false"/>
+                <Action type="SetProperty" frame="MapInfoButton" Visible="false"/>
+                <Action type="SetProperty" frame="WatchReplayButton" Visible="false"/>
+                <Action type="SetProperty" frame="RenameReplayButton" Visible="false"/>
+                <Action type="SetProperty" frame="IdleSpinner" Visible="false"/>
+                <Action type="SetProperty" frame="BackButton" Visible="true"/>
             </State>
 
             <State name="Error">
@@ -614,7 +664,8 @@
                 <Action type="SetProperty" frame="HeaderContainer" Visible="false"/>
                 <Action type="SetProperty" frame="TabControl" Visible="false"/>
                 <Action type="SetProperty" frame="CoopCampaignPanel" Visible="false"/>
-                <Action type="SetProperty" frame="PlayAgainButton" Visible="false"/>
+                <Action type="SetProperty" frame="MatchmakingPlayAgainButton" Visible="false"/>
+                <Action type="SetProperty" frame="CustomGamePlayAgainButton" Visible="false"/>
                 <Action type="SetProperty" frame="MapInfoButton" Visible="false"/>
                 <Action type="SetProperty" frame="WatchReplayButton" Visible="false"/>
                 <Action type="SetProperty" frame="RenameReplayButton" Visible="false"/>

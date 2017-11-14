@@ -431,15 +431,11 @@
     ===========================================================
     -->
     <Frame type="ArcadeBrowseListPanel" name="CustomGamesArcade" template="CustomGamesTemplates/CustomGamesBaseTemplate">
-        <HookupAlias original="SearchResultsLabel" alias="ContentContainer/HeaderPanel/SearchResultsLabel"/>
-        <HookupAlias original="BookmarkCountFrame" alias="ContentContainer/HeaderPanel/BookmarkCountFrame"/>
-        <HookupAlias original="SearchEditBox" alias="ContentContainer/HeaderPanel/SearchEditBox"/>
-        <HookupAlias original="SearchBackButton" alias="ContentContainer/HeaderPanel/SearchEditBox/ClearTextButton"/>
         <HookupAlias original="FilterPulldown" alias="ContentContainer/HeaderPanel/FilterPulldown"/>
         <HookupAlias original="GenrePulldown" alias="ContentContainer/HeaderPanel/GenrePulldown"/>
         <HookupAlias original="GamesTileList" alias="ContentContainer/PrimaryPanel/GamesTileList"/>
         <HookupAlias original="GamesTileList/ScrollBar" alias="ContentContainer/PrimaryPanel/GamesTileList/ScrollBar"/>
-        <!-- <HookupAlias original="GameInfoPanel" alias="ContentContainer/SecondaryPanel/GameInfoPanel"/> -->
+        <SearchText val="{$this/ContentContainer/HeaderPanel/SearchEditBox/@Text}"/>
 
         <Anchor relative="$parent"/>
 
@@ -457,13 +453,31 @@
                 <Frame type="EditBox" name="SearchEditBox" template="CustomGamesTemplates/SearchEditBoxTemplate">
                     <Tooltip val="@UI/ScreenCustomGames/SearchTooltip"/>
                     <MaxCharacters val="80"/>
-                    
+
+                    <Animation name="RequestSearch">
+                        <Event event="OnEnterPressed" frame="$this" action="Reset,Play"/>
+
+                        <Controller type="Event" end="Pause" frame="$ancestor[@type=ArcadeBrowseListPanel]">
+                            <Key type="Event" time="0.0" event="RequestEditBoxSearch"/>
+                        </Controller>
+                    </Animation>
+
                     <Frame type="Label" name="SearchTextLabel">
                         <Text val="@UI/ScreenCustomGames/Arcade/SearchText"/>
                     </Frame>
     
                     <Frame type="Frame" name="AnchorFrame">
                         <Anchor side="Right" relative="$parent/$parent/GenrePulldown/AnchorFrame" pos="Min" offset="-14"/>
+                    </Frame>
+
+                    <Frame type="Button" name="ClearTextButton">
+                        <Animation name="ClearLobbyList">
+                            <Event event="OnClick" frame="$this" action="Reset,Play"/>
+
+                            <Controller type="Event" end="Pause" frame="$ancestor[@type=ArcadeBrowseListPanel]">
+                                <Key type="Event" time="0.1" event="RequestEditBoxSearch"/>
+                            </Controller>
+                        </Animation>
                     </Frame>
                 </Frame>
 
@@ -501,58 +515,6 @@
                             <Action type="SetProperty" frame="$this" SelectedIndex="0" Undo="false"/>
                         </State>
                     </StateGroup>
-                </Frame>
-
-                <Frame type="BookmarkCountFrame" name="BookmarkCountFrame">
-                    <Anchor side="Top" relative="$parent/SearchEditBox" pos="Mid" offset="0"/>
-                    <Anchor side="Bottom" relative="$parent/SearchEditBox" pos="Mid" offset="0"/>
-                    <Anchor side="Right" relative="$parent/GenrePulldown/AnchorFrame" pos="Min" offset="-12"/>
-                    <Anchor side="Left" relative="$parent/SearchEditBox" pos="Max" offset="22"/>
-                    <Height val="43"/>
-
-                    <Frame type="Image" name="BookmarkInfoIcon">
-                        <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
-                        <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
-                        <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
-                        <Width val="43"/>
-                        <Height val="43"/>
-                        <Texture val="@UI/Glues_Icons_GenericInfo"/>
-                        <AcceptsMouseTooltip val="true"/>
-                        <Tooltip val="@UI/ScreenCustomGames/BookmarkInfoTooltip"/>
-                    </Frame>
-
-                    <Frame type="Label" name="Label">
-                        <Anchor side="Top" relative="$parent/BookmarkInfoIcon" pos="Mid" offset="0"/>
-                        <Anchor side="Bottom" relative="$parent/BookmarkInfoIcon" pos="Mid" offset="0"/>
-                        <Anchor side="Right" relative="$parent/BookmarkInfoIcon" pos="Min" offset="0"/>
-                        <Style val="@Arcade_Subtitle"/>
-                    </Frame>
-                </Frame>
-
-                <Frame type="Label" name="SearchResultsLabel">
-                    <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
-                    <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
-                    <Anchor side="Right" relative="$parent/RefreshButton/AnchorFrame" pos="Min" offset="-12"/>
-                    <Text val="{$parent/$parent/$parent/@SearchResultsString}"/>
-                    <Style val="@Arcade_SearchResultsText"/>
-                </Frame>
-
-                <Frame type="Button" name="RefreshButton" template="StandardSmallButtonTemplates/StandardSmallIconButtonTemplate">
-                    <Visible val="False"/>
-                    
-                    <Frame type="Frame" name="AnchorFrame">
-                        <Anchor side="Top" relative="$parent/$parent" pos="Mid" offset="0"/>
-                        <Anchor side="Bottom" relative="$parent/$parent" pos="Mid" offset="0"/>
-                        <Anchor side="Right" relative="$parent/$parent" pos="Max" offset="-12"/>
-                    </Frame>
-
-                    <Frame type="Image" name="Icon">
-                        <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
-                        <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
-                        <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
-                        <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
-                        <Texture val="@UI/SC2_UI_Battlenet_Glue_Arcade_RefreshIcon"/>
-                    </Frame>
                 </Frame>
             </Frame>
 
@@ -609,15 +571,69 @@
             </Frame>
         </Frame>
 
-        <Frame type="GlueButton" name="CreateButton" template="StandardBattlenetTemplates/BattlenetAlternateButtonTemplate">
+        <Frame type="CustomGamePlayButton" name="CreateButton" template="StandardBattlenetTemplates/BattlenetAlternateButtonTemplate">
             <Anchor side="Bottom" relative="$Anchor_ActionButton" pos="Min" offset="0"/>
             <Anchor side="Left" relative="$Anchor_ActionButton" pos="Max" offset="0"/>
+            <Width val="260"/>
             <Text val="@UI/ScreenCustomGames/CreateButton"/>
+            <MapHandle val="{$parent/@SelectedMapHandle}"/>
+            <UseDefaultVariant val="true"/>
+
+            <Animation name="ItemDoubleClicked">
+                <Event event="OnItemDoubleClicked" action="Reset,Play" frame="$parent/ContentContainer/PrimaryPanel/GamesTileList"/>
+
+                <Controller type="Event" end="Pause">
+                    <Key type="Event" time="0" event="ControlClickRequest"/>
+                </Controller>
+            </Animation>
         </Frame>
 
+        <Frame type="CustomGamePlayButton" name="AutoJoinButton" template="StandardBattlenetTemplates/BattlenetStandardButtonTemplate">
+            <Anchor side="Bottom" relative="$Anchor_ActionButton" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent/CreateButton" pos="Max" offset="8"/>
+            <Width val="260"/>
+            <Text val="@UI/ScreenCustomGames/AutoJoinButton"/>
+            <Tooltip val="@UI/ScreenCustomGames/AutoJoinTooltip"/>
+            <AcceptsMouseTooltip val="True"/>
+            <TooltipDelayed val="True"/>
+            <MapHandle val="{$parent/@SelectedMapHandle}"/>
+            <UseDefaultVariant val="False"/>
+            <VariantIndex val="{$parent/VariantPulldown/@VariantIndex}"/>
+            <PlayMode val="JoinOrCreate"/>
+
+            <Animation name="ItemDoubleClicked">
+                <Event event="OnItemDoubleClicked" action="Reset,Play" frame="$parent/ContentContainer/PrimaryPanel/GamesTileList"/>
+
+                <Controller type="Event" end="Pause">
+                    <Key type="Event" time="0" event="ControlClickRequest"/>
+                </Controller>
+            </Animation>
+        </Frame>
+
+        <Frame type="BattleMapVariantPulldown" name="VariantPulldown" template="StandardBattlenetTemplates/BattlenetLargePulldownTemplate">
+            <Anchor side="Bottom" relative="$Anchor_ActionButton" pos="Min" offset="-4"/>
+            <Anchor side="Left" relative="$parent/AutoJoinButton" pos="Max" offset="8"/>
+            <Width val="260"/>
+            <MapHandle val="{$parent/@SelectedMapHandle}"/>
+                
+            <StateGroup name="EnabledState">
+                <DefaultState val="Disabled"/>
+            
+                <State name="Enabled">
+                    <When type="Property" frame="$parent/AutoJoinButton" Enabled="True"/>
+                    <Action type="SetProperty" frame="$this" Enabled="True"/>
+                </State>
+                
+                <State name="Disabled">
+                    <Action type="SetProperty" frame="$this" Enabled="False"/>
+                </State>
+            </StateGroup>
+        </Frame>
+        
         <Frame type="ViewMapProfileButton" name="GameInfoButton" template="StandardBattlenetTemplates/BattlenetStandardButtonTemplate">
             <Anchor side="Bottom" relative="$Anchor_ActionButton" pos="Min" offset="0"/>
-            <Anchor side="Left" relative="$parent/CreateButton" pos="Max" offset="20"/>
+            <Anchor side="Left" relative="$parent/VariantPulldown" pos="Max" offset="8"/>
+            <Width val="260"/>
             <Text val="@UI/ScreenCustomGames/MapInfoButton"/>
             <HoverSound val="@UI_HoverTick"/>
             <MapHandle val="{$parent/@SelectedMapHandle}"/>
@@ -648,23 +664,11 @@
                 <When type="AnimationState" frame="$this" SearchState="Searching"/>
                 <Action type="SetProperty" frame="ContentContainer/HeaderPanel/FilterPulldown" Visible="false"/>
                 <Action type="SetProperty" frame="ContentContainer/HeaderPanel/GenrePulldown" Visible="false"/>
-                <Action type="SetProperty" frame="ContentContainer/HeaderPanel/SearchResultsLabel" Visible="false"/>
-                <Action type="SetProperty" frame="ContentContainer/HeaderPanel/BookmarkCountFrame" visible="false"/>
-            </State>
-
-            <State name="FilterMyBookmarksState">
-                <When type="AnimationState" frame="$this" FilterState="MyBookmarks"/>
-                <Action type="SetProperty" frame="ContentContainer/HeaderPanel/FilterPulldown" Visible="true"/>
-                <Action type="SetProperty" frame="ContentContainer/HeaderPanel/GenrePulldown" Visible="true"/>
-                <Action type="SetProperty" frame="ContentContainer/HeaderPanel/SearchResultsLabel" Visible="false"/>
-                <Action type="SetProperty" frame="ContentContainer/HeaderPanel/BookmarkCountFrame" visible="true"/>
             </State>
 
             <State name="NotSearchingState">
                 <Action type="SetProperty" frame="ContentContainer/HeaderPanel/FilterPulldown" Visible="true"/>
                 <Action type="SetProperty" frame="ContentContainer/HeaderPanel/GenrePulldown" Visible="true"/>
-                <Action type="SetProperty" frame="ContentContainer/HeaderPanel/SearchResultsLabel" Visible="false"/>
-                <Action type="SetProperty" frame="ContentContainer/HeaderPanel/BookmarkCountFrame" visible="false"/>
             </State>
         </StateGroup>
     </Frame>

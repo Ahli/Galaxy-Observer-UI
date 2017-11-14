@@ -170,6 +170,7 @@
         <Frame type="GlueButton" name="JoinButton" template="StandardBattlenetTemplates/BattlenetAlternateButtonTemplate">
             <Anchor side="Bottom" relative="$GameInfoAnchorFrame" pos="Max" offset="-40"/>
             <Anchor side="Left" relative="$parent" pos="Min" offset="4"/>
+            <Width val="260"/>
             <Handle val="GameInfoJoinLobbyButton"/>
             <Text val="@UI/ScreenCustomGames/JoinButton"/>
             <CollapseLayout val="True"/>
@@ -257,8 +258,7 @@
     <Frame type="ScreenBattleMapProfile" name="ScreenBattleMapProfile">
         <Anchor relative="$parent"/>
         <Handle val="ScreenBattleMapProfile"/>
-        <!-- This must render below ScreenBattlenet so fanfares and profile can appear above it -->
-        <!-- But render above ScreenNavigation and other content screens so you can't navigate or interact with other things -->
+        <!-- This must render above ScreenNavigation and other content screens so you can't navigate or interact with other things -->
         <RenderPriority val="650"/>
 
         <Animation name="Show">
@@ -268,6 +268,14 @@
             <Controller type="Fade" end="Pause">
                 <Key type="Curve" time="0.000" value="0" out="Slow"/>
                 <Key type="Curve" time="0.175" value="255" in="Auto"/>
+            </Controller>
+        </Animation>
+
+        <Animation name="ViewOverview">
+            <Event event="ViewOverview" action="Reset,Play" frame="$this"/>
+
+            <Controller type="Property" property="SelectedIndex" end="Pause" frame="TabControl">
+                <Key type="Property" time="0" value="0"/>
             </Controller>
         </Animation>
         
@@ -345,6 +353,7 @@
         <Frame type="BattleMapIcon" name="IconImage">
             <Anchor relative="$parent/IconImageAnchor"/>
             <CollapseLayout val="true"/>
+            <MapHandle val="{$parent/@MapHandle}"/>
 
             <Frame type="Image" name="Image">
                 <Anchor relative="$parent"/>
@@ -380,12 +389,19 @@
             <Options val="Ellipsis | TooltipIfTruncated | NoWrapping"/>
             <PreserveAnchorOffset val="true"/>
             <AutoSizeClamps maxWidth="520"/>
+            <Text val="{$this/BattleMapFrame/@NameWithVersion}"/>
+
+            <Frame type="BattleMapFrame" name="BattleMapFrame">
+                <Anchor relative="$parent"/>
+                <MapHandle val="{$parent/$parent/@MapHandle}"/>
+            </Frame>
         </Frame>
 
         <Frame type="BattleMapContextMenu" name="MapContextMenu" template="StandardTemplates/StandardContextMenuTemplate">
             <Anchor side="Top" relative="$parent/OptionsButton" pos="Max" offset="0"/>
             <Anchor side="Left" relative="$parent/OptionsButton" pos="Min" offset="0"/>
             <UseAnchors val="true"/>
+            <MapHandle val="{$parent/@MapHandle}"/>
         </Frame>
 
         <Frame type="Button" name="OptionsButton" template="StandardBattlenetTemplates/OptionsButton">
@@ -481,12 +497,25 @@
             </Animation>
         </Frame>
 
+        <Frame type="TabControl" name="TabControl">
+            <Anchor relative="$parent"/>
+            <TabListItem val="$parent/OverviewButton"/>
+            <TabListItem val="$parent/HowToPlayButton"/>
+            <TabListItem val="$parent/PatchNotesButton"/>
+            <TabListItem val="$parent/ReviewsButton"/>
+            <PanelListItem val="$parent/OverviewPanel"/>
+            <PanelListItem val="$parent/HowToPlayPanel"/>
+            <PanelListItem val="$parent/PatchNotesPanel"/>
+            <PanelListItem val="$parent/ReviewsPanel"/>
+        </Frame>
+
         <Frame type="Button" name="OverviewButton" template="StandardBattlenetTemplates/BattlenetVerticalTabButtonTemplate">
             <Anchor side="Top" relative="$parent/TitleBackground" pos="Max" offset="-1"/>
             <Anchor side="Left" relative="$parent/TitleBackground" pos="Min" offset="4"/>
             <Text val="@UI/BattleMapProfilePanel/Overview"/>
             <Width val="370"/>
             <HoverSound val="@UI_HoverTick"/>
+            <Toggleable val="true"/>
         </Frame>
 
         <Frame type="Button" name="HowToPlayButton" template="StandardBattlenetTemplates/BattlenetVerticalTabButtonTemplate">
@@ -494,8 +523,8 @@
             <Anchor side="Left" relative="$parent/OverviewButton" pos="Min" offset="0"/>
             <Text val="@UI/BattleMapProfilePanel/HowToPlay"/>
             <Width val="370"/>
-
             <HoverSound val="@UI_HoverTick"/>
+            <Toggleable val="true"/>
 
             <StateGroup name="HowToPlayStateGroup">
                 <State name="EmptyState">
@@ -517,8 +546,8 @@
             <Anchor side="Left" relative="$parent/HowToPlayButton" pos="Min" offset="0"/>
             <Text val="@UI/BattleMapProfilePanel/PatchNotes"/>
             <Width val="370"/>
-
             <HoverSound val="@UI_HoverTick"/>
+            <Toggleable val="true"/>
 
             <StateGroup name="PatchNotesStateGroup">
                 <State name="EmptyState">
@@ -541,6 +570,7 @@
             <Text val="@UI/BattleMapProfilePanel/Reviews"/>
             <Width val="370"/>
             <HoverSound val="@UI_HoverTick"/>
+            <Toggleable val="true"/>
         </Frame>
 
         <Frame type="BattleMapProfileOverviewPanel" name="OverviewPanel" template="BattleMapProfileOverviewPanel/BattleMapProfileOverviewPanelTemplate">
@@ -549,6 +579,7 @@
             <Anchor side="Right" relative="$parent/PageHeaderBackground" pos="Max" offset="0"/>
             <Anchor side="Bottom" relative="$parent/GameLobbyListFrame" pos="Min" offset="0"/>
             <Visible val="false"/>
+            <MapHandle val="{$parent/@MapHandle}"/>
         </Frame>
 
         <Frame type="BattleMapProfileHowToPlayPanel" name="HowToPlayPanel" template="BattleMapProfileHowToPlayPanel/BattleMapProfileHowToPlayPanelTemplate">
@@ -557,6 +588,7 @@
             <Anchor side="Right" relative="$parent/OverviewPanel" pos="Max" offset="0"/>
             <Anchor side="Bottom" relative="$parent/GameLobbyListFrame" pos="Min" offset="0"/>
             <Visible val="false"/>
+            <MapHandle val="{$parent/@MapHandle}"/>
         </Frame>
 
         <Frame type="BattleMapProfilePatchNotesPanel" name="PatchNotesPanel" template="BattleMapProfilePatchNotesPanel/BattleMapProfilePatchNotesPanelTemplate">
@@ -565,10 +597,12 @@
             <Anchor side="Right" relative="$parent/OverviewPanel" pos="Max" offset="0"/>
             <Anchor side="Bottom" relative="$parent/GameLobbyListFrame" pos="Min" offset="0"/>
             <Visible val="false"/>
+            <MapHandle val="{$parent/@MapHandle}"/>
         </Frame>
 
         <Frame type="BattleMapProfileReviewsPanel" name="ReviewsPanel" template="BattleMapProfileReviewsPanel/BattleMapProfileReviewsPanelTemplate">
             <Visible val="false"/>
+            <MapHandle val="{$parent/@MapHandle}"/>
             <!-- This needs to render above the close button for when you're writing a review -->
             <RenderPriority val="800"/>
 
@@ -601,45 +635,79 @@
 
         <Frame type="LobbyListFrame" name="GameLobbyListFrame" template="ScreenBattleMapProfile/GameLobbyListFrameTemplate"/>
 
-        <Frame type="Label" name="ModeLabel">
-            <Anchor side="Top" relative="$parent/GameModePulldown" pos="Mid" offset="0"/>
-            <Anchor side="Bottom" relative="$parent/GameModePulldown" pos="Mid" offset="0"/>
-            <Anchor side="Left" relative="$parent/PageHeaderBackground" pos="Min" offset="4"/>
-            <Style val="@Arcade_Subtitle"/>
-            <Text val="@UI/BattleMapProfilePanel/Mode"/>
-            <CollapseLayout val="true"/>
-            <Visible val="False"/>
+        <Frame type="ExpansionPulldown" name="ExpansionPulldown" template="StandardBattlenetTemplates/BattlenetLargePulldownTemplate">
+            <Anchor side="Bottom" relative="$GameInfoAnchorFrame" pos="Max" offset="-44"/>
+            <Anchor side="Left" relative="$parent/CreateModButton" pos="Max" offset="8"/>
+            <Width val="288"/>
+            <RequiredExpansionLevel val="{$parent/BattleMapFrame/@ExpansionLevel}"/>
         </Frame>
 
-        <Frame type="Pulldown" name="GameModePulldown" template="StandardTemplates/StandardPulldownTemplate">
-            <Anchor side="Bottom" relative="$parent/JoinButton" pos="Min" offset="-5"/>
-            <Anchor side="Left" relative="$parent/ModeLabel" pos="Max" offset="5"/>
-            <CollapseLayout val="true"/>
-            <Visible val="False"/>
-        </Frame>
-
-        <Frame type="GlueButton" name="JoinButton" template="StandardBattlenetTemplates/BattlenetAlternateButtonTemplate">
-            <Anchor side="Bottom" relative="$parent/ExtendedExperienceBG/AnchorFrame" pos="Max" offset="-36"/>
-            <Anchor side="Left" relative="$parent/OverviewButton" pos="Max" offset="10"/>
-            <Text val="@UI/BattleMapProfilePanel/Play"/>
-            <Width val="325"/>
-            <CollapseLayout val="False"/>
-            <Visible val="False"/>
-        </Frame>
-
-        <Frame type="GlueButton" name="CreateButton" template="StandardBattlenetTemplates/BattlenetStandardButtonTemplate">
+        <Frame type="CustomGamePlayButton" name="CreateButton" template="StandardBattlenetTemplates/BattlenetStandardButtonTemplate">
             <Anchor side="Bottom" relative="$GameInfoAnchorFrame" pos="Max" offset="-40"/>
-            <Anchor side="Left" relative="$GameInfoJoinLobbyButton" pos="Max" offset="20"/>
+            <Anchor side="Left" relative="$GameInfoJoinLobbyButton" pos="Max" offset="8"/>
+            <Width val="260"/>
             <Text val="@UI/ScreenCustomGames/CreateButton"/>
             <CollapseLayout val="true"/>
+            <MapHandle val="{$parent/@MapHandle}"/>
+            <ExpansionTag val="{$parent/ExpansionPulldown/@ExpansionTag}"/>
+            <VariantIndex val="{$parent/VariantPulldown/@VariantIndex}"/>
         </Frame>
 
-        <Frame type="GlueButton" name="TutorialButton" template="StandardBattlenetTemplates/BattlenetStandardButtonTemplate">
+        <Frame type="CustomGamePlayButton" name="AutoJoinButton" template="StandardBattlenetTemplates/BattlenetStandardButtonTemplate">
+            <Anchor side="Bottom" relative="$GameInfoAnchorFrame" pos="Max" offset="-40"/>
+            <Anchor side="Left" relative="$parent/CreateButton" pos="Max" offset="8"/>
+            <Width val="260"/>
+            <Text val="@UI/ScreenCustomGames/AutoJoinButton"/>
+            <Tooltip val="@UI/ScreenCustomGames/AutoJoinTooltip"/>
+            <TooltipDelayed val="True"/>
+            <AcceptsMouseTooltip val="True"/>
+            <MapHandle val="{$parent/@MapHandle}"/>
+            <UseDefaultVariant val="False"/>
+            <VariantIndex val="{$parent/VariantPulldown/@VariantIndex}"/>
+            <PlayMode val="JoinOrCreate"/>
+            <CollapseLayout val="True"/>
+
+            <StateGroup name="VisibleState">
+                <DefaultState val="NotVisible"/>
+                
+                <State name="Visible">
+                    <When type="Property" frame="$parent/BattleMapFrame" IsArcade="True"/>
+                    <Action type="SetProperty" frame="$this" Visible="True"/>
+                </State>
+                
+                <State name="NotVisible">
+                    <Action type="SetProperty" frame="$this" Visible="False"/>
+                </State>
+            </StateGroup>
+        </Frame>
+
+        <Frame type="BattleMapVariantPulldown" name="VariantPulldown" template="StandardBattlenetTemplates/BattlenetLargePulldownTemplate">
+            <Anchor side="Bottom" relative="$GameInfoAnchorFrame" pos="Max" offset="-44"/>
+            <Anchor side="Left" relative="$parent/AutoJoinButton" pos="Max" offset="8"/>
+            <Width val="260"/>
+            <MapHandle val="{$parent/@MapHandle}"/>
+        </Frame>
+
+        <Frame type="CustomGamePlayButton" name="TutorialButton" template="StandardBattlenetTemplates/BattlenetStandardButtonTemplate">
             <Anchor side="Top" relative="$parent/CreateButton" pos="Min" offset="0"/>
-            <Anchor side="Left" relative="$parent/CreateButton" pos="Max" offset="5"/>
+            <Anchor side="Left" relative="$parent/TitleBackground" pos="Min" offset="4"/>
+            <Width val="370"/>
             <Text val="@UI/BattleMapProfilePanel/Tutorial"/>
-            <Width val="325"/>
             <CollapseLayout val="true"/>
+            <MapHandle val="{$parent/@TutorialHandle}"/>
+            <ExpansionTag val="{$parent/ExpansionPulldown/@ExpansionTag}"/>
+            <UseDefaultVariant val="true"/>
+        </Frame>
+
+        <Frame type="Button" name="CreateModButton" template="StandardBattlenetTemplates/BattlenetStandardButtonTemplate">
+            <Anchor side="Top" relative="$parent/CreateButton" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent/CreateButton" pos="Max" offset="8"/>
+            <Width val="260"/>
+            <Text val="@UI/ScreenCustomGames/CreateModButton"/>
+            <HoverSound val="@UI_HoverTick"/>
+            <CollapseLayout val="true"/>
+            <Enabled val="{$parent/CreateButton/@Enabled}"/>
+            <Tooltip val="{$parent/CreateButton/@Tooltip}"/>
         </Frame>
 
         <Frame type="Button" name="CloseButton" template="StandardBattlenetTemplates/CloseButton">
@@ -652,56 +720,38 @@
         <Frame type="Frame" name="IdleSpinner" template="StandardBattlenetTemplates/IdleSpinnerTemplate">
             <Anchor relative="$parent/ExtendedExperienceBG/AnchorFrame"/>
         </Frame>
+        
+        <Frame type="CustomGameModListPanel" name="ModListPanel" template="CustomGameModListPanel/CustomGameModListPanelTemplate">
+            <Handle val="ModListPanel"/>
+            <Anchor relative="$parent"/>
+            <RenderPriority val="900"/>
+            <Visible val="false"/>
+            <MapHandle val="{$parent/@MapHandle}"/>
+            
+            <Animation name="Show">
+                <Event event="OnClick" action="Reset,Play" frame="$parent/CreateModButton"/>
+                <Event event="OnClick" action="Reset,Stop" frame="CloseButton"/>
+                <Event event="Loading" action="Reset,Stop" frame="$parent"/>
+                <Event event="OnHidden" action="Reset,Stop" frame="$parent"/>
+                <Event event="ViewOverview" action="Reset,Stop" frame="$parent"/>
 
-        <StateGroup name="ProfilePanelModeStateGroup">
-            <State name="ModeOverview">
-                <When type="AnimationState" frame="$this" ProfilePanelMode="Overview"/>
-                <Action type="SetProperty" frame="OverviewPanel" Visible="true"/>
-                <Action type="SetProperty" frame="HowToPlayPanel" Visible="false"/>
-                <Action type="SetProperty" frame="PatchNotesPanel" Visible="false"/>
-                <Action type="SetProperty" frame="ReviewsPanel" Visible="false"/>
-                <Action type="SetProperty" frame="OverviewButton" Toggled="true"/>
-                <Action type="SetProperty" frame="HowToPlayButton" Toggled="false"/>
-                <Action type="SetProperty" frame="PatchNotesButton" Toggled="false"/>
-                <Action type="SetProperty" frame="ReviewsButton" Toggled="false"/>
-            </State>
+                <Controller type="Visibility" end="Pause">
+                    <Key type="Bool" time="0.000" value="false"/>
+                    <Key type="Bool" time="0.001" value="true"/>
+                    <Key type="Bool" time="0.175" value="true"/>
+                </Controller>
 
-            <State name="ModeHowToPlay">
-                <When type="AnimationState" frame="$this" ProfilePanelMode="HowToPlay"/>
-                <Action type="SetProperty" frame="OverviewPanel" Visible="false"/>
-                <Action type="SetProperty" frame="HowToPlayPanel" Visible="true"/>
-                <Action type="SetProperty" frame="PatchNotesPanel" Visible="false"/>
-                <Action type="SetProperty" frame="ReviewsPanel" Visible="false"/>
-                <Action type="SetProperty" frame="OverviewButton" Toggled="false"/>
-                <Action type="SetProperty" frame="HowToPlayButton" Toggled="true"/>
-                <Action type="SetProperty" frame="PatchNotesButton" Toggled="false"/>
-                <Action type="SetProperty" frame="ReviewsButton" Toggled="false"/>
-            </State>
+                <Controller type="Fade" end="Pause">
+                    <Key type="Curve" time="0.000" value="0" out="Slow"/>
+                    <Key type="Curve" time="0.175" value="255" in="Auto"/>
+                </Controller>
+            </Animation>
 
-            <State name="ModePatchNotes">
-                <When type="AnimationState" frame="$this" ProfilePanelMode="PatchNotes"/>
-                <Action type="SetProperty" frame="OverviewPanel" Visible="false"/>
-                <Action type="SetProperty" frame="HowToPlayPanel" Visible="false"/>
-                <Action type="SetProperty" frame="PatchNotesPanel" Visible="true"/>
-                <Action type="SetProperty" frame="ReviewsPanel" Visible="false"/>
-                <Action type="SetProperty" frame="OverviewButton" Toggled="false"/>
-                <Action type="SetProperty" frame="HowToPlayButton" Toggled="false"/>
-                <Action type="SetProperty" frame="PatchNotesButton" Toggled="true"/>
-                <Action type="SetProperty" frame="ReviewsButton" Toggled="false"/>
-            </State>
-
-            <State name="ModeReviews">
-                <When type="AnimationState" frame="$this" ProfilePanelMode="Reviews"/>
-                <Action type="SetProperty" frame="OverviewPanel" Visible="false"/>
-                <Action type="SetProperty" frame="HowToPlayPanel" Visible="false"/>
-                <Action type="SetProperty" frame="PatchNotesPanel" Visible="false"/>
-                <Action type="SetProperty" frame="ReviewsPanel" Visible="true"/>
-                <Action type="SetProperty" frame="OverviewButton" Toggled="false"/>
-                <Action type="SetProperty" frame="HowToPlayButton" Toggled="false"/>
-                <Action type="SetProperty" frame="PatchNotesButton" Toggled="false"/>
-                <Action type="SetProperty" frame="ReviewsButton" Toggled="true"/>
-            </State>
-        </StateGroup>
+            <Frame type="CustomGamePlayButton" name="CreateButton">
+                <ExpansionTag val="{$parent/$parent/ExpansionPulldown/@ExpansionTag}"/>
+                <VariantIndex val="{$parent/$parent/VariantPulldown/@VariantIndex}"/>
+            </Frame>
+        </Frame>
 
         <StateGroup name="TutorialLoadingStateGroup">
             <State name="LoadingState">
@@ -725,10 +775,10 @@
         <StateGroup name="ArcadeLoadingStateGroup">
             <State name="LoadingState">
                 <When type="AnimationState" frame="$this" LoadingState="Loading"/>
-                <Action type="SetProperty" frame="ModeLabel" Visible="false"/>
-                <Action type="SetProperty" frame="GameModePulldown" Visible="false"/>
-                <Action type="SetProperty" frame="JoinButton" Visible="false"/>
                 <Action type="SetProperty" frame="CreateButton" Visible="false"/>
+                <Action type="SetProperty" frame="CreateModButton" Visible="false"/>
+                <Action type="SetProperty" frame="ExpansionPulldown" Visible="false"/>
+                <Action type="SetProperty" frame="VariantPulldown" Visible="false"/>
                 <Action type="SetProperty" frame="IconImage" Visible="false"/>
                 <Action type="SetProperty" frame="IconImageFrame" Visible="false"/>
                 <Action type="SetProperty" frame="IconImageFrameAnchor" Visible="true"/>
@@ -737,34 +787,34 @@
             <State name="LoadedModState">
                 <When type="AnimationState" frame="$this" LoadingState="Loaded"/>
                 <When type="AnimationState" frame="$this" ModState="Mod"/>
-                <Action type="SetProperty" frame="ModeLabel" Visible="false"/>
-                <Action type="SetProperty" frame="GameModePulldown" Visible="false"/>
-                <Action type="SetProperty" frame="JoinButton" Visible="false"/>
                 <Action type="SetProperty" frame="CreateButton" Visible="false"/>
+                <Action type="SetProperty" frame="CreateModButton" Visible="false"/>
+                <Action type="SetProperty" frame="ExpansionPulldown" Visible="false"/>
+                <Action type="SetProperty" frame="VariantPulldown" Visible="false"/>
                 <Action type="SetProperty" frame="IconImage" Visible="false"/>
                 <Action type="SetProperty" frame="IconImageFrame" Visible="false"/>
                 <Action type="SetProperty" frame="IconImageFrameAnchor" Visible="false"/>
             </State>
 
-            <State name="LoadedTutorialState">
+            <State name="LoadedArcadeState">
                 <When type="AnimationState" frame="$this" LoadingState="Loaded"/>
                 <When type="AnimationState" frame="$this" ArcadeState="Arcade"/>
-                <Action type="SetProperty" frame="ModeLabel" Visible="false"/>
-                <Action type="SetProperty" frame="GameModePulldown" Visible="false"/>
-                <Action type="SetProperty" frame="JoinButton" Visible="false"/>
                 <Action type="SetProperty" frame="CreateButton" Visible="true"/>
+                <Action type="SetProperty" frame="CreateModButton" Visible="false"/>
+                <Action type="SetProperty" frame="ExpansionPulldown" Visible="false"/>
+                <Action type="SetProperty" frame="VariantPulldown" Visible="true"/>
                 <Action type="SetProperty" frame="IconImage" Visible="true"/>
                 <Action type="SetProperty" frame="IconImageFrame" Visible="true"/>
                 <Action type="SetProperty" frame="IconImageFrameAnchor" Visible="false"/>
             </State>
 
-            <State name="LoadedNoTutorialState">
+            <State name="LoadedMeleeState">
                 <When type="AnimationState" frame="$this" LoadingState="Loaded"/>
                 <When type="AnimationState" frame="$this" ArcadeState="NotArcade"/>
-                <Action type="SetProperty" frame="ModeLabel" Visible="false"/>
-                <Action type="SetProperty" frame="GameModePulldown" Visible="false"/>
-                <Action type="SetProperty" frame="JoinButton" Visible="false"/>
                 <Action type="SetProperty" frame="CreateButton" Visible="true"/>
+                <Action type="SetProperty" frame="CreateModButton" Visible="true"/>
+                <Action type="SetProperty" frame="ExpansionPulldown" Visible="true"/>
+                <Action type="SetProperty" frame="VariantPulldown" Visible="false"/>
                 <Action type="SetProperty" frame="IconImage" Visible="false"/>
                 <Action type="SetProperty" frame="IconImageFrame" Visible="false"/>
                 <Action type="SetProperty" frame="IconImageFrameAnchor" Visible="true"/>

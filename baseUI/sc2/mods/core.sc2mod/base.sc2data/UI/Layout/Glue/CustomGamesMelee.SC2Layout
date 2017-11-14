@@ -528,16 +528,11 @@
     -->
     <Frame type="CustomGameListPanel" name="CustomGamesMelee" template="CustomGamesTemplates/CustomGamesBaseTemplate">
         <Anchor relative="$parent"/>
-        <HookupAlias original="BookmarkCountFrame" alias="ContentContainer/HeaderPanel/BookmarkCountFrame"/>
         <HookupAlias original="FilterPulldown" alias="ContentContainer/HeaderPanel/FilterPulldown"/>
-        <HookupAlias original="LadderFilterCheckBox" alias="ContentContainer/HeaderPanel/LadderFilterCheckBox"/>
-        <HookupAlias original="RefreshButton" alias="ContentContainer/HeaderPanel/RefreshButton"/>
-        <HookupAlias original="SearchEditBox" alias="ContentContainer/HeaderPanel/SearchEditBox"/>
-        <HookupAlias original="SearchBackButton" alias="ContentContainer/HeaderPanel/SearchEditBox/ClearTextButton"/>
-        <HookupAlias original="SearchResultsLabel" alias="ContentContainer/HeaderPanel/SearchResultsLabel"/>
         <HookupAlias original="GamesTileList" alias="ContentContainer/PrimaryPanel/MeleeMapListContainer/MeleeMapList"/>
         <HookupAlias original="GamesTileList/ScrollBar" alias="ContentContainer/PrimaryPanel/MeleeMapListContainer/MeleeMapList/ScrollBar"/>
-        <!-- <HookupAlias original="GameInfoPanel" alias="ContentContainer/SecondaryPanel/GameInfoPanel"/> -->
+        <ExpansionTag val="{$this/ContentContainer/HeaderPanel/ExpansionPulldown/@ExpansionTag}"/>
+        <SearchText val="{$this/ContentContainer/HeaderPanel/SearchEditBox/@Text}"/>
          
         <Frame type="Label" name="TitleLabel">
             <Text val="@UI/ScreenCustomGames/Melee/Title"/>
@@ -554,11 +549,39 @@
                     <Tooltip val="@UI/ScreenCustomGames/SearchTooltip"/>
                     <MaxCharacters val="80"/>
                     
+                    <Animation name="RequestSearch">
+                        <Event event="OnEnterPressed" frame="$this" action="Reset,Play"/>
+
+                        <Controller type="Event" end="Pause" frame="$ancestor[@type=CustomGameListPanel]">
+                            <Key type="Event" time="0.0" event="RequestEditBoxSearch"/>
+                        </Controller>
+                    </Animation>
+                    
                     <Frame type="Label" name="SearchTextLabel">
                         <Text val="@UI/ScreenCustomGames/Melee/SearchText"/>
                     </Frame>
     
                     <Frame type="Frame" name="AnchorFrame">
+                        <Anchor side="Right" relative="$parent/$parent/ExpansionPulldown/AnchorFrame" pos="Min" offset="-14"/>
+                    </Frame>
+
+                    <Frame type="Button" name="ClearTextButton">
+                        <Animation name="ClearLobbyList">
+                            <Event event="OnClick" frame="$this" action="Reset,Play"/>
+
+                            <Controller type="Event" end="Pause" frame="$ancestor[@type=CustomGameListPanel]">
+                                <Key type="Event" time="0.1" event="RequestEditBoxSearch"/>
+                            </Controller>
+                        </Animation>
+                    </Frame>
+                </Frame>
+
+                <Frame type="ExpansionPulldown" name="ExpansionPulldown" template="StandardSmallButtonTemplates/StandardSmallPulldownTemplate">
+                    <SettingName val="CustomGamesMelee.Expansion"/>
+                    
+                    <Frame type="Frame" name="AnchorFrame">
+                        <Anchor side="Top" relative="$parent/$parent" pos="Mid" offset="0"/>
+                        <Anchor side="Bottom" relative="$parent/$parent" pos="Mid" offset="0"/>
                         <Anchor side="Right" relative="$parent/$parent/FilterPulldown/AnchorFrame" pos="Min" offset="-14"/>
                     </Frame>
                 </Frame>
@@ -568,58 +591,6 @@
                         <Anchor side="Top" relative="$parent/$parent" pos="Mid" offset="0"/>
                         <Anchor side="Bottom" relative="$parent/$parent" pos="Mid" offset="0"/>
                         <Anchor side="Right" relative="$parent/$parent" pos="Max" offset="-15"/>
-                    </Frame>
-                </Frame>
-
-                <Frame type="BookmarkCountFrame" name="BookmarkCountFrame">
-                    <Anchor side="Top" relative="$parent/SearchEditBox" pos="Mid" offset="0"/>
-                    <Anchor side="Bottom" relative="$parent/SearchEditBox" pos="Mid" offset="0"/>
-                    <Anchor side="Right" relative="$parent/FilterPulldown/AnchorFrame" pos="Min" offset="-12"/>
-                    <Anchor side="Left" relative="$parent/SearchEditBox" pos="Max" offset="22"/>
-                    <Height val="43"/>
-
-                    <Frame type="Image" name="BookmarkInfoIcon">
-                        <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
-                        <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
-                        <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
-                        <Width val="43"/>
-                        <Height val="43"/>
-                        <Texture val="@UI/Glues_Icons_GenericInfo"/>
-                        <AcceptsMouseTooltip val="true"/>
-                        <Tooltip val="@UI/ScreenCustomGames/BookmarkInfoTooltip"/>
-                    </Frame>
-
-                    <Frame type="Label" name="Label">
-                        <Anchor side="Top" relative="$parent/BookmarkInfoIcon" pos="Mid" offset="0"/>
-                        <Anchor side="Bottom" relative="$parent/BookmarkInfoIcon" pos="Mid" offset="0"/>
-                        <Anchor side="Right" relative="$parent/BookmarkInfoIcon" pos="Min" offset="0"/>
-                        <Style val="@Arcade_Subtitle"/>
-                    </Frame>
-                </Frame>
-
-                <Frame type="Label" name="SearchResultsLabel">
-                    <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
-                    <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
-                    <Anchor side="Right" relative="$parent/RefreshButton/AnchorFrame" pos="Min" offset="-12"/>
-                    <Text val="@UI/ScreenCustomGames/SearchResults"/>
-                    <Style val="@Arcade_SearchResultsText"/>
-                </Frame>
-
-                <Frame type="Button" name="RefreshButton" template="StandardSmallButtonTemplates/StandardSmallIconButtonTemplate">
-                    <Visible val="False"/>
-                    
-                    <Frame type="Frame" name="AnchorFrame">
-                        <Anchor side="Top" relative="$parent/$parent" pos="Mid" offset="0"/>
-                        <Anchor side="Bottom" relative="$parent/$parent" pos="Mid" offset="0"/>
-                        <Anchor side="Right" relative="$parent/$parent" pos="Max" offset="-12"/>
-                    </Frame>
-
-                    <Frame type="Image" name="Icon">
-                        <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
-                        <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
-                        <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
-                        <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
-                        <Texture val="@UI/SC2_UI_Battlenet_Glue_Arcade_RefreshIcon"/>
                     </Frame>
                 </Frame>
             </Frame>
@@ -699,16 +670,32 @@
             </Frame>
         </Frame>
 
-        <Frame type="GlueButton" name="CreateButton" template="StandardBattlenetTemplates/BattlenetAlternateButtonTemplate">
+        <Frame type="CustomGamePlayButton" name="CreateButton" template="StandardBattlenetTemplates/BattlenetAlternateButtonTemplate">
             <Anchor side="Bottom" relative="$Anchor_ActionButton" pos="Min" offset="0"/>
             <Anchor side="Left" relative="$Anchor_ActionButton" pos="Max" offset="0"/>
             <Text val="@UI/ScreenCustomGames/CreateButton"/>
+            <MapHandle val="{$parent/@SelectedMapHandle}"/>
+            <ModHandle val="{$parent/@SelectedModHandle}"/>
+            <ExpansionTag val="{$parent/@ExpansionTag}"/>
+            <VariantIndex val="{$parent/@SelectedVariantIndex}"/>
+            <GameSpeed val="{$parent/@SelectedGameSpeed}"/>
+            <UseDefaultVariant val="true"/>
+
+            <Animation name="ItemDoubleClicked">
+                <Event event="OnItemDoubleClicked" action="Reset,Play" frame="$parent/ContentContainer/PrimaryPanel/MeleeMapListContainer/MeleeMapList"/>
+
+                <Controller type="Event" end="Pause">
+                    <Key type="Event" time="0" event="ControlClickRequest"/>
+                </Controller>
+            </Animation>
         </Frame>
 
-        <Frame type="GlueButton" name="CreateModButton" template="StandardBattlenetTemplates/BattlenetStandardButtonTemplate">
+        <Frame type="Button" name="CreateModButton" template="StandardBattlenetTemplates/BattlenetStandardButtonTemplate">
             <Anchor side="Top" relative="$parent/CreateButton" pos="Min" offset="0"/>
             <Anchor side="Left" relative="$parent/CreateButton" pos="Max" offset="20"/>
             <Text val="@UI/ScreenCustomGames/CreateModButton"/>
+            <Enabled val="{$parent/CreateButton/@Enabled}"/>
+            <Tooltip val="{$parent/CreateButton/@Tooltip}"/>
         </Frame>
 
         <Frame type="ViewMapProfileButton" name="GameInfoButton" template="StandardBattlenetTemplates/BattlenetStandardButtonTemplate">
@@ -736,12 +723,14 @@
             <ShowCreateOffline val="true"/>
             <MapHandle val="{$parent/@SelectedMapHandle}"/>
             <ModHandle val="{$parent/@SelectedModHandle}"/>
+            <ExpansionTag val="{$parent/@ExpansionTag}"/>
         </Frame>
 
         <Frame type="CustomGameModListPanel" name="ModListPanel" template="CustomGameModListPanel/CustomGameModListPanelTemplate">
             <Anchor relative="$parent"/>
             <RenderPriority val="900"/>
             <Visible val="false"/>
+            <MapHandle val="{$parent/@SelectedMapHandle}"/>
 
             <Animation name="Show">
                 <Event event="OnClick" action="Reset,Play" frame="$parent/CreateModButton"/>
@@ -759,7 +748,31 @@
                     <Key type="Curve" time="0.175" value="255" in="Auto"/>
                 </Controller>
             </Animation>
+
+            <Frame type="CustomGamePlayButton" name="CreateButton">
+                <ExpansionTag val="{$parent/$parent/@ExpansionTag}"/>
+                <VariantIndex val="{$parent/$parent/@SelectedVariantIndex}"/>
+                <GameSpeed val="{$parent/$parent/@SelectedGameSpeed}"/>
+                <UseDefaultVariant val="true"/>
+            </Frame>
         </Frame>
+
+        <!-- These types of filters use the default variant when creating a game -->
+        <StateGroup name="DefaultVariantStateGroup">
+            <State name="SearchingState">
+                <When type="AnimationState" frame="$this" SearchState="Searching"/>
+            </State>
+            <State name="TopPlayedState">
+                <When type="AnimationState" frame="$this" FilterState="TopPlayed"/>
+                <Action type="SetProperty" frame="CreateButton" UseDefaultVariant="false"/>
+                <Action type="SetProperty" frame="ModListPanel/CreateButton" UseDefaultVariant="false"/>
+            </State>
+            <State name="RecentlyPlayedState">
+                <When type="AnimationState" frame="$this" FilterState="RecentlyPlayed"/>
+                <Action type="SetProperty" frame="CreateButton" UseDefaultVariant="false"/>
+                <Action type="SetProperty" frame="ModListPanel/CreateButton" UseDefaultVariant="false"/>
+            </State>
+        </StateGroup>
 
         <StateGroup name="SearchingStateGroup">
             <DefaultState val="NotSearchingState"/>
@@ -767,28 +780,12 @@
             <State name="SearchingState">
                 <When type="AnimationState" frame="$this" SearchState="Searching"/>
                 <Action type="SetProperty" frame="ContentContainer/HeaderPanel/FilterPulldown" Visible="false"/>
-                <Action type="SetProperty" frame="ContentContainer/HeaderPanel/SearchResultsLabel" Visible="false"/>
-                <Action type="SetProperty" frame="ContentContainer/HeaderPanel/BookmarkCountFrame" visible="false"/>
-            </State>
-
-            <State name="FilterBlizzardMapsState">
-                <When type="AnimationState" frame="$this" FilterState="BlizzardMaps"/>
-                <Action type="SetProperty" frame="ContentContainer/HeaderPanel/FilterPulldown" Visible="true"/>
-                <Action type="SetProperty" frame="ContentContainer/HeaderPanel/SearchResultsLabel" Visible="false"/>
-                <Action type="SetProperty" frame="ContentContainer/HeaderPanel/BookmarkCountFrame" visible="false"/>
-            </State>
-
-            <State name="FilterMyBookmarksState">
-                <When type="AnimationState" frame="$this" FilterState="MyBookmarks"/>
-                <Action type="SetProperty" frame="ContentContainer/HeaderPanel/FilterPulldown" Visible="true"/>
-                <Action type="SetProperty" frame="ContentContainer/HeaderPanel/SearchResultsLabel" Visible="false"/>
-                <Action type="SetProperty" frame="ContentContainer/HeaderPanel/BookmarkCountFrame" visible="true"/>
+                <Action type="SetProperty" frame="ContentContainer/HeaderPanel/ExpansionPulldown" Visible="false"/>
             </State>
 
             <State name="NotSearchingState">
                 <Action type="SetProperty" frame="ContentContainer/HeaderPanel/FilterPulldown" Visible="true"/>
-                <Action type="SetProperty" frame="ContentContainer/HeaderPanel/SearchResultsLabel" Visible="false"/>
-                <Action type="SetProperty" frame="ContentContainer/HeaderPanel/BookmarkCountFrame" visible="false"/>
+                <Action type="SetProperty" frame="ContentContainer/HeaderPanel/ExpansionPulldown" Visible="true"/>
             </State>
         </StateGroup>
     </Frame>
