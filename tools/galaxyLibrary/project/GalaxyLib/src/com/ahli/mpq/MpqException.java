@@ -1,6 +1,7 @@
 package com.ahli.mpq;
 
 /**
+ * Exception created while handling MPQ archives.
  * 
  * @author Ahli
  * 

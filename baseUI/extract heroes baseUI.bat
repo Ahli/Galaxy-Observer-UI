@@ -41,7 +41,7 @@ for /f "usebackq delims=" %%a in ("!file!") do (
 echo ===============Parameters==============
 set DESTINATION=%~dp0%DESTINATION_SUBFOLDER%\
 set CASCPROGRAM=%parentLevel%\tools\plugins\casc\CASCConsole.exe
-set CASCSETTINGSPROG=%parentLevel%\tools\cascToolSettingEdit\cascExplorerSettingsEdit.jar
+set CASCSETTINGSPROG=%parentLevel%\tools\cascToolSettingEdit\CascExplorerConfigFileEdit.jar
 set CASCSETTINGSFILE=%parentLevel%\tools\plugins\casc\CASCConsole.exe.config
 
 echo GAMEPATH=%GAMEPATH%

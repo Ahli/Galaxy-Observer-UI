@@ -3,6 +3,7 @@ package com.ahli.mpq;
 import java.io.File;
 
 /**
+ * Interface for the interaction of MPQ files.
  * 
  * @author Ahli
  *
@@ -27,7 +28,7 @@ public interface MpqInterface {
 	/**
 	 * Returns the cache folder of the opened mpq.
 	 * 
-	 * @return
+	 * @return cache folder as File
 	 */
 	File getCache();
 	
@@ -35,6 +36,7 @@ public interface MpqInterface {
 	 * Sets the cache folder.
 	 * 
 	 * @param cache
+	 *            Cache folder to temporarily store mpq content within
 	 */
 	void setCache(File cache);
 	

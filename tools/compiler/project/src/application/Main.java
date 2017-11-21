@@ -7,8 +7,8 @@ import java.nio.file.FileSystemException;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import javax.swing.JFileChooser;
@@ -26,6 +26,8 @@ import com.ahli.mpq.MpqException;
 
 import application.integration.ReplayFinder;
 import application.integration.SettingsIniInterface;
+import application.thread.ThreadManager;
+import application.thread.ThreadManagerImpl;
 import application.util.ErrorTracker;
 import application.util.ErrorTrackerImpl;
 import application.util.JarHelper;
@@ -41,19 +43,26 @@ import javafx.stage.Stage;
 import javafx.util.Duration;
 
 /**
+ * Interface Builder Application
  * 
  * @author Ahli
  * 
  */
 public class Main extends Application {
+	
 	static Logger LOGGER = LogManager.getLogger(Main.class);
 	
+	protected static final String THREAD_TAG_GAMERUNNER = "GameRunner";
+	protected static final String THREAD_TAG_BUILDER = "Builder";
+	protected static final String THREAD_TAG_BUILDERMANAGER = "BuilderManager";
+	
 	// Components
-	private MpqEditorInterface baseMpqInterface = new MpqEditorInterface();
-	private SettingsIniInterface settings = new SettingsIniInterface();
+	private MpqEditorInterface baseMpqInterface = null;
+	private SettingsIniInterface settings = null;
 	private ReplayFinder replayFinder = new ReplayFinder();
 	private ErrorTracker errorTracker = new ErrorTrackerImpl();
 	private CompileManager compileManager = new CompileManager(errorTracker);
+	private ThreadManager threadManager = new ThreadManagerImpl();
 	
 	// data
 	private boolean namespaceHeroes = true;
@@ -65,10 +74,6 @@ public class Main extends Application {
 	
 	// performance
 	private static long startTime;
-	
-	// Builder
-	private HashMap<Integer, Thread> builders = new HashMap<>();
-	private int nextFreeBuilderID = 0;
 	
 	// Command Line Parameter
 	private boolean hasParamCompilePath = false;
@@ -96,10 +101,10 @@ public class Main extends Application {
 		launch(args);
 	}
 	
-	@Override
 	/**
 	 * Called when the App is initializing.
 	 */
+	@Override
 	public void start(Stage primaryStage) {
 		// shorter thread name for application
 		Thread.currentThread().setName("UI");
@@ -110,11 +115,11 @@ public class Main extends Application {
 		
 		initPaths();
 		
-		initSettings(settings);
-		
 		printVariables();
 		
-		initMpqInterface(baseMpqInterface);
+		initSettings(null);
+		
+		initMpqInterface();
 		
 		// // TEST DefaultUICatalog
 		// String baseUIpath = basePath.getParent() + File.separator + "baseUI";
@@ -159,6 +164,63 @@ public class Main extends Application {
 		// if (true)
 		// return;
 		
+		startWorkThread(primaryStage);
+		
+	}
+	
+	/**
+	 * Starts the Application's work thread.
+	 * 
+	 * @param primaryStage
+	 */
+	private void startWorkThread(Stage primaryStage) {
+		Thread buildManagerThread = new Thread() {
+			@Override
+			public void run() {
+				// manage thread
+				final int threadID = threadManager.registerThread(this, THREAD_TAG_BUILDERMANAGER);
+				this.setName(THREAD_TAG_BUILDERMANAGER + threadID);
+				// work
+				buildOneOrMoreUIs(true);
+				printLogMessage("All done.");
+				startReplayOrQuitOrShowError(primaryStage);
+				// manage thread
+				threadManager.unregisterThread(this);
+			}
+		};
+		buildManagerThread.start();
+	}
+	
+	/**
+	 * Starts a Replay, quits the Application or remains alive to show an error.
+	 * Action depends on fields.
+	 * 
+	 * @param primaryStage
+	 */
+	private void startReplayOrQuitOrShowError(Stage primaryStage) {
+		if (!errorTracker.hasEncounteredError()) {
+			// start game, launch replay
+			attemptToRunGameWithReplay(paramRunPath, compileAndRun, paramCompilePath);
+			if (!hasParamCompilePath) {
+				// close after 5 seconds, if compiled all and no errors
+				PauseTransition delay = new PauseTransition(Duration.seconds(5));
+				delay.setOnFinished(event -> primaryStage.close());
+				delay.play();
+			} else if (hasParamCompilePath || paramRunPath != null) {
+				// close instantly, if compiled special and no errors
+				primaryStage.close();
+			}
+		}
+	}
+	
+	/**
+	 * Builds one or more UIs depending on settings.
+	 * 
+	 * @param waitForFinish
+	 *            wait for the build-threads to finish
+	 */
+	private void buildOneOrMoreUIs(boolean waitForFinish) {
+		
 		// WORK WORK WORK
 		if (!hasParamCompilePath) {
 			// compile all
@@ -182,31 +244,20 @@ public class Main extends Application {
 			}
 		}
 		
-		// wait for all threads to finish
-		for (Thread buildThread : builders.values()) {
-			try {
-				buildThread.join();
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-				LOGGER.error("waiting for build thread to join failed", e);
+		if (waitForFinish) {
+			// wait for all threads to finish
+			Set<Thread> builders = null;
+			while (!(builders = threadManager.getThreadsByTag("Builder")).isEmpty()) {
+				for (Thread buildThread : builders) {
+					try {
+						buildThread.join();
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+						LOGGER.error("waiting for build threads to join failed", e);
+						errorTracker.reportErrorEncounter(e);
+					}
+				}
 			}
-		}
-		primaryStage.setTitle("Compiling Interfaces... done.");
-		printLogMessage("All done.");
-		
-		if (!errorTracker.hasEncounteredError()) {
-			// start game, launch replay
-			attemptToRunGameWithReplay(paramRunPath, compileAndRun, paramCompilePath);
-		}
-		
-		if (!errorTracker.hasEncounteredError() && !hasParamCompilePath) {
-			// close after 5 seconds, if compiled all and no errors
-			PauseTransition delay = new PauseTransition(Duration.seconds(5));
-			delay.setOnFinished(event -> primaryStage.close());
-			delay.play();
-		} else if (!errorTracker.hasEncounteredError() && (hasParamCompilePath || paramRunPath != null)) {
-			// close instantly, if compiled special and no errors
-			primaryStage.close();
 		}
 	}
 	
@@ -225,16 +276,6 @@ public class Main extends Application {
 		if (paramRunPath != null) {
 			LOGGER.info("run param path: " + paramRunPath);
 		}
-	}
-	
-	/**
-	 * Returns an unused thread ID.
-	 * 
-	 * @return
-	 */
-	private int getUnusedThreadID() {
-		// return val, then increment
-		return nextFreeBuilderID++;
 	}
 	
 	/**
@@ -303,7 +344,9 @@ public class Main extends Application {
 		new Thread() {
 			@Override
 			public void run() {
-				this.setName(this.getName().replaceFirst("Thread", "GameRunner"));
+				// manage thread
+				int id = threadManager.registerThread(this, THREAD_TAG_GAMERUNNER);
+				this.setName(THREAD_TAG_GAMERUNNER + id);
 				boolean isHeroes = false;
 				String gamePath = null;
 				
@@ -365,6 +408,9 @@ public class Main extends Application {
 				} else {
 					LOGGER.warn("Failed to find any replay.");
 				}
+				
+				// manage thread
+				threadManager.unregisterThread(this);
 			}
 		}.start();
 		
@@ -418,7 +464,7 @@ public class Main extends Application {
 	}
 	
 	/**
-	 * Build a specific Interface.
+	 * Builds a specific Interface in a Build Thread.
 	 * 
 	 * @param folder
 	 * @param isHeroes
@@ -426,17 +472,17 @@ public class Main extends Application {
 	 */
 	public void buildSpecificUI(File interfaceFolder, boolean isHeroes) throws IOException {
 		if (interfaceFolder.isDirectory()) {
-			// build according to param
-			final int threadID = getUnusedThreadID();
-			
-			// create unique cache path
-			final MpqEditorInterface threadsMpqInterface = (MpqEditorInterface) baseMpqInterface.clone();
-			threadsMpqInterface.setMpqCachePath(baseMpqInterface.getMpqCachePath() + threadID);
-			
 			Thread buildThread = new Thread() {
 				@Override
 				public void run() {
-					this.setName("Builder" + threadID);
+					// manage thread
+					int threadId = threadManager.registerThread(this, THREAD_TAG_BUILDER);
+					this.setName(THREAD_TAG_BUILDER + threadId);
+					
+					// create unique cache path
+					final MpqEditorInterface threadsMpqInterface = (MpqEditorInterface) baseMpqInterface.clone();
+					threadsMpqInterface.setMpqCachePath(baseMpqInterface.getMpqCachePath() + threadId);
+					
 					// work
 					try {
 						buildFile(interfaceFolder, isHeroes, threadsMpqInterface);
@@ -445,9 +491,10 @@ public class Main extends Application {
 						errorTracker.reportErrorEncounter();
 						e.printStackTrace();
 					}
+					// manage thread
+					threadManager.unregisterThread(this);
 				}
 			};
-			builders.put(threadID, buildThread);
 			buildThread.start();
 		}
 	}
@@ -462,7 +509,6 @@ public class Main extends Application {
 		Platform.runLater(new Runnable() {
 			@Override
 			public void run() {
-				// console.print(msg + "\n");
 				txtArea.appendText(msg + "\n");
 			}
 		});
@@ -527,7 +573,7 @@ public class Main extends Application {
 		int copyAttempts = 0;
 		x: for (copyAttempts = 0; copyAttempts <= 100; copyAttempts++) {
 			try {
-				copyFolder(file, cache);
+				copyFileOrFolder(file, cache);
 				LOGGER.debug("Copy Folder took " + copyAttempts + " attempts to succeed.");
 				break x;
 			} catch (FileSystemException e) {
@@ -624,23 +670,29 @@ public class Main extends Application {
 	
 	/**
 	 * Initializes the MPQ Interface.
-	 * 
-	 * @param mpqi
 	 */
-	private void initMpqInterface(MpqEditorInterface mpqi) {
-		
-		mpqi.setMpqEditorPath(basePath.getParent() + File.separator + "tools" + File.separator + "plugins"
+	private void initMpqInterface() {
+		String tempDirectory = System.getProperty("java.io.tmpdir");
+		String cachePath = tempDirectory + "ObserverInterfaceBuilder" + File.separator + "_ExtractedMpq";
+		baseMpqInterface = new MpqEditorInterface(cachePath);
+		baseMpqInterface.setMpqEditorPath(basePath.getParent() + File.separator + "tools" + File.separator + "plugins"
 				+ File.separator + "mpq" + File.separator + "MPQEditor.exe");
 	}
 	
 	/**
-	 * Initializes the Settings File Interface.
+	 * Initializes the Settings File Interface. It either uses the specified
+	 * SettingsIniInterface or loads them from the default location.
 	 * 
-	 * @param settings
-	 *            settings to initialize
+	 * @param optionalSettingsToLoad
+	 *            optional SettingsIniInterface, set to null to load from default
+	 *            location
 	 */
-	private void initSettings(SettingsIniInterface settings) {
-		settings.setSettingsFilePath(basePath.getParent() + File.separator + "settings.ini");
+	private void initSettings(SettingsIniInterface optionalSettingsToLoad) {
+		SettingsIniInterface settings = optionalSettingsToLoad;
+		if (settings == null) {
+			String settingsFilePath = basePath.getParent() + File.separator + "settings.ini";
+			settings = new SettingsIniInterface(settingsFilePath);
+		}
 		try {
 			settings.readSettingsFromFile();
 		} catch (FileNotFoundException e) {
@@ -648,6 +700,7 @@ public class Main extends Application {
 			errorTracker.reportErrorEncounter(e);
 			e.printStackTrace();
 		}
+		this.settings = settings;
 	}
 	
 	/**
@@ -660,13 +713,13 @@ public class Main extends Application {
 	}
 	
 	/**
-	 * Copies a folder.
+	 * Copies a file or folder.
 	 * 
 	 * @param source
 	 * @param target
 	 * @throws IOException
 	 */
-	private static void copyFolder(File source, File target) throws IOException {
+	private static void copyFileOrFolder(File source, File target) throws IOException {
 		if (source.isDirectory()) {
 			// create folder if not existing
 			if (!target.exists() && !target.mkdir()) {
@@ -686,7 +739,7 @@ public class Main extends Application {
 				File srcFile = new File(source, file);
 				File destFile = new File(target, file);
 				// Recursive function call
-				copyFolder(srcFile, destFile);
+				copyFileOrFolder(srcFile, destFile);
 			}
 		} else {
 			// copy the file

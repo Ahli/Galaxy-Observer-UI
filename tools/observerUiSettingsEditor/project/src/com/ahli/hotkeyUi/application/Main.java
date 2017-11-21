@@ -67,7 +67,7 @@ public class Main extends Application {
 	private TabsController tabsCtrl;
 	private String openedDocPath = null;
 	private boolean isNamespaceHeroes = true;
-	private MpqEditorInterface mpqi = new MpqEditorInterface();
+	private MpqEditorInterface mpqi = null;
 	private DescIndexData descIndex = new DescIndexData(mpqi);
 	private File basePath = null;
 	private boolean hasUnsavedFileChanges = false;
@@ -149,7 +149,7 @@ public class Main extends Application {
 			
 			LOGGER.warn("finished app initialization after " + (System.nanoTime() - appStartTime) / 1000000 + "ms.");
 			
-			initMpqInterface(mpqi);
+			initMpqInterface();
 			
 		} catch (Exception e) {
 			LOGGER.error("App Error: " + ExceptionUtils.getStackTrace(e), e); //$NON-NLS-1$
@@ -569,10 +569,11 @@ public class Main extends Application {
 	
 	/**
 	 * Initializes the MPQ Editor Interface.
-	 * 
-	 * @param mpqi
 	 */
-	private void initMpqInterface(MpqEditorInterface mpqi) {
+	private void initMpqInterface() {
+		String tempDirectory = System.getProperty("java.io.tmpdir");
+		String cachePath = tempDirectory + "ObserverUiSettingsEditor" + File.separator + "_ExtractedMpq";
+		mpqi = new MpqEditorInterface(cachePath);
 		String path = basePath + File.separator + "plugins" + File.separator + "mpq" + File.separator + "MPQEditor.exe"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		mpqi.setMpqEditorPath(path);
 		File f = new File(path);

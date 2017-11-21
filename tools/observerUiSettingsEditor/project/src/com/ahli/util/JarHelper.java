@@ -34,8 +34,7 @@ public class JarHelper {
 		LOGGER.debug("Attempt#1 java.class.path: " + str); //$NON-NLS-1$
 		
 		// check if started in eclipse
-		if (str.contains("tools" + File.separator + "observerUiSettingsEditor" + File.separator + "project" //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-				+ File.separator + "target" + File.separator + "classes;")) { //$NON-NLS-1$ //$NON-NLS-2$
+		if (str.contains(File.separator + "target" + File.separator + "classes;")) { //$NON-NLS-1$ //$NON-NLS-2$
 			// get current working directory
 			URI uri = new File(".").toURI(); //$NON-NLS-1$
 			// results in: "file:/D:/GalaxyObsUI/dev/./"

@@ -13,6 +13,7 @@ import org.xml.sax.SAXException;
 import com.ahli.mpq.i18n.Messages;
 
 /**
+ * Implements a MpqInterface for Ladislav Zezula's MpqEditor.exe.
  * 
  * @author Ahli
  * 
@@ -20,11 +21,18 @@ import com.ahli.mpq.i18n.Messages;
 public class MpqEditorInterface implements MpqInterface, Cloneable {
 	static Logger LOGGER = LogManager.getLogger("MpqInterface"); //$NON-NLS-1$
 	
-	private final String TEMP_DIR = System.getProperty("java.io.tmpdir"); //$NON-NLS-1$
 	private String MPQ_EDITOR = "plugins" + File.separator + "mpq" + File.separator + "MPQEditor.exe"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-	private String mpqCachePath = TEMP_DIR + "ObserverUiSettingsEditor" + File.separator + "_ExtractedMpq"; //$NON-NLS-1$ //$NON-NLS-2$
+	private String mpqCachePath;
 	
-	public MpqEditorInterface() {
+	/**
+	 * Constructor
+	 * 
+	 * @param mpqCachePath
+	 *            path of the directory that will temporarily contain the extracted
+	 *            mpq
+	 */
+	public MpqEditorInterface(String mpqCachePath) {
+		this.mpqCachePath = mpqCachePath;
 	}
 	
 	public String getMpqCachePath() {
@@ -50,8 +58,7 @@ public class MpqEditorInterface implements MpqInterface, Cloneable {
 			e.printStackTrace();
 			LOGGER.error("error calling super.clone(): " + e.getMessage());
 		}
-		MpqEditorInterface clone = new MpqEditorInterface();
-		clone.setMpqCachePath(this.mpqCachePath);
+		MpqEditorInterface clone = new MpqEditorInterface(this.mpqCachePath);
 		clone.setMpqEditorPath(this.MPQ_EDITOR);
 		return clone;
 	}

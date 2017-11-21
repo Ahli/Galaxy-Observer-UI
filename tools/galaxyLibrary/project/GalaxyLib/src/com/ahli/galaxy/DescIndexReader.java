@@ -17,6 +17,7 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 /**
+ * Reads a a Desc Index File.
  * 
  * @author Ahli
  *

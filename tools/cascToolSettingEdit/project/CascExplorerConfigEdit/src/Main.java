@@ -2,6 +2,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -21,11 +22,19 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 /**
+ * Application that edits the
+ * 
+ * 
  * 
  * @author Ahli
  *
  */
 public class Main {
+	
+	/**
+	 * 
+	 * @param args
+	 */
 	public static void main(String[] args) {
 		System.out.println("Command Line Parameters: [ConfigFilePath] [StoragePath] [OnlineMode] [Product] [Locale]");
 		System.out.println("Parameters provided:");
@@ -34,40 +43,38 @@ public class Main {
 		System.out.println("OnlineMode: " + args[2]);
 		System.out.println("Product: " + args[3]);
 		System.out.println("Locale: " + args[4]);
-
+		
 		String path = args[0], storagePath = args[1], onlineMode = args[2], product = args[3], locale = args[4];
-
+		
 		InputStream is = null;
 		try {
 			DocumentBuilder dBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
 			Document doc = null;
 			File f = new File(path);
-
+			
 			// parse XML file
-
+			
 			// THIS DOES NOT CLOSE THE INPUTSTREAM ON EXCEPTION
 			// CREATING TONS OF FILE ACCESS PROBLEMS. DO NOT USE!
 			// doc = dBuilder.parse(curFile);
-
+			
 			// WORKAROUND -> provide Inputstream
 			is = new FileInputStream(f);
 			doc = dBuilder.parse(is);
 			is.close();
-
+			
 			// edit document
 			NodeList nodeList = doc.getElementsByTagName("setting");
 			for (int i = 0; i < nodeList.getLength(); i++) {
 				Node curNode = nodeList.item(i);
-
+				
 				NamedNodeMap attributes = curNode.getAttributes();
 				for (int j = 0; j < attributes.getLength(); j++) {
 					Node attrNode = attributes.item(j);
-
+					
 					if (attrNode != null) {
 						String val = attrNode.getNodeValue();
-//						System.out.println("attr name: " + attrNode.getNodeName());
-//						System.out.println("attr value: " + val);
-
+						
 						if (val.equalsIgnoreCase("StoragePath")) {
 							replaceValueInSettingNode(curNode, storagePath);
 						} else if (val.equalsIgnoreCase("OnlineMode")) {
@@ -79,18 +86,15 @@ public class Main {
 						}
 					}
 				}
-
-				// Node attrNode = attributes.getNamedItem("name");
-
 			}
-
+			
 			// write DOM back to XML
 			Source source = new DOMSource(doc);
 			Result result = new StreamResult(f);
 			Transformer xformer;
 			xformer = TransformerFactory.newInstance().newTransformer();
 			xformer.transform(source, result);
-
+			
 		} catch (IOException | ParserConfigurationException | SAXException | TransformerFactoryConfigurationError
 				| TransformerException e1) {
 			e1.printStackTrace();
@@ -104,21 +108,21 @@ public class Main {
 		}
 	}
 	
-	private static void replaceValueInSettingNode(Node settingNode, String newSettingVal){
+	/**
+	 * 
+	 * @param settingNode
+	 * @param newSettingVal
+	 */
+	private static void replaceValueInSettingNode(Node settingNode, String newSettingVal) {
 		NodeList children = settingNode.getChildNodes();
-//		System.out.println("child nodes count: "+children.getLength());
-		x:for(int a=0; a<children.getLength(); a++){
+		x: for (int a = 0; a < children.getLength(); a++) {
 			Node curChild = children.item(a);
-//			System.out.println("child name: "+curChild.getNodeName());
-//			System.out.println("child value: "+curChild.getNodeValue());
-//			System.out.println("child text: "+curChild.getTextContent());
 			if (curChild.getNodeName().equalsIgnoreCase("value")) {
 				curChild.setTextContent(newSettingVal);
 				break x;
 			}
 		}
 		
-		
 	}
-
+	
 }

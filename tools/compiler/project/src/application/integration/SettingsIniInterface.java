@@ -19,18 +19,21 @@ import org.apache.logging.log4j.Logger;
 public class SettingsIniInterface {
 	static Logger LOGGER = LogManager.getLogger(SettingsIniInterface.class);
 	
-	private String SETTINGS_FILE = "";
+	private String settingsFilePath = "";
 	private String SC2_Path = "", HEROES_Path = "", HEROES_PTR_Path = "";
 	private boolean ptrActive = false, SC2_64bit = false, HEROES_64bit = false, HEROES_PTR_64bit = false,
 			HEROES_protectMPQ = false, SC2_protectMPQ = false, buildUnprotectedToo = false;
 	
-	/**
-	 * Set the File path of the Settings file.
-	 * 
-	 * @param path
-	 */
+	public SettingsIniInterface(String settingsFilePath) {
+		this.settingsFilePath = settingsFilePath;
+	}
+	
 	public void setSettingsFilePath(String path) {
-		SETTINGS_FILE = path;
+		settingsFilePath = path;
+	}
+	
+	public String getSettingsFilePath() {
+		return settingsFilePath;
 	}
 	
 	/**
@@ -39,7 +42,7 @@ public class SettingsIniInterface {
 	 * @throws FileNotFoundException
 	 */
 	public void readSettingsFromFile() throws FileNotFoundException {
-		InputStreamReader is = new InputStreamReader(new FileInputStream(SETTINGS_FILE), StandardCharsets.UTF_8);
+		InputStreamReader is = new InputStreamReader(new FileInputStream(settingsFilePath), StandardCharsets.UTF_8);
 		BufferedReader br = new BufferedReader(is);
 		String line = "";
 		try {

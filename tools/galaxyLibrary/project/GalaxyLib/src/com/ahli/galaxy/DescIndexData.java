@@ -19,6 +19,7 @@ import com.ahli.mpq.MpqInterface;
 import javafx.util.Pair;
 
 /**
+ * Stores the Data of a Desc Index File.
  * 
  * @author Ahli
  *

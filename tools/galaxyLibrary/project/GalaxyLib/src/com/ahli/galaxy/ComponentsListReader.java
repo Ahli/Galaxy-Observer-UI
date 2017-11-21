@@ -15,6 +15,7 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 /**
+ * Reads the Components List file within the MPQ Archive.
  * 
  * @author Ahli
  *
