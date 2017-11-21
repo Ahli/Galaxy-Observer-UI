@@ -13,6 +13,12 @@
             </Frame>
         </Frame>
         
+        <Frame type="AspectRatioFrame" name="MutatorAspectRatio5x4">
+            <Anchor relative="$parent"/>
+            <MinVisibleAspectRatio val="1"/>
+            <MaxVisibleAspectRatio val="1.25"/>
+        </Frame>
+        
         <Frame type="ChatBar" name="ChatBar">
             
             <Animation name="CustomMutatorAnchoring">
@@ -31,6 +37,23 @@
                     <Key type="Curve" time="0" value="210" out="Fast"/>
                 </Controller>
             </Animation>
+            
+            <Animation name="CustomMutatorAnchoring5x4">
+                <Event event="CustomMutatorActive5x4" action="Reset,Play" frame="$parent"/>
+                <Event event="CustomMutatorInactive" action="Reset,Stop" frame="$parent"/>
+                 
+                <Controller type="Anchor" end="Pause" side="Left" relative="true">
+                    <Key type="Curve" time="0" value="-408" out="Fast"/>
+                </Controller>
+                
+                <Controller type="Anchor" end="Pause" side="Right" relative="true">
+                    <Key type="Curve" time="0" value="-80" out="Fast"/>
+                </Controller>
+                
+                <Controller type="Anchor" end="Pause" side="Bottom" relative="true">
+                    <Key type="Curve" time="0" value="170" out="Fast"/>
+                </Controller>
+            </Animation>
         </Frame>
 
         <StateGroup name="MutatorSelectionState">
@@ -40,12 +63,13 @@
                 <When type="AnimationState" MutatorSelectionState="Active"/>
                 <Action type="SetProperty" frame="$this/ChatBar/BackgroundImage" visible="False"/>
                 <Action type="SetProperty" frame="$this/ChatBar/RecipientImage" visible="False"/>
-                <Action type="SetProperty" frame="$this/ChatBar/RecipientLabel" visible="True"/>
+                <Action type="SetProperty" frame="$this/ChatBar/RecipientLabel" visible="true"/>
                 <Action type="SetProperty" frame="$this/ChatBar/HelpLabel" visible="False"/>
                 <Action type="SetProperty" frame="$this/ChatHelpLabel" alpha="0"/>
                 <Action type="SetProperty" frame="$this/MenuBar" alpha="0"/>
                 <Action type="SetProperty" frame="$this/MenuBar/MouseBlocker" visible="True"/>
-                <Action type="SendEvent" frame="$this" event="CustomMutatorActive"/>
+                <Action type="SetState" frame="$this/ChatBar" group="MutatorSelectionState" state="Active"/>
+                <Action type="SetState" frame="$this/EmoticonPanel" group="MutatorSelectionState" state="Active"/>
             </State>
             
             <State name="Inactive">
@@ -57,6 +81,28 @@
                 <Action type="SetProperty" frame="$this/ChatHelpLabel" alpha="255"/>
                 <Action type="SetProperty" frame="$this/MenuBar" alpha="255"/>
                 <Action type="SetProperty" frame="$this/MenuBar/MouseBlocker" visible="False"/>
+                <Action type="SetState" frame="$this/ChatBar" group="MutatorSelectionState" state="Inactive"/>
+                <Action type="SetState" frame="$this/EmoticonPanel" group="MutatorSelectionState" state="Inactive"/>
+            </State>
+        </StateGroup>
+
+        <StateGroup name="MutatorSelectionAndAspectRatioState">
+            <DefaultState val="Inactive"/>
+        
+            <State name="Active">
+                <When type="AnimationState" MutatorSelectionState="Active"/>
+                <When type="Property" frame="$this/MutatorAspectRatio5x4" Visible="false"/>
+                <Action type="SendEvent" frame="$this" event="CustomMutatorActive"/>
+            </State>
+        
+            <State name="Active5x4">
+                <When type="AnimationState" MutatorSelectionState="Active"/>
+                <When type="Property" frame="$this/MutatorAspectRatio5x4" Visible="true"/>
+                <Action type="SendEvent" frame="$this" event="CustomMutatorActive5x4"/>
+            </State>
+            
+            <State name="Inactive">
+                <When type="AnimationState" MutatorSelectionState="Inactive"/>
                 <Action type="SendEvent" frame="$this" event="CustomMutatorInactive"/>
             </State>
         </StateGroup>
@@ -91,56 +137,30 @@
             </Animation>
         </Frame>
         
-        <Frame type="Frame" name="BackgroundContainer">
-            <Anchor relative="$parent"/>
+        <Frame type="Frame" name="ExtendedExperienceBG" template="StandardExtendedExperienceTemplates/StandardSizeExtendedExperienceTemplate">
             
-            <Frame type="Image" name="BackgroundGlowLeft">
-                <Anchor side="Top" relative="$parent/Background" pos="Mid" offset="0"/>
-                <Anchor side="Bottom" relative="$parent/Background" pos="Mid" offset="0"/>
-                <Anchor side="Right" relative="$parent/Background" pos="Mid" offset="-140"/>
-                <Texture val="@UI/SC2_UI_Coop_CustomMutators_Background_SideGlow"/>
-            </Frame>
-            
-            <Frame type="Image" name="BackgroundGlowRight">
-                <Anchor side="Top" relative="$parent/Background" pos="Mid" offset="0"/>
-                <Anchor side="Bottom" relative="$parent/Background" pos="Mid" offset="0"/>
-                <Anchor side="Left" relative="$parent/Background" pos="Mid" offset="140"/>
-                <TextureCoords top="0" left="1" bottom="1" right="0"/>
-                <Texture val="@UI/SC2_UI_Coop_CustomMutators_Background_SideGlow"/>
-            </Frame>
-            
-            <Frame type="Image" name="Background">
+            <Frame type="Frame" name="AnchorFrame">
                 <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
                 <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
                 <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
                 <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
                 <Width val="1559"/>
                 <Height val="1072"/>
-                <TextureType val="NineSlice"/>
-                <Texture val="@UI/SC2_UI_Coop_CustomMutators_Background_Panel"/>
             </Frame>
             
-            <Frame type="Image" name="BackgroundGlowTop">
-                <Anchor side="Top" relative="$parent/Background" pos="Min" offset="5"/>
-                <Anchor side="Left" relative="$parent" pos="Mid" offset="1"/>
-                <Anchor side="Right" relative="$parent" pos="Mid" offset="1"/>
-                <Texture val="@UI/SC2_UI_Coop_CustomMutators_Background_TopGlow"/>
-            </Frame>
-            
-            <Frame type="Image" name="BackgroundGlowBottom">
-                <Anchor side="Bottom" relative="$parent/Background" pos="Max" offset="-5"/>
-                <Anchor side="Left" relative="$parent" pos="Mid" offset="1"/>
-                <Anchor side="Right" relative="$parent" pos="Mid" offset="1"/>
-                <TextureCoords top="1" left="0" bottom="0" right="1"/>
-                <Texture val="@UI/SC2_UI_Coop_CustomMutators_Background_TopGlow"/>
+            <Frame type="Frame" name="BackgroundContainer">
+                <Frame type="Image" name="Corner_TopRight">
+                    <Texture val="@UI/Glues_ExtendedXP_Scaleable_Background_Corner_Standard"/>
+                    <TextureCoords top="0" left="1" bottom="1" right="0"/>
+                </Frame>
             </Frame>
         </Frame>
 
         <Frame type="Frame" name="CustomMutatorMenuContainer">
-            <Anchor side="Top" relative="$parent/BackgroundContainer/Background" pos="Min" offset="0"/>
+            <Anchor side="Top" relative="$parent/ExtendedExperienceBG/AnchorFrame" pos="Min" offset="0"/>
             <Anchor side="Bottom" relative="$this/StartGameButton" pos="Max" offset="0"/>
-            <Anchor side="Left" relative="$parent/BackgroundContainer/Background" pos="Min" offset="0"/>
-            <Anchor side="Right" relative="$parent/BackgroundContainer/Background" pos="Max" offset="0"/>
+            <Anchor side="Left" relative="$parent/ExtendedExperienceBG/AnchorFrame" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent/ExtendedExperienceBG/AnchorFrame" pos="Max" offset="0"/>
 
             <Frame type="Label" name="Title">
                 <Anchor side="Top" relative="$parent" pos="Min" offset="44"/>

@@ -3,8 +3,680 @@
     <Constant name="EarnedRewardTileSpacing" val="-5"/>
     <Constant name="EarnedRewardTooltipHorizontalLeftPadding" val="12"/>
     <Constant name="EarnedRewardTooltipHorizontalRightPadding" val="-5"/>
-
     <Constant name="RenderPriorityScoreScreenTooltip" val="600"/>
+    <Constant name="QuestIneligibleColor" val="FF888888"/>
+
+    <!-- Glow VFX template for hero progress bar -->
+    <Frame type="Image" name="AddGlowOverride" template="StandardAnimationTemplates/AddGlowOverride">
+        <Frame type="Image" name="FillImage">
+            <Alpha val="{$ancestor[@type=ScoreScreenPointReward]/GlowValueProvider/@Alpha}"/>
+        </Frame>
+    </Frame>
+
+    <!-- Mastery icon for hero progress bar -->
+    <Frame type="Frame" name="MasteryIconFrameTemplate">
+        <Anchor relative="MasteryIcon"/>
+        <Visible val="False"/>
+        <Unclipped val="True"/>
+
+        <StateGroup name="IsUpgraded">
+            <DefaultState val="Default"/>
+            <State name="Default"/>
+            <State name="Upgraded">
+                <Action type="SetProperty" frame="MasteryIconRays" visible="True"/>
+                <Action type="SetProperty" frame="MasteryIconGlow" visible="True"/>
+                <Action type="SetProperty" frame="GlitterVfx" visible="True"/>
+            </State>
+        </StateGroup>
+
+        <StateGroup name="MasteryIconSize">
+            <DefaultState val="NormalSize"/>
+            <State name="NormalSize">
+                <Action type="SendEvent" frame="MasteryIcon" event="RefreshBaseValue"/>
+                <Action type="SendEvent" frame="ProgressBarFx" event="RefreshBaseValue"/>
+            </State>
+            <State name="SmallSize">
+                <Action type="SetProperty" frame="MasteryIcon" Height="106"/>
+                <Action type="SetProperty" frame="MasteryIcon" Width="106"/>
+                <Action type="SetProperty" frame="ProgressBarFx" Height="249"/>
+                <Action type="SetProperty" frame="ProgressBarFx" Width="249"/>
+                <Action type="SendEvent" frame="MasteryIcon" event="RefreshBaseValue"/>
+                <Action type="SendEvent" frame="ProgressBarFx" event="RefreshBaseValue"/>
+            </State>
+        </StateGroup>
+
+        <!-- Mastery Icon and VFX -->
+        <Frame type="Image" name="ProgressBarFx">
+            <Anchor relative="$ancestor[@type=ScoreScreenPointReward]/ProgressBar"/>
+            <Texture val="@UI/Storm_UI_Scorescreen_PlayerXP_BoostBar"/>
+            <Color val="AAAAAA"/>
+            <Visible val="False"/>
+
+            <Animation name="FadeOut">
+                <Event event="OnShown" action="Restart,Play"/>
+                <Event event="OnHidden" action="Stop"/>
+                <Event event="RefreshBaseValue" action="RefreshBaseValue"/>
+
+                <Controller type="Fade" end="Pause">
+                    <Key type="Curve" time="0.0" value="255" inout="Linear"/>
+                    <Key type="Curve" time="0.35" value="0" inout="Slow,Linear"/>
+                </Controller>
+                <Controller type="Visibility" end="Pause">
+                    <Key type="Bool" time="0.0" value="True"/>
+                    <Key type="Bool" time="0.35" value="False"/>
+                </Controller>
+                <Controller type="Dimension" dimension="Width" percentage="True" end="Pause" unclip="True">
+                    <Key type="Curve" time="0.0" value="100" inout="Linear"/>
+                    <Key type="Curve" time="0.35" value="110" inout="Slow,Linear"/>
+                </Controller>
+                <Controller type="Dimension" dimension="Height" percentage="True" end="Pause" unclip="True">
+                    <Key type="Curve" time="0.0" value="100" inout="Linear"/>
+                    <Key type="Curve" time="0.35" value="110" inout="Slow,Linear"/>
+                </Controller>
+            </Animation>
+        </Frame>
+
+        <Frame type="Image" name="MasteryIconRays">
+            <Anchor relative="$parent" offset="6"/>
+            <Texture val="Assets\Textures\Storm_UI_Master_Taunt_Effect_Flare.dds"/>
+            <BlendMode val="Add"/>
+            <Unclipped val="True"/>
+            <Visible val="False"/>
+
+            <Animation name="Rotation">
+                <Event event="OnShown" action="Restart,Play"/>
+            
+                <Controller type="Rotation" end="Loop">
+                    <Key type="Curve" time="0.0" value="0"/>
+                    <Key type="Curve" time="12.0" value="360"/>
+                </Controller>
+            </Animation>
+        </Frame>
+
+        <Frame type="Image" name="MasteryIconGlow">
+            <Anchor relative="$parent/MasteryIcon"/>
+            <Texture val="{TextureFormatter/@Text}"/>
+            <Visible val="False"/>
+
+            <Frame type="TextFormatFrame" name="TextureFormatter">
+                <Anchor relative="$parent"/>
+                <FormatText val="Assets\Textures\Storm_UI_Icon_Master_Taunt_%0%_Lrg_Bright.dds"/>
+                <Replacement val="{$ancestor[@type=PlayerRewardsPanel]/@MasteryIndex}" index="0"/>
+            </Frame>
+        </Frame>
+
+        <Frame type="Image" name="MasteryIcon">
+            <Texture val="{TextureFormatter/@Text}"/>
+            <Height val="154"/>
+            <Width val="154"/>
+
+            <Frame type="TextFormatFrame" name="TextureFormatter">
+                <Anchor relative="$parent"/>
+                <FormatText val="Assets\Textures\Storm_UI_Icon_Master_Taunt_%0%_Lrg.dds"/>
+                <Replacement val="{$ancestor[@type=PlayerRewardsPanel]/@MasteryIndex}" index="0"/>
+            </Frame>
+ 
+            <Animation name="FadeIn">
+                <Event event="HeroLevelUpIntroMasteryUpgrade" action="Reset,Play" frame="$ancestor[@type=ScoreScreenPointReward]"/>
+                <Event event="RefreshBaseValue" action="RefreshBaseValue"/>
+                <Controller type="State" frame="$parent" stateGroup="IsUpgraded" end="Pause">
+                    <Key type="Identifier" time="0" value="Upgraded"/>
+                </Controller>
+                <Controller type="Fade" end="Pause">
+                    <Key type="Curve" time="0" value="0" inout="Linear,Slow"/>
+                    <Key type="Curve" time="0.15" value="32" inout="Slow"/>
+                    <Key type="Curve" time="0.25" value="255" inout="Linear"/>
+                </Controller>
+                <Controller type="Dimension" dimension="Width" percentage="True" end="Pause" unclip="True">
+                    <Key type="Curve" time="0.0" value="350" inout="Linear,Slow"/>
+                    <Key type="Curve" time="0.25" value="100" inout="Linear"/>
+                </Controller>
+                <Controller type="Dimension" dimension="Height" percentage="True" end="Pause" unclip="True">
+                    <Key type="Curve" time="0.0" value="350" inout="Linear,Slow"/>
+                    <Key type="Curve" time="0.25" value="100" inout="Linear"/>
+                </Controller>
+                <Controller type="Visibility" end="Pause" frame="$parent/ProgressBarFx">
+                    <Key type="Bool" time="0" value="False"/>
+                    <Key type="Bool" time="0.25" value="True"/>
+                </Controller>
+            </Animation>
+
+            <Animation name="ResetAnim">
+                <Event event="OnShown" action="Reset,Play"/>
+                <Controller type="State" frame="$parent" stateGroup="IsUpgraded" end="Pause">
+                    <Key type="Identifier" time="0" value="Default"/>
+                </Controller>
+            </Animation>
+
+            <Animation name="ShakeAnimation" template="StandardAnimationTemplates/ShakeAnimation"/>
+        </Frame>
+
+        <!-- Glitter VFX -->
+        <Frame type="Frame" name="GlitterVfx">
+            <Anchor relative="$parent/MasteryIcon"/>
+            <Visible val="False"/>
+
+            <Frame type="Image" name="Sparkle1">
+                <Anchor side="Top" relative="$parent" pos="0.33" offset="0"/>
+                <Anchor side="Bottom" relative="$parent" pos="0.33" offset="0"/>
+                <Anchor side="Left" relative="$parent" pos="0.445" offset="0"/>
+                <Anchor side="Right" relative="$parent" pos="0.445" offset="0"/>
+                <Width val="85"/>
+                <ScaleHeightToTexture val="True"/>
+                <Texture val="@UI/Storm_UI_Scorescreen_Lens_Flare_Gold"/>
+                <BlendMode val="Add"/>
+            </Frame>
+            <Frame type="Image" name="Sparkle2" template="PlayerRewardsPanel/MasteryIconFrameTemplate/GlitterVfx/Sparkle1">
+                <Anchor side="Top" relative="$parent" pos="0.59" offset="0"/>
+                <Anchor side="Bottom" relative="$parent" pos="0.59" offset="0"/>
+                <Anchor side="Left" relative="$parent" pos="0.525" offset="0"/>
+                <Anchor side="Right" relative="$parent" pos="0.525" offset="0"/>
+            </Frame>
+            <Frame type="Image" name="Sparkle3" template="PlayerRewardsPanel/MasteryIconFrameTemplate/GlitterVfx/Sparkle1">
+                <Anchor side="Top" relative="$parent" pos="0.355" offset="0"/>
+                <Anchor side="Bottom" relative="$parent" pos="0.355" offset="0"/>
+                <Anchor side="Left" relative="$parent" pos="0.75" offset="0"/>
+                <Anchor side="Right" relative="$parent" pos="0.75" offset="0"/>
+            </Frame>
+            <Frame type="Image" name="Sparkle4" template="PlayerRewardsPanel/MasteryIconFrameTemplate/GlitterVfx/Sparkle1">
+                <Anchor side="Top" relative="$parent" pos="0.42" offset="0"/>
+                <Anchor side="Bottom" relative="$parent" pos="0.42" offset="0"/>
+                <Anchor side="Left" relative="$parent" pos="0.29" offset="0"/>
+                <Anchor side="Right" relative="$parent" pos="0.29" offset="0"/>
+            </Frame>
+            <Frame type="Image" name="Sparkle5" template="PlayerRewardsPanel/MasteryIconFrameTemplate/GlitterVfx/Sparkle1">
+                <Anchor side="Top" relative="$parent" pos="0.29" offset="0"/>
+                <Anchor side="Bottom" relative="$parent" pos="0.29" offset="0"/>
+                <Anchor side="Left" relative="$parent" pos="0.525" offset="0"/>
+                <Anchor side="Right" relative="$parent" pos="0.525" offset="0"/>
+            </Frame>
+            <Frame type="Image" name="Sparkle6" template="PlayerRewardsPanel/MasteryIconFrameTemplate/GlitterVfx/Sparkle1">
+                <Anchor side="Top" relative="$parent" pos="0.562" offset="0"/>
+                <Anchor side="Bottom" relative="$parent" pos="0.562" offset="0"/>
+                <Anchor side="Left" relative="$parent" pos="0.588" offset="0"/>
+                <Anchor side="Right" relative="$parent" pos="0.588" offset="0"/>
+            </Frame>
+
+            <Animation name="Translate">
+                <Event event="OnShown" action="Reset,Play"/>
+
+                <Controller type="Anchor" frame="Sparkle1" side="Left" relative="True" end="Loop">
+                    <Key type="Curve" time="0" value="-10"/>
+                    <Key type="Curve" time="0.2" value="-10"/>
+                    <Key type="Curve" time="1.7" value="10"/>
+                    <Key type="Curve" time="8.0" value="10"/>
+                </Controller>
+                <Controller type="Anchor" frame="Sparkle1" side="Right" relative="True" end="Loop">
+                    <Key type="Curve" time="0" value="-10"/>
+                    <Key type="Curve" time="0.2" value="-10"/>
+                    <Key type="Curve" time="1.7" value="10"/>
+                    <Key type="Curve" time="8.0" value="10"/>
+                </Controller>
+                <Controller type="Anchor" frame="Sparkle1" side="Top" relative="True" end="Loop">
+                    <Key type="Curve" time="0" value="7"/>
+                    <Key type="Curve" time="0.2" value="7"/>
+                    <Key type="Curve" time="1.7" value="-7"/>
+                    <Key type="Curve" time="8.0" value="-7"/>
+                </Controller>
+                <Controller type="Anchor" frame="Sparkle1" side="Bottom" relative="True" end="Loop">
+                    <Key type="Curve" time="0" value="7"/>
+                    <Key type="Curve" time="0.2" value="7"/>
+                    <Key type="Curve" time="1.7" value="-7"/>
+                    <Key type="Curve" time="8.0" value="-7"/>
+                </Controller>
+
+                <Controller type="Anchor" frame="Sparkle6" side="Left" relative="True" end="Loop">
+                    <Key type="Curve" time="0" value="-10"/>
+                    <Key type="Curve" time="5.3" value="-10"/>
+                    <Key type="Curve" time="6.8" value="10"/>
+                    <Key type="Curve" time="8.0" value="10"/>
+                </Controller>
+                <Controller type="Anchor" frame="Sparkle6" side="Right" relative="True" end="Loop">
+                    <Key type="Curve" time="0" value="-10"/>
+                    <Key type="Curve" time="5.3" value="-10"/>
+                    <Key type="Curve" time="6.8" value="10"/>
+                    <Key type="Curve" time="8.0" value="10"/>
+                </Controller>
+                <Controller type="Anchor" frame="Sparkle6" side="Top" relative="True" end="Loop">
+                    <Key type="Curve" time="0" value="6"/>
+                    <Key type="Curve" time="5.3" value="6"/>
+                    <Key type="Curve" time="6.8" value="-6"/>
+                    <Key type="Curve" time="8.0" value="-6"/>
+                </Controller>
+                <Controller type="Anchor" frame="Sparkle6" side="Bottom" relative="True" end="Loop">
+                    <Key type="Curve" time="0" value="6"/>
+                    <Key type="Curve" time="5.3" value="6"/>
+                    <Key type="Curve" time="6.8" value="-6"/>
+                    <Key type="Curve" time="8.0" value="-6"/>
+                </Controller>
+            </Animation>
+
+            <Animation name="Blink">
+                <Event event="OnShown" action="Reset,Play"/>
+                <Controller type="Fade" frame="Sparkle1" end="Loop">
+                    <Key type="Curve" time="0" value="0"/>
+                    <Key type="Curve" time="0.2" value="255"/>
+                    <Key type="Curve" time="1.1" value="255"/>
+                    <Key type="Curve" time="1.7" value="0"/>
+                    <Key type="Curve" time="8.0" value="0"/>
+                </Controller>
+                <Controller type="Fade" frame="Sparkle2" end="Loop">
+                    <Key type="Curve" time="0" value="0"/>
+                    <Key type="Curve" time="1.7" value="0"/>
+                    <Key type="Curve" time="2.1" value="255"/>
+                    <Key type="Curve" time="2.5" value="0"/>
+                    <Key type="Curve" time="8.0" value="0"/>
+                </Controller>
+                <Controller type="Fade" frame="Sparkle3" end="Loop">
+                    <Key type="Curve" time="0" value="0"/>
+                    <Key type="Curve" time="2.3" value="0"/>
+                    <Key type="Curve" time="2.7" value="255"/>
+                    <Key type="Curve" time="3.1" value="0"/>
+                    <Key type="Curve" time="8.0" value="0"/>
+                </Controller>
+                <Controller type="Fade" frame="Sparkle4" end="Loop">
+                    <Key type="Curve" time="0" value="0"/>
+                    <Key type="Curve" time="2.9" value="0"/>
+                    <Key type="Curve" time="3.3" value="255"/>
+                    <Key type="Curve" time="3.7" value="0"/>
+                    <Key type="Curve" time="8.0" value="0"/>
+                </Controller>
+                <Controller type="Fade" frame="Sparkle5" end="Loop">
+                    <Key type="Curve" time="0" value="0"/>
+                    <Key type="Curve" time="4.4" value="0"/>
+                    <Key type="Curve" time="4.8" value="255"/>
+                    <Key type="Curve" time="5.2" value="0"/>
+                    <Key type="Curve" time="8.0" value="0"/>
+                </Controller>
+                <Controller type="Fade" frame="Sparkle6" end="Loop">
+                    <Key type="Curve" time="0" value="0"/>
+                    <Key type="Curve" time="5.1" value="0"/>
+                    <Key type="Curve" time="5.3" value="255"/>
+                    <Key type="Curve" time="6.2" value="255"/>
+                    <Key type="Curve" time="6.8" value="0"/>
+                    <Key type="Curve" time="8.0" value="0"/>
+                </Controller>
+            </Animation>
+        </Frame>
+    </Frame>
+
+    <Frame type="ScoreScreenPointReward" name="RoundScoreFrameTemplate">
+        <Width val="130"/>
+        <Height val="130"/>
+        <AcceptsMouseTooltip val="true"/>
+        <TooltipAnchorPosition val="BottomCenter"/>
+
+        <!-- Intro Animation sets this -->
+        <Alpha val="0"/>
+        
+        <HookupAlias original="LevelLabel" alias="HeroContainerFrame/HeroLevelLabel"/>
+        <HookupAlias original="BoostProgressBar" alias="HeroContainerFrame/HeroExperienceBar"/>
+
+        <StateGroup name="ShowLevelUpAnimation">
+            <State name="ShowLevelUpAnimation">
+                <When type="AnimationState" LevelUpAnimation="NotSuppressed"/>
+                <Action type="SetProperty" frame="LevelUpArrow" visible="true"/>
+                <Action type="SetProperty" frame="Flare" visible="true"/>
+            </State>
+        </StateGroup>
+
+        <Frame type="Image" name="LevelUpArrow">
+            <Anchor side="Bottom" relative="$parent/HeroContainerFrame" pos="Max" offset="-5"/>
+            <Anchor side="Left" relative="$parent/HeroContainerFrame" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent/HeroContainerFrame" pos="Mid" offset="0"/>
+            <Texture val="@UI/Storm_UI_Scorescreen_Brawl_Level_Up_Arrow"/>
+            <Unclipped val="true"/>
+            <Alpha val="0"/>
+            <Visible val="false"/>
+        </Frame>
+
+        <Frame type="Image" name="Flare">
+            <Anchor side="Top" relative="$parent/LevelUpArrow" pos="Mid" offset="-12"/>
+            <Anchor side="Bottom" relative="$parent/LevelUpArrow" pos="Mid" offset="-12"/>
+            <Anchor side="Left" relative="$parent/LevelUpArrow" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent/LevelUpArrow" pos="Mid" offset="0"/>
+            <Texture val="@UI/Storm_UI_Centered_Lens_Flare"/>
+            <RenderPriority val="513"/>
+            <BlendMode val="Add"/>
+            <Unclipped val="True"/>
+            <Alpha val="0"/>
+            <Visible val="false"/>
+        </Frame>
+
+        <Frame type="Image" name="SelectedBackgroundImage">
+            <Anchor side="Top" relative="$parent/HeroContainerFrame" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent/HeroContainerFrame" pos="Mid" offset="0"/>
+            <Anchor side="Left" relative="$parent/HeroContainerFrame" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent/HeroContainerFrame" pos="Mid" offset="0"/>
+
+            <Texture val="@UI/Storm_UI_Play_HeroPortrait_Selected"/>
+            <Width val="130"/>
+            <Height val="130"/>
+            <BlendMode val="Add"/>
+            <SubpixelRendering val="True"/>
+            <Unclipped val="true"/>
+
+            <Animation name="OnShown" template="HeroSelectTileList/SelectedBackgroundImageSecondaryOnShownTemplate"/>
+            <Visible val="false"/>
+        </Frame>
+
+        <Frame type="Image" name="SelectedBackgroundImage2" template="PlayerRewardsPanel/RoundScoreFrameTemplate/SelectedBackgroundImage">
+            <TextureCoords top="1" left="1" bottom="0" right="0"/>
+            <Unclipped val="true"/>
+        </Frame>
+
+        <Frame type="HeroContainerFrame" name="HeroContainerFrame" template="HeroStandardTemplate/HeroItemBaseTemplate">
+            <Hero val="{$ancestor[@type=PlayerRewardsPanel]/@Hero[0]}"/>
+
+            <!-- Width, Height: 130 - 32*2 = 66 -->
+            <Anchor relative="$parent" offset="-32"/>
+
+            <Frame type="HeroLabel" name="HeroLevelLabel">
+                <ScaleText val="True"/>
+            </Frame>
+
+            <Animation name="HeroLabelScale">
+                <Event event="OnShown" action="Play"/>
+                <Controller type="Dimension" frame="HeroLevelLabel" dimension="Height" relative="False" percentage="True" end="Pause" >
+                    <Key type="Curve" time="0" value="80" inout="Linear,Smooth"/>
+                </Controller>
+                <Controller type="Dimension" frame="HeroLevelLabel" dimension="Width" relative="False" percentage="True" end="Pause" >
+                    <Key type="Curve" time="0" value="80" inout="Linear,Smooth"/>
+                </Controller>
+            </Animation>
+        </Frame>
+
+        <Frame type="Image" name="SelectedImage">
+            <Anchor relative="$parent/HeroContainerFrame" />
+            <SubpixelRendering val="True"/>
+            <Texture val="@UI/Storm_UI_Play_HeroPortrait_ProgressBar_Selected_Gold"/>
+            <Visible val="false"/>
+        </Frame>
+
+        <Frame type="Image" name="HoverImage">
+            <RenderPriority val="520"/>
+            <Anchor relative="$parent/HeroContainerFrame" />
+            <SubpixelRendering val="True"/>
+            <Texture val="@UI/Storm_UI_Play_HeroPortrait_ProgressBar_Hover_On"/>
+            <Alpha val="0"/>
+            
+            <Animation name="Hover">
+                <Event event="OnMouseEnter" action="DirectionForward,Play" frame="$parent"/>
+                <Event event="OnMouseExit" action="DirectionReverse,Play" frame="$parent"/>
+                <Controller type="Fade" end="Pause">
+                    <Key type="Curve" time="0" value="0" inout="Linear,Slow"/>
+                    <Key type="Curve" time=".1" value="255" inout="Slow,Linear"/>
+                </Controller>
+            </Animation>
+        </Frame>
+
+        <Animation name="Intro">
+            <Event event="Intro" action="Play"/>
+            <Event event="OnHidden" action="Reset"/>
+            <Controller type="Anchor" end="Pause" side="Top" relative="true">
+                <Key type="Curve" time="0" value="30" inout="Linear"/>
+                <Key type="Curve" time=".5" value="0" inout="Slow,Linear"/>
+            </Controller>
+            <Controller type="Fade" end="Pause">
+                <Key type="Curve" time="0" value="0" inout="Linear,Slow"/>
+                <Key type="Curve" time=".5" value="255" inout="Slow,Linear"/>
+            </Controller>
+        </Animation>
+
+        <!-- HERO SCORE FRAME ANIMATION -->
+        <Animation name="LevelUpTransition">
+            <Event event="LevelUp" action="Reset,Play"/>
+            <Event event="ShowIntro" action="Stop" frame="$ancestor[@type=PlayerRewardsPanel]"/>
+
+            <Controller type="Sound" end="Stop">
+                <Key type="Sound" time="0.01" sound="@UI_BNet_Progression_Levelup02"/>
+            </Controller>
+            <Controller type="Event" end="Pause">
+                <Key type="Event" time="0.0" event="Complete"/>
+            </Controller>
+            <Controller type="Fade" end="Pause" frame="LevelUpArrow">
+                <Key type="Curve" time="0" value="0" inout="Linear"/>
+                <Key type="Curve" time=".5" value="255" inout="Slow,Linear"/>
+            </Controller>
+            <Controller type="Anchor" end="Pause" side="Bottom" relative="true" frame="LevelUpArrow">
+                <Key type="Curve" time="0" value="0" inout="Linear"/>
+                <Key type="Curve" time=".5" value="-30" inout="Slow"/>
+            </Controller>
+            <Controller type="Fade" end="Pause" frame="Flare">
+                <Key type="Curve" time="0.0" value="0"/>
+                <Key type="Curve" time="0.5" value="192" inout="Linear,Smooth"/>
+                <Key type="Curve" time="1.0" value="0" inout="Linear"/>
+            </Controller>
+            <Controller type="Dimension" frame="Flare" dimension="Width" relative="False" percentage="True" end="Pause" >
+                <Key type="Curve" time="0" value="200" inout="Linear,Smooth"/>
+                <Key type="Curve" time="1.0" value="0"/>
+            </Controller>
+            <Controller type="Dimension" frame="Flare" dimension="Height" relative="False" percentage="True" end="Pause" >
+                <Key type="Curve" time="0" value="200" inout="Linear,Smooth"/>
+                <Key type="Curve" time="1.0" value="0"/>
+            </Controller>
+        </Animation>
+
+        <!-- "LevelUpIntro" Animation Name is referenced from the code -->
+        <Animation name="LevelUpIntro">
+            <Event event="HeroLevelUpIntro" action="Reset,Play"/>
+
+            <Controller type="Event" end="Pause">
+                <Key type="Event" time="0.55" event="IntroComplete"/>
+            </Controller>
+        </Animation>
+
+        <!-- For small round frames, do not show mastery animation -->
+        <Animation name="HeroLevelUpIntroMasteryUpgrade">
+            <Event event="HeroLevelUpIntroMasteryUpgrade" action="Reset,Play"/>
+
+            <Controller type="Event" end="Pause">
+                <Key type="Event" time="0.55" event="IntroComplete"/>
+            </Controller>
+        </Animation>
+
+        <!-- For small round frames, do not show mastery animation -->
+        <Animation name="LevelUpMasteryUpgrade">
+            <Event event="LevelUpMasteryUpgrade" action="Reset,Play"/>
+            <Event event="HeroLevelUpIntroMasteryUpgrade" action="Stop"/>
+            <Event event="OnShown" action="Stop"/>
+            <Event event="OnHidden" action="Stop"/>
+
+            <Controller type="Event" end="Pause">
+                <Key type="Event" time="0.0" event="Complete"/>
+            </Controller>
+        </Animation>
+
+        <Frame type="ProgressBar" name="ProgressBar">
+            <Anchor relative="$parent"/>
+            <Visible val="false"/>
+        </Frame>
+
+        <Frame type="Label" name="NameLabel">
+            <Anchor relative="$parent"/>
+            <Visible val="false"/>
+        </Frame>
+
+        <Animation name="Click">
+            <Event event="Selected" action="Restart,Play"/>
+            <Controller type="Sound" end="Pause">
+                <Key type="Sound" time="0.0" sound="@UI_BNet_HeroChoose"/>
+            </Controller>
+        </Animation>
+
+        <!--============================================================================
+        <! STATEGROUP
+        <!===========================================================================-->
+        <StateGroup name="Selected">
+            <State name="Selected">
+                <When type="AnimationState" Selected="Selected"/>
+                <Action type="SetProperty" frame="SelectedImage" visible="true"/>
+                <Action type="SetProperty" frame="SelectedBackgroundImage" visible="true"/>
+                <Action type="SetProperty" frame="SelectedBackgroundImage2" visible="true"/>
+            </State>
+        </StateGroup>
+
+        <StateGroup name="HeroStates">
+            <DefaultState val="Normal"/>
+
+            <State name="Max">
+                <When type="AnimationState" frame="$this" Theme="ThemeMaxLevel"/>
+                <Action type="SetProperty" frame="HoverImage" texture="@UI/Storm_UI_Play_HeroPortrait_ProgressBar_Hover_Gold"/>
+                <Action type="ApplyTemplate" frame="HeroContainerFrame" template="HeroStandardTemplate/HeroItemAllowedMaxTemplate"/>
+                <Action type="SetProperty" frame="SelectedImage" texture="@UI/Storm_UI_Play_HeroPortrait_ProgressBar_Selected_Gold"/>
+                <Action type="SetProperty" frame="SelectedBackgroundImage" texture="@UI/Storm_UI_Play_HeroPortrait_Selected_Gold"/>
+                <Action type="SetProperty" frame="SelectedBackgroundImage2" texture="@UI/Storm_UI_Play_HeroPortrait_Selected_Gold"/>
+                <Action type="SetProperty" frame="LevelUpArrow" ColorAdjustMode="Colorize"/>
+                <Action type="SetProperty" frame="LevelUpArrow" AdjustmentColor="fed600"/>
+            </State>
+
+            <State name="Gold">
+                <When type="AnimationState" frame="$this" Theme="ThemeGold"/>
+                <Action type="SetProperty" frame="HoverImage" texture="@UI/Storm_UI_Play_HeroPortrait_ProgressBar_Hover_Gold"/>
+                <Action type="ApplyTemplate" frame="HeroContainerFrame" template="HeroStandardTemplate/HeroItemAllowedGoldTemplate"/>
+                <Action type="SetProperty" frame="SelectedImage" texture="@UI/Storm_UI_Play_HeroPortrait_ProgressBar_Selected_Gold"/>
+                <Action type="SetProperty" frame="SelectedBackgroundImage" texture="@UI/Storm_UI_Play_HeroPortrait_Selected_Gold"/>
+                <Action type="SetProperty" frame="SelectedBackgroundImage2" texture="@UI/Storm_UI_Play_HeroPortrait_Selected_Gold"/>
+                <Action type="SetProperty" frame="LevelUpArrow" ColorAdjustMode="Colorize"/>
+                <Action type="SetProperty" frame="LevelUpArrow" AdjustmentColor="fed600"/>
+            </State>
+
+            <State name="Normal">
+                <Action type="SetProperty" frame="HoverImage" texture="@UI/Storm_UI_Play_HeroPortrait_ProgressBar_Hover_On"/>
+                <Action type="ApplyTemplate" frame="HeroContainerFrame" template="HeroStandardTemplate/HeroItemAllowedTemplate"/>
+                <Action type="SetProperty" frame="SelectedImage" texture="@UI/Storm_UI_Play_HeroPortrait_ProgressBar_Selected_On"/>
+            </State>
+        </StateGroup>
+
+        <Frame type="Frame" name="HitTestFrame">
+            <Anchor side="Top" relative="$parent/HeroContainerFrame" pos="Min" offset="0"/>
+            <!-- Have some padding for tooltip  -->
+            <Anchor side="Bottom" relative="$parent/HeroContainerFrame" pos="Max" offset="10"/>
+            <Anchor side="Left" relative="$parent/HeroContainerFrame" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent/HeroContainerFrame" pos="Max" offset="0"/>
+            <TooltipAnchorPosition val="BottomCenter"/>
+        </Frame>
+    </Frame>
+
+    <Frame type="RewardTooltip" name="ProgressionRewardTooltipTemplate" template="StandardTooltip/StandardTooltip">
+        <MinWidth val="360"/>
+
+        <Frame type="Label" name="NameLabel">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="20"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="26"/>
+            <CollapseLayout val="true"/>
+            <Style val="QuestTooltipTitle"/>
+            <Options val="Ellipsis | NoWrapping"/>
+
+            <StateGroup name="RewardType">
+                <State name="Hero">
+                    <When type="Property" frame="$parent" rewardSourceType="ProgressionHeroRank"/>
+                    <Action type="SetProperty" text="@UI/RewardMap/HeroProgression"/>
+                </State>
+                <State name="Player">
+                    <When type="Property" frame="$parent" rewardSourceType="ProgressionPlayerRank"/>
+                    <Action type="SetProperty" text="@UI/RewardMap/AccountProgression"/>
+                </State>
+            </StateGroup>
+        </Frame>
+
+        <Frame type="Label" name="DescriptionLabel">
+            <Anchor side="Top" relative="$parent/NameLabel" pos="Max" offset="8"/>
+            <Anchor side="Left" relative="$parent/NameLabel" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="-10"/>
+            <CollapseLayout val="true"/>
+            <Style val="QuestTooltipText" />
+            <Text val="{DescriptionText/@Text}"/>
+
+            <Frame type="TextFormatFrame" name="DescriptionText">
+                <Anchor relative="$parent"/>
+                <Replacement val="{$parent/$parent/@RewardAwardLevel}" index="0"/>
+            </Frame>
+
+            <StateGroup name="RewardType">
+                <State name="Hero">
+                    <When type="Property" frame="$parent" rewardSourceType="ProgressionHeroRank"/>
+                    <Action type="SetProperty" frame="DescriptionText" formatText="@UI/RewardMap/RewardHeroLevelRequirementText"/>
+                </State>
+                <State name="Player">
+                    <When type="Property" frame="$parent" rewardSourceType="ProgressionPlayerRank"/>
+                    <Action type="SetProperty" frame="DescriptionText" formatText="@UI/RewardMap/RewardAccountLevelRequirementText"/>
+                </State>
+            </StateGroup>
+        </Frame>
+
+        <Frame type="Image" name="BorderImage" template="StandardTemplates/HBorderImageTemplate">
+            <Anchor side="Top" relative="$parent/DescriptionLabel" pos="Max" offset="10"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="4"/>
+            <Anchor side="Right" relative="$parent/TopBorder" pos="Max" offset="-4"/>
+            <OnDisableDesaturationColor val="#QuestIneligibleColor"/>
+        </Frame>
+
+        <Frame type="Label" name="RewardHeaderLabel">
+            <Anchor side="Top" relative="$parent/BorderImage" pos="Max" offset="10"/>
+            <Anchor side="Left" relative="$parent/NameLabel" pos="Min" offset="0"/>
+            <CollapseLayout val="true"/>
+            <Style val="QuestTooltipRewardHeader"/>
+            <Text val="@UI/ScoreScreen/TotalRewards"/>
+        </Frame>
+
+        <Frame type="Label" name="RewardLabel">
+            <Anchor side="Top" relative="$parent/RewardHeaderLabel" pos="Max" offset="0"/>
+            <Anchor side="Left" relative="$parent/NameLabel" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent/TopBorder" pos="Max" offset="-5"/>
+            <CollapseLayout val="true"/>
+            <Style val="QuestTooltipText"/>
+
+            <Text val="{$ancestor[@type=RewardTooltip]/@RewardNames}"/>
+        </Frame>
+
+        <Frame type="Frame" name="AnchorFrame">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Bottom" relative="$parent/RewardLabel" pos="Max" offset="25"/>
+            <Anchor side="Left" relative="$parent/NameLabel" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent/NameLabel" pos="Max" offset="0"/>
+        </Frame>
+    </Frame>
+
+    <Animation name="EnlargeTextAnimTemplate">
+        <Event event="EnlargeText" action="Restart,Play"/>
+
+        <Controller type="Dimension" dimension="Width" relative="False" percentage="True" end="Pause" >
+            <Key type="Curve" time="0" value="100" inout="linear,Linear"/>
+            <Key type="Curve" time=".02" value="130" inout="Slow"/>
+            <Key type="Curve" time=".20" value="100"  inout="Linear"/>
+        </Controller>
+        <Controller type="Dimension" dimension="Height" relative="False" percentage="True" end="Pause" >
+            <Key type="Curve" time="0" value="100" inout="linear,Linear"/>
+            <Key type="Curve" time=".02" value="130" inout="Slow"/>
+            <Key type="Curve" time=".20" value="100"  inout="Linear"/>
+        </Controller>
+    </Animation>
+
+    <Frame type="Image" name="BrightnessTemplate">
+        <Frame type="Image" name="FillImage">
+            <Anchor relative="$parent"/>
+            <ColorAdjustMode val="Colorize"/>
+            <AdjustmentColor val="150,255,255,255"/>
+            <Alpha val="0"/>
+            <BlendMode val="Add"/>
+            <Blur val="false"/>
+            <Texture val="{$parent/@Texture}"/>
+        </Frame>
+
+        <Animation name="BrightnessAnimation">
+
+            <Controller type="Fade" end="Pause" frame="FillImage">
+                <Key type="Curve" time="0.0" value="#RankBadgeBrightnessFadeKey03"/>
+                <Key type="Curve" time="0.25" value="#RankBadgeBrightnessFadeKey01" inout="Smooth,Linear"/>
+            </Controller>
+
+            <Controller type="Fade" end="Pause">
+                <Key type="Curve" time="0.0" value="#RankBadgeBrightnessFadeKey03"/>
+                <Key type="Curve" time="0.25" value="#RankBadgeBrightnessFadeKey01" inout="Smooth,Linear"/>
+            </Controller>
+        </Animation>
+    </Frame>
 
     <!--=======================================================================================
     <! Promotion / Demotion Explanation Tooltip
@@ -67,7 +739,7 @@
     </Frame>
 
     <!--===========================================================================================
-    <! TOOLTIP TEMPLATES 
+    <! TOOLTIP TEMPLATES
     <!==========================================================================================-->
     <Frame type="RewardBreakdownItem" name="ToolTipItemTemplate">
         <Height val="20"/>
@@ -226,23 +898,21 @@
         </Frame>
 
         <Animation name="Show">
-            <Event event="OnMouseEnter" action="DirectionForward"/>
-            <Event event="OnMouseEnter" action="Play"/>
-            <Event event="OnMouseExit" action="DirectionReverse"/>
-            <Event event="OnMouseExit" action="Play"/>
+            <Event event="OnMouseEnter" action="DirectionForward,Play"/>
+            <Event event="OnMouseExit" action="DirectionReverse,Play"/>
             <Controller type="Visibility" end="Pause" frame="EarnedToolTipFrame">
                 <Key type="Bool" time="0" value="false"/>
                 <Key type="Bool" time=".01" value="true"/>
             </Controller>
             <Controller type="Fade" end="Pause" frame="EarnedToolTipFrame">
-                <Key type="Curve" time="0" value="0" out="Slow"/>
-                <Key type="Curve" time=".2" value="255" in="Auto"/>
+                <Key type="Curve" time="0" value="0" inout="Linear,Slow"/>
+                <Key type="Curve" time=".2" value="255" inout="Auto,Linear"/>
             </Controller>
          </Animation>
     </Frame>
         
     <!--===========================================================================================
-    <! SCOREREWARD TILELIST TEMPLATES 
+    <! SCOREREWARD TILELIST TEMPLATES
     <!==========================================================================================-->
     <Frame type="RewardTileListItem" name="HeroRewardItemTemplate">
         <Height val="65"/>
@@ -252,19 +922,17 @@
             <Anchor relative="$parent"/>
         </Frame>
 
-        <Animation name="RankLayout">
-            <Event event="RankedGame" action="DirectionForward" frame="$parent/$parent"/>
-            <Event event="RankedGame" action="Play" frame="$parent/$parent"/>
-            <Event event="NonRankedGame" action="DirectionReverse" frame="$parent/$parent"/>
-            <Event event="NonRankedGame" action="Play" frame="$parent/$parent"/>
+        <Animation name="ScoreLayout">
+            <Event event="LayoutThreeScores" action="DirectionForward,Play" frame="$parent"/>
+            <Event event="LayoutTwoScores" action="DirectionReverse,Play" frame="$parent"/>
             
             <Controller type="Dimension" dimension="Width" relative="False" percentage="False" end="Pause" >
-                <Key type="Curve" time="0" value="90" out="Step"/>
-                <Key type="Curve" time=".01" value="65" in="Step"/>
+                <Key type="Curve" time="0" value="90" inout="Linear,Step"/>
+                <Key type="Curve" time=".01" value="65" inout="Step,Linear"/>
             </Controller>
             <Controller type="Dimension" dimension="Height" relative="False" percentage="False" end="Pause">
-                <Key type="Curve" time="0" value="90" out="Step"/>
-                <Key type="Curve" time=".01" value="65" in="Step"/>
+                <Key type="Curve" time="0" value="90" inout="Linear,Step"/>
+                <Key type="Curve" time=".01" value="65" inout="Step,Linear"/>
             </Controller>
         </Animation>
     </Frame>
@@ -280,55 +948,50 @@
         <Frame type="Image" name="BoostGlowImage">
             <Anchor side="Top" relative="$parent" pos="Min" offset="2"/>
             <Anchor side="Bottom" relative="$parent" pos="Max" offset="2"/>
-            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/> 
+            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
             <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
             <Texture val="@UI/Storm_Draft_Portrait_BackgroundTiles_Glow"/>
             <Color val="0,204,255"/>
             <Visible val="false"/>
             
             <Animation name="AmountStyleXPBoost">
-                <Event event="ScoreRewardXPBoost" action="Reset" frame="$parent/AmountLabel"/>
-                <Event event="ScoreRewardXPBoost" action="Play" frame="$parent/AmountLabel"/>
+                <Event event="ScoreRewardXPBoost" action="Reset,Play" frame="$parent/AmountLabel"/>
                 <Controller type="Visibility" end="Pause">
                     <Key type="Bool" time="0.00" value="true"/>
                 </Controller>
                 
                 <Controller type="Color" end="Pause">
-                    <Key type="Curve" time="0.00" value="0,204,255" out="Auto"/>
+                    <Key type="Curve" time="0.00" value="0,204,255" inout="Linear,Auto"/>
                 </Controller>
             </Animation>
             
             <Animation name="AmountStyleGoldBoost">
-                <Event event="ScoreRewardGoldBoost" action="Reset" frame="$parent/AmountLabel"/>
-                <Event event="ScoreRewardGoldBoost" action="Play" frame="$parent/AmountLabel"/>
+                <Event event="ScoreRewardGoldBoost" action="Reset,Play" frame="$parent/AmountLabel"/>
                 <Controller type="Visibility" end="Pause">
                     <Key type="Bool" time="0.00" value="true"/>
                 </Controller>
                 
                 <Controller type="Color" end="Pause">
-                    <Key type="Curve" time="0.00" value="255,198,0" out="Auto"/>
+                    <Key type="Curve" time="0.00" value="255,198,0" inout="Linear,Auto"/>
                 </Controller>
             </Animation>
             
             <Animation name="AmountStyleGold">
-                <Event event="ScoreRewardGoldAmount" action="Reset" frame="$parent/AmountLabel"/>
-                <Event event="ScoreRewardGoldAmount" action="Play" frame="$parent/AmountLabel"/>
+                <Event event="ScoreRewardGoldAmount" action="Reset,Play" frame="$parent/AmountLabel"/>
                 <Controller type="Visibility" end="Pause">
                     <Key type="Bool" time="0.00" value="false"/>
                 </Controller>
             </Animation>
             
             <Animation name="AmountStyleXP">
-                <Event event="ScoreRewardXPAmount" action="Reset" frame="$parent/AmountLabel"/>
-                <Event event="ScoreRewardXPAmount" action="Play" frame="$parent/AmountLabel"/>
+                <Event event="ScoreRewardXPAmount" action="Reset,Play" frame="$parent/AmountLabel"/>
                 <Controller type="Visibility" end="Pause">
                     <Key type="Bool" time="0.00" value="false"/>
                 </Controller>
             </Animation>
             
             <Animation name="AmountStyleUnlock">
-                <Event event="ScoreRewardUnlockDescription" action="Reset" frame="$parent/AmountLabel"/>
-                <Event event="ScoreRewardUnlockDescription" action="Play" frame="$parent/AmountLabel"/>
+                <Event event="ScoreRewardUnlockDescription" action="Reset,Play" frame="$parent/AmountLabel"/>
                 <Controller type="Visibility" end="Pause">
                     <Key type="Bool" time="0.00" value="false"/>
                 </Controller>
@@ -338,71 +1001,65 @@
         <Frame type="CountdownLabel" name="AmountLabel">
             <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
             <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
-            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/> 
+            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
             <Anchor side="Right" relative="$parent" pos="Mid" offset="-120"/>
             <Style val="ScoreRewardItemXPAmount"/>
             <FormatNumber val="true"/>
             <Visible val="False"/>
             
             <Animation name="ShowLabel">
-                <Event event="OnShown" action="Reset"/>
-                <Event event="OnShown" action="Play"/>
+                <Event event="OnShown" action="Reset,Play"/>
                 <Controller type="Fade" end="Pause">
-                    <Key type="Curve" time="0.0" value="0" out="Auto"/>
-                    <Key type="Curve" time="0.2" value="255" in="Auto"/>
+                    <Key type="Curve" time="0.0" value="0" inout="Linear,Auto"/>
+                    <Key type="Curve" time="0.2" value="255" inout="Auto,Linear"/>
                 </Controller>
             </Animation>
             
             <Animation name="InstantUp">
                 <Controller type="Counter" end="Pause">
-                    <Key type="Curve" time="0.0" value="1.0" out="Step"/>
+                    <Key type="Curve" time="0.0" value="1.0" inout="Linear,Step"/>
                 </Controller>
             </Animation>
             
             <Animation name="CountUp">
                 <Controller type="Counter" end="Pause">
-                    <Key type="Curve" time="0.0" value="0.0" out="Slow"/>
-                    <Key type="Curve" time="1.0" value="1.0" in="Slow"/>
+                    <Key type="Curve" time="0.0" value="0.0" inout="Linear,Slow"/>
+                    <Key type="Curve" time="1.0" value="1.0" inout="Slow,Linear"/>
                 </Controller>
             </Animation>
             
             <Animation name="AmountStyleXPBoost">
-                <Event event="ScoreRewardXPBoost" action="Reset"/>
-                <Event event="ScoreRewardXPBoost" action="Play"/>
+                <Event event="ScoreRewardXPBoost" action="Reset,Play"/>
                 <Controller type="Style" end="Pause" style1="ScoreRewardItemXPAmount" style2="ScoreRewardItemXPAmount">
-                    <Key type="Curve" time="0.00" value="1.0" out="Auto"/>
+                    <Key type="Curve" time="0.00" value="1.0" inout="Linear,Auto"/>
                 </Controller>
             </Animation>
             
             <Animation name="AmountStyleGoldBoost">
-                <Event event="ScoreRewardGoldBoost" action="Reset"/>
-                <Event event="ScoreRewardGoldBoost" action="Play"/>
+                <Event event="ScoreRewardGoldBoost" action="Reset,Play"/>
                 <Controller type="Style" end="Pause" style1="ScoreRewardItemGoldAmount" style2="ScoreRewardItemGoldAmount">
-                    <Key type="Curve" time="0.00" value="1.0" out="Auto"/>
+                    <Key type="Curve" time="0.00" value="1.0" inout="Linear,Auto"/>
                 </Controller>
             </Animation>
             
             <Animation name="AmountStyleGold">
-                <Event event="ScoreRewardGoldAmount" action="Reset"/>
-                <Event event="ScoreRewardGoldAmount" action="Play"/>
+                <Event event="ScoreRewardGoldAmount" action="Reset,Play"/>
                 <Controller type="Style" end="Pause" style1="ScoreRewardItemGoldAmount" style2="ScoreRewardItemGoldAmount">
-                    <Key type="Curve" time="0.00" value="1.0" out="Auto"/>
+                    <Key type="Curve" time="0.00" value="1.0" inout="Linear,Auto"/>
                 </Controller>
             </Animation>
             
             <Animation name="AmountStyleXP">
-                <Event event="ScoreRewardXPAmount" action="Reset"/>
-                <Event event="ScoreRewardXPAmount" action="Play"/>
+                <Event event="ScoreRewardXPAmount" action="Reset,Play"/>
                 <Controller type="Style" end="Pause" style1="ScoreRewardItemXPAmount" style2="ScoreRewardItemXPAmount">
-                    <Key type="Curve" time="0.00" value="1.0" out="Auto"/>
+                    <Key type="Curve" time="0.00" value="1.0" inout="Linear,Auto"/>
                 </Controller>
             </Animation>
             
             <Animation name="AmountStyleUnlock">
-                <Event event="ScoreRewardUnlockDescription" action="Reset"/>
-                <Event event="ScoreRewardUnlockDescription" action="Play"/>
+                <Event event="ScoreRewardUnlockDescription" action="Reset,Play"/>
                 <Controller type="Style" end="Pause" style1="ScoreRewardItemXPAmount" style2="ScoreRewardItemXPAmount">
-                    <Key type="Curve" time="0.00" value="1.0" out="Auto"/>
+                    <Key type="Curve" time="0.00" value="1.0" inout="Linear,Auto"/>
                 </Controller>
             </Animation>
         </Frame>
@@ -412,42 +1069,37 @@
             <Style val="ScoreRewardItemXPDescription"/>
             
             <Animation name="AmountStyleXPBoost">
-                <Event event="ScoreRewardXPBoost" action="Reset"/>
-                <Event event="ScoreRewardXPBoost" action="Play"/>
+                <Event event="ScoreRewardXPBoost" action="Reset,Play"/>
                 <Controller type="Style" end="Pause" style1="ScoreRewardItemXPBoostDescription" style2="ScoreRewardItemXPBoostDescription">
-                    <Key type="Curve" time="0.00" value="1.0" out="Auto"/>
+                    <Key type="Curve" time="0.00" value="1.0" inout="Linear,Auto"/>
                 </Controller>
             </Animation>
             
             <Animation name="AmountStyleGoldBoost">
-                <Event event="ScoreRewardGoldBoost" action="Reset"/>
-                <Event event="ScoreRewardGoldBoost" action="Play"/>
+                <Event event="ScoreRewardGoldBoost" action="Reset,Play"/>
                 <Controller type="Style" end="Pause" style1="ScoreRewardItemGoldBoostDescription" style2="ScoreRewardItemGoldBoostDescription">
-                    <Key type="Curve" time="0.00" value="1.0" out="Auto"/>
+                    <Key type="Curve" time="0.00" value="1.0" inout="Linear,Auto"/>
                 </Controller>
             </Animation>
             
             <Animation name="AmountStyleGold">
-                <Event event="ScoreRewardGoldSource" action="Reset"/>
-                <Event event="ScoreRewardGoldSource" action="Play"/>
+                <Event event="ScoreRewardGoldSource" action="Reset,Play"/>
                 <Controller type="Style" end="Pause" style1="ScoreRewardItemGoldDescription" style2="ScoreRewardItemGoldDescription">
-                    <Key type="Curve" time="0.00" value="1.0" out="Auto"/>
+                    <Key type="Curve" time="0.00" value="1.0" inout="Linear,Auto"/>
                 </Controller>
             </Animation>
             
             <Animation name="AmountStyleXP">
-                <Event event="ScoreRewardXPSource" action="Reset"/>
-                <Event event="ScoreRewardXPSource" action="Play"/>
+                <Event event="ScoreRewardXPSource" action="Reset,Play"/>
                 <Controller type="Style" end="Pause" style1="ScoreRewardItemXPDescription" style2="ScoreRewardItemXPDescription">
-                    <Key type="Curve" time="0.00" value="1.0" out="Auto"/>
+                    <Key type="Curve" time="0.00" value="1.0" inout="Linear,Auto"/>
                 </Controller>
             </Animation>
 
             <Animation name="AmountStyleUnlock">
-                <Event event="ScoreRewardUnlockTitle" action="Reset"/>
-                <Event event="ScoreRewardUnlockTitle" action="Play"/>
+                <Event event="ScoreRewardUnlockTitle" action="Reset,Play"/>
                 <Controller type="Style" end="Pause" style1="ScoreRewardItemXPDescription" style2="ScoreRewardItemXPDescription">
-                    <Key type="Curve" time="0.00" value="1.0" out="Auto"/>
+                    <Key type="Curve" time="0.00" value="1.0" inout="Linear,Auto"/>
                 </Controller>
             </Animation>
         </Frame>
@@ -463,16 +1115,14 @@
             <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
             
             <Animation name="AmountEarned">
-                <Event event="InstantUp" action="Reset"/>
-                <Event event="InstantUp" action="Play"/>
+                <Event event="InstantUp" action="Reset,Play"/>
                 <Controller type="Animation" end="Stop" frame="AmountLabel" animation="InstantUp">
                     <Key type="Animation" time="0.0" action="Play"/>
                 </Controller>
             </Animation>
             
             <Animation name="CountUp">
-                <Event event="CountUp" action="Reset"/>
-                <Event event="CountUp" action="Play"/>
+                <Event event="CountUp" action="Reset,Play"/>
                 <Controller type="Animation" end="Stop" frame="AmountLabel" animation="CountUp">
                     <Key type="Animation" time="0.0" action="Reset"/>
                     <Key type="Animation" time="0.1" action="Play"/>
@@ -481,21 +1131,20 @@
         </Frame>
         
         <Animation name="SlideIn">
-            <Event event="Intro" action="Reset"/>
-            <Event event="Intro" action="Play"/>
+            <Event event="Intro" action="Reset,Play"/>
             <Controller type="Fade" end="Pause">
-                <Key type="Curve" time="0" value="0" out="Slow"/>
-                <Key type="Curve" time=".4" value="255" in="Slow"/>
-                <Key type="Curve" time=".8" value="255" out="Slow"/>
-                <Key type="Curve" time="1" value="0" in="Slow"/>
+                <Key type="Curve" time="0" value="0" inout="Linear,Slow"/>
+                <Key type="Curve" time=".4" value="255" inout="Slow,Linear"/>
+                <Key type="Curve" time=".8" value="255" inout="Linear,Slow"/>
+                <Key type="Curve" time="1" value="0" inout="Slow,Linear"/>
             </Controller>
             <Controller type="Anchor" end="Pause" side="Top" relative="true">
-                <Key type="Curve" time="0" value="200" out="Fast"/>
-                <Key type="Curve" time=".2" value="0" in="Slow" out="Slow"/>
-                <Key type="Curve" time=".25" value="8" in="Fast" />
-                <Key type="Curve" time=".3" value="0" out="Auto"/>
-                <Key type="Curve" time=".8" value="0" in="Slow" out="Slow"/>
-                <Key type="Curve" time="1" value="-100" in="Fast"/>
+                <Key type="Curve" time="0" value="200" inout="Linear"/>
+                <Key type="Curve" time=".2" value="0" inout="Slow"/>
+                <Key type="Curve" time=".25" value="8"  inout="Linear"/>
+                <Key type="Curve" time=".3" value="0" inout="Linear,Auto"/>
+                <Key type="Curve" time=".8" value="0" inout="Slow"/>
+                <Key type="Curve" time="1" value="-100" inout="Linear"/>
             </Controller>
         </Animation>
     </Frame>
@@ -506,50 +1155,78 @@
         <Alpha val="0"/>
         
         <Animation name="Reset">
-            <Event event="ShowIntro" action="Reset" frame="$parent/$parent"/>
-            <Event event="ShowIntro" action="Play" frame="$parent/$parent"/>
+            <Event event="ShowIntro" action="Reset,Play" frame="$parent/$parent"/>
+            <Event event="Reset" action="Reset,Play" frame="$parent"/>
             <Controller type="Fade" end="Pause">
-                <Key type="Curve" time="0" value="0" out="Slow"/>
+                <Key type="Curve" time="0" value="0" inout="Linear,Slow"/>
             </Controller>
         </Animation>
 
-        <Animation name="Trigger">
-            <Event event="LevelUp" action="Reset" frame="$parent"/>
-            <Event event="LevelUp" action="Play" frame="$parent"/>
+        <Animation name="TriggerSkipIntro">
+            <Event event="LevelUp" action="Stop" frame="$parent"/>
+            <Event event="Reset" action="Stop" frame="$parent"/>
             <Event event="InitialDelay" action="Stop" frame="$parent/$parent"/>
             <Event event="ShowIntro" action="Stop" frame="$parent/$parent"/>
+            <Event event="SetLevelUp" action="Reset,Play" frame="$parent"/>
+
             <Controller type="Fade" end="Pause">
-                <Key type="Curve" time="0" value="0" out="Slow"/>
-                <Key type="Curve" time=".4" value="255" in="Slow"/>
+                <Key type="Curve" time="0" value="255" inout="Linear,Slow"/>
             </Controller>
             <Controller type="Event" end="Stop">
                 <Key type="Event" time="0" event="Begin"/>
             </Controller>
             <Controller type="Fade" end="Pause" frame="$parent/LevelDescriptionLabel">
-                <Key type="Curve" time="0" value="255" out="Fast"/>
-                <Key type="Curve" time=".3" value="0" in="Slow"/>
-                <Key type="Curve" time="3" value="0" in="Slow"/>
-                <Key type="Curve" time="3.4" value="255" in="Slow"/>
+                <Key type="Curve" time="0" value="255" inout="Linear"/>
             </Controller>
             <Controller type="Fade" end="Pause" frame="$parent/LevelLabel">
-                <Key type="Curve" time="0" value="255" out="Fast"/>
-                <Key type="Curve" time=".3" value="0" in="Slow"/>
-                <Key type="Curve" time="3" value="0" in="Slow"/>
-                <Key type="Curve" time="3.4" value="255" in="Slow"/>
+                <Key type="Curve" time="0" value="255" inout="Linear"/>
             </Controller>
             <Controller type="Fade" end="Pause" frame="LevelUpLabel">
-                <Key type="Curve" time="0" value="0" out="Slow"/>
-                <Key type="Curve" time=".4" value="255" in="Slow"/>
-                <Key type="Curve" time="3" value="255" in="Slow"/>
-                <Key type="Curve" time="3.15" value="0" in="Slow"/>
+                <Key type="Curve" time="0" value="0" inout="Linear,Slow"/>
             </Controller>
             <Controller type="Anchor" end="Pause" side="Top" relative="true" frame="LevelUpLabel">
-                <Key type="Curve" time="0" value="200" out="Fast"/>
-                <Key type="Curve" time=".3" value="0" in="Slow"/>
-                <Key type="Curve" time=".4" value="-12" in="Slow" out="Slow"/>
-                <Key type="Curve" time=".6" value="0" in="Fast"/>
-                <Key type="Curve" time="3" value="0" in="Fast"/>
-                <Key type="Curve" time="3.2" value="-155" in="Fast"/>
+                <Key type="Curve" time="0" value="-155" inout="Linear"/>
+            </Controller>
+        </Animation>
+
+        <Animation name="Trigger">
+            <Event event="LevelUp" action="Reset,Play" frame="$parent"/>
+            <Event event="Reset" action="Stop" frame="$parent"/>
+            <Event event="InitialDelay" action="Stop" frame="$parent/$parent"/>
+            <Event event="ShowIntro" action="Stop" frame="$parent/$parent"/>
+
+            <Controller type="Fade" end="Pause">
+                <Key type="Curve" time="0" value="0" inout="Linear,Slow"/>
+                <Key type="Curve" time=".4" value="255" inout="Slow,Linear"/>
+            </Controller>
+            <Controller type="Event" end="Stop">
+                <Key type="Event" time="0" event="Begin"/>
+            </Controller>
+            <Controller type="Fade" end="Pause" frame="$parent/LevelDescriptionLabel">
+                <Key type="Curve" time="0" value="255" inout="Linear"/>
+                <Key type="Curve" time=".3" value="0" inout="Slow,Linear"/>
+                <Key type="Curve" time="3" value="0" inout="Slow,Linear"/>
+                <Key type="Curve" time="3.4" value="255" inout="Slow,Linear"/>
+            </Controller>
+            <Controller type="Fade" end="Pause" frame="$parent/LevelLabel">
+                <Key type="Curve" time="0" value="255" inout="Linear"/>
+                <Key type="Curve" time=".3" value="0" inout="Slow,Linear"/>
+                <Key type="Curve" time="3" value="0" inout="Slow,Linear"/>
+                <Key type="Curve" time="3.4" value="255" inout="Slow,Linear"/>
+            </Controller>
+            <Controller type="Fade" end="Pause" frame="LevelUpLabel">
+                <Key type="Curve" time="0" value="0" inout="Linear,Slow"/>
+                <Key type="Curve" time=".4" value="255" inout="Slow,Linear"/>
+                <Key type="Curve" time="3" value="255" inout="Slow,Linear"/>
+                <Key type="Curve" time="3.15" value="0" inout="Slow,Linear"/>
+            </Controller>
+            <Controller type="Anchor" end="Pause" side="Top" relative="true" frame="LevelUpLabel">
+                <Key type="Curve" time="0" value="200" inout="Linear"/>
+                <Key type="Curve" time=".3" value="0" inout="Slow,Linear"/>
+                <Key type="Curve" time=".4" value="-12" inout="Slow"/>
+                <Key type="Curve" time=".6" value="0" inout="Linear"/>
+                <Key type="Curve" time="3" value="0" inout="Linear"/>
+                <Key type="Curve" time="3.2" value="-155" inout="Linear"/>
             </Controller>
         </Animation>
                         
@@ -573,12 +1250,10 @@
             <WrapUV val="True" layer="1"/>
             
             <Animation name="UVScroll">
-                <Event event="Begin" action="Restart" frame="$parent"/>
-                <Event event="Begin" action="DirectionForward" frame="$parent"/>
-                <Event event="Begin" action="Play" frame="$parent"/>
+                <Event event="Begin" action="Restart,DirectionForward,Play" frame="$parent"/>
                 <Controller type="LayerUV" layer="1" side="Top" relative="True" sidelock="True" end="Loop" >
-                    <Key type="Curve" time="0" value="0" out="fast"/>
-                    <Key type="Curve" time="1" value="1" in="fast"/>
+                    <Key type="Curve" time="0" value="0" inout="Linear"/>
+                    <Key type="Curve" time="1" value="1" inout="Linear"/>
                 </Controller>
             </Animation>
         </Frame>
@@ -608,12 +1283,10 @@
             <TextureCoords top=".05" left="-0.05" bottom=".95" right="1.05" layer="1"/>
             
             <Animation name="UVScroll">
-                <Event event="Begin" action="Restart" frame="$parent"/>
-                <Event event="Begin" action="DirectionForward" frame="$parent"/>
-                <Event event="Begin" action="Play" frame="$parent"/>
+                <Event event="Begin" action="Restart,DirectionForward,Play" frame="$parent"/>
                 <Controller type="LayerUV" layer="1" side="Top" relative="True" sidelock="True" end="Loop" >
-                    <Key type="Curve" time="0" value="0" out="fast"/>
-                    <Key type="Curve" time="5" value="1" in="fast"/>
+                    <Key type="Curve" time="0" value="0" inout="Linear"/>
+                    <Key type="Curve" time="5" value="1" inout="Linear"/>
                 </Controller>
             </Animation>
         </Frame>
@@ -626,12 +1299,10 @@
             <TextureCoords top=".01" left="-0.05" bottom=".98" right="1.05" layer="1"/>
             
             <Animation name="UVScroll">
-                <Event event="Begin" action="Restart" frame="$parent"/>
-                <Event event="Begin" action="DirectionForward" frame="$parent"/>
-                <Event event="Begin" action="Play" frame="$parent"/>
+                <Event event="Begin" action="Restart,DirectionForward,Play" frame="$parent"/>
                 <Controller type="LayerUV" layer="1" side="Top" relative="True" sidelock="True" end="Loop" >
-                    <Key type="Curve" time="0" value="0" out="fast"/>
-                    <Key type="Curve" time="2.5" value="1" in="fast"/>
+                    <Key type="Curve" time="0" value="0" inout="Linear"/>
+                    <Key type="Curve" time="2.5" value="1" inout="Linear"/>
                 </Controller>
             </Animation>
         </Frame>
@@ -644,12 +1315,10 @@
             <TextureCoords top=".01" left="-0.05" bottom=".98" right="1.05" layer="1"/>
             
             <Animation name="UVScroll">
-                <Event event="Begin" action="Restart" frame="$parent"/>
-                <Event event="Begin" action="DirectionForward" frame="$parent"/>
-                <Event event="Begin" action="Play" frame="$parent"/>
+                <Event event="Begin" action="Restart,DirectionForward,Play" frame="$parent"/>
                 <Controller type="LayerUV" layer="1" side="Top" relative="True" sidelock="True" end="Loop" >
-                    <Key type="Curve" time="0" value="0" out="fast"/>
-                    <Key type="Curve" time="2" value="1" in="fast"/>
+                    <Key type="Curve" time="0" value="0" inout="Linear"/>
+                    <Key type="Curve" time="2" value="1" inout="Linear"/>
                 </Controller>
             </Animation>
         </Frame>
@@ -679,10 +1348,8 @@
         <Animation name="Background">
             <Event event="ThemeNormal" action="Stop" frame="$parent"/>
             <Event event="ThemePlacement" action="Stop" frame="$parent"/>
-            <Event event="ThemeMaxLevel" action="DirectionForward" frame="$parent"/>
-            <Event event="ThemeMaxLevel" action="Play" frame="$parent"/>
-            <Event event="ThemeGold" action="DirectionReverse" frame="$parent"/>
-            <Event event="ThemeGold" action="Play" frame="$parent"/>
+            <Event event="ThemeMaxLevel" action="DirectionForward,Play" frame="$parent"/>
+            <Event event="ThemeGold" action="DirectionReverse,Play" frame="$parent"/>
 
             <Controller type="Texture" end="Pause">
                 <Key type="Image" time="0.00" image="@UI/Storm_UI_Scorescreen_GoldXP_Background"/>
@@ -699,85 +1366,150 @@
     <!==========================================================================================-->
     <Frame type="ScoreScreenPointReward" name="ScoreFrameTemplate">
         <Width val="500"/>
-        <Height val="500"/>
+        <Height val="560"/>
         <AcceptsMouseTooltip val="true"/>
-        
-        <Animation name="RankLayout">
-            <Event event="RankedGame" action="DirectionForward" frame="$parent"/>
-            <Event event="RankedGame" action="Play" frame="$parent"/>
-            <Event event="NonRankedGame" action="DirectionReverse" frame="$parent"/>
-            <Event event="NonRankedGame" action="Play" frame="$parent"/>
+
+        <Animation name="ScoreLayout">
+            <Event event="SmallSize" action="DirectionForward,Play"/>
+            <Event event="NormalSize" action="DirectionReverse,Play"/>
             
             <Controller type="Dimension" dimension="Width" relative="False" percentage="False" end="Pause" >
-                <Key type="Curve" time="0" value="500" out="Step"/>
-                <Key type="Curve" time=".01" value="449" in="Step"/>
+                <Key type="Curve" time="0" value="500" inout="Linear,Step"/>
+                <Key type="Curve" time=".01" value="449" inout="Step,Linear"/>
             </Controller>
             <Controller type="Dimension" dimension="Width" relative="False" percentage="False" end="Pause" frame="ProgressBackground" >
-                <Key type="Curve" time="0" value="356" out="Step"/>
-                <Key type="Curve" time=".01" value="249" in="Step"/>
+                <Key type="Curve" time="0" value="356" inout="Linear,Step"/>
+                <Key type="Curve" time=".01" value="249" inout="Step,Linear"/>
             </Controller>
             <Controller type="Dimension" dimension="Height" relative="False" percentage="False" end="Pause" frame="ProgressBackground" >
-                <Key type="Curve" time="0" value="356" out="Step"/>
-                <Key type="Curve" time=".01" value="249" in="Step"/>
+                <Key type="Curve" time="0" value="356" inout="Linear,Step"/>
+                <Key type="Curve" time=".01" value="249" inout="Step,Linear"/>
             </Controller>
+            <Controller type="Dimension" dimension="Width" relative="False" percentage="True" end="Pause" frame="NameLabel" >
+                <Key type="Curve" time="0" value="100" inout="Linear,Step"/>
+                <Key type="Curve" time=".01" value="80" inout="Step,Linear"/>
+            </Controller>
+            <Controller type="Dimension" dimension="Height" relative="False" percentage="True" end="Pause" frame="NameLabel" >
+                <Key type="Curve" time="0" value="100" inout="Linear,Step"/>
+                <Key type="Curve" time=".01" value="80" inout="Step,Linear"/>
+            </Controller>
+        </Animation>
+
+        <Frame type="Image" name="ProgressBackground">
+            <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent/NameLabel" pos="Min" offset="0"/>
+            <Texture val="@UI/Storm_UI_Scorescreen_PlayerXP_Background"/>
+        </Frame>
+        
+        <Frame type="ProgressBar" name="BoostProgressBar" template="StandardTemplates/ScoreProgressBarTemplate">
+            <Anchor relative="$parent/ProgressBackground"/>
+            <AcceptsMouse val="false"/>
+
+            <Frame type="Frame" name="FillImageContainer">
+                <Frame type="Image" name="FillImage">
+                    <Anchor relative="$parent"/>
+                    <Texture val="@UI/Storm_UI_Scorescreen_PlayerXP_BoostBar"/>
+                    <TextureType val="Circular"/>
+                </Frame>
+            </Frame>
+            <!-- For Trunk
+            <Frame type="Image" name="EndCapImage">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="-1"/>
+                <Anchor side="Left" relative="$parent" pos="Mid" offset="-2"/>
+                <Texture val="@UI/Storm_UI_Scorescreen_PlayerXP_Boost_Cap"/>
+            </Frame>
+            -->
+        </Frame>
+
+        <Frame type="ProgressBar" name="ProgressBar" template="StandardTemplates/ScoreProgressBarTemplate">
+            <Anchor relative="$parent/ProgressBackground"/>
+            <AcceptsMouse val="false"/>
+            
+            <Frame type="Frame" name="FillImageContainer">
+                <Frame type="Image" name="FillImage">
+                    <Anchor relative="$parent"/>
+                    <Texture val="@UI/Storm_UI_Scorescreen_PlayerXP_Bar"/>
+                    <TextureType val="Circular"/>
+                </Frame>
+            </Frame>
+        </Frame>
+
+        <Frame type="Label" name="NameLabel">
+            <Anchor side="Left" relative="$parent" pos="Min" offset="75"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="-75"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+            <Height val="65"/>
+            <RenderPriority val="513"/>
+            <Options val="NoWrapping | ScaleToPreventTruncation"/>
+            <Text val="@UI/PlayerRewardsPanel/PlayerName"/>
+            <Style val="ScoreLevelTitle"/>
+        </Frame>
+        
+        <Frame type="Frame" name="HitTestFrame">
+            <Anchor side="Top" relative="$parent/ProgressBackground" pos="Min" offset="5"/>
+            <Anchor side="Left" relative="$parent/ProgressBackground" pos="Min" offset="5"/>
+            <Anchor side="Bottom" relative="$parent/ProgressBackground" pos="Max" offset="-5"/>
+            <Anchor side="Right" relative="$parent/ProgressBackground" pos="Max" offset="-5"/>
+            <Anchor relative="$parent/ProgressBackground"/>
+            <TooltipAnchorPosition val="TopCenter"/>
+        </Frame>
+    </Frame>
+    
+    <Frame type="ScoreScreenPointReward" name="HeroScoreFrameTemplate" template="PlayerRewardsPanel/ScoreFrameTemplate">
+        <Animation name="ScoreLayout">
             <Controller type="Dimension" dimension="Width" relative="False" percentage="True" end="Pause" frame="LevelLabel" >
-                <Key type="Curve" time="0" value="100" out="Step"/>
-                <Key type="Curve" time=".01" value="70" in="Step"/>
+                <Key type="Curve" time="0" value="100" inout="Linear,Step"/>
+                <Key type="Curve" time=".01" value="70" inout="Step,Linear"/>
             </Controller>
             <Controller type="Dimension" dimension="Height" relative="False" percentage="True" end="Pause" frame="LevelLabel" >
-                <Key type="Curve" time="0" value="100" out="Step"/>
-                <Key type="Curve" time=".01" value="70" in="Step"/>
+                <Key type="Curve" time="0" value="100" inout="Linear,Step"/>
+                <Key type="Curve" time=".01" value="70" inout="Step,Linear"/>
             </Controller>
             
             <Controller type="Dimension" dimension="Width" relative="False" percentage="False" end="Pause" frame="LevelUpContainer" >
-                <Key type="Curve" time="0" value="246" out="Step"/>
-                <Key type="Curve" time=".01" value="175" in="Step"/>
+                <Key type="Curve" time="0" value="246" inout="Linear,Step"/>
+                <Key type="Curve" time=".01" value="175" inout="Step,Linear"/>
             </Controller>
             <Controller type="Dimension" dimension="Height" relative="False" percentage="False" end="Pause" frame="LevelUpContainer" >
-                <Key type="Curve" time="0" value="246" out="Step"/>
-                <Key type="Curve" time=".01" value="175" in="Step"/>
+                <Key type="Curve" time="0" value="246" inout="Linear,Step"/>
+                <Key type="Curve" time=".01" value="175" inout="Step,Linear"/>
             </Controller>
             <Controller type="Anchor" end="Pause" side="Top" relative="False" frame="LevelUpContainer">
-                <Key type="Curve" time="0" value="54" out="Step"/>
-                <Key type="Curve" time=".01" value="36" in="Step"/>
+                <Key type="Curve" time="0" value="54" inout="Linear,Step"/>
+                <Key type="Curve" time=".01" value="36" inout="Step,Linear"/>
             </Controller>
             <Controller type="Anchor" end="Pause" side="Left" relative="False" frame="LevelUpContainer">
-                <Key type="Curve" time="0" value="56" out="Step"/>
-                <Key type="Curve" time=".01" value="38" in="Step"/>
+                <Key type="Curve" time="0" value="56" inout="Linear,Step"/>
+                <Key type="Curve" time=".01" value="38" inout="Step,Linear"/>
             </Controller>
             <Controller type="Style" end="Pause" style1="ScoreRankLevelUp" style2="ScoreRankLevelUpSmall" frame="LevelUpContainer/LevelUpLabel">
-                <Key type="Curve" time="0" value="0" out="Step"/>
-                <Key type="Curve" time=".01" value="1" in="Step"/>
-            </Controller>
-            <Controller type="Visibility" end="Pause" frame="LensFlareImage">
-                <Key type="Bool" time="0" value="true"/>
-                <Key type="Bool" time=".01" value="false"/>
-            </Controller>
-            <Controller type="Visibility" end="Pause" frame="LensFlare2Image">
-                <Key type="Bool" time="0" value="true"/>
-                <Key type="Bool" time=".01" value="false"/>
+                <Key type="Curve" time="0" value="0" inout="Linear,Step"/>
+                <Key type="Curve" time=".01" value="1" inout="Step,Linear"/>
             </Controller>
             <Controller type="Dimension" dimension="Width" relative="False" percentage="False" end="Pause" frame="ProgressPattern" >
-                <Key type="Curve" time="0" value="296" out="Step"/>
-                <Key type="Curve" time=".01" value="207" in="Step"/>
+                <Key type="Curve" time="0" value="296" inout="Linear,Step"/>
+                <Key type="Curve" time=".01" value="207" inout="Step,Linear"/>
             </Controller>
             <Controller type="Dimension" dimension="Height" relative="False" percentage="False" end="Pause" frame="ProgressPattern" >
-                <Key type="Curve" time="0" value="296" out="Step"/>
-                <Key type="Curve" time=".01" value="207" in="Step"/>
-            </Controller>
-            <Controller type="Dimension" dimension="Width" relative="False" percentage="True" end="Pause" frame="NameLabel" >
-                <Key type="Curve" time="0" value="100" out="Step"/>
-                <Key type="Curve" time=".01" value="80" in="Step"/>
-            </Controller>
-            <Controller type="Dimension" dimension="Height" relative="False" percentage="True" end="Pause" frame="NameLabel" >
-                <Key type="Curve" time="0" value="100" out="Step"/>
-                <Key type="Curve" time=".01" value="80" in="Step"/>
+                <Key type="Curve" time="0" value="296" inout="Linear,Step"/>
+                <Key type="Curve" time=".01" value="207" inout="Step,Linear"/>
             </Controller>
         </Animation>
+
+        <Frame type="Image" name="GlowValueProvider" template="StandardAnimationTemplates/GlowValueProviderTemplate"/>
+
+        <Frame type="Image" name="ProgressBackground" template="PlayerRewardsPanel/AddGlowOverride"/>
 
         <!--=======================================================================================
         <! GOLD VERSION
         <!======================================================================================-->
+        <StateGroup name="HeroMastery">
+            <DefaultState val="Normal"/>
+            <State name="Normal"/>
+            <State name="Gold"/>
+        </StateGroup>
+
         <Animation name="GoldTheme">
             <Event event="ThemeMaxLevel" action="Play"/>
             <Event event="ThemeGold" action="Play"/>
@@ -821,7 +1553,13 @@
                 <Key type="Image" time="0.0" image="@UI/Storm_UI_Scorescreen_LevelUp_TopShadow_Gold"/>
             </Controller>
             <Controller type="Style" end="Pause" style1="ScoreLevelTitleComplete" style2="ScoreLevelTitleComplete" frame="NameLabel">
-                <Key type="Curve" time="0.00" value="1.0" out="Auto"/>
+                <Key type="Curve" time="0.00" value="1.0" inout="Linear,Auto"/>
+            </Controller>
+            <Controller type="Visibility" end="Pause" frame="MasteryIconFrame">
+                <Key type="Bool" time="0" value="True"/>
+            </Controller>
+            <Controller type="State" stateGroup="HeroMastery" end="Pause">
+                <Key type="Identifier" time="0" value="Gold"/>
             </Controller>
         </Animation>
 
@@ -842,7 +1580,7 @@
             <Event event="ThemeNormal" action="Stop"/>
             <Event event="ThemeGold" action="Stop"/>
             <Event event="ThemeMaxLevel" action="Stop"/>
-            <Event event="ThemePlacement" action="Play"/>            
+            <Event event="ThemePlacement" action="Play"/>
             <Controller type="Visibility" end="Pause" frame="LevelDescriptionLabel">
                 <Key type="Bool" time="0.0" value="False"/>
             </Controller>
@@ -858,36 +1596,30 @@
             <Alpha val="0"/>
             
             <Animation name="LevelUp">
-                <Event event="LevelUp" action="Reset" frame="$parent"/>
-                <Event event="LevelUp" action="Play" frame="$parent"/>
+                <Event event="LevelUp" action="Reset,Play" frame="$parent"/>
                 <Controller type="Fade" end="Pause">
-                    <Key type="Curve" time="0" value="0" out="Fast"/>
-                    <Key type="Curve" time=".2" value="255" in="Slow"/>
-                    <Key type="Curve" time="1" value="0" in="Slow"/>
+                    <Key type="Curve" time="0" value="0" inout="Linear"/>
+                    <Key type="Curve" time=".2" value="255" inout="Slow,Linear"/>
+                    <Key type="Curve" time="1" value="0" inout="Slow,Linear"/>
                 </Controller>
                 <Controller type="Dimension" dimension="Width" relative="False" percentage="True" end="Pause" >
-                    <Key type="Curve" time="0" value="0" in="linear" out="linear"/>
-                    <Key type="Curve" time=".2" value="100" in="linear" out="linear"/>
-                    <Key type="Curve" time="1" value="90" in="linear" out="linear"/>
+                    <Key type="Curve" time="0" value="0" inout="linear"/>
+                    <Key type="Curve" time=".2" value="100" inout="linear"/>
+                    <Key type="Curve" time="1" value="90" inout="linear"/>
                 </Controller>
                 <Controller type="Dimension" dimension="Height" relative="False" percentage="True" end="Pause" >
-                    <Key type="Curve" time="0" value="0" in="linear" out="linear"/>
-                    <Key type="Curve" time=".2" value="100" in="linear" out="linear"/>
-                    <Key type="Curve" time="1" value="90" in="linear" out="linear"/>
+                    <Key type="Curve" time="0" value="0" inout="linear"/>
+                    <Key type="Curve" time=".2" value="100" inout="linear"/>
+                    <Key type="Curve" time="1" value="90" inout="linear"/>
                 </Controller>
                 <Controller type="Rotation" relative="False" end="Loop" >
-                    <Key type="Curve" time="0" value="0" out="linear"/>
-                    <Key type="Curve" time="3" value="-360" in="linear"/>
+                    <Key type="Curve" time="0" value="0" inout="Linear,linear"/>
+                    <Key type="Curve" time="3" value="-360" inout="linear,Linear"/>
                 </Controller>
             </Animation>
         </Frame>
 
-        <Frame type="Image" name="ProgressBackground">
-            <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
-            <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
-            <Anchor side="Bottom" relative="$parent/NameLabel" pos="Min" offset="0"/>
-            <Texture val="@UI/Storm_UI_Scorescreen_PlayerXP_Background"/>
-        </Frame>
+        <Frame type="Image" name="ProgressBackground" template="PlayerRewardsPanel/AddGlowOverride"/>
 
         <Frame type="Image" name="ProgressPattern">
             <Anchor side="Left" relative="$parent/ProgressBackground" pos="Mid" offset="0"/>
@@ -896,6 +1628,7 @@
             <Width val="296"/>
             <Height val="296"/>
             <LayerCount val="2"/>
+            <RenderPriority val="511"/>
             
             <Texture val="@UI/Storm_UI_Scorescreen_Pattern_Mask" layer="0"/>
             <TextureCoords top="-.3" left="-.3" bottom="1.3" right="1.3" layer="0"/>
@@ -906,50 +1639,15 @@
             <WrapUV val="True" layer="1"/>
             
             <Animation name="UVScroll">
-                <Event event="OnShown" action="Restart" frame="$parent"/>
-                <Event event="OnShown" action="DirectionForward" frame="$parent"/>
-                <Event event="OnShown" action="Play" frame="$parent"/>
+                <Event event="OnShown" action="Restart,DirectionForward,Play" frame="$parent"/>
                 <Event event="OnMouseEnter" action="Play" frame="$parent"/>
                 <Controller type="LayerUV" layer="0" side="Top" relative="True" sidelock="True" end="Loop" >
-                    <Key type="Curve" time="0" value="0" out="fast"/>
-                    <Key type="Curve" time="1.9" value="1" in="fast"/>
+                    <Key type="Curve" time="0" value="0" inout="Linear"/>
+                    <Key type="Curve" time="1.9" value="1" inout="Linear"/>
                 </Controller>
             </Animation>
         </Frame>
 
-        <Frame type="ProgressBar" name="BoostProgressBar" template="StandardTemplates/ScoreProgressBarTemplate">
-            <Anchor relative="$parent/ProgressBackground"/>
-            <AcceptsMouse val="false"/>
-
-            <Frame type="Frame" name="FillImageContainer">
-                <Frame type="Image" name="FillImage">
-                    <Anchor relative="$parent"/>
-                    <Texture val="@UI/Storm_UI_Scorescreen_PlayerXP_BoostBar"/>
-                    <TextureType val="Circular"/>
-                </Frame>
-            </Frame>
-            <!-- For Trunk
-            <Frame type="Image" name="EndCapImage">
-                <Anchor side="Top" relative="$parent" pos="Min" offset="-1"/>
-                <Anchor side="Left" relative="$parent" pos="Mid" offset="-2"/>
-                <Texture val="@UI/Storm_UI_Scorescreen_PlayerXP_Boost_Cap"/>
-            </Frame>
-            -->
-        </Frame>
-
-        <Frame type="ProgressBar" name="ProgressBar" template="StandardTemplates/ScoreProgressBarTemplate">
-            <Anchor relative="$parent/ProgressBackground"/>
-            <AcceptsMouse val="false"/>
-            
-            <Frame type="Frame" name="FillImageContainer">
-                <Frame type="Image" name="FillImage">
-                    <Anchor relative="$parent"/>
-                    <Texture val="@UI/Storm_UI_Scorescreen_PlayerXP_Bar"/>
-                    <TextureType val="Circular"/>
-                </Frame>
-            </Frame>
-        </Frame>
-        
         <Frame type="Frame" name="LevelUpContainer" template="PlayerRewardsPanel/LevelUpContainerTemplate">
             <Anchor side="Top" relative="$parent/ProgressBackground" pos="Min" offset="54"/>
             <Anchor side="Left" relative="$parent/ProgressBackground" pos="Min" offset="56"/>
@@ -968,24 +1666,158 @@
         </Frame>
 
         <Frame type="Label" name="LevelLabel">
-            <Anchor side="Left" relative="$parent/ProgressBackground" pos="Min" offset="0"/>
-            <Anchor side="Top" relative="$parent/ProgressBackground" pos="Min" offset="10"/>
+            <Anchor side="Left" relative="$parent/ProgressBackground" pos="Min" offset="6"/>
+            <Anchor side="Top" relative="$parent/ProgressBackground" pos="Min" offset="16"/>
             <Anchor side="Right" relative="$parent/ProgressBackground" pos="Max" offset="0"/>
             <Anchor side="Bottom" relative="$parent/ProgressBackground" pos="Max" offset="-21"/>
-            <Style val="ScorePlayerLevel"/>
             <Text val="99"/>
             <ScaleText val="True"/>
+
+            <StateGroup name="LabelStyleUpdate">
+                <DefaultState val="ThreeDigits"/>
+                <State name="OneOrTwoDigits">
+                    <When type="Property" frame="$ancestor[@type=ScoreScreenPointReward]" displayLevel="100" operator="LessThan"/>
+                    <Action type="SetProperty" style="ScorePlayerLevel"/>
+                </State>
+                <State name="ThreeDigits">
+                    <Action type="SetProperty" style="ScorePlayerLevel_Small"/>
+                </State>
+            </StateGroup>
         </Frame>
 
-        <Frame type="Label" name="NameLabel">
-            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
-            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
-            <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
-            <Text val="@UI/PlayerRewardsPanel/PlayerName"/>
-            <Style val="ScoreLevelTitle"/>
-            <ScaleText val="true"/>
+        <!-- Lightning VFX -->
+        <Frame type="Frame" name="AscensionTransitionAnimationContainer">
+            <Anchor side="Left" relative="$ancestor[@type=PlayerRewardsPanel]/PlayerScoreFrame" pos="0.0" offset="0"/>
+            <Anchor side="Right" relative="$ancestor[@type=PlayerRewardsPanel]/HeroScoreFrame" pos="1.0" offset="0"/>
+            <Anchor side="Bottom" relative="$ancestor[@type=PlayerRewardsPanel]/PlayerScoreFrame" pos="0.88" offset="0"/>
+            <Height val="50"/>
+
+            <Animation name="TransitionToAscensionLevelUp">
+                <Event event="StartTransitionToAscensionLevelUp" action="Reset,Play" frame="$ancestor[@type=PlayerRewardsPanel]"/>
+                <Event event="FinishAnimation" action="Stop" frame="$ancestor[@type=PlayerRewardsPanel]"/>
+
+                <Controller type="Event" end="Pause" frame="$ancestor[@type=PlayerRewardsPanel]">
+                    <Key type="Event" time="0.73" event="TransitionToAscensionLevelUpDone" />
+                </Controller>
+
+                <Controller type="Sound" end="Stop">
+                    <Key type="Sound" time="0" sound="*@UI_BNet_Progression_Levelup_RankSparks"/>
+                </Controller>
+
+                <Controller type="Visibility" end="Pause" frame="AscensionTransitionCutscene">
+                    <Key type="Bool" time="0" value="true"/>
+                </Controller>
+
+                <Controller type="Cutscene" end="Pause" frame="AscensionTransitionCutscene">
+                    <Key type="Cutscene" time="0" action="Play"/>
+                    <Key type="Cutscene" time="0" action="Bookmark" bookmark="Start"/>
+                </Controller>
+            </Animation>
+
+            <Animation name="HideCutscene">
+                <Event event="FinishAnimation" action="Reset,Play" frame="$ancestor[@type=PlayerRewardsPanel]"/>
+                <Event event="OnHidden" action="Reset,Play" frame="$ancestor[@type=PlayerRewardsPanel]"/>
+
+                <Controller type="Visibility" end="Pause" frame="AscensionTransitionCutscene">
+                    <Key type="Bool" time="0" value="False"/>
+                </Controller>
+            </Animation>
+
+            <Frame type="CutsceneFrame" name="AscensionTransitionCutscene">
+                <Anchor side="Left" relative="$parent" pos="Mid" offset="25"/>
+                <Anchor side="Right" relative="$parent" pos="Mid" offset="25"/>
+                <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+                <Width val="665"/>
+                <Height val="620"/>
+
+                <RenderPriority val="2000"/>
+                <File val="Cutscenes/UI/UI_ScoreScreen_Lightning.StormCutscene"/>
+                <Unclipped val="True"/>
+                <Visible val="False"/>
+
+                <Animation name="Ranked">
+                    <Event event="Ranked" action="Reset,Play"/>
+                    <Controller type="Cutscene" end="Stop">
+                        <Key type="Cutscene" time="0.00" action="ClearFilters"/>
+                        <Key type="Cutscene" time="0.00" action="AddFilter" filter="Ranked"/>
+                    </Controller>
+                </Animation>
+
+                <Animation name="Unranked">
+                    <Event event="Unranked" action="Reset,Play"/>
+                    <Controller type="Cutscene" end="Stop">
+                        <Key type="Cutscene" time="0.00" action="ClearFilters"/>
+                        <Key type="Cutscene" time="0.00" action="AddFilter" filter="Unranked"/>
+                    </Controller>
+                </Animation>
+
+                <Animation name="RankedGold">
+                    <Event event="RankedGold" action="Reset,Play"/>
+                    <Controller type="Cutscene" end="Stop">
+                        <Key type="Cutscene" time="0" action="ClearFilters"/>
+                        <Key type="Cutscene" time="0" action="AddFilter" filter="Ranked"/>
+                        <Key type="Cutscene" time="0" action="AddFilter" filter="Gold"/>
+                    </Controller>
+                </Animation>
+
+                <Animation name="UnrankedGold">
+                    <Event event="UnrankedGold" action="Reset,Play"/>
+                    <Controller type="Cutscene" end="Stop">
+                        <Key type="Cutscene" time="0" action="ClearFilters"/>
+                        <Key type="Cutscene" time="0" action="AddFilter" filter="Unranked"/>
+                        <Key type="Cutscene" time="0" action="AddFilter" filter="Gold"/>
+                    </Controller>
+                </Animation>
+
+                <StateGroup name="CutsceneFilter">
+                    <DefaultState val="Ranked"/>
+                    <!-- Wait until Cutscene is loaded, so that filter can be applied after creation -->
+                    <State name="Invisible">
+                        <When type="Property" inheritedVisible="false"/>
+                    </State>
+                    <State name="Unloaded">
+                        <When type="AnimationState" CutsceneLoad="Unloaded"/>
+                    </State>
+                    <State name="Loading">
+                        <When type="AnimationState" CutsceneLoad="Loading"/>
+                    </State>
+                    <State name="UnrankedGold">
+                        <When type="StateGroup" frame="$ancestor[@type=PlayerRewardsPanel]" RewardType="Regular"/>
+                        <When type="StateGroup" frame="$ancestor[@type=PlayerRewardsPanel]/HeroScoreFrame" HeroMastery="Gold"/>
+                        <Action type="SendEvent" frame="$this" event="UnrankedGold"/>
+                    </State>
+                    <State name="Unranked">
+                        <When type="StateGroup" frame="$ancestor[@type=PlayerRewardsPanel]" RewardType="Regular"/>
+                        <Action type="SendEvent" frame="$this" event="Unranked"/>
+                    </State>
+                    <State name="RankedGold">
+                        <When type="StateGroup" frame="$ancestor[@type=PlayerRewardsPanel]/HeroScoreFrame" HeroMastery="Gold"/>
+                        <Action type="SendEvent" frame="$this" event="RankedGold"/>
+                    </State>
+                    <State name="Ranked">
+                        <Action type="SendEvent" frame="$this" event="Ranked"/>
+                    </State>
+                </StateGroup>
+            </Frame>
         </Frame>
-        
+
+        <Frame type="Frame" name="MasteryIconFrame" template="PlayerRewardsPanel/MasteryIconFrameTemplate">
+            <Frame type="Image" name="MasteryIcon" template="PlayerRewardsPanel/AddGlowOverride">
+                <Anchor side="Top" relative="$parent/$parent/ProgressBackground" pos="0.89575" offset="0"/>
+                <Anchor side="Bottom" relative="$parent/$parent/ProgressBackground" pos="0.89575" offset="0"/>
+                <Anchor side="Left" relative="$parent/$parent/ProgressBackground" pos="Mid" offset="0"/>
+                <Anchor side="Right" relative="$parent/$parent/ProgressBackground" pos="Mid" offset="0"/>
+            </Frame>
+        </Frame>
+
+        <Animation name="ScoreLayout">
+            <Controller type="State" frame="MasteryIconFrame" stateGroup="MasteryIconSize" end="Pause">
+                <Key type="Identifier" time="0" value="NormalSize"/>
+                <Key type="Identifier" time="0" value="SmallSize"/>
+            </Controller>
+        </Animation>
+
         <Frame type="Frame" name="LensFlare1Anchor">
             <Anchor side="Top" relative="$parent/ProgressBackground" pos="Min" offset="78"/>
             <Anchor side="Left" relative="$parent/ProgressBackground" pos="Min" offset="90"/>
@@ -1001,41 +1833,40 @@
             <BlendMode val="Add"/>
             <Texture val="@UI/Storm_UI_Scorescreen_Lens_Flare"/>
             <Animation name="Pulse">
-                <Event event="Shine" action="Reset" frame="$parent"/>
-                <Event event="Shine" action="Play" frame="$parent"/>
+                <Event event="Shine" action="Reset,Play" frame="$parent"/>
                 <Controller type="Fade" end="Loop">
-                    <Key type="Curve" time="0" value="0" out="Slow"/>
-                    <Key type="Curve" time="1" value="255" in="Slow"/>
-                    <Key type="Curve" time="2" value="0" in="Slow"/>
-                    <Key type="Curve" time="10" value="0" in="Slow"/>
+                    <Key type="Curve" time="0" value="0" inout="Linear,Slow"/>
+                    <Key type="Curve" time="1" value="255" inout="Slow,Linear"/>
+                    <Key type="Curve" time="2" value="0" inout="Slow,Linear"/>
+                    <Key type="Curve" time="10" value="0" inout="Slow,Linear"/>
                 </Controller>
                 <Controller type="Anchor" side="Left" relative="true" frame="$parent/LensFlare1Anchor" end="Loop">
-                    <Key type="Curve" time="0" value="-30" out="Fast"/>
-                    <Key type="Curve" time=".1" value="-30" out="Fast"/>
-                    <Key type="Curve" time="2" value="50" in="Slow"/>
-                    <Key type="Curve" time="10" value="50" in="Slow"/>
+                    <Key type="Curve" time="0" value="-30" inout="Linear"/>
+                    <Key type="Curve" time=".1" value="-30" inout="Linear"/>
+                    <Key type="Curve" time="2" value="50" inout="Slow,Linear"/>
+                    <Key type="Curve" time="10" value="50" inout="Slow,Linear"/>
                 </Controller>
                 <Controller type="Anchor" side="Top" relative="true" frame="$parent/LensFlare1Anchor" end="Loop">
-                    <Key type="Curve" time="0" value="40" out="Fast"/>
-                    <Key type="Curve" time=".1" value="40" out="Fast"/>
-                    <Key type="Curve" time="2" value="-30" in="Slow"/>
-                    <Key type="Curve" time="10" value="-30" in="Slow"/>
+                    <Key type="Curve" time="0" value="40" inout="Linear"/>
+                    <Key type="Curve" time=".1" value="40" inout="Linear"/>
+                    <Key type="Curve" time="2" value="-30" inout="Slow,Linear"/>
+                    <Key type="Curve" time="10" value="-30" inout="Slow,Linear"/>
                 </Controller>
                 <Controller type="Dimension" dimension="Width" relative="False" percentage="True" end="Loop" >
-                    <Key type="Curve" time="0" value="40" in="linear" out="linear"/>
-                    <Key type="Curve" time="1" value="120" in="linear" out="linear"/>
-                    <Key type="Curve" time="2" value="40" in="linear" out="linear"/>
-                    <Key type="Curve" time="10" value="40" in="linear" out="linear"/>
+                    <Key type="Curve" time="0" value="40" inout="linear"/>
+                    <Key type="Curve" time="1" value="120" inout="linear"/>
+                    <Key type="Curve" time="2" value="40" inout="linear"/>
+                    <Key type="Curve" time="10" value="40" inout="linear"/>
                 </Controller>
                 <Controller type="Dimension" dimension="Height" relative="False" percentage="True" end="Loop" >
-                    <Key type="Curve" time="0" value="40" in="linear" out="linear"/>
-                    <Key type="Curve" time="1" value="120" in="linear" out="linear"/>
-                    <Key type="Curve" time="10" value="40" in="linear" out="linear"/>
+                    <Key type="Curve" time="0" value="40" inout="linear"/>
+                    <Key type="Curve" time="1" value="120" inout="linear"/>
+                    <Key type="Curve" time="10" value="40" inout="linear"/>
                 </Controller>
                 <Controller type="Rotation" relative="False" end="Loop" >
-                    <Key type="Curve" time="0" value="-10" out="linear"/>
-                    <Key type="Curve" time="2" value="20" in="linear"/>
-                    <Key type="Curve" time="10" value="20" in="linear"/>
+                    <Key type="Curve" time="0" value="-10" inout="Linear,linear"/>
+                    <Key type="Curve" time="2" value="20" inout="linear,Linear"/>
+                    <Key type="Curve" time="10" value="20" inout="linear,Linear"/>
                 </Controller>
             </Animation>
         </Frame>
@@ -1057,46 +1888,45 @@
             <Texture val="@UI/Storm_UI_Scorescreen_Lens_Flare"/>
             
             <Animation name="Pulse">
-                <Event event="Shine" action="Reset" frame="$parent"/>
-                <Event event="Shine" action="Play" frame="$parent"/>
+                <Event event="Shine" action="Reset,Play" frame="$parent"/>
                 <Controller type="Fade" end="Loop">
-                    <Key type="Curve" time="0" value="0" out="Slow"/>
-                    <Key type="Curve" time="1" value="0" out="Slow"/>
-                    <Key type="Curve" time="2" value="255" in="Slow" out="Slow"/>
-                    <Key type="Curve" time="3" value="0" in="Fast"/>
-                    <Key type="Curve" time="10" value="0" in="Fast"/>
+                    <Key type="Curve" time="0" value="0" inout="Linear,Slow"/>
+                    <Key type="Curve" time="1" value="0" inout="Linear,Slow"/>
+                    <Key type="Curve" time="2" value="255" inout="Slow"/>
+                    <Key type="Curve" time="3" value="0" inout="Linear"/>
+                    <Key type="Curve" time="10" value="0" inout="Linear"/>
                 </Controller>
                 <Controller type="Anchor" end="Loop" side="Left" relative="true" frame="$parent/LensFlare2Anchor">
-                    <Key type="Curve" time="0" value="60" out="Fast"/>
-                    <Key type="Curve" time="1" value="60" out="Fast"/>
-                    <Key type="Curve" time="3" value="-10" in="Slow"/>
-                    <Key type="Curve" time="10" value="-10" in="Slow"/>
+                    <Key type="Curve" time="0" value="60" inout="Linear"/>
+                    <Key type="Curve" time="1" value="60" inout="Linear"/>
+                    <Key type="Curve" time="3" value="-10" inout="Slow,Linear"/>
+                    <Key type="Curve" time="10" value="-10" inout="Slow,Linear"/>
                 </Controller>
                 <Controller type="Anchor" end="Loop" side="Top" relative="true" frame="$parent/LensFlare2Anchor">
-                    <Key type="Curve" time="0" value="-80" out="Fast"/>
-                    <Key type="Curve" time="1" value="-80" out="Fast"/>
-                    <Key type="Curve" time="3" value="15" in="Slow"/>
-                    <Key type="Curve" time="10" value="15" in="Slow"/>
+                    <Key type="Curve" time="0" value="-80" inout="Linear"/>
+                    <Key type="Curve" time="1" value="-80" inout="Linear"/>
+                    <Key type="Curve" time="3" value="15" inout="Slow,Linear"/>
+                    <Key type="Curve" time="10" value="15" inout="Slow,Linear"/>
                 </Controller>
                 <Controller type="Rotation" relative="False" end="Loop" >
-                    <Key type="Curve" time="0" value="175" out="Fast"/>
-                    <Key type="Curve" time="1" value="175" out="Fast"/>
-                    <Key type="Curve" time="3" value="200" in="Slow"/>
-                    <Key type="Curve" time="10" value="200" in="Slow"/>
+                    <Key type="Curve" time="0" value="175" inout="Linear"/>
+                    <Key type="Curve" time="1" value="175" inout="Linear"/>
+                    <Key type="Curve" time="3" value="200" inout="Slow,Linear"/>
+                    <Key type="Curve" time="10" value="200" inout="Slow,Linear"/>
                 </Controller>
                 <Controller type="Dimension" dimension="Width" relative="False" percentage="True" end="Loop" >
-                    <Key type="Curve" time="0" value="20" out="Fast"/>
-                    <Key type="Curve" time="1" value="20" out="Fast"/>
-                    <Key type="Curve" time="2" value="80" in="Slow" out="Slow"/>
-                    <Key type="Curve" time="3" value="10" in="Slow" />
-                    <Key type="Curve" time="10" value="10" in="Slow" />
+                    <Key type="Curve" time="0" value="20" inout="Linear"/>
+                    <Key type="Curve" time="1" value="20" inout="Linear"/>
+                    <Key type="Curve" time="2" value="80" inout="Slow"/>
+                    <Key type="Curve" time="3" value="10"  inout="Slow,Linear"/>
+                    <Key type="Curve" time="10" value="10"  inout="Slow,Linear"/>
                 </Controller>
                 <Controller type="Dimension" dimension="Height" relative="False" percentage="True" end="Loop" >
-                    <Key type="Curve" time="0" value="20" out="Fast"/>
-                    <Key type="Curve" time="1" value="20" out="Fast"/>
-                    <Key type="Curve" time="2" value="80" in="Slow" out="Slow"/>
-                    <Key type="Curve" time="3" value="20" in="Slow" />
-                    <Key type="Curve" time="10" value="20" in="Slow" />
+                    <Key type="Curve" time="0" value="20" inout="Linear"/>
+                    <Key type="Curve" time="1" value="20" inout="Linear"/>
+                    <Key type="Curve" time="2" value="80" inout="Slow"/>
+                    <Key type="Curve" time="3" value="20"  inout="Slow,Linear"/>
+                    <Key type="Curve" time="10" value="20"  inout="Slow,Linear"/>
                 </Controller>
             </Animation>
         </Frame>
@@ -1109,48 +1939,164 @@
             <Color val="8ad4ff"/>
             
             <Animation name="LevelUp">
-                <Event event="LevelUp" action="Reset" frame="$parent"/>
-                <Event event="LevelUp" action="Play" frame="$parent"/>
+                <Event event="LevelUp" action="Reset,Play" frame="$parent"/>
                 <Controller type="Fade" end="Pause">
-                    <Key type="Curve" time="0" value="0" out="Fast"/>
-                    <Key type="Curve" time=".2" value="255" in="Slow"/>
-                    <Key type="Curve" time="1" value="0" in="Slow"/>
+                    <Key type="Curve" time="0" value="0" inout="Linear"/>
+                    <Key type="Curve" time=".2" value="255" inout="Slow,Linear"/>
+                    <Key type="Curve" time="1" value="0" inout="Slow,Linear"/>
                 </Controller>
                 <Controller type="Dimension" dimension="Width" relative="False" percentage="True" end="Pause" >
-                    <Key type="Curve" time="0" value="0" in="linear" out="linear"/>
-                    <Key type="Curve" time=".2" value="100" in="linear" out="linear"/>
-                    <Key type="Curve" time="1" value="90" in="linear" out="linear"/>
+                    <Key type="Curve" time="0" value="0" inout="linear"/>
+                    <Key type="Curve" time=".2" value="100" inout="linear"/>
+                    <Key type="Curve" time="1" value="90" inout="linear"/>
                 </Controller>
                 <Controller type="Dimension" dimension="Height" relative="False" percentage="True" end="Pause" >
-                    <Key type="Curve" time="0" value="0" in="linear" out="linear"/>
-                    <Key type="Curve" time=".2" value="100" in="linear" out="linear"/>
-                    <Key type="Curve" time="1" value="90" in="linear" out="linear"/>
+                    <Key type="Curve" time="0" value="0" inout="linear"/>
+                    <Key type="Curve" time=".2" value="100" inout="linear"/>
+                    <Key type="Curve" time="1" value="90" inout="linear"/>
                 </Controller>
                 <Controller type="Rotation" relative="False" end="Loop" >
-                    <Key type="Curve" time="0" value="0" out="linear"/>
-                    <Key type="Curve" time="4" value="360" in="linear"/>
+                    <Key type="Curve" time="0" value="0" inout="Linear,linear"/>
+                    <Key type="Curve" time="4" value="360" inout="linear,Linear"/>
                 </Controller>
             </Animation>
         </Frame>
-
-        <Frame type="Frame" name="HitTestFrame">
-            <Anchor side="Top" relative="$parent/ProgressBackground" pos="Min" offset="5"/>
-            <Anchor side="Left" relative="$parent/ProgressBackground" pos="Min" offset="5"/>
-            <Anchor side="Bottom" relative="$parent/ProgressBackground" pos="Max" offset="-5"/>
-            <Anchor side="Right" relative="$parent/ProgressBackground" pos="Max" offset="-5"/>
-            <Anchor relative="$parent/ProgressBackground"/>
-            <TooltipAnchorPosition val="TopCenter"/>
-        </Frame>    
     </Frame>
     
+    <Frame type="TileList" name="BrawlUnlockTileList">
+        <Animation name="EmptyReward">
+            <Event event="Hide" action="Reset,Play" frame="$parent"/>
+            <Event event="Show" action="Reset" frame="$parent"/>
+            <Controller type="Visibility" end="Pause">
+                <Key type="Bool" time="0.0" value="false"/>
+            </Controller>
+        </Animation>
+        
+        <Frame type="RewardTileListItem" name="Item0" template="PlayerRewardsPanel/HeroRewardItemTemplate">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+            <CollapseLayout val="true"/>
+        </Frame>
+      
+        <Frame type="RewardTileListItem" name="Item1" template="PlayerRewardsPanel/HeroRewardItemTemplate">
+            <Anchor side="Top" relative="$parent/Item0" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent/Item0" pos="Max" offset="-7"/>
+            <CollapseLayout val="true"/>
+        </Frame>
+    </Frame>
+
+    <Frame type="ScoreScreenPointReward" name="BrawlRewardScoreFrameTemplate" template="PlayerRewardsPanel/HeroScoreFrameTemplate">
+        <Frame type="Image" name="ProgressBackground" template="PlayerRewardsPanel/ScoreNonRankBackgroundTemplate">
+            <Texture val="@UI/Storm_UI_Scorescreen_HeroXP_Background"/>
+        </Frame>
+
+        <Frame type="Image" name="ProgressPattern">
+            <Texture val="@UI/Storm_UI_Scorescreen_HeroXP_Pattern" layer="1"/>
+        </Frame>
+
+        <Frame type="ProgressBar" name="ProgressBar" template="StandardTemplates/ScoreProgressBarTemplate">
+            <Frame type="Frame" name="FillImageContainer">
+                <Frame type="Image" name="FillImage">
+                    <Texture val="@UI/Storm_UI_Scorescreen_HeroXP_Bar"/>
+                </Frame>
+            </Frame>
+        </Frame>
+
+        <Frame type="Progressbar" name="BoostProgressBar">
+            <Visible val="false"/>
+        </Frame>
+
+        <Frame type="Frame" name="LevelUpContainer" template="PlayerRewardsPanel/LevelUpContainerTemplate">
+            <Frame type="Label" name="LevelUpLabel">
+                <Visible val="false"/>
+            </Frame>
+        </Frame>
+
+        <Frame type="Label" name="LevelLabel">
+            <Visible val="False"/>
+        </Frame>
+
+        <Frame type="Label" name="NameLabel">
+            <Text val="@UI/ScreenScore/WeeklyReward"/>
+        </Frame>
+
+        <Frame type="BrawlRewardPanel" name="BrawlRewardPanel" template="BrawlRewardPanel/BrawlRewardPanelTemplate">
+            <Anchor relative="$parent/ProgressBar" offset="100"/>
+            <AchivementId val="{$ancestor[@type=PlayerRewardsPanel]/@BrawlAchievementId}"/>
+
+            <Frame type="UnlockableFrame" name="PortraitUnlockableFrame">
+                <Anchor side="Top" relative="$parent/BorderImage" pos="Min" offset="27"/>
+                <Anchor side="Left" relative="$parent/BorderImage" pos="Min" offset="78"/>
+                <Width val="200"/>
+                <Height val="200"/>
+            </Frame>
+
+            <Frame type="LootChestCutsceneFrame" name="LootChestCutscene">
+                <Width val="975"/>
+                <Height val="300"/>
+                <IgnoreParentAlpha val="true"/>
+            </Frame>
+
+            <Frame type="Image" name="BorderImage">
+                <Anchor side="Left" relative="$parent" pos="Mid" offset="7"/>
+                <Anchor side="Right" relative="$parent" pos="Mid" offset="7"/>
+            </Frame>
+
+        </Frame>
+
+        <Frame type="Label" name="CountLabel">
+            <Anchor side="Bottom" relative="$parent/ProgressBar" pos="Max" offset="0"/>
+            <Anchor side="Left" relative="$parent/ProgressBar" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent/ProgressBar" pos="Max" offset="0"/>
+            <Height val=" 50"/>
+            <Style val="HeroesBrawlPanel_QuestProgress"/>
+        </Frame>
+
+        <Frame type="Image" name="CompletedImage">
+            <Anchor side="Top" relative="$parent/CountLabel" pos="Mid" offset="-6"/>
+            <Anchor side="Bottom" relative="$parent/CountLabel" pos="Mid" offset="-6"/>
+            <Anchor side="Right" relative="$parent/CountLabel" pos="Mid" offset="0"/>
+            <Anchor side="Left" relative="$parent/CountLabel" pos="Mid" offset="0"/>
+            <Width val="96"/>
+            <Height val="96"/>
+            <Texture val="@UI/Storm_UI_NewUser_IconComplete"/>
+        </Frame>
+
+        <StateGroup name="EarnedState">
+            <DefaultState val="NotEarned"/>
+            <State name="Earned">
+                <When type="AnimationState" frame="$this" CompletionState="Completed"/>
+                <Action type="SetProperty" frame="NameLabel" Text="@UI/WeeklyReward/Complete"/>
+                <Action type="SetProperty" frame="CountLabel" visible="false"/>
+                <Action type="SetProperty" frame="CompletedImage" visible="true"/>
+            </State>
+            <State name="NotEarned">
+                <Action type="SetProperty" frame="NameLabel" Text="@UI/ScreenScore/WeeklyReward"/>
+                <Action type="SetProperty" frame="CountLabel" visible="true"/>
+                <Action type="SetProperty" frame="CompletedImage" visible="false"/>
+            </State>
+        </StateGroup>
+
+        <Animation name="LevelUp">
+            <Event event="LevelUp" action="Reset,Play"/>
+
+            <Controller type="Sound" end="Stop">
+                <Key type="Sound" time="0.0" sound="@UI_BNet_Progression_Levelup02"/>
+            </Controller>
+            <Controller type="Event" end="Pause">
+                <Key type="Event" time="0" event="Complete"/>
+            </Controller>
+        </Animation>
+    </Frame>
 
     <!--===========================================================================================
     <! MAIN LAYOUT
     <!=============================================================================================
     <! Events (Recieve): ShowDailyQuest
-    <! Events (Send)   : RankedGame, NonRankedGame, InitialDelay
+    <! Events (Send)   : InitialDelay
     <!==========================================================================================-->
     <Frame type="PlayerRewardsPanel" name="PlayerRewardsPanelTemplate">
+        <AscensionLevelProgressDurationMS val="300"/>
         <Visible val="true"/>
         <Anchor relative="$parent"/>
 
@@ -1176,102 +2122,136 @@
             <Event event="ShowIntro" action="Reset, Play"/>
 
             <Controller type="Fade" end="Stop">
-                <Key type="Curve" time="0.0" value="255" out="Slow"/>
-                <Key type="Curve" time="2.0" value="255" in="Slow"/>
+                <Key type="Curve" time="0.0" value="255" inout="Linear,Slow"/>
+                <Key type="Curve" time="2.0" value="255" inout="Slow,Linear"/>
             </Controller>
+
+            <!-- Player -->
             <Controller type="Anchor" end="Pause" side="Bottom" relative="true" frame="PlayerScoreFrame">
-                <Key type="Curve" time="0" value="30" out="Fast"/>
-                <Key type="Curve" time=".5" value="0" in="Slow"/>
+                <Key type="Curve" time="0" value="30" inout="Linear"/>
+                <Key type="Curve" time=".5" value="0" inout="Slow,Linear"/>
             </Controller>
             <Controller type="Fade" end="Pause" frame="PlayerScoreFrame">
-                <Key type="Curve" time="0" value="0" out="Slow"/>
-                <Key type="Curve" time=".5" value="255" in="Slow"/>
+                <Key type="Curve" time="0" value="0" inout="Linear,Slow"/>
+                <Key type="Curve" time=".5" value="255" inout="Slow,Linear"/>
             </Controller>
             <Controller type="Fade" end="Pause" frame="NextUnlockTileList">
-                <Key type="Curve" time="0" value="0" out="Slow"/>
-                <Key type="Curve" time=".3" value="0" out="Fast"/>
-                <Key type="Curve" time=".6" value="255" in="Slow"/>
+                <Key type="Curve" time="0" value="0" inout="Linear,Slow"/>
+                <Key type="Curve" time=".3" value="0" inout="Linear"/>
+                <Key type="Curve" time=".6" value="255" inout="Slow,Linear"/>
             </Controller>
+
+            <!-- Ranked -->
             <Controller type="Anchor" end="Pause" side="Bottom" relative="true" frame="RankFrameAnchor">
-                <Key type="Curve" time="0" value="50" out="Fast"/>
-                <Key type="Curve" time=".5" value="0" in="Slow"/>
+                <Key type="Curve" time="0" value="50" inout="Linear"/>
+                <Key type="Curve" time=".5" value="0" inout="Slow,Linear"/>
             </Controller>
             <Controller type="Fade" end="Pause" frame="RankScoreFrame">
-                <Key type="Curve" time="0" value="0" out="Slow"/>
-                <Key type="Curve" time=".9" value="255" in="Slow"/>
+                <Key type="Curve" time="0" value="0" inout="Linear,Slow"/>
+                <Key type="Curve" time=".9" value="255" inout="Slow,Linear"/>
             </Controller>
+
+            <!-- Hero -->
             <Controller type="Anchor" end="Pause" side="Bottom" relative="true" frame="HeroScoreFrame">
-                <Key type="Curve" time="0" value="30" out="Fast"/>
-                <Key type="Curve" time=".5" value="0" in="Slow"/>
+                <Key type="Curve" time="0" value="30" inout="Linear"/>
+                <Key type="Curve" time=".5" value="0" inout="Slow,Linear"/>
             </Controller>
             <Controller type="Fade" end="Pause" frame="NextHeroUnlockTileList">
-                <Key type="Curve" time="0" value="0" out="Slow"/>
-                <Key type="Curve" time=".3" value="0" out="Fast"/>
-                <Key type="Curve" time=".6" value="255" in="Slow"/>
+                <Key type="Curve" time="0" value="0" inout="Linear,Slow"/>
+                <Key type="Curve" time=".3" value="0" inout="Linear"/>
+                <Key type="Curve" time=".6" value="255" inout="Slow,Linear"/>
             </Controller>
             <Controller type="Fade" end="Pause" frame="HeroScoreFrame">
-                <Key type="Curve" time="0" value="0" out="Slow"/>
-                <Key type="Curve" time=".5" value="255" in="Slow"/>
+                <Key type="Curve" time="0" value="0" inout="Linear,Slow"/>
+                <Key type="Curve" time=".5" value="255" inout="Slow,Linear"/>
             </Controller>
+
+            <!-- Hero Rounds -->
+            <Controller type="Event" end="Pause" frame="RoundScoreFrame0">
+                <Key type="Event" time="0.1" event="Intro"/>
+            </Controller>
+            <Controller type="Event" end="Pause" frame="RoundScoreFrame1">
+                <Key type="Event" time="0.2" event="Intro"/>
+            </Controller>
+            <Controller type="Event" end="Pause" frame="RoundScoreFrame2">
+                <Key type="Event" time="0.3" event="Intro"/>
+            </Controller>
+
+            <!-- Counting Labels -->
             <Controller type="Anchor" end="Pause" side="Top" relative="true" frame="XPCountingFrame">
-                <Key type="Curve" time="0" value="-30" out="Fast"/>
-                <Key type="Curve" time=".5" value="0" in="Slow"/>
+                <Key type="Curve" time="0" value="-30" inout="Linear"/>
+                <Key type="Curve" time=".5" value="0" inout="Slow,Linear"/>
             </Controller>
             <Controller type="Fade" end="Pause" frame="XPCountingFrame">
-                <Key type="Curve" time="0" value="0" out="Slow"/>
-                <Key type="Curve" time=".5" value="255" in="Slow"/>
+                <Key type="Curve" time="0" value="0" inout="Linear,Slow"/>
+                <Key type="Curve" time=".5" value="255" inout="Slow,Linear"/>
             </Controller>
             <Controller type="Anchor" end="Pause" side="Top" relative="true" frame="RankCountingFrame">
-                <Key type="Curve" time="0" value="-30" out="Fast"/>
-                <Key type="Curve" time=".5" value="0" in="Slow"/>
+                <Key type="Curve" time="0" value="-30" inout="Linear"/>
+                <Key type="Curve" time=".5" value="0" inout="Slow,Linear"/>
             </Controller>
             <Controller type="Fade" end="Pause" frame="RankCountingFrame">
-                <Key type="Curve" time="0" value="0" out="Slow"/>
-                <Key type="Curve" time=".5" value="255" in="Slow"/>
+                <Key type="Curve" time="0" value="0" inout="Linear,Slow"/>
+                <Key type="Curve" time=".5" value="255" inout="Slow,Linear"/>
             </Controller>
             <Controller type="Anchor" end="Pause" side="Top" relative="true" frame="GoldCountingFrame">
-                <Key type="Curve" time="0" value="-30" out="Fast"/>
-                <Key type="Curve" time=".5" value="0" in="Slow"/>
+                <Key type="Curve" time="0" value="-30" inout="Linear"/>
+                <Key type="Curve" time=".5" value="0" inout="Slow,Linear"/>
             </Controller>
             <Controller type="Fade" end="Pause" frame="GoldCountingFrame">
-                <Key type="Curve" time="0" value="0" out="Slow"/>
-                <Key type="Curve" time=".5" value="255" in="Slow"/>
+                <Key type="Curve" time="0" value="0" inout="Linear,Slow"/>
+                <Key type="Curve" time=".5" value="255" inout="Slow,Linear"/>
+            </Controller>
+
+            <!-- Brawl -->
+            <Controller name="RewardSlide" type="Anchor" end="Pause" side="Bottom" relative="true" frame="BrawlRewardScoreFrame">
+                <Key type="Curve" time="0" value="30" inout="Linear"/>
+                <Key type="Curve" time=".5" value="0" inout="Slow,Linear"/>
+            </Controller>
+            <Controller name="RewardFade" type="Fade" end="Pause" frame="BrawlRewardScoreFrame">
+                <Key type="Curve" time="0" value="0" inout="Linear,Slow"/>
+                <Key type="Curve" time=".5" value="255" inout="Slow,Linear"/>
             </Controller>
         </Animation>
 
-        <Animation name="RankedGame">
-            <Event event="RankedGame" action="Reset"/>
-            <Event event="RankedGame" action="Play"/>
-          
-            <Controller type="Visibility" end="Pause" frame="RankScoreFrame">
-                <Key type="Bool" time="0.0" value="true"/>
-            </Controller>
+        <StateGroup name="RewardType">
+            <DefaultState val="Regular"/>
 
-            <Controller type="Visibility" end="Pause" frame="RankCountingFrame">
-                <Key type="Bool" time="0.0" value="true"/>
-            </Controller>
+            <State name="RankedGame">
+                <When type="AnimationState" RewardType="RankedGame"/>
 
-            <Controller type="Visibility" end="Pause" frame="RankRewardTileList">
-                <Key type="Bool" time="0.0" value="true"/>
-            </Controller>
-        </Animation>
+                <Action type="SetProperty" frame="RankScoreFrame" visible="true"/>
+                <Action type="SetProperty" frame="RankCountingFrame" visible="true"/>
+                <Action type="SetProperty" frame="RankRewardTileList" visible="true"/>
+                <Action type="SetProperty" frame="RankEarnedToolTipHitTestFrame" visible="true"/>
 
-        <Animation name="NonRankedGame">
-            <Event event="NonRankedGame" action="Reset"/>
-            <Event event="NonRankedGame" action="Play"/>
-          
-            <Controller type="Visibility" end="Pause" frame="RankScoreFrame">
-                <Key type="Bool" time="0.0" value="false"/>
-            </Controller>
+                <Action type="SendEvent" frame="PlayerScoreFrame" event="SmallSize"/>
+                <Action type="SendEvent" frame="HeroScoreFrame" event="SmallSize"/>
+                <Action type="SetProperty" frame="XPScoreFrameAnchor" width="650"/>
 
-            <Controller type="Visibility" end="Pause" frame="RankCountingFrame">
-                <Key type="Bool" time="0.0" value="false"/>
-            </Controller>
+                <Action type="SendEvent" frame="$this" event="LayoutThreeScores"/>
+            </State>
 
-            <Controller type="Visibility" end="Pause" frame="RankRewardTileList">
-                <Key type="Bool" time="0.0" value="false"/>
-            </Controller>
-        </Animation>
+            <State name="Brawl">
+                <When type="AnimationState" RewardType="Brawl"/>
+                
+                <Action type="SetProperty" frame="BrawlRewardScoreFrame" visible="True"/>
+
+                <Action type="SendEvent" frame="PlayerScoreFrame" event="SmallSize"/>
+                <Action type="SendEvent" frame="HeroScoreFrame" event="SmallSize"/>
+                <Action type="SetProperty" frame="XPScoreFrameAnchor" width="650"/>
+
+                <Action type="SendEvent" frame="$this" event="LayoutThreeScores"/>
+            </State>
+
+            <State name="Regular">
+                <Action type="SendEvent" frame="PlayerScoreFrame" event="NormalSize"/>
+                <Action type="SendEvent" frame="HeroScoreFrame" event="NormalSize"/>
+                <Action type="SetProperty" frame="XPScoreFrameAnchor" width="405"/>
+
+                <Action type="SendEvent" frame="$this" event="LayoutTwoScores"/>
+            </State>
+        </StateGroup>
 
         <!--=======================================================================================
         <! TOP ROW - PROGRESS BARS
@@ -1290,24 +2270,127 @@
         <!======================================================================================-->
         <Frame type="ScoreScreenPointReward" name="PlayerScoreFrame" template="PlayerRewardsPanel/ScoreFrameTemplate">
             <Anchor side="Bottom" relative="$parent/ScoreFramesAnchor" pos="Max" offset="0"/>
-            <Anchor side="Right" relative="$parent/RankScoreFrame" pos="Min" offset="232"/>
+            <Anchor side="Right" relative="$parent/XPScoreFrameAnchor" pos="Min" offset="232"/>
+
+            <!-- Updating size for Draft/Brawl -->
+            <Animation name="ScoreLayout">
+                <Controller type="State" stateGroup="PlayerScoreFrameSize" end="Pause">
+                    <Key type="Identifier" time="0" value="NormalSize"/>
+                    <Key type="Identifier" time="0" value="SmallSize"/>
+                </Controller>
+            </Animation>
+            <StateGroup name="PlayerScoreFrameSize">
+                <DefaultState val="NormalSize"/>
+                <State name="NormalSize">
+                    <Action type="SendEvent" frame="AscensionFrame" event="RefreshBaseValue"/>
+                </State>
+                <State name="SmallSize">
+                    <Action type="SetProperty" frame="AscensionFrame/FontStyle" FormatText="AscensionBadge_ScoreRanked_T%0%" undo="true"/>
+                    <Action type="SetProperty" frame="AscensionFrame" Width="224" undo="true"/>
+                    <Action type="SetProperty" frame="AscensionFrame" Height="224" undo="true"/>
+                    <Action type="SendEvent" frame="AscensionFrame" event="RefreshBaseValue"/>
+                </State>
+            </StateGroup>
 
             <!-- PLAYER SCORE FRAME ANIMATION -->
-            <Animation name="LevelUp">
-                <Event event="LevelUp" action="Reset"/>
-                <Event event="LevelUp" action="Play"/>
+            <Animation name="PlayerLevelUp1">
+                <Event event="PlayerLevelUp1" action="Reset,Play"/>
+                <Event event="PlayerPostLevelUp1" action="Stop"/>
+                <Event event="OnShown" action="Stop"/>
+                <Event event="OnHidden" action="Stop"/>
+
+                <!-- Level logo fade -->
+                <Controller type="Fade" frame="AscensionFrame/BadgeContainer/LogoImage" end="Pause">
+                    <Key type="Curve" time="0.0" value="255"/>
+                    <Key type="Curve" time="0.25" value="0"/>
+                </Controller>
+
+                <!-- Level text fade -->
+                <Controller type="Fade" frame="AscensionFrame/ProgressionBadgeText" end="Pause">
+                    <Key type="Curve" time="0.0" value="255"/>
+                    <Key type="Curve" time="0.25" value="0"/>
+                </Controller>
+
+                <!-- Play sound early so that pounding sound is synced with zoom in animation in PlayerPostLevelUp1 -->
+                <Controller type="Sound" end="Stop">
+                    <Key type="Sound" time="0.40" sound="*@UI_BNet_Progression_Levelup01"/>
+                </Controller>
+
+                <Controller type="Event" end="Pause">
+                    <Key type="Event" time="0.45" event="Complete"/>
+                </Controller>
+            </Animation>
+
+            <Animation name="PlayerPostLevelUp1">
+                <Event event="PlayerPostLevelUp1" action="Reset,Play"/>
+
+                <!-- Level label scale -->
+                <Controller type="Dimension" frame="AscensionFrame/ProgressionBadgeText" dimension="Width" percentage="True" end="Pause">
+                    <Key type="Curve" time="0.0" value="133" inout="Linear"/>
+                    <Key type="Curve" time="0.17" value="100" inout="Slow,Linear"/>
+                </Controller>
+                <Controller type="Dimension" frame="AscensionFrame/ProgressionBadgeText" dimension="Height" percentage="True" end="Pause">
+                    <Key type="Curve" time="0.0" value="133" inout="Linear"/>
+                    <Key type="Curve" time="0.17" value="100" inout="Slow,Linear"/>
+                </Controller>
+
+                <Controller type="Event" end="Pause">
+                    <Key type="Event" time="0.5" event="IntroComplete"/>
+                </Controller>
+            </Animation>
+
+            <Animation name="PlayerLevelUp25">
+                <Event event="PlayerLevelUp25" action="Reset,Play"/>
+                <Event event="OnHidden" action="Stop"/>
 
                 <Controller type="Sound" end="Stop">
-                    <Key type="Sound" time="0.0" sound="@UI_BNet_Progression_Levelup01"/>
+                    <Key type="Sound" time="0.001" sound="*@UI_BNet_Progression_Levelup_Rank25"/>
+                </Controller>
+                <Controller type="Event" end="Pause" frame="AscensionFrame">
+                    <Key type="Event" time="0.0" event="BadgeTransitionFlash"/>
                 </Controller>
                 <Controller type="Event" end="Pause">
-                    <Key type="Event" time="0" event="Complete"/>
+                    <Key type="Event" time="1.75" event="Complete"/>
+                </Controller>
+            </Animation>
+
+            <Animation name="PlayerPostLevelUp25">
+                <Event event="PlayerPostLevelUp25" action="Reset,Play"/>
+
+                <Controller type="Event" end="Pause">
+                    <Key type="Event" time="1.3" event="IntroComplete"/>
+                </Controller>
+            </Animation>
+
+            <Animation name="PlayerLevelUp100">
+                <Event event="PlayerLevelUp100" action="Reset,Play"/>
+                <Event event="OnHidden" action="Stop"/>
+
+                <Controller type="Sound" end="Stop">
+                    <Key type="Sound" time="0.001" sound="*@UI_BNet_Progression_Levelup_Rank100"/>
+                </Controller>
+                <Controller type="Event" end="Pause" frame="AscensionFrame">
+                    <Key type="Event" time="0.0" event="BadgeTransitionFlash"/>
+                </Controller>
+                <Controller type="Event" end="Pause">
+                    <Key type="Event" time="1.75" event="Complete"/>
+                </Controller>
+            </Animation>
+
+            <Animation name="PlayerPostLevelUp100">
+                <Event event="PlayerPostLevelUp100" action="Reset,Play"/>
+
+                <Controller type="Fade" frame="AscensionFrame/BadgeContainer/LogoImage" end="Pause">
+                    <Key type="Curve" time="0" value="255"/>
+                </Controller>
+
+                <Controller type="Event" end="Pause">
+                    <Key type="Event" time="1.3" event="IntroComplete"/>
                 </Controller>
             </Animation>
 
             <Animation name="AnimationCascade">
-                <Event event="OnShown" action="DirectionForward"/>
-                <Event event="OnShown" action="Play"/>
+                <Event event="OnShown" action="DirectionForward,Play"/>
                 <Event event="OnMouseUp" action="Play"/>
                 <Controller type="Event" end="Stop">
                     <Key type="Event" time="0" event="Shine"/>
@@ -1318,47 +2401,50 @@
                 <Controller type="Event" end="Stop" frame="$parent/HeroScoreFrame">
                     <Key type="Event" time="1" event="Shine"/>
                 </Controller>
+                <Controller name="RewardCascade" type="Event" end="Stop" frame="$parent/BrawlRewardScoreFrame">
+                    <Key type="Event" time="1" event="Shine"/>
+                </Controller>
             </Animation>
             
-            <Frame type="Image" name="ProgressBackground" template="PlayerRewardsPanel/ScoreNonRankBackgroundTemplate"/>
-
-            <Frame type="Image" name="LensFlareImage">
-                <Texture val="@UI/Storm_UI_Scorescreen_Lens_Flare_Purple"/>
+            <Frame type="Image" name="ProgressBackground">
+                <ColorAdjustMode val="Colorize"/>
+                <LightAdjustColor val="{$ancestor[@type=ScoreScreenPointReward]/AscensionFrame/ProgressBarColorizationProvider/@LightAdjustColor}"/>
+                <DarkAdjustColor val="{$ancestor[@type=ScoreScreenPointReward]/AscensionFrame/ProgressBarColorizationProvider/@DarkAdjustColor}"/>
             </Frame>
 
-            <Frame type="Image" name="LensFlare2Image">
-                <Texture val="@UI/Storm_UI_Scorescreen_Lens_Flare_Purple"/>
+            <Frame type="Label" name="LevelLabel">
+                <Visible val="False"/>
             </Frame>
 
-            <Frame type="Frame" name="LevelUpContainer" template="PlayerRewardsPanel/LevelUpContainerTemplate">
-                 <Frame type="Image" name="BottomShadowImage">
-                    <Texture val="@UI/Storm_UI_Scorescreen_LevelUp_BottomShadow_Player"/>
+            <Frame type="ProgressBar" name="ProgressBar">
+                <Frame type="Frame" name="FillImageContainer">
+                    <Frame type="Image" name="FillImage">
+                        <ColorAdjustMode val="Colorize"/>
+                        <LightAdjustColor val="{$ancestor[@type=ScoreScreenPointReward]/AscensionFrame/ProgressBarColorizationProvider/@LightAdjustColor}"/>
+                        <DarkAdjustColor val="{$ancestor[@type=ScoreScreenPointReward]/AscensionFrame/ProgressBarColorizationProvider/@DarkAdjustColor}"/>
+                    </Frame>
                 </Frame>
-                <Frame type="Image" name="ArrowsImage">
-                    <Texture val="@UI/Storm_UI_Scorescreen_LevelUp_Arrows_Player" layer="1"/>
-                </Frame>
+            </Frame>
 
-                <Frame type="Image" name="SparklesTemplate">
-                    <Texture val="@UI/Storm_UI_Scorescreen_LevelUp_Sparkles_Rank1_Purple" layer="1"/>
-                </Frame>
-                <Frame type="Image" name="Sparkles1">
-                    <Texture val="@UI/Storm_UI_Scorescreen_LevelUp_Sparkles_Rank1_Purple" layer="1"/>
-                </Frame>
-                <Frame type="Image" name="Sparkles2">
-                    <Texture val="@UI/Storm_UI_Scorescreen_LevelUp_Sparkles_Rank2_Purple" layer="1"/>
-                </Frame>
-                <Frame type="Image" name="Sparkles3">
-                    <Texture val="@UI/Storm_UI_Scorescreen_LevelUp_Sparkles_Rank3_Purple" layer="1"/>
-                </Frame>
+            <Frame type="ProgressBar" name="BoostProgressBar">
+                <Visible val="False"/>
+            </Frame>
+
+            <Frame type="AscensionFrame" name="AscensionFrame" template="AscensionBadge/AscensionScoreBadgeTemplate">
+                <Anchor side="Left" relative="$parent/ProgressBackground" pos="Mid" offset="0"/>
+                <Anchor side="Right" relative="$parent/ProgressBackground" pos="Mid" offset="0"/>
+                <Anchor side="Top" relative="$parent/ProgressBackground" pos="Mid" offset="-1"/>
+                <Anchor side="Bottom" relative="$parent/ProgressBackground" pos="Mid" offset="-1"/>
+                <AccountLevel val="{$ancestor[@type=PlayerRewardsPanel]/@DisplayedAccountLevel}"/>
             </Frame>
         </Frame>
 
         <!--=======================================================================================
         <! HERO SCORE FRAME
         <!======================================================================================-->
-        <Frame type="ScoreScreenPointReward" name="HeroScoreFrame" template="PlayerRewardsPanel/ScoreFrameTemplate">
+        <Frame type="ScoreScreenPointReward" name="HeroScoreFrame" template="PlayerRewardsPanel/HeroScoreFrameTemplate">
             <Anchor side="Bottom" relative="$parent/ScoreFramesAnchor" pos="Max" offset="0"/>
-            <Anchor side="Left" relative="$parent/RankScoreFrame" pos="Max" offset="-235"/>
+            <Anchor side="Left" relative="$parent/XPScoreFrameAnchor" pos="Max" offset="-235"/>
 
             <Frame type="Image" name="ProgressBackground" template="PlayerRewardsPanel/ScoreNonRankBackgroundTemplate">
                 <Texture val="@UI/Storm_UI_Scorescreen_HeroXP_Background"/>
@@ -1384,12 +2470,24 @@
                 </Frame>
             </Frame>
 
+            <Frame type="Image" name="FillImageForAnimation" template="PlayerRewardsPanel/BrightnessTemplate">
+                <Anchor relative="$parent/BoostProgressBar"/>
+                <Alpha val="0"/>
+                <Texture val="@UI/Storm_UI_Scorescreen_HeroXP_BoostBar"/>
+
+                <Animation name="BrightnessAnimation">
+                    <Event event="HeroLevelUpIntro" action="Restart,Play" frame="$ancestor[@type=ScoreScreenPointReward]"/>
+                    <Event event="IntroComplete" action="Stop" frame="$ancestor[@type=ScoreScreenPointReward]"/>
+                </Animation>
+            </Frame>
+
             <Frame type="Label" name="LevelLabel">
                 <Style val="ScoreHeroLevel"/>
+                <Animation name="ShakeAnimation" template="StandardAnimationTemplates/ShakeAnimation"/>
             </Frame>
             
             <Frame type="Frame" name="LevelUpContainer" template="PlayerRewardsPanel/LevelUpContainerTemplate">
-                 <Frame type="Image" name="BottomShadowImage">
+                <Frame type="Image" name="BottomShadowImage">
                     <Texture val="@UI/Storm_UI_Scorescreen_LevelUp_BottomShadow_Hero"/>
                 </Frame>
                 <Frame type="Image" name="ArrowsImage">
@@ -1397,19 +2495,142 @@
                 </Frame>
             </Frame>
 
-            <!-- HERO SCORE FRAME ANIMATION -->
-            <Animation name="LevelUp">
-                <Event event="LevelUp" action="Reset"/>
-                <Event event="LevelUp" action="Play"/>
-
-                <Controller type="Sound" end="Stop">
-                    <Key type="Sound" time="0.0" sound="@UI_BNet_Progression_Levelup02"/>
+            <Animation name="ScoreLayout">
+                <Controller type="Visibility" end="Pause" frame="LensFlareImage">
+                    <Key type="Bool" time="0" value="true"/>
+                    <Key type="Bool" time="0" value="false"/>
                 </Controller>
-                <Controller type="Event" end="Pause">
-                    <Key type="Event" time="0" event="Complete"/>
+                <Controller type="Visibility" end="Pause" frame="LensFlare2Image">
+                    <Key type="Bool" time="0" value="true"/>
+                    <Key type="Bool" time="0" value="false"/>
                 </Controller>
             </Animation>
 
+            <!-- HERO SCORE FRAME ANIMATION -->
+            <Animation name="LevelUpTransition">
+                <Event event="LevelUp" action="Reset,Play"/>
+
+                <Controller type="Sound" end="Stop">
+                    <Key type="Sound" time="0.01" sound="@UI_BNet_Progression_Levelup02"/>
+                </Controller>
+                <Controller type="Event" end="Pause">
+                    <Key type="Event" time="0.0" event="Complete"/>
+                </Controller>
+            </Animation>
+
+            <!-- "HeroLevelUpIntro" Animation Name/Event is referenced from the code -->
+            <Animation name="HeroLevelUpIntro">
+                <Event event="HeroLevelUpIntro" action="Reset,Play"/>
+
+                <Controller type="Event" name="CompleteEvent" end="Pause">
+                    <Key type="Event" time="0.55" event="IntroComplete"/>
+                </Controller>
+            </Animation>
+
+            <!-- "LevelUpMasteryUpgrade" Animation Name/Event is referenced from the code -->
+            <Animation name="LevelUpMasteryUpgrade">
+                <Event event="LevelUpMasteryUpgrade" action="Reset,Play"/>
+                <Event event="HeroLevelUpIntroMasteryUpgrade" action="Stop"/>
+                <Event event="OnShown" action="Stop"/>
+                <Event event="OnHidden" action="Stop"/>
+
+                <Controller type="Event" end="Stop" frame="LevelLabel">
+                    <Key type="Event" time="0.1" event="StartShaking" />
+                    <Key type="Event" time="2.2" event="StopShaking"/>
+                </Controller>
+                <Controller type="Event" end="Stop" frame="MasteryIconFrame/MasteryIcon">
+                    <Key type="Event" time="0.2" event="StartShaking" />
+                    <Key type="Event" time="2.2" event="StopShaking"/>
+                </Controller>
+                <Controller type="Event" name="CompleteEvent" end="Stop">
+                    <Key type="Event" time="2.3" event="Complete"/>
+                </Controller>
+
+                <Controller type="Fade" frame="GlowValueProvider" end="Pause">
+                    <Key type="Curve" time="0.0" value="0"/>
+                    <Key type="Curve" time="2.2" value="255"/>
+                </Controller>
+                <Controller type="AdjustmentColor" frame="GlowValueProvider" end="Pause">
+                    <Key type="Curve" time="0.0" value="00ffffff"/>
+                    <Key type="Curve" time="2.3" value="ffffffff"/>
+                </Controller>
+                <Controller type="Sound" end="Stop">
+                    <Key type="Sound" time="0.0" sound="*@UI_BNet_Progression_Levelup_Mastery"/>
+                </Controller>
+            </Animation>
+
+            <!-- "HeroLevelUpIntroMasteryUpgrade" Animation Name/Event is referenced from the code -->
+            <Animation name="HeroLevelUpIntroMasteryUpgrade">
+                <Event event="HeroLevelUpIntroMasteryUpgrade" action="Reset,Play"/>
+
+                <Controller type="Event" name="CompleteEvent" end="Pause">
+                    <Key type="Event" time="1.0" event="IntroComplete"/>
+                </Controller>
+                <Controller type="Fade" frame="GlowValueProvider" end="Pause">
+                    <Key type="Curve" time="0.0" value="255"/>
+                    <Key type="Curve" time="1.0" value="0"/>
+                </Controller>
+                <Controller type="AdjustmentColor" frame="GlowValueProvider" end="Pause">
+                    <Key type="Curve" time="0" value="ffffffff"/>
+                    <Key type="Curve" time="1.0" value="00ffffff"/>
+                </Controller>
+            </Animation>
+        </Frame>
+
+        <Frame type="ScoreScreenPointReward" name="RoundScoreFrame0" template="PlayerRewardsPanel/RoundScoreFrameTemplate">
+            <Anchor side="Top" relative="$parent/ScoreFramesAnchor" pos="Max" offset="-22"/>
+            <Anchor side="Left" relative="$parent/HeroScoreFrame" pos="Mid" offset="-66"/>
+            <Anchor side="Right" relative="$parent/HeroScoreFrame" pos="Mid" offset="-66"/>
+
+            <Frame type="HeroContainerFrame" name="HeroContainerFrame">
+                <Hero val="{$ancestor[@type=PlayerRewardsPanel]/@Hero[0]}"/>
+            </Frame>
+        </Frame>
+
+        <Frame type="ScoreScreenPointReward" name="RoundScoreFrame1" template="PlayerRewardsPanel/RoundScoreFrameTemplate">
+            <Anchor side="Top" relative="$parent/ScoreFramesAnchor" pos="Max" offset="-22"/>
+            <Anchor side="Left" relative="$parent/RoundScoreFrame0" pos="Max" offset="-64"/>
+
+            <Frame type="HeroContainerFrame" name="HeroContainerFrame">
+                <Hero val="{$ancestor[@type=PlayerRewardsPanel]/@Hero[1]}"/>
+            </Frame>
+        </Frame>
+
+        <Frame type="ScoreScreenPointReward" name="RoundScoreFrame2" template="PlayerRewardsPanel/RoundScoreFrameTemplate">
+            <Anchor side="Top" relative="$parent/ScoreFramesAnchor" pos="Max" offset="-22"/>
+            <Anchor side="Left" relative="$parent/RoundScoreFrame1" pos="Max" offset="-64"/>
+
+            <Frame type="HeroContainerFrame" name="HeroContainerFrame">
+                <Hero val="{$ancestor[@type=PlayerRewardsPanel]/@Hero[2]}"/>
+            </Frame>
+        </Frame>
+
+        <!--=======================================================================================
+        <! BRAWL SCORE FRAME
+        <!======================================================================================-->
+        <Frame type="ScoreScreenPointReward" name="BrawlRewardScoreFrame" template="PlayerRewardsPanel/BrawlRewardScoreFrameTemplate">
+            <Visible val="false"/>
+            <Anchor side="Left" relative="$parent/RankFrameAnchor" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent/RankFrameAnchor" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent/ScoreFramesAnchor" pos="Max" offset="0"/>
+
+            <Animation name="CountUp">
+                <Event event="CountdownStarting" action="Reset,Play"/>
+
+                <!-- Start player/hero countdown labels -->
+                <Controller type="Event" end="Pause" frame="$ancestor[@type=PlayerRewardsPanel]">
+                    <Key type="Event" time="2.0" event="ResumeScoreAnimation"/>
+                </Controller>
+            </Animation>
+        </Frame>
+
+        <Frame type="TileList" name="BrawlRewardTileList" template="PlayerRewardsPanel/BrawlUnlockTileList">
+            <!-- This should stay hidden since rewards are already shown on the scoreframe -->
+            <Visible val="false"/>
+            <Anchor side="Top" relative="$parent/BrawlRewardScoreFrame" pos="Max" offset="-105"/>
+            <Anchor side="Left" relative="$parent/BrawlRewardScoreFrame" pos="Max" offset="-140"/>
+            <Width val="300"/>
+            <Height val="100"/>
         </Frame>
 
         <!--=======================================================================================
@@ -1423,6 +2644,13 @@
             <Height val="10"/>
         </Frame>
 
+        <Frame type="Frame" name="XPScoreFrameAnchor">
+            <Anchor side="Bottom" relative="$parent/RankFrameAnchor" pos="Max" offset="-10"/>
+            <Anchor side="Left" relative="$parent/RankFrameAnchor" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent/RankFrameAnchor" pos="Mid" offset="0"/>
+            <Width val="650"/>
+        </Frame>
+
         <Frame type="Frame" name="RankBadgePopupAnchor">
             <Anchor side="Top" relative="$parent/RankScoreFrame/AnchorFrame" pos="Min" offset="0" />
             <Anchor side="Left" relative="$parent/RankScoreFrame/AnchorFrame" pos="Min" offset="-20" />
@@ -1432,43 +2660,20 @@
             <Frame type="AnchoredPopup" name="ScoreAnchoredPopup" template="PlayerRewardsPanel/ScoreAnchoredPopupTemplate"/>
         </Frame>
 
-        <Frame type="RankBadge" name="RankScoreFrame" template="RankBadgeTemplates/RankBadgeTemplate">
+        <Frame type="RankBadge" name="RankScoreFrame" template="RankBadgeTemplates/RankBadgeBaseTemplateNoOverlaySound">
             <Anchor side="Bottom" relative="$parent/RankFrameAnchor" pos="Max" offset="-10"/>
             <Anchor side="Left" relative="$parent/RankFrameAnchor" pos="Mid" offset="0"/>
             <Anchor side="Right" relative="$parent/RankFrameAnchor" pos="Mid" offset="0"/>
+            <Visible val="false"/>
             <AcceptsMouse val="True"/>
-            <Width val="640"/>
+            <Width val="650"/>
             <Handle val="PlayerRewardPanel_RankScoreFrame"/>
-                
-            <Animation name="RankLayoutRankFrame">
-                <Event event="RankedGame" action="DirectionForward" frame="$parent"/>
-                <Event event="RankedGame" action="Play" frame="$parent"/>
-                <Event event="NonRankedGame" action="DirectionReverse" frame="$parent"/>
-                <Event event="NonRankedGame" action="Play" frame="$parent"/>
-
-                <Controller type="Dimension" dimension="Width" relative="False" percentage="False" end="Pause" >
-                    <Key type="Curve" time="0" value="405" in="linear"/>
-                    <Key type="Curve" time=".01" value="650" out="linear"/>
-                </Controller>
-                <Controller type="Visibility" end="Pause">
-                    <Key type="Bool" time="0" value="false"/>
-                    <Key type="Bool" time=".01" value="true"/>
-                </Controller>
-                <Controller type="Visibility" end="Pause" frame="$parent/RankTitleTooltip">
-                    <Key type="Bool" time="0" value="false"/>
-                    <Key type="Bool" time=".01" value="true"/>
-                </Controller>
-                <Controller type="Visibility" end="Pause" frame="$parent/RankCountingFrame">
-                    <Key type="Bool" time="0" value="false"/>
-                    <Key type="Bool" time=".01" value="true"/>
-                </Controller>
-            </Animation>
 
             <StateGroup name="GrandMasterAnchor">
                 <DefaultState val="Normal"/>
 
                 <State name="GrandMaster">
-                    <When type="Property" RankType="Grandmaster"/>
+                    <When type="Property" RankType="GrandMaster"/>
                     <Action type="SendEvent" event="RaiseRankBadgeAnchor"/>
                 </State>
                 <State name="Normal">
@@ -1481,8 +2686,8 @@
                 <Event event="ResetRankBadgeAnchor" action="DirectionReverse,Play"/>
                 
                 <Controller type="Anchor" end="Pause" side="Bottom" relative="False">
-                    <Key type="Curve" time="0" value="0" out="Step"/>
-                    <Key type="Curve" time=".01" value="-40" in="Step"/>
+                    <Key type="Curve" time="0" value="0" inout="Linear,Step"/>
+                    <Key type="Curve" time=".01" value="-40" inout="Step,Linear"/>
                 </Controller>
             </Animation>
 
@@ -1567,8 +2772,7 @@
             <Height val="100"/>
           
             <Animation name="EmptyReward">
-                <Event event="Hide" action="Reset"/>
-                <Event event="Hide" action="Play"/>
+                <Event event="Hide" action="Reset,Play"/>
                 <Event event="Show" action="Reset"/>
                 <Controller type="Visibility" end="Pause">
                     <Key type="Bool" time="0.0" value="false"/>
@@ -1587,23 +2791,21 @@
                 <CollapseLayout val="true"/>
             </Frame>
             
-            <Animation name="RankLayout">
-                <Event event="RankedGame" action="DirectionForward" frame="$parent"/>
-                <Event event="RankedGame" action="Play" frame="$parent"/>
-                <Event event="NonRankedGame" action="DirectionReverse" frame="$parent"/>
-                <Event event="NonRankedGame" action="Play" frame="$parent"/>
+            <Animation name="ScoreLayout">
+                <Event event="LayoutThreeScores" action="DirectionForward,Play" frame="$parent"/>
+                <Event event="LayoutTwoScores" action="DirectionReverse,Play" frame="$parent"/>
                 
                 <Controller type="Anchor" end="Pause" side="Top" relative="False">
-                    <Key type="Curve" time="0" value="-145" out="Step"/>
-                    <Key type="Curve" time=".01" value="-105" in="Step"/>
+                    <Key type="Curve" time="0" value="-145" inout="Linear,Step"/>
+                    <Key type="Curve" time=".01" value="-105" inout="Step,Linear"/>
                 </Controller>
                 <Controller type="Anchor" end="Pause" side="Left" relative="False">
-                    <Key type="Curve" time="0" value="-130" out="Step"/>
-                    <Key type="Curve" time=".01" value="-140" in="Step"/>
+                    <Key type="Curve" time="0" value="-130" inout="Linear,Step"/>
+                    <Key type="Curve" time=".01" value="-140" inout="Step,Linear"/>
                 </Controller>
                 <Controller type="Anchor" end="Pause" side="Left" relative="False" frame="Item1">
-                    <Key type="Curve" time="0" value="-10" out="Step"/>
-                    <Key type="Curve" time=".01" value="-7" in="Step"/>
+                    <Key type="Curve" time="0" value="-10" inout="Linear,Step"/>
+                    <Key type="Curve" time=".01" value="-7" inout="Step,Linear"/>
                 </Controller>
             </Animation>
 
@@ -1619,8 +2821,7 @@
             <Height val="100"/>
           
             <Animation name="EmptyReward">
-                <Event event="Hide" action="Reset" frame="$parent"/>
-                <Event event="Hide" action="Play" frame="$parent"/>
+                <Event event="Hide" action="Reset,Play" frame="$parent"/>
                 <Event event="Show" action="Reset" frame="$parent"/>
                 <Controller type="Visibility" end="Pause">
                     <Key type="Bool" time="0.0" value="false"/>
@@ -1639,23 +2840,21 @@
                 <CollapseLayout val="true"/>
             </Frame>
             
-            <Animation name="RankLayout">
-                <Event event="RankedGame" action="DirectionForward" frame="$parent"/>
-                <Event event="RankedGame" action="Play" frame="$parent"/>
-                <Event event="NonRankedGame" action="DirectionReverse" frame="$parent"/>
-                <Event event="NonRankedGame" action="Play" frame="$parent"/>
+            <Animation name="ScoreLayout">
+                <Event event="LayoutThreeScores" action="DirectionForward,Play" frame="$parent"/>
+                <Event event="LayoutTwoScores" action="DirectionReverse,Play" frame="$parent"/>
                 
                 <Controller type="Anchor" end="Pause" side="Top" relative="False">
-                    <Key type="Curve" time="0" value="-145" out="Step"/>
-                    <Key type="Curve" time=".01" value="-105" in="Step"/>
+                    <Key type="Curve" time="0" value="-145" inout="Linear,Step"/>
+                    <Key type="Curve" time=".01" value="-105" inout="Step,Linear"/>
                 </Controller>
                 <Controller type="Anchor" end="Pause" side="Left" relative="False">
-                    <Key type="Curve" time="0" value="-130" out="Step"/>
-                    <Key type="Curve" time=".01" value="-140" in="Step"/>
+                    <Key type="Curve" time="0" value="-130" inout="Linear,Step"/>
+                    <Key type="Curve" time=".01" value="-140" inout="Step,Linear"/>
                 </Controller>
                 <Controller type="Anchor" end="Pause" side="Left" relative="False" frame="Item1">
-                    <Key type="Curve" time="0" value="-10" out="Step"/>
-                    <Key type="Curve" time=".01" value="-7" in="Step"/>
+                    <Key type="Curve" time="0" value="-10" inout="Linear,Step"/>
+                    <Key type="Curve" time=".01" value="-7" inout="Step,Linear"/>
                 </Controller>
             </Animation>
         </Frame>
@@ -1678,8 +2877,8 @@
         <Frame type="Frame" name="XPCountingFrame">
             <Anchor side="Top" relative="$parent/CountingLablesAnchor" pos="Min" offset="0"/>
             <Anchor side="Bottom" relative="$parent/CountingLablesAnchor" pos="Max" offset="0"/>
-            <Anchor side="Left" relative="$parent/PlayerScoreFrame" pos="Mid" offset="0"/>
-            <Anchor side="Right" relative="$parent/PlayerScoreFrame" pos="Mid" offset="0"/>
+            <Anchor side="Left" relative="$parent/HeroScoreFrame" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent/HeroScoreFrame" pos="Mid" offset="0"/>
             <Width val="694"/>
 
             <Frame type="Label" name="RewardHeaderLabel">
@@ -1692,35 +2891,31 @@
             </Frame>
 
             <Frame type="Image" name="XPEarnedBackground">
-                <Anchor side="Bottom" relative="$parent/XPEarnedLabel" pos="Max" offset="80"/>
-                <Anchor side="Left" relative="$parent/XPEarnedLabel" pos="Mid" offset="0"/>
-                <Anchor side="Right" relative="$parent/XPEarnedLabel" pos="Mid" offset="0"/>
+                <Anchor side="Bottom" relative="$parent/EarnedLabelAnchor" pos="Max" offset="80"/>
+                <Anchor side="Left" relative="$parent/EarnedLabelAnchor" pos="Mid" offset="0"/>
+                <Anchor side="Right" relative="$parent/EarnedLabelAnchor" pos="Mid" offset="0"/>
                 <Texture val="@UI/Score_TextFlareBg"/>
                 <LayerColor val="009bff"/>
                 <Width val="688"/>
                 <Height val="300"/>
             </Frame>
 
-            <Frame type="CountdownLabel" name="XPEarnedLabel">
+            <Frame type="Frame" name="EarnedLabelAnchor">
                 <Anchor side="Top" relative="$parent/RewardHeaderLabel" pos="Max" offset="-6"/>
-                <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
-                <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
                 <Height val="130"/>
+            </Frame>
+
+            <Frame type="CountdownLabel" name="XPEarnedLabel">
+                <Anchor relative="$parent/EarnedLabelAnchor"/>
+                <ScaleText val="True"/>
+
                 <Style val="ScoreLevelXPAmount"/>
                 <CountdownSound val="UI_BNet_ProgressionCounter_Loop1"/>
                 <FormatNumber val="true"/>
 
-                <!-- This animation controls how long the total XP count up is -->
-                <Animation name="CountUp">
-                    <Event event="Begin" action="Reset" frame="$parent/$parent"/>
-                    <Event event="Begin" action="Play" frame="$parent/$parent"/>
-
-                    <!-- This animation is scaled from the code. Do not modify end time. -->
-                    <Controller type="Counter" end="Pause">
-                        <Key type="Curve" time="0.0" value="0.0" out="Slow"/>
-                        <Key type="Curve" time="1.0" value="1.0" in="Slow"/>
-                    </Controller>
-                </Animation>
+                <Animation name="EnlargeTextAnimation" template="PlayerRewardsPanel/EnlargeTextAnimTemplate"/>
             </Frame>
 
         </Frame>
@@ -1733,13 +2928,12 @@
             <Anchor side="Bottom" relative="$parent/CountingLablesAnchor" pos="Max" offset="0"/>
             <Anchor side="Left" relative="$parent/RankScoreFrame" pos="Mid" offset="0"/>
             <Anchor side="Right" relative="$parent/RankScoreFrame" pos="Mid" offset="0"/>
+            <Visible val="false"/>
             <Width val="694"/>
 
             <Animation name="RankedTextTypes">
-                <Event event="SetRankedMode" action="DirectionForward" frame="$this"/>
-                <Event event="SetRankedMode" action="Play" frame="$this"/>
-                <Event event="SetPlacementMode" action="DirectionReverse" frame="$this"/>
-                <Event event="SetPlacementMode" action="Play" frame="$this"/>
+                <Event event="SetRankedMode" action="DirectionForward,Play" frame="$this"/>
+                <Event event="SetPlacementMode" action="DirectionReverse,Play" frame="$this"/>
 
                 <Controller type="Text" end="Pause" frame="$this/RewardHeaderLabel">
                     <Key type="Text" time="0" text="@UI/ScoreRankPanel/PlacementGames"/>
@@ -1757,23 +2951,31 @@
             </Frame>
 
             <Frame type="Image" name="RankEarnedBackground">
-                <Anchor side="Bottom" relative="$parent/RankEarnedLabel" pos="Max" offset="80"/>
-                <Anchor side="Left" relative="$parent/RankEarnedLabel" pos="Mid" offset="0"/>
-                <Anchor side="Right" relative="$parent/RankEarnedLabel" pos="Mid" offset="0"/>
+                <Anchor side="Bottom" relative="$parent/EarnedLabelAnchor" pos="Max" offset="80"/>
+                <Anchor side="Left" relative="$parent/EarnedLabelAnchor" pos="Mid" offset="0"/>
+                <Anchor side="Right" relative="$parent/EarnedLabelAnchor" pos="Mid" offset="0"/>
                 <Texture val="@UI/Score_TextFlareBg"/>
                 <LayerColor val="009bff"/>
                 <Width val="688"/>
                 <Height val="300"/>
             </Frame>
 
-            <Frame type="CountdownLabel" name="RankEarnedLabel">
+            <Frame type="Frame" name="EarnedLabelAnchor">
                 <Anchor side="Top" relative="$parent/RewardHeaderLabel" pos="Max" offset="-6"/>
-                <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
-                <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
                 <Height val="130"/>
+            </Frame>
+
+            <Frame type="CountdownLabel" name="RankEarnedLabel">
+                <Anchor relative="$parent/EarnedLabelAnchor"/>
+                <ScaleText val="True"/>
+                
                 <Style val="ScoreLevelXPAmount"/>
-                <CountdownSound val="UI_BNet_ProgressionCounter_Loop2"/>
+                <CountdownSound val="UI_BNet_ProgressionCounter_Loop3"/>
                 <FormatNumber val="true"/>
+
+                <Animation name="EnlargeTextAnimation" template="PlayerRewardsPanel/EnlargeTextAnimTemplate"/>
 
                 <StateGroup name="CountDownSound">
                     <DefaultState val="Up"/>
@@ -1784,7 +2986,7 @@
                     </State>
                     <State name="Up">
                         <When type="AnimationState" frame="$parent/$parent/RankScoreFrame" CountdownDirection="Up"/>
-                        <Action type="SetProperty" CountdownSound="UI_BNet_ProgressionCounter_Loop2"/>
+                        <Action type="SetProperty" CountdownSound="UI_BNet_ProgressionCounter_Loop3"/>
                     </State>
                 </StateGroup>
 
@@ -1793,8 +2995,8 @@
                     <Event event="CountdownStarting" action="Reset,Play" frame="$parent/$parent/RankScoreFrame"/>
                     
                     <Controller type="Counter" end="Pause">
-                        <Key type="Curve" time="0.0" value="0.0" out="Slow"/>
-                        <Key type="Curve" time="3.5" value="1.0" in="Slow"/>
+                        <Key type="Curve" time="0.0" value="0.0" inout="Linear,Slow"/>
+                        <Key type="Curve" time="3.5" value="1.0" inout="Slow,Linear"/>
                     </Controller>
 
                     <!-- Start player/hero countdown labels -->
@@ -1812,8 +3014,8 @@
         <Frame type="Frame" name="GoldCountingFrame">
             <Anchor side="Top" relative="$parent/CountingLablesAnchor" pos="Min" offset="0"/>
             <Anchor side="Bottom" relative="$parent/CountingLablesAnchor" pos="Max" offset="0"/>
-            <Anchor side="Left" relative="$parent/HeroScoreFrame" pos="Mid" offset="0"/>
-            <Anchor side="Right" relative="$parent/HeroScoreFrame" pos="Mid" offset="0"/>
+            <Anchor side="Left" relative="$parent/PlayerScoreFrame" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent/PlayerScoreFrame" pos="Mid" offset="0"/>
             <Width val="694"/>
 
             <Frame type="Label" name="RewardHeaderLabel">
@@ -1826,34 +3028,31 @@
             </Frame>
 
             <Frame type="Image" name="GoldEarnedBackground">
-                <Anchor side="Bottom" relative="$parent/GoldEarnedLabel" pos="Max" offset="80"/>
-                <Anchor side="Left" relative="$parent/GoldEarnedLabel" pos="Mid" offset="0"/>
-                <Anchor side="Right" relative="$parent/GoldEarnedLabel" pos="Mid" offset="0"/>
+                <Anchor side="Bottom" relative="$parent/EarnedLabelAnchor" pos="Max" offset="80"/>
+                <Anchor side="Left" relative="$parent/EarnedLabelAnchor" pos="Mid" offset="0"/>
+                <Anchor side="Right" relative="$parent/EarnedLabelAnchor" pos="Mid" offset="0"/>
                 <Texture val="@UI/Score_TextFlareBg"/>
                 <LayerColor val="fdb902"/>
                 <Width val="688"/>
                 <Height val="300"/>
             </Frame>
 
-            <Frame type="CountdownLabel" name="GoldEarnedLabel">
+            <Frame type="Frame" name="EarnedLabelAnchor">
                 <Anchor side="Top" relative="$parent/RewardHeaderLabel" pos="Max" offset="-6"/>
-                <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
-                <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
                 <Height val="130"/>
+            </Frame>
+
+            <Frame type="CountdownLabel" name="GoldEarnedLabel">
+                <Anchor relative="$parent/EarnedLabelAnchor"/>
+                <ScaleText val="True"/>
+
                 <Style val="ScoreLevelGoldAmount"/>
                 <CountdownSound val="UI_BNet_ProgressionCounter_Loop2"/>
                 <FormatNumber val="true"/>
 
-                <!-- This animation controls how long the total Gold count up is -->
-                <Animation name="CountUp">
-                    <Event event="Begin" action="Reset" frame="$parent/$parent"/>
-                    <Event event="Begin" action="Play" frame="$parent/$parent"/>
-                    
-                    <Controller type="Counter" end="Pause">
-                        <Key type="Curve" time="0.0" value="0.0" out="Slow"/>
-                        <Key type="Curve" time="3.5" value="1.0" in="Slow"/>
-                    </Controller>
-                </Animation>
+                <Animation name="EnlargeTextAnimation" template="PlayerRewardsPanel/EnlargeTextAnimTemplate"/>
             </Frame>
 
             <Frame type="Image" name="CurrencyImage">
@@ -1880,44 +3079,43 @@
                 <BlendMode val="Add"/>
                 
                 <Animation name="Flare">
-                    <Event event="OnShown" action="DirectionForward"/>
-                    <Event event="OnShown" action="Play"/>
+                    <Event event="OnShown" action="DirectionForward,Play"/>
                     <Event event="OnMouseUp" action="Play" frame="$parent/CurrencyImage"/>
                     <Controller type="Fade" end="Loop">
-                        <Key type="Curve" time="0" value="0" out="Slow"/>
-                        <Key type="Curve" time=".4" value="255" in="Slow"/>
-                        <Key type="Curve" time="1.6" value="255" in="Slow"/>
-                        <Key type="Curve" time="2" value="0" in="Slow"/>
-                        <Key type="Curve" time="7" value="0" in="Slow"/>
+                        <Key type="Curve" time="0" value="0" inout="Linear,Slow"/>
+                        <Key type="Curve" time=".4" value="255" inout="Slow,Linear"/>
+                        <Key type="Curve" time="1.6" value="255" inout="Slow,Linear"/>
+                        <Key type="Curve" time="2" value="0" inout="Slow,Linear"/>
+                        <Key type="Curve" time="7" value="0" inout="Slow,Linear"/>
                     </Controller>
                     <Controller type="Rotation" relative="False" end="Loop" >
-                        <Key type="Curve" time="0" value="-45" out="linear"/>
-                        <Key type="Curve" time="2" value="55" in="linear"/>
-                        <Key type="Curve" time="7" value="55" in="linear"/>
+                        <Key type="Curve" time="0" value="-45" inout="Linear,linear"/>
+                        <Key type="Curve" time="2" value="55" inout="linear,Linear"/>
+                        <Key type="Curve" time="7" value="55" inout="linear,Linear"/>
                     </Controller>
                     <Controller type="Anchor" end="Loop" side="Left" relative="true" frame="$parent/CurrencyFlare1Anchor">
-                        <Key type="Curve" time="0" value="-10" out="Fast"/>
-                        <Key type="Curve" time="2" value="14" in="Slow"/>
-                        <Key type="Curve" time="7" value="14" in="Slow"/>
+                        <Key type="Curve" time="0" value="-10" inout="Linear"/>
+                        <Key type="Curve" time="2" value="14" inout="Slow,Linear"/>
+                        <Key type="Curve" time="7" value="14" inout="Slow,Linear"/>
                     </Controller>
                     <Controller type="Anchor" end="Loop" side="Top" relative="true" frame="$parent/CurrencyFlare1Anchor">
-                        <Key type="Curve" time="0" value="10" out="Fast"/>
-                        <Key type="Curve" time="2" value="-5" in="Slow"/>
-                        <Key type="Curve" time="7" value="-5" in="Slow"/>
+                        <Key type="Curve" time="0" value="10" inout="Linear"/>
+                        <Key type="Curve" time="2" value="-5" inout="Slow,Linear"/>
+                        <Key type="Curve" time="7" value="-5" inout="Slow,Linear"/>
                     </Controller>
                     <Controller type="Dimension" dimension="Width" relative="False" percentage="True" end="Loop" >
-                        <Key type="Curve" time="0" value="50" out="Slow"/>
-                        <Key type="Curve" time=".5" value="100" in="Slow"/>
-                        <Key type="Curve" time="1.4" value="130" in="Slow"/>
-                        <Key type="Curve" time="2" value="10" in="Slow"/>
-                        <Key type="Curve" time="7" value="10" in="Slow"/>
+                        <Key type="Curve" time="0" value="50" inout="Linear,Slow"/>
+                        <Key type="Curve" time=".5" value="100" inout="Slow,Linear"/>
+                        <Key type="Curve" time="1.4" value="130" inout="Slow,Linear"/>
+                        <Key type="Curve" time="2" value="10" inout="Slow,Linear"/>
+                        <Key type="Curve" time="7" value="10" inout="Slow,Linear"/>
                     </Controller>
                     <Controller type="Dimension" dimension="Height" relative="False" percentage="True" end="Loop" >
-                        <Key type="Curve" time="0" value="50" out="Slow"/>
-                        <Key type="Curve" time=".5" value="100" in="Slow"/>
-                        <Key type="Curve" time="1.4" value="130" in="Slow"/>
-                        <Key type="Curve" time="2" value="10" in="Slow"/>
-                        <Key type="Curve" time="7" value="10" in="Slow"/>
+                        <Key type="Curve" time="0" value="50" inout="Linear,Slow"/>
+                        <Key type="Curve" time=".5" value="100" inout="Slow,Linear"/>
+                        <Key type="Curve" time="1.4" value="130" inout="Slow,Linear"/>
+                        <Key type="Curve" time="2" value="10" inout="Slow,Linear"/>
+                        <Key type="Curve" time="7" value="10" inout="Slow,Linear"/>
                     </Controller>
                 </Animation>
             </Frame>
@@ -1938,44 +3136,43 @@
                 <BlendMode val="Add"/>
                 
                 <Animation name="Flare">
-                    <Event event="OnShown" action="DirectionForward"/>
-                    <Event event="OnShown" action="Play"/>
+                    <Event event="OnShown" action="DirectionForward,Play"/>
                     <Event event="OnMouseUp" action="Play" frame="$parent/CurrencyImage"/>
                     <Controller type="Fade" end="Loop">
-                        <Key type="Curve" time="0" value="0" out="Slow"/>
-                        <Key type="Curve" time=".5" value="255" in="Slow"/>
-                        <Key type="Curve" time="1.4" value="255" in="Slow"/>
-                        <Key type="Curve" time="2" value="0" in="Slow"/>
-                        <Key type="Curve" time="7" value="0" in="Slow"/>
+                        <Key type="Curve" time="0" value="0" inout="Linear,Slow"/>
+                        <Key type="Curve" time=".5" value="255" inout="Slow,Linear"/>
+                        <Key type="Curve" time="1.4" value="255" inout="Slow,Linear"/>
+                        <Key type="Curve" time="2" value="0" inout="Slow,Linear"/>
+                        <Key type="Curve" time="7" value="0" inout="Slow,Linear"/>
                     </Controller>
                     <Controller type="Rotation" relative="False" end="Loop" >
-                        <Key type="Curve" time="0" value="180" out="linear"/>
-                        <Key type="Curve" time="2" value="210" in="linear"/>
-                        <Key type="Curve" time="7" value="210" in="linear"/>
+                        <Key type="Curve" time="0" value="180" inout="Linear,linear"/>
+                        <Key type="Curve" time="2" value="210" inout="linear,Linear"/>
+                        <Key type="Curve" time="7" value="210" inout="linear,Linear"/>
                     </Controller>
                     <Controller type="Anchor" end="Loop" side="Left" relative="true" frame="$parent/CurrencyFlare2Anchor">
-                        <Key type="Curve" time="0" value="8" out="Fast"/>
-                        <Key type="Curve" time="2" value="-10" in="Slow"/>
-                        <Key type="Curve" time="7" value="-10" in="Slow"/>
+                        <Key type="Curve" time="0" value="8" inout="Linear"/>
+                        <Key type="Curve" time="2" value="-10" inout="Slow,Linear"/>
+                        <Key type="Curve" time="7" value="-10" inout="Slow,Linear"/>
                     </Controller>
                     <Controller type="Anchor" end="Loop" side="Top" relative="true" frame="$parent/CurrencyFlare2Anchor">
-                        <Key type="Curve" time="0" value="-5" out="Fast"/>
-                        <Key type="Curve" time="2" value="7" in="Slow"/>
-                        <Key type="Curve" time="7" value="7" in="Slow"/>
+                        <Key type="Curve" time="0" value="-5" inout="Linear"/>
+                        <Key type="Curve" time="2" value="7" inout="Slow,Linear"/>
+                        <Key type="Curve" time="7" value="7" inout="Slow,Linear"/>
                     </Controller>
                     <Controller type="Dimension" dimension="Width" relative="False" percentage="True" end="Loop" >
-                        <Key type="Curve" time="0" value="50" out="Slow"/>
-                        <Key type="Curve" time=".5" value="100" in="Slow"/>
-                        <Key type="Curve" time="1.4" value="100" in="Slow"/>
-                        <Key type="Curve" time="2" value="10" in="Slow"/>
-                        <Key type="Curve" time="7" value="10" in="Slow"/>
+                        <Key type="Curve" time="0" value="50" inout="Linear,Slow"/>
+                        <Key type="Curve" time=".5" value="100" inout="Slow,Linear"/>
+                        <Key type="Curve" time="1.4" value="100" inout="Slow,Linear"/>
+                        <Key type="Curve" time="2" value="10" inout="Slow,Linear"/>
+                        <Key type="Curve" time="7" value="10" inout="Slow,Linear"/>
                     </Controller>
                     <Controller type="Dimension" dimension="Height" relative="False" percentage="True" end="Loop" >
-                        <Key type="Curve" time="0" value="50" out="Slow"/>
-                        <Key type="Curve" time=".5" value="100" in="Slow"/>
-                        <Key type="Curve" time="1.4" value="100" in="Slow"/>
-                        <Key type="Curve" time="2" value="10" in="Slow"/>
-                        <Key type="Curve" time="7" value="10" in="Slow"/>
+                        <Key type="Curve" time="0" value="50" inout="Linear,Slow"/>
+                        <Key type="Curve" time=".5" value="100" inout="Slow,Linear"/>
+                        <Key type="Curve" time="1.4" value="100" inout="Slow,Linear"/>
+                        <Key type="Curve" time="2" value="10" inout="Slow,Linear"/>
+                        <Key type="Curve" time="7" value="10" inout="Slow,Linear"/>
                     </Controller>
                 </Animation>
             </Frame>
@@ -1996,31 +3193,29 @@
                 <WrapUV val="False" layer="1"/>
                 
                 <Animation name="UVScroll">
-                    <Event event="OnShown" action="Restart" frame="$parent"/>
-                    <Event event="OnShown" action="DirectionForward" frame="$parent"/>
-                    <Event event="OnShown" action="Play" frame="$parent"/>
+                    <Event event="OnShown" action="Restart,DirectionForward,Play" frame="$parent"/>
                     <Event event="OnMouseUp" action="Play" frame="$parent/CurrencyImage"/>
                     <Controller type="LayerUV" layer="1" side="Left" relative="False" sidelock="True" end="Loop" >
-                        <Key type="Curve" time="0" value="2" out="fast"/>
-                        <Key type="Curve" time="1" value="2" out="fast"/>
-                        <Key type="Curve" time="3" value="-2" in="fast"/>
-                        <Key type="Curve" time="7" value="-2" in="fast"/>
+                        <Key type="Curve" time="0" value="2" inout="Linear"/>
+                        <Key type="Curve" time="1" value="2" inout="Linear"/>
+                        <Key type="Curve" time="3" value="-2" inout="Linear"/>
+                        <Key type="Curve" time="7" value="-2" inout="Linear"/>
                     </Controller>
                     <Controller type="Fade" end="Loop">
-                        <Key type="Curve" time="0" value="0" out="Auto"/>
-                        <Key type="Curve" time="2.5" value="255" out="Auto"/>
-                        <Key type="Curve" time="3" value="255" in="Auto"/>
-                        <Key type="Curve" time="7" value="0" in="Auto"/>
+                        <Key type="Curve" time="0" value="0" inout="Linear,Auto"/>
+                        <Key type="Curve" time="2.5" value="255" inout="Linear,Auto"/>
+                        <Key type="Curve" time="3" value="255" inout="Auto,Linear"/>
+                        <Key type="Curve" time="7" value="0" inout="Auto,Linear"/>
                     </Controller>
                 </Animation>
             </Frame>
         </Frame>
-
+        
         <!--=======================================================================================
         <! XP REWARD ITEMS
         <!======================================================================================-->
         <Frame type="TileList" name="ScoreRewardTileList">
-            <Anchor side="Top" relative="$parent/XPCountingFrame/XPEarnedLabel" pos="Max" offset="-130"/>
+            <Anchor side="Top" relative="$parent/XPCountingFrame/EarnedLabelAnchor" pos="Max" offset="-130"/>
             <Anchor side="Left" relative="$parent/XPCountingFrame" pos="Mid" offset="0"/>
             <Anchor side="Right" relative="$parent/XPCountingFrame" pos="Mid" offset="0"/>
             <Anchor side="Bottom" relative="$parent" pos="Max" offset="-100"/>
@@ -2093,10 +3288,9 @@
             </Frame>
 
             <Animation name="Trigger">
-                <Event event="Begin" action="Reset" frame="$parent"/>
-                <Event event="Begin" action="Play" frame="$parent"/>
+                <Event event="Begin" action="Reset,Play" frame="$parent"/>
                 <Controller type="Fade" end="Pause">
-                    <Key type="Curve" time="0" value="255" out="Auto"/>
+                    <Key type="Curve" time="0" value="255" inout="Linear,Auto"/>
                 </Controller>
                 <Controller type="Event" end="Stop">
                     <Key type="Event" time="0" event="Start"/>
@@ -2104,10 +3298,9 @@
             </Animation>
 
             <Animation name="FinishAnimation">
-                <Event event="FinishAnimation" action="Reset" frame="$parent"/>
-                <Event event="FinishAnimation" action="Play" frame="$parent"/>
+                <Event event="FinishAnimation" action="Reset,Play" frame="$parent"/>
                 <Controller type="Fade" end="Pause">
-                    <Key type="Curve" time="0" value="0" out="Auto"/>
+                    <Key type="Curve" time="0" value="0" inout="Linear,Auto"/>
                 </Controller>
             </Animation>
         </Frame>
@@ -2116,12 +3309,12 @@
         <! RANK REWARD ITEMS
         <!======================================================================================-->
         <Frame type="TileList" name="RankRewardTileList">
-            <Anchor side="Top" relative="$parent/RankCountingFrame/RankEarnedLabel" pos="Max" offset="-130"/>
+            <Anchor side="Top" relative="$parent/RankCountingFrame/EarnedLabelAnchor" pos="Max" offset="-130"/>
             <Anchor side="Left" relative="$parent/RankCountingFrame" pos="Mid" offset="0"/>
             <Anchor side="Right" relative="$parent/RankCountingFrame" pos="Mid" offset="0"/>
             <Anchor side="Bottom" relative="$parent" pos="Max" offset="-100"/>
             <Width val="510"/>
-            <Visible val="true"/>
+            <Visible val="false"/>
 
             <Frame type="ScoreRewardTileListItem" name="Item0" template="PlayerRewardsPanel/EarnedRewardTileListItemTemplate">
                 <Anchor side="Top" relative="$parent" pos="Min" offset="130"/>
@@ -2157,10 +3350,9 @@
             </Frame>
 
             <Animation name="Trigger">
-                <Event event="Begin" action="Reset" frame="$parent"/>
-                <Event event="Begin" action="Play" frame="$parent"/>
+                <Event event="Begin" action="Reset,Play" frame="$parent"/>
                 <Controller type="Fade" end="Pause">
-                    <Key type="Curve" time="0" value="255" out="Auto"/>
+                    <Key type="Curve" time="0" value="255" inout="Linear,Auto"/>
                 </Controller>
                 <Controller type="Event" end="Stop">
                     <Key type="Event" time="0.2" event="Start"/>
@@ -2168,10 +3360,9 @@
             </Animation>
 
             <Animation name="FinishAnimation">
-                <Event event="FinishAnimation" action="Reset" frame="$parent"/>
-                <Event event="FinishAnimation" action="Play" frame="$parent"/>
+                <Event event="FinishAnimation" action="Reset,Play" frame="$parent"/>
                 <Controller type="Fade" end="Pause">
-                    <Key type="Curve" time="0" value="0" out="Auto"/>
+                    <Key type="Curve" time="0" value="0" inout="Linear,Auto"/>
                 </Controller>
             </Animation>
         </Frame>
@@ -2180,7 +3371,7 @@
         <! GOLD REWARD ITEMS
         <!======================================================================================-->
         <Frame type="TileList" name="GoldRewardTileList">
-            <Anchor side="Top" relative="$parent/GoldCountingFrame/GoldEarnedLabel" pos="Max" offset="-130"/>
+            <Anchor side="Top" relative="$parent/GoldCountingFrame/EarnedLabelAnchor" pos="Max" offset="-130"/>
             <Anchor side="Left" relative="$parent/GoldCountingFrame" pos="Mid" offset="0"/>
             <Anchor side="Right" relative="$parent/GoldCountingFrame" pos="Mid" offset="0"/>
             <Anchor side="Bottom" relative="$parent" pos="Max" offset="-100"/>
@@ -2254,10 +3445,9 @@
             </Frame>
 
             <Animation name="Trigger">
-                <Event event="Begin" action="Reset" frame="$parent"/>
-                <Event event="Begin" action="Play" frame="$parent"/>
+                <Event event="Begin" action="Reset,Play" frame="$parent"/>
                 <Controller type="Fade" end="Pause">
-                    <Key type="Curve" time="0" value="255" out="Auto"/>
+                    <Key type="Curve" time="0" value="255" inout="Linear,Auto"/>
                 </Controller>
                 <Controller type="Event" end="Stop">
                     <Key type="Event" time="0.3" event="Start"/>
@@ -2265,10 +3455,9 @@
             </Animation>
 
             <Animation name="FinishAnimation">
-                <Event event="FinishAnimation" action="Reset" frame="$parent"/>
-                <Event event="FinishAnimation" action="Play" frame="$parent"/>
+                <Event event="FinishAnimation" action="Reset,Play" frame="$parent"/>
                 <Controller type="Fade" end="Pause">
-                    <Key type="Curve" time="0" value="0" out="Auto"/>
+                    <Key type="Curve" time="0" value="0" inout="Linear,Auto"/>
                 </Controller>
             </Animation>
         </Frame>
@@ -2278,24 +3467,24 @@
         <!======================================================================================-->
 
         <Frame type="Frame" name="XPEarnedToolTipHitTestFrame" template="PlayerRewardsPanel/EarnedToolTipHitTestFrameTemplate">
-            <Anchor side="Top" relative="$parent/XPCountingFrame/XPEarnedLabel" pos="Mid" offset="-100"/>
-            <Anchor side="Bottom" relative="$parent/XPCountingFrame/XPEarnedLabel" pos="Mid" offset="100"/>
-            <Anchor side="Left" relative="$parent/XPCountingFrame/XPEarnedLabel" pos="Mid" offset="-180"/>
-            <Anchor side="Right" relative="$parent/XPCountingFrame/XPEarnedLabel" pos="Mid" offset="180"/>
+            <Anchor side="Top" relative="$parent/XPCountingFrame/EarnedLabelAnchor" pos="Mid" offset="-100"/>
+            <Anchor side="Bottom" relative="$parent/XPCountingFrame/EarnedLabelAnchor" pos="Mid" offset="100"/>
+            <Anchor side="Left" relative="$parent/XPCountingFrame/EarnedLabelAnchor" pos="Mid" offset="-180"/>
+            <Anchor side="Right" relative="$parent/XPCountingFrame/EarnedLabelAnchor" pos="Mid" offset="180"/>
 
             <Frame type="TileList" name="EarnedToolTipFrame">
                 <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
                 <Frame type="Label" name="ToolTipHeader">
                     <Text val="@UI/PlayerRewardsPanel/XPEarnedToolTipHeader"/>
                 </Frame>
-            </Frame>  
+            </Frame>
         </Frame>
 
         <Frame type="Frame" name="GoldEarnedToolTipHitTestFrame" template="PlayerRewardsPanel/EarnedToolTipHitTestFrameTemplate">
-            <Anchor side="Top" relative="$parent/GoldCountingFrame/GoldEarnedLabel" pos="Mid" offset="-100"/>
-            <Anchor side="Bottom" relative="$parent/GoldCountingFrame/GoldEarnedLabel" pos="Mid" offset="100"/>
-            <Anchor side="Left" relative="$parent/GoldCountingFrame/GoldEarnedLabel" pos="Mid" offset="-200"/>
-            <Anchor side="Right" relative="$parent/GoldCountingFrame/GoldEarnedLabel" pos="Mid" offset="150"/> 
+            <Anchor side="Top" relative="$parent/GoldCountingFrame/EarnedLabelAnchor" pos="Mid" offset="-100"/>
+            <Anchor side="Bottom" relative="$parent/GoldCountingFrame/EarnedLabelAnchor" pos="Mid" offset="100"/>
+            <Anchor side="Left" relative="$parent/GoldCountingFrame/EarnedLabelAnchor" pos="Mid" offset="-200"/>
+            <Anchor side="Right" relative="$parent/GoldCountingFrame/EarnedLabelAnchor" pos="Mid" offset="150"/>
 
             <Frame type="TileList" name="EarnedToolTipFrame">
                 <Anchor side="Left" relative="$parent" pos="Mid" offset="30"/>
@@ -2304,14 +3493,15 @@
 
                     <Text val="@UI/PlayerRewardsPanel/GoldEarnedToolTipHeader"/>
                 </Frame>
-            </Frame>  
+            </Frame>
         </Frame>
 
         <Frame type="Frame" name="RankEarnedToolTipHitTestFrame" template="PlayerRewardsPanel/EarnedToolTipHitTestFrameTemplate">
-            <Anchor side="Top" relative="$parent/RankCountingFrame/RankEarnedLabel" pos="Mid" offset="-100"/>
-            <Anchor side="Bottom" relative="$parent/RankCountingFrame/RankEarnedLabel" pos="Mid" offset="100"/>
-            <Anchor side="Left" relative="$parent/XPEarnedToolTipHitTestFrame" pos="Max" offset="0"/>
-            <Anchor side="Right" relative="$parent/GoldEarnedToolTipHitTestFrame" pos="Min" offset="0"/>
+            <Anchor side="Top" relative="$parent/RankCountingFrame/EarnedLabelAnchor" pos="Mid" offset="-100"/>
+            <Anchor side="Bottom" relative="$parent/RankCountingFrame/EarnedLabelAnchor" pos="Mid" offset="100"/>
+            <Anchor side="Left" relative="$parent/GoldEarnedToolTipHitTestFrame" pos="Max" offset="0"/>
+            <Anchor side="Right" relative="$parent/XPEarnedToolTipHitTestFrame" pos="Min" offset="0"/>
+            <Visible val="false"/>
 
             <Frame type="TileList" name="EarnedToolTipFrame">
                 <Anchor side="Left" relative="$parent" pos="Mid" offset="20"/>
@@ -2319,12 +3509,19 @@
                 <Frame type="Label" name="ToolTipHeader">
                     <Text val="@UI/PlayerRewardsPanel/RankEarnedToolTipHeader"/>
                 </Frame>
-            </Frame>  
+            </Frame>
         </Frame>
 
         <!--=======================================================================================
         <! Sound hookup for ranked game
         <!======================================================================================-->
+        <Animation name="StopLoopingSounds">
+            <Event event="OnHidden" action="Restart,Play"/>
+            <Controller type="Sound" end="Stop">
+                <Key type="Sound" time="0.0" sound="*@UI_BNet_ProgressionExit_StopActor"/>
+            </Controller>
+        </Animation>
+
         <Animation name="RankedGameWon">
             <Event event="RankedGameWon" action="Restart,Play"/>
             <Controller type="Sound" end="Stop">
@@ -2342,16 +3539,102 @@
         <Animation name="PlayPromotionWarning">
             <Event event="PlayPromotionWarning" action="Restart,Play"/>
             <Controller type="Sound" end="Stop">
-                <Key type="Sound" time="0.0" sound="@UI_BNet_Ranked_Promotion_Warning_Generic"/>
+                <Key type="Sound" time="0.0" sound="*@UI_BNet_Progression_Promotion"/>
             </Controller>
         </Animation>
 
         <Animation name="PlayDemotionWarning">
             <Event event="PlayDemotionWarning" action="Restart,Play"/>
             <Controller type="Sound" end="Stop">
-                <Key type="Sound" time="0.0" sound="@UI_BNet_Ranked_Demotion_Warning_Generic"/>
+                <Key type="Sound" time="0.0" sound="*@UI_BNet_Progression_Demotion"/>
             </Controller>
         </Animation>
+
+        <StateGroup name="StartAsPromotionState">
+            <State name="StartAsPromotionState">
+                <When type="Property" frame="RankScoreFrame" PromotionState="Promotion"/>
+                <When type="Property" frame="RankScoreFrame" inheritedVisible="true"/>
+                <Action type="PlaySound" sound="*@UI_BNet_Progression_Levelup_RankedBadge_Ascend_Start"/>
+            </State>
+            <State name="StartAsDemotionState">
+                <When type="Property" frame="RankScoreFrame" PromotionState="Demotion"/>
+                <When type="Property" frame="RankScoreFrame" inheritedVisible="true"/>
+                <Action type="PlaySound" sound="*@UI_BNet_Progression_Levelup_RankedBadge_Decline_Start"/>
+            </State>
+            <State name="EnterPromotionReady">
+                <When type="Property" frame="RankScoreFrame" PromotionState="PromotionNextGame"/>
+                <When type="Property" frame="RankScoreFrame" inheritedVisible="true"/>
+                <Action type="PlaySound" sound="*@UI_BNet_Progression_Promotion_Loop"/>
+                <Action type="PlaySound" sound="*@UI_BNet_Progression_Promotion_Loop_End" on="Exit"/>
+            </State>
+            <State name="EnterDemotionReady">
+                <When type="Property" frame="RankScoreFrame" PromotionState="DemotionNextGame"/>
+                <When type="Property" frame="RankScoreFrame" inheritedVisible="true"/>
+                <Action type="PlaySound" sound="*@UI_BNet_Progression_Demotion_Loop"/>
+                <Action type="PlaySound" sound="*@UI_BNet_Progression_Demotion_Loop_End" on="Exit"/>
+            </State>
+        </StateGroup>
+
+        <StateGroup name="RankCountingSound">
+            <State name="StartCountingUp">
+                <When type="AnimationState" frame="RankScoreFrame" CountdownDirection="Up"/>
+                <When type="Property" frame="RankCountingFrame/RankEarnedLabel" Counting="true"/>
+                <Action type="PlaySound" sound="*@UI_BNet_ProgressionCounter_Rank"/>
+                <Action type="PlaySound" sound="*@UI_BNet_ProgressionCounter_Rank_End" on="Exit"/>
+                <Action type="SendEvent" frame="RankCountingFrame/RankEarnedLabel" event="EnlargeText" on="Exit"/>
+            </State>
+            <State name="StartCountingDown">
+                <When type="AnimationState" frame="RankScoreFrame" CountdownDirection="Down"/>
+                <When type="Property" frame="RankCountingFrame/RankEarnedLabel" Counting="true"/>
+                <Action type="PlaySound" sound="*@UI_BNet_ProgressionCounter_Demotion"/>
+                <Action type="PlaySound" sound="*@UI_BNet_ProgressionCounter_Demotion_End" on="Exit"/>
+                <Action type="SendEvent" frame="RankCountingFrame/RankEarnedLabel" event="EnlargeText" on="Exit"/>
+            </State>
+        </StateGroup>
+
+        <StateGroup name="GoldCountingSound">
+            <State name="StartCounting">
+                <When type="Property" frame="GoldCountingFrame/GoldEarnedLabel" Counting="true"/>
+                <Action type="PlaySound" sound="*@UI_BNet_ProgressionCounter_Gold"/>
+                <Action type="PlaySound" sound="*@UI_BNet_ProgressionCounter_Gold_End" on="Exit"/>
+                <Action type="SendEvent" frame="GoldCountingFrame/GoldEarnedLabel" event="EnlargeText" on="Exit"/>
+            </State>
+        </StateGroup>
+
+        <StateGroup name="XPCountingSound">
+            <State name="StartCounting">
+                <When type="Property" frame="XPCountingFrame/XPEarnedLabel" Counting="true"/>
+                <Action type="PlaySound" sound="*@UI_BNet_ProgressionCounter_XP"/>
+                <Action type="PlaySound" sound="*@UI_BNet_ProgressionCounter_XP_End" on="Exit"/>
+                <Action type="SendEvent" frame="XPCountingFrame/XPEarnedLabel" event="EnlargeText" on="Exit"/>
+            </State>
+        </StateGroup>
+
+        <StateGroup name="HeroProgressSound">
+            <State name="StartCounting">
+                <When type="Property" frame="XPCountingFrame/XPEarnedLabel" Counting="true"/>
+                <When type="Property" frame="HeroScoreFrame" Visible="true"/>
+                <Action type="PlaySound" sound="*@UI_BNet_ProgressionCounter_Hero"/>
+                <Action type="PlaySound" sound="*@UI_BNet_ProgressionCounter_Hero_End" on="Exit"/>
+            </State>
+        </StateGroup>
+
+        <StateGroup name="BrawlProgressBarSound">
+            <State name="StartCounting">
+                <When type="Property" frame="BrawlRewardScoreFrame" IsCounting="true"/>
+                <When type="Property" frame="BrawlRewardScoreFrame" Visible="true"/>
+                <Action type="PlaySound" sound="*@UI_BNet_ProgressionCounter_Brawl"/>
+                <Action type="PlaySound" sound="*@UI_BNet_ProgressionCounter_Brawl_End" on="Exit"/>
+            </State>
+        </StateGroup>
+
+        <StateGroup name="PlayerProgressSound">
+            <State name="StartCounting">
+                <When type="Property" frame="PlayerScoreFrame" IsCounting="true"/>
+                <Action type="PlaySound" sound="*@UI_BNet_ProgressionCounter_Rank"/>
+                <Action type="PlaySound" sound="*@UI_BNet_ProgressionCounter_Rank_End" on="Exit"/>
+            </State>
+        </StateGroup>
     </Frame>
 
 </Desc>

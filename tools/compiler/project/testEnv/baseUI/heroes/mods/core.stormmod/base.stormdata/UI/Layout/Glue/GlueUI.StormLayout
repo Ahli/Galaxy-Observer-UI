@@ -1,6 +1,56 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <Desc>
     <DescFlags val="Locked"/>
+
+    <Frame type="UnitStatusColor" name="GlueColoringTemplate">
+        <Width val="3"/>
+        <Height val="3"/>
+
+        <ColorStyle val="MinimapTeams"/>
+        <AdditionalColorStyle val="PrimaryLight" index="0"/>
+
+        <StateGroup name="ReadRelation">
+            <State name="Ally">
+                <When type="Property" frame="$this" CurrentRelation="Ally"/>
+                <Action type="SetState" frame="$this" group="RedBlue" state="Blue"/>
+            </State>
+            <State name="TeamOrder">
+                <When type="Property" frame="$this" CurrentRelation="TeamOrder"/>
+                <Action type="SetState" frame="$this" group="RedBlue" state="Blue"/>
+            </State>
+            <State name="Enemy">
+                <When type="Property" frame="$this" CurrentRelation="Enemy"/>
+                <Action type="SetState" frame="$this" group="RedBlue" state="Red"/>
+            </State>
+            <State name="TeamChaos">
+                <When type="Property" frame="$this" CurrentRelation="TeamChaos"/>
+                <Action type="SetState" frame="$this" group="RedBlue" state="Red"/>
+            </State>
+        </StateGroup>
+        <StateGroup name="RedBlue">
+            <DefaultState val="Blue"/>
+            <State name="Red"/>
+            <State name="Blue"/>
+        </StateGroup>
+
+        <StateGroup name="TextureColor">
+            <DefaultState val="TextureBlue"/>
+            <State name="TextureOrange">
+                <When type="StateGroup" frame="$this" RedBlue="Red"/>
+                <When type="Option" colorblind="True"/>
+            </State>
+            <State name="TextureCyan">
+                <When type="StateGroup" frame="$this" RedBlue="Blue"/>
+                <When type="Option" colorblind="True"/>
+            </State>
+            <State name="TextureRed">
+                <When type="StateGroup" frame="$this" RedBlue="Red"/>
+            </State>
+            <State name="TextureBlue">
+                <When type="StateGroup" frame="$this" RedBlue="Blue"/>
+            </State>
+        </StateGroup>
+    </Frame>
     
     <Frame type="GlueUI" name="GlueUI">
         <Anchor relative="$parent"/>
@@ -10,6 +60,26 @@
         <Shortcut val="@UI/GlueReply_Hotkey"/>
         <Shortcut val="@UI/GlueSlashCommand_Hotkey"/>
         <Handle val="GlueUI"/>
+
+
+        <!-- BEGIN Property bindable Colors -->
+        <Frame type="UnitStatusColor" name="GlueBlueColors" template="GlueUI/GlueColoringTemplate">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+            <Width val="3"/>
+            <Height val="3"/>
+
+            <ForcedRelation val="Ally"/>
+        </Frame>
+        <Frame type="UnitStatusColor" name="GlueRedColors" template="GlueUI/GlueColoringTemplate">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent/GlueBlueColors" pos="Min" offset="0"/>
+            <Width val="3"/>
+            <Height val="3"/>
+
+            <ForcedRelation val="Enemy"/>
+        </Frame>
+        <!-- END Property bindable Colors -->
 
         <StateGroup name="SoundtrackState">
             <DefaultState val="Default"/>

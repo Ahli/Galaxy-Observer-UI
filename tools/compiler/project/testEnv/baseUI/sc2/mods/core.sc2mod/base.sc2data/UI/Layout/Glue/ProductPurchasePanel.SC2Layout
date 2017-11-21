@@ -44,8 +44,8 @@
             <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
             <Width val="702"/>
             <Height val="752"/>
-            <Texture val="@UI/Glues_Battlenet_DialogBox_BG"/>
-            <TextureType val="HorizontalBorder"/>
+            <Texture val="@UI/Glues_Battlenet_DialogBox_StandardBG"/>
+            <TextureType val="NineSlice"/>
         </Frame>
         
         <Frame type="Image" name="TopHexPattern">
@@ -65,11 +65,16 @@
     </Frame>
 
     <Frame type="ProductListBoxItem" name="ProductListBoxItemTemplate">
+        <Frame type="StoreCacheFrame" name="StoreCacheFrame">
+            <Anchor relative="$parent"/>
+            <GameContent val="{$parent/@GameContent}"/>
+        </Frame>
+
         <Frame type="GameContentFrame" name="GameContentFrame">
             <Anchor relative="$parent"/>
             <GameContent val="{$parent/@GameContent}"/>
         </Frame>
-            
+
         <Frame type="Label" name="ProductNameLabel">
             <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
             <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
@@ -98,7 +103,7 @@
             <DefaultState val="NotPurchased"/>
 
             <State name="Purchased">
-                <When type="AnimationState" frame="$this/GameContentFrame" PurchasedState="Purchased"/>
+                <When type="Property" frame="$this/GameContentFrame" IsPurchased="True"/>
                 <Action type="SetProperty" frame="ProductNameLabel" style="@Campaign_PurchaseDialogItemTitle_Owned"/>
                 <Action type="SetProperty" frame="QuantityLabel" visible="false"/>
                 <Action type="SetProperty" frame="OwnedLabel" visible="true"/>
@@ -122,7 +127,7 @@
         <Anchor relative="$parent"/>
         <RenderType val="LDR"/>
         
-        <Frame type="GameContentFrame" name="GameContentFrame">
+        <Frame type="StoreCacheFrame" name="StoreCacheFrame">
             <Anchor relative="$parent"/>
             <GameContent val="{$parent/@GameContent}"/>
         </Frame>
@@ -159,52 +164,6 @@
                 <Text val="@UI/ProductPurchase/CancelButton"/>
                 <Shortcut val="@UI/ScreenNavigationBack_Hotkey"/>
                 <ReportsStats val="true"/>
-                <ClickSound val="@UI_ActionButtonSelect"/>
-            </Frame>
-        </Frame>
-        
-        <!--
-        
-        
-        CONFIRM REGION PANEL
-        This probably won't be necessary for SC2.
-        
-        
-        -->
-
-        <Frame type="Frame" name="ConfirmRegionPanel">
-            <Anchor relative="$parent/AnchorFrame"/>
-        
-            <Frame type="Label" name="ConfirmTextLabel">
-                <Anchor side="Top" relative="$parent" pos="Min" offset="10"/>
-                <Anchor side="Left" relative="$parent" pos="Min" offset="50"/>
-                <Anchor side="Right" relative="$parent" pos="Max" offset="-50"/>
-            </Frame>
-        
-            <Frame type="EditBox" name="ConfirmEditBox" template="StandardTemplates/StandardEditBoxTemplate">
-                <Anchor side="Top" relative="$parent/ConfirmTextLabel" pos="Max" offset="10"/>
-                <Anchor side="Left" relative="$parent/ConfirmTextLabel" pos="Min" offset="0"/>
-                <Anchor side="Right" relative="$parent" pos="Max" offset="-50"/>
-
-                <Frame type="Label" name="SearchTextLabel">
-                    <Anchor side="Top" relative="$parent" pos="Min" offset="15"/>
-                    <Anchor side="Bottom" relative="$parent" pos="Max" offset="-12"/>
-                    <Anchor side="Left" relative="$parent" pos="Min" offset="20"/>
-                    <Anchor side="Right" relative="$parent" pos="Max" offset="-15"/>
-                </Frame>
-            </Frame>
-            
-            <Frame type="Button" name="ConfirmButton" template="StandardTemplates/StandardButtonTemplate">
-                <Anchor side="Top" relative="$parent/ConfirmEditBox" pos="Max" offset="0"/>
-                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
-                <Text val="@UI/ProductPurchase/PurchaseButton"/>
-            </Frame>
-
-            <Frame type="Button" name="CancelButton" template="StandardTemplates/StandardButtonTemplate">
-                <Anchor side="Top" relative="$parent/ConfirmButton" pos="Min" offset="0"/>
-                <Anchor side="Left" relative="$parent/ConfirmButton" pos="Max" offset="-7"/>
-                <Text val="@UI/ProductPurchase/CancelButton"/>
-                <Shortcut val="@UI/ScreenNavigationBack_Hotkey"/>
                 <ClickSound val="@UI_ActionButtonSelect"/>
             </Frame>
         </Frame>
@@ -354,7 +313,7 @@
                     <Anchor side="Right" relative="$parent/QuantityHeaderLabel" pos="Max" offset="25"/>
                     <Anchor side="Bottom" relative="$parent" pos="Max" offset="-10"/>
                     
-                    <ItemHeight val="40"/>
+                    <ItemHeight val="46"/>
                     <ItemDesc val="ProductPurchasePanel/ProductListBoxItemTemplate"/>
                     <SelectedImage val="SelectedImage"/>
                     <HoverImage val="HoverImage"/>
@@ -420,13 +379,6 @@
                 <Style val="@Campaign_PurchaseDialogSubItemTitle"/>
                 <Text val="@UI/ProductPurchase/PaymentMethod"/>
             </Frame>
-            
-            <Frame type="Label" name="PayWithGoldLabel">
-                <Anchor side="Top" relative="$parent/PaymentMethodHeaderLabel" pos="Min" offset="0"/>
-                <Anchor side="Left" relative="$parent/PaymentMethodHeaderLabel" pos="Max" offset="0"/>
-                <Text val="@UI/ProductPurchase/GoldPurchase"/>
-                <CollapseLayout val="true"/>
-            </Frame>
 
             <Frame type="Pulldown" name="PaymentMethodPulldown" template="StandardBattlenetTemplates/StandardBattlenetPulldownTemplate">
                 <Anchor side="Top" relative="$parent/PaymentMethodHeaderLabel" pos="Mid" offset="0"/>
@@ -460,18 +412,6 @@
                 <Anchor side="Right" relative="$parent/AnchorFrame" pos="Max" offset="-30"/>
                 <Style val="@Campaign_PurchaseDialogItemHeader"/>
                 <Text val="@UI/ProductPurchase/TaxesIncluded"/>
-            </Frame>
-            
-            <Frame type="Label" name="TaxesExcludedLabel" template="ProductPurchasePanel/ProductPurchasePanelTemplate/CompletePurchasePanel/TaxesIncludedLabel">
-                <Text val="@UI/ProductPurchase/TaxesExcluded"/>
-            </Frame>
-            
-            <Frame type="Label" name="EuVATIncludedLabel" template="ProductPurchasePanel/ProductPurchasePanelTemplate/CompletePurchasePanel/TaxesIncludedLabel">
-                <Text val="@UI/ProductPurchase/EuVATIncluded"/>
-            </Frame>
-            
-            <Frame type="Label" name="KoVATIncludedLabel" template="ProductPurchasePanel/ProductPurchasePanelTemplate/CompletePurchasePanel/TaxesIncludedLabel">
-                <Text val="@UI/ProductPurchase/KoVATIncluded"/>
             </Frame>
             
             <Frame type="Label" name="ErrorLabel">
@@ -511,38 +451,21 @@
                 <Anchor side="Top" relative="$parent/TotalBackground" pos="Max" offset="20"/>
                 <Anchor side="Left" relative="$parent/InputLabel" pos="Min" offset="0"/>
             </Frame>
-            
-            <Frame type="CheckBox" name="RefundPolicyCheckBox" template="StandardTemplates/StandardCheckBoxLabelTemplate">
-                <Anchor side="Top" relative="$parent/CheckboxShim" pos="Max" offset="0"/>
+
+            <Frame type="CheckBox" name="TermsOfSaleCheckBox" template="StandardTemplates/StandardCheckBoxLabelTemplate">
+                <Anchor side="Bottom" relative="$parent/TermsOfSaleLabel" pos="Min" offset="0"/>
                 <Anchor side="Left" relative="$parent/CheckboxShim" pos="Min" offset="0"/>
-                <Width val="550"/>
-                <Height val="32"/>
+                <Width val="700"/>
+                <Height val="64"/>
                 <CollapseLayout val="true"/>
 
                 <Frame type="Label" name="Label">
-                    <Anchor side="Top" relative="$parent" pos="Mid" offset="3"/>
-                    <Anchor side="Bottom" relative="$parent" pos="Mid" offset="3"/>
-                    <Style val="Campaign_PurchaseDialogItemHeaderMiddle"/>
-                    <AcceptsMouse val="true"/>
-                </Frame>
-            </Frame>
-            
-            <Frame type="CheckBox" name="TermsOfSaleCheckBox" template="StandardTemplates/StandardCheckBoxLabelTemplate">
-                <Anchor side="Top" relative="$parent/RefundPolicyCheckBox" pos="Max" offset="5"/>
-                <Anchor side="Left" relative="$parent/RefundPolicyCheckBox" pos="Min" offset="0"/>
-                <Width val="550"/>
-                <Height val="32"/>
-                <CollapseLayout val="true"/>
-            
-                <Frame type="Label" name="Label">
-                    <Anchor side="Top" relative="$parent" pos="Mid" offset="3"/>
-                    <Anchor side="Bottom" relative="$parent" pos="Mid" offset="3"/>
-                    <Style val="Campaign_PurchaseDialogItemHeaderMiddle"/>
+                    <Style val="PurchaseFlowCheckboxLabel"/>
                     <Text val="@UI/ProductPurchase/TermsOfSale"/>
                     <AcceptsMouse val="true"/>
                 </Frame>
             </Frame>
-
+            
             <Frame type="Frame" name="ProductRatingFrame">
                 <Anchor side="Bottom" relative="$parent/AnchorFrame" pos="Max" offset="-135"/>
                 <Anchor side="Right" relative="$parent/CancelButton" pos="Max" offset="0"/>
@@ -633,6 +556,7 @@
                 <Anchor side="Bottom" relative="$parent/BottomAnchorFrame" pos="Min" offset="0"/>
                 <Anchor side="Left" relative="$parent/AnchorFrame" pos="Min" offset="60"/>
                 <Text val="@UI/ProductPurchase/ConfirmButton"/>
+                <ClickSound val="@UI_ActionButtonSelect"/>
             </Frame>
 
             <Frame type="Button" name="CancelButton" template="StandardBattlenetTemplates/BattlenetStandardButtonTemplate">
@@ -669,12 +593,213 @@
                 <DefaultState val="NotBundle"/>
 
                 <State name="Bundle">
-                    <When type="Property" frame="$parent/GameContentFrame" IsBundle="True"/>
+                    <When type="Property" frame="$parent/StoreCacheFrame" IsBundle="True"/>
                     <Action type="SetProperty" frame="BundleFrame" visible="true"/>
                 </State>
 
                 <State name="NotBundle">
                     <Action type="SetProperty" frame="BundleFrame" visible="false"/>
+                </State>
+            </StateGroup>
+
+            <StateGroup name="TermsOfSaleVisibility">
+                <DefaultState val="NotVisible"/>
+
+                <State name="PurchaseFailed">
+                    <When type="Property" frame="$parent" PurchaseStep="Failed"/>
+                    <Action type="SetProperty" frame="TermsOfSaleCheckBox" Visible="False"/>
+                    <Action type="SetProperty" frame="TermsOfSaleLabel" Visible="False"/>
+                </State>
+
+                <State name="KRProductExpires">
+                    <When type="Property" frame="$parent" AccountCountry="KOR"/>
+                    <When type="Property" frame="$parent" DoesProductExpire="True"/>
+                    <Action type="SetProperty" frame="TermsOfSaleCheckBox" Visible="True"/>
+                    <Action type="SetProperty" frame="TermsOfSaleCheckBox/Label" Text="@UI/ProductPurchase/TermsOfSaleKRExpires"/>
+                    <Action type="SetProperty" frame="TermsOfSaleLabel" Visible="False"/>
+                </State>
+
+                <State name="KRProductDoesntExpire">
+                    <When type="Property" frame="$parent" AccountCountry="KOR"/>
+                    <Action type="SetProperty" frame="TermsOfSaleCheckBox" Visible="True"/>
+                    <Action type="SetProperty" frame="TermsOfSaleCheckBox/Label" Text="@UI/ProductPurchase/TermsOfSaleKR"/>
+                    <Action type="SetProperty" frame="TermsOfSaleLabel" Visible="False"/>
+                </State>
+
+                <State name="RealCurrency_EUR">
+                    <When type="Property" frame="$parent" SelectedCurrency="EUR"/>
+                    <Action type="SetProperty" frame="TermsOfSaleCheckBox" Visible="False"/>
+                    <Action type="SetProperty" frame="TermsOfSaleLabel" Visible="True"/>
+                    <Action type="SetProperty" frame="TermsOfSaleLabel" Text="@UI/ProductPurchase/EuTermsOfSale"/>
+                </State>
+
+                <State name="RealCurrency_GBP">
+                    <When type="Property" frame="$parent" SelectedCurrency="GBP"/>
+                    <Action type="SetProperty" frame="TermsOfSaleCheckBox" Visible="False"/>
+                    <Action type="SetProperty" frame="TermsOfSaleLabel" Visible="True"/>
+                    <Action type="SetProperty" frame="TermsOfSaleLabel" Text="@UI/ProductPurchase/EuTermsOfSale"/>
+                </State>
+
+                <State name="RealCurrency_RUB">
+                    <When type="Property" frame="$parent" SelectedCurrency="RUB"/>
+                    <Action type="SetProperty" frame="TermsOfSaleCheckBox" Visible="False"/>
+                    <Action type="SetProperty" frame="TermsOfSaleLabel" Visible="True"/>
+                    <Action type="SetProperty" frame="TermsOfSaleLabel" Text="@UI/ProductPurchase/EuTermsOfSale"/>
+                </State>
+
+                <State name="RealCurrency">
+                    <When type="Property" frame="$parent" IsRealCurrency="True"/>
+                    <Action type="SetProperty" frame="TermsOfSaleCheckBox" Visible="False"/>
+                    <Action type="SetProperty" frame="TermsOfSaleLabel" Visible="True"/>
+                    <Action type="SetProperty" frame="TermsOfSaleLabel" Text="@UI/ProductPurchase/TermsOfSale"/>
+                </State>
+
+                <State name="NotVisible">
+                    <Action type="SetProperty" frame="TermsOfSaleCheckBox" Visible="False"/>
+                    <Action type="SetProperty" frame="TermsOfSaleLabel" Visible="False"/>
+                </State>
+            </StateGroup>
+
+            <StateGroup name="AdditionalLegalTextVisibility">
+                <DefaultState val="NotVisible"/>
+
+                <State name="PurchaseFailed">
+                    <When type="Property" frame="$parent" PurchaseStep="Failed"/>
+                    <Action type="SetProperty" frame="AdditionalLegalTextLabel" Visible="False"/>
+                </State>
+
+                <State name="KRProductExpires">
+                    <When type="Property" frame="$parent" AccountCountry="KOR"/>
+                    <When type="Property" frame="$parent" DoesProductExpire="True"/>
+                    <Action type="SetProperty" frame="AdditionalLegalTextLabel" Visible="True"/>
+                    <Action type="SetProperty" frame="AdditionalLegalTextLabel" Text="@UI/ProductPurchase/AdditionalLegalTextKRExpires"/>
+                </State>
+
+                <State name="KRProduct">
+                    <When type="Property" frame="$parent" AccountCountry="KOR"/>
+                    <Action type="SetProperty" frame="AdditionalLegalTextLabel" Visible="True"/>
+                    <Action type="SetProperty" frame="AdditionalLegalTextLabel" Text="@UI/ProductPurchase/AdditionalLegalTextKR"/>
+                </State>
+
+                <State name="TaiwanCurrency">
+                    <When type="Property" frame="$parent" SelectedCurrency="NT$"/>
+                    <Action type="SetProperty" frame="AdditionalLegalTextLabel" Visible="True"/>
+                    <Action type="SetProperty" frame="AdditionalLegalTextLabel" Text="@@UI/ProductPurchase/AdditionalLegalTextTW"/>
+                </State>
+
+                <State name="BRACurrency">
+                    <When type="Property" frame="$parent" SelectedCurrency="BRL"/>
+                    <Action type="SetProperty" frame="AdditionalLegalTextLabel" Visible="True"/>
+                    <Action type="SetProperty" frame="AdditionalLegalTextLabel" Text="@@UI/ProductPurchase/AdditionalLegalText"/>
+                </State>
+
+                <State name="NotVisible">
+                    <Action type="SetProperty" frame="AdditionalLegalTextLabel" Visible="False"/>
+                </State>
+            </StateGroup>
+
+            <StateGroup name="BundleLegalTextVisibility">
+                <DefaultState val="NotVisible"/>
+
+                <State name="PurchaseFailed">
+                    <When type="Property" frame="$parent" PurchaseStep="Failed"/>
+                    <Action type="SetProperty" frame="BundleLegalTextLabel" Visible="False"/>
+                </State>
+
+                <State name="Bundle_KOR">
+                    <When type="Property" frame="$parent" AccountCountry="KOR"/>
+                    <When type="Property" frame="$parent" IsProductBundle="True"/>
+                    <Action type="SetProperty" frame="BundleLegalTextLabel" Visible="True"/>
+                </State>
+
+                <State name="NotVisible">
+                    <Action type="SetProperty" frame="BundleLegalTextLabel" Visible="False"/>
+                </State>
+            </StateGroup>
+
+            <StateGroup name="TaxesIncludedVisibility">
+                <DefaultState val="NotVisible"/>
+
+                <State name="PurchaseFailed">
+                    <When type="Property" frame="$parent" PurchaseStep="Failed"/>
+                    <Action type="SetProperty" frame="TaxesIncludedLabel" Visible="False"/>
+                </State>
+
+                <State name="VATIncluded_KOR">
+                    <When type="Property" frame="$parent" AccountCountry="KOR"/>
+                    <When type="Property" frame="$parent" IsRealCurrency="True"/>
+                    <Action type="SetProperty" frame="TaxesIncludedLabel" Visible="True"/>
+                    <Action type="SetProperty" frame="TaxesIncludedLabel" Text="@UI/ProductPurchase/KoVATIncluded"/>
+                </State>
+
+                <State name="VATIncluded_EUR">
+                    <When type="Property" frame="$parent" SelectedCurrency="EUR"/>
+                    <Action type="SetProperty" frame="TaxesIncludedLabel" Visible="True"/>
+                    <Action type="SetProperty" frame="TaxesIncludedLabel" Text="@UI/ProductPurchase/EuVATIncluded"/>
+                </State>
+
+                <State name="VATIncluded_RUB">
+                    <When type="Property" frame="$parent" SelectedCurrency="RUB"/>
+                    <Action type="SetProperty" frame="TaxesIncludedLabel" Visible="True"/>
+                    <Action type="SetProperty" frame="TaxesIncludedLabel" Text="@UI/ProductPurchase/EuVATIncluded"/>
+                </State>
+
+                <State name="VATIncluded_GBP">
+                    <When type="Property" frame="$parent" SelectedCurrency="GBP"/>
+                    <Action type="SetProperty" frame="TaxesIncludedLabel" Visible="True"/>
+                    <Action type="SetProperty" frame="TaxesIncludedLabel" Text="@UI/ProductPurchase/EuVATIncluded"/>
+                </State>
+
+                <State name="TaxesIncluded_ARS">
+                    <When type="Property" frame="$parent" SelectedCurrency="ARS"/>
+                    <Action type="SetProperty" frame="TaxesIncludedLabel" Visible="True"/>
+                    <Action type="SetProperty" frame="TaxesIncludedLabel" Text="@UI/ProductPurchase/TaxesIncluded"/>
+                </State>
+
+                <State name="TaxesIncluded_CLP">
+                    <When type="Property" frame="$parent" SelectedCurrency="CLP"/>
+                    <Action type="SetProperty" frame="TaxesIncludedLabel" Visible="True"/>
+                    <Action type="SetProperty" frame="TaxesIncludedLabel" Text="@UI/ProductPurchase/TaxesIncluded"/>
+                </State>
+
+                <State name="TaxesIncluded_MXN">
+                    <When type="Property" frame="$parent" SelectedCurrency="MXN"/>
+                    <Action type="SetProperty" frame="TaxesIncludedLabel" Visible="True"/>
+                    <Action type="SetProperty" frame="TaxesIncludedLabel" Text="@UI/ProductPurchase/TaxesIncluded"/>
+                </State>
+
+                <State name="TaxesExcluded_USD">
+                    <When type="Property" frame="$parent" SelectedCurrency="USD"/>
+                    <Action type="SetProperty" frame="TaxesIncludedLabel" Visible="True"/>
+                    <Action type="SetProperty" frame="TaxesIncludedLabel" Text="@UI/ProductPurchase/TaxesExcluded"/>
+                </State>
+
+                <State name="TaxesExcluded_BRL">
+                    <When type="Property" frame="$parent" SelectedCurrency="BRL"/>
+                    <Action type="SetProperty" frame="TaxesIncludedLabel" Visible="True"/>
+                    <Action type="SetProperty" frame="TaxesIncludedLabel" Text="@UI/ProductPurchase/TaxesExcluded"/>
+                </State>
+
+                <State name="NotVisible">
+                    <Action type="SetProperty" frame="TaxesIncludedLabel" Visible="False"/>
+                </State>
+            </StateGroup>
+
+            <StateGroup name="ProductRatingFrameVisibility">
+                <DefaultState val="ProductRatingFrameNotVisible"/>
+
+                <State name="PurchaseFailed">
+                    <When type="Property" frame="$parent" PurchaseStep="Failed"/>
+                    <Action type="SetProperty" frame="ProductRatingFrame" Visible="False"/>
+                </State>
+
+                <State name="ProductRating_BRA">
+                    <When type="Property" frame="$parent" AccountCountry="BRA"/>
+                    <Action type="SetProperty" frame="ProductRatingFrame" Visible="True"/>
+                </State>
+
+                <State name="ProductRatingFrameNotVisible">
+                    <Action type="SetProperty" frame="ProductRatingFrame" Visible="False"/>
                 </State>
             </StateGroup>
         </Frame>
@@ -702,7 +827,6 @@
 
             <Animation name="PurchasingVisiblity">
                 <Event event="OnShown" action="Reset" frame="$parent/SelectCurrencyPanel"/>
-                <Event event="OnShown" action="Reset" frame="$parent/ConfirmRegionPanel"/>
                 <Event event="OnShown" action="Reset" frame="$parent/PurchasedPanel"/>
                 <Event event="OnShown" action="Reset" frame="$parent/CompletePurchasePanel"/>
                 <Event event="OnShown" action="Reset" frame="$parent/BeginPurchasePanel"/>
@@ -713,11 +837,11 @@
                     <Key type="Bool" time="0" value="true"/>
                 </Controller>
             </Animation>
-            
         </Frame>
         
         <Frame type="Frame" name="PurchasedPanel">
             <Anchor relative="$parent/AnchorFrame"/>
+            <Visible val="false"/>
             
             <Frame type="Image" name="PurchaseBG">
                 <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
@@ -821,6 +945,45 @@
                 <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
                 <Text val="@UI/ProductPurchase/BackButton"/>
             </Frame>
+
+            <Frame type="GameContentFrame" name="ContentFrame">
+                <Anchor relative="$parent"/>
+                <GameContent val="{$parent/$parent/@GameContent}"/>
+            </Frame>
+
+            <Frame type="Image" name="WarChestLogo">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="34"/>
+                <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+                <Width val="640"/>
+                <Height val="356"/>
+                <Texture val="@UI/SC2_UI_Battlenet_Glue_Campaign_Purchase_WarChest_Logo"/>
+                
+                <Animation name="Sound_ThankYou">
+                    <Event event="OnShown" action="Reset,Play"/>
+                    <Event event="OnHidden" action="Stop"/>
+                    
+                    <Controller type="Sound" end="Stop">
+                        <Key type="Sound" time="0.1" sound="*@UI_WarChest_Purchased_AS"/>
+                    </Controller>
+                </Animation>
+            </Frame>
+
+            <StateGroup name="PurchaseThankYouImageState">
+                <DefaultState val="Normal"/>
+                
+                <State name="WarChest">
+                    <When type="Property" frame="ContentFrame" ContentType="WarChest"/>
+                    <When type="Property" frame="$parent" PurchaseStep="Purchased"/>
+                    <Action type="SetProperty" frame="PurchaseBG" Texture="@UI/SC2_UI_Battlenet_Glue_Campaign_Purchase_WarChest_ThankYouBG"/>
+                    <Action type="SetProperty" frame="WarChestLogo" Visible="True"/>
+                </State>
+
+                <State name="Normal">
+                    <Action type="SetProperty" frame="PurchaseBG" Texture="@UI/SC2_UI_Battlenet_Glue_Campaign_Purchase_ThankYouBG"/>
+                    <Action type="SetProperty" frame="WarChestLogo" Visible="False"/>
+                </State>
+            </StateGroup>
         </Frame>
         
         <Frame type="Frame" name="ErrorPanel">

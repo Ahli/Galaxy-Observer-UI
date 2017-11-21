@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<Desc>
+    <DescFlags val="Locked"/>
+    
+    <!--
+    ====================================
+    COMMANDER BACKGROUND CONTAINER TEMPLATE
+    ====================================
+    
+    Contains the background image of the most played commander
+    -->
+    <Frame type="Frame" name="CommanderBackgroundContainerTemplate">
+        <Width val="634"/>
+        <Height val="258"/>
+        
+        <Frame type="Image" name="CommanderImage">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="3"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="-3"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="3"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="-3"/>
+            <Texture val="{$parent/$parent/@Commander[ProfileImagePath]}"/>
+        </Frame>
+        
+        <Frame type="Image" name="RightGradient">
+            <Anchor side="Top" relative="$parent/CommanderImage" pos="Min" offset="0"/>
+            <Anchor side="Bottom" relative="$parent/CommanderImage" pos="Max" offset="0"/>
+            <Anchor side="Right" relative="$parent/CommanderImage" pos="Max" offset="0"/>
+            <Width val="440"/>
+            <Texture val="@UI/SC2_UI_UserProfile_Summary_Coop_GradientRight"/>
+            <Alpha val="179"/>
+        </Frame>
+        
+        <Frame type="Image" name="BottomLeftGradient">
+            <Anchor side="Bottom" relative="$parent/CommanderImage" pos="Max" offset="0"/>
+            <Anchor side="Left" relative="$parent/CommanderImage" pos="Min" offset="0"/>
+            <Texture val="@UI/SC2_UI_UserProfile_Summary_Coop_GradientCorner"/>
+        </Frame>
+        
+        <!-- BORDER OUTER -->
+        <Frame type="Image" name="BorderOuter">
+            <Anchor relative="$parent"/>
+            <Texture val="@UI/Glues_Battlenet_PageAssets_GraphicListItem_Border_Outer"/>
+            <TextureType val="NineSlice"/>
+            <Color val="0,0,0"/>
+        </Frame>
+        
+        <!-- BORDER INNER -->
+        <Frame type="Image" name="BorderInner">
+            <Anchor relative="$parent"/>
+            <Texture val="@UI/Glues_Battlenet_PageAssets_GraphicListItem_Border_Inner"/>
+            <TextureType val="NineSlice"/>
+            <Color val="29,46,69"/>
+        </Frame>
+
+        <Frame type="Label" name="MostPlayedLabel">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="197"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="19"/>
+            <Text val="@UI/ScreenUserProfile/SummaryCoop/LastPlayed"/>
+            <Style val="Profile_Summary_CoopMostPlayed"/>
+        </Frame>
+
+        <Frame type="Label" name="CommanderLabel">
+            <Anchor side="Top" relative="$parent/MostPlayedLabel" pos="Max" offset="-5"/>
+            <Anchor side="Left" relative="$parent/MostPlayedLabel" pos="Min" offset="0"/>
+            <Text val="{$parent/$parent/@Commander[Name]}"/>
+            <Style val="Profile_Summary_CoopCommander"/>
+            <Visible val="{$parent/MostPlayedLabel/@Visible}"/>
+        </Frame>
+    
+        <!-- AspectRatioState-->
+        <StateGroup name="AspectRatioState">
+            <DefaultState val="Default"/>
+            
+            <State name="16x9">
+                <When type="StateGroup" frame="$GlueUI" AspectRatioState="16x9"/>
+                <Action type="SetProperty" frame="BorderOuter" Texture="@UI/Glues_Battlenet_PageAssets_GraphicListItem_Border_Outer_16x9"/>
+                <Action type="SetProperty" frame="BorderInner" Texture="@UI/Glues_Battlenet_PageAssets_GraphicListItem_Border_Inner_16x9"/>
+            </State>
+            
+            <State name="Default">
+                <Action type="SetProperty" frame="BorderOuter" Texture="@UI/Glues_Battlenet_PageAssets_GraphicListItem_Border_Outer"/>
+                <Action type="SetProperty" frame="BorderInner" Texture="@UI/Glues_Battlenet_PageAssets_GraphicListItem_Border_Inner"/>
+            </State>
+        </StateGroup>
+        
+        <StateGroup name="PlayedCommanderState">
+            <DefaultState val="NonePlayed"/>
+            
+            <State name="Played">
+                <When type="AnimationState" frame="$parent" LoadingState="Loaded"/>
+                <Action type="SetProperty" frame="CommanderImage" Texture="{$parent/$parent/@Commander[ProfileImagePath]}"/>
+                <Action type="SetProperty" frame="CommanderLabel" Text="{$parent/$parent/@Commander[Name]}"/>
+            </State>
+            
+            <State name="NonePlayed">
+                <Action type="SetProperty" frame="CommanderImage" Texture="@UI/SC2_UI_UserProfile_Summary_Commander_Empty"/>
+                <Action type="SetProperty" frame="CommanderLabel" Text="@UI/ScreenUserProfile/SummaryCoop/CoopCommander"/>
+            </State>
+        </StateGroup>
+    </Frame>
+
+    
+    <!--
+    ====================================
+    USER PROFILE SUMMARY COOP COMMANDER FRAME
+    ====================================
+    
+    -->
+    <Frame type="UserProfileSummaryCoopCommanderFrame" name="UserProfileSummaryCoopCommanderFrame">
+        <PresenceId val="{$ScreenUserProfile/@PresenceId}"/>
+
+        <Frame type="Label" name="CoopHeaderLabel">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="9"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="14"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="-15"/>
+            <Text val="@UI/ScreenUserProfile/SummaryCoop/CoopMissions"/>
+            <Style val="Profile_Summary_Header"/>
+            <Options val="Ellipsis | TooltipIfTruncated | NoWrapping"/>
+        </Frame>
+        
+        <Frame type="Frame" name="CommanderBackgroundContainer" template="UserProfileSummaryCoopCommanderFrame/CommanderBackgroundContainerTemplate">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="44"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="14"/>
+        </Frame>
+
+        <Frame type="UserProfileSummaryCoopMasteryFrame" name="UserProfileSummaryCoopMasteryFrame" template="UserProfileSummaryCoopMasteryFrame/UserProfileSummaryCoopMasteryFrameTemplate">
+            <Anchor relative="$parent/CommanderBackgroundContainer"/>
+        </Frame>
+
+        <Frame type="UserProfileSummaryCoopMutatorFrame" name="UserProfileSummaryCoopMutatorFrame" template="UserProfileSummaryCoopMutatorFrame/UserProfileSummaryCoopMutatorFrameTemplate">
+            <Anchor relative="$parent/CommanderBackgroundContainer"/>
+        </Frame>
+    </Frame>
+</Desc>

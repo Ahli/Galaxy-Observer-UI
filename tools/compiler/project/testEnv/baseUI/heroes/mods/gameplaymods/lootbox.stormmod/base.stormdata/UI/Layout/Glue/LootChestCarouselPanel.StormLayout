@@ -1,0 +1,828 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<Desc>
+    <DescFlags val="Locked"/>
+
+    <!--===========================================================================================
+    <! Constants
+    <!==========================================================================================-->
+    <Constant name="CommonLightAdjustColor" val="7999f5"/>
+    <Constant name="CommonDarkAdjustColor" val="293367"/>
+    <Constant name="RareLightAdjustColor" val="7fbfff"/>
+    <Constant name="RareDarkAdjustColor" val="0024ff"/>
+    <Constant name="EpicLightAdjustColor" val="d6bbff"/>
+    <Constant name="EpicDarkAdjustColor" val="5300ea"/>
+    <Constant name="LegendaryLightAdjustColor" val="ffb9a9"/>
+    <Constant name="LegendaryDarkAdjustColor" val="d02c00"/>
+
+    <!--===========================================================================================
+    <! Templates
+    <!==========================================================================================-->
+
+    <Frame type="LootChestCutsceneFrame" name="LootChestCutsceneTemplate">
+        <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+        <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+        <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+        <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+
+        <AutoPlay val="True"/>
+        <RenderType val="HDR"/>
+        <ToneMapping val="False"/>
+
+        <Animation name="SetupCutscene">
+            <Event event="OnShown" action="Restart,Play"/>
+
+            <Controller type="Cutscene" end="Pause">
+                <Key type="Cutscene" time="0" action="SetCutscene" file="Cutscenes/UI_LootBox.StormCutscene" preloadFilters="Common,Rare,Epic,Legendary,OpenCommon,OpenRare,OpenEpic,OpenLegendary"/>
+                <Key type="Cutscene" time="0" action="Bookmark" bookmark="Start"/>
+                <Key type="Cutscene" time="0" action="Play"/>
+            </Controller>
+        </Animation>
+
+        <Animation name="ChestHover">
+            <Event event="OnMouseEnter" action="DirectionForward, Play"/>
+            <Event event="OnMouseExit" action="DirectionReverse, Play"/>
+
+            <Controller type="CutscenePropertyReal" end="Pause" property="scaleX" finderTag="Chest">
+                <Key type="Curve" time="0" value="1.0"/>
+                <Key type="Curve" time=".1" value="1.1"/>
+            </Controller>
+            <Controller type="CutscenePropertyReal" end="Pause" property="scaleY" finderTag="Chest">
+                <Key type="Curve" time="0" value="1.0"/>
+                <Key type="Curve" time=".1" value="1.1"/>
+            </Controller>
+            <Controller type="CutscenePropertyReal" end="Pause" property="scaleZ" finderTag="Chest">
+                <Key type="Curve" time="0" value="1.0"/>
+                <Key type="Curve" time=".1" value="1.1"/>
+            </Controller>
+        </Animation>
+
+        <StateGroup name="ChestHoverStates">
+            <State name="HoverEnabled">
+                <When type="Property" IsCenterChest="true"/>
+                <Action type="SetAnimationProperty" animation="ChestHover" enabled="true"/>
+            </State>
+            <State name="HoverDisabled">
+                <When type="Property" IsCenterChest="false"/>
+                <Action type="SetAnimationProperty" animation="ChestHover" enabled="false"/>
+            </State>
+        </StateGroup>
+
+        <Animation name="ErrorClickSound" enabled="false">
+            <Event event="OnClick" action="Reset, Play"/>
+
+            <Controller type="Sound" end="Stop">
+                <Key type="Sound" time="0" sound="@UI_BNet_Loot_Box_Error"/>
+            </Controller>
+        </Animation>
+
+        <StateGroup name="LootChestErrorSoundStates">
+            <State name="EnableErrorSound">
+                <When type="Property" BuyPreview="true"/>
+                <Action type="SetAnimationProperty" animation="ErrorClickSound" enabled="true"/>
+            </State>
+            <State name="DisableErrorSound">
+                <When type="Property" BuyPreview="false"/>
+                <Action type="SetAnimationProperty" animation="ErrorClickSound" enabled="false"/>
+            </State>
+        </StateGroup>
+    </Frame>
+
+    <!--===========================================================================================
+    <! Main Frame
+    <!==========================================================================================-->
+
+    <Frame type="LootChestCarouselPanel" name="LootChestCarouselPanel">
+        <Anchor relative="$parent"/>
+        <AcceptsMouse val="True"/>
+
+        <!--=======================================================================================
+        <! Chest Move Animations:
+        <!  * MoveStart - Starts the fade (Sent from code)
+        <!  * UpdateValues - Tells code to update the count values
+        <!  * MoveEnd - Starts the fade up (Sent from code)
+        <!  * OpenStart - Starts the open sequence for a chest (Sent from code)
+        <!======================================================================================-->
+        <Animation name="SetupChestsAnim">
+            <Event event="SetupChests" action="Reset, Play"/>
+
+            <Controller type="Fade" end="Pause" frame="Content">
+                <Key type="Curve" time="0" value="255"/>
+            </Controller>
+
+            <Controller type="Fade" end="Pause" frame="Content/TopValues">
+                <Key type="Curve" time="0" value="255"/>
+            </Controller>
+
+            <Controller type="Anchor" end="Pause" side="Top" relative="True" frame="BackgroundCutscene">
+                <Key type="Curve" time="0" value="0"/>
+            </Controller>
+            <Controller type="Anchor" end="Pause" side="Top" relative="True" frame="LightRayCutscene">
+                <Key type="Curve" time="0" value="0"/>
+            </Controller>
+            <Controller type="Anchor" end="Pause" side="Top" relative="True" frame="LootChestCutscene0">
+                <Key type="Curve" time="0" value="0"/>
+            </Controller>
+            <Controller type="Anchor" end="Pause" side="Top" relative="True" frame="LootChestCutscene1">
+                <Key type="Curve" time="0" value="0"/>
+            </Controller>
+            <Controller type="Anchor" end="Pause" side="Top" relative="True" frame="LootChestCutscene2">
+                <Key type="Curve" time="0" value="0"/>
+            </Controller>
+            <Controller type="Anchor" end="Pause" side="Top" relative="True" frame="LootChestCutscene3">
+                <Key type="Curve" time="0" value="0"/>
+            </Controller>
+        </Animation>
+
+        <Animation name="ChestMoveAnims">
+            <Event event="MoveStart" action="DirectionForward, Play"/>
+            <Event event="MoveEnd" action="DirectionReverse, Play"/>
+
+            <Controller type="Fade" end="Pause" frame="Content/TopValues">
+                <Key type="Curve" time="0" value="255"/>
+                <Key type="Curve" time=".15" value="0"/>
+                <Key type="Curve" time=".37" value="0"/>
+            </Controller>
+        </Animation>
+
+        <Animation name="UpdateValuesAnim">
+            <Event event="MoveStart" action="Reset, Play"/>
+
+            <Controller type="Event" end="Stop">
+                <Key type="Event" time=".5" event="UpdateValues"/>
+            </Controller>
+        </Animation>
+
+        <Animation name="ChestOpenAnim">
+            <Event event="OpenStart" action="Reset, Play"/>
+            <Event event="SetupChests" action="Stop"/>
+            <Event event="SetupChestsShort" action="Stop"/>
+
+            <Controller type="Fade" end="Pause" frame="Content">
+                <Key type="Curve" time="0" value="255"/>
+                <Key type="Curve" time=".3" value="0"/>
+            </Controller>
+        </Animation>
+
+        <Animation name="StartCutscenes">
+            <Event event="OnShown" action="Restart,Play"/>
+            <Event event="SetupChests" action="Restart,Play"/>
+
+            <Controller type="Cutscene" end="Pause" frame="BackgroundCutscene">
+                <Key type="Cutscene" time="0" action="SetCutscene" file="Cutscenes/UI_LootBox_BG.StormCutscene"/>
+                <Key type="Cutscene" time="0" action="Bookmark" bookmark="Start"/>
+                <Key type="Cutscene" time="0" action="Play"/>
+            </Controller>
+
+            <Controller type="Cutscene" end="Pause" frame="LightRayCutscene">
+                <Key type="Cutscene" time="0" action="SetCutscene" file="Cutscenes/UI_LootChest_LightRays.StormCutscene"/>
+                <Key type="Cutscene" time="0" action="Bookmark" bookmark="Start"/>
+                <Key type="Cutscene" time="0" action="Play"/>
+            </Controller>
+        </Animation>
+
+        <Animation name="StartCutscenesShort">
+            <Event event="SetupChestsShort" action="Restart,Play"/>
+
+            <Controller type="Fade" end="Pause" frame="Content">
+                <Key type="Curve" time="0" value="255"/>
+            </Controller>
+
+            <Controller type="Fade" end="Pause" frame="Content/TopValues">
+                <Key type="Curve" time="0" value="255"/>
+            </Controller>
+
+            <Controller type="Cutscene" end="Pause" frame="BackgroundCutscene">
+                <Key type="Cutscene" time="0" action="SetCutscene" file="Cutscenes/UI_LootBox_BG.StormCutscene"/>
+                <Key type="Cutscene" time="0" action="Bookmark" bookmark="Start Short"/>
+                <Key type="Cutscene" time="0" action="Play"/>
+            </Controller>
+
+            <Controller type="Cutscene" end="Pause" frame="LightRayCutscene">
+                <Key type="Cutscene" time="0" action="SetCutscene" file="Cutscenes/UI_LootChest_LightRays.StormCutscene"/>
+                <Key type="Cutscene" time="0" action="Bookmark" bookmark="Start Short"/>
+                <Key type="Cutscene" time="0" action="Play"/>
+            </Controller>
+        </Animation>
+
+        <Animation name="OpenBuyDialogSound">
+            <Event event="OpenBuyDialog" action="Reset,Play"/>
+
+            <Controller type="Sound" end="Stop">
+                <Key type="Sound" time="0" sound="@UI_BNet_Loot_Chest_Buy_Page_Click"/>
+            </Controller>
+        </Animation>
+
+        <!-- Container frame, to easily hide everything on open -->
+        <Frame type="Frame" name="Content">
+            <Anchor relative="$parent"/>
+            <RenderPriority val="513"/>
+
+            <!-- Container frame, to easily hide everything on rotate -->
+            <Frame type="Frame" name="TopValues">
+                <Anchor relative="$parent"/>
+
+                <!--=======================================================================================
+                <! Chest Count Frames
+                <!======================================================================================-->
+
+                <!-- Chest InfoFrame for Left Chest -->
+                <Frame type="Frame" name="LeftChestInfoFrame">
+                    <Anchor side="Top" relative="$parent/ActiveChestInfoFrame" pos="Mid" offset="-3"/>
+                    <Anchor side="Left" relative="$parent" pos="Mid" offset="-630"/>
+                    <Anchor side="Right" relative="$parent" pos="Mid" offset="-630"/>
+                    <Anchor side="Bottom" relative="$parent/ActiveChestInfoFrame" pos="Mid" offset="-3"/>
+                    <Width val="280"/>
+                    <Height val="130"/>
+
+                    <Frame type="Label" name="LeftChestNameLabel">
+                        <Anchor side="Top" relative="$parent" pos="Min" offset="10"/>
+                        <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+                        <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+                        <Unclipped val="true"/>
+                        <Style val="LootCarouselChestNameSide_Common"/>
+                        <Text val="{$ancestor[@type=LootChestCarouselPanel]/@LeftChest[Name]}"/>
+                    </Frame>
+
+                    <Frame type="Frame" name="TitleBannerFrame">
+                        <Anchor side="Top" relative="$parent/LeftChestNameLabel" pos="Max" offset="-25"/>
+                        <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                        <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+                        <Anchor side="Bottom" relative="BannerGlowImage" pos="Max" offset="0"/>
+
+                        <Frame type="Image" name="BaseBannerImage">
+                            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                            <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+                            <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+                            <Width val="225"/>
+                            <Height val="50"/>
+                            <ColorAdjustMode val="Colorize"/>
+                            <LightAdjustColor val="{$parent/AdjustmentColorFrame/@LightAdjustColor}"/>
+                            <DarkAdjustColor val="{$parent/AdjustmentColorFrame/@DarkAdjustColor}"/>
+                            <Texture val="@UI/Storm_UI_Loot_TitleBanner"/>
+                        </Frame>
+
+                        <Frame type="Image" name="BannerGlowImage">
+                            <Anchor side="Top" relative="$parent/BaseBannerImage" pos="Min" offset="0"/>
+                            <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+                            <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+                            <Width val="225"/>
+                            <Height val="50"/>
+                            <Alpha val="128"/>
+                            <ColorAdjustMode val="Colorize"/>
+                            <LightAdjustColor val="{$parent/AdjustmentColorFrame/@LightAdjustColor}"/>
+                            <DarkAdjustColor val="{$parent/AdjustmentColorFrame/@DarkAdjustColor}"/>
+                            <Texture val="@UI/Storm_UI_Loot_TitleBannerGlow"/>
+                        </Frame>
+
+                        <Frame type="Image" name="AdjustmentColorFrame">
+                            <Anchor relative="$parent"/>
+                            <Visible val="false"/>
+                            <LightAdjustColor val="#CommonLightAdjustColor"/>
+                            <DarkAdjustColor val="#CommonDarkAdjustColor"/>
+                        </Frame>
+                    </Frame>
+
+                    <Frame type="Label" name="LeftChestCountLabel">
+                        <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+                        <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+                        <Anchor side="Bottom" relative="$parent/TitleBannerFrame" pos="Max" offset="36"/>
+                        <AcceptsMouseTooltip val="True"/>
+                        <Tooltip val="{CountTooltipTextFormatFrame/@Text}"/>
+                        <Style val="LootCarouselChestCountSide_Common"/>
+                        <Text val="{$ancestor[@type=LootChestCarouselPanel]/@ChestCount[0]}"/>
+
+                        <Frame type="TextFormatFrame" name="CountTooltipTextFormatFrame">
+                            <Anchor relative="$parent"/>
+                            <FormatText val="@UI/LootChest/Carousel/CountTooltip"/>
+                            <Replacement val="{$ancestor[@type=LootChestCarouselPanel]/@ChestCount[0]}"/>
+                        </Frame>
+                    </Frame>
+
+                    <Frame type="Label" name="RarityLabel">
+                        <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                        <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                        <Visible val="false"/>
+                        <Text val="{$ancestor[@type=LootChestCarouselPanel]/@LeftChest[Rarity]}"/>
+                    </Frame>
+
+                    <StateGroup name="RarityStates">
+                        <State name="Common">
+                            <When type="Property" frame="RarityLabel" Text="Common"/>
+                            <Action type="SetProperty" frame="TitleBannerFrame/AdjustmentColorFrame" LightAdjustColor="#CommonLightAdjustColor"/>
+                            <Action type="SetProperty" frame="TitleBannerFrame/AdjustmentColorFrame" DarkAdjustColor="#CommonDarkAdjustColor"/>
+                            <Action type="SetProperty" frame="LeftChestNameLabel" Style="LootCarouselChestNameSide_Common"/>
+                            <Action type="SetProperty" frame="LeftChestCountLabel" Style="LootCarouselChestCountSide_Common"/>
+                        </State>
+                        <State name="Rare">
+                            <When type="Property" frame="RarityLabel" Text="Rare"/>
+                            <Action type="SetProperty" frame="TitleBannerFrame/AdjustmentColorFrame" LightAdjustColor="#RareLightAdjustColor"/>
+                            <Action type="SetProperty" frame="TitleBannerFrame/AdjustmentColorFrame" DarkAdjustColor="#RareDarkAdjustColor"/>
+                            <Action type="SetProperty" frame="LeftChestNameLabel" Style="LootCarouselChestNameSide_Rare"/>
+                            <Action type="SetProperty" frame="LeftChestCountLabel" Style="LootCarouselChestCountSide_Rare"/>
+                        </State>
+                        <State name="Epic">
+                            <When type="Property" frame="RarityLabel" Text="Epic"/>
+                            <Action type="SetProperty" frame="TitleBannerFrame/AdjustmentColorFrame" LightAdjustColor="#EpicLightAdjustColor"/>
+                            <Action type="SetProperty" frame="TitleBannerFrame/AdjustmentColorFrame" DarkAdjustColor="#EpicDarkAdjustColor"/>
+                            <Action type="SetProperty" frame="LeftChestNameLabel" Style="LootCarouselChestNameSide_Epic"/>
+                            <Action type="SetProperty" frame="LeftChestCountLabel" Style="LootCarouselChestCountSide_Epic"/>
+                        </State>
+                        <State name="Legendary">
+                            <When type="Property" frame="RarityLabel" Text="Legendary"/>
+                            <Action type="SetProperty" frame="TitleBannerFrame/AdjustmentColorFrame" LightAdjustColor="#LegendaryLightAdjustColor"/>
+                            <Action type="SetProperty" frame="TitleBannerFrame/AdjustmentColorFrame" DarkAdjustColor="#LegendaryDarkAdjustColor"/>
+                            <Action type="SetProperty" frame="LeftChestNameLabel" Style="LootCarouselChestNameSide_Legendary"/>
+                            <Action type="SetProperty" frame="LeftChestCountLabel" Style="LootCarouselChestCountSide_Legendary"/>
+                        </State>
+                    </StateGroup>
+
+                    <StateGroup name="VisibilityStates">
+                        <State name="HideInfoFrame">
+                            <When type="Property" frame="LeftChestCountLabel" Text="0"/>
+                            <Action type="SetProperty" Visible="false"/>
+                        </State>
+                    </StateGroup>
+                </Frame>
+
+                <!-- Chest Info Frame for Middle (Active) Chest -->
+                <Frame type="Frame" name="ActiveChestInfoFrame">
+                    <Anchor side="Top" relative="$parent" pos="Min" offset="120"/>
+                    <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+                    <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+                    <Anchor side="Bottom" relative="ActiveChestCountLabel" pos="Max" offset="0"/>
+                    <Width val="475"/>
+
+                    <Frame type="Label" name="ActiveChestNameLabel">
+                        <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                        <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+                        <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+                        <Unclipped val="true"/>
+                        <Style val="LootCarouselChestName_Common"/>
+                        <Text val="{$ancestor[@type=LootChestCarouselPanel]/@ActiveChest[Name]}"/>
+                    </Frame>
+
+                    <Frame type="Frame" name="TitleBannerFrame">
+                        <Anchor side="Top" relative="$parent/ActiveChestNameLabel" pos="Max" offset="-50"/>
+                        <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                        <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+                        <Anchor side="Bottom" relative="BannerArrowImage2" pos="Max" offset="0"/>
+
+                        <Frame type="Image" name="BaseBannerImage">
+                            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                            <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+                            <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+                            <Alpha val="128"/>
+                            <ColorAdjustMode val="Colorize"/>
+                            <LightAdjustColor val="{$parent/AdjustmentColorFrame/@LightAdjustColor}"/>
+                            <DarkAdjustColor val="{$parent/AdjustmentColorFrame/@DarkAdjustColor}"/>
+                            <Texture val="@UI/Storm_UI_Loot_TitleBanner"/>
+                        </Frame>
+
+                        <Frame type="Image" name="BannerGlowImage">
+                            <Anchor side="Top" relative="$parent/BaseBannerImage" pos="Min" offset="0"/>
+                            <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+                            <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+                            <BlendMode val="Add"/>
+                            <ColorAdjustMode val="Colorize"/>
+                            <LightAdjustColor val="{$parent/AdjustmentColorFrame/@LightAdjustColor}"/>
+                            <DarkAdjustColor val="{$parent/AdjustmentColorFrame/@DarkAdjustColor}"/>
+                            <Texture val="@UI/Storm_UI_Loot_TitleBannerGlow"/>
+
+                            <Animation name="BannerGlowAnim">
+                                <Event event="OnShown" action="Reset, Play"/>
+
+                                <Controller type="Fade" end="Loop">
+                                    <Key type="Curve" time="0" value="85"/>
+                                    <Key type="Curve" time=".5" value="255"/>
+                                    <Key type="Curve" time="1" value="85"/>
+                                    <Key type="Curve" time="1.6" value="85"/>
+                                </Controller>
+                            </Animation>
+                        </Frame>
+
+                        <Frame type="Image" name="BannerArrowImage1">
+                            <Anchor side="Top" relative="$parent/BannerGlowImage" pos="Max" offset="-42"/>
+                            <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+                            <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+                            <BlendMode val="Add"/>
+                            <ColorAdjustMode val="Colorize"/>
+                            <LightAdjustColor val="{$parent/AdjustmentColorFrame/@LightAdjustColor}"/>
+                            <DarkAdjustColor val="{$parent/AdjustmentColorFrame/@DarkAdjustColor}"/>
+                            <Texture val="@UI/Storm_UI_Loot_TitleBannerArrow1"/>
+
+                            <Animation name="BannerArrow1Anim">
+                                <Event event="OnShown" action="Reset, Play"/>
+
+                                <Controller type="Fade" end="Loop">
+                                    <Key type="Curve" time="0" value="85"/>
+                                    <Key type="Curve" time=".25" value="85"/>
+                                    <Key type="Curve" time=".75" value="255"/>
+                                    <Key type="Curve" time="1.25" value="85"/>
+                                    <Key type="Curve" time="1.6" value="85"/>
+                                </Controller>
+                            </Animation>
+                        </Frame>
+
+                        <Frame type="Image" name="BannerArrowImage2">
+                            <Anchor side="Top" relative="$parent/BannerArrowImage1" pos="Max" offset="-61"/>
+                            <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+                            <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+                            <BlendMode val="Add"/>
+                            <ColorAdjustMode val="Colorize"/>
+                            <LightAdjustColor val="{$parent/AdjustmentColorFrame/@LightAdjustColor}"/>
+                            <DarkAdjustColor val="{$parent/AdjustmentColorFrame/@DarkAdjustColor}"/>
+                            <Texture val="@UI/Storm_UI_Loot_TitleBannerArrow2"/>
+
+                            <Animation name="BannerArrow2Anim">
+                                <Event event="OnShown" action="Reset, Play"/>
+
+                                <Controller type="Fade" end="Loop">
+                                    <Key type="Curve" time="0" value="64"/>
+                                    <Key type="Curve" time=".5" value="64"/>
+                                    <Key type="Curve" time="1" value="255"/>
+                                    <Key type="Curve" time="1.5" value="64"/>
+                                    <Key type="Curve" time="1.6" value="64"/>
+                                </Controller>
+                            </Animation>
+                        </Frame>
+
+                        <Frame type="Image" name="AdjustmentColorFrame">
+                            <Anchor relative="$parent"/>
+                            <Visible val="false"/>
+                            <LightAdjustColor val="#CommonLightAdjustColor"/>
+                            <DarkAdjustColor val="#CommonDarkAdjustColor"/>
+                        </Frame>
+                    </Frame>
+
+                    <Frame type="Label" name="ActiveChestCountLabel">
+                        <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+                        <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+                        <Anchor side="Bottom" relative="$parent/TitleBannerFrame" pos="Max" offset="20"/>
+                        <AcceptsMouseTooltip val="True"/>
+                        <Tooltip val="{CountTooltipTextFormatFrame/@Text}"/>
+                        <Style val="LootCarouselChestCount_Common"/>
+                        <Text val="{$ancestor[@type=LootChestCarouselPanel]/@ChestCount[1]}"/>
+
+                        <Frame type="TextFormatFrame" name="CountTooltipTextFormatFrame">
+                            <Anchor relative="$parent"/>
+                            <FormatText val="@UI/LootChest/Carousel/CountTooltip"/>
+                            <Replacement val="{$ancestor[@type=LootChestCarouselPanel]/@ChestCount[1]}"/>
+                        </Frame>
+                    </Frame>
+
+                    <Frame type="Label" name="RarityLabel">
+                        <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                        <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                        <Visible val="false"/>
+                        <Text val="{$ancestor[@type=LootChestCarouselPanel]/@ActiveChest[Rarity]}"/>
+                    </Frame>
+
+                    <StateGroup name="RarityStates">
+                        <State name="Common">
+                            <When type="Property" frame="RarityLabel" Text="Common"/>
+                            <Action type="SetProperty" frame="TitleBannerFrame/AdjustmentColorFrame" LightAdjustColor="#CommonLightAdjustColor"/>
+                            <Action type="SetProperty" frame="TitleBannerFrame/AdjustmentColorFrame" DarkAdjustColor="#CommonDarkAdjustColor"/>
+                            <Action type="SetProperty" frame="ActiveChestNameLabel" Style="LootCarouselChestName_Common"/>
+                            <Action type="SetProperty" frame="ActiveChestCountLabel" Style="LootCarouselChestCount_Common"/>
+                        </State>
+                        <State name="Rare">
+                            <When type="Property" frame="RarityLabel" Text="Rare"/>
+                            <Action type="SetProperty" frame="TitleBannerFrame/AdjustmentColorFrame" LightAdjustColor="#RareLightAdjustColor"/>
+                            <Action type="SetProperty" frame="TitleBannerFrame/AdjustmentColorFrame" DarkAdjustColor="#RareDarkAdjustColor"/>
+                            <Action type="SetProperty" frame="ActiveChestNameLabel" Style="LootCarouselChestName_Rare"/>
+                            <Action type="SetProperty" frame="ActiveChestCountLabel" Style="LootCarouselChestCount_Rare"/>
+                        </State>
+                        <State name="Epic">
+                            <When type="Property" frame="RarityLabel" Text="Epic"/>
+                            <Action type="SetProperty" frame="TitleBannerFrame/AdjustmentColorFrame" LightAdjustColor="#EpicLightAdjustColor"/>
+                            <Action type="SetProperty" frame="TitleBannerFrame/AdjustmentColorFrame" DarkAdjustColor="#EpicDarkAdjustColor"/>
+                            <Action type="SetProperty" frame="ActiveChestNameLabel" Style="LootCarouselChestName_Epic"/>
+                            <Action type="SetProperty" frame="ActiveChestCountLabel" Style="LootCarouselChestCount_Epic"/>
+                        </State>
+                        <State name="Legendary">
+                            <When type="Property" frame="RarityLabel" Text="Legendary"/>
+                            <Action type="SetProperty" frame="TitleBannerFrame/AdjustmentColorFrame" LightAdjustColor="#LegendaryLightAdjustColor"/>
+                            <Action type="SetProperty" frame="TitleBannerFrame/AdjustmentColorFrame" DarkAdjustColor="#LegendaryDarkAdjustColor"/>
+                            <Action type="SetProperty" frame="ActiveChestNameLabel" Style="LootCarouselChestName_Legendary"/>
+                            <Action type="SetProperty" frame="ActiveChestCountLabel" Style="LootCarouselChestCount_Legendary"/>
+                        </State>
+                    </StateGroup>
+
+                    <StateGroup name="AnimationStates">
+                        <State name="DisableAnimations">
+                            <When type="Property" frame="ActiveChestCountLabel" Text="0"/>
+                            <Action type="SetProperty" frame="TitleBannerFrame/BannerGlowImage" Visible="false"/>
+                            <Action type="SetProperty" frame="TitleBannerFrame/BannerArrowImage1" Visible="false"/>
+                            <Action type="SetProperty" frame="TitleBannerFrame/BannerArrowImage2" Visible="false"/>
+                        </State>
+                    </StateGroup>
+                </Frame>
+
+                <!-- Chest Info Frame for Right Chest -->
+                <Frame type="Frame" name="RightChestInfoFrame">
+                    <Anchor side="Top" relative="$parent/ActiveChestInfoFrame" pos="Mid" offset="-3"/>
+                    <Anchor side="Left" relative="$parent" pos="Mid" offset="630"/>
+                    <Anchor side="Right" relative="$parent" pos="Mid" offset="630"/>
+                    <Anchor side="Bottom" relative="$parent/ActiveChestInfoFrame" pos="Mid" offset="-3"/>
+                    <Width val="280"/>
+                    <Height val="130"/>
+
+                    <Frame type="Label" name="RightChestNameLabel">
+                        <Anchor side="Top" relative="$parent" pos="Min" offset="10"/>
+                        <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+                        <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+                        <Unclipped val="true"/>
+                        <Style val="LootCarouselChestNameSide_Common"/>
+                        <Text val="{$ancestor[@type=LootChestCarouselPanel]/@RightChest[Name]}"/>
+                    </Frame>
+
+                    <Frame type="Frame" name="TitleBannerFrame">
+                        <Anchor side="Top" relative="$parent/RightChestNameLabel" pos="Max" offset="-25"/>
+                        <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                        <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+                        <Anchor side="Bottom" relative="BannerGlowImage" pos="Max" offset="0"/>
+
+                        <Frame type="Image" name="BaseBannerImage">
+                            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                            <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+                            <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+                            <Width val="225"/>
+                            <Height val="50"/>
+                            <ColorAdjustMode val="Colorize"/>
+                            <LightAdjustColor val="{$parent/AdjustmentColorFrame/@LightAdjustColor}"/>
+                            <DarkAdjustColor val="{$parent/AdjustmentColorFrame/@DarkAdjustColor}"/>
+                            <Texture val="@UI/Storm_UI_Loot_TitleBanner"/>
+                        </Frame>
+
+                        <Frame type="Image" name="BannerGlowImage">
+                            <Anchor side="Top" relative="$parent/BaseBannerImage" pos="Min" offset="0"/>
+                            <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+                            <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+                            <Width val="225"/>
+                            <Height val="50"/>
+                            <Alpha val="128"/>
+                            <ColorAdjustMode val="Colorize"/>
+                            <LightAdjustColor val="{$parent/AdjustmentColorFrame/@LightAdjustColor}"/>
+                            <DarkAdjustColor val="{$parent/AdjustmentColorFrame/@DarkAdjustColor}"/>
+                            <Texture val="@UI/Storm_UI_Loot_TitleBannerGlow"/>
+                        </Frame>
+
+                        <Frame type="Image" name="AdjustmentColorFrame">
+                            <Anchor relative="$parent"/>
+                            <Visible val="false"/>
+                            <LightAdjustColor val="#CommonLightAdjustColor"/>
+                            <DarkAdjustColor val="#CommonDarkAdjustColor"/>
+                        </Frame>
+                    </Frame>
+
+                    <Frame type="Label" name="RightChestCountLabel">
+                        <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+                        <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+                        <Anchor side="Bottom" relative="$parent/TitleBannerFrame" pos="Max" offset="36"/>
+                        <AcceptsMouseTooltip val="True"/>
+                        <Tooltip val="{CountTooltipTextFormatFrame/@Text}"/>
+                        <Style val="LootCarouselChestCountSide_Common"/>
+                        <Text val="{$ancestor[@type=LootChestCarouselPanel]/@ChestCount[2]}"/>
+
+                        <Frame type="TextFormatFrame" name="CountTooltipTextFormatFrame">
+                            <Anchor relative="$parent"/>
+                            <FormatText val="@UI/LootChest/Carousel/CountTooltip"/>
+                            <Replacement val="{$ancestor[@type=LootChestCarouselPanel]/@ChestCount[2]}"/>
+                        </Frame>
+                    </Frame>
+
+                    <Frame type="Label" name="RarityLabel">
+                        <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                        <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                        <Visible val="false"/>
+                        <Text val="{$ancestor[@type=LootChestCarouselPanel]/@RightChest[Rarity]}"/>
+                    </Frame>
+
+                    <StateGroup name="RarityStates">
+                        <State name="Common">
+                            <When type="Property" frame="RarityLabel" Text="Common"/>
+                            <Action type="SetProperty" frame="TitleBannerFrame/AdjustmentColorFrame" LightAdjustColor="#CommonLightAdjustColor"/>
+                            <Action type="SetProperty" frame="TitleBannerFrame/AdjustmentColorFrame" DarkAdjustColor="#CommonDarkAdjustColor"/>
+                            <Action type="SetProperty" frame="RightChestNameLabel" Style="LootCarouselChestNameSide_Common"/>
+                            <Action type="SetProperty" frame="RightChestCountLabel" Style="LootCarouselChestCountSide_Common"/>
+                        </State>
+                        <State name="Rare">
+                            <When type="Property" frame="RarityLabel" Text="Rare"/>
+                            <Action type="SetProperty" frame="TitleBannerFrame/AdjustmentColorFrame" LightAdjustColor="#RareLightAdjustColor"/>
+                            <Action type="SetProperty" frame="TitleBannerFrame/AdjustmentColorFrame" DarkAdjustColor="#RareDarkAdjustColor"/>
+                            <Action type="SetProperty" frame="RightChestNameLabel" Style="LootCarouselChestNameSide_Rare"/>
+                            <Action type="SetProperty" frame="RightChestCountLabel" Style="LootCarouselChestCountSide_Rare"/>
+                        </State>
+                        <State name="Epic">
+                            <When type="Property" frame="RarityLabel" Text="Epic"/>
+                            <Action type="SetProperty" frame="TitleBannerFrame/AdjustmentColorFrame" LightAdjustColor="#EpicLightAdjustColor"/>
+                            <Action type="SetProperty" frame="TitleBannerFrame/AdjustmentColorFrame" DarkAdjustColor="#EpicDarkAdjustColor"/>
+                            <Action type="SetProperty" frame="RightChestNameLabel" Style="LootCarouselChestNameSide_Epic"/>
+                            <Action type="SetProperty" frame="RightChestCountLabel" Style="LootCarouselChestCountSide_Epic"/>
+                        </State>
+                        <State name="Legendary">
+                            <When type="Property" frame="RarityLabel" Text="Legendary"/>
+                            <Action type="SetProperty" frame="TitleBannerFrame/AdjustmentColorFrame" LightAdjustColor="#LegendaryLightAdjustColor"/>
+                            <Action type="SetProperty" frame="TitleBannerFrame/AdjustmentColorFrame" DarkAdjustColor="#LegendaryDarkAdjustColor"/>
+                            <Action type="SetProperty" frame="RightChestNameLabel" Style="LootCarouselChestNameSide_Legendary"/>
+                            <Action type="SetProperty" frame="RightChestCountLabel" Style="LootCarouselChestCountSide_Legendary"/>
+                        </State>
+                    </StateGroup>
+
+                    <StateGroup name="VisibilityStates">
+                        <State name="HideInfoFrame">
+                            <When type="Property" frame="RightChestCountLabel" Text="0"/>
+                            <Action type="SetProperty" Visible="false"/>
+                        </State>
+                    </StateGroup>
+                </Frame>
+            </Frame>
+
+            <!--=======================================================================================
+            <! Action Buttons
+            <!======================================================================================-->
+            <Frame type="Button" name="BuyButton" template="StandardTemplates/StandardButtonTemplate">
+                <Anchor side="Bottom" relative="$parent" pos="Max" offset="-120"/>
+                <Anchor side="Left" relative="$parent" pos="Mid" offset="135"/>
+                <Anchor side="Right" relative="$parent" pos="Mid" offset="135"/>
+                <DisabledAlpha val="0"/>
+                <Width val="300"/>
+                <Height val="100"/>
+
+                <Text val="@UI/LootChest/Action/Buy"/>
+
+                <Animation name="CarouselMove">
+                    <Event event="MoveStart" action="DirectionForward, Play" frame="$parent/$parent"/>
+                    <Event event="MoveEnd" action="DirectionReverse, Play" frame="$parent/$parent"/>
+
+                    <Controller type="Fade" end="Pause">
+                        <Key type="Curve" time="0" value="255"/>
+                        <Key type="Curve" time=".15" value="0"/>
+                        <Key type="Curve" time=".37" value="0"/>
+                    </Controller>
+                </Animation>
+            </Frame>
+
+            <Frame type="Button" name="OpenButton" template="StandardTemplates/StandardButtonTemplate">
+                <Anchor side="Bottom" relative="$parent" pos="Max" offset="-120"/>
+                <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+                <Width val="300"/>
+                <Height val="100"/>
+
+                <Text val="@UI/LootChest/Action/Open"/>
+
+                <Frame type="TextFormatFrame" name="LoadTimeoutTextFrame">
+                    <Anchor relative="$parent"/>
+                    <FormatText val="@UI/LootChest/Warning/SystemUnderLoadTooltip"/>
+                    <Replacement index="0" val="{$ancestor[@type=LootChestCarouselPanel]/@RemainingLoadoutTimeoutSeconds}"/>
+                </Frame>
+
+                <Frame type="Frame" name="HitTestFrame">
+                    <TooltipAnchorPosition val="TopCenter"/>
+                </Frame>
+
+                <Animation name="CarouselMove">
+                    <Event event="MoveStart" action="DirectionForward, Play" frame="$parent/$parent"/>
+                    <Event event="MoveEnd" action="DirectionReverse, Play" frame="$parent/$parent"/>
+
+                    <Controller type="Fade" end="Pause">
+                        <Key type="Curve" time="0" value="255"/>
+                        <Key type="Curve" time=".15" value="0"/>
+                        <Key type="Curve" time=".37" value="0"/>
+                    </Controller>
+                </Animation>
+
+                <StateGroup name="BuyButtonVisibilityAdjustments">
+                    <State name="BuyButtonActive">
+                        <When type="Property" frame="$parent/BuyButton" Enabled="true"/>
+                        <Action type="SetAnchor" side="Left" relative="$parent" pos="Mid" offset="-285"/>
+                        <Action type="SetAnchor" side="Right" relative="$parent" pos="Mid" offset="15"/>
+                    </State>
+                </StateGroup>
+
+                <StateGroup name="OpenButtonActiveStates">
+                    <State name="NoChests">
+                        <When type="Property" frame="$parent/TopValues/ActiveChestInfoFrame/ActiveChestCountLabel" Text="0"/>
+                        <Action type="SetProperty" Enabled="false"/>
+                    </State>
+                    <State name="PatchAvailable">
+                        <When type="Property" frame="$GlueUI" PatchAvailable="true"/>
+                        <Action type="SetProperty" Enabled="false"/>
+                        <Action type="SetProperty" Tooltip="@UI/RestrictedStatePendingHotPatch"/>
+                    </State>
+                    <State name="TimeoutActive">
+                        <When type="Property" frame="$ancestor[@type=LootChestCarouselPanel]" LoadTimeoutActive="true"/>
+                        <Action type="SetProperty" Enabled="false"/>
+                        <Action type="SetProperty" Tooltip="{$this/LoadTimeoutTextFrame/@Text}"/>
+                    </State>
+                </StateGroup>
+            </Frame>
+
+            <StateGroup name="ActionButtonVisibilityStates">
+                <State name="RewardsPanelVisible">
+                    <When type="Property" frame="$parent/$parent/LootChestRewardsPanel" Visible="true"/>
+                    <Action type="SetProperty" frame="BuyButton" Visible="false"/>
+                    <Action type="SetProperty" frame="OpenButton" Visible="false"/>
+                </State>
+            </StateGroup>
+
+            <!-- In Queue/Lobby warning message -->
+            <Frame type="Image" name="InQueueWarning">
+                <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Bottom" relative="$parent/OpenButton" pos="Min" offset="-15"/>
+                <Visible val="False"/>
+                <Width val="484"/>
+                <Height val="96"/>
+                <Texture val="@UI/Storm_UI_Loot_CarouselError"/>
+
+                <Frame type="Label" name="WarningLabel">
+                    <Anchor side="Top" relative="$parent" pos="Mid" offset="1"/>
+                    <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+                    <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+                    <Style val="LootCarouselErrorLabel"/>
+                    <Text val="@UI/LootChest/Warning/InQueue"/>
+                </Frame>
+
+                <Frame type="TextFormatFrame" name="LoadTimeoutTextFrame">
+                    <Anchor relative="$parent"/>
+                    <FormatText val="@UI/LootChest/Warning/SystemUnderLoadWarning"/>
+                    <Replacement index="0" val="{$ancestor[@type=LootChestCarouselPanel]/@RemainingLoadoutTimeoutSeconds}"/>
+                </Frame>
+
+                <Animation name="OnShown">
+                    <Event event="OnShown" action="Reset, Play"/>
+
+                    <Controller type="Fade" end="Pause">
+                        <Key type="Curve" time="0" value="0"/>
+                        <Key type="Curve" time="2" value="0"/>
+                        <Key type="Curve" time="2.25" value="255"/>
+                    </Controller>
+                </Animation>
+
+                <StateGroup name="WarningStates">
+                    <State name="NoWarning">
+                        <When type="Property" frame="$ancestor[@type=LootChestCarouselPanel]" SearchingForGame="false"/>
+                        <When type="Property" frame="$ancestor[@type=LootChestCarouselPanel]" InLobbyOrGame="false"/>
+                        <When type="Property" frame="$ancestor[@type=LootChestCarouselPanel]" LoadTimeoutActive="false"/>
+                        <Action type="SetProperty" frame="$this" Visible="false"/>
+                    </State>
+                    <State name="InQueue">
+                        <When type="Property" frame="$ancestor[@type=LootChestCarouselPanel]" SearchingForGame="true"/>
+                        <Action type="SetProperty" frame="$this" Visible="true"/>
+                        <Action type="SetProperty" frame="WarningLabel" Text="@UI/LootChest/Warning/InQueue"/>
+                    </State>
+                    <State name="InLobby">
+                        <When type="Property" frame="$ancestor[@type=LootChestCarouselPanel]" InLobbyOrGame="true"/>
+                        <Action type="SetProperty" frame="$this" Visible="true"/>
+                        <Action type="SetProperty" frame="WarningLabel" Text="@UI/LootChest/Warning/InLobby"/>
+                    </State>
+                    <State name="TimeoutActive">
+                        <When type="Property" frame="$ancestor[@type=LootChestCarouselPanel]" LoadTimeoutActive="true"/>
+                        <Action type="SetProperty" frame="$this" Visible="true"/>
+                        <Action type="SetProperty" Width="636"/>
+                        <Action type="SetProperty" Height="112"/>
+                        <Action type="SetProperty" ColorAdjustMode="Colorize"/>
+                        <Action type="SetProperty" LightAdjustColor="ff2e51 "/>
+                        <Action type="SetProperty" DarkAdjustColor="0e1028"/>
+                        <Action type="SetProperty" frame="$this" Texture="@UI/Storm_UI_Loot_CarouselWarning"/>
+                        <Action type="SetProperty" frame="WarningLabel" Text="{$parent/LoadTimeoutTextFrame/@Text}"/>
+                        <Action type="SetAnchor" frame="WarningLabel" side="Top" relative="$parent" pos="Mid" offset="5"/>
+                    </State>
+                </StateGroup>
+            </Frame>
+        </Frame>
+
+        <!--=======================================================================================
+        <! Chest Cutscene Frames
+        <!  * These are managed almost completely in code.
+        <!======================================================================================-->
+
+        <!-- Background Cutscene -->
+        <Frame type="CutsceneFrame" name="BackgroundCutscene">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+
+            <RenderType val="HDR"/>
+            <RenderPriority val="150"/>
+            <ToneMapping val="False"/>
+        </Frame>
+
+        <!-- Chest Cutscenes -->
+        <Frame type="LootChestCutsceneFrame" name="LootChestCutscene0" template="LootChestCarouselPanel/LootChestCutsceneTemplate"/>
+        <Frame type="LootChestCutsceneFrame" name="LootChestCutscene1" template="LootChestCarouselPanel/LootChestCutsceneTemplate"/>
+        <Frame type="LootChestCutsceneFrame" name="LootChestCutscene2" template="LootChestCarouselPanel/LootChestCutsceneTemplate"/>
+        <Frame type="LootChestCutsceneFrame" name="LootChestCutscene3" template="LootChestCarouselPanel/LootChestCutsceneTemplate"/>
+
+        <!-- Light Ray Cutscenes -->
+        <Frame type="CutsceneFrame" name="LightRayCutscene">
+            <Anchor relative="$parent"/>
+            <AutoPlay val="True"/>
+            <RenderType val="HDR"/>
+            <ToneMapping val="False"/>
+        </Frame>
+    </Frame>
+</Desc>

@@ -7,37 +7,35 @@
     <Constant name="ScreenPlay_RenderPriority_PanelLayerTop" val="525"/>
     <Constant name="ScreenPlay_RenderPriority_NavigationButton" val="530"/>
 
-    <Constant name="ScreenPlay_NavigationButton_Offset" val="0"/>
+    <Constant name="ScreenPlay_NavigationButton_Offset" val="-30"/>
 
     <Constant name="ScreenPlay_SuggestedImage_Width" val="35"/>
 
     <Frame type="GlueButton" name="NavigationButtonTemplate" template="StandardTemplates/Top_Navigation">
-        <Anchor side="Right" relative="SuggestedImageContainer" pos="Max" offset="10"/>
-        <PreserveAnchorOffset val="true"/>
+        <PreserveAnchorOffset val="false"/>
         <RenderPriority val="#ScreenPlay_RenderPriority_NavigationButton"/>
         <ReportsStats val="true"/>
         <TooltipAnchorPosition val="LeftToLeft | TopToBottom"/>
-        <TooltipDelayed val="true"/>
 
-        <Frame type="Frame" name="Spacer">
+        <!--Frame type="Frame" name="Spacer">
             <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
             <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
             <Anchor side="Left" relative="$parent/Label" pos="Max" offset="0"/>
             <Width val="10"/>
-        </Frame>
+        </Frame-->
 
         <Frame type="Frame" name="SuggestedImageContainer">
-            <Anchor side="Top" relative="$parent/Label" pos="Min" offset="3"/>
-            <Anchor side="Left" relative="$parent/Spacer" pos="Max" offset="0"/>
+            <Anchor side="Top" relative="$parent" pos="Min" offset="-1"/>
+            <Anchor side="Left" relative="$parent/Label" pos="Max" offset="5"/>
             <Width val="25"/>
-            <CollapseLayout val="true"/>
+            <CollapseLayout val="false"/>
             <Visible val="false"/>
 
             <Frame type="Image" name="SuggestedImage">
                 <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
                 <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
                 <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
-                <Unclipped val="true"/>
+                <Unclipped val="True"/>
                 <ColorAdjustMode val="AddSelf"/>
                 <AdjustmentColor val="0,255,255,255"/>
                 <Texture val="@UI/Storm_UI_MainNavigation_Recommended"/>
@@ -48,17 +46,31 @@
                 <Event event="StopPulse" action="Stop"/>
 
                 <Controller type="AdjustmentColor" end="Loop" frame="SuggestedImage">
-                    <Key type="Curve" time="0" value="0,255,255,255" out="Fast"/>
+                    <Key type="Curve" time="0" value="0,255,255,255" inout="Linear"/>
                     <Key type="Curve" time="1" value="150,255,255,255" inout="Slow"/>
-                    <Key type="Curve" time="2" value="0,255,255,255" in="Fast"/>
+                    <Key type="Curve" time="2" value="0,255,255,255" inout="Linear"/>
                 </Controller>
+            </Animation>
 
-                <Controller type="Style" end="Loop" style1="TopNavigation" style2="TopNavigationPulse" frame="$ancestor[@type=GlueButton]/Label">
+            <!--Animation name="SuggestedTextPulse">
+                <Event event="StartTextPulse" action="DirectionForward,Play"/>
+                <Event event="StopPulse" action="Stop"/>
+                <Controller type="Style" end="Loop" style1="TaskBarSubNavigation" style2="TopNavigationPulse" frame="$ancestor[@type=GlueButton]/Label">
                     <Key type="Curve" time="0" value="0" out="Fast"/>
                     <Key type="Curve" time="1" value="1" inout="Slow"/>
                     <Key type="Curve" time="2" value="0" in="Fast"/>
                 </Controller>
             </Animation>
+
+            <Animation name="SuggestedTextPulseSmall">
+                <Event event="StartTextPulseSmall" action="DirectionForward,Play"/>
+                <Event event="StopPulse" action="Stop"/>
+                <Controller type="Style" end="Loop" style1="TaskBarSubNavigationSmall" style2="TopNavigationPulse_Small" frame="$ancestor[@type=GlueButton]/Label">
+                    <Key type="Curve" time="0" value="0" inout="Linear"/>
+                    <Key type="Curve" time="1" value="1" inout="Slow"/>
+                    <Key type="Curve" time="2" value="0" inout="Linear"/>
+                </Controller>
+            </Animation-->
 
             <StateGroup name="SuggestedTexture">
                 <DefaultState val="Normal"/>
@@ -76,17 +88,16 @@
             </StateGroup>
 
             <Animation name="Transition">
-                <Event event="Show" action="Reset" frame="$parent/$parent"/>
-                <Event event="Show" action="Play" frame="$parent/$parent"/>
+                <Event event="Show" action="Reset,Play" frame="$parent/$parent"/>
                 <Controller type="Fade" end="Pause" frame="SuggestedImage">
-                    <Key type="Curve" time="0.0" value="0" out="Slow"/>
-                    <Key type="Curve" time="0" value="0" out="Slow"/>
-                    <Key type="Curve" time="0.4" value="255" in="Slow" out="Step"/>
+                    <Key type="Curve" time="0.0" value="0" inout="Linear,Slow"/>
+                    <Key type="Curve" time="0" value="0" inout="Linear,Slow"/>
+                    <Key type="Curve" time="0.4" value="255" inout="Slow,Step"/>
                 </Controller>
                 <Controller type="Anchor" end="Pause" side="Top" relative="true">
-                    <Key type="Curve" time="0.0" value="-10" out="Slow"/>
-                    <Key type="Curve" time="0.1" value="-10" out="Fast"/>
-                    <Key type="Curve" time="0.5" value="0" in="Slow" />
+                    <Key type="Curve" time="0.0" value="-10" inout="Linear,Slow"/>
+                    <Key type="Curve" time="0.1" value="-10" inout="Linear"/>
+                    <Key type="Curve" time="0.5" value="0"  inout="Slow,Linear"/>
                 </Controller>
             </Animation>
 
@@ -101,39 +112,47 @@
 
             <StateGroup name="SuggestedPlayModePulseStates">
                 <DefaultState val="SuggestedOff"/>
+
                 <State name="Toggled">
                     <When type="Property" Toggled="true" frame="$ancestor[@type=GlueButton]"/>
                     <When type="Property" frame="$ancestor[@type=GlueButton]/SuggestedImageContainer" visible="True"/>
                     <Action type="SendEvent" event="StopPulse"/>
                 </State>
+
                 <State name="Normal">
                     <When type="Property" frame="$ancestor[@type=GlueButton]/SuggestedImageContainer" visible="True"/>
                     <Action type="SendEvent" event="StartPulse"/>
                 </State>
+
                 <State name="SuggestedOff">
                     <When type="Property" frame="$ancestor[@type=GlueButton]/SuggestedImageContainer" visible="False"/>
                     <Action type="SendEvent" event="StopPulse"/>
                 </State>
             </StateGroup>
 
-        </Frame>       
+            <StateGroup name="SuggestedVisibilityStates">
+                <State name="IsVisible">
+                    <When type="Property" visible="True"/>
+                    <Action type="SetAnchor" frame="$parent/Anchor_4x3_Right" side="Left" relative="$parent/SuggestedImageContainer" pos="Max" offset="22"/>
+                    <Action type="SetAnchor" frame="$parent/HitTestFrame" side="Right" relative="$parent/SuggestedImageContainer" pos="Max" offset="10"/>
+                </State>
+            </StateGroup>
+
+        </Frame>
     </Frame>
 
     <Frame type="ScreenPlay" name="ScreenPlay" template="StandardTemplates/GlueScreen">
         <Animation name="Transition">
-            <Event event="Show" action="Play"/>
-            <Event event="Show" action="Reset"/>
-            <Event event="Hide" action="Play"/>
-            <Event event="Hide" action="DirectionReverse"/>
+            <Event event="Show" action="Play,Reset"/>
+            <Event event="Hide" action="Play,DirectionReverse"/>
             <Controller type="Fade" end="Pause">
-                <Key type="Curve" time="0.0" value="0" out="Slow"/>
-                <Key type="Curve" time="0.4" value="255" in="Slow" out="Slow"/>
+                <Key type="Curve" time="0.0" value="0" inout="Linear,Slow"/>
+                <Key type="Curve" time="0.4" value="255" inout="Slow"/>
             </Controller>
         </Animation>
 
         <Animation name="LeaveHeroSelect">
-            <Event event="LeaveHeroSelect" action="Play" />
-            <Event event="LeaveHeroSelect" action="Reset" />
+            <Event event="LeaveHeroSelect" action="Play,Reset"/>
 
             <Controller type="Sound" end="Pause">
                 <Key type="Sound" time="0.0" sound=""/>
@@ -155,11 +174,12 @@
         </Frame>
         
         <Frame type="Image" name="VersusAIBackground">
-            <Anchor side="Top" relative="$parent" pos="Min" offset="54"/>
-            <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
-            <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
-            <Width val="1920"/>
-            <Height val="716"/>
+            <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+            <ScaleWidthToTexture val="true"/>
+            <Height val="1200"/>
             <LayerCount val="2"/>
             <Visible val="False"/>
             <Alpha val="0"/>
@@ -168,7 +188,7 @@
             <RenderType val="HDR"/>
             <BlendMode val="Add"/>
             
-            <Texture val="@UI/HUD_Effect_Phase_Glow_Mask2" layer="0"/>
+            <Texture val="@UI/Storm_UI_Play_AI_Shimmer" layer="0"/>
             <TextureCoords top="0" left="0" bottom="1" right="1" layer="0"/>
             <AlphaLayer val="True" layer="0"/>
             <WrapUV val="True" layer="0"/>
@@ -185,17 +205,17 @@
                 <Event event="PlayScreenModeRanked" action="DirectionReverse,Play" frame="$parent"/>
                 <Event event="PlayScreenModeCustom" action="DirectionReverse,Play" frame="$parent"/>
                 <Event event="PlayScreenModeInvalid" action="DirectionReverse,Play" frame="$parent"/>
-                <Controller type="LayerUV" layer="0" side="Top" relative="True" sidelock="True" end="Loop" >
-                    <Key type="Curve" time="0" value="0" out="Slow"/>
-                    <Key type="Curve" time="3" value="1" in="fast"/>
+                <Controller type="LayerUV" layer="0" side="Top" relative="False" sidelock="True" end="Loop" >
+                    <Key type="Curve" time="0" value="-1" inout="Linear"/>
+                    <Key type="Curve" time="9" value="1" inout="Linear"/>
                 </Controller>
                 <Controller type="Fade" end="Pause">
-                    <Key type="Curve" time="0" value="0" out="Fast"/>
-                    <Key type="Curve" time=".8" value="255" in="Slow"/>
+                    <Key type="Curve" time="0" value="0" inout="Linear"/>
+                    <Key type="Curve" time=".8" value="255" inout="Slow,Linear"/>
                 </Controller>
                 <Controller type="Visibility" end="Pause">
                     <Key type="Bool" time="0" value="False"/>
-                    <Key type="Bool" time=".01" value="True"/>
+                    <Key type="Bool" time=".01" value="true"/>
                 </Controller>
             </Animation>
         </Frame>
@@ -216,8 +236,8 @@
                 <Event event="OnShown" action="Restart,Play" frame="$parent/VersusAIBackground"/>
                 <Event event="OnHidden" action="DirectionReverse,Play" frame="$parent/VersusAIBackground"/>
                 <Controller type="Color" end="Pause" name="ColorChange">
-                    <Key type="Curve" time="0" value="175,175,175" out="Fast"/>
-                    <Key type="Curve" time=".5" value="255,255,255" out="Slow"/>
+                    <Key type="Curve" time="0" value="175,175,175" inout="Linear"/>
+                    <Key type="Curve" time=".5" value="255,255,255" inout="Linear,Slow"/>
                 </Controller>
                 <Controller type="Visibility" end="Pause">
                     <Key type="Bool" time="0" value="False"/>
@@ -257,13 +277,11 @@
 
         <Frame type="Frame" name="SubNavContainer" template="StandardTemplates/SubNavContainer">
             <RenderPriority val="#ScreenPlay_RenderPriority_NavigationButton"/>
-            <Anchor side="Top" relative="$parent/$parent/ScreenNavigationHero/TopNavContainer" pos="Max" offset="-20"/>
+            <Anchor side="Top" relative="$parent/$parent/ScreenNavigationHero/TopNavContainer" pos="Max" offset="-29"/>
 
             <Animation name="Visibility">
-                <Event event="OnShown" action="DirectionForward" frame="$parent/QuickMatchButton"/>
-                <Event event="OnShown" action="Play" frame="$parent/QuickMatchButton"/>
-                <Event event="OnHidden" action="DirectionReverse" frame="$parent/QuickMatchButton"/>
-                <Event event="OnHidden" action="Play" frame="$parent/QuickMatchButton"/>
+                <Event event="OnShown" action="DirectionForward,Play" frame="$parent/QuickMatchButton"/>
+                <Event event="OnHidden" action="DirectionReverse,Play" frame="$parent/QuickMatchButton"/>
 
                 <Controller type="Visibility" end="Pause">
                     <Key type="Bool" time="0" value="false"/>
@@ -275,7 +293,7 @@
 
         <Frame type="GlueButton" name="CooperativeButton" template="ScreenPlay/NavigationButtonTemplate">
             <Anchor side="Top" relative="$parent/SubNavContainer" pos="Min" offset="0"/>
-            <Anchor side="Left" relative="$parent/SubNavContainer" pos="Min" offset="10"/>
+            <Anchor side="Left" relative="$parent/SubNavContainer" pos="Min" offset="-7"/>
             <Text val="@UI/ScreenPlay/CooperativeButton"/>
             <Handle val="ScreenPlay_CooperativeButton"/>
         </Frame>

@@ -146,22 +146,6 @@
                 <Key type="Bool" time="0" value="false"/>
             </Controller>
         </Animation>
-
-        <Animation name="MapImageAvailable">
-            <Event event="Show" action="Reset,Play" frame="MapInfoFrame/MapImage"/>
-
-            <Controller type="Visibility" end="Pause" frame="MapInfoFrame/MapImage">
-                <Key type="Bool" time="0" value="true"/>
-            </Controller>
-        </Animation>
-
-        <Animation name="MapImageNotAvailable">
-            <Event event="Hide" action="Reset,Play" frame="MapInfoFrame/MapImage"/>
-
-            <Controller type="Visibility" end="Pause" frame="MapInfoFrame/MapImage">
-                <Key type="Bool" time="0" value="false"/>
-            </Controller>
-        </Animation>
         
         <!-- This tooltip is just for blocking tooltips behind this panel -->
         <Frame type="StandardTooltip" name="MapVetoTooltip">
@@ -198,8 +182,8 @@
             <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
             <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
             <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
-            <Texture val="@UI/Glues_Battlenet_DialogBox_BG"/>
-            <TextureType val="HorizontalBorder"/>
+            <Texture val="@UI/Glues_Battlenet_DialogBox_StandardBG"/>
+            <TextureType val="NineSlice"/>
             <Tiled val="false"/>
             <Width val="950"/>
             <Height val="846"/>
@@ -352,12 +336,7 @@
                 <Anchor side="Bottom" relative="$parent/MapImage" pos="Max" offset="0"/>
                 <ScaleWidthToTexture val="true"/>
                 <TextureType val="Normal"/>
-
-                <Frame type="PropertyBind" name="BindTexture">
-                    <Anchor relative="$parent"/>
-                    <Source frame="$parent/$parent/MapImage/Image" property="Texture"/>
-                    <Target frame="$parent" property="Texture"/>
-                </Frame>
+                <Texture val="{$parent/MapImage/Image/@Texture}"/>
             </Frame>
 
             <Frame type="Image" name="MapImageVerticalFrame">
@@ -375,25 +354,33 @@
                 <Anchor side="Left" relative="$parent/ImageVertical" pos="Min" offset="0"/>
                 <Anchor side="Right" relative="$parent/MapImage" pos="Min" offset="0"/>
                 <LowerWidth val="0"/>
-
-                <StateGroup name="Crowding">
-                    <State name="Spacious">
-                        <When type="Property" frame="$this" UnderWidth="false"/>
-                        <Action type="SetProperty" frame="$parent/MapImage/Image" Visible="true"/>
-                        <Action type="SetProperty" frame="$parent/MapImageFrame" Visible="true"/>
-                        <Action type="SetProperty" frame="$parent/ImageVertical" Visible="false"/>
-                        <Action type="SetProperty" frame="$parent/MapImageVerticalFrame" Visible="false"/>
-                    </State>
-
-                    <State name="Crowded">
-                        <When type="Property" frame="$this" UnderWidth="true"/>
-                        <Action type="SetProperty" frame="$parent/MapImage/Image" Visible="false"/>
-                        <Action type="SetProperty" frame="$parent/MapImageFrame" Visible="false"/>
-                        <Action type="SetProperty" frame="$parent/ImageVertical" Visible="true"/>
-                        <Action type="SetProperty" frame="$parent/MapImageVerticalFrame" Visible="true"/>
-                    </State>
-                </StateGroup>
             </Frame>
+
+            <StateGroup name="Crowding">
+                <State name="Hide">
+                    <When type="AnimationState" frame="MapImage" IconState="Hide"/>
+                    <Action type="SetProperty" frame="MapImage/Image" Visible="false"/>
+                    <Action type="SetProperty" frame="MapImageFrame" Visible="false"/>
+                    <Action type="SetProperty" frame="ImageVertical" Visible="false"/>
+                    <Action type="SetProperty" frame="MapImageVerticalFrame" Visible="false"/>
+                </State>
+                
+                <State name="Spacious">
+                    <When type="Property" frame="RangeFrame" UnderWidth="false"/>
+                    <Action type="SetProperty" frame="MapImage/Image" Visible="true"/>
+                    <Action type="SetProperty" frame="MapImageFrame" Visible="true"/>
+                    <Action type="SetProperty" frame="ImageVertical" Visible="false"/>
+                    <Action type="SetProperty" frame="MapImageVerticalFrame" Visible="false"/>
+                </State>
+
+                <State name="Crowded">
+                    <When type="Property" frame="RangeFrame" UnderWidth="true"/>
+                    <Action type="SetProperty" frame="MapImage/Image" Visible="false"/>
+                    <Action type="SetProperty" frame="MapImageFrame" Visible="false"/>
+                    <Action type="SetProperty" frame="ImageVertical" Visible="true"/>
+                    <Action type="SetProperty" frame="MapImageVerticalFrame" Visible="true"/>
+                </State>
+            </StateGroup>
         </Frame>
 
         <Frame type="TileList" name="TileList">

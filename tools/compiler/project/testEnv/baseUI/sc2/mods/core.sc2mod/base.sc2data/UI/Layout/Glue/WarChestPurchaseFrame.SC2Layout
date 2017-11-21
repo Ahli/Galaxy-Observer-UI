@@ -1,0 +1,572 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<Desc>
+    <DescFlags val="Locked"/>
+
+    <Frame type="WarChestPurchaseTileListItem" name="TileListItemTemplate">
+        <Height val="36"/>
+        <Anchor side="Right" relative="TypeLabel" pos="Max" offset="0"/>
+        <CollapseLayout val="true"/>
+        <HideWhenCleared val="true"/>
+        <SelectedSound val="@UI_CheckboxSelect"/>
+
+        <Frame type="StoreCacheFrame" name="StoreFrame">
+            <Anchor relative="$parent"/>
+            <GameContent val="{$parent/@GameContent}"/>
+        </Frame>
+        
+        <StateGroup name="PurchasedStateGroup">
+            <State name="PurchasedState">
+                <When type="Property" frame="StoreFrame" IsPurchased="true"/>
+                <Action type="SetProperty" frame="$this" Enabled="false"/>
+            </State>
+        </StateGroup>
+
+<!-- this works but also plays when you hover over the currency, price, and type labels
+        <Animation name="Sound_CheckBox_Hover_Sound">
+            <Event event="OnMouseEnter" action="Reset,Play"/>
+            <Controller type="Sound" end="Stop">
+                <Key type="Sound" time="0" sound="@UI_HoverTick"/>
+            </Controller>
+        </Animation>
+ -->
+  
+        <Animation name="Show">
+            <Event event="OnShown" action="Reset,Play" frame="$parent/$parent" />
+
+            <Controller type="Fade" end="Pause">
+                <Key type="Curve" time="0.0" value="0" out="Fast"/>
+                <Key type="Curve" time="0.45" value="0" out="Fast"/>
+                <Key type="Curve" time="0.85" value="255" in="Slow"/>
+            </Controller>
+        </Animation>
+
+        <Frame type="CheckBox" name="CheckBox" template="StandardBattlenetTemplates/BattlenetRadioButtonTemplate">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+            <!-- on shown seemed to play but not when you hover over it
+            <Animation name="Sound_CheckBox_Hover_Sound">
+                <Event event="OnShown" action="Reset,Play"/>
+                <Event event="OnMouseEnter" action="Reset,Play"/>
+                <Event event="Hovered" action="Reset,Play"/>
+                <Controller type="Sound" end="Stop">
+                    <Key type="Sound" time="0" sound="@UI_WarChestToast_FlourishFlavor"/>
+                </Controller>
+            </Animation>
+             -->
+         </Frame>
+
+        <Frame type="Label" name="CurrencyLabel">
+            <Anchor side="Top" relative="$parent/CheckBox" pos="Mid" offset="1"/>
+            <Anchor side="Bottom" relative="$parent/CheckBox" pos="Mid" offset="1"/>
+            <Anchor side="Left" relative="$parent/CheckBox" pos="Max" offset="11"/>
+            <Style val="@Campaign_PurchaseCurrency"/>
+        </Frame>
+
+        <Frame type="Label" name="OriginalPriceLabel">
+            <Anchor side="Top" relative="$parent/CurrencyLabel" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent/CurrencyLabel" pos="Mid" offset="0"/>
+            <Anchor side="Left" relative="$parent/CurrencyLabel" pos="Max" offset="0"/>
+            <Style val="@Campaign_OriginalPurchasePrice"/>
+            <CollapseLayout val="true"/>
+        </Frame>
+
+        <Frame type="Image" name="OriginalPriceStrikethrough">
+            <Anchor side="Top" relative="$parent/OriginalPriceLabel" pos="Mid" offset="-1"/>
+            <Anchor side="Bottom" relative="$parent/OriginalPriceLabel" pos="Mid" offset="-1"/>
+            <Anchor side="Left" relative="$parent/OriginalPriceLabel" pos="Min" offset="-2"/>
+            <Anchor side="Right" relative="$parent/OriginalPriceLabel" pos="Max" offset="-4"/>
+            <Height val="2"/>
+            <Color val="538393"/>
+            <Visible val="False"/>
+
+            <Animation name="ShowStrike">
+                <Event event="OnShown" action="Reset, Play" frame="$parent/OriginalPriceLabel"/>
+                <Event event="OnHidden" action="Reset" frame="$parent/OriginalPriceLabel"/>
+
+                <Controller type="Visibility" end="Pause">
+                    <Key type="Bool" time="0" value="True"/>
+                </Controller>
+            </Animation>
+        </Frame>
+
+        <Frame type="Label" name="PriceLabel">
+            <Anchor side="Top" relative="$parent/CurrencyLabel" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent/CurrencyLabel" pos="Mid" offset="0"/>
+            <Anchor side="Left" relative="$parent/OriginalPriceLabel" pos="Max" offset="5"/>
+            <Style val="@Campaign_PurchasePrice"/>
+        </Frame>
+
+        <Frame type="Label" name="TypeLabel">
+            <Anchor side="Top" relative="$parent/PriceLabel" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent/PriceLabel" pos="Mid" offset="0"/>
+            <Anchor side="Left" relative="$parent/PriceLabel" pos="Max" offset="11"/>
+            <Style val="@Campaign_PurchaseType"/>
+        </Frame>
+    </Frame>
+
+    <Frame type="Frame" name="WarChestPurchaseFrame">
+        <Anchor relative="$parent"/>
+        <AcceptsMouse val="true"/>
+        
+        <Frame type="BlurFrame" name="FullscreenBlurFrame" template="StandardTemplates/FullscreenBlurFrame">
+            <Anchor relative="$parent"/>
+            <Alpha val="0"/>
+            
+            <Animation name="DialogAnimation">
+                <Event event="OnShown" action="Reset,Play" frame="$parent"/>
+                <Controller type="Blur" end="Pause">
+                    <Key type="Curve" time="0" value="0.0" out="Auto"/>
+                    <Key type="Curve" time="0.2" value="1.0" in="Auto"/>
+                </Controller>
+            </Animation>
+        </Frame>
+    
+        <Frame type="Image" name="Blackout">
+            <Anchor relative="$parent"/>
+            <LayerColor val="000000"/>
+            <Alpha val="180"/>
+    
+            <Animation name="DialogAnimation">
+                <Event event="OnShown" action="Reset,Play" frame="$parent"/>
+                
+                <Controller type="Anchor" end="Pause" side="Top" relative="true">
+                    <Key type="Curve" time="0" value="-20" out="Slow"/>
+                    <Key type="Curve" time=".2" value="0" in="Slow"/>
+                </Controller>
+                
+                <Controller type="Anchor" end="Pause" side="Bottom" relative="true">
+                    <Key type="Curve" time="0" value="40" out="Slow"/>
+                    <Key type="Curve" time=".2" value="0" in="Slow"/>
+                </Controller>
+            </Animation>
+        </Frame>
+        
+        <Frame type="Image" name="LeftBGGlowPattern">
+            <Anchor side="Top" relative="$parent/BackgroundFrame" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent/BackgroundFrame" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent/BackgroundFrame" pos="Min" offset="40"/>
+            <Texture val="@UI/Glues_Battlenet_DialogBox_BackGlow"/>
+        </Frame>
+
+        <Frame type="Image" name="RightBGGlowPattern">
+            <Anchor side="Top" relative="$parent/BackgroundFrame" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent/BackgroundFrame" pos="Mid" offset="0"/>
+            <Anchor side="Left" relative="$parent/BackgroundFrame" pos="Max" offset="-40"/>
+            <Texture val="@UI/Glues_Battlenet_DialogBox_BackGlow"/>
+            <TextureCoords top="0.0" left="1.0" bottom="1.0" right="0.0"/>
+        </Frame>
+        
+        <Frame type="BlurFrame" name="BackgroundFrameBlur">
+            <Anchor side="Top" relative="$parent/BackgroundFrame" pos="Min" offset="13"/>
+            <Anchor side="Left" relative="$parent/BackgroundFrame" pos="Min" offset="13"/>
+            <Anchor side="Bottom" relative="$parent/BackgroundFrame" pos="Max" offset="-13"/>
+            <Anchor side="Right" relative="$parent/BackgroundFrame" pos="Max" offset="-13"/>
+
+            <Animation name="Blur">
+                <Event event="OnShown" action="Reset,Play" frame="$parent" />
+
+                <Controller type="Blur" end="Pause">
+                    <Key type="Curve" time="0" value=".35" out="Fast"/>
+                </Controller>
+            </Animation>
+        </Frame>
+        
+        <Frame type="Frame" name="BackgroundFrame" template="StandardTemplates/GlueDialogTemplate">
+            <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+            <Height val="752"/>
+            <Width val="1262"/>
+        </Frame>
+        
+        <Frame type="Image" name="KeyArt">
+            <Anchor side="Top" relative="$parent/BackgroundFrame" pos="Min" offset="17"/>
+            <Anchor side="Right" relative="$parent/BackgroundFrame" pos="Max" offset="-14"/>
+            <Width val="1136"/>
+            <Height val="588"/>
+            <Texture val="@UI/SC2_UI_Collection_WarChest_Dialogs_Purchase_KeyArt"/>
+        </Frame>
+        
+        <Frame type="Image" name="ExclusivesBadge">
+            <Anchor side="Top" relative="$parent/KeyArt" pos="Min" offset="213"/>
+            <Anchor side="Right" relative="$parent/KeyArt" pos="Max" offset="3"/>
+            <Width val="320"/>
+            <Height val="320"/>
+            <Texture val="{$WarChestFrame/@CurrentSeasonId[PurchaseImage]}"/>
+            
+            <StateGroup name="VisibleState">
+                <DefaultState val="NotVisible"/>
+                
+                <State name="Visible">
+                    <When type="StateGroup" frame="$TerranWarChest/WarChestNode0" OwnedState="NotOwned"/>
+                    <When type="StateGroup" frame="$ZergWarChest/WarChestNode0" OwnedState="NotOwned"/>
+                    <When type="StateGroup" frame="$ProtossWarChest/WarChestNode0" OwnedState="NotOwned"/>
+                    <Action type="SetProperty" frame="$this" Visible="True"/>
+                </State>
+                
+                <State name="NotVisible">
+                    <Action type="SetProperty" frame="$this" Visible="False"/>
+                </State>
+            </StateGroup>
+        </Frame>
+        
+        <Frame type="Frame" name="RaceIconsContainer">
+            <Anchor side="Top" relative="$parent/BackgroundFrame" pos="Min" offset="-14"/>
+            <Anchor side="Right" relative="$parent/BackgroundFrame" pos="Max" offset="0"/>
+            <Width val="200"/>
+            <Height val="200"/>
+            
+            <Frame type="Frame" name="SingleIcons">
+                <Anchor relative="$parent"/>
+                <Visible val="False"/>
+                
+                <Frame type="Image" name="RingSingle">
+                    <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+                    <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+                    <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+                    <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+                    <Width val="88"/>
+                    <Height val="88"/>
+                    <Texture val="@UI/SC2_UI_Collection_WarChest_Dialogs_Purchase_RaceBadge_Ring_Single"/>
+                </Frame>
+                
+                <Frame type="Image" name="RaceIcon">
+                    <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+                    <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+                    <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+                    <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+                    <Width val="64"/>
+                    <Height val="64"/>
+                    <Texture val="@UI/SC2_UI_Collection_WarChest_Dialogs_Purchase_RaceBadge_Icon_Terran"/>
+                </Frame>
+            </Frame>
+            
+            <Frame type="Frame" name="AllIcons">
+                <Anchor relative="$parent"/>
+                <Visible val="False"/>
+                
+                <Frame type="Image" name="RingAll">
+                    <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+                    <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+                    <Anchor side="Left" relative="$parent" pos="Mid" offset="3"/>
+                    <Anchor side="Right" relative="$parent" pos="Mid" offset="3"/>
+                    <Width val="72"/>
+                    <Height val="76"/>
+                    <Texture val="@UI/SC2_UI_Collection_WarChest_Dialogs_Purchase_RaceBadge_Ring_All"/>
+                </Frame>
+                
+                <Frame type="Image" name="RaceIconTerran">
+                    <Anchor side="Top" relative="$parent" pos="Mid" offset="-4"/>
+                    <Anchor side="Bottom" relative="$parent" pos="Mid" offset="-4"/>
+                    <Anchor side="Left" relative="$parent" pos="Mid" offset="-27"/>
+                    <Anchor side="Right" relative="$parent" pos="Mid" offset="-27"/>
+                    <Width val="64"/>
+                    <Height val="64"/>
+                    <Texture val="@UI/SC2_UI_Collection_WarChest_Dialogs_Purchase_RaceBadge_Icon_Terran"/>
+                    
+                    <StateGroup name="OwnedState">
+                        <DefaultState val="NotOwned"/>
+                        
+                        <State name="Owned">
+                            <When type="StateGroup" frame="$TerranWarChest/WarChestNode0" OwnedState="Owned"/>
+                            <Action type="SetProperty" frame="$this" Alpha="128"/>
+                        </State>
+                        
+                        <State name="NotOwned">
+                            <Action type="SetProperty" frame="$this" Alpha="255"/>
+                        </State>
+                    </StateGroup>
+                </Frame>
+                
+                <Frame type="Image" name="RaceIconZerg">
+                    <Anchor side="Top" relative="$parent" pos="Mid" offset="-21"/>
+                    <Anchor side="Bottom" relative="$parent" pos="Mid" offset="-21"/>
+                    <Anchor side="Left" relative="$parent" pos="Mid" offset="18"/>
+                    <Anchor side="Right" relative="$parent" pos="Mid" offset="18"/>
+                    <Width val="64"/>
+                    <Height val="64"/>
+                    <Texture val="@UI/SC2_UI_Collection_WarChest_Dialogs_Purchase_RaceBadge_Icon_Zerg"/>
+                    
+                    <StateGroup name="OwnedState">
+                        <DefaultState val="NotOwned"/>
+                        
+                        <State name="Owned">
+                            <When type="StateGroup" frame="$ZergWarChest/WarChestNode0" OwnedState="Owned"/>
+                            <Action type="SetProperty" frame="$this" Alpha="128"/>
+                        </State>
+                        
+                        <State name="NotOwned">
+                            <Action type="SetProperty" frame="$this" Alpha="255"/>
+                        </State>
+                    </StateGroup>
+                </Frame>
+                
+                <Frame type="Image" name="RaceIconProtoss">
+                    <Anchor side="Top" relative="$parent" pos="Mid" offset="24"/>
+                    <Anchor side="Bottom" relative="$parent" pos="Mid" offset="24"/>
+                    <Anchor side="Left" relative="$parent" pos="Mid" offset="6"/>
+                    <Anchor side="Right" relative="$parent" pos="Mid" offset="6"/>
+                    <Width val="64"/>
+                    <Height val="64"/>
+                    <Texture val="@UI/SC2_UI_Collection_WarChest_Dialogs_Purchase_RaceBadge_Icon_Protoss"/>
+                    
+                    <StateGroup name="OwnedState">
+                        <DefaultState val="NotOwned"/>
+                        
+                        <State name="Owned">
+                            <When type="StateGroup" frame="$ProtossWarChest/WarChestNode0" OwnedState="Owned"/>
+                            <Action type="SetProperty" frame="$this" Alpha="128"/>
+                        </State>
+                        
+                        <State name="NotOwned">
+                            <Action type="SetProperty" frame="$this" Alpha="255"/>
+                        </State>
+                    </StateGroup>
+                </Frame>
+            </Frame>
+        
+            <StateGroup name="RaceIconState">
+            
+                <State name="Terran">
+                    <When type="Property" frame="$parent/TileList/Item0" Selected="True"/>
+                    <Action type="SetProperty" frame="$this/AllIcons" visible="False"/>
+                    <Action type="SetProperty" frame="$this/SingleIcons" visible="True"/>
+                    <Action type="SetProperty" frame="$this/SingleIcons/RaceIcon" texture="@UI/SC2_UI_Collection_WarChest_Dialogs_Purchase_RaceBadge_Icon_Terran"/>
+                </State>
+            
+                <State name="Zerg">
+                    <When type="Property" frame="$parent/TileList/Item1" Selected="True"/>
+                    <Action type="SetProperty" frame="$this/AllIcons" visible="False"/>
+                    <Action type="SetProperty" frame="$this/SingleIcons" visible="True"/>
+                    <Action type="SetProperty" frame="$this/SingleIcons/RaceIcon" texture="@UI/SC2_UI_Collection_WarChest_Dialogs_Purchase_RaceBadge_Icon_Zerg"/>
+                </State>
+            
+                <State name="Protoss">
+                    <When type="Property" frame="$parent/TileList/Item2" Selected="True"/>
+                    <Action type="SetProperty" frame="$this/AllIcons" visible="False"/>
+                    <Action type="SetProperty" frame="$this/SingleIcons" visible="True"/>
+                    <Action type="SetProperty" frame="$this/SingleIcons/RaceIcon" texture="@UI/SC2_UI_Collection_WarChest_Dialogs_Purchase_RaceBadge_Icon_Protoss"/>
+                </State>
+            
+                <State name="All">
+                    <When type="Property" frame="$parent/TileList/Item3" Selected="True"/>
+                    <Action type="SetProperty" frame="$this/AllIcons" visible="True"/>
+                    <Action type="SetProperty" frame="$this/SingleIcons" visible="False"/>
+                </State>
+            </StateGroup>
+        </Frame>
+
+        <Frame type="Label" name="TitleLabel">
+            <Anchor side="Top" relative="$parent/BackgroundFrame" pos="Min" offset="69"/>
+            <Anchor side="Left" relative="$parent/BackgroundFrame" pos="Min" offset="80"/>
+            <Width val="700"/>
+            <Text val="{$WarChestFrame/@CurrentSeasonId[PurchaseTitle]}"/>
+            <Style val="@Collection_WarChest_PurchaseDialog_Title"/>
+
+            <Animation name="Show" speed="2">
+                <Event event="OnShown" action="Reset,Play" frame="$parent" />
+
+                <Controller type="Fade" end="Pause">
+                    <Key type="Curve" time="0.0" value="0" out="Fast"/>
+                    <Key type="Curve" time="0.3" value="0" out="Fast"/>
+                    <Key type="Curve" time="0.7" value="255" in="Slow"/>
+                </Controller>
+            </Animation>
+        </Frame>
+
+        <Frame type="Label" name="TypeLabel">
+            <Anchor side="Top" relative="$parent/TitleLabel" pos="Max" offset="8"/>
+            <Anchor side="Left" relative="$parent/TitleLabel" pos="Min" offset="0"/>
+            <Width val="700"/>
+            <Style val="@Collection_WarChest_PurchaseDialog_TypeLabel"/>
+
+            <Text val="@UI/CampaignPurchase/DigitalDownload"/>
+
+            <Animation name="Show" speed="2">
+                <Event event="OnShown" action="Reset,Play" frame="$parent" />
+
+                <Controller type="Fade" end="Pause">
+                    <Key type="Curve" time="0.0" value="0" out="Fast"/>
+                    <Key type="Curve" time="0.3" value="0" out="Fast"/>
+                    <Key type="Curve" time="0.7" value="255" in="Slow"/>
+                </Controller>
+            </Animation>
+        </Frame>
+
+        <Frame type="Label" name="DescriptionLabel">
+            <Anchor side="Top" relative="$parent/TypeLabel" pos="Max" offset="22"/>
+            <Anchor side="Left" relative="$parent/TypeLabel" pos="Min" offset="0"/>
+            <Width val="700"/>
+            <Style val="@Collection_WarChest_PurchaseDialog_DescriptionLabel"/>
+            <Text val="{$WarChestFrame/@CurrentSeasonId[PurchaseDescription]}"/>
+
+            <Animation name="Show" speed="2">
+                <Event event="OnShown" action="Reset,Play" frame="$parent" />
+
+                <Controller type="Fade" end="Pause">
+                    <Key type="Curve" time="0.0" value="0" out="Fast"/>
+                    <Key type="Curve" time="0.3" value="0" out="Fast"/>
+                    <Key type="Curve" time="0.7" value="255" in="Slow"/>
+                </Controller>
+            </Animation>
+        </Frame>
+
+        <Frame type="WarChestPurchaseTileList" name="TileList">
+            <Anchor side="Top" relative="$parent/DescriptionLabel" pos="Max" offset="30"/>
+            <Anchor side="Left" relative="$parent/BackgroundFrame" pos="Min" offset="80"/>
+            <Anchor side="Bottom" relative="$this/Item3" pos="Max" offset="100"/>
+            <Width val="1100"/>
+            <CollapseLayout val="true"/>
+
+            <Frame type="WarChestPurchaseTileListItem" name="Item0" template="WarChestPurchaseFrame/TileListItemTemplate">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+            </Frame>
+
+            <Frame type="WarChestPurchaseTileListItem" name="Item1" template="WarChestPurchaseFrame/TileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item0" pos="Max" offset="8"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+            </Frame>
+
+            <Frame type="WarChestPurchaseTileListItem" name="Item2" template="WarChestPurchaseFrame/TileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item1" pos="Max" offset="8"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+            </Frame>
+
+            <Frame type="WarChestPurchaseTileListItem" name="Item3" template="WarChestPurchaseFrame/TileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item2" pos="Max" offset="8"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+            </Frame>
+
+            <Animation name="Show" speed="2">
+                <Event event="OnShown" action="Reset,Play" frame="$parent" />
+
+                <Controller type="Fade" end="Pause">
+                    <Key type="Curve" time="0.0" value="0" out="Fast"/>
+                    <Key type="Curve" time="0.3" value="0" out="Fast"/>
+                    <Key type="Curve" time="0.7" value="255" in="Slow"/>
+                </Controller>
+            </Animation>
+            
+            <StateGroup name="ProtossSelectableState">
+                <DefaultState val="Selectable"/>
+                
+                <State name="TerranZergOwned">
+                    <When type="StateGroup" frame="$TerranWarChest/WarChestNode0" OwnedState="Owned"/>
+                    <When type="StateGroup" frame="$ZergWarChest/WarChestNode0" OwnedState="Owned"/>
+                    <Action type="SetProperty" frame="$this/Item2" Enabled="False"/>
+                </State>
+                
+                <State name="ProtossOwned">
+                    <When type="StateGroup" frame="$ProtossWarChest/WarChestNode0" OwnedState="Owned"/>
+                    <Action type="SetProperty" frame="$this/Item2" Enabled="False"/>
+                </State>
+                
+                <State name="Selectable">
+                    <Action type="SetProperty" frame="$this/Item2" Enabled="True"/>
+                </State>
+            </StateGroup>
+            
+            <StateGroup name="ZergSelectableState">
+                <DefaultState val="Selectable"/>
+                
+                <State name="TerranProtossOwned">
+                    <When type="StateGroup" frame="$TerranWarChest/WarChestNode0" OwnedState="Owned"/>
+                    <When type="StateGroup" frame="$ProtossWarChest/WarChestNode0" OwnedState="Owned"/>
+                    <Action type="SetProperty" frame="$this/Item1" Enabled="False"/>
+                </State>
+                
+                <State name="ZergOwned">
+                    <When type="StateGroup" frame="$ZergWarChest/WarChestNode0" OwnedState="Owned"/>
+                    <Action type="SetProperty" frame="$this/Item1" Enabled="False"/>
+                </State>
+                
+                <State name="Selectable">
+                    <Action type="SetProperty" frame="$this/Item1" Enabled="True"/>
+                </State>
+            </StateGroup>
+            
+            <StateGroup name="TerranSelectableState">
+                <DefaultState val="Selectable"/>
+                
+                <State name="ZergProtossOwned">
+                    <When type="StateGroup" frame="$ZergWarChest/WarChestNode0" OwnedState="Owned"/>
+                    <When type="StateGroup" frame="$ProtossWarChest/WarChestNode0" OwnedState="Owned"/>
+                    <Action type="SetProperty" frame="$this/Item0" Enabled="False"/>
+                </State>
+                
+                <State name="TerranOwned">
+                    <When type="StateGroup" frame="$TerranWarChest/WarChestNode0" OwnedState="Owned"/>
+                    <Action type="SetProperty" frame="$this/Item0" Enabled="False"/>
+                </State>
+                
+                <State name="Selectable">
+                    <Action type="SetProperty" frame="$this/Item0" Enabled="True"/>
+                </State>
+            </StateGroup>
+        </Frame>
+
+        <Frame type="Label" name="WarningLabel">
+            <Anchor side="Bottom" relative="$parent/PurchaseButton" pos="Min" offset="-16"/>
+            <Anchor side="Left" relative="$parent/TypeLabel" pos="Min" offset="0"/>
+            <Width val="700"/>
+            <Style val="@Collection_WarChest_PurchaseDialog_DescriptionLabel"/>
+            <Text val="{$WarChestFrame/@CurrentSeasonId[PurchaseWarning]}"/>
+
+            <Animation name="Show" speed="2">
+                <Event event="OnShown" action="Reset,Play" frame="$parent" />
+
+                <Controller type="Fade" end="Pause">
+                    <Key type="Curve" time="0.0" value="0" out="Fast"/>
+                    <Key type="Curve" time="0.3" value="0" out="Fast"/>
+                    <Key type="Curve" time="0.7" value="255" in="Slow"/>
+                </Controller>
+            </Animation>
+        </Frame>
+
+        <Frame type="BuyButton" name="PurchaseButton" template="StandardBattlenetTemplates/BattlenetAlternateButtonTemplate">
+            <Anchor side="Bottom" relative="$parent/BackgroundFrame" pos="Max" offset="-41"/>
+            <Anchor side="Left" relative="$parent/BackgroundFrame" pos="Min" offset="71"/>
+            <ShowPrice val="false"/>
+            <AlwaysShow val="true"/>
+            <UseRealCurrency val="true"/>
+            <ShowPurchaseDialog val="true"/>
+            <GameContent val="{$parent/TileList/@SelectedGameContent}"/>
+            <Text val="@UI/Purchase"/>
+
+            <Animation name="Show" speed="2">
+                <Event event="OnShown" action="Reset,Play" frame="$parent" />
+
+                <Controller type="Fade" end="Pause">
+                    <Key type="Curve" time="0.0" value="0" out="Fast"/>
+                    <Key type="Curve" time="0.3" value="0" out="Fast"/>
+                    <Key type="Curve" time="0.7" value="255" in="Slow"/>
+                </Controller>
+            </Animation>
+        </Frame>
+
+        <Frame type="Button" name="CloseButton" template="StandardBattlenetTemplates/BattlenetStandardButtonTemplate">
+            <Anchor side="Top" relative="$parent/PurchaseButton" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent/PurchaseButton" pos="Max" offset="6"/>
+            <RenderPriority val="530"/>
+            <Shortcut val="@UI/Close_Hotkey"/>
+            <Shortcut val="@UI/ScreenNavigationBack_Hotkey"/>
+            <Text val="@UI/Close_Control"/>
+
+            <Frame type="Label" name="Label">
+                <Options val="StripHotkeys"/>
+            </Frame>
+
+            <Animation name="Show" speed="2">
+                <Event event="OnShown" action="Reset,Play" frame="$parent" />
+
+                <Controller type="Fade" end="Pause">
+                    <Key type="Curve" time="0.0" value="0" out="Fast"/>
+                    <Key type="Curve" time="0.3" value="0" out="Fast"/>
+                    <Key type="Curve" time="0.7" value="255" in="Slow"/>
+                </Controller>
+            </Animation>
+        </Frame>
+    </Frame>
+</Desc>

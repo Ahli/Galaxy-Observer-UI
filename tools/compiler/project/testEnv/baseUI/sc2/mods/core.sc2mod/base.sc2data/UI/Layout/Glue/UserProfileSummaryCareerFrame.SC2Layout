@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<Desc>
+    <DescFlags val="Locked"/>
+    
+    <!--
+    ====================================
+    USER PROFILE SUMMARY CAREER FRAME TEMPLATE
+    ====================================
+    
+    Displays a career best league finish
+    -->
+
+    <Frame type="UserProfileSummaryCareerFrame" name="UserProfileSummaryCareerFrameTemplate">
+        <Anchor side="Right" relative="$parent" pos="Max" offset="-18"/>
+        <Width val="450"/>
+        <Height val="100"/>
+        <PresenceId val="{$ScreenUserProfile/@PresenceId}"/>
+
+        <Frame type="Image" name="Background">
+            <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+            <Texture val="@UI/SC2_UI_UserProfile_Summary_HorizontalBanner_Empty"/>
+        </Frame>
+    
+        <Frame type="Image" name="Backlight">
+            <Anchor side="Top" relative="$parent/Background" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent/Background" pos="Mid" offset="0"/>
+            <Anchor side="Left" relative="$parent/LeagueIcon" pos="Mid" offset="3"/>
+            <Anchor side="Right" relative="$parent/LeagueIcon" pos="Mid" offset="3"/>
+            <Width val="108"/>
+            <Height val="108"/>
+            <Texture val="@UI/SC2_UI_Collection_VoicePack_CharacterFrame_GenericEffect_RadialGradient_256x256"/>
+            <Color val="0,111,201"/>
+            <Alpha val="230"/>
+        </Frame>
+        
+        <Frame type="MatchmakingLeagueIcon" name="LeagueIcon" template="MatchmakingLeagueIcon/MatchmakingLeagueIconResizableTemplate">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="7"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="10"/>
+            <Width val="145"/>
+            <HideBanner val="True"/>
+            <League val="{$parent/@League}"/>
+            <AcceptsMouseTooltip val="true"/>
+            <Tooltip val="{$this/TooltipFormatFrame/@Text}"/>
+
+            <Frame type="TextFormatFrame" name="TooltipFormatFrame">
+                <Anchor relative="$parent"/>
+                <FormatText val="@UI/ScreenUserProfile/SummaryCareer/Tooltip"/>
+                <Replacement index="0" val="{$parent/@LeagueName}"/>
+                <Replacement index="1" val="{$parent/$parent/@EarnedCount}"/>
+            </Frame>
+        </Frame>
+
+        <Frame type="Label" name="LeagueHeaderLabel">
+            <Anchor side="Bottom" relative="$parent" pos="Mid" offset="6"/>
+            <Anchor side="Left" relative="$parent" pos="Max" offset="-309"/>
+            <Text val="@UI/ScreenUserProfile/SummaryCareer/LeagueSolo"/>
+            <Style val="Profile_Summary_VersusLeagueHeader"/>
+        </Frame>
+
+        <Frame type="Label" name="LeagueResultLabel">
+            <Anchor side="Top" relative="$parent" pos="Mid" offset="3"/>
+            <Anchor side="Left" relative="$parent/LeagueHeaderLabel" pos="Min" offset="0"/>
+            <Text val="{$this/FormatFrame/@Text}"/>
+            <Style val="Profile_Summary_CoopMostPlayed"/>
+
+            <Frame type="TextFormatFrame" name="FormatFrame">
+                <Anchor relative="$parent"/>
+                <FormatText val="@UI/UserProfileSummaryTeamsFrame/LeagueFull"/>
+                <Replacement index="0" val="{$parent/$parent/LeagueIcon/@LeagueName}"/>
+                <Replacement index="1" val="{$parent/$parent/LeagueIcon/@LeagueTier}"/>
+            </Frame>
+        </Frame>
+
+        <StateGroup name="CareerState">
+            <DefaultState val="Ranked"/>
+            
+            <State name="Unranked">
+                <When type="Property" EarnedCount="0"/>
+                <Action type="SetProperty" frame="Background" Texture="@UI/SC2_UI_UserProfile_Summary_HorizontalBanner_Empty"/>
+                <Action type="SetAnchor" frame="LeagueIcon" side="Top" relative="$parent" pos="Min" offset="13"/>
+                <Action type="SetProperty" frame="LeagueResultLabel" Text="@UI/UserProfileSummaryTeamsFrame/NoCareerFinishes"/>
+            </State>
+            
+            <State name="Ranked">
+                <Action type="SetProperty" frame="Background" Texture="@UI/SC2_UI_UserProfile_Summary_HorizontalBanner_Full"/>
+                <Action type="SetAnchor" frame="LeagueIcon" side="Top" relative="$parent" pos="Min" offset="7"/>
+                <Action type="SetProperty" frame="LeagueResultLabel" Text="{$this/FormatFrame/@Text}"/>
+            </State>
+        </StateGroup>
+    </Frame>
+    
+    <!--
+    ====================================
+    USER PROFILE SUMMARY CAREER CONTAINER FRAME
+    ====================================
+    
+    Contains career best solo and team league finishes
+    -->
+
+    <Frame type="Frame" name="UserProfileSummaryCareerContainerFrame">
+        
+        <Frame type="UserProfileSummaryCareerFrame" name="SoloCareerFrame" template="UserProfileSummaryCareerFrame/UserProfileSummaryCareerFrameTemplate">
+            <Anchor side="Bottom" relative="$parent/TeamCareerFrame" pos="Min" offset="-2"/>
+            <IsSoloQueue val="true"/>
+
+            <Frame type="Label" name="LeagueHeaderLabel">
+                <Text val="@UI/ScreenUserProfile/SummaryCareer/LeagueSolo"/>
+            </Frame>
+        </Frame>
+        
+        <Frame type="UserProfileSummaryCareerFrame" name="TeamCareerFrame" template="UserProfileSummaryCareerFrame/UserProfileSummaryCareerFrameTemplate">
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="-17"/>
+            <IsSoloQueue val="false"/>
+
+            <Frame type="Label" name="LeagueHeaderLabel">
+                <Text val="@UI/ScreenUserProfile/SummaryCareer/LeagueTeam"/>
+            </Frame>
+        </Frame>
+    </Frame>
+</Desc>

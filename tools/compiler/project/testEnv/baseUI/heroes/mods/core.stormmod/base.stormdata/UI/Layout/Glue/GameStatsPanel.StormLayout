@@ -66,7 +66,7 @@
     <Frame type="PlayerScoreValueResultNumberFrame" name="PlayerScoreValueResultFrameTemplate">
         <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
         <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
-        <Width val="160"/>
+        <Width val="140"/>
 
         <Frame type="Label" name="ResultLabel">
             <Anchor side="Top" relative="$parent" pos="Min" offset="3"/>
@@ -88,43 +88,37 @@
         </Frame>
 
         <Animation name="AllyBestValue">
-            <Event event="AllyBestValue" action="Reset"/>
-            <Event event="AllyBestValue" action="Play"/>
+            <Event event="AllyBestValue" action="Reset,Play"/>
             <Controller type="Style" end="Pause" frame="ResultLabel" style1="Storm_ScoreScreenResultBestValueTeam1" style2="Storm_ScoreScreenResultBestValueTeam1">
-                <Key type="Curve" time="0.00" value="1.0" out="Auto"/>
+                <Key type="Curve" time="0.00" value="1.0" inout="Linear,Auto"/>
             </Controller>
         </Animation>
 
         <Animation name="AllyNotBestValue">
-            <Event event="AllyNotBestValue" action="Reset"/>
-            <Event event="AllyNotBestValue" action="Play"/>
+            <Event event="AllyNotBestValue" action="Reset,Play"/>
             <Controller type="Style" end="Pause" frame="ResultLabel" style1="Storm_ScoreScreenResultValueTeam1" style2="Storm_ScoreScreenResultValueTeam1">
-                <Key type="Curve" time="0.00" value="1.0" out="Auto"/>
+                <Key type="Curve" time="0.00" value="1.0" inout="Linear,Auto"/>
             </Controller>
         </Animation>
 
         <Animation name="EnemyBestValue">
-            <Event event="EnemyBestValue" action="Reset"/>
-            <Event event="EnemyBestValue" action="Play"/>
+            <Event event="EnemyBestValue" action="Reset,Play"/>
             <Controller type="Style" end="Pause" frame="ResultLabel" style1="Storm_ScoreScreenResultBestValueTeam2" style2="Storm_ScoreScreenResultBestValueTeam2">
-                <Key type="Curve" time="0.00" value="1.0" out="Auto"/>
+                <Key type="Curve" time="0.00" value="1.0" inout="Linear,Auto"/>
             </Controller>
         </Animation>
 
         <Animation name="EnemyNotBestValue">
-            <Event event="EnemyNotBestValue" action="Reset"/>
-            <Event event="EnemyNotBestValue" action="Play"/>
+            <Event event="EnemyNotBestValue" action="Reset,Play"/>
             <Controller type="Style" end="Pause" frame="ResultLabel" style1="Storm_ScoreScreenResultValueTeam2" style2="Storm_ScoreScreenResultValueTeam2">
-                <Key type="Curve" time="0.00" value="1.0" out="Auto"/>
+                <Key type="Curve" time="0.00" value="1.0" inout="Linear,Auto"/>
             </Controller>
         </Animation>
     </Frame>
-    
-    <Frame type="UnitStatusTalentIcon" name="SelectedTalentTreeIconImageTemplate" template="StandardTemplates/UnitStatusTalentIconTemplate">
+
+    <Frame type="UnitStatusTalentIcon" name="QuestIconImageTemplate" template="StandardTemplates/UnitStatusTalentIconTemplate">
         <Width val="68"/>
         <Height val="68"/>
-
-        <TooltipFrame val="HeroTalentTooltip"/>
         <AcceptsMouse val="True"/>
 
         <Frame type="Image" name="IconBackgroundImage">
@@ -157,8 +151,7 @@
             <Anchor side="Left" relative="$parent" pos="Min" offset="14"/>
             <Anchor side="Right" relative="$parent" pos="Max" offset="-14"/>
             <Anchor side="Bottom" relative="$parent" pos="Max" offset="-14"/>
-            
-            <Texture val="@UI/Storm_UI_InGame_Leader_Talent_Unselected"/>
+
             <IgnoreParentColor val="true"/>
             <RenderPriority val="520"/>
         </Frame>
@@ -178,7 +171,7 @@
             <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
             <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
             <Visible val="False"/>
-            
+
             <IgnoreParentColor val="True"/>
             <Vertical val="True"/>
             <Width val="68"/>
@@ -195,6 +188,7 @@
                     <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
                     <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
                     <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+                    <TextureCoords top="0" left="0.5" bottom="0" right="1"/>
                     <RenderPriority val="536"/>
                     <LayerCount val="1"/>
 
@@ -216,72 +210,121 @@
         </Frame>
 
         <Frame type="Label" name="QuestProgressStackLabel">
-            <Anchor side="Bottom" relative="$parent/QuestProgressBar" pos="Max" offset="0"/>
+            <Anchor side="Bottom" relative="$parent/QuestProgressBar" pos="Max" offset="-4"/>
             <Anchor side="Left" relative="$parent" pos="Min" offset="3"/>
             <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
             <Style val="Storm_LeaderTalentQuestStack"/>
             <Visible val="false"/>
             <RenderPriority val="537"/>
             <IgnoreParentColor val="True"/>
-            <Text val="{$parent/QuestProgressBar/@Value}"/>
+            <Text val="{$parent/@QuestProgressValue}"/>
         </Frame>
+    </Frame>
+    
+    <Frame type="UnitStatusBaselineQuestIcon" name="UnitStatusBaselineQuestIconTemplate" template="GameStatsPanel/QuestIconImageTemplate">
+        <TooltipFrame val="HeroBaselineQuestTooltip"/>
 
-        <StateGroup name="TalentTypeState">
-            <State name="TypeTalent">
+        <StateGroup name="QuestState">
+            
+            <State name="QuestSelected">
                 <Action type="SetProperty" frame="$this/IconBorderImage" texture="@UI/Storm_UI_InGame_Leader_Talent_Available"/>
-            </State>
-            <State name="TypeUltimate">
-                <Action type="SetProperty" frame="$this/IconBorderImage" texture="@UI/Storm_UI_InGame_Leader_Talent_Available_Ult"/>
-            </State>
-        </StateGroup>
-
-        <StateGroup name="TalentTierState">
-            <State name="TierAvailable">
-                <When type="AnimationState" frame="$this" TalentTierState="TierAvailable"/>
-                <Action type="SetProperty" frame="$this/IconImage" texture="@UI/storm_ui_ingame_shop_shopbuttonicon_shadow"/>
-            </State>
-        </StateGroup>
-
-        <StateGroup name="TalentTypeState1">
-            <DefaultState val="TypeTalent_Unavailable"/>
-
-            <State name="TypeTalent_Unavailable">
-                <When type="AnimationState" frame="$this" TalentTypeState="TypeTalent"/>
-                <When type="AnimationState" frame="$this" TalentTierState="TierNotAvailable"/>
-                <Action type="SetProperty" frame="$this/IconImage" visible="false"/>
-                <Action type="SetProperty" frame="$this/IconBorderImage" texture="@UI/Storm_UI_InGame_Leader_Talent_Unavailable"/>
-                <Action type="SetProperty" frame="$this/IconBackgroundImage" alpha="100"/>
+                <Action type="SetProperty" frame="$this/IconBackgroundImage" alpha="255"/>
             </State>
 
-            <State name="TypeTalent_Available">
-                <When type="AnimationState" frame="$this" TalentTypeState="TypeTalent"/>
-                <When type="AnimationState" frame="$this" TalentTierState="TierAvailable"/>
-                <Action type="SetProperty" frame="$this/IconImage" visible="true"/>
+            <State name="QuestAvailable">
                 <Action type="SetProperty" frame="$this/IconImage" texture="@UI/Storm_UI_InGame_Leader_Talent_Unselected"/>
                 <Action type="SetProperty" frame="$this/IconBorderImage" texture="@UI/Storm_UI_InGame_Leader_Talent_Available"/>
                 <Action type="SetProperty" frame="$this/IconBackgroundImage" alpha="255"/>
             </State>
 
-            <State name="TypeUltimate_Unavailable">
-                <When type="AnimationState" frame="$this" TalentTypeState="TypeUltimate"/>
-                <When type="AnimationState" frame="$this" TalentTierState="TierNotAvailable"/>
+            <State name="QuestNotAvailable">
                 <Action type="SetProperty" frame="$this/IconImage" visible="false"/>
-                <Action type="SetProperty" frame="$this/IconBorderImage" texture="@UI/Storm_UI_InGame_Leader_Ultimate_Unavailable"/>
+                <Action type="SetProperty" frame="$this/IconBorderImage" texture="@UI/Storm_UI_InGame_Leader_Talent_Unavailable"/>
                 <Action type="SetProperty" frame="$this/IconBackgroundImage" alpha="100"/>
             </State>
+        </StateGroup>
 
-            <State name="TypeUltimate_Available">
-                <When type="AnimationState" frame="$this" TalentTypeState="TypeUltimate"/>
-                <When type="AnimationState" frame="$this" TalentTierState="TierAvailable"/>
-                <Action type="SetProperty" frame="$this/IconImage" visible="true"/>
+        <StateGroup name="BaselineQuestProgress">
+            <DefaultState val="NoQuest"/>
+
+            <State name="HasQuest">
+                <When type="Property" frame="$this" QuestProgress="QuestInProgress"/>
+                <Action type="SetProperty" frame="QuestProgressBar" visible="True"/>
+                <Action type="SetProperty" frame="UnfilledProgressImage" visible="True"/>
+                <Action type="SetProperty" frame="QuestCompleteImage" visible="False"/>
+                <Action type="SetProperty" frame="QuestProgressStackLabel" visible="True"/>
+            </State>
+
+            <State name="HasUntrackedQuest">
+                <When type="Property" frame="$this" QuestProgress="ProgressUntracked"/>
+                <Action type="SetProperty" frame="QuestProgressBar" visible="false"/>
+                <Action type="SetProperty" frame="UnfilledProgressImage" visible="True"/>
+                <Action type="SetProperty" frame="QuestCompleteImage" visible="False"/>
+                <Action type="SetProperty" frame="QuestProgressStackLabel" visible="False"/>
+            </State>
+
+            <State name="FinishedQuest">
+                <When type="Property" frame="$this" QuestProgress="FinishedQuest"/>
+                <Action type="SetProperty" frame="QuestProgressBar" visible="False"/>
+                <Action type="SetProperty" frame="UnfilledProgressImage" visible="True"/>
+                <Action type="SetProperty" frame="QuestCompleteImage" visible="True"/>
+                <Action type="SetProperty" frame="QuestProgressStackLabel" visible="False"/>
+            </State>
+
+            <State name="FinishedUnlimitedQuest">
+                <When type="Property" frame="$this" QuestProgress="FinishedUnlimitedQuest"/>
+                <Action type="SetProperty" frame="QuestProgressBar" visible="False"/>
+                <Action type="SetProperty" frame="UnfilledProgressImage" visible="True"/>
+                <Action type="SetProperty" frame="QuestCompleteImage" visible="True"/>
+                <Action type="SetProperty" frame="QuestProgressStackLabel" visible="True"/>
+            </State>
+
+            <State name="NoQuest">
+                <Action type="SetProperty" frame="QuestProgressBar" visible="False"/>
+                <Action type="SetProperty" frame="UnfilledProgressImage" visible="False"/>
+                <Action type="SetProperty" frame="QuestCompleteImage" visible="False"/>
+                <Action type="SetProperty" frame="QuestProgressStackLabel" visible="False"/>
+            </State>
+        </StateGroup>
+    </Frame>
+    
+    <Frame type="UnitStatusTalentIcon" name="SelectedTalentTreeIconImageTemplate" template="GameStatsPanel/QuestIconImageTemplate">
+        <TooltipFrame val="HeroTalentTooltip"/>
+
+        <StateGroup name="TalentTierState">
+
+            <State name="TalentTierSelected">
+                <Action type="SetProperty" frame="$this/IconBorderImage" texture="@UI/Storm_UI_InGame_Leader_Talent_Available"/>
+                <Action type="SetProperty" frame="$this/IconBackgroundImage" alpha="255"/>
+            </State>
+
+            <State name="UltimateTierSelected">
                 <Action type="SetProperty" frame="$this/IconBorderImage" texture="@UI/Storm_UI_InGame_Leader_Talent_Available_Ult"/>
                 <Action type="SetProperty" frame="$this/IconBackgroundImage" alpha="255"/>
             </State>
 
-            <State name="TierSelected">
-                <When type="AnimationState" frame="$this" TalentTierState="TierSelected"/>
-                <!-- IconImage Texture taken care of by code -->
-                <Action type="SetProperty" frame="$this/IconImage" visible="true"/>
+            <State name="TalentTierAvailable">
+                <Action type="SetProperty" frame="$this/IconImage" texture="@UI/Storm_UI_InGame_Leader_Talent_Unselected"/>
+                <Action type="SetProperty" frame="$this/IconBorderImage" texture="@UI/Storm_UI_InGame_Leader_Talent_Available"/>
+                <Action type="SetProperty" frame="$this/IconBackgroundImage" alpha="255"/>
+            </State>
+
+            <State name="UltimateTierAvailable">
+                <Action type="SetProperty" frame="$this/IconImage" texture="@UI/Storm_UI_InGame_Leader_Talent_Unselected"/>
+                <Action type="SetProperty" frame="$this/IconBorderImage" texture="@UI/Storm_UI_InGame_Leader_Talent_Available_Ult"/>
+                <Action type="SetProperty" frame="$this/IconBackgroundImage" alpha="255"/>
+            </State>
+
+            <State name="TalentTierNotAvailable">
+                <Action type="SetProperty" frame="$this/IconImage" visible="false"/>
+                <Action type="SetProperty" frame="$this/IconBorderImage" texture="@UI/Storm_UI_InGame_Leader_Talent_Unavailable"/>
+                <Action type="SetProperty" frame="$this/IconBackgroundImage" alpha="100"/>
+            </State>
+
+            <State name="UltimateTierNotAvailable">
+                <Action type="SetProperty" frame="$this/IconImage" visible="false"/>
+                <Action type="SetProperty" frame="$this/IconBorderImage" texture="@UI/Storm_UI_InGame_Leader_Ultimate_Unavailable"/>
+                <Action type="SetProperty" frame="$this/IconBackgroundImage" alpha="100"/>
             </State>
         </StateGroup>
 
@@ -311,6 +354,15 @@
                 <Action type="SetProperty" frame="QuestCompleteImage" visible="True"/>
                 <Action type="SetProperty" frame="QuestProgressStackLabel" visible="False"/>
             </State>
+            
+            <State name="FinishedUnlimitedQuest">
+                <When type="Property" frame="$this" QuestProgress="FinishedUnlimitedQuest"/>
+                <Action type="SetProperty" frame="QuestProgressBar" visible="False"/>
+                <Action type="SetProperty" frame="UnfilledProgressImage" visible="True"/>
+                <Action type="SetProperty" frame="QuestCompleteImage" visible="True"/>
+                <Action type="SetProperty" frame="QuestProgressStackLabel" visible="True"/>
+            </State>
+
 
             <State name="NoQuest">
                 <Action type="SetProperty" frame="QuestProgressBar" visible="False"/>
@@ -337,10 +389,8 @@
                 <IgnoreParentColor val="true"/>
                 <Texture val="@UI/Storm_UI_InGame_Leader_ProgressBar"/>
                 <Animation name="LocalPlayer">
-                    <Event event="AllyPlayer" action="DirectionReverse" frame="$parent/$parent/$parent/$parent/$parent/$parent/$parent"/>
-                    <Event event="AllyPlayer" action="Play" frame="$parent/$parent/$parent/$parent/$parent/$parent/$parent"/>
-                    <Event event="EnemyPlayer" action="Restart" frame="$parent/$parent/$parent/$parent/$parent/$parent/$parent"/>
-                    <Event event="EnemyPlayer" action="Play" frame="$parent/$parent/$parent/$parent/$parent/$parent/$parent"/>
+                    <Event event="AllyPlayer" action="DirectionReverse,Play" frame="$parent/$parent/$parent/$parent/$parent/$parent/$parent"/>
+                    <Event event="EnemyPlayer" action="Restart,Play" frame="$parent/$parent/$parent/$parent/$parent/$parent/$parent"/>
                     <Controller type="Texture" end="Pause">
                         <Key type="Image" time="0.0" image="@UI/Storm_UI_InGame_Leader_ProgressBar"/>
                         <Key type="Image" time="0.01" image="@UI/Storm_UI_InGame_Leader_ProgressBar_Red"/>
@@ -389,10 +439,8 @@
             <Texture val="@UI/Storm_UI_InGame_Leader_ProgressBar"/>
             <Alpha val="50"/>
             <Animation name="LocalPlayer">
-                <Event event="AllyPlayer" action="DirectionReverse" frame="$parent/$parent/$parent"/>
-                <Event event="AllyPlayer" action="Play" frame="$parent/$parent/$parent"/>
-                <Event event="EnemyPlayer" action="Restart" frame="$parent/$parent/$parent"/>
-                <Event event="EnemyPlayer" action="Play" frame="$parent/$parent/$parent"/>
+                <Event event="AllyPlayer" action="DirectionReverse,Play" frame="$parent/$parent/$parent"/>
+                <Event event="EnemyPlayer" action="Restart,Play" frame="$parent/$parent/$parent"/>
                 <Controller type="Texture" end="Pause">
                     <Key type="Image" time="0.0" image="@UI/Storm_UI_InGame_Leader_ProgressBar"/>
                     <Key type="Image" time="0.01" image="@UI/Storm_UI_InGame_Leader_ProgressBar_Red"/>
@@ -422,14 +470,17 @@
             <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
             <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
             <Anchor side="Right" relative="$parent" pos="Max" offset="-8"/>
-            <Texture val="@UI/Storm_UI_ScoreScreen_Stats_PlayerBG_Blue"/>
+            <Texture val="@UI/Storm_UI_ScoreScreen_Stats_PlayerBG"/>
             <TextureType val="NineSlice"/>
+
+            <ColorAdjustMode val="Colorize"/>
         </Frame>
         
         <Frame type="Image" name="SelfBackground">
-            <Anchor relative="$parent"/>
+            <Anchor relative="$parent/Background"/>
             <Texture val="@UI/Storm_UI_ScoreScreen_Stats_PlayerBG_Gold"/>
             <TextureType val="NineSlice"/>
+            <Visible val="False"/>
         </Frame>
     
         <Frame type="BattleUserContextMenu" name="PlayerContextMenu" template="BattleUserContextMenu/BattleUserContextMenu" >
@@ -491,7 +542,6 @@
             <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
             <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
             <Anchor side="Right" relative="$parent" pos="Max" offset="-10"/>
-            <ClickSound val="UI_BNet_Dropdown"/>
         </Frame>
         
         <Frame type="Frame" name="TooltipHitFrame">
@@ -504,7 +554,7 @@
             <Frame type="StandardTooltip" name="UserTooltip" template="StandardTooltip/StandardUserTooltipTemplate"/>
             
             <TooltipAnchorPosition val="MiddleLeft"/>
-            <TooltipFrame val="UserTooltip"/> 
+            <TooltipFrame val="UserTooltip"/>
         </Frame>
         
         <Frame type="PartyInviteButton" name="PartyInviteButton" template="GameStatsPanel/JoinGameButton">
@@ -523,22 +573,6 @@
             <Frame type="ScoreValueAwardIconFrame" name="AwardIcon0" template="GameStatsPanel/EndOfMatchAwardIconTemplate">
                 <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
             </Frame>
-
-            <Animation name="FreeSpace">
-                <!-- allow the HeroNameLabel to claim this award space if there is no award -->
-                <Event event="OnHidden" frame="AwardIcon0" action="Play"/>
-                <Event event="OnShown" frame="AwardIcon0" action="Reset"/>
-
-                <Controller type="Dimension" frame="$parent/HeroNameLabel" end="Pause" dimension="Width" percentage="False" relative="true">
-                    <Key type="Curve" time="0" value="0"/>
-                    <Key type="Curve" time=".01" value="55"/>
-                </Controller>
-
-                <Controller type="Anchor" end="Pause" side="Right" relative="true">
-                    <Key type="Curve" time="0" value="0"/>
-                    <Key type="Curve" time=".01" value="-55"/>
-                </Controller>
-            </Animation>
         </Frame>
 
         <!--===========================================================================================
@@ -548,19 +582,19 @@
             <Anchor relative="$parent"/>
 
             <Frame type="PlayerScoreValueResultNumberFrame" name="SoloKillResultFrame" template="GameStatsPanel/PlayerScoreValueResultFrameTemplate">
-                <Width val="67"/>
+                <Width val="60"/>
                 <Anchor side="Left" relative="$parent/$parent/AwardsContainer" pos="Max" offset="-12"/>
                 <ScoreValueLink val="SoloKill"/>
             </Frame>
 
             <Frame type="PlayerScoreValueResultNumberFrame" name="AssistsResultFrame" template="GameStatsPanel/PlayerScoreValueResultFrameTemplate">
-                <Width val="67"/>
+                <Width val="60"/>
                 <Anchor side="Left" relative="$parent/SoloKillResultFrame" pos="Max" offset="5"/>
                 <ScoreValueLink val="Assists"/>
             </Frame>
 
             <Frame type="PlayerScoreValueResultNumberFrame" name="DeathsResultFrame" template="GameStatsPanel/PlayerScoreValueResultFrameTemplate">
-                <Width val="67"/>
+                <Width val="60"/>
                 <Anchor side="Left" relative="$parent/AssistsResultFrame" pos="Max" offset="5"/>
                 <ScoreValueLink val="Deaths"/>
             </Frame>
@@ -569,37 +603,48 @@
                 <Anchor side="Left" relative="$parent/DeathsResultFrame" pos="Max" offset="5"/>
                 <ScoreValueLink val="SiegeDamage"/>
                 <BestValueGrouping val="Team"/>
+                <Width val="134"/>
             </Frame>
 
             <Frame type="PlayerScoreValueResultNumberFrame" name="HeroDamageFrame" template="GameStatsPanel/PlayerScoreValueResultFrameTemplate">
                 <Anchor side="Left" relative="$parent/SiegeDamageFrame" pos="Max" offset="5"/>
                 <ScoreValueLink val="HeroDamage"/>
                 <BestValueGrouping val="Team"/>
+                <Width val="134"/>
             </Frame>
 
             <Frame type="PlayerScoreValueResultNumberFrame" name="HealingFrame" template="GameStatsPanel/PlayerScoreValueResultFrameTemplate">
                 <Anchor side="Left" relative="$parent/HeroDamageFrame" pos="Max" offset="5"/>
-                <RoleBasedScoreValue val="True"/>
+                <Width val="134"/>
+                <OptionalScoreValue val="True"/>
                 <BestValueGrouping val="Team"/>
                 <AcceptsMouseTooltip val="True"/>
+                <ScoreValueLink val="Healing"/>
 
-                <Frame type="Label" name="ResultLabel">
-                    <Anchor side="Left" relative="$parent" pos="Min" offset="20"/>
-                </Frame>
 
                 <Frame type="Image" name="IconImage">
-                    <Anchor side="Top" relative="$parent/ResultLabel" pos="Mid" offset="0"/>
-                    <Anchor side="Bottom" relative="$parent/ResultLabel" pos="Mid" offset="0"/>
-                    <Anchor side="Left" relative="$parent/ResultLabel" pos="Min" offset="-10"/>
-                    <Width val="28"/>
-                    <Height val="28"/>
+                    <Alpha val="0"/>
+                </Frame>
+            </Frame>
+
+            <Frame type="PlayerScoreValueResultNumberFrame" name="DamageTakenFrame" template="GameStatsPanel/PlayerScoreValueResultFrameTemplate">
+                <Anchor side="Left" relative="$parent/HealingFrame" pos="Max" offset="5"/>
+                <Width val="134"/>
+                <OptionalScoreValue val="True"/>
+                <BestValueGrouping val="Team"/>
+                <AcceptsMouseTooltip val="True"/>
+                <ScoreValueLink val="DamageTaken"/>
+
+                <Frame type="Image" name="IconImage">
+                    <Alpha val="0"/>
                 </Frame>
             </Frame>
 
             <Frame type="PlayerScoreValueResultNumberFrame" name="ExperienceFrame" template="GameStatsPanel/PlayerScoreValueResultFrameTemplate">
-                <Anchor side="Left" relative="$parent/HealingFrame" pos="Max" offset="5"/>
+                <Anchor side="Left" relative="$parent/DamageTakenFrame" pos="Max" offset="5"/>
                 <ScoreValueLink val="ExperienceContribution"/>
                 <BestValueGrouping val="Team"/>
+                <Width val="134"/>
             </Frame>
         </Frame>
 
@@ -607,7 +652,7 @@
             <Anchor relative="$parent"/>
 
             <Frame type="PlayerScoreValueResultTalentFrame" name="TalentResultFrame0" template="GameStatsPanel/PlayerScoreValueTalentFrameTemplate">
-                <Anchor side="Left" relative="$parent/$parent/HeroNameLabel" pos="Max" offset="35"/>
+                <Anchor side="Left" relative="$parent/$parent/HeroNameLabel" pos="Max" offset="20"/>
                 <ScoreValueLink val="Tier1Talent"/>
                 <Frame type="ProgressBar" name="ProgressBar">
                     <MinValue val="1.000000"/>
@@ -672,56 +717,32 @@
         
 
         <!-- Animation Events for Team Color -->
-        <Animation name="LocalPlayer">
-            <Event event="LocalPlayer" action="Reset"/>
-            <Event event="LocalPlayer" action="Play"/>
-            <Controller type="Style" end="Pause" frame="HeroNameLabel" style1="Storm_ScoreScreenHeroNameSelf" style2="Storm_ScoreScreenHeroNameSelf">
-                <Key type="Curve" time="0.00" value="1.0" out="Auto"/>
-            </Controller>
-            <Controller type="Style" end="Pause" frame="PlayerNameLabel" style1="Storm_ScoreScreenPlayerNameSelf" style2="Storm_ScoreScreenPlayerNameSelf">
-                <Key type="Curve" time="0.00" value="1.0" out="Auto"/>
-            </Controller>
-            <Controller type="Visibility" end="Pause" frame="SelfBackground">
-                <Key type="Bool" time="0.00" value="true"/>
-            </Controller>
-            <Controller type="Texture" end="Pause" frame="Background">
-                <Key type="Image" time="0.0" image="@UI/Storm_UI_ScoreScreen_Stats_PlayerBG_Blue"/>
-            </Controller>
-        </Animation>
-
-        <Animation name="AllyPlayer">
-            <Event event="AllyPlayer" action="Reset"/>
-            <Event event="AllyPlayer" action="Play"/>
-            <Controller type="Style" end="Pause" frame="HeroNameLabel" style1="Storm_ScoreScreenHeroNameTeam1" style2="Storm_ScoreScreenHeroNameTeam1">
-                <Key type="Curve" time="0.00" value="1.0" out="Auto"/>
-            </Controller>
-            <Controller type="Style" end="Pause" frame="PlayerNameLabel" style1="Storm_ScoreScreenPlayerNameTeam1" style2="Storm_ScoreScreenPlayerNameTeam1">
-                <Key type="Curve" time="0.00" value="1.0" out="Auto"/>
-            </Controller>
-            <Controller type="Visibility" end="Pause" frame="SelfBackground">
-                <Key type="Bool" time="0.00" value="false"/>
-            </Controller>
-            <Controller type="Texture" end="Pause" frame="Background">
-                <Key type="Image" time="0.0" image="@UI/Storm_UI_ScoreScreen_Stats_PlayerBG_Blue"/>
-            </Controller>
-        </Animation>
-
-        <Animation name="EnemyPlayer">
-            <Event event="EnemyPlayer" action="Reset"/>
-            <Event event="EnemyPlayer" action="Play"/>
-            <Controller type="Style" end="Pause" frame="HeroNameLabel" style1="Storm_ScoreScreenHeroNameTeam2" style2="Storm_ScoreScreenHeroNameTeam2">
-                <Key type="Curve" time="0.00" value="1.0" out="Auto"/>
-            </Controller>
-            <Controller type="Style" end="Pause" frame="PlayerNameLabel" style1="Storm_ScoreScreenPlayerNameTeam2" style2="Storm_ScoreScreenPlayerNameTeam2">
-                <Key type="Curve" time="0.00" value="1.0" out="Auto"/>
-            </Controller>
-            <Controller type="Visibility" end="Pause" frame="SelfBackground">
-                <Key type="Bool" time="0.00" value="false"/>
-            </Controller>
-            <Controller type="Texture" end="Pause" frame="Background">
-                <Key type="Image" time="0.0" image="@UI/Storm_UI_ScoreScreen_Stats_PlayerBG_Red"/>
-            </Controller>
-        </Animation>
+        <StateGroup name="PlayerTypeState">
+            <State name="LocalPlayer">
+                <When type="AnimationState" PlayerTypeState="LocalPlayer"/>
+                <Action type="SetProperty" Visible="True" frame="SelfBackground"/>
+                <Action type="SetProperty" Style="Storm_ScoreScreenHeroNameSelf" frame="HeroNameLabel"/>
+                <Action type="SetProperty" Style="Storm_ScoreScreenPlayerNameSelf" frame="PlayerNameLabel"/>
+                <Action type="SetProperty" LightAdjustColor="{$GlueUI/GlueBlueColors/@AdditionalColor[0]}" frame="Background"/>
+                <Action type="SetProperty" DarkAdjustColor="{$GlueUI/GlueBlueColors/@Color}" frame="Background"/>
+            </State>
+            <State name="AllyPlayer">
+                <When type="AnimationState" PlayerTypeState="AllyPlayer"/>
+                <Action type="SetProperty" Visible="False" frame="SelfBackground"/>
+                <Action type="SetProperty" Style="Storm_ScoreScreenHeroNameTeam1" frame="HeroNameLabel"/>
+                <Action type="SetProperty" Style="Storm_ScoreScreenPlayerNameTeam1" frame="PlayerNameLabel"/>
+                <Action type="SetProperty" LightAdjustColor="{$GlueUI/GlueBlueColors/@AdditionalColor[0]}" frame="Background"/>
+                <Action type="SetProperty" DarkAdjustColor="{$GlueUI/GlueBlueColors/@Color}" frame="Background"/>
+            </State>
+            <State name="EnemyPlayer">
+                <When type="AnimationState" PlayerTypeState="EnemyPlayer"/>
+                <Action type="SetProperty" Visible="False" frame="SelfBackground"/>
+                <Action type="SetProperty" Style="Storm_ScoreScreenHeroNameTeam2" frame="HeroNameLabel"/>
+                <Action type="SetProperty" Style="Storm_ScoreScreenPlayerNameTeam2" frame="PlayerNameLabel"/>
+                <Action type="SetProperty" LightAdjustColor="{$GlueUI/GlueRedColors/@AdditionalColor[0]}" frame="Background"/>
+                <Action type="SetProperty" DarkAdjustColor="{$GlueUI/GlueRedColors/@Color}" frame="Background"/>
+            </State>
+        </StateGroup>
     </Frame>
     
     <!-- Template: Team Stats -->
@@ -760,19 +781,32 @@
         <Frame type="Label" name="TotalKill">
             <Anchor side="Right" relative="$parent/BattleIcon" pos="Min" offset="-10"/>
             <Text val="99"/>
-            <Style val="Storm_ScoreScreenTeamKillsTeam1"/>
+            <Style val="Storm_ScoreScreenTeamKillsTeam"/>
+
+            <GlowColor val="{$GlueUI/GlueBlueColors/@Color}"/>
+            <ColorAdjustMode val="Colorize"/>
+            <LightAdjustColor val="#ColorWhite"/>
+            <DarkAdjustColor val="{$GlueUI/GlueBlueColors/@Color}"/>
         </Frame>
 
         <Frame type="Label" name="TeamTitle">
             <Anchor side="Right" relative="$parent/TotalKill" pos="Min" offset="-10"/>
             <Text val="@UI/ScreenScore/Team1LevelTitle"/>
-            <Style val="@Storm_ScoreScreenTeamNameTeam1"/>
+            <Style val="@Storm_ScoreScreenTeamNameTeam"/>
+
+            <GlowColor val="{$GlueUI/GlueBlueColors/@Color}"/>
+            <ColorAdjustMode val="Colorize"/>
+            <LightAdjustColor val="#ColorWhite"/>
+            <DarkAdjustColor val="{$GlueUI/GlueBlueColors/@Color}"/>
         </Frame>
 
         <Frame type="Label" name="TeamLevel">
             <Anchor side="Right" relative="$parent/TotalKill" pos="Min" offset="-10"/>
             <Text val="Level 11"/>
-            <Style val="@Storm_ScoreScreenTeamLevelTeam1"/>
+            <Style val="@Storm_ScoreScreenTeamLevelTeam"/>
+
+            <GlowColor val="{$GlueUI/GlueBlueColors/@Color}"/>
+            <Color val="{$GlueUI/GlueBlueColors/@AdditionalColor[0]}"/>
         </Frame>
     </Frame>
 
@@ -786,19 +820,32 @@
         <Frame type="Label" name="TotalKill">
             <Anchor side="Left" relative="$parent/BattleIcon" pos="Max" offset="12"/>
             <Text val="99"/>
-            <Style val="Storm_ScoreScreenTeamKillsTeam2"/>
+            <Style val="Storm_ScoreScreenTeamKillsTeam"/>
+
+            <GlowColor val="{$GlueUI/GlueRedColors/@Color}"/>
+            <ColorAdjustMode val="Colorize"/>
+            <LightAdjustColor val="#ColorWhite"/>
+            <DarkAdjustColor val="{$GlueUI/GlueRedColors/@Color}"/>
         </Frame>
 
         <Frame type="Label" name="TeamTitle">
             <Anchor side="Left" relative="$parent/TotalKill" pos="Max" offset="10"/>
             <Text val="@UI/ScreenScore/Team2LevelTitle"/>
-            <Style val="@Storm_ScoreScreenTeamNameTeam2"/>
+            <Style val="@Storm_ScoreScreenTeamNameTeam"/>
+
+            <GlowColor val="{$GlueUI/GlueRedColors/@Color}"/>
+            <ColorAdjustMode val="Colorize"/>
+            <LightAdjustColor val="#ColorWhite"/>
+            <DarkAdjustColor val="{$GlueUI/GlueRedColors/@Color}"/>
         </Frame>
 
         <Frame type="Label" name="TeamLevel">
             <Anchor side="Left" relative="$parent/TotalKill" pos="Max" offset="10"/>
             <Text val="Level 11"/>
-            <Style val="@Storm_ScoreScreenTeamLevelTeam2"/>
+            <Style val="@Storm_ScoreScreenTeamLevelTeam"/>
+
+            <GlowColor val="{$GlueUI/GlueRedColors/@Color}"/>
+            <Color val="{$GlueUI/GlueRedColors/@AdditionalColor[0]}"/>
         </Frame>
     </Frame>
 
@@ -928,16 +975,25 @@
             <Anchor side="Right" relative="$parent/Player0/StatsContainer/HeroDamageFrame" pos="Max" offset="#SortButtonFrameAlignment"/>
             <ScoreValueLink val="HeroDamage"/>
         </Frame>
-
         <Frame type="HeroLeaderPanelSortButton" name="SortButton5" template="StandardTemplates/GameStatsSortButtonTemplate">
             <Anchor side="Bottom" relative="$parent/Player0" pos="Min" offset="-10"/>
             <Anchor side="Left" relative="$parent/Player0/StatsContainer/HealingFrame" pos="Min" offset="0"/>
             <Anchor side="Right" relative="$parent/Player0/StatsContainer/HealingFrame" pos="Max" offset="#SortButtonFrameAlignment"/>
-            <ScoreValueLink val="Role"/>
-            <RoleBasedScoreValue val="True"/>
+            <ScoreValueLink val="Healing"/>
+            <OptionalScoreValue val="True"/>
+
         </Frame>
 
         <Frame type="HeroLeaderPanelSortButton" name="SortButton6" template="StandardTemplates/GameStatsSortButtonTemplate">
+            <Anchor side="Bottom" relative="$parent/Player0" pos="Min" offset="-10"/>
+            <Anchor side="Left" relative="$parent/Player0/StatsContainer/DamageTakenFrame" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent/Player0/StatsContainer/DamageTakenFrame" pos="Max" offset="#SortButtonFrameAlignment"/>
+            <ScoreValueLink val="DamageTaken"/>
+            <OptionalScoreValue val="True"/>
+
+        </Frame>
+
+        <Frame type="HeroLeaderPanelSortButton" name="SortButton7" template="StandardTemplates/GameStatsSortButtonTemplate">
             <Anchor side="Bottom" relative="$parent/Player0" pos="Min" offset="-10"/>
             <Anchor side="Left" relative="$parent/Player0/StatsContainer/ExperienceFrame" pos="Min" offset="0"/>
             <Anchor side="Right" relative="$parent/Player0/StatsContainer/ExperienceFrame" pos="Max" offset="#SortButtonFrameAlignment"/>
@@ -1059,7 +1115,7 @@
         
         <Frame type="Frame" name="GameTimeContainer">
             <Width val="250"/>
-            <Anchor side="Top" relative="$parent/Player9" pos="Max" offset="5"/>
+            <Anchor side="Top" relative="$parent/Player9" pos="Max" offset="0"/>
             <Anchor side="Bottom" relative="$parent/PanelBackground" pos="Max" offset="-5"/>
             <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
             <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
@@ -1070,6 +1126,7 @@
                 <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
                 <Text val="@UI/ScreenScore/GameTime"/>
                 <Style val="@Storm_ScoreScreenGameTimeTitle"/>
+                <Options val="ScaleToPreventTruncation"/>
             </Frame>
 
             <Frame type="Label" name="GameTime">

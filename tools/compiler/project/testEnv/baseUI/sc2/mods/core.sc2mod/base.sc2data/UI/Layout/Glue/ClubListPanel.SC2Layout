@@ -1,8 +1,111 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <Desc>
     <DescFlags val="Locked"/>
+    
+    <Frame type="Button" name="TabButtonTemplate">
+        <Height val="36"/>
+        <ClickSound val="@AC_UI_OnClick01"/>
+        <HoverSound val="@AC_UI_MouseOver01"/>
+        <Toggleable val="true"/>
+        
+        <Frame type="Image" name="NormalFrameImage">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+            <Texture val="@UI/Glues_Battlenet_TabButton_Left_Normal" layer="0"/>
+            <TextureType val="EndCap"/>
+            <Tiled val="true"/>
+            <DesaturateOnDisable val="false"/>
+            
+            <Animation name="Normal">
+                <Event event="Normal" action="Reset,Play" frame="$parent"/>
+                <Event event="OnMouseEnter" action="DirectionReverse,Play" frame="$parent"/>
+                <Event event="OnMouseExit" action="DirectionForward,Play" frame="$parent"/>
 
-    <Frame type="ClubItem" name="ClubItemTemplate">
+                <Controller type="Fade" end="Pause">
+                    <Key type="Curve" time="0" value="0" out="Fast"/>
+                    <Key type="Curve" time=".01" value="255" in="Fast"/>
+                </Controller>
+            </Animation>
+        </Frame>
+        
+        <Frame type="Image" name="HoverFrameImage">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+            <Texture val="@UI/Glues_Battlenet_TabButton_Left_Over" layer="0"/>
+            <TextureType val="EndCap"/>
+            <Tiled val="true"/>
+            <Alpha val="0"/>
+            <DesaturateOnDisable val="false"/>
+            
+            <Animation name="Hovered">
+                <Event event="OnMouseEnter" action="DirectionForward,Play" frame="$parent"/>
+                <Event event="OnMouseExit" action="DirectionReverse,Play" frame="$parent"/>
+
+                <Controller type="Fade" end="Pause">
+                    <Key type="Curve" time="0" value="0" out="Fast"/>
+                    <Key type="Curve" time=".01" value="255" in="Fast"/>
+                </Controller>
+            </Animation>
+        </Frame>
+        
+        <Frame type="Image" name="SelectedFrameImage">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+            <Texture val="@UI/Glues_Battlenet_TabButton_Left_Selected"/>
+            <TextureType val="EndCap"/>
+            <Visible val="{$parent/@Toggled}"/>
+            <DesaturateOnDisable val="false"/>
+        </Frame>
+
+        <Frame type="Label" name="Label">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="3"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="15"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="-20"/>
+            <Style val="@Coop_CommanderTabButton"/>
+
+            <Options val="Ellipsis | TooltipIfTruncated | NoWrapping"/>
+            <AcceptsMouseTooltip val="true"/>
+
+            <StateGroup name="SelectedStateGroup">
+                <State name="SelectedState">
+                    <When type="Property" frame="$parent" Toggled="true"/>
+                    <Action type="SetProperty" frame="$this" Style="@Coop_CommanderTabButton_Selected"/>
+                </State>
+            </StateGroup>
+        </Frame>
+    </Frame>
+    
+    <Frame type="Button" name="TabButtonRightTemplate" template="ClubListPanel/TabButtonTemplate">
+        <Frame type="Image" name="NormalFrameImage">
+            <Texture val="@UI/Glues_Battlenet_TabButton_Right_Normal" layer="0"/>
+        </Frame>
+        
+        <Frame type="Image" name="HoverFrameImage">
+            <Texture val="@UI/Glues_Battlenet_TabButton_Right_Over" layer="0"/>
+        </Frame>
+        
+        <Frame type="Image" name="SelectedFrameImage">
+            <Texture val="@UI/Glues_Battlenet_TabButton_Right_Selected"/>
+        </Frame>
+        
+        <Frame type="Label" name="Label">
+            <Anchor side="Left" relative="$parent" pos="Min" offset="20"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="-15"/>
+            <Options val="Ellipsis | TooltipIfTruncated | NoWrapping"/>
+            <AcceptsMouseTooltip val="true"/>
+        </Frame>
+    </Frame>
+
+    <Frame type="BattleClubFrame" name="ClubItemTemplate">
+        <UseChatSessionMembers val="true"/>
+        
         <Frame type="Frame" name="Container">
             <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
             <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
@@ -14,19 +117,16 @@
                 <Anchor side="Left" relative="$parent" pos="Min" offset="7"/>
                 <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
                 <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
-                <Visible val="false"/>
+                <Visible val="true"/>
 
-                <Animation name="IconVisibility">
-                    <Event event="HideIcon" action="Reset" frame="$parent/$parent"/>
-                    <Event event="ShowIcon" action="Reset,Play" frame="$parent/$parent"/>
-                    <Event event="ShowIconClanDefault" action="Reset" frame="$parent/$parent"/>
-                    <Event event="ShowHasNoClan" action="Reset" frame="$parent/$parent"/>
+                <StateGroup name="IconStateGroup">
+                    <State name="DefaultState">
+                        <When type="Property" frame="$parent/$parent" Icon=""/>
+                        <Action type="SetProperty" frame="DefaultImage" Visible="true"/>
+                        <Action type="SetProperty" frame="ClubImage" Visible="false"/>
+                    </State>
+                </StateGroup>
 
-                    <Controller type="Visibility" end="Pause" frame="$parent/ClubImageContainer">
-                        <Key type="Bool" time="0" value="True"/>
-                    </Controller>
-                </Animation>
-                
                 <Frame type="Image" name="ClubFrameImage">
                     <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
                     <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
@@ -34,96 +134,88 @@
                     <Width val="61"/>
                     <Texture val="@UI/Glues_ClubListPanel_ClubListBackground"/>
                 </Frame>
+
+                <Frame type="Image" name="DefaultImage">
+                    <Anchor side="Top" relative="$parent" pos="Min" offset="6"/>
+                    <Anchor side="Left" relative="$parent" pos="Min" offset="6"/>
+                    <Height val="50"/>
+                    <Width val="50"/>
+                    <Visible val="false"/>
+
+                    <StateGroup name="CategoryStateGroup">
+                        <State name="ClanState">
+                            <When type="Property" frame="$parent/$parent/$parent" IsClan="true"/>
+                            <Action type="SetProperty" frame="$this" Texture="@UI/Glues_ClubListPanel_Icons_ClanToast"/>
+                        </State>
+                
+                        <State name="CommunityState">
+                            <When type="Property" frame="$parent/$parent/$parent" Category="Community"/>
+                            <Action type="SetProperty" frame="$this" Texture="@UI/Glues_ClubListPanel_OnlineCommIcon"/>
+                        </State>
+
+                        <State name="BarcraftState">
+                            <When type="Property" frame="$parent/$parent/$parent" Category="Barcraft"/>
+                            <Action type="SetProperty" frame="$this" Texture="@UI/Glues_ClubListPanel_BarcraftIcon"/>
+                        </State>
+
+                        <State name="EsportsTeamsState">
+                            <When type="Property" frame="$parent/$parent/$parent" Category="EsportsTeams"/>
+                            <Action type="SetProperty" frame="$this" Texture="@UI/Glues_ClubListPanel_ProPlayersIcon"/>
+                        </State>
+
+                        <State name="CoachingState">
+                            <When type="Property" frame="$parent/$parent/$parent" Category="Coaching"/>
+                            <Action type="SetProperty" frame="$this" Texture="@UI/Glues_ClubListPanel_StrategyIcon"/>
+                        </State>
+
+                        <State name="CompanyState">
+                            <When type="Property" frame="$parent/$parent/$parent" Category="Company"/>
+                            <Action type="SetProperty" frame="$this" Texture="@UI/Glues_ClubListPanel_CompanyIcon"/>
+                        </State>
+
+                        <State name="RegionState">
+                            <When type="Property" frame="$parent/$parent/$parent" Category="Region"/>
+                            <Action type="SetProperty" frame="$this" Texture="@UI/Glues/ClubListPanel_RegionalIcon"/>
+                        </State>
+
+                        <State name="SchoolState">
+                            <When type="Property" frame="$parent/$parent/$parent" Category="School"/>
+                            <Action type="SetProperty" frame="$this" Texture="@UI/Glues/ClubListPanel_SchoolsIcon"/>
+                        </State>
+
+                        <State name="ShoutcastState">
+                            <When type="Property" frame="$parent/$parent/$parent" Category="Shoutcast"/>
+                            <Action type="SetProperty" frame="$this" Texture="@UI/Glues/ClubListPanel_BroadcastersIcon"/>
+                        </State>
+
+                        <State name="OtherState">
+                            <When type="Property" frame="$parent/$parent/$parent" Category="Other"/>
+                            <Action type="SetProperty" frame="$this" Texture="@UI/Glues/ClubListPanel_OtherIcon"/>
+                        </State>
+
+                        <State name="EsportsLeaguesState">
+                            <When type="Property" frame="$parent/$parent/$parent" Category="EsportsLeagues"/>
+                            <Action type="SetProperty" frame="$this" Texture="@UI/Glues_ClubListPanel_TournamentsIcon"/>
+                        </State>
+
+                        <State name="ArcadeState">
+                            <When type="Property" frame="$parent/$parent/$parent" Category="Arcade"/>
+                            <Action type="SetProperty" frame="$this" Texture="@UI/Glues_ClubListPanel_ArcadeIcon"/>
+                        </State>
+
+                        <State name="IgrState">
+                            <When type="Property" frame="$parent/$parent/$parent" Category="Igr"/>
+                            <Action type="SetProperty" frame="$this" Texture="@UI/Glues/ClubListPanel_IGRIcon"/>
+                        </State>
+                    </StateGroup>
+                </Frame>
                 
                 <Frame type="Image" name="ClubImage">
                     <Anchor side="Top" relative="$parent" pos="Min" offset="6"/>
                     <Anchor side="Left" relative="$parent" pos="Min" offset="6"/>
                     <Height val="50"/>
                     <Width val="50"/>
-
-                    <Animation name="IconArcade">
-                        <Event event="ShowIconArcade" action="Reset,Play" frame="$parent/$parent/$parent"/>
-                        <Controller type="Texture" end="Pause">
-                            <Key type="Image" time="0" image="@UI/Glues_ClubListPanel_ArcadeIcon"/>
-                        </Controller>
-                    </Animation>
-
-                    <Animation name="IconBarcraft">
-                        <Event event="ShowIconBarcraft" action="Reset,Play" frame="$parent/$parent/$parent"/>
-                        <Controller type="Texture" end="Pause">
-                            <Key type="Image" time="0" image="@UI/Glues_ClubListPanel_BarcraftIcon"/>
-                        </Controller>
-                    </Animation>
-
-                    <Animation name="IconCoaching">
-                        <Event event="ShowIconCoaching" action="Reset,Play" frame="$parent/$parent/$parent"/>
-                        <Controller type="Texture" end="Pause">
-                            <Key type="Image" time="0" image="@UI/Glues_ClubListPanel_StrategyIcon"/>
-                        </Controller>
-                    </Animation>
-
-                    <Animation name="IconCommunity">
-                        <Event event="ShowIconCommunity" action="Reset,Play" frame="$parent/$parent/$parent"/>
-                        <Controller type="Texture" end="Pause">
-                            <Key type="Image" time="0" image="@UI/Glues_ClubListPanel_OnlineCommIcon"/>
-                        </Controller>
-                    </Animation>
-
-                    <Animation name="IconCompany">
-                        <Event event="ShowIconCompany" action="Reset,Play" frame="$parent/$parent/$parent"/>
-                        <Controller type="Texture" end="Pause">
-                            <Key type="Image" time="0" image="@UI/Glues_ClubListPanel_CompanyIcon"/>
-                        </Controller>
-                    </Animation>
-
-                    <Animation name="IconEsportsLeagues">
-                        <Event event="ShowIconEsportsLeagues" action="Reset,Play" frame="$parent/$parent/$parent"/>
-                        <Controller type="Texture" end="Pause">
-                            <Key type="Image" time="0" image="@UI/Glues_ClubListPanel_TournamentsIcon"/>
-                        </Controller>
-                    </Animation>
-
-                    <Animation name="IconEsportsTeams">
-                        <Event event="ShowIconEsportsTeams" action="Reset,Play" frame="$parent/$parent/$parent"/>
-                        <Controller type="Texture" end="Pause">
-                            <Key type="Image" time="0" image="@UI/Glues_ClubListPanel_ProPlayersIcon"/>
-                        </Controller>
-                    </Animation>
-
-                    <Animation name="IconIGR">
-                        <Event event="ShowIconIGR" action="Reset,Play" frame="$parent/$parent/$parent"/>
-                        <Controller type="Texture" end="Pause">
-                            <Key type="Image" time="0" image="@UI/Glues/ClubListPanel_IGRIcon"/>
-                        </Controller>
-                    </Animation>
-
-                    <Animation name="IconOther">
-                        <Event event="ShowIconOther" action="Reset,Play" frame="$parent/$parent/$parent"/>
-                        <Controller type="Texture" end="Pause">
-                            <Key type="Image" time="0" image="@UI/Glues/ClubListPanel_OtherIcon"/>
-                        </Controller>
-                    </Animation>
-
-                    <Animation name="IconRegion">
-                        <Event event="ShowIconRegion" action="Reset,Play" frame="$parent/$parent/$parent"/>
-                        <Controller type="Texture" end="Pause">
-                            <Key type="Image" time="0" image="@UI/Glues/ClubListPanel_RegionalIcon"/>
-                        </Controller>
-                    </Animation>
-
-                    <Animation name="IconSchool">
-                        <Event event="ShowIconSchool" action="Reset,Play" frame="$parent/$parent/$parent"/>
-                        <Controller type="Texture" end="Pause">
-                            <Key type="Image" time="0" image="@UI/Glues/ClubListPanel_SchoolsIcon"/>
-                        </Controller>
-                    </Animation>
-
-                    <Animation name="IconShoutcast">
-                        <Event event="ShowIconShoutcast" action="Reset,Play" frame="$parent/$parent/$parent"/>
-                        <Controller type="Texture" end="Pause">
-                            <Key type="Image" time="0" image="@UI/Glues/ClubListPanel_BroadcastersIcon"/>
-                        </Controller>
-                    </Animation>
+                    <Texture val="{$parent/$parent/$parent/@Icon}"/>
                 </Frame>
             </Frame>
 
@@ -132,35 +224,37 @@
                 <Anchor side="Left" relative="$parent" pos="Min" offset="2"/>
                 <Texture val="@UI/Glues_ClubListPanel_Icons_ClanToast"/>
                 <Visible val="False"/>
-
-                <Animation name="ClanIconVisibility">
-                    <Event event="ShowIconClanDefault" action="Reset,Play" frame="$parent/$parent"/>
-                    <Event event="HideClanIcon" action="Reset" frame="$parent/$parent"/>
-                    <Event event="ShowHasNoClan" action="Reset" frame="$parent/$parent"/>
-                    <Event event="ShowIcon" action="Reset" frame="$parent/$parent"/>
-
-                    <Controller type="Visibility" end="Pause">
-                        <Key type="Bool" time="0" value="True"/>
-                    </Controller>
-                </Animation>
             </Frame>
 
+            <StateGroup name="IconStateGroup">
+                <State name="EmptyClubState">
+                    <When type="Property" frame="$parent/$parent" ClubId="0"/>
+                    <Action type="SetProperty" frame="ClanIcon" Visible="false"/>
+                    <Action type="SetProperty" frame="ClubImageContainer" Visible="false"/>
+                </State>
+                
+                <State name="DefaultClanState">
+                    <When type="Property" frame="$parent/$parent" Icon=""/>
+                    <When type="Property" frame="$parent/$parent" IsClan="true"/>
+                    <Action type="SetProperty" frame="ClanIcon" Visible="true"/>
+                    <Action type="SetProperty" frame="ClubImageContainer" Visible="false"/>
+                </State>
+            </StateGroup>
+
             <Frame type="Image" name="EventImage">
-                <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
-                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Top" relative="$parent" pos="Min" offset="-1"/>
+                <Anchor side="Left" relative="$parent/ClubImageContainer/ClubFrameImage" pos="Max" offset="-30"/>
                 <Height val="29"/>
                 <Width val="30"/>
                 <Texture val="@UI/Glues_EventTodayIcon"/>
                 <Visible val="false"/>
 
-                <Animation name="EventVisibility">
-                    <Event event="ShowCurrentEvent" action="Reset,Play" frame="$parent/$parent"/>
-                    <Event event="HideCurrentEvent" action="Reset" frame="$parent/$parent"/>
-
-                    <Controller type="Visibility" end="Pause">
-                        <Key type="Bool" time="0" value="True"/>
-                    </Controller>
-                </Animation>
+                <StateGroup name="HasEventStateGroup">
+                    <State name="HasEventState">
+                        <When type="Property" frame="$parent/$parent" operator="GreaterThan" CurrentEventCount="0"/>
+                        <Action type="SetProperty" frame="$this" Visible="true"/>
+                    </State>
+                </StateGroup>
             </Frame>
 
             <Frame type="Label" name="GroupName">
@@ -169,6 +263,16 @@
                 <Anchor side="Left" relative="$parent/ClanIcon" pos="Max" offset="5"/>
                 <Anchor side="Right" relative="$parent/RankImage" pos="Min" offset="-4"/>
                 <Height val="22"/>
+                <Text val="{$parent/$parent/@DisplayName}"/>
+                <Options val="Ellipsis | TooltipIfTruncated | NoWrapping"/>
+                <AcceptsMouseTooltip val="true"/>
+            </Frame>
+
+            <Frame type="TextFormatFrame" name="StatusFormatFrame">
+                <Anchor relative="$parent"/>
+                <FormatText val="@UI/ClubPanel/PlayersOnline"/>
+                <Replacement index="0" val="{$parent/$parent/@ChatMemberCount}"/>
+                <Replacement index="1" val="{$parent/$parent/@OnlineCount}"/>
             </Frame>
 
             <Frame type="Label" name="Status">
@@ -177,6 +281,7 @@
                 <Anchor side="Left" relative="$parent/GroupName" pos="Min" offset="0"/>
                 <Anchor side="Right" relative="$parent/GroupName" pos="Max" offset="0"/>
                 <Height val="20"/>
+                <Text val="{$parent/StatusFormatFrame/@Text}"/>
             </Frame>
 
             <Frame type="Image" name="RankImage">
@@ -184,47 +289,24 @@
                 <Anchor side="Right" relative="$parent" pos="Max" offset="-17"/>
                 <Width val="40"/>
                 <Height val="45"/>
-                <AcceptsMouse val="true"/>
+                <AcceptsMouseTooltip val="true"/>
                 <Visible val="false"/>
-                
-                <Animation name="RankIconVisiblity">
-                    <Event event="HideRankIcon" action="Reset" frame="$parent/$parent"/>
-                    <Event event="ShowIconOfficer" action="Reset,Play" frame="$parent/$parent"/>
-                    <Event event="ShowIconOwner" action="Reset,Play" frame="$parent/$parent"/>
 
-                    <Controller type="Visibility" end="Pause">
-                        <Key type="Bool" time="0" value="False"/>
-                        <Key type="Bool" time=".01" value="True"/>
-                    </Controller>
-                </Animation>
-
-                <Animation name="IconOfficer">
-                    <Event event="ShowIconOfficer" action="Reset,Play" frame="$parent/$parent"/>
-
-                    <Controller type="Texture" end="Pause">
-                        <Key type="Image" time="0" image="@UI/Glues_ClubListPanel_Icon_ClanMember"/>
-                        <Key type="Image" time="0.01" image="@UI/Glues_ClubListPanel_Icon_ClanMember"/>
-                    </Controller>
-
-                    <Controller type="Tooltip" end="Pause">
-                        <Key type="Text" time="0" text=""/>
-                        <Key type="Text" time="0.01" text="@UI/Club/Ranknames/Officer"/>
-                    </Controller>
-                </Animation>
-
-                <Animation name="IconOwner">
-                    <Event event="ShowIconOwner" action="Reset,Play" frame="$parent/$parent"/>
-
-                    <Controller type="Texture" end="Pause">
-                        <Key type="Image" time="0" image="@UI/Glues_ClubListPanel_Icons_ClanLeader"/>
-                        <Key type="Image" time="0.01" image="@UI/Glues_ClubListPanel_Icons_ClanLeader"/>
-                    </Controller>
-
-                    <Controller type="Tooltip" end="Pause">
-                        <Key type="Text" time="0" text=""/>
-                        <Key type="Text" time="0.01" text="@UI/Club/Ranknames/Owner"/>
-                    </Controller>
-                </Animation>
+                <StateGroup name="RankStateGroup">
+                    <State name="OwnerState">
+                        <When type="Property" frame="$parent/$parent" IsLocalOwner="true"/>
+                        <Action type="SetProperty" frame="$this" Texture="@UI/Glues_ClubListPanel_Icons_ClanLeader"/>
+                        <Action type="SetProperty" frame="$this" Tooltip="@UI/Club/Ranknames/Owner"/>
+                        <Action type="SetProperty" frame="$this" Visible="true"/>
+                    </State>
+                    
+                    <State name="OfficerState">
+                        <When type="Property" frame="$parent/$parent" IsLocalOfficer="true"/>
+                        <Action type="SetProperty" frame="$this" Texture="@UI/Glues_ClubListPanel_Icon_ClanMember"/>
+                        <Action type="SetProperty" frame="$this" Tooltip="@UI/Club/Ranknames/Officer"/>
+                        <Action type="SetProperty" frame="$this" Visible="true"/>
+                    </State>
+                </StateGroup>
             </Frame>
         </Frame>
     </Frame>
@@ -235,26 +317,223 @@
         <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
         <Height val="74"/>
 
-        <Frame name="ClubItem" type="ClubItem" template="ClubListPanel/ClubItemTemplate">
-            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
-            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
-            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
-            <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+        <Frame type="BattleClubFrame" name="ClubItem" template="ClubListPanel/ClubItemTemplate">
+            <Anchor relative="$parent"/>
+            <ClubId val="{$parent/@ClubId}"/>
         </Frame>
     </Frame>
 
-    <Frame type="ScrollBar" name="ChatScrollBarTemplate" template="StandardBattlenetTemplates/GluesSocialScrollBarTemplate">
-        <Animation name="FadeScrollbar">
-            <Event event="EditBoxFocusLost" action="DirectionForward" frame="$parent/$parent/$parent"/>
-            <Event event="EditBoxFocusLost" action="Play" frame="$parent/$parent/$parent"/>
-            <Event event="EditBoxFocusGained" action="DirectionReverse" frame="$parent/$parent/$parent"/>
-            <Event event="EditBoxFocusGained" action="Play" frame="$parent/$parent/$parent"/>
+    <Frame type="ClubEventListBoxItem" name="ClubEventListBoxItem">
+        <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+        <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+        <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+        
+        <Frame type="Frame" name="TitleContainer">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+            <Height val="40"/>
+            <CollapseLayout val="true"/>
+            <Visible val="false"/>
+            
+            <Frame type="Image" name="TitleBorderImage">
+                <Anchor relative="$parent" offset="0"/>
+                <Texture val="@UI/Glues_Battlenet_PageAssets_ChatPanelCategoryBg"/>
+                <TextureType val="Nineslice"/>
+            </Frame>
+            
+            <Frame type="Label" name="TitleLabel">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="3"/>
+                <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="10"/>
+                <Anchor side="Right" relative="$parent" pos="Max" offset="10"/>
+                <Style val="ChatMembersTitleLabel"/>
+                <AcceptsMouseTooltip val="true"/>
+                <Options val="Ellipsis | TooltipIfTruncated | NoWrapping"/>
+                <Text val="@UI/ClubListPanel/CurrentEvents"/>
 
-            <Controller name="Fade" type="Fade" end="Pause">
-                <Key type="Curve" time="0" value="230" out="Auto"/>
-                <Key type="Curve" time="0.5" value="0" out="Auto"/>
-            </Controller>
-        </Animation>
+                <StateGroup name="UpcomingStateGroup">
+                    <State name="UpcomingState">
+                        <When type="Property" frame="$parent/$parent" IsCurrent="false"/>
+                        <Action type="SetProperty" frame="$this" Text="@UI/ClubListPanel/UpcomingEvents"/>
+                    </State>
+                </StateGroup>
+            </Frame>
+        </Frame>
+        
+        <Frame type="Frame" name="EventContainer">
+            <Anchor side="Top" relative="$parent/TitleContainer" pos="Max" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+            <Height val="74"/>
+            <CollapseLayout val="true"/>
+            <Visible val="true"/>
+            
+            <Frame type="BattleClubFrame" name="ClubFrame">
+                <Anchor relative="$parent"/>
+                <ClubId val="{$parent/$parent/@ClubId}"/>
+            </Frame>
+        
+            <!-- TODO: Put these in a template? -->
+            <Frame type="Image" name="IconImage">
+                <Anchor side="Top" relative="$parent/IconImageFrame" pos="Min" offset="6"/>
+                <Anchor side="Left" relative="$parent/IconImageFrame" pos="Min" offset="6"/>
+                <Width val="50"/>
+                <Height val="50"/>
+                <Texture val="{$parent/ClubFrame/@Icon}"/>
+            </Frame>
+
+            <Frame type="Image" name="DefaultIconImage">
+                <Anchor side="Top" relative="$parent/IconImageFrame" pos="Min" offset="6"/>
+                <Anchor side="Left" relative="$parent/IconImageFrame" pos="Min" offset="6"/>
+                <Width val="50"/>
+                <Height val="50"/>
+                <Visible val="false"/>
+
+                <StateGroup name="CategoryStateGroup">
+                    <State name="ClanState">
+                        <When type="Property" frame="$parent/ClubFrame" IsClan="true"/>
+                        <Action type="SetProperty" frame="$this" Texture="@UI/Glues_ClubListPanel_Icons_ClanToast"/>
+                    </State>
+
+                    <State name="CommunityState">
+                        <When type="Property" frame="$parent/ClubFrame" Category="Community"/>
+                        <Action type="SetProperty" frame="$this" Texture="@UI/Glues_ClubListPanel_OnlineCommIcon"/>
+                    </State>
+
+                    <State name="BarcraftState">
+                        <When type="Property" frame="$parent/ClubFrame" Category="Barcraft"/>
+                        <Action type="SetProperty" frame="$this" Texture="@UI/Glues_ClubListPanel_BarcraftIcon"/>
+                    </State>
+
+                    <State name="EsportsTeamsState">
+                        <When type="Property" frame="$parent/ClubFrame" Category="EsportsTeams"/>
+                        <Action type="SetProperty" frame="$this" Texture="@UI/Glues_ClubListPanel_ProPlayersIcon"/>
+                    </State>
+
+                    <State name="CoachingState">
+                        <When type="Property" frame="$parent/ClubFrame" Category="Coaching"/>
+                        <Action type="SetProperty" frame="$this" Texture="@UI/Glues_ClubListPanel_StrategyIcon"/>
+                    </State>
+
+                    <State name="CompanyState">
+                        <When type="Property" frame="$parent/ClubFrame" Category="Company"/>
+                        <Action type="SetProperty" frame="$this" Texture="@UI/Glues_ClubListPanel_CompanyIcon"/>
+                    </State>
+
+                    <State name="RegionState">
+                        <When type="Property" frame="$parent/ClubFrame" Category="Region"/>
+                        <Action type="SetProperty" frame="$this" Texture="@UI/Glues/ClubListPanel_RegionalIcon"/>
+                    </State>
+
+                    <State name="SchoolState">
+                        <When type="Property" frame="$parent/ClubFrame" Category="School"/>
+                        <Action type="SetProperty" frame="$this" Texture="@UI/Glues/ClubListPanel_SchoolsIcon"/>
+                    </State>
+
+                    <State name="ShoutcastState">
+                        <When type="Property" frame="$parent/ClubFrame" Category="Shoutcast"/>
+                        <Action type="SetProperty" frame="$this" Texture="@UI/Glues/ClubListPanel_BroadcastersIcon"/>
+                    </State>
+
+                    <State name="OtherState">
+                        <When type="Property" frame="$parent/ClubFrame" Category="Other"/>
+                        <Action type="SetProperty" frame="$this" Texture="@UI/Glues/ClubListPanel_OtherIcon"/>
+                    </State>
+
+                    <State name="EsportsLeaguesState">
+                        <When type="Property" frame="$parent/ClubFrame" Category="EsportsLeagues"/>
+                        <Action type="SetProperty" frame="$this" Texture="@UI/Glues_ClubListPanel_TournamentsIcon"/>
+                    </State>
+
+                    <State name="ArcadeState">
+                        <When type="Property" frame="$parent/ClubFrame" Category="Arcade"/>
+                        <Action type="SetProperty" frame="$this" Texture="@UI/Glues_ClubListPanel_ArcadeIcon"/>
+                    </State>
+
+                    <State name="IgrState">
+                        <When type="Property" frame="$parent/ClubFrame" Category="Igr"/>
+                        <Action type="SetProperty" frame="$this" Texture="@UI/Glues/ClubListPanel_IGRIcon"/>
+                    </State>
+                </StateGroup>
+            </Frame>
+
+            <Frame type="Image" name="IconImageFrame">
+                <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="7"/>
+                <Height val="61"/>
+                <Width val="61"/>
+                <Texture val="@UI/Glues_ClubListPanel_ClubListBackground"/>
+                <Visible val="true"/>
+            </Frame>
+
+            <StateGroup name="IconStateGroup">
+                <State name="DefaultState">
+                    <When type="Property" frame="$this/ClubFrame" Icon=""/>
+                    <Action type="SetProperty" frame="DefaultIconImage" Visible="true"/>
+                    <Action type="SetProperty" frame="IconImage" Visible="false"/>
+                </State>
+            </StateGroup>
+
+            <Frame type="Label" name="Title">
+                <Style val="SocialPlayerName"/>
+                <Anchor side="Top" relative="$parent" pos="Min" offset="14"/>
+                <Anchor side="Left" relative="$parent/IconImage" pos="Max" offset="15"/>
+                <Anchor side="Right" relative="$parent/TimeRemaining" pos="Min" offset="-4"/>
+                <Height val="22"/>
+                <Text val="{$parent/ClubFrame/@DisplayName}"/>
+                <Options val="Ellipsis | TooltipIfTruncated | NoWrapping"/>
+                <AcceptsMouseTooltip val="true"/>
+            </Frame>
+
+            <Frame type="Label" name="Description">
+                <Style val="SocialPlayerStatus"/>
+                <Anchor side="Top" relative="$parent/Title" pos="Max" offset="3"/>
+                <Anchor side="Left" relative="$parent/Title" pos="Min" offset="0"/>
+                <Anchor side="Right" relative="$parent/Title" pos="Max" offset="0"/>
+                <Height val="20"/>
+                <Text val="{$parent/$parent/@Title}"/>
+            </Frame>
+            
+            <Frame type="TextFormatFrame" name="TimeFormatFrame">
+                <Anchor relative="$parent"/>
+                <FormatText val="@UI/ClubListPanel/TimeRemainingCurrent"/>
+                <Replacement index="0" val="{$parent/$parent/@TimeText}"/>
+                
+                <StateGroup name="UpcomingStateGroup">
+                    <State name="UpcomingState">
+                        <When type="Property" frame="$parent/$parent" IsCurrent="false"/>
+                        <Action type="SetProperty" frame="$this" FormatText="@UI/ClubListPanel/TimeRemainingUpcoming"/>
+                    </State>
+                </StateGroup>
+            </Frame>
+
+            <Frame type="Label" name="TimeRemaining">
+                <Style val="SocialPlayerStatus"/>
+                <Anchor side="Top" relative="$parent" pos="Min" offset="14"/>
+                <Anchor side="Right" relative="$parent" pos="Max" offset="-4"/>
+                <Text val="{$parent/TimeFormatFrame/@Text}"/>
+            </Frame>
+        </Frame>
+        
+        <Frame type="Frame" name="AnchorFrame">
+            <Anchor side="Top" relative="$parent/TitleContainer" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+            <Anchor side="Bottom" relative="$parent/EventContainer" pos="Max" offset="0"/>
+        </Frame>
+
+        <StateGroup name="VisibleStateGroup">
+            <State name="TitleState">
+                <When type="Property" frame="$this" ClubId="0"/>
+                <Action type="SetProperty" frame="TitleContainer" Visible="true"/>
+                <Action type="SetProperty" frame="EventContainer" Visible="false"/>
+            </State>
+        </StateGroup>
+    </Frame>
+
+    <Frame type="ScrollBar" name="ChatScrollBarTemplate" template="StandardBattlenetTemplates/GluesSocialScrollBarTemplate">
     </Frame>
 
     <Frame type="Image" name="ClubListBoxBackground">
@@ -285,6 +564,7 @@
         <SelectedImage val="$root/ClubListPanel/ClubListSelected"/>
         <HoverImage val="$root/ClubListPanel/ClubListHover"/>
         <HighlightOnHover val="true"/>
+        <ItemHeight val="74"/>
         
         <ItemDesc val="ClubListPanel/ClubListBoxItem"/>
         <ScrollBar val="ScrollBar"/>
@@ -331,41 +611,72 @@
             <Anchor side="Bottom" relative="$parent/FindGroupButton" pos="Min" offset="-3"/>
             <Texture val="@UI/Glues_Battlenet_PageAssets_MainInnerContainer"/>
             <TextureType val="Nineslice"/>
+            <Visible val="{$parent/ClubListContainer/@Visible}"/>
+        </Frame>
+        
+        <Frame type="Image" name="ClubEventListContainerInnerBorderImage">
+            <Anchor side="Left" relative="$parent" pos="Min" offset="15"/>
+            <Anchor side="Top" relative="$parent/TabControl" pos="Max" offset="5"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="-15"/>
+            <Anchor side="Bottom" relative="$parent/FindGroupButton" pos="Min" offset="-3"/>
+            <Texture val="@UI/Glues_Battlenet_PageAssets_MainInnerContainer"/>
+            <TextureType val="Nineslice"/>
+            <Visible val="{$parent/ClubEventListPanel/@Visible}"/>
+        </Frame>
+        
+        <Frame type="ClubEventListPanel" name="ClubEventListPanel">
+            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>  
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+            <AcceptsMouse val="true"/>
+            <Visible val="true"/>
+
+            <Frame type="TreeView" name="EventListBox" template="ClubListPanel/ClubListBoxTemplate">
+                <Anchor side="Top" relative="$parent/$parent/ClubEventListContainerInnerBorderImage" pos="Min" offset="5"/>
+                <Anchor side="Left" relative="$parent/$parent/ClubEventListContainerInnerBorderImage" pos="Min" offset="5"/>
+                <Anchor side="Bottom" relative="$parent/$parent/ClubEventListContainerInnerBorderImage" pos="Max" offset="-5"/>
+                <Anchor side="Right" relative="$parent/$parent/ClubEventListContainerInnerBorderImage" pos="Max" offset="-5"/>
+                <ItemDesc val="ClubListPanel/ClubEventListBoxItem"/>
+                <ItemHeight val="0"/>
+            </Frame>
+
+            <Frame type="Label" name="NoResultsLabel">
+                <Anchor side="Top" relative="$parent/EventListBox" pos="Mid" offset="0"/>
+                <Anchor side="Bottom" relative="$parent/EventListBox" pos="Mid" offset="0"/>
+                <Anchor side="Left" relative="$parent/EventListBox" pos="Min" offset="0"/>
+                <Anchor side="Right" relative="$parent/EventListBox" pos="Max" offset="0"/>
+                <Style val="@ClubProfileNoResultsLabel"/>
+                <Text val="@UI/ClubEventListPanel/NoResults"/>
+                <Visible val="false"/>
+            </Frame>
+
+            <StateGroup name="SearchingStateGroup">
+                <State name="NoResultsState">
+                    <When type="Property" frame="EventListBox" DataCount="0"/>
+                    <Action type="SetProperty" frame="NoResultsLabel" Visible="true"/>
+                </State>
+            </StateGroup>
+
+            <Frame type="BattleClubContextMenu" name="ItemContextMenu" template="BattleClubContextMenu/BattleClubContextMenu">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+            </Frame>
         </Frame>
         
         <Frame type="Frame" name="ClubListContainer">
             <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
             <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
-            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>  
             <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
             <AcceptsMouse val="true"/>
-            <Visible val="false"/>
-
-            <Animation name="ClubListVisibility">
-                <Event event="ShowClubEmpty" action="Reset" frame="$parent"/>
-                <Event event="HideClubEmpty" action="Reset,Play" frame="$parent"/>
-
-                <Controller type="Visibility" end="Pause" frame="$parent/ClubListContainer">
-                    <Key type="Bool" time="0" value="True"/>
-                </Controller>
-            </Animation>
+            <Visible val="true"/>
 
             <Frame type="ListBox" name="ClubListBox" template="ClubListPanel/ClubListBoxTemplate">
                 <Anchor side="Top" relative="$parent/$parent/ClubListContainerInnerBorderImage" pos="Min" offset="5"/>
                 <Anchor side="Left" relative="$parent/$parent/ClubListContainerInnerBorderImage" pos="Min" offset="5"/>
                 <Anchor side="Bottom" relative="$parent/$parent/ClubListContainerInnerBorderImage" pos="Max" offset="-5"/>
                 <Anchor side="Right" relative="$parent/$parent/ClubListContainerInnerBorderImage" pos="Max" offset="-5"/>
-                
-                <Frame type="ScrollBar" name="ScrollBar">
-                    <Animation name="SocialPanelEmptyScrollbarFiller">
-                        <Event event="OnShown" action="Reset,Play"/>
-                        <Event event="OnHidden" action="Reset"/>
-
-                        <Controller type="Visibility" end="Pause" frame="$parent/$parent/ScrollBarLine">
-                            <Key type="Bool" time="0" value="false"/>
-                        </Controller>
-                    </Animation>
-                </Frame>
             </Frame>
             
             <Frame type="Image" name="ClubBgImage">
@@ -376,16 +687,6 @@
                 <TextureType val="Nineslice"/>
                 <Texture val="@UI/Glues_Battlenet_PageAssets_MainInnerContainer"/>
             </Frame>
-            
-            <Frame type="Image" name="ScrollBarLine">
-                <Anchor side="Top" relative="$parent/$parent/ClubListContainerInnerBorderImage" pos="Min" offset="1"/>
-                <Anchor side="Bottom" relative="$parent/$parent/ClubListContainerInnerBorderImage" pos="Max" offset="-1"/>
-                <Anchor side="Right" relative="$parent/$parent/ClubListContainerInnerBorderImage" pos="Max" offset="-12"/>
-                <Width val="3"/>
-                <TextureType val="Nineslice"/>
-                <Texture val="@UI/ChatPanelScrollBarLine"/>
-                <Visible val="true"/>
-            </Frame>
 
             <Frame type="Frame" name="NoClanFrame">
                 <Anchor side="Top" relative="$parent/ClubBgImage" pos="Min" offset="0"/>
@@ -394,14 +695,12 @@
                 <Height val="84"/>
                 <Visible val="false"/>
 
-                <Animation name="NoClanVisibility">
-                    <Event event="ShowHasNoClan" action="Reset,Play" frame="$parent/$parent"/>
-                    <Event event="HideHasNoClan" action="Reset" frame="$parent/$parent"/>
-
-                    <Controller type="Visibility" end="Pause" frame="$this">
-                        <Key type="Bool" time="0" value="True"/>
-                    </Controller>
-                </Animation>
+                <StateGroup name="NoClanStateGroup">
+                    <State name="NoClanState">
+                        <When type="Property" frame="$parent/$parent" ClanId="0"/>
+                        <Action type="SetProperty" frame="$this" Visible="true"/>
+                    </State>
+                </StateGroup>
                 
                 <Frame type="Image" name="NoClanIcon">
                     <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
@@ -422,36 +721,42 @@
                 </Frame>
             </Frame>
 
-            <Frame type="ClanItem" name="Clan">
+            <Frame type="BattleClubContextMenu" name="ClanContextMenu" template="BattleClubContextMenu/BattleClubContextMenu">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                <ClubId val="{$ClubListPanel/@ClanId}"/>
+            </Frame>
+
+            <Frame type="Control" name="Clan">
                 <Anchor side="Top" relative="$parent" pos="Min" offset="64"/>
                 <Anchor side="Left" relative="$parent" pos="Min" offset="15"/>
                 <Anchor side="Right" relative="$parent" pos="Max" offset="-15"/>
                 <Height val="84"/>
                 <AcceptsMouse val="true"/>
                 <Visible val="False"/>
-                
-                <Animation name="HasClanVisibility">
-                    <Event event="ShowHasNoClan" action="Reset" frame="$parent/$parent"/>
-                    <Event event="HideHasNoClan" action="Reset,Play" frame="$parent/$parent"/>
+                <ContextMenu val="$parent/ClanContextMenu"/>
 
-                    <Controller type="Visibility" end="Pause" frame="$this">
-                        <Key type="Bool" time="0" value="True"/>
-                    </Controller>
-                </Animation>
+                <StateGroup name="HasClanStateGroup">
+                    <State name="HasClanState">
+                        <When type="Property" frame="$ClubListPanel" operator="NotEqual" ClanId="0"/>
+                        <Action type="SetProperty" frame="$this" Visible="true"/>
+                    </State>
+                </StateGroup>
 
-                <Frame type="ClubItem" name="Item" template="ClubListPanel/ClubItemTemplate">
+                <Frame type="BattleClubFrame" name="Item" template="ClubListPanel/ClubItemTemplate">
                     <Anchor side="Top" relative="$parent" pos="Min" offset="5"/>
                     <Anchor side="Left" relative="$parent" pos="Min" offset="5"/>
                     <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
                     <Height Val="80"/>
+                    <ClubId val="{$ClubListPanel/@ClanId}"/>
 
                     <Frame type="Frame" name="Container">
                         <Frame type="Label" name="GroupName">
-                            <Anchor side="Top" relative="$parent" pos="Min" offset="22"/>
+                            <Anchor side="Top" relative="$parent" pos="Min" offset="14"/>
                         </Frame>
 
                         <Frame type="Image" name="RankImage">
-                            <Anchor side="Right" relative="$parent" pos="Max" offset="-35"/>
+                            <Anchor side="Right" relative="$parent" pos="Max" offset="-23"/>
                         </Frame>
                     </Frame>
                 </Frame>
@@ -465,24 +770,6 @@
             <Width val="392"/>
             <Height val="783"/>
             <Visible val="false"/>
-            
-            <Animation name="ClubListEmptyScrollbarFiller">
-                <Event event="OnShown" action="Reset,Play"/>
-                <Event event="OnHidden" action="Reset"/>
-
-                <Controller type="Visibility" end="Pause" frame="$parent/ClubListContainer/ScrollBarLine">
-                    <Key type="Bool" time="0" value="false"/>
-                </Controller>
-            </Animation>
-
-            <Animation name="ClubListEmptyVisibility">
-                <Event event="ShowClubEmpty" action="Reset,Play" frame="$parent"/>
-                <Event event="HideClubEmpty" action="Reset" frame="$parent"/>
-
-                <Controller type="Visibility" end="Pause" frame="$parent/ClubListContainerEmpty">
-                    <Key type="Bool" time="0" value="True"/>
-                </Controller>
-            </Animation>
 
             <Frame type="Image" name="ClubListEmptyImage">
                 <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
@@ -519,17 +806,69 @@
             </Frame>
         </Frame>
 
+        <StateGroup name="ClubListStateGroup">
+            <State name="EmptyState">
+                <When type="Property" frame="ClubListContainer/ClubListBox" DataCount="0"/>
+                <When type="Property" frame="$this" ClanId="0"/>
+                <Action type="SetProperty" frame="ClubListContainer" Visible="false"/>
+                <Action type="SetProperty" frame="ClubEventListPanel" Visible="false"/>
+                <Action type="SetProperty" frame="ClubListContainerEmpty" Visible="true"/>
+            </State>
+            <State name="GroupsState">
+                <When type="Property" frame="TabControl" SelectedIndex="0"/>
+                <Action type="SetProperty" frame="ClubListContainer" Visible="true"/>
+                <Action type="SetProperty" frame="ClubEventListPanel" Visible="false"/>
+                <Action type="SetProperty" frame="ClubListContainerEmpty" Visible="false"/>
+            </State>
+            <State name="EventsState">
+                <When type="Property" frame="TabControl" SelectedIndex="1"/>
+                <Action type="SetProperty" frame="ClubListContainer" Visible="false"/>
+                <Action type="SetProperty" frame="ClubEventListPanel" Visible="true"/>
+                <Action type="SetProperty" frame="ClubListContainerEmpty" Visible="false"/>
+            </State>
+        </StateGroup>
+
+        <!-- TODO: Show ClubListLabel and hide TabControl if we want to turn off the events list -->
         <Frame type="Label" name="ClubListLabel">
             <Anchor side="Top" relative="$parent/ClubListContainer" pos="Min" offset="25"/>
             <Anchor side="Left" relative="$parent/ClubListContainer" pos="Min" offset="20"/>
             <Style val="SocialPlayerNameLabel"/>
             <Text val="@UI/Community/Club/Types/GroupPlural"/>
+            <Visible val="false"/>
+        </Frame>
+
+        <Frame type="TabControl" name="TabControl">
+            <Anchor side="Top" relative="$parent/ClubListContainer" pos="Min" offset="17"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="13"/>
+            <Anchor side="Right" relative="$parent/CloseButton" pos="Min" offset="-13"/>
+            <Height val="36"/>
+            <Visible val="true"/>
+
+            <TabListItem val="GroupsButton"/>
+            <TabListItem val="EventsButton"/>
+
+            <Frame type="Button" name="GroupsButton" template="ClubListPanel/TabButtonTemplate">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Right" relative="$parent" pos="Mid" offset="10"/>
+                <HoverSound val="@UI_HoverTick"/>
+                <Text val="@UI/ClubListPanel/GroupTitle"/>
+            </Frame>
+
+            <Frame type="Button" name="EventsButton" template="ClubListPanel/TabButtonRightTemplate">
+                <Anchor side="Top" relative="$parent/GroupsButton" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/GroupsButton" pos="Max" offset="-20"/>
+                <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+                <Text val="@UI/ClubListPanel/EventTitle"/>
+                <HoverSound val="@UI_HoverTick"/>
+            </Frame>
         </Frame>
 
         <Frame type="Button" name="CloseButton" template="SocialPanel/SocialCloseButtonTemplate">
             <Anchor side="Top" relative="$parent" pos="Min" offset="20"/>
             <Anchor side="Right" relative="$parent" pos="Max" offset="-15"/>
             <Shortcut val="@UI/ScreenNavigationBack_Hotkey"/>
+            <HoverSound val="@UI_HoverTick"/>
         </Frame>
 
         <Frame type="Button" name="FindGroupButton" template="StandardBattlenetTemplates/BattlenetSmallButtonTemplate">
@@ -538,6 +877,7 @@
             <Text val="@UI/ClubPanel/Find"/>
             <Width val="203"/>
             <AcceptsMouse val="true"/>
+            <HoverSound val="@UI_HoverTick"/>
         </Frame>
 
         <Frame type="Button" name="CreateGroupButton" template="StandardBattlenetTemplates/BattlenetSmallButtonTemplate">
@@ -546,16 +886,12 @@
             <Text val="@UI/ClubPanel/Create"/>
             <Width val="203"/>
             <AcceptsMouse val="true"/>
+            <HoverSound val="@UI_HoverTick"/>
         </Frame>
 
-        <Frame type="BattleClubContextMenu" name="ItemContextMenu" template="StandardTemplates/StandardContextMenuTemplate">
+        <Frame type="BattleClubContextMenu" name="ItemContextMenu" template="BattleClubContextMenu/BattleClubContextMenu">
             <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
             <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
-
-            <Frame type="ListBox" name="Menu">
-                <Insets top="25" left="20" bottom="25" right="8"/>
-                <ItemHoverWhileDisabled val="false"/>
-            </Frame>
         </Frame>
     </Frame>
 
@@ -564,6 +900,15 @@
         <Height val="61"/>
         <DisplayType val="ImageLayer"/>
         <ClickSound val="@UI_ActionButtonSelect"/>
+
+        <Animation name="NewEvent">
+            <Event event="CurrentEventStarted" frame="$ClubListPanel" action="Reset,Play"/>
+            <Event event="OnClick" action="Reset,Stop"/>
+
+            <Controller type="Visibility" end="Pause" frame="$this/NewEventIcon">
+                <Key type="Bool" time="0" value="true"/>
+            </Controller>
+        </Animation>
         
         <Frame type="Image" name="NormalImage">
             <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
@@ -603,6 +948,51 @@
             <DesaturateOnDisable val="false"/>
             <DisabledAlpha val="100"/>
         </Frame>
+
+        <Frame type="Image" name="NewEventIcon">
+            <Anchor relative="$parent" side="Bottom" pos="Max" offset="-8"/>
+            <Anchor relative="$parent" side="Left" pos="Min" offset="8"/>
+            <Width val="29"/>
+            <Height val="30"/>
+            <Texture val="@UI/Glues_EventTodayIcon"/>
+            <Visible val="false"/>
+
+            <Animation name="NewEventLoop">
+                <Event event="OnShown" frame="$this" action="Play"/>
+            
+                <Controller type="Fade" end="PingPong" frame="$this">
+                    <Key type="Curve" time="0" value="0" out="Auto"/>
+                    <Key type="Curve" time=".6" value="255" in="Auto"/>
+                </Controller>
+            </Animation>
+        </Frame>
+
+        <Frame type="Image" name="EventCountBackground">
+            <Anchor relative="$parent" side="Top" pos="Min" offset="-12"/>
+            <Anchor relative="$parent/EventCountLabel" side="Left" pos="Min" offset="-8"/>
+            <Anchor relative="$parent/EventCountLabel" side="Right" pos="Max" offset="7"/>
+            <Texture val="@UI/Glues_SocialPanel_SocialCounter"/>
+            <TextureType val="Nineslice"/>
+            <Height val="25"/>
+            <Unclipped val="true"/>
+        </Frame>
+
+        <Frame type="Label" name="EventCountLabel">
+            <Anchor side="Top" relative="$parent/EventCountBackground" pos="Min" offset="4"/>
+            <Anchor side="Bottom" relative="$parent/EventCountBackground" pos="Max" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+            <Style val="FriendsOnlineLabel"/>
+            <Unclipped val="true"/>
+            <Text val="{$ClubListPanel/@CurrentEventCount}"/>
+        </Frame>
+
+        <StateGroup name="EventCountStateGroup">
+            <State name="EventCountState">
+                <When type="Property" frame="$ClubListPanel" CurrentEventCount="0"/>
+                <Action type="SetProperty" frame="EventCountBackground" Visible="false"/>
+                <Action type="SetProperty" frame="EventCountLabel" Visible="false"/>
+            </State>
+        </StateGroup>
     </Frame>
 
 </Desc>

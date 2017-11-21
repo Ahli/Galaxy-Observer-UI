@@ -1,0 +1,442 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<Desc>
+    <DescFlags val="Locked"/>
+
+    <!--===========================================================================================
+    <! Main Frame
+    <!==========================================================================================-->
+
+    <Frame type="LootChestRewardsPanel" name="LootChestRewardsPanel">
+        <Anchor relative="$parent"/>
+        <MinWaitTimeMs val="220"/>
+        <MaxWaitTimeMs val="220"/>
+
+        <!--=======================================================================================
+        <! Reward Contents
+        <!======================================================================================-->
+        <Frame type="ParentCenteredFrame" name="Content">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="RewardTileList" pos="Max" offset="0"/>
+            <Anchor side="Bottom" relative="RewardTileList" pos="Max" offset="0"/>
+
+            <Frame type="TileList" name="RewardTileList" template="LootChestRewardsTileList/LootChestRewardTileListTemplate">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Right" relative="Item4" pos="Max" offset="0"/>
+                <Anchor side="Bottom" relative="Item0" pos="Max" offset="0"/>
+            </Frame>
+        </Frame>
+
+        <!--=======================================================================================
+        <! Reward Interactions
+        <!======================================================================================-->
+        <Frame type="Button" name="AcceptButton" template="StandardTemplates/StandardButtonTemplate">
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="-100"/>
+            <Anchor side="Right" relative="$parent" pos="Mid" offset="10"/>
+            <Enabled val="True"/>
+            <Visible val="False"/>
+            <Width val="350"/>
+            <Height val="100"/>
+            <ClickSound val="@UI_BNet_Loot_Finished_Dialog_Click_Accept"/>
+            <Text val="@UI/LootChest/Action/Accept"/>
+
+            <Frame type="Label" name="Label">
+                <Anchor side="Right" relative="$parent" pos="Max" offset="-46"/>
+            </Frame>
+
+            <Frame type="Frame" name="HitTestFrame">
+                <TooltipAnchorPosition val="TopCenter"/>
+            </Frame>
+
+            <Animation name="ButtonFade">
+                <Event event="OnClick" action="Reset, Play"/>
+
+                <Controller type="Event" end="Stop" frame="$parent">
+                    <Key type="Event" time="0.1" event="HideButtons"/>
+                </Controller>
+            </Animation>
+
+            <StateGroup name="AcceptButtonActiveStates">
+                <State name="PatchAvailable">
+                    <When type="Property" frame="$GlueUI" PatchAvailable="true"/>
+                    <Action type="SetProperty" Enabled="false"/>
+                    <Action type="SetProperty" Tooltip="@UI/RestrictedStatePendingHotPatch"/>
+                </State>
+            </StateGroup>
+        </Frame>
+
+        <Frame type="Button" name="RerollButton" template="StandardTemplates/StandardButtonTemplate">
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="-100"/>
+            <Anchor side="Left" relative="$parent" pos="Mid" offset="-10"/>
+            <Enabled val="True"/>
+            <Visible val="False"/>
+            <Width val="350"/>
+            <Height val="100"/>
+            <ClickSound val=""/>
+            <Text val="@UI/LootChest/Action/Reroll"/>
+
+            <Frame type="Frame" name="HitTestFrame">
+                <TooltipAnchorPosition val="TopCenter"/>
+            </Frame>
+
+            <Animation name="ButtonFade">
+                <Event event="OnClick" action="Reset, Play"/>
+
+                <Controller type="Event" end="Stop" frame="$parent">
+                    <Key type="Event" time="0.1" event="HideButtons"/>
+                </Controller>
+            </Animation>
+
+            <StateGroup name="RerollButtonActiveStates">
+                <State name="PatchAvailable">
+                    <When type="Property" frame="$GlueUI" PatchAvailable="true"/>
+                    <Action type="SetProperty" Enabled="false"/>
+                    <Action type="SetProperty" Tooltip="@UI/RestrictedStatePendingHotPatch"/>
+                </State>
+            </StateGroup>
+        </Frame>
+
+        <Frame type="Label" name="RemainingRerollsLabel">
+            <Anchor side="Top" relative="$parent/RerollButton" pos="Max" offset="-16"/>
+            <Anchor side="Left" relative="$parent/RerollButton" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent/RerollButton" pos="Mid" offset="0"/>
+            <Visible val="{$parent/RerollButton/@Visible}"/>
+            <Alpha val="{$parent/RerollButton/@Alpha}"/>
+            <Style val="LootReward_RerollRemaining"/>
+        </Frame>
+
+        <StateGroup name="InteractionVisibility">
+            <State name="Visible">
+                <When type="Property" ShowRerollWarning="false"/>
+                <Action type="SetProperty" frame="AcceptButton" Visible="true"/>
+                <Action type="SetProperty" frame="RerollButton" Visible="true"/>
+                <Action type="SetProperty" frame="RemainingRerollsLabel" Visible="true"/>
+            </State>
+            <State name="Invisible">
+                <When type="Property" ShowRerollWarning="true"/>
+                <Action type="SetProperty" frame="AcceptButton" Visible="false"/>
+                <Action type="SetProperty" frame="RerollButton" Visible="false"/>
+                <Action type="SetProperty" frame="RemainingRerollsLabel" Visible="false"/>
+            </State>
+        </StateGroup>
+
+        <!--=======================================================================================
+        <! Licenses Warning Panel
+        <!======================================================================================-->
+        <Frame type="Frame" name="LicensesWarningPanel">
+            <Anchor side="Bottom" relative="$parent/AcceptButton" pos="Min" offset="-10"/>
+            <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+            <Visible val="{$parent/@ShowLicensesWarning}"/>
+
+            <Height val="125"/>
+            <Width val="800"/>
+
+            <Frame type="BlurFrame" name="BlurBackground">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="11"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="11"/>
+                <Anchor side="Right" relative="$parent" pos="Max" offset="-11"/>
+                <Anchor side="Bottom" relative="$parent" pos="Max" offset="-11"/>
+                <BlurAmount val="0.8"/>
+                <RenderPriority val="399"/>
+
+                <Frame type="Image" name="LowImage">
+                    <Anchor relative="$parent" />
+                    <Texture val="@UI/Storm_Generic_Background_Low"/>
+                </Frame>
+            </Frame>
+
+            <Frame type="Image" name="Background">
+                <Anchor relative="$parent"/>
+                <Texture val="@UI/Storm_Store_Warning_Background"/>
+                <TextureType val="Nineslice"/>
+            </Frame>
+
+            <Frame type="Image" name="HexImage">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="12"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="12"/>
+                <Anchor side="Right" relative="$parent" pos="Max" offset="-12"/>
+                <Texture val="@UI/Storm_Store_Warning_Hex"/>
+            </Frame>
+
+            <Frame type="Label" name="WarningLabel">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="30"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="50"/>
+                <Anchor side="Right" relative="$parent" pos="Max" offset="-50"/>
+                <Anchor side="Bottom" relative="$parent" pos="Max" offset="-30"/>
+                <Style val="StoreWarning"/>
+                <Text val="@UI/LootChest/Warning/LicensesOutOfDate"/>
+            </Frame>
+        </Frame>
+
+        <!--=======================================================================================
+        <! Reroll Warning Panel
+        <!======================================================================================-->
+        <Frame type="Frame" name="RerollWarningPanel">
+            <Anchor relative="$parent" />
+            <Visible val="{$parent/@ShowRerollWarning}"/>
+
+            <Frame type="BlurFrame" name="BlurFrame" template="StandardTemplates/FullscreenBlurFrame">
+                <Anchor relative="$parent/BackgroundFrame"/>
+                <Animation name="DialogAnimation">
+                    <Event event="OnShown" action="DirectionForward,Play"/>
+                    <Controller type="Blur" end="Pause">
+                        <Key type="Curve" time="0" value="0.0" inout="Linear,Auto"/>
+                        <Key type="Curve" time="0.2" value="0.93" inout="Auto,Linear"/>
+                    </Controller>
+                </Animation>
+            </Frame>
+
+            <Frame type="Image" name="BackgroundFrame">
+                <Anchor side="Top" relative="$parent" pos="Mid" offset="-100"/>
+                <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Bottom" relative="$parent/RerollWarningLabel" pos="Max" offset="100"/>
+                <Width val="725"/>
+                <Color val="12, 10, 37"/>
+                <Alpha val="128"/>
+            </Frame>
+
+            <Frame type="Frame" name="BackgroundImageFrame" template="StandardTemplates/PanelBorderFrameTempalte">
+                <Anchor relative="$parent/BackgroundFrame" offset="14"/>
+            </Frame>
+
+            <Frame type="Label" name="RerollWarningHeaderLabel">
+                <Anchor side="Top" relative="$parent/BackgroundFrame" pos="Min" offset="20"/>
+                <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+                <Style val="LootReward_RerollWarning_Header"/>
+                <Text val="@UI/LootChest/Warning/RerollHeader"/>
+            </Frame>
+
+            <Frame type="Label" name="RerollWarningLabel">
+                <Anchor side="Top" relative="$parent/RerollWarningHeaderLabel" pos="Max" offset="20"/>
+                <Anchor side="Left" relative="$parent/BackgroundFrame" pos="Mid" offset="0"/>
+                <Anchor side="Right" relative="$parent/BackgroundFrame" pos="Mid" offset="0"/>
+                <Width val="675"/>
+                <Style val="LootReward_RerollWarning"/>
+                <Text val="@UI/LootChest/Warning/LegendaryReroll"/>
+            </Frame>
+
+            <Frame type="Button" name="RerollButton" template="StandardTemplates/StandardButtonTemplate">
+                <Anchor side="Right" relative="$parent" pos="Mid" offset="10"/>
+                <Anchor side="Bottom" relative="$parent/BackgroundFrame" pos="Max" offset="0"/>
+                <Enabled val="True"/>
+                <Width val="300"/>
+                <Height val="100"/>
+                <ClickSound val="@UI_BNet_Loot_Finished_Dialog_Click_Reroll"/>
+                <Text val="@UI/LootChest/Action/AcceptReroll"/>
+
+                <Animation name="HideRerollWarning">
+                    <Event event="OnClick" action="Restart,Play"/>
+                    <Event event="OnShown" action="Pause" frame="$parent/$parent"/>
+                    <Controller type="Property" frame="$parent/$parent" property="ShowRerollWarning" end="Pause">
+                        <Key type="Property" time="0.1" value="false"/>
+                    </Controller>
+                </Animation>
+
+                <StateGroup name="RerollButtonActiveStates">
+                    <State name="PatchAvailable">
+                        <When type="Property" frame="$GlueUI" PatchAvailable="true"/>
+                        <Action type="SetProperty" Enabled="false"/>
+                        <Action type="SetProperty" Tooltip="@UI/RestrictedStatePendingHotPatch"/>
+                    </State>
+                </StateGroup>
+            </Frame>
+
+            <Frame type="Button" name="CancelButton" template="StandardTemplates/StandardButtonTemplate">
+                <Anchor side="Top" relative="$parent/RerollButton" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent" pos="Mid" offset="-10"/>
+                <Enabled val="True"/>
+                <Width val="300"/>
+                <Height val="100"/>
+                <ClickSound val="@UI_BNet_Loot_Finished_Dialog_Click_Reroll_Cancel"/>
+                <Text val="@UI/LootChest/Action/Cancel"/>
+
+                <Animation name="HideRerollWarning">
+                    <Event event="OnClick" action="Restart,Play"/>
+                    <Controller type="Property" frame="$parent/$parent" property="ShowRerollWarning" end="Pause">
+                        <Key type="Property" time="0" value="false"/>
+                    </Controller>
+                    <Controller type="Event" end="Stop" frame="$parent/$parent">
+                        <Key type="Event" time="0" event="RerollCancel"/>
+                    </Controller>
+                </Animation>
+            </Frame>
+        </Frame>
+
+        <!--=======================================================================================
+        <! Animations / State Groups
+        <!======================================================================================-->
+
+        <!-- States for whether reroll button is enabled -->
+        <StateGroup name="AcceptRerollEnabled">
+            <State name="Waiting">
+                <When type="Property" WaitingForServer="true"/>
+                <Action type="SetProperty" frame="AcceptButton" Enabled="false"/>
+                <Action type="SetProperty" frame="RerollButton" Enabled="false"/>
+            </State>
+            <State name="NoRerollsRemaining">
+                <When type="Property" AvailableRerolls="0"/>
+                <Action type="SetProperty" frame="RerollButton" Enabled="false"/>
+            </State>
+            <State name="CantAffordReroll">
+                <When type="Property" HasFundsForReroll="false"/>
+                <Action type="SetProperty" frame="RerollButton" Enabled="false"/>
+            </State>
+            <State name="PatchAvailable">
+                <When type="Property" frame="$GlueUI" PatchAvailable="true"/>
+                <Action type="SetProperty" frame="RerollButton" Enabled="false"/>
+                <Action type="SetProperty" Tooltip="@UI/RestrictedStatePendingHotPatch"/>
+            </State>
+            <State name="NotWaiting">
+                <When type="Property" WaitingForServer="false"/>
+            </State>
+        </StateGroup>
+
+        <!-- States for showing the Accept and Reroll buttons -->
+        <StateGroup name="AcceptRerollButtonStates">
+            <DefaultState val="HideButtons"/>
+
+            <State name="ShowButtons">
+                <When type="Property" frame="Content/RewardTileList/Item0" IsOpen="True"/>
+                <When type="Property" frame="Content/RewardTileList/Item1" IsOpen="True"/>
+                <When type="Property" frame="Content/RewardTileList/Item2" IsOpen="True"/>
+                <When type="Property" frame="Content/RewardTileList/Item3" IsOpen="True"/>
+                <When type="Property" frame="Content/RewardTileList/Item4" IsOpen="True"/>
+                <Action type="SendEvent" frame="$this" event="ShowButtons"/>
+                <Action type="SetProperty" frame="AcceptButton" Visible="true"/>
+                <Action type="SetProperty" frame="RerollButton" Visible="true"/>
+            </State>
+
+            <State name="HideButtons">
+                <Action type="SendEvent" frame="$this" event="HideButtons"/>
+                <Action type="SetProperty" frame="AcceptButton" Visible="false"/>
+                <Action type="SetProperty" frame="RerollButton" Visible="false"/>
+            </State>
+        </StateGroup>
+
+        <!-- States for showing the Accept and Reroll buttons -->
+        <StateGroup name="RerollAnimComplete">
+            <State name="Complete">
+                <When type="Property" frame="Content/RewardTileList/Item0" IsOut="True"/>
+                <When type="Property" frame="Content/RewardTileList/Item1" IsOut="True"/>
+                <When type="Property" frame="Content/RewardTileList/Item2" IsOut="True"/>
+                <When type="Property" frame="Content/RewardTileList/Item3" IsOut="True"/>
+                <When type="Property" frame="Content/RewardTileList/Item4" IsOut="True"/>
+                <Action type="SetProperty" frame="$this" ActiveAnimComplete="True"/>
+            </State>
+        </StateGroup>
+
+        <!-- Animations for showing/hiding buttons -->
+        <Animation name="AcceptSound">
+            <Event event="AcceptingRewards" action="Reset,Play"/>
+
+            <Controller type="Sound" end="Stop">
+                <Key type="Sound" time="0" sound="@UI_BNet_Loot_Finished_Dialog_Click_Accept"/>
+            </Controller>
+        </Animation>
+
+        <Animation name="OpenAllSound">
+            <Event event="OpeningAllRewards" action="Reset,Play"/>
+
+            <Controller type="Sound" end="Stop">
+                <Key type="Sound" time="0" sound="@UI_BNet_Loot_Open_With_Space"/>
+            </Controller>
+        </Animation>
+
+        <Animation name="ShowHideButtonsAnims">
+            <Event event="ShowButtons" action="DirectionForward, Play"/>
+            <Event event="HideButtons" action="Stop"/>
+
+            <Controller type="Fade" end="Pause" frame="AcceptButton">
+                <Key type="Curve" time="0" value="0"/>
+                <Key type="Curve" time="1" value="0"/>
+                <Key type="Curve" time="1.3" value="255"/>
+            </Controller>
+            <Controller type="Fade" end="Pause" frame="RerollButton">
+                <Key type="Curve" time="0" value="0"/>
+                <Key type="Curve" time="1" value="0"/>
+                <Key type="Curve" time="1.3" value="255"/>
+            </Controller>
+            <Controller type="Fade" end="Pause" frame="LicensesWarningPanel">
+                <Key type="Curve" time="0" value="0"/>
+                <Key type="Curve" time="1" value="0"/>
+                <Key type="Curve" time="1.3" value="255"/>
+            </Controller>
+            <Controller type="Property" property="AcceptsMouse" end="Pause" frame="AcceptButton">
+                <Key type="Property" time="0" value="false"/>
+                <Key type="Property" time="1.3" value="true"/>
+            </Controller>
+            <Controller type="Property" property="AcceptsMouse" end="Pause" frame="RerollButton">
+                <Key type="Property" time="0" value="false"/>
+                <Key type="Property" time="1.3" value="true"/>
+            </Controller>
+            <Controller type="Property" property="ReadyToAccept" end="Pause">
+                <Key type="Property" time="0" value="false"/>
+                <Key type="Property" time="1.3" value="true"/>
+            </Controller>
+            <Controller type="Sound" end="Stop">
+                <Key type="Sound" time="1" sound="@UI_BNet_Loot_Finished_Dialog_Popup"/>
+            </Controller>
+        </Animation>
+
+        <Animation name="AcceptRerollHideButtonAnims">
+            <Event event="HideButtons" action="Reset, Play"/>
+
+            <Controller type="Fade" end="Pause"  frame="AcceptButton">
+                <Key type="Curve" time="0" value="255"/>
+                <Key type="Curve" time=".3" value="0"/>
+            </Controller>
+            <Controller type="Fade" end="Pause"  frame="RerollButton">
+                <Key type="Curve" time="0" value="255"/>
+                <Key type="Curve" time=".3" value="0"/>
+            </Controller>
+            <Controller type="Fade" end="Pause"  frame="LicensesWarningPanel">
+                <Key type="Curve" time="0" value="255"/>
+                <Key type="Curve" time=".3" value="0"/>
+            </Controller>
+            <Controller type="Property" property="ReadyToAccept" end="Pause">
+                <Key type="Property" time="0" value="false"/>
+            </Controller>
+        </Animation>
+
+        <Animation name="RerollCancelButtonAnims">
+            <Event event="RerollCancel" action="Reset, Play"/>
+
+            <Controller type="Visibility" end="Pause" frame="AcceptButton">
+                <Key type="Bool" time="0" value="false"/>
+                <Key type="Bool" time=".01" value="true"/>
+            </Controller>
+            <Controller type="Visibility" end="Pause" frame="RerollButton">
+                <Key type="Bool" time="0" value="false"/>
+                <Key type="Bool" time=".01" value="true"/>
+            </Controller>
+            <Controller type="Fade" end="Pause" frame="AcceptButton">
+                <Key type="Curve" time="0" value="0"/>
+                <Key type="Curve" time=".3" value="255"/>
+            </Controller>
+            <Controller type="Fade" end="Pause" frame="RerollButton">
+                <Key type="Curve" time="0" value="0"/>
+                <Key type="Curve" time=".3" value="255"/>
+            </Controller>
+            <Controller type="Fade" end="Pause" frame="LicensesWarningPanel">
+                <Key type="Curve" time="0" value="0"/>
+                <Key type="Curve" time=".3" value="255"/>
+            </Controller>
+            <Controller type="Property" property="AcceptsMouse" end="Pause" frame="AcceptButton">
+                <Key type="Property" time="0" value="false"/>
+                <Key type="Property" time=".3" value="true"/>
+            </Controller>
+            <Controller type="Property" property="AcceptsMouse" end="Pause" frame="RerollButton">
+                <Key type="Property" time="0" value="false"/>
+                <Key type="Property" time=".3" value="true"/>
+            </Controller>
+            <Controller type="Property" property="ReadyToAccept" end="Pause">
+                <Key type="Property" time="0" value="false"/>
+                <Key type="Property" time=".3" value="true"/>
+            </Controller>
+        </Animation>
+    </Frame>
+</Desc>

@@ -1,5 +1,16 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <Desc>
+
+    <Constant name="TeamAllyBackingColor" val="0048eb"/>
+    <Constant name="TeamEnemyBackingColor" val="eb0011"/>
+
+    <!-- Override to turn off the "VS" label so it does not appear in localized version of the client -->
+    <Frame type="CommandPanel" name="GameUI/UIContainer/ConsoleUIContainer/PartyFramePanel" file="GameUI">
+        <Frame type="Label" name="VSLabel">
+            <Visible val="False"/>
+        </Frame>
+    </Frame>
+
     <Frame type="UnitStatusFrame" name="PunisherUnitStatusFrameTemplate" template="UnitStatus/SuperCreepUnitStatusFrameTemplate">
         <Frame type="UnitStatusDurationBar" name="DurationBar" template="UnitStatus/UnitStatusDurationBarTemplate">
             <Height val="7"/>
@@ -20,8 +31,8 @@
                 <Event event="OnShown" action="Stop"/>
                 <Event event="PunisherDefeated" action="Restart,Play" frame="$parent"/>
                 <Controller type="Fade" end="Pause">
-                    <Key type="Curve" time="0" value="0" out="Fast"/>
-                    <Key type="Curve" time=".03" value="255" out="Fast"/>
+                    <Key type="Curve" time="0" value="0" inout="Linear"/>
+                    <Key type="Curve" time=".03" value="255" inout="Linear"/>
                 </Controller>
                 <Controller type="Dimension" dimension="Width" relative="False" percentage="True" end="Pause" >
                     <Key type="Curve" time="0" value="0"/>
@@ -37,8 +48,8 @@
                 <Event event="PunisherRespawned" action="Restart,Play" frame="$parent"/>
                 
                 <Controller type="Fade" end="Pause">
-                    <Key type="Curve" time="0" value="255" out="Fast"/>
-                    <Key type="Curve" time=".2" value="0" in="Slow"/>
+                    <Key type="Curve" time="0" value="255" inout="Linear"/>
+                    <Key type="Curve" time=".2" value="0" inout="Slow,Linear"/>
                 </Controller>
             </Animation>
             
@@ -55,9 +66,9 @@
                 <Event event="PunisherDefeated" action="Restart,Play" frame="$parent"/>
                 
                 <Controller type="Fade" end="Pause">
-                    <Key type="Curve" time="0" value="0" out="Fast"/>
-                    <Key type="Curve" time=".1" value="0" out="Fast"/>
-                    <Key type="Curve" time=".13" value="255" in="Slow"/>
+                    <Key type="Curve" time="0" value="0" inout="Linear"/>
+                    <Key type="Curve" time=".1" value="0" inout="Linear"/>
+                    <Key type="Curve" time=".13" value="255" inout="Slow,Linear"/>
                 </Controller>
                 <Controller type="Dimension" dimension="Width" relative="False" percentage="True" end="Pause">
                     <Key type="Curve" time="0" value="0"/>
@@ -78,8 +89,8 @@
                 <Event event="PunisherDefeated" action="Stop" frame="$parent"/>
 
                 <Controller type="Fade" end="Pause">
-                    <Key type="Curve" time="0" value="255" out="Fast"/>
-                    <Key type="Curve" time=".2" value="0" in="Slow"/>
+                    <Key type="Curve" time="0" value="255" inout="Linear"/>
+                    <Key type="Curve" time=".2" value="0" inout="Slow,Linear"/>
                 </Controller>
             </Animation>
         </Frame>
@@ -94,8 +105,8 @@
                 <Key type="Bool" time="0" value="True"/>
             </Controller>
             <Controller type="Fade" end="Pause" frame="$parent/PunisherIconOverlay">
-                <Key type="Curve" time="0" value="0" out="Fast"/>
-                <Key type="Curve" time=".3" value="160" out="Slow"/>
+                <Key type="Curve" time="0" value="0" inout="Linear"/>
+                <Key type="Curve" time=".3" value="160" inout="Linear,Slow"/>
             </Controller>
         </Animation>
         
@@ -109,10 +120,18 @@
                 <Key type="Bool" time=".3" value="True"/>
             </Controller>
             <Controller type="Fade" end="Pause" frame="$parent/PunisherIconOverlay">
-                <Key type="Curve" time="0" value="160" out="Fast"/>
-                <Key type="Curve" time=".3" value="0" out="Slow"/>
+                <Key type="Curve" time="0" value="160" inout="Linear"/>
+                <Key type="Curve" time=".3" value="0" inout="Linear,Slow"/>
             </Controller>
-        </Animation>    
+        </Animation>
+
+        <Animation name="PunisherSpawned">
+            <Event event="PunisherSpawned" action="Restart,Play" frame="$parent"/>
+            
+            <Controller type="Visibility" end="Pause" frame="$parent/PunisherIconOverlay">
+                <Key type="Bool" time="0" value="False"/>
+            </Controller>
+        </Animation>
     </Frame>
     
     <Frame type="Image" name="IconOverlayTemplate">
@@ -120,63 +139,18 @@
         <Texture val="{$parent/PunisherIcon/@Texture}"/>
         <Visible val="False"/>
         <Alpha val="0"/>
-        <ColorAdjustMode val="Fill"/> 
+        <ColorAdjustMode val="Fill"/>
         <AdjustmentColor val="000000"/>
     </Frame>
 
     <!--**************************************************************-->
     <!-- Top Count Label                                              -->
     <!--**************************************************************-->
-    <Frame type="Frame" name="ArenaPunisherScorePanel">
+    <Frame type="Frame" name="ArenaPunisherScorePanel" template="ArenaModeScore/ArenaScorePanel">
         <Anchor relative="$parent"/>
-
-        <Frame type="Frame" name="SkullsFrame">
-            <Anchor relative="$parent"/>
-            
-            <!-- Switching team colors for Score Labels if needed -->
-            <StateGroup name="ScoreLabelStyles">
-                <DefaultState val="Team1IsBlue"/>
-
-                <State name="Team1IsBlue">
-                    <When type="AnimationState" frame="$ancestor[@type=GameUI]/UIContainer" TeamColors="Team1IsBlue"/>
-                    <Action type="SetProperty" frame="Team1Score" style="Storm_MapMechanicScoreAlly"/>
-                    <Action type="SetProperty" frame="Team2Score" style="Storm_MapMechanicScoreEnemy"/>
-                </State>
-                
-                <State name="Team2IsBlue">
-                    <When type="AnimationState" frame="$ancestor[@type=GameUI]/UIContainer" TeamColors="Team2IsBlue"/>
-                    <Action type="SetProperty" frame="Team1Score" style="Storm_MapMechanicScoreEnemy"/>
-                    <Action type="SetProperty" frame="Team2Score" style="Storm_MapMechanicScoreAlly"/>
-                </State>
-            </StateGroup>
-            
-            <Frame type="Image" name="VsImage">
-                <Anchor side="Top" relative="$parent" pos="Min" offset="31"/>
-                <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
-                <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
-                <Texture val="@UI/Storm_UI_Brawl_HUD_Icon_Kill_Points_Purple"/>
-            </Frame>
-
-            <Frame type="Label" name="HelpText">
-                <Anchor side="Top" relative="$parent" pos="Min" offset="90"/>
-                <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
-                <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
-                <Style val="Storm_MapMechanic_MechanicCounterCentered"/>
-            </Frame>
-            
-            <Frame type="Label" name="Team1Score">
-                <Anchor side="Bottom" relative="$parent" pos="Min" offset="73"/>
-                <Anchor side="Right" relative="$parent" pos="Mid" offset="-40"/>
-                <Width val="100"/>
-                <Text val="0"/>
-            </Frame>
-            
-            <Frame type="Label" name="Team2Score">
-                <Anchor side="Bottom" relative="$parent" pos="Min" offset="73"/>
-                <Anchor side="Left" relative="$parent" pos="Mid" offset="44"/>
-                <Width val="100"/>
-                <Text val="0"/>
-            </Frame>
+        
+        <Frame type="Image" name="VsImage">
+            <Texture val="@UI/Storm_UI_Brawl_HUD_Icon_Kill_Points_Purple"/>
         </Frame>
     </Frame>
 
@@ -233,12 +207,12 @@
                 <Event event="SlideOut" action="DirectionReverse,Play"/>
                  
                 <Controller type="Anchor" end="Pause" side="Right" relative="true">
-                    <Key type="Curve" time="0.0" value="500" out="Fast"/>
-                    <Key type="Curve" time="0.25" value="0" in="Fast"/>
+                    <Key type="Curve" time="0.0" value="500" inout="Linear"/>
+                    <Key type="Curve" time="0.25" value="0" inout="Linear"/>
                 </Controller>
                 <Controller type="Fade" end="Pause" side="Right" relative="true">
-                    <Key type="Curve" time="0.0" value="0" out="Fast"/>
-                    <Key type="Curve" time="0.25" value="255" in="Fast"/>
+                    <Key type="Curve" time="0.0" value="0" inout="Linear"/>
+                    <Key type="Curve" time="0.25" value="255" inout="Linear"/>
                 </Controller>
             </Animation>
 
@@ -311,6 +285,10 @@
                     </Frame>
                     
                     <Frame type="UnitStatusHealthLabel" name="HealthLabel">
+                        <Anchor side="Top" relative="$parent" pos="Mid" offset="3"/>
+                        <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+                        <Anchor side="Bottom" relative="$parent" pos="Mid" offset="3"/>
+                        <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
                         <ShowPercent val="true"/>
                         <Visible val="False"/>
                         <Frame type="Label" name="StatusLabel">
@@ -387,6 +365,10 @@
                     </Frame>
                     
                     <Frame type="UnitStatusHealthLabel" name="HealthLabel">
+                        <Anchor side="Top" relative="$parent" pos="Mid" offset="3"/>
+                        <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+                        <Anchor side="Bottom" relative="$parent" pos="Mid" offset="3"/>
+                        <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
                         <ShowPercent val="true"/>
                         <Visible val="False"/>
                         <Frame type="Label" name="StatusLabel">
@@ -423,7 +405,6 @@
                 </Frame>
             </Frame>
         </Frame>
-
     </Frame>
 </Desc>
 

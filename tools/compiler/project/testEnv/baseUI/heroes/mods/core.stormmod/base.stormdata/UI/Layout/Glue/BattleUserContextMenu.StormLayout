@@ -25,20 +25,142 @@
             </Frame>
         </Frame>
 
+        <Frame type="Image" name="HighlightBackgroundImage">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="1"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="8"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="-3"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="3"/>
+            <Alpha val="64"/>
+            <Visible val="False"/>
+         </Frame>
+
         <Frame type="Image" name="CheckMark">
-            <Anchor side="Top" relative="$parent" pos="Mid" offset="1"/>
-            <Anchor side="Bottom" relative="$parent" pos="Mid" offset="1"/>
-            <Anchor side="Left" relative="$parent" pos="Min" offset="-1"/>
-            <Width val="37"/>
-            <Height val="31"/>
+            <Anchor side="Top" relative="$parent/NameLabel" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent/NameLabel" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent/NameLabel" pos="Min" offset="10"/>
+            <Width val="36"/>
+            <Height val="36"/>
             <Texture val="@UI/Storm_Checkbox_CheckMark"/>
             <Visible val="False"/>
         </Frame>
+
+        <Frame type="Image" name="Icon">
+            <Anchor side="Top" relative="$parent" pos="Mid" offset="1"/>
+            <Anchor side="Bottom" relative="$parent" pos="Mid" offset="1"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="15"/>
+            <Visible val="False"/>
+            <Width val="36"/>
+            <Height val="36"/>
+            <AcceptsMouse val="true"/>
+        </Frame>
+
+        <Frame type="Slider" name="Slider" template="StandardTemplates/StandardSliderTemplate">
+            <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Left" relative="$parent/Icon" pos="Max" offset="-5"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="-25"/>
+            <Continuous val="true"/>
+        </Frame>
+
+        <Frame type="Label" name="NameLabel">
+            <Anchor side="Left" relative="$parent" pos="Min" offset="26"/>
+            <Anchor side="Right" relative="$this" pos="Min" offset="0"/>
+        </Frame>
+
+        <Frame type="VoiceChannelFrame" name="VoiceChannelFrame">
+            <Anchor side="Top" relative="$parent/NameLabel" pos="Min" offset="0"/>
+            <Anchor side="Bottom" relative="$parent/NameLabel" pos="Max" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="-10"/>
+            <Width val="80"/>
+
+            <AcceptsMouse val="False"/>
+            <Visible val="False"/>
+
+            <Frame type="Label" name="CountLabel">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+                <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+                <Width val="32"/>
+                <Style val="{$parent/$parent/NameLabel/@Style}"/>
+                <Text val="{$parent/CountFormatter/@Text}"/>
+            </Frame>
+
+            <Frame type="TextFormatFrame" name="CountFormatter">
+                <Anchor relative="$parent"/>
+                <Replacement val="{$parent/@ActiveMemberCount}" index="0"/>
+            </Frame>
+        </Frame>
+
+        <!-- Managing channel state for VoiceChannelFrame -->
+        <StateGroup name="CheckmarkStates" requiredtoload="IS_VOICECHAT_ENABLED">
+            <State name="Party">
+                <When type="Property" frame="VoiceChannelFrame" ChannelType="Party"/>
+                <Action type="SetProperty" frame="VoiceChannelFrame" Visible="True"/>
+                <Action type="SetProperty" frame="VoiceChannelFrame/CountFormatter" FormatText="@UI/BattleUserContextMenuVoicePartyChannelCount"/>
+                <Action type="SetProperty" frame="CheckMark" Texture="@UI/VoiceChat_Channel_Checkbox"/>
+                <Action type="SetProperty" frame="CheckMark" Color="#VoiceChatColor_Party"/>
+                <Action type="SetAnchor" frame="CheckMark" side="Right" relative="$parent/VoiceChannelFrame/CountLabel" pos="Min" offset="0"/>
+                <Action type="SetProperty" frame="HighlightBackgroundImage" Color="#VoiceChatColor_Party"/>
+            </State>
+            <State name="Team">
+                <When type="Property" frame="VoiceChannelFrame" ChannelType="Team"/>
+                <Action type="SetProperty" frame="VoiceChannelFrame" Visible="True"/>
+                <Action type="SetProperty" frame="VoiceChannelFrame/CountFormatter" FormatText="@UI/BattleUserContextMenuVoiceTeamChannelCount"/>
+                <Action type="SetProperty" frame="CheckMark" Texture="@UI/VoiceChat_Channel_Checkbox"/>
+                <Action type="SetProperty" frame="CheckMark" Color="#VoiceChatColor_Team"/>
+                <Action type="SetAnchor" frame="CheckMark" side="Right" relative="$parent/VoiceChannelFrame/CountLabel" pos="Min" offset="0"/>
+                <Action type="SetProperty" frame="HighlightBackgroundImage" Color="#VoiceChatColor_Team"/>
+            </State>
+        </StateGroup>
+
+        <StateGroup name="HighlightStates" requiredtoload="IS_VOICECHAT_ENABLED">
+            <DefaultState val="Invisible"/>
+            <State name="Invisible"/>
+            <State name="Visible">
+                <When type="Property" frame="VoiceChannelFrame" operator="NotEqual" ChannelType="Invalid"/>
+                <When type="Property" frame="CheckMark" Visible="True"/>
+                <Action type="SetProperty" frame="HighlightBackgroundImage" Visible="True"/>
+            </State>
+        </StateGroup>
+
+        <!-- Managing mute state for icon & slider -->
+        <StateGroup name="MuteType" requiredtoload="IS_VOICECHAT_ENABLED">
+            <DefaultState val="Default"/>
+            <State name="MicMuted">
+                <When type="Property" frame="$this" MenuAction="VoiceInputVolume"/>
+                <When type="Property" frame="$VoiceChatUI" IsActiveMicMuted="true"/>
+                <Action type="SetState" group="MuteState" state="Muted"/>
+            </State>
+            <State name="SpeakerMuted">
+                <When type="Property" frame="$this" MenuAction="VoiceOutputVolume"/>
+                <When type="Property" frame="$VoiceChatUI" IsActiveSpeakerMuted="true"/>
+                <Action type="SetState" group="MuteState" state="Muted"/>
+            </State>
+            <State name="UserMuted">
+                <When type="Property" frame="$this" MenuAction="VoiceMemberVolume"/>
+                <When type="Property" frame="$ancestor[@type=BattleUserContextMenu]/BattleUserVoiceFrame" IsMutedForMe="true"/>
+                <Action type="SetState" group="MuteState" state="Muted"/>
+            </State>
+            <State name="Default">
+                <Action type="SetState" group="MuteState" state="Unmuted"/>
+            </State>
+        </StateGroup>
+
+        <StateGroup name="MuteState">
+            <State name="Unmuted">
+                <Action type="SetProperty" frame="Slider" alpha="255"/>
+                <Action type="SetProperty" frame="Icon" alpha="255"/>
+            </State>
+            <State name="Muted">
+                <Action type="SetProperty" frame="Slider" alpha="128"/>
+                <Action type="SetProperty" frame="Icon" alpha="128"/>
+            </State>
+        </StateGroup>
     </Frame>
 
     <Frame type="BattleUserContextMenu" name="BattleUserContextMenu" template="StandardTemplates/StandardContextMenuTemplate">
         <Frame type="ListBox" name="Menu">
-            <Insets top="72" left="20" bottom="25" right="8"/>
+            <Insets top="72" left="20" bottom="31" right="8"/>
             <ItemHoverWhileDisabled val="false"/>
             <ItemDesc val="BattleUserContextMenu/BattleUserContextMenuListBoxItem"/>
             <ItemHeight val="0"/>
@@ -46,11 +168,18 @@
         
         <Frame type="Label" name="TitleLabel">
             <Anchor side="Top" relative="$parent" pos="Min" offset="23"/>
-            <Anchor side="Left" relative="$parent" pos="Min" offset="20"/> 
-            <Anchor side="Right" relative="$parent" pos="Max" offset="-20"/> 
+            <Anchor side="Left" relative="$parent" pos="Min" offset="20"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="-20"/>
             <Height val="30"/>
             <Style val="SocialPlayerNameLabel"/>
             <RenderPriority val="600"/>
+        </Frame>
+
+        <Frame type="BattleUserVoiceFrame" name="BattleUserVoiceFrame" requiredtoload="IS_VOICECHAT_ENABLED">
+            <Anchor relative="$parent"/>
+            <Visible val="false"/>
+            <PresenceId val="{$parent/@PresenceId}"/>
+            <ChannelType val="{$VoiceChatUI/@ActiveChannelType}"/>
         </Frame>
     </Frame>
 </Desc>

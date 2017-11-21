@@ -16,11 +16,10 @@
             <Texture val="@UI/Storm_UI_Play_F2P_LogoGlow"/>
             <BlendMode val="Add"/>
             <Animation name="Pulse">
-                <Event event="OnShown" action="DirectionForward"/>
-                <Event event="OnShown" action="Play"/>
+                <Event event="OnShown" action="DirectionForward,Play"/>
                 <Controller type="Fade" end="PingPong">
-                    <Key type="Curve" time="0" value="0" out="Fast"/>
-                    <Key type="Curve" time=".7" value="255" in="Slow"/>
+                    <Key type="Curve" time="0" value="0" inout="Linear"/>
+                    <Key type="Curve" time=".7" value="255" inout="Slow,Linear"/>
                 </Controller>
             </Animation>
         </Frame>
@@ -54,13 +53,13 @@
             <State name="Empty">
                 <Action type="SetProperty" frame="$this" visible="false"/>
             </State>
-        </StateGroup>     
+        </StateGroup>
     </Frame>
 
     <!--===========================================================================================
     <! HeroBadgeContainer
     <!==========================================================================================-->
-    <Frame type="Frame" name="HeroBadgeContainerTemplate"> 
+    <Frame type="Frame" name="HeroBadgeContainerTemplate">
         <Frame type="Frame" name="TopIcon" template="HeroStandardTemplate/HeroBadgeIconTemplate">
             <Anchor side="Top" relative="$parent" pos="Min" offset="53"/>
             <Anchor side="Left" relative="$parent" pos="Min" offset="53"/>
@@ -122,23 +121,24 @@
     <!==========================================================================================-->
     <Frame type="HeroContainerFrame" name="HeroItemBaseTemplate">
         <Anchor relative="$parent" offset="-54"/>
+        
         <Height val="112"/>
         <Width val="112"/>
 
         <Frame type="Image" name="PortraitBackingImage">
-            <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
-            <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
-            <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
-            <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor relative="$parent"/>
             <Texture val="@UI/Storm_UI_Play_HeroPortrait_Backing_Off"/>
             <IgnoreParentAlpha val="false"/>
+            <SubpixelRendering val="True"/>
         </Frame>
 
         <!-- HERO PORTRAIT ICON -->
         <Frame type="HeroImage" name="IconImage">
-            <Anchor relative="$parent" offset="-14"/>
-            <Height val="84"/>
-            <Width val="84"/>
+            <!-- Based on the 14 offsets (84 in 112)-->
+            <Anchor side="Top" relative="$parent" pos="0.125" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="0.875" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="0.125" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="0.875" offset="0"/>
             <LayerCount val="1"/>
             <DesaturateOnDisable val="true"/>
             <DesaturationColor val="726899"/>
@@ -173,18 +173,31 @@
             </Frame>
         </Frame>
 
+        <!-- HERO LEVEL BG -->
+        <Frame type="Image" name="MasteryBg">
+            <Anchor side="Top" relative="$parent/PortraitBackingImage" pos="0.28" offset="0"/>
+            <Anchor side="Bottom" relative="$parent/PortraitBackingImage" pos="1.42" offset="0"/>
+            <Anchor side="Left" relative="$parent/PortraitBackingImage" pos="-0.1" offset="1"/>
+            <Anchor side="Right" relative="$parent/PortraitBackingImage" pos="1.1" offset="1"/>
+            <Visible val="False"/>
+            <ColorAdjustMode val="None"/>
+            <AdjustmentColor val="127,0,0,0"/>
+            <Unclipped val="True"/>
+        </Frame>
+
         <!-- HERO LEVEL TEXT -->
         <Frame type="HeroLabel" name="HeroLevelLabel">
-            <Anchor side="Bottom" relative="$parent" pos="Max" offset="5"/>
-            <Anchor side="Left" relative="$parent" pos="Min" offset="4"/>
-            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+            <Anchor side="Top" relative="$parent/MasteryBg" pos=".53" offset="0"/>
+            <Anchor side="Bottom" relative="$parent/MasteryBg" pos=".53" offset="0"/>
+            <Anchor side="Left" relative="$parent/MasteryBg" pos="Mid" offset="1"/>
+            <Anchor side="Right" relative="$parent/MasteryBg" pos="Mid" offset="1"/>
             <Style val="HeroSelectHeroLevelLabel"/>
             <HeroLabelType val="Level"/>
         </Frame>
     </Frame>
 
     <!--===========================================================================================
-    <! HeroItemTemplate - This has StateGroup that utilizes barebone templates to apply different states
+    <! HeroItemTemplate - This has StateGroups that utilize barebone templates to apply different states
     <!==========================================================================================-->
     <Frame type="HeroContainerFrame" name="HeroItemTemplate" template="HeroStandardTemplate/HeroItemBaseTemplate">
 
@@ -193,6 +206,7 @@
         <!=========================================================================================
         <! Allowed: true / false
         <! LevelType: Normal / Gold / Max
+        <! MasteryIndex: 0-5
         <!======================================================================================-->
         <Frame type="HeroState" name="HeroState">
             <Anchor relative="$parent"/>
@@ -207,31 +221,68 @@
 
             <State name="AlwaysAllowed">
                 <Action type="ApplyTemplate" template="HeroStandardTemplate/HeroItemAllowedTemplate"/>
+                <Action type="SetProperty" frame="HeroLevelLabel" style="HeroSelectHeroLevelLabel"/>
+            </State>
+
+            <State name="LockedGold">
+                <!-- Allowed == false -->
+                <When type="Property" frame="HeroState" levelType="Gold"/>
+                <When type="Property" frame="HeroState" isAllowed="false"/>
+                <Action type="ApplyTemplate" template="HeroStandardTemplate/HeroItemLockedGoldTemplate"/>
+                <Action type="SetProperty" frame="HeroLevelLabel" style="HeroSelectHeroLevelUnownedCompleteLabel"/>
+            </State>
+
+            <State name="LockedMax">
+                <When type="Property" frame="HeroState" levelType="Max"/>
+                <When type="Property" frame="HeroState" isAllowed="false"/>
+                <Action type="ApplyTemplate" template="HeroStandardTemplate/HeroItemNotAllowedMaxTemplate"/>
+                <Action type="SetProperty" frame="HeroLevelLabel" style="HeroSelectHeroLevelUnownedCompleteLabel"/>
             </State>
             
             <State name="Locked">
                 <When type="Property" frame="HeroState" isAllowed="false"/>
                 <Action type="ApplyTemplate" template="HeroStandardTemplate/HeroItemNotAllowedTemplate"/>
+                <Action type="SetProperty" frame="HeroLevelLabel" style="HeroSelectHeroLevelUnownedLabel"/>
             </State>
 
             <State name="AllowedNormal">
-                <!-- Allowed == false -->
                 <When type="Property" frame="HeroState" levelType="Normal"/>
                 <Action type="ApplyTemplate" template="HeroStandardTemplate/HeroItemAllowedTemplate"/>
+                <Action type="SetProperty" frame="HeroLevelLabel" style="HeroSelectHeroLevelLabel"/>
             </State>
 
             <State name="Gold">
                 <!-- Allowed == false -->
                 <When type="Property" frame="HeroState" levelType="Gold"/>
                 <Action type="ApplyTemplate" template="HeroStandardTemplate/HeroItemAllowedGoldTemplate"/>
+                <Action type="SetProperty" frame="HeroLevelLabel" style="HeroSelectHeroLevelCompleteLabel"/>
             </State>
 
             <State name="Max">
                 <!-- Allowed == false -->
                 <!-- LevelType == Max -->
                 <Action type="ApplyTemplate" template="HeroStandardTemplate/HeroItemAllowedMaxTemplate"/>
+                <Action type="SetProperty" frame="HeroLevelLabel" style="HeroSelectHeroLevelCompleteLabel"/>
             </State>
         </StateGroup>
+
+        <!-- HERO LEVEL BG -->
+        <Frame type="Image" name="MasteryBg">
+            <Texture val="{TextureFormatter/@Text}"/>
+
+            <Frame type="TextFormatFrame" name="TextureFormatter">
+                <Anchor relative="$parent"/>
+                <FormatText val="Assets\Textures\storm_ui_icon_master_taunt_%0%.dds"/>
+                <Replacement val="{$ancestor[@type=HeroContainerFrame]/HeroState/@MasteryIndex}" index="0"/>
+            </Frame>
+
+            <StateGroup name="Mastery">
+                <State name="Hidden">
+                    <When type="Property" frame="$ancestor[@type=HeroContainerFrame]/HeroState" MasteryIndex="0" operator="NotEqual"/>
+                    <Action type="SetProperty" visible="True"/>
+                </State>
+            </StateGroup>
+        </Frame>
     </Frame>
 
     <!--===========================================================================================
@@ -251,12 +302,17 @@
 
                     <Texture val="@UI/Storm_UI_Play_HeroPortrait_ProgressBar_Top_Off" layer="0"/>
                     <Texture val="@UI/Storm_UI_Play_HeroPortrait_ProgressBar_Off" layer="1"/>
+                    <ColorAdjustMode val="None"/>
                 </Frame>
             </Frame>
         </Frame>
 
         <Frame type="HeroLabel" name="HeroLevelLabel">
-            <Style val="HeroSelectHeroLevelUnownedLabel"/>
+            <Alpha val="255"/>
+        </Frame>
+
+        <Frame type="Image" name="MasteryBg">
+            <ColorAdjustMode val="Fill"/>
         </Frame>
     </Frame>
 
@@ -278,14 +334,18 @@
         </Frame>
 
         <Frame type="HeroLabel" name="HeroLevelLabel">
-            <Style val="HeroSelectHeroLevelLabel"/>
+            <Alpha val="255"/>
+        </Frame>
+
+        <Frame type="Image" name="MasteryBg">
+            <ColorAdjustMode val="None"/>
         </Frame>
     </Frame>
 
     <!--===========================================================================================
-    <! Template for StateGroup - HeroItemAllowedGoldTemplate 
+    <! Template for StateGroup - HeroItemAllowedGoldTemplate
     <!==========================================================================================-->
-    <Frame type="HeroContainerFrame" name="HeroItemAllowedGoldTemplate" template="HeroStandardTemplate/HeroItemNotAllowedTemplate">
+    <Frame type="HeroContainerFrame" name="HeroItemAllowedGoldTemplate" template="HeroStandardTemplate/HeroItemAllowedTemplate">
         <Frame type="HeroImage" name="IconImage">
             <Desaturated val="false"/>
         </Frame>
@@ -300,14 +360,47 @@
         </Frame>
 
         <Frame type="HeroLabel" name="HeroLevelLabel">
-            <Style val="HeroSelectHeroLevelCompleteLabel"/>
+            <Alpha val="255"/>
+        </Frame>
+
+        <Frame type="Image" name="MasteryBg">
+            <ColorAdjustMode val="None"/>
         </Frame>
     </Frame>
 
     <!--===========================================================================================
-    <! Template for StateGroup - HeroItemAllowedMaxTemplate 
+    <! Template for StateGroup - HeroItemLockedGoldTemplate
     <!==========================================================================================-->
-    <Frame type="HeroContainerFrame" name="HeroItemAllowedMaxTemplate" template="HeroStandardTemplate/HeroItemNotAllowedTemplate">
+    <Frame type="HeroContainerFrame" name="HeroItemLockedGoldTemplate" template="HeroStandardTemplate/HeroItemNotAllowedTemplate">
+        <Frame type="HeroImage" name="IconImage">
+            <Desaturated val="true"/>
+        </Frame>
+
+        <Frame type="HeroExperienceBar" name="HeroExperienceBar">
+            <Frame type="Frame" name="FillImageContainer">
+                <Frame type="Image" name="FillImage">
+                    <Texture val="@UI/Storm_UI_Play_HeroPortrait_ProgressBar_Top_On" layer="0"/>
+                    <Texture val="@UI/Storm_UI_Play_HeroPortrait_ProgressBar_On" layer="1"/>
+                    <ColorAdjustMode val="Colorize"/>
+                    <AdjustmentColor val="634428"/>
+                    <!-- <AdjustmentColor val="9E6734"/> -->
+                </Frame>
+            </Frame>
+        </Frame>
+
+        <Frame type="HeroLabel" name="HeroLevelLabel">
+            <Alpha val="127"/>
+        </Frame>
+
+        <Frame type="Image" name="MasteryBg">
+            <ColorAdjustMode val="Fill"/>
+        </Frame>
+    </Frame>
+
+    <!--===========================================================================================
+    <! Template for StateGroup - HeroItemAllowedMaxTemplate
+    <!==========================================================================================-->
+    <Frame type="HeroContainerFrame" name="HeroItemAllowedMaxTemplate" template="HeroStandardTemplate/HeroItemAllowedTemplate">
         <Frame type="HeroImage" name="IconImage">
             <Desaturated val="false"/>
         </Frame>
@@ -322,7 +415,39 @@
         </Frame>
 
         <Frame type="HeroLabel" name="HeroLevelLabel">
-            <Style val="HeroSelectHeroLevelCompleteLabel"/>
+            <Alpha val="255"/>
+        </Frame>
+
+        <Frame type="Image" name="MasteryBg">
+            <ColorAdjustMode val="None"/>
+        </Frame>
+    </Frame>
+
+    <!--===========================================================================================
+    <! Template for StateGroup - HeroItemNotAllowedMaxTemplate
+    <!==========================================================================================-->
+    <Frame type="HeroContainerFrame" name="HeroItemNotAllowedMaxTemplate" template="HeroStandardTemplate/HeroItemNotAllowedTemplate">
+        <Frame type="HeroImage" name="IconImage">
+            <Desaturated val="true"/>
+        </Frame>
+
+        <Frame type="HeroExperienceBar" name="HeroExperienceBar">
+            <Frame type="Frame" name="FillImageContainer">
+                <Frame type="Image" name="FillImage">
+                    <Texture val="@UI/Storm_UI_Play_HeroPortrait_ProgressBar_Gold" layer="0"/>
+                    <Texture val="@UI/Storm_UI_Play_HeroPortrait_ProgressBar_Top_Gold" layer="1"/>
+                    <ColorAdjustMode val="Colorize"/>
+                    <AdjustmentColor val="64350b"/>
+                </Frame>
+            </Frame>
+        </Frame>
+
+        <Frame type="HeroLabel" name="HeroLevelLabel">
+            <Alpha val="127"/>
+        </Frame>
+
+        <Frame type="Image" name="MasteryBg">
+            <ColorAdjustMode val="Fill"/>
         </Frame>
     </Frame>
 
@@ -346,11 +471,12 @@
         </Frame>
 
         <Frame type="Image" name="EmptyImage">
-            <Anchor side="Top" relative="$parent/HeroContainerFrame" pos="Mid" offset="0"/>
-            <Anchor side="Left" relative="$parent/HeroContainerFrame" pos="Mid" offset="0"/>
-            <Anchor side="Bottom" relative="$parent/HeroContainerFrame" pos="Mid" offset="0"/>
-            <Anchor side="Right" relative="$parent/HeroContainerFrame" pos="Mid" offset="0"/>
+            <Anchor side="Top" relative="$parent/HeroContainerFrame" pos="Min" offset="1"/>
+            <Anchor side="Bottom" relative="$parent/HeroContainerFrame" pos="Max" offset="1"/>
+            <Anchor side="Left" relative="$parent/HeroContainerFrame" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent/HeroContainerFrame" pos="Max" offset="0"/>
             <Texture val="@UI/Storm_UI_Play_HeroPortrait_Empty"/>
+            <SubpixelRendering val="true"/>
             <Visible val="False"/>
         </Frame>
 
@@ -369,8 +495,8 @@
                 <Event event="Hover" action="DirectionForward,Play" frame="$parent"/>
                 <Event event="Death" action="DirectionReverse,Play" frame="$parent"/>
                 <Controller type="Fade" end="Pause">
-                    <Key type="Curve" time="0" value="0" out="Slow"/>
-                    <Key type="Curve" time=".1" value="255" in="Slow"/>
+                    <Key type="Curve" time="0" value="0" inout="Linear,Slow"/>
+                    <Key type="Curve" time=".1" value="255" inout="Slow,Linear"/>
                 </Controller>
             </Animation>
         </Frame>
@@ -383,7 +509,7 @@
 
     <!--===========================================================================================
     <! TileList Template with StateGroup
-    <!==========================================================================================-->    
+    <!==========================================================================================-->
     <Frame type="TileListItem" name="HeroTileListItemTemplate" template="HeroStandardTemplate/HeroTileListBaseTemplate">
         <!-- TILELIST STATE -->
         <StateGroup name="TileListState">
@@ -396,15 +522,28 @@
             <State name="NotEmpty">
                 <Action type="SetProperty" frame="HeroContainerFrame" visible="true"/>
             </State>
-        </StateGroup>        
+        </StateGroup>
 
         <!-- HERO STATE -->
         <StateGroup name="HeroStates">
             <DefaultState val="Gold"/>
-            
+
             <State name="Locked">
+                <When type="Property" frame="HeroContainerFrame/HeroState" levelType="Normal"/>
                 <When type="Property" frame="HeroContainerFrame/HeroState" isAllowed="false"/>
                 <Action type="SetProperty" frame="HoverImage" texture="@UI/Storm_UI_Play_HeroPortrait_ProgressBar_Hover_Off"/>
+            </State>
+
+            <State name="LockedGold">
+                <When type="Property" frame="HeroContainerFrame/HeroState" levelType="Gold"/>
+                <When type="Property" frame="HeroContainerFrame/HeroState" isAllowed="false"/>
+                <Action type="SetProperty" frame="HoverImage" texture="@UI/Storm_UI_Play_HeroPortrait_ProgressBar_Hover_Gold"/>
+            </State>
+
+            <State name="LockedMax">
+                <When type="Property" frame="HeroContainerFrame/HeroState" levelType="Max"/>
+                <When type="Property" frame="HeroContainerFrame/HeroState" isAllowed="false"/>
+                <Action type="SetProperty" frame="HoverImage" texture="@UI/Storm_UI_Play_HeroPortrait_ProgressBar_Hover_Gold"/>
             </State>
 
             <State name="AllowedNormal">
@@ -421,19 +560,30 @@
         </StateGroup>
 
         <!-- HERO BADGE STATE -->
+        <!-- Do not show IGR state on Roster panel -->
         <StateGroup name="HeroBadge">
             <DefaultState val="Empty"/>
             
+            <State name="Favorite_FreeToPlay">
+                <When type="Property" frame="HeroContainerFrame/HeroState" isFavorite="true"/>
+                <When type="Property" frame="HeroContainerFrame/HeroState" IsFreeToPlay="true"/>
+                <Action type="SetState" frame="HeroBadgeContainer" group="State" state="Favorite_FreeToPlay"/>
+            </State>
+
             <State name="Favorite">
                 <When type="Property" frame="HeroContainerFrame/HeroState" isFavorite="true"/>
                 <Action type="SetState" frame="HeroBadgeContainer" group="State" state="Favorite"/>
+            </State>
+
+            <State name="FreeToPlay">
+                <When type="Property" frame="HeroContainerFrame/HeroState" IsFreeToPlay="true"/>
+                <Action type="SetState" frame="HeroBadgeContainer" group="State" state="FreeToPlay"/>
             </State>
 
             <State name="Empty">
                 <Action type="SetState" frame="HeroBadgeContainer" group="State" state="Empty"/>
             </State>
         </StateGroup>
-
     </Frame>
 
 </Desc>

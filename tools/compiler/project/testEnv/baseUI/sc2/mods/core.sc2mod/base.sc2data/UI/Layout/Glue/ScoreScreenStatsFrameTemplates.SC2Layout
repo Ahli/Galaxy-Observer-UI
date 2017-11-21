@@ -8,8 +8,8 @@
     <Constant name="TitlePlayerWidth" val="350"/>
     
     <Frame type="ScrollBar" name="ScrollBarTemplate">
-        <Image val="$root/CustomGameListPanel/ScrollBarBackgroundImage"/>
-        <Button val="$root/CustomGameListPanel/ScrollBarButtonTemplate"/>
+        <Image val="$root/StandardBattlenetTemplates/ScrollBarBackgroundImage"/>
+        <Button val="$root/StandardBattlenetTemplates/ScrollBarButtonTemplate"/>
         <Orientation val="Vertical"/>
         <Width val="16"/>
     </Frame>
@@ -93,6 +93,7 @@
                 <!-- This animation causes the bar to fill up -->
                 <Animation name="CountUp">
                     <Event event="OnShown" action="Reset,Play" frame="$parent/$parent/$parent"/>
+                    <Event event="OnUpdateData" action="Reset,Play" frame="$parent/$parent/$parent/$parent"/>
 
                     <Controller type="Anchor" side="Right" relative="True" end="Pause">
                         <Key type="Curve" time="0.0" value="-240" out="Slow"/>
@@ -187,6 +188,7 @@
 
             <Animation name="CountUp">
                 <Event event="OnShown" action="Reset,Play" frame="$parent"/>
+                <Event event="OnUpdateData" action="Reset,Play" frame="$parent/$parent"/>
 
                 <Controller type="Counter" end="Pause">
                     <Key type="Curve" time="0.0" value="0.0" out="Slow"/>
@@ -259,7 +261,7 @@
                 <Anchor side="Top" relative="$parent" pos="Mid" offset="-1"/>
                 <Anchor side="Bottom" relative="$parent" pos="Mid" offset="-1"/>
                 <Anchor side="Left" relative="$parent/LeagueIcon" pos="Max" offset="5"/>
-                <Texture val="@UI/SC2_UI_Collection_VoicePack_RaceIcon_Terr"/>
+                <Texture val="@UI/Battlenet_Glue_Ladder_Score_RaceIcon_Terr"/>
                 <Width val="40"/>
                 <Height val="48"/>
             
@@ -267,43 +269,34 @@
                 <StateGroup name="RaceStateGroup">
                     <State name="Terr">
                         <When type="Property" frame="$parent/$parent" RaceText="Terr"/>
-                        <Action type="SetProperty" Texture="@UI/SC2_UI_Collection_VoicePack_RaceIcon_Terr"/>
+                        <Action type="SetProperty" Texture="@UI/Battlenet_Glue_Ladder_Score_RaceIcon_Terr"/>
                     </State>
                 
                     <State name="Zerg">
                         <When type="Property" frame="$parent/$parent" RaceText="Zerg"/>
-                        <Action type="SetProperty" Texture="@UI/SC2_UI_Collection_VoicePack_RaceIcon_Zerg"/>
+                        <Action type="SetProperty" Texture="@UI/Battlenet_Glue_Ladder_Score_RaceIcon_Zerg"/>
                     </State>
                 
                     <State name="Prot">
                         <When type="Property" frame="$parent/$parent" RaceText="Prot"/>
-                        <Action type="SetProperty" Texture="@UI/SC2_UI_Collection_VoicePack_RaceIcon_Prot"/>
+                        <Action type="SetProperty" Texture="@UI/Battlenet_Glue_Ladder_Score_RaceIcon_Prot"/>
                     </State>
                 </StateGroup>
             </Frame>
 
-            <Frame type="Frame" name="ComputerLabelContainer">
-                <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
-                <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
-                <Anchor side="Left" relative="$parent/RaceIcon" pos="Max" offset="0"/>
-                <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
-                
-                <Frame type="Label" name="ComputerLabel">
-                    <Anchor side="Top" relative="$parent" pos="Min" offset="3"/>
-                    <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
-                    <Anchor side="Left" relative="$parent" pos="Min" offset="10"/>
-                    <Style val="ScoreScreenStatsAILabel"/>
-                    <Text val="@UI/ScreenScore/ComputerName"/>
-                    <Color val="{$parent/$parent/$parent/@PlayerColor}"/>
-                </Frame>
+            <Frame type="Label" name="ComputerLabel">
+                <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Left" relative="$parent/RaceIcon" pos="Max" offset="10"/>
+                <Anchor side="Right" relative="$parent" pos="Max" offset="-10"/>
+                <Color val="{$parent/$parent/@PlayerColor}"/>
+                <Style val="ScoreScreenPlayerLabel"/>
+                <Text val="{$this/FormatFrame/@Text}"/>
 
-                <Frame type="Label" name="ScopeLabel">
-                    <Anchor side="Top" relative="$parent" pos="Min" offset="3"/>
-                    <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
-                    <Anchor side="Left" relative="$parent/ComputerLabel" pos="Max" offset="0"/>
-                    <Style val="ScoreScreenStatsAILabel"/>
-                    <Text val="{$parent/$parent/$parent/@PlayerScope}"/>
-                    <Color val="{$parent/$parent/$parent/@PlayerColor}"/>
+                <Frame type="TextFormatFrame" name="FormatFrame">
+                    <Anchor relative="$parent"/>
+                    <FormatText val="@UI/ScreenScore/ComputerName"/>
+                    <Replacement index="0" val="{$parent/$parent/$parent/@PlayerScope}"/>
                 </Frame>
             </Frame>
 
@@ -320,13 +313,13 @@
             <StateGroup name="ComputerStateGroup">
                 <State name="IsComputer">
                     <When type="Property" frame="$parent" IsComputer="true"/>
-                    <Action type="SetProperty" frame="ComputerLabelContainer" Visible="true"/>
+                    <Action type="SetProperty" frame="ComputerLabel" Visible="true"/>
                     <Action type="SetProperty" frame="UserButton" Visible="false"/>
                 </State>
                 
                 <State name="IsPlayer">
                     <When type="Property" frame="$parent" IsComputer="false"/>
-                    <Action type="SetProperty" frame="ComputerLabelContainer" Visible="false"/>
+                    <Action type="SetProperty" frame="ComputerLabel" Visible="false"/>
                     <Action type="SetProperty" frame="UserButton" Visible="true"/>
                 </State>
             </StateGroup>
@@ -336,6 +329,7 @@
                 <Anchor side="Left" relative="$parent/UserButton" pos="Min" offset="0"/>
                 <UseAnchors val="true"/>
                 <PresenceId val="{$parent/$parent/@PresenceId}"/>
+                <FromScoreScreen val="true"/>
             </Frame>
         </Frame>
     </Frame>

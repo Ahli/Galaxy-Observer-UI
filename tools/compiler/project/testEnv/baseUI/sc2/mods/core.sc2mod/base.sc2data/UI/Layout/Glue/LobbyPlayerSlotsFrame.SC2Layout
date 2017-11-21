@@ -49,32 +49,28 @@
         <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
         <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
         <Height val="#PlayerSlotHeight"/>
+        <Enabled val="true"/>
         <Draggable val="{$ScreenBattleLobby/@IsHost}"/>
         <DragConstraintFrame val="$parent/$parent/$parent/$parent/ConstraintFrame"/>
         <DragCursor val="GripClosed"/>
         <DragHoverCursor val="GripOpen"/>
         <AcceptsMouseDropTarget val="true"/>
         <ContextMenu val="$this/ContextMenu"/>
-
-        <!-- Set the player slot and the container team frame to render above when dragging -->
-        <!-- Also unclip the dragged frame so it can break outside all the containers -->
-        <!-- Set the render priority of the team frame through animation events -->
-        <!-- Because layout complains when setting it as a property in template heirarchy -->
-        <StateGroup name="RenderPriorityStateGroup">
+        
+        <StateGroup name="DraggableStateGroup">
+            <State name="DragState">
+                <When type="Property" frame="$ScreenBattleLobby" IsCountdownLocked="true"/>
+                <Action type="SetProperty" frame="$this" Enabled="false"/>
+            </State>
+        </StateGroup>
+        
+        <!-- Hide this slot while is is being dragged. The displayed dragging slot is actually a separate slot -->
+        <!-- that renders on top of everything else and is anchored to the actual dragged slot. -->
+        <StateGroup name="DraggingSlotStateGroup">
             <State name="DragState">
                 <When type="Property" frame="$this" IsDraggingSlot="true"/>
-                <Action type="SetProperty" frame="$this" Unclipped="true"/>
                 <Action type="SetProperty" frame="$this" AcceptsMouseDropTarget="false"/>
-                <Action type="SendEvent" frame="$parent" Event="DragStart"/>
-                <Action type="SendEvent" frame="$parent/$parent" Event="DragStart"/>
-                <Action type="SendEvent" frame="$parent/$parent/$parent/$parent" Event="DragStart"/>
-            </State>
-
-            <State name="DragEndState">
-                <When type="Property" frame="$this" IsDraggingSlot="false"/>
-                <Action type="SendEvent" frame="$parent" Event="DragEnd"/>
-                <Action type="SendEvent" frame="$parent/$parent" Event="DragEnd"/>
-                <Action type="SendEvent" frame="$parent/$parent/$parent/$parent" Event="DragEnd"/>
+                <Action type="SetProperty" frame="$this" Alpha="0"/>
             </State>
         </StateGroup>
         
@@ -107,6 +103,7 @@
             <CollapseLayout val="true"/>
             <Visible val="{$parent/@IsTandemFollower}"/>
             <Texture val="@UI/Battlenet_Glue_Multiplayer_Custom_ArchonSlot_Empty"/>
+            <DesaturateOnDisable val="false"/>
             
             <StateGroup name="SlotStatus">
                 <DefaultState val="OccupiedSlot"/>
@@ -130,6 +127,7 @@
             <PreserveAnchorOffset val="False"/>
             <Texture val="@UI/SC2_UI_Battlenet_Glue_Arcade_MainListItem_Normal"/>
             <TextureType val="NineSlice"/>
+            <DesaturateOnDisable val="false"/>
             
             <StateGroup name="SlotStatus">
                 <DefaultState val="OccupiedSlot"/>
@@ -200,6 +198,7 @@
                 <Width val="49"/>
                 <Height val="49"/>
                 <Texture val="@UI/Glues_Icons_AI_Small"/>
+                <DesaturateOnDisable val="false"/>
             </Frame>
 
             <Frame type="Image" name="Frame">
@@ -209,6 +208,7 @@
                 <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
                 <Texture val="@UI/Glues_Avatar_LeagueBorder_Small_Unranked"/>
                 <Alpha val="255"/>
+                <DesaturateOnDisable val="false"/>
             </Frame>
         </Frame>
 
@@ -448,6 +448,7 @@
             <AcceptsMouseTooltip val="true"/>
             <Tooltip val="@UI/ScreenBattleLobby/CustomObserverInterfaceTooltip"/>
             <Texture val="@UI/Glues_Icons_Warning_Small"/>
+            <DesaturateOnDisable val="false"/>
 
             <!-- Show this icon for non-Resume replay lobbies if this player has a custom observer interface -->
             <StateGroup name="VisibleStateGroup">
@@ -526,6 +527,8 @@
         <Visible val="true"/>
         <CollapseLayout val="true"/>
         <ItemDesc val="LobbyPlayerSlotsFrame/LobbyPlayerSlotsPlayerFrameTemplate"/>
+        <DragSlotFrame val="$parent/$parent/$parent/DragSlotFrame"/>
+        <AcceptsMouseDropTarget val="true"/>
         
         <!-- This container frame will create the PlayerFrame on demand in code, to avoid creating -->
         <!-- tens of thousands of frames on startup. This means you won't be able to use StateGroups to -->
@@ -543,22 +546,6 @@
                 <Action type="SetProperty" frame="$this" Visible="false"/>
             </State>
         </StateGroup>
-    
-        <!-- Set the player slot and the container team frame to render above when dragging -->
-        <!-- Also unclip the dragged frame so it can break outside all the containers -->
-        <!-- Set the render priority of the team frame through animation events -->
-        <!-- Because layout complains when setting it as a property in template heirarchy -->
-        <Animation name="DragAnim">
-            <Event event="DragStart" action="Reset,Play"/>
-            <Event event="DragEnd" action="Reset,Stop"/>
-            <Controller type="Property" property="RenderPriority" end="Pause">
-                <Key type="Property" time="0" value="#DragRenderPriority"/>
-            </Controller>
-        
-            <Controller type="Property" property="AcceptsMouseDropTarget" end="Pause">
-                <Key type="Property" time="0" value="true"/>
-            </Controller>
-        </Animation>
     </Frame>
 
     <Frame type="LobbyPlayerSlotsTeamFrame" name="LobbyPlayerSlotsTeamFrameTemplate">
@@ -568,14 +555,6 @@
         <Visible val="{$this/PlayerFrame0/@Visible}"/>
         <CollapseLayout val="true"/>
         <AcceptsMouseDropTarget val="{$this/@CanAddSlot}"/>
-        
-        <Animation name="DragAnim">
-            <Event event="DragStart" action="Reset,Play"/>
-            <Event event="DragEnd" action="Reset,Stop"/>
-            <Controller type="Property" property="RenderPriority" end="Pause">
-                <Key type="Property" time="0" value="#DragRenderPriority"/>
-            </Controller>
-        </Animation>
 
         <Frame type="Image" name="BackgroundImage">
             <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
@@ -855,7 +834,7 @@
                         <Text val="@UI/ScreenBattleLobby/TeamReplay"/>
                     </Frame>
                 </Frame>
-    
+
                 <Frame type="Frame" name="BottomPaddingFrame">
                     <Anchor side="Top" relative="$parent/TeamFrameReplay" pos="Max" offset="0"/>
                     <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
@@ -886,7 +865,6 @@
                         <Anchor relative="$parent"/>
                         <Texture val="@UI/ChatPanelScrollBarGrabber_Normal"/>
                         <TextureType val="NineSlice"/>
-                        <StateCount val="2"/>
                         <Tiled val="true"/>
                     </Frame>
 
@@ -894,10 +872,17 @@
                         <Anchor relative="$parent"/>
                         <Texture val="@UI/ChatPanelScrollBarGrabber_Hover"/>
                         <TextureType val="NineSlice"/>
-                        <StateCount val="2"/>
                         <Tiled val="true"/>
                     </Frame>
                 </Frame>
+            </Frame>
+
+            <Frame type="LobbyPlayerSlotsPlayerFrame" name="DragSlotFrame" template="LobbyPlayerSlotsFrame/LobbyPlayerSlotsPlayerFrameTemplate">
+                <Visible val="{$this/@HasScope}"/>
+                <Enabled val="true"/>
+                <Draggable val="false"/>
+                <AcceptsMouseDropTarget val="false"/>
+                <AcceptsMouse val="false"/>
             </Frame>
             
             <Frame type="Control" name="IncrementFrame">
@@ -905,15 +890,7 @@
                 <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
                 <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
                 <Height val="50"/>
-                <Visible val="false"/>
-        
-                <Animation name="DragAnim">
-                    <Event event="DragStart" frame="$parent" action="Reset,Play"/>
-                    <Event event="DragEnd" frame="$parent" action="Reset,Stop"/>
-                    <Controller type="Property" property="Visible" end="Pause">
-                        <Key type="Property" time="0" value="true"/>
-                    </Controller>
-                </Animation>
+                <Visible val="{$parent/DragSlotFrame/@Visible}"/>
             </Frame>
             
             <Frame type="Control" name="DecrementFrame">
@@ -921,7 +898,7 @@
                 <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
                 <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
                 <Height val="50"/>
-                <Visible val="{$parent/IncrementFrame/@Visible}"/>
+                <Visible val="{$parent/DragSlotFrame/@Visible}"/>
             </Frame>
         </Frame>
     </Frame>

@@ -1,11 +1,186 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <Desc>
 
+    <!-- Region: Templates -->
     <Frame type="Frame" name="PortraitMaskFrameTemplate">
         <AlphaMaskTexture val="@UI/HUD_BG_PortraitFrame_InverseAlphaMask"/>
         <AlphaMaskSiblings val="true"/>
         <RenderPriority val="1"/>
     </Frame>
+
+    <Frame type="UnitStatusColor" name="TeamColoringTemplate">
+        <Width val="3"/>
+        <Height val="3"/>
+
+        <ColorStyle val="MinimapTeams"/>
+        <AdditionalColorStyle val="PrimaryLight" index="0"/>
+
+        <StateGroup name="ReadRelation">
+            <State name="Ally">
+                <When type="Property" frame="$this" CurrentRelation="Ally"/>
+                <Action type="SetState" frame="$this" group="RedBlue" state="Blue"/>
+            </State>
+            <State name="TeamOrder">
+                <When type="Property" frame="$this" CurrentRelation="TeamOrder"/>
+                <Action type="SetState" frame="$this" group="RedBlue" state="Blue"/>
+            </State>
+            <State name="Enemy">
+                <When type="Property" frame="$this" CurrentRelation="Enemy"/>
+                <Action type="SetState" frame="$this" group="RedBlue" state="Red"/>
+            </State>
+            <State name="TeamChaos">
+                <When type="Property" frame="$this" CurrentRelation="TeamChaos"/>
+                <Action type="SetState" frame="$this" group="RedBlue" state="Red"/>
+            </State>
+        </StateGroup>
+        <StateGroup name="RedBlue">
+            <DefaultState val="Blue"/>
+            <State name="Red"/>
+            <State name="Blue"/>
+        </StateGroup>
+
+        <StateGroup name="TextureColor">
+            <DefaultState val="TextureBlue"/>
+            <State name="TextureOrange">
+                <When type="StateGroup" frame="$this" RedBlue="Red"/>
+                <When type="Option" colorblind="True"/>
+            </State>
+            <State name="TextureCyan">
+                <When type="StateGroup" frame="$this" RedBlue="Blue"/>
+                <When type="Option" colorblind="True"/>
+            </State>
+            <State name="TextureRed">
+                <When type="StateGroup" frame="$this" RedBlue="Red"/>
+            </State>
+            <State name="TextureBlue">
+                <When type="StateGroup" frame="$this" RedBlue="Blue"/>
+            </State>
+        </StateGroup>
+    </Frame>
+
+    <!-- Cooldown Notification Template -->
+    <Frame type="CooldownNotificationFrame" name="CooldownNoficationFrameTemplate">
+        <Visible val="false"/>
+        <Alpha val="255"/>
+
+        <Frame type="Frame" name="CursorAnchorFrame">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+            <Height val="0"/>
+            <Width val="0"/>
+        </Frame>
+
+        <Frame type="Image" name="BackgroundImage">
+            <Anchor side="Top" relative="$parent/CursorAnchorFrame" pos="Mid" offset="50"/>
+            <Anchor side="Left" relative="$parent/CursorAnchorFrame" pos="Max" offset="50"/>
+            <Anchor side="Bottom" relative="$parent/CursorAnchorFrame" pos="Mid" offset="50"/>
+            <Width val="60"/>
+            <Height val="64"/>
+            <Texture val="@UI/Storm_UI_InGame_CooldownNotification_Background"/>
+        </Frame>
+
+        <Frame type="ProgressBar" name="ProgressBar">
+            <Anchor relative="$parent/BackgroundImage"/>
+            <Width val="60"/>
+            <Height val="64"/>
+
+            <Circular val="true"/>
+            <InvertFill val="true"/>
+            <Value val="{$parent/@CooldownValue}"/>
+            <MaxValue val="3"/>
+
+            <Frame type="Frame" name="FillImageContainer">
+                <Anchor relative="$parent"/>
+
+                <Frame type="Image" name="FillImage">
+                    <Anchor relative="$parent"/>
+                    <TextureType val="Circular"/>
+                    <Texture val="@UI/Storm_UI_InGame_CooldownNotification_ProgressBar"/>
+                </Frame>
+            </Frame>
+
+            <StateGroup name="CooldownStates">
+                <State name="GreaterThan3">
+                    <When type="Property" frame="$parent" operator="GreaterThan" CooldownValue="3"/>
+                    <Action type="SetProperty" Visible="false"/>
+                    <Action type="SetProperty" frame="$parent/Label" Alpha="180"/>
+                </State>
+            </StateGroup>
+        </Frame>
+
+        <Frame type="Label" name="Label">
+            <Anchor side="Top" relative="$parent/BackgroundImage" pos="Mid" offset="1"/>
+            <Anchor side="Left" relative="$parent/BackgroundImage" pos="Mid" offset="1"/>
+            <Anchor side="Right" relative="$parent/BackgroundImage" pos="Mid" offset="1"/>
+            <Anchor side="Bottom" relative="$parent/BackgroundImage" pos="Mid" offset="1"/>
+            <Style val="CooldownNotification"/>
+            <Text val="{$parent/@CooldownText}"/>
+        </Frame>
+
+        <Animation name="FadeAnim">
+            <Event event="OnShown" action="Reset, Play"/>
+            <Event event="RestartNotification" action="Reset, Play"/>
+
+            <Controller type="Fade" end="Stop">
+                <Key type="Curve" time="0" value="255"/>
+                <Key type="Curve" time=".4" value="255" inout="Linear,Slow"/>
+                <Key type="Curve" time=".7" value="0" inout="Fast,Linear"/>
+            </Controller>
+            <Controller type="Visibility" end="Pause">
+                <Key type="Bool" time=".7" value="false"/>
+            </Controller>
+        </Animation>
+
+        <Animation name="NormalSoundAnim">
+            <Event event="PlaySound" action="Reset, Play"/>
+
+            <Controller type="Sound" end="Stop">
+                <Key type="Sound" time="0" sound="@UI_Generic_Cooldown"/>
+            </Controller>
+        </Animation>
+
+        <Animation name="3SecSoundAnim">
+            <Event event="PlaySound" action="Reset, Play"/>
+
+            <Controller type="Sound" end="Stop">
+                <Key type="Sound" time="0" sound="@UI_Generic_Cooldown_3Sec"/>
+            </Controller>
+        </Animation>
+
+        <Animation name="PlaySoundAnim">
+            <Event event="OnShown" action="Reset, Play"/>
+            <Event event="RestartNotification" action="Reset, Play"/>
+
+            <Controller type="Event" end="Stop">
+                <Key type="Event" time="0.001" event="PlaySound"/>
+            </Controller>
+        </Animation>
+
+        <StateGroup name="SoundStates">
+            <State name="ErrorSoundsDisabled">
+                <When type="Option" sounderrors="false"/>
+                <Action type="SetAnimationProperty" animation="NormalSoundAnim" enabled="false"/>
+                <Action type="SetAnimationProperty" animation="3SecSoundAnim" enabled="false"/>
+            </State>
+            <State name="GreaterThan3">
+                <When type="Property" operator="GreaterThan" CooldownValue="3"/>
+                <Action type="SetAnimationProperty" animation="NormalSoundAnim" enabled="true"/>
+                <Action type="SetAnimationProperty" animation="3SecSoundAnim" enabled="false"/>
+            </State>
+            <State name="LessThan3">
+                <When type="Property" operator="LessThan" CooldownValue="3"/>
+                <When type="Property" operator="GreaterThan" CooldownValue="0.55"/>
+                <Action type="SetAnimationProperty" animation="NormalSoundAnim" enabled="false"/>
+                <Action type="SetAnimationProperty" animation="3SecSoundAnim" enabled="true"/>
+            </State>
+            <State name="LessThanHalfSecond">
+                <When type="Property" operator="LessThan" CooldownValue="0.55"/>
+                <Action type="SetAnimationProperty" animation="NormalSoundAnim" enabled="false"/>
+                <Action type="SetAnimationProperty" animation="3SecSoundAnim" enabled="false"/>
+            </State>
+        </StateGroup>
+    </Frame>
+    <!-- EndRegion: Templates -->
 
     <Frame type="GameUI" name="GameUI">
         <Anchor relative="$parent"/>
@@ -14,15 +189,51 @@
         <ConsoleWorldBottomOffset val="0"/>
         <SuppressEnemyConnectionEvents val="true" />
         <DeactivateChatBarOnClick val="true" />
+        <Handle val="GameUI"/>
 
         <Frame type="StandardTooltip" name="StormStandardTooltip" template="StandardTooltip/StandardTooltip"/>
+
+        <!-- BEGIN Property bindable Colors -->
+        <Frame type="UnitStatusColor" name="TeamOrderColors" template="GameUI/TeamColoringTemplate">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+
+            <ForcedTeam val="0"/>
+        </Frame>
+        <Frame type="UnitStatusColor" name="TeamChaosColors" template="GameUI/TeamColoringTemplate">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent/TeamOrderColors" pos="Max" offset="0"/>
+
+            <ForcedTeam val="1"/>
+        </Frame>
+        <Frame type="UnitStatusColor" name="AllyColors">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent/TeamChaosColors" pos="Min" offset="0"/>
+            <Width val="3"/>
+            <Height val="3"/>
+
+            <ForcedRelation val="Ally"/>
+            <ColorStyle val="Primary"/>
+            <AdditionalColorStyle val="PrimaryLight" index="0"/>
+        </Frame>
+        <Frame type="UnitStatusColor" name="EnemyColors">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent/AllyColors" pos="Min" offset="0"/>
+            <Width val="3"/>
+            <Height val="3"/>
+
+            <ForcedRelation val="Enemy"/>
+            <ColorStyle val="Primary"/>
+            <AdditionalColorStyle val="PrimaryLight" index="0"/>
+        </Frame>
+        <!-- END Property bindable Colors -->
 
         <Frame type="WorldPanel" name="WorldPanel">
             <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
             <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
             <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
             <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
-            
+
             <Frame type="UnitStatusFloatingCombatElement" name="CinematicFloatingCombatElement" template="FloatingCombatElements/UnitStatusFloatingCombatElementTemplate">
                 <StateGroup name="CinematicFloatingCombatState">
                     <DefaultState val="PlayingState"/>
@@ -31,7 +242,7 @@
                         <When type="Property" frame="$parent/$parent/UIContainer/ConsoleUIContainer" visible="true"/>
                         <Action type="SetProperty" frame="$this" visible="false"/>
                     </State>
-                    
+
                     <State name="WatchingState">
                         <When type="Property" frame="$parent/$parent/UIContainer/ConsoleUIContainer" visible="false"/>
                         <Action type="SetProperty" frame="$this" visible="true"/>
@@ -47,17 +258,16 @@
                 <Batch val="true"/>
 
                 <Frame type="Frame" name="PortraitMaskFrame" template="GameUI/PortraitMaskFrameTemplate">
-                    <Anchor relative="$parent/$parent/$parent/UIContainer/ConsolePanel/PortraitPanel" offset="-10"/>
+                    <Anchor relative="$parent/$parent/$parent/UIContainer/ConsolePanel/PortraitPanelContainer/PortraitPanel" offset="-10"/>
                 </Frame>
             </Frame>
         </Frame>
 
 
-        <Frame type="Frame" name="SeasonalEventSplashPanel" template="StarCraftEventHelpPanel/StarCraftEventHelpPanelTemplate">
+        <!-- <Frame type="Frame" name="SeasonalEventSplashPanel" template="StarCraftEventHelpPanel/StarCraftEventHelpPanelTemplate">
             <Anchor relative="$parent"/>
-        </Frame>
+        </Frame> -->
 
-        
         <Frame type="Image" name="OverlayImage">
             <TextureType val="Normal" layer="0"/>
             <Visible val="false"/>
@@ -114,7 +324,7 @@
         <Frame type="Frame" name="UIContainer">
             <Anchor relative="$parent"/>
 
-            <Frame type="TalentTooltip" name="HeroTalentTooltip" template="StandardTooltip/TalentTooltipTemplate"/>
+            <Frame type="Frame" name="GameUITooltips" template="GameUITooltips/GameUITooltipsTemplate"/>
 
             <!-- Fullscreen lower UI elements - below the console -->
             <Frame type="Frame" name="FullscreenLowerContainer">
@@ -138,31 +348,31 @@
                     <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
                     <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
                 </Frame>
+
+                <Frame type="Frame" name="GameNotificationsPanel" template="GameNotifications/InGameNotificationsTemplate">
+                    <Anchor side="Top" relative="$parent/$parent/ConsoleUIContainer/PartyFramePanel" pos="Max" offset="-34"/>
+                </Frame>
             </Frame>
 
             <!-- Console Panel - actual model frame which makes up the console -->
             <Frame type="ConsolePanel" name="ConsolePanel" template="ConsolePanel/ConsolePanelTemplate">
                 <Handle val="ConsolePanel"/>
                 <Anchor relative="$parent"/>
-                
+
                 <Animation name="HideMask">
-                    <Event event="OnShown" action="DirectionForward"/>
-                    <Event event="OnShown" action="Play"/>
-                    <Event event="OnHidden" action="DirectionReverse"/>
-                    <Event event="OnHidden" action="Play"/>
+                    <Event event="OnShown" action="DirectionForward,Play"/>
+                    <Event event="OnHidden" action="DirectionReverse,Play"/>
 
                     <Controller type="Visibility" end="Pause" frame="$parent/$parent/WorldPanel/UnitStatusPanel/PortraitMaskFrame">
                         <Key type="Bool" time="0" value="false"/>
                         <Key type="Bool" time=".001" value="true"/>
                     </Controller>
                 </Animation>
-                
+
                 <Frame type="Frame" name="HeroTalentTreeSelectionIndicatorContainer">
                     <Animation name="Hide">
-                        <Event event="OnShown" action="DirectionForward" frame="$parent/$parent/ConsoleUIContainer/HeroCharacterSheetPanelContainer/HeroCharacterSheetPanel"/>
-                        <Event event="OnShown" action="Play" frame="$parent/$parent/ConsoleUIContainer/HeroCharacterSheetPanelContainer/HeroCharacterSheetPanel"/>
-                        <Event event="OnHidden" action="DirectionReverse" frame="$parent/$parent/ConsoleUIContainer/HeroCharacterSheetPanelContainer/HeroCharacterSheetPanel"/>
-                        <Event event="OnHidden" action="Play" frame="$parent/$parent/ConsoleUIContainer/HeroCharacterSheetPanelContainer/HeroCharacterSheetPanel"/>
+                        <Event event="OnShown" action="DirectionForward,Play" frame="$parent/$parent/ConsoleUIContainer/HeroCharacterSheetPanelContainer/HeroCharacterSheetPanel"/>
+                        <Event event="OnHidden" action="DirectionReverse,Play" frame="$parent/$parent/ConsoleUIContainer/HeroCharacterSheetPanelContainer/HeroCharacterSheetPanel"/>
 
                         <Controller type="Fade" end="Pause">
                             <Key type="Curve" time="0.0" value="255"/>
@@ -170,12 +380,54 @@
                         </Controller>
                     </Animation>
                 </Frame>
-                
+
                 <Frame type="Frame" name="KillLogPanel">
                     <Anchor side="Top" relative="$parent/$parent/ConsoleUIContainer/PartyFramePanel" pos="Max" offset="-34"/>
                     <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
                     <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
                     <Width val="600"/>
+
+                    <Frame type="UnitStatusColor" name="AllyColors">
+                        <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                        <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                        <Width val="3"/>
+                        <Height val="3"/>
+
+                        <ForcedRelation val="Ally"/>
+
+                        <ColorStyle val="MedKillLog"/>
+                        <AdditionalColorStyle val="LightKillLog" index="0"/>
+                        <AdditionalColorStyle val="DarkKillLog" index="1"/>
+                    </Frame>
+                    <Frame type="UnitStatusColor" name="EnemyColors">
+                        <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                        <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                        <Width val="3"/>
+                        <Height val="3"/>
+
+                        <ForcedRelation val="Enemy"/>
+
+                        <ColorStyle val="MedKillLog"/>
+                        <AdditionalColorStyle val="LightKillLog" index="0"/>
+                        <AdditionalColorStyle val="DarkKillLog" index="1"/>
+                    </Frame>
+                    <Frame type="UnitStatusColor" name="NexusColors">
+                        <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                        <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                        <Width val="3"/>
+                        <Height val="3"/>
+
+                        <ForcedRelation val="DefaultNeutral"/>
+
+                        <ColorStyle val="MedKillLog"/>
+                        <AdditionalColorStyle val="LightKillLog" index="0"/>
+                        <AdditionalColorStyle val="DarkKillLog" index="1"/>
+                    </Frame>
+                </Frame>
+
+                <Frame type="Frame" name="KillLogDebugPanel" template="KillLog/DebugPanel">
+                    <Anchor side="Top" relative="$parent/KillLogPanel" pos="Min" offset="300"/>
+                    <Anchor side="Left" relative="$parent/KillLogPanel" pos="Max" offset="10"/>
                 </Frame>
             </Frame>
 
@@ -186,46 +438,87 @@
                 <Frame type="Frame" name="SandboxUIContainer">
                     <Anchor relative="$parent"/>
                     <Visible val="false"/>
-                    
-                    <Frame type="Label" name="WatermarkTopLabel">
-                        <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
-                        <Anchor side="Right" relative="$parent" pos="Max" offset="-15"/>
-                        <Text val="@UI/Sandbox/Title"/>
-                        <Style val="Storm_Sandbox_Title"/>
+
+                    <Frame type="AspectRatioFrame" name="4x3_5x4_Frame">
+                        <Anchor relative="$parent"/>
+                        <MinVisibleAspectRatio val="1.5"/>
                     </Frame>
-                    
-                    <Frame type="Label" name="WatermarkSubLabel">
-                        <Anchor side="Top" relative="$parent\WatermarkTopLabel" pos="Max" offset="-15"/>
-                        <Anchor side="Right" relative="$parent\WatermarkTopLabel" pos="Max" offset="0"/>
-                        <Anchor side="left" relative="$parent\WatermarkTopLabel" pos="Min" offset="0"/>
-                        <Text val="@UI/Sandbox/Label"/>
-                        <Style val="Storm_Sandbox_Label"/>
-                    </Frame>
-                    
+
+                    <StateGroup name="AspectRatioState">
+                        <DefaultState val="Not_4x3_5x4"/>
+
+                        <State name="Not_4x3_5x4">
+                            <When type="Property" frame="4x3_5x4_Frame" visible="true"/>
+                        </State>
+
+                        <State name="4x3_5x4">
+                            <When type="Property" frame="4x3_5x4_Frame" visible="false"/>
+                            <Action type="SetProperty" frame="WatermarkLabelContainer" visible="False"/>
+                            <Action type="SetAnchor" frame="WatermarkImage" side="Right" relative="$parent" pos="Max" offset="0"/>
+                        </State>
+                    </StateGroup>
+
                     <Frame type="Image" name="WatermarkImage">
                         <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
-                        <Anchor side="Right" relative="$parent/WatermarkTopLabel" pos="Min" offset="-5"/>
+                        <Anchor side="Right" relative="$parent" pos="Max" offset="-190"/>
                         <Texture val="@UI/Storm_UI_Sandbox_WaterMark"/>
                     </Frame>
-                    
+
+                    <Frame type="Frame" name="WatermarkLabelContainer">
+                        <Anchor side="Top" relative="$parent\WatermarkImage" pos="Min" offset="5"/>
+                        <Anchor side="Left" relative="$parent\WatermarkImage" pos="Max" offset="0"/>
+                        <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+                        <Anchor side="Bottom" relative="$parent\WatermarkImage" pos="Max" offset="-5"/>
+
+                        <Frame type="ParentCenteredFrame" name="WatermarkLabelCenteredFrame">
+                            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+                            <Anchor side="Bottom" relative="WatermarkSubLabel" pos="Max" offset="0"/>
+                            <PreserveAnchorOffset val="false"/>
+
+                            <Frame type="Label" name="WatermarkTopLabel">
+                                <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                                <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+
+                                <Options val="NoWrapping|ScaleToPreventTruncation"/>
+                                <Text val="@UI/Sandbox/Title"/>
+                                <Style val="Storm_Sandbox_Title"/>
+                            </Frame>
+
+                            <Frame type="Label" name="WatermarkSubLabel">
+                                <Anchor side="Top" relative="$parent\WatermarkTopLabel" pos="Max" offset="-10"/>
+                                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                                <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+
+                                <Options val="NoWrapping|ScaleToPreventTruncation"/>
+                                <Text val="@UI/Sandbox/Label"/>
+                                <Style val="Storm_Sandbox_Label"/>
+                            </Frame>
+                        </Frame>
+                    </Frame>
+
                     <Frame type="Frame" name="SandboxButtonPanel" template="TutorialUI/SandboxButtonPanelTemplate">
                         <Anchor side="Top" relative="$parent" pos="Min" offset="5"/>
                         <Anchor side="Left" relative="$parent" pos="Min" offset="5"/>
                     </Frame>
-                    
+
                     <Frame type="Frame" name="SandboxShowButton" template="TutorialUI/SandboxShowButtonTemplate">
                         <Anchor side="Top" relative="$parent" pos="Min" offset="15"/>
                         <Anchor side="Left" relative="$parent" pos="Min" offset="15"/>
                     </Frame>
-                    
-                    <Frame type="Frame" name="DummyPanel" template="TutorialUI/DummyUITemplate">
-                        <Anchor side="Bottom" relative="$parent" pos="Max" offset="-250"/>
+
+                    <Frame type="Frame" name="DummyPanel" template="TutorialUI/TeamDummyUITemplate">
+                        <Anchor side="Bottom" relative="$parent" pos="Max" offset="-550"/>
                         <Anchor side="Right" relative="$parent" pos="Max" offset="-15"/>
+                        <Visible val="False"/>
                     </Frame>
-                    
+
                     <Frame type="Frame" name="HealingDummyPanel" template="TutorialUI/DummyUITemplate">
-                        <Anchor side="Bottom" relative="$parent" pos="Max" offset="-500"/>
+                        <Anchor side="Bottom" relative="$parent" pos="Max" offset="-800"/>
                         <Anchor side="Right" relative="$parent" pos="Max" offset="-15"/>
+                        <Visible val="False"/>
                     </Frame>
                 </Frame>
 
@@ -240,11 +533,11 @@
 
                         <Frame type="HeroTalentTreeSelectionPanel" name="HeroTalentTreeSelectionPanel" template="HeroTalentTreeSelectionPanel/HeroTalentTreeSelectionPanelTemplate">
                             <Handle val="GameUI_HeroTalentTreeSelectionPanel"/>
-                            <Anchor side="Bottom" relative="$parent/$parent/$parent/$parent/ConsolePanel/PortraitPanel" pos="Mid" offset="30"/>
-                            <Anchor side="Left" relative="$parent/$parent/$parent/$parent/ConsolePanel/PortraitPanel" pos="Min" offset="-25"/>
+                            <Anchor side="Bottom" relative="$parent/$parent/$parent/$parent/ConsolePanel/PortraitPanelContainer/PortraitPanel" pos="Mid" offset="30"/>
+                            <Anchor side="Left" relative="$parent/$parent/$parent/$parent/ConsolePanel/PortraitPanelContainer/PortraitPanel" pos="Min" offset="-25"/>
 
                             <Frame type="Frame" name="PortraitMaskFrame" template="GameUI/PortraitMaskFrameTemplate">
-                                <Anchor relative="$parent/$parent/$parent/$parent/$parent/ConsolePanel/PortraitPanel" offset="-10"/>
+                                <Anchor relative="$parent/$parent/$parent/$parent/$parent/ConsolePanel/PortraitPanelContainer/PortraitPanel" offset="-10"/>
                             </Frame>
 
                             <Animation name="Show">
@@ -260,8 +553,8 @@
                                 </Controller>
 
                                 <Controller type="Anchor" end="Pause" side="Left" relative="true">
-                                    <Key type="Curve" time="0" value="-75" out="Slow"/>
-                                    <Key type="Curve" time=".175" value="0" in="Slow"/>
+                                    <Key type="Curve" time="0" value="-75" inout="Linear,Slow"/>
+                                    <Key type="Curve" time=".175" value="0" inout="Slow,Linear"/>
                                 </Controller>
 
                                 <Controller type="Sound" end="Pause">
@@ -294,8 +587,6 @@
                     </Frame>
                 </Frame>
 
-                <Frame type="StandardNameTooltip" name="StandardNameTooltip" template="StandardTooltip/StandardNameTooltipTemplate"/>
-
                 <Frame type="Frame" name="OffscreenUnitContainer" template="HeroTracker/OffscreenUnitContainerTemplate">
                     <Anchor side="Top" relative="$parent" pos="Min" offset="150"/>
                     <Anchor side="Bottom" relative="$parent" pos="Max" offset="-220"/>
@@ -313,11 +604,11 @@
                 <Frame type="Frame" name="HeroCharacterSheetPanelContainer">
                     <Anchor relative="$parent"/>
                     <Frame type="HeroCharacterSheetPanel" name="HeroCharacterSheetPanel" template="HeroCharacterSheetPanel/HeroCharacterSheetPanelTemplate">
-                        <Anchor side="Bottom" relative="$parent/$parent/$parent/ConsolePanel/PortraitPanel" pos="Mid" offset="30"/>
-                        <Anchor side="Left" relative="$parent/$parent/$parent/ConsolePanel/PortraitPanel" pos="Min" offset="30"/>
+                        <Anchor side="Bottom" relative="$parent/$parent/$parent/ConsolePanel/PortraitPanelContainer/PortraitPanel" pos="Mid" offset="30"/>
+                        <Anchor side="Left" relative="$parent/$parent/$parent/ConsolePanel/PortraitPanelContainer/PortraitPanel" pos="Min" offset="30"/>
 
                         <Frame type="Frame" name="PortraitMaskFrame" template="GameUI/PortraitMaskFrameTemplate">
-                            <Anchor relative="$parent/$parent/$parent/$parent/ConsolePanel/PortraitPanel" offset="-11"/>
+                            <Anchor relative="$parent/$parent/$parent/$parent/ConsolePanel/PortraitPanelContainer/PortraitPanel" offset="-11"/>
                         </Frame>
 
                         <Animation name="Show">
@@ -331,8 +622,8 @@
                             </Controller>
 
                             <Controller type="Anchor" end="Pause" side="Left" relative="true">
-                                <Key type="Curve" time="0" value="-75" out="Slow"/>
-                                <Key type="Curve" time=".175" value="0" in="Slow"/>
+                                <Key type="Curve" time="0" value="-75" inout="Linear,Slow"/>
+                                <Key type="Curve" time=".175" value="0" inout="Slow,Linear"/>
                             </Controller>
 
                             <Controller type="Sound" end="Pause">
@@ -362,21 +653,21 @@
                     <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
                     <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
                 </Frame>
-                
+
                 <!--Frame type="Frame" name="LunarNewYearPanel" template="LunarNewYear/LunarNewYearTemplate">
                     <Anchor relative="$parent"/>
                 </Frame-->
-                
-                <Frame type="Frame" name="SeasonalEventPanel" template="LunarNewYearRooster/LunarNewYearRoosterTemplate">
+
+                <!-- <Frame type="Frame" name="SeasonalEventPanel" template="LunarNewYearRooster/LunarNewYearRoosterTemplate">
                     <Anchor relative="$parent"/>
-                </Frame>
-                
+                </Frame> -->
+
                 <Frame type="Frame" name="MutatorPanel">
                     <Anchor relative="$parent"/>
                     <Visible val="False"/>
                     <RenderPriority val="520"/>
                 </Frame>
-                
+
                 <Frame type="MinimapPanel" name="MinimapPanel" template="MinimapPanel/MinimapPanelTemplate">
                     <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
                     <Anchor side="Bottom" relative="$parent" pos="Max" offset="35"/>
@@ -385,7 +676,7 @@
                 <Frame type="Frame" name="MapMechanicPanel" template="MapMechanicPanel/MapMechanicPanelTemplate">
                     <Anchor relative="$parent"/>
                 </Frame>
-                
+
                 <Frame type="Frame" name="TutorialReferenceCard" template="TutorialUI/TutorialReferenceCardTemplate">
                     <Anchor side="Top" relative="$parent" pos="Min" offset="75"/>
                     <Anchor side="Left" relative="$parent" pos="Min" offset="15"/>
@@ -398,7 +689,7 @@
                     <CollapseLayout val="true"/>
                     <Visible val="false"/>
                 </Frame>
-                
+
                 <Frame type="Frame" name="TryMeModeUIContainer">
                     <Anchor relative="$parent"/>
                     <Visible val="false"/>
@@ -406,23 +697,23 @@
                         <Anchor side="Top" relative="$parent" pos="Min" offset="15"/>
                         <Anchor side="Left" relative="$parent" pos="Min" offset="15"/>
                     </Frame>
-                    
+
                     <Frame type="Frame" name="TryMeModeShowButton" template="TutorialUI/TryMeModeShowButtonTemplate">
                         <Anchor side="Top" relative="$parent" pos="Min" offset="15"/>
                         <Anchor side="Left" relative="$parent" pos="Min" offset="15"/>
                     </Frame>
-                    
+
                     <Frame type="Frame" name="DummyPanel" template="TutorialUI/DummyUITemplate">
                         <Anchor side="Bottom" relative="$parent" pos="Max" offset="-250"/>
                         <Anchor side="Right" relative="$parent" pos="Max" offset="-15"/>
                     </Frame>
-                    
+
                     <Frame type="Frame" name="HealingDummyPanel" template="TutorialUI/DummyUITemplate">
                         <Anchor side="Bottom" relative="$parent" pos="Max" offset="-500"/>
                         <Anchor side="Right" relative="$parent" pos="Max" offset="-15"/>
                     </Frame>
                 </Frame>
-                
+
                 <Frame type="Frame" name="TutorialHintsButton" template="TutorialUI/TutorialHintsButtonTemplate">
                     <Anchor side="Top" relative="$parent/TutorialCardButton" pos="Max" offset="0"/>
                     <Anchor side="Left" relative="$parent/TutorialCardButton" pos="Min" offset="0"/>
@@ -437,15 +728,7 @@
                     <Height val="165"/>
                     <DisplayCancelCommandCard val="false"/>
                     <Batch val="true"/>
-                </Frame>
- 
-                <Frame type="HeroSpecificContainerPanel" name="HeroSpecificCommandCardPanel">
-                    <Anchor side="Bottom" relative="$parent/CommandPanel" pos="Max" offset="0"/>
-                    <Anchor side="Left" relative="$parent/CommandPanel" pos="Mid" offset="0"/>
-                    <Anchor side="Right" relative="$parent/CommandPanel" pos="Mid" offset="0"/>
-                    <Height val="165"/>
-                    <Width val="826"/>
-                    <HeroSpecificLocation val="ConsoleUICommandCardStatus"/>
+                    <Handle val="GameUICommandPanel"/>
                 </Frame>
 
                 <Frame type="ControlGroupPanel" name="ControlGroupPanel" template="ControlGroupPanel/ControlGroupPanelTemplate">
@@ -477,31 +760,40 @@
                     <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
                 </Frame>
 
+                <Frame type="HeroSpecificContainerPanel" name="HeroSpecificCommandCardPanel">
+                    <Anchor side="Bottom" relative="$parent/CommandPanel" pos="Max" offset="0"/>
+                    <Anchor side="Left" relative="$parent/CommandPanel" pos="Mid" offset="0"/>
+                    <Anchor side="Right" relative="$parent/CommandPanel" pos="Mid" offset="0"/>
+                    <Height val="165"/>
+                    <Width val="826"/>
+                    <HeroSpecificLocation val="ConsoleUICommandCardStatus"/>
+                </Frame>
+
                 <Frame type="Frame" name="HeroConsolePanel" template="HeroConsole/HeroConsolePanelTemplate">
-                    <Anchor side="Bottom" relative="$parent/$parent/ConsolePanel/PortraitPanel" pos="Max" offset="2"/>
-                    <Anchor side="Left" relative="$parent/$parent/ConsolePanel/PortraitPanel" pos="Min" offset="0"/>
+                    <Anchor side="Bottom" relative="$parent/$parent/ConsolePanel/PortraitPanelContainer/PortraitPanel" pos="Max" offset="2"/>
+                    <Anchor side="Left" relative="$parent/$parent/ConsolePanel/PortraitPanelContainer/PortraitPanel" pos="Min" offset="0"/>
                     <RenderPriority val="600"/>
                 </Frame>
-                
+
                 <Frame type="Frame" name="HudEffectInvulnerable" template="HeroConsole/HudEffectInvulnerableTemplate">
                     <Anchor relative="$parent"/>
                     <RenderPriority val="601"/>
                 </Frame>
-                
+
                 <Frame type="Frame" name="HeroSpecificFullUIModContainer">
                     <Anchor relative="$parent"/>
                     <RenderPriority val="601"/>
                 </Frame>
-                
+
                 <Frame type="HeroSpecificContainerPanel" name="HeroSpecificStatusContainer">
                     <Width val="400"/>
                     <Height val="300"/>
-                    <Anchor side="Bottom" relative="$parent/$parent/ConsolePanel/PortraitPanel" pos="Mid" offset="8"/>
-                    <Anchor side="Left" relative="$parent/$parent/ConsolePanel/PortraitPanel" pos="Max" offset="-56"/>
+                    <Anchor side="Bottom" relative="$parent/$parent/ConsolePanel/PortraitPanelContainer/PortraitPanel" pos="Mid" offset="8"/>
+                    <Anchor side="Left" relative="$parent/$parent/ConsolePanel/PortraitPanelContainer/PortraitPanel" pos="Max" offset="-56"/>
                     <RenderPriority val="601"/>
                     <HeroSpecificLocation val="Status"/>
                 </Frame>
-                
+
                 <Frame type="HeroSpecificContainerPanel" name="FullscreenStatusPanel">
                     <Anchor relative="$parent"/>
                     <HeroSpecificLocation val="FullscreenStatus"/>
@@ -517,7 +809,7 @@
                     <Anchor side="Left" relative="$parent/HeroConsolePanel/Background" pos="Min" offset="7"/>
                     <RenderPriority val="601"/>
                 </Frame>
-                
+
                 <Frame type="UnitStatusFrame" name="HeroCastChannelBarFrame" template="ChannelBars/HeroCastChannelBarFrameTemplate">
                     <Anchor side="Bottom" relative="$parent/HeroBehaviorChannelBarSurroundFrame" pos="Min" offset="-20"/>
                     <Anchor side="Left" relative="$parent/$parent/ConsolePanel/GameHudBackFill" pos="Mid" offset="0"/>
@@ -545,7 +837,7 @@
                     <PreserveAnchorOffset val="True"/>
                 </Frame>
                 <Frame type="UnitStatusFrame" name="HeroBehaviorChannelBarFrameRight" template="ChannelBars/HeroBehaviorChannelBarFrameTemplate">
-                    <Anchor side="Bottom" relative="$parent/HeroBehaviorChannelBarFrame" pos="Max" offset="0"/>
+                    <Anchor side="Bottom" relative="$parent/ControlGroupPanel" pos="Min" offset="-20"/>
                     <Anchor side="Left" relative="$parent/$parent/ConsolePanel/GameHudBackFill" pos="Mid" offset="#ChannelBarHalfWidthNeg"/>
                     <Anchor side="Right" relative="$parent/$parent/ConsolePanel/GameHudBackFill" pos="Mid" offset="#ChannelBarHalfWidth"/>
                     <CollapseLayout val="True"/>
@@ -585,24 +877,47 @@
                 <!--  EndRegion: Channel Bars -->
 
                 <Frame type="UnitStatusFrame" name="HeroDeathStunFrame" template="ChannelBars/HeroDeathStunFrameTemplate">
-                    <Anchor side="Bottom" relative="$parent/HeroCastChannelBarFrame" pos="Min" offset="-8"/>
+                    <Anchor side="Bottom" relative="$parent/HeroCastChannelBarFrame" pos="Min" offset="5"/>
                     <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
                     <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
                     <PreserveAnchorOffset val="True"/>
+
+                    <Frame type="Button" name="DeathRecapButton" template="DeathRecap/DeathRecapButtonTemplate">
+                        <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+                        <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+                        <Anchor side="Bottom" relative="$parent" pos="Min" offset="61"/>
+                    </Frame>
+
+                    <!-- Hides the DeathRecapButton when the player is not dead. Otherwise show the button and play its animation.-->
+                    <StateGroup name="DeadState">
+                        <DefaultState val="NotDead"/>
+
+                        <State name="NotDead">
+                            <Action type="SendEvent" frame="DeathRecapButton" event="Hide"/>
+                        </State>
+                        <State name="Dead">
+                            <When type="Property" frame="DeathStunLabel" Text="DEAD"/>
+                            <When type="Property" Visible="true"/>
+                            <Action type="SetProperty" frame="DeathRecapButton" Visible="True"/>
+                            <Action type="SendEvent" frame="DeathRecapButton" event="Show"/>
+                        </State>
+                    </StateGroup>
                 </Frame>
-                
-                <Frame type="Frame" name="PartyFramePanel" template="PartyFrame/PartyFrameOverview">
+
+                <Frame type="PartyFramePanel" name="PartyFramePanel" template="PartyFrame/PartyFrameOverview">
                     <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
                     <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
                     <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+                    <OverrideVisibilityForObservers val="True"/>
+                    <OverriddenObserverVisibility val="False"/>
                 </Frame>
-                
+
 
                 <Frame type="HeroTalentTreeSelectionToggleButton" name="HeroTalentTreeSelectionToggleButton" template="HeroTalentTreeSelectionPanel/HeroTalentTreeSelectionToggleButtonTemplate">
-                    <Anchor side="Top" relative="$parent/$parent/ConsolePanel/PortraitPanel" pos="Mid" offset="0"/>
-                    <Anchor side="Bottom" relative="$parent/$parent/ConsolePanel/PortraitPanel" pos="Mid" offset="0"/>
-                    <Anchor side="Left" relative="$parent/$parent/ConsolePanel/PortraitPanel" pos="Mid" offset="0"/>
-                    <Anchor side="Right" relative="$parent/$parent/ConsolePanel/PortraitPanel" pos="Mid" offset="0"/>
+                    <Anchor side="Top" relative="$parent/$parent/ConsolePanel/PortraitPanelContainer/PortraitPanel" pos="Mid" offset="0"/>
+                    <Anchor side="Bottom" relative="$parent/$parent/ConsolePanel/PortraitPanelContainer/PortraitPanel" pos="Mid" offset="0"/>
+                    <Anchor side="Left" relative="$parent/$parent/ConsolePanel/PortraitPanelContainer/PortraitPanel" pos="Mid" offset="0"/>
+                    <Anchor side="Right" relative="$parent/$parent/ConsolePanel/PortraitPanelContainer/PortraitPanel" pos="Mid" offset="0"/>
                     <RenderPriority val="510"/>
                     <Handle val="GameUI_HeroTalentTreeSelectionToggleButton"/>
                 </Frame>
@@ -654,15 +969,14 @@
                     <Height val="100"/>
                     <Visible val="false"/>
                     <Animation name="OutOfFocus">
-                        <Event event="OnEnabled" action="Reset"/>
-                        <Event event="OnEnabled" action="Play"/>
+                        <Event event="OnEnabled" action="Reset,Play"/>
                         <Controller type="Anchor" end="Pause" side="Bottom" relative="true">
-                            <Key type="Curve" time="0" value="80" out="Smooth"/>
-                            <Key type="Curve" time="4.0" value="0" in="Smooth"/>
+                            <Key type="Curve" time="0" value="80" inout="Linear,Smooth"/>
+                            <Key type="Curve" time="4.0" value="0" inout="Smooth,Linear"/>
                         </Controller>
                         <Controller type="Fade" end="Pause">
-                            <Key type="Curve" time="0" value="255" out="Smooth"/>
-                            <Key type="Curve" time="4.0" value="100" in="Smooth"/>
+                            <Key type="Curve" time="0" value="255" inout="Linear,Smooth"/>
+                            <Key type="Curve" time="4.0" value="100" inout="Smooth,Linear"/>
                         </Controller>
                         <Controller type="Visibility" end="Pause">
                             <Key type="Bool" time="0" value="true"/>
@@ -682,18 +996,16 @@
                     <Text val="TEMP VOICE OVER"/>
                     <Visible val="false"/>
                 </Frame>
+
+                <Frame type="CooldownNotificationFrame" name="CooldownNotificationFrame" template="GameUI/CooldownNoficationFrameTemplate">
+                    <Anchor relative="$parent"/>
+                    <RenderPriority val="605"/>
+                </Frame>
             </Frame>
 
             <!-- Fullscreen upper UI elements - above the console -->
             <Frame type="Frame" name="FullscreenUpperContainer">
                 <Anchor relative="$parent"/>
-
-                <Frame type="TalkerPanel" name="TalkerPanel" template="TalkerPanel/TalkerPanelTemplate">
-                    <Anchor side="Top" relative="$parent" pos="Min" offset="100"/>
-                    <Anchor side="Right" relative="$parent" pos="Max" offset="-10"/>
-                    <Height val="800"/>
-                    <Width val="375"/>
-                </Frame>
 
                 <Frame type="GameMessageDisplay" name="ObjectiveDisplay">
                     <MessageArea val="Objective"/>
@@ -757,12 +1069,6 @@
                     <Batch val="false"/>
                 </Frame>
 
-                <Frame type="Button" name="DeathRecapButton" template="DeathRecap/DeathRecapButtonTemplate">
-                    <Anchor side="Left" relative="$parent/$parent/ConsoleUIContainer/HeroDeathStunFrame" pos="Mid" offset="0"/>
-                    <Anchor side="Right" relative="$parent/$parent/ConsoleUIContainer/HeroDeathStunFrame" pos="Mid" offset="0"/>
-                    <Anchor side="Bottom" relative="$parent/$parent/ConsoleUIContainer/HeroDeathStunFrame" pos="Min" offset="35"/>
-                </Frame>
-
                 <Frame type="Frame" name="DirectiveDisplay" template="DirectiveDisplay/DirectiveDisplayTemplate">
                     <Anchor side="Top" relative="$parent" pos="Min" offset="160"/>
                     <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
@@ -770,38 +1076,37 @@
                     <Height val="200"/>
                     <Width val="800"/>
                 </Frame>
-                
-                <Frame type="Frame" name="GameNotificationsPanel" template="GameNotifications/InGameNotificationsTemplate">
-                    <Anchor side="Top" relative="$parent/$parent/ConsoleUIContainer/PartyFramePanel" pos="Max" offset="-34"/>
-                </Frame>
 
                 <Frame type="HeroLeaderPanel" name="HeroLeaderPanel" template="HeroLeaderPanel/HeroLeaderPanelTemplate">
                     <Anchor relative="$parent"/>
                     <RenderPriority val="520"/>
                 </Frame>
-                
+
+                <!-- Voice Chat -->
+                <Frame type="TalkerPanel" name="TalkerPanel" template="TalkerPanel/TalkerPanel_Template" requiredtoload="IS_VOICECHAT_ENABLED">
+                    <Anchor side="Top" relative="$parent" pos="Min" offset="42"/>
+                    <Anchor side="Right" relative="$parent" pos="Max" offset="-32"/>
+                    <ChannelType val="{$VoiceChatUI/@ActiveChannelType}"/>
+
+                    <!-- Must be on the same level as Tab panel -->
+                    <RenderPriority val="520"/>
+                </Frame>
+
                 <Frame type="Frame" name="ObserverHeroOverviewPanel" template="StormObserverPanel/ObserverHeroOverview">
                     <Anchor relative="$parent"/>
                 </Frame>
-                
+
                 <Frame type="Frame" name="ObserverTeamNamePanel">
                     <Anchor side="Top" relative="$parent/ObserverHeroOverviewPanel/ObserverTopPanel/TopBarBacking" pos="Min" offset="0"/>
                     <Anchor side="Left" relative="$parent/ObserverHeroOverviewPanel/ObserverTopPanel/TopBarBacking" pos="Min" offset="0"/>
                     <Anchor side="Right" relative="$parent/ObserverHeroOverviewPanel/ObserverTopPanel/TopBarBacking" pos="Max" offset="0"/>
                     <Height val="56"/>
                     <Visible val="false"/>
-                    
+
                     <Frame type="Image" name="PanelImage">
                         <Anchor relative="$parent"/>
                         <Texture val="@UI/obs_bar_middle_simple"/>
                     </Frame>
-                </Frame>
-                
-                <Frame type="Frame" name="TargetInfoPanel" template="TargetInfoPanel/TargetInfoPanelTemplate">
-                    <Anchor side="Bottom" relative="$parent" pos="Max" offset="-480"/>
-                    <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
-                    <Height val="166"/>
-                    <Width val="280"/>
                 </Frame>
 
                 <Frame type="Frame" name="FriendlyAbilityTargetHelper" template="FriendlyAbilityTargetHelper/FriendlyAbilityTargetHelperTemplate">
@@ -809,7 +1114,7 @@
                     <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
                     <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
                 </Frame>
-                
+
                 <Frame type="Frame" name="DebugPanel" template="StormDebugPanel/DebugPanelTemplate">
                     <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
                     <Anchor side="Top" relative="$parent" pos="Min" offset="10"/>
@@ -837,13 +1142,13 @@
                 <Frame type="GameMessageDisplay" name="ChatDisplay" template="StandardTemplates/StandardMessageDisplayTemplate">
                     <MessageArea val="Chat"/>
                     <Anchor side="Bottom" relative="$parent/ChatBar" pos="Min" offset="-10"/>
-                    <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
-                    <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
-                    <Width val="750"/>
+                    <Anchor side="Left" relative="$parent/ChatBar" pos="Min" offset="0"/>
+                    <Anchor side="Right" relative="$parent/ChatBar" pos="Max" offset="0"/>
                     <Height val="310"/>
                     <RenderPriority val="600"/>
                     <Style val="ChatDisplay"/>
                     <LabelsWithHyperlinksAcceptMouseTarget val="true"/>
+                    <HideClippedMessages val="true"/>
                 </Frame>
 
                 <Frame type="PingPanel" name="PingPanel" template="PingPanel/PingPanelTemplate">
@@ -856,7 +1161,7 @@
                     <Visible val="false"/>
                 </Frame>
 
-                <Frame type="PingPanel" name="EmotePanel" template="EmotePanel/EmotePanelTemplate">
+                <Frame type="PingPanel" name="EmotePanel" template="WheelPanel/WheelPanelTemplate">
                     <Anchor relative="$parent"/>
                     <Visible val="false"/>
                 </Frame>
@@ -878,20 +1183,20 @@
 
                     <Frame type="ObserverPanel" name="ObserverPanel" template="ObserverPanel/ObserverPanelTemplate">
                         <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
-                        <Anchor side="Top" relative="$parent/$parent/GameNotificationsPanel/KillCounterTemplate" pos="Max" offset="-35"/>
+                        <Anchor side="Top" relative="$ancestor[@name=UIContainer]/FullscreenLowerContainer/GameNotificationsPanel/KillCounterTemplate" pos="Max" offset="-35"/>
                         <Width val="400"/>
                         <Height val="68"/>
                     </Frame>
 
                     <Frame type="ReplayPanel" name="ReplayPanel" template="ReplayPanel/ReplayPanelTemplate">
-                        <Anchor side="Right" relative="$parent" pos="Max" offset="-40"/>
-                        <Anchor side="Bottom" relative="$parent" pos="Max" offset="-490"/>
-                        <Height val="468"/>
+                        <Anchor side="Right" relative="$parent" pos="Max" offset="-10"/>
+                        <Anchor side="Top" relative="$parent" pos="Min" offset="120"/>
+                        <Height val="170"/>
                         <Width val="420"/>
-                        <Handle val="ScreenReplay_ReplayPanel"/>
+                        <Handle val="GameUI_ReplayPanel"/>
                     </Frame>
                 </Frame>
-                
+
                 <Frame type="Frame" name="ObserverToggleControls" template="StormObserverPanel/ToggleControlsTemplate">
                     <Anchor relative="$parent"/>
                 </Frame>
@@ -911,20 +1216,125 @@
 
                 <Frame type="ChatBar" name="ChatBar" template="ChatBar/ChatBarTemplate">
                     <Handle val="GameUI_ChatBar"/>
-                    <Anchor side="Bottom" relative="$parent/$parent/ConsoleUIContainer/HeroDeathStunFrame" pos="Min" offset="-15"/>
-                    <Anchor side="Left" relative="$parent/ChatDisplay" pos="Min" offset="0"/>
-                    <Anchor side="Right" relative="$parent/ChatDisplay" pos="Max" offset="0"/>
+                    <Anchor side="Top" relative="$parent/ChatBarDragButton" pos="Min" offset="0"/>
+                    <Anchor side="Left" relative="$parent/ChatBarDragButton" pos="Max" offset="1"/>
+                    <Width val="750"/>
                     <RenderPriority val="600"/>
 
-                    <Animation name="EndOfMatch">
-                        <Event event="OnShown" frame="$parent/EndOfGameAwardsPanel" action="DirectionForward,Play"/>
-                        <Event event="OnHidden" frame="$parent/EndOfGameAwardsPanel" action="DirectionReverse,Play"/>
+                    <StateGroup name="EndOfMatchChatPosition">
+                        <State name="EndOfMatchChatPosition">
+                            <When type="Property" frame="$parent/EndOfGameAwardsPanel" visible="True"/>
+                            <Action type="SetAnchor" frame="$this" undo="False" side="Top" relative="$parent" pos="Min" offset="1080"/>
+                            <Action type="SetAnchor" frame="$this" undo="False" side="Left" relative="$parent/ChatBarAnchorFrame" pos="Max" offset="0"/>
+                        </State>
+                    </StateGroup>
+                </Frame>
 
-                        <Controller type="Anchor" end="Pause" side="Bottom" relative="true">
+                <Frame type="Frame" name="ChatBarAnchorFrame">
+                    <Anchor side="Top" relative="$parent" pos="Min" offset="830"/>
+                    <Anchor side="Left" relative="$parent" pos="Mid" offset="-350"/>
+                    <Anchor side="Right" relative="$parent" pos="Mid" offset="-350"/>
+                    <Width val="48"/>
+                    <Height val="48"/>
+                    <Visible val="false"/>
+                </Frame>
+
+                <Frame type="Control" name="ChatBarDragButton">
+                    <Anchor side="Top" relative="$parent/ChatBarAnchorFrame" pos="Mid" offset="0"/>
+                    <Anchor side="Bottom" relative="$parent/ChatBarAnchorFrame" pos="Mid" offset="0"/>
+                    <Anchor side="Left" relative="$parent/ChatBarAnchorFrame" pos="Mid" offset="0"/>
+                    <Anchor side="Right" relative="$parent/ChatBarAnchorFrame" pos="Mid" offset="0"/>
+
+                    <Width val="48"/>
+                    <Height val="48"/>
+
+                    <Draggable val="true"/>
+                    <AcceptsMouse val="true"/>
+                    <DragHoverCursor val="GripOpen"/>
+                    <DragCursor val="GripClosed"/>
+                    <DragConstraintFrame val="$GameUI"/>
+                    <Visible val="false"/>
+
+                    <Frame type="Image" name="ChatBarDragButton">
+                        <Anchor relative="$parent"/>
+                        <Texture val="@UI/Storm_UI_InGame_Chat_Button_Drag"/>
+                    </Frame>
+
+                    <StateGroup name="ShowButton">
+                        <State name="Show">
+                            <When type="Property" frame="$parent/ChatBar" Visible="true"/>
+                            <When type="Property" frame="$parent/EndOfGameAwardsPanel" visible="false"/>
+                            <When type="Property" frame="$GameUI" ShowChatDragButton="true"/>
+                            <Action type="SetProperty" frame="$this" visible="true"/>
+                        </State>
+                    </StateGroup>
+
+                    <StateGroup name="Hovered">
+                        <State name="Hovering">
+                            <When type="Property" frame="$this" Hovering="true"/>
+                            <Action type="SetProperty" frame="ChatBarDragButton" texture="@UI/Storm_UI_InGame_Chat_Button_Drag_Hover"/>
+                        </State>
+                        <State name="Dragging">
+                            <When type="Property" frame="$this" Dragging="true"/>
+                            <Action type="SetProperty" frame="ChatBarDragButton" texture="@UI/Storm_UI_InGame_Chat_Button_Drag_Hover"/>
+                        </State>
+                    </StateGroup>
+                </Frame>
+
+                <Frame type="Frame" name="ChatWarning" template="StandardTooltip/StandardTooltip">
+                    <Anchor side="Top" relative="$parent/ChatBar" pos="Max" offset="10"/>
+                    <Anchor side="Left" relative="$parent/ChatBar" pos="Min" offset="0"/>
+                    <Anchor side="Right" relative="$parent/ChatBar" pos="Max" offset="0"/>
+                    <Anchor side="Bottom" relative="TopBorder" pos="Max" offset="0"/>
+                    <Alpha val="0"/>
+                    <VisibilityOnFade val="true"/>
+
+                    <Frame type="Label" name="Label">
+                        <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+                        <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+                        <Width val="0"/>
+                    </Frame>
+
+                    <Frame type="Image" name="TopBorder">
+                        <Anchor relative="$parent/Label" offset="20"/>
+                    </Frame>
+
+                    <Frame type="BlurFrame" name="BlurBackground">
+                        <Anchor relative="$parent/Label" offset="11"/>
+                    </Frame>
+
+                    <StateGroup name="Warnings">
+                        <DefaultState val="NoProblem"/>
+
+                        <State name="AtMaxEmojis">
+                            <When type="Property" frame="$parent/ChatBar" SupportsEmojis="true"/>
+                            <When type="Property" frame="$parent/ChatBar" EmojisRemaining="0"/>
+                            <Action type="SetProperty" frame="Label" text="@UI/BattleChat/EmoticonMaxReached"/>
+                            <Action type="SendEvent" event="Show"/>
+                        </State>
+                        <State name="OverMaxEmojis">
+                            <When type="Property" frame="$parent/ChatBar" EmojisRemaining="0" operator="LessThan"/>
+                            <Action type="SetProperty" frame="Label" text="@UI/BattleChat/EmoticonMaxExceeded"/>
+                            <Action type="SendEvent" event="Show"/>
+                        </State>
+                        <State name="NoProblem">
+                            <Action type="SendEvent" event="Hide"/>
+                        </State>
+                    </StateGroup>
+
+                    <Animation name="Fade">
+                        <Event event="Show" action="DirectionForward,Play"/>
+                        <Event event="Hide" action="DirectionReverse,Play"/>
+
+                        <Controller type="Fade" end="Pause">
                             <Key type="Curve" time="0" value="0"/>
-                            <Key type="Curve" time=".01" value="180"/>
+                            <Key type="Curve" time=".2" value="255"/>
                         </Controller>
                     </Animation>
+                </Frame>
+
+                <Frame type="Frame" name="ChatEmojiPanelManager" template="ChatBar/EmojiManagerTemplate">
+                    <Anchor relative="$parent/ChatDisplay"/>
                 </Frame>
 
                 <Frame type="Label" name="ChatHelpLabel">
@@ -932,7 +1342,7 @@
                     <Anchor side="Left" relative="$parent/ChatDisplay" pos="Min" offset="0"/>
                     <Style val="@@ChatHelp"/>
                 </Frame>
-                
+
                 <Frame type="Frame" name="ToastPanel">
                     <Anchor side="Bottom" relative="$parent/ChatDisplay" pos="Max" offset="0"/>
                     <Anchor side="Left" relative="$parent/ChatDisplay" pos="Min" offset="0"/>
@@ -1019,7 +1429,7 @@
                     <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
                     <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
                 </Frame>
-                
+
                 <Frame type="Image" name="DebugDataErrorMessage">
                     <Handle val="GameUI_DebugDataErrorMessage"/>
                     <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
@@ -1062,11 +1472,10 @@
                             <Texture val="@UI/LatencyIndicatorIcon"/>
 
                             <Animation name="Pulse">
-                                <Event event="OnShown" action="Reset"/>
-                                <Event event="OnShown" action="Play"/>
+                                <Event event="OnShown" action="Reset,Play"/>
                                 <Controller type="Fade" end="PingPong">
-                                    <Key type="Curve" time="0" value="0" out="Slow"/>
-                                    <Key type="Curve" time=".5" value="255" in="Slow"/>
+                                    <Key type="Curve" time="0" value="0" inout="Linear,Slow"/>
+                                    <Key type="Curve" time=".5" value="255" inout="Slow,Linear"/>
                                 </Controller>
                             </Animation>
                         </Frame>
@@ -1083,26 +1492,26 @@
                     </Frame>
                 </Frame>
             </Frame>
-            
+
             <Frame type="HelpMenuDialog" name="HelpMenuDialogGame" template="HelpMenuDialog/HelpMenuDialogGame">
             </Frame>
 
             <Frame type="Frame" name="GameOverSplash" template="GameOverSplash/GameOverSplashTemplate">
                 <Anchor relative="$parent"/>
                 <Handle val="GameOverSplash"/>
-                
+
                 <Animation name="StopGameOverCutscenes">
-                    <Event event="OnShown" frame="$parent/FullscreenUpperContainer/EndOfGameAwardsPanel" action="Play"/>
-                    
+                    <Event event="OnShown" action="Play" frame="$parent/FullscreenUpperContainer/EndOfGameAwardsPanel"/>
+
                     <Controller type="Cutscene" end="Stop" frame="VictoryBackground/VictoryBackgroundCutscene">
                         <Key type="Cutscene" time="0.0" action="Stop"/>
                     </Controller>
-                    
+
                     <Controller type="Cutscene" end="Stop" frame="DefeatBackground/DefeatBackgroundCutscene">
                         <Key type="Cutscene" time="0.0" action="Stop"/>
                     </Controller>
                 </Animation>
-                
+
                 <StateGroup name="EOMVisibility">
                     <State name="Off">
                         <When type="Property" frame="$parent/FullscreenUpperContainer/EndOfGameAwardsPanel" visible="true"/>

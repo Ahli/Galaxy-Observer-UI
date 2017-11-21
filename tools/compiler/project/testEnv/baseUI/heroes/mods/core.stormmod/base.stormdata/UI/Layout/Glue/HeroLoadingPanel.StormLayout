@@ -2,7 +2,7 @@
 <Desc>
     <DescFlags val="Locked"/>
     <Constant name="LoadingPanelHeroVerticalCenterOffset" val="200"/>
-    
+
     <!--===========================================================================================
     <! HeroLoadingPanelPlayerFrame
     <!==========================================================================================-->
@@ -49,14 +49,14 @@
                 <Event event="IsPlayer" action="Stop" frame="$parent"/>
                 <Event event="IsComputer" action="Play" frame="$parent"/>
                 <Event event="IsOfflinePlayer" action="Play" frame="$parent"/>
-                
+
                 <Controller type="Visibility" end="Pause">
                     <Key type="Bool" time="0" value="True"/>
                 </Controller>
             </Animation>
         </Frame>
-        
-        <Frame type="AvatarFrame" name="AvatarFrame" template="AvatarFrameTemplates/AvatarStateTemplate_PartyMember">
+
+        <Frame type="AvatarFrame" name="AvatarFrame" template="AvatarFrameTemplates/AvatarStateTemplate_Loading">
             <Anchor side="Top" relative="$parent" pos="Min" offset="10"/>
 
             <!-- Disable GM animation for loading screen -->
@@ -81,7 +81,7 @@
         </Frame>
 
         <Frame type="Image" name="LoadingProgressBarImage">
-            <Anchor side="Top" relative="$parent" pos="Min" offset="135"/>            
+            <Anchor side="Top" relative="$parent" pos="Min" offset="135"/>
             <Texture val="@UI/LoadingScreen_LoadingBar_Blue"/>
             <TextureType val="NineSlice"/>
             <Unclipped val="True"/>
@@ -100,6 +100,15 @@
             <Anchor side="Top" relative="$parent" pos="Min" offset="15"/>
             <ColorAdjustMode val="Colorize"/>
             <Texture val="@UI/UI_ingame_LoadScreen_PartyLink"/>
+        </Frame>
+
+        <!--=======================================================================================
+        <! Voice Chat
+        <!======================================================================================-->
+        <Frame type="BattleUserVoiceFrame" name="VoiceChatFrame" template="BattleUserVoiceFrame/BattleUserVoiceFrame_AdjustableSpeaker_Template" requiredtoload="IS_VOICECHAT_ENABLED">
+            <ChannelType val="{$VoiceChatUI/@ActiveChannelType}"/>
+            <PresenceId val="{$parent/AvatarFrame/@PresenceId}"/>
+            <ContextMenu val="$ancestor[@type=HeroLoadingPanel]/PlayerContextMenu"/>
         </Frame>
 
         <!--=======================================================================================
@@ -195,8 +204,13 @@
         <Frame type="Image" name="PartyIdImage">
             <Anchor side="Right" relative="$parent" pos="Max" offset="-10"/>
         </Frame>
+
+        <Frame type="BattleUserVoiceFrame" name="VoiceChatFrame" template="BattleUserVoiceFrame/BattleUserVoiceFrame_AdjustableSpeaker_Template" requiredtoload="IS_VOICECHAT_ENABLED">
+            <Anchor side="Right" relative="$parent" pos="Max" offset="-5"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="-10"/>
+        </Frame>
     </Frame>
-    
+
     <!--=======================================================================================
     <! RIGHT PLAYER
     <!======================================================================================-->
@@ -217,7 +231,7 @@
             <Anchor side="Right" relative="$parent" pos="Max" offset="-11"/>
 
             <Frame type="HeroImage" name="PortraitPanel">
-                <TextureCoords top="0.0" left="1.0" bottom="1.0" right="0.0"/> 
+                <TextureCoords top="0.0" left="1.0" bottom="1.0" right="0.0"/>
                 <Anchor side="Left" relative="$parent" pos="Min" offset="-1"/>
             </Frame>
 
@@ -243,6 +257,11 @@
         <Frame type="Image" name="PartyIdImage">
             <Anchor side="Left" relative="$parent" pos="Min" offset="10"/>
         </Frame>
+
+        <Frame type="BattleUserVoiceFrame" name="VoiceChatFrame" template="BattleUserVoiceFrame/BattleUserVoiceFrame_AdjustableSpeaker_Template" requiredtoload="IS_VOICECHAT_ENABLED">
+            <Anchor side="Left" relative="$parent" pos="Min" offset="5"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="-10"/>
+        </Frame>
     </Frame>
 
     <Frame type="HeroLoadingPanel" name="HeroLoadingPanelTemplate">
@@ -252,8 +271,8 @@
         <!======================================================================================-->
         <Frame type="Image" name="LeftTeamBackgroundImage">
             <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
-            <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>            
-            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>            
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
             <Texture val="@UI/LoadingScreen_TeamGrid"/>
             <TextureCoords top="0.0" left="1.0" bottom="1.0" right="0.0"/>
             <ColorAdjustMode val="Colorize"/>
@@ -272,14 +291,19 @@
         <Animation name="RedTeamOnLeft">
             <Event event="BlueTeamOnLeft" action="Stop"/>
             <Event event="RedTeamOnLeft" action="Reset,Play"/>
-            
+
             <Controller type="AdjustmentColor" end="Pause" frame="LeftTeamBackgroundImage">
-                <Key type="Curve" time="0.0" value="97,35,38" out="Step"/>
+                <Key type="Curve" time="0.0" value="97,35,38" inout="Linear,Step"/>
             </Controller>
             <Controller type="AdjustmentColor" end="Pause" frame="RightTeamBackgroundImage">
-                <Key type="Curve" time="0.0" value="36,47,103" out="Step"/>
+                <Key type="Curve" time="0.0" value="36,47,103" inout="Linear,Step"/>
             </Controller>
         </Animation>
+
+        <Frame type="BattleUserContextMenu" name="PlayerContextMenu" template="BattleUserContextMenu/BattleUserContextMenu" >
+            <Anchor side="Top" relative="$parent" pos="Max" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+        </Frame>
 
         <!--=======================================================================================
         <! LEFT PLAYERS
@@ -313,7 +337,7 @@
         <!--=======================================================================================
         <! RIGHT PLAYERS
         <!======================================================================================-->
-        
+
         <Frame type="HeroLoadingPanelPlayerFrame" name="PlayerFrame5" template="HeroLoadingPanel/HeroLoadingPanelPlayerFrameRightTemplate">
             <Anchor side="Top" relative="$parent" pos="Min" offset="#LoadingPanelHeroVerticalCenterOffset"/>
             <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
@@ -342,6 +366,11 @@
             <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
             <Anchor side="Top" relative="$parent/PlayerFrame8" pos="Max" offset="0"/>
             <Visible val="true"/>
+        </Frame>
+
+        <Frame type="Frame" name="ChannelSelector" template="VoiceChannelSelector/VoiceChannelSelectorTemplate" requiredtoload="IS_VOICECHAT_ENABLED">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="10"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="5"/>
         </Frame>
     </Frame>
 </Desc>

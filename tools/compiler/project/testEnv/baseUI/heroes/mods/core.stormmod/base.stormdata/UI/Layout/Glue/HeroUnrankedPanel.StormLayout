@@ -17,6 +17,8 @@
             <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
             <Texture val="@UI/Storm_ExclusiveButton_Normal"/>
             <TextureType val="NineSlice"/>
+            <DesaturateOnDisable val="false"/>
+            <DisabledAlpha val="150"/>
         </Frame>
 
         <StateGroup name="RadioState">
@@ -48,21 +50,19 @@
     <Frame type="VersusAIPanel" name="VersusAIPanelTemplate">
         <Anchor side="Bottom" relative="TrainingButton" pos="Max" offset="20"/>
         <Anchor side="Right" relative="Header" pos="Max" offset="20"/>
-        <RenderType val="HDR"/>
+        <RenderType val="LDR"/>
         <Visible val="False"/>
 
         <Animation name="OnShown">
-            <Event event="OnShown" action="DirectionForward"/>
-            <Event event="OnShown" action="Play"/>
-            <Event event="OnHidden" action="DirectionReverse"/>
-            <Event event="OnHidden" action="Play"/>
+            <Event event="OnShown" action="DirectionForward,Play"/>
+            <Event event="OnHidden" action="DirectionReverse,Play"/>
             <Controller type="Fade" end="Pause">
-                <Key type="Curve" time="0" value="0" out="Fast"/>
-                <Key type="Curve" time=".4" value="255" in="Slow"/>
+                <Key type="Curve" time="0" value="0" inout="Linear"/>
+                <Key type="Curve" time=".4" value="255" inout="Slow,Linear"/>
             </Controller>
             <Controller type="Anchor" end="Pause" side="Top" relative="true">
-                <Key type="Curve" time="0" value="400" out="Fast"/>
-                <Key type="Curve" time=".4" value="0" in="Slow"/>
+                <Key type="Curve" time="0" value="400" inout="Linear"/>
+                <Key type="Curve" time=".4" value="0" inout="Slow,Linear"/>
             </Controller>
         </Animation>
         
@@ -70,8 +70,8 @@
             <Event event="Show" action="DirectionForward,Play" frame="$parent/HeroAttributesGroup/ChangeHeroPanel"/>
             <Event event="Hide" action="DirectionReverse,Play" frame="$parent/HeroAttributesGroup/ChangeHeroPanel"/>
             <Controller type="Fade" end="Pause">
-                <Key type="Curve" time="0" value="255" out="Fast"/>
-                <Key type="Curve" time=".2" value="0" in="Slow"/>
+                <Key type="Curve" time="0" value="255" inout="Linear"/>
+                <Key type="Curve" time=".2" value="0" inout="Slow,Linear"/>
             </Controller>
             <Controller type="Visibility" end="Pause" frame="MouseBlocker">
                 <Key type="Bool" time="0.0" value="false"/>
@@ -80,20 +80,32 @@
             </Controller>
         </Animation>
 
-        <Frame type="BlurFrame" name="BlurBackground">
-            <Anchor relative="$parent/VersusAIPanelBg" />
+        <Frame type="BlurFrame" name="BlurFrame">
+            <Anchor side="Left" relative="$parent/VersusAIPanelBg" pos="Min" offset="4"/>
+            <Anchor side="Top" relative="$parent/VersusAIPanelBg" pos="Min" offset="4"/>
+            <Anchor side="Right" relative="$parent/VersusAIPanelBg" pos="Max" offset="-4"/>
+            <Anchor side="Bottom" relative="$parent/VersusAIPanelBg" pos="Max" offset="-4"/>
+            <AcceptsMouse val="True"/>
             <BlurAmount val="0.8"/>
-                
+
             <Frame type="Image" name="LowImage">
                 <Anchor relative="$parent" />
                 <Texture val="@UI/Storm_Generic_Background_Low"/>
             </Frame>
         </Frame>
 
+        <Frame type="Image" name="BackgroundColorImage">
+            <Anchor relative="$parent/BlurFrame"/>
+            <Color val="08081d"/>
+            <Alpha val="100"/>
+        </Frame>
+
         <Frame type="Image" name="VersusAIPanelBg">
             <Anchor relative="$parent"/>
-            <Texture val="@UI/Storm_Replays_PanelBg"/>
+            <Texture val="@UI/Storm_Generic_SmallPanel_Border"/>
             <TextureType val="Nineslice"/>
+            <DesaturateOnDisable val="False"/>
+            <DisabledAlpha val="150"/>
         </Frame>
 
         <Frame type="Frame" name="Header" template="StandardTemplates/SummarySubHeaderTemplate">
@@ -106,6 +118,10 @@
                 <Text val="@UI/ScreenPlay/AIOptionsTitle"/>
                 <Style val="PlayerProfileTitle"/>
                 <AutoSizeClamps minWidth="228"/>
+            </Frame>
+
+            <Frame type="Image" name="HeaderUnderlineImage">
+                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
             </Frame>
         </Frame>
 
@@ -133,7 +149,7 @@
             <Continuous val="false"/>
         </Frame>
         
-        <Frame type="RadioGroup" name="RadioGroup">
+        <Frame type="RadioButtonGroup" name="RadioGroup">
             <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
             <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
             <Anchor side="Left" relative="$parent" pos="Min" offset="17"/>
@@ -183,13 +199,11 @@
         <RenderType val="HDR"/>
 
         <Animation name="Transition">
-            <Event event="Show" action="Reset"/>
-            <Event event="Show" action="Play"/>
-            <Event event="Hide" action="DirectionReverse"/>
-            <Event event="Hide" action="Play"/>
+            <Event event="Show" action="Reset,Play"/>
+            <Event event="Hide" action="DirectionReverse,Play"/>
             <Controller type="Fade" end="Pause">
-                <Key type="Curve" time="0.0" value="0" out="Slow"/>
-                <Key type="Curve" time="0.4" value="255" in="Slow" out="Slow"/>
+                <Key type="Curve" time="0.0" value="0" inout="Linear,Slow"/>
+                <Key type="Curve" time="0.4" value="255" inout="Slow"/>
             </Controller>
         </Animation>
 
@@ -216,46 +230,20 @@
             </Frame>
 
             <Frame type="VersusAIPanel" name="VersusAIPanel" template="HeroUnrankedPanel/VersusAIPanelTemplate">
-                <Anchor side="Top" relative="$parent/HeroAttributesGroup/SkinsButton" pos="Min" offset="-322"/>
-                <Anchor side="Left" relative="$parent/HeroAttributesGroup/SkinsButton" pos="Min" offset="35"/>
+                <Anchor side="Top" relative="$parent/HeroAttributesGroup/LoadoutsButton" pos="Min" offset="-322"/>
+                <Anchor side="Left" relative="$parent/HeroAttributesGroup/LoadoutsButton" pos="Min" offset="35"/>
             </Frame>
 
             <Frame type="Frame" name="HeroAttributesGroup">
-                <Frame type="HeroSelectSkinsPanel" name="SkinsPanel">
-                    <Frame type="PurchaseCurrencySelectPanel" name="PurchaseCurrencySelectPanel">
-                        <Frame type="BuyButton" name="GoldPurchaseButton">
-                            <ReportsStats val="True"/>
-                            <Handle val="UnrankedSkinSelect_GoldCurrencyButton"/>
-                        </Frame>
-
-                        <Frame type="BuyButton" name="RealPurchaseButton">
-                            <ReportsStats val="True"/>
-                            <Handle val="UnrankedSkinSelect_RealCurrencyButton"/>
-                        </Frame>
-                    </Frame>
-                </Frame>
-
-                <Frame type="HeroSelectMountsPanel" name="MountsPanel">
-                    <Frame type="PurchaseCurrencySelectPanel" name="PurchaseCurrencySelectPanel">
-                        <Frame type="BuyButton" name="GoldPurchaseButton">
-                            <ReportsStats val="True"/>
-                            <Handle val="UnrankedMountSelect_GoldCurrencyButton"/>
-                        </Frame>
-
-                        <Frame type="BuyButton" name="RealPurchaseButton">
-                            <ReportsStats val="True"/>
-                            <Handle val="UnrankedMountSelect_RealCurrencyButton"/>
-                        </Frame>
-                    </Frame>
-                </Frame>
-                
-                <Frame type="HeroSelectArtifactsPanel" name="ArtifactsPanel">
+                <!-- <Frame type="HeroSelectArtifactsPanel" name="ArtifactsPanel">
                     <Frame type="BuyButton" name="BuyButton">
                         <ReportsStats val="true"/>
                         <Handle val="ScreenHeroMatchmaking_HeroSelectPanel_HeroSelectArtifactsPanel_BuyButton"/>
                     </Frame>
-                </Frame>
+                </Frame> -->
                 <Frame type="HeroSelectChangeHeroPanel" name="ChangeHeroPanel">
+                    <RenderType val="LDR"/>
+
                     <Frame type="HeroSelectTileList" name="HeroTileList" template="HeroSelectTileList/ChangeHeroTileListTemplate">
                         <Anchor side="Top" relative="$parent" pos="Min" offset="180"/>
                         <Anchor side="Left" relative="$parent" pos="Min" offset="22"/>
@@ -274,7 +262,7 @@
                         <Frame Type="HeroContextMenu" name="ContextMenu" template="StandardTemplates/StandardContextMenuTemplate" >
                             <Anchor side="Top" relative="$parent" pos="Max" offset="0"/>
                             <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
-                        </Frame> 
+                        </Frame>
                     </Frame>
 
                     <Frame type="HeroFilterPanel" name="HeroFilterPanel" template="HeroSelectChangeHeroPanel/HeroFilterPanelTemplate">
@@ -285,19 +273,76 @@
                     </Frame>
 
                     <Frame type="PurchaseCurrencySelectPanel" name="PurchaseCurrencySelectPanel">
-                        <Frame type="BuyButton" name="GoldPurchaseButton">
+                        <FrameHandlePrefix val="HeroUnrankedPanel"/>
+                        
+                        <Frame type="BuyButton" name="BuyButton0">
                             <ReportsStats val="True"/>
-                            <Handle val="UnrankedHeroSelect_GoldCurrencyButton"/>
+                            <PositionHint val="HeroSelect"/>
                         </Frame>
 
-                        <Frame type="BuyButton" name="RealPurchaseButton">
+                        <Frame type="BuyButton" name="BuyButton1">
                             <ReportsStats val="True"/>
-                            <Handle val="UnrankedHeroSelect_RealCurrencyButton"/>
+                            <PositionHint val="HeroSelect"/>
                         </Frame>
+
+                        <Frame type="BuyButton" name="BuyButton2">
+                            <ReportsStats val="True"/>
+                            <PositionHint val="HeroSelect"/>
+                        </Frame>
+
+                        <StateGroup name="ShopIconShowHideStates">
+                            <State name="HideShopIcon">
+                                <When type="Property" frame="BuyButton0" visible="False"/>
+                                <When type="Property" frame="BuyButton1" visible="False"/>
+                                <Action type="SetProperty" frame="ShopIconImage" visible="False"/>
+                            </State>
+                            <State name="ShowShopIcon">
+                                <Action type="SetProperty" frame="ShopIconImage" visible="True"/>
+                            </State>
+                        </StateGroup>
                     </Frame>
                     
                     <Frame type="PurchaseInfoPanel" name="PurchaseInfoPanel">
                         <Handle val="UnrankedHeroSelect_PurchasePanel"/>
+                    </Frame>
+                </Frame>
+
+                <Frame type="HeroSelectLoadoutsPanel" name="HeroSelectLoadoutPanel" template="HeroSelectLoadoutPanel/HeroSelectLoadoutPanelTemplate">
+                    <Frame type="PurchaseCurrencySelectPanel" name="PurchaseCurrencySelectPanel" template="HeroSelectLoadoutTemplates/LoadoutPurchaseCurrencySelectPanel">
+                        <Frame type="BuyButton" name="BuyButton0" template="StoreTemplates/BuyButtonSmallTemplate">
+                            <ReportsStats val="true"/>
+                            <Handle val="UnrankedHeroSelectLoadout_BuyButton0"/>
+                        </Frame>
+                        <Frame type="BuyButton" name="BuyButton1" template="StoreTemplates/BuyButtonSmallTemplate">
+                            <ReportsStats val="true"/>
+                            <Handle val="UnrankedHeroSelectLoadout_BuyButton1"/>
+                        </Frame>
+                    </Frame>
+                    <Frame type="TabControl" name="LoadoutPanelTabs" template="HeroSelectLoadoutPanel/LoadoutPanelTabsTemplate">
+                        <Frame type="Button" name="SkinsButton" template="HeroSelectLoadoutPanel/LoadoutNavigationButtonTemplate">
+                            <ReportsStats val="true"/>
+                            <Handle val="UnrankedHeroSelectLoadout_SkinsButton"/>
+                        </Frame>
+                        <Frame type="Button" name="MountsButton" template="HeroSelectLoadoutPanel/LoadoutNavigationButtonTemplate">
+                            <ReportsStats val="true"/>
+                            <Handle val="UnrankedHeroSelectLoadout_MountsButton"/>
+                        </Frame>
+                        <Frame type="Button" name="BannersButton" template="HeroSelectLoadoutPanel/LoadoutNavigationButtonTemplate">
+                            <ReportsStats val="true"/>
+                            <Handle val="UnrankedHeroSelectLoadout_BannersButton"/>
+                        </Frame>
+                        <Frame type="Button" name="SpraysButton" template="HeroSelectLoadoutPanel/LoadoutNavigationButtonTemplate">
+                            <ReportsStats val="true"/>
+                            <Handle val="UnrankedHeroSelectLoadout_SpraysButton"/>
+                        </Frame>
+                        <Frame type="Button" name="AnnouncerPacksButton" template="HeroSelectLoadoutPanel/LoadoutNavigationButtonTemplate">
+                            <ReportsStats val="true"/>
+                            <Handle val="UnrankedHeroSelectLoadout_AnnouncerPacksButton"/>
+                        </Frame>
+                        <Frame type="Button" name="VoiceLinesButton" template="HeroSelectLoadoutPanel/LoadoutNavigationButtonTemplate">
+                            <ReportsStats val="true"/>
+                            <Handle val="UnrankedHeroSelectLoadout_VoiceLinesButton"/>
+                        </Frame>
                     </Frame>
                 </Frame>
             </Frame>
@@ -306,7 +351,7 @@
         <Frame type="AutoSelectFilterPanel" name="AutoSelectFilter" template="AutoSelectFilterPanel/AutoSelectFilterPanelTemplate">
             <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
             <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
-            <Anchor side="Bottom" relative="$parent/ReadyButton" pos="Mid" offset="-50"/>
+            <Anchor side="Bottom" relative="$parent/ReadyButton" pos="Mid" offset="-35"/>
             <CollapseLayout val="True"/>
             <Visible val="False"/>
 
@@ -325,6 +370,7 @@
             <Handle val="ScreenHeroMatchmaking_ReadyButton"/>
             <ClickSound val="@UI_BNet_Ready"/>
             <Text val="@UI/ScreenHeroMatchmaking/ReadyButton"/>
+            <RenderType val="LDR"/>
 
             <Frame type="Frame" name="HitTestFrame">
                 <AcceptsMouseTooltip val="true"/>

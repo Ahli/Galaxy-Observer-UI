@@ -1,0 +1,403 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<Desc>
+    <DescFlags val="Locked"/>
+
+    <Constant name="SubNavigationButton_Offset" val="-30"/>
+
+    <!--===============================================================================================
+    <! Templates
+    <!==============================================================================================-->
+    <Frame type="Button" name="CollectionNavigationButtonTemplate" template="StandardTemplates/Top_Navigation">
+        <ReportsStats val="true"/>
+        <Toggleable val="true"/>
+
+        <Frame Type="CollectionContextMenu" name="ContextMenu" template="StandardTemplates/StandardContextMenuTemplate" >
+            <Anchor side="Top" relative="$parent" pos="Max" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+        </Frame>
+
+        <Frame type="Frame" name="NewItemNotificationLabel">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="6"/>
+            <Anchor side="Left" relative="$parent/Label" pos="Max" offset="0"/>
+            <Anchor side="Right" relative="ItemQuantityLabel" pos="Max" offset="2"/>
+            <AcceptsMouseTooltip val="true"/>
+            <Tooltip val="{TooltipTextFormatFrame/@Text}"/>
+            <Visible val="False"/>
+            <Width val="24"/>
+            <Height val="24"/>
+
+            <Frame type="Label" name="ItemQuantityLabel">
+                <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="2"/>
+                <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+                <Style val="TaskBarSubNavItemNotification"/>
+
+                <StateGroup name="FontStates">
+
+                    <State name="Selected">
+                        <When type="Property" frame="$parent/$parent" Toggled="true"/>
+                        <Action type="SetProperty" Style="TaskBarSubNavItemNotificationSelected"/>
+                    </State>
+                    <State name="Hovered">
+                        <When type="Property" frame="$parent/$parent" Hovering="true"/>
+                        <Action type="SetProperty" Style="TaskBarSubNavItemNotificationHover"/>
+                    </State>
+                </StateGroup>
+            </Frame>
+
+            <Frame type="TextFormatFrame" name="TooltipTextFormatFrame">
+                <Anchor relative="$parent"/>
+                <Replacement val="{$parent/ItemQuantityLabel/@Text}"/>
+            </Frame>
+
+            <StateGroup name="VisibilityStates">
+                <State name="HasUnseenItems">
+                    <When type="Property" frame="ItemQuantityLabel" operator="NotEqual" Text="0"/>
+                    <Action type="SetProperty" visible="True"/>
+                    <Action type="SetAnchor" frame="$parent/Anchor_4x3_Right" side="Left" relative="$parent/NewItemNotificationLabel" pos="Max" offset="10"/>
+                    <Action type="SetAnchor" frame="$parent/HitTestFrame" side="Right" relative="$parent/NewItemNotificationLabel" pos="Max" offset="10"/>
+                </State>
+            </StateGroup>
+        </Frame>
+
+        <Animation name="Transition">
+            <Event event="Show" action="Reset,Play" frame="$parent"/>
+            <Controller type="Fade" end="Pause">
+                <Key type="Curve" time="0.0" value="0" inout="Linear,Slow"/>
+                <Key type="Curve" time="0.15" value="0" inout="Slow,Linear"/>
+                <Key type="Curve" time="0.4" value="255" inout="Slow,Step"/>
+            </Controller>
+            <Controller type="Anchor" end="Pause" side="Top" relative="true">
+                <Key type="Curve" time="0.0" value="-10" inout="Linear,Slow"/>
+                <Key type="Curve" time="0.15" value="-10" inout="Slow,Linear"/>
+                <Key type="Curve" time="0.4" value="0" inout="Slow,Step"/>
+            </Controller>
+        </Animation>
+    </Frame>
+
+    <!--===============================================================================================
+    <! Main Frame
+    <!==============================================================================================-->
+    <Frame type="ScreenCollection" name="ScreenCollection">
+        <Anchor relative="$parent"/>
+
+        <Frame type="Frame" name="SubNavContainer" template="StandardTemplates/SubNavContainer">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="79"/>
+        </Frame>
+
+        <Frame type="TabControl" name="PanelTabs">
+            <Anchor side="Top" relative="$parent/SubNavContainer" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+            <Batch val="false"/>
+
+            <Animation name="Transition">
+                <Event event="Show" action="Reset,Play"/>
+                <Event event="Hide" action="DirectionReverse,Play"/>
+                <Event event="End" action="Stop"/>
+                <Controller type="Fade" end="Pause">
+                    <Key type="Curve" time="0.0" value="0" inout="Linear,Slow"/>
+                    <Key type="Curve" time="0.4" value="255" inout="Slow"/>
+                </Controller>
+            </Animation>
+
+            <Animation name="PreTransition">
+                <Event event="Begin" action="Reset,Play"/>
+
+                <Controller type="Sound" end="Pause">
+                    <Key type="Sound" time="0.0" sound="@UI_Gluescreen_Transition_ShopBkgnd"/>
+                </Controller>
+            </Animation>
+
+            <Frame type="Label" name="UnavailableLabel">
+                <Handle val="ScreenCollection_UnavailableLabel"/>
+                <Anchor side="Bottom" relative="$parent" pos="Max" offset="-60"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="25"/>
+                <Style val="StoreGoldLabel"/>
+                <Visible val="{$parent/$parent/@IsStoreUnavailable}"/>
+                <Text val="@UI/ScreenStore/StoreUnavailable"/>
+            </Frame>
+
+            <!--===========================================================================================
+            <! TAB BUTTONS
+            <!==========================================================================================-->
+            <TabListItem val="FeaturedButton"/>
+            <Frame type="Button" name="FeaturedButton" template="ScreenCollection/CollectionNavigationButtonTemplate">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="-7"/>
+                <Text val="@UI/ScreenStore/FeaturedButton"/>
+                <Handle val="ScreenCollection_FeaturedButton"/>
+
+                <Frame type="Frame" name="NewItemNotificationLabel">
+                    <Frame type="Label" name="ItemQuantityLabel">
+                        <Text val="{$ancestor[@type=ScreenCollection]/@UnseenCountByType[12]}"/>
+                    </Frame>
+                </Frame>
+            </Frame>
+
+            <TabListItem val="HeroButton"/>
+            <Frame type="Button" name="HeroButton" template="ScreenCollection/CollectionNavigationButtonTemplate">
+                <Anchor side="Top" relative="$parent/FeaturedButton" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/FeaturedButton" pos="Max" offset="#SubNavigationButton_Offset"/>
+                <Text val="@UI/ScreenStore/HeroButton"/>
+                <Handle val="ScreenCollection_HeroButton"/>
+
+                <ContextMenu val="ContextMenu"/>
+                <Frame Type="CollectionContextMenu" name="ContextMenu" template="StandardTemplates/StandardContextMenuTemplate" >
+                    <GameContentType val="Hero"/>
+                </Frame>
+
+                <Frame type="Frame" name="NewItemNotificationLabel">
+                    <Frame type="Label" name="ItemQuantityLabel">
+                        <Text val="{$ancestor[@type=ScreenCollection]/@UnseenCountByType[0]}"/>
+                    </Frame>
+
+                    <Frame type="TextFormatFrame" name="TooltipTextFormatFrame">
+                        <FormatText val="@UI/ScreenStore/HeroButtonTooltip"/>
+                    </Frame>
+                </Frame>
+            </Frame>
+
+            <TabListItem val="SkinButton"/>
+            <Frame type="Button" name="SkinButton" template="ScreenCollection/CollectionNavigationButtonTemplate">
+                <Anchor side="Top" relative="$parent/HeroButton" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/HeroButton" pos="Max" offset="#SubNavigationButton_Offset"/>
+                <Text val="@UI/ScreenStore/SkinButton"/>
+                <Handle val="ScreenCollection_SkinButton"/>
+
+                <ContextMenu val="ContextMenu"/>
+                <Frame Type="CollectionContextMenu" name="ContextMenu" template="StandardTemplates/StandardContextMenuTemplate" >
+                    <GameContentType val="Skin"/>
+                </Frame>
+
+                <Frame type="Frame" name="NewItemNotificationLabel">
+                    <Frame type="Label" name="ItemQuantityLabel">
+                        <Text val="{$ancestor[@type=ScreenCollection]/@UnseenCountByType[1]}"/>
+                    </Frame>
+
+                    <Frame type="TextFormatFrame" name="TooltipTextFormatFrame">
+                        <FormatText val="@UI/ScreenStore/SkinButtonTooltip"/>
+                    </Frame>
+                </Frame>
+            </Frame>
+
+            <TabListItem val="MountButton"/>
+            <Frame type="Button" name="MountButton" template="ScreenCollection/CollectionNavigationButtonTemplate">
+                <Anchor side="Top" relative="$parent/SkinButton" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/SkinButton" pos="Max" offset="#SubNavigationButton_Offset"/>
+                <Text val="@UI/ScreenStore/MountButton"/>
+                <Handle val="ScreenCollection_MountButton"/>
+
+                <ContextMenu val="ContextMenu"/>
+                <Frame Type="CollectionContextMenu" name="ContextMenu" template="StandardTemplates/StandardContextMenuTemplate" >
+                    <GameContentType val="Mount"/>
+                </Frame>
+
+                <Frame type="Frame" name="NewItemNotificationLabel">
+                    <Frame type="Label" name="ItemQuantityLabel">
+                        <Text val="{$ancestor[@type=ScreenCollection]/@UnseenCountByType[2]}"/>
+                    </Frame>
+
+                    <Frame type="TextFormatFrame" name="TooltipTextFormatFrame">
+                        <FormatText val="@UI/ScreenStore/MountButtonTooltip"/>
+                    </Frame>
+                </Frame>
+            </Frame>
+
+            <TabListItem val="BannerButton"/>
+            <Frame type="Button" name="BannerButton" template="ScreenCollection/CollectionNavigationButtonTemplate">
+                <Anchor side="Top" relative="$parent/MountButton" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/MountButton" pos="Max" offset="#SubNavigationButton_Offset"/>
+                <Text val="@UI/ScreenStore/BannerButton"/>
+                <Handle val="ScreenCollection_BannerButton"/>
+
+                <ContextMenu val="ContextMenu"/>
+                <Frame Type="CollectionContextMenu" name="ContextMenu" template="StandardTemplates/StandardContextMenuTemplate" >
+                    <GameContentType val="Banner"/>
+                </Frame>
+
+                <Frame type="Frame" name="NewItemNotificationLabel">
+                    <Frame type="Label" name="ItemQuantityLabel">
+                        <Text val="{$ancestor[@type=ScreenCollection]/@UnseenCountByType[6]}"/>
+                    </Frame>
+
+                    <Frame type="TextFormatFrame" name="TooltipTextFormatFrame">
+                        <FormatText val="@UI/ScreenStore/BannerButtonTooltip"/>
+                    </Frame>
+                </Frame>
+            </Frame>
+
+            <TabListItem val="SprayButton"/>
+            <Frame type="Button" name="SprayButton" template="ScreenCollection/CollectionNavigationButtonTemplate">
+                <Anchor side="Top" relative="$parent/BannerButton" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/BannerButton" pos="Max" offset="#SubNavigationButton_Offset"/>
+                <Text val="@UI/ScreenStore/SprayButton"/>
+                <Handle val="ScreenCollection_SprayButton"/>
+
+                <ContextMenu val="ContextMenu"/>
+                <Frame Type="CollectionContextMenu" name="ContextMenu" template="StandardTemplates/StandardContextMenuTemplate" >
+                    <GameContentType val="Spray"/>
+                </Frame>
+
+                <Frame type="Frame" name="NewItemNotificationLabel">
+                    <Frame type="Label" name="ItemQuantityLabel">
+                        <Text val="{$ancestor[@type=ScreenCollection]/@UnseenCountByType[7]}"/>
+                    </Frame>
+
+                    <Frame type="TextFormatFrame" name="TooltipTextFormatFrame">
+                        <FormatText val="@UI/ScreenStore/SprayButtonTooltip"/>
+                    </Frame>
+                </Frame>
+            </Frame>
+
+            <TabListItem val="AnnouncerPackButton"/>
+            <Frame type="Button" name="AnnouncerPackButton" template="ScreenCollection/CollectionNavigationButtonTemplate">
+                <Anchor side="Top" relative="$parent/SprayButton" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/SprayButton" pos="Max" offset="#SubNavigationButton_Offset"/>
+                <Text val="@UI/ScreenStore/AnnouncerPackButton"/>
+                <Handle val="ScreenCollection_AnnouncerPackButton"/>
+
+                <ContextMenu val="ContextMenu"/>
+                <Frame Type="CollectionContextMenu" name="ContextMenu" template="StandardTemplates/StandardContextMenuTemplate" >
+                    <GameContentType val="AnnouncerPack"/>
+                </Frame>
+
+                <Frame type="Frame" name="NewItemNotificationLabel">
+                    <Frame type="Label" name="ItemQuantityLabel">
+                        <Text val="{$ancestor[@type=ScreenCollection]/@UnseenCountByType[8]}"/>
+                    </Frame>
+
+                    <Frame type="TextFormatFrame" name="TooltipTextFormatFrame">
+                        <FormatText val="@UI/ScreenStore/AnnouncerPackButtonTooltip"/>
+                    </Frame>
+                </Frame>
+            </Frame>
+
+            <TabListItem val="VoiceLineButton"/>
+            <Frame type="Button" name="VoiceLineButton" template="ScreenCollection/CollectionNavigationButtonTemplate">
+                <Anchor side="Top" relative="$parent/AnnouncerPackButton" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/AnnouncerPackButton" pos="Max" offset="#SubNavigationButton_Offset"/>
+                <Text val="@UI/ScreenStore/VoiceLineButton"/>
+                <Handle val="ScreenCollection_VoiceLineButton"/>
+
+                <ContextMenu val="ContextMenu"/>
+                <Frame Type="CollectionContextMenu" name="ContextMenu" template="StandardTemplates/StandardContextMenuTemplate" >
+                    <GameContentType val="VoiceLine"/>
+                </Frame>
+
+                <Frame type="Frame" name="NewItemNotificationLabel">
+                    <Frame type="Label" name="ItemQuantityLabel">
+                        <Text val="{$ancestor[@type=ScreenCollection]/@UnseenCountByType[9]}"/>
+                    </Frame>
+
+                    <Frame type="TextFormatFrame" name="TooltipTextFormatFrame">
+                        <FormatText val="@UI/ScreenStore/VoiceLineButtonTooltip"/>
+                    </Frame>
+                </Frame>
+            </Frame>
+
+            <TabListItem val="EmojisButton"/>
+            <Frame type="Button" name="EmojisButton" template="ScreenCollection/CollectionNavigationButtonTemplate">
+                <Anchor side="Top" relative="$parent/VoiceLineButton" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/VoiceLineButton" pos="Max" offset="#SubNavigationButton_Offset"/>
+                <Text val="@UI/ScreenStore/EmojisButton"/>
+                <Handle val="ScreenCollection_EmojisButton"/>
+
+                <ContextMenu val="ContextMenu"/>
+                <Frame Type="CollectionContextMenu" name="ContextMenu" template="StandardTemplates/StandardContextMenuTemplate" >
+                    <GameContentType val="EmoticonPack"/>
+                </Frame>
+
+                <Frame type="Frame" name="NewItemNotificationLabel">
+                    <Frame type="Label" name="ItemQuantityLabel">
+                        <Text val="{$ancestor[@type=ScreenCollection]/@UnseenCountByType[10]}"/>
+                    </Frame>
+
+                    <Frame type="TextFormatFrame" name="TooltipTextFormatFrame">
+                        <FormatText val="@UI/ScreenStore/EmojisButtonTooltip"/>
+                    </Frame>
+                </Frame>
+            </Frame>
+
+            <TabListItem val="PortraitButton"/>
+            <Frame type="Button" name="PortraitButton" template="ScreenCollection/CollectionNavigationButtonTemplate">
+                <Anchor side="Top" relative="$parent/EmojisButton" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/EmojisButton" pos="Max" offset="#SubNavigationButton_Offset"/>
+                <Text val="@UI/ScreenStore/PortraitButton"/>
+                <Handle val="ScreenCollection_PortraitButton"/>
+
+                <ContextMenu val="ContextMenu"/>
+                <Frame Type="CollectionContextMenu" name="ContextMenu" template="StandardTemplates/StandardContextMenuTemplate" >
+                    <GameContentType val="PortraitPack"/>
+                </Frame>
+
+                <Frame type="Frame" name="NewItemNotificationLabel">
+                    <Frame type="Label" name="ItemQuantityLabel">
+                        <Text val="{$ancestor[@type=ScreenCollection]/@UnseenCountByType[11]}"/>
+                    </Frame>
+
+                    <Frame type="TextFormatFrame" name="TooltipTextFormatFrame">
+                        <FormatText val="@UI/ScreenStore/PortraitButtonTooltip"/>
+                    </Frame>
+                </Frame>
+            </Frame>
+
+
+            <TabListItem val="BoostButton"/>
+            <Frame type="Button" name="BoostButton" template="ScreenCollection/CollectionNavigationButtonTemplate">
+                <Anchor side="Top" relative="$parent/PortraitButton" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/PortraitButton" pos="Max" offset="#SubNavigationButton_Offset"/>
+                <Text val="@UI/ScreenStore/BoostButton"/>
+                <Handle val="ScreenCollection_BoostButton"/>
+
+                <Frame type="Frame" name="NewItemNotificationLabel">
+                    <Frame type="Label" name="ItemQuantityLabel">
+                        <Text val="{$ancestor[@type=ScreenCollection]/@UnseenCountByType[4]}"/>
+                    </Frame>
+                </Frame>
+                
+                <Frame type="Image" name="SeparatorImage">
+                    <Visible val="false"/>
+                </Frame>
+            </Frame>
+
+            <!--===========================================================================================
+            <! TAB PANELS
+            <!==========================================================================================-->
+            <PanelListItem val="PanelContainer/FeaturedPanel"/>
+            <PanelListItem val="PanelContainer/HeroPanel"/>
+            <PanelListItem val="PanelContainer/SkinPanel"/>
+            <PanelListItem val="PanelContainer/MountPanel"/>
+            <PanelListItem val="PanelContainer/BannerPanel"/>
+            <PanelListItem val="PanelContainer/SprayPanel"/>
+            <PanelListItem val="PanelContainer/AnnouncerPackPanel"/>
+            <PanelListItem val="PanelContainer/VoiceLinePanel"/>
+            <PanelListItem val="PanelContainer/EmoticonPackPanel"/>
+            <PanelListItem val="PanelContainer/PortraitPanel"/>
+            <PanelListItem val="PanelContainer/BoostPanel"/>
+
+            <Frame type="Frame" name="PanelContainer">
+                <Anchor side="Top" relative="$parent/$parent/SubNavContainer" pos="Max" offset="-30"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+                <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+
+                <Frame type="Frame" name="FeaturedPanel" template="FeaturedCollectionPanel/FeaturedCollectionPanelTemplate" />
+                <Frame type="Frame" name="HeroPanel" template="HeroCollectionPanel/HeroCollectionPanelTemplate" />
+                <Frame type="Frame" name="SkinPanel" template="SkinCollectionPanel/SkinCollectionPanelTemplate" />
+                <Frame type="Frame" name="MountPanel" template="MountCollectionPanel/MountCollectionPanelTemplate" />
+                <Frame type="Frame" name="BannerPanel" template="BannerCollectionPanel/BannerCollectionPanelTemplate" />
+                <Frame type="Frame" name="SprayPanel" template="SprayCollectionPanel/SprayCollectionPanelTemplate" />
+                <Frame type="Frame" name="AnnouncerPackPanel" template="AnnouncerPackCollectionPanel/AnnouncerPackCollectionPanelTemplate" />
+                <Frame type="Frame" name="VoiceLinePanel" template="VoiceLineCollectionPanel/VoiceLineCollectionPanelTemplate" />
+                <Frame type="Frame" name="EmoticonPackPanel" template="EmoticonPackCollectionPanel/EmoticonPackCollectionPanelTemplate" />
+                <Frame type="PortraitSelectionPanel" name="PortraitPanel" template="PortraitSelectionPanel/PortraitPanelTemplate">
+                    <Anchor relative="$parent/VoiceLinePanel"/>
+                </Frame>
+                <Frame type="Frame" name="BoostPanel" template="BoostCollectionPanel/BoostCollectionPanelTemplate" />
+                
+            </Frame>
+        </Frame>
+    </Frame>
+</Desc>

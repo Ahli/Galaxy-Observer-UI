@@ -49,6 +49,7 @@
             <Anchor side="Left" relative="$parent/BackgroundFrame/BorderImage" pos="Mid" offset="0"/>
             <Text val="@UI/StandardDialog_Ok_Control"/>
             <Shortcut val="@UI/StandardDialog_Ok_Hotkey"/>
+            <HoverSound val="@UI_HoverTick"/>
         </Frame>
     </Frame>
 
@@ -65,6 +66,7 @@
             <Anchor side="Right" relative="$parent/BackgroundFrame/BorderImage" pos="Max" offset="-50"/>
             <Text val="@UI/StandardDialog_No_Control"/>
             <Shortcut val="@UI/StandardDialog_No_Hotkey"/>
+            <HoverSound val="@UI_HoverTick"/>
         </Frame>
     </Frame>
 
@@ -76,11 +78,13 @@
         <Frame type="Button" name="SecondButton" template="StandardTemplates/StandardButtonTemplate">
             <Anchor side="Left" relative="$parent/BackgroundFrame/BorderImage" pos="Mid" offset="0"/>
             <Anchor side="Right" relative="$parent/BackgroundFrame/BorderImage" pos="Mid" offset="0"/>
+            <HoverSound val="@UI_HoverTick"/>
         </Frame>
 
         <Frame type="Button" name="ThirdButton" template="StandardTemplates/StandardButtonTemplate">
             <Anchor side="Top" relative="$parent/Button" pos="Min" offset="0"/>
             <Anchor side="Right" relative="$parent/BackgroundFrame/BorderImage" pos="Max" offset="-50"/>
+            <HoverSound val="@UI_HoverTick"/>
         </Frame>
     </Frame>
 
@@ -142,6 +146,227 @@
             <Anchor side="Top" relative="$parent/ProgressLabel" pos="Max" offset="20"/>
             <Text val="@UI/StandardDialog_Cancel_Control"/>
             <Shortcut val="@UI/StandardDialog_Cancel_Hotkey"/>
+        </Frame>
+    </Frame>
+
+    <Frame type="BrowserDialog" name="BrowserDialogTemplate" template="StandardDialog/StandardDialogTemplate">
+        <HookupAlias original="Button" alias="CloseButton"/>
+
+        <Frame type="Frame" name="BackgroundFrame" template="StandardTemplates/GlueDialogTemplate">
+            <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+            <Height val="860"/>
+            <Width val="1270"/>
+        </Frame>
+
+        <Frame type="Label" name="BrowserTitleLabel">
+            <Anchor side="Top" relative="$parent/BackgroundFrame" pos="Min" offset="14"/>
+            <Anchor side="Left" relative="$parent/BackgroundFrame" pos="Min" offset="26"/>
+            <Anchor side="Right" relative="$parent/BackgroundFrame" pos="Max" offset="-10"/>
+            <Text val="{$parent/Browser/@Title}"/>
+        </Frame>
+
+        <Frame type="Label" name="TitleLabel">
+            <Anchor side="Left" relative="$parent" pos="Mid" offset="-300"/>
+            <Anchor side="Right" relative="$parent" pos="Mid" offset="300"/>
+            <Anchor relative="$parent/BrowserTitleLabel"/>
+        </Frame>
+
+        <Frame type="Label" name="MessageLabel">
+            <Anchor relative="$parent/BrowserTitleLabel"/>
+        </Frame>
+
+        <Frame type="Image" name="DialogHeaderBackgroundImage">
+            <Anchor side="Top" relative="$parent/BackgroundFrame" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent/BackgroundFrame" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent/BackgroundFrame" pos="Max" offset="0"/>
+            <Height val="67"/>
+            <Visible val="False"/>
+        </Frame>
+
+        <Frame type="Browser" name="Browser">
+            <Anchor side="Top" relative="$parent/BackgroundFrame" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent/BackgroundFrame" pos="Min" offset="20"/>
+            <Anchor side="Bottom" relative="$parent/BackgroundFrame" pos="Max" offset="-100"/>
+            <Anchor side="Right" relative="$parent/BackgroundFrame" pos="Max" offset="-20"/>
+            <Address val="{$this/AddressEditBox/@Text}"/>
+            <RejectsFocus val="false"/>
+            <BlocksShortcuts val="true"/>
+
+            <Frame type="Image" name="BrowserImage">
+                <Anchor side="Top" relative="$parent/$parent/DialogHeaderBackgroundImage" pos="Max" offset="30"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="3"/>
+                <Anchor side="Bottom" relative="$parent" pos="Max" offset="-3"/>
+                <Anchor side="Right" relative="$parent" pos="Max" offset="-3"/>
+
+                <StateGroup name="HideBrowserImage">
+                    <State name="HasError">
+                        <When type="Property" frame="$parent" Error="True"/>
+                        <Action type="SetProperty" Visible="False"/>
+                    </State>
+                    <State name="IsNavigating">
+                        <When type="Property" frame="$parent" Navigating="True"/>
+                        <Action type="SetProperty" Visible="False"/>
+                    </State>
+                </StateGroup>
+            </Frame>
+
+            <Frame type="EditBox" name="AddressEditBox" template="StandardTemplates/StandardEditBoxTemplate">
+                <Anchor side="Top" relative="$parent/ForwardButton" pos="Mid" offset="0"/>
+                <Anchor side="Right" relative="$parent/BackButton" pos="Min" offset="-60"/>
+                <Anchor side="Bottom" relative="$parent/ForwardButton" pos="Mid" offset="0"/>
+                <Height val="54"/>
+                <Width val="400"/>
+                <Text val="{$parent/@Address}"/>
+                <Visible val="True"/>
+            </Frame>
+
+            <Frame type="Button" name="BackButton" template="StandardTemplates/StandardGlueButton">
+                <Anchor side="Top" relative="$parent/ForwardButton" pos="Min" offset="0"/>
+                <Anchor side="Right" relative="$parent/ForwardButton" pos="Min" offset="0"/>
+                <Text val="&lt;"/>
+                <Height val="60"/>
+                <Width val="74"/>
+                
+                <Visible val="True"/>
+                <Enabled val="{$parent/@CanGoBackward}"/>
+            </Frame>
+
+            <Frame type="Button" name="ForwardButton" template="StandardTemplates/StandardGlueButton">
+                <Anchor side="Top" relative="$parent/GoButton" pos="Min" offset="0"/>
+                <Anchor side="Right" relative="$parent/GoButton" pos="Min" offset="0"/>
+                <Text val="&gt;"/>
+                <Height val="60"/>
+                <Width val="74"/>
+                <Visible val="True"/>
+                <Enabled val="{$parent/@CanGoForward}"/>
+            </Frame>
+
+            <Frame type="Button" name="GoButton" template="StandardTemplates/StandardGlueButton">
+                <Anchor side="Top" relative="$parent/LaunchButton" pos="Min" offset="0"/>
+                <Anchor side="Right" relative="$parent/LaunchButton" pos="Min" offset="0"/>
+                <Height val="60"/>
+                <Width val="74"/>
+               
+                <Frame type="Image" name="ButtonIconImage">
+                    <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+                    <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+                    <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+                    <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+                    <Texture val="@UI/SC2_UI_Battlenet_Glue_Arcade_RefreshIcon"/>
+                </Frame>
+            </Frame>
+
+            <Frame type="LaunchURLButton" name="LaunchButton" template="StandardTemplates/StandardGlueButton">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="30"/>
+                <Anchor side="Right" relative="$parent" pos="Max" offset="-70"/>
+                <Height val="60"/>
+                <Width val="74"/>
+                <URL val="{$parent/@Address}"/>
+                
+                <Frame type="Image" name="ButtonIconImage">
+                    <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+                    <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+                    <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+                    <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+                    <Texture val="@UI/Glues_Icons_ViewInFolder"/>
+                </Frame>
+            </Frame>
+
+            <Frame type="ScrollBar" name="ScrollBar" template="StandardTemplates/StandardScrollBarTemplate">
+                <Anchor side="Top" relative="$parent/BrowserImage" pos="Min" offset="-2"/>
+                <Anchor side="Right" relative="$parent/BrowserImage" pos="Max" offset="4"/>
+                <Anchor side="Bottom" relative="$parent/BrowserImage" pos="Max" offset="4"/>
+                <DescFlags val=""/>
+                <Width val="30"/>
+                <StepValue val="100.0"/>
+                <Continuous val="true"/>
+            </Frame>
+
+            <Frame type="Image" name="IdleSpinner">
+                <Anchor side="Top" relative="$parent" pos="Mid" offset="10"/>
+                <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+                <Visible val="{$parent/@Loading}"/>
+
+                <Width val="92"/>
+                <Height val="92"/>
+
+                <Frame type="Image" name="SpinnerBG">
+                    <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+                    <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+                    <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+                    <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+                    <Width val="92"/>
+                    <Height val="92"/>
+                    <Texture val="@UI/Glues_Battlenet_PageAssets_LoadingSpinnerBG"/>
+                </Frame>
+
+                <Frame type="Image" name="SpinnerFill">
+                    <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+                    <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+                    <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+                    <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+                    <Width val="92"/>
+                    <Height val="92"/>
+                    <Texture val="@UI/Glues_Battlenet_PageAssets_LoadingSpinnerFill"/>
+
+                    <Animation name="Spin">
+                        <Event event="OnShown" action="Reset,Play"/>
+
+                        <Controller type="Rotation" relative="False" end="Loop" >
+                            <Key type="Curve" time="0" value="360" out="linear"/>
+                            <Key type="Curve" time="3" value="0" in="linear"/>
+                        </Controller>
+                    </Animation>
+                </Frame>
+            </Frame>
+
+            <Frame type="Frame" name="ErrorContainer">
+                <Anchor relative="$parent" />
+                <Visible val="{$parent/@Error}"/>
+                <Visible val="False"/>
+
+                <Frame type="Image" name="MismatchImage">
+                    <Anchor side="Bottom" relative="$parent" pos="Mid" offset="-25"/>
+                    <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+                    <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+                </Frame>
+
+                <Frame type="Label" name="PartyMismatchLabel">
+                    <Anchor side="Top" relative="$parent/MismatchImage" pos="Min" offset="60" />
+                    <Anchor side="Left" relative="$parent" pos="Mid" offset="0" />
+                    <Anchor side="Right" relative="$parent" pos="Mid" offset="0" />s
+                    <Text val="@UI/ProfileDialog/ErrorTitle"/>
+                </Frame>
+
+                <Frame type="Label" name="DescriptionLabel">
+                    <Anchor side="Top" relative="$parent/MismatchImage" pos="Max" offset="25"/>
+                    <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                    <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+                    <Text val="@UI/ProfileDialog/ErrorDescription"/>
+                </Frame>
+
+                <Animation name="OnShown">
+                    <Event event="OnShown" action="Reset"/>
+                    <Event event="OnShown" action="Play"/>
+                    <Controller type="Fade" end="Pause">
+                        <Key type="Curve" time="0" value="0" out="Slow"/>
+                        <Key type="Curve" time="0.5" value="0" out="Slow"/>
+                        <Key type="Curve" time=".9" value="255" in="Slow"/>
+                    </Controller>
+                </Animation>
+            </Frame>
+        </Frame>
+
+        <Frame type="Button" name="Button">
+            <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Top" relative="$parent" pos="Max" offset="-270"/>
+            <Text val="@UI/StandardDialog_Ok_Control"/>
+            <Shortcut val="@UI/Back_Hotkey"/>
         </Frame>
     </Frame>
 </Desc>

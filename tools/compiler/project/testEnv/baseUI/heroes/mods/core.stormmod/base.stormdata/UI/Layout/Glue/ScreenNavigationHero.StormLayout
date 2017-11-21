@@ -2,7 +2,8 @@
 <Desc>
     <DescFlags val="Locked"/>
 
-    
+    <Constant name="ButtonOffset" val="-60"/>
+    <Constant name="ButtonOffsetLeft" val="-105"/>
 
     <Frame type="ScreenNavigationHero" name="ScreenNavigationHero" template="StandardTemplates/GlueScreen">
         <Anchor relative="$parent"/>
@@ -25,12 +26,12 @@
                 <Key type="Bool" time="0.1" value="true"/>
             </Controller>
             <Controller type="Fade" end="Pause">
-                <Key type="Curve" time="0.0" value="0" out="Fast"/>
-                <Key type="Curve" time="0.3" value="255" in="Fast"/>
+                <Key type="Curve" time="0.0" value="0" inout="Linear"/>
+                <Key type="Curve" time="0.3" value="255" inout="Linear"/>
             </Controller>
             <Controller type="Anchor" end="Pause" side="Top" relative="true">
-                <Key type="Curve" time="0" value="-50" out="Fast"/>
-                <Key type="Curve" time="0.3" value="0" out="Fast"/>
+                <Key type="Curve" time="0" value="-50" inout="Linear"/>
+                <Key type="Curve" time="0.3" value="0" inout="Linear"/>
             </Controller>
         </Animation>
 
@@ -38,7 +39,7 @@
             <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
             <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
             <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
-            <Height val="100"/>
+            <Height val="108"/>
         </Frame>
 
         <Frame type="Button" name="HomeButton" template="StandardTemplates/HomeButtonTemplate">
@@ -50,8 +51,8 @@
         </Frame>
 
         <Frame type="Button" name="PlayButton" template="StandardTemplates/ScreenNavigationButtonTemplate">
-            <Anchor side="Top" relative="$parent/HomeButton" pos="Min" offset="-12"/>
-            <Anchor side="Left" relative="$parent/HomeButton" pos="Max" offset="0"/>
+            <Anchor side="Top" relative="$parent/HomeButton" pos="Min" offset="-1"/>
+            <Anchor side="Left" relative="$parent/HomeButton" pos="Max" offset="#ButtonOffset"/>
             <Text val="@UI/ScreenNavigation/PlayButton"/>
             <Shortcut val="@UI/ScreenNavigation2_Hotkey"/>
             <ReportsStats val="true"/>
@@ -60,16 +61,175 @@
 
         <Frame type="Button" name="StoreButton" template="StandardTemplates/ScreenNavigationButtonTemplate">
             <Anchor side="Top" relative="$parent/PlayButton" pos="Min" offset="0"/>
-            <Anchor side="Left" relative="$parent/PlayButton" pos="Max" offset="0"/>
+            <Anchor side="Left" relative="$parent/PlayButton" pos="Max" offset="#ButtonOffsetLeft"/>
             <Text val="@UI/ScreenNavigation/StoreButton"/>
             <Shortcut val="@UI/ScreenNavigation3_Hotkey"/>
             <ReportsStats val="true"/>
             <Handle val="ScreenNavigation_StoreButton"/>
+            <ContextMenu val="ContextMenu"/>
+
+            <Frame Type="CollectionContextMenu" name="ContextMenu" template="StandardTemplates/StandardContextMenuTemplate" >
+                <Anchor side="Top" relative="$parent" pos="Max" offset="0"/>
+                <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+            </Frame>
+
+            <Frame type="Image" name="NewItemNotificationBox" template="StandardTemplates/ItemNotificationBoxTemplate">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="10"/>
+                <Anchor side="Left" relative="$parent/Label" pos="Max" offset="5"/>
+                <Tooltip val="{TooltipTextFormatFrame/@Text}"/>
+                <Visible val="True"/>
+
+                <Frame type="Label" name="ItemQuantityLabel">
+                    <Text val="{$ancestor[@name=GlueUI]/ScreenCollection/@UnseenItemsCount}"/>
+                </Frame>
+
+                <Frame type="TextFormatFrame" name="TooltipTextFormatFrame">
+                    <Anchor relative="$parent"/>
+                    <FormatText val="@UI/ScreenNavigation/StoreButtonCountTooltip"/>
+                    <Replacement val="{$parent/ItemQuantityLabel/@Text}"/>
+                </Frame>
+
+                <Frame type="Frame" name="ShineFrame">
+                    <Anchor relative="$parent"/>
+
+                    <Frame type="Image" name="TopFlare">
+                        <Anchor side="Top" relative="$parent" pos="Min" offset="-45"/>
+                        <Anchor side="Left" relative="$parent" pos="Min" offset="-45"/>
+                        <Visible val="false"/>
+                        <Width val="100"/>
+                        <Height val="100"/>
+                        <Unclipped val="true"/>
+                        <BlendMode val="Add"/>
+                        <Texture val="@UI/Storm_UI_Centered_Lens_Flare"/>
+
+                        <Animation name="Shine">
+                            <Event event="PlayShine" action="Reset, Play" frame="$parent"/>
+
+                            <Controller type="Visibility" end="Stop">
+                                <Key type="Bool" time="0" value="true"/>
+                                <Key type="Bool" time="1" value="false"/>
+                            </Controller>
+                            <Controller type="Fade" end="Stop">
+                                <Key type="Curve" time="0" value="0"/>
+                                <Key type="Curve" time=".2" value="255"/>
+                                <Key type="Curve" time=".4" value="0"/>
+                                <Key type="Curve" time="1" value="0"/>
+                            </Controller>
+                        </Animation>
+                    </Frame>
+
+                    <Frame type="Image" name="BottomFlare">
+                        <Anchor side="Right" relative="$parent" pos="Max" offset="45"/>
+                        <Anchor side="Bottom" relative="$parent" pos="Max" offset="45"/>
+                        <Visible val="false"/>
+                        <Width val="100"/>
+                        <Height val="100"/>
+                        <Unclipped val="true"/>
+                        <BlendMode val="Add"/>
+                        <Texture val="@UI/Storm_UI_Centered_Lens_Flare"/>
+
+                        <Animation name="Shine">
+                            <Event event="PlayShine" action="Reset, Play" frame="$parent"/>
+
+                            <Controller type="Visibility" end="Stop">
+                                <Key type="Bool" time="0" value="true"/>
+                                <Key type="Bool" time="1" value="false"/>
+                            </Controller>
+                            <Controller type="Fade" end="Stop">
+                                <Key type="Curve" time="0" value="0"/>
+                                <Key type="Curve" time=".2" value="255"/>
+                                <Key type="Curve" time=".4" value="0"/>
+                                <Key type="Curve" time="1" value="0"/>
+                            </Controller>
+                        </Animation>
+                    </Frame>
+
+                    <Frame type="Image" name="ShineImage">
+                        <Anchor relative="$parent"/>
+                        <Visible val="false"/>
+                        <LayerCount val="2"/>
+                        <Texture val="@UI/Storm_UI_Glues_Draft_Portrait_Selecting_Glow_Mask" layer="0"/>
+                        <AlphaLayer val="true" layer="0"/>
+                        <TextureCoords layer="0" top="1" left="0" right="1" bottom="0"/>
+                        <Texture val="@UI/Storm_Taskbar_SocialButton_Countbg" layer="1"/>
+                        <BlendMode val="Add" layer="1"/>
+                        <TextureType val="NineSlice" layer="1"/>
+
+                        <Animation name="UVScroll">
+                            <Event event="PlayShine" action="Reset, Play" frame="$parent"/>
+
+                            <Controller type="Visibility" end="Stop">
+                                <Key type="Bool" time="0" value="true"/>
+                                <Key type="Bool" time="1" value="false"/>
+                            </Controller>
+                            <Controller type="LayerUV" side="Left" sidelock="true" end="Stop" layer="0">
+                                <Key type="Curve" time="0" value="1"/>
+                                <Key type="Curve" time=".1" value="1"/>
+                                <Key type="Curve" time="1" value="-1"/>
+                            </Controller>
+                        </Animation>
+                    </Frame>
+
+                    <Frame type="Image" name="ShineImage2">
+                        <Anchor relative="$parent"/>
+                        <Visible val="false"/>
+                        <LayerCount val="2"/>
+                        <Texture val="@UI/Storm_UI_Glues_Draft_Portrait_Selecting_Glow_Mask" layer="0"/>
+                        <AlphaLayer val="true" layer="0"/>
+                        <TextureCoords layer="0" top="1" left="0" right="1" bottom="0"/>
+                        <Texture val="@UI/Storm_Taskbar_SocialButton_Countbg" layer="1"/>
+                        <BlendMode val="Add" layer="1"/>
+                        <TextureType val="NineSlice" layer="1"/>
+
+                        <Animation name="UVScroll">
+                            <Event event="PlayShine" action="Reset, Play" frame="$parent"/>
+
+                            <Controller type="Visibility" end="Stop">
+                                <Key type="Bool" time="0" value="true"/>
+                                <Key type="Bool" time="1" value="false"/>
+                            </Controller>
+                            <Controller type="LayerUV" side="Right" sidelock="true" end="Stop" layer="0">
+                                <Key type="Curve" time="0" value="0"/>
+                                <Key type="Curve" time=".1" value="0"/>
+                                <Key type="Curve" time="1" value="2"/>
+                            </Controller>
+                        </Animation>
+                    </Frame>
+
+                    <Animation name="ShineAnimation">
+                        <Event event="UnseenItemCountIncreased" action="Reset, Play" frame="$ancestor[@type=GlueUI]/ScreenCollection"/>
+
+                        <Controller type="Event" end="Stop">
+                            <Key type="Event" time=".5" event="PlayShine"/>
+                        </Controller>
+                    </Animation>
+                </Frame>
+
+                <StateGroup name="VisibilityStates">
+                    <State name="HasUnseenItems">
+                        <When type="Property" frame="$ancestor[@name=GlueUI]/ScreenCollection" operator="Equal" unseenItemsCount="0"/>
+                        <Action type="SetProperty" visible="False"/>
+                    </State>
+                </StateGroup>
+
+                <StateGroup name="AnchorStates">
+                    <State name="VisibleNot4x3">
+                        <When type="Property" visible="True"/>
+                        <When type="Property" frame="$parent/Anchor_4x3_Right" visible="True"/>
+                        <Action type="SetAnchor" frame="$parent/Anchor_4x3_Right" side="Left" relative="$parent/NewItemNotificationBox" pos="Max" offset="55"/>
+                    </State>
+                    <State name="VisibleIs4x3">
+                        <When type="Property" visible="True"/>
+                        <When type="Property" frame="$parent/Anchor_4x3_Right" visible="False"/>
+                        <Action type="SetAnchor" frame="$parent" side="Right" relative="NewItemNotificationBox" pos="Max" offset="60"/>
+                    </State>
+                </StateGroup>
+            </Frame>
         </Frame>
 
         <Frame type="Button" name="ReplayButton" template="StandardTemplates/ScreenNavigationButtonTemplate">
             <Anchor side="Top" relative="$parent/StoreButton" pos="Min" offset="0"/>
-            <Anchor side="Left" relative="$parent/StoreButton" pos="Max" offset="0"/>
+            <Anchor side="Left" relative="$parent/StoreButton" pos="Max" offset="#ButtonOffsetLeft"/>
             <Text val="@UI/ScreenNavigation/ReplayButton"/>
             <Shortcut val="@UI/ScreenNavigation4_Hotkey"/>
             <ReportsStats val="true"/>

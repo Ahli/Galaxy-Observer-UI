@@ -11,124 +11,393 @@
     <Constant name="TileListItemOffsetRight" val="-2"/>
     <Constant name="TileListItemOffsetTop" val="2"/>
 
-    <Constant name="Collection_Spacing_StandardItem_Horizontal" val="15"/>
-    <Constant name="Collection_Spacing_StandardItem_Vertical" val="9"/>
+    <Constant name="Collection_Spacing_StandardItem_Horizontal" val="10"/>
+    <Constant name="Collection_Spacing_StandardItem_Vertical" val="8"/>
 
-    <Frame type="BundleTileListItem" name="BundleTileListItemTemplate">
-        <Height val="#TileListItemHeight"/>
-        <Width val="#TileListItemWidth"/>
-        <HideWhenCleared val="False"/>
-        
-        <Animation name="ClickSound">
-            <Event event="OnClick" action="Reset,Play"/>
-            <Controller type="Sound" end="Stop">
-                <Key type="Sound" time="0" sound="@UI_FileSelectionSelect"/>
-            </Controller>
-        </Animation>
+    <Constant name="InvalidTileListIndex" val="4294967295"/>
 
-        <Animation name="HoverSound">
-            <Event event="OnMouseEnter" action="Reset,Play"/>
-            <Event event="OnMouseExit" action="Reset, Stop"/>
-            <Controller type="Sound" end="Stop">
-                <Key type="Sound" time="0" sound="@UI_Large_MouseOver"/>
-            </Controller>
-        </Animation>
+
+    <!-- 
+    ===========================================================
+    
+    BUNDLE TILE LIST ITEM TEMPLATES
+    
+    ===========================================================
+    -->
+    
+    <!-- 
+    =======================
+    BUNDLE TILE LIST ITEM
+    =======================
+    -->
+    <Frame type="Control" name="BundleTileListItemBaseTemplate" template="StandardTileListTemplates/GraphicControlTemplate">
         
-        <!-- Base States -->
-        <StateGroup name="ItemTypeState">
-            <State name="Empty">
-                <When type="Property" frame="$this" HasData="False"/>
-            </State>
-            <State name="IndividualItem">
-                <When type="Property" frame="$this/BundleCacheFrame" ProductCount="1"/>
-            </State>
-            <State name="DynamicBundle">
-                <When type="Property" frame="$this/BundleCacheFrame" ShowDynamicBundle="True"/>
-            </State>
-            <State name="StandardBundle">
-                <When type="Property" frame="$this/GameContentFrame" IsBundle="True"/>
-                <When type="Property" frame="$this/BundleCacheFrame" ShowDynamicBundle="False"/>
-            </State>
+        <!--
+        ==============================
+        SizeState
+        ==============================
+        This StateGroup determines whether the item will display as large, medium or small in the list.
+        -->
+        <StateGroup name="SizeState">
+            <DefaultState val="Small"/>
+            <State name="Large"/>
+            <State name="Medium"/>
+            <State name="Small"/>
         </StateGroup>
+
+        <!-- ANCHORFRAME -->
+        <Frame type="Frame" name="AnchorFrame">
+            <Width val="564"/>
+            <Height val="702"/>
         
-        <StateGroup name="ItemOwnedState">
-            <State name="Purchased">
-                <When type="Property" frame="$this/GameContentFrame" IsPurchased="True"/>
-            </State>
-            <State name="NotPurchased">
-                <When type="Property" frame="$this/GameContentFrame" IsPurchased="False"/>
-            </State>
-        </StateGroup>
+            <StateGroup name="SizeState">
+                <State name="Large">
+                    <When type="StateGroup" frame="$parent" SizeState="Large"/>
+                    <Action type="SetProperty" frame="$this" Width="564"/>
+                    <Action type="SetProperty" frame="$this" Height="702"/>
+                </State>
+                <State name="Medium">
+                    <When type="StateGroup" frame="$parent" SizeState="Medium"/>
+                    <Action type="SetProperty" frame="$this" Width="460"/>
+                    <Action type="SetProperty" frame="$this" Height="310"/>
+                </State>
+                <State name="Small">
+                    <When type="StateGroup" frame="$parent" SizeState="Small"/>
+                    <Action type="SetProperty" frame="$this" Width="224"/>
+                    <Action type="SetProperty" frame="$this" Height="310"/>
+                </State>
+            </StateGroup>
+        </Frame>
+        
         
         <Frame type="BundleCacheFrame" name="BundleCacheFrame">
-            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
-            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
-            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
-            <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+            <Anchor relative="$parent"/>
             <Bundle val="{$parent/@Bundle}"/>
         </Frame>
 
-        <Frame type="GameContentFrame" name="GameContentFrame">
-            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
-            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
-            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
-            <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+        <Frame type="StoreCacheFrame" name="StoreCacheFrame">
+            <Anchor relative="$parent"/>
             <GameContent val="{$parent/BundleCacheFrame/@GameContent}"/>
+            <UseRawCost val="true"/>
         </Frame>
-
-        <Frame type="BlurFrame" name="BackgroundBlur">
-            <Anchor side="Top" relative="$parent/NormalImage" pos="Min" offset="8"/>
-            <Anchor side="Left" relative="$parent/NormalImage" pos="Min" offset="8"/>
-            <Anchor side="Bottom" relative="$parent/NormalImage" pos="Max" offset="-8"/>
-            <Anchor side="Right" relative="$parent/NormalImage" pos="Max" offset="-8"/>
-            <BlurAmount val=".35"/>
-        </Frame>
-
-        <Frame type="Image" name="NormalImage">
-            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
-            <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
-            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
-            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
-            <Texture val="@UI/SC2_UI_Collection_StandardItemFrame_Normal"/>
-            <TextureType val="NineSlice"/>
-            <Alpha val="255"/>
-        </Frame>
-
-        <Frame type="Image" name="HoverImage">
-            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
-            <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
-            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
-            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
-            <Texture val="@UI/SC2_UI_Collection_StandardItemFrame_Hover"/>
-            <TextureType val="NineSlice"/>
+       
+            
+        <!-- BACKGROUND -->
+        <Frame type="Image" name="Background">
+            <StateGroup name="ColorState">
+                <State name="Locked">
+                    <Action type="SetProperty" frame="$this" Color="6,15,25"/>
+                    <Action type="SetProperty" frame="$this" Alpha="179"/>
+                </State>
+            </StateGroup>
         </Frame>
         
-        <Frame type="Image" name="SelectedImage">
-            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
-            <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
-            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
-            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
-            <Texture val="@UI/SC2_UI_Collection_StandardItemFrame_Normal"/>
-            <TextureType val="NineSlice"/>
-            <Alpha val="0"/>
+        <!-- TEXT BACKGROUND -->
+        <Frame type="Image" name="TextBackground">
+            <StateGroup name="DisplayState">
+                <State name="Locked">
+                    <Action type="SetProperty" frame="$this" Texture="@UI/Glues_Battlenet_PageAssets_GraphicListItem_TextBackground_Normal"/>
+                </State>
+            </StateGroup>
         </Frame>
         
-        <Frame type="Image" name="SelectedImageFake">
-            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
-            <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
-            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
-            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
-            <Texture val="@UI/SC2_UI_Collection_StandardItemFrame_Normal"/>
-            <TextureType val="NineSlice"/>
-            <Alpha val="255"/>
-            <Visible val="False"/>
+        <!-- BORDER INNER -->
+        <Frame type="Image" name="BorderInner">
+            <StateGroup name="ColorState">
+                <State name="Locked">
+                    <Action type="SetProperty" frame="$this" Color="36,107,169"/>
+                    <Action type="SetProperty" frame="$this" Alpha="255"/>
+                </State>
+            </StateGroup>
+        </Frame>
+        
+        <!-- BORDER HIGHLIGHT -->
+        <Frame type="Image" name="BorderHighlight">
+            <StateGroup name="ColorState">
+                <State name="Locked">
+                    <Action type="SetProperty" frame="$this" Color="65,131,199"/>
+                    <Action type="SetProperty" frame="$this" Alpha="255"/>
+                </State>
+            </StateGroup>
+        </Frame>
+            
+        <!-- ICONIMAGE -->
+        <Frame type="Image" name="IconImage">
+            <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+            <Width val="216"/>
+            <Height val="304"/>
+            <Texture val="{$parent/BundleCacheFrame/@IconFilePath}"/>
+        
+            <StateGroup name="SizeState">
+                <State name="Large">
+                    <When type="StateGroup" frame="$parent" SizeState="Large"/>
+                    <Action type="SetProperty" frame="$this" Width="558"/>
+                    <Action type="SetProperty" frame="$this" Height="696"/>
+                    <Action type="SetProperty" frame="$this" Texture="{$parent/BundleCacheFrame/@LargeIconFilePath}"/>
+                </State>
+                <State name="Medium">
+                    <When type="StateGroup" frame="$parent" SizeState="Medium"/>
+                    <Action type="SetProperty" frame="$this" Width="452"/>
+                    <Action type="SetProperty" frame="$this" Height="304"/>
+                    <Action type="SetProperty" frame="$this" Texture="{$parent/BundleCacheFrame/@MediumIconFilePath}"/>
+                </State>
+                <State name="Small">
+                    <When type="StateGroup" frame="$parent" SizeState="Small"/>
+                    <Action type="SetProperty" frame="$this" Width="216"/>
+                    <Action type="SetProperty" frame="$this" Height="304"/>
+                    <Action type="SetProperty" frame="$this" Texture="{$parent/BundleCacheFrame/@IconFilePath}"/>
+                </State>
+            </StateGroup>
             
             <StateGroup name="VisibleState">
                 <DefaultState val="NotVisible"/>
-
+            
                 <State name="Visible">
-                    <When type="Property" frame="$parent/SelectedImage" Visible="True"/>
-                    <When type="Property" frame="$parent/HoverImage" Visible="False"/>
+                    <When type="StateGroup" frame="$parent" EmptyState="NotEmpty"/>
+                    <Action type="SetProperty" frame="$this" Visible="True"/>
+                </State>
+                
+                <State name="NotVisible">
+                    <Action type="SetProperty" frame="$this" Visible="False"/>
+                </State>
+            </StateGroup>
+        </Frame>
+
+        <!-- TITLELABEL -->
+        <Frame type="Label" name="TitleLabel">
+            <Anchor side="Bottom" relative="$parent/SubtitleLabel" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent/CurrencyLabel" pos="Min" offset="-1"/>
+            <Anchor side="Right" relative="$parent/SubtitleLabel" pos="Max" offset="0"/>
+            <Text val="{$parent/BundleCacheFrame/@NameText}"/>
+            
+            <StateGroup name="StyleState">
+            
+                <State name="LargeEquippedSelected">
+                    <When type="StateGroup" frame="$parent" SizeState="Large"/>
+                    <When type="StateGroup" frame="$parent" SelectedState="Selected"/>
+                    <When type="StateGroup" frame="$parent" EquippedState="Equipped"/>
+                    <Action type="SetProperty" frame="$this" Style="@GraphicListItemTitle_Large_Standard_Selected"/>
+                </State>
+            
+                <State name="LargePurchasableSelected">
+                    <When type="StateGroup" frame="$parent" SizeState="Large"/>
+                    <When type="StateGroup" frame="$parent" SelectedState="Selected"/>
+                    <When type="StateGroup" frame="$parent" PurchasableState="Purchasable"/>
+                    <Action type="SetProperty" frame="$this" Style="@GraphicListItemTitle_Large_Standard_Selected"/>
+                </State>
+            
+                <State name="LargeSelected">
+                    <When type="StateGroup" frame="$parent" SizeState="Large"/>
+                    <When type="StateGroup" frame="$parent" SelectedState="Selected"/>
+                    <Action type="SetProperty" frame="$this" Style="@GraphicListItemTitle_Large_Standard_Selected"/>
+                </State>
+                
+                <State name="LargeEquippedHovered">
+                    <When type="StateGroup" frame="$parent" SizeState="Large"/>
+                    <When type="StateGroup" frame="$parent" HoveredState="Hovered"/>
+                    <When type="StateGroup" frame="$parent" EquippedState="Equipped"/>
+                    <Action type="SetProperty" frame="$this" Style="@GraphicListItemTitle_Large_Standard_Hovered"/>
+                </State>
+            
+                <State name="LargePurchasableHovered">
+                    <When type="StateGroup" frame="$parent" SizeState="Large"/>
+                    <When type="StateGroup" frame="$parent" HoveredState="Hovered"/>
+                    <When type="StateGroup" frame="$parent" PurchasableState="Purchasable"/>
+                    <Action type="SetProperty" frame="$this" Style="@GraphicListItemTitle_Large_Standard_Hovered"/>
+                </State>
+                
+                <State name="LargeHovered">
+                    <When type="StateGroup" frame="$parent" SizeState="Large"/>
+                    <When type="StateGroup" frame="$parent" HoveredState="Hovered"/>
+                    <Action type="SetProperty" frame="$this" Style="@GraphicListItemTitle_Large_Standard_Hovered"/>
+                </State>
+
+                <State name="LargeEquippedNormal">
+                    <When type="StateGroup" frame="$parent" SizeState="Large"/>
+                    <When type="StateGroup" frame="$parent" EquippedState="Equipped"/>
+                    <Action type="SetProperty" frame="$this" Style="@GraphicListItemTitle_Large_Standard_Normal"/>
+                </State>
+            
+                <State name="LargePurchasableNormal">
+                    <When type="StateGroup" frame="$parent" SizeState="Large"/>
+                    <When type="StateGroup" frame="$parent" PurchasableState="Purchasable"/>
+                    <Action type="SetProperty" frame="$this" Style="@GraphicListItemTitle_Large_Standard_Normal"/>
+                </State>
+                
+                <State name="LargeLocked">
+                    <When type="StateGroup" frame="$parent" SizeState="Large"/>
+                    <When type="StateGroup" frame="$parent" EmptyState="NotEmpty"/>
+                    <When type="StateGroup" frame="$parent" LockedState="Locked"/>
+                    <When type="StateGroup" frame="$parent" PurchasableState="NotPurchasable"/>
+                    <Action type="SetProperty" frame="$this" Style="@GraphicListItemTitle_Large_Locked_Normal"/>
+                </State>
+
+                <State name="LargeNormal">
+                    <When type="StateGroup" frame="$parent" SizeState="Large"/>
+                    <Action type="SetProperty" frame="$this" Style="@GraphicListItemTitle_Large_Standard_Normal"/>
+                </State>
+                
+                <State name="SmallEquippedSelected">
+                    <When type="StateGroup" frame="$parent" SizeState="Small"/>
+                    <When type="StateGroup" frame="$parent" SelectedState="Selected"/>
+                    <When type="StateGroup" frame="$parent" EquippedState="Equipped"/>
+                    <Action type="SetProperty" frame="$this" Style="@GraphicListItemTitle_Small_Standard_Selected"/>
+                </State>
+            
+                <State name="SmallPurchasableSelected">
+                    <When type="StateGroup" frame="$parent" SizeState="Small"/>
+                    <When type="StateGroup" frame="$parent" SelectedState="Selected"/>
+                    <When type="StateGroup" frame="$parent" PurchasableState="Purchasable"/>
+                    <Action type="SetProperty" frame="$this" Style="@GraphicListItemTitle_Small_Standard_Selected"/>
+                </State>
+            
+                <State name="SmallSelected">
+                    <When type="StateGroup" frame="$parent" SizeState="Small"/>
+                    <When type="StateGroup" frame="$parent" SelectedState="Selected"/>
+                    <Action type="SetProperty" frame="$this" Style="@GraphicListItemTitle_Small_Standard_Selected"/>
+                </State>
+                
+                <State name="SmallEquippedHovered">
+                    <When type="StateGroup" frame="$parent" SizeState="Small"/>
+                    <When type="StateGroup" frame="$parent" HoveredState="Hovered"/>
+                    <When type="StateGroup" frame="$parent" EquippedState="Equipped"/>
+                    <Action type="SetProperty" frame="$this" Style="@GraphicListItemTitle_Small_Standard_Hovered"/>
+                </State>
+            
+                <State name="SmallPurchasableHovered">
+                    <When type="StateGroup" frame="$parent" SizeState="Small"/>
+                    <When type="StateGroup" frame="$parent" HoveredState="Hovered"/>
+                    <When type="StateGroup" frame="$parent" PurchasableState="Purchasable"/>
+                    <Action type="SetProperty" frame="$this" Style="@GraphicListItemTitle_Small_Standard_Hovered"/>
+                </State>
+                
+                <State name="SmallHovered">
+                    <When type="StateGroup" frame="$parent" SizeState="Small"/>
+                    <When type="StateGroup" frame="$parent" HoveredState="Hovered"/>
+                    <Action type="SetProperty" frame="$this" Style="@GraphicListItemTitle_Small_Standard_Hovered"/>
+                </State>
+
+                <State name="SmallEquippedNormal">
+                    <When type="StateGroup" frame="$parent" SizeState="Small"/>
+                    <When type="StateGroup" frame="$parent" EquippedState="Equipped"/>
+                    <Action type="SetProperty" frame="$this" Style="@GraphicListItemTitle_Small_Standard_Normal"/>
+                </State>
+            
+                <State name="SmallPurchasableNormal">
+                    <When type="StateGroup" frame="$parent" SizeState="Small"/>
+                    <When type="StateGroup" frame="$parent" PurchasableState="Purchasable"/>
+                    <Action type="SetProperty" frame="$this" Style="@GraphicListItemTitle_Small_Standard_Normal"/>
+                </State>
+                
+                <State name="SmallLocked">
+                    <When type="StateGroup" frame="$parent" SizeState="Small"/>
+                    <When type="StateGroup" frame="$parent" EmptyState="NotEmpty"/>
+                    <When type="StateGroup" frame="$parent" LockedState="Locked"/>
+                    <When type="StateGroup" frame="$parent" PurchasableState="NotPurchasable"/>
+                    <Action type="SetProperty" frame="$this" Style="@GraphicListItemTitle_Small_Locked_Normal"/>
+                </State>
+
+                <State name="SmallNormal">
+                    <When type="StateGroup" frame="$parent" SizeState="Small"/>
+                    <Action type="SetProperty" frame="$this" Style="@GraphicListItemTitle_Small_Standard_Normal"/>
+                </State>
+            
+                <State name="EquippedSelected">
+                    <When type="StateGroup" frame="$parent" SizeState="Medium"/>
+                    <When type="StateGroup" frame="$parent" SelectedState="Selected"/>
+                    <When type="StateGroup" frame="$parent" EquippedState="Equipped"/>
+                    <Action type="SetProperty" frame="$this" Style="@GraphicListItemTitle_Medium_Standard_Selected"/>
+                </State>
+            
+                <State name="PurchasableSelected">
+                    <When type="StateGroup" frame="$parent" SizeState="Medium"/>
+                    <When type="StateGroup" frame="$parent" SelectedState="Selected"/>
+                    <When type="StateGroup" frame="$parent" PurchasableState="Purchasable"/>
+                    <Action type="SetProperty" frame="$this" Style="@GraphicListItemTitle_Medium_Standard_Selected"/>
+                </State>
+            
+                <State name="Selected">
+                    <When type="StateGroup" frame="$parent" SizeState="Medium"/>
+                    <When type="StateGroup" frame="$parent" SelectedState="Selected"/>
+                    <Action type="SetProperty" frame="$this" Style="@GraphicListItemTitle_Medium_Standard_Selected"/>
+                </State>
+                
+                <State name="EquippedHovered">
+                    <When type="StateGroup" frame="$parent" SizeState="Medium"/>
+                    <When type="StateGroup" frame="$parent" HoveredState="Hovered"/>
+                    <When type="StateGroup" frame="$parent" EquippedState="Equipped"/>
+                    <Action type="SetProperty" frame="$this" Style="@GraphicListItemTitle_Medium_Standard_Hovered"/>
+                </State>
+            
+                <State name="PurchasableHovered">
+                    <When type="StateGroup" frame="$parent" SizeState="Medium"/>
+                    <When type="StateGroup" frame="$parent" HoveredState="Hovered"/>
+                    <When type="StateGroup" frame="$parent" PurchasableState="Purchasable"/>
+                    <Action type="SetProperty" frame="$this" Style="@GraphicListItemTitle_Medium_Standard_Hovered"/>
+                </State>
+                
+                <State name="Hovered">
+                    <When type="StateGroup" frame="$parent" SizeState="Medium"/>
+                    <When type="StateGroup" frame="$parent" HoveredState="Hovered"/>
+                    <Action type="SetProperty" frame="$this" Style="@GraphicListItemTitle_Medium_Standard_Hovered"/>
+                </State>
+
+                <State name="EquippedNormal">
+                    <When type="StateGroup" frame="$parent" SizeState="Medium"/>
+                    <When type="StateGroup" frame="$parent" EquippedState="Equipped"/>
+                    <Action type="SetProperty" frame="$this" Style="@GraphicListItemTitle_Medium_Standard_Normal"/>
+                </State>
+            
+                <State name="PurchasableNormal">
+                    <When type="StateGroup" frame="$parent" SizeState="Medium"/>
+                    <When type="StateGroup" frame="$parent" PurchasableState="Purchasable"/>
+                    <Action type="SetProperty" frame="$this" Style="@GraphicListItemTitle_Medium_Standard_Normal"/>
+                </State>
+                
+                <State name="Locked">
+                    <When type="StateGroup" frame="$parent" SizeState="Medium"/>
+                    <When type="StateGroup" frame="$parent" EmptyState="NotEmpty"/>
+                    <When type="StateGroup" frame="$parent" LockedState="Locked"/>
+                    <When type="StateGroup" frame="$parent" PurchasableState="NotPurchasable"/>
+                    <Action type="SetProperty" frame="$this" Style="@GraphicListItemTitle_Medium_Locked_Normal"/>
+                </State>
+
+                <State name="Normal">
+                    <Action type="SetProperty" frame="$this" Style="@GraphicListItemTitle_Medium_Standard_Normal"/>
+                </State>
+            </StateGroup>
+        </Frame>
+        
+        <Frame type="Label" name="CurrencyLabel">
+            <Anchor side="Bottom" relative="$parent/AnchorFrame" pos="Max" offset="-13"/>
+            <Anchor side="Left" relative="$parent/AnchorFrame" pos="Min" offset="18"/>
+            <Style val="{$parent/SubtitleLabel/@Style}"/>
+            <Text val="{$parent/StoreCacheFrame/@CurrencyText}"/>
+            <RenderPriority val="530"/>
+            <CollapseLayout val="True"/>
+        
+            <StateGroup name="SizeState">
+                <DefaultState val="Normal"/>
+                
+                <State name="Large">
+                    <When type="StateGroup" frame="$parent" SizeState="Large"/>
+                    <Action type="SetAnchor" frame="$this" side="Bottom" relative="$parent/AnchorFrame" pos="Max" offset="-20"/>
+                    <Action type="SetAnchor" frame="$this" side="Left" relative="$parent/AnchorFrame" pos="Min" offset="27"/>
+                </State>
+                <State name="Normal">
+                    <Action type="SetAnchor" frame="$this" side="Bottom" relative="$parent/AnchorFrame" pos="Max" offset="-13"/>
+                    <Action type="SetAnchor" frame="$this" side="Left" relative="$parent/AnchorFrame" pos="Min" offset="18"/>
+                </State>
+            </StateGroup>
+            
+            <StateGroup name="VisibilityState">
+                <DefaultState val="NotVisible"/>
+            
+                <State name="Visible">
+                    <When type="StateGroup" frame="$parent" PurchasableState="Purchasable"/>
                     <Action type="SetProperty" frame="$this" Visible="True"/>
                 </State>
 
@@ -137,429 +406,834 @@
                 </State>
             </StateGroup>
         </Frame>
-
-        <Frame type="Image" name="EmptyImage">
-            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
-            <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
-            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
-            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
-            <Texture val="@UI/SC2_UI_Collection_StandardItemFrame_Disabled"/>
-            <TextureType val="NineSlice"/>
+        
+        <!-- ORIGINAL PRICE LABEL -->
+        <Frame type="Label" name="OriginalPriceLabel">
+            <Anchor side="Bottom" relative="$parent/CurrencyLabel" pos="Max" offset="0"/>
+            <Anchor side="Left" relative="$parent/CurrencyLabel" pos="Max" offset="0"/>
+            <Style val="@StandardListItemSubtitle_Medium_Purchasable_Locked"/>
+            <Text val="{$parent/StoreCacheFrame/@RetailCostText}"/>
+            <RenderPriority val="530"/>
             <Visible val="False"/>
-            <Alpha val="180"/>
+            <CollapseLayout val="True"/>
+        
+            <StateGroup name="SizeState">
+                <DefaultState val="Normal"/>
+                
+                <State name="Large">
+                    <When type="StateGroup" frame="$parent" SizeState="Large"/>
+                    <Action type="SetAnchor" frame="$this" side="Bottom" relative="$parent/AnchorFrame" pos="Max" offset="-20"/>
+                    <Action type="SetProperty" frame="$this" Style="@StandardListItemSubtitle_Large_Purchasable_Locked"/>
+                </State>
+                <State name="Normal">
+                    <Action type="SetAnchor" frame="$this" side="Bottom" relative="$parent/AnchorFrame" pos="Max" offset="-13"/>
+                    <Action type="SetProperty" frame="$this" Style="@StandardListItemSubtitle_Medium_Purchasable_Locked"/>
+                </State>
+            </StateGroup>
         </Frame>
         
-        <Frame type="Frame" name="IconImageContainer">
-            <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
-            <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
-            <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
-            <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
-            <Height val="648"/>
-            <Width val="484"/>
-            
-            <Frame type="Image" name="IconImage">
-                <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
-                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
-                <Height val="648"/>
-                <Width val="484"/>
-                <Texture val="{$parent/$parent/BundleCacheFrame/@IconFilePath}"/>
+        <Frame type="Frame" name="DiscountSlashContainer">
+            <Anchor side="Top" relative="$parent/OriginalPriceLabel" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent/OriginalPriceLabel" pos="Mid" offset="0"/>
+            <Anchor side="Left" relative="$parent/OriginalPriceLabel" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent/OriginalPriceLabel" pos="Max" offset="0"/>
+            <Height val="16"/>
+            <RenderPriority val="530"/>
+            <Visible val="{$parent/OriginalPriceLabel/@Visible}"/>
+        
+            <Frame type="Image" name="DiscountSlash">
+                <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+                <Width val="60"/>
+                <Height val="16"/>
+                <Texture val="@UI/SC2_UI_Collection_DiscountSlash"/>
+                <Color val="111,161,187"/>
             </Frame>
         </Frame>
 
-        <Frame type="Image" name="TextBackground">
-            <Anchor side="Bottom" relative="$parent" pos="Max" offset="-13"/>
-            <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
-            <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
-            <Width val="484"/>
-            <Height val="188"/>
-            <Visible val="True"/>
-            <Texture val="@UI/SC2_UI_Collection_Featured_TextUnderlay_Large"/>
-        </Frame>
-        
-        <Frame type="Image" name="DiscountPercentageTab">
-            <Anchor side="Top" relative="$parent" pos="Min" offset="24"/>
-            <Anchor side="Left" relative="$parent" pos="Min" offset="13"/>
-            <Width val="144"/>
-            <Height val="48"/>
-            <Texture val="@UI/SC2_UI_Collection_Featured_DiscountTab"/>
-            <TextureType val="EndCap"/>
-            <Tiled val="True"/>
-            <Visible val="{$parent/DiscountPercentageLabel/@Visible}"/>
-        </Frame>
-        
-        <Frame type="TextFormatFrame" name="DiscountPercentageFormat">
-            <Anchor relative="$parent/DiscountPercentageTab"/>
-            <Visible val="False"/>
-            <FormatText val="@UI/ScreenCollection/DiscountPercentFormat"/>
-            <Replacement index="0" val="{$parent/GameContentFrame/@DiscountPercent}"/>
-        </Frame>
-        
-        <Frame type="Label" name="DiscountPercentageLabelShadow">
-            <Anchor side="Top" relative="$parent/DiscountPercentageLabel" pos="Min" offset="2"/>
-            <Anchor side="Left" relative="$parent/DiscountPercentageLabel" pos="Min" offset="1"/>
-            <Style val="@Collection_Bundle_TileList_Discount"/>
-            <Color val="0,0,0"/>
-            <Alpha val="128"/>
-            <Text val="{$parent/DiscountPercentageLabel/@Text}"/>
-            <Visible val="{$parent/DiscountPercentageLabel/@Visible}"/>
-        </Frame>
-        
-        <Frame type="Label" name="DiscountPercentageLabel">
-            <Anchor side="Top" relative="$parent/DiscountPercentageTab" pos="Mid" offset="2"/>
-            <Anchor side="Bottom" relative="$parent/DiscountPercentageTab" pos="Mid" offset="2"/>
-            <Anchor side="Left" relative="$parent/DiscountPercentageTab" pos="Min" offset="14"/>
-            <Style val="@Collection_Bundle_TileList_Discount"/>
-            <Text val="{$parent/DiscountPercentageFormat/@Text}"/>
-            <Visible val="False"/>
-        </Frame>
-        
-        <Frame type="Image" name="LockedItemBackgroundGlow">
-            <Anchor side="Top" relative="$parent" pos="Min" offset="13"/>
-            <Anchor side="Right" relative="$parent" pos="Max" offset="-13"/>
-            <Width val="160"/>
-            <Height val="185"/>
-            <Visible val="{$parent/LockedItemIcon/@Visible}"/>
-            <Texture val="@UI/SC2_UI_Battlenet_Glue_Campaign_Purchase_GlowBG"/>
-            <ColorAdjustMode val="Colorize"/>
-            <AdjustmentColor val="22,150,255"/>
-            <Alpha val="235"/>
-            <TextureCoords top=".53" left="0" bottom="1" right=".28"/>
-        </Frame>
-        
-        <Frame type="Image" name="LockedItemIcon">
-            <Anchor side="Top" relative="$parent/LockedItemBackgroundGlow" pos="Min" offset="8"/>
-            <Anchor side="Right" relative="$parent/LockedItemBackgroundGlow" pos="Max" offset="-3"/>
-            <Width val="63"/>
-            <ScaleHeightToTexture val="True"/>
-            <Texture val="@UI/SC2_UI_Collection_Icon_Locked"/>
-            <Alpha val="191"/>
-            <Visible val="False"/>
-        </Frame>
-
-        <Frame type="Label" name="NameLabel">
-            <Anchor side="Bottom" relative="$parent/CurrentPriceLabel" pos="Min" offset="1"/>
-            <Anchor side="Left" relative="$parent" pos="Min" offset="36"/>
-            <Anchor side="Right" relative="$parent" pos="Max" offset="-36"/>
+        <!-- SUBTITLELABEL -->
+        <Frame type="Label" name="SubtitleLabel">
+            <Anchor side="Top" relative="$this" pos="Max" offset="0"/>
+            <Anchor side="Bottom" relative="$parent/AnchorFrame" pos="Max" offset="-13"/>
+            <Anchor side="Left" relative="$parent/OriginalPriceLabel" pos="Max" offset="5"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="-18"/>
+            <RenderPriority val="530"/>
+            <Options val="Ellipsis | NoWrapping | TooltipIfTruncated"/>
             <AcceptsMouseTooltip val="True"/>
-            <Options val="Ellipsis | TooltipIfTruncated"/>
-            <Style val="@Collection_Bundle_TileListName"/>
-            <Text val="{$parent/BundleCacheFrame/@NameText}"/>
-        </Frame>
-
-        <Frame type="Label" name="CurrentPriceLabel">
-            <Anchor side="Bottom" relative="$parent" pos="Max" offset="-29"/>
-            <Anchor side="Left" relative="$parent/NameLabel" pos="Min" offset="0"/>
-            <Style val="@Collection_ListItem_Cost"/>
-            <Height val="25"/>
-            <Text val="{$parent/GameContentFrame/@CostText}"/>
-            <Visible val="False"/>
-        </Frame>
+            <Style val="@StandardListItemSubtitle_Medium_Standard_Normal"/>
         
-        <Frame type="Label" name="OriginalPriceLabel">
-            <Anchor side="Bottom" relative="$parent/CurrentPriceLabel" pos="Max" offset="0"/>
-            <Anchor side="Left" relative="$parent/CurrentPriceLabel" pos="Max" offset="10"/>
-            <Style val="@Collection_ListItem_CostOriginal"/>
-            <Height val="25"/>
-            <Text val="{$parent/GameContentFrame/@RetailCostText}"/>
-            <Visible val="False"/>
-        </Frame>
-        
-        <Frame type="Image" name="DiscountSlash">
-            <Anchor side="Top" relative="$parent/OriginalPriceLabel" pos="Mid" offset="-1"/>
-            <Anchor side="Bottom" relative="$parent/OriginalPriceLabel" pos="Mid" offset="-1"/>
-            <Anchor side="Left" relative="$parent/OriginalPriceLabel" pos="Mid" offset="0"/>
-            <Anchor side="Right" relative="$parent/OriginalPriceLabel" pos="Mid" offset="0"/>
-            <Width val="60"/>
-            <Height val="16"/>
-            <Texture val="@UI/SC2_UI_Collection_DiscountSlash"/>
-            <Visible val="False"/>
-        </Frame>
-
-        <Frame type="Label" name="StateLabel">
-            <Anchor side="Bottom" relative="$parent" pos="Max" offset="-30"/>
-            <Anchor side="Left" relative="$parent/NameLabel" pos="Min" offset="0"/>
-            <Anchor side="Right" relative="$parent/NameLabel" pos="Max" offset="0"/>
-            <Style val="@Collection_Bundle_TileListDesc"/>
-            <Height val="25"/>
-            <Text val="@UI/ScreenCollection/Owned"/>
-            <Visible val="False"/>
-        </Frame>
-        
-        <StateGroup name="ItemDisplayState">
-
-            <State name="Empty">
-                <When type="StateGroup" frame="$this" ItemTypeState="Empty"/>
-                <Action type="SetProperty" frame="EmptyImage" Visible="True"/>
-                <Action type="SetProperty" frame="IconImageContainer" Visible="False"/>
-                <Action type="SetProperty" frame="TextBackground" Visible="False"/>
-                <Action type="SetProperty" frame="NameLabel" Visible="False"/>
-                <Action type="SetProperty" frame="CurrentPriceLabel" Visible="False"/>
-                <Action type="SetProperty" frame="StateLabel" Visible="False"/>
-                <Action type="SetProperty" frame="BackgroundBlur" BlurAmount=".1"/>
-            </State>
-
-            <State name="Owned">
-                <When type="StateGroup" frame="$this" ItemOwnedState="Purchased"/>
-                <Action type="SetProperty" frame="StateLabel" Visible="True"/>
-            </State>
-
-            <State name="UnpurchasedIndividualItem">
-                <When type="StateGroup" frame="$this" ItemTypeState="IndividualItem"/>
-                <When type="StateGroup" frame="$this" ItemOwnedState="NotPurchased"/>
-                <Action type="SetProperty" frame="LockedItemIcon" Visible="True"/>
-                <Action type="SetProperty" frame="CurrentPriceLabel" Visible="True"/>
-                <Action type="SetProperty" frame="OriginalPriceLabel" Visible="False"/>
-                <Action type="SetProperty" frame="DiscountSlash" Visible="False"/>
-            </State>
+            <StateGroup name="SizeState">
+                <DefaultState val="Normal"/>
+                
+                <State name="Large">
+                    <When type="StateGroup" frame="$parent" SizeState="Large"/>
+                    <Action type="SetAnchor" frame="$this" side="Bottom" relative="$parent/AnchorFrame" pos="Max" offset="-20"/>
+                    <Action type="SetAnchor" frame="$this" side="Right" relative="$parent/AnchorFrame" pos="Max" offset="-27"/>
+                </State>
+                <State name="Normal_deDE">
+                    <When type="Option" localeiddata="deDE"/>
+                    <Action type="SetAnchor" frame="$this" side="Bottom" relative="$parent/AnchorFrame" pos="Max" offset="-13"/>
+                    <Action type="SetAnchor" frame="$this" side="Right" relative="$parent/AnchorFrame" pos="Max" offset="-12"/>
+                </State>
+                <State name="Normal">
+                    <Action type="SetAnchor" frame="$this" side="Bottom" relative="$parent/AnchorFrame" pos="Max" offset="-13"/>
+                    <Action type="SetAnchor" frame="$this" side="Right" relative="$parent/AnchorFrame" pos="Max" offset="-18"/>
+                </State>
+            </StateGroup>
             
-            <State name="UnpurchasedStandardBundle">
-                <When type="StateGroup" frame="$this" ItemTypeState="StandardBundle"/>
-                <When type="StateGroup" frame="$this" ItemOwnedState="NotPurchased"/>
-                <Action type="SetProperty" frame="LockedItemIcon" Visible="True"/>
-                <Action type="SetProperty" frame="CurrentPriceLabel" Visible="True"/>
-                <Action type="SetProperty" frame="OriginalPriceLabel" Visible="False"/>
-                <Action type="SetProperty" frame="DiscountSlash" Visible="False"/>
-            </State>
+            <StateGroup name="TextState">
+                <DefaultState val="Empty"/>
             
-            <State name="UnpurchasedDynamicBundle">
-                <When type="StateGroup" frame="$this" ItemTypeState="DynamicBundle"/>
-                <When type="StateGroup" frame="$this" ItemOwnedState="NotPurchased"/>
-                <Action type="SetProperty" frame="DiscountPercentageLabel" Visible="True"/>
-                <Action type="SetProperty" frame="LockedItemIcon" Visible="True"/>
-                <Action type="SetProperty" frame="CurrentPriceLabel" Visible="True"/>
-                <Action type="SetProperty" frame="OriginalPriceLabel" Visible="True"/>
-                <Action type="SetProperty" frame="DiscountSlash" Visible="True"/>
+                <State name="Purchasable">
+                    <When type="StateGroup" frame="$parent" PurchasableState="Purchasable"/>
+                    <Action type="SetProperty" frame="$this" Text="{$parent/StoreCacheFrame/@CostText}"/>
+                </State>
+
+                <State name="Owned">
+                    <When type="StateGroup" frame="$parent" EmptyState="NotEmpty"/>
+                    <Action type="SetProperty" frame="$this" Text="@UI/ScreenCollection/Owned"/>
+                </State>
+
+                <State name="Empty">
+                    <Action type="SetProperty" frame="$this" Text=""/>
+                </State>
+            </StateGroup>
+            
+            <StateGroup name="StyleState">
+                <DefaultState val="Normal"/>
+            
+                <State name="LargeEquippedSelected">
+                    <When type="StateGroup" frame="$parent" SizeState="Large"/>
+                    <When type="StateGroup" frame="$parent" SelectedState="Selected"/>
+                    <When type="StateGroup" frame="$parent" EquippedState="Equipped"/>
+                    <Action type="SetProperty" frame="$this" Style="@StandardListItemSubtitle_Large_Standard_Selected"/>
+                </State>
+            
+                <State name="LargePurchasableSelected">
+                    <When type="StateGroup" frame="$parent" SizeState="Large"/>
+                    <When type="StateGroup" frame="$parent" SelectedState="Selected"/>
+                    <When type="StateGroup" frame="$parent" PurchasableState="Purchasable"/>
+                    <Action type="SetProperty" frame="$this" Style="@StandardListItemSubtitle_Large_Purchasable_Selected"/>
+                </State>
+            
+                <State name="LargeSelected">
+                    <When type="StateGroup" frame="$parent" SizeState="Large"/>
+                    <When type="StateGroup" frame="$parent" SelectedState="Selected"/>
+                    <Action type="SetProperty" frame="$this" Style="@StandardListItemSubtitle_Large_Standard_Selected"/>
+                </State>
+                
+                <State name="LargeEquippedHovered">
+                    <When type="StateGroup" frame="$parent" SizeState="Large"/>
+                    <When type="StateGroup" frame="$parent" HoveredState="Hovered"/>
+                    <When type="StateGroup" frame="$parent" EquippedState="Equipped"/>
+                    <Action type="SetProperty" frame="$this" Style="@StandardListItemSubtitle_Large_Standard_Hovered"/>
+                </State>
+            
+                <State name="LargePurchasableHovered">
+                    <When type="StateGroup" frame="$parent" SizeState="Large"/>
+                    <When type="StateGroup" frame="$parent" HoveredState="Hovered"/>
+                    <When type="StateGroup" frame="$parent" PurchasableState="Purchasable"/>
+                    <Action type="SetProperty" frame="$this" Style="@StandardListItemSubtitle_Large_Purchasable_Hovered"/>
+                </State>
+                
+                <State name="LargeHovered">
+                    <When type="StateGroup" frame="$parent" SizeState="Large"/>
+                    <When type="StateGroup" frame="$parent" HoveredState="Hovered"/>
+                    <Action type="SetProperty" frame="$this" Style="@StandardListItemSubtitle_Large_Standard_Hovered"/>
+                </State>
+
+                <State name="LargeEquippedNormal">
+                    <When type="StateGroup" frame="$parent" SizeState="Large"/>
+                    <When type="StateGroup" frame="$parent" EquippedState="Equipped"/>
+                    <Action type="SetProperty" frame="$this" Style="@StandardListItemSubtitle_Large_Standard_Normal"/>
+                </State>
+            
+                <State name="LargePurchasableNormal">
+                    <When type="StateGroup" frame="$parent" SizeState="Large"/>
+                    <When type="StateGroup" frame="$parent" PurchasableState="Purchasable"/>
+                    <Action type="SetProperty" frame="$this" Style="@StandardListItemSubtitle_Large_Purchasable_Normal"/>
+                </State>
+                
+                <State name="LargeLocked">
+                    <When type="StateGroup" frame="$parent" SizeState="Large"/>
+                    <When type="StateGroup" frame="$parent" EmptyState="NotEmpty"/>
+                    <When type="StateGroup" frame="$parent" LockedState="Locked"/>
+                    <When type="StateGroup" frame="$parent" PurchasableState="NotPurchasable"/>
+                    <Action type="SetProperty" frame="$this" Style="@StandardListItemSubtitle_Large_Locked_Normal"/>
+                </State>
+
+                <State name="LargeNormal">
+                    <When type="StateGroup" frame="$parent" SizeState="Large"/>
+                    <Action type="SetProperty" frame="$this" Style="@StandardListItemSubtitle_Large_Standard_Normal"/>
+                </State>
+            
+                <State name="EquippedSelected">
+                    <When type="StateGroup" frame="$parent" operator="NotEqual" SizeState="Large"/>
+                    <When type="StateGroup" frame="$parent" SelectedState="Selected"/>
+                    <When type="StateGroup" frame="$parent" EquippedState="Equipped"/>
+                    <Action type="SetProperty" frame="$this" Style="@StandardListItemSubtitle_Medium_Equipped_Selected"/>
+                </State>
+            
+                <State name="PurchasableSelected">
+                    <When type="StateGroup" frame="$parent" operator="NotEqual" SizeState="Large"/>
+                    <When type="StateGroup" frame="$parent" SelectedState="Selected"/>
+                    <When type="StateGroup" frame="$parent" PurchasableState="Purchasable"/>
+                    <Action type="SetProperty" frame="$this" Style="@StandardListItemSubtitle_Medium_Purchasable_Selected"/>
+                </State>
+            
+                <State name="Selected">
+                    <When type="StateGroup" frame="$parent" operator="NotEqual" SizeState="Large"/>
+                    <When type="StateGroup" frame="$parent" SelectedState="Selected"/>
+                    <Action type="SetProperty" frame="$this" Style="@StandardListItemSubtitle_Medium_Standard_Selected"/>
+                </State>
+                
+                <State name="EquippedHovered">
+                    <When type="StateGroup" frame="$parent" operator="NotEqual" SizeState="Large"/>
+                    <When type="StateGroup" frame="$parent" HoveredState="Hovered"/>
+                    <When type="StateGroup" frame="$parent" EquippedState="Equipped"/>
+                    <Action type="SetProperty" frame="$this" Style="@StandardListItemSubtitle_Medium_Equipped_Hovered"/>
+                </State>
+            
+                <State name="PurchasableHovered">
+                    <When type="StateGroup" frame="$parent" operator="NotEqual" SizeState="Large"/>
+                    <When type="StateGroup" frame="$parent" HoveredState="Hovered"/>
+                    <When type="StateGroup" frame="$parent" PurchasableState="Purchasable"/>
+                    <Action type="SetProperty" frame="$this" Style="@StandardListItemSubtitle_Medium_Purchasable_Hovered"/>
+                </State>
+                
+                <State name="Hovered">
+                    <When type="StateGroup" frame="$parent" operator="NotEqual" SizeState="Large"/>
+                    <When type="StateGroup" frame="$parent" HoveredState="Hovered"/>
+                    <Action type="SetProperty" frame="$this" Style="@StandardListItemSubtitle_Medium_Standard_Hovered"/>
+                </State>
+
+                <State name="EquippedNormal">
+                    <When type="StateGroup" frame="$parent" operator="NotEqual" SizeState="Large"/>
+                    <When type="StateGroup" frame="$parent" EquippedState="Equipped"/>
+                    <Action type="SetProperty" frame="$this" Style="@StandardListItemSubtitle_Medium_Equipped_Normal"/>
+                </State>
+            
+                <State name="PurchasableNormal">
+                    <When type="StateGroup" frame="$parent" operator="NotEqual" SizeState="Large"/>
+                    <When type="StateGroup" frame="$parent" PurchasableState="Purchasable"/>
+                    <Action type="SetProperty" frame="$this" Style="@StandardListItemSubtitle_Medium_Purchasable_Normal"/>
+                </State>
+                
+                <State name="Locked">
+                    <When type="StateGroup" frame="$parent" operator="NotEqual" SizeState="Large"/>
+                    <When type="StateGroup" frame="$parent" LockedState="Locked"/>
+                    <When type="StateGroup" frame="$parent" PurchasableState="NotPurchasable"/>
+                    <Action type="SetProperty" frame="$this" Style="@StandardListItemSubtitle_Medium_Locked_Normal"/>
+                </State>
+
+                <State name="Normal">
+                    <When type="StateGroup" frame="$parent" operator="NotEqual" SizeState="Large"/>
+                    <Action type="SetProperty" frame="$this" Style="@StandardListItemSubtitle_Medium_Standard_Normal"/>
+                </State>
+            </StateGroup>
+        </Frame>
+        
+        <!-- Used to detect when the price label would truncate -->
+        <Frame type="Label" name="DummyOriginalPriceLabel">
+            <Anchor side="Bottom" relative="$parent/AnchorFrame" pos="Max" offset="100"/>
+            <Anchor side="Left" relative="$parent/CurrencyLabel" pos="Max" offset="0"/>
+            <Style val="{$parent/OriginalPriceLabel/@Style}"/>
+            <Text val="{$parent/OriginalPriceLabel/@Text}"/>
+        </Frame>
+        
+        <!-- Used to detect when the price label would truncate -->
+        <Frame type="Label" name="DummySubtitleLabel">
+            <Anchor side="Top" relative="$this" pos="Max" offset="0"/>
+            <Anchor side="Bottom" relative="$parent/AnchorFrame" pos="Max" offset="100"/>
+            <Anchor side="Left" relative="$parent/DummyOriginalPriceLabel" pos="Max" offset="5"/>
+            <Anchor side="Right" relative="$parent/SubtitleLabel" pos="Max" offset="0"/>
+            <Style val="{$parent/SubtitleLabel/@Style}"/>
+            <Text val="{$parent/SubtitleLabel/@Text}"/>
+            <Options val="Ellipsis | NoWrapping | TooltipIfTruncated"/>
+        </Frame>
+        
+        <Frame type="Frame" name="DiscountTabContainer">
+            <Anchor relative="$parent/AnchorFrame"/>
+            <Visible val="False"/>
+        
+            <Frame type="Image" name="DiscountPercentageTab">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="12"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="4"/>
+                <Width val="124"/>
+                <Height val="40"/>
+                <Texture val="@UI/SC2_UI_Collection_Featured_DiscountTab"/>
+                <TextureType val="Normal"/>
+                <Tiled val="True"/>
+            </Frame>
+            
+            <Frame type="TextFormatFrame" name="DiscountPercentageFormat">
+                <Anchor relative="$parent/DiscountPercentageTab"/>
+                <Visible val="False"/>
+                <FormatText val="@UI/ScreenCollection/DiscountPercentFormat"/>
+                <Replacement index="0" val="{$parent/$parent/StoreCacheFrame/@DiscountPercent}"/>
+            </Frame>
+            
+            <Frame type="Label" name="DiscountPercentageLabelShadow">
+                <Anchor side="Top" relative="$parent/DiscountPercentageLabel" pos="Min" offset="2"/>
+                <Anchor side="Left" relative="$parent/DiscountPercentageLabel" pos="Min" offset="1"/>
+                <Style val="@Collection_Bundle_TileList_Discount"/>
+                <Color val="0,0,0"/>
+                <Alpha val="191"/>
+                <Text val="{$parent/DiscountPercentageLabel/@Text}"/>
+            </Frame>
+            
+            <Frame type="Label" name="DiscountPercentageLabel">
+                <Anchor side="Top" relative="$parent/DiscountPercentageTab" pos="Mid" offset="-1"/>
+                <Anchor side="Bottom" relative="$parent/DiscountPercentageTab" pos="Mid" offset="-1"/>
+                <Anchor side="Left" relative="$parent/DiscountPercentageTab" pos="Min" offset="11"/>
+                <Style val="@Collection_Bundle_TileList_Discount"/>
+                <Text val="{$parent/DiscountPercentageFormat/@Text}"/>
+            </Frame>
+        </Frame>
+    </Frame>
+    
+    <!-- 
+    =======================
+    BUNDLE TILE LIST ITEM
+    =======================
+    -->
+    <Frame type="BundleTileListItem" name="BundleTileListItemTemplate" template="BundleSelectionFrame/BundleTileListItemBaseTemplate">
+        <HideWhenCleared val="False"/>
+        <SelectedSound val="@UI_FileSelectionSelect"/>
+        
+        <Frame type="Label" name="TitleLabel">
+            <Options val="TooltipIfTruncated"/>
+            <AutoSizeClamps maxHeight="41"/>
+        </Frame>
+                
+        <!-- SelectedState -->
+        <StateGroup name="SelectedState">
+            <State name="Selected">
+                <When type="Property" frame="$this" Selected="True"/>
             </State>
         </StateGroup>
+                
+        <!-- LockedState -->
+        <StateGroup name="LockedState">
+            <DefaultState val="NotLocked"/>
+            <State name="Locked">
+                <When type="Property" frame="StoreCacheFrame" IsPurchased="False"/>
+                <!-- <When type="AnimationState" frame="RewardCacheFrame" AllowedState="NotAllowed"/> -->
+            </State>
+            <State name="NotLocked"/>
+        </StateGroup>
+        
+        <!-- PurchasableState -->
+        <StateGroup name="PurchasableState">
+            <DefaultState val="NotPurchasable"/>
+            <State name="Purchasable">
+                <When type="Property" frame="StoreCacheFrame" IsPurchased="False"/>
+                <When type="Property" frame="StoreCacheFrame" CanPurchase="True"/>
+            </State>
+            <State name="NotPurchasable"/>
+        </StateGroup>
+        
+        <!-- DiscountedState -->
+        <StateGroup name="DiscountedState">
+            <DefaultState val="NotDiscounted"/>
+            <State name="DiscountedWithTextOverflow">
+                <When type="StateGroup" frame="$this" PurchasableState="Purchasable"/>
+                <When type="Property" frame="StoreCacheFrame" operator="NotEqual" DiscountPercent="0"/>
+                <When type="Property" frame="DummySubtitleLabel" IsTextTruncated="True"/>
+                <Action type="SetProperty" frame="DiscountTabContainer" Visible="False"/>
+                <Action type="SetProperty" frame="OriginalPriceLabel" Visible="False"/>
+            </State>
+            <State name="Discounted">
+                <When type="StateGroup" frame="$this" PurchasableState="Purchasable"/>
+                <When type="Property" frame="StoreCacheFrame" operator="NotEqual" DiscountPercent="0"/>
+                <Action type="SetProperty" frame="DiscountTabContainer" Visible="True"/>
+                <Action type="SetProperty" frame="OriginalPriceLabel" Visible="True"/>
+            </State>
+            <State name="NotDiscounted"/>
+        </StateGroup>
+                
+        <!-- HoverSoundState -->
+        <StateGroup name="HoverSoundState">
+            <DefaultState val="DoNotPlay"/>
+            <State name="Play">
+                <When type="StateGroup" HoveredState="Hovered"/>
+                <When type="StateGroup" SelectedState="NotSelected"/>
+                <Action type="PlaySound" sound="@UI_Large_MouseOver"/>
+            </State>
+            <State name="DoNotPlay"/>
+        </StateGroup>
     </Frame>
+    
+    <!-- 
+    =====================================
+    War Chest Purchase TileListItem Dummy Template
+    =====================================
+    -->
+    <Frame type="WarChestPurchaseTileListItem" name="WarChestPurchaseTileListItemDummyTemplate">
+        <Anchor relative="$parent"/>
+        <Visible val="True"/>
 
-    <Frame type="BundleTileListItem" name="BundleTileListItemTemplateSmall" template="BundleSelectionFrame/BundleTileListItemTemplate">
-        <Height val="#TileListItemSmallHeight"/>
-        <Width val="#TileListItemSmallWidth"/>
-        
-        <Frame type="Frame" name="IconImageContainer">
-            <Height val="307"/>
-            <Width val="224"/>
-            
-            <Frame type="Image" name="IconImage">
-                <Height val="308"/>
-                <Width val="224"/>
-            </Frame>
+        <Frame type="CheckBox" name="CheckBox" template="StandardBattlenetTemplates/BattlenetRadioButtonTemplate">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
         </Frame>
 
-        <Frame type="Image" name="TextBackground">
-            <Anchor side="Bottom" relative="$parent" pos="Max" offset="-13"/>
-            <Width val="224"/>
-            <Height val="88"/>
-            <Texture val="@UI/SC2_UI_Collection_Featured_TextUnderlay_Small"/>
+        <Frame type="Label" name="CurrencyLabel">
+            <Anchor side="Top" relative="$parent/CheckBox" pos="Mid" offset="1"/>
+            <Anchor side="Bottom" relative="$parent/CheckBox" pos="Mid" offset="1"/>
+            <Anchor side="Left" relative="$parent/CheckBox" pos="Max" offset="11"/>
+            <Style val="@Campaign_PurchaseCurrency"/>
         </Frame>
-        
-        <Frame type="Image" name="DiscountPercentageTab">
-            <Anchor side="Top" relative="$parent" pos="Min" offset="20"/>
-            <Anchor side="Left" relative="$parent" pos="Min" offset="13"/>
-            <Width val="133"/>
-            <Height val="48"/>
-            <Texture val="@UI/SC2_UI_Collection_Featured_DiscountTab"/>
-            <TextureType val="EndCap"/>
-            <Tiled val="True"/>
-            <Visible val="{$parent/DiscountPercentageLabel/@Visible}"/>
-        </Frame>
-        
-        <Frame type="Label" name="NameLabel">
-            <Anchor side="Bottom" relative="$parent/CurrentPriceLabel" pos="Min" offset="2"/>
-            <Anchor side="Left" relative="$parent" pos="Min" offset="23"/>
-            <Anchor side="Right" relative="$parent" pos="Max" offset="-23"/>
-            <Style val="@Collection_Bundle_TileListName_Small"/>
-            <AcceptsMouseTooltip val="True"/>
-            <Options val="Ellipsis | TooltipIfTruncated"/>
-        </Frame>
-        
-        <Frame type="Label" name="CurrentPriceLabel">
-            <Anchor side="Bottom" relative="$parent" pos="Max" offset="-17"/>
-            <Style val="@Collection_ListItem_Cost_Small"/>
-            <Height val="23"/>
-        </Frame>
-        
+
         <Frame type="Label" name="OriginalPriceLabel">
-            <Style val="@Collection_ListItem_CostOriginal_Small"/>
-            <Height val="23"/>
+            <Anchor side="Top" relative="$parent/CurrencyLabel" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent/CurrencyLabel" pos="Mid" offset="0"/>
+            <Anchor side="Left" relative="$parent/CurrencyLabel" pos="Max" offset="0"/>
+            <Style val="@Campaign_OriginalPurchasePrice"/>
+            <CollapseLayout val="true"/>
         </Frame>
-        
-        <Frame type="Image" name="DiscountSlash">
-            <Width val="48"/>
-            <TextureCoords top="0" left=".1" bottom="1" right=".9"/>
-        </Frame>
-        
-        <Frame type="Label" name="StateLabel">
-            <Anchor side="Bottom" relative="$parent" pos="Max" offset="-17"/>
-            <Style val="@Collection_Bundle_TileListDesc_Small"/>
-            <Height val="23"/>
-        </Frame>
-    </Frame>
 
-    <Frame type="Frame" name="BundleFrameTemplate">
-        <Frame type="BlurFrame" name="BundleFrameBgBlur">
-            <Anchor side="Top" relative="$parent/BundleFrameBg" pos="Min" offset="4"/>
-            <Anchor side="Left" relative="$parent/BundleFrameBg" pos="Min" offset="4"/>
-            <Anchor side="Bottom" relative="$parent/BundleFrameBg" pos="Max" offset="-4"/>
-            <Anchor side="Right" relative="$parent/BundleFrameBg" pos="Max" offset="-4"/>
+        <Frame type="Image" name="OriginalPriceStrikethrough">
+            <Anchor side="Top" relative="$parent/OriginalPriceLabel" pos="Mid" offset="-1"/>
+            <Anchor side="Bottom" relative="$parent/OriginalPriceLabel" pos="Mid" offset="-1"/>
+            <Anchor side="Left" relative="$parent/OriginalPriceLabel" pos="Min" offset="-2"/>
+            <Anchor side="Right" relative="$parent/OriginalPriceLabel" pos="Max" offset="-4"/>
+            <Height val="2"/>
+            <Color val="538393"/>
+            <Visible val="False"/>
 
-            <Animation name="Blur">
-                <Event event="OnShown" action="Reset,Play" frame="$parent" />
+            <Animation name="ShowStrike">
+                <Event event="OnShown" action="Reset, Play" frame="$parent/OriginalPriceLabel"/>
+                <Event event="OnHidden" action="Reset" frame="$parent/OriginalPriceLabel"/>
 
-                <Controller type="Blur" end="Pause">
-                    <Key type="Curve" time="0" value=".35" out="Fast"/>
+                <Controller type="Visibility" end="Pause">
+                    <Key type="Bool" time="0" value="True"/>
                 </Controller>
             </Animation>
         </Frame>
 
-        <Frame type="Image" name="BundleFrameBg">
-            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
-            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
-            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
-            <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
-            <Texture val="@UI/SC2_UI_Battlenet_Glue_Arcade_MainContainer"/>
-            <TextureType val="NineSlice"/>
-        </Frame>
-
-        <Frame type="Image" name="IconImage">
-            <Anchor side="Top" relative="$parent" pos="Min" offset="25"/>
-            <Anchor side="Bottom" relative="$parent" pos="Max" offset="-25"/>
-            <Anchor side="Left" relative="$parent" pos="Min" offset="24"/>
-            <TextureType val="Normal"/>
-            <Texture val="{$parent/@IconFilePath}"/>
-            <Width val="483"/>
-            <Visible val="False"/>
-        </Frame>
-
-        <Frame type="Image" name="IconFrame">
-            <Anchor side="Top" relative="$parent/CharacterFrame_Background" pos="Min" offset="0"/>
-            <Anchor side="Left" relative="$parent/CharacterFrame_Background" pos="Min" offset="0"/>
-            <Anchor side="Right" relative="$parent/CharacterFrame_Background" pos="Max" offset="0"/>
-            <Anchor side="Bottom" relative="$parent/CharacterFrame_Background" pos="Max" offset="0"/>
-            <Texture val="@UI/SC2_UI_Collection_Bundle_ImageFrame"/>
-            <TextureType val="Nineslice"/>
+        <Frame type="Label" name="PriceLabel">
+            <Anchor side="Top" relative="$parent/CurrencyLabel" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent/CurrencyLabel" pos="Mid" offset="0"/>
+            <Anchor side="Left" relative="$parent/OriginalPriceLabel" pos="Max" offset="5"/>
+            <Style val="@Campaign_PurchasePrice"/>
         </Frame>
 
         <Frame type="Label" name="TypeLabel">
-            <Anchor side="Top" relative="$parent/IconFrame" pos="Min" offset="10"/>
-            <Anchor side="Left" relative="$parent/IconImage" pos="Max" offset="35"/>
-            <Anchor side="Right" relative="$parent" pos="Max" offset="-24"/>
-            <Style val="@Collection_ItemFrame_Type"/>
-            <Text val="@UI/ScreenCollection/Bundle/Type"/>
+            <Anchor side="Top" relative="$parent/PriceLabel" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent/PriceLabel" pos="Mid" offset="0"/>
+            <Anchor side="Left" relative="$parent/PriceLabel" pos="Max" offset="11"/>
+            <Style val="@Campaign_PurchaseType"/>
+        </Frame>
+    </Frame>
+    
+    <!-- 
+    =======================
+    FAKE WAR CHEST ITEM
+    =======================
+    -->
+    <Frame type="GlueHyperlinkButton" name="FakeWarChestItemTemplate" template="BundleSelectionFrame/BundleTileListItemBaseTemplate">
+        <Hyperlink val="battlenet:://starcraft/collection/5"/>
+        <HoverSound val="@UI_Large_MouseOver"/>
+        <ClickSound val="@UI_FileSelectionSelect"/>
+            
+        <StateGroup name="SizeState">
+            <DefaultState val="Large"/>
+        </StateGroup>
+        
+        <Frame type="WarChestPurchaseTileList" name="WarChestPurchaseTileList">
+            <Anchor side="Top" relative="$parent" pos="Max" offset="100"/>
+            <Anchor side="Left" relative="$parent" pos="Max" offset="100"/>
+            <Width val="100"/>
+            <Visible val="True"/>
+            <SeasonId val="{$ancestor[@type=BundleSelectionFrame]/$parent/WarChestFrame/@CurrentSeasonId}"/>
+
+            <Frame type="WarChestPurchaseTileListItem" name="Item0" template="BundleSelectionFrame/WarChestPurchaseTileListItemDummyTemplate"/>
+            <Frame type="WarChestPurchaseTileListItem" name="Item1" template="BundleSelectionFrame/WarChestPurchaseTileListItemDummyTemplate"/>
+            <Frame type="WarChestPurchaseTileListItem" name="Item2" template="BundleSelectionFrame/WarChestPurchaseTileListItemDummyTemplate"/>
+            <Frame type="WarChestPurchaseTileListItem" name="Item3" template="BundleSelectionFrame/WarChestPurchaseTileListItemDummyTemplate"/>
+        </Frame>
+        
+        <Frame type="BundleCacheFrame" name="BundleCacheFrame">
+            <Anchor relative="$parent"/>
+            <Bundle val=""/>
         </Frame>
 
-        <Frame type="Label" name="NameLabel">
-            <Anchor side="Top" relative="$parent/TypeLabel" pos="Max" offset="0"/>
-            <Anchor side="Left" relative="$parent/TypeLabel" pos="Min" offset="0"/>
-            <Anchor side="Right" relative="$parent" pos="Max" offset="-24"/>
-            <Style val="@Collection_ItemFrame_Name"/>
-            <Text val="{$parent/@NameText}"/>
+        <Frame type="StoreCacheFrame" name="StoreCacheFrame">
+            <Anchor relative="$parent"/>
+            <GameContent val="{$parent/WarChestPurchaseTileList/Item0/@GameContent}"/>
+        </Frame>
+        
+        <Frame type="Image" name="IconImage">
+        
+            <StateGroup name="SizeState">
+                <State name="Large">
+                    <When type="StateGroup" frame="$parent" SizeState="Large"/>
+                    <Action type="SetProperty" frame="$this" Width="558"/>
+                    <Action type="SetProperty" frame="$this" Height="696"/>
+                    <Action type="SetProperty" frame="$this" Texture="@UI/SC2_UI_Collection_Featured_WarChest"/>
+                </State>
+            </StateGroup>
+        </Frame>
+        
+        <Frame type="Label" name="TitleLabel">
+            <Text val="@UI/ScreenCollection/WarChest/FeaturedPageTitle"/>
+            <Options val="TooltipIfTruncated"/>
+            <AutoSizeClamps maxHeight="60"/>
+        </Frame>
+        
+        <Frame type="Label" name="SubtitleLabel">
+            <Style val="@StandardListItemSubtitle_Large_Standard_Normal"/>
+            <Text val="{$parent/FormattedCostText/@Text}"/>
+            
+            <StateGroup name="TextState">
+                <DefaultState val="Empty"/>
+            
+                <State name="Purchasable">
+                    <When type="StateGroup" frame="$parent" PurchasableState="Purchasable"/>
+                    <Action type="SetProperty" frame="$this" Text="{$parent/FormattedCostText/@Text}"/>
+                </State>
+
+                <State name="Owned">
+                    <When type="StateGroup" frame="$parent" LockedState="NotLocked"/>
+                    <Action type="SetProperty" frame="$this" Text="@UI/ScreenCollection/Owned"/>
+                </State>
+
+                <State name="Empty">
+                    <Action type="SetProperty" frame="$this" Text=""/>
+                </State>
+            </StateGroup>
+        </Frame>
+        
+        <Frame type="Label" name="Label">
+            <Visible val="False"/>
+        </Frame>
+        
+        <Frame type="TextFormatFrame" name="FormattedCostText">
+            <Anchor relative="$parent/SubtitleLabel"/>
+            <FormatText val="@UI/ScreenCollection/WarChest/FeaturedPageDescription"/>
+            <Replacement index="0" val="{$parent/StoreCacheFrame/@CostText}"/>
+            
+            <StateGroup name="TextState">
+                <DefaultState val="Normal"/>
+            
+                <State name="Hovered">
+                    <When type="StateGroup" frame="$parent" HoveredState="Hovered"/>
+                    <Action type="SetProperty" frame="$this" FormatText="@UI/ScreenCollection/WarChest/FeaturedPageDescriptionHovered"/>
+                </State>
+
+                <State name="Normal">
+                    <Action type="SetProperty" frame="$this" FormatText="@UI/ScreenCollection/WarChest/FeaturedPageDescription"/>
+                </State>
+            </StateGroup>
+        </Frame>
+        
+        <!-- This label reports the time remaining until the War Chest can no longer be purchased -->
+        <Frame type="Label" name="OfferEndsLabel">
+            <Anchor side="Bottom" relative="$parent/TitleLabel" pos="Min" offset="-3"/>
+            <Anchor side="Left" relative="$parent/TitleLabel" pos="Min" offset="0"/>
+            <Style val="@Collection_Bundle_WarChest_OfferEnds"/>
+            <Text val="{$this/FormattedOfferEndsText/@Text}"/>
+            <RenderPriority val="530"/>
+
+            <Frame type="TimeFormatFrame" name="TimeFormatFrame">
+                <Anchor relative="$parent"/>
+                <FormatText val="&lt;daytotal/&gt;:&lt;hour2/&gt;:&lt;min2/&gt;:&lt;sec2/&gt;"/>
+                <Time val="{$parent/WarChestInfo/@PurchaseEndTimeRemaining}"/>
+            </Frame>
+        
+            <Frame type="WarChestAdvertisementFrame" name="WarChestInfo">
+                <Anchor relative="$parent"/>
+            </Frame>
+        
+            <Frame type="TextFormatFrame" name="FormattedOfferEndsText">
+                <Anchor relative="$parent"/>
+                <FormatText val="@UI/ScreenCollection/WarChest/FeaturedPageOfferEnds"/>
+                <Replacement index="0" val="{$parent/TimeFormatFrame/@Text}"/>
+            </Frame>
+            
+            <StateGroup name="VisibleState">
+                <DefaultState val="NotVisible"/>
+            
+                <State name="Visible">
+                    <When type="Property" frame="WarChestInfo" WarChestFullyPurchased="False"/>
+                    <Action type="SetProperty" frame="$this" Visible="True"/>
+                </State>
+                
+                <State name="NotVisible">
+                    <Action type="SetProperty" frame="$this" Visible="False"/>
+                </State>
+            </StateGroup>
+        </Frame>
+        
+        <!-- LockedState -->
+        <StateGroup name="LockedState">
+            <DefaultState val="Locked"/>
+            <State name="Locked">
+            </State>
+            <State name="NotLocked">
+                <When type="Property" frame="$ancestor[@name=CollectionTabControl]/WarChestFrame/TerranWarChest/WarChestNode0/WarChestOwnedAchievement" Awarded="True"/>
+                <When type="Property" frame="$ancestor[@name=CollectionTabControl]/WarChestFrame/ZergWarChest/WarChestNode0/WarChestOwnedAchievement" Awarded="True"/>
+                <When type="Property" frame="$ancestor[@name=CollectionTabControl]/WarChestFrame/ProtossWarChest/WarChestNode0/WarChestOwnedAchievement" Awarded="True"/>
+            </State>
+        </StateGroup>
+        
+        <!-- PurchasableState -->
+        <StateGroup name="PurchasableState">
+            <DefaultState val="NotPurchasable"/>
+            <State name="Purchasable">
+                <When type="StateGroup" frame="$this" LockedState="Locked"/>
+            </State>
+            <State name="NotPurchasable"/>
+        </StateGroup>
+    </Frame>
+    
+    <!-- 
+    ===========================================================
+    
+    BIG TILE LIST TEMPLATE
+    
+    ===========================================================
+    -->
+
+    <Frame type="TileList" name="BigTileListTemplate">
+        <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+        <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+        <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+        <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+        <ClearSelectionIfNotVisible val="true"/>
+        <RequireSelection val="false"/>
+
+        <MaxItemPerPage val="2"/>
+
+        <AcceptsMouse val="true"/>
+        
+        <Frame type="GlueHyperlinkButton" name="WarChestItem" template="BundleSelectionFrame/FakeWarChestItemTemplate">
+            <Frame type="Frame" name="AnchorFrame">
+                <Anchor side="Top" relative="$parent/$parent" pos="Min" offset="14"/>
+                <Anchor side="Left" relative="$parent/$parent" pos="Min" offset="14"/>
+            </Frame>
+        </Frame>
+        
+        <Frame type="BundleTileListItem" name="Item0" template="BundleSelectionFrame/BundleTileListItemTemplate">
+            <Frame type="Frame" name="AnchorFrame">
+                <Anchor side="Top" relative="$parent/$parent" pos="Min" offset="14"/>
+                <Anchor side="Left" relative="$parent/$parent" pos="Min" offset="14"/>
+            </Frame>
+        
+        <Frame type="Label" name="TitleLabel">
+            <AutoSizeClamps maxHeight="60"/>
+        </Frame>
+            
+            <StateGroup name="SizeState">
+                <DefaultState val="Large"/>
+            </StateGroup>
+        </Frame>
+            
+        <StateGroup name="WarChestPurchasableState">
+            <DefaultState val="NotPurchasable"/>
+        
+            <State name="Purchasable">
+                <When type="StateGroup" frame="$ancestor[@type=BundleSelectionFrame]" WarChestPurchasableState="Purchasable"/>
+                <Action type="SetProperty" frame="$this/Item0" HideWhenCleared="True"/>
+                <Action type="SetProperty" frame="$this/WarChestItem" Visible="True"/>
+            </State>
+        
+            <State name="NotPurchasable">
+                <Action type="SetProperty" frame="$this/Item0" HideWhenCleared="False"/>
+                <Action type="SetProperty" frame="$this/WarChestItem" Visible="False"/>
+            </State>
+        </StateGroup>
+    </Frame>
+    
+    <!-- 
+    ===========================================================
+    
+    SMALL TILE LIST TEMPLATE
+    
+    ===========================================================
+    -->
+        
+    <Frame type="TileList" name="SmallTileListTemplate">
+        <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+        <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+        <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+        <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+        <ClearSelectionIfNotVisible val="true"/>
+        <RequireSelection val="false"/>
+        <AcceptsMouse val="true"/>
+        <ScrollStepValue val="4"/>
+
+        <Frame type="BundleTileListItem" name="Item0" template="BundleSelectionFrame/BundleTileListItemTemplate">
+            
+            <Frame type="Frame" name="AnchorFrame">
+                <Anchor side="Top" relative="$parent/$parent" pos="Min" offset="14"/>
+                <Anchor side="Left" relative="$parent/$parent" pos="Min" offset="14"/>
+            </Frame>
+
+            <StateGroup name="DisplayState">
+                <DefaultState val="Normal"/>
+            
+                <State name="Offscreen">
+                    <When type="Property" frame="$parent/ScrollBar" Value="0"/>
+                    <Action type="SetAnchor" frame="$this/AnchorFrame" side="Left" relative="$parent/$parent" pos="Max" offset="5000"/>
+                </State>
+
+                <State name="Normal">
+                    <Action type="SetAnchor" frame="$this/AnchorFrame" side="Left" relative="$parent/$parent" pos="Min" offset="14"/>
+                </State>
+            </StateGroup>
         </Frame>
 
-        <Frame type="Label" name="DescriptionLabel">
-            <Anchor side="Top" relative="$parent/NameLabel" pos="Max" offset="30"/>
-            <Anchor side="Left" relative="$parent/NameLabel" pos="Min" offset="0"/>
-            <Anchor side="Right" relative="$parent" pos="Max" offset="-24"/>
-            <Style val="@Collection_ItemFrame_Desc"/>
-            <Text val="{$parent/@DescriptionText}"/>
-            <Height val="175"/>
+        <Frame type="BundleTileListItem" name="Item1" template="BundleSelectionFrame/BundleTileListItemTemplate">
+            <Frame type="Frame" name="AnchorFrame">
+                <Anchor side="Top" relative="$parent/$parent/Item0/AnchorFrame" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/$parent/Item0/AnchorFrame" pos="Max" offset="12"/>
+            </Frame>
+        
+            <Frame type="Label" name="TitleLabel">
+                <Options val="TooltipIfTruncated"/>
+                <AutoSizeClamps maxHeight="50"/>
+            </Frame>
+            
+            <Frame type="Image" name="TextBackground">
+                <TextureCoords top="0" bottom="1" left="-.2" right="1.2"/>
+            </Frame>
+
+            <StateGroup name="DisplayState">
+                <DefaultState val="Normal"/>
+            
+                <State name="Expanded">
+                    <When type="Property" frame="$parent/ScrollBar" Value="0"/>
+                    <Action type="SetState" frame="$this" group="SizeState" state="Medium"/>
+                    <Action type="SetAnchor" frame="$this/AnchorFrame" side="Left" relative="$parent/$parent" pos="Min" offset="14"/>
+                </State>
+
+                <State name="Normal">
+                    <Action type="SetState" frame="$this" group="SizeState" state="Small"/>
+                    <Action type="SetAnchor" frame="$this/AnchorFrame" side="Left" relative="$parent/$parent/Item0/AnchorFrame" pos="Max" offset="12"/>
+                </State>
+            </StateGroup>
         </Frame>
 
-        <Frame type="Label" name="ExampleLineTitle">
-            <Anchor side="Top" relative="$parent/DescriptionLabel" pos="Max" offset="15"/>
-            <Anchor side="Left" relative="$parent/NameLabel" pos="Min" offset="0"/>
-            <Anchor side="Right" relative="$parent" pos="Max" offset="-24"/>
-            <Text val="@UI/ScreenCollection/Bundle/ExampleLineTitle"/>
-            <Style val="@Bundle_ItemFrame_SoundPreview"/>
+        <Frame type="BundleTileListItem" name="Item2" template="BundleSelectionFrame/BundleTileListItemTemplate">
+            <Frame type="Frame" name="AnchorFrame">
+                <Anchor side="Top" relative="$parent/$parent/Item1/AnchorFrame" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/$parent/Item1/AnchorFrame" pos="Max" offset="11"/>
+            </Frame>
+        </Frame>
+
+        <Frame type="BundleTileListItem" name="Item3" template="BundleSelectionFrame/BundleTileListItemTemplate">
+            <Frame type="Frame" name="AnchorFrame">
+                <Anchor side="Top" relative="$parent/$parent/Item2/AnchorFrame" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/$parent/Item2/AnchorFrame" pos="Max" offset="11"/>
+            </Frame>
+        </Frame>
+
+        <Frame type="BundleTileListItem" name="Item4" template="BundleSelectionFrame/BundleTileListItemTemplate">
+            <Frame type="Frame" name="AnchorFrame">
+                <Anchor side="Top" relative="$parent/$parent/Item0/AnchorFrame" pos="Max" offset="12"/>
+                <Anchor side="Left" relative="$parent/$parent" pos="Min" offset="14"/>
+            </Frame>
+        </Frame>
+
+        <Frame type="BundleTileListItem" name="Item5" template="BundleSelectionFrame/BundleTileListItemTemplate">
+            <Frame type="Frame" name="AnchorFrame">
+                <Anchor side="Top" relative="$parent/$parent/Item4/AnchorFrame" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/$parent/Item4/AnchorFrame" pos="Max" offset="12"/>
+            </Frame>
+        </Frame>
+
+        <Frame type="BundleTileListItem" name="Item6" template="BundleSelectionFrame/BundleTileListItemTemplate">
+            <Frame type="Frame" name="AnchorFrame">
+                <Anchor side="Top" relative="$parent/$parent/Item5/AnchorFrame" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/$parent/Item5/AnchorFrame" pos="Max" offset="11"/>
+            </Frame>
+        </Frame>
+
+        <Frame type="BundleTileListItem" name="Item7" template="BundleSelectionFrame/BundleTileListItemTemplate">
+            <Frame type="Frame" name="AnchorFrame">
+                <Anchor side="Top" relative="$parent/$parent/Item6/AnchorFrame" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/$parent/Item6/AnchorFrame" pos="Max" offset="11"/>
+            </Frame>
+        </Frame>
+
+        <Frame type="Image" name="ScrollBarBackground" template="StandardTileListTemplates/StandardTileListScrollBarBackgroundTemplate"/>
+
+        <Frame type="ScrollBar" name="ScrollBar" template="StandardTileListTemplates/StandardTileListScrollBarTemplate">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="10"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="-2"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="-10"/>
         </Frame>
     </Frame>
 
-    <Frame type="BundleSelectionFrame" name="BundleSelectionFrameTemplate">
-        <SortMethod val="{$this/SortPulldown/@SelectedSort}"/>
-        
-        <Frame type="Frame" name="AnchorFrame">
-            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
-            <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
-            <Anchor side="Left" relative="$parent" pos="Min" offset="112"/>
-            <Anchor side="Right" relative="$parent" pos="Max" offset="-170"/>
-        </Frame>
 
-        <Frame type="AspectRatioFrame" name="Anchor4x3">
-            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
-            <Anchor side="Left" relative="$parent/AnchorFrame" pos="Min" offset="0"/>
-            <Width val="1470"/>
-            <Height val="50"/>
-            <CollapseLayout val="true"/>
-            <MaxVisibleAspectRatio val="1.51"/>
-        </Frame>
-        
-        <Frame type="AspectRatioFrame" name="Anchor16x10">
-            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
-            <Anchor side="Left" relative="$parent/Anchor4x3" pos="Max" offset="0"/>
-            <Width val="1608"/>
-            <Height val="50"/>
-            <CollapseLayout val="true"/>
-            <MinVisibleAspectRatio val="1.51001"/>
-        </Frame>
+    <!-- 
+    ===========================================================
+    
+    BUNDLE SELECTION FRAME
+    
+    ===========================================================
+    -->
+    <Frame type="BundleSelectionFrame" name="BundleSelectionFrameTemplate" template="CollectionTemplates/CollectionBaseTemplate">
+        <HookupAlias original="BigTileList" alias="ContentContainer/PrimaryPanel/BigTileList"/>
+        <HookupAlias original="ContentTileList" alias="ContentContainer/SecondaryPanel/ContentTileList"/>
+        <AddDummyEntry val="True"/>
+        <PopulateLargeTileList val="True"/>
 
         <Frame type="Label" name="TitleLabel">
-            <Anchor side="Top" relative="$parent" pos="Min" offset="98"/>
-            <Anchor side="Left" relative="$Anchor_LeftHeader" pos="Max" offset="0"/>
-            <Style val="@Arcade_Title"/>
             <Text val="@UI/ScreenCollection/Featured/Title"/>
         </Frame>
 
-        <Frame type="GameContentSortPulldown" name="SortPulldown" template="StandardBattlenetTemplates/BattlenetLargePulldownTemplate">
-            <Anchor side="Bottom" relative="$parent/BundleTileList" pos="Min" offset="3"/>
-            <Anchor side="Right" relative="$parent/BundleTileList/Item3" pos="Max" offset="0"/>
-            <Visible val="false"/>
+        <Frame type="Label" name="SubtitleLabel">
+            <Text val="@UI/ScreenCollection/Featured/Subtitle"/>
         </Frame>
 
-        <Frame type="TileList" name="BundleTileList">
-            <Anchor side="Top" relative="$parent" pos="Min" offset="217"/>
-            <Anchor side="Left" relative="$Anchor_LeftStandard" pos="Max" offset="0"/>
-            <Width val="1597"/>
-            <Height val="676"/>
-            <ClearSelectionIfNotVisible val="true"/>
-            <RequireSelection val="false"/>
-
-            <AcceptsMouse val="true"/>
-
-            <Frame type="BundleTileListItem" name="Item0" template="BundleSelectionFrame/BundleTileListItemTemplate">
-                <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
-                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+        <Frame type="StoreCacheFrame" name="StoreCacheFrame">
+            <Anchor relative="$parent"/>
+        </Frame>
+        
+        <Frame type="Frame" name="ContentContainer">
+            <Anchor side="Right" relative="$Anchor_CollectionContentContainer_Right" pos="Max" offset="0"/>
+        
+            <Frame type="Image" name="HeaderHighlight">
+                <Anchor side="Left" relative="$parent/DividerAnchor" pos="Min" offset="-2"/>
+                <Texture val="@UI/Glues_Battlenet_PageAssets_StandardContainer_Mask_SolidCorner" layer="0"/>
+            </Frame>
+            
+            <Frame type="Image" name="BodyShadow">
+                <Anchor side="Left" relative="$parent/DividerAnchor" pos="Min" offset="0"/>
+            </Frame>
+            
+            <Frame type="Image" name="DividerAnchor">
+                <Anchor side="Left" relative="$Anchor_StandardContentSidebar_Right" pos="Max" offset="60"/>
+            </Frame>
+            
+            <Frame type="Image" name="DividerTop">
+                <Visible val="True"/>
+            </Frame>
+            
+            <Frame type="Image" name="DividerLeft">
+                <Visible val="False"/>
             </Frame>
 
-            <Frame type="BundleTileListItem" name="Item1" template="BundleSelectionFrame/BundleTileListItemTemplate">
-                <Anchor side="Top" relative="$parent/Item0" pos="Min" offset="0"/>
-                <Anchor side="Left" relative="$parent/Item0" pos="Max" offset="15"/>
+            <!-- Header Panel -->
+            <Frame type="Frame" name="HeaderPanel">
             </Frame>
+            
+            <!-- Primary Panel -->
+            <Frame type="Frame" name="PrimaryPanel">
+                <Anchor side="Top" relative="$parent/AnchorFrame" pos="Min" offset="0"/>
 
-            <Frame type="BundleTileListItem" name="Item2" template="BundleSelectionFrame/BundleTileListItemTemplateSmall">
-                <Anchor side="Top" relative="$parent/Item1" pos="Min" offset="0"/>
-                <Anchor side="Left" relative="$parent/Item1" pos="Max" offset="15"/>
+                <Frame type="TileList" name="BigTileList" template="BundleSelectionFrame/BigTileListTemplate"/>
             </Frame>
-
-            <Frame type="BundleTileListItem" name="Item3" template="BundleSelectionFrame/BundleTileListItemTemplateSmall">
-                <Anchor side="Top" relative="$parent/Item2" pos="Min" offset="0"/>
-                <Anchor side="Left" relative="$parent/Item2" pos="Max" offset="10"/>
-            </Frame>
-
-            <Frame type="BundleTileListItem" name="Item4" template="BundleSelectionFrame/BundleTileListItemTemplateSmall">
-                <Anchor side="Top" relative="$parent/Item2" pos="Max" offset="8"/>
-                <Anchor side="Left" relative="$parent/Item2" pos="Min" offset="0"/>
-            </Frame>
-
-            <Frame type="BundleTileListItem" name="Item5" template="BundleSelectionFrame/BundleTileListItemTemplateSmall">
-                <Anchor side="Top" relative="$parent/Item2" pos="Max" offset="8"/>
-                <Anchor side="Left" relative="$parent/Item4" pos="Max" offset="10"/>
-            </Frame>
-
-            <Frame type="ScrollBar" name="ScrollBar" template="CollectionTemplates/ScrollBarTemplate">
-                <Anchor side="Top" relative="$parent" pos="Min" offset="-3"/>
-                <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
-                <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+            
+            <!-- Secondary Panel -->
+            <Frame type="Frame" name="SecondaryPanel">
+        
+                <Frame type="TileList" name="ContentTileList" template="BundleSelectionFrame/SmallTileListTemplate"/>
             </Frame>
         </Frame>
 
@@ -573,12 +1247,31 @@
                 <Animation name="ClearBundle">
                     <Event event="OnClick" action="Restart,Play"/>
 
-                    <Controller type="Property" frame="$parent" property="Bundle" end="Pause">
-                        <Key type="Property" time="0" value=""/>
+                    <Controller type="Property" frame="$parent/$parent/ContentContainer/PrimaryPanel/BigTileList" property="SelectedIndex" end="Pause">
+                        <Key type="Property" time="0" value="#InvalidTileListIndex"/>
+                    </Controller>
+
+                    <Controller type="Property" frame="$ancestor[@type=BundleSelectionFrame]/ContentContainer/SecondaryPanel/ContentTileList" property="SelectedIndex" end="Pause">
+                        <Key type="Property" time="0" value="#InvalidTileListIndex"/>
                     </Controller>
                 </Animation>
             </Frame>
         </Frame>
+
+        <StateGroup name="StoreStatusStates">
+            <DefaultState val="StoreDown"/>
+            
+            <State name="StoreAvailable">
+                <When type="Property" frame="StoreCacheFrame" IsStoreAvailable="True"/>
+                <Action type="SetProperty" frame="$this/ContentContainer/SecondaryPanel/ContentTileList" Visible="True"/>
+                <Action type="SetProperty" frame="$this/ContentContainer/PrimaryPanel/BigTileList" Visible="True"/>
+            </State>
+            
+            <State name="StoreDown">
+                <Action type="SetProperty" frame="$this/ContentContainer/SecondaryPanel/ContentTileList" Visible="False"/>
+                <Action type="SetProperty" frame="$this/ContentContainer/PrimaryPanel/BigTileList" Visible="False"/>
+            </State>
+        </StateGroup>
 
         <StateGroup name="SelectedBundleVisibility">
             <DefaultState val="SelectedBundleNotVisible"/>
@@ -586,12 +1279,23 @@
             <State name="SelectedBundleVisible">
                 <When type="Property" frame="SelectedBundleFrame" operator="NotEqual" Bundle=""/>
                 <Action type="SetProperty" frame="SelectedBundleFrame" visible="true"/>
-                <Action type="SetProperty" frame="BundleTileList" visible="false"/>
             </State>
             
             <State name="SelectedBundleNotVisible">
                 <Action type="SetProperty" frame="SelectedBundleFrame" visible="false"/>
-                <Action type="SetProperty" frame="BundleTileList" visible="true"/>
+            </State>
+        </StateGroup>
+            
+        <StateGroup name="WarChestPurchasableState">
+            <DefaultState val="NotPurchasable"/>
+        
+            <State name="Purchasable">
+                <When type="Property" frame="$parent/WarChestFrame" IsPurchaseAvailable="True"/>
+                <Action type="SetProperty" frame="$this" PopulateLargeTileList="False"/>
+            </State>
+        
+            <State name="NotPurchasable">
+                <Action type="SetProperty" frame="$this" PopulateLargeTileList="True"/>
             </State>
         </StateGroup>
     </Frame>

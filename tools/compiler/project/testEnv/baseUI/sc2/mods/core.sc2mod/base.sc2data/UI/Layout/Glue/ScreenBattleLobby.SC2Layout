@@ -4,9 +4,8 @@
     
     <Frame type="ScreenBattleLobby" name="ScreenBattleLobby">
         <Anchor relative="$parent"/>
-        <!-- This must render below ScreenBattlenet so fanfares and profile can appear above it -->
-        <!-- But render above ScreenNavigation and other content screens so you can't navigate or interact with other things -->
-        <RenderPriority val="650"/>
+        <!-- This must render above ScreenNavigation and other content screens so you can't navigate or interact with other things -->
+        <RenderPriority val="640"/>
         <Handle val="ScreenBattleLobby"/>
 
         <Animation name="Show">
@@ -29,7 +28,7 @@
         </Frame>
         
         
-        <Frame type="Frame" name="ExtendedExperienceBG" template="StandardBattlenetTemplates/BattlenetScaleableExetendedExperienceTemplate"/>
+        <Frame type="Frame" name="ExtendedExperienceBG" template="StandardExtendedExperienceTemplates/AspectRatioFlexExtendedExperienceTemplate"/>
 
         <!-- HEADER -->
 
@@ -49,8 +48,8 @@
         </Frame>
 
         <Frame type="Frame" name="ExpansionAnchorFrame">
-            <Anchor side="Top" relative="$parent/ExtendedExperienceBG/BackgroundContainer" pos="Min" offset="39"/>
-            <Anchor side="Left" relative="$parent/ExtendedExperienceBG/BackgroundContainer" pos="Min" offset="30"/>
+            <Anchor side="Top" relative="$parent/ExtendedExperienceBG/AnchorFrame" pos="Min" offset="39"/>
+            <Anchor side="Left" relative="$parent/ExtendedExperienceBG/AnchorFrame" pos="Min" offset="30"/>
             <Width val="62"/>
             <Height val="65"/>
         </Frame>
@@ -85,7 +84,7 @@
                     <When type="Property" frame="$parent/MultiModFrame" ExpansionLevel="3"/>
                     <Action type="SetProperty" frame="ExpansionIcon" Texture="@UI/Glues_Icons_ExpansionLevel_Large_LotV"/>
                     <Action type="SetProperty" frame="$this" Tooltip="@UI/ScreenBattleLobby/ExpansionLevelLotV"/>
-                    <Action type="SetProperty" frame="$this" Visible="true"/>
+                    <Action type="SetProperty" frame="$this" Visible="false"/>
                 </State>
 
                 <State name="WoLModState">
@@ -106,14 +105,14 @@
                     <When type="Property" frame="$parent/ModFrame" ExpansionLevel="3"/>
                     <Action type="SetProperty" frame="ExpansionIcon" Texture="@UI/Glues_Icons_ExpansionLevel_Large_LotV"/>
                     <Action type="SetProperty" frame="$this" Tooltip="@UI/ScreenBattleLobby/ExpansionLevelLotV"/>
-                    <Action type="SetProperty" frame="$this" Visible="true"/>
+                    <Action type="SetProperty" frame="$this" Visible="false"/>
                 </State>
             </StateGroup>
         </Frame>
 
         <Frame type="Label" name="MapNameLabel">
-            <Anchor side="Top" relative="$parent/ExpansionAnchorFrame" pos="Mid" offset="0"/>
-            <Anchor side="Bottom" relative="$parent/ExpansionAnchorFrame" pos="Mid" offset="0"/>
+            <Anchor side="Top" relative="$parent/ExpansionAnchorFrame" pos="Mid" offset="-9"/>
+            <Anchor side="Bottom" relative="$parent/ExpansionAnchorFrame" pos="Mid" offset="-9"/>
             <Anchor side="Left" relative="$parent/ExpansionIconFrame" pos="Max" offset="10"/>
             <AutoSizeClamps maxWidth="430"/>
             <Style val="@Lobby_Title"/>
@@ -127,8 +126,8 @@
             <Anchor side="Top" relative="$parent/ModNameLabel" pos="Mid" offset="0"/>
             <Anchor side="Bottom" relative="$parent/ModNameLabel" pos="Mid" offset="0"/>
             <Anchor side="Left" relative="$parent/MapNameLabel" pos="Max" offset="5"/>
-            <Style val="@Lobby_Title"/>
-            <Text val="|"/>
+            <Style val="@Lobby_ModTitle"/>
+            <Text val="+"/>
             <CollapseLayout val="true"/>
             <Visible val="{$parent/ModNameLabel/@Visible}"/>
         </Frame>
@@ -174,9 +173,131 @@
             <ModHandle val="{$parent/@ModHandle}"/>
         </Frame>
 
+        <Frame type="Label" name="LobbyNameLabel">
+            <Anchor side="Top" relative="$parent/MapNameLabel" pos="Max" offset="0"/>
+            <Anchor side="Left" relative="$parent/ExpansionIconFrame" pos="Max" offset="10"/>
+            <AutoSizeClamps maxWidth="430"/>
+            <Style val="@Lobby_Name"/>
+            <AcceptsMouseTooltip val="true"/>
+            <Options val="Ellipsis | TooltipIfTruncated | NoWrapping"/>
+            <Text val="{$parent/@LobbyName}"/>
+            <PreserveAnchorOffset val="True"/>
+                
+            <StateGroup name="VisibleState">
+                <DefaultState val="NotVisible"/>
+            
+                <State name="Visible">
+                    <When type="Property" frame="$ancestor[@type=ScreenBattleLobby]" IsOpenToPublic="True"/>
+                    <Action type="SetProperty" frame="$this" Visible="True"/>
+                </State>
+                
+                <State name="NotVisible">
+                    <Action type="SetProperty" frame="$this" Visible="False"/>
+                </State>
+            </StateGroup>
+        </Frame>
+        
+        <Frame type="Label" name="PrivateLobbyWarningLabel">
+            <Anchor side="Top" relative="$parent/MapNameLabel" pos="Max" offset="0"/>
+            <Anchor side="Left" relative="$parent/LobbyNameLabel" pos="Min" offset="0"/>
+            <AcceptsMouseTooltip val="true"/>
+            <Tooltip val="@UI/ScreenBattleLobby/PrivateLobbyInfo"/>
+            <Style val="@Lobby_PrivateWarning"/>
+            <Text val="@UI/ScreenBattleLobby/PrivateLobby"/>
+                
+            <StateGroup name="VisibleState">
+                <DefaultState val="NotVisible"/>
+            
+                <State name="Visible">
+                    <When type="Property" frame="$ancestor[@type=ScreenBattleLobby]" IsOpenToPublic="False"/>
+                    <Action type="SetProperty" frame="$this" Visible="True"/>
+                </State>
+                
+                <State name="NotVisible">
+                    <Action type="SetProperty" frame="$this" Visible="False"/>
+                </State>
+            </StateGroup>
+        </Frame>
+            
+        <Frame type="Image" name="PrivateLobbyInfoIcon">
+            <Anchor side="Top" relative="$parent/PrivateLobbyWarningLabel" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent/PrivateLobbyWarningLabel" pos="Mid" offset="0"/>
+            <Anchor side="Left" relative="$parent/PrivateLobbyWarningLabel" pos="Max" offset="6"/>
+            <Width val="24"/>
+            <Height val="24"/>
+            <AcceptsMouseTooltip val="true"/>
+            <Tooltip val="@UI/ScreenBattleLobby/PrivateLobbyInfo"/>
+            <Texture val="@UI/Glues_Icons_GenericInfo"/>
+            <Visible val="{$parent/PrivateLobbyWarningLabel/@Visible}"/>
+        </Frame>
+
+        <Frame type="Button" name="EditLobbyNameButton">
+            <Anchor side="Top" relative="$parent/MapNameLabel" pos="Max" offset="-5"/>
+            <Anchor side="Left" relative="$parent/LobbyNameLabel" pos="Max" offset="0"/>
+            <Anchor side="Right" relative="$this/EditLobbyNameLabel" pos="Max" offset="0"/>
+            <Height val="32"/>
+            
+            <Frame type="Image" name="Image">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                <Width val="32"/>
+                <Height val="32"/>
+                <Texture val="@UI/Glues_Icons_Edit"/>
+            </Frame>
+
+            <Frame type="Label" name="EditLobbyNameLabel">
+                <Anchor side="Top" relative="$parent/$parent/MapNameLabel" pos="Max" offset="3"/>
+                <Anchor side="Left" relative="$parent/Image" pos="Max" offset="-1"/>
+                <Style val="@Lobby_NameEdit"/>
+                <Text val="@UI/Lobby/EditLobbyName"/>
+                
+                <StateGroup name="VisibleState">
+                    <DefaultState val="NotVisible"/>
+                
+                    <State name="Visible">
+                        <When type="Property" frame="$ancestor[@type=ScreenBattleLobby]" LobbyName=""/>
+                        <Action type="SetProperty" frame="$this" Visible="True"/>
+                    </State>
+                    
+                    <State name="NotVisible">
+                        <Action type="SetProperty" frame="$this" Visible="False"/>
+                    </State>
+                </StateGroup>
+            </Frame>
+            
+            <StateGroup name="LobbyNamedState">
+                <DefaultState val="LobbyNamed"/>
+            
+                <State name="LobbyUnnamed">
+                    <When type="Property" frame="$ancestor[@type=ScreenBattleLobby]" LobbyName=""/>
+                    <Action type="SetAnchor" frame="$this" side="Left" relative="$parent/ExpansionIconFrame" pos="Max" offset="2"/>
+                    <Action type="SetAnchor" frame="$this" side="Right" relative="$this/EditLobbyNameLabel" pos="Max" offset="0"/>
+                </State>
+                
+                <State name="LobbyNamed">
+                    <Action type="SetAnchor" frame="$this" side="Left" relative="$parent/LobbyNameLabel" pos="Max" offset="0"/>
+                    <Action type="SetAnchor" frame="$this" side="Right" relative="$this/Image" pos="Max" offset="0"/>
+                </State>
+            </StateGroup>
+                
+            <StateGroup name="VisibleState">
+                <DefaultState val="NotVisible"/>
+            
+                <State name="Visible">
+                    <When type="Property" frame="$ancestor[@type=ScreenBattleLobby]" IsHost="True"/>
+                    <When type="Property" frame="$ancestor[@type=ScreenBattleLobby]" IsOpenToPublic="True"/>
+                    <Action type="SetProperty" frame="$this" Visible="True"/>
+                </State>
+                
+                <State name="NotVisible">
+                    <Action type="SetProperty" frame="$this" Visible="False"/>
+                </State>
+            </StateGroup>
+        </Frame>
+
         <Frame type="Button" name="InvitePlayerButton" template="StandardBattlenetTemplates/BattlenetSmallButtonTemplate">
-            <Anchor side="Top" relative="$parent/ExtendedExperienceBG/BackgroundContainer" pos="Min" offset="62"/>
-            <Anchor side="Right" relative="$parent/ExtendedExperienceBG/BackgroundContainer" pos="Max" offset="-34"/>
+            <Anchor side="Top" relative="$parent/ExtendedExperienceBG/AnchorFrame" pos="Min" offset="62"/>
+            <Anchor side="Right" relative="$parent/ExtendedExperienceBG/AnchorFrame" pos="Max" offset="-34"/>
             <Text val="@UI/ScreenBattleLobby/InvitePlayerButton"/>
             <Tooltip val="@UI/ScreenBattleLobby/InvitePlayerTooltip"/>
             <Width val="200"/>
@@ -239,12 +360,11 @@
             </StateGroup>
         </Frame>
 
-        <Frame type="Button" name="OpenPublicButton" template="StandardBattlenetTemplates/BattlenetSmallButtonTemplate">
-            <Anchor side="Top" relative="$parent/AddComputerButton" pos="Min" offset="0"/>
-            <Anchor side="Right" relative="$parent/AddComputerButton" pos="Min" offset="0"/>
-            <Text val="@UI/ScreenBattleLobby/OpenPublicButton"/>
+        <Frame type="Button" name="OpenPublicButton" template="StandardBattlenetTemplates/BattlenetStandardButtonTemplate">
+            <Anchor side="Bottom" relative="$parent/StartButton" pos="Max" offset="0"/>
+            <Anchor side="Left" relative="$parent/StartButton" pos="Max" offset="6"/>
+            <Text val="@UI/ScreenBattleLobby/MakePublic"/>
             <Tooltip val="@UI/ScreenBattleLobby/OpenPublicTooltip"/>
-            <Width val="200"/>
 
             <StateGroup name="ButtonStateGroup">
                 <State name="OfflineState">
@@ -265,11 +385,12 @@
                     <Action type="SetProperty" Tooltip="@UI/ScreenBattleLobby/OpenPublicPrivateMapTooltip"/>
                 </State>
 
-                <State name="MatchPrivacyState">
+                <!-- This disabled the open to public button when the match was set to know show up in match history -->
+                <!-- <State name="MatchPrivacyState">
                     <When type="Property" frame="$parent" IsMatchPrivate="true"/>
                     <Action type="SetProperty" Enabled="false"/>
                     <Action type="SetProperty" Tooltip="@UI/ScreenBattleLobby/OpenPublicMatchPrivateTooltip"/>
-                </State>
+                </State> -->
                 
                 <State name="ObserversState">
                     <When type="Property" frame="$parent" HasObserver="true"/>
@@ -298,8 +419,8 @@
         </Frame>
 
         <Frame type="Button" name="MinimizeButton" template="StandardBattlenetTemplates/MinimizeButton">
-            <Anchor side="Top" relative="$parent/ExtendedExperienceBG/BackgroundContainer" pos="Min" offset="11"/>
-            <Anchor side="Right" relative="$parent/ExtendedExperienceBG/BackgroundContainer" pos="Max" offset="-14"/>
+            <Anchor side="Top" relative="$parent/ExtendedExperienceBG/AnchorFrame" pos="Min" offset="11"/>
+            <Anchor side="Right" relative="$parent/ExtendedExperienceBG/AnchorFrame" pos="Max" offset="-14"/>
             <Shortcut val="@UI/ScreenNavigationBack_Hotkey"/>
             <ClickSound val="@UI_BnetDefaultClick"/>
         </Frame>
@@ -307,16 +428,16 @@
         <!-- RIGHT SIDE -->
 
         <Frame type="LobbyPlayerSlotsFrame" name="LobbyPlayerSlotsFrame" template="LobbyPlayerSlotsFrame/LobbyPlayerSlotsFrameTemplate">
-            <Anchor side="Top" relative="$parent/ExtendedExperienceBG/BackgroundContainer" pos="Min" offset="93"/>
-            <Anchor side="Left" relative="$parent/ExtendedExperienceBG/BackgroundContainer" pos="Min" offset="13"/>
+            <Anchor side="Top" relative="$parent/ExtendedExperienceBG/AnchorFrame" pos="Min" offset="93"/>
+            <Anchor side="Left" relative="$parent/ExtendedExperienceBG/AnchorFrame" pos="Min" offset="13"/>
             <Anchor side="Bottom" relative="$parent/CloseButton" pos="Min" offset="-10"/>
             <Width val="1120"/>
         </Frame>
         
         <Frame type="Image" name="GameInfoBackground">
-            <Anchor side="Top" relative="$parent/ExtendedExperienceBG/BackgroundContainer" pos="Min" offset="113"/>
+            <Anchor side="Top" relative="$parent/ExtendedExperienceBG/AnchorFrame" pos="Min" offset="113"/>
             <Anchor side="Left" relative="$parent/LobbyPlayerSlotsFrame" pos="Max" offset="-23"/>
-            <Anchor side="Right" relative="$parent/ExtendedExperienceBG/BackgroundContainer" pos="Max" offset="-34"/>
+            <Anchor side="Right" relative="$parent/ExtendedExperienceBG/AnchorFrame" pos="Max" offset="-34"/>
             <Height val="490"/>
             <Texture val="@UI/Glues_ExtendedXP_InnerContainer_1"/>
             <TextureType val="NineSlice"/>
@@ -380,9 +501,8 @@
         <!-- BOTTOM BUTTONS -->
 
         <Frame type="Button" name="StartButton" template="StandardBattlenetTemplates/BattlenetAlternateButtonTemplate">
-            <Anchor side="Bottom" relative="$parent/ExtendedExperienceBG/BackgroundContainer" pos="Max" offset="-33"/>
-            <Anchor side="Left" relative="$parent/ExtendedExperienceBG/BackgroundContainer" pos="Min" offset="40"/>
-            <Width val="300"/>
+            <Anchor side="Bottom" relative="$parent/ExtendedExperienceBG/AnchorFrame" pos="Max" offset="-33"/>
+            <Anchor side="Left" relative="$parent/ExtendedExperienceBG/AnchorFrame" pos="Min" offset="40"/>
             <Text val="@UI/ScreenBattleLobby/StartButton"/>
 
             <StateGroup name="ButtonStateGroup">
@@ -390,6 +510,12 @@
                     <When type="Property" frame="$parent" IsCountdown="true"/>
                     <Action type="SetProperty" Enabled="false"/>
                     <Action type="SetProperty" Text="@UI/ScreenBattleLobby/StartCountdownButton"/>
+                </State>
+
+                <State name="PendingState">
+                    <When type="Property" frame="$parent" HasPendingSlots="true"/>
+                    <Action type="SetProperty" Text="@UI/ScreenBattleLobby/StartPendingButton"/>
+                    <Action type="SetProperty" Enabled="false"/>
                 </State>
                 
                 <State name="HostState">
@@ -427,9 +553,8 @@
         </Frame>
 
         <Frame type="Button" name="CloseButton" template="StandardBattlenetTemplates/BattlenetStandardButtonTemplate">
-            <Anchor side="Bottom" relative="$parent/StartButton" pos="Max" offset="0"/>
-            <Anchor side="Left" relative="$parent/StartButton" pos="Max" offset="6"/>
-            <Width val="250"/>
+            <Anchor side="Bottom" relative="$parent/OpenPublicButton" pos="Max" offset="0"/>
+            <Anchor side="Left" relative="$parent/OpenPublicButton" pos="Max" offset="6"/>
             <Text val="@UI/ScreenBattleLobby/CloseButton"/>
 
             <StateGroup name="ButtonStateGroup">

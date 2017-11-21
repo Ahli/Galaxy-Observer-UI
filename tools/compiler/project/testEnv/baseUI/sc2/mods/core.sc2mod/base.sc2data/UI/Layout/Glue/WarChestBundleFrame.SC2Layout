@@ -1,0 +1,610 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<Desc>
+    <DescFlags val="Locked"/>
+
+    <Frame type="SelectedBundleFrame" name="WarChestBundleFrameTemplate" template="SelectedBundleFrame/BaseBundleFrameTemplate">
+        <Bundle val="{$parent/@Bundle}"/>
+        <Visible val="false"/>
+        
+        <Frame type="WarChestTierFrame" name="WarChestTierFrame">
+            <Anchor relative="$parent"/>
+        </Frame>
+        
+        <Frame type="UnlockableTileListTooltip" name="UnlockableTileListTooltip" template="UnlockablePanel/UnlockableTileListTooltipTemplate"/>
+        
+        <Frame type="AchievementInfoFrame" name="WarChestOwnedAchievement">
+            <Anchor relative="$parent"/>
+            <Visible val="false"/>
+            <AchievementId val="{$parent/WarChestTierFrame/@StartAchievementId}"/>
+            <PresenceId val="{$BattleUI/@LocalToonPresenceId}"/>
+        </Frame>
+        
+        <Frame type="AchievementInfoFrame" name="NodeCompletedAchievement">
+            <Anchor relative="$parent"/>
+            <Visible val="false"/>
+            <AchievementId val="{$parent/WarChestTierFrame/@AchievementId}"/>
+            <PresenceId val="{$BattleUI/@LocalToonPresenceId}"/>
+        </Frame>
+
+        <Frame type="Image" name="LockIcon">
+            <Anchor side="Top" relative="$parent/BackgroundImage" pos="Min" offset="56"/>
+            <Anchor side="Right" relative="$parent/BackgroundImage" pos="Max" offset="-56"/>
+            <Texture val="@UI/SC2_UI_Collection_WarChest_Dialogs_SelectedBundle_LockIcon"/>
+            <CollapseLayout val="true"/>
+        </Frame>
+
+        <Frame type="Label" name="BundleXPLabel">
+            <Anchor side="Top" relative="$parent/BackgroundImage" pos="Min" offset="81"/>
+            <Anchor side="Right" relative="$parent/LockIcon" pos="Min" offset="-3"/>
+            <Style val="@Collection_WarChest_BundleXP"/>
+            <Text val="{$parent/FormattedXPText/@Text}"/>
+            <Color val="#WarChestNodeColor_ProgressBar_Primary"/>
+        </Frame>
+        
+        <!--
+        CurrentXPVal and GoalXPVal do the subtraction math to convert absolute Min/Max XP vals into a local range (0 to 300k)
+        CurrentXP binds the result and clamps it between 0 and the max (300k)
+        CurrentXPWithCommas and GoalXPWithCommas add commas to the values and output as text
+        CurrentXPFinalBuffer evaluates the final current xp and sets it to 0 in the case that it is at or below zero. This avoids some bugs with countdown labels and property binding replacement indeces.
+        -->
+        <Frame type="TextFormatFrame" name="FormattedXPText">
+            <Anchor relative="$parent"/>
+            <Visible val="false"/>
+            <FormatText val="@UI/ScreenCollection/WarChest/Tooltip/MinMaxXP"/>
+            <Replacement val="{$this/CurrentXPFinalBuffer/@Text}" index="0"/>
+            <Replacement val="{$this/GoalXPWithCommas/@Text}" index="1"/>
+            
+            <Frame type="Label" name="CurrentXP">
+                <Anchor relative="$parent"/>
+                <Visible val="false"/>
+                <Text val="0"/>
+            </Frame>
+            
+            <Frame type="Label" name="CurrentXPFinalBuffer">
+                <Anchor relative="$parent"/>
+                <Visible val="false"/>
+                <Text val="{$parent/CurrentXPWithCommas/@Text}"/>
+            </Frame>
+            
+            <Frame type="MathFrame" name="CurrentXPVal">
+                <Anchor relative="$parent"/>
+                <Visible val="false"/>
+                <A val="{$WarChestFrame/@EarnedXP}"/>
+                <B val="{$parent/$parent/WarChestTierFrame/@MinXP}"/>
+                <Operator val="Subtract"/>
+            </Frame>
+            
+            <Frame type="MathFrame" name="GoalXPVal">
+                <Anchor relative="$parent"/>
+                <Visible val="false"/>
+                <A val="{$parent/$parent/WarChestTierFrame/@MaxXP}"/>
+                <B val="{$parent/$parent/WarChestTierFrame/@MinXP}"/>
+                <Operator val="Subtract"/>
+            </Frame>
+        
+            <Frame type="CountdownLabel" name="CurrentXPWithCommas">
+                <Anchor relative="$parent"/>
+                <Visible val="false"/>
+                <FormatNumber val="true"/>
+                <CurrentValue val="{$parent/CurrentXP/@Text}"/>
+            </Frame>
+            
+            <Frame type="CountdownLabel" name="GoalXPWithCommas">
+                <Anchor relative="$parent"/>
+                <Visible val="false"/>
+                <FormatNumber val="true"/>
+                <CurrentValue val="{$parent/GoalXPVal/@ResultInt}"/>
+            </Frame>
+            
+            <StateGroup name="CurrentXPRangeState">
+                <DefaultState val="BelowMin"/>
+                
+                <State name="BetweenMinMax">
+                    <When type="Property" frame="CurrentXPVal" Operator="LessThanOrEqual" Result="{$this/GoalXPVal/@Result}"/>
+                    <When type="Property" frame="CurrentXPVal" Operator="GreaterThan" Result="0"/>
+                    <Action type="SetProperty" frame="CurrentXP" Text="{$parent/CurrentXPVal/@ResultInt}"/>
+                    <Action type="SetProperty" frame="CurrentXPFinalBuffer" Text="{$parent/CurrentXPWithCommas/@Text}"/>
+                </State>
+                
+                <State name="AboveMax">
+                    <When type="Property" frame="CurrentXPVal" Operator="GreaterThan" Result="{$this/GoalXPVal/@Result}"/>
+                    <Action type="SetProperty" frame="CurrentXP" Text="{$parent/GoalXPVal/@ResultInt}"/>
+                    <Action type="SetProperty" frame="CurrentXPFinalBuffer" Text="{$parent/CurrentXPWithCommas/@Text}"/>
+                </State>
+                
+                <State name="BelowMin">
+                    <Action type="SetProperty" frame="CurrentXP" Text="0"/>
+                    <Action type="SetProperty" frame="CurrentXPFinalBuffer" Text="0"/>
+                </State>
+            </StateGroup>
+        </Frame>
+        
+        <StateGroup name="WarChestBundleStateGroup">
+            <DefaultState val="Unlocked"/>
+            
+            <State name="NotOwned_StartingProtoss">
+                <When type="StateGroup" WarChestTierStateGroup="ProtossStarting"/>
+                <When type="Property" frame="WarChestOwnedAchievement" Awarded="false"/>
+                <Action type="SetProperty" frame="LockIcon" Visible="true"/>
+                <Action type="SetProperty" frame="BundleXPLabel" Visible="false"/>
+                <Action type="SetProperty" frame="BundleSubLabel" Text="@UI/ScreenCollection/WarChest/Bundle/NotOwned"/>
+                <Action type="SetProperty" frame="BundleDescriptionLabel" Text="@UI/ScreenCollection/WarChest/Bundle/RequiresProtoss"/>
+
+            </State>
+            
+            <State name="NotOwned_StartingTerran">
+                <When type="StateGroup" WarChestTierStateGroup="TerranStarting"/>
+                <When type="Property" frame="WarChestOwnedAchievement" Awarded="false"/>
+                <Action type="SetProperty" frame="LockIcon" Visible="true"/>
+                <Action type="SetProperty" frame="BundleXPLabel" Visible="false"/>
+                <Action type="SetProperty" frame="BundleSubLabel" Text="@UI/ScreenCollection/WarChest/Bundle/NotOwned"/>
+                <Action type="SetProperty" frame="BundleDescriptionLabel" Text="@UI/ScreenCollection/WarChest/Bundle/RequiresTerran"/>
+            </State>
+            
+            <State name="NotOwned_StartingZerg">
+                <When type="StateGroup" WarChestTierStateGroup="ZergStarting"/>
+                <When type="Property" frame="WarChestOwnedAchievement" Awarded="false"/>
+                <Action type="SetProperty" frame="LockIcon" Visible="true"/>
+                <Action type="SetProperty" frame="BundleXPLabel" Visible="false"/>
+                <Action type="SetProperty" frame="BundleSubLabel" Text="@UI/ScreenCollection/WarChest/Bundle/NotOwned"/>
+                <Action type="SetProperty" frame="BundleDescriptionLabel" Text="@UI/ScreenCollection/WarChest/Bundle/RequiresZerg"/>
+            </State>
+            
+            <State name="Owned_StartingProtoss">
+                <When type="StateGroup" WarChestTierStateGroup="ProtossStarting"/>
+                <Action type="SetProperty" frame="LockIcon" Visible="false"/>
+                <Action type="SetProperty" frame="BundleXPLabel" Visible="false"/>
+                <Action type="SetProperty" frame="BundleSubLabel" Text="@UI/ScreenCollection/WarChest/Bundle/RewardsUnlocked"/>
+                <Action type="SetProperty" frame="BundleDescriptionLabel" Text="@UI/ScreenCollection/WarChest/Bundle/RewardsReady"/>
+            </State>
+            
+            <State name="Owned_StartingTerran">
+                <When type="StateGroup" WarChestTierStateGroup="TerranStarting"/>
+                <Action type="SetProperty" frame="LockIcon" Visible="false"/>
+                <Action type="SetProperty" frame="BundleXPLabel" Visible="false"/>
+                <Action type="SetProperty" frame="BundleSubLabel" Text="@UI/ScreenCollection/WarChest/Bundle/RewardsUnlocked"/>
+                <Action type="SetProperty" frame="BundleDescriptionLabel" Text="@UI/ScreenCollection/WarChest/Bundle/RewardsReady"/>
+            </State>
+            
+            <State name="Owned_StartingZerg">
+                <When type="StateGroup" WarChestTierStateGroup="ZergStarting"/>
+                <Action type="SetProperty" frame="LockIcon" Visible="false"/>
+                <Action type="SetProperty" frame="BundleXPLabel" Visible="false"/>
+                <Action type="SetProperty" frame="BundleSubLabel" Text="@UI/ScreenCollection/WarChest/Bundle/RewardsUnlocked"/>
+                <Action type="SetProperty" frame="BundleDescriptionLabel" Text="@UI/ScreenCollection/WarChest/Bundle/RewardsReady"/>
+            </State>
+            
+            <State name="NotOwned_Protoss">
+                <When type="Property" frame="WarChestTierFrame" RewardGroup="Protoss"/>
+                <When type="Property" frame="WarChestOwnedAchievement" Awarded="false"/>
+                <Action type="SetProperty" frame="LockIcon" Visible="true"/>
+                <Action type="SetProperty" frame="BundleXPLabel" Visible="true"/>
+                <Action type="SetProperty" frame="BundleSubLabel" Text="@UI/ScreenCollection/WarChest/Bundle/NotOwned"/>
+                <Action type="SetProperty" frame="BundleDescriptionLabel" Text="@UI/ScreenCollection/WarChest/Bundle/RequiresProtoss"/>
+            </State>
+            
+            <State name="NotOwned_Terran">
+                <When type="Property" frame="WarChestTierFrame" RewardGroup="Terran"/>
+                <When type="Property" frame="WarChestOwnedAchievement" Awarded="false"/>
+                <Action type="SetProperty" frame="LockIcon" Visible="true"/>
+                <Action type="SetProperty" frame="BundleXPLabel" Visible="true"/>
+                <Action type="SetProperty" frame="BundleSubLabel" Text="@UI/ScreenCollection/WarChest/Bundle/NotOwned"/>
+                <Action type="SetProperty" frame="BundleDescriptionLabel" Text="@UI/ScreenCollection/WarChest/Bundle/RequiresTerran"/>
+            </State>
+            
+            <State name="NotOwned_Zerg">
+                <When type="Property" frame="WarChestTierFrame" RewardGroup="Zerg"/>
+                <When type="Property" frame="WarChestOwnedAchievement" Awarded="false"/>
+                <Action type="SetProperty" frame="LockIcon" Visible="true"/>
+                <Action type="SetProperty" frame="BundleXPLabel" Visible="true"/>
+                <Action type="SetProperty" frame="BundleSubLabel" Text="@UI/ScreenCollection/WarChest/Bundle/NotOwned"/>
+                <Action type="SetProperty" frame="BundleDescriptionLabel" Text="@UI/ScreenCollection/WarChest/Bundle/RequiresZerg"/>
+            </State>
+            
+            <State name="NotUnlocked">
+                <When type="Property" frame="NodeCompletedAchievement" Awarded="false"/>
+                <Action type="SetProperty" frame="LockIcon" Visible="true"/>
+                <Action type="SetProperty" frame="BundleXPLabel" Visible="true"/>
+                <Action type="SetProperty" frame="BundleSubLabel" Text="@UI/ScreenCollection/WarChest/Bundle/Owned"/>
+                <Action type="SetProperty" frame="BundleDescriptionLabel" Text="@UI/ScreenCollection/WarChest/Bundle/PlayToUnlock"/>
+            </State>
+            
+            <State name="Unlocked">
+                <Action type="SetProperty" frame="LockIcon" Visible="false"/>
+                <Action type="SetProperty" frame="BundleXPLabel" Visible="true"/>
+                <Action type="SetProperty" frame="BundleSubLabel" Text="@UI/ScreenCollection/WarChest/Bundle/RewardsUnlocked"/>
+                <Action type="SetProperty" frame="BundleDescriptionLabel" Text="@UI/ScreenCollection/WarChest/Bundle/RewardsReady"/>
+            </State>
+        </StateGroup>
+        
+        <!-- This state group compares the bundle to War Chest tiers and populates a local tier with its info -->
+        
+        <StateGroup name="WarChestTierStateGroup">
+            <DefaultState val="ProtossTier15"/>
+            
+            <State name="TerranStarting">
+                <When type="Property" frame="BundleCacheFrame" Bundle="{$WarChestFrame/TerranWarChest/WarChestNode0/WarChestTierFrame/@StartBundle}"/>
+                <Action type="SetProperty" frame="WarChestTierFrame" Season="{$WarChestFrame/TerranWarChest/WarChestNode0/WarChestTierFrame/@Season}"/>
+                <Action type="SetProperty" frame="WarChestTierFrame" Round="{$WarChestFrame/TerranWarChest/WarChestNode0/WarChestTierFrame/@Round}"/>
+                <Action type="SetProperty" frame="WarChestTierFrame" Tier="{$WarChestFrame/TerranWarChest/WarChestNode0/WarChestTierFrame/@Tier}"/>
+                <Action type="SetProperty" frame="WarChestTierFrame" RewardGroup="{$WarChestFrame/TerranWarChest/WarChestNode0/WarChestTierFrame/@RewardGroup}"/>
+            </State>
+            
+            <State name="ZergStarting">
+                <When type="Property" frame="BundleCacheFrame" Bundle="{$WarChestFrame/ZergWarChest/WarChestNode0/WarChestTierFrame/@StartBundle}"/>
+                <Action type="SetProperty" frame="WarChestTierFrame" Season="{$WarChestFrame/ZergWarChest/WarChestNode0/WarChestTierFrame/@Season}"/>
+                <Action type="SetProperty" frame="WarChestTierFrame" Round="{$WarChestFrame/ZergWarChest/WarChestNode0/WarChestTierFrame/@Round}"/>
+                <Action type="SetProperty" frame="WarChestTierFrame" Tier="{$WarChestFrame/ZergWarChest/WarChestNode0/WarChestTierFrame/@Tier}"/>
+                <Action type="SetProperty" frame="WarChestTierFrame" RewardGroup="{$WarChestFrame/ZergWarChest/WarChestNode0/WarChestTierFrame/@RewardGroup}"/>
+            </State>
+            
+            <State name="ProtossStarting">
+                <When type="Property" frame="BundleCacheFrame" Bundle="{$WarChestFrame/ProtossWarChest/WarChestNode0/WarChestTierFrame/@StartBundle}"/>
+                <Action type="SetProperty" frame="WarChestTierFrame" Season="{$WarChestFrame/ProtossWarChest/WarChestNode0/WarChestTierFrame/@Season}"/>
+                <Action type="SetProperty" frame="WarChestTierFrame" Round="{$WarChestFrame/ProtossWarChest/WarChestNode0/WarChestTierFrame/@Round}"/>
+                <Action type="SetProperty" frame="WarChestTierFrame" Tier="{$WarChestFrame/ProtossWarChest/WarChestNode0/WarChestTierFrame/@Tier}"/>
+                <Action type="SetProperty" frame="WarChestTierFrame" RewardGroup="{$WarChestFrame/ProtossWarChest/WarChestNode0/WarChestTierFrame/@RewardGroup}"/>
+            </State>
+            
+            <State name="TerranTier1">
+                <When type="Property" Bundle="{$WarChestFrame/TerranWarChest/WarChestNode0/WarChestTierFrame/@Bundle}"/>
+                <Action type="SetProperty" frame="WarChestTierFrame" Season="{$WarChestFrame/TerranWarChest/WarChestNode0/WarChestTierFrame/@Season}"/>
+                <Action type="SetProperty" frame="WarChestTierFrame" Round="{$WarChestFrame/TerranWarChest/WarChestNode0/WarChestTierFrame/@Round}"/>
+                <Action type="SetProperty" frame="WarChestTierFrame" Tier="{$WarChestFrame/TerranWarChest/WarChestNode0/WarChestTierFrame/@Tier}"/>
+                <Action type="SetProperty" frame="WarChestTierFrame" RewardGroup="{$WarChestFrame/TerranWarChest/WarChestNode0/WarChestTierFrame/@RewardGroup}"/>
+            </State>
+            
+            <State name="TerranTier2">
+                <When type="Property" Bundle="{$WarChestFrame/TerranWarChest/WarChestNode1/WarChestTierFrame/@Bundle}"/>
+                <Action type="SetProperty" frame="WarChestTierFrame" Season="{$WarChestFrame/TerranWarChest/WarChestNode1/WarChestTierFrame/@Season}"/>
+                <Action type="SetProperty" frame="WarChestTierFrame" Round="{$WarChestFrame/TerranWarChest/WarChestNode1/WarChestTierFrame/@Round}"/>
+                <Action type="SetProperty" frame="WarChestTierFrame" Tier="{$WarChestFrame/TerranWarChest/WarChestNode1/WarChestTierFrame/@Tier}"/>
+                <Action type="SetProperty" frame="WarChestTierFrame" RewardGroup="{$WarChestFrame/TerranWarChest/WarChestNode1/WarChestTierFrame/@RewardGroup}"/>
+            </State>
+            
+            <State name="TerranTier3">
+                <When type="Property" Bundle="{$WarChestFrame/TerranWarChest/WarChestNode2/WarChestTierFrame/@Bundle}"/>
+                <Action type="SetProperty" frame="WarChestTierFrame" Season="{$WarChestFrame/TerranWarChest/WarChestNode2/WarChestTierFrame/@Season}"/>
+                <Action type="SetProperty" frame="WarChestTierFrame" Round="{$WarChestFrame/TerranWarChest/WarChestNode2/WarChestTierFrame/@Round}"/>
+                <Action type="SetProperty" frame="WarChestTierFrame" Tier="{$WarChestFrame/TerranWarChest/WarChestNode2/WarChestTierFrame/@Tier}"/>
+                <Action type="SetProperty" frame="WarChestTierFrame" RewardGroup="{$WarChestFrame/TerranWarChest/WarChestNode2/WarChestTierFrame/@RewardGroup}"/>
+            </State>
+            
+            <State name="TerranTier4">
+                <When type="Property" Bundle="{$WarChestFrame/TerranWarChest/WarChestNode3/WarChestTierFrame/@Bundle}"/>
+                <Action type="SetProperty" frame="WarChestTierFrame" Season="{$WarChestFrame/TerranWarChest/WarChestNode3/WarChestTierFrame/@Season}"/>
+                <Action type="SetProperty" frame="WarChestTierFrame" Round="{$WarChestFrame/TerranWarChest/WarChestNode3/WarChestTierFrame/@Round}"/>
+                <Action type="SetProperty" frame="WarChestTierFrame" Tier="{$WarChestFrame/TerranWarChest/WarChestNode3/WarChestTierFrame/@Tier}"/>
+                <Action type="SetProperty" frame="WarChestTierFrame" RewardGroup="{$WarChestFrame/TerranWarChest/WarChestNode3/WarChestTierFrame/@RewardGroup}"/>
+            </State>
+            
+            <State name="TerranTier5">
+                <When type="Property" Bundle="{$WarChestFrame/TerranWarChest/WarChestNode4/WarChestTierFrame/@Bundle}"/>
+                <Action type="SetProperty" frame="WarChestTierFrame" Season="{$WarChestFrame/TerranWarChest/WarChestNode4/WarChestTierFrame/@Season}"/>
+                <Action type="SetProperty" frame="WarChestTierFrame" Round="{$WarChestFrame/TerranWarChest/WarChestNode4/WarChestTierFrame/@Round}"/>
+                <Action type="SetProperty" frame="WarChestTierFrame" Tier="{$WarChestFrame/TerranWarChest/WarChestNode4/WarChestTierFrame/@Tier}"/>
+                <Action type="SetProperty" frame="WarChestTierFrame" RewardGroup="{$WarChestFrame/TerranWarChest/WarChestNode4/WarChestTierFrame/@RewardGroup}"/>
+            </State>
+            
+            <State name="TerranTier6">
+                <When type="Property" Bundle="{$WarChestFrame/TerranWarChest/WarChestNode5/WarChestTierFrame/@Bundle}"/>
+                <Action type="SetProperty" frame="WarChestTierFrame" Season="{$WarChestFrame/TerranWarChest/WarChestNode5/WarChestTierFrame/@Season}"/>
+                <Action type="SetProperty" frame="WarChestTierFrame" Round="{$WarChestFrame/TerranWarChest/WarChestNode5/WarChestTierFrame/@Round}"/>
+                <Action type="SetProperty" frame="WarChestTierFrame" Tier="{$WarChestFrame/TerranWarChest/WarChestNode5/WarChestTierFrame/@Tier}"/>
+                <Action type="SetProperty" frame="WarChestTierFrame" RewardGroup="{$WarChestFrame/TerranWarChest/WarChestNode5/WarChestTierFrame/@RewardGroup}"/>
+            </State>
+            
+            <State name="TerranTier7">
+                <When type="Property" Bundle="{$WarChestFrame/TerranWarChest/WarChestNode6/WarChestTierFrame/@Bundle}"/>
+                <Action type="SetProperty" frame="WarChestTierFrame" Season="{$WarChestFrame/TerranWarChest/WarChestNode6/WarChestTierFrame/@Season}"/>
+                <Action type="SetProperty" frame="WarChestTierFrame" Round="{$WarChestFrame/TerranWarChest/WarChestNode6/WarChestTierFrame/@Round}"/>
+                <Action type="SetProperty" frame="WarChestTierFrame" Tier="{$WarChestFrame/TerranWarChest/WarChestNode6/WarChestTierFrame/@Tier}"/>
+                <Action type="SetProperty" frame="WarChestTierFrame" RewardGroup="{$WarChestFrame/TerranWarChest/WarChestNode6/WarChestTierFrame/@RewardGroup}"/>
+            </State>
+            
+            <State name="TerranTier8">
+                <When type="Property" Bundle="{$WarChestFrame/TerranWarChest/WarChestNode7/WarChestTierFrame/@Bundle}"/>
+                <Action type="SetProperty" frame="WarChestTierFrame" Season="{$WarChestFrame/TerranWarChest/WarChestNode7/WarChestTierFrame/@Season}"/>
+                <Action type="SetProperty" frame="WarChestTierFrame" Round="{$WarChestFrame/TerranWarChest/WarChestNode7/WarChestTierFrame/@Round}"/>
+                <Action type="SetProperty" frame="WarChestTierFrame" Tier="{$WarChestFrame/TerranWarChest/WarChestNode7/WarChestTierFrame/@Tier}"/>
+                <Action type="SetProperty" frame="WarChestTierFrame" RewardGroup="{$WarChestFrame/TerranWarChest/WarChestNode7/WarChestTierFrame/@RewardGroup}"/>
+            </State>
+            
+            <State name="TerranTier9">
+                <When type="Property" Bundle="{$WarChestFrame/TerranWarChest/WarChestNode8/WarChestTierFrame/@Bundle}"/>
+                <Action type="SetProperty" frame="WarChestTierFrame" Season="{$WarChestFrame/TerranWarChest/WarChestNode8/WarChestTierFrame/@Season}"/>
+                <Action type="SetProperty" frame="WarChestTierFrame" Round="{$WarChestFrame/TerranWarChest/WarChestNode8/WarChestTierFrame/@Round}"/>
+                <Action type="SetProperty" frame="WarChestTierFrame" Tier="{$WarChestFrame/TerranWarChest/WarChestNode8/WarChestTierFrame/@Tier}"/>
+                <Action type="SetProperty" frame="WarChestTierFrame" RewardGroup="{$WarChestFrame/TerranWarChest/WarChestNode8/WarChestTierFrame/@RewardGroup}"/>
+            </State>
+            
+            <State name="TerranTier10">
+                <When type="Property" Bundle="{$WarChestFrame/TerranWarChest/WarChestNode9/WarChestTierFrame/@Bundle}"/>
+                <Action type="SetProperty" frame="WarChestTierFrame" Season="{$WarChestFrame/TerranWarChest/WarChestNode9/WarChestTierFrame/@Season}"/>
+                <Action type="SetProperty" frame="WarChestTierFrame" Round="{$WarChestFrame/TerranWarChest/WarChestNode9/WarChestTierFrame/@Round}"/>
+                <Action type="SetProperty" frame="WarChestTierFrame" Tier="{$WarChestFrame/TerranWarChest/WarChestNode9/WarChestTierFrame/@Tier}"/>
+                <Action type="SetProperty" frame="WarChestTierFrame" RewardGroup="{$WarChestFrame/TerranWarChest/WarChestNode9/WarChestTierFrame/@RewardGroup}"/>
+            </State>
+            
+            <State name="TerranTier11">
+                <When type="Property" Bundle="{$WarChestFrame/TerranWarChest/WarChestNode10/WarChestTierFrame/@Bundle}"/>
+                <Action type="SetProperty" frame="WarChestTierFrame" Season="{$WarChestFrame/TerranWarChest/WarChestNode10/WarChestTierFrame/@Season}"/>
+                <Action type="SetProperty" frame="WarChestTierFrame" Round="{$WarChestFrame/TerranWarChest/WarChestNode10/WarChestTierFrame/@Round}"/>
+                <Action type="SetProperty" frame="WarChestTierFrame" Tier="{$WarChestFrame/TerranWarChest/WarChestNode10/WarChestTierFrame/@Tier}"/>
+                <Action type="SetProperty" frame="WarChestTierFrame" RewardGroup="{$WarChestFrame/TerranWarChest/WarChestNode10/WarChestTierFrame/@RewardGroup}"/>
+            </State>
+            
+            <State name="TerranTier12">
+                <When type="Property" Bundle="{$WarChestFrame/TerranWarChest/WarChestNode11/WarChestTierFrame/@Bundle}"/>
+                <Action type="SetProperty" frame="WarChestTierFrame" Season="{$WarChestFrame/TerranWarChest/WarChestNode11/WarChestTierFrame/@Season}"/>
+                <Action type="SetProperty" frame="WarChestTierFrame" Round="{$WarChestFrame/TerranWarChest/WarChestNode11/WarChestTierFrame/@Round}"/>
+                <Action type="SetProperty" frame="WarChestTierFrame" Tier="{$WarChestFrame/TerranWarChest/WarChestNode11/WarChestTierFrame/@Tier}"/>
+                <Action type="SetProperty" frame="WarChestTierFrame" RewardGroup="{$WarChestFrame/TerranWarChest/WarChestNode11/WarChestTierFrame/@RewardGroup}"/>
+            </State>
+            
+            <State name="TerranTier13">
+                <When type="Property" Bundle="{$WarChestFrame/TerranWarChest/WarChestNode12/WarChestTierFrame/@Bundle}"/>
+                <Action type="SetProperty" frame="WarChestTierFrame" Season="{$WarChestFrame/TerranWarChest/WarChestNode12/WarChestTierFrame/@Season}"/>
+                <Action type="SetProperty" frame="WarChestTierFrame" Round="{$WarChestFrame/TerranWarChest/WarChestNode12/WarChestTierFrame/@Round}"/>
+                <Action type="SetProperty" frame="WarChestTierFrame" Tier="{$WarChestFrame/TerranWarChest/WarChestNode12/WarChestTierFrame/@Tier}"/>
+                <Action type="SetProperty" frame="WarChestTierFrame" RewardGroup="{$WarChestFrame/TerranWarChest/WarChestNode12/WarChestTierFrame/@RewardGroup}"/>
+            </State>
+            
+            <State name="TerranTier14">
+                <When type="Property" Bundle="{$WarChestFrame/TerranWarChest/WarChestNode13/WarChestTierFrame/@Bundle}"/>
+                <Action type="SetProperty" frame="WarChestTierFrame" Season="{$WarChestFrame/TerranWarChest/WarChestNode13/WarChestTierFrame/@Season}"/>
+                <Action type="SetProperty" frame="WarChestTierFrame" Round="{$WarChestFrame/TerranWarChest/WarChestNode13/WarChestTierFrame/@Round}"/>
+                <Action type="SetProperty" frame="WarChestTierFrame" Tier="{$WarChestFrame/TerranWarChest/WarChestNode13/WarChestTierFrame/@Tier}"/>
+                <Action type="SetProperty" frame="WarChestTierFrame" RewardGroup="{$WarChestFrame/TerranWarChest/WarChestNode13/WarChestTierFrame/@RewardGroup}"/>
+            </State>
+            
+            <State name="TerranTier15">
+                <When type="Property" Bundle="{$WarChestFrame/TerranWarChest/WarChestNode14/WarChestTierFrame/@Bundle}"/>
+                <Action type="SetProperty" frame="WarChestTierFrame" Season="{$WarChestFrame/TerranWarChest/WarChestNode14/WarChestTierFrame/@Season}"/>
+                <Action type="SetProperty" frame="WarChestTierFrame" Round="{$WarChestFrame/TerranWarChest/WarChestNode14/WarChestTierFrame/@Round}"/>
+                <Action type="SetProperty" frame="WarChestTierFrame" Tier="{$WarChestFrame/TerranWarChest/WarChestNode14/WarChestTierFrame/@Tier}"/>
+                <Action type="SetProperty" frame="WarChestTierFrame" RewardGroup="{$WarChestFrame/TerranWarChest/WarChestNode14/WarChestTierFrame/@RewardGroup}"/>
+            </State>
+            
+            <State name="ZergTier1">
+                <When type="Property" Bundle="{$WarChestFrame/ZergWarChest/WarChestNode0/WarChestTierFrame/@Bundle}"/>
+                <Action type="SetProperty" frame="WarChestTierFrame" Season="{$WarChestFrame/ZergWarChest/WarChestNode0/WarChestTierFrame/@Season}"/>
+                <Action type="SetProperty" frame="WarChestTierFrame" Round="{$WarChestFrame/ZergWarChest/WarChestNode0/WarChestTierFrame/@Round}"/>
+                <Action type="SetProperty" frame="WarChestTierFrame" Tier="{$WarChestFrame/ZergWarChest/WarChestNode0/WarChestTierFrame/@Tier}"/>
+                <Action type="SetProperty" frame="WarChestTierFrame" RewardGroup="{$WarChestFrame/ZergWarChest/WarChestNode0/WarChestTierFrame/@RewardGroup}"/>
+            </State>
+            
+            <State name="ZergTier2">
+                <When type="Property" Bundle="{$WarChestFrame/ZergWarChest/WarChestNode1/WarChestTierFrame/@Bundle}"/>
+                <Action type="SetProperty" frame="WarChestTierFrame" Season="{$WarChestFrame/ZergWarChest/WarChestNode1/WarChestTierFrame/@Season}"/>
+                <Action type="SetProperty" frame="WarChestTierFrame" Round="{$WarChestFrame/ZergWarChest/WarChestNode1/WarChestTierFrame/@Round}"/>
+                <Action type="SetProperty" frame="WarChestTierFrame" Tier="{$WarChestFrame/ZergWarChest/WarChestNode1/WarChestTierFrame/@Tier}"/>
+                <Action type="SetProperty" frame="WarChestTierFrame" RewardGroup="{$WarChestFrame/ZergWarChest/WarChestNode1/WarChestTierFrame/@RewardGroup}"/>
+            </State>
+            
+            <State name="ZergTier3">
+                <When type="Property" Bundle="{$WarChestFrame/ZergWarChest/WarChestNode2/WarChestTierFrame/@Bundle}"/>
+                <Action type="SetProperty" frame="WarChestTierFrame" Season="{$WarChestFrame/ZergWarChest/WarChestNode2/WarChestTierFrame/@Season}"/>
+                <Action type="SetProperty" frame="WarChestTierFrame" Round="{$WarChestFrame/ZergWarChest/WarChestNode2/WarChestTierFrame/@Round}"/>
+                <Action type="SetProperty" frame="WarChestTierFrame" Tier="{$WarChestFrame/ZergWarChest/WarChestNode2/WarChestTierFrame/@Tier}"/>
+                <Action type="SetProperty" frame="WarChestTierFrame" RewardGroup="{$WarChestFrame/ZergWarChest/WarChestNode2/WarChestTierFrame/@RewardGroup}"/>
+            </State>
+            
+            <State name="ZergTier4">
+                <When type="Property" Bundle="{$WarChestFrame/ZergWarChest/WarChestNode3/WarChestTierFrame/@Bundle}"/>
+                <Action type="SetProperty" frame="WarChestTierFrame" Season="{$WarChestFrame/ZergWarChest/WarChestNode3/WarChestTierFrame/@Season}"/>
+                <Action type="SetProperty" frame="WarChestTierFrame" Round="{$WarChestFrame/ZergWarChest/WarChestNode3/WarChestTierFrame/@Round}"/>
+                <Action type="SetProperty" frame="WarChestTierFrame" Tier="{$WarChestFrame/ZergWarChest/WarChestNode3/WarChestTierFrame/@Tier}"/>
+                <Action type="SetProperty" frame="WarChestTierFrame" RewardGroup="{$WarChestFrame/ZergWarChest/WarChestNode3/WarChestTierFrame/@RewardGroup}"/>
+            </State>
+            
+            <State name="ZergTier5">
+                <When type="Property" Bundle="{$WarChestFrame/ZergWarChest/WarChestNode4/WarChestTierFrame/@Bundle}"/>
+                <Action type="SetProperty" frame="WarChestTierFrame" Season="{$WarChestFrame/ZergWarChest/WarChestNode4/WarChestTierFrame/@Season}"/>
+                <Action type="SetProperty" frame="WarChestTierFrame" Round="{$WarChestFrame/ZergWarChest/WarChestNode4/WarChestTierFrame/@Round}"/>
+                <Action type="SetProperty" frame="WarChestTierFrame" Tier="{$WarChestFrame/ZergWarChest/WarChestNode4/WarChestTierFrame/@Tier}"/>
+                <Action type="SetProperty" frame="WarChestTierFrame" RewardGroup="{$WarChestFrame/ZergWarChest/WarChestNode4/WarChestTierFrame/@RewardGroup}"/>
+            </State>
+            
+            <State name="ZergTier6">
+                <When type="Property" Bundle="{$WarChestFrame/ZergWarChest/WarChestNode5/WarChestTierFrame/@Bundle}"/>
+                <Action type="SetProperty" frame="WarChestTierFrame" Season="{$WarChestFrame/ZergWarChest/WarChestNode5/WarChestTierFrame/@Season}"/>
+                <Action type="SetProperty" frame="WarChestTierFrame" Round="{$WarChestFrame/ZergWarChest/WarChestNode5/WarChestTierFrame/@Round}"/>
+                <Action type="SetProperty" frame="WarChestTierFrame" Tier="{$WarChestFrame/ZergWarChest/WarChestNode5/WarChestTierFrame/@Tier}"/>
+                <Action type="SetProperty" frame="WarChestTierFrame" RewardGroup="{$WarChestFrame/ZergWarChest/WarChestNode5/WarChestTierFrame/@RewardGroup}"/>
+            </State>
+            
+            <State name="ZergTier7">
+                <When type="Property" Bundle="{$WarChestFrame/ZergWarChest/WarChestNode6/WarChestTierFrame/@Bundle}"/>
+                <Action type="SetProperty" frame="WarChestTierFrame" Season="{$WarChestFrame/ZergWarChest/WarChestNode6/WarChestTierFrame/@Season}"/>
+                <Action type="SetProperty" frame="WarChestTierFrame" Round="{$WarChestFrame/ZergWarChest/WarChestNode6/WarChestTierFrame/@Round}"/>
+                <Action type="SetProperty" frame="WarChestTierFrame" Tier="{$WarChestFrame/ZergWarChest/WarChestNode6/WarChestTierFrame/@Tier}"/>
+                <Action type="SetProperty" frame="WarChestTierFrame" RewardGroup="{$WarChestFrame/ZergWarChest/WarChestNode6/WarChestTierFrame/@RewardGroup}"/>
+            </State>
+            
+            <State name="ZergTier8">
+                <When type="Property" Bundle="{$WarChestFrame/ZergWarChest/WarChestNode7/WarChestTierFrame/@Bundle}"/>
+                <Action type="SetProperty" frame="WarChestTierFrame" Season="{$WarChestFrame/ZergWarChest/WarChestNode7/WarChestTierFrame/@Season}"/>
+                <Action type="SetProperty" frame="WarChestTierFrame" Round="{$WarChestFrame/ZergWarChest/WarChestNode7/WarChestTierFrame/@Round}"/>
+                <Action type="SetProperty" frame="WarChestTierFrame" Tier="{$WarChestFrame/ZergWarChest/WarChestNode7/WarChestTierFrame/@Tier}"/>
+                <Action type="SetProperty" frame="WarChestTierFrame" RewardGroup="{$WarChestFrame/ZergWarChest/WarChestNode7/WarChestTierFrame/@RewardGroup}"/>
+            </State>
+            
+            <State name="ZergTier9">
+                <When type="Property" Bundle="{$WarChestFrame/ZergWarChest/WarChestNode8/WarChestTierFrame/@Bundle}"/>
+                <Action type="SetProperty" frame="WarChestTierFrame" Season="{$WarChestFrame/ZergWarChest/WarChestNode8/WarChestTierFrame/@Season}"/>
+                <Action type="SetProperty" frame="WarChestTierFrame" Round="{$WarChestFrame/ZergWarChest/WarChestNode8/WarChestTierFrame/@Round}"/>
+                <Action type="SetProperty" frame="WarChestTierFrame" Tier="{$WarChestFrame/ZergWarChest/WarChestNode8/WarChestTierFrame/@Tier}"/>
+                <Action type="SetProperty" frame="WarChestTierFrame" RewardGroup="{$WarChestFrame/ZergWarChest/WarChestNode8/WarChestTierFrame/@RewardGroup}"/>
+            </State>
+            
+            <State name="ZergTier10">
+                <When type="Property" Bundle="{$WarChestFrame/ZergWarChest/WarChestNode9/WarChestTierFrame/@Bundle}"/>
+                <Action type="SetProperty" frame="WarChestTierFrame" Season="{$WarChestFrame/ZergWarChest/WarChestNode9/WarChestTierFrame/@Season}"/>
+                <Action type="SetProperty" frame="WarChestTierFrame" Round="{$WarChestFrame/ZergWarChest/WarChestNode9/WarChestTierFrame/@Round}"/>
+                <Action type="SetProperty" frame="WarChestTierFrame" Tier="{$WarChestFrame/ZergWarChest/WarChestNode9/WarChestTierFrame/@Tier}"/>
+                <Action type="SetProperty" frame="WarChestTierFrame" RewardGroup="{$WarChestFrame/ZergWarChest/WarChestNode9/WarChestTierFrame/@RewardGroup}"/>
+            </State>
+            
+            <State name="ZergTier11">
+                <When type="Property" Bundle="{$WarChestFrame/ZergWarChest/WarChestNode10/WarChestTierFrame/@Bundle}"/>
+                <Action type="SetProperty" frame="WarChestTierFrame" Season="{$WarChestFrame/ZergWarChest/WarChestNode10/WarChestTierFrame/@Season}"/>
+                <Action type="SetProperty" frame="WarChestTierFrame" Round="{$WarChestFrame/ZergWarChest/WarChestNode10/WarChestTierFrame/@Round}"/>
+                <Action type="SetProperty" frame="WarChestTierFrame" Tier="{$WarChestFrame/ZergWarChest/WarChestNode10/WarChestTierFrame/@Tier}"/>
+                <Action type="SetProperty" frame="WarChestTierFrame" RewardGroup="{$WarChestFrame/ZergWarChest/WarChestNode10/WarChestTierFrame/@RewardGroup}"/>
+            </State>
+            
+            <State name="ZergTier12">
+                <When type="Property" Bundle="{$WarChestFrame/ZergWarChest/WarChestNode11/WarChestTierFrame/@Bundle}"/>
+                <Action type="SetProperty" frame="WarChestTierFrame" Season="{$WarChestFrame/ZergWarChest/WarChestNode11/WarChestTierFrame/@Season}"/>
+                <Action type="SetProperty" frame="WarChestTierFrame" Round="{$WarChestFrame/ZergWarChest/WarChestNode11/WarChestTierFrame/@Round}"/>
+                <Action type="SetProperty" frame="WarChestTierFrame" Tier="{$WarChestFrame/ZergWarChest/WarChestNode11/WarChestTierFrame/@Tier}"/>
+                <Action type="SetProperty" frame="WarChestTierFrame" RewardGroup="{$WarChestFrame/ZergWarChest/WarChestNode11/WarChestTierFrame/@RewardGroup}"/>
+            </State>
+            
+            <State name="ZergTier13">
+                <When type="Property" Bundle="{$WarChestFrame/ZergWarChest/WarChestNode12/WarChestTierFrame/@Bundle}"/>
+                <Action type="SetProperty" frame="WarChestTierFrame" Season="{$WarChestFrame/ZergWarChest/WarChestNode12/WarChestTierFrame/@Season}"/>
+                <Action type="SetProperty" frame="WarChestTierFrame" Round="{$WarChestFrame/ZergWarChest/WarChestNode12/WarChestTierFrame/@Round}"/>
+                <Action type="SetProperty" frame="WarChestTierFrame" Tier="{$WarChestFrame/ZergWarChest/WarChestNode12/WarChestTierFrame/@Tier}"/>
+                <Action type="SetProperty" frame="WarChestTierFrame" RewardGroup="{$WarChestFrame/ZergWarChest/WarChestNode12/WarChestTierFrame/@RewardGroup}"/>
+            </State>
+            
+            <State name="ZergTier14">
+                <When type="Property" Bundle="{$WarChestFrame/ZergWarChest/WarChestNode13/WarChestTierFrame/@Bundle}"/>
+                <Action type="SetProperty" frame="WarChestTierFrame" Season="{$WarChestFrame/ZergWarChest/WarChestNode13/WarChestTierFrame/@Season}"/>
+                <Action type="SetProperty" frame="WarChestTierFrame" Round="{$WarChestFrame/ZergWarChest/WarChestNode13/WarChestTierFrame/@Round}"/>
+                <Action type="SetProperty" frame="WarChestTierFrame" Tier="{$WarChestFrame/ZergWarChest/WarChestNode13/WarChestTierFrame/@Tier}"/>
+                <Action type="SetProperty" frame="WarChestTierFrame" RewardGroup="{$WarChestFrame/ZergWarChest/WarChestNode13/WarChestTierFrame/@RewardGroup}"/>
+            </State>
+            
+            <State name="ZergTier15">
+                <When type="Property" Bundle="{$WarChestFrame/ZergWarChest/WarChestNode14/WarChestTierFrame/@Bundle}"/>
+                <Action type="SetProperty" frame="WarChestTierFrame" Season="{$WarChestFrame/ZergWarChest/WarChestNode14/WarChestTierFrame/@Season}"/>
+                <Action type="SetProperty" frame="WarChestTierFrame" Round="{$WarChestFrame/ZergWarChest/WarChestNode14/WarChestTierFrame/@Round}"/>
+                <Action type="SetProperty" frame="WarChestTierFrame" Tier="{$WarChestFrame/ZergWarChest/WarChestNode14/WarChestTierFrame/@Tier}"/>
+                <Action type="SetProperty" frame="WarChestTierFrame" RewardGroup="{$WarChestFrame/ZergWarChest/WarChestNode14/WarChestTierFrame/@RewardGroup}"/>
+            </State>
+            
+            <State name="ProtossTier1">
+                <When type="Property" Bundle="{$WarChestFrame/ProtossWarChest/WarChestNode0/WarChestTierFrame/@Bundle}"/>
+                <Action type="SetProperty" frame="WarChestTierFrame" Season="{$WarChestFrame/ProtossWarChest/WarChestNode0/WarChestTierFrame/@Season}"/>
+                <Action type="SetProperty" frame="WarChestTierFrame" Round="{$WarChestFrame/ProtossWarChest/WarChestNode0/WarChestTierFrame/@Round}"/>
+                <Action type="SetProperty" frame="WarChestTierFrame" Tier="{$WarChestFrame/ProtossWarChest/WarChestNode0/WarChestTierFrame/@Tier}"/>
+                <Action type="SetProperty" frame="WarChestTierFrame" RewardGroup="{$WarChestFrame/ProtossWarChest/WarChestNode0/WarChestTierFrame/@RewardGroup}"/>
+            </State>
+            
+            <State name="ProtossTier2">
+                <When type="Property" Bundle="{$WarChestFrame/ProtossWarChest/WarChestNode1/WarChestTierFrame/@Bundle}"/>
+                <Action type="SetProperty" frame="WarChestTierFrame" Season="{$WarChestFrame/ProtossWarChest/WarChestNode1/WarChestTierFrame/@Season}"/>
+                <Action type="SetProperty" frame="WarChestTierFrame" Round="{$WarChestFrame/ProtossWarChest/WarChestNode1/WarChestTierFrame/@Round}"/>
+                <Action type="SetProperty" frame="WarChestTierFrame" Tier="{$WarChestFrame/ProtossWarChest/WarChestNode1/WarChestTierFrame/@Tier}"/>
+                <Action type="SetProperty" frame="WarChestTierFrame" RewardGroup="{$WarChestFrame/ProtossWarChest/WarChestNode1/WarChestTierFrame/@RewardGroup}"/>
+            </State>
+            
+            <State name="ProtossTier3">
+                <When type="Property" Bundle="{$WarChestFrame/ProtossWarChest/WarChestNode2/WarChestTierFrame/@Bundle}"/>
+                <Action type="SetProperty" frame="WarChestTierFrame" Season="{$WarChestFrame/ProtossWarChest/WarChestNode2/WarChestTierFrame/@Season}"/>
+                <Action type="SetProperty" frame="WarChestTierFrame" Round="{$WarChestFrame/ProtossWarChest/WarChestNode2/WarChestTierFrame/@Round}"/>
+                <Action type="SetProperty" frame="WarChestTierFrame" Tier="{$WarChestFrame/ProtossWarChest/WarChestNode2/WarChestTierFrame/@Tier}"/>
+                <Action type="SetProperty" frame="WarChestTierFrame" RewardGroup="{$WarChestFrame/ProtossWarChest/WarChestNode2/WarChestTierFrame/@RewardGroup}"/>
+            </State>
+            
+            <State name="ProtossTier4">
+                <When type="Property" Bundle="{$WarChestFrame/ProtossWarChest/WarChestNode3/WarChestTierFrame/@Bundle}"/>
+                <Action type="SetProperty" frame="WarChestTierFrame" Season="{$WarChestFrame/ProtossWarChest/WarChestNode3/WarChestTierFrame/@Season}"/>
+                <Action type="SetProperty" frame="WarChestTierFrame" Round="{$WarChestFrame/ProtossWarChest/WarChestNode3/WarChestTierFrame/@Round}"/>
+                <Action type="SetProperty" frame="WarChestTierFrame" Tier="{$WarChestFrame/ProtossWarChest/WarChestNode3/WarChestTierFrame/@Tier}"/>
+                <Action type="SetProperty" frame="WarChestTierFrame" RewardGroup="{$WarChestFrame/ProtossWarChest/WarChestNode3/WarChestTierFrame/@RewardGroup}"/>
+            </State>
+            
+            <State name="ProtossTier5">
+                <When type="Property" Bundle="{$WarChestFrame/ProtossWarChest/WarChestNode4/WarChestTierFrame/@Bundle}"/>
+                <Action type="SetProperty" frame="WarChestTierFrame" Season="{$WarChestFrame/ProtossWarChest/WarChestNode4/WarChestTierFrame/@Season}"/>
+                <Action type="SetProperty" frame="WarChestTierFrame" Round="{$WarChestFrame/ProtossWarChest/WarChestNode4/WarChestTierFrame/@Round}"/>
+                <Action type="SetProperty" frame="WarChestTierFrame" Tier="{$WarChestFrame/ProtossWarChest/WarChestNode4/WarChestTierFrame/@Tier}"/>
+                <Action type="SetProperty" frame="WarChestTierFrame" RewardGroup="{$WarChestFrame/ProtossWarChest/WarChestNode4/WarChestTierFrame/@RewardGroup}"/>
+            </State>
+            
+            <State name="ProtossTier6">
+                <When type="Property" Bundle="{$WarChestFrame/ProtossWarChest/WarChestNode5/WarChestTierFrame/@Bundle}"/>
+                <Action type="SetProperty" frame="WarChestTierFrame" Season="{$WarChestFrame/ProtossWarChest/WarChestNode5/WarChestTierFrame/@Season}"/>
+                <Action type="SetProperty" frame="WarChestTierFrame" Round="{$WarChestFrame/ProtossWarChest/WarChestNode5/WarChestTierFrame/@Round}"/>
+                <Action type="SetProperty" frame="WarChestTierFrame" Tier="{$WarChestFrame/ProtossWarChest/WarChestNode5/WarChestTierFrame/@Tier}"/>
+                <Action type="SetProperty" frame="WarChestTierFrame" RewardGroup="{$WarChestFrame/ProtossWarChest/WarChestNode5/WarChestTierFrame/@RewardGroup}"/>
+            </State>
+            
+            <State name="ProtossTier7">
+                <When type="Property" Bundle="{$WarChestFrame/ProtossWarChest/WarChestNode6/WarChestTierFrame/@Bundle}"/>
+                <Action type="SetProperty" frame="WarChestTierFrame" Season="{$WarChestFrame/ProtossWarChest/WarChestNode6/WarChestTierFrame/@Season}"/>
+                <Action type="SetProperty" frame="WarChestTierFrame" Round="{$WarChestFrame/ProtossWarChest/WarChestNode6/WarChestTierFrame/@Round}"/>
+                <Action type="SetProperty" frame="WarChestTierFrame" Tier="{$WarChestFrame/ProtossWarChest/WarChestNode6/WarChestTierFrame/@Tier}"/>
+                <Action type="SetProperty" frame="WarChestTierFrame" RewardGroup="{$WarChestFrame/ProtossWarChest/WarChestNode6/WarChestTierFrame/@RewardGroup}"/>
+            </State>
+            
+            <State name="ProtossTier8">
+                <When type="Property" Bundle="{$WarChestFrame/ProtossWarChest/WarChestNode7/WarChestTierFrame/@Bundle}"/>
+                <Action type="SetProperty" frame="WarChestTierFrame" Season="{$WarChestFrame/ProtossWarChest/WarChestNode7/WarChestTierFrame/@Season}"/>
+                <Action type="SetProperty" frame="WarChestTierFrame" Round="{$WarChestFrame/ProtossWarChest/WarChestNode7/WarChestTierFrame/@Round}"/>
+                <Action type="SetProperty" frame="WarChestTierFrame" Tier="{$WarChestFrame/ProtossWarChest/WarChestNode7/WarChestTierFrame/@Tier}"/>
+                <Action type="SetProperty" frame="WarChestTierFrame" RewardGroup="{$WarChestFrame/ProtossWarChest/WarChestNode7/WarChestTierFrame/@RewardGroup}"/>
+            </State>
+            
+            <State name="ProtossTier9">
+                <When type="Property" Bundle="{$WarChestFrame/ProtossWarChest/WarChestNode8/WarChestTierFrame/@Bundle}"/>
+                <Action type="SetProperty" frame="WarChestTierFrame" Season="{$WarChestFrame/ProtossWarChest/WarChestNode8/WarChestTierFrame/@Season}"/>
+                <Action type="SetProperty" frame="WarChestTierFrame" Round="{$WarChestFrame/ProtossWarChest/WarChestNode8/WarChestTierFrame/@Round}"/>
+                <Action type="SetProperty" frame="WarChestTierFrame" Tier="{$WarChestFrame/ProtossWarChest/WarChestNode8/WarChestTierFrame/@Tier}"/>
+                <Action type="SetProperty" frame="WarChestTierFrame" RewardGroup="{$WarChestFrame/ProtossWarChest/WarChestNode8/WarChestTierFrame/@RewardGroup}"/>
+            </State>
+            
+            <State name="ProtossTier10">
+                <When type="Property" Bundle="{$WarChestFrame/ProtossWarChest/WarChestNode9/WarChestTierFrame/@Bundle}"/>
+                <Action type="SetProperty" frame="WarChestTierFrame" Season="{$WarChestFrame/ProtossWarChest/WarChestNode9/WarChestTierFrame/@Season}"/>
+                <Action type="SetProperty" frame="WarChestTierFrame" Round="{$WarChestFrame/ProtossWarChest/WarChestNode9/WarChestTierFrame/@Round}"/>
+                <Action type="SetProperty" frame="WarChestTierFrame" Tier="{$WarChestFrame/ProtossWarChest/WarChestNode9/WarChestTierFrame/@Tier}"/>
+                <Action type="SetProperty" frame="WarChestTierFrame" RewardGroup="{$WarChestFrame/ProtossWarChest/WarChestNode9/WarChestTierFrame/@RewardGroup}"/>
+            </State>
+            
+            <State name="ProtossTier11">
+                <When type="Property" Bundle="{$WarChestFrame/ProtossWarChest/WarChestNode10/WarChestTierFrame/@Bundle}"/>
+                <Action type="SetProperty" frame="WarChestTierFrame" Season="{$WarChestFrame/ProtossWarChest/WarChestNode10/WarChestTierFrame/@Season}"/>
+                <Action type="SetProperty" frame="WarChestTierFrame" Round="{$WarChestFrame/ProtossWarChest/WarChestNode10/WarChestTierFrame/@Round}"/>
+                <Action type="SetProperty" frame="WarChestTierFrame" Tier="{$WarChestFrame/ProtossWarChest/WarChestNode10/WarChestTierFrame/@Tier}"/>
+                <Action type="SetProperty" frame="WarChestTierFrame" RewardGroup="{$WarChestFrame/ProtossWarChest/WarChestNode10/WarChestTierFrame/@RewardGroup}"/>
+            </State>
+            
+            <State name="ProtossTier12">
+                <When type="Property" Bundle="{$WarChestFrame/ProtossWarChest/WarChestNode11/WarChestTierFrame/@Bundle}"/>
+                <Action type="SetProperty" frame="WarChestTierFrame" Season="{$WarChestFrame/ProtossWarChest/WarChestNode11/WarChestTierFrame/@Season}"/>
+                <Action type="SetProperty" frame="WarChestTierFrame" Round="{$WarChestFrame/ProtossWarChest/WarChestNode11/WarChestTierFrame/@Round}"/>
+                <Action type="SetProperty" frame="WarChestTierFrame" Tier="{$WarChestFrame/ProtossWarChest/WarChestNode11/WarChestTierFrame/@Tier}"/>
+                <Action type="SetProperty" frame="WarChestTierFrame" RewardGroup="{$WarChestFrame/ProtossWarChest/WarChestNode11/WarChestTierFrame/@RewardGroup}"/>
+            </State>
+            
+            <State name="ProtossTier13">
+                <When type="Property" Bundle="{$WarChestFrame/ProtossWarChest/WarChestNode12/WarChestTierFrame/@Bundle}"/>
+                <Action type="SetProperty" frame="WarChestTierFrame" Season="{$WarChestFrame/ProtossWarChest/WarChestNode12/WarChestTierFrame/@Season}"/>
+                <Action type="SetProperty" frame="WarChestTierFrame" Round="{$WarChestFrame/ProtossWarChest/WarChestNode12/WarChestTierFrame/@Round}"/>
+                <Action type="SetProperty" frame="WarChestTierFrame" Tier="{$WarChestFrame/ProtossWarChest/WarChestNode12/WarChestTierFrame/@Tier}"/>
+                <Action type="SetProperty" frame="WarChestTierFrame" RewardGroup="{$WarChestFrame/ProtossWarChest/WarChestNode12/WarChestTierFrame/@RewardGroup}"/>
+            </State>
+            
+            <State name="ProtossTier14">
+                <When type="Property" Bundle="{$WarChestFrame/ProtossWarChest/WarChestNode13/WarChestTierFrame/@Bundle}"/>
+                <Action type="SetProperty" frame="WarChestTierFrame" Season="{$WarChestFrame/ProtossWarChest/WarChestNode13/WarChestTierFrame/@Season}"/>
+                <Action type="SetProperty" frame="WarChestTierFrame" Round="{$WarChestFrame/ProtossWarChest/WarChestNode13/WarChestTierFrame/@Round}"/>
+                <Action type="SetProperty" frame="WarChestTierFrame" Tier="{$WarChestFrame/ProtossWarChest/WarChestNode13/WarChestTierFrame/@Tier}"/>
+                <Action type="SetProperty" frame="WarChestTierFrame" RewardGroup="{$WarChestFrame/ProtossWarChest/WarChestNode13/WarChestTierFrame/@RewardGroup}"/>
+            </State>
+            
+            <State name="ProtossTier15">
+                <When type="Property" Bundle="{$WarChestFrame/ProtossWarChest/WarChestNode14/WarChestTierFrame/@Bundle}"/>
+                <Action type="SetProperty" frame="WarChestTierFrame" Season="{$WarChestFrame/ProtossWarChest/WarChestNode14/WarChestTierFrame/@Season}"/>
+                <Action type="SetProperty" frame="WarChestTierFrame" Round="{$WarChestFrame/ProtossWarChest/WarChestNode14/WarChestTierFrame/@Round}"/>
+                <Action type="SetProperty" frame="WarChestTierFrame" Tier="{$WarChestFrame/ProtossWarChest/WarChestNode14/WarChestTierFrame/@Tier}"/>
+                <Action type="SetProperty" frame="WarChestTierFrame" RewardGroup="{$WarChestFrame/ProtossWarChest/WarChestNode14/WarChestTierFrame/@RewardGroup}"/>
+            </State>
+        </StateGroup>
+    </Frame>
+</Desc>

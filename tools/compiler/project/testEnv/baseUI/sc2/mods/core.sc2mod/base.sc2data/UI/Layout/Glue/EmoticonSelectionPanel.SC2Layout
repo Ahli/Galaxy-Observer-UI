@@ -1,53 +1,58 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <Desc>
     <DescFlags val="Locked"/>
+    <Constant name="EmojiItemBGColor_Prot" val="10,155,255"/>
+    <Constant name="EmojiItemBGColor_Zerg" val="200,90,0"/>
+    <Constant name="EmojiItemBGColor_Terr" val="0,200,90"/>
+    <Constant name="PageSelectorColor_Prot" val="60,170,255"/>
+    <Constant name="PageSelectorColor_Zerg" val="255,150,0"/>
+    <Constant name="PageSelectorColor_Terr" val="40,215,51"/>
     
     <Constant name="TileHorizontalSpace" val="3"/>
     <Constant name="TileVerticalSpace" val="3"/>
     
     <Frame type="Button" name="EmoticonButtonTemplate">
-        <Width val="62"/>
-        <Height val="61"/>
+        <Width val="32"/>
+        <Height val="32"/>
         <DisplayType val="ImageLayer"/>
         <ClickSound val="@UI_EmoticonButtonClick"/>
-        
-        <Frame type="Image" name="NormalImage">
-            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
-            <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
-            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
-            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
-            <LayerCount val="4"/>
-            <Texture val="@UI/Glues_BlueButtons_SmallTaskBarButton_Normal" layer="0"/>
-            <Texture val="@UI/Glues_BlueButtons_SmallTaskBarButton_Down" layer="1"/>
-            <Texture val="@UI/Glues_BlueButtons_SmallTaskBarButton_Down" layer="2"/>
-            <Texture val="@UI/Glues_BlueButtons_SmallTaskBarButton_Disabled" layer="3"/>
-            <StateCount val="1"/>
+
+        <Frame type="Image" name="DropShadowImage">
+            <Anchor side="Top" relative="$parent/NormalImage" pos="Min" offset="2"/>
+            <Anchor side="Left" relative="$parent/NormalImage" pos="Min" offset="1"/>
+            <Texture val="@UI/Glues_Icons_Emojis"/>
+            <Height val="26"/>
+            <Width val="26"/>
             <DesaturateOnDisable val="false"/>
+            <DisabledAlpha val="100"/>
+            <ColorAdjustMode val="Fill"/>
+            <AdjustmentColor val="255,0,0,0"/>
+        </Frame>
+
+        <Frame type="Image" name="NormalImage">
+            <Anchor side="Top" relative="$parent" pos="Mid" offset="-1"/>
+            <Anchor side="Bottom" relative="$parent" pos="Mid" offset="-1"/>
+            <Anchor side="Left" relative="$parent" pos="Mid" offset="1"/>
+            <Anchor side="Right" relative="$parent" pos="Mid" offset="1"/>
+            <Texture val="@UI/Glues_Icons_Emojis"/>
+            <Height val="26"/>
+            <Width val="26"/>
+            <DesaturateOnDisable val="false"/>
+            <DisabledAlpha val="100"/>
         </Frame>
 
         <Frame type="Image" name="HoverImage">
-            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
-            <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
-            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
-            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
-            <LayerCount val="4"/>
-            <Texture val="@UI/Glues_BlueButtons_SmallTaskBarButton_Hover" layer="0"/>
-            <Texture val="@UI/Glues_BlueButtons_SmallTaskBarButton_Down" layer="1"/>
-            <Texture val="@UI/Glues_BlueButtons_SmallTaskBarButton_Down" layer="2"/>
-            <Texture val="@UI/Glues_BlueButtons_SmallTaskBarButton_Disabled" layer="3"/>
-            <StateCount val="1"/>
-            <DesaturateOnDisable val="false"/>
-        </Frame>
-
-        <Frame type="Image" name="EmoticonIcon">
-            <Anchor side="Top" relative="$parent" pos="Min" offset="18"/>
+            <Anchor side="Top" relative="$parent" pos="Mid" offset="-1"/>
+            <Anchor side="Bottom" relative="$parent" pos="Mid" offset="-1"/>
             <Anchor side="Left" relative="$parent" pos="Mid" offset="1"/>
             <Anchor side="Right" relative="$parent" pos="Mid" offset="1"/>
-            <Texture val="@UI/Glues_Icons_Emoticons"/>
-            <Height val="28"/>
-            <Width val="27"/>
+            <Texture val="@UI/Glues_Icons_Emojis"/>
+            <Height val="26"/>
+            <Width val="26"/>
             <DesaturateOnDisable val="false"/>
             <DisabledAlpha val="100"/>
+            <ColorAdjustMode val="AddSelf"/>
+            <AdjustmentColor val="96,96,96,96"/>
         </Frame>
     </Frame>
     
@@ -232,10 +237,9 @@
         <Width val="30"/>
         <Height val="30"/>
         <TooltipFrame val="EmoticonTooltip"/>
-        <Enabled val="{$this/@EmoticonAllowed}"/>
-        <Tooltip val="{$this/@EmoticonDescription}"/>
+        <Enabled val="false"/>
 
-        <Frame type="AchievementInfoFrame" name="AchievementInfoFrame" template="StandardTemplates/AchievementInfoFrameTemplate">
+        <Frame type="AchievementInfoFrame" name="AchievementInfoFrame">
             <Anchor relative="$parent"/>
             <Visible val="false"/>
             <AchievementId val="{$parent/@AchievementId}"/>
@@ -245,8 +249,18 @@
         <Frame type="StandardTooltip" name="EmoticonTooltip" template="StandardTooltip/StandardBattlenetTooltipTemplate"/>
 
         <StateGroup name="DisabledStateGroup">
-            <State name="VisibleState">
-                <When type="Property" frame="$this" EmoticonAllowed="false"/>
+            <DefaultState val="DisabledState"/>
+            
+            <State name="EnabledState">
+                <When type="Property" frame="$this" EmoticonAllowed="true"/>
+                <When type="Property" frame="$this" EmoticonAwarded="true"/>
+                <Action type="SetProperty" Enabled="true"/>
+                <Action type="SetProperty" frame="Background" Alpha="255"/>
+                <Action type="SetProperty" frame="Icon" Alpha="255"/>
+            </State>
+            
+            <State name="DisabledState">
+                <Action type="SetProperty" Enabled="false"/>
                 <Action type="SetProperty" frame="Background" Alpha="100"/>
                 <Action type="SetProperty" frame="Icon" Alpha="100"/>
                 <Action type="SetProperty" frame="Icon" ColorAdjustMode="Colorize"/>
@@ -290,13 +304,6 @@
             <ManagedAnim val="true"/>
             <LoopingAnim val="true"/>
         </Frame>
-
-        <Frame type="Frame" name="DisabledTooltipFrame">
-            <Anchor relative="$parent"/>
-            <AcceptsMouseTooltip val="true"/>
-            <TooltipFrame val="EmoticonTooltip"/>
-            <Tooltip val="{$parent/@EmoticonDescriptionLocked}"/>
-        </Frame>
         
         <Frame type="EmoticonAchievementFrame" name="AchievementFrame">
             <Anchor relative="$parent"/>
@@ -310,12 +317,14 @@
         </Frame>
 
         <StateGroup name="TooltipStateGroup">
+            <DefaultState val="EnabledState"/>
+            
             <State name="AchievementStateHiddenTillAwarded">
                 <When type="Property" frame="$this" EmoticonAllowed="false"/>
                 <When type="AnimationState" frame="AchievementFrame" AchievementState="HasAchievement"/>
                 <When type="Property" frame="AchievementInfoFrame" HiddenUntilAwarded="true"/>
                 <Action type="SetProperty" frame="AchievementFrame" Visible="true"/>
-                <Action type="SetProperty" frame="DisabledTooltipFrame" Visible="false"/>
+                <Action type="SetProperty" frame="$this" Tooltip="{$this/@EmoticonDescription}"/>
             </State>
 
             <State name="AchievementStateHidden">
@@ -323,26 +332,26 @@
                 <When type="AnimationState" frame="AchievementFrame" AchievementState="HasAchievement"/>
                 <When type="Property" frame="AchievementInfoFrame" Hidden="true"/>
                 <Action type="SetProperty" frame="AchievementFrame" Visible="false"/>
-                <Action type="SetProperty" frame="DisabledTooltipFrame" Visible="true"/>
+                <Action type="SetProperty" frame="$this" Tooltip="{$this/@EmoticonDescriptionLocked}"/>
             </State>
 
             <State name="AchievementState">
                 <When type="Property" frame="$this" EmoticonAllowed="false"/>
                 <When type="AnimationState" frame="AchievementFrame" AchievementState="HasAchievement"/>
                 <Action type="SetProperty" frame="AchievementFrame" Visible="true"/>
-                <Action type="SetProperty" frame="DisabledTooltipFrame" Visible="false"/>
+                <Action type="SetProperty" frame="$this" Tooltip="{$this/@EmoticonDescription}"/>
             </State>
 
             <State name="DisabledState">
-                <When type="Property" frame="$this" EmoticonAllowed="false"/>
+                <When type="StateGroup" frame="$this" DisabledStateGroup="DisabledState"/>
                 <Action type="SetProperty" frame="AchievementFrame" Visible="false"/>
-                <Action type="SetProperty" frame="DisabledTooltipFrame" Visible="true"/>
+                <Action type="SetProperty" frame="$this" Tooltip="{$this/@EmoticonDescriptionLocked}"/>
             </State>
 
             <State name="EnabledState">
-                <When type="Property" frame="$this" EmoticonAllowed="true"/>
+                <When type="StateGroup" frame="$this" DisabledStateGroup="EnabledState"/>
                 <Action type="SetProperty" frame="AchievementFrame" Visible="false"/>
-                <Action type="SetProperty" frame="DisabledTooltipFrame" Visible="false"/>
+                <Action type="SetProperty" frame="$this" Tooltip="{$this/@EmoticonDescription}"/>
             </State>
         </StateGroup>
 
@@ -360,8 +369,8 @@
     </Frame>
     
     <Frame type="EmoticonSelectionPanel" name="EmoticonSelectionPanelTemplate">
-        <Width val="272"/>
-        <Height val="378"/>
+        <Width val="371"/>
+        <Height val="550"/>
         
         <Frame type="BlurFrame" name="BlurBackground">
             <Anchor side="Top" relative="$parent/Background" pos="Min" offset="5"/>
@@ -385,7 +394,7 @@
         <Frame type="Image" name="BackgroundInner">
             <Anchor side="Top" relative="$parent/Background" pos="Min" offset="50"/>
             <Anchor side="Left" relative="$parent/Background" pos="Min" offset="12"/>
-            <Anchor side="Bottom" relative="$parent/Background" pos="Max" offset="-49"/>
+            <Anchor side="Bottom" relative="$parent/Background" pos="Max" offset="-56"/>
             <Anchor side="Right" relative="$parent/Background" pos="Max" offset="-12"/>
             <TextureType val="Nineslice"/>
             <Texture val="@UI/Glues_Battlenet_PageAssets_MainInnerContainer"/>
@@ -439,25 +448,25 @@
                 <Anchor side="Left" relative="$parent/Item5" pos="Max" offset="#TileHorizontalSpace"/>
             </Frame>
             
-            <!-- Row 2 -->
             <Frame type="EmoticonTileListItem" name="Item7" template="EmoticonSelectionPanel/EmoticonTileListItemTemplate">
-                <Anchor side="Top" relative="$parent/Item0" pos="Max" offset="#TileVerticalSpace"/>
-                <Anchor side="Left" relative="$parent/Item0" pos="Min" offset="0"/>
+                <Anchor side="Top" relative="$parent/Item6" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item6" pos="Max" offset="#TileHorizontalSpace"/>
             </Frame>
-
+            
             <Frame type="EmoticonTileListItem" name="Item8" template="EmoticonSelectionPanel/EmoticonTileListItemTemplate">
                 <Anchor side="Top" relative="$parent/Item7" pos="Min" offset="0"/>
                 <Anchor side="Left" relative="$parent/Item7" pos="Max" offset="#TileHorizontalSpace"/>
             </Frame>
-
+            
             <Frame type="EmoticonTileListItem" name="Item9" template="EmoticonSelectionPanel/EmoticonTileListItemTemplate">
                 <Anchor side="Top" relative="$parent/Item8" pos="Min" offset="0"/>
                 <Anchor side="Left" relative="$parent/Item8" pos="Max" offset="#TileHorizontalSpace"/>
             </Frame>
-
+            
+            <!-- Row 2 -->
             <Frame type="EmoticonTileListItem" name="Item10" template="EmoticonSelectionPanel/EmoticonTileListItemTemplate">
-                <Anchor side="Top" relative="$parent/Item9" pos="Min" offset="0"/>
-                <Anchor side="Left" relative="$parent/Item9" pos="Max" offset="#TileHorizontalSpace"/>
+                <Anchor side="Top" relative="$parent/Item0" pos="Max" offset="#TileVerticalSpace"/>
+                <Anchor side="Left" relative="$parent/Item0" pos="Min" offset="0"/>
             </Frame>
 
             <Frame type="EmoticonTileListItem" name="Item11" template="EmoticonSelectionPanel/EmoticonTileListItemTemplate">
@@ -474,11 +483,10 @@
                 <Anchor side="Top" relative="$parent/Item12" pos="Min" offset="0"/>
                 <Anchor side="Left" relative="$parent/Item12" pos="Max" offset="#TileHorizontalSpace"/>
             </Frame>
-            
-            <!-- Row 3 -->
+
             <Frame type="EmoticonTileListItem" name="Item14" template="EmoticonSelectionPanel/EmoticonTileListItemTemplate">
-                <Anchor side="Top" relative="$parent/Item7" pos="Max" offset="#TileVerticalSpace"/>
-                <Anchor side="Left" relative="$parent/Item7" pos="Min" offset="0"/>
+                <Anchor side="Top" relative="$parent/Item13" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item13" pos="Max" offset="#TileHorizontalSpace"/>
             </Frame>
 
             <Frame type="EmoticonTileListItem" name="Item15" template="EmoticonSelectionPanel/EmoticonTileListItemTemplate">
@@ -500,21 +508,21 @@
                 <Anchor side="Top" relative="$parent/Item17" pos="Min" offset="0"/>
                 <Anchor side="Left" relative="$parent/Item17" pos="Max" offset="#TileHorizontalSpace"/>
             </Frame>
-            
+
             <Frame type="EmoticonTileListItem" name="Item19" template="EmoticonSelectionPanel/EmoticonTileListItemTemplate">
                 <Anchor side="Top" relative="$parent/Item18" pos="Min" offset="0"/>
                 <Anchor side="Left" relative="$parent/Item18" pos="Max" offset="#TileHorizontalSpace"/>
             </Frame>
             
+            <!-- Row 3 -->
             <Frame type="EmoticonTileListItem" name="Item20" template="EmoticonSelectionPanel/EmoticonTileListItemTemplate">
-                <Anchor side="Top" relative="$parent/Item19" pos="Min" offset="0"/>
-                <Anchor side="Left" relative="$parent/Item19" pos="Max" offset="#TileHorizontalSpace"/>
+                <Anchor side="Top" relative="$parent/Item10" pos="Max" offset="#TileVerticalSpace"/>
+                <Anchor side="Left" relative="$parent/Item10" pos="Min" offset="0"/>
             </Frame>
-            
-            <!-- Row 4 -->
+
             <Frame type="EmoticonTileListItem" name="Item21" template="EmoticonSelectionPanel/EmoticonTileListItemTemplate">
-                <Anchor side="Top" relative="$parent/Item14" pos="Max" offset="#TileVerticalSpace"/>
-                <Anchor side="Left" relative="$parent/Item14" pos="Min" offset="0"/>
+                <Anchor side="Top" relative="$parent/Item20" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item20" pos="Max" offset="#TileHorizontalSpace"/>
             </Frame>
 
             <Frame type="EmoticonTileListItem" name="Item22" template="EmoticonSelectionPanel/EmoticonTileListItemTemplate">
@@ -531,7 +539,7 @@
                 <Anchor side="Top" relative="$parent/Item23" pos="Min" offset="0"/>
                 <Anchor side="Left" relative="$parent/Item23" pos="Max" offset="#TileHorizontalSpace"/>
             </Frame>
-
+            
             <Frame type="EmoticonTileListItem" name="Item25" template="EmoticonSelectionPanel/EmoticonTileListItemTemplate">
                 <Anchor side="Top" relative="$parent/Item24" pos="Min" offset="0"/>
                 <Anchor side="Left" relative="$parent/Item24" pos="Max" offset="#TileHorizontalSpace"/>
@@ -547,20 +555,20 @@
                 <Anchor side="Left" relative="$parent/Item26" pos="Max" offset="#TileHorizontalSpace"/>
             </Frame>
             
-            <!-- Row 5 -->
             <Frame type="EmoticonTileListItem" name="Item28" template="EmoticonSelectionPanel/EmoticonTileListItemTemplate">
-                <Anchor side="Top" relative="$parent/Item21" pos="Max" offset="#TileVerticalSpace"/>
-                <Anchor side="Left" relative="$parent/Item21" pos="Min" offset="0"/>
+                <Anchor side="Top" relative="$parent/Item27" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item27" pos="Max" offset="#TileHorizontalSpace"/>
             </Frame>
-
+            
             <Frame type="EmoticonTileListItem" name="Item29" template="EmoticonSelectionPanel/EmoticonTileListItemTemplate">
                 <Anchor side="Top" relative="$parent/Item28" pos="Min" offset="0"/>
                 <Anchor side="Left" relative="$parent/Item28" pos="Max" offset="#TileHorizontalSpace"/>
             </Frame>
-
+            
+            <!-- Row 4 -->
             <Frame type="EmoticonTileListItem" name="Item30" template="EmoticonSelectionPanel/EmoticonTileListItemTemplate">
-                <Anchor side="Top" relative="$parent/Item29" pos="Min" offset="0"/>
-                <Anchor side="Left" relative="$parent/Item29" pos="Max" offset="#TileHorizontalSpace"/>
+                <Anchor side="Top" relative="$parent/Item20" pos="Max" offset="#TileVerticalSpace"/>
+                <Anchor side="Left" relative="$parent/Item20" pos="Min" offset="0"/>
             </Frame>
 
             <Frame type="EmoticonTileListItem" name="Item31" template="EmoticonSelectionPanel/EmoticonTileListItemTemplate">
@@ -572,7 +580,7 @@
                 <Anchor side="Top" relative="$parent/Item31" pos="Min" offset="0"/>
                 <Anchor side="Left" relative="$parent/Item31" pos="Max" offset="#TileHorizontalSpace"/>
             </Frame>
-            
+
             <Frame type="EmoticonTileListItem" name="Item33" template="EmoticonSelectionPanel/EmoticonTileListItemTemplate">
                 <Anchor side="Top" relative="$parent/Item32" pos="Min" offset="0"/>
                 <Anchor side="Left" relative="$parent/Item32" pos="Max" offset="#TileHorizontalSpace"/>
@@ -583,10 +591,9 @@
                 <Anchor side="Left" relative="$parent/Item33" pos="Max" offset="#TileHorizontalSpace"/>
             </Frame>
             
-            <!-- Row 6 -->
             <Frame type="EmoticonTileListItem" name="Item35" template="EmoticonSelectionPanel/EmoticonTileListItemTemplate">
-                <Anchor side="Top" relative="$parent/Item28" pos="Max" offset="#TileVerticalSpace"/>
-                <Anchor side="Left" relative="$parent/Item28" pos="Min" offset="0"/>
+                <Anchor side="Top" relative="$parent/Item34" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item34" pos="Max" offset="#TileHorizontalSpace"/>
             </Frame>
 
             <Frame type="EmoticonTileListItem" name="Item36" template="EmoticonSelectionPanel/EmoticonTileListItemTemplate">
@@ -609,20 +616,20 @@
                 <Anchor side="Left" relative="$parent/Item38" pos="Max" offset="#TileHorizontalSpace"/>
             </Frame>
             
+            <!-- Row 5 -->
             <Frame type="EmoticonTileListItem" name="Item40" template="EmoticonSelectionPanel/EmoticonTileListItemTemplate">
-                <Anchor side="Top" relative="$parent/Item39" pos="Min" offset="0"/>
-                <Anchor side="Left" relative="$parent/Item39" pos="Max" offset="#TileHorizontalSpace"/>
+                <Anchor side="Top" relative="$parent/Item30" pos="Max" offset="#TileVerticalSpace"/>
+                <Anchor side="Left" relative="$parent/Item30" pos="Min" offset="0"/>
             </Frame>
-            
+
             <Frame type="EmoticonTileListItem" name="Item41" template="EmoticonSelectionPanel/EmoticonTileListItemTemplate">
                 <Anchor side="Top" relative="$parent/Item40" pos="Min" offset="0"/>
                 <Anchor side="Left" relative="$parent/Item40" pos="Max" offset="#TileHorizontalSpace"/>
             </Frame>
-            
-            <!-- Row 7 -->
+
             <Frame type="EmoticonTileListItem" name="Item42" template="EmoticonSelectionPanel/EmoticonTileListItemTemplate">
-                <Anchor side="Top" relative="$parent/Item35" pos="Max" offset="#TileVerticalSpace"/>
-                <Anchor side="Left" relative="$parent/Item35" pos="Min" offset="0"/>
+                <Anchor side="Top" relative="$parent/Item41" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item41" pos="Max" offset="#TileHorizontalSpace"/>
             </Frame>
 
             <Frame type="EmoticonTileListItem" name="Item43" template="EmoticonSelectionPanel/EmoticonTileListItemTemplate">
@@ -634,12 +641,12 @@
                 <Anchor side="Top" relative="$parent/Item43" pos="Min" offset="0"/>
                 <Anchor side="Left" relative="$parent/Item43" pos="Max" offset="#TileHorizontalSpace"/>
             </Frame>
-
+            
             <Frame type="EmoticonTileListItem" name="Item45" template="EmoticonSelectionPanel/EmoticonTileListItemTemplate">
                 <Anchor side="Top" relative="$parent/Item44" pos="Min" offset="0"/>
                 <Anchor side="Left" relative="$parent/Item44" pos="Max" offset="#TileHorizontalSpace"/>
             </Frame>
-
+            
             <Frame type="EmoticonTileListItem" name="Item46" template="EmoticonSelectionPanel/EmoticonTileListItemTemplate">
                 <Anchor side="Top" relative="$parent/Item45" pos="Min" offset="0"/>
                 <Anchor side="Left" relative="$parent/Item45" pos="Max" offset="#TileHorizontalSpace"/>
@@ -655,15 +662,15 @@
                 <Anchor side="Left" relative="$parent/Item47" pos="Max" offset="#TileHorizontalSpace"/>
             </Frame>
             
-            <!-- Row 8 -->
             <Frame type="EmoticonTileListItem" name="Item49" template="EmoticonSelectionPanel/EmoticonTileListItemTemplate">
-                <Anchor side="Top" relative="$parent/Item42" pos="Max" offset="#TileVerticalSpace"/>
-                <Anchor side="Left" relative="$parent/Item42" pos="Min" offset="0"/>
+                <Anchor side="Top" relative="$parent/Item48" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item48" pos="Max" offset="#TileHorizontalSpace"/>
             </Frame>
-
+            
+            <!-- Row 6 -->
             <Frame type="EmoticonTileListItem" name="Item50" template="EmoticonSelectionPanel/EmoticonTileListItemTemplate">
-                <Anchor side="Top" relative="$parent/Item49" pos="Min" offset="0"/>
-                <Anchor side="Left" relative="$parent/Item49" pos="Max" offset="#TileHorizontalSpace"/>
+                <Anchor side="Top" relative="$parent/Item40" pos="Max" offset="#TileVerticalSpace"/>
+                <Anchor side="Left" relative="$parent/Item40" pos="Min" offset="0"/>
             </Frame>
 
             <Frame type="EmoticonTileListItem" name="Item51" template="EmoticonSelectionPanel/EmoticonTileListItemTemplate">
@@ -680,7 +687,7 @@
                 <Anchor side="Top" relative="$parent/Item52" pos="Min" offset="0"/>
                 <Anchor side="Left" relative="$parent/Item52" pos="Max" offset="#TileHorizontalSpace"/>
             </Frame>
-            
+
             <Frame type="EmoticonTileListItem" name="Item54" template="EmoticonSelectionPanel/EmoticonTileListItemTemplate">
                 <Anchor side="Top" relative="$parent/Item53" pos="Min" offset="0"/>
                 <Anchor side="Left" relative="$parent/Item53" pos="Max" offset="#TileHorizontalSpace"/>
@@ -689,6 +696,383 @@
             <Frame type="EmoticonTileListItem" name="Item55" template="EmoticonSelectionPanel/EmoticonTileListItemTemplate">
                 <Anchor side="Top" relative="$parent/Item54" pos="Min" offset="0"/>
                 <Anchor side="Left" relative="$parent/Item54" pos="Max" offset="#TileHorizontalSpace"/>
+            </Frame>
+            
+            <Frame type="EmoticonTileListItem" name="Item56" template="EmoticonSelectionPanel/EmoticonTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item55" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item55" pos="Max" offset="#TileHorizontalSpace"/>
+            </Frame>
+            
+            <Frame type="EmoticonTileListItem" name="Item57" template="EmoticonSelectionPanel/EmoticonTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item56" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item56" pos="Max" offset="#TileHorizontalSpace"/>
+            </Frame>
+            
+            <Frame type="EmoticonTileListItem" name="Item58" template="EmoticonSelectionPanel/EmoticonTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item57" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item57" pos="Max" offset="#TileHorizontalSpace"/>
+            </Frame>
+            
+            <Frame type="EmoticonTileListItem" name="Item59" template="EmoticonSelectionPanel/EmoticonTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item58" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item58" pos="Max" offset="#TileHorizontalSpace"/>
+            </Frame>
+            
+            <!-- Row 7 -->
+            <Frame type="EmoticonTileListItem" name="Item60" template="EmoticonSelectionPanel/EmoticonTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item50" pos="Max" offset="#TileVerticalSpace"/>
+                <Anchor side="Left" relative="$parent/Item50" pos="Min" offset="0"/>
+            </Frame>
+
+            <Frame type="EmoticonTileListItem" name="Item61" template="EmoticonSelectionPanel/EmoticonTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item60" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item60" pos="Max" offset="#TileHorizontalSpace"/>
+            </Frame>
+
+            <Frame type="EmoticonTileListItem" name="Item62" template="EmoticonSelectionPanel/EmoticonTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item61" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item61" pos="Max" offset="#TileHorizontalSpace"/>
+            </Frame>
+
+            <Frame type="EmoticonTileListItem" name="Item63" template="EmoticonSelectionPanel/EmoticonTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item62" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item62" pos="Max" offset="#TileHorizontalSpace"/>
+            </Frame>
+
+            <Frame type="EmoticonTileListItem" name="Item64" template="EmoticonSelectionPanel/EmoticonTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item63" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item63" pos="Max" offset="#TileHorizontalSpace"/>
+            </Frame>
+            
+            <Frame type="EmoticonTileListItem" name="Item65" template="EmoticonSelectionPanel/EmoticonTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item64" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item64" pos="Max" offset="#TileHorizontalSpace"/>
+            </Frame>
+            
+            <Frame type="EmoticonTileListItem" name="Item66" template="EmoticonSelectionPanel/EmoticonTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item65" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item65" pos="Max" offset="#TileHorizontalSpace"/>
+            </Frame>
+            
+            <Frame type="EmoticonTileListItem" name="Item67" template="EmoticonSelectionPanel/EmoticonTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item66" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item66" pos="Max" offset="#TileHorizontalSpace"/>
+            </Frame>
+            
+            <Frame type="EmoticonTileListItem" name="Item68" template="EmoticonSelectionPanel/EmoticonTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item67" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item67" pos="Max" offset="#TileHorizontalSpace"/>
+            </Frame>
+            
+            <Frame type="EmoticonTileListItem" name="Item69" template="EmoticonSelectionPanel/EmoticonTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item68" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item68" pos="Max" offset="#TileHorizontalSpace"/>
+            </Frame>
+            
+            <!-- Row 8 -->
+            <Frame type="EmoticonTileListItem" name="Item70" template="EmoticonSelectionPanel/EmoticonTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item60" pos="Max" offset="#TileVerticalSpace"/>
+                <Anchor side="Left" relative="$parent/Item60" pos="Min" offset="0"/>
+            </Frame>
+
+            <Frame type="EmoticonTileListItem" name="Item71" template="EmoticonSelectionPanel/EmoticonTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item70" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item70" pos="Max" offset="#TileHorizontalSpace"/>
+            </Frame>
+
+            <Frame type="EmoticonTileListItem" name="Item72" template="EmoticonSelectionPanel/EmoticonTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item71" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item71" pos="Max" offset="#TileHorizontalSpace"/>
+            </Frame>
+
+            <Frame type="EmoticonTileListItem" name="Item73" template="EmoticonSelectionPanel/EmoticonTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item72" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item72" pos="Max" offset="#TileHorizontalSpace"/>
+            </Frame>
+
+            <Frame type="EmoticonTileListItem" name="Item74" template="EmoticonSelectionPanel/EmoticonTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item73" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item73" pos="Max" offset="#TileHorizontalSpace"/>
+            </Frame>
+            
+            <Frame type="EmoticonTileListItem" name="Item75" template="EmoticonSelectionPanel/EmoticonTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item74" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item74" pos="Max" offset="#TileHorizontalSpace"/>
+            </Frame>
+            
+            <Frame type="EmoticonTileListItem" name="Item76" template="EmoticonSelectionPanel/EmoticonTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item75" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item75" pos="Max" offset="#TileHorizontalSpace"/>
+            </Frame>
+            
+            <Frame type="EmoticonTileListItem" name="Item77" template="EmoticonSelectionPanel/EmoticonTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item76" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item76" pos="Max" offset="#TileHorizontalSpace"/>
+            </Frame>
+            
+            <Frame type="EmoticonTileListItem" name="Item78" template="EmoticonSelectionPanel/EmoticonTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item77" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item77" pos="Max" offset="#TileHorizontalSpace"/>
+            </Frame>
+            
+            <Frame type="EmoticonTileListItem" name="Item79" template="EmoticonSelectionPanel/EmoticonTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item78" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item78" pos="Max" offset="#TileHorizontalSpace"/>
+            </Frame>
+            
+            <!-- Row 9 -->
+            <Frame type="EmoticonTileListItem" name="Item80" template="EmoticonSelectionPanel/EmoticonTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item70" pos="Max" offset="#TileVerticalSpace"/>
+                <Anchor side="Left" relative="$parent/Item70" pos="Min" offset="0"/>
+            </Frame>
+
+            <Frame type="EmoticonTileListItem" name="Item81" template="EmoticonSelectionPanel/EmoticonTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item80" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item80" pos="Max" offset="#TileHorizontalSpace"/>
+            </Frame>
+
+            <Frame type="EmoticonTileListItem" name="Item82" template="EmoticonSelectionPanel/EmoticonTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item81" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item81" pos="Max" offset="#TileHorizontalSpace"/>
+            </Frame>
+
+            <Frame type="EmoticonTileListItem" name="Item83" template="EmoticonSelectionPanel/EmoticonTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item82" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item82" pos="Max" offset="#TileHorizontalSpace"/>
+            </Frame>
+
+            <Frame type="EmoticonTileListItem" name="Item84" template="EmoticonSelectionPanel/EmoticonTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item83" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item83" pos="Max" offset="#TileHorizontalSpace"/>
+            </Frame>
+            
+            <Frame type="EmoticonTileListItem" name="Item85" template="EmoticonSelectionPanel/EmoticonTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item84" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item84" pos="Max" offset="#TileHorizontalSpace"/>
+            </Frame>
+            
+            <Frame type="EmoticonTileListItem" name="Item86" template="EmoticonSelectionPanel/EmoticonTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item85" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item85" pos="Max" offset="#TileHorizontalSpace"/>
+            </Frame>
+            
+            <Frame type="EmoticonTileListItem" name="Item87" template="EmoticonSelectionPanel/EmoticonTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item86" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item86" pos="Max" offset="#TileHorizontalSpace"/>
+            </Frame>
+            
+            <Frame type="EmoticonTileListItem" name="Item88" template="EmoticonSelectionPanel/EmoticonTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item87" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item87" pos="Max" offset="#TileHorizontalSpace"/>
+            </Frame>
+            
+            <Frame type="EmoticonTileListItem" name="Item89" template="EmoticonSelectionPanel/EmoticonTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item88" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item88" pos="Max" offset="#TileHorizontalSpace"/>
+            </Frame>
+            
+            <!-- Row 10 -->
+            <Frame type="EmoticonTileListItem" name="Item90" template="EmoticonSelectionPanel/EmoticonTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item80" pos="Max" offset="#TileVerticalSpace"/>
+                <Anchor side="Left" relative="$parent/Item80" pos="Min" offset="0"/>
+            </Frame>
+
+            <Frame type="EmoticonTileListItem" name="Item91" template="EmoticonSelectionPanel/EmoticonTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item90" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item90" pos="Max" offset="#TileHorizontalSpace"/>
+            </Frame>
+
+            <Frame type="EmoticonTileListItem" name="Item92" template="EmoticonSelectionPanel/EmoticonTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item91" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item91" pos="Max" offset="#TileHorizontalSpace"/>
+            </Frame>
+
+            <Frame type="EmoticonTileListItem" name="Item93" template="EmoticonSelectionPanel/EmoticonTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item92" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item92" pos="Max" offset="#TileHorizontalSpace"/>
+            </Frame>
+
+            <Frame type="EmoticonTileListItem" name="Item94" template="EmoticonSelectionPanel/EmoticonTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item93" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item93" pos="Max" offset="#TileHorizontalSpace"/>
+            </Frame>
+            
+            <Frame type="EmoticonTileListItem" name="Item95" template="EmoticonSelectionPanel/EmoticonTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item94" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item94" pos="Max" offset="#TileHorizontalSpace"/>
+            </Frame>
+            
+            <Frame type="EmoticonTileListItem" name="Item96" template="EmoticonSelectionPanel/EmoticonTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item95" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item95" pos="Max" offset="#TileHorizontalSpace"/>
+            </Frame>
+            
+            <Frame type="EmoticonTileListItem" name="Item97" template="EmoticonSelectionPanel/EmoticonTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item96" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item96" pos="Max" offset="#TileHorizontalSpace"/>
+            </Frame>
+            
+            <Frame type="EmoticonTileListItem" name="Item98" template="EmoticonSelectionPanel/EmoticonTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item97" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item97" pos="Max" offset="#TileHorizontalSpace"/>
+            </Frame>
+            
+            <Frame type="EmoticonTileListItem" name="Item99" template="EmoticonSelectionPanel/EmoticonTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item98" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item98" pos="Max" offset="#TileHorizontalSpace"/>
+            </Frame>
+            
+            <!-- Row 11 -->
+            <Frame type="EmoticonTileListItem" name="Item100" template="EmoticonSelectionPanel/EmoticonTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item90" pos="Max" offset="#TileVerticalSpace"/>
+                <Anchor side="Left" relative="$parent/Item90" pos="Min" offset="0"/>
+            </Frame>
+
+            <Frame type="EmoticonTileListItem" name="Item101" template="EmoticonSelectionPanel/EmoticonTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item100" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item100" pos="Max" offset="#TileHorizontalSpace"/>
+            </Frame>
+
+            <Frame type="EmoticonTileListItem" name="Item102" template="EmoticonSelectionPanel/EmoticonTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item101" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item101" pos="Max" offset="#TileHorizontalSpace"/>
+            </Frame>
+
+            <Frame type="EmoticonTileListItem" name="Item103" template="EmoticonSelectionPanel/EmoticonTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item102" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item102" pos="Max" offset="#TileHorizontalSpace"/>
+            </Frame>
+
+            <Frame type="EmoticonTileListItem" name="Item104" template="EmoticonSelectionPanel/EmoticonTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item103" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item103" pos="Max" offset="#TileHorizontalSpace"/>
+            </Frame>
+            
+            <Frame type="EmoticonTileListItem" name="Item105" template="EmoticonSelectionPanel/EmoticonTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item104" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item104" pos="Max" offset="#TileHorizontalSpace"/>
+            </Frame>
+            
+            <Frame type="EmoticonTileListItem" name="Item106" template="EmoticonSelectionPanel/EmoticonTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item105" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item105" pos="Max" offset="#TileHorizontalSpace"/>
+            </Frame>
+            
+            <Frame type="EmoticonTileListItem" name="Item107" template="EmoticonSelectionPanel/EmoticonTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item106" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item106" pos="Max" offset="#TileHorizontalSpace"/>
+            </Frame>
+            
+            <Frame type="EmoticonTileListItem" name="Item108" template="EmoticonSelectionPanel/EmoticonTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item107" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item107" pos="Max" offset="#TileHorizontalSpace"/>
+            </Frame>
+            
+            <Frame type="EmoticonTileListItem" name="Item109" template="EmoticonSelectionPanel/EmoticonTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item108" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item108" pos="Max" offset="#TileHorizontalSpace"/>
+            </Frame>
+            
+            <!-- Row 12 -->
+            <Frame type="EmoticonTileListItem" name="Item110" template="EmoticonSelectionPanel/EmoticonTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item100" pos="Max" offset="#TileVerticalSpace"/>
+                <Anchor side="Left" relative="$parent/Item100" pos="Min" offset="0"/>
+            </Frame>
+
+            <Frame type="EmoticonTileListItem" name="Item111" template="EmoticonSelectionPanel/EmoticonTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item110" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item110" pos="Max" offset="#TileHorizontalSpace"/>
+            </Frame>
+
+            <Frame type="EmoticonTileListItem" name="Item112" template="EmoticonSelectionPanel/EmoticonTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item111" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item111" pos="Max" offset="#TileHorizontalSpace"/>
+            </Frame>
+
+            <Frame type="EmoticonTileListItem" name="Item113" template="EmoticonSelectionPanel/EmoticonTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item112" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item112" pos="Max" offset="#TileHorizontalSpace"/>
+            </Frame>
+
+            <Frame type="EmoticonTileListItem" name="Item114" template="EmoticonSelectionPanel/EmoticonTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item113" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item113" pos="Max" offset="#TileHorizontalSpace"/>
+            </Frame>
+            
+            <Frame type="EmoticonTileListItem" name="Item115" template="EmoticonSelectionPanel/EmoticonTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item114" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item114" pos="Max" offset="#TileHorizontalSpace"/>
+            </Frame>
+            
+            <Frame type="EmoticonTileListItem" name="Item116" template="EmoticonSelectionPanel/EmoticonTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item115" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item115" pos="Max" offset="#TileHorizontalSpace"/>
+            </Frame>
+            
+            <Frame type="EmoticonTileListItem" name="Item117" template="EmoticonSelectionPanel/EmoticonTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item116" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item116" pos="Max" offset="#TileHorizontalSpace"/>
+            </Frame>
+            
+            <Frame type="EmoticonTileListItem" name="Item118" template="EmoticonSelectionPanel/EmoticonTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item117" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item117" pos="Max" offset="#TileHorizontalSpace"/>
+            </Frame>
+            
+            <Frame type="EmoticonTileListItem" name="Item119" template="EmoticonSelectionPanel/EmoticonTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item118" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item118" pos="Max" offset="#TileHorizontalSpace"/>
+            </Frame>
+            
+            <!-- Row 13 -->
+            <Frame type="EmoticonTileListItem" name="Item120" template="EmoticonSelectionPanel/EmoticonTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item110" pos="Max" offset="#TileVerticalSpace"/>
+                <Anchor side="Left" relative="$parent/Item110" pos="Min" offset="0"/>
+            </Frame>
+
+            <Frame type="EmoticonTileListItem" name="Item121" template="EmoticonSelectionPanel/EmoticonTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item120" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item120" pos="Max" offset="#TileHorizontalSpace"/>
+            </Frame>
+
+            <Frame type="EmoticonTileListItem" name="Item122" template="EmoticonSelectionPanel/EmoticonTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item121" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item121" pos="Max" offset="#TileHorizontalSpace"/>
+            </Frame>
+
+            <Frame type="EmoticonTileListItem" name="Item123" template="EmoticonSelectionPanel/EmoticonTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item122" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item122" pos="Max" offset="#TileHorizontalSpace"/>
+            </Frame>
+
+            <Frame type="EmoticonTileListItem" name="Item124" template="EmoticonSelectionPanel/EmoticonTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item123" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item123" pos="Max" offset="#TileHorizontalSpace"/>
+            </Frame>
+            
+            <Frame type="EmoticonTileListItem" name="Item125" template="EmoticonSelectionPanel/EmoticonTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item124" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item124" pos="Max" offset="#TileHorizontalSpace"/>
+            </Frame>
+            
+            <Frame type="EmoticonTileListItem" name="Item126" template="EmoticonSelectionPanel/EmoticonTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item125" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item125" pos="Max" offset="#TileHorizontalSpace"/>
+            </Frame>
+            
+            <Frame type="EmoticonTileListItem" name="Item127" template="EmoticonSelectionPanel/EmoticonTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item126" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item126" pos="Max" offset="#TileHorizontalSpace"/>
+            </Frame>
+            
+            <Frame type="EmoticonTileListItem" name="Item128" template="EmoticonSelectionPanel/EmoticonTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item127" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item127" pos="Max" offset="#TileHorizontalSpace"/>
+            </Frame>
+            
+            <Frame type="EmoticonTileListItem" name="Item129" template="EmoticonSelectionPanel/EmoticonTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item128" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item128" pos="Max" offset="#TileHorizontalSpace"/>
             </Frame>
             
             <Frame type="Frame" name="PageSelectorAnchor">
@@ -762,5 +1146,1317 @@
                 </Animation>
             </Frame>
         </Frame>
+    </Frame>
+    
+    <!-- In-game race-specific layout for EmoticonSelectionPanel -->
+    
+    <Frame type="Button" name="EmoticonInGameButtonTemplate">
+        <Width val="32"/>
+        <Height val="32"/>
+        <DisplayType val="ImageLayer"/>
+        <ClickSound val="@UI_EmoticonButtonClick"/>
+
+        <Frame type="Image" name="DropShadowImage">
+            <Anchor side="Top" relative="$parent/NormalImage" pos="Min" offset="2"/>
+            <Anchor side="Left" relative="$parent/NormalImage" pos="Min" offset="1"/>
+            <Texture val="@UI/Glues_Icons_Emojis"/>
+            <Height val="26"/>
+            <Width val="26"/>
+            <DesaturateOnDisable val="false"/>
+            <DisabledAlpha val="100"/>
+            <ColorAdjustMode val="Fill"/>
+            <AdjustmentColor val="255,0,0,0"/>
+            <Visible val="false"/>
+        </Frame>
+
+        <Frame type="Image" name="NormalImage">
+            <Anchor side="Top" relative="$parent" pos="Mid" offset="-1"/>
+            <Anchor side="Bottom" relative="$parent" pos="Mid" offset="-1"/>
+            <Anchor side="Left" relative="$parent" pos="Mid" offset="1"/>
+            <Anchor side="Right" relative="$parent" pos="Mid" offset="1"/>
+            <Texture val="@@UI/Glues_Icons_Emojis"/>
+            <Height val="26"/>
+            <Width val="26"/>
+            <DesaturationColor val="128,128,128"/>
+            <DesaturateOnDisable val="false"/>
+            <DisabledAlpha val="100"/>
+        </Frame>
+
+        <Frame type="Image" name="HoverImage">
+            <Anchor side="Top" relative="$parent" pos="Mid" offset="-1"/>
+            <Anchor side="Bottom" relative="$parent" pos="Mid" offset="-1"/>
+            <Anchor side="Left" relative="$parent" pos="Mid" offset="1"/>
+            <Anchor side="Right" relative="$parent" pos="Mid" offset="1"/>
+            <Texture val="@@UI/Glues_Icons_Emojis"/>
+            <Height val="26"/>
+            <Width val="26"/>
+            <DesaturationColor val="128,128,128"/>
+            <DesaturateOnDisable val="false"/>
+            <DisabledAlpha val="100"/>
+            <ColorAdjustMode val="AddSelf"/>
+            <AdjustmentColor val="96,96,96,96"/>
+        </Frame>
+    </Frame>
+    
+    <Frame type="Button" name="PageSelectorInGameButtonTemplate" template="EmoticonSelectionPanel/PageSelectorButtonTemplate">
+        <Width val="22"/>
+        <Height val="22"/>
+
+        <Frame type="Image" name="NormalImage">
+            <Texture val="@UI/SC2_UI_Battlenet_Glue_EmoticonPanel_InGame_PagePip_Inactive"/>
+            <ColorAdjustMode val="Colorize"/>
+            <AdjustmentColor val="##PageSelectorColor"/>
+        </Frame>
+
+        <Frame type="Image" name="HoverImage">
+            <Texture val="@UI/SC2_UI_Battlenet_Glue_EmoticonPanel_InGame_PagePip_Active"/>
+            <ColorAdjustMode val="Colorize"/>
+            <AdjustmentColor val="##PageSelectorColor"/>
+        </Frame>
+        
+        <Frame type="Image" name="SelectedImage">
+            <Texture val="@UI/SC2_UI_Battlenet_Glue_EmoticonPanel_InGame_PagePip_Active"/>
+            <ColorAdjustMode val="Colorize"/>
+            <AdjustmentColor val="##PageSelectorColor"/>
+            <Visible val="false"/>
+        </Frame>
+        
+        <StateGroup name="MutatorSelectionState">
+            <State name="Inactive">
+                <When type="StateGroup" frame="$parent/$parent/$parent" MutatorSelectionState="Inactive"/>
+            </State>
+            
+            <State name="Active">
+                <When type="StateGroup" frame="$parent/$parent/$parent" MutatorSelectionState="Active"/>
+                <Action type="SetProperty" frame="$this" width="31"/>
+                <Action type="SetProperty" frame="$this" height="20"/>
+                <Action type="SetProperty" frame="$this/NormalImage" texture="@UI/Glues_Battlenet_PageAssets_PageButtonUp"/>
+                <Action type="SetProperty" frame="$this/HoverImage" texture="@UI/Glues_Battlenet_PageAssets_PageButtonSelected"/>
+                <Action type="SetProperty" frame="$this/SelectedImage" texture="@UI/Glues_Battlenet_PageAssets_PageButtonSelected"/>
+                <Action type="SetProperty" frame="$this/NormalImage" ColorAdjustMode="None"/>
+                <Action type="SetProperty" frame="$this/HoverImage" ColorAdjustMode="None"/>
+                <Action type="SetProperty" frame="$this/SelectedImage" ColorAdjustMode="None"/>
+            </State>
+        </StateGroup>
+    </Frame>
+    
+    <Frame type="PageSelectorButtonList" name="PageSelectorInGameTemplate">
+        
+        <Frame type="Button" name="DecrementButton" template="EmoticonSelectionPanel/EmoticonPageButtonTemplate">
+            <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+
+            <Frame type="Image" name="Icon">
+                <Texture val="@UI/SC2_UI_Glues_EmoticonPanel_Arrow_Left_Inactive"/>
+                <ColorAdjustMode val="Colorize"/>
+                <AdjustmentColor val="##PageSelectorColor"/>
+                
+                <Animation name="OnDisable">
+                    <Event event="OnDisabled" action="Reset,Play"/>
+                    <Event event="OnEnabled" action="Reset"/>
+                    
+                    <Controller type="Texture" end="Pause">
+                        <Key type="Image" time="0" image="@UI/SC2_UI_Glues_EmoticonPanel_Arrow_Left_Disabled"/>
+                    </Controller>
+                    
+                    <Controller type="Fade" end="Pause">
+                        <Key type="Curve" time="0" value="128" out="linear"/>
+                    </Controller>
+                </Animation>
+                
+                <Animation name="OnHover">
+                    <Event event="OnMouseEnter" action="Reset, Play" frame="$parent"/>
+                    <Event event="OnMouseExit" action="Reset" frame="$parent"/>
+                    <Controller type="Texture" end="Pause">
+                        <Key type="Image" time="0" image="@UI/SC2_UI_Glues_EmoticonPanel_Arrow_Left_Active"/>
+                    </Controller>
+                </Animation>
+            </Frame>
+
+            <Frame type="Image" name="GlueIcon">
+                <Anchor relative="$parent" side="Top" pos="Mid" offset="0"/>
+                <Anchor relative="$parent" side="Bottom" pos="Mid" offset="0"/>
+                <Anchor relative="$parent" side="Left" pos="Mid" offset="0"/>
+                <Anchor relative="$parent" side="Right" pos="Mid" offset="0"/>
+                <Width val="22"/>
+                <Height val="26"/>
+                <Texture val="@UI/Glues_Icons_SmallPageArrow_Left_Normal"/>
+                <DesaturateOnDisable val="false"/>
+                <Visible val="false"/>
+                
+                <Animation name="OnDisable">
+                    <Event event="OnDisabled" action="Reset,Play"/>
+                    <Event event="OnEnabled" action="Reset"/>
+                    
+                    <Controller type="Texture" end="Pause">
+                        <Key type="Image" time="0" image="@UI/Glues_Icons_SmallPageArrow_Left_Disabled"/>
+                    </Controller>
+                </Animation>
+                
+                <Animation name="OnHover">
+                    <Event event="OnMouseEnter" action="Reset, Play" frame="$parent"/>
+                    <Event event="OnMouseExit" action="Reset" frame="$parent"/>
+                    <Controller type="Texture" end="Pause">
+                        <Key type="Image" time="0" image="@UI/Glues_Icons_SmallPageArrow_Left_Hover"/>
+                    </Controller>
+                </Animation>
+            </Frame>
+        </Frame>
+        
+        <Frame type="Button" name="PageButton0" template="EmoticonSelectionPanel/PageSelectorInGameButtonTemplate">
+            <Anchor side="Top" relative="$parent/PageButton2" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent/PageButton1" pos="Min" offset="0"/>
+        </Frame>
+        
+        <Frame type="Button" name="PageButton1" template="EmoticonSelectionPanel/PageSelectorInGameButtonTemplate">
+            <Anchor side="Top" relative="$parent/PageButton2" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent/PageButton2" pos="Min" offset="0"/>
+        </Frame>
+        
+        <Frame type="Button" name="PageButton2" template="EmoticonSelectionPanel/PageSelectorInGameButtonTemplate">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="7"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="165"/>
+        </Frame>
+        
+        <Frame type="Button" name="PageButton3" template="EmoticonSelectionPanel/PageSelectorInGameButtonTemplate">
+            <Anchor side="Top" relative="$parent/PageButton2" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent/PageButton2" pos="Max" offset="0"/>
+        </Frame>
+        
+        <Frame type="Button" name="PageButton4" template="EmoticonSelectionPanel/PageSelectorInGameButtonTemplate">
+            <Anchor side="Top" relative="$parent/PageButton2" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent/PageButton3" pos="Max" offset="0"/>
+        </Frame>
+        
+        <Frame type="Button" name="IncrementButton" template="EmoticonSelectionPanel/EmoticonPageButtonTemplate">
+            <Anchor side="Top" relative="$parent/DecrementButton" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+
+            <Frame type="Image" name="Icon">
+                <Texture val="@UI/SC2_UI_Glues_EmoticonPanel_Arrow_Left_Inactive"/>
+                <TextureCoords top="0.0" left="1.0" bottom="1.0" right="0.0"/>
+                <ColorAdjustMode val="Colorize"/>
+                <AdjustmentColor val="##PageSelectorColor"/>
+                
+                <Animation name="OnDisable">
+                    <Event event="OnDisabled" action="Reset,Play"/>
+                    <Event event="OnEnabled" action="Reset"/>
+                    
+                    <Controller type="Texture" end="Pause">
+                        <Key type="Image" time="0" image="@UI/SC2_UI_Glues_EmoticonPanel_Arrow_Left_Disabled"/>
+                    </Controller>
+                    
+                    <Controller type="Fade" end="Pause">
+                        <Key type="Curve" time="0" value="128" out="linear"/>
+                    </Controller>
+                </Animation>
+                
+                <Animation name="OnHover">
+                    <Event event="OnMouseEnter" action="Reset, Play" frame="$parent"/>
+                    <Event event="OnMouseExit" action="Reset" frame="$parent"/>
+                    <Controller type="Texture" end="Pause">
+                        <Key type="Image" time="0" image="@UI/SC2_UI_Glues_EmoticonPanel_Arrow_Left_Active"/>
+                    </Controller>
+                </Animation>
+            </Frame>
+
+            <Frame type="Image" name="GlueIcon">
+                <Anchor relative="$parent" side="Top" pos="Mid" offset="0"/>
+                <Anchor relative="$parent" side="Bottom" pos="Mid" offset="0"/>
+                <Anchor relative="$parent" side="Left" pos="Mid" offset="0"/>
+                <Anchor relative="$parent" side="Right" pos="Mid" offset="0"/>
+                <Width val="22"/>
+                <Height val="26"/>
+                <Texture val="@UI/Glues_Icons_SmallPageArrow_Left_Normal"/>
+                <TextureCoords top="0.0" left="1.0" bottom="1.0" right="0.0"/>
+                <DesaturateOnDisable val="false"/>
+                <Visible val="false"/>
+                
+                <Animation name="OnDisable">
+                    <Event event="OnDisabled" action="Reset,Play"/>
+                    <Event event="OnEnabled" action="Reset"/>
+                    
+                    <Controller type="Texture" end="Pause">
+                        <Key type="Image" time="0" image="@UI/Glues_Icons_SmallPageArrow_Left_Disabled"/>
+                    </Controller>
+                </Animation>
+                
+                <Animation name="OnHover">
+                    <Event event="OnMouseEnter" action="Reset, Play" frame="$parent"/>
+                    <Event event="OnMouseExit" action="Reset" frame="$parent"/>
+                    <Controller type="Texture" end="Pause">
+                        <Key type="Image" time="0" image="@UI/Glues_Icons_SmallPageArrow_Left_Hover"/>
+                    </Controller>
+                </Animation>
+            </Frame>
+        </Frame>
+        
+        <StateGroup name="MutatorSelectionState">
+            <State name="Inactive">
+                <When type="StateGroup" frame="$parent/$parent" MutatorSelectionState="Inactive"/>
+                <Action type="SetProperty" frame="$this/DecrementButton/Icon" visible="true"/>
+                <Action type="SetProperty" frame="$this/DecrementButton/GlueIcon" visible="false"/>
+                <Action type="SetProperty" frame="$this/IncrementButton/Icon" visible="true"/>
+                <Action type="SetProperty" frame="$this/IncrementButton/GlueIcon" visible="false"/>
+                <Action type="SetAnchor" frame="$this/PageButton0" side="Right" relative="$parent/PageButton1" pos="Min" offset="0"/>
+                <Action type="SetAnchor" frame="$this/PageButton1" side="Right" relative="$parent/PageButton2" pos="Min" offset="0"/>
+                <Action type="SetAnchor" frame="$this/PageButton2" side="Top" relative="$parent" pos="Min" offset="7"/>
+                <Action type="SetAnchor" frame="$this/PageButton2" side="Left" relative="$parent" pos="Min" offset="165"/>
+                <Action type="SetAnchor" frame="$this/PageButton3" side="Left" relative="$parent/PageButton2" pos="Max" offset="0"/>
+                <Action type="SetAnchor" frame="$this/PageButton4" side="Left" relative="$parent/PageButton3" pos="Max" offset="0"/>
+            </State>
+            
+            <State name="Active">
+                <When type="StateGroup" frame="$parent/$parent" MutatorSelectionState="Active"/>
+                <Action type="SetProperty" frame="$this/DecrementButton/Icon" visible="false"/>
+                <Action type="SetProperty" frame="$this/DecrementButton/GlueIcon" visible="true"/>
+                <Action type="SetProperty" frame="$this/IncrementButton/Icon" visible="false"/>
+                <Action type="SetProperty" frame="$this/IncrementButton/GlueIcon" visible="true"/>
+                <Action type="SetAnchor" frame="$this/PageButton0" side="Right" relative="$parent/PageButton1" pos="Min" offset="12"/>
+                <Action type="SetAnchor" frame="$this/PageButton1" side="Right" relative="$parent/PageButton2" pos="Min" offset="12"/>
+                <Action type="SetAnchor" frame="$this/PageButton2" side="Top" relative="$parent" pos="Min" offset="8"/>
+                <Action type="SetAnchor" frame="$this/PageButton2" side="Left" relative="$parent" pos="Min" offset="158"/>
+                <Action type="SetAnchor" frame="$this/PageButton3" side="Left" relative="$parent/PageButton2" pos="Max" offset="-12"/>
+                <Action type="SetAnchor" frame="$this/PageButton4" side="Left" relative="$parent/PageButton3" pos="Max" offset="-12"/>
+            </State>
+        </StateGroup>
+    </Frame>
+    
+    <Frame type="StandardTooltip" name="MutableEmoticonTooltip" template="StandardTooltip/StandardTooltip">
+        <StateGroup name="MutatorSelectionState">
+            <State name="Inactive">
+                <When type="StateGroup" frame="$parent/GameUI/UIContainer/FullscreenUpperContainer/EmoticonPanel" MutatorSelectionState="Inactive"/>
+            </State>
+            
+            <State name="Active">
+                <When type="StateGroup" frame="$parent/GameUI/UIContainer/FullscreenUpperContainer/EmoticonPanel" MutatorSelectionState="Active"/>
+                <Action type="SetProperty" frame="$this/BackgroundImage" texture="@UI/StandardGameTooltip"/>
+                <Action type="SetProperty" frame="$this/Label" style="StoryModeTooltip"/>
+            </State>
+        </StateGroup>
+    </Frame>
+    
+    <Frame type="EmoticonTileListItem" name="EmoticonInGameTileListItemTemplate">
+        <Width val="30"/>
+        <Height val="30"/>
+        <TooltipFrame val="EmoticonMutableTooltip"/>
+        <Enabled val="false"/>
+
+        <Frame type="AchievementInfoFrame" name="AchievementInfoFrame">
+            <Anchor relative="$parent"/>
+            <Visible val="false"/>
+            <AchievementId val="{$parent/@AchievementId}"/>
+            <PresenceId val="{$BattleUI/@LocalToonPresenceId}"/>
+        </Frame>
+
+        <Frame type="StandardTooltip" name="EmoticonMutableTooltip" template="EmoticonSelectionPanel/MutableEmoticonTooltip"/>
+
+        <StateGroup name="DisabledStateGroup">
+            <DefaultState val="DisabledState"/>
+            
+            <State name="EnabledState">
+                <When type="Property" frame="$this" EmoticonAllowed="true"/>
+                <When type="Property" frame="$this" EmoticonAwarded="true"/>
+                <Action type="SetProperty" Enabled="true"/>
+                <Action type="SetProperty" frame="Background" Alpha="255"/>
+                <Action type="SetProperty" frame="GlueBackground" Alpha="255"/>
+                <Action type="SetProperty" frame="Icon" Alpha="255"/>
+            </State>
+            
+            <State name="DisabledState">
+                <Action type="SetProperty" Enabled="false"/>
+                <Action type="SetProperty" frame="Background" Alpha="100"/>
+                <Action type="SetProperty" frame="GlueBackground" Alpha="100"/>
+                <Action type="SetProperty" frame="Icon" Alpha="100"/>
+                <Action type="SetProperty" frame="Icon" ColorAdjustMode="Colorize"/>
+            </State>
+        </StateGroup>
+
+        <Frame type="Image" name="Background">
+            <Anchor relative="$parent"/>
+            <TextureType val="Nineslice"/>
+            <Texture val="@UI/SC2_UI_Battlenet_Glue_EmoticonPanel_InGame_Item_Normal"/>
+            <Alpha val="150"/>
+            <DesaturateOnDisable val="false"/>
+            <ColorAdjustMode val="Colorize"/>
+            <AdjustmentColor val="##EmojiItemBGColor"/>
+            
+            <Animation name="OnHover">
+                <Event event="OnMouseEnter" action="Reset, Play" frame="$parent"/>
+                <Event event="OnMouseExit" action="Reset" frame="$parent"/>
+                <Controller type="Texture" end="Pause">
+                    <Key type="Image" time="0" image="@UI/SC2_UI_Battlenet_Glue_EmoticonPanel_Item_Hover"/>
+                </Controller>
+            </Animation>
+        </Frame>
+
+        <Frame type="Image" name="GlueBackground">
+            <Anchor relative="$parent"/>
+            <TextureType val="Nineslice"/>
+            <Texture val="@UI/SC2_UI_Battlenet_Glue_EmoticonPanel_Item_Normal"/>
+            <Alpha val="150"/>
+            <DesaturateOnDisable val="false"/>
+            <Visible val="false"/>
+            
+            <Animation name="OnHover">
+                <Event event="OnMouseEnter" action="Reset, Play" frame="$parent"/>
+                <Event event="OnMouseExit" action="Reset" frame="$parent"/>
+                <Controller type="Texture" end="Pause">
+                    <Key type="Image" time="0" image="@UI/SC2_UI_Battlenet_Glue_EmoticonPanel_Item_Hover"/>
+                </Controller>
+            </Animation>
+        </Frame>
+        
+        <Frame type="Image" name="SelectedImage">
+            <Anchor relative="$parent"/>
+            <TextureType val="Nineslice"/>
+            <Texture val="@UI/SC2_UI_Battlenet_Glue_EmoticonPanel_Item_Selected"/>
+            <ColorAdjustMode val="Colorize"/>
+            <AdjustmentColor val="##EmojiItemBGColor"/>
+        </Frame>
+
+        <Frame type="Image" name="Icon">
+            <Anchor side="Top" relative="$parent/Background" pos="Mid" offset="0"/>
+            <Anchor side="Left" relative="$parent/Background" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent/Background" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent/Background" pos="Mid" offset="0"/>
+            <TextureType val="Normal"/>
+            <ScaleWithTexCoords val="true"/>
+            <DesaturateOnDisable val="false"/>
+            <ColorAdjustMode val="None"/>
+            <AdjustmentColor val="54,109,171"/>
+            <Alpha val="255"/>
+            <Animating val="{$parent/@Hovered}"/>
+            <ManagedAnim val="true"/>
+            <LoopingAnim val="true"/>
+        </Frame>
+        
+        <Frame type="EmoticonAchievementFrame" name="AchievementFrame">
+            <Anchor relative="$parent"/>
+            <AcceptsMouseTooltip val="true"/>
+            <TooltipFrame val="AchievementInfoTooltip"/>
+            <Visible val="false"/>
+            <AchievementId val="{$parent/@AchievementId}"/>
+            <MouseInside val="{$parent/@Hovered}"/>
+
+            <Frame type="AchievementInfoTooltip" name="AchievementInfoTooltip" template="StandardTemplates/AchievementInfoTooltipTemplate"/>
+        </Frame>
+
+        <StateGroup name="TooltipStateGroup">
+            <DefaultState val="EnabledState"/>
+            
+            <State name="AchievementStateHiddenTillAwarded">
+                <When type="Property" frame="$this" EmoticonAllowed="false"/>
+                <When type="AnimationState" frame="AchievementFrame" AchievementState="HasAchievement"/>
+                <When type="Property" frame="AchievementInfoFrame" HiddenUntilAwarded="true"/>
+                <Action type="SetProperty" frame="AchievementFrame" Visible="true"/>
+                <Action type="SetProperty" frame="$this" Tooltip="{$this/@EmoticonDescription}"/>
+            </State>
+
+            <State name="AchievementStateHidden">
+                <When type="Property" frame="$this" EmoticonAllowed="false"/>
+                <When type="AnimationState" frame="AchievementFrame" AchievementState="HasAchievement"/>
+                <When type="Property" frame="AchievementInfoFrame" Hidden="true"/>
+                <Action type="SetProperty" frame="AchievementFrame" Visible="false"/>
+                <Action type="SetProperty" frame="$this" Tooltip="{$this/@EmoticonDescriptionLocked}"/>
+            </State>
+
+            <State name="AchievementState">
+                <When type="Property" frame="$this" EmoticonAllowed="false"/>
+                <When type="AnimationState" frame="AchievementFrame" AchievementState="HasAchievement"/>
+                <Action type="SetProperty" frame="AchievementFrame" Visible="true"/>
+                <Action type="SetProperty" frame="$this" Tooltip="{$this/@EmoticonDescription}"/>
+            </State>
+
+            <State name="DisabledState">
+                <When type="StateGroup" frame="$this" DisabledStateGroup="DisabledState"/>
+                <Action type="SetProperty" frame="AchievementFrame" Visible="false"/>
+                <Action type="SetProperty" frame="$this" Tooltip="{$this/@EmoticonDescriptionLocked}"/>
+            </State>
+
+            <State name="EnabledState">
+                <When type="StateGroup" frame="$this" DisabledStateGroup="EnabledState"/>
+                <Action type="SetProperty" frame="AchievementFrame" Visible="false"/>
+                <Action type="SetProperty" frame="$this" Tooltip="{$this/@EmoticonDescription}"/>
+            </State>
+        </StateGroup>
+
+        <StateGroup name="HoverStateGroup">
+            <State name="HoveredState">
+                <When type="Property" frame="$this" Hovered="true"/>
+                <Action type="SendEvent" frame="$parent/$parent" event="ItemMouseEnter"/>
+            </State>
+            
+            <State name="UnhoveredState">
+                <When type="Property" frame="$this" Hovered="false"/>
+                <Action type="SendEvent" frame="$parent/$parent" event="ItemMouseExit"/>
+            </State>
+        </StateGroup>
+
+        <StateGroup name="MutatorSelectionState">
+            <State name="Inactive">
+                <When type="StateGroup" frame="$parent/$parent" MutatorSelectionState="Inactive"/>
+                <Action type="SetProperty" frame="$this/Background" visible="true"/>
+                <Action type="SetProperty" frame="$this/GlueBackground" visible="false"/>
+                <Action type="SetProperty" frame="$this/SelectedImage" ColorAdjustMode="Colorize"/>
+            </State>
+            
+            <State name="Active">
+                <When type="StateGroup" frame="$parent/$parent" MutatorSelectionState="Active"/>
+                <Action type="SetProperty" frame="$this/Background" visible="false"/>
+                <Action type="SetProperty" frame="$this/GlueBackground" visible="true"/>
+                <Action type="SetProperty" frame="$this/SelectedImage" ColorAdjustMode="None"/>
+            </State>
+        </StateGroup>
+    </Frame>
+    
+    <Frame type="Image" name="MutablePagePipDummyDisabled">
+
+        <StateGroup name="MutatorSelectionState">
+            <State name="Inactive">
+                <When type="StateGroup" frame="$parent/$parent" MutatorSelectionState="Inactive"/>
+            </State>
+            
+            <State name="Active">
+                <When type="StateGroup" frame="$parent/$parent" MutatorSelectionState="Active"/>
+                <Action type="SetProperty" frame="$this" ColorAdjustMode="None"/>
+                <Action type="SetProperty" frame="$this" texture="@UI/Glues_Battlenet_PageAssets_PageButtonUp"/>
+                <Action type="SetProperty" frame="$this" TextureType="Normal"/>
+                <Action type="SetProperty" frame="$this" Width="31"/>
+                <Action type="SetProperty" frame="$this" Height="20"/>
+                <Action type="SetProperty" frame="$this" Alpha="80"/>
+            </State>
+        </StateGroup>
+    </Frame>
+    
+    <Frame type="EmoticonSelectionPanel" name="EmoticonSelectionInGamePanelTemplate">
+        <Width val="383"/>
+        <Height val="563"/>
+        <RenderPriority val="600"/>
+        
+        <Frame type="Image" name="BackgroundDimmer">
+            <Anchor side="Top" relative="$parent/Background" pos="Min" offset="5"/>
+            <Anchor side="Left" relative="$parent/Background" pos="Min" offset="5"/>
+            <Anchor side="Bottom" relative="$parent/Background" pos="Max" offset="-5"/>
+            <Anchor side="Right" relative="$parent/Background" pos="Max" offset="-5"/>
+            <LayerColor val="081114"/>
+            <Alpha val="255"/>
+            <Visible val="false"/>
+        </Frame>
+        
+        <Frame type="Image" name="Background">
+            <Anchor relative="$parent"/>
+            <TextureType val="Border"/>
+            <Texture val="@@UI/ChatBarBorder"/>
+        </Frame>
+        
+        <Frame type="Image" name="BackgroundInner">
+            <Anchor side="Top" relative="$parent/Background" pos="Min" offset="55"/>
+            <Anchor side="Left" relative="$parent/Background" pos="Min" offset="18"/>
+            <Anchor side="Bottom" relative="$parent/Background" pos="Max" offset="-56"/>
+            <Anchor side="Right" relative="$parent/Background" pos="Max" offset="-18"/>
+            <TextureType val="Nineslice"/>
+            <Texture val="@UI/Glues_Battlenet_PageAssets_MainInnerContainer"/>
+            <Visible val="false"/>
+        </Frame>
+        
+        <Frame type="Label" name="EmoticonTitleLabel">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="27"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="27"/>
+            <Anchor side="Bottom" relative="$parent" pos="Min" offset="52"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="-20"/>
+            <Style val="@@EmoticonTitleText"/>
+            <Text val="@UI/EmoticonPanel/Title"/>
+        </Frame>
+
+        <Frame type="TileList" name="TileList">
+            <Anchor relative="$parent"/>
+            <AcceptsMouse val="true"/>
+
+            <Frame type="EmoticonTileListItem" name="Item0" template="EmoticonSelectionPanel/EmoticonInGameTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/$parent/BackgroundInner" pos="Min" offset="9"/>
+                <Anchor side="Left" relative="$parent/$parent/BackgroundInner" pos="Min" offset="10"/>
+            </Frame>
+
+            <Frame type="EmoticonTileListItem" name="Item1" template="EmoticonSelectionPanel/EmoticonInGameTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item0" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item0" pos="Max" offset="#TileHorizontalSpace"/>
+            </Frame>
+
+            <Frame type="EmoticonTileListItem" name="Item2" template="EmoticonSelectionPanel/EmoticonInGameTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item1" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item1" pos="Max" offset="#TileHorizontalSpace"/>
+            </Frame>
+
+            <Frame type="EmoticonTileListItem" name="Item3" template="EmoticonSelectionPanel/EmoticonInGameTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item2" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item2" pos="Max" offset="#TileHorizontalSpace"/>
+            </Frame>
+
+            <Frame type="EmoticonTileListItem" name="Item4" template="EmoticonSelectionPanel/EmoticonInGameTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item3" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item3" pos="Max" offset="#TileHorizontalSpace"/>
+            </Frame>
+            
+            <Frame type="EmoticonTileListItem" name="Item5" template="EmoticonSelectionPanel/EmoticonInGameTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item4" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item4" pos="Max" offset="#TileHorizontalSpace"/>
+            </Frame>
+            
+            <Frame type="EmoticonTileListItem" name="Item6" template="EmoticonSelectionPanel/EmoticonInGameTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item5" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item5" pos="Max" offset="#TileHorizontalSpace"/>
+            </Frame>
+            
+            <Frame type="EmoticonTileListItem" name="Item7" template="EmoticonSelectionPanel/EmoticonInGameTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item6" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item6" pos="Max" offset="#TileHorizontalSpace"/>
+            </Frame>
+            
+            <Frame type="EmoticonTileListItem" name="Item8" template="EmoticonSelectionPanel/EmoticonInGameTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item7" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item7" pos="Max" offset="#TileHorizontalSpace"/>
+            </Frame>
+            
+            <Frame type="EmoticonTileListItem" name="Item9" template="EmoticonSelectionPanel/EmoticonInGameTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item8" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item8" pos="Max" offset="#TileHorizontalSpace"/>
+            </Frame>
+            
+            <!-- Row 2 -->
+            <Frame type="EmoticonTileListItem" name="Item10" template="EmoticonSelectionPanel/EmoticonInGameTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item0" pos="Max" offset="#TileVerticalSpace"/>
+                <Anchor side="Left" relative="$parent/Item0" pos="Min" offset="0"/>
+            </Frame>
+
+            <Frame type="EmoticonTileListItem" name="Item11" template="EmoticonSelectionPanel/EmoticonInGameTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item10" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item10" pos="Max" offset="#TileHorizontalSpace"/>
+            </Frame>
+            
+            <Frame type="EmoticonTileListItem" name="Item12" template="EmoticonSelectionPanel/EmoticonInGameTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item11" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item11" pos="Max" offset="#TileHorizontalSpace"/>
+            </Frame>
+            
+            <Frame type="EmoticonTileListItem" name="Item13" template="EmoticonSelectionPanel/EmoticonInGameTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item12" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item12" pos="Max" offset="#TileHorizontalSpace"/>
+            </Frame>
+
+            <Frame type="EmoticonTileListItem" name="Item14" template="EmoticonSelectionPanel/EmoticonInGameTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item13" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item13" pos="Max" offset="#TileHorizontalSpace"/>
+            </Frame>
+
+            <Frame type="EmoticonTileListItem" name="Item15" template="EmoticonSelectionPanel/EmoticonInGameTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item14" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item14" pos="Max" offset="#TileHorizontalSpace"/>
+            </Frame>
+
+            <Frame type="EmoticonTileListItem" name="Item16" template="EmoticonSelectionPanel/EmoticonInGameTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item15" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item15" pos="Max" offset="#TileHorizontalSpace"/>
+            </Frame>
+
+            <Frame type="EmoticonTileListItem" name="Item17" template="EmoticonSelectionPanel/EmoticonInGameTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item16" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item16" pos="Max" offset="#TileHorizontalSpace"/>
+            </Frame>
+
+            <Frame type="EmoticonTileListItem" name="Item18" template="EmoticonSelectionPanel/EmoticonInGameTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item17" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item17" pos="Max" offset="#TileHorizontalSpace"/>
+            </Frame>
+
+            <Frame type="EmoticonTileListItem" name="Item19" template="EmoticonSelectionPanel/EmoticonInGameTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item18" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item18" pos="Max" offset="#TileHorizontalSpace"/>
+            </Frame>
+            
+            <!-- Row 3 -->
+            <Frame type="EmoticonTileListItem" name="Item20" template="EmoticonSelectionPanel/EmoticonInGameTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item10" pos="Max" offset="#TileVerticalSpace"/>
+                <Anchor side="Left" relative="$parent/Item10" pos="Min" offset="0"/>
+            </Frame>
+
+            <Frame type="EmoticonTileListItem" name="Item21" template="EmoticonSelectionPanel/EmoticonInGameTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item20" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item20" pos="Max" offset="#TileHorizontalSpace"/>
+            </Frame>
+
+            <Frame type="EmoticonTileListItem" name="Item22" template="EmoticonSelectionPanel/EmoticonInGameTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item21" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item21" pos="Max" offset="#TileHorizontalSpace"/>
+            </Frame>
+
+            <Frame type="EmoticonTileListItem" name="Item23" template="EmoticonSelectionPanel/EmoticonInGameTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item22" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item22" pos="Max" offset="#TileHorizontalSpace"/>
+            </Frame>
+
+            <Frame type="EmoticonTileListItem" name="Item24" template="EmoticonSelectionPanel/EmoticonInGameTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item23" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item23" pos="Max" offset="#TileHorizontalSpace"/>
+            </Frame>
+            
+            <Frame type="EmoticonTileListItem" name="Item25" template="EmoticonSelectionPanel/EmoticonInGameTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item24" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item24" pos="Max" offset="#TileHorizontalSpace"/>
+            </Frame>
+            
+            <Frame type="EmoticonTileListItem" name="Item26" template="EmoticonSelectionPanel/EmoticonInGameTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item25" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item25" pos="Max" offset="#TileHorizontalSpace"/>
+            </Frame>
+            
+            <Frame type="EmoticonTileListItem" name="Item27" template="EmoticonSelectionPanel/EmoticonInGameTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item26" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item26" pos="Max" offset="#TileHorizontalSpace"/>
+            </Frame>
+            
+            <Frame type="EmoticonTileListItem" name="Item28" template="EmoticonSelectionPanel/EmoticonInGameTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item27" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item27" pos="Max" offset="#TileHorizontalSpace"/>
+            </Frame>
+            
+            <Frame type="EmoticonTileListItem" name="Item29" template="EmoticonSelectionPanel/EmoticonInGameTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item28" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item28" pos="Max" offset="#TileHorizontalSpace"/>
+            </Frame>
+            
+            <!-- Row 4  -->
+            <Frame type="EmoticonTileListItem" name="Item30" template="EmoticonSelectionPanel/EmoticonInGameTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item20" pos="Max" offset="#TileVerticalSpace"/>
+                <Anchor side="Left" relative="$parent/Item20" pos="Min" offset="0"/>
+            </Frame>
+
+            <Frame type="EmoticonTileListItem" name="Item31" template="EmoticonSelectionPanel/EmoticonInGameTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item30" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item30" pos="Max" offset="#TileHorizontalSpace"/>
+            </Frame>
+
+            <Frame type="EmoticonTileListItem" name="Item32" template="EmoticonSelectionPanel/EmoticonInGameTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item31" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item31" pos="Max" offset="#TileHorizontalSpace"/>
+            </Frame>
+
+            <Frame type="EmoticonTileListItem" name="Item33" template="EmoticonSelectionPanel/EmoticonInGameTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item32" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item32" pos="Max" offset="#TileHorizontalSpace"/>
+            </Frame>
+            
+            <Frame type="EmoticonTileListItem" name="Item34" template="EmoticonSelectionPanel/EmoticonInGameTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item33" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item33" pos="Max" offset="#TileHorizontalSpace"/>
+            </Frame>
+            
+            <Frame type="EmoticonTileListItem" name="Item35" template="EmoticonSelectionPanel/EmoticonInGameTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item34" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item34" pos="Max" offset="#TileHorizontalSpace"/>
+            </Frame>
+
+            <Frame type="EmoticonTileListItem" name="Item36" template="EmoticonSelectionPanel/EmoticonInGameTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item35" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item35" pos="Max" offset="#TileHorizontalSpace"/>
+            </Frame>
+
+            <Frame type="EmoticonTileListItem" name="Item37" template="EmoticonSelectionPanel/EmoticonInGameTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item36" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item36" pos="Max" offset="#TileHorizontalSpace"/>
+            </Frame>
+
+            <Frame type="EmoticonTileListItem" name="Item38" template="EmoticonSelectionPanel/EmoticonInGameTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item37" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item37" pos="Max" offset="#TileHorizontalSpace"/>
+            </Frame>
+
+            <Frame type="EmoticonTileListItem" name="Item39" template="EmoticonSelectionPanel/EmoticonInGameTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item38" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item38" pos="Max" offset="#TileHorizontalSpace"/>
+            </Frame>
+            
+            <!-- Row 5 -->
+            <Frame type="EmoticonTileListItem" name="Item40" template="EmoticonSelectionPanel/EmoticonInGameTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item30" pos="Max" offset="#TileVerticalSpace"/>
+                <Anchor side="Left" relative="$parent/Item30" pos="Min" offset="0"/>
+            </Frame>
+
+            <Frame type="EmoticonTileListItem" name="Item41" template="EmoticonSelectionPanel/EmoticonInGameTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item40" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item40" pos="Max" offset="#TileHorizontalSpace"/>
+            </Frame>
+
+            <Frame type="EmoticonTileListItem" name="Item42" template="EmoticonSelectionPanel/EmoticonInGameTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item41" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item41" pos="Max" offset="#TileHorizontalSpace"/>
+            </Frame>
+
+            <Frame type="EmoticonTileListItem" name="Item43" template="EmoticonSelectionPanel/EmoticonInGameTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item42" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item42" pos="Max" offset="#TileHorizontalSpace"/>
+            </Frame>
+
+            <Frame type="EmoticonTileListItem" name="Item44" template="EmoticonSelectionPanel/EmoticonInGameTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item43" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item43" pos="Max" offset="#TileHorizontalSpace"/>
+            </Frame>
+            
+            <Frame type="EmoticonTileListItem" name="Item45" template="EmoticonSelectionPanel/EmoticonInGameTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item44" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item44" pos="Max" offset="#TileHorizontalSpace"/>
+            </Frame>
+            
+            <Frame type="EmoticonTileListItem" name="Item46" template="EmoticonSelectionPanel/EmoticonInGameTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item45" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item45" pos="Max" offset="#TileHorizontalSpace"/>
+            </Frame>
+            
+            <Frame type="EmoticonTileListItem" name="Item47" template="EmoticonSelectionPanel/EmoticonInGameTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item46" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item46" pos="Max" offset="#TileHorizontalSpace"/>
+            </Frame>
+            
+            <Frame type="EmoticonTileListItem" name="Item48" template="EmoticonSelectionPanel/EmoticonInGameTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item47" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item47" pos="Max" offset="#TileHorizontalSpace"/>
+            </Frame>
+            
+            <Frame type="EmoticonTileListItem" name="Item49" template="EmoticonSelectionPanel/EmoticonInGameTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item48" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item48" pos="Max" offset="#TileHorizontalSpace"/>
+            </Frame>
+            
+            <!-- Row 6 -->
+            <Frame type="EmoticonTileListItem" name="Item50" template="EmoticonSelectionPanel/EmoticonInGameTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item40" pos="Max" offset="#TileVerticalSpace"/>
+                <Anchor side="Left" relative="$parent/Item40" pos="Min" offset="0"/>
+            </Frame>
+
+            <Frame type="EmoticonTileListItem" name="Item51" template="EmoticonSelectionPanel/EmoticonInGameTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item50" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item50" pos="Max" offset="#TileHorizontalSpace"/>
+            </Frame>
+
+            <Frame type="EmoticonTileListItem" name="Item52" template="EmoticonSelectionPanel/EmoticonInGameTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item51" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item51" pos="Max" offset="#TileHorizontalSpace"/>
+            </Frame>
+
+            <Frame type="EmoticonTileListItem" name="Item53" template="EmoticonSelectionPanel/EmoticonInGameTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item52" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item52" pos="Max" offset="#TileHorizontalSpace"/>
+            </Frame>
+
+            <Frame type="EmoticonTileListItem" name="Item54" template="EmoticonSelectionPanel/EmoticonInGameTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item53" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item53" pos="Max" offset="#TileHorizontalSpace"/>
+            </Frame>
+            
+            <Frame type="EmoticonTileListItem" name="Item55" template="EmoticonSelectionPanel/EmoticonInGameTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item54" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item54" pos="Max" offset="#TileHorizontalSpace"/>
+            </Frame>
+            
+            <Frame type="EmoticonTileListItem" name="Item56" template="EmoticonSelectionPanel/EmoticonInGameTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item55" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item55" pos="Max" offset="#TileHorizontalSpace"/>
+            </Frame>
+            
+            <Frame type="EmoticonTileListItem" name="Item57" template="EmoticonSelectionPanel/EmoticonInGameTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item56" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item56" pos="Max" offset="#TileHorizontalSpace"/>
+            </Frame>
+            
+            <Frame type="EmoticonTileListItem" name="Item58" template="EmoticonSelectionPanel/EmoticonInGameTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item57" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item57" pos="Max" offset="#TileHorizontalSpace"/>
+            </Frame>
+            
+            <Frame type="EmoticonTileListItem" name="Item59" template="EmoticonSelectionPanel/EmoticonInGameTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item58" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item58" pos="Max" offset="#TileHorizontalSpace"/>
+            </Frame>
+            
+            <!-- Row 7 -->
+            <Frame type="EmoticonTileListItem" name="Item60" template="EmoticonSelectionPanel/EmoticonInGameTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item50" pos="Max" offset="#TileVerticalSpace"/>
+                <Anchor side="Left" relative="$parent/Item50" pos="Min" offset="0"/>
+            </Frame>
+
+            <Frame type="EmoticonTileListItem" name="Item61" template="EmoticonSelectionPanel/EmoticonInGameTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item60" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item60" pos="Max" offset="#TileHorizontalSpace"/>
+            </Frame>
+
+            <Frame type="EmoticonTileListItem" name="Item62" template="EmoticonSelectionPanel/EmoticonInGameTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item61" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item61" pos="Max" offset="#TileHorizontalSpace"/>
+            </Frame>
+
+            <Frame type="EmoticonTileListItem" name="Item63" template="EmoticonSelectionPanel/EmoticonInGameTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item62" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item62" pos="Max" offset="#TileHorizontalSpace"/>
+            </Frame>
+
+            <Frame type="EmoticonTileListItem" name="Item64" template="EmoticonSelectionPanel/EmoticonInGameTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item63" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item63" pos="Max" offset="#TileHorizontalSpace"/>
+            </Frame>
+            
+            <Frame type="EmoticonTileListItem" name="Item65" template="EmoticonSelectionPanel/EmoticonInGameTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item64" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item64" pos="Max" offset="#TileHorizontalSpace"/>
+            </Frame>
+            
+            <Frame type="EmoticonTileListItem" name="Item66" template="EmoticonSelectionPanel/EmoticonInGameTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item65" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item65" pos="Max" offset="#TileHorizontalSpace"/>
+            </Frame>
+            
+            <Frame type="EmoticonTileListItem" name="Item67" template="EmoticonSelectionPanel/EmoticonInGameTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item66" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item66" pos="Max" offset="#TileHorizontalSpace"/>
+            </Frame>
+            
+            <Frame type="EmoticonTileListItem" name="Item68" template="EmoticonSelectionPanel/EmoticonInGameTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item67" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item67" pos="Max" offset="#TileHorizontalSpace"/>
+            </Frame>
+            
+            <Frame type="EmoticonTileListItem" name="Item69" template="EmoticonSelectionPanel/EmoticonInGameTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item68" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item68" pos="Max" offset="#TileHorizontalSpace"/>
+            </Frame>
+            
+            <!-- Row 8 -->
+            <Frame type="EmoticonTileListItem" name="Item70" template="EmoticonSelectionPanel/EmoticonInGameTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item60" pos="Max" offset="#TileVerticalSpace"/>
+                <Anchor side="Left" relative="$parent/Item60" pos="Min" offset="0"/>
+            </Frame>
+
+            <Frame type="EmoticonTileListItem" name="Item71" template="EmoticonSelectionPanel/EmoticonInGameTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item70" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item70" pos="Max" offset="#TileHorizontalSpace"/>
+            </Frame>
+
+            <Frame type="EmoticonTileListItem" name="Item72" template="EmoticonSelectionPanel/EmoticonInGameTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item71" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item71" pos="Max" offset="#TileHorizontalSpace"/>
+            </Frame>
+
+            <Frame type="EmoticonTileListItem" name="Item73" template="EmoticonSelectionPanel/EmoticonInGameTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item72" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item72" pos="Max" offset="#TileHorizontalSpace"/>
+            </Frame>
+
+            <Frame type="EmoticonTileListItem" name="Item74" template="EmoticonSelectionPanel/EmoticonInGameTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item73" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item73" pos="Max" offset="#TileHorizontalSpace"/>
+            </Frame>
+            
+            <Frame type="EmoticonTileListItem" name="Item75" template="EmoticonSelectionPanel/EmoticonInGameTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item74" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item74" pos="Max" offset="#TileHorizontalSpace"/>
+            </Frame>
+            
+            <Frame type="EmoticonTileListItem" name="Item76" template="EmoticonSelectionPanel/EmoticonInGameTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item75" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item75" pos="Max" offset="#TileHorizontalSpace"/>
+            </Frame>
+            
+            <Frame type="EmoticonTileListItem" name="Item77" template="EmoticonSelectionPanel/EmoticonInGameTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item76" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item76" pos="Max" offset="#TileHorizontalSpace"/>
+            </Frame>
+            
+            <Frame type="EmoticonTileListItem" name="Item78" template="EmoticonSelectionPanel/EmoticonInGameTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item77" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item77" pos="Max" offset="#TileHorizontalSpace"/>
+            </Frame>
+            
+            <Frame type="EmoticonTileListItem" name="Item79" template="EmoticonSelectionPanel/EmoticonInGameTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item78" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item78" pos="Max" offset="#TileHorizontalSpace"/>
+            </Frame>
+            
+            <!-- Row 9 -->
+            <Frame type="EmoticonTileListItem" name="Item80" template="EmoticonSelectionPanel/EmoticonInGameTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item70" pos="Max" offset="#TileVerticalSpace"/>
+                <Anchor side="Left" relative="$parent/Item70" pos="Min" offset="0"/>
+            </Frame>
+
+            <Frame type="EmoticonTileListItem" name="Item81" template="EmoticonSelectionPanel/EmoticonInGameTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item80" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item80" pos="Max" offset="#TileHorizontalSpace"/>
+            </Frame>
+
+            <Frame type="EmoticonTileListItem" name="Item82" template="EmoticonSelectionPanel/EmoticonInGameTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item81" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item81" pos="Max" offset="#TileHorizontalSpace"/>
+            </Frame>
+
+            <Frame type="EmoticonTileListItem" name="Item83" template="EmoticonSelectionPanel/EmoticonInGameTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item82" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item82" pos="Max" offset="#TileHorizontalSpace"/>
+            </Frame>
+
+            <Frame type="EmoticonTileListItem" name="Item84" template="EmoticonSelectionPanel/EmoticonInGameTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item83" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item83" pos="Max" offset="#TileHorizontalSpace"/>
+            </Frame>
+            
+            <Frame type="EmoticonTileListItem" name="Item85" template="EmoticonSelectionPanel/EmoticonInGameTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item84" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item84" pos="Max" offset="#TileHorizontalSpace"/>
+            </Frame>
+            
+            <Frame type="EmoticonTileListItem" name="Item86" template="EmoticonSelectionPanel/EmoticonInGameTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item85" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item85" pos="Max" offset="#TileHorizontalSpace"/>
+            </Frame>
+            
+            <Frame type="EmoticonTileListItem" name="Item87" template="EmoticonSelectionPanel/EmoticonInGameTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item86" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item86" pos="Max" offset="#TileHorizontalSpace"/>
+            </Frame>
+            
+            <Frame type="EmoticonTileListItem" name="Item88" template="EmoticonSelectionPanel/EmoticonInGameTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item87" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item87" pos="Max" offset="#TileHorizontalSpace"/>
+            </Frame>
+            
+            <Frame type="EmoticonTileListItem" name="Item89" template="EmoticonSelectionPanel/EmoticonInGameTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item88" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item88" pos="Max" offset="#TileHorizontalSpace"/>
+            </Frame>
+            
+            <!-- Row 10 -->
+            <Frame type="EmoticonTileListItem" name="Item90" template="EmoticonSelectionPanel/EmoticonInGameTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item80" pos="Max" offset="#TileVerticalSpace"/>
+                <Anchor side="Left" relative="$parent/Item80" pos="Min" offset="0"/>
+            </Frame>
+
+            <Frame type="EmoticonTileListItem" name="Item91" template="EmoticonSelectionPanel/EmoticonInGameTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item90" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item90" pos="Max" offset="#TileHorizontalSpace"/>
+            </Frame>
+
+            <Frame type="EmoticonTileListItem" name="Item92" template="EmoticonSelectionPanel/EmoticonInGameTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item91" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item91" pos="Max" offset="#TileHorizontalSpace"/>
+            </Frame>
+
+            <Frame type="EmoticonTileListItem" name="Item93" template="EmoticonSelectionPanel/EmoticonInGameTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item92" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item92" pos="Max" offset="#TileHorizontalSpace"/>
+            </Frame>
+
+            <Frame type="EmoticonTileListItem" name="Item94" template="EmoticonSelectionPanel/EmoticonInGameTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item93" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item93" pos="Max" offset="#TileHorizontalSpace"/>
+            </Frame>
+            
+            <Frame type="EmoticonTileListItem" name="Item95" template="EmoticonSelectionPanel/EmoticonInGameTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item94" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item94" pos="Max" offset="#TileHorizontalSpace"/>
+            </Frame>
+            
+            <Frame type="EmoticonTileListItem" name="Item96" template="EmoticonSelectionPanel/EmoticonInGameTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item95" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item95" pos="Max" offset="#TileHorizontalSpace"/>
+            </Frame>
+            
+            <Frame type="EmoticonTileListItem" name="Item97" template="EmoticonSelectionPanel/EmoticonInGameTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item96" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item96" pos="Max" offset="#TileHorizontalSpace"/>
+            </Frame>
+            
+            <Frame type="EmoticonTileListItem" name="Item98" template="EmoticonSelectionPanel/EmoticonInGameTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item97" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item97" pos="Max" offset="#TileHorizontalSpace"/>
+            </Frame>
+            
+            <Frame type="EmoticonTileListItem" name="Item99" template="EmoticonSelectionPanel/EmoticonInGameTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item98" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item98" pos="Max" offset="#TileHorizontalSpace"/>
+            </Frame>
+            
+            <!-- Row 11 -->
+            <Frame type="EmoticonTileListItem" name="Item100" template="EmoticonSelectionPanel/EmoticonInGameTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item90" pos="Max" offset="#TileVerticalSpace"/>
+                <Anchor side="Left" relative="$parent/Item90" pos="Min" offset="0"/>
+            </Frame>
+
+            <Frame type="EmoticonTileListItem" name="Item101" template="EmoticonSelectionPanel/EmoticonInGameTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item100" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item100" pos="Max" offset="#TileHorizontalSpace"/>
+            </Frame>
+
+            <Frame type="EmoticonTileListItem" name="Item102" template="EmoticonSelectionPanel/EmoticonInGameTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item101" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item101" pos="Max" offset="#TileHorizontalSpace"/>
+            </Frame>
+
+            <Frame type="EmoticonTileListItem" name="Item103" template="EmoticonSelectionPanel/EmoticonInGameTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item102" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item102" pos="Max" offset="#TileHorizontalSpace"/>
+            </Frame>
+
+            <Frame type="EmoticonTileListItem" name="Item104" template="EmoticonSelectionPanel/EmoticonInGameTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item103" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item103" pos="Max" offset="#TileHorizontalSpace"/>
+            </Frame>
+            
+            <Frame type="EmoticonTileListItem" name="Item105" template="EmoticonSelectionPanel/EmoticonInGameTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item104" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item104" pos="Max" offset="#TileHorizontalSpace"/>
+            </Frame>
+            
+            <Frame type="EmoticonTileListItem" name="Item106" template="EmoticonSelectionPanel/EmoticonInGameTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item105" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item105" pos="Max" offset="#TileHorizontalSpace"/>
+            </Frame>
+            
+            <Frame type="EmoticonTileListItem" name="Item107" template="EmoticonSelectionPanel/EmoticonInGameTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item106" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item106" pos="Max" offset="#TileHorizontalSpace"/>
+            </Frame>
+            
+            <Frame type="EmoticonTileListItem" name="Item108" template="EmoticonSelectionPanel/EmoticonInGameTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item107" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item107" pos="Max" offset="#TileHorizontalSpace"/>
+            </Frame>
+            
+            <Frame type="EmoticonTileListItem" name="Item109" template="EmoticonSelectionPanel/EmoticonInGameTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item108" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item108" pos="Max" offset="#TileHorizontalSpace"/>
+            </Frame>
+            
+            <!-- Row 12 -->
+            <Frame type="EmoticonTileListItem" name="Item110" template="EmoticonSelectionPanel/EmoticonInGameTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item100" pos="Max" offset="#TileVerticalSpace"/>
+                <Anchor side="Left" relative="$parent/Item100" pos="Min" offset="0"/>
+            </Frame>
+
+            <Frame type="EmoticonTileListItem" name="Item111" template="EmoticonSelectionPanel/EmoticonInGameTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item110" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item110" pos="Max" offset="#TileHorizontalSpace"/>
+            </Frame>
+
+            <Frame type="EmoticonTileListItem" name="Item112" template="EmoticonSelectionPanel/EmoticonInGameTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item111" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item111" pos="Max" offset="#TileHorizontalSpace"/>
+            </Frame>
+
+            <Frame type="EmoticonTileListItem" name="Item113" template="EmoticonSelectionPanel/EmoticonInGameTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item112" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item112" pos="Max" offset="#TileHorizontalSpace"/>
+            </Frame>
+
+            <Frame type="EmoticonTileListItem" name="Item114" template="EmoticonSelectionPanel/EmoticonInGameTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item113" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item113" pos="Max" offset="#TileHorizontalSpace"/>
+            </Frame>
+            
+            <Frame type="EmoticonTileListItem" name="Item115" template="EmoticonSelectionPanel/EmoticonInGameTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item114" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item114" pos="Max" offset="#TileHorizontalSpace"/>
+            </Frame>
+            
+            <Frame type="EmoticonTileListItem" name="Item116" template="EmoticonSelectionPanel/EmoticonInGameTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item115" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item115" pos="Max" offset="#TileHorizontalSpace"/>
+            </Frame>
+            
+            <Frame type="EmoticonTileListItem" name="Item117" template="EmoticonSelectionPanel/EmoticonInGameTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item116" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item116" pos="Max" offset="#TileHorizontalSpace"/>
+            </Frame>
+            
+            <Frame type="EmoticonTileListItem" name="Item118" template="EmoticonSelectionPanel/EmoticonInGameTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item117" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item117" pos="Max" offset="#TileHorizontalSpace"/>
+            </Frame>
+            
+            <Frame type="EmoticonTileListItem" name="Item119" template="EmoticonSelectionPanel/EmoticonInGameTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item118" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item118" pos="Max" offset="#TileHorizontalSpace"/>
+            </Frame>
+            
+            <!-- Row 13 -->
+            <Frame type="EmoticonTileListItem" name="Item120" template="EmoticonSelectionPanel/EmoticonInGameTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item110" pos="Max" offset="#TileVerticalSpace"/>
+                <Anchor side="Left" relative="$parent/Item110" pos="Min" offset="0"/>
+            </Frame>
+
+            <Frame type="EmoticonTileListItem" name="Item121" template="EmoticonSelectionPanel/EmoticonInGameTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item120" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item120" pos="Max" offset="#TileHorizontalSpace"/>
+            </Frame>
+
+            <Frame type="EmoticonTileListItem" name="Item122" template="EmoticonSelectionPanel/EmoticonInGameTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item121" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item121" pos="Max" offset="#TileHorizontalSpace"/>
+            </Frame>
+
+            <Frame type="EmoticonTileListItem" name="Item123" template="EmoticonSelectionPanel/EmoticonInGameTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item122" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item122" pos="Max" offset="#TileHorizontalSpace"/>
+            </Frame>
+
+            <Frame type="EmoticonTileListItem" name="Item124" template="EmoticonSelectionPanel/EmoticonInGameTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item123" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item123" pos="Max" offset="#TileHorizontalSpace"/>
+            </Frame>
+            
+            <Frame type="EmoticonTileListItem" name="Item125" template="EmoticonSelectionPanel/EmoticonInGameTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item124" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item124" pos="Max" offset="#TileHorizontalSpace"/>
+            </Frame>
+            
+            <Frame type="EmoticonTileListItem" name="Item126" template="EmoticonSelectionPanel/EmoticonInGameTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item125" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item125" pos="Max" offset="#TileHorizontalSpace"/>
+            </Frame>
+            
+            <Frame type="EmoticonTileListItem" name="Item127" template="EmoticonSelectionPanel/EmoticonInGameTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item126" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item126" pos="Max" offset="#TileHorizontalSpace"/>
+            </Frame>
+            
+            <Frame type="EmoticonTileListItem" name="Item128" template="EmoticonSelectionPanel/EmoticonInGameTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item127" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item127" pos="Max" offset="#TileHorizontalSpace"/>
+            </Frame>
+            
+            <Frame type="EmoticonTileListItem" name="Item129" template="EmoticonSelectionPanel/EmoticonInGameTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item128" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item128" pos="Max" offset="#TileHorizontalSpace"/>
+            </Frame>
+            
+            <Frame type="Frame" name="PageSelectorAnchor">
+                <Anchor side="Left" relative="$parent/$parent/BackgroundInner" pos="Min" offset="-2"/>
+                <Anchor side="Bottom" relative="$parent" pos="Max" offset="-35"/>
+                <Anchor side="Right" relative="$parent/$parent/BackgroundInner" pos="Max" offset="2"/>
+                <Height val="35"/>
+            </Frame>
+            
+            <Frame type="Image" name="PagePipDummyDisabled0" template="EmoticonSelectionPanel/MutablePagePipDummyDisabled">
+                <Anchor side="Top" relative="$parent/PageSelector/PageButton0" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/PageSelector/PageButton0" pos="Min" offset="0"/>
+                <Texture val="@UI/SC2_UI_Battlenet_Glue_EmoticonPanel_InGame_PagePip_Disabled"/>
+                <TextureType val="Normal"/>
+                <Width val="22"/>
+                <Height val="22"/>
+                <Alpha val="180"/>
+                <ColorAdjustMode val="Colorize"/>
+                <AdjustmentColor val="##PageSelectorColor"/>
+            </Frame>
+            
+            <Frame type="Image" name="PagePipDummyDisabled1" template="EmoticonSelectionPanel/MutablePagePipDummyDisabled">
+                <Anchor side="Top" relative="$parent/PageSelector/PageButton1" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/PageSelector/PageButton1" pos="Min" offset="0"/>
+                <Texture val="@UI/SC2_UI_Battlenet_Glue_EmoticonPanel_InGame_PagePip_Disabled"/>
+                <TextureType val="Normal"/>
+                <Width val="22"/>
+                <Height val="22"/>
+                <Alpha val="180"/>
+                <ColorAdjustMode val="Colorize"/>
+                <AdjustmentColor val="##PageSelectorColor"/>
+            </Frame>
+            
+            <Frame type="Image" name="PagePipDummyDisabled2" template="EmoticonSelectionPanel/MutablePagePipDummyDisabled">
+                <Anchor side="Top" relative="$parent/PageSelector/PageButton2" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/PageSelector/PageButton2" pos="Min" offset="0"/>
+                <Texture val="@UI/SC2_UI_Battlenet_Glue_EmoticonPanel_InGame_PagePip_Disabled"/>
+                <TextureType val="Normal"/>
+                <Width val="22"/>
+                <Height val="22"/>
+                <Alpha val="180"/>
+                <ColorAdjustMode val="Colorize"/>
+                <AdjustmentColor val="##PageSelectorColor"/>
+            </Frame>
+            
+            <Frame type="Image" name="PagePipDummyDisabled3" template="EmoticonSelectionPanel/MutablePagePipDummyDisabled">
+                <Anchor side="Top" relative="$parent/PageSelector/PageButton3" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/PageSelector/PageButton3" pos="Min" offset="0"/>
+                <Texture val="@UI/SC2_UI_Battlenet_Glue_EmoticonPanel_InGame_PagePip_Disabled"/>
+                <TextureType val="Normal"/>
+                <Width val="22"/>
+                <Height val="22"/>
+                <Alpha val="180"/>
+                <ColorAdjustMode val="Colorize"/>
+                <AdjustmentColor val="##PageSelectorColor"/>
+            </Frame>
+            
+            <Frame type="Image" name="PagePipDummyDisabled4" template="EmoticonSelectionPanel/MutablePagePipDummyDisabled">
+                <Anchor side="Top" relative="$parent/PageSelector/PageButton4" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/PageSelector/PageButton4" pos="Min" offset="0"/>
+                <Texture val="@UI/SC2_UI_Battlenet_Glue_EmoticonPanel_InGame_PagePip_Disabled"/>
+                <TextureType val="Normal"/>
+                <Width val="22"/>
+                <Height val="22"/>
+                <Alpha val="180"/>
+                <ColorAdjustMode val="Colorize"/>
+                <AdjustmentColor val="##PageSelectorColor"/>
+            </Frame>
+            
+            <Frame type="PageSelectorButtonList" name="PageSelector" template="EmoticonSelectionPanel/PageSelectorInGameTemplate">
+                <Anchor relative="$parent/PageSelectorAnchor"/>
+                <Visible val="False"/>
+                
+                <Animation name="Show">
+                    <Event event="OnShown" action="Reset,Play" frame="$parent/Item0"/>
+                    <Event event="OnHidden" action="Reset" frame="$parent/Item0"/>
+                     
+                    <Controller type="Visibility" end="Pause">
+                        <Key type="Bool" time="0" value="True"/>
+                    </Controller>
+                </Animation>
+            </Frame>
+        </Frame>
+        
+        <StateGroup name="MutatorSelectionState">
+            <DefaultState val="Inactive"/>
+            
+            <State name="Inactive">
+                <Action type="SetAnchor" frame="$this" side="Top" relative="$this" pos="Max" offset="-563"/>
+                <Action type="SetAnchor" frame="$this" side="Bottom" relative="$parent/ChatBar/BackgroundImage" pos="Max" offset="0"/>
+                <Action type="SetAnchor" frame="$this" side="Left" relative="$this" pos="Max" offset="-383"/>
+                <Action type="SetAnchor" frame="$this" side="Right" relative="$parent/ChatBar/BackgroundImage" pos="Min" offset="0"/>
+                <Action type="SetAnchor" frame="$this/EmoticonTitleLabel" side="Top" relative="$parent" pos="Min" offset="27"/>
+                <Action type="SetAnchor" frame="$this/EmoticonTitleLabel" side="Bottom" relative="$parent" pos="Min" offset="52"/>
+                <Action type="SetAnchor" frame="$this/EmoticonTitleLabel" side="Left" relative="$parent" pos="Min" offset="27"/>
+                <Action type="SetAnchor" frame="$this/EmoticonTitleLabel" side="Right" relative="$parent" pos="Max" offset="-20"/>
+                <Action type="SetAnchor" frame="$this/TileList/PageSelectorAnchor" side="Bottom" relative="$parent" pos="Max" offset="-35"/>
+                <Action type="SetAnchor" frame="$this/TileList/PageSelectorAnchor" side="Left" relative="$parent/$parent/BackgroundInner" pos="Min" offset="-2"/>
+                <Action type="SetAnchor" frame="$this/TileList/PageSelectorAnchor" side="Right" relative="$parent/$parent/BackgroundInner" pos="Max" offset="2"/>
+            </State>
+            
+            <State name="Active">
+                <Action type="SetAnchor" frame="$this" side="Top" relative="$this" pos="Max" offset="-550"/>
+                <Action type="SetAnchor" frame="$this" side="Bottom" relative="$parent/ChatBar" pos="Min" offset="14"/>
+                <Action type="SetAnchor" frame="$this" side="Left" relative="$parent/ChatBar" pos="Min" offset="47"/>
+                <Action type="SetAnchor" frame="$this" side="Right" relative="$this" pos="Min" offset="371"/>
+                <Action type="SetProperty" frame="$this/Background" texture="@UI/Glues_Battlenet_PageAssets_MainContainer"/>
+                <Action type="SetProperty" frame="$this/Background" TextureType="Nineslice"/>
+                <Action type="SetProperty" frame="$this/BackgroundDimmer" visible="true"/>
+                <Action type="SetProperty" frame="$this/BackgroundInner" visible="true"/>
+                <Action type="SetAnchor" frame="$this/BackgroundInner" side="Top" relative="$parent/Background" pos="Min" offset="50"/>
+                <Action type="SetAnchor" frame="$this/BackgroundInner" side="Left" relative="$parent/Background" pos="Min" offset="12"/>
+                <Action type="SetAnchor" frame="$this/BackgroundInner" side="Right" relative="$parent/Background" pos="Max" offset="-12"/>
+                <Action type="SetAnchor" frame="$this/EmoticonTitleLabel" side="Top" relative="$parent" pos="Min" offset="15"/>
+                <Action type="SetAnchor" frame="$this/EmoticonTitleLabel" side="Bottom" relative="$parent/BackgroundInner" pos="Min" offset="-5"/>
+                <Action type="SetAnchor" frame="$this/EmoticonTitleLabel" side="Left" relative="$parent" pos="Min" offset="20"/>
+                <Action type="SetAnchor" frame="$this/EmoticonTitleLabel" side="Right" relative="$parent" pos="Max" offset="-20"/>
+                <Action type="SetProperty" frame="$this/EmoticonTitleLabel" style="@EmoticonTitleText"/>
+                <Action type="SetAnchor" frame="$this/TileList/PageSelectorAnchor" side="Bottom" relative="$parent" pos="Max" offset="-11"/>
+                <Action type="SetAnchor" frame="$this/TileList/PageSelectorAnchor" side="Left" relative="$parent/$parent/BackgroundInner" pos="Min" offset="0"/>
+                <Action type="SetAnchor" frame="$this/TileList/PageSelectorAnchor" side="Right" relative="$parent/$parent/BackgroundInner" pos="Max" offset="0"/>
+                <Action type="SetAnchor" frame="$this/TileList/PageSelectorAnchor" side="Right" relative="$parent/$parent/BackgroundInner" pos="Max" offset="0"/>
+            </State>
+        </StateGroup>
     </Frame>
 </Desc>

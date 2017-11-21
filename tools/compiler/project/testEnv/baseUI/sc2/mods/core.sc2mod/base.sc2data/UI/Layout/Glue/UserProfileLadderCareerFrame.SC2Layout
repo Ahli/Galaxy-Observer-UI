@@ -1,0 +1,214 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<Desc>
+    <DescFlags val="Locked"/>
+
+    <Frame type="UserProfileLadderCareerTileListItem" name="UserProfileLadderCareerTileListItem">
+        <Width val="209"/>
+        <Height val="354"/>
+        <HideWhenCleared val="False"/>
+
+        <Frame type="Image" name="BackgroundImage">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+            <Texture val="@UI/SC2_UI_Battlenet_Glue_Arcade_MainListItem_Normal"/>
+            <TextureType val="NineSlice"/>
+        </Frame>
+
+        <Frame type="Image" name="NormalImage">
+            <Anchor relative="$parent"/>
+            <Alpha val="0"/>
+        </Frame>
+
+        <Frame type="Image" name="HoverImage">
+            <Anchor relative="$parent"/>
+            <Alpha val="0"/>
+        </Frame>
+
+        <Frame type="Image" name="SelectedImage">
+            <Anchor relative="$parent"/>
+            <Alpha val="0"/>
+        </Frame>
+
+        <Frame type="BattleQueueFrame" name="QueueFrame">
+            <Anchor relative="$parent"/>
+            <QueueId val="{$parent/@QueueId}"/>
+        </Frame>
+
+        <Frame type="MatchmakingLeagueIcon" name="LeagueIcon" template="MatchmakingLeagueIcon/MatchmakingLeagueIconTinyResizableTemplate">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="50"/>
+            <Anchor side="Left" relative="$parent" pos="Mid" offset="-7"/>
+            <Anchor side="Right" relative="$parent" pos="Mid" offset="-7"/>
+            <Width val="271"/>
+            <League val="{$parent/@League}"/>
+            <LeagueTier val="{$parent/@Tier}"/>
+            <LeagueRank val="{$parent/@Rank}"/>
+            
+            <Frame type="Frame" name="LeagueBanner">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="112"/>
+            </Frame>
+        </Frame>
+
+        <Frame type="Label" name="SeasonNameLabel">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="8"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+            <Style val="Profile_Ladders_CareerSeasonUppercase"/>
+            <Text val="@UI/UserProfileLadderCareerFrame/CurrentSeason"/>
+            <Visible val="{$parent/LeagueIcon/@Visible}"/>
+            <Options val="NoWrapping|ScaleToPreventTruncation"/>
+
+            <Frame type="MatchmakingSeasonFrame" name="SeasonFrame">
+                <Anchor relative="$parent"/>
+                <SeasonId val="{$parent/$parent/@SeasonId}"/>
+            </Frame>
+            
+            <StateGroup name="SeasonStateGroup">
+                <State name="CurrentSeasonState">
+                    <When type="Property" frame="SeasonFrame" IsCurrentSeason="false"/>
+                    <Action type="SetProperty" frame="$this" Text="{$this/SeasonFrame/@SeasonName}"/>
+                    <Action type="SetProperty" frame="$this" Style="Profile_Ladders_CareerSeason"/>
+                </State>
+            </StateGroup>
+        </Frame>
+
+        <Frame type="Label" name="QueueNameLabel">
+            <Anchor side="Top" relative="$parent/SeasonNameLabel" pos="Max" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Mid" offset="2"/>
+            <Anchor side="Right" relative="$parent" pos="Mid" offset="2"/>
+            <Style val="Profile_Ladders_CareerMode"/>
+            <Text val="{$parent/QueueFrame/@ShortName}"/>
+            <Visible val="{$parent/LeagueIcon/@Visible}"/>
+        </Frame>
+        
+        <StateGroup name="DataState">
+            <DefaultState val="Empty"/>
+            
+            <State name="HasData">
+                <When type="Property" HasData="True"/>
+                <Action type="SetProperty" frame="BackgroundImage" Alpha="255"/>
+                <Action type="SetProperty" frame="LeagueIcon" Visible="True"/>
+            </State>
+            
+            <State name="Empty">
+                <Action type="SetProperty" frame="BackgroundImage" Alpha="64"/>
+                <Action type="SetProperty" frame="LeagueIcon" Visible="False"/>
+            </State>
+        </StateGroup>
+    </Frame>
+    
+    <Frame type="UserProfileLadderCareerFrame" name="UserProfileLadderCareerFrameTemplate">
+        <PresenceId val="{$ScreenUserProfile/@PresenceId}"/>
+        <QueueId val="{$this/ModePulldown/@QueueId}"/>
+        <ExpansionTag val="{$this/ExpansionPulldown/@ExpansionTag}"/>
+        <SortRank val="{$this/SortCheckBox/@Checked}"/>
+        
+        <Frame type="Frame" name="BackgroundContainer" template="UserProfileTemplates/MonoListBackgroundTemplate">
+            <Anchor relative="$parent"/>
+        </Frame>
+        
+        <Frame type="Label" name="FilterLabel">
+            <Anchor side="Top" relative="$parent/ModePulldown" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent/ModePulldown" pos="Mid" offset="0"/>
+            <Anchor side="Left" relative="$parent/BackgroundContainer" pos="Min" offset="29"/>
+            <Text val="@UI/ScreenUserProfile/Ladders/RaceReport/FilterMode"/>
+            <Style val="Profile_Achievement_SectionHeader"/>
+            <Visible val="{$parent/ModePulldown/@Visible}"/>
+        </Frame>
+
+        <Frame type="BattleQueuePulldown" name="ModePulldown" template="StandardTemplates/StandardPulldownTemplate">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="11"/>
+            <Anchor side="Left" relative="$parent/FilterLabel" pos="Max" offset="10"/>
+            <TagString index="0" val="Ladd"/>
+            <Tag index="1" val="{$parent/ExpansionPulldown/@ExpansionTag}"/>
+            <IncludeAll val="true"/>
+        </Frame>
+
+        <Frame type="CheckBox" name="SortCheckBox" template="StandardTemplates/StandardCheckBoxTemplate">
+            <Anchor side="Top" relative="$parent/ModePulldown" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent/ModePulldown" pos="Mid" offset="0"/>
+            <Anchor side="Left" relative="$parent/ModePulldown" pos="Max" offset="10"/>
+            <Checked val="false"/>
+        </Frame>
+
+        <Frame type="Label" name="SortLabel">
+            <Anchor side="Top" relative="$parent/SortCheckBox" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent/SortCheckBox" pos="Mid" offset="0"/>
+            <Anchor side="Left" relative="$parent/SortCheckBox" pos="Max" offset="0"/>
+            <Style val="Profile_Achievement_SectionHeader"/>
+            <Text val="@UI/UserProfileLadderCareerFrame/SortRank"/>
+        </Frame>
+
+        <Frame type="ExpansionPulldown" name="ExpansionPulldown" template="StandardTemplates/StandardPulldownTemplate">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="11"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="-13"/>
+        </Frame>
+
+        <Frame type="TileList" name="TileList">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="73"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="12"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="-10"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="-12"/>
+            <ScrollStepValue val="5"/>
+            <AcceptsMouse val="true"/>
+
+            <Frame type="UserProfileLadderCareerTileListItem" name="Item0" template="UserProfileLadderCareerFrame/UserProfileLadderCareerTileListItem">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="3"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="4"/>
+            </Frame>
+
+            <Frame type="UserProfileLadderCareerTileListItem" name="Item1" template="UserProfileLadderCareerFrame/UserProfileLadderCareerTileListItem">
+                <Anchor side="Top" relative="$parent/Item0" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item0" pos="Max" offset="6"/>
+            </Frame>
+
+            <Frame type="UserProfileLadderCareerTileListItem" name="Item2" template="UserProfileLadderCareerFrame/UserProfileLadderCareerTileListItem">
+                <Anchor side="Top" relative="$parent/Item1" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item1" pos="Max" offset="6"/>
+            </Frame>
+
+            <Frame type="UserProfileLadderCareerTileListItem" name="Item3" template="UserProfileLadderCareerFrame/UserProfileLadderCareerTileListItem">
+                <Anchor side="Top" relative="$parent/Item2" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item2" pos="Max" offset="6"/>
+            </Frame>
+
+            <Frame type="UserProfileLadderCareerTileListItem" name="Item4" template="UserProfileLadderCareerFrame/UserProfileLadderCareerTileListItem">
+                <Anchor side="Top" relative="$parent/Item3" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item3" pos="Max" offset="6"/>
+            </Frame>
+
+            <Frame type="UserProfileLadderCareerTileListItem" name="Item5" template="UserProfileLadderCareerFrame/UserProfileLadderCareerTileListItem">
+                <Anchor side="Top" relative="$parent/Item0" pos="Max" offset="6"/>
+                <Anchor side="Left" relative="$parent/Item0" pos="Min" offset="0"/>
+            </Frame>
+
+            <Frame type="UserProfileLadderCareerTileListItem" name="Item6" template="UserProfileLadderCareerFrame/UserProfileLadderCareerTileListItem">
+                <Anchor side="Top" relative="$parent/Item5" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item5" pos="Max" offset="6"/>
+            </Frame>
+
+            <Frame type="UserProfileLadderCareerTileListItem" name="Item7" template="UserProfileLadderCareerFrame/UserProfileLadderCareerTileListItem">
+                <Anchor side="Top" relative="$parent/Item6" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item6" pos="Max" offset="6"/>
+            </Frame>
+
+            <Frame type="UserProfileLadderCareerTileListItem" name="Item8" template="UserProfileLadderCareerFrame/UserProfileLadderCareerTileListItem">
+                <Anchor side="Top" relative="$parent/Item7" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item7" pos="Max" offset="6"/>
+            </Frame>
+
+            <Frame type="UserProfileLadderCareerTileListItem" name="Item9" template="UserProfileLadderCareerFrame/UserProfileLadderCareerTileListItem">
+                <Anchor side="Top" relative="$parent/Item8" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item8" pos="Max" offset="6"/>
+            </Frame>
+
+            <Frame type="ScrollBar" name="ScrollBar" template="CollectionTemplates/ScrollBarTemplate">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="-3"/>
+                <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+                <Anchor side="Bottom" relative="$parent" pos="Max" offset="2"/>
+                <CollapseLayout val="true"/>
+            </Frame>
+        </Frame>
+    </Frame>
+</Desc>

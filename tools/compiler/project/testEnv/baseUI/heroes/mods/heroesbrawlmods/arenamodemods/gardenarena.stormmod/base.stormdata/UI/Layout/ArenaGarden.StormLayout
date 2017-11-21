@@ -3,72 +3,23 @@
 
     <Constant name="TeamAllyBackingColor" val="0048eb"/>
     <Constant name="TeamEnemyBackingColor" val="eb0011"/>
+
+    <!-- Override to turn off the "VS" label so it does not appear in localized version of the client -->
+    <Frame type="CommandPanel" name="GameUI/UIContainer/ConsoleUIContainer/PartyFramePanel" file="GameUI">
+        <Frame type="Label" name="VSLabel">
+            <Visible val="False"/>
+        </Frame>
+    </Frame>
     
     <!--**************************************************************-->
     <!-- Top Count Label                                              -->
     <!--**************************************************************-->
-    <Frame type="Frame" name="ArenaGardenScorePanel">
+    <Frame type="Frame" name="ArenaGardenScorePanel" template="ArenaModeScore/ArenaScorePanel">
         <Anchor relative="$parent"/>
         
-        <Frame type="Image" name="Team1LevelColorBacking">
-            <Anchor relative="$ancestor[@name=PartyFramePanel]/Team1LevelInfo/TeamLevelColorBacking"/>
-            <Texture val="@UI/HUD_TopBar_TeamXP_ColorBacking"/>
-            <BlendMode val="Add"/>
-        </Frame>
-
-        <Frame type="Image" name="Team2LevelColorBacking">
-            <Anchor relative="$ancestor[@name=PartyFramePanel]/Team2LevelInfo/TeamLevelColorBacking"/>
-            <Texture val="@UI/HUD_TopBar_TeamXP_ColorBacking"/>
-            <TextureCoords top="0" left="1" bottom="1" right="0"/>
-            <BlendMode val="Add"/>
-        </Frame>
-        
         <Frame type="Image" name="VsImage">
-            <Anchor side="Top" relative="$parent" pos="Min" offset="31"/>
-            <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
-            <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
             <Texture val="@UI/Storm_UI_Brawl_HUD_Icon_Seeds"/>
         </Frame>
-
-        <Frame type="Label" name="HelpText">
-            <Anchor side="Top" relative="$parent" pos="Min" offset="90"/>
-            <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
-            <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
-            <Style val="Storm_MapMechanic_MechanicCounterCentered"/>
-        </Frame>
-        
-        <Frame type="Label" name="Team1Score">
-            <Anchor relative="$ancestor[@name=PartyFramePanel]/Team1LevelInfo/TeamLevelLabel" side="Top" pos="Min" offset="-20"/>
-            <Anchor relative="$ancestor[@name=PartyFramePanel]/Team1LevelInfo/TeamLevelLabel" side="Bottom" pos="Max" offset="0"/>
-            <Anchor relative="$ancestor[@name=PartyFramePanel]/Team1LevelInfo/TeamLevelLabel" side="Left" pos="Min" offset="3"/>
-            <Anchor relative="$ancestor[@name=PartyFramePanel]/Team1LevelInfo/TeamLevelLabel" side="Right" pos="Max" offset="11"/>
-        </Frame>
-        
-        <Frame type="Label" name="Team2Score">
-            <Anchor relative="$ancestor[@name=PartyFramePanel]/Team2LevelInfo/TeamLevelLabel" side="Top" pos="Min" offset="-20"/>
-            <Anchor relative="$ancestor[@name=PartyFramePanel]/Team2LevelInfo/TeamLevelLabel" side="Bottom" pos="Max" offset="0"/>
-            <Anchor relative="$ancestor[@name=PartyFramePanel]/Team2LevelInfo/TeamLevelLabel" side="Left" pos="Min" offset="-8"/>
-            <Anchor relative="$ancestor[@name=PartyFramePanel]/Team2LevelInfo/TeamLevelLabel" side="Right" pos="Max" offset="0"/>
-        </Frame>
-
-        <!-- Switching team colors for Score Labels if needed -->
-        <StateGroup name="SetTeamColors">
-            <State name="SetLeftAlly">
-                <When type="AnimationState" frame="$ancestor[@type=GameUI]/UIContainer" TeamColors="Team1IsBlue"/>
-                <Action type="SetProperty" frame="Team1LevelColorBacking" color="#TeamAllyBackingColor"/>
-                <Action type="SetProperty" frame="Team1Score" style="PartyFrame_TeamLevel"/>
-                <Action type="SetProperty" frame="Team2LevelColorBacking" color="#TeamEnemyBackingColor"/>
-                <Action type="SetProperty" frame="Team2Score" style="PartyFrame_TeamLevel_Enemy"/>
-            </State>
-
-            <State name="SetRightAlly">
-                <When type="AnimationState" frame="$ancestor[@type=GameUI]/UIContainer" TeamColors="Team2IsBlue"/>
-                <Action type="SetProperty" frame="Team2LevelColorBacking" color="#TeamAllyBackingColor"/>
-                <Action type="SetProperty" frame="Team2Score" style="PartyFrame_TeamLevel"/>
-                <Action type="SetProperty" frame="Team1LevelColorBacking" color="#TeamEnemyBackingColor"/>
-                <Action type="SetProperty" frame="Team1Score" style="PartyFrame_TeamLevel_Enemy"/>
-            </State>
-        </StateGroup>
     </Frame>
     
     <!--**************************************************************-->
@@ -122,16 +73,16 @@
                 <Key type="Bool" time="5.5" value="False"/>
             </Controller>
             <Controller type="Anchor" end="Pause" side="Right" relative="true">
-                <Key type="Curve" time="0.0" value="500" out="Fast"/>
+                <Key type="Curve" time="0.0" value="500" inout="Linear"/>
                 <Key type="Curve" time="0.25" value="0" inout="Fast"/>
                 <Key type="Curve" time="5.25" value="0" inout="Fast"/>
-                <Key type="Curve" time="5.5" value="500" in="Fast"/>
+                <Key type="Curve" time="5.5" value="500" inout="Linear"/>
             </Controller>
             <Controller type="Fade" end="Pause">
-                <Key type="Curve" time="0.0" value="0" out="Fast"/>
+                <Key type="Curve" time="0.0" value="0" inout="Linear"/>
                 <Key type="Curve" time="0.25" value="255" inout="Fast"/>
                 <Key type="Curve" time="5.25" value="255" inout="Fast"/>
-                <Key type="Curve" time="5.5" value="0" in="Fast"/>
+                <Key type="Curve" time="5.5" value="0" inout="Linear"/>
             </Controller>
             <Controller type="Anchor" end="Pause" side="Top">
                 <Key type="Curve" time="0.0" value="0"/>
@@ -141,8 +92,8 @@
         <!-- Make room for another notification -->
         <Animation name="ShiftUp">
             <Controller type="Anchor" end="Pause" side="Top" relative="true">
-                <Key type="Curve" time="0.0" value="0" out="Fast"/>
-                <Key type="Curve" time="0.25" value="-120" in="Slow" out="Step"/>
+                <Key type="Curve" time="0.0" value="0" inout="Linear"/>
+                <Key type="Curve" time="0.25" value="-120" inout="Slow,Step"/>
             </Controller>
         </Animation>
     </Frame>
@@ -201,7 +152,7 @@
     </Frame>
     
     <!-- Notification template override -->
-    <Frame type="Frame" name="ProgressAnnouncementTemplate" template="GameNotifications/InGameNotificationsTemplate">    
+    <Frame type="Frame" name="ProgressAnnouncementTemplate" template="GameNotifications/InGameNotificationsTemplate">
         <Anchor side="Top" relative="$parent/$parent/ConsoleUIContainer/TopPanel" pos="Max" offset="-20"/>
         <Frame type="Frame" name="StandardNotificationTemplate" template="ArenaGarden/NotificationOverride"/>
         <Frame type="Frame" name="StandardEnemyNotificationTemplate" template="ArenaGarden/NotificationOverride"/>
@@ -226,22 +177,22 @@
                     <Style val="Storm_InGame_Notification_Title_Mid"/>
                     <Animation name="ShowTitle">
                         <Controller type="Anchor" end="Pause" side="Right" relative="true">
-                            <Key type="Curve" time="0.0" value="75" out="Auto"/>
-                            <Key type="Curve" time="0.1" value="75" out="Auto"/>
-                            <Key type="Curve" time="0.4" value="325" in="Auto" out="Linear"/>
-                            <Key type="Curve" time="2.6" value="375" in="Linear" out="Auto"/>
-                            <Key type="Curve" time="2.8" value="625" in="Auto"/>
+                            <Key type="Curve" time="0.0" value="75" inout="Linear,Auto"/>
+                            <Key type="Curve" time="0.1" value="75" inout="Linear,Auto"/>
+                            <Key type="Curve" time="0.4" value="325" inout="Auto,Linear"/>
+                            <Key type="Curve" time="2.6" value="375" inout="Linear,Auto"/>
+                            <Key type="Curve" time="2.8" value="625" inout="Auto,Linear"/>
                         </Controller>
                     </Animation>
                 </Frame>
                 <Frame type="Label" name="NotificationTitle_Blur">
                     <Animation name="ShowTitle">
                         <Controller type="Anchor" end="Pause" side="Right" relative="true">
-                            <Key type="Curve" time="0.0" value="75" out="Auto"/>
-                            <Key type="Curve" time="0.1" value="75" out="Auto"/>
-                            <Key type="Curve" time="0.4" value="325" in="Auto" out="Linear"/>
-                            <Key type="Curve" time="2.6" value="375" in="Linear" out="Auto"/>
-                            <Key type="Curve" time="2.8" value="625" in="Auto"/>
+                            <Key type="Curve" time="0.0" value="75" inout="Linear,Auto"/>
+                            <Key type="Curve" time="0.1" value="75" inout="Linear,Auto"/>
+                            <Key type="Curve" time="0.4" value="325" inout="Auto,Linear"/>
+                            <Key type="Curve" time="2.6" value="375" inout="Linear,Auto"/>
+                            <Key type="Curve" time="2.8" value="625" inout="Auto,Linear"/>
                         </Controller>
                     </Animation>
                 </Frame>
@@ -253,22 +204,22 @@
                     <Text val="{$parent/$parent/StandardNotificationTemplate/NotificationTitle/@Text}"/>
                     <Animation name="ShowTitle">
                         <Controller type="Anchor" end="Pause" side="Right" relative="true">
-                            <Key type="Curve" time="0.0" value="75" out="Auto"/>
-                            <Key type="Curve" time="0.1" value="75" out="Auto"/>
-                            <Key type="Curve" time="0.4" value="325" in="Auto" out="Linear"/>
-                            <Key type="Curve" time="2.6" value="375" in="Linear" out="Auto"/>
-                            <Key type="Curve" time="2.8" value="625" in="Auto"/>
+                            <Key type="Curve" time="0.0" value="75" inout="Linear,Auto"/>
+                            <Key type="Curve" time="0.1" value="75" inout="Linear,Auto"/>
+                            <Key type="Curve" time="0.4" value="325" inout="Auto,Linear"/>
+                            <Key type="Curve" time="2.6" value="375" inout="Linear,Auto"/>
+                            <Key type="Curve" time="2.8" value="625" inout="Auto,Linear"/>
                         </Controller>
                     </Animation>
                 </Frame>
                 <Frame type="Label" name="NotificationTitle_Blur">
                     <Animation name="ShowTitle">
                         <Controller type="Anchor" end="Pause" side="Right" relative="true">
-                            <Key type="Curve" time="0.0" value="75" out="Auto"/>
-                            <Key type="Curve" time="0.1" value="75" out="Auto"/>
-                            <Key type="Curve" time="0.4" value="325" in="Auto" out="Linear"/>
-                            <Key type="Curve" time="2.6" value="375" in="Linear" out="Auto"/>
-                            <Key type="Curve" time="2.8" value="625" in="Auto"/>
+                            <Key type="Curve" time="0.0" value="75" inout="Linear,Auto"/>
+                            <Key type="Curve" time="0.1" value="75" inout="Linear,Auto"/>
+                            <Key type="Curve" time="0.4" value="325" inout="Auto,Linear"/>
+                            <Key type="Curve" time="2.6" value="375" inout="Linear,Auto"/>
+                            <Key type="Curve" time="2.8" value="625" inout="Auto,Linear"/>
                         </Controller>
                     </Animation>
                 </Frame>
@@ -287,22 +238,22 @@
                     <Style val="Storm_InGame_Notification_Title_Mid"/>
                     <Animation name="ShowTitle">
                         <Controller type="Anchor" end="Pause" side="Right" relative="true">
-                            <Key type="Curve" time="0.0" value="775" out="Auto"/>
-                            <Key type="Curve" time="0.1" value="775" out="Auto"/>
-                            <Key type="Curve" time="0.4" value="525" in="Auto" out="Linear"/>
-                            <Key type="Curve" time="2.6" value="475" in="Linear" out="Auto"/>
-                            <Key type="Curve" time="2.8" value="225" in="Auto"/>
+                            <Key type="Curve" time="0.0" value="775" inout="Linear,Auto"/>
+                            <Key type="Curve" time="0.1" value="775" inout="Linear,Auto"/>
+                            <Key type="Curve" time="0.4" value="525" inout="Auto,Linear"/>
+                            <Key type="Curve" time="2.6" value="475" inout="Linear,Auto"/>
+                            <Key type="Curve" time="2.8" value="225" inout="Auto,Linear"/>
                         </Controller>
                     </Animation>
                 </Frame>
                 <Frame type="Label" name="NotificationTitle_Blur">
                     <Animation name="ShowTitle">
                         <Controller type="Anchor" end="Pause" side="Right" relative="true">
-                            <Key type="Curve" time="0.0" value="775" out="Auto"/>
-                            <Key type="Curve" time="0.1" value="775" out="Auto"/>
-                            <Key type="Curve" time="0.4" value="525" in="Auto" out="Linear"/>
-                            <Key type="Curve" time="2.6" value="475" in="Linear" out="Auto"/>
-                            <Key type="Curve" time="2.8" value="225" in="Auto"/>
+                            <Key type="Curve" time="0.0" value="775" inout="Linear,Auto"/>
+                            <Key type="Curve" time="0.1" value="775" inout="Linear,Auto"/>
+                            <Key type="Curve" time="0.4" value="525" inout="Auto,Linear"/>
+                            <Key type="Curve" time="2.6" value="475" inout="Linear,Auto"/>
+                            <Key type="Curve" time="2.8" value="225" inout="Auto,Linear"/>
                         </Controller>
                     </Animation>
                 </Frame>
@@ -314,22 +265,22 @@
                     <Text val="{$parent/$parent/StandardNotificationTemplate/NotificationTitle/@Text}"/>
                     <Animation name="ShowTitle">
                         <Controller type="Anchor" end="Pause" side="Right" relative="true">
-                            <Key type="Curve" time="0.0" value="775" out="Auto"/>
-                            <Key type="Curve" time="0.1" value="775" out="Auto"/>
-                            <Key type="Curve" time="0.4" value="525" in="Auto" out="Linear"/>
-                            <Key type="Curve" time="2.6" value="475" in="Linear" out="Auto"/>
-                            <Key type="Curve" time="2.8" value="225" in="Auto"/>
+                            <Key type="Curve" time="0.0" value="775" inout="Linear,Auto"/>
+                            <Key type="Curve" time="0.1" value="775" inout="Linear,Auto"/>
+                            <Key type="Curve" time="0.4" value="525" inout="Auto,Linear"/>
+                            <Key type="Curve" time="2.6" value="475" inout="Linear,Auto"/>
+                            <Key type="Curve" time="2.8" value="225" inout="Auto,Linear"/>
                         </Controller>
                     </Animation>
                 </Frame>
                 <Frame type="Label" name="NotificationTitle_Blur">
                     <Animation name="ShowTitle">
                         <Controller type="Anchor" end="Pause" side="Right" relative="true">
-                            <Key type="Curve" time="0.0" value="775" out="Auto"/>
-                            <Key type="Curve" time="0.1" value="775" out="Auto"/>
-                            <Key type="Curve" time="0.4" value="525" in="Auto" out="Linear"/>
-                            <Key type="Curve" time="2.6" value="475" in="Linear" out="Auto"/>
-                            <Key type="Curve" time="2.8" value="225" in="Auto"/>
+                            <Key type="Curve" time="0.0" value="775" inout="Linear,Auto"/>
+                            <Key type="Curve" time="0.1" value="775" inout="Linear,Auto"/>
+                            <Key type="Curve" time="0.4" value="525" inout="Auto,Linear"/>
+                            <Key type="Curve" time="2.6" value="475" inout="Linear,Auto"/>
+                            <Key type="Curve" time="2.8" value="225" inout="Auto,Linear"/>
                         </Controller>
                     </Animation>
                 </Frame>

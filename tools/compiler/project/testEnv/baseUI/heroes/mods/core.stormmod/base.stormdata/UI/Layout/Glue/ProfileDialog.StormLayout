@@ -2,6 +2,15 @@
 <Desc>
     <DescFlags val="Locked"/>
 
+    <Constant name="ProfileDialog_NavigationButton_Offset" val="-30"/>
+
+    <Frame type="GlueButton" name="ProfileNavigationButtonTemplate" template="StandardTemplates/Top_Navigation">
+        <ReportsStats val="true"/>
+        <ClickSound val="@UI_BNet_PageSelect"/>
+        <EnabledDuringRestrictedState val="true"/>
+        <EnabledDuringGameLaunch val="true"/>
+    </Frame>
+
     <Frame type="ProfileDialog" name="ProfileDialog" template="StandardTemplates/StandardClosableDialog">
         <Anchor relative="$parent"/>
 
@@ -33,23 +42,29 @@
             </Frame>
 
             <Animation name="OnShown">
-                <Event event="OnShown" action="Reset"/>
-                <Event event="OnShown" action="Play"/>
+                <Event event="OnShown" action="Reset,Play"/>
                 <Controller type="Fade" end="Pause">
-                    <Key type="Curve" time="0" value="0" out="Slow"/>
-                    <Key type="Curve" time="0.5" value="0" out="Slow"/>
-                    <Key type="Curve" time=".9" value="255" in="Slow"/>
+                    <Key type="Curve" time="0" value="0" inout="Linear,Slow"/>
+                    <Key type="Curve" time="0.5" value="0" inout="Linear,Slow"/>
+                    <Key type="Curve" time=".9" value="255" inout="Slow,Linear"/>
                 </Controller>
             </Animation>
-            
         </Frame>
-        
+
+        <StateGroup name="Loading">
+            <State name="Loading">
+                <When type="Property" frame="$this" isInitializing="true"/>
+                <Action type="SetProperty" frame="LoadingContainer" visible="true"/>
+                <Action type="SetProperty" frame="SubNavAnchor" visible="false"/>
+            </State>
+        </StateGroup>
+
         <Frame type="Frame" name="LoadingContainer">
             <Anchor relative="$parent/SummaryPanel" />
             <Visible val="false"/>
 
             <Frame type="Label" name="LoadingLabel">
-                <Anchor side="Bottom" relative="$parent" pos="Mid" offset="-10"/>
+                <Anchor side="Bottom" relative="$parent" pos="Mid" offset="-60"/>
                 <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
                 <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
                 <Text val="@UI/ProfileDialog/Loading"/>
@@ -57,57 +72,89 @@
             </Frame>
 
             <Frame type="Image" name="IdleSpinner" template="StandardTemplates/IdleSpinnerTemplate">
-                <Anchor side="Top" relative="$parent" pos="Mid" offset="10"/>
+                <Anchor side="Top" relative="$parent/LoadingLabel" pos="Max" offset="20"/>
                 <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
                 <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
             </Frame>
             
-            <Animation name="OnShown">
-                <Event event="OnShown" action="Reset"/>    
-                <Event event="OnShown" action="DirectionForward"/>    
-                <Event event="OnShown" action="Play"/>
-                <Event event="OnHidden" action="DirectionReverse"/>
-                <Event event="OnHidden" action="Play"/>
+            <Animation name="Hover">
+                <Event event="OnShown" action="Restart,Play"/>
                 <Controller type="Fade" end="Pause">
-                    <Key type="Curve" time="0" value="0" out="Slow"/>
-                    <Key type="Curve" time="0.5" value="0" out="Slow"/>
-                    <Key type="Curve" time=".9" value="255" in="Slow"/>
+                    <Key type="Curve" time="0" value="0"/>
+                    <Key type="Curve" time="1" value="0" inout="Linear"/>
+                    <Key type="Curve" time="1.7" value="255" inout="Slow,Linear"/>
+                </Controller>
+                <Controller type="Event" end="Pause">
+                    <Key type="Event" time="0" event=""/>
+                    <Key type="Event" time="2" event="Pulse"/>
                 </Controller>
             </Animation>
-            
+            <Animation name="Pulse">
+                <Event event="Pulse" action="Restart,Play"/>
+                <Event event="OnHidden" action="Stop"/>
+                <Controller type="Fade" end="PingPong">
+                    <Key type="Curve" time="0" value="255"/>
+                    <Key type="Curve" time="1" value="100" inout="Slow,Linear"/>
+                </Controller>
+            </Animation>
         </Frame>
-        
+
+        <Frame type="Frame" name="SubNavAnchor" template="StandardTemplates/SubNavContainer">
+            <Anchor side="Top" relative="$parent/DialogHeaderUnderlineImage" pos="Max" offset="0"/>
+            <Anchor side="Left" relative="$parent/DialogContentContainer" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent/DialogContentContainer" pos="Max" offset="0"/>
+            <Height val="55"/>
+        </Frame>
+
+        <Frame type="Frame" name="DialogContentContainer">
+            <Anchor side="Top" relative="$parent/SubNavAnchor" pos="Max" offset="0"/>
+            <Anchor side="Left" relative="$parent/BackgroundFrame" pos="Min" offset="3"/>
+            <Anchor side="Right" relative="$parent/BackgroundFrame" pos="Max" offset="-3"/>
+            <Anchor side="Bottom" relative="$parent/BackgroundFrame" pos="Max" offset="0"/>
+        </Frame>
+
         <Frame type="ProfileSummaryPanel" name="SummaryPanel" template="ProfileSummaryPanel/ProfileSummaryPanelTemplate">
-            <Anchor relative="$parent/PlayerProgressionPanel"/>
+            <Visible val="false"/>
+            <Anchor side="Left" relative="$parent/DialogContentContainer" pos="Min" offset="45"/>
+            <Anchor side="Right" relative="$parent/DialogContentContainer" pos="Max" offset="-45"/>
+            <Anchor side="Top" relative="$parent/DialogContentContainer" pos="Min" offset="35"/>
+            <Anchor side="Bottom" relative="$parent/DialogContentContainer" pos="Max" offset="-45"/>
         </Frame>
         
         <Frame type="ProfilePlayerProgressionPanel" name="PlayerProgressionPanel" template="ProfilePlayerProgressionPanel/ProfilePlayerProgressionPanelTemplate">
-            <Anchor side="Top" relative="$parent/DialogHeaderBackgroundImage" pos="Max" offset="2"/>
-            <Anchor side="Left" relative="$parent/BackgroundFrame" pos="Min" offset="3"/>
-            <Anchor side="Bottom" relative="$parent/BackgroundFrame" pos="Max" offset="3"/>
-            <Anchor side="Right" relative="$parent/BackgroundFrame" pos="Max" offset="3"/>
+            <Visible val="false"/>
+            <Anchor side="Left" relative="$parent/DialogContentContainer" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent/DialogContentContainer" pos="Max" offset="0"/>
+            <Anchor side="Top" relative="$parent/DialogContentContainer" pos="Min" offset="0"/>
+            <Anchor side="Bottom" relative="$parent/DialogContentContainer" pos="Max" offset="0"/>
         </Frame>
         
         <Frame type="ProfileHeroProgressionPanel" name="HeroProgressionPanel" template="ProfileHeroProgressionPanel/ProfileHeroProgressionPanelTemplate">
-            <Anchor side="Top" relative="$parent/DialogHeaderBackgroundImage" pos="Max" offset="2"/>
-            <Anchor side="Left" relative="$parent/BackgroundFrame" pos="Min" offset="3"/>
-            <Anchor side="Bottom" relative="$parent/BackgroundFrame" pos="Max" offset="3"/>
-            <Anchor side="Right" relative="$parent/BackgroundFrame" pos="Max" offset="3"/>
+            <Visible val="false"/>
+            <Anchor side="Left" relative="$parent/DialogContentContainer" pos="Min" offset="45"/>
+            <Anchor side="Right" relative="$parent/DialogContentContainer" pos="Max" offset="-5"/>
+            <Anchor side="Top" relative="$parent/DialogContentContainer" pos="Min" offset="35"/>
+            <Anchor side="Bottom" relative="$parent/DialogContentContainer" pos="Max" offset="-45"/>
         </Frame>
         
         <Frame type="ProfileMatchHistoryPanel" name="MatchHistoryPanel" template="ProfileMatchHistoryPanel/ProfileMatchHistoryPanelTemplate">
-            <Anchor relative="$parent/DialogContentContainer"/>
+            <Visible val="false"/>
+            <Anchor side="Left" relative="$parent/DialogContentContainer" pos="Min" offset="45"/>
+            <Anchor side="Right" relative="$parent/DialogContentContainer" pos="Max" offset="0"/>
+            <Anchor side="Top" relative="$parent/SubNavAnchor" pos="Min" offset="0"/>
+            <Anchor side="Bottom" relative="$parent/DialogContentContainer" pos="Max" offset="-35"/>
         </Frame>
         
         <Frame type="ProfileStatisticsPanel" name="StatisticsPanel" template="ProfileStatisticsPanel/ProfileStatisticsPanelTemplate">
-            <Anchor relative="$parent/DialogContentContainer"/>
-        </Frame>
-        
-        <Frame type="ProfilePortraitPanel" name="PortraitPanel" template="ProfilePortraitPanel/PortraitPanelTemplate">
-            <Anchor relative="$parent/DialogContentContainer"/>
+            <Visible val="false"/>
+            <Anchor side="Left" relative="$parent/DialogContentContainer" pos="Min" offset="45"/>
+            <Anchor side="Right" relative="$parent/DialogContentContainer" pos="Max" offset="0"/>
+            <Anchor side="Top" relative="$parent/SubNavAnchor" pos="Min" offset="0"/>
+            <Anchor side="Bottom" relative="$parent/DialogContentContainer" pos="Max" offset="-25"/>
         </Frame>
 
         <Frame type="ProfileFavoriteHeroesPanel" name="HeroCollectionPanel" template="ProfileFavoriteHeroesPanel/ProfileFavoriteHeroesPanelTemplate">
+            <Visible val="false"/>
             <Anchor relative="$parent/DialogContentContainer"/>
 
             <!-- Drag image should be on top -->
@@ -115,8 +162,8 @@
         </Frame>
 
         <Frame type="AvatarFrame" name="AvatarFrame" template="AvatarFrameTemplates/AvatarStateTemplate_Profile">
-            <Anchor side="Top" relative="$parent/BackgroundFrame" pos="Min" offset="-54"/>
-            <Anchor side="Left" relative="$parent/BackgroundFrame" pos="Min" offset="0"/>
+            <Anchor side="Top" relative="$parent/BackgroundFrame" pos="Min" offset="-91"/>
+            <Anchor side="Left" relative="$parent/BackgroundFrame" pos="Min" offset="-10"/>
         </Frame>
 
         <Frame type="Label" name="PlayerLabel">
@@ -132,88 +179,64 @@
             <Style val="PlayerProfileBattletagLabel"/>
         </Frame>
 
-        <Frame type="GlueButton" name="BackButton" template="StandardTemplates/LeftNavigationBack">
-            <Anchor side="Top" relative="$parent/DialogContentContainer" pos="Min" offset="13"/>
-            <Anchor side="Left" relative="$parent/BackgroundFrame" pos="Min" offset="-2"/>
-            <Text val="@UI/ProfileDialog/BackButton"/>
+        <Frame type="Button" name="BackButton" template="StandardTemplates/StandardBackGlueButtonTemplate">
+            <Anchor side="Top" relative="$parent/DialogContentContainer" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent/DialogContentContainer" pos="Min" offset="-40"/>
+            <Width val="290"/>
+            <Height val="72"/>
             <CollapseLayout val="true"/>
             <ReportsStats val="true"/>
             <Handle val="ProfileDialog_BackButton"/>
             <ClickSound val="@UI_BNet_PageSelect"/>
-            <EnabledDuringRestrictedState val="true"/>
-            <EnabledDuringGameLaunch val="true"/>
         </Frame>
 
-        <Frame type="GlueButton" name="SummaryButton" template="StandardTemplates/LeftNavigation">
-            <Anchor side="Top" relative="$parent/BackButton" pos="Max" offset="-8"/>
-            <Anchor side="Left" relative="$parent/BackButton" pos="Min" offset="0"/>
+        <Frame type="GlueButton" name="SummaryButton" template="ProfileDialog/ProfileNavigationButtonTemplate">
+            <Anchor side="Top" relative="$parent/SubNavAnchor" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent/DialogContentContainer" pos="Min" offset="20"/>
             <Text val="@UI/ProfileDialog/SummaryButton"/>
             <Shortcut val="@UI/ScreenNavigation1_Hotkey"/>
-            <ReportsStats val="true"/>
             <Handle val="ProfileDialog_SummaryButton"/>
-            <ClickSound val="@UI_BNet_PageSelect"/>
-            <EnabledDuringRestrictedState val="true"/>
-            <EnabledDuringGameLaunch val="true"/>
+            <EnabledInDraftLobby val="true"/>
         </Frame>
 
-        <Frame type="GlueButton" name="PlayerProgressionButton" template="StandardTemplates/LeftNavigation">
-            <Anchor side="Top" relative="$parent/SummaryButton" pos="Max" offset="-8"/>
-            <Anchor side="Left" relative="$parent/SummaryButton" pos="Min" offset="0"/>
+        <Frame type="GlueButton" name="PlayerProgressionButton" template="ProfileDialog/ProfileNavigationButtonTemplate">
+            <Anchor side="Top" relative="$parent/SubNavAnchor" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent/SummaryButton" pos="Max" offset="#ProfileDialog_NavigationButton_Offset"/>
             <Text val="@UI/ProfileDialog/RewardsButton"/>
             <Shortcut val="@UI/ScreenNavigation2_Hotkey"/>
-            <ReportsStats val="true"/>
             <Handle val="ProfileDialog_RewardButton"/>
-            <ClickSound val="@UI_BNet_PageSelect"/>
-            <EnabledDuringRestrictedState val="true"/>
-            <EnabledDuringGameLaunch val="true"/>
+            <EnabledInDraftLobby val="true"/>
         </Frame>
 
-        <Frame type="GlueButton" name="HeroCollectionButton" template="StandardTemplates/LeftNavigation">
-            <Anchor side="Top" relative="$parent/PlayerProgressionButton" pos="Max" offset="-8"/>
-            <Anchor side="Left" relative="$parent/PlayerProgressionButton" pos="Min" offset="0"/>
+        <Frame type="GlueButton" name="HeroCollectionButton" template="ProfileDialog/ProfileNavigationButtonTemplate">
+            <Anchor side="Top" relative="$parent/SubNavAnchor" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent/PlayerProgressionButton" pos="Max" offset="#ProfileDialog_NavigationButton_Offset"/>
             <Text val="@UI/ProfileDialog/HeroCollectionButton"/>
             <Shortcut val="@UI/ScreenNavigation3_Hotkey"/>
-            <ReportsStats val="true"/>
             <Handle val="ProfileDialog_HeroCollectionButton"/>
-            <ClickSound val="@UI_BNet_PageSelect"/>
-            <EnabledDuringRestrictedState val="true"/>
-            <EnabledDuringGameLaunch val="true"/>
+            <EnabledInDraftLobby val="true"/>
         </Frame>
 
-        <Frame type="GlueButton" name="MatchHistoryButton" template="StandardTemplates/LeftNavigation">
-            <Anchor side="Top" relative="$parent/HeroCollectionButton" pos="Max" offset="-8"/>
-            <Anchor side="Left" relative="$parent/HeroCollectionButton" pos="Min" offset="0"/>
+        <Frame type="GlueButton" name="MatchHistoryButton" template="ProfileDialog/ProfileNavigationButtonTemplate">
+            <Anchor side="Top" relative="$parent/SubNavAnchor" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent/HeroCollectionButton" pos="Max" offset="#ProfileDialog_NavigationButton_Offset"/>
             <Text val="@UI/ProfileDialog/MatchHistoryButton"/>
             <Shortcut val="@UI/ScreenNavigation4_Hotkey"/>
-            <ReportsStats val="true"/>
             <Handle val="ProfileDialog_MatchHistoryButton"/>
-            <ClickSound val="@UI_BNet_PageSelect"/>
-            <EnabledDuringRestrictedState val="true"/>
-            <EnabledDuringGameLaunch val="true"/>
+            <EnabledInDraftLobby val="true"/>
         </Frame>
 
-        <Frame type="GlueButton" name="StatisticsButton" template="StandardTemplates/LeftNavigation">
-            <Anchor side="Top" relative="$parent/MatchHistoryButton" pos="Max" offset="-8"/>
-            <Anchor side="Left" relative="$parent/MatchHistoryButton" pos="Min" offset="0"/>
+        <Frame type="GlueButton" name="StatisticsButton" template="ProfileDialog/ProfileNavigationButtonTemplate">
+            <Anchor side="Top" relative="$parent/SubNavAnchor" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent/MatchHistoryButton" pos="Max" offset="#ProfileDialog_NavigationButton_Offset"/>
             <Text val="@UI/ProfileDialog/StatisticsButton"/>
             <Shortcut val="@UI/ScreenNavigation5_Hotkey"/>
-            <ReportsStats val="true"/>
             <Handle val="ProfileDialog_StatisticsButton"/>
-            <ClickSound val="@UI_BNet_PageSelect"/>
-            <EnabledDuringRestrictedState val="true"/>
-            <EnabledDuringGameLaunch val="true"/>
-        </Frame>
+            <EnabledInDraftLobby val="true"/>
 
-        <Frame type="GlueButton" name="PortraitButton" template="StandardTemplates/LeftNavigation">
-            <Anchor side="Top" relative="$parent/StatisticsButton" pos="Max" offset="-8"/>
-            <Anchor side="Left" relative="$parent/StatisticsButton" pos="Min" offset="0"/>
-            <Text val="@UI/ProfileDialog/PortraitButton"/>
-            <Shortcut val="@UI/ScreenNavigation6_Hotkey"/>
-            <ReportsStats val="true"/>
-            <Handle val="ProfileDialog_PortraitButton"/>
-            <ClickSound val="@UI_BNet_PageSelect"/>
-            <EnabledDuringRestrictedState val="true"/>
-            <EnabledDuringGameLaunch val="true"/>
+            <Frame type="Image" name="SeparatorImage">
+                <Alpha val="0"/>
+            </Frame>
         </Frame>
 
         <Frame type="Button" name="CloseButton" template="StandardTemplates/SmallPanelCloseButtonTemplate">

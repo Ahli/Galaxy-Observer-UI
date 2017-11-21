@@ -1,0 +1,675 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<Desc>
+    <DescFlags val="Locked"/>
+    
+    <Constant name="ArcadeBrowseItem_Spacing_Horizontal" val="8"/>
+    <Constant name="ArcadeBrowseItem_Spacing_Vertical" val="7"/>
+    
+    <!-- 
+    ================================
+    DETAILS PANEL TEMPLATE
+    ================================
+    -->
+    <Frame type="Frame" name="DetailsPanelTemplate" template="CustomGamesTemplates/DetailsPanelTemplate">
+        <Frame type="TabControl" name="BottomSection">
+
+            <Frame type="Frame" name="TabsContainer">
+            
+                <Frame type="Button" name="Button1">
+                    <Width val="246"/>
+                    <Text val="@UI/ScreenCustomGames/InfoTabs/Bookmarks"/>
+                </Frame>
+
+                <Frame type="Button" name="Button2">
+                    <Anchor side="Left" relative="$parent/Button1" pos="Max" offset="-22"/>
+                    <Enabled val="False"/>
+                    <Visible val="False"/>
+                    <CollapseLayout val="True"/>
+                </Frame>
+
+                <Frame type="Button" name="Button3">
+                    <Width val="246"/>
+                    <Text val="@UI/ScreenCustomGames/InfoTabs/Map"/>
+                </Frame>
+            </Frame>
+            
+            <Frame type="Frame" name="Panel1">
+                <Frame type="BookmarkSelectionFrame" name="BookmarkSelectionFrame16x10" template="CustomGamesTemplates/BookmarkSelectionFrame16x10Template"/>
+                <Frame type="BookmarkSelectionFrame" name="BookmarkSelectionFrame16x9" template="CustomGamesTemplates/BookmarkSelectionFrame16x9Template"/>
+            </Frame>
+            
+            <Frame type="Frame" name="Panel2">
+            </Frame>
+            
+            <Frame type="Frame" name="Panel3">
+                <Frame type="BattleMapInfoPanel" name="BattleMapInfoPanel" template="CustomGamesTemplates/BattleMapInfoPanelTemplate"/>
+            </Frame>
+        </Frame>
+    </Frame>
+    
+    <!-- 
+    ========================
+    ARCADE LIST ITEM TEMPLATE
+    ========================
+    -->
+    <Frame type="ArcadeBrowseTileListItem" name="ArcadeListItemTemplate" template="StandardTileListTemplates/UnlockableTileListItemTemplate">
+        <HideWhenCleared val="False"/>
+        <SelectedSound val="@UI_FileSelectionSelect"/>
+        <!-- <TooltipFrame val="BattleMapInfoTooltip"/> -->
+        <ContextMenu val="$parent/$parent/$parent/$parent/ItemContextMenu"/>
+        <HasItemContextMenu val="true"/>
+        <Tooltip val=""/>
+        <UseTooltip val="false"/>
+        
+        <Frame type="Frame" name="AnchorFrame">
+            <Width val="198"/>
+            <Height val="206"/>
+        </Frame>
+
+        <Frame type="BattleMapIcon" name="BattleMapIcon">
+            <Anchor relative="$parent"/>
+            <MapHandle val="{$parent/@MapHandle}"/>
+        </Frame>
+        
+        <Frame type="Image" name="Icon">
+            <Anchor side="Top" relative="$parent/AnchorFrame" pos="Min" offset="3"/>
+            <Anchor side="Bottom" relative="$parent/AnchorFrame" pos="Min" offset="131"/>
+            <Anchor side="Left" relative="$parent/AnchorFrame" pos="Min" offset="3"/>
+            <Anchor side="Right" relative="$parent/AnchorFrame" pos="Max" offset="-3"/>
+            <Texture val="Assets/Textures/White.dds" layer="0"/>
+            <Texture val="{$parent/BattleMapIcon/@ImagePath}" layer="1"/>
+            <Visible val="True"/>
+                
+            <Animation name="FadeIn">
+                <Event event="OnShown" action="Reset,Play"/>
+
+                <Controller name="FadeIn" type="Fade" end="Pause">
+                    <Key type="Curve" time="0.0" value="0" in="Auto"/>
+                    <Key type="Curve" time="0.20" value="255" in="Auto"/>
+                </Controller>
+            </Animation>
+            
+            <StateGroup name="VisibleState">
+                <DefaultState val="NotVisible"/>
+                
+                <State name="Visible">
+                    <When type="AnimationState" frame="$parent/BattleMapIcon" IconState="Show"/>
+                    <Action type="SetProperty" frame="$this" Visible="True"/>
+                </State>
+
+                <State name="NotVisible">
+                    <Action type="SetProperty" frame="$this" Visible="False"/>
+                </State>
+            </StateGroup>
+        </Frame>
+        
+        <Frame type="UnlockableFrame" name="UnlockableFrame">
+            <RenderPriority val="300"/>
+            <Visible val="False"/>
+        </Frame>
+
+        <Frame type="ProgressBar" name="RatingProgressBar">
+            <Anchor side="Top" relative="$parent/AnchorFrame" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent/AnchorFrame" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent/AnchorFrame" pos="Max" offset="-8"/>
+            <Width val="64"/>
+            <Height val="14"/>
+            <Texture val="@UI/SC2_UI_Battlenet_Glue_Arcade_RatingStarsMini"/>
+            <Color val="FFFFFF"/>
+            <ColorStep val="FFFFFF"/>
+            <MinValue val="0"/>
+            <MaxValue val="5"/>
+            <AcceptsMouse val="false"/>
+            <Visible val="false"/>
+        </Frame>
+
+        <Frame type="Label" name="Mode">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+            <Style val="@Arcade_ListTitle_Normal"/>
+            <Visible val="false"/>
+        </Frame>
+
+        <Frame type="Label" name="Name">
+            <Anchor side="Bottom" relative="$parent/AnchorFrame" pos="Max" offset="-10"/>
+            <Anchor side="Left" relative="$parent/AnchorFrame" pos="Min" offset="12"/>
+            <Anchor side="Right" relative="$parent/AnchorFrame" pos="Max" offset="-10"/>
+            <Height val="23"/>
+            <Style val="@Arcade_Widget_Title"/>
+            <AcceptsMouseTooltip val="true"/>
+            <Options val="Ellipsis | TooltipIfTruncated | NoWrapping"/>
+            <RenderPriority val="650"/>
+            <Alpha val="0"/>
+        </Frame>
+        
+        <Frame type="Image" name="TextBackground">
+            <Height val="72"/>
+        </Frame>
+
+        <Frame type="Label" name="TitleLabel">
+            <Anchor side="Top" relative="$parent/Divider" pos="Max" offset="6"/>
+            <Anchor side="Bottom" relative="$parent/AnchorFrame" pos="Max" offset="-12"/>
+            <Anchor side="Left" relative="$parent/AnchorFrame" pos="Min" offset="12"/>
+            <Anchor side="Right" relative="$parent/AnchorFrame" pos="Max" offset="-12"/>
+            <Text val="{$parent/Name/@Text}"/>
+            
+            <StateGroup name="StyleState">
+                
+                <State name="Locked">
+                    <Action type="SetProperty" frame="$this" Style="@InternationalListItemTitle_Small_Locked_Normal_Centered"/>
+                </State>
+            
+                <State name="EquippedSelected">
+                    <Action type="SetProperty" frame="$this" Style="@InternationalListItemTitle_Small_Bookmarked_Selected_Centered"/>
+                </State>
+            
+                <State name="PurchasableSelected">
+                    <Action type="SetProperty" frame="$this" Style="@InternationalListItemTitle_Small_Standard_Selected_Centered"/>
+                </State>
+            
+                <State name="Selected">
+                    <Action type="SetProperty" frame="$this" Style="@InternationalListItemTitle_Small_Standard_Selected_Centered"/>
+                </State>
+                
+                <State name="EquippedHovered">
+                    <Action type="SetProperty" frame="$this" Style="@InternationalListItemTitle_Small_Bookmarked_Hovered_Centered"/>
+                </State>
+            
+                <State name="PurchasableHovered">
+                    <Action type="SetProperty" frame="$this" Style="@InternationalListItemTitle_Small_Standard_Hovered_Centered"/>
+                </State>
+                
+                <State name="Hovered">
+                    <Action type="SetProperty" frame="$this" Style="@InternationalListItemTitle_Small_Standard_Hovered_Centered"/>
+                </State>
+
+                <State name="EquippedNormal">
+                    <Action type="SetProperty" frame="$this" Style="@InternationalListItemTitle_Small_Bookmarked_Normal_Centered"/>
+                </State>
+            
+                <State name="PurchasableNormal">
+                    <Action type="SetProperty" frame="$this" Style="@InternationalListItemTitle_Small_Standard_Normal_Centered"/>
+                </State>
+
+                <State name="Normal">
+                    <Action type="SetProperty" frame="$this" Style="@InternationalListItemTitle_Small_Standard_Normal_Centered"/>
+                </State>
+            </StateGroup>
+        </Frame>
+
+        <Frame type="Image" name="CountBg">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="14"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="14"/>
+            <Anchor side="Right" relative="$parent/CountLabel" pos="Max" offset="0"/>
+            <Height val="21"/>
+            <Texture val="@UI/SC2_UI_Battlenet_Glue_Arcade_GameWidget_NumberBG"/>
+            <Visible val="false"/>
+        </Frame>
+
+        <Frame type="Label" name="CountLabel">
+            <Anchor side="Top" relative="$parent/CountBg" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent/CountBg" pos="Min" offset="2"/>
+            <Anchor side="Bottom" relative="$parent/CountBg" pos="Max" offset="0"/>
+            <Style val="@Arcade_Widget_Number"/>
+            <Visible val="false"/>
+        </Frame>
+        
+        <!-- EQUIPPED ICON -->
+        <Frame type="Image" name="EquippedIcon">
+            <Alpha val="0"/>
+        </Frame>
+        
+        <!-- BOOKMARKED ICON -->
+        <Frame type="Image" name="BookmarkedIcon">
+            <Anchor side="Top" relative="$parent/AnchorFrame" pos="Min" offset="0"/>
+            <Anchor side="Bottom" relative="$parent/AnchorFrame" pos="Max" offset="0"/>
+            <Anchor side="Left" relative="$parent/AnchorFrame" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent/AnchorFrame" pos="Max" offset="0"/>
+            <Texture val="@UI/Glues_Battlenet_PageAssets_GraphicListItem_Border_Bookmarked"/>
+            <TextureType val="NineSlice"/>
+            <RenderPriority val="530"/>
+            <Visible val="{$parent/EquippedIcon/@Visible}"/>
+            
+            <StateGroup name="AspectRatioState">
+                <DefaultState val="Default"/>
+                
+                <State name="16x9">
+                    <When type="StateGroup" frame="$GlueUI" AspectRatioState="16x9"/>
+                    <Action type="SetProperty" frame="$this" Texture="@UI/Glues_Battlenet_PageAssets_GraphicListItem_Border_Bookmarked_16x9"/>
+                </State>
+                
+                <State name="Default">
+                    <Action type="SetProperty" frame="$this" Texture="@UI/Glues_Battlenet_PageAssets_GraphicListItem_Border_Bookmarked"/>
+                </State>
+            </StateGroup>
+        </Frame>
+        
+        <StateGroup name="EquippedState">
+            <DefaultState val="NotEquipped"/>
+            <State name="Equipped">
+                <When type="AnimationState" frame="$this" BookmarkedState="Bookmarked"/>
+            </State>
+            <State name="NotEquipped">
+            </State>
+        </StateGroup>
+    </Frame>
+    
+    <!-- 
+    ========================
+    ARCADE LIST TEMPLATE
+    ========================
+    -->
+    
+    <Frame type="TileList" name="ArcadeGamesListTemplate">
+        <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+        <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+        <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+        <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+        <AcceptsMouse val="true"/>
+        <ScrollStepValue val="5"/>
+
+        <Frame type="BattleMapInfoTooltip" name="BattleMapInfoTooltip" template="BattleMapInfoTooltip/BattleMapInfoTooltipTemplate"/>
+
+        <!-- Row 1 -->
+        <Frame type="ArcadeBrowseTileListItem" name="Item0" template="CustomGamesArcade/ArcadeListItemTemplate">
+            <Frame type="Frame" name="AnchorFrame">
+                <Anchor side="Top" relative="$parent/$parent" pos="Min" offset="14"/>
+                <Anchor side="Left" relative="$parent/$parent" pos="Min" offset="14"/>
+            </Frame>
+        </Frame>
+
+        <Frame type="ArcadeBrowseTileListItem" name="Item1" template="CustomGamesArcade/ArcadeListItemTemplate">
+            <Frame type="Frame" name="AnchorFrame">
+                <Anchor side="Top" relative="$parent/$parent/Item0/AnchorFrame" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/$parent/Item0/AnchorFrame" pos="Max" offset="#ArcadeBrowseItem_Spacing_Horizontal"/>
+            </Frame>
+        </Frame>
+
+        <Frame type="ArcadeBrowseTileListItem" name="Item2" template="CustomGamesArcade/ArcadeListItemTemplate">
+            <Frame type="Frame" name="AnchorFrame">
+                <Anchor side="Top" relative="$parent/$parent/Item1/AnchorFrame" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/$parent/Item1/AnchorFrame" pos="Max" offset="#ArcadeBrowseItem_Spacing_Horizontal"/>
+            </Frame>
+        </Frame>
+
+        <Frame type="ArcadeBrowseTileListItem" name="Item3" template="CustomGamesArcade/ArcadeListItemTemplate">
+            <Frame type="Frame" name="AnchorFrame">
+                <Anchor side="Top" relative="$parent/$parent/Item2/AnchorFrame" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/$parent/Item2/AnchorFrame" pos="Max" offset="#ArcadeBrowseItem_Spacing_Horizontal"/>
+            </Frame>
+        </Frame>
+
+        <Frame type="ArcadeBrowseTileListItem" name="Item4" template="CustomGamesArcade/ArcadeListItemTemplate">
+            <Frame type="Frame" name="AnchorFrame">
+                <Anchor side="Top" relative="$parent/$parent/Item3/AnchorFrame" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/$parent/Item3/AnchorFrame" pos="Max" offset="#ArcadeBrowseItem_Spacing_Horizontal"/>
+            </Frame>
+        </Frame>
+
+        <!-- Row 2 -->
+        <Frame type="ArcadeBrowseTileListItem" name="Item5" template="CustomGamesArcade/ArcadeListItemTemplate">
+            <Frame type="Frame" name="AnchorFrame">
+                <Anchor side="Top" relative="$parent/$parent/Item0/AnchorFrame" pos="Max" offset="#ArcadeBrowseItem_Spacing_Vertical"/>
+                <Anchor side="Left" relative="$parent/$parent/Item0/AnchorFrame" pos="Min" offset="0"/>
+            </Frame>
+        </Frame>
+
+        <Frame type="ArcadeBrowseTileListItem" name="Item6" template="CustomGamesArcade/ArcadeListItemTemplate">
+            <Frame type="Frame" name="AnchorFrame">
+                <Anchor side="Top" relative="$parent/$parent/Item5/AnchorFrame" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/$parent/Item5/AnchorFrame" pos="Max" offset="#ArcadeBrowseItem_Spacing_Horizontal"/>
+            </Frame>
+        </Frame>
+
+        <Frame type="ArcadeBrowseTileListItem" name="Item7" template="CustomGamesArcade/ArcadeListItemTemplate">
+            <Frame type="Frame" name="AnchorFrame">
+                <Anchor side="Top" relative="$parent/$parent/Item6/AnchorFrame" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/$parent/Item6/AnchorFrame" pos="Max" offset="#ArcadeBrowseItem_Spacing_Horizontal"/>
+            </Frame>
+        </Frame>
+
+        <Frame type="ArcadeBrowseTileListItem" name="Item8" template="CustomGamesArcade/ArcadeListItemTemplate">
+            <Frame type="Frame" name="AnchorFrame">
+                <Anchor side="Top" relative="$parent/$parent/Item7/AnchorFrame" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/$parent/Item7/AnchorFrame" pos="Max" offset="#ArcadeBrowseItem_Spacing_Horizontal"/>
+            </Frame>
+        </Frame>
+
+        <Frame type="ArcadeBrowseTileListItem" name="Item9" template="CustomGamesArcade/ArcadeListItemTemplate">
+            <Frame type="Frame" name="AnchorFrame">
+                <Anchor side="Top" relative="$parent/$parent/Item8/AnchorFrame" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/$parent/Item8/AnchorFrame" pos="Max" offset="#ArcadeBrowseItem_Spacing_Horizontal"/>
+            </Frame>
+        </Frame>
+
+        <!-- Row 3 -->
+        <Frame type="ArcadeBrowseTileListItem" name="Item10" template="CustomGamesArcade/ArcadeListItemTemplate">
+            <Frame type="Frame" name="AnchorFrame">
+                <Anchor side="Top" relative="$parent/$parent/Item5/AnchorFrame" pos="Max" offset="#ArcadeBrowseItem_Spacing_Vertical"/>
+                <Anchor side="Left" relative="$parent/$parent/Item5/AnchorFrame" pos="Min" offset="0"/>
+            </Frame>
+        </Frame>
+
+        <Frame type="ArcadeBrowseTileListItem" name="Item11" template="CustomGamesArcade/ArcadeListItemTemplate">
+            <Frame type="Frame" name="AnchorFrame">
+                <Anchor side="Top" relative="$parent/$parent/Item10/AnchorFrame" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/$parent/Item10/AnchorFrame" pos="Max" offset="#ArcadeBrowseItem_Spacing_Horizontal"/>
+            </Frame>
+        </Frame>
+
+        <Frame type="ArcadeBrowseTileListItem" name="Item12" template="CustomGamesArcade/ArcadeListItemTemplate">
+            <Frame type="Frame" name="AnchorFrame">
+                <Anchor side="Top" relative="$parent/$parent/Item11/AnchorFrame" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/$parent/Item11/AnchorFrame" pos="Max" offset="#ArcadeBrowseItem_Spacing_Horizontal"/>
+            </Frame>
+        </Frame>
+
+        <Frame type="ArcadeBrowseTileListItem" name="Item13" template="CustomGamesArcade/ArcadeListItemTemplate">
+            <Frame type="Frame" name="AnchorFrame">
+                <Anchor side="Top" relative="$parent/$parent/Item12/AnchorFrame" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/$parent/Item12/AnchorFrame" pos="Max" offset="#ArcadeBrowseItem_Spacing_Horizontal"/>
+            </Frame>
+        </Frame>
+
+        <Frame type="ArcadeBrowseTileListItem" name="Item14" template="CustomGamesArcade/ArcadeListItemTemplate">
+            <Frame type="Frame" name="AnchorFrame">
+                <Anchor side="Top" relative="$parent/$parent/Item13/AnchorFrame" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/$parent/Item13/AnchorFrame" pos="Max" offset="#ArcadeBrowseItem_Spacing_Horizontal"/>
+            </Frame>
+        </Frame>
+
+        <!-- Row 4 --><!-- 
+        <Frame type="ArcadeBrowseTileListItem" name="Item15" template="CustomGamesArcade/ArcadeListItemTemplate">
+            <Frame type="Frame" name="AnchorFrame">
+                <Anchor side="Top" relative="$parent/$parent/Item10/AnchorFrame" pos="Max" offset="#ArcadeBrowseItem_Spacing_Vertical"/>
+                <Anchor side="Left" relative="$parent/$parent/Item10/AnchorFrame" pos="Min" offset="0"/>
+            </Frame>
+        </Frame>
+
+        <Frame type="ArcadeBrowseTileListItem" name="Item16" template="CustomGamesArcade/ArcadeListItemTemplate">
+            <Frame type="Frame" name="AnchorFrame">
+                <Anchor side="Top" relative="$parent/$parent/Item15/AnchorFrame" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/$parent/Item15/AnchorFrame" pos="Max" offset="#ArcadeBrowseItem_Spacing_Horizontal"/>
+            </Frame>
+        </Frame>
+
+        <Frame type="ArcadeBrowseTileListItem" name="Item17" template="CustomGamesArcade/ArcadeListItemTemplate">
+            <Frame type="Frame" name="AnchorFrame">
+                <Anchor side="Top" relative="$parent/$parent/Item16/AnchorFrame" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/$parent/Item16/AnchorFrame" pos="Max" offset="#ArcadeBrowseItem_Spacing_Horizontal"/>
+            </Frame>
+        </Frame>
+
+        <Frame type="ArcadeBrowseTileListItem" name="Item18" template="CustomGamesArcade/ArcadeListItemTemplate">
+            <Frame type="Frame" name="AnchorFrame">
+                <Anchor side="Top" relative="$parent/$parent/Item17/AnchorFrame" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/$parent/Item17/AnchorFrame" pos="Max" offset="#ArcadeBrowseItem_Spacing_Horizontal"/>
+            </Frame>
+        </Frame>
+
+        <Frame type="ArcadeBrowseTileListItem" name="Item19" template="CustomGamesArcade/ArcadeListItemTemplate">
+            <Frame type="Frame" name="AnchorFrame">
+                <Anchor side="Top" relative="$parent/$parent/Item18/AnchorFrame" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/$parent/Item18/AnchorFrame" pos="Max" offset="#ArcadeBrowseItem_Spacing_Horizontal"/>
+            </Frame>
+        </Frame> -->
+            
+        <Frame type="Image" name="ScrollBarBackground" template="StandardTileListTemplates/StandardTileListScrollBarBackgroundTemplate"/>
+
+        <Frame type="ScrollBar" name="ScrollBar" template="StandardTileListTemplates/StandardTileListScrollBarTemplate">
+            <Anchor side="Top" relative="$parent/Item0" pos="Min" offset="14"/>
+            <Anchor side="Bottom" relative="$parent/Item14" pos="Max" offset="-14"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="-2"/>
+        </Frame>
+    </Frame>
+    
+    <!-- 
+    ===========================================================
+    
+    CUSTOM GAMES ARCADE TEMPLATE
+    
+    ===========================================================
+    -->
+    <Frame type="ArcadeBrowseListPanel" name="CustomGamesArcade" template="CustomGamesTemplates/CustomGamesBaseTemplate">
+        <HookupAlias original="FilterPulldown" alias="ContentContainer/HeaderPanel/FilterPulldown"/>
+        <HookupAlias original="GenrePulldown" alias="ContentContainer/HeaderPanel/GenrePulldown"/>
+        <HookupAlias original="GamesTileList" alias="ContentContainer/PrimaryPanel/GamesTileList"/>
+        <HookupAlias original="GamesTileList/ScrollBar" alias="ContentContainer/PrimaryPanel/GamesTileList/ScrollBar"/>
+        <SearchText val="{$this/ContentContainer/HeaderPanel/SearchEditBox/@Text}"/>
+
+        <Anchor relative="$parent"/>
+
+        <Frame type="Label" name="TitleLabel">
+            <Text val="@UI/ScreenCustomGames/Arcade/Title"/>
+        </Frame>
+        
+        <Frame type="Label" name="SubtitleLabel">
+            <Text val="@UI/ScreenCustomGames/Arcade/Subtitle"/>
+        </Frame>
+        
+        <Frame type="Frame" name="ContentContainer">
+            <Frame type="Frame" name="HeaderPanel">
+                
+                <Frame type="EditBox" name="SearchEditBox" template="CustomGamesTemplates/SearchEditBoxTemplate">
+                    <Tooltip val="@UI/ScreenCustomGames/SearchTooltip"/>
+                    <MaxCharacters val="80"/>
+
+                    <Animation name="RequestSearch">
+                        <Event event="OnEnterPressed" frame="$this" action="Reset,Play"/>
+
+                        <Controller type="Event" end="Pause" frame="$ancestor[@type=ArcadeBrowseListPanel]">
+                            <Key type="Event" time="0.0" event="RequestEditBoxSearch"/>
+                        </Controller>
+                    </Animation>
+
+                    <Frame type="Label" name="SearchTextLabel">
+                        <Text val="@UI/ScreenCustomGames/Arcade/SearchText"/>
+                    </Frame>
+    
+                    <Frame type="Frame" name="AnchorFrame">
+                        <Anchor side="Right" relative="$parent/$parent/GenrePulldown/AnchorFrame" pos="Min" offset="-14"/>
+                    </Frame>
+
+                    <Frame type="Button" name="ClearTextButton">
+                        <Animation name="ClearLobbyList">
+                            <Event event="OnClick" frame="$this" action="Reset,Play"/>
+
+                            <Controller type="Event" end="Pause" frame="$ancestor[@type=ArcadeBrowseListPanel]">
+                                <Key type="Event" time="0.1" event="RequestEditBoxSearch"/>
+                            </Controller>
+                        </Animation>
+                    </Frame>
+                </Frame>
+
+                <Frame type="Pulldown" name="FilterPulldown" template="StandardSmallButtonTemplates/StandardSmallPulldownTemplate">
+                    <Frame type="Frame" name="AnchorFrame">
+                        <Anchor side="Top" relative="$parent/$parent" pos="Mid" offset="0"/>
+                        <Anchor side="Bottom" relative="$parent/$parent" pos="Mid" offset="0"/>
+                        <Anchor side="Right" relative="$parent/$parent" pos="Max" offset="-15"/>
+                    </Frame>
+                </Frame>
+
+                <Frame type="Pulldown" name="GenrePulldown" template="StandardSmallButtonTemplates/StandardSmallPulldownTemplate">
+                    <Frame type="Frame" name="AnchorFrame">
+                        <Anchor side="Top" relative="$parent/$parent" pos="Mid" offset="0"/>
+                        <Anchor side="Bottom" relative="$parent/$parent" pos="Mid" offset="0"/>
+                        <Anchor side="Right" relative="$parent/$parent/FilterPulldown/AnchorFrame" pos="Min" offset="-14"/>
+                    </Frame>
+
+                    <StateGroup name="FilterStateGroup">
+                        <State name="MyBookmarksState">
+                            <When type="AnimationState" frame="$parent/$parent/$parent" FilterState="MyBookmarks"/>
+                            <Action type="SetProperty" frame="$this" Enabled="false"/>
+                            <Action type="SetProperty" frame="$this" SelectedIndex="0" Undo="false"/>
+                        </State>
+
+                        <State name="RecentlyPlayedState">
+                            <When type="AnimationState" frame="$parent/$parent/$parent" FilterState="RecentlyPlayed"/>
+                            <Action type="SetProperty" frame="$this" Enabled="false"/>
+                            <Action type="SetProperty" frame="$this" SelectedIndex="0" Undo="false"/>
+                        </State>
+
+                        <State name="MyPublishedState">
+                            <When type="AnimationState" frame="$parent/$parent/$parent" FilterState="MyPublished"/>
+                            <Action type="SetProperty" frame="$this" Enabled="false"/>
+                            <Action type="SetProperty" frame="$this" SelectedIndex="0" Undo="false"/>
+                        </State>
+                    </StateGroup>
+                </Frame>
+            </Frame>
+
+            <Frame type="Frame" name="PrimaryPanel">
+                <Frame type="TileList" name="GamesTileList" template="CustomGamesArcade/ArcadeGamesListTemplate"/>
+            </Frame>
+
+            <Frame type="Frame" name="SecondaryPanel">
+                
+                <Frame type="Frame" name="DetailsPanel" template="CustomGamesArcade/DetailsPanelTemplate">
+        
+                    <Frame type="TabControl" name="InfoPanel">
+                        <Frame type="Frame" name="TabsContainer">
+                            <Visible val="True"/>
+                        </Frame>
+                        
+                        <Frame type="Frame" name="Panel2">
+                            <Frame type="BattleMapInfoPanel" name="BattleMapInfoPanel">
+                                <MapHandle val="0,0"/>
+            
+                                <StateGroup name="ExtensionModState">
+                                    <DefaultState val="ExtensionMod"/>
+                                </StateGroup>
+                
+                                <StateGroup name="ErrorState">
+                                    <DefaultState val="NoSelection"/>
+                                
+                                    <State name="ArcadeExtensionMod">
+                                        <When type="Property" frame="$parent/$parent/Panel1/BattleMapInfoPanel/BattleMapFrame" IsArcade="True"/>
+                                        <Action type="SetProperty" frame="$this/ErrorLabel" Text="@UI/ScreenCustomGames/InfoTabs/Error/ArcadeMod"/>
+                                    </State>
+                                
+                                    <State name="MeleeNoExtensionMod">
+                                        <When type="Property" frame="$this/BattleMapFrame" MapHandle="0,0"/>
+                                        <Action type="SetProperty" frame="$this/ErrorLabel" Text="@UI/ScreenCustomGames/InfoTabs/Error/NoMod"/>
+                                    </State>
+                                    
+                                    <State name="NoSelection">
+                                        <Action type="SetProperty" frame="$this/ErrorLabel" Text=""/>
+                                    </State>
+                                </StateGroup>
+                            </Frame>
+                        </Frame>
+                    </Frame>
+        
+                    <Frame type="BattleMapFrame" name="BattleMapFrame">
+                        <MapHandle val="{$ancestor[@type=ArcadeBrowseListPanel]/@SelectedMapHandle}"/>
+                    </Frame>
+
+                    <Frame type="BattleMapFrame" name="BattleModFrame">
+                        <MapHandle val="0,0"/>
+                    </Frame>
+                </Frame>
+            </Frame>
+        </Frame>
+
+        <Frame type="CustomGamePlayButton" name="CreateButton" template="StandardBattlenetTemplates/BattlenetAlternateButtonTemplate">
+            <Anchor side="Bottom" relative="$Anchor_ActionButton" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$Anchor_ActionButton" pos="Max" offset="0"/>
+            <Width val="260"/>
+            <Text val="@UI/ScreenCustomGames/CreateButton"/>
+            <MapHandle val="{$parent/@SelectedMapHandle}"/>
+            <UseDefaultVariant val="true"/>
+
+            <Animation name="ItemDoubleClicked">
+                <Event event="OnItemDoubleClicked" action="Reset,Play" frame="$parent/ContentContainer/PrimaryPanel/GamesTileList"/>
+
+                <Controller type="Event" end="Pause">
+                    <Key type="Event" time="0" event="ControlClickRequest"/>
+                </Controller>
+            </Animation>
+        </Frame>
+
+        <Frame type="CustomGamePlayButton" name="AutoJoinButton" template="StandardBattlenetTemplates/BattlenetStandardButtonTemplate">
+            <Anchor side="Bottom" relative="$Anchor_ActionButton" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent/CreateButton" pos="Max" offset="8"/>
+            <Width val="260"/>
+            <Text val="@UI/ScreenCustomGames/AutoJoinButton"/>
+            <Tooltip val="@UI/ScreenCustomGames/AutoJoinTooltip"/>
+            <AcceptsMouseTooltip val="True"/>
+            <TooltipDelayed val="True"/>
+            <MapHandle val="{$parent/@SelectedMapHandle}"/>
+            <UseDefaultVariant val="False"/>
+            <VariantIndex val="{$parent/VariantPulldown/@VariantIndex}"/>
+            <PlayMode val="JoinOrCreate"/>
+
+            <Animation name="ItemDoubleClicked">
+                <Event event="OnItemDoubleClicked" action="Reset,Play" frame="$parent/ContentContainer/PrimaryPanel/GamesTileList"/>
+
+                <Controller type="Event" end="Pause">
+                    <Key type="Event" time="0" event="ControlClickRequest"/>
+                </Controller>
+            </Animation>
+        </Frame>
+
+        <Frame type="BattleMapVariantPulldown" name="VariantPulldown" template="StandardBattlenetTemplates/BattlenetLargePulldownTemplate">
+            <Anchor side="Bottom" relative="$Anchor_ActionButton" pos="Min" offset="-4"/>
+            <Anchor side="Left" relative="$parent/AutoJoinButton" pos="Max" offset="8"/>
+            <Width val="260"/>
+            <MapHandle val="{$parent/@SelectedMapHandle}"/>
+                
+            <StateGroup name="EnabledState">
+                <DefaultState val="Disabled"/>
+            
+                <State name="Enabled">
+                    <When type="Property" frame="$parent/AutoJoinButton" Enabled="True"/>
+                    <Action type="SetProperty" frame="$this" Enabled="True"/>
+                </State>
+                
+                <State name="Disabled">
+                    <Action type="SetProperty" frame="$this" Enabled="False"/>
+                </State>
+            </StateGroup>
+        </Frame>
+        
+        <Frame type="ViewMapProfileButton" name="GameInfoButton" template="StandardBattlenetTemplates/BattlenetStandardButtonTemplate">
+            <Anchor side="Bottom" relative="$Anchor_ActionButton" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent/VariantPulldown" pos="Max" offset="8"/>
+            <Width val="260"/>
+            <Text val="@UI/ScreenCustomGames/MapInfoButton"/>
+            <HoverSound val="@UI_HoverTick"/>
+            <MapHandle val="{$parent/@SelectedMapHandle}"/>
+
+            <StateGroup name="GameInfoButtonState">
+                <State name="MapHandleInvalid">
+                    <When type="Property" frame="$parent" SelectedMapHandle="0,0"/>
+                    <Action type="SetProperty" frame="$this" Enabled="false"/>
+                </State>
+                <State name="MapHandleValid">
+                    <Action type="SetProperty" frame="$this" Enabled="true"/>
+                </State>
+            </StateGroup>
+        </Frame>
+
+        <Frame type="BattleMapContextMenu" name="ItemContextMenu" template="StandardTemplates/StandardContextMenuTemplate">
+            <Anchor side="Top" relative="$parent" pos="Max" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+            <ShowMapInfo val="true"/>
+            <ShowCreateOffline val="false"/>
+            <MapHandle val="{$parent/@SelectedMapHandle}"/>
+        </Frame>
+
+        <StateGroup name="SearchingStateGroup">
+            <DefaultState val="NotSearchingState"/>
+
+            <State name="SearchingState">
+                <When type="AnimationState" frame="$this" SearchState="Searching"/>
+                <Action type="SetProperty" frame="ContentContainer/HeaderPanel/FilterPulldown" Visible="false"/>
+                <Action type="SetProperty" frame="ContentContainer/HeaderPanel/GenrePulldown" Visible="false"/>
+            </State>
+
+            <State name="NotSearchingState">
+                <Action type="SetProperty" frame="ContentContainer/HeaderPanel/FilterPulldown" Visible="true"/>
+                <Action type="SetProperty" frame="ContentContainer/HeaderPanel/GenrePulldown" Visible="true"/>
+            </State>
+        </StateGroup>
+    </Frame>
+</Desc>

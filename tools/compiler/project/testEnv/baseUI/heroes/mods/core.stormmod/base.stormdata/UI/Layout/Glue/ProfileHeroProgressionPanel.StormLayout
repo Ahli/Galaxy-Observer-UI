@@ -2,307 +2,527 @@
 <Desc>
     <DescFlags val="Locked"/>
 
-    <Frame type="HeroLevelRewardTileListItem" name="ProfileHeroLevelRewardTileListItemTemplate">
-        <Height val="46"/>
-        <Width val="400"/>
-        <TooltipAnchorPosition val="MiddleLeft"/>
-        
-        <Frame type="Image" name="RewardIcon">
-            <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
-            <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
-            <Anchor side="Left" relative="$parent" pos="Min" offset="40"/>
-            <Height val="40"/>
-            <Width val="40"/>
-            <DesaturateOnDisable val="true"/>
-            <DesaturationColor val="9c85bf"/>
-            <OnDisableDesaturationColor val="9c85bf"/>
-            <Animation name="RankLabelAwarded">
-                <Event event="NotAwarded" action="DirectionForward" frame="$parent"/>
-                <Event event="NotAwarded" action="Play" frame="$parent"/>
-                <Event event="Awarded" action="DirectionReverse" frame="$parent"/>
-                <Event event="Awarded" action="Play" frame="$parent"/>
-                <Controller type="Desaturation" end="Pause">
-                    <Key type="Bool" time="0" value="false"/>
-                    <Key type="Bool" time=".01" value="true"/>
-                </Controller>
-            </Animation>
+    <Constant name="SummaryContainerWidth" val="430"/>
+    <Constant name="Padding" val="15"/>
+    <Constant name="PaddingNeg" val="-15"/>
+
+    <Frame type="Frame" name="SparkleContainerTemplate">
+        <AcceptsMouse val="false"/>
+
+        <Animation name="SparkleController">
+            <Event event="OnShown" action="Restart,Play"/>
+
+            <Controller type="Event" end="Loop">
+                <Key type="Event" time="0" event="ResetSparkle"/>
+                <Key type="Event" time="3" event="BeginFlare"/>
+                <Key type="Event" time="7" event="Null"/>
+            </Controller>
+        </Animation>
+
+        <Frame type="Frame" name="LensFlare1Anchor">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="84"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="84"/>
+            <Width val="1"/>
+            <Height val="1"/>
         </Frame>
         
-        <Frame type="Label" name="LevelLabel">
-            <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
-            <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
-            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
-            <Style val="PlayerProfileRewardLocked"/>
+        <Frame type="Image" name="LensFlareImage">
+            <Anchor side="Top" relative="$parent/LensFlare1Anchor" pos="Mid" offset="0"/>
+            <Anchor side="Left" relative="$parent/LensFlare1Anchor" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent/LensFlare1Anchor" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent/LensFlare1Anchor" pos="Mid" offset="0"/>
             
-            <Animation name="RankLabelAwarded">
-                <Event event="Awarded" action="DirectionForward" frame="$parent"/>
-                <Event event="Awarded" action="Play" frame="$parent"/>
-                <Event event="NotAwarded" action="DirectionReverse" frame="$parent"/>
-                <Event event="NotAwarded" action="Play" frame="$parent"/>
-                <Controller type="Style" end="Pause" style1="PlayerProfileRewardLocked" style2="PlayerProfileReward">
-                    <Key type="Curve" time="0" value="0" out="Step"/>
-                    <Key type="Curve" time=".01" value="1.0" in="Step"/>
+            <Alpha val="0"/>
+            <BlendMode val="Add"/>
+            <Texture val="@UI/Storm_UI_GoldCoin_Flare"/>
+            <Unclipped val="true"/>
+
+            <Animation name="Flare">
+                <Event event="BeginFlare" action="Restart,Play" frame="$parent"/>
+                <Event event="ResetSparkle" action="Stop" frame="$parent"/>
+
+                <Controller type="Fade" end="Pause">
+                    <Key type="Curve" time="0" value="0" inout="Linear,Slow"/>
+                    <Key type="Curve" time=".4" value="255" inout="Slow,Linear"/>
+                    <Key type="Curve" time="1.6" value="255" inout="Slow,Linear"/>
+                    <Key type="Curve" time="2" value="0" inout="Slow,Linear"/>
+                </Controller>
+                <Controller type="Rotation" relative="False" end="Loop" >
+                    <Key type="Curve" time="0" value="-45" inout="Linear,linear"/>
+                    <Key type="Curve" time="2" value="55" inout="linear,Linear"/>
+                </Controller>
+                <Controller type="Anchor" end="Loop" side="Left" relative="true" frame="$parent/LensFlare1Anchor">
+                    <Key type="Curve" time="0" value="-10" inout="Linear"/>
+                    <Key type="Curve" time="2" value="14" inout="Slow,Linear"/>
+                </Controller>
+                <Controller type="Anchor" end="Loop" side="Top" relative="true" frame="$parent/LensFlare1Anchor">
+                    <Key type="Curve" time="0" value="10" inout="Linear"/>
+                    <Key type="Curve" time="2" value="-5" inout="Slow,Linear"/>
+                </Controller>
+                <Controller type="Dimension" dimension="Width" relative="False" percentage="True" end="Loop" >
+                    <Key type="Curve" time="0" value="40" inout="Linear,Slow"/>
+                    <Key type="Curve" time=".5" value="80" inout="Slow,Linear"/>
+                    <Key type="Curve" time="1.4" value="104" inout="Slow,Linear"/>
+                    <Key type="Curve" time="2" value="8" inout="Slow,Linear"/>
+                </Controller>
+                <Controller type="Dimension" dimension="Height" relative="False" percentage="True" end="Loop" >
+                    <Key type="Curve" time="0" value="40" inout="Linear,Slow"/>
+                    <Key type="Curve" time=".5" value="80" inout="Slow,Linear"/>
+                    <Key type="Curve" time="1.4" value="104" inout="Slow,Linear"/>
+                    <Key type="Curve" time="2" value="8" inout="Slow,Linear"/>
                 </Controller>
             </Animation>
         </Frame>
 
-        <Frame type="Label" name="RewardLabel">
-            <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
-            <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
-            <Anchor side="Left" relative="$parent/RewardIcon" pos="Max" offset="20"/>
-            <Anchor side="Right" relative="$parent" pos="Max" offset="-20"/>
-            <Text val="Unlock Cooperative"/>
-            <Style val="PlayerProfileRewardLocked"/>
+        <Frame type="Frame" name="LensFlare2Anchor">
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="-82"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="-79"/>
+            <Width val="5"/>
+            <Height val="5"/>
+        </Frame>
+        
+        <Frame type="Image" name="LensFlare2Image">
+            <Anchor side="Top" relative="$parent/LensFlare2Anchor" pos="Mid" offset="0"/>
+            <Anchor side="Left" relative="$parent/LensFlare2Anchor" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent/LensFlare2Anchor" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent/LensFlare2Anchor" pos="Mid" offset="0"/>
             
-            <Animation name="RankLabelAwarded">
-                <Event event="Awarded" action="DirectionForward" frame="$parent"/>
-                <Event event="Awarded" action="Play" frame="$parent"/>
-                <Event event="NotAwarded" action="DirectionReverse" frame="$parent"/>
-                <Event event="NotAwarded" action="Play" frame="$parent"/>
-                <Controller type="Style" end="Pause" style1="PlayerProfileRewardLocked" style2="PlayerProfileReward">
-                    <Key type="Curve" time="0" value="0" out="Step"/>
-                    <Key type="Curve" time=".01" value="1.0" in="Step"/>
+            <Texture val="@UI/Storm_UI_GoldCoin_Flare"/>
+            <BlendMode val="Add"/>
+            <Alpha val="0"/>
+
+            <Animation name="Flare">
+                <Event event="BeginFlare" action="Restart,Play" frame="$parent"/>
+                <Event event="ResetSparkle" action="Stop" frame="$parent"/>
+
+                <Controller type="Fade" end="Pause">
+                    <Key type="Curve" time="0" value="0" inout="Linear,Slow"/>
+                    <Key type="Curve" time=".5" value="255" inout="Slow,Linear"/>
+                    <Key type="Curve" time="1.4" value="255" inout="Slow,Linear"/>
+                    <Key type="Curve" time="2" value="0" inout="Slow,Linear"/>
+                </Controller>
+                <Controller type="Rotation" relative="False" end="Pause" >
+                    <Key type="Curve" time="0" value="180" inout="Linear,linear"/>
+                    <Key type="Curve" time="2" value="210" inout="linear,Linear"/>
+                </Controller>
+                <Controller type="Anchor" end="Pause" side="Left" relative="true" frame="$parent/LensFlare2Anchor">
+                    <Key type="Curve" time="0" value="8" inout="Linear"/>
+                    <Key type="Curve" time="2" value="-10" inout="Slow,Linear"/>
+                </Controller>
+                <Controller type="Anchor" end="Pause" side="Top" relative="true" frame="$parent/LensFlare2Anchor">
+                    <Key type="Curve" time="0" value="-5" inout="Linear"/>
+                    <Key type="Curve" time="2" value="7" inout="Slow,Linear"/>
+                </Controller>
+                <Controller type="Dimension" dimension="Width" relative="False" percentage="True" end="Pause" >
+                    <Key type="Curve" time="0" value="40" inout="Linear,Slow"/>
+                    <Key type="Curve" time=".5" value="80" inout="Slow,Linear"/>
+                    <Key type="Curve" time="1.4" value="80" inout="Slow,Linear"/>
+                    <Key type="Curve" time="2" value="8" inout="Slow,Linear"/>
+                </Controller>
+                <Controller type="Dimension" dimension="Height" relative="False" percentage="True" end="Pause" >
+                    <Key type="Curve" time="0" value="40" inout="Linear,Slow"/>
+                    <Key type="Curve" time=".5" value="80" inout="Slow,Linear"/>
+                    <Key type="Curve" time="1.4" value="80" inout="Slow,Linear"/>
+                    <Key type="Curve" time="2" value="8" inout="Slow,Linear"/>
                 </Controller>
             </Animation>
         </Frame>
     </Frame>
 
-    <Frame type="ProfileHeroProgressionPanel" name="ProfileHeroProgressionPanelTemplate">
-        
-        <Frame type="Image" name="BackgroundImage">
-            <Anchor side="Top" relative="$parent" pos="Min" offset="-29"/>
-            <Anchor side="Left" relative="$parent" pos="Min" offset="61"/>
-            <Texture val="@UI/Storm_UI_ProfileDialog_GridBackground"/>
-        </Frame>
-        
-        <Frame type="Image" name="BackgroundGlowImage">
-            <Anchor side="Bottom" relative="$parent/BackgroundImage" pos="Max" offset="2"/>
-            <Anchor side="Left" relative="$parent" pos="Min" offset="61"/>
-            <Width val="1216"/>
-            <Height val="240"/>
-            <LayerCount val="2"/>
+    <Frame type="RewardMapTileListItem" name="RewardMapTileItemTemplate" template="ProfileTemplates/RewardMapTileItemTemplate">
+        <Width val="200"/>
+        <Height val="200"/>
+    </Frame>
 
-            <Texture val="@UI/storm_ui_glues_draft_hero_shine_mask" layer="0"/>
+    <Frame type="RewardTileListItem" name="HeroRewardItemTemplate">
+        <TooltipAnchorPosition val="TopCenter"/>
+
+        <StateGroup name="IsAwarded">
+            <State name="IsAwarded">
+                <When type="Property" isAwarded="true"/>
+                <Action type="SetProperty" frame="SourceLabel" style="PlayerProfileReward"/>
+                <Action type="SetProperty" frame="CompletedIcon" visible="true"/>
+            </State>
+        </StateGroup>
+
+        <Frame type="Image" name="RewardIconImage">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+            <Width val="100"/>
+            <Height val="100"/>
+        </Frame>
+
+        <Frame type="Image" name="CompletedIcon">
+            <Anchor side="Right" relative="$parent/RewardIconImage" pos="Max" offset="0"/>
+            <Anchor side="Bottom" relative="$parent/RewardIconImage" pos="Max" offset="0"/>
+            <Width val="0"/>
+            <Height  val="0"/>
+            <Visible val="false"/>
+            <Texture val="@UI/Storm_UI_IconComplete_Small"/>
+        </Frame>
+
+        <Frame type="Label" name="SourceLabel">
+            <Anchor side="Top" relative="$parent/RewardIconImage" pos="Max" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+            <Style val="PlayerProfileRewardLocked"/>
+        </Frame>
+    </Frame>
+
+    <Frame type="ProfileHeroProgressionPanel" name="ProfileHeroProgressionPanelTemplate">
+
+        <Frame type="Image" name="BackgroundImage">
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="45"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="-45"/>
+            <Texture val="@UI/Storm_UI_ProfileDialog_GridBackground"/>
+            <BlendMode val="Normal"/>
+            <Unclipped val="True"/>
+        </Frame>
+
+        <Frame type="Image" name="BackgroundGlowImage">
+            <Anchor side="Bottom" relative="$parent/BackgroundImage" pos="Max" offset="0"/>
+            <Anchor side="Left" relative="$parent/BackgroundImage" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent/BackgroundImage" pos="Mid" offset="0"/>
+            <Width val="1037"/>
+            <Height val="680"/>
+            <LayerCount val="2"/>
+            <Alpha val="200"/>
+            <BlendMode val="Add"/>
+            <Unclipped val="True"/>
+
+            <Texture val="@UI/Storm_UI_ProfileDialog_GridBackground_Mask" layer="0"/>
             <TextureCoords top="0" left="0" bottom="1" right="1" layer="0"/>
             <AlphaLayer val="True" layer="0"/>
             <WrapUV val="False" layer="0"/>
-            
+
             <Texture val="@UI/Storm_UI_ProfileDialog_GridBackground_Glow" layer="1"/>
             <TextureCoords top="0" left="0" bottom="1" right="1" layer="1"/>
             <WrapUV val="True" layer="1"/>
-            
+
             <Animation name="UVScroll">
-                <Event event="OnShown" action="Restart" frame="$parent"/>
-                <Event event="OnShown" action="DirectionForward" frame="$parent"/>
-                <Event event="OnShown" action="Play" frame="$parent"/>
-                <Event event="OnMouseDown" action="Play" />
-                <Controller type="LayerUV" layer="0" side="Top" relative="False" sidelock="True" end="Loop" >
-                    <Key type="Curve" time="0" value="1" out="fast"/>
-                    <Key type="Curve" time="6" value="-.7" in="fast"/>
+                <Event event="OnShown" action="Restart,DirectionForward,Play" frame="$parent"/>
+                <Event event="OnMouseDown" action="Play"/>
+                <Controller type="LayerUV" layer="1" side="Top" relative="False" sidelock="True" end="Loop" >
+                    <Key type="Curve" time="0" value="1" inout="Linear"/>
+                    <Key type="Curve" time="10" value="-.7" inout="Linear"/>
                 </Controller>
             </Animation>
         </Frame>
 
-        <Frame type="HeroContainerFrame" name="HeroContainerFrame">
-            <Anchor relative="$parent" />
+        <Frame type="HeroContainerFrame" name="HeroContainerFrame" template="HeroStandardTemplate/HeroItemTemplate">
+            <Anchor relative="$parent" offset="42"/>
             <AcceptsMouse val="true"/>
+            <Unclipped val="True"/>
 
-            <Frame type="HeroExperienceBar" name="HeroExperienceBar">
-                <Anchor side="Top" relative="$parent" pos="Min" offset="75"/>
-                <Anchor side="Left" relative="$parent" pos="Min" offset="341"/>
-                <Width val="632"/>
-                <Height val="588"/>
-                <MinValue val="0.000000"/>
-                <MaxValue val="1.00"/>
-                <Circular val="true"/>
-                <CircularStart val="210"/>
-                <CircularEndOffset val="300"/>
-                <FillInset val="0.0"/>
-                <AcceptsMouse val="true"/>
-                <TooltipAnchorPosition val="TopCenter"/>
+            <Frame type="Frame" name="IconAnchor">
+                <Anchor side="Bottom" relative="$parent/ShopButton" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="42"/>
+                <Height val="124"/>
+                <Width val="124"/>
+            </Frame>
 
-                <Frame type="Frame" name="FillImageContainer">
-                    <Anchor relative="$parent"/>
+            <HookupAlias original="HeroCutsceneClippingFrame/HeroCutscene" alias="HeroCutscene"/>
+            <Frame type="Frame" name="HeroCutsceneClippingFrame">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+                <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+                <Unclipped val="True"/>
+                <RenderPriority val="500"/>
 
-                    <Frame type="Image" name="FillImage">
-                        <Anchor relative="$parent"/>
-                        <LayerCount val="2"/>
+                <Frame type="HeroCutsceneFrame" name="HeroCutscene">
+                    <Anchor side="Top" relative="$parent" pos="Min" offset="-160"/>
+                    <Anchor side="Left" relative="$parent" pos="Min" offset="-390"/>
+                    <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+                    <Anchor side="Bottom" relative="$parent" pos="Max" offset="120"/>
 
-                        <Texture val="@UI/Storm_UI_ProfileDialog_Progress_HeroBackground" layer="0"/>
-                        <TextureType layer="0" val="Normal"/>
-
-                        <Texture val="@UI/Storm_UI_ProfileDialog_Progress_HeroProgressBar" layer="1"/>
-                        <TextureType layer="1" val="Circular"/>
-
-                        <Animation name="StateChange">
-                            <Event event="StateCompleted" action="DirectionForward" frame="$parent/$parent"/>
-                            <Event event="StateCompleted" action="Play" frame="$parent/$parent"/>
-                            <Event event="StateGold" action="DirectionReverse" frame="$parent/$parent"/>
-                            <Event event="StateGold" action="Play" frame="$parent/$parent"/>
-                            <Event event="StateNormal" action="Stop" frame="$parent/$parent"/>
-                            <Event event="StateLocked" action="Stop" frame="$parent/$parent"/>
-
-                            <Controller type="Texture" end="Loop" layer="0">
-                                <Key type="Image" time="0.0" image="@UI/Storm_UI_ProfileDialog_Progress_HeroBackground_Complete"/>
-                                <Key type="Image" time="0.01" image="@UI/Storm_UI_ProfileDialog_Progress_HeroProgressBar_Complete"/>
-                            </Controller>
-                            <Controller type="Texture" end="Loop" layer="1">
-                                <Key type="Image" time="0.0" image="@UI/Storm_UI_ProfileDialog_Progress_HeroProgressBar_Gold"/>
-                                <Key type="Image" time="0.01" image="@UI/Storm_UI_ProfileDialog_Progress_HeroProgressBar_Complete"/>
-                            </Controller>
-                        </Animation>
-                    </Frame>
+                    <RenderType val="LDR"/>
+                    <HeroCutsceneType val="HeroSelect"/>
+                    <HeroCutsceneDragEnabled val="true"/>
+                    
+                    <Animation name="StartCutscene">
+                        <Event event="OnShown" action="Reset,Play" frame="$ancestor[@type=ProfileHeroProgressionPanel]"/>
+                        <Controller type="Cutscene" end="Pause">
+                            <Key type="Cutscene" time="0" action="AddFilter" filter="Slot0"/>
+                            <Key type="Cutscene" time="0" action="AddFilter" filter="Brawl"/>
+                            <Key type="Cutscene" time="0" action="Bookmark" bookmark="Select Start"/>
+                            <Key type="Cutscene" time="0" action="Play"/>
+                        </Controller>
+                    </Animation>
                 </Frame>
             </Frame>
 
-            <Frame type="HeroCutsceneFrame" name="HeroCutscene">
-                <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
-                <Anchor side="Left" relative="$parent" pos="Min" offset="320"/>
-                <Width val="700"/>
-                <Height val="700"/>
-                <Unclipped val="True"/>
-                <HeroCutsceneType val="ShopTile"/>
-                <HeroCutsceneDragEnabled val="true"/>
+            <Frame type="Image" name="HeroVignette">
+                <Anchor relative="$parent/$parent/BackgroundImage"/>
+                <Texture val="@UI/Storm_UI_ProfileDialog_HeroBg_Vignette"/>
+                <Alpha val="200"/>
+                <RenderPriority val="501"/>
             </Frame>
-            
+
+            <Frame type="Image" name="PortraitBackingImage">
+                <Anchor relative="$parent/IconAnchor"/>
+                <RenderPriority val="502"/>
+            </Frame>
+
+            <Frame type="HeroImage" name="IconImage">
+                <Anchor relative="$parent/IconAnchor" offset="-14"/>
+                <RenderPriority val="502"/>
+            </Frame>
+
+            <Frame type="HeroExperienceBar" name="HeroExperienceBar">
+                <Anchor relative="$parent/IconAnchor"/>
+                <RenderPriority val="502"/>
+            </Frame>
+
+            <Frame type="Frame" name="SparkleContainer" template="ProfileHeroProgressionPanel/SparkleContainerTemplate">
+                <Anchor relative="$parent/HeroExperienceBar" offset="55"/>
+                <Visible val="false"/>
+
+                <StateGroup name="ShowSparkle">
+                    <State name="Show">
+                        <When type="Property" frame="$ancestor[@type=HeroContainerFrame]/HeroState" levelType="Max"/>
+                        <When type="Property" frame="$ancestor[@type=HeroContainerFrame]/HeroState" isAllowed="true"/>
+                        <Action type="SetProperty" visible="true"/>
+                    </State>
+                </StateGroup>
+            </Frame>
+
             <Frame type="HeroLabel" name="HeroNameLabel">
-                <Anchor side="Bottom" relative="$parent/HeroLevelLongLabel" pos="Min" offset="0"/>
-                <Anchor side="Left" relative="$parent/$parent/BackgroundImage" pos="Min" offset="187"/>
-                <Anchor side="Right" relative="$parent/$parent/BackgroundImage" pos="Max" offset="-187"/>
-                <Height val="200"/>
+                <Anchor side="Bottom" relative="$parent/IconAnchor" pos="Mid" offset="30"/>
+                <Anchor side="Left" relative="$parent/IconAnchor" pos="Max" offset="8"/>
+                <Anchor side="Right" relative="$parent" pos="0.65" offset="0"/>
+                <Options val="ScaleToPreventTruncation"/>
                 <HeroLabelType val="Name"/>
                 <Style val="PlayerProfileProgressNameLabel"/>
-                <Animation name="StateCompleted">
-                    <Event event="StateCompleted" action="DirectionForward" frame="$parent/HeroExperienceBar"/>
-                    <Event event="StateCompleted" action="Play" frame="$parent/HeroExperienceBar"/>
-                    <Event event="StateGold" action="DirectionForward" frame="$parent/HeroExperienceBar"/>
-                    <Event event="StateGold" action="Play" frame="$parent/HeroExperienceBar"/>
-                    <Event event="StateNormal" action="Stop" frame="$parent/HeroExperienceBar"/>
-                    <Controller type="Style" end="Pause" style1="PlayerProfileProgressNameLabel" style2="PlayerProfileProgressNameLabelComplete">
-                        <Key type="Curve" time="0.0" value="0" out="Auto"/>
-                        <Key type="Curve" time="0.01" value="1.0" out="Auto"/>
-                    </Controller>
-                </Animation>
+                <StateGroup name="MasteryState">
+                    <State name="Gold">
+                        <When type="Property" frame="$ancestor[@type=HeroContainerFrame]/HeroState" LevelType="Gold"/>
+                        <Action type="SetProperty" style="PlayerProfileProgressNameLabelComplete" undo="True"/>
+                    </State>
+                    <State name="Max">
+                        <When type="Property" frame="$ancestor[@type=HeroContainerFrame]/HeroState" LevelType="Max"/>
+                        <Action type="SetProperty" style="PlayerProfileProgressNameLabelComplete" undo="True"/>
+                    </State>
+                </StateGroup>
             </Frame>
-            
-            <Frame type="HeroLabel" name="HeroLevelLongLabel">
-                <Anchor side="Bottom" relative="$parent/HeroExperienceBar" pos="Max" offset="40"/>
-                <Anchor side="Left" relative="$parent/$parent/BackgroundImage" pos="Mid" offset="0"/>
-                <Anchor side="Right" relative="$parent/$parent/BackgroundImage" pos="Mid" offset="0"/>
-                <HeroLabelType val="LevelFormatted"/>
+
+            <Frame type="HeroLabel" name="HeroRoleLabel">
+                <Anchor side="Top" relative="$parent/HeroNameLabel" pos="Max" offset="-10"/>
+                <Anchor side="Left" relative="$parent/HeroNameLabel" pos="Min" offset="0"/>
+                <Anchor side="Right" relative="$parent" pos="0.65" offset="0"/>
+                <HeroLabelType val="RangeRole"/>
                 <Style val="PlayerProfileProgressLevelLabel"/>
-                <Animation name="StateCompleted">
-                    <Event event="StateCompleted" action="DirectionForward" frame="$parent/HeroExperienceBar"/>
-                    <Event event="StateCompleted" action="Play" frame="$parent/HeroExperienceBar"/>
-                    <Event event="StateGold" action="DirectionForward" frame="$parent/HeroExperienceBar"/>
-                    <Event event="StateGold" action="Play" frame="$parent/HeroExperienceBar"/>
-                    <Event event="StateNormal" action="Stop" frame="$parent/HeroExperienceBar"/>
-                    <Controller type="Style" end="Pause" style1="PlayerProfileProgressLevelLabel" style2="PlayerProfileProgressLevelLabelComplete">
-                        <Key type="Curve" time="0.0" value="0" out="Auto"/>
-                        <Key type="Curve" time="0.01" value="1.0" out="Auto"/>
+                <StateGroup name="MasteryState">
+                    <State name="Gold">
+                        <When type="Property" frame="$ancestor[@type=HeroContainerFrame]/HeroState" LevelType="Gold"/>
+                        <Action type="SetProperty" style="PlayerProfileProgressLevelLabelComplete" undo="True"/>
+                    </State>
+                    <State name="Max">
+                        <When type="Property" frame="$ancestor[@type=HeroContainerFrame]/HeroState" LevelType="Max"/>
+                        <Action type="SetProperty" style="PlayerProfileProgressLevelLabelComplete" undo="True"/>
+                    </State>
+                </StateGroup>
+            </Frame>
+
+            <Frame type="HeroGlueButton" name="ShopButton" template="StandardTemplates/StandardButtonTemplate">
+                <Anchor side="Bottom" relative="$parent" pos="Max" offset="-24"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="24"/>
+                <Width val="328"/>
+                <Handle val="ProfileDialog_HeroProgression_ShopButton"/>
+                <ReportsStats val="true"/>
+                <EnabledDuringRestrictedState val="true"/>
+                <EnabledDuringGameLaunch val="false"/>
+                <EnabledInDraftLobby val="false"/>
+                <HeroGlueButtonType val="Shop"/>
+                <ClickSound val="@UI_BNet_Generic_01" />
+                <Text val="@UI/ProfileDialog/HeroInfoButton"/>
+
+                <Frame type="Image" name="NormalImage">
+                    <Unclipped val="True"/>
+                </Frame>
+                <Frame type="Image" name="HoverImage">
+                    <Unclipped val="True"/>
+                </Frame>
+
+                <Animation name="DismissDialog">
+                    <Event event="OnClick" action="Play"/>
+                    <Controller type="Event" end="Stop" frame="$ancestor[@type=ProfileDialog]">
+                        <Key type="Event" time="0" event="DismissDialog"/>
                     </Controller>
                 </Animation>
             </Frame>
 
-            <Frame type="HeroLabel" name="HeroExperienceLabel">
-                <Anchor side="Top" relative="$parent/HeroLevelLongLabel" pos="Max" offset="10"/>
-                <Anchor side="Left" relative="$parent/$parent/BackgroundImage" pos="Mid" offset="0"/>
-                <Anchor side="Right" relative="$parent/$parent/BackgroundImage" pos="Mid" offset="0"/>
-                <HeroLabelType val="Experience"/>
-                <Style val="PlayerProfileProgressStatsLabel"/>
+            <Frame type="HeroGlueButton" name="TryButton" template="StandardTemplates/StandardButtonTemplate">
+                <Anchor side="Bottom" relative="$parent/ShopButton" pos="Max" offset="0"/>
+                <Anchor side="Left" relative="$parent/ShopButton" pos="Max" offset="-35"/>
+                <Width val="328"/>
+                <Handle val="ProfileDialog_HeroProgression_TryButton"/>
+                <ReportsStats val="true"/>
+                <EnabledDuringRestrictedState val="false"/>
+                <EnabledDuringGameLaunch val="false"/>
+                <EnabledInDraftLobby val="false"/>
+                <EnabledWhileInParty val="false"/>
+                <HeroGlueButtonType val="Try"/>
+                <RenderPriority val="514"/>
+                
+                <Frame type="Label" name="Label">
+                    <Text val="@UI/ScreenHome/TryButton"/>
+                </Frame>
+                <Frame type="Image" name="NormalImage">
+                    <Unclipped val="True"/>
+                </Frame>
+                <Frame type="Image" name="HoverImage">
+                    <Unclipped val="True"/>
+                </Frame>
+
+                <Animation name="DismissDialog">
+                    <Event event="OnClick" action="Play"/>
+                    <Controller type="Event" end="Stop" frame="$ancestor[@type=ProfileDialog]">
+                        <Key type="Event" time="0" event="DismissDialog"/>
+                    </Controller>
+                </Animation>
+            </Frame>
+
+            <Frame type="HeroExperienceBar" name="HeroExperienceBar">
+                <AcceptsMouseTooltip val="true"/>
+                <Tooltip val="$ancestor[@type=ProfileHeroProgressionPanel]/@HeroTooltip"/>
+                <TooltipAnchorPosition val="LeftToLeft | BottomToTop"/>
             </Frame>
         </Frame>
 
-        <Frame type="Label" name="HeroStatsLabel">
-            <Anchor side="Top" relative="$parent/BackgroundImage" pos="Max" offset="30"/>
-            <Anchor side="Left" relative="$parent/BackgroundImage" pos="Mid" offset="0"/>
-            <Anchor side="Right" relative="$parent/BackgroundImage" pos="Mid" offset="0"/>
-            <Style val="PlayerProfileProgressStatsLabel"/>
+        <!--===========================
+        <! Stats
+        <!===========================-->
+
+        <Frame type="Frame" name="StatsHeaderLabel" template="ProfileSummaryPanel/SummarySubHeaderTemplate">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="-40"/>
+            <Width val="#SummaryContainerWidth"/>
+            <Frame type="Label" name="HeaderLabel">
+                <Text val="@UI/ProfileDialog/GeneralStatsHeader"/>
+            </Frame>
         </Frame>
 
-        <Frame type="Label" name="RewardsTitleLabel">
-            <Anchor side="Bottom" relative="$parent/RewardsTileList" pos="Min" offset="-15"/>
-            <Anchor side="Left" relative="$parent/RewardsTileList" pos="Min" offset="-2"/>
-            <Style val="PlayerProfileProgressTitleLabel"/>
-            <Text val="@UI/LevelUpHero"/>
+        <Frame type="ListBox" name="GeneralStatListBox" template="ProfileSummaryPanel/ProfileGeneralStatListBoxTemplate">
+            <Anchor side="Top" relative="$parent/StatsHeaderLabel" pos="Max" offset="12"/>
+            <Anchor side="Bottom" relative="$parent" pos="0.333" offset="0"/>
+            <Anchor side="Left" relative="$parent/StatsHeaderLabel" pos="Min" offset="10"/>
+            <Anchor side="Right" relative="$parent/StatsHeaderLabel" pos="Max" offset="0"/>
+            <ItemHeight val="34"/>
+        </Frame>
+
+        <!--===========================
+        <! Mastery
+        <!===========================-->
+
+        <Frame type="Frame" name="MasteryHeaderLabel" template="ProfileSummaryPanel/SummarySubHeaderTemplate">
+            <Anchor side="Top" relative="$parent/GeneralStatListBox" pos="Max" offset="10"/>
+            <Anchor side="Right" relative="$parent/StatsHeaderLabel" pos="Max" offset="0"/>
+            <Width val="#SummaryContainerWidth"/>
+            <Frame type="Label" name="HeaderLabel">
+                <Text val="@UI/ProfileDialog/MasteryRewardsHeader"/>
+            </Frame>
+        </Frame>
+
+        <Frame type="TileList" name="MasteryRewardsTileList">
+            <Anchor side="Top" relative="$parent/MasteryHeaderLabel" pos="Max" offset="14"/>
+            <Anchor side="Left" relative="$parent/MasteryHeaderLabel" pos="Min" offset="-33"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="0.667" offset="0"/>
+            <AcceptsMouse val="True"/>
+            <ScrollStepValue val="1"/>
+   
+            <Frame type="RewardTileListItem" name="Item0" template="ProfileHeroProgressionPanel/HeroRewardItemTemplate">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+                <Anchor side="Left" relative="$parent" pos=".19" offset="0"/>
+                <Anchor side="Right" relative="$parent" pos=".19" offset="0"/>
+                <Width val="130"/>
+            </Frame>
+          
+            <Frame type="RewardTileListItem" name="Item1" template="ProfileHeroProgressionPanel/HeroRewardItemTemplate">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+                <Anchor side="Left" relative="$parent" pos=".5" offset="0"/>
+                <Anchor side="Right" relative="$parent" pos=".5" offset="0"/>
+                <Width val="130"/>
+            </Frame>
+          
+            <Frame type="RewardTileListItem" name="Item2" template="ProfileHeroProgressionPanel/HeroRewardItemTemplate">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+                <Anchor side="Left" relative="$parent" pos=".81" offset="0"/>
+                <Anchor side="Right" relative="$parent" pos=".81" offset="0"/>
+                <Width val="130"/>
+            </Frame>
+
+            <Frame type="ScrollBar" name="ScrollBar">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+                <AcceptsMouse val="false"/>
+                
+                <Orientation val="Horizontal"/>
+
+                <Frame type="Button" name="Button">
+                    <Draggable val="false"/>
+                    <AcceptsMouse val="false"/>
+                </Frame>
+
+                <Frame type="Button" name="DecrementButton" template="StandardTemplates/MiniPaginationArrowButtonTemplate_Left">
+                    <Height val="100"/>
+                    <Anchor side="Top" relative="$parent/$parent/Item0/RewardIconImage" pos="Mid" offset="0"/>
+                    <Anchor side="Bottom" relative="$parent/$parent/Item0/RewardIconImage" pos="Mid" offset="0"/>
+                    <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                    <ClickSound val="@UI_BNet_Increment"/>
+                </Frame>
+
+                <Frame type="Button" name="IncrementButton" template="StandardTemplates/MiniPaginationArrowButtonTemplate_Right">
+                    <Height val="100"/>
+                    <Anchor side="Top" relative="$parent/$parent/Item2/RewardIconImage" pos="Mid" offset="0"/>
+                    <Anchor side="Bottom" relative="$parent/$parent/Item2/RewardIconImage" pos="Mid" offset="0"/>
+                    <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+                    <ClickSound val="@UI_BNet_Increment"/>
+                </Frame>
+            </Frame>
+        </Frame>
+
+        <!--===========================
+        <! Progression
+        <!===========================-->
+
+        <Frame type="Frame" name="ProgressionHeaderLabel" template="ProfileSummaryPanel/SummarySubHeaderTemplate">
+            <Anchor side="Top" relative="$parent/MasteryRewardsTileList" pos="Max" offset="-5"/>
+            <Anchor side="Right" relative="$parent/StatsHeaderLabel" pos="Max" offset="0"/>
+            <Width val="#SummaryContainerWidth"/>
+            <Frame type="Label" name="HeaderLabel">
+                <Text val="@UI/ProfileDialog/ProgressionRewardsHeader"/>
+            </Frame>
         </Frame>
 
         <Frame type="TileList" name="RewardsTileList">
-            <Anchor side="Top" relative="$parent" pos="Min" offset="140"/>
-            <Anchor side="Bottom" relative="$parent" pos="Max" offset="-20"/>
-            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
-            <Width val="400"/>
-            <AcceptsMouse val="true"/>
+            <Anchor side="Top" relative="$parent/ProgressionHeaderLabel" pos="Max" offset="10"/>
+            <Anchor side="Left" relative="$parent/ProgressionHeaderLabel" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent/ProgressionHeaderLabel" pos="Max" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="1.0" offset="0"/>
 
-            <Frame type="HeroLevelRewardTileListItem" name="Item0" template="ProfileHeroProgressionPanel/ProfileHeroLevelRewardTileListItemTemplate">
+            <Frame type="RewardMapTileListItem" name="Item0" template="ProfileHeroProgressionPanel/RewardMapTileItemTemplate">
                 <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
-                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+                <Anchor side="Left" relative="$parent" pos="0.25" offset="0"/>
+                <Anchor side="Right" relative="$parent" pos="0.25" offset="0"/>
+
             </Frame>
 
-            <Frame type="HeroLevelRewardTileListItem" name="Item1" template="ProfileHeroProgressionPanel/ProfileHeroLevelRewardTileListItemTemplate">
-                <Anchor side="Top" relative="$parent/Item0" pos="Max" offset="0"/>
-                <Anchor side="Left" relative="$parent/Item0" pos="Min" offset="0"/>
-            </Frame>
-
-            <Frame type="HeroLevelRewardTileListItem" name="Item2" template="ProfileHeroProgressionPanel/ProfileHeroLevelRewardTileListItemTemplate">
-                <Anchor side="Top" relative="$parent/Item1" pos="Max" offset="0"/>
-                <Anchor side="Left" relative="$parent/Item1" pos="Min" offset="0"/>
-            </Frame>
-
-            <Frame type="HeroLevelRewardTileListItem" name="Item3" template="ProfileHeroProgressionPanel/ProfileHeroLevelRewardTileListItemTemplate">
-                <Anchor side="Top" relative="$parent/Item2" pos="Max" offset="0"/>
-                <Anchor side="Left" relative="$parent/Item2" pos="Min" offset="0"/>
-            </Frame>
-
-            <Frame type="HeroLevelRewardTileListItem" name="Item4" template="ProfileHeroProgressionPanel/ProfileHeroLevelRewardTileListItemTemplate">
-                <Anchor side="Top" relative="$parent/Item3" pos="Max" offset="0"/>
-                <Anchor side="Left" relative="$parent/Item3" pos="Min" offset="0"/>
-            </Frame>
-
-            <Frame type="HeroLevelRewardTileListItem" name="Item5" template="ProfileHeroProgressionPanel/ProfileHeroLevelRewardTileListItemTemplate">
-                <Anchor side="Top" relative="$parent/Item4" pos="Max" offset="0"/>
-                <Anchor side="Left" relative="$parent/Item4" pos="Min" offset="0"/>
-            </Frame>
-
-            <Frame type="HeroLevelRewardTileListItem" name="Item6" template="ProfileHeroProgressionPanel/ProfileHeroLevelRewardTileListItemTemplate">
-                <Anchor side="Top" relative="$parent/Item5" pos="Max" offset="0"/>
-                <Anchor side="Left" relative="$parent/Item5" pos="Min" offset="0"/>
-            </Frame>
-
-            <Frame type="HeroLevelRewardTileListItem" name="Item7" template="ProfileHeroProgressionPanel/ProfileHeroLevelRewardTileListItemTemplate">
-                <Anchor side="Top" relative="$parent/Item6" pos="Max" offset="0"/>
-                <Anchor side="Left" relative="$parent/Item6" pos="Min" offset="0"/>
-            </Frame>
-
-            <Frame type="HeroLevelRewardTileListItem" name="Item8" template="ProfileHeroProgressionPanel/ProfileHeroLevelRewardTileListItemTemplate">
-                <Anchor side="Top" relative="$parent/Item7" pos="Max" offset="0"/>
-                <Anchor side="Left" relative="$parent/Item7" pos="Min" offset="0"/>
-            </Frame>
-
-            <Frame type="HeroLevelRewardTileListItem" name="Item9" template="ProfileHeroProgressionPanel/ProfileHeroLevelRewardTileListItemTemplate">
-                <Anchor side="Top" relative="$parent/Item8" pos="Max" offset="0"/>
-                <Anchor side="Left" relative="$parent/Item8" pos="Min" offset="0"/>
-            </Frame>
-
-            <Frame type="HeroLevelRewardTileListItem" name="Item10" template="ProfileHeroProgressionPanel/ProfileHeroLevelRewardTileListItemTemplate">
-                <Anchor side="Top" relative="$parent/Item9" pos="Max" offset="0"/>
-                <Anchor side="Left" relative="$parent/Item9" pos="Min" offset="0"/>
-            </Frame>
-
-            <Frame type="HeroLevelRewardTileListItem" name="Item11" template="ProfileHeroProgressionPanel/ProfileHeroLevelRewardTileListItemTemplate">
-                <Anchor side="Top" relative="$parent/Item10" pos="Max" offset="0"/>
-                <Anchor side="Left" relative="$parent/Item10" pos="Min" offset="0"/>
-            </Frame>
-            
-            <Frame type="HeroLevelRewardTileListItem" name="Item12" template="ProfileHeroProgressionPanel/ProfileHeroLevelRewardTileListItemTemplate">
-                <Anchor side="Top" relative="$parent/Item11" pos="Max" offset="0"/>
-                <Anchor side="Left" relative="$parent/Item11" pos="Min" offset="0"/>
-            </Frame>
-            
-            <Frame type="HeroLevelRewardTileListItem" name="Item13" template="ProfileHeroProgressionPanel/ProfileHeroLevelRewardTileListItemTemplate">
-                <Anchor side="Top" relative="$parent/Item12" pos="Max" offset="0"/>
-                <Anchor side="Left" relative="$parent/Item12" pos="Min" offset="0"/>
+            <Frame type="RewardMapTileListItem" name="Item1" template="ProfileHeroProgressionPanel/RewardMapTileItemTemplate">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+                <Anchor side="Left" relative="$parent" pos="0.75" offset="0"/>
+                <Anchor side="Right" relative="$parent" pos="0.75" offset="0"/>
             </Frame>
         </Frame>
+
     </Frame>
 </Desc>

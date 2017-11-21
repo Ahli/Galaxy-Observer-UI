@@ -2,6 +2,47 @@
 <Desc>
     <DescFlags val="Locked"/>
 
+    <Animation name="IntroTemplate">
+        <Event event="OnShown" action="Play"/>
+        <Event event="Begin" action="Play" frame="$ancestor[@oftype=PromotionalFanfareDialog]"/>
+        <Event event="Reset" action="Stop" frame="$ancestor[@oftype=PromotionalFanfareDialog]"/>
+        <Controller type="Fade" end="Pause">
+            <Key type="Curve" time="0" value="0" inout="Linear,Slow"/>
+            <Key type="Curve" time=".5" value="0" inout="Linear,Slow"/>
+            <Key type="Curve" time=".8" value="255" inout="Slow,Linear"/>
+        </Controller>
+        <Controller type="Dimension" dimension="Width" relative="False" percentage="True" end="Pause">
+            <Key type="Curve" time="0" value="500" inout="Linear"/>
+            <Key type="Curve" time=".5" value="500" inout="Linear"/>
+            <Key type="Curve" time=".9" value="90" inout="Linear,slow"/>
+            <Key type="Curve" time="1" value="100" inout="slow,Linear"/>
+        </Controller>
+        <Controller type="Dimension" dimension="Height" relative="False" percentage="True" end="Pause">
+            <Key type="Curve" time="0" value="500" inout="Linear"/>
+            <Key type="Curve" time=".5" value="500" inout="Linear"/>
+            <Key type="Curve" time=".9" value="90" inout="Linear,slow"/>
+            <Key type="Curve" time="1" value="100" inout="slow,Linear"/>
+        </Controller>
+    </Animation>
+
+    <Animation name="BoinkTemplate">
+        <Event event="OnMouseDown" action="Reset,Play"/>
+        <Controller type="Dimension" dimension="Width" relative="False" percentage="True" end="Pause">
+            <Key type="Curve" time="0" value="100" inout="Linear,slow"/>
+            <Key type="Curve" time=".05" value="93" inout="Linear,slow"/>
+            <Key type="Curve" time=".7" value="102" inout="slow"/>
+            <Key type="Curve" time="1.1" value="98" inout="slow"/>
+            <Key type="Curve" time="1.5" value="100" inout="slow"/>
+        </Controller>
+        <Controller type="Dimension" dimension="Height" relative="False" percentage="True" end="Pause">
+            <Key type="Curve" time="0" value="100" inout="Linear,slow"/>
+            <Key type="Curve" time=".05" value="93" inout="Linear,slow"/>
+            <Key type="Curve" time=".7" value="102" inout="slow"/>
+            <Key type="Curve" time="1.1" value="98" inout="slow"/>
+            <Key type="Curve" time="1.5" value="100" inout="slow"/>
+        </Controller>
+    </Animation>
+
     <Frame type="AnchoredPopup" name="RewardsAnhcoredPopup" template="StandardPopupTooltip/AnchoredPopupBottomArrowTemplate">
         <MinWidth val="500"/>
 
@@ -36,8 +77,7 @@
         <Handle val="PromotionalFanfareDialog"/>
 
         <Animation name="ShowAnimation">
-            <Event event="OnShown" action="Reset"/>
-            <Event event="OnShown" action="Play"/>
+            <Event event="Begin" action="Reset,Play"/>
 
             <Controller type="Sound" end="Pause">
                 <Key type="Sound" time="0" sound="@UI_BNet_Menu_Show" />
@@ -46,8 +86,7 @@
         </Animation>
 
         <Animation name="HideAnimation">
-            <Event event="OnHidden" action="Reset"/>
-            <Event event="OnHidden" action="Play"/>
+            <Event event="OnHidden" action="Reset,Play"/>
 
             <Controller type="Sound" end="Pause">
                 <Key type="Sound" time="0" sound="@UI_BNet_Menu_Hide" />
@@ -55,6 +94,12 @@
         </Animation>
 
         <StateGroup name="FanfareType">
+            <!-- When the dialog is hidden, reset the visiblility of
+            cutscene frames so that onShown event can be triggered to
+            setup the cutscenes -->
+            <State name="Hidden">
+                <When type="Property" InheritedVisible="false"/>
+            </State>
             <State name="HeroCutscene">
                 <When type="Property" FanfareType="HeroCutscene"/>
                 <Action type="SetProperty" frame="ImageClippingContainer/HeroCutsceneFrame" visible="true"/>
@@ -71,6 +116,46 @@
                 <When type="Property" FanfareType="LargeImage"/>
                 <Action type="SetProperty" frame="ImageClippingContainer/LargePromoArtImage" visible="true"/>
             </State>
+            <State name="Megabundle">
+                <When type="Property" FanfareType="Megabundle"/>
+                <Action type="SetProperty" frame="MegabundlePromoFrame" visible="true"/>
+            </State>
+
+            <!-- GameContents -->
+            <State name="GameContentHero">
+                <When type="Property" FanfareType="GameContent"/>
+                <When type="Property" frame="ImageClippingContainer/GameContentFrame" ContentType="Hero"/>
+                <Action type="SetProperty" frame="ImageClippingContainer/GameContentHeroCutsceneFrame" HeroCutsceneType="ShopTile" undo="false"/>
+                <Action type="SetProperty" frame="ImageClippingContainer/GameContentHeroCutsceneFrame" visible="true"/>
+            </State>
+            <State name="GameContentSkin">
+                <When type="Property" FanfareType="GameContent"/>
+                <When type="Property" frame="ImageClippingContainer/GameContentFrame" ContentType="Skin"/>
+                <Action type="SetProperty" frame="ImageClippingContainer/GameContentHeroCutsceneFrame" HeroCutsceneType="ShopTile" undo="false"/>
+                <Action type="SetProperty" frame="ImageClippingContainer/GameContentHeroCutsceneFrame" visible="true"/>
+            </State>
+            <State name="GameContentMount">
+                <When type="Property" FanfareType="GameContent"/>
+                <When type="Property" frame="ImageClippingContainer/GameContentFrame" ContentType="Mount"/>
+                <Action type="SetProperty" frame="ImageClippingContainer/GameContentHeroCutsceneFrame" HeroCutsceneType="ShopTile" undo="false"/>
+                <Action type="SetProperty" frame="ImageClippingContainer/GameContentHeroCutsceneFrame" visible="true"/>
+            </State>
+            <State name="GameContentSpray">
+                <When type="Property" FanfareType="GameContent"/>
+                <When type="Property" frame="ImageClippingContainer/GameContentFrame" ContentType="Spray"/>
+                <Action type="SetProperty" frame="ImageClippingContainer/SprayImage" visible="true"/>
+            </State>
+            <State name="GameContentBanner">
+                <When type="Property" FanfareType="GameContent"/>
+                <When type="Property" frame="ImageClippingContainer/GameContentFrame" ContentType="Banner"/>
+                <Action type="SetProperty" frame="ImageClippingContainer/GameContentHeroCutsceneFrame" HeroCutsceneType="Preview" undo="false"/>
+                <Action type="SetProperty" frame="ImageClippingContainer/GameContentHeroCutsceneFrame" visible="true"/>
+            </State>
+            <State name="GameContentLootChest">
+                <When type="Property" FanfareType="GameContent"/>
+                <When type="Property" frame="ImageClippingContainer/GameContentFrame" ContentType="LootChest"/>
+                <Action type="SetProperty" frame="ImageClippingContainer/LootChestCutscene" visible="true"/>
+            </State>
         </StateGroup>
 
         <Frame type="Frame" name="ImageClippingContainer">
@@ -83,13 +168,11 @@
                 <BlurAmount val="0.8"/>
 
                 <Animation name="DialogAnimation">
-                    <Event event="OnShown" action="DirectionForward" frame="$parent"/>
-                    <Event event="OnShown" action="Play" frame="$parent"/>
-                    <Event event="DialogDismissed" action="DirectionReverse" frame="$parent"/>
-                    <Event event="DialogDismissed" action="Play" frame="$parent"/>
+                    <Event event="OnShown" action="DirectionForward,Play" frame="$parent"/>
+                    <Event event="DialogDismissed" action="DirectionReverse,Play" frame="$parent"/>
                     <Controller type="Blur" end="Pause">
-                        <Key type="Curve" time="0" value="0.0" out="Auto"/>
-                        <Key type="Curve" time="0.2" value=".6" in="Auto"/>
+                        <Key type="Curve" time="0" value="0.0" inout="Linear,Auto"/>
+                        <Key type="Curve" time="0.2" value=".6" inout="Auto,Linear"/>
                     </Controller>
                 </Animation>
             </Frame>
@@ -127,8 +210,8 @@
                     <Animation name="UVScroll">
                         <Event event="OnShown" action="Restart,Play" frame="$parent"/>
                         <Controller type="LayerUV" layer="1" side="Left" relative="True" sidelock="True" end="Loop" >
-                            <Key type="Curve" time="0" value="1" out="fast"/>
-                           <Key type="Curve" time="8" value="0" in="fast"/>
+                            <Key type="Curve" time="0" value="1" inout="Linear"/>
+                           <Key type="Curve" time="8" value="0" inout="Linear"/>
                         </Controller>
                     </Animation>
                 </Frame>
@@ -158,45 +241,46 @@
                     <Animation name="UVScroll">
                         <Event event="OnShown" action="Restart,Play" frame="$parent"/>
                         <Controller type="LayerUV" layer="1" side="Left" relative="True" sidelock="True" end="Loop" >
-                            <Key type="Curve" time="0" value="0" out="fast"/>
-                           <Key type="Curve" time="8" value="1" in="fast"/>
+                            <Key type="Curve" time="0" value="0" inout="Linear"/>
+                           <Key type="Curve" time="8" value="1" inout="Linear"/>
                         </Controller>
                     </Animation>
                 </Frame>
             </Frame>
 
             <Animation name="Intro">
-                <Event event="OnShown" action="Restart"/>
                 <Event event="OnShown" action="Play"/>
+                <Event event="Begin" action="Play" frame="$ancestor[@oftype=PromotionalFanfareDialog]"/>
+                <Event event="Reset" action="Stop" frame="$ancestor[@oftype=PromotionalFanfareDialog]"/>
                 <Controller type="Anchor" end="Pause" side="Left" relative="true" frame="$parent/TitleLabel">
-                    <Key type="Curve" time="0" value="120" out="Fast"/>
-                    <Key type="Curve" time=".9" value="120" out="Fast"/>
-                    <Key type="Curve" time="1.1" value="0" in="Slow"/>
+                    <Key type="Curve" time="0" value="120" inout="Linear"/>
+                    <Key type="Curve" time=".9" value="120" inout="Linear"/>
+                    <Key type="Curve" time="1.1" value="0" inout="Slow,Linear"/>
                 </Controller>
                 <Controller type="Fade" end="Pause" frame="$parent/TitleLabel">
-                    <Key type="Curve" time="0" value="0" out="Slow"/>
-                    <Key type="Curve" time=".9" value="0" out="Slow"/>
-                    <Key type="Curve" time="1.1" value="255" in="Slow"/>
+                    <Key type="Curve" time="0" value="0" inout="Linear,Slow"/>
+                    <Key type="Curve" time=".9" value="0" inout="Linear,Slow"/>
+                    <Key type="Curve" time="1.1" value="255" inout="Slow,Linear"/>
                 </Controller>
                 <Controller type="Fade" end="Pause" frame="$parent/UnlockedLabel">
-                    <Key type="Curve" time="0" value="0" out="Slow"/>
-                    <Key type="Curve" time="1.1" value="0" out="Slow"/>
-                    <Key type="Curve" time="1.2" value="255" in="Slow"/>
+                    <Key type="Curve" time="0" value="0" inout="Linear,Slow"/>
+                    <Key type="Curve" time="1.1" value="0" inout="Linear,Slow"/>
+                    <Key type="Curve" time="1.2" value="255" inout="Slow,Linear"/>
                 </Controller>
                 <Controller type="Fade" end="Pause" frame="$parent/MessageLabel">
-                    <Key type="Curve" time="0" value="0" out="Slow"/>
-                    <Key type="Curve" time="1.2" value="0" out="Slow"/>
-                    <Key type="Curve" time="1.3" value="255" in="Slow"/>
+                    <Key type="Curve" time="0" value="0" inout="Linear,Slow"/>
+                    <Key type="Curve" time="1.2" value="0" inout="Linear,Slow"/>
+                    <Key type="Curve" time="1.3" value="255" inout="Slow,Linear"/>
                 </Controller>
                 <Controller type="Fade" end="Pause" frame="$parent/Button">
-                    <Key type="Curve" time="0" value="0" out="Slow"/>
-                    <Key type="Curve" time="1.2" value="0" out="Slow"/>
-                    <Key type="Curve" time="1.3" value="255" in="Slow"/>
+                    <Key type="Curve" time="0" value="0" inout="Linear,Slow"/>
+                    <Key type="Curve" time="1.2" value="0" inout="Linear,Slow"/>
+                    <Key type="Curve" time="1.3" value="255" inout="Slow,Linear"/>
                 </Controller>
                 <Controller type="Fade" end="Pause" frame="$parent/InfoIcon">
-                    <Key type="Curve" time="0" value="0" out="Slow"/>
-                    <Key type="Curve" time="1.2" value="0" out="Slow"/>
-                    <Key type="Curve" time="1.3" value="255" in="Slow"/>
+                    <Key type="Curve" time="0" value="0" inout="Linear,Slow"/>
+                    <Key type="Curve" time="1.2" value="0" inout="Linear,Slow"/>
+                    <Key type="Curve" time="1.3" value="255" inout="Slow,Linear"/>
                 </Controller>
             </Animation>
 
@@ -223,7 +307,7 @@
                     <Anchor side="Right" relative="$parent/$parent/PromoImageAnchor" pos="Mid" offset="0"/>
                     <Anchor side="Bottom" relative="$parent/$parent/PromoImageAnchor" pos="Mid" offset="0"/>
                     <Texture val="@UI/Storm_UI_Promotional_Fanfare_ImageFrame"/>
-                </Frame> 
+                </Frame>
                 
                 <Frame type="Image" name="Background">
                     <Anchor side="Top" relative="$parent" pos="Mid" offset="-15"/>
@@ -240,13 +324,104 @@
                 </Frame>
 
                 <Animation name="Intro">
-                    <Event event="OnShown" action="Restart,Play"/>
+                    <Event event="OnShown" action="Play"/>
+                    <Event event="Begin" action="Play" frame="$ancestor[@oftype=PromotionalFanfareDialog]"/>
+                    <Event event="Reset" action="Stop" frame="$ancestor[@oftype=PromotionalFanfareDialog]"/>
                     <Controller type="Fade" end="Pause">
-                        <Key type="Curve" time="0" value="0" out="Slow"/>
-                        <Key type="Curve" time=".5" value="0" out="Slow"/>
-                        <Key type="Curve" time=".8" value="255" in="Slow"/>
+                        <Key type="Curve" time="0" value="0" inout="Linear,Slow"/>
+                        <Key type="Curve" time=".5" value="0" inout="Linear,Slow"/>
+                        <Key type="Curve" time=".8" value="255" inout="Slow,Linear"/>
                     </Controller>
                 </Animation>
+            </Frame>
+
+            <Frame type="GameContentFrame" name="GameContentFrame">
+                <Anchor relative="$parent"/>
+                <GameContent val="{$ancestor[@oftype=PromotionalFanfareDialog]/@GameContent}"/>
+            </Frame>
+
+            <Frame type="Image" name="SprayImage">
+                <Anchor side="Top" relative="$parent/PromoImageAnchor" pos="Mid" offset="0"/>
+                <Anchor side="Bottom" relative="$parent/PromoImageAnchor" pos="Mid" offset="0"/>
+                <Anchor side="Left" relative="$parent/PromoImageAnchor" pos="Mid" offset="0"/>
+                <Anchor side="Right" relative="$parent/PromoImageAnchor" pos="Mid" offset="0"/>
+                <Width val="512"/>
+                <Height val="512"/>
+                <Texture val="{$parent/GameContentFrame/@SprayLink[Texture]}"/>
+                <AnimCount val="{$parent/GameContentFrame/@SprayLink[AnimCount]}"/>
+                <AnimDuration val="{$parent/GameContentFrame/@SprayLink[AnimDuration]}"/>
+                <AnimColumns val="{$parent/GameContentFrame/@SprayLink[AnimCount]}"/>
+                <Visible val="false"/>
+
+                <StateGroup name="AnimatedState">
+                    <State name="Animated">
+                        <When type="Property" AnimCount="1" operator="GreaterThan"/>
+                        <Action type="SetProperty" TextureCoords="0,0,1,0.5" />
+                        <Action type="SetProperty" ScaleHeightToTexture="false"/>
+                        <Action type="SetProperty" Animating="True"/>
+                        <Action type="SetProperty" ManagedAnim="true"/>
+                        <Action type="SetProperty" LoopingAnim="true"/>
+                    </State>
+                </StateGroup>
+
+                <!-- Zoom in Intro Animation -->
+                <Animation name="Intro" template="PromotionalFanfareDialog/IntroTemplate"/>
+
+                <!-- Click effect -->
+                <AcceptsMouse val="true"/>
+                <Animation name="Boink" template="PromotionalFanfareDialog/BoinkTemplate"/>
+            </Frame>
+
+            <Frame type="LootChestCutsceneFrame" name="LootChestCutscene">
+                <Anchor side="Top" relative="$parent/PromoImageAnchor" pos="Mid" offset="50"/>
+                <Anchor side="Bottom" relative="$parent/PromoImageAnchor" pos="Mid" offset="50"/>
+                <Anchor side="Left" relative="$parent/PromoImageAnchor" pos="Mid" offset="0"/>
+                <Anchor side="Right" relative="$parent/PromoImageAnchor" pos="Mid" offset="0"/>
+                <Width val="1920"/>
+                <Height val="1200"/>
+
+                <AcceptsMouse val="False"/>
+                <AutoPlay val="True"/>
+                <RenderType val="LDR"/>
+                <ToneMapping val="False"/>
+                <Visible val="False"/>
+
+                <File val="Cutscenes/UI_LootBox.StormCutscene"/>
+
+                <Animation name="SetupCutscene">
+                    <Event event="OnShown" action="Play"/>
+                    <Event event="Begin" action="Play" frame="$ancestor[@oftype=PromotionalFanfareDialog]"/>
+                    <Event event="Reset" action="Stop" frame="$ancestor[@oftype=PromotionalFanfareDialog]"/>
+
+                    <!-- 0.1 delay is required in case the fanfare dialogs are shown back to back -->
+                    <Controller type="Cutscene" end="Pause">
+                        <Key type="Cutscene" time="0.1" action="Play"/>
+                        <Key type="Cutscene" time="0.1" action="AddFilter" filter="Mute"/>
+                        <Key type="Cutscene" time="0.1" action="Bookmark" bookmark="Center Start Short"/>
+                    </Controller>
+                </Animation>
+
+                <!-- Zoom in Intro Animation -->
+                <Animation name="Intro" template="PromotionalFanfareDialog/IntroTemplate"/>
+            </Frame>
+
+            <Frame type="HeroCutsceneFrame" name="GameContentHeroCutsceneFrame">
+                <Anchor side="Top" relative="$parent/PromoImageAnchor" pos="Mid" offset="-60"/>
+                <Anchor side="Bottom" relative="$parent/PromoImageAnchor" pos="Mid" offset="-60"/>
+                <Anchor side="Left" relative="$parent/PromoImageAnchor" pos="Mid" offset="0"/>
+                <Anchor side="Right" relative="$parent/PromoImageAnchor" pos="Mid" offset="0"/>
+                <Width val="913"/>
+                <Height val="705"/>
+                <RenderType val="LDR"/>
+                <Unclipped val="True"/>
+                <Visible val="False"/>
+                <HeroCutsceneDragEnabled val="true"/>
+                <AcceptsMouse val="True"/>
+                <HeroCutsceneType val="ShopTile"/>
+                <GameContent val="{$ancestor[@oftype=PromotionalFanfareDialog]/@GameContent}"/>
+
+                <!-- Zoom in Intro Animation -->
+                <Animation name="Intro" template="PromotionalFanfareDialog/IntroTemplate"/>
             </Frame>
 
             <Frame type="HeroCutsceneFrame" name="HeroCutsceneFrame">
@@ -261,26 +436,9 @@
                 <Visible val="False"/>
                 <HeroCutsceneDragEnabled val="true"/>
                 <AcceptsMouse val="True"/>
-                <Animation name="Intro">
-                    <Event event="OnShown" action="Restart,Play"/>
-                    <Controller type="Fade" end="Pause">
-                        <Key type="Curve" time="0" value="0" out="Slow"/>
-                        <Key type="Curve" time=".5" value="0" out="Slow"/>
-                        <Key type="Curve" time=".8" value="255" in="Slow"/>
-                    </Controller>
-                    <Controller type="Dimension" dimension="Width" relative="False" percentage="True" end="Pause">
-                        <Key type="Curve" time="0" value="500" in="fast" out="fast"/>
-                        <Key type="Curve" time=".5" value="500" in="fast" out="fast"/>
-                        <Key type="Curve" time=".9" value="90" in="fast" out="slow"/>
-                        <Key type="Curve" time="1" value="100" in="slow" out="fast"/>
-                    </Controller>
-                    <Controller type="Dimension" dimension="Height" relative="False" percentage="True" end="Pause">
-                        <Key type="Curve" time="0" value="500" in="fast" out="fast"/>
-                        <Key type="Curve" time=".5" value="500" in="fast" out="fast"/>
-                        <Key type="Curve" time=".9" value="90" in="fast" out="slow"/>
-                        <Key type="Curve" time="1" value="100" in="slow" out="fast"/>
-                    </Controller>
-                </Animation>
+
+                <!-- Zoom in Intro Animation -->
+                <Animation name="Intro" template="PromotionalFanfareDialog/IntroTemplate"/>
             </Frame>
 
             <Frame type="CutsceneFrame" name="CutsceneFrame">
@@ -294,18 +452,12 @@
                 <AutoPlay val="True"/>
                 <Visible val="False"/>
                 <Unclipped val="True"/>
-                <Animation name="Intro">
-                    <Event event="OnShown" action="Restart,Play"/>
-                    <Controller type="Fade" end="Pause">
-                        <Key type="Curve" time="0" value="0" out="Slow"/>
-                        <Key type="Curve" time=".5" value="0" out="Slow"/>
-                        <Key type="Curve" time=".8" value="255" in="Slow"/>
-                    </Controller>
-                </Animation>
+
+                <!-- Zoom in Intro Animation -->
+                <Animation name="Intro" template="PromotionalFanfareDialog/IntroTemplate"/>
             </Frame>
 
             <Frame type="Image" name="LargePromoArtImage">
-                <AcceptsMouse val="true"/>
                 <Anchor side="Top" relative="$parent/PromoImageAnchor" pos="Mid" offset="0"/>
                 <Anchor side="Bottom" relative="$parent/PromoImageAnchor" pos="Mid" offset="0"/>
                 <Anchor side="Left" relative="$parent/PromoImageAnchor" pos="Mid" offset="0"/>
@@ -315,46 +467,85 @@
                 <SubpixelRendering val="True"/>
                 <Visible val="false"/>
 
-                <Animation name="Intro">
-                    <Event event="OnShown" action="Restart"/>
-                    <Event event="OnShown" action="Play"/>
-                    <Controller type="Fade" end="Pause">
-                        <Key type="Curve" time="0" value="0" out="Slow"/>
-                        <Key type="Curve" time=".5" value="0" out="Slow"/>
-                        <Key type="Curve" time=".8" value="255" in="Slow"/>
-                    </Controller>
-                    <Controller type="Dimension" dimension="Width" relative="False" percentage="True" end="Pause">
-                        <Key type="Curve" time="0" value="500" in="fast" out="fast"/>
-                        <Key type="Curve" time=".5" value="500" in="fast" out="fast"/>
-                        <Key type="Curve" time=".9" value="90" in="fast" out="slow"/>
-                        <Key type="Curve" time="1" value="100" in="slow" out="fast"/>
-                    </Controller>
-                    <Controller type="Dimension" dimension="Height" relative="False" percentage="True" end="Pause">
-                        <Key type="Curve" time="0" value="500" in="fast" out="fast"/>
-                        <Key type="Curve" time=".5" value="500" in="fast" out="fast"/>
-                        <Key type="Curve" time=".9" value="90" in="fast" out="slow"/>
-                        <Key type="Curve" time="1" value="100" in="slow" out="fast"/>
-                    </Controller>
-                </Animation>
+                <!-- Zoom in Intro Animation -->
+                <Animation name="Intro" template="PromotionalFanfareDialog/IntroTemplate"/>
 
-                <Animation name="Boink">
-                    <Event event="OnMouseDown" action="Reset"/>
-                    <Event event="OnMouseDown" action="Play"/>
-                    <Controller type="Dimension" dimension="Width" relative="False" percentage="True" end="Pause">
-                        <Key type="Curve" time="0" value="100" in="fast" out="slow"/>
-                        <Key type="Curve" time=".05" value="93" in="fast" out="slow"/>
-                        <Key type="Curve" time=".7" value="102" in="slow" out="slow"/>
-                        <Key type="Curve" time="1.1" value="98" in="slow" out="slow"/>
-                        <Key type="Curve" time="1.5" value="100" in="slow" out="slow"/>
-                    </Controller>
-                    <Controller type="Dimension" dimension="Height" relative="False" percentage="True" end="Pause">
-                        <Key type="Curve" time="0" value="100" in="fast" out="slow"/>
-                        <Key type="Curve" time=".05" value="93" in="fast" out="slow"/>
-                        <Key type="Curve" time=".7" value="102" in="slow" out="slow"/>
-                        <Key type="Curve" time="1.1" value="98" in="slow" out="slow"/>
-                        <Key type="Curve" time="1.5" value="100" in="slow" out="slow"/>
+                <!-- Click effect -->
+                <AcceptsMouse val="true"/>
+                <Animation name="Boink" template="PromotionalFanfareDialog/BoinkTemplate"/>
+            </Frame>
+            
+            <Frame type="Image" name="MegaBundleArtImage">
+                <!-- Separate, to not interfere with largepromoartimage sizing and animation -->
+                <AcceptsMouse val="true"/>
+                <Anchor side="Top" relative="$parent/BackgroundBlurFrame" pos="Min" offset="0"/>
+                <Anchor side="Bottom" relative="$parent/BackgroundBlurFrame" pos="Max" offset="0"/>
+                <Anchor side="Left" relative="$parent/PromoImageAnchor" pos="Mid" offset="0"/>
+                <Anchor side="Right" relative="$parent/PromoImageAnchor" pos="Mid" offset="0"/>
+                <ScaleWidthToTexture val="true"/>
+                <SubpixelRendering val="True"/>
+                <Visible val="false"/>
+                <Texture val="@UI/Storm_UI_Storm_MegaBundle"/>
+                <Animation name="Intro">
+                    <Event event="OnShown" action="Play"/>
+                    <Event event="Begin" action="Play" frame="$ancestor[@oftype=PromotionalFanfareDialog]"/>
+                    <Event event="Reset" action="Stop" frame="$ancestor[@oftype=PromotionalFanfareDialog]"/>
+                    <Controller type="Fade" end="Pause">
+                        <Key type="Curve" time="0" value="0" inout="Linear,Slow"/>
+                        <Key type="Curve" time=".5" value="0" inout="Linear,Slow"/>
+                        <Key type="Curve" time=".8" value="255" inout="Slow,Linear"/>
                     </Controller>
                 </Animation>
+            </Frame>
+        </Frame>
+
+        <Frame type="Frame" name="MegabundlePromoFrame">
+            <Anchor relative="$parent"/>
+            <Visible val="False"/>
+            
+            <Frame type="TextFormatFrame" name="GemsTextFormatFrame">
+                <Anchor relative="$parent"/>
+                <Visible val="False"/>
+                <FormatText val="@UI/PromotionalFanfare/ReceiveGems"/>
+                <Replacement val="{$parent/$parent/@RewardAmount}" index="0"/>
+            </Frame>
+            
+            <Frame type="TextFormatFrame" name="ActiveBundleTextFormatFrame">
+                <Anchor relative="$parent"/>
+                <Visible val="False"/>
+                <FormatText val="@UI/PromotionalFanfare/ReceiveGemsSubtitle"/>
+                <Replacement val="{$parent/$parent/@RewardAmount}" index="0"/>
+            </Frame>
+            
+            <StateGroup name="Active">
+                <State name="Active">
+                    <When type="Property" InheritedVisible="true"/>
+                    <Action type="SetProperty" frame="$parent/InfoIcon" visible="false"/>
+                    <Action type="SetProperty" frame="$parent/ImageClippingContainer/MegaBundleArtImage" visible="true"/>
+                    <Action type="SetAnchor" frame="$parent/Button" side="left" relative="$parent" pos="Mid" offset="0"/>
+                    <Action type="SetAnchor" frame="$parent/Button" side="right" relative="$parent" pos="Mid" offset="292"/>
+                </State>
+            </StateGroup>
+
+            <StateGroup name="FeaturedDisplay">
+                <State name="Megabundles">
+                    <When type="Property" visible="true"/>
+                    <When type="Property" frame="$parent" MegabundlesPurchasable="true"/>
+                    <Action type="SetProperty" frame="$parent/ImageClippingContainer/MegaBundleArtImage" texture="@UI/Storm_UI_Storm_MegaBundle_LargePromo"/>
+                </State>
+                <State name="Gems">
+                    <When type="Property" visible="true"/>
+                    <When type="Property" frame="$parent" MegabundlesPurchasable="false"/>
+                    <Action type="SetProperty" frame="$parent/ImageClippingContainer/MegaBundleArtImage" texture="@UI/Storm_UI_Store_GemItem_4"/>
+                </State>
+            </StateGroup>
+
+            <Frame type="Button" name="CollectionsButton" template="StandardTemplates/StandardButtonTemplate">
+                <Anchor side="Top" relative="$parent/$parent/InfoIcon" pos="Max" offset="0"/>
+                <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+                <Alpha val="{$parent/$parent/Button/@Alpha}"/>
+                <Text val="@UI/TakeMeThere"/>
+                <VisibilityOnFade val="true"/>
             </Frame>
         </Frame>
         
@@ -365,6 +556,24 @@
 
             <RenderPriority val="530"/>
             <Style val="RewardsFanfareTitle"/>
+
+            <StateGroup name="MegabundleOverride">
+                <State name="Active">
+                    <When type="Property" frame="$parent/MegabundlePromoFrame" InheritedVisible="true"/>
+                    <When type="Property" frame="$parent" MegabundlesPurchasable="true"/>
+                    <Action type="SetProperty" text="@UI/PromotionalFanfare/ReceiveGemsMegaBundle"/>
+                </State>
+                <State name="ActiveGemsOnly">
+                    <When type="Property" frame="$parent/MegabundlePromoFrame" InheritedVisible="true"/>
+                    <When type="Property" frame="$parent" MegabundlesPurchasable="false"/>
+                    <Action type="SetProperty" text="{$parent/MegabundlePromoFrame/GemsTextFormatFrame/@Text}"/>
+                    <Action type="SetAnchor" frame="$parent/ImageClippingContainer/MegaBundleArtImage" side="Top" relative="$parent/BackgroundBlurFrame" pos="Min" offset="-300"/>
+                </State>
+                <State name="Default">
+                    <When type="Property" frame="$parent/MegabundlePromoFrame" InheritedVisible="false"/>
+                    <Action type="SetProperty" text="{$parent/@RewardName}"/>
+                </State>
+            </StateGroup>
         </Frame>
         
         <Frame type="Label" name="UnlockedLabel">
@@ -372,7 +581,28 @@
             <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
             <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
             <Style val="RewardsFanfareSubTitle"/>
-            <Text val="@UI/PromotionalFanfareUnlocked"/>
+            
+            <StateGroup name="MegabundleOverride">
+                <State name="Active">
+                    <When type="Property" frame="$parent/MegabundlePromoFrame" InheritedVisible="true"/>
+                    <When type="Property" frame="$parent" MegabundlesPurchasable="true"/>
+                    <Action type="SetProperty" text="{$parent/MegabundlePromoFrame/ActiveBundleTextFormatFrame/@Text}"/>
+                </State>
+                <State name="ActiveGemsOnly">
+                    <When type="Property" frame="$parent/MegabundlePromoFrame" InheritedVisible="true"/>
+                    <When type="Property" frame="$parent" MegabundlesPurchasable="false"/>
+                    <Action type="SetProperty" text="@UI/PromotionalFanfare/PromoteCollection"/>
+                </State>
+                <State name="AwardedChest">
+                    <When type="Property" frame="$ancestor[@oftype=PromotionalFanfareDialog]" FanfareType="GameContent"/>
+                    <When type="Property" frame="$parent/ImageClippingContainer/GameContentFrame" ContentType="LootChest"/>
+                    <Action type="SetProperty" text="@UI/PromotionalFanfareAwarded"/>
+                </State>
+                <State name="Default">
+                    <When type="Property" frame="$parent/MegabundlePromoFrame" InheritedVisible="false"/>
+                    <Action type="SetProperty" text="{$parent/@RewardUnlockText}"/>
+                </State>
+            </StateGroup>
         </Frame>
         
         <Frame type="Label" name="MessageLabel">
@@ -400,6 +630,7 @@
             <AcceptsMouse val="True"/>
             <RenderPriority val="515"/>
             <Texture val="@UI/Storm_UI_Promotional_Fanfare_InfoButton"/>
+            <CollapseLayout val="true"/>
         </Frame>
 
         <!-- <Frame type="PropertyBind" name="BindDescriptionText">
@@ -415,6 +646,17 @@
             <Text val="@UI/Sweet"/>
             <Shortcut val="@UI/StandardDialog_Ok_Hotkey"/>
             <VisibilityOnFade val="true"/>
+
+            <StateGroup name="ButtonText">
+                <DefaultState val="LastReward"/>
+                <State name="HasNextReward">
+                    <When type="Property" frame="$ancestor[@oftype=PromotionalFanfareDialog]" operator="NotEqual" IsAtLastReward="true"/>
+                    <Action type="SetProperty" text="@UI/ShowNextReward"/>
+                </State>
+                <State name="LastReward">
+                    <Action type="SetProperty" text="@UI/Sweet"/>
+                </State>
+            </StateGroup>
         </Frame>
     </Frame>
 </Desc>

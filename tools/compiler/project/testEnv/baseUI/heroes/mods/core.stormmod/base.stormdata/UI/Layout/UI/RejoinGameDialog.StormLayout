@@ -9,49 +9,210 @@
         <Frame type="BlurFrame" name="FullscreenBlurFrame">
             <Visible val="false"/>
         </Frame>
+        
+        <Frame type="Image" name="FullscreenBlackoutImage">
+            <Anchor relative="$parent"/>
+            <Alpha val="255"/>
+            
+            <Frame type="Image" name="MapImage">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+                <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+                <Color val="255,255,255"/>
+                <ScaleWidthToTexture val="true"/>
+                <TextureType val="Normal"/>
+                <Texture val="{$parent/$parent/MapCache/@BackgroundImagePath}"/>
+            </Frame>
+
+            <Animation name="FadeBackground">
+                <Event event="FadeBackground" action="Reset,Play"/>
+
+                <Controller type="Fade" end="Pause">
+                    <Key type="Curve" time="0" value="0"/>
+                    <Key type="Curve" time="1" value="255"/>
+                </Controller>
+            </Animation>
+            
+            <StateGroup name="Visibility">
+                <State name="ShortWait">
+                    <When type="AnimationState" frame="$parent" RejoinState="ShortWait"/>
+                    <Action type="SetProperty" Visible="False"/>
+                </State>
+                <State name="LongWait">
+                    <When type="AnimationState" frame="$parent" RejoinState="LongWait"/>
+                    <Action type="SendEvent" event="FadeBackground"/>
+                </State>
+            </StateGroup>
+        </Frame>
+
+        <Frame type="MapCacheFrame" name="MapCache">
+            <Anchor relative="$parent"/>
+            <Link val="{$parent/@MapLink}"/>
+        </Frame>
 
         <Frame type="Image" name="BackgroundFrame">
             <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
             <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
             <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
             <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
-            <Height val="420"/>
+            <Height val="325"/>
+            <Alpha val="200"/>
         </Frame>
 
         <Frame type="Label" name="TitleLabel">
-            <Text val="@UI/RejoinGameDialogTitle"/>
-            <Style val="DialogHeaderLabel"/>
+            <Anchor side="Bottom" relative="$parent/RejoinProgressBar" pos="Min" offset="-40"/>
+            <Text val="@UI/WaitingForServerDialogTitle"/>
+            <Style val="RejoinDialogHeaderLabel"/>
         </Frame>
-
-        <Frame type="Label" name="MessageLabel">
-            <Text val="@UI/RejoinGameDialogMessage"/>
-            <Width val="500"/>
-            <Style val="DialogMessageLabel"/>
-        </Frame>
-        
-        <Frame type="Label" name="DurationLabel">
-            <Anchor side="Top" relative="$parent/MessageLabel" pos="Max" offset="20"/>
+               
+        <Frame type="ProgressBar" name="RejoinProgressBar">
+            <Anchor side="Top" relative="$parent/BackgroundFrame" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent/BackgroundFrame" pos="Mid" offset="0"/>
             <Anchor side="Left" relative="$parent/BackgroundFrame" pos="Mid" offset="0"/>
             <Anchor side="Right" relative="$parent/BackgroundFrame" pos="Mid" offset="0"/>
-            <Width val="500"/>
-            <Style val="DialogMessageLabel"/>
-        </Frame>
-        
-        <Frame type="ProgressBar" name="RejoinProgressBar">
-            <Anchor side="Top" relative="$parent/DurationLabel" pos="Max" offset="0"/>
-            <Anchor side="Left" relative="$parent/DurationLabel" pos="Mid" offset="0"/>
-            <Anchor side="Right" relative="$parent/DurationLabel" pos="Mid" offset="0"/>
-            <Width val="500"/>
+            <Width val="290"/>
             <Height val="42"/>
             <Texture val="@UI/Storm_Notifications_ProgressBar"/>
             <MinValue val="0.000000"/>
             <MaxValue val="1.00"/>
-            <Value val="0.0"/>
-            <FillInset val="0.03125"/> 
+            <Value val="{$parent/@ProgressPercent}"/>
+            <FillInset val="0.03125"/>
+            <LightAdjustColor val="76c7fb"/>
+            <DarkAdjustColor val="0081de"/>
+            <ColorAdjustMode val="Colorize"/>
         </Frame>
+
+        <Frame type="Label" name="SubDescription">
+            <Anchor side="Bottom" relative="$parent/BackgroundFrame" pos="Max" offset="-40"/>
+            <Anchor side="Left" relative="$parent/BackgroundFrame" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent/BackgroundFrame" pos="Mid" offset="0"/>
+            <Text val="@UI/RejoinGameDialogMessage"/>
+            <Width val="700"/>
+            <Style val="DialogMessageLabel"/>
+        </Frame>
+
+        <Frame type="TeamHeroInfoPanel" name="TeamHeroInfo">
+            <Anchor relative="$parent" offset="0"/>
+        </Frame>
+
+        <Frame type="Frame" name="PlayerIcon" template="WaitingForServerDialog/LogoFrameTemplate">
+            <Anchor side="Top" relative="$parent/RejoinProgressBar" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent/RejoinProgressBar" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent/RejoinProgressBar" pos="Min" offset="0"/>
+
+            <Frame type="HeroContainerFrame" name="PortraitContainer">
+                <Hero val="{$parent/$parent/TeamHeroInfo/@LocalPlayerHero}"/>
+            </Frame>
+
+            <StateGroup name="LogoVisibility">
+                <State name="HasPlayerImage">
+                    <When type="Property" frame="PortraitContainer/PortraitImage" operator="NotEqual" Texture=""/>
+                    <Action type="SetProperty" frame="LogoImage" Visible="False"/>
+                </State>
+
+                <State name="NoPlayerImage">
+                    <When type="Property" frame="PortraitContainer/PortraitImage" Texture=""/>
+                    <Action type="SetProperty" frame="LogoImage" Visible="True"/>
+                </State>
+            </StateGroup>
+        </Frame>
+
+        <Frame type="Frame" name="TeammateIcon0" template="WaitingForServerDialog/PlayerIconSmallTemplate">
+            <Anchor side="Top" relative="$parent/RejoinProgressBar" pos="Mid" offset="-17"/>
+            <Anchor side="Bottom" relative="$parent/RejoinProgressBar" pos="Mid" offset="-17"/>
+            <Anchor side="Left" relative="$parent/RejoinProgressBar" pos="Max" offset="10"/>
+
+            <Frame type="HeroContainerFrame" name="PortraitContainer">
+                <Hero val="{$parent/$parent/TeamHeroInfo/@TeammateHero[0]}"/>
+            </Frame>
+        </Frame>
+
+        <Frame type="Frame" name="TeammateIcon1" template="WaitingForServerDialog/PlayerIconSmallTemplate">
+            <Anchor side="Top" relative="$parent/TeammateIcon0" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent/TeammateIcon0" pos="Mid" offset="0"/>
+            <Anchor side="Left" relative="$parent/TeammateIcon0" pos="Max" offset="-9"/>
+
+            <Frame type="HeroContainerFrame" name="PortraitContainer">
+                <Hero val="{$parent/$parent/TeamHeroInfo/@TeammateHero[1]}"/>
+            </Frame>
+        </Frame>
+
+        <Frame type="Frame" name="TeammateIcon2" template="WaitingForServerDialog/PlayerIconSmallTemplate">
+            <Anchor side="Top" relative="$parent/RejoinProgressBar" pos="Mid" offset="17"/>
+            <Anchor side="Bottom" relative="$parent/RejoinProgressBar" pos="Mid" offset="17"/>
+            <Anchor side="Left" relative="$parent/TeammateIcon0" pos="Mid" offset="-4"/>
+
+            <Frame type="HeroContainerFrame" name="PortraitContainer">
+                <Hero val="{$parent/$parent/TeamHeroInfo/@TeammateHero[2]}"/>
+            </Frame>
+        </Frame>
+
+        <Frame type="Frame" name="TeammateIcon3" template="WaitingForServerDialog/PlayerIconSmallTemplate">
+            <Anchor side="Top" relative="$parent/TeammateIcon2" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent/TeammateIcon2" pos="Mid" offset="0"/>
+            <Anchor side="Left" relative="$parent/TeammateIcon2" pos="Max" offset="-9"/>
+
+            <Frame type="HeroContainerFrame" name="PortraitContainer">
+                <Hero val="{$parent/$parent/TeamHeroInfo/@TeammateHero[3]}"/>
+            </Frame>
+        </Frame>
+
+        <Frame type="Frame" name="LogoFrame" template="WaitingForServerDialog/LogoFrameTemplate">
+            <Anchor side="Top" relative="$parent/RejoinProgressBar" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent/RejoinProgressBar" pos="Mid" offset="0"/>
+            <Anchor side="Left" relative="$parent/RejoinProgressBar" pos="Max" offset="0"/>
+
+            <Visible val="False"/>
+        </Frame>
+
+        <StateGroup name="TeamVisibility">
+            <State name="NoTeammates">
+                <When type="Property" frame="TeammateIcon0/PortraitContainer/PortraitImage" Texture=""/>
+                <When type="Property" frame="TeammateIcon1/PortraitContainer/PortraitImage" Texture=""/>
+                <When type="Property" frame="TeammateIcon2/PortraitContainer/PortraitImage" Texture=""/>
+                <When type="Property" frame="TeammateIcon3/PortraitContainer/PortraitImage" Texture=""/>
+
+                <Action type="SetProperty" frame="TeammateIcon0" Visible="False"/>
+                <Action type="SetProperty" frame="TeammateIcon1" Visible="False"/>
+                <Action type="SetProperty" frame="TeammateIcon2" Visible="False"/>
+                <Action type="SetProperty" frame="TeammateIcon3" Visible="False"/>
+                <Action type="SetProperty" frame="LogoFrame" Visible="True"/>
+            </State>
+        </StateGroup>
         
         <Frame type="Button" name="Button">
-            <Visible val="false"/>
+            <Anchor side="Top" relative="$parent" pos="Max" offset=" -110"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="-20"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="20"/>
+            <Anchor side="Right" relative="$parent" pos="Min" offset="272"/>
+            <Text val="@UI/Exit"/>
+            <Visible val="False"/>
         </Frame>
+        
+        <StateGroup name="WaitinForServer">
+            <State name="NotWaiting">
+                <When type="Property" IsWaitingForServer="False"/>
+            </State>
+            <State name="IsWaiting">
+                <When type="Property" IsWaitingForServer="True"/>
+                <Action type="SetProperty" frame="Button" Visible="False"/>
+                <Action type="SetProperty" frame="TeammateIcon3" Visible="False"/>
+                <Action type="SetProperty" frame="TeammateIcon2" Visible="False"/>
+                <Action type="SetProperty" frame="TeammateIcon1" Visible="False"/>
+                <Action type="SetProperty" frame="TeammateIcon0" Visible="False"/>
+                <Action type="SetProperty" frame="PlayerIcon" Visible="False"/>
+                <Action type="SetProperty" frame="SubDescription" Visible="False"/>
+                <Action type="SetProperty" frame="RejoinProgressBar" Visible="False"/>
+                <Action type="SetProperty" frame="TitleLabel" Visible="False"/>
+                <Action type="SetProperty" frame="BackgroundFrame" Visible="False"/>
+                <Action type="SetProperty" frame="GlowTop" Visible="False"/>
+                <Action type="SetProperty" frame="GlowBottom" Visible="False"/>
+                <Action type="SetProperty" frame="BackgroundGlowTop" Visible="False"/>
+                <Action type="SetProperty" frame="BackgroundGlowBottom" Visible="False"/>
+                <Action type="SetProperty" frame="BackgroundGlowTopBorder" Visible="False"/>
+                <Action type="SetProperty" frame="BackgroundGlowBottomBorder" Visible="False"/>
+            </State>
+        </StateGroup>
     </Frame>
 </Desc>

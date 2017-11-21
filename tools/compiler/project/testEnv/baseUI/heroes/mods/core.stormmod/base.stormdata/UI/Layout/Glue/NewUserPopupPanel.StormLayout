@@ -5,6 +5,7 @@
     <Constant name="PageTransitionDuration" val="0.2"/>
     <Constant name="PageTabWidth" val="45"/>
     <Constant name="PageTabSkew" val="-30"/>
+    <Constant name="PageTabOffset" val="-10"/>
 
 <!-- Region: Tile List Item Templates -->
     <!--  TutorialMap  -->
@@ -45,8 +46,8 @@
                     <Event event="OnMouseEnter" action="DirectionForward,Play" frame="$parent/$parent"/>
                     <Event event="OnMouseExit" action="DirectionReverse,Play" frame="$parent/$parent"/>
                     <Controller type="Fade" end="Pause">
-                        <Key type="Curve" time="0" value="0" out="Fast"/>
-                        <Key type="Curve" time=".2" value="255" in="Slow"/>
+                        <Key type="Curve" time="0" value="0" inout="Linear"/>
+                        <Key type="Curve" time=".2" value="255" inout="Slow,Linear"/>
                     </Controller>
                 </Animation>
             </Frame>
@@ -61,8 +62,8 @@
                     <Event event="Selected" action="DirectionForward,Play" frame="$parent/$parent"/>
                     <Event event="Death" action="DirectionReverse,Play" frame="$parent/$parent"/>
                     <Controller type="Fade" end="Pause">
-                        <Key type="Curve" time="0" value="0" out="Fast"/>
-                        <Key type="Curve" time=".2" value="255" in="Slow"/>
+                        <Key type="Curve" time="0" value="0" inout="Linear"/>
+                        <Key type="Curve" time=".2" value="255" inout="Slow,Linear"/>
                     </Controller>
                 </Animation>
             </Frame>
@@ -83,16 +84,16 @@
                     <Event event="Selected" action="DirectionForward,Play" frame="$parent/$parent"/>
                     <Event event="Death" action="DirectionReverse,Play" frame="$parent/$parent"/>
                     <Controller type="Fade" end="Pause">
-                        <Key type="Curve" time="0" value="0" out="Fast"/>
-                        <Key type="Curve" time=".4" value="255" in="Slow"/>
+                        <Key type="Curve" time="0" value="0" inout="Linear"/>
+                        <Key type="Curve" time=".4" value="255" inout="Slow,Linear"/>
                     </Controller>
                 </Animation>
                 <Animation name="Hover">
                     <Event event="OnMouseEnter" action="DirectionForward,Play" frame="$parent/$parent"/>
                     <Event event="OnMouseExit" action="DirectionReverse,Play" frame="$parent/$parent"/>
                     <Controller type="Anchor" end="Pause" side="Bottom" relative="true" frame="$parent/ButtonIconImage">
-                        <Key type="Curve" time="0" value="0" out="Fast"/>
-                        <Key type="Curve" time=".2" value="-5" in="Slow" out="Slow"/>
+                        <Key type="Curve" time="0" value="0" inout="Linear"/>
+                        <Key type="Curve" time=".2" value="-5" inout="Slow"/>
                     </Controller>
                 </Animation>
             </Frame>
@@ -116,8 +117,8 @@
                 <Event event="Selected" action="DirectionForward,Play" frame="$parent"/>
                 <Event event="Death" action="DirectionReverse,Play" frame="$parent"/>
                 <Controller type="Fade" end="Pause">
-                    <Key type="Curve" time="0" value="0" out="Fast"/>
-                    <Key type="Curve" time=".2" value="255" in="Slow"/>
+                    <Key type="Curve" time="0" value="0" inout="Linear"/>
+                    <Key type="Curve" time=".2" value="255" inout="Slow,Linear"/>
                 </Controller>
             </Animation>
         </Frame>
@@ -158,30 +159,43 @@
             <Unclipped val="False"/>
         </Frame>
 
-
+        <Frame type="Button" name="ViewInBundleButton">
+            <StateGroup name="VisibilityState">
+                <State name="Visible">
+                    <Action type="SetProperty" Visible="false"/>
+                </State>
+            </StateGroup>
+        </Frame>
+        
         <Frame type="Image" name="SelectedImage">
             <Anchor relative="$parent/NormalImage" />
             <Texture val="@UI/Storm_UI_Store_SmallFrame_Off"/>
+            <TextureType val="Nineslice"/>
             <Alpha val="255"/>
+            <BlendMode val="Add"/>
             <RenderType val="LDR" />
 
             <ColorAdjustMode val="AddSelf"/>
             <AdjustmentColor val="0,0,0"/>
 
             <Animation name="Selected">
-                <Event event="Selected" frame="$parent" action="DirectionForward,Play"/>
-                <Event event="Hover" frame="$parent" action="DirectionForward,Play"/>
-                <Event event="Stop" frame="$parent" action="DirectionReverse,Play"/>
-                <Event event="Death" frame="$parent" action="DirectionReverse,Play"/>
+                <Event event="Selected" action="DirectionForward,Play" frame="$parent"/>
+                <Event event="Hover" action="DirectionForward,Play" frame="$parent"/>
+                <Event event="Stop" action="DirectionReverse,Play" frame="$parent"/>
+                <Event event="Death" action="DirectionReverse,Play" frame="$parent"/>
 
                 <Controller type="AdjustmentColor" end="Pause">
-                    <Key type="Curve" time="0" value="0,0,0" out="Fast"/>
-                    <Key type="Curve" time=".2" value="255,255,255" in="Slow"/>
+                    <Key type="Curve" time="0" value="0,0,0" inout="Linear"/>
+                    <Key type="Curve" time=".2" value="255,255,255" inout="Slow,Linear"/>
                 </Controller>
             </Animation>
         </Frame>
 
         <Frame type="Image" name="QualityGlow">
+            <Anchor side="Top" relative="$parent/NormalImage" pos="Min" offset="14"/>
+            <Anchor side="Left" relative="$parent/NormalImage" pos="Min" offset="14"/>
+            <Anchor side="Right" relative="$parent/NormalImage" pos="Max" offset="-14"/>
+            <Anchor side="Bottom" relative="$parent/NormalImage" pos="Max" offset="-14"/>
             <RenderType val="LDR" />
         </Frame>
 
@@ -190,30 +204,31 @@
         </Frame>
 
         <Frame type="HeroCutsceneFrame" name="PortraitCutscene">
+            <Anchor side="Left" relative="$parent" pos="Min" offset="7"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="-7"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="-6"/>
             <RenderType val="LDR" />
         </Frame>
 
         <Frame type="HeroContainerFrame" name="HeroContainerFrame">
             <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
             <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="-2"/>
             <Width val="0"/>
-            
+            <Height val="80"/>
             <CollapseLayout val="False"/>
-            
-            <Frame type="HeroImage" name="UniverseIcon">
-                <Visible val="false"/>
-            </Frame>
-            
+            <Hero val="{$parent/GameContentFrame/@HeroLink}"/>
+
             <Frame type="Image" name="Background">
                 <Anchor relative="$parent/RoleIcon" offset="0"/>
                 <Texture val="@UI/HeroUtil/Role/Background"/>
             </Frame>
-            
+
             <Frame type="HeroImage" name="RoleIcon">
-                <Anchor side="Top" relative="$parent/UniverseIcon" pos="Mid" offset="0"/>
+                <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
                 <Anchor side="Left" relative="$parent" pos="Min" offset="40"/>
                 <Anchor side="Right" relative="$parent" pos="Min" offset="40"/>
-                <Anchor side="Bottom" relative="$parent/UniverseIcon" pos="Mid" offset="0"/>
+                <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
                 <Width val="80"/>
                 <Height val="80"/>
                 <HeroImageType val="RoleIcon"/>
@@ -221,40 +236,71 @@
                 <AdjustmentColor val="0,0,0"/>
             
                 <Animation name="Glow">
-                    <Event event="OnMouseEnter" frame="$parent/$parent" action="DirectionForward,Play"/>
-                    <Event event="OnMouseExit" frame="$parent/$parent" action="DirectionReverse,Play"/>
+                    <Event event="OnMouseEnter" action="DirectionForward,Play" frame="$parent/$parent"/>
+                    <Event event="OnMouseExit" action="DirectionReverse,Play" frame="$parent/$parent"/>
                     
                     <Controller type="AdjustmentColor" end="Pause">
-                        <Key type="Curve" time="0" value="0,0,0" out="Fast"/>
-                        <Key type="Curve" time=".15" value="255,64,0" out="Slow"/>
+                        <Key type="Curve" time="0" value="0,0,0" inout="Linear"/>
+                        <Key type="Curve" time=".15" value="255,64,0" inout="Linear,Slow"/>
                     </Controller>
                 </Animation>
             </Frame>
 
             <Frame type="HeroLabel" name="RoleLabel">
-                <Anchor relative="$parent/$parent/DescriptionLabel"/>
+                <Anchor relative="$parent/$parent/InfoFrame/DescriptionLabel"/>
                 <Style val="StoreItemDescriptionLabel"/>
                 <HeroLabelType val="Role"/>
             </Frame>
         </Frame>
 
-        <Frame type="Label" name="NameLabel">
+        <Frame type="Frame" name="InfoFrame">
             <Anchor side="Left" relative="$parent/HeroContainerFrame/RoleIcon" pos="Max" offset="-5"/>
-            <Visible val="true"/>
+
+            <Frame type="Label" name="DescriptionLabel">
+                <Visible val="False"/>
+            </Frame>
+
+            <StateGroup name="OwnedUnOwnedStates">
+                <State name="UnOwned">
+                    <Action type="SetAnchor" side="Bottom" relative="$parent" pos="Max" offset="-16"/>
+                </State>
+            </StateGroup>
         </Frame>
 
-        <Frame type="Label" name="CostLabel">
-            <Visible val="false"/>
-        </Frame>
+        <!-- This overrides the Quick Buy button states from the StoreTileList template -->
+        <StateGroup name="TileListHoveredStates">
+            <DefaultState val="BuyButtonOverride"/>
 
-        <Frame type="Label" name="DescriptionLabel">
-            <Visible val="false"/>
-        </Frame>
+            <State name="BuyButtonOverride">
+                <When type="Property" visible="True"/>
+                <Action type="SendEvent" event="MouseOut"/>
+                <Action type="SetProperty" frame="BuyButton0" visible="False"/>
+                <Action type="SetProperty" frame="BuyButton1" visible="False"/>
+            </State>
+            <State name="Hovered">
+                <When type="Property" visible="False"/>
+            </State>
+            <State name="Button0Hovered">
+                <When type="Property" visible="False"/>
+            </State>
+            <State name="Button1Hovered">
+                <When type="Property" visible="False"/>
+            </State>
+            <State name="NotHovered">
+                <When type="Property" visible="False"/>
+            </State>
+        </StateGroup>
+
+        <StateGroup name="VisibilityState">
+            <State name="Visible">
+                <Action type="SetProperty" Visible="false"/>
+            </State>
+        </StateGroup>
     </Frame>
     <!-- End: Hero -->
     
     <!-- HeroTileListItem Tooltip -->
-    <Frame type="StoreTileTooltip" name="HeroTileListItemTooltipTemplate" template="StandardTooltip/StandardTooltip/">        
+    <Frame type="StoreTileTooltip" name="HeroTileListItemTooltipTemplate" template="StandardTooltip/StandardTooltip/">
         <MaxWidth val="300"/>
         <MaxHeight val="400"/>
         <FadeTime val="0"/>
@@ -271,9 +317,9 @@
         </Frame>
         
         <Frame type="HeroContainerFrame" name="HeroContainerFrame">
-            <Anchor side="Top" relative="$parent/BackgroundColorImage" pos="Min" offset="3"/>
-            <Anchor side="Left" relative="$parent/BackgroundColorImage" pos="Min" offset="3"/>
-            <Anchor side="Right" relative="$parent/BackgroundColorImage" pos="Max" offset="-3"/>
+            <Anchor side="Top" relative="$parent/BlurBackground" pos="Min" offset="3"/>
+            <Anchor side="Left" relative="$parent/BlurBackground" pos="Min" offset="3"/>
+            <Anchor side="Right" relative="$parent/BlurBackground" pos="Max" offset="-3"/>
             <Height val="62"/>
             
             <Frame type="Image" name="Background">
@@ -414,62 +460,55 @@
                         <Key type="Cutscene" time="0.0" action="Bookmark" bookmark="Large Stand Start"/>
                     </Controller>
                     <Controller type="Fade" end="Pause">
-                        <Key type="Curve" time=".0" value="0" in="Linear" out="Linear"/>
-                        <Key type="Curve" time=".5" value="255" in="Linear" out="Linear"/>
+                        <Key type="Curve" time=".0" value="0" inout="Linear"/>
+                        <Key type="Curve" time=".5" value="255" inout="Linear"/>
                     </Controller>
                 </Animation>
 
                 <Animation name="NewUserDialogExplainBasic">
-                    <Event event="NewUserDialogExplainBasic" action="Reset" frame="$parent/$parent"/>
-                    <Event event="NewUserDialogExplainBasic" action="Play" frame="$parent/$parent"/>
+                    <Event event="NewUserDialogExplainBasic" action="Reset,Play" frame="$parent/$parent"/>
                     <Controller type="Cutscene" end="Stop">
                         <Key type="Cutscene" time="0.0" action="Bookmark" bookmark="Basic Unlocked"/>
                     </Controller>
                 </Animation>
 
                 <Animation name="NewUserDialogExplainAdvanced">
-                    <Event event="NewUserDialogExplainAdvanced" action="Reset" frame="$parent/$parent"/>
-                    <Event event="NewUserDialogExplainAdvanced" action="Play" frame="$parent/$parent"/>
+                    <Event event="NewUserDialogExplainAdvanced" action="Reset,Play" frame="$parent/$parent"/>
                     <Controller type="Cutscene" end="Stop">
                         <Key type="Cutscene" time="0.0" action="Bookmark" bookmark="Advanced Unlocked"/>
                     </Controller>
                 </Animation>
 
                 <Animation name="NewUserDialogExplainTraining">
-                    <Event event="NewUserDialogExplainTraining" action="Reset" frame="$parent/$parent"/>
-                    <Event event="NewUserDialogExplainTraining" action="Play" frame="$parent/$parent"/>
+                    <Event event="NewUserDialogExplainTraining" action="Reset,Play" frame="$parent/$parent"/>
                     <Controller type="Cutscene" end="Stop">
                         <Key type="Cutscene" time="0.0" action="Bookmark" bookmark="Training Unlocked"/>
                     </Controller>
                 </Animation>
 
                 <Animation name="NewUserDialogTraining0">
-                    <Event event="NewUserDialogTraining0" action="Reset" frame="$parent/$parent"/>
-                    <Event event="NewUserDialogTraining0" action="Play" frame="$parent/$parent"/>
+                    <Event event="NewUserDialogTraining0" action="Reset,Play" frame="$parent/$parent"/>
                     <Controller type="Cutscene" end="Stop">
                         <Key type="Cutscene" time="0.0" action="Bookmark" bookmark="Training 0 Start"/>
                     </Controller>
                 </Animation>
 
                 <Animation name="NewUserDialogTraining1">
-                    <Event event="NewUserDialogTraining1" action="Reset" frame="$parent/$parent"/>
-                    <Event event="NewUserDialogTraining1" action="Play" frame="$parent/$parent"/>
+                    <Event event="NewUserDialogTraining1" action="Reset,Play" frame="$parent/$parent"/>
                     <Controller type="Cutscene" end="Stop">
                         <Key type="Cutscene" time="0.0" action="Bookmark" bookmark="Training 1 Start"/>
                     </Controller>
                 </Animation>
 
                 <Animation name="NewUserDialogTraining2">
-                    <Event event="NewUserDialogTraining2" action="Reset" frame="$parent/$parent"/>
-                    <Event event="NewUserDialogTraining2" action="Play" frame="$parent/$parent"/>
+                    <Event event="NewUserDialogTraining2" action="Reset,Play" frame="$parent/$parent"/>
                     <Controller type="Cutscene" end="Stop">
                         <Key type="Cutscene" time="0.0" action="Bookmark" bookmark="Training 2 Start"/>
                     </Controller>
                 </Animation>
 
                 <Animation name="NewUserDialogTraining3">
-                    <Event event="NewUserDialogTraining3" action="Reset" frame="$parent/$parent"/>
-                    <Event event="NewUserDialogTraining3" action="Play" frame="$parent/$parent"/>
+                    <Event event="NewUserDialogTraining3" action="Reset,Play" frame="$parent/$parent"/>
                     <Controller type="Cutscene" end="Stop">
                         <Key type="Cutscene" time="0.0" action="Bookmark" bookmark="Training 3 Start"/>
                     </Controller>
@@ -663,18 +702,17 @@
                 </Frame>
             
                 <Animation name="Expand">
-                    <Event event="OnShown" action="Restart,Play">
-                        <Controller type="Anchor" side="Right" relative="false" end="Pause">
-                            <Key type="Curve" time="0" value="0"/>
-                            <Key type="Curve" time="0.2" value="0"/>
-                            <Key type="Curve" time="0.5" value="840"/>
-                        </Controller>
-                    </Event>
+                    <Event event="OnShown" action="Restart,Play"/>
+                    <Controller type="Anchor" side="Right" relative="false" end="Pause">
+                        <Key type="Curve" time="0" value="0"/>
+                        <Key type="Curve" time="0.2" value="0"/>
+                        <Key type="Curve" time="0.5" value="840"/>
+                    </Controller>
                 
                     <Controller type="Fade" end="Pause">
                         <Key type="Curve" time="0" value="0"/>
-                        <Key type="Curve" time="0.2" value="0" out="Slow"/>
-                        <Key type="Curve" time="0.5" value="255" in="Fast"/>
+                        <Key type="Curve" time="0.2" value="0" inout="Linear,Slow"/>
+                        <Key type="Curve" time="0.5" value="255" inout="Linear"/>
                     </Controller>
                 </Animation>
             </Frame>
@@ -687,7 +725,7 @@
 
                 <Animation name="Click">
                     <Event event="OnMouseDown" action="Restart,Play"/>
-                    <Event event="OnShown" frame="$parent/$parent" action="Restart,Play"/>
+                    <Event event="OnShown" action="Restart,Play" frame="$parent/$parent"/>
                     <Controller type="State" frame="$parent/$parent" stateGroup="ChooseMode" end="Pause">
                         <Key type="Identifier" time="0" value="ChooseMap"/>
                     </Controller>
@@ -743,8 +781,8 @@
             <Event event="FillAnim" action="Restart,Play"/>
             <Event event="StopAutoPlay" action="Pause" frame="$parent/$parent"/>
             <Controller type="Anchor" end="Pause" side="Right" relative="False" frame="Fill">
-                <Key type="Curve" time="0" value="0" out="Fast"/>
-                <Key type="Curve" time="#PageTransitionDuration" value="#PageTabWidth" in="Slow"/>
+                <Key type="Curve" time="0" value="0" inout="Linear"/>
+                <Key type="Curve" time="#PageTransitionDuration" value="#PageTabWidth" inout="Slow,Linear"/>
             </Controller>
         </Animation>
 
@@ -753,12 +791,12 @@
             <Event event="EmptyAnim" action="Play"/>
             <Event event="StopAutoPlay" action="Pause" frame="$parent/$parent"/>
             <Controller type="Anchor" end="Pause" side="Left" relative="False" frame="Fill">
-                <Key type="Curve" time="0" value="0" out="Fast"/>
-                <Key type="Curve" time="#PageTransitionDuration" value="#PageTabWidth" in="Slow"/>
+                <Key type="Curve" time="0" value="0" inout="Linear"/>
+                <Key type="Curve" time="#PageTransitionDuration" value="#PageTabWidth" inout="Slow,Linear"/>
             </Controller>
             <Controller type="Anchor" end="Pause" side="Left" relative="False" frame="Fill/Glow">
-                <Key type="Curve" time="0" value="-24" out="Fast"/>
-                <Key type="Curve" time="#PageTransitionDuration" value="24" in="Slow"/>
+                <Key type="Curve" time="0" value="-24" inout="Linear"/>
+                <Key type="Curve" time="#PageTransitionDuration" value="24" inout="Slow,Linear"/>
             </Controller>
         </Animation>
         
@@ -767,8 +805,8 @@
             <Event event="Show" action="DirectionForward,Play"/>
             <Event event="FillAnim" action="DirectionForward,Play"/>
             <Controller type="Fade" end="Pause" frame="Fill">
-                <Key type="Curve" time="0" value="0" out="Slow"/>
-                <Key type="Curve" time="#PageTransitionDuration" value="255" in="Fast"/>
+                <Key type="Curve" time="0" value="0" inout="Linear,Slow"/>
+                <Key type="Curve" time="#PageTransitionDuration" value="255" inout="Linear"/>
             </Controller>
         </Animation>
 
@@ -819,10 +857,13 @@
 
     <!-- Promotional Slide Template -->
     <Frame type="Frame" name="PromotionalSlideTemplate">
+        <Anchor relative="$parent"/>
+        <Visible val="False"/>
+
         <Animation name="Visibility">
             <Event event="Show" action="DirectionForward,Play"/>
             <Event event="Hide" action="DirectionReverse,Play"/>
-            <Event event="Hide" frame="$parent/$parent" action="DirectionReverse,Play"/>
+            <Event event="Hide" action="DirectionReverse,Play" frame="$parent/$parent"/>
 
             <Controller type="Visibility" end="Pause">
                 <Key type="Bool" time="0.00" value="false"/>
@@ -958,8 +999,8 @@
                     <Event event="OnShown" action="DirectionReverse,Play" frame="$parent/$parent"/>
 
                     <Controller type="Fade" end="Pause">
-                        <Key type="Curve" time="0" value="0" out="Auto"/>
-                        <Key type="Curve" time="0.2" value="255" in="Auto" out="Auto"/>
+                        <Key type="Curve" time="0" value="0" inout="Linear,Auto"/>
+                        <Key type="Curve" time="0.2" value="255" inout="Auto"/>
                     </Controller>
                 </Animation>
 
@@ -967,15 +1008,15 @@
                     <Event event="OnMouseEnter" action="Reset,Play" frame="$parent/$parent"/>
                     
                     <Controller type="LayerUV" layer="1" side="Top" relative="False" sidelock="false" end="Loop">
-                        <Key type="Curve" time="0" value="-1" out="Auto"/>
-                        <Key type="Curve" time="3.0" value="1" in="Auto" out="Auto"/>
-                        <Key type="Curve" time="6.8" value="1" in="Auto" out="Auto"/>
+                        <Key type="Curve" time="0" value="-1" inout="Linear,Auto"/>
+                        <Key type="Curve" time="3.0" value="1" inout="Auto"/>
+                        <Key type="Curve" time="6.8" value="1" inout="Auto"/>
                     </Controller>
 
                     <Controller type="LayerUV" layer="1" side="Bottom" relative="False" sidelock="false" end="Loop">
-                        <Key type="Curve" time="0" value="0" out="Auto"/>
-                        <Key type="Curve" time="3.0" value="2" in="Auto" out="Auto"/>
-                        <Key type="Curve" time="6.8" value="2" in="Auto" out="Auto"/>
+                        <Key type="Curve" time="0" value="0" inout="Linear,Auto"/>
+                        <Key type="Curve" time="3.0" value="2" inout="Auto"/>
+                        <Key type="Curve" time="6.8" value="2" inout="Auto"/>
                     </Controller>
                 </Animation>
             </Frame>
@@ -1069,14 +1110,13 @@
             <Texture val="@UI/Storm_NewUserPopUpAttentionNe"/>
             
             <Animation name="Pulse">
-                <Event event="OnShown" action="Restart" frame="$this"/>
-                <Event event="OnShown" action="Play" frame="$this"/>
+                <Event event="OnShown" action="Restart,Play" frame="$this"/>
                 <Controller type="Fade" end="Loop">
-                    <Key type="Curve" time="0" value="255" in="Smooth" out="Smooth"/>
-                    <Key type="Curve" time=".2" value="128" in="Smooth" out="Smooth"/>
-                    <Key type="Curve" time=".4" value="0" in="Smooth" out="Smooth"/>
-                    <Key type="Curve" time=".6" value="128" in="Smooth" out="Smooth"/>
-                    <Key type="Curve" time=".8" value="255" in="Smooth" out="Smooth"/>
+                    <Key type="Curve" time="0" value="255" inout="Smooth"/>
+                    <Key type="Curve" time=".2" value="128" inout="Smooth"/>
+                    <Key type="Curve" time=".4" value="0" inout="Smooth"/>
+                    <Key type="Curve" time=".6" value="128" inout="Smooth"/>
+                    <Key type="Curve" time=".8" value="255" inout="Smooth"/>
                 </Controller>
             </Animation>
         </Frame>
@@ -1087,15 +1127,14 @@
             <Texture val="@UI/Storm_NewUserPopUpAttentionNe"/>
 
             <Animation name="Pulse">
-                <Event event="OnShown" action="Restart" frame="$this"/>
-                <Event event="OnShown" action="Play" frame="$this"/>
+                <Event event="OnShown" action="Restart,Play" frame="$this"/>
                 <Controller type="Fade" end="Loop">
-                    <Key type="Curve" time="0" value="192" in="Smooth" out="Smooth"/>
-                    <Key type="Curve" time=".1" value="255" in="Smooth" out="Smooth"/>
-                    <Key type="Curve" time=".3" value="128" in="Smooth" out="Smooth"/>
-                    <Key type="Curve" time=".5" value="0" in="Smooth" out="Smooth"/>
-                    <Key type="Curve" time=".7" value="128" in="Smooth" out="Smooth"/>
-                    <Key type="Curve" time=".8" value="192" in="Smooth" out="Smooth"/>
+                    <Key type="Curve" time="0" value="192" inout="Smooth"/>
+                    <Key type="Curve" time=".1" value="255" inout="Smooth"/>
+                    <Key type="Curve" time=".3" value="128" inout="Smooth"/>
+                    <Key type="Curve" time=".5" value="0" inout="Smooth"/>
+                    <Key type="Curve" time=".7" value="128" inout="Smooth"/>
+                    <Key type="Curve" time=".8" value="192" inout="Smooth"/>
                 </Controller>
             </Animation>
         </Frame>
@@ -1106,14 +1145,13 @@
             <Texture val="@UI/Storm_NewUserPopUpAttentionNe"/>
 
             <Animation name="Pulse">
-                <Event event="OnShown" action="Restart" frame="$this"/>
-                <Event event="OnShown" action="Play" frame="$this"/>
+                <Event event="OnShown" action="Restart,Play" frame="$this"/>
                 <Controller type="Fade" end="Loop">
-                    <Key type="Curve" time="0" value="128" in="Smooth" out="Smooth"/>
-                    <Key type="Curve" time=".2" value="255" in="Smooth" out="Smooth"/>
-                    <Key type="Curve" time=".4" value="128" in="Smooth" out="Smooth"/>
-                    <Key type="Curve" time=".6" value="0" in="Smooth" out="Smooth"/>
-                    <Key type="Curve" time=".8" value="128" in="Smooth" out="Smooth"/>
+                    <Key type="Curve" time="0" value="128" inout="Smooth"/>
+                    <Key type="Curve" time=".2" value="255" inout="Smooth"/>
+                    <Key type="Curve" time=".4" value="128" inout="Smooth"/>
+                    <Key type="Curve" time=".6" value="0" inout="Smooth"/>
+                    <Key type="Curve" time=".8" value="128" inout="Smooth"/>
                 </Controller>
             </Animation>
         </Frame>
@@ -1332,7 +1370,7 @@
             <Frame type="Label" name="TitleLabel">
                 <Anchor side="Top" relative="$parent" pos="Min" offset="120"/>
                 <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
-                <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>                
+                <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
                 <Style val="QuestionnaireTitle"/>
                 <!--Text val="@UI/NewUser/Questionnaire/Title"/-->
                 <Visible val="false"/>
@@ -1405,11 +1443,11 @@
                 <Animation name="FadeAnimation">
                     <Event event="Show" action="DirectionForward,Play"/>
                     <Event event="Hide" action="DirectionReverse,Play"/>
-                    <Event event="OnHidden" frame="$parent" action="DirectionReverse,Play"/>
+                    <Event event="OnHidden" action="DirectionReverse,Play" frame="$parent"/>
 
                     <Controller type="Fade" end="Pause">
-                        <Key type="Curve" time="0" value="0" out="Fast"/>
-                        <Key type="Curve" time="0.15" value="255" in="Fast"/>
+                        <Key type="Curve" time="0" value="0" inout="Linear"/>
+                        <Key type="Curve" time="0.15" value="255" inout="Linear"/>
                     </Controller>
                 </Animation>
             </Frame>
@@ -1431,9 +1469,9 @@
                 </Controller>
 
                 <Controller type="Anchor" frame="BodyLabel" side="Top" relative="true" end="Pause">
-                    <Key type="Curve" time="0" value="50" out="fast"/>
-                    <Key type="Curve" time="0.4" value="10" in="smooth"/>
-                    <Key type="Curve" time="1.4" value="0" in="slow"/>
+                    <Key type="Curve" time="0" value="50" inout="Linear"/>
+                    <Key type="Curve" time="0.4" value="10" inout="smooth,Linear"/>
+                    <Key type="Curve" time="1.4" value="0" inout="slow,Linear"/>
                 </Controller>
 
                 <Controller type="Visibility" frame="ChoiceCasualButton" end="Pause">
@@ -1503,14 +1541,36 @@
                     
                     <Controller type="Fade" end="Pause">
                         <Key type="Curve" time="0" value="0"/>
-                        <Key type="Curve" time="0.2" value="0" out="Slow"/>
-                        <Key type="Curve" time="0.4" value="255" in="Fast"/>
+                        <Key type="Curve" time="0.2" value="0" inout="Linear,Slow"/>
+                        <Key type="Curve" time="0.4" value="255" inout="Linear"/>
                     </Controller>
                 </Animation>
             </Frame>
+            
+            <Frame type="Image" name="RewardFrame">
+                <Anchor side="Top" relative="$parent/HeroTileList" pos="Max" offset="30"/>
+                <Anchor side="Left" relative="$parent/HeroTileList/Item0" pos="Min" offset="-3"/>
+                <Anchor side="Right" relative="$parent/HeroTileList/Item2" pos="Max" offset="3"/>
+                <Height val="100"/>
+
+                <Texture val="@UI/StormTooltipFrame"/>
+                <TextureType val="Nineslice"/>
+
+                <Frame type="Label" name="RewardLabel">
+                    <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                    <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+                    <Anchor side="Left" relative="$parent" pos="Min" offset="5"/>
+                    <Anchor side="Right" relative="$parent" pos="Max" offset="-5"/>
+
+                    <Text val="@UI/NewUserPopup/TutorialReward"/>
+                    <Style val="QuestionnaireReward"/>
+                </Frame>
+            </Frame>
+            
+
 
             <Frame type="Button" name="PlayButton" template="StandardTemplates/StandardButtonTemplate">
-                <Anchor side="Top" relative="$parent/HeroTileList" pos="Max" offset="50"/>
+                <Anchor side="Top" relative="$parent/RewardFrame" pos="Max" offset="10"/>
                 <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
                 <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
                 <Visible val="false"/>
@@ -1524,6 +1584,7 @@
         <Frame type="Frame" name="NewUserPromotionalPanel">
             <Anchor relative="$parent"/>
             <Visible val="false"/>
+            <AcceptsMouse val="True"/>
             
             <Frame type="Label" name="Header">
                 <Anchor side="Bottom" relative="$parent/Slides" pos="Min" offset="0"/>
@@ -1544,9 +1605,6 @@
                 </Frame>
 
                 <Frame type="Frame" name="Slide_Shop" template="NewUserPopupPanel/PromotionalSlideTemplate">
-                    <Anchor relative="$parent"/>
-                    <Visible val="false"/>
-                    
                     <Frame type="Label" name="Subtitle">
                         <Anchor side="Top" relative="$parent" pos="Max" offset="-200"/>
                         <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
@@ -1566,9 +1624,6 @@
                 </Frame>
 
                 <Frame type="Frame" name="Slide_Modes" template="NewUserPopupPanel/PromotionalSlideTemplate">
-                    <Anchor relative="$parent"/>
-                    <Visible val="false"/>
-                    
                     <Frame type="Label" name="Subtitle_AI">
                         <Anchor side="Top" relative="$parent" pos="Max" offset="-250"/>
                         <Anchor side="Left" relative="$parent" pos="Mid" offset="-440"/>
@@ -1647,9 +1702,6 @@
                 </Frame>
 
                 <Frame type="Frame" name="Slide_Battlegrounds" template="NewUserPopupPanel/PromotionalSlideTemplate">
-                    <Anchor relative="$parent"/>
-                    <Visible val="false"/>
-
                     <Frame type="Label" name="Subtitle">
                         <Anchor side="Top" relative="$parent" pos="Max" offset="-200"/>
                         <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
@@ -1668,14 +1720,46 @@
                     -->
                 </Frame>
 
+                <Frame type="Frame" name="Slide_Loot" template="NewUserPopupPanel/PromotionalSlideTemplate">
+                    <Frame type="Label" name="Subtitle_LootChests1">
+                        <Anchor side="Top" relative="$parent" pos="Max" offset="-250"/>
+                        <Anchor side="Left" relative="$parent" pos="Mid" offset="-440"/>
+                        <Anchor side="Right" relative="$parent" pos="Mid" offset="-440"/>
+                        <Text val="@UI/NewUser/PromoDialog/Loot/Subtitle1"/>
+                        <Style val="NewUserPromoTitle"/>
+                    </Frame>
+                    <Frame type="Label" name="Description_LootChests1">
+                        <Anchor side="Top" relative="$parent/Subtitle_LootChests1" pos="Max" offset="0"/>
+                        <Anchor side="Left" relative="$parent/Subtitle_LootChests1" pos="Mid" offset="-200"/>
+                        <Anchor side="Right" relative="$parent/Subtitle_LootChests1" pos="Mid" offset="200"/>
+                        <Text val="@UI/NewUser/PromoDialog/Loot/Description1"/>
+                        <Style val="NewUserBody"/>
+                    </Frame>
+
+                    <Frame type="Label" name="Subtitle_LootChests2">
+                        <Anchor side="Top" relative="$parent" pos="Max" offset="-250"/>
+                        <Anchor side="Left" relative="$parent" pos="Mid" offset="460"/>
+                        <Anchor side="Right" relative="$parent" pos="Mid" offset="460"/>
+                        <Text val="@UI/NewUser/PromoDialog/Loot/Subtitle2"/>
+                        <Style val="NewUserPromoTitle"/>
+                    </Frame>
+                    <Frame type="Label" name="Description_LootChests2">
+                        <Anchor side="Top" relative="$parent/Subtitle_LootChests2" pos="Max" offset="0"/>
+                        <Anchor side="Left" relative="$parent/Subtitle_LootChests2" pos="Mid" offset="-200"/>
+                        <Anchor side="Right" relative="$parent/Subtitle_LootChests2" pos="Mid" offset="200"/>
+                        <Text val="@UI/NewUser/PromoDialog/Loot/Description2"/>
+                        <Style val="NewUserBody"/>
+                    </Frame>
+                </Frame>
+
                 <StateGroup name="SlideState">
                     <State name="Slide1">
                         <Action type="SendEvent" frame="Slide_Shop" event="Show"/>
                         <Action type="SendEvent" frame="Slide_Shop" event="Hide" on="Exit"/>
                         <Action type="SetProperty" frame="SlideImage" texture="@UI/Storm_NewUser_Tutorial_Promotional_1" undo="false"/>
                         <Action type="SetProperty" frame="$parent/Header" text="@UI/NewUser/PromoDialog/Shop/Title" undo="false"/>
-                        <Action type="SetState" frame="$parent/Tabs/Tab1" group="ActiveState" state="Active"/>
-                        <Action type="SetState" frame="$parent/Tabs/Tab1" group="ActiveState" state="Inactive" on="Exit"/>
+                        <Action type="SetState" frame="$parent/TabsCenterFrame/Tabs/Tab1" group="ActiveState" state="Active"/>
+                        <Action type="SetState" frame="$parent/TabsCenterFrame/Tabs/Tab1" group="ActiveState" state="Inactive" on="Exit"/>
                         <Action type="SendEvent" event="ChangeSlide"/>
                     </State>
                     <State name="Slide2">
@@ -1683,8 +1767,8 @@
                         <Action type="SendEvent" frame="Slide_Battlegrounds" event="Hide" on="Exit"/>
                         <Action type="SetProperty" frame="SlideImage" texture="@UI/Storm_NewUser_Tutorial_Promotional_3" undo="false"/>
                         <Action type="SetProperty" frame="$parent/Header" text="@UI/NewUser/PromoDialog/Battlegrounds/Half1" undo="false"/>
-                        <Action type="SetState" frame="$parent/Tabs/Tab2" group="ActiveState" state="Active"/>
-                        <Action type="SetState" frame="$parent/Tabs/Tab2" group="ActiveState" state="Inactive" on="Exit"/>
+                        <Action type="SetState" frame="$parent/TabsCenterFrame/Tabs/Tab2" group="ActiveState" state="Active"/>
+                        <Action type="SetState" frame="$parent/TabsCenterFrame/Tabs/Tab2" group="ActiveState" state="Inactive" on="Exit"/>
                         <Action type="SendEvent" event="ChangeSlide"/>
                     </State>
                     <State name="Slide3">
@@ -1692,8 +1776,17 @@
                         <Action type="SendEvent" frame="Slide_Modes" event="Hide" on="Exit"/>
                         <Action type="SetProperty" frame="SlideImage" texture="@UI/Storm_NewUser_Tutorial_Promotional_2" undo="false"/>
                         <Action type="SetProperty" frame="$parent/Header" text="@UI/NewUser/PromoDialog/GameModes/Title" undo="false"/>
-                        <Action type="SetState" frame="$parent/Tabs/Tab3" group="ActiveState" state="Active"/>
-                        <Action type="SetState" frame="$parent/Tabs/Tab3" group="ActiveState" state="Inactive" on="Exit"/>
+                        <Action type="SetState" frame="$parent/TabsCenterFrame/Tabs/Tab3" group="ActiveState" state="Active"/>
+                        <Action type="SetState" frame="$parent/TabsCenterFrame/Tabs/Tab3" group="ActiveState" state="Inactive" on="Exit"/>
+                        <Action type="SendEvent" event="ChangeSlide"/>
+                    </State>
+                    <State name="Slide4">
+                        <Action type="SendEvent" frame="Slide_Loot" event="Show"/>
+                        <Action type="SendEvent" frame="Slide_Loot" event="Hide" on="Exit"/>
+                        <Action type="SetProperty" frame="SlideImage" texture="@UI/Storm_NewUser_Tutorial_Promotional_4" undo="false"/>
+                        <Action type="SetProperty" frame="$parent/Header" text="@UI/NewUser/PromoDialog/Loot/Title" undo="false"/>
+                        <Action type="SetState" frame="$parent/TabsCenterFrame/Tabs/Tab4" group="ActiveState" state="Active"/>
+                        <Action type="SetState" frame="$parent/TabsCenterFrame/Tabs/Tab4" group="ActiveState" state="Inactive" on="Exit"/>
                         <Action type="SendEvent" event="ChangeSlide"/>
                     </State>
                     <State name="Done">
@@ -1703,34 +1796,42 @@
                 </StateGroup>
             </Frame>
 
-            <Frame type="Frame" name="Tabs">
-                <Anchor side="Bottom" relative="$parent/Slides" pos="Max" offset="0"/>
-                <Anchor side="Left" relative="$parent" pos="Mid" offset="-80"/>
-                <Anchor side="Right" relative="$parent" pos="Mid" offset="80"/>
-                <Height val="30"/>
+            <Frame type="ParentCenteredFrame" name="TabsCenterFrame">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Right" relative="Tabs" pos="Max" offset="0"/>
+                <Anchor side="Bottom" relative="Tabs" pos="Max" offset="0"/>
 
-                <Frame type="Frame" name="Tab1" template="NewUserPopupPanel/PageTabTemplate">
-                    <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+                <Frame type="Frame" name="Tabs">
+                    <Anchor side="Top" relative="$parent/$parent/Slides" pos="Max" offset="-35"/>
                     <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
-                    <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
-                </Frame>
+                    <Anchor side="Right" relative="Tab4" pos="Max" offset="0"/>
+                    <Anchor side="Bottom" relative="Tab1" pos="Max" offset="0"/>
 
-                <Frame type="Frame" name="Tab2" template="NewUserPopupPanel/PageTabTemplate">
-                    <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
-                    <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
-                    <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
-                    <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
-                </Frame>
+                    <Frame type="Frame" name="Tab1" template="NewUserPopupPanel/PageTabTemplate">
+                        <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                        <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                    </Frame>
 
-                <Frame type="Frame" name="Tab3" template="NewUserPopupPanel/PageTabTemplate">
-                    <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
-                    <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
-                    <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+                    <Frame type="Frame" name="Tab2" template="NewUserPopupPanel/PageTabTemplate">
+                        <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                        <Anchor side="Left" relative="$parent/Tab1" pos="Max" offset="#PageTabOffset"/>
+                    </Frame>
+
+                    <Frame type="Frame" name="Tab3" template="NewUserPopupPanel/PageTabTemplate">
+                        <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                        <Anchor side="Left" relative="$parent/Tab2" pos="Max" offset="#PageTabOffset"/>
+                    </Frame>
+
+                    <Frame type="Frame" name="Tab4" template="NewUserPopupPanel/PageTabTemplate">
+                        <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                        <Anchor side="Left" relative="$parent/Tab3" pos="Max" offset="#PageTabOffset"/>
+                    </Frame>
                 </Frame>
             </Frame>
             
             <Frame type="Button" name="Next" template="StandardTemplates/StandardButtonTemplate">
-                <Anchor side="Top" relative="$parent/Tabs" pos="Max" offset="0"/>
+                <Anchor side="Top" relative="$parent/TabsCenterFrame" pos="Max" offset="0"/>
                 <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
                 <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
 
@@ -1745,7 +1846,7 @@
                 </Animation>
 
                 <Animation name="ClosePageSound">
-                    <Event event="Hide" frame="$parent" action="Play"/>
+                    <Event event="Hide" action="Play" frame="$parent"/>
                     <Controller type="Sound" end="Stop">
                         <Key type="Sound" time="0.0" sound="@UI_Tutorial01_NewUserPopupPanel_Transition_Close"/>
                     </Controller>
@@ -1761,7 +1862,8 @@
                     <Key type="Identifier" time="0.0" value="Slide1"/>
                     <Key type="Identifier" time="0.1" value="Slide2"/>
                     <Key type="Identifier" time="0.2" value="Slide3"/>
-                    <Key type="Identifier" time="0.3" value="Done"/>
+                    <Key type="Identifier" time="0.3" value="Slide4"/>
+                    <Key type="Identifier" time="0.4" value="Done"/>
                 </Controller>
             </Animation>
 
@@ -1823,7 +1925,7 @@
                 <Frame type="Image" name="BlueFrame">
                     <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
                     <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
-                    <Width val="815"/> 
+                    <Width val="815"/>
                     <Height val="289"/>
                     <Texture val="@UI/Storm_NewUserPopUpBlueFrame"/>
 
@@ -1941,13 +2043,11 @@
         <Frame type="Frame" name="NewUserBlurEffect">
             <Frame type="BlurFrame" name="BlurredRect">
                 <Animation name="PulseIn">
-                    <Event event="PulseIn" action="DirectionForward" frame="$parent/$parent/NewUserPopUp"/>
-                    <Event event="PulseIn" action="Play" frame="$parent/$parent/NewUserPopUp"/>
-                    <Event event="PulseOut" action="DirectionReverse" frame="$parent/$parent/NewUserPopUp"/>
-                    <Event event="PulseOut" action="Play" frame="$parent/$parent/NewUserPopUp"/>
+                    <Event event="PulseIn" action="DirectionForward,Play" frame="$parent/$parent/NewUserPopUp"/>
+                    <Event event="PulseOut" action="DirectionReverse,Play" frame="$parent/$parent/NewUserPopUp"/>
                     <Controller type="Blur" end="Pause">
-                        <Key type="Curve" time="0" value="0.0" out="Auto"/>
-                        <Key type="Curve" time="0.4" value="0.4" in="Auto"/>
+                        <Key type="Curve" time="0" value="0.0" inout="Linear,Auto"/>
+                        <Key type="Curve" time="0.4" value="0.4" inout="Auto,Linear"/>
                     </Controller>
                 </Animation>
             </Frame>
@@ -1956,9 +2056,7 @@
         <!-- New User Pop Up -->
         <Frame type="Frame" name="NewUserPopUp">
             <Animation name="PulseIn">
-                <Event event="PulseIn" action="RefreshBaseValue" frame="$this"/>
-                <Event event="PulseIn" action="Restart" frame="$this"/>
-                <Event event="PulseIn" action="Play" frame="$this"/>
+                <Event event="PulseIn" action="RefreshBaseValue,Restart,Play" frame="$this"/>
                 <Controller type="Visibility" end="Pause">
                     <Key type="Bool" time="0" value="True"/>
                 </Controller>
@@ -1966,16 +2064,14 @@
                     <Key type="Bool" time="1" value="True"/>
                 </Controller>
                 <Controller type="Fade" end="Pause" frame="ClipFrame/DismissButton">
-                    <Key type="Curve" time="0" value="0" in="Auto" out="Linear"/>
-                    <Key type="Curve" time="1" value="0" in="Linear" out="Linear"/>
-                    <Key type="Curve" time="1.5" value="255" in="Linear" out="Auto"/>
+                    <Key type="Curve" time="0" value="0" inout="Auto,Linear"/>
+                    <Key type="Curve" time="1" value="0" inout="Linear"/>
+                    <Key type="Curve" time="1.5" value="255" inout="Linear,Auto"/>
                 </Controller>
             </Animation>
 
             <Animation name="PulseOut">
-                <Event event="PulseOut" action="RefreshBaseValue" frame="$this"/>
-                <Event event="PulseOut" action="Restart" frame="$this"/>
-                <Event event="PulseOut" action="Play" frame="$this"/>
+                <Event event="PulseOut" action="RefreshBaseValue,Restart,Play" frame="$this"/>
                 <Controller type="Visibility" end="Pause">
                     <Key type="Bool" time="0" value="True"/>
                     <Key type="Bool" time=".4" value="False"/>
@@ -1984,103 +2080,96 @@
                     <Key type="Bool" time="0" value="False"/>
                 </Controller>
                 <Controller type="Anchor" end="Stop" side="Left" relative="true">
-                    <Key type="Curve" time=".0" value="0" in="Auto" out="Linear"/>
-                    <Key type="Curve" time=".2" value="335" in="Linear" out="Linear"/>
-                    <Key type="Curve" time=".41" value="335" in="Linear" out="Auto"/>
+                    <Key type="Curve" time=".0" value="0" inout="Auto,Linear"/>
+                    <Key type="Curve" time=".2" value="335" inout="Linear"/>
+                    <Key type="Curve" time=".41" value="335" inout="Linear,Auto"/>
                 </Controller>
                 <Controller type="Anchor" end="Stop" side="Right" relative="true">
-                    <Key type="Curve" time=".0" value="0" in="Auto" out="Linear"/>
-                    <Key type="Curve" time=".2" value="-671" in="Linear" out="Linear"/>
-                    <Key type="Curve" time=".41" value="-671" in="Linear" out="Auto"/>
+                    <Key type="Curve" time=".0" value="0" inout="Auto,Linear"/>
+                    <Key type="Curve" time=".2" value="-671" inout="Linear"/>
+                    <Key type="Curve" time=".41" value="-671" inout="Linear,Auto"/>
                 </Controller>
             </Animation>
 
             <Animation name="ShowTutorialPlayButton">
-                <Event event="ShowTutorialPlayButton" action="Restart" frame="$this"/>
-                <Event event="ShowTutorialPlayButton" action="Play" frame="$this"/>
+                <Event event="ShowTutorialPlayButton" action="Restart,Play" frame="$this"/>
                 <Controller type="Anchor" end="Pause" side="Left" relative="False">
-                    <Key type="Curve" time="0" value="-720" in="Step" out="Step"/>
+                    <Key type="Curve" time="0" value="-720" inout="Step"/>
                 </Controller>
                 <Controller type="Anchor" end="Pause" side="Top" relative="False">
-                    <Key type="Curve" time="0" value="-400" in="Step" out="Step"/>
+                    <Key type="Curve" time="0" value="-400" inout="Step"/>
                 </Controller>
                 <Controller type="Anchor" end="Pause" side="Right" relative="True">
-                    <Key type="Curve" time="0" value="0" in="Step" out="Step"/>
+                    <Key type="Curve" time="0" value="0" inout="Step"/>
                 </Controller>
                 <Controller type="Anchor" end="Pause" side="Bottom" relative="True">
-                    <Key type="Curve" time="0" value="0" in="Step" out="Step"/>
+                    <Key type="Curve" time="0" value="0" inout="Step"/>
                 </Controller>
             </Animation>
 
             <Animation name="ShowTutorialExplainHeroSelect">
-                <Event event="ShowTutorialExplainHeroSelect" action="Restart" frame="$this"/>
-                <Event event="ShowTutorialExplainHeroSelect" action="Play" frame="$this"/>
+                <Event event="ShowTutorialExplainHeroSelect" action="Restart,Play" frame="$this"/>
                 <Controller type="Anchor" end="Pause" side="Left" relative="False">
-                    <Key type="Curve" time="0" value="-720" in="Step" out="Step"/>
+                    <Key type="Curve" time="0" value="-720" inout="Step"/>
                 </Controller>
                 <Controller type="Anchor" end="Pause" side="Top" relative="False">
-                    <Key type="Curve" time="0" value="-300" in="Step" out="Step"/>
+                    <Key type="Curve" time="0" value="-300" inout="Step"/>
                 </Controller>
                 <Controller type="Anchor" end="Pause" side="Right" relative="True">
-                    <Key type="Curve" time="0" value="0" in="Step" out="Step"/>
+                    <Key type="Curve" time="0" value="0" inout="Step"/>
                 </Controller>
                 <Controller type="Anchor" end="Pause" side="Bottom" relative="True">
-                    <Key type="Curve" time="0" value="0" in="Step" out="Step"/>
+                    <Key type="Curve" time="0" value="0" inout="Step"/>
                 </Controller>
             </Animation>
 
             <Animation name="ShowTutorialExplainHeroAbilities">
-                <Event event="ShowTutorialExplainHeroAbilities" action="Restart" frame="$this"/>
-                <Event event="ShowTutorialExplainHeroAbilities" action="Play" frame="$this"/>
-                <Event event="ShowTutorialExplainNewMount" action="Restart" frame="$this"/>
-                <Event event="ShowTutorialExplainNewMount" action="Play" frame="$this"/>
-                <Event event="ShowTutorialExplainNewSkin" action="Restart" frame="$this"/>
-                <Event event="ShowTutorialExplainNewSkin" action="Play" frame="$this"/>
+                <Event event="ShowTutorialExplainHeroAbilities" action="Restart,Play" frame="$this"/>
+                <Event event="ShowTutorialExplainNewMount" action="Restart,Play" frame="$this"/>
+                <Event event="ShowTutorialExplainNewSkin" action="Restart,Play" frame="$this"/>
                 <Controller type="Anchor" end="Pause" side="Left" relative="False">
-                    <Key type="Curve" time="0" value="-720" in="Step" out="Step"/>
+                    <Key type="Curve" time="0" value="-720" inout="Step"/>
                 </Controller>
                 <Controller type="Anchor" end="Pause" side="Top" relative="False">
-                    <Key type="Curve" time="0" value="-150" in="Step" out="Step"/>
+                    <Key type="Curve" time="0" value="-150" inout="Step"/>
                 </Controller>
                 <Controller type="Anchor" end="Pause" side="Right" relative="True">
-                    <Key type="Curve" time="0" value="0" in="Step" out="Step"/>
+                    <Key type="Curve" time="0" value="0" inout="Step"/>
                 </Controller>
                 <Controller type="Anchor" end="Pause" side="Bottom" relative="True">
-                    <Key type="Curve" time="0" value="0" in="Step" out="Step"/>
+                    <Key type="Curve" time="0" value="0" inout="Step"/>
                 </Controller>
             </Animation>
 
             <Animation name="ShowTutorialShopButton">
-                <Event event="ShowTutorialShopButton" action="Restart" frame="$this"/>
-                <Event event="ShowTutorialShopButton" action="Play" frame="$this"/>
+                <Event event="ShowTutorialShopButton" action="Restart,Play" frame="$this"/>
                 <Controller type="Anchor" end="Pause" side="Left" relative="False">
-                    <Key type="Curve" time="0" value="-720" in="Step" out="Step"/>
+                    <Key type="Curve" time="0" value="-720" inout="Step"/>
                 </Controller>
                 <Controller type="Anchor" end="Pause" side="Top" relative="False">
-                    <Key type="Curve" time="0" value="-300" in="Step" out="Step"/>
+                    <Key type="Curve" time="0" value="-300" inout="Step"/>
                 </Controller>
                 <Controller type="Anchor" end="Pause" side="Right" relative="True">
-                    <Key type="Curve" time="0" value="0" in="Step" out="Step"/>
+                    <Key type="Curve" time="0" value="0" inout="Step"/>
                 </Controller>
                 <Controller type="Anchor" end="Pause" side="Bottom" relative="True">
-                    <Key type="Curve" time="0" value="0" in="Step" out="Step"/>
+                    <Key type="Curve" time="0" value="0" inout="Step"/>
                 </Controller>
             </Animation>
 
             <Animation name="ShowTutorialDailyQuests">
-                <Event event="ShowTutorialDailyQuests" action="Restart" frame="$this"/>
-                <Event event="ShowTutorialDailyQuests" action="Play" frame="$this"/>
+                <Event event="ShowTutorialDailyQuests" action="Restart,Play" frame="$this"/>
                 <Controller type="Anchor" end="Pause" side="Left" relative="False">
-                    <Key type="Curve" time="0" value="-720" in="Step" out="Step"/>
+                    <Key type="Curve" time="0" value="-720" inout="Step"/>
                 </Controller>
                 <Controller type="Anchor" end="Pause" side="Top" relative="False">
-                    <Key type="Curve" time="0" value="-200" in="Step" out="Step"/>
+                    <Key type="Curve" time="0" value="-200" inout="Step"/>
                 </Controller>
                 <Controller type="Anchor" end="Pause" side="Right" relative="True">
-                    <Key type="Curve" time="0" value="0" in="Step" out="Step"/>
+                    <Key type="Curve" time="0" value="0" inout="Step"/>
                 </Controller>
                 <Controller type="Anchor" end="Pause" side="Bottom" relative="True">
-                    <Key type="Curve" time="0" value="0" in="Step" out="Step"/>
+                    <Key type="Curve" time="0" value="0" inout="Step"/>
                 </Controller>
             </Animation>
 
@@ -2089,22 +2178,21 @@
                     <Texture val="@UI/Storm_NewUserPopUpBlueFrame"/>
                     
                     <Animation name="PulseIn">
-                        <Event event="PulseIn" action="Restart" frame="$parent/$parent"/>
-                        <Event event="PulseIn" action="Play" frame="$parent/$parent"/>
+                        <Event event="PulseIn" action="Restart,Play" frame="$parent/$parent"/>
                         
                         <Controller type="Visibility" end="Pause">
                             <Key type="Bool" time="0" value="True"/>
                         </Controller>
                         
                         <Controller type="Fade" end="Pause">
-                            <Key type="Curve" time=".0" value="0" in="Auto" out="Step"/>
-                            <Key type="Curve" time=".2" value="255" in="Step" out="Step"/>
+                            <Key type="Curve" time=".0" value="0" inout="Auto,Step"/>
+                            <Key type="Curve" time=".2" value="255" inout="Step"/>
                         </Controller>
                         
                         <Controller type="Anchor" end="Pause" side="Right" relative="true">
-                            <Key type="Curve" time=".0" value="-671" in="Auto" out="Linear"/>
-                            <Key type="Curve" time=".2" value="-671" in="Linear" out="Slow"/>
-                            <Key type="Curve" time=".4" value="0" in="Slow" out="Auto"/>
+                            <Key type="Curve" time=".0" value="-671" inout="Auto,Linear"/>
+                            <Key type="Curve" time=".2" value="-671" inout="Linear,Slow"/>
+                            <Key type="Curve" time=".4" value="0" inout="Slow,Auto"/>
                         </Controller>
                         
                         <Controller type="Sound" end="Pause">
@@ -2113,8 +2201,7 @@
                     </Animation>
 
                     <Animation name="PulseOut">
-                        <Event event="PulseOut" action="Restart" frame="$parent/$parent"/>
-                        <Event event="PulseOut" action="Play" frame="$parent/$parent"/>
+                        <Event event="PulseOut" action="Restart,Play" frame="$parent/$parent"/>
                         
                         <Controller type="Visibility" end="Pause">
                             <Key type="Bool" time="0" value="True"/>
@@ -2128,19 +2215,17 @@
 
                     <Frame type="Label" name="BodyLabel">
                         <Animation name="PulseIn">
-                            <Event event="PulseIn" action="Restart" frame="$parent/$parent/$parent"/>
-                            <Event event="PulseIn" action="Play" frame="$parent/$parent/$parent"/>
+                            <Event event="PulseIn" action="Restart,Play" frame="$parent/$parent/$parent"/>
                             
                             <Controller type="Fade" end="Pause">
-                                <Key type="Curve" time=".0" value="0" in="Auto" out="Linear"/>
-                                <Key type="Curve" time=".4" value="32" in="Linear" out="Slow"/>
-                                <Key type="Curve" time=".6" value="255" in="Slow" out="Auto"/>
+                                <Key type="Curve" time=".0" value="0" inout="Auto,Linear"/>
+                                <Key type="Curve" time=".4" value="32" inout="Linear,Slow"/>
+                                <Key type="Curve" time=".6" value="255" inout="Slow,Auto"/>
                             </Controller>
                         </Animation>
 
                         <Animation name="ShowTutorialPlayButton">
-                            <Event event="ShowTutorialPlayButton" action="Restart" frame="$parent/$parent/$parent"/>
-                            <Event event="ShowTutorialPlayButton" action="Play" frame="$parent/$parent/$parent"/>
+                            <Event event="ShowTutorialPlayButton" action="Restart,Play" frame="$parent/$parent/$parent"/>
                             
                             <Controller type="Text" end="Pause">
                                 <Key type="Text" time="0" text="@Conversation/UserExperience/Line00004"/>
@@ -2148,8 +2233,7 @@
                         </Animation>
 
                         <Animation name="ShowTutorialExplainHeroSelect">
-                            <Event event="ShowTutorialExplainHeroSelect" action="Restart" frame="$parent/$parent/$parent"/>
-                            <Event event="ShowTutorialExplainHeroSelect" action="Play" frame="$parent/$parent/$parent"/>
+                            <Event event="ShowTutorialExplainHeroSelect" action="Restart,Play" frame="$parent/$parent/$parent"/>
                             
                             <Controller type="Text" end="Pause">
                                 <Key type="Text" time="0" text="@Conversation/UserExperience/Line00044"/>
@@ -2157,8 +2241,7 @@
                         </Animation>
 
                         <Animation name="ShowTutorialExplainHeroAbilities">
-                            <Event event="ShowTutorialExplainHeroAbilities" action="Restart" frame="$parent/$parent/$parent"/>
-                            <Event event="ShowTutorialExplainHeroAbilities" action="Play" frame="$parent/$parent/$parent"/>
+                            <Event event="ShowTutorialExplainHeroAbilities" action="Restart,Play" frame="$parent/$parent/$parent"/>
                             
                             <Controller type="Text" end="Pause">
                                 <Key type="Text" time="0" text="@Conversation/UserExperience/Line00008"/>
@@ -2166,8 +2249,7 @@
                         </Animation>
 
                         <Animation name="ShowTutorialExplainNewMount">
-                            <Event event="ShowTutorialExplainNewMount" action="Restart" frame="$parent/$parent/$parent"/>
-                            <Event event="ShowTutorialExplainNewMount" action="Play" frame="$parent/$parent/$parent"/>
+                            <Event event="ShowTutorialExplainNewMount" action="Restart,Play" frame="$parent/$parent/$parent"/>
                             
                             <Controller type="Text" end="Pause">
                                 <Key type="Text" time="0" text="@Conversation/UserExperience/Line00009"/>
@@ -2175,8 +2257,7 @@
                         </Animation>
 
                         <Animation name="ShowTutorialExplainNewSkin">
-                            <Event event="ShowTutorialExplainNewSkin" action="Restart" frame="$parent/$parent/$parent"/>
-                            <Event event="ShowTutorialExplainNewSkin" action="Play" frame="$parent/$parent/$parent"/>
+                            <Event event="ShowTutorialExplainNewSkin" action="Restart,Play" frame="$parent/$parent/$parent"/>
                             
                             <Controller type="Text" end="Pause">
                                 <Key type="Text" time="0" text="@Conversation/UserExperience/Line00010"/>
@@ -2184,8 +2265,7 @@
                         </Animation>
 
                         <Animation name="ShowTutorialShopButton">
-                            <Event event="ShowTutorialShopButton" action="Restart" frame="$parent/$parent/$parent"/>
-                            <Event event="ShowTutorialShopButton" action="Play" frame="$parent/$parent/$parent"/>
+                            <Event event="ShowTutorialShopButton" action="Restart,Play" frame="$parent/$parent/$parent"/>
                             
                             <Controller type="Text" end="Pause">
                                 <Key type="Text" time="0" text="@Conversation/UserExperience/Line00006"/>
@@ -2193,8 +2273,7 @@
                         </Animation>
 
                         <Animation name="ShowTutorialDailyQuests">
-                            <Event event="ShowTutorialDailyQuests" action="Restart" frame="$parent/$parent/$parent"/>
-                            <Event event="ShowTutorialDailyQuests" action="Play" frame="$parent/$parent/$parent"/>
+                            <Event event="ShowTutorialDailyQuests" action="Restart,Play" frame="$parent/$parent/$parent"/>
                             
                             <Controller type="Text" end="Pause">
                                 <Key type="Text" time="0" text="@Conversation/UserExperience/Line00043"/>
@@ -2206,57 +2285,55 @@
 
             <Frame type="Frame" name="Portrait">
                 <Animation name="PulseIn">
-                    <Event event="PulseIn" action="Restart" frame="$parent"/>
-                    <Event event="PulseIn" action="Play" frame="$parent"/>
+                    <Event event="PulseIn" action="Restart,Play" frame="$parent"/>
                     <Controller type="Fade" end="Pause">
-                        <Key type="Curve" time=".0" value="0" in="Auto" out="Linear"/>
-                        <Key type="Curve" time=".2" value="255" in="Linear" out="Auto"/>
+                        <Key type="Curve" time=".0" value="0" inout="Auto,Linear"/>
+                        <Key type="Curve" time=".2" value="255" inout="Linear,Auto"/>
                     </Controller>
                     <Controller type="Anchor" end="Pause" side="Right" relative="true">
-                        <Key type="Curve" time=".0" value="80" in="Auto" out="Linear"/>
-                        <Key type="Curve" time=".2" value="0" in="Linear" out="Auto"/>
+                        <Key type="Curve" time=".0" value="80" inout="Auto,Linear"/>
+                        <Key type="Curve" time=".2" value="0" inout="Linear,Auto"/>
                     </Controller>
                     <Controller type="Anchor" end="Pause" side="Left" relative="true">
-                        <Key type="Curve" time=".0" value="-40" in="Auto" out="Linear"/>
-                        <Key type="Curve" time=".2" value="0" in="Linear" out="Auto"/>
+                        <Key type="Curve" time=".0" value="-40" inout="Auto,Linear"/>
+                        <Key type="Curve" time=".2" value="0" inout="Linear,Auto"/>
                     </Controller>
                     <Controller type="Anchor" end="Pause" side="Bottom" relative="true">
-                        <Key type="Curve" time=".0" value="110" in="Auto" out="Linear"/>
-                        <Key type="Curve" time=".2" value="0" in="Linear" out="Auto"/>
+                        <Key type="Curve" time=".0" value="110" inout="Auto,Linear"/>
+                        <Key type="Curve" time=".2" value="0" inout="Linear,Auto"/>
                     </Controller>
                     <Controller type="Anchor" end="Pause" side="Top" relative="true">
-                        <Key type="Curve" time=".0" value="-55" in="Auto" out="Linear"/>
-                        <Key type="Curve" time=".2" value="0" in="Linear" out="Auto"/>
+                        <Key type="Curve" time=".0" value="-55" inout="Auto,Linear"/>
+                        <Key type="Curve" time=".2" value="0" inout="Linear,Auto"/>
                     </Controller>
                 </Animation>
 
                 <Animation name="PulseOut">
-                    <Event event="PulseOut" action="Restart" frame="$parent"/>
-                    <Event event="PulseOut" action="Play" frame="$parent"/>
+                    <Event event="PulseOut" action="Restart,Play" frame="$parent"/>
                     <Controller type="Fade" end="Pause">
-                        <Key type="Curve" time="0" value="255" in="Auto" out="Linear"/>
-                        <Key type="Curve" time=".2" value="255" in="Linear" out="Fast"/>
-                        <Key type="Curve" time=".4" value="0" in="Slow" out="Auto"/>
+                        <Key type="Curve" time="0" value="255" inout="Auto,Linear"/>
+                        <Key type="Curve" time=".2" value="255" inout="Linear"/>
+                        <Key type="Curve" time=".4" value="0" inout="Slow,Auto"/>
                     </Controller>
                     <Controller type="Anchor" end="Pause" side="Right" relative="true">
-                        <Key type="Curve" time="0" value="0" in="Auto" out="Linear"/>
-                        <Key type="Curve" time=".2" value="0" in="Linear" out="Linear"/>
-                        <Key type="Curve" time=".4" value="-80" in="Linear" out="Auto"/>
+                        <Key type="Curve" time="0" value="0" inout="Auto,Linear"/>
+                        <Key type="Curve" time=".2" value="0" inout="Linear"/>
+                        <Key type="Curve" time=".4" value="-80" inout="Linear,Auto"/>
                     </Controller>
                     <Controller type="Anchor" end="Pause" side="Left" relative="true">
-                        <Key type="Curve" time="0" value="0" in="Auto" out="Linear"/>
-                        <Key type="Curve" time=".2" value="0" in="Linear" out="Linear"/>
-                        <Key type="Curve" time=".4" value="40" in="Linear" out="Auto"/>
+                        <Key type="Curve" time="0" value="0" inout="Auto,Linear"/>
+                        <Key type="Curve" time=".2" value="0" inout="Linear"/>
+                        <Key type="Curve" time=".4" value="40" inout="Linear,Auto"/>
                     </Controller>
                     <Controller type="Anchor" end="Pause" side="Bottom" relative="true">
-                        <Key type="Curve" time=".0" value="0" in="Auto" out="Linear"/>
-                        <Key type="Curve" time=".2" value="0" in="Linear" out="Linear"/>
-                        <Key type="Curve" time=".4" value="-110" in="Linear" out="Auto"/>
+                        <Key type="Curve" time=".0" value="0" inout="Auto,Linear"/>
+                        <Key type="Curve" time=".2" value="0" inout="Linear"/>
+                        <Key type="Curve" time=".4" value="-110" inout="Linear,Auto"/>
                     </Controller>
                     <Controller type="Anchor" end="Pause" side="Top" relative="true">
-                        <Key type="Curve" time="0" value="0" in="Auto" out="Linear"/>
-                        <Key type="Curve" time=".2" value="0" in="Linear" out="Linear"/>
-                        <Key type="Curve" time=".4" value="55" in="Linear" out="Auto"/>
+                        <Key type="Curve" time="0" value="0" inout="Auto,Linear"/>
+                        <Key type="Curve" time=".2" value="0" inout="Linear"/>
+                        <Key type="Curve" time=".4" value="55" inout="Linear,Auto"/>
                     </Controller>
                 </Animation>
 
@@ -2277,21 +2354,19 @@
                     </Animation>
 
                     <Animation name="PulseIn">
-                        <Event event="PulseIn" action="Restart" frame="$parent/$parent"/>
-                        <Event event="PulseIn" action="Play" frame="$parent/$parent"/>
+                        <Event event="PulseIn" action="Restart,Play" frame="$parent/$parent"/>
                         <Controller type="Visibility" end="Pause">
                             <Key type="Bool" time="0" value="True"/>
                         </Controller>
                         <Controller type="Fade" end="Pause">
-                            <Key type="Curve" time=".0" value="0" in="Auto" out="Linear"/>
-                            <Key type="Curve" time=".2" value="0" in="Linear" out="Linear"/>
-                            <Key type="Curve" time=".4" value="255" in="Linear" out="Auto"/>
+                            <Key type="Curve" time=".0" value="0" inout="Auto,Linear"/>
+                            <Key type="Curve" time=".2" value="0" inout="Linear"/>
+                            <Key type="Curve" time=".4" value="255" inout="Linear,Auto"/>
                         </Controller>
                     </Animation>
 
                     <Animation name="PulseOut">
-                        <Event event="PulseOut" action="Restart" frame="$parent/$parent"/>
-                        <Event event="PulseOut" action="Play" frame="$parent/$parent"/>
+                        <Event event="PulseOut" action="Restart,Play" frame="$parent/$parent"/>
                         <Controller type="Visibility" end="Pause">
                             <Key type="Bool" time=".2" value="False"/>
                         </Controller>
@@ -2301,88 +2376,77 @@
                     </Animation>
 
                     <Animation name="ShowTutorialMap2">
-                        <Event event="ShowTutorialMap2" action="Restart" frame="$parent/$parent"/>
-                        <Event event="ShowTutorialMap2" action="Play" frame="$parent/$parent"/>
+                        <Event event="ShowTutorialMap2" action="Restart,Play" frame="$parent/$parent"/>
                         <Controller type="Cutscene" end="Stop">
                             <Key type="Cutscene" time="0.0" action="Bookmark" bookmark="Tutorial01 Start"/>
                         </Controller>
                     </Animation>
 
                     <Animation name="ShowTutorialConfirmSkipMap2">
-                        <Event event="ShowTutorialConfirmSkipMap2" action="Restart" frame="$parent/$parent"/>
-                        <Event event="ShowTutorialConfirmSkipMap2" action="Play" frame="$parent/$parent"/>
+                        <Event event="ShowTutorialConfirmSkipMap2" action="Restart,Play" frame="$parent/$parent"/>
                         <Controller type="Cutscene" end="Stop">
                             <Key type="Cutscene" time="0.0" action="Bookmark" bookmark="SkipTutorial Start"/>
                         </Controller>
                     </Animation>
 
                     <Animation name="ShowTutorialMap3">
-                        <Event event="ShowTutorialMap3" action="Restart" frame="$parent/$parent"/>
-                        <Event event="ShowTutorialMap3" action="Play" frame="$parent/$parent"/>
+                        <Event event="ShowTutorialMap3" action="Restart,Play" frame="$parent/$parent"/>
                         <Controller type="Cutscene" end="Stop">
                             <Key type="Cutscene" time="0.0" action="Bookmark" bookmark="Tutorial01 Start"/>
                         </Controller>
                     </Animation>
 
                     <Animation name="ShowTutorialConfirmSkipMap3">
-                        <Event event="ShowTutorialConfirmSkipMap3" action="Restart" frame="$parent/$parent"/>
-                        <Event event="ShowTutorialConfirmSkipMap3" action="Play" frame="$parent/$parent"/>
+                        <Event event="ShowTutorialConfirmSkipMap3" action="Restart,Play" frame="$parent/$parent"/>
                         <Controller type="Cutscene" end="Stop">
                             <Key type="Cutscene" time="0.0" action="Bookmark" bookmark="SkipTutorial Start"/>
                         </Controller>
                     </Animation>
 
                     <Animation name="ShowTutorialPlayButton">
-                        <Event event="ShowTutorialPlayButton" action="Restart" frame="$parent/$parent"/>
-                        <Event event="ShowTutorialPlayButton" action="Play" frame="$parent/$parent"/>
+                        <Event event="ShowTutorialPlayButton" action="Restart,Play" frame="$parent/$parent"/>
                         <Controller type="Cutscene" end="Stop">
                             <Key type="Cutscene" time="0.0" action="Bookmark" bookmark="Tutorial02 Start"/>
                         </Controller>
                     </Animation>
 
                     <Animation name="ShowTutorialExplainHeroSelect">
-                        <Event event="ShowTutorialExplainHeroSelect" action="Restart" frame="$parent/$parent"/>
-                        <Event event="ShowTutorialExplainHeroSelect" action="Play" frame="$parent/$parent"/>
+                        <Event event="ShowTutorialExplainHeroSelect" action="Restart,Play" frame="$parent/$parent"/>
                         <Controller type="Cutscene" end="Stop">
                             <Key type="Cutscene" time="0.0" action="Bookmark" bookmark="HeroSelect Start"/>
                         </Controller>
                     </Animation>
 
                     <Animation name="ShowTutorialExplainHeroAbilities">
-                        <Event event="ShowTutorialExplainHeroAbilities" action="Restart" frame="$parent/$parent"/>
-                        <Event event="ShowTutorialExplainHeroAbilities" action="Play" frame="$parent/$parent"/>
+                        <Event event="ShowTutorialExplainHeroAbilities" action="Restart,Play" frame="$parent/$parent"/>
                         <Controller type="Cutscene" end="Stop">
                             <Key type="Cutscene" time="0.0" action="Bookmark" bookmark="HeroAbilities Start"/>
                         </Controller>
                     </Animation>
 
                     <Animation name="ShowTutorialExplainNewMount">
-                        <Event event="ShowTutorialExplainNewMount" action="Restart" frame="$parent/$parent"/>
-                        <Event event="ShowTutorialExplainNewMount" action="Play" frame="$parent/$parent"/>
+                        <Event event="ShowTutorialExplainNewMount" action="Restart,Play" frame="$parent/$parent"/>
                         <Controller type="Cutscene" end="Stop">
                             <Key type="Cutscene" time="0.0" action="Bookmark" bookmark="NewMount Start"/>
                         </Controller>
                     </Animation>
 
                     <Animation name="ShowTutorialExplainNewSkin">
-                        <Event event="ShowTutorialExplainNewSkin" action="Restart" frame="$parent/$parent"/>
-                        <Event event="ShowTutorialExplainNewSkin" action="Play" frame="$parent/$parent"/>
+                        <Event event="ShowTutorialExplainNewSkin" action="Restart,Play" frame="$parent/$parent"/>
                         <Controller type="Cutscene" end="Stop">
                             <Key type="Cutscene" time="0.0" action="Bookmark" bookmark="NewSkin Start"/>
                         </Controller>
                     </Animation>
 
                     <Animation name="ShowTutorialShopButton">
-                        <Event event="ShowTutorialShopButton" action="Restart" frame="$parent/$parent"/>
-                        <Event event="ShowTutorialShopButton" action="Play" frame="$parent/$parent"/>
+                        <Event event="ShowTutorialShopButton" action="Restart,Play" frame="$parent/$parent"/>
                         <Controller type="Cutscene" end="Stop">
                             <Key type="Cutscene" time="0.0" action="Bookmark" bookmark="Gold Start"/>
                         </Controller>
                     </Animation>
 
                     <Animation name="ShowTutorialDailyQuests">
-                        <Event event="ShowTutorialDailyQuests" action="Restart" frame="$parent/$parent"/>
-                        <Event event="ShowTutorialDailyQuests" action="Play" frame="$parent/$parent"/>
+                        <Event event="ShowTutorialDailyQuests" action="Restart,Play" frame="$parent/$parent"/>
                         <Controller type="Cutscene" end="Stop">
                             <Key type="Cutscene" time="0" action="Bookmark" bookmark="Quests Start"/>
                         </Controller>
@@ -2391,16 +2455,14 @@
 
                 <Frame type="Frame" name="PortraitLdrMask">
                     <Animation name="PulseIn">
-                        <Event event="PulseIn" action="Restart" frame="$parent/$parent"/>
-                        <Event event="PulseIn" action="Play" frame="$parent/$parent"/>
+                        <Event event="PulseIn" action="Restart,Play" frame="$parent/$parent"/>
                         <Controller type="Visibility" end="Pause">
                             <Key type="Bool" time="0" value="True"/>
                         </Controller>
                     </Animation>
 
                     <Animation name="PulseOut">
-                        <Event event="PulseOut" action="Restart" frame="$parent/$parent"/>
-                        <Event event="PulseOut" action="Play" frame="$parent/$parent"/>
+                        <Event event="PulseOut" action="Restart,Play" frame="$parent/$parent"/>
                         <Controller type="Visibility" end="Pause">
                             <Key type="Bool" time="0" value="True"/>
                             <Key type="Bool" time=".2" value="False"/>
@@ -2413,16 +2475,14 @@
 <!-- Region: SuggestionArrows -->
         <Frame type="Frame" name="SuggestionArrowPlayButton">
             <Animation name="PulseOut">
-                <Event event="PulseOut" action="Restart" frame="$parent/NewUserPopUp"/>
-                <Event event="PulseOut" action="Play" frame="$parent/NewUserPopUp"/>
+                <Event event="PulseOut" action="Restart,Play" frame="$parent/NewUserPopUp"/>
                 <Controller type="Visibility" end="Pause">
                     <Key type="Bool" time="0" value="False"/>
                 </Controller>
             </Animation>
 
             <Animation name="ShowTutorialPlayButton">
-                <Event event="ShowTutorialPlayButton" action="Restart" frame="$parent/NewUserPopUp"/>
-                <Event event="ShowTutorialPlayButton" action="Play" frame="$parent/NewUserPopUp"/>
+                <Event event="ShowTutorialPlayButton" action="Restart,Play" frame="$parent/NewUserPopUp"/>
                 <Controller type="Visibility" end="Pause">
                     <Key type="Bool" time="0" value="True"/>
                 </Controller>
@@ -2432,16 +2492,14 @@
         <Frame type="Frame" name="SuggestionArrowPracticeButton">
             <!--  This is currently an Arrow without Uther, that is why it listens for events on $parent -->
             <Animation name="HideArrow">
-                <Event event="HideArrow" action="Restart" frame="$parent"/>
-                <Event event="HideArrow" action="Play" frame="$parent"/>
+                <Event event="HideArrow" action="Restart,Play" frame="$parent"/>
                 <Controller type="Visibility" end="Pause">
                     <Key type="Bool" time="0" value="False"/>
                 </Controller>
             </Animation>
 
             <Animation name="ShowTutorialPracticeGame">
-                <Event event="ShowTutorialPracticeGame" action="Restart" frame="$parent"/>
-                <Event event="ShowTutorialPracticeGame" action="Play" frame="$parent"/>
+                <Event event="ShowTutorialPracticeGame" action="Restart,Play" frame="$parent"/>
                 <Controller type="Visibility" end="Pause">
                     <Key type="Bool" time="0" value="True"/>
                 </Controller>
@@ -2450,19 +2508,16 @@
 
         <Frame type="Frame" name="SuggestionArrowHeroSelect">
             <Animation name="PulseOut">
-                <Event event="PulseOut" action="Restart" frame="$parent/NewUserPopUp"/>
-                <Event event="PulseOut" action="Play" frame="$parent/NewUserPopUp"/>
+                <Event event="PulseOut" action="Restart,Play" frame="$parent/NewUserPopUp"/>
+                <Event event="HideArrow" action="Restart,Play" frame="$parent/NewUserPopUp"/>
                 <!--  Special case hackery to allow this Arrow to disappear before Uther -->
-                <Event event="HideArrow" action="Restart" frame="$parent/NewUserPopUp"/>
-                <Event event="HideArrow" action="Play" frame="$parent/NewUserPopUp"/>
                 <Controller type="Visibility" end="Pause">
                     <Key type="Bool" time="0" value="False"/>
                 </Controller>
             </Animation>
 
             <Animation name="ShowTutorialExplainHeroSelect">
-                <Event event="ShowTutorialExplainHeroSelect" action="Restart" frame="$parent/NewUserPopUp"/>
-                <Event event="ShowTutorialExplainHeroSelect" action="Play" frame="$parent/NewUserPopUp"/>
+                <Event event="ShowTutorialExplainHeroSelect" action="Restart,Play" frame="$parent/NewUserPopUp"/>
                 <Controller type="Visibility" end="Pause">
                     <Key type="Bool" time="0" value="True"/>
                 </Controller>
@@ -2471,20 +2526,16 @@
 
         <Frame type="Frame" name="SuggestionArrowHeroAbilities">
             <Animation name="PulseOut">
-                <Event event="PulseOut" action="Restart" frame="$parent/NewUserPopUp"/>
-                <Event event="PulseOut" action="Play" frame="$parent/NewUserPopUp"/>
+                <Event event="PulseOut" action="Restart,Play" frame="$parent/NewUserPopUp"/>
                 <Controller type="Visibility" end="Pause">
                     <Key type="Bool" time="0" value="False"/>
                 </Controller>
             </Animation>
 
             <Animation name="ShowTutorialExplainHeroAbilities">
-                <Event event="ShowTutorialExplainHeroAbilities" action="Restart" frame="$parent/NewUserPopUp"/>
-                <Event event="ShowTutorialExplainHeroAbilities" action="Play" frame="$parent/NewUserPopUp"/>
-                <Event event="ShowTutorialExplainNewMount" action="Restart" frame="$parent/NewUserPopUp"/>
-                <Event event="ShowTutorialExplainNewMount" action="Play" frame="$parent/NewUserPopUp"/>
-                <Event event="ShowTutorialExplainNewSkin" action="Restart" frame="$parent/NewUserPopUp"/>
-                <Event event="ShowTutorialExplainNewSkin" action="Play" frame="$parent/NewUserPopUp"/>
+                <Event event="ShowTutorialExplainHeroAbilities" action="Restart,Play" frame="$parent/NewUserPopUp"/>
+                <Event event="ShowTutorialExplainNewMount" action="Restart,Play" frame="$parent/NewUserPopUp"/>
+                <Event event="ShowTutorialExplainNewSkin" action="Restart,Play" frame="$parent/NewUserPopUp"/>
                 <Controller type="Visibility" end="Pause">
                     <Key type="Bool" time="0" value="True"/>
                 </Controller>
@@ -2493,16 +2544,14 @@
 
         <Frame type="Frame" name="SuggestionArrowShopButton">
             <Animation name="PulseOut">
-                <Event event="PulseOut" action="Restart" frame="$parent/NewUserPopUp"/>
-                <Event event="PulseOut" action="Play" frame="$parent/NewUserPopUp"/>
+                <Event event="PulseOut" action="Restart,Play" frame="$parent/NewUserPopUp"/>
                 <Controller type="Visibility" end="Pause">
                     <Key type="Bool" time="0" value="False"/>
                 </Controller>
             </Animation>
 
             <Animation name="ShowTutorialShopButton">
-                <Event event="ShowTutorialShopButton" action="Restart" frame="$parent/NewUserPopUp"/>
-                <Event event="ShowTutorialShopButton" action="Play" frame="$parent/NewUserPopUp"/>
+                <Event event="ShowTutorialShopButton" action="Restart,Play" frame="$parent/NewUserPopUp"/>
                 <Controller type="Visibility" end="Pause">
                     <Key type="Bool" time="0" value="True"/>
                 </Controller>
@@ -2511,16 +2560,14 @@
 
         <Frame type="Frame" name="SuggestionArrowDailyQuests">
             <Animation name="PulseOut">
-                <Event event="PulseOut" action="Restart" frame="$parent/NewUserPopUp"/>
-                <Event event="PulseOut" action="Play" frame="$parent/NewUserPopUp"/>
+                <Event event="PulseOut" action="Restart,Play" frame="$parent/NewUserPopUp"/>
                 <Controller type="Visibility" end="Pause">
                     <Key type="Bool" time="0" value="False"/>
                 </Controller>
             </Animation>
 
             <Animation name="ShowTutorialDailyQuests">
-                <Event event="ShowTutorialDailyQuests" action="Restart" frame="$parent/NewUserPopUp"/>
-                <Event event="ShowTutorialDailyQuests" action="Play" frame="$parent/NewUserPopUp"/>
+                <Event event="ShowTutorialDailyQuests" action="Restart,Play" frame="$parent/NewUserPopUp"/>
                 <Controller type="Visibility" end="Pause">
                     <Key type="Bool" time="0" value="True"/>
                 </Controller>

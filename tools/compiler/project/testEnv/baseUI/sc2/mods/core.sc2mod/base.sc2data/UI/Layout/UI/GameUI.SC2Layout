@@ -19,7 +19,13 @@
             <Event event="OnConvertToReplay" action="Reset,Play"/>
 
             <Controller type="Sound" end="Pause">
-                <Key type="Sound" time="0.6" sound="*@UI_Rewind_Button_AS" direction="Forward"/>
+                <Key type="Sound" time="0.2" sound="*@UI_Rewind_Button_AS" direction="Forward"/>
+            </Controller>
+
+            <Controller type="Visibility" frame="ConvertToReplayAnim" end="Pause">
+                <Key type="Bool" time="0" value="False"/>
+                <Key type="Bool" time=".1" value="True"/>
+                <Key type="Bool" time="1.5" value="False"/>
             </Controller>
         </Animation>
 
@@ -126,6 +132,7 @@
                     <Anchor side="Right" relative="$parent" pos="Max" offset="-21"/>
                     <Width val="400"/>
                     <Height val="242"/>
+                    <Handle val="GameUI_CommandPanel"/>
                 </Frame>
 
                 <Frame type="CommandPanelAI" name="CommandPanelAI" template="AIFrames/CommandPanelAITemplate">
@@ -354,6 +361,7 @@
                     <Anchor side="Top" relative="$parent/AlertPanel" pos="Max" offset="0"/>
                     <Width val="550"/>
                     <Height val="106"/>
+                    <HideClippedMessages val="true"/>
                 </Frame>
 
                 <Frame type="GameMessageDisplay" name="DebugDisplay">
@@ -415,6 +423,7 @@
                     <Width val="720"/>
                     <Height val="300"/>
                     <Style val="ChatDisplay"/>
+                    <HideClippedMessages val="true"/>
                 </Frame>
 
                 <Frame type="TipAlertMovingFrame" name="TipAlertMovingFrame" template="TipAlertPanel/TipAlertMovingFrameTemplate">
@@ -543,6 +552,85 @@
                     <Anchor side="Bottom" relative="$parent" pos="Max" offset="-280"/>
                     <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
                     <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+                    <InsertEmoticon val="{$parent/EmoticonPanel/@SelectedEmoticon}"/>
+
+                    <Frame type="Button" name="EmoticonButton"  template="EmoticonSelectionPanel/EmoticonInGameButtonTemplate">
+                        <Anchor side="Top" relative="$parent/RecipientImage" pos="Min" offset="1"/>
+                        <Anchor side="Right" relative="$parent/EmojiBorderLine" pos="Min" offset="-6"/>
+                        <Toggleable val="true"/>
+                        <Toggled val="false"/>
+
+                        <Animation name="UntoggleAnim">
+                            <Event event="OnFocusLost" action="Restart,Play" frame="$parent/ChatEditBox"/>
+                            <Event event="OnHidden" action="Restart,Play" frame="$parent/ChatEditBox"/>
+
+                            <Controller name="Name1" type="Property" property="Toggled" end="Pause">
+                                <Key type="Property" time="0" value="false"/>
+                            </Controller>
+                        </Animation>
+
+                        <Animation name="GainChatFocusAnim">
+                            <Event event="OnClick" action="Restart,Play" frame="$this"/>
+
+                            <Controller name="Name2" type="Property" property="Focused" frame="$parent/ChatEditBox" end="Pause">
+                                <Key type="Property" time="0" value="true"/>
+                            </Controller>
+                        </Animation>
+                        
+                        <StateGroup name="DesaturationStates">
+                            <DefaultState val="Unfocused"/>
+                            <State name="Unfocused">
+                                <When type="Property" frame="$parent/ChatEditBox" Focused="false"/>
+                                <Action type="SetProperty" frame="NormalImage" Desaturated="True"/>
+                                <Action type="SetProperty" frame="HoverImage" Desaturated="True"/>
+                                <Action type="SetProperty" frame="HoverImage" ColorAdjustMode="None"/>
+                                <Action type="SetProperty" frame="$this" AcceptsMouse="False"/>
+                            </State>
+                            <State name="Focused">
+                                <When type="Property" frame="$parent/ChatEditBox" Focused="true"/>
+                                <Action type="SetProperty" frame="NormalImage" Desaturated="False"/>
+                                <Action type="SetProperty" frame="HoverImage" Desaturated="False"/>
+                                <Action type="SetProperty" frame="HoverImage" ColorAdjustMode="AddSelf"/>
+                                <Action type="SetProperty" frame="$this" AcceptsMouse="True"/>
+                            </State>
+                        </StateGroup>
+                    </Frame>
+                </Frame>
+
+                <Frame type="EmoticonSelectionPanel" name="EmoticonPanel" template="EmoticonSelectionPanel/EmoticonSelectionInGamePanelTemplate">
+                    <Anchor side="Bottom" relative="$parent/ChatBar/BackgroundImage" pos="Max" offset="0"/>
+                    <Anchor side="Right" relative="$parent/ChatBar/BackgroundImage" pos="Min" offset="0"/>
+                    <Visible val="false"/>
+
+                    <Animation name="ToggleVisibility">
+                        <Event event="FadeIn" action="DirectionForward,Play" frame="$this"/>
+                        <Event event="FadeOut" action="DirectionReverse,Play" frame="$this"/>
+
+                        <Controller type="Fade" end="Pause">
+                            <Key type="Curve" time="0.0" value="0" out="Auto"/>
+                            <Key type="Curve" time="0.2" value="255" out="Auto"/>
+                        </Controller>
+
+                        <Controller type="Visibility" end="Pause">
+                            <Key type="Bool" time="0" value="False"/>
+                            <Key type="Bool" time="0.01" value="True"/>
+                            <Key type="Bool" time="0.2" value="True"/>
+                        </Controller>
+                    </Animation>
+
+                    <StateGroup name="ToggledStateGroup">
+                        <DefaultState val="NotVisibleState"/>
+                        
+                        <State name="VisibleState">
+                            <When type="Property" frame="$parent/ChatBar/EmoticonButton" Toggled="true"/>
+                            <Action type="SendEvent" frame="$this" event="FadeIn"/>
+                        </State>
+
+                        <State name="NotVisibleState">
+                            <When type="Property" frame="$parent/ChatBar/EmoticonButton" Toggled="false"/>
+                            <Action type="SendEvent" frame="$this" event="FadeOut"/>
+                        </State>
+                    </StateGroup>
                 </Frame>
 
                 <Frame type="Label" name="ChatHelpLabel">
@@ -623,49 +711,97 @@
                         <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
                         <Width val="#ChatPanelWidth"/>
                         <Height val="#ChatPanelHeight"/>
+                        <InsertEmoticon val="{$parent/EmoticonPanel/@SelectedEmoticon}"/>
+
+                        <Frame type="Button" name="EmoticonButton"  template="EmoticonSelectionPanel/EmoticonButtonTemplate">
+                            <Anchor side="Top" relative="$parent/ChatEditBoxFrame" pos="Mid" offset="1"/>
+                            <Anchor side="Bottom" relative="$parent/ChatEditBoxFrame" pos="Mid" offset="1"/>
+                            <Anchor side="Left" relative="$parent/ChatEditBoxFrame" pos="Min" offset="14"/>
+                            <Toggleable val="true"/>
+                            <Toggled val="false"/>
+                            
+                            <Animation name="UntoggleAnim">
+                                <Event event="OnFocusLost" action="Restart,Play" frame="$parent/ChatEditBoxFrame/ChatEditBox"/>
+                                
+                                <Controller name="Name1" type="Property" property="Toggled" end="Pause">
+                                    <Key type="Property" time="0" value="false"/>
+                                </Controller>
+                            </Animation>
+
+                            <Animation name="GainChatFocusAnim">
+                                <Event event="OnClick" action="Restart,Play" frame="$this"/>
+
+                                <Controller name="Name1" type="Property" property="Focused" frame="$parent/ChatEditBoxFrame/ChatEditBox" end="Pause">
+                                    <Key type="Property" time="0" value="true"/>
+                                </Controller>
+                            </Animation>
+                        </Frame>
                     </Frame>
-                    
-                    <!--
 
                     <Frame type="EmoticonSelectionPanel" name="EmoticonPanel" template="EmoticonSelectionPanel/EmoticonSelectionPanelTemplate">
-                        <Anchor side="Bottom" relative="$parent/EmoticonButton" pos="Min" offset="5"/>
-                        <Anchor side="Right" relative="$parent/ChatPanel" pos="Min" offset="7"/>
-                        <CollapseLayout val="true"/>
-                    </Frame>
-                    
-                    -->
-
-                    <!-- This property bind actually inserts the selected emoticon into the chat edit box -->
-                    
-                    <!--
-                    
-                    <Frame type="PropertyBind" name="BindEmoticon">
-                        <Anchor relative="$parent/EmoticonPanel"/>
-                        <Source frame="$parent/EmoticonPanel" property="SelectedEmoticon"/>
-                        <Target frame="$parent/ChatPanel" property="InsertEmoticon"/>
-                    </Frame>
-
-                    <Frame type="Button" name="EmoticonButton"  template="EmoticonSelectionPanel/EmoticonButtonTemplate">
                         <Anchor side="Bottom" relative="$parent/ChatPanel" pos="Max" offset="0"/>
                         <Anchor side="Right" relative="$parent/ChatPanel" pos="Min" offset="7"/>
-                        <Toggleable val="true"/>
+                        <Visible val="false"/>
+                        
+                        <Frame type="BlurFrame" name="BlurBackground">
+                            <BlurAmount val="0"/>
+        
+                            <Frame type="Image" name="BackgroundDimmer">
+                                <Anchor side="Top" relative="$parent/$parent/Background" pos="Min" offset="5"/>
+                                <Anchor side="Left" relative="$parent/$parent/Background" pos="Min" offset="5"/>
+                                <Anchor side="Bottom" relative="$parent/$parent/Background" pos="Max" offset="-5"/>
+                                <Anchor side="Right" relative="$parent/$parent/Background" pos="Max" offset="-5"/>
+                                <LayerColor val="081114"/>
+                                <Alpha val="200"/>
+                            </Frame>
+                        </Frame>
 
-                        <StateGroup name="VisibilityStateGroup">
+                        <Animation name="ToggleVisibility">
+                            <Event event="FadeIn" action="DirectionForward,Play" frame="$this"/>
+                            <Event event="FadeOut" action="DirectionReverse,Play" frame="$this"/>
+
+                            <Controller type="Fade" end="Pause">
+                                <Key type="Curve" time="0.0" value="0" out="Auto"/>
+                                <Key type="Curve" time="0.2" value="255" out="Auto"/>
+                            </Controller>
+
+                            <Controller type="Visibility" end="Pause">
+                                <Key type="Bool" time="0" value="False"/>
+                                <Key type="Bool" time="0.01" value="True"/>
+                                <Key type="Bool" time="0.2" value="True"/>
+                            </Controller>
+                        </Animation>
+
+                        <StateGroup name="ToggledStateGroup">
                             <State name="VisibleState">
-                                <When type="Property" frame="$this" Toggled="true"/>
-                                <Action type="SetProperty" frame="$parent/EmoticonPanel" Visible="true"/>
+                                <When type="Property" frame="$parent/ChatPanel/EmoticonButton" Toggled="true"/>
+                                <Action type="SendEvent" frame="$this" event="FadeIn"/>
                             </State>
 
-                            <State name="InvisibleState">
-                                <When type="Property" frame="$this" Toggled="false"/>
-                                <Action type="SetProperty" frame="$parent/EmoticonPanel" Visible="false"/>
+                            <State name="NotVisibleState">
+                                <When type="Property" frame="$parent/ChatPanel/EmoticonButton" Toggled="false"/>
+                                <Action type="SendEvent" frame="$this" event="FadeOut"/>
+                            </State>
+                        </StateGroup>
+
+                        <StateGroup name="VisibleStateGroup">
+                            <DefaultState val="NotVisibleState"/>
+                            
+                            <State name="VisibleState">
+                                <When type="Property" frame="$parent" Visible="true"/>
+                                <Action type="SetProperty" frame="$parent/ChatPanel/EmoticonButton" Toggled="false"/>
+                                <Action type="SetProperty" frame="$this" Visible="false"/>
+                            </State>
+
+                            <State name="NotVisibleState">
+                                <When type="Property" frame="$parent" Visible="false"/>
+                                <Action type="SetProperty" frame="$parent/ChatPanel/EmoticonButton" Toggled="false"/>
+                                <Action type="SetProperty" frame="$this" Visible="false"/>
                             </State>
                         </StateGroup>
                     </Frame>
-                    
-                    -->
                 </Frame>
-                
+
                 <Frame type="Frame" name="FriendsPanel">
                     <Anchor relative="$parent"/>
                     <Visible val="false"/>
@@ -673,6 +809,7 @@
                     <Animation name="ToggleSocialPanelVisibility">
                         <Event event="OnClick" action="DirectionForward,Play" frame="Socialpanel/CloseButton"/>
                         <Event event="Toggle" action="ToggleDirection,Play" frame="$parent/MenuBar/SocialButton"/>
+                        <Event event="ToggleSocial" action="ToggleDirection,Play" frame="$GameUI"/>
                         <Event event="OnHidden" action="DirectionForward,Play" frame="$parent/MenuBar/SocialButton"/>
                         <Event event="Hide" action="DirectionForward,Play"/>
 
@@ -895,6 +1032,10 @@
 
                 </Frame>
 
+                <Frame type="AchievementsDialog" name="AchievementsDialog" template="AchievementsDialog/AchievementsDialogTemplate">
+
+                </Frame>
+
                 <Frame type="SystemAlertPanel" name="SystemAlertPanel" template="SystemAlertPanel/SystemAlertPanelTemplate">
                     <Anchor side="Top" relative="$parent" pos="Min" offset="40"/>
                     <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
@@ -944,7 +1085,7 @@
             </Frame>
 
             <Frame type="AchievementFanfaresFrame" name="AchievementFanfaresFrame" template="AchievementFanfaresFrame/AchievementFanfaresFrameTemplate">
-                <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Top" relative="$parent" pos="Mid" offset="-200"/>
                 <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
                 <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
                 <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
@@ -954,6 +1095,190 @@
                 <Frame type="Image" name="Blackout">
                     <Visible val="false"/>
                 </Frame>
+            </Frame>
+        </Frame>
+
+        <Frame type="Frame" name="ConvertToReplayAnim">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+            <Visible val="False"/>
+
+            <Frame type="Image" name="DarkBg">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+                <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+                <LayerColor val="000000"/>
+                <Alpha val="180"/>
+            </Frame>
+
+            <Frame type="Image" name="Scanlines">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+                <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+                <Texture val="@UI/SC2_InGame_Replay_Effect_Scanlines"/>
+                <Tiled val="True"/>
+                <Alpha val="85"/>
+            </Frame>
+
+            <Frame type="Label" name="RewindLabel">
+                <Anchor side="Left" relative="$parent" pos="Mid" offset="50"/>
+                <Anchor side="Right" relative="$parent" pos="Mid" offset="50"/>
+                <Anchor side="Bottom" relative="$parent" pos="Mid" offset="-70"/>
+                <Text val="@UI/ScreenReplay/ConvertToReplay"/>
+                <Style val="ReplayConvertTitle"/>
+
+                <Animation name="DistortionAnim">
+                    <Event event="OnShown" frame="$parent" action="Reset,Play"/>
+
+                    <Controller type="Fade" end="Pause">
+                        <Key type="Curve" time="0" value="0" out="Fast"/>
+                        <Key type="Curve" time=".25" value="255" in="Slow"/>
+                        <Key type="Curve" time="1.4" value="255" in="Slow"/>
+                        <Key type="Curve" time="1.5" value="0" out="Fast"/>
+                    </Controller>
+                </Animation>
+            </Frame>
+
+            <Frame type="Image" name="Underline">
+                <Anchor side="Bottom" relative="$parent/RewindLabel" pos="Max" offset="10"/>
+                <Anchor side="Left" relative="$parent/RewindLabel" pos="Min" offset="-45"/>
+                <Anchor side="Right" relative="$parent/RewindLabel" pos="Max" offset="55"/>
+                <Texture val="@UI/SC2_InGame_Replay_Effect_Underline"/>
+                <TextureType val="Nineslice"/>
+                <Tiled val="True"/>
+                <Alpha val="0"/>
+
+                <Animation name="DistortionAnim">
+                    <Event event="OnShown" frame="$parent" action="Reset,Play"/>
+
+                    <Controller type="Fade" end="Pause">
+                        <Key type="Curve" time="0" value="0" out="Fast"/>
+                        <Key type="Curve" time=".25" value="255" in="Slow"/>
+                        <Key type="Curve" time="1.4" value="255" in="Slow"/>
+                        <Key type="Curve" time="1.5" value="0" out="Fast"/>
+                    </Controller>
+                </Animation>
+            </Frame>
+
+            <Frame type="Image" name="Arrow1">
+                <Anchor side="Bottom" relative="$parent/Underline" pos="Max" offset="10"/>
+                <Anchor side="Right" relative="$parent/Underline" pos="Min" offset="10"/>
+                <Texture val="@UI/SC2_InGame_Replay_Effect_Arrow"/>
+                <Alpha val="0"/>
+
+                <Animation name="StaticAnim1">
+                    <Event event="OnShown" frame="$parent" action="Reset,Play"/>
+
+                    <Controller type="Fade" end="Pause">
+                        <Key type="Curve" time="0" value="0" out="Fast"/>
+                        <Key type="Curve" time=".25" value="255" in="Slow"/>
+                        <Key type="Curve" time="1.4" value="255" in="Slow"/>
+                        <Key type="Curve" time="1.5" value="0" out="Fast"/>
+                    </Controller>
+                </Animation>
+            </Frame>
+
+            <Frame type="Image" name="Arrow1_Highlight">
+                <Anchor relative="$parent/Arrow1"/>
+                <Texture val="@UI/SC2_InGame_Replay_Effect_Arrow_Highlight"/>
+                <Alpha val="0"/>
+
+                <Animation name="StaticAnim1">
+                    <Event event="OnShown" frame="$parent" action="Reset,Play"/>
+
+                    <Controller type="Fade" end="Pause">
+                        <Key type="Curve" time="0" value="0" out="Fast"/>
+                        <Key type="Curve" time=".30" value="0" in="Slow"/>
+                        <Key type="Curve" time="0.35" value="255" in="Slow"/>
+                        <Key type="Curve" time="0.4" value="0" out="Fast"/>
+                        <Key type="Curve" time=".6" value="0" in="Slow"/>
+                        <Key type="Curve" time="0.65" value="255" in="Slow"/>
+                        <Key type="Curve" time="0.7" value="0" out="Fast"/>
+                        <Key type="Curve" time="1.5" value="0" out="Fast"/>
+                    </Controller>
+                </Animation>
+            </Frame>
+
+            <Frame type="Image" name="Arrow2">
+                <Anchor side="Top" relative="$parent/Arrow1" pos="Min" offset="0"/>
+                <Anchor side="Right" relative="$parent/Arrow1" pos="Min" offset="25"/>
+                <Texture val="@UI/SC2_InGame_Replay_Effect_Arrow"/>
+                <Alpha val="0"/>
+
+                <Animation name="StaticAnim2">
+                    <Event event="OnShown" frame="$parent" action="Reset,Play"/>
+
+                    <Controller type="Fade" end="Pause">
+                        <Key type="Curve" time="0" value="0" out="Fast"/>
+                        <Key type="Curve" time=".25" value="255" in="Slow"/>
+                        <Key type="Curve" time="1.4" value="255" in="Slow"/>
+                        <Key type="Curve" time="1.5" value="0" out="Fast"/>
+                    </Controller>
+                </Animation>
+            </Frame>
+
+            <Frame type="Image" name="Arrow2_Highlight">
+                <Anchor relative="$parent/Arrow2"/>
+                <Texture val="@UI/SC2_InGame_Replay_Effect_Arrow_Highlight"/>
+                <Alpha val="0"/>
+
+                <Animation name="StaticAnim1">
+                    <Event event="OnShown" frame="$parent" action="Reset,Play"/>
+
+                    <Controller type="Fade" end="Pause">
+                        <Key type="Curve" time="0" value="0" out="Fast"/>
+                        <Key type="Curve" time=".35" value="0" in="Slow"/>
+                        <Key type="Curve" time="0.4" value="255" in="Slow"/>
+                        <Key type="Curve" time="0.45" value="0" out="Fast"/>
+                        <Key type="Curve" time=".65" value="0" in="Slow"/>
+                        <Key type="Curve" time="0.7" value="255" in="Slow"/>
+                        <Key type="Curve" time="0.75" value="0" out="Fast"/>
+                        <Key type="Curve" time="1.5" value="0" out="Fast"/>
+                    </Controller>
+                </Animation>
+            </Frame>
+
+            <Frame type="Image" name="Arrow3">
+                <Anchor side="Top" relative="$parent/Arrow2" pos="Min" offset="0"/>
+                <Anchor side="Right" relative="$parent/Arrow2" pos="Min" offset="25"/>
+                <Texture val="@UI/SC2_InGame_Replay_Effect_Arrow"/>
+                <Alpha val="0"/>
+
+                <Animation name="StaticAnim3">
+                    <Event event="OnShown" frame="$parent" action="Reset,Play"/>
+
+                    <Controller type="Fade" end="Pause">
+                        <Key type="Curve" time="0" value="0" out="Fast"/>
+                        <Key type="Curve" time=".25" value="255" in="Slow"/>
+                        <Key type="Curve" time="1.4" value="255" in="Slow"/>
+                        <Key type="Curve" time="1.5" value="0" out="Fast"/>
+                    </Controller>
+                </Animation>
+            </Frame>
+
+            <Frame type="Image" name="Arrow3_Highlight">
+                <Anchor relative="$parent/Arrow3"/>
+                <Texture val="@UI/SC2_InGame_Replay_Effect_Arrow_Highlight"/>
+                <Alpha val="0"/>
+
+                <Animation name="StaticAnim1">
+                    <Event event="OnShown" frame="$parent" action="Reset,Play"/>
+
+                    <Controller type="Fade" end="Pause">
+                        <Key type="Curve" time="0" value="0" out="Fast"/>
+                        <Key type="Curve" time=".40" value="0" in="Slow"/>
+                        <Key type="Curve" time="0.45" value="255" in="Slow"/>
+                        <Key type="Curve" time="0.5" value="0" out="Fast"/>
+                        <Key type="Curve" time=".7" value="0" in="Slow"/>
+                        <Key type="Curve" time="0.75" value="255" in="Slow"/>
+                        <Key type="Curve" time="0.8" value="0" out="Fast"/>
+                        <Key type="Curve" time="1.5" value="0" out="Fast"/>
+                    </Controller>
+                </Animation>
             </Frame>
         </Frame>
 

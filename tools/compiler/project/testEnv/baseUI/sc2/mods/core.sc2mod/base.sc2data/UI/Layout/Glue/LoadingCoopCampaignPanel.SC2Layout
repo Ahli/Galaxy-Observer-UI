@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <Desc>
     <DescFlags val="Locked"/>
+    
+    <Constant name="Coop_LevelCircle_Color" val="0,120,255"/>
+    <Constant name="Coop_LevelCircle_Color_Mastery" val="255,78,0"/>
 
     <Frame type="LoadingCoopCampaignPlayerFrame" name="LoadingCoopCampaignPlayerFrameTemplate">
         <Width val="1024"/>
@@ -13,6 +16,13 @@
             <ScaleWidthToTexture val="True"/>
             <Width val="1024"/>
             <RenderPriority val="200"/>
+
+            <StateGroup name="VisibilityStateGroup">
+                <State name="HiddenState">
+                    <When type="Property" frame="$this" Texture=""/>
+                    <Action type="SetProperty" frame="$this" Visible="false"/>
+                </State>
+            </StateGroup>
         </Frame>
         
         <Frame type="Image" name="CommanderNameplateBG">
@@ -149,28 +159,58 @@
             </StateGroup>
         </Frame>
         
-        <Frame type="Label" name="CommanderLevelLabel">
-            <Anchor side="Top" relative="$parent/CommanderNameplate" pos="Min" offset="8"/>
-            <Anchor side="Bottom" relative="$parent/CommanderNameplate" pos="Max" offset="0"/>
+        <Frame type="Image" name="LevelCircleBackground">
+            <Anchor side="Top" relative="$parent/CommanderNameplate" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent/CommanderNameplate" pos="Mid" offset="0"/>
             <Anchor side="Left" relative="$parent" pos="Min" offset="50"/>
+            <Width val="144"/>
+            <Height val="144"/>
+            <LayerCount val="2"/>
+            
+            <Texture val="@UI/SC2_UI_Coop_Loading_LevelCircle" layer="0"/>
+            <AlphaLayer val="true" layer="0"/>
+            <AlphaChannel val="Red"/>
+            
+            <Texture val="Assets/Textures/white.dds" layer="1"/>
+            <LayerColor val="#Coop_LevelCircle_Color" layer="1"/>
+        </Frame>
+
+        <Frame type="Label" name="CommanderLevelLabel">
+            <Anchor side="Top" relative="$parent/LevelCircleBackground" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent/LevelCircleBackground" pos="Mid" offset="0"/>
+            <Anchor side="Left" relative="$parent/LevelCircleBackground" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent/LevelCircleBackground" pos="Mid" offset="0"/>
             <Style val="Coop_Loading_Level"/>
-            <RenderPriority val="400"/>
-            <CollapseLayout val="true"/>
         </Frame>
 
         <Frame type="Label" name="MasteryLevelLabel">
-            <Anchor side="Top" relative="$parent/CommanderNameplate" pos="Mid" offset="-2"/>
-            <Anchor side="Bottom" relative="$parent/CommanderNameplate" pos="Mid" offset="-2"/>
-            <Anchor side="Left" relative="$parent/CommanderLevelLabel" pos="Max" offset="0"/>
-            <Height val="110"/>
-            <Style val="@Coop_Loading_Level_Mastery"/>
-            <CollapseLayout val="true"/>
+            <Anchor side="Top" relative="$parent/LevelCircleBackground" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent/LevelCircleBackground" pos="Mid" offset="0"/>
+            <Anchor side="Left" relative="$parent/LevelCircleBackground" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent/LevelCircleBackground" pos="Mid" offset="0"/>
+            <Style val="Coop_Loading_Level_Mastery"/>
+            <Text val="{$parent/@MasteryLevel}"/>
+        </Frame>
 
-            <Frame type="PropertyBind" name="BindMasteryLevel">
-                <Anchor relative="$parent"/>
-                <Source frame="$parent/$parent" property="MasteryLevel"/>
-                <Target frame="$parent" property="Text"/>
-            </Frame>
+        <Frame type="Image" name="MasteryMaxIcon">
+            <Anchor side="Top" relative="$parent/LevelCircleBackground" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent/LevelCircleBackground" pos="Mid" offset="0"/>
+            <Anchor side="Left" relative="$parent/LevelCircleBackground" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent/LevelCircleBackground" pos="Mid" offset="0"/>
+            <Width val="140"/>
+            <Height val="140"/>
+            <Texture val="@UI/SC2_UI_Coop_CommanderIcon_MaxLevel"/>
+        </Frame>
+        
+        <Frame type="Image" name="LevelCircle">
+            <Anchor relative="$parent/LevelCircleBackground"/>
+            <LayerCount val="2"/>
+            
+            <Texture val="@UI/SC2_UI_Coop_Loading_LevelCircle" layer="0"/>
+            <AlphaLayer val="true" layer="0"/>
+            <AlphaChannel val="Green"/>
+            
+            <Texture val="Assets/Textures/white.dds" layer="1"/>
         </Frame>
 
         <StateGroup name="MasteryStateGroup">
@@ -180,17 +220,39 @@
                 <When type="Property" frame="$this" MasteryLevel="0"/>
                 <Action type="SetProperty" frame="CommanderLevelLabel" Visible="true"/>
                 <Action type="SetProperty" frame="MasteryLevelLabel" Visible="false"/>
+                <Action type="SetProperty" frame="MasteryMaxIcon" Visible="false"/>
+                <Action type="SetProperty" frame="LevelCircleBackground" LayerColor="#Coop_LevelCircle_Color" index="1"/>
+            </State>
+
+            <State name="MasteryMaxState">
+                <When type="Property" frame="$this" MasteryLevel="1000"/>
+                <Action type="SetProperty" frame="CommanderLevelLabel" Visible="false"/>
+                <Action type="SetProperty" frame="MasteryLevelLabel" Visible="false"/>
+                <Action type="SetProperty" frame="MasteryMaxIcon" Visible="true"/>
+                <Action type="SetProperty" frame="LevelCircleBackground" LayerColor="#Coop_LevelCircle_Color_Mastery" index="1"/>
+            </State>
+
+            <State name="MasteryThreeDigitState">
+                <When type="Property" frame="$this" operator="GreaterThanOrEqual" MasteryLevel="100"/>
+                <Action type="SetProperty" frame="CommanderLevelLabel" Visible="false"/>
+                <Action type="SetProperty" frame="MasteryLevelLabel" Visible="true"/>
+                <Action type="SetProperty" frame="MasteryMaxIcon" Visible="false"/>
+                <Action type="SetProperty" frame="MasteryLevelLabel" Style="Coop_Loading_Level_Mastery_TripleDigits"/>
+                <Action type="SetProperty" frame="LevelCircleBackground" LayerColor="#Coop_LevelCircle_Color_Mastery" index="1"/>
             </State>
 
             <State name="MasteryActiveState">
                 <Action type="SetProperty" frame="CommanderLevelLabel" Visible="false"/>
                 <Action type="SetProperty" frame="MasteryLevelLabel" Visible="true"/>
+                <Action type="SetProperty" frame="MasteryMaxIcon" Visible="false"/>
+                <Action type="SetProperty" frame="MasteryLevelLabel" Style="Coop_Loading_Level_Mastery"/>
+                <Action type="SetProperty" frame="LevelCircleBackground" LayerColor="#Coop_LevelCircle_Color_Mastery" index="1"/>
             </State>
         </StateGroup>
         
         <Frame type="Label" name="CommanderNameLabel">
             <Anchor side="Bottom" relative="$parent/CommanderNameplate" pos="Mid" offset="12"/>
-            <Anchor side="Left" relative="$parent/MasteryLevelLabel" pos="Max" offset="10"/>
+            <Anchor side="Left" relative="$parent/LevelCircleBackground" pos="Max" offset="10"/>
             <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
             <Style val="Coop_Loading_CommanderName"/>
             <RenderPriority val="400"/>
@@ -218,6 +280,13 @@
             <Width val="1024"/>
             <TextureCoords top="0.0" left="1.0" bottom="1" right="0"/>
             <RenderPriority val="200"/>
+
+            <StateGroup name="VisibilityStateGroup">
+                <State name="HiddenState">
+                    <When type="Property" frame="$this" Texture=""/>
+                    <Action type="SetProperty" frame="$this" Visible="false"/>
+                </State>
+            </StateGroup>
         </Frame>
         
         <Frame type="Image" name="CommanderNameplateBG">
@@ -358,28 +427,58 @@
             </StateGroup>
         </Frame>
         
-        <Frame type="Label" name="CommanderLevelLabel">
-            <Anchor side="Top" relative="$parent/CommanderNameplate" pos="Min" offset="6"/>
-            <Anchor side="Bottom" relative="$parent/CommanderNameplate" pos="Max" offset="0"/>
+        <Frame type="Image" name="LevelCircleBackground">
+            <Anchor side="Top" relative="$parent/CommanderNameplate" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent/CommanderNameplate" pos="Mid" offset="0"/>
             <Anchor side="Right" relative="$parent" pos="Max" offset="-50"/>
+            <Width val="144"/>
+            <Height val="144"/>
+            <LayerCount val="2"/>
+            
+            <Texture val="@UI/SC2_UI_Coop_Loading_LevelCircle" layer="0"/>
+            <AlphaLayer val="true" layer="0"/>
+            <AlphaChannel val="Red"/>
+            
+            <Texture val="Assets/Textures/white.dds" layer="1"/>
+            <LayerColor val="#Coop_LevelCircle_Color" layer="1"/>
+        </Frame>
+
+        <Frame type="Label" name="CommanderLevelLabel">
+            <Anchor side="Top" relative="$parent/LevelCircleBackground" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent/LevelCircleBackground" pos="Mid" offset="0"/>
+            <Anchor side="Left" relative="$parent/LevelCircleBackground" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent/LevelCircleBackground" pos="Mid" offset="0"/>
             <Style val="Coop_Loading_Level_Ally"/>
-            <RenderPriority val="400"/>
-            <CollapseLayout val="true"/>
         </Frame>
 
         <Frame type="Label" name="MasteryLevelLabel">
-            <Anchor side="Top" relative="$parent/CommanderNameplate" pos="Mid" offset="-2"/>
-            <Anchor side="Bottom" relative="$parent/CommanderNameplate" pos="Mid" offset="-2"/>
-            <Anchor side="Right" relative="$parent/CommanderLevelLabel" pos="Min" offset="0"/>
-            <Height val="110"/>
-            <Style val="@Coop_Loading_Level_Ally_Mastery"/>
-            <CollapseLayout val="true"/>
+            <Anchor side="Top" relative="$parent/LevelCircleBackground" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent/LevelCircleBackground" pos="Mid" offset="0"/>
+            <Anchor side="Left" relative="$parent/LevelCircleBackground" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent/LevelCircleBackground" pos="Mid" offset="0"/>
+            <Style val="Coop_Loading_Level_Ally_Mastery"/>
+            <Text val="{$parent/@MasteryLevel}"/>
+        </Frame>
 
-            <Frame type="PropertyBind" name="BindMasteryLevel">
-                <Anchor relative="$parent"/>
-                <Source frame="$parent/$parent" property="MasteryLevel"/>
-                <Target frame="$parent" property="Text"/>
-            </Frame>
+        <Frame type="Image" name="MasteryMaxIcon">
+            <Anchor side="Top" relative="$parent/LevelCircleBackground" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent/LevelCircleBackground" pos="Mid" offset="0"/>
+            <Anchor side="Left" relative="$parent/LevelCircleBackground" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent/LevelCircleBackground" pos="Mid" offset="0"/>
+            <Width val="140"/>
+            <Height val="140"/>
+            <Texture val="@UI/SC2_UI_Coop_CommanderIcon_MaxLevel"/>
+        </Frame>
+        
+        <Frame type="Image" name="LevelCircle">
+            <Anchor relative="$parent/LevelCircleBackground"/>
+            <LayerCount val="2"/>
+            
+            <Texture val="@UI/SC2_UI_Coop_Loading_LevelCircle" layer="0"/>
+            <AlphaLayer val="true" layer="0"/>
+            <AlphaChannel val="Green"/>
+            
+            <Texture val="Assets/Textures/white.dds" layer="1"/>
         </Frame>
 
         <StateGroup name="MasteryStateGroup">
@@ -389,18 +488,40 @@
                 <When type="Property" frame="$this" MasteryLevel="0"/>
                 <Action type="SetProperty" frame="CommanderLevelLabel" Visible="true"/>
                 <Action type="SetProperty" frame="MasteryLevelLabel" Visible="false"/>
+                <Action type="SetProperty" frame="MasteryMaxIcon" Visible="false"/>
+                <Action type="SetProperty" frame="LevelCircleBackground" LayerColor="#Coop_LevelCircle_Color" index="1"/>
+            </State>
+
+            <State name="MasteryMaxState">
+                <When type="Property" frame="$this" MasteryLevel="1000"/>
+                <Action type="SetProperty" frame="CommanderLevelLabel" Visible="false"/>
+                <Action type="SetProperty" frame="MasteryLevelLabel" Visible="false"/>
+                <Action type="SetProperty" frame="MasteryMaxIcon" Visible="true"/>
+                <Action type="SetProperty" frame="LevelCircleBackground" LayerColor="#Coop_LevelCircle_Color_Mastery" index="1"/>
+            </State>
+
+            <State name="MasteryThreeDigitState">
+                <When type="Property" frame="$this" operator="GreaterThanOrEqual" MasteryLevel="100"/>
+                <Action type="SetProperty" frame="CommanderLevelLabel" Visible="false"/>
+                <Action type="SetProperty" frame="MasteryLevelLabel" Visible="true"/>
+                <Action type="SetProperty" frame="MasteryMaxIcon" Visible="false"/>
+                <Action type="SetProperty" frame="MasteryLevelLabel" Style="Coop_Loading_Level_Ally_Mastery_TripleDigits"/>
+                <Action type="SetProperty" frame="LevelCircleBackground" LayerColor="#Coop_LevelCircle_Color_Mastery" index="1"/>
             </State>
 
             <State name="MasteryActiveState">
                 <Action type="SetProperty" frame="CommanderLevelLabel" Visible="false"/>
                 <Action type="SetProperty" frame="MasteryLevelLabel" Visible="true"/>
+                <Action type="SetProperty" frame="MasteryMaxIcon" Visible="false"/>
+                <Action type="SetProperty" frame="MasteryLevelLabel" Style="Coop_Loading_Level_Ally_Mastery"/>
+                <Action type="SetProperty" frame="LevelCircleBackground" LayerColor="#Coop_LevelCircle_Color_Mastery" index="1"/>
             </State>
         </StateGroup>
         
         <Frame type="Label" name="CommanderNameLabel">
             <Anchor side="Bottom" relative="$parent/CommanderNameplate" pos="Mid" offset="12"/>
             <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
-            <Anchor side="Right" relative="$parent/MasteryLevelLabel" pos="Min" offset="-30"/>
+            <Anchor side="Right" relative="$parent/LevelCircleBackground" pos="Min" offset="-30"/>
             <Style val="Coop_Loading_CommanderName_Ally"/>
             <RenderPriority val="400"/>
             <PreserveAnchorOffset val="true"/>
@@ -409,7 +530,7 @@
         <Frame type="Label" name="PlayerNameLabel">
             <Anchor side="Top" relative="$parent/CommanderNameLabel" pos="Max" offset="-5"/>
             <Anchor side="Left" relative="$parent/CommanderNameLabel" pos="Min" offset="0"/>
-            <Anchor side="Right" relative="$parent/MasteryLevelLabel" pos="Min" offset="-30"/>
+            <Anchor side="Right" relative="$parent/LevelCircleBackground" pos="Min" offset="-30"/>
             <Style val="Coop_Loading_PlayerName_Ally"/>
             <RenderPriority val="400"/>
             <PreserveAnchorOffset val="true"/>

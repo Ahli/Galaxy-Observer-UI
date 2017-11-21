@@ -16,18 +16,14 @@
         </Frame>
 
         <Frame type="Image" name="HealthBarBacking">
-            <Width val="210"/>
-            <Height val="52"/>
-            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Top" relative="$parent/$parent/CoreHealthBacking" pos="Min" offset="7"/>
+            <Anchor side="Left" relative="$parent/$parent/CoreHealthBacking" pos="Min" offset="15"/>
             <Texture val="@UI/HUD_TopBar_CoreHealth_Bar_Frame"/>
         </Frame>
 
         <Frame type="Image" name="HealthBarInvulnerable">
             <RenderPriority val="601"/>
-            <Anchor side="Top" relative="$parent\HealthBarBacking" pos="Mid" offset="-1"/>
-            <Anchor side="Bottom" relative="$parent\HealthBarBacking" pos="Mid" offset="-1"/>
-            <Anchor side="Left" relative="$parent\HealthBarBacking" pos="Mid" offset="0"/>
-            <Anchor side="Right" relative="$parent\HealthBarBacking" pos="Mid" offset="0"/>
+            <Anchor relative="$parent/HealthBar"/>
             <Texture val="@UI/HUD_TopBar_CoreHealth_Bar_Invulnerable"/>
             
             <Frame type="Image" name="Glow">
@@ -35,7 +31,7 @@
                 <BlendMode val="Add"/>
                 <ColorAdjustMode val="Colorize"/>
                 <Texture val="@UI/HUD_Bar_CoreHealth_Invulnerable_Glow"/>
-                <Visible val="False"/>            
+                <Visible val="False"/>
             </Frame>
         </Frame>
 
@@ -62,8 +58,6 @@
             <Texture val="@UI/HUD_TopBar_CoreHealth_BarLeft"/>
             <RenderPriority val="600"/>
             <BackgroundShown val="false"/>
-            <BarInsetRect top="0" left="0" bottom="0" right="0"/>
-            <BackgroundInsetRect top="0" left="0" bottom="0" right="0"/>
             <AllyColor val="0970ee" index="0"/>
             <EnemyColor val="ca240d" index="0"/>
 
@@ -96,6 +90,139 @@
             </Frame>
         </Frame>
 
+        <Frame type="Image" name="CoreAttackWarning">
+            <Anchor side="Top" relative="$parent/HealthBarBacking" pos="Min" offset="-10"/>
+            <Anchor side="Left" relative="$parent/HealthBarBacking" pos="Min" offset="-11"/>
+            <Anchor side="Bottom" relative="$parent/HealthBarBacking" pos="Max" offset="10"/>
+            <Anchor side="Right" relative="$parent/HealthBarBacking" pos="Max" offset="11"/>
+            <Texture val="@UI/Storm_InGame_CoreHealth_WarningFrame"/>
+            <Visible val="False"/>
+            
+            <!-- animation state from triggers (UI - Party Frame - Core Under Attack) -->
+            <StateGroup name="CoreUnderAttackWarning">
+                <State name="WarningOn">
+                    <When type="AnimationState" frame="$parent" CoreWarning="WarningOn"/>
+                    <Action type="SetProperty" visible="True"/>
+                    <Action type="SendEvent" frame="$this" event="FlashWarning"/>
+                </State>
+            </StateGroup>
+            
+            <Animation name="WarningEntrance">
+                <Event event="FlashWarning" action="Reset,Play"/>
+                
+                <Controller type="Fade" end="Pause">
+                    <Key type="Curve" time="0" value="0"/>
+                    <Key type="Curve" time="0.53" value="0" inout="Linear"/>
+                    <Key type="Curve" time="0.63" value="255" inout="Linear"/>
+                    <Key type="Curve" time="0.76" value="255" inout="Linear"/>
+                    <Key type="Curve" time="0.82" value="100" inout="Linear"/>
+                </Controller>
+                
+                <!-- Extra boldness on the highlight frame -->
+                <Controller type="Dimension" frame="$parent/CoreAttackWarningHighlight" dimension="Width" relative="False" percentage="True" end="Pause">
+                    <Key type="Curve" time="0" value="230"/>
+                    <Key type="Curve" time="0.2" value="230"/>
+                    <Key type="Curve" time="0.6" value="100" inout="Fast,Slow"/>
+                </Controller>
+                
+                <Controller type="Dimension" frame="$parent/CoreAttackWarningHighlight" dimension="Height" relative="False" percentage="True" end="Pause">
+                    <Key type="Curve" time="0" value="230"/>
+                    <Key type="Curve" time="0.2" value="230"/>
+                    <Key type="Curve" time="0.6" value="100" inout="Fast,Slow"/>
+                </Controller>
+                
+                <Controller type="Fade" frame="$parent/CoreAttackWarningHighlight" end="Pause">
+                    <Key type="Curve" time="0" value="0" inout="Linear"/>
+                    <Key type="Curve" time="0.2" value="0" inout="Linear"/>
+                    <Key type="Curve" time="0.4" value="75" inout="Linear"/>
+                    <Key type="Curve" time="0.6" value="125" inout="Linear"/>
+                    <Key type="Curve" time="0.93" value="0" inout="Linear"/>
+                </Controller>
+                
+                <!-- Highlight echo 1 -->
+                <Controller type="Dimension" frame="$parent/CoreAttackWarningHighlight2" dimension="Width" relative="False" percentage="True" end="Stop">
+                    <Key type="Curve" time="0" value="177"/>
+                    <Key type="Curve" time="0.26" value="177"/>
+                    <Key type="Curve" time="0.5" value="100" inout="Fast,Slow"/>
+                </Controller>
+                
+                <Controller type="Dimension" frame="$parent/CoreAttackWarningHighlight2" dimension="Height" relative="False" percentage="True" end="Stop">
+                    <Key type="Curve" time="0" value="177"/>
+                    <Key type="Curve" time="0.26" value="177"/>
+                    <Key type="Curve" time="0.5" value="100" inout="Fast,Slow"/>
+                </Controller>
+                
+                <Controller type="Fade" frame="$parent/CoreAttackWarningHighlight2" end="Stop">
+                    <Key type="Curve" time="0" value="0" inout="Linear"/>
+                    <Key type="Curve" time="0.23" value="0" inout="Linear"/>
+                    <Key type="Curve" time="0.26" value="51" inout="Linear"/>
+                    <Key type="Curve" time="0.36" value="200" inout="Linear"/>
+                    <Key type="Curve" time="0.5" value="230" inout="Linear"/>
+                    <Key type="Curve" time="0.93" value="0" inout="Linear"/>
+                </Controller>
+                
+                <!-- Highlight echo 2 -->
+                <Controller type="Dimension" frame="$parent/CoreAttackWarningHighlight3" dimension="Width" relative="False" percentage="True" end="Stop">
+                    <Key type="Curve" time="0" value="141"/>
+                    <Key type="Curve" time="0.33" value="141"/>
+                    <Key type="Curve" time="0.47" value="100" inout="Fast,Slow"/>
+                </Controller>
+                
+                <Controller type="Dimension" frame="$parent/CoreAttackWarningHighlight3" dimension="Height" relative="False" percentage="True" end="Stop">
+                    <Key type="Curve" time="0" value="141"/>
+                    <Key type="Curve" time="0.33" value="141"/>
+                    <Key type="Curve" time="0.47" value="100" inout="Fast,Slow"/>
+                </Controller>
+                
+                <Controller type="Fade" frame="$parent/CoreAttackWarningHighlight3" end="Stop">
+                    <Key type="Curve" time="0" value="0" inout="Linear"/>
+                    <Key type="Curve" time="0.3" value="0" inout="Linear"/>
+                    <Key type="Curve" time="0.33" value="102" inout="Linear"/>
+                    <Key type="Curve" time="0.4" value="230" inout="Linear"/>
+                    <Key type="Curve" time="0.47" value="255" inout="Linear"/>
+                    <Key type="Curve" time="0.8" value="0" inout="Linear"/>
+                </Controller>
+                
+                <Controller type="Event" end="Stop">
+                    <Key type="Event" time="0.82" event="ContinueFlash"/>
+                </Controller>
+                
+                <Controller type="Visibility" frame="$parent/CoreAttackWarningHighlight" end="Pause">
+                    <Key type="Bool" time="0" value="True"/>
+                    <Key type="Bool" time="0.93" value="False"/>
+                </Controller>
+            </Animation>
+            
+            <Animation name="WarningFlash">
+                <Event event="ContinueFlash" action="Play"/>
+                
+                <Controller type="Fade" end="PingPong">
+                    <Key type="Curve" time="0" value="100" inout="Linear"/>
+                    <Key type="Curve" time="0.4" value="255" inout="Linear"/>
+                </Controller>
+            </Animation>
+        </Frame>
+        
+        <Frame type="Image" name="CoreAttackWarningHighlight">
+            <Anchor side="Top" relative="$parent/CoreAttackWarning" pos="Mid" offset="0"/>
+            <Anchor side="Left" relative="$parent/CoreAttackWarning" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent/CoreAttackWarning" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent/CoreAttackWarning" pos="Mid" offset="0"/>
+            <Texture val="@UI/Storm_InGame_CoreHealth_WarningHighlight"/>
+            <Visible val="False"/>
+            <Alpha val="0"/>
+            <!-- unclip for the landing animation -->
+            <Unclipped val="true"/>
+        </Frame>
+        
+        <Frame type="Image" name="CoreAttackWarningHighlight2" template="TopBar/CoreUnitStatusBaseTemplate/CoreAttackWarningHighlight">
+            <Visible val="{$parent/CoreAttackWarningHighlight/@Visible}"/>
+        </Frame>
+        
+        <Frame type="Image" name="CoreAttackWarningHighlight3" template="TopBar/CoreUnitStatusBaseTemplate/CoreAttackWarningHighlight">
+            <Visible val="{$parent/CoreAttackWarningHighlight/@Visible}"/>
+        </Frame>
+        
         <Frame type="UnitStatusHealthLabel" name="HealthLabel">
             <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
             <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
@@ -127,8 +254,8 @@
                 <Event event="Show" action="DirectionForward,Play"/>
 
                 <Controller type="Fade" end="Pause">
-                    <Key type="Curve" time="0.0" value="0" out="Fast"/>
-                    <Key type="Curve" time="0.15" value="255" in="Fast"/>
+                    <Key type="Curve" time="0.0" value="0" inout="Linear"/>
+                    <Key type="Curve" time="0.15" value="255" inout="Linear"/>
                 </Controller>
             </Animation>
 
@@ -141,13 +268,13 @@
                 </Controller>
 
                 <Controller type="Fade" end="Pause" frame="$parent/HealthLabel/StatusLabel">
-                    <Key type="Curve" time="0.0" value="255" out="Fast"/>
-                    <Key type="Curve" time="0.15" value="0" in="Fast"/>
+                    <Key type="Curve" time="0.0" value="255" inout="Linear"/>
+                    <Key type="Curve" time="0.15" value="0" inout="Linear"/>
                 </Controller>
 
                 <Controller type="Fade" end="Pause" frame="$parent/HealthBarInvulnerable">
-                    <Key type="Curve" time="0.0" value="0" out="Fast"/>
-                    <Key type="Curve" time="0.15" value="255" in="Fast"/>
+                    <Key type="Curve" time="0.0" value="0" inout="Linear"/>
+                    <Key type="Curve" time="0.15" value="255" inout="Linear"/>
                 </Controller>
             </Animation>
 
@@ -195,7 +322,7 @@
             <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
             <TextureCoords top="0.0" left="1.0" bottom="1.0" right="0.0"/>
         </Frame>
-
+        
         <Frame type="Image" name="HealthBarInvulnerable">
             <TextureCoords top="0.0" left="1.0" bottom="1.0" right="0.0"/>
             <Frame type="Image" name="Glow">
@@ -207,6 +334,26 @@
             <Anchor side="Right" relative="$parent" pos="Max" offset="-19"/>
             <Texture val="@UI/HUD_TopBar_CoreHealth_BarRight"/>
             <Expansion val="Right"/>
+        </Frame>
+        
+        <Frame type="Image" name="CoreAttackWarning">
+            <Anchor side="Left" relative="$parent/HealthBarBacking" pos="Min" offset="-11"/>
+            <Anchor side="Right" relative="$parent/HealthBarBacking" pos="Max" offset="11"/>
+            <TextureCoords top="0.0" left="1.0" bottom="1.0" right="0.0"/>
+        </Frame>
+        
+        <Frame type="Image" name="CoreAttackWarningHighlight">
+            <TextureCoords top="0.0" left="1.0" bottom="1.0" right="0.0"/>
+        </Frame>
+        
+        <Frame type="Image" name="CoreAttackWarningHighlight2" template="TopBar/CoreUnitStatusBaseTemplate/CoreAttackWarningHighlight">
+            <TextureCoords top="0.0" left="1.0" bottom="1.0" right="0.0"/>
+            <Visible val="{$parent/CoreAttackWarningHighlight/@Visible}"/>
+        </Frame>
+        
+        <Frame type="Image" name="CoreAttackWarningHighlight3" template="TopBar/CoreUnitStatusBaseTemplate/CoreAttackWarningHighlight">
+            <TextureCoords top="0.0" left="1.0" bottom="1.0" right="0.0"/>
+            <Visible val="{$parent/CoreAttackWarningHighlight/@Visible}"/>
         </Frame>
 
         <Frame type="UnitStatusHealthLabel" name="HealthLabel">
@@ -507,7 +654,7 @@
                     </Frame>
                 </Frame>
 
-                <Animation name="TeamColorSwap"> 
+                <Animation name="TeamColorSwap">
                     <Event event="EnemyColorSwap" action="Restart, DirectionForward, Play" frame="$NormalModeContainer/Team2XPInfoFrame"/>
                     <Event event="AllyColorSwap" action="Stop" frame="$NormalModeContainer/Team2XPInfoFrame"/>
 
@@ -527,7 +674,7 @@
                         <Key type="Curve" time="0" value="0"/>
                         <Key type="Curve" time=".01" value="1"/>
                     </Controller>
-                </Animation> 
+                </Animation>
             </Frame>
         </Frame>
 
@@ -551,8 +698,8 @@
     </Frame>
 
     <!--===============================================================================
-        The frame containing Normal Mode UI bits: XP bar, Team levels, core health etc. 
-        Hidden in Arena Mode. 
+        The frame containing Normal Mode UI bits: XP bar, Team levels, core health etc.
+        Hidden in Arena Mode.
     ================================================================================-->
     <Frame type="Frame" name="NormalModeContainerTemplate">
         <Handle val="NormalModeContainer"/>
@@ -667,24 +814,22 @@
             <Text val="1"/>
 
             <Animation name="LevelUpBlue">
-                <Event event="Team1LevelUpBlue" action="Reset" frame="$parent/$parent"/>
-                <Event event="Team1LevelUpBlue" action="Play" frame="$parent/$parent"/>
+                <Event event="Team1LevelUpBlue" action="Reset,Play" frame="$parent/$parent"/>
                 <Controller type="Style" end="Stop" style1="PartyFrame_TeamLevel" style2="PartyFrame_TeamLevel" >
-                    <Key type="Curve" time="0.00" value="0.0" out="Slow"/>
-                    <Key type="Curve" time="0.25" value="1.0" in="Slow" out="Slow"/>
-                    <Key type="Curve" time="2.75" value="1.0" in="Slow" out="Slow"/>
-                    <Key type="Curve" time="3.00" value="0.0" in="Slow"/>
+                    <Key type="Curve" time="0.00" value="0.0" inout="Linear,Slow"/>
+                    <Key type="Curve" time="0.25" value="1.0" inout="Slow"/>
+                    <Key type="Curve" time="2.75" value="1.0" inout="Slow"/>
+                    <Key type="Curve" time="3.00" value="0.0" inout="Slow,Linear"/>
                 </Controller>
             </Animation>
 
             <Animation name="LevelUpRed">
-                <Event event="Team1LevelUpRed" action="Reset" frame="$parent/$parent"/>
-                <Event event="Team1LevelUpRed" action="Play" frame="$parent/$parent"/>
+                <Event event="Team1LevelUpRed" action="Reset,Play" frame="$parent/$parent"/>
                 <Controller type="Style" end="Stop" style1="PartyFrame_TeamLevel" style2="PartyFrame_TeamLevel" >
-                    <Key type="Curve" time="0.00" value="0.0" out="Slow"/>
-                    <Key type="Curve" time="0.25" value="1.0" in="Slow" out="Slow"/>
-                    <Key type="Curve" time="2.75" value="1.0" in="Slow" out="Slow"/>
-                    <Key type="Curve" time="3.00" value="0.0" in="Slow"/>
+                    <Key type="Curve" time="0.00" value="0.0" inout="Linear,Slow"/>
+                    <Key type="Curve" time="0.25" value="1.0" inout="Slow"/>
+                    <Key type="Curve" time="2.75" value="1.0" inout="Slow"/>
+                    <Key type="Curve" time="3.00" value="0.0" inout="Slow,Linear"/>
                 </Controller>
             </Animation>
         </Frame>
@@ -715,24 +860,22 @@
             <Text val="1"/>
 
             <Animation name="LevelUpBlue">
-                <Event event="Team2LevelUpBlue" action="Reset" frame="$parent/$parent"/>
-                <Event event="Team2LevelUpBlue" action="Play" frame="$parent/$parent"/>
+                <Event event="Team2LevelUpBlue" action="Reset,Play" frame="$parent/$parent"/>
                 <Controller type="Style" end="Stop" style1="PartyFrame_TeamLevel_Highlight" style2="PartyFrame_TeamLevel_Highlight" >
-                    <Key type="Curve" time="0.00" value="0.0" out="Slow"/>
-                    <Key type="Curve" time="0.25" value="1.0" in="Slow" out="Slow"/>
-                    <Key type="Curve" time="2.75" value="1.0" in="Slow" out="Slow"/>
-                    <Key type="Curve" time="3.00" value="0.0" in="Slow"/>
+                    <Key type="Curve" time="0.00" value="0.0" inout="Linear,Slow"/>
+                    <Key type="Curve" time="0.25" value="1.0" inout="Slow"/>
+                    <Key type="Curve" time="2.75" value="1.0" inout="Slow"/>
+                    <Key type="Curve" time="3.00" value="0.0" inout="Slow,Linear"/>
                 </Controller>
             </Animation>
 
             <Animation name="LevelUpRed">
-                <Event event="Team2LevelUpRed" action="Reset" frame="$parent/$parent"/>
-                <Event event="Team2LevelUpRed" action="Play" frame="$parent/$parent"/>
+                <Event event="Team2LevelUpRed" action="Reset,Play" frame="$parent/$parent"/>
                 <Controller type="Style" end="Stop" style1="PartyFrame_TeamLevel_Highlight" style2="PartyFrame_TeamLevel_Highlight" >
-                    <Key type="Curve" time="0.00" value="0.0" out="Slow"/>
-                    <Key type="Curve" time="0.25" value="1.0" in="Slow" out="Slow"/>
-                    <Key type="Curve" time="2.75" value="1.0" in="Slow" out="Slow"/>
-                    <Key type="Curve" time="3.00" value="0.0" in="Slow"/>
+                    <Key type="Curve" time="0.00" value="0.0" inout="Linear,Slow"/>
+                    <Key type="Curve" time="0.25" value="1.0" inout="Slow"/>
+                    <Key type="Curve" time="2.75" value="1.0" inout="Slow"/>
+                    <Key type="Curve" time="3.00" value="0.0" inout="Slow,Linear"/>
                 </Controller>
             </Animation>
         </Frame>
@@ -765,12 +908,12 @@
             <Alpha val="0"/>
 
             <Animation name="FadeInTop">
-                <Event event="TutorialTopBarHighlight" frame="$parent" action="Reset,Play"/>
+                <Event event="TutorialTopBarHighlight" action="Reset,Play" frame="$parent"/>
 
                 <Controller type="Fade" end="Pause">
-                    <Key type="Curve" time="0" value="0" out="Fast"/>
-                    <Key type="Curve" time="1" value="0" in="Fast"/>
-                    <Key type="Curve" time="1.5" value="255" in="Fast"/>
+                    <Key type="Curve" time="0" value="0" inout="Linear"/>
+                    <Key type="Curve" time="1" value="0" inout="Linear"/>
+                    <Key type="Curve" time="1.5" value="255" inout="Linear"/>
                 </Controller>
             </Animation>
         </Frame>
@@ -796,6 +939,23 @@
             </Frame>
         </Frame>
         
+        <Frame type="Image" name="TutorialEXP1">
+            <Anchor relative="$parent/NormalModeContainer/Team1XPUnitStatusFrame/XPBar" offset="0"/>
+            <Texture val="{$parent/NormalModeContainer/Team1XPUnitStatusFrame/XPBar/@Texture}"/>
+            <LightAdjustColor val="135ce1"/>
+            <ColorAdjustMode val="Colorize"/>
+            <Visible val="false"/>
+
+            <Animation name="Blink">
+                <Event event="OnShown" action="Play"/>
+                <Event event="OnHidden" action="Stop"/>
+                <Controller type="Fade" end="PingPong">
+                    <Key type="Curve" time="0" value="0" inout="Linear,Slow"/>
+                    <Key type="Curve" time="0.5" value="255" inout="Linear"/>
+                </Controller>
+            </Animation>
+        </Frame>
+
         <Frame type="Frame" name="TutorialArrowLevel2" template="StartingExperience/HUDAlertArrow_Single">
             <Anchor side="Left" relative="$parent/NormalModeContainer/Team2LevelLabel" pos="Mid" offset="0"/>
             <Anchor side="Right" relative="$parent/NormalModeContainer/Team2LevelLabel" pos="Mid" offset="0"/>
@@ -818,18 +978,18 @@
                 <Key type="Bool" time="0" value="True"/>
             </Controller>
             <Controller type="Style" end="Loop" style1="PartyFrame_TeamLevel" style2="PartyFrame_TeamLevel_Highlight" frame="NormalModeContainer/Team1LevelLabel">
-                <Key type="Curve" time="0" value="1" out="Slow"/>
-                <Key type="Curve" time=".1" value="1" out="Slow"/>
-                <Key type="Curve" time=".5" value="0" in="Slow" out="Slow"/>
-                <Key type="Curve" time=".7" value="1" in="Slow"/>
-                <Key type="Curve" time=".8" value="1" in="Slow"/>
+                <Key type="Curve" time="0" value="1" inout="Linear,Slow"/>
+                <Key type="Curve" time=".1" value="1" inout="Linear,Slow"/>
+                <Key type="Curve" time=".5" value="0" inout="Slow"/>
+                <Key type="Curve" time=".7" value="1" inout="Slow,Linear"/>
+                <Key type="Curve" time=".8" value="1" inout="Slow,Linear"/>
             </Controller>
             <Controller type="Style" end="Loop" style1="PartyFrame_TeamLevel" style2="PartyFrame_TeamLevel_Highlight" frame="NormalModeContainer/Team2LevelLabel">
-                <Key type="Curve" time="0" value="1" out="Slow"/>
-                <Key type="Curve" time=".1" value="1" out="Slow"/>
-                <Key type="Curve" time=".5" value="0" in="Slow" out="Slow"/>
-                <Key type="Curve" time=".7" value="1" in="Slow"/>
-                <Key type="Curve" time=".8" value="1" in="Slow"/>
+                <Key type="Curve" time="0" value="1" inout="Linear,Slow"/>
+                <Key type="Curve" time=".1" value="1" inout="Linear,Slow"/>
+                <Key type="Curve" time=".5" value="0" inout="Slow"/>
+                <Key type="Curve" time=".7" value="1" inout="Slow,Linear"/>
+                <Key type="Curve" time=".8" value="1" inout="Slow,Linear"/>
             </Controller>
         </Animation>
         
@@ -841,11 +1001,11 @@
                 <Key type="Bool" time="0" value="True"/>
             </Controller>
             <Controller type="Style" end="Loop" style1="PartyFrame_TeamLevel" style2="PartyFrame_TeamLevel_Highlight" frame="NormalModeContainer/Team1LevelLabel">
-                <Key type="Curve" time="0" value="1" out="Slow"/>
-                <Key type="Curve" time=".1" value="1" out="Slow"/>
-                <Key type="Curve" time=".5" value="0" in="Slow" out="Slow"/>
-                <Key type="Curve" time=".7" value="1" in="Slow"/>
-                <Key type="Curve" time=".8" value="1" in="Slow"/>
+                <Key type="Curve" time="0" value="1" inout="Linear,Slow"/>
+                <Key type="Curve" time=".1" value="1" inout="Linear,Slow"/>
+                <Key type="Curve" time=".5" value="0" inout="Slow"/>
+                <Key type="Curve" time=".7" value="1" inout="Slow,Linear"/>
+                <Key type="Curve" time=".8" value="1" inout="Slow,Linear"/>
             </Controller>
         </Animation>
 
@@ -854,6 +1014,9 @@
             <Event event="EXPFlashStop" action="Stop"/>
 
             <Controller type="Visibility" end="Pause" frame="TutorialArrowEXP1">
+                <Key type="Bool" time="0" value="True"/>
+            </Controller>
+            <Controller type="Visibility" end="Pause" frame="TutorialEXP1">
                 <Key type="Bool" time="0" value="True"/>
             </Controller>
         </Animation>
@@ -866,31 +1029,31 @@
             <Visible val="False"/>
 
             <Animation name="TutorialPartyFrameFlash">
-                <Event event="TutorialTopBarHighlight" frame="$parent" action="Reset,Play"/>
+                <Event event="TutorialTopBarHighlight" action="Reset,Play" frame="$parent"/>
 
                 <Controller type="Visibility" end="Pause">
                     <Key type="Bool" time="0" value="True"/>
                 </Controller>
 
                 <Controller type="Anchor" end="Pause" side="Top" relative="true">
-                    <Key type="Curve" time="0" value="0" out="Fast"/>
-                    <Key type="Curve" time="1" value="-200" in="Slow"/>
+                    <Key type="Curve" time="0" value="0" inout="Linear"/>
+                    <Key type="Curve" time="1" value="-200" inout="Slow,Linear"/>
                 </Controller>
 
                 <Controller type="Fade" end="Pause">
-                    <Key type="Curve" time="0" value="255" out="Fast"/>
-                    <Key type="Curve" time="1" value="255" in="Fast"/>
-                    <Key type="Curve" time="1.875" value="0" in="Fast"/>
-                    <Key type="Curve" time="2.75" value="255" in="Fast"/>
-                    <Key type="Curve" time="3.625" value="0" in="Fast"/>
-                    <Key type="Curve" time="4.5" value="255" in="Fast"/>
-                    <Key type="Curve" time="5.375" value="0" in="Fast"/>
-                    <Key type="Curve" time="6.25" value="255" in="Fast"/>
-                    <Key type="Curve" time="7.125" value="0" in="Fast"/>
-                    <Key type="Curve" time="8" value="255" in="Fast"/>
-                    <Key type="Curve" time="8.875" value="0" in="Fast"/>
-                    <Key type="Curve" time="9.75" value="255" in="Fast"/>
-                    <Key type="Curve" time="10.5" value="0" in="Fast"/>
+                    <Key type="Curve" time="0" value="255" inout="Linear"/>
+                    <Key type="Curve" time="1" value="255" inout="Linear"/>
+                    <Key type="Curve" time="1.875" value="0" inout="Linear"/>
+                    <Key type="Curve" time="2.75" value="255" inout="Linear"/>
+                    <Key type="Curve" time="3.625" value="0" inout="Linear"/>
+                    <Key type="Curve" time="4.5" value="255" inout="Linear"/>
+                    <Key type="Curve" time="5.375" value="0" inout="Linear"/>
+                    <Key type="Curve" time="6.25" value="255" inout="Linear"/>
+                    <Key type="Curve" time="7.125" value="0" inout="Linear"/>
+                    <Key type="Curve" time="8" value="255" inout="Linear"/>
+                    <Key type="Curve" time="8.875" value="0" inout="Linear"/>
+                    <Key type="Curve" time="9.75" value="255" inout="Linear"/>
+                    <Key type="Curve" time="10.5" value="0" inout="Linear"/>
                 </Controller>
             </Animation>
         </Frame>

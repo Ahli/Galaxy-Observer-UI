@@ -1,9 +1,130 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <Desc>
 
+    <Frame type="SelectionUnitStatusPanel" name="JainaStacksFrameContainer">
+        <Anchor relative="$parent"/>
+        <SpecificUnit val="HeroJaina"/>
+
+        <Frame type="UnitStatusUnitStackingDebuffElement" name="StacksFrame" template="UnitStatus/SingleBehaviorTemplate">
+            <BuffBehavior val="JainaChilledDamageBonus"/>
+
+            <Frame type="Image" name="StacksFull">
+                <Texture val="@UI/Stacks/Jaina"/>
+            </Frame>
+        </Frame>
+    </Frame>
+
     <Frame type="SelectionUnitStatusPanel" name="JainaBackplate" template="StandardHeroUITemplates/CircularHeroUIBackplateTemplate">
         <SpecificUnit val="HeroJaina"/>
     </Frame>
+    
+    <Frame type="UnitStatusFrame" name="JainaIceBlockButtonOverlayFrame">
+        <Anchor relative="$parent"/>
+        <Visible val="True"/>
+
+        <!-- Animation Events To turn off the Container frame for the Ice Block Progress bar-->
+        <Frame type="UnitStatusValidatorAnimElement" name="JainaIceBlockUsedAnim">
+            <Anchor relative="$parent"/>
+            <Validator val="JainaDoesHaveIceBlockUsed"/>
+
+            <Animation name="JainaDoesHaveIceBlockUsed">
+                <Event event="Reset" action="Stop"/>
+                <Event event="JainaDoesHaveIceBlockUsed" action="Restart, Play"/>
+
+                <Controller type="Visibility" end="Pause" frame="$parent/JainaIceBlockContrainerFrame">
+                    <Key type="Bool" time="0" value="True"/>
+                    <Key type="Bool" time="0" value="False"/>
+                </Controller>
+            </Animation>
+        </Frame>
+
+        <Frame type="Frame" name="JainaIceBlockContrainerFrame">
+            <Anchor relative="$parent"/>
+            <Visible val="True"/>
+
+            <!-- Animation Events to flash the ProgressBar when Ice Block is useable-->
+            <Frame type="UnitStatusValidatorAnimElement" name="JainaIceBlockActiveAnims">
+                <Anchor relative="$parent"/>
+                <Validator val="JainaHasIceBlockButtonFlash"/>
+
+                <Animation name="JainaIceBlockReadyPulse">
+                    <Event event="Reset" action="Stop"/>
+                    <Event event="NoState" action="Stop"/>
+                    <Event event="JainaHasIceBlockButtonFlash" action="Restart, Play"/>
+
+                    <Controller type="Property" property="ColorAdjustMode" end="Pause" frame="$parent/JainaIceBlockBehaviorIcon/BehaviorIcon/JainaIceBlockProgress/FillImageContainer/FillImage">
+                      <Key type="Property" time="0" value="Addself"/>
+                    </Controller>
+
+                    <Controller type="AdjustmentColor" end="pingpong" frame="$parent/JainaIceBlockBehaviorIcon/BehaviorIcon/JainaIceBlockProgress/FillImageContainer/FillImage">
+                        <Key type="Curve" time="0" value="002573" inout="Linear"/>
+                        <Key type="Curve" time=".5" value="007fc3" inout="Linear,Slow"/>
+                    </Controller>
+                </Animation>
+            </Frame>
+
+            <Frame type="Image" name="JainaIceBlockDarkBackGround">
+                <Anchor relative="$parent/JainaIceBlockBehaviorIcon/BehaviorIcon/JainaIceBlockProgress"/>
+                <Visible val="True"/>
+                <Alpha val="255"/>
+                <ColorAdjustMode val="None"/>
+                <Desaturated val="True"/>
+                <DesaturationColor val="202020"/>
+                <SubpixelRendering val="True"/>
+                <BlendMode val="Normal"/>
+                <RenderType val="LDR"/>
+                <Texture val="@UI/storm_ui_icon_Jaina_ImprovedIceBlock"/>
+                <ImageMaskTexture val="@UI/HUD_BTN_BG_Ability_AlphaMask"/>
+            </Frame>
+
+            <!-- Progress Bar for Ice Block activation-->
+            <Frame type="UnitStatusBehaviorIcon" name="JainaIceBlockBehaviorIcon">
+                <Anchor relative="$parent"/>
+                <Alpha val="255"/>
+                <AcceptsMouse val="False"/>
+                <RenderPriority val="610"/>
+                <Behavior val="JainaFrostbiteTokenCounter"/>
+
+                <Frame type="BehaviorIcon" name="BehaviorIcon">
+                    <Anchor relative="$parent"/>
+                    <AcceptsMouse val="False"/>
+
+                    <Frame type="ProgressBar" name="JainaIceBlockProgress">
+                        <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                        <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                        <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+                        <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+                        <AcceptsMouse val="False"/>
+                        <MinValue val="0"/>
+                        <MaxValue val="{$parent/@MaxStackCount}"/>
+                        <Value val="{$parent/@CurrentStackCount}"/>
+                        <FillInset val="0.0"/>
+                        <Height val="66"/>
+                        <Width val="66"/>
+                        <Vertical val="True"/>
+                        <UseFillContainer val="False"/>                    
+
+                        <Frame type="Frame" name="FillImageContainer">
+                            <Anchor relative="$parent"/>
+
+                            <Frame type="Image" name="FillImage">
+                                <Anchor relative="$parent"/>
+                                <Texture val="@UI/storm_ui_icon_Jaina_ImprovedIceBlock"/>
+                                <ImageMaskTexture val="@UI/HUD_BTN_BG_Ability_AlphaMask"/>
+                                <RenderPriority val="600"/>
+                                <SubpixelRendering val="True"/>
+                                <ColorAdjustMode val="None"/>
+                                <Desaturated val="True"/>
+                                <DesaturationColor val="494B83"/>
+                                <Alpha val="255"/>
+                            </Frame>
+                        </Frame>
+                    </Frame>
+                </Frame>
+            </Frame>
+        </Frame>
+    </Frame>
+    
 
     <Frame type="SelectionUnitStatusPanel" name="JainaFrame" template="StandardHeroUITemplates/CircularHeroUITemplate">
         <SpecificUnit val="HeroJaina"/>
@@ -16,16 +137,19 @@
 
                 <Frame type="BehaviorIcon" name="JainaIceBarrierTooltip">
                     <Anchor relative="$parent"/>
-                    <TooltipFrame val="StandardNameTooltip"/>
+                    <TooltipFrame val="BehaviorIconTooltip"/>
                     <Behavior val="JainaFrostbiteIceBarrierCarryBehavior"/>
                 </Frame>
             </Frame>
 
             <Frame type="UnitStatusBehaviorIcon" name="IceBarrierShield" template="StandardHeroUITemplates/CircularBehaviorCountdownBarTemplate">
                 <Behavior val="JainaFrostbiteIceBarrierShield"/>
-
+                <Visible val="False"/>
                 <Animation name="IceBarrierActive" template="StandardHeroUITemplates/PulseInAnimTemplate">
                     <Event event="OnShown" action="Reset, Play"/>
+                    <Controller type="Visibility" end="Pause" frame="$parent">
+                        <Key type="Bool" time="0" value="True"/>
+                    </Controller>
                 </Animation>
 
                 <Animation name="IceBarrierDeactive" template="StandardHeroUITemplates/PulseOutAnimTemplate">

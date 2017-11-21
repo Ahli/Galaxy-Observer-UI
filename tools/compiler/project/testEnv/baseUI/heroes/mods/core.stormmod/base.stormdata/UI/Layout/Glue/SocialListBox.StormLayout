@@ -6,33 +6,23 @@
         <TooltipAnchorPosition val="MiddleLeft"/>
         <TooltipFrame val="UserTooltip"/>
         
-        <Animation name="OfflineStyle">
-            <Event event="Begin" action="Stop"/>
-            <Event event="End" action="Restart"/>
-            <Event event="End" action="Play"/>
-            <Controller type="Fade" end="Pause" frame="UserContainer">
-                <Key type="Curve" time="0" value="255"/>
-                <Key type="Curve" time=".01" value="97"/>
-            </Controller>
-            <Controller type="Visibility" end="Pause" frame="UserContainer/OfflineImage">
-                <Key type="Bool" time="0" value="false"/>
-                <Key type="Bool" time=".01" value="true"/>
-            </Controller>
-            <Controller type="Visibility" end="Pause" frame="UserContainer/AvatarFrame/PortraitContainer/PortraitFrame/UnlockableImage">
-                <Key type="Bool" time="0" value="true"/>
-                <Key type="Bool" time=".01" value="false"/>
-            </Controller>
-            <Controller type="Style" end="Pause" style1="SocialPlayerName" style2="SocialPlayerNameOffline" frame="UserContainer/NameLabel">
-                <Key type="Curve" time="0" value="0"/>
-                <Key type="Curve" time=".01" value="1"/>
-            </Controller>
-        </Animation>
-        
+        <StateGroup name="OfflineStyle">
+            <State name="Offline">
+                <When type="AnimationState" OnlineState="Offline"/>
+                <Action type="SetProperty" alpha="97"/>
+                <Action type="SetProperty" frame="UserContainer/OfflineImage" visible="true"/>
+                <Action type="SetProperty" frame="UserContainer/AvatarFrame/PortraitContainer/PortraitFrame/UnlockableImage" visible="false"/>
+                <!-- Using alpha instead of visibility to avoid interfering with AnchorUpdate state group in 'PortraitContainer/AvatarBorderImage' -->
+                <Action type="SetProperty" frame="UserContainer/AvatarFrame/PortraitContainer/AvatarBorderImage/AscensionBadge" alpha="0"/>
+                <Action type="SetProperty" frame="UserContainer/NameLabel" style="SocialPlayerNameOffline"/>
+            </State>
+        </StateGroup>
+
         <Frame type="Frame" name="UserContainer">
             <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
             <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
             <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
-            <Height val="75"/>
+            <Height val="80"/>
 
             <Frame type="AvatarFrame" name="AvatarFrame" template="AvatarFrameTemplates/AvatarStateTemplate_Friend">
                 <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
@@ -51,9 +41,10 @@
 
             <Frame type="Image" name="OfflineImage">
                 <Anchor relative="$parent/AvatarFrame/PortraitContainer/PortraitBackground" offset="0"/>
-                <Texture val="@UI/Storm_HeroSelect_Icon_AI"/>
+                <Texture val="@UI/Storm_HeroSelect_Icon_Offline"/>
                 <Visible val="False"/>
                 <Alpha val="255"/>
+                <IgnoreParentAlpha val="true"/>
             </Frame>
         
             <Frame type="Label" name="NameLabel">
@@ -144,8 +135,7 @@
         </Frame>
 
         <Animation name="ToggleSound">
-            <Event event="Toggle" action="Reset"/>
-            <Event event="Toggle" action="Play"/>
+            <Event event="Toggle" action="Reset,Play"/>
 
             <Controller type="Sound" end="Stop">
                 <Key type="Sound" time="0.00" sound="@UI_BNet_DropdownHidden" direction="Forward"/>

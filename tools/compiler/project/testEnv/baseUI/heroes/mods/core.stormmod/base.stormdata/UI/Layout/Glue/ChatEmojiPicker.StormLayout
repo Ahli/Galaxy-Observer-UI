@@ -1,0 +1,844 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<Desc>
+
+    <Constant name="EmotionFilterGap" val="0"/>
+    <Constant name="TileHorizontalSpace" val="-1"/>
+    <Constant name="TileVerticalSpace" val="-1"/>
+    
+    <Frame type="EmoticonTileListItem" name="EmoticonTileListItemTemplate">
+        <Anchor side="Top" relative="$parent" pos="Min" offset="#TileVerticalSpace"/>
+        <Anchor side="Left" relative="$parent" pos="Min" offset="#TileHorizontalSpace"/>
+        <Anchor side="Right" relative="$this" pos="Min" offset="42"/>
+        <Anchor side="Bottom" relative="$this" pos="Min" offset="40"/>
+        <AnchorUseDeviceOffset val="false"/>
+        <TooltipFrame val="EmoticonTooltip"/>
+
+        <Frame type="StandardTooltip" name="EmoticonTooltip" template="StandardTooltip/StandardTooltip"/>
+
+        <StateGroup name="DisabledStateGroup">
+            <State name="MaxCapacity">
+                <When type="StateGroup" frame="$parent/$parent" EmojiCapacity="MaxedOut"/>
+                <Action type="SetProperty" frame="Icon" Alpha="125"/>
+                <Action type="SetProperty" frame="Icon" ColorAdjustMode="Desaturate"/>
+                <Action type="SetProperty" frame="$this" enabled="false"/>
+                <Action type="SetProperty" frame="ClickImage" Visible="false"/>
+            </State>
+            <State name="DisabledHover">
+                <When type="Property" frame="$this" Hovered="true"/>
+                <When type="Property" frame="$this" EmoticonAllowed="false"/>
+                <Action type="SetProperty" frame="Icon" Alpha="255"/>
+                <Action type="SetProperty" frame="Icon" ColorAdjustMode="Desaturate"/>
+                <Action type="SetProperty" frame="ClickImage" Visible="false"/>
+            </State>
+            <State name="Disabled">
+                <When type="Property" frame="$this" Hovered="false"/>
+                <When type="Property" frame="$this" EmoticonAllowed="false"/>
+                <Action type="SetProperty" frame="Icon" Alpha="125"/>
+                <Action type="SetProperty" frame="Icon" ColorAdjustMode="Desaturate"/>
+                <Action type="SetProperty" frame="ClickImage" Visible="false"/>
+            </State>
+        </StateGroup>
+
+        <Frame type="Image" name="Background">
+            <Anchor relative="$parent"/>
+            <TextureType val="Nineslice"/>
+            <DesaturateOnDisable val="false"/>
+            <RenderPriority val="128"/>
+
+            <StateGroup name="hover">
+                <State name="Normal">
+                    <When type="Property" frame="$parent" Hovered="false"/>
+                    <When type="Property" frame="$parent" IsFavorite="false"/>
+                    <Action type="SetProperty" Visible="false"/>
+                </State>
+                <State name="DisabledHover">
+                    <When type="Property" frame="$parent" Hovered="true"/>
+                    <When type="Property" frame="$parent" EmoticonAllowed="false"/>
+                    <Action type="SetProperty" Visible="false"/>
+                </State>
+                <State name="NormalHover">
+                    <When type="Property" frame="$parent" Hovered="true"/>
+                    <When type="Property" frame="$parent" IsFavorite="false"/>
+                    <Action type="SetProperty" Texture="@UI/Storm_UI_EmojiBG_Hover"/>
+                </State>
+                <State name="Favorite">
+                    <When type="Property" frame="$parent" Hovered="false"/>
+                    <When type="Property" frame="$parent" IsFavorite="true"/>
+                    <Action type="SetProperty" Texture="@UI/Storm_UI_EmojiBG_Favorite"/>
+                </State>
+                <State name="FavoriteHover">
+                    <When type="Property" frame="$parent" Hovered="true"/>
+                    <When type="Property" frame="$parent" IsFavorite="true"/>
+                    <Action type="SetProperty" Texture="@UI/Storm_UI_EmojiBG_Favorite_Hover"/>
+                </State>
+            </StateGroup>
+        </Frame>
+        
+        <Frame type="Image" name="ClickImage">
+            <Anchor relative="$parent"/>
+            <TextureType val="Nineslice"/>
+            <Texture val="@UI/Storm_UI_EmojiBG_Selected"/>
+            <RenderPriority val="256"/>
+            <Alpha val="0"/>
+            
+            <Animation name="SelectionHighlight">
+                <Event event="OnMouseDown" action="Restart,Pause" frame="$parent"/>
+                <Event event="OnMouseUp" action="Play" frame="$parent"/>
+                <Controller type="Fade" end="Pause">
+                    <Key type="Curve" time="0" value="255"/>
+                    <Key type="Curve" time="0.05" value="0"/>
+                </Controller>
+            </Animation>
+        </Frame>
+        
+        <Frame type="Image" name="FavIcon">
+            <Anchor side="Top" relative="$parent" pos="-.15" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="-.15" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="0.55" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="0.55" offset="0"/>
+            <DesaturateOnDisable val="false"/>
+
+            <Texture val="@UI/storm_ui_glues_draft_favorite"/>
+            <Visible val="{$parent/@IsFavorite}"/>
+        </Frame>
+
+        <Frame type="Image" name="Icon">
+            <Anchor side="Top" relative="$parent/Background" pos="Mid" offset="0"/>
+            <Anchor side="Left" relative="$parent/Background" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent/Background" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent/Background" pos="Mid" offset="0"/>
+            <RenderPriority val="500"/>
+            <TextureType val="Normal"/>
+            <ScaleWithTexCoords val="true"/>
+            <SnapToDevicePixels val="true"/>
+            <AnchorUseDeviceOffset val="false"/>
+            <DesaturateOnDisable val="false"/>
+            <ColorAdjustMode val="None"/>
+            <LightAdjustColor val="b59bff"/>
+            <DarkAdjustColor val="130e30"/>
+            <Alpha val="255"/>
+            <Animating val="{$parent/@Hovered}"/>
+            <ManagedAnim val="true"/>
+            <LoopingAnim val="true"/>
+            <Enabled val="{$parent/@EmoticonAllowed}"/>
+        </Frame>
+    </Frame>
+    
+    <!-- insert template for ChatPanel/ChatEditBoxFrame/EmojiPickerChatButton -->
+    <Frame type="Button" name="EmojiPickerChatButtonTemplate">
+        <NormalImage val="NormalImage"/>
+        <HoverImage val="HoverImage"/>
+        <DisplayType val="ImageLayer"/>
+        <ClickSound val="@UI_BNet_Generic_01"/>
+        
+        <Frame type="Image" name="NormalImage">
+            <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+            <LayerCount val="4"/>
+            <StateCount val="1"/>
+            <Texture val="@UI/Storm_UI_EmojiChat_Icon" layer="0"/>
+            <Texture val="@UI/Storm_UI_EmojiChat_Icon_Down" layer="1"/>
+            <Texture val="@UI/Storm_UI_EmojiChat_Icon_Down" layer="2"/>
+            <Texture val="@UI/Storm_UI_EmojiChat_Icon_Disabled" layer="3"/>
+            <DesaturateOnDisable val="False"/>
+        </Frame>
+        
+         <Frame type="Image" name="HoverImage">
+            <Anchor relative="$parent/NormalImage"/>
+            <LayerCount val="4"/>
+            <StateCount val="1"/>
+            <Texture val="@UI/Storm_UI_EmojiChat_Icon_Hover" layer="0"/>
+            <Texture val="@UI/Storm_UI_EmojiChat_Icon_Down" layer="1"/>
+            <Texture val="@UI/Storm_UI_EmojiChat_Icon_Down" layer="2"/>
+            <Texture val="@UI/Storm_UI_EmojiChat_Icon_Disabled" layer="3"/>
+            <DesaturateOnDisable val="False"/>
+        </Frame>
+        
+        <Frame type="Image" name="SideBorder">
+            <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="-5"/>
+            <Unclipped val="true"/>
+            <Alpha val="51"/>
+            <Texture val="@UI/Storm_UI_MainNavigation_Separator"/>
+            <Height val="31"/>
+            <Width val="2"/>
+        </Frame>
+        
+        <Frame type="Frame" name="HitTestFrame">
+            <Anchor relative="$parent"/>
+        </Frame>
+        
+        <!-- onClick toggle the emoji picker open/close -->
+        <Animation name="ClickDetection">
+            <Event event="OnShown" action="DirectionReverse"/>
+            <Event event="OnClick" action="ToggleDirection,Play"/>
+            <Event event="Collapse" action="DirectionReverse,Play"/>
+            
+            <Controller type="State" stateGroup="ExpandedButton" end="Pause">
+                <Key type="Identifier" time="0" value="Collapsed"/>
+                <Key type="Identifier" time="0.01" value="Expanded"/>
+            </Controller>
+        </Animation>
+    
+        <!-- button manages the open/closed-ness of the picker panel -->
+        <StateGroup name="ExpandedButton">
+            <DefaultState val="Collapsed"/>
+            <State name="Expanded"/>
+            <State name="Collapsed"/>
+        </StateGroup>
+    </Frame>
+
+    <!-- Filter button templates -->
+    <Frame type="Button" name="FilterButtonTemplate">
+        <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+        <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+        <Width val="44"/>
+        <Height val="52"/>
+        <NormalImage val="NormalImage"/>
+        <HoverImage val="HoverImage"/>
+        <ClickSound val="@UI_BNet_Generic_01"/>
+        <DisplayType val="ImageLayer"/>
+        <Toggleable val="true"/>
+        
+        <Frame type="Image" name="NormalImage">
+            <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+            <LayerCount val="3"/>
+        </Frame>
+        
+        <Frame type="Image" name="HoverImage">
+            <Anchor relative="$parent"/>
+            <LayerCount val="3"/>
+        </Frame>
+        
+        <Frame type="Frame" name="HitTestFrame">
+            <Anchor relative="$parent"/>
+        </Frame>
+    </Frame>
+    
+    <Frame type="Button" name="EmotionFilterTemplate">
+        <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+        <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+        <Width val="41"/>
+        <NormalImage val="NormalImage"/>
+        <HoverImage val="HoverImage"/>
+        <ClickSound val="@UI_BNet_Generic_01"/>
+        <DisplayType val="ImageLayer"/>
+        <Toggleable val="true"/>
+        
+        <Frame type="Image" name="NormalImage">
+            <Anchor relative="$parent"/>
+            <LayerCount val="3"/>
+            <Texture val="@UI/Storm_UI_EmojiBG" layer="0"/>
+            <Texture val="@UI/Storm_UI_EmojiBG_Selected" layer="1"/>
+            <Texture val="@UI/Storm_UI_EmojiBG_Selected" layer="2"/>
+        </Frame>
+        
+        <Frame type="Image" name="HoverImage">
+            <Anchor relative="$parent/NormalImage"/>
+            <LayerCount val="3"/>
+            <Texture val="@UI/Storm_UI_EmojiBG_Hover" layer="0"/>
+            <Texture val="@UI/Storm_UI_EmojiBG_Selected" layer="1"/>
+            <Texture val="@UI/Storm_UI_EmojiBG_Selected" layer="2"/>
+        </Frame>
+        
+        <Frame type="Label" name="EmoteLabel">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="1"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+            <Style val="EmojiPickerLabel"/>
+            
+            <StateGroup name="FontStyleSwap">
+                <DefaultState val="LabelNormal"/>
+                
+                <State name="LabelNormal">
+                    <Action type="SetProperty" Style="EmojiPickerLabel"/>
+                </State>
+                
+                <State name="LabelHover">
+                    <When type="Property" frame="$parent/HoverImage" visible="True"/>
+                    <When type="AnimationState" frame="$parent" operator="NotEqual" ButtonState="Toggled"/>
+                    <Action type="SetProperty" Style="EmojiPickerHover"/>
+                </State>
+                
+                <State name="LabelToggled">
+                    <When type="AnimationState" frame="$parent" ButtonState="Toggled"/>
+                    <Action type="SetProperty" Style="EmojiPickerToggled"/>
+                </State>
+            </StateGroup>
+        </Frame>
+        
+        <Frame type="Frame" name="HitTestFrame">
+            <Anchor relative="$parent"/>
+        </Frame>
+    </Frame>
+    
+    <!-- insert template for chatpanel/emojipickerpanel -->
+    <Frame type="EmoticonSelectionPanel" name="EmojiPickerTemplate">
+        <Frame type="BlurFrame" name="BlurBackground">
+            <Anchor side="Top" relative="$parent/Border" pos="Min" offset="4"/>
+            <Anchor side="Left" relative="$parent/Border" pos="Min" offset="4"/>
+            <Anchor side="Bottom" relative="$parent/Border" pos="Max" offset="-4"/>
+            <Anchor side="Right" relative="$parent/Border" pos="Max" offset="-4"/>
+            <BlurAmount val="0.8"/>
+
+            <Frame type="Image" name="LowImage">
+                <Anchor relative="$parent" />
+                <Texture val="@UI/Storm_Generic_Background_Low"/>
+                <Alpha val="200"/>
+            </Frame>
+        </Frame>
+        <Frame type="Image" name="BackgroundColorImage">
+            <Anchor relative="$parent/BlurBackground"/>
+            <Color val="08081d"/>
+            <Alpha val="100"/>
+        </Frame>
+        <Frame type="Image" name="BackgroundGradient">
+            <Anchor relative="$parent"/>
+            <Alpha val="0"/>
+            <Texture val="@UI/storm_ui_glues_draft_hero_gradient"/>
+            <TextureCoords val="1,0,-0.5,1"/>
+        </Frame>
+        <Frame type="Image" name="Border">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="-3"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="2"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="3"/>
+            <Texture val="@UI/Storm_Generic_SmallPanel_Border"/>
+            <TextureType val="Nineslice"/>
+        </Frame>
+        
+        <Frame type="Image" name="FilterBorder">
+            <Anchor side="Top" relative="$parent/SubfilterBar" pos="Max" offset="5"/>
+            <Anchor side="Left" relative="$parent/Border" pos="Min" offset="6"/>
+            <Anchor side="Right" relative="$parent/Border" pos="Max" offset="-6"/>
+            <Height val="2"/>
+            <Color val="92,71,179"/>
+        </Frame>
+    
+        <Frame type="Frame" name="FilterBar">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="8"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+            <Height val="54"/>
+            
+            <Frame type="Button" name="RecentFilter" template="ChatEmojiPicker/FilterButtonTemplate">
+                <Anchor side="Left" relative="$parent" pos="Min" offset="8"/>
+                <Tooltip val="@UI/EmojiFilter/Recent"/>
+                
+                <Frame type="Image" name="NormalImage">
+                    <Texture val="@UI/Storm_UI_EmojiFilter_Recent" layer="0"/>
+                    <Texture val="@UI/Storm_UI_EmojiFilter_Recent_Selected" layer="1"/>
+                    <Texture val="@UI/Storm_UI_EmojiFilter_Recent_Selected" layer="2"/>
+                </Frame>
+                
+                <Frame type="Image" name="HoverImage">
+                    <Texture val="@UI/Storm_UI_EmojiFilter_Recent_Hover" layer="0"/>
+                    <Texture val="@UI/Storm_UI_EmojiFilter_Recent_Selected" layer="1"/>
+                    <Texture val="@UI/Storm_UI_EmojiFilter_Recent_Selected" layer="2"/>
+                </Frame>
+            </Frame>
+            
+            <Frame type="Button" name="FavoriteFilter" template="ChatEmojiPicker/FilterButtonTemplate">
+                <Anchor side="Left" relative="$parent/RecentFilter" pos="Max" offset="-6"/>
+                <Tooltip val="@UI/EmojiFilter/Favorite"/>
+
+                <Frame type="Image" name="NormalImage">
+                    <Texture val="@UI/Storm_UI_EmojiFilter_Favorites" layer="0"/>
+                    <Texture val="@UI/Storm_UI_EmojiFilter_Favorites_Selected" layer="1"/>
+                    <Texture val="@UI/Storm_UI_EmojiFilter_Favorites_Selected" layer="2"/>
+                </Frame>
+                
+                <Frame type="Image" name="HoverImage">
+                    <Texture val="@UI/Storm_UI_EmojiFilter_Favorites_Hover" layer="0"/>
+                    <Texture val="@UI/Storm_UI_EmojiFilter_Favorites_Selected" layer="1"/>
+                    <Texture val="@UI/Storm_UI_EmojiFilter_Favorites_Selected" layer="2"/>
+                </Frame>
+            </Frame>
+            
+            <Frame type="Button" name="EmotionFilter" template="ChatEmojiPicker/FilterButtonTemplate">
+                <Anchor side="Left" relative="$parent/FavoriteFilter" pos="Max" offset="-6"/>
+                <Tooltip val="@UI/EmojiFilter/Emotion"/>
+
+                <Frame type="Image" name="NormalImage">
+                    <Texture val="@UI/Storm_UI_EmojiFilter_Emoticons" layer="0"/>
+                    <Texture val="@UI/Storm_UI_EmojiFilter_Emoticons_Selected" layer="1"/>
+                    <Texture val="@UI/Storm_UI_EmojiFilter_Emoticons_Selected" layer="2"/>
+                </Frame>
+                
+                <Frame type="Image" name="HoverImage">
+                    <Texture val="@UI/Storm_UI_EmojiFilter_Emoticons_Hover" layer="0"/>
+                    <Texture val="@UI/Storm_UI_EmojiFilter_Emoticons_Selected" layer="1"/>
+                    <Texture val="@UI/Storm_UI_EmojiFilter_Emoticons_Selected" layer="2"/>
+                </Frame>
+                
+                <!--special toggle for subfilter bar -->
+                <StateGroup name="SubfilterBar">
+                    <State name="ToggleOn">
+                        <When type="AnimationState" ButtonState="Toggled"/>
+                        <Action type="SetProperty" frame="$parent/$parent/SubfilterBar" visible="true"/>
+                    </State>
+                    <State name="ToggleOff">
+                        <When type="AnimationState" operator="NotEqual" ButtonState="Toggled"/>
+                        <Action type="SetProperty" frame="$parent/$parent/SubfilterBar" visible="false"/>
+                    </State>
+                </StateGroup>
+            </Frame>
+            
+            <Frame type="Button" name="NexusFilter" template="ChatEmojiPicker/FilterButtonTemplate">
+                <Anchor side="Left" relative="$parent/EmotionFilter" pos="Max" offset="-6"/>
+                <Tooltip val="@UI/EmojiFilter/Nexus"/>
+
+                <Frame type="Image" name="NormalImage">
+                    <Texture val="@UI/Storm_UI_EmojiFilter_Nexus" layer="0"/>
+                    <Texture val="@UI/Storm_UI_EmojiFilter_Nexus_Selected" layer="1"/>
+                    <Texture val="@UI/Storm_UI_EmojiFilter_Nexus_Selected" layer="2"/>
+                </Frame>
+                
+                <Frame type="Image" name="HoverImage">
+                    <Texture val="@UI/Storm_UI_EmojiFilter_Nexus_Hover" layer="0"/>
+                    <Texture val="@UI/Storm_UI_EmojiFilter_Nexus_Selected" layer="1"/>
+                    <Texture val="@UI/Storm_UI_EmojiFilter_Nexus_Selected" layer="2"/>
+                </Frame>
+            </Frame>
+            
+            <!-- property bind some filter value/property to editbox value? -->
+            <Frame type="EditBox" name="SearchBar" template="StandardTemplates/StandardSearchEditBoxTemplate">
+                <Height val="50"/>
+                <Width val="0"/>
+                <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Left" relative="$parent/NexusFilter" pos="Max" offset="6"/>
+                <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Right" relative="$parent" pos="Max" offset="-4"/>
+                <Insets top="10" left="15" bottom="10" right="15"/>
+                <HighlightOnGainFocus val="false"/>
+                
+                <Frame type="Label" name="SearchTextLabel">
+                    <Height val="30"/>
+                </Frame>
+                
+                <Frame type="Button" name="ClearTextButton">
+                    <Anchor relative="$parent/FilterSearchImage"/>
+                    
+                    <Frame type="Image" name="NormalImage">
+                        <Texture val="@UI/Storm_UI_Icon_CloseSearch_Disabled" layer="0"/>
+                    </Frame>
+
+                    <Frame type="Image" name="HoverImage">
+                        <Texture val="@UI/Storm_UI_Icon_CloseSearch_Hover" layer="0"/>
+                    </Frame>
+                </Frame>
+            
+                <Frame type="Image" name="FilterSearchImage">
+                    <Anchor side="Top" relative="$parent/LabelContainerFrame" pos="Mid" offset="0"/>
+                    <Anchor side="Bottom" relative="$parent/LabelContainerFrame" pos="Mid" offset="0"/>
+                    <Anchor side="Right" relative="$parent/LabelContainerFrame" pos="Max" offset="0"/>
+                    <Width val="28"/>
+                    <Height val="28"/>
+                    <Texture val="@UI/Storm_UI_Icon_SearchGlass_Dark"/>
+                    
+                    <Animation name="FilterSearchImage">
+                        <Event event="OnShown" action="DirectionForward, Play" frame="$parent/ClearTextButton"/>
+                        <Event event="OnHidden" action="DirectionReverse, Play" frame="$parent/ClearTextButton"/>
+
+                        <Controller type="Fade" end="Pause">
+                            <Key type="Curve" time="0" value="255" inout="Linear,Slow"/>
+                            <Key type="Curve" time=".1" value="0" inout="Slow,Linear"/>
+                        </Controller>
+                    </Animation>
+                </Frame>
+            </Frame>
+        </Frame>
+        
+        <Frame type="Frame" name="SubfilterBar">
+            <Anchor side="Top" relative="$parent/FilterBar" pos="Max" offset="4"/>
+            <Anchor side="Left" relative="$parent/FilterBar" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent/FilterBar" pos="Max" offset="0"/>
+            <Height val="36"/>
+            <Visible val="false"/>
+            <CollapseLayout val="true"/>
+            
+            <Frame type="Button" name="HappyFilter" template="ChatEmojiPicker/EmotionFilterTemplate">
+                <Anchor side="Left" relative="$parent" pos="Min" offset="10"/>
+                <Tooltip val="@Emoticon/Description/abstract_happy"/>
+                <Frame type="Label" name="EmoteLabel">
+                    <Text val="@Emoticon/Name/ascii_happy"/>
+                </Frame>
+            </Frame>
+            <Frame type="Button" name="RoflFilter" template="ChatEmojiPicker/EmotionFilterTemplate">
+                <Anchor side="Left" relative="$parent/HappyFilter" pos="Max" offset="#EmotionFilterGap"/>
+                <Tooltip val="@Emoticon/Description/abstract_rofl"/>
+                <Frame type="Label" name="EmoteLabel">
+                    <Text val="@Emoticon/Name/ascii_rofl"/>
+                </Frame>
+            </Frame>
+            <Frame type="Button" name="SadFilter" template="ChatEmojiPicker/EmotionFilterTemplate">
+                <Anchor side="Left" relative="$parent/RoflFilter" pos="Max" offset="#EmotionFilterGap"/>
+                <Tooltip val="@Emoticon/Description/abstract_sad"/>
+                <Frame type="Label" name="EmoteLabel">
+                    <Text val="@Emoticon/Name/ascii_sad"/>
+                </Frame>
+            </Frame>
+            <Frame type="Button" name="SillyFilter" template="ChatEmojiPicker/EmotionFilterTemplate">
+                <Anchor side="Left" relative="$parent/SadFilter" pos="Max" offset="#EmotionFilterGap"/>
+                <Tooltip val="@Emoticon/Description/abstract_silly"/>
+                <Frame type="Label" name="EmoteLabel">
+                    <Text val="@Emoticon/Name/ascii_silly"/>
+                </Frame>
+            </Frame>
+            <Frame type="Button" name="SpeechlessFilter" template="ChatEmojiPicker/EmotionFilterTemplate">
+                <Anchor side="Left" relative="$parent/SillyFilter" pos="Max" offset="#EmotionFilterGap"/>
+                <Tooltip val="@Emoticon/Description/abstract_speechless"/>
+                <Frame type="Label" name="EmoteLabel">
+                    <Text val="@Emoticon/Name/ascii_speechless"/>
+                </Frame>
+            </Frame>
+            <Frame type="Button" name="AngryFilter" template="ChatEmojiPicker/EmotionFilterTemplate">
+                <Anchor side="Left" relative="$parent/SpeechlessFilter" pos="Max" offset="#EmotionFilterGap"/>
+                <Tooltip val="@Emoticon/Description/abstract_angry"/>
+                <Frame type="Label" name="EmoteLabel">
+                    <Text val="@Emoticon/Name/ascii_angry"/>
+                </Frame>
+            </Frame>
+            <Frame type="Button" name="CoolFilter" template="ChatEmojiPicker/EmotionFilterTemplate">
+                <Anchor side="Left" relative="$parent/AngryFilter" pos="Max" offset="#EmotionFilterGap"/>
+                <Tooltip val="@Emoticon/Description/abstract_cool"/>
+                <Frame type="Label" name="EmoteLabel">
+                    <Text val="@Emoticon/Name/ascii_cool"/>
+                </Frame>
+            </Frame>
+            <Frame type="Button" name="EmbarrassedFilter" template="ChatEmojiPicker/EmotionFilterTemplate">
+                <Anchor side="Left" relative="$parent/CoolFilter" pos="Max" offset="#EmotionFilterGap"/>
+                <Tooltip val="@Emoticon/Description/abstract_embarrassed"/>
+                <Frame type="Label" name="EmoteLabel">
+                    <Text val="@Emoticon/Name/ascii_embarrassed"/>
+                </Frame>
+            </Frame>
+            <Frame type="Button" name="InloveFilter" template="ChatEmojiPicker/EmotionFilterTemplate">
+                <Anchor side="Left" relative="$parent/EmbarrassedFilter" pos="Max" offset="#EmotionFilterGap"/>
+                <Tooltip val="@Emoticon/Description/abstract_inlove"/>
+                <Frame type="Label" name="EmoteLabel">
+                    <Text val="@Emoticon/Name/ascii_inlove"/>
+                </Frame>
+            </Frame>
+            <Frame type="Button" name="SurprisedFilter" template="ChatEmojiPicker/EmotionFilterTemplate">
+                <Anchor side="Left" relative="$parent/InloveFilter" pos="Max" offset="#EmotionFilterGap"/>
+                <Tooltip val="@Emoticon/Description/abstract_surprised"/>
+                <Frame type="Label" name="EmoteLabel">
+                    <Text val="@Emoticon/Name/ascii_surprised"/>
+                </Frame>
+            </Frame>
+        </Frame>
+        
+        <Frame type="TileList" name="TileList">
+            <Anchor side="Top" relative="$parent/FilterBorder" pos="Max" offset="3"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="13"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="-5"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="-4"/>
+            <AcceptsMouse val="true"/>
+
+            <Frame type="Image" name="NarrowScrollBarBackgroundImage">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="2"/>
+                <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+                <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+                <Width val="8"/>
+                <Color val="0e091e"/>
+                <Alpha val="255"/>
+            </Frame>
+
+            <Frame type="Image" name="ScrollBarLineLeft" template="StandardTemplates/VBorderImageTemplate">
+                <Anchor side="Top" relative="$parent/NarrowScrollBarBackgroundImage" pos="Min" offset="0"/>
+                <Anchor side="Bottom" relative="$parent/NarrowScrollBarBackgroundImage" pos="Max" offset="0"/>
+                <Anchor side="Left" relative="$parent/NarrowScrollBarBackgroundImage" pos="Min" offset="0"/>
+                <Alpha val="255"/>
+            </Frame>
+
+            <Frame type="ScrollBar" name="ScrollBar" template="StandardTemplates/NarrowScrollableBarTemplate">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="2"/>
+                <Anchor side="Right" relative="$parent" pos="Max" offset="2"/>
+                <Anchor side="Bottom" relative="$parent" pos="Max" offset="5"/>
+                <CollapseLayout val="true"/>
+                <DescFlags val=""/>
+                <IncrementSound val=""/>
+            </Frame>
+
+            <Frame Type="EmoticonContextMenu" name="ContextMenu" template="StandardTemplates/StandardContextMenuTemplate" >
+                <Anchor side="Top" relative="$parent" pos="Max" offset="0"/>
+                <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+            </Frame>
+            
+            <!-- TileListItems laid out in CEmoticonSelectionPanel::UpdateListLayout -->
+            <Frame type="EmoticonTileListItem" name="Item0" template="ChatEmojiPicker/EmoticonTileListItemTemplate"/>
+            <Frame type="EmoticonTileListItem" name="Item1" template="ChatEmojiPicker/EmoticonTileListItemTemplate"/>
+            <Frame type="EmoticonTileListItem" name="Item2" template="ChatEmojiPicker/EmoticonTileListItemTemplate"/>
+            <Frame type="EmoticonTileListItem" name="Item3" template="ChatEmojiPicker/EmoticonTileListItemTemplate"/>
+            <Frame type="EmoticonTileListItem" name="Item4" template="ChatEmojiPicker/EmoticonTileListItemTemplate"/>
+            <Frame type="EmoticonTileListItem" name="Item5" template="ChatEmojiPicker/EmoticonTileListItemTemplate"/>
+            <Frame type="EmoticonTileListItem" name="Item6" template="ChatEmojiPicker/EmoticonTileListItemTemplate"/>
+            <Frame type="EmoticonTileListItem" name="Item7" template="ChatEmojiPicker/EmoticonTileListItemTemplate"/>
+            <Frame type="EmoticonTileListItem" name="Item8" template="ChatEmojiPicker/EmoticonTileListItemTemplate"/>
+            <Frame type="EmoticonTileListItem" name="Item9" template="ChatEmojiPicker/EmoticonTileListItemTemplate"/>
+            <Frame type="EmoticonTileListItem" name="Item10" template="ChatEmojiPicker/EmoticonTileListItemTemplate"/>
+            <Frame type="EmoticonTileListItem" name="Item11" template="ChatEmojiPicker/EmoticonTileListItemTemplate"/>
+            <Frame type="EmoticonTileListItem" name="Item12" template="ChatEmojiPicker/EmoticonTileListItemTemplate"/>
+            <Frame type="EmoticonTileListItem" name="Item13" template="ChatEmojiPicker/EmoticonTileListItemTemplate"/>
+            <Frame type="EmoticonTileListItem" name="Item14" template="ChatEmojiPicker/EmoticonTileListItemTemplate"/>
+            <Frame type="EmoticonTileListItem" name="Item15" template="ChatEmojiPicker/EmoticonTileListItemTemplate"/>
+            <Frame type="EmoticonTileListItem" name="Item16" template="ChatEmojiPicker/EmoticonTileListItemTemplate"/>
+            <Frame type="EmoticonTileListItem" name="Item17" template="ChatEmojiPicker/EmoticonTileListItemTemplate"/>
+            <Frame type="EmoticonTileListItem" name="Item18" template="ChatEmojiPicker/EmoticonTileListItemTemplate"/>
+            <Frame type="EmoticonTileListItem" name="Item19" template="ChatEmojiPicker/EmoticonTileListItemTemplate"/>
+            <Frame type="EmoticonTileListItem" name="Item20" template="ChatEmojiPicker/EmoticonTileListItemTemplate"/>
+            <Frame type="EmoticonTileListItem" name="Item21" template="ChatEmojiPicker/EmoticonTileListItemTemplate"/>
+            <Frame type="EmoticonTileListItem" name="Item22" template="ChatEmojiPicker/EmoticonTileListItemTemplate"/>
+            <Frame type="EmoticonTileListItem" name="Item23" template="ChatEmojiPicker/EmoticonTileListItemTemplate"/>
+            <Frame type="EmoticonTileListItem" name="Item24" template="ChatEmojiPicker/EmoticonTileListItemTemplate"/>
+            <Frame type="EmoticonTileListItem" name="Item25" template="ChatEmojiPicker/EmoticonTileListItemTemplate"/>
+            <Frame type="EmoticonTileListItem" name="Item26" template="ChatEmojiPicker/EmoticonTileListItemTemplate"/>
+            <Frame type="EmoticonTileListItem" name="Item27" template="ChatEmojiPicker/EmoticonTileListItemTemplate"/>
+            <Frame type="EmoticonTileListItem" name="Item28" template="ChatEmojiPicker/EmoticonTileListItemTemplate"/>
+            <Frame type="EmoticonTileListItem" name="Item29" template="ChatEmojiPicker/EmoticonTileListItemTemplate"/>
+            <Frame type="EmoticonTileListItem" name="Item30" template="ChatEmojiPicker/EmoticonTileListItemTemplate"/>
+            <Frame type="EmoticonTileListItem" name="Item31" template="ChatEmojiPicker/EmoticonTileListItemTemplate"/>
+            <Frame type="EmoticonTileListItem" name="Item32" template="ChatEmojiPicker/EmoticonTileListItemTemplate"/>
+            <Frame type="EmoticonTileListItem" name="Item33" template="ChatEmojiPicker/EmoticonTileListItemTemplate"/>
+            <Frame type="EmoticonTileListItem" name="Item34" template="ChatEmojiPicker/EmoticonTileListItemTemplate"/>
+            <Frame type="EmoticonTileListItem" name="Item35" template="ChatEmojiPicker/EmoticonTileListItemTemplate"/>
+            <Frame type="EmoticonTileListItem" name="Item36" template="ChatEmojiPicker/EmoticonTileListItemTemplate"/>
+            <Frame type="EmoticonTileListItem" name="Item37" template="ChatEmojiPicker/EmoticonTileListItemTemplate"/>
+            <Frame type="EmoticonTileListItem" name="Item38" template="ChatEmojiPicker/EmoticonTileListItemTemplate"/>
+            <Frame type="EmoticonTileListItem" name="Item39" template="ChatEmojiPicker/EmoticonTileListItemTemplate"/>
+            <Frame type="EmoticonTileListItem" name="Item40" template="ChatEmojiPicker/EmoticonTileListItemTemplate"/>
+            <Frame type="EmoticonTileListItem" name="Item41" template="ChatEmojiPicker/EmoticonTileListItemTemplate"/>
+            <Frame type="EmoticonTileListItem" name="Item42" template="ChatEmojiPicker/EmoticonTileListItemTemplate"/>
+            <Frame type="EmoticonTileListItem" name="Item43" template="ChatEmojiPicker/EmoticonTileListItemTemplate"/>
+            <Frame type="EmoticonTileListItem" name="Item44" template="ChatEmojiPicker/EmoticonTileListItemTemplate"/>
+            <Frame type="EmoticonTileListItem" name="Item45" template="ChatEmojiPicker/EmoticonTileListItemTemplate"/>
+            <Frame type="EmoticonTileListItem" name="Item46" template="ChatEmojiPicker/EmoticonTileListItemTemplate"/>
+            <Frame type="EmoticonTileListItem" name="Item47" template="ChatEmojiPicker/EmoticonTileListItemTemplate"/>
+            <Frame type="EmoticonTileListItem" name="Item48" template="ChatEmojiPicker/EmoticonTileListItemTemplate"/>
+            <Frame type="EmoticonTileListItem" name="Item49" template="ChatEmojiPicker/EmoticonTileListItemTemplate"/>
+            <Frame type="EmoticonTileListItem" name="Item50" template="ChatEmojiPicker/EmoticonTileListItemTemplate"/>
+            <Frame type="EmoticonTileListItem" name="Item51" template="ChatEmojiPicker/EmoticonTileListItemTemplate"/>
+            <Frame type="EmoticonTileListItem" name="Item52" template="ChatEmojiPicker/EmoticonTileListItemTemplate"/>
+            <Frame type="EmoticonTileListItem" name="Item53" template="ChatEmojiPicker/EmoticonTileListItemTemplate"/>
+            <Frame type="EmoticonTileListItem" name="Item54" template="ChatEmojiPicker/EmoticonTileListItemTemplate"/>
+            <Frame type="EmoticonTileListItem" name="Item55" template="ChatEmojiPicker/EmoticonTileListItemTemplate"/>
+            <Frame type="EmoticonTileListItem" name="Item56" template="ChatEmojiPicker/EmoticonTileListItemTemplate"/>
+            <Frame type="EmoticonTileListItem" name="Item57" template="ChatEmojiPicker/EmoticonTileListItemTemplate"/>
+            <Frame type="EmoticonTileListItem" name="Item58" template="ChatEmojiPicker/EmoticonTileListItemTemplate"/>
+            <Frame type="EmoticonTileListItem" name="Item59" template="ChatEmojiPicker/EmoticonTileListItemTemplate"/>
+            <Frame type="EmoticonTileListItem" name="Item60" template="ChatEmojiPicker/EmoticonTileListItemTemplate"/>
+            <Frame type="EmoticonTileListItem" name="Item61" template="ChatEmojiPicker/EmoticonTileListItemTemplate"/>
+            <Frame type="EmoticonTileListItem" name="Item62" template="ChatEmojiPicker/EmoticonTileListItemTemplate"/>
+            <Frame type="EmoticonTileListItem" name="Item63" template="ChatEmojiPicker/EmoticonTileListItemTemplate"/>
+            <Frame type="EmoticonTileListItem" name="Item64" template="ChatEmojiPicker/EmoticonTileListItemTemplate"/>
+            <Frame type="EmoticonTileListItem" name="Item65" template="ChatEmojiPicker/EmoticonTileListItemTemplate"/>
+            <Frame type="EmoticonTileListItem" name="Item66" template="ChatEmojiPicker/EmoticonTileListItemTemplate"/>
+            <Frame type="EmoticonTileListItem" name="Item67" template="ChatEmojiPicker/EmoticonTileListItemTemplate"/>
+            <Frame type="EmoticonTileListItem" name="Item68" template="ChatEmojiPicker/EmoticonTileListItemTemplate"/>
+            <Frame type="EmoticonTileListItem" name="Item69" template="ChatEmojiPicker/EmoticonTileListItemTemplate"/>
+            <Frame type="EmoticonTileListItem" name="Item70" template="ChatEmojiPicker/EmoticonTileListItemTemplate"/>
+            <Frame type="EmoticonTileListItem" name="Item71" template="ChatEmojiPicker/EmoticonTileListItemTemplate"/>
+            <Frame type="EmoticonTileListItem" name="Item72" template="ChatEmojiPicker/EmoticonTileListItemTemplate"/>
+            <Frame type="EmoticonTileListItem" name="Item73" template="ChatEmojiPicker/EmoticonTileListItemTemplate"/>
+            <Frame type="EmoticonTileListItem" name="Item74" template="ChatEmojiPicker/EmoticonTileListItemTemplate"/>
+            <Frame type="EmoticonTileListItem" name="Item75" template="ChatEmojiPicker/EmoticonTileListItemTemplate"/>
+            <Frame type="EmoticonTileListItem" name="Item76" template="ChatEmojiPicker/EmoticonTileListItemTemplate"/>
+            <Frame type="EmoticonTileListItem" name="Item77" template="ChatEmojiPicker/EmoticonTileListItemTemplate"/>
+            <Frame type="EmoticonTileListItem" name="Item78" template="ChatEmojiPicker/EmoticonTileListItemTemplate"/>
+            <Frame type="EmoticonTileListItem" name="Item79" template="ChatEmojiPicker/EmoticonTileListItemTemplate"/>
+            <Frame type="EmoticonTileListItem" name="Item80" template="ChatEmojiPicker/EmoticonTileListItemTemplate"/>
+            <Frame type="EmoticonTileListItem" name="Item81" template="ChatEmojiPicker/EmoticonTileListItemTemplate"/>
+            <Frame type="EmoticonTileListItem" name="Item82" template="ChatEmojiPicker/EmoticonTileListItemTemplate"/>
+            <Frame type="EmoticonTileListItem" name="Item83" template="ChatEmojiPicker/EmoticonTileListItemTemplate"/>
+            <Frame type="EmoticonTileListItem" name="Item84" template="ChatEmojiPicker/EmoticonTileListItemTemplate"/>
+            <Frame type="EmoticonTileListItem" name="Item85" template="ChatEmojiPicker/EmoticonTileListItemTemplate"/>
+            <Frame type="EmoticonTileListItem" name="Item86" template="ChatEmojiPicker/EmoticonTileListItemTemplate"/>
+            <Frame type="EmoticonTileListItem" name="Item87" template="ChatEmojiPicker/EmoticonTileListItemTemplate"/>
+            <Frame type="EmoticonTileListItem" name="Item88" template="ChatEmojiPicker/EmoticonTileListItemTemplate"/>
+            <Frame type="EmoticonTileListItem" name="Item89" template="ChatEmojiPicker/EmoticonTileListItemTemplate"/>
+            <Frame type="EmoticonTileListItem" name="Item90" template="ChatEmojiPicker/EmoticonTileListItemTemplate"/>
+            <Frame type="EmoticonTileListItem" name="Item91" template="ChatEmojiPicker/EmoticonTileListItemTemplate"/>
+            <Frame type="EmoticonTileListItem" name="Item92" template="ChatEmojiPicker/EmoticonTileListItemTemplate"/>
+            <Frame type="EmoticonTileListItem" name="Item93" template="ChatEmojiPicker/EmoticonTileListItemTemplate"/>
+            <Frame type="EmoticonTileListItem" name="Item94" template="ChatEmojiPicker/EmoticonTileListItemTemplate"/>
+            <Frame type="EmoticonTileListItem" name="Item95" template="ChatEmojiPicker/EmoticonTileListItemTemplate"/>
+            <Frame type="EmoticonTileListItem" name="Item96" template="ChatEmojiPicker/EmoticonTileListItemTemplate"/>
+            <Frame type="EmoticonTileListItem" name="Item97" template="ChatEmojiPicker/EmoticonTileListItemTemplate"/>
+            <Frame type="EmoticonTileListItem" name="Item98" template="ChatEmojiPicker/EmoticonTileListItemTemplate"/>
+            <Frame type="EmoticonTileListItem" name="Item99" template="ChatEmojiPicker/EmoticonTileListItemTemplate"/>
+            <Frame type="EmoticonTileListItem" name="Item100" template="ChatEmojiPicker/EmoticonTileListItemTemplate"/>
+            <Frame type="EmoticonTileListItem" name="Item101" template="ChatEmojiPicker/EmoticonTileListItemTemplate"/>
+            <Frame type="EmoticonTileListItem" name="Item102" template="ChatEmojiPicker/EmoticonTileListItemTemplate"/>
+            <Frame type="EmoticonTileListItem" name="Item103" template="ChatEmojiPicker/EmoticonTileListItemTemplate"/>
+            <Frame type="EmoticonTileListItem" name="Item104" template="ChatEmojiPicker/EmoticonTileListItemTemplate"/>
+            <Frame type="EmoticonTileListItem" name="Item105" template="ChatEmojiPicker/EmoticonTileListItemTemplate"/>
+            <Frame type="EmoticonTileListItem" name="Item106" template="ChatEmojiPicker/EmoticonTileListItemTemplate"/>
+            <Frame type="EmoticonTileListItem" name="Item107" template="ChatEmojiPicker/EmoticonTileListItemTemplate"/>
+            <Frame type="EmoticonTileListItem" name="Item108" template="ChatEmojiPicker/EmoticonTileListItemTemplate"/>
+            <Frame type="EmoticonTileListItem" name="Item109" template="ChatEmojiPicker/EmoticonTileListItemTemplate"/>
+            <Frame type="EmoticonTileListItem" name="Item110" template="ChatEmojiPicker/EmoticonTileListItemTemplate"/>
+            <Frame type="EmoticonTileListItem" name="Item111" template="ChatEmojiPicker/EmoticonTileListItemTemplate"/>
+            <Frame type="EmoticonTileListItem" name="Item112" template="ChatEmojiPicker/EmoticonTileListItemTemplate"/>
+            <Frame type="EmoticonTileListItem" name="Item113" template="ChatEmojiPicker/EmoticonTileListItemTemplate"/>
+            <Frame type="EmoticonTileListItem" name="Item114" template="ChatEmojiPicker/EmoticonTileListItemTemplate"/>
+            <Frame type="EmoticonTileListItem" name="Item115" template="ChatEmojiPicker/EmoticonTileListItemTemplate"/>
+            <Frame type="EmoticonTileListItem" name="Item116" template="ChatEmojiPicker/EmoticonTileListItemTemplate"/>
+            <Frame type="EmoticonTileListItem" name="Item117" template="ChatEmojiPicker/EmoticonTileListItemTemplate"/>
+            <Frame type="EmoticonTileListItem" name="Item118" template="ChatEmojiPicker/EmoticonTileListItemTemplate"/>
+            <Frame type="EmoticonTileListItem" name="Item119" template="ChatEmojiPicker/EmoticonTileListItemTemplate"/>
+            <Frame type="EmoticonTileListItem" name="Item120" template="ChatEmojiPicker/EmoticonTileListItemTemplate"/>
+            <Frame type="EmoticonTileListItem" name="Item121" template="ChatEmojiPicker/EmoticonTileListItemTemplate"/>
+            <Frame type="EmoticonTileListItem" name="Item122" template="ChatEmojiPicker/EmoticonTileListItemTemplate"/>
+            <Frame type="EmoticonTileListItem" name="Item123" template="ChatEmojiPicker/EmoticonTileListItemTemplate"/>
+            <Frame type="EmoticonTileListItem" name="Item124" template="ChatEmojiPicker/EmoticonTileListItemTemplate"/>
+            <Frame type="EmoticonTileListItem" name="Item125" template="ChatEmojiPicker/EmoticonTileListItemTemplate"/>
+            <Frame type="EmoticonTileListItem" name="Item126" template="ChatEmojiPicker/EmoticonTileListItemTemplate"/>
+            <Frame type="EmoticonTileListItem" name="Item127" template="ChatEmojiPicker/EmoticonTileListItemTemplate"/>
+            <Frame type="EmoticonTileListItem" name="Item128" template="ChatEmojiPicker/EmoticonTileListItemTemplate"/>
+            <Frame type="EmoticonTileListItem" name="Item129" template="ChatEmojiPicker/EmoticonTileListItemTemplate"/>
+            <Frame type="EmoticonTileListItem" name="Item130" template="ChatEmojiPicker/EmoticonTileListItemTemplate"/>
+            <Frame type="EmoticonTileListItem" name="Item131" template="ChatEmojiPicker/EmoticonTileListItemTemplate"/>
+            <Frame type="EmoticonTileListItem" name="Item132" template="ChatEmojiPicker/EmoticonTileListItemTemplate"/>
+            <Frame type="EmoticonTileListItem" name="Item133" template="ChatEmojiPicker/EmoticonTileListItemTemplate"/>
+            <Frame type="EmoticonTileListItem" name="Item134" template="ChatEmojiPicker/EmoticonTileListItemTemplate"/>
+            <Frame type="EmoticonTileListItem" name="Item135" template="ChatEmojiPicker/EmoticonTileListItemTemplate"/>
+            <Frame type="EmoticonTileListItem" name="Item136" template="ChatEmojiPicker/EmoticonTileListItemTemplate"/>
+            <Frame type="EmoticonTileListItem" name="Item137" template="ChatEmojiPicker/EmoticonTileListItemTemplate"/>
+            <Frame type="EmoticonTileListItem" name="Item138" template="ChatEmojiPicker/EmoticonTileListItemTemplate"/>
+            <Frame type="EmoticonTileListItem" name="Item139" template="ChatEmojiPicker/EmoticonTileListItemTemplate"/>
+            <Frame type="EmoticonTileListItem" name="Item140" template="ChatEmojiPicker/EmoticonTileListItemTemplate"/>
+            <Frame type="EmoticonTileListItem" name="Item141" template="ChatEmojiPicker/EmoticonTileListItemTemplate"/>
+            <Frame type="EmoticonTileListItem" name="Item142" template="ChatEmojiPicker/EmoticonTileListItemTemplate"/>
+            <Frame type="EmoticonTileListItem" name="Item143" template="ChatEmojiPicker/EmoticonTileListItemTemplate"/>
+            <Frame type="EmoticonTileListItem" name="Item144" template="ChatEmojiPicker/EmoticonTileListItemTemplate"/>
+            <Frame type="EmoticonTileListItem" name="Item145" template="ChatEmojiPicker/EmoticonTileListItemTemplate"/>
+            <Frame type="EmoticonTileListItem" name="Item146" template="ChatEmojiPicker/EmoticonTileListItemTemplate"/>
+            <Frame type="EmoticonTileListItem" name="Item147" template="ChatEmojiPicker/EmoticonTileListItemTemplate"/>
+            <Frame type="EmoticonTileListItem" name="Item148" template="ChatEmojiPicker/EmoticonTileListItemTemplate"/>
+            <Frame type="EmoticonTileListItem" name="Item149" template="ChatEmojiPicker/EmoticonTileListItemTemplate"/>
+            <Frame type="EmoticonTileListItem" name="Item150" template="ChatEmojiPicker/EmoticonTileListItemTemplate"/>
+            <Frame type="EmoticonTileListItem" name="Item151" template="ChatEmojiPicker/EmoticonTileListItemTemplate"/>
+            <Frame type="EmoticonTileListItem" name="Item152" template="ChatEmojiPicker/EmoticonTileListItemTemplate"/>
+            <Frame type="EmoticonTileListItem" name="Item153" template="ChatEmojiPicker/EmoticonTileListItemTemplate"/>
+            <Frame type="EmoticonTileListItem" name="Item154" template="ChatEmojiPicker/EmoticonTileListItemTemplate"/>
+            <Frame type="EmoticonTileListItem" name="Item155" template="ChatEmojiPicker/EmoticonTileListItemTemplate"/>
+            <Frame type="EmoticonTileListItem" name="Item156" template="ChatEmojiPicker/EmoticonTileListItemTemplate"/>
+            <Frame type="EmoticonTileListItem" name="Item157" template="ChatEmojiPicker/EmoticonTileListItemTemplate"/>
+            <Frame type="EmoticonTileListItem" name="Item158" template="ChatEmojiPicker/EmoticonTileListItemTemplate"/>
+            <Frame type="EmoticonTileListItem" name="Item159" template="ChatEmojiPicker/EmoticonTileListItemTemplate"/>
+            <Frame type="EmoticonTileListItem" name="Item160" template="ChatEmojiPicker/EmoticonTileListItemTemplate"/>
+            <Frame type="EmoticonTileListItem" name="Item161" template="ChatEmojiPicker/EmoticonTileListItemTemplate"/>
+            <Frame type="EmoticonTileListItem" name="Item162" template="ChatEmojiPicker/EmoticonTileListItemTemplate"/>
+            <Frame type="EmoticonTileListItem" name="Item163" template="ChatEmojiPicker/EmoticonTileListItemTemplate"/>
+            <Frame type="EmoticonTileListItem" name="Item164" template="ChatEmojiPicker/EmoticonTileListItemTemplate"/>
+            <Frame type="EmoticonTileListItem" name="Item165" template="ChatEmojiPicker/EmoticonTileListItemTemplate"/>
+            <Frame type="EmoticonTileListItem" name="Item166" template="ChatEmojiPicker/EmoticonTileListItemTemplate"/>
+            <Frame type="EmoticonTileListItem" name="Item167" template="ChatEmojiPicker/EmoticonTileListItemTemplate"/>
+            <Frame type="EmoticonTileListItem" name="Item168" template="ChatEmojiPicker/EmoticonTileListItemTemplate"/>
+            <Frame type="EmoticonTileListItem" name="Item169" template="ChatEmojiPicker/EmoticonTileListItemTemplate"/>
+            <Frame type="EmoticonTileListItem" name="Item170" template="ChatEmojiPicker/EmoticonTileListItemTemplate"/>
+            <Frame type="EmoticonTileListItem" name="Item171" template="ChatEmojiPicker/EmoticonTileListItemTemplate"/>
+            <Frame type="EmoticonTileListItem" name="Item172" template="ChatEmojiPicker/EmoticonTileListItemTemplate"/>
+            <Frame type="EmoticonTileListItem" name="Item173" template="ChatEmojiPicker/EmoticonTileListItemTemplate"/>
+            <Frame type="EmoticonTileListItem" name="Item174" template="ChatEmojiPicker/EmoticonTileListItemTemplate"/>
+            <Frame type="EmoticonTileListItem" name="Item175" template="ChatEmojiPicker/EmoticonTileListItemTemplate"/>
+            <Frame type="EmoticonTileListItem" name="Item176" template="ChatEmojiPicker/EmoticonTileListItemTemplate"/>
+            <Frame type="EmoticonTileListItem" name="Item177" template="ChatEmojiPicker/EmoticonTileListItemTemplate"/>
+            <Frame type="EmoticonTileListItem" name="Item178" template="ChatEmojiPicker/EmoticonTileListItemTemplate"/>
+            <Frame type="EmoticonTileListItem" name="Item179" template="ChatEmojiPicker/EmoticonTileListItemTemplate"/>
+            <Frame type="EmoticonTileListItem" name="Item180" template="ChatEmojiPicker/EmoticonTileListItemTemplate"/>
+            <Frame type="EmoticonTileListItem" name="Item181" template="ChatEmojiPicker/EmoticonTileListItemTemplate"/>
+            <Frame type="EmoticonTileListItem" name="Item182" template="ChatEmojiPicker/EmoticonTileListItemTemplate"/>
+            <Frame type="EmoticonTileListItem" name="Item183" template="ChatEmojiPicker/EmoticonTileListItemTemplate"/>
+            <Frame type="EmoticonTileListItem" name="Item184" template="ChatEmojiPicker/EmoticonTileListItemTemplate"/>
+            <Frame type="EmoticonTileListItem" name="Item185" template="ChatEmojiPicker/EmoticonTileListItemTemplate"/>
+            <Frame type="EmoticonTileListItem" name="Item186" template="ChatEmojiPicker/EmoticonTileListItemTemplate"/>
+            <Frame type="EmoticonTileListItem" name="Item187" template="ChatEmojiPicker/EmoticonTileListItemTemplate"/>
+            <Frame type="EmoticonTileListItem" name="Item188" template="ChatEmojiPicker/EmoticonTileListItemTemplate"/>
+            <Frame type="EmoticonTileListItem" name="Item189" template="ChatEmojiPicker/EmoticonTileListItemTemplate"/>
+            <Frame type="EmoticonTileListItem" name="Item190" template="ChatEmojiPicker/EmoticonTileListItemTemplate"/>
+            <Frame type="EmoticonTileListItem" name="Item191" template="ChatEmojiPicker/EmoticonTileListItemTemplate"/>
+            <Frame type="EmoticonTileListItem" name="Item192" template="ChatEmojiPicker/EmoticonTileListItemTemplate"/>
+            <Frame type="EmoticonTileListItem" name="Item193" template="ChatEmojiPicker/EmoticonTileListItemTemplate"/>
+            <Frame type="EmoticonTileListItem" name="Item194" template="ChatEmojiPicker/EmoticonTileListItemTemplate"/>
+            <Frame type="EmoticonTileListItem" name="Item195" template="ChatEmojiPicker/EmoticonTileListItemTemplate"/>
+            <Frame type="EmoticonTileListItem" name="Item196" template="ChatEmojiPicker/EmoticonTileListItemTemplate"/>
+            <Frame type="EmoticonTileListItem" name="Item197" template="ChatEmojiPicker/EmoticonTileListItemTemplate"/>
+            <Frame type="EmoticonTileListItem" name="Item198" template="ChatEmojiPicker/EmoticonTileListItemTemplate"/>
+            <Frame type="EmoticonTileListItem" name="Item199" template="ChatEmojiPicker/EmoticonTileListItemTemplate"/>
+            <Frame type="EmoticonTileListItem" name="Item200" template="ChatEmojiPicker/EmoticonTileListItemTemplate"/>
+            <Frame type="EmoticonTileListItem" name="Item201" template="ChatEmojiPicker/EmoticonTileListItemTemplate"/>
+            <Frame type="EmoticonTileListItem" name="Item202" template="ChatEmojiPicker/EmoticonTileListItemTemplate"/>
+            <Frame type="EmoticonTileListItem" name="Item203" template="ChatEmojiPicker/EmoticonTileListItemTemplate"/>
+            <Frame type="EmoticonTileListItem" name="Item204" template="ChatEmojiPicker/EmoticonTileListItemTemplate"/>
+            <Frame type="EmoticonTileListItem" name="Item205" template="ChatEmojiPicker/EmoticonTileListItemTemplate"/>
+            <Frame type="EmoticonTileListItem" name="Item206" template="ChatEmojiPicker/EmoticonTileListItemTemplate"/>
+            <Frame type="EmoticonTileListItem" name="Item207" template="ChatEmojiPicker/EmoticonTileListItemTemplate"/>
+            <Frame type="EmoticonTileListItem" name="Item208" template="ChatEmojiPicker/EmoticonTileListItemTemplate"/>
+            <Frame type="EmoticonTileListItem" name="Item209" template="ChatEmojiPicker/EmoticonTileListItemTemplate"/>
+            <Frame type="EmoticonTileListItem" name="Item210" template="ChatEmojiPicker/EmoticonTileListItemTemplate"/>
+            <Frame type="EmoticonTileListItem" name="Item211" template="ChatEmojiPicker/EmoticonTileListItemTemplate"/>
+            <Frame type="EmoticonTileListItem" name="Item212" template="ChatEmojiPicker/EmoticonTileListItemTemplate"/>
+            <Frame type="EmoticonTileListItem" name="Item213" template="ChatEmojiPicker/EmoticonTileListItemTemplate"/>
+            <Frame type="EmoticonTileListItem" name="Item214" template="ChatEmojiPicker/EmoticonTileListItemTemplate"/>
+            <Frame type="EmoticonTileListItem" name="Item215" template="ChatEmojiPicker/EmoticonTileListItemTemplate"/>
+            <Frame type="EmoticonTileListItem" name="Item216" template="ChatEmojiPicker/EmoticonTileListItemTemplate"/>
+            <Frame type="EmoticonTileListItem" name="Item217" template="ChatEmojiPicker/EmoticonTileListItemTemplate"/>
+            <Frame type="EmoticonTileListItem" name="Item218" template="ChatEmojiPicker/EmoticonTileListItemTemplate"/>
+            <Frame type="EmoticonTileListItem" name="Item219" template="ChatEmojiPicker/EmoticonTileListItemTemplate"/>
+            <Frame type="EmoticonTileListItem" name="Item220" template="ChatEmojiPicker/EmoticonTileListItemTemplate"/>
+            <Frame type="EmoticonTileListItem" name="Item221" template="ChatEmojiPicker/EmoticonTileListItemTemplate"/>
+            <Frame type="EmoticonTileListItem" name="Item222" template="ChatEmojiPicker/EmoticonTileListItemTemplate"/>
+            <Frame type="EmoticonTileListItem" name="Item223" template="ChatEmojiPicker/EmoticonTileListItemTemplate"/>
+            <Frame type="EmoticonTileListItem" name="Item224" template="ChatEmojiPicker/EmoticonTileListItemTemplate"/>
+            <Frame type="EmoticonTileListItem" name="Item225" template="ChatEmojiPicker/EmoticonTileListItemTemplate"/>
+            <Frame type="EmoticonTileListItem" name="Item226" template="ChatEmojiPicker/EmoticonTileListItemTemplate"/>
+            <Frame type="EmoticonTileListItem" name="Item227" template="ChatEmojiPicker/EmoticonTileListItemTemplate"/>
+            <Frame type="EmoticonTileListItem" name="Item228" template="ChatEmojiPicker/EmoticonTileListItemTemplate"/>
+            <Frame type="EmoticonTileListItem" name="Item229" template="ChatEmojiPicker/EmoticonTileListItemTemplate"/>
+        </Frame>
+    
+        <Animation name="OpenClosePicker">
+            <Event event="OpenPicker" action="DirectionForward,Play"/>
+            <Event event="ClosePicker" action="DirectionReverse,Play"/>
+
+            <Controller type="Fade" end="Pause">
+                <Key type="Curve" time="0.0" value="0"/>
+                <Key type="Curve" time="0.1" value="0"/>
+                <Key type="Curve" time="0.2" value="255"/>
+            </Controller>
+            
+            <Controller type="State" stateGroup="ExpandedState" end="Pause">
+                <Key type="Identifier" time="0" value="Collapsed"/>
+                <Key type="Identifier" time="0.01" value="Expanded"/>
+                <Key type="Identifier" time="0.1" value="Expanded"/>
+            </Controller>
+        </Animation>
+        
+        <StateGroup name="ExpandedState">
+            <DefaultState val="Collapsed"/>
+            <State name="Collapsed">
+                <Action type="SetProperty" visible="false"/>
+            </State>
+            <State name="Expanded">
+                <Action type="SetProperty" visible="true"/>
+            </State>
+        </StateGroup>
+
+        <StateGroup name="EmojiCapacity">
+            <State name="MaxedOut">
+                <When type="Property" frame="$parent" SupportsEmojis="true"/>
+                <When type="Property" frame="$parent" EmojisRemaining="0" operator="LessThanOrEqual"/>
+            </State>
+        </StateGroup>
+        
+    </Frame>
+</Desc>

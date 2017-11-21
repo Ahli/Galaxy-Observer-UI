@@ -1,0 +1,2665 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<Desc>
+    <DescFlags val="Locked"/>
+    
+    <Constant name="WarChestNodeAnimationSpeed" val="1"/>
+    <Constant name="WarChestNodeColor_Primary" val="0,156,255"/>
+    <Constant name="WarChestNodeColor_Primary_Highlight" val="70,215,255"/>
+    <Constant name="WarChestNodeColor_Secondary" val="5,105,154"/>
+    <Constant name="WarChestNodeColor_Secondary_Highlight" val="3,136,197"/>
+    <Constant name="WarChestNodeColor_White" val="255,255,255"/>
+    
+    <Constant name="WarChestNodeColor_ProgressBar_Primary" val="119,236,255"/>
+    <Constant name="WarChestNodeColor_ProgressBar_Highlight" val="222,245,255"/>
+    
+    <!--
+    ======================================================
+    
+    INFO
+    
+    ======================================================
+    
+    The "WarChestNodeTemplate" is broken up into several different components, each with their own
+    animations which occur based on when events get sent out by the node template itself.
+    
+    State Info:
+    
+    Owned/NotOwned = The player has/has not purchased the War Chest this node belongs to.
+    Locked/Unlocked = The War Chest phase this node is in has opened or not opened yet (each War Chest has 3 phases).
+    Complete/Incomplete = The player has earned enough XP to finish this node whether it is owned or not.
+    Active/Inactive = Whether this node is the node the player APPEARS to be actively earning XP towards (connected to the vertical progress line indicator)
+    -->
+    
+    <!--
+    =================================
+    Base Image Template
+    =================================
+    
+    In an effort to get all of the images in the node and all of the nodes in the War Chest to batch for
+    better performance, all of the image frames in the node use the same textures on each of their
+    four layers, with the same AlphaLayer, AlphaChannel and ColorAdjustMode settings.
+    -->
+        
+    <Frame type="Image" name="ImageTemplate">
+        <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+        <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+        <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+        <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+        <LayerCount val="4"/>
+        
+        <Texture val="@UI/SC2_UI_Collection_WarChest_Node_Mask" layer="0"/>
+        <TextureCoords top="0.49" left="0.49" bottom="0.51" right="0.51" layer="0"/>
+        <AlphaLayer val="True" layer="0"/>
+        
+        <Texture val="@UI/SC2_UI_Collection_WarChest_Node_Mask" layer="1"/>
+        <TextureCoords top="0.00" left="0.00" bottom="0.01" right="0.01" layer="1"/>
+        <AlphaLayer val="True" layer="1"/>
+        <AlphaChannel val="InverseAlpha" layer="1"/>
+        
+        <Texture val="@UI/SC2_UI_Collection_WarChest_Node_Mask" layer="2"/>
+        <TextureCoords top="0.00" left="0.00" bottom="0.01" right="0.01" layer="2"/>
+        <AlphaLayer val="True" layer="2"/>
+        <AlphaChannel val="InverseRed" layer="2"/>
+        
+        <Texture val="@UI/SC2_UI_Collection_WarChest_Node_Components_Sheet" layer="3"/>
+        <TextureCoords top="0.49" left="0.07" bottom="0.51" right="0.09" layer="3"/>
+    </Frame>
+    
+    <!--
+    ======================================================
+    
+    DATA AND ANCHORING COMPONENTS
+    
+    ======================================================
+    
+    These components are used for retrieving data to drive the node states, as well as for helping 
+    other outside frames anchor effectively to the node during its different states.
+    -->
+    
+    <!--
+    =================================
+    WarChestTierFrame Template
+    =================================
+    -->
+    
+    <Frame type="WarChestTierFrame" name="WarChestTierFrameTemplate">
+        <Anchor relative="$parent/StandardNodeComponentsContainer/NodeButton"/>
+        <Season val="{$ancestor[@type=WarChestFrame]/@CurrentSeason}"/>
+        <AcceptsMouseTooltip val="true"/>
+        <TooltipFrame val="WarChestTierNodeTooltip"/>
+        <TooltipAnchorPosition val="BottomToBottom | HCenterToCenter"/>
+    </Frame>
+    
+    <!--
+    =================================
+    Tier Node Complete AchievementInfoFrame Template
+    =================================
+    -->
+    
+    <Frame type="AchievementInfoFrame" name="TierNodeCompleteAchievementInfoFrameTemplate">
+        <Anchor relative="$parent"/>
+        <AchievementId val="{$parent/WarChestTierFrame/@AchievementId}"/>
+        <PresenceId val="{$BattleUI/@LocalToonPresenceId}"/>
+    </Frame>
+    
+    <!--
+    =================================
+    War Chest Owned AchievementInfoFrame Template
+    =================================
+    -->
+    
+    <Frame type="AchievementInfoFrame" name="WarChestOwnedAchievementInfoFrameTemplate">
+        <Anchor relative="$parent"/>
+        <AchievementId val="{$parent/WarChestTierFrame/@StartAchievementId}"/>
+        <PresenceId val="{$BattleUI/@LocalToonPresenceId}"/>
+    </Frame>
+    
+    <!--
+    =================================
+    Line Distance Check Template
+    =================================
+    -->
+    
+    <Frame type="RangeFrame" name="LineDistanceCheckTemplate">
+        <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+        <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+        <Anchor side="Left" relative="$WarChestNodeProgressIndicatorLine" pos="Mid" offset="0"/>
+        <Anchor side="Right" relative="$parent" pos="Mid" offset="5"/>
+        <LowerWidth val="0"/>
+        <UpperWidth val="10"/>
+    </Frame>
+    
+    <!--
+    =================================
+    Node Sizing Frame
+    =================================
+    -->
+    
+    <Frame type="Frame" name="NodeSizingFrameTemplate">
+        <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+        <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+        <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+        <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+        <Width val="52"/>
+        
+        <StateGroup name="NodeState">
+            
+            <State name="NodeUnlockOwned">
+                <When type="StateGroup" frame="$parent" NodeState="NodeUnlockOwned"/>
+                <Action type="SetProperty" frame="$this" Width="52"/>
+            </State>
+            <State name="NodeUnlockNotOwned">
+                <When type="StateGroup" frame="$parent" NodeState="NodeUnlockNotOwned"/>
+                <Action type="SetProperty" frame="$this" Width="52"/>
+            </State>
+            <State name="PhaseUnlock">
+                <When type="StateGroup" frame="$parent" NodeState="PhaseUnlock"/>
+                <Action type="SetProperty" frame="$this" Width="22"/>
+            </State>
+            <State name="OwnedUnlockedComplete">
+                <When type="StateGroup" frame="$parent" NodeState="OwnedUnlockedComplete"/>
+                <Action type="SetProperty" frame="$this" Width="32"/>
+            </State>
+            <State name="OwnedUnlockedIncompleteActive">
+                <When type="StateGroup" frame="$parent" NodeState="OwnedUnlockedIncompleteActive"/>
+                <Action type="SetProperty" frame="$this" Width="52"/>
+            </State>
+            <State name="OwnedUnlockedIncompleteInactive">
+                <When type="StateGroup" frame="$parent" NodeState="OwnedUnlockedIncompleteInactive"/>
+                <Action type="SetProperty" frame="$this" Width="22"/>
+            </State>
+            <State name="OwnedLockedIncompleteActive">
+                <When type="StateGroup" frame="$parent" NodeState="OwnedLockedIncompleteActive"/>
+                <Action type="SetProperty" frame="$this" Width="52"/>
+            </State>
+            <State name="OwnedLockedIncompleteInactive">
+                <When type="StateGroup" frame="$parent" NodeState="OwnedLockedIncompleteInactive"/>
+                <Action type="SetProperty" frame="$this" Width="22"/>
+            </State>
+            <State name="NotOwnedUnlockedComplete">
+                <When type="StateGroup" frame="$parent" NodeState="NotOwnedUnlockedComplete"/>
+                <Action type="SetProperty" frame="$this" Width="32"/>
+            </State>
+            <State name="NotOwnedUnlockedIncompleteActive">
+                <When type="StateGroup" frame="$parent" NodeState="NotOwnedUnlockedIncompleteActive"/>
+                <Action type="SetProperty" frame="$this" Width="42"/>
+            </State>
+            <State name="NotOwnedUnlockedIncompleteInactive">
+                <When type="StateGroup" frame="$parent" NodeState="NotOwnedUnlockedIncompleteInactive"/>
+                <Action type="SetProperty" frame="$this" Width="22"/>
+            </State>
+            <State name="NotOwnedLockedIncompleteActive">
+                <When type="StateGroup" frame="$parent" NodeState="NotOwnedLockedIncompleteActive"/>
+                <Action type="SetProperty" frame="$this" Width="42"/>
+            </State>
+            <State name="NotOwnedLockedIncompleteInactive">
+                <When type="StateGroup" frame="$parent" NodeState="NotOwnedLockedIncompleteInactive"/>
+                <Action type="SetProperty" frame="$this" Width="22"/>
+            </State>
+        </StateGroup>
+    </Frame>
+    
+    <!--
+    ======================================================
+    
+    STANDARD NODE VISUAL COMPONENTS
+    
+    ======================================================
+    
+    These visual elements are what comprises the node while the unlock animation is not playing.
+    -->
+    
+    <!--
+    =================================
+    Unlocked Hover Background Glow Template
+    =================================
+    -->
+        
+    <Frame type="Image" name="UnlockedHoverBackgroundGlowTemplate" template="WarChestNodeTemplate/ImageTemplate">
+        <Width val="142"/>
+        <Height val="142"/>
+        <LayerAlpha val="0" layer="3"/>
+        <Color val="0,118,218"/>
+        
+        <TextureCoords top="-0.01" left="-0.01" bottom="1.01" right="1.01" layer="0"/>
+        <TextureCoords top="0" left="0" bottom="0.01" right="0.01" layer="1"/>
+        <TextureCoords top="0.52" left="0.04" bottom="0.98" right="0.50" layer="3"/>
+        
+        <Animation name="UnlockedNodeGlowStart">
+            <Event event="NodeUnlockEnd" action="DirectionForward,Play" frame="$parent/$parent"/>
+            <Event event="OnMouseEnter" action="DirectionReverse,Play" frame="$parent/NodeButton"/>
+            <Event event="OnHidden" action="Reset,Stop" frame="$WarChestFrame"/>
+             
+            <Controller type="Property" property="LayerAlpha" curve="True" index="3"  end="Pause" frame="$this">
+                <Key type="Property" time="0.000" value="0" inout="Linear"/>
+                <Key type="Property" time="0.500" value="150" inout="Linear"/>
+            </Controller>
+        </Animation>
+        
+        <StateGroup name="VisibleState">
+            <DefaultState val="NotVisible"/>
+
+            <State name="Visible">
+                <When type="StateGroup" frame="$parent/$parent" OwnedState="Owned"/>
+                <Action type="SetProperty" frame="$this" visible="True"/>
+            </State>
+            
+            <State name="NotVisible">
+                <Action type="SetProperty" frame="$this" visible="False"/>
+            </State>
+        </StateGroup>
+    </Frame>
+    
+    <!--
+    =================================
+    Purchase Intro Background Glow Template
+    =================================
+    -->
+        
+    <Frame type="Image" name="PurchaseIntroBackgroundGlowTemplate" template="WarChestNodeTemplate/ImageTemplate">
+        <Width val="128"/>
+        <Height val="128"/>
+        <LayerAlpha val="0" layer="3"/>
+        <Color val="0,118,218"/>
+        
+        <TextureCoords top="-0.01" left="-0.01" bottom="1.01" right="1.01" layer="0"/>
+        <TextureCoords top="0" left="0" bottom="0.01" right="0.01" layer="1"/>
+        <TextureCoords top="0.52" left="0.04" bottom="0.98" right="0.50" layer="3"/>
+    </Frame>
+    
+    <!--
+    =================================
+    Progress Bar Background Glow Template
+    =================================
+    -->
+        
+    <Frame type="Image" name="ProgressBarBackgroundGlowTemplate" template="WarChestNodeTemplate/ImageTemplate">
+        <Width val="160"/>
+        <Height val="160"/>
+        <LayerAlpha val="0" layer="3"/>
+        <Color val="0,118,218"/>
+        
+        <TextureCoords top="-0.01" left="-0.01" bottom="1.01" right="1.01" layer="0"/>
+        <TextureCoords top="0" left="0" bottom="0.01" right="0.01" layer="1"/>
+        <TextureCoords top="0.52" left="0.04" bottom="0.98" right="0.50" layer="3"/>
+        
+        <Animation name="ShowProgressBarBackgroundGlow" speed="#WarChestNodeAnimationSpeed">
+            <Event event="OnShown" action="Reset,Play" frame="$this"/>
+            
+            <Controller type="Property" property="LayerAlpha" curve="True" index="3"  end="Loop" frame="$this">
+                <Key type="Property" time="0.000" value="55" inout="Slow"/>
+                <Key type="Property" time="1.600" value="80" inout="Slow"/>
+                <Key type="Property" time="3.200" value="55" inout="Slow"/>
+            </Controller>
+            
+            <Controller type="Dimension" dimension="Width" relative="False" percentage="True" end="Loop" frame="$this">
+                <Key type="Curve" time="0.000" value="120" inout="Slow"/>
+                <Key type="Curve" time="1.600" value="145" inout="Slow"/>
+                <Key type="Curve" time="3.200" value="120" inout="Slow"/>
+            </Controller>
+            
+            <Controller type="Dimension" dimension="Height" relative="False" percentage="True" end="Loop" frame="$this">
+                <Key type="Curve" time="0.000" value="120" inout="Slow"/>
+                <Key type="Curve" time="1.600" value="145" inout="Slow"/>
+                <Key type="Curve" time="3.200" value="120" inout="Slow"/>
+            </Controller>
+            
+        </Animation>
+        
+        <StateGroup name="VisibleState">
+            <DefaultState val="NotVisible"/>
+            
+            <!-- The node is both active and not blocked by the phase from progressing further -->
+            <State name="Visible">
+                <When type="StateGroup" frame="$parent/$parent" OwnedState="Owned"/>
+                <When type="StateGroup" frame="$parent/$parent" ActiveState="Active"/>
+                <When type="StateGroup" frame="$parent" BlockedState="NotBlocked"/>
+                <Action type="SetProperty" frame="$this" visible="True"/>
+            </State>
+            
+            <State name="NotVisible">
+                <Action type="SetProperty" frame="$this" visible="False"/>
+            </State>
+        </StateGroup>
+    </Frame>
+    
+    <!--
+    =================================
+    Progress Bar Background Template
+    =================================
+    -->
+        
+    <Frame type="Image" name="ProgressBarBackgroundTemplate" template="WarChestNodeTemplate/ImageTemplate">
+        <Width val="46"/>
+        <Height val="46"/>
+        <!-- <Alpha val="{$parent/ProgressBar/@Alpha}"/> -->
+        
+        <TextureCoords top="0.1" left="0.1" bottom="0.9" right="0.9" layer="0"/>
+        <TextureCoords top="0" left="0" bottom="1.00" right="1.00" layer="1"/>
+        <TextureCoords top="0.52" left="0.04" bottom="0.98" right="0.50" layer="3"/>
+        
+        <Animation name="ShowProgressBar" speed="#WarChestNodeAnimationSpeed">
+            <Event event="OnShown" action="Reset,Play" frame="$this"/>
+            
+            <Controller type="Fade" end="Pause" frame="$this">
+                <Key type="Curve" time="0.00" value="0" inout="Linear"/>
+                <Key type="Curve" time="0.017" value="255" inout="Linear"/>
+                <Key type="Curve" time="0.067" value="128" inout="Linear"/>
+                <Key type="Curve" time="0.117" value="191" inout="Linear"/>
+                <Key type="Curve" time="0.167" value="90" inout="Linear"/>
+                <Key type="Curve" time="0.217" value="255" inout="Linear"/>
+            </Controller>
+        </Animation>
+        
+        <StateGroup name="VisibleState">
+            <DefaultState val="NotVisible"/>
+            
+            <!-- The node is both active and not blocked by the phase from progressing further -->
+            <State name="Visible">
+                <When type="StateGroup" frame="$parent/$parent" OwnedState="Owned"/>
+                <When type="StateGroup" frame="$parent/$parent" ActiveState="Active"/>
+                <When type="StateGroup" frame="$parent" BlockedState="NotBlocked"/>
+                <Action type="SetProperty" frame="$this" visible="True"/>
+            </State>
+            
+            <State name="NotVisible">
+                <Action type="SetProperty" frame="$this" visible="False"/>
+            </State>
+        </StateGroup>
+    </Frame>
+    
+    <!--
+    =================================
+    Not Owned Progress Bar Background Template
+    =================================
+    -->
+            
+    <Frame type="Image" name="NotOwnedProgressBarBackgroundTemplate" template="WarChestNodeTemplate/ImageTemplate">
+        <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+        <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+        <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+        <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+        <Width val="80"/>
+        <Height val="80"/>
+        <Color val="#WarChestNodeColor_Primary"/>
+        <LayerAlpha val="60" layer="3"/>
+        <Rotation val="0"/>
+        <LayerCount val="4"/>
+        
+        <TextureCoords top="-0.40" left="-0.40" bottom="1.40" right="1.40" layer="0"/>
+        <TextureCoords top="-0.52" left="-0.52" bottom="1.52" right="1.52" layer="1"/>
+        <TextureType val="Normal" layer="3"/>
+    
+        <Animation name="ShowProgressBar" speed="#WarChestNodeAnimationSpeed">
+            <Event event="OnShown" action="Reset,Play" frame="$this"/>
+            
+            <Controller type="Property" property="LayerAlpha" curve="True" index="1" end="Pause" frame="$this">
+                <Key type="Property" time="0.00" value="0" inout="Linear"/>
+                <Key type="Property" time="0.017" value="255" inout="Linear"/>
+                <Key type="Property" time="0.067" value="128" inout="Linear"/>
+                <Key type="Property" time="0.117" value="191" inout="Linear"/>
+                <Key type="Property" time="0.167" value="90" inout="Linear"/>
+                <Key type="Property" time="0.217" value="255" inout="Linear"/>
+            </Controller>
+        </Animation>
+        
+        <StateGroup name="VisibleState">
+            <DefaultState val="NotVisible"/>
+            
+            <!-- The node is both active and not blocked by the phase from progressing further -->
+            <State name="Visible">
+                <When type="StateGroup" frame="$parent/$parent" OwnedState="NotOwned"/>
+                <When type="StateGroup" frame="$parent/$parent" ActiveState="Active"/>
+                <When type="StateGroup" frame="$parent" BlockedState="NotBlocked"/>
+                <Action type="SetProperty" frame="$this" visible="True"/>
+            </State>
+            
+            <State name="NotVisible">
+                <Action type="SetProperty" frame="$this" visible="False"/>
+            </State>
+        </StateGroup>
+    </Frame>
+    
+    <!--
+    =================================
+    Progress Bar Template
+    =================================
+    -->
+    
+    <Frame type="ProgressBar" name="ProgressBarTemplate">
+        <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+        <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+        <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+        <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+        <Width val="80"/>
+        <Height val="80"/>
+        <UseFillContainer val="False"/>
+        <Circular val="True"/>
+        <CircularStart val="0"/>
+        <CircularEndOffset val="360"/>
+        <MinValue val="{$parent/$parent/WarChestTierFrame/@MinXP}"/>
+        <MaxValue val="{$parent/$parent/WarChestTierFrame/@MaxXP}"/>
+        <Value val="{$WarChestExperienceCounter/@CurrentValue}"/>
+        <Alpha val="0"/>
+        
+        <Frame type="Frame" name="FillImageContainer">
+            <Anchor relative="$parent"/>
+            
+            <Frame type="Image" name="FillImageBlur" template="WarChestNodeTemplate/ImageTemplate">
+                <Anchor relative="$parent"/>
+                <StartAngle val="{$parent/FillImage/@StartAngle}"/>
+                <EndAngleOffset val="{$parent/FillImage/@EndAngleOffset}"/>
+                <Color val="{$parent/FillImage/@Color}"/>
+                <LayerAlpha val="{$parent/FillImage/@LayerAlpha[3]}" layer="3"/>
+                <Rotation val="{$parent/FillImage/@Rotation}"/>
+                <Blur val="True"/>
+                <BlurAmount val="1.3"/>
+                
+                <TextureCoords val="{$parent/FillImage/@TextureCoords[0]}" layer="0"/>
+                <TextureCoords val="{$parent/FillImage/@TextureCoords[1]}" layer="1"/>
+                <TextureCoords val="{$parent/FillImage/@TextureCoords[2]}" layer="2"/>
+                <TextureType val="Circular" layer="3"/>
+            </Frame>
+            
+            <Frame type="Image" name="FillImage" template="WarChestNodeTemplate/ImageTemplate">
+                <Anchor relative="$parent"/>
+                <Color val="#WarChestNodeColor_ProgressBar_Primary"/>
+                <Rotation val="0"/>
+                <LayerCount val="4"/>
+                
+                <TextureCoords top="-0.21" left="-0.21" bottom="1.21" right="1.21" layer="0"/>
+                <TextureCoords top="-0.3" left="-0.3" bottom="1.3" right="1.3" layer="1"/>
+                <TextureType val="Circular" layer="3"/>
+            </Frame>
+        </Frame>
+        
+        <Animation name="ShowProgressBar" speed="#WarChestNodeAnimationSpeed">
+            <Event event="OnShown" action="Reset,Play" frame="$this"/>
+            
+            <Controller type="Fade" end="Pause" frame="$this">
+                <Key type="Curve" time="0.00" value="0" inout="Linear"/>
+                <Key type="Curve" time="0.017" value="255" inout="Linear"/>
+                <Key type="Curve" time="0.067" value="128" inout="Linear"/>
+                <Key type="Curve" time="0.117" value="191" inout="Linear"/>
+                <Key type="Curve" time="0.167" value="90" inout="Linear"/>
+                <Key type="Curve" time="0.217" value="255" inout="Linear"/>
+            </Controller>
+        </Animation>
+        
+        <StateGroup name="OwnedState">
+            <DefaultState val="NotOwned"/>
+            
+            <State name="Owned">
+                <When type="StateGroup" frame="$parent/$parent" OwnedState="Owned"/>
+                <Action type="SetProperty" frame="$this/FillImageContainer/FillImage" textureCoords="-0.21,-0.21,1.21,1.21" index="0"/>
+                <Action type="SetProperty" frame="$this/FillImageContainer/FillImage" textureCoords="-0.3,-0.3,1.3,1.3" index="1"/>
+            </State>
+            
+            <State name="NotOwned">
+                <Action type="SetProperty" frame="$this/FillImageContainer/FillImage" textureCoords="-0.40,-0.40,1.40,1.40" index="0"/>
+                <Action type="SetProperty" frame="$this/FillImageContainer/FillImage" textureCoords="-0.52,-0.52,1.52,1.52" index="1"/>
+            </State>
+        </StateGroup>
+        
+        <StateGroup name="VisibleState">
+            <DefaultState val="NotVisible"/>
+        
+            <!-- The node is both active and not blocked by the phase from progressing further -->
+            <State name="Visible">
+                <When type="StateGroup" frame="$parent/$parent" ActiveState="Active"/>
+                <When type="StateGroup" frame="$parent" BlockedState="NotBlocked"/>
+                <Action type="SetProperty" frame="$this" visible="True"/>
+            </State>
+            
+            <State name="NotVisible">
+                <Action type="SetProperty" frame="$this" visible="False"/>
+            </State>
+        </StateGroup>
+    </Frame>
+    
+    <!--
+    =================================
+    Node Arrow Template
+    =================================
+    -->
+        
+    <Frame type="Image" name="NodeArrowTemplate">
+        <Anchor side="Top" relative="$parent" pos="Mid" offset="-36"/>
+        <Anchor side="Bottom" relative="$parent" pos="Mid" offset="-20"/>
+        <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+        <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+        <Width val="20"/>
+        <Texture val="@UI/SC2_UI_Collection_WarChest_ComicPreviewArrow_Disabled"/>
+        <Visible val="false"/>
+        
+        <Animation name="NodeHover">
+            <Event event="OnShown" action="Reset,Play"/>
+            
+            <Controller type="Sound" end="Stop">
+                <Key type="Sound" time="0.0" sound="@UI_WarChest_Node_Hover"/>
+            </Controller>
+
+            <Controller type="Fade" end="Pause">
+                <Key type="Curve" time="0.000" value="0" out="Linear"/>
+                <Key type="Curve" time="0.017" value="0" out="Linear"/>
+                <Key type="Curve" time="0.100" value="255" in="Linear"/>
+            </Controller>
+            
+            <Controller type="Anchor" end="Pause" side="Top" relative="true">
+                <Key type="Curve" time="0.000" value="12" inOut="Linear"/>
+                <Key type="Curve" time="0.017" value="12" inOut="Linear"/>
+                <Key type="Curve" time="0.117" value="0" inOut="Slow"/>
+            </Controller>
+            
+            <Controller type="Anchor" end="Pause" side="Bottom" relative="true">
+                <Key type="Curve" time="0.000" value="12" inOut="Linear"/>
+                <Key type="Curve" time="0.017" value="12" inOut="Linear"/>
+                <Key type="Curve" time="0.117" value="0" inOut="Slow"/>
+            </Controller>
+        </Animation>
+        
+        <StateGroup name="VisibleState">
+            <DefaultState val="NotVisible"/>
+            
+            <State name="Visible">
+                <When type="Property" frame="$parent/NodeButton" Hovering="true"/>
+                <Action type="SetProperty" frame="$this" visible="True"/>
+            </State>
+            
+            <State name="NotVisible">
+                <Action type="SetProperty" frame="$this" visible="False"/>
+            </State>
+        </StateGroup>
+    </Frame>
+    
+    <!--
+    =================================
+    Node Button Template
+    =================================
+    -->
+    
+    <Frame type="GameContentDialogButton" name="NodeButtonTemplate">
+        <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+        <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+        <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+        <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+        <Width val="72"/>
+        <Height val="48"/>
+        <Toggleable val="true"/>
+        <Visible val="True"/>
+        <DisplayType val="ImageLayer"/>
+        <!-- <HoverSound val="@UI_WarChest_Node_Hover"/> -->
+        <GameContent val="{$this/BundleFrame/@GameContent}"/>
+        
+        <Frame type="BundleCacheFrame" name="BundleFrame">
+            <Anchor relative="$parent"/>
+            <Bundle val="{$parent/$parent/$parent/WarChestTierFrame/@Bundle}"/>
+        </Frame>
+                
+        <Frame type="Image" name="NormalImage">
+            <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+            <Width val="72"/>
+            <Height val="72"/>
+            <LayerCount val="4"/>
+            <Texture val="@UI/SC2_UI_Collection_WarChest_Node_States_Sheet" layer="0"/>
+            <Texture val="@UI/SC2_UI_Collection_WarChest_Node_States_Sheet" layer="1"/>
+            <Texture val="@UI/SC2_UI_Collection_WarChest_Node_States_Sheet" layer="2"/>
+            <Texture val="@UI/SC2_UI_Collection_WarChest_Node_States_Sheet" layer="3"/>
+            <TextureCoords val="{$this/@TextureCoords[0]}" layer="2"/>
+            <TextureCoords val="{$this/@TextureCoords[0]}" layer="3"/>
+        </Frame>
+        
+        <Frame type="Image" name="HoverImage">
+            <Anchor relative="$parent/NormalImage"/>
+            <LayerCount val="4"/>
+            <Texture val="@UI/SC2_UI_Collection_WarChest_Node_States_Sheet" layer="0"/>
+            <Texture val="@UI/SC2_UI_Collection_WarChest_Node_States_Sheet" layer="1"/>
+            <Texture val="@UI/SC2_UI_Collection_WarChest_Node_States_Sheet" layer="2"/>
+            <Texture val="@UI/SC2_UI_Collection_WarChest_Node_States_Sheet" layer="3"/>
+            <TextureCoords val="{$parent/NormalImage/@TextureCoords[1]}" layer="1"/>
+            <TextureCoords val="{$this/@TextureCoords[0]}" layer="2"/>
+            <TextureCoords val="{$this/@TextureCoords[0]}" layer="3"/>
+        </Frame>
+
+        <StateGroup name="NodeState">
+            <State name="OwnedUnlockedCompleteAnimating">
+                <When type="StateGroup" frame="$parent/$parent" NodeState="OwnedUnlockedComplete"/>
+                <When type="StateGroup" frame="$parent/$parent" UnlockAnimationState="Incomplete"/>
+                <Action type="SetProperty" frame="$this/NormalImage" textureCoords="0.25,0.00,0.50,0.20" index="0"/>
+                <Action type="SetProperty" frame="$this/NormalImage" textureCoords="0.25,0.40,0.50,0.60" index="1"/>
+                <Action type="SetProperty" frame="$this/HoverImage" textureCoords="0.25,0.20,0.50,0.40" index="0"/>
+            </State>
+            <State name="OwnedUnlockedComplete">
+                <When type="StateGroup" frame="$parent/$parent" NodeState="OwnedUnlockedComplete"/>
+                <Action type="SetProperty" frame="$this/NormalImage" textureCoords="0.00,0.00,0.25,0.20" index="0"/>
+                <Action type="SetProperty" frame="$this/NormalImage" textureCoords="0.00,0.40,0.25,0.60" index="1"/>
+                <Action type="SetProperty" frame="$this/HoverImage" textureCoords="0.00,0.20,0.25,0.40" index="0"/>
+            </State>
+            <State name="OwnedUnlockedIncompleteActive">
+                <When type="StateGroup" frame="$parent/$parent" NodeState="OwnedUnlockedIncompleteActive"/>
+                <Action type="SetProperty" frame="$this/NormalImage" textureCoords="0.25,0.00,0.50,0.20" index="0"/>
+                <Action type="SetProperty" frame="$this/NormalImage" textureCoords="0.25,0.40,0.50,0.60" index="1"/>
+                <Action type="SetProperty" frame="$this/HoverImage" textureCoords="0.25,0.20,0.50,0.40" index="0"/>
+            </State>
+            <State name="OwnedUnlockedIncompleteInactive">
+                <When type="StateGroup" frame="$parent/$parent" NodeState="OwnedUnlockedIncompleteInactive"/>
+                <Action type="SetProperty" frame="$this/NormalImage" textureCoords="0.25,0.00,0.50,0.20" index="0"/>
+                <Action type="SetProperty" frame="$this/NormalImage" textureCoords="0.25,0.40,0.50,0.60" index="1"/>
+                <Action type="SetProperty" frame="$this/HoverImage" textureCoords="0.25,0.20,0.50,0.40" index="0"/>
+            </State>
+            <State name="OwnedLockedIncompleteActive">
+                <When type="StateGroup" frame="$parent/$parent" NodeState="OwnedLockedIncompleteActive"/>
+                <Action type="SetProperty" frame="$this/NormalImage" textureCoords="0.50,0.00,0.75,0.20" index="0"/>
+                <Action type="SetProperty" frame="$this/NormalImage" textureCoords="0.50,0.40,0.75,0.60" index="1"/>
+                <Action type="SetProperty" frame="$this/HoverImage" textureCoords="0.50,0.20,0.75,0.40" index="0"/>
+            </State>
+            <State name="OwnedLockedIncompleteInactive">
+                <When type="StateGroup" frame="$parent/$parent" NodeState="OwnedLockedIncompleteInactive"/>
+                <Action type="SetProperty" frame="$this/NormalImage" textureCoords="0.50,0.00,0.75,0.20" index="0"/>
+                <Action type="SetProperty" frame="$this/NormalImage" textureCoords="0.50,0.40,0.75,0.60" index="1"/>
+                <Action type="SetProperty" frame="$this/HoverImage" textureCoords="0.50,0.20,0.75,0.40" index="0"/>
+            </State>
+            <State name="NotOwnedUnlockedCompleteAnimating">
+                <When type="StateGroup" frame="$parent/$parent" NodeState="NotOwnedUnlockedComplete"/>
+                <When type="StateGroup" frame="$parent/$parent" UnlockAnimationState="Incomplete"/>
+                <Action type="SetProperty" frame="$this/NormalImage" textureCoords="0.00,0.60,0.25,0.80" index="0"/>
+                <Action type="SetProperty" frame="$this/NormalImage" textureCoords="0.50,0.60,0.75,0.80" index="1"/>
+                <Action type="SetProperty" frame="$this/HoverImage" textureCoords="0.25,0.60,0.50,0.80" index="0"/>
+            </State>
+            <State name="NotOwnedUnlockedComplete">
+                <When type="StateGroup" frame="$parent/$parent" NodeState="NotOwnedUnlockedComplete"/>
+                <Action type="SetProperty" frame="$this/NormalImage" textureCoords="0.75,0.00,1.00,0.20" index="0"/>
+                <Action type="SetProperty" frame="$this/NormalImage" textureCoords="0.75,0.40,1.00,0.60" index="1"/>
+                <Action type="SetProperty" frame="$this/HoverImage" textureCoords="0.75,0.20,1.00,0.40" index="0"/>
+            </State>
+            <State name="NotOwnedUnlockedIncompleteActive">
+                <When type="StateGroup" frame="$parent/$parent" NodeState="NotOwnedUnlockedIncompleteActive"/>
+                <Action type="SetProperty" frame="$this/NormalImage" textureCoords="0.00,0.60,0.25,0.80" index="0"/>
+                <Action type="SetProperty" frame="$this/NormalImage" textureCoords="0.50,0.60,0.75,0.80" index="1"/>
+                <Action type="SetProperty" frame="$this/HoverImage" textureCoords="0.25,0.60,0.50,0.80" index="0"/>
+            </State>
+            <State name="NotOwnedUnlockedIncompleteInactive">
+                <When type="StateGroup" frame="$parent/$parent" NodeState="NotOwnedUnlockedIncompleteInactive"/>
+                <Action type="SetProperty" frame="$this/NormalImage" textureCoords="0.00,0.60,0.25,0.80" index="0"/>
+                <Action type="SetProperty" frame="$this/NormalImage" textureCoords="0.50,0.60,0.75,0.80" index="1"/>
+                <Action type="SetProperty" frame="$this/HoverImage" textureCoords="0.25,0.60,0.50,0.80" index="0"/>
+            </State>
+            <State name="NotOwnedLockedIncompleteActive">
+                <When type="StateGroup" frame="$parent/$parent" NodeState="NotOwnedLockedIncompleteActive"/>
+                <Action type="SetProperty" frame="$this/NormalImage" textureCoords="0.00,0.80,0.25,1.00" index="0"/>
+                <Action type="SetProperty" frame="$this/NormalImage" textureCoords="0.50,0.80,0.75,1.00" index="1"/>
+                <Action type="SetProperty" frame="$this/HoverImage" textureCoords="0.25,0.80,0.50,1.00" index="0"/>
+            </State>
+            <State name="NotOwnedLockedIncompleteInactive">
+                <When type="StateGroup" frame="$parent/$parent" NodeState="NotOwnedLockedIncompleteInactive"/>
+                <Action type="SetProperty" frame="$this/NormalImage" textureCoords="0.00,0.80,0.25,1.00" index="0"/>
+                <Action type="SetProperty" frame="$this/NormalImage" textureCoords="0.50,0.80,0.75,1.00" index="1"/>
+                <Action type="SetProperty" frame="$this/HoverImage" textureCoords="0.25,0.80,0.50,1.00" index="0"/>
+            </State>
+        </StateGroup>
+    </Frame>
+    
+    <!--
+    =================================
+    Purchase Intro Node Image Template
+    =================================
+    -->
+    
+    <Frame type="Image" name="PurchaseIntroNodeImageTemplate">
+        <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+        <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+        <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+        <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+        <Width val="72"/>
+        <Height val="72"/>
+        <AcceptsMouse val="False"/>
+        <BlendMode val="Add"/>
+        <Alpha val="0"/>
+        
+        <Texture val="@UI/SC2_UI_Collection_WarChest_Node_States_Sheet"/>
+        <TextureCoords val="{$parent/NodeButton/NormalImage/@TextureCoords[0]}"/>
+    </Frame>
+    
+    <!--
+    ==============================================
+    Standard Node Components Container Template
+    ==============================================
+    -->
+    
+    <Frame type="Frame" name="StandardNodeComponentsContainerTemplate">
+        <Anchor relative="$parent"/>
+        <Visible val="True"/>
+        
+        <Frame type="Image" name="UnlockedHoverBackgroundGlow" template="WarChestNodeTemplate/UnlockedHoverBackgroundGlowTemplate"/>
+        <Frame type="Image" name="PurchaseIntroBackgroundGlow" template="WarChestNodeTemplate/PurchaseIntroBackgroundGlowTemplate"/>
+        <Frame type="Image" name="ProgressBarBackgroundGlow" template="WarChestNodeTemplate/ProgressBarBackgroundGlowTemplate"/>
+        <Frame type="Image" name="ProgressBarBackground" template="WarChestNodeTemplate/ProgressBarBackgroundTemplate"/>
+        <Frame type="Image" name="NotOwnedProgressBarBackground" template="WarChestNodeTemplate/NotOwnedProgressBarBackgroundTemplate"/>
+        <Frame type="ProgressBar" name="ProgressBar" template="WarChestNodeTemplate/ProgressBarTemplate"/>
+        <Frame type="Image" name="NodeArrow" template="WarChestNodeTemplate/NodeArrowTemplate"/>
+        <Frame type="GameContentDialogButton" name="NodeButton" template="WarChestNodeTemplate/NodeButtonTemplate"/>
+        <Frame type="Image" name="PurchaseIntroNodeImage" template="WarChestNodeTemplate/PurchaseIntroNodeImageTemplate"/>
+        
+        <Animation name="PurchaseIntroStart">
+            <Event event="NodePurchaseIntroStart" action="Reset,Play" frame="$parent"/>
+            <Event event="OnShown" action="Stop,Reset" frame="$parent"/>
+
+            <Controller type="Fade" end="Pause" frame="$this/PurchaseIntroNodeImage">
+                <Key type="Curve" time="0.000" value="0" inout="Linear"/>
+                <Key type="Curve" time="0.150" value="255" inout="Linear"/>
+            </Controller>
+            
+            <Controller type="Property" property="LayerAlpha" curve="True" index="3"  end="Pause" frame="$this/PurchaseIntroBackgroundGlow">
+                <Key type="Property" time="0.000" value="0" inout="Linear"/>
+                <Key type="Property" time="0.150" value="128" inout="Linear"/>
+            </Controller>
+        </Animation>
+        
+        <Animation name="PurchaseIntroEnd">
+            <Event event="NodePurchaseIntroEnd" action="Reset,Play" frame="$parent"/>
+            <Event event="OnShown" action="Stop,Reset" frame="$parent"/>
+
+            <Controller type="Fade" end="Pause" frame="$this/PurchaseIntroNodeImage">
+                <Key type="Curve" time="0.000" value="255" inout="Linear"/>
+                <Key type="Curve" time="1.017" value="255" inout="Linear"/>
+                <Key type="Curve" time="1.350" value="0" inout="Linear"/>
+            </Controller>
+            
+            <Controller type="Property" property="LayerAlpha" curve="True" index="3"  end="Pause" frame="$this/PurchaseIntroBackgroundGlow">
+                <Key type="Property" time="0.000" value="128" inout="Linear"/>
+                <Key type="Property" time="0.050" value="76" inout="Linear"/>
+                <Key type="Property" time="0.100" value="165" inout="Linear"/>
+                <Key type="Property" time="0.150" value="102" inout="Linear"/>
+                <Key type="Property" time="0.200" value="128" inout="Linear"/>
+                <Key type="Property" time="1.017" value="128" inout="Linear"/>
+                <Key type="Property" time="1.350" value="0" inout="Linear"/>
+            </Controller>
+        </Animation>
+        
+        <StateGroup name="BlockedState">
+            <DefaultState val="NotBlocked"/>
+        
+            <State name="BlockedOwned">
+                <When type="StateGroup" frame="$parent" NodeState="OwnedUnlockedComplete"/>
+                <When type="StateGroup" frame="$parent" UnlockAnimationState="Complete"/><!-- 
+                <When type="Property" frame="$WarChestCurrentPhaseBind" A="{$parent/WarChestTierFrame/@Round}"/> -->
+            </State>
+            <State name="BlockedNotOwned">
+                <When type="StateGroup" frame="$parent" NodeState="NotOwnedUnlockedComplete"/>
+                <When type="StateGroup" frame="$parent" UnlockAnimationState="Complete"/><!-- 
+                <When type="Property" frame="$WarChestCurrentPhaseBind" A="{$parent/WarChestTierFrame/@Round}"/> -->
+            </State>
+            <State name="NotBlocked"/>
+        </StateGroup>
+    </Frame>
+    
+    <!--
+    ======================================================
+    
+    NODE UNLOCK ANIMATION COMPONENTS
+    
+    ======================================================
+    
+    The node unlock animation is a pretty complex UI animation made up of many different elements animating in unison.  I felt the best
+    way to implement this was to switch out the actual real node button with a container of elements made to look like it while it
+    animates.  This section contains all of the templates for the individual elements contained within that container to be animated.
+    -->
+    
+    <!--
+    =================================
+    Background Glow Template
+    =================================
+    -->
+        
+    <Frame type="Image" name="BackgroundGlowTemplate" template="WarChestNodeTemplate/ImageTemplate">
+        <Width val="200"/>
+        <Height val="200"/>
+        <LayerAlpha val="0" layer="3"/>
+        <Color val="#WarChestNodeColor_Primary"/>
+        
+        <TextureCoords top="-0.01" left="-0.01" bottom="1.01" right="1.01" layer="0"/>
+        <TextureCoords top="0" left="0" bottom="0.01" right="0.01" layer="1"/>
+        <TextureCoords top="0.52" left="0.04" bottom="0.98" right="0.50" layer="3"/>
+    </Frame>
+    
+    <!--
+    =================================
+    Nucleus Template
+    =================================
+    -->
+    
+    <Frame type="Image" name="NucleusTemplate" template="WarChestNodeTemplate/ImageTemplate">
+        <Width val="14"/>
+        <Height val="14"/>
+        
+        <TextureCoords top="0.10" left="0.13" bottom="0.24" right="0.27" layer="3"/>
+    </Frame>
+    
+    <!--
+    =================================
+    Nucleus Highlight Template
+    =================================
+    -->
+    
+    <Frame type="Image" name="NucleusHighlightTemplate" template="WarChestNodeTemplate/ImageTemplate">
+        <Width val="14"/>
+        <Height val="14"/>
+        <LayerAlpha val="0" layer="3"/>
+        
+        <TextureCoords top="0.25" left="0.13" bottom="0.39" right="0.27" layer="3"/>
+    </Frame>
+    
+    <!--
+    =================================
+    Nucleus Border Template
+    =================================
+    -->
+    
+    <Frame type="Image" name="NucleusBorderTemplate" template="WarChestNodeTemplate/ImageTemplate">
+        <Width val="18"/>
+        <Height val="18"/>
+
+        <TextureCoords top="0.41" left="0.45" bottom="0.59" right="0.63" layer="3"/>
+        <TextureType val="Circular"/>
+        <StartAngle val="0"/>
+        <EndAngleOffset val="360"/>
+    </Frame>
+    
+    <!--
+    =================================
+    Fake Progress Bar Template
+    =================================
+    -->
+    
+    <Frame type="Image" name="FakeProgressBarTemplate" template="WarChestNodeTemplate/ImageTemplate">
+        <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+        <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+        <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+        <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+        <Width val="80"/>
+        <Height val="80"/>
+        <Color val="#WarChestNodeColor_Primary"/>
+        <Rotation val="0"/>
+        <LayerCount val="4"/>
+        
+        <TextureCoords top="-0.21" left="-0.21" bottom="1.21" right="1.21" layer="0"/>
+        <TextureCoords top="-0.3" left="-0.3" bottom="1.3" right="1.3" layer="1"/>
+    </Frame>
+    
+    <!--
+    =================================
+    Fake Progress Bar Blur Template
+    =================================
+    -->
+    
+    <Frame type="Image" name="FakeProgressBarBlurTemplate" template="WarChestNodeTemplate/ImageTemplate">
+        <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+        <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+        <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+        <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+        <Width val="80"/>
+        <Height val="80"/>
+        <Color val="{$parent/FakeProgressBar/@Color}"/>
+        <LayerAlpha val="{$parent/FakeProgressBar/@LayerAlpha[3]}" layer="3"/>
+        <Rotation val="{$parent/FakeProgressBar/@Rotation}"/>
+        <Blur val="True"/>
+        <BlurAmount val="1.3"/>
+        
+        <TextureCoords val="{$parent/FakeProgressBar/@TextureCoords[0]}" layer="0"/>
+        <TextureCoords val="{$parent/FakeProgressBar/@TextureCoords[1]}" layer="1"/>
+        <TextureCoords val="{$parent/FakeProgressBar/@TextureCoords[2]}" layer="2"/>
+    </Frame>
+    
+    <!--
+    =================================
+    Inner Circle Template
+    =================================
+    -->
+    
+    <Frame type="Image" name="InnerCircleTemplate" template="WarChestNodeTemplate/ImageTemplate">
+        <Width val="80"/>
+        <Height val="80"/>
+        <Rotation val="0"/>
+        <LayerAlpha val="0" layer="3"/>
+        <Color val="#WarChestNodeColor_Secondary"/>
+        
+        <TextureCoords top="-0.45" left="-0.45" bottom="1.45" right="1.45" layer="0"/>
+        <TextureCoords top="-0.57" left="-0.57" bottom="1.57" right="1.57" layer="1"/>
+        
+        <!--
+        <StateGroup name="BrokenRingState">
+            <DefaultState val="Unbroken"/>
+                    
+            <State name="Unbroken">
+                <Action type="SetProperty" frame="$this" TextureCoords="0.00,0.00,0.01,0.01" index="2"/>
+                <Action type="SetProperty" frame="$this/Blur" TextureCoords="0.00,0.00,0.01,0.01" index="2"/>
+            </State>
+            <State name="Broken">
+                <Action type="SetProperty" frame="$this" TextureCoords="0.20,0.20,0.80,0.80" index="2"/>
+                <Action type="SetProperty" frame="$this/Blur" TextureCoords="0.20,0.20,0.80,0.80" index="2"/>
+            </State>
+        </StateGroup>
+        -->
+        
+        <Frame type="Image" name="Blur" template="WarChestNodeTemplate/ImageTemplate">
+            <Anchor relative="$parent"/>
+            <Color val="#WarChestNodeColor_Secondary"/>
+            <Rotation val="{$parent/@Rotation}"/>
+            <Blur val="True"/>
+            <BlurAmount val="1.3"/>
+            <LayerAlpha val="{$parent/@LayerAlpha[3]}" layer="3"/>
+            
+            <TextureCoords val="{$parent/@TextureCoords[0]}" layer="0"/>
+            <TextureCoords val="{$parent/@TextureCoords[1]}" layer="1"/>
+            <TextureCoords val="{$parent/@TextureCoords[2]}" layer="2"/>
+        </Frame>
+    </Frame>
+    
+    <!--
+    =================================
+    Horizontal Clamp Template (Right)
+    =================================
+    -->
+    
+    <Frame type="Image" name="HorizontalClampTemplate_Right" template="WarChestNodeTemplate/ImageTemplate">
+        <Anchor side="Right" relative="$this" pos="Min" offset="0"/>
+        <Width val="49"/>
+        <Height val="22"/>
+        <RotationPosition val="MiddleLeft"/>
+        <Rotation val="0"/>
+        <Color val="#WarChestNodeColor_Primary"/>
+        <LayerAlpha val="0" layer="3"/>
+
+        <TextureCoords top="0.78" left="0.86" bottom="1.00" right="1.35" layer="3"/>
+    </Frame>
+    
+    <!--
+    =================================
+    Horizontal Clamp Template (Left)
+    =================================
+    -->
+    
+    <Frame type="Image" name="HorizontalClampTemplate_Left" template="WarChestNodeTemplate/HorizontalClampTemplate_Right">
+        <Rotation val="180"/>
+        <Color val="{$parent/HorizontalClamp_Right/@Color}"/>
+        <LayerAlpha val="{$parent/HorizontalClamp_Right/@LayerAlpha[3]}" layer="3"/>
+        
+        <TextureCoords val="{$parent/HorizontalClamp_Right/@TextureCoords[3]}" layer="3"/>
+    </Frame>
+    
+    <!--
+    =================================
+    Horizontal Clamp Blur Template (Right)
+    =================================
+    -->
+    
+    <Frame type="Image" name="HorizontalClampBlurTemplate_Right" template="WarChestNodeTemplate/HorizontalClampTemplate_Right">
+        <Rotation val="{$parent/HorizontalClamp_Right/@Rotation}"/>
+        <Color val="{$parent/HorizontalClamp_Right/@Color}"/>
+        <Blur val="True"/>
+        <BlurAmount val="1.1"/>
+        
+        <TextureCoords val="{$parent/HorizontalClamp_Right/@TextureCoords[3]}" layer="3"/>
+    </Frame>
+    
+    <!--
+    =================================
+    Horizontal Clamp Blur Template (Left)
+    =================================
+    -->
+    
+    <Frame type="Image" name="HorizontalClampBlurTemplate_Left" template="WarChestNodeTemplate/HorizontalClampTemplate_Left">
+        <Rotation val="{$parent/HorizontalClamp_Left/@Rotation}"/>
+        <LayerAlpha val="{$parent/HorizontalClampBlur_Right/@LayerAlpha[3]}" layer="3"/>
+        <Blur val="True"/>
+        <BlurAmount val="1.05"/>
+        
+        <TextureCoords val="{$parent/HorizontalClamp_Left/@TextureCoords[3]}" layer="3"/>
+    </Frame>
+    
+    <!--
+    =================================
+    Dotted Circle Template (Right)
+    =================================
+    -->
+    
+    <Frame type="Image" name="DottedCircleTemplate_Right" template="WarChestNodeTemplate/ImageTemplate">
+        <Width val="46"/>
+        <Height val="46"/>
+        <StartAngle val="70"/>
+        <EndAngleOffset val="0"/>
+        <Rotation val="0"/>
+        <Color val="#WarChestNodeColor_White"/>
+        
+        <TextureCoords top="0.1" left="0.1" bottom="0.9" right="0.9" layer="0"/>
+        <TextureCoords top="0" left="0" bottom="1.00" right="1.00" layer="1"/>
+        <TextureCoords top="0.02" left="0.04" bottom="0.48" right="0.50" layer="3"/>
+        <TextureType val="Circular" layer="3"/>
+    </Frame>
+    
+    <!--
+    =================================
+    Dotted Circle Template (Left)
+    =================================
+    -->
+    
+    <Frame type="Image" name="DottedCircleTemplate_Left" template="WarChestNodeTemplate/DottedCircleTemplate_Right">
+        <StartAngle val="{$parent/DottedCircle_Right/@StartAngle}"/>
+        <EndAngleOffset val="{$parent/DottedCircle_Right/@EndAngleOffset}"/>
+        <LayerAlpha val="{$parent/DottedCircle_Right/@LayerAlpha[3]}" layer="3"/>
+        <Rotation val="180"/>
+    </Frame>
+    
+    <!--
+    =================================
+    Vertical Clamp Template (Top)
+    =================================
+    -->
+    
+    <Frame type="Image" name="VerticalClampTemplate_Top" template="WarChestNodeTemplate/ImageTemplate">
+        <Anchor side="Right" relative="$this" pos="Min" offset="0"/>
+        <Width val="45"/>
+        <Height val="12"/>
+        <RotationPosition val="MiddleLeft"/>
+        <Rotation val="-90"/>
+        <Color val="{$parent/HorizontalClamp_Right/@Color}"/>
+        <LayerAlpha val="0" layer="3"/>
+        
+        <TextureCoords top="0.66" left="0.84" bottom="0.78" right="1.29" layer="3"/>
+    </Frame>
+    
+    <!--
+    =================================
+    Vertical Clamp Template (Bottom)
+    =================================
+    -->
+    
+    <Frame type="Image" name="VerticalClampTemplate_Bottom" template="WarChestNodeTemplate/VerticalClampTemplate_Top">
+        <Rotation val="90"/>
+        <LayerAlpha val="{$parent/VerticalClamp_Top/@LayerAlpha[3]}" layer="3"/>
+        
+        <TextureCoords val="{$parent/VerticalClamp_Top/@TextureCoords[3]}" layer="3"/>
+    </Frame>
+    
+    <!--
+    =================================
+    Vertical Clamp Blur Template (Top)
+    =================================
+    -->
+    
+    <Frame type="Image" name="VerticalClampBlurTemplate_Top" template="WarChestNodeTemplate/VerticalClampTemplate_Top">
+        <Blur val="True"/>
+        <BlurAmount val="1.1"/>
+        <LayerAlpha val="{$parent/VerticalClamp_Top/@LayerAlpha[3]}" layer="3"/>
+        
+        <TextureCoords val="{$parent/VerticalClamp_Top/@TextureCoords[3]}" layer="3"/>
+    </Frame>
+    
+    <!--
+    =================================
+    Vertical Clamp Blur Template (Bottom)
+    =================================
+    -->
+    
+    <Frame type="Image" name="VerticalClampBlurTemplate_Bottom" template="WarChestNodeTemplate/VerticalClampTemplate_Bottom">
+        <Blur val="True"/>
+        <BlurAmount val="1.1"/>
+        
+        <TextureCoords val="{$parent/VerticalClamp_Bottom/@TextureCoords[3]}" layer="3"/>
+    </Frame>
+    
+    <!--
+    =================================
+    Spark Template (TopLeft)
+    =================================
+    -->
+    
+    <Frame type="Image" name="SparkTemplate_TopLeft" template="WarChestNodeTemplate/ImageTemplate">
+        <Anchor side="Top" relative="$this" pos="Max" offset="0"/>
+        <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+        <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+        <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+        <Width val="2"/>
+        <Height val="100"/>
+        <RotationPosition val="BottomCenter"/>
+        <Rotation val="-32.5"/>
+        <LayerAlpha val="0" layer="3"/>
+        
+        <TextureCoords top="-2" left="0" bottom="0.68" right="0.001" layer="3"/>
+    </Frame>
+    
+    <!--
+    =================================
+    Spark Template (TopRight)
+    =================================
+    -->
+    
+    <Frame type="Image" name="SparkTemplate_TopRight" template="WarChestNodeTemplate/SparkTemplate_TopLeft">
+        <Rotation val="32.5"/>
+        <LayerAlpha val="{$parent/Spark_TopLeft/@LayerAlpha[3]}" layer="3"/>
+        <TextureCoords val="{$parent/Spark_TopLeft/@TextureCoords[3]}" layer="3"/>
+    </Frame>
+    
+    <!--
+    =================================
+    Spark Template (BottomLeft)
+    =================================
+    -->
+    
+    <Frame type="Image" name="SparkTemplate_BottomLeft" template="WarChestNodeTemplate/SparkTemplate_TopLeft">
+        <Rotation val="212.5"/>
+        <LayerAlpha val="{$parent/Spark_TopLeft/@LayerAlpha[3]}" layer="3"/>
+        <TextureCoords val="{$parent/Spark_TopLeft/@TextureCoords[3]}" layer="3"/>
+    </Frame>
+    
+    <!--
+    =================================
+    Spark Template (BottomRight)
+    =================================
+    -->
+    
+    <Frame type="Image" name="SparkTemplate_BottomRight" template="WarChestNodeTemplate/SparkTemplate_TopLeft">
+        <Rotation val="147.5"/>
+        <LayerAlpha val="{$parent/Spark_TopLeft/@LayerAlpha[3]}" layer="3"/>
+        <TextureCoords val="{$parent/Spark_TopLeft/@TextureCoords[3]}" layer="3"/>
+    </Frame>
+    
+    <!--
+    =================================
+    Spark Blur Template (TopLeft)
+    =================================
+    -->
+    
+    <Frame type="Image" name="SparkBlurTemplate_TopLeft" template="WarChestNodeTemplate/SparkTemplate_TopLeft">
+        <Blur val="True"/>
+        <BlurAmount val="1.1"/>
+        <LayerAlpha val="{$parent/Spark_TopLeft/@LayerAlpha[3]}" layer="3"/>
+        
+        <TextureCoords val="{$parent/Spark_TopLeft/@TextureCoords[3]}" layer="3"/>
+    </Frame>
+    
+    <!--
+    =================================
+    Spark Blur Template (TopRight)
+    =================================
+    -->
+    
+    <Frame type="Image" name="SparkBlurTemplate_TopRight" template="WarChestNodeTemplate/SparkBlurTemplate_TopLeft">
+        <Rotation val="32.5"/>
+    </Frame>
+    
+    <!--
+    =================================
+    Spark Blur Template (BottomLeft)
+    =================================
+    -->
+    
+    <Frame type="Image" name="SparkBlurTemplate_BottomLeft" template="WarChestNodeTemplate/SparkBlurTemplate_TopLeft">
+        <Rotation val="212.5"/>
+    </Frame>
+    
+    <!--
+    =================================
+    Spark Blur Template (BottomRight)
+    =================================
+    -->
+    
+    <Frame type="Image" name="SparkBlurTemplate_BottomRight" template="WarChestNodeTemplate/SparkBlurTemplate_TopLeft">
+        <Rotation val="147.5"/>
+    </Frame>
+    
+    <!--
+    =================================
+    Node Unlock Animation Components Container Template
+    =================================
+    -->
+    
+    <Frame type="Frame" name="NodeUnlockAnimationComponentsContainerTemplate">
+        <Anchor relative="$parent"/>
+        <Visible val="False"/>
+        
+        <Frame type="Image" name="BackgroundGlow" template="WarChestNodeTemplate/BackgroundGlowTemplate"/>
+        <Frame type="Image" name="Nucleus" template="WarChestNodeTemplate/NucleusTemplate"/>
+        <Frame type="Image" name="NucleusHighlight" template="WarChestNodeTemplate/NucleusHighlightTemplate"/>
+        <Frame type="Image" name="NucleusBorder" template="WarChestNodeTemplate/NucleusBorderTemplate"/>
+        <Frame type="Image" name="InnerCircle" template="WarChestNodeTemplate/InnerCircleTemplate"/>
+        <Frame type="Image" name="FakeProgressBarBlur" template="WarChestNodeTemplate/FakeProgressBarBlurTemplate"/>
+        <Frame type="Image" name="FakeProgressBar" template="WarChestNodeTemplate/FakeProgressBarTemplate"/>
+        <Frame type="Image" name="HorizontalClampBlur_Right" template="WarChestNodeTemplate/HorizontalClampBlurTemplate_Right"/>
+        <Frame type="Image" name="HorizontalClampBlur_Left" template="WarChestNodeTemplate/HorizontalClampBlurTemplate_Left"/>
+        <Frame type="Image" name="HorizontalClamp_Right" template="WarChestNodeTemplate/HorizontalClampTemplate_Right"/>
+        <Frame type="Image" name="HorizontalClamp_Left" template="WarChestNodeTemplate/HorizontalClampTemplate_Left"/>
+        <Frame type="Image" name="VerticalClamBlur_Top" template="WarChestNodeTemplate/VerticalClampBlurTemplate_Top"/>
+        <Frame type="Image" name="VerticalClamBlur_Bottom" template="WarChestNodeTemplate/VerticalClampBlurTemplate_Bottom"/>
+        <Frame type="Image" name="VerticalClamp_Top" template="WarChestNodeTemplate/VerticalClampTemplate_Top"/>
+        <Frame type="Image" name="VerticalClamp_Bottom" template="WarChestNodeTemplate/VerticalClampTemplate_Bottom"/>
+        <Frame type="Image" name="DottedCircle_Right" template="WarChestNodeTemplate/DottedCircleTemplate_Right"/>
+        <Frame type="Image" name="DottedCircle_Left" template="WarChestNodeTemplate/DottedCircleTemplate_Left"/>
+        <Frame type="Image" name="SparkBlur_TopLeft" template="WarChestNodeTemplate/SparkBlurTemplate_TopLeft"/>
+        <Frame type="Image" name="SparkBlur_TopRight" template="WarChestNodeTemplate/SparkBlurTemplate_TopRight"/>
+        <Frame type="Image" name="SparkBlur_BottomLeft" template="WarChestNodeTemplate/SparkBlurTemplate_BottomLeft"/>
+        <Frame type="Image" name="SparkBlur_BottomRight" template="WarChestNodeTemplate/SparkBlurTemplate_BottomRight"/>
+        <Frame type="Image" name="Spark_TopLeft" template="WarChestNodeTemplate/SparkTemplate_TopLeft"/>
+        <Frame type="Image" name="Spark_TopRight" template="WarChestNodeTemplate/SparkTemplate_TopRight"/>
+        <Frame type="Image" name="Spark_BottomLeft" template="WarChestNodeTemplate/SparkTemplate_BottomLeft"/>
+        <Frame type="Image" name="Spark_BottomRight" template="WarChestNodeTemplate/SparkTemplate_BottomRight"/>
+        
+        <!-- <StateGroup name="VisibleState">
+            <State name="Visible">
+                <When type="StateGroup" frame="$parent" NodeState="NodeUnlock"/>
+                <Action type="SetProperty" frame="$this" visible="True"/>
+            </State>
+            <State name="NotVisible">
+                <Action type="SetProperty" frame="$this" visible="False"/>
+            </State>
+        </StateGroup> -->
+        
+        <!--
+        
+        Node Unlock Animation
+        
+        -->
+
+        <!-- sound for Node Complete/Unlock -->
+        <Animation name="Sound_WarChest_Node_Complete">
+            <Event event="OnHidden" action="Reset,Stop" frame="$WarChestFrame"/>
+            <Event event="ResetEverything" action="Reset,Stop" frame="$parent"/>
+            <Event event="NodeUnlock" action="Reset,Play" frame="$parent"/>
+            <Controller type="Sound" end="Stop">
+                <Key type="Sound" time="0.0" sound="@UI_WarChest_Node_Complete"/>
+            </Controller>
+        </Animation>
+        <!-- ============================== -->
+
+        <Animation name="NodeUnlock" speed="#WarChestNodeAnimationSpeed">
+            <Event event="OnHidden" action="Reset,Stop" frame="$WarChestFrame"/>
+            <Event event="ResetEverything" action="Reset,Stop" frame="$parent"/>
+            <Event event="NodeUnlock" action="Reset,Play" frame="$parent"/>
+            
+            <!-- Hide Real Progress Bar -->
+            <Controller type="Fade" end="Pause" frame="$parent/StandardNodeComponentsContainer/ProgressBar">
+                <Key type="Curve" time="0" value="255" out="Fast"/>
+                <Key type="Curve" time="0.001" value="0" in="Slow"/>
+            </Controller>
+            
+            <!-- Hide Real Progress Bar Background -->
+            <Controller type="Fade" end="Pause" frame="$parent/StandardNodeComponentsContainer/ProgressBarBackground">
+                <Key type="Curve" time="0" value="255" out="Fast"/>
+                <Key type="Curve" time="0.001" value="0" in="Slow"/>
+            </Controller>
+            
+            <!-- Background Glow Controllers -->
+            <Controller type="Property" property="LayerAlpha" curve="True" index="3"  end="Pause" frame="$this/BackgroundGlow">
+                <Key type="Property" time="0.000" value="0" inout="Linear"/>
+                <Key type="Property" time="0.167" value="0" inout="Linear"/>
+                <Key type="Property" time="0.233" value="85" inout="Linear"/>
+                <Key type="Property" time="0.667" value="0" inout="Linear"/>
+                <Key type="Property" time="1.267" value="0" inout="Linear"/>
+                <Key type="Property" time="1.700" value="85" inout="Linear"/>
+                <Key type="Property" time="3.200" value="85" inout="Linear"/>
+                <Key type="Property" time="3.400" value="85" inout="Linear"/>
+                <Key type="Property" time="3.733" value="0" inout="Linear"/>
+            </Controller>
+            
+            <Controller type="Dimension" dimension="Width" relative="False" percentage="True" end="Pause" frame="$this/BackgroundGlow">
+                <Key type="Curve" time="0.000" value="35" inout="Linear"/>
+                <Key type="Curve" time="1.267" value="35" inout="Linear"/>
+                <Key type="Curve" time="1.700" value="70" inout="Linear"/>
+                <Key type="Curve" time="3.200" value="70" inout="Linear"/>
+                <Key type="Curve" time="3.400" value="105" inout="Linear"/>
+            </Controller>
+            
+            <Controller type="Dimension" dimension="Height" relative="False" percentage="True" end="Pause" frame="$this/BackgroundGlow">
+                <Key type="Curve" time="0.000" value="35" inout="Linear"/>
+                <Key type="Curve" time="1.267" value="35" inout="Linear"/>
+                <Key type="Curve" time="1.700" value="70" inout="Linear"/>
+                <Key type="Curve" time="3.200" value="70" inout="Linear"/>
+                <Key type="Curve" time="3.400" value="105" inout="Linear"/>
+            </Controller>
+            
+            <!-- Nucleus Controllers -->
+            <Controller type="Property" property="LayerAlpha" curve="True" index="3"  end="Pause" frame="$this/Nucleus">
+                <Key type="Property" time="0.000" value="255" inout="Linear"/>
+                <Key type="Property" time="0.733" value="255" inout="Linear"/>
+                <Key type="Property" time="0.933" value="0" inout="Linear"/>
+                <Key type="Property" time="1.267" value="0" inout="Linear"/>
+                <Key type="Property" time="1.333" value="153" inout="Linear"/>
+                <Key type="Property" time="1.400" value="77" inout="Linear"/>
+                <Key type="Property" time="1.467" value="153" inout="Linear"/>
+                <Key type="Property" time="1.533" value="26" inout="Linear"/>
+                <Key type="Property" time="1.600" value="204" inout="Linear"/>
+                <Key type="Property" time="1.667" value="153" inout="Linear"/>
+                <Key type="Property" time="1.700" value="255" inout="Linear"/>
+            </Controller>
+            
+            <Controller type="LayerUV" layer="3" side="Left" relative="False" sidelock="True" end="Pause" frame="$this/Nucleus">
+                <Key type="Curve" time="0.000" value="0.13" inOut="Slow"/>
+                <Key type="Curve" time="0.999" value="0.13" inOut="Slow"/>
+                <Key type="Curve" time="1.000" value="0.27" inOut="Slow"/>
+            </Controller>
+            
+            <Controller type="Dimension" dimension="Width" relative="False" percentage="True" end="Pause" frame="$this/Nucleus">
+                <Key type="Curve" time="0.000" value="100" inout="Linear"/>
+                <Key type="Curve" time="0.767" value="100" inout="Linear"/>
+                <Key type="Curve" time="0.900" value="50" inout="Linear"/>
+                <Key type="Curve" time="1.267" value="50" inout="Linear,Slow"/>
+                <Key type="Curve" time="1.700" value="100" inout="Fast,Linear"/>
+            </Controller>
+            
+            <Controller type="Dimension" dimension="Height" relative="False" percentage="True" end="Pause" frame="$this/Nucleus">
+                <Key type="Curve" time="0.000" value="100" inout="Linear"/>
+                <Key type="Curve" time="0.767" value="100" inout="Linear"/>
+                <Key type="Curve" time="0.900" value="50" inout="Linear"/>
+                <Key type="Curve" time="1.267" value="50" inout="Linear,Slow"/>
+                <Key type="Curve" time="1.700" value="100" inout="Fast,Linear"/>
+            </Controller>
+            
+            <!-- Nucleus Highlight Controllers -->
+            <Controller type="Property" property="LayerAlpha" curve="True" index="3"  end="Pause" frame="$this/NucleusHighlight">
+                <Key type="Property" time="0.000" value="0" inout="Linear"/>
+                <Key type="Property" time="0.167" value="0" inout="Linear"/>
+                <Key type="Property" time="0.233" value="255" inout="Linear,Slow"/>
+                <Key type="Property" time="0.667" value="0" inout="Linear"/>
+                <Key type="Property" time="3.333" value="0" inout="Linear"/>
+                <Key type="Property" time="3.400" value="255" inout="Slow"/>
+                <Key type="Property" time="3.567" value="0" inout="Linear"/>
+            </Controller>
+            
+            <Controller type="LayerUV" layer="3" side="Left" relative="False" sidelock="True" end="Pause" frame="$this/NucleusHighlight">
+                <Key type="Curve" time="0.000" value="0.13" inOut="Slow"/>
+                <Key type="Curve" time="0.999" value="0.13" inOut="Slow"/>
+                <Key type="Curve" time="1.000" value="0.27" inOut="Slow"/>
+            </Controller>
+            
+            <!-- Nucleus Border Controllers -->
+            <Controller type="Property" property="LayerAlpha" curve="True" index="3"  end="Pause" frame="$this/NucleusBorder">
+                <Key type="Property" time="0.000" value="255" out="Fast"/>
+                <Key type="Property" time="0.767" value="255" out="Fast"/>
+                <Key type="Property" time="0.8" value="0" in="Slow"/>
+                <Key type="Property" time="1.000" value="0" in="Slow"/>
+                <Key type="Property" time="1.267" value="0" in="Slow"/>
+                <Key type="Property" time="1.268" value="255" in="Slow"/>
+                <Key type="Property" time="1.8" value="255" in="Slow"/>
+                <Key type="Property" time="2.5" value="255" in="Slow"/>
+            </Controller>
+            
+            <Controller type="EndAngleOffset" end="Pause" relative="false" frame="$this/NucleusBorder">
+                <Key type="Curve" time="0" value="360" inout="linear"/>
+                <Key type="Curve" time="1.266" value="360" inout="linear"/>
+                <Key type="Curve" time="1.267" value="0" inout="linear,slow"/>
+                <Key type="Curve" time="1.700" value="360" inout="linear"/>
+            </Controller>
+            
+            <!-- Progress Ring Controllers -->
+            <Controller type="Property" property="LayerAlpha" curve="True" index="3"  end="Pause" frame="$this/FakeProgressBar">
+                <Key type="Property" time="0.000" value="255" inout="Linear"/>
+                <Key type="Property" time="0.067" value="255" inout="Linear"/>
+                <Key type="Property" time="0.133" value="128" inout="Linear"/>
+                <Key type="Property" time="0.200" value="255" inout="Linear"/>
+                <Key type="Property" time="0.267" value="126" inout="Linear"/>
+                <Key type="Property" time="0.333" value="255" inout="Linear"/>
+                <Key type="Property" time="0.767" value="255" inout="Linear"/>
+                <Key type="Property" time="0.800" value="153" inout="Linear"/>
+                <Key type="Property" time="0.867" value="153" inout="Linear"/>
+                <Key type="Property" time="0.900" value="77" inout="Linear"/>
+                <Key type="Property" time="0.967" value="77" inout="Linear"/>
+                <Key type="Property" time="1.000" value="0" inout="Linear"/>
+            </Controller>
+            
+            <Controller type="Rotation" relative="False" end="Pause" frame="$this/FakeProgressBar">
+                <Key type="Curve" time="0.000" value="0" inout="linear"/>
+                <Key type="Curve" time="0.067" value="0" inout="linear"/>
+                <Key type="Curve" time="0.767" value="120" inout="linear"/>
+                <Key type="Curve" time="1.000" value="240" inout="linear"/>
+            </Controller>
+            
+            <Controller type="Color" end="Pause" frame="$this/FakeProgressBar">
+                <Key type="Curve" time="0.000" value="#WarChestNodeColor_Primary" out="Fast"/>
+                <Key type="Curve" time="0.167" value="#WarChestNodeColor_Primary" out="Fast"/>
+                <Key type="Curve" time="0.200" value="#WarChestNodeColor_Primary_Highlight" out="Fast"/>
+                <Key type="Curve" time="0.367" value="#WarChestNodeColor_Primary_Highlight" out="Fast"/>
+                <Key type="Curve" time="0.767" value="#WarChestNodeColor_Primary" out="Fast"/>
+            </Controller>
+            
+            <Controller type="LayerUV" layer="0" side="Top" relative="False" sidelock="False" end="Pause" frame="$this/FakeProgressBar">
+                <Key type="Curve" time="0.000" value="-0.21" inOut="Linear"/>
+                <Key type="Curve" time="0.167" value="-0.21" inOut="Linear"/>
+                <Key type="Curve" time="0.200" value="-0.07" inOut="Linear"/>
+                <Key type="Curve" time="0.300" value="-0.07" inOut="Linear"/>
+                <Key type="Curve" time="0.333" value="-0.00" inOut="Linear"/>
+                <Key type="Curve" time="0.767" value="-0.00" inOut="Linear,Slow"/>
+                <Key type="Curve" time="1.000" value="-1.3" inOut="Fast"/>
+            </Controller>
+    
+            <Controller type="LayerUV" layer="0" side="Bottom" relative="False" sidelock="False" end="Pause" frame="$this/FakeProgressBar">
+                <Key type="Curve" time="0.000" value="1.21" inOut="Linear"/>
+                <Key type="Curve" time="0.167" value="1.21" inOut="Linear"/>
+                <Key type="Curve" time="0.200" value="1.07" inOut="Linear"/>
+                <Key type="Curve" time="0.300" value="1.07" inOut="Linear"/>
+                <Key type="Curve" time="0.333" value="1.00" inOut="Linear"/>
+                <Key type="Curve" time="0.767" value="1.00" inOut="Linear,Slow"/>
+                <Key type="Curve" time="1.000" value="2.3" inOut="Fast"/>
+            </Controller>
+    
+            <Controller type="LayerUV" layer="0" side="Left" relative="False" sidelock="False" end="Pause" frame="$this/FakeProgressBar">
+                <Key type="Curve" time="0.000" value="-0.21" inOut="Linear"/>
+                <Key type="Curve" time="0.167" value="-0.21" inOut="Linear"/>
+                <Key type="Curve" time="0.200" value="-0.07" inOut="Linear"/>
+                <Key type="Curve" time="0.300" value="-0.07" inOut="Linear"/>
+                <Key type="Curve" time="0.333" value="-0.00" inOut="Linear"/>
+                <Key type="Curve" time="0.767" value="-0.00" inOut="Linear,Slow"/>
+                <Key type="Curve" time="1.000" value="-1.3" inOut="Fast"/>
+            </Controller>
+    
+            <Controller type="LayerUV" layer="0" side="Right" relative="False" sidelock="False" end="Pause" frame="$this/FakeProgressBar">
+                <Key type="Curve" time="0.000" value="1.21" inOut="Linear"/>
+                <Key type="Curve" time="0.167" value="1.21" inOut="Linear"/>
+                <Key type="Curve" time="0.200" value="1.07" inOut="Linear"/>
+                <Key type="Curve" time="0.300" value="1.07" inOut="Linear"/>
+                <Key type="Curve" time="0.333" value="1.00" inOut="Linear"/>
+                <Key type="Curve" time="0.767" value="1.00" inOut="Linear,Slow"/>
+                <Key type="Curve" time="1.000" value="2.3" inOut="Fast"/>
+            </Controller>
+            
+            <Controller type="LayerUV" layer="1" side="Top" relative="False" sidelock="False" end="Pause" frame="$this/FakeProgressBar">
+                <Key type="Curve" time="0.000" value="-0.3" inOut="Linear"/>
+                <Key type="Curve" time="0.167" value="-0.3" inOut="Linear"/>
+                <Key type="Curve" time="0.200" value="-0.14" inOut="Linear"/>
+                <Key type="Curve" time="0.300" value="-0.14" inOut="Linear"/>
+                <Key type="Curve" time="0.333" value="-0.06" inOut="Linear"/>
+                <Key type="Curve" time="0.767" value="-0.06" inOut="Linear,Slow"/>
+                <Key type="Curve" time="1.000" value="-1.8" inOut="Fast"/>
+            </Controller>
+    
+            <Controller type="LayerUV" layer="1" side="Bottom" relative="False" sidelock="False" end="Pause" frame="$this/FakeProgressBar">
+                <Key type="Curve" time="0.000" value="1.3" inOut="Linear"/>
+                <Key type="Curve" time="0.167" value="1.3" inOut="Linear"/>
+                <Key type="Curve" time="0.200" value="1.14" inOut="Linear"/>
+                <Key type="Curve" time="0.300" value="1.14" inOut="Linear"/>
+                <Key type="Curve" time="0.333" value="1.06" inOut="Linear"/>
+                <Key type="Curve" time="0.767" value="1.06" inOut="Linear,Slow"/>
+                <Key type="Curve" time="1.000" value="2.8" inOut="Fast"/>
+            </Controller>
+    
+            <Controller type="LayerUV" layer="1" side="Left" relative="False" sidelock="False" end="Pause" frame="$this/FakeProgressBar">
+                <Key type="Curve" time="0.000" value="-0.3" inOut="Linear"/>
+                <Key type="Curve" time="0.167" value="-0.3" inOut="Linear"/>
+                <Key type="Curve" time="0.200" value="-0.14" inOut="Linear"/>
+                <Key type="Curve" time="0.300" value="-0.14" inOut="Linear"/>
+                <Key type="Curve" time="0.333" value="-0.06" inOut="Linear"/>
+                <Key type="Curve" time="0.767" value="-0.06" inOut="Linear,Slow"/>
+                <Key type="Curve" time="1.000" value="-1.8" inOut="Fast"/>
+            </Controller>
+    
+            <Controller type="LayerUV" layer="1" side="Right" relative="False" sidelock="False" end="Pause" frame="$this/FakeProgressBar">
+                <Key type="Curve" time="0.000" value="1.3" inOut="Linear"/>
+                <Key type="Curve" time="0.167" value="1.3" inOut="Linear"/>
+                <Key type="Curve" time="0.200" value="1.14" inOut="Linear"/>
+                <Key type="Curve" time="0.300" value="1.14" inOut="Linear"/>
+                <Key type="Curve" time="0.333" value="1.06" inOut="Linear"/>
+                <Key type="Curve" time="0.767" value="1.06" inOut="Linear,Slow"/>
+                <Key type="Curve" time="1.000" value="2.8" inOut="Fast"/>
+            </Controller>
+           
+    
+            <Controller type="LayerUV" layer="2" side="Top" relative="False" sidelock="False" end="Pause" frame="$this/FakeProgressBar">
+                <Key type="Curve" time="0.000" value="0.00" inOut="Linear"/><!-- Unbroken Start -->
+                <Key type="Curve" time="0.132" value="0.00" inOut="Linear"/><!-- Unbroken End -->
+                <Key type="Curve" time="0.133" value="0.30" inOut="Linear"/><!-- Broken Start -->
+                <Key type="Curve" time="0.166" value="0.30" inOut="Linear"/><!-- Broken End -->
+                <Key type="Curve" time="0.167" value="0.00" inOut="Linear"/><!-- Unbroken Start -->
+                <Key type="Curve" time="0.266" value="0.00" inOut="Linear"/><!-- Unbroken End -->
+                <Key type="Curve" time="0.267" value="0.30" inOut="Linear"/><!-- Broken Start -->
+                <Key type="Curve" time="0.299" value="0.30" inOut="Linear"/><!-- Broken End -->
+                <Key type="Curve" time="0.300" value="0.00" inOut="Linear"/><!-- Unbroken Start -->
+                <Key type="Curve" time="0.332" value="0.00" inOut="Linear"/><!-- Unbroken End -->
+                <Key type="Curve" time="0.333" value="0.30" inOut="Linear"/><!-- Broken Start -->
+                <Key type="Curve" time="0.767" value="0.30" inOut="Linear"/>
+                <Key type="Curve" time="1.000" value="0.00" inOut="Linear"/><!-- Unbroken Start -->
+            </Controller>
+    
+            <Controller type="LayerUV" layer="2" side="Bottom" relative="False" sidelock="False" end="Pause" frame="$this/FakeProgressBar">
+                <Key type="Curve" time="0.000" value="0.00" inOut="Linear"/><!-- Unbroken Start -->
+                <Key type="Curve" time="0.132" value="0.00" inOut="Linear"/><!-- Unbroken End -->
+                <Key type="Curve" time="0.133" value="0.70" inOut="Linear"/><!-- Broken Start -->
+                <Key type="Curve" time="0.166" value="0.70" inOut="Linear"/><!-- Broken End -->
+                <Key type="Curve" time="0.167" value="0.00" inOut="Linear"/><!-- Unbroken Start -->
+                <Key type="Curve" time="0.266" value="0.00" inOut="Linear"/><!-- Unbroken End -->
+                <Key type="Curve" time="0.267" value="0.70" inOut="Linear"/><!-- Broken Start -->
+                <Key type="Curve" time="0.299" value="0.70" inOut="Linear"/><!-- Broken End -->
+                <Key type="Curve" time="0.300" value="0.00" inOut="Linear"/><!-- Unbroken Start -->
+                <Key type="Curve" time="0.332" value="0.00" inOut="Linear"/><!-- Unbroken End -->
+                <Key type="Curve" time="0.333" value="0.70" inOut="Linear"/><!-- Broken Start -->
+                <Key type="Curve" time="0.767" value="0.70" inOut="Linear"/>
+                <Key type="Curve" time="1.000" value="1.00" inOut="Linear"/><!-- Unbroken Start -->
+            </Controller>
+    
+            <Controller type="LayerUV" layer="2" side="Left" relative="False" sidelock="False" end="Pause" frame="$this/FakeProgressBar">
+                <Key type="Curve" time="0.000" value="0.00" inOut="Linear"/><!-- Unbroken Start -->
+                <Key type="Curve" time="0.132" value="0.00" inOut="Linear"/><!-- Unbroken End -->
+                <Key type="Curve" time="0.133" value="0.30" inOut="Linear"/><!-- Broken Start -->
+                <Key type="Curve" time="0.166" value="0.30" inOut="Linear"/><!-- Broken End -->
+                <Key type="Curve" time="0.167" value="0.00" inOut="Linear"/><!-- Unbroken Start -->
+                <Key type="Curve" time="0.266" value="0.00" inOut="Linear"/><!-- Unbroken End -->
+                <Key type="Curve" time="0.267" value="0.30" inOut="Linear"/><!-- Broken Start -->
+                <Key type="Curve" time="0.299" value="0.30" inOut="Linear"/><!-- Broken End -->
+                <Key type="Curve" time="0.300" value="0.00" inOut="Linear"/><!-- Unbroken Start -->
+                <Key type="Curve" time="0.332" value="0.00" inOut="Linear"/><!-- Unbroken End -->
+                <Key type="Curve" time="0.333" value="0.30" inOut="Linear"/><!-- Broken Start -->
+                <Key type="Curve" time="0.767" value="0.30" inOut="Linear"/>
+                <Key type="Curve" time="1.000" value="0.00" inOut="Linear"/><!-- Unbroken Start -->
+            </Controller>
+    
+            <Controller type="LayerUV" layer="2" side="Right" relative="False" sidelock="False" end="Pause" frame="$this/FakeProgressBar">
+                <Key type="Curve" time="0.000" value="0.00" inOut="Linear"/><!-- Unbroken Start -->
+                <Key type="Curve" time="0.132" value="0.00" inOut="Linear"/><!-- Unbroken End -->
+                <Key type="Curve" time="0.133" value="0.70" inOut="Linear"/><!-- Broken Start -->
+                <Key type="Curve" time="0.166" value="0.70" inOut="Linear"/><!-- Broken End -->
+                <Key type="Curve" time="0.167" value="0.00" inOut="Linear"/><!-- Unbroken Start -->
+                <Key type="Curve" time="0.266" value="0.00" inOut="Linear"/><!-- Unbroken End -->
+                <Key type="Curve" time="0.267" value="0.70" inOut="Linear"/><!-- Broken Start -->
+                <Key type="Curve" time="0.299" value="0.70" inOut="Linear"/><!-- Broken End -->
+                <Key type="Curve" time="0.300" value="0.00" inOut="Linear"/><!-- Unbroken Start -->
+                <Key type="Curve" time="0.332" value="0.00" inOut="Linear"/><!-- Unbroken End -->
+                <Key type="Curve" time="0.333" value="0.70" inOut="Linear"/><!-- Broken Start -->
+                <Key type="Curve" time="0.767" value="0.70" inOut="Linear"/>
+                <Key type="Curve" time="1.000" value="1.00" inOut="Linear"/><!-- Unbroken Start -->
+            </Controller>
+            
+            <!-- Inner Circle Controllers -->
+            <Controller type="Property" property="LayerAlpha" curve="True" index="3"  end="Pause" frame="$this/InnerCircle">
+                <Key type="Property" time="0.000" value="0" inOut="Linear"/>
+                <Key type="Property" time="0.067" value="0" inOut="Linear"/>
+                <Key type="Property" time="0.133" value="64" inOut="Linear"/>
+                <Key type="Property" time="0.200" value="128" inOut="Linear"/>
+                <Key type="Property" time="0.267" value="64" inOut="Linear"/>
+                <Key type="Property" time="0.333" value="128" inOut="Linear"/>
+                <Key type="Property" time="0.667" value="0" inOut="Linear"/>
+                <Key type="Property" time="1.000" value="0" inOut="Linear"/>
+            </Controller>
+            
+            <Controller type="Rotation" relative="False" end="Pause" frame="$this/InnerCircle">
+                <Key type="Curve" time="0.000" value="0" inOut="linear"/>
+                <Key type="Curve" time="0.067" value="0" inOut="linear"/>
+                <Key type="Curve" time="0.667" value="-120" inOut="linear"/>
+                <Key type="Curve" time="0.900" value="-240" inOut="linear"/>
+            </Controller>
+            
+            <Controller type="Color" end="Pause" frame="$this/InnerCircle">
+                <Key type="Curve" time="0.000" value="#WarChestNodeColor_Secondary" out="Fast"/>
+                <Key type="Curve" time="0.167" value="#WarChestNodeColor_Secondary" out="Fast"/>
+                <Key type="Curve" time="0.200" value="#WarChestNodeColor_Secondary_Highlight" out="Fast"/>
+                <Key type="Curve" time="0.367" value="#WarChestNodeColor_Secondary_Highlight" out="Fast"/>
+                <Key type="Curve" time="0.767" value="#WarChestNodeColor_Secondary" out="Fast"/>
+            </Controller>
+            
+            <Controller type="LayerUV" layer="0" side="Top" relative="False" sidelock="False" end="Pause" frame="$this/InnerCircle">
+                <Key type="Curve" time="0.000" value="-0.45" inOut="slow"/>
+                <Key type="Curve" time="0.167" value="-0.45" inOut="slow"/>
+                <Key type="Curve" time="0.200" value="-0.28" inOut="slow"/>
+                <Key type="Curve" time="0.300" value="-0.28" inOut="slow"/>
+                <Key type="Curve" time="0.333" value="-0.14" inOut="slow"/>
+                <Key type="Curve" time="0.767" value="-0.14" inOut="slow"/>
+                <Key type="Curve" time="1.000" value="-0.45" inOut="slow"/>
+            </Controller>
+    
+            <Controller type="LayerUV" layer="0" side="Bottom" relative="False" sidelock="False" end="Pause" frame="$this/InnerCircle">
+                <Key type="Curve" time="0.000" value="1.45" inOut="slow"/>
+                <Key type="Curve" time="0.167" value="1.45" inOut="slow"/>
+                <Key type="Curve" time="0.200" value="1.28" inOut="slow"/>
+                <Key type="Curve" time="0.300" value="1.28" inOut="slow"/>
+                <Key type="Curve" time="0.333" value="1.14" inOut="slow"/>
+                <Key type="Curve" time="0.767" value="1.14" inOut="slow"/>
+                <Key type="Curve" time="1.000" value="1.45" inOut="slow"/>
+            </Controller>
+    
+            <Controller type="LayerUV" layer="0" side="Left" relative="False" sidelock="False" end="Pause" frame="$this/InnerCircle">
+                <Key type="Curve" time="0.000" value="-0.45" inOut="slow"/>
+                <Key type="Curve" time="0.167" value="-0.45" inOut="slow"/>
+                <Key type="Curve" time="0.200" value="-0.28" inOut="slow"/>
+                <Key type="Curve" time="0.300" value="-0.28" inOut="slow"/>
+                <Key type="Curve" time="0.333" value="-0.14" inOut="slow"/>
+                <Key type="Curve" time="0.767" value="-0.14" inOut="slow"/>
+                <Key type="Curve" time="1.000" value="-0.45" inOut="slow"/>
+            </Controller>
+    
+            <Controller type="LayerUV" layer="0" side="Right" relative="False" sidelock="False" end="Pause" frame="$this/InnerCircle">
+                <Key type="Curve" time="0.000" value="1.45" inOut="slow"/>
+                <Key type="Curve" time="0.167" value="1.45" inOut="slow"/>
+                <Key type="Curve" time="0.200" value="1.28" inOut="slow"/>
+                <Key type="Curve" time="0.300" value="1.28" inOut="slow"/>
+                <Key type="Curve" time="0.333" value="1.14" inOut="slow"/>
+                <Key type="Curve" time="0.767" value="1.14" inOut="slow"/>
+                <Key type="Curve" time="1.000" value="1.45" inOut="slow"/>
+            </Controller>
+            
+            <Controller type="LayerUV" layer="1" side="Top" relative="False" sidelock="False" end="Pause" frame="$this/InnerCircle">
+                <Key type="Curve" time="0.000" value="-0.50" inOut="slow"/>
+                <Key type="Curve" time="0.167" value="-0.50" inOut="slow"/>
+                <Key type="Curve" time="0.200" value="-0.35" inOut="slow"/>
+                <Key type="Curve" time="0.300" value="-0.35" inOut="slow"/>
+                <Key type="Curve" time="0.333" value="-0.20" inOut="slow"/>
+                <Key type="Curve" time="0.767" value="-0.16" inOut="slow"/>
+                <Key type="Curve" time="1.000" value="-0.70" inOut="slow"/>
+            </Controller>
+    
+            <Controller type="LayerUV" layer="1" side="Bottom" relative="False" sidelock="False" end="Pause" frame="$this/InnerCircle">
+                <Key type="Curve" time="0.000" value="1.50" inOut="slow"/>
+                <Key type="Curve" time="0.167" value="1.50" inOut="slow"/>
+                <Key type="Curve" time="0.200" value="1.35" inOut="slow"/>
+                <Key type="Curve" time="0.300" value="1.35" inOut="slow"/>
+                <Key type="Curve" time="0.333" value="1.20" inOut="slow"/>
+                <Key type="Curve" time="0.767" value="1.16" inOut="slow"/>
+                <Key type="Curve" time="1.000" value="1.70" inOut="slow"/>
+            </Controller>
+    
+            <Controller type="LayerUV" layer="1" side="Left" relative="False" sidelock="False" end="Pause" frame="$this/InnerCircle">
+                <Key type="Curve" time="0.000" value="-0.50" inOut="slow"/>
+                <Key type="Curve" time="0.167" value="-0.50" inOut="slow"/>
+                <Key type="Curve" time="0.200" value="-0.35" inOut="slow"/>
+                <Key type="Curve" time="0.300" value="-0.35" inOut="slow"/>
+                <Key type="Curve" time="0.333" value="-0.20" inOut="slow"/>
+                <Key type="Curve" time="0.767" value="-0.16" inOut="slow"/>
+                <Key type="Curve" time="1.000" value="-0.70" inOut="slow"/>
+            </Controller>
+    
+            <Controller type="LayerUV" layer="1" side="Right" relative="False" sidelock="False" end="Pause" frame="$this/InnerCircle">
+                <Key type="Curve" time="0.000" value="1.50" inOut="slow"/>
+                <Key type="Curve" time="0.167" value="1.50" inOut="slow"/>
+                <Key type="Curve" time="0.200" value="1.35" inOut="slow"/>
+                <Key type="Curve" time="0.300" value="1.35" inOut="slow"/>
+                <Key type="Curve" time="0.333" value="1.20" inOut="slow"/>
+                <Key type="Curve" time="0.767" value="1.16" inOut="slow"/>
+                <Key type="Curve" time="1.000" value="1.70" inOut="slow"/>
+            </Controller>
+            
+            <Controller type="LayerUV" layer="2" side="Top" relative="False" sidelock="False" end="Pause" frame="$this/InnerCircle">
+                <Key type="Curve" time="0.000" value="0.00" inOut="Linear"/><!-- Unbroken Start -->
+                <Key type="Curve" time="0.132" value="0.00" inOut="Linear"/><!-- Unbroken End -->
+                <Key type="Curve" time="0.133" value="0.20" inOut="Linear"/><!-- Broken Start -->
+                <Key type="Curve" time="0.166" value="0.20" inOut="Linear"/><!-- Broken End -->
+                <Key type="Curve" time="0.167" value="0.00" inOut="Linear"/><!-- Unbroken Start -->
+                <Key type="Curve" time="0.266" value="0.00" inOut="Linear"/><!-- Unbroken End -->
+                <Key type="Curve" time="0.267" value="0.20" inOut="Linear"/><!-- Broken Start -->
+                <Key type="Curve" time="0.299" value="0.20" inOut="Linear"/><!-- Broken End -->
+                <Key type="Curve" time="0.300" value="0.00" inOut="Linear"/><!-- Unbroken Start -->
+                <Key type="Curve" time="0.332" value="0.00" inOut="Linear"/><!-- Unbroken End -->
+                <Key type="Curve" time="0.333" value="0.20" inOut="Linear"/><!-- Broken Start -->
+                <Key type="Curve" time="0.999" value="0.20" inOut="Linear"/><!-- Broken End -->
+                <Key type="Curve" time="1.000" value="0.00" inOut="Linear"/><!-- Unbroken Start -->
+            </Controller>
+    
+            <Controller type="LayerUV" layer="2" side="Bottom" relative="False" sidelock="False" end="Pause" frame="$this/InnerCircle">
+                <Key type="Curve" time="0.000" value="0.00" inOut="Linear"/><!-- Unbroken Start -->
+                <Key type="Curve" time="0.132" value="0.00" inOut="Linear"/><!-- Unbroken End -->
+                <Key type="Curve" time="0.133" value="0.80" inOut="Linear"/><!-- Broken Start -->
+                <Key type="Curve" time="0.166" value="0.80" inOut="Linear"/><!-- Broken End -->
+                <Key type="Curve" time="0.167" value="0.00" inOut="Linear"/><!-- Unbroken Start -->
+                <Key type="Curve" time="0.266" value="0.00" inOut="Linear"/><!-- Unbroken End -->
+                <Key type="Curve" time="0.267" value="0.80" inOut="Linear"/><!-- Broken Start -->
+                <Key type="Curve" time="0.299" value="0.80" inOut="Linear"/><!-- Broken End -->
+                <Key type="Curve" time="0.300" value="0.00" inOut="Linear"/><!-- Unbroken Start -->
+                <Key type="Curve" time="0.332" value="0.00" inOut="Linear"/><!-- Unbroken End -->
+                <Key type="Curve" time="0.333" value="0.80" inOut="Linear"/><!-- Broken Start -->
+                <Key type="Curve" time="0.999" value="0.80" inOut="Linear"/><!-- Broken End -->
+                <Key type="Curve" time="1.000" value="0.00" inOut="Linear"/><!-- Unbroken Start -->
+            </Controller>
+    
+            <Controller type="LayerUV" layer="2" side="Left" relative="False" sidelock="False" end="Pause" frame="$this/InnerCircle">
+                <Key type="Curve" time="0.000" value="0.00" inOut="Linear"/><!-- Unbroken Start -->
+                <Key type="Curve" time="0.132" value="0.00" inOut="Linear"/><!-- Unbroken End -->
+                <Key type="Curve" time="0.133" value="0.20" inOut="Linear"/><!-- Broken Start -->
+                <Key type="Curve" time="0.166" value="0.20" inOut="Linear"/><!-- Broken End -->
+                <Key type="Curve" time="0.167" value="0.00" inOut="Linear"/><!-- Unbroken Start -->
+                <Key type="Curve" time="0.266" value="0.00" inOut="Linear"/><!-- Unbroken End -->
+                <Key type="Curve" time="0.267" value="0.20" inOut="Linear"/><!-- Broken Start -->
+                <Key type="Curve" time="0.299" value="0.20" inOut="Linear"/><!-- Broken End -->
+                <Key type="Curve" time="0.300" value="0.00" inOut="Linear"/><!-- Unbroken Start -->
+                <Key type="Curve" time="0.332" value="0.00" inOut="Linear"/><!-- Unbroken End -->
+                <Key type="Curve" time="0.333" value="0.20" inOut="Linear"/><!-- Broken Start -->
+                <Key type="Curve" time="0.999" value="0.20" inOut="Linear"/><!-- Broken End -->
+                <Key type="Curve" time="1.000" value="0.00" inOut="Linear"/><!-- Unbroken Start -->
+            </Controller>
+    
+            <Controller type="LayerUV" layer="2" side="Right" relative="False" sidelock="False" end="Pause" frame="$this/InnerCircle">
+                <Key type="Curve" time="0.000" value="0.00" inOut="Linear"/><!-- Unbroken Start -->
+                <Key type="Curve" time="0.132" value="0.00" inOut="Linear"/><!-- Unbroken End -->
+                <Key type="Curve" time="0.133" value="0.80" inOut="Linear"/><!-- Broken Start -->
+                <Key type="Curve" time="0.166" value="0.80" inOut="Linear"/><!-- Broken End -->
+                <Key type="Curve" time="0.167" value="0.00" inOut="Linear"/><!-- Unbroken Start -->
+                <Key type="Curve" time="0.266" value="0.00" inOut="Linear"/><!-- Unbroken End -->
+                <Key type="Curve" time="0.267" value="0.80" inOut="Linear"/><!-- Broken Start -->
+                <Key type="Curve" time="0.299" value="0.80" inOut="Linear"/><!-- Broken End -->
+                <Key type="Curve" time="0.300" value="0.00" inOut="Linear"/><!-- Unbroken Start -->
+                <Key type="Curve" time="0.332" value="0.00" inOut="Linear"/><!-- Unbroken End -->
+                <Key type="Curve" time="0.333" value="0.80" inOut="Linear"/><!-- Broken Start -->
+                <Key type="Curve" time="0.999" value="0.80" inOut="Linear"/><!-- Broken End -->
+                <Key type="Curve" time="1.000" value="0.00" inOut="Linear"/><!-- Unbroken Start -->
+            </Controller>
+    
+            <!-- Horizontal Clamp Right Controllers -->
+            <Controller type="Property" property="LayerAlpha" curve="True" index="3"  end="Pause" frame="$this/HorizontalClamp_Right">
+                <Key type="Property" time="0.000" value="0" inout="linear"/>
+                <Key type="Property" time="1.767" value="0" inout="linear"/>
+                <Key type="Property" time="1.833" value="153" inout="linear"/>
+                <Key type="Property" time="1.900" value="64" inout="linear"/>
+                <Key type="Property" time="1.967" value="153" inout="linear"/>
+                <Key type="Property" time="2.000" value="64" inout="linear"/>
+                <Key type="Property" time="2.067" value="255" inout="linear"/>
+                <Key type="Property" time="2.633" value="255" inout="linear"/>
+                <Key type="Property" time="2.700" value="64" inout="linear"/>
+                <Key type="Property" time="2.767" value="255" inout="linear"/>
+            </Controller>
+            
+            <Controller type="Color" end="Pause" frame="$this/HorizontalClamp_Right">
+                <Key type="Curve" time="0.000" value="#WarChestNodeColor_Primary" out="Fast"/>
+                <Key type="Curve" time="3.333" value="#WarChestNodeColor_Primary" out="Fast"/>
+                <Key type="Curve" time="3.400" value="#WarChestNodeColor_Primary_Highlight" out="Fast"/>
+                <Key type="Curve" time="3.567" value="#WarChestNodeColor_Primary" out="Fast"/>
+            </Controller>
+            
+            <Controller type="Dimension" dimension="Width" relative="False" percentage="True" end="Pause" frame="$this/HorizontalClamp_Right">
+                <Key type="Curve" time="0.000" value="50"/>
+                <Key type="Curve" time="1.767" value="50"/>
+                <Key type="Curve" time="1.967" value="100"/>
+            </Controller>
+            
+            <Controller type="Dimension" dimension="Height" relative="False" percentage="True" end="Pause" frame="$this/HorizontalClamp_Right">
+                <Key type="Curve" time="0.000" value="50"/>
+                <Key type="Curve" time="1.767" value="50"/>
+                <Key type="Curve" time="1.967" value="100"/>
+            </Controller>
+            
+            <Controller type="LayerUV" layer="3" side="Left" relative="False" sidelock="True" end="Pause" frame="$this/HorizontalClamp_Right">
+                <Key type="Curve" time="0" value="0.86" out="slow"/>
+                <Key type="Curve" time="1.767" value="0.86" in="slow"/>
+                <Key type="Curve" time="1.967" value=".72" in="slow"/>
+                <Key type="Curve" time="3.100" value=".72" in="slow"/>
+                <Key type="Curve" time="3.233" value="0.62" inout="slow"/>
+                <Key type="Curve" time="3.400" value="0.88" inout="linear"/>
+                <Key type="Curve" time="3.500" value="0.845" inout="slow"/>
+                <Key type="Curve" time="3.633" value="0.85" in="slow"/>
+            </Controller>
+            
+            <Controller type="Rotation" relative="True" end="Pause" frame="$this/HorizontalClamp_Right">
+                <Key type="Curve" time="0.000" value="0" inout="linear"/>
+                <Key type="Curve" time="2.200" value="0" out="slow"/>
+                <Key type="Curve" time="2.700" value="182" inout="Linear,Slow" />
+                <Key type="Curve" time="2.800" value="179" inout="slow"/>
+                <Key type="Curve" time="2.900" value="180" in="slow"/>
+            </Controller>
+    
+            <!-- Horizontal Clamp Left Controllers -->
+            
+            <Controller type="Dimension" dimension="Width" relative="False" percentage="True" end="Pause" frame="$this/HorizontalClamp_Left">
+                <Key type="Curve" time="0.000" value="50"/>
+                <Key type="Curve" time="1.767" value="50"/>
+                <Key type="Curve" time="1.967" value="100"/>
+            </Controller>
+            
+            <Controller type="Dimension" dimension="Height" relative="False" percentage="True" end="Pause" frame="$this/HorizontalClamp_Left">
+                <Key type="Curve" time="0.000" value="50"/>
+                <Key type="Curve" time="1.767" value="50"/>
+                <Key type="Curve" time="1.967" value="100"/>
+            </Controller>
+            
+            <Controller type="Rotation" relative="True" end="Pause" frame="$this/HorizontalClamp_Left">
+                <Key type="Curve" time="0.000" value="0" inout="Linear"/>
+                <Key type="Curve" time="2.200" value="0" out="Slow"/>
+                <Key type="Curve" time="2.700" value="182" inout="Linear,Slow"/>
+                <Key type="Curve" time="2.800" value="179" inout="Slow"/>
+                <Key type="Curve" time="2.900" value="180" in="Slow"/>
+            </Controller>
+            
+            <!-- Horizontal Clamp Blur Right Controllers -->
+            <Controller type="Property" property="LayerAlpha" curve="True" index="3"  end="Pause" frame="$this/HorizontalClampBlur_Right">
+                <Key type="Property" time="0.000" value="0" inout="Linear"/>
+                <Key type="Property" time="1.767" value="0" inout="Linear"/>
+                <Key type="Property" time="1.833" value="153" inout="Linear"/>
+                <Key type="Property" time="1.900" value="64" inout="Linear"/>
+                <Key type="Property" time="1.967" value="153" inout="Linear"/>
+                <Key type="Property" time="2.000" value="64" inout="Linear"/>
+                <Key type="Property" time="2.067" value="255" inout="Linear"/>
+                <Key type="Property" time="2.633" value="255" inout="Linear"/>
+                <Key type="Property" time="2.700" value="64" inout="Linear"/>
+                <Key type="Property" time="2.767" value="255" inout="Linear"/>
+            </Controller>
+            
+            <Controller type="Dimension" dimension="Width" relative="False" percentage="True" end="Pause" frame="$this/HorizontalClampBlur_Right">
+                <Key type="Curve" time="0.000" value="50"/>
+                <Key type="Curve" time="1.767" value="50"/>
+                <Key type="Curve" time="1.967" value="100"/>
+            </Controller>
+            
+            <Controller type="Dimension" dimension="Height" relative="False" percentage="True" end="Pause" frame="$this/HorizontalClampBlur_Right">
+                <Key type="Curve" time="0.000" value="50"/>
+                <Key type="Curve" time="1.767" value="50"/>
+                <Key type="Curve" time="1.967" value="100"/>
+            </Controller>
+            
+            <!-- Horizontal Clamp Blur Left Controllers -->
+            
+            <Controller type="Dimension" dimension="Width" relative="False" percentage="True" end="Pause" frame="$this/HorizontalClampBlur_Left">
+                <Key type="Curve" time="0.000" value="50"/>
+                <Key type="Curve" time="1.767" value="50"/>
+                <Key type="Curve" time="1.967" value="100"/>
+            </Controller>
+            
+            <Controller type="Dimension" dimension="Height" relative="False" percentage="True" end="Pause" frame="$this/HorizontalClampBlur_Left">
+                <Key type="Curve" time="0.000" value="50"/>
+                <Key type="Curve" time="1.767" value="50"/>
+                <Key type="Curve" time="1.967" value="100"/>
+            </Controller>
+            
+            <!-- Dotted Circle Right Controllers -->
+            
+            <Controller type="StartingAngle" end="Pause" relative="False" frame="$this/DottedCircle_Right">
+                <Key type="Curve" time="0" value="240" inout="Linear"/>
+                <Key type="Curve" time="2.200" value="240" out="Slow"/>
+                <Key type="Curve" time="2.700" value="420" inout="Linear,Slow"/>
+            </Controller>
+            
+            <Controller type="EndAngleOffset" end="Pause" relative="False" frame="$this/DottedCircle_Right">
+                <Key type="Curve" time="0" value="-0" inout="Linear"/>
+                <Key type="Curve" time="2.200" value="0" out="Slow"/>
+                <Key type="Curve" time="2.433" value="-72" inout="Linear"/>
+                <Key type="Curve" time="2.700" value="0" inout="Linear,Slow"/>
+            </Controller>
+            
+            <Controller type="Property" property="LayerAlpha" curve="True" index="3"  end="Pause" frame="$this/DottedCircle_Right">
+                <Key type="Property" time="0.000" value="128" inout="Linear"/>
+                <Key type="Property" time="2.433" value="128" inout="Linear"/>
+                <Key type="Property" time="2.700" value="0" inout="Linear"/>
+            </Controller>
+            
+            <!-- Vertical Clamp Top Controllers -->
+            <Controller type="Property" property="LayerAlpha" curve="True" index="3"  end="Pause" frame="$this/VerticalClamp_Top">
+                <Key type="Property" time="0.000" value="0" inout="Linear"/>
+                <Key type="Property" time="3.233" value="0" inout="Linear"/>
+                <Key type="Property" time="3.400" value="255" inout="Linear"/>
+            </Controller>
+
+            <Controller type="LayerUV" layer="3" side="Left" relative="False" sidelock="True" end="Pause" frame="$this/VerticalClamp_Top">
+                <Key type="Curve" time="0" value="0.55" out="Slow"/>
+                <Key type="Curve" time="3.233" value="0.55" inout="Linear,Slow"/>
+                <Key type="Curve" time="3.400" value="0.83" inout="Fast"/>
+            </Controller>
+            
+            <!-- Sparks Top Left Controllers -->
+            <Controller type="LayerUV" layer="3" side="Top" relative="False" sidelock="False" end="Pause" frame="$this/Spark_TopLeft">
+                <Key type="Curve" time="0.000" value="-2.00" inout="Linear"/>
+                <Key type="Curve" time="3.300" value="-2.00" inout="Linear"/>
+                <Key type="Curve" time="3.700" value="-1.8" inout="Linear"/>
+            </Controller>
+            
+            <Controller type="LayerUV" layer="3" side="Bottom" relative="False" sidelock="False" end="Pause" frame="$this/Spark_TopLeft">
+                <Key type="Curve" time="0.000" value="0" inout="Linear"/>
+                <Key type="Curve" time="3.300" value="0" inout="Linear"/>
+                <Key type="Curve" time="3.700" value="4.5" inout="Linear"/>
+            </Controller>
+            
+            <Controller type="Property" property="LayerAlpha" curve="True" index="3"  end="Pause" frame="$this/Spark_TopLeft">
+                <Key type="Property" time="0" value="0" inout="Linear"/>
+                <Key type="Property" time="3.333" value="0" inout="Linear"/>
+                <Key type="Property" time="3.367" value="255" inout="Linear"/>
+                <Key type="Property" time="3.400" value="255" inout="Linear"/>
+                <Key type="Property" time="3.700" value="0" inout="Linear"/>
+            </Controller>
+            
+            <Controller type="Event" end="Pause" frame="$parent">
+                <Key type="Event" timeinc="4" event="NodeUnlockEnd"/>
+            </Controller>
+            
+            <Controller type="Event" end="Pause" frame="$WarChestFrame">
+                <Key type="Event" timeinc="0" event="PauseXP"/>
+                <Key type="Event" timeinc="5" event="ResumeXP"/>
+            </Controller>
+            
+            <Controller type="State" stateGroup="MoveLineTrigger" end="Pause" frame="$parent">
+                <Key type="Identifier" time="4" value="MoveLine"/>
+            </Controller>
+        </Animation>
+    </Frame>
+    
+    <!--
+    =================================
+    Fake Progress Bar Not Owned Template
+    =================================
+    -->
+    
+    <Frame type="Image" name="FakeProgressBarNotOwnedTemplate" template="WarChestNodeTemplate/ImageTemplate">
+        <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+        <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+        <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+        <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+        <Width val="80"/>
+        <Height val="80"/>
+        <Color val="#WarChestNodeColor_ProgressBar_Primary"/>
+        <Rotation val="0"/>
+        <LayerCount val="4"/>
+        
+        <TextureCoords top="-0.40" left="-0.40" bottom="1.40" right="1.40" layer="0"/>
+        <TextureCoords top="-0.52" left="-0.52" bottom="1.52" right="1.52" layer="1"/>
+    </Frame>
+    
+    <!--
+    =================================
+    Fake Complete NotOwned Node Template
+    =================================
+    -->
+    
+    <Frame type="Image" name="FakeCompleteNotOwnedNodeTemplate">
+        <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+        <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+        <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+        <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+        <Width val="72"/>
+        <Height val="72"/>
+        <LayerAlpha val="0" layer="0"/>
+        
+        <Texture val="@UI/SC2_UI_Collection_WarChest_Node_States_Sheet"/>
+        <TextureCoords top="0.75" left="0.00" bottom="1.00" right="0.20"/>
+    </Frame>
+    
+    <!--
+    ==============================================
+    Node Unlock Animation Components Container Not Owned Template
+    ==============================================
+    -->
+    
+    <Frame type="Frame" name="NodeUnlockAnimationComponentsContainerNotOwnedTemplate">
+        <Anchor relative="$parent"/>
+        <Visible val="False"/>
+        
+        <Frame type="Image" name="FakeProgressBarNotOwned" template="WarChestNodeTemplate/FakeProgressBarNotOwnedTemplate"/>
+        <Frame type="Image" name="FakeCompleteNotOwnedNode" template="WarChestNodeTemplate/FakeCompleteNotOwnedNodeTemplate"/>
+        
+        <!--
+        
+        Node Unlock Animation
+        
+        -->
+        
+        <Animation name="NodeUnlock" speed="#WarChestNodeAnimationSpeed">
+            <Event event="OnHidden" action="Reset,Stop" frame="$WarChestFrame"/>
+            <Event event="ResetEverything" action="Reset,Stop" frame="$parent"/>
+            <Event event="NodeUnlock" action="Reset,Play" frame="$parent"/>
+            
+            <!-- Hide Real Progress Bar -->
+            <Controller type="Fade" end="Pause" frame="$parent/StandardNodeComponentsContainer/ProgressBar">
+                <Key type="Curve" time="0" value="255" out="Fast"/>
+                <Key type="Curve" time="0.001" value="0" in="Slow"/>
+            </Controller>
+            
+            <!-- Hide Real Progress Bar Background -->
+            <Controller type="Fade" end="Pause" frame="$parent/StandardNodeComponentsContainer/NotOwnedProgressBarBackground">
+                <Key type="Curve" time="0" value="255" out="Fast"/>
+                <Key type="Curve" time="0.001" value="0" in="Slow"/>
+            </Controller>
+            
+            <Controller type="Property" property="LayerAlpha" curve="True" index="0"  end="Pause" frame="$this/FakeCompleteNotOwnedNode">
+                <Key type="Property" time="0" value="0" inout="Linear"/>
+                <Key type="Property" time="1.267" value="0" inout="Linear"/>
+                <Key type="Property" time="1.333" value="153" inout="Linear"/>
+                <Key type="Property" time="1.400" value="77" inout="Linear"/>
+                <Key type="Property" time="1.467" value="153" inout="Linear"/>
+                <Key type="Property" time="1.533" value="25" inout="Linear"/>
+                <Key type="Property" time="1.600" value="255" inout="Linear"/>
+            </Controller>
+            
+            <Controller type="Property" property="LayerAlpha" curve="True" index="3"  end="Pause" frame="$this/FakeProgressBarNotOwned">
+                <Key type="Property" time="0" value="255" inout="Linear"/>
+                <Key type="Property" time="0.067" value="255" inout="Linear"/>
+                <Key type="Property" time="0.133" value="128" inout="Linear"/>
+                <Key type="Property" time="0.200" value="255" inout="Linear"/>
+                <Key type="Property" time="0.267" value="128" inout="Linear"/>
+                <Key type="Property" time="0.333" value="255" inout="Linear"/>
+                <Key type="Property" time="0.767" value="255" inout="Linear"/>
+                <Key type="Property" time="0.800" value="153" inout="Linear"/>
+                <Key type="Property" time="0.867" value="153" inout="Linear"/>
+                <Key type="Property" time="0.900" value="77" inout="Linear"/>
+                <Key type="Property" time="0.967" value="77" inout="Linear"/>
+                <Key type="Property" time="1.000" value="0" inout="Linear"/>
+            </Controller>
+            
+            <Controller type="LayerUV" layer="0" side="Top" relative="False" sidelock="False" end="Pause" frame="$this/FakeProgressBarNotOwned">
+                <Key type="Curve" time="0.000" value="-0.40" inOut="Linear"/>
+                <Key type="Curve" time="0.167" value="-0.40" inOut="Linear"/>
+                <Key type="Curve" time="0.200" value="-0.27" inOut="Linear"/>
+                <Key type="Curve" time="0.300" value="-0.27" inOut="Linear"/>
+                <Key type="Curve" time="0.333" value="-0.14" inOut="Linear"/>
+                <Key type="Curve" time="0.767" value="-0.14" inOut="Linear,Slow"/>
+                <Key type="Curve" time="1.000" value="-1.60" inOut="Linear"/>
+            </Controller>
+    
+            <Controller type="LayerUV" layer="0" side="Bottom" relative="False" sidelock="False" end="Pause" frame="$this/FakeProgressBarNotOwned">
+                <Key type="Curve" time="0.000" value="1.40" inOut="Linear"/>
+                <Key type="Curve" time="0.167" value="1.40" inOut="Linear"/>
+                <Key type="Curve" time="0.200" value="1.27" inOut="Linear"/>
+                <Key type="Curve" time="0.300" value="1.27" inOut="Linear"/>
+                <Key type="Curve" time="0.333" value="1.14" inOut="Linear"/>
+                <Key type="Curve" time="0.767" value="1.14" inOut="Linear,Slow"/>
+                <Key type="Curve" time="1.000" value="2.60" inOut="Linear"/>
+            </Controller>
+    
+            <Controller type="LayerUV" layer="0" side="Left" relative="False" sidelock="False" end="Pause" frame="$this/FakeProgressBarNotOwned">
+                <Key type="Curve" time="0.000" value="-0.40" inOut="Linear"/>
+                <Key type="Curve" time="0.167" value="-0.40" inOut="Linear"/>
+                <Key type="Curve" time="0.200" value="-0.27" inOut="Linear"/>
+                <Key type="Curve" time="0.300" value="-0.27" inOut="Linear"/>
+                <Key type="Curve" time="0.333" value="-0.14" inOut="Linear"/>
+                <Key type="Curve" time="0.767" value="-0.14" inOut="Linear,Slow"/>
+                <Key type="Curve" time="1.000" value="-1.60" inOut="Linear"/>
+            </Controller>
+    
+            <Controller type="LayerUV" layer="0" side="Right" relative="False" sidelock="False" end="Pause" frame="$this/FakeProgressBarNotOwned">
+                <Key type="Curve" time="0.000" value="1.40" inOut="Linear"/>
+                <Key type="Curve" time="0.167" value="1.40" inOut="Linear"/>
+                <Key type="Curve" time="0.200" value="1.27" inOut="Linear"/>
+                <Key type="Curve" time="0.300" value="1.27" inOut="Linear"/>
+                <Key type="Curve" time="0.333" value="1.14" inOut="Linear"/>
+                <Key type="Curve" time="0.767" value="1.14" inOut="Linear,Slow"/>
+                <Key type="Curve" time="1.000" value="2.60" inOut="Linear"/>
+            </Controller>
+            
+            <Controller type="LayerUV" layer="1" side="Top" relative="False" sidelock="False" end="Pause" frame="$this/FakeProgressBarNotOwned">
+                <Key type="Curve" time="0.000" value="-0.50" inOut="Linear"/>
+                <Key type="Curve" time="0.167" value="-0.50" inOut="Linear"/>
+                <Key type="Curve" time="0.200" value="-0.35" inOut="Linear"/>
+                <Key type="Curve" time="0.300" value="-0.35" inOut="Linear"/>
+                <Key type="Curve" time="0.333" value="-0.20" inOut="Linear"/>
+                <Key type="Curve" time="0.767" value="-0.20" inOut="Linear,Slow"/>
+                <Key type="Curve" time="1.000" value="-2" inOut="Linear"/>
+            </Controller>
+    
+            <Controller type="LayerUV" layer="1" side="Bottom" relative="False" sidelock="False" end="Pause" frame="$this/FakeProgressBarNotOwned">
+                <Key type="Curve" time="0.000" value="1.50" inOut="Linear"/>
+                <Key type="Curve" time="0.167" value="1.50" inOut="Linear"/>
+                <Key type="Curve" time="0.200" value="1.35" inOut="Linear"/>
+                <Key type="Curve" time="0.300" value="1.35" inOut="Linear"/>
+                <Key type="Curve" time="0.333" value="1.20" inOut="Linear"/>
+                <Key type="Curve" time="0.767" value="1.20" inOut="Linear,Slow"/>
+                <Key type="Curve" time="1.000" value="3" inOut="Linear"/>
+            </Controller>
+    
+            <Controller type="LayerUV" layer="1" side="Left" relative="False" sidelock="False" end="Pause" frame="$this/FakeProgressBarNotOwned">
+                <Key type="Curve" time="0.000" value="-0.50" inOut="Linear"/>
+                <Key type="Curve" time="0.167" value="-0.50" inOut="Linear"/>
+                <Key type="Curve" time="0.200" value="-0.35" inOut="Linear"/>
+                <Key type="Curve" time="0.300" value="-0.35" inOut="Linear"/>
+                <Key type="Curve" time="0.333" value="-0.20" inOut="Linear"/>
+                <Key type="Curve" time="0.767" value="-0.20" inOut="Linear,Slow"/>
+                <Key type="Curve" time="1.000" value="-2" inOut="Linear"/>
+            </Controller>
+    
+            <Controller type="LayerUV" layer="1" side="Right" relative="False" sidelock="False" end="Pause" frame="$this/FakeProgressBarNotOwned">
+                <Key type="Curve" time="0.000" value="1.50" inOut="Linear"/>
+                <Key type="Curve" time="0.167" value="1.50" inOut="Linear"/>
+                <Key type="Curve" time="0.200" value="1.35" inOut="Linear"/>
+                <Key type="Curve" time="0.300" value="1.35" inOut="Linear"/>
+                <Key type="Curve" time="0.333" value="1.20" inOut="Linear"/>
+                <Key type="Curve" time="0.767" value="1.20" inOut="Linear,Slow"/>
+                <Key type="Curve" time="1.000" value="3" inOut="Linear"/>
+            </Controller>
+            
+            <Controller type="Event" end="Pause" frame="$parent">
+                <Key type="Event" timeinc="4" event="NodeUnlockEnd"/>
+            </Controller>
+            
+            <Controller type="Event" end="Pause" frame="$WarChestFrame">
+                <Key type="Event" timeinc="0" event="PauseXP"/>
+                <Key type="Event" timeinc="5" event="ResumeXP"/>
+            </Controller>
+            
+            <Controller type="State" stateGroup="MoveLineTrigger" end="Pause" frame="$parent">
+                <Key type="Identifier" time="4" value="MoveLine"/>
+            </Controller>
+        </Animation>
+    </Frame>
+    
+    <!--
+    ==============================================
+    Node Phase Unlock Animation Components Container Template
+    ==============================================
+    -->
+    
+    <Frame type="Frame" name="NodePhaseUnlockAnimationComponentsContainerTemplate">
+        <Anchor relative="$parent"/>
+        <Visible val="False"/>
+        
+        <Frame type="Image" name="BackgroundGlow" template="WarChestNodeTemplate/BackgroundGlowTemplate">
+            <Width val="78"/>
+            <Height val="78"/>
+        </Frame>
+        
+        <Frame type="Image" name="StartNodeImage">
+            <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+            <Width val="72"/>
+            <Height val="72"/>
+            <Texture val="@UI/SC2_UI_Collection_WarChest_Node_States_Sheet"/>
+            
+            <StateGroup name="NodeState">
+                <State name="Owned">
+                    <When type="StateGroup" frame="$parent/$parent" OwnedState="Owned"/>
+                    <Action type="SetProperty" frame="$this" textureCoords="0.50,0.00,0.75,0.20" index="0"/>
+                </State>
+                <State name="NotOwned">
+                    <When type="StateGroup" frame="$parent/$parent" OwnedState="NotOwned"/>
+                    <Action type="SetProperty" frame="$this" textureCoords="0.00,0.80,0.25,1.00" index="0"/>
+                </State>
+            </StateGroup>
+        </Frame>
+        
+        <Frame type="Image" name="EndNodeImage">
+            <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+            <Width val="72"/>
+            <Height val="72"/>
+            <Texture val="@UI/SC2_UI_Collection_WarChest_Node_States_Sheet"/>
+            <LayerAlpha val="0" layer="0"/>
+            
+            <StateGroup name="NodeState">
+                <State name="Owned">
+                    <When type="StateGroup" frame="$parent/$parent" OwnedState="Owned"/>
+                    <Action type="SetProperty" frame="$this" textureCoords="0.25,0.00,0.50,0.20" index="0"/>
+                </State>
+                <State name="NotOwned">
+                    <When type="StateGroup" frame="$parent/$parent" OwnedState="NotOwned"/>
+                    <Action type="SetProperty" frame="$this" textureCoords="0.00,0.60,0.25,0.80" index="0"/>
+                </State>
+            </StateGroup>
+        </Frame>
+        
+        <Frame type="Image" name="EndNodeImageBright">
+            <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+            <Width val="72"/>
+            <Height val="72"/>
+            <Texture val="@UI/SC2_UI_Collection_WarChest_Node_States_Sheet"/>
+            <LayerAlpha val="0" layer="0"/>
+            <ColorAdjustMode val="AddSelf"/>
+            
+            <StateGroup name="NodeState">
+                <State name="Owned">
+                    <When type="StateGroup" frame="$parent/$parent" OwnedState="Owned"/>
+                    <Action type="SetProperty" frame="$this" textureCoords="0.25,0.00,0.50,0.20" index="0"/>
+                </State>
+                <State name="NotOwned">
+                    <When type="StateGroup" frame="$parent/$parent" OwnedState="NotOwned"/>
+                    <Action type="SetProperty" frame="$this" textureCoords="0.00,0.60,0.25,0.80" index="0"/>
+                </State>
+            </StateGroup>
+        </Frame>
+
+        
+        <!--
+        
+        Phase Unlock Animation
+        
+        -->
+        <Animation name="PhaseUnlock" speed="#WarChestNodeAnimationSpeed">
+            <Event event="PhaseUnlock" action="Reset,Play" frame="$parent" />
+            
+            <Controller type="Property" property="LayerAlpha" curve="True" index="0"  end="Pause" frame="$this/StartNodeImage">
+                <Key type="Property" time="0.0" value="255" inout="Linear"/>
+                <Key type="Property" timeinc="0.050" value="0" inout="Linear"/>
+            </Controller>
+            
+            <Controller type="Property" property="LayerAlpha" curve="True" index="0"  end="Pause" frame="$this/EndNodeImage">
+                <Key type="Property" time="0.000" value="0" inout="Linear"/>
+                <Key type="Property" time="0.050" value="0" inout="Linear"/>
+                <Key type="Property" time="0.100" value="178" inout="Linear"/>
+                <Key type="Property" time="0.150" value="76" inout="Linear"/>
+                <Key type="Property" time="0.200" value="255" inout="Linear"/>
+            </Controller>
+            
+            <Controller type="Property" property="LayerAlpha" curve="True" index="0"  end="Pause" frame="$this/EndNodeImageBright">
+                <Key type="Property" time="0.000" value="0" inout="Linear"/>
+                <Key type="Property" time="0.050" value="0" inout="Linear"/>
+                <Key type="Property" time="0.100" value="178" inout="Linear"/>
+                <Key type="Property" time="0.150" value="76" inout="Linear"/>
+                <Key type="Property" time="0.200" value="255" inout="Linear"/>
+            </Controller>
+            
+            <Controller type="Property" property="LayerAlpha" curve="True" index="3"  end="Pause" frame="$this/BackgroundGlow">
+                <Key type="Property" time="0.0" value="0" inout="Linear"/>
+                <Key type="Property" timeinc="0.050" value="0" inout="Linear"/>
+                <Key type="Property" timeinc="0.200" value="128" inout="Linear"/>
+                <Key type="Property" timeinc="0.250" value="128" inout="Linear"/>
+            </Controller>
+        </Animation>
+        
+        <!--
+        
+        Phase Unlock End Animation
+        
+        -->
+        <Animation name="PhaseUnlockEnd" speed="#WarChestNodeAnimationSpeed">
+            <Event event="PhaseUnlockEnd" action="Reset,Play" frame="$parent" />
+            
+            <Controller type="Property" property="LayerAlpha" curve="True" index="3"  end="Pause" frame="$this/BackgroundGlow">
+                <Key type="Property" timeinc="0.000" value="128" inout="Linear"/>
+                <Key type="Property" timeinc="0.333" value="0" inout="Linear"/>
+            </Controller>
+            
+            <Controller type="Property" property="LayerAlpha" curve="True" index="0"  end="Pause" frame="$this/EndNodeImageBright">
+                <Key type="Property" time="0.0" value="200" inout="Linear"/>
+                <Key type="Property" timeinc="0.333" value="0" inout="Linear"/>
+            </Controller>
+        </Animation>
+    </Frame>
+    
+    <!--
+    ======================================================
+    
+    WAR CHEST NODE TEMPLATE
+    
+    ======================================================
+    -->
+    
+    <Frame type="Frame" name="WarChestNodeTemplate">
+        <Width val="200"/>
+        <Height val="200"/>
+        <Batch val="False"/>
+        
+        <!-- Visible frames -->
+        <Frame type="Frame" name="StandardNodeComponentsContainer" template="WarChestNodeTemplate/StandardNodeComponentsContainerTemplate"/>
+        <Frame type="Frame" name="NodeUnlockAnimationComponentsContainer" template="WarChestNodeTemplate/NodeUnlockAnimationComponentsContainerTemplate"/>
+        <Frame type="Frame" name="NodeUnlockAnimationComponentsContainerNotOwned" template="WarChestNodeTemplate/NodeUnlockAnimationComponentsContainerNotOwnedTemplate"/>
+        <Frame type="Frame" name="NodePhaseUnlockAnimationComponentsContainer" template="WarChestNodeTemplate/NodePhaseUnlockAnimationComponentsContainerTemplate"/>
+        
+        <!-- Invisible frames used for checking data or anchoring -->
+        <Frame type="WarChestTierFrame" name="WarChestTierFrame" template="WarChestNodeTemplate/WarChestTierFrameTemplate"/>
+        <Frame type="AchievementInfoFrame" name="TierNodeCompleteAchievement" template="WarChestNodeTemplate/TierNodeCompleteAchievementInfoFrameTemplate"/>
+        <Frame type="AchievementInfoFrame" name="WarChestOwnedAchievement" template="WarChestNodeTemplate/WarChestOwnedAchievementInfoFrameTemplate"/>
+        <Frame type="RangeFrame" name="LineDistanceCheck" template="WarChestNodeTemplate/LineDistanceCheckTemplate"/>
+        <Frame type="Frame" name="NodeSizingFrame" template="WarChestNodeTemplate/NodeSizingFrameTemplate"/>
+        
+        
+        <!-- 
+        =====================
+        BASIC STATES
+        =====================
+        -->
+        
+        <!-- OWNED STATE -->
+        <!-- Whether or not the player owns the War Chest license that this node is attached to -->
+        <StateGroup name="OwnedState">
+            <DefaultState val="NotOwned"/>
+        
+            <State name="Owned">
+                <When type="Property" frame="$this/WarChestOwnedAchievement" Awarded="True"/>
+            </State>
+            
+            <State name="NotOwned"/>
+        </StateGroup>
+        
+        <!-- LOCKED STATE -->
+        <!-- Whether or not current phase/round (they mean the same thing) the node/tier is in is currently open -->
+        <StateGroup name="LockedState">
+            <DefaultState val="Locked"/>
+        
+            <State name="Unlocked">
+                <When type="Property" frame="$this/WarChestTierFrame" operator="LessThanOrEqual" Round="{$WarChestCurrentPhaseBind/@A}"/>
+            </State>
+            
+            <State name="Locked"/>
+        </StateGroup>
+        
+        <!-- COMPLETION STATE -->
+        <!-- Whether or not the player has earned enough experience to complete this node/tier -->
+        <StateGroup name="CompletionState">
+            <DefaultState val="Incomplete"/>
+        
+            <State name="Complete">
+                <When type="Property" frame="$this/WarChestTierFrame" operator="LessThanOrEqual" MaxXP="{$WarChestExperienceCounter/@CurrentValue}"/>
+            </State>
+            
+            <State name="Incomplete"/>
+        </StateGroup>
+        
+        <!-- ACTIVE STATE -->
+        <!-- Whether or not this node appears to be what the player is actively earning XP towards in the UI -->
+        <StateGroup name="ActiveState">
+            <DefaultState val="Inactive"/>
+        
+            <State name="Active">
+                <When type="Property" frame="$this/LineDistanceCheck" UnderWidth="False"/>
+                <When type="Property" frame="$this/LineDistanceCheck" OverWidth="False"/>
+                <When type="Property" frame="$WarChestFrame" visible="True"/>
+            </State>
+            
+            <State name="Inactive">
+            </State>
+        </StateGroup>
+
+        <!-- 
+        =====================
+        NODE OVERALL STATE
+        =====================
+        -->
+        
+        <StateGroup name="NodeState">
+        
+            <!-- This node is playing its node completion celebration animation -->
+            <State name="NodeUnlockOwned">
+                <When type="StateGroup" frame="$this" OwnedState="Owned"/>
+                <When type="Property" frame="NodeUnlockTriggerFrame" visible="True"/>
+                <Action type="SetProperty" frame="StandardNodeComponentsContainer" visible="False"/>
+                <Action type="SetProperty" frame="NodeUnlockAnimationComponentsContainer" visible="True"/>
+                <Action type="SendEvent" frame="$this" event="NodeUnlock"/>
+            </State>
+            <State name="NodeUnlockNotOwned">
+                <When type="StateGroup" frame="$this" OwnedState="NotOwned"/>
+                <When type="Property" frame="NodeUnlockTriggerFrame" visible="True"/>
+                <Action type="SetProperty" frame="StandardNodeComponentsContainer" visible="False"/>
+                <Action type="SetProperty" frame="NodeUnlockAnimationComponentsContainerNotOwned" visible="True"/>
+                <Action type="SendEvent" frame="$this" event="NodeUnlock"/>
+            </State>
+            <State name="PhaseUnlock">
+                <When type="Property" frame="PhaseUnlockTriggerFrame" visible="True"/>
+                <Action type="SetProperty" frame="StandardNodeComponentsContainer" visible="False"/>
+                <Action type="SetProperty" frame="NodePhaseUnlockAnimationComponentsContainer" visible="True"/>
+            </State>
+            <State name="OwnedUnlockedComplete">
+                <When type="StateGroup" frame="$this" OwnedState="Owned"/>
+                <When type="StateGroup" frame="$this" LockedState="Unlocked"/>
+                <When type="StateGroup" frame="$this" CompletionState="Complete"/>
+            </State>
+            <State name="OwnedUnlockedIncompleteActive">
+                <When type="StateGroup" frame="$this" OwnedState="Owned"/>
+                <When type="StateGroup" frame="$this" LockedState="Unlocked"/>
+                <When type="StateGroup" frame="$this" ActiveState="Active"/>
+                <Action type="SetState" undo="false" frame="$this" group="UnlockAnimationState" state="Incomplete"/>
+            </State>
+            <State name="OwnedUnlockedIncompleteInactive">
+                <When type="StateGroup" frame="$this" OwnedState="Owned"/>
+                <When type="StateGroup" frame="$this" LockedState="Unlocked"/>
+                <When type="StateGroup" frame="$this" ActiveState="Inactive"/>
+            </State>
+            <State name="OwnedLockedIncompleteActive">
+                <When type="StateGroup" frame="$this" OwnedState="Owned"/>
+                <When type="StateGroup" frame="$this" LockedState="Locked"/>
+                <When type="StateGroup" frame="$this" ActiveState="Active"/>
+            </State>
+            <State name="OwnedLockedIncompleteInactive">
+                <When type="StateGroup" frame="$this" OwnedState="Owned"/>
+                <When type="StateGroup" frame="$this" LockedState="Locked"/>
+                <When type="StateGroup" frame="$this" ActiveState="Inactive"/>
+            </State>
+            <State name="NotOwnedUnlockedComplete">
+                <When type="StateGroup" frame="$this" OwnedState="NotOwned"/>
+                <When type="StateGroup" frame="$this" LockedState="Unlocked"/>
+                <When type="StateGroup" frame="$this" CompletionState="Complete"/>
+            </State>
+            <State name="NotOwnedUnlockedIncompleteActive">
+                <When type="StateGroup" frame="$this" OwnedState="NotOwned"/>
+                <When type="StateGroup" frame="$this" LockedState="Unlocked"/>
+                <When type="StateGroup" frame="$this" ActiveState="Active"/>
+                <Action type="SetState" undo="false" frame="$this" group="UnlockAnimationState" state="Incomplete"/>
+            </State>
+            <State name="NotOwnedUnlockedIncompleteInactive">
+                <When type="StateGroup" frame="$this" OwnedState="NotOwned"/>
+                <When type="StateGroup" frame="$this" LockedState="Unlocked"/>
+                <When type="StateGroup" frame="$this" ActiveState="Inactive"/>
+            </State>
+            <State name="NotOwnedLockedIncompleteActive">
+                <When type="StateGroup" frame="$this" OwnedState="NotOwned"/>
+                <When type="StateGroup" frame="$this" LockedState="Locked"/>
+                <When type="StateGroup" frame="$this" ActiveState="Active"/>
+            </State>
+            <State name="NotOwnedLockedIncompleteInactive">
+                <When type="StateGroup" frame="$this" OwnedState="NotOwned"/>
+                <When type="StateGroup" frame="$this" LockedState="Locked"/>
+                <When type="StateGroup" frame="$this" ActiveState="Inactive"/>
+            </State>
+        </StateGroup>
+        
+        <!-- UNLOCK ANIMATION STATE -->
+        <!--
+        This state prevents a newly Completed node from appearing Completed until after the node unlock
+        animation has been finished. This state is flagged as Incomplete when a node is enters an Active
+        NodeState; it is returned to a Complete state when the NodeUnlockEnd event is received.
+        -->
+        <StateGroup name="UnlockAnimationState">
+            <DefaultState val="Complete"/>
+        
+            <State name="Incomplete"/>
+            <State name="Complete"/>
+        </StateGroup>
+        
+        <!-- RESET UNLOCK ANIMATION STATE -->
+        <!--
+        This state resets the UnlockAnimationState when the player navigates away from the War Chest
+        -->
+        <StateGroup name="ResetUnlockAnimationState">
+            <DefaultState val="NoReset"/>
+            
+            <State name="Reset">
+                <When type="StateGroup" ActiveState="Inactive"/>
+                <When type="StateGroup" UnlockAnimationState="Incomplete"/>
+                <Action type="SendEvent" event="OnResetUnlockAnim"/>
+            </State>
+            
+            <State name="NoReset"/>
+        </StateGroup>
+        
+        <!-- RESET UNLOCK ANIMATION -->
+        <!--
+        State groups are not allowed to switch states within the same tick, so we delay the Reset switch by a tickk
+        with an animation
+        -->
+        <Animation name="ResetUnlockAnimation">
+            <Event event="OnResetUnlockAnim" action="Play"/>
+             
+            <Controller type="State" stateGroup="UnlockAnimationState" end="Stop">
+                <Key type="Identifier" time="0.05" value="Complete"/>
+            </Controller>
+        </Animation>
+        
+        <!-- 
+        This StateGroup starts the sequence of events which leads to the Node Unlock animation playing. It does 
+        this by sending an event "NodeUnlockTrigger" to the Node.  The "NodeUnlockTriggerFrame" responds to 
+        this event and shows itself.  This allows the "NodeState" StateGroup to enter the "NodeUnlockOwned" or
+        "NodeUnlockNotOwned" states.  When this happens they make node unlock animation components visible
+        and send the "NodeUnlock" event which those components respond to and start animating.
+        
+        At the end of that animation it fires off the "NodeUnlockEnd" event which the "NodeUnlockTriggerFrame"
+        responds to by hiding itself again so the node can return to normal, non-animated states.
+        -->
+        
+        <StateGroup name="NodeUnlockStart">
+            <DefaultState val="TriggerLock"/>
+
+            <State name="TriggerUnlock">
+                <When type="Property" frame="$this/StandardNodeComponentsContainer/ProgressBar" operator="GreaterThan" value="0"/>
+                <When type="Property" frame="$this/StandardNodeComponentsContainer/ProgressBar" value="{$this/StandardNodeComponentsContainer/ProgressBar/@MaxValue}"/>
+                <When type="Property" frame="$WarChestLastSeenXPBind" operator="LessThan" A="{$this/StandardNodeComponentsContainer/ProgressBar/@MaxValue}"/>
+                <Action type="SendEvent" frame="$this" event="NodeUnlockTrigger"/>
+            </State>
+
+            <State name="TriggerLock">
+                <Action type="SendEvent" frame="$this" event="NodeLockTrigger"/>
+            </State>
+        </StateGroup>
+        
+        <Frame type="Frame" name="NodeUnlockTriggerFrame">
+            <Anchor relative="$parent"/>
+            <Visible val="False"/>
+            
+            <Animation name="Show">
+                <Event event="NodeUnlockTrigger" action="Reset,Play" frame="$parent"/>
+                <Event event="NodeLockTrigger" action="Reset,Stop" frame="$parent"/>
+                <Event event="NodeUnlockEnd" action="Reset" frame="$parent"/>
+                <Event event="OnHidden" action="Reset" frame="$WarChestFrame"/>
+                <Event event="ResetEverything" action="Reset" frame="$WarChestFrame"/>
+                 
+                <Controller type="Visibility" end="Pause">
+                    <Key type="Bool" time="0" value="False"/>
+                    <Key type="Bool" time=".01" value="True"/>
+                </Controller>
+            </Animation>
+        </Frame>
+        
+        <Frame type="Frame" name="PhaseUnlockTriggerFrame">
+            <Anchor relative="$parent"/>
+            <Visible val="False"/>
+            
+            <Animation name="Show">
+                <Event event="PhaseUnlockPrep" action="Reset,Play" frame="$parent"/>
+                <Event event="OnHidden" action="Reset" frame="$WarChestFrame"/>
+                <Event event="ResetEverything" action="Reset" frame="$WarChestFrame"/>
+                 
+                <Controller type="Visibility" end="Pause">
+                    <Key type="Bool" time="0" value="False"/>
+                    <Key type="Bool" time=".01" value="True"/>
+                </Controller>
+            </Animation>
+            
+            <Animation name="Hide">
+                <Event event="PhaseUnlockEnd" action="Reset,Play" frame="$parent"/>
+                <Event event="OnHidden" action="Reset" frame="$WarChestFrame"/>
+                <Event event="ResetEverything" action="Reset" frame="$WarChestFrame"/>
+                 
+                <Controller type="Visibility" end="Pause">
+                    <Key type="Bool" time="0.2" value="False"/>
+                </Controller>
+            </Animation>
+        </Frame>
+            
+        <Animation name="CompleteUnlockAnimationState">
+            <Event event="OnShown" frame="$WarChestFrame" action="Restart"/>
+            <Event event="NodeUnlockEnd" action="Play"/>
+        
+            <Controller type="State" stateGroup="UnlockAnimationState" end="Pause">
+                <Key type="Identifier" time="0" value="Complete"/>
+            </Controller>
+        </Animation>
+        
+        <StateGroup name="MoveLineTrigger">
+            <DefaultState val="DoNotMoveLine"/>
+            <State name="DoNotMoveLine"/>
+            <State name="MoveLine"/>
+        </StateGroup>
+        
+        <StateGroup name="MoveLine">
+            
+            <State name="MoveLine0">
+                <When type="Property" frame="$this/WarChestTierFrame" Round="1"/>
+                <When type="Property" frame="$this/WarChestTierFrame" Tier="1"/>
+                <When type="StateGroup" frame="$this" MoveLineTrigger="MoveLine"/>
+                <Action type="SendEvent" frame="$WarChestFrame" event="MoveLine0"/>
+            </State>
+            
+            <State name="MoveLine1">
+                <When type="Property" frame="$this/WarChestTierFrame" Round="1"/>
+                <When type="Property" frame="$this/WarChestTierFrame" Tier="2"/>
+                <When type="StateGroup" frame="$this" MoveLineTrigger="MoveLine"/>
+                <Action type="SendEvent" frame="$WarChestFrame" event="MoveLine1"/>
+            </State>
+            
+            <State name="MoveLine2">
+                <When type="Property" frame="$this/WarChestTierFrame" Round="1"/>
+                <When type="Property" frame="$this/WarChestTierFrame" Tier="3"/>
+                <When type="StateGroup" frame="$this" MoveLineTrigger="MoveLine"/>
+                <Action type="SendEvent" frame="$WarChestFrame" event="MoveLine2"/>
+            </State>
+            
+            <State name="MoveLine3">
+                <When type="Property" frame="$this/WarChestTierFrame" Round="1"/>
+                <When type="Property" frame="$this/WarChestTierFrame" Tier="4"/>
+                <When type="StateGroup" frame="$this" MoveLineTrigger="MoveLine"/>
+                <Action type="SendEvent" frame="$WarChestFrame" event="MoveLine3"/>
+            </State>
+            
+            <State name="MoveLine4">
+                <When type="Property" frame="$this/WarChestTierFrame" Round="1"/>
+                <When type="Property" frame="$this/WarChestTierFrame" Tier="5"/>
+                <When type="Property" frame="$WarChestCurrentPhaseBind" operator="GreaterThanOrEqual" A="2"/>
+                <When type="StateGroup" frame="$this" MoveLineTrigger="MoveLine"/>
+                <Action type="SendEvent" frame="$WarChestFrame" event="MoveLine4"/>
+            </State>
+            
+            <State name="MoveLine5">
+                <When type="Property" frame="$this/WarChestTierFrame" Round="2"/>
+                <When type="Property" frame="$this/WarChestTierFrame" Tier="1"/>
+                <When type="StateGroup" frame="$this" MoveLineTrigger="MoveLine"/>
+                <Action type="SendEvent" frame="$WarChestFrame" event="MoveLine5"/>
+            </State>
+            
+            <State name="MoveLine6">
+                <When type="Property" frame="$this/WarChestTierFrame" Round="2"/>
+                <When type="Property" frame="$this/WarChestTierFrame" Tier="2"/>
+                <When type="StateGroup" frame="$this" MoveLineTrigger="MoveLine"/>
+                <Action type="SendEvent" frame="$WarChestFrame" event="MoveLine6"/>
+            </State>
+            
+            <State name="MoveLine7">
+                <When type="Property" frame="$this/WarChestTierFrame" Round="2"/>
+                <When type="Property" frame="$this/WarChestTierFrame" Tier="3"/>
+                <When type="StateGroup" frame="$this" MoveLineTrigger="MoveLine"/>
+                <Action type="SendEvent" frame="$WarChestFrame" event="MoveLine7"/>
+            </State>
+            
+            <State name="MoveLine8">
+                <When type="Property" frame="$this/WarChestTierFrame" Round="2"/>
+                <When type="Property" frame="$this/WarChestTierFrame" Tier="4"/>
+                <When type="StateGroup" frame="$this" MoveLineTrigger="MoveLine"/>
+                <Action type="SendEvent" frame="$WarChestFrame" event="MoveLine8"/>
+            </State>
+            
+            <State name="MoveLine9">
+                <When type="Property" frame="$this/WarChestTierFrame" Round="2"/>
+                <When type="Property" frame="$this/WarChestTierFrame" Tier="5"/>
+                <When type="Property" frame="$WarChestCurrentPhaseBind" operator="GreaterThanOrEqual" A="3"/>
+                <When type="StateGroup" frame="$this" MoveLineTrigger="MoveLine"/>
+                <Action type="SendEvent" frame="$WarChestFrame" event="MoveLine9"/>
+            </State>
+            
+            <State name="MoveLine10">
+                <When type="Property" frame="$this/WarChestTierFrame" Round="3"/>
+                <When type="Property" frame="$this/WarChestTierFrame" Tier="1"/>
+                <When type="StateGroup" frame="$this" MoveLineTrigger="MoveLine"/>
+                <Action type="SendEvent" frame="$WarChestFrame" event="MoveLine10"/>
+            </State>
+            
+            <State name="MoveLine11">
+                <When type="Property" frame="$this/WarChestTierFrame" Round="3"/>
+                <When type="Property" frame="$this/WarChestTierFrame" Tier="2"/>
+                <When type="StateGroup" frame="$this" MoveLineTrigger="MoveLine"/>
+                <Action type="SendEvent" frame="$WarChestFrame" event="MoveLine11"/>
+            </State>
+            
+            <State name="MoveLine12">
+                <When type="Property" frame="$this/WarChestTierFrame" Round="3"/>
+                <When type="Property" frame="$this/WarChestTierFrame" Tier="3"/>
+                <When type="StateGroup" frame="$this" MoveLineTrigger="MoveLine"/>
+                <Action type="SendEvent" frame="$WarChestFrame" event="MoveLine12"/>
+            </State>
+            
+            <State name="MoveLine13">
+                <When type="Property" frame="$this/WarChestTierFrame" Round="3"/>
+                <When type="Property" frame="$this/WarChestTierFrame" Tier="4"/>
+                <When type="StateGroup" frame="$this" MoveLineTrigger="MoveLine"/>
+                <Action type="SendEvent" frame="$WarChestFrame" event="MoveLine13"/>
+            </State>
+            
+            <State name="MoveLine14">
+                <When type="Property" frame="$this/WarChestTierFrame" Round="3"/>
+                <When type="Property" frame="$this/WarChestTierFrame" Tier="5"/>
+                <When type="StateGroup" frame="$this" MoveLineTrigger="MoveLine"/>
+                <Action type="SendEvent" frame="$WarChestFrame" event="HideLine"/>
+            </State>
+        </StateGroup>
+    </Frame>
+</Desc>

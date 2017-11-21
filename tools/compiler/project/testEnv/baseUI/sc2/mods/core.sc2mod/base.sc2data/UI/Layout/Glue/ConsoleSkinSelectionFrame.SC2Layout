@@ -48,18 +48,17 @@
         </Frame>
 
         <Frame type="GameContentFrame" name="GameContentFrame">
-            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
-            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
-            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
-            <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+            <Anchor relative="$parent"/>
+            <GameContent val="{$parent/ConsoleSkinCacheFrame/@GameContent}"/>
+        </Frame>
+
+        <Frame type="StoreCacheFrame" name="StoreCacheFrame">
+            <Anchor relative="$parent"/>
             <GameContent val="{$parent/ConsoleSkinCacheFrame/@GameContent}"/>
         </Frame>
 
         <Frame type="RewardCacheFrame" name="RewardCacheFrame">
-            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
-            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
-            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
-            <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+            <Anchor relative="$parent"/>
             <Reward val="{$parent/ConsoleSkinCacheFrame/@RequiredReward}"/>
         </Frame>
 
@@ -160,7 +159,7 @@
             <Anchor side="Right" relative="$parent/NameLabel" pos="Max" offset="0"/>
             <Style val="@Collection_ListItem_Cost"/>
             <Height val="23"/>
-            <Text val="{$parent/GameContentFrame/@CostText}"/>
+            <Text val="{$parent/StoreCacheFrame/@CostText}"/>
         </Frame>
 
         <Frame type="Label" name="StateLabel">
@@ -212,7 +211,7 @@
             </State>
 
             <State name="GameContentPurchased">
-                <When type="AnimationState" frame="$this/GameContentFrame" PurchasedState="Purchased"/>
+                <When type="Property" frame="$this/StoreCacheFrame" IsPurchased="True"/>
                 <Action type="SetProperty" frame="StateLabel" visible="true"/>
                 <Action type="SetProperty" frame="StateLabel" text="@UI/ScreenCollection/Owned"/>
                 <Action type="SetProperty" frame="CostLabel" visible="false"/>
@@ -236,7 +235,7 @@
             </State>
 
             <State name="GameContentLocked">
-                <When type="Property" frame="$this/GameContentFrame" CanPurchase="false"/>
+                <When type="Property" frame="$this/StoreCacheFrame" CanPurchase="false"/>
                 <Action type="SetProperty" frame="StateLabel" visible="true"/>
                 <Action type="SetProperty" frame="StateLabel" text="@UI/ScreenCollection/Locked"/>
                 <Action type="SetProperty" frame="CostLabel" visible="false"/>
@@ -265,12 +264,31 @@
     </Frame>
 
     <Frame type="TileList" name="ConsoleSkinTileListTemplate">
+        <Width val="517"/>
+        <Height val="681"/>
         <AcceptsMouse val="true"/>
         <RequireSelection val="true"/>
 
-        <Frame type="ConsoleSkinTileListItem" name="Item0" template="ConsoleSkinSelectionFrame/ConsoleSkinTileListItemTemplate">
+        <Frame type="BlurFrame" name="BackgroundBlur">
+            <Anchor side="Top" relative="$parent/Background" pos="Min" offset="4"/>
+            <Anchor side="Left" relative="$parent/Background" pos="Min" offset="4"/>
+            <Anchor side="Bottom" relative="$parent/Background" pos="Max" offset="-4"/>
+            <Anchor side="Right" relative="$parent/Background" pos="Max" offset="-4"/>
+            <BlurAmount val=".35"/>
+        </Frame>
+
+        <Frame type="Image" name="Background">
             <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
             <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+            <Texture val="@UI/SC2_UI_Battlenet_Glue_Arcade_MainContainer"/>
+            <TextureType val="NineSlice"/>
+        </Frame>
+
+        <Frame type="ConsoleSkinTileListItem" name="Item0" template="ConsoleSkinSelectionFrame/ConsoleSkinTileListItemTemplate">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="25"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="24"/>
             <Anchor side="Right" relative="$parent/ScrollBar" pos="Min" offset="#TileListItemOffsetRight"/>
         </Frame>
 
@@ -320,10 +338,18 @@
     <Frame type="ConsoleSkinSelectionFrame" name="ConsoleSkinSelectionFrameTemplate">
         <HideAllowed val="{$this/HidePurchasedCheckBox/@Checked}"/>
         <SortMethod val="{$this/SortPulldown/@SelectedSort}"/>
+        <SelectedRace val="{$this/RaceTabControl/@SelectedRace}"/>
+
+        <Frame type="RaceTabControl" name="RaceTabControl" template="CollectionTemplates/RaceTabControlTemplate">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="234"/>
+            <Anchor side="Left" relative="$parent/ConsoleSkinTileList" pos="Min" offset="3"/>
+            <Anchor side="Right" relative="$this/RaceButton2" pos="Max" offset="0"/>
+            <Height val="38"/>
+        </Frame>
 
         <Frame type="Label" name="TitleLabel">
-            <Anchor side="Top" relative="$parent" pos="Min" offset="98"/>
-            <Anchor side="Left" relative="$Anchor_LeftHeader" pos="Max" offset="0"/>
+            <Anchor side="Top" relative="$Anchor_Header" pos="Max" offset="0"/>
+            <Anchor side="Left" relative="$Anchor_Header" pos="Max" offset="0"/>
             <Style val="@Arcade_Title"/>
             <Text val="PH - Console Skins"/>
         </Frame>
@@ -343,52 +369,26 @@
         </Frame>
 
         <Frame type="GameContentSortPulldown" name="SortPulldown" template="StandardBattlenetTemplates/BattlenetLargePulldownTemplate">
-            <Anchor side="Bottom" relative="$parent/ConsoleSkinCacheFrame" pos="Min" offset="3"/>
+            <Anchor side="Bottom" relative="$Collection_DropdownAnchor" pos="Max" offset="0"/>
             <Anchor side="Right" relative="$parent/ConsoleSkinCacheFrame" pos="Max" offset="-4"/>
         </Frame>
 
         <Frame type="ConsoleSkinCacheFrame" name="ConsoleSkinCacheFrame">
-            <Anchor side="Top" relative="$parent/TileListFrameBg" pos="Min" offset="0"/>
+            <Anchor side="Top" relative="$parent/ConsoleSkinTileList" pos="Min" offset="0"/>
             <Anchor side="Left" relative="$parent/ConsoleSkinTileList" pos="Max" offset="30"/>
             <Height val="619"/>
             <Width val="1024"/>
             <ConsoleSkin val="{$parent/@SelectedConsoleSkin}"/>
         </Frame>
         
-        <Frame type="BlurFrame" name="TilelistFrameBgBlur">
-            <Anchor side="Top" relative="$parent/TileListFrameBg" pos="Min" offset="4"/>
-            <Anchor side="Left" relative="$parent/TileListFrameBg" pos="Min" offset="4"/>
-            <Anchor side="Bottom" relative="$parent/TileListFrameBg" pos="Max" offset="-4"/>
-            <Anchor side="Right" relative="$parent/TileListFrameBg" pos="Max" offset="-4"/>
-
-            <Animation name="Blur">
-                <Event event="OnShown" action="Reset,Play" frame="$parent" />
-
-                <Controller type="Blur" end="Pause">
-                    <Key type="Curve" time="0" value=".35" out="Fast"/>
-                </Controller>
-            </Animation>
-        </Frame>
-
-        <Frame type="Image" name="TileListFrameBg">
-            <Anchor side="Top" relative="$parent/TitleLabel" pos="Max" offset="15"/>
-            <Anchor side="Left" relative="$Anchor_LeftStandard" pos="Max" offset="0"/>
-            <Anchor side="Bottom" relative="$parent/ConsoleSkinCacheFrame" pos="Max" offset="0"/>
-            <Texture val="@UI/SC2_UI_Battlenet_Glue_Arcade_MainContainer"/>
-            <TextureType val="NineSlice"/>
-            <Width val="517"/>
-        </Frame>
-
         <Frame type="TileList" name="ConsoleSkinTileList" template="ConsoleSkinSelectionFrame/ConsoleSkinTileListTemplate">
-            <Anchor side="Top" relative="$parent/TileListFrameBg" pos="Min" offset="25"/>
-            <Anchor side="Left" relative="$parent/TileListFrameBg" pos="Min" offset="24"/>
-            <Anchor side="Bottom" relative="$parent/TileListFrameBg" pos="Max" offset="-25"/>
-            <Anchor side="Right" relative="$parent/TileListFrameBg" pos="Max" offset="-12"/>
+            <Anchor side="Top" relative="$parent" pos="Min" offset="284"/>
+            <Anchor side="Left" relative="$Anchor_Standard_Left" pos="Max" offset="0"/>
         </Frame>
 
         <Frame type="SelectUnlockableButton" name="SelectUnlockableButton" template="CollectionTemplates/SelectUnlockableButtonTemplate">
-            <Anchor side="Bottom" relative="$Anchor_BottomActionButton" pos="Min" offset="0"/>
-            <Anchor side="Left" relative="$Anchor_LeftActionButton" pos="Max" offset="0"/>
+            <Anchor side="Bottom" relative="$Anchor_ActionButton" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$Anchor_ActionButton" pos="Max" offset="0"/>
             <Reward val="{$parent/ConsoleSkinCacheFrame/@RequiredReward}"/>
             <PresenceId val="{$BattleUI/@LocalToonPresenceId}"/>
             <Visible val="False"/>
@@ -396,10 +396,14 @@
             <Frame type="GameContentFrame" name="GameContentFrame">
                 <GameContent val="{$parent/$parent/ConsoleSkinCacheFrame/@GameContent}"/>
             </Frame>
+            
+            <Frame type="StoreCacheFrame" name="StoreCacheFrame">
+                <GameContent val="{$parent/$parent/ConsoleSkinCacheFrame/@GameContent}"/>
+            </Frame>
         </Frame>
 
         <Frame type="Frame" name="EquippedWarningContainer" template="CollectionTemplates/EquippedWarningContainerTemplate">
-            <Anchor side="Bottom" relative="$Anchor_BottomActionButton" pos="Min" offset="0"/>
+            <Anchor side="Bottom" relative="$Anchor_ActionButton" pos="Min" offset="0"/>
             <Anchor side="Left" relative="$parent/SelectUnlockableButton" pos="Max" offset="5"/>
 
             <StateGroup name="EquippedStateGroup">
@@ -419,16 +423,16 @@
         </Frame>
         
         <Frame type="Frame" name="AchievementLockedWarningContainer" template="CollectionTemplates/AchievementLockedWarningContainerTemplate">
-            <Anchor side="Bottom" relative="$Anchor_BottomActionButton" pos="Min" offset="0"/>
+            <Anchor side="Bottom" relative="$Anchor_ActionButton" pos="Min" offset="0"/>
             <Anchor side="Left" relative="$parent/SelectUnlockableButton" pos="Max" offset="20"/>
             
             <StateGroup name="AchievementLockedStateGroup">
                 <DefaultState val="NotAchievementLockedState"/>
             
                 <State name="AchievementLockedState">
-                    <When type="AnimationState" frame="$parent/SelectUnlockableButton/GameContentFrame" PurchasedState="NotPurchased"/>
+                    <When type="Property" frame="$parent/SelectUnlockableButton/StoreCacheFrame" IsPurchased="False"/>
                     <When type="Property" frame="$parent/SelectUnlockableButton/RewardCacheFrame" Default="False"/>
-                    <When type="Property" frame="$parent/SelectUnlockableButton/GameContentFrame" CanPurchase="False"/>
+                    <When type="Property" frame="$parent/SelectUnlockableButton/StoreCacheFrame" CanPurchase="False"/>
                     <When type="AnimationState" frame="$parent/SelectUnlockableButton/RewardCacheFrame" AllowedState="NotAllowed"/>
                     <When type="Property" frame="$parent/SelectUnlockableButton/GameContentFrame" IsValid="True"/>
                     <Action type="SetProperty" frame="$this" visible="True"/>
@@ -441,8 +445,8 @@
         </Frame>
 
         <Frame type="BuyButton" name="BuyButton" template="CollectionTemplates/BuyButtonTemplate">
-            <Anchor side="Bottom" relative="$Anchor_BottomActionButton" pos="Min" offset="0"/>
-            <Anchor side="Left" relative="$Anchor_LeftActionButton" pos="Max" offset="0"/>
+            <Anchor side="Bottom" relative="$Anchor_ActionButton" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$Anchor_ActionButton" pos="Max" offset="0"/>
             <GameContent val="{$parent/ConsoleSkinCacheFrame/@GameContent}"/>
 
             <StateGroup name="RewardEarnedStateGroup">

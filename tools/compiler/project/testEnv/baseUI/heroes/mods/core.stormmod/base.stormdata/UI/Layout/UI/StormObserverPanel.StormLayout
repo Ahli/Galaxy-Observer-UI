@@ -16,7 +16,7 @@
     <Constant name="CoreHealthPercentLabelTopOffset" val="1"/>
     <Constant name="TimerLabelShift" val="-4"/>
     
-    <!-- overview for one hero at the top, left side --> 
+    <!-- overview for one hero at the top, left side -->
     <Frame type="Frame" name="HeroOverviewTemplate">
         <Width val="250"/>
         <Height val="130"/>
@@ -32,6 +32,20 @@
             <Height val="60"/>
             <TextureCoords top="0.3" left="0.0" bottom="0.7" right="1.0"/>
             <AlphaMaskTexture val="@UI/obs_alphaMask_portrait"/>
+
+            <!-- Custom override for individual heroes that have issues with the default texture coordiantes-->
+            <StateGroup name="HeroPortraitTextureCoordinates">
+                <State name="Kel'Thuzad">
+                    <When type="Property" frame="$parent/HeroStatus" Unit="HeroKelThuzad"/>
+
+                    <Action type="SetProperty" TextureCoords="0.1,0.0,0.7,1.0"/>
+                </State>
+                <State name="Alexxstrasza">
+                    <When type="Property" frame="$parent/HeroStatus" Unit="HeroAlexstrasza"/>
+
+                    <Action type="SetProperty" TextureCoords="0.1,0.0,0.7,1.0"/>
+                </State>
+            </StateGroup>
         </Frame>
 
         <Frame type="UnitTargetFrame" name="TargetHeroUnitFrame">
@@ -67,6 +81,46 @@
             <Height val="50"/>
             <Style val="Storm_ObserverTeam_DeathTimer_Blue"/>
             <Visible val="false"/>
+
+            <StateGroup name="DeathExtendedIconVisible">
+                <State name="WhenDeathExtended">
+                    <When type="Property" frame="$parent/HeroDeathExtendedIcon" visible="True"/>
+                    <Action type="SetAnchor" frame="$this" side="Right" relative="$parent/HeroDeathExtendedIcon" pos="Min" offset="10"/>
+                </State>
+
+                <State name="WhenDeathCondensed">
+                    <When type="Property" frame="$parent/HeroDeathCondensedIcon" visible="True"/>
+                    <Action type="SetAnchor" frame="$this" side="Right" relative="$parent/HeroDeathCondensedIcon" pos="Min" offset="10"/>
+                </State>
+
+                <State name="WhenDeathNormal">
+                    <When type="Property" frame="$parent/HeroDeathExtendedIcon" visible="False"/>
+                    <Action type="SetAnchor" frame="$this" side="Right" relative="$parent/IconFrame" pos="Max" offset="-60"/>
+                </State>
+
+                <State name="WhenDeathNormal">
+                    <When type="Property" frame="$parent/HeroDeathCondensedIcon" visible="False"/>
+                    <Action type="SetAnchor" frame="$this" side="Right" relative="$parent/IconFrame" pos="Max" offset="-60"/>
+                </State>
+            </StateGroup>
+        </Frame>
+
+        <Frame type="Image" name="HeroDeathCondensedIcon">
+            <Anchor side="Top" relative="$parent/IconFrame" pos="Mid" offset="-30"/>
+            <Anchor side="Bottom" relative="$parent/IconFrame" pos="Mid" offset="-30"/>
+            <Anchor side="Right" relative="$parent/IconFrame" pos="Max" offset="-82"/>
+            <Texture val="@UI/HUD_TopBar_Team_HeroFrame_DeathCondensedIcon"/>
+            <Visible val="false"/>
+            <CollapseLayout val="True"/>
+        </Frame>
+
+        <Frame type="Image" name="HeroDeathExtendedIcon">
+            <Anchor side="Top" relative="$parent/IconFrame" pos="Mid" offset="-30"/>
+            <Anchor side="Bottom" relative="$parent/IconFrame" pos="Mid" offset="-30"/>
+            <Anchor side="Right" relative="$parent/IconFrame" pos="Max" offset="-82"/>
+            <Texture val="@UI/HUD_TopBar_Team_HeroFrame_DeathExtendedIcon"/>
+            <Visible val="false"/>
+            <CollapseLayout val="True"/>
         </Frame>
         
         <Frame type="UnitStatusFrame" name="HeroStatus">
@@ -117,7 +171,7 @@
         </Frame>
     </Frame>
     
-    <!-- overview for one hero at the top, right side --> 
+    <!-- overview for one hero at the top, right side -->
     <Frame type="Frame" name="HeroOverviewTemplate_R" template="StormObserverPanel/HeroOverviewTemplate">
         <Frame type="Image" name="HeroPortraitImage">
             <Anchor side="Left" relative="$parent/IconFrame" pos="Mid" offset="#PortraitHorizontalShiftRed"/>
@@ -356,7 +410,7 @@
                 <Anchor side="Bottom" relative="$parent/HealthBar" pos="Max" offset="0"/>
                 <Anchor side="Left" relative="$this" pos="Max" offset="0"/>
                 <Anchor side="Right" relative="$parent/HealthBar" pos="Max" offset="0"/>
-                <ShowPercent val="true"/>
+                <ShowPercent val="{$parent/$parent/$parent/$parent/$parent/ConsoleUIContainer/PartyFramePanel/Team1CoreUnitStatus/HealthLabel/@ShowPercent}"/>
                 
                 <Frame type="Label" name="StatusLabel">
                     <Anchor relative="$parent"/>
@@ -446,7 +500,7 @@
                 <Anchor side="Bottom" relative="$parent/HealthBar" pos="Max" offset="0"/>
                 <Anchor side="Left" relative="$parent/HealthBar" pos="Min" offset="0"/>
                 <Anchor side="Right" relative="$this" pos="Min" offset="0"/>
-                <ShowPercent val="true"/>
+                <ShowPercent val="{$parent/$parent/$parent/$parent/$parent/ConsoleUIContainer/PartyFramePanel/Team2CoreUnitStatus/HealthLabel/@ShowPercent}"/>
                 
                 <Frame type="Label" name="StatusLabel">
                     <Anchor relative="$parent"/>
@@ -632,7 +686,7 @@
             <Visible val="false"/>
             
             <Animation name="ToggleReplayPanel">
-                <Event event="OnShown" action="DirectionForward,Play"/>
+                <Event event="OnShown" action="Reset,Play"/>
                 <Event event="OnHidden" action="DirectionReverse,Play"/>
                 
                 <Controller type="Fade" end="Pause" frame="$parent/$parent/ObserverPanelMovingContainer/ReplayPanel">
@@ -641,8 +695,8 @@
                 </Controller>
                 
                 <Controller type="Anchor" end="Pause" side="Left" relative="true" frame="$parent/$parent/ObserverPanelMovingContainer/ReplayPanel">
-                    <Key type="Curve" time="0.0" value="-300" out="Fast"/>
-                    <Key type="Curve" time="0.2" value="0" in="Slow"/>
+                    <Key type="Curve" time="0.0" value="-300" inout="Linear"/>
+                    <Key type="Curve" time="0.2" value="0" inout="Slow,Linear"/>
                 </Controller>
                 
                 <Controller type="Visibility" end="Pause" frame="$parent/$parent/ObserverPanelMovingContainer/ReplayPanel">
@@ -661,7 +715,7 @@
             <Visible val="true"/>
             
             <Animation name="FadeAnimation">
-                <Event event="OnShown" action="DirectionForward,Play"/>
+                <Event event="OnShown" action="Reset,Play"/>
                 <Event event="OnHidden" action="DirectionReverse,Play"/>
                 
                 <Controller type="Fade" end="Pause" frame="$parent/$parent/ChatDisplay">
@@ -680,12 +734,12 @@
             <Visible val="false"/>
             
             <Animation name="ToggleHUD">
+                <Event event="OnShown" action="Reset,Play"/>
                 <Event event="OnHidden" action="DirectionReverse,Play"/>
-                <Event event="OnShown" action="DirectionForward,Play"/>
 
                 <Controller type="Fade" end="Pause" frame="$parent/$parent/ObserverHeroOverviewPanel">
                     <Key type="Curve" time="0" value="255"/>
-                    <Key type="Curve" time="0.2" value="50"/>
+                    <Key type="Curve" time="0.2" value="0"/>
                 </Controller>
                 
                 <Controller type="Visibility" end="Pause" frame="$parent/$parent/ObserverHeroOverviewPanel">
@@ -695,7 +749,7 @@
                 </Controller>
                 
                 <Controller type="Fade" end="Pause" frame="$parent/$parent/ObserverTeamNamePanel">
-                    <Key type="Curve" time="0" value="50"/>
+                    <Key type="Curve" time="0" value="0"/>
                     <Key type="Curve" time="0.2" value="255"/>
                 </Controller>
                 
@@ -708,7 +762,7 @@
                 <!-- fade bottom right -->
                 <Controller type="Fade" end="Pause" frame="$parent/$parent/$parent/ConsoleUIContainer/MinimapPanel">
                     <Key type="Curve" time="0" value="255"/>
-                    <Key type="Curve" time="0.2" value="50"/>
+                    <Key type="Curve" time="0.2" value="0"/>
                 </Controller>
                 
                 <Controller type="Visibility" end="Pause" frame="$parent/$parent/$parent/ConsoleUIContainer/MinimapPanel">
@@ -719,7 +773,7 @@
                 
                 <Controller type="Fade" end="Pause" frame="$parent/$parent/$parent/ConsoleUIContainer/MapMechanicPanel">
                     <Key type="Curve" time="0" value="255"/>
-                    <Key type="Curve" time="0.2" value="50"/>
+                    <Key type="Curve" time="0.2" value="0"/>
                 </Controller>
                 
                 <Controller type="Visibility" end="Pause" frame="$parent/$parent/$parent/ConsoleUIContainer/MapMechanicPanel">
@@ -739,8 +793,8 @@
             <Visible val="false"/>
             
             <Animation name="ToggleHUD">
+                <Event event="OnShown" action="Reset,Play"/>
                 <Event event="OnHidden" action="DirectionReverse,Play"/>
-                <Event event="OnShown" action="DirectionForward,Play"/>
                 
                 <Controller type="Visibility" end="Pause" frame="$parent/$parent/ObserverTeamNamePanel">
                     <Key type="Bool" time="0" value="false"/>
@@ -749,7 +803,7 @@
                 
                 <Controller type="Fade" end="Pause" frame="$parent/$parent/ObserverHeroOverviewPanel">
                     <Key type="Curve" time="0" value="255"/>
-                    <Key type="Curve" time="0.2" value="50"/>
+                    <Key type="Curve" time="0.2" value="0"/>
                 </Controller>
                 
                 <Controller type="Visibility" end="Pause" frame="$parent/$parent/ObserverHeroOverviewPanel">
@@ -761,7 +815,7 @@
                 <!-- fade bottom right -->
                 <Controller type="Fade" end="Pause" frame="$parent/$parent/$parent/ConsoleUIContainer/MinimapPanel">
                     <Key type="Curve" time="0" value="255"/>
-                    <Key type="Curve" time="0.2" value="50"/>
+                    <Key type="Curve" time="0.2" value="0"/>
                 </Controller>
                 
                 <Controller type="Visibility" end="Pause" frame="$parent/$parent/$parent/ConsoleUIContainer/MinimapPanel">
@@ -772,7 +826,7 @@
                 
                 <Controller type="Fade" end="Pause" frame="$parent/$parent/$parent/ConsoleUIContainer/MapMechanicPanel">
                     <Key type="Curve" time="0" value="255"/>
-                    <Key type="Curve" time="0.2" value="50"/>
+                    <Key type="Curve" time="0.2" value="0"/>
                 </Controller>
                 
                 <Controller type="Visibility" end="Pause" frame="$parent/$parent/$parent/ConsoleUIContainer/MapMechanicPanel">
@@ -782,5 +836,5 @@
                 </Controller>
             </Animation>
         </Frame>
-    </Frame>    
+    </Frame>
 </Desc>

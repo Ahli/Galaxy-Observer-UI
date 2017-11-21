@@ -3,7 +3,7 @@
     <DescFlags val="Locked"/>
 
     <Frame type="CommanderMasteryTalentFrame" name="CommanderMasteryTalentFrameTemplate">
-        <Height val="72"/>
+        <Height val="50"/>
         <BatchRankAmount val="5"/>
 
         <Frame type="Image" name="NormalImage">
@@ -26,6 +26,8 @@
             <AlphaMaskTexture val="@UI/SC2_UI_Coop_AbilityFrame_Mask"/>
             <CollapseLayout val="true"/>
             <Visible val="false"/>
+            <Texture val="{$parent/@ButtonId[Icon]}"/>
+            <Tooltip val="{$parent/@ButtonId[Tooltip]}"/>
         </Frame>
         
         <Frame type="Image" name="BorderImage">
@@ -37,8 +39,9 @@
             <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
             <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
             <Anchor side="Left" relative="$parent" pos="Min" offset="16"/>
-            <Width val="280"/>
+            <Width val="380"/>
             <Style val="@Coop_CommanderMasteryTalentInfo"/>
+            <Text val="{$parent/@ButtonId[Name]}"/>
         </Frame>
 
         <Frame type="Frame" name="TooltipAnchorFrame">
@@ -48,20 +51,16 @@
             <Anchor side="Right" relative="$parent/NameLabel" pos="Max" offset="0"/>
             <AcceptsMouseTooltip val="true"/>
             <TooltipAnchorPosition val="MiddleLeft"/>
-
-            <Frame type="PropertyBind" name="BindEmoticon">
-                <Anchor relative="$parent"/>
-                <Source frame="$parent/$parent/IconImage" property="Tooltip"/>
-                <Target frame="$parent" property="Tooltip"/>
-            </Frame>
+            <Tooltip val="{$parent/IconImage/@Tooltip}"/>
         </Frame>
 
         <Frame type="Label" name="ValueLabel">
             <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
             <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
-            <Anchor side="Left" relative="$parent" pos="Mid" offset="69"/>
-            <Anchor side="Right" relative="$parent" pos="Mid" offset="69"/>
+            <Anchor side="Left" relative="$parent" pos="Mid" offset="119"/>
+            <Anchor side="Right" relative="$parent" pos="Mid" offset="119"/>
             <Style val="@Coop_CommanderMasteryTalentInfoCentered"/>
+            <Text val="{$parent/@ValueText}"/>
         </Frame>
 
         <Frame type="Label" name="RankLabel">
@@ -69,12 +68,22 @@
             <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
             <Anchor side="Right" relative="$parent/DecrementButton" pos="Min" offset="-9"/>
             <Style val="@Coop_CommanderMasteryTalentInfo"/>
+            <Text val="{$this/FormatFrame/@Text}"/>
+
+            <Frame type="TextFormatFrame" name="FormatFrame">
+                <Anchor relative="$parent"/>
+                <FormatText val="@UI/CommanderMasteryTalentFrame/Rank"/>
+                <Replacement index="0" val="{$parent/$parent/@Rank}"/>
+                <Replacement index="1" val="{$parent/$parent/@MaxRank}"/>
+            </Frame>
         </Frame>
 
         <Frame type="Button" name="DecrementButton" template="StandardBattlenetTemplates/BattlenetSquareIconButtonTemplate">
             <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
             <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
             <Anchor side="Right" relative="$parent/IncrementButton" pos="Min" offset="-1"/>
+            <Width val="47"/>
+            <Height val="43"/>
             
             <Frame type="Image" name="Icon">
                 <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
@@ -99,6 +108,8 @@
             <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
             <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
             <Anchor side="Right" relative="$parent" pos="Max" offset="-7"/>
+            <Width val="47"/>
+            <Height val="43"/>
             
             <Frame type="Image" name="Icon">
                 <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
@@ -195,10 +206,10 @@
             <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
             <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
             <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
-            <Texture val="@UI/Glues_Battlenet_DialogBox_BG"/>
-            <TextureType val="HorizontalBorder"/>
+            <Texture val="@UI/Glues_Battlenet_DialogBox_StandardBG"/>
+            <TextureType val="NineSlice"/>
             <Tiled val="false"/>
-            <Width val="782"/>
+            <Width val="882"/>
             <Height val="950"/>
         </Frame>
         
@@ -222,6 +233,32 @@
             <Anchor side="Left" relative="$parent/BackgroundImage" pos="Min" offset="30"/>
             <Anchor side="Right" relative="$parent/BackgroundImage" pos="Max" offset="-30"/>
             <Style val="@BattlenetDialogTitle"/>
+            <Text val="{$this/FormatFrame/@Text}"/>
+
+            <Frame type="TextFormatFrame" name="FormatFrame">
+                <Anchor relative="$parent"/>
+                <FormatText val="@UI/CommanderMasterySelectionPanel/Title"/>
+                <Replacement index="0" val="{$parent/$parent/@Commander[Name]}"/>
+            </Frame>
+
+            <Frame type="TextFormatFrame" name="PrestigeFormatFrame">
+                <Anchor relative="$parent"/>
+                <FormatText val="@UI/CommanderMasterySelectionPanel/TitlePrestige"/>
+                <Replacement index="0" val="{$parent/$parent/@Commander[Name]}"/>
+            </Frame>
+
+            <StateGroup name="PrestigeLevelStateGroup">
+                <DefaultState val="MasteryLevelState"/>
+                
+                <State name="PrestigeLevelState">
+                    <When type="Property" frame="$parent/MasteryLevelFrame" operator="GreaterThanOrEqual" MasteryLevel="90"/>
+                    <Action type="SetProperty" frame="$this" Text="{$this/PrestigeFormatFrame/@Text}"/>
+                </State>
+
+                <State name="MasteryLevelState">
+                    <Action type="SetProperty" frame="$this" Text="{$this/FormatFrame/@Text}"/>
+                </State>
+            </StateGroup>
         </Frame>
 
         <Frame type="Label" name="DescriptionLabel">
@@ -234,14 +271,16 @@
 
         <Frame type="ProgressBar" name="MasteryLevelProgressBar">
             <Anchor side="Top" relative="$parent/DescriptionLabel" pos="Max" offset="17"/>
+            <Anchor side="Left" relative="$parent/MasteryLevelFrame/IconImage" pos="Max" offset="-4"/>
             <Anchor side="Right" relative="$parent/ListBackground0" pos="Max" offset="-19"/>
-            <Width val="626"/>
             <Height val="25"/>
             <Color val="FFFFFF"/>
             <ColorStep val="FFFFFF"/>
             <UseFillContainer val="true"/>
             <!-- <Color val="##StandardProgressBorder"/>
             <ColorStep val="##StandardProgressFill"/> -->
+            <MaxValue val="{$parent/@TotalXP}"/>
+            <Value val="{$parent/@CurrentXP}"/>
 
             <Frame type="Image" name="BorderImage">
                 <Anchor relative="$parent"/>
@@ -260,12 +299,76 @@
                     <TextureCoords top="0.5" left="0.0" right="1.0" bottom="1.0"/>
                 </Frame>
             </Frame>
+            
+            <StateGroup name="MasteryLevelState">
+                <DefaultState val="Mastery"/>
+                
+                <State name="PrestigeTierMax">
+                    <When type="StateGroup" frame="$Coop_MasteryLevelFrame" operator="GreaterThanOrEqual" TierStateGroup="PrestigeTierMax"/>
+                    <Action type="SetAnchor" side="Left" relative="$parent/MasteryLevelFrame/IconImage" pos="Max" offset="-4"/>
+                </State>
+                
+                <State name="PrestigeTier10">
+                    <When type="StateGroup" frame="$Coop_MasteryLevelFrame" operator="GreaterThanOrEqual" TierStateGroup="PrestigeTier10"/>
+                    <Action type="SetAnchor" side="Left" relative="$parent/MasteryLevelFrame/IconImage" pos="Max" offset="-4"/>
+                </State>
+                
+                <State name="PrestigeTier9">
+                    <When type="StateGroup" frame="$Coop_MasteryLevelFrame" operator="GreaterThanOrEqual" TierStateGroup="PrestigeTier9"/>
+                    <Action type="SetAnchor" side="Left" relative="$parent/MasteryLevelFrame/IconImage" pos="Max" offset="-4"/>
+                </State>
+                
+                <State name="PrestigeTier8">
+                    <When type="StateGroup" frame="$Coop_MasteryLevelFrame" operator="GreaterThanOrEqual" TierStateGroup="PrestigeTier8"/>
+                    <Action type="SetAnchor" side="Left" relative="$parent/MasteryLevelFrame/IconImage" pos="Max" offset="-4"/>
+                </State>
+                
+                <State name="PrestigeTier7">
+                    <When type="StateGroup" frame="$Coop_MasteryLevelFrame" operator="GreaterThanOrEqual" TierStateGroup="PrestigeTier7"/>
+                    <Action type="SetAnchor" side="Left" relative="$parent/MasteryLevelFrame/IconImage" pos="Max" offset="-4"/>
+                </State>
+                
+                <State name="PrestigeTier6">
+                    <When type="StateGroup" frame="$Coop_MasteryLevelFrame" operator="GreaterThanOrEqual" TierStateGroup="PrestigeTier6"/>
+                    <Action type="SetAnchor" side="Left" relative="$parent/MasteryLevelFrame/IconImage" pos="Max" offset="-4"/>
+                </State>
+                
+                <State name="PrestigeTier5">
+                    <When type="StateGroup" frame="$Coop_MasteryLevelFrame" operator="GreaterThanOrEqual" TierStateGroup="PrestigeTier5"/>
+                    <Action type="SetAnchor" side="Left" relative="$parent/MasteryLevelFrame/IconImage" pos="Max" offset="-4"/>
+                </State>
+                
+                <State name="PrestigeTier4">
+                    <When type="StateGroup" frame="$Coop_MasteryLevelFrame" operator="GreaterThanOrEqual" TierStateGroup="PrestigeTier4"/>
+                    <Action type="SetAnchor" side="Left" relative="$parent/MasteryLevelFrame/IconImage" pos="Max" offset="-4"/>
+                </State>
+                
+                <State name="PrestigeTier3">
+                    <When type="StateGroup" frame="$Coop_MasteryLevelFrame" operator="GreaterThanOrEqual" TierStateGroup="PrestigeTier3"/>
+                    <Action type="SetAnchor" side="Left" relative="$parent/MasteryLevelFrame/IconImage" pos="Max" offset="-4"/>
+                </State>
+                
+                <State name="PrestigeTier2">
+                    <When type="StateGroup" frame="$Coop_MasteryLevelFrame" operator="GreaterThanOrEqual" TierStateGroup="PrestigeTier2"/>
+                    <Action type="SetAnchor" side="Left" relative="$parent/MasteryLevelFrame/IconImage" pos="Max" offset="-4"/>
+                </State>
+                
+                <State name="PrestigeTier1">
+                    <When type="StateGroup" frame="$Coop_MasteryLevelFrame" operator="GreaterThanOrEqual" TierStateGroup="PrestigeTier1"/>
+                    <Action type="SetAnchor" side="Left" relative="$parent/MasteryLevelFrame/IconImage" pos="Max" offset="-14"/>
+                </State>
+                
+                <State name="Mastery">
+                    <Action type="SetAnchor" side="Left" relative="$parent/MasteryLevelFrame/IconImage" pos="Max" offset="-4"/>
+                </State>
+            </StateGroup>
         </Frame>
         
         <Frame type="CommanderMasteryLevelFrame" name="MasteryLevelFrame" template="CommanderMasteryLevelFrame/CommanderMasteryLevelFrameTemplate">
-            <Anchor side="Top" relative="$parent/MasteryLevelProgressBar" pos="Mid" offset="12"/>
-            <Anchor side="Bottom" relative="$parent/MasteryLevelProgressBar" pos="Mid" offset="12"/>
-            <Anchor side="Right" relative="$parent/MasteryLevelProgressBar" pos="Min" offset="4"/>
+            <Anchor side="Top" relative="$parent/MasteryLevelProgressBar" pos="Mid" offset="3"/>
+            <Anchor side="Bottom" relative="$parent/MasteryLevelProgressBar" pos="Mid" offset="3"/>
+            <Anchor side="Left" relative="$parent/BackgroundImage" pos="Mid" offset="-365"/>
+            <Anchor side="Right" relative="$parent/BackgroundImage" pos="Mid" offset="-365"/>
         </Frame>
 
         <Frame type="Label" name="MasteryExperienceLabel">
@@ -274,6 +377,38 @@
             <Anchor side="Left" relative="$parent/MasteryLevelProgressBar" pos="Mid" offset="0"/>
             <Anchor side="Right" relative="$parent/MasteryLevelProgressBar" pos="Mid" offset="0"/>
             <Style val="@Coop_CommanderMasteryXP"/>
+
+            <StateGroup name="MaxLevelStateGroup">
+                <DefaultState val="MasteryLevelState"/>
+                
+                <State name="MaxLevelState">
+                    <When type="Property" frame="$parent/MasteryLevelFrame" MasteryLevel="1000"/>
+                    <Action type="SetProperty" frame="$this" Text="@UI/ScreenCoopCampaign/ExperienceMaxMasteryTooltip"/>
+                </State>
+                
+                <State name="PrestigeLevelState">
+                    <When type="Property" frame="$parent/MasteryLevelFrame" operator="GreaterThanOrEqual" MasteryLevel="90"/>
+                    <Action type="SetProperty" frame="$this" Text="{$this/PrestigeFormatFrame/@Text}"/>
+                </State>
+
+                <State name="MasteryLevelState">
+                    <Action type="SetProperty" frame="$this" Text="{$this/FormatFrame/@Text}"/>
+                </State>
+            </StateGroup>
+
+            <Frame type="TextFormatFrame" name="FormatFrame">
+                <Anchor relative="$parent"/>
+                <FormatText val="@UI/ScreenCoopCampaign/ExperienceMasteryTooltip"/>
+                <Replacement index="0" val="{$parent/$parent/@CurrentXP}"/>
+                <Replacement index="1" val="{$parent/$parent/@TotalXP}"/>
+            </Frame>
+
+            <Frame type="TextFormatFrame" name="PrestigeFormatFrame">
+                <Anchor relative="$parent"/>
+                <FormatText val="@UI/ScreenCoopCampaign/ExperiencePrestigeTooltip"/>
+                <Replacement index="0" val="{$parent/$parent/@CurrentXP}"/>
+                <Replacement index="1" val="{$parent/$parent/@TotalXP}"/>
+            </Frame>
         </Frame>
 
         <Frame type="Button" name="ResetButton" template="StandardBattlenetTemplates/BattlenetSmallButtonTemplate">
@@ -283,19 +418,44 @@
             <Visible val="False"/>
         </Frame>
 
+        <Frame type="Label" name="MasteryCompleteLabel">
+            <Anchor side="Bottom" relative="$parent/MaxRankLabel" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent/BackgroundImage" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent/BackgroundImage" pos="Mid" offset="0"/>
+            <Style val="@Coop_CommanderMasteryComplete"/>
+            <Text val="@UI/CommanderMasterySelectionPanel/MasteryComplete"/>
+            <CollapseLayout val="true"/>
+        </Frame>
+
         <Frame type="Label" name="MaxRankLabel">
-            <Anchor side="Bottom" relative="$parent/ListBackground0" pos="Min" offset="-12"/>
+            <Anchor side="Bottom" relative="$parent/MasteryCompleteWarningLabel" pos="Min" offset="0"/>
             <Anchor side="Left" relative="$parent/BackgroundImage" pos="Mid" offset="0"/>
             <Anchor side="Right" relative="$parent/BackgroundImage" pos="Mid" offset="0"/>
             <Style val="@Coop_CommanderMasteryInfoHeader"/>
+            <Text val="{$this/FormatFrame/@Text}"/>
+
+            <Frame type="TextFormatFrame" name="FormatFrame">
+                <Anchor relative="$parent"/>
+                <FormatText val="@UI/CommanderMasterySelectionPanel/MaxRank"/>
+                <Replacement index="0" val="{$parent/$parent/@MaxRank}"/>
+            </Frame>
+        </Frame>
+
+        <Frame type="Label" name="MasteryCompleteWarningLabel">
+            <Anchor side="Bottom" relative="$parent/ListBackground0" pos="Min" offset="-12"/>
+            <Anchor side="Left" relative="$parent/BackgroundImage" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent/BackgroundImage" pos="Mid" offset="0"/>
+            <Style val="@Coop_CommanderMasterySubtitle"/>
+            <Text val="@UI/CommanderMasterySelectionPanel/MasteryCompleteWarning"/>
+            <CollapseLayout val="true"/>
         </Frame>
 
         <Frame type="Image" name="ListBackground0">
-            <Anchor side="Top" relative="$parent/BackgroundImage" pos="Min" offset="203"/>
+            <Anchor side="Bottom" relative="$parent/ListBackground1" pos="Min" offset="-8"/>
             <Anchor side="Left" relative="$parent/BackgroundImage" pos="Mid" offset="0"/>
             <Anchor side="Right" relative="$parent/BackgroundImage" pos="Mid" offset="0"/>
-            <Width val="712"/>
-            <Height val="204"/>
+            <Width val="812"/>
+            <Height val="160"/>
             <Texture val="@UI/Glues_Battlenet_PageAssets_ContainerBorder"/>
             <TextureType val="NineSlice"/>
         </Frame>
@@ -340,10 +500,10 @@
         </Frame>
         
         <Frame type="Image" name="ListBackground1">
-            <Anchor side="Top" relative="$parent/ListBackground0" pos="Max" offset="8"/>
+            <Anchor side="Bottom" relative="$parent/ListBackground2" pos="Min" offset="-8"/>
             <Anchor side="Left" relative="$parent/ListBackground0" pos="Min" offset="0"/>
             <Anchor side="Right" relative="$parent/ListBackground0" pos="Max" offset="0"/>
-            <Height val="204"/>
+            <Height val="160"/>
             <Texture val="@UI/Glues_Battlenet_PageAssets_ContainerBorder"/>
             <TextureType val="NineSlice"/>
         </Frame>
@@ -388,10 +548,10 @@
         </Frame>
         
         <Frame type="Image" name="ListBackground2">
-            <Anchor side="Top" relative="$parent/ListBackground1" pos="Max" offset="8"/>
+            <Anchor side="Bottom" relative="$parent/AcceptButton" pos="Min" offset="-8"/>
             <Anchor side="Left" relative="$parent/ListBackground0" pos="Min" offset="0"/>
             <Anchor side="Right" relative="$parent/ListBackground0" pos="Max" offset="0"/>
-            <Height val="204"/>
+            <Height val="160"/>
             <Texture val="@UI/Glues_Battlenet_PageAssets_ContainerBorder"/>
             <TextureType val="NineSlice"/>
         </Frame>
@@ -469,5 +629,22 @@
             <Text val="@UI/StandardDialog_Cancel_Control"/>
             <Shortcut val="@UI/ScreenNavigationBack_Hotkey"/>
         </Frame>
+        
+        <StateGroup name="MasteryMaxState">
+            <DefaultState val="NotMax"/>
+            
+            <State name="Max">
+                <When type="Property" frame="MasteryLevelFrame" operator="GreaterThanOrEqual" MasteryLevel="90"/>
+                <Action type="SetProperty" frame="BackgroundImage" Height="865"/>
+                <Action type="SetProperty" frame="MasteryCompleteLabel" Visible="true"/>
+                <Action type="SetProperty" frame="MasteryCompleteWarningLabel" Visible="true"/>
+            </State>
+            
+            <State name="NotMax">
+                <Action type="SetProperty" frame="BackgroundImage" Height="814"/>
+                <Action type="SetProperty" frame="MasteryCompleteLabel" Visible="false"/>
+                <Action type="SetProperty" frame="MasteryCompleteWarningLabel" Visible="false"/>
+            </State>
+        </StateGroup>
     </Frame>
 </Desc>
