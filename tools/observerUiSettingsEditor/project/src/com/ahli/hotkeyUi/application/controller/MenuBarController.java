@@ -18,11 +18,11 @@ import javafx.scene.input.KeyCombination;
  *
  */
 public class MenuBarController {
-	// static Logger LOGGER = LogManager.getLogger("MenuBarController");
+	// static Logger LOGGER = LogManager.getLogger(MenuBarController.class);
 	// //$NON-NLS-1$
-
+	
 	private Main main;
-
+	
 	@FXML
 	private MenuItem menuOpen;
 	@FXML
@@ -31,7 +31,7 @@ public class MenuBarController {
 	private MenuItem menuSaveAs;
 	@FXML
 	private MenuItem menuClose;
-
+	
 	/**
 	 * Automatically called on Controller initialization.
 	 */
@@ -42,7 +42,7 @@ public class MenuBarController {
 				new KeyCodeCombination(KeyCode.S, KeyCombination.CONTROL_DOWN, KeyCombination.ALT_DOWN));
 		menuClose.setAccelerator(new KeyCodeCombination(KeyCode.W, KeyCombination.CONTROL_DOWN));
 	}
-
+	
 	/**
 	 * 
 	 * @param main
@@ -50,7 +50,7 @@ public class MenuBarController {
 	public void setMainApp(Main main) {
 		this.main = main;
 	}
-
+	
 	/**
 	 * Called when the user clicks on the delete button.
 	 */
@@ -58,7 +58,7 @@ public class MenuBarController {
 	public void close(ActionEvent event) {
 		main.closeFile();
 	}
-
+	
 	/**
 	 * Called when the user clicks on the open button.
 	 */
@@ -66,7 +66,7 @@ public class MenuBarController {
 	public void open(ActionEvent event) {
 		main.openUiMpq();
 	}
-
+	
 	/**
 	 * Called when the user clicks on the save as button.
 	 */
@@ -74,7 +74,7 @@ public class MenuBarController {
 	public void saveAs(ActionEvent event) {
 		main.saveAsUiMpq();
 	}
-
+	
 	/**
 	 * Called when the user clicks on the save as button.
 	 */
@@ -82,7 +82,7 @@ public class MenuBarController {
 	public void saveCurrent(ActionEvent event) {
 		main.saveUiMpq();
 	}
-
+	
 	/**
 	 * Called when the user clicks on the save as button.
 	 */
@@ -90,30 +90,30 @@ public class MenuBarController {
 	public void exit(ActionEvent event) {
 		main.closeApp();
 	}
-
+	
 	/**
 	 * Updates the menu bar's items.
 	 */
 	public void updateMenuBar() {
 		boolean docLoaded = main.isValidOpenedDocPath();
-
+		
 		menuSave.setDisable(!docLoaded);
 		menuSaveAs.setDisable(!docLoaded);
 		menuClose.setDisable(!docLoaded);
 	}
-
+	
 	/**
 	 * clicked on About
 	 */
 	@FXML
 	public void aboutClicked() {
-		String content = String.format(Messages.getString("MenuBarController.AboutText"), Main.VERSION)
-				+ "\n\n" + Messages.getString("MenuBarController.AboutText2"); //$NON-NLS-1$
+		String content = String.format(Messages.getString("MenuBarController.AboutText"), Main.VERSION) + "\n\n" //$NON-NLS-2$
+				+ Messages.getString("MenuBarController.AboutText2");
 		String title = Messages.getString("MenuBarController.About"); //$NON-NLS-1$
 		String header = Messages.getString("MenuBarController.ObserverUISettingsEditor"); //$NON-NLS-1$
 		String imgUrl = Main.class.getResource("/res/ahliLogo.png").toString(); //$NON-NLS-1$
 		Alert alert = Alerts.buildAboutAlert(main.getPrimaryStage(), title, header, content, imgUrl);
 		alert.showAndWait();
 	}
-
+	
 }

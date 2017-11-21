@@ -18,16 +18,16 @@ import org.apache.logging.log4j.Logger;
  */
 public class Messages {
 	static Logger LOGGER = LogManager.getLogger("Messages"); //$NON-NLS-1$
-
+	
 	private static final String BUNDLE_NAME = "com.ahli.mpq.i18n.messages"; //$NON-NLS-1$
-
+	
 	private static ResourceBundle resourceBundle = ResourceBundle.getBundle(BUNDLE_NAME);
-
+	
 	private static Locale usedLocale = Locale.getDefault();
-
+	
 	private Messages() {
 	}
-
+	
 	/**
 	 * Returns the String of the key.
 	 * 
@@ -41,7 +41,7 @@ public class Messages {
 			return '!' + key + '!';
 		}
 	}
-
+	
 	/**
 	 * Sets a bundle based on the specified Locale.
 	 * 
@@ -51,7 +51,7 @@ public class Messages {
 		resourceBundle = ResourceBundle.getBundle(BUNDLE_NAME, loc);
 		usedLocale = loc;
 	}
-
+	
 	/**
 	 * Returns the currently used bundle.
 	 * 
@@ -60,7 +60,7 @@ public class Messages {
 	public static ResourceBundle getBundle() {
 		return resourceBundle;
 	}
-
+	
 	/**
 	 * Returns the Locale that was used to get the bundle in effect.
 	 * 
@@ -69,7 +69,7 @@ public class Messages {
 	public static Locale getUsedLocale() {
 		return usedLocale;
 	}
-
+	
 	/**
 	 * Checks if the Locale's resource bundle is the one used.
 	 * 

@@ -53,14 +53,14 @@ import javafx.util.Duration;
  * Application
  * 
  * @author Ahli
- *
+ * 
  */
 public class Main extends Application {
 	long appStartTime = System.nanoTime();
-	static Logger LOGGER = LogManager.getLogger("Main"); //$NON-NLS-1$
-
+	static Logger LOGGER = LogManager.getLogger(Main.class); // $NON-NLS-1$
+	
 	public final static String VERSION = "alpha";
-
+	
 	private Stage primaryStage;
 	private BorderPane rootLayout;
 	private MenuBarController mbarCtrl;
@@ -72,7 +72,7 @@ public class Main extends Application {
 	private File basePath = null;
 	private boolean hasUnsavedFileChanges = false;
 	private LayoutExtensionReader layoutExtReader;
-
+	
 	/**
 	 * Initialize the UI Application.
 	 */
@@ -84,22 +84,22 @@ public class Main extends Application {
 			this.primaryStage = primaryStage;
 			this.primaryStage.setMaximized(true);
 			this.primaryStage.setOpacity(0);
-
+			
 			setUserAgentStylesheet(STYLESHEET_MODENA);
-
+			
 			// if it fails to load the resource in as a jar, check the eclipse
 			// settings
 			this.primaryStage.getIcons().add(new Image(Main.class.getResourceAsStream("/res/ahliLogo.png"))); //$NON-NLS-1$
-
+			
 			long time = System.nanoTime();
 			initRootLayout();
 			LOGGER.warn("initialized root layout within " + (System.nanoTime() - time) / 1000000 + "ms.");
-
+			
 			// Load Tab layout from fxml file
 			time = System.nanoTime();
 			FXMLLoader loader = new FXMLLoader();
 			loader.setResources(Messages.getBundle());
-
+			
 			TabPane tabPane = null;
 			InputStream is = null;
 			try {
@@ -113,12 +113,12 @@ public class Main extends Application {
 				} catch (IOException e) {
 				}
 			}
-
+			
 			LOGGER.warn("initialized tab layout within " + (System.nanoTime() - time) / 1000000 + "ms.");
 			rootLayout.setCenter(tabPane);
 			tabsCtrl = loader.getController();
 			tabsCtrl.setMainApp(this);
-
+			
 			// ask to save on close
 			this.primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
 				@Override
@@ -130,27 +130,27 @@ public class Main extends Application {
 					}
 				}
 			});
-
+			
 			initPaths();
-
+			
 			// Fade animation
 			FadeTransition ft = new FadeTransition(Duration.millis(750), rootLayout);
 			ft.setFromValue(0);
 			ft.setToValue(1.0);
 			ft.play();
-
+			
 			time = System.nanoTime();
 			this.primaryStage.show();
 			this.primaryStage.setOpacity(1);
 			LOGGER.warn("executed root layout stage.show() within " + (System.nanoTime() - time) / 1000000 + "ms.");
-
+			
 			// hide apps splash screen image
 			Platform.runLater(new SplashScreenHider());
-
+			
 			LOGGER.warn("finished app initialization after " + (System.nanoTime() - appStartTime) / 1000000 + "ms.");
-
+			
 			initMpqInterface(mpqi);
-
+			
 		} catch (Exception e) {
 			LOGGER.error("App Error: " + ExceptionUtils.getStackTrace(e), e); //$NON-NLS-1$
 			e.printStackTrace();
@@ -159,7 +159,7 @@ public class Main extends Application {
 			closeApp();
 		}
 	}
-
+	
 	/**
 	 * Asks the user to decide on unsaved changes, if there are any.
 	 * 
@@ -170,11 +170,11 @@ public class Main extends Application {
 			// ask to save changes in the file
 			String title = Messages.getString("Main.unsavedChangesTitle"); //$NON-NLS-1$
 			String content = String.format(Messages.getString("Main.hasUnsavedChanges"), openedDocPath); //$NON-NLS-1$
-
+			
 			Alert alert = Alerts.buildYesNoCancelAlert(primaryStage, title, title, content);
-
+			
 			Optional<ButtonType> result = alert.showAndWait();
-
+			
 			if ((result.isPresent())) {
 				if (result.get() == ButtonType.YES) {
 					saveUiMpq();
@@ -187,7 +187,7 @@ public class Main extends Application {
 		}
 		return true;
 	}
-
+	
 	/**
 	 * Entry point of Application.
 	 * 
@@ -200,15 +200,15 @@ public class Main extends Application {
 		LOGGER.warn("warn log visible"); //$NON-NLS-1$
 		LOGGER.error("error log visible"); //$NON-NLS-1$
 		LOGGER.fatal("fatal log visible"); //$NON-NLS-1$
-
+		
 		LOGGER.trace("Configuration File of System: " + System.getProperty("log4j.configurationFile")); //$NON-NLS-1$ //$NON-NLS-2$
-
+		
 		// TEST Locale
 		// Messages.setBundle(Locale.CHINA);
-
+		
 		launch(args);
 	}
-
+	
 	/**
 	 * Returns true, if the path of the current opened document is valid. Invalid
 	 * usually means that no document has been opened.
@@ -218,27 +218,27 @@ public class Main extends Application {
 	public boolean isValidOpenedDocPath() {
 		return openedDocPath != null && !openedDocPath.equals(""); //$NON-NLS-1$
 	}
-
+	
 	/**
 	 * Open File window and actions.
 	 */
 	public void openUiMpq() {
 		FileChooser fileChooser = new FileChooser();
 		fileChooser.setTitle(Messages.getString("Main.openObserverInterfaceTitle")); //$NON-NLS-1$
-
+		
 		ExtensionFilter genExtFilter = new ExtensionFilter(
 				Messages.getString("Main.sc2HeroesObserverInterfaceExtFilter"), "*.SC2Interface", //$NON-NLS-1$ //$NON-NLS-2$
 				"*.StormInterface"); //$NON-NLS-1$
-
+		
 		fileChooser.getExtensionFilters().addAll(new ExtensionFilter(Messages.getString("Main.allFilesFilter"), "*.*"), //$NON-NLS-1$ //$NON-NLS-2$
 				genExtFilter, new ExtensionFilter(Messages.getString("Main.sc2InterfaceFilter"), "*.SC2Interface"), //$NON-NLS-1$ //$NON-NLS-2$
 				new ExtensionFilter(Messages.getString("Main.heroesInterfaceFilter"), "*.StormInterface")); //$NON-NLS-1$ //$NON-NLS-2$
 		fileChooser.setSelectedExtensionFilter(genExtFilter);
 		File f = fileChooser.showOpenDialog(primaryStage);
-
+		
 		openMpqFile(f);
 	}
-
+	
 	/**
 	 * Opens the specified MPQ file.
 	 * 
@@ -255,7 +255,7 @@ public class Main extends Application {
 						mpqi.extractEntireMPQ(f.getAbsolutePath());
 						openedDocPath = f.getAbsolutePath();
 						updateAppTitle();
-
+						
 						// load desc index from mpq
 						try {
 							isNamespaceHeroes = mpqi.isHeroesMpq();
@@ -264,33 +264,33 @@ public class Main extends Application {
 							throw new ShowToUserException(Messages.getString("Main.OpenedFileNoComponentList"));
 						}
 						boolean ignoreRequiredToLoadEntries = true;
-
+						
 						File componentListFile = mpqi.getComponentListFile();
 						if (componentListFile == null) {
 							throw new ShowToUserException(Messages.getString("Main.OpenedFileNoComponentList")); //$NON-NLS-1$
 						}
 						descIndex.setDescIndexPathAndClear(ComponentsListReader.getDescIndexPath(componentListFile));
-
+						
 						File descIndexFile = mpqi.getFileFromMpq(descIndex.getDescIndexIntPath());
 						descIndex.addLayoutIntPath(
 								DescIndexReader.getLayoutPathList(descIndexFile, ignoreRequiredToLoadEntries));
-
+						
 						tabsCtrl.clearData();
 						hasUnsavedFileChanges = false;
-
+						
 						boolean recursive = true;
 						File cache = new File(mpqi.getMpqCachePath());
 						Collection<File> layoutFiles = FileUtils.listFiles(cache, null, recursive);
-
+						
 						layoutExtReader = new LayoutExtensionReader();
 						layoutExtReader.processLayoutFiles(layoutFiles);
-
+						
 						ArrayList<ValueDef> hotkeys = layoutExtReader.getHotkeys();
 						tabsCtrl.getHotkeysData().addAll(hotkeys);
-
+						
 						ArrayList<ValueDef> settings = layoutExtReader.getSettings();
 						tabsCtrl.getSettingsData().addAll(settings);
-
+						
 					} catch (MpqException | ShowToUserException e) {
 						LOGGER.error("File could not be opened. MPQ-Error: " + ExceptionUtils.getStackTrace(e), e); //$NON-NLS-1$
 						openedDocPath = null;
@@ -309,7 +309,7 @@ public class Main extends Application {
 						// alert.setContentText(Messages.getString("Main.anErrorOccured")
 						// + e.getMessage()); //$NON-NLS-1$
 						// alert.showAndWait();
-
+						
 						showExceptionAlert(e);
 					}
 					updateMenuBar();
@@ -320,7 +320,7 @@ public class Main extends Application {
 			}
 		}.start();
 	}
-
+	
 	/**
 	 * Closes the currently opened document.
 	 */
@@ -336,7 +336,7 @@ public class Main extends Application {
 			hasUnsavedFileChanges = false;
 		}
 	}
-
+	
 	/**
 	 * Update the menu bar in the main window. E.g. this needs to be done after
 	 * opening/closing a document to enable/disable the save buttons.
@@ -350,7 +350,7 @@ public class Main extends Application {
 			}
 		});
 	}
-
+	
 	/**
 	 * Initializes the root layout.
 	 * 
@@ -374,41 +374,41 @@ public class Main extends Application {
 			}
 		}
 		LOGGER.warn("initialized root layout fxml within " + (System.nanoTime() - time) / 1000000 + "ms.");
-
+		
 		// get Controller
 		time = System.nanoTime();
 		mbarCtrl = loader.getController();
 		mbarCtrl.setMainApp(this);
 		LOGGER.warn("received root layout controller within " + (System.nanoTime() - time) / 1000000 + "ms.");
-
+		
 		// Show the scene containing the root layout.
 		Scene scene = new Scene(rootLayout);
 		time = System.nanoTime();
 		scene.getStylesheets().add(Main.class.getResource("view/application.css").toExternalForm()); //$NON-NLS-1$
-
+		
 		LOGGER.debug("installed font families: " + Font.getFamilies());
 		LOGGER.trace("Locale dflt is '" + Locale.getDefault() + "'"); //$NON-NLS-1$
 		LOGGER.trace("Locale of Messages.class is '" + Messages.getBundle().getLocale() + "'"); //$NON-NLS-1$
 		LOGGER.trace("Locale china: " + Locale.SIMPLIFIED_CHINESE); //$NON-NLS-1$
 		if (Messages.checkIfTargetResourceIsUsed(Locale.CHINA)) {
 			LOGGER.trace("apply Chinese css"); //$NON-NLS-1$
-
+			
 			scene.getStylesheets().add(Main.class.getResource("i18n/china.css").toExternalForm());
 			// //$NON-NLS-1$
-
+			
 		}
 		LOGGER.warn("initialized root layout css within " + (System.nanoTime() - time) / 1000000 + "ms.");
-
+		
 		time = System.nanoTime();
 		primaryStage.setTitle(Messages.getString("Main.observerUiSettingsEditorTitle")); //$NON-NLS-1$
 		primaryStage.setScene(scene);
 		LOGGER.warn("executed root layout setScene+title within " + (System.nanoTime() - time) / 1000000 + "ms.");
-
+		
 		time = System.nanoTime();
 		updateMenuBar();
 		LOGGER.warn("updateMenuBar within " + (System.nanoTime() - time) / 1000000 + "ms.");
 	}
-
+	
 	/**
 	 * Returns true, if it belongs to Heroes of the Storm, false otherwise.
 	 * 
@@ -417,7 +417,7 @@ public class Main extends Application {
 	public boolean isHeroesFile() {
 		return isNamespaceHeroes;
 	}
-
+	
 	/**
 	 * Saves the currently opened document.
 	 */
@@ -427,12 +427,12 @@ public class Main extends Application {
 			public void run() {
 				this.setName(this.getName().replaceFirst("Thread", "Save")); //$NON-NLS-1$
 				long time = System.nanoTime();
-
+				
 				// cannot save, if not valid
 				if (!isValidOpenedDocPath()) {
 					return;
 				}
-
+				
 				try {
 					compile();
 					mpqi.buildMpq(openedDocPath, false, false);
@@ -448,7 +448,7 @@ public class Main extends Application {
 			}
 		}.start();
 	}
-
+	
 	/**
 	 * Save As window + actions.
 	 */
@@ -457,25 +457,25 @@ public class Main extends Application {
 		if (!isValidOpenedDocPath()) {
 			return;
 		}
-
+		
 		FileChooser fileChooser = new FileChooser();
 		fileChooser.setTitle(Messages.getString("Main.saveUiTitle")); //$NON-NLS-1$
-
+		
 		ExtensionFilter genExtFilter = new ExtensionFilter(
 				Messages.getString("Main.sc2HeroesObserverInterfaceExtFilter"), "*.SC2Interface", //$NON-NLS-1$ //$NON-NLS-2$
 				"*.StormInterface"); //$NON-NLS-1$
-
+		
 		fileChooser.getExtensionFilters().addAll(new ExtensionFilter(Messages.getString("Main.allFilesFilter"), "*.*"), //$NON-NLS-1$ //$NON-NLS-2$
 				genExtFilter, new ExtensionFilter(Messages.getString("Main.sc2InterfaceFilter"), "*.SC2Interface"), //$NON-NLS-1$ //$NON-NLS-2$
 				new ExtensionFilter(Messages.getString("Main.heroesInterfaceFilter"), "*.StormInterface")); //$NON-NLS-1$ //$NON-NLS-2$
 		fileChooser.setSelectedExtensionFilter(genExtFilter);
-
+		
 		File loadedF = new File(this.getOpenedDocPath());
 		fileChooser.setInitialFileName(loadedF.getName());
 		fileChooser.setInitialDirectory(loadedF.getParentFile());
-
+		
 		File f = fileChooser.showSaveDialog(primaryStage);
-
+		
 		if (f != null) {
 			try {
 				compile();
@@ -492,7 +492,7 @@ public class Main extends Application {
 		}
 		updateMenuBar();
 	}
-
+	
 	/**
 	 * Shows an Error Alert with the specified message.
 	 * 
@@ -511,7 +511,7 @@ public class Main extends Application {
 			}
 		});
 	}
-
+	
 	/**
 	 * Shows an Exception Alert.
 	 * 
@@ -528,7 +528,7 @@ public class Main extends Application {
 			}
 		});
 	}
-
+	
 	/**
 	 * Returns the File path of the opened Document.
 	 * 
@@ -537,7 +537,7 @@ public class Main extends Application {
 	public String getOpenedDocPath() {
 		return openedDocPath;
 	}
-
+	
 	/**
 	 * Compiles and updates the data in the cache.
 	 * 
@@ -552,21 +552,21 @@ public class Main extends Application {
 		Collection<File> layoutFiles = FileUtils.listFiles(cache, extensions, recursive);
 		layoutExtReader.updateLayoutFiles(layoutFiles);
 	}
-
+	
 	/**
 	 * Causes the App to shut down. This includes asking to save unsaved changes.
 	 */
 	public void closeApp() {
 		primaryStage.fireEvent(new WindowEvent(primaryStage, WindowEvent.WINDOW_CLOSE_REQUEST));
 	}
-
+	
 	/**
 	 * Initialize Paths
 	 */
 	private void initPaths() {
 		basePath = JarHelper.getJarDir(Main.class);
 	}
-
+	
 	/**
 	 * Initializes the MPQ Editor Interface.
 	 * 
@@ -584,7 +584,7 @@ public class Main extends Application {
 			alert.showAndWait();
 		}
 	}
-
+	
 	/**
 	 * Whether the opened file was changed and the app notified about it or not.
 	 * 
@@ -593,7 +593,7 @@ public class Main extends Application {
 	public boolean hasUnsavedFileChanges() {
 		return hasUnsavedFileChanges;
 	}
-
+	
 	/**
 	 * 
 	 */
@@ -603,7 +603,7 @@ public class Main extends Application {
 			updateAppTitle();
 		}
 	}
-
+	
 	/**
 	 * Updates the title of the App.
 	 */
@@ -622,9 +622,9 @@ public class Main extends Application {
 				primaryStage.setTitle(title);
 			}
 		});
-
+		
 	}
-
+	
 	/**
 	 * Returns the App's main window stage.
 	 * 
@@ -633,7 +633,7 @@ public class Main extends Application {
 	public Stage getPrimaryStage() {
 		return primaryStage;
 	}
-
+	
 	/**
 	 * Hides the Splash Screen.
 	 * 
@@ -649,5 +649,5 @@ public class Main extends Application {
 			}
 		}
 	}
-
+	
 }

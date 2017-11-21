@@ -7,18 +7,18 @@ package com.ahli.galaxy.ui;
  */
 public abstract class UIElement {
 	String name = "";
-
+	
 	public UIElement(String name) {
 		this.name = name;
 	}
-
+	
 	/**
 	 * @return the name
 	 */
 	public String getName() {
 		return name;
 	}
-
+	
 	/**
 	 * @param name
 	 *            the name to set
@@ -26,14 +26,14 @@ public abstract class UIElement {
 	public void setName(String name) {
 		this.name = name;
 	}
-
+	
 	/**
 	 * 
 	 * @param path
 	 * @return
 	 */
 	public abstract UIElement receiveFrameFromPath(String path);
-
+	
 	/**
 	 * 
 	 * @param path
@@ -47,7 +47,7 @@ public abstract class UIElement {
 		String newPath = path.substring(i + 1);
 		return newPath;
 	}
-
+	
 	/**
 	 * 
 	 * @param path
@@ -60,11 +60,11 @@ public abstract class UIElement {
 		}
 		return path.substring(0, i);
 	}
-
+	
 	/**
 	 * 
 	 * @return
 	 */
 	public abstract Object deepClone();
-
+	
 }

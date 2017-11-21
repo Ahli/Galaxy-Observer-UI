@@ -17,26 +17,26 @@ import javafx.scene.control.TableCell;
  *
  */
 public class ResetDefaultButtonTableCell extends TableCell<ValueDef, Boolean> {
-	static Logger LOGGER = LogManager.getLogger("ButtonTableCell");
-
+	static Logger LOGGER = LogManager.getLogger(ResetDefaultButtonTableCell.class);
+	
 	final Button cellButton = new Button();
-
+	
 	public ResetDefaultButtonTableCell() {
 		cellButton.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent t) {
 				LOGGER.trace("reset table item clicked");
-				ValueDef data = (ValueDef) getTableRow().getItem();
+				ValueDef data = getTableRow().getItem();
 				data.setValue(data.getDefaultValue());
 			}
 		});
 	}
-
+	
 	public ResetDefaultButtonTableCell(String text) {
 		this();
 		cellButton.setText(text);
 	}
-
+	
 	// Display button if the row is not empty
 	@Override
 	protected void updateItem(Boolean t, boolean empty) {

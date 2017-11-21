@@ -35,18 +35,18 @@ import com.ahli.hotkeyUi.application.model.ValueDef;
 import com.ahli.util.SilentXmlSaxErrorHandler;
 
 public class LayoutExtensionReader {
-	static Logger LOGGER = LogManager.getLogger("LayoutExtensionReader");
-
+	static Logger LOGGER = LogManager.getLogger(LayoutExtensionReader.class);
+	
 	private ArrayList<ValueDef> hotkeys = new ArrayList<>();
 	private ArrayList<ValueDef> settings = new ArrayList<>();
-
+	
 	/**
 	 * @return the hotkeys
 	 */
 	public ArrayList<ValueDef> getHotkeys() {
 		return hotkeys;
 	}
-
+	
 	/**
 	 * @param hotkeys
 	 *            the hotkeys to set
@@ -54,14 +54,14 @@ public class LayoutExtensionReader {
 	public void setHotkeys(ArrayList<ValueDef> hotkeys) {
 		this.hotkeys = hotkeys;
 	}
-
+	
 	/**
 	 * @return the settings
 	 */
 	public ArrayList<ValueDef> getSettings() {
 		return settings;
 	}
-
+	
 	/**
 	 * @param settings
 	 *            the settings to set
@@ -69,7 +69,7 @@ public class LayoutExtensionReader {
 	public void setSettings(ArrayList<ValueDef> settings) {
 		this.settings = settings;
 	}
-
+	
 	/**
 	 * Processes the specified Layout files. It finds hotkeys and setting
 	 * definitions.
@@ -81,29 +81,29 @@ public class LayoutExtensionReader {
 	 */
 	public void processLayoutFiles(Collection<File> layoutFiles)
 			throws ParserConfigurationException, SAXException, IOException {
-
+		
 		LOGGER.info("Scanning for XML file...");
-
+		
 		DocumentBuilder dBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
 		// provide error handler that does not print incompatible files into
 		// console
 		dBuilder.setErrorHandler(new SilentXmlSaxErrorHandler());
-
+		
 		InputStream is = null;
-
+		
 		x: for (File curFile : layoutFiles) {
 			Document doc = null;
 			try {
 				// parse XML file
-
+				
 				// THIS DOES NOT CLOSE THE INPUTSTREAM ON EXCEPTION
 				// CREATING TONS OF FILE ACCESS PROBLEMS. DO NOT USE!
 				// doc = dBuilder.parse(curFile);
-
+				
 				// WORKAROUND -> provide Inputstream
 				is = new FileInputStream(curFile);
 				doc = dBuilder.parse(is);
-
+				
 			} catch (SAXParseException | IOException e) {
 				// couldn't parse, most likely no XML file
 				if (is != null) {
@@ -115,30 +115,30 @@ public class LayoutExtensionReader {
 					is.close();
 				}
 			}
-
+			
 			LOGGER.debug("comments - processing file: " + curFile.getPath());
-
+			
 			// read comments
 			Element elem = doc.getDocumentElement();
 			NodeList childNodes = elem.getChildNodes();
 			readComments(childNodes);
 		}
-
+		
 		is = null;
-
+		
 		x: for (File curFile : layoutFiles) {
 			Document doc = null;
 			try {
 				// parse XML file
-
+				
 				// THIS DOES NOT CLOSE THE INPUTSTREAM ON EXCEPTION
 				// CREATING TONS OF FILE ACCESS PROBLEMS. DO NOT USE!
 				// doc = dBuilder.parse(curFile);
-
+				
 				// WORKAROUND -> provide Inputstream
 				is = new FileInputStream(curFile);
 				doc = dBuilder.parse(is);
-
+				
 			} catch (SAXParseException | IOException e) {
 				// couldn't parse, most likely no XML file
 				if (is != null) {
@@ -150,16 +150,16 @@ public class LayoutExtensionReader {
 					is.close();
 				}
 			}
-
+			
 			LOGGER.debug("constants - processing file: " + curFile.getPath());
-
+			
 			// read constants
 			Element elem = doc.getDocumentElement();
 			NodeList childNodes = elem.getChildNodes();
 			readConstants(childNodes);
 		}
 	}
-
+	
 	/**
 	 * Processes the Comments in the given Nodes.
 	 * 
@@ -168,28 +168,27 @@ public class LayoutExtensionReader {
 	private void readComments(NodeList childNodes) {
 		for (int i = 0; i < childNodes.getLength(); i++) {
 			Node curNode = childNodes.item(i);
-
+			
 			if (curNode.getNodeType() == Node.COMMENT_NODE) {
-
+				
 				Comment comment = (Comment) curNode;
 				String text = comment.getData();
 				processCommentText(text);
-
+				
 			} else {
 				readComments(curNode.getChildNodes());
 			}
 		}
 	}
-
+	
 	/**
-	 * Creates ValueDef for the Hotkey and Setting definitions found in this
-	 * comment
+	 * Creates ValueDef for the Hotkey and Setting definitions found in this comment
 	 * 
 	 * @param textInput
 	 */
 	public void processCommentText(String textInput) {
 		String constant = "", description = "", defaultValue = "";
-
+		
 		// String textInputLower = textInput.toLowerCase();
 		LOGGER.debug("textInput:" + textInput);
 		try {
@@ -198,23 +197,23 @@ public class LayoutExtensionReader {
 			for (String text : textInput.split("(?=@hotkey|@setting)/i")) {
 				LOGGER.debug("token start:" + text);
 				text = text.trim();
-
+				
 				constant = "";
 				description = "";
 				defaultValue = "";
-
+				
 				boolean isHotkey = text.toLowerCase(Locale.ROOT).startsWith("@hotkey");
 				boolean isSetting = text.toLowerCase(Locale.ROOT).startsWith("@setting");
-
+				
 				if (isHotkey || isSetting) {
 					LOGGER.debug("detected hotkey or setting");
 					// move behind keyword
 					int pos = (isHotkey) ? "@hotkey".length() : "@setting".length();
 					String toProcess = text.substring(pos);
-
+					
 					// move beyond '('
 					toProcess = toProcess.substring(1 + toProcess.indexOf('(')).trim();
-
+					
 					// split at keyword
 					for (String part : toProcess.split("(?i)(?=(constant|default|description)[\\s]*=)")) {
 						part = part.trim();
@@ -237,7 +236,7 @@ public class LayoutExtensionReader {
 							LOGGER.debug("description = " + description);
 						}
 					}
-
+					
 					if (!constant.equals("")) {
 						if (isHotkey) {
 							addHotkeyValueDef(constant, description, defaultValue, "");
@@ -253,17 +252,17 @@ public class LayoutExtensionReader {
 			LOGGER.debug("Parsing Comment failed.", e);
 		}
 	}
-
+	
 	public void addHotkeyValueDef(String constant, String description, String defaultValue, String curValue) {
 		ValueDef def = new ValueDef(constant, curValue, description, defaultValue);
 		hotkeys.add(def);
 	}
-
+	
 	public void addSettingValueDef(String constant, String description, String defaultValue, String curValue) {
 		ValueDef def = new ValueDef(constant, curValue, description, defaultValue);
 		settings.add(def);
 	}
-
+	
 	/**
 	 * Processes the Constants in the given Nodes.
 	 * 
@@ -272,20 +271,20 @@ public class LayoutExtensionReader {
 	private void readConstants(NodeList childNodes) {
 		for (int i = 0; i < childNodes.getLength(); i++) {
 			Node curNode = childNodes.item(i);
-
+			
 			if (curNode.getNodeType() == Node.ELEMENT_NODE) {
-
+				
 				String nodeName = curNode.getNodeName().toLowerCase(Locale.ROOT);
 				if (nodeName.equals("constant")) {
 					processConstant(curNode);
 				}
-
+				
 			} else {
 				readConstants(curNode.getChildNodes());
 			}
 		}
 	}
-
+	
 	/**
 	 * 
 	 * @param node
@@ -296,10 +295,10 @@ public class LayoutExtensionReader {
 		Node valAttrNode = getNamedItemIgnoreCase(node.getAttributes(), "val");
 		String val = valAttrNode.getNodeValue();
 		LOGGER.debug("Constant: name = " + name + ", val = " + val);
-
+		
 		setValueDefCurValue(name, val);
 	}
-
+	
 	/**
 	 * 
 	 * @param name
@@ -320,7 +319,7 @@ public class LayoutExtensionReader {
 		}
 		LOGGER.debug("no ValueDef found with name: " + name);
 	}
-
+	
 	/**
 	 * 
 	 * @param layoutFiles
@@ -331,27 +330,27 @@ public class LayoutExtensionReader {
 	public void updateLayoutFiles(Collection<File> layoutFiles)
 			throws ParserConfigurationException, SAXException, IOException {
 		LOGGER.info("Scanning for XML file...");
-
+		
 		DocumentBuilder dBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
 		// provide error handler that does not print incompatible files into
 		// console
 		dBuilder.setErrorHandler(new SilentXmlSaxErrorHandler());
-
+		
 		InputStream is = null;
-
+		
 		x: for (File curFile : layoutFiles) {
 			Document doc = null;
 			try {
 				// parse XML file
-
+				
 				// THIS DOES NOT CLOSE THE INPUTSTREAM ON EXCEPTION
 				// CREATING TONS OF FILE ACCESS PROBLEMS. DO NOT USE!
 				// doc = dBuilder.parse(curFile);
-
+				
 				// WORKAROUND -> provide Inputstream
 				is = new FileInputStream(curFile);
 				doc = dBuilder.parse(is);
-
+				
 			} catch (SAXParseException | IOException e) {
 				// couldn't parse, most likely no XML file
 				if (is != null) {
@@ -363,14 +362,14 @@ public class LayoutExtensionReader {
 					is.close();
 				}
 			}
-
+			
 			LOGGER.debug("processing file: " + curFile.getPath());
-
+			
 			// process files
 			Element elem = doc.getDocumentElement();
 			NodeList childNodes = elem.getChildNodes();
 			modifyConstants(childNodes);
-
+			
 			// write DOM back to XML
 			Source source = new DOMSource(doc);
 			Result result = new StreamResult(curFile);
@@ -383,26 +382,26 @@ public class LayoutExtensionReader {
 				e.printStackTrace();
 			}
 		}
-
+		
 	}
-
+	
 	private void modifyConstants(NodeList childNodes) {
 		for (int i = 0; i < childNodes.getLength(); i++) {
 			Node curNode = childNodes.item(i);
-
+			
 			if (curNode.getNodeType() == Node.ELEMENT_NODE) {
-
+				
 				String nodeName = curNode.getNodeName().toLowerCase(Locale.ROOT);
 				if (nodeName.equals("constant")) {
 					modifyConstant(curNode);
 				}
-
+				
 			} else {
 				readConstants(curNode.getChildNodes());
 			}
 		}
 	}
-
+	
 	/**
 	 * Modify a Constant node from XML with data's current value.
 	 * 
@@ -413,7 +412,7 @@ public class LayoutExtensionReader {
 		String name = nameAttrNode.getNodeValue();
 		Node valAttrNode = getNamedItemIgnoreCase(node.getAttributes(), "val");
 		String val = valAttrNode.getNodeValue();
-
+		
 		for (ValueDef item : hotkeys) {
 			if (item.getId().equalsIgnoreCase(name)) {
 				LOGGER.debug("updating hotkey constant: " + name + ", with val: " + val);
@@ -427,7 +426,7 @@ public class LayoutExtensionReader {
 			}
 		}
 	}
-
+	
 	/**
 	 * 
 	 * @param nodes
@@ -446,7 +445,7 @@ public class LayoutExtensionReader {
 		}
 		return node;
 	}
-
+	
 	/**
 	 * Clears stored data.
 	 */

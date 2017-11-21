@@ -8,10 +8,10 @@ import java.util.ArrayList;
  *
  */
 public class UIStateGroup extends UIElement {
-
+	
 	private String defaultState = "";
 	private ArrayList<UIState> states = new ArrayList<>();
-
+	
 	/**
 	 * 
 	 * @param name
@@ -19,14 +19,14 @@ public class UIStateGroup extends UIElement {
 	public UIStateGroup(String name) {
 		super(name);
 	}
-
+	
 	/**
 	 * @return the defaultState
 	 */
 	public String getDefaultState() {
 		return defaultState;
 	}
-
+	
 	/**
 	 * @param defaultState
 	 *            the defaultState to set
@@ -34,14 +34,14 @@ public class UIStateGroup extends UIElement {
 	public void setDefaultState(String defaultState) {
 		this.defaultState = defaultState;
 	}
-
+	
 	/**
 	 * @return the states
 	 */
 	public ArrayList<UIState> getStates() {
 		return states;
 	}
-
+	
 	/**
 	 * @param states
 	 *            the states to set
@@ -49,7 +49,7 @@ public class UIStateGroup extends UIElement {
 	public void setStates(ArrayList<UIState> states) {
 		this.states = states;
 	}
-
+	
 	/**
 	 * 
 	 * @param path
@@ -73,7 +73,7 @@ public class UIStateGroup extends UIElement {
 			return null;
 		}
 	}
-
+	
 	/**
 	 * 
 	 */
@@ -81,12 +81,12 @@ public class UIStateGroup extends UIElement {
 	public Object deepClone() {
 		UIStateGroup clone = new UIStateGroup(name);
 		clone.setDefaultState(defaultState);
-
+		
 		// clone states
 		for (UIState state : states) {
 			clone.getStates().add((UIState) state.deepClone());
 		}
-
+		
 		return clone;
 	}
 }

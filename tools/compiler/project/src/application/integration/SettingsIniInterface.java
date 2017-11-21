@@ -10,14 +10,20 @@ import java.nio.charset.StandardCharsets;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-public class SettingsInterface {
-	static Logger LOGGER = LogManager.getLogger(SettingsInterface.class);
+/**
+ * Interface Class for the Settings .ini file.
+ * 
+ * @author Ahli
+ *
+ */
+public class SettingsIniInterface {
+	static Logger LOGGER = LogManager.getLogger(SettingsIniInterface.class);
 	
 	private String SETTINGS_FILE = "";
 	private String SC2_Path = "", HEROES_Path = "", HEROES_PTR_Path = "";
 	private boolean ptrActive = false, SC2_64bit = false, HEROES_64bit = false, HEROES_PTR_64bit = false,
 			HEROES_protectMPQ = false, SC2_protectMPQ = false, buildUnprotectedToo = false;
-
+	
 	/**
 	 * Set the File path of the Settings file.
 	 * 
@@ -26,7 +32,7 @@ public class SettingsInterface {
 	public void setSettingsFilePath(String path) {
 		SETTINGS_FILE = path;
 	}
-
+	
 	/**
 	 * Read all Settings from the Settings file.
 	 * 
@@ -49,7 +55,7 @@ public class SettingsInterface {
 			}
 		}
 	}
-
+	
 	/**
 	 * Parse a line from the Settings file.
 	 * 
@@ -89,7 +95,7 @@ public class SettingsInterface {
 			buildUnprotectedToo = Boolean.parseBoolean(val);
 		}
 	}
-
+	
 	/**
 	 * Reads the Value from a line from the Settings file.
 	 * 
@@ -99,45 +105,45 @@ public class SettingsInterface {
 	private String getValFromIniLine(String line) {
 		return line.substring(line.indexOf('=') + 1);
 	}
-
+	
 	public String getSC2Path() {
 		return SC2_Path;
 	}
-
+	
 	public String getHeroesPath() {
 		return HEROES_Path;
 	}
-
+	
 	public String getHeroesPtrPath() {
 		return HEROES_PTR_Path;
 	}
-
+	
 	public boolean isPtrActive() {
 		return ptrActive;
 	}
-
+	
 	public boolean isSC264bit() {
 		return SC2_64bit;
 	}
-
+	
 	public boolean isHeroesPtr64bit() {
 		return HEROES_PTR_64bit;
 	}
-
+	
 	public boolean isHeroes64bit() {
 		return HEROES_64bit;
 	}
-
+	
 	public boolean isHeroesProtectMPQ() {
-		LOGGER.debug("Heroes protection is: "+HEROES_protectMPQ);
+		LOGGER.debug("Heroes protection is: " + HEROES_protectMPQ);
 		return HEROES_protectMPQ;
 	}
-
+	
 	public boolean isSC2ProtectMPQ() {
-		LOGGER.debug("SC2 protection is: "+SC2_protectMPQ);
+		LOGGER.debug("SC2 protection is: " + SC2_protectMPQ);
 		return SC2_protectMPQ;
 	}
-
+	
 	public boolean isBuildUnprotectedToo() {
 		return buildUnprotectedToo;
 	}

@@ -3,11 +3,11 @@ package com.ahli.galaxy.ui;
 /**
  * 
  * @author Ahli
- *
+ * 
  */
 public class UIConstant extends UIElement {
 	String value = "";
-
+	
 	/**
 	 * 
 	 * @param name
@@ -15,14 +15,14 @@ public class UIConstant extends UIElement {
 	public UIConstant(String name) {
 		super(name);
 	}
-
+	
 	/**
 	 * @return the value
 	 */
 	public String getValue() {
 		return value;
 	}
-
+	
 	/**
 	 * @param value
 	 *            the value to set
@@ -30,7 +30,7 @@ public class UIConstant extends UIElement {
 	public void setValue(String value) {
 		this.value = value;
 	}
-
+	
 	/**
 	 * 
 	 * @param path
@@ -40,7 +40,7 @@ public class UIConstant extends UIElement {
 	public UIElement receiveFrameFromPath(String path) {
 		return (path == null || path.isEmpty()) ? this : null;
 	}
-
+	
 	/**
 	 * 
 	 * @return
@@ -49,7 +49,7 @@ public class UIConstant extends UIElement {
 	public Object deepClone() {
 		UIConstant clone = new UIConstant(name);
 		clone.setValue(value);
-
+		
 		return clone;
 	}
 }

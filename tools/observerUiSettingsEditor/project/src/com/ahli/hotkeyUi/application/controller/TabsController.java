@@ -29,17 +29,17 @@ import javafx.util.Callback;
 /**
  * 
  * @author Ahli
- *
+ * 
  */
 public class TabsController {
-	static Logger LOGGER = LogManager.getLogger("TabsController");
-
+	static Logger LOGGER = LogManager.getLogger(TabsController.class);
+	
 	private Main main;
-
+	
 	private final ObservableList<ValueDef> hotkeysData = FXCollections.observableArrayList();
-
+	
 	private final ObservableList<ValueDef> settingsData = FXCollections.observableArrayList();
-
+	
 	@FXML
 	private Tab hotkeysTab;
 	@FXML
@@ -54,7 +54,7 @@ public class TabsController {
 	private TableColumn<ValueDef, String> hotkeysKeyCol;
 	@FXML
 	private TableColumn<ValueDef, Boolean> hotkeysActionsCol;
-
+	
 	@FXML
 	private Tab settingsTab;
 	@FXML
@@ -69,11 +69,11 @@ public class TabsController {
 	private TableColumn<ValueDef, String> settingsValueCol;
 	@FXML
 	private TableColumn<ValueDef, Boolean> settingsActionsCol;
-
+	
 	// based on:
 	// http://jluger.de/blog/20160731_javafx_text_rendering_in_tableview.html
 	private static final Callback<TableColumn<ValueDef, String>, TableCell<ValueDef, String>> WRAPPING_CELL_FACTORY = new Callback<TableColumn<ValueDef, String>, TableCell<ValueDef, String>>() {
-
+		
 		@Override
 		public TableCell<ValueDef, String> call(TableColumn<ValueDef, String> param) {
 			TableCell<ValueDef, String> tableCell = new TableCell<ValueDef, String>() {
@@ -107,28 +107,28 @@ public class TabsController {
 			return tableCell;
 		}
 	};
-
+	
 	private static final Callback<CellDataFeatures<ValueDef, Boolean>, ObservableValue<Boolean>> ActionColumnCellValueFactory = new Callback<TableColumn.CellDataFeatures<ValueDef, Boolean>, ObservableValue<Boolean>>() {
 		@Override
 		public ObservableValue<Boolean> call(TableColumn.CellDataFeatures<ValueDef, Boolean> p) {
 			return new SimpleBooleanProperty(p.getValue() != null);
 		}
 	};
-
+	
 	private static final Callback<TableColumn<ValueDef, Boolean>, TableCell<ValueDef, Boolean>> ActionColumnCellFactoryReset = new Callback<TableColumn<ValueDef, Boolean>, TableCell<ValueDef, Boolean>>() {
 		@Override
 		public TableCell<ValueDef, Boolean> call(TableColumn<ValueDef, Boolean> p) {
 			return new ResetDefaultButtonTableCell(Messages.getString("TabsController.Reset")); //$NON-NLS-1$
 		}
 	};
-
+	
 	/**
 	 * On Controller initialization.
 	 */
 	@FXML
 	public void initialize() {
 		LOGGER.trace("initializing");
-
+		
 		hotkeysNameCol.setCellValueFactory(new PropertyValueFactory<>("id"));
 		hotkeysDescriptionCol.setCellValueFactory(new PropertyValueFactory<>("description"));
 		hotkeysDescriptionCol.setCellFactory(WRAPPING_CELL_FACTORY);
@@ -145,7 +145,7 @@ public class TabsController {
 		hotkeysActionsCol.setSortable(false);
 		hotkeysActionsCol.setCellValueFactory(ActionColumnCellValueFactory);
 		hotkeysActionsCol.setCellFactory(ActionColumnCellFactoryReset);
-
+		
 		settingsNameCol.setCellValueFactory(new PropertyValueFactory<>("id"));
 		settingsDescriptionCol.setCellValueFactory(new PropertyValueFactory<>("description"));
 		settingsDescriptionCol.setCellFactory(WRAPPING_CELL_FACTORY);
@@ -162,11 +162,11 @@ public class TabsController {
 		settingsActionsCol.setSortable(false);
 		settingsActionsCol.setCellValueFactory(ActionColumnCellValueFactory);
 		settingsActionsCol.setCellFactory(ActionColumnCellFactoryReset);
-
+		
 		hotkeysTable.setItems(hotkeysData);
 		settingsTable.setItems(settingsData);
 	}
-
+	
 	/**
 	 * 
 	 * @param main
@@ -174,21 +174,21 @@ public class TabsController {
 	public void setMainApp(Main main) {
 		this.main = main;
 	}
-
+	
 	/**
 	 * @return the hotkeysData
 	 */
 	public ObservableList<ValueDef> getHotkeysData() {
 		return hotkeysData;
 	}
-
+	
 	/**
 	 * @return the settingsData
 	 */
 	public ObservableList<ValueDef> getSettingsData() {
 		return settingsData;
 	}
-
+	
 	/**
 	 * Clears the data.
 	 */
@@ -196,5 +196,5 @@ public class TabsController {
 		hotkeysData.clear();
 		settingsData.clear();
 	}
-
+	
 }

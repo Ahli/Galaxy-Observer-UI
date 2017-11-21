@@ -3,6 +3,7 @@ package com.ahli.galaxy;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -21,8 +22,8 @@ import org.xml.sax.SAXException;
  *
  */
 public class DescIndexReader {
-	static Logger LOGGER = LogManager.getLogger("DescIndexReader");
-
+	static Logger LOGGER = LogManager.getLogger(DescIndexReader.class);
+	
 	/**
 	 * Grabs all layout file paths from a given descIndex file.
 	 * 
@@ -36,10 +37,10 @@ public class DescIndexReader {
 	public static ArrayList<String> getLayoutPathList(File f, boolean ignoreRequiredToLoadEntries)
 			throws SAXException, IOException, ParserConfigurationException {
 		ArrayList<String> list = new ArrayList<>();
-
+		
 		DocumentBuilder dBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
 		Document doc = dBuilder.parse(f);
-
+		
 		// must be in a DataComponent node
 		NodeList nodeList = doc.getElementsByTagName("*");
 		for (int i = 0; i < nodeList.getLength(); i++) {
@@ -47,20 +48,20 @@ public class DescIndexReader {
 			if (node.getNodeName().equalsIgnoreCase("Include")) {
 				NamedNodeMap attributes = node.getAttributes();
 				String path = attributes.item(0).getNodeValue();
-
+				
 				// ignore requiredtoload if desired
 				if (ignoreRequiredToLoadEntries && attributes.getLength() > 1
 						&& attributes.item(1).getNodeName().equalsIgnoreCase("requiredtoload")) {
 					continue;
 				}
-
+				
 				list.add(path);
 				LOGGER.debug("Adding layout path to layoutPathList: " + path);
 			}
 		}
 		return list;
 	}
-
+	
 	// private List<Node> getElementsByTagNameIgnoreCase(Document doc, String
 	// tag) {
 	// NodeList children = doc.getChildNodes();

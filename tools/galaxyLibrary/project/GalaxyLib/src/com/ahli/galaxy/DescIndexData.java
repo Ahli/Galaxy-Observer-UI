@@ -24,12 +24,12 @@ import javafx.util.Pair;
  *
  */
 public class DescIndexData {
-	static Logger LOGGER = LogManager.getLogger("DescIndexData");
-
+	static Logger LOGGER = LogManager.getLogger(DescIndexData.class);
+	
 	private String descIndexIntPath = null;
 	private ArrayList<Pair<File, String>> fileIntPathList = new ArrayList<>();
 	private MpqInterface mpqi;
-
+	
 	/**
 	 * 
 	 * @param mpqi
@@ -38,7 +38,7 @@ public class DescIndexData {
 		this.mpqi = mpqi;
 		fileIntPathList = new ArrayList<>();
 	}
-
+	
 	/**
 	 * 
 	 * @return
@@ -46,7 +46,7 @@ public class DescIndexData {
 	public String getDescIndexIntPath() {
 		return descIndexIntPath;
 	}
-
+	
 	/**
 	 * 
 	 * @param descIndexIntPath
@@ -54,7 +54,7 @@ public class DescIndexData {
 	public void setDescIndexIntPath(String descIndexIntPath) {
 		this.descIndexIntPath = descIndexIntPath;
 	}
-
+	
 	/**
 	 * 
 	 * @param i
@@ -63,7 +63,7 @@ public class DescIndexData {
 	public String getLayoutIntPath(int i) {
 		return fileIntPathList.get(i).getValue();
 	}
-
+	
 	/**
 	 * 
 	 * @param intPath
@@ -85,7 +85,7 @@ public class DescIndexData {
 		LOGGER.debug("added Layout path: " + intPath2);
 		LOGGER.debug("added File path: " + f.getAbsolutePath());
 	}
-
+	
 	/**
 	 * 
 	 * @param intPath
@@ -101,14 +101,14 @@ public class DescIndexData {
 		}
 		return false;
 	}
-
+	
 	/**
 	 * 
 	 */
 	public void clear() {
 		fileIntPathList.clear();
 	}
-
+	
 	/**
 	 * 
 	 * @param descIndexPath
@@ -117,7 +117,7 @@ public class DescIndexData {
 		clear();
 		setDescIndexIntPath(descIndexPath);
 	}
-
+	
 	/**
 	 * 
 	 * @param layoutPathList
@@ -129,7 +129,7 @@ public class DescIndexData {
 			this.addLayoutIntPath(it.next());
 		}
 	}
-
+	
 	/**
 	 * 
 	 * @return
@@ -137,7 +137,7 @@ public class DescIndexData {
 	public int getLayoutCount() {
 		return fileIntPathList.size();
 	}
-
+	
 	/**
 	 * 
 	 * @param intPath
@@ -152,7 +152,7 @@ public class DescIndexData {
 		}
 		return null;
 	}
-
+	
 	/**
 	 * @throws IOException
 	 * 
@@ -163,13 +163,13 @@ public class DescIndexData {
 		try {
 			bw = new OutputStreamWriter(new FileOutputStream(f, false), "UTF-8");
 			bw.write("<?xml version=\"1.0\" encoding=\"utf-8\" standalone=\"yes\"?>\r\n<Desc>\r\n");
-
+			
 			for (Pair<File, String> p : fileIntPathList) {
 				bw.write("    <Include path=\"");
 				bw.write(p.getValue());
 				bw.write("\"/>\r\n");
 			}
-
+			
 			bw.write("</Desc>\r\n");
 		} catch (IOException e) {
 			LOGGER.error("ERROR writing DescIndex to disc" + e);
@@ -184,7 +184,7 @@ public class DescIndexData {
 			}
 		}
 	}
-
+	
 	/**
 	 * Orders layout files in DescIndex
 	 * 
@@ -195,35 +195,35 @@ public class DescIndexData {
 	public void orderLayoutFiles() throws ParserConfigurationException, SAXException, IOException {
 		ArrayList<ArrayList<String>> dependencies = new ArrayList<ArrayList<String>>();
 		ArrayList<ArrayList<String>> ownConstants = new ArrayList<ArrayList<String>>();
-
+		
 		// grab dependencies and constant definitions for every layout file
 		for (Pair<File, String> pair : fileIntPathList) {
 			ArrayList<String> layoutDeps = null;
 			ArrayList<String> curConstants = null;
-
+			
 			curConstants = LayoutReader.getLayoutsConstantDefinitions(pair.getKey());
-
+			
 			// add calculated list of dependencies from layout file
 			layoutDeps = LayoutReader.getDependencyLayouts(pair.getKey(), curConstants);
 			LOGGER.debug("Dependencies found: " + layoutDeps);
-
+			
 			ownConstants.add(curConstants);
 			dependencies.add(layoutDeps);
 		}
-
+		
 		boolean insertOccurred = true;
 		for (int counter = 0; insertOccurred && counter < Math.pow(fileIntPathList.size(), 4); counter++) {
 			LOGGER.trace("counter=" + counter);
 			insertOccurred = false;
 			for (int i = 0; i < dependencies.size(); i++) {
-
+				
 				ArrayList<String> curLayoutDepList = dependencies.get(i);
 				Pair<File, String> pair = fileIntPathList.get(i);
-
+				
 				for (int j = 0; j < curLayoutDepList.size(); j++) {
-
+					
 					String curDependencyTo = curLayoutDepList.get(j);
-
+					
 					if (curDependencyTo.startsWith("#")) {
 						LOGGER.trace("DEPENDENCY: " + curDependencyTo);
 						while (curDependencyTo.startsWith("#")) {
@@ -281,24 +281,24 @@ public class DescIndexData {
 						// templates
 					}
 				}
-
+				
 			}
 		}
-
+		
 		// change order according to templates
 		insertOccurred = true;
 		for (int counter = 0; insertOccurred && counter < Math.pow(fileIntPathList.size(), 4); counter++) {
 			LOGGER.trace("counter=" + counter);
 			insertOccurred = false;
 			x: for (int i = 0; i < dependencies.size(); i++) {
-
+				
 				ArrayList<String> curLayoutDepList = dependencies.get(i);
 				Pair<File, String> pair = fileIntPathList.get(i);
-
+				
 				for (int j = 0; j < curLayoutDepList.size(); j++) {
-
+					
 					String curDependencyTo = curLayoutDepList.get(j);
-
+					
 					if (curDependencyTo.startsWith("#")) {
 						// constants
 					} else {
@@ -307,7 +307,7 @@ public class DescIndexData {
 							Pair<File, String> otherPair = fileIntPathList.get(i2);
 							String fileName = otherPair.getKey().getName();
 							fileName = fileName.substring(0, fileName.lastIndexOf('.'));
-
+							
 							if (fileName.equals(curDependencyTo)) {
 								LOGGER.trace("checked " + fileIntPathList.get(i).getKey().getName()
 										+ " with dependency " + curDependencyTo + " and " + fileName + " i=" + i + " j="
@@ -330,13 +330,13 @@ public class DescIndexData {
 										+ j + " i2=" + i2);
 							}
 						}
-
+						
 					}
 				}
-
+				
 			}
 		}
-
+		
 		// 1. layouts durchgehen und Abhaengigkeiten speichern
 		// Abhaengigkeit:
 		// - template aus anderem layout aus dieser Liste benutzen
@@ -344,7 +344,7 @@ public class DescIndexData {
 		// - constant benutzen, die in anderem layout definiert wird und nicht
 		// im eigenen (#abc oder ##abc)
 		// 2. layouts anordnen, sodass keine Abhaengigkeit mehr vorhanden sind
-
+		
 	}
-
+	
 }

@@ -8,14 +8,14 @@ import java.util.Map.Entry;
 /**
  * 
  * @author Ahli
- *
+ * 
  */
 public class UIAnimation extends UIElement {
 	private ArrayList<UIController> controllers = new ArrayList<>();
 	private Map<String, UIAttribute> events = new HashMap<>();
 	private boolean nextEventsAdditionShouldOverride = false;
 	private UIAttribute driver = null;
-
+	
 	/**
 	 * 
 	 * @param name
@@ -23,14 +23,14 @@ public class UIAnimation extends UIElement {
 	public UIAnimation(String name) {
 		super(name);
 	}
-
+	
 	/**
 	 * @return the controllers
 	 */
 	public ArrayList<UIController> getControllers() {
 		return controllers;
 	}
-
+	
 	/**
 	 * @param controllers
 	 *            the controllers to set
@@ -38,14 +38,14 @@ public class UIAnimation extends UIElement {
 	public void setControllers(ArrayList<UIController> controllers) {
 		this.controllers = controllers;
 	}
-
+	
 	/**
 	 * @return the events
 	 */
 	public Map<String, UIAttribute> getEvents() {
 		return events;
 	}
-
+	
 	/**
 	 * @param events
 	 *            the events to set
@@ -53,7 +53,7 @@ public class UIAnimation extends UIElement {
 	public void setEvents(Map<String, UIAttribute> events) {
 		this.events = events;
 	}
-
+	
 	/**
 	 * 
 	 * @return
@@ -61,7 +61,7 @@ public class UIAnimation extends UIElement {
 	public boolean isNextEventsAdditionShouldOverride() {
 		return nextEventsAdditionShouldOverride;
 	}
-
+	
 	/**
 	 * 
 	 * @param nextEventsAdditionShouldOverride
@@ -69,14 +69,14 @@ public class UIAnimation extends UIElement {
 	public void setNextEventsAdditionShouldOverride(boolean nextEventsAdditionShouldOverride) {
 		this.nextEventsAdditionShouldOverride = nextEventsAdditionShouldOverride;
 	}
-
+	
 	/**
 	 * @return the driver
 	 */
 	public UIAttribute getDriver() {
 		return driver;
 	}
-
+	
 	/**
 	 * @param driver
 	 *            the driver to set
@@ -84,7 +84,7 @@ public class UIAnimation extends UIElement {
 	public void setDriver(UIAttribute driver) {
 		this.driver = driver;
 	}
-
+	
 	/**
 	 * 
 	 * @param path
@@ -108,7 +108,7 @@ public class UIAnimation extends UIElement {
 			return null;
 		}
 	}
-
+	
 	/**
 	 * 
 	 * @return
@@ -117,7 +117,7 @@ public class UIAnimation extends UIElement {
 	public Object deepClone() {
 		UIAnimation clone = new UIAnimation(name);
 		clone.setNextEventsAdditionShouldOverride(nextEventsAdditionShouldOverride);
-
+		
 		// clone events
 		Map<String, UIAttribute> clonedEvents = new HashMap<>();
 		for (Entry<String, UIAttribute> entry : events.entrySet()) {
@@ -125,14 +125,14 @@ public class UIAnimation extends UIElement {
 			clonedEvents.put(entry.getKey(), clonedValue);
 		}
 		clone.setEvents(clonedEvents);
-
+		
 		// clone controllers
 		for (UIController controller : controllers) {
 			clone.getControllers().add((UIController) controller.deepClone());
 		}
-
+		
 		// clone driver
-		if(driver != null){
+		if (driver != null) {
 			clone.setDriver((UIAttribute) driver.deepClone());
 		}
 		

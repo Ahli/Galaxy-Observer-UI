@@ -11,20 +11,20 @@ import java.util.Map.Entry;
  *
  */
 public class UIAttribute extends UIElement {
-
+	
 	public UIAttribute(String name) {
 		super(name);
 	}
-
+	
 	private Map<String, String> values = new HashMap<>();
-
+	
 	/**
 	 * @return the values
 	 */
 	public Map<String, String> getValues() {
 		return values;
 	}
-
+	
 	/**
 	 * @param values
 	 *            the values to set
@@ -32,7 +32,7 @@ public class UIAttribute extends UIElement {
 	public void setValues(Map<String, String> values) {
 		this.values = values;
 	}
-
+	
 	/**
 	 * 
 	 * @param path
@@ -42,7 +42,7 @@ public class UIAttribute extends UIElement {
 	public UIElement receiveFrameFromPath(String path) {
 		return (path == null || path.isEmpty()) ? this : null;
 	}
-
+	
 	/**
 	 * 
 	 * @return
@@ -50,14 +50,14 @@ public class UIAttribute extends UIElement {
 	@Override
 	public Object deepClone() {
 		UIAttribute clone = new UIAttribute(name);
-
+		
 		// clone values
 		Map<String, String> clonedValues = new HashMap<>();
 		for (Entry<String, String> entry : values.entrySet()) {
 			clonedValues.put(entry.getKey(), entry.getValue());
 		}
 		clone.setValues(clonedValues);
-
+		
 		return clone;
 	}
 }

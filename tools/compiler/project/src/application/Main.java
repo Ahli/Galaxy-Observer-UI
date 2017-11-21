@@ -3,13 +3,10 @@ package application;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.net.URI;
-import java.net.URL;
 import java.nio.file.FileSystemException;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -17,9 +14,6 @@ import java.util.concurrent.TimeUnit;
 import javax.swing.JFileChooser;
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.io.filefilter.TrueFileFilter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.xml.sax.SAXException;
@@ -30,7 +24,11 @@ import com.ahli.galaxy.DescIndexReader;
 import com.ahli.mpq.MpqEditorInterface;
 import com.ahli.mpq.MpqException;
 
-import application.integration.SettingsInterface;
+import application.integration.ReplayFinder;
+import application.integration.SettingsIniInterface;
+import application.util.ErrorTracker;
+import application.util.ErrorTrackerImpl;
+import application.util.JarHelper;
 import application.util.logger.log4j2plugin.TextAreaAppender;
 import javafx.animation.PauseTransition;
 import javafx.application.Application;
@@ -45,36 +43,41 @@ import javafx.util.Duration;
 /**
  * 
  * @author Ahli
- *
+ * 
  */
 public class Main extends Application {
 	static Logger LOGGER = LogManager.getLogger(Main.class);
-
-	private MpqEditorInterface baseMpqInterface = null;
-	private SettingsInterface settings = new SettingsInterface();
+	
+	// Components
+	private MpqEditorInterface baseMpqInterface = new MpqEditorInterface();
+	private SettingsIniInterface settings = new SettingsIniInterface();
+	private ReplayFinder replayFinder = new ReplayFinder();
+	private ErrorTracker errorTracker = new ErrorTrackerImpl();
+	private CompileManager compileManager = new CompileManager(errorTracker);
+	
+	// data
 	private boolean namespaceHeroes = true;
 	private String documentsPath = new JFileChooser().getFileSystemView().getDefaultDirectory().toString();
 	private File basePath = null;
-
+	
 	// GUI
 	private TextArea txtArea = null;
-	private boolean encounteredError = false;
-
+	
 	// performance
 	private static long startTime;
-
+	
 	// Builder
 	private HashMap<Integer, Thread> builders = new HashMap<>();
 	private int nextFreeBuilderID = 0;
-
+	
 	// Command Line Parameter
 	private boolean hasParamCompilePath = false;
 	private String paramCompilePath = null;
 	private boolean compileAndRun = false;
 	private String paramRunPath = null;
-
+	
 	/**
-	 * Entry point of the App
+	 * Entry point of the App.
 	 * 
 	 * @param args
 	 */
@@ -86,13 +89,13 @@ public class Main extends Application {
 		LOGGER.warn("warn log visible");
 		LOGGER.error("error log visible");
 		LOGGER.fatal("fatal log visible");
-
+		
 		LOGGER.trace("Configuration File of System: " + System.getProperty("log4j.configurationFile"));
 		LOGGER.info("Launch arguments: " + Arrays.toString(args));
-
+		
 		launch(args);
 	}
-
+	
 	@Override
 	/**
 	 * Called when the App is initializing.
@@ -100,32 +103,19 @@ public class Main extends Application {
 	public void start(Stage primaryStage) {
 		// shorter thread name for application
 		Thread.currentThread().setName("UI");
-
+		
 		initParams();
-
+		
 		initGUI(primaryStage);
-
+		
 		initPaths();
-
+		
 		initSettings(settings);
-
-		// output data
-		LOGGER.info("basePath: " + basePath);
-		LOGGER.info("documentsPath: " + documentsPath);
-		if (paramCompilePath != null) {
-			LOGGER.info("compile param path: " + paramCompilePath);
-			if (compileAndRun) {
-				LOGGER.info("run after compile: " + compileAndRun);
-			}
-		}
-		if (paramRunPath != null) {
-			LOGGER.info("run param path: " + paramRunPath);
-		}
-
-		// init MPQ stuff
-		baseMpqInterface = new MpqEditorInterface();
+		
+		printVariables();
+		
 		initMpqInterface(baseMpqInterface);
-
+		
 		// // TEST DefaultUICatalog
 		// String baseUIpath = basePath.getParent() + File.separator + "baseUI";
 		// LOGGER.info("BaseUI path: " + baseUIpath);
@@ -168,7 +158,7 @@ public class Main extends Application {
 		// }.start();
 		// if (true)
 		// return;
-
+		
 		// WORK WORK WORK
 		if (!hasParamCompilePath) {
 			// compile all
@@ -176,9 +166,9 @@ public class Main extends Application {
 				buildGamesUIs("heroes", true);
 				buildGamesUIs("sc2", false);
 			} catch (IOException e) {
-				LOGGER.error("IOException while building UIs", e);
-				reportErrorEncounter();
 				e.printStackTrace();
+				LOGGER.error("IOException while building UIs", e);
+				errorTracker.reportErrorEncounter(e);
 			}
 		} else {
 			// build specific file due to param
@@ -186,12 +176,12 @@ public class Main extends Application {
 			try {
 				buildSpecificUI(new File(paramCompilePath), isHeroes);
 			} catch (IOException e) {
-				LOGGER.error("IOException while building UIs", e);
-				reportErrorEncounter();
 				e.printStackTrace();
+				LOGGER.error("IOException while building UIs", e);
+				errorTracker.reportErrorEncounter(e);
 			}
 		}
-
+		
 		// wait for all threads to finish
 		for (Thread buildThread : builders.values()) {
 			try {
@@ -203,24 +193,42 @@ public class Main extends Application {
 		}
 		primaryStage.setTitle("Compiling Interfaces... done.");
 		printLogMessage("All done.");
-
-		if (!hasEncounteredError()) {
+		
+		if (!errorTracker.hasEncounteredError()) {
 			// start game, launch replay
 			attemptToRunGameWithReplay(paramRunPath, compileAndRun, paramCompilePath);
 		}
-
-		if (!hasEncounteredError() && !hasParamCompilePath) {
+		
+		if (!errorTracker.hasEncounteredError() && !hasParamCompilePath) {
 			// close after 5 seconds, if compiled all and no errors
 			PauseTransition delay = new PauseTransition(Duration.seconds(5));
 			delay.setOnFinished(event -> primaryStage.close());
 			delay.play();
-		} else if (!hasEncounteredError() && (hasParamCompilePath || paramRunPath != null)) {
+		} else if (!errorTracker.hasEncounteredError() && (hasParamCompilePath || paramRunPath != null)) {
 			// close instantly, if compiled special and no errors
 			primaryStage.close();
 		}
 	}
-
+	
 	/**
+	 * Prints variables into console.
+	 */
+	private void printVariables() {
+		LOGGER.info("basePath: " + basePath);
+		LOGGER.info("documentsPath: " + documentsPath);
+		if (paramCompilePath != null) {
+			LOGGER.info("compile param path: " + paramCompilePath);
+			if (compileAndRun) {
+				LOGGER.info("run after compile: " + compileAndRun);
+			}
+		}
+		if (paramRunPath != null) {
+			LOGGER.info("run param path: " + paramRunPath);
+		}
+	}
+	
+	/**
+	 * Returns an unused thread ID.
 	 * 
 	 * @return
 	 */
@@ -228,16 +236,16 @@ public class Main extends Application {
 		// return val, then increment
 		return nextFreeBuilderID++;
 	}
-
+	
 	/**
-	 * 
+	 * Turns App's parameters into variables.
 	 */
 	private void initParams() {
 		// named params
 		// e.g. "--paramname=value".
 		Parameters params = this.getParameters();
 		Map<String, String> namedParams = params.getNamed();
-
+		
 		// COMPILE / COMPILERUN PARAM
 		// --compile="D:\GalaxyObsUI\dev\heroes\AhliObs.StormInterface"
 		paramCompilePath = namedParams.get("compile");
@@ -248,19 +256,19 @@ public class Main extends Application {
 		}
 		paramCompilePath = cutCompileParamPath(paramCompilePath);
 		hasParamCompilePath = (paramCompilePath != null);
-
+		
 		// RUN PARAM
-		// --run="F:\Spiele\Heroes of the Storm\Support\HeroesSwitcher.exe"
+		// --run="F:\Games\Heroes of the Storm\Support\HeroesSwitcher.exe"
 		paramRunPath = namedParams.get("run");
 	}
-
+	
 	/**
 	 * Initialize Paths
 	 */
 	private void initPaths() {
-		basePath = getJarDir(Main.class);
+		basePath = JarHelper.getJarDir(Main.class);
 	}
-
+	
 	/**
 	 * Initialize GUI
 	 */
@@ -273,17 +281,17 @@ public class Main extends Application {
 		TextAreaAppender.setTextArea(txtArea);
 		root.setCenter(txtArea);
 		Scene scene = new Scene(root, 1200, 400);
-		// scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
+		scene.getStylesheets().add(Main.class.getResource("application.css").toExternalForm()); //$NON-NLS-1$
 		primaryStage.setScene(scene);
 		primaryStage.show();
 		primaryStage.setTitle("Compiling Interfaces...");
 		try {
-			primaryStage.getIcons().add(new Image(Main.class.getResourceAsStream("/res/ahli.png")));
+			primaryStage.getIcons().add(new Image(Main.class.getResourceAsStream("/res/ahli.png"))); //$NON-NLS-1$
 		} catch (Exception e) {
 			LOGGER.error("Failed to load ahli.png");
 		}
 	}
-
+	
 	/**
 	 * Attempt to run the Game with the newest Replay file.
 	 * 
@@ -298,7 +306,7 @@ public class Main extends Application {
 				this.setName(this.getName().replaceFirst("Thread", "GameRunner"));
 				boolean isHeroes = false;
 				String gamePath = null;
-
+				
 				if (!compileAndRun) {
 					// use the run param
 					if (paramRunPath == null) {
@@ -342,17 +350,8 @@ public class Main extends Application {
 						}
 					}
 				}
-
-				File replay = null;
-				// try {
-				// replay = getLastUsedReplay(isHeroes);
-				// } catch (IOException e) {
-				// /* nothing */
-				// }
-				// if (replay == null || !replay.exists() || !replay.isFile()) {
-				// LOGGER.debug("Last used replay is invalid, getting newest replay instead.");
-				replay = getNewestReplay(isHeroes);
-				// }
+				
+				File replay = replayFinder.getLastOrNewestReplay(isHeroes, documentsPath);
 				if (replay != null && replay.exists() && replay.isFile()) {
 					LOGGER.info("Starting game with replay: " + replay.getName());
 					String cmd = "cmd /C start \"\" \"" + gamePath + "\" \"" + replay.getAbsolutePath() + "\"";
@@ -368,11 +367,11 @@ public class Main extends Application {
 				}
 			}
 		}.start();
-
+		
 	}
-
+	
 	/**
-	 * Param path might be some layout or folder within the interface, so we cut it
+	 * ParamPath might be some layout or folder within the interface, so we cut it
 	 * down to the interface base path.
 	 * 
 	 * @param paramPath
@@ -395,101 +394,7 @@ public class Main extends Application {
 		LOGGER.debug("cutting result: " + str);
 		return str;
 	}
-
-	/**
-	 * Returns the newest Replay file for the game.
-	 * 
-	 * @param isHeroes
-	 * @return
-	 */
-	private File getNewestReplay(boolean isHeroes) {
-		String basePath = documentsPath + File.separator;
-		String[] extensions = null;
-		if (isHeroes) {
-			basePath += "Heroes of the Storm";
-			extensions = new String[] { "StormReplay" };
-		} else {
-			basePath += "StarCraft II";
-			extensions = new String[] { "SC2Replay" };
-		}
-		basePath += File.separator + "Accounts";
-		LOGGER.debug(basePath);
-		// FAILS for some reason
-		// boolean recursive = true;
-		// Collection<File> allReplays = FileUtils.listFiles(new File(basePath),
-		// extensions, recursive);
-		Collection<File> allReplays = FileUtils.listFiles(new File(basePath), TrueFileFilter.INSTANCE,
-				TrueFileFilter.INSTANCE);
-		LOGGER.debug("# Replays found: " + allReplays.size());
-
-		long newestDate = Long.MIN_VALUE;
-		File newestReplay = null;
-		for (File curReplay : allReplays) {
-			// check extension of file
-			String curReplayName = curReplay.getName();
-			LOGGER.debug("curReplay name: " + curReplayName);
-			String extension = FilenameUtils.getExtension(curReplayName);
-			LOGGER.debug("extension: " + extension);
-			if (curReplay.isFile() && extension.equalsIgnoreCase(extensions[0])) {
-				// check date
-				long curDate = curReplay.lastModified();
-				LOGGER.debug("curDate: " + curDate);
-				if (curDate > newestDate) {
-					newestDate = curDate;
-					newestReplay = curReplay;
-				}
-			}
-		}
-		if (newestReplay != null) {
-			LOGGER.info("newest Replay: " + newestReplay.getName());
-		}
-		return newestReplay;
-	}
-
-	// /**
-	// * Returns the last used replay file read from the game's Variables.txt.
-	// *
-	// * @param isHeroes
-	// * @return
-	// * @throws IOException
-	// */
-	// private File getLastUsedReplay(boolean isHeroes) throws IOException {
-	// String basePath = documentsPath + File.separator;
-	// if (isHeroes) {
-	// basePath += "Heroes of the Storm";
-	// } else {
-	// basePath += "StarCraft II";
-	// }
-	// basePath += File.separator + "Variables.txt";
-	// LOGGER.debug(basePath);
-	//
-	// BufferedReader br = null;
-	// String line, replayPath = null;
-	// try {
-	// InputStreamReader is = new InputStreamReader(new FileInputStream(new
-	// File(basePath)),
-	// StandardCharsets.UTF_8);
-	// br = new BufferedReader(is);
-	// boolean found = false;
-	// String searchToken = "lastReplayFilePath=";
-	// while ((line = br.readLine()) != null && !found) {
-	// if (line.startsWith(searchToken)) {
-	// found = true;
-	// replayPath = line.substring(searchToken.length());
-	// }
-	// }
-	// } finally {
-	// if (br != null) {
-	// br.close();
-	// }
-	// }
-	// LOGGER.debug("replayPath: " + replayPath);
-	// if (replayPath == null) {
-	// return null;
-	// }
-	// return new File(replayPath);
-	// }
-
+	
 	/**
 	 * Build all Interfaces for game subfolders.
 	 * 
@@ -509,9 +414,9 @@ public class Main extends Application {
 				}
 			}
 		}
-
+		
 	}
-
+	
 	/**
 	 * Build a specific Interface.
 	 * 
@@ -523,11 +428,11 @@ public class Main extends Application {
 		if (interfaceFolder.isDirectory()) {
 			// build according to param
 			final int threadID = getUnusedThreadID();
-
+			
 			// create unique cache path
 			final MpqEditorInterface threadsMpqInterface = (MpqEditorInterface) baseMpqInterface.clone();
 			threadsMpqInterface.setMpqCachePath(baseMpqInterface.getMpqCachePath() + threadID);
-
+			
 			Thread buildThread = new Thread() {
 				@Override
 				public void run() {
@@ -537,7 +442,7 @@ public class Main extends Application {
 						buildFile(interfaceFolder, isHeroes, threadsMpqInterface);
 					} catch (IOException e) {
 						LOGGER.error("IOException while building UIs", e);
-						reportErrorEncounter();
+						errorTracker.reportErrorEncounter();
 						e.printStackTrace();
 					}
 				}
@@ -546,14 +451,14 @@ public class Main extends Application {
 			buildThread.start();
 		}
 	}
-
+	
 	/**
 	 * Prints a message to the message log.
 	 * 
 	 * @param msg
 	 */
 	public void printLogMessage(String msg) {
-
+		
 		Platform.runLater(new Runnable() {
 			@Override
 			public void run() {
@@ -562,7 +467,7 @@ public class Main extends Application {
 			}
 		});
 	}
-
+	
 	/**
 	 * Builds MPQ Archive File. Run this in its own thread!
 	 * 
@@ -579,25 +484,25 @@ public class Main extends Application {
 	 */
 	private void buildFile(File file, boolean isHeroes, MpqEditorInterface mpqi) throws IOException {
 		String buildPath = documentsPath + File.separator;
-
+		
 		LOGGER.info("Starting to build file: " + file.getPath());
-
+		
 		if (isHeroes) {
 			buildPath += "Heroes of the Storm";
 		} else {
 			buildPath += "StarCraft II";
 		}
 		buildPath += File.separator + "Interfaces";
-
+		
 		// get and create cache
 		File cache = new File(mpqi.getMpqCachePath());
 		if (!cache.exists() && !cache.mkdirs()) {
-			reportErrorEncounter();
+			errorTracker.reportErrorEncounter();
 			String msg = "Unable to create cache directory.";
 			LOGGER.error(msg);
 			throw new IOException(msg);
 		}
-
+		
 		int cacheClearAttempts = 0;
 		y: for (cacheClearAttempts = 0; cacheClearAttempts <= 100; cacheClearAttempts++) {
 			if (!mpqi.clearCacheExtractedMpq()) {
@@ -617,7 +522,7 @@ public class Main extends Application {
 			LOGGER.error(msg);
 			return;
 		}
-
+		
 		// put files into cache
 		int copyAttempts = 0;
 		x: for (copyAttempts = 0; copyAttempts <= 100; copyAttempts++) {
@@ -629,7 +534,7 @@ public class Main extends Application {
 				if (copyAttempts == 0) {
 					LOGGER.warn("Attempt to copy directory failed.", e);
 				} else if (copyAttempts >= 100) {
-					reportErrorEncounter();
+					errorTracker.reportErrorEncounter();
 					String msg = "Unable to copy directory after 100 copy attempts: " + e.getMessage();
 					LOGGER.error(msg, e);
 					e.printStackTrace();
@@ -642,7 +547,7 @@ public class Main extends Application {
 					LOGGER.error("Thread sleep was interrupted with exception.", e);
 				}
 			} catch (IOException e) {
-				reportErrorEncounter();
+				errorTracker.reportErrorEncounter();
 				String msg = "Unable to copy directory";
 				LOGGER.error(msg, e);
 				e.printStackTrace();
@@ -652,69 +557,57 @@ public class Main extends Application {
 			// copy keeps failing -> abort
 			String msg = "Above code did not throw exception about copy attempt threshold reached.";
 			LOGGER.error(msg);
-			reportErrorEncounter();
+			errorTracker.reportErrorEncounter();
 			throw new IOException(msg);
 		}
-
+		
 		// do stuff
 		LOGGER.debug("retrieving componentList");
 		File componentListFile = mpqi.getComponentListFile();
 		LOGGER.debug("retrieving descIndex - set path and clear");
-
+		
 		DescIndexData descIndex = new DescIndexData(mpqi);
-
+		
 		try {
 			descIndex.setDescIndexPathAndClear(ComponentsListReader.getDescIndexPath(componentListFile));
 		} catch (ParserConfigurationException | SAXException | IOException e) {
 			LOGGER.error("unable to read DescIndex path", e);
-			reportErrorEncounter();
+			errorTracker.reportErrorEncounter();
 			e.printStackTrace();
 		}
-
+		
 		LOGGER.debug("retrieving descIndex - get cached file");
 		File descIndexFile = mpqi.getFileFromMpq(descIndex.getDescIndexIntPath());
 		LOGGER.debug("adding layouts from descIndexFile: " + descIndexFile.getAbsolutePath());
 		try {
 			descIndex.addLayoutIntPath(DescIndexReader.getLayoutPathList(descIndexFile, false));
 		} catch (SAXException | ParserConfigurationException | IOException | MpqException e) {
-			String msg = "unable to read Layout paths";
-			LOGGER.error(msg);
-			reportErrorEncounter();
+			LOGGER.error("unable to read Layout paths", e);
+			errorTracker.reportErrorEncounter(e);
 			e.printStackTrace();
 		}
-
+		
 		LOGGER.info("Compiling... " + file.getName());
-
+		
 		// perform checks/improvements on code
-		compile(descIndex);
-
+		compileManager.compile(descIndex);
+		
 		LOGGER.info("Building... " + file.getName());
-
+		
 		try {
 			boolean protectMPQ = isHeroes ? settings.isHeroesProtectMPQ() : settings.isSC2ProtectMPQ();
 			mpqi.buildMpq(buildPath, file.getName(), protectMPQ, settings.isBuildUnprotectedToo());
 		} catch (IOException | InterruptedException e) {
-			String msg = "unable to construct final Interface file";
-			LOGGER.error(msg);
-			reportErrorEncounter();
+			LOGGER.error("unable to construct final Interface file", e);
+			errorTracker.reportErrorEncounter(e);
 			e.printStackTrace();
 		} catch (Exception e1) {
-			String msg = "caught an unexpected Exception";
-			LOGGER.error(msg, e1);
-			reportErrorEncounter();
+			LOGGER.error("caught an unexpected Exception", e1);
+			errorTracker.reportErrorEncounter(e1);
 			e1.printStackTrace();
 		}
 	}
-
-	// /**
-	// * Returns the Mpq Interface.
-	// *
-	// * @return
-	// */
-	// public MpqInterface getMpqInterface() {
-	// return baseMpqInterface;
-	// }
-
+	
 	/**
 	 * Is called when the App is closing.
 	 */
@@ -728,35 +621,35 @@ public class Main extends Application {
 				TimeUnit.MILLISECONDS.toSeconds(executionTime)
 						- TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(executionTime))));
 	}
-
+	
 	/**
 	 * Initializes the MPQ Interface.
 	 * 
 	 * @param mpqi
 	 */
 	private void initMpqInterface(MpqEditorInterface mpqi) {
-
+		
 		mpqi.setMpqEditorPath(basePath.getParent() + File.separator + "tools" + File.separator + "plugins"
 				+ File.separator + "mpq" + File.separator + "MPQEditor.exe");
-
 	}
-
+	
 	/**
 	 * Initializes the Settings File Interface.
 	 * 
 	 * @param settings
+	 *            settings to initialize
 	 */
-	private void initSettings(SettingsInterface settings) {
+	private void initSettings(SettingsIniInterface settings) {
 		settings.setSettingsFilePath(basePath.getParent() + File.separator + "settings.ini");
 		try {
 			settings.readSettingsFromFile();
 		} catch (FileNotFoundException e) {
 			LOGGER.error("settings file could not be found", e);
-			reportErrorEncounter();
+			errorTracker.reportErrorEncounter(e);
 			e.printStackTrace();
 		}
 	}
-
+	
 	/**
 	 * Returns true, if it belongs to Heroes of the Storm, false otherwise.
 	 * 
@@ -765,22 +658,7 @@ public class Main extends Application {
 	public boolean isHeroesFile() {
 		return namespaceHeroes;
 	}
-
-	/**
-	 * Compiles and updates the data in the cache.
-	 */
-	public void compile(DescIndexData descIndex) {
-		try {
-			// manage order of layout files in DescIndex
-			descIndex.orderLayoutFiles();
-			descIndex.persistDescIndexFile();
-		} catch (ParserConfigurationException | SAXException | IOException e) {
-			e.printStackTrace();
-			reportErrorEncounter();
-			LOGGER.error("encountered error while compiling", e);
-		}
-	}
-
+	
 	/**
 	 * Copies a folder.
 	 * 
@@ -796,7 +674,7 @@ public class Main extends Application {
 				LOGGER.error(msg);
 				throw new IOException(msg);
 			}
-
+			
 			// copy all contained files recursively
 			String[] fileList = source.list();
 			if (fileList == null) {
@@ -815,146 +693,5 @@ public class Main extends Application {
 			Files.copy(source.toPath(), target.toPath(), StandardCopyOption.REPLACE_EXISTING);
 		}
 	}
-
-	/**
-	 * from stackoverflow because why doesn't java have this functionality? It's not
-	 * like nobody would need that or it is trivial to create...
-	 * 
-	 * @param aclass
-	 * @return File at base path
-	 */
-	public static File getJarDir(Class<Main> aclass) {
-		LOGGER.debug("_FINDING JAR'S PATH");
-
-		// ATTEMPT #1
-		File f = new File(System.getProperty("java.class.path"));
-		File dir = f.getAbsoluteFile().getParentFile();
-		String str = dir.toString();
-		LOGGER.debug("Attempt#1 java.class.path: " + str);
-
-		// check if started in eclipse
-		if (str.contains("tools" + File.separator + "compiler" + File.separator + "project" + File.separator + "target"
-				+ File.separator + "classes;")) {
-			// get current working directory
-			URI uri = new File(".").toURI();
-			// results in: "file:/D:/GalaxyObsUI/dev/./"
-			// but maybe results in something completely different like
-			// notepad++'s directory...
-			// addLogMessage("METHOD TEST: " + new File(".").toURI());
-
-			str = uri.getPath();
-			LOGGER.debug("_URI path:" + str);
-
-			if (str.startsWith("file:/")) {
-				str = str.substring(6);
-			}
-			if (str.startsWith("/")) {
-				str = str.substring(1);
-			}
-			if (str.endsWith("/./")) {
-				str = str.substring(0, str.length() - 3);
-			}
-
-			URL url = aclass.getProtectionDomain().getCodeSource().getLocation();
-			// class returns "rsrc:./", if 2nd option during jar export was
-			// chosen
-			if (!url.toString().startsWith("rsrc:./")) {
-				// wild guess that we are in test environment
-				str += "/testEnv/dev/";
-				LOGGER.debug("assuming Test Environment: " + str);
-			}
-
-		}
-		LOGGER.debug("_RESULT PATH: " + str);
-
-		return new File(str);
-
-		// URL url;
-		// String extURL; // url.toExternalForm();
-		//
-		// // get an url
-		// try {
-		// addLogMessage("attempting to get URL");
-		// url = aclass.getProtectionDomain().getCodeSource().getLocation();
-		// // url is in one of two forms
-		// // ./build/classes/ NetBeans test
-		// // jardir/JarName.jar froma jar
-		// } catch (SecurityException ex) {
-		// addLogMessage("attempting to get URL - had exception");
-		// url = aclass.getResource(aclass.getSimpleName() + ".class");
-		// // url is in one of two forms, both ending
-		// // "/com/physpics/tools/ui/PropNode.class"
-		// // file:/U:/Fred/java/Tools/UI/build/classes
-		// // jar:file:/U:/Fred/java/Tools/UI/dist/UI.jar!
-		// }
-		// addLogMessage("URL: "+url);
-		//
-		// // convert to external form
-		// extURL = url.toExternalForm();
-		// addLogMessage("URL external form: "+extURL);
-		//
-		// // prune for various cases
-		// if (extURL.endsWith(".jar")) { // from getCodeSource
-		// addLogMessage("URL ends with jar");
-		//
-		// extURL = extURL.substring(0, extURL.lastIndexOf("/"));
-		// addLogMessage("extURL: "+extURL);
-		// } else { // from getResource
-		// addLogMessage("get URL from resource");
-		// String suffix = "/" + (aclass.getName()).replace(".", "/") +
-		// ".class";
-		// extURL = extURL.replace(suffix, "");
-		// addLogMessage("extURL: "+extURL);
-		// if (extURL.startsWith("jar:") && extURL.endsWith(".jar!")) {
-		// addLogMessage("JAR path cutting");
-		// extURL = extURL.substring(4, extURL.lastIndexOf("/"));
-		// addLogMessage("extURL: "+extURL);
-		// } else {
-		// addLogMessage("not JAR");
-		// //hack for dev environment => move up two levels
-		// if(extURL.endsWith("/classes/")){
-		// addLogMessage("URL ends with classes");
-		// extURL = extURL.substring(0, extURL.lastIndexOf("/"));
-		// extURL = extURL.substring(0, extURL.lastIndexOf("/"));
-		// extURL = extURL.substring(0, extURL.lastIndexOf("/"));
-		// extURL += "/testEnv/baseUI/";
-		// addLogMessage("extURL: "+extURL);
-		// }
-		// }
-		// }
-		//
-		// // convert back to url
-		// try {
-		// url = new URL(extURL);
-		// addLogMessage("URL: "+url);
-		// } catch (MalformedURLException mux) {
-		// // leave url unchanged; probably does not happen
-		// addLogMessage("leave url unchanged; probably does not happen");
-		// }
-		//
-		// // convert url to File
-		// try {
-		// return new File(url.toURI());
-		// } catch (URISyntaxException ex) {
-		// addLogMessage("catched URISyntaxException");
-		// return new File(url.getPath());
-		// }
-	}
-
-	public boolean hasEncounteredError() {
-		return encounteredError;
-	}
-
-	public void reportErrorEncounter() {
-		this.encounteredError = true;
-	}
-
-	// private void clearErrorEncounter() {
-	// this.encounteredError = false;
-	// }
-
-	public void printError(String string) {
-		this.encounteredError = true;
-		// logger does this
-	}
+	
 }

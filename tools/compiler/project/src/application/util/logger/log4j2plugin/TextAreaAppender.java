@@ -1,7 +1,11 @@
 package application.util.logger.log4j2plugin;
 
-import javafx.application.Platform;
-import javafx.scene.control.TextArea;
+import java.io.Serializable;
+import java.nio.charset.StandardCharsets;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
+
 import org.apache.logging.log4j.core.Filter;
 import org.apache.logging.log4j.core.Layout;
 import org.apache.logging.log4j.core.LogEvent;
@@ -12,11 +16,8 @@ import org.apache.logging.log4j.core.config.plugins.PluginElement;
 import org.apache.logging.log4j.core.config.plugins.PluginFactory;
 import org.apache.logging.log4j.core.layout.PatternLayout;
 
-import java.io.Serializable;
-import java.nio.charset.StandardCharsets;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReadWriteLock;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
+import javafx.application.Platform;
+import javafx.scene.control.TextArea;
 
 /**
  * TextAreaAppender for Log4j2 Source:
@@ -24,17 +25,17 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
  */
 @Plugin(name = "TextAreaAppender", category = "Core", elementType = "appender", printObject = true)
 public final class TextAreaAppender extends AbstractAppender {
-
+	
 	private static TextArea textArea;
-
+	
 	private final ReadWriteLock rwLock = new ReentrantReadWriteLock();
 	private final Lock readLock = rwLock.readLock();
-
+	
 	protected TextAreaAppender(String name, Filter filter, Layout<? extends Serializable> layout,
 			final boolean ignoreExceptions) {
 		super(name, filter, layout, ignoreExceptions);
 	}
-
+	
 	/**
 	 * This method is where the appender does the work.
 	 *
@@ -44,11 +45,11 @@ public final class TextAreaAppender extends AbstractAppender {
 	@Override
 	public void append(LogEvent event) {
 		readLock.lock();
-
+		
 		// append log text to TextArea
 		try {
 			final String message = new String(getLayout().toByteArray(event), StandardCharsets.UTF_8);
-
+			
 			Platform.runLater(() -> {
 				try {
 					if (textArea != null) {
@@ -65,12 +66,12 @@ public final class TextAreaAppender extends AbstractAppender {
 			});
 		} catch (final IllegalStateException ex) {
 			ex.printStackTrace();
-
+			
 		} finally {
 			readLock.unlock();
 		}
 	}
-
+	
 	/**
 	 * Factory method. Log4j will parse the configuration and call this factory
 	 * method to construct the appender with the configured attributes.
@@ -96,7 +97,7 @@ public final class TextAreaAppender extends AbstractAppender {
 		}
 		return new TextAreaAppender(name, filter, layout, true);
 	}
-
+	
 	/**
 	 * Set TextArea to append
 	 *

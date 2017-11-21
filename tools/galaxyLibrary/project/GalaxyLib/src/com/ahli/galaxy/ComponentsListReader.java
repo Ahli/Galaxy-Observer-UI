@@ -20,8 +20,8 @@ import org.xml.sax.SAXException;
  *
  */
 public class ComponentsListReader {
-	static Logger LOGGER = LogManager.getLogger("ComponentsListReader");
-
+	static Logger LOGGER = LogManager.getLogger(ComponentsListReader.class);
+	
 	/**
 	 * Returns the internal path of DescIndex of the mpq file.
 	 * 
@@ -37,10 +37,10 @@ public class ComponentsListReader {
 		LOGGER.trace("DescIndexPath: " + str);
 		return str;
 	}
-
+	
 	/**
-	 * Returns the path information of a given type value, e.g. "uiui" or
-	 * "font". Locales are not supported here.
+	 * Returns the path information of a given type value, e.g. "uiui" or "font".
+	 * Locales are not supported here.
 	 * 
 	 * @return
 	 * @throws ParserConfigurationException
@@ -52,7 +52,7 @@ public class ComponentsListReader {
 		// find the type in the xml
 		DocumentBuilder dBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
 		Document doc = dBuilder.parse(f);
-
+		
 		// must be in a DataComponent node
 		NodeList nodeList = doc.getElementsByTagName("DataComponent");
 		for (int i = 0; i < nodeList.getLength(); i++) {
@@ -64,7 +64,7 @@ public class ComponentsListReader {
 				return node.getTextContent();
 			}
 		}
-
+		
 		return null;
 	}
 }

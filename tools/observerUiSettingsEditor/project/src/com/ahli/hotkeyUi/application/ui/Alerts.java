@@ -20,11 +20,11 @@ import javafx.stage.Window;
 /**
  * 
  * @author Ahli
- *
+ * 
  */
 public class Alerts {
-	static Logger LOGGER = LogManager.getLogger("Alerts");
-
+	static Logger LOGGER = LogManager.getLogger(Alerts.class);
+	
 	/**
 	 * 
 	 * @param owner
@@ -45,7 +45,7 @@ public class Alerts {
 		LOGGER.warn("created yesNoCancelAlert within " + (System.nanoTime() - time) / 1000000 + "ms.");
 		return alert;
 	}
-
+	
 	/**
 	 * 
 	 * @param owner
@@ -64,7 +64,7 @@ public class Alerts {
 		LOGGER.warn("created errorAlert within " + (System.nanoTime() - time) / 1000000 + "ms.");
 		return alert;
 	}
-
+	
 	/**
 	 * 
 	 * @param owner
@@ -83,7 +83,7 @@ public class Alerts {
 		LOGGER.warn("created infoAlert within " + (System.nanoTime() - time) / 1000000 + "ms.");
 		return alert;
 	}
-
+	
 	/**
 	 * 
 	 * @param owner
@@ -102,7 +102,7 @@ public class Alerts {
 		LOGGER.warn("created warningAlert within " + (System.nanoTime() - time) / 1000000 + "ms.");
 		return alert;
 	}
-
+	
 	/**
 	 * 
 	 * @param owner
@@ -126,7 +126,7 @@ public class Alerts {
 		LOGGER.warn("initialized about-alert within " + (System.nanoTime() - time) / 1000000 + "ms.");
 		return alert;
 	}
-
+	
 	/**
 	 * 
 	 * @param owner
@@ -139,28 +139,28 @@ public class Alerts {
 		String localizedMsg = e.getLocalizedMessage();
 		Alert alert = new Alert(AlertType.ERROR, localizedMsg, okButton);
 		alert.initOwner(owner);
-
+		
 		Label label = new Label(Messages.getString("General.ExceptionStackTrace")); //$NON-NLS-1$
 		String stackTrace = ExceptionUtils.getStackTrace(e);
-
+		
 		TextArea textArea = new TextArea(stackTrace);
 		textArea.setEditable(false);
 		textArea.setWrapText(true);
-
+		
 		textArea.setMaxWidth(Double.MAX_VALUE);
 		textArea.setMaxHeight(Double.MAX_VALUE);
 		GridPane.setVgrow(textArea, Priority.ALWAYS);
 		GridPane.setHgrow(textArea, Priority.ALWAYS);
-
+		
 		GridPane expContent = new GridPane();
 		expContent.setMaxWidth(Double.MAX_VALUE);
 		expContent.add(label, 0, 0);
 		expContent.add(textArea, 0, 1);
-
+		
 		// Set expandable Exception into the dialog pane.
 		alert.getDialogPane().setExpandableContent(expContent);
 		LOGGER.warn("created exceptionAlert within " + (System.nanoTime() - time) / 1000000 + "ms.");
-
+		
 		return alert;
 	}
 }
