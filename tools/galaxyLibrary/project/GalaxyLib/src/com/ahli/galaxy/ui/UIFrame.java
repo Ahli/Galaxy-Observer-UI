@@ -247,4 +247,9 @@ public class UIFrame extends UIElement {
 		return clone;
 	}
 	
+	@Override
+	public String toString() {
+		return "<Frame type='" + type + "' name='" + name + "'>";
+	}
+	
 }

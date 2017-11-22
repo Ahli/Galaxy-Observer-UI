@@ -118,4 +118,9 @@ public class UIController extends UIElement {
 		
 		return clone;
 	}
+	
+	@Override
+	public String toString() {
+		return "<Controller name='" + name + "'>";
+	}
 }

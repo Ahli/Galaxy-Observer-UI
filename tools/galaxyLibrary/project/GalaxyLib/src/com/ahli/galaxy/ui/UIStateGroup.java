@@ -89,4 +89,9 @@ public class UIStateGroup extends UIElement {
 		
 		return clone;
 	}
+	
+	@Override
+	public String toString() {
+		return "<StateGroup name='" + name + "'>";
+	}
 }

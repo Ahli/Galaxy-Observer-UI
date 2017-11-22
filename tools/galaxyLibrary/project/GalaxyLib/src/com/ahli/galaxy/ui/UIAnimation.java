@@ -138,4 +138,9 @@ public class UIAnimation extends UIElement {
 		
 		return clone;
 	}
+	
+	@Override
+	public String toString() {
+		return "<Animation name='" + name + "'>";
+	}
 }

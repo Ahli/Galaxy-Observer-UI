@@ -89,4 +89,9 @@ public class UITemplate {
 		LOGGER.debug("did not find template: " + path);
 		return null;
 	}
+	
+	@Override
+	public String toString() {
+		return "<Template fileName='" + fileName + "'>";
+	}
 }

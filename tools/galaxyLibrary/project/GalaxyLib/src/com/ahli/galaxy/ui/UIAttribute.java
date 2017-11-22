@@ -60,4 +60,9 @@ public class UIAttribute extends UIElement {
 		
 		return clone;
 	}
+	
+	@Override
+	public String toString() {
+		return "<Attribute name='" + name + "'>";
+	}
 }

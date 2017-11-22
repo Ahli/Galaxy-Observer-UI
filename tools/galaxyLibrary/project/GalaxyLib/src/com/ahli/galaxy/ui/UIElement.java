@@ -67,4 +67,8 @@ public abstract class UIElement {
 	 */
 	public abstract Object deepClone();
 	
+	@Override
+	public String toString() {
+		return "<UIElement name='" + name + "'>";
+	}
 }

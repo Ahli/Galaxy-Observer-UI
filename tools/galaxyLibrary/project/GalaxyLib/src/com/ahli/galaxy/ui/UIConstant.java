@@ -52,4 +52,9 @@ public class UIConstant extends UIElement {
 		
 		return clone;
 	}
+	
+	@Override
+	public String toString() {
+		return "<Constant name='" + name + "', value='" + value + "'>";
+	}
 }

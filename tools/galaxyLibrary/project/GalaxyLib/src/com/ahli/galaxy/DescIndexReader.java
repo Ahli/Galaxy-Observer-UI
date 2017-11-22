@@ -16,6 +16,8 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
+import com.ahli.util.XmlDomHelper;
+
 /**
  * Reads a a Desc Index File.
  * 
@@ -51,8 +53,8 @@ public class DescIndexReader {
 				String path = attributes.item(0).getNodeValue();
 				
 				// ignore requiredtoload if desired
-				if (ignoreRequiredToLoadEntries && attributes.getLength() > 1
-						&& attributes.item(1).getNodeName().equalsIgnoreCase("requiredtoload")) {
+				if (ignoreRequiredToLoadEntries
+						&& XmlDomHelper.getNamedItemIgnoringCase(attributes, "requiredtoload") != null) {
 					continue;
 				}
 				
