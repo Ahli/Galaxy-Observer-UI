@@ -1,0 +1,1976 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<Desc>
+
+    <!--
+
+    =================================================
+
+    PLAYER IDENTIFICATION TEMPLATES
+
+    =================================================
+
+    -->
+        
+        <!--
+        ===================================
+        Player Data Frame
+        ===================================
+        
+        This is the frame that should contain all other frames specific to this player.  They will all point to this one as their ancestor
+        to check to see what its "VersusModePlayerSide" and "VersusModePlayerIndex" properties are and assign those property
+        values to themselves.
+        
+        In the final place where you are actually adding this frame to the GameUI you will need to make sure to set those two
+        properties to the player you want, otherwise virtually nothing will work.
+        -->
+    
+        <Frame type="PlayerFrame" name="Template_PlayerData">
+            <Anchor relative="$parent"/>
+            <CustomTeamColor val="#Red" index="1"/>
+            <CustomTeamColor val="#Blue" index="2"/>
+            <CustomTeamColor val="#Teal" index="3"/>
+            <CustomTeamColor val="#Purple" index="4"/>
+            <CustomTeamColor val="#Yellow" index="5"/>
+            <CustomTeamColor val="#Orange" index="6"/>
+            <CustomTeamColor val="#Green" index="7"/>
+            <CustomTeamColor val="#LightPink" index="8"/>
+            <CustomTeamColor val="#Violet" index="9"/>
+            <CustomTeamColor val="#LightGrey" index="10"/>
+            <CustomTeamColor val="#DarkGreen" index="11"/>
+            <CustomTeamColor val="#Brown" index="12"/>
+            <CustomTeamColor val="#LightGreen" index="13"/>
+            <CustomTeamColor val="#DarkGrey" index="14"/>
+            <CustomTeamColor val="#Pink" index="15"/>
+        </Frame>
+
+        
+        <!-- 
+        
+        -->
+        
+        <Frame type="Label" name="Template_PlayerNameLabel">
+            <Anchor relative="$parent"/>
+            <Options val="NoWrapping"/>
+            <Style val="WCSPlayerName"/>
+            <IgnoreParentColor val="True"/>
+            
+            <StateGroup name="GameTypeState">
+                
+                <State name="1v1">
+                    <When type="AnimationState" frame="$GameUI" versusMode="1v1"/>
+                    <Action type="SetProperty" frame="$this" style="WCSPlayerName"/>
+                </State>
+                
+                <State name="2v2">
+                    <When type="AnimationState" frame="$GameUI" versusMode="2v2"/>
+                    <Action type="SetProperty" frame="$this" style="WCSPlayerName"/>
+                </State>
+                
+                <State name="3v3">
+                    <When type="AnimationState" frame="$GameUI" versusMode="3v3"/>
+                    <Action type="SetProperty" frame="$this" style="WCSPlayerName_Small"/>
+                </State>
+                
+                <State name="4v4">
+                    <When type="AnimationState" frame="$GameUI" versusMode="4v4"/>
+                    <Action type="SetProperty" frame="$this" style="WCSPlayerName_Small"/>
+                </State>
+            </StateGroup>
+        </Frame>
+        
+        <!--
+        ===================================
+        Player name Labels
+        ===================================
+        
+        This container handles displaying the player names, whether the default names, the names from the mod, or auto-detecting what to show.
+        -->
+
+        <Frame type="Frame" name="Template_PlayerNameLabelContainer">
+
+            <!-- PlayerName Label (Standard) -->
+            <Frame type="Frame" name="PlayerName_Label_Standard">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+            
+                <Frame type="PlayerNameFrame" name="PlayerNameFrame">
+                    <Anchor relative="$parent"/>
+                    <ShowClanTag val="false"/>
+                    <VersusModePlayerSide val="{$ancestor[@name=PlayerData]/@VersusModePlayerSide}"/>
+                    <VersusModePlayerIndex val="{$ancestor[@name=PlayerData]/@VersusModePlayerIndex}"/>
+                    
+                    <Frame type="Label" name="PlayerNameLabel" template="WCS_Templates_PlayerBar_Generic/Template_PlayerNameLabel">
+                        <Anchor relative="$parent"/>
+                        <Options val="NoWrapping"/>
+                        <Style val="WCSPlayerName"/>
+                        <IgnoreParentColor val="True"/>
+                    </Frame>
+                </Frame>
+                
+                <StateGroup name="VisibleState">
+
+                    <State name="Visible">
+                        <When type="Property" frame="$PlayerName_Standard" visible="True"/>
+                        <Action type="SetProperty" frame="$this" visible="True"/>
+                    </State>
+                    
+                    <State name="NotVisible">
+                        <When type="Property" frame="$PlayerName_Standard" visible="False"/>
+                        <Action type="SetProperty" frame="$this" visible="False"/>
+                    </State>
+                </StateGroup>
+            </Frame>
+            
+            <!-- PlayerName Label (From Logos.SC2Mod) -->
+            <Frame type="Frame" name="PlayerName_Label_FromMod">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+                
+                <Frame type="PlayerLogoTextFrame" name="PlayerLogoTextFrame">
+                    <Anchor relative="$parent"/>
+                    <FrameLogoAlias val="PlayerName"/>
+                    
+                    <VersusModePlayerSide val="{$ancestor[@name=PlayerData]/@VersusModePlayerSide}"/>
+                    <VersusModePlayerIndex val="{$ancestor[@name=PlayerData]/@VersusModePlayerIndex}"/>
+
+                    <Frame type="Label" name="LogoLabel" template="WCS_Templates_PlayerBar_Generic/Template_PlayerNameLabel">
+                        <Anchor relative="$parent"/>
+                        <Text val=" "/>
+                        <IgnoreParentColor val="True"/>
+                        <Style val="WCSPlayerName"/>
+                    </Frame>
+                </Frame>
+                
+                <StateGroup name="VisibleState">
+            
+                    <State name="Visible">
+                        <When type="Property" frame="$PlayerName_FromMod" visible="True"/>
+                        <Action type="SetProperty" frame="$this" visible="True"/>
+                    </State>
+                    
+                    <State name="NotVisible">
+                        <When type="Property" frame="$PlayerName_FromMod" visible="False"/>
+                        <Action type="SetProperty" frame="$this" visible="False"/>
+                    </State>
+                </StateGroup>
+            </Frame>
+            
+            <!-- PlayerName Label (Auto-detecting what to show between standard and Logos mod) (DEFAULT) -->
+            <Frame type="Frame" name="PlayerName_Label_AutoDetect">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+                
+                <Frame type="Frame" name="Standard">
+                    <Anchor relative="$parent"/>
+                    
+                    <Frame type="PlayerNameFrame" name="PlayerNameFrame">
+                        <Anchor relative="$parent"/>
+                        <ShowClanTag val="false"/>
+                        <VersusModePlayerSide val="{$ancestor[@name=PlayerData]/@VersusModePlayerSide}"/>
+                        <VersusModePlayerIndex val="{$ancestor[@name=PlayerData]/@VersusModePlayerIndex}"/>
+                        <Visible val="False"/>
+                        
+                        <Frame type="Label" name="PlayerNameLabel" template="WCS_Templates_PlayerBar_Generic/Template_PlayerNameLabel">
+                            <Anchor relative="$parent"/>
+                            <Options val="NoWrapping"/>
+                            <Style val="WCSPlayerName"/>
+                            <IgnoreParentColor val="True"/>
+                        </Frame>
+                    </Frame>
+                </Frame>
+                
+                <Frame type="Frame" name="FromMod">
+                    <Anchor relative="$parent"/>
+                    <Visible val="False"/>
+                    
+                    <Frame type="PlayerLogoTextFrame" name="PlayerLogoTextFrame">
+                        <Anchor relative="$parent"/>
+                        <FrameLogoAlias val="PlayerName"/>
+                        
+                        <VersusModePlayerSide val="{$ancestor[@name=PlayerData]/@VersusModePlayerSide}"/>
+                        <VersusModePlayerIndex val="{$ancestor[@name=PlayerData]/@VersusModePlayerIndex}"/>
+
+                        <Frame type="Label" name="LogoLabel" template="WCS_Templates_PlayerBar_Generic/Template_PlayerNameLabel">
+                            <Anchor relative="$parent"/>
+                            <IgnoreParentColor val="True"/>
+                            <Style val="WCSPlayerName"/>
+                        </Frame>
+                    </Frame>
+                </Frame>
+                
+                <StateGroup name="TypeState">
+                    <DefaultState val="FromMod"/>
+            
+                    <State name="Standard">
+                        <When type="Property" frame="$this/FromMod/PlayerLogoTextFrame/LogoLabel" text=""/>
+                        <Action type="SetProperty" frame="$this/Standard" visible="True"/>
+                        <Action type="SetProperty" frame="$this/FromMod" visible="False"/>
+                    </State>
+                    
+                    <State name="FromMod">
+                        <Action type="SetProperty" frame="$this/Standard" visible="False"/>
+                        <Action type="SetProperty" frame="$this/FromMod" visible="True"/>
+                    </State>
+                </StateGroup>
+                
+                <StateGroup name="VisibleState">
+                
+                    <State name="Visible">
+                        <When type="Property" frame="$PlayerName_AutoDetect" visible="True"/>
+                        <Action type="SetProperty" frame="$this" visible="True"/>
+                    </State>
+                    
+                    <State name="NotVisible">
+                        <When type="Property" frame="$PlayerName_AutoDetect" visible="False"/>
+                        <Action type="SetProperty" frame="$this" visible="False"/>
+                    </State>
+                </StateGroup>
+            </Frame>
+        </Frame>
+
+        <!--
+        ===================================
+        Team Logo
+        ===================================
+        
+        This small frame displays the player's team logo when the player has one, the race logo when they don't.  If neither player
+        has a team logo it will automatically hide itself.
+        -->
+        
+        <Frame type="Frame" name="Template_TeamLogo">
+            <Width val="#Height_PlayerBar"/>
+            <Height val="#Height_PlayerBar"/>
+            <CollapseLayout val="True"/>
+            
+            <Frame type="Image" name="Background">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+                <Texture val="@WCS/RoundedRectangle_Small"/>
+                <TextureType val="NineSlice"/>
+                <Color val="#Color_RaceIcon_Background"/>
+            </Frame>
+            
+            <Frame type="Frame" name="Logo">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="2"/>
+                <Anchor side="Bottom" relative="$parent" pos="Max" offset="-2"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="2"/>
+                <Anchor side="Right" relative="$parent" pos="Max" offset="-2"/>
+                <Visible val="False"/>
+                
+                <Frame type="PlayerLogoImageFrame" name="PlayerLogoImageFrame">
+                    <Anchor relative="$parent"/>
+                    <FrameLogoAlias val="LogoSmall"/>
+                    <VersusModePlayerSide val="{$ancestor[@name=PlayerData]/@VersusModePlayerSide}"/>
+                    <VersusModePlayerIndex val="{$ancestor[@name=PlayerData]/@VersusModePlayerIndex}"/>
+
+                    <Frame type="Image" name="LogoImage">
+                        <Anchor relative="$parent"/>
+                        <TextureType val="Normal"/>
+                        <BlendMode val="Normal"/>
+                        <IgnoreParentColor val="True"/>
+                        <Texture val="Assets/Textures/Blank.dds"/>
+                    </Frame>
+                </Frame>
+            </Frame>
+            
+            <Frame type="Frame" name="RaceIcon">
+                <Anchor relative="$parent"/>
+                <Visible val="False"/>
+                
+                <Frame type="PlayerRaceIconFrame" name="PlayerRaceIconFrame">
+                    <Anchor relative="$parent"/>
+                    <VersusModePlayerSide val="{$ancestor[@name=PlayerData]/@VersusModePlayerSide}"/>
+                    <VersusModePlayerIndex val="{$ancestor[@name=PlayerData]/@VersusModePlayerIndex}"/>
+                    <BaseTexture val="@WCS/Race"/>
+
+                    <Frame type="Image" name="RaceImage">
+                        <Anchor relative="$parent"/>
+                        <TextureType val="Normal"/>
+                        <IgnoreParentColor val="True"/>
+                        <Color val="{$ancestor[@name=PlayerData]/@Color}"/>
+                    </Frame>
+                </Frame>
+            </Frame>
+            
+            <StateGroup name="TeamLogoState">
+                <DefaultState val="Visible"/>
+                
+                <State name="NotVisible">
+                    <When type="Property" frame="$this/Logo/PlayerLogoImageFrame/LogoImage" texture=""/>
+                    <Action type="SetProperty" frame="$this/Logo" visible="False"/>
+                    <Action type="SetProperty" frame="$this/RaceIcon" visible="True"/>
+                </State>
+                
+                <State name="Visible">
+                    <Action type="SetProperty" frame="$this/Logo" visible="True"/>
+                    <Action type="SetProperty" frame="$this/RaceIcon" visible="False"/>
+                </State>
+            </StateGroup>
+            
+            <StateGroup name="VisibleState">
+                <DefaultState val="Visible"/>
+                
+                <State name="NotVisible">
+                    <When type="Property" frame="$TeamLogos_VisibleState" visible="False"/>
+                    <Action type="SetProperty" frame="$this" visible="False"/>
+                </State>
+                
+                <State name="Visible">
+                    <When type="Property" frame="$TeamLogos_VisibleState" visible="True"/>
+                    <Action type="SetProperty" frame="$this" visible="True"/>
+                </State>
+            </StateGroup>
+        </Frame>
+        
+        <!--
+        ===================================
+        Complete player identification bar
+        ===================================
+        
+        Dropping this into a PlayerData frame will automatically generate a display for the player's name, color, team logo and race icon.
+        -->
+        
+        <Frame type="Frame" name="Template_PlayerIdentificationContainer">
+            
+            <Frame type="Image" name="Background">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+                <Texture val="@WCS/RoundedRectangle_Small"/>
+                <TextureType val="NineSlice"/>
+                <Color val="{$ancestor[@name=PlayerData]/@Color}"/>
+            </Frame>
+            
+            <Frame type="Frame" name="RaceIconContainer">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+                <Anchor side="Right" relative="$parent" pos="Max" offset="-4"/>
+                <Width val="41"/>
+                <CollapseLayout val="True"/>
+                
+                <Frame type="Image" name="Background">
+                    <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                    <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+                    <Anchor side="Left" relative="$parent" pos="Min" offset="-10"/>
+                    <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+                    <Texture val="@WCS/RoundedRectangle_Small"/>
+                    <TextureType val="NineSlice"/>
+                    <IgnoreParentColor val="True"/>
+                    <Color val="70,70,70"/>
+                    <BlendMode val="Subtract"/>
+                </Frame>
+                
+                <Frame type="PlayerRaceIconFrame" name="RaceIconFrame">
+                    <Anchor side="Top" relative="$parent" pos="Mid" offset="-20"/>
+                    <Anchor side="Right" relative="$parent" pos="Max" offset="1"/>
+                    <Width val="40"/>
+                    <Height val="40"/>
+                    <VersusModePlayerSide val="{$ancestor[@name=PlayerData]/@VersusModePlayerSide}"/>
+                    <VersusModePlayerIndex val="{$ancestor[@name=PlayerData]/@VersusModePlayerIndex}"/>
+                    
+                    <BaseTexture val="@WCS/Race"/>
+
+                    <Frame type="Image" name="RaceImage">
+                        <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                        <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+                        <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                        <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+                        <TextureType val="Normal"/>
+                        <IgnoreParentColor val="True"/>
+                        <Color val="255,255,255"/>
+                    </Frame>
+                </Frame>
+                
+                <StateGroup name="GameTypeState">
+                
+                    <State name="1v1">
+                        <When type="AnimationState" frame="$GameUI" versusMode="1v1"/>
+                        <Action type="SetProperty" frame="$this" visible="True"/>
+                    </State>
+                    
+                    <State name="2v2">
+                        <When type="AnimationState" frame="$GameUI" versusMode="2v2"/>
+                        <Action type="SetProperty" frame="$this" visible="True"/>
+                    </State>
+                    
+                    <State name="3v3">
+                        <When type="AnimationState" frame="$GameUI" versusMode="3v3"/>
+                        <Action type="SetProperty" frame="$this" visible="False"/>
+                    </State>
+                    
+                    <State name="4v4">
+                        <When type="AnimationState" frame="$GameUI" versusMode="4v4"/>
+                        <Action type="SetProperty" frame="$this" visible="False"/>
+                    </State>
+                </StateGroup>
+            </Frame>
+            
+            <Frame type="Image" name="PlayerName_RaceIconOverlap">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="20"/>
+                <Anchor side="Right" relative="$parent" pos="Max" offset="-42"/>
+                <Texture val="@WCS/RoundedRectangle_Small"/>
+                <TextureType val="NineSlice"/>
+                <Color val="{$ancestor[@name=PlayerData]/@Color}"/>
+                
+                <StateGroup name="GameTypeState">
+                
+                    <State name="1v1">
+                        <When type="AnimationState" frame="$GameUI" versusMode="1v1"/>
+                        <Action type="SetProperty" frame="$this" visible="True"/>
+                    </State>
+                    
+                    <State name="2v2">
+                        <When type="AnimationState" frame="$GameUI" versusMode="2v2"/>
+                        <Action type="SetProperty" frame="$this" visible="True"/>
+                    </State>
+                    
+                    <State name="3v3">
+                        <When type="AnimationState" frame="$GameUI" versusMode="3v3"/>
+                        <Action type="SetProperty" frame="$this" visible="False"/>
+                    </State>
+                    
+                    <State name="4v4">
+                        <When type="AnimationState" frame="$GameUI" versusMode="4v4"/>
+                        <Action type="SetProperty" frame="$this" visible="False"/>
+                    </State>
+                </StateGroup>
+            </Frame>
+            
+            <!-- Team Logo -->
+            <Frame type="Frame" name="TeamLogo" template="WCS_Templates_PlayerBar_Generic/Template_TeamLogo">
+                <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="4"/>
+            </Frame>
+            
+            <Frame type="Frame" name="PlayerNameLabelContainer" template="WCS_Templates_PlayerBar_Generic/Template_PlayerNameLabelContainer">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="2"/>
+                <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+                <Anchor side="Left" relative="$parent/TeamLogo" pos="Max" offset="8"/>
+                <Anchor side="Right" relative="$parent/RaceIconContainer" pos="Min" offset="0"/>
+                <PreserveAnchorOffset val="True"/>
+            </Frame>
+        </Frame>
+        
+        
+        
+    <!--
+
+    =================================================
+
+    PLAYER SCORE DATA TEMPLATES (Supply, Minerals etc)
+
+    =================================================
+
+    -->
+    
+        <!--
+        ===================================
+        Resource Label Template
+        ===================================
+        -->
+        
+        <Frame type="Label" name="Template_ResourceLabel">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+            <Style val="WCSResource_Standard"/>
+            
+            <StateGroup name="GameTypeState">
+                
+                <State name="1v1">
+                    <When type="AnimationState" frame="$GameUI" versusMode="1v1"/>
+                    <Action type="SetProperty" frame="$this" style="WCSResource_Standard"/>
+                </State>
+                
+                <State name="2v2">
+                    <When type="AnimationState" frame="$GameUI" versusMode="2v2"/>
+                    <Action type="SetProperty" frame="$this" style="WCSResource_Standard"/>
+                </State>
+                
+                <State name="3v3">
+                    <When type="AnimationState" frame="$GameUI" versusMode="3v3"/>
+                    <Action type="SetProperty" frame="$this" style="WCSResource_Small"/>
+                </State>
+                
+                <State name="4v4">
+                    <When type="AnimationState" frame="$GameUI" versusMode="4v4"/>
+                    <Action type="SetProperty" frame="$this" style="WCSResource_Small"/>
+                </State>
+            </StateGroup>
+        </Frame>
+
+        <!--
+        ===================================
+        Player Supply Template
+        ===================================
+        -->
+        
+        <Frame type="PlayerSupplyFrame" name="PlayerSupply_Template">
+            <VersusModePlayerSide val="{$ancestor[@name=PlayerData]/@VersusModePlayerSide}"/>
+            <VersusModePlayerIndex val="{$ancestor[@name=PlayerData]/@VersusModePlayerIndex}"/>
+            
+            <Frame type="Label" name="UsedLabel">
+                <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="14"/>
+                <IgnoreParentColor val="true"/>
+                <Style val="WCSSupplyUsed"/>
+                
+                <StateGroup name="GameTypeState">
+                
+                    <State name="1v1">
+                        <When type="AnimationState" frame="$GameUI" versusMode="1v1"/>
+                        <Action type="SetProperty" frame="$this" style="WCSSupplyUsed"/>
+                    </State>
+                    
+                    <State name="2v2">
+                        <When type="AnimationState" frame="$GameUI" versusMode="2v2"/>
+                        <Action type="SetProperty" frame="$this" style="WCSSupplyUsed_2v2"/>
+                    </State>
+                    
+                    <State name="3v3">
+                        <When type="AnimationState" frame="$GameUI" versusMode="3v3"/>
+                        <Action type="SetProperty" frame="$this" style="WCSSupplyUsed_3v3"/>
+                    </State>
+                    
+                    <State name="4v4">
+                        <When type="AnimationState" frame="$GameUI" versusMode="4v4"/>
+                        <Action type="SetProperty" frame="$this" style="WCSSupplyUsed_4v4"/>
+                    </State>
+                </StateGroup>
+            </Frame>
+
+            <Frame type="Label" name="DividerLabel">
+                <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Left" relative="$parent/UsedLabel" pos="Max" offset="0"/>
+                <IgnoreParentColor val="true"/>
+                <Style val="WCSSupplyCap"/>
+                <Text val=" /"/>
+            </Frame>
+
+            <Frame type="Label" name="CapLabel">
+                <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Left" relative="$parent/DividerLabel" pos="Max" offset="0"/>
+                <IgnoreParentColor val="true"/>
+                <Style val="WCSSupplyCap"/>
+            </Frame>
+        </Frame>
+        
+        <!--
+        ===================================
+        Player Minerals Template
+        ===================================
+        -->
+        
+        <Frame type="Frame" name="Template_Minerals">
+            <Width val="#Width_Minerals"/>
+            
+            <Frame type="PlayerScoreValueFrame" name="PlayerScoreValueFrame">
+                <Anchor relative="$parent"/>
+                <VersusModePlayerSide val="{$ancestor[@name=PlayerData]/@VersusModePlayerSide}"/>
+                <VersusModePlayerIndex val="{$ancestor[@name=PlayerData]/@VersusModePlayerIndex}"/>
+            
+                <!-- Minerals -->
+                <Frame type="ScoreValueLabelFrame" name="ScoreValueFrame0">
+                    <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                    <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+                    <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                    <Anchor side="Right" relative="$this/Label" pos="Max" offset="0"/>
+                    <ScoreValue val="MineralsCurrent"/>
+                    <AddCommas val="False"/>
+                    
+                    <Frame type="Label" name="Label" template="WCS_Templates_PlayerBar_Generic/Template_ResourceLabel">
+                        <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                        <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+                        <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                        <Style val="WCSResource_Standard"/>
+                        <Color val="#Color_Minerals"/>
+                    </Frame>
+                </Frame>
+            </Frame>
+        </Frame>
+        
+        <!--
+        ===================================
+        Player Minerals with Income Template
+        ===================================
+        -->
+        
+        <Frame type="Frame" name="Template_MineralsWithIncome">
+            <Width val="#Width_Minerals"/>
+            
+            <Frame type="PlayerScoreValueFrame" name="PlayerScoreValueFrame">
+                <Anchor relative="$parent"/>
+                <VersusModePlayerSide val="{$ancestor[@name=PlayerData]/@VersusModePlayerSide}"/>
+                <VersusModePlayerIndex val="{$ancestor[@name=PlayerData]/@VersusModePlayerIndex}"/>
+            
+                <!-- Minerals -->
+                <Frame type="ScoreValueLabelFrame" name="ScoreValueFrame0">
+                    <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                    <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+                    <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                    <Anchor side="Right" relative="$this/Label" pos="Max" offset="0"/>
+                    <ScoreValue val="MineralsCurrent"/>
+                    <AddCommas val="False"/>
+                    
+                    <Frame type="Label" name="Label" template="WCS_Templates_PlayerBar_Generic/Template_ResourceLabel">
+                        <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                        <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+                        <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                        <Style val="WCSResource_Standard"/>
+                        <Color val="#Color_Minerals"/>
+                    </Frame>
+                </Frame>
+                
+                <!-- Minerals Plus -->
+                <Frame type="Label" name="MineralsPlus">
+                    <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                    <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+                    <Anchor side="Left" relative="$parent/ScoreValueFrame0" pos="Max" offset="5"/>
+                    <Style val="WCSResource_Small"/>
+                    <Color val="#Color_MineralsIncome"/>
+                    <Text val="+"/>
+                </Frame>
+                
+                <!-- Minerals Income -->
+                <Frame type="ScoreValueLabelFrame" name="ScoreValueFrame1">
+                    <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                    <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+                    <Anchor side="Left" relative="$parent/MineralsPlus" pos="Max" offset="-2"/>
+                    <Anchor side="Right" relative="$this/Label" pos="Max" offset="0"/>
+                    <ScoreValue val="MineralsCollectionRate"/>
+                    <AddCommas val="False"/>
+                    
+                    <Frame type="Label" name="Label">
+                        <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                        <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+                        <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                        <Style val="WCSResource_Small"/>
+                        <Color val="#Color_MineralsIncome"/>
+                    </Frame>
+                </Frame>
+            </Frame>
+        </Frame>
+        
+        <!--
+        ===================================
+        Player Gas Template
+        ===================================
+        -->
+        
+        <Frame type="Frame" name="Template_Gas">
+            <Width val="#Width_Gas"/>
+            
+            <Frame type="PlayerScoreValueFrame" name="PlayerScoreValueFrame">
+                <Anchor relative="$parent"/>
+                <VersusModePlayerSide val="{$ancestor[@name=PlayerData]/@VersusModePlayerSide}"/>
+                <VersusModePlayerIndex val="{$ancestor[@name=PlayerData]/@VersusModePlayerIndex}"/>
+            
+                <!-- Gas -->
+                <Frame type="ScoreValueLabelFrame" name="ScoreValueFrame0">
+                    <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                    <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+                    <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                    <Anchor side="Right" relative="$this/Label" pos="Max" offset="0"/>
+                    <ScoreValue val="VespeneCurrent"/>
+                    <AddCommas val="False"/>
+                    
+                    <Frame type="Label" name="Label" template="WCS_Templates_PlayerBar_Generic/Template_ResourceLabel">
+                        <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                        <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+                        <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                        <Style val="WCSResource_Standard"/>
+                        <Color val="#Color_Gas"/>
+                    </Frame>
+                </Frame>
+            </Frame>
+        </Frame>
+        
+        <!--
+        ===================================
+        Player Gas with Income Template
+        ===================================
+        -->
+        
+        <Frame type="Frame" name="Template_GasWithIncome">
+            <Width val="#Width_Gas"/>
+            
+            <Frame type="PlayerScoreValueFrame" name="PlayerScoreValueFrame">
+                <Anchor relative="$parent"/>
+                <VersusModePlayerSide val="{$ancestor[@name=PlayerData]/@VersusModePlayerSide}"/>
+                <VersusModePlayerIndex val="{$ancestor[@name=PlayerData]/@VersusModePlayerIndex}"/>
+            
+                <!-- Gas -->
+                <Frame type="ScoreValueLabelFrame" name="ScoreValueFrame0">
+                    <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                    <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+                    <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                    <Anchor side="Right" relative="$this/Label" pos="Max" offset="0"/>
+                    <ScoreValue val="VespeneCurrent"/>
+                    <AddCommas val="False"/>
+                    
+                    <Frame type="Label" name="Label" template="WCS_Templates_PlayerBar_Generic/Template_ResourceLabel">
+                        <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                        <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+                        <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                        <Style val="WCSResource_Standard"/>
+                        <Color val="#Color_Gas"/>
+                    </Frame>
+                </Frame>
+                
+                <!-- Gas Plus -->
+                <Frame type="Label" name="GasPlus">
+                    <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                    <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+                    <Anchor side="Left" relative="$parent/ScoreValueFrame0" pos="Max" offset="5"/>
+                    <Style val="WCSResource_Small"/>
+                    <Color val="#Color_GasIncome"/>
+                    <Text val="+"/>
+                </Frame>
+                
+                <!-- Gas Income -->
+                <Frame type="ScoreValueLabelFrame" name="ScoreValueFrame1">
+                    <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                    <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+                    <Anchor side="Left" relative="$parent/GasPlus" pos="Max" offset="-2"/>
+                    <Anchor side="Right" relative="$this/Label" pos="Max" offset="0"/>
+                    <ScoreValue val="VespeneCollectionRate"/>
+                    <AddCommas val="False"/>
+                    
+                    <Frame type="Label" name="Label">
+                        <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                        <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+                        <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                        <Style val="WCSResource_Small"/>
+                        <Color val="#Color_GasIncome"/>
+                    </Frame>
+                </Frame>
+            </Frame>
+        </Frame>
+        
+        <!--
+        ===================================
+        Player Workers Template
+        ===================================
+        -->
+        
+        <Frame type="Frame" name="Template_Workers">
+            <Width val="#Width_Workers"/>
+            
+            <Frame type="PlayerScoreValueFrame" name="PlayerScoreValueFrame">
+                <Anchor relative="$parent"/>
+                <VersusModePlayerSide val="{$ancestor[@name=PlayerData]/@VersusModePlayerSide}"/>
+                <VersusModePlayerIndex val="{$ancestor[@name=PlayerData]/@VersusModePlayerIndex}"/>
+            
+                <!-- Workers -->
+                <Frame type="ScoreValueLabelFrame" name="ScoreValueFrame0">
+                    <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                    <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+                    <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                    <Anchor side="Right" relative="$this/Label" pos="Max" offset="0"/>
+                    <ScoreValue val="WorkersActiveCount"/>
+                    <AddCommas val="False"/>
+                    
+                    <Frame type="Label" name="Label" template="WCS_Templates_PlayerBar_Generic/Template_ResourceLabel">
+                        <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                        <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+                        <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                        <Style val="WCSResource_Standard"/>
+                        <Color val="#Color_Workers"/>
+                    </Frame>
+                </Frame>
+            </Frame>
+        </Frame>
+        
+        <!--
+        ===================================
+        Player Army Template
+        ===================================
+        -->
+        
+        <Frame type="Frame" name="Template_Army">
+            <Width val="#Width_Army"/>
+            
+            <Frame type="PlayerScoreValueFrame" name="PlayerScoreValueFrame">
+                <Anchor relative="$parent"/>
+                <VersusModePlayerSide val="{$ancestor[@name=PlayerData]/@VersusModePlayerSide}"/>
+                <VersusModePlayerIndex val="{$ancestor[@name=PlayerData]/@VersusModePlayerIndex}"/>
+            
+                <!-- Army -->
+                <Frame type="ScoreValueLabelFrame" name="ScoreValueFrame0">
+                    <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                    <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+                    <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                    <Anchor side="Right" relative="$this/Label" pos="Max" offset="0"/>
+                    <ScoreValue val="FoodUsedArmy"/>
+                    <AddCommas val="False"/>
+                    
+                    <Frame type="Label" name="Label" template="WCS_Templates_PlayerBar_Generic/Template_ResourceLabel">
+                        <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                        <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+                        <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                        <Style val="WCSResource_Standard"/>
+                        <Color val="#Color_Army"/>
+                    </Frame>
+                </Frame>
+            </Frame>
+        </Frame>
+        
+        <!--
+        ===================================
+        Player Tech Template
+        ===================================
+        -->
+        
+        <Frame type="Frame" name="Template_Tech">
+            <Width val="#Width_Tech"/>
+            
+            <Frame type="PlayerScoreValueFrame" name="PlayerScoreValueFrame">
+                <Anchor relative="$parent"/>
+                <VersusModePlayerSide val="{$ancestor[@name=PlayerData]/@VersusModePlayerSide}"/>
+                <VersusModePlayerIndex val="{$ancestor[@name=PlayerData]/@VersusModePlayerIndex}"/>
+            
+                <!-- Tech Spending -->
+                <Frame type="ScoreValueLabelFrame" name="ScoreValueFrame0">
+                    <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                    <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+                    <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                    <Anchor side="Right" relative="$this/Label" pos="Max" offset="0"/>
+                    <ScoreValueLink val="TechnologySpendingTotal"/>
+                    <AddCommas val="False"/>
+                    
+                    <Frame type="Label" name="Label" template="WCS_Templates_PlayerBar_Generic/Template_ResourceLabel">
+                        <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                        <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+                        <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                        <Style val="WCSResource_Standard"/>
+                        <Color val="#Color_Tech"/>
+                    </Frame>
+                </Frame>
+            </Frame>
+        </Frame>
+        
+        <!--
+        ===================================
+        Player Resources Lost Template
+        ===================================
+        -->
+        
+        <Frame type="Frame" name="Template_ResourcesLost">
+            <Width val="#Width_ResourcesLost"/>
+            
+            <Frame type="PlayerScoreValueFrame" name="PlayerScoreValueFrame">
+                <Anchor relative="$parent"/>
+                <VersusModePlayerSide val="{$ancestor[@name=PlayerData]/@VersusModePlayerSide}"/>
+                <VersusModePlayerIndex val="{$ancestor[@name=PlayerData]/@VersusModePlayerIndex}"/>
+                
+                <Frame type="Label" name="Minus">
+                    <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                    <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+                    <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                    <Style val="WCSResource_Standard"/>
+                    <Color val="#Color_ResourcesLost"/>
+                    <Text val="-"/>
+                </Frame>
+                
+                <!-- Resources Lost -->
+                <Frame type="ScoreValueLabelFrame" name="ScoreValueFrame0">
+                    <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                    <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+                    <Anchor side="Left" relative="$parent/Minus" pos="Max" offset="0"/>
+                    <Anchor side="Right" relative="$this/Label" pos="Max" offset="0"/>
+                    <ScoreValueLink val="ResourceLostAll"/>
+                    <AddCommas val="False"/>
+                    
+                    <Frame type="Label" name="Label" template="WCS_Templates_PlayerBar_Generic/Template_ResourceLabel">
+                        <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                        <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+                        <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                        <Style val="WCSResource_Standard"/>
+                        <Color val="#Color_ResourcesLost"/>
+                    </Frame>
+                </Frame>
+            </Frame>
+        </Frame>
+        
+        <!--
+        ===================================
+        Player Idle Worker Time Template
+        ===================================
+        -->
+        
+        <Frame type="Frame" name="Template_IdleTime">
+            <Width val="#Width_IdleTime"/>
+            
+            <Frame type="PlayerScoreValueFrame" name="PlayerScoreValueFrame">
+                <Anchor relative="$parent"/>
+                <VersusModePlayerSide val="{$ancestor[@name=PlayerData]/@VersusModePlayerSide}"/>
+                <VersusModePlayerIndex val="{$ancestor[@name=PlayerData]/@VersusModePlayerIndex}"/>
+                
+                <Frame type="Label" name="Minus">
+                    <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                    <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+                    <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                    <Style val="WCSResource_Standard"/>
+                    <Color val="#Color_IdleTime"/>
+                    <Text val="-"/>
+                </Frame>
+                
+                <!-- Resources Lost -->
+                <Frame type="ScoreValueLabelFrame" name="ScoreValueFrame0">
+                    <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                    <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+                    <Anchor side="Left" relative="$parent/Minus" pos="Max" offset="0"/>
+                    <Anchor side="Right" relative="$this/Label" pos="Max" offset="0"/>
+                    <ScoreValueLink val="IdleWorkerTime"/>
+                    <AddCommas val="False"/>
+                    
+                    <Frame type="Label" name="Label" template="WCS_Templates_PlayerBar_Generic/Template_ResourceLabel">
+                        <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                        <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+                        <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                        <Style val="WCSResource_Standard"/>
+                        <Color val="#Color_IdleTime"/>
+                    </Frame>
+                </Frame>
+            </Frame>
+        </Frame>
+        
+        <!--
+        ===================================
+        Minerals Lost Template
+        ===================================
+        -->
+        
+        <Frame type="Frame" name="Template_MineralsLost">
+            <Width val="#Width_MineralsLost"/>
+            
+            <Frame type="PlayerScoreValueFrame" name="PlayerScoreValueFrame">
+                <Anchor relative="$parent"/>
+                <VersusModePlayerSide val="{$ancestor[@name=PlayerData]/@VersusModePlayerSide}"/>
+                <VersusModePlayerIndex val="{$ancestor[@name=PlayerData]/@VersusModePlayerIndex}"/>
+                
+                <!-- Resources Lost -->
+                <Frame type="ScoreValueLabelFrame" name="ScoreValueFrame0">
+                    <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                    <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+                    <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                    <Anchor side="Right" relative="$this/Label" pos="Max" offset="0"/>
+                    <ScoreValueLink val="MineralsLostUnits"/>
+                    <AddCommas val="False"/>
+                    
+                    <Frame type="Label" name="Label" template="WCS_Templates_PlayerBar_Generic/Template_ResourceLabel">
+                        <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                        <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+                        <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                        <Style val="WCSResource_Standard"/>
+                        <Color val="#Color_Minerals"/>
+                    </Frame>
+                </Frame>
+            </Frame>
+        </Frame>
+        
+        <!--
+        ===================================
+        Gas Lost Template
+        ===================================
+        -->
+        
+        <Frame type="Frame" name="Template_GasLost">
+            <Width val="#Width_GasLost"/>
+            
+            <Frame type="PlayerScoreValueFrame" name="PlayerScoreValueFrame">
+                <Anchor relative="$parent"/>
+                <VersusModePlayerSide val="{$ancestor[@name=PlayerData]/@VersusModePlayerSide}"/>
+                <VersusModePlayerIndex val="{$ancestor[@name=PlayerData]/@VersusModePlayerIndex}"/>
+                
+                <!-- Resources Lost -->
+                <Frame type="ScoreValueLabelFrame" name="ScoreValueFrame0">
+                    <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                    <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+                    <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                    <Anchor side="Right" relative="$this/Label" pos="Max" offset="0"/>
+                    <ScoreValueLink val="VespeneLostUnits"/>
+                    <AddCommas val="False"/>
+                    
+                    <Frame type="Label" name="Label" template="WCS_Templates_PlayerBar_Generic/Template_ResourceLabel">
+                        <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                        <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+                        <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                        <Style val="WCSResource_Standard"/>
+                        <Color val="#Color_Gas"/>
+                    </Frame>
+                </Frame>
+            </Frame>
+        </Frame>
+        
+        <!--
+        ===================================
+        Extra Info Template
+        ===================================
+        
+        This is a panel that cycles between showing APM and weapons/armor upgrades for the players.
+        -->
+        
+        <Frame type="Frame" name="Template_ExtraInfo">
+            <Width val="#Width_ExtraInfo"/>
+            
+            <!-- APM -->
+            <Frame type="PlayerScoreValueFrame" name="APM">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+                <VersusModePlayerSide val="{$ancestor[@name=PlayerData]/@VersusModePlayerSide}"/>
+                <VersusModePlayerIndex val="{$ancestor[@name=PlayerData]/@VersusModePlayerIndex}"/>
+                <Alpha val="0"/>
+                
+                <!-- APM -->
+                <Frame type="ScoreValueLabelFrame" name="ScoreValueFrame0">
+                    <Anchor relative="$parent"/>
+                    <ScoreValueLink val="APM"/>
+                    <AddCommas val="False"/>
+                    
+                    <Frame type="Label" name="Label">
+                        <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                        <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+                        <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                        <Style val="WCSResource_Standard"/>
+                        <IgnoreParentColor val="True"/>
+                        <Color val="#Color_APM"/>
+                    </Frame>
+                </Frame>
+                
+                <Animation name="Show">
+                    <Event event="OnShown" action="Reset,Play" frame="$ExtraAPM"/>
+                     
+                    <Controller type="Fade" end="Pause">
+                        <Key type="Curve" time="0" value="0" out="Slow"/>
+                        <Key type="Curve" time=".1" value="0" out="Slow"/>
+                        <Key type="Curve" time=".2" value="255" in="Slow"/>
+                    </Controller>
+                </Animation>
+                
+                <Animation name="Hide">
+                    <Event event="OnHidden" action="Reset,Play" frame="$ExtraAPM"/>
+                     
+                    <Controller type="Fade" end="Pause">
+                        <Key type="Curve" time="0" value="255" out="Slow"/>
+                        <Key type="Curve" time=".1" value="0" in="Slow"/>
+                    </Controller>
+                </Animation>
+            </Frame>
+            
+            <!-- QuickUpgrades -->
+            <Frame type="PlayerUpgradesFrame" name="QuickUpgrades" template="WCS_Templates_LeaderPanel_1v1/PlayerQuickUpgradesFrameTemplate">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+                <Alpha val="0"/>
+                
+                <Animation name="Show">
+                    <Event event="OnShown" action="Reset,Play" frame="$ExtraUpgrades"/>
+                     
+                    <Controller type="Fade" end="Pause">
+                        <Key type="Curve" time="0" value="0" out="Slow"/>
+                        <Key type="Curve" time=".1" value="0" out="Slow"/>
+                        <Key type="Curve" time=".2" value="255" in="Slow"/>
+                    </Controller>
+                </Animation>
+                
+                <Animation name="Hide">
+                    <Event event="OnHidden" action="Reset,Play" frame="$ExtraUpgrades"/>
+                     
+                    <Controller type="Fade" end="Pause">
+                        <Key type="Curve" time="0" value="255" out="Slow"/>
+                        <Key type="Curve" time=".1" value="0" in="Slow"/>
+                    </Controller>
+                </Animation>
+            </Frame>
+        </Frame>
+        
+        <!--
+        ===================================
+        Icon Template
+        ===================================
+        
+        This template is used for displaying resource/data icons near the values so viewers know what they are.
+        -->
+        <Frame type="PlayerRaceIconFrame" name="Template_DataIcon">
+            <Width val="30"/>
+            <Height val="30"/>
+            <VersusModePlayerSide val="{$ancestor[@name=PlayerData]/@VersusModePlayerSide}"/>
+            <VersusModePlayerIndex val="{$ancestor[@name=PlayerData]/@VersusModePlayerIndex}"/>
+            <BaseTexture val="@WCS/Supply"/>
+
+            <Frame type="Image" name="RaceImage">
+                <Anchor relative="$parent"/>
+                <TextureType val="Normal"/>
+                <IgnoreParentColor val="True"/>
+            </Frame>
+        </Frame>
+        
+        
+        
+    <!--
+
+    =================================================
+
+    MAP SCORE / MATCH TYPE TEMPLATES
+
+    =================================================
+
+    -->
+
+        <!--
+        ===================================
+        Map Score Template
+        ===================================
+        
+        This template displays a map score for the team/player it is assigned to.  It just needs to be put inside a PlayerFrame named "PlayerData".
+        -->
+        
+        <Frame type="Frame" name="Template_MapScore">
+            <Width val="45"/>
+            
+            <StateGroup name="VersusModePlayerSideState">
+                
+                <State name="Top">
+                    <When type="Property" frame="$ancestor[@name=PlayerData]" versusModePlayerSide="Left"/>
+                    <Action type="SetProperty" frame="MapScoreTop" visible="True"/>
+                    <Action type="SetProperty" frame="MapScoreBottom" visible="False"/>
+                </State>
+                
+                <State name="Bottom">
+                    <When type="Property" frame="$ancestor[@name=PlayerData]" versusModePlayerSide="Right"/>
+                    <Action type="SetProperty" frame="MapScoreTop" visible="False"/>
+                    <Action type="SetProperty" frame="MapScoreBottom" visible="True"/>
+                </State>
+            </StateGroup>
+            
+            <Frame type="Image" name="Background">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+                <Texture val="Assets/Textures/White.dds"/>
+                <TextureType val="Normal"/>
+                <Color val="230,230,230"/>
+            </Frame>
+            
+            <Frame type="Frame" name="MapScoreTop">
+                <Anchor relative="$parent"/>
+                <Visible val="False"/>
+            
+                <Frame type="Button" name="Set_0">
+                    <Anchor relative="$parent"/>
+                    <Visible val="true"/>
+                    
+                    <Frame type="Label" name="WinLabel">
+                        <Anchor side="Top" relative="$parent" pos="Mid" offset="#vOffset_MapScore"/>
+                        <Anchor side="Bottom" relative="$parent" pos="Mid" offset="#vOffset_MapScore"/>
+                        <Anchor side="Left" relative="$parent" pos="Mid" offset="-1"/>
+                        <Anchor side="Right" relative="$parent" pos="Mid" offset="-1"/>
+                        <Style val="WCSPlayerScore"/>
+                        <Color val="0,0,0"/>
+                    </Frame>
+                    
+                    <StateGroup name="CountState">
+                        
+                        <State name="0">
+                            <When type="Property" frame="$MapScore_Top_0" visible="True"/>
+                            <Action type="SetProperty" frame="$this/WinLabel" text="0"/>
+                        </State>
+                        
+                        <State name="1">
+                            <When type="Property" frame="$MapScore_Top_1" visible="True"/>
+                            <Action type="SetProperty" frame="$this/WinLabel" text="1"/>
+                        </State>
+                        
+                        <State name="2">
+                            <When type="Property" frame="$MapScore_Top_2" visible="True"/>
+                            <Action type="SetProperty" frame="$this/WinLabel" text="2"/>
+                        </State>
+                        
+                        <State name="3">
+                            <When type="Property" frame="$MapScore_Top_3" visible="True"/>
+                            <Action type="SetProperty" frame="$this/WinLabel" text="3"/>
+                        </State>
+                        
+                        <State name="4">
+                            <When type="Property" frame="$MapScore_Top_4" visible="True"/>
+                            <Action type="SetProperty" frame="$this/WinLabel" text="4"/>
+                        </State>
+                        
+                        <State name="5">
+                            <When type="Property" frame="$MapScore_Top_5" visible="True"/>
+                            <Action type="SetProperty" frame="$this/WinLabel" text="5"/>
+                        </State>
+                        
+                        <State name="6">
+                            <When type="Property" frame="$MapScore_Top_6" visible="True"/>
+                            <Action type="SetProperty" frame="$this/WinLabel" text="6"/>
+                        </State>
+                        
+                        <State name="7">
+                            <When type="Property" frame="$MapScore_Top_7" visible="True"/>
+                            <Action type="SetProperty" frame="$this/WinLabel" text="7"/>
+                        </State>
+                        
+                        <State name="8">
+                            <When type="Property" frame="$MapScore_Top_8" visible="True"/>
+                            <Action type="SetProperty" frame="$this/WinLabel" text="8"/>
+                        </State>
+                        
+                        <State name="9">
+                            <When type="Property" frame="$MapScore_Top_9" visible="True"/>
+                            <Action type="SetProperty" frame="$this/WinLabel" text="9"/>
+                        </State>
+                    </StateGroup>
+                    
+                    <Animation name="Switch">
+                        <Event event="OnDoubleClick" action="Reset,Play"/>
+                         
+                        <Controller type="Visibility" end="Pause" frame="$this">
+                            <Key type="Bool" time="0" value="False"/>
+                        </Controller>
+                        
+                        <Controller type="Visibility" end="Pause" frame="$parent/Set_1">
+                            <Key type="Bool" time="0" value="True"/>
+                        </Controller>
+                    </Animation>
+                </Frame>
+                
+                <Frame type="Button" name="Set_1">
+                    <Anchor relative="$parent"/>
+                    <Visible val="false"/>
+                    
+                    <Frame type="Label" name="WinLabel">
+                        <Anchor side="Top" relative="$parent" pos="Mid" offset="#vOffset_MapScore"/>
+                        <Anchor side="Bottom" relative="$parent" pos="Mid" offset="#vOffset_MapScore"/>
+                        <Anchor side="Left" relative="$parent" pos="Mid" offset="-1"/>
+                        <Anchor side="Right" relative="$parent" pos="Mid" offset="-1"/>
+                        <Style val="WCSPlayerScore_Small"/>
+                        <Color val="0,0,0"/>
+                    </Frame>
+                    
+                    <StateGroup name="CountState">
+                        
+                        <State name="0">
+                            <When type="Property" frame="$MapScore_Top_0" visible="True"/>
+                            <Action type="SetProperty" frame="$this/WinLabel" text="10"/>
+                        </State>
+                        
+                        <State name="1">
+                            <When type="Property" frame="$MapScore_Top_1" visible="True"/>
+                            <Action type="SetProperty" frame="$this/WinLabel" text="11"/>
+                        </State>
+                        
+                        <State name="2">
+                            <When type="Property" frame="$MapScore_Top_2" visible="True"/>
+                            <Action type="SetProperty" frame="$this/WinLabel" text="12"/>
+                        </State>
+                        
+                        <State name="3">
+                            <When type="Property" frame="$MapScore_Top_3" visible="True"/>
+                            <Action type="SetProperty" frame="$this/WinLabel" text="13"/>
+                        </State>
+                        
+                        <State name="4">
+                            <When type="Property" frame="$MapScore_Top_4" visible="True"/>
+                            <Action type="SetProperty" frame="$this/WinLabel" text="14"/>
+                        </State>
+                        
+                        <State name="5">
+                            <When type="Property" frame="$MapScore_Top_5" visible="True"/>
+                            <Action type="SetProperty" frame="$this/WinLabel" text="15"/>
+                        </State>
+                        
+                        <State name="6">
+                            <When type="Property" frame="$MapScore_Top_6" visible="True"/>
+                            <Action type="SetProperty" frame="$this/WinLabel" text="16"/>
+                        </State>
+                        
+                        <State name="7">
+                            <When type="Property" frame="$MapScore_Top_7" visible="True"/>
+                            <Action type="SetProperty" frame="$this/WinLabel" text="17"/>
+                        </State>
+                        
+                        <State name="8">
+                            <When type="Property" frame="$MapScore_Top_8" visible="True"/>
+                            <Action type="SetProperty" frame="$this/WinLabel" text="18"/>
+                        </State>
+                        
+                        <State name="9">
+                            <When type="Property" frame="$MapScore_Top_9" visible="True"/>
+                            <Action type="SetProperty" frame="$this/WinLabel" text="19"/>
+                        </State>
+                    </StateGroup>
+                    
+                    <Animation name="Switch">
+                        <Event event="OnDoubleClick" action="Reset,Play"/>
+                         
+                        <Controller type="Visibility" end="Pause" frame="$this">
+                            <Key type="Bool" time="0" value="False"/>
+                        </Controller>
+                        
+                        <Controller type="Visibility" end="Pause" frame="$parent/Set_2">
+                            <Key type="Bool" time="0" value="True"/>
+                        </Controller>
+                    </Animation>
+                </Frame>
+                
+                <Frame type="Button" name="Set_2">
+                    <Anchor relative="$parent"/>
+                    <Visible val="false"/>
+                    
+                    <Frame type="Label" name="WinLabel">
+                        <Anchor side="Top" relative="$parent" pos="Mid" offset="#vOffset_MapScore"/>
+                        <Anchor side="Bottom" relative="$parent" pos="Mid" offset="#vOffset_MapScore"/>
+                        <Anchor side="Left" relative="$parent" pos="Mid" offset="-1"/>
+                        <Anchor side="Right" relative="$parent" pos="Mid" offset="-1"/>
+                        <Style val="WCSPlayerScore_Small"/>
+                        <Color val="0,0,0"/>
+                    </Frame>
+                    
+                    <StateGroup name="CountState">
+                        
+                        <State name="0">
+                            <When type="Property" frame="$MapScore_Top_0" visible="True"/>
+                            <Action type="SetProperty" frame="$this/WinLabel" text="20"/>
+                        </State>
+                        
+                        <State name="1">
+                            <When type="Property" frame="$MapScore_Top_1" visible="True"/>
+                            <Action type="SetProperty" frame="$this/WinLabel" text="21"/>
+                        </State>
+                        
+                        <State name="2">
+                            <When type="Property" frame="$MapScore_Top_2" visible="True"/>
+                            <Action type="SetProperty" frame="$this/WinLabel" text="22"/>
+                        </State>
+                        
+                        <State name="3">
+                            <When type="Property" frame="$MapScore_Top_3" visible="True"/>
+                            <Action type="SetProperty" frame="$this/WinLabel" text="23"/>
+                        </State>
+                        
+                        <State name="4">
+                            <When type="Property" frame="$MapScore_Top_4" visible="True"/>
+                            <Action type="SetProperty" frame="$this/WinLabel" text="24"/>
+                        </State>
+                        
+                        <State name="5">
+                            <When type="Property" frame="$MapScore_Top_5" visible="True"/>
+                            <Action type="SetProperty" frame="$this/WinLabel" text="25"/>
+                        </State>
+                        
+                        <State name="6">
+                            <When type="Property" frame="$MapScore_Top_6" visible="True"/>
+                            <Action type="SetProperty" frame="$this/WinLabel" text="26"/>
+                        </State>
+                        
+                        <State name="7">
+                            <When type="Property" frame="$MapScore_Top_7" visible="True"/>
+                            <Action type="SetProperty" frame="$this/WinLabel" text="27"/>
+                        </State>
+                        
+                        <State name="8">
+                            <When type="Property" frame="$MapScore_Top_8" visible="True"/>
+                            <Action type="SetProperty" frame="$this/WinLabel" text="28"/>
+                        </State>
+                        
+                        <State name="9">
+                            <When type="Property" frame="$MapScore_Top_9" visible="True"/>
+                            <Action type="SetProperty" frame="$this/WinLabel" text="29"/>
+                        </State>
+                    </StateGroup>
+                    
+                    <Animation name="Switch">
+                        <Event event="OnDoubleClick" action="Reset,Play"/>
+                         
+                        <Controller type="Visibility" end="Pause" frame="$this">
+                            <Key type="Bool" time="0" value="False"/>
+                        </Controller>
+                        
+                        <Controller type="Visibility" end="Pause" frame="$parent/Set_3">
+                            <Key type="Bool" time="0" value="True"/>
+                        </Controller>
+                    </Animation>
+                </Frame>
+                
+                <Frame type="Button" name="Set_3">
+                    <Anchor relative="$parent"/>
+                    <Visible val="false"/>
+                    
+                    <Frame type="Label" name="WinLabel">
+                        <Anchor side="Top" relative="$parent" pos="Mid" offset="#vOffset_MapScore"/>
+                        <Anchor side="Bottom" relative="$parent" pos="Mid" offset="#vOffset_MapScore"/>
+                        <Anchor side="Left" relative="$parent" pos="Mid" offset="-1"/>
+                        <Anchor side="Right" relative="$parent" pos="Mid" offset="-1"/>
+                        <Style val="WCSPlayerScore_Small"/>
+                        <Color val="0,0,0"/>
+                    </Frame>
+                    
+                    <StateGroup name="CountState">
+                        
+                        <State name="0">
+                            <When type="Property" frame="$MapScore_Top_0" visible="True"/>
+                            <Action type="SetProperty" frame="$this/WinLabel" text="30"/>
+                        </State>
+                        
+                        <State name="1">
+                            <When type="Property" frame="$MapScore_Top_1" visible="True"/>
+                            <Action type="SetProperty" frame="$this/WinLabel" text="31"/>
+                        </State>
+                        
+                        <State name="2">
+                            <When type="Property" frame="$MapScore_Top_2" visible="True"/>
+                            <Action type="SetProperty" frame="$this/WinLabel" text="32"/>
+                        </State>
+                        
+                        <State name="3">
+                            <When type="Property" frame="$MapScore_Top_3" visible="True"/>
+                            <Action type="SetProperty" frame="$this/WinLabel" text="33"/>
+                        </State>
+                        
+                        <State name="4">
+                            <When type="Property" frame="$MapScore_Top_4" visible="True"/>
+                            <Action type="SetProperty" frame="$this/WinLabel" text="34"/>
+                        </State>
+                        
+                        <State name="5">
+                            <When type="Property" frame="$MapScore_Top_5" visible="True"/>
+                            <Action type="SetProperty" frame="$this/WinLabel" text="35"/>
+                        </State>
+                        
+                        <State name="6">
+                            <When type="Property" frame="$MapScore_Top_6" visible="True"/>
+                            <Action type="SetProperty" frame="$this/WinLabel" text="36"/>
+                        </State>
+                        
+                        <State name="7">
+                            <When type="Property" frame="$MapScore_Top_7" visible="True"/>
+                            <Action type="SetProperty" frame="$this/WinLabel" text="37"/>
+                        </State>
+                        
+                        <State name="8">
+                            <When type="Property" frame="$MapScore_Top_8" visible="True"/>
+                            <Action type="SetProperty" frame="$this/WinLabel" text="38"/>
+                        </State>
+                        
+                        <State name="9">
+                            <When type="Property" frame="$MapScore_Top_9" visible="True"/>
+                            <Action type="SetProperty" frame="$this/WinLabel" text="39"/>
+                        </State>
+                    </StateGroup>
+                    
+                    <Animation name="Switch">
+                        <Event event="OnDoubleClick" action="Reset,Play"/>
+                         
+                        <Controller type="Visibility" end="Pause" frame="$this">
+                            <Key type="Bool" time="0" value="False"/>
+                        </Controller>
+                        
+                        <Controller type="Visibility" end="Pause" frame="$parent/Set_4">
+                            <Key type="Bool" time="0" value="True"/>
+                        </Controller>
+                    </Animation>
+                </Frame>
+                
+                <Frame type="Button" name="Set_4">
+                    <Anchor relative="$parent"/>
+                    <Visible val="false"/>
+                    
+                    <Frame type="Label" name="WinLabel">
+                        <Anchor side="Top" relative="$parent" pos="Mid" offset="#vOffset_MapScore"/>
+                        <Anchor side="Bottom" relative="$parent" pos="Mid" offset="#vOffset_MapScore"/>
+                        <Anchor side="Left" relative="$parent" pos="Mid" offset="-1"/>
+                        <Anchor side="Right" relative="$parent" pos="Mid" offset="-1"/>
+                        <Style val="WCSPlayerScore_Small"/>
+                        <Color val="0,0,0"/>
+                    </Frame>
+                    
+                    <StateGroup name="CountState">
+                        
+                        <State name="0">
+                            <When type="Property" frame="$MapScore_Top_0" visible="True"/>
+                            <Action type="SetProperty" frame="$this/WinLabel" text="40"/>
+                        </State>
+                        
+                        <State name="1">
+                            <When type="Property" frame="$MapScore_Top_1" visible="True"/>
+                            <Action type="SetProperty" frame="$this/WinLabel" text="41"/>
+                        </State>
+                        
+                        <State name="2">
+                            <When type="Property" frame="$MapScore_Top_2" visible="True"/>
+                            <Action type="SetProperty" frame="$this/WinLabel" text="42"/>
+                        </State>
+                        
+                        <State name="3">
+                            <When type="Property" frame="$MapScore_Top_3" visible="True"/>
+                            <Action type="SetProperty" frame="$this/WinLabel" text="43"/>
+                        </State>
+                        
+                        <State name="4">
+                            <When type="Property" frame="$MapScore_Top_4" visible="True"/>
+                            <Action type="SetProperty" frame="$this/WinLabel" text="44"/>
+                        </State>
+                        
+                        <State name="5">
+                            <When type="Property" frame="$MapScore_Top_5" visible="True"/>
+                            <Action type="SetProperty" frame="$this/WinLabel" text="45"/>
+                        </State>
+                        
+                        <State name="6">
+                            <When type="Property" frame="$MapScore_Top_6" visible="True"/>
+                            <Action type="SetProperty" frame="$this/WinLabel" text="46"/>
+                        </State>
+                        
+                        <State name="7">
+                            <When type="Property" frame="$MapScore_Top_7" visible="True"/>
+                            <Action type="SetProperty" frame="$this/WinLabel" text="47"/>
+                        </State>
+                        
+                        <State name="8">
+                            <When type="Property" frame="$MapScore_Top_8" visible="True"/>
+                            <Action type="SetProperty" frame="$this/WinLabel" text="48"/>
+                        </State>
+                        
+                        <State name="9">
+                            <When type="Property" frame="$MapScore_Top_9" visible="True"/>
+                            <Action type="SetProperty" frame="$this/WinLabel" text="49"/>
+                        </State>
+                    </StateGroup>
+                    
+                    <Animation name="Switch">
+                        <Event event="OnDoubleClick" action="Reset,Play"/>
+                         
+                        <Controller type="Visibility" end="Pause" frame="$this">
+                            <Key type="Bool" time="0" value="False"/>
+                        </Controller>
+                        
+                        <Controller type="Visibility" end="Pause" frame="$parent/Set_0">
+                            <Key type="Bool" time="0" value="True"/>
+                        </Controller>
+                    </Animation>
+                </Frame>
+            </Frame>
+            
+            <Frame type="Frame" name="MapScoreBottom">
+                <Anchor relative="$parent"/>
+                <Visible val="False"/>
+            
+                <Frame type="Button" name="Set_0">
+                    <Anchor relative="$parent"/>
+                    <Visible val="true"/>
+                    
+                    <Frame type="Label" name="WinLabel">
+                        <Anchor side="Top" relative="$parent" pos="Mid" offset="#vOffset_MapScore"/>
+                        <Anchor side="Bottom" relative="$parent" pos="Mid" offset="#vOffset_MapScore"/>
+                        <Anchor side="Left" relative="$parent" pos="Mid" offset="-1"/>
+                        <Anchor side="Right" relative="$parent" pos="Mid" offset="-1"/>
+                        <Style val="WCSPlayerScore"/>
+                        <Color val="0,0,0"/>
+                    </Frame>
+                    
+                    <StateGroup name="CountState">
+                        
+                        <State name="0">
+                            <When type="Property" frame="$MapScore_Bottom_0" visible="True"/>
+                            <Action type="SetProperty" frame="$this/WinLabel" text="0"/>
+                        </State>
+                        
+                        <State name="1">
+                            <When type="Property" frame="$MapScore_Bottom_1" visible="True"/>
+                            <Action type="SetProperty" frame="$this/WinLabel" text="1"/>
+                        </State>
+                        
+                        <State name="2">
+                            <When type="Property" frame="$MapScore_Bottom_2" visible="True"/>
+                            <Action type="SetProperty" frame="$this/WinLabel" text="2"/>
+                        </State>
+                        
+                        <State name="3">
+                            <When type="Property" frame="$MapScore_Bottom_3" visible="True"/>
+                            <Action type="SetProperty" frame="$this/WinLabel" text="3"/>
+                        </State>
+                        
+                        <State name="4">
+                            <When type="Property" frame="$MapScore_Bottom_4" visible="True"/>
+                            <Action type="SetProperty" frame="$this/WinLabel" text="4"/>
+                        </State>
+                        
+                        <State name="5">
+                            <When type="Property" frame="$MapScore_Bottom_5" visible="True"/>
+                            <Action type="SetProperty" frame="$this/WinLabel" text="5"/>
+                        </State>
+                        
+                        <State name="6">
+                            <When type="Property" frame="$MapScore_Bottom_6" visible="True"/>
+                            <Action type="SetProperty" frame="$this/WinLabel" text="6"/>
+                        </State>
+                        
+                        <State name="7">
+                            <When type="Property" frame="$MapScore_Bottom_7" visible="True"/>
+                            <Action type="SetProperty" frame="$this/WinLabel" text="7"/>
+                        </State>
+                        
+                        <State name="8">
+                            <When type="Property" frame="$MapScore_Bottom_8" visible="True"/>
+                            <Action type="SetProperty" frame="$this/WinLabel" text="8"/>
+                        </State>
+                        
+                        <State name="9">
+                            <When type="Property" frame="$MapScore_Bottom_9" visible="True"/>
+                            <Action type="SetProperty" frame="$this/WinLabel" text="9"/>
+                        </State>
+                    </StateGroup>
+                    
+                    <Animation name="Switch">
+                        <Event event="OnDoubleClick" action="Reset,Play"/>
+                         
+                        <Controller type="Visibility" end="Pause" frame="$this">
+                            <Key type="Bool" time="0" value="False"/>
+                        </Controller>
+                        
+                        <Controller type="Visibility" end="Pause" frame="$parent/Set_1">
+                            <Key type="Bool" time="0" value="True"/>
+                        </Controller>
+                    </Animation>
+                </Frame>
+                
+                <Frame type="Button" name="Set_1">
+                    <Anchor relative="$parent"/>
+                    <Visible val="false"/>
+                    
+                    <Frame type="Label" name="WinLabel">
+                        <Anchor side="Top" relative="$parent" pos="Mid" offset="#vOffset_MapScore"/>
+                        <Anchor side="Bottom" relative="$parent" pos="Mid" offset="#vOffset_MapScore"/>
+                        <Anchor side="Left" relative="$parent" pos="Mid" offset="-1"/>
+                        <Anchor side="Right" relative="$parent" pos="Mid" offset="-1"/>
+                        <Style val="WCSPlayerScore_Small"/>
+                        <Color val="0,0,0"/>
+                    </Frame>
+                    
+                    <StateGroup name="CountState">
+                        
+                        <State name="0">
+                            <When type="Property" frame="$MapScore_Bottom_0" visible="True"/>
+                            <Action type="SetProperty" frame="$this/WinLabel" text="10"/>
+                        </State>
+                        
+                        <State name="1">
+                            <When type="Property" frame="$MapScore_Bottom_1" visible="True"/>
+                            <Action type="SetProperty" frame="$this/WinLabel" text="11"/>
+                        </State>
+                        
+                        <State name="2">
+                            <When type="Property" frame="$MapScore_Bottom_2" visible="True"/>
+                            <Action type="SetProperty" frame="$this/WinLabel" text="12"/>
+                        </State>
+                        
+                        <State name="3">
+                            <When type="Property" frame="$MapScore_Bottom_3" visible="True"/>
+                            <Action type="SetProperty" frame="$this/WinLabel" text="13"/>
+                        </State>
+                        
+                        <State name="4">
+                            <When type="Property" frame="$MapScore_Bottom_4" visible="True"/>
+                            <Action type="SetProperty" frame="$this/WinLabel" text="14"/>
+                        </State>
+                        
+                        <State name="5">
+                            <When type="Property" frame="$MapScore_Bottom_5" visible="True"/>
+                            <Action type="SetProperty" frame="$this/WinLabel" text="15"/>
+                        </State>
+                        
+                        <State name="6">
+                            <When type="Property" frame="$MapScore_Bottom_6" visible="True"/>
+                            <Action type="SetProperty" frame="$this/WinLabel" text="16"/>
+                        </State>
+                        
+                        <State name="7">
+                            <When type="Property" frame="$MapScore_Bottom_7" visible="True"/>
+                            <Action type="SetProperty" frame="$this/WinLabel" text="17"/>
+                        </State>
+                        
+                        <State name="8">
+                            <When type="Property" frame="$MapScore_Bottom_8" visible="True"/>
+                            <Action type="SetProperty" frame="$this/WinLabel" text="18"/>
+                        </State>
+                        
+                        <State name="9">
+                            <When type="Property" frame="$MapScore_Bottom_9" visible="True"/>
+                            <Action type="SetProperty" frame="$this/WinLabel" text="19"/>
+                        </State>
+                    </StateGroup>
+                    
+                    <Animation name="Switch">
+                        <Event event="OnDoubleClick" action="Reset,Play"/>
+                         
+                        <Controller type="Visibility" end="Pause" frame="$this">
+                            <Key type="Bool" time="0" value="False"/>
+                        </Controller>
+                        
+                        <Controller type="Visibility" end="Pause" frame="$parent/Set_2">
+                            <Key type="Bool" time="0" value="True"/>
+                        </Controller>
+                    </Animation>
+                </Frame>
+                
+                <Frame type="Button" name="Set_2">
+                    <Anchor relative="$parent"/>
+                    <Visible val="false"/>
+                    
+                    <Frame type="Label" name="WinLabel">
+                        <Anchor side="Top" relative="$parent" pos="Mid" offset="#vOffset_MapScore"/>
+                        <Anchor side="Bottom" relative="$parent" pos="Mid" offset="#vOffset_MapScore"/>
+                        <Anchor side="Left" relative="$parent" pos="Mid" offset="-1"/>
+                        <Anchor side="Right" relative="$parent" pos="Mid" offset="-1"/>
+                        <Style val="WCSPlayerScore_Small"/>
+                        <Color val="0,0,0"/>
+                    </Frame>
+                    
+                    <StateGroup name="CountState">
+                        
+                        <State name="0">
+                            <When type="Property" frame="$MapScore_Bottom_0" visible="True"/>
+                            <Action type="SetProperty" frame="$this/WinLabel" text="20"/>
+                        </State>
+                        
+                        <State name="1">
+                            <When type="Property" frame="$MapScore_Bottom_1" visible="True"/>
+                            <Action type="SetProperty" frame="$this/WinLabel" text="21"/>
+                        </State>
+                        
+                        <State name="2">
+                            <When type="Property" frame="$MapScore_Bottom_2" visible="True"/>
+                            <Action type="SetProperty" frame="$this/WinLabel" text="22"/>
+                        </State>
+                        
+                        <State name="3">
+                            <When type="Property" frame="$MapScore_Bottom_3" visible="True"/>
+                            <Action type="SetProperty" frame="$this/WinLabel" text="23"/>
+                        </State>
+                        
+                        <State name="4">
+                            <When type="Property" frame="$MapScore_Bottom_4" visible="True"/>
+                            <Action type="SetProperty" frame="$this/WinLabel" text="24"/>
+                        </State>
+                        
+                        <State name="5">
+                            <When type="Property" frame="$MapScore_Bottom_5" visible="True"/>
+                            <Action type="SetProperty" frame="$this/WinLabel" text="25"/>
+                        </State>
+                        
+                        <State name="6">
+                            <When type="Property" frame="$MapScore_Bottom_6" visible="True"/>
+                            <Action type="SetProperty" frame="$this/WinLabel" text="26"/>
+                        </State>
+                        
+                        <State name="7">
+                            <When type="Property" frame="$MapScore_Bottom_7" visible="True"/>
+                            <Action type="SetProperty" frame="$this/WinLabel" text="27"/>
+                        </State>
+                        
+                        <State name="8">
+                            <When type="Property" frame="$MapScore_Bottom_8" visible="True"/>
+                            <Action type="SetProperty" frame="$this/WinLabel" text="28"/>
+                        </State>
+                        
+                        <State name="9">
+                            <When type="Property" frame="$MapScore_Bottom_9" visible="True"/>
+                            <Action type="SetProperty" frame="$this/WinLabel" text="29"/>
+                        </State>
+                    </StateGroup>
+                    
+                    <Animation name="Switch">
+                        <Event event="OnDoubleClick" action="Reset,Play"/>
+                         
+                        <Controller type="Visibility" end="Pause" frame="$this">
+                            <Key type="Bool" time="0" value="False"/>
+                        </Controller>
+                        
+                        <Controller type="Visibility" end="Pause" frame="$parent/Set_3">
+                            <Key type="Bool" time="0" value="True"/>
+                        </Controller>
+                    </Animation>
+                </Frame>
+                
+                <Frame type="Button" name="Set_3">
+                    <Anchor relative="$parent"/>
+                    <Visible val="false"/>
+                    
+                    <Frame type="Label" name="WinLabel">
+                        <Anchor side="Top" relative="$parent" pos="Mid" offset="#vOffset_MapScore"/>
+                        <Anchor side="Bottom" relative="$parent" pos="Mid" offset="#vOffset_MapScore"/>
+                        <Anchor side="Left" relative="$parent" pos="Mid" offset="-1"/>
+                        <Anchor side="Right" relative="$parent" pos="Mid" offset="-1"/>
+                        <Style val="WCSPlayerScore_Small"/>
+                        <Color val="0,0,0"/>
+                    </Frame>
+                    
+                    <StateGroup name="CountState">
+                        
+                        <State name="0">
+                            <When type="Property" frame="$MapScore_Bottom_0" visible="True"/>
+                            <Action type="SetProperty" frame="$this/WinLabel" text="30"/>
+                        </State>
+                        
+                        <State name="1">
+                            <When type="Property" frame="$MapScore_Bottom_1" visible="True"/>
+                            <Action type="SetProperty" frame="$this/WinLabel" text="31"/>
+                        </State>
+                        
+                        <State name="2">
+                            <When type="Property" frame="$MapScore_Bottom_2" visible="True"/>
+                            <Action type="SetProperty" frame="$this/WinLabel" text="32"/>
+                        </State>
+                        
+                        <State name="3">
+                            <When type="Property" frame="$MapScore_Bottom_3" visible="True"/>
+                            <Action type="SetProperty" frame="$this/WinLabel" text="33"/>
+                        </State>
+                        
+                        <State name="4">
+                            <When type="Property" frame="$MapScore_Bottom_4" visible="True"/>
+                            <Action type="SetProperty" frame="$this/WinLabel" text="34"/>
+                        </State>
+                        
+                        <State name="5">
+                            <When type="Property" frame="$MapScore_Bottom_5" visible="True"/>
+                            <Action type="SetProperty" frame="$this/WinLabel" text="35"/>
+                        </State>
+                        
+                        <State name="6">
+                            <When type="Property" frame="$MapScore_Bottom_6" visible="True"/>
+                            <Action type="SetProperty" frame="$this/WinLabel" text="36"/>
+                        </State>
+                        
+                        <State name="7">
+                            <When type="Property" frame="$MapScore_Bottom_7" visible="True"/>
+                            <Action type="SetProperty" frame="$this/WinLabel" text="37"/>
+                        </State>
+                        
+                        <State name="8">
+                            <When type="Property" frame="$MapScore_Bottom_8" visible="True"/>
+                            <Action type="SetProperty" frame="$this/WinLabel" text="38"/>
+                        </State>
+                        
+                        <State name="9">
+                            <When type="Property" frame="$MapScore_Bottom_9" visible="True"/>
+                            <Action type="SetProperty" frame="$this/WinLabel" text="39"/>
+                        </State>
+                    </StateGroup>
+                    
+                    <Animation name="Switch">
+                        <Event event="OnDoubleClick" action="Reset,Play"/>
+                         
+                        <Controller type="Visibility" end="Pause" frame="$this">
+                            <Key type="Bool" time="0" value="False"/>
+                        </Controller>
+                        
+                        <Controller type="Visibility" end="Pause" frame="$parent/Set_4">
+                            <Key type="Bool" time="0" value="True"/>
+                        </Controller>
+                    </Animation>
+                </Frame>
+                
+                <Frame type="Button" name="Set_4">
+                    <Anchor relative="$parent"/>
+                    <Visible val="false"/>
+                    
+                    <Frame type="Label" name="WinLabel">
+                        <Anchor side="Top" relative="$parent" pos="Mid" offset="#vOffset_MapScore"/>
+                        <Anchor side="Bottom" relative="$parent" pos="Mid" offset="#vOffset_MapScore"/>
+                        <Anchor side="Left" relative="$parent" pos="Mid" offset="-1"/>
+                        <Anchor side="Right" relative="$parent" pos="Mid" offset="-1"/>
+                        <Style val="WCSPlayerScore_Small"/>
+                        <Color val="0,0,0"/>
+                    </Frame>
+                    
+                    <StateGroup name="CountState">
+                        
+                        <State name="0">
+                            <When type="Property" frame="$MapScore_Bottom_0" visible="True"/>
+                            <Action type="SetProperty" frame="$this/WinLabel" text="40"/>
+                        </State>
+                        
+                        <State name="1">
+                            <When type="Property" frame="$MapScore_Bottom_1" visible="True"/>
+                            <Action type="SetProperty" frame="$this/WinLabel" text="41"/>
+                        </State>
+                        
+                        <State name="2">
+                            <When type="Property" frame="$MapScore_Bottom_2" visible="True"/>
+                            <Action type="SetProperty" frame="$this/WinLabel" text="42"/>
+                        </State>
+                        
+                        <State name="3">
+                            <When type="Property" frame="$MapScore_Bottom_3" visible="True"/>
+                            <Action type="SetProperty" frame="$this/WinLabel" text="43"/>
+                        </State>
+                        
+                        <State name="4">
+                            <When type="Property" frame="$MapScore_Bottom_4" visible="True"/>
+                            <Action type="SetProperty" frame="$this/WinLabel" text="44"/>
+                        </State>
+                        
+                        <State name="5">
+                            <When type="Property" frame="$MapScore_Bottom_5" visible="True"/>
+                            <Action type="SetProperty" frame="$this/WinLabel" text="45"/>
+                        </State>
+                        
+                        <State name="6">
+                            <When type="Property" frame="$MapScore_Bottom_6" visible="True"/>
+                            <Action type="SetProperty" frame="$this/WinLabel" text="46"/>
+                        </State>
+                        
+                        <State name="7">
+                            <When type="Property" frame="$MapScore_Bottom_7" visible="True"/>
+                            <Action type="SetProperty" frame="$this/WinLabel" text="47"/>
+                        </State>
+                        
+                        <State name="8">
+                            <When type="Property" frame="$MapScore_Bottom_8" visible="True"/>
+                            <Action type="SetProperty" frame="$this/WinLabel" text="48"/>
+                        </State>
+                        
+                        <State name="9">
+                            <When type="Property" frame="$MapScore_Bottom_9" visible="True"/>
+                            <Action type="SetProperty" frame="$this/WinLabel" text="49"/>
+                        </State>
+                    </StateGroup>
+                    
+                    <Animation name="Switch">
+                        <Event event="OnDoubleClick" action="Reset,Play"/>
+                         
+                        <Controller type="Visibility" end="Pause" frame="$this">
+                            <Key type="Bool" time="0" value="False"/>
+                        </Controller>
+                        
+                        <Controller type="Visibility" end="Pause" frame="$parent/Set_0">
+                            <Key type="Bool" time="0" value="True"/>
+                        </Controller>
+                    </Animation>
+                </Frame>
+            </Frame>
+        </Frame>
+</Desc>
