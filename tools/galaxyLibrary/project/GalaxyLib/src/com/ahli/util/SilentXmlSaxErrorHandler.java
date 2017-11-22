@@ -13,16 +13,16 @@ import org.xml.sax.SAXParseException;
 public class SilentXmlSaxErrorHandler implements ErrorHandler {
 	
 	@Override
-	public void warning(SAXParseException e) throws SAXException {
+	public void warning(final SAXParseException e) throws SAXException {
 	}
 	
 	@Override
-	public void fatalError(SAXParseException e) throws SAXException {
+	public void fatalError(final SAXParseException e) throws SAXException {
 		throw e;
 	}
 	
 	@Override
-	public void error(SAXParseException e) throws SAXException {
+	public void error(final SAXParseException e) throws SAXException {
 		throw e;
 	}
 	

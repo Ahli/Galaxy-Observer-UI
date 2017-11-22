@@ -24,11 +24,11 @@ public class SettingsIniInterface {
 	private boolean ptrActive = false, SC2_64bit = false, HEROES_64bit = false, HEROES_PTR_64bit = false,
 			HEROES_protectMPQ = false, SC2_protectMPQ = false, buildUnprotectedToo = false;
 	
-	public SettingsIniInterface(String settingsFilePath) {
+	public SettingsIniInterface(final String settingsFilePath) {
 		this.settingsFilePath = settingsFilePath;
 	}
 	
-	public void setSettingsFilePath(String path) {
+	public void setSettingsFilePath(final String path) {
 		settingsFilePath = path;
 	}
 	
@@ -42,19 +42,20 @@ public class SettingsIniInterface {
 	 * @throws FileNotFoundException
 	 */
 	public void readSettingsFromFile() throws FileNotFoundException {
-		InputStreamReader is = new InputStreamReader(new FileInputStream(settingsFilePath), StandardCharsets.UTF_8);
-		BufferedReader br = new BufferedReader(is);
+		final InputStreamReader is = new InputStreamReader(new FileInputStream(settingsFilePath),
+				StandardCharsets.UTF_8);
+		final BufferedReader br = new BufferedReader(is);
 		String line = "";
 		try {
 			while ((line = br.readLine()) != null) {
 				parseLine(line);
 			}
-		} catch (IOException e) {
+		} catch (final IOException e) {
 			e.printStackTrace();
 		} finally {
 			try {
 				br.close();
-			} catch (IOException e) {
+			} catch (final IOException e) {
 			}
 		}
 	}
@@ -64,7 +65,7 @@ public class SettingsIniInterface {
 	 * 
 	 * @param line
 	 */
-	private void parseLine(String line) {
+	private void parseLine(final String line) {
 		String val = "";
 		if (line.startsWith("Heroes_Path")) {
 			val = getValFromIniLine(line);
@@ -105,7 +106,7 @@ public class SettingsIniInterface {
 	 * @param line
 	 * @return
 	 */
-	private String getValFromIniLine(String line) {
+	private String getValFromIniLine(final String line) {
 		return line.substring(line.indexOf('=') + 1);
 	}
 	

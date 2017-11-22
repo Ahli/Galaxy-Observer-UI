@@ -31,8 +31,8 @@ public class ComponentsListReader {
 	 * @throws SAXException
 	 * @throws ParserConfigurationException
 	 */
-	public static String getDescIndexPath(File f) throws ParserConfigurationException, SAXException, IOException {
-		String intPath = getComponentsListValue(f, "uiui");
+	public static String getDescIndexPath(final File f) throws ParserConfigurationException, SAXException, IOException {
+		final String intPath = getComponentsListValue(f, "uiui");
 		String str = intPath.endsWith("StormLayout") ? "Base.StormData" : "Base.SC2Data";
 		str += File.separator + intPath;
 		LOGGER.trace("DescIndexPath: " + str);
@@ -48,17 +48,17 @@ public class ComponentsListReader {
 	 * @throws IOException
 	 * @throws SAXException
 	 */
-	public static String getComponentsListValue(File f, String typeVal)
+	public static String getComponentsListValue(final File f, final String typeVal)
 			throws ParserConfigurationException, SAXException, IOException {
 		// find the type in the xml
-		DocumentBuilder dBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-		Document doc = dBuilder.parse(f);
+		final DocumentBuilder dBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+		final Document doc = dBuilder.parse(f);
 		
 		// must be in a DataComponent node
-		NodeList nodeList = doc.getElementsByTagName("DataComponent");
+		final NodeList nodeList = doc.getElementsByTagName("DataComponent");
 		for (int i = 0; i < nodeList.getLength(); i++) {
-			Node node = nodeList.item(i);
-			Node attrZero = node.getAttributes().item(0);
+			final Node node = nodeList.item(i);
+			final Node attrZero = node.getAttributes().item(0);
 			// first attribute's name is Type & value must be as specified
 			if (attrZero.getNodeName().equals("Type") && attrZero.getNodeValue().equals(typeVal)) {
 				// the text is the value between the tags

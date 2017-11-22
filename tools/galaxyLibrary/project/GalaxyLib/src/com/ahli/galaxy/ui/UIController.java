@@ -20,7 +20,7 @@ public class UIController extends UIElement {
 	 * 
 	 * @param name
 	 */
-	public UIController(String name) {
+	public UIController(final String name) {
 		super(name);
 	}
 	
@@ -35,7 +35,7 @@ public class UIController extends UIElement {
 	 * @param keys
 	 *            the keys to set
 	 */
-	public void setKeys(ArrayList<UIAttribute> keys) {
+	public void setKeys(final ArrayList<UIAttribute> keys) {
 		this.keys = keys;
 	}
 	
@@ -50,7 +50,7 @@ public class UIController extends UIElement {
 	 * @param nextAdditionShouldOverride
 	 *            the nextAdditionShouldOverride to set
 	 */
-	public void setNextAdditionShouldOverride(boolean nextAdditionShouldOverride) {
+	public void setNextAdditionShouldOverride(final boolean nextAdditionShouldOverride) {
 		this.nextAdditionShouldOverride = nextAdditionShouldOverride;
 	}
 	
@@ -65,7 +65,7 @@ public class UIController extends UIElement {
 	 * @param values
 	 *            the values to set
 	 */
-	public void setValues(Map<String, String> values) {
+	public void setValues(final Map<String, String> values) {
 		this.values = values;
 	}
 	
@@ -80,7 +80,7 @@ public class UIController extends UIElement {
 	 * @param nameIsImplicit
 	 *            the nameIsImplicit to set
 	 */
-	public void setNameIsImplicit(boolean nameIsImplicit) {
+	public void setNameIsImplicit(final boolean nameIsImplicit) {
 		this.nameIsImplicit = nameIsImplicit;
 	}
 	
@@ -90,7 +90,7 @@ public class UIController extends UIElement {
 	 * @return
 	 */
 	@Override
-	public UIElement receiveFrameFromPath(String path) {
+	public UIElement receiveFrameFromPath(final String path) {
 		return (path == null || path.isEmpty()) ? this : null;
 	}
 	
@@ -100,19 +100,19 @@ public class UIController extends UIElement {
 	 */
 	@Override
 	public Object deepClone() {
-		UIController clone = new UIController(name);
+		final UIController clone = new UIController(name);
 		clone.setNameIsImplicit(nameIsImplicit);
 		clone.setNextAdditionShouldOverride(nextAdditionShouldOverride);
 		
 		// clone values
-		Map<String, String> clonedValues = new HashMap<>();
-		for (Entry<String, String> entry : values.entrySet()) {
+		final Map<String, String> clonedValues = new HashMap<>();
+		for (final Entry<String, String> entry : values.entrySet()) {
 			clonedValues.put(entry.getKey(), entry.getValue());
 		}
 		clone.setValues(clonedValues);
 		
 		// clone keys
-		for (UIElement key : keys) {
+		for (final UIElement key : keys) {
 			clone.getKeys().add((UIAttribute) key.deepClone());
 		}
 		

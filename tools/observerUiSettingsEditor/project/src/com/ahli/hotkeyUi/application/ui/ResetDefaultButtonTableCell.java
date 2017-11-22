@@ -24,22 +24,22 @@ public class ResetDefaultButtonTableCell extends TableCell<ValueDef, Boolean> {
 	public ResetDefaultButtonTableCell() {
 		cellButton.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
-			public void handle(ActionEvent t) {
+			public void handle(final ActionEvent t) {
 				LOGGER.trace("reset table item clicked");
-				ValueDef data = (ValueDef) getTableRow().getItem();
+				final ValueDef data = (ValueDef) getTableRow().getItem();
 				data.setValue(data.getDefaultValue());
 			}
 		});
 	}
 	
-	public ResetDefaultButtonTableCell(String text) {
+	public ResetDefaultButtonTableCell(final String text) {
 		this();
 		cellButton.setText(text);
 	}
 	
 	// Display button if the row is not empty
 	@Override
-	protected void updateItem(Boolean t, boolean empty) {
+	protected void updateItem(final Boolean t, final boolean empty) {
 		super.updateItem(t, empty);
 		if (!empty) {
 			setGraphic(cellButton);

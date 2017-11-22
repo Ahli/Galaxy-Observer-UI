@@ -34,10 +34,10 @@ public class Messages {
 	 * @param key
 	 * @return
 	 */
-	public static String getString(String key) {
+	public static String getString(final String key) {
 		try {
 			return resourceBundle.getString(key);
-		} catch (MissingResourceException e) {
+		} catch (final MissingResourceException e) {
 			return '!' + key + '!';
 		}
 	}
@@ -47,7 +47,7 @@ public class Messages {
 	 * 
 	 * @param loc
 	 */
-	public static void setBundle(Locale loc) {
+	public static void setBundle(final Locale loc) {
 		resourceBundle = ResourceBundle.getBundle(BUNDLE_NAME, loc);
 		usedLocale = loc;
 	}
@@ -76,8 +76,8 @@ public class Messages {
 	 * @param locale
 	 * @return
 	 */
-	public static boolean checkIfTargetResourceIsUsed(Locale locale) {
-		boolean result = resourceBundle.equals(ResourceBundle.getBundle(BUNDLE_NAME, locale));
+	public static boolean checkIfTargetResourceIsUsed(final Locale locale) {
+		final boolean result = resourceBundle.equals(ResourceBundle.getBundle(BUNDLE_NAME, locale));
 		LOGGER.trace("compare used locale's resource '" + usedLocale + "' with one for locale '" + locale
 				+ "', result: " + result);
 		return result;

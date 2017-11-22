@@ -3,12 +3,12 @@ package com.ahli.galaxy.ui;
 /**
  * 
  * @author Ahli
- *
+ * 
  */
 public abstract class UIElement {
 	String name = "";
 	
-	public UIElement(String name) {
+	public UIElement(final String name) {
 		this.name = name;
 	}
 	
@@ -23,7 +23,7 @@ public abstract class UIElement {
 	 * @param name
 	 *            the name to set
 	 */
-	public void setName(String name) {
+	public void setName(final String name) {
 		this.name = name;
 	}
 	
@@ -39,12 +39,12 @@ public abstract class UIElement {
 	 * @param path
 	 * @return
 	 */
-	public static String removeLeftPathLevel(String path) {
-		int i = path.indexOf('/');
+	public static String removeLeftPathLevel(final String path) {
+		final int i = path.indexOf('/');
 		if (i == -1) {
 			return null;
 		}
-		String newPath = path.substring(i + 1);
+		final String newPath = path.substring(i + 1);
 		return newPath;
 	}
 	
@@ -53,8 +53,8 @@ public abstract class UIElement {
 	 * @param path
 	 * @return
 	 */
-	public static String getLeftPathLevel(String path) {
-		int i = path.indexOf('/');
+	public static String getLeftPathLevel(final String path) {
+		final int i = path.indexOf('/');
 		if (i == -1) {
 			return path;
 		}

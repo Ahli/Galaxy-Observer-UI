@@ -29,13 +29,13 @@ public class DescIndexData {
 	
 	private String descIndexIntPath = null;
 	private ArrayList<Pair<File, String>> fileIntPathList = new ArrayList<>();
-	private MpqInterface mpqi;
+	private final MpqInterface mpqi;
 	
 	/**
 	 * 
 	 * @param mpqi
 	 */
-	public DescIndexData(MpqInterface mpqi) {
+	public DescIndexData(final MpqInterface mpqi) {
 		this.mpqi = mpqi;
 		fileIntPathList = new ArrayList<>();
 	}
@@ -52,7 +52,7 @@ public class DescIndexData {
 	 * 
 	 * @param descIndexIntPath
 	 */
-	public void setDescIndexIntPath(String descIndexIntPath) {
+	public void setDescIndexIntPath(final String descIndexIntPath) {
 		this.descIndexIntPath = descIndexIntPath;
 	}
 	
@@ -61,7 +61,7 @@ public class DescIndexData {
 	 * @param i
 	 * @return
 	 */
-	public String getLayoutIntPath(int i) {
+	public String getLayoutIntPath(final int i) {
 		return fileIntPathList.get(i).getValue();
 	}
 	
@@ -70,7 +70,7 @@ public class DescIndexData {
 	 * @param intPath
 	 * @throws MpqException
 	 */
-	public void addLayoutIntPath(String intPath) throws MpqException {
+	public void addLayoutIntPath(final String intPath) throws MpqException {
 		String intPath2 = intPath;
 		File f = mpqi.getFileFromMpq(intPath);
 		if (!f.exists()) {
@@ -81,7 +81,7 @@ public class DescIndexData {
 		if (!f.exists()) {
 			return;
 		}
-		Pair<File, String> p = new Pair<>(f, intPath2);
+		final Pair<File, String> p = new Pair<>(f, intPath2);
 		fileIntPathList.add(p);
 		LOGGER.debug("added Layout path: " + intPath2);
 		LOGGER.debug("added File path: " + f.getAbsolutePath());
@@ -92,9 +92,9 @@ public class DescIndexData {
 	 * @param intPath
 	 * @return
 	 */
-	public boolean removeLayoutIntPath(String intPath) {
+	public boolean removeLayoutIntPath(final String intPath) {
 		for (int i = 0; i < fileIntPathList.size(); i++) {
-			Pair<File, String> p = fileIntPathList.get(i);
+			final Pair<File, String> p = fileIntPathList.get(i);
 			if (p.getValue().equals(intPath)) {
 				fileIntPathList.remove(i);
 				return true;
@@ -114,7 +114,7 @@ public class DescIndexData {
 	 * 
 	 * @param descIndexPath
 	 */
-	public void setDescIndexPathAndClear(String descIndexPath) {
+	public void setDescIndexPathAndClear(final String descIndexPath) {
 		clear();
 		setDescIndexIntPath(descIndexPath);
 	}
@@ -124,8 +124,8 @@ public class DescIndexData {
 	 * @param layoutPathList
 	 * @throws MpqException
 	 */
-	public void addLayoutIntPath(Iterable<String> layoutPathList) throws MpqException {
-		Iterator<String> it = layoutPathList.iterator();
+	public void addLayoutIntPath(final Iterable<String> layoutPathList) throws MpqException {
+		final Iterator<String> it = layoutPathList.iterator();
 		while (it.hasNext()) {
 			this.addLayoutIntPath(it.next());
 		}
@@ -144,9 +144,9 @@ public class DescIndexData {
 	 * @param intPath
 	 * @return
 	 */
-	public File getLayoutFile(String intPath) {
+	public File getLayoutFile(final String intPath) {
 		for (int i = 0; i < fileIntPathList.size(); i++) {
-			Pair<File, String> p = fileIntPathList.get(i);
+			final Pair<File, String> p = fileIntPathList.get(i);
 			if (p.getValue().equals(intPath)) {
 				return p.getKey();
 			}
@@ -159,27 +159,27 @@ public class DescIndexData {
 	 * 
 	 */
 	public void persistDescIndexFile() throws IOException {
-		File f = mpqi.getFileFromMpq(descIndexIntPath);
+		final File f = mpqi.getFileFromMpq(descIndexIntPath);
 		OutputStreamWriter bw = null;
 		try {
 			bw = new OutputStreamWriter(new FileOutputStream(f, false), "UTF-8");
 			bw.write("<?xml version=\"1.0\" encoding=\"utf-8\" standalone=\"yes\"?>\r\n<Desc>\r\n");
 			
-			for (Pair<File, String> p : fileIntPathList) {
+			for (final Pair<File, String> p : fileIntPathList) {
 				bw.write("    <Include path=\"");
 				bw.write(p.getValue());
 				bw.write("\"/>\r\n");
 			}
 			
 			bw.write("</Desc>\r\n");
-		} catch (IOException e) {
+		} catch (final IOException e) {
 			LOGGER.error("ERROR writing DescIndex to disc" + e);
 			throw e;
 		} finally {
 			if (bw != null) {
 				try {
 					bw.close();
-				} catch (IOException e) {
+				} catch (final IOException e) {
 					e.printStackTrace();
 				}
 			}
@@ -194,11 +194,11 @@ public class DescIndexData {
 	 * @throws ParserConfigurationException
 	 */
 	public void orderLayoutFiles() throws ParserConfigurationException, SAXException, IOException {
-		ArrayList<ArrayList<String>> dependencies = new ArrayList<ArrayList<String>>();
-		ArrayList<ArrayList<String>> ownConstants = new ArrayList<ArrayList<String>>();
+		final ArrayList<ArrayList<String>> dependencies = new ArrayList<>();
+		final ArrayList<ArrayList<String>> ownConstants = new ArrayList<>();
 		
 		// grab dependencies and constant definitions for every layout file
-		for (Pair<File, String> pair : fileIntPathList) {
+		for (final Pair<File, String> pair : fileIntPathList) {
 			ArrayList<String> layoutDeps = null;
 			ArrayList<String> curConstants = null;
 			
@@ -218,8 +218,8 @@ public class DescIndexData {
 			insertOccurred = false;
 			for (int i = 0; i < dependencies.size(); i++) {
 				
-				ArrayList<String> curLayoutDepList = dependencies.get(i);
-				Pair<File, String> pair = fileIntPathList.get(i);
+				final ArrayList<String> curLayoutDepList = dependencies.get(i);
+				final Pair<File, String> pair = fileIntPathList.get(i);
 				
 				for (int j = 0; j < curLayoutDepList.size(); j++) {
 					
@@ -240,7 +240,7 @@ public class DescIndexData {
 								// otherPair.getKey().getName();
 								// fileName = fileName.substring(0,
 								// fileName.lastIndexOf('.'));
-								for (String constant : ownConstants.get(i2)) {
+								for (final String constant : ownConstants.get(i2)) {
 									if (constant.equals(curDependencyTo)) {
 										constantDefinedBefore = true;
 										break y;
@@ -250,10 +250,10 @@ public class DescIndexData {
 						}
 						if (!constantDefinedBefore) {
 							y: for (int i2 = i + 1; i2 < dependencies.size(); i2++) {
-								Pair<File, String> otherPair = fileIntPathList.get(i2);
+								final Pair<File, String> otherPair = fileIntPathList.get(i2);
 								String fileName = otherPair.getKey().getName();
 								fileName = fileName.substring(0, fileName.lastIndexOf('.'));
-								for (String constant : ownConstants.get(i2)) {
+								for (final String constant : ownConstants.get(i2)) {
 									if (constant.equals(curDependencyTo)) {
 										LOGGER.trace("checked " + fileIntPathList.get(i).getKey().getName()
 												+ " with dependency " + curDependencyTo + " and " + constant + " i=" + i
@@ -293,19 +293,19 @@ public class DescIndexData {
 			insertOccurred = false;
 			x: for (int i = 0; i < dependencies.size(); i++) {
 				
-				ArrayList<String> curLayoutDepList = dependencies.get(i);
-				Pair<File, String> pair = fileIntPathList.get(i);
+				final ArrayList<String> curLayoutDepList = dependencies.get(i);
+				final Pair<File, String> pair = fileIntPathList.get(i);
 				
 				for (int j = 0; j < curLayoutDepList.size(); j++) {
 					
-					String curDependencyTo = curLayoutDepList.get(j);
+					final String curDependencyTo = curLayoutDepList.get(j);
 					
 					if (curDependencyTo.startsWith("#")) {
 						// constants
 					} else {
 						// check if it appears after the template
 						for (int i2 = i + 1; i2 < dependencies.size(); i2++) {
-							Pair<File, String> otherPair = fileIntPathList.get(i2);
+							final Pair<File, String> otherPair = fileIntPathList.get(i2);
 							String fileName = otherPair.getKey().getName();
 							fileName = fileName.substring(0, fileName.lastIndexOf('.'));
 							

@@ -36,7 +36,7 @@ public class ReplayFinder {
 	 * @throws IOException
 	 *             Signals that an I/O exception has occurred.
 	 */
-	public File getLastUsedReplay(boolean isHeroes, String documentsPath) throws IOException {
+	public File getLastUsedReplay(final boolean isHeroes, final String documentsPath) throws IOException {
 		String basePath = documentsPath + File.separator;
 		if (isHeroes) {
 			basePath += "Heroes of the Storm";
@@ -49,11 +49,11 @@ public class ReplayFinder {
 		BufferedReader br = null;
 		String line, replayPath = null;
 		try {
-			InputStreamReader is = new InputStreamReader(new FileInputStream(new File(basePath)),
+			final InputStreamReader is = new InputStreamReader(new FileInputStream(new File(basePath)),
 					StandardCharsets.UTF_8);
 			br = new BufferedReader(is);
 			boolean found = false;
-			String searchToken = "lastReplayFilePath=";
+			final String searchToken = "lastReplayFilePath=";
 			while ((line = br.readLine()) != null && !found) {
 				if (line.startsWith(searchToken)) {
 					found = true;
@@ -80,7 +80,7 @@ public class ReplayFinder {
 	 *            the documents path
 	 * @return the newest replay
 	 */
-	public File getNewestReplay(boolean isHeroes, String documentsPath) {
+	public File getNewestReplay(final boolean isHeroes, final String documentsPath) {
 		String basePath = documentsPath + File.separator;
 		String[] extensions = null;
 		if (isHeroes) {
@@ -93,22 +93,22 @@ public class ReplayFinder {
 		basePath += File.separator + "Accounts";
 		LOGGER.debug(basePath);
 		
-		Collection<File> allReplays = FileUtils.listFiles(new File(basePath), TrueFileFilter.INSTANCE,
+		final Collection<File> allReplays = FileUtils.listFiles(new File(basePath), TrueFileFilter.INSTANCE,
 				TrueFileFilter.INSTANCE);
 		
 		LOGGER.debug("# Replays found: " + allReplays.size());
 		
 		long newestDate = Long.MIN_VALUE;
 		File newestReplay = null;
-		for (File curReplay : allReplays) {
+		for (final File curReplay : allReplays) {
 			// check extension of file
-			String curReplayName = curReplay.getName();
+			final String curReplayName = curReplay.getName();
 			LOGGER.debug("curReplay name: " + curReplayName);
-			String extension = FilenameUtils.getExtension(curReplayName);
+			final String extension = FilenameUtils.getExtension(curReplayName);
 			LOGGER.debug("extension: " + extension);
 			if (curReplay.isFile() && extension.equalsIgnoreCase(extensions[0])) {
 				// check date
-				long curDate = curReplay.lastModified();
+				final long curDate = curReplay.lastModified();
 				LOGGER.debug("curDate: " + curDate);
 				if (curDate > newestDate) {
 					newestDate = curDate;
@@ -131,11 +131,11 @@ public class ReplayFinder {
 	 *            the documents path
 	 * @return the last or newest replay
 	 */
-	public File getLastOrNewestReplay(boolean isHeroes, String documentsPath) {
+	public File getLastOrNewestReplay(final boolean isHeroes, final String documentsPath) {
 		File replay = null;
 		try {
 			replay = getLastUsedReplay(isHeroes, documentsPath);
-		} catch (IOException e) {
+		} catch (final IOException e) {
 			LOGGER.error("Failed to receive last used replay.", e);
 		}
 		if (replay == null || !replay.exists() || !replay.isFile()) {

@@ -6,6 +6,7 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
+import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.core.Filter;
 import org.apache.logging.log4j.core.Layout;
 import org.apache.logging.log4j.core.LogEvent;
@@ -15,24 +16,25 @@ import org.apache.logging.log4j.core.config.plugins.PluginAttribute;
 import org.apache.logging.log4j.core.config.plugins.PluginElement;
 import org.apache.logging.log4j.core.config.plugins.PluginFactory;
 import org.apache.logging.log4j.core.layout.PatternLayout;
+import org.fxmisc.richtext.StyleClassedTextArea;
 
 import javafx.application.Platform;
-import javafx.scene.control.TextArea;
 
 /**
  * TextAreaAppender for Log4j2 Source:
- * http://blog.pikodat.com/2015/10/11/frontend-logging-with-javafx/
+ * http://blog.pikodat.com/2015/10/11/frontend-logging-with-javafx/ , modified
+ * for org.fxmisc.richtext.StyleClassedTextArea: Ahli
  */
-@Plugin(name = "TextAreaAppender", category = "Core", elementType = "appender", printObject = true)
-public final class TextAreaAppender extends AbstractAppender {
+@Plugin(name = "StylizedTextAreaAppender", category = "Core", elementType = "appender", printObject = true)
+public final class StylizedTextAreaAppender extends AbstractAppender {
 	
-	private static TextArea textArea;
+	private static StyleClassedTextArea textArea;
 	
 	private final ReadWriteLock rwLock = new ReentrantReadWriteLock();
 	private final Lock readLock = rwLock.readLock();
 	
-	protected TextAreaAppender(final String name, final Filter filter, final Layout<? extends Serializable> layout,
-			final boolean ignoreExceptions) {
+	protected StylizedTextAreaAppender(final String name, final Filter filter,
+			final Layout<? extends Serializable> layout, final boolean ignoreExceptions) {
 		super(name, filter, layout, ignoreExceptions);
 	}
 	
@@ -50,15 +52,14 @@ public final class TextAreaAppender extends AbstractAppender {
 		try {
 			final String message = new String(getLayout().toByteArray(event), StandardCharsets.UTF_8);
 			
+			final Level level = event.getLevel();
+			
 			Platform.runLater(() -> {
 				try {
 					if (textArea != null) {
-						if (textArea.getText().length() == 0) {
-							textArea.setText(message);
-						} else {
-							textArea.selectEnd();
-							textArea.insertText(textArea.getText().length(), message);
-						}
+						final int length = textArea.getLength();
+						textArea.appendText(message);
+						textArea.setStyleClass(length, textArea.getLength(), level.toString());
 					}
 				} catch (final Throwable t) {
 					System.err.println("Error while append to TextArea: " + t.getMessage());
@@ -85,17 +86,17 @@ public final class TextAreaAppender extends AbstractAppender {
 	 * @return The TextAreaAppender
 	 */
 	@PluginFactory
-	public static TextAreaAppender createAppender(@PluginAttribute("name") final String name,
+	public static StylizedTextAreaAppender createAppender(@PluginAttribute("name") final String name,
 			@PluginElement("Layout") Layout<? extends Serializable> layout,
 			@PluginElement("Filter") final Filter filter) {
 		if (name == null) {
-			LOGGER.error("No name provided for TextAreaAppender");
+			LOGGER.error("No name provided for StylizedTextAreaAppender");
 			return null;
 		}
 		if (layout == null) {
 			layout = PatternLayout.createDefaultLayout();
 		}
-		return new TextAreaAppender(name, filter, layout, true);
+		return new StylizedTextAreaAppender(name, filter, layout, true);
 	}
 	
 	/**
@@ -104,7 +105,7 @@ public final class TextAreaAppender extends AbstractAppender {
 	 * @param textArea
 	 *            TextArea to append
 	 */
-	public static void setTextArea(final TextArea textArea) {
-		TextAreaAppender.textArea = textArea;
+	public static void setTextArea(final StyleClassedTextArea textArea) {
+		StylizedTextAreaAppender.textArea = textArea;
 	}
 }

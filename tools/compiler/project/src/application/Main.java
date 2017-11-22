@@ -16,6 +16,8 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.fxmisc.flowless.VirtualizedScrollPane;
+import org.fxmisc.richtext.StyleClassedTextArea;
 import org.xml.sax.SAXException;
 
 import com.ahli.galaxy.ComponentsListReader;
@@ -31,12 +33,11 @@ import application.thread.ThreadManagerImpl;
 import application.util.ErrorTracker;
 import application.util.ErrorTrackerImpl;
 import application.util.JarHelper;
-import application.util.logger.log4j2plugin.TextAreaAppender;
+import application.util.logger.log4j2plugin.StylizedTextAreaAppender;
 import javafx.animation.PauseTransition;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.scene.Scene;
-import javafx.scene.control.TextArea;
 import javafx.scene.image.Image;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
@@ -59,18 +60,18 @@ public class Main extends Application {
 	// Components
 	private MpqEditorInterface baseMpqInterface = null;
 	private SettingsIniInterface settings = null;
-	private ReplayFinder replayFinder = new ReplayFinder();
-	private ErrorTracker errorTracker = new ErrorTrackerImpl();
-	private CompileManager compileManager = new CompileManager(errorTracker);
-	private ThreadManager threadManager = new ThreadManagerImpl();
+	private final ReplayFinder replayFinder = new ReplayFinder();
+	private final ErrorTracker errorTracker = new ErrorTrackerImpl();
+	private final CompileManager compileManager = new CompileManager(errorTracker);
+	private final ThreadManager threadManager = new ThreadManagerImpl();
 	
 	// data
 	private boolean namespaceHeroes = true;
-	private String documentsPath = new JFileChooser().getFileSystemView().getDefaultDirectory().toString();
+	private final String documentsPath = new JFileChooser().getFileSystemView().getDefaultDirectory().toString();
 	private File basePath = null;
 	
 	// GUI
-	private TextArea txtArea = null;
+	private StyleClassedTextArea txtArea = null;
 	
 	// performance
 	private static long startTime;
@@ -86,7 +87,7 @@ public class Main extends Application {
 	 * 
 	 * @param args
 	 */
-	public static void main(String[] args) {
+	public static void main(final String[] args) {
 		startTime = System.currentTimeMillis();
 		LOGGER.trace("trace log visible");
 		LOGGER.debug("debug log visible");
@@ -105,7 +106,7 @@ public class Main extends Application {
 	 * Called when the App is initializing.
 	 */
 	@Override
-	public void start(Stage primaryStage) {
+	public void start(final Stage primaryStage) {
 		// shorter thread name for application
 		Thread.currentThread().setName("UI");
 		
@@ -121,13 +122,13 @@ public class Main extends Application {
 		
 		initMpqInterface();
 		
-		// // TEST DefaultUICatalog
-		// String baseUIpath = basePath.getParent() + File.separator + "baseUI";
+		// // // TEST DefaultUICatalog
+		// final String baseUIpath = basePath.getParent() + File.separator + "baseUI";
 		// LOGGER.info("BaseUI path: " + baseUIpath);
 		// // UICatalog catalogSC2 = new UICatalog();
-		// UICatalog catalogHeroes = new UICatalog();
-		//
+		// final UICatalog catalogHeroes = new UICatalog();
 		// new Thread() {
+		// @Override
 		// public void run() {
 		// try {
 		// // catalogSC2.processDescIndex(new File(baseUIpath +
@@ -136,33 +137,53 @@ public class Main extends Application {
 		// // "base.sc2data" + File.separator + "UI"
 		// // + File.separator + "Layout" + File.separator +
 		// // "DescIndex.SC2Layout"));
-		// catalogHeroes.processDescIndex(
-		// new File(baseUIpath + File.separator + "heroes" + File.separator +
-		// "mods" + File.separator
-		// + "core.stormmod" + File.separator + "base.stormdata" +
-		// File.separator + "UI"
-		// + File.separator + "Layout" + File.separator +
-		// "DescIndex.StormLayout"));
+		//
+		// // force core first
+		// // catalogHeroes.processDescIndex(
+		// // new File(baseUIpath + File.separator + "heroes" + File.separator + "mods"
+		// +
+		// // File.separator
+		// // + "core.stormmod" + File.separator + "base.stormdata" + File.separator +
+		// "UI"
+		// // + File.separator + "Layout" + File.separator + "DescIndex.StormLayout"),
+		// // "Terr");
+		//
+		// final File directory = new File(baseUIpath + File.separator + "heroes" +
+		// File.separator + "mods");
+		// final Collection<File> descIndexFiles = FileUtils.listFiles(directory,
+		// new WildcardFileFilter("DescIndex.*Layout"), TrueFileFilter.INSTANCE);
+		// LOGGER.info("number of descIndexFiles found: " + descIndexFiles.size());
+		//
+		// for (final File descIndexFile : descIndexFiles) {
+		// LOGGER.info("parsing descIndexFile '" + descIndexFile.getPath() + "'");
+		// catalogHeroes.processDescIndex(descIndexFile, "Terr");
+		// }
+		//
+		// LOGGER.info("done.");
+		// // TODO load other layout mods
+		//
+		// // load AhliObs
 		// catalogHeroes.processDescIndex(
 		// new File(basePath.getAbsolutePath() + File.separator + "heroes" +
 		// File.separator
 		// + "AhliObs.StormInterface" + File.separator + "Base.StormData" +
 		// File.separator
 		// + "UI" + File.separator + "Layout" + File.separator +
-		// "DescIndex.StormLayout"));
-		// } catch (ParserConfigurationException | SAXException | IOException e)
-		// {
-		// LOGGER.error("Error parsing base UI catalog due to a technical
-		// problem.", e);
+		// "DescIndex.StormLayout"),
+		// "Terr");
+		// LOGGER.info("done.");
+		// } catch (ParserConfigurationException | SAXException | IOException e) {
+		// LOGGER.error("ERROR parsing base UI catalog due to a technical problem.", e);
 		// e.printStackTrace();
-		// } catch (UIException e) {
-		// LOGGER.error("Error parsing base UI due to a logical problem.", e);
+		// } catch (final UIException e) {
+		// LOGGER.error("ERROR parsing base UI due to a logical problem.", e);
 		// e.printStackTrace();
 		// }
 		// }
 		// }.start();
-		// if (true)
+		// if (true) {
 		// return;
+		// }
 		
 		startWorkThread(primaryStage);
 		
@@ -173,13 +194,13 @@ public class Main extends Application {
 	 * 
 	 * @param primaryStage
 	 */
-	private void startWorkThread(Stage primaryStage) {
-		Thread buildManagerThread = new Thread() {
+	private void startWorkThread(final Stage primaryStage) {
+		final Thread buildManagerThread = new Thread() {
 			@Override
 			public void run() {
 				// manage thread
 				final int threadID = threadManager.registerThread(this, THREAD_TAG_BUILDERMANAGER);
-				this.setName(THREAD_TAG_BUILDERMANAGER + threadID);
+				setName(THREAD_TAG_BUILDERMANAGER + threadID);
 				// work
 				buildOneOrMoreUIs(true);
 				printLogMessage("All done.");
@@ -197,18 +218,28 @@ public class Main extends Application {
 	 * 
 	 * @param primaryStage
 	 */
-	private void startReplayOrQuitOrShowError(Stage primaryStage) {
+	private void startReplayOrQuitOrShowError(final Stage primaryStage) {
 		if (!errorTracker.hasEncounteredError()) {
 			// start game, launch replay
 			attemptToRunGameWithReplay(paramRunPath, compileAndRun, paramCompilePath);
 			if (!hasParamCompilePath) {
-				// close after 5 seconds, if compiled all and no errors
-				PauseTransition delay = new PauseTransition(Duration.seconds(5));
-				delay.setOnFinished(event -> primaryStage.close());
-				delay.play();
+				Platform.runLater(new Runnable() {
+					@Override
+					public void run() {
+						// close after 5 seconds, if compiled all and no errors
+						final PauseTransition delay = new PauseTransition(Duration.seconds(5));
+						delay.setOnFinished(event -> primaryStage.close());
+						delay.play();
+					}
+				});
 			} else if (hasParamCompilePath || paramRunPath != null) {
 				// close instantly, if compiled special and no errors
-				primaryStage.close();
+				Platform.runLater(new Runnable() {
+					@Override
+					public void run() {
+						primaryStage.close();
+					}
+				});
 			}
 		}
 	}
@@ -219,7 +250,7 @@ public class Main extends Application {
 	 * @param waitForFinish
 	 *            wait for the build-threads to finish
 	 */
-	private void buildOneOrMoreUIs(boolean waitForFinish) {
+	private void buildOneOrMoreUIs(final boolean waitForFinish) {
 		
 		// WORK WORK WORK
 		if (!hasParamCompilePath) {
@@ -227,17 +258,17 @@ public class Main extends Application {
 			try {
 				buildGamesUIs("heroes", true);
 				buildGamesUIs("sc2", false);
-			} catch (IOException e) {
+			} catch (final IOException e) {
 				e.printStackTrace();
 				LOGGER.error("IOException while building UIs", e);
 				errorTracker.reportErrorEncounter(e);
 			}
 		} else {
 			// build specific file due to param
-			boolean isHeroes = paramCompilePath.contains("heroes" + File.separator);
+			final boolean isHeroes = paramCompilePath.contains("heroes" + File.separator);
 			try {
 				buildSpecificUI(new File(paramCompilePath), isHeroes);
-			} catch (IOException e) {
+			} catch (final IOException e) {
 				e.printStackTrace();
 				LOGGER.error("IOException while building UIs", e);
 				errorTracker.reportErrorEncounter(e);
@@ -248,10 +279,10 @@ public class Main extends Application {
 			// wait for all threads to finish
 			Set<Thread> builders = null;
 			while (!(builders = threadManager.getThreadsByTag("Builder")).isEmpty()) {
-				for (Thread buildThread : builders) {
+				for (final Thread buildThread : builders) {
 					try {
 						buildThread.join();
-					} catch (InterruptedException e) {
+					} catch (final InterruptedException e) {
 						e.printStackTrace();
 						LOGGER.error("waiting for build threads to join failed", e);
 						errorTracker.reportErrorEncounter(e);
@@ -284,8 +315,8 @@ public class Main extends Application {
 	private void initParams() {
 		// named params
 		// e.g. "--paramname=value".
-		Parameters params = this.getParameters();
-		Map<String, String> namedParams = params.getNamed();
+		final Parameters params = getParameters();
+		final Map<String, String> namedParams = params.getNamed();
 		
 		// COMPILE / COMPILERUN PARAM
 		// --compile="D:\GalaxyObsUI\dev\heroes\AhliObs.StormInterface"
@@ -313,22 +344,27 @@ public class Main extends Application {
 	/**
 	 * Initialize GUI
 	 */
-	private void initGUI(Stage primaryStage) {
+	private void initGUI(final Stage primaryStage) {
 		// Build UI
-		BorderPane root = new BorderPane();
-		txtArea = new TextArea();
-		txtArea.setText("Initializing App...\n");
+		final BorderPane root = new BorderPane();
+		
+		txtArea = new StyleClassedTextArea();
+		printLogMessage("Initializing App...");
 		// log4j2 can print into GUI
-		TextAreaAppender.setTextArea(txtArea);
-		root.setCenter(txtArea);
-		Scene scene = new Scene(root, 1200, 400);
+		StylizedTextAreaAppender.setTextArea(txtArea);
+		
+		final VirtualizedScrollPane<StyleClassedTextArea> virtualizedScrollPane = new VirtualizedScrollPane<>(txtArea);
+		
+		root.setCenter(virtualizedScrollPane);
+		final Scene scene = new Scene(root, 1200, 400);
 		scene.getStylesheets().add(Main.class.getResource("application.css").toExternalForm()); //$NON-NLS-1$
+		scene.getStylesheets().add(Main.class.getResource("textStyles.css").toExternalForm()); //$NON-NLS-1$
 		primaryStage.setScene(scene);
 		primaryStage.show();
 		primaryStage.setTitle("Compiling Interfaces...");
 		try {
 			primaryStage.getIcons().add(new Image(Main.class.getResourceAsStream("/res/ahli.png"))); //$NON-NLS-1$
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			LOGGER.error("Failed to load ahli.png");
 		}
 	}
@@ -340,13 +376,14 @@ public class Main extends Application {
 	 * @param paramCompilePath
 	 * @param compileAndRun
 	 */
-	private void attemptToRunGameWithReplay(String paramRunPath, boolean compileAndRun, String paramCompilePath) {
+	private void attemptToRunGameWithReplay(final String paramRunPath, final boolean compileAndRun,
+			final String paramCompilePath) {
 		new Thread() {
 			@Override
 			public void run() {
 				// manage thread
-				int id = threadManager.registerThread(this, THREAD_TAG_GAMERUNNER);
-				this.setName(THREAD_TAG_GAMERUNNER + id);
+				final int id = threadManager.registerThread(this, THREAD_TAG_GAMERUNNER);
+				setName(THREAD_TAG_GAMERUNNER + id);
 				boolean isHeroes = false;
 				String gamePath = null;
 				
@@ -394,15 +431,15 @@ public class Main extends Application {
 					}
 				}
 				
-				File replay = replayFinder.getLastOrNewestReplay(isHeroes, documentsPath);
+				final File replay = replayFinder.getLastOrNewestReplay(isHeroes, documentsPath);
 				if (replay != null && replay.exists() && replay.isFile()) {
 					LOGGER.info("Starting game with replay: " + replay.getName());
-					String cmd = "cmd /C start \"\" \"" + gamePath + "\" \"" + replay.getAbsolutePath() + "\"";
+					final String cmd = "cmd /C start \"\" \"" + gamePath + "\" \"" + replay.getAbsolutePath() + "\"";
 					LOGGER.debug("executing: " + cmd);
 					try {
 						Runtime.getRuntime().exec(cmd);
 						LOGGER.debug("after Start attempt...");
-					} catch (IOException e) {
+					} catch (final IOException e) {
 						e.printStackTrace();
 					}
 				} else {
@@ -423,12 +460,12 @@ public class Main extends Application {
 	 * @param paramPath
 	 * @return
 	 */
-	private String cutCompileParamPath(String paramPath) {
+	private String cutCompileParamPath(final String paramPath) {
 		String str = paramPath;
 		if (str != null) {
 			while (str.length() > 0 && !str.endsWith("Interface")) {
 				LOGGER.debug("cutting progress: " + str);
-				int lastIndex = str.lastIndexOf(File.separatorChar);
+				final int lastIndex = str.lastIndexOf(File.separatorChar);
 				if (lastIndex != -1) {
 					str = str.substring(0, lastIndex);
 				} else {
@@ -448,13 +485,13 @@ public class Main extends Application {
 	 * @param isHeroes
 	 * @throws IOException
 	 */
-	public void buildGamesUIs(String subfolderName, boolean isHeroes) throws IOException {
-		File dir = new File(basePath.getAbsolutePath() + File.separator + subfolderName);
+	public void buildGamesUIs(final String subfolderName, final boolean isHeroes) throws IOException {
+		final File dir = new File(basePath.getAbsolutePath() + File.separator + subfolderName);
 		namespaceHeroes = isHeroes;
 		if (dir.exists() && dir.isDirectory()) {
-			File[] directoryListing = dir.listFiles();
+			final File[] directoryListing = dir.listFiles();
 			if (directoryListing != null) {
-				for (File child : directoryListing) {
+				for (final File child : directoryListing) {
 					// build UI
 					buildSpecificUI(child, isHeroes);
 				}
@@ -470,14 +507,14 @@ public class Main extends Application {
 	 * @param isHeroes
 	 * @throws IOException
 	 */
-	public void buildSpecificUI(File interfaceFolder, boolean isHeroes) throws IOException {
+	public void buildSpecificUI(final File interfaceFolder, final boolean isHeroes) throws IOException {
 		if (interfaceFolder.isDirectory()) {
-			Thread buildThread = new Thread() {
+			final Thread buildThread = new Thread() {
 				@Override
 				public void run() {
 					// manage thread
-					int threadId = threadManager.registerThread(this, THREAD_TAG_BUILDER);
-					this.setName(THREAD_TAG_BUILDER + threadId);
+					final int threadId = threadManager.registerThread(this, THREAD_TAG_BUILDER);
+					setName(THREAD_TAG_BUILDER + threadId);
 					
 					// create unique cache path
 					final MpqEditorInterface threadsMpqInterface = (MpqEditorInterface) baseMpqInterface.clone();
@@ -486,7 +523,7 @@ public class Main extends Application {
 					// work
 					try {
 						buildFile(interfaceFolder, isHeroes, threadsMpqInterface);
-					} catch (IOException e) {
+					} catch (final IOException e) {
 						LOGGER.error("IOException while building UIs", e);
 						errorTracker.reportErrorEncounter();
 						e.printStackTrace();
@@ -504,12 +541,13 @@ public class Main extends Application {
 	 * 
 	 * @param msg
 	 */
-	public void printLogMessage(String msg) {
-		
+	public void printLogMessage(final String msg) {
 		Platform.runLater(new Runnable() {
 			@Override
 			public void run() {
+				final int len = txtArea.getLength();
 				txtArea.appendText(msg + "\n");
+				txtArea.setStyleClass(len, txtArea.getLength(), "printlog");
 			}
 		});
 	}
@@ -528,7 +566,7 @@ public class Main extends Application {
 	 *            MpqInterface with unique cache path
 	 * @throws IOException
 	 */
-	private void buildFile(File file, boolean isHeroes, MpqEditorInterface mpqi) throws IOException {
+	private void buildFile(final File file, final boolean isHeroes, final MpqEditorInterface mpqi) throws IOException {
 		String buildPath = documentsPath + File.separator;
 		
 		LOGGER.info("Starting to build file: " + file.getPath());
@@ -541,10 +579,10 @@ public class Main extends Application {
 		buildPath += File.separator + "Interfaces";
 		
 		// get and create cache
-		File cache = new File(mpqi.getMpqCachePath());
+		final File cache = new File(mpqi.getMpqCachePath());
 		if (!cache.exists() && !cache.mkdirs()) {
 			errorTracker.reportErrorEncounter();
-			String msg = "Unable to create cache directory.";
+			final String msg = "Unable to create cache directory.";
 			LOGGER.error(msg);
 			throw new IOException(msg);
 		}
@@ -555,7 +593,7 @@ public class Main extends Application {
 				// sleep and hope the file gets released soon
 				try {
 					Thread.sleep(500);
-				} catch (InterruptedException e1) {
+				} catch (final InterruptedException e1) {
 					e1.printStackTrace();
 				}
 			} else {
@@ -564,7 +602,7 @@ public class Main extends Application {
 			}
 		}
 		if (cacheClearAttempts > 100) {
-			String msg = "Cache could not be cleared";
+			final String msg = "Cache could not be cleared";
 			LOGGER.error(msg);
 			return;
 		}
@@ -576,12 +614,12 @@ public class Main extends Application {
 				copyFileOrFolder(file, cache);
 				LOGGER.debug("Copy Folder took " + copyAttempts + " attempts to succeed.");
 				break x;
-			} catch (FileSystemException e) {
+			} catch (final FileSystemException e) {
 				if (copyAttempts == 0) {
 					LOGGER.warn("Attempt to copy directory failed.", e);
 				} else if (copyAttempts >= 100) {
 					errorTracker.reportErrorEncounter();
-					String msg = "Unable to copy directory after 100 copy attempts: " + e.getMessage();
+					final String msg = "Unable to copy directory after 100 copy attempts: " + e.getMessage();
 					LOGGER.error(msg, e);
 					e.printStackTrace();
 					throw new FileSystemException(msg);
@@ -589,19 +627,19 @@ public class Main extends Application {
 				// sleep and hope the file gets released soon
 				try {
 					Thread.sleep(500);
-				} catch (InterruptedException e1) {
+				} catch (final InterruptedException e1) {
 					LOGGER.error("Thread sleep was interrupted with exception.", e);
 				}
-			} catch (IOException e) {
+			} catch (final IOException e) {
 				errorTracker.reportErrorEncounter();
-				String msg = "Unable to copy directory";
+				final String msg = "Unable to copy directory";
 				LOGGER.error(msg, e);
 				e.printStackTrace();
 			}
 		}
 		if (copyAttempts > 100) {
 			// copy keeps failing -> abort
-			String msg = "Above code did not throw exception about copy attempt threshold reached.";
+			final String msg = "Above code did not throw exception about copy attempt threshold reached.";
 			LOGGER.error(msg);
 			errorTracker.reportErrorEncounter();
 			throw new IOException(msg);
@@ -609,10 +647,10 @@ public class Main extends Application {
 		
 		// do stuff
 		LOGGER.debug("retrieving componentList");
-		File componentListFile = mpqi.getComponentListFile();
+		final File componentListFile = mpqi.getComponentListFile();
 		LOGGER.debug("retrieving descIndex - set path and clear");
 		
-		DescIndexData descIndex = new DescIndexData(mpqi);
+		final DescIndexData descIndex = new DescIndexData(mpqi);
 		
 		try {
 			descIndex.setDescIndexPathAndClear(ComponentsListReader.getDescIndexPath(componentListFile));
@@ -623,7 +661,7 @@ public class Main extends Application {
 		}
 		
 		LOGGER.debug("retrieving descIndex - get cached file");
-		File descIndexFile = mpqi.getFileFromMpq(descIndex.getDescIndexIntPath());
+		final File descIndexFile = mpqi.getFileFromMpq(descIndex.getDescIndexIntPath());
 		LOGGER.debug("adding layouts from descIndexFile: " + descIndexFile.getAbsolutePath());
 		try {
 			descIndex.addLayoutIntPath(DescIndexReader.getLayoutPathList(descIndexFile, false));
@@ -641,13 +679,13 @@ public class Main extends Application {
 		LOGGER.info("Building... " + file.getName());
 		
 		try {
-			boolean protectMPQ = isHeroes ? settings.isHeroesProtectMPQ() : settings.isSC2ProtectMPQ();
+			final boolean protectMPQ = isHeroes ? settings.isHeroesProtectMPQ() : settings.isSC2ProtectMPQ();
 			mpqi.buildMpq(buildPath, file.getName(), protectMPQ, settings.isBuildUnprotectedToo());
 		} catch (IOException | InterruptedException e) {
 			LOGGER.error("unable to construct final Interface file", e);
 			errorTracker.reportErrorEncounter(e);
 			e.printStackTrace();
-		} catch (Exception e1) {
+		} catch (final Exception e1) {
 			LOGGER.error("caught an unexpected Exception", e1);
 			errorTracker.reportErrorEncounter(e1);
 			e1.printStackTrace();
@@ -662,7 +700,7 @@ public class Main extends Application {
 		LOGGER.info("App is about to shut down.");
 		baseMpqInterface.clearCacheExtractedMpq();
 		LOGGER.info("App waves Goodbye!");
-		long executionTime = (System.currentTimeMillis() - startTime);
+		final long executionTime = (System.currentTimeMillis() - startTime);
 		LOGGER.info("Execution time: " + String.format("%d min, %d sec", TimeUnit.MILLISECONDS.toMinutes(executionTime),
 				TimeUnit.MILLISECONDS.toSeconds(executionTime)
 						- TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(executionTime))));
@@ -672,8 +710,8 @@ public class Main extends Application {
 	 * Initializes the MPQ Interface.
 	 */
 	private void initMpqInterface() {
-		String tempDirectory = System.getProperty("java.io.tmpdir");
-		String cachePath = tempDirectory + "ObserverInterfaceBuilder" + File.separator + "_ExtractedMpq";
+		final String tempDirectory = System.getProperty("java.io.tmpdir");
+		final String cachePath = tempDirectory + "ObserverInterfaceBuilder" + File.separator + "_ExtractedMpq";
 		baseMpqInterface = new MpqEditorInterface(cachePath);
 		baseMpqInterface.setMpqEditorPath(basePath.getParent() + File.separator + "tools" + File.separator + "plugins"
 				+ File.separator + "mpq" + File.separator + "MPQEditor.exe");
@@ -687,15 +725,15 @@ public class Main extends Application {
 	 *            optional SettingsIniInterface, set to null to load from default
 	 *            location
 	 */
-	private void initSettings(SettingsIniInterface optionalSettingsToLoad) {
+	private void initSettings(final SettingsIniInterface optionalSettingsToLoad) {
 		SettingsIniInterface settings = optionalSettingsToLoad;
 		if (settings == null) {
-			String settingsFilePath = basePath.getParent() + File.separator + "settings.ini";
+			final String settingsFilePath = basePath.getParent() + File.separator + "settings.ini";
 			settings = new SettingsIniInterface(settingsFilePath);
 		}
 		try {
 			settings.readSettingsFromFile();
-		} catch (FileNotFoundException e) {
+		} catch (final FileNotFoundException e) {
 			LOGGER.error("settings file could not be found", e);
 			errorTracker.reportErrorEncounter(e);
 			e.printStackTrace();
@@ -719,25 +757,25 @@ public class Main extends Application {
 	 * @param target
 	 * @throws IOException
 	 */
-	private static void copyFileOrFolder(File source, File target) throws IOException {
+	private static void copyFileOrFolder(final File source, final File target) throws IOException {
 		if (source.isDirectory()) {
 			// create folder if not existing
 			if (!target.exists() && !target.mkdir()) {
-				String msg = "Could not create directory " + target.getAbsolutePath();
+				final String msg = "Could not create directory " + target.getAbsolutePath();
 				LOGGER.error(msg);
 				throw new IOException(msg);
 			}
 			
 			// copy all contained files recursively
-			String[] fileList = source.list();
+			final String[] fileList = source.list();
 			if (fileList == null) {
-				String msg = "Source directory's files returned null";
+				final String msg = "Source directory's files returned null";
 				LOGGER.error(msg);
 				throw new IOException(msg);
 			}
-			for (String file : fileList) {
-				File srcFile = new File(source, file);
-				File destFile = new File(target, file);
+			for (final String file : fileList) {
+				final File srcFile = new File(source, file);
+				final File destFile = new File(target, file);
 				// Recursive function call
 				copyFileOrFolder(srcFile, destFile);
 			}

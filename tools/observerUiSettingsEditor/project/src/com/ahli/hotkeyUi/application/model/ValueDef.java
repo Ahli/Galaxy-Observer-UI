@@ -14,7 +14,7 @@ public class ValueDef {
 	private final SimpleStringProperty description;
 	private final SimpleStringProperty defaultValue;
 	
-	public ValueDef(String id, String value, String description, String defaultValue) {
+	public ValueDef(final String id, final String value, final String description, final String defaultValue) {
 		this.id = new SimpleStringProperty(id);
 		this.value = new SimpleStringProperty(value);
 		this.description = new SimpleStringProperty(description);
@@ -25,7 +25,7 @@ public class ValueDef {
 		return id.get();
 	}
 	
-	public void setId(String id) {
+	public void setId(final String id) {
 		this.id.set(id);
 	}
 	
@@ -33,7 +33,7 @@ public class ValueDef {
 		return value.get();
 	}
 	
-	public void setValue(String value) {
+	public void setValue(final String value) {
 		this.value.set(value);
 	}
 	
@@ -41,7 +41,7 @@ public class ValueDef {
 		return description.get();
 	}
 	
-	public void setDescription(String description) {
+	public void setDescription(final String description) {
 		this.description.set(description);
 	}
 	
@@ -49,7 +49,7 @@ public class ValueDef {
 		return defaultValue.get();
 	}
 	
-	public void setDefaultValue(String defaultValue) {
+	public void setDefaultValue(final String defaultValue) {
 		this.defaultValue.set(defaultValue);
 	}
 	

@@ -24,19 +24,19 @@ public class JarHelper {
 	 * @param aclass
 	 * @return File at base path
 	 */
-	public static File getJarDir(Class<? extends Object> aclass) {
+	public static File getJarDir(final Class<? extends Object> aclass) {
 		LOGGER.debug("_FINDING JAR'S PATH"); //$NON-NLS-1$
 		
 		// ATTEMPT #1
-		File f = new File(System.getProperty("java.class.path")); //$NON-NLS-1$
-		File dir = f.getAbsoluteFile().getParentFile();
+		final File f = new File(System.getProperty("java.class.path")); //$NON-NLS-1$
+		final File dir = f.getAbsoluteFile().getParentFile();
 		String str = dir.toString();
 		LOGGER.debug("Attempt#1 java.class.path: " + str); //$NON-NLS-1$
 		
 		// check if started in eclipse
 		if (str.contains(File.separator + "target" + File.separator + "classes;")) { //$NON-NLS-1$ //$NON-NLS-2$
 			// get current working directory
-			URI uri = new File(".").toURI(); //$NON-NLS-1$
+			final URI uri = new File(".").toURI(); //$NON-NLS-1$
 			// results in: "file:/D:/GalaxyObsUI/dev/./"
 			// but maybe results in something completely different like
 			// notepad++'s directory...
@@ -55,7 +55,7 @@ public class JarHelper {
 				str = str.substring(0, str.length() - 3);
 			}
 			
-			URL url = aclass.getProtectionDomain().getCodeSource().getLocation();
+			final URL url = aclass.getProtectionDomain().getCodeSource().getLocation();
 			// class returns "rsrc:./", if 2nd option during jar export was
 			// chosen
 			if (!url.toString().startsWith("rsrc:./")) { //$NON-NLS-1$

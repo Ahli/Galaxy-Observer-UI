@@ -18,8 +18,8 @@ public class ThreadManagerImpl implements ThreadManager {
 	int nextFreeThreadId = 0;
 	
 	@Override
-	public int registerThread(Thread thread, String tag) {
-		int threadId = getUnusedThreadId();
+	public int registerThread(final Thread thread, final String tag) {
+		final int threadId = getUnusedThreadId();
 		idToThread.put(threadId, thread);
 		threadToId.put(thread, threadId);
 		threadToTag.put(thread, getInternalTag(threadId, tag));
@@ -27,13 +27,14 @@ public class ThreadManagerImpl implements ThreadManager {
 	}
 	
 	@Override
-	public Set<Thread> getThreadsByTag(String tag) {
-		Set<Thread> set = new HashSet<>();
-		String regex = getInternalTagValidationRegex(tag);
+	public Set<Thread> getThreadsByTag(final String tag) {
+		final Set<Thread> set = new HashSet<>();
+		final String regex = getInternalTagValidationRegex(tag);
 		// arraylist clones key set to fix java.util.ConcurrentModificationException
-		for (Thread thread : new ArrayList<Thread>(threadToId.keySet())) {
-			if (thread.getName().matches(regex))
+		for (final Thread thread : new ArrayList<>(threadToId.keySet())) {
+			if (thread.getName().matches(regex)) {
 				set.add(thread);
+			}
 		}
 		return set;
 	}
@@ -44,8 +45,8 @@ public class ThreadManagerImpl implements ThreadManager {
 	}
 	
 	@Override
-	public boolean unregisterThread(Thread thread) {
-		Integer id = threadToId.get(thread);
+	public boolean unregisterThread(final Thread thread) {
+		final Integer id = threadToId.get(thread);
 		if (id != null) {
 			threadToId.remove(thread);
 			idToThread.remove(id);
@@ -70,7 +71,7 @@ public class ThreadManagerImpl implements ThreadManager {
 	 * @param tag
 	 * @return
 	 */
-	private String getInternalTag(int threadId, String tag) {
+	private String getInternalTag(final int threadId, final String tag) {
 		return tag + "_" + threadId;
 	}
 	
@@ -81,7 +82,7 @@ public class ThreadManagerImpl implements ThreadManager {
 	 *            the tag String
 	 * @return regex to validate these tags
 	 */
-	private String getInternalTagValidationRegex(String tag) {
+	private String getInternalTagValidationRegex(final String tag) {
 		return "^" + tag + "_[0-9]+$";
 	}
 	

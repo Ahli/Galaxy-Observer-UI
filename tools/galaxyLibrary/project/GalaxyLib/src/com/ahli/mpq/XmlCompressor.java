@@ -42,39 +42,39 @@ public class XmlCompressor {
 	 * @throws SAXException
 	 * @throws IOException
 	 */
-	public static void processCache(String cachePath, int ignoreCommentCountPerFile)
+	public static void processCache(final String cachePath, final int ignoreCommentCountPerFile)
 			throws ParserConfigurationException, SAXException, IOException {
 		
 		LOGGER.info("Compressing XML files...");
 		LOGGER.debug("cachePath: " + cachePath);
 		
-		File cache = new File(cachePath);
-		boolean recursive = true;
+		final File cache = new File(cachePath);
+		final boolean recursive = true;
 		
-		Collection<File> filesOfCache = FileUtils.listFiles(cache, null, recursive);
+		final Collection<File> filesOfCache = FileUtils.listFiles(cache, null, recursive);
 		
-		DocumentBuilder dBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+		final DocumentBuilder dBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
 		// provide error handler that does not print incompatible files into
 		// console
 		dBuilder.setErrorHandler(new ErrorHandler() {
 			@Override
-			public void warning(SAXParseException e) throws SAXException {
+			public void warning(final SAXParseException e) throws SAXException {
 			}
 			
 			@Override
-			public void fatalError(SAXParseException e) throws SAXException {
+			public void fatalError(final SAXParseException e) throws SAXException {
 				throw e;
 			}
 			
 			@Override
-			public void error(SAXParseException e) throws SAXException {
+			public void error(final SAXParseException e) throws SAXException {
 				throw e;
 			}
 		});
 		
 		InputStream is = null;
 		
-		x: for (File curFile : filesOfCache) {
+		x: for (final File curFile : filesOfCache) {
 			Document doc = null;
 			try {
 				// parse XML file
@@ -102,22 +102,22 @@ public class XmlCompressor {
 			LOGGER.debug("compression - processing file: " + curFile.getPath());
 			
 			// process all nodes
-			NodeList nodes = doc.getElementsByTagName("*");
+			final NodeList nodes = doc.getElementsByTagName("*");
 			for (int i = 0; i < nodes.getLength(); i++) {
-				Node curNode = nodes.item(i);
+				final Node curNode = nodes.item(i);
 				
 				// remove whitespace
 				trimWhitespace(curNode);
 			}
 			
 			// remove comment nodes except first one
-			Element elem = doc.getDocumentElement();
-			NodeList childNodes = elem.getChildNodes();
+			final Element elem = doc.getDocumentElement();
+			final NodeList childNodes = elem.getChildNodes();
 			removeCommentsInChildNodes(childNodes, ignoreCommentCountPerFile);
 			
 			// write DOM back to XML
-			Source source = new DOMSource(doc);
-			Result result = new StreamResult(curFile);
+			final Source source = new DOMSource(doc);
+			final Result result = new StreamResult(curFile);
 			Transformer xformer;
 			try {
 				xformer = TransformerFactory.newInstance().newTransformer();
@@ -131,16 +131,16 @@ public class XmlCompressor {
 		
 	}
 	
-	private static void removeCommentsInChildNodes(NodeList childNodes, int ignoreCount) {
+	private static void removeCommentsInChildNodes(final NodeList childNodes, int ignoreCount) {
 		for (int i = 0; i < childNodes.getLength(); i++) {
-			Node curNode = childNodes.item(i);
+			final Node curNode = childNodes.item(i);
 			
 			if (curNode.getNodeType() == Node.COMMENT_NODE) {
 				if (ignoreCount == 0) {
 					
 					// keep hotkeys/settings definition alive
-					Comment comment = (Comment) curNode;
-					String text = comment.getData().trim().toLowerCase(Locale.ENGLISH);
+					final Comment comment = (Comment) curNode;
+					final String text = comment.getData().trim().toLowerCase(Locale.ENGLISH);
 					if (!text.contains("@hotkey") && !text.contains("@setting")) {
 						
 						curNode.getParentNode().removeChild(curNode);
@@ -156,10 +156,10 @@ public class XmlCompressor {
 		}
 	}
 	
-	public static void trimWhitespace(Node node) {
-		NodeList childNodes = node.getChildNodes();
+	public static void trimWhitespace(final Node node) {
+		final NodeList childNodes = node.getChildNodes();
 		for (int i = 0; i < childNodes.getLength(); i++) {
-			Node child = childNodes.item(i);
+			final Node child = childNodes.item(i);
 			if (child.getNodeType() == Node.TEXT_NODE) {
 				child.setTextContent(child.getTextContent().trim());
 			}

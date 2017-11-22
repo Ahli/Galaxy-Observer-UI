@@ -20,7 +20,7 @@ public class UIAnimation extends UIElement {
 	 * 
 	 * @param name
 	 */
-	public UIAnimation(String name) {
+	public UIAnimation(final String name) {
 		super(name);
 	}
 	
@@ -35,7 +35,7 @@ public class UIAnimation extends UIElement {
 	 * @param controllers
 	 *            the controllers to set
 	 */
-	public void setControllers(ArrayList<UIController> controllers) {
+	public void setControllers(final ArrayList<UIController> controllers) {
 		this.controllers = controllers;
 	}
 	
@@ -50,7 +50,7 @@ public class UIAnimation extends UIElement {
 	 * @param events
 	 *            the events to set
 	 */
-	public void setEvents(Map<String, UIAttribute> events) {
+	public void setEvents(final Map<String, UIAttribute> events) {
 		this.events = events;
 	}
 	
@@ -66,7 +66,7 @@ public class UIAnimation extends UIElement {
 	 * 
 	 * @param nextEventsAdditionShouldOverride
 	 */
-	public void setNextEventsAdditionShouldOverride(boolean nextEventsAdditionShouldOverride) {
+	public void setNextEventsAdditionShouldOverride(final boolean nextEventsAdditionShouldOverride) {
 		this.nextEventsAdditionShouldOverride = nextEventsAdditionShouldOverride;
 	}
 	
@@ -81,7 +81,7 @@ public class UIAnimation extends UIElement {
 	 * @param driver
 	 *            the driver to set
 	 */
-	public void setDriver(UIAttribute driver) {
+	public void setDriver(final UIAttribute driver) {
 		this.driver = driver;
 	}
 	
@@ -91,17 +91,17 @@ public class UIAnimation extends UIElement {
 	 * @return
 	 */
 	@Override
-	public UIElement receiveFrameFromPath(String path) {
+	public UIElement receiveFrameFromPath(final String path) {
 		if (path == null || path.isEmpty()) {
 			// end here
 			return this;
 		} else {
 			// go deeper
-			String curName = UIElement.getLeftPathLevel(path);
-			for (UIElement curElem : controllers) {
+			final String curName = UIElement.getLeftPathLevel(path);
+			for (final UIElement curElem : controllers) {
 				if (curName.equalsIgnoreCase(curElem.getName())) {
 					// found right frame -> cut path
-					String newPath = UIElement.removeLeftPathLevel(path);
+					final String newPath = UIElement.removeLeftPathLevel(path);
 					return curElem.receiveFrameFromPath(newPath);
 				}
 			}
@@ -115,19 +115,19 @@ public class UIAnimation extends UIElement {
 	 */
 	@Override
 	public Object deepClone() {
-		UIAnimation clone = new UIAnimation(name);
+		final UIAnimation clone = new UIAnimation(name);
 		clone.setNextEventsAdditionShouldOverride(nextEventsAdditionShouldOverride);
 		
 		// clone events
-		Map<String, UIAttribute> clonedEvents = new HashMap<>();
-		for (Entry<String, UIAttribute> entry : events.entrySet()) {
-			UIAttribute clonedValue = (UIAttribute) entry.getValue().deepClone();
+		final Map<String, UIAttribute> clonedEvents = new HashMap<>();
+		for (final Entry<String, UIAttribute> entry : events.entrySet()) {
+			final UIAttribute clonedValue = (UIAttribute) entry.getValue().deepClone();
 			clonedEvents.put(entry.getKey(), clonedValue);
 		}
 		clone.setEvents(clonedEvents);
 		
 		// clone controllers
-		for (UIController controller : controllers) {
+		for (final UIController controller : controllers) {
 			clone.getControllers().add((UIController) controller.deepClone());
 		}
 		

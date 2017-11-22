@@ -21,16 +21,16 @@ import application.util.ErrorTracker;
 public class CompileManager {
 	static Logger LOGGER = LogManager.getLogger(CompileManager.class);
 	
-	private ErrorTracker errorTracker;
+	private final ErrorTracker errorTracker;
 	
-	public CompileManager(ErrorTracker errorTracker) {
+	public CompileManager(final ErrorTracker errorTracker) {
 		this.errorTracker = errorTracker;
 	}
 	
 	/**
 	 * Compiles and updates the data in the cache.
 	 */
-	public void compile(DescIndexData descIndex) {
+	public void compile(final DescIndexData descIndex) {
 		try {
 			// manage order of layout files in DescIndex
 			descIndex.orderLayoutFiles();

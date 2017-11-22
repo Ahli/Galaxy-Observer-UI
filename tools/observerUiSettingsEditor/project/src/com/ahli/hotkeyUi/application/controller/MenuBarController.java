@@ -47,7 +47,7 @@ public class MenuBarController {
 	 * 
 	 * @param main
 	 */
-	public void setMainApp(Main main) {
+	public void setMainApp(final Main main) {
 		this.main = main;
 	}
 	
@@ -55,7 +55,7 @@ public class MenuBarController {
 	 * Called when the user clicks on the delete button.
 	 */
 	@FXML
-	public void close(ActionEvent event) {
+	public void close(final ActionEvent event) {
 		main.closeFile();
 	}
 	
@@ -63,7 +63,7 @@ public class MenuBarController {
 	 * Called when the user clicks on the open button.
 	 */
 	@FXML
-	public void open(ActionEvent event) {
+	public void open(final ActionEvent event) {
 		main.openUiMpq();
 	}
 	
@@ -71,7 +71,7 @@ public class MenuBarController {
 	 * Called when the user clicks on the save as button.
 	 */
 	@FXML
-	public void saveAs(ActionEvent event) {
+	public void saveAs(final ActionEvent event) {
 		main.saveAsUiMpq();
 	}
 	
@@ -79,7 +79,7 @@ public class MenuBarController {
 	 * Called when the user clicks on the save as button.
 	 */
 	@FXML
-	public void saveCurrent(ActionEvent event) {
+	public void saveCurrent(final ActionEvent event) {
 		main.saveUiMpq();
 	}
 	
@@ -87,7 +87,7 @@ public class MenuBarController {
 	 * Called when the user clicks on the save as button.
 	 */
 	@FXML
-	public void exit(ActionEvent event) {
+	public void exit(final ActionEvent event) {
 		main.closeApp();
 	}
 	
@@ -95,7 +95,7 @@ public class MenuBarController {
 	 * Updates the menu bar's items.
 	 */
 	public void updateMenuBar() {
-		boolean docLoaded = main.isValidOpenedDocPath();
+		final boolean docLoaded = main.isValidOpenedDocPath();
 		
 		menuSave.setDisable(!docLoaded);
 		menuSaveAs.setDisable(!docLoaded);
@@ -107,12 +107,12 @@ public class MenuBarController {
 	 */
 	@FXML
 	public void aboutClicked() {
-		String content = String.format(Messages.getString("MenuBarController.AboutText"), Main.VERSION) + "\n\n" //$NON-NLS-2$
+		final String content = String.format(Messages.getString("MenuBarController.AboutText"), Main.VERSION) + "\n\n" //$NON-NLS-2$
 				+ Messages.getString("MenuBarController.AboutText2");
-		String title = Messages.getString("MenuBarController.About"); //$NON-NLS-1$
-		String header = Messages.getString("MenuBarController.ObserverUISettingsEditor"); //$NON-NLS-1$
-		String imgUrl = Main.class.getResource("/res/ahliLogo.png").toString(); //$NON-NLS-1$
-		Alert alert = Alerts.buildAboutAlert(main.getPrimaryStage(), title, header, content, imgUrl);
+		final String title = Messages.getString("MenuBarController.About"); //$NON-NLS-1$
+		final String header = Messages.getString("MenuBarController.ObserverUISettingsEditor"); //$NON-NLS-1$
+		final String imgUrl = Main.class.getResource("/res/ahliLogo.png").toString(); //$NON-NLS-1$
+		final Alert alert = Alerts.buildAboutAlert(main.getPrimaryStage(), title, header, content, imgUrl);
 		alert.showAndWait();
 	}
 	

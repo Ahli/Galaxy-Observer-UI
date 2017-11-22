@@ -37,20 +37,20 @@ public class DescIndexReader {
 	 * @throws SAXException
 	 * @throws ParserConfigurationException
 	 */
-	public static ArrayList<String> getLayoutPathList(File f, boolean ignoreRequiredToLoadEntries)
+	public static ArrayList<String> getLayoutPathList(final File f, final boolean ignoreRequiredToLoadEntries)
 			throws SAXException, IOException, ParserConfigurationException {
-		ArrayList<String> list = new ArrayList<>();
+		final ArrayList<String> list = new ArrayList<>();
 		
-		DocumentBuilder dBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-		Document doc = dBuilder.parse(f);
+		final DocumentBuilder dBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+		final Document doc = dBuilder.parse(f);
 		
 		// must be in a DataComponent node
-		NodeList nodeList = doc.getElementsByTagName("*");
+		final NodeList nodeList = doc.getElementsByTagName("*");
 		for (int i = 0; i < nodeList.getLength(); i++) {
-			Node node = nodeList.item(i);
+			final Node node = nodeList.item(i);
 			if (node.getNodeName().equalsIgnoreCase("Include")) {
-				NamedNodeMap attributes = node.getAttributes();
-				String path = attributes.item(0).getNodeValue();
+				final NamedNodeMap attributes = node.getAttributes();
+				final String path = attributes.item(0).getNodeValue();
 				
 				// ignore requiredtoload if desired
 				if (ignoreRequiredToLoadEntries

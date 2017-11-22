@@ -28,7 +28,7 @@ public class ErrorTrackerImpl implements ErrorTracker {
 	}
 	
 	@Override
-	public void reportErrorEncounter(Exception exception) {
+	public void reportErrorEncounter(final Exception exception) {
 		this.exception = exception;
 	}
 	

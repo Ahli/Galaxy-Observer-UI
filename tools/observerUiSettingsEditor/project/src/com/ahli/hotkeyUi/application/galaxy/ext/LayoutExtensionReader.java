@@ -51,7 +51,7 @@ public class LayoutExtensionReader {
 	 * @param hotkeys
 	 *            the hotkeys to set
 	 */
-	public void setHotkeys(ArrayList<ValueDef> hotkeys) {
+	public void setHotkeys(final ArrayList<ValueDef> hotkeys) {
 		this.hotkeys = hotkeys;
 	}
 	
@@ -66,7 +66,7 @@ public class LayoutExtensionReader {
 	 * @param settings
 	 *            the settings to set
 	 */
-	public void setSettings(ArrayList<ValueDef> settings) {
+	public void setSettings(final ArrayList<ValueDef> settings) {
 		this.settings = settings;
 	}
 	
@@ -79,19 +79,19 @@ public class LayoutExtensionReader {
 	 * @throws SAXException
 	 * @throws IOException
 	 */
-	public void processLayoutFiles(Collection<File> layoutFiles)
+	public void processLayoutFiles(final Collection<File> layoutFiles)
 			throws ParserConfigurationException, SAXException, IOException {
 		
 		LOGGER.info("Scanning for XML file...");
 		
-		DocumentBuilder dBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+		final DocumentBuilder dBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
 		// provide error handler that does not print incompatible files into
 		// console
 		dBuilder.setErrorHandler(new SilentXmlSaxErrorHandler());
 		
 		InputStream is = null;
 		
-		x: for (File curFile : layoutFiles) {
+		x: for (final File curFile : layoutFiles) {
 			Document doc = null;
 			try {
 				// parse XML file
@@ -119,14 +119,14 @@ public class LayoutExtensionReader {
 			LOGGER.debug("comments - processing file: " + curFile.getPath());
 			
 			// read comments
-			Element elem = doc.getDocumentElement();
-			NodeList childNodes = elem.getChildNodes();
+			final Element elem = doc.getDocumentElement();
+			final NodeList childNodes = elem.getChildNodes();
 			readComments(childNodes);
 		}
 		
 		is = null;
 		
-		x: for (File curFile : layoutFiles) {
+		x: for (final File curFile : layoutFiles) {
 			Document doc = null;
 			try {
 				// parse XML file
@@ -154,8 +154,8 @@ public class LayoutExtensionReader {
 			LOGGER.debug("constants - processing file: " + curFile.getPath());
 			
 			// read constants
-			Element elem = doc.getDocumentElement();
-			NodeList childNodes = elem.getChildNodes();
+			final Element elem = doc.getDocumentElement();
+			final NodeList childNodes = elem.getChildNodes();
 			readConstants(childNodes);
 		}
 	}
@@ -165,14 +165,14 @@ public class LayoutExtensionReader {
 	 * 
 	 * @param childNodes
 	 */
-	private void readComments(NodeList childNodes) {
+	private void readComments(final NodeList childNodes) {
 		for (int i = 0; i < childNodes.getLength(); i++) {
-			Node curNode = childNodes.item(i);
+			final Node curNode = childNodes.item(i);
 			
 			if (curNode.getNodeType() == Node.COMMENT_NODE) {
 				
-				Comment comment = (Comment) curNode;
-				String text = comment.getData();
+				final Comment comment = (Comment) curNode;
+				final String text = comment.getData();
 				processCommentText(text);
 				
 			} else {
@@ -186,7 +186,7 @@ public class LayoutExtensionReader {
 	 * 
 	 * @param textInput
 	 */
-	public void processCommentText(String textInput) {
+	public void processCommentText(final String textInput) {
 		String constant = "", description = "", defaultValue = "";
 		
 		// String textInputLower = textInput.toLowerCase();
@@ -202,13 +202,13 @@ public class LayoutExtensionReader {
 				description = "";
 				defaultValue = "";
 				
-				boolean isHotkey = text.toLowerCase(Locale.ROOT).startsWith("@hotkey");
-				boolean isSetting = text.toLowerCase(Locale.ROOT).startsWith("@setting");
+				final boolean isHotkey = text.toLowerCase(Locale.ROOT).startsWith("@hotkey");
+				final boolean isSetting = text.toLowerCase(Locale.ROOT).startsWith("@setting");
 				
 				if (isHotkey || isSetting) {
 					LOGGER.debug("detected hotkey or setting");
 					// move behind keyword
-					int pos = (isHotkey) ? "@hotkey".length() : "@setting".length();
+					final int pos = (isHotkey) ? "@hotkey".length() : "@setting".length();
 					String toProcess = text.substring(pos);
 					
 					// move beyond '('
@@ -217,7 +217,7 @@ public class LayoutExtensionReader {
 					// split at keyword
 					for (String part : toProcess.split("(?i)(?=(constant|default|description)[\\s]*=)")) {
 						part = part.trim();
-						String partLower = part.toLowerCase(Locale.ROOT);
+						final String partLower = part.toLowerCase(Locale.ROOT);
 						LOGGER.debug("part: " + part);
 						if (partLower.startsWith("constant")) {
 							// move beyond '='
@@ -246,20 +246,22 @@ public class LayoutExtensionReader {
 					}
 				}
 			}
-		} catch (RuntimeException e) {
+		} catch (final RuntimeException e) {
 			throw e;
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			LOGGER.debug("Parsing Comment failed.", e);
 		}
 	}
 	
-	public void addHotkeyValueDef(String constant, String description, String defaultValue, String curValue) {
-		ValueDef def = new ValueDef(constant, curValue, description, defaultValue);
+	public void addHotkeyValueDef(final String constant, final String description, final String defaultValue,
+			final String curValue) {
+		final ValueDef def = new ValueDef(constant, curValue, description, defaultValue);
 		hotkeys.add(def);
 	}
 	
-	public void addSettingValueDef(String constant, String description, String defaultValue, String curValue) {
-		ValueDef def = new ValueDef(constant, curValue, description, defaultValue);
+	public void addSettingValueDef(final String constant, final String description, final String defaultValue,
+			final String curValue) {
+		final ValueDef def = new ValueDef(constant, curValue, description, defaultValue);
 		settings.add(def);
 	}
 	
@@ -268,13 +270,13 @@ public class LayoutExtensionReader {
 	 * 
 	 * @param childNodes
 	 */
-	private void readConstants(NodeList childNodes) {
+	private void readConstants(final NodeList childNodes) {
 		for (int i = 0; i < childNodes.getLength(); i++) {
-			Node curNode = childNodes.item(i);
+			final Node curNode = childNodes.item(i);
 			
 			if (curNode.getNodeType() == Node.ELEMENT_NODE) {
 				
-				String nodeName = curNode.getNodeName().toLowerCase(Locale.ROOT);
+				final String nodeName = curNode.getNodeName().toLowerCase(Locale.ROOT);
 				if (nodeName.equals("constant")) {
 					processConstant(curNode);
 				}
@@ -289,11 +291,11 @@ public class LayoutExtensionReader {
 	 * 
 	 * @param node
 	 */
-	public void processConstant(Node node) {
-		Node nameAttrNode = getNamedItemIgnoreCase(node.getAttributes(), "name");
-		String name = nameAttrNode.getNodeValue();
-		Node valAttrNode = getNamedItemIgnoreCase(node.getAttributes(), "val");
-		String val = valAttrNode.getNodeValue();
+	public void processConstant(final Node node) {
+		final Node nameAttrNode = getNamedItemIgnoreCase(node.getAttributes(), "name");
+		final String name = nameAttrNode.getNodeValue();
+		final Node valAttrNode = getNamedItemIgnoreCase(node.getAttributes(), "val");
+		final String val = valAttrNode.getNodeValue();
 		LOGGER.debug("Constant: name = " + name + ", val = " + val);
 		
 		setValueDefCurValue(name, val);
@@ -304,14 +306,14 @@ public class LayoutExtensionReader {
 	 * @param name
 	 * @param val
 	 */
-	private void setValueDefCurValue(String name, String val) {
-		for (ValueDef item : hotkeys) {
+	private void setValueDefCurValue(final String name, final String val) {
+		for (final ValueDef item : hotkeys) {
 			if (item.getId().equalsIgnoreCase(name)) {
 				item.setValue(val);
 				return;
 			}
 		}
-		for (ValueDef item : settings) {
+		for (final ValueDef item : settings) {
 			if (item.getId().equalsIgnoreCase(name)) {
 				item.setValue(val);
 				return;
@@ -327,18 +329,18 @@ public class LayoutExtensionReader {
 	 * @throws IOException
 	 * @throws SAXException
 	 */
-	public void updateLayoutFiles(Collection<File> layoutFiles)
+	public void updateLayoutFiles(final Collection<File> layoutFiles)
 			throws ParserConfigurationException, SAXException, IOException {
 		LOGGER.info("Scanning for XML file...");
 		
-		DocumentBuilder dBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+		final DocumentBuilder dBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
 		// provide error handler that does not print incompatible files into
 		// console
 		dBuilder.setErrorHandler(new SilentXmlSaxErrorHandler());
 		
 		InputStream is = null;
 		
-		x: for (File curFile : layoutFiles) {
+		x: for (final File curFile : layoutFiles) {
 			Document doc = null;
 			try {
 				// parse XML file
@@ -366,13 +368,13 @@ public class LayoutExtensionReader {
 			LOGGER.debug("processing file: " + curFile.getPath());
 			
 			// process files
-			Element elem = doc.getDocumentElement();
-			NodeList childNodes = elem.getChildNodes();
+			final Element elem = doc.getDocumentElement();
+			final NodeList childNodes = elem.getChildNodes();
 			modifyConstants(childNodes);
 			
 			// write DOM back to XML
-			Source source = new DOMSource(doc);
-			Result result = new StreamResult(curFile);
+			final Source source = new DOMSource(doc);
+			final Result result = new StreamResult(curFile);
 			Transformer xformer;
 			try {
 				xformer = TransformerFactory.newInstance().newTransformer();
@@ -385,13 +387,13 @@ public class LayoutExtensionReader {
 		
 	}
 	
-	private void modifyConstants(NodeList childNodes) {
+	private void modifyConstants(final NodeList childNodes) {
 		for (int i = 0; i < childNodes.getLength(); i++) {
-			Node curNode = childNodes.item(i);
+			final Node curNode = childNodes.item(i);
 			
 			if (curNode.getNodeType() == Node.ELEMENT_NODE) {
 				
-				String nodeName = curNode.getNodeName().toLowerCase(Locale.ROOT);
+				final String nodeName = curNode.getNodeName().toLowerCase(Locale.ROOT);
 				if (nodeName.equals("constant")) {
 					modifyConstant(curNode);
 				}
@@ -407,19 +409,19 @@ public class LayoutExtensionReader {
 	 * 
 	 * @param node
 	 */
-	private void modifyConstant(Node node) {
-		Node nameAttrNode = getNamedItemIgnoreCase(node.getAttributes(), "name");
-		String name = nameAttrNode.getNodeValue();
-		Node valAttrNode = getNamedItemIgnoreCase(node.getAttributes(), "val");
-		String val = valAttrNode.getNodeValue();
+	private void modifyConstant(final Node node) {
+		final Node nameAttrNode = getNamedItemIgnoreCase(node.getAttributes(), "name");
+		final String name = nameAttrNode.getNodeValue();
+		final Node valAttrNode = getNamedItemIgnoreCase(node.getAttributes(), "val");
+		final String val = valAttrNode.getNodeValue();
 		
-		for (ValueDef item : hotkeys) {
+		for (final ValueDef item : hotkeys) {
 			if (item.getId().equalsIgnoreCase(name)) {
 				LOGGER.debug("updating hotkey constant: " + name + ", with val: " + val);
 				valAttrNode.setNodeValue(item.getValue());
 			}
 		}
-		for (ValueDef item : settings) {
+		for (final ValueDef item : settings) {
 			if (item.getId().equalsIgnoreCase(name)) {
 				LOGGER.debug("updating setting constant:" + name + ", with val: " + val);
 				valAttrNode.setNodeValue(item.getValue());
@@ -433,11 +435,11 @@ public class LayoutExtensionReader {
 	 * @param name
 	 * @return
 	 */
-	private Node getNamedItemIgnoreCase(NamedNodeMap nodes, String name) {
-		Node node = nodes.getNamedItem(name);
+	private Node getNamedItemIgnoreCase(final NamedNodeMap nodes, final String name) {
+		final Node node = nodes.getNamedItem(name);
 		if (node == null) {
 			for (int i = 0, len = nodes.getLength(); i < len; i++) {
-				Node curNode = nodes.item(i);
+				final Node curNode = nodes.item(i);
 				if (name.equalsIgnoreCase(curNode.getNodeName())) {
 					return curNode;
 				}

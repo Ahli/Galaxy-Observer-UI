@@ -12,7 +12,7 @@ public class UIConstant extends UIElement {
 	 * 
 	 * @param name
 	 */
-	public UIConstant(String name) {
+	public UIConstant(final String name) {
 		super(name);
 	}
 	
@@ -27,7 +27,7 @@ public class UIConstant extends UIElement {
 	 * @param value
 	 *            the value to set
 	 */
-	public void setValue(String value) {
+	public void setValue(final String value) {
 		this.value = value;
 	}
 	
@@ -37,7 +37,7 @@ public class UIConstant extends UIElement {
 	 * @return
 	 */
 	@Override
-	public UIElement receiveFrameFromPath(String path) {
+	public UIElement receiveFrameFromPath(final String path) {
 		return (path == null || path.isEmpty()) ? this : null;
 	}
 	
@@ -47,7 +47,7 @@ public class UIConstant extends UIElement {
 	 */
 	@Override
 	public Object deepClone() {
-		UIConstant clone = new UIConstant(name);
+		final UIConstant clone = new UIConstant(name);
 		clone.setValue(value);
 		
 		return clone;

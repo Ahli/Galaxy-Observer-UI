@@ -37,7 +37,7 @@ public class Main {
 	 * 
 	 * @param args
 	 */
-	public static void main(String[] args) {
+	public static void main(final String[] args) {
 		System.out.println("Command Line Parameters: [ConfigFilePath] [StoragePath] [OnlineMode] [Product] [Locale]");
 		System.out.println("Parameters provided:");
 		System.out.println("ConfigFilePath: " + args[0]);
@@ -46,13 +46,13 @@ public class Main {
 		System.out.println("Product: " + args[3]);
 		System.out.println("Locale: " + args[4]);
 		
-		String path = args[0], storagePath = args[1], onlineMode = args[2], product = args[3], locale = args[4];
+		final String path = args[0], storagePath = args[1], onlineMode = args[2], product = args[3], locale = args[4];
 		
 		InputStream is = null;
 		try {
-			DocumentBuilder dBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+			final DocumentBuilder dBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
 			Document doc = null;
-			File f = new File(path);
+			final File f = new File(path);
 			
 			// parse XML file
 			
@@ -66,16 +66,16 @@ public class Main {
 			is.close();
 			
 			// edit document
-			NodeList nodeList = doc.getElementsByTagName("setting");
+			final NodeList nodeList = doc.getElementsByTagName("setting");
 			for (int i = 0; i < nodeList.getLength(); i++) {
-				Node curNode = nodeList.item(i);
+				final Node curNode = nodeList.item(i);
 				
-				NamedNodeMap attributes = curNode.getAttributes();
+				final NamedNodeMap attributes = curNode.getAttributes();
 				for (int j = 0; j < attributes.getLength(); j++) {
-					Node attrNode = attributes.item(j);
+					final Node attrNode = attributes.item(j);
 					
 					if (attrNode != null) {
-						String val = attrNode.getNodeValue();
+						final String val = attrNode.getNodeValue();
 						
 						if (val.equalsIgnoreCase("StoragePath")) {
 							replaceValueInSettingNode(curNode, storagePath);
@@ -91,8 +91,8 @@ public class Main {
 			}
 			
 			// write DOM back to XML
-			Source source = new DOMSource(doc);
-			Result result = new StreamResult(f);
+			final Source source = new DOMSource(doc);
+			final Result result = new StreamResult(f);
 			Transformer xformer;
 			xformer = TransformerFactory.newInstance().newTransformer();
 			xformer.transform(source, result);
@@ -104,7 +104,7 @@ public class Main {
 			if (is != null) {
 				try {
 					is.close();
-				} catch (IOException e) {
+				} catch (final IOException e) {
 				}
 			}
 		}
@@ -115,10 +115,10 @@ public class Main {
 	 * @param settingNode
 	 * @param newSettingVal
 	 */
-	private static void replaceValueInSettingNode(Node settingNode, String newSettingVal) {
-		NodeList children = settingNode.getChildNodes();
+	private static void replaceValueInSettingNode(final Node settingNode, final String newSettingVal) {
+		final NodeList children = settingNode.getChildNodes();
 		x: for (int a = 0; a < children.getLength(); a++) {
-			Node curChild = children.item(a);
+			final Node curChild = children.item(a);
 			if (curChild.getNodeName().equalsIgnoreCase("value")) {
 				curChild.setTextContent(newSettingVal);
 				break x;

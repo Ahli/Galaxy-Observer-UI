@@ -20,7 +20,7 @@ public class UITemplate {
 	 * @param fileName
 	 * @param frame
 	 */
-	public UITemplate(String fileName, UIElement element) {
+	public UITemplate(final String fileName, final UIElement element) {
 		this.fileName = fileName;
 		this.element = element;
 	}
@@ -36,7 +36,7 @@ public class UITemplate {
 	 * @param fileName
 	 *            the fileName to set
 	 */
-	public void setFileName(String fileName) {
+	public void setFileName(final String fileName) {
 		this.fileName = fileName;
 	}
 	
@@ -51,7 +51,7 @@ public class UITemplate {
 	 * @param frame
 	 *            the frame to set
 	 */
-	public void setElement(UIElement element) {
+	public void setElement(final UIElement element) {
 		this.element = element;
 	}
 	
@@ -66,7 +66,7 @@ public class UITemplate {
 	 * @param isLocked
 	 *            the isLocked to set
 	 */
-	public void setLocked(boolean isLocked) {
+	public void setLocked(final boolean isLocked) {
 		this.isLocked = isLocked;
 	}
 	
@@ -75,13 +75,13 @@ public class UITemplate {
 	 * @param path
 	 * @return
 	 */
-	public UIElement receiveFrameFromPath(String path) {
+	public UIElement receiveFrameFromPath(final String path) {
 		LOGGER.debug("receive Frame from path: " + path);
 		LOGGER.debug("template's element name: " + element.getName());
-		String curName = UIElement.getLeftPathLevel(path);
+		final String curName = UIElement.getLeftPathLevel(path);
 		LOGGER.debug("searched name: " + curName);
 		if (curName.equalsIgnoreCase(element.getName())) {
-			String newPath = UIElement.removeLeftPathLevel(path);
+			final String newPath = UIElement.removeLeftPathLevel(path);
 			LOGGER.debug("match! new Path: " + newPath);
 			
 			return element.receiveFrameFromPath(newPath);

@@ -17,7 +17,7 @@ public class UIState extends UIElement {
 	 * 
 	 * @param name
 	 */
-	public UIState(String name) {
+	public UIState(final String name) {
 		super(name);
 	}
 	
@@ -32,7 +32,7 @@ public class UIState extends UIElement {
 	 * @param whens
 	 *            the whens to set
 	 */
-	public void setWhens(ArrayList<UIAttribute> whens) {
+	public void setWhens(final ArrayList<UIAttribute> whens) {
 		this.whens = whens;
 	}
 	
@@ -47,7 +47,7 @@ public class UIState extends UIElement {
 	 * @param actions
 	 *            the actions to set
 	 */
-	public void setActions(ArrayList<UIAttribute> actions) {
+	public void setActions(final ArrayList<UIAttribute> actions) {
 		this.actions = actions;
 	}
 	
@@ -62,7 +62,7 @@ public class UIState extends UIElement {
 	 * @param nextAdditionShouldOverrideWhens
 	 *            the nextAdditionShouldOverrideWhens to set
 	 */
-	public void setNextAdditionShouldOverrideWhens(boolean nextAdditionShouldOverrideWhens) {
+	public void setNextAdditionShouldOverrideWhens(final boolean nextAdditionShouldOverrideWhens) {
 		this.nextAdditionShouldOverrideWhens = nextAdditionShouldOverrideWhens;
 	}
 	
@@ -77,7 +77,7 @@ public class UIState extends UIElement {
 	 * @param nextAdditionShouldOverrideActions
 	 *            the nextAdditionShouldOverrideActions to set
 	 */
-	public void setNextAdditionShouldOverrideActions(boolean nextAdditionShouldOverrideActions) {
+	public void setNextAdditionShouldOverrideActions(final boolean nextAdditionShouldOverrideActions) {
 		this.nextAdditionShouldOverrideActions = nextAdditionShouldOverrideActions;
 	}
 	
@@ -87,7 +87,7 @@ public class UIState extends UIElement {
 	 * @return
 	 */
 	@Override
-	public UIElement receiveFrameFromPath(String path) {
+	public UIElement receiveFrameFromPath(final String path) {
 		return (path == null || path.isEmpty()) ? this : null;
 	}
 	
@@ -97,17 +97,17 @@ public class UIState extends UIElement {
 	 */
 	@Override
 	public Object deepClone() {
-		UIState clone = new UIState(name);
+		final UIState clone = new UIState(name);
 		clone.setNextAdditionShouldOverrideWhens(nextAdditionShouldOverrideWhens);
 		clone.setNextAdditionShouldOverrideActions(nextAdditionShouldOverrideActions);
 		
 		// clone whens
-		for (UIElement when : whens) {
+		for (final UIElement when : whens) {
 			clone.getWhens().add((UIAttribute) when.deepClone());
 		}
 		
 		// clone actions
-		for (UIElement action : actions) {
+		for (final UIElement action : actions) {
 			clone.getActions().add((UIAttribute) action.deepClone());
 		}
 		

@@ -5,7 +5,7 @@ import java.util.ArrayList;
 /**
  * 
  * @author Ahli
- *
+ * 
  */
 public class UIStateGroup extends UIElement {
 	
@@ -16,7 +16,7 @@ public class UIStateGroup extends UIElement {
 	 * 
 	 * @param name
 	 */
-	public UIStateGroup(String name) {
+	public UIStateGroup(final String name) {
 		super(name);
 	}
 	
@@ -31,7 +31,7 @@ public class UIStateGroup extends UIElement {
 	 * @param defaultState
 	 *            the defaultState to set
 	 */
-	public void setDefaultState(String defaultState) {
+	public void setDefaultState(final String defaultState) {
 		this.defaultState = defaultState;
 	}
 	
@@ -46,7 +46,7 @@ public class UIStateGroup extends UIElement {
 	 * @param states
 	 *            the states to set
 	 */
-	public void setStates(ArrayList<UIState> states) {
+	public void setStates(final ArrayList<UIState> states) {
 		this.states = states;
 	}
 	
@@ -56,17 +56,17 @@ public class UIStateGroup extends UIElement {
 	 * @return
 	 */
 	@Override
-	public UIElement receiveFrameFromPath(String path) {
+	public UIElement receiveFrameFromPath(final String path) {
 		if (path == null || path.isEmpty()) {
 			// end here
 			return this;
 		} else {
 			// go deeper
-			String curName = UIElement.getLeftPathLevel(path);
-			for (UIElement curElem : states) {
+			final String curName = UIElement.getLeftPathLevel(path);
+			for (final UIElement curElem : states) {
 				if (curName.equalsIgnoreCase(curElem.getName())) {
 					// found right frame -> cut path
-					String newPath = UIElement.removeLeftPathLevel(path);
+					final String newPath = UIElement.removeLeftPathLevel(path);
 					return curElem.receiveFrameFromPath(newPath);
 				}
 			}
@@ -79,11 +79,11 @@ public class UIStateGroup extends UIElement {
 	 */
 	@Override
 	public Object deepClone() {
-		UIStateGroup clone = new UIStateGroup(name);
+		final UIStateGroup clone = new UIStateGroup(name);
 		clone.setDefaultState(defaultState);
 		
 		// clone states
-		for (UIState state : states) {
+		for (final UIState state : states) {
 			clone.getStates().add((UIState) state.deepClone());
 		}
 		

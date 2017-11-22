@@ -68,7 +68,7 @@ public class Main extends Application {
 	private String openedDocPath = null;
 	private boolean isNamespaceHeroes = true;
 	private MpqEditorInterface mpqi = null;
-	private DescIndexData descIndex = new DescIndexData(mpqi);
+	private final DescIndexData descIndex = new DescIndexData(mpqi);
 	private File basePath = null;
 	private boolean hasUnsavedFileChanges = false;
 	private LayoutExtensionReader layoutExtReader;
@@ -77,7 +77,7 @@ public class Main extends Application {
 	 * Initialize the UI Application.
 	 */
 	@Override
-	public void start(Stage primaryStage) {
+	public void start(final Stage primaryStage) {
 		try {
 			Thread.currentThread().setName("UI"); //$NON-NLS-1$
 			LOGGER.warn("start function called after " + (System.nanoTime() - appStartTime) / 1000000 + "ms.");
@@ -97,7 +97,7 @@ public class Main extends Application {
 			
 			// Load Tab layout from fxml file
 			time = System.nanoTime();
-			FXMLLoader loader = new FXMLLoader();
+			final FXMLLoader loader = new FXMLLoader();
 			loader.setResources(Messages.getBundle());
 			
 			TabPane tabPane = null;
@@ -110,7 +110,7 @@ public class Main extends Application {
 					if (is != null) {
 						is.close();
 					}
-				} catch (IOException e) {
+				} catch (final IOException e) {
 				}
 			}
 			
@@ -122,8 +122,8 @@ public class Main extends Application {
 			// ask to save on close
 			this.primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
 				@Override
-				public void handle(WindowEvent event) {
-					boolean notCancelled = askToSaveUnsavedChanges();
+				public void handle(final WindowEvent event) {
+					final boolean notCancelled = askToSaveUnsavedChanges();
 					if (!notCancelled) {
 						// cancel closing
 						event.consume();
@@ -134,7 +134,7 @@ public class Main extends Application {
 			initPaths();
 			
 			// Fade animation
-			FadeTransition ft = new FadeTransition(Duration.millis(750), rootLayout);
+			final FadeTransition ft = new FadeTransition(Duration.millis(750), rootLayout);
 			ft.setFromValue(0);
 			ft.setToValue(1.0);
 			ft.play();
@@ -151,7 +151,7 @@ public class Main extends Application {
 			
 			initMpqInterface();
 			
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			LOGGER.error("App Error: " + ExceptionUtils.getStackTrace(e), e); //$NON-NLS-1$
 			e.printStackTrace();
 			this.primaryStage.setOpacity(1);
@@ -168,12 +168,12 @@ public class Main extends Application {
 	public boolean askToSaveUnsavedChanges() {
 		if (hasUnsavedFileChanges()) {
 			// ask to save changes in the file
-			String title = Messages.getString("Main.unsavedChangesTitle"); //$NON-NLS-1$
-			String content = String.format(Messages.getString("Main.hasUnsavedChanges"), openedDocPath); //$NON-NLS-1$
+			final String title = Messages.getString("Main.unsavedChangesTitle"); //$NON-NLS-1$
+			final String content = String.format(Messages.getString("Main.hasUnsavedChanges"), openedDocPath); //$NON-NLS-1$
 			
-			Alert alert = Alerts.buildYesNoCancelAlert(primaryStage, title, title, content);
+			final Alert alert = Alerts.buildYesNoCancelAlert(primaryStage, title, title, content);
 			
-			Optional<ButtonType> result = alert.showAndWait();
+			final Optional<ButtonType> result = alert.showAndWait();
 			
 			if ((result.isPresent())) {
 				if (result.get() == ButtonType.YES) {
@@ -193,7 +193,7 @@ public class Main extends Application {
 	 * 
 	 * @param args
 	 */
-	public static void main(String[] args) {
+	public static void main(final String[] args) {
 		LOGGER.trace("trace log visible"); //$NON-NLS-1$
 		LOGGER.debug("debug log visible"); //$NON-NLS-1$
 		LOGGER.info("info log visible"); //$NON-NLS-1$
@@ -223,10 +223,10 @@ public class Main extends Application {
 	 * Open File window and actions.
 	 */
 	public void openUiMpq() {
-		FileChooser fileChooser = new FileChooser();
+		final FileChooser fileChooser = new FileChooser();
 		fileChooser.setTitle(Messages.getString("Main.openObserverInterfaceTitle")); //$NON-NLS-1$
 		
-		ExtensionFilter genExtFilter = new ExtensionFilter(
+		final ExtensionFilter genExtFilter = new ExtensionFilter(
 				Messages.getString("Main.sc2HeroesObserverInterfaceExtFilter"), "*.SC2Interface", //$NON-NLS-1$ //$NON-NLS-2$
 				"*.StormInterface"); //$NON-NLS-1$
 		
@@ -234,7 +234,7 @@ public class Main extends Application {
 				genExtFilter, new ExtensionFilter(Messages.getString("Main.sc2InterfaceFilter"), "*.SC2Interface"), //$NON-NLS-1$ //$NON-NLS-2$
 				new ExtensionFilter(Messages.getString("Main.heroesInterfaceFilter"), "*.StormInterface")); //$NON-NLS-1$ //$NON-NLS-2$
 		fileChooser.setSelectedExtensionFilter(genExtFilter);
-		File f = fileChooser.showOpenDialog(primaryStage);
+		final File f = fileChooser.showOpenDialog(primaryStage);
 		
 		openMpqFile(f);
 	}
@@ -244,12 +244,12 @@ public class Main extends Application {
 	 * 
 	 * @param f
 	 */
-	public void openMpqFile(File f) {
+	public void openMpqFile(final File f) {
 		new Thread() {
 			@Override
 			public void run() {
-				this.setName(this.getName().replaceFirst("Thread", "Open")); //$NON-NLS-1$
-				long time = System.nanoTime();
+				setName(getName().replaceFirst("Thread", "Open")); //$NON-NLS-1$
+				final long time = System.nanoTime();
 				if (f != null) {
 					try {
 						mpqi.extractEntireMPQ(f.getAbsolutePath());
@@ -259,36 +259,36 @@ public class Main extends Application {
 						// load desc index from mpq
 						try {
 							isNamespaceHeroes = mpqi.isHeroesMpq();
-						} catch (MpqException e) {
+						} catch (final MpqException e) {
 							// special case to show readable error to user
 							throw new ShowToUserException(Messages.getString("Main.OpenedFileNoComponentList"));
 						}
-						boolean ignoreRequiredToLoadEntries = true;
+						final boolean ignoreRequiredToLoadEntries = true;
 						
-						File componentListFile = mpqi.getComponentListFile();
+						final File componentListFile = mpqi.getComponentListFile();
 						if (componentListFile == null) {
 							throw new ShowToUserException(Messages.getString("Main.OpenedFileNoComponentList")); //$NON-NLS-1$
 						}
 						descIndex.setDescIndexPathAndClear(ComponentsListReader.getDescIndexPath(componentListFile));
 						
-						File descIndexFile = mpqi.getFileFromMpq(descIndex.getDescIndexIntPath());
+						final File descIndexFile = mpqi.getFileFromMpq(descIndex.getDescIndexIntPath());
 						descIndex.addLayoutIntPath(
 								DescIndexReader.getLayoutPathList(descIndexFile, ignoreRequiredToLoadEntries));
 						
 						tabsCtrl.clearData();
 						hasUnsavedFileChanges = false;
 						
-						boolean recursive = true;
-						File cache = new File(mpqi.getMpqCachePath());
-						Collection<File> layoutFiles = FileUtils.listFiles(cache, null, recursive);
+						final boolean recursive = true;
+						final File cache = new File(mpqi.getMpqCachePath());
+						final Collection<File> layoutFiles = FileUtils.listFiles(cache, null, recursive);
 						
 						layoutExtReader = new LayoutExtensionReader();
 						layoutExtReader.processLayoutFiles(layoutFiles);
 						
-						ArrayList<ValueDef> hotkeys = layoutExtReader.getHotkeys();
+						final ArrayList<ValueDef> hotkeys = layoutExtReader.getHotkeys();
 						tabsCtrl.getHotkeysData().addAll(hotkeys);
 						
-						ArrayList<ValueDef> settings = layoutExtReader.getSettings();
+						final ArrayList<ValueDef> settings = layoutExtReader.getSettings();
 						tabsCtrl.getSettingsData().addAll(settings);
 						
 					} catch (MpqException | ShowToUserException e) {
@@ -296,7 +296,7 @@ public class Main extends Application {
 						openedDocPath = null;
 						updateAppTitle();
 						showErrorAlert(e);
-					} catch (Exception e) {
+					} catch (final Exception e) {
 						LOGGER.error("File could not be opened. Error: " + ExceptionUtils.getStackTrace(e), e); //$NON-NLS-1$
 						e.printStackTrace();
 						openedDocPath = null;
@@ -359,7 +359,7 @@ public class Main extends Application {
 	public void initRootLayout() throws IOException {
 		// Load root layout from fxml file.
 		long time = System.nanoTime();
-		FXMLLoader loader = new FXMLLoader();
+		final FXMLLoader loader = new FXMLLoader();
 		loader.setResources(Messages.getBundle());
 		InputStream is = null;
 		try {
@@ -370,7 +370,7 @@ public class Main extends Application {
 				if (is != null) {
 					is.close();
 				}
-			} catch (IOException e) {
+			} catch (final IOException e) {
 			}
 		}
 		LOGGER.warn("initialized root layout fxml within " + (System.nanoTime() - time) / 1000000 + "ms.");
@@ -382,7 +382,7 @@ public class Main extends Application {
 		LOGGER.warn("received root layout controller within " + (System.nanoTime() - time) / 1000000 + "ms.");
 		
 		// Show the scene containing the root layout.
-		Scene scene = new Scene(rootLayout);
+		final Scene scene = new Scene(rootLayout);
 		time = System.nanoTime();
 		scene.getStylesheets().add(Main.class.getResource("view/application.css").toExternalForm()); //$NON-NLS-1$
 		
@@ -425,8 +425,8 @@ public class Main extends Application {
 		new Thread() {
 			@Override
 			public void run() {
-				this.setName(this.getName().replaceFirst("Thread", "Save")); //$NON-NLS-1$
-				long time = System.nanoTime();
+				setName(getName().replaceFirst("Thread", "Save")); //$NON-NLS-1$
+				final long time = System.nanoTime();
 				
 				// cannot save, if not valid
 				if (!isValidOpenedDocPath()) {
@@ -458,10 +458,10 @@ public class Main extends Application {
 			return;
 		}
 		
-		FileChooser fileChooser = new FileChooser();
+		final FileChooser fileChooser = new FileChooser();
 		fileChooser.setTitle(Messages.getString("Main.saveUiTitle")); //$NON-NLS-1$
 		
-		ExtensionFilter genExtFilter = new ExtensionFilter(
+		final ExtensionFilter genExtFilter = new ExtensionFilter(
 				Messages.getString("Main.sc2HeroesObserverInterfaceExtFilter"), "*.SC2Interface", //$NON-NLS-1$ //$NON-NLS-2$
 				"*.StormInterface"); //$NON-NLS-1$
 		
@@ -470,11 +470,11 @@ public class Main extends Application {
 				new ExtensionFilter(Messages.getString("Main.heroesInterfaceFilter"), "*.StormInterface")); //$NON-NLS-1$ //$NON-NLS-2$
 		fileChooser.setSelectedExtensionFilter(genExtFilter);
 		
-		File loadedF = new File(this.getOpenedDocPath());
+		final File loadedF = new File(getOpenedDocPath());
 		fileChooser.setInitialFileName(loadedF.getName());
 		fileChooser.setInitialDirectory(loadedF.getParentFile());
 		
-		File f = fileChooser.showSaveDialog(primaryStage);
+		final File f = fileChooser.showSaveDialog(primaryStage);
 		
 		if (f != null) {
 			try {
@@ -498,15 +498,15 @@ public class Main extends Application {
 	 * 
 	 * @param message
 	 */
-	private void showErrorAlert(Exception e) {
+	private void showErrorAlert(final Exception e) {
 		Platform.runLater(new Runnable() {
 			@Override
 			public void run() {
 				// Update UI here
 				LOGGER.trace("showing error popup");
-				String title = Messages.getString("Main.anErrorOccured"); //$NON-NLS-1$
-				String content = e.getMessage();
-				Alert alert = Alerts.buildErrorAlert(primaryStage, title, title, content);
+				final String title = Messages.getString("Main.anErrorOccured"); //$NON-NLS-1$
+				final String content = e.getMessage();
+				final Alert alert = Alerts.buildErrorAlert(primaryStage, title, title, content);
 				alert.showAndWait();
 			}
 		});
@@ -517,13 +517,13 @@ public class Main extends Application {
 	 * 
 	 * @param message
 	 */
-	private void showExceptionAlert(Exception e) {
+	private void showExceptionAlert(final Exception e) {
 		Platform.runLater(new Runnable() {
 			@Override
 			public void run() {
 				// Update UI here
 				LOGGER.trace("showing exception popup");
-				Alert alert = Alerts.buildExceptionAlert(primaryStage, e);
+				final Alert alert = Alerts.buildExceptionAlert(primaryStage, e);
 				alert.showAndWait();
 			}
 		});
@@ -546,10 +546,10 @@ public class Main extends Application {
 	 * @throws ParserConfigurationException
 	 */
 	public void compile() throws ParserConfigurationException, SAXException, IOException {
-		File cache = new File(mpqi.getMpqCachePath());
-		boolean recursive = true;
-		String[] extensions = new String[] { "StormLayout", "SC2Layout" }; //$NON-NLS-1$ //$NON-NLS-2$
-		Collection<File> layoutFiles = FileUtils.listFiles(cache, extensions, recursive);
+		final File cache = new File(mpqi.getMpqCachePath());
+		final boolean recursive = true;
+		final String[] extensions = new String[] { "StormLayout", "SC2Layout" }; //$NON-NLS-1$ //$NON-NLS-2$
+		final Collection<File> layoutFiles = FileUtils.listFiles(cache, extensions, recursive);
 		layoutExtReader.updateLayoutFiles(layoutFiles);
 	}
 	
@@ -571,17 +571,18 @@ public class Main extends Application {
 	 * Initializes the MPQ Editor Interface.
 	 */
 	private void initMpqInterface() {
-		String tempDirectory = System.getProperty("java.io.tmpdir");
-		String cachePath = tempDirectory + "ObserverUiSettingsEditor" + File.separator + "_ExtractedMpq";
+		final String tempDirectory = System.getProperty("java.io.tmpdir");
+		final String cachePath = tempDirectory + "ObserverUiSettingsEditor" + File.separator + "_ExtractedMpq";
 		mpqi = new MpqEditorInterface(cachePath);
-		String path = basePath + File.separator + "plugins" + File.separator + "mpq" + File.separator + "MPQEditor.exe"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		final String path = basePath + File.separator + "plugins" + File.separator + "mpq" + File.separator //$NON-NLS-1$ //$NON-NLS-2$
+				+ "MPQEditor.exe"; //$NON-NLS-1$
 		mpqi.setMpqEditorPath(path);
-		File f = new File(path);
+		final File f = new File(path);
 		if (!f.exists() || !f.isFile()) {
 			LOGGER.error("Could not find MPQEditor.exe within its expected path: " + path);
-			String title = Messages.getString("Main.warningAlertTitle"); //$NON-NLS-1$
-			String content = String.format(Messages.getString("Main.couldNotFindMpqEditor"), path); //$NON-NLS-1$
-			Alert alert = Alerts.buildWarningAlert(primaryStage, title, title, content);
+			final String title = Messages.getString("Main.warningAlertTitle"); //$NON-NLS-1$
+			final String content = String.format(Messages.getString("Main.couldNotFindMpqEditor"), path); //$NON-NLS-1$
+			final Alert alert = Alerts.buildWarningAlert(primaryStage, title, title, content);
 			alert.showAndWait();
 		}
 	}

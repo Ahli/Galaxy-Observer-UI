@@ -34,29 +34,30 @@ public class LayoutReader {
 	 * @throws SAXException
 	 * @throws IOException
 	 */
-	public static ArrayList<String> getDependencyLayouts(File f, ArrayList<String> ownConstants)
+	public static ArrayList<String> getDependencyLayouts(final File f, ArrayList<String> ownConstants)
 			throws ParserConfigurationException, SAXException, IOException {
-		String nameWithFileEnding = f.getName();
-		String nameWOfileEnding = nameWithFileEnding.substring(0, Math.max(0, nameWithFileEnding.lastIndexOf('.')));
+		final String nameWithFileEnding = f.getName();
+		final String nameWOfileEnding = nameWithFileEnding.substring(0,
+				Math.max(0, nameWithFileEnding.lastIndexOf('.')));
 		
-		DocumentBuilder dBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-		Document doc = dBuilder.parse(f);
+		final DocumentBuilder dBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+		final Document doc = dBuilder.parse(f);
 		
-		ArrayList<String> list = new ArrayList<>();
+		final ArrayList<String> list = new ArrayList<>();
 		
 		// check TEMPLATES
-		NodeList nodes = doc.getElementsByTagName("*");
+		final NodeList nodes = doc.getElementsByTagName("*");
 		for (int i = 0; i < nodes.getLength(); i++) {
-			Node frame = nodes.item(i);
+			final Node frame = nodes.item(i);
 			// check if node is a frame
 			if (frame.getNodeName().equalsIgnoreCase("Frame")) {
-				NamedNodeMap attributes = frame.getAttributes();
+				final NamedNodeMap attributes = frame.getAttributes();
 				for (int j = 0; j < attributes.getLength(); j++) {
-					Node attr = attributes.item(j);
+					final Node attr = attributes.item(j);
 					
 					// attribute is Template
 					if (attr.getNodeName().equalsIgnoreCase("template")) {
-						String dependency = attr.getNodeValue();
+						final String dependency = attr.getNodeValue();
 						if (dependency != null) {
 							int firstIndex = dependency.indexOf('/');
 							int firstIndex2 = dependency.indexOf('\\');
@@ -67,7 +68,7 @@ public class LayoutReader {
 								firstIndex2 = Integer.MAX_VALUE;
 							}
 							firstIndex = Math.min(firstIndex, firstIndex2);
-							String layoutName = dependency.substring(0, firstIndex);
+							final String layoutName = dependency.substring(0, firstIndex);
 							if (!layoutName.equalsIgnoreCase(nameWOfileEnding)) {
 								if (!doesNameAppearInList(layoutName, list)) {
 									LOGGER.trace(nameWOfileEnding + " has dependency to " + layoutName);
@@ -86,16 +87,16 @@ public class LayoutReader {
 		
 		if (ownConstants == null) {
 			ownConstants = getLayoutsConstantDefinitions(doc);
-			for (String str : ownConstants) {
+			for (final String str : ownConstants) {
 				LOGGER.trace(nameWOfileEnding + " defines constant " + str);
 			}
 		}
 		
 		// constantUsage
 		// nodes = doc.getElementsByTagName("*");
-		ArrayList<String> usedConstants = new ArrayList<>();
+		final ArrayList<String> usedConstants = new ArrayList<>();
 		for (int i = 0; i < nodes.getLength(); i++) {
-			Node node = nodes.item(i);
+			final Node node = nodes.item(i);
 			
 			// String nodeName = node.getNodeName();
 			// if(nodeName.startsWith("#")){
@@ -108,15 +109,15 @@ public class LayoutReader {
 			// }
 			
 			// if (true) {
-			NamedNodeMap attributes = node.getAttributes();
+			final NamedNodeMap attributes = node.getAttributes();
 			for (int j = 0; j < attributes.getLength(); j++) {
-				Node attribute = attributes.item(j);
-				String attrName = attribute.getNodeName();
-				String attrValue = attribute.getNodeValue();
+				final Node attribute = attributes.item(j);
+				final String attrName = attribute.getNodeName();
+				final String attrValue = attribute.getNodeValue();
 				
 				// attribute name
 				if (attrName.startsWith("#")) {
-					String constName = attrName;
+					final String constName = attrName;
 					if (!doesNameAppearInList(constName, usedConstants)
 							&& !doesConstantNameAppearInList(constName, ownConstants)) {
 						LOGGER.trace(nameWOfileEnding + " uses undefined constant " + constName);
@@ -126,7 +127,7 @@ public class LayoutReader {
 				}
 				// attribute value
 				if (attrValue.startsWith("#")) {
-					String constName = attrValue;
+					final String constName = attrValue;
 					if (!doesNameAppearInList(constName, usedConstants)
 							&& !doesConstantNameAppearInList(constName, ownConstants)) {
 						LOGGER.trace(nameWOfileEnding + " uses undefined constant " + constName);
@@ -163,7 +164,7 @@ public class LayoutReader {
 	 * @param list
 	 * @return
 	 */
-	private static boolean doesConstantNameAppearInList(String constUsage, ArrayList<String> list) {
+	private static boolean doesConstantNameAppearInList(final String constUsage, final ArrayList<String> list) {
 		
 		String name = constUsage;
 		
@@ -175,7 +176,7 @@ public class LayoutReader {
 			}
 		}
 		
-		for (String n : list) {
+		for (final String n : list) {
 			if (n.equalsIgnoreCase(name)) {
 				// System.out.println("check - true - "+constUsage);
 				return true;
@@ -192,8 +193,8 @@ public class LayoutReader {
 	 * @param list
 	 * @return
 	 */
-	private static boolean doesNameAppearInList(String name, ArrayList<String> list) {
-		for (String n : list) {
+	private static boolean doesNameAppearInList(final String name, final ArrayList<String> list) {
+		for (final String n : list) {
 			if (n.equalsIgnoreCase(name)) {
 				return true;
 			}
@@ -210,10 +211,10 @@ public class LayoutReader {
 	 * @throws SAXException
 	 * @throws IOException
 	 */
-	public static ArrayList<String> getLayoutsConstantDefinitions(File f)
+	public static ArrayList<String> getLayoutsConstantDefinitions(final File f)
 			throws ParserConfigurationException, SAXException, IOException {
-		DocumentBuilder dBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-		Document doc = dBuilder.parse(f);
+		final DocumentBuilder dBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+		final Document doc = dBuilder.parse(f);
 		
 		return getLayoutsConstantDefinitions(doc);
 	}
@@ -227,15 +228,15 @@ public class LayoutReader {
 	 * @throws SAXException
 	 * @throws IOException
 	 */
-	public static ArrayList<String> getLayoutsConstantDefinitions(Document doc) {
+	public static ArrayList<String> getLayoutsConstantDefinitions(final Document doc) {
 		// create list of own constant definitions
-		ArrayList<String> ownConstants = new ArrayList<>();
-		NodeList constants = doc.getElementsByTagName("Constant");
+		final ArrayList<String> ownConstants = new ArrayList<>();
+		final NodeList constants = doc.getElementsByTagName("Constant");
 		for (int i = 0; i < constants.getLength(); i++) {
-			Node constant = constants.item(i);
-			NamedNodeMap attributes = constant.getAttributes();
+			final Node constant = constants.item(i);
+			final NamedNodeMap attributes = constant.getAttributes();
 			for (int j = 0; j < attributes.getLength(); j++) {
-				Node attr = attributes.item(j);
+				final Node attr = attributes.item(j);
 				// attribute is Template
 				if (attr.getNodeName().equalsIgnoreCase("name")) {
 					ownConstants.add(attr.getNodeValue());

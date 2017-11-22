@@ -33,12 +33,14 @@ public class Alerts {
 	 * @param content
 	 * @return
 	 */
-	public static Alert buildYesNoCancelAlert(Window owner, String title, String header, String content) {
-		long time = System.nanoTime();
-		ButtonType yesButton = new ButtonType(Messages.getString("General.YesButton"), ButtonData.YES); //$NON-NLS-1$
-		ButtonType noButton = new ButtonType(Messages.getString("General.NoButton"), ButtonData.NO); //$NON-NLS-1$
-		ButtonType cancelButton = new ButtonType(Messages.getString("General.CancelButton"), ButtonData.CANCEL_CLOSE); // $NON-NLS-1$
-		Alert alert = new Alert(AlertType.INFORMATION, content, yesButton, noButton, cancelButton);
+	public static Alert buildYesNoCancelAlert(final Window owner, final String title, final String header,
+			final String content) {
+		final long time = System.nanoTime();
+		final ButtonType yesButton = new ButtonType(Messages.getString("General.YesButton"), ButtonData.YES); //$NON-NLS-1$
+		final ButtonType noButton = new ButtonType(Messages.getString("General.NoButton"), ButtonData.NO); //$NON-NLS-1$
+		final ButtonType cancelButton = new ButtonType(Messages.getString("General.CancelButton"),
+				ButtonData.CANCEL_CLOSE); // $NON-NLS-1$
+		final Alert alert = new Alert(AlertType.INFORMATION, content, yesButton, noButton, cancelButton);
 		alert.initOwner(owner);
 		alert.setTitle(title);
 		alert.setHeaderText(header);
@@ -54,10 +56,11 @@ public class Alerts {
 	 * @param content
 	 * @return
 	 */
-	public static Alert buildErrorAlert(Window owner, String title, String header, String content) {
-		long time = System.nanoTime();
-		ButtonType okButton = new ButtonType(Messages.getString("General.OkButton"), ButtonData.YES); //$NON-NLS-1$
-		Alert alert = new Alert(AlertType.ERROR, content, okButton);
+	public static Alert buildErrorAlert(final Window owner, final String title, final String header,
+			final String content) {
+		final long time = System.nanoTime();
+		final ButtonType okButton = new ButtonType(Messages.getString("General.OkButton"), ButtonData.YES); //$NON-NLS-1$
+		final Alert alert = new Alert(AlertType.ERROR, content, okButton);
 		alert.initOwner(owner);
 		alert.setTitle(title);
 		alert.setHeaderText(header);
@@ -73,10 +76,11 @@ public class Alerts {
 	 * @param content
 	 * @return
 	 */
-	public static Alert buildInfoAlert(Window owner, String title, String header, String content) {
-		long time = System.nanoTime();
-		ButtonType okButton = new ButtonType(Messages.getString("General.OkButton"), ButtonData.YES); //$NON-NLS-1$
-		Alert alert = new Alert(AlertType.INFORMATION, content, okButton);
+	public static Alert buildInfoAlert(final Window owner, final String title, final String header,
+			final String content) {
+		final long time = System.nanoTime();
+		final ButtonType okButton = new ButtonType(Messages.getString("General.OkButton"), ButtonData.YES); //$NON-NLS-1$
+		final Alert alert = new Alert(AlertType.INFORMATION, content, okButton);
 		alert.initOwner(owner);
 		alert.setTitle(title);
 		alert.setHeaderText(header);
@@ -92,10 +96,11 @@ public class Alerts {
 	 * @param content
 	 * @return
 	 */
-	public static Alert buildWarningAlert(Window owner, String title, String header, String content) {
-		long time = System.nanoTime();
-		ButtonType okButton = new ButtonType(Messages.getString("General.OkButton"), ButtonData.YES); //$NON-NLS-1$
-		Alert alert = new Alert(AlertType.WARNING, content, okButton);
+	public static Alert buildWarningAlert(final Window owner, final String title, final String header,
+			final String content) {
+		final long time = System.nanoTime();
+		final ButtonType okButton = new ButtonType(Messages.getString("General.OkButton"), ButtonData.YES); //$NON-NLS-1$
+		final Alert alert = new Alert(AlertType.WARNING, content, okButton);
 		alert.initOwner(owner);
 		alert.setTitle(title);
 		alert.setHeaderText(header);
@@ -112,10 +117,11 @@ public class Alerts {
 	 * @param imageUrl
 	 * @return
 	 */
-	public static Alert buildAboutAlert(Window owner, String title, String header, String content, String imageUrl) {
-		long time = System.nanoTime();
-		ButtonType okButton = new ButtonType(Messages.getString("General.OkButton"), ButtonData.OK_DONE); //$NON-NLS-1$
-		Alert alert = new Alert(AlertType.INFORMATION, content, okButton);
+	public static Alert buildAboutAlert(final Window owner, final String title, final String header,
+			final String content, final String imageUrl) {
+		final long time = System.nanoTime();
+		final ButtonType okButton = new ButtonType(Messages.getString("General.OkButton"), ButtonData.OK_DONE); //$NON-NLS-1$
+		final Alert alert = new Alert(AlertType.INFORMATION, content, okButton);
 		alert.initOwner(owner);
 		alert.setTitle(title);
 		alert.setHeaderText(header);
@@ -133,17 +139,17 @@ public class Alerts {
 	 * @param e
 	 * @return
 	 */
-	public static Alert buildExceptionAlert(Window owner, Exception e) {
-		long time = System.nanoTime();
-		ButtonType okButton = new ButtonType(Messages.getString("General.OkButton"), ButtonData.OK_DONE); //$NON-NLS-1$
-		String localizedMsg = e.getLocalizedMessage();
-		Alert alert = new Alert(AlertType.ERROR, localizedMsg, okButton);
+	public static Alert buildExceptionAlert(final Window owner, final Exception e) {
+		final long time = System.nanoTime();
+		final ButtonType okButton = new ButtonType(Messages.getString("General.OkButton"), ButtonData.OK_DONE); //$NON-NLS-1$
+		final String localizedMsg = e.getLocalizedMessage();
+		final Alert alert = new Alert(AlertType.ERROR, localizedMsg, okButton);
 		alert.initOwner(owner);
 		
-		Label label = new Label(Messages.getString("General.ExceptionStackTrace")); //$NON-NLS-1$
-		String stackTrace = ExceptionUtils.getStackTrace(e);
+		final Label label = new Label(Messages.getString("General.ExceptionStackTrace")); //$NON-NLS-1$
+		final String stackTrace = ExceptionUtils.getStackTrace(e);
 		
-		TextArea textArea = new TextArea(stackTrace);
+		final TextArea textArea = new TextArea(stackTrace);
 		textArea.setEditable(false);
 		textArea.setWrapText(true);
 		
@@ -152,7 +158,7 @@ public class Alerts {
 		GridPane.setVgrow(textArea, Priority.ALWAYS);
 		GridPane.setHgrow(textArea, Priority.ALWAYS);
 		
-		GridPane expContent = new GridPane();
+		final GridPane expContent = new GridPane();
 		expContent.setMaxWidth(Double.MAX_VALUE);
 		expContent.add(label, 0, 0);
 		expContent.add(textArea, 0, 1);

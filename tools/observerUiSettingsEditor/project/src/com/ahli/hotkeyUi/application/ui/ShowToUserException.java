@@ -9,7 +9,7 @@ package com.ahli.hotkeyUi.application.ui;
  */
 public class ShowToUserException extends Exception {
 	
-	public ShowToUserException(String msg) {
+	public ShowToUserException(final String msg) {
 		super(msg);
 	}
 	

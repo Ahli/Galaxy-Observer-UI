@@ -28,7 +28,7 @@ public class UIFrame extends UIElement {
 	 * @param name
 	 * @param type
 	 */
-	public UIFrame(String name, String type) {
+	public UIFrame(final String name, final String type) {
 		super(name);
 		this.type = type;
 		relative[0] = "$this";
@@ -56,7 +56,7 @@ public class UIFrame extends UIElement {
 	 * @param type
 	 *            the type to set
 	 */
-	public void setType(String type) {
+	public void setType(final String type) {
 		this.type = type;
 	}
 	
@@ -72,7 +72,7 @@ public class UIFrame extends UIElement {
 	 * 
 	 * @param children
 	 */
-	public void setChildren(ArrayList<UIElement> children) {
+	public void setChildren(final ArrayList<UIElement> children) {
 		this.children = children;
 	}
 	
@@ -87,7 +87,7 @@ public class UIFrame extends UIElement {
 	 * @param attributes
 	 *            the attributes to set
 	 */
-	public void setAttributes(Map<String, UIAttribute> attributes) {
+	public void setAttributes(final Map<String, UIAttribute> attributes) {
 		this.attributes = attributes;
 	}
 	
@@ -96,7 +96,7 @@ public class UIFrame extends UIElement {
 	 * @param side
 	 * @param relative
 	 */
-	public void setAnchorRelative(UIAnchorSide side, String relative) {
+	public void setAnchorRelative(final UIAnchorSide side, final String relative) {
 		this.relative[getAnchorSideIndex(side)] = relative;
 	}
 	
@@ -105,7 +105,7 @@ public class UIFrame extends UIElement {
 	 * @param side
 	 * @param offset
 	 */
-	public void setAnchorOffset(UIAnchorSide side, String offset) {
+	public void setAnchorOffset(final UIAnchorSide side, final String offset) {
 		this.offset[getAnchorSideIndex(side)] = offset;
 	}
 	
@@ -114,7 +114,7 @@ public class UIFrame extends UIElement {
 	 * @param side
 	 * @param pos
 	 */
-	public void setAnchorPos(UIAnchorSide side, String pos) {
+	public void setAnchorPos(final UIAnchorSide side, final String pos) {
 		this.pos[getAnchorSideIndex(side)] = pos;
 	}
 	
@@ -123,7 +123,7 @@ public class UIFrame extends UIElement {
 	 * @param side
 	 * @return
 	 */
-	public String getAnchorRelative(UIAnchorSide side) {
+	public String getAnchorRelative(final UIAnchorSide side) {
 		return relative[getAnchorSideIndex(side)];
 	}
 	
@@ -132,7 +132,7 @@ public class UIFrame extends UIElement {
 	 * @param side
 	 * @return
 	 */
-	public String getAnchorOffset(UIAnchorSide side) {
+	public String getAnchorOffset(final UIAnchorSide side) {
 		return offset[getAnchorSideIndex(side)];
 	}
 	
@@ -141,7 +141,7 @@ public class UIFrame extends UIElement {
 	 * @param side
 	 * @return
 	 */
-	public String getAnchorPos(UIAnchorSide side) {
+	public String getAnchorPos(final UIAnchorSide side) {
 		return pos[getAnchorSideIndex(side)];
 	}
 	
@@ -150,7 +150,7 @@ public class UIFrame extends UIElement {
 	 * @param side
 	 * @return
 	 */
-	private int getAnchorSideIndex(UIAnchorSide side) {
+	private int getAnchorSideIndex(final UIAnchorSide side) {
 		switch (side) {
 			case Top:
 				return 0;
@@ -168,18 +168,18 @@ public class UIFrame extends UIElement {
 	 * @param relative
 	 * @param offset
 	 */
-	public void setAnchor(String relative, String offset) {
+	public void setAnchor(final String relative, final String offset) {
 		this.relative[0] = relative;
 		this.relative[1] = relative;
 		this.relative[2] = relative;
 		this.relative[3] = relative;
-		this.pos[0] = "Min";
+		pos[0] = "Min";
 		this.offset[0] = offset;
-		this.pos[1] = "Min";
+		pos[1] = "Min";
 		this.offset[1] = offset;
-		this.pos[2] = "Max";
+		pos[2] = "Max";
 		this.offset[2] = Integer.toString((Integer.parseInt(offset) * (-1)));
-		this.pos[3] = "Max";
+		pos[3] = "Max";
 		this.offset[3] = Integer.toString((Integer.parseInt(offset) * (-1)));
 	}
 	
@@ -189,20 +189,20 @@ public class UIFrame extends UIElement {
 	 * @return
 	 */
 	@Override
-	public UIElement receiveFrameFromPath(String path) {
+	public UIElement receiveFrameFromPath(final String path) {
 		if (path == null || path.isEmpty()) {
 			// end here
 			return this;
 		} else {
 			// go deeper
-			String curName = UIElement.getLeftPathLevel(path);
+			final String curName = UIElement.getLeftPathLevel(path);
 			LOGGER.debug("curName: " + curName);
 			LOGGER.debug("children to check: " + children.size());
-			for (UIElement curElem : children) {
+			for (final UIElement curElem : children) {
 				LOGGER.debug("checking child: " + curElem.getName());
 				if (curName.equalsIgnoreCase(curElem.getName())) {
 					// found right frame -> cut path
-					String newPath = UIElement.removeLeftPathLevel(path);
+					final String newPath = UIElement.removeLeftPathLevel(path);
 					LOGGER.debug("match! newPath:" + newPath);
 					return curElem.receiveFrameFromPath(newPath);
 				}
@@ -216,12 +216,12 @@ public class UIFrame extends UIElement {
 	 */
 	@Override
 	public Object deepClone() {
-		UIFrame clone = new UIFrame(name, type);
+		final UIFrame clone = new UIFrame(name, type);
 		
 		// clone attributes
-		Map<String, UIAttribute> clonedAttributes = new HashMap<>();
-		for (Entry<String, UIAttribute> entry : attributes.entrySet()) {
-			UIAttribute clonedValue = (UIAttribute) entry.getValue().deepClone();
+		final Map<String, UIAttribute> clonedAttributes = new HashMap<>();
+		for (final Entry<String, UIAttribute> entry : attributes.entrySet()) {
+			final UIAttribute clonedValue = (UIAttribute) entry.getValue().deepClone();
 			clonedAttributes.put(entry.getKey(), clonedValue);
 		}
 		clone.setAttributes(clonedAttributes);
@@ -240,7 +240,7 @@ public class UIFrame extends UIElement {
 		clone.setAnchorRelative(UIAnchorSide.Bottom, pos[2]);
 		clone.setAnchorRelative(UIAnchorSide.Right, pos[3]);
 		
-		for (UIElement child : children) {
+		for (final UIElement child : children) {
 			clone.getChildren().add((UIElement) child.deepClone());
 		}
 		
