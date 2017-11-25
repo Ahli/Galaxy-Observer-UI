@@ -9,6 +9,11 @@ import java.util.List;
  * 
  */
 public class UIState extends UIElement {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -2094212167992593460L;
+	
 	private List<UIAttribute> whens = new ArrayList<>();
 	private List<UIAttribute> actions = new ArrayList<>();
 	private boolean nextAdditionShouldOverrideWhens = false;

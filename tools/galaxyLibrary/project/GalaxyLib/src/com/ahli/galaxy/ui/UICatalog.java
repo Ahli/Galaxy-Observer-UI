@@ -55,6 +55,8 @@ public class UICatalog implements Cloneable, Serializable {
 	@Override
 	public Object clone() {
 		final UICatalog clone = new UICatalog();
+		// 1041ms for AhliObs -> 12s execution time
+		// testing shows that iterators are not faster and are not thread safe
 		for (int i = 0; i < templates.size(); i++) {
 			clone.templates.add((UITemplate) templates.get(i).clone());
 		}
@@ -70,6 +72,7 @@ public class UICatalog implements Cloneable, Serializable {
 		for (int i = 0; i < blizzOnlyLayouts.size(); i++) {
 			clone.blizzOnlyLayouts.add(blizzOnlyLayouts.get(i));
 		}
+		
 		clone.curBasePath = curBasePath;
 		return clone;
 	}

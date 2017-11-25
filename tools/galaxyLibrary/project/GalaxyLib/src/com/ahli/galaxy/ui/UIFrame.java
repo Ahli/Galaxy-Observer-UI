@@ -14,6 +14,11 @@ import org.apache.logging.log4j.Logger;
  *
  */
 public class UIFrame extends UIElement {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -4610017347746925885L;
+	
 	private static final Logger LOGGER = LogManager.getLogger(UIFrame.class);
 	
 	private String type = "";

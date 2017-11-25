@@ -12,6 +12,11 @@ import java.util.Map.Entry;
  *
  */
 public class UIController extends UIElement {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -5133613746543071378L;
+	
 	private List<UIAttribute> keys = new ArrayList<>();
 	private Map<String, String> values = new HashMap<>();
 	private boolean nextAdditionShouldOverride = false;

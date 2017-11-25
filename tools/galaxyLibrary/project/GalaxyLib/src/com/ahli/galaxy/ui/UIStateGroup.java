@@ -9,6 +9,11 @@ import java.util.ArrayList;
  */
 public class UIStateGroup extends UIElement {
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 6020966617264020882L;
+	
 	private String defaultState = "";
 	private ArrayList<UIState> states = new ArrayList<>();
 	
