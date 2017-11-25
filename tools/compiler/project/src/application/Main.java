@@ -3,33 +3,47 @@ package application;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.FileSystemException;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.Iterator;
 import java.util.Map;
-import java.util.Set;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 import javax.swing.JFileChooser;
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOCase;
+import org.apache.commons.io.filefilter.IOFileFilter;
+import org.apache.commons.io.filefilter.SuffixFileFilter;
+import org.apache.commons.io.filefilter.TrueFileFilter;
+import org.apache.commons.io.filefilter.WildcardFileFilter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.fxmisc.flowless.VirtualizedScrollPane;
 import org.fxmisc.richtext.StyleClassedTextArea;
 import org.xml.sax.SAXException;
 
-import com.ahli.galaxy.ComponentsListReader;
-import com.ahli.galaxy.DescIndexData;
-import com.ahli.galaxy.DescIndexReader;
+import com.ahli.galaxy.ModData;
+import com.ahli.galaxy.archive.ComponentsListReader;
+import com.ahli.galaxy.archive.DescIndexData;
+import com.ahli.galaxy.game.GameData;
+import com.ahli.galaxy.game.def.HeroesGameDef;
+import com.ahli.galaxy.game.def.SC2GameDef;
+import com.ahli.galaxy.game.def.abstracts.GameDef;
+import com.ahli.galaxy.ui.DescIndexReader;
+import com.ahli.galaxy.ui.UICatalog;
 import com.ahli.mpq.MpqEditorInterface;
 import com.ahli.mpq.MpqException;
 
 import application.integration.ReplayFinder;
 import application.integration.SettingsIniInterface;
-import application.thread.ThreadManager;
-import application.thread.ThreadManagerImpl;
 import application.util.ErrorTracker;
 import application.util.ErrorTrackerImpl;
 import application.util.JarHelper;
@@ -37,25 +51,26 @@ import application.util.logger.log4j2plugin.StylizedTextAreaAppender;
 import javafx.animation.PauseTransition;
 import javafx.application.Application;
 import javafx.application.Platform;
+import javafx.collections.ObservableList;
+import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
+import javafx.scene.control.Tab;
+import javafx.scene.control.TabPane;
 import javafx.scene.image.Image;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
 /**
- * Interface Builder Application
+ * Interface Compiler and Builder Application.
  * 
  * @author Ahli
  * 
  */
-public class Main extends Application {
+public final class Main extends Application {
 	
-	static Logger LOGGER = LogManager.getLogger(Main.class);
-	
-	protected static final String THREAD_TAG_GAMERUNNER = "GameRunner";
-	protected static final String THREAD_TAG_BUILDER = "Builder";
-	protected static final String THREAD_TAG_BUILDERMANAGER = "BuilderManager";
+	private static Logger logger = LogManager.getLogger(Main.class);
+	private ThreadPoolExecutor executor;
 	
 	// Components
 	private MpqEditorInterface baseMpqInterface = null;
@@ -63,15 +78,16 @@ public class Main extends Application {
 	private final ReplayFinder replayFinder = new ReplayFinder();
 	private final ErrorTracker errorTracker = new ErrorTrackerImpl();
 	private final CompileManager compileManager = new CompileManager(errorTracker);
-	private final ThreadManager threadManager = new ThreadManagerImpl();
 	
 	// data
-	private boolean namespaceHeroes = true;
 	private final String documentsPath = new JFileChooser().getFileSystemView().getDefaultDirectory().toString();
 	private File basePath = null;
+	private final GameData gameSC2 = new GameData(new SC2GameDef());
+	private final GameData gameHeroes = new GameData(new HeroesGameDef());
 	
 	// GUI
 	private StyleClassedTextArea txtArea = null;
+	private TabPane tabPane = null;
 	
 	// performance
 	private static long startTime;
@@ -86,18 +102,19 @@ public class Main extends Application {
 	 * Entry point of the App.
 	 * 
 	 * @param args
+	 *            command line arguments
 	 */
 	public static void main(final String[] args) {
 		startTime = System.currentTimeMillis();
-		LOGGER.trace("trace log visible");
-		LOGGER.debug("debug log visible");
-		LOGGER.info("info log visible");
-		LOGGER.warn("warn log visible");
-		LOGGER.error("error log visible");
-		LOGGER.fatal("fatal log visible");
+		logger.trace("trace log visible");
+		logger.debug("debug log visible");
+		logger.info("info log visible");
+		logger.warn("warn log visible");
+		logger.error("error log visible");
+		logger.fatal("fatal log visible");
 		
-		LOGGER.trace("Configuration File of System: " + System.getProperty("log4j.configurationFile"));
-		LOGGER.info("Launch arguments: " + Arrays.toString(args));
+		logger.trace("Configuration File of System: " + System.getProperty("log4j.configurationFile"));
+		logger.info("Launch arguments: " + Arrays.toString(args));
 		
 		launch(args);
 	}
@@ -107,8 +124,9 @@ public class Main extends Application {
 	 */
 	@Override
 	public void start(final Stage primaryStage) {
-		// shorter thread name for application
 		Thread.currentThread().setName("UI");
+		
+		initThreadPool();
 		
 		initParams();
 		
@@ -122,101 +140,209 @@ public class Main extends Application {
 		
 		initMpqInterface();
 		
-		// // // TEST DefaultUICatalog
-		// final String baseUIpath = basePath.getParent() + File.separator + "baseUI";
-		// LOGGER.info("BaseUI path: " + baseUIpath);
-		// // UICatalog catalogSC2 = new UICatalog();
-		// final UICatalog catalogHeroes = new UICatalog();
-		// new Thread() {
-		// @Override
-		// public void run() {
-		// try {
-		// // catalogSC2.processDescIndex(new File(baseUIpath +
-		// // File.separator + "sc2" + File.separator + "mods"
-		// // + File.separator + "core.sc2mod" + File.separator +
-		// // "base.sc2data" + File.separator + "UI"
-		// // + File.separator + "Layout" + File.separator +
-		// // "DescIndex.SC2Layout"));
-		//
-		// // force core first
-		// // catalogHeroes.processDescIndex(
-		// // new File(baseUIpath + File.separator + "heroes" + File.separator + "mods"
-		// +
-		// // File.separator
-		// // + "core.stormmod" + File.separator + "base.stormdata" + File.separator +
-		// "UI"
-		// // + File.separator + "Layout" + File.separator + "DescIndex.StormLayout"),
-		// // "Terr");
-		//
-		// final File directory = new File(baseUIpath + File.separator + "heroes" +
-		// File.separator + "mods");
-		// final Collection<File> descIndexFiles = FileUtils.listFiles(directory,
-		// new WildcardFileFilter("DescIndex.*Layout"), TrueFileFilter.INSTANCE);
-		// LOGGER.info("number of descIndexFiles found: " + descIndexFiles.size());
-		//
-		// for (final File descIndexFile : descIndexFiles) {
-		// LOGGER.info("parsing descIndexFile '" + descIndexFile.getPath() + "'");
-		// catalogHeroes.processDescIndex(descIndexFile, "Terr");
-		// }
-		//
-		// LOGGER.info("done.");
-		// // TODO load other layout mods
-		//
-		// // load AhliObs
-		// catalogHeroes.processDescIndex(
-		// new File(basePath.getAbsolutePath() + File.separator + "heroes" +
-		// File.separator
-		// + "AhliObs.StormInterface" + File.separator + "Base.StormData" +
-		// File.separator
-		// + "UI" + File.separator + "Layout" + File.separator +
-		// "DescIndex.StormLayout"),
-		// "Terr");
-		// LOGGER.info("done.");
-		// } catch (ParserConfigurationException | SAXException | IOException e) {
-		// LOGGER.error("ERROR parsing base UI catalog due to a technical problem.", e);
-		// e.printStackTrace();
-		// } catch (final UIException e) {
-		// LOGGER.error("ERROR parsing base UI due to a logical problem.", e);
-		// e.printStackTrace();
-		// }
-		// }
-		// }.start();
-		// if (true) {
-		// return;
-		// }
-		
-		startWorkThread(primaryStage);
-		
+		// compile interfaces and run game
+		executeWorkPipeline(primaryStage);
+	}
+	
+	/**
+	 * Initializes the ThreadPool.
+	 */
+	private void initThreadPool() {
+		final int numberOfProcessors = Runtime.getRuntime().availableProcessors();
+		logger.info("detected processor count: " + numberOfProcessors);
+		// test sleepytasks:
+		// durations/thread# for my 4cpu/8threads: 18, 14, 12, 15, 15, 17, 16, 19, .,14
+		// test new:
+		// durations/thread# for my 4cpu/8threads: 15, 12, 15, 15, 15, 15, 14, 14, .,14
+		final int maxThreads = Math.max(1, Math.min(numberOfProcessors, 2));
+		executor = new ThreadPoolExecutor(maxThreads, maxThreads, 5000, TimeUnit.MILLISECONDS,
+				new LinkedBlockingQueue<Runnable>(), runnable -> {
+					final Thread t = new Thread(runnable);
+					t.setDaemon(true);
+					t.setName(t.getName().replaceFirst("Thread", "W"));
+					final String title = t.getName();
+					addThreadLoggerTab(t.getId(), title);
+					return t;
+				});
+		executor.allowCoreThreadTimeOut(true);
+	}
+	
+	/**
+	 * Returns the path the a game's base UI folder.
+	 * 
+	 * @param gameDef
+	 *            the game
+	 * @return path to the baseUI folder of the specified game
+	 */
+	private String getBaseUiPath(final GameDef gameDef) {
+		return basePath.getParent() + File.separator + "baseUI" + File.separator + gameDef.getNameHandle();
 	}
 	
 	/**
 	 * Starts the Application's work thread.
 	 * 
 	 * @param primaryStage
+	 *            app's main stage
 	 */
-	private void startWorkThread(final Stage primaryStage) {
-		final Thread buildManagerThread = new Thread() {
+	private void executeWorkPipeline(final Stage primaryStage) {
+		final String path = hasParamCompilePath ? paramCompilePath : basePath.getAbsolutePath();
+		
+		final boolean workHeroes = pathContainsCompileableForGame(path, gameHeroes);
+		final boolean workSC2 = pathContainsCompileableForGame(path, gameSC2);
+		
+		if (workHeroes) {
+			executor.execute(new Runnable() {
+				@Override
+				public void run() {
+					buildGamesInterfaceFiles(gameHeroes, path);
+				}
+			});
+		}
+		
+		if (workSC2) {
+			executor.execute(new Runnable() {
+				@Override
+				public void run() {
+					buildGamesInterfaceFiles(gameSC2, path);
+				}
+			});
+		}
+		
+		new Thread() {
 			@Override
 			public void run() {
-				// manage thread
-				final int threadID = threadManager.registerThread(this, THREAD_TAG_BUILDERMANAGER);
-				setName(THREAD_TAG_BUILDERMANAGER + threadID);
-				// work
-				buildOneOrMoreUIs(true);
-				printLogMessage("All done.");
-				startReplayOrQuitOrShowError(primaryStage);
-				// manage thread
-				threadManager.unregisterThread(this);
+				Thread.currentThread().setName("TimeKeeper");
+				try {
+					while (executor.getQueue().size() > 0 || executor.getActiveCount() > 0) {
+						Thread.sleep(50);
+					}
+					setStageTitle("Compiling completed.", primaryStage);
+					startReplayOrQuitOrShowError(primaryStage);
+					executor.shutdown();
+					executor.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
+					final long executionTime = (System.currentTimeMillis() - startTime);
+					logger.info("Execution time: " + String.format("%d min, %d sec",
+							TimeUnit.MILLISECONDS.toMinutes(executionTime),
+							TimeUnit.MILLISECONDS.toSeconds(executionTime)
+									- TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(executionTime))));
+				} catch (final InterruptedException e) {
+					logger.error("ERROR: execution time measuring thread was interrupted.");
+					errorTracker.reportErrorEncounter(e);
+				}
 			}
-		};
-		buildManagerThread.start();
+		}.start();
+		
+	}
+	
+	/**
+	 * 
+	 * @param gameHeroes2
+	 * @param path
+	 */
+	private void buildGamesInterfaceFiles(final GameData game, final String path) {
+		printLogMessage("Starting to parse base " + game.getGameDef().getName() + " UI.");
+		parseDefaultUI(game);
+		try {
+			if (hasParamCompilePath) {
+				buildSpecificUI(new File(path), game);
+			} else {
+				buildGamesUIs(game.getGameDef().getNameHandle(), game);
+			}
+		} catch (final IOException e) {
+			logger.error("ERROR while building a UI for " + game.getGameDef().getName() + ": " + e);
+			e.printStackTrace();
+		}
+		printLogMessage("Finished constructing UIs for " + game.getGameDef().getName() + ".");
+	}
+	
+	/**
+	 * Returns whether the specified path contains a compilable file for the
+	 * specified game.
+	 * 
+	 * @param path
+	 * @param game
+	 * @return
+	 */
+	private boolean pathContainsCompileableForGame(final String path, final GameData game) {
+		
+		// final String fileFilter = "DescIndex" +
+		// game.getGameDef().getLayoutFileEnding();
+		// final Collection<File> descIndexFiles = FileUtils.listFiles(new File(path),
+		// new WildcardFileFilter(fileFilter),
+		// TrueFileFilter.INSTANCE);
+		// return !descIndexFiles.isEmpty();
+		
+		final String[] extensions = new String[1];
+		extensions[0] = game.getGameDef().getLayoutFileEnding();
+		final IOFileFilter filter = new SuffixFileFilter(extensions, IOCase.INSENSITIVE);
+		final Iterator<File> iter = FileUtils.iterateFiles(new File(path), filter, TrueFileFilter.INSTANCE);
+		
+		while (iter.hasNext()) {
+			if (iter.next().isFile()) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	/**
+	 * Parses the default UI of the specified game.
+	 * 
+	 * @param game
+	 *            game whose default UI is parsed
+	 */
+	private void parseDefaultUI(final GameData game) {
+		final UICatalog uiCatalog = game.getUiCatalog();
+		final String gameDir = getBaseUiPath(game.getGameDef()) + File.separator
+				+ game.getGameDef().getModsSubDirectory();
+		try {
+			
+			for (final String modOrDir : game.getGameDef().getCoreModsOrDirectories()) {
+				
+				final File directory = new File(gameDir + File.separator + modOrDir);
+				
+				final Collection<File> descIndexFiles = FileUtils.listFiles(directory,
+						new WildcardFileFilter("DescIndex.*Layout"), TrueFileFilter.INSTANCE);
+				logger.info("number of descIndexFiles found: " + descIndexFiles.size());
+				
+				for (final File descIndexFile : descIndexFiles) {
+					logger.info("parsing descIndexFile '" + descIndexFile.getPath() + "'");
+					uiCatalog.processDescIndex(descIndexFile, game.getGameDef().getDefaultRaceId());
+				}
+			}
+			logger.info("Finished parsing base UI for " + game.getGameDef().getName());
+			// } catch (ParserConfigurationException | SAXException | IOException |
+			// UIException e) {
+		} catch (final Exception e) {
+			logger.error("ERROR parsing base UI catalog for '" + game.getGameDef().getName() + "'.", e);
+			e.printStackTrace();
+			errorTracker.reportErrorEncounter(e);
+		}
+	}
+	
+	/**
+	 * Sets title of stage.
+	 * 
+	 * @param title
+	 *            the new title
+	 * @param stage
+	 *            stage receiving the title
+	 */
+	private void setStageTitle(final String title, final Stage stage) {
+		Platform.runLater(new Runnable() {
+			@Override
+			public void run() {
+				stage.setTitle(title);
+			}
+		});
 	}
 	
 	/**
 	 * Starts a Replay, quits the Application or remains alive to show an error.
 	 * Action depends on fields.
-	 * 
+	 *
 	 * @param primaryStage
+	 *            app's main stage
 	 */
 	private void startReplayOrQuitOrShowError(final Stage primaryStage) {
 		if (!errorTracker.hasEncounteredError()) {
@@ -235,155 +361,34 @@ public class Main extends Application {
 			} else if (hasParamCompilePath || paramRunPath != null) {
 				// close instantly, if compiled special and no errors
 				Platform.runLater(new Runnable() {
+					
 					@Override
 					public void run() {
 						primaryStage.close();
 					}
+					
 				});
 			}
 		}
 	}
 	
 	/**
-	 * Builds one or more UIs depending on settings.
-	 * 
-	 * @param waitForFinish
-	 *            wait for the build-threads to finish
-	 */
-	private void buildOneOrMoreUIs(final boolean waitForFinish) {
-		
-		// WORK WORK WORK
-		if (!hasParamCompilePath) {
-			// compile all
-			try {
-				buildGamesUIs("heroes", true);
-				buildGamesUIs("sc2", false);
-			} catch (final IOException e) {
-				e.printStackTrace();
-				LOGGER.error("IOException while building UIs", e);
-				errorTracker.reportErrorEncounter(e);
-			}
-		} else {
-			// build specific file due to param
-			final boolean isHeroes = paramCompilePath.contains("heroes" + File.separator);
-			try {
-				buildSpecificUI(new File(paramCompilePath), isHeroes);
-			} catch (final IOException e) {
-				e.printStackTrace();
-				LOGGER.error("IOException while building UIs", e);
-				errorTracker.reportErrorEncounter(e);
-			}
-		}
-		
-		if (waitForFinish) {
-			// wait for all threads to finish
-			Set<Thread> builders = null;
-			while (!(builders = threadManager.getThreadsByTag("Builder")).isEmpty()) {
-				for (final Thread buildThread : builders) {
-					try {
-						buildThread.join();
-					} catch (final InterruptedException e) {
-						e.printStackTrace();
-						LOGGER.error("waiting for build threads to join failed", e);
-						errorTracker.reportErrorEncounter(e);
-					}
-				}
-			}
-		}
-	}
-	
-	/**
-	 * Prints variables into console.
-	 */
-	private void printVariables() {
-		LOGGER.info("basePath: " + basePath);
-		LOGGER.info("documentsPath: " + documentsPath);
-		if (paramCompilePath != null) {
-			LOGGER.info("compile param path: " + paramCompilePath);
-			if (compileAndRun) {
-				LOGGER.info("run after compile: " + compileAndRun);
-			}
-		}
-		if (paramRunPath != null) {
-			LOGGER.info("run param path: " + paramRunPath);
-		}
-	}
-	
-	/**
-	 * Turns App's parameters into variables.
-	 */
-	private void initParams() {
-		// named params
-		// e.g. "--paramname=value".
-		final Parameters params = getParameters();
-		final Map<String, String> namedParams = params.getNamed();
-		
-		// COMPILE / COMPILERUN PARAM
-		// --compile="D:\GalaxyObsUI\dev\heroes\AhliObs.StormInterface"
-		paramCompilePath = namedParams.get("compile");
-		compileAndRun = false;
-		if (namedParams.get("compileRun") != null) {
-			paramCompilePath = namedParams.get("compileRun");
-			compileAndRun = true;
-		}
-		paramCompilePath = cutCompileParamPath(paramCompilePath);
-		hasParamCompilePath = (paramCompilePath != null);
-		
-		// RUN PARAM
-		// --run="F:\Games\Heroes of the Storm\Support\HeroesSwitcher.exe"
-		paramRunPath = namedParams.get("run");
-	}
-	
-	/**
-	 * Initialize Paths
-	 */
-	private void initPaths() {
-		basePath = JarHelper.getJarDir(Main.class);
-	}
-	
-	/**
-	 * Initialize GUI
-	 */
-	private void initGUI(final Stage primaryStage) {
-		// Build UI
-		final BorderPane root = new BorderPane();
-		
-		txtArea = new StyleClassedTextArea();
-		printLogMessage("Initializing App...");
-		// log4j2 can print into GUI
-		StylizedTextAreaAppender.setTextArea(txtArea);
-		
-		final VirtualizedScrollPane<StyleClassedTextArea> virtualizedScrollPane = new VirtualizedScrollPane<>(txtArea);
-		
-		root.setCenter(virtualizedScrollPane);
-		final Scene scene = new Scene(root, 1200, 400);
-		scene.getStylesheets().add(Main.class.getResource("application.css").toExternalForm()); //$NON-NLS-1$
-		scene.getStylesheets().add(Main.class.getResource("textStyles.css").toExternalForm()); //$NON-NLS-1$
-		primaryStage.setScene(scene);
-		primaryStage.show();
-		primaryStage.setTitle("Compiling Interfaces...");
-		try {
-			primaryStage.getIcons().add(new Image(Main.class.getResourceAsStream("/res/ahli.png"))); //$NON-NLS-1$
-		} catch (final Exception e) {
-			LOGGER.error("Failed to load ahli.png");
-		}
-	}
-	
-	/**
 	 * Attempt to run the Game with the newest Replay file.
-	 * 
+	 *
 	 * @param paramRunPath
-	 * @param paramCompilePath
+	 *            path to the replay file.
 	 * @param compileAndRun
+	 *            setting whether it compiles and runs or only runs
+	 * @param paramCompilePath
+	 *            compile path
 	 */
 	private void attemptToRunGameWithReplay(final String paramRunPath, final boolean compileAndRun,
 			final String paramCompilePath) {
-		new Thread() {
+		
+		executor.execute(new Runnable() {
 			@Override
 			public void run() {
 				// manage thread
-				final int id = threadManager.registerThread(this, THREAD_TAG_GAMERUNNER);
-				setName(THREAD_TAG_GAMERUNNER + id);
 				boolean isHeroes = false;
 				String gamePath = null;
 				
@@ -430,70 +435,192 @@ public class Main extends Application {
 						}
 					}
 				}
+				printLogMessage("Game location: " + gamePath);
 				
-				final File replay = replayFinder.getLastOrNewestReplay(isHeroes, documentsPath);
+				final File replay = replayFinder.getLastUsedOrNewestReplay(isHeroes, documentsPath);
 				if (replay != null && replay.exists() && replay.isFile()) {
-					LOGGER.info("Starting game with replay: " + replay.getName());
+					logger.info("Starting game with replay: " + replay.getName());
 					final String cmd = "cmd /C start \"\" \"" + gamePath + "\" \"" + replay.getAbsolutePath() + "\"";
-					LOGGER.debug("executing: " + cmd);
+					logger.trace("executing: " + cmd);
 					try {
 						Runtime.getRuntime().exec(cmd);
-						LOGGER.debug("after Start attempt...");
+						logger.trace("after Start attempt...");
 					} catch (final IOException e) {
 						e.printStackTrace();
+						errorTracker.reportErrorEncounter(e);
 					}
 				} else {
-					LOGGER.warn("Failed to find any replay.");
+					logger.error("Failed to find any replay.");
 				}
-				
-				// manage thread
-				threadManager.unregisterThread(this);
+				printLogMessage("Finished to start the game with a replay.");
 			}
-		}.start();
+		});
 		
 	}
 	
 	/**
-	 * ParamPath might be some layout or folder within the interface, so we cut it
+	 * Prints variables into console.
+	 */
+	private void printVariables() {
+		logger.info("basePath: " + basePath);
+		logger.info("documentsPath: " + documentsPath);
+		if (paramCompilePath != null) {
+			logger.info("compile param path: " + paramCompilePath);
+			if (compileAndRun) {
+				logger.info("run after compile: " + compileAndRun);
+			}
+		}
+		if (paramRunPath != null) {
+			logger.info("run param path: " + paramRunPath);
+		}
+	}
+	
+	/**
+	 * Turns App's parameters into variables.
+	 */
+	private void initParams() {
+		// named params
+		// e.g. "--paramname=value".
+		final Parameters params = getParameters();
+		final Map<String, String> namedParams = params.getNamed();
+		
+		// COMPILE / COMPILERUN PARAM
+		// --compile="D:\GalaxyObsUI\dev\heroes\AhliObs.StormInterface"
+		paramCompilePath = namedParams.get("compile");
+		compileAndRun = false;
+		if (namedParams.get("compileRun") != null) {
+			paramCompilePath = namedParams.get("compileRun");
+			compileAndRun = true;
+		}
+		paramCompilePath = getInterfaceRootFromPath(paramCompilePath);
+		hasParamCompilePath = (paramCompilePath != null);
+		
+		// RUN PARAM
+		// --run="F:\Games\Heroes of the Storm\Support\HeroesSwitcher.exe"
+		paramRunPath = namedParams.get("run");
+	}
+	
+	/**
+	 * Initialize Paths.
+	 */
+	private void initPaths() {
+		basePath = JarHelper.getJarDir(Main.class);
+	}
+	
+	/**
+	 * Initialize GUI.
+	 * 
+	 * @param primaryStage
+	 *            the main App's Stage
+	 */
+	private void initGUI(final Stage primaryStage) {
+		// Build UI
+		final BorderPane root = new BorderPane();
+		
+		txtArea = new StyleClassedTextArea();
+		txtArea.setEditable(false);
+		// log4j2 can print into GUI
+		StylizedTextAreaAppender.setTextArea(txtArea);
+		final VirtualizedScrollPane<StyleClassedTextArea> virtualizedScrollPane = new VirtualizedScrollPane<>(txtArea);
+		
+		final Scene scene = new Scene(root, 1200, 400);
+		scene.getStylesheets().add(Main.class.getResource("view/application.css").toExternalForm()); //$NON-NLS-1$
+		scene.getStylesheets().add(Main.class.getResource("view/textStyles.css").toExternalForm()); //$NON-NLS-1$
+		
+		final FXMLLoader loader = new FXMLLoader();
+		// loader.setResources(Messages.getBundle());
+		try (InputStream is = Main.class.getResourceAsStream("view/TabsLayout.fxml");) {
+			tabPane = (TabPane) loader.load(is); // $NON-NLS-1$
+		} catch (final IOException e) {
+			logger.error("failed to load TabsLayout.fxml");
+			e.printStackTrace();
+			errorTracker.reportErrorEncounter(e);
+		}
+		root.setCenter(tabPane);
+		final ObservableList<Tab> tabs = tabPane.getTabs();
+		tabs.get(0).setContent(virtualizedScrollPane);
+		
+		try {
+			primaryStage.getIcons().add(new Image(Main.class.getResourceAsStream("/res/ahli.png"))); //$NON-NLS-1$
+		} catch (final Exception e) {
+			logger.error("Failed to load ahli.png");
+			errorTracker.reportErrorEncounter(e);
+		}
+		
+		primaryStage.setScene(scene);
+		primaryStage.show();
+		primaryStage.setTitle("Compiling Interfaces...");
+		printLogMessage("Initializing App...");
+	}
+	
+	/**
+	 * Adds a Tab for the specified Thread ID containing its log messages.
+	 * 
+	 * @param threadId
+	 */
+	private void addThreadLoggerTab(final long threadId, final String tabTitle) {
+		final Tab newTab = new Tab();
+		final StyleClassedTextArea newTxtArea = new StyleClassedTextArea();
+		final VirtualizedScrollPane<StyleClassedTextArea> virtualizedScrollPane = new VirtualizedScrollPane<>(
+				newTxtArea);
+		newTab.setContent(virtualizedScrollPane);
+		StylizedTextAreaAppender.setSpecialTextArea(newTxtArea, threadId);
+		newTab.setText(tabTitle);
+		newTxtArea.setEditable(false);
+		// runlater needs to appear below the edits above, else it might be added before
+		// resulting in UI edits not in UI thread
+		Platform.runLater(new Runnable() {
+			@Override
+			public void run() {
+				tabPane.getTabs().add(newTab);
+			}
+		});
+	}
+	
+	/**
+	 * ParamPath might be some layout or folder within the interface, so it is cut
 	 * down to the interface base path.
 	 * 
 	 * @param paramPath
-	 * @return
+	 *            application's compileParam's value
+	 * @return shortens the path to the Interface root folder
 	 */
-	private String cutCompileParamPath(final String paramPath) {
+	private String getInterfaceRootFromPath(final String paramPath) {
 		String str = paramPath;
 		if (str != null) {
 			while (str.length() > 0 && !str.endsWith("Interface")) {
-				LOGGER.debug("cutting progress: " + str);
+				// logger.trace("cutting progress: " + str);
 				final int lastIndex = str.lastIndexOf(File.separatorChar);
 				if (lastIndex != -1) {
 					str = str.substring(0, lastIndex);
 				} else {
-					LOGGER.debug("LastIndex is -1 => null compile path");
+					// logger.trace("LastIndex is -1 => null compile path");
 					return null;
 				}
 			}
 		}
-		LOGGER.debug("cutting result: " + str);
+		logger.trace("cutting result: " + str);
 		return str;
 	}
 	
 	/**
-	 * Build all Interfaces for game subfolders.
+	 * Build all Interfaces for a game's subdirectory.
 	 * 
 	 * @param subfolderName
-	 * @param isHeroes
+	 *            name from the base path to the directory whose interfaces are
+	 *            built.
+	 * @param gameData
+	 *            the game information
 	 * @throws IOException
+	 *             when something goes wrong
 	 */
-	public void buildGamesUIs(final String subfolderName, final boolean isHeroes) throws IOException {
+	public void buildGamesUIs(final String subfolderName, final GameData gameData) throws IOException {
 		final File dir = new File(basePath.getAbsolutePath() + File.separator + subfolderName);
-		namespaceHeroes = isHeroes;
 		if (dir.exists() && dir.isDirectory()) {
 			final File[] directoryListing = dir.listFiles();
 			if (directoryListing != null) {
 				for (final File child : directoryListing) {
-					// build UI
-					buildSpecificUI(child, isHeroes);
+					buildSpecificUI(child, gameData);
 				}
 			}
 		}
@@ -503,36 +630,34 @@ public class Main extends Application {
 	/**
 	 * Builds a specific Interface in a Build Thread.
 	 * 
-	 * @param folder
-	 * @param isHeroes
-	 * @throws IOException
+	 * @param interfaceFolder
+	 *            folder of the interface file to be built
+	 * @param game
+	 *            the game information about the file
 	 */
-	public void buildSpecificUI(final File interfaceFolder, final boolean isHeroes) throws IOException {
+	public void buildSpecificUI(final File interfaceFolder, final GameData game) {
 		if (interfaceFolder.isDirectory()) {
-			final Thread buildThread = new Thread() {
+			executor.execute(new Runnable() {
 				@Override
 				public void run() {
-					// manage thread
-					final int threadId = threadManager.registerThread(this, THREAD_TAG_BUILDER);
-					setName(THREAD_TAG_BUILDER + threadId);
-					
 					// create unique cache path
 					final MpqEditorInterface threadsMpqInterface = (MpqEditorInterface) baseMpqInterface.clone();
+					final long threadId = Thread.currentThread().getId();
 					threadsMpqInterface.setMpqCachePath(baseMpqInterface.getMpqCachePath() + threadId);
 					
 					// work
 					try {
-						buildFile(interfaceFolder, isHeroes, threadsMpqInterface);
+						buildFile(interfaceFolder, game, threadsMpqInterface);
+						threadsMpqInterface.clearCacheExtractedMpq();
 					} catch (final IOException e) {
-						LOGGER.error("IOException while building UIs", e);
+						logger.error("IOException while building UIs", e);
 						errorTracker.reportErrorEncounter();
 						e.printStackTrace();
 					}
-					// manage thread
-					threadManager.unregisterThread(this);
 				}
-			};
-			buildThread.start();
+			});
+		} else {
+			logger.error("Can't build UI from file '" + interfaceFolder + "', expected a directory.");
 		}
 	}
 	
@@ -540,16 +665,10 @@ public class Main extends Application {
 	 * Prints a message to the message log.
 	 * 
 	 * @param msg
+	 *            the message
 	 */
 	public void printLogMessage(final String msg) {
-		Platform.runLater(new Runnable() {
-			@Override
-			public void run() {
-				final int len = txtArea.getLength();
-				txtArea.appendText(msg + "\n");
-				txtArea.setStyleClass(len, txtArea.getLength(), "printlog");
-			}
-		});
+		logger.info(msg);
 	}
 	
 	/**
@@ -558,35 +677,34 @@ public class Main extends Application {
 	 * Conditions: - Specified MpqInterface requires a unique cache path for
 	 * multithreading.
 	 * 
-	 * @param file
+	 * @param sourceFile
 	 *            folder location
-	 * @param isHeroes
+	 * @param game
 	 *            set to true, if Heroes
 	 * @param mpqi
 	 *            MpqInterface with unique cache path
 	 * @throws IOException
+	 *             when something goes wrong
 	 */
-	private void buildFile(final File file, final boolean isHeroes, final MpqEditorInterface mpqi) throws IOException {
-		String buildPath = documentsPath + File.separator;
+	private void buildFile(final File sourceFile, final GameData game, final MpqEditorInterface mpqi)
+			throws IOException {
+		String targetPath = documentsPath + File.separator;
+		targetPath += game.getGameDef().getDocumentsGameDirectoryName();
+		targetPath += File.separator + game.getGameDef().getDocumentsInterfaceSubdirectoryName();
 		
-		LOGGER.info("Starting to build file: " + file.getPath());
-		
-		if (isHeroes) {
-			buildPath += "Heroes of the Storm";
-		} else {
-			buildPath += "StarCraft II";
-		}
-		buildPath += File.separator + "Interfaces";
+		// do stuff
+		final ModData mod = new ModData(game);
+		mod.setSourcePath(sourceFile);
+		mod.setTargetPath(new File(targetPath));
 		
 		// get and create cache
 		final File cache = new File(mpqi.getMpqCachePath());
 		if (!cache.exists() && !cache.mkdirs()) {
 			errorTracker.reportErrorEncounter();
 			final String msg = "Unable to create cache directory.";
-			LOGGER.error(msg);
+			logger.error(msg);
 			throw new IOException(msg);
 		}
-		
 		int cacheClearAttempts = 0;
 		y: for (cacheClearAttempts = 0; cacheClearAttempts <= 100; cacheClearAttempts++) {
 			if (!mpqi.clearCacheExtractedMpq()) {
@@ -595,6 +713,7 @@ public class Main extends Application {
 					Thread.sleep(500);
 				} catch (final InterruptedException e1) {
 					e1.printStackTrace();
+					errorTracker.reportErrorEncounter(e1);
 				}
 			} else {
 				// success
@@ -603,24 +722,24 @@ public class Main extends Application {
 		}
 		if (cacheClearAttempts > 100) {
 			final String msg = "Cache could not be cleared";
-			LOGGER.error(msg);
+			logger.error(msg);
 			return;
 		}
-		
+		mod.setMpqCachePath(cache);
 		// put files into cache
 		int copyAttempts = 0;
 		x: for (copyAttempts = 0; copyAttempts <= 100; copyAttempts++) {
 			try {
-				copyFileOrFolder(file, cache);
-				LOGGER.debug("Copy Folder took " + copyAttempts + " attempts to succeed.");
+				copyFileOrFolder(sourceFile, cache);
+				logger.trace("Copy Folder took " + copyAttempts + " attempts to succeed.");
 				break x;
 			} catch (final FileSystemException e) {
 				if (copyAttempts == 0) {
-					LOGGER.warn("Attempt to copy directory failed.", e);
+					logger.warn("Attempt to copy directory failed.", e);
 				} else if (copyAttempts >= 100) {
 					errorTracker.reportErrorEncounter();
 					final String msg = "Unable to copy directory after 100 copy attempts: " + e.getMessage();
-					LOGGER.error(msg, e);
+					logger.error(msg, e);
 					e.printStackTrace();
 					throw new FileSystemException(msg);
 				}
@@ -628,65 +747,72 @@ public class Main extends Application {
 				try {
 					Thread.sleep(500);
 				} catch (final InterruptedException e1) {
-					LOGGER.error("Thread sleep was interrupted with exception.", e);
+					logger.error("Thread sleep was interrupted with exception.", e);
+					errorTracker.reportErrorEncounter(e);
 				}
 			} catch (final IOException e) {
 				errorTracker.reportErrorEncounter();
 				final String msg = "Unable to copy directory";
-				LOGGER.error(msg, e);
+				logger.error(msg, e);
+				errorTracker.reportErrorEncounter(e);
 				e.printStackTrace();
 			}
 		}
 		if (copyAttempts > 100) {
 			// copy keeps failing -> abort
 			final String msg = "Above code did not throw exception about copy attempt threshold reached.";
-			LOGGER.error(msg);
+			logger.error(msg);
 			errorTracker.reportErrorEncounter();
 			throw new IOException(msg);
 		}
 		
-		// do stuff
-		LOGGER.debug("retrieving componentList");
+		logger.trace("retrieving componentList");
 		final File componentListFile = mpqi.getComponentListFile();
-		LOGGER.debug("retrieving descIndex - set path and clear");
+		mod.setComponentListFile(componentListFile);
+		logger.trace("retrieving descIndex - set path and clear");
 		
-		final DescIndexData descIndex = new DescIndexData(mpqi);
+		final DescIndexData descIndexData = new DescIndexData(mpqi);
+		mod.setDescIndexData(descIndexData);
 		
 		try {
-			descIndex.setDescIndexPathAndClear(ComponentsListReader.getDescIndexPath(componentListFile));
+			descIndexData.setDescIndexPathAndClear(ComponentsListReader.getDescIndexPath(componentListFile));
 		} catch (ParserConfigurationException | SAXException | IOException e) {
-			LOGGER.error("unable to read DescIndex path", e);
-			errorTracker.reportErrorEncounter();
+			final String msg = "ERROR: unable to read DescIndex path.";
+			logger.error(msg, e);
+			errorTracker.reportErrorEncounter(e);
 			e.printStackTrace();
+			throw new IOException(msg, e);
 		}
 		
-		LOGGER.debug("retrieving descIndex - get cached file");
-		final File descIndexFile = mpqi.getFileFromMpq(descIndex.getDescIndexIntPath());
-		LOGGER.debug("adding layouts from descIndexFile: " + descIndexFile.getAbsolutePath());
+		logger.trace("retrieving descIndex - get cached file");
+		final File descIndexFile = mpqi.getFileFromMpq(descIndexData.getDescIndexIntPath());
+		logger.trace("adding layouts from descIndexFile: " + descIndexFile.getAbsolutePath());
 		try {
-			descIndex.addLayoutIntPath(DescIndexReader.getLayoutPathList(descIndexFile, false));
+			descIndexData.addLayoutIntPath(DescIndexReader.getLayoutPathList(descIndexFile, false));
 		} catch (SAXException | ParserConfigurationException | IOException | MpqException e) {
-			LOGGER.error("unable to read Layout paths", e);
+			logger.error("unable to read Layout paths", e);
 			errorTracker.reportErrorEncounter(e);
 			e.printStackTrace();
 		}
 		
-		LOGGER.info("Compiling... " + file.getName());
+		logger.info("Compiling... " + sourceFile.getName());
 		
 		// perform checks/improvements on code
-		compileManager.compile(descIndex);
+		compileManager.compile(mod, "Terr");
 		
-		LOGGER.info("Building... " + file.getName());
+		logger.info("Building... " + sourceFile.getName());
 		
 		try {
-			final boolean protectMPQ = isHeroes ? settings.isHeroesProtectMPQ() : settings.isSC2ProtectMPQ();
-			mpqi.buildMpq(buildPath, file.getName(), protectMPQ, settings.isBuildUnprotectedToo());
+			final boolean protectMPQ = game.getGameDef() instanceof HeroesGameDef ? settings.isHeroesProtectMPQ()
+					: settings.isSC2ProtectMPQ();
+			mpqi.buildMpq(targetPath, sourceFile.getName(), protectMPQ, settings.isBuildUnprotectedToo());
+			logger.info("Finished building... " + sourceFile.getName());
 		} catch (IOException | InterruptedException e) {
-			LOGGER.error("unable to construct final Interface file", e);
+			logger.error("ERROR: unable to construct final Interface file", e);
 			errorTracker.reportErrorEncounter(e);
 			e.printStackTrace();
 		} catch (final Exception e1) {
-			LOGGER.error("caught an unexpected Exception", e1);
+			logger.error("ERROR: caught an unexpected Exception", e1);
 			errorTracker.reportErrorEncounter(e1);
 			e1.printStackTrace();
 		}
@@ -697,13 +823,19 @@ public class Main extends Application {
 	 */
 	@Override
 	public void stop() {
-		LOGGER.info("App is about to shut down.");
+		logger.info("App is about to shut down.");
 		baseMpqInterface.clearCacheExtractedMpq();
-		LOGGER.info("App waves Goodbye!");
-		final long executionTime = (System.currentTimeMillis() - startTime);
-		LOGGER.info("Execution time: " + String.format("%d min, %d sec", TimeUnit.MILLISECONDS.toMinutes(executionTime),
-				TimeUnit.MILLISECONDS.toSeconds(executionTime)
-						- TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(executionTime))));
+		executor.shutdown();
+		try {
+			if (executor.awaitTermination(60, TimeUnit.SECONDS)) {
+				logger.info("App waves Goodbye!");
+			} else {
+				logger.error("ERROR: Executor timed out waiting for termination.");
+			}
+		} catch (final InterruptedException e) {
+			logger.error("ERROR while shutting down executor.", e);
+			e.printStackTrace(System.err);
+		}
 	}
 	
 	/**
@@ -726,15 +858,17 @@ public class Main extends Application {
 	 *            location
 	 */
 	private void initSettings(final SettingsIniInterface optionalSettingsToLoad) {
-		SettingsIniInterface settings = optionalSettingsToLoad;
-		if (settings == null) {
+		SettingsIniInterface settings;
+		if (optionalSettingsToLoad == null) {
 			final String settingsFilePath = basePath.getParent() + File.separator + "settings.ini";
 			settings = new SettingsIniInterface(settingsFilePath);
+		} else {
+			settings = optionalSettingsToLoad;
 		}
 		try {
 			settings.readSettingsFromFile();
 		} catch (final FileNotFoundException e) {
-			LOGGER.error("settings file could not be found", e);
+			logger.error("settings file could not be found", e);
 			errorTracker.reportErrorEncounter(e);
 			e.printStackTrace();
 		}
@@ -742,27 +876,21 @@ public class Main extends Application {
 	}
 	
 	/**
-	 * Returns true, if it belongs to Heroes of the Storm, false otherwise.
-	 * 
-	 * @return
-	 */
-	public boolean isHeroesFile() {
-		return namespaceHeroes;
-	}
-	
-	/**
 	 * Copies a file or folder.
 	 * 
 	 * @param source
+	 *            source location
 	 * @param target
+	 *            target location
 	 * @throws IOException
+	 *             when something goes wrong
 	 */
 	private static void copyFileOrFolder(final File source, final File target) throws IOException {
 		if (source.isDirectory()) {
 			// create folder if not existing
 			if (!target.exists() && !target.mkdir()) {
 				final String msg = "Could not create directory " + target.getAbsolutePath();
-				LOGGER.error(msg);
+				logger.error(msg);
 				throw new IOException(msg);
 			}
 			
@@ -770,7 +898,7 @@ public class Main extends Application {
 			final String[] fileList = source.list();
 			if (fileList == null) {
 				final String msg = "Source directory's files returned null";
-				LOGGER.error(msg);
+				logger.error(msg);
 				throw new IOException(msg);
 			}
 			for (final String file : fileList) {

@@ -9,7 +9,13 @@ import org.w3c.dom.Node;
  * @author Ahli
  *
  */
-public class XmlDomHelper {
+public final class XmlDomHelper {
+	
+	/**
+	 * Disabled Constructor.
+	 */
+	private XmlDomHelper() {
+	}
 	
 	/**
 	 * Returns named item of a specified NamedNodeMap (e.g. from attributes).

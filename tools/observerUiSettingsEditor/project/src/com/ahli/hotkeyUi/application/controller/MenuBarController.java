@@ -18,7 +18,7 @@ import javafx.scene.input.KeyCombination;
  *
  */
 public class MenuBarController {
-	// static Logger LOGGER = LogManager.getLogger(MenuBarController.class);
+	// static Logger logger = LogManager.getLogger(MenuBarController.class);
 	// //$NON-NLS-1$
 	
 	private Main main;

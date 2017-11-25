@@ -1,5 +1,7 @@
 package com.ahli.galaxy.ui;
 
+import java.io.Serializable;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -8,8 +10,13 @@ import org.apache.logging.log4j.Logger;
  * @author Ahli
  *
  */
-public class UITemplate {
-	private final static Logger LOGGER = LogManager.getLogger(UITemplate.class);
+public class UITemplate implements Cloneable, Serializable {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 7686203678975623860L;
+	
+	private static final Logger logger = LogManager.getLogger(UITemplate.class);
 	
 	private String fileName = "";
 	private UIElement element = null;
@@ -23,6 +30,16 @@ public class UITemplate {
 	public UITemplate(final String fileName, final UIElement element) {
 		this.fileName = fileName;
 		this.element = element;
+	}
+	
+	/**
+	 * Returns a deep clone of this.
+	 */
+	@Override
+	public Object clone() {
+		final UITemplate clone = new UITemplate(fileName, (UIElement) element.clone());
+		clone.setLocked(isLocked);
+		return clone;
 	}
 	
 	/**
@@ -48,8 +65,8 @@ public class UITemplate {
 	}
 	
 	/**
-	 * @param frame
-	 *            the frame to set
+	 * @param element
+	 *            the element to set
 	 */
 	public void setElement(final UIElement element) {
 		this.element = element;
@@ -76,17 +93,17 @@ public class UITemplate {
 	 * @return
 	 */
 	public UIElement receiveFrameFromPath(final String path) {
-		LOGGER.debug("receive Frame from path: " + path);
-		LOGGER.debug("template's element name: " + element.getName());
+		logger.trace("receive Frame from path: " + path);
+		logger.trace("template's element name: " + element.getName());
 		final String curName = UIElement.getLeftPathLevel(path);
-		LOGGER.debug("searched name: " + curName);
+		logger.trace("searched name: " + curName);
 		if (curName.equalsIgnoreCase(element.getName())) {
 			final String newPath = UIElement.removeLeftPathLevel(path);
-			LOGGER.debug("match! new Path: " + newPath);
+			logger.trace("match! new Path: " + newPath);
 			
 			return element.receiveFrameFromPath(newPath);
 		}
-		LOGGER.debug("did not find template: " + path);
+		logger.trace("did not find template: " + path);
 		return null;
 	}
 	

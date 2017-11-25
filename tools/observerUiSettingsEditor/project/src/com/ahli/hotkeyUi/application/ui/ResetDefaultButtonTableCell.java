@@ -17,21 +17,28 @@ import javafx.scene.control.TableCell;
  *
  */
 public class ResetDefaultButtonTableCell extends TableCell<ValueDef, Boolean> {
-	static Logger LOGGER = LogManager.getLogger(ResetDefaultButtonTableCell.class);
+	private static Logger logger = LogManager.getLogger(ResetDefaultButtonTableCell.class);
 	
-	final Button cellButton = new Button();
+	private final Button cellButton = new Button();
 	
+	/**
+	 * Constructor.
+	 */
 	public ResetDefaultButtonTableCell() {
 		cellButton.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(final ActionEvent t) {
-				LOGGER.trace("reset table item clicked");
+				logger.trace("reset table item clicked");
 				final ValueDef data = (ValueDef) getTableRow().getItem();
 				data.setValue(data.getDefaultValue());
 			}
 		});
 	}
 	
+	/**
+	 * 
+	 * @param text
+	 */
 	public ResetDefaultButtonTableCell(final String text) {
 		this();
 		cellButton.setText(text);

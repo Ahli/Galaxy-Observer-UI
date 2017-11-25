@@ -14,8 +14,14 @@ import org.apache.logging.log4j.Logger;
  * @author Ahli
  *
  */
-public class JarHelper {
-	static Logger LOGGER = LogManager.getLogger(JarHelper.class); // $NON-NLS-1$
+public final class JarHelper {
+	private static Logger logger = LogManager.getLogger(JarHelper.class); // $NON-NLS-1$
+	
+	/**
+	 * Disabled Constructor.
+	 */
+	private JarHelper() {
+	}
 	
 	/**
 	 * from stackoverflow because why doesn't java have this functionality? It's not
@@ -25,13 +31,13 @@ public class JarHelper {
 	 * @return File at base path
 	 */
 	public static File getJarDir(final Class<? extends Object> aclass) {
-		LOGGER.debug("_FINDING JAR'S PATH"); //$NON-NLS-1$
+		logger.trace("_FINDING JAR'S PATH"); //$NON-NLS-1$
 		
 		// ATTEMPT #1
 		final File f = new File(System.getProperty("java.class.path")); //$NON-NLS-1$
 		final File dir = f.getAbsoluteFile().getParentFile();
 		String str = dir.toString();
-		LOGGER.debug("Attempt#1 java.class.path: " + str); //$NON-NLS-1$
+		logger.trace("Attempt#1 java.class.path: " + str); //$NON-NLS-1$
 		
 		// check if started in eclipse
 		if (str.contains(File.separator + "target" + File.separator + "classes;")) { //$NON-NLS-1$ //$NON-NLS-2$
@@ -43,7 +49,7 @@ public class JarHelper {
 			// addLogMessage("METHOD TEST: " + new File(".").toURI());
 			
 			str = uri.getPath();
-			LOGGER.debug("_URI path:" + str); //$NON-NLS-1$
+			logger.trace("_URI path:" + str); //$NON-NLS-1$
 			
 			if (str.startsWith("file:/")) { //$NON-NLS-1$
 				str = str.substring(6);
@@ -61,18 +67,18 @@ public class JarHelper {
 			if (!url.toString().startsWith("rsrc:./")) { //$NON-NLS-1$
 				// wild guess that we are in test environment
 				str += "/testEnv/dev/"; //$NON-NLS-1$
-				LOGGER.debug("assuming Test Environment: " + str); //$NON-NLS-1$
+				logger.trace("assuming Test Environment: " + str); //$NON-NLS-1$
 			}
 			
 		} else {
 			if (str.contains(".jar;")) {
 				str = str.substring(0, str.indexOf(".jar"));
-				LOGGER.debug("path before .jar: " + str);
+				logger.trace("path before .jar: " + str);
 				str = str.substring(0, str.lastIndexOf(File.separator));
 			}
 			
 		}
-		LOGGER.debug("_RESULT PATH: " + str); //$NON-NLS-1$
+		logger.trace("_RESULT PATH: " + str); //$NON-NLS-1$
 		
 		return new File(str);
 	}

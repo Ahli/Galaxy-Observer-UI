@@ -19,13 +19,13 @@ import com.ahli.mpq.i18n.Messages;
  * 
  */
 public class MpqEditorInterface implements MpqInterface, Cloneable {
-	static Logger LOGGER = LogManager.getLogger("MpqInterface"); //$NON-NLS-1$
+	private static Logger logger = LogManager.getLogger("MpqInterface"); //$NON-NLS-1$
 	
-	private String MPQ_EDITOR = "plugins" + File.separator + "mpq" + File.separator + "MPQEditor.exe"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+	private String mpqEditor = "plugins" + File.separator + "mpq" + File.separator + "MPQEditor.exe"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	private String mpqCachePath;
 	
 	/**
-	 * Constructor
+	 * Constructor.
 	 * 
 	 * @param mpqCachePath
 	 *            path of the directory that will temporarily contain the extracted
@@ -35,16 +35,33 @@ public class MpqEditorInterface implements MpqInterface, Cloneable {
 		this.mpqCachePath = mpqCachePath;
 	}
 	
+	/**
+	 * Returns the cache path as String.
+	 * 
+	 * @return cache path as String
+	 */
 	public String getMpqCachePath() {
 		return mpqCachePath;
 	}
 	
+	/**
+	 * Sets the cache path.
+	 * 
+	 * @param mpqCachePath
+	 *            new cache path as String
+	 */
 	public void setMpqCachePath(final String mpqCachePath) {
 		this.mpqCachePath = mpqCachePath;
 	}
 	
+	/**
+	 * Sets the MpqEditor path.
+	 * 
+	 * @param editorPath
+	 *            new editor path as String
+	 */
 	public void setMpqEditorPath(final String editorPath) {
-		MPQ_EDITOR = editorPath;
+		mpqEditor = editorPath;
 	}
 	
 	/**
@@ -56,10 +73,10 @@ public class MpqEditorInterface implements MpqInterface, Cloneable {
 			super.clone();
 		} catch (final CloneNotSupportedException e) {
 			e.printStackTrace();
-			LOGGER.error("error calling super.clone(): " + e.getMessage());
+			logger.error("error calling super.clone(): " + e.getMessage());
 		}
 		final MpqEditorInterface clone = new MpqEditorInterface(mpqCachePath);
-		clone.setMpqEditorPath(MPQ_EDITOR);
+		clone.setMpqEditorPath(mpqEditor);
 		return clone;
 	}
 	
@@ -104,7 +121,7 @@ public class MpqEditorInterface implements MpqInterface, Cloneable {
 		final File parentFolder = targetFile.getParentFile();
 		if (!parentFolder.exists() && !parentFolder.mkdirs()) {
 			final String msg = "ERROR: Could not create path " + parentFolder.getAbsolutePath(); //$NON-NLS-1$
-			LOGGER.error(msg);
+			logger.error(msg);
 			throw new MpqException(String.format(Messages.getString("MpqInterface.CouldNotCreatePath"), //$NON-NLS-1$
 					parentFolder.getAbsolutePath()));
 		}
@@ -120,7 +137,7 @@ public class MpqEditorInterface implements MpqInterface, Cloneable {
 				if (fup.exists() && fup.isFile()) {
 					if (!fup.delete()) {
 						final String msg = "ERROR: Could not delete file " + unprotectedAbsolutePath; //$NON-NLS-1$
-						LOGGER.error(msg);
+						logger.error(msg);
 						throw new MpqException(
 								String.format(Messages.getString("MpqInterface.CouldNotOverwriteFile"), absolutePath)); //$NON-NLS-1$
 					}
@@ -137,7 +154,7 @@ public class MpqEditorInterface implements MpqInterface, Cloneable {
 			if (f.exists() && f.isFile()) {
 				if (!f.delete()) {
 					final String msg = "ERROR: Could not delete file " + absolutePath; //$NON-NLS-1$
-					LOGGER.error(msg);
+					logger.error(msg);
 					throw new MpqException(
 							String.format(Messages.getString("MpqInterface.CouldNotOverwriteFile"), absolutePath)); //$NON-NLS-1$
 				}
@@ -160,7 +177,7 @@ public class MpqEditorInterface implements MpqInterface, Cloneable {
 				XmlCompressor.processCache(mpqCachePath, 1);
 			} catch (ParserConfigurationException | SAXException e) {
 				e.printStackTrace();
-				LOGGER.error(ExceptionUtils.getStackTrace(e));
+				logger.error(ExceptionUtils.getStackTrace(e));
 			}
 			
 			// build protected file
@@ -176,7 +193,7 @@ public class MpqEditorInterface implements MpqInterface, Cloneable {
 			if (f.exists() && f.isFile()) {
 				if (!f.delete()) {
 					final String msg = "ERROR: Could not delete file " + absolutePath; //$NON-NLS-1$
-					LOGGER.error(msg);
+					logger.error(msg);
 					throw new MpqException(
 							String.format(Messages.getString("MpqInterface.CouldNotOverwriteFile"), absolutePath)); //$NON-NLS-1$
 				}
@@ -231,8 +248,8 @@ public class MpqEditorInterface implements MpqInterface, Cloneable {
 	 * @throws MpqException
 	 */
 	public void extractEntireMPQ(final String mpqSourcePath) throws InterruptedException, IOException, MpqException {
-		LOGGER.trace("mpqCachePath: " + mpqCachePath); //$NON-NLS-1$
-		LOGGER.trace("mpqSourcePath: " + mpqSourcePath); //$NON-NLS-1$
+		logger.trace("mpqCachePath: " + mpqCachePath); //$NON-NLS-1$
+		logger.trace("mpqSourcePath: " + mpqSourcePath); //$NON-NLS-1$
 		
 		clearCacheExtractedMpq();
 		
@@ -277,10 +294,10 @@ public class MpqEditorInterface implements MpqInterface, Cloneable {
 		final File f = new File(mpqCachePath);
 		if (f.exists()) {
 			if (deleteDir(f)) {
-				LOGGER.debug("clearing Cache succeeded"); //$NON-NLS-1$
+				logger.trace("clearing Cache succeeded"); //$NON-NLS-1$
 				return true;
 			} else {
-				LOGGER.error("clearing Cache FAILED"); //$NON-NLS-1$
+				logger.error("clearing Cache FAILED"); //$NON-NLS-1$
 				return false;
 			}
 		} else {
@@ -306,7 +323,7 @@ public class MpqEditorInterface implements MpqInterface, Cloneable {
 		}
 		final boolean result = f.delete();
 		if (!result) {
-			LOGGER.error("Deleting file/folder " + f.getPath() + " failed."); //$NON-NLS-1$ //$NON-NLS-2$
+			logger.error("Deleting file/folder " + f.getPath() + " failed."); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 		return result;
 	}
@@ -322,13 +339,13 @@ public class MpqEditorInterface implements MpqInterface, Cloneable {
 	public void newMpq(final String mpqPath, final int maxFileCount)
 			throws InterruptedException, IOException, MpqException {
 		if (!verifyMpqEditor()) {
-			throw new MpqException(String.format(Messages.getString("MpqInterface.MPQEditorNotFound"), MPQ_EDITOR)); //$NON-NLS-1$
+			throw new MpqException(String.format(Messages.getString("MpqInterface.MPQEditorNotFound"), mpqEditor)); //$NON-NLS-1$
 		}
 		final String q = "\""; //$NON-NLS-1$
-		final String cmd = "cmd /C " + q + q + MPQ_EDITOR + q + " /n " + q + mpqPath + q + " " + maxFileCount + q; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-		LOGGER.debug("executing: " + cmd); //$NON-NLS-1$
+		final String cmd = "cmd /C " + q + q + mpqEditor + q + " /n " + q + mpqPath + q + " " + maxFileCount + q; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		logger.trace("executing: " + cmd); //$NON-NLS-1$
 		Runtime.getRuntime().exec(cmd).waitFor();
-		LOGGER.debug("execution finished"); //$NON-NLS-1$
+		logger.trace("execution finished"); //$NON-NLS-1$
 	}
 	
 	/**
@@ -337,7 +354,7 @@ public class MpqEditorInterface implements MpqInterface, Cloneable {
 	 * @return
 	 */
 	private boolean verifyMpqEditor() {
-		final File f = new File(MPQ_EDITOR);
+		final File f = new File(mpqEditor);
 		return f.exists() && f.isFile();
 	}
 	
@@ -353,15 +370,15 @@ public class MpqEditorInterface implements MpqInterface, Cloneable {
 	public void addToMpq(final String mpqPath, final String sourceFilePath, final String targetName)
 			throws InterruptedException, IOException, MpqException {
 		if (!verifyMpqEditor()) {
-			throw new MpqException(String.format(Messages.getString("MpqInterface.MPQEditorNotFound"), MPQ_EDITOR)); //$NON-NLS-1$
+			throw new MpqException(String.format(Messages.getString("MpqInterface.MPQEditorNotFound"), mpqEditor)); //$NON-NLS-1$
 		}
 		final String q = "\""; //$NON-NLS-1$
-		final String cmd = "cmd /C " + q + q + MPQ_EDITOR + q + " /a " + q + mpqPath + q + " " + q + sourceFilePath + q //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		final String cmd = "cmd /C " + q + q + mpqEditor + q + " /a " + q + mpqPath + q + " " + q + sourceFilePath + q //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 				+ " " //$NON-NLS-1$
 				+ q + targetName + q + " /r" + q; //$NON-NLS-1$
-		LOGGER.debug("executing: " + cmd); //$NON-NLS-1$
+		logger.trace("executing: " + cmd); //$NON-NLS-1$
 		Runtime.getRuntime().exec(cmd).waitFor();
-		LOGGER.debug("execution finished"); //$NON-NLS-1$
+		logger.trace("execution finished"); //$NON-NLS-1$
 	}
 	
 	/**
@@ -377,23 +394,23 @@ public class MpqEditorInterface implements MpqInterface, Cloneable {
 	public void extractFromMpq(final String mpqPath, final String fileName, final String targetPath,
 			final boolean inclSubFolders) throws InterruptedException, IOException, MpqException {
 		if (!verifyMpqEditor()) {
-			throw new MpqException(String.format(Messages.getString("MpqInterface.MPQEditorNotFound"), MPQ_EDITOR)); //$NON-NLS-1$
+			throw new MpqException(String.format(Messages.getString("MpqInterface.MPQEditorNotFound"), mpqEditor)); //$NON-NLS-1$
 		}
 		final String q = "\""; //$NON-NLS-1$
-		final String cmd = "cmd /C " + q + q + MPQ_EDITOR + q + " /e " + q + mpqPath + q + " " + q + fileName + q + " " //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+		final String cmd = "cmd /C " + q + q + mpqEditor + q + " /e " + q + mpqPath + q + " " + q + fileName + q + " " //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 				+ q + targetPath + q + (inclSubFolders ? " /fp" : "") + q; //$NON-NLS-1$ //$NON-NLS-2$
-		LOGGER.debug("executing: " + cmd); //$NON-NLS-1$
+		logger.trace("executing: " + cmd); //$NON-NLS-1$
 		Runtime.getRuntime().exec(cmd).waitFor();
-		LOGGER.debug("execution finished"); //$NON-NLS-1$
+		logger.trace("execution finished"); //$NON-NLS-1$
 		
 		// // MONITOR https://github.com/inwc3/JMPQ3 if it can handle sc2 files
 		// someday to potentially replace MpqEditor.exe
 		// File mpq = new File(mpqPath);
-		// LOGGER.trace("Extract from Mpq: "+mpq.getAbsolutePath());
+		// logger.trace("Extract from Mpq: "+mpq.getAbsolutePath());
 		// JMpqEditor editor = new JMpqEditor(mpq, MPQOpenOption.FORCE_V0);
 		// File cache = new File(mpqCachePath);
 		// cache.mkdirs();
-		// LOGGER.trace("Extract into: "+cache.getAbsolutePath());
+		// logger.trace("Extract into: "+cache.getAbsolutePath());
 		// editor.extractAllFiles(cache);
 	}
 	
@@ -406,13 +423,13 @@ public class MpqEditorInterface implements MpqInterface, Cloneable {
 	 */
 	public void compactMpq(final String mpqPath) throws InterruptedException, IOException, MpqException {
 		if (!verifyMpqEditor()) {
-			throw new MpqException(String.format(Messages.getString("MpqInterface.MPQEditorNotFound"), MPQ_EDITOR)); //$NON-NLS-1$
+			throw new MpqException(String.format(Messages.getString("MpqInterface.MPQEditorNotFound"), mpqEditor)); //$NON-NLS-1$
 		}
 		final String q = "\""; //$NON-NLS-1$
-		final String cmd = "cmd /C " + q + q + MPQ_EDITOR + q + " /compact " + q + mpqPath + q + q; //$NON-NLS-1$ //$NON-NLS-2$
-		LOGGER.debug("executing: " + cmd); //$NON-NLS-1$
+		final String cmd = "cmd /C " + q + q + mpqEditor + q + " /compact " + q + mpqPath + q + q; //$NON-NLS-1$ //$NON-NLS-2$
+		logger.trace("executing: " + cmd); //$NON-NLS-1$
 		Runtime.getRuntime().exec(cmd).waitFor();
-		LOGGER.debug("execution finished"); //$NON-NLS-1$
+		logger.trace("execution finished"); //$NON-NLS-1$
 		
 	}
 	
@@ -427,13 +444,13 @@ public class MpqEditorInterface implements MpqInterface, Cloneable {
 	public void scriptMpq(final String mpqPath, final String scriptPath)
 			throws InterruptedException, IOException, MpqException {
 		if (!verifyMpqEditor()) {
-			throw new MpqException(String.format(Messages.getString("MpqInterface.MPQEditorNotFound"), MPQ_EDITOR)); //$NON-NLS-1$
+			throw new MpqException(String.format(Messages.getString("MpqInterface.MPQEditorNotFound"), mpqEditor)); //$NON-NLS-1$
 		}
 		final String q = "\""; //$NON-NLS-1$
-		final String cmd = "cmd /C " + q + q + MPQ_EDITOR + q + " /s " + q + mpqPath + q + " " + q + scriptPath + q + q; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-		LOGGER.debug("executing: " + cmd); //$NON-NLS-1$
+		final String cmd = "cmd /C " + q + q + mpqEditor + q + " /s " + q + mpqPath + q + " " + q + scriptPath + q + q; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		logger.trace("executing: " + cmd); //$NON-NLS-1$
 		Runtime.getRuntime().exec(cmd).waitFor();
-		LOGGER.debug("execution finished"); //$NON-NLS-1$
+		logger.trace("execution finished"); //$NON-NLS-1$
 	}
 	
 	/**
@@ -447,13 +464,13 @@ public class MpqEditorInterface implements MpqInterface, Cloneable {
 	public void deleteFileInMpq(final String mpqPath, final String filePath)
 			throws InterruptedException, IOException, MpqException {
 		if (!verifyMpqEditor()) {
-			throw new MpqException(String.format(Messages.getString("MpqInterface.MPQEditorNotFound"), MPQ_EDITOR)); //$NON-NLS-1$
+			throw new MpqException(String.format(Messages.getString("MpqInterface.MPQEditorNotFound"), mpqEditor)); //$NON-NLS-1$
 		}
 		final String q = "\""; //$NON-NLS-1$
-		final String cmd = "cmd /C " + q + q + MPQ_EDITOR + q + " /d " + q + mpqPath + q + " " + q + filePath + q + q; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-		LOGGER.debug("executing: " + cmd); //$NON-NLS-1$
+		final String cmd = "cmd /C " + q + q + mpqEditor + q + " /d " + q + mpqPath + q + " " + q + filePath + q + q; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		logger.trace("executing: " + cmd); //$NON-NLS-1$
 		Runtime.getRuntime().exec(cmd).waitFor();
-		LOGGER.debug("execution finished"); //$NON-NLS-1$
+		logger.trace("execution finished"); //$NON-NLS-1$
 	}
 	
 	/**
@@ -468,15 +485,15 @@ public class MpqEditorInterface implements MpqInterface, Cloneable {
 	public void renameFileInMpq(final String mpqPath, final String oldfilePath, final String newFilePath)
 			throws InterruptedException, IOException, MpqException {
 		if (!verifyMpqEditor()) {
-			throw new MpqException(String.format(Messages.getString("MpqInterface.MPQEditorNotFound"), MPQ_EDITOR)); //$NON-NLS-1$
+			throw new MpqException(String.format(Messages.getString("MpqInterface.MPQEditorNotFound"), mpqEditor)); //$NON-NLS-1$
 		}
 		final String q = "\""; //$NON-NLS-1$
-		final String cmd = "cmd /C " + q + q + MPQ_EDITOR + q + " /r " + q + mpqPath + q + " " + q + oldfilePath + q //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		final String cmd = "cmd /C " + q + q + mpqEditor + q + " /r " + q + mpqPath + q + " " + q + oldfilePath + q //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 				+ " " + q //$NON-NLS-1$
 				+ newFilePath + q + q;
-		LOGGER.debug("executing: " + cmd); //$NON-NLS-1$
+		logger.trace("executing: " + cmd); //$NON-NLS-1$
 		Runtime.getRuntime().exec(cmd).waitFor();
-		LOGGER.debug("execution finished"); //$NON-NLS-1$
+		logger.trace("execution finished"); //$NON-NLS-1$
 	}
 	
 	/**
@@ -513,10 +530,10 @@ public class MpqEditorInterface implements MpqInterface, Cloneable {
 	public boolean isHeroesMpq() throws MpqException {
 		File f = new File(mpqCachePath + File.separator + "ComponentList.StormComponents"); //$NON-NLS-1$
 		if (!f.exists() || f.isDirectory()) {
-			LOGGER.debug("file not found in archive: " + f.getAbsolutePath());
+			logger.trace("file not found in archive: " + f.getAbsolutePath());
 			f = new File(mpqCachePath + File.separator + "ComponentList.SC2Components"); //$NON-NLS-1$
 			if (!f.exists() || f.isDirectory()) {
-				LOGGER.error("ERROR: archive has no ComponentList file."); //$NON-NLS-1$
+				logger.error("ERROR: archive has no ComponentList file."); //$NON-NLS-1$
 				throw new MpqException("ERROR: Cannot identify if file belongs to Heroes or SC2."); //$NON-NLS-1$
 			}
 			return false;

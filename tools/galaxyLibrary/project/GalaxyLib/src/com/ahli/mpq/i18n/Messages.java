@@ -16,8 +16,8 @@ import org.apache.logging.log4j.Logger;
  * @author Ahli
  *
  */
-public class Messages {
-	static Logger LOGGER = LogManager.getLogger("Messages"); //$NON-NLS-1$
+public final class Messages {
+	private static Logger logger = LogManager.getLogger("Messages"); //$NON-NLS-1$
 	
 	private static final String BUNDLE_NAME = "com.ahli.mpq.i18n.messages"; //$NON-NLS-1$
 	
@@ -25,6 +25,9 @@ public class Messages {
 	
 	private static Locale usedLocale = Locale.getDefault();
 	
+	/**
+	 * The Default Constructor.
+	 */
 	private Messages() {
 	}
 	
@@ -32,7 +35,8 @@ public class Messages {
 	 * Returns the String of the key.
 	 * 
 	 * @param key
-	 * @return
+	 *            the key
+	 * @return string of the key
 	 */
 	public static String getString(final String key) {
 		try {
@@ -46,6 +50,7 @@ public class Messages {
 	 * Sets a bundle based on the specified Locale.
 	 * 
 	 * @param loc
+	 *            the Locale
 	 */
 	public static void setBundle(final Locale loc) {
 		resourceBundle = ResourceBundle.getBundle(BUNDLE_NAME, loc);
@@ -55,7 +60,7 @@ public class Messages {
 	/**
 	 * Returns the currently used bundle.
 	 * 
-	 * @return
+	 * @return the ResourceBundle
 	 */
 	public static ResourceBundle getBundle() {
 		return resourceBundle;
@@ -64,7 +69,7 @@ public class Messages {
 	/**
 	 * Returns the Locale that was used to get the bundle in effect.
 	 * 
-	 * @return
+	 * @return used Locale
 	 */
 	public static Locale getUsedLocale() {
 		return usedLocale;
@@ -74,11 +79,12 @@ public class Messages {
 	 * Checks if the Locale's resource bundle is the one used.
 	 * 
 	 * @param locale
-	 * @return
+	 *            a Locale
+	 * @return whether the specified Locale is used or not
 	 */
 	public static boolean checkIfTargetResourceIsUsed(final Locale locale) {
 		final boolean result = resourceBundle.equals(ResourceBundle.getBundle(BUNDLE_NAME, locale));
-		LOGGER.trace("compare used locale's resource '" + usedLocale + "' with one for locale '" + locale
+		logger.trace("compare used locale's resource '" + usedLocale + "' with one for locale '" + locale
 				+ "', result: " + result);
 		return result;
 	}

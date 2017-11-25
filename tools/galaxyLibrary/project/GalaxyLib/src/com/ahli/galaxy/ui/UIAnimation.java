@@ -2,6 +2,7 @@ package com.ahli.galaxy.ui;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -11,7 +12,12 @@ import java.util.Map.Entry;
  * 
  */
 public class UIAnimation extends UIElement {
-	private ArrayList<UIController> controllers = new ArrayList<>();
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 7493401910318905210L;
+	
+	private List<UIController> controllers = new ArrayList<>();
 	private Map<String, UIAttribute> events = new HashMap<>();
 	private boolean nextEventsAdditionShouldOverride = false;
 	private UIAttribute driver = null;
@@ -25,9 +31,31 @@ public class UIAnimation extends UIElement {
 	}
 	
 	/**
+	 * Returns a deep clone of this.
+	 */
+	@Override
+	public Object clone() {
+		final UIAnimation clone = new UIAnimation(getName());
+		for (int i = 0; i < controllers.size(); i++) {
+			clone.controllers.add((UIController) controllers.get(i).clone());
+		}
+		final Object[] entries = events.entrySet().toArray();
+		for (int fix = 0, i = fix; i < entries.length; i++) {
+			@SuppressWarnings("unchecked")
+			final Entry<String, UIAttribute> entry = (Entry<String, UIAttribute>) entries[i];
+			clone.events.put(entry.getKey(), (UIAttribute) entry.getValue().clone());
+		}
+		clone.nextEventsAdditionShouldOverride = nextEventsAdditionShouldOverride;
+		if (driver != null) {
+			clone.driver = (UIAttribute) driver.clone();
+		}
+		return clone;
+	}
+	
+	/**
 	 * @return the controllers
 	 */
-	public ArrayList<UIController> getControllers() {
+	public List<UIController> getControllers() {
 		return controllers;
 	}
 	
@@ -35,7 +63,7 @@ public class UIAnimation extends UIElement {
 	 * @param controllers
 	 *            the controllers to set
 	 */
-	public void setControllers(final ArrayList<UIController> controllers) {
+	public void setControllers(final List<UIController> controllers) {
 		this.controllers = controllers;
 	}
 	
@@ -109,38 +137,8 @@ public class UIAnimation extends UIElement {
 		}
 	}
 	
-	/**
-	 * 
-	 * @return
-	 */
-	@Override
-	public Object deepClone() {
-		final UIAnimation clone = new UIAnimation(name);
-		clone.setNextEventsAdditionShouldOverride(nextEventsAdditionShouldOverride);
-		
-		// clone events
-		final Map<String, UIAttribute> clonedEvents = new HashMap<>();
-		for (final Entry<String, UIAttribute> entry : events.entrySet()) {
-			final UIAttribute clonedValue = (UIAttribute) entry.getValue().deepClone();
-			clonedEvents.put(entry.getKey(), clonedValue);
-		}
-		clone.setEvents(clonedEvents);
-		
-		// clone controllers
-		for (final UIController controller : controllers) {
-			clone.getControllers().add((UIController) controller.deepClone());
-		}
-		
-		// clone driver
-		if (driver != null) {
-			clone.setDriver((UIAttribute) driver.deepClone());
-		}
-		
-		return clone;
-	}
-	
 	@Override
 	public String toString() {
-		return "<Animation name='" + name + "'>";
+		return "<Animation name='" + getName() + "'>";
 	}
 }

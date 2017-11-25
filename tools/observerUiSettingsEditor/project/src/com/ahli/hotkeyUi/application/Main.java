@@ -17,9 +17,9 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.xml.sax.SAXException;
 
-import com.ahli.galaxy.ComponentsListReader;
-import com.ahli.galaxy.DescIndexData;
-import com.ahli.galaxy.DescIndexReader;
+import com.ahli.galaxy.archive.ComponentsListReader;
+import com.ahli.galaxy.archive.DescIndexData;
+import com.ahli.galaxy.ui.DescIndexReader;
 import com.ahli.hotkeyUi.application.controller.MenuBarController;
 import com.ahli.hotkeyUi.application.controller.TabsController;
 import com.ahli.hotkeyUi.application.galaxy.ext.LayoutExtensionReader;
@@ -57,7 +57,7 @@ import javafx.util.Duration;
  */
 public class Main extends Application {
 	long appStartTime = System.nanoTime();
-	static Logger LOGGER = LogManager.getLogger(Main.class); // $NON-NLS-1$
+	static Logger logger = LogManager.getLogger(Main.class); // $NON-NLS-1$
 	
 	public final static String VERSION = "alpha";
 	
@@ -68,7 +68,7 @@ public class Main extends Application {
 	private String openedDocPath = null;
 	private boolean isNamespaceHeroes = true;
 	private MpqEditorInterface mpqi = null;
-	private final DescIndexData descIndex = new DescIndexData(mpqi);
+	private DescIndexData descIndex = null;
 	private File basePath = null;
 	private boolean hasUnsavedFileChanges = false;
 	private LayoutExtensionReader layoutExtReader;
@@ -80,7 +80,7 @@ public class Main extends Application {
 	public void start(final Stage primaryStage) {
 		try {
 			Thread.currentThread().setName("UI"); //$NON-NLS-1$
-			LOGGER.warn("start function called after " + (System.nanoTime() - appStartTime) / 1000000 + "ms.");
+			logger.warn("start function called after " + (System.nanoTime() - appStartTime) / 1000000 + "ms.");
 			this.primaryStage = primaryStage;
 			this.primaryStage.setMaximized(true);
 			this.primaryStage.setOpacity(0);
@@ -93,7 +93,7 @@ public class Main extends Application {
 			
 			long time = System.nanoTime();
 			initRootLayout();
-			LOGGER.warn("initialized root layout within " + (System.nanoTime() - time) / 1000000 + "ms.");
+			logger.warn("initialized root layout within " + (System.nanoTime() - time) / 1000000 + "ms.");
 			
 			// Load Tab layout from fxml file
 			time = System.nanoTime();
@@ -101,20 +101,11 @@ public class Main extends Application {
 			loader.setResources(Messages.getBundle());
 			
 			TabPane tabPane = null;
-			InputStream is = null;
-			try {
-				is = Main.class.getResourceAsStream("view/TabsLayout.fxml");
+			try (InputStream is = Main.class.getResourceAsStream("view/TabsLayout.fxml");) {
 				tabPane = (TabPane) loader.load(is); // $NON-NLS-1$
-			} finally {
-				try {
-					if (is != null) {
-						is.close();
-					}
-				} catch (final IOException e) {
-				}
 			}
 			
-			LOGGER.warn("initialized tab layout within " + (System.nanoTime() - time) / 1000000 + "ms.");
+			logger.warn("initialized tab layout within " + (System.nanoTime() - time) / 1000000 + "ms.");
 			rootLayout.setCenter(tabPane);
 			tabsCtrl = loader.getController();
 			tabsCtrl.setMainApp(this);
@@ -142,17 +133,17 @@ public class Main extends Application {
 			time = System.nanoTime();
 			this.primaryStage.show();
 			this.primaryStage.setOpacity(1);
-			LOGGER.warn("executed root layout stage.show() within " + (System.nanoTime() - time) / 1000000 + "ms.");
+			logger.warn("executed root layout stage.show() within " + (System.nanoTime() - time) / 1000000 + "ms.");
 			
 			// hide apps splash screen image
 			Platform.runLater(new SplashScreenHider());
 			
-			LOGGER.warn("finished app initialization after " + (System.nanoTime() - appStartTime) / 1000000 + "ms.");
+			logger.warn("finished app initialization after " + (System.nanoTime() - appStartTime) / 1000000 + "ms.");
 			
 			initMpqInterface();
 			
 		} catch (final Exception e) {
-			LOGGER.error("App Error: " + ExceptionUtils.getStackTrace(e), e); //$NON-NLS-1$
+			logger.error("App Error: " + ExceptionUtils.getStackTrace(e), e); //$NON-NLS-1$
 			e.printStackTrace();
 			this.primaryStage.setOpacity(1);
 			Alerts.buildExceptionAlert(this.primaryStage, e).showAndWait();
@@ -194,14 +185,14 @@ public class Main extends Application {
 	 * @param args
 	 */
 	public static void main(final String[] args) {
-		LOGGER.trace("trace log visible"); //$NON-NLS-1$
-		LOGGER.debug("debug log visible"); //$NON-NLS-1$
-		LOGGER.info("info log visible"); //$NON-NLS-1$
-		LOGGER.warn("warn log visible"); //$NON-NLS-1$
-		LOGGER.error("error log visible"); //$NON-NLS-1$
-		LOGGER.fatal("fatal log visible"); //$NON-NLS-1$
+		logger.trace("trace log visible"); //$NON-NLS-1$
+		logger.debug("debug log visible"); //$NON-NLS-1$
+		logger.info("info log visible"); //$NON-NLS-1$
+		logger.warn("warn log visible"); //$NON-NLS-1$
+		logger.error("error log visible"); //$NON-NLS-1$
+		logger.fatal("fatal log visible"); //$NON-NLS-1$
 		
-		LOGGER.trace("Configuration File of System: " + System.getProperty("log4j.configurationFile")); //$NON-NLS-1$ //$NON-NLS-2$
+		logger.trace("Configuration File of System: " + System.getProperty("log4j.configurationFile")); //$NON-NLS-1$ //$NON-NLS-2$
 		
 		// TEST Locale
 		// Messages.setBundle(Locale.CHINA);
@@ -292,12 +283,12 @@ public class Main extends Application {
 						tabsCtrl.getSettingsData().addAll(settings);
 						
 					} catch (MpqException | ShowToUserException e) {
-						LOGGER.error("File could not be opened. MPQ-Error: " + ExceptionUtils.getStackTrace(e), e); //$NON-NLS-1$
+						logger.error("File could not be opened. MPQ-Error: " + ExceptionUtils.getStackTrace(e), e); //$NON-NLS-1$
 						openedDocPath = null;
 						updateAppTitle();
 						showErrorAlert(e);
 					} catch (final Exception e) {
-						LOGGER.error("File could not be opened. Error: " + ExceptionUtils.getStackTrace(e), e); //$NON-NLS-1$
+						logger.error("File could not be opened. Error: " + ExceptionUtils.getStackTrace(e), e); //$NON-NLS-1$
 						e.printStackTrace();
 						openedDocPath = null;
 						updateAppTitle();
@@ -314,9 +305,9 @@ public class Main extends Application {
 					}
 					updateMenuBar();
 				} else {
-					LOGGER.trace("File to open was null, most likely due to 'cancel'."); //$NON-NLS-1$
+					logger.trace("File to open was null, most likely due to 'cancel'."); //$NON-NLS-1$
 				}
-				LOGGER.warn("opened mpq within " + (System.nanoTime() - time) / 1000000 + "ms.");
+				logger.warn("opened mpq within " + (System.nanoTime() - time) / 1000000 + "ms.");
 			}
 		}.start();
 	}
@@ -361,52 +352,44 @@ public class Main extends Application {
 		long time = System.nanoTime();
 		final FXMLLoader loader = new FXMLLoader();
 		loader.setResources(Messages.getBundle());
-		InputStream is = null;
-		try {
-			is = Main.class.getResourceAsStream("view/RootLayout.fxml");
+		
+		try (InputStream is = Main.class.getResourceAsStream("view/RootLayout.fxml");) {
 			rootLayout = (BorderPane) loader.load(is); // $NON-NLS-1$
-		} finally {
-			try {
-				if (is != null) {
-					is.close();
-				}
-			} catch (final IOException e) {
-			}
 		}
-		LOGGER.warn("initialized root layout fxml within " + (System.nanoTime() - time) / 1000000 + "ms.");
+		logger.warn("initialized root layout fxml within " + (System.nanoTime() - time) / 1000000 + "ms.");
 		
 		// get Controller
 		time = System.nanoTime();
 		mbarCtrl = loader.getController();
 		mbarCtrl.setMainApp(this);
-		LOGGER.warn("received root layout controller within " + (System.nanoTime() - time) / 1000000 + "ms.");
+		logger.warn("received root layout controller within " + (System.nanoTime() - time) / 1000000 + "ms.");
 		
 		// Show the scene containing the root layout.
 		final Scene scene = new Scene(rootLayout);
 		time = System.nanoTime();
 		scene.getStylesheets().add(Main.class.getResource("view/application.css").toExternalForm()); //$NON-NLS-1$
 		
-		LOGGER.debug("installed font families: " + Font.getFamilies());
-		LOGGER.trace("Locale dflt is '" + Locale.getDefault() + "'"); //$NON-NLS-1$
-		LOGGER.trace("Locale of Messages.class is '" + Messages.getBundle().getLocale() + "'"); //$NON-NLS-1$
-		LOGGER.trace("Locale china: " + Locale.SIMPLIFIED_CHINESE); //$NON-NLS-1$
+		logger.debug("installed font families: " + Font.getFamilies());
+		logger.trace("Locale dflt is '" + Locale.getDefault() + "'"); //$NON-NLS-1$
+		logger.trace("Locale of Messages.class is '" + Messages.getBundle().getLocale() + "'"); //$NON-NLS-1$
+		logger.trace("Locale china: " + Locale.SIMPLIFIED_CHINESE); //$NON-NLS-1$
 		if (Messages.checkIfTargetResourceIsUsed(Locale.CHINA)) {
-			LOGGER.trace("apply Chinese css"); //$NON-NLS-1$
+			logger.trace("apply Chinese css"); //$NON-NLS-1$
 			
 			scene.getStylesheets().add(Main.class.getResource("i18n/china.css").toExternalForm());
 			// //$NON-NLS-1$
 			
 		}
-		LOGGER.warn("initialized root layout css within " + (System.nanoTime() - time) / 1000000 + "ms.");
+		logger.warn("initialized root layout css within " + (System.nanoTime() - time) / 1000000 + "ms.");
 		
 		time = System.nanoTime();
 		primaryStage.setTitle(Messages.getString("Main.observerUiSettingsEditorTitle")); //$NON-NLS-1$
 		primaryStage.setScene(scene);
-		LOGGER.warn("executed root layout setScene+title within " + (System.nanoTime() - time) / 1000000 + "ms.");
+		logger.warn("executed root layout setScene+title within " + (System.nanoTime() - time) / 1000000 + "ms.");
 		
 		time = System.nanoTime();
 		updateMenuBar();
-		LOGGER.warn("updateMenuBar within " + (System.nanoTime() - time) / 1000000 + "ms.");
+		logger.warn("updateMenuBar within " + (System.nanoTime() - time) / 1000000 + "ms.");
 	}
 	
 	/**
@@ -440,11 +423,11 @@ public class Main extends Application {
 					updateAppTitle();
 				} catch (IOException | InterruptedException | ParserConfigurationException | SAXException
 						| MpqException e) {
-					LOGGER.error(ExceptionUtils.getStackTrace(e), e);
+					logger.error(ExceptionUtils.getStackTrace(e), e);
 					e.printStackTrace();
 					showErrorAlert(e);
 				}
-				LOGGER.warn("opened mpq within " + (System.nanoTime() - time) / 1000000 + "ms.");
+				logger.warn("opened mpq within " + (System.nanoTime() - time) / 1000000 + "ms.");
 			}
 		}.start();
 	}
@@ -485,7 +468,7 @@ public class Main extends Application {
 				updateAppTitle();
 			} catch (IOException | InterruptedException | ParserConfigurationException | SAXException
 					| MpqException e) {
-				LOGGER.error(ExceptionUtils.getStackTrace(e), e);
+				logger.error(ExceptionUtils.getStackTrace(e), e);
 				e.printStackTrace();
 				showErrorAlert(e);
 			}
@@ -503,7 +486,7 @@ public class Main extends Application {
 			@Override
 			public void run() {
 				// Update UI here
-				LOGGER.trace("showing error popup");
+				logger.trace("showing error popup");
 				final String title = Messages.getString("Main.anErrorOccured"); //$NON-NLS-1$
 				final String content = e.getMessage();
 				final Alert alert = Alerts.buildErrorAlert(primaryStage, title, title, content);
@@ -522,7 +505,7 @@ public class Main extends Application {
 			@Override
 			public void run() {
 				// Update UI here
-				LOGGER.trace("showing exception popup");
+				logger.trace("showing exception popup");
 				final Alert alert = Alerts.buildExceptionAlert(primaryStage, e);
 				alert.showAndWait();
 			}
@@ -579,12 +562,13 @@ public class Main extends Application {
 		mpqi.setMpqEditorPath(path);
 		final File f = new File(path);
 		if (!f.exists() || !f.isFile()) {
-			LOGGER.error("Could not find MPQEditor.exe within its expected path: " + path);
+			logger.error("Could not find MPQEditor.exe within its expected path: " + path);
 			final String title = Messages.getString("Main.warningAlertTitle"); //$NON-NLS-1$
 			final String content = String.format(Messages.getString("Main.couldNotFindMpqEditor"), path); //$NON-NLS-1$
 			final Alert alert = Alerts.buildWarningAlert(primaryStage, title, title, content);
 			alert.showAndWait();
 		}
+		descIndex = new DescIndexData(mpqi);
 	}
 	
 	/**
@@ -642,7 +626,7 @@ public class Main extends Application {
 	 * @author Ahli
 	 *
 	 */
-	static class SplashScreenHider implements Runnable {
+	private static final class SplashScreenHider implements Runnable {
 		@Override
 		public void run() {
 			final SplashScreen splash = SplashScreen.getSplashScreen();

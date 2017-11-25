@@ -17,21 +17,36 @@ import org.apache.logging.log4j.Logger;
  *
  */
 public class SettingsIniInterface {
-	static Logger LOGGER = LogManager.getLogger(SettingsIniInterface.class);
+	private static Logger logger = LogManager.getLogger(SettingsIniInterface.class);
 	
 	private String settingsFilePath = "";
-	private String SC2_Path = "", HEROES_Path = "", HEROES_PTR_Path = "";
-	private boolean ptrActive = false, SC2_64bit = false, HEROES_64bit = false, HEROES_PTR_64bit = false,
-			HEROES_protectMPQ = false, SC2_protectMPQ = false, buildUnprotectedToo = false;
+	private String sc2Path = "", heroesPath = "", heroesPtrPath = "";
+	private boolean ptrActive = false, sc2X64 = false, heroesX64 = false, heroesPtrX64 = false,
+			heroesProtectMpq = false, sc2ProtectMpq = false, buildUnprotectedToo = false;
 	
+	/**
+	 * Constructor.
+	 * 
+	 * @param settingsFilePath
+	 */
 	public SettingsIniInterface(final String settingsFilePath) {
 		this.settingsFilePath = settingsFilePath;
 	}
 	
+	/**
+	 * Constructor.
+	 * 
+	 * @param path
+	 */
 	public void setSettingsFilePath(final String path) {
 		settingsFilePath = path;
 	}
 	
+	/**
+	 * Returns path to settings file.
+	 * 
+	 * @return path as String
+	 */
 	public String getSettingsFilePath() {
 		return settingsFilePath;
 	}
@@ -40,6 +55,7 @@ public class SettingsIniInterface {
 	 * Read all Settings from the Settings file.
 	 * 
 	 * @throws FileNotFoundException
+	 *             when no file exists
 	 */
 	public void readSettingsFromFile() throws FileNotFoundException {
 		final InputStreamReader is = new InputStreamReader(new FileInputStream(settingsFilePath),
@@ -64,36 +80,37 @@ public class SettingsIniInterface {
 	 * Parse a line from the Settings file.
 	 * 
 	 * @param line
+	 *            line of settings
 	 */
 	private void parseLine(final String line) {
 		String val = "";
 		if (line.startsWith("Heroes_Path")) {
 			val = getValFromIniLine(line);
-			HEROES_Path = val;
+			heroesPath = val;
 		} else if (line.startsWith("HeroesPTR_Path")) {
 			val = getValFromIniLine(line);
-			HEROES_PTR_Path = val;
+			heroesPtrPath = val;
 		} else if (line.startsWith("StarCraft2_Path")) {
 			val = getValFromIniLine(line);
-			SC2_Path = val;
+			sc2Path = val;
 		} else if (line.startsWith("PTRactive")) {
 			val = getValFromIniLine(line);
 			ptrActive = Boolean.parseBoolean(val);
 		} else if (line.startsWith("Heroes_use64bit")) {
 			val = getValFromIniLine(line);
-			HEROES_64bit = Boolean.parseBoolean(val);
+			heroesX64 = Boolean.parseBoolean(val);
 		} else if (line.startsWith("HeroesPTR_use64bit")) {
 			val = getValFromIniLine(line);
-			HEROES_PTR_64bit = Boolean.parseBoolean(val);
+			heroesPtrX64 = Boolean.parseBoolean(val);
 		} else if (line.startsWith("StarCraft2_use64bit")) {
 			val = getValFromIniLine(line);
-			SC2_64bit = Boolean.parseBoolean(val);
+			sc2X64 = Boolean.parseBoolean(val);
 		} else if (line.startsWith("Heroes_protectMPQ")) {
 			val = getValFromIniLine(line);
-			HEROES_protectMPQ = Boolean.parseBoolean(val);
+			heroesProtectMpq = Boolean.parseBoolean(val);
 		} else if (line.startsWith("StarCraft2_protectMPQ")) {
 			val = getValFromIniLine(line);
-			SC2_protectMPQ = Boolean.parseBoolean(val);
+			sc2ProtectMpq = Boolean.parseBoolean(val);
 		} else if (line.startsWith("buildUnprotectedToo")) {
 			val = getValFromIniLine(line);
 			buildUnprotectedToo = Boolean.parseBoolean(val);
@@ -110,44 +127,81 @@ public class SettingsIniInterface {
 		return line.substring(line.indexOf('=') + 1);
 	}
 	
+	/**
+	 * 
+	 * @return
+	 */
 	public String getSC2Path() {
-		return SC2_Path;
+		return sc2Path;
 	}
 	
+	/**
+	 * 
+	 * @return
+	 */
 	public String getHeroesPath() {
-		return HEROES_Path;
+		return heroesPath;
 	}
 	
+	/**
+	 * 
+	 * @return
+	 */
 	public String getHeroesPtrPath() {
-		return HEROES_PTR_Path;
+		return heroesPtrPath;
 	}
 	
+	/**
+	 * 
+	 * @return
+	 */
 	public boolean isPtrActive() {
 		return ptrActive;
 	}
 	
+	/**
+	 * 
+	 * @return
+	 */
 	public boolean isSC264bit() {
-		return SC2_64bit;
+		return sc2X64;
 	}
 	
+	/**
+	 * 
+	 * @return
+	 */
 	public boolean isHeroesPtr64bit() {
-		return HEROES_PTR_64bit;
+		return heroesPtrX64;
 	}
 	
+	/**
+	 * 
+	 * @return
+	 */
 	public boolean isHeroes64bit() {
-		return HEROES_64bit;
+		return heroesX64;
 	}
 	
+	/**
+	 * 
+	 * @return
+	 */
 	public boolean isHeroesProtectMPQ() {
-		LOGGER.debug("Heroes protection is: " + HEROES_protectMPQ);
-		return HEROES_protectMPQ;
+		return heroesProtectMpq;
 	}
 	
+	/**
+	 * 
+	 * @return
+	 */
 	public boolean isSC2ProtectMPQ() {
-		LOGGER.debug("SC2 protection is: " + SC2_protectMPQ);
-		return SC2_protectMPQ;
+		return sc2ProtectMpq;
 	}
 	
+	/**
+	 * 
+	 */
 	public boolean isBuildUnprotectedToo() {
 		return buildUnprotectedToo;
 	}

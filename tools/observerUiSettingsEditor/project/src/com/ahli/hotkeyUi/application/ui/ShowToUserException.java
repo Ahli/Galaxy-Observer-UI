@@ -7,12 +7,36 @@ package com.ahli.hotkeyUi.application.ui;
  * @author Ahli
  *
  */
-public class ShowToUserException extends Exception {
+public final class ShowToUserException extends Exception {
 	
+	private static final long serialVersionUID = 6225880770962102124L;
+	
+	/**
+	 * Constructor.
+	 * 
+	 * @param msg
+	 */
 	public ShowToUserException(final String msg) {
 		super(msg);
 	}
 	
-	private static final long serialVersionUID = 6225880770962102124L;
+	/**
+	 * Constructor.
+	 * 
+	 * @param msg
+	 * @param e
+	 */
+	public ShowToUserException(final String msg, final Exception e) {
+		super(msg, e);
+	}
+	
+	/**
+	 * Constructor.
+	 * 
+	 * @param e
+	 */
+	public ShowToUserException(final Exception e) {
+		super(e);
+	}
 	
 }

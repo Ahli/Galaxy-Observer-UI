@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -21,7 +22,6 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
-import com.ahli.galaxy.DescIndexReader;
 import com.ahli.galaxy.ui.exception.UIException;
 import com.ahli.util.XmlDomHelper;
 
@@ -31,17 +31,48 @@ import com.ahli.util.XmlDomHelper;
  * @author Ahli
  * 
  */
-public class UICatalog {
-	private final static Logger LOGGER = LogManager.getLogger(UICatalog.class);
+public class UICatalog implements Cloneable, Serializable {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -4725838598338592813L;
+	
+	private static final Logger LOGGER = LogManager.getLogger(UICatalog.class);
 	
 	// members
-	ArrayList<UITemplate> templates = new ArrayList<>();
-	ArrayList<UITemplate> blizzDevTemplates = new ArrayList<>();
-	ArrayList<UIConstant> constants = new ArrayList<>();
-	ArrayList<UIConstant> blizzOnlyConstants = new ArrayList<>();
-	ArrayList<String> devLayouts = new ArrayList<>();
+	private ArrayList<UITemplate> templates = new ArrayList<>();
+	private ArrayList<UITemplate> blizzOnlyTemplates = new ArrayList<>();
+	private ArrayList<UIConstant> constants = new ArrayList<>();
+	private ArrayList<UIConstant> blizzOnlyConstants = new ArrayList<>();
+	private ArrayList<String> blizzOnlyLayouts = new ArrayList<>();
 	
-	String curBasePath = "";
+	// internal, used during processing
+	private String curBasePath = "";
+	
+	/**
+	 * Returns a deep clone of this.
+	 */
+	@Override
+	public Object clone() {
+		final UICatalog clone = new UICatalog();
+		for (int i = 0; i < templates.size(); i++) {
+			clone.templates.add((UITemplate) templates.get(i).clone());
+		}
+		for (int i = 0; i < blizzOnlyTemplates.size(); i++) {
+			clone.blizzOnlyTemplates.add((UITemplate) blizzOnlyTemplates.get(i).clone());
+		}
+		for (int i = 0; i < constants.size(); i++) {
+			clone.constants.add((UIConstant) constants.get(i).clone());
+		}
+		for (int i = 0; i < blizzOnlyConstants.size(); i++) {
+			clone.blizzOnlyConstants.add((UIConstant) blizzOnlyConstants.get(i).clone());
+		}
+		for (int i = 0; i < blizzOnlyLayouts.size(); i++) {
+			clone.blizzOnlyLayouts.add(blizzOnlyLayouts.get(i));
+		}
+		clone.curBasePath = curBasePath;
+		return clone;
+	}
 	
 	/**
 	 * 
@@ -61,13 +92,13 @@ public class UICatalog {
 		
 		final ArrayList<String> combinedList = new ArrayList<>(DescIndexReader.getLayoutPathList(f, false));
 		
-		devLayouts.addAll(combinedList);
-		devLayouts.removeAll(generalLayouts);
+		blizzOnlyLayouts.addAll(combinedList);
+		blizzOnlyLayouts.removeAll(generalLayouts);
 		
 		final String descIndexPath = f.getAbsolutePath();
 		final String basePath = descIndexPath.substring(0, descIndexPath.length() - f.getName().length());
-		LOGGER.debug("descIndexPath=" + descIndexPath);
-		LOGGER.debug("basePath=" + basePath);
+		LOGGER.trace("descIndexPath=" + descIndexPath);
+		LOGGER.trace("basePath=" + basePath);
 		
 		processLayouts(combinedList, basePath, raceId);
 	}
@@ -79,15 +110,15 @@ public class UICatalog {
 	 */
 	private void processLayouts(final ArrayList<String> toProcessList, final String basePath, final String raceId) {
 		loop: for (final String intPath : toProcessList) {
-			final boolean isDevLayout = devLayouts.contains(intPath);
-			LOGGER.debug("intPath=" + intPath);
-			LOGGER.debug("isDevLayout=" + isDevLayout);
+			final boolean isDevLayout = blizzOnlyLayouts.contains(intPath);
+			LOGGER.trace("intPath=" + intPath);
+			LOGGER.trace("isDevLayout=" + isDevLayout);
 			String basePathTemp = "" + basePath;
 			while (!new File(basePathTemp + File.separator + intPath).exists()) {
 				final int lastIndex = basePathTemp.lastIndexOf(File.separatorChar);
 				if (lastIndex != -1) {
 					basePathTemp = basePathTemp.substring(0, basePathTemp.lastIndexOf(File.separatorChar));
-					LOGGER.debug("basePathTemp=" + basePathTemp);
+					LOGGER.trace("basePathTemp=" + basePathTemp);
 				} else {
 					if (!isDevLayout) {
 						LOGGER.error("ERROR: Cannot find layout file: " + intPath);
@@ -144,7 +175,7 @@ public class UICatalog {
 			is = new FileInputStream(f);
 			doc = dBuilder.parse(is);
 			
-			LOGGER.debug("retrieving document's children");
+			LOGGER.trace("retrieving document's children");
 			final NodeList nodes = doc.getChildNodes();
 			
 			if (nodes.getLength() <= 0) {
@@ -153,7 +184,7 @@ public class UICatalog {
 			} else {
 				// parse document's content
 				parse(nodes, null, f.getName().substring(0, f.getName().lastIndexOf('.')), raceId, isDevLayout);
-				LOGGER.debug("Finished parsing file.");
+				LOGGER.trace("Finished parsing file.");
 			}
 		} catch (SAXParseException | IOException e) {
 			LOGGER.error("Failed to parse file: " + f, e);
@@ -174,7 +205,7 @@ public class UICatalog {
 	private void processLayoutFile(final String pathAttributeValue, final String raceId, final boolean isDevLayout) {
 		LOGGER.trace("processing layoutFile from include: " + pathAttributeValue);
 		if (isDevLayout) {
-			devLayouts.add(pathAttributeValue);
+			blizzOnlyLayouts.add(pathAttributeValue);
 		}
 		final String basePath = curBasePath;
 		final ArrayList<String> list = new ArrayList<>();
@@ -193,13 +224,13 @@ public class UICatalog {
 			final boolean isDevLayout) throws UIException {
 		if (childNodes != null) {
 			final int len = childNodes.getLength();
-			LOGGER.debug("checking childNodes, length: " + len);
+			LOGGER.trace("checking childNodes, length: " + len);
 			
 			for (int i = 0; i < len; i++) {
 				final Node curNode = childNodes.item(i);
 				
 				if (isTrashNodeType(curNode)) {
-					LOGGER.debug("Skipping node type " + curNode.getNodeType());
+					LOGGER.trace("Skipping node type " + curNode.getNodeType());
 					continue;
 				}
 				
@@ -219,6 +250,18 @@ public class UICatalog {
 	}
 	
 	/**
+	 * Checks if any attribute is the requiredToLoad one and does not start with
+	 * "!".
+	 * 
+	 * @param attributes
+	 * @return
+	 */
+	public static boolean isFailingRequiredToLoad(final NamedNodeMap attributes) {
+		final Node requiredtoloadAttr = XmlDomHelper.getNamedItemIgnoringCase(attributes, "requiredtoload");
+		return requiredtoloadAttr != null && !requiredtoloadAttr.getNodeValue().trim().startsWith("!");
+	}
+	
+	/**
 	 * 
 	 * @param childNode
 	 * @param parent
@@ -227,10 +270,10 @@ public class UICatalog {
 	private void parse(final Node node, final UIElement parent, final String fileName, final String raceId,
 			final boolean isDevLayout) throws UIException {
 		final String nodeName = node.getNodeName().toLowerCase(Locale.ROOT);
-		LOGGER.debug("node name: " + nodeName);
+		LOGGER.trace("node name: " + nodeName);
 		
 		// do not load, if requiredtoload
-		if (XmlDomHelper.getNamedItemIgnoringCase(node.getAttributes(), "requiredtoload") != null) {
+		if (isFailingRequiredToLoad(node.getAttributes())) {
 			if (nodeName.equals("include")) {
 				parseInclude(node, parent, fileName, raceId, isDevLayout, true);
 			} else if (!isDevLayout) {
@@ -312,19 +355,19 @@ public class UICatalog {
 	 */
 	private void parseDescFlags(final Node node, final UIElement parent, final String fileName, final String raceId,
 			final boolean isDevLayout) throws UIException {
-		LOGGER.debug("parsing DescFlags");
+		LOGGER.trace("parsing DescFlags");
 		if (parent == null) {
 			final Node val = XmlDomHelper.getNamedItemIgnoringCase(node.getAttributes(), "val");
 			if (getConstantValue(val.getNodeValue(), raceId, isDevLayout).compareToIgnoreCase("locked") == 0) {
 				for (final UITemplate template : templates) {
 					if (template.getFileName().compareToIgnoreCase(fileName) == 0) {
 						template.setLocked(true);
-						LOGGER.debug("locked templated " + fileName + "/" + template.getElement().getName());
+						LOGGER.trace("locked templated " + fileName + "/" + template.getElement().getName());
 					}
 				}
 			}
 		} else {
-			LOGGER.debug("DescFlags found with parent. -> ignored");
+			LOGGER.trace("DescFlags found with parent. -> ignored");
 		}
 		
 		// verify that it cannot go deeper
@@ -339,7 +382,7 @@ public class UICatalog {
 	 */
 	private void parseController(final Node node, final UIElement parent, final String fileName, final String raceId,
 			final boolean isDevLayout) throws UIException {
-		LOGGER.debug("parsing Controller");
+		LOGGER.trace("parsing Controller");
 		// Controllers may not have a name defined
 		final Node nameAttrNode = XmlDomHelper.getNamedItemIgnoringCase(node.getAttributes(), "name");
 		String name = null;
@@ -350,9 +393,9 @@ public class UICatalog {
 			nameIsImplicit = false;
 		}
 		if (name == null) {
-			LOGGER.debug("name is null");
+			LOGGER.trace("name is null");
 		} else {
-			LOGGER.debug("name = " + name);
+			LOGGER.trace("name = " + name);
 		}
 		final String template = readTemplate(node.getAttributes());
 		final UIElement templateElem = instanciateTemplate(template, name, isDevLayout, parent);
@@ -361,7 +404,7 @@ public class UICatalog {
 		
 		// parse other settings in that line
 		final NamedNodeMap attributes = node.getAttributes();
-		LOGGER.debug("attribute length = " + attributes.getLength());
+		LOGGER.trace("attribute length = " + attributes.getLength());
 		for (int i = 0; i < attributes.getLength(); i++) {
 			final Node curAttribute = attributes.item(i);
 			if (nameAttrNode == curAttribute) {
@@ -370,10 +413,10 @@ public class UICatalog {
 			} else {
 				final String attrKey = curAttribute.getNodeName();
 				final String attrVal = getConstantValue(curAttribute.getNodeValue(), raceId, isDevLayout);
-				LOGGER.debug("key,value = '" + attrKey + "', '" + attrVal + "'");
+				LOGGER.trace("key,value = '" + attrKey + "', '" + attrVal + "'");
 				final String overriddenVal = thisElem.getValues().put(attrKey, attrVal);
 				if (overriddenVal != null) {
-					LOGGER.debug("overridden value = " + overriddenVal);
+					LOGGER.trace("overridden value = " + overriddenVal);
 				}
 			}
 		}
@@ -407,13 +450,13 @@ public class UICatalog {
 	 */
 	private void parseState(final Node node, final UIElement parent, final String fileName, final String raceId,
 			final boolean isDevLayout) throws UIException {
-		LOGGER.debug("parsing State");
+		LOGGER.trace("parsing State");
 		final Node nameAttrNode = XmlDomHelper.getNamedItemIgnoringCase(node.getAttributes(), "name");
 		if (nameAttrNode == null) {
 			throw new UIException("State has no specified 'name'");
 		}
 		final String name = getConstantValue(nameAttrNode.getNodeValue(), raceId, isDevLayout);
-		LOGGER.debug("name = " + name);
+		LOGGER.trace("name = " + name);
 		final String template = readTemplate(node.getAttributes());
 		final UIElement templateElem = instanciateTemplate(template, name, isDevLayout, parent);
 		final UIState thisElem = templateElem != null ? (UIState) templateElem : new UIState(name);
@@ -444,12 +487,12 @@ public class UICatalog {
 	 */
 	private void parseAnchor(final Node node, final UIElement parent, final String raceId, final boolean isDevLayout)
 			throws UIException {
-		LOGGER.debug("parsing Anchor");
+		LOGGER.trace("parsing Anchor");
 		if (parent instanceof UIFrame) {
 			final UIFrame frame = (UIFrame) parent;
 			
 			final NamedNodeMap attributes = node.getAttributes();
-			LOGGER.debug("attribute length = " + attributes.getLength());
+			LOGGER.trace("attribute length = " + attributes.getLength());
 			
 			final Node nodeSide = XmlDomHelper.getNamedItemIgnoringCase(attributes, "side");
 			final Node nodeRelative = XmlDomHelper.getNamedItemIgnoringCase(attributes, "relative");
@@ -518,22 +561,22 @@ public class UICatalog {
 	 */
 	private void parseAttribute(final Node node, final UIElement parent, final String fileName, final String raceId,
 			final boolean isDevLayout) throws UIException {
-		LOGGER.debug("parsing Attribute");
+		LOGGER.trace("parsing Attribute");
 		final String id = node.getNodeName();
 		final UIAttribute thisElem = new UIAttribute(id);
-		LOGGER.debug("id = " + id);
+		LOGGER.trace("id = " + id);
 		
 		final NamedNodeMap attributes = node.getAttributes();
-		LOGGER.debug("attribute length = " + attributes.getLength());
+		LOGGER.trace("attribute length = " + attributes.getLength());
 		
 		for (int i = 0; i < attributes.getLength(); i++) {
 			final Node curAttribute = attributes.item(i);
 			final String attrKey = curAttribute.getNodeName();
 			final String attrVal = getConstantValue(curAttribute.getNodeValue(), raceId, isDevLayout);
-			LOGGER.debug("key,value = '" + attrKey + "', '" + attrVal + "'");
+			LOGGER.trace("key,value = '" + attrKey + "', '" + attrVal + "'");
 			final String overriddenVal = thisElem.getValues().put(attrKey, attrVal);
 			if (overriddenVal != null) {
-				LOGGER.debug("overridden value = " + overriddenVal);
+				LOGGER.trace("overridden value = " + overriddenVal);
 			}
 		}
 		
@@ -634,7 +677,7 @@ public class UICatalog {
 			if (isTrashNodeType(node)) {
 				final String msg = "Found trash nodeType within Attribute '" + parentName + "', nodeType = '"
 						+ node.getNodeType() + "'";
-				LOGGER.debug(msg);
+				LOGGER.trace(msg);
 				throw new UIException(msg);
 			}
 			
@@ -651,7 +694,7 @@ public class UICatalog {
 	 */
 	private void parseDesc(final Node node, final UIElement parent, final String fileName, final String raceId,
 			final boolean isDevLayout) throws UIException {
-		LOGGER.debug("parsing Desc");
+		LOGGER.trace("parsing Desc");
 		
 		// go deeper
 		parse(node.getChildNodes(), null, fileName, raceId, isDevLayout);
@@ -665,13 +708,13 @@ public class UICatalog {
 	 */
 	private void parseStateGroup(final Node node, final UIElement parent, final String fileName, final String raceId,
 			final boolean isDevLayout) throws UIException {
-		LOGGER.debug("parsing Stategroup");
+		LOGGER.trace("parsing Stategroup");
 		final Node nameAttrNode = XmlDomHelper.getNamedItemIgnoringCase(node.getAttributes(), "name");
 		if (nameAttrNode == null) {
 			throw new UIException("Stategroup has no specified 'name'");
 		}
 		final String name = getConstantValue(nameAttrNode.getNodeValue(), raceId, isDevLayout);
-		LOGGER.debug("name = " + name);
+		LOGGER.trace("name = " + name);
 		final String template = readTemplate(node.getAttributes());
 		final UIElement templateElem = instanciateTemplate(template, name, isDevLayout, parent);
 		final UIStateGroup thisElem = templateElem != null ? (UIStateGroup) templateElem : new UIStateGroup(name);
@@ -698,13 +741,13 @@ public class UICatalog {
 	 */
 	private void parseAnimation(final Node node, final UIElement parent, final String fileName, final String raceId,
 			final boolean isDevLayout) throws UIException {
-		LOGGER.debug("parsing Animation");
+		LOGGER.trace("parsing Animation");
 		final Node nameAttrNode = XmlDomHelper.getNamedItemIgnoringCase(node.getAttributes(), "name");
 		if (nameAttrNode == null) {
 			throw new UIException("Animation has no specified 'name'");
 		}
 		final String name = getConstantValue(nameAttrNode.getNodeValue(), raceId, isDevLayout);
-		LOGGER.debug("name = " + name);
+		LOGGER.trace("name = " + name);
 		final String template = readTemplate(node.getAttributes());
 		final UIElement templateElem = instanciateTemplate(template, name, isDevLayout, parent);
 		final UIAnimation thisElem = templateElem != null ? (UIAnimation) templateElem : new UIAnimation(name);
@@ -726,10 +769,11 @@ public class UICatalog {
 		// set implicit controller names
 		if (parent != null) {
 			setImplicitControllerNames(thisElem);
-		} else {
-			// cannot set names for templates as they could be incomplete,
-			// right?
 		}
+		// else {
+		// // cannot set names for templates as they could be incomplete,
+		// // right?
+		// }
 		
 		thisElem.setNextEventsAdditionShouldOverride(true);
 	}
@@ -741,23 +785,23 @@ public class UICatalog {
 	 * @param isDevLayout
 	 */
 	private void addTemplate(final String fileName, final UIElement thisElem, final boolean isDevLayout) {
-		final List<UITemplate> list = isDevLayout ? blizzDevTemplates : templates;
+		final List<UITemplate> list = isDevLayout ? blizzOnlyTemplates : templates;
 		list.add(new UITemplate(fileName, thisElem));
 	}
 	
 	/**
-	 * Set the implicit names of controllers in animations
+	 * Set the implicit names of controllers in animations.
 	 * 
 	 * @param thisElem
 	 * @throws UIException
 	 */
 	private void setImplicitControllerNames(final UIAnimation thisElem) throws UIException {
-		LOGGER.debug("Setting implicit controller names");
-		final ArrayList<UIController> controllers = thisElem.getControllers();
+		LOGGER.trace("Setting implicit controller names");
+		final List<UIController> controllers = thisElem.getControllers();
 		for (final UIController contr : controllers) {
 			if (contr.getName() == null) {
 				final String type = contr.getValues().get("type");
-				LOGGER.debug("type = " + type);
+				LOGGER.trace("type = " + type);
 				contr.setName(getImplicitName(type, controllers));
 				contr.setNameIsImplicit(true);
 			}
@@ -771,8 +815,8 @@ public class UICatalog {
 	 * @return
 	 * @throws UIException
 	 */
-	private String getImplicitName(final String type, final ArrayList<UIController> controllers) throws UIException {
-		LOGGER.debug("Constructing implicit controller name");
+	private String getImplicitName(final String type, final List<UIController> controllers) throws UIException {
+		LOGGER.trace("Constructing implicit controller name");
 		if (type == null) {
 			throw new UIException("'type=\"...\"' of Controller is not set or invalid.");
 		}
@@ -783,10 +827,10 @@ public class UICatalog {
 			
 			if (controllers.stream()
 					.noneMatch(t -> t.getName() != null && t.getName().compareToIgnoreCase(name) == 0)) {
-				LOGGER.debug("Constructing implicit controller name: " + name);
+				LOGGER.trace("Constructing implicit controller name: " + name);
 				return name;
 			}
-			LOGGER.debug("Implicit controller name existing: " + name);
+			LOGGER.trace("Implicit controller name existing: " + name);
 			i++;
 		}
 	}
@@ -799,13 +843,13 @@ public class UICatalog {
 	 */
 	private void parseConstant(final Node node, final UIElement parent, final String fileName, final String raceId,
 			final boolean isDevLayout) throws UIException {
-		LOGGER.debug("parsing Constant");
+		LOGGER.trace("parsing Constant");
 		final Node nameAttrNode = XmlDomHelper.getNamedItemIgnoringCase(node.getAttributes(), "name");
 		if (nameAttrNode == null) {
 			throw new UIException("Constant has no specified 'name'");
 		}
 		final String name = getConstantValue(nameAttrNode.getNodeValue(), raceId, isDevLayout);
-		LOGGER.debug("name = " + name);
+		LOGGER.trace("name = " + name);
 		final String template = readTemplate(node.getAttributes());
 		final UIElement templateElem = instanciateTemplate(template, name, isDevLayout, parent);
 		final UIConstant thisElem = templateElem != null ? (UIConstant) templateElem : new UIConstant(name);
@@ -815,7 +859,7 @@ public class UICatalog {
 			throw new UIException("Constant has no specified 'val'");
 		}
 		final String val = getConstantValue(valAttrNode.getNodeValue(), raceId, isDevLayout);
-		LOGGER.debug("val = " + val);
+		LOGGER.trace("val = " + val);
 		thisElem.setValue(val);
 		
 		// register with parent/templates overriding previous constant values
@@ -843,6 +887,12 @@ public class UICatalog {
 		parse(node.getChildNodes(), thisElem, fileName, raceId, isDevLayout);
 	}
 	
+	/**
+	 * 
+	 * @param name
+	 * @param listOfConstants
+	 * @return
+	 */
 	private boolean removeConstantFromList(final String name, final List<UIConstant> listOfConstants) {
 		boolean result = false;
 		for (int i = listOfConstants.size() - 1; i >= 0; i--) {
@@ -863,20 +913,20 @@ public class UICatalog {
 	 */
 	private void parseFrame(final Node node, final UIElement parent, final String fileName, final String raceId,
 			final boolean isDevLayout) throws UIException {
-		LOGGER.debug("parsing Frame");
+		LOGGER.trace("parsing Frame");
 		final Node nameAttrNode = XmlDomHelper.getNamedItemIgnoringCase(node.getAttributes(), "name");
 		if (nameAttrNode == null) {
 			throw new UIException("Frame has no specified 'name'");
 		}
 		final String name = getConstantValue(nameAttrNode.getNodeValue(), raceId, isDevLayout);
-		LOGGER.debug("name = " + name);
+		LOGGER.trace("name = " + name);
 		
 		final Node typeAttrNode = XmlDomHelper.getNamedItemIgnoringCase(node.getAttributes(), "type");
 		if (typeAttrNode == null) {
 			throw new UIException("Frame has no specified 'type'");
 		}
 		final String type = getConstantValue(typeAttrNode.getNodeValue(), raceId, isDevLayout);
-		LOGGER.debug("type = " + type);
+		LOGGER.trace("type = " + type);
 		
 		final String template = readTemplate(node.getAttributes());
 		final UIElement templateElem = instanciateTemplate(template, name, isDevLayout, parent);
@@ -884,7 +934,7 @@ public class UICatalog {
 		
 		// register with parent/templates
 		if (parent == null) {
-			LOGGER.debug("Adding new template Frame named " + fileName + "/" + thisElem.getName());
+			LOGGER.trace("Adding new template Frame named " + fileName + "/" + thisElem.getName());
 			addTemplate(fileName, thisElem, isDevLayout);
 		} else if (parent instanceof UIFrame) {
 			final UIFrame p = (UIFrame) parent;
@@ -908,7 +958,7 @@ public class UICatalog {
 		if (path == null) {
 			return null;
 		}
-		LOGGER.debug("Instanciating Template of path " + path);
+		LOGGER.trace("Instanciating Template of path " + path);
 		path = path.replace('\\', '/');
 		final String fileName = path.substring(0, path.indexOf("/"));
 		
@@ -918,7 +968,7 @@ public class UICatalog {
 			return templateInstance;
 		} else {
 			// 2. if fail -> check dev templates
-			templateInstance = instanciateTemplateFromList(blizzDevTemplates, fileName, path, newName);
+			templateInstance = instanciateTemplateFromList(blizzOnlyTemplates, fileName, path, newName);
 			if (templateInstance != null) {
 				if (!isDevLayout) {
 					LOGGER.error("ERROR: the non-Blizz-only frame '" + parent + "' uses a Blizz-only template '" + path
@@ -937,6 +987,14 @@ public class UICatalog {
 		return null;
 	}
 	
+	/**
+	 * 
+	 * @param templates
+	 * @param fileName
+	 * @param path
+	 * @param newName
+	 * @return
+	 */
 	private UIElement instanciateTemplateFromList(final List<UITemplate> templates, final String fileName,
 			final String path, final String newName) {
 		for (final UITemplate curTemplate : templates) {
@@ -949,7 +1007,7 @@ public class UICatalog {
 					// not the correct template
 					continue;
 				}
-				final UIElement clone = (UIElement) frameFromPath.deepClone();
+				final UIElement clone = (UIElement) frameFromPath.clone();
 				clone.setName(newName);
 				return clone;
 			}
@@ -958,8 +1016,10 @@ public class UICatalog {
 	}
 	
 	/**
+	 * Reads a template if it is existing.
 	 * 
 	 * @param attributes
+	 *            the attributes
 	 * @return template reference or null
 	 */
 	private String readTemplate(final NamedNodeMap attributes) {
@@ -987,7 +1047,7 @@ public class UICatalog {
 		}
 		final String prefix = constantRef.substring(0, i);
 		final String constantName = constantRef.substring(i);
-		LOGGER.debug("Encountered Constant: prefix='" + prefix + "', constantName='" + constantName + "'");
+		LOGGER.trace("Encountered Constant: prefix='" + prefix + "', constantName='" + constantName + "'");
 		for (final UIConstant c : constants) {
 			if (c.getName().equalsIgnoreCase(constantName)) {
 				return c.getValue();
@@ -995,17 +1055,28 @@ public class UICatalog {
 		}
 		// constant tag with race suffix
 		if (i == 2) {
-			final String constantNameWithRacePostFix = constantName + "_" + "raceId";
+			final String constantNameWithRacePostFix = constantName + "_" + raceId;
 			for (final UIConstant c : constants) {
 				if (c.getName().equalsIgnoreCase(constantNameWithRacePostFix)) {
 					return c.getValue();
 				}
 			}
 		}
+		if (i >= 3) {
+			LOGGER.error("ERROR: Encountered a constant definition with three #'" + constantRef
+					+ "' when its maximum is two '#'.");
+		}
+		
 		if (!isDevLayout) {
 			LOGGER.warn("WARNING: Did not find a constant definition for '" + constantRef + "', so '" + constantName
 					+ "' is used instead.");
 		} else {
+			// inside blizz-only
+			for (final UIConstant c : blizzOnlyConstants) {
+				if (c.getName().equalsIgnoreCase(constantName)) {
+					return c.getValue();
+				}
+			}
 			LOGGER.warn("WARNING: Did not find a constant definition for '" + constantRef
 					+ "', but it is a Blizz-only layout, so this is fine.");
 		}
@@ -1028,18 +1099,78 @@ public class UICatalog {
 	}
 	
 	/**
-	 * @return the blizzDevTemplates
+	 * @return the blizzOnlyTemplates
 	 */
-	public ArrayList<UITemplate> getBlizzDevTemplates() {
-		return blizzDevTemplates;
+	public ArrayList<UITemplate> getBlizzOnlyTemplates() {
+		return blizzOnlyTemplates;
 	}
 	
 	/**
-	 * @param blizzDevTemplates
-	 *            the blizzDevTemplates to set
+	 * @param blizzOnlyTemplates
+	 *            the blizzOnlyTemplates to set
 	 */
-	public void setBlizzDevTemplates(final ArrayList<UITemplate> blizzDevTemplates) {
-		this.blizzDevTemplates = blizzDevTemplates;
+	public void setBlizzOnlyTemplates(final ArrayList<UITemplate> blizzOnlyTemplates) {
+		this.blizzOnlyTemplates = blizzOnlyTemplates;
+	}
+	
+	/**
+	 * @return the constants
+	 */
+	public ArrayList<UIConstant> getConstants() {
+		return constants;
+	}
+	
+	/**
+	 * @param constants
+	 *            the constants to set
+	 */
+	public void setConstants(final ArrayList<UIConstant> constants) {
+		this.constants = constants;
+	}
+	
+	/**
+	 * @return the blizzOnlyConstants
+	 */
+	public ArrayList<UIConstant> getBlizzOnlyConstants() {
+		return blizzOnlyConstants;
+	}
+	
+	/**
+	 * @param blizzOnlyConstants
+	 *            the blizzOnlyConstants to set
+	 */
+	public void setBlizzOnlyConstants(final ArrayList<UIConstant> blizzOnlyConstants) {
+		this.blizzOnlyConstants = blizzOnlyConstants;
+	}
+	
+	/**
+	 * @return the devLayouts
+	 */
+	public ArrayList<String> getDevLayouts() {
+		return blizzOnlyLayouts;
+	}
+	
+	/**
+	 * @param devLayouts
+	 *            the devLayouts to set
+	 */
+	public void setDevLayouts(final ArrayList<String> devLayouts) {
+		blizzOnlyLayouts = devLayouts;
+	}
+	
+	/**
+	 * @return the curBasePath
+	 */
+	public String getCurBasePath() {
+		return curBasePath;
+	}
+	
+	/**
+	 * @param curBasePath
+	 *            the curBasePath to set
+	 */
+	public void setCurBasePath(final String curBasePath) {
+		this.curBasePath = curBasePath;
 	}
 	
 }

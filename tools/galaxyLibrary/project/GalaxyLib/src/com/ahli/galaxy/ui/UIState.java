@@ -1,6 +1,7 @@
 package com.ahli.galaxy.ui;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * 
@@ -8,8 +9,8 @@ import java.util.ArrayList;
  * 
  */
 public class UIState extends UIElement {
-	private ArrayList<UIAttribute> whens = new ArrayList<>();
-	private ArrayList<UIAttribute> actions = new ArrayList<>();
+	private List<UIAttribute> whens = new ArrayList<>();
+	private List<UIAttribute> actions = new ArrayList<>();
 	private boolean nextAdditionShouldOverrideWhens = false;
 	private boolean nextAdditionShouldOverrideActions = false;
 	
@@ -22,9 +23,30 @@ public class UIState extends UIElement {
 	}
 	
 	/**
+	 * Returns a deep clone of this.
+	 */
+	@Override
+	public Object clone() {
+		final UIState clone = new UIState(getName());
+		final ArrayList<UIAttribute> whensClone = new ArrayList<>();
+		for (int i = 0; i < whens.size(); i++) {
+			whensClone.add((UIAttribute) whens.get(i).clone());
+		}
+		clone.setWhens(whensClone);
+		final ArrayList<UIAttribute> actionsClone = new ArrayList<>();
+		for (int i = 0; i < actions.size(); i++) {
+			actionsClone.add((UIAttribute) actions.get(i).clone());
+		}
+		clone.actions = actionsClone;
+		clone.nextAdditionShouldOverrideActions = nextAdditionShouldOverrideActions;
+		clone.nextAdditionShouldOverrideWhens = nextAdditionShouldOverrideWhens;
+		return clone;
+	}
+	
+	/**
 	 * @return the whens
 	 */
-	public ArrayList<UIAttribute> getWhens() {
+	public List<UIAttribute> getWhens() {
 		return whens;
 	}
 	
@@ -32,14 +54,14 @@ public class UIState extends UIElement {
 	 * @param whens
 	 *            the whens to set
 	 */
-	public void setWhens(final ArrayList<UIAttribute> whens) {
+	public void setWhens(final List<UIAttribute> whens) {
 		this.whens = whens;
 	}
 	
 	/**
 	 * @return the actions
 	 */
-	public ArrayList<UIAttribute> getActions() {
+	public List<UIAttribute> getActions() {
 		return actions;
 	}
 	
@@ -47,7 +69,7 @@ public class UIState extends UIElement {
 	 * @param actions
 	 *            the actions to set
 	 */
-	public void setActions(final ArrayList<UIAttribute> actions) {
+	public void setActions(final List<UIAttribute> actions) {
 		this.actions = actions;
 	}
 	
@@ -89,29 +111,6 @@ public class UIState extends UIElement {
 	@Override
 	public UIElement receiveFrameFromPath(final String path) {
 		return (path == null || path.isEmpty()) ? this : null;
-	}
-	
-	/**
-	 * 
-	 * @return
-	 */
-	@Override
-	public Object deepClone() {
-		final UIState clone = new UIState(name);
-		clone.setNextAdditionShouldOverrideWhens(nextAdditionShouldOverrideWhens);
-		clone.setNextAdditionShouldOverrideActions(nextAdditionShouldOverrideActions);
-		
-		// clone whens
-		for (final UIElement when : whens) {
-			clone.getWhens().add((UIAttribute) when.deepClone());
-		}
-		
-		// clone actions
-		for (final UIElement action : actions) {
-			clone.getActions().add((UIAttribute) action.deepClone());
-		}
-		
-		return clone;
 	}
 	
 	@Override

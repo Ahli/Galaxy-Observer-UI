@@ -23,7 +23,7 @@ import javafx.stage.Window;
  * 
  */
 public class Alerts {
-	static Logger LOGGER = LogManager.getLogger(Alerts.class);
+	private static Logger logger = LogManager.getLogger(Alerts.class);
 	
 	/**
 	 * 
@@ -44,7 +44,7 @@ public class Alerts {
 		alert.initOwner(owner);
 		alert.setTitle(title);
 		alert.setHeaderText(header);
-		LOGGER.warn("created yesNoCancelAlert within " + (System.nanoTime() - time) / 1000000 + "ms.");
+		logger.warn("created yesNoCancelAlert within " + (System.nanoTime() - time) / 1000000 + "ms.");
 		return alert;
 	}
 	
@@ -64,7 +64,7 @@ public class Alerts {
 		alert.initOwner(owner);
 		alert.setTitle(title);
 		alert.setHeaderText(header);
-		LOGGER.warn("created errorAlert within " + (System.nanoTime() - time) / 1000000 + "ms.");
+		logger.warn("created errorAlert within " + (System.nanoTime() - time) / 1000000 + "ms.");
 		return alert;
 	}
 	
@@ -84,7 +84,7 @@ public class Alerts {
 		alert.initOwner(owner);
 		alert.setTitle(title);
 		alert.setHeaderText(header);
-		LOGGER.warn("created infoAlert within " + (System.nanoTime() - time) / 1000000 + "ms.");
+		logger.warn("created infoAlert within " + (System.nanoTime() - time) / 1000000 + "ms.");
 		return alert;
 	}
 	
@@ -104,7 +104,7 @@ public class Alerts {
 		alert.initOwner(owner);
 		alert.setTitle(title);
 		alert.setHeaderText(header);
-		LOGGER.warn("created warningAlert within " + (System.nanoTime() - time) / 1000000 + "ms.");
+		logger.warn("created warningAlert within " + (System.nanoTime() - time) / 1000000 + "ms.");
 		return alert;
 	}
 	
@@ -129,7 +129,7 @@ public class Alerts {
 			alert.setGraphic(new ImageView(imageUrl));
 		}
 		alert.getDialogPane().setPrefSize(480, 360);
-		LOGGER.warn("initialized about-alert within " + (System.nanoTime() - time) / 1000000 + "ms.");
+		logger.warn("initialized about-alert within " + (System.nanoTime() - time) / 1000000 + "ms.");
 		return alert;
 	}
 	
@@ -165,7 +165,7 @@ public class Alerts {
 		
 		// Set expandable Exception into the dialog pane.
 		alert.getDialogPane().setExpandableContent(expContent);
-		LOGGER.warn("created exceptionAlert within " + (System.nanoTime() - time) / 1000000 + "ms.");
+		logger.warn("created exceptionAlert within " + (System.nanoTime() - time) / 1000000 + "ms.");
 		
 		return alert;
 	}

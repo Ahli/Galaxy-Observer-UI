@@ -1,4 +1,4 @@
-package com.ahli.galaxy;
+package com.ahli.galaxy.ui;
 
 import java.io.File;
 import java.io.IOException;
@@ -16,16 +16,20 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
-import com.ahli.util.XmlDomHelper;
-
 /**
  * Reads a a Desc Index File.
  * 
  * @author Ahli
  *
  */
-public class DescIndexReader {
-	static Logger LOGGER = LogManager.getLogger(DescIndexReader.class);
+public final class DescIndexReader {
+	private static Logger logger = LogManager.getLogger(DescIndexReader.class);
+	
+	/**
+	 * 
+	 */
+	private DescIndexReader() {
+	}
 	
 	/**
 	 * Grabs all layout file paths from a given descIndex file.
@@ -42,6 +46,7 @@ public class DescIndexReader {
 		final ArrayList<String> list = new ArrayList<>();
 		
 		final DocumentBuilder dBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+		logger.trace("reading layouts from descIndexFile: " + f);
 		final Document doc = dBuilder.parse(f);
 		
 		// must be in a DataComponent node
@@ -53,35 +58,15 @@ public class DescIndexReader {
 				final String path = attributes.item(0).getNodeValue();
 				
 				// ignore requiredtoload if desired
-				if (ignoreRequiredToLoadEntries
-						&& XmlDomHelper.getNamedItemIgnoringCase(attributes, "requiredtoload") != null) {
+				if (ignoreRequiredToLoadEntries && UICatalog.isFailingRequiredToLoad(attributes)) {
 					continue;
 				}
 				
 				list.add(path);
-				LOGGER.debug("Adding layout path to layoutPathList: " + path);
+				logger.trace("Adding layout path to layoutPathList: " + path);
 			}
 		}
 		return list;
 	}
 	
-	// private List<Node> getElementsByTagNameIgnoreCase(Document doc, String
-	// tag) {
-	// NodeList children = doc.getChildNodes();
-	// return getElementsByTagNameIgnoreCase(children, tag);
-	// }
-	//
-	// private List<Node> getElementsByTagNameIgnoreCase(NodeList children,
-	// String tag) {
-	// List<Node> list = new ArrayList<Node>();
-	// int len = children.getLength();
-	// for (int i = 0; i < len; i++) {
-	// Node node = children.item(i);
-	// if (tag.equalsIgnoreCase(node.getNodeName())) {
-	// list.add(node);
-	// list.addAll(getElementsByTagNameIgnoreCase(node.getChildNodes(), tag));
-	// }
-	// }
-	// return list;
-	// }
 }

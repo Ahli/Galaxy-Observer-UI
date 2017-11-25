@@ -35,7 +35,7 @@ import com.ahli.hotkeyUi.application.model.ValueDef;
 import com.ahli.util.SilentXmlSaxErrorHandler;
 
 public class LayoutExtensionReader {
-	static Logger LOGGER = LogManager.getLogger(LayoutExtensionReader.class);
+	static Logger logger = LogManager.getLogger(LayoutExtensionReader.class);
 	
 	private ArrayList<ValueDef> hotkeys = new ArrayList<>();
 	private ArrayList<ValueDef> settings = new ArrayList<>();
@@ -82,18 +82,16 @@ public class LayoutExtensionReader {
 	public void processLayoutFiles(final Collection<File> layoutFiles)
 			throws ParserConfigurationException, SAXException, IOException {
 		
-		LOGGER.info("Scanning for XML file...");
+		logger.info("Scanning for XML file...");
 		
 		final DocumentBuilder dBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
 		// provide error handler that does not print incompatible files into
 		// console
 		dBuilder.setErrorHandler(new SilentXmlSaxErrorHandler());
 		
-		InputStream is = null;
-		
 		x: for (final File curFile : layoutFiles) {
 			Document doc = null;
-			try {
+			try (InputStream is = new FileInputStream(curFile)) {
 				// parse XML file
 				
 				// THIS DOES NOT CLOSE THE INPUTSTREAM ON EXCEPTION
@@ -101,22 +99,14 @@ public class LayoutExtensionReader {
 				// doc = dBuilder.parse(curFile);
 				
 				// WORKAROUND -> provide Inputstream
-				is = new FileInputStream(curFile);
 				doc = dBuilder.parse(is);
 				
 			} catch (SAXParseException | IOException e) {
 				// couldn't parse, most likely no XML file
-				if (is != null) {
-					is.close();
-				}
 				continue x;
-			} finally {
-				if (is != null) {
-					is.close();
-				}
 			}
 			
-			LOGGER.debug("comments - processing file: " + curFile.getPath());
+			logger.debug("comments - processing file: " + curFile.getPath());
 			
 			// read comments
 			final Element elem = doc.getDocumentElement();
@@ -124,11 +114,9 @@ public class LayoutExtensionReader {
 			readComments(childNodes);
 		}
 		
-		is = null;
-		
 		x: for (final File curFile : layoutFiles) {
 			Document doc = null;
-			try {
+			try (InputStream is = new FileInputStream(curFile);) {
 				// parse XML file
 				
 				// THIS DOES NOT CLOSE THE INPUTSTREAM ON EXCEPTION
@@ -136,22 +124,15 @@ public class LayoutExtensionReader {
 				// doc = dBuilder.parse(curFile);
 				
 				// WORKAROUND -> provide Inputstream
-				is = new FileInputStream(curFile);
+				
 				doc = dBuilder.parse(is);
 				
 			} catch (SAXParseException | IOException e) {
 				// couldn't parse, most likely no XML file
-				if (is != null) {
-					is.close();
-				}
 				continue x;
-			} finally {
-				if (is != null) {
-					is.close();
-				}
 			}
 			
-			LOGGER.debug("constants - processing file: " + curFile.getPath());
+			logger.debug("constants - processing file: " + curFile.getPath());
 			
 			// read constants
 			final Element elem = doc.getDocumentElement();
@@ -190,12 +171,12 @@ public class LayoutExtensionReader {
 		String constant = "", description = "", defaultValue = "";
 		
 		// String textInputLower = textInput.toLowerCase();
-		LOGGER.debug("textInput:" + textInput);
+		logger.debug("textInput:" + textInput);
 		try {
 			// split at keywords @hotkey or @setting without removing, case
 			// insensitive
 			for (String text : textInput.split("(?=@hotkey|@setting)/i")) {
-				LOGGER.debug("token start:" + text);
+				logger.debug("token start:" + text);
 				text = text.trim();
 				
 				constant = "";
@@ -206,7 +187,7 @@ public class LayoutExtensionReader {
 				final boolean isSetting = text.toLowerCase(Locale.ROOT).startsWith("@setting");
 				
 				if (isHotkey || isSetting) {
-					LOGGER.debug("detected hotkey or setting");
+					logger.debug("detected hotkey or setting");
 					// move behind keyword
 					final int pos = (isHotkey) ? "@hotkey".length() : "@setting".length();
 					String toProcess = text.substring(pos);
@@ -218,22 +199,22 @@ public class LayoutExtensionReader {
 					for (String part : toProcess.split("(?i)(?=(constant|default|description)[\\s]*=)")) {
 						part = part.trim();
 						final String partLower = part.toLowerCase(Locale.ROOT);
-						LOGGER.debug("part: " + part);
+						logger.debug("part: " + part);
 						if (partLower.startsWith("constant")) {
 							// move beyond '='
 							part = part.substring(1 + part.indexOf("=")).trim();
 							constant = part.substring(part.indexOf('"') + 1, part.lastIndexOf('"'));
-							LOGGER.debug("constant = " + constant);
+							logger.debug("constant = " + constant);
 						} else if (partLower.startsWith("default")) {
 							// move beyond '='
 							part = part.substring(1 + part.indexOf("=")).trim();
 							defaultValue = part.substring(part.indexOf('"') + 1, part.lastIndexOf('"'));
-							LOGGER.debug("default = " + defaultValue);
+							logger.debug("default = " + defaultValue);
 						} else if (partLower.startsWith("description")) {
 							// move beyond '='
 							part = part.substring(1 + part.indexOf("=")).trim();
 							description = part.substring(part.indexOf('"') + 1, part.lastIndexOf('"'));
-							LOGGER.debug("description = " + description);
+							logger.debug("description = " + description);
 						}
 					}
 					
@@ -249,7 +230,7 @@ public class LayoutExtensionReader {
 		} catch (final RuntimeException e) {
 			throw e;
 		} catch (final Exception e) {
-			LOGGER.debug("Parsing Comment failed.", e);
+			logger.debug("Parsing Comment failed.", e);
 		}
 	}
 	
@@ -296,7 +277,7 @@ public class LayoutExtensionReader {
 		final String name = nameAttrNode.getNodeValue();
 		final Node valAttrNode = getNamedItemIgnoreCase(node.getAttributes(), "val");
 		final String val = valAttrNode.getNodeValue();
-		LOGGER.debug("Constant: name = " + name + ", val = " + val);
+		logger.debug("Constant: name = " + name + ", val = " + val);
 		
 		setValueDefCurValue(name, val);
 	}
@@ -319,7 +300,7 @@ public class LayoutExtensionReader {
 				return;
 			}
 		}
-		LOGGER.debug("no ValueDef found with name: " + name);
+		logger.debug("no ValueDef found with name: " + name);
 	}
 	
 	/**
@@ -331,7 +312,7 @@ public class LayoutExtensionReader {
 	 */
 	public void updateLayoutFiles(final Collection<File> layoutFiles)
 			throws ParserConfigurationException, SAXException, IOException {
-		LOGGER.info("Scanning for XML file...");
+		logger.info("Scanning for XML file...");
 		
 		final DocumentBuilder dBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
 		// provide error handler that does not print incompatible files into
@@ -365,7 +346,7 @@ public class LayoutExtensionReader {
 				}
 			}
 			
-			LOGGER.debug("processing file: " + curFile.getPath());
+			logger.debug("processing file: " + curFile.getPath());
 			
 			// process files
 			final Element elem = doc.getDocumentElement();
@@ -380,7 +361,7 @@ public class LayoutExtensionReader {
 				xformer = TransformerFactory.newInstance().newTransformer();
 				xformer.transform(source, result);
 			} catch (TransformerFactoryConfigurationError | TransformerException e) {
-				LOGGER.error("Transforming to generate XML file failed.", e);
+				logger.error("Transforming to generate XML file failed.", e);
 				e.printStackTrace();
 			}
 		}
@@ -417,13 +398,13 @@ public class LayoutExtensionReader {
 		
 		for (final ValueDef item : hotkeys) {
 			if (item.getId().equalsIgnoreCase(name)) {
-				LOGGER.debug("updating hotkey constant: " + name + ", with val: " + val);
+				logger.debug("updating hotkey constant: " + name + ", with val: " + val);
 				valAttrNode.setNodeValue(item.getValue());
 			}
 		}
 		for (final ValueDef item : settings) {
 			if (item.getId().equalsIgnoreCase(name)) {
-				LOGGER.debug("updating setting constant:" + name + ", with val: " + val);
+				logger.debug("updating setting constant:" + name + ", with val: " + val);
 				valAttrNode.setNodeValue(item.getValue());
 			}
 		}

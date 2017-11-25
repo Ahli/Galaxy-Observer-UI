@@ -1,16 +1,35 @@
 package com.ahli.galaxy.ui;
 
+import java.io.Serializable;
+
 /**
  * 
  * @author Ahli
  * 
  */
-public abstract class UIElement {
-	String name = "";
+public abstract class UIElement implements Cloneable, Serializable {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -9128521308405405698L;
 	
+	private String name = "";
+	
+	/**
+	 * Constructor.
+	 * 
+	 * @param name
+	 *            element's name
+	 */
 	public UIElement(final String name) {
 		this.name = name;
 	}
+	
+	/**
+	 * Returns a deep clone of this.
+	 */
+	@Override
+	public abstract Object clone();
 	
 	/**
 	 * @return the name
@@ -28,9 +47,12 @@ public abstract class UIElement {
 	}
 	
 	/**
+	 * Returns the correct frame based on a specified path. For example, the frame
+	 * that a path in a template references.
 	 * 
 	 * @param path
-	 * @return
+	 *            path of an element
+	 * @return Frame element
 	 */
 	public abstract UIElement receiveFrameFromPath(String path);
 	
@@ -60,12 +82,6 @@ public abstract class UIElement {
 		}
 		return path.substring(0, i);
 	}
-	
-	/**
-	 * 
-	 * @return
-	 */
-	public abstract Object deepClone();
 	
 	@Override
 	public String toString() {

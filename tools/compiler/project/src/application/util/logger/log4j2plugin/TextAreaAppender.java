@@ -20,7 +20,7 @@ import javafx.application.Platform;
 import javafx.scene.control.TextArea;
 
 /**
- * TextAreaAppender for Log4j2 Source:
+ * TextAreaAppender for Log4j2. Source:
  * http://blog.pikodat.com/2015/10/11/frontend-logging-with-javafx/
  */
 @Plugin(name = "TextAreaAppender", category = "Core", elementType = "appender", printObject = true)
@@ -31,6 +31,13 @@ public final class TextAreaAppender extends AbstractAppender {
 	private final ReadWriteLock rwLock = new ReentrantReadWriteLock();
 	private final Lock readLock = rwLock.readLock();
 	
+	/**
+	 * 
+	 * @param name
+	 * @param filter
+	 * @param layout
+	 * @param ignoreExceptions
+	 */
 	protected TextAreaAppender(final String name, final Filter filter, final Layout<? extends Serializable> layout,
 			final boolean ignoreExceptions) {
 		super(name, filter, layout, ignoreExceptions);
@@ -99,7 +106,7 @@ public final class TextAreaAppender extends AbstractAppender {
 	}
 	
 	/**
-	 * Set TextArea to append
+	 * Set TextArea to append.
 	 *
 	 * @param textArea
 	 *            TextArea to append

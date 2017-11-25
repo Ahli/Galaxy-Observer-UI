@@ -2,8 +2,8 @@ package com.ahli.galaxy.ui;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -14,14 +14,14 @@ import org.apache.logging.log4j.Logger;
  *
  */
 public class UIFrame extends UIElement {
-	private final static Logger LOGGER = LogManager.getLogger(UIFrame.class);
+	private static final Logger LOGGER = LogManager.getLogger(UIFrame.class);
 	
-	String type = "";
-	ArrayList<UIElement> children = new ArrayList<>();
+	private String type = "";
+	private List<UIElement> children = new ArrayList<>();
 	private Map<String, UIAttribute> attributes = new HashMap<>();
-	String[] pos = new String[4];
-	String[] offset = new String[4];
-	String[] relative = new String[4];
+	private final String[] pos = new String[4];
+	private final String[] offset = new String[4];
+	private final String[] relative = new String[4];
 	
 	/**
 	 * 
@@ -46,6 +46,25 @@ public class UIFrame extends UIElement {
 	}
 	
 	/**
+	 * Returns a deep clone of this.
+	 */
+	@Override
+	public Object clone() {
+		final UIFrame clone = new UIFrame(getName(), type);
+		final ArrayList<UIElement> childrenClone = new ArrayList<>();
+		for (int i = 0; i < children.size(); i++) {
+			childrenClone.add((UIElement) children.get(i).clone());
+		}
+		clone.children = childrenClone;
+		for (int i = 0; i <= 3; i++) {
+			clone.relative[i] = relative[i];
+			clone.offset[i] = offset[i];
+			clone.pos[i] = pos[i];
+		}
+		return clone;
+	}
+	
+	/**
 	 * @return the type
 	 */
 	public String getType() {
@@ -64,7 +83,7 @@ public class UIFrame extends UIElement {
 	 * 
 	 * @return
 	 */
-	public ArrayList<UIElement> getChildren() {
+	public List<UIElement> getChildren() {
 		return children;
 	}
 	
@@ -72,7 +91,7 @@ public class UIFrame extends UIElement {
 	 * 
 	 * @param children
 	 */
-	public void setChildren(final ArrayList<UIElement> children) {
+	public void setChildren(final List<UIElement> children) {
 		this.children = children;
 	}
 	
@@ -196,14 +215,14 @@ public class UIFrame extends UIElement {
 		} else {
 			// go deeper
 			final String curName = UIElement.getLeftPathLevel(path);
-			LOGGER.debug("curName: " + curName);
-			LOGGER.debug("children to check: " + children.size());
+			LOGGER.trace("curName: " + curName);
+			LOGGER.trace("children to check: " + children.size());
 			for (final UIElement curElem : children) {
-				LOGGER.debug("checking child: " + curElem.getName());
+				LOGGER.trace("checking child: " + curElem.getName());
 				if (curName.equalsIgnoreCase(curElem.getName())) {
 					// found right frame -> cut path
 					final String newPath = UIElement.removeLeftPathLevel(path);
-					LOGGER.debug("match! newPath:" + newPath);
+					LOGGER.trace("match! newPath:" + newPath);
 					return curElem.receiveFrameFromPath(newPath);
 				}
 			}
@@ -211,45 +230,9 @@ public class UIFrame extends UIElement {
 		}
 	}
 	
-	/**
-	 * 
-	 */
-	@Override
-	public Object deepClone() {
-		final UIFrame clone = new UIFrame(name, type);
-		
-		// clone attributes
-		final Map<String, UIAttribute> clonedAttributes = new HashMap<>();
-		for (final Entry<String, UIAttribute> entry : attributes.entrySet()) {
-			final UIAttribute clonedValue = (UIAttribute) entry.getValue().deepClone();
-			clonedAttributes.put(entry.getKey(), clonedValue);
-		}
-		clone.setAttributes(clonedAttributes);
-		
-		// clone anchors
-		clone.setAnchorOffset(UIAnchorSide.Top, offset[0]);
-		clone.setAnchorOffset(UIAnchorSide.Left, offset[1]);
-		clone.setAnchorOffset(UIAnchorSide.Bottom, offset[2]);
-		clone.setAnchorOffset(UIAnchorSide.Right, offset[3]);
-		clone.setAnchorPos(UIAnchorSide.Top, pos[0]);
-		clone.setAnchorPos(UIAnchorSide.Left, pos[1]);
-		clone.setAnchorPos(UIAnchorSide.Bottom, pos[2]);
-		clone.setAnchorPos(UIAnchorSide.Right, pos[3]);
-		clone.setAnchorRelative(UIAnchorSide.Top, relative[0]);
-		clone.setAnchorRelative(UIAnchorSide.Left, pos[1]);
-		clone.setAnchorRelative(UIAnchorSide.Bottom, pos[2]);
-		clone.setAnchorRelative(UIAnchorSide.Right, pos[3]);
-		
-		for (final UIElement child : children) {
-			clone.getChildren().add((UIElement) child.deepClone());
-		}
-		
-		return clone;
-	}
-	
 	@Override
 	public String toString() {
-		return "<Frame type='" + type + "' name='" + name + "'>";
+		return "<Frame type='" + type + "' name='" + getName() + "'>";
 	}
 	
 }

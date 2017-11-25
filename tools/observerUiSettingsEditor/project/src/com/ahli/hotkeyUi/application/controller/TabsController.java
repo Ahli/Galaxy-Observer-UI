@@ -32,7 +32,7 @@ import javafx.util.Callback;
  * 
  */
 public class TabsController {
-	static Logger LOGGER = LogManager.getLogger(TabsController.class);
+	static Logger logger = LogManager.getLogger(TabsController.class);
 	
 	private Main main;
 	
@@ -80,7 +80,7 @@ public class TabsController {
 				@Override
 				protected void updateItem(final String item, final boolean empty) {
 					if (empty || item == null) {
-						LOGGER.trace("update wrapping table cell - null");
+						logger.trace("update wrapping table cell - null");
 						super.updateItem(item, empty);
 						super.setGraphic(null);
 						super.setText(null);
@@ -89,7 +89,7 @@ public class TabsController {
 						final boolean equals = item.equals(getItem());
 						super.updateItem(item, empty);
 						if (!equals) {
-							LOGGER.trace("update wrapping table cell - newLabel " + item);
+							logger.trace("update wrapping table cell - newLabel " + item);
 							final Label l = new Label(item);
 							l.setWrapText(true);
 							final VBox box = new VBox(l);
@@ -99,7 +99,7 @@ public class TabsController {
 							});
 							super.setGraphic(box);
 						} else {
-							LOGGER.trace("update wrapping table cell - equal");
+							logger.trace("update wrapping table cell - equal");
 						}
 					}
 				}
@@ -127,7 +127,7 @@ public class TabsController {
 	 */
 	@FXML
 	public void initialize() {
-		LOGGER.trace("initializing");
+		logger.trace("initializing");
 		
 		hotkeysNameCol.setCellValueFactory(new PropertyValueFactory<>("id"));
 		hotkeysDescriptionCol.setCellValueFactory(new PropertyValueFactory<>("description"));
@@ -138,7 +138,7 @@ public class TabsController {
 		hotkeysKeyCol.setOnEditCommit((final CellEditEvent<ValueDef, String> t) -> {
 			if (!t.getOldValue().equals(t.getNewValue())) {
 				t.getTableView().getItems().get(t.getTablePosition().getRow()).setValue(t.getNewValue());
-				LOGGER.debug("write hotkey val: " + t.getNewValue());
+				logger.debug("write hotkey val: " + t.getNewValue());
 				main.notifyFileDataWasChanged();
 			}
 		});
@@ -155,7 +155,7 @@ public class TabsController {
 		settingsValueCol.setOnEditCommit((final CellEditEvent<ValueDef, String> t) -> {
 			if (!t.getOldValue().equals(t.getNewValue())) {
 				t.getTableView().getItems().get(t.getTablePosition().getRow()).setValue(t.getNewValue());
-				LOGGER.debug("write setting val: " + t.getNewValue());
+				logger.debug("write setting val: " + t.getNewValue());
 				main.notifyFileDataWasChanged();
 			}
 		});

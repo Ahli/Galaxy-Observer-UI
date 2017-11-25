@@ -1,4 +1,4 @@
-package com.ahli.galaxy;
+package com.ahli.galaxy.archive;
 
 import java.io.File;
 import java.io.IOException;
@@ -22,8 +22,14 @@ import org.xml.sax.SAXException;
  * @author Ahli
  * 
  */
-public class LayoutReader {
-	static Logger LOGGER = LogManager.getLogger(LayoutReader.class);
+public final class LayoutReader {
+	private static Logger logger = LogManager.getLogger(LayoutReader.class);
+	
+	/**
+	 * 
+	 */
+	private LayoutReader() {
+	}
 	
 	/**
 	 * 
@@ -71,7 +77,7 @@ public class LayoutReader {
 							final String layoutName = dependency.substring(0, firstIndex);
 							if (!layoutName.equalsIgnoreCase(nameWOfileEnding)) {
 								if (!doesNameAppearInList(layoutName, list)) {
-									LOGGER.trace(nameWOfileEnding + " has dependency to " + layoutName);
+									logger.trace(nameWOfileEnding + " has dependency to " + layoutName);
 									list.add(layoutName);
 								}
 							}
@@ -88,7 +94,7 @@ public class LayoutReader {
 		if (ownConstants == null) {
 			ownConstants = getLayoutsConstantDefinitions(doc);
 			for (final String str : ownConstants) {
-				LOGGER.trace(nameWOfileEnding + " defines constant " + str);
+				logger.trace(nameWOfileEnding + " defines constant " + str);
 			}
 		}
 		
@@ -120,7 +126,7 @@ public class LayoutReader {
 					final String constName = attrName;
 					if (!doesNameAppearInList(constName, usedConstants)
 							&& !doesConstantNameAppearInList(constName, ownConstants)) {
-						LOGGER.trace(nameWOfileEnding + " uses undefined constant " + constName);
+						logger.trace(nameWOfileEnding + " uses undefined constant " + constName);
 						usedConstants.add(constName);
 						list.add(constName);
 					}
@@ -130,7 +136,7 @@ public class LayoutReader {
 					final String constName = attrValue;
 					if (!doesNameAppearInList(constName, usedConstants)
 							&& !doesConstantNameAppearInList(constName, ownConstants)) {
-						LOGGER.trace(nameWOfileEnding + " uses undefined constant " + constName);
+						logger.trace(nameWOfileEnding + " uses undefined constant " + constName);
 						usedConstants.add(constName);
 						list.add(constName);
 					}
@@ -240,7 +246,7 @@ public class LayoutReader {
 				// attribute is Template
 				if (attr.getNodeName().equalsIgnoreCase("name")) {
 					ownConstants.add(attr.getNodeValue());
-					LOGGER.trace("FOUND CONSTANT DEFINITION: " + attr.getNodeValue());
+					logger.trace("FOUND CONSTANT DEFINITION: " + attr.getNodeValue());
 				}
 				// else
 				// System.out.println("REJECTED CONSTANT ATTR: " +

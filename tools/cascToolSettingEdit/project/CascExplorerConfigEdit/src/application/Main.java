@@ -24,9 +24,7 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 /**
- * Application that edits the
- * 
- * 
+ * Application that edits the config file of the CascExplorerConsole.exe.
  * 
  * @author Ahli
  *
@@ -47,23 +45,12 @@ public class Main {
 		System.out.println("Locale: " + args[4]);
 		
 		final String path = args[0], storagePath = args[1], onlineMode = args[2], product = args[3], locale = args[4];
-		
-		InputStream is = null;
-		try {
+		final File f = new File(path);
+		try (InputStream is = new FileInputStream(f)) {
 			final DocumentBuilder dBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
 			Document doc = null;
-			final File f = new File(path);
 			
-			// parse XML file
-			
-			// THIS DOES NOT CLOSE THE INPUTSTREAM ON EXCEPTION
-			// CREATING TONS OF FILE ACCESS PROBLEMS. DO NOT USE!
-			// doc = dBuilder.parse(curFile);
-			
-			// WORKAROUND -> provide Inputstream
-			is = new FileInputStream(f);
 			doc = dBuilder.parse(is);
-			is.close();
 			
 			// edit document
 			final NodeList nodeList = doc.getElementsByTagName("setting");
@@ -93,20 +80,12 @@ public class Main {
 			// write DOM back to XML
 			final Source source = new DOMSource(doc);
 			final Result result = new StreamResult(f);
-			Transformer xformer;
-			xformer = TransformerFactory.newInstance().newTransformer();
+			final Transformer xformer = TransformerFactory.newInstance().newTransformer();
 			xformer.transform(source, result);
 			
 		} catch (IOException | ParserConfigurationException | SAXException | TransformerFactoryConfigurationError
 				| TransformerException e1) {
 			e1.printStackTrace();
-		} finally {
-			if (is != null) {
-				try {
-					is.close();
-				} catch (final IOException e) {
-				}
-			}
 		}
 	}
 	

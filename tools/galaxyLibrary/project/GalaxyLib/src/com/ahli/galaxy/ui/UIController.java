@@ -2,6 +2,7 @@ package com.ahli.galaxy.ui;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -11,8 +12,8 @@ import java.util.Map.Entry;
  *
  */
 public class UIController extends UIElement {
+	private List<UIAttribute> keys = new ArrayList<>();
 	private Map<String, String> values = new HashMap<>();
-	private ArrayList<UIAttribute> keys = new ArrayList<>();
 	private boolean nextAdditionShouldOverride = false;
 	private boolean nameIsImplicit = true;
 	
@@ -25,9 +26,29 @@ public class UIController extends UIElement {
 	}
 	
 	/**
+	 * Returns a deep clone of this.
+	 */
+	@Override
+	public Object clone() {
+		final UIController clone = new UIController(getName());
+		for (int i = 0; i < keys.size(); i++) {
+			clone.keys.add((UIAttribute) keys.get(i).clone());
+		}
+		final Object[] entries = values.entrySet().toArray();
+		for (int fix = 0, i = fix; i < entries.length; i++) {
+			@SuppressWarnings("unchecked")
+			final Entry<String, String> entry = (Entry<String, String>) entries[i];
+			clone.values.put(entry.getKey(), entry.getValue());
+		}
+		clone.nextAdditionShouldOverride = nextAdditionShouldOverride;
+		clone.nameIsImplicit = nameIsImplicit;
+		return clone;
+	}
+	
+	/**
 	 * @return the keys
 	 */
-	public ArrayList<UIAttribute> getKeys() {
+	public List<UIAttribute> getKeys() {
 		return keys;
 	}
 	
@@ -35,7 +56,7 @@ public class UIController extends UIElement {
 	 * @param keys
 	 *            the keys to set
 	 */
-	public void setKeys(final ArrayList<UIAttribute> keys) {
+	public void setKeys(final List<UIAttribute> keys) {
 		this.keys = keys;
 	}
 	
@@ -94,33 +115,8 @@ public class UIController extends UIElement {
 		return (path == null || path.isEmpty()) ? this : null;
 	}
 	
-	/**
-	 * 
-	 * @return
-	 */
-	@Override
-	public Object deepClone() {
-		final UIController clone = new UIController(name);
-		clone.setNameIsImplicit(nameIsImplicit);
-		clone.setNextAdditionShouldOverride(nextAdditionShouldOverride);
-		
-		// clone values
-		final Map<String, String> clonedValues = new HashMap<>();
-		for (final Entry<String, String> entry : values.entrySet()) {
-			clonedValues.put(entry.getKey(), entry.getValue());
-		}
-		clone.setValues(clonedValues);
-		
-		// clone keys
-		for (final UIElement key : keys) {
-			clone.getKeys().add((UIAttribute) key.deepClone());
-		}
-		
-		return clone;
-	}
-	
 	@Override
 	public String toString() {
-		return "<Controller name='" + name + "'>";
+		return "<Controller name='" + getName() + "'>";
 	}
 }

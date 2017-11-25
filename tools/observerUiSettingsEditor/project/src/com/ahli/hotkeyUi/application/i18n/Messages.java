@@ -16,8 +16,8 @@ import org.apache.logging.log4j.Logger;
  * @author Ahli
  * 
  */
-public class Messages {
-	static Logger LOGGER = LogManager.getLogger(Messages.class); // $NON-NLS-1$
+public final class Messages {
+	private static Logger logger = LogManager.getLogger(Messages.class); // $NON-NLS-1$
 	
 	private static final String BUNDLE_NAME = "com.ahli.hotkeyUi.application.i18n.messages"; //$NON-NLS-1$
 	
@@ -25,6 +25,9 @@ public class Messages {
 	
 	private static Locale usedLocale = Locale.getDefault();
 	
+	/**
+	 * Disabled Constructor.
+	 */
 	private Messages() {
 	}
 	
@@ -78,7 +81,7 @@ public class Messages {
 	 */
 	public static boolean checkIfTargetResourceIsUsed(final Locale locale) {
 		final boolean result = resourceBundle.equals(ResourceBundle.getBundle(BUNDLE_NAME, locale));
-		LOGGER.trace("compare used locale's resource '" + usedLocale + "' with one for locale '" + locale
+		logger.trace("compare used locale's resource '" + usedLocale + "' with one for locale '" + locale
 				+ "', result: " + result);
 		return result;
 	}

@@ -1,4 +1,4 @@
-package com.ahli.galaxy;
+package com.ahli.galaxy.archive;
 
 import java.io.File;
 import java.io.IOException;
@@ -20,12 +20,20 @@ import org.xml.sax.SAXException;
  * @author Ahli
  *
  */
-public class ComponentsListReader {
-	static Logger LOGGER = LogManager.getLogger(ComponentsListReader.class);
+public final class ComponentsListReader {
+	private static Logger logger = LogManager.getLogger(ComponentsListReader.class);
+	
+	/**
+	 * 
+	 */
+	private ComponentsListReader() {
+	}
 	
 	/**
 	 * Returns the internal path of DescIndex of the mpq file.
 	 * 
+	 * @param f
+	 *            components list file
 	 * @return
 	 * @throws IOException
 	 * @throws SAXException
@@ -35,7 +43,7 @@ public class ComponentsListReader {
 		final String intPath = getComponentsListValue(f, "uiui");
 		String str = intPath.endsWith("StormLayout") ? "Base.StormData" : "Base.SC2Data";
 		str += File.separator + intPath;
-		LOGGER.trace("DescIndexPath: " + str);
+		logger.trace("DescIndexPath: " + str);
 		return str;
 	}
 	
@@ -43,7 +51,11 @@ public class ComponentsListReader {
 	 * Returns the path information of a given type value, e.g. "uiui" or "font".
 	 * Locales are not supported here.
 	 * 
-	 * @return
+	 * @param f
+	 *            components list file
+	 * @param typeVal
+	 *            value of the type, e.g. "uiui"
+	 * @return path information of the specified type value
 	 * @throws ParserConfigurationException
 	 * @throws IOException
 	 * @throws SAXException

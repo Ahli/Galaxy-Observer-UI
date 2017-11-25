@@ -10,19 +10,19 @@ public interface ErrorTracker {
 	/**
 	 * Checks if an error was recently reported.
 	 * 
-	 * @return
+	 * @return whether an error was occurred
 	 */
-	public boolean hasEncounteredError();
+	boolean hasEncounteredError();
 	
 	/**
 	 * Clear the Error.
 	 */
-	public void clearError();
+	void clearError();
 	
 	/**
 	 * Reports that an error occurred.
 	 */
-	public void reportErrorEncounter();
+	void reportErrorEncounter();
 	
 	/**
 	 * Reports that an error occurred.
@@ -30,12 +30,12 @@ public interface ErrorTracker {
 	 * @param exception
 	 *            occurred Exception
 	 */
-	public void reportErrorEncounter(Exception exception);
+	void reportErrorEncounter(Exception exception);
 	
 	/**
 	 * Returns the Exception reported.
 	 * 
-	 * @return
+	 * @return exception of the report, can be null
 	 */
-	public Exception getErrorException();
+	Exception getErrorException();
 }

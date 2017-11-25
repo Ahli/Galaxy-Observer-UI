@@ -6,7 +6,7 @@ package com.ahli.galaxy.ui;
  * 
  */
 public class UIConstant extends UIElement {
-	String value = "";
+	private String value = "";
 	
 	/**
 	 * 
@@ -14,6 +14,15 @@ public class UIConstant extends UIElement {
 	 */
 	public UIConstant(final String name) {
 		super(name);
+	}
+	
+	/**
+	 * Returns a deep clone of this.
+	 */
+	@Override
+	public Object clone() {
+		final UIConstant clone = new UIConstant(getName());
+		return clone;
 	}
 	
 	/**
@@ -41,20 +50,8 @@ public class UIConstant extends UIElement {
 		return (path == null || path.isEmpty()) ? this : null;
 	}
 	
-	/**
-	 * 
-	 * @return
-	 */
-	@Override
-	public Object deepClone() {
-		final UIConstant clone = new UIConstant(name);
-		clone.setValue(value);
-		
-		return clone;
-	}
-	
 	@Override
 	public String toString() {
-		return "<Constant name='" + name + "', value='" + value + "'>";
+		return "<Constant name='" + getName() + "', value='" + value + "'>";
 	}
 }

@@ -12,11 +12,32 @@ import java.util.Map.Entry;
  */
 public class UIAttribute extends UIElement {
 	
+	private Map<String, String> values = new HashMap<>();
+	
+	/**
+	 * Constructor.
+	 * 
+	 * @param name
+	 *            Element's name
+	 */
 	public UIAttribute(final String name) {
 		super(name);
 	}
 	
-	private Map<String, String> values = new HashMap<>();
+	/**
+	 * Returns a deep clone of this.
+	 */
+	@Override
+	public Object clone() {
+		final UIAttribute clone = new UIAttribute(getName());
+		final Object[] entries = values.entrySet().toArray();
+		for (int fix = 0, i = fix; i < entries.length; i++) {
+			@SuppressWarnings("unchecked")
+			final Entry<String, String> entry = (Entry<String, String>) entries[i];
+			clone.values.put(entry.getKey(), entry.getValue());
+		}
+		return clone;
+	}
 	
 	/**
 	 * @return the values
@@ -43,26 +64,8 @@ public class UIAttribute extends UIElement {
 		return (path == null || path.isEmpty()) ? this : null;
 	}
 	
-	/**
-	 * 
-	 * @return
-	 */
-	@Override
-	public Object deepClone() {
-		final UIAttribute clone = new UIAttribute(name);
-		
-		// clone values
-		final Map<String, String> clonedValues = new HashMap<>();
-		for (final Entry<String, String> entry : values.entrySet()) {
-			clonedValues.put(entry.getKey(), entry.getValue());
-		}
-		clone.setValues(clonedValues);
-		
-		return clone;
-	}
-	
 	@Override
 	public String toString() {
-		return "<Attribute name='" + name + "'>";
+		return "<Attribute name='" + getName() + "'>";
 	}
 }

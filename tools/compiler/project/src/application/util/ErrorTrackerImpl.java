@@ -6,7 +6,7 @@ package application.util;
  * @author Ahli
  *
  */
-public class ErrorTrackerImpl implements ErrorTracker {
+public final class ErrorTrackerImpl implements ErrorTracker {
 	private boolean encounteredError = false;
 	private Exception exception = null;
 	

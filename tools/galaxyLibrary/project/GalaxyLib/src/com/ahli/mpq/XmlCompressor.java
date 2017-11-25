@@ -27,12 +27,24 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-import org.xml.sax.ErrorHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
-public class XmlCompressor {
-	static Logger LOGGER = LogManager.getLogger(XmlCompressor.class);
+import com.ahli.util.SilentXmlSaxErrorHandler;
+
+/**
+ * 
+ * @author Ahli
+ *
+ */
+public final class XmlCompressor {
+	private static Logger logger = LogManager.getLogger(XmlCompressor.class);
+	
+	/**
+	 * 
+	 */
+	private XmlCompressor() {
+	}
 	
 	/**
 	 * 
@@ -45,8 +57,8 @@ public class XmlCompressor {
 	public static void processCache(final String cachePath, final int ignoreCommentCountPerFile)
 			throws ParserConfigurationException, SAXException, IOException {
 		
-		LOGGER.info("Compressing XML files...");
-		LOGGER.debug("cachePath: " + cachePath);
+		logger.info("Compressing XML files...");
+		logger.trace("cachePath: " + cachePath);
 		
 		final File cache = new File(cachePath);
 		final boolean recursive = true;
@@ -54,52 +66,20 @@ public class XmlCompressor {
 		final Collection<File> filesOfCache = FileUtils.listFiles(cache, null, recursive);
 		
 		final DocumentBuilder dBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-		// provide error handler that does not print incompatible files into
-		// console
-		dBuilder.setErrorHandler(new ErrorHandler() {
-			@Override
-			public void warning(final SAXParseException e) throws SAXException {
-			}
-			
-			@Override
-			public void fatalError(final SAXParseException e) throws SAXException {
-				throw e;
-			}
-			
-			@Override
-			public void error(final SAXParseException e) throws SAXException {
-				throw e;
-			}
-		});
-		
-		InputStream is = null;
+		// provide error handler that does not print incompatible files into console
+		dBuilder.setErrorHandler(new SilentXmlSaxErrorHandler());
 		
 		x: for (final File curFile : filesOfCache) {
 			Document doc = null;
-			try {
-				// parse XML file
+			try (InputStream is = new FileInputStream(curFile)) {
 				
-				// THIS DOES NOT CLOSE THE INPUTSTREAM ON EXCEPTION
-				// CREATING TONS OF FILE ACCESS PROBLEMS. DO NOT USE!
-				// doc = dBuilder.parse(curFile);
-				
-				// WORKAROUND -> provide Inputstream
-				is = new FileInputStream(curFile);
 				doc = dBuilder.parse(is);
 				
 			} catch (SAXParseException | IOException e) {
-				// couldn't parse, most likely no XML file
-				if (is != null) {
-					is.close();
-				}
 				continue x;
-			} finally {
-				if (is != null) {
-					is.close();
-				}
 			}
 			
-			LOGGER.debug("compression - processing file: " + curFile.getPath());
+			logger.trace("compression - processing file: " + curFile.getPath());
 			
 			// process all nodes
 			final NodeList nodes = doc.getElementsByTagName("*");
@@ -118,12 +98,11 @@ public class XmlCompressor {
 			// write DOM back to XML
 			final Source source = new DOMSource(doc);
 			final Result result = new StreamResult(curFile);
-			Transformer xformer;
 			try {
-				xformer = TransformerFactory.newInstance().newTransformer();
+				final Transformer xformer = TransformerFactory.newInstance().newTransformer();
 				xformer.transform(source, result);
 			} catch (TransformerFactoryConfigurationError | TransformerException e) {
-				LOGGER.error("Transforming to generate XML file failed.", e);
+				logger.error("Transforming to generate XML file failed.", e);
 				e.printStackTrace();
 			}
 			
@@ -131,6 +110,11 @@ public class XmlCompressor {
 		
 	}
 	
+	/**
+	 * 
+	 * @param childNodes
+	 * @param ignoreCount
+	 */
 	private static void removeCommentsInChildNodes(final NodeList childNodes, int ignoreCount) {
 		for (int i = 0; i < childNodes.getLength(); i++) {
 			final Node curNode = childNodes.item(i);
@@ -156,6 +140,10 @@ public class XmlCompressor {
 		}
 	}
 	
+	/**
+	 * 
+	 * @param node
+	 */
 	public static void trimWhitespace(final Node node) {
 		final NodeList childNodes = node.getChildNodes();
 		for (int i = 0; i < childNodes.getLength(); i++) {

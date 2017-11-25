@@ -24,7 +24,7 @@ import org.apache.logging.log4j.Logger;
  *
  */
 public class ReplayFinder {
-	static Logger LOGGER = LogManager.getLogger(ReplayFinder.class);
+	private static Logger logger = LogManager.getLogger(ReplayFinder.class);
 	
 	/**
 	 * Returns the last used replay file read from the game's Variables.txt.
@@ -44,14 +44,12 @@ public class ReplayFinder {
 			basePath += "StarCraft II";
 		}
 		basePath += File.separator + "Variables.txt";
-		LOGGER.debug(basePath);
+		logger.trace(basePath);
 		
-		BufferedReader br = null;
 		String line, replayPath = null;
-		try {
-			final InputStreamReader is = new InputStreamReader(new FileInputStream(new File(basePath)),
-					StandardCharsets.UTF_8);
-			br = new BufferedReader(is);
+		try (final InputStreamReader is = new InputStreamReader(new FileInputStream(new File(basePath)),
+				StandardCharsets.UTF_8); BufferedReader br = new BufferedReader(is);) {
+			
 			boolean found = false;
 			final String searchToken = "lastReplayFilePath=";
 			while ((line = br.readLine()) != null && !found) {
@@ -60,12 +58,8 @@ public class ReplayFinder {
 					replayPath = line.substring(searchToken.length());
 				}
 			}
-		} finally {
-			if (br != null) {
-				br.close();
-			}
 		}
-		LOGGER.debug("replayPath: " + replayPath);
+		logger.trace("replayPath: " + replayPath);
 		if (replayPath == null) {
 			return null;
 		}
@@ -91,25 +85,25 @@ public class ReplayFinder {
 			extensions = new String[] { "SC2Replay" };
 		}
 		basePath += File.separator + "Accounts";
-		LOGGER.debug(basePath);
+		logger.trace(basePath);
 		
 		final Collection<File> allReplays = FileUtils.listFiles(new File(basePath), TrueFileFilter.INSTANCE,
 				TrueFileFilter.INSTANCE);
 		
-		LOGGER.debug("# Replays found: " + allReplays.size());
+		logger.trace("# Replays found: " + allReplays.size());
 		
 		long newestDate = Long.MIN_VALUE;
 		File newestReplay = null;
 		for (final File curReplay : allReplays) {
 			// check extension of file
 			final String curReplayName = curReplay.getName();
-			LOGGER.debug("curReplay name: " + curReplayName);
+			logger.trace("curReplay name: " + curReplayName);
 			final String extension = FilenameUtils.getExtension(curReplayName);
-			LOGGER.debug("extension: " + extension);
+			logger.trace("extension: " + extension);
 			if (curReplay.isFile() && extension.equalsIgnoreCase(extensions[0])) {
 				// check date
 				final long curDate = curReplay.lastModified();
-				LOGGER.debug("curDate: " + curDate);
+				logger.trace("curDate: " + curDate);
 				if (curDate > newestDate) {
 					newestDate = curDate;
 					newestReplay = curReplay;
@@ -117,7 +111,7 @@ public class ReplayFinder {
 			}
 		}
 		if (newestReplay != null) {
-			LOGGER.info("newest Replay: " + newestReplay.getName());
+			logger.info("newest Replay: " + newestReplay.getName());
 		}
 		return newestReplay;
 	}
@@ -131,15 +125,15 @@ public class ReplayFinder {
 	 *            the documents path
 	 * @return the last or newest replay
 	 */
-	public File getLastOrNewestReplay(final boolean isHeroes, final String documentsPath) {
+	public File getLastUsedOrNewestReplay(final boolean isHeroes, final String documentsPath) {
 		File replay = null;
 		try {
 			replay = getLastUsedReplay(isHeroes, documentsPath);
 		} catch (final IOException e) {
-			LOGGER.error("Failed to receive last used replay.", e);
+			logger.error("Failed to receive last used replay.", e);
 		}
 		if (replay == null || !replay.exists() || !replay.isFile()) {
-			LOGGER.debug("Last used replay is invalid, getting newest replay instead.");
+			logger.trace("Last used replay is invalid, getting newest replay instead.");
 			replay = getNewestReplay(isHeroes, documentsPath);
 		}
 		return replay;

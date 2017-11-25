@@ -21,6 +21,19 @@ public class UIStateGroup extends UIElement {
 	}
 	
 	/**
+	 * Returns a deep clone of this.
+	 */
+	@Override
+	public Object clone() {
+		final UIStateGroup clone = new UIStateGroup(getName());
+		for (int i = 0; i < states.size(); i++) {
+			clone.states.add((UIState) states.get(i).clone());
+		}
+		clone.defaultState = defaultState;
+		return clone;
+	}
+	
+	/**
 	 * @return the defaultState
 	 */
 	public String getDefaultState() {
@@ -74,24 +87,8 @@ public class UIStateGroup extends UIElement {
 		}
 	}
 	
-	/**
-	 * 
-	 */
-	@Override
-	public Object deepClone() {
-		final UIStateGroup clone = new UIStateGroup(name);
-		clone.setDefaultState(defaultState);
-		
-		// clone states
-		for (final UIState state : states) {
-			clone.getStates().add((UIState) state.deepClone());
-		}
-		
-		return clone;
-	}
-	
 	@Override
 	public String toString() {
-		return "<StateGroup name='" + name + "'>";
+		return "<StateGroup name='" + getName() + "'>";
 	}
 }
