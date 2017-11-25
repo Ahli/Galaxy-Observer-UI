@@ -154,7 +154,15 @@ public final class Main extends Application {
 		// durations/thread# for my 4cpu/8threads: 18, 14, 12, 15, 15, 17, 16, 19, .,14
 		// test new:
 		// durations/thread# for my 4cpu/8threads: 15, 12, 15, 15, 15, 15, 14, 14, .,14
-		final int maxThreads = Math.max(1, Math.min(numberOfProcessors, 2));
+		// after frame attribute cloning fix:
+		// durations/thread# for my 4cpu/8threads: 16, 13, 16, 16
+		// after memory optimizations:
+		// durations/thread# for my 4cpu/8threads: 13, 11, 11, 10, 10, 10, 10, 10
+		
+		// test with proper compression of mpqeditor
+		// durations/thread# for my 4cpu/8threads: 16, 13, 12, 12, 12,... 12
+		
+		final int maxThreads = Math.max(1, Math.min(numberOfProcessors, 3));
 		executor = new ThreadPoolExecutor(maxThreads, maxThreads, 5000, TimeUnit.MILLISECONDS,
 				new LinkedBlockingQueue<Runnable>(), runnable -> {
 					final Thread t = new Thread(runnable);

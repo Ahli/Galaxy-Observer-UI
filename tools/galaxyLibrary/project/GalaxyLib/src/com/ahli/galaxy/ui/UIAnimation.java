@@ -1,10 +1,9 @@
 package com.ahli.galaxy.ui;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
+
+import com.ahli.util.Pair;
 
 /**
  * 
@@ -17,8 +16,9 @@ public class UIAnimation extends UIElement {
 	 */
 	private static final long serialVersionUID = 7493401910318905210L;
 	
-	private List<UIController> controllers = new ArrayList<>();
-	private Map<String, UIAttribute> events = new HashMap<>();
+	private List<UIController> controllers = null;
+	// private Map<String, UIAttribute> events = new HashMap<>();
+	private ArrayList<Pair<String, UIAttribute>> events = null;
 	private boolean nextEventsAdditionShouldOverride = false;
 	private UIAttribute driver = null;
 	
@@ -28,6 +28,21 @@ public class UIAnimation extends UIElement {
 	 */
 	public UIAnimation(final String name) {
 		super(name);
+		events = new ArrayList<>(2);
+		controllers = new ArrayList<>(1);
+	}
+	
+	/**
+	 * Constructor.
+	 * 
+	 * @param name
+	 *            Element's name
+	 */
+	public UIAnimation(final String name, final int minEventsCapacity, final int minControllerCapacity) {
+		super(name);
+		// values = new HashMap<>(minAttributeCapacity, 1);
+		events = new ArrayList<>(minEventsCapacity);
+		controllers = new ArrayList<>(minControllerCapacity);
 	}
 	
 	/**
@@ -35,15 +50,20 @@ public class UIAnimation extends UIElement {
 	 */
 	@Override
 	public Object clone() {
-		final UIAnimation clone = new UIAnimation(getName());
+		final UIAnimation clone = new UIAnimation(getName(), events.size(), controllers.size());
 		for (int i = 0; i < controllers.size(); i++) {
 			clone.controllers.add((UIController) controllers.get(i).clone());
 		}
-		final Object[] entries = events.entrySet().toArray();
-		for (int fix = 0, i = fix; i < entries.length; i++) {
-			@SuppressWarnings("unchecked")
-			final Entry<String, UIAttribute> entry = (Entry<String, UIAttribute>) entries[i];
-			clone.events.put(entry.getKey(), (UIAttribute) entry.getValue().clone());
+		// final Object[] entries = events.entrySet().toArray();
+		// for (int fix = 0, i = fix; i < entries.length; i++) {
+		// @SuppressWarnings("unchecked")
+		// final Entry<String, UIAttribute> entry = (Entry<String, UIAttribute>)
+		// entries[i];
+		// clone.events.put(entry.getKey(), (UIAttribute) entry.getValue().clone());
+		// }
+		for (int i = 0; i < events.size(); i++) {
+			final Pair<String, UIAttribute> p = events.get(i);
+			clone.events.add(new Pair<>(p.getKey(), (UIAttribute) p.getValue().clone()));
 		}
 		clone.nextEventsAdditionShouldOverride = nextEventsAdditionShouldOverride;
 		if (driver != null) {
@@ -67,10 +87,25 @@ public class UIAnimation extends UIElement {
 		this.controllers = controllers;
 	}
 	
+	// /**
+	// * @return the events
+	// */
+	// public Map<String, UIAttribute> getEvents() {
+	// return events;
+	// }
+	//
+	// /**
+	// * @param events
+	// * the events to set
+	// */
+	// public void setEvents(final Map<String, UIAttribute> events) {
+	// this.events = events;
+	// }
+	
 	/**
 	 * @return the events
 	 */
-	public Map<String, UIAttribute> getEvents() {
+	public ArrayList<Pair<String, UIAttribute>> getEvents() {
 		return events;
 	}
 	
@@ -78,8 +113,41 @@ public class UIAnimation extends UIElement {
 	 * @param events
 	 *            the events to set
 	 */
-	public void setEvents(final Map<String, UIAttribute> events) {
+	public void setEvents(final ArrayList<Pair<String, UIAttribute>> events) {
 		this.events = events;
+	}
+	
+	/**
+	 * 
+	 * @param key
+	 * @param value
+	 */
+	public UIAttribute addEvent(final String key, final UIAttribute value) {
+		final Pair<String, UIAttribute> newPair = new Pair<>(key, value);
+		final int i = events.indexOf(newPair);
+		if (i == -1) {
+			events.add(newPair);
+			return null;
+		} else {
+			return events.set(i, newPair).getValue();
+		}
+	}
+	
+	/**
+	 * 
+	 * @param key
+	 * @return
+	 */
+	public UIAttribute getValue(final String key) {
+		int i;
+		Pair<String, UIAttribute> p = null;
+		for (i = 0; i < events.size(); i++) {
+			p = events.get(i);
+			if (p.getKey().equals(key)) {
+				return p.getValue();
+			}
+		}
+		return null;
 	}
 	
 	/**

@@ -1,10 +1,9 @@
 package com.ahli.galaxy.ui;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
+
+import com.ahli.util.Pair;
 
 /**
  * 
@@ -17,8 +16,9 @@ public class UIController extends UIElement {
 	 */
 	private static final long serialVersionUID = -5133613746543071378L;
 	
-	private List<UIAttribute> keys = new ArrayList<>();
-	private Map<String, String> values = new HashMap<>();
+	private List<UIAttribute> keys = null;
+	// private Map<String, String> values = null;
+	private ArrayList<Pair<String, String>> values = null;
 	private boolean nextAdditionShouldOverride = false;
 	private boolean nameIsImplicit = true;
 	
@@ -28,6 +28,20 @@ public class UIController extends UIElement {
 	 */
 	public UIController(final String name) {
 		super(name);
+		// values = new HashMap<>(1, 1f);
+		values = new ArrayList<>();
+		keys = new ArrayList<>();
+	}
+	
+	/**
+	 * 
+	 * @param name
+	 */
+	public UIController(final String name, final int initialValuesMaxCapacity, final int initialKeysMaxCapacity) {
+		super(name);
+		// values = new HashMap<>(initialValuesMaxCapacity, 1f);
+		values = new ArrayList<>(initialValuesMaxCapacity);
+		keys = new ArrayList<>(initialKeysMaxCapacity);
 	}
 	
 	/**
@@ -35,15 +49,20 @@ public class UIController extends UIElement {
 	 */
 	@Override
 	public Object clone() {
-		final UIController clone = new UIController(getName());
+		final UIController clone = new UIController(getName(), values.size(), keys.size());
 		for (int i = 0; i < keys.size(); i++) {
 			clone.keys.add((UIAttribute) keys.get(i).clone());
 		}
-		final Object[] entries = values.entrySet().toArray();
-		for (int fix = 0, i = fix; i < entries.length; i++) {
-			@SuppressWarnings("unchecked")
-			final Entry<String, String> entry = (Entry<String, String>) entries[i];
-			clone.values.put(entry.getKey(), entry.getValue());
+		// final Object[] entries = values.entrySet().toArray();
+		// final Map<String, String> clonedMap = clone.values;
+		// for (int fix = 0, i = fix; i < entries.length; i++) {
+		// @SuppressWarnings("unchecked")
+		// final Entry<String, String> entry = (Entry<String, String>) entries[i];
+		// clonedMap.put(entry.getKey(), entry.getValue());
+		// }
+		for (int i = 0; i < values.size(); i++) {
+			final Pair<String, String> p = values.get(i);
+			clone.values.add(new Pair<>(p.getKey(), p.getValue()));
 		}
 		clone.nextAdditionShouldOverride = nextAdditionShouldOverride;
 		clone.nameIsImplicit = nameIsImplicit;
@@ -80,10 +99,25 @@ public class UIController extends UIElement {
 		this.nextAdditionShouldOverride = nextAdditionShouldOverride;
 	}
 	
+	// /**
+	// * @return the values
+	// */
+	// public Map<String, String> getValues() {
+	// return values;
+	// }
+	//
+	// /**
+	// * @param values
+	// * the values to set
+	// */
+	// public void setValues(final Map<String, String> values) {
+	// this.values = values;
+	// }
+	
 	/**
 	 * @return the values
 	 */
-	public Map<String, String> getValues() {
+	public ArrayList<Pair<String, String>> getValues() {
 		return values;
 	}
 	
@@ -91,8 +125,41 @@ public class UIController extends UIElement {
 	 * @param values
 	 *            the values to set
 	 */
-	public void setValues(final Map<String, String> values) {
+	public void setValues(final ArrayList<Pair<String, String>> values) {
 		this.values = values;
+	}
+	
+	/**
+	 * 
+	 * @param key
+	 * @param value
+	 */
+	public String addValue(final String key, final String value) {
+		final Pair<String, String> newPair = new Pair<>(key, value);
+		final int i = values.indexOf(newPair);
+		if (i == -1) {
+			values.add(newPair);
+			return null;
+		} else {
+			return values.set(i, newPair).getValue();
+		}
+	}
+	
+	/**
+	 * 
+	 * @param key
+	 * @return
+	 */
+	public String getValue(final String key) {
+		int i;
+		Pair<String, String> p = null;
+		for (i = 0; i < values.size(); i++) {
+			p = values.get(i);
+			if (p.getKey().equals(key)) {
+				return p.getValue();
+			}
+		}
+		return null;
 	}
 	
 	/**

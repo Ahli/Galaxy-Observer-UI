@@ -15,7 +15,7 @@ public class UIStateGroup extends UIElement {
 	private static final long serialVersionUID = 6020966617264020882L;
 	
 	private String defaultState = "";
-	private ArrayList<UIState> states = new ArrayList<>();
+	private ArrayList<UIState> states = null;
 	
 	/**
 	 * 
@@ -23,6 +23,16 @@ public class UIStateGroup extends UIElement {
 	 */
 	public UIStateGroup(final String name) {
 		super(name);
+		states = new ArrayList<>();
+	}
+	
+	/**
+	 * 
+	 * @param name
+	 */
+	public UIStateGroup(final String name, final int initialStatesMaxCapacity) {
+		super(name);
+		states = new ArrayList<>(initialStatesMaxCapacity);
 	}
 	
 	/**
@@ -30,7 +40,7 @@ public class UIStateGroup extends UIElement {
 	 */
 	@Override
 	public Object clone() {
-		final UIStateGroup clone = new UIStateGroup(getName());
+		final UIStateGroup clone = new UIStateGroup(getName(), states.size());
 		for (int i = 0; i < states.size(); i++) {
 			clone.states.add((UIState) states.get(i).clone());
 		}

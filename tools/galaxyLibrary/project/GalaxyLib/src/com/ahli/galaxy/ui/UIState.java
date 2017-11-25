@@ -14,8 +14,8 @@ public class UIState extends UIElement {
 	 */
 	private static final long serialVersionUID = -2094212167992593460L;
 	
-	private List<UIAttribute> whens = new ArrayList<>();
-	private List<UIAttribute> actions = new ArrayList<>();
+	private List<UIAttribute> whens = null;
+	private List<UIAttribute> actions = null;
 	private boolean nextAdditionShouldOverrideWhens = false;
 	private boolean nextAdditionShouldOverrideActions = false;
 	
@@ -25,6 +25,20 @@ public class UIState extends UIElement {
 	 */
 	public UIState(final String name) {
 		super(name);
+		whens = new ArrayList<>();
+		actions = new ArrayList<>();
+	}
+	
+	/**
+	 * 
+	 * @param name
+	 * @param initialWhensCapacity
+	 * @param initialActionsCapacity
+	 */
+	public UIState(final String name, final int initialWhensCapacity, final int initialActionsCapacity) {
+		super(name);
+		whens = new ArrayList<>(initialWhensCapacity);
+		actions = new ArrayList<>(initialActionsCapacity);
 	}
 	
 	/**
@@ -32,17 +46,15 @@ public class UIState extends UIElement {
 	 */
 	@Override
 	public Object clone() {
-		final UIState clone = new UIState(getName());
-		final ArrayList<UIAttribute> whensClone = new ArrayList<>();
+		final UIState clone = new UIState(getName(), whens.size(), actions.size());
+		final List<UIAttribute> whensClone = clone.whens;
 		for (int i = 0; i < whens.size(); i++) {
 			whensClone.add((UIAttribute) whens.get(i).clone());
 		}
-		clone.setWhens(whensClone);
-		final ArrayList<UIAttribute> actionsClone = new ArrayList<>();
+		final List<UIAttribute> actionsClone = clone.actions;
 		for (int i = 0; i < actions.size(); i++) {
 			actionsClone.add((UIAttribute) actions.get(i).clone());
 		}
-		clone.actions = actionsClone;
 		clone.nextAdditionShouldOverrideActions = nextAdditionShouldOverrideActions;
 		clone.nextAdditionShouldOverrideWhens = nextAdditionShouldOverrideWhens;
 		return clone;

@@ -38,7 +38,7 @@ public class UITemplate implements Cloneable, Serializable {
 	@Override
 	public Object clone() {
 		final UITemplate clone = new UITemplate(fileName, (UIElement) element.clone());
-		clone.setLocked(isLocked);
+		clone.isLocked = isLocked;
 		return clone;
 	}
 	

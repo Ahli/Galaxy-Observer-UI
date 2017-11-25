@@ -40,21 +40,47 @@ public class UICatalog implements Cloneable, Serializable {
 	private static final Logger LOGGER = LogManager.getLogger(UICatalog.class);
 	
 	// members
-	private ArrayList<UITemplate> templates = new ArrayList<>();
-	private ArrayList<UITemplate> blizzOnlyTemplates = new ArrayList<>();
-	private ArrayList<UIConstant> constants = new ArrayList<>();
-	private ArrayList<UIConstant> blizzOnlyConstants = new ArrayList<>();
-	private ArrayList<String> blizzOnlyLayouts = new ArrayList<>();
+	private ArrayList<UITemplate> templates = null;
+	private ArrayList<UITemplate> blizzOnlyTemplates = null;
+	private ArrayList<UIConstant> constants = null;
+	private ArrayList<UIConstant> blizzOnlyConstants = null;
+	private ArrayList<String> blizzOnlyLayouts = null;
 	
 	// internal, used during processing
 	private String curBasePath = "";
+	
+	/**
+	 * Constructor.
+	 */
+	public UICatalog() {
+		templates = new ArrayList<>(2500);
+		blizzOnlyTemplates = new ArrayList<>(10);
+		constants = new ArrayList<>(800);
+		blizzOnlyConstants = new ArrayList<>(1);
+		blizzOnlyLayouts = new ArrayList<>(25);
+	}
+	
+	/**
+	 * Constructor.
+	 */
+	public UICatalog(final int templatesCapacity, final int blizzOnlyTemplatesCapacity, final int constantsCapacity,
+			final int blizzOnlyConstantsCapacity, final int blizzOnlyLayoutsCapacity) {
+		templates = new ArrayList<>(templatesCapacity);
+		blizzOnlyTemplates = new ArrayList<>(blizzOnlyTemplatesCapacity);
+		constants = new ArrayList<>(constantsCapacity);
+		blizzOnlyConstants = new ArrayList<>(blizzOnlyConstantsCapacity);
+		blizzOnlyLayouts = new ArrayList<>(blizzOnlyLayoutsCapacity);
+	}
 	
 	/**
 	 * Returns a deep clone of this.
 	 */
 	@Override
 	public Object clone() {
-		final UICatalog clone = new UICatalog();
+		// clone with additional space for templates and constants, but perfect fits for
+		// blizzOnly
+		final UICatalog clone = new UICatalog(templates.size() * 3 / 2 + 1, blizzOnlyTemplates.size(),
+				constants.size() * 3 / 2 + 1, blizzOnlyConstants.size(), blizzOnlyLayouts.size());
 		// 1041ms for AhliObs -> 12s execution time
 		// testing shows that iterators are not faster and are not thread safe
 		for (int i = 0; i < templates.size(); i++) {
@@ -104,6 +130,9 @@ public class UICatalog implements Cloneable, Serializable {
 		LOGGER.trace("basePath=" + basePath);
 		
 		processLayouts(combinedList, basePath, raceId);
+		
+		LOGGER.info("UICatalogSizes: " + templates.size() + " " + blizzOnlyTemplates.size() + " " + constants.size()
+				+ " " + blizzOnlyConstants.size() + " " + blizzOnlyLayouts.size());
 	}
 	
 	/**
@@ -417,7 +446,8 @@ public class UICatalog implements Cloneable, Serializable {
 				final String attrKey = curAttribute.getNodeName();
 				final String attrVal = getConstantValue(curAttribute.getNodeValue(), raceId, isDevLayout);
 				LOGGER.trace("key,value = '" + attrKey + "', '" + attrVal + "'");
-				final String overriddenVal = thisElem.getValues().put(attrKey, attrVal);
+				// final String overriddenVal = thisElem.getValues().put(attrKey, attrVal);
+				final String overriddenVal = thisElem.addValue(attrKey, attrVal);
 				if (overriddenVal != null) {
 					LOGGER.trace("overridden value = " + overriddenVal);
 				}
@@ -577,7 +607,7 @@ public class UICatalog implements Cloneable, Serializable {
 			final String attrKey = curAttribute.getNodeName();
 			final String attrVal = getConstantValue(curAttribute.getNodeValue(), raceId, isDevLayout);
 			LOGGER.trace("key,value = '" + attrKey + "', '" + attrVal + "'");
-			final String overriddenVal = thisElem.getValues().put(attrKey, attrVal);
+			final String overriddenVal = thisElem.addValue(attrKey, attrVal);
 			if (overriddenVal != null) {
 				LOGGER.trace("overridden value = " + overriddenVal);
 			}
@@ -586,6 +616,7 @@ public class UICatalog implements Cloneable, Serializable {
 		// register with frame/animation/stategroup/state/controller
 		if (parent instanceof UIFrame) {
 			final UIFrame p = (UIFrame) parent;
+			// p.addAttribute(id, thisElem);
 			p.getAttributes().put(id, thisElem);
 		} else if (parent instanceof UIAnimation) {
 			if (id.equalsIgnoreCase("event")) {
@@ -595,7 +626,7 @@ public class UICatalog implements Cloneable, Serializable {
 					p.getEvents().clear();
 					p.setNextEventsAdditionShouldOverride(false);
 				}
-				p.getEvents().put(id, thisElem);
+				p.addEvent(id, thisElem);
 			} else if (id.equalsIgnoreCase("driver")) {
 				final UIAnimation p = (UIAnimation) parent;
 				p.setDriver(thisElem);
@@ -608,7 +639,7 @@ public class UICatalog implements Cloneable, Serializable {
 						"Parent element (Animation) expects 'DefaultState' attribute instead of '" + id + "'");
 			}
 			final UIStateGroup p = (UIStateGroup) parent;
-			final String val = thisElem.getValues().get("val");
+			final String val = thisElem.getValue("val");
 			if (val != null) {
 				p.setDefaultState(val);
 			} else {
@@ -803,7 +834,8 @@ public class UICatalog implements Cloneable, Serializable {
 		final List<UIController> controllers = thisElem.getControllers();
 		for (final UIController contr : controllers) {
 			if (contr.getName() == null) {
-				final String type = contr.getValues().get("type");
+				// final String type = contr.getValues().get("type");
+				final String type = contr.getValue("type");
 				LOGGER.trace("type = " + type);
 				contr.setName(getImplicitName(type, controllers));
 				contr.setNameIsImplicit(true);

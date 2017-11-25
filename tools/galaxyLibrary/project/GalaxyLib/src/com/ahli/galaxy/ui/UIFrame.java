@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -22,8 +23,9 @@ public class UIFrame extends UIElement {
 	private static final Logger LOGGER = LogManager.getLogger(UIFrame.class);
 	
 	private String type = "";
-	private List<UIElement> children = new ArrayList<>();
-	private Map<String, UIAttribute> attributes = new HashMap<>();
+	private List<UIElement> children = null;
+	private Map<String, UIAttribute> attributes = null;
+	// private ArrayList<Pair<String, UIAttribute>> attributes = null;
 	private final String[] pos = new String[4];
 	private final String[] offset = new String[4];
 	private final String[] relative = new String[4];
@@ -36,6 +38,31 @@ public class UIFrame extends UIElement {
 	public UIFrame(final String name, final String type) {
 		super(name);
 		this.type = type;
+		init();
+		attributes = new HashMap<>(1, 1f);
+		// attributes = new ArrayList<>();
+		children = new ArrayList<>();
+	}
+	
+	/**
+	 * 
+	 * @param name
+	 * @param type
+	 */
+	public UIFrame(final String name, final String type, final int initialAttributesCapacity,
+			final int initialChildrenCapacity) {
+		super(name);
+		this.type = type;
+		init();
+		attributes = new HashMap<>(initialAttributesCapacity, 1f);
+		// attributes = new ArrayList<>(initialAttributesCapacity);
+		children = new ArrayList<>(initialChildrenCapacity);
+	}
+	
+	/**
+	 * Initializes variables
+	 */
+	private void init() {
 		relative[0] = "$this";
 		pos[0] = "Min";
 		offset[0] = "0";
@@ -55,12 +82,23 @@ public class UIFrame extends UIElement {
 	 */
 	@Override
 	public Object clone() {
-		final UIFrame clone = new UIFrame(getName(), type);
-		final ArrayList<UIElement> childrenClone = new ArrayList<>();
+		final UIFrame clone = new UIFrame(getName(), type, attributes.size(), children.size());
+		final List<UIElement> childrenClone = clone.children;
 		for (int i = 0; i < children.size(); i++) {
 			childrenClone.add((UIElement) children.get(i).clone());
 		}
-		clone.children = childrenClone;
+		final Map<String, UIAttribute> clonedMap = clone.attributes;
+		final Object[] entries = attributes.entrySet().toArray();
+		for (int fix = 0, i = fix; i < entries.length; i++) {
+			@SuppressWarnings("unchecked")
+			final Entry<String, UIAttribute> entry = (Entry<String, UIAttribute>) entries[i];
+			clonedMap.put(entry.getKey(), entry.getValue());
+		}
+		// for (int i = 0; i < attributes.size(); i++) {
+		// final Pair<String, UIAttribute> p = attributes.get(i);
+		// clone.attributes.add(new Pair<>(p.getKey(), (UIAttribute)
+		// p.getValue().clone()));
+		// }
 		for (int i = 0; i <= 3; i++) {
 			clone.relative[i] = relative[i];
 			clone.offset[i] = offset[i];
@@ -114,6 +152,55 @@ public class UIFrame extends UIElement {
 	public void setAttributes(final Map<String, UIAttribute> attributes) {
 		this.attributes = attributes;
 	}
+	
+	// /**
+	// * @return the attributes
+	// */
+	// public ArrayList<Pair<String, UIAttribute>> getAttributes() {
+	// return attributes;
+	// }
+	//
+	// /**
+	// * @param attributes
+	// * the attributes to set
+	// */
+	// public void setAttributes(final ArrayList<Pair<String, UIAttribute>>
+	// attributes) {
+	// this.attributes = attributes;
+	// }
+	//
+	// /**
+	// *
+	// * @param key
+	// * @param value
+	// */
+	// public UIAttribute addAttribute(final String key, final UIAttribute value) {
+	// final Pair<String, UIAttribute> newPair = new Pair<>(key, value);
+	// final int i = attributes.indexOf(newPair);
+	// if (i == -1) {
+	// attributes.add(newPair);
+	// return null;
+	// } else {
+	// return attributes.set(i, newPair).getValue();
+	// }
+	// }
+	//
+	// /**
+	// *
+	// * @param key
+	// * @return
+	// */
+	// public UIAttribute getValue(final String key) {
+	// int i;
+	// Pair<String, UIAttribute> p = null;
+	// for (i = 0; i < attributes.size(); i++) {
+	// p = attributes.get(0);
+	// if (p.getKey().equals(key)) {
+	// return p.getValue();
+	// }
+	// }
+	// return null;
+	// }
 	
 	/**
 	 * 
