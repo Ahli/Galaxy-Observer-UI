@@ -11,14 +11,14 @@ import org.apache.logging.log4j.Logger;
 import org.xml.sax.SAXException;
 
 import com.ahli.mpq.i18n.Messages;
+import com.ahli.util.DeepCopyable;
 
 /**
  * Implements a MpqInterface for Ladislav Zezula's MpqEditor.exe.
  * 
  * @author Ahli
- * 
  */
-public class MpqEditorInterface implements MpqInterface, Cloneable {
+public class MpqEditorInterface implements MpqInterface, DeepCopyable {
 	private static Logger logger = LogManager.getLogger("MpqInterface"); //$NON-NLS-1$
 	
 	private String mpqEditor = "plugins" + File.separator + "mpq" + File.separator + "MPQEditor.exe"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
@@ -67,14 +67,7 @@ public class MpqEditorInterface implements MpqInterface, Cloneable {
 	/**
 	 * Returns a cloned instance of this.
 	 */
-	@Override
-	public Object clone() {
-		try {
-			super.clone();
-		} catch (final CloneNotSupportedException e) {
-			e.printStackTrace();
-			logger.error("error calling super.clone(): " + e.getMessage());
-		}
+	public Object deepCopy() {
 		final MpqEditorInterface clone = new MpqEditorInterface(mpqCachePath);
 		clone.setMpqEditorPath(mpqEditor);
 		return clone;
@@ -241,7 +234,6 @@ public class MpqEditorInterface implements MpqInterface, Cloneable {
 	}
 	
 	/**
-	 * 
 	 * @param mpqSourcePath
 	 * @throws InterruptedException
 	 * @throws IOException
@@ -306,7 +298,6 @@ public class MpqEditorInterface implements MpqInterface, Cloneable {
 	}
 	
 	/**
-	 * 
 	 * @param f
 	 * @return
 	 */
@@ -329,7 +320,6 @@ public class MpqEditorInterface implements MpqInterface, Cloneable {
 	}
 	
 	/**
-	 * 
 	 * @param mpqPath
 	 * @param maxFileCount
 	 * @throws InterruptedException
@@ -359,7 +349,6 @@ public class MpqEditorInterface implements MpqInterface, Cloneable {
 	}
 	
 	/**
-	 * 
 	 * @param mpqPath
 	 * @param sourceFilePath
 	 * @param targetName
@@ -382,7 +371,6 @@ public class MpqEditorInterface implements MpqInterface, Cloneable {
 	}
 	
 	/**
-	 * 
 	 * @param mpqPath
 	 * @param fileName
 	 * @param targetPath
@@ -415,7 +403,6 @@ public class MpqEditorInterface implements MpqInterface, Cloneable {
 	}
 	
 	/**
-	 * 
 	 * @param mpqPath
 	 * @throws InterruptedException
 	 * @throws IOException
@@ -434,7 +421,6 @@ public class MpqEditorInterface implements MpqInterface, Cloneable {
 	}
 	
 	/**
-	 * 
 	 * @param mpqPath
 	 * @param scriptPath
 	 * @throws InterruptedException
@@ -454,7 +440,6 @@ public class MpqEditorInterface implements MpqInterface, Cloneable {
 	}
 	
 	/**
-	 * 
 	 * @param mpqPath
 	 * @param filePath
 	 * @throws InterruptedException
@@ -474,7 +459,6 @@ public class MpqEditorInterface implements MpqInterface, Cloneable {
 	}
 	
 	/**
-	 * 
 	 * @param mpqPath
 	 * @param oldfilePath
 	 * @param newFilePath

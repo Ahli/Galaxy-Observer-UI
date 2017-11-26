@@ -47,7 +47,7 @@ public class UIAttribute extends UIElement {
 	 * Returns a deep clone of this.
 	 */
 	@Override
-	public Object clone() {
+	public Object deepCopy() {
 		final UIAttribute clone = new UIAttribute(getName(), values.size());
 		// final Map<String, String> clonedMap = clone.getValues();
 		// final Object[] entries = values.entrySet().toArray();

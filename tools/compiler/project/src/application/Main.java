@@ -658,7 +658,8 @@ public final class Main extends Application {
 				@Override
 				public void run() {
 					// create unique cache path
-					final MpqEditorInterface threadsMpqInterface = (MpqEditorInterface) getBaseMpqInterface().clone();
+					final MpqEditorInterface threadsMpqInterface = (MpqEditorInterface) getBaseMpqInterface()
+							.deepCopy();
 					final long threadId = Thread.currentThread().getId();
 					threadsMpqInterface.setMpqCachePath(getBaseMpqInterface().getMpqCachePath() + threadId);
 					

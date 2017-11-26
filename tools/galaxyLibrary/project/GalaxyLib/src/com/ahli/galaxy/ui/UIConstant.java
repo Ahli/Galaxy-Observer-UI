@@ -22,7 +22,7 @@ public class UIConstant extends UIElement {
 	 * Returns a deep clone of this.
 	 */
 	@Override
-	public Object clone() {
+	public Object deepCopy() {
 		final UIConstant clone = new UIConstant(getName());
 		return clone;
 	}

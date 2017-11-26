@@ -2,10 +2,12 @@ package com.ahli.galaxy.ui;
 
 import java.io.Serializable;
 
+import com.ahli.util.DeepCopyable;
+
 /**
  * @author Ahli
  */
-public abstract class UIElement implements Cloneable, Serializable {
+public abstract class UIElement implements Serializable, DeepCopyable {
 	/**
 	 * 
 	 */
@@ -22,12 +24,6 @@ public abstract class UIElement implements Cloneable, Serializable {
 	public UIElement(final String name) {
 		this.name = name;
 	}
-	
-	/**
-	 * Returns a deep clone of this.
-	 */
-	@Override
-	public abstract Object clone();
 	
 	/**
 	 * @return the name

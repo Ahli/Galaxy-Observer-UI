@@ -5,10 +5,12 @@ import java.io.Serializable;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import com.ahli.util.DeepCopyable;
+
 /**
  * @author Ahli
  */
-public class UITemplate implements Cloneable, Serializable {
+public class UITemplate implements Serializable, DeepCopyable {
 	/**
 	 * 
 	 */
@@ -33,8 +35,8 @@ public class UITemplate implements Cloneable, Serializable {
 	 * Returns a deep clone of this.
 	 */
 	@Override
-	public Object clone() {
-		final UITemplate clone = new UITemplate(fileName, (UIElement) element.clone());
+	public Object deepCopy() {
+		final UITemplate clone = new UITemplate(fileName, (UIElement) element.deepCopy());
 		clone.isLocked = isLocked;
 		return clone;
 	}

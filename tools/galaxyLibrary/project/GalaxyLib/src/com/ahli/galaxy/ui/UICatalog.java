@@ -24,6 +24,7 @@ import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
 import com.ahli.galaxy.ui.exception.UIException;
+import com.ahli.util.DeepCopyable;
 import com.ahli.util.XmlDomHelper;
 
 /**
@@ -31,7 +32,7 @@ import com.ahli.util.XmlDomHelper;
  * 
  * @author Ahli
  */
-public class UICatalog implements Cloneable, Serializable {
+public class UICatalog implements Serializable, DeepCopyable {
 	/**
 	 * 
 	 */
@@ -76,7 +77,7 @@ public class UICatalog implements Cloneable, Serializable {
 	 * Returns a deep clone of this.
 	 */
 	@Override
-	public Object clone() {
+	public Object deepCopy() {
 		// clone with additional space for templates and constants, but perfect fits for
 		// blizzOnly
 		final UICatalog clone = new UICatalog(templates.size() * 3 / 2 + 1, blizzOnlyTemplates.size(),
@@ -84,16 +85,16 @@ public class UICatalog implements Cloneable, Serializable {
 		// 1041ms for AhliObs -> 12s execution time
 		// testing shows that iterators are not faster and are not thread safe
 		for (int i = 0; i < templates.size(); i++) {
-			clone.templates.add((UITemplate) templates.get(i).clone());
+			clone.templates.add((UITemplate) templates.get(i).deepCopy());
 		}
 		for (int i = 0; i < blizzOnlyTemplates.size(); i++) {
-			clone.blizzOnlyTemplates.add((UITemplate) blizzOnlyTemplates.get(i).clone());
+			clone.blizzOnlyTemplates.add((UITemplate) blizzOnlyTemplates.get(i).deepCopy());
 		}
 		for (int i = 0; i < constants.size(); i++) {
-			clone.constants.add((UIConstant) constants.get(i).clone());
+			clone.constants.add((UIConstant) constants.get(i).deepCopy());
 		}
 		for (int i = 0; i < blizzOnlyConstants.size(); i++) {
-			clone.blizzOnlyConstants.add((UIConstant) blizzOnlyConstants.get(i).clone());
+			clone.blizzOnlyConstants.add((UIConstant) blizzOnlyConstants.get(i).deepCopy());
 		}
 		for (int i = 0; i < blizzOnlyLayouts.size(); i++) {
 			clone.blizzOnlyLayouts.add(blizzOnlyLayouts.get(i));
@@ -842,7 +843,7 @@ public class UICatalog implements Cloneable, Serializable {
 			
 			if (controllers.stream().noneMatch(new Predicate<UIController>() {
 				@Override
-				public boolean test(UIController t) {
+				public boolean test(final UIController t) {
 					return t.getName() != null && t.getName().compareToIgnoreCase(name) == 0;
 				}
 			})) {
@@ -1021,7 +1022,7 @@ public class UICatalog implements Cloneable, Serializable {
 					// not the correct template
 					continue;
 				}
-				final UIElement clone = (UIElement) frameFromPath.clone();
+				final UIElement clone = (UIElement) frameFromPath.deepCopy();
 				clone.setName(newName);
 				return clone;
 			}

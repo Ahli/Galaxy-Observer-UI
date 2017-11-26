@@ -6,7 +6,6 @@ import java.io.File;
  * Interface for the interaction of MPQ files.
  * 
  * @author Ahli
- *
  */
 public interface MpqInterface {
 	
@@ -19,7 +18,6 @@ public interface MpqInterface {
 	File getFileFromMpq(String internalPath);
 	
 	/**
-	 * 
 	 * @return
 	 * @throws MpqException
 	 */

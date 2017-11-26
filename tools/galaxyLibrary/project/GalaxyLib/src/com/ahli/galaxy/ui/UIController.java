@@ -44,10 +44,10 @@ public class UIController extends UIElement {
 	 * Returns a deep clone of this.
 	 */
 	@Override
-	public Object clone() {
+	public Object deepCopy() {
 		final UIController clone = new UIController(getName(), values.size(), keys.size());
 		for (int i = 0; i < keys.size(); i++) {
-			clone.keys.add((UIAttribute) keys.get(i).clone());
+			clone.keys.add((UIAttribute) keys.get(i).deepCopy());
 		}
 		// final Object[] entries = values.entrySet().toArray();
 		// final Map<String, String> clonedMap = clone.values;

@@ -46,25 +46,25 @@ public class UIAnimation extends UIElement {
 	 * Returns a deep clone of this.
 	 */
 	@Override
-	public Object clone() {
+	public Object deepCopy() {
 		final UIAnimation clone = new UIAnimation(getName(), events.size(), controllers.size());
 		for (int i = 0; i < controllers.size(); i++) {
-			clone.controllers.add((UIController) controllers.get(i).clone());
+			clone.controllers.add((UIController) controllers.get(i).deepCopy());
 		}
 		// final Object[] entries = events.entrySet().toArray();
 		// for (int fix = 0, i = fix; i < entries.length; i++) {
 		// @SuppressWarnings("unchecked")
 		// final Entry<String, UIAttribute> entry = (Entry<String, UIAttribute>)
 		// entries[i];
-		// clone.events.put(entry.getKey(), (UIAttribute) entry.getValue().clone());
+		// clone.events.put(entry.getKey(), (UIAttribute) entry.getValue().deepCopy());
 		// }
 		for (int i = 0; i < events.size(); i++) {
 			final Pair<String, UIAttribute> p = events.get(i);
-			clone.events.add(new Pair<>(p.getKey(), (UIAttribute) p.getValue().clone()));
+			clone.events.add(new Pair<>(p.getKey(), (UIAttribute) p.getValue().deepCopy()));
 		}
 		clone.nextEventsAdditionShouldOverride = nextEventsAdditionShouldOverride;
 		if (driver != null) {
-			clone.driver = (UIAttribute) driver.clone();
+			clone.driver = (UIAttribute) driver.deepCopy();
 		}
 		return clone;
 	}

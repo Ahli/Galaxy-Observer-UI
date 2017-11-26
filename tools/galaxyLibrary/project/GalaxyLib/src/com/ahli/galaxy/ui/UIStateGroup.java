@@ -35,10 +35,10 @@ public class UIStateGroup extends UIElement {
 	 * Returns a deep clone of this.
 	 */
 	@Override
-	public Object clone() {
+	public Object deepCopy() {
 		final UIStateGroup clone = new UIStateGroup(getName(), states.size());
 		for (int i = 0; i < states.size(); i++) {
-			clone.states.add((UIState) states.get(i).clone());
+			clone.states.add((UIState) states.get(i).deepCopy());
 		}
 		clone.defaultState = defaultState;
 		return clone;

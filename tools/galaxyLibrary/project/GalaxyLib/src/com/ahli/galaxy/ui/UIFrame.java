@@ -77,11 +77,11 @@ public class UIFrame extends UIElement {
 	 * Returns a deep clone of this.
 	 */
 	@Override
-	public Object clone() {
+	public Object deepCopy() {
 		final UIFrame clone = new UIFrame(getName(), type, attributes.size(), children.size());
 		final List<UIElement> childrenClone = clone.children;
 		for (int i = 0; i < children.size(); i++) {
-			childrenClone.add((UIElement) children.get(i).clone());
+			childrenClone.add((UIElement) children.get(i).deepCopy());
 		}
 		final Map<String, UIAttribute> clonedMap = clone.attributes;
 		final Object[] entries = attributes.entrySet().toArray();

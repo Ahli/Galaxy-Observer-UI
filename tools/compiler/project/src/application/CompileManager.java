@@ -108,6 +108,6 @@ public class CompileManager {
 	 * @return clone of mod's CatalogUI
 	 */
 	private UICatalog getClonedUICatalog(final ModData mod) {
-		return (UICatalog) mod.getGameData().getUiCatalog().clone();
+		return (UICatalog) mod.getGameData().getUiCatalog().deepCopy();
 	}
 }
