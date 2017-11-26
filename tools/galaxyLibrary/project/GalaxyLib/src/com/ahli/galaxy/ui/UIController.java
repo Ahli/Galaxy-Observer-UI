@@ -6,9 +6,7 @@ import java.util.List;
 import com.ahli.util.Pair;
 
 /**
- * 
  * @author Ahli
- *
  */
 public class UIController extends UIElement {
 	/**
@@ -23,7 +21,6 @@ public class UIController extends UIElement {
 	private boolean nameIsImplicit = true;
 	
 	/**
-	 * 
 	 * @param name
 	 */
 	public UIController(final String name) {
@@ -34,7 +31,6 @@ public class UIController extends UIElement {
 	}
 	
 	/**
-	 * 
 	 * @param name
 	 */
 	public UIController(final String name, final int initialValuesMaxCapacity, final int initialKeysMaxCapacity) {
@@ -130,7 +126,6 @@ public class UIController extends UIElement {
 	}
 	
 	/**
-	 * 
 	 * @param key
 	 * @param value
 	 */
@@ -146,7 +141,6 @@ public class UIController extends UIElement {
 	}
 	
 	/**
-	 * 
 	 * @param key
 	 * @return
 	 */
@@ -178,7 +172,6 @@ public class UIController extends UIElement {
 	}
 	
 	/**
-	 * 
 	 * @param path
 	 * @return
 	 */

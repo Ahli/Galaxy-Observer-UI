@@ -33,9 +33,7 @@ import org.xml.sax.SAXParseException;
 import com.ahli.util.SilentXmlSaxErrorHandler;
 
 /**
- * 
  * @author Ahli
- *
  */
 public final class XmlCompressor {
 	private static Logger logger = LogManager.getLogger(XmlCompressor.class);
@@ -47,7 +45,6 @@ public final class XmlCompressor {
 	}
 	
 	/**
-	 * 
 	 * @param cachePath
 	 * @param ignoreCommentCountPerFile
 	 * @throws ParserConfigurationException
@@ -83,7 +80,7 @@ public final class XmlCompressor {
 			
 			// process all nodes
 			final NodeList nodes = doc.getElementsByTagName("*");
-			for (int i = 0; i < nodes.getLength(); i++) {
+			for (int i = 0, len = nodes.getLength(); i < len; i++) {
 				final Node curNode = nodes.item(i);
 				
 				// remove whitespace
@@ -111,7 +108,6 @@ public final class XmlCompressor {
 	}
 	
 	/**
-	 * 
 	 * @param childNodes
 	 * @param ignoreCount
 	 */
@@ -141,7 +137,6 @@ public final class XmlCompressor {
 	}
 	
 	/**
-	 * 
 	 * @param node
 	 */
 	public static void trimWhitespace(final Node node) {

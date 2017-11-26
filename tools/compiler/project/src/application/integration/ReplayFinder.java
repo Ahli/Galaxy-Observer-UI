@@ -21,7 +21,6 @@ import org.apache.logging.log4j.Logger;
  * Class that finds replays.
  * 
  * @author Ahli
- *
  */
 public class ReplayFinder {
 	private static Logger logger = LogManager.getLogger(ReplayFinder.class);

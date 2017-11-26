@@ -10,7 +10,6 @@ import com.ahli.galaxy.ui.UICatalog;
  * Class containing the data of a game (Sc2/Heroes/...).
  * 
  * @author Ahli
- *
  */
 public class GameData {
 	
@@ -59,7 +58,6 @@ public class GameData {
 	}
 	
 	/**
-	 * 
 	 * @return
 	 */
 	public Map<Object, Object> getKeyValueStore() {
@@ -67,7 +65,6 @@ public class GameData {
 	}
 	
 	/**
-	 * 
 	 * @param keyValueStore
 	 */
 	public void setKeyValueStore(final Map<Object, Object> keyValueStore) {

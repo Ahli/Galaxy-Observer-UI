@@ -12,6 +12,7 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
@@ -52,6 +53,8 @@ import javafx.animation.PauseTransition;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.Tab;
@@ -65,7 +68,6 @@ import javafx.util.Duration;
  * Interface Compiler and Builder Application.
  * 
  * @author Ahli
- * 
  */
 public final class Main extends Application {
 	
@@ -162,15 +164,18 @@ public final class Main extends Application {
 		// test with proper compression of mpqeditor
 		// durations/thread# for my 4cpu/8threads: 16, 13, 12, 12, 12,... 12
 		
-		final int maxThreads = Math.max(1, Math.min(numberOfProcessors, 3));
+		final int maxThreads = Math.max(1, Math.min(numberOfProcessors / 2, 3));
 		executor = new ThreadPoolExecutor(maxThreads, maxThreads, 5000, TimeUnit.MILLISECONDS,
-				new LinkedBlockingQueue<Runnable>(), runnable -> {
-					final Thread t = new Thread(runnable);
-					t.setDaemon(true);
-					t.setName(t.getName().replaceFirst("Thread", "W"));
-					final String title = t.getName();
-					addThreadLoggerTab(t.getId(), title);
-					return t;
+				new LinkedBlockingQueue<Runnable>(), new ThreadFactory() {
+					@Override
+					public Thread newThread(final Runnable runnable) {
+						final Thread t = new Thread(runnable);
+						t.setDaemon(true);
+						t.setName(t.getName().replaceFirst("Thread", "W"));
+						final String title = t.getName();
+						addThreadLoggerTab(t.getId(), title);
+						return t;
+					}
 				});
 		executor.allowCoreThreadTimeOut(true);
 	}
@@ -202,7 +207,7 @@ public final class Main extends Application {
 			executor.execute(new Runnable() {
 				@Override
 				public void run() {
-					buildGamesInterfaceFiles(gameHeroes, path);
+					buildGamesInterfaceFiles(getGameHeroes(), path);
 				}
 			});
 		}
@@ -211,7 +216,7 @@ public final class Main extends Application {
 			executor.execute(new Runnable() {
 				@Override
 				public void run() {
-					buildGamesInterfaceFiles(gameSC2, path);
+					buildGamesInterfaceFiles(getGameSC2(), path);
 				}
 			});
 		}
@@ -221,6 +226,7 @@ public final class Main extends Application {
 			public void run() {
 				Thread.currentThread().setName("TimeKeeper");
 				try {
+					final ThreadPoolExecutor executor = getExecutor();
 					while (executor.getQueue().size() > 0 || executor.getActiveCount() > 0) {
 						Thread.sleep(50);
 					}
@@ -235,7 +241,7 @@ public final class Main extends Application {
 									- TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(executionTime))));
 				} catch (final InterruptedException e) {
 					logger.error("ERROR: execution time measuring thread was interrupted.");
-					errorTracker.reportErrorEncounter(e);
+					getErrorTracker().reportErrorEncounter(e);
 				}
 			}
 		}.start();
@@ -243,7 +249,6 @@ public final class Main extends Application {
 	}
 	
 	/**
-	 * 
 	 * @param gameHeroes2
 	 * @param path
 	 */
@@ -355,18 +360,23 @@ public final class Main extends Application {
 	private void startReplayOrQuitOrShowError(final Stage primaryStage) {
 		if (!errorTracker.hasEncounteredError()) {
 			// start game, launch replay
-			attemptToRunGameWithReplay(paramRunPath, compileAndRun, paramCompilePath);
+			attemptToRunGameWithReplayThreaded();
 			if (!hasParamCompilePath) {
 				Platform.runLater(new Runnable() {
 					@Override
 					public void run() {
 						// close after 5 seconds, if compiled all and no errors
 						final PauseTransition delay = new PauseTransition(Duration.seconds(5));
-						delay.setOnFinished(event -> primaryStage.close());
+						delay.setOnFinished(new EventHandler<ActionEvent>() {
+							@Override
+							public void handle(final ActionEvent event) {
+								primaryStage.close();
+							}
+						});
 						delay.play();
 					}
 				});
-			} else if (hasParamCompilePath || paramRunPath != null) {
+			} else {
 				// close instantly, if compiled special and no errors
 				Platform.runLater(new Runnable() {
 					
@@ -390,80 +400,79 @@ public final class Main extends Application {
 	 * @param paramCompilePath
 	 *            compile path
 	 */
-	private void attemptToRunGameWithReplay(final String paramRunPath, final boolean compileAndRun,
-			final String paramCompilePath) {
-		
+	private void attemptToRunGameWithReplayThreaded() {
 		executor.execute(new Runnable() {
 			@Override
 			public void run() {
-				// manage thread
-				boolean isHeroes = false;
-				String gamePath = null;
-				
-				if (!compileAndRun) {
-					// use the run param
-					if (paramRunPath == null) {
-						return;
-					}
-					gamePath = paramRunPath;
-					isHeroes = gamePath.contains("HeroesSwitcher.exe");
-				} else {
-					// compileAndRun is active -> figure out the right game
-					if (paramCompilePath.contains(File.separator + "heroes" + File.separator)) {
-						// Heroes
-						isHeroes = true;
-						if (settings.isPtrActive()) {
-							// PTR Heroes
-							if (settings.isHeroesPtr64bit()) {
-								gamePath = settings.getHeroesPtrPath() + File.separator + "Support64" + File.separator
-										+ "HeroesSwitcher_x64.exe";
-							} else {
-								gamePath = settings.getHeroesPtrPath() + File.separator + "Support" + File.separator
-										+ "HeroesSwitcher.exe";
-							}
-						} else {
-							// live Heroes
-							if (settings.isHeroes64bit()) {
-								gamePath = settings.getHeroesPath() + File.separator + "Support64" + File.separator
-										+ "HeroesSwitcher_x64.exe";
-							} else {
-								gamePath = settings.getHeroesPath() + File.separator + "Support" + File.separator
-										+ "HeroesSwitcher.exe";
-							}
-						}
-					} else {
-						// SC2
-						isHeroes = false;
-						if (settings.isSC264bit()) {
-							gamePath = settings.getSC2Path() + File.separator + "Support64" + File.separator
-									+ "SC2Switcher_x64.exe";
-						} else {
-							gamePath = settings.getSC2Path() + File.separator + "Support" + File.separator
-									+ "SC2Switcher.exe";
-						}
-					}
-				}
-				printLogMessage("Game location: " + gamePath);
-				
-				final File replay = replayFinder.getLastUsedOrNewestReplay(isHeroes, documentsPath);
-				if (replay != null && replay.exists() && replay.isFile()) {
-					logger.info("Starting game with replay: " + replay.getName());
-					final String cmd = "cmd /C start \"\" \"" + gamePath + "\" \"" + replay.getAbsolutePath() + "\"";
-					logger.trace("executing: " + cmd);
-					try {
-						Runtime.getRuntime().exec(cmd);
-						logger.trace("after Start attempt...");
-					} catch (final IOException e) {
-						e.printStackTrace();
-						errorTracker.reportErrorEncounter(e);
-					}
-				} else {
-					logger.error("Failed to find any replay.");
-				}
-				printLogMessage("Finished to start the game with a replay.");
+				attemptToRunGameWithReplay();
 			}
 		});
+	}
+	
+	public void attemptToRunGameWithReplay() {
+		boolean isHeroes = false;
+		String gamePath = null;
 		
+		if (!compileAndRun) {
+			// use the run param
+			if (paramRunPath == null) {
+				return;
+			}
+			gamePath = paramRunPath;
+			isHeroes = gamePath.contains("HeroesSwitcher.exe");
+		} else {
+			// compileAndRun is active -> figure out the right game
+			if (paramCompilePath.contains(File.separator + "heroes" + File.separator)) {
+				// Heroes
+				isHeroes = true;
+				if (settings.isPtrActive()) {
+					// PTR Heroes
+					if (settings.isHeroesPtr64bit()) {
+						gamePath = settings.getHeroesPtrPath() + File.separator + "Support64" + File.separator
+								+ "HeroesSwitcher_x64.exe";
+					} else {
+						gamePath = settings.getHeroesPtrPath() + File.separator + "Support" + File.separator
+								+ "HeroesSwitcher.exe";
+					}
+				} else {
+					// live Heroes
+					if (settings.isHeroes64bit()) {
+						gamePath = settings.getHeroesPath() + File.separator + "Support64" + File.separator
+								+ "HeroesSwitcher_x64.exe";
+					} else {
+						gamePath = settings.getHeroesPath() + File.separator + "Support" + File.separator
+								+ "HeroesSwitcher.exe";
+					}
+				}
+			} else {
+				// SC2
+				isHeroes = false;
+				if (settings.isSC264bit()) {
+					gamePath = settings.getSC2Path() + File.separator + "Support64" + File.separator
+							+ "SC2Switcher_x64.exe";
+				} else {
+					gamePath = settings.getSC2Path() + File.separator + "Support" + File.separator + "SC2Switcher.exe";
+				}
+			}
+		}
+		printLogMessage("Game location: " + gamePath);
+		
+		final File replay = replayFinder.getLastUsedOrNewestReplay(isHeroes, documentsPath);
+		if (replay != null && replay.exists() && replay.isFile()) {
+			logger.info("Starting game with replay: " + replay.getName());
+			final String cmd = "cmd /C start \"\" \"" + gamePath + "\" \"" + replay.getAbsolutePath() + "\"";
+			logger.trace("executing: " + cmd);
+			try {
+				Runtime.getRuntime().exec(cmd);
+				logger.trace("after Start attempt...");
+			} catch (final IOException e) {
+				e.printStackTrace();
+				errorTracker.reportErrorEncounter(e);
+			}
+		} else {
+			logger.error("Failed to find any replay.");
+		}
+		printLogMessage("Finished to start the game with a replay.");
 	}
 	
 	/**
@@ -580,7 +589,7 @@ public final class Main extends Application {
 		Platform.runLater(new Runnable() {
 			@Override
 			public void run() {
-				tabPane.getTabs().add(newTab);
+				getTabPane().getTabs().add(newTab);
 			}
 		});
 	}
@@ -649,9 +658,9 @@ public final class Main extends Application {
 				@Override
 				public void run() {
 					// create unique cache path
-					final MpqEditorInterface threadsMpqInterface = (MpqEditorInterface) baseMpqInterface.clone();
+					final MpqEditorInterface threadsMpqInterface = (MpqEditorInterface) getBaseMpqInterface().clone();
 					final long threadId = Thread.currentThread().getId();
-					threadsMpqInterface.setMpqCachePath(baseMpqInterface.getMpqCachePath() + threadId);
+					threadsMpqInterface.setMpqCachePath(getBaseMpqInterface().getMpqCachePath() + threadId);
 					
 					// work
 					try {
@@ -659,7 +668,7 @@ public final class Main extends Application {
 						threadsMpqInterface.clearCacheExtractedMpq();
 					} catch (final IOException e) {
 						logger.error("IOException while building UIs", e);
-						errorTracker.reportErrorEncounter();
+						getErrorTracker().reportErrorEncounter();
 						e.printStackTrace();
 					}
 				}
@@ -680,10 +689,8 @@ public final class Main extends Application {
 	}
 	
 	/**
-	 * Builds MPQ Archive File. Run this in its own thread!
-	 * 
-	 * Conditions: - Specified MpqInterface requires a unique cache path for
-	 * multithreading.
+	 * Builds MPQ Archive File. Run this in its own thread! Conditions: - Specified
+	 * MpqInterface requires a unique cache path for multithreading.
 	 * 
 	 * @param sourceFile
 	 *            folder location
@@ -919,6 +926,48 @@ public final class Main extends Application {
 			// copy the file
 			Files.copy(source.toPath(), target.toPath(), StandardCopyOption.REPLACE_EXISTING);
 		}
+	}
+	
+	/**
+	 * @return the executor
+	 */
+	public ThreadPoolExecutor getExecutor() {
+		return executor;
+	}
+	
+	/**
+	 * @return the errorTracker
+	 */
+	public ErrorTracker getErrorTracker() {
+		return errorTracker;
+	}
+	
+	/**
+	 * @return the gameSC2
+	 */
+	public GameData getGameSC2() {
+		return gameSC2;
+	}
+	
+	/**
+	 * @return the gameHeroes
+	 */
+	public GameData getGameHeroes() {
+		return gameHeroes;
+	}
+	
+	/**
+	 * @return the baseMpqInterface
+	 */
+	public MpqEditorInterface getBaseMpqInterface() {
+		return baseMpqInterface;
+	}
+	
+	/**
+	 * @return
+	 */
+	public TabPane getTabPane() {
+		return tabPane;
 	}
 	
 }

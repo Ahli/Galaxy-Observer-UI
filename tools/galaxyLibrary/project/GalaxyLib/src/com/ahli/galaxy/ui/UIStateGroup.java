@@ -3,9 +3,7 @@ package com.ahli.galaxy.ui;
 import java.util.ArrayList;
 
 /**
- * 
  * @author Ahli
- * 
  */
 public class UIStateGroup extends UIElement {
 	
@@ -18,7 +16,6 @@ public class UIStateGroup extends UIElement {
 	private ArrayList<UIState> states = null;
 	
 	/**
-	 * 
 	 * @param name
 	 */
 	public UIStateGroup(final String name) {
@@ -27,7 +24,6 @@ public class UIStateGroup extends UIElement {
 	}
 	
 	/**
-	 * 
 	 * @param name
 	 */
 	public UIStateGroup(final String name, final int initialStatesMaxCapacity) {
@@ -79,7 +75,6 @@ public class UIStateGroup extends UIElement {
 	}
 	
 	/**
-	 * 
 	 * @param path
 	 * @return
 	 */

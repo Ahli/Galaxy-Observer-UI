@@ -11,7 +11,6 @@ import java.nio.charset.StandardCharsets;
  * Interface Class for the Settings .ini file.
  * 
  * @author Ahli
- *
  */
 public class SettingsIniInterface {
 	
@@ -124,7 +123,6 @@ public class SettingsIniInterface {
 	}
 	
 	/**
-	 * 
 	 * @return
 	 */
 	public String getSC2Path() {
@@ -132,7 +130,6 @@ public class SettingsIniInterface {
 	}
 	
 	/**
-	 * 
 	 * @return
 	 */
 	public String getHeroesPath() {
@@ -140,7 +137,6 @@ public class SettingsIniInterface {
 	}
 	
 	/**
-	 * 
 	 * @return
 	 */
 	public String getHeroesPtrPath() {
@@ -148,7 +144,6 @@ public class SettingsIniInterface {
 	}
 	
 	/**
-	 * 
 	 * @return
 	 */
 	public boolean isPtrActive() {
@@ -156,7 +151,6 @@ public class SettingsIniInterface {
 	}
 	
 	/**
-	 * 
 	 * @return
 	 */
 	public boolean isSC264bit() {
@@ -164,7 +158,6 @@ public class SettingsIniInterface {
 	}
 	
 	/**
-	 * 
 	 * @return
 	 */
 	public boolean isHeroesPtr64bit() {
@@ -172,7 +165,6 @@ public class SettingsIniInterface {
 	}
 	
 	/**
-	 * 
 	 * @return
 	 */
 	public boolean isHeroes64bit() {
@@ -180,7 +172,6 @@ public class SettingsIniInterface {
 	}
 	
 	/**
-	 * 
 	 * @return
 	 */
 	public boolean isHeroesProtectMPQ() {
@@ -188,7 +179,6 @@ public class SettingsIniInterface {
 	}
 	
 	/**
-	 * 
 	 * @return
 	 */
 	public boolean isSC2ProtectMPQ() {

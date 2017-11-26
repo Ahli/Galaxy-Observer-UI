@@ -1,9 +1,7 @@
 package com.ahli.galaxy.ui;
 
 /**
- * 
  * @author Ahli
- * 
  */
 public class UIConstant extends UIElement {
 	/**
@@ -14,7 +12,6 @@ public class UIConstant extends UIElement {
 	private String value = "";
 	
 	/**
-	 * 
 	 * @param name
 	 */
 	public UIConstant(final String name) {
@@ -46,7 +43,6 @@ public class UIConstant extends UIElement {
 	}
 	
 	/**
-	 * 
 	 * @param path
 	 * @return
 	 */

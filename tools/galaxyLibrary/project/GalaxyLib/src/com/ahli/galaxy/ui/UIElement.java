@@ -3,9 +3,7 @@ package com.ahli.galaxy.ui;
 import java.io.Serializable;
 
 /**
- * 
  * @author Ahli
- * 
  */
 public abstract class UIElement implements Cloneable, Serializable {
 	/**
@@ -57,7 +55,6 @@ public abstract class UIElement implements Cloneable, Serializable {
 	public abstract UIElement receiveFrameFromPath(String path);
 	
 	/**
-	 * 
 	 * @param path
 	 * @return
 	 */
@@ -71,7 +68,6 @@ public abstract class UIElement implements Cloneable, Serializable {
 	}
 	
 	/**
-	 * 
 	 * @param path
 	 * @return
 	 */

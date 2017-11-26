@@ -14,7 +14,6 @@ import javafx.scene.control.TableCell;
  * A table cell for ValueDef model data to reset its value to the default value.
  * 
  * @author Ahli
- *
  */
 public class ResetDefaultButtonTableCell extends TableCell<ValueDef, Boolean> {
 	private static Logger logger = LogManager.getLogger(ResetDefaultButtonTableCell.class);
@@ -36,7 +35,6 @@ public class ResetDefaultButtonTableCell extends TableCell<ValueDef, Boolean> {
 	}
 	
 	/**
-	 * 
 	 * @param text
 	 */
 	public ResetDefaultButtonTableCell(final String text) {

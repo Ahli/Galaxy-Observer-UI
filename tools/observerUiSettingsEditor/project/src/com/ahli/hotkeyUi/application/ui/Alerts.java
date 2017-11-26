@@ -18,15 +18,12 @@ import javafx.scene.layout.Priority;
 import javafx.stage.Window;
 
 /**
- * 
  * @author Ahli
- * 
  */
 public class Alerts {
 	private static Logger logger = LogManager.getLogger(Alerts.class);
 	
 	/**
-	 * 
 	 * @param owner
 	 * @param title
 	 * @param header
@@ -49,7 +46,6 @@ public class Alerts {
 	}
 	
 	/**
-	 * 
 	 * @param owner
 	 * @param title
 	 * @param header
@@ -69,7 +65,6 @@ public class Alerts {
 	}
 	
 	/**
-	 * 
 	 * @param owner
 	 * @param title
 	 * @param header
@@ -89,7 +84,6 @@ public class Alerts {
 	}
 	
 	/**
-	 * 
 	 * @param owner
 	 * @param title
 	 * @param header
@@ -109,7 +103,6 @@ public class Alerts {
 	}
 	
 	/**
-	 * 
 	 * @param owner
 	 * @param title
 	 * @param header
@@ -134,7 +127,6 @@ public class Alerts {
 	}
 	
 	/**
-	 * 
 	 * @param owner
 	 * @param e
 	 * @return

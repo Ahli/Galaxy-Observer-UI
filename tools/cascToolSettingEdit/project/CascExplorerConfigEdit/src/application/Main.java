@@ -27,12 +27,10 @@ import org.xml.sax.SAXException;
  * Application that edits the config file of the CascExplorerConsole.exe.
  * 
  * @author Ahli
- *
  */
 public class Main {
 	
 	/**
-	 * 
 	 * @param args
 	 */
 	public static void main(final String[] args) {
@@ -90,7 +88,6 @@ public class Main {
 	}
 	
 	/**
-	 * 
 	 * @param settingNode
 	 * @param newSettingVal
 	 */

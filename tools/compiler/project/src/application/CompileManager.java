@@ -20,7 +20,6 @@ import application.util.ErrorTracker;
  * Compiles MPQ stuff.
  * 
  * @author Ahli
- *
  */
 public class CompileManager {
 	private static Logger logger = LogManager.getLogger(CompileManager.class);

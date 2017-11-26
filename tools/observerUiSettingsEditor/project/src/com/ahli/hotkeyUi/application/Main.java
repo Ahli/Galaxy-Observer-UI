@@ -53,7 +53,6 @@ import javafx.util.Duration;
  * Application
  * 
  * @author Ahli
- * 
  */
 public class Main extends Application {
 	long appStartTime = System.nanoTime();
@@ -235,81 +234,88 @@ public class Main extends Application {
 	 * 
 	 * @param f
 	 */
-	public void openMpqFile(final File f) {
+	public void openMpqFileThreaded(final File f) {
 		new Thread() {
 			@Override
 			public void run() {
 				setName(getName().replaceFirst("Thread", "Open")); //$NON-NLS-1$
-				final long time = System.nanoTime();
-				if (f != null) {
-					try {
-						mpqi.extractEntireMPQ(f.getAbsolutePath());
-						openedDocPath = f.getAbsolutePath();
-						updateAppTitle();
-						
-						// load desc index from mpq
-						try {
-							isNamespaceHeroes = mpqi.isHeroesMpq();
-						} catch (final MpqException e) {
-							// special case to show readable error to user
-							throw new ShowToUserException(Messages.getString("Main.OpenedFileNoComponentList"));
-						}
-						final boolean ignoreRequiredToLoadEntries = true;
-						
-						final File componentListFile = mpqi.getComponentListFile();
-						if (componentListFile == null) {
-							throw new ShowToUserException(Messages.getString("Main.OpenedFileNoComponentList")); //$NON-NLS-1$
-						}
-						descIndex.setDescIndexPathAndClear(ComponentsListReader.getDescIndexPath(componentListFile));
-						
-						final File descIndexFile = mpqi.getFileFromMpq(descIndex.getDescIndexIntPath());
-						descIndex.addLayoutIntPath(
-								DescIndexReader.getLayoutPathList(descIndexFile, ignoreRequiredToLoadEntries));
-						
-						tabsCtrl.clearData();
-						hasUnsavedFileChanges = false;
-						
-						final boolean recursive = true;
-						final File cache = new File(mpqi.getMpqCachePath());
-						final Collection<File> layoutFiles = FileUtils.listFiles(cache, null, recursive);
-						
-						layoutExtReader = new LayoutExtensionReader();
-						layoutExtReader.processLayoutFiles(layoutFiles);
-						
-						final ArrayList<ValueDef> hotkeys = layoutExtReader.getHotkeys();
-						tabsCtrl.getHotkeysData().addAll(hotkeys);
-						
-						final ArrayList<ValueDef> settings = layoutExtReader.getSettings();
-						tabsCtrl.getSettingsData().addAll(settings);
-						
-					} catch (MpqException | ShowToUserException e) {
-						logger.error("File could not be opened. MPQ-Error: " + ExceptionUtils.getStackTrace(e), e); //$NON-NLS-1$
-						openedDocPath = null;
-						updateAppTitle();
-						showErrorAlert(e);
-					} catch (final Exception e) {
-						logger.error("File could not be opened. Error: " + ExceptionUtils.getStackTrace(e), e); //$NON-NLS-1$
-						e.printStackTrace();
-						openedDocPath = null;
-						updateAppTitle();
-						// Alert alert = new Alert(AlertType.ERROR);
-						// alert.setTitle(Messages.getString("Main.errorOpeningFileTitle"));
-						// //$NON-NLS-1$
-						// alert.setHeaderText(Messages.getString("Main.errorOpeningFileTitle"));
-						// //$NON-NLS-1$
-						// alert.setContentText(Messages.getString("Main.anErrorOccured")
-						// + e.getMessage()); //$NON-NLS-1$
-						// alert.showAndWait();
-						
-						showExceptionAlert(e);
-					}
-					updateMenuBar();
-				} else {
-					logger.trace("File to open was null, most likely due to 'cancel'."); //$NON-NLS-1$
-				}
-				logger.warn("opened mpq within " + (System.nanoTime() - time) / 1000000 + "ms.");
+				openMpqFile(f);
 			}
 		}.start();
+	}
+	
+	/**
+	 * @param f
+	 */
+	public void openMpqFile(final File f) {
+		final long time = System.nanoTime();
+		if (f != null) {
+			try {
+				mpqi.extractEntireMPQ(f.getAbsolutePath());
+				openedDocPath = f.getAbsolutePath();
+				updateAppTitle();
+				
+				// load desc index from mpq
+				try {
+					isNamespaceHeroes = mpqi.isHeroesMpq();
+				} catch (final MpqException e) {
+					// special case to show readable error to user
+					throw new ShowToUserException(Messages.getString("Main.OpenedFileNoComponentList"));
+				}
+				final boolean ignoreRequiredToLoadEntries = true;
+				
+				final File componentListFile = mpqi.getComponentListFile();
+				if (componentListFile == null) {
+					throw new ShowToUserException(Messages.getString("Main.OpenedFileNoComponentList")); //$NON-NLS-1$
+				}
+				descIndex.setDescIndexPathAndClear(ComponentsListReader.getDescIndexPath(componentListFile));
+				
+				final File descIndexFile = mpqi.getFileFromMpq(descIndex.getDescIndexIntPath());
+				descIndex.addLayoutIntPath(
+						DescIndexReader.getLayoutPathList(descIndexFile, ignoreRequiredToLoadEntries));
+				
+				tabsCtrl.clearData();
+				hasUnsavedFileChanges = false;
+				
+				final boolean recursive = true;
+				final File cache = new File(mpqi.getMpqCachePath());
+				final Collection<File> layoutFiles = FileUtils.listFiles(cache, null, recursive);
+				
+				layoutExtReader = new LayoutExtensionReader();
+				layoutExtReader.processLayoutFiles(layoutFiles);
+				
+				final ArrayList<ValueDef> hotkeys = layoutExtReader.getHotkeys();
+				tabsCtrl.getHotkeysData().addAll(hotkeys);
+				
+				final ArrayList<ValueDef> settings = layoutExtReader.getSettings();
+				tabsCtrl.getSettingsData().addAll(settings);
+				
+			} catch (MpqException | ShowToUserException e) {
+				logger.error("File could not be opened. MPQ-Error: " + ExceptionUtils.getStackTrace(e), e); //$NON-NLS-1$
+				openedDocPath = null;
+				updateAppTitle();
+				showErrorAlert(e);
+			} catch (final Exception e) {
+				logger.error("File could not be opened. Error: " + ExceptionUtils.getStackTrace(e), e); //$NON-NLS-1$
+				e.printStackTrace();
+				openedDocPath = null;
+				updateAppTitle();
+				// Alert alert = new Alert(AlertType.ERROR);
+				// alert.setTitle(Messages.getString("Main.errorOpeningFileTitle"));
+				// //$NON-NLS-1$
+				// alert.setHeaderText(Messages.getString("Main.errorOpeningFileTitle"));
+				// //$NON-NLS-1$
+				// alert.setContentText(Messages.getString("Main.anErrorOccured")
+				// + e.getMessage()); //$NON-NLS-1$
+				// alert.showAndWait();
+				
+				showExceptionAlert(e);
+			}
+			updateMenuBar();
+		} else {
+			logger.trace("File to open was null, most likely due to 'cancel'."); //$NON-NLS-1$
+		}
+		logger.warn("opened mpq within " + (System.nanoTime() - time) / 1000000 + "ms.");
 	}
 	
 	/**
@@ -337,7 +343,7 @@ public class Main extends Application {
 			@Override
 			public void run() {
 				// Update UI here
-				mbarCtrl.updateMenuBar();
+				getMbarCtrl().updateMenuBar();
 			}
 		});
 	}
@@ -404,32 +410,38 @@ public class Main extends Application {
 	/**
 	 * Saves the currently opened document.
 	 */
-	public void saveUiMpq() {
+	public void saveUiMpqThreaded() {
 		new Thread() {
 			@Override
 			public void run() {
 				setName(getName().replaceFirst("Thread", "Save")); //$NON-NLS-1$
-				final long time = System.nanoTime();
-				
-				// cannot save, if not valid
-				if (!isValidOpenedDocPath()) {
-					return;
-				}
-				
-				try {
-					compile();
-					mpqi.buildMpq(openedDocPath, false, false);
-					hasUnsavedFileChanges = false;
-					updateAppTitle();
-				} catch (IOException | InterruptedException | ParserConfigurationException | SAXException
-						| MpqException e) {
-					logger.error(ExceptionUtils.getStackTrace(e), e);
-					e.printStackTrace();
-					showErrorAlert(e);
-				}
-				logger.warn("opened mpq within " + (System.nanoTime() - time) / 1000000 + "ms.");
+				saveUiMpq();
 			}
 		}.start();
+	}
+	
+	/**
+	 * Saves the currently opened document.
+	 */
+	public void saveUiMpq() {
+		final long time = System.nanoTime();
+		
+		// cannot save, if not valid
+		if (!isValidOpenedDocPath()) {
+			return;
+		}
+		
+		try {
+			compile();
+			mpqi.buildMpq(openedDocPath, false, false);
+			hasUnsavedFileChanges = false;
+			updateAppTitle();
+		} catch (IOException | InterruptedException | ParserConfigurationException | SAXException | MpqException e) {
+			logger.error(ExceptionUtils.getStackTrace(e), e);
+			e.printStackTrace();
+			showErrorAlert(e);
+		}
+		logger.warn("opened mpq within " + (System.nanoTime() - time) / 1000000 + "ms.");
 	}
 	
 	/**
@@ -489,7 +501,7 @@ public class Main extends Application {
 				logger.trace("showing error popup");
 				final String title = Messages.getString("Main.anErrorOccured"); //$NON-NLS-1$
 				final String content = e.getMessage();
-				final Alert alert = Alerts.buildErrorAlert(primaryStage, title, title, content);
+				final Alert alert = Alerts.buildErrorAlert(getPrimaryStage(), title, title, content);
 				alert.showAndWait();
 			}
 		});
@@ -506,7 +518,7 @@ public class Main extends Application {
 			public void run() {
 				// Update UI here
 				logger.trace("showing exception popup");
-				final Alert alert = Alerts.buildExceptionAlert(primaryStage, e);
+				final Alert alert = Alerts.buildExceptionAlert(getPrimaryStage(), e);
 				alert.showAndWait();
 			}
 		});
@@ -599,13 +611,14 @@ public class Main extends Application {
 			public void run() {
 				// Update UI here
 				String title = Messages.getString("Main.observerUiSettingsEditorTitle"); //$NON-NLS-1$
+				final String openedDocPath = getOpenedDocPath();
 				if (openedDocPath != null) {
 					title += "- [" + openedDocPath + "]"; //$NON-NLS-1$ //$NON-NLS-2$
 				}
-				if (hasUnsavedFileChanges) {
+				if (hasUnsavedFileChanges()) {
 					title += "*"; //$NON-NLS-1$
 				}
-				primaryStage.setTitle(title);
+				getPrimaryStage().setTitle(title);
 			}
 		});
 		
@@ -624,7 +637,6 @@ public class Main extends Application {
 	 * Hides the Splash Screen.
 	 * 
 	 * @author Ahli
-	 *
 	 */
 	private static final class SplashScreenHider implements Runnable {
 		@Override
@@ -634,6 +646,13 @@ public class Main extends Application {
 				splash.close();
 			}
 		}
+	}
+	
+	/**
+	 * @return the mbarCtrl
+	 */
+	public MenuBarController getMbarCtrl() {
+		return mbarCtrl;
 	}
 	
 }

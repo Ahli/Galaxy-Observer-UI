@@ -6,9 +6,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 /**
- * 
  * @author Ahli
- *
  */
 public class UITemplate implements Cloneable, Serializable {
 	/**
@@ -23,7 +21,6 @@ public class UITemplate implements Cloneable, Serializable {
 	private boolean isLocked = false;
 	
 	/**
-	 * 
 	 * @param fileName
 	 * @param frame
 	 */
@@ -88,7 +85,6 @@ public class UITemplate implements Cloneable, Serializable {
 	}
 	
 	/**
-	 * 
 	 * @param path
 	 * @return
 	 */

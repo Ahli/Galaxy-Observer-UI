@@ -13,9 +13,7 @@ import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
 
 /**
- * 
  * @author Ahli
- *
  */
 public class MenuBarController {
 	// static Logger logger = LogManager.getLogger(MenuBarController.class);
@@ -44,7 +42,6 @@ public class MenuBarController {
 	}
 	
 	/**
-	 * 
 	 * @param main
 	 */
 	public void setMainApp(final Main main) {
@@ -80,7 +77,7 @@ public class MenuBarController {
 	 */
 	@FXML
 	public void saveCurrent(final ActionEvent event) {
-		main.saveUiMpq();
+		main.saveUiMpqThreaded();
 	}
 	
 	/**

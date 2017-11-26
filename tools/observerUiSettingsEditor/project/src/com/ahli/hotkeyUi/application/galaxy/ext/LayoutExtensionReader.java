@@ -202,17 +202,17 @@ public class LayoutExtensionReader {
 						logger.debug("part: " + part);
 						if (partLower.startsWith("constant")) {
 							// move beyond '='
-							part = part.substring(1 + part.indexOf("=")).trim();
+							part = part.substring(1 + part.indexOf('=')).trim();
 							constant = part.substring(part.indexOf('"') + 1, part.lastIndexOf('"'));
 							logger.debug("constant = " + constant);
 						} else if (partLower.startsWith("default")) {
 							// move beyond '='
-							part = part.substring(1 + part.indexOf("=")).trim();
+							part = part.substring(1 + part.indexOf('=')).trim();
 							defaultValue = part.substring(part.indexOf('"') + 1, part.lastIndexOf('"'));
 							logger.debug("default = " + defaultValue);
 						} else if (partLower.startsWith("description")) {
 							// move beyond '='
-							part = part.substring(1 + part.indexOf("=")).trim();
+							part = part.substring(1 + part.indexOf('=')).trim();
 							description = part.substring(part.indexOf('"') + 1, part.lastIndexOf('"'));
 							logger.debug("description = " + description);
 						}
@@ -269,7 +269,6 @@ public class LayoutExtensionReader {
 	}
 	
 	/**
-	 * 
 	 * @param node
 	 */
 	public void processConstant(final Node node) {
@@ -283,7 +282,6 @@ public class LayoutExtensionReader {
 	}
 	
 	/**
-	 * 
 	 * @param name
 	 * @param val
 	 */
@@ -304,7 +302,6 @@ public class LayoutExtensionReader {
 	}
 	
 	/**
-	 * 
 	 * @param layoutFiles
 	 * @throws ParserConfigurationException
 	 * @throws IOException
@@ -411,7 +408,6 @@ public class LayoutExtensionReader {
 	}
 	
 	/**
-	 * 
 	 * @param nodes
 	 * @param name
 	 * @return

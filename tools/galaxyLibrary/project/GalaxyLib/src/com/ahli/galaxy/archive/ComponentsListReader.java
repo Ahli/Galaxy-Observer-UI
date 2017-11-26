@@ -18,7 +18,6 @@ import org.xml.sax.SAXException;
  * Reads the Components List file within the MPQ Archive.
  * 
  * @author Ahli
- *
  */
 public final class ComponentsListReader {
 	private static Logger logger = LogManager.getLogger(ComponentsListReader.class);
@@ -68,7 +67,7 @@ public final class ComponentsListReader {
 		
 		// must be in a DataComponent node
 		final NodeList nodeList = doc.getElementsByTagName("DataComponent");
-		for (int i = 0; i < nodeList.getLength(); i++) {
+		for (int i = 0, len = nodeList.getLength(); i < len; i++) {
 			final Node node = nodeList.item(i);
 			final Node attrZero = node.getAttributes().item(0);
 			// first attribute's name is Type & value must be as specified

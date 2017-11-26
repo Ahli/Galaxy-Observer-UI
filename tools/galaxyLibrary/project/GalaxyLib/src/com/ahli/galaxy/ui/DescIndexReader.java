@@ -20,7 +20,6 @@ import org.xml.sax.SAXException;
  * Reads a a Desc Index File.
  * 
  * @author Ahli
- *
  */
 public final class DescIndexReader {
 	private static Logger logger = LogManager.getLogger(DescIndexReader.class);
@@ -51,7 +50,7 @@ public final class DescIndexReader {
 		
 		// must be in a DataComponent node
 		final NodeList nodeList = doc.getElementsByTagName("*");
-		for (int i = 0; i < nodeList.getLength(); i++) {
+		for (int i = 0, len = nodeList.getLength(); i < len; i++) {
 			final Node node = nodeList.item(i);
 			if (node.getNodeName().equalsIgnoreCase("Include")) {
 				final NamedNodeMap attributes = node.getAttributes();

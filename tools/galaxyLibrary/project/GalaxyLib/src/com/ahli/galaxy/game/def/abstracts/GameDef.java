@@ -1,9 +1,9 @@
 package com.ahli.galaxy.game.def.abstracts;
 
+import java.util.Arrays;
+
 /**
- * 
  * @author Ahli
- *
  */
 public abstract class GameDef {
 	private String[] coreModsOrDirectories = null;
@@ -35,7 +35,7 @@ public abstract class GameDef {
 	 * @return the coreModsOrDirectories
 	 */
 	public String[] getCoreModsOrDirectories() {
-		return coreModsOrDirectories;
+		return Arrays.copyOf(coreModsOrDirectories, 1);
 	}
 	
 	/**
@@ -46,7 +46,6 @@ public abstract class GameDef {
 	}
 	
 	/**
-	 * 
 	 * @return
 	 */
 	public String getDocumentsGameDirectoryName() {
@@ -89,11 +88,13 @@ public abstract class GameDef {
 	}
 	
 	/**
+	 * Saves a copy of the specified array.
+	 * 
 	 * @param coreModsOrDirectories
 	 *            the coreModsOrDirectories to set
 	 */
 	public void setCoreModsOrDirectories(final String[] coreModsOrDirectories) {
-		this.coreModsOrDirectories = coreModsOrDirectories;
+		this.coreModsOrDirectories = Arrays.copyOf(coreModsOrDirectories, coreModsOrDirectories.length);
 	}
 	
 	/**

@@ -8,7 +8,6 @@ import com.ahli.util.Pair;
  * Basic Attribute implementation to describe default UI's attribute.
  * 
  * @author Ahli
- *
  */
 public class UIAttribute extends UIElement {
 	
@@ -95,7 +94,6 @@ public class UIAttribute extends UIElement {
 	}
 	
 	/**
-	 * 
 	 * @param key
 	 * @param value
 	 */
@@ -111,7 +109,6 @@ public class UIAttribute extends UIElement {
 	}
 	
 	/**
-	 * 
 	 * @param key
 	 * @return
 	 */

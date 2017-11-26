@@ -8,6 +8,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.function.Predicate;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -29,7 +30,6 @@ import com.ahli.util.XmlDomHelper;
  * Represents a container for UI frame.
  * 
  * @author Ahli
- * 
  */
 public class UICatalog implements Cloneable, Serializable {
 	/**
@@ -104,7 +104,6 @@ public class UICatalog implements Cloneable, Serializable {
 	}
 	
 	/**
-	 * 
 	 * @param f
 	 *            descIndex file to process
 	 * @param raceId
@@ -136,7 +135,6 @@ public class UICatalog implements Cloneable, Serializable {
 	}
 	
 	/**
-	 * 
 	 * @param toProcessList
 	 * @param basePath
 	 */
@@ -173,7 +171,6 @@ public class UICatalog implements Cloneable, Serializable {
 	}
 	
 	/**
-	 * 
 	 * @param f
 	 *            layout file to process
 	 * @param raceId
@@ -230,7 +227,6 @@ public class UICatalog implements Cloneable, Serializable {
 	}
 	
 	/**
-	 * 
 	 * @param nodeValue
 	 * @param raceId
 	 */
@@ -246,7 +242,6 @@ public class UICatalog implements Cloneable, Serializable {
 	}
 	
 	/**
-	 * 
 	 * @param childNodes
 	 * @param parent
 	 * @param isDevLayout
@@ -272,7 +267,6 @@ public class UICatalog implements Cloneable, Serializable {
 	}
 	
 	/**
-	 * 
 	 * @param node
 	 * @return
 	 */
@@ -294,7 +288,6 @@ public class UICatalog implements Cloneable, Serializable {
 	}
 	
 	/**
-	 * 
 	 * @param childNode
 	 * @param parent
 	 * @throws UIException
@@ -354,7 +347,6 @@ public class UICatalog implements Cloneable, Serializable {
 	}
 	
 	/**
-	 * 
 	 * @param node
 	 * @param parent
 	 * @param fileName
@@ -379,7 +371,6 @@ public class UICatalog implements Cloneable, Serializable {
 	}
 	
 	/**
-	 * 
 	 * @param node
 	 * @param parent
 	 * @param fileName
@@ -407,7 +398,6 @@ public class UICatalog implements Cloneable, Serializable {
 	}
 	
 	/**
-	 * 
 	 * @param node
 	 * @param parent
 	 * @throws UIException
@@ -476,7 +466,6 @@ public class UICatalog implements Cloneable, Serializable {
 	}
 	
 	/**
-	 * 
 	 * @param node
 	 * @param parent
 	 * @throws UIException
@@ -513,7 +502,6 @@ public class UICatalog implements Cloneable, Serializable {
 	}
 	
 	/**
-	 * 
 	 * @param node
 	 * @param parent
 	 * @throws UIException
@@ -587,7 +575,6 @@ public class UICatalog implements Cloneable, Serializable {
 	}
 	
 	/**
-	 * 
 	 * @param node
 	 * @param parent
 	 * @throws UIException
@@ -687,8 +674,7 @@ public class UICatalog implements Cloneable, Serializable {
 				throw new UIException("Parent element '" + parent.getName()
 						+ "' does not allow an Attribute to be defined here. Parent: " + parent);
 			} else {
-				throw new UIException(
-						"Parent element 'null' does not allow an Attribute to be defined here. Parent: " + parent);
+				throw new UIException("Parent element 'null' does not allow an Attribute to be defined here.");
 			}
 		}
 		
@@ -697,7 +683,6 @@ public class UICatalog implements Cloneable, Serializable {
 	}
 	
 	/**
-	 * 
 	 * @param childNodes
 	 * @param thisElem
 	 * @throws UIException
@@ -721,7 +706,6 @@ public class UICatalog implements Cloneable, Serializable {
 	}
 	
 	/**
-	 * 
 	 * @param node
 	 * @param parent
 	 * @throws UIException
@@ -735,7 +719,6 @@ public class UICatalog implements Cloneable, Serializable {
 	}
 	
 	/**
-	 * 
 	 * @param node
 	 * @param parent
 	 * @throws UIException
@@ -768,7 +751,6 @@ public class UICatalog implements Cloneable, Serializable {
 	}
 	
 	/**
-	 * 
 	 * @param node
 	 * @param parent
 	 * @throws UIException
@@ -813,7 +795,6 @@ public class UICatalog implements Cloneable, Serializable {
 	}
 	
 	/**
-	 * 
 	 * @param fileName
 	 * @param thisElem
 	 * @param isDevLayout
@@ -844,7 +825,6 @@ public class UICatalog implements Cloneable, Serializable {
 	}
 	
 	/**
-	 * 
 	 * @param type
 	 * @param controllers
 	 * @return
@@ -860,8 +840,12 @@ public class UICatalog implements Cloneable, Serializable {
 		while (true) {
 			final String name = type + "_" + i;
 			
-			if (controllers.stream()
-					.noneMatch(t -> t.getName() != null && t.getName().compareToIgnoreCase(name) == 0)) {
+			if (controllers.stream().noneMatch(new Predicate<UIController>() {
+				@Override
+				public boolean test(UIController t) {
+					return t.getName() != null && t.getName().compareToIgnoreCase(name) == 0;
+				}
+			})) {
 				LOGGER.trace("Constructing implicit controller name: " + name);
 				return name;
 			}
@@ -871,7 +855,6 @@ public class UICatalog implements Cloneable, Serializable {
 	}
 	
 	/**
-	 * 
 	 * @param node
 	 * @param parent
 	 * @throws UIException
@@ -923,7 +906,6 @@ public class UICatalog implements Cloneable, Serializable {
 	}
 	
 	/**
-	 * 
 	 * @param name
 	 * @param listOfConstants
 	 * @return
@@ -941,7 +923,6 @@ public class UICatalog implements Cloneable, Serializable {
 	}
 	
 	/**
-	 * 
 	 * @param node
 	 * @param parent
 	 * @throws UIException
@@ -983,7 +964,6 @@ public class UICatalog implements Cloneable, Serializable {
 	}
 	
 	/**
-	 * 
 	 * @param template
 	 * @return Template instance
 	 * @throws UIException
@@ -995,7 +975,7 @@ public class UICatalog implements Cloneable, Serializable {
 		}
 		LOGGER.trace("Instanciating Template of path " + path);
 		path = path.replace('\\', '/');
-		final String fileName = path.substring(0, path.indexOf("/"));
+		final String fileName = path.substring(0, path.indexOf('/'));
 		
 		// 1. check templates
 		UIElement templateInstance = instanciateTemplateFromList(templates, fileName, path, newName);
@@ -1023,7 +1003,6 @@ public class UICatalog implements Cloneable, Serializable {
 	}
 	
 	/**
-	 * 
 	 * @param templates
 	 * @param fileName
 	 * @param path
@@ -1063,7 +1042,6 @@ public class UICatalog implements Cloneable, Serializable {
 	}
 	
 	/**
-	 * 
 	 * @param constantRef
 	 * @param raceId
 	 *            id String of the viewer's Race

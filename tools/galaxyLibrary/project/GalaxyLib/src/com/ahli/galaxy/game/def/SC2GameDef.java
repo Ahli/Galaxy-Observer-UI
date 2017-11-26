@@ -3,9 +3,7 @@ package com.ahli.galaxy.game.def;
 import com.ahli.galaxy.game.def.abstracts.GameDef;
 
 /**
- * 
  * @author Ahli
- *
  */
 public class SC2GameDef extends GameDef {
 	

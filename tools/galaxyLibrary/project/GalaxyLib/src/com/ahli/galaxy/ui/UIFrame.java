@@ -10,9 +10,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 /**
- * 
  * @author Ahli
- *
  */
 public class UIFrame extends UIElement {
 	/**
@@ -31,7 +29,6 @@ public class UIFrame extends UIElement {
 	private final String[] relative = new String[4];
 	
 	/**
-	 * 
 	 * @param name
 	 * @param type
 	 */
@@ -45,7 +42,6 @@ public class UIFrame extends UIElement {
 	}
 	
 	/**
-	 * 
 	 * @param name
 	 * @param type
 	 */
@@ -123,7 +119,6 @@ public class UIFrame extends UIElement {
 	}
 	
 	/**
-	 * 
 	 * @return
 	 */
 	public List<UIElement> getChildren() {
@@ -131,7 +126,6 @@ public class UIFrame extends UIElement {
 	}
 	
 	/**
-	 * 
 	 * @param children
 	 */
 	public void setChildren(final List<UIElement> children) {
@@ -203,7 +197,6 @@ public class UIFrame extends UIElement {
 	// }
 	
 	/**
-	 * 
 	 * @param side
 	 * @param relative
 	 */
@@ -212,7 +205,6 @@ public class UIFrame extends UIElement {
 	}
 	
 	/**
-	 * 
 	 * @param side
 	 * @param offset
 	 */
@@ -221,7 +213,6 @@ public class UIFrame extends UIElement {
 	}
 	
 	/**
-	 * 
 	 * @param side
 	 * @param pos
 	 */
@@ -230,7 +221,6 @@ public class UIFrame extends UIElement {
 	}
 	
 	/**
-	 * 
 	 * @param side
 	 * @return
 	 */
@@ -239,7 +229,6 @@ public class UIFrame extends UIElement {
 	}
 	
 	/**
-	 * 
 	 * @param side
 	 * @return
 	 */
@@ -248,7 +237,6 @@ public class UIFrame extends UIElement {
 	}
 	
 	/**
-	 * 
 	 * @param side
 	 * @return
 	 */
@@ -257,7 +245,6 @@ public class UIFrame extends UIElement {
 	}
 	
 	/**
-	 * 
 	 * @param side
 	 * @return
 	 */
@@ -275,7 +262,6 @@ public class UIFrame extends UIElement {
 	}
 	
 	/**
-	 * 
 	 * @param relative
 	 * @param offset
 	 */
@@ -295,7 +281,6 @@ public class UIFrame extends UIElement {
 	}
 	
 	/**
-	 * 
 	 * @param path
 	 * @return
 	 */

@@ -6,9 +6,7 @@ import java.util.List;
 import com.ahli.util.Pair;
 
 /**
- * 
  * @author Ahli
- * 
  */
 public class UIAnimation extends UIElement {
 	/**
@@ -23,7 +21,6 @@ public class UIAnimation extends UIElement {
 	private UIAttribute driver = null;
 	
 	/**
-	 * 
 	 * @param name
 	 */
 	public UIAnimation(final String name) {
@@ -118,7 +115,6 @@ public class UIAnimation extends UIElement {
 	}
 	
 	/**
-	 * 
 	 * @param key
 	 * @param value
 	 */
@@ -134,7 +130,6 @@ public class UIAnimation extends UIElement {
 	}
 	
 	/**
-	 * 
 	 * @param key
 	 * @return
 	 */
@@ -151,7 +146,6 @@ public class UIAnimation extends UIElement {
 	}
 	
 	/**
-	 * 
 	 * @return
 	 */
 	public boolean isNextEventsAdditionShouldOverride() {
@@ -159,7 +153,6 @@ public class UIAnimation extends UIElement {
 	}
 	
 	/**
-	 * 
 	 * @param nextEventsAdditionShouldOverride
 	 */
 	public void setNextEventsAdditionShouldOverride(final boolean nextEventsAdditionShouldOverride) {
@@ -182,7 +175,6 @@ public class UIAnimation extends UIElement {
 	}
 	
 	/**
-	 * 
 	 * @param path
 	 * @return
 	 */

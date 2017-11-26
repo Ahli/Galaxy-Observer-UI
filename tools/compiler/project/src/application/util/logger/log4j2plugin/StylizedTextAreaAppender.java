@@ -37,7 +37,6 @@ public final class StylizedTextAreaAppender extends AbstractAppender {
 	private final Lock readLock = rwLock.readLock();
 	
 	/**
-	 * 
 	 * @param name
 	 * @param filter
 	 * @param layout
@@ -64,16 +63,19 @@ public final class StylizedTextAreaAppender extends AbstractAppender {
 			final Level level = event.getLevel();
 			final long id = event.getThreadId();
 			
-			Platform.runLater(() -> {
-				try {
-					final StyleClassedTextArea txtArea = getTextArea(id);
-					if (txtArea != null) {
-						final int length = txtArea.getLength();
-						txtArea.appendText(message);
-						txtArea.setStyleClass(length, txtArea.getLength(), level.toString());
+			Platform.runLater(new Runnable() {
+				@Override
+				public void run() {
+					try {
+						final StyleClassedTextArea txtArea = getTextArea(id);
+						if (txtArea != null) {
+							final int length = txtArea.getLength();
+							txtArea.appendText(message);
+							txtArea.setStyleClass(length, txtArea.getLength(), level.toString());
+						}
+					} catch (final Throwable t) {
+						System.err.println("Error while append to TextArea: " + t.getMessage());
 					}
-				} catch (final Throwable t) {
-					System.err.println("Error while append to TextArea: " + t.getMessage());
 				}
 			});
 		} catch (final IllegalStateException ex) {
@@ -130,7 +132,6 @@ public final class StylizedTextAreaAppender extends AbstractAppender {
 	}
 	
 	/**
-	 * 
 	 * @param id
 	 * @return
 	 */

@@ -6,7 +6,6 @@ import javafx.beans.property.SimpleStringProperty;
  * Class that defines a Hotkey or Settings value to be used in UI.
  * 
  * @author Ahli
- *
  */
 public class ValueDef {
 	private final SimpleStringProperty id;
@@ -30,7 +29,6 @@ public class ValueDef {
 	}
 	
 	/**
-	 * 
 	 * @return
 	 */
 	public String getId() {
@@ -38,7 +36,6 @@ public class ValueDef {
 	}
 	
 	/**
-	 * 
 	 * @param id
 	 */
 	public void setId(final String id) {
@@ -46,7 +43,6 @@ public class ValueDef {
 	}
 	
 	/**
-	 * 
 	 * @return
 	 */
 	public String getValue() {
@@ -54,7 +50,6 @@ public class ValueDef {
 	}
 	
 	/**
-	 * 
 	 * @param value
 	 */
 	public void setValue(final String value) {
@@ -62,7 +57,6 @@ public class ValueDef {
 	}
 	
 	/**
-	 * 
 	 * @return
 	 */
 	public String getDescription() {
@@ -70,7 +64,6 @@ public class ValueDef {
 	}
 	
 	/**
-	 * 
 	 * @param description
 	 */
 	public void setDescription(final String description) {
@@ -78,7 +71,6 @@ public class ValueDef {
 	}
 	
 	/**
-	 * 
 	 * @return
 	 */
 	public String getDefaultValue() {
@@ -86,7 +78,6 @@ public class ValueDef {
 	}
 	
 	/**
-	 * 
 	 * @param defaultValue
 	 */
 	public void setDefaultValue(final String defaultValue) {
@@ -94,7 +85,6 @@ public class ValueDef {
 	}
 	
 	/**
-	 * 
 	 * @return
 	 */
 	// required to make UI track changes
@@ -103,7 +93,6 @@ public class ValueDef {
 	}
 	
 	/**
-	 * 
 	 * @return
 	 */
 	// required to make UI track changes
@@ -112,7 +101,6 @@ public class ValueDef {
 	}
 	
 	/**
-	 * 
 	 * @return
 	 */
 	// required to make UI track changes
@@ -121,7 +109,6 @@ public class ValueDef {
 	}
 	
 	/**
-	 * 
 	 * @return
 	 */
 	// required to make UI track changes

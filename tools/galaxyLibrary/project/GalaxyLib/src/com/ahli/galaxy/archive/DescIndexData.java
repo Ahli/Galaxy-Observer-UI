@@ -22,7 +22,6 @@ import javafx.util.Pair;
  * Stores the Data of a Desc Index File.
  * 
  * @author Ahli
- *
  */
 public class DescIndexData {
 	private static Logger logger = LogManager.getLogger(DescIndexData.class);
@@ -43,7 +42,6 @@ public class DescIndexData {
 	}
 	
 	/**
-	 * 
 	 * @return
 	 */
 	public String getDescIndexIntPath() {
@@ -51,7 +49,6 @@ public class DescIndexData {
 	}
 	
 	/**
-	 * 
 	 * @param descIndexIntPath
 	 */
 	public void setDescIndexIntPath(final String descIndexIntPath) {
@@ -59,7 +56,6 @@ public class DescIndexData {
 	}
 	
 	/**
-	 * 
 	 * @param i
 	 * @return
 	 */
@@ -68,7 +64,6 @@ public class DescIndexData {
 	}
 	
 	/**
-	 * 
 	 * @param intPath
 	 * @throws MpqException
 	 */
@@ -90,7 +85,6 @@ public class DescIndexData {
 	}
 	
 	/**
-	 * 
 	 * @param intPath
 	 * @return
 	 */
@@ -113,7 +107,6 @@ public class DescIndexData {
 	}
 	
 	/**
-	 * 
 	 * @param descIndexPath
 	 */
 	public void setDescIndexPathAndClear(final String descIndexPath) {
@@ -122,7 +115,6 @@ public class DescIndexData {
 	}
 	
 	/**
-	 * 
 	 * @param layoutPathList
 	 * @throws MpqException
 	 */
@@ -134,7 +126,6 @@ public class DescIndexData {
 	}
 	
 	/**
-	 * 
 	 * @return
 	 */
 	public int getLayoutCount() {
@@ -142,7 +133,6 @@ public class DescIndexData {
 	}
 	
 	/**
-	 * 
 	 * @param intPath
 	 * @return
 	 */
@@ -158,7 +148,6 @@ public class DescIndexData {
 	
 	/**
 	 * @throws IOException
-	 * 
 	 */
 	public void persistDescIndexFile() throws IOException {
 		final File f = mpqi.getFileFromMpq(descIndexIntPath);

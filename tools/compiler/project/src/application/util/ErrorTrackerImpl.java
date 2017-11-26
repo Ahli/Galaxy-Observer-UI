@@ -4,7 +4,6 @@ package application.util;
  * Tracks occurrence of an error.
  * 
  * @author Ahli
- *
  */
 public final class ErrorTrackerImpl implements ErrorTracker {
 	private boolean encounteredError = false;

@@ -20,7 +20,6 @@ import org.xml.sax.SAXException;
  * Reads a Layout file.
  * 
  * @author Ahli
- * 
  */
 public final class LayoutReader {
 	private static Logger logger = LogManager.getLogger(LayoutReader.class);
@@ -32,7 +31,6 @@ public final class LayoutReader {
 	}
 	
 	/**
-	 * 
 	 * @param f
 	 * @param ownConstants
 	 * @return
@@ -53,7 +51,7 @@ public final class LayoutReader {
 		
 		// check TEMPLATES
 		final NodeList nodes = doc.getElementsByTagName("*");
-		for (int i = 0; i < nodes.getLength(); i++) {
+		for (int i = 0, len = nodes.getLength(); i < len; i++) {
 			final Node frame = nodes.item(i);
 			// check if node is a frame
 			if (frame.getNodeName().equalsIgnoreCase("Frame")) {
@@ -101,7 +99,7 @@ public final class LayoutReader {
 		// constantUsage
 		// nodes = doc.getElementsByTagName("*");
 		final ArrayList<String> usedConstants = new ArrayList<>();
-		for (int i = 0; i < nodes.getLength(); i++) {
+		for (int i = 0, len = nodes.getLength(); i < len; i++) {
 			final Node node = nodes.item(i);
 			
 			// String nodeName = node.getNodeName();
@@ -165,7 +163,6 @@ public final class LayoutReader {
 	}
 	
 	/**
-	 * 
 	 * @param constUsage
 	 * @param list
 	 * @return
@@ -238,7 +235,7 @@ public final class LayoutReader {
 		// create list of own constant definitions
 		final ArrayList<String> ownConstants = new ArrayList<>();
 		final NodeList constants = doc.getElementsByTagName("Constant");
-		for (int i = 0; i < constants.getLength(); i++) {
+		for (int i = 0, len = constants.getLength(); i < len; i++) {
 			final Node constant = constants.item(i);
 			final NamedNodeMap attributes = constant.getAttributes();
 			for (int j = 0; j < attributes.getLength(); j++) {

@@ -4,9 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * 
  * @author Ahli
- * 
  */
 public class UIState extends UIElement {
 	/**
@@ -20,7 +18,6 @@ public class UIState extends UIElement {
 	private boolean nextAdditionShouldOverrideActions = false;
 	
 	/**
-	 * 
 	 * @param name
 	 */
 	public UIState(final String name) {
@@ -30,7 +27,6 @@ public class UIState extends UIElement {
 	}
 	
 	/**
-	 * 
 	 * @param name
 	 * @param initialWhensCapacity
 	 * @param initialActionsCapacity
@@ -121,7 +117,6 @@ public class UIState extends UIElement {
 	}
 	
 	/**
-	 * 
 	 * @param path
 	 * @return
 	 */

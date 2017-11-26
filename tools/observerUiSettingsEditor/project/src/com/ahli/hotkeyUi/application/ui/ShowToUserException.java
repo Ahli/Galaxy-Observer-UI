@@ -5,7 +5,6 @@ package com.ahli.hotkeyUi.application.ui;
  * Exception should be localized.
  * 
  * @author Ahli
- *
  */
 public final class ShowToUserException extends Exception {
 	

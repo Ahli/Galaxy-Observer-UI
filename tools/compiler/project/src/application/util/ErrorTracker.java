@@ -4,7 +4,6 @@ package application.util;
  * Tracks Errors.
  * 
  * @author Ahli
- *
  */
 public interface ErrorTracker {
 	/**

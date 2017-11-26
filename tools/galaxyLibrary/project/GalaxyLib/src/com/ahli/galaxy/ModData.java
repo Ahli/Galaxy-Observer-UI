@@ -6,9 +6,7 @@ import com.ahli.galaxy.archive.DescIndexData;
 import com.ahli.galaxy.game.GameData;
 
 /**
- * 
  * @author Ahli
- *
  */
 public class ModData {
 	
