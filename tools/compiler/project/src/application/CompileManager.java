@@ -43,8 +43,9 @@ public class CompileManager {
 	 *            the mod
 	 * @param raceId
 	 *            the raceId used
+	 * @throws InterruptedException
 	 */
-	public void compile(final ModData mod, final String raceId) {
+	public void compile(final ModData mod, final String raceId) throws InterruptedException {
 		try {
 			long startTime;
 			long executionTime;

@@ -81,14 +81,14 @@ public class Main extends Application {
 			Thread.currentThread().setName("UI"); //$NON-NLS-1$
 			logger.warn("start function called after " + (System.nanoTime() - appStartTime) / 1000000 + "ms.");
 			this.primaryStage = primaryStage;
-			this.primaryStage.setMaximized(true);
-			this.primaryStage.setOpacity(0);
+			primaryStage.setMaximized(true);
+			primaryStage.setOpacity(0);
 			
 			setUserAgentStylesheet(STYLESHEET_MODENA);
 			
 			// if it fails to load the resource in as a jar, check the eclipse
 			// settings
-			this.primaryStage.getIcons().add(new Image(Main.class.getResourceAsStream("/res/ahliLogo.png"))); //$NON-NLS-1$
+			primaryStage.getIcons().add(new Image(Main.class.getResourceAsStream("/res/ahliLogo.png"))); //$NON-NLS-1$
 			
 			long time = System.nanoTime();
 			initRootLayout();
@@ -110,7 +110,7 @@ public class Main extends Application {
 			tabsCtrl.setMainApp(this);
 			
 			// ask to save on close
-			this.primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
+			primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
 				@Override
 				public void handle(final WindowEvent event) {
 					final boolean notCancelled = askToSaveUnsavedChanges();
@@ -130,8 +130,8 @@ public class Main extends Application {
 			ft.play();
 			
 			time = System.nanoTime();
-			this.primaryStage.show();
-			this.primaryStage.setOpacity(1);
+			primaryStage.show();
+			primaryStage.setOpacity(1);
 			logger.warn("executed root layout stage.show() within " + (System.nanoTime() - time) / 1000000 + "ms.");
 			
 			// hide apps splash screen image
@@ -141,7 +141,7 @@ public class Main extends Application {
 			
 			initMpqInterface();
 			
-		} catch (final Exception e) {
+		} catch (final Throwable e) {
 			logger.error("App Error: " + ExceptionUtils.getStackTrace(e), e); //$NON-NLS-1$
 			e.printStackTrace();
 			this.primaryStage.setOpacity(1);

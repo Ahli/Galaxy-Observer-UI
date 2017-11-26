@@ -16,6 +16,7 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.w3c.dom.DOMException;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -113,9 +114,11 @@ public class UICatalog implements Serializable, DeepCopyable {
 	 * @throws IOException
 	 * @throws ParserConfigurationException
 	 * @throws UIException
+	 * @throws InterruptedException
+	 *             if the current Thread was interrupted
 	 */
 	public void processDescIndex(final File f, final String raceId)
-			throws SAXException, IOException, ParserConfigurationException, UIException {
+			throws SAXException, IOException, ParserConfigurationException, UIException, InterruptedException {
 		
 		final ArrayList<String> generalLayouts = DescIndexReader.getLayoutPathList(f, true);
 		
@@ -138,8 +141,11 @@ public class UICatalog implements Serializable, DeepCopyable {
 	/**
 	 * @param toProcessList
 	 * @param basePath
+	 * @throws InterruptedException
+	 *             if the current thread was interrupted
 	 */
-	private void processLayouts(final ArrayList<String> toProcessList, final String basePath, final String raceId) {
+	private void processLayouts(final ArrayList<String> toProcessList, final String basePath, final String raceId)
+			throws InterruptedException {
 		loop: for (final String intPath : toProcessList) {
 			final boolean isDevLayout = blizzOnlyLayouts.contains(intPath);
 			LOGGER.trace("intPath=" + intPath);
@@ -168,6 +174,9 @@ public class UICatalog implements Serializable, DeepCopyable {
 						e);
 				e.printStackTrace();
 			}
+			if (Thread.interrupted()) {
+				throw new InterruptedException();
+			}
 		}
 	}
 	
@@ -180,9 +189,11 @@ public class UICatalog implements Serializable, DeepCopyable {
 	 * @throws IOException
 	 * @throws ParserConfigurationException
 	 * @throws UIException
+	 * @throws InterruptedException
+	 * @throws DOMException
 	 */
-	public void processLayoutFile(final File f, final String raceId, final boolean isDevLayout)
-			throws SAXException, IOException, ParserConfigurationException, UIException {
+	public void processLayoutFile(final File f, final String raceId, final boolean isDevLayout) throws SAXException,
+			IOException, ParserConfigurationException, UIException, DOMException, InterruptedException {
 		if (!isDevLayout) {
 			LOGGER.info("Processing layout file " + f.getAbsolutePath());
 		} else {
@@ -230,8 +241,11 @@ public class UICatalog implements Serializable, DeepCopyable {
 	/**
 	 * @param nodeValue
 	 * @param raceId
+	 * @throws InterruptedException
+	 *             if the current Thread was interrupted
 	 */
-	private void processLayoutFile(final String pathAttributeValue, final String raceId, final boolean isDevLayout) {
+	private void processLayoutFile(final String pathAttributeValue, final String raceId, final boolean isDevLayout)
+			throws InterruptedException {
 		LOGGER.trace("processing layoutFile from include: " + pathAttributeValue);
 		if (isDevLayout) {
 			blizzOnlyLayouts.add(pathAttributeValue);
@@ -247,9 +261,11 @@ public class UICatalog implements Serializable, DeepCopyable {
 	 * @param parent
 	 * @param isDevLayout
 	 * @throws UIException
+	 * @throws InterruptedException
+	 * @throws DOMException
 	 */
 	private void parse(final NodeList childNodes, final UIElement parent, final String fileName, final String raceId,
-			final boolean isDevLayout) throws UIException {
+			final boolean isDevLayout) throws UIException, DOMException, InterruptedException {
 		if (childNodes != null) {
 			final int len = childNodes.getLength();
 			LOGGER.trace("checking childNodes, length: " + len);
@@ -292,9 +308,11 @@ public class UICatalog implements Serializable, DeepCopyable {
 	 * @param childNode
 	 * @param parent
 	 * @throws UIException
+	 * @throws InterruptedException
+	 * @throws DOMException
 	 */
 	private void parse(final Node node, final UIElement parent, final String fileName, final String raceId,
-			final boolean isDevLayout) throws UIException {
+			final boolean isDevLayout) throws UIException, DOMException, InterruptedException {
 		final String nodeName = node.getNodeName().toLowerCase(Locale.ROOT);
 		LOGGER.trace("node name: " + nodeName);
 		
@@ -353,9 +371,11 @@ public class UICatalog implements Serializable, DeepCopyable {
 	 * @param fileName
 	 * @param raceId
 	 * @param isDevLayout
+	 * @throws InterruptedException
+	 * @throws DOMException
 	 */
 	private void parseInclude(final Node node, final UIElement parent, final String fileName, final String raceId,
-			final boolean isDevLayout, final boolean hasReqToLoadAttribute) {
+			final boolean isDevLayout, final boolean hasReqToLoadAttribute) throws DOMException, InterruptedException {
 		final NamedNodeMap attributes = node.getAttributes();
 		final Node pathAttribute = XmlDomHelper.getNamedItemIgnoringCase(attributes, "path");
 		if (pathAttribute != null) {
@@ -402,9 +422,11 @@ public class UICatalog implements Serializable, DeepCopyable {
 	 * @param node
 	 * @param parent
 	 * @throws UIException
+	 * @throws InterruptedException
+	 * @throws DOMException
 	 */
 	private void parseController(final Node node, final UIElement parent, final String fileName, final String raceId,
-			final boolean isDevLayout) throws UIException {
+			final boolean isDevLayout) throws UIException, DOMException, InterruptedException {
 		LOGGER.trace("parsing Controller");
 		// Controllers may not have a name defined
 		final Node nameAttrNode = XmlDomHelper.getNamedItemIgnoringCase(node.getAttributes(), "name");
@@ -470,9 +492,11 @@ public class UICatalog implements Serializable, DeepCopyable {
 	 * @param node
 	 * @param parent
 	 * @throws UIException
+	 * @throws InterruptedException
+	 * @throws DOMException
 	 */
 	private void parseState(final Node node, final UIElement parent, final String fileName, final String raceId,
-			final boolean isDevLayout) throws UIException {
+			final boolean isDevLayout) throws UIException, DOMException, InterruptedException {
 		LOGGER.trace("parsing State");
 		final Node nameAttrNode = XmlDomHelper.getNamedItemIgnoringCase(node.getAttributes(), "name");
 		if (nameAttrNode == null) {
@@ -579,9 +603,11 @@ public class UICatalog implements Serializable, DeepCopyable {
 	 * @param node
 	 * @param parent
 	 * @throws UIException
+	 * @throws InterruptedException
+	 * @throws DOMException
 	 */
 	private void parseAttribute(final Node node, final UIElement parent, final String fileName, final String raceId,
-			final boolean isDevLayout) throws UIException {
+			final boolean isDevLayout) throws UIException, DOMException, InterruptedException {
 		LOGGER.trace("parsing Attribute");
 		final String id = node.getNodeName();
 		final UIAttribute thisElem = new UIAttribute(id);
@@ -710,9 +736,11 @@ public class UICatalog implements Serializable, DeepCopyable {
 	 * @param node
 	 * @param parent
 	 * @throws UIException
+	 * @throws InterruptedException
+	 * @throws DOMException
 	 */
 	private void parseDesc(final Node node, final UIElement parent, final String fileName, final String raceId,
-			final boolean isDevLayout) throws UIException {
+			final boolean isDevLayout) throws UIException, DOMException, InterruptedException {
 		LOGGER.trace("parsing Desc");
 		
 		// go deeper
@@ -723,9 +751,11 @@ public class UICatalog implements Serializable, DeepCopyable {
 	 * @param node
 	 * @param parent
 	 * @throws UIException
+	 * @throws InterruptedException
+	 * @throws DOMException
 	 */
 	private void parseStateGroup(final Node node, final UIElement parent, final String fileName, final String raceId,
-			final boolean isDevLayout) throws UIException {
+			final boolean isDevLayout) throws UIException, DOMException, InterruptedException {
 		LOGGER.trace("parsing Stategroup");
 		final Node nameAttrNode = XmlDomHelper.getNamedItemIgnoringCase(node.getAttributes(), "name");
 		if (nameAttrNode == null) {
@@ -755,9 +785,11 @@ public class UICatalog implements Serializable, DeepCopyable {
 	 * @param node
 	 * @param parent
 	 * @throws UIException
+	 * @throws InterruptedException
+	 * @throws DOMException
 	 */
 	private void parseAnimation(final Node node, final UIElement parent, final String fileName, final String raceId,
-			final boolean isDevLayout) throws UIException {
+			final boolean isDevLayout) throws UIException, DOMException, InterruptedException {
 		LOGGER.trace("parsing Animation");
 		final Node nameAttrNode = XmlDomHelper.getNamedItemIgnoringCase(node.getAttributes(), "name");
 		if (nameAttrNode == null) {
@@ -859,9 +891,11 @@ public class UICatalog implements Serializable, DeepCopyable {
 	 * @param node
 	 * @param parent
 	 * @throws UIException
+	 * @throws InterruptedException
+	 * @throws DOMException
 	 */
 	private void parseConstant(final Node node, final UIElement parent, final String fileName, final String raceId,
-			final boolean isDevLayout) throws UIException {
+			final boolean isDevLayout) throws UIException, DOMException, InterruptedException {
 		LOGGER.trace("parsing Constant");
 		final Node nameAttrNode = XmlDomHelper.getNamedItemIgnoringCase(node.getAttributes(), "name");
 		if (nameAttrNode == null) {
@@ -927,9 +961,11 @@ public class UICatalog implements Serializable, DeepCopyable {
 	 * @param node
 	 * @param parent
 	 * @throws UIException
+	 * @throws InterruptedException
+	 * @throws DOMException
 	 */
 	private void parseFrame(final Node node, final UIElement parent, final String fileName, final String raceId,
-			final boolean isDevLayout) throws UIException {
+			final boolean isDevLayout) throws UIException, DOMException, InterruptedException {
 		LOGGER.trace("parsing Frame");
 		final Node nameAttrNode = XmlDomHelper.getNamedItemIgnoringCase(node.getAttributes(), "name");
 		if (nameAttrNode == null) {

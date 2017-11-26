@@ -23,6 +23,7 @@ public class MpqEditorInterface implements MpqInterface, DeepCopyable {
 	
 	private String mpqEditor = "plugins" + File.separator + "mpq" + File.separator + "MPQEditor.exe"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	private String mpqCachePath;
+	private final static char q = '\"';
 	
 	/**
 	 * Constructor.
@@ -67,6 +68,7 @@ public class MpqEditorInterface implements MpqInterface, DeepCopyable {
 	/**
 	 * Returns a cloned instance of this.
 	 */
+	@Override
 	public Object deepCopy() {
 		final MpqEditorInterface clone = new MpqEditorInterface(mpqCachePath);
 		clone.setMpqEditorPath(mpqEditor);
@@ -331,8 +333,9 @@ public class MpqEditorInterface implements MpqInterface, DeepCopyable {
 		if (!verifyMpqEditor()) {
 			throw new MpqException(String.format(Messages.getString("MpqInterface.MPQEditorNotFound"), mpqEditor)); //$NON-NLS-1$
 		}
-		final String q = "\""; //$NON-NLS-1$
+		
 		final String cmd = "cmd /C " + q + q + mpqEditor + q + " /n " + q + mpqPath + q + " " + maxFileCount + q; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		
 		logger.trace("executing: " + cmd); //$NON-NLS-1$
 		Runtime.getRuntime().exec(cmd).waitFor();
 		logger.trace("execution finished"); //$NON-NLS-1$
@@ -361,7 +364,6 @@ public class MpqEditorInterface implements MpqInterface, DeepCopyable {
 		if (!verifyMpqEditor()) {
 			throw new MpqException(String.format(Messages.getString("MpqInterface.MPQEditorNotFound"), mpqEditor)); //$NON-NLS-1$
 		}
-		final String q = "\""; //$NON-NLS-1$
 		final String cmd = "cmd /C " + q + q + mpqEditor + q + " /a " + q + mpqPath + q + " " + q + sourceFilePath + q //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 				+ " " //$NON-NLS-1$
 				+ q + targetName + q + " /r" + q; //$NON-NLS-1$
@@ -384,7 +386,6 @@ public class MpqEditorInterface implements MpqInterface, DeepCopyable {
 		if (!verifyMpqEditor()) {
 			throw new MpqException(String.format(Messages.getString("MpqInterface.MPQEditorNotFound"), mpqEditor)); //$NON-NLS-1$
 		}
-		final String q = "\""; //$NON-NLS-1$
 		final String cmd = "cmd /C " + q + q + mpqEditor + q + " /e " + q + mpqPath + q + " " + q + fileName + q + " " //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 				+ q + targetPath + q + (inclSubFolders ? " /fp" : "") + q; //$NON-NLS-1$ //$NON-NLS-2$
 		logger.trace("executing: " + cmd); //$NON-NLS-1$
@@ -412,7 +413,6 @@ public class MpqEditorInterface implements MpqInterface, DeepCopyable {
 		if (!verifyMpqEditor()) {
 			throw new MpqException(String.format(Messages.getString("MpqInterface.MPQEditorNotFound"), mpqEditor)); //$NON-NLS-1$
 		}
-		final String q = "\""; //$NON-NLS-1$
 		final String cmd = "cmd /C " + q + q + mpqEditor + q + " /compact " + q + mpqPath + q + q; //$NON-NLS-1$ //$NON-NLS-2$
 		logger.trace("executing: " + cmd); //$NON-NLS-1$
 		Runtime.getRuntime().exec(cmd).waitFor();
@@ -432,7 +432,6 @@ public class MpqEditorInterface implements MpqInterface, DeepCopyable {
 		if (!verifyMpqEditor()) {
 			throw new MpqException(String.format(Messages.getString("MpqInterface.MPQEditorNotFound"), mpqEditor)); //$NON-NLS-1$
 		}
-		final String q = "\""; //$NON-NLS-1$
 		final String cmd = "cmd /C " + q + q + mpqEditor + q + " /s " + q + mpqPath + q + " " + q + scriptPath + q + q; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		logger.trace("executing: " + cmd); //$NON-NLS-1$
 		Runtime.getRuntime().exec(cmd).waitFor();
@@ -451,7 +450,6 @@ public class MpqEditorInterface implements MpqInterface, DeepCopyable {
 		if (!verifyMpqEditor()) {
 			throw new MpqException(String.format(Messages.getString("MpqInterface.MPQEditorNotFound"), mpqEditor)); //$NON-NLS-1$
 		}
-		final String q = "\""; //$NON-NLS-1$
 		final String cmd = "cmd /C " + q + q + mpqEditor + q + " /d " + q + mpqPath + q + " " + q + filePath + q + q; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		logger.trace("executing: " + cmd); //$NON-NLS-1$
 		Runtime.getRuntime().exec(cmd).waitFor();
@@ -471,7 +469,6 @@ public class MpqEditorInterface implements MpqInterface, DeepCopyable {
 		if (!verifyMpqEditor()) {
 			throw new MpqException(String.format(Messages.getString("MpqInterface.MPQEditorNotFound"), mpqEditor)); //$NON-NLS-1$
 		}
-		final String q = "\""; //$NON-NLS-1$
 		final String cmd = "cmd /C " + q + q + mpqEditor + q + " /r " + q + mpqPath + q + " " + q + oldfilePath + q //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 				+ " " + q //$NON-NLS-1$
 				+ newFilePath + q + q;

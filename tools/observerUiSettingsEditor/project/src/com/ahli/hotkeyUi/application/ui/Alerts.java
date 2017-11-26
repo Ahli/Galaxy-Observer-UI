@@ -131,7 +131,7 @@ public class Alerts {
 	 * @param e
 	 * @return
 	 */
-	public static Alert buildExceptionAlert(final Window owner, final Exception e) {
+	public static Alert buildExceptionAlert(final Window owner, final Throwable e) {
 		final long time = System.nanoTime();
 		final ButtonType okButton = new ButtonType(Messages.getString("General.OkButton"), ButtonData.OK_DONE); //$NON-NLS-1$
 		final String localizedMsg = e.getLocalizedMessage();

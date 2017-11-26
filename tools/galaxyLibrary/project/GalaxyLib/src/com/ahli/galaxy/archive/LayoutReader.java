@@ -25,7 +25,7 @@ public final class LayoutReader {
 	private static Logger logger = LogManager.getLogger(LayoutReader.class);
 	
 	/**
-	 * 
+	 * Disabled Constructor.
 	 */
 	private LayoutReader() {
 	}

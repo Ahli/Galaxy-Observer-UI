@@ -40,6 +40,7 @@ import com.ahli.galaxy.game.def.SC2GameDef;
 import com.ahli.galaxy.game.def.abstracts.GameDef;
 import com.ahli.galaxy.ui.DescIndexReader;
 import com.ahli.galaxy.ui.UICatalog;
+import com.ahli.galaxy.ui.exception.UIException;
 import com.ahli.mpq.MpqEditorInterface;
 import com.ahli.mpq.MpqException;
 
@@ -60,6 +61,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.image.Image;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 import javafx.util.Duration;
@@ -90,6 +92,7 @@ public final class Main extends Application {
 	// GUI
 	private StyleClassedTextArea txtArea = null;
 	private TabPane tabPane = null;
+	private boolean userPreventedAutomaticClosing = false;
 	
 	// performance
 	private static long startTime;
@@ -207,7 +210,11 @@ public final class Main extends Application {
 			executor.execute(new Runnable() {
 				@Override
 				public void run() {
-					buildGamesInterfaceFiles(getGameHeroes(), path);
+					try {
+						buildGamesInterfaceFiles(getGameHeroes(), path);
+					} catch (final InterruptedException e) {
+						logger.trace("INTERRUPT: Building Heroes interface files was interrupted.");
+					}
 				}
 			});
 		}
@@ -216,7 +223,11 @@ public final class Main extends Application {
 			executor.execute(new Runnable() {
 				@Override
 				public void run() {
-					buildGamesInterfaceFiles(getGameSC2(), path);
+					try {
+						buildGamesInterfaceFiles(getGameSC2(), path);
+					} catch (final InterruptedException e) {
+						logger.trace("INTERRUPT: Building SC2 interface files was interrupted.");
+					}
 				}
 			});
 		}
@@ -224,7 +235,7 @@ public final class Main extends Application {
 		new Thread() {
 			@Override
 			public void run() {
-				Thread.currentThread().setName("TimeKeeper");
+				Thread.currentThread().setName("Supervisor");
 				try {
 					final ThreadPoolExecutor executor = getExecutor();
 					while (executor.getQueue().size() > 0 || executor.getActiveCount() > 0) {
@@ -240,8 +251,7 @@ public final class Main extends Application {
 							TimeUnit.MILLISECONDS.toSeconds(executionTime)
 									- TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(executionTime))));
 				} catch (final InterruptedException e) {
-					logger.error("ERROR: execution time measuring thread was interrupted.");
-					getErrorTracker().reportErrorEncounter(e);
+					logger.trace("INTERRUPT: Execution time measuring Thread was interrupted.");
 				}
 			}
 		}.start();
@@ -251,8 +261,9 @@ public final class Main extends Application {
 	/**
 	 * @param gameHeroes2
 	 * @param path
+	 * @throws InterruptedException
 	 */
-	private void buildGamesInterfaceFiles(final GameData game, final String path) {
+	private void buildGamesInterfaceFiles(final GameData game, final String path) throws InterruptedException {
 		printLogMessage("Starting to parse base " + game.getGameDef().getName() + " UI.");
 		parseDefaultUI(game);
 		try {
@@ -303,8 +314,9 @@ public final class Main extends Application {
 	 * 
 	 * @param game
 	 *            game whose default UI is parsed
+	 * @throws InterruptedException
 	 */
-	private void parseDefaultUI(final GameData game) {
+	private void parseDefaultUI(final GameData game) throws InterruptedException {
 		final UICatalog uiCatalog = game.getUiCatalog();
 		final String gameDir = getBaseUiPath(game.getGameDef()) + File.separator
 				+ game.getGameDef().getModsSubDirectory();
@@ -326,7 +338,7 @@ public final class Main extends Application {
 			logger.info("Finished parsing base UI for " + game.getGameDef().getName());
 			// } catch (ParserConfigurationException | SAXException | IOException |
 			// UIException e) {
-		} catch (final Exception e) {
+		} catch (final SAXException | IOException | ParserConfigurationException | UIException e) {
 			logger.error("ERROR parsing base UI catalog for '" + game.getGameDef().getName() + "'.", e);
 			e.printStackTrace();
 			errorTracker.reportErrorEncounter(e);
@@ -360,55 +372,41 @@ public final class Main extends Application {
 	private void startReplayOrQuitOrShowError(final Stage primaryStage) {
 		if (!errorTracker.hasEncounteredError()) {
 			// start game, launch replay
-			attemptToRunGameWithReplayThreaded();
-			if (!hasParamCompilePath) {
-				Platform.runLater(new Runnable() {
-					@Override
-					public void run() {
-						// close after 5 seconds, if compiled all and no errors
-						final PauseTransition delay = new PauseTransition(Duration.seconds(5));
-						delay.setOnFinished(new EventHandler<ActionEvent>() {
-							@Override
-							public void handle(final ActionEvent event) {
-								primaryStage.close();
-							}
-						});
-						delay.play();
-					}
-				});
-			} else {
-				// close instantly, if compiled special and no errors
-				Platform.runLater(new Runnable() {
-					
-					@Override
-					public void run() {
-						primaryStage.close();
-					}
-					
-				});
+			attemptToRunGameWithReplay();
+			if (!userPreventedAutomaticClosing) {
+				if (!hasParamCompilePath) {
+					Platform.runLater(new Runnable() {
+						@Override
+						public void run() {
+							// close after 5 seconds, if compiled all and no errors
+							final PauseTransition delay = new PauseTransition(Duration.seconds(5));
+							delay.setOnFinished(new EventHandler<ActionEvent>() {
+								@Override
+								public void handle(final ActionEvent event) {
+									primaryStage.close();
+								}
+							});
+							delay.play();
+						}
+					});
+				} else {
+					// close instantly, if compiled special and no errors
+					Platform.runLater(new Runnable() {
+						
+						@Override
+						public void run() {
+							primaryStage.close();
+						}
+						
+					});
+				}
 			}
 		}
 	}
 	
 	/**
-	 * Attempt to run the Game with the newest Replay file.
-	 *
-	 * @param paramRunPath
-	 *            path to the replay file.
-	 * @param compileAndRun
-	 *            setting whether it compiles and runs or only runs
-	 * @param paramCompilePath
-	 *            compile path
+	 * Attempts to run a game with a replay, if desired.
 	 */
-	private void attemptToRunGameWithReplayThreaded() {
-		executor.execute(new Runnable() {
-			@Override
-			public void run() {
-				attemptToRunGameWithReplay();
-			}
-		});
-	}
-	
 	public void attemptToRunGameWithReplay() {
 		boolean isHeroes = false;
 		String gamePath = null;
@@ -564,9 +562,18 @@ public final class Main extends Application {
 			errorTracker.reportErrorEncounter(e);
 		}
 		
+		// mouse click detection to prevent auto-closing
+		scene.addEventFilter(MouseEvent.MOUSE_PRESSED, new EventHandler<MouseEvent>() {
+			@Override
+			public void handle(final MouseEvent mouseEvent) {
+				logger.error("CLICK");
+				userPreventedAutomaticClosing = true;
+			}
+		});
+		
 		primaryStage.setScene(scene);
-		primaryStage.show();
 		primaryStage.setTitle("Compiling Interfaces...");
+		primaryStage.show();
 		printLogMessage("Initializing App...");
 	}
 	
@@ -585,7 +592,7 @@ public final class Main extends Application {
 		newTab.setText(tabTitle);
 		newTxtArea.setEditable(false);
 		// runlater needs to appear below the edits above, else it might be added before
-		// resulting in UI edits not in UI thread
+		// which results in UI edits not in UI thread -> error
 		Platform.runLater(new Runnable() {
 			@Override
 			public void run() {
@@ -654,28 +661,34 @@ public final class Main extends Application {
 	 */
 	public void buildSpecificUI(final File interfaceFolder, final GameData game) {
 		if (interfaceFolder.isDirectory()) {
-			executor.execute(new Runnable() {
-				@Override
-				public void run() {
-					// create unique cache path
-					final MpqEditorInterface threadsMpqInterface = (MpqEditorInterface) getBaseMpqInterface()
-							.deepCopy();
-					final long threadId = Thread.currentThread().getId();
-					threadsMpqInterface.setMpqCachePath(getBaseMpqInterface().getMpqCachePath() + threadId);
-					
-					// work
-					try {
-						buildFile(interfaceFolder, game, threadsMpqInterface);
-						threadsMpqInterface.clearCacheExtractedMpq();
-					} catch (final IOException e) {
-						logger.error("IOException while building UIs", e);
-						getErrorTracker().reportErrorEncounter();
-						e.printStackTrace();
+			if (!executor.isShutdown()) {
+				executor.execute(new Runnable() {
+					@Override
+					public void run() {
+						// create unique cache path
+						final MpqEditorInterface threadsMpqInterface = (MpqEditorInterface) getBaseMpqInterface()
+								.deepCopy();
+						final long threadId = Thread.currentThread().getId();
+						threadsMpqInterface.setMpqCachePath(getBaseMpqInterface().getMpqCachePath() + threadId);
+						
+						// work
+						try {
+							buildFile(interfaceFolder, game, threadsMpqInterface);
+							threadsMpqInterface.clearCacheExtractedMpq();
+						} catch (final InterruptedException e) {
+							logger.trace("INTERRUPT: building a File was interrupted.");
+						} catch (final IOException e) {
+							logger.error("ERROR: Exception while building UIs.", e);
+							getErrorTracker().reportErrorEncounter();
+							e.printStackTrace();
+						}
 					}
-				}
-			});
+				});
+			} else {
+				logger.error("ERROR: Executor shut down. Skipping building a UI...");
+			}
 		} else {
-			logger.error("Can't build UI from file '" + interfaceFolder + "', expected a directory.");
+			logger.error("ERROR: Can't build UI from file '" + interfaceFolder + "', expected a directory.");
 		}
 	}
 	
@@ -701,9 +714,10 @@ public final class Main extends Application {
 	 *            MpqInterface with unique cache path
 	 * @throws IOException
 	 *             when something goes wrong
+	 * @throws InterruptedException
 	 */
 	private void buildFile(final File sourceFile, final GameData game, final MpqEditorInterface mpqi)
-			throws IOException {
+			throws IOException, InterruptedException {
 		String targetPath = documentsPath + File.separator;
 		targetPath += game.getGameDef().getDocumentsGameDirectoryName();
 		targetPath += File.separator + game.getGameDef().getDocumentsInterfaceSubdirectoryName();
@@ -725,19 +739,14 @@ public final class Main extends Application {
 		y: for (cacheClearAttempts = 0; cacheClearAttempts <= 100; cacheClearAttempts++) {
 			if (!mpqi.clearCacheExtractedMpq()) {
 				// sleep and hope the file gets released soon
-				try {
-					Thread.sleep(500);
-				} catch (final InterruptedException e1) {
-					e1.printStackTrace();
-					errorTracker.reportErrorEncounter(e1);
-				}
+				Thread.sleep(500);
 			} else {
 				// success
 				break y;
 			}
 		}
 		if (cacheClearAttempts > 100) {
-			final String msg = "Cache could not be cleared";
+			final String msg = "ERROR: Cache could not be cleared";
 			logger.error(msg);
 			return;
 		}
@@ -760,12 +769,7 @@ public final class Main extends Application {
 					throw new FileSystemException(msg);
 				}
 				// sleep and hope the file gets released soon
-				try {
-					Thread.sleep(500);
-				} catch (final InterruptedException e1) {
-					logger.error("Thread sleep was interrupted with exception.", e);
-					errorTracker.reportErrorEncounter(e);
-				}
+				Thread.sleep(500);
 			} catch (final IOException e) {
 				errorTracker.reportErrorEncounter();
 				final String msg = "Unable to copy directory";
@@ -823,14 +827,10 @@ public final class Main extends Application {
 					: settings.isSC2ProtectMPQ();
 			mpqi.buildMpq(targetPath, sourceFile.getName(), protectMPQ, settings.isBuildUnprotectedToo());
 			logger.info("Finished building... " + sourceFile.getName());
-		} catch (IOException | InterruptedException e) {
-			logger.error("ERROR: unable to construct final Interface file", e);
+		} catch (final IOException | MpqException e) {
+			logger.error("ERROR: unable to construct final Interface file.", e);
 			errorTracker.reportErrorEncounter(e);
 			e.printStackTrace();
-		} catch (final Exception e1) {
-			logger.error("ERROR: caught an unexpected Exception", e1);
-			errorTracker.reportErrorEncounter(e1);
-			e1.printStackTrace();
 		}
 	}
 	
@@ -840,18 +840,17 @@ public final class Main extends Application {
 	@Override
 	public void stop() {
 		logger.info("App is about to shut down.");
-		baseMpqInterface.clearCacheExtractedMpq();
-		executor.shutdown();
-		try {
-			if (executor.awaitTermination(60, TimeUnit.SECONDS)) {
-				logger.info("App waves Goodbye!");
-			} else {
-				logger.error("ERROR: Executor timed out waiting for termination.");
-			}
-		} catch (final InterruptedException e) {
-			logger.error("ERROR while shutting down executor.", e);
-			e.printStackTrace(System.err);
+		if (!executor.isShutdown()) {
+			executor.shutdownNow();
 		}
+		try {
+			executor.awaitTermination(120L, TimeUnit.SECONDS);
+		} catch (final InterruptedException e) {
+			logger.error(
+					"ERROR: Executor timed out waiting for Worker Theads to terminate. A Thread might run rampage.", e);
+		}
+		baseMpqInterface.clearCacheExtractedMpq();
+		logger.info("App waves Goodbye!");
 	}
 	
 	/**
@@ -874,12 +873,10 @@ public final class Main extends Application {
 	 *            location
 	 */
 	private void initSettings(final SettingsIniInterface optionalSettingsToLoad) {
-		SettingsIniInterface settings;
+		SettingsIniInterface settings = optionalSettingsToLoad;
 		if (optionalSettingsToLoad == null) {
 			final String settingsFilePath = basePath.getParent() + File.separator + "settings.ini";
 			settings = new SettingsIniInterface(settingsFilePath);
-		} else {
-			settings = optionalSettingsToLoad;
 		}
 		try {
 			settings.readSettingsFromFile();
