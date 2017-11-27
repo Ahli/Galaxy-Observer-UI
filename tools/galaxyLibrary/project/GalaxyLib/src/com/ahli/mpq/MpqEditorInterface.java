@@ -511,7 +511,7 @@ public class MpqEditorInterface implements MpqInterface, DeepCopyable {
 	public boolean isHeroesMpq() throws MpqException {
 		File f = new File(mpqCachePath + File.separator + "ComponentList.StormComponents"); //$NON-NLS-1$
 		if (!f.exists() || f.isDirectory()) {
-			logger.trace("file not found in archive: " + f.getAbsolutePath());
+			logger.trace("file not found in archive: " + f.getAbsolutePath()); //$NON-NLS-1$
 			f = new File(mpqCachePath + File.separator + "ComponentList.SC2Components"); //$NON-NLS-1$
 			if (!f.exists() || f.isDirectory()) {
 				logger.error("ERROR: archive has no ComponentList file."); //$NON-NLS-1$

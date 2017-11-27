@@ -566,7 +566,6 @@ public final class Main extends Application {
 		scene.addEventFilter(MouseEvent.MOUSE_PRESSED, new EventHandler<MouseEvent>() {
 			@Override
 			public void handle(final MouseEvent mouseEvent) {
-				logger.error("CLICK");
 				userPreventedAutomaticClosing = true;
 			}
 		});
