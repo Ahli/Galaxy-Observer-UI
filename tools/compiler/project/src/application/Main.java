@@ -167,7 +167,7 @@ public final class Main extends Application {
 		// test with proper compression of mpqeditor
 		// durations/thread# for my 4cpu/8threads: 16, 13, 12, 12, 12,... 12
 		
-		final int maxThreads = Math.max(1, Math.min(numberOfProcessors / 2, 3));
+		final int maxThreads = Math.max(1, Math.min(numberOfProcessors / 2, 1));
 		executor = new ThreadPoolExecutor(maxThreads, maxThreads, 5000, TimeUnit.MILLISECONDS,
 				new LinkedBlockingQueue<Runnable>(), new ThreadFactory() {
 					@Override
