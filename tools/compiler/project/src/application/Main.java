@@ -7,9 +7,11 @@ import java.io.InputStream;
 import java.nio.file.FileSystemException;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadFactory;
@@ -46,8 +48,7 @@ import com.ahli.mpq.MpqException;
 
 import application.integration.ReplayFinder;
 import application.integration.SettingsIniInterface;
-import application.util.ErrorTracker;
-import application.util.ErrorTrackerImpl;
+import application.util.ErrorTabPaneController;
 import application.util.JarHelper;
 import application.util.logger.log4j2plugin.StylizedTextAreaAppender;
 import javafx.animation.PauseTransition;
@@ -80,8 +81,7 @@ public final class Main extends Application {
 	private MpqEditorInterface baseMpqInterface = null;
 	private SettingsIniInterface settings = null;
 	private final ReplayFinder replayFinder = new ReplayFinder();
-	private final ErrorTracker errorTracker = new ErrorTrackerImpl();
-	private final CompileManager compileManager = new CompileManager(errorTracker);
+	private final CompileManager compileManager = new CompileManager();
 	
 	// data
 	private final String documentsPath = new JFileChooser().getFileSystemView().getDefaultDirectory().toString();
@@ -90,9 +90,10 @@ public final class Main extends Application {
 	private final GameData gameHeroes = new GameData(new HeroesGameDef());
 	
 	// GUI
-	private StyleClassedTextArea txtArea = null;
+	// private StyleClassedTextArea txtArea = null;
 	private TabPane tabPane = null;
 	private boolean userPreventedAutomaticClosing = false;
+	private final List<ErrorTabPaneController> errorTabControllers = new ArrayList<>();
 	
 	// performance
 	private static long startTime;
@@ -111,15 +112,15 @@ public final class Main extends Application {
 	 */
 	public static void main(final String[] args) {
 		startTime = System.currentTimeMillis();
-		logger.trace("trace log visible");
-		logger.debug("debug log visible");
-		logger.info("info log visible");
-		logger.warn("warn log visible");
-		logger.error("error log visible");
-		logger.fatal("fatal log visible");
+		logger.trace("trace log visible"); //$NON-NLS-1$
+		logger.debug("debug log visible"); //$NON-NLS-1$
+		logger.info("info log visible"); //$NON-NLS-1$
+		logger.warn("warn log visible"); //$NON-NLS-1$
+		logger.error("error log visible"); //$NON-NLS-1$
+		logger.fatal("fatal log visible"); //$NON-NLS-1$
 		
-		logger.trace("Configuration File of System: " + System.getProperty("log4j.configurationFile"));
-		logger.info("Launch arguments: " + Arrays.toString(args));
+		logger.trace("Configuration File of System: " + System.getProperty("log4j.configurationFile")); //$NON-NLS-1$ //$NON-NLS-2$
+		logger.info("Launch arguments: " + Arrays.toString(args)); //$NON-NLS-1$
 		
 		launch(args);
 	}
@@ -129,7 +130,7 @@ public final class Main extends Application {
 	 */
 	@Override
 	public void start(final Stage primaryStage) {
-		Thread.currentThread().setName("UI");
+		Thread.currentThread().setName("UI"); //$NON-NLS-1$
 		
 		initThreadPool();
 		
@@ -154,7 +155,7 @@ public final class Main extends Application {
 	 */
 	private void initThreadPool() {
 		final int numberOfProcessors = Runtime.getRuntime().availableProcessors();
-		logger.info("detected processor count: " + numberOfProcessors);
+		logger.info("detected processor count: " + numberOfProcessors); //$NON-NLS-1$
 		// test sleepytasks:
 		// durations/thread# for my 4cpu/8threads: 18, 14, 12, 15, 15, 17, 16, 19, .,14
 		// test new:
@@ -169,14 +170,14 @@ public final class Main extends Application {
 		
 		final int maxThreads = Math.max(1, Math.min(numberOfProcessors / 2, 1));
 		executor = new ThreadPoolExecutor(maxThreads, maxThreads, 5000, TimeUnit.MILLISECONDS,
+				// new LinkedBlockingQueue<Runnable>(), new WorkerThreadFactory());
 				new LinkedBlockingQueue<Runnable>(), new ThreadFactory() {
 					@Override
 					public Thread newThread(final Runnable runnable) {
 						final Thread t = new Thread(runnable);
 						t.setDaemon(true);
-						t.setName(t.getName().replaceFirst("Thread", "W"));
-						final String title = t.getName();
-						addThreadLoggerTab(t.getId(), title);
+						t.setName(t.getName().replaceFirst("Thread", "W")); //$NON-NLS-1$ //$NON-NLS-2$
+						// addThreadLoggerTab(t.getId(), t.getName());
 						return t;
 					}
 				});
@@ -191,7 +192,7 @@ public final class Main extends Application {
 	 * @return path to the baseUI folder of the specified game
 	 */
 	private String getBaseUiPath(final GameDef gameDef) {
-		return basePath.getParent() + File.separator + "baseUI" + File.separator + gameDef.getNameHandle();
+		return basePath.getParent() + File.separator + "baseUI" + File.separator + gameDef.getNameHandle(); //$NON-NLS-1$
 	}
 	
 	/**
@@ -207,55 +208,56 @@ public final class Main extends Application {
 		final boolean workSC2 = pathContainsCompileableForGame(path, gameSC2);
 		
 		if (workHeroes) {
-			executor.execute(new Runnable() {
-				@Override
-				public void run() {
-					try {
-						buildGamesInterfaceFiles(getGameHeroes(), path);
-					} catch (final InterruptedException e) {
-						logger.trace("INTERRUPT: Building Heroes interface files was interrupted.");
-					}
-				}
-			});
+			startBaseUiParsingThread(gameHeroes, path);
 		}
 		
 		if (workSC2) {
-			executor.execute(new Runnable() {
-				@Override
-				public void run() {
-					try {
-						buildGamesInterfaceFiles(getGameSC2(), path);
-					} catch (final InterruptedException e) {
-						logger.trace("INTERRUPT: Building SC2 interface files was interrupted.");
-					}
-				}
-			});
+			startBaseUiParsingThread(gameSC2, path);
 		}
 		
 		new Thread() {
 			@Override
 			public void run() {
-				Thread.currentThread().setName("Supervisor");
+				Thread.currentThread().setName("Supervisor"); //$NON-NLS-1$
 				try {
 					final ThreadPoolExecutor executor = getExecutor();
 					while (executor.getQueue().size() > 0 || executor.getActiveCount() > 0) {
 						Thread.sleep(50);
 					}
-					setStageTitle("Compiling completed.", primaryStage);
+					setStageTitle("Compiling completed.", primaryStage); //$NON-NLS-1$
 					startReplayOrQuitOrShowError(primaryStage);
 					executor.shutdown();
 					executor.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
 					final long executionTime = (System.currentTimeMillis() - startTime);
-					logger.info("Execution time: " + String.format("%d min, %d sec",
+					logger.info("Execution time: " + String.format("%d min, %d sec", //$NON-NLS-1$ //$NON-NLS-2$
 							TimeUnit.MILLISECONDS.toMinutes(executionTime),
 							TimeUnit.MILLISECONDS.toSeconds(executionTime)
 									- TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(executionTime))));
 				} catch (final InterruptedException e) {
-					logger.trace("INTERRUPT: Execution time measuring Thread was interrupted.");
+					logger.trace("INTERRUPT: Execution time measuring Thread was interrupted."); //$NON-NLS-1$
 				}
 			}
 		}.start();
 		
+	}
+	
+	/**
+	 * @param game
+	 * @param path
+	 */
+	private void startBaseUiParsingThread(final GameData game, final String path) {
+		executor.execute(new Runnable() {
+			@Override
+			public void run() {
+				try {
+					addThreadLoggerTab(Thread.currentThread().getId(), game.getGameDef().getNameHandle() + "UI"); //$NON-NLS-1$
+					buildGamesInterfaceFiles(game, path);
+				} catch (final InterruptedException e) {
+					logger.trace("INTERRUPT: Building " + game.getGameDef().getNameHandle() //$NON-NLS-1$
+							+ " interface files was interrupted."); //$NON-NLS-1$
+				}
+			}
+		});
 	}
 	
 	/**
@@ -264,7 +266,7 @@ public final class Main extends Application {
 	 * @throws InterruptedException
 	 */
 	private void buildGamesInterfaceFiles(final GameData game, final String path) throws InterruptedException {
-		printLogMessage("Starting to parse base " + game.getGameDef().getName() + " UI.");
+		printLogMessage("Starting to parse base " + game.getGameDef().getName() + " UI."); //$NON-NLS-1$ //$NON-NLS-2$
 		parseDefaultUI(game);
 		try {
 			if (hasParamCompilePath) {
@@ -273,10 +275,10 @@ public final class Main extends Application {
 				buildGamesUIs(game.getGameDef().getNameHandle(), game);
 			}
 		} catch (final IOException e) {
-			logger.error("ERROR while building a UI for " + game.getGameDef().getName() + ": " + e);
+			logger.error("ERROR while building a UI for " + game.getGameDef().getName() + ": " + e); //$NON-NLS-1$ //$NON-NLS-2$
 			e.printStackTrace();
 		}
-		printLogMessage("Finished constructing UIs for " + game.getGameDef().getName() + ".");
+		printLogMessage("Finished constructing UIs for " + game.getGameDef().getName() + "."); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 	
 	/**
@@ -327,21 +329,20 @@ public final class Main extends Application {
 				final File directory = new File(gameDir + File.separator + modOrDir);
 				
 				final Collection<File> descIndexFiles = FileUtils.listFiles(directory,
-						new WildcardFileFilter("DescIndex.*Layout"), TrueFileFilter.INSTANCE);
-				logger.info("number of descIndexFiles found: " + descIndexFiles.size());
+						new WildcardFileFilter("DescIndex.*Layout"), TrueFileFilter.INSTANCE); //$NON-NLS-1$
+				logger.info("number of descIndexFiles found: " + descIndexFiles.size()); //$NON-NLS-1$
 				
 				for (final File descIndexFile : descIndexFiles) {
-					logger.info("parsing descIndexFile '" + descIndexFile.getPath() + "'");
+					logger.info("parsing descIndexFile '" + descIndexFile.getPath() + "'"); //$NON-NLS-1$ //$NON-NLS-2$
 					uiCatalog.processDescIndex(descIndexFile, game.getGameDef().getDefaultRaceId());
 				}
 			}
-			logger.info("Finished parsing base UI for " + game.getGameDef().getName());
+			logger.info("Finished parsing base UI for " + game.getGameDef().getName()); //$NON-NLS-1$
 			// } catch (ParserConfigurationException | SAXException | IOException |
 			// UIException e) {
 		} catch (final SAXException | IOException | ParserConfigurationException | UIException e) {
-			logger.error("ERROR parsing base UI catalog for '" + game.getGameDef().getName() + "'.", e);
+			logger.error("ERROR parsing base UI catalog for '" + game.getGameDef().getName() + "'.", e); //$NON-NLS-1$ //$NON-NLS-2$
 			e.printStackTrace();
-			errorTracker.reportErrorEncounter(e);
 		}
 	}
 	
@@ -370,7 +371,7 @@ public final class Main extends Application {
 	 *            app's main stage
 	 */
 	private void startReplayOrQuitOrShowError(final Stage primaryStage) {
-		if (!errorTracker.hasEncounteredError()) {
+		if (!anyErrorTrackerEncounteredError()) {
 			// start game, launch replay
 			attemptToRunGameWithReplay();
 			if (!userPreventedAutomaticClosing) {
@@ -392,16 +393,26 @@ public final class Main extends Application {
 				} else {
 					// close instantly, if compiled special and no errors
 					Platform.runLater(new Runnable() {
-						
 						@Override
 						public void run() {
 							primaryStage.close();
 						}
-						
 					});
 				}
 			}
 		}
+	}
+	
+	/**
+	 * @return
+	 */
+	private boolean anyErrorTrackerEncounteredError() {
+		for (final ErrorTabPaneController ctrl : errorTabControllers) {
+			if (ctrl.hasEncounteredError()) {
+				return true;
+			}
+		}
+		return false;
 	}
 	
 	/**
@@ -417,76 +428,75 @@ public final class Main extends Application {
 				return;
 			}
 			gamePath = paramRunPath;
-			isHeroes = gamePath.contains("HeroesSwitcher.exe");
+			isHeroes = gamePath.contains("HeroesSwitcher.exe"); //$NON-NLS-1$
 		} else {
 			// compileAndRun is active -> figure out the right game
-			if (paramCompilePath.contains(File.separator + "heroes" + File.separator)) {
+			if (paramCompilePath.contains(File.separator + "heroes" + File.separator)) { //$NON-NLS-1$
 				// Heroes
 				isHeroes = true;
 				if (settings.isPtrActive()) {
 					// PTR Heroes
 					if (settings.isHeroesPtr64bit()) {
-						gamePath = settings.getHeroesPtrPath() + File.separator + "Support64" + File.separator
-								+ "HeroesSwitcher_x64.exe";
+						gamePath = settings.getHeroesPtrPath() + File.separator + "Support64" + File.separator //$NON-NLS-1$
+								+ "HeroesSwitcher_x64.exe"; //$NON-NLS-1$
 					} else {
-						gamePath = settings.getHeroesPtrPath() + File.separator + "Support" + File.separator
-								+ "HeroesSwitcher.exe";
+						gamePath = settings.getHeroesPtrPath() + File.separator + "Support" + File.separator //$NON-NLS-1$
+								+ "HeroesSwitcher.exe"; //$NON-NLS-1$
 					}
 				} else {
 					// live Heroes
 					if (settings.isHeroes64bit()) {
-						gamePath = settings.getHeroesPath() + File.separator + "Support64" + File.separator
-								+ "HeroesSwitcher_x64.exe";
+						gamePath = settings.getHeroesPath() + File.separator + "Support64" + File.separator //$NON-NLS-1$
+								+ "HeroesSwitcher_x64.exe"; //$NON-NLS-1$
 					} else {
-						gamePath = settings.getHeroesPath() + File.separator + "Support" + File.separator
-								+ "HeroesSwitcher.exe";
+						gamePath = settings.getHeroesPath() + File.separator + "Support" + File.separator //$NON-NLS-1$
+								+ "HeroesSwitcher.exe"; //$NON-NLS-1$
 					}
 				}
 			} else {
 				// SC2
 				isHeroes = false;
 				if (settings.isSC264bit()) {
-					gamePath = settings.getSC2Path() + File.separator + "Support64" + File.separator
-							+ "SC2Switcher_x64.exe";
+					gamePath = settings.getSC2Path() + File.separator + "Support64" + File.separator //$NON-NLS-1$
+							+ "SC2Switcher_x64.exe"; //$NON-NLS-1$
 				} else {
-					gamePath = settings.getSC2Path() + File.separator + "Support" + File.separator + "SC2Switcher.exe";
+					gamePath = settings.getSC2Path() + File.separator + "Support" + File.separator + "SC2Switcher.exe"; //$NON-NLS-1$ //$NON-NLS-2$
 				}
 			}
 		}
-		printLogMessage("Game location: " + gamePath);
+		printLogMessage("Game location: " + gamePath); //$NON-NLS-1$
 		
 		final File replay = replayFinder.getLastUsedOrNewestReplay(isHeroes, documentsPath);
 		if (replay != null && replay.exists() && replay.isFile()) {
-			logger.info("Starting game with replay: " + replay.getName());
-			final String cmd = "cmd /C start \"\" \"" + gamePath + "\" \"" + replay.getAbsolutePath() + "\"";
-			logger.trace("executing: " + cmd);
+			logger.info("Starting game with replay: " + replay.getName()); //$NON-NLS-1$
+			final String cmd = "cmd /C start \"\" \"" + gamePath + "\" \"" + replay.getAbsolutePath() + "\""; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			logger.trace("executing: " + cmd); //$NON-NLS-1$
 			try {
 				Runtime.getRuntime().exec(cmd);
-				logger.trace("after Start attempt...");
+				logger.trace("after Start attempt..."); //$NON-NLS-1$
 			} catch (final IOException e) {
 				e.printStackTrace();
-				errorTracker.reportErrorEncounter(e);
 			}
 		} else {
-			logger.error("Failed to find any replay.");
+			logger.error("Failed to find any replay."); //$NON-NLS-1$
 		}
-		printLogMessage("Finished to start the game with a replay.");
+		printLogMessage("Finished to start the game with a replay."); //$NON-NLS-1$
 	}
 	
 	/**
 	 * Prints variables into console.
 	 */
 	private void printVariables() {
-		logger.info("basePath: " + basePath);
-		logger.info("documentsPath: " + documentsPath);
+		logger.info("basePath: " + basePath); //$NON-NLS-1$
+		logger.info("documentsPath: " + documentsPath); //$NON-NLS-1$
 		if (paramCompilePath != null) {
-			logger.info("compile param path: " + paramCompilePath);
+			logger.info("compile param path: " + paramCompilePath); //$NON-NLS-1$
 			if (compileAndRun) {
-				logger.info("run after compile: " + compileAndRun);
+				logger.info("run after compile: " + compileAndRun); //$NON-NLS-1$
 			}
 		}
 		if (paramRunPath != null) {
-			logger.info("run param path: " + paramRunPath);
+			logger.info("run param path: " + paramRunPath); //$NON-NLS-1$
 		}
 	}
 	
@@ -501,10 +511,10 @@ public final class Main extends Application {
 		
 		// COMPILE / COMPILERUN PARAM
 		// --compile="D:\GalaxyObsUI\dev\heroes\AhliObs.StormInterface"
-		paramCompilePath = namedParams.get("compile");
+		paramCompilePath = namedParams.get("compile"); //$NON-NLS-1$
 		compileAndRun = false;
-		if (namedParams.get("compileRun") != null) {
-			paramCompilePath = namedParams.get("compileRun");
+		if (namedParams.get("compileRun") != null) { //$NON-NLS-1$
+			paramCompilePath = namedParams.get("compileRun"); //$NON-NLS-1$
 			compileAndRun = true;
 		}
 		paramCompilePath = getInterfaceRootFromPath(paramCompilePath);
@@ -512,7 +522,7 @@ public final class Main extends Application {
 		
 		// RUN PARAM
 		// --run="F:\Games\Heroes of the Storm\Support\HeroesSwitcher.exe"
-		paramRunPath = namedParams.get("run");
+		paramRunPath = namedParams.get("run"); //$NON-NLS-1$
 	}
 	
 	/**
@@ -532,10 +542,9 @@ public final class Main extends Application {
 		// Build UI
 		final BorderPane root = new BorderPane();
 		
-		txtArea = new StyleClassedTextArea();
+		final StyleClassedTextArea txtArea = new StyleClassedTextArea();
 		txtArea.setEditable(false);
 		// log4j2 can print into GUI
-		StylizedTextAreaAppender.setTextArea(txtArea);
 		final VirtualizedScrollPane<StyleClassedTextArea> virtualizedScrollPane = new VirtualizedScrollPane<>(txtArea);
 		
 		final Scene scene = new Scene(root, 1200, 400);
@@ -544,36 +553,47 @@ public final class Main extends Application {
 		
 		final FXMLLoader loader = new FXMLLoader();
 		// loader.setResources(Messages.getBundle());
-		try (InputStream is = Main.class.getResourceAsStream("view/TabsLayout.fxml");) {
+		try (InputStream is = Main.class.getResourceAsStream("view/TabsLayout.fxml");) { //$NON-NLS-1$
 			tabPane = (TabPane) loader.load(is); // $NON-NLS-1$
 		} catch (final IOException e) {
-			logger.error("failed to load TabsLayout.fxml");
+			logger.error("failed to load TabsLayout.fxml"); //$NON-NLS-1$
 			e.printStackTrace();
-			errorTracker.reportErrorEncounter(e);
 		}
 		root.setCenter(tabPane);
 		final ObservableList<Tab> tabs = tabPane.getTabs();
-		tabs.get(0).setContent(virtualizedScrollPane);
+		final Tab tab = tabs.get(0);
+		tab.setContent(virtualizedScrollPane);
+		
+		final ErrorTabPaneController errorTabCtrl = new ErrorTabPaneController(tab, txtArea);
+		errorTabCtrl.setRunning(true);
+		errorTabControllers.add(errorTabCtrl);
+		StylizedTextAreaAppender.setGeneralController(errorTabCtrl);
 		
 		try {
 			primaryStage.getIcons().add(new Image(Main.class.getResourceAsStream("/res/ahli.png"))); //$NON-NLS-1$
 		} catch (final Exception e) {
-			logger.error("Failed to load ahli.png");
-			errorTracker.reportErrorEncounter(e);
+			logger.error("Failed to load ahli.png"); //$NON-NLS-1$
 		}
 		
 		// mouse click detection to prevent auto-closing
 		scene.addEventFilter(MouseEvent.MOUSE_PRESSED, new EventHandler<MouseEvent>() {
 			@Override
 			public void handle(final MouseEvent mouseEvent) {
-				userPreventedAutomaticClosing = true;
+				setUserPreventedAutomaticClosing(true);
 			}
 		});
 		
 		primaryStage.setScene(scene);
-		primaryStage.setTitle("Compiling Interfaces...");
+		primaryStage.setTitle("Compiling Interfaces..."); //$NON-NLS-1$
 		primaryStage.show();
-		printLogMessage("Initializing App...");
+		printLogMessage("Initializing App..."); //$NON-NLS-1$
+	}
+	
+	/**
+	 * @param b
+	 */
+	public void setUserPreventedAutomaticClosing(final boolean b) {
+		userPreventedAutomaticClosing = b;
 	}
 	
 	/**
@@ -584,12 +604,17 @@ public final class Main extends Application {
 	private void addThreadLoggerTab(final long threadId, final String tabTitle) {
 		final Tab newTab = new Tab();
 		final StyleClassedTextArea newTxtArea = new StyleClassedTextArea();
+		final ErrorTabPaneController errorTabCtrl = new ErrorTabPaneController(newTab, newTxtArea);
+		errorTabCtrl.setRunning(true);
+		errorTabControllers.add(errorTabCtrl);
+		
 		final VirtualizedScrollPane<StyleClassedTextArea> virtualizedScrollPane = new VirtualizedScrollPane<>(
 				newTxtArea);
 		newTab.setContent(virtualizedScrollPane);
-		StylizedTextAreaAppender.setSpecialTextArea(newTxtArea, threadId);
+		StylizedTextAreaAppender.setWorkerTaskController(errorTabCtrl, threadId);
 		newTab.setText(tabTitle);
 		newTxtArea.setEditable(false);
+		
 		// runlater needs to appear below the edits above, else it might be added before
 		// which results in UI edits not in UI thread -> error
 		Platform.runLater(new Runnable() {
@@ -611,7 +636,7 @@ public final class Main extends Application {
 	private String getInterfaceRootFromPath(final String paramPath) {
 		String str = paramPath;
 		if (str != null) {
-			while (str.length() > 0 && !str.endsWith("Interface")) {
+			while (str.length() > 0 && !str.endsWith("Interface")) { //$NON-NLS-1$
 				// logger.trace("cutting progress: " + str);
 				final int lastIndex = str.lastIndexOf(File.separatorChar);
 				if (lastIndex != -1) {
@@ -622,7 +647,7 @@ public final class Main extends Application {
 				}
 			}
 		}
-		logger.trace("cutting result: " + str);
+		logger.trace("cutting result: " + str); //$NON-NLS-1$
 		return str;
 	}
 	
@@ -661,9 +686,11 @@ public final class Main extends Application {
 	public void buildSpecificUI(final File interfaceFolder, final GameData game) {
 		if (interfaceFolder.isDirectory()) {
 			if (!executor.isShutdown()) {
+				// create tasks for the worker pool
 				executor.execute(new Runnable() {
 					@Override
 					public void run() {
+						addThreadLoggerTab(Thread.currentThread().getId(), interfaceFolder.getName());
 						// create unique cache path
 						final MpqEditorInterface threadsMpqInterface = (MpqEditorInterface) getBaseMpqInterface()
 								.deepCopy();
@@ -675,19 +702,18 @@ public final class Main extends Application {
 							buildFile(interfaceFolder, game, threadsMpqInterface);
 							threadsMpqInterface.clearCacheExtractedMpq();
 						} catch (final InterruptedException e) {
-							logger.trace("INTERRUPT: building a File was interrupted.");
+							logger.trace("INTERRUPT: building a File was interrupted."); //$NON-NLS-1$
 						} catch (final IOException e) {
-							logger.error("ERROR: Exception while building UIs.", e);
-							getErrorTracker().reportErrorEncounter();
+							logger.error("ERROR: Exception while building UIs.", e); //$NON-NLS-1$
 							e.printStackTrace();
 						}
 					}
 				});
 			} else {
-				logger.error("ERROR: Executor shut down. Skipping building a UI...");
+				logger.error("ERROR: Executor shut down. Skipping building a UI..."); //$NON-NLS-1$
 			}
 		} else {
-			logger.error("ERROR: Can't build UI from file '" + interfaceFolder + "', expected a directory.");
+			logger.error("ERROR: Can't build UI from file '" + interfaceFolder + "', expected a directory."); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 	}
 	
@@ -729,8 +755,7 @@ public final class Main extends Application {
 		// get and create cache
 		final File cache = new File(mpqi.getMpqCachePath());
 		if (!cache.exists() && !cache.mkdirs()) {
-			errorTracker.reportErrorEncounter();
-			final String msg = "Unable to create cache directory.";
+			final String msg = "Unable to create cache directory."; //$NON-NLS-1$
 			logger.error(msg);
 			throw new IOException(msg);
 		}
@@ -745,7 +770,7 @@ public final class Main extends Application {
 			}
 		}
 		if (cacheClearAttempts > 100) {
-			final String msg = "ERROR: Cache could not be cleared";
+			final String msg = "ERROR: Cache could not be cleared"; //$NON-NLS-1$
 			logger.error(msg);
 			return;
 		}
@@ -755,14 +780,13 @@ public final class Main extends Application {
 		x: for (copyAttempts = 0; copyAttempts <= 100; copyAttempts++) {
 			try {
 				copyFileOrFolder(sourceFile, cache);
-				logger.trace("Copy Folder took " + copyAttempts + " attempts to succeed.");
+				logger.trace("Copy Folder took " + copyAttempts + " attempts to succeed."); //$NON-NLS-1$ //$NON-NLS-2$
 				break x;
 			} catch (final FileSystemException e) {
 				if (copyAttempts == 0) {
-					logger.warn("Attempt to copy directory failed.", e);
+					logger.warn("Attempt to copy directory failed.", e); //$NON-NLS-1$
 				} else if (copyAttempts >= 100) {
-					errorTracker.reportErrorEncounter();
-					final String msg = "Unable to copy directory after 100 copy attempts: " + e.getMessage();
+					final String msg = "Unable to copy directory after 100 copy attempts: " + e.getMessage(); //$NON-NLS-1$
 					logger.error(msg, e);
 					e.printStackTrace();
 					throw new FileSystemException(msg);
@@ -770,25 +794,22 @@ public final class Main extends Application {
 				// sleep and hope the file gets released soon
 				Thread.sleep(500);
 			} catch (final IOException e) {
-				errorTracker.reportErrorEncounter();
-				final String msg = "Unable to copy directory";
+				final String msg = "Unable to copy directory"; //$NON-NLS-1$
 				logger.error(msg, e);
-				errorTracker.reportErrorEncounter(e);
 				e.printStackTrace();
 			}
 		}
 		if (copyAttempts > 100) {
 			// copy keeps failing -> abort
-			final String msg = "Above code did not throw exception about copy attempt threshold reached.";
+			final String msg = "Above code did not throw exception about copy attempt threshold reached."; //$NON-NLS-1$
 			logger.error(msg);
-			errorTracker.reportErrorEncounter();
 			throw new IOException(msg);
 		}
 		
-		logger.trace("retrieving componentList");
+		logger.trace("retrieving componentList"); //$NON-NLS-1$
 		final File componentListFile = mpqi.getComponentListFile();
 		mod.setComponentListFile(componentListFile);
-		logger.trace("retrieving descIndex - set path and clear");
+		logger.trace("retrieving descIndex - set path and clear"); //$NON-NLS-1$
 		
 		final DescIndexData descIndexData = new DescIndexData(mpqi);
 		mod.setDescIndexData(descIndexData);
@@ -796,39 +817,36 @@ public final class Main extends Application {
 		try {
 			descIndexData.setDescIndexPathAndClear(ComponentsListReader.getDescIndexPath(componentListFile));
 		} catch (ParserConfigurationException | SAXException | IOException e) {
-			final String msg = "ERROR: unable to read DescIndex path.";
+			final String msg = "ERROR: unable to read DescIndex path."; //$NON-NLS-1$
 			logger.error(msg, e);
-			errorTracker.reportErrorEncounter(e);
 			e.printStackTrace();
 			throw new IOException(msg, e);
 		}
 		
-		logger.trace("retrieving descIndex - get cached file");
+		logger.trace("retrieving descIndex - get cached file"); //$NON-NLS-1$
 		final File descIndexFile = mpqi.getFileFromMpq(descIndexData.getDescIndexIntPath());
-		logger.trace("adding layouts from descIndexFile: " + descIndexFile.getAbsolutePath());
+		logger.trace("adding layouts from descIndexFile: " + descIndexFile.getAbsolutePath()); //$NON-NLS-1$
 		try {
 			descIndexData.addLayoutIntPath(DescIndexReader.getLayoutPathList(descIndexFile, false));
 		} catch (SAXException | ParserConfigurationException | IOException | MpqException e) {
-			logger.error("unable to read Layout paths", e);
-			errorTracker.reportErrorEncounter(e);
+			logger.error("unable to read Layout paths", e); //$NON-NLS-1$
 			e.printStackTrace();
 		}
 		
-		logger.info("Compiling... " + sourceFile.getName());
+		logger.info("Compiling... " + sourceFile.getName()); //$NON-NLS-1$
 		
 		// perform checks/improvements on code
-		compileManager.compile(mod, "Terr");
+		compileManager.compile(mod, "Terr"); //$NON-NLS-1$
 		
-		logger.info("Building... " + sourceFile.getName());
+		logger.info("Building... " + sourceFile.getName()); //$NON-NLS-1$
 		
 		try {
 			final boolean protectMPQ = game.getGameDef() instanceof HeroesGameDef ? settings.isHeroesProtectMPQ()
 					: settings.isSC2ProtectMPQ();
 			mpqi.buildMpq(targetPath, sourceFile.getName(), protectMPQ, settings.isBuildUnprotectedToo());
-			logger.info("Finished building... " + sourceFile.getName());
+			logger.info("Finished building... " + sourceFile.getName()); //$NON-NLS-1$
 		} catch (final IOException | MpqException e) {
-			logger.error("ERROR: unable to construct final Interface file.", e);
-			errorTracker.reportErrorEncounter(e);
+			logger.error("ERROR: unable to construct final Interface file.", e); //$NON-NLS-1$
 			e.printStackTrace();
 		}
 	}
@@ -838,7 +856,7 @@ public final class Main extends Application {
 	 */
 	@Override
 	public void stop() {
-		logger.info("App is about to shut down.");
+		logger.info("App is about to shut down."); //$NON-NLS-1$
 		if (!executor.isShutdown()) {
 			executor.shutdownNow();
 		}
@@ -846,21 +864,21 @@ public final class Main extends Application {
 			executor.awaitTermination(120L, TimeUnit.SECONDS);
 		} catch (final InterruptedException e) {
 			logger.error(
-					"ERROR: Executor timed out waiting for Worker Theads to terminate. A Thread might run rampage.", e);
+					"ERROR: Executor timed out waiting for Worker Theads to terminate. A Thread might run rampage.", e); //$NON-NLS-1$
 		}
 		baseMpqInterface.clearCacheExtractedMpq();
-		logger.info("App waves Goodbye!");
+		logger.info("App waves Goodbye!"); //$NON-NLS-1$
 	}
 	
 	/**
 	 * Initializes the MPQ Interface.
 	 */
 	private void initMpqInterface() {
-		final String tempDirectory = System.getProperty("java.io.tmpdir");
-		final String cachePath = tempDirectory + "ObserverInterfaceBuilder" + File.separator + "_ExtractedMpq";
+		final String tempDirectory = System.getProperty("java.io.tmpdir"); //$NON-NLS-1$
+		final String cachePath = tempDirectory + "ObserverInterfaceBuilder" + File.separator + "_ExtractedMpq"; //$NON-NLS-1$ //$NON-NLS-2$
 		baseMpqInterface = new MpqEditorInterface(cachePath);
-		baseMpqInterface.setMpqEditorPath(basePath.getParent() + File.separator + "tools" + File.separator + "plugins"
-				+ File.separator + "mpq" + File.separator + "MPQEditor.exe");
+		baseMpqInterface.setMpqEditorPath(basePath.getParent() + File.separator + "tools" + File.separator + "plugins" //$NON-NLS-1$ //$NON-NLS-2$
+				+ File.separator + "mpq" + File.separator + "MPQEditor.exe"); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 	
 	/**
@@ -874,14 +892,13 @@ public final class Main extends Application {
 	private void initSettings(final SettingsIniInterface optionalSettingsToLoad) {
 		SettingsIniInterface settings = optionalSettingsToLoad;
 		if (optionalSettingsToLoad == null) {
-			final String settingsFilePath = basePath.getParent() + File.separator + "settings.ini";
+			final String settingsFilePath = basePath.getParent() + File.separator + "settings.ini"; //$NON-NLS-1$
 			settings = new SettingsIniInterface(settingsFilePath);
 		}
 		try {
 			settings.readSettingsFromFile();
 		} catch (final FileNotFoundException e) {
-			logger.error("settings file could not be found", e);
-			errorTracker.reportErrorEncounter(e);
+			logger.error("settings file could not be found", e); //$NON-NLS-1$
 			e.printStackTrace();
 		}
 		this.settings = settings;
@@ -901,7 +918,7 @@ public final class Main extends Application {
 		if (source.isDirectory()) {
 			// create folder if not existing
 			if (!target.exists() && !target.mkdir()) {
-				final String msg = "Could not create directory " + target.getAbsolutePath();
+				final String msg = "Could not create directory " + target.getAbsolutePath(); //$NON-NLS-1$
 				logger.error(msg);
 				throw new IOException(msg);
 			}
@@ -909,7 +926,7 @@ public final class Main extends Application {
 			// copy all contained files recursively
 			final String[] fileList = source.list();
 			if (fileList == null) {
-				final String msg = "Source directory's files returned null";
+				final String msg = "Source directory's files returned null"; //$NON-NLS-1$
 				logger.error(msg);
 				throw new IOException(msg);
 			}
@@ -930,13 +947,6 @@ public final class Main extends Application {
 	 */
 	public ThreadPoolExecutor getExecutor() {
 		return executor;
-	}
-	
-	/**
-	 * @return the errorTracker
-	 */
-	public ErrorTracker getErrorTracker() {
-		return errorTracker;
 	}
 	
 	/**

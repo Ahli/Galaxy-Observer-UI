@@ -20,6 +20,7 @@ import org.apache.logging.log4j.core.config.plugins.PluginFactory;
 import org.apache.logging.log4j.core.layout.PatternLayout;
 import org.fxmisc.richtext.StyleClassedTextArea;
 
+import application.util.ErrorTabPaneController;
 import javafx.application.Platform;
 
 /**
@@ -30,8 +31,8 @@ import javafx.application.Platform;
 @Plugin(name = "StylizedTextAreaAppender", category = "Core", elementType = "appender", printObject = true)
 public final class StylizedTextAreaAppender extends AbstractAppender {
 	
-	private static StyleClassedTextArea textArea;
-	private static Map<Long, StyleClassedTextArea> specialTextAreas = new HashMap<>();
+	private static ErrorTabPaneController generalController;
+	private static Map<Long, ErrorTabPaneController> workerTaskControllers = new HashMap<>();
 	
 	private final ReadWriteLock rwLock = new ReentrantReadWriteLock();
 	private final Lock readLock = rwLock.readLock();
@@ -62,22 +63,25 @@ public final class StylizedTextAreaAppender extends AbstractAppender {
 			final String message = new String(getLayout().toByteArray(event), StandardCharsets.UTF_8);
 			final Level level = event.getLevel();
 			final long id = event.getThreadId();
-			
-			Platform.runLater(new Runnable() {
-				@Override
-				public void run() {
-					try {
-						final StyleClassedTextArea txtArea = getTextArea(id);
-						if (txtArea != null) {
-							final int length = txtArea.getLength();
-							txtArea.appendText(message);
-							txtArea.setStyleClass(length, txtArea.getLength(), level.toString());
+			final ErrorTabPaneController controller = getWorkerTaskController(id);
+			if (controller != null) {
+				final StyleClassedTextArea txtArea = controller.getTextArea();
+				
+				Platform.runLater(new Runnable() {
+					@Override
+					public void run() {
+						try {
+							if (controller != null) {
+								final int length = txtArea.getLength();
+								txtArea.appendText(message);
+								txtArea.setStyleClass(length, txtArea.getLength(), level.toString());
+							}
+						} catch (final Throwable t) {
+							System.err.println("Error while append to TextArea: " + t.getMessage());
 						}
-					} catch (final Throwable t) {
-						System.err.println("Error while append to TextArea: " + t.getMessage());
 					}
-				}
-			});
+				});
+			}
 		} catch (final IllegalStateException ex) {
 			ex.printStackTrace();
 		} finally {
@@ -117,8 +121,8 @@ public final class StylizedTextAreaAppender extends AbstractAppender {
 	 * @param textArea
 	 *            TextArea to append
 	 */
-	public static void setTextArea(final StyleClassedTextArea textArea) {
-		StylizedTextAreaAppender.textArea = textArea;
+	public static void setGeneralController(final ErrorTabPaneController controller) {
+		StylizedTextAreaAppender.generalController = controller;
 	}
 	
 	/**
@@ -127,15 +131,15 @@ public final class StylizedTextAreaAppender extends AbstractAppender {
 	 * @param textArea
 	 *            TextArea to append
 	 */
-	public static void setSpecialTextArea(final StyleClassedTextArea textArea, final long id) {
-		StylizedTextAreaAppender.specialTextAreas.put(id, textArea);
+	public static void setWorkerTaskController(final ErrorTabPaneController controller, final long id) {
+		StylizedTextAreaAppender.workerTaskControllers.put(id, controller);
 	}
 	
 	/**
 	 * @param id
 	 * @return
 	 */
-	private StyleClassedTextArea getTextArea(final long id) {
-		return specialTextAreas.getOrDefault(id, textArea);
+	private ErrorTabPaneController getWorkerTaskController(final long id) {
+		return workerTaskControllers.getOrDefault(id, generalController);
 	}
 }

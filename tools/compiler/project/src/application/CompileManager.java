@@ -14,8 +14,6 @@ import com.ahli.galaxy.archive.DescIndexData;
 import com.ahli.galaxy.ui.UICatalog;
 import com.ahli.galaxy.ui.exception.UIException;
 
-import application.util.ErrorTracker;
-
 /**
  * Compiles MPQ stuff.
  * 
@@ -24,16 +22,10 @@ import application.util.ErrorTracker;
 public class CompileManager {
 	private static Logger logger = LogManager.getLogger(CompileManager.class);
 	
-	private final ErrorTracker errorTracker;
-	
 	/**
 	 * Constructor.
-	 * 
-	 * @param errorTracker
-	 *            error tracker to report errors to
 	 */
-	public CompileManager(final ErrorTracker errorTracker) {
-		this.errorTracker = errorTracker;
+	public CompileManager() {
 	}
 	
 	/**
@@ -79,7 +71,6 @@ public class CompileManager {
 			logger.info("Processing DescIndex took " + executionTime + "ms.");
 			
 		} catch (ParserConfigurationException | SAXException | IOException | UIException e) {
-			errorTracker.reportErrorEncounter(e);
 			logger.error("ERROR: encountered error while compiling.", e);
 			e.printStackTrace();
 		}
