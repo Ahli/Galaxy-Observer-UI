@@ -14,10 +14,10 @@ public class UIController extends UIElement {
 	 */
 	private static final long serialVersionUID = -5133613746543071378L;
 	
-	private List<UIAttribute> keys = null;
+	private List<UIAttribute> keys;
 	// private Map<String, String> values = null;
-	private ArrayList<Pair<String, String>> values = null;
-	private boolean nextAdditionShouldOverride = false;
+	private ArrayList<Pair<String, String>> values;
+	private boolean nextAdditionShouldOverride;
 	private boolean nameIsImplicit = true;
 	
 	/**

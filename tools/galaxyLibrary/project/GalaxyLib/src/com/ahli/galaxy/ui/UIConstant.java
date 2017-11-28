@@ -9,7 +9,7 @@ public class UIConstant extends UIElement {
 	 */
 	private static final long serialVersionUID = -1827619598265805855L;
 	
-	private String value = "";
+	private String value;
 	
 	/**
 	 * @param name

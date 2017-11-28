@@ -80,6 +80,7 @@ public class Main extends Application {
 		try {
 			Thread.currentThread().setName("UI"); //$NON-NLS-1$
 			logger.warn("start function called after " + (System.nanoTime() - appStartTime) / 1000000 + "ms.");
+			Thread.currentThread().setPriority(Thread.MAX_PRIORITY);
 			this.primaryStage = primaryStage;
 			primaryStage.setMaximized(true);
 			primaryStage.setOpacity(0);
@@ -238,6 +239,7 @@ public class Main extends Application {
 		new Thread() {
 			@Override
 			public void run() {
+				Thread.currentThread().setPriority(Thread.NORM_PRIORITY);
 				setName(getName().replaceFirst("Thread", "Open")); //$NON-NLS-1$
 				openMpqFile(f);
 			}
@@ -414,6 +416,7 @@ public class Main extends Application {
 		new Thread() {
 			@Override
 			public void run() {
+				Thread.currentThread().setPriority(Thread.NORM_PRIORITY);
 				setName(getName().replaceFirst("Thread", "Save")); //$NON-NLS-1$
 				saveUiMpq();
 			}

@@ -18,9 +18,9 @@ public class UITemplate implements Serializable, DeepCopyable {
 	
 	private static final Logger logger = LogManager.getLogger(UITemplate.class);
 	
-	private String fileName = "";
-	private UIElement element = null;
-	private boolean isLocked = false;
+	private String fileName;
+	private UIElement element;
+	private boolean isLocked;
 	
 	/**
 	 * @param fileName

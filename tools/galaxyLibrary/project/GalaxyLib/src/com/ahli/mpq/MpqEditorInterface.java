@@ -19,7 +19,7 @@ import com.ahli.util.DeepCopyable;
  * @author Ahli
  */
 public class MpqEditorInterface implements MpqInterface, DeepCopyable {
-	private static Logger logger = LogManager.getLogger("MpqInterface"); //$NON-NLS-1$
+	private static Logger logger = LogManager.getLogger(MpqEditorInterface.class);
 	
 	private String mpqEditor = "plugins" + File.separator + "mpq" + File.separator + "MPQEditor.exe"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	private String mpqCachePath;

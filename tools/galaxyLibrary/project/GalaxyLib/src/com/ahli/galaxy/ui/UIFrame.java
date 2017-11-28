@@ -13,6 +13,8 @@ import org.apache.logging.log4j.Logger;
  * @author Ahli
  */
 public class UIFrame extends UIElement {
+	private static final String ZERO = "0";
+	
 	/**
 	 * 
 	 */
@@ -20,9 +22,9 @@ public class UIFrame extends UIElement {
 	
 	private static final Logger LOGGER = LogManager.getLogger(UIFrame.class);
 	
-	private String type = "";
-	private List<UIElement> children = null;
-	private Map<String, UIAttribute> attributes = null;
+	private String type;
+	private List<UIElement> children;
+	private Map<String, UIAttribute> attributes;
 	// private ArrayList<Pair<String, UIAttribute>> attributes = null;
 	private final String[] pos = new String[4];
 	private final String[] offset = new String[4];
@@ -59,18 +61,18 @@ public class UIFrame extends UIElement {
 	 * Initializes variables
 	 */
 	private void init() {
-		relative[0] = "$this";
-		pos[0] = "Min";
-		offset[0] = "0";
-		relative[1] = "$this";
-		pos[1] = "Min";
-		offset[1] = "0";
-		relative[2] = "$this";
-		pos[2] = "Max";
-		offset[2] = "0";
-		relative[3] = "$this";
-		pos[3] = "Max";
-		offset[3] = "0";
+		// relative[0] = "$this";
+		// pos[0] = "Min";
+		// offset[0] = "0";
+		// relative[1] = "$this";
+		// pos[1] = "Min";
+		// offset[1] = "0";
+		// relative[2] = "$this";
+		// pos[2] = "Max";
+		// offset[2] = "0";
+		// relative[3] = "$this";
+		// pos[3] = "Max";
+		// offset[3] = "0";
 	}
 	
 	/**
@@ -270,14 +272,21 @@ public class UIFrame extends UIElement {
 		this.relative[1] = relative;
 		this.relative[2] = relative;
 		this.relative[3] = relative;
-		pos[0] = "Min";
-		this.offset[0] = offset;
-		pos[1] = "Min";
-		this.offset[1] = offset;
-		pos[2] = "Max";
-		this.offset[2] = Integer.toString((Integer.parseInt(offset) * (-1)));
-		pos[3] = "Max";
-		this.offset[3] = Integer.toString((Integer.parseInt(offset) * (-1)));
+		pos[0] = null;
+		pos[1] = null;
+		pos[2] = null;
+		pos[3] = null;
+		if (!offset.equals(ZERO)) {
+			this.offset[0] = offset;
+			this.offset[1] = offset;
+			this.offset[2] = Integer.toString((Integer.parseInt(offset) * (-1)));
+			this.offset[3] = Integer.toString((Integer.parseInt(offset) * (-1)));
+		} else {
+			this.offset[0] = null;
+			this.offset[1] = null;
+			this.offset[2] = null;
+			this.offset[3] = null;
+		}
 	}
 	
 	/**

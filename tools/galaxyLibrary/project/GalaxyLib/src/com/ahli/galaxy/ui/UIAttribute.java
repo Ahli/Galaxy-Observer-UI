@@ -17,7 +17,7 @@ public class UIAttribute extends UIElement {
 	private static final long serialVersionUID = 5420685675382001338L;
 	
 	// private Map<String, String> values = null;
-	private ArrayList<Pair<String, String>> values = null;
+	private ArrayList<Pair<String, String>> values;
 	
 	/**
 	 * Constructor.

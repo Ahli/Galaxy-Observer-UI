@@ -46,9 +46,9 @@ import com.ahli.galaxy.ui.exception.UIException;
 import com.ahli.mpq.MpqEditorInterface;
 import com.ahli.mpq.MpqException;
 
+import application.controller.ErrorTabPaneController;
 import application.integration.ReplayFinder;
 import application.integration.SettingsIniInterface;
-import application.util.ErrorTabPaneController;
 import application.util.JarHelper;
 import application.util.logger.log4j2plugin.StylizedTextAreaAppender;
 import javafx.animation.PauseTransition;
@@ -131,6 +131,7 @@ public final class Main extends Application {
 	@Override
 	public void start(final Stage primaryStage) {
 		Thread.currentThread().setName("UI"); //$NON-NLS-1$
+		Thread.currentThread().setPriority(Thread.MAX_PRIORITY);
 		
 		initThreadPool();
 		
@@ -148,6 +149,7 @@ public final class Main extends Application {
 		
 		// compile interfaces and run game
 		executeWorkPipeline(primaryStage);
+		
 	}
 	
 	/**
@@ -168,19 +170,31 @@ public final class Main extends Application {
 		// test with proper compression of mpqeditor
 		// durations/thread# for my 4cpu/8threads: 16, 13, 12, 12, 12,... 12
 		
-		final int maxThreads = Math.max(1, Math.min(numberOfProcessors / 2, 1));
+		final int maxThreads = Math.max(1, Math.min(numberOfProcessors / 2, 4));
 		executor = new ThreadPoolExecutor(maxThreads, maxThreads, 5000, TimeUnit.MILLISECONDS,
-				// new LinkedBlockingQueue<Runnable>(), new WorkerThreadFactory());
 				new LinkedBlockingQueue<Runnable>(), new ThreadFactory() {
 					@Override
 					public Thread newThread(final Runnable runnable) {
 						final Thread t = new Thread(runnable);
-						t.setDaemon(true);
-						t.setName(t.getName().replaceFirst("Thread", "W")); //$NON-NLS-1$ //$NON-NLS-2$
-						// addThreadLoggerTab(t.getId(), t.getName());
+						t.setPriority(Thread.NORM_PRIORITY);
 						return t;
 					}
-				});
+				}) {
+					
+			@Override
+			protected void beforeExecute(final Thread t, final Runnable r) {
+				super.beforeExecute(t, r);
+				// altering the thread name allows the logger to use the correct controller
+				// -> log message is always put into the correct ID
+				t.setName(t.getId() + "_" + r.hashCode());
+			}
+			
+			@Override
+			protected void afterExecute(final Runnable r, final Throwable t) {
+				super.afterExecute(r, t);
+				StylizedTextAreaAppender.finishedWork(Thread.currentThread().getName());
+			}
+		};
 		executor.allowCoreThreadTimeOut(true);
 	}
 	
@@ -208,17 +222,18 @@ public final class Main extends Application {
 		final boolean workSC2 = pathContainsCompileableForGame(path, gameSC2);
 		
 		if (workHeroes) {
-			startBaseUiParsingThread(gameHeroes, path);
+			startWorkOnGame(gameHeroes, path);
 		}
 		
 		if (workSC2) {
-			startBaseUiParsingThread(gameSC2, path);
+			startWorkOnGame(gameSC2, path);
 		}
 		
 		new Thread() {
 			@Override
 			public void run() {
 				Thread.currentThread().setName("Supervisor"); //$NON-NLS-1$
+				Thread.currentThread().setPriority(Thread.MIN_PRIORITY);
 				try {
 					final ThreadPoolExecutor executor = getExecutor();
 					while (executor.getQueue().size() > 0 || executor.getActiveCount() > 0) {
@@ -233,6 +248,12 @@ public final class Main extends Application {
 							TimeUnit.MILLISECONDS.toMinutes(executionTime),
 							TimeUnit.MILLISECONDS.toSeconds(executionTime)
 									- TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(executionTime))));
+					Platform.runLater(new Runnable() {
+						@Override
+						public void run() {
+							errorTabControllers.get(0).setRunning(false);
+						}
+					});
 				} catch (final InterruptedException e) {
 					logger.trace("INTERRUPT: Execution time measuring Thread was interrupted."); //$NON-NLS-1$
 				}
@@ -245,12 +266,15 @@ public final class Main extends Application {
 	 * @param game
 	 * @param path
 	 */
-	private void startBaseUiParsingThread(final GameData game, final String path) {
+	private void startWorkOnGame(final GameData game, final String path) {
 		executor.execute(new Runnable() {
 			@Override
 			public void run() {
 				try {
-					addThreadLoggerTab(Thread.currentThread().getId(), game.getGameDef().getNameHandle() + "UI"); //$NON-NLS-1$
+					addThreadLoggerTab(Thread.currentThread().getName(), game.getGameDef().getNameHandle() + "UI"); //$NON-NLS-1$
+					
+					parseDefaultUI(game);
+					
 					buildGamesInterfaceFiles(game, path);
 				} catch (final InterruptedException e) {
 					logger.trace("INTERRUPT: Building " + game.getGameDef().getNameHandle() //$NON-NLS-1$
@@ -266,8 +290,6 @@ public final class Main extends Application {
 	 * @throws InterruptedException
 	 */
 	private void buildGamesInterfaceFiles(final GameData game, final String path) throws InterruptedException {
-		printLogMessage("Starting to parse base " + game.getGameDef().getName() + " UI."); //$NON-NLS-1$ //$NON-NLS-2$
-		parseDefaultUI(game);
 		try {
 			if (hasParamCompilePath) {
 				buildSpecificUI(new File(path), game);
@@ -278,7 +300,6 @@ public final class Main extends Application {
 			logger.error("ERROR while building a UI for " + game.getGameDef().getName() + ": " + e); //$NON-NLS-1$ //$NON-NLS-2$
 			e.printStackTrace();
 		}
-		printLogMessage("Finished constructing UIs for " + game.getGameDef().getName() + "."); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 	
 	/**
@@ -319,6 +340,8 @@ public final class Main extends Application {
 	 * @throws InterruptedException
 	 */
 	private void parseDefaultUI(final GameData game) throws InterruptedException {
+		printLogMessageToGeneral("Starting to parse base " + game.getGameDef().getName() + " UI."); //$NON-NLS-1$ //$NON-NLS-2$
+		
 		final UICatalog uiCatalog = game.getUiCatalog();
 		final String gameDir = getBaseUiPath(game.getGameDef()) + File.separator
 				+ game.getGameDef().getModsSubDirectory();
@@ -337,13 +360,15 @@ public final class Main extends Application {
 					uiCatalog.processDescIndex(descIndexFile, game.getGameDef().getDefaultRaceId());
 				}
 			}
-			logger.info("Finished parsing base UI for " + game.getGameDef().getName()); //$NON-NLS-1$
 			// } catch (ParserConfigurationException | SAXException | IOException |
 			// UIException e) {
 		} catch (final SAXException | IOException | ParserConfigurationException | UIException e) {
 			logger.error("ERROR parsing base UI catalog for '" + game.getGameDef().getName() + "'.", e); //$NON-NLS-1$ //$NON-NLS-2$
 			e.printStackTrace();
 		}
+		final String msg = "Finished parsing base UI for " + game.getGameDef().getName() + "."; //$NON-NLS-1$ //$NON-NLS-2$
+		logger.info(msg);
+		printLogMessageToGeneral(msg);
 	}
 	
 	/**
@@ -384,7 +409,9 @@ public final class Main extends Application {
 							delay.setOnFinished(new EventHandler<ActionEvent>() {
 								@Override
 								public void handle(final ActionEvent event) {
-									primaryStage.close();
+									if (!isUserPreventedAutomaticClosing()) {
+										primaryStage.close();
+									}
 								}
 							});
 							delay.play();
@@ -464,7 +491,7 @@ public final class Main extends Application {
 				}
 			}
 		}
-		printLogMessage("Game location: " + gamePath); //$NON-NLS-1$
+		logger.info("Game location: " + gamePath); //$NON-NLS-1$
 		
 		final File replay = replayFinder.getLastUsedOrNewestReplay(isHeroes, documentsPath);
 		if (replay != null && replay.exists() && replay.isFile()) {
@@ -480,7 +507,7 @@ public final class Main extends Application {
 		} else {
 			logger.error("Failed to find any replay."); //$NON-NLS-1$
 		}
-		printLogMessage("Finished to start the game with a replay."); //$NON-NLS-1$
+		printLogMessageToGeneral("The game starts with a replay now..."); //$NON-NLS-1$
 	}
 	
 	/**
@@ -564,7 +591,7 @@ public final class Main extends Application {
 		final Tab tab = tabs.get(0);
 		tab.setContent(virtualizedScrollPane);
 		
-		final ErrorTabPaneController errorTabCtrl = new ErrorTabPaneController(tab, txtArea);
+		final ErrorTabPaneController errorTabCtrl = new ErrorTabPaneController(tab, txtArea, false, true);
 		errorTabCtrl.setRunning(true);
 		errorTabControllers.add(errorTabCtrl);
 		StylizedTextAreaAppender.setGeneralController(errorTabCtrl);
@@ -586,7 +613,7 @@ public final class Main extends Application {
 		primaryStage.setScene(scene);
 		primaryStage.setTitle("Compiling Interfaces..."); //$NON-NLS-1$
 		primaryStage.show();
-		printLogMessage("Initializing App..."); //$NON-NLS-1$
+		logger.info("Initializing App..."); //$NON-NLS-1$
 	}
 	
 	/**
@@ -597,21 +624,28 @@ public final class Main extends Application {
 	}
 	
 	/**
+	 * @return the userPreventedAutomaticClosing
+	 */
+	public boolean isUserPreventedAutomaticClosing() {
+		return userPreventedAutomaticClosing;
+	}
+	
+	/**
 	 * Adds a Tab for the specified Thread ID containing its log messages.
 	 * 
 	 * @param threadId
 	 */
-	private void addThreadLoggerTab(final long threadId, final String tabTitle) {
+	private void addThreadLoggerTab(final String threadName, final String tabTitle) {
 		final Tab newTab = new Tab();
 		final StyleClassedTextArea newTxtArea = new StyleClassedTextArea();
-		final ErrorTabPaneController errorTabCtrl = new ErrorTabPaneController(newTab, newTxtArea);
+		final ErrorTabPaneController errorTabCtrl = new ErrorTabPaneController(newTab, newTxtArea, true, false);
 		errorTabCtrl.setRunning(true);
 		errorTabControllers.add(errorTabCtrl);
 		
 		final VirtualizedScrollPane<StyleClassedTextArea> virtualizedScrollPane = new VirtualizedScrollPane<>(
 				newTxtArea);
 		newTab.setContent(virtualizedScrollPane);
-		StylizedTextAreaAppender.setWorkerTaskController(errorTabCtrl, threadId);
+		StylizedTextAreaAppender.setWorkerTaskController(errorTabCtrl, threadName);
 		newTab.setText(tabTitle);
 		newTxtArea.setEditable(false);
 		
@@ -690,7 +724,7 @@ public final class Main extends Application {
 				executor.execute(new Runnable() {
 					@Override
 					public void run() {
-						addThreadLoggerTab(Thread.currentThread().getId(), interfaceFolder.getName());
+						addThreadLoggerTab(Thread.currentThread().getName(), interfaceFolder.getName());
 						// create unique cache path
 						final MpqEditorInterface threadsMpqInterface = (MpqEditorInterface) getBaseMpqInterface()
 								.deepCopy();
@@ -723,8 +757,13 @@ public final class Main extends Application {
 	 * @param msg
 	 *            the message
 	 */
-	public void printLogMessage(final String msg) {
-		logger.info(msg);
+	public void printLogMessageToGeneral(final String msg) {
+		Platform.runLater(new Runnable() {
+			@Override
+			public void run() {
+				logger.info(msg);
+			}
+		});
 	}
 	
 	/**
@@ -743,6 +782,8 @@ public final class Main extends Application {
 	 */
 	private void buildFile(final File sourceFile, final GameData game, final MpqEditorInterface mpqi)
 			throws IOException, InterruptedException {
+		printLogMessageToGeneral(sourceFile.getName() + " started construction.");
+		
 		String targetPath = documentsPath + File.separator;
 		targetPath += game.getGameDef().getDocumentsGameDirectoryName();
 		targetPath += File.separator + game.getGameDef().getDocumentsInterfaceSubdirectoryName();
@@ -849,6 +890,7 @@ public final class Main extends Application {
 			logger.error("ERROR: unable to construct final Interface file.", e); //$NON-NLS-1$
 			e.printStackTrace();
 		}
+		printLogMessageToGeneral(sourceFile.getName() + " finished construction.");
 	}
 	
 	/**

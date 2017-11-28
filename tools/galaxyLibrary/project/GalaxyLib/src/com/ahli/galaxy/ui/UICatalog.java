@@ -34,6 +34,14 @@ import com.ahli.util.XmlDomHelper;
  * @author Ahli
  */
 public class UICatalog implements Serializable, DeepCopyable {
+	private static final String TYPE_ATTR = "type";
+	
+	private static final String NAME_ATTR = "name";
+	
+	private static final String REQUIREDTOLOAD = "requiredtoload";
+	
+	private static final String NEG_PREFIX = "!";
+	
 	/**
 	 * 
 	 */
@@ -42,14 +50,14 @@ public class UICatalog implements Serializable, DeepCopyable {
 	private static final Logger LOGGER = LogManager.getLogger(UICatalog.class);
 	
 	// members
-	private ArrayList<UITemplate> templates = null;
-	private ArrayList<UITemplate> blizzOnlyTemplates = null;
-	private ArrayList<UIConstant> constants = null;
-	private ArrayList<UIConstant> blizzOnlyConstants = null;
-	private ArrayList<String> blizzOnlyLayouts = null;
+	private ArrayList<UITemplate> templates;
+	private ArrayList<UITemplate> blizzOnlyTemplates;
+	private ArrayList<UIConstant> constants;
+	private ArrayList<UIConstant> blizzOnlyConstants;
+	private ArrayList<String> blizzOnlyLayouts;
 	
 	// internal, used during processing
-	private String curBasePath = "";
+	private String curBasePath;
 	
 	/**
 	 * Constructor.
@@ -300,8 +308,8 @@ public class UICatalog implements Serializable, DeepCopyable {
 	 * @return
 	 */
 	public static boolean isFailingRequiredToLoad(final NamedNodeMap attributes) {
-		final Node requiredtoloadAttr = XmlDomHelper.getNamedItemIgnoringCase(attributes, "requiredtoload");
-		return requiredtoloadAttr != null && !requiredtoloadAttr.getNodeValue().trim().startsWith("!");
+		final Node requiredtoloadAttr = XmlDomHelper.getNamedItemIgnoringCase(attributes, REQUIREDTOLOAD);
+		return requiredtoloadAttr != null && !requiredtoloadAttr.getNodeValue().trim().startsWith(NEG_PREFIX);
 	}
 	
 	/**
@@ -429,7 +437,7 @@ public class UICatalog implements Serializable, DeepCopyable {
 			final boolean isDevLayout) throws UIException, DOMException, InterruptedException {
 		LOGGER.trace("parsing Controller");
 		// Controllers may not have a name defined
-		final Node nameAttrNode = XmlDomHelper.getNamedItemIgnoringCase(node.getAttributes(), "name");
+		final Node nameAttrNode = XmlDomHelper.getNamedItemIgnoringCase(node.getAttributes(), NAME_ATTR);
 		String name = null;
 		boolean nameIsImplicit = true;
 		
@@ -498,7 +506,7 @@ public class UICatalog implements Serializable, DeepCopyable {
 	private void parseState(final Node node, final UIElement parent, final String fileName, final String raceId,
 			final boolean isDevLayout) throws UIException, DOMException, InterruptedException {
 		LOGGER.trace("parsing State");
-		final Node nameAttrNode = XmlDomHelper.getNamedItemIgnoringCase(node.getAttributes(), "name");
+		final Node nameAttrNode = XmlDomHelper.getNamedItemIgnoringCase(node.getAttributes(), NAME_ATTR);
 		if (nameAttrNode == null) {
 			throw new UIException("State has no specified 'name'");
 		}
@@ -757,7 +765,7 @@ public class UICatalog implements Serializable, DeepCopyable {
 	private void parseStateGroup(final Node node, final UIElement parent, final String fileName, final String raceId,
 			final boolean isDevLayout) throws UIException, DOMException, InterruptedException {
 		LOGGER.trace("parsing Stategroup");
-		final Node nameAttrNode = XmlDomHelper.getNamedItemIgnoringCase(node.getAttributes(), "name");
+		final Node nameAttrNode = XmlDomHelper.getNamedItemIgnoringCase(node.getAttributes(), NAME_ATTR);
 		if (nameAttrNode == null) {
 			throw new UIException("Stategroup has no specified 'name'");
 		}
@@ -791,7 +799,7 @@ public class UICatalog implements Serializable, DeepCopyable {
 	private void parseAnimation(final Node node, final UIElement parent, final String fileName, final String raceId,
 			final boolean isDevLayout) throws UIException, DOMException, InterruptedException {
 		LOGGER.trace("parsing Animation");
-		final Node nameAttrNode = XmlDomHelper.getNamedItemIgnoringCase(node.getAttributes(), "name");
+		final Node nameAttrNode = XmlDomHelper.getNamedItemIgnoringCase(node.getAttributes(), NAME_ATTR);
 		if (nameAttrNode == null) {
 			throw new UIException("Animation has no specified 'name'");
 		}
@@ -849,7 +857,7 @@ public class UICatalog implements Serializable, DeepCopyable {
 		for (final UIController contr : controllers) {
 			if (contr.getName() == null) {
 				// final String type = contr.getValues().get("type");
-				final String type = contr.getValue("type");
+				final String type = contr.getValue(TYPE_ATTR);
 				LOGGER.trace("type = " + type);
 				contr.setName(getImplicitName(type, controllers));
 				contr.setNameIsImplicit(true);
@@ -897,7 +905,7 @@ public class UICatalog implements Serializable, DeepCopyable {
 	private void parseConstant(final Node node, final UIElement parent, final String fileName, final String raceId,
 			final boolean isDevLayout) throws UIException, DOMException, InterruptedException {
 		LOGGER.trace("parsing Constant");
-		final Node nameAttrNode = XmlDomHelper.getNamedItemIgnoringCase(node.getAttributes(), "name");
+		final Node nameAttrNode = XmlDomHelper.getNamedItemIgnoringCase(node.getAttributes(), NAME_ATTR);
 		if (nameAttrNode == null) {
 			throw new UIException("Constant has no specified 'name'");
 		}
@@ -967,14 +975,14 @@ public class UICatalog implements Serializable, DeepCopyable {
 	private void parseFrame(final Node node, final UIElement parent, final String fileName, final String raceId,
 			final boolean isDevLayout) throws UIException, DOMException, InterruptedException {
 		LOGGER.trace("parsing Frame");
-		final Node nameAttrNode = XmlDomHelper.getNamedItemIgnoringCase(node.getAttributes(), "name");
+		final Node nameAttrNode = XmlDomHelper.getNamedItemIgnoringCase(node.getAttributes(), NAME_ATTR);
 		if (nameAttrNode == null) {
 			throw new UIException("Frame has no specified 'name'");
 		}
 		final String name = getConstantValue(nameAttrNode.getNodeValue(), raceId, isDevLayout);
 		LOGGER.trace("name = " + name);
 		
-		final Node typeAttrNode = XmlDomHelper.getNamedItemIgnoringCase(node.getAttributes(), "type");
+		final Node typeAttrNode = XmlDomHelper.getNamedItemIgnoringCase(node.getAttributes(), TYPE_ATTR);
 		if (typeAttrNode == null) {
 			throw new UIException("Frame has no specified 'type'");
 		}
@@ -1085,11 +1093,12 @@ public class UICatalog implements Serializable, DeepCopyable {
 	 * @return
 	 */
 	public String getConstantValue(final String constantRef, final String raceId, final boolean isDevLayout) {
-		String id = constantRef;
+		// String id = constantRef;
 		int i = 0;
-		while (id.startsWith("#")) {
-			i++;
-			id = id.substring(1);
+		if (constantRef.length() > 0) {
+			while (constantRef.charAt(i) == '#') {
+				i++;
+			}
 		}
 		// no constant tag
 		if (i <= 0) {

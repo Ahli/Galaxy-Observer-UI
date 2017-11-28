@@ -56,7 +56,7 @@ public class SettingsIniInterface {
 		final InputStreamReader is = new InputStreamReader(new FileInputStream(settingsFilePath),
 				StandardCharsets.UTF_8);
 		final BufferedReader br = new BufferedReader(is);
-		String line = "";
+		String line;
 		try {
 			while ((line = br.readLine()) != null) {
 				parseLine(line);
@@ -78,7 +78,7 @@ public class SettingsIniInterface {
 	 *            line of settings
 	 */
 	private void parseLine(final String line) {
-		String val = "";
+		String val;
 		if (line.startsWith("Heroes_Path")) {
 			val = getValFromIniLine(line);
 			heroesPath = val;

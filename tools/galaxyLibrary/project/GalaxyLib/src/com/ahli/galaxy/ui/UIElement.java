@@ -13,7 +13,7 @@ public abstract class UIElement implements Serializable, DeepCopyable {
 	 */
 	private static final long serialVersionUID = -9128521308405405698L;
 	
-	private String name = "";
+	private String name;
 	
 	/**
 	 * Constructor.

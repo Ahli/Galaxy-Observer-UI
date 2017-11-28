@@ -12,10 +12,10 @@ public class UIState extends UIElement {
 	 */
 	private static final long serialVersionUID = -2094212167992593460L;
 	
-	private List<UIAttribute> whens = null;
-	private List<UIAttribute> actions = null;
-	private boolean nextAdditionShouldOverrideWhens = false;
-	private boolean nextAdditionShouldOverrideActions = false;
+	private List<UIAttribute> whens;
+	private List<UIAttribute> actions;
+	private boolean nextAdditionShouldOverrideWhens;
+	private boolean nextAdditionShouldOverrideActions;
 	
 	/**
 	 * @param name
@@ -127,6 +127,6 @@ public class UIState extends UIElement {
 	
 	@Override
 	public String toString() {
-		return "<State>";
+		return "<State " + getName() + ">";
 	}
 }

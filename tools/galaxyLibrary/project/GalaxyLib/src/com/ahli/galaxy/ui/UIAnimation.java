@@ -14,11 +14,11 @@ public class UIAnimation extends UIElement {
 	 */
 	private static final long serialVersionUID = 7493401910318905210L;
 	
-	private List<UIController> controllers = null;
+	private List<UIController> controllers;
 	// private Map<String, UIAttribute> events = new HashMap<>();
-	private ArrayList<Pair<String, UIAttribute>> events = null;
-	private boolean nextEventsAdditionShouldOverride = false;
-	private UIAttribute driver = null;
+	private ArrayList<Pair<String, UIAttribute>> events;
+	private boolean nextEventsAdditionShouldOverride;
+	private UIAttribute driver;
 	
 	/**
 	 * @param name

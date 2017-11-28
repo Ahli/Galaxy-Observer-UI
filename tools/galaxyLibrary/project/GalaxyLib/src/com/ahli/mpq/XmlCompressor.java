@@ -36,6 +36,9 @@ import com.ahli.util.SilentXmlSaxErrorHandler;
  * @author Ahli
  */
 public final class XmlCompressor {
+	private static final String AHLI_SETTING = "@setting";
+	private static final String AHLI_HOTKEY = "@hotkey";
+	private static final String ANY_TAGNAME = "*";
 	private static Logger logger = LogManager.getLogger(XmlCompressor.class);
 	
 	/**
@@ -79,7 +82,7 @@ public final class XmlCompressor {
 			logger.trace("compression - processing file: " + curFile.getPath());
 			
 			// process all nodes
-			final NodeList nodes = doc.getElementsByTagName("*");
+			final NodeList nodes = doc.getElementsByTagName(ANY_TAGNAME);
 			for (int i = 0, len = nodes.getLength(); i < len; i++) {
 				final Node curNode = nodes.item(i);
 				
@@ -121,7 +124,7 @@ public final class XmlCompressor {
 					// keep hotkeys/settings definition alive
 					final Comment comment = (Comment) curNode;
 					final String text = comment.getData().trim().toLowerCase(Locale.ENGLISH);
-					if (!text.contains("@hotkey") && !text.contains("@setting")) {
+					if (!text.contains(AHLI_HOTKEY) && !text.contains(AHLI_SETTING)) {
 						
 						curNode.getParentNode().removeChild(curNode);
 						
