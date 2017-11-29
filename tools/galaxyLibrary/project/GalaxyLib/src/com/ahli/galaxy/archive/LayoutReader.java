@@ -22,6 +22,13 @@ import org.xml.sax.SAXException;
  * @author Ahli
  */
 public final class LayoutReader {
+	private static final String TEMPLATE = "template";
+	private static final String FRAME = "Frame";
+	private static final String ANY_TAG = "*";
+	private static final String RACE_CONSTANT = "##";
+	private static final String CONSTANT = "Constant";
+	private static final String NAME = "name";
+	private static final String CONSTANT_MARKER = "#";
 	private static Logger logger = LogManager.getLogger(LayoutReader.class);
 	
 	/**
@@ -50,17 +57,17 @@ public final class LayoutReader {
 		final ArrayList<String> list = new ArrayList<>();
 		
 		// check TEMPLATES
-		final NodeList nodes = doc.getElementsByTagName("*");
+		final NodeList nodes = doc.getElementsByTagName(ANY_TAG);
 		for (int i = 0, len = nodes.getLength(); i < len; i++) {
 			final Node frame = nodes.item(i);
 			// check if node is a frame
-			if (frame.getNodeName().equalsIgnoreCase("Frame")) {
+			if (frame.getNodeName().equalsIgnoreCase(FRAME)) {
 				final NamedNodeMap attributes = frame.getAttributes();
 				for (int j = 0; j < attributes.getLength(); j++) {
 					final Node attr = attributes.item(j);
 					
 					// attribute is Template
-					if (attr.getNodeName().equalsIgnoreCase("template")) {
+					if (attr.getNodeName().equalsIgnoreCase(TEMPLATE)) {
 						final String dependency = attr.getNodeValue();
 						if (dependency != null) {
 							int firstIndex = dependency.indexOf('/');
@@ -120,7 +127,7 @@ public final class LayoutReader {
 				final String attrValue = attribute.getNodeValue();
 				
 				// attribute name
-				if (attrName.startsWith("#")) {
+				if (attrName.startsWith(CONSTANT_MARKER)) {
 					final String constName = attrName;
 					if (!doesNameAppearInList(constName, usedConstants)
 							&& !doesConstantNameAppearInList(constName, ownConstants)) {
@@ -130,7 +137,7 @@ public final class LayoutReader {
 					}
 				}
 				// attribute value
-				if (attrValue.startsWith("#")) {
+				if (attrValue.startsWith(CONSTANT_MARKER)) {
 					final String constName = attrValue;
 					if (!doesNameAppearInList(constName, usedConstants)
 							&& !doesConstantNameAppearInList(constName, ownConstants)) {
@@ -171,8 +178,8 @@ public final class LayoutReader {
 		
 		String name = constUsage;
 		
-		if (constUsage.startsWith("#")) {
-			if (constUsage.startsWith("##")) {
+		if (constUsage.startsWith(CONSTANT_MARKER)) {
+			if (constUsage.startsWith(RACE_CONSTANT)) {
 				name = constUsage.substring(2);
 			} else {
 				name = constUsage.substring(1);
@@ -234,14 +241,14 @@ public final class LayoutReader {
 	public static ArrayList<String> getLayoutsConstantDefinitions(final Document doc) {
 		// create list of own constant definitions
 		final ArrayList<String> ownConstants = new ArrayList<>();
-		final NodeList constants = doc.getElementsByTagName("Constant");
+		final NodeList constants = doc.getElementsByTagName(CONSTANT);
 		for (int i = 0, len = constants.getLength(); i < len; i++) {
 			final Node constant = constants.item(i);
 			final NamedNodeMap attributes = constant.getAttributes();
 			for (int j = 0; j < attributes.getLength(); j++) {
 				final Node attr = attributes.item(j);
 				// attribute is Template
-				if (attr.getNodeName().equalsIgnoreCase("name")) {
+				if (attr.getNodeName().equalsIgnoreCase(NAME)) {
 					ownConstants.add(attr.getNodeValue());
 					logger.trace("FOUND CONSTANT DEFINITION: " + attr.getNodeValue());
 				}

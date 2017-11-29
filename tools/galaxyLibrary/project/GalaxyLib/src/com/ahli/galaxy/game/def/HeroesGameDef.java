@@ -18,5 +18,6 @@ public class HeroesGameDef extends GameDef {
 		setDefaultRaceId("Terr");
 		setDocumentsGameDirectoryName("Heroes of the Storm");
 		setLayoutFileEnding("stormlayout");
+		setBaseDataFolderName("Base.StormData");
 	}
 }

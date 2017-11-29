@@ -1,10 +1,7 @@
 package com.ahli.galaxy.ui;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -33,7 +30,59 @@ import com.ahli.util.XmlDomHelper;
  * 
  * @author Ahli
  */
-public class UICatalog implements Serializable, DeepCopyable {
+public class UICatalog implements DeepCopyable {
+	private static final String TOP = "top";
+
+	private static final String DRIVER = "driver";
+
+	private static final String TEMPLATE2 = "template";
+
+	private static final String DESC_FLAGS = "'DescFlags'";
+	
+	private static final String DEFAULTSTATE = "defaultstate";
+	
+	private static final String RIGHT = "right";
+	
+	private static final String ZERO_VAL = "0";
+	
+	private static final String EVENT = "event";
+	
+	private static final String BOTTOM = "bottom";
+	
+	private static final String LEFT = "left";
+	
+	private static final String LOCKED = "locked";
+	
+	private static final String VAL = "val";
+	
+	private static final String PATH = "path";
+	
+	private static final String CONSTANT = "constant";
+	
+	private static final String STATEGROUP = "stategroup";
+	
+	private static final String ANIMATION = "animation";
+	
+	private static final String CONTROLLER = "controller";
+	
+	private static final String STATE = "state";
+	
+	private static final String ANCHOR = "anchor";
+	
+	private static final String FRAME = "frame";
+	
+	private static final String DESC = "desc";
+	
+	private static final String DESCFLAGS = "descflags";
+	
+	private static final String ACTION = "action";
+	
+	private static final String KEY = "key";
+	
+	private static final String WHEN = "when";
+	
+	private static final String INCLUDE = "include";
+	
 	private static final String TYPE_ATTR = "type";
 	
 	private static final String NAME_ATTR = "name";
@@ -42,36 +91,39 @@ public class UICatalog implements Serializable, DeepCopyable {
 	
 	private static final String NEG_PREFIX = "!";
 	
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = -4725838598338592813L;
+	static long totalExecutionTime = 0;
 	
-	private static final Logger LOGGER = LogManager.getLogger(UICatalog.class);
+	private static final Logger logger = LogManager.getLogger(UICatalog.class);
+	
+	DocumentBuilder dBuilder = null;
 	
 	// members
-	private ArrayList<UITemplate> templates;
-	private ArrayList<UITemplate> blizzOnlyTemplates;
-	private ArrayList<UIConstant> constants;
-	private ArrayList<UIConstant> blizzOnlyConstants;
-	private ArrayList<String> blizzOnlyLayouts;
+	private List<UITemplate> templates;
+	private List<UITemplate> blizzOnlyTemplates;
+	private List<UIConstant> constants;
+	private List<UIConstant> blizzOnlyConstants;
+	private List<String> blizzOnlyLayouts;
 	
 	// internal, used during processing
 	private String curBasePath;
 	
 	/**
 	 * Constructor.
+	 * 
+	 * @throws ParserConfigurationException
 	 */
 	public UICatalog() {
 		templates = new ArrayList<>(2500);
-		blizzOnlyTemplates = new ArrayList<>(10);
+		blizzOnlyTemplates = new ArrayList<>();
 		constants = new ArrayList<>(800);
-		blizzOnlyConstants = new ArrayList<>(1);
+		blizzOnlyConstants = new ArrayList<>();
 		blizzOnlyLayouts = new ArrayList<>(25);
 	}
 	
 	/**
 	 * Constructor.
+	 * 
+	 * @throws ParserConfigurationException
 	 */
 	public UICatalog(final int templatesCapacity, final int blizzOnlyTemplatesCapacity, final int constantsCapacity,
 			final int blizzOnlyConstantsCapacity, final int blizzOnlyLayoutsCapacity) {
@@ -93,24 +145,45 @@ public class UICatalog implements Serializable, DeepCopyable {
 				constants.size() * 3 / 2 + 1, blizzOnlyConstants.size(), blizzOnlyLayouts.size());
 		// 1041ms for AhliObs -> 12s execution time
 		// testing shows that iterators are not faster and are not thread safe
-		for (int i = 0; i < templates.size(); i++) {
+		int i, len;
+		for (i = 0, len = templates.size(); i < len; i++) {
 			clone.templates.add((UITemplate) templates.get(i).deepCopy());
 		}
-		for (int i = 0; i < blizzOnlyTemplates.size(); i++) {
+		for (i = 0, len = blizzOnlyTemplates.size(); i < len; i++) {
 			clone.blizzOnlyTemplates.add((UITemplate) blizzOnlyTemplates.get(i).deepCopy());
 		}
-		for (int i = 0; i < constants.size(); i++) {
+		for (i = 0, len = constants.size(); i < len; i++) {
 			clone.constants.add((UIConstant) constants.get(i).deepCopy());
 		}
-		for (int i = 0; i < blizzOnlyConstants.size(); i++) {
+		for (i = 0, len = blizzOnlyConstants.size(); i < len; i++) {
 			clone.blizzOnlyConstants.add((UIConstant) blizzOnlyConstants.get(i).deepCopy());
 		}
-		for (int i = 0; i < blizzOnlyLayouts.size(); i++) {
+		for (i = 0, len = blizzOnlyLayouts.size(); i < len; i++) {
 			clone.blizzOnlyLayouts.add(blizzOnlyLayouts.get(i));
 		}
-		
 		clone.curBasePath = curBasePath;
+		
+		// TODO debug
+		// printDebugStats();
+		// clone.printDebugStats();
+		
 		return clone;
+	}
+	
+	/**
+	 * @throws ParserConfigurationException
+	 */
+	private void prepareDomParser() throws ParserConfigurationException {
+		if (dBuilder == null) {
+			dBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+		}
+	}
+	
+	/**
+	 * Clears the XML DOM Parser to release its memory.
+	 */
+	public void clearDomParser() {
+		dBuilder = null;
 	}
 	
 	/**
@@ -137,13 +210,12 @@ public class UICatalog implements Serializable, DeepCopyable {
 		
 		final String descIndexPath = f.getAbsolutePath();
 		final String basePath = descIndexPath.substring(0, descIndexPath.length() - f.getName().length());
-		LOGGER.trace("descIndexPath=" + descIndexPath);
-		LOGGER.trace("basePath=" + basePath);
+		logger.trace("descIndexPath=" + descIndexPath);
+		logger.trace("basePath=" + basePath);
 		
 		processLayouts(combinedList, basePath, raceId);
 		
-		LOGGER.info("UICatalogSizes: " + templates.size() + " " + blizzOnlyTemplates.size() + " " + constants.size()
-				+ " " + blizzOnlyConstants.size() + " " + blizzOnlyLayouts.size());
+		printDebugStats();
 	}
 	
 	/**
@@ -156,19 +228,19 @@ public class UICatalog implements Serializable, DeepCopyable {
 			throws InterruptedException {
 		loop: for (final String intPath : toProcessList) {
 			final boolean isDevLayout = blizzOnlyLayouts.contains(intPath);
-			LOGGER.trace("intPath=" + intPath);
-			LOGGER.trace("isDevLayout=" + isDevLayout);
+			logger.trace("intPath=" + intPath);
+			logger.trace("isDevLayout=" + isDevLayout);
 			String basePathTemp = "" + basePath;
 			while (!new File(basePathTemp + File.separator + intPath).exists()) {
 				final int lastIndex = basePathTemp.lastIndexOf(File.separatorChar);
 				if (lastIndex != -1) {
 					basePathTemp = basePathTemp.substring(0, basePathTemp.lastIndexOf(File.separatorChar));
-					LOGGER.trace("basePathTemp=" + basePathTemp);
+					logger.trace("basePathTemp=" + basePathTemp);
 				} else {
 					if (!isDevLayout) {
-						LOGGER.error("ERROR: Cannot find layout file: " + intPath);
+						logger.error("ERROR: Cannot find layout file: " + intPath);
 					} else {
-						LOGGER.warn("WARNING: Cannot find Blizz-only layout file: " + intPath + ", so this is fine.");
+						logger.warn("WARNING: Cannot find Blizz-only layout file: " + intPath + ", so this is fine.");
 					}
 					continue loop;
 				}
@@ -178,7 +250,7 @@ public class UICatalog implements Serializable, DeepCopyable {
 			try {
 				processLayoutFile(layoutFile, raceId, isDevLayout);
 			} catch (SAXException | IOException | ParserConfigurationException | UIException e) {
-				LOGGER.error("ERROR: encountered an Exception while processing the layout file '" + layoutFile + "'.",
+				logger.error("ERROR: encountered an Exception while processing the layout file '" + layoutFile + "'.",
 						e);
 				e.printStackTrace();
 			}
@@ -203,46 +275,50 @@ public class UICatalog implements Serializable, DeepCopyable {
 	public void processLayoutFile(final File f, final String raceId, final boolean isDevLayout) throws SAXException,
 			IOException, ParserConfigurationException, UIException, DOMException, InterruptedException {
 		if (!isDevLayout) {
-			LOGGER.info("Processing layout file " + f.getAbsolutePath());
+			logger.info("Processing layout file " + f.getAbsolutePath());
 		} else {
-			LOGGER.info("Processing Blizz-only layout file " + f.getAbsolutePath());
+			logger.info("Processing Blizz-only layout file " + f.getAbsolutePath());
 		}
 		
-		final DocumentBuilder dBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-		
-		InputStream is = null;
+		// InputStream is = null;
 		
 		Document doc = null;
 		try {
 			// parse XML file
 			
+			final long startTime = System.currentTimeMillis();
+			
+			prepareDomParser();
+			
 			// THIS DOES NOT CLOSE THE INPUTSTREAM ON EXCEPTION
 			// CREATING TONS OF FILE ACCESS PROBLEMS. DO NOT USE!
-			// doc = dBuilder.parse(curFile);
+			doc = dBuilder.parse(f);
+			
+			final long executionTime = (System.currentTimeMillis() - startTime);
+			synchronized (this) {
+				totalExecutionTime += executionTime;
+			}
+			logger.info("XML parsing layout file took " + executionTime + "ms. Total time: " + totalExecutionTime);
 			
 			// WORKAROUND -> provide Inputstream
-			is = new FileInputStream(f);
-			doc = dBuilder.parse(is);
+			// is = new FileInputStream(f);
+			// doc = dBuilder.parse(is);
 			
-			LOGGER.trace("retrieving document's children");
+			logger.trace("retrieving document's children");
 			final NodeList nodes = doc.getChildNodes();
 			
 			if (nodes.getLength() <= 0) {
-				LOGGER.warn("Empty layout file: " + f);
+				logger.warn("Empty layout file: " + f);
 				return;
 			} else {
 				// parse document's content
 				parse(nodes, null, f.getName().substring(0, f.getName().lastIndexOf('.')), raceId, isDevLayout);
-				LOGGER.trace("Finished parsing file.");
+				logger.trace("Finished parsing file.");
 			}
 		} catch (SAXParseException | IOException e) {
-			LOGGER.error("Failed to parse file: " + f, e);
+			logger.error("Failed to parse file: " + f, e);
 			// couldn't parse, most likely no XML file
 			// -> do nothing
-		} finally {
-			if (is != null) {
-				is.close();
-			}
 		}
 	}
 	
@@ -254,7 +330,7 @@ public class UICatalog implements Serializable, DeepCopyable {
 	 */
 	private void processLayoutFile(final String pathAttributeValue, final String raceId, final boolean isDevLayout)
 			throws InterruptedException {
-		LOGGER.trace("processing layoutFile from include: " + pathAttributeValue);
+		logger.trace("processing layoutFile from include: " + pathAttributeValue);
 		if (isDevLayout) {
 			blizzOnlyLayouts.add(pathAttributeValue);
 		}
@@ -276,13 +352,13 @@ public class UICatalog implements Serializable, DeepCopyable {
 			final boolean isDevLayout) throws UIException, DOMException, InterruptedException {
 		if (childNodes != null) {
 			final int len = childNodes.getLength();
-			LOGGER.trace("checking childNodes, length: " + len);
+			logger.trace("checking childNodes, length: " + len);
 			
 			for (int i = 0; i < len; i++) {
 				final Node curNode = childNodes.item(i);
 				
 				if (isTrashNodeType(curNode)) {
-					LOGGER.trace("Skipping node type " + curNode.getNodeType());
+					logger.trace("Skipping node type " + curNode.getNodeType());
 					continue;
 				}
 				
@@ -322,14 +398,14 @@ public class UICatalog implements Serializable, DeepCopyable {
 	private void parse(final Node node, final UIElement parent, final String fileName, final String raceId,
 			final boolean isDevLayout) throws UIException, DOMException, InterruptedException {
 		final String nodeName = node.getNodeName().toLowerCase(Locale.ROOT);
-		LOGGER.trace("node name: " + nodeName);
+		logger.trace("node name: " + nodeName);
 		
 		// do not load, if requiredtoload
 		if (isFailingRequiredToLoad(node.getAttributes())) {
-			if (nodeName.equals("include")) {
+			if (nodeName.equals(INCLUDE)) {
 				parseInclude(node, parent, fileName, raceId, isDevLayout, true);
 			} else if (!isDevLayout) {
-				LOGGER.warn("WARNING: Encountered 'requiredToLoad' attribute in non-Blizz-only layout. ElementName: "
+				logger.warn("WARNING: Encountered 'requiredToLoad' attribute in non-Blizz-only layout. ElementName: "
 						+ nodeName + ", parent: " + parent);
 			}
 			return;
@@ -337,34 +413,34 @@ public class UICatalog implements Serializable, DeepCopyable {
 		
 		// use lowercase for cases!
 		switch (nodeName) {
-			case "frame":
+			case FRAME:
 				parseFrame(node, parent, fileName, raceId, isDevLayout);
 				break;
-			case "anchor":
+			case ANCHOR:
 				parseAnchor(node, parent, raceId, isDevLayout);
 				break;
-			case "state":
+			case STATE:
 				parseState(node, parent, fileName, raceId, isDevLayout);
 				break;
-			case "controller":
+			case CONTROLLER:
 				parseController(node, parent, fileName, raceId, isDevLayout);
 				break;
-			case "animation":
+			case ANIMATION:
 				parseAnimation(node, parent, fileName, raceId, isDevLayout);
 				break;
-			case "stategroup":
+			case STATEGROUP:
 				parseStateGroup(node, parent, fileName, raceId, isDevLayout);
 				break;
-			case "constant":
+			case CONSTANT:
 				parseConstant(node, parent, fileName, raceId, isDevLayout);
 				break;
-			case "desc":
+			case DESC:
 				parseDesc(node, parent, fileName, raceId, isDevLayout);
 				break;
-			case "descflags":
+			case DESCFLAGS:
 				parseDescFlags(node, parent, fileName, raceId, isDevLayout);
 				break;
-			case "include":
+			case INCLUDE:
 				parseInclude(node, parent, fileName, raceId, isDevLayout, false);
 				break;
 			default:
@@ -385,15 +461,15 @@ public class UICatalog implements Serializable, DeepCopyable {
 	private void parseInclude(final Node node, final UIElement parent, final String fileName, final String raceId,
 			final boolean isDevLayout, final boolean hasReqToLoadAttribute) throws DOMException, InterruptedException {
 		final NamedNodeMap attributes = node.getAttributes();
-		final Node pathAttribute = XmlDomHelper.getNamedItemIgnoringCase(attributes, "path");
+		final Node pathAttribute = XmlDomHelper.getNamedItemIgnoringCase(attributes, PATH);
 		if (pathAttribute != null) {
 			final boolean thisOneIsDevLayoutToo = (isDevLayout || hasReqToLoadAttribute);
 			processLayoutFile(pathAttribute.getNodeValue(), raceId, thisOneIsDevLayoutToo);
 		} else {
 			if (!isDevLayout) {
-				LOGGER.error("ERROR: encountered 'Include' without required 'path' attribute.");
+				logger.error("ERROR: encountered 'Include' without required 'path' attribute.");
 			} else {
-				LOGGER.error(
+				logger.error(
 						"WARNING: encountered 'Include' without required 'path' attribute in a blizz-only layout, so this is fine.");
 			}
 		}
@@ -407,23 +483,23 @@ public class UICatalog implements Serializable, DeepCopyable {
 	 */
 	private void parseDescFlags(final Node node, final UIElement parent, final String fileName, final String raceId,
 			final boolean isDevLayout) throws UIException {
-		LOGGER.trace("parsing DescFlags");
+		logger.trace("parsing DescFlags");
 		if (parent == null) {
-			final Node val = XmlDomHelper.getNamedItemIgnoringCase(node.getAttributes(), "val");
-			if (getConstantValue(val.getNodeValue(), raceId, isDevLayout).compareToIgnoreCase("locked") == 0) {
+			final Node val = XmlDomHelper.getNamedItemIgnoringCase(node.getAttributes(), VAL);
+			if (getConstantValue(val.getNodeValue(), raceId, isDevLayout).compareToIgnoreCase(LOCKED) == 0) {
 				for (final UITemplate template : templates) {
 					if (template.getFileName().compareToIgnoreCase(fileName) == 0) {
 						template.setLocked(true);
-						LOGGER.trace("locked templated " + fileName + "/" + template.getElement().getName());
+						logger.trace("locked templated " + fileName + "/" + template.getElement().getName());
 					}
 				}
 			}
 		} else {
-			LOGGER.trace("DescFlags found with parent. -> ignored");
+			logger.trace("DescFlags found with parent. -> ignored");
 		}
 		
 		// verify that it cannot go deeper
-		parseAttrChildren(node.getChildNodes(), "'DescFlags'", isDevLayout);
+		parseAttrChildren(node.getChildNodes(), DESC_FLAGS, isDevLayout);
 	}
 	
 	/**
@@ -435,7 +511,7 @@ public class UICatalog implements Serializable, DeepCopyable {
 	 */
 	private void parseController(final Node node, final UIElement parent, final String fileName, final String raceId,
 			final boolean isDevLayout) throws UIException, DOMException, InterruptedException {
-		LOGGER.trace("parsing Controller");
+		logger.trace("parsing Controller");
 		// Controllers may not have a name defined
 		final Node nameAttrNode = XmlDomHelper.getNamedItemIgnoringCase(node.getAttributes(), NAME_ATTR);
 		String name = null;
@@ -446,9 +522,9 @@ public class UICatalog implements Serializable, DeepCopyable {
 			nameIsImplicit = false;
 		}
 		if (name == null) {
-			LOGGER.trace("name is null");
+			logger.trace("name is null");
 		} else {
-			LOGGER.trace("name = " + name);
+			logger.trace("name = " + name);
 		}
 		final String template = readTemplate(node.getAttributes());
 		final UIElement templateElem = instanciateTemplate(template, name, isDevLayout, parent);
@@ -457,7 +533,7 @@ public class UICatalog implements Serializable, DeepCopyable {
 		
 		// parse other settings in that line
 		final NamedNodeMap attributes = node.getAttributes();
-		LOGGER.trace("attribute length = " + attributes.getLength());
+		logger.trace("attribute length = " + attributes.getLength());
 		for (int i = 0; i < attributes.getLength(); i++) {
 			final Node curAttribute = attributes.item(i);
 			if (nameAttrNode == curAttribute) {
@@ -466,11 +542,11 @@ public class UICatalog implements Serializable, DeepCopyable {
 			} else {
 				final String attrKey = curAttribute.getNodeName();
 				final String attrVal = getConstantValue(curAttribute.getNodeValue(), raceId, isDevLayout);
-				LOGGER.trace("key,value = '" + attrKey + "', '" + attrVal + "'");
+				logger.trace("key,value = '" + attrKey + "', '" + attrVal + "'");
 				// final String overriddenVal = thisElem.getValues().put(attrKey, attrVal);
 				final String overriddenVal = thisElem.addValue(attrKey, attrVal);
 				if (overriddenVal != null) {
-					LOGGER.trace("overridden value = " + overriddenVal);
+					logger.trace("overridden value = " + overriddenVal);
 				}
 			}
 		}
@@ -505,13 +581,13 @@ public class UICatalog implements Serializable, DeepCopyable {
 	 */
 	private void parseState(final Node node, final UIElement parent, final String fileName, final String raceId,
 			final boolean isDevLayout) throws UIException, DOMException, InterruptedException {
-		LOGGER.trace("parsing State");
+		logger.trace("parsing State");
 		final Node nameAttrNode = XmlDomHelper.getNamedItemIgnoringCase(node.getAttributes(), NAME_ATTR);
 		if (nameAttrNode == null) {
 			throw new UIException("State has no specified 'name'");
 		}
 		final String name = getConstantValue(nameAttrNode.getNodeValue(), raceId, isDevLayout);
-		LOGGER.trace("name = " + name);
+		logger.trace("name = " + name);
 		final String template = readTemplate(node.getAttributes());
 		final UIElement templateElem = instanciateTemplate(template, name, isDevLayout, parent);
 		final UIState thisElem = templateElem != null ? (UIState) templateElem : new UIState(name);
@@ -541,12 +617,12 @@ public class UICatalog implements Serializable, DeepCopyable {
 	 */
 	private void parseAnchor(final Node node, final UIElement parent, final String raceId, final boolean isDevLayout)
 			throws UIException {
-		LOGGER.trace("parsing Anchor");
+		logger.trace("parsing Anchor");
 		if (parent instanceof UIFrame) {
 			final UIFrame frame = (UIFrame) parent;
 			
 			final NamedNodeMap attributes = node.getAttributes();
-			LOGGER.trace("attribute length = " + attributes.getLength());
+			logger.trace("attribute length = " + attributes.getLength());
 			
 			final Node nodeSide = XmlDomHelper.getNamedItemIgnoringCase(attributes, "side");
 			final Node nodeRelative = XmlDomHelper.getNamedItemIgnoringCase(attributes, "relative");
@@ -557,8 +633,11 @@ public class UICatalog implements Serializable, DeepCopyable {
 				throw new UIException("'Anchor' attribute does not contain required attribute 'relative='");
 			}
 			final String relative = getConstantValue(nodeRelative.getNodeValue(), raceId, isDevLayout);
-			String offset = nodeOffset == null ? null
-					: getConstantValue(nodeOffset.getNodeValue(), raceId, isDevLayout);
+			
+			String offset = null;
+			if (nodeOffset != null) {
+				offset = getConstantValue(nodeOffset.getNodeValue(), raceId, isDevLayout);
+			}
 			
 			if (nodeSide != null) {
 				// version with side
@@ -571,13 +650,13 @@ public class UICatalog implements Serializable, DeepCopyable {
 				final String pos = getConstantValue(nodePos.getNodeValue(), raceId, isDevLayout);
 				final String side = getConstantValue(nodeSide.getNodeValue(), raceId, isDevLayout);
 				UIAnchorSide sideVal = null;
-				if (side.compareToIgnoreCase("left") == 0) {
+				if (side.compareToIgnoreCase(LEFT) == 0) {
 					sideVal = UIAnchorSide.Left;
-				} else if (side.compareToIgnoreCase("bottom") == 0) {
+				} else if (side.compareToIgnoreCase(BOTTOM) == 0) {
 					sideVal = UIAnchorSide.Bottom;
-				} else if (side.compareToIgnoreCase("right") == 0) {
+				} else if (side.compareToIgnoreCase(RIGHT) == 0) {
 					sideVal = UIAnchorSide.Right;
-				} else if (side.compareToIgnoreCase("top") == 0) {
+				} else if (side.compareToIgnoreCase(TOP) == 0) {
 					sideVal = UIAnchorSide.Top;
 				} else {
 					throw new UIException(
@@ -590,7 +669,7 @@ public class UICatalog implements Serializable, DeepCopyable {
 				// version without side
 				if (offset == null) {
 					// relative information alone is enough
-					offset = "0";
+					offset = ZERO_VAL;
 				}
 				try {
 					frame.setAnchor(relative, offset);
@@ -616,32 +695,33 @@ public class UICatalog implements Serializable, DeepCopyable {
 	 */
 	private void parseAttribute(final Node node, final UIElement parent, final String fileName, final String raceId,
 			final boolean isDevLayout) throws UIException, DOMException, InterruptedException {
-		LOGGER.trace("parsing Attribute");
+		logger.trace("parsing Attribute");
 		final String id = node.getNodeName();
-		final UIAttribute thisElem = new UIAttribute(id);
-		LOGGER.trace("id = " + id);
+		logger.trace("id = " + id);
 		
 		final NamedNodeMap attributes = node.getAttributes();
-		LOGGER.trace("attribute length = " + attributes.getLength());
+		final int len = attributes.getLength();
+		logger.trace("attribute length = " + len);
 		
-		for (int i = 0; i < attributes.getLength(); i++) {
+		final UIAttribute thisElem = new UIAttribute(id, len);
+		for (int i = 0; i < len; i++) {
 			final Node curAttribute = attributes.item(i);
 			final String attrKey = curAttribute.getNodeName();
 			final String attrVal = getConstantValue(curAttribute.getNodeValue(), raceId, isDevLayout);
-			LOGGER.trace("key,value = '" + attrKey + "', '" + attrVal + "'");
+			logger.trace("key,value = '" + attrKey + "', '" + attrVal + "'");
 			final String overriddenVal = thisElem.addValue(attrKey, attrVal);
+			
 			if (overriddenVal != null) {
-				LOGGER.trace("overridden value = " + overriddenVal);
+				logger.trace("overridden value = " + overriddenVal);
 			}
 		}
 		
 		// register with frame/animation/stategroup/state/controller
 		if (parent instanceof UIFrame) {
 			final UIFrame p = (UIFrame) parent;
-			// p.addAttribute(id, thisElem);
-			p.getAttributes().put(id, thisElem);
+			p.addAttribute(thisElem);
 		} else if (parent instanceof UIAnimation) {
-			if (id.equalsIgnoreCase("event")) {
+			if (id.equalsIgnoreCase(EVENT)) {
 				final UIAnimation p = (UIAnimation) parent;
 				// override all animation events
 				if (p.isNextEventsAdditionShouldOverride()) {
@@ -649,19 +729,19 @@ public class UICatalog implements Serializable, DeepCopyable {
 					p.setNextEventsAdditionShouldOverride(false);
 				}
 				p.addEvent(id, thisElem);
-			} else if (id.equalsIgnoreCase("driver")) {
+			} else if (id.equalsIgnoreCase(DRIVER)) {
 				final UIAnimation p = (UIAnimation) parent;
 				p.setDriver(thisElem);
 			} else {
 				throw new UIException("Parent element (Frame) expects 'Event' attribute instead of '" + id + "'");
 			}
 		} else if (parent instanceof UIStateGroup) {
-			if (id.compareToIgnoreCase("defaultstate") != 0) {
+			if (id.compareToIgnoreCase(DEFAULTSTATE) != 0) {
 				throw new UIException(
 						"Parent element (Animation) expects 'DefaultState' attribute instead of '" + id + "'");
 			}
 			final UIStateGroup p = (UIStateGroup) parent;
-			final String val = thisElem.getValue("val");
+			final String val = thisElem.getValue(VAL);
 			if (val != null) {
 				p.setDefaultState(val);
 			} else {
@@ -671,7 +751,7 @@ public class UICatalog implements Serializable, DeepCopyable {
 		} else if (parent instanceof UIState) {
 			UIState p = null;
 			switch (id.toLowerCase(Locale.ROOT)) {
-				case "when":
+				case WHEN:
 					p = (UIState) parent;
 					// override all state whens
 					if (p.isNextAdditionShouldOverrideWhens()) {
@@ -680,7 +760,7 @@ public class UICatalog implements Serializable, DeepCopyable {
 					}
 					p.getWhens().add(thisElem);
 					break;
-				case "action":
+				case ACTION:
 					p = (UIState) parent;
 					// override all state actions
 					if (p.isNextAdditionShouldOverrideActions()) {
@@ -694,7 +774,7 @@ public class UICatalog implements Serializable, DeepCopyable {
 							"Parent element (UIState) expects 'when' or 'action' attribute instead of '" + id + "'");
 			}
 		} else if (parent instanceof UIController) {
-			if (id.compareToIgnoreCase("key") != 0) {
+			if (id.compareToIgnoreCase(KEY) != 0) {
 				throw new UIException("Parent element (UIController) expects 'key' attribute instead of '" + id + "'");
 			}
 			final UIController p = (UIController) parent;
@@ -731,8 +811,10 @@ public class UICatalog implements Serializable, DeepCopyable {
 			if (isTrashNodeType(node)) {
 				final String msg = "Found trash nodeType within Attribute '" + parentName + "', nodeType = '"
 						+ node.getNodeType() + "'";
-				LOGGER.trace(msg);
+				logger.trace(msg);
 				throw new UIException(msg);
+			} else {
+				// TODO
 			}
 			
 			// verify that it cannot go deeper
@@ -749,7 +831,7 @@ public class UICatalog implements Serializable, DeepCopyable {
 	 */
 	private void parseDesc(final Node node, final UIElement parent, final String fileName, final String raceId,
 			final boolean isDevLayout) throws UIException, DOMException, InterruptedException {
-		LOGGER.trace("parsing Desc");
+		logger.trace("parsing Desc");
 		
 		// go deeper
 		parse(node.getChildNodes(), null, fileName, raceId, isDevLayout);
@@ -764,13 +846,13 @@ public class UICatalog implements Serializable, DeepCopyable {
 	 */
 	private void parseStateGroup(final Node node, final UIElement parent, final String fileName, final String raceId,
 			final boolean isDevLayout) throws UIException, DOMException, InterruptedException {
-		LOGGER.trace("parsing Stategroup");
+		logger.trace("parsing Stategroup");
 		final Node nameAttrNode = XmlDomHelper.getNamedItemIgnoringCase(node.getAttributes(), NAME_ATTR);
 		if (nameAttrNode == null) {
 			throw new UIException("Stategroup has no specified 'name'");
 		}
 		final String name = getConstantValue(nameAttrNode.getNodeValue(), raceId, isDevLayout);
-		LOGGER.trace("name = " + name);
+		logger.trace("name = " + name);
 		final String template = readTemplate(node.getAttributes());
 		final UIElement templateElem = instanciateTemplate(template, name, isDevLayout, parent);
 		final UIStateGroup thisElem = templateElem != null ? (UIStateGroup) templateElem : new UIStateGroup(name);
@@ -798,13 +880,13 @@ public class UICatalog implements Serializable, DeepCopyable {
 	 */
 	private void parseAnimation(final Node node, final UIElement parent, final String fileName, final String raceId,
 			final boolean isDevLayout) throws UIException, DOMException, InterruptedException {
-		LOGGER.trace("parsing Animation");
+		logger.trace("parsing Animation");
 		final Node nameAttrNode = XmlDomHelper.getNamedItemIgnoringCase(node.getAttributes(), NAME_ATTR);
 		if (nameAttrNode == null) {
 			throw new UIException("Animation has no specified 'name'");
 		}
 		final String name = getConstantValue(nameAttrNode.getNodeValue(), raceId, isDevLayout);
-		LOGGER.trace("name = " + name);
+		logger.trace("name = " + name);
 		final String template = readTemplate(node.getAttributes());
 		final UIElement templateElem = instanciateTemplate(template, name, isDevLayout, parent);
 		final UIAnimation thisElem = templateElem != null ? (UIAnimation) templateElem : new UIAnimation(name);
@@ -852,13 +934,13 @@ public class UICatalog implements Serializable, DeepCopyable {
 	 * @throws UIException
 	 */
 	private void setImplicitControllerNames(final UIAnimation thisElem) throws UIException {
-		LOGGER.trace("Setting implicit controller names");
+		logger.trace("Setting implicit controller names");
 		final List<UIController> controllers = thisElem.getControllers();
 		for (final UIController contr : controllers) {
 			if (contr.getName() == null) {
 				// final String type = contr.getValues().get("type");
 				final String type = contr.getValue(TYPE_ATTR);
-				LOGGER.trace("type = " + type);
+				logger.trace("type = " + type);
 				contr.setName(getImplicitName(type, controllers));
 				contr.setNameIsImplicit(true);
 			}
@@ -872,7 +954,7 @@ public class UICatalog implements Serializable, DeepCopyable {
 	 * @throws UIException
 	 */
 	private String getImplicitName(final String type, final List<UIController> controllers) throws UIException {
-		LOGGER.trace("Constructing implicit controller name");
+		logger.trace("Constructing implicit controller name");
 		if (type == null) {
 			throw new UIException("'type=\"...\"' of Controller is not set or invalid.");
 		}
@@ -887,10 +969,10 @@ public class UICatalog implements Serializable, DeepCopyable {
 					return t.getName() != null && t.getName().compareToIgnoreCase(name) == 0;
 				}
 			})) {
-				LOGGER.trace("Constructing implicit controller name: " + name);
+				logger.trace("Constructing implicit controller name: " + name);
 				return name;
 			}
-			LOGGER.trace("Implicit controller name existing: " + name);
+			logger.trace("Implicit controller name existing: " + name);
 			i++;
 		}
 	}
@@ -904,23 +986,23 @@ public class UICatalog implements Serializable, DeepCopyable {
 	 */
 	private void parseConstant(final Node node, final UIElement parent, final String fileName, final String raceId,
 			final boolean isDevLayout) throws UIException, DOMException, InterruptedException {
-		LOGGER.trace("parsing Constant");
+		logger.trace("parsing Constant");
 		final Node nameAttrNode = XmlDomHelper.getNamedItemIgnoringCase(node.getAttributes(), NAME_ATTR);
 		if (nameAttrNode == null) {
 			throw new UIException("Constant has no specified 'name'");
 		}
 		final String name = getConstantValue(nameAttrNode.getNodeValue(), raceId, isDevLayout);
-		LOGGER.trace("name = " + name);
+		logger.trace("name = " + name);
 		final String template = readTemplate(node.getAttributes());
 		final UIElement templateElem = instanciateTemplate(template, name, isDevLayout, parent);
 		final UIConstant thisElem = templateElem != null ? (UIConstant) templateElem : new UIConstant(name);
 		
-		final Node valAttrNode = XmlDomHelper.getNamedItemIgnoringCase(node.getAttributes(), "val");
+		final Node valAttrNode = XmlDomHelper.getNamedItemIgnoringCase(node.getAttributes(), VAL);
 		if (valAttrNode == null) {
 			throw new UIException("Constant has no specified 'val'");
 		}
 		final String val = getConstantValue(valAttrNode.getNodeValue(), raceId, isDevLayout);
-		LOGGER.trace("val = " + val);
+		logger.trace("val = " + val);
 		thisElem.setValue(val);
 		
 		// register with parent/templates overriding previous constant values
@@ -930,7 +1012,7 @@ public class UICatalog implements Serializable, DeepCopyable {
 			removeConstantFromList(name, constants);
 			constants.add(thisElem);
 			if (removedBlizzOnly) {
-				LOGGER.warn("WARNING: constant '" + name
+				logger.warn("WARNING: constant '" + name
 						+ "' overrides value from Blizz-only constant, so this might be fine.");
 			}
 		} else {
@@ -939,7 +1021,7 @@ public class UICatalog implements Serializable, DeepCopyable {
 			final boolean removedGeneral = removeConstantFromList(name, blizzOnlyConstants);
 			blizzOnlyConstants.add(thisElem);
 			if (removedGeneral) {
-				LOGGER.warn("WARNING: constant '" + name
+				logger.warn("WARNING: constant '" + name
 						+ "' from Blizz-only layout overrides a general constant, so this might be fine.");
 			}
 		}
@@ -974,20 +1056,20 @@ public class UICatalog implements Serializable, DeepCopyable {
 	 */
 	private void parseFrame(final Node node, final UIElement parent, final String fileName, final String raceId,
 			final boolean isDevLayout) throws UIException, DOMException, InterruptedException {
-		LOGGER.trace("parsing Frame");
+		logger.trace("parsing Frame");
 		final Node nameAttrNode = XmlDomHelper.getNamedItemIgnoringCase(node.getAttributes(), NAME_ATTR);
 		if (nameAttrNode == null) {
 			throw new UIException("Frame has no specified 'name'");
 		}
 		final String name = getConstantValue(nameAttrNode.getNodeValue(), raceId, isDevLayout);
-		LOGGER.trace("name = " + name);
+		logger.trace("name = " + name);
 		
 		final Node typeAttrNode = XmlDomHelper.getNamedItemIgnoringCase(node.getAttributes(), TYPE_ATTR);
 		if (typeAttrNode == null) {
 			throw new UIException("Frame has no specified 'type'");
 		}
 		final String type = getConstantValue(typeAttrNode.getNodeValue(), raceId, isDevLayout);
-		LOGGER.trace("type = " + type);
+		logger.trace("type = " + type);
 		
 		final String template = readTemplate(node.getAttributes());
 		final UIElement templateElem = instanciateTemplate(template, name, isDevLayout, parent);
@@ -995,7 +1077,7 @@ public class UICatalog implements Serializable, DeepCopyable {
 		
 		// register with parent/templates
 		if (parent == null) {
-			LOGGER.trace("Adding new template Frame named " + fileName + "/" + thisElem.getName());
+			logger.trace("Adding new template Frame named " + fileName + "/" + thisElem.getName());
 			addTemplate(fileName, thisElem, isDevLayout);
 		} else if (parent instanceof UIFrame) {
 			final UIFrame p = (UIFrame) parent;
@@ -1018,7 +1100,7 @@ public class UICatalog implements Serializable, DeepCopyable {
 		if (path == null) {
 			return null;
 		}
-		LOGGER.trace("Instanciating Template of path " + path);
+		logger.trace("Instanciating Template of path " + path);
 		path = path.replace('\\', '/');
 		final String fileName = path.substring(0, path.indexOf('/'));
 		
@@ -1031,7 +1113,7 @@ public class UICatalog implements Serializable, DeepCopyable {
 			templateInstance = instanciateTemplateFromList(blizzOnlyTemplates, fileName, path, newName);
 			if (templateInstance != null) {
 				if (!isDevLayout) {
-					LOGGER.error("ERROR: the non-Blizz-only frame '" + parent + "' uses a Blizz-only template '" + path
+					logger.error("ERROR: the non-Blizz-only frame '" + parent + "' uses a Blizz-only template '" + path
 							+ "'.");
 				}
 				return templateInstance;
@@ -1039,9 +1121,9 @@ public class UICatalog implements Serializable, DeepCopyable {
 		}
 		// template does not exist or its layout was not loaded, yet
 		if (!isDevLayout) {
-			LOGGER.error("ERROR: Template of path '" + path + "' could not be found.");
+			logger.error("ERROR: Template of path '" + path + "' could not be found.");
 		} else {
-			LOGGER.warn("WARNING: Template of path '" + path
+			logger.warn("WARNING: Template of path '" + path
 					+ "' could not be found, but we are creating a Blizz-only layout, so this is fine.");
 		}
 		return null;
@@ -1056,6 +1138,7 @@ public class UICatalog implements Serializable, DeepCopyable {
 	 */
 	private UIElement instanciateTemplateFromList(final List<UITemplate> templates, final String fileName,
 			final String path, final String newName) {
+		
 		for (final UITemplate curTemplate : templates) {
 			if (curTemplate.getFileName().equalsIgnoreCase(fileName)) {
 				// found template file
@@ -1082,7 +1165,7 @@ public class UICatalog implements Serializable, DeepCopyable {
 	 * @return template reference or null
 	 */
 	private String readTemplate(final NamedNodeMap attributes) {
-		final Node template = attributes.getNamedItem("template");
+		final Node template = attributes.getNamedItem(TEMPLATE2);
 		return template != null ? template.getNodeValue() : null;
 	}
 	
@@ -1094,6 +1177,7 @@ public class UICatalog implements Serializable, DeepCopyable {
 	 */
 	public String getConstantValue(final String constantRef, final String raceId, final boolean isDevLayout) {
 		// String id = constantRef;
+		
 		int i = 0;
 		if (constantRef.length() > 0) {
 			while (constantRef.charAt(i) == '#') {
@@ -1106,7 +1190,7 @@ public class UICatalog implements Serializable, DeepCopyable {
 		}
 		final String prefix = constantRef.substring(0, i);
 		final String constantName = constantRef.substring(i);
-		LOGGER.trace("Encountered Constant: prefix='" + prefix + "', constantName='" + constantName + "'");
+		logger.trace("Encountered Constant: prefix='" + prefix + "', constantName='" + constantName + "'");
 		for (final UIConstant c : constants) {
 			if (c.getName().equalsIgnoreCase(constantName)) {
 				return c.getValue();
@@ -1122,12 +1206,12 @@ public class UICatalog implements Serializable, DeepCopyable {
 			}
 		}
 		if (i >= 3) {
-			LOGGER.error("ERROR: Encountered a constant definition with three #'" + constantRef
+			logger.error("ERROR: Encountered a constant definition with three #'" + constantRef
 					+ "' when its maximum is two '#'.");
 		}
 		
 		if (!isDevLayout) {
-			LOGGER.warn("WARNING: Did not find a constant definition for '" + constantRef + "', so '" + constantName
+			logger.warn("WARNING: Did not find a constant definition for '" + constantRef + "', so '" + constantName
 					+ "' is used instead.");
 		} else {
 			// inside blizz-only
@@ -1136,7 +1220,7 @@ public class UICatalog implements Serializable, DeepCopyable {
 					return c.getValue();
 				}
 			}
-			LOGGER.warn("WARNING: Did not find a constant definition for '" + constantRef
+			logger.warn("WARNING: Did not find a constant definition for '" + constantRef
 					+ "', but it is a Blizz-only layout, so this is fine.");
 		}
 		return constantName;
@@ -1145,7 +1229,7 @@ public class UICatalog implements Serializable, DeepCopyable {
 	/**
 	 * @return the templates
 	 */
-	public ArrayList<UITemplate> getTemplates() {
+	public List<UITemplate> getTemplates() {
 		return templates;
 	}
 	
@@ -1153,14 +1237,14 @@ public class UICatalog implements Serializable, DeepCopyable {
 	 * @param templates
 	 *            the templates to set
 	 */
-	public void setTemplates(final ArrayList<UITemplate> templates) {
+	public void setTemplates(final List<UITemplate> templates) {
 		this.templates = templates;
 	}
 	
 	/**
 	 * @return the blizzOnlyTemplates
 	 */
-	public ArrayList<UITemplate> getBlizzOnlyTemplates() {
+	public List<UITemplate> getBlizzOnlyTemplates() {
 		return blizzOnlyTemplates;
 	}
 	
@@ -1168,14 +1252,14 @@ public class UICatalog implements Serializable, DeepCopyable {
 	 * @param blizzOnlyTemplates
 	 *            the blizzOnlyTemplates to set
 	 */
-	public void setBlizzOnlyTemplates(final ArrayList<UITemplate> blizzOnlyTemplates) {
+	public void setBlizzOnlyTemplates(final List<UITemplate> blizzOnlyTemplates) {
 		this.blizzOnlyTemplates = blizzOnlyTemplates;
 	}
 	
 	/**
 	 * @return the constants
 	 */
-	public ArrayList<UIConstant> getConstants() {
+	public List<UIConstant> getConstants() {
 		return constants;
 	}
 	
@@ -1183,14 +1267,14 @@ public class UICatalog implements Serializable, DeepCopyable {
 	 * @param constants
 	 *            the constants to set
 	 */
-	public void setConstants(final ArrayList<UIConstant> constants) {
+	public void setConstants(final List<UIConstant> constants) {
 		this.constants = constants;
 	}
 	
 	/**
 	 * @return the blizzOnlyConstants
 	 */
-	public ArrayList<UIConstant> getBlizzOnlyConstants() {
+	public List<UIConstant> getBlizzOnlyConstants() {
 		return blizzOnlyConstants;
 	}
 	
@@ -1198,14 +1282,14 @@ public class UICatalog implements Serializable, DeepCopyable {
 	 * @param blizzOnlyConstants
 	 *            the blizzOnlyConstants to set
 	 */
-	public void setBlizzOnlyConstants(final ArrayList<UIConstant> blizzOnlyConstants) {
+	public void setBlizzOnlyConstants(final List<UIConstant> blizzOnlyConstants) {
 		this.blizzOnlyConstants = blizzOnlyConstants;
 	}
 	
 	/**
 	 * @return the devLayouts
 	 */
-	public ArrayList<String> getDevLayouts() {
+	public List<String> getDevLayouts() {
 		return blizzOnlyLayouts;
 	}
 	
@@ -1213,7 +1297,7 @@ public class UICatalog implements Serializable, DeepCopyable {
 	 * @param devLayouts
 	 *            the devLayouts to set
 	 */
-	public void setDevLayouts(final ArrayList<String> devLayouts) {
+	public void setDevLayouts(final List<String> devLayouts) {
 		blizzOnlyLayouts = devLayouts;
 	}
 	
@@ -1232,4 +1316,16 @@ public class UICatalog implements Serializable, DeepCopyable {
 		this.curBasePath = curBasePath;
 	}
 	
+	public void printDebugStats() {
+		logger.info("UICatalogSizes: " + templates.size() + " " + blizzOnlyTemplates.size() + " " + constants.size()
+				+ " " + blizzOnlyConstants.size() + " " + blizzOnlyLayouts.size());
+		// int count = 0;
+		// for(int i = 0; i < templates.size(); i++) {
+		// UIElement elem = templates.get(i).getElement();
+		// if(elem instanceof UIFrame) {
+		// UIFrame frame = (UIFrame) elem;
+		// frame.getChildren();
+		// }
+		// }
+	}
 }

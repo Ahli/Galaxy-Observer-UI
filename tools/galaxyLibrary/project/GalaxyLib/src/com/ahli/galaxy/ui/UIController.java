@@ -16,7 +16,7 @@ public class UIController extends UIElement {
 	
 	private List<UIAttribute> keys;
 	// private Map<String, String> values = null;
-	private ArrayList<Pair<String, String>> values;
+	private final List<Pair<String, String>> values;
 	private boolean nextAdditionShouldOverride;
 	private boolean nameIsImplicit = true;
 	
@@ -46,7 +46,7 @@ public class UIController extends UIElement {
 	@Override
 	public Object deepCopy() {
 		final UIController clone = new UIController(getName(), values.size(), keys.size());
-		for (int i = 0; i < keys.size(); i++) {
+		for (int i = 0, len = keys.size(); i < len; i++) {
 			clone.keys.add((UIAttribute) keys.get(i).deepCopy());
 		}
 		// final Object[] entries = values.entrySet().toArray();
@@ -56,7 +56,7 @@ public class UIController extends UIElement {
 		// final Entry<String, String> entry = (Entry<String, String>) entries[i];
 		// clonedMap.put(entry.getKey(), entry.getValue());
 		// }
-		for (int i = 0; i < values.size(); i++) {
+		for (int i = 0, len = values.size(); i < len; i++) {
 			final Pair<String, String> p = values.get(i);
 			clone.values.add(new Pair<>(p.getKey(), p.getValue()));
 		}
@@ -110,20 +110,20 @@ public class UIController extends UIElement {
 	// this.values = values;
 	// }
 	
-	/**
-	 * @return the values
-	 */
-	public ArrayList<Pair<String, String>> getValues() {
-		return values;
-	}
+	// /**
+	// * @return the values
+	// */
+	// public List<Pair<String, String>> getValues() {
+	// return values;
+	// }
 	
-	/**
-	 * @param values
-	 *            the values to set
-	 */
-	public void setValues(final ArrayList<Pair<String, String>> values) {
-		this.values = values;
-	}
+	// /**
+	// * @param values
+	// * the values to set
+	// */
+	// public void setValues(final List<Pair<String, String>> values) {
+	// this.values = values;
+	// }
 	
 	/**
 	 * @param key

@@ -14,6 +14,8 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
+import com.ahli.galaxy.game.def.abstracts.GameDef;
+
 /**
  * Reads the Components List file within the MPQ Archive.
  * 
@@ -38,10 +40,9 @@ public final class ComponentsListReader {
 	 * @throws SAXException
 	 * @throws ParserConfigurationException
 	 */
-	public static String getDescIndexPath(final File f) throws ParserConfigurationException, SAXException, IOException {
-		final String intPath = getComponentsListValue(f, "uiui");
-		String str = intPath.endsWith("StormLayout") ? "Base.StormData" : "Base.SC2Data";
-		str += File.separator + intPath;
+	public static String getDescIndexPath(final File f, final GameDef game)
+			throws ParserConfigurationException, SAXException, IOException {
+		final String str = game.getBaseDataFolderName() + File.separator + getComponentsListValue(f, "uiui");
 		logger.trace("DescIndexPath: " + str);
 		return str;
 	}
@@ -62,7 +63,9 @@ public final class ComponentsListReader {
 	public static String getComponentsListValue(final File f, final String typeVal)
 			throws ParserConfigurationException, SAXException, IOException {
 		// find the type in the xml
-		final DocumentBuilder dBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+		final DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+		factory.setIgnoringComments(true);
+		final DocumentBuilder dBuilder = factory.newDocumentBuilder();
 		final Document doc = dBuilder.parse(f);
 		
 		// must be in a DataComponent node

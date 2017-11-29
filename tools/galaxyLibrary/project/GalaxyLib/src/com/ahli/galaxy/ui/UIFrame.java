@@ -1,10 +1,7 @@
 package com.ahli.galaxy.ui;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -13,7 +10,10 @@ import org.apache.logging.log4j.Logger;
  * @author Ahli
  */
 public class UIFrame extends UIElement {
+	private static final String THIS = "$this";
+	private static final String PARENT = "$parent";
 	private static final String ZERO = "0";
+	private static final String[] POSI = { "Min", "Max" };
 	
 	/**
 	 * 
@@ -24,8 +24,7 @@ public class UIFrame extends UIElement {
 	
 	private String type;
 	private List<UIElement> children;
-	private Map<String, UIAttribute> attributes;
-	// private ArrayList<Pair<String, UIAttribute>> attributes = null;
+	private final List<UIAttribute> attributes;
 	private final String[] pos = new String[4];
 	private final String[] offset = new String[4];
 	private final String[] relative = new String[4];
@@ -38,8 +37,7 @@ public class UIFrame extends UIElement {
 		super(name);
 		this.type = type;
 		init();
-		attributes = new HashMap<>(1, 1f);
-		// attributes = new ArrayList<>();
+		attributes = new ArrayList<>();
 		children = new ArrayList<>();
 	}
 	
@@ -52,8 +50,7 @@ public class UIFrame extends UIElement {
 		super(name);
 		this.type = type;
 		init();
-		attributes = new HashMap<>(initialAttributesCapacity, 1f);
-		// attributes = new ArrayList<>(initialAttributesCapacity);
+		attributes = new ArrayList<>(initialAttributesCapacity);
 		children = new ArrayList<>(initialChildrenCapacity);
 	}
 	
@@ -61,18 +58,10 @@ public class UIFrame extends UIElement {
 	 * Initializes variables
 	 */
 	private void init() {
-		// relative[0] = "$this";
-		// pos[0] = "Min";
-		// offset[0] = "0";
-		// relative[1] = "$this";
-		// pos[1] = "Min";
-		// offset[1] = "0";
-		// relative[2] = "$this";
-		// pos[2] = "Max";
-		// offset[2] = "0";
-		// relative[3] = "$this";
-		// pos[3] = "Max";
-		// offset[3] = "0";
+		relative[0] = THIS;
+		relative[1] = THIS;
+		relative[2] = THIS;
+		relative[3] = THIS;
 	}
 	
 	/**
@@ -82,21 +71,12 @@ public class UIFrame extends UIElement {
 	public Object deepCopy() {
 		final UIFrame clone = new UIFrame(getName(), type, attributes.size(), children.size());
 		final List<UIElement> childrenClone = clone.children;
-		for (int i = 0; i < children.size(); i++) {
+		for (int i = 0, len = children.size(); i < len; i++) {
 			childrenClone.add((UIElement) children.get(i).deepCopy());
 		}
-		final Map<String, UIAttribute> clonedMap = clone.attributes;
-		final Object[] entries = attributes.entrySet().toArray();
-		for (int fix = 0, i = fix; i < entries.length; i++) {
-			@SuppressWarnings("unchecked")
-			final Entry<String, UIAttribute> entry = (Entry<String, UIAttribute>) entries[i];
-			clonedMap.put(entry.getKey(), entry.getValue());
+		for (int i = 0, len = attributes.size(); i < len; i++) {
+			clone.attributes.add((UIAttribute) attributes.get(i).deepCopy());
 		}
-		// for (int i = 0; i < attributes.size(); i++) {
-		// final Pair<String, UIAttribute> p = attributes.get(i);
-		// clone.attributes.add(new Pair<>(p.getKey(), (UIAttribute)
-		// p.getValue().clone()));
-		// }
 		for (int i = 0; i <= 3; i++) {
 			clone.relative[i] = relative[i];
 			clone.offset[i] = offset[i];
@@ -134,20 +114,20 @@ public class UIFrame extends UIElement {
 		this.children = children;
 	}
 	
-	/**
-	 * @return the attributes
-	 */
-	public Map<String, UIAttribute> getAttributes() {
-		return attributes;
-	}
-	
-	/**
-	 * @param attributes
-	 *            the attributes to set
-	 */
-	public void setAttributes(final Map<String, UIAttribute> attributes) {
-		this.attributes = attributes;
-	}
+	// /**
+	// * @return the attributes
+	// */
+	// public Map<String, UIAttribute> getAttributes() {
+	// return attributes;
+	// }
+	//
+	// /**
+	// * @param attributes
+	// * the attributes to set
+	// */
+	// public void setAttributes(final Map<String, UIAttribute> attributes) {
+	// this.attributes = attributes;
+	// }
 	
 	// /**
 	// * @return the attributes
@@ -165,45 +145,42 @@ public class UIFrame extends UIElement {
 	// this.attributes = attributes;
 	// }
 	//
-	// /**
-	// *
-	// * @param key
-	// * @param value
-	// */
-	// public UIAttribute addAttribute(final String key, final UIAttribute value) {
-	// final Pair<String, UIAttribute> newPair = new Pair<>(key, value);
-	// final int i = attributes.indexOf(newPair);
-	// if (i == -1) {
-	// attributes.add(newPair);
-	// return null;
-	// } else {
-	// return attributes.set(i, newPair).getValue();
-	// }
-	// }
-	//
-	// /**
-	// *
-	// * @param key
-	// * @return
-	// */
-	// public UIAttribute getValue(final String key) {
-	// int i;
-	// Pair<String, UIAttribute> p = null;
-	// for (i = 0; i < attributes.size(); i++) {
-	// p = attributes.get(0);
-	// if (p.getKey().equals(key)) {
-	// return p.getValue();
-	// }
-	// }
-	// return null;
-	// }
+	/**
+	 * @param value
+	 */
+	public UIAttribute addAttribute(final UIAttribute value) {
+		final String key = value.getName();
+		for (int i = 0, len = attributes.size(); i < len; i++) {
+			if (attributes.get(i).getName().equalsIgnoreCase(key)) {
+				return attributes.set(i, value);
+			}
+		}
+		attributes.add(value);
+		return null;
+	}
+	
+	/**
+	 * @param key
+	 * @return
+	 */
+	public UIAttribute getValue(final String key) {
+		for (int i = 0, len = attributes.size(); i < len; i++) {
+			final UIAttribute a = attributes.get(i);
+			if (a.getName().equalsIgnoreCase(key)) {
+				return a;
+			}
+		}
+		return null;
+	}
 	
 	/**
 	 * @param side
 	 * @param relative
 	 */
 	public void setAnchorRelative(final UIAnchorSide side, final String relative) {
-		this.relative[getAnchorSideIndex(side)] = relative;
+		// $parent is null
+		final int i = side.ordinal();
+		this.relative[i] = relative.equalsIgnoreCase(PARENT) ? null : relative;
 	}
 	
 	/**
@@ -211,7 +188,7 @@ public class UIFrame extends UIElement {
 	 * @param offset
 	 */
 	public void setAnchorOffset(final UIAnchorSide side, final String offset) {
-		this.offset[getAnchorSideIndex(side)] = offset;
+		this.offset[side.ordinal()] = offset.equals(ZERO) ? null : offset;
 	}
 	
 	/**
@@ -219,7 +196,9 @@ public class UIFrame extends UIElement {
 	 * @param pos
 	 */
 	public void setAnchorPos(final UIAnchorSide side, final String pos) {
-		this.pos[getAnchorSideIndex(side)] = pos;
+		// top/left with Min is null; bottom/right with Max is null
+		final int i = side.ordinal();
+		this.pos[i] = pos.equalsIgnoreCase(POSI[i / 2]) ? null : pos;
 	}
 	
 	/**
@@ -227,7 +206,7 @@ public class UIFrame extends UIElement {
 	 * @return
 	 */
 	public String getAnchorRelative(final UIAnchorSide side) {
-		return relative[getAnchorSideIndex(side)];
+		return relative[side.ordinal()];
 	}
 	
 	/**
@@ -235,7 +214,7 @@ public class UIFrame extends UIElement {
 	 * @return
 	 */
 	public String getAnchorOffset(final UIAnchorSide side) {
-		return offset[getAnchorSideIndex(side)];
+		return offset[side.ordinal()];
 	}
 	
 	/**
@@ -243,24 +222,7 @@ public class UIFrame extends UIElement {
 	 * @return
 	 */
 	public String getAnchorPos(final UIAnchorSide side) {
-		return pos[getAnchorSideIndex(side)];
-	}
-	
-	/**
-	 * @param side
-	 * @return
-	 */
-	private int getAnchorSideIndex(final UIAnchorSide side) {
-		switch (side) {
-			case Top:
-				return 0;
-			case Left:
-				return 1;
-			case Bottom:
-				return 2;
-			default:
-				return 3;
-		}
+		return pos[side.ordinal()];
 	}
 	
 	/**
@@ -268,24 +230,34 @@ public class UIFrame extends UIElement {
 	 * @param offset
 	 */
 	public void setAnchor(final String relative, final String offset) {
-		this.relative[0] = relative;
-		this.relative[1] = relative;
-		this.relative[2] = relative;
-		this.relative[3] = relative;
+		if (relative.equalsIgnoreCase(PARENT)) {
+			// $parent is null
+			this.relative[0] = null;
+			this.relative[1] = null;
+			this.relative[2] = null;
+			this.relative[3] = null;
+		} else {
+			this.relative[0] = relative;
+			this.relative[1] = relative;
+			this.relative[2] = relative;
+			this.relative[3] = relative;
+		}
+		// top/left with Min is null; bottom/right with Max is null
 		pos[0] = null;
 		pos[1] = null;
 		pos[2] = null;
 		pos[3] = null;
-		if (!offset.equals(ZERO)) {
-			this.offset[0] = offset;
-			this.offset[1] = offset;
-			this.offset[2] = Integer.toString((Integer.parseInt(offset) * (-1)));
-			this.offset[3] = Integer.toString((Integer.parseInt(offset) * (-1)));
-		} else {
+		if (offset.equals(ZERO)) {
+			// offset "0" is null
 			this.offset[0] = null;
 			this.offset[1] = null;
 			this.offset[2] = null;
 			this.offset[3] = null;
+		} else {
+			this.offset[0] = offset;
+			this.offset[1] = offset;
+			this.offset[2] = Integer.toString((Integer.parseInt(offset) * (-1)));
+			this.offset[3] = Integer.toString((Integer.parseInt(offset) * (-1)));
 		}
 	}
 	

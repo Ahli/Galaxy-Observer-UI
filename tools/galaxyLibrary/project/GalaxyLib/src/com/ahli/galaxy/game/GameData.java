@@ -14,7 +14,7 @@ import com.ahli.galaxy.ui.UICatalog;
 public class GameData {
 	
 	private GameDef gameDef;
-	private UICatalog uiCatalog = new UICatalog();
+	private UICatalog uiCatalog;
 	private Map<Object, Object> keyValueStore = new HashMap<>();
 	
 	/**
@@ -25,6 +25,7 @@ public class GameData {
 	 */
 	public GameData(final GameDef gameDef) {
 		this.gameDef = gameDef;
+		uiCatalog = new UICatalog();
 	}
 	
 	/**

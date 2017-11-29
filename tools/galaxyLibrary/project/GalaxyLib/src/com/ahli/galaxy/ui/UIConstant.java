@@ -24,6 +24,7 @@ public class UIConstant extends UIElement {
 	@Override
 	public Object deepCopy() {
 		final UIConstant clone = new UIConstant(getName());
+		clone.value = value;
 		return clone;
 	}
 	

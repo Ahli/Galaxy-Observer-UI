@@ -18,6 +18,7 @@ public class SC2GameDef extends GameDef {
 		setDefaultRaceId("Terr");
 		setDocumentsGameDirectoryName("StarCraft II");
 		setLayoutFileEnding("sc2layout");
+		setBaseDataFolderName("Base.SC2Data");
 	}
 	
 }

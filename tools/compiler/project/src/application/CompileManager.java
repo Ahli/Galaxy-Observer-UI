@@ -66,6 +66,7 @@ public class CompileManager {
 			
 			// apply mod's UI
 			catalogClone.processDescIndex(descIndexFile, raceId);
+			catalogClone.clearDomParser();
 			
 			executionTime = (System.currentTimeMillis() - startTime);
 			logger.info("Processing DescIndex took " + executionTime + "ms.");

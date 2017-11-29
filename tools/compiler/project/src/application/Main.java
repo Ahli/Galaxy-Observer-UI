@@ -122,6 +122,13 @@ public final class Main extends Application {
 		logger.trace("Configuration File of System: " + System.getProperty("log4j.configurationFile")); //$NON-NLS-1$ //$NON-NLS-2$
 		logger.info("Launch arguments: " + Arrays.toString(args)); //$NON-NLS-1$
 		
+		// try {
+		// Thread.sleep(5000);
+		// } catch (final InterruptedException e) {
+		// // TODO Auto-generated catch block
+		// e.printStackTrace();
+		// }
+		
 		launch(args);
 	}
 	
@@ -170,7 +177,7 @@ public final class Main extends Application {
 		// test with proper compression of mpqeditor
 		// durations/thread# for my 4cpu/8threads: 16, 13, 12, 12, 12,... 12
 		
-		final int maxThreads = Math.max(1, Math.min(numberOfProcessors / 2, 4));
+		final int maxThreads = Math.max(1, Math.min(numberOfProcessors / 2, 1));
 		executor = new ThreadPoolExecutor(maxThreads, maxThreads, 5000, TimeUnit.MILLISECONDS,
 				new LinkedBlockingQueue<Runnable>(), new ThreadFactory() {
 					@Override
@@ -360,8 +367,9 @@ public final class Main extends Application {
 					uiCatalog.processDescIndex(descIndexFile, game.getGameDef().getDefaultRaceId());
 				}
 			}
-			// } catch (ParserConfigurationException | SAXException | IOException |
-			// UIException e) {
+			
+			uiCatalog.clearDomParser();
+			
 		} catch (final SAXException | IOException | ParserConfigurationException | UIException e) {
 			logger.error("ERROR parsing base UI catalog for '" + game.getGameDef().getName() + "'.", e); //$NON-NLS-1$ //$NON-NLS-2$
 			e.printStackTrace();
@@ -784,9 +792,11 @@ public final class Main extends Application {
 			throws IOException, InterruptedException {
 		printLogMessageToGeneral(sourceFile.getName() + " started construction.");
 		
+		final GameDef gameDef = game.getGameDef();
+		
 		String targetPath = documentsPath + File.separator;
-		targetPath += game.getGameDef().getDocumentsGameDirectoryName();
-		targetPath += File.separator + game.getGameDef().getDocumentsInterfaceSubdirectoryName();
+		targetPath += gameDef.getDocumentsGameDirectoryName();
+		targetPath += File.separator + gameDef.getDocumentsInterfaceSubdirectoryName();
 		
 		// do stuff
 		final ModData mod = new ModData(game);
@@ -856,7 +866,7 @@ public final class Main extends Application {
 		mod.setDescIndexData(descIndexData);
 		
 		try {
-			descIndexData.setDescIndexPathAndClear(ComponentsListReader.getDescIndexPath(componentListFile));
+			descIndexData.setDescIndexPathAndClear(ComponentsListReader.getDescIndexPath(componentListFile, gameDef));
 		} catch (ParserConfigurationException | SAXException | IOException e) {
 			final String msg = "ERROR: unable to read DescIndex path."; //$NON-NLS-1$
 			logger.error(msg, e);

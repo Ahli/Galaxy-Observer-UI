@@ -1,6 +1,7 @@
 package com.ahli.galaxy.ui;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author Ahli
@@ -13,7 +14,7 @@ public class UIStateGroup extends UIElement {
 	private static final long serialVersionUID = 6020966617264020882L;
 	
 	private String defaultState;
-	private ArrayList<UIState> states;
+	private List<UIState> states;
 	
 	/**
 	 * @param name
@@ -37,7 +38,7 @@ public class UIStateGroup extends UIElement {
 	@Override
 	public Object deepCopy() {
 		final UIStateGroup clone = new UIStateGroup(getName(), states.size());
-		for (int i = 0; i < states.size(); i++) {
+		for (int i = 0, len = states.size(); i < len; i++) {
 			clone.states.add((UIState) states.get(i).deepCopy());
 		}
 		clone.defaultState = defaultState;
@@ -62,7 +63,7 @@ public class UIStateGroup extends UIElement {
 	/**
 	 * @return the states
 	 */
-	public ArrayList<UIState> getStates() {
+	public List<UIState> getStates() {
 		return states;
 	}
 	

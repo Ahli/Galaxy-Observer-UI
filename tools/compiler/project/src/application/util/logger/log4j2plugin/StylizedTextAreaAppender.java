@@ -2,7 +2,6 @@ package application.util.logger.log4j2plugin;
 
 import java.io.Serializable;
 import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
@@ -21,6 +20,7 @@ import org.apache.logging.log4j.core.layout.PatternLayout;
 import org.fxmisc.richtext.StyleClassedTextArea;
 
 import application.controller.ErrorTabPaneController;
+import gnu.trove.map.hash.THashMap;
 import javafx.application.Platform;
 
 /**
@@ -30,9 +30,8 @@ import javafx.application.Platform;
  */
 @Plugin(name = "StylizedTextAreaAppender", category = "Core", elementType = "appender", printObject = true)
 public final class StylizedTextAreaAppender extends AbstractAppender {
-	
 	private static ErrorTabPaneController generalController;
-	private static Map<String, ErrorTabPaneController> workerTaskControllers = new HashMap<>();
+	private static Map<String, ErrorTabPaneController> workerTaskControllers = new THashMap<>();
 	
 	private final ReadWriteLock rwLock = new ReentrantReadWriteLock();
 	private final Lock readLock = rwLock.readLock();

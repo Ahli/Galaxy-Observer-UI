@@ -1,9 +1,7 @@
 package com.ahli.hotkeyUi.application.galaxy.ext;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Locale;
@@ -91,18 +89,20 @@ public class LayoutExtensionReader {
 		
 		x: for (final File curFile : layoutFiles) {
 			Document doc = null;
-			try (InputStream is = new FileInputStream(curFile)) {
+			// try (InputStream is = new FileInputStream(curFile)) {
+			try {
 				// parse XML file
 				
 				// THIS DOES NOT CLOSE THE INPUTSTREAM ON EXCEPTION
 				// CREATING TONS OF FILE ACCESS PROBLEMS. DO NOT USE!
-				// doc = dBuilder.parse(curFile);
+				doc = dBuilder.parse(curFile);
 				
 				// WORKAROUND -> provide Inputstream
-				doc = dBuilder.parse(is);
+				// doc = dBuilder.parse(is);
 				
 			} catch (SAXParseException | IOException e) {
 				// couldn't parse, most likely no XML file
+				
 				continue x;
 			}
 			
@@ -116,16 +116,17 @@ public class LayoutExtensionReader {
 		
 		x: for (final File curFile : layoutFiles) {
 			Document doc = null;
-			try (InputStream is = new FileInputStream(curFile);) {
+			// try (InputStream is = new FileInputStream(curFile);) {
+			try {
 				// parse XML file
 				
 				// THIS DOES NOT CLOSE THE INPUTSTREAM ON EXCEPTION
 				// CREATING TONS OF FILE ACCESS PROBLEMS. DO NOT USE!
-				// doc = dBuilder.parse(curFile);
+				doc = dBuilder.parse(curFile);
 				
 				// WORKAROUND -> provide Inputstream
 				
-				doc = dBuilder.parse(is);
+				// doc = dBuilder.parse(is);
 				
 			} catch (SAXParseException | IOException e) {
 				// couldn't parse, most likely no XML file
@@ -316,7 +317,7 @@ public class LayoutExtensionReader {
 		// console
 		dBuilder.setErrorHandler(new SilentXmlSaxErrorHandler());
 		
-		InputStream is = null;
+		// InputStream is = null;
 		
 		x: for (final File curFile : layoutFiles) {
 			Document doc = null;
@@ -325,23 +326,24 @@ public class LayoutExtensionReader {
 				
 				// THIS DOES NOT CLOSE THE INPUTSTREAM ON EXCEPTION
 				// CREATING TONS OF FILE ACCESS PROBLEMS. DO NOT USE!
-				// doc = dBuilder.parse(curFile);
+				doc = dBuilder.parse(curFile);
 				
 				// WORKAROUND -> provide Inputstream
-				is = new FileInputStream(curFile);
-				doc = dBuilder.parse(is);
+				// is = new FileInputStream(curFile);
+				// doc = dBuilder.parse(is);
 				
 			} catch (SAXParseException | IOException e) {
 				// couldn't parse, most likely no XML file
-				if (is != null) {
-					is.close();
-				}
+				// if (is != null) {
+				// is.close();
+				// }
 				continue x;
-			} finally {
-				if (is != null) {
-					is.close();
-				}
 			}
+			// finally {
+			// if (is != null) {
+			// is.close();
+			// }
+			// }
 			
 			logger.debug("processing file: " + curFile.getPath());
 			

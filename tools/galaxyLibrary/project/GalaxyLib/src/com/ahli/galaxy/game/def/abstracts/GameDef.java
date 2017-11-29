@@ -15,6 +15,7 @@ public abstract class GameDef {
 	private String name = "StarCraft II";
 	private String nameHandle = "sc2";
 	private String layoutFileEnding = ".sc2layout";
+	private String baseDataFolderName = "Base.SC2Data";
 	
 	/**
 	 * @return the layoutFileEnding
@@ -35,7 +36,7 @@ public abstract class GameDef {
 	 * @return the coreModsOrDirectories
 	 */
 	public String[] getCoreModsOrDirectories() {
-		return Arrays.copyOf(coreModsOrDirectories, 1);
+		return Arrays.copyOf(coreModsOrDirectories, coreModsOrDirectories.length);
 	}
 	
 	/**
@@ -151,6 +152,21 @@ public abstract class GameDef {
 	 */
 	public void setNameHandle(final String nameHandle) {
 		this.nameHandle = nameHandle;
+	}
+	
+	/**
+	 * @return
+	 */
+	public String getBaseDataFolderName() {
+		return baseDataFolderName;
+	}
+	
+	/**
+	 * @param baseDataFolderName
+	 *            the baseDataFolderName to set
+	 */
+	public void setBaseDataFolderName(final String baseDataFolderName) {
+		this.baseDataFolderName = baseDataFolderName;
 	}
 	
 }

@@ -1,6 +1,7 @@
 package com.ahli.galaxy.ui;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import com.ahli.util.Pair;
 
@@ -16,8 +17,8 @@ public class UIAttribute extends UIElement {
 	 */
 	private static final long serialVersionUID = 5420685675382001338L;
 	
-	// private Map<String, String> values = null;
-	private ArrayList<Pair<String, String>> values;
+	// private final Map<String, String> values;
+	private final List<Pair<String, String>> values;
 	
 	/**
 	 * Constructor.
@@ -27,8 +28,8 @@ public class UIAttribute extends UIElement {
 	 */
 	public UIAttribute(final String name) {
 		super(name);
-		// values = new HashMap<>(1, 1f);
-		values = new ArrayList<>(1);
+		// values = new THashMap<>(1, 1f);
+		values = new ArrayList<>();
 	}
 	
 	/**
@@ -39,7 +40,7 @@ public class UIAttribute extends UIElement {
 	 */
 	public UIAttribute(final String name, final int initialValuesMaxCapacity) {
 		super(name);
-		// values = new HashMap<>(initialValuesMaxCapacity, 1f);
+		// values = new THashMap<>(initialValuesMaxCapacity, 1f);
 		values = new ArrayList<>(initialValuesMaxCapacity);
 	}
 	
@@ -49,14 +50,14 @@ public class UIAttribute extends UIElement {
 	@Override
 	public Object deepCopy() {
 		final UIAttribute clone = new UIAttribute(getName(), values.size());
-		// final Map<String, String> clonedMap = clone.getValues();
+		// final Map<String, String> clonedMap = clone.values;
 		// final Object[] entries = values.entrySet().toArray();
 		// for (int fix = 0, i = fix; i < entries.length; i++) {
 		// @SuppressWarnings("unchecked")
 		// final Entry<String, String> entry = (Entry<String, String>) entries[i];
 		// clonedMap.put(entry.getKey(), entry.getValue());
 		// }
-		for (int i = 0; i < values.size(); i++) {
+		for (int i = 0, len = values.size(); i < len; i++) {
 			final Pair<String, String> p = values.get(i);
 			clone.values.add(new Pair<>(p.getKey(), p.getValue()));
 		}
@@ -78,22 +79,24 @@ public class UIAttribute extends UIElement {
 	// this.values = values;
 	// }
 	
-	/**
-	 * @return the values
-	 */
-	public ArrayList<Pair<String, String>> getValues() {
-		return values;
-	}
+	// /**
+	// * @return the values
+	// */
+	// public List<Pair<String, String>> getValues() {
+	// return values;
+	// }
+	
+	// /**
+	// * @param values
+	// * the values to set
+	// */
+	// public void setValues(final ArrayList<Pair<String, String>> values) {
+	// this.values = values;
+	// }
 	
 	/**
-	 * @param values
-	 *            the values to set
-	 */
-	public void setValues(final ArrayList<Pair<String, String>> values) {
-		this.values = values;
-	}
-	
-	/**
+	 * Adds a value for the key and returns any overridden value.
+	 * 
 	 * @param key
 	 * @param value
 	 */
@@ -106,6 +109,8 @@ public class UIAttribute extends UIElement {
 		} else {
 			return values.set(i, newPair).getValue();
 		}
+		
+		// return values.put(key, value);
 	}
 	
 	/**
@@ -122,6 +127,8 @@ public class UIAttribute extends UIElement {
 			}
 		}
 		return null;
+		
+		// return values.get(key);
 	}
 	
 	@Override

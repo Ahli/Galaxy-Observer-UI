@@ -16,7 +16,7 @@ public class UIAnimation extends UIElement {
 	
 	private List<UIController> controllers;
 	// private Map<String, UIAttribute> events = new HashMap<>();
-	private ArrayList<Pair<String, UIAttribute>> events;
+	private List<Pair<String, UIAttribute>> events;
 	private boolean nextEventsAdditionShouldOverride;
 	private UIAttribute driver;
 	
@@ -25,8 +25,8 @@ public class UIAnimation extends UIElement {
 	 */
 	public UIAnimation(final String name) {
 		super(name);
-		events = new ArrayList<>(2);
-		controllers = new ArrayList<>(1);
+		events = new ArrayList<>();
+		controllers = new ArrayList<>();
 	}
 	
 	/**
@@ -48,7 +48,7 @@ public class UIAnimation extends UIElement {
 	@Override
 	public Object deepCopy() {
 		final UIAnimation clone = new UIAnimation(getName(), events.size(), controllers.size());
-		for (int i = 0; i < controllers.size(); i++) {
+		for (int i = 0, len = controllers.size(); i < len; i++) {
 			clone.controllers.add((UIController) controllers.get(i).deepCopy());
 		}
 		// final Object[] entries = events.entrySet().toArray();
@@ -58,7 +58,7 @@ public class UIAnimation extends UIElement {
 		// entries[i];
 		// clone.events.put(entry.getKey(), (UIAttribute) entry.getValue().deepCopy());
 		// }
-		for (int i = 0; i < events.size(); i++) {
+		for (int i = 0, len = events.size(); i < len; i++) {
 			final Pair<String, UIAttribute> p = events.get(i);
 			clone.events.add(new Pair<>(p.getKey(), (UIAttribute) p.getValue().deepCopy()));
 		}
@@ -102,7 +102,7 @@ public class UIAnimation extends UIElement {
 	/**
 	 * @return the events
 	 */
-	public ArrayList<Pair<String, UIAttribute>> getEvents() {
+	public List<Pair<String, UIAttribute>> getEvents() {
 		return events;
 	}
 	
@@ -110,7 +110,7 @@ public class UIAnimation extends UIElement {
 	 * @param events
 	 *            the events to set
 	 */
-	public void setEvents(final ArrayList<Pair<String, UIAttribute>> events) {
+	public void setEvents(final List<Pair<String, UIAttribute>> events) {
 		this.events = events;
 	}
 	
