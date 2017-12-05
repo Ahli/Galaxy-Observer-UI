@@ -741,6 +741,7 @@
             <State name="DiscountedWithTextOverflow">
                 <When type="StateGroup" frame="$this" PurchasableState="Purchasable"/>
                 <When type="Property" frame="StoreCacheFrame" operator="NotEqual" DiscountPercent="0"/>
+                <When type="Property" frame="BundleCacheFrame" SuppressDiscount="false"/>
                 <When type="Property" frame="DummySubtitleLabel" IsTextTruncated="True"/>
                 <Action type="SetProperty" frame="DiscountTabContainer" Visible="False"/>
                 <Action type="SetProperty" frame="OriginalPriceLabel" Visible="False"/>
@@ -748,6 +749,7 @@
             <State name="Discounted">
                 <When type="StateGroup" frame="$this" PurchasableState="Purchasable"/>
                 <When type="Property" frame="StoreCacheFrame" operator="NotEqual" DiscountPercent="0"/>
+                <When type="Property" frame="BundleCacheFrame" SuppressDiscount="false"/>
                 <Action type="SetProperty" frame="DiscountTabContainer" Visible="True"/>
                 <Action type="SetProperty" frame="OriginalPriceLabel" Visible="True"/>
             </State>
@@ -835,13 +837,17 @@
     =======================
     -->
     <Frame type="GlueHyperlinkButton" name="FakeWarChestItemTemplate" template="BundleSelectionFrame/BundleTileListItemBaseTemplate">
-        <Hyperlink val="battlenet:://starcraft/collection/5"/>
+        <Hyperlink val="#CollectionIndex_Hyperlink_WarChest"/>
         <HoverSound val="@UI_Large_MouseOver"/>
         <ClickSound val="@UI_FileSelectionSelect"/>
             
         <StateGroup name="SizeState">
             <DefaultState val="Large"/>
         </StateGroup>
+        
+        <Frame type="WarChestAdvertisementFrame" name="WarChestInfo">
+            <Anchor relative="$parent"/>
+        </Frame>
         
         <Frame type="WarChestPurchaseTileList" name="WarChestPurchaseTileList">
             <Anchor side="Top" relative="$parent" pos="Max" offset="100"/>
@@ -879,7 +885,7 @@
         </Frame>
         
         <Frame type="Label" name="TitleLabel">
-            <Text val="@UI/ScreenCollection/WarChest/FeaturedPageTitle"/>
+            <Text val="{$parent/WarChestInfo/@CurrentSeasonId[Name]}"/>
             <Options val="TooltipIfTruncated"/>
             <AutoSizeClamps maxHeight="60"/>
         </Frame>
@@ -941,11 +947,7 @@
             <Frame type="TimeFormatFrame" name="TimeFormatFrame">
                 <Anchor relative="$parent"/>
                 <FormatText val="&lt;daytotal/&gt;:&lt;hour2/&gt;:&lt;min2/&gt;:&lt;sec2/&gt;"/>
-                <Time val="{$parent/WarChestInfo/@PurchaseEndTimeRemaining}"/>
-            </Frame>
-        
-            <Frame type="WarChestAdvertisementFrame" name="WarChestInfo">
-                <Anchor relative="$parent"/>
+                <Time val="{$parent/$parent/WarChestInfo/@PurchaseEndTimeRemaining}"/>
             </Frame>
         
             <Frame type="TextFormatFrame" name="FormattedOfferEndsText">
@@ -958,7 +960,7 @@
                 <DefaultState val="NotVisible"/>
             
                 <State name="Visible">
-                    <When type="Property" frame="WarChestInfo" WarChestFullyPurchased="False"/>
+                    <When type="Property" frame="$parent/WarChestInfo" WarChestFullyPurchased="False"/>
                     <Action type="SetProperty" frame="$this" Visible="True"/>
                 </State>
                 
