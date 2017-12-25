@@ -2,9 +2,6 @@ package com.ahli.galaxy.ui;
 
 import java.io.Serializable;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
 import com.ahli.util.DeepCopyable;
 
 /**
@@ -16,7 +13,7 @@ public class UITemplate implements Serializable, DeepCopyable {
 	 */
 	private static final long serialVersionUID = 7686203678975623860L;
 	
-	private static final Logger logger = LogManager.getLogger(UITemplate.class);
+	// private static final Logger logger = LogManager.getLogger();
 	
 	private String fileName;
 	private UIElement element;
@@ -91,22 +88,22 @@ public class UITemplate implements Serializable, DeepCopyable {
 	 * @return
 	 */
 	public UIElement receiveFrameFromPath(final String path) {
-		logger.trace("receive Frame from path: " + path);
-		logger.trace("template's element name: " + element.getName());
+		// logger.trace("receive Frame from path: " + path);
+		// logger.trace("template's element name: " + element.getName());
 		final String curName = UIElement.getLeftPathLevel(path);
-		logger.trace("searched name: " + curName);
+		// logger.trace("searched name: " + curName);
 		if (curName.equalsIgnoreCase(element.getName())) {
 			final String newPath = UIElement.removeLeftPathLevel(path);
-			logger.trace("match! new Path: " + newPath);
+			// logger.trace("match! new Path: " + newPath);
 			
 			return element.receiveFrameFromPath(newPath);
 		}
-		logger.trace("did not find template: " + path);
+		// logger.trace("did not find template: " + path);
 		return null;
 	}
 	
 	@Override
 	public String toString() {
-		return "<Template fileName='" + fileName + "'>";
+		return "<Template fileName='" + fileName + "' elementName='" + element.getName() + "'>";
 	}
 }

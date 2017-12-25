@@ -19,6 +19,9 @@ import org.xml.sax.SAXException;
 
 import com.ahli.galaxy.archive.ComponentsListReader;
 import com.ahli.galaxy.archive.DescIndexData;
+import com.ahli.galaxy.game.def.HeroesGameDef;
+import com.ahli.galaxy.game.def.SC2GameDef;
+import com.ahli.galaxy.game.def.abstracts.GameDef;
 import com.ahli.galaxy.ui.DescIndexReader;
 import com.ahli.hotkeyUi.application.controller.MenuBarController;
 import com.ahli.hotkeyUi.application.controller.TabsController;
@@ -270,7 +273,10 @@ public class Main extends Application {
 				if (componentListFile == null) {
 					throw new ShowToUserException(Messages.getString("Main.OpenedFileNoComponentList")); //$NON-NLS-1$
 				}
-				descIndex.setDescIndexPathAndClear(ComponentsListReader.getDescIndexPath(componentListFile));
+				
+				final GameDef game = isNamespaceHeroes ? new HeroesGameDef() : new SC2GameDef();
+				
+				descIndex.setDescIndexPathAndClear(ComponentsListReader.getDescIndexPath(componentListFile, game));
 				
 				final File descIndexFile = mpqi.getFileFromMpq(descIndex.getDescIndexIntPath());
 				descIndex.addLayoutIntPath(

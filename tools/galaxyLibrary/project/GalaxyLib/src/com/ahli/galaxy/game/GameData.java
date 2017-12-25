@@ -4,7 +4,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.ahli.galaxy.game.def.abstracts.GameDef;
-import com.ahli.galaxy.ui.UICatalog;
+import com.ahli.galaxy.ui.UICatalogImpl;
+import com.ahli.galaxy.ui.interfaces.UICatalog;
 
 /**
  * Class containing the data of a game (Sc2/Heroes/...).
@@ -25,7 +26,9 @@ public class GameData {
 	 */
 	public GameData(final GameDef gameDef) {
 		this.gameDef = gameDef;
-		uiCatalog = new UICatalog();
+		uiCatalog = new UICatalogImpl();
+		// uiCatalog = new UICatalogDomParser();
+		// uiCatalog = new UICatalogVtdXmlParser();
 	}
 	
 	/**

@@ -29,7 +29,7 @@ public final class LayoutReader {
 	private static final String CONSTANT = "Constant";
 	private static final String NAME = "name";
 	private static final String CONSTANT_MARKER = "#";
-	private static Logger logger = LogManager.getLogger(LayoutReader.class);
+	private static Logger logger = LogManager.getLogger();
 	
 	/**
 	 * Disabled Constructor.

@@ -2,7 +2,7 @@
 : Batch Script 
 : author: @AhliSC2
 
-java "-jar" "compile.jar"
+java -jar compile.jar
 
 : line breaks
 echo.

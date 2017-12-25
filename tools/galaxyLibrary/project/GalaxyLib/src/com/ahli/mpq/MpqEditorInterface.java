@@ -19,7 +19,7 @@ import com.ahli.util.DeepCopyable;
  * @author Ahli
  */
 public class MpqEditorInterface implements MpqInterface, DeepCopyable {
-	private static Logger logger = LogManager.getLogger(MpqEditorInterface.class);
+	private static Logger logger = LogManager.getLogger();
 	
 	private String mpqEditor = "plugins" + File.separator + "mpq" + File.separator + "MPQEditor.exe"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	private String mpqCachePath;
@@ -32,8 +32,8 @@ public class MpqEditorInterface implements MpqInterface, DeepCopyable {
 	 *            path of the directory that will temporarily contain the extracted
 	 *            mpq
 	 */
-	public MpqEditorInterface(final String mpqCachePath) {
-		this.mpqCachePath = mpqCachePath;
+	public MpqEditorInterface(final String mpqCachePath2) {
+		mpqCachePath = mpqCachePath2;
 	}
 	
 	/**
@@ -51,8 +51,8 @@ public class MpqEditorInterface implements MpqInterface, DeepCopyable {
 	 * @param mpqCachePath
 	 *            new cache path as String
 	 */
-	public void setMpqCachePath(final String mpqCachePath) {
-		this.mpqCachePath = mpqCachePath;
+	public void setMpqCachePath(final String mpqCachePath2) {
+		mpqCachePath = mpqCachePath2;
 	}
 	
 	/**

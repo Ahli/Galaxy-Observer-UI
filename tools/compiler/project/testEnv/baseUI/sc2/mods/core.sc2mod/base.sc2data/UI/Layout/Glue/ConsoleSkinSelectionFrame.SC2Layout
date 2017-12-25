@@ -5,45 +5,99 @@
     <Constant name="TileListItemHeight" val="88"/>
     <Constant name="TileListItemOffsetRight" val="-2"/>
     <Constant name="TileListItemOffsetTop" val="2"/>
+    <Constant name="VoiceLineLeftOffset" val="3"/>
 
-    <Frame type="ConsoleSkinTileListItem" name="ConsoleSkinTileListItemTemplate">
-        <Height val="#TileListItemHeight"/>
-        <HideWhenCleared val="true"/>
-        <SelectedSound val="@UI_FileSelectionSelect"/>
-
-        <Frame type="Image" name="NormalImage">
-            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
-            <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
-            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
-            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
-            <Texture val="@UI/SC2_UI_Battlenet_Glue_Arcade_MainListItem_Normal"/>
-            <TextureType val="NineSlice"/>
-            <Alpha val="255"/>
+    <!--
+    =======================================
+    
+    CONSOLE SKIN PREVIEW PANE
+    
+    =======================================
+    -->
+    <Frame type="ConsoleSkinCacheFrame" name="ConsoleSkinPreviewPaneTemplate" template="CollectionPreviewPane/CollectionPreviewPaneTemplate">
+        <Frame type="Frame" name="DisplayContainer">
+            <Frame type="Frame" name="PreviewContainer">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="4"/>
+                <Anchor side="Bottom" relative="$parent" pos="Max" offset="-4"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="4"/>
+                <Anchor side="Right" relative="$parent" pos="Max" offset="-4"/>
+                    
+                <Frame type="Image" name="BackgroundImage">
+                    <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+                    <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+                    <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                    <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+                    <ScaleHeightToTexture val="True"/>
+                    <Texture val="@UI/SC2_UI_Collection_HUDs_Background_Zerg"/>
+                    
+                    <StateGroup name="RaceState">
+                        <DefaultState val="Zerg"/>
+                        
+                        <State name="Protoss">
+                            <When type="Property" frame="$ancestor[@type=ConsoleSkinCacheFrame]/RewardCacheFrame" Race="Prot"/>
+                            <Action type="SetProperty" Texture="@UI/SC2_UI_Collection_HUDs_Background_Protoss"/>
+                        </State>
+                        
+                        <State name="Terran">
+                            <When type="Property" frame="$ancestor[@type=ConsoleSkinCacheFrame]/RewardCacheFrame" Race="Terr"/>
+                            <Action type="SetProperty" Texture="@UI/SC2_UI_Collection_HUDs_Background_Terran"/>
+                        </State>
+                        
+                        <State name="Zerg">
+                            <Action type="SetProperty" Texture="@UI/SC2_UI_Collection_HUDs_Background_Zerg"/>
+                        </State>
+                    </StateGroup>
+                </Frame>
+                
+                <Frame type="Image" name="ConsolePreviewImage">
+                    <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+                    <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                    <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+                    <ScaleHeightToTexture val="True"/>
+                    <Texture val="{$ancestor[@type=ConsoleSkinCacheFrame]/@FeaturedImage}"/>
+                </Frame>
+                
+                <Frame type="Label" name="NameLabel">
+                    <Anchor side="Top" relative="$parent" pos="Min" offset="19"/>
+                    <Anchor side="Left" relative="$parent" pos="Min" offset="23"/>
+                    <Anchor side="Right" relative="$parent" pos="Max" offset="-23"/>
+                    <Style val="Collection_ItemFrame_Name"/>
+                    <Text val="{$ancestor[@type=ConsoleSkinCacheFrame]/@NameText}"/>
+                </Frame>
+                
+                <Frame type="Label" name="DescriptionLabel">
+                    <Anchor side="Top" relative="$parent/NameLabel" pos="Max" offset="21"/>
+                    <Anchor side="Left" relative="$parent/NameLabel" pos="Min" offset="0"/>
+                    <Width val="480"/>
+                    <Style val="Collection_ItemFrame_Desc"/>
+                    <Text val="{$ancestor[@type=ConsoleSkinCacheFrame]/@ConsoleSkin[Description]}"/>
+                </Frame>
+            </Frame>
         </Frame>
-
-        <Frame type="Image" name="HoverImage">
-            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
-            <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
-            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
-            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
-            <Texture val="@UI/SC2_UI_Battlenet_Glue_Arcade_MainListItem_Over"/>
-            <TextureType val="NineSlice"/>
+        
+        <Frame type="RewardCacheFrame" name="RewardCacheFrame">
+            <Anchor relative="$parent"/>
+            <Reward val="{$parent/@RequiredReward}"/>
+            <PresenceId val="{$BattleUI/@LocalToonPresenceId}"/>
         </Frame>
+    </Frame>
 
-        <Frame type="Image" name="SelectedImage">
-            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
-            <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
-            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
-            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
-            <Texture val="@UI/SC2_UI_Battlenet_Glue_Arcade_MainListItem_Selected"/>
-            <TextureType val="NineSlice"/>
+    <!--
+    =======================================
+    
+    CONSOLE SKIN TILE LIST ITEM TEMPLATE
+    
+    =======================================
+    -->
+    <Frame type="ConsoleSkinTileListItem" name="ConsoleSkinTileListItemTemplate" template="StandardTileListTemplates/StandardLargeTileListItemTemplate">
+
+        <Frame type="Frame" name="AnchorFrame">
+            <Anchor side="Left" relative="$parent/$parent" pos="Min" offset="16"/>
+            <Anchor side="Right" relative="$parent/$parent/ScrollBar" pos="Min" offset="-2"/>
         </Frame>
 
         <Frame type="ConsoleSkinCacheFrame" name="ConsoleSkinCacheFrame">
-            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
-            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
-            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
-            <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+            <Anchor relative="$parent"/>
             <ConsoleSkin val="{$parent/@ConsoleSkin}"/>
         </Frame>
 
@@ -59,360 +113,295 @@
 
         <Frame type="RewardCacheFrame" name="RewardCacheFrame">
             <Anchor relative="$parent"/>
+            <PresenceId val="{$BattleUI/@LocalToonPresenceId}"/>
             <Reward val="{$parent/ConsoleSkinCacheFrame/@RequiredReward}"/>
         </Frame>
 
-        <Frame type="Image" name="IconImage">
-            <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
-            <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
-            <Anchor side="Left" relative="$parent" pos="Min" offset="5"/>
-            <Height val="78"/>
-            <Width val="93"/>
-            <Alpha val="130"/>
-
-            <Animation name="SelectedIconStyle">
-                <Event event="OnShown" action="Reset" frame="$parent/SelectedImage"/>
-                <Event event="OnShown" action="Play" frame="$parent/SelectedImage"/>
-
-                <Controller type="Fade" end="Pause">
-                    <Key type="Curve" time="0" value="130" out="Fast"/>
-                    <Key type="Curve" time=".2" value="255" in="Slow"/>
-                </Controller>
-            </Animation>
-
-            <Animation name="NormalIconStyle">
-                <Event event="OnHidden" action="Reset" frame="$parent/SelectedImage"/>
-                <Event event="OnHidden" action="Play" frame="$parent/SelectedImage"/>
-
-                <Controller type="Fade" end="Pause">
-                    <Key type="Curve" time="0" value="255" out="Fast"/>
-                    <Key type="Curve" time=".2" value="130" in="Slow"/>
-                </Controller>
-            </Animation>
-        </Frame>
-
-        <Frame type="Frame" name="LockedIcon">
-            <Anchor side="Top" relative="$parent/IconImage" pos="Min" offset="0"/>
-            <Anchor side="Left" relative="$parent/IconImage" pos="Min" offset="0"/>
-            <Anchor side="Right" relative="$parent/IconImage" pos="Max" offset="0"/>
-            <Anchor side="Bottom" relative="$parent/IconImage" pos="Max" offset="0"/>
-            <Visible val="False"/>
-
-            <Frame type="Image" name="Background">
-                <Anchor relative="$parent"/>
-                <LayerColor val="000000"/>
-                <Alpha val="150"/>
-            </Frame>
-
-            <Frame type="Image" name="LockIcon">
-                <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
-                <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
-                <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
-                <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
-                <Texture val="@UI/Glues_Icons_SmallLock"/>
-            </Frame>
-        </Frame>
-
-        <Frame type="Image" name="IconFrame">
-            <Anchor side="Top" relative="$parent/IconImage" pos="Min" offset="0"/>
-            <Anchor side="Left" relative="$parent/IconImage" pos="Min" offset="0"/>
-            <Anchor side="Right" relative="$parent/IconImage" pos="Max" offset="0"/>
-            <Anchor side="Bottom" relative="$parent/IconImage" pos="Max" offset="0"/>
-            <Texture val="@UI/SC2_UI_Collection_VoicePack_ImageFrame"/>
-            <TextureType val="Nineslice"/>
-        </Frame>
-
-        <Frame type="Label" name="NameLabel">
-            <Anchor side="Bottom" relative="$parent/IconImage" pos="Mid" offset="0"/>
-            <Anchor side="Left" relative="$parent/IconImage" pos="Max" offset="15"/>
-            <Anchor side="Right" relative="$parent" pos="Max" offset="-15"/>
-            <Style val="@Collection_ListItem_Name"/>
-            <Text val="{$parent/ConsoleSkinCacheFrame/@NameText}"/>
-
-            <StateGroup name="ListItemTextStates">
-                <DefaultState val="NormalState"/>
-            
-                <State name="ToggledState">
-                    <When type="Property" frame="$parent/SelectedImage" visible="True"/>
-                    <Action type="SetProperty" frame="$this" Style="@Collection_ListItem_Name_Selected"/>
-                </State>
-                
-                <State name="HoverState">
-                    <When type="Property" frame="$parent/HoverImage" visible="True"/>
-                    <Action type="SetProperty" frame="$this" Style="@Collection_ListItem_Name_Selected"/>
-                </State>
-        
-                <State name="LockedState">
-                    <When type="Property" frame="$parent/LockedIcon" visible="True"/>
-                    <Action type="SetProperty" frame="$this" Style="@Collection_ListItem_Name_Locked"/>
-                </State>
-
-                <State name="NormalState">
-                    <Action type="SetProperty" frame="$this" Style="@Collection_ListItem_Name"/>
-                </State>
-            </StateGroup>
-        </Frame>
-
-        <Frame type="Label" name="CostLabel">
-            <Anchor side="Top" relative="$parent/IconImage" pos="Mid" offset="2"/>
-            <Anchor side="Left" relative="$parent/NameLabel" pos="Min" offset="1"/>
-            <Anchor side="Right" relative="$parent/NameLabel" pos="Max" offset="0"/>
-            <Style val="@Collection_ListItem_Cost"/>
-            <Height val="23"/>
-            <Text val="{$parent/StoreCacheFrame/@CostText}"/>
-        </Frame>
-
-        <Frame type="Label" name="StateLabel">
-            <Anchor side="Top" relative="$parent/IconImage" pos="Mid" offset="2"/>
-            <Anchor side="Left" relative="$parent/NameLabel" pos="Min" offset="1"/>
-            <Anchor side="Right" relative="$parent/NameLabel" pos="Max" offset="0"/>
-            <Style val="@Collection_ListItem_Desc"/>
-            <Height val="23"/>
-
-            <StateGroup name="ListItemTextStates">
-                <DefaultState val="NormalState"/>
-            
-                <State name="ToggledState">
-                    <When type="Property" frame="$parent/SelectedImage" visible="True"/>
-                    <Action type="SetProperty" frame="$this" Style="@Collection_ListItem_Desc_Selected"/>
-                </State>
-                
-                <State name="HoverState">
-                    <When type="Property" frame="$parent/HoverImage" visible="True"/>
-                    <Action type="SetProperty" frame="$this" Style="@Collection_ListItem_Desc_Selected"/>
-                </State>
-        
-                <State name="LockedState">
-                    <When type="Property" frame="$parent/LockedIcon" visible="True"/>
-                    <Action type="SetProperty" frame="$this" Style="@Collection_ListItem_Desc_Locked"/>
-                </State>
-
-                <State name="NormalState">
-                    <Action type="SetProperty" frame="$this" Style="@Collection_ListItem_Desc"/>
-                </State>
-            </StateGroup>
-        </Frame>
-
-        <Frame type="Image" name="CheckMarkImage">
-            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
-            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
-            <Texture val="@UI/SC2_UI_Collection_Icon_Equipped"/>
-        </Frame>
-
-        <StateGroup name="GameContentOwnedStateGroup">
-            <DefaultState val="GameContentNotOwned"/>
-
-            <State name="RewardSelected">
-                <When type="AnimationState" frame="RewardCacheFrame" SelectedState="Selected"/>
-                <Action type="SetProperty" frame="StateLabel" visible="true"/>
-                <Action type="SetProperty" frame="StateLabel" text="@UI/ScreenCollection/Equipped"/>
-                <Action type="SetProperty" frame="CostLabel" visible="false"/>
-                <Action type="SetProperty" frame="LockedIcon" visible="False"/>
-            </State>
-
-            <State name="GameContentPurchased">
-                <When type="Property" frame="$this/StoreCacheFrame" IsPurchased="True"/>
-                <Action type="SetProperty" frame="StateLabel" visible="true"/>
-                <Action type="SetProperty" frame="StateLabel" text="@UI/ScreenCollection/Owned"/>
-                <Action type="SetProperty" frame="CostLabel" visible="false"/>
-                <Action type="SetProperty" frame="LockedIcon" visible="False"/>
-            </State>
-
-            <State name="GameContentDefault">
-                <When type="Property" frame="$this/ConsoleSkinCacheFrame" Default="true"/>
-                <Action type="SetProperty" frame="StateLabel" visible="true"/>
-                <Action type="SetProperty" frame="StateLabel" text="@UI/ScreenCollection/Default"/>
-                <Action type="SetProperty" frame="CostLabel" visible="false"/>
-                <Action type="SetProperty" frame="LockedIcon" visible="False"/>
-            </State>
-
-            <State name="GameContentAllowed">
-                <When type="Property" frame="$this/GameContentFrame" IsAllowed="true"/>
-                <Action type="SetProperty" frame="StateLabel" visible="true"/>
-                <Action type="SetProperty" frame="StateLabel" text="@UI/ScreenCollection/Earned"/>
-                <Action type="SetProperty" frame="CostLabel" visible="false"/>
-                <Action type="SetProperty" frame="LockedIcon" visible="False"/>
-            </State>
-
-            <State name="GameContentLocked">
-                <When type="Property" frame="$this/StoreCacheFrame" CanPurchase="false"/>
-                <Action type="SetProperty" frame="StateLabel" visible="true"/>
-                <Action type="SetProperty" frame="StateLabel" text="@UI/ScreenCollection/Locked"/>
-                <Action type="SetProperty" frame="CostLabel" visible="false"/>
-                <Action type="SetProperty" frame="LockedIcon" visible="True"/>
-            </State>
-
-            <State name="GameContentNotOwned">
-                <Action type="SetProperty" frame="StateLabel" visible="false"/>
-                <Action type="SetProperty" frame="CostLabel" visible="true"/>
-                <Action type="SetProperty" frame="LockedIcon" visible="True"/>
-            </State>
-        </StateGroup>
-
-        <StateGroup name="RewardSelectedStateGroup">
-            <DefaultState val="RewardNotSelected"/>
-
-            <State name="RewardSelected">
-                <When type="AnimationState" frame="RewardCacheFrame" SelectedState="Selected"/>
-                <Action type="SetProperty" frame="CheckMarkImage" visible="true"/>
-            </State>
-
-            <State name="RewardNotSelected">
-                <Action type="SetProperty" frame="CheckMarkImage" visible="false"/>
-            </State>
-        </StateGroup>
-    </Frame>
-
-    <Frame type="TileList" name="ConsoleSkinTileListTemplate">
-        <Width val="517"/>
-        <Height val="681"/>
-        <AcceptsMouse val="true"/>
-        <RequireSelection val="true"/>
-
-        <Frame type="BlurFrame" name="BackgroundBlur">
-            <Anchor side="Top" relative="$parent/Background" pos="Min" offset="4"/>
-            <Anchor side="Left" relative="$parent/Background" pos="Min" offset="4"/>
-            <Anchor side="Bottom" relative="$parent/Background" pos="Max" offset="-4"/>
-            <Anchor side="Right" relative="$parent/Background" pos="Max" offset="-4"/>
-            <BlurAmount val=".35"/>
-        </Frame>
-
-        <Frame type="Image" name="Background">
-            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
-            <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
-            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
-            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
-            <Texture val="@UI/SC2_UI_Battlenet_Glue_Arcade_MainContainer"/>
-            <TextureType val="NineSlice"/>
-        </Frame>
-
-        <Frame type="ConsoleSkinTileListItem" name="Item0" template="ConsoleSkinSelectionFrame/ConsoleSkinTileListItemTemplate">
-            <Anchor side="Top" relative="$parent" pos="Min" offset="25"/>
-            <Anchor side="Left" relative="$parent" pos="Min" offset="24"/>
-            <Anchor side="Right" relative="$parent/ScrollBar" pos="Min" offset="#TileListItemOffsetRight"/>
-        </Frame>
-
-        <Frame type="ConsoleSkinTileListItem" name="Item1" template="ConsoleSkinSelectionFrame/ConsoleSkinTileListItemTemplate">
-            <Anchor side="Top" relative="$parent/Item0" pos="Max" offset="#TileListItemOffsetTop"/>
-            <Anchor side="Left" relative="$parent/Item0" pos="Min" offset="0"/>
-            <Anchor side="Right" relative="$parent/ScrollBar" pos="Min" offset="#TileListItemOffsetRight"/>
-        </Frame>
-
-        <Frame type="ConsoleSkinTileListItem" name="Item2" template="ConsoleSkinSelectionFrame/ConsoleSkinTileListItemTemplate">
-            <Anchor side="Top" relative="$parent/Item1" pos="Max" offset="#TileListItemOffsetTop"/>
-            <Anchor side="Left" relative="$parent/Item0" pos="Min" offset="0"/>
-            <Anchor side="Right" relative="$parent/ScrollBar" pos="Min" offset="#TileListItemOffsetRight"/>
-        </Frame>
-
-        <Frame type="ConsoleSkinTileListItem" name="Item3" template="ConsoleSkinSelectionFrame/ConsoleSkinTileListItemTemplate">
-            <Anchor side="Top" relative="$parent/Item2" pos="Max" offset="#TileListItemOffsetTop"/>
-            <Anchor side="Left" relative="$parent/Item0" pos="Min" offset="0"/>
-            <Anchor side="Right" relative="$parent/ScrollBar" pos="Min" offset="#TileListItemOffsetRight"/>
-        </Frame>
-
-        <Frame type="ConsoleSkinTileListItem" name="Item4" template="ConsoleSkinSelectionFrame/ConsoleSkinTileListItemTemplate">
-            <Anchor side="Top" relative="$parent/Item3" pos="Max" offset="#TileListItemOffsetTop"/>
-            <Anchor side="Left" relative="$parent/Item0" pos="Min" offset="0"/>
-            <Anchor side="Right" relative="$parent/ScrollBar" pos="Min" offset="#TileListItemOffsetRight"/>
-        </Frame>
-
-        <Frame type="ConsoleSkinTileListItem" name="Item5" template="ConsoleSkinSelectionFrame/ConsoleSkinTileListItemTemplate">
-            <Anchor side="Top" relative="$parent/Item4" pos="Max" offset="#TileListItemOffsetTop"/>
-            <Anchor side="Left" relative="$parent/Item0" pos="Min" offset="0"/>
-            <Anchor side="Right" relative="$parent/ScrollBar" pos="Min" offset="#TileListItemOffsetRight"/>
-        </Frame>
-
-        <Frame type="ConsoleSkinTileListItem" name="Item6" template="ConsoleSkinSelectionFrame/ConsoleSkinTileListItemTemplate">
-            <Anchor side="Top" relative="$parent/Item5" pos="Max" offset="#TileListItemOffsetTop"/>
-            <Anchor side="Left" relative="$parent/Item0" pos="Min" offset="0"/>
-            <Anchor side="Right" relative="$parent/ScrollBar" pos="Min" offset="#TileListItemOffsetRight"/>
-        </Frame>
-
-        <Frame type="ScrollBar" name="ScrollBar" template="CollectionTemplates/ScrollBarTemplate">
-            <Anchor side="Top" relative="$parent" pos="Min" offset="-3"/>
-            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
-            <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
-        </Frame>
-    </Frame>
-
-    <Frame type="ConsoleSkinSelectionFrame" name="ConsoleSkinSelectionFrameTemplate">
-        <HideAllowed val="{$this/HidePurchasedCheckBox/@Checked}"/>
-        <SortMethod val="{$this/SortPulldown/@SelectedSort}"/>
-        <SelectedRace val="{$this/RaceTabControl/@SelectedRace}"/>
-
-        <Frame type="RaceTabControl" name="RaceTabControl" template="CollectionTemplates/RaceTabControlTemplate">
-            <Anchor side="Top" relative="$parent" pos="Min" offset="234"/>
-            <Anchor side="Left" relative="$parent/ConsoleSkinTileList" pos="Min" offset="3"/>
-            <Anchor side="Right" relative="$this/RaceButton2" pos="Max" offset="0"/>
-            <Height val="38"/>
+        <Frame type="Image" name="Icon">
+            <Texture val="{$parent/ConsoleSkinCacheFrame/@ThumbnailImage}" layer="1"/>
+            <TextureCoords top="0.05556" left="0" bottom="0.94444" right="0.79167" layer="1"/>
+            <Visible val="True"/>
         </Frame>
 
         <Frame type="Label" name="TitleLabel">
-            <Anchor side="Top" relative="$Anchor_Header" pos="Max" offset="0"/>
-            <Anchor side="Left" relative="$Anchor_Header" pos="Max" offset="0"/>
-            <Style val="@Arcade_Title"/>
-            <Text val="PH - Console Skins"/>
+            <Text val="{$parent/ConsoleSkinCacheFrame/@NameText}"/>
         </Frame>
 
-        <Frame type="CheckBox" name="HidePurchasedCheckBox" template="StandardTemplates/StandardCheckBoxTemplate">
-            <Anchor side="Top" relative="$parent/SortPulldown" pos="Mid" offset="0"/>
-            <Anchor side="Bottom" relative="$parent/SortPulldown" pos="Mid" offset="0"/>
-            <Anchor side="Left" relative="$parent/SortPulldown" pos="Min" offset="-40"/>
-        </Frame>
+        <Frame type="Label" name="SubtitleLabel">
+            
+            <StateGroup name="TextState">
+                <DefaultState val="Empty"/>
 
-        <Frame type="Label" name="HidePurchasedLabel">
-            <Anchor side="Top" relative="$parent/HidePurchasedCheckBox" pos="Mid" offset="1"/>
-            <Anchor side="Bottom" relative="$parent/HidePurchasedCheckBox" pos="Mid" offset="1"/>
-            <Anchor side="Right" relative="$parent/HidePurchasedCheckBox" pos="Min" offset="-5"/>
-            <Style val="@Arcade_Subtitle"/>
-            <Text val="@UI/ScreenCollection/HideOwned"/>
-        </Frame>
+                <State name="Equipped">
+                    <When type="StateGroup" frame="$parent" EmptyState="NotEmpty"/>
+                    <When type="StateGroup" frame="$parent" EquippedState="Equipped"/>
+                    <Action type="SetProperty" frame="$this" Text="@UI/ScreenCollection/Equipped"/>
+                </State>
 
-        <Frame type="GameContentSortPulldown" name="SortPulldown" template="StandardBattlenetTemplates/BattlenetLargePulldownTemplate">
-            <Anchor side="Bottom" relative="$Collection_DropdownAnchor" pos="Max" offset="0"/>
-            <Anchor side="Right" relative="$parent/ConsoleSkinCacheFrame" pos="Max" offset="-4"/>
-        </Frame>
+                <State name="Purchasable">
+                    <When type="StateGroup" frame="$parent" PurchasableState="Purchasable"/>
+                    <Action type="SetProperty" frame="$this" Text="{$parent/StoreCacheFrame/@CostText}"/>
+                </State>
 
-        <Frame type="ConsoleSkinCacheFrame" name="ConsoleSkinCacheFrame">
-            <Anchor side="Top" relative="$parent/ConsoleSkinTileList" pos="Min" offset="0"/>
-            <Anchor side="Left" relative="$parent/ConsoleSkinTileList" pos="Max" offset="30"/>
-            <Height val="619"/>
-            <Width val="1024"/>
-            <ConsoleSkin val="{$parent/@SelectedConsoleSkin}"/>
+                <State name="Locked">
+                    <When type="StateGroup" frame="$parent" EmptyState="NotEmpty"/>
+                    <When type="StateGroup" frame="$parent" LockedState="Locked"/>
+                    <Action type="SetProperty" frame="$this" Text="@UI/ScreenCollection/Locked"/>
+                </State>
+
+                <State name="Normal">
+                    <When type="StateGroup" frame="$parent" EmptyState="NotEmpty"/>
+                    <Action type="SetProperty" frame="$this" Text="@UI/ScreenCollection/Owned"/>
+                </State>
+
+                <State name="Empty">
+                    <Action type="SetProperty" frame="$this" Text=""/>
+                </State>
+            </StateGroup>
         </Frame>
         
-        <Frame type="TileList" name="ConsoleSkinTileList" template="ConsoleSkinSelectionFrame/ConsoleSkinTileListTemplate">
-            <Anchor side="Top" relative="$parent" pos="Min" offset="284"/>
-            <Anchor side="Left" relative="$Anchor_Standard_Left" pos="Max" offset="0"/>
+        <!-- PurchasableState -->
+        <StateGroup name="PurchasableState">
+            <DefaultState val="NotPurchasable"/>
+            <State name="Purchasable">
+                <When type="Property" frame="StoreCacheFrame" IsPurchased="False"/>
+                <When type="Property" frame="StoreCacheFrame" CanPurchase="True"/>
+            </State>
+            <State name="NotPurchasable"/>
+        </StateGroup>
+        
+        <!-- EquippedState -->
+        <StateGroup name="EquippedState">
+            <DefaultState val="NotEquipped"/>
+            <State name="Equipped">
+                <When type="AnimationState" frame="RewardCacheFrame" SelectedState="Selected"/>
+            </State>
+            <State name="NotEquipped"/>
+        </StateGroup>
+        
+        <!-- LockedState -->
+        <StateGroup name="LockedState">
+            <DefaultState val="NotLocked"/>
+            <State name="Locked">
+                <When type="AnimationState" frame="RewardCacheFrame" AllowedState="NotAllowed"/>
+            </State>
+            <State name="NotLocked"/>
+        </StateGroup>
+    </Frame>
+
+    
+    <!-- 
+    ===========================================================
+    
+    CONSOLE SKIN TILE LIST
+    
+    ===========================================================
+    -->
+    <Frame type="TileList" name="ConsoleSkinTileListTemplate">
+        <AcceptsMouse val="true"/>
+        <RequireSelection val="true"/>
+
+        <Frame type="ConsoleSkinTileListItem" name="Item0" template="ConsoleSkinSelectionFrame/ConsoleSkinTileListItemTemplate">
+            <Frame type="Frame" name="AnchorFrame">
+                <Anchor side="Top" relative="$parent/$parent" pos="Min" offset="16"/>
+            </Frame>
         </Frame>
 
-        <Frame type="SelectUnlockableButton" name="SelectUnlockableButton" template="CollectionTemplates/SelectUnlockableButtonTemplate">
-            <Anchor side="Bottom" relative="$Anchor_ActionButton" pos="Min" offset="0"/>
-            <Anchor side="Left" relative="$Anchor_ActionButton" pos="Max" offset="0"/>
-            <Reward val="{$parent/ConsoleSkinCacheFrame/@RequiredReward}"/>
-            <PresenceId val="{$BattleUI/@LocalToonPresenceId}"/>
-            <Visible val="False"/>
+        <Frame type="ConsoleSkinTileListItem" name="Item1" template="ConsoleSkinSelectionFrame/ConsoleSkinTileListItemTemplate">
+            <Frame type="Frame" name="AnchorFrame">
+                <Anchor side="Top" relative="$parent/$parent/Item0/AnchorFrame" pos="Max" offset="2"/>
+            </Frame>
+        </Frame>
 
-            <Frame type="GameContentFrame" name="GameContentFrame">
-                <GameContent val="{$parent/$parent/ConsoleSkinCacheFrame/@GameContent}"/>
+        <Frame type="ConsoleSkinTileListItem" name="Item2" template="ConsoleSkinSelectionFrame/ConsoleSkinTileListItemTemplate">
+            <Frame type="Frame" name="AnchorFrame">
+                <Anchor side="Top" relative="$parent/$parent/Item1/AnchorFrame" pos="Max" offset="2"/>
+            </Frame>
+        </Frame>
+
+        <Frame type="ConsoleSkinTileListItem" name="Item3" template="ConsoleSkinSelectionFrame/ConsoleSkinTileListItemTemplate">
+            <Frame type="Frame" name="AnchorFrame">
+                <Anchor side="Top" relative="$parent/$parent/Item2/AnchorFrame" pos="Max" offset="2"/>
+            </Frame>
+        </Frame>
+
+        <Frame type="ConsoleSkinTileListItem" name="Item4" template="ConsoleSkinSelectionFrame/ConsoleSkinTileListItemTemplate">
+            <Frame type="Frame" name="AnchorFrame">
+                <Anchor side="Top" relative="$parent/$parent/Item3/AnchorFrame" pos="Max" offset="2"/>
+            </Frame>
+        </Frame>
+
+        <Frame type="ConsoleSkinTileListItem" name="Item5" template="ConsoleSkinSelectionFrame/ConsoleSkinTileListItemTemplate">
+            <Frame type="Frame" name="AnchorFrame">
+                <Anchor side="Top" relative="$parent/$parent/Item4/AnchorFrame" pos="Max" offset="2"/>
+            </Frame>
+        </Frame>
+
+        <Frame type="ConsoleSkinTileListItem" name="Item6" template="ConsoleSkinSelectionFrame/ConsoleSkinTileListItemTemplate">
+            <Frame type="Frame" name="AnchorFrame">
+                <Anchor side="Top" relative="$parent/$parent/Item5/AnchorFrame" pos="Max" offset="2"/>
+            </Frame>
+        </Frame>
+
+        <Frame type="ConsoleSkinTileListItem" name="Item7" template="ConsoleSkinSelectionFrame/ConsoleSkinTileListItemTemplate">
+            <Frame type="Frame" name="AnchorFrame">
+                <Anchor side="Top" relative="$parent/$parent/Item6/AnchorFrame" pos="Max" offset="2"/>
+            </Frame>
+        </Frame>
+
+        <Frame type="ConsoleSkinTileListItem" name="Item8" template="ConsoleSkinSelectionFrame/ConsoleSkinTileListItemTemplate">
+            <Frame type="Frame" name="AnchorFrame">
+                <Anchor side="Top" relative="$parent/$parent/Item7/AnchorFrame" pos="Max" offset="2"/>
+            </Frame>
+        </Frame>
+        
+        <Frame type="Image" name="ScrollBarBackground" template="StandardTileListTemplates/StandardTileListScrollBarBackgroundTemplate"/>
+
+        <Frame type="ScrollBar" name="ScrollBar" template="StandardTileListTemplates/StandardTileListScrollBarTemplate">
+            <Anchor side="Top" relative="$parent/Item0" pos="Min" offset="2"/>
+            <Anchor side="Bottom" relative="$parent/Item8" pos="Max" offset="-2"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="-2"/>
+        </Frame>
+    </Frame>
+
+    
+    <!-- 
+    ===========================================================
+    
+    CONSOLE SKIN SELECTION FRAME
+    
+    ===========================================================
+    -->
+    <Frame type="ConsoleSkinSelectionFrame" name="ConsoleSkinSelectionFrameTemplate" template="CollectionTemplates/CollectionBaseTemplate">
+        <Handle val="ConsoleSkinSelectionFrame"/>
+        <HideAllowed val="{$this/ContentContainer/HeaderPanel/HideOwnedCheckBox/@Checked}"/>
+        <SelectedRace val="{$this/ContentContainer/HeaderPanel/RaceTabControl/@SelectedRace}"/>
+        <SortMethod val="{$this/ContentContainer/HeaderPanel/SortPulldown/@SelectedSort}"/>
+        <HookupAlias original="ConsoleSkinTileList" alias="ContentContainer/PrimaryPanel/ConsoleSkinTileList"/>
+
+        <Frame type="Label" name="TitleLabel">
+            <Text val="@UI/ScreenCollection/ConsoleSkins/Title"/>
+        </Frame>
+
+        <Frame type="Label" name="SubtitleLabel">
+            <Text val="@UI/ScreenCollection/ConsoleSkins/Subtitle"/>
+        </Frame>
+
+        <Frame type="GameContentFrame" name="GameContentFrame">
+            <Anchor relative="$parent"/>
+            <GameContent val="{$parent/ContentContainer/SecondaryPanel/ConsoleSkinPreviewPane/@GameContent}"/>
+        </Frame>
+
+        <Frame type="StoreCacheFrame" name="StoreCacheFrame">
+            <Anchor relative="$parent"/>
+            <GameContent val="{$parent/ContentContainer/SecondaryPanel/ConsoleSkinPreviewPane/@GameContent}"/>
+        </Frame>
+        
+        <Frame type="Frame" name="ContentContainer">
+            <Anchor side="Right" relative="$Anchor_CollectionContentContainer_Right" pos="Max" offset="0"/>
+
+            <!-- Header Panel -->
+            <Frame type="Frame" name="HeaderPanel">
+
+                <Frame type="RaceTabControl" name="RaceTabControl" template="CollectionTemplates/RaceTabControlTemplate">
+                    <Anchor side="Top" relative="$parent/$parent/AnchorFrame" pos="Min" offset="0"/>
+                    <Anchor side="Bottom" relative="$parent/$parent/DividerLeft" pos="Min" offset="0"/>
+                    <Anchor side="Left" relative="$parent/$parent/AnchorFrame" pos="Min" offset="0"/>
+                    <Anchor side="Right" relative="$parent/$parent/DividerTop" pos="Max" offset="0"/>
+                </Frame>
+
+                <Frame type="GameContentSortPulldown" name="SortPulldown" template="StandardSmallButtonTemplates/StandardSmallPulldownTemplate">
+                
+                    <Frame type="Frame" name="AnchorFrame">
+                        <Anchor side="Top" relative="$parent/$parent" pos="Mid" offset="0"/>
+                        <Anchor side="Bottom" relative="$parent/$parent" pos="Mid" offset="0"/>
+                        <Anchor side="Left" relative="$parent/$parent/$parent/DividerTop" pos="Max" offset="15"/>
+                    </Frame>
+                    
+                    <Animation name="HoverSound">
+                        <Event event="OnMouseEnter" action="Reset,Play"/>
+                        <Event event="OnMouseExit" action="Reset, Stop"/>
+                        <Controller type="Sound" end="Stop">
+                            <Key type="Sound" time="0" sound="@UI_HoverTick"/>
+                        </Controller>
+                    </Animation>
+                </Frame>
+
+                <Frame type="CheckBox" name="HideOwnedCheckBox" template="StandardSmallButtonTemplates/StandardSmallCheckBoxTemplate">
+                    <Anchor side="Top" relative="$parent/SortPulldown/AnchorFrame" pos="Mid" offset="0"/>
+                    <Anchor side="Bottom" relative="$parent/SortPulldown/AnchorFrame" pos="Mid" offset="0"/>
+                    <Anchor side="Left" relative="$parent/SortPulldown/AnchorFrame" pos="Max" offset="14"/>
+                </Frame>
+                
+                <Frame type="Label" name="HideOwnedLabel">
+                    <Anchor side="Top" relative="$parent/HideOwnedCheckBox" pos="Mid" offset="1"/>
+                    <Anchor side="Bottom" relative="$parent/HideOwnedCheckBox" pos="Mid" offset="1"/>
+                    <Anchor side="Left" relative="$parent/HideOwnedCheckBox" pos="Max" offset="2"/>
+                    <Style val="@StandardSmallCheckboxDescription_Normal"/>
+                    <Text val="@UI/ScreenCollection/HideOwned"/>
+                </Frame>
             </Frame>
             
-            <Frame type="StoreCacheFrame" name="StoreCacheFrame">
-                <GameContent val="{$parent/$parent/ConsoleSkinCacheFrame/@GameContent}"/>
+            <!-- Primary Panel -->
+            <Frame type="Frame" name="PrimaryPanel">
+
+                <Frame type="TileList" name="ConsoleSkinTileList" template="ConsoleSkinSelectionFrame/ConsoleSkinTileListTemplate">
+                    <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                    <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+                    <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                    <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+                </Frame>
             </Frame>
+            
+            <!-- Secondary Panel -->
+            <Frame type="Frame" name="SecondaryPanel">
+                <Frame type="ConsoleSkinCacheFrame" name="ConsoleSkinPreviewPane" template="ConsoleSkinSelectionFrame/ConsoleSkinPreviewPaneTemplate">
+                    <Anchor side="Top" relative="$parent" pos="Min" offset="14"/>
+                    <Anchor side="Left" relative="$parent" pos="Min" offset="14"/>
+                    <Width val="998"/>
+                    <Height val="632"/>
+                    <ConsoleSkin val="{$ancestor[@type=ConsoleSkinSelectionFrame]/@SelectedConsoleSkin}"/>
+                </Frame>
+            </Frame>
+            
+            <!-- Hide the content containers if there's no content to display -->
+            <StateGroup name="ListContentState">
+                <DefaultState val="NotEmpty"/>
+                
+                <State name="Empty">
+                    <When type="Property" frame="PrimaryPanel/ConsoleSkinTileList" DataCount="0"/>
+                    <Action type="SetProperty" frame="PrimaryPanel" Visible="False"/>
+                    <Action type="SetProperty" frame="SecondaryPanel" Visible="False"/>
+                </State>
+                
+                <State name="NotEmpty">
+                    <Action type="SetProperty" frame="PrimaryPanel" Visible="True"/>
+                    <Action type="SetProperty" frame="SecondaryPanel" Visible="True"/>
+                </State>
+            </StateGroup>
         </Frame>
 
+        <Frame type="SelectUnlockableButton" name="SelectUnlockableButton" template="CollectionTemplates/SelectRaceUnlockableButtonTemplate">
+            <Anchor side="Bottom" relative="$Anchor_ActionButton" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$Anchor_ActionButton" pos="Max" offset="0"/>
+            <Reward val="{$parent/ContentContainer/SecondaryPanel/ConsoleSkinPreviewPane/@RequiredReward}"/>
+            <PresenceId val="{$BattleUI/@LocalToonPresenceId}"/>
+            <Text val="@UI/ScreenCollection/Buttons/Equip"/>
+            <Visible val="False"/>
+            <HoverSound val="@UI_HoverTick"/>
+            <CollapseLayout val="True"/>
+        </Frame>
+        
         <Frame type="Frame" name="EquippedWarningContainer" template="CollectionTemplates/EquippedWarningContainerTemplate">
             <Anchor side="Bottom" relative="$Anchor_ActionButton" pos="Min" offset="0"/>
-            <Anchor side="Left" relative="$parent/SelectUnlockableButton" pos="Max" offset="5"/>
-
+            <Anchor side="Left" relative="$parent/SelectUnlockableButton" pos="Max" offset="13"/>
+            
             <StateGroup name="EquippedStateGroup">
                 <DefaultState val="UnequippedState"/>
-
+            
                 <State name="EquippedState">
-                    <When type="Property" frame="$parent/SelectUnlockableButton" enabled="False"/>
-                    <When type="Property" frame="$parent/SelectUnlockableButton" visible="True"/>
-                    <When type="AnimationState" frame="$parent/SelectUnlockableButton/RewardCacheFrame" AllowedState="Allowed"/>
+                    <When type="AnimationState" frame="$parent/ContentContainer/SecondaryPanel/ConsoleSkinPreviewPane/RewardCacheFrame" SelectedState="Selected"/>
+                    <When type="Property" frame="$parent/GameContentFrame" IsValid="True"/>
                     <Action type="SetProperty" frame="$this" visible="True"/>
                 </State>
                 
@@ -422,19 +411,19 @@
             </StateGroup>
         </Frame>
         
+        <!-- TODO -->
         <Frame type="Frame" name="AchievementLockedWarningContainer" template="CollectionTemplates/AchievementLockedWarningContainerTemplate">
             <Anchor side="Bottom" relative="$Anchor_ActionButton" pos="Min" offset="0"/>
-            <Anchor side="Left" relative="$parent/SelectUnlockableButton" pos="Max" offset="20"/>
+            <Anchor side="Left" relative="$parent/SelectUnlockableButton" pos="Max" offset="13"/>
+            <CollapseLayout val="true"/>
             
             <StateGroup name="AchievementLockedStateGroup">
                 <DefaultState val="NotAchievementLockedState"/>
             
                 <State name="AchievementLockedState">
-                    <When type="Property" frame="$parent/SelectUnlockableButton/StoreCacheFrame" IsPurchased="False"/>
-                    <When type="Property" frame="$parent/SelectUnlockableButton/RewardCacheFrame" Default="False"/>
-                    <When type="Property" frame="$parent/SelectUnlockableButton/StoreCacheFrame" CanPurchase="False"/>
-                    <When type="AnimationState" frame="$parent/SelectUnlockableButton/RewardCacheFrame" AllowedState="NotAllowed"/>
-                    <When type="Property" frame="$parent/SelectUnlockableButton/GameContentFrame" IsValid="True"/>
+                    <When type="Property" frame="$parent/GameContentFrame" IsAllowed="False"/>
+                    <When type="Property" frame="$parent/GameContentFrame" IsPurchased="False"/>
+                    <When type="Property" frame="$parent/GameContentFrame" IsValid="True"/>
                     <Action type="SetProperty" frame="$this" visible="True"/>
                 </State>
                 
@@ -443,18 +432,25 @@
                 </State>
             </StateGroup>
         </Frame>
-
+        
         <Frame type="BuyButton" name="BuyButton" template="CollectionTemplates/BuyButtonTemplate">
             <Anchor side="Bottom" relative="$Anchor_ActionButton" pos="Min" offset="0"/>
-            <Anchor side="Left" relative="$Anchor_ActionButton" pos="Max" offset="0"/>
-            <GameContent val="{$parent/ConsoleSkinCacheFrame/@GameContent}"/>
+            <Anchor side="Left" relative="$parent/SelectUnlockableButton" pos="Max" offset="5"/>
+            <!-- <GameContent val="{$parent/@SelectedConsoleSkin}"/> -->
+            <CollapseLayout val="true"/>
 
             <StateGroup name="RewardEarnedStateGroup">
                 <DefaultState val="RewardNotEarnedState"/>
 
                 <State name="RewardEarnedState">
-                    <When type="AnimationState" frame="$parent/SelectUnlockableButton/RewardCacheFrame" AllowedState="Allowed"/>
+                    <When type="AnimationState" frame="$parent/SelectUnlockableButton/FirstUnlockedRewardCacheFrame" AllowedState="Allowed"/>
                     <Action type="SetProperty" frame="$this" visible="false"/>
+                </State>
+
+                <State name="BuyHidden">
+                    <!-- TODO -->
+                    <!-- <When type="Property" frame="$ancestor[@type=ConsoleSkinSelectionFrame]/ContentContainer/SecondaryPanel/ConsoleSkinFrame" IsPurchaseHidden="True"/> -->
+                    <!-- <Action type="SetProperty" frame="$this" visible="false"/> -->
                 </State>
 
                 <State name="RewardNotEarnedState">
@@ -470,12 +466,12 @@
             </State>
             <State name="EquipStateActive">
                 <When type="Property" frame="BuyButton" visible="False"/>
-                <When type="AnimationState" frame="SelectUnlockableButton/RewardCacheFrame" AllowedState="Allowed"/>
+                <When type="AnimationState" frame="SelectUnlockableButton/FirstUnlockedRewardCacheFrame" AllowedState="Allowed"/>
                 <Action type="SetProperty" frame="SelectUnlockableButton" visible="True"/>
             </State>
             <State name="NeitherActive">
                 <When type="Property" frame="BuyButton" visible="False"/>
-                <When type="AnimationState" frame="SelectUnlockableButton/RewardCacheFrame" AllowedState="NotAllowed"/>
+                <When type="AnimationState" frame="SelectUnlockableButton/FirstUnlockedRewardCacheFrame" AllowedState="NotAllowed"/>
                 <Action type="SetProperty" frame="SelectUnlockableButton" visible="True"/>
             </State>
         </StateGroup>

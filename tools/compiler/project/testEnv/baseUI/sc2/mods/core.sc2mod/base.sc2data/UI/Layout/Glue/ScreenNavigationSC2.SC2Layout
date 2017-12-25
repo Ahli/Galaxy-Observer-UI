@@ -300,16 +300,111 @@
                 <Text val="@UI/ScreenNavigationSC2/CooperativeButton"/>
                 <Shortcut val="@UI/ScreenNavigation3_Hotkey"/>
                 <Enabled val="{$BattleUI/@IsOnline}"/>
+                <TooltipDelayed val="True"/>
                 
                 <Frame type="Frame" name="HitTestFrame">
                     <Anchor side="Top" relative="$parent/$parent" pos="Min" offset="0"/>
                     <Anchor side="Left" relative="$parent/$parent/CampaignButton/HitTestFrame" pos="Max" offset="0"/>
+                </Frame>
+
+                <Frame type="StimpackCacheFrame" name="StimpackCacheFrame">
+                    <Anchor relative="$parent"/>
+                </Frame>
+
+                <Frame type="TimeFormatFrame" name="TimeFormatFrame">
+                    <Anchor relative="$parent"/>
+                    <FormatText val="&lt;daytotal/&gt;:&lt;hour2/&gt;:&lt;min2/&gt;:&lt;sec2/&gt;"/>
+                    <Time val="{$parent/StimpackCacheFrame/@TimeRemaining}"/>
+                </Frame>
+            
+                <Frame type="TextFormatFrame" name="StimpackTimeRemainingTooltip">
+                    <Anchor relative="$parent"/>
+                    <FormatText val="@UI/ScreenCoopCampaign/StimpackTimeRemainingTooltip"/>
+                    <Replacement index="0" val="{$parent/TimeFormatFrame/@Text}"/>
+                </Frame>
+
+                <Frame type="Frame" name="CoopStimpackContainer">
+                    <Anchor side="Bottom" relative="$parent" pos="Max" offset="-14"/>
+                    <Anchor side="Right" relative="$parent/NewContentFrame" pos="Min" offset="4"/>
+                    <Width val="36"/>
+                    <Height val="36"/>
+                    <CollapseLayout val="True"/>
+                    <Visible val="False"/>
+            
+                    <StateGroup name="VisibleState">
+                        <DefaultState val="NotVisible"/>
+                        
+                        <State name="Visible">
+                            <When type="Property" frame="$parent/StimpackCacheFrame" IsAvailable="True"/>
+                            <Action type="SetProperty" frame="$this" Visible="True"/>
+                            <Action type="SetProperty" frame="$parent" Tooltip="{$this/StimpackTimeRemainingTooltip/@Text}"/>
+                        </State>
+                        
+                        <State name="NotVisible">
+                            <Action type="SetProperty" frame="$this" Visible="False"/>
+                            <Action type="SetProperty" frame="$parent" Tooltip=""/>
+                        </State>
+                    </StateGroup>
+
+                    <Frame type="Image" name="Background">
+                        <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+                        <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+                        <Texture val="@UI/Glues_Battlenet_TopNav_NewContentGlow"/>
+                        <Width val="36"/>
+                        <Height val="36"/>
+
+                        <Animation name="FlagGlow">
+                            <Event event="OnShown" action="Reset,Play" frame="$parent"/>
+                            <Event event="OnHidden" action="Stop" frame="$parent"/>
+
+                            <Controller type="Rotation" relative="False" end="Loop">
+                                <Key type="Curve" time="0" value="0" out="Linear"/>
+                                <Key type="Curve" time="5" value="360" in="Linear"/>
+                            </Controller>
+                        </Animation>
+                    </Frame>
+                    
+                    <Frame type="Image" name="Glow">
+                        <Anchor side="Bottom" relative="$parent/Icon" pos="Max" offset="0"/>
+                        <Anchor side="Left" relative="$parent/Icon" pos="Mid" offset="0"/>
+                        <Anchor side="Right" relative="$parent/Icon" pos="Mid" offset="0"/>
+                        <Texture val="@UI/Glues_Battlenet_TopNav_NewContentBg"/>
+                        <Width val="36"/>
+                        <Height val="36"/>
+                        <Alpha val="0"/>
+                        
+                        <Animation name="FlagGlow">
+                            <Event event="OnShown" action="Reset,Play" frame="$parent"/>
+                            <Event event="OnHidden" action="Stop" frame="$parent"/>
+
+                            <Controller type="Rotation" relative="False" end="Loop">
+                                <Key type="Curve" time="0" value="0" out="Linear"/>
+                                <Key type="Curve" time="5" value="360" in="Linear"/>
+                            </Controller>
+
+                            <Controller type="Fade" end="Loop">
+                                <Key type="Curve" time="0" value="255" out="Fast"/>
+                                <Key type="Curve" time="2" value="0" in="Slow"/>
+                                <Key type="Curve" time="4" value="255" out="Fast"/>
+                            </Controller>
+                        </Animation>
+                    </Frame>
+
+                    <Frame type="Image" name="Icon">
+                        <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+                        <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+                        <Texture val="@UI/Glues_Icons_TopNav_Stimpack_Selected"/>
+                        <Width val="36"/>
+                        <Height val="36"/>
+                        <RenderPriority val="513"/>
+                    </Frame>
                 </Frame>
                 
                 <!--  ALARAK & CUSTOM MUTATORS IS LATEST VERSION (3) -->
                 <Frame type="VersionNotificationFrame" name="NewContentFrame">
                     <Version val="3"/> 
                     <SettingName val="NavigationCoopButton"/>
+                    <CollapseLayout val="True"/>
                 </Frame>
 
                 <Animation name="VersionState">

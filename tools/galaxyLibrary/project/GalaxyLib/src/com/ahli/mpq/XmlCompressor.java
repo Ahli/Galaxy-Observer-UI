@@ -39,7 +39,7 @@ public final class XmlCompressor {
 	private static final String AHLI_SETTING = "@setting";
 	private static final String AHLI_HOTKEY = "@hotkey";
 	private static final String ANY_TAGNAME = "*";
-	private static Logger logger = LogManager.getLogger(XmlCompressor.class);
+	private static Logger logger = LogManager.getLogger();
 	
 	/**
 	 * 

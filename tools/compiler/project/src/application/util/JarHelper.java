@@ -14,7 +14,7 @@ import org.apache.logging.log4j.Logger;
  * @author Ahli
  */
 public final class JarHelper {
-	private static Logger logger = LogManager.getLogger(JarHelper.class); // $NON-NLS-1$
+	private static Logger logger = LogManager.getLogger();
 	
 	/**
 	 * Disabled Constructor.

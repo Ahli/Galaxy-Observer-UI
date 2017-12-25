@@ -22,7 +22,7 @@ import com.ahli.galaxy.game.def.abstracts.GameDef;
  * @author Ahli
  */
 public final class ComponentsListReader {
-	private static Logger logger = LogManager.getLogger(ComponentsListReader.class);
+	private static Logger logger = LogManager.getLogger();
 	
 	/**
 	 * 

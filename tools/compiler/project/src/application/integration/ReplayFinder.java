@@ -23,7 +23,7 @@ import org.apache.logging.log4j.Logger;
  * @author Ahli
  */
 public class ReplayFinder {
-	private static Logger logger = LogManager.getLogger(ReplayFinder.class);
+	private static Logger logger = LogManager.getLogger();
 	
 	/**
 	 * Returns the last used replay file read from the game's Variables.txt.

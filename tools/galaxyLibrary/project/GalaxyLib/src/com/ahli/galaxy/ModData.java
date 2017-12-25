@@ -4,6 +4,7 @@ import java.io.File;
 
 import com.ahli.galaxy.archive.DescIndexData;
 import com.ahli.galaxy.game.GameData;
+import com.ahli.galaxy.ui.interfaces.UICatalog;
 
 /**
  * @author Ahli
@@ -16,6 +17,7 @@ public class ModData {
 	private File targetPath = null;
 	private DescIndexData descIndexData = null;
 	private File componentListFile = null;
+	private UICatalog catalog = null;
 	
 	/**
 	 * Constructor.
@@ -117,4 +119,17 @@ public class ModData {
 		this.targetPath = targetPath;
 	}
 	
+	/**
+	 * @param catalog
+	 */
+	public void setUi(final UICatalog catalog) {
+		this.catalog = catalog;
+	}
+	
+	/**
+	 * @return
+	 */
+	public UICatalog getUi() {
+		return catalog;
+	}
 }

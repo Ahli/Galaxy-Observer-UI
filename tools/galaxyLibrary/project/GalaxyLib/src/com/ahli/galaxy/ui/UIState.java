@@ -127,6 +127,6 @@ public class UIState extends UIElement {
 	
 	@Override
 	public String toString() {
-		return "<State " + getName() + ">";
+		return "<State name='" + getName() + "'>";
 	}
 }

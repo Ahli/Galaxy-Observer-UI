@@ -101,16 +101,26 @@ public class UIAttribute extends UIElement {
 	 * @param value
 	 */
 	public String addValue(final String key, final String value) {
-		final Pair<String, String> newPair = new Pair<>(key, value);
-		final int i = values.indexOf(newPair);
-		if (i == -1) {
-			values.add(newPair);
+		// final Pair<String, String> newPair = new Pair<>(key, value);
+		// final int i = values.indexOf(newPair);
+		int i = 0;
+		int len = 0;
+		Pair<String, String> p = null;
+		for (len = values.size(); i < len; i++) {
+			p = values.get(i);
+			if (p.getKey().equals(key)) {
+				break;
+			}
+		}
+		if (i == len) {
+			// not found
+			values.add(new Pair<>(key, value));
 			return null;
 		} else {
-			return values.set(i, newPair).getValue();
+			final String oldVal = p.getValue();
+			p.setValue(value);
+			return oldVal;
 		}
-		
-		// return values.put(key, value);
 	}
 	
 	/**
@@ -138,6 +148,6 @@ public class UIAttribute extends UIElement {
 	
 	@Override
 	public String toString() {
-		return "<Attribute name='" + getName() + "'>";
+		return "<" + getName() + ">";
 	}
 }

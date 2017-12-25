@@ -1,0 +1,140 @@
+package com.ahli.galaxy.test;
+
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.util.ArrayList;
+import java.util.List;
+
+import com.ximpleware.AutoPilot;
+import com.ximpleware.EOFException;
+import com.ximpleware.EncodingException;
+import com.ximpleware.EntityException;
+import com.ximpleware.NavException;
+import com.ximpleware.ParseException;
+import com.ximpleware.PilotException;
+import com.ximpleware.VTDGen;
+import com.ximpleware.VTDNav;
+
+public class RecursiveVtdTest {
+	private static final String TAG = "*";
+	final static List<Object> list = new ArrayList<>();
+	
+	public static void main(final String[] args) {
+		long endMem;
+		int iterations = 0;
+		try {
+			Thread.sleep(1000);
+		} catch (final InterruptedException e1) {
+			e1.printStackTrace();
+		}
+		System.out.println("memory: " + Runtime.getRuntime().totalMemory());
+		final Runtime rt = Runtime.getRuntime();
+		final long startMem = rt.totalMemory() - rt.freeMemory();
+		final long startTime = System.currentTimeMillis();
+		final File f = new File(
+				"F:\\Spiele\\GalaxyObsUI\\baseUI\\heroes\\mods\\core.stormmod\\base.stormdata\\UI\\Layout\\UI\\GameUI.StormLayout");
+		final VTDGen vtd;
+		
+		try {
+			vtd = new VTDGen();
+			// for (int i = 0; i < 1000; i++) {
+			while (System.currentTimeMillis() - startTime < 60000) {
+				loadRecursiveXML(vtd, f);
+				iterations++;
+				// if (i % 100 == 0) {
+				// endMem = rt.totalMemory() - rt.freeMemory();
+				// System.out.println("Memory Use: " + ((float) endMem - startMem) / (1 << 20) +
+				// " MB.");
+				// }
+			}
+		} catch (final NavException | IOException | ParseException e) {
+			e.printStackTrace();
+		}
+		
+		final long executionTime = (System.currentTimeMillis() - startTime);
+		endMem = rt.totalMemory() - rt.freeMemory();
+		System.out.println("recursive traversal took " + executionTime + "ms. Per iteration: "
+				+ executionTime / iterations + "ms.");
+		System.out.println("elements: " + list.size());
+		System.out.println("Memory Use: " + ((float) endMem - startMem) / (1 << 20) + " MB.");
+		System.out.println("iterations: " + iterations);
+		
+		try {
+			Thread.sleep(1000);
+		} catch (final InterruptedException e1) {
+			e1.printStackTrace();
+		}
+	}
+	
+	public static void loadRecursiveXML(final VTDGen vtd, final File f) throws PilotException, NavException,
+			IOException, EncodingException, EOFException, EntityException, ParseException {
+		// long startTime = System.currentTimeMillis();
+		// if (!vtd.parseFile(f.getPath(), false)) {
+		// return;
+		// }
+		// final FileInputStream fs = new FileInputStream(f);
+		// final FileChannel channel = fs.getChannel();
+		// final MappedByteBuffer buffer1 = channel.map(FileChannel.MapMode.READ_ONLY,
+		// 0, channel.size());
+		// final ByteBuffer buffer2 = ByteBuffer.allocate((int) channel.size());
+		// channel.read(buffer2);
+		
+		final byte[] bytes = readBinary(f);
+		// setdoc causes a nullpointer error due to an internal bug
+		vtd.setDoc_BR(bytes);
+		vtd.parse(false);
+		// vtd.setDoc_BR(bytes);
+		// channel.close();
+		// fs.close();
+		
+		// long executionTime = (System.currentTimeMillis() - startTime);
+		// System.out.println("file loading took " + executionTime + "ms.");
+		// startTime = System.currentTimeMillis();
+		
+		final VTDNav nav = vtd.getNav();
+		final AutoPilot ap = new AutoPilot(nav);
+		
+		// ap.enableCaching(false);
+		ap.selectElement(TAG);
+		final AutoPilot ap2 = new AutoPilot(nav);
+		// ap2.enableCaching(false);
+		
+		// executionTime = (System.currentTimeMillis() - startTime);
+		// System.out.println("creating navigation objects took " + executionTime +
+		// "ms.");
+		// startTime = System.currentTimeMillis();
+		int n;
+		String elName;
+		int i;
+		String attrName;
+		String attrVal;
+		int d;
+		while (ap.iterate()) {
+			n = nav.getCurrentIndex();
+			d = nav.getCurrentDepth();
+			// elName = nav.toStringLowerCase(n);
+			elName = nav.toRawStringLowerCase(n);
+			list.add(d);
+			list.add(elName);
+			// executionTime = (System.currentTimeMillis() - startTime);
+			// System.out.println(n + " - level" + d + " - " + elName + " @ " +
+			// executionTime);
+			// System.out.println(n + " - level" + d + " - " + elName);
+			ap2.selectAttr(TAG);
+			while ((i = ap2.iterateAttr()) != -1) {
+				// i will be attr name, i+1 will be attribute value
+				attrName = nav.toRawStringLowerCase(i);
+				attrVal = nav.toRawString(i + 1);
+				list.add(attrName);
+				list.add(attrVal);
+				// executionTime = (System.currentTimeMillis() - startTime);
+				// System.out.println(attrName + "=" + attrVal + " @ " + executionTime);
+			}
+		}
+	}
+	
+	static byte[] readBinary(final File f) throws IOException {
+		return Files.readAllBytes(f.toPath());
+	}
+}

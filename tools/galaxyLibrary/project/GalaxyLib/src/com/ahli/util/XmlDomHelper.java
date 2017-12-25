@@ -7,9 +7,12 @@ import org.w3c.dom.Node;
  * Helper methods for handling XML content.
  * 
  * @author Ahli
- *
  */
 public final class XmlDomHelper {
+	
+	private static final String REQUIREDTOLOAD = "requiredtoload";
+	
+	private static final String NEG_PREFIX = "!";
 	
 	/**
 	 * Disabled Constructor.
@@ -39,4 +42,15 @@ public final class XmlDomHelper {
 		return node;
 	}
 	
+	/**
+	 * Checks if any attribute is the requiredToLoad one and does not start with
+	 * "!".
+	 * 
+	 * @param attributes
+	 * @return
+	 */
+	public static boolean isFailingRequiredToLoad(final NamedNodeMap attributes) {
+		final Node requiredtoloadAttr = XmlDomHelper.getNamedItemIgnoringCase(attributes, REQUIREDTOLOAD);
+		return requiredtoloadAttr != null && !requiredtoloadAttr.getNodeValue().trim().startsWith(NEG_PREFIX);
+	}
 }

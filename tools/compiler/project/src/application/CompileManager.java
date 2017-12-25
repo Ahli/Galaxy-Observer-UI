@@ -11,8 +11,8 @@ import org.xml.sax.SAXException;
 
 import com.ahli.galaxy.ModData;
 import com.ahli.galaxy.archive.DescIndexData;
-import com.ahli.galaxy.ui.UICatalog;
 import com.ahli.galaxy.ui.exception.UIException;
+import com.ahli.galaxy.ui.interfaces.UICatalog;
 
 /**
  * Compiles MPQ stuff.
@@ -20,7 +20,7 @@ import com.ahli.galaxy.ui.exception.UIException;
  * @author Ahli
  */
 public class CompileManager {
-	private static Logger logger = LogManager.getLogger(CompileManager.class);
+	private static Logger logger = LogManager.getLogger();
 	
 	/**
 	 * Constructor.
@@ -37,27 +37,29 @@ public class CompileManager {
 	 *            the raceId used
 	 * @throws InterruptedException
 	 */
-	public void compile(final ModData mod, final String raceId) throws InterruptedException {
+	public UICatalog compile(final ModData mod, final String raceId) throws InterruptedException {
+		UICatalog catalogClone = null;
 		try {
 			long startTime;
 			long executionTime;
 			
-			startTime = System.currentTimeMillis();
+			// startTime = System.currentTimeMillis();
 			
 			// manage descIndexData
-			final DescIndexData descIndex = mod.getDescIndexData();
-			manageOrderOfLayoutFiles(descIndex);
+			// TODO re-enable when improved memory+performance
+			// final DescIndexData descIndex = mod.getDescIndexData();
+			// manageOrderOfLayoutFiles(descIndex);
 			
-			executionTime = (System.currentTimeMillis() - startTime);
-			logger.info("DescIndex management took " + executionTime + "ms.");
+			// executionTime = (System.currentTimeMillis() - startTime);
+			// logger.info("DescIndex management took " + executionTime + "ms.");
 			
 			// validate catalog
 			final File descIndexFile = new File(
 					mod.getCachePath() + File.separator + mod.getDescIndexData().getDescIndexIntPath());
-			logger.trace("processing descIndexFile: " + descIndexFile);
+			// logger.trace("processing descIndexFile: " + descIndexFile);
 			startTime = System.currentTimeMillis();
 			
-			final UICatalog catalogClone = getClonedUICatalog(mod);
+			catalogClone = getClonedUICatalog(mod);
 			
 			executionTime = (System.currentTimeMillis() - startTime);
 			logger.info("BaseUI Cloning took " + executionTime + "ms.");
@@ -66,7 +68,11 @@ public class CompileManager {
 			
 			// apply mod's UI
 			catalogClone.processDescIndex(descIndexFile, raceId);
-			catalogClone.clearDomParser();
+			catalogClone.clearParser();
+			
+			// test performance for GC
+			// mod.setUi(catalogClone);
+			// catalogClone = null;
 			
 			executionTime = (System.currentTimeMillis() - startTime);
 			logger.info("Processing DescIndex took " + executionTime + "ms.");
@@ -75,6 +81,7 @@ public class CompileManager {
 			logger.error("ERROR: encountered error while compiling.", e);
 			e.printStackTrace();
 		}
+		return catalogClone;
 	}
 	
 	/**

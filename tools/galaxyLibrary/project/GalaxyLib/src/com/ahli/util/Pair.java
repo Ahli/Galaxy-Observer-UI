@@ -17,7 +17,7 @@ public class Pair<K, V> implements Serializable {
 	/**
 	 * Key of this <code>Pair</code>.
 	 */
-	private final K key;
+	private K key;
 	
 	/**
 	 * Gets the key for this pair.
@@ -31,7 +31,7 @@ public class Pair<K, V> implements Serializable {
 	/**
 	 * Value of this this <code>Pair</code>.
 	 */
-	private final V value;
+	private V value;
 	
 	/**
 	 * Gets the value for this pair.
@@ -59,7 +59,6 @@ public class Pair<K, V> implements Serializable {
 	 * <p>
 	 * <code>String</code> representation of this <code>Pair</code>.
 	 * </p>
-	 *
 	 * <p>
 	 * The default name/value delimiter '=' is always used.
 	 * </p>
@@ -75,7 +74,6 @@ public class Pair<K, V> implements Serializable {
 	 * <p>
 	 * Generate a hash code for this <code>Pair</code>.
 	 * </p>
-	 *
 	 * <p>
 	 * The hash code is calculated using only the key of the <code>Pair</code>.
 	 * </p>
@@ -89,16 +87,24 @@ public class Pair<K, V> implements Serializable {
 		return hash;
 	}
 	
+	public void setKey(final K key) {
+		this.key = key;
+		
+	}
+	
+	public void setValue(final V value) {
+		this.value = value;
+		
+	}
+	
 	/**
 	 * <p>
 	 * Test this <code>Pair</code> for equality with another <code>Object</code>.
 	 * </p>
-	 *
 	 * <p>
 	 * If the <code>Object</code> to be tested is not a <code>Pair</code> or is
 	 * <code>null</code>, then this method returns <code>false</code>.
 	 * </p>
-	 *
 	 * <p>
 	 * Two <code>Pair</code>s are considered equal if and only if the key is equal.
 	 * </p>

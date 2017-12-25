@@ -8,16 +8,13 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 /**
- * Class to internationalize messages.
- * 
- * Hint: FXML files can be localized via text="%key", if the FxmlLoader receives
- * the correct resource bundle.
+ * Class to internationalize messages. Hint: FXML files can be localized via
+ * text="%key", if the FxmlLoader receives the correct resource bundle.
  * 
  * @author Ahli
- *
  */
 public final class Messages {
-	private static Logger logger = LogManager.getLogger("Messages"); //$NON-NLS-1$
+	private static Logger logger = LogManager.getLogger();
 	
 	private static final String BUNDLE_NAME = "com.ahli.mpq.i18n.messages"; //$NON-NLS-1$
 	

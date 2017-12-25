@@ -15,16 +15,29 @@ import org.xml.sax.SAXException;
 
 import com.ahli.mpq.MpqException;
 import com.ahli.mpq.MpqInterface;
-
-import javafx.util.Pair;
+import com.ahli.util.Pair;
 
 /**
  * Stores the Data of a Desc Index File.
  * 
  * @author Ahli
  */
+// TODO rebuild to use the UI object model instead of parsing all layout files
+// another time
 public class DescIndexData {
-	private static Logger logger = LogManager.getLogger(DescIndexData.class);
+	private static final String STRING2 = "#";
+	
+	private static final String DESC = "</Desc>\r\n";
+	
+	private static final String STRING = "\"/>\r\n";
+	
+	private static final String INCLUDE_PATH = "    <Include path=\"";
+	
+	private static final String XML_VERSION_1_0_ENCODING_UTF_8_STANDALONE_YES_DESC = "<?xml version=\"1.0\" encoding=\"utf-8\" standalone=\"yes\"?>\r\n<Desc>\r\n";
+	
+	private static final String UTF_8 = "UTF-8";
+	
+	private static Logger logger = LogManager.getLogger();
 	
 	private String descIndexIntPath = null;
 	private ArrayList<Pair<File, String>> fileIntPathList = new ArrayList<>();
@@ -151,29 +164,20 @@ public class DescIndexData {
 	 */
 	public void persistDescIndexFile() throws IOException {
 		final File f = mpqi.getFileFromMpq(descIndexIntPath);
-		OutputStreamWriter bw = null;
-		try {
-			bw = new OutputStreamWriter(new FileOutputStream(f, false), "UTF-8");
-			bw.write("<?xml version=\"1.0\" encoding=\"utf-8\" standalone=\"yes\"?>\r\n<Desc>\r\n");
+		
+		try (OutputStreamWriter bw = new OutputStreamWriter(new FileOutputStream(f, false), UTF_8)) {
+			bw.write(XML_VERSION_1_0_ENCODING_UTF_8_STANDALONE_YES_DESC);
 			
 			for (final Pair<File, String> p : fileIntPathList) {
-				bw.write("    <Include path=\"");
+				bw.write(INCLUDE_PATH);
 				bw.write(p.getValue());
-				bw.write("\"/>\r\n");
+				bw.write(STRING);
 			}
 			
-			bw.write("</Desc>\r\n");
+			bw.write(DESC);
 		} catch (final IOException e) {
 			logger.error("ERROR writing DescIndex to disc" + e);
 			throw e;
-		} finally {
-			if (bw != null) {
-				try {
-					bw.close();
-				} catch (final IOException e) {
-					e.printStackTrace();
-				}
-			}
 		}
 	}
 	
@@ -216,9 +220,9 @@ public class DescIndexData {
 					
 					String curDependencyTo = curLayoutDepList.get(j);
 					
-					if (curDependencyTo.startsWith("#")) {
+					if (curDependencyTo.startsWith(STRING2)) {
 						logger.trace("DEPENDENCY: " + curDependencyTo);
-						while (curDependencyTo.startsWith("#")) {
+						while (curDependencyTo.startsWith(STRING2)) {
 							curDependencyTo = curDependencyTo.substring(1);
 						}
 						boolean constantDefinedBefore = false;
@@ -292,7 +296,7 @@ public class DescIndexData {
 					
 					final String curDependencyTo = curLayoutDepList.get(j);
 					
-					if (!curDependencyTo.startsWith("#")) {
+					if (!curDependencyTo.startsWith(STRING2)) {
 						// check if it appears after the template
 						for (int i2 = i + 1; i2 < dependencies.size(); i2++) {
 							final Pair<File, String> otherPair = fileIntPathList.get(i2);

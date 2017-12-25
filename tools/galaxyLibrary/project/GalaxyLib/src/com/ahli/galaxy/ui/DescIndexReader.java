@@ -16,13 +16,15 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
+import com.ahli.util.XmlDomHelper;
+
 /**
  * Reads a a Desc Index File.
  * 
  * @author Ahli
  */
 public final class DescIndexReader {
-	private static Logger logger = LogManager.getLogger(DescIndexReader.class);
+	private static Logger logger = LogManager.getLogger();
 	
 	/**
 	 * 
@@ -57,7 +59,7 @@ public final class DescIndexReader {
 				final String path = attributes.item(0).getNodeValue();
 				
 				// ignore requiredtoload if desired
-				if (ignoreRequiredToLoadEntries && UICatalog.isFailingRequiredToLoad(attributes)) {
+				if (ignoreRequiredToLoadEntries && XmlDomHelper.isFailingRequiredToLoad(attributes)) {
 					continue;
 				}
 				
