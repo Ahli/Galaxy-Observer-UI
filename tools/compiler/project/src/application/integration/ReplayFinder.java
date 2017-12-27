@@ -43,7 +43,9 @@ public class ReplayFinder {
 			basePath += "StarCraft II";
 		}
 		basePath += File.separator + "Variables.txt";
-		logger.trace(basePath);
+		if (logger.isTraceEnabled()) {
+			logger.trace(basePath);
+		}
 		
 		String line, replayPath = null;
 		try (final InputStreamReader is = new InputStreamReader(new FileInputStream(new File(basePath)),
@@ -58,7 +60,9 @@ public class ReplayFinder {
 				}
 			}
 		}
-		logger.trace("replayPath: " + replayPath);
+		if (logger.isTraceEnabled()) {
+			logger.trace("replayPath: " + replayPath);
+		}
 		if (replayPath == null) {
 			return null;
 		}
@@ -84,25 +88,35 @@ public class ReplayFinder {
 			extensions = new String[] { "SC2Replay" };
 		}
 		basePath += File.separator + "Accounts";
-		logger.trace(basePath);
+		if (logger.isTraceEnabled()) {
+			logger.trace(basePath);
+		}
 		
 		final Collection<File> allReplays = FileUtils.listFiles(new File(basePath), TrueFileFilter.INSTANCE,
 				TrueFileFilter.INSTANCE);
 		
-		logger.trace("# Replays found: " + allReplays.size());
+		if (logger.isTraceEnabled()) {
+			logger.trace("# Replays found: " + allReplays.size());
+		}
 		
 		long newestDate = Long.MIN_VALUE;
 		File newestReplay = null;
 		for (final File curReplay : allReplays) {
 			// check extension of file
 			final String curReplayName = curReplay.getName();
-			logger.trace("curReplay name: " + curReplayName);
+			if (logger.isTraceEnabled()) {
+				logger.trace("curReplay name: " + curReplayName);
+			}
 			final String extension = FilenameUtils.getExtension(curReplayName);
-			logger.trace("extension: " + extension);
+			if (logger.isTraceEnabled()) {
+				logger.trace("extension: " + extension);
+			}
 			if (curReplay.isFile() && extension.equalsIgnoreCase(extensions[0])) {
 				// check date
 				final long curDate = curReplay.lastModified();
-				logger.trace("curDate: " + curDate);
+				if (logger.isTraceEnabled()) {
+					logger.trace("curDate: " + curDate);
+				}
 				if (curDate > newestDate) {
 					newestDate = curDate;
 					newestReplay = curReplay;
@@ -132,7 +146,9 @@ public class ReplayFinder {
 			logger.error("Failed to receive last used replay.", e);
 		}
 		if (replay == null || !replay.exists() || !replay.isFile()) {
-			logger.trace("Last used replay is invalid, getting newest replay instead.");
+			if (logger.isTraceEnabled()) {
+				logger.trace("Last used replay is invalid, getting newest replay instead.");
+			}
 			replay = getNewestReplay(isHeroes, documentsPath);
 		}
 		return replay;

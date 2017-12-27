@@ -82,7 +82,9 @@ public final class LayoutReader {
 							final String layoutName = dependency.substring(0, firstIndex);
 							if (!layoutName.equalsIgnoreCase(nameWOfileEnding)) {
 								if (!doesNameAppearInList(layoutName, list)) {
-									logger.trace(nameWOfileEnding + " has dependency to " + layoutName);
+									if (logger.isTraceEnabled()) {
+										logger.trace(nameWOfileEnding + " has dependency to " + layoutName);
+									}
 									list.add(layoutName);
 								}
 							}
@@ -98,8 +100,11 @@ public final class LayoutReader {
 		
 		if (ownConstants == null) {
 			ownConstants = getLayoutsConstantDefinitions(doc);
-			for (final String str : ownConstants) {
-				logger.trace(nameWOfileEnding + " defines constant " + str);
+			
+			if (logger.isTraceEnabled()) {
+				for (final String str : ownConstants) {
+					logger.trace(nameWOfileEnding + " defines constant " + str);
+				}
 			}
 		}
 		
@@ -131,7 +136,9 @@ public final class LayoutReader {
 					final String constName = attrName;
 					if (!doesNameAppearInList(constName, usedConstants)
 							&& !doesConstantNameAppearInList(constName, ownConstants)) {
-						logger.trace(nameWOfileEnding + " uses undefined constant " + constName);
+						if (logger.isTraceEnabled()) {
+							logger.trace(nameWOfileEnding + " uses undefined constant " + constName);
+						}
 						usedConstants.add(constName);
 						list.add(constName);
 					}
@@ -141,7 +148,9 @@ public final class LayoutReader {
 					final String constName = attrValue;
 					if (!doesNameAppearInList(constName, usedConstants)
 							&& !doesConstantNameAppearInList(constName, ownConstants)) {
-						logger.trace(nameWOfileEnding + " uses undefined constant " + constName);
+						if (logger.isTraceEnabled()) {
+							logger.trace(nameWOfileEnding + " uses undefined constant " + constName);
+						}
 						usedConstants.add(constName);
 						list.add(constName);
 					}
@@ -250,7 +259,7 @@ public final class LayoutReader {
 				// attribute is Template
 				if (attr.getNodeName().equalsIgnoreCase(NAME)) {
 					ownConstants.add(attr.getNodeValue());
-					logger.trace("FOUND CONSTANT DEFINITION: " + attr.getNodeValue());
+					logger.trace("FOUND CONSTANT DEFINITION: {}", () -> attr.getNodeValue());
 				}
 				// else
 				// System.out.println("REJECTED CONSTANT ATTR: " +

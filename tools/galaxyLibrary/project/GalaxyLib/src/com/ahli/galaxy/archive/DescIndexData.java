@@ -93,8 +93,11 @@ public class DescIndexData {
 		}
 		final Pair<File, String> p = new Pair<>(f, intPath2);
 		fileIntPathList.add(p);
-		logger.trace("added Layout path: " + intPath2);
-		logger.trace("added File path: " + f.getAbsolutePath());
+		
+		if (logger.isTraceEnabled()) {
+			logger.trace("added Layout path: " + intPath2);
+			logger.trace("added File path: " + f.getAbsolutePath());
+		}
 	}
 	
 	/**
@@ -201,7 +204,9 @@ public class DescIndexData {
 			
 			// add calculated list of dependencies from layout file
 			layoutDeps = LayoutReader.getDependencyLayouts(pair.getKey(), curConstants);
-			logger.trace("Dependencies found: " + layoutDeps);
+			if (logger.isTraceEnabled()) {
+				logger.trace("Dependencies found: " + layoutDeps);
+			}
 			
 			ownConstants.add(curConstants);
 			dependencies.add(layoutDeps);
@@ -209,7 +214,9 @@ public class DescIndexData {
 		
 		boolean insertOccurred = true;
 		for (int counter = 0; insertOccurred && counter < Math.pow(fileIntPathList.size(), 4); counter++) {
-			logger.trace("counter=" + counter);
+			if (logger.isTraceEnabled()) {
+				logger.trace("counter=" + counter);
+			}
 			insertOccurred = false;
 			for (int i = 0; i < dependencies.size(); i++) {
 				
@@ -221,7 +228,9 @@ public class DescIndexData {
 					String curDependencyTo = curLayoutDepList.get(j);
 					
 					if (curDependencyTo.startsWith(STRING2)) {
-						logger.trace("DEPENDENCY: " + curDependencyTo);
+						if (logger.isTraceEnabled()) {
+							logger.trace("DEPENDENCY: " + curDependencyTo);
+						}
 						while (curDependencyTo.startsWith(STRING2)) {
 							curDependencyTo = curDependencyTo.substring(1);
 						}
@@ -250,10 +259,12 @@ public class DescIndexData {
 								fileName = fileName.substring(0, fileName.lastIndexOf('.'));
 								for (final String constant : ownConstants.get(i2)) {
 									if (constant.equals(curDependencyTo)) {
-										logger.trace("checked " + fileIntPathList.get(i).getKey().getName()
-												+ " with dependency " + curDependencyTo + " and " + constant + " i=" + i
-												+ " j=" + j + " i2=" + i2);
-										logger.trace("fileIntPathList:" + fileIntPathList);
+										if (logger.isTraceEnabled()) {
+											logger.trace("checked " + fileIntPathList.get(i).getKey().getName()
+													+ " with dependency " + curDependencyTo + " and " + constant + " i="
+													+ i + " j=" + j + " i2=" + i2);
+											logger.trace("fileIntPathList:" + fileIntPathList);
+										}
 										// i's needs to be inserted after i2
 										dependencies.remove(i);
 										fileIntPathList.remove(i);
@@ -261,14 +272,18 @@ public class DescIndexData {
 										dependencies.add(i, curLayoutDepList);
 										fileIntPathList.add(i, pair);
 										constantDefinedBefore = true;
-										logger.trace("inserted " + fileIntPathList.get(i).getKey().getName() + " after "
-												+ fileName);
-										logger.trace("fileIntPathList: " + fileIntPathList);
+										if (logger.isTraceEnabled()) {
+											logger.trace("inserted " + fileIntPathList.get(i).getKey().getName()
+													+ " after " + fileName);
+											logger.trace("fileIntPathList: " + fileIntPathList);
+										}
 										break y;
 									} else {
-										logger.trace("checked " + fileIntPathList.get(i).getKey().getName()
-												+ " with dependency " + curDependencyTo + " and " + constant + " i=" + i
-												+ " j=" + j + " i2=" + i2);
+										if (logger.isTraceEnabled()) {
+											logger.trace("checked " + fileIntPathList.get(i).getKey().getName()
+													+ " with dependency " + curDependencyTo + " and " + constant + " i="
+													+ i + " j=" + j + " i2=" + i2);
+										}
 									}
 								}
 							}
@@ -285,7 +300,9 @@ public class DescIndexData {
 		// change order according to templates
 		insertOccurred = true;
 		for (int counter = 0; insertOccurred && counter < Math.pow(fileIntPathList.size(), 4); counter++) {
-			logger.trace("counter=" + counter);
+			if (logger.isTraceEnabled()) {
+				logger.trace("counter=" + counter);
+			}
 			insertOccurred = false;
 			x: for (int i = 0; i < dependencies.size(); i++) {
 				
@@ -304,10 +321,12 @@ public class DescIndexData {
 							fileName = fileName.substring(0, fileName.lastIndexOf('.'));
 							
 							if (fileName.equals(curDependencyTo)) {
-								logger.trace("checked " + fileIntPathList.get(i).getKey().getName()
-										+ " with dependency " + curDependencyTo + " and " + fileName + " i=" + i + " j="
-										+ j + " i2=" + i2);
-								logger.trace("fileIntPathList:" + fileIntPathList);
+								if (logger.isTraceEnabled()) {
+									logger.trace("checked " + fileIntPathList.get(i).getKey().getName()
+											+ " with dependency " + curDependencyTo + " and " + fileName + " i=" + i
+											+ " j=" + j + " i2=" + i2);
+									logger.trace("fileIntPathList:" + fileIntPathList);
+								}
 								// i's needs to be inserted after i2
 								dependencies.remove(i);
 								fileIntPathList.remove(i);
@@ -315,14 +334,18 @@ public class DescIndexData {
 								dependencies.add(i, curLayoutDepList);
 								fileIntPathList.add(i, pair);
 								insertOccurred = true;
-								logger.trace(
-										"inserted " + fileIntPathList.get(i).getKey().getName() + " after " + fileName);
-								logger.trace("fileIntPathList: " + fileIntPathList);
+								if (logger.isTraceEnabled()) {
+									logger.trace("inserted " + fileIntPathList.get(i).getKey().getName() + " after "
+											+ fileName);
+									logger.trace("fileIntPathList: " + fileIntPathList);
+								}
 								break x;
 							} else {
-								logger.trace("checked " + fileIntPathList.get(i).getKey().getName()
-										+ " with dependency " + curDependencyTo + " and " + fileName + " i=" + i + " j="
-										+ j + " i2=" + i2);
+								if (logger.isTraceEnabled()) {
+									logger.trace("checked " + fileIntPathList.get(i).getKey().getName()
+											+ " with dependency " + curDependencyTo + " and " + fileName + " i=" + i
+											+ " j=" + j + " i2=" + i2);
+								}
 							}
 						}
 						

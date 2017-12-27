@@ -58,7 +58,7 @@ public final class XmlCompressor {
 			throws ParserConfigurationException, SAXException, IOException {
 		
 		logger.info("Compressing XML files...");
-		logger.trace("cachePath: " + cachePath);
+		logger.trace("cachePath: {}", () -> cachePath);
 		
 		final File cache = new File(cachePath);
 		final boolean recursive = true;
@@ -79,7 +79,7 @@ public final class XmlCompressor {
 				continue x;
 			}
 			
-			logger.trace("compression - processing file: " + curFile.getPath());
+			logger.trace("compression - processing file: {}", () -> curFile.getPath());
 			
 			// process all nodes
 			final NodeList nodes = doc.getElementsByTagName(ANY_TAGNAME);

@@ -81,8 +81,8 @@ public final class Messages {
 	 */
 	public static boolean checkIfTargetResourceIsUsed(final Locale locale) {
 		final boolean result = resourceBundle.equals(ResourceBundle.getBundle(BUNDLE_NAME, locale));
-		logger.trace("compare used locale's resource '" + usedLocale + "' with one for locale '" + locale
-				+ "', result: " + result);
+		logger.trace("compare used locale's resource '{}' with one for locale '{}', result: {}", () -> usedLocale,
+				() -> locale, () -> result);
 		return result;
 	}
 }

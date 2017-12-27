@@ -43,7 +43,7 @@ public final class ComponentsListReader {
 	public static String getDescIndexPath(final File f, final GameDef game)
 			throws ParserConfigurationException, SAXException, IOException {
 		final String str = game.getBaseDataFolderName() + File.separator + getComponentsListValue(f, "uiui");
-		logger.trace("DescIndexPath: " + str);
+		logger.trace("DescIndexPath: {}", () -> str);
 		return str;
 	}
 	

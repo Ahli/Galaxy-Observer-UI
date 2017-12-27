@@ -72,7 +72,7 @@ public class XmlParserDom extends XmlParserAbstract {
 	
 	@Override
 	public void parseFile(final File f) throws IOException {
-		logger.trace("parsing layout file: " + f.getName());
+		logger.trace("parsing layout file: {}", () -> f.getName());
 		try {
 			final NodeList elements = dBuilder.parse(f).getElementsByTagName(ANY_TAG);
 			Node node;

@@ -47,7 +47,7 @@ public final class DescIndexReader {
 		final ArrayList<String> list = new ArrayList<>();
 		
 		final DocumentBuilder dBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-		logger.trace("reading layouts from descIndexFile: " + f);
+		logger.trace("reading layouts from descIndexFile: {}", () -> f);
 		final Document doc = dBuilder.parse(f);
 		
 		// must be in a DataComponent node
@@ -64,7 +64,7 @@ public final class DescIndexReader {
 				}
 				
 				list.add(path);
-				logger.trace("Adding layout path to layoutPathList: " + path);
+				logger.trace("Adding layout path to layoutPathList: {}", () -> path);
 			}
 		}
 		return list;

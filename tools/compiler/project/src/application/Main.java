@@ -13,6 +13,7 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -119,16 +120,9 @@ public final class Main extends Application {
 		logger.error("error log visible"); //$NON-NLS-1$
 		logger.fatal("fatal log visible"); //$NON-NLS-1$
 		
-		logger.trace("Configuration File of System: " + System.getProperty("log4j.configurationFile")); //$NON-NLS-1$ //$NON-NLS-2$
+		logger.trace("Configuration File of System: {}", () -> System.getProperty("log4j.configurationFile")); //$NON-NLS-1$ //$NON-NLS-2$
 		logger.info("Launch arguments: " + Arrays.toString(args)); //$NON-NLS-1$
 		logger.info("Max Heap Space: " + Runtime.getRuntime().maxMemory() / 1048576L + "mb.");
-		
-		// try {
-		// Thread.sleep(5000);
-		// } catch (final InterruptedException e) {
-		// // TODO Auto-generated catch block
-		// e.printStackTrace();
-		// }
 		
 		launch(args);
 	}
@@ -161,6 +155,43 @@ public final class Main extends Application {
 	}
 	
 	/**
+	 * Worker Thread Factory for the Thread Pool.
+	 * 
+	 * @author Ahli
+	 */
+	private static final class MyThreadFactory implements ThreadFactory {
+		@Override
+		public Thread newThread(final Runnable runnable) {
+			final Thread t = new Thread(runnable);
+			t.setPriority(Thread.NORM_PRIORITY);
+			return t;
+		}
+	}
+	
+	private static final class MyThreadPoolExecutor extends ThreadPoolExecutor {
+		
+		public MyThreadPoolExecutor(final int arg0, final int arg1, final long arg2, final TimeUnit arg3,
+				final BlockingQueue<Runnable> arg4, final ThreadFactory arg5) {
+			super(arg0, arg1, arg2, arg3, arg4, arg5);
+		}
+		
+		@Override
+		protected void beforeExecute(final Thread t, final Runnable r) {
+			super.beforeExecute(t, r);
+			// altering the thread name allows the logger to use the correct controller
+			// -> log message is always put into the correct ID
+			t.setName(t.getId() + "_" + r.hashCode());
+		}
+		
+		@Override
+		protected void afterExecute(final Runnable r, final Throwable t) {
+			super.afterExecute(r, t);
+			StylizedTextAreaAppender.finishedWork(Thread.currentThread().getName());
+		}
+		
+	};
+	
+	/**
 	 * Initializes the ThreadPool.
 	 */
 	private void initThreadPool() {
@@ -179,31 +210,8 @@ public final class Main extends Application {
 		// durations/thread# for my 4cpu/8threads: 16, 13, 12, 12, 12,... 12
 		
 		final int maxThreads = Math.max(1, Math.min(numberOfProcessors / 2, 1));
-		executor = new ThreadPoolExecutor(maxThreads, maxThreads, 5000, TimeUnit.MILLISECONDS,
-				new LinkedBlockingQueue<Runnable>(), new ThreadFactory() {
-					@Override
-					public Thread newThread(final Runnable runnable) {
-						final Thread t = new Thread(runnable);
-						t.setPriority(Thread.NORM_PRIORITY);
-						return t;
-					}
-				}) {
-					
-			@Override
-			protected void beforeExecute(final Thread t, final Runnable r) {
-				super.beforeExecute(t, r);
-				// altering the thread name allows the logger to use the correct controller
-				// -> log message is always put into the correct ID
-				t.setName(t.getId() + "_" + r.hashCode());
-			}
-			
-			@Override
-			protected void afterExecute(final Runnable r, final Throwable t) {
-				super.afterExecute(r, t);
-				StylizedTextAreaAppender.finishedWork(Thread.currentThread().getName());
-			}
-			
-		};
+		executor = new MyThreadPoolExecutor(maxThreads, maxThreads, 5000L, TimeUnit.MILLISECONDS,
+				new LinkedBlockingQueue<Runnable>(), new MyThreadFactory());
 		executor.allowCoreThreadTimeOut(true);
 	}
 	
@@ -232,11 +240,12 @@ public final class Main extends Application {
 					Thread.currentThread().setName("Supervisor"); //$NON-NLS-1$
 					Thread.currentThread().setPriority(Thread.MIN_PRIORITY);
 					final ThreadPoolExecutor executor = getExecutor();
-					final String path = hasParamCompilePath ? paramCompilePath : basePath.getAbsolutePath();
+					final String path = isHasParamCompilePath() ? getParamCompilePath()
+							: getBasePath().getAbsolutePath();
 					
-					final boolean workHeroes = pathContainsCompileableForGame(path, gameHeroes);
+					final boolean workHeroes = pathContainsCompileableForGame(path, getGameHeroes());
 					if (workHeroes) {
-						startWorkOnGame(gameHeroes, path);
+						startWorkOnGame(getGameHeroes(), path);
 					}
 					
 					// wait until all UIs were build to save baseUI memory
@@ -245,9 +254,9 @@ public final class Main extends Application {
 					}
 					gameHeroes = null;
 					
-					final boolean workSC2 = pathContainsCompileableForGame(path, gameSC2);
+					final boolean workSC2 = pathContainsCompileableForGame(path, getGameSC2());
 					if (workSC2) {
-						startWorkOnGame(gameSC2, path);
+						startWorkOnGame(getGameSC2(), path);
 					}
 					
 					while (executor.getQueue().size() > 0 || executor.getActiveCount() > 0) {
@@ -266,7 +275,7 @@ public final class Main extends Application {
 						@Override
 						public void run() {
 							try {
-								errorTabControllers.get(0).setRunning(false);
+								getErrorTabControllers().get(0).setRunning(false);
 							} catch (final Throwable e) {
 								logger.fatal("FATAL ERROR: ", e);
 							}
@@ -281,6 +290,34 @@ public final class Main extends Application {
 			}
 		}.start();
 		
+	}
+	
+	/**
+	 * @return the basePath
+	 */
+	public File getBasePath() {
+		return basePath;
+	}
+	
+	/**
+	 * @return the hasParamCompilePath
+	 */
+	public boolean isHasParamCompilePath() {
+		return hasParamCompilePath;
+	}
+	
+	/**
+	 * @return the paramCompilePath
+	 */
+	public String getParamCompilePath() {
+		return paramCompilePath;
+	}
+	
+	/**
+	 * @return the errorTabControllers
+	 */
+	public List<ErrorTabPaneController> getErrorTabControllers() {
+		return errorTabControllers;
 	}
 	
 	/**
@@ -842,7 +879,7 @@ public final class Main extends Application {
 		targetPath += File.separator + gameDef.getDocumentsInterfaceSubdirectoryName();
 		
 		// do stuff
-		ModData mod = new ModData(game);
+		final ModData mod = new ModData(game);
 		mod.setSourcePath(sourceFile);
 		mod.setTargetPath(new File(targetPath));
 		
@@ -941,7 +978,7 @@ public final class Main extends Application {
 		// mod.getUi().setDevLayouts(null);
 		// mod.getUi().setBlizzOnlyTemplates(null);
 		// mod.setUi(null);
-		mod = null;
+		// mod = null;
 		
 		logger.info("Building... " + sourceFile.getName()); //$NON-NLS-1$
 		
@@ -996,18 +1033,18 @@ public final class Main extends Application {
 	 *            location
 	 */
 	private void initSettings(final SettingsIniInterface optionalSettingsToLoad) {
-		SettingsIniInterface settings = optionalSettingsToLoad;
+		SettingsIniInterface settings2 = optionalSettingsToLoad;
 		if (optionalSettingsToLoad == null) {
 			final String settingsFilePath = basePath.getParent() + File.separator + "settings.ini"; //$NON-NLS-1$
-			settings = new SettingsIniInterface(settingsFilePath);
+			settings2 = new SettingsIniInterface(settingsFilePath);
 		}
 		try {
-			settings.readSettingsFromFile();
+			settings2.readSettingsFromFile();
 		} catch (final FileNotFoundException e) {
 			logger.error("settings file could not be found", e); //$NON-NLS-1$
 			e.printStackTrace();
 		}
-		this.settings = settings;
+		settings = settings2;
 	}
 	
 	/**

@@ -4,19 +4,16 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Predicate;
 
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.w3c.dom.NamedNodeMap;
-import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
 
 import com.ahli.galaxy.parser.UICatalogParser;
 import com.ahli.galaxy.parser.XmlParser;
-import com.ahli.galaxy.parser.XmlParserVtd;
+import com.ahli.galaxy.parser.XmlParserDom;
 import com.ahli.galaxy.ui.exception.UIException;
 import com.ahli.galaxy.ui.interfaces.UICatalog;
 
@@ -110,7 +107,7 @@ public class UICatalogImpl implements UICatalog {
 	
 	private void prepareParser() {
 		if (parser == null) {
-			parser = new UICatalogParser(this, new XmlParserVtd(null));
+			parser = new UICatalogParser(this, new XmlParserDom(null));
 		}
 	}
 	
@@ -127,8 +124,8 @@ public class UICatalogImpl implements UICatalog {
 		
 		final String descIndexPath = f.getAbsolutePath();
 		final String basePath = descIndexPath.substring(0, descIndexPath.length() - f.getName().length());
-		logger.trace("descIndexPath=" + descIndexPath);
-		logger.trace("basePath=" + basePath);
+		logger.trace("descIndexPath={}", () -> descIndexPath);
+		logger.trace("basePath={}", () -> basePath);
 		
 		processLayouts(combinedList, basePath, raceId);
 		
@@ -145,14 +142,16 @@ public class UICatalogImpl implements UICatalog {
 			throws InterruptedException {
 		loop: for (final String intPath : toProcessList) {
 			final boolean isDevLayout = blizzOnlyLayouts.contains(intPath);
-			logger.trace("intPath=" + intPath);
-			logger.trace("isDevLayout=" + isDevLayout);
+			logger.trace("intPath={}", () -> intPath);
+			logger.trace("isDevLayout={}", () -> isDevLayout);
 			String basePathTemp = basePath;
 			while (!new File(basePathTemp + File.separator + intPath).exists()) {
 				final int lastIndex = basePathTemp.lastIndexOf(File.separatorChar);
 				if (lastIndex != -1) {
 					basePathTemp = basePathTemp.substring(0, basePathTemp.lastIndexOf(File.separatorChar));
-					logger.trace("basePathTemp=" + basePathTemp);
+					if (logger.isTraceEnabled()) {
+						logger.trace("basePathTemp=" + basePathTemp);
+					}
 				} else {
 					if (!isDevLayout) {
 						logger.error("ERROR: Cannot find layout file: " + intPath);
@@ -185,14 +184,18 @@ public class UICatalogImpl implements UICatalog {
 	
 	@Override
 	public void processInclude(final String path, final boolean isDevLayout, final String raceId) {
-		logger.trace("processing Include appearing within a real layout");
+		if (logger.isTraceEnabled()) {
+			logger.trace("processing Include appearing within a real layout");
+		}
 		
 		String basePathTemp = getCurBasePath();
 		while (!new File(basePathTemp + File.separator + path).exists()) {
 			final int lastIndex = basePathTemp.lastIndexOf(File.separatorChar);
 			if (lastIndex != -1) {
 				basePathTemp = basePathTemp.substring(0, basePathTemp.lastIndexOf(File.separatorChar));
-				logger.trace("basePathTemp=" + basePathTemp);
+				if (logger.isTraceEnabled()) {
+					logger.trace("basePathTemp=" + basePathTemp);
+				}
 			} else {
 				if (!isDevLayout) {
 					logger.error("ERROR: Cannot find layout file: " + path);
@@ -204,7 +207,7 @@ public class UICatalogImpl implements UICatalog {
 		}
 		// curBasePath = basePathTemp;
 		final File file = new File(basePathTemp + File.separator + path);
-		final XmlParser xmlParser = new XmlParserVtd();
+		final XmlParser xmlParser = new XmlParserDom();
 		final UICatalogParser parserTemp = new UICatalogParser(this, xmlParser);
 		try {
 			parserTemp.parseFile(file, raceId, isDevLayout);
@@ -851,55 +854,61 @@ public class UICatalogImpl implements UICatalog {
 		return template;
 	}
 	
-	/**
-	 * Set the implicit names of controllers in animations.
-	 *
-	 * @param thisElem
-	 * @throws UIException
-	 */
-	private void setImplicitControllerNames(final UIAnimation thisElem) throws UIException {
-		logger.trace("Setting implicit controller names");
-		final List<UIController> controllers = thisElem.getControllers();
-		for (final UIController contr : controllers) {
-			if (contr.getName() == null) {
-				// final String type = contr.getValues().get("type");
-				final String type = contr.getValue(TYPE_ATTR);
-				logger.trace("type = " + type);
-				contr.setName(getImplicitName(type, controllers));
-				contr.setNameIsImplicit(true);
-			}
-		}
-	}
+	// /**
+	// * Set the implicit names of controllers in animations.
+	// *
+	// * @param thisElem
+	// * @throws UIException
+	// */
+	// private void setImplicitControllerNames(final UIAnimation thisElem) throws
+	// UIException {
+	// if (logger.isTraceEnabled()) {
+	// logger.trace("Setting implicit controller names");
+	// }
+	// final List<UIController> controllers = thisElem.getControllers();
+	// for (final UIController contr : controllers) {
+	// if (contr.getName() == null) {
+	// // final String type = contr.getValues().get("type");
+	// final String type = contr.getValue(TYPE_ATTR);
+	// logger.trace("type = {}", () -> type);
+	// contr.setName(getImplicitName(type, controllers));
+	// contr.setNameIsImplicit(true);
+	// }
+	// }
+	// }
 	
-	/**
-	 * @param type
-	 * @param controllers
-	 * @return
-	 * @throws UIException
-	 */
-	private String getImplicitName(final String type, final List<UIController> controllers) throws UIException {
-		logger.trace("Constructing implicit controller name");
-		if (type == null) {
-			throw new UIException("'type=\"...\"' of Controller is not set or invalid.");
-		}
-		
-		int i = 0;
-		while (true) {
-			final String name = type + "_" + i;
-			
-			if (controllers.stream().noneMatch(new Predicate<UIController>() {
-				@Override
-				public boolean test(final UIController t) {
-					return t.getName() != null && t.getName().compareToIgnoreCase(name) == 0;
-				}
-			})) {
-				logger.trace("Constructing implicit controller name: " + name);
-				return name;
-			}
-			logger.trace("Implicit controller name existing: " + name);
-			i++;
-		}
-	}
+	// /**
+	// * @param type
+	// * @param controllers
+	// * @return
+	// * @throws UIException
+	// */
+	// private String getImplicitName(final String type, final List<UIController>
+	// controllers) throws UIException {
+	// if (logger.isTraceEnabled()) {
+	// logger.trace("Constructing implicit controller name");
+	// }
+	// if (type == null) {
+	// throw new UIException("'type=\"...\"' of Controller is not set or invalid.");
+	// }
+	//
+	// int i = 0;
+	// while (true) {
+	// final String name = type + "_" + i;
+	//
+	// if (controllers.stream().noneMatch(new Predicate<UIController>() {
+	// @Override
+	// public boolean test(final UIController t) {
+	// return t.getName() != null && t.getName().compareToIgnoreCase(name) == 0;
+	// }
+	// })) {
+	// logger.trace("Constructing implicit controller name: {}", () -> name);
+	// return name;
+	// }
+	// logger.trace("Implicit controller name existing: {}", () -> name);
+	// i++;
+	// }
+	// }
 	
 	/**
 	 * Adds a Constant to the correct list. It removes other values and loggs
@@ -1082,17 +1091,17 @@ public class UICatalogImpl implements UICatalog {
 	// return null;
 	// }
 	
-	/**
-	 * Reads a template if it is existing.
-	 *
-	 * @param attributes
-	 *            the attributes
-	 * @return template reference or null
-	 */
-	private String readTemplate(final NamedNodeMap attributes) {
-		final Node template = attributes.getNamedItem(TEMPLATE2);
-		return template != null ? template.getNodeValue() : null;
-	}
+	// /**
+	// * Reads a template if it is existing.
+	// *
+	// * @param attributes
+	// * the attributes
+	// * @return template reference or null
+	// */
+	// private String readTemplate(final NamedNodeMap attributes) {
+	// final Node template = attributes.getNamedItem(TEMPLATE2);
+	// return template != null ? template.getNodeValue() : null;
+	// }
 	
 	@Override
 	public String getConstantValue(final String constantRef, final String raceId, final boolean isDevLayout) {
@@ -1110,7 +1119,7 @@ public class UICatalogImpl implements UICatalog {
 		}
 		final String prefix = constantRef.substring(0, i);
 		final String constantName = constantRef.substring(i);
-		logger.trace("Encountered Constant: prefix='" + prefix + "', constantName='" + constantName + "'");
+		logger.trace("Encountered Constant: prefix='{}', constantName='{}'", () -> prefix, () -> constantName);
 		for (final UIConstant c : constants) {
 			if (c.getName().equalsIgnoreCase(constantName)) {
 				return c.getValue();

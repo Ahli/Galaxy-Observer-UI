@@ -32,8 +32,8 @@ public class UICatalogParser implements ParsedXmlConsumer {
 	private String raceId;
 	// private final UiTagType curType = UiTagType.invalid;
 	private final List<UIElement> curPath = new ArrayList<>();
-	private UITemplate curTemplate;
-	private boolean editingMode;
+	// private UITemplate curTemplate;
+	// private boolean editingMode;
 	private String curFileName;
 	private final List<UIState> statesToClose;
 	private final List<Integer> statesToCloseLevel;
@@ -57,7 +57,7 @@ public class UICatalogParser implements ParsedXmlConsumer {
 	@Override
 	public void parse(final int level, final String tagName, final List<String> attrTypes,
 			final List<String> attrValues) throws UIException {
-		logger.trace("level=" + level + ", tag=" + tagName);
+		logger.trace("level={}, tag={}", () -> level, () -> tagName);
 		if (tagName == null) {
 			logger.error("ERROR: tag in XML is null.");
 			return;
@@ -70,17 +70,24 @@ public class UICatalogParser implements ParsedXmlConsumer {
 			curLevel = level;
 			curElement = null;
 			// default editing mode unless the parsed aspect defines another one
-			editingMode = false;
-			logger.trace("resetting path to root");
+			// editingMode = false;
+			if (logger.isTraceEnabled()) {
+				logger.trace("resetting path to root");
+			}
 		} else {
 			while (level <= curLevel) {
 				curLevel--;
 				// curLevel - 2 because root is level 2 on list index 0
 				curElement = curPath.get(curLevel - 2);
-				logger.trace("shrinking path: curElement=" + curElement + ", level=" + curLevel);
-				logger.trace("path  pre-dropLast: " + curPath);
+				if (logger.isTraceEnabled()) {
+					logger.trace("shrinking path: curElement=" + curElement + ", level=" + curLevel);
+					logger.trace("path  pre-dropLast: " + curPath);
+				}
 				curPath.remove(curPath.size() - 1);
-				logger.trace("path afterDropLast: " + curPath);
+				
+				if (logger.isTraceEnabled()) {
+					logger.trace("path afterDropLast: " + curPath);
+				}
 			}
 		}
 		
@@ -105,7 +112,7 @@ public class UICatalogParser implements ParsedXmlConsumer {
 		// contain file=, e.g. for cutscene frames)
 		if ((i = attrTypes.indexOf("file")) != -1 && !tagName.equals("key") && !tagName.equals("action")) {
 			if (level == 2) {
-				editingMode = true;
+				// editingMode = true;
 				// TODO edit existing template
 				// curTemplate = getUITemplateOfPath
 			} else {
@@ -250,10 +257,15 @@ public class UICatalogParser implements ParsedXmlConsumer {
 		// register template
 		if (level == 2) {
 			if (newElem != null) {
-				logger.trace("adding new template: " + curFileName + " with " + newElem.getName());
-				curTemplate = catalog.addTemplate(curFileName, newElem, curIsDevLayout);
+				if (logger.isTraceEnabled()) {
+					logger.trace("adding new template: " + curFileName + " with " + newElem.getName());
+				}
+				// curTemplate =
+				catalog.addTemplate(curFileName, newElem, curIsDevLayout);
 			} else {
-				logger.trace("skipped creating a template because newElem was null. curFileName: " + curFileName);
+				if (logger.isTraceEnabled()) {
+					logger.trace("skipped creating a template because newElem was null. curFileName: " + curFileName);
+				}
 			}
 		}
 		
@@ -343,7 +355,9 @@ public class UICatalogParser implements ParsedXmlConsumer {
 			return null;
 		}
 		
-		logger.trace("Instanciating Template of path " + path);
+		if (logger.isTraceEnabled()) {
+			logger.trace("Instanciating Template of path " + path);
+		}
 		path = path.replace('\\', '/');
 		final String fileName = path.substring(0, path.indexOf('/'));
 		
