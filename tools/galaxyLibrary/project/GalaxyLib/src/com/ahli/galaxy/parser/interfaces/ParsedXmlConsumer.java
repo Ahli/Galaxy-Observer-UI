@@ -1,4 +1,4 @@
-package com.ahli.galaxy.parser;
+package com.ahli.galaxy.parser.interfaces;
 
 import java.util.List;
 

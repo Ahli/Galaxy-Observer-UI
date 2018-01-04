@@ -46,9 +46,8 @@ public class CompileManager {
 			// startTime = System.currentTimeMillis();
 			
 			// manage descIndexData
-			// TODO re-enable when improved memory+performance
-			// final DescIndexData descIndex = mod.getDescIndexData();
-			// manageOrderOfLayoutFiles(descIndex);
+			final DescIndexData descIndex = mod.getDescIndexData();
+			manageOrderOfLayoutFiles(descIndex);
 			
 			// executionTime = (System.currentTimeMillis() - startTime);
 			// logger.info("DescIndex management took " + executionTime + "ms.");

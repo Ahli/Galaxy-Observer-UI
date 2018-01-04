@@ -9,6 +9,8 @@ import java.util.List;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import com.ahli.galaxy.parser.abstracts.XmlParserAbstract;
+import com.ahli.galaxy.parser.interfaces.ParsedXmlConsumer;
 import com.ahli.galaxy.ui.exception.UIException;
 import com.ximpleware.AutoPilot;
 import com.ximpleware.NavException;

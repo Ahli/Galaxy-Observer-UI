@@ -4,10 +4,13 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Predicate;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import com.ahli.galaxy.parser.interfaces.ParsedXmlConsumer;
+import com.ahli.galaxy.parser.interfaces.XmlParser;
 import com.ahli.galaxy.ui.UIAnchorSide;
 import com.ahli.galaxy.ui.UIAnimation;
 import com.ahli.galaxy.ui.UIAttribute;
@@ -22,6 +25,8 @@ import com.ahli.galaxy.ui.exception.UIException;
 import com.ahli.galaxy.ui.interfaces.UICatalog;
 
 public class UICatalogParser implements ParsedXmlConsumer {
+	private static final String TYPE = "type";
+	
 	private static final Logger logger = LogManager.getLogger();
 	
 	private final UICatalog catalog;
@@ -137,7 +142,7 @@ public class UICatalogParser implements ParsedXmlConsumer {
 				if (newElem == null) {
 					newElem = new UIFrame(name);
 				}
-				final String type = ((i = attrTypes.indexOf("type")) != -1)
+				final String type = ((i = attrTypes.indexOf(TYPE)) != -1)
 						? catalog.getConstantValue(attrValues.get(i), raceId, curIsDevLayout)
 						: null;
 				if (!checkFrameTypeCompatibility(type, ((UIFrame) newElem).getType())) {
@@ -182,6 +187,14 @@ public class UICatalogParser implements ParsedXmlConsumer {
 				if (curElement != null) {
 					if (curElement instanceof UIAnimation) {
 						((UIAnimation) curElement).getControllers().add((UIController) newElem);
+						
+						for (int j = 0, len = attrValues.size(); j < len; j++) {
+							((UIController) newElem).addValue(attrTypes.get(j), attrValues.get(j));
+						}
+						
+						if (name == null) {
+							setImplicitControllerNames((UIAnimation) curElement);
+						}
 					} else {
 						logger.error("Controller appearing in unexpected parent element: " + curElement);
 					}
@@ -348,7 +361,6 @@ public class UICatalogParser implements ParsedXmlConsumer {
 	/**
 	 * @param template
 	 * @return Template instance
-	 * @throws UIException
 	 */
 	private UIElement instanciateTemplate(String path, final String newName) {
 		if (path == null) {
@@ -414,4 +426,55 @@ public class UICatalogParser implements ParsedXmlConsumer {
 		return null;
 	}
 	
+	/**
+	 * Set the implicit names of controllers in animations.
+	 *
+	 * @param thisElem
+	 */
+	private void setImplicitControllerNames(final UIAnimation thisElem) {
+		if (logger.isTraceEnabled()) {
+			logger.trace("Setting implicit controller names for UIAnimation " + thisElem.getName());
+		}
+		final List<UIController> controllers = thisElem.getControllers();
+		for (final UIController contr : controllers) {
+			if (contr.getName() == null) {
+				final String type = contr.getValue(TYPE);
+				logger.trace("type = {}", () -> type);
+				contr.setName(getImplicitName(type, controllers));
+				contr.setNameIsImplicit(true);
+			}
+		}
+	}
+	
+	/**
+	 * @param type
+	 * @param controllers
+	 * @return
+	 */
+	private String getImplicitName(final String type, final List<UIController> controllers) {
+		if (logger.isTraceEnabled()) {
+			logger.trace("Constructing implicit controller name");
+		}
+		if (type == null) {
+			logger.error("'type=\"...\"' of Controller is not set or invalid.");
+			return "";
+		}
+		
+		int i = 0;
+		while (true) {
+			final String name = type + "_" + i;
+			
+			if (controllers.stream().noneMatch(new Predicate<UIController>() {
+				@Override
+				public boolean test(final UIController t) {
+					return t.getName() != null && t.getName().compareToIgnoreCase(name) == 0;
+				}
+			})) {
+				logger.trace("Constructing implicit controller name: {}", () -> name);
+				return name;
+			}
+			logger.trace("Implicit controller name existing: {}", () -> name);
+			i++;
+		}
+	}
 }

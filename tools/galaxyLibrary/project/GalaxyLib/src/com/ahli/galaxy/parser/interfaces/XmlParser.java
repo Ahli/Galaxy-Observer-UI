@@ -1,7 +1,9 @@
-package com.ahli.galaxy.parser;
+package com.ahli.galaxy.parser.interfaces;
 
 import java.io.File;
 import java.io.IOException;
+
+import com.ahli.galaxy.parser.interfaces.ParsedXmlConsumer;
 
 /**
  * Interface for Parser
