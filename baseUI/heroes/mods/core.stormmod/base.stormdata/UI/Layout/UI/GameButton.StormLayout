@@ -11,36 +11,64 @@
             <Anchor side="Bottom" relative="$parent" pos="Max" offset="-10"/>
             <Anchor side="Left" relative="$parent" pos="Min" offset="10"/>
             <Anchor side="Right" relative="$parent" pos="Max" offset="-10"/>
-            <Unclipped val="False"/>
+
             <DesaturationColor val="#DesaturationColor"/>
             <OnDisableDesaturationColor val="#DesaturationColor"/>
             <DisabledAlpha val="255"/>
             <ImageMaskTexture val="@UI/HUD_BTN_BG_Ability_AlphaMask"/>
-            <LayerCount val="4"/>
+
+            <LayerCount val="1"/>
 
             <!-- Layer 0 used for icon -->
             <TextureType val="Normal" layer="0"/>
 
-            <!-- Layer 1 used for cooldown -->
-            <Texture val="@UI/HUD_BTN_Ability_Cooldown_Anim" layer="1"/>
-            <TextureCoords top="0.0" left="0.0" bottom="0.2" right="0.1" layer="1"/>
-            <Animating val="True" layer="1"/>
-            <ManagedAnim val="False" layer="1"/>
-            <AnimColumns val="10" layer="1"/>
-            <AnimCount val="50" layer="1"/>
-            <LayerVisible val="False" layer="1" />
-          
-            <Texture val="@UI/HUD_BTN_Ability_Cooldown_Charge_Anim" layer="2"/>
-            <TextureCoords top="0.0" left="0.0" bottom="0.2" right="0.1" layer="2"/>
-            <Animating val="True" layer="2"/>
-            <ManagedAnim val="False" layer="2"/>
-            <AnimColumns val="10" layer="2"/>
-            <AnimCount val="50" layer="2"/>
-            <LayerVisible val="False" layer="2" />
-            
-            <Texture val="@UI/Storm_UI_Blank" layer="3"/>
-
             <RenderPriority val="500"/>
+        </Frame>
+
+        <Frame type="ProgressBar" name="CooldownProgress">
+            <Anchor side="Top" relative="$parent/NormalImage" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent/NormalImage" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent/NormalImage" pos="Max" offset="0"/>
+            <Anchor side="Bottom" relative="$parent/NormalImage" pos="Max" offset="0"/>
+            <RenderPriority val="502"/>
+            <Visible val="{$parent/@MaxCooldownValue}"/>
+            <Alpha val="220"/>
+
+            <MinValue val="0"/>
+            <MaxValue val="{$parent/@MaxCooldownValue}"/>
+            <Value val="{$parent/@CurrentCooldownValue}"/>
+            <Circular val="true"/>
+            <CircularStart val="0"/>
+            <CircularEndOffset val="360"/>
+            <FillInset val="0.0"/>
+
+            <Frame type="Frame" name="FillImageContainer">
+                <Anchor relative="$parent"/>
+
+                <Frame type="Image" name="FillImage">
+                    <Anchor relative="$parent"/>
+                    <RenderPriority val="502"/>
+
+                    <LayerCount val="2"/>
+                    <LayerColor val="000000" layer="0"/>
+                    <TextureType val="None" layer="0"/>
+
+                    <Texture val="@UI/Storm_UI_GenFX_BallAlpha" layer="1"/>
+                    <TextureType val="Circular" layer="1"/>
+                    <TextureCoords top=".05" bottom=".95" left =".05" right=".95"/>
+                    <LayerColor val="00BBFF" layer="1"/>
+
+                    <ImageMaskTexture val="{$parent/$parent/$parent/NormalImage/@ImageMaskTexture}"/>
+                </Frame>
+            </Frame>
+
+            <Frame type="Image" name="EndCapImage">
+                <Anchor relative="$parent"/>
+                <RenderPriority val="503"/>
+
+                <Texture val="@UI/HUD_BTN_Ability_Cooldown_Endcap" layer="0"/>
+                <LayerColor val="00BBFF" layer="0"/>
+            </Frame>
         </Frame>
         
         <Frame type="Image" name="GameButtonDefaultBorder">
@@ -49,8 +77,8 @@
             <Anchor side="Left" relative="$parent/NormalImage" pos="Mid" offset="0"/>
             <Anchor side="Right" relative="$parent/NormalImage" pos="Mid" offset="0"/>
             <Texture val="@UI/Storm_UI_InGame_AbilityButtonBorder"/>
-            <RenderPriority val="502"/>
-            <Unclipped val="False"/>
+            <RenderPriority val="504"/>
+
             <DesaturateOnDisable val="True"/>
             <DesaturationColor val="#DesaturationColor"/>
             <OnDisableDesaturationColor val="#DesaturationColor"/>
@@ -59,8 +87,8 @@
         <Frame type="Image" name="GameButtonDefaultHoverBorder">
             <Anchor relative="$parent/GameButtonDefaultBorder"/>
             <Texture val="@UI/Storm_UI_InGame_AbilityButtonBorder_Hover"/>
-            <RenderPriority val="503"/>
-            <Unclipped val="False"/>
+            <RenderPriority val="505"/>
+
             <Alpha val="0"/>
             <DesaturationColor val="#DesaturationColor"/>
             <OnDisableDesaturationColor val="#DesaturationColor"/>
@@ -70,29 +98,6 @@
                 <Controller type="Fade" end="Pause">
                     <Key type="Curve" time="0" value="0" inout="Linear"/>
                     <Key type="Curve" time=".2" value="255" inout="Slow,Linear"/>
-                </Controller>
-            </Animation>
-        </Frame>
-
-        <Frame type="Image" name="HighlightBorder">
-            <Anchor side="Top" relative="$parent/NormalImage" pos="Mid" offset="-5"/>
-            <Anchor side="Bottom" relative="$parent/NormalImage" pos="Mid" offset="5"/>
-            <Anchor side="Left" relative="$parent/NormalImage" pos="Mid" offset="-5"/>
-            <Anchor side="Right" relative="$parent/NormalImage" pos="Mid" offset="5"/>
-            <Texture val="@UI/Storm_UI_InGame_AbilityButton_Activate_Add"/>
-            <Color val="100,255,200"/>
-            <DesaturationColor val="#DesaturationColor"/>
-            <OnDisableDesaturationColor val="#DesaturationColor"/>
-            <RenderPriority val="503"/>
-            <Alpha val="0"/>
-            <BlendMode val="Add"/>
-            <Animation name="HighlightState">
-                <Event event="HighlightOn" action="Restart,Play" frame="$parent"/>
-                <Event event="HighlightOff" action="Stop" frame="$parent"/>
-                <Controller type="Fade" end="Loop">
-                    <Key type="Curve" time="0" value="255" inout="Linear,Slow"/>
-                    <Key type="Curve" time=".5" value="0" inout="Linear"/>
-                    <Key type="Curve" time="1" value="255" inout="Slow,Linear"/>
                 </Controller>
             </Animation>
         </Frame>
@@ -419,6 +424,8 @@
             <Anchor side="Right" relative="$parent/ChargeBackground" pos="Mid" offset="-1"/>
             <Width val="64"/>
             <Height val="64"/>
+            <Visible val="True"/>
+
             <Circular val="true"/>
             <CircularStart val="0"/>
             <CircularEndOffset val="360"/>
@@ -438,7 +445,6 @@
 
                 <Frame type="Image" name="FillImage">
                     <Anchor relative="$parent"/>
-                    <Unclipped val="True"/>
                     <LayerCount val="1"/>
                     <BlendMode val="Add"/>
 
@@ -475,18 +481,5 @@
                 <Options val="NoWrapping | ScaleToPreventTruncation"/>
             </Frame>
         </Frame>
-
-        <StateGroup name="HighlightState">
-            <DefaultState val="Unlit"/>
-
-            <State name="Lit">
-                <When type="Property" frame="$this" Highlighted="true"/>
-                <Action type="SendEvent" frame="$this" event="HighlightOn"/>
-            </State>
-            <State name="Unlit">
-                <When type="Property" frame="$this" Highlighted="false"/>
-                <Action type="SendEvent" frame="$this" event="HighlightOff"/>
-            </State>
-        </StateGroup>
     </Frame>
 </Desc>
