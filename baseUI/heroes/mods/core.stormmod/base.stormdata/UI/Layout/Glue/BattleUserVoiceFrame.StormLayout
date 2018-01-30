@@ -1,552 +1,210 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <Desc>
-    <DescFlags val="Locked"/>
-
-    <Constant name="VoiceChatColor_Default" val="7975E7"/>
-    <Constant name="VoiceChatColor_Party" val="9E7FFF"/>
-    <Constant name="VoiceChatColor_Team" val="028CF7"/>
-    <Constant name="VoiceChatColor_Lobby" val="7BE1F8"/>
-    <Constant name="VoiceChatColor_Invalid" val="FF2D50"/>
-    <Constant name="VoiceChatColor_Inactive" val="777777"/>
-    <Constant name="VoiceChatColor_Muted" val="FE3356"/>
-
-    <!-- Voice frame template: mouse hover, channel colorization -->
-    <Frame type="BattleUserVoiceFrame" name="BattleUserVoiceFrame_Generic_Template">
-        <AcceptsMouse val="True"/>
-        <PreferBattleTag val="True"/>
-
-        <Frame type="Image" name="BackgroundImage">
-            <LightAdjustColor val="30ffffff"/>
-            <ColorAdjustMode val="None"/>
-            <Animation name="HoverAnim">
-                <Event event="OnMouseEnter" frame="$parent" action="Reset,Play"/>
-                <Event event="OnMouseExit" frame="$parent" action="Stop"/>
-
-                <Controller type="Property" property="ColorAdjustMode" end="Pause">
-                    <Key type="Property" time="0" value="AddSelf"/>
-                </Controller>
-            </Animation>
-        </Frame>
-
-        <StateGroup name="ColorStates">
-            <State name="Inactive">
-                <When type="Property" IsActive="False"/>
-            </State>
-            <State name="MutedForMe">
-                <When type="Property" IsMutedForMe="True"/>
-            </State>
-            <State name="MutedForAll">
-                <When type="Property" IsMutedForAll="True"/>
-            </State>
-            <State name="MicMuted">
-                <When type="Property" IsLocalUser="True"/>
-                <When type="Property" frame="$VoiceChatUI" IsActiveMicMuted="True"/>
-            </State>
-            <State name="Team">
-                <When type="Property" ChannelType="Team"/>
-                <Action type="SetProperty" frame="BackgroundImage" Color="#VoiceChatColor_Team"/>
-            </State>
-            <State name="Party">
-                <When type="Property" ChannelType="Party"/>
-                <Action type="SetProperty" frame="BackgroundImage" Color="#VoiceChatColor_Party"/>
-            </State>
-        </StateGroup>
+  <DescFlags val="Locked" />
+  <Constant name="VoiceChatColor_Default" val="43366D" />
+  <Constant name="VoiceChatColor_Party" val="9E7FFF" />
+  <Constant name="VoiceChatColor_Team" val="028CF7" />
+  <Frame type="BattleUserVoiceFrame" name="BattleUserVoiceFrame_Speaker_Template">
+    <Height val="32" />
+    <Width val="32" />
+    <AcceptsMouse val="True" />
+    <PreferBattleTag val="True" />
+    <Visible val="{$this/@IsActive}" />
+    <ChannelType val="{$VoiceChatUI/@ActiveChannelType}" />
+    <ContextMenuButtons val="Left" />
+    <Frame type="Image" name="Icon">
+      <Anchor relative="$parent" />
+      <LightAdjustColor val="30ffffff" />
+      <ColorAdjustMode val="None" />
+      <Animation name="HoverAnim">
+        <Event event="OnMouseEnter" frame="$parent" action="Reset,Play" />
+        <Event event="OnMouseExit" frame="$parent" action="Stop" />
+        <Controller type="Property" property="ColorAdjustMode" end="Pause">
+          <Key type="Property" time="0" value="AddSelf" />
+        </Controller>
+      </Animation>
     </Frame>
-    
-    <!-- Voice frame template: top-right menu widget button and progress bar -->
-    <Frame type="BattleUserVoiceFrame" name="BattleUserVoiceFrame_PlayerMenu_Template" template="BattleUserVoiceFrame/BattleUserVoiceFrame_Generic_Template">
-        <Height val="280"/>
-        <Width val="400"/>
-        <AcceptsMouse val="False"/>
-
-        <Frame type="Frame" name="ButtonAnchorFrame">
-            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
-            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
-            <Width val="56"/>
-            <Height val="56"/>
+    <Frame type="ProgressBar" name="SpeakerPowerBar">
+      <Anchor relative="$parent" />
+      <AcceptsMouse val="False" />
+      <MinValue val="0" />
+      <MaxValue val=".67" />
+      <Value val="{$ancestor[@type=BattleUserVoiceFrame]/@SpeakingEnergy}" />
+      <UseFillContainer val="True" />
+      <Frame type="Frame" name="FillImageContainer">
+        <Anchor side="Bottom" relative="$parent" pos="Max" offset="0" />
+        <Anchor side="Left" relative="$parent" pos="Min" offset="0" />
+        <Height val="32" />
+        <Width val="32" />
+        <Frame type="Image" name="FillImage_Other">
+          <Anchor relative="$parent/$parent" />
+          <Visible val="false" />
+          <Texture val="@UI/VoiceChat_Voice_Party_Energy" />
+          <TextureCoords top="0" bottom="1" left=".61" right=".82" />
         </Frame>
-
-        <!-- Border -->
-        <Frame type="Button" name="BackgroundButton">
-            <Anchor relative="$parent/ButtonAnchorFrame"/>
-            <RenderPriority val="511"/>
-            <Toggleable val="True"/>
-            <DisplayType val="ImageLayer"/>
-            <HitTestFrame val="HitTestFrame"/>
-            <ClickSound val="@UI_BNet_Generic_01"/>
-
-            <Frame type="Image" name="NormalImage">
-                <Anchor relative="$parent"/>
-                <Texture val="@UI/VoiceChat_Voice_Menu_Background"/>
-            </Frame>
-
-            <Frame type="Image" name="HoverImage" template="BattleUserVoiceFrame/BattleUserVoiceFrame_PlayerMenu_Template/BackgroundButton/NormalImage">
-                <ColorAdjustMode val="AddSelf"/>
-                <AdjustmentColor val="44ffffff"/>
-            </Frame>
-
-            <Frame type="Frame" name="HitTestFrame">
-                <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
-                <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
-                <Width val="42"/>
-                <Height val="43"/>
-            </Frame>
+        <Frame type="Image" name="FillImage_Self">
+          <Anchor relative="$parent/$parent" />
+          <Visible val="false" />
+          <Texture val="@UI/VoiceChat_Voice_Player_Energy" />
+          <TextureCoords top=".27" bottom=".555" left="0" right="1" />
         </Frame>
-
-        <!-- Headset icon -->
-        <!-- Binding background normal/hover properties to button art -->
-        <Frame type="Image" name="BackgroundImage">
-            <Anchor side="Top" relative="$parent/ButtonAnchorFrame" pos="Mid" offset="-6"/>
-            <Anchor side="Bottom" relative="$parent/ButtonAnchorFrame" pos="Mid" offset="-6"/>
-            <Anchor side="Left" relative="$parent/ButtonAnchorFrame" pos="Mid" offset="8"/>
-            <Anchor side="Right" relative="$parent/ButtonAnchorFrame" pos="Mid" offset="8"/>
-            <Width val="56"/>
-            <Height val="56"/>
-
-            <Texture val="@UI/VoiceChat_Voice_Menu_Enabled"/>
-
-            <Animation name="ScaleWhenClicked">
-                <Event event="OnMouseDown" action="DirectionForward,Play" frame="$parent/BackgroundButton"/>
-                <Event event="OnMouseUp" action="DirectionReverse,Play" frame="$parent/BackgroundButton"/>
-                <Event event="OnMouseExit" action="DirectionReverse,Play" frame="$parent/BackgroundButton"/>
-
-                <Controller type="Dimension" dimension="Height" percentage="True" end="Pause" unclip="True">
-                    <Key type="Curve" time="0" value="100" inout="Linear"/>
-                    <Key type="Curve" time=".05" value="94" inout="Linear"/>
-                </Controller>
-                <Controller type="Dimension" dimension="Width" percentage="True" end="Pause" unclip="True">
-                    <Key type="Curve" time="0" value="100" inout="Linear"/>
-                    <Key type="Curve" time=".05" value="94" inout="Linear"/>
-                </Controller>
-            </Animation>
-
-            <Visible val="{$parent/BackgroundButton/NormalImage/@Visible}"/>
-            <Color val="888888"/>
-        </Frame>
-        <Frame type="Image" name="BackgroundImageHover" template="BattleUserVoiceFrame/BattleUserVoiceFrame_PlayerMenu_Template/BackgroundImage">
-            <ColorAdjustMode val="{$parent/BackgroundButton/HoverImage/@ColorAdjustMode}"/>
-            <AdjustmentColor val="{$parent/BackgroundButton/HoverImage/@AdjustmentColor}"/>
-            <Visible val="{$parent/BackgroundButton/HoverImage/@Visible}"/>
-            <Alpha val="{$parent/BackgroundButton/HoverImage/@Alpha}"/>
-            <Color val="{$parent/BackgroundImage/@Color}"/>
-        </Frame>
-
-        <!-- Voice energy progress bar -->
-        <Frame type="ProgressBar" name="SpeakerPowerBar">
-            <Anchor side="Top" relative="$parent/BackgroundImage" pos=".34" offset="0"/>
-            <Anchor side="Bottom" relative="$parent/BackgroundImage" pos=".6" offset="0"/>
-            <Anchor side="Left" relative="$parent/BackgroundImage" pos="Min" offset="0"/>
-            <Anchor side="Right" relative="$parent/BackgroundImage" pos="Max" offset="0"/>
-            <Visible val="{$parent/@IsActive}"/>
-            <AcceptsMouse val="False"/>
-
-            <MinValue val="0"/>
-            <MaxValue val="0.67"/>
-            <Value val="{$ancestor[@type=BattleUserVoiceFrame]/@SpeakingEnergy}"/>
-            <UseFillContainer val="True"/>
-            <Vertical val="True"/>
-
-            <Frame type="Frame" name="FillImageContainer">
-                <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
-                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
-                <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
-
-                <Frame type="Image" name="FillImage">
-                    <Anchor relative="$parent/$parent"/>
-                    <Texture val="@UI/VoiceChat_Voice_Menu_Energy"/>
-                    <TextureCoords top=".34" bottom=".6" left="0" right="1"/>
-                </Frame>
-            </Frame>
-        </Frame>
-
-        <!-- Channel switch confirmation dialog -->
-        <Frame type="Frame" name="ChannelSwitchConfirmationDialog" template="StandardTemplates/InfoPanelTemplate">
-            <Anchor side="Top" relative="$parent/BackgroundButton" pos="Max" offset="-10"/>
-            <Anchor side="Right" relative="$parent/BackgroundButton" pos="Max" offset="-5"/>
-            <Height val="174"/>
-            <Width val="370"/>
-
-            <Frame type="Button" name="CloseButton">
-                <Visible val="False"/>
-            </Frame>
-
-            <!-- Text -->
-            <Frame type="Label" name="TitleLabel">
-                <Text val="{TextFormatter/@Text}"/>
-
-                <Frame type="TextFormatFrame" name="TextFormatter">
-                    <Anchor relative="$parent"/>
-                    <FormatText val="@UI/VoiceAutoJoinNotificationTitle"/>    
-                    <Replacement val="#VoiceChatColor_Default" index="0"/>
-                    <Replacement val="[CHANNEL]" index="1"/>
-                </Frame>
-                
-                <StateGroup name="ChannelStates">
-                    <DefaultState val="None"/>
-                    <State name="Team">
-                        <When type="Property" frame="$VoiceChatUI" PendingChannelType="Team"/>
-                        <When type="Property" frame="$VoiceChatUI" IsInMicTestMode="false"/>
-                        <Action type="SetProperty" frame="TextFormatter" Replacement="#VoiceChatColor_Team" index="0"/>
-                        <Action type="SetProperty" frame="TextFormatter" Replacement="@UI/VoiceAutoJoinTeam" index="1"/>
-                    </State>
-                    <State name="Party">
-                        <When type="Property" frame="$VoiceChatUI" PendingChannelType="Party"/>
-                        <When type="Property" frame="$VoiceChatUI" IsInMicTestMode="false"/>
-                        <Action type="SetProperty" frame="TextFormatter" Replacement="#VoiceChatColor_Party" index="0"/>
-                        <Action type="SetProperty" frame="TextFormatter" Replacement="@UI/VoiceAutoJoinParty" index="1"/>
-                    </State>
-                    <State name="None">
-                        <Action type="SetProperty" frame="$parent" Visible="false"/>
-                        <Action type="SetProperty" frame="$parent" Enabled="false"/>
-                        <Action type="SendEvent" frame="$parent" Event="OnAutoJoin" on="Exit"/>
-                    </State>
-                </StateGroup>
-            </Frame>
-            <Frame type="Label" name="DescriptionLabel">
-                <Text val="{TextFormatter/@Text}"/>
-
-                <Frame type="TextFormatFrame" name="TextFormatter">
-                    <Anchor relative="$parent"/>
-                    <FormatText val="@UI/VoiceAutoJoinNotificationDescription"/>
-                    <Replacement val="#VoiceChatColor_Default" index="0"/>
-                    <Replacement val="[CHANNEL]" index="1"/>
-                </Frame>
-                
-                <StateGroup name="ChannelStates">
-                    <State name="Team">
-                        <When type="Property" frame="$VoiceChatUI" ActiveChannelType="Team"/>
-                        <Action type="SetProperty" frame="TextFormatter" Replacement="#VoiceChatColor_Team" index="0"/>
-                        <Action type="SetProperty" frame="TextFormatter" Replacement="@UI/VoiceAutoJoinTeam" index="1"/>
-                    </State>
-                    <State name="Party">
-                        <When type="Property" frame="$VoiceChatUI" ActiveChannelType="Party"/>
-                        <Action type="SetProperty" frame="TextFormatter" Replacement="#VoiceChatColor_Party" index="0"/>
-                        <Action type="SetProperty" frame="TextFormatter" Replacement="@UI/VoiceAutoJoinParty" index="1"/>
-                    </State>
-                </StateGroup>
-            </Frame>
-
-            <!-- Text -->
-            <Frame type="Button" name="OkButton" template="StandardTemplates/StandardButtonMiniTemplate">
-                <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
-                <Anchor side="Left" relative="$parent" pos="0" offset="0"/>
-                <Anchor side="Right" relative="$parent" pos=".54" offset="0"/>
-                <Width val="0"/>
-                <Height val="80"/>
-                <Text val="@UI/VoiceAutoJoinNotificationJoin"/>
-
-                <Frame type="Label" name="Label">
-                    <Style val="StandardGlueButtonMiniUppercase"/>
-                </Frame>
-
-                <Animation name="Confirm">
-                    <Event event="OnClick" action="Play"/>
-                    <Controller type="Event" frame="$VoiceChatUI" end="Stop">
-                        <Key type="Event" time="0.0" event="AcceptAutoJoin"/>
-                    </Controller>
-                </Animation>
-            </Frame>
-            <Frame type="Button" name="CancelButton" template="StandardTemplates/StandardButtonMiniTemplate">
-                <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
-                <Anchor side="Left" relative="$parent" pos=".46" offset="0"/>
-                <Anchor side="Right" relative="$parent" pos="1" offset="0"/>
-                <Width val="0"/>
-                <Height val="80"/>
-                <Text val="{CountDown/@Text}"/>
-
-                <Frame type="Label" name="Label">
-                    <Style val="StandardGlueButtonMiniUppercase"/>
-                </Frame>
-
-                <Frame type="TimeFormatFrame" name="CountDown">
-                    <Anchor relative="$parent"/>
-                    <Time val="{$this/@Alpha}"/>
-                    <FormatText val="@UI/VoiceAutoJoinNotificationCancelTimeout"/>
-
-                    <Animation name="TimeOut">
-                        <Event event="OnAutoJoin" frame="$parent/$parent" action="Restart"/>
-                        <Event event="OnShown" frame="$parent/$parent" action="Play"/>
-
-                        <Controller type="Fade" end="Pause">
-                            <Key type="Curve" time="0" value="30" inout="Linear"/>
-                            <Key type="Curve" time="30" value="0" inout="Linear"/>
-                        </Controller>
-                        <Controller type="Event" frame="$VoiceChatUI" end="Stop">
-                            <Key type="Event" time="30" event="CancelAutoJoin"/>
-                        </Controller>
-                    </Animation>
-                </Frame>
-
-                <Animation name="Cancel">
-                    <Event event="OnClick" action="Play"/>
-                    <Controller type="Event" frame="$VoiceChatUI" end="Stop">
-                        <Key type="Event" time="0.0" event="CancelAutoJoin"/>
-                    </Controller>
-                </Animation>
-            </Frame>
-        </Frame>
-
-        <StateGroup name="ChannelSelectorVisibilityStates">
-            <State name="ButtonUntoggled">
-                <When type="Property" frame="BackgroundButton" Toggled="False"/>
-                <Action type="SendEvent" frame="ChannelSelector" event="Hide"/>
-            </State>
-            <State name="ButtonToggled">
-                <When type="Property" frame="BackgroundButton" Toggled="True"/>
-                <Action type="SendEvent" frame="ChannelSelector" event="Show"/>
-            </State>
-        </StateGroup>
-
-        <Animation name="ToggleOnHide">
-            <Event event="OnHidden" action="Reset,Play"/>
-
-            <Controller type="Property" property="Toggled" end="Pause" frame="BackgroundButton">
-                <Key type="Property" time="0" value="False"/>
-            </Controller>
+      </Frame>
+      <StateGroup name="PlayerType">
+        <DefaultState val="Other" />
+        <State name="Self">
+          <When type="Property" frame="$parent" IsLocalUser="True" />
+          <When type="Property" frame="FillImageContainer/FillImage_Self" enabled="True" />
+          <Action type="SetProperty" Vertical="True" />
+          <Action type="SetAnchor" side="Top" relative="$parent" pos=".27" offset="0" />
+          <Action type="SetAnchor" side="Bottom" relative="$parent" pos=".555" offset="0" />
+          <Action type="SetProperty" frame="FillImageContainer" Width="{$ancestor[@type=BattleUserVoiceFrame]/@Width}" />
+          <Action type="SetProperty" frame="FillImageContainer/FillImage_Self" Visible="True" />
+        </State>
+        <State name="Other">
+          <Action type="SetProperty" Vertical="False" />
+          <Action type="SetAnchor" side="Left" relative="$parent" pos=".61" offset="0" />
+          <Action type="SetAnchor" side="Right" relative="$parent" pos=".82" offset="0" />
+          <Action type="SetProperty" frame="FillImageContainer" Height="{$ancestor[@type=BattleUserVoiceFrame]/@Height}" />
+          <Action type="SetProperty" frame="FillImageContainer/FillImage_Other" Visible="True" />
+        </State>
+      </StateGroup>
+    </Frame>
+    <StateGroup name="ParentalControls">
+      <DefaultState val="None" />
+      <State name="None">
+        <Action type="SetProperty" Tooltip="" />
+      </State>
+      <State name="Disabled">
+        <When type="Property" frame="$VoiceChatUI" ParentalControlAccess="NotAllowed" />
+        <Action type="SetProperty" Tooltip="@UI/VoiceChat/ParentalDisabled" />
+      </State>
+      <State name="ListenOnly">
+        <When type="Property" frame="$VoiceChatUI" ParentalControlAccess="ListenOnly" />
+        <Action type="SetProperty" Tooltip="@UI/VoiceChat/ParentalListenOnly" />
+      </State>
+    </StateGroup>
+    <StateGroup name="IconTexture">
+      <State name="Blocked">
+        <When type="Property" IsBlocked="true" />
+        <Action type="SetProperty" frame="Icon" texture="@UI/VoiceChat_Voice_Party_Muted" />
+        <Action type="SetProperty" Tooltip="@UI/PlayerBlockFrame/Blocked" />
+      </State>
+      <State name="Self">
+        <When type="StateGroup" Muted="NotMuted" />
+        <When type="Property" IsLocalUser="True" />
+        <When type="Property" frame="SpeakerPowerBar/FillImageContainer/FillImage_Self" enabled="True" />
+        <Action type="SetProperty" frame="Icon" Texture="@UI/VoiceChat_Voice_Player" />
+      </State>
+      <State name="Other">
+        <When type="StateGroup" Muted="NotMuted" />
+        <Action type="SetProperty" frame="Icon" Texture="@UI/VoiceChat_Voice_Party" />
+      </State>
+      <State name="SelfMuted">
+        <When type="StateGroup" Muted="MutedSelf" />
+        <Action type="SetProperty" frame="Icon" Texture="@UI/VoiceChat_Voice_Player_Muted" />
+      </State>
+      <State name="OtherMuted">
+        <When type="StateGroup" Muted="NotMuted" operator="NotEqual" />
+        <Action type="SetProperty" frame="Icon" texture="@UI/VoiceChat_Voice_Party_Muted" />
+      </State>
+    </StateGroup>
+    <StateGroup name="ColorStates">
+      <State name="Inactive">
+        <When type="Property" IsActive="False" />
+      </State>
+      <State name="Team">
+        <When type="Property" ChannelType="Team" />
+        <Action type="SetProperty" frame="Icon" Color="#VoiceChatColor_Team" />
+      </State>
+      <State name="Party">
+        <When type="Property" ChannelType="Party" />
+        <Action type="SetProperty" frame="Icon" Color="#VoiceChatColor_Party" />
+      </State>
+    </StateGroup>
+    <StateGroup name="Muted">
+      <DefaultState val="NotMuted" />
+      <State name="NotMuted" />
+      <State name="MutedSelf">
+        <When type="StateGroup" frame="SpeakerPowerBar" PlayerType="Self" />
+        <When type="Property" frame="$VoiceChatUI" IsActiveMicMuted="True" />
+        <Action type="SetProperty" frame="SpeakerPowerBar" visible="False" />
+      </State>
+      <State name="MutedForMe">
+        <When type="Property" IsMutedForMe="True" />
+        <Action type="SetProperty" frame="SpeakerPowerBar" visible="False" />
+      </State>
+      <State name="MutedForAll">
+        <When type="Property" IsMutedForAll="True" />
+        <Action type="SetProperty" frame="SpeakerPowerBar" visible="False" />
+      </State>
+    </StateGroup>
+  </Frame>
+  <Frame type="BattleUserVoiceFrame" name="BattleUserVoiceFrame_AdjustableSpeaker_Template">
+    <Height val="60" />
+    <Width val="40" />
+    <Visible val="{$this/@IsActive}" />
+    <ChannelType val="{$VoiceChatUI/@ActiveChannelType}" />
+    <AcceptsMouse val="False" />
+    <ContextMenuButtons val="Left" />
+    <Frame type="Image" name="BackgroundImage">
+      <Anchor relative="$parent" />
+      <Texture val="@UI/VoiceChat_Voice_ContextBase" />
+    </Frame>
+    <Frame type="Image" name="Arrow">
+      <Anchor side="Left" relative="$parent" pos="Mid" offset="0" />
+      <Anchor side="Right" relative="$parent" pos="Mid" offset="0" />
+      <Anchor side="Bottom" relative="$parent" pos="Max" offset="-1" />
+      <Width val="24" />
+      <Height val="24" />
+      <Texture val="@UI/VoiceChat_Voice_ContextArrow" />
+      <Color val="{$parent/SpeakingIndicator/Icon/@Color}" />
+      <Frame type="Image" name="HoverGlow">
+        <Anchor relative="$parent" />
+        <Texture val="@UI/VoiceChat_Voice_ContextArrow_Glow" />
+        <BlendMode val="Add" />
+        <Color val="{$parent/@Color}" />
+        <Alpha val="0" />
+        <Animation name="HoverAnim">
+          <Event event="OnMouseEnter" frame="$parent/$parent/ContextMenuButton" action="Play" />
+          <Event event="OnMouseExit" frame="$parent/$parent/ContextMenuButton" action="Stop" />
+          <Controller type="Fade" end="Pause">
+            <Key type="Curve" time="0" value="196" />
+          </Controller>
         </Animation>
-
-        <StateGroup name="ColorStates">
-            <!-- default is 0x888888 -->
-            <State name="Team">
-                <Action type="SetProperty" frame="BackgroundImage" Color="#VoiceChatColor_Team"/>
-            </State>
-            <State name="Party">
-                <Action type="SetProperty" frame="BackgroundImage" Color="#VoiceChatColor_Party"/>
-            </State>
-        </StateGroup>
+      </Frame>
     </Frame>
-
-    <!-- Voice frame template: player's speaking indicator -->
-    <Frame type="BattleUserVoiceFrame" name="BattleUserVoiceFrame_Speaker_Template" template="BattleUserVoiceFrame/BattleUserVoiceFrame_Generic_Template">
-        <Height val="32"/>
-        <Width val="32"/>
-        <Visible val="{$this/@IsActive}"/>
-        <ChannelType val="{$VoiceChatUI/@ActiveChannelType}"/>
-
-        <StateGroup name="ParentalType">
-            <DefaultState val="None"/>
-
-            <State name="None">
-                <Action type="SetProperty" Tooltip=""/>
-            </State>
-
-            <State name="Disabled">
-                <When type="Property" frame="$VoiceChatUI" ParentalControlAccess="NotAllowed"/>
-                <Action type="SetProperty" Tooltip="@UI/VoiceChat/ParentalDisabled"/>
-            </State>
-
-            <State name="ListenOnly">
-                <When type="Property" frame="$VoiceChatUI" ParentalControlAccess="ListenOnly"/>
-                <Action type="SetProperty" Tooltip="@UI/VoiceChat/ParentalListenOnly"/>
-            </State>
-        </StateGroup>
-
-        <Frame type="Image" name="BackgroundImage">
-            <Anchor relative="$parent"/>
-        </Frame>
-
-        <Frame type="ProgressBar" name="SpeakerPowerBar">
-            <Anchor relative="$parent"/>
-            <AcceptsMouse val="False"/>
-
-            <MinValue val="0"/>
-            <MaxValue val=".67"/>
-            <Value val="{$ancestor[@type=BattleUserVoiceFrame]/@SpeakingEnergy}"/>
-            <UseFillContainer val="True"/>
-
-            <Frame type="Frame" name="FillImageContainer">
-                <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
-                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
-                <Height val="32"/>
-                <Width val="32"/>
-
-                <Frame type="Image" name="FillImage_Other">
-                    <Anchor relative="$parent"/>
-                    <Visible val="false"/>
-                    <Texture val="@UI/VoiceChat_Voice_Party_Energy"/>
-                    <TextureCoords top="0" bottom="1" left=".61" right=".82"/>
-                </Frame>
-
-                <Frame type="Image" name="FillImage_Self">
-                    <Anchor relative="$parent"/>
-                    <Visible val="false"/>
-                    <Texture val="@UI/VoiceChat_Voice_Player_Energy"/>
-                    <TextureCoords top=".27" bottom=".555" left="0" right="1"/>
-                </Frame>
-            </Frame>
-        
-            <StateGroup name="PlayerType">
-                <DefaultState val="Other"/>
-                <State name="Self">
-                    <When type="Property" frame="$parent" IsLocalUser="True"/>
-                    <When type="Property" frame="FillImageContainer/FillImage_Self" enabled="True"/>
-                    <Action type="SetProperty" Vertical="True"/>
-                    <Action type="SetAnchor" side="Top" relative="$parent" pos=".27" offset="0"/>
-                    <Action type="SetAnchor" side="Bottom" relative="$parent" pos=".555" offset="0"/>
-                    <Action type="SetProperty" frame="FillImageContainer" Width="{$ancestor[@type=BattleUserVoiceFrame]/@Width}"/>
-                    <Action type="SetProperty" frame="FillImageContainer/FillImage_Self" Visible="True"/>
-                </State>
-                <State name="Other">
-                    <Action type="SetProperty" Vertical="False"/>
-                    <Action type="SetAnchor" side="Left" relative="$parent" pos=".61" offset="0"/>
-                    <Action type="SetAnchor" side="Right" relative="$parent" pos=".82" offset="0"/>
-                    <Action type="SetProperty" frame="FillImageContainer" Height="{$ancestor[@type=BattleUserVoiceFrame]/@Height}"/>
-                    <Action type="SetProperty" frame="FillImageContainer/FillImage_Other" Visible="True"/>
-                </State>
-            </StateGroup>
-        </Frame>
-
-        <StateGroup name="Muted">
-            <DefaultState val="NotMuted"/>
-            <State name="NotMuted"/>
-            <State name="MutedSelf">
-                <When type="StateGroup" frame="SpeakerPowerBar" PlayerType="Self"/>
-                <When type="Property" frame="$VoiceChatUI" IsActiveMicMuted="True"/>
-                <Action type="SetProperty" frame="SpeakerPowerBar" visible="False"/>
-            </State>
-            <State name="MutedForMe">
-                <When type="Property" IsMutedForMe="True"/>
-                <Action type="SetProperty" frame="SpeakerPowerBar" visible="False"/>
-            </State>
-            <State name="MutedForAll">
-                <When type="Property" IsMutedForAll="True"/>
-                <Action type="SetProperty" frame="SpeakerPowerBar" visible="False"/>
-            </State>
-        </StateGroup>
-
-        <StateGroup name="BackgroundImageTexture">
-            <State name="Self">
-                <When type="StateGroup" Muted="NotMuted"/>
-                <When type="Property" IsLocalUser="True"/>
-                <When type="Property" frame="SpeakerPowerBar/FillImageContainer/FillImage_Self" enabled="True"/>
-                <Action type="SetProperty" frame="BackgroundImage" Texture="@UI/VoiceChat_Voice_Player"/>
-            </State>
-            <State name="Other">
-                <When type="StateGroup" Muted="NotMuted"/>
-                <Action type="SetProperty" frame="BackgroundImage" Texture="@UI/VoiceChat_Voice_Party"/>
-            </State>
-            <State name="SelfMuted">
-                <When type="StateGroup" Muted="MutedSelf"/>
-                <Action type="SetProperty" frame="BackgroundImage" Texture="@UI/VoiceChat_Voice_Player_Muted"/>
-            </State>
-            <State name="OtherMuted">
-                <When type="StateGroup" Muted="NotMuted" operator="NotEqual"/>
-                <Action type="SetProperty" frame="BackgroundImage" texture="@UI/VoiceChat_Voice_Party_Muted"/>
-            </State>
-        </StateGroup>
+    <Frame type="Button" name="ContextMenuButton">
+      <Anchor relative="$parent" offset="0" />
     </Frame>
-
-    <!-- Voice frame template: tab panel right-side context menu button -->
-    <Frame type="BattleUserVoiceFrame" name="BattleUserVoiceFrame_ContextMenuButton_Template">
-        <Height val="36"/>
-        <Width val="36"/>
-
-        <AcceptsMouse val="True"/>
-        <ContextMenuButtons val="Right"/>
-
-        <Frame type="Image" name="BackgroundImage" template="BattleUserVoiceFrame/BattleUserVoiceFrame_Generic_Template/BackgroundImage">
-            <Anchor relative="$parent" offset="-1"/>
-            <Texture val="@UI/VoiceChat_Voice_ContextButton"/>
-        </Frame>
-
-        <!-- Only displayed when active -->
-        <Visible val="False"/>
-        <StateGroup name="VoiceChatState">
-            <DefaultState val="Hidden"/>
-            <State name="Hidden"/>
-            <State name="IsMember">
-                <When type="Property" IsMember="True"/>
-                <Action type="SetProperty" Visible="True"/>
-            </State>
-            <State name="LocalUser">
-                <When type="Property" IsLocalUser="True"/>
-                <When type="Property" frame="$VoiceChatUI" VoiceEnabled="True"/>
-                <Action type="SetProperty" Visible="True"/>
-            </State>
-        </StateGroup>
-
-        <!-- Strikethrough -->
-        <StateGroup name="Muted">
-            <DefaultState val="NotMuted"/>
-            <State name="NotMuted"/>
-            <State name="Self_MicMuted">
-                <When type="Property" IsLocalUser="True"/>
-                <When type="Property" frame="$VoiceChatUI" IsActiveMicMuted="True"/>
-                <Action type="SetProperty" frame="BackgroundImage" Texture="@UI/VoiceChat_Voice_ContextButton_Disabled"/>
-            </State>
-            <State name="Other_MutedForMe">
-                <When type="Property" IsMutedForMe="True"/>
-                <Action type="SetProperty" frame="BackgroundImage" Texture="@UI/VoiceChat_Voice_ContextButton_Disabled"/>
-            </State>
-            <State name="Other_MutedForAll">
-                <When type="Property" IsMutedForAll="True"/>
-                <Action type="SetProperty" frame="BackgroundImage" Texture="@UI/VoiceChat_Voice_ContextButton_Disabled"/>
-            </State>
-        </StateGroup>
+    <Frame type="BattleUserVoiceFrame" name="SpeakingIndicator" template="BattleUserVoiceFrame/BattleUserVoiceFrame_Speaker_Template">
+      <Anchor side="Top" relative="$parent" pos="Min" offset="0" />
+      <Anchor side="Left" relative="$parent" pos="Mid" offset="0" />
+      <Anchor side="Right" relative="$parent" pos="Mid" offset="0" />
+      <Width val="44" />
+      <Height val="44" />
+      <Visible val="True" />
+      <PresenceId val="{$parent/@PresenceId}" />
+      <ChannelType val="{$parent/@ChannelType}" />
+      <ContextMenuButtons val="" />
     </Frame>
-
-    <Frame type="BattleUserVoiceFrame" name="BattleUserVoiceFrame_AdjustableSpeaker_Template">
-        <Height val="60"/>
-        <Width val="40"/>
-        <Visible val="{$this/@IsActive}"/>
-        <ChannelType val="{$VoiceChatUI/@ActiveChannelType}"/>
-        <AcceptsMouse val="true"/>
-        <ContextMenuButtons val="Left"/>
-        
-        <Frame type="Image" name="BackgroundImage">
-            <Anchor relative="$parent"/>
-            <Texture val="@UI/VoiceChat_Voice_ContextBase"/>
-        </Frame>
-
-        <Frame type="BattleUserVoiceFrame" name="SpeakingIndicator" template="BattleUserVoiceFrame/BattleUserVoiceFrame_Speaker_Template">
-            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
-            <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
-            <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
-            <Width val="44"/>
-            <Height val="44"/>
-            <Visible val="true"/>
-            <PresenceId val="{$parent/@PresenceId}"/>
-            <ChannelType val="{$parent/@ChannelType}"/>
-            <ContextMenuButtons val=""/>
-        </Frame>
-
-        <Frame type="Image" name="Arrow">
-            <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
-            <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
-            <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
-            <Width val="24"/>
-            <Height val="24"/>
-            
-            <Texture val="@UI/VoiceChat_Voice_ContextArrow"/>
-            <AcceptsMouse val="true"/>
-            
-            <Frame type="Image" name="HoverImage">
-                <Anchor relative="$parent"/>
-                <Texture val="@UI/VoiceChat_Voice_ContextArrow_Glow"/>
-                <Alpha val="0"/>
-                <ColorAdjustMode val="AddSelf"/>
-                <AdjustmentColor val="{$parent/@Color}"/>
-            </Frame>
-
-            <Animation name="HoverAnim">
-                <Event event="OnMouseEnter" frame="$this" action="Play"/>
-                <Event event="OnMouseExit" frame="$this" action="Stop"/>
-            
-                <Controller type="Fade" frame="HoverImage" end="Pause">
-                    <Key type="Curve" time="0" value="255"/>
-                </Controller>
-            </Animation>
-        
-            <StateGroup name="MuteState">
-                <DefaultState val="Muted"/>
-                <State name="Unmuted">
-                    <When type="StateGroup" frame="$parent/SpeakingIndicator" Muted="NotMuted"/>
-                    <Action type="SetProperty" frame="$this" Color="{$parent/SpeakingIndicator/BackgroundImage/@Color}"/>
-                </State>
-                <State name="Muted">
-                    <Action type="SetProperty" frame="$this" Color="#VoiceChatColor_Muted"/>
-                </State>
-            </StateGroup>
-        </Frame>
+  </Frame>
+  <Frame type="BattleUserVoiceFrame" name="BattleUserVoiceFrame_Rejoin_Template">
+    <Visible val="{$this/@IsActive}" />
+    <ChannelType val="{$VoiceChatUI/@ActiveChannelType}" />
+    <AcceptsMouse val="False" />
+    <ContextMenuButtons val="Left" />
+    <Frame type="Button" name="ContextMenuButton">
+      <Anchor relative="$parent" />
     </Frame>
+    <Frame type="BattleUserVoiceFrame" name="SpeakingIndicator" template="BattleUserVoiceFrame/BattleUserVoiceFrame_Speaker_Template">
+      <Anchor side="Top" relative="$parent" pos="Mid" offset="0" />
+      <Anchor side="Left" relative="$parent" pos="Mid" offset="0" />
+      <Height val="48" />
+      <Width val="48" />
+      <Visible val="True" />
+      <PresenceId val="{$parent/@PresenceId}" />
+      <ChannelType val="{$parent/@ChannelType}" />
+      <ContextMenuButtons val="" />
+    </Frame>
+  </Frame>
 </Desc>

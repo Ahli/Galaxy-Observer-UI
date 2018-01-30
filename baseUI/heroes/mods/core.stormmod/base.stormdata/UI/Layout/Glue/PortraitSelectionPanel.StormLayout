@@ -1,573 +1,478 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <Desc>
-    <DescFlags val="Locked"/>
-
-    <!--===============================================================================================
-    <! Constants
-    <!==============================================================================================-->
-    <Constant name="CollectionCategoryNormalLeftOffset" val="-890"/>
-    <Constant name="CollectionCategory4x3LeftOffset" val="-785"/>
-    <Constant name="CollectionTileListLeftMidOffset" val="-847"/>
-
-    <!--===============================================================================================
-    <! Templates
-    <!==============================================================================================-->
-
-    <!-- Category templates -->
-    <Frame type="UnlockableCategoryTileListItem" name="UnlockableCategoryTileListItemTemplate">
-        <AcceptsMouse val="True"/>
-        <SelectedSound val="@UI_BNet_Generic_01"/>
-        <Width val="261"/>
-        <Height val="75"/>
-
-        <Frame type="Frame" name="TooltipAnchorFrame">
-            <Anchor relative="$parent"/>
-            <Tooltip val="{$parent/TooltipFormatFrame/@Text}"/>
-            <TooltipAnchorPosition val="MiddleRight"/>
-            <TooltipDelayed val="true"/>
-            <AcceptsMouseTooltip val="true"/>
-        </Frame>
-
-        <Frame type="Image" name="NormalImage">
-            <Anchor relative="$parent"/>
-            <Texture val="@UI/Storm_UI_LeftNav_Button_Dimmed"/>
-        </Frame>
-
-        <Frame type="Image" name="SelectedImage">
-            <Anchor relative="$parent"/>
-            <Texture val="@UI/Storm_UI_LeftNav_Button_Selected"/>
-        </Frame>
-
-        <Frame type="Image" name="HoverImage">
-            <Anchor relative="$parent"/>
-            <Texture val="@UI/Storm_UI_LeftNav_Button_Hover"/>
-        </Frame>
-
-        <Frame type="ProgressBar" name="OwnershipProgressBar">
-            <Anchor side="Top" relative="$parent" pos="Min" offset="15"/>
-            <Anchor side="Left" relative="$parent" pos="Min" offset="15"/>
-            <Anchor side="Right" relative="$parent" pos="Max" offset="-13"/>
-            <Anchor side="Bottom" relative="$parent" pos="Max" offset="-15"/>
-
-            <AcceptsMouse val="False"/>
-            <MinValue val="0"/>
-            <MaxValue val="{$parent/@Total}"/>
-            <Value val="{$parent/@Owned}"/>
-
-            <Frame type="Frame" name="FillImageContainer">
-                <Anchor relative="$parent"/>
-
-                <Frame type="Image" name="FillImage">
-                    <Anchor relative="$parent"/>
-                    <Texture val="@UI/Storm_UI_LeftNav_Button_Progress"/>
-                </Frame>
-            </Frame>
-        </Frame>
-
-        <Frame type="Image" name="AllOwnedFrame">
-            <Anchor side="Top" relative="$parent" pos="Min" offset="-9"/>
-            <Anchor side="Left" relative="$parent" pos="Min" offset="-10"/>
-            <Anchor side="Right" relative="$parent" pos="Max" offset="11"/>
-            <Anchor side="Bottom" relative="$parent" pos="Max" offset="9"/>
-            <SubpixelRendering val="true"/>
-            <Visible val="false"/>
-
-            <LayerCount val="2"/>
-            <Texture val="@UI/Storm_UI_ProfileDialog_BorderGlow_Mask" layer="0"/>
-            <TextureCoords top=".25" left=".25" right=".75" bottom=".75"/>
-            <AlphaLayer val="true" layer="0"/>
-            <Texture val="@UI/Storm_UI_GenFX_3pxBorderGlow" layer="1"/>
-            <TextureType val="Nineslice" layer="1"/>
-            <BlendMode val="Add" layer="1"/>
-            <ColorAdjustMode val="Colorize" layer="1"/>
-            <LightAdjustColor val="4a9fff" layer="1"/>
-            <DarkAdjustColor val="8400ff" layer="1"/>
-
-            <Animation name="ShineAnim">
-                <Event event="OnShown" action="DirectionForward, Play"/>
-
-                <Controller type="LayerUV" side="Left" layer="0" sidelock="true" end="Loop">
-                    <Key type="Curve" time="0" value="1"/>
-                    <Key type="Curve" time="8" value="-1"/>
-                </Controller>
-            </Animation>
-
-            <StateGroup name="VisibilityStates">
-                <State name="AllOwned">
-                    <When type="Property" frame="$parent/OwnershipProgressBar" ProgressPercent="1.0"/>
-                    <Action type="SetProperty" Visible="true"/>
-                </State>
-            </StateGroup>
-        </Frame>
-
-        <Frame type="Label" name="CategoryLabel">
-            <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
-            <Anchor side="Left" relative="$parent" pos="Min" offset="20"/>
-            <Anchor side="Right" relative="$parent" pos="Max" offset="-12"/>
-            <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
-            <Options val="NoWrapping | ScaleToPreventTruncation"/>
-            <Style val="StoreSkinHeroListButtonLabel"/>
-            <Text val="{$parent/@CollectionCategory[Name]}"/>
-        </Frame>
-
-        <Frame type="TextFormatFrame" name="CountTextFormatFrame">
-            <Anchor relative="$parent"/>
-            <FormatText val="@UI/Collection/Category/Count"/>
-            <Replacement val="{$parent/@Owned}" index="0"/>
-            <Replacement val="{$parent/@Total}" index="1"/>
-        </Frame>
-
-        <Frame type="TextFormatFrame" name="TooltipFormatFrame">
-            <Anchor relative="$parent"/>
-            <FormatText val="@UI/Store/DescriptionFormat/OwnedTotal"/>
-            <Replacement val="{$parent/CountTextFormatFrame/@Text}"/>
-        </Frame>
-
-        <Frame type="Frame" name="HitTestFrame">
-            <Anchor side="Top" relative="$parent" pos="Min" offset="5"/>
-            <Anchor side="Left" relative="$parent" pos="Min" offset="13"/>
-            <Anchor side="Right" relative="$parent" pos="Max" offset="-13"/>
-            <Anchor side="Bottom" relative="$parent" pos="Max" offset="-5"/>
-        </Frame>
-
-        <Frame type="Image" name="NewItemNotificationBox" template="StandardTemplates/ItemNotificationBoxTemplate">
-            <Anchor side="Top" relative="$parent" pos="Min" offset="12"/>
-            <Anchor side="Left" relative="$parent" pos="Max" offset="-42"/>
-            <Tooltip val="{TooltipTextFormatFrame/@Text}"/>
-            <Visible val="false"/>
-
-            <Frame type="Label" name="ItemQuantityLabel">
-                <Text val="{$parent/$parent/@UnseenItemsCount}"/>
-            </Frame>
-
-            <Frame type="TextFormatFrame" name="TooltipTextFormatFrame">
-                <Anchor relative="$parent"/>
-                <FormatText val="@UI/ScreenNavigation/StoreButtonCountTooltip"/>
-                <Replacement val="{$parent/ItemQuantityLabel/@Text}"/>
-            </Frame>
-
-            <StateGroup name="VisibilityStates">
-                <State name="HasUnseenItems">
-                    <When type="Property" frame="$parent" operator="NotEqual" UnseenItemsCount="0"/>
-                    <Action type="SetProperty" Visible="true"/>
-                </State>
-            </StateGroup>
-        </Frame>
-
-        <StateGroup name="FontStates">
-            <State name="NonHovered">
-                <When type="Property" hovered="False"/>
-                <When type="Property" selected="False"/>
-                <Action type="SetProperty" frame="CategoryLabel" style="StoreSkinHeroListButtonLabel"/>
-            </State>
-            <State name="Hovered">
-                <When type="Property" hovered="True"/>
-                <When type="Property" selected="False"/>
-                <Action type="SetProperty" frame="CategoryLabel" style="StoreSkinHeroListButtonSelectedLabel"/>
-            </State>
-            <State name="Toggled">
-                <When type="Property" selected="True"/>
-                <Action type="SetProperty" frame="CategoryLabel" style="StoreSkinHeroListButtonSelectedLabel"/>
-            </State>
-        </StateGroup>
+  <DescFlags val="Locked" />
+  <Constant name="CollectionCategoryNormalLeftOffset" val="-890" />
+  <Constant name="CollectionCategory4x3LeftOffset" val="-785" />
+  <Constant name="CollectionTileListLeftMidOffset" val="-847" />
+  <Frame type="UnlockableCategoryTileListItem" name="UnlockableCategoryTileListItemTemplate">
+    <AcceptsMouse val="True" />
+    <SelectedSound val="@UI_BNet_Generic_01" />
+    <Width val="261" />
+    <Height val="75" />
+    <Frame type="Frame" name="TooltipAnchorFrame">
+      <Anchor relative="$parent" />
+      <Tooltip val="{$parent/TooltipFormatFrame/@Text}" />
+      <TooltipAnchorPosition val="MiddleRight" />
+      <TooltipDelayed val="true" />
+      <AcceptsMouseTooltip val="true" />
     </Frame>
-
-    <Frame type="UnlockableCategoryTileList" name="UnlockableCategoryTileListTemplate">
-        <ReportsStats val="true"/>
-        <AcceptsMouse val="True"/>
-        <RenderPriority val="601"/>
-        <ScrollStepValue val="1"/>
-        <MaxItemPerPage val="8"/>
-        <SelectedIndex val="0"/>
-        <RequireSelection val="true"/>
-
-        <Frame type="ScrollBar" name="ScrollBar" template="StandardTemplates/WideScrollableBarTemplate">
-            <Anchor side="Top" relative="$parent" pos="Min" offset="5"/>
-            <Anchor side="Right" relative="$parent/Item0" pos="Max" offset="21"/>
-            <Anchor side="Bottom" relative="$parent" pos="Max" offset="-5"/>
-            <IncrementSound val=""/>
-        </Frame>
-
-        <Frame type="UnlockableCategoryTileListItem" name="Item0" template="PortraitSelectionPanel/UnlockableCategoryTileListItemTemplate">
-            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
-            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
-        </Frame>
-
-        <Frame type="UnlockableCategoryTileListItem" name="Item1" template="PortraitSelectionPanel/UnlockableCategoryTileListItemTemplate">
-            <Anchor side="Top" relative="$parent/Item0" pos="Max" offset="#CollectionCategoryTileListItemSpacing"/>
-            <Anchor side="Left" relative="$parent/Item0" pos="Min" offset="0"/>
-        </Frame>
-
-        <Frame type="UnlockableCategoryTileListItem" name="Item2" template="PortraitSelectionPanel/UnlockableCategoryTileListItemTemplate">
-            <Anchor side="Top" relative="$parent/Item1" pos="Max" offset="#CollectionCategoryTileListItemSpacing"/>
-            <Anchor side="Left" relative="$parent/Item0" pos="Min" offset="0"/>
-        </Frame>
-
-        <Frame type="UnlockableCategoryTileListItem" name="Item3" template="PortraitSelectionPanel/UnlockableCategoryTileListItemTemplate">
-            <Anchor side="Top" relative="$parent/Item2" pos="Max" offset="#CollectionCategoryTileListItemSpacing"/>
-            <Anchor side="Left" relative="$parent/Item0" pos="Min" offset="0"/>
-        </Frame>
-
-        <Frame type="UnlockableCategoryTileListItem" name="Item4" template="PortraitSelectionPanel/UnlockableCategoryTileListItemTemplate">
-            <Anchor side="Top" relative="$parent/Item3" pos="Max" offset="#CollectionCategoryTileListItemSpacing"/>
-            <Anchor side="Left" relative="$parent/Item0" pos="Min" offset="0"/>
-        </Frame>
-
-        <Frame type="UnlockableCategoryTileListItem" name="Item5" template="PortraitSelectionPanel/UnlockableCategoryTileListItemTemplate">
-            <Anchor side="Top" relative="$parent/Item4" pos="Max" offset="#CollectionCategoryTileListItemSpacing"/>
-            <Anchor side="Left" relative="$parent/Item0" pos="Min" offset="0"/>
-        </Frame>
-
-        <Frame type="UnlockableCategoryTileListItem" name="Item6" template="PortraitSelectionPanel/UnlockableCategoryTileListItemTemplate">
-            <Anchor side="Top" relative="$parent/Item5" pos="Max" offset="#CollectionCategoryTileListItemSpacing"/>
-            <Anchor side="Left" relative="$parent/Item0" pos="Min" offset="0"/>
-        </Frame>
-
-        <Frame type="UnlockableCategoryTileListItem" name="Item7" template="PortraitSelectionPanel/UnlockableCategoryTileListItemTemplate">
-            <Anchor side="Top" relative="$parent/Item6" pos="Max" offset="#CollectionCategoryTileListItemSpacing"/>
-            <Anchor side="Left" relative="$parent/Item0" pos="Min" offset="0"/>
-        </Frame>
-
-        <Frame type="UnlockableCategoryTileListItem" name="Item8" template="PortraitSelectionPanel/UnlockableCategoryTileListItemTemplate">
-            <Anchor side="Top" relative="$parent/Item7" pos="Max" offset="#CollectionCategoryTileListItemSpacing"/>
-            <Anchor side="Left" relative="$parent/Item0" pos="Min" offset="0"/>
-        </Frame>
-
-        <Frame type="UnlockableCategoryTileListItem" name="Item9" template="PortraitSelectionPanel/UnlockableCategoryTileListItemTemplate">
-            <Anchor side="Top" relative="$parent/Item8" pos="Max" offset="#CollectionCategoryTileListItemSpacing"/>
-            <Anchor side="Left" relative="$parent/Item0" pos="Min" offset="0"/>
-        </Frame>
+    <Frame type="Image" name="NormalImage">
+      <Anchor relative="$parent" />
+      <Texture val="@UI/Storm_UI_LeftNav_Button_Dimmed" />
     </Frame>
-
-    <!-- Portrait Border Selection List Item Template-->
-    <Frame type="UnlockableTileListItem" name="PortraitBorderListItemTemplate">
-        <AcceptsMouse val="true"/>
-        <Width val="85"/>
-        <Height val="85"/>
-        <SelectedSound val="@UI_BNet_ShopTileSelect"/>
-
-        <Frame type="RewardCacheFrame" name="RewardCacheFrame">
-            <Anchor relative="$parent"/>
-            <PresenceId val="{$BattleUI/@LocalToonPresenceId}"/>
-            <UnlockableTag val="{$parent/UnlockableFrame/@UnlockableTag}"/>
-            <UnlockableIndex val="{$parent/UnlockableFrame/@UnlockableIndex}"/>
-        </Frame>
-
-        <Frame type="UnlockableFrame" name="UnlockableFrame" template="StandardTemplates/UnlockableFrameTemplate">
-            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
-            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
-            <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
-            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
-            <Width val="0"/>
-            <Height val="0"/>
-
-            <Frame type="Image" name="UnlockableImage">
-                <Visible val="false"/>
-            </Frame>
-
-            <Frame type="AvatarFrame" name="AvatarFrame" template="AvatarFrameTemplates/AvatarStateTemplate_Friend">
-                <Anchor side="Top" relative="$parent/Background" pos="Mid" offset="0"/>
-                <Anchor side="Bottom" relative="$parent/Background" pos="Mid" offset="0"/>
-                <Anchor side="Left" relative="$parent/Background" pos="Mid" offset="0"/>
-                <Anchor side="Right" relative="$parent/Background" pos="Mid" offset="0"/>
-
-                <Animation name="Hover">
-                    <Event event="OnMouseEnter" action="DirectionForward,Play" frame="$parent/$parent"/>
-                    <Event event="OnMouseExit" action="DirectionReverse,Play" frame="$parent/$parent"/>
-
-                    <Controller type="AdjustmentColor" end="Pause" frame="$this/PortraitContainer/AvatarBorderImage">
-                        <Key type="Curve" time="0" value="0,255,255,255" inout="Linear"/>
-                        <Key type="Curve" time="0.2" value="75,255,255,255" inout="Slow,Linear"/>
-                    </Controller>
-                    <Controller type="AdjustmentColor" end="Pause" frame="$this/PortraitContainer/AvatarBorderImage/GrandMasterBorder">
-                        <Key type="Curve" time="0" value="0,255,255,255" inout="Linear"/>
-                        <Key type="Curve" time="0.2" value="75,255,255,255" inout="Slow,Linear"/>
-                    </Controller>
-                    <Controller type="AdjustmentColor" end="Pause" frame="$this/PortraitContainer/AvatarBorderImage/RankBadgeImage">
-                        <Key type="Curve" time="0" value="0,255,255,255" inout="Linear"/>
-                        <Key type="Curve" time="0.2" value="75,255,255,255" inout="Slow,Linear"/>
-                    </Controller>
-                </Animation>
-            </Frame>
-
-            <StateGroup name="SelectedAvatarImageState">
-                <State name="Deselect">
-                    <When type="Property" frame="$parent/RewardCacheFrame" Selected="false"/>
-                    <Action type="SetProperty" frame="AvatarFrame" alpha="100" undo="true"/>
-                </State>
-            </StateGroup>
-        </Frame>
+    <Frame type="Image" name="SelectedImage">
+      <Anchor relative="$parent" />
+      <Texture val="@UI/Storm_UI_LeftNav_Button_Selected" />
     </Frame>
-
-    <!-- Portrait Border Selection Panel Template-->
-    <Frame type="UnlockablePanel" name="PortraitBorderSelectionPanelTemplate">
-        <Anchor side="Top" relative="BorderSelection" pos="Min" offset="-25"/>
-        <Anchor side="Left" relative="$parent/UnlockableCategoryTileList" pos="Min" offset="5"/>
-        <Anchor side="Right" relative="$parent/UnlockableCategoryTileList/Item0" pos="Max" offset="-4"/>
-        <Anchor side="Bottom" relative="$parent/UnlockableCategoryTileList" pos="Min" offset="0"/>
-        <UnlockableTag val="POVT"/>
-
-        <Frame type="Image" name="BackgroundImage">
-            <Anchor side="Top" relative="$parent" pos="Min" offset="6"/>
-            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
-            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
-            <Anchor side="Bottom" relative="$parent" pos="Max" offset="-9"/>
-            <TextureType val="NineSlice"/>
-            <Texture val="@UI/Storm_Generic_SmallPanel_Border"/>
-        </Frame>
-
-        <Frame type="Label" name="BorderSelection">
-            <Anchor side="Left" relative="$parent/SelectedBorder" pos="Min" offset="0"/>
-            <Anchor side="Bottom" relative="$parent/SelectedBorder" pos="Min" offset="0"/>
-            <Style val="StorePortraitBorderSelectionLabel"/>
-
-            <Text val="@UI/ScreenStore/SelectedPortraitBorder"/>
-        </Frame>
-
-        <Frame type="Label" name="SelectedBorder">
-            <Anchor side="Left" relative="$parent/UnlockableTileList/Item0" pos="Min" offset="14"/>
-            <Anchor side="Bottom" relative="$parent/UnlockableTileList" pos="Min" offset="-12"/>
-            <Style val="StorePortraitSelectedBorderLabel"/>
-
-            <StateGroup name="SelectedBorderStateGroup">
-                <State name="BasicBorderSelected">
-                    <When type="Property" frame="$parent/UnlockableTileList" SelectedIndex="0"/>
-                    <Action type="SetProperty" Text="{$parent/UnlockableTileList/Item0/RewardCacheFrame/@Name}"/>
-                </State>
-
-                <State name="HeroLeagueBorderSelected">
-                    <When type="Property" frame="$parent/UnlockableTileList" SelectedIndex="1"/>
-                    <Action type="SetProperty" Text="{$parent/UnlockableTileList/Item1/RewardCacheFrame/@Name}"/>
-                </State>
-
-                <State name="TeamLeagueBorderSelected">
-                    <When type="Property" frame="$parent/UnlockableTileList" SelectedIndex="2"/>
-                    <Action type="SetProperty" Text="{$parent/UnlockableTileList/Item2/RewardCacheFrame/@Name}"/>
-                </State>
-            </StateGroup>
-        </Frame>
-
-        <Frame type="TileList" name="UnlockableTileList">
-            <Anchor side="Top" relative="Item1" pos="Min" offset="0"/>
-            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
-            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
-            <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
-            <ReportsStats val="true"/>
-            <Handle val="UnlockablePanelPortraitOverlay_TileList"/>
-
-            <!-- Override item index 0 to be the Basic border -->
-            <Frame type="UnlockableTileListItem" name="Item0" template="PortraitSelectionPanel/PortraitBorderListItemTemplate">
-                <Anchor side="Right" relative="$parent/Item1" pos="Min" offset="14"/>
-                <Anchor side="Bottom" relative="$parent/Item1" pos="Max" offset="0"/>
-
-                <Frame type="UnlockableFrame" name="UnlockableFrame">
-                    <Frame type="AvatarFrame" name="AvatarFrame">
-                        <Handle val="PortraitSelectionPanel_BasicBorder"/>
-                    </Frame>
-                </Frame>
-            </Frame>
-
-            <!-- Override item index 1 to be the Hero League border -->
-            <Frame type="UnlockableTileListItem" name="Item1" template="PortraitSelectionPanel/PortraitBorderListItemTemplate">
-                <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
-                <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
-                <Anchor side="Bottom" relative="$parent" pos="Max" offset="-25"/>
-
-                <Frame type="UnlockableFrame" name="UnlockableFrame">
-                    <Frame type="AvatarFrame" name="AvatarFrame">
-                        <Handle val="PortraitSelectionPanel_HeroRankBorder"/>
-                    </Frame>
-                </Frame>
-            </Frame>
-
-            <!-- Override item index 2 to be the Team League border -->
-            <Frame type="UnlockableTileListItem" name="Item2" template="PortraitSelectionPanel/PortraitBorderListItemTemplate">
-                <Anchor side="Left" relative="$parent/Item1" pos="Max" offset="-14"/>
-                <Anchor side="Bottom" relative="$parent/Item1" pos="Max" offset="0"/>
-
-                <Frame type="UnlockableFrame" name="UnlockableFrame">
-                    <Frame type="AvatarFrame" name="AvatarFrame">
-                        <Handle val="PortraitSelectionPanel_TeamRankBorder"/>
-                    </Frame>
-                </Frame>
-            </Frame>
-        </Frame>
+    <Frame type="Image" name="HoverImage">
+      <Anchor relative="$parent" />
+      <Texture val="@UI/Storm_UI_LeftNav_Button_Hover" />
     </Frame>
-
-    <!--===============================================================================================
-    <! Main Frame
-    <!==============================================================================================-->
-    <Frame type="PortraitSelectionPanel" name="PortraitPanelTemplate">
-        <PresenceId val="{$BattleUI/@LocalToonPresenceId}"/>
-
-        <!-- Border Picker-->
-        <Frame type="UnlockablePanel" name="UnlockablePortraitOverlayPanel" template="PortraitSelectionPanel/PortraitBorderSelectionPanelTemplate"/>
-
-        <!-- Category list -->
-        <Frame type="UnlockableCategoryTileList" name="UnlockableCategoryTileList" template="PortraitSelectionPanel/UnlockableCategoryTileListTemplate">
-            <Anchor side="Top" relative="$parent" pos="Min" offset="345"/>
-            <Anchor side="Left" relative="$parent" pos="Mid" offset="#CollectionCategoryNormalLeftOffset"/>
-            <Anchor side="Right" relative="ScrollBar" pos="Max" offset="0"/>
-            <Anchor side="Bottom" relative="Item7" pos="Max" offset="0"/>
-            <Handle val="ScreenCollection_Portrait_CategoryTileList"/>
-            <UnlockableTag val="{$parent/UnlockablePortraitPanel/@UnlockableTag}"/>
-            <PresenceId val="{$parent/@PresenceId}"/>
+    <Frame type="ProgressBar" name="OwnershipProgressBar">
+      <Anchor side="Top" relative="$parent" pos="Min" offset="15" />
+      <Anchor side="Left" relative="$parent" pos="Min" offset="15" />
+      <Anchor side="Right" relative="$parent" pos="Max" offset="-13" />
+      <Anchor side="Bottom" relative="$parent" pos="Max" offset="-15" />
+      <AcceptsMouse val="False" />
+      <MinValue val="0" />
+      <MaxValue val="{$parent/@Total}" />
+      <Value val="{$parent/@Owned}" />
+      <Frame type="Frame" name="FillImageContainer">
+        <Anchor relative="$parent" />
+        <Frame type="Image" name="FillImage">
+          <Anchor relative="$parent" />
+          <Texture val="@UI/Storm_UI_LeftNav_Button_Progress" />
         </Frame>
-
-        <Frame type="AspectRatioFrame" name="AspectRatioFrame" template="CollectionTemplates/CategoryTileListAspectRatioFrameTemplate">
-            <StateGroup name="AspectRatioStates">
-                <State name="Not4x3_Normal">
-                    <When type="Property" Visible="true"/>
-                    <Action type="SetAnchor" frame="$parent/SearchEditBox" side="Right" relative="$parent" pos="Mid" offset="#SearchEditBoxNormalRightOffset"/>
-                    <Action type="SetAnchor" frame="$parent/BigSectionHeader" side="Left" relative="$parent" pos="Mid" offset="#BigSectionHeaderNormalLeftOffset"/>
-                    <Action type="SetAnchor" frame="$parent/UnlockableCategoryTileList" side="Left" relative="$parent" pos="Mid" offset="#CollectionCategoryNormalLeftOffset"/>
-                </State>
-                <State name="Not4x3_Wide">
-                    <When type="Property" Visible="true"/>
-                    <Action type="SetAnchor" frame="$parent/SearchEditBox" side="Right" relative="$parent" pos="Mid" offset="#SearchEditBoxNormalRightOffset"/>
-                    <Action type="SetAnchor" frame="$parent/BigSectionHeader" side="Left" relative="$parent" pos="Mid" offset="#BigSectionHeaderNormalLeftOffset"/>
-                    <Action type="SetAnchor" frame="$parent/UnlockableCategoryTileList" side="Left" relative="$parent" pos="Mid" offset="#CollectionCategoryNormalLeftOffset"/>
-                </State>
-                <State name="Is4x3_Normal">
-                    <When type="Property" Visible="false"/>
-                    <Action type="SetAnchor" frame="$parent/SearchEditBox" side="Right" relative="$parent" pos="Mid" offset="#SearchEditBox4x3RightOffset"/>
-                    <Action type="SetAnchor" frame="$parent/BigSectionHeader" side="Left" relative="$parent" pos="Mid" offset="#BigSectionHeader4x3LeftOffset"/>
-                    <Action type="SetAnchor" frame="$parent/UnlockableCategoryTileList" side="Left" relative="$parent" pos="Mid" offset="#CollectionCategory4x3LeftOffset"/>
-                </State>
-                <State name="Is4x3_Wide">
-                    <When type="Property" Visible="false"/>
-                    <Action type="SetAnchor" frame="$parent/SearchEditBox" side="Right" relative="$parent" pos="Mid" offset="#SearchEditBox4x3RightOffset"/>
-                    <Action type="SetAnchor" frame="$parent/BigSectionHeader" side="Left" relative="$parent" pos="Mid" offset="#BigSectionHeader4x3LeftOffset"/>
-                    <Action type="SetAnchor" frame="$parent/UnlockableCategoryTileList" side="Left" relative="$parent" pos="Mid" offset="#CollectionCategory4x3LeftOffset"/>
-                </State>
-            </StateGroup>
-        </Frame>
-
-        <Frame type="Frame" name="BigSectionHeader" template="CollectionTemplates/SectionHeaderTemplate">
-            <Anchor side="Top" relative="$parent/$parent" pos="Min" offset="20"/>
-            <Anchor side="Left" relative="$parent/UnlockableCategoryTileList" pos="Min" offset="10"/>
-            <Anchor side="Right" relative="$parent/SearchEditBox" pos="Max" offset="0"/>
-
-            <Frame type="Image" name="TitleIcon">
-                <Texture val="@UI/Storm_UI_Store_TitleIcon_Portraits"/>
-            </Frame>
-            <Frame type="Label" name="TitleLabel">
-                <Text val="@UI/ScreenStore/BigSectionTitle/Portraits"/>
-            </Frame>
-        </Frame>
-        
-        <Frame type="EditBox" name="SearchEditBox" template="CollectionTemplates/SearchEditBoxTemplate">
-            <Anchor side="Top" relative="$parent/BigSectionHeader/TitleLabel" pos="Mid" offset="0"/>
-            <Anchor side="Bottom" relative="$parent/BigSectionHeader/TitleLabel" pos="Mid" offset="0"/>
-            <Anchor side="Right" relative="$parent" pos="Mid" offset="822"/>
-            <Frame type="Label" name="SearchTextLabel">
-                <Text val="@UI/ScreenStore/SearchEditBox/Portraits"/>
-            </Frame>
-        </Frame>
-
-        <!-- proxy for ScreenCollection hookups -->
-        <Frame type="GameContentTileList" name="ContentTileList">
-            <Anchor relative="$parent"/>
-            <Visible val="false"/>
-            <StateGroup name="ExactMatch">
-                <State name="Exact">
-                    <When type="Property" SearchFlags="UseExactMatchForNames"/>
-                    <When type="Property" frame="$parent/SearchEditBox" operator="NotEqual" Text=""/>
-                    <Action type="SetProperty" frame="$parent/UnlockablePortraitPanel" UseExactMatchForNames="true"/>
-                    <Action type="SetProperty" frame="$parent/UnlockablePortraitPanel" OwnershipFilter="AllContent"/>
-                    <Action type="SetProperty" frame="$parent/UnlockablePortraitPanel" OnlyShowUnseen="false"/>
-                    <Action type="SetProperty" frame="$parent/UnlockablePortraitPanel/OwnershipFilterPulldown" Visible="false"/>
-                    <Action type="SetProperty" frame="$parent/UnlockablePortraitPanel/FilterNewlyAcquired" Visible="false"/>
-                </State>
-            </StateGroup>
-        </Frame>
-
-        <!-- Portrait grid -->
-        <Frame type="UnlockablePanel" name="UnlockablePortraitPanel" template="UnlockablePanel/UnlockablePanelTemplate">
-            <Anchor relative="$parent"/>
-            <UnlockableTag val="PORT"/>
-            <CollectionCategoryFilter val="{$parent/UnlockableCategoryTileList/@SelectedCollectionCategory}"/>
-            <OnlyShowUnseen val="{FilterNewlyAcquired/@Toggled}"/>
-            <FilterString val="{$parent/SearchEditBox/@Text}"/>
-            
-            <Frame type="EditBox" name="SearchEditBox">
-                <Anchor relative="$parent/$parent/SearchEditBox"/>
-                <Visible val="false"/>
-            </Frame>
-
-            <Frame type="TileList" name="UnlockableTileList">
-                <Anchor side="Top" relative="$parent/$parent/UnlockablePortraitOverlayPanel" pos="Min" offset="7"/>
-                <Anchor side="Left" relative="$parent/$parent/UnlockableCategoryTileList" pos="Max" offset="122"/>
-                <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
-                <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
-            </Frame>
-
-            <StateGroup name="SearchHideContent">
-                <State name="SearchActive">
-                    <When type="StateGroup" NormalOrWideState="Wide"/>
-                    <Action type="SetProperty" frame="$this" CollectionCategoryFilter="" undo="false"/>
-                    <Action type="SetProperty" frame="$parent/UnlockableCategoryTileList" Visible="false"/>
-                    <Action type="SetProperty" frame="$parent/UnlockablePortraitOverlayPanel" Visible="false"/>
-                    <Action type="SetProperty" frame="$this" CollectionCategoryFilter="{$parent/UnlockableCategoryTileList/@SelectedCollectionCategory}" on="Exit"/>
-                </State>
-            </StateGroup>
-
-            <!-- Sets MaxItemPerPage and TileList Anchor based off of 4x3 and search -->
-            <StateGroup name="NormalOrWideState">
-                <DefaultState val="Normal"/>
-                <State name="Normal"/>
-                <State name="Wide"/>
-            </StateGroup>
-
-            <StateGroup name="NewlyAcquiredAndSearchStates">
-                <State name="Inactive">
-                    <When type="Property" frame="$parent/SearchEditBox" Text=""/>
-                    <When type="Property" frame="FilterNewlyAcquired" Toggled="false"/>
-                    <Action type="SetState" group="NormalOrWideState" state="Normal"/>
-                </State>
-                <State name="SearchActive">
-                    <When type="Property" frame="$parent/SearchEditBox" operator="NotEqual" Text=""/>
-                    <When type="Property" frame="FilterNewlyAcquired" Toggled="false"/>
-                    <Action type="SetState" group="NormalOrWideState" state="Wide"/>
-                </State>
-                <State name="NewlyAcquiredActive">
-                    <When type="Property" frame="$parent/SearchEditBox" Text=""/>
-                    <When type="Property" frame="FilterNewlyAcquired" Toggled="true"/>
-                    <Action type="SetState" group="NormalOrWideState" state="Wide"/>
-                </State>
-                <State name="BothActive">
-                    <When type="Property" frame="$parent/SearchEditBox" operator="NotEqual" Text=""/>
-                    <When type="Property" frame="FilterNewlyAcquired" Toggled="true"/>
-                    <Action type="SetState" group="NormalOrWideState" state="Wide"/>
-                </State>
-            </StateGroup>
-
-            <StateGroup name="MaxItemPerPageStates">
-                <State name="Normal_Not4x3">
-                    <When type="StateGroup" NormalOrWideState="Normal"/>
-                    <When type="Property" frame="$parent/AspectRatioFrame" Visible="true"/>
-                    <Action type="SetProperty" frame="UnlockableTileList" MaxItemPerPage="28"/>
-                    <Action type="SetAnchor" frame="UnlockableTileList" side="Left" relative="$parent/$parent/UnlockableCategoryTileList" pos="Max" offset="111"/>
-                </State>
-                <State name="Normal_Is4x3">
-                    <When type="StateGroup" NormalOrWideState="Normal"/>
-                    <When type="Property" frame="$parent/AspectRatioFrame" Visible="false"/>
-                    <Action type="SetProperty" frame="UnlockableTileList" MaxItemPerPage="24"/>
-                    <Action type="SetAnchor" frame="UnlockableTileList" side="Left" relative="$parent/$parent/UnlockableCategoryTileList" pos="Max" offset="136"/>
-                </State>
-                <State name="Wide_Not4x3">
-                    <When type="StateGroup" NormalOrWideState="Wide"/>
-                    <When type="Property" frame="$parent/AspectRatioFrame" Visible="true"/>
-                    <Action type="SetProperty" frame="UnlockableTileList" MaxItemPerPage="36"/>
-                    <Action type="SetAnchor" frame="UnlockableTileList" side="Left" relative="$parent" pos="Mid" offset="-874"/>
-                </State>
-                <State name="Wide_Is4x3">
-                    <When type="StateGroup" NormalOrWideState="Wide"/>
-                    <When type="Property" frame="$parent/AspectRatioFrame" Visible="false"/>
-                    <Action type="SetProperty" frame="UnlockableTileList" MaxItemPerPage="32"/>
-                    <Action type="SetAnchor" frame="UnlockableTileList" side="Left" relative="$parent" pos="Mid" offset="-748"/>
-                </State>
-            </StateGroup>
-        </Frame>
+      </Frame>
     </Frame>
+    <Frame type="Image" name="AllOwnedFrame">
+      <Anchor side="Top" relative="$parent" pos="Min" offset="-9" />
+      <Anchor side="Left" relative="$parent" pos="Min" offset="-10" />
+      <Anchor side="Right" relative="$parent" pos="Max" offset="11" />
+      <Anchor side="Bottom" relative="$parent" pos="Max" offset="9" />
+      <SubpixelRendering val="true" />
+      <Visible val="false" />
+      <LayerCount val="2" />
+      <Texture val="@UI/Storm_UI_ProfileDialog_BorderGlow_Mask" layer="0" />
+      <TextureCoords top=".25" left=".25" right=".75" bottom=".75" />
+      <AlphaLayer val="true" layer="0" />
+      <Texture val="@UI/Storm_UI_GenFX_3pxBorderGlow" layer="1" />
+      <TextureType val="Nineslice" layer="1" />
+      <BlendMode val="Add" layer="1" />
+      <ColorAdjustMode val="Colorize" layer="1" />
+      <LightAdjustColor val="4a9fff" layer="1" />
+      <DarkAdjustColor val="8400ff" layer="1" />
+      <Animation name="ShineAnim">
+        <Event event="OnShown" action="DirectionForward, Play" />
+        <Controller type="LayerUV" side="Left" layer="0" sidelock="true" end="Loop">
+          <Key type="Curve" time="0" value="1" />
+          <Key type="Curve" time="8" value="-1" />
+        </Controller>
+      </Animation>
+      <StateGroup name="VisibilityStates">
+        <State name="AllOwned">
+          <When type="Property" frame="$parent/OwnershipProgressBar" ProgressPercent="1.0" />
+          <Action type="SetProperty" Visible="true" />
+        </State>
+      </StateGroup>
+    </Frame>
+    <Frame type="Label" name="CategoryLabel">
+      <Anchor side="Top" relative="$parent" pos="Mid" offset="0" />
+      <Anchor side="Left" relative="$parent" pos="Min" offset="20" />
+      <Anchor side="Right" relative="$parent" pos="Max" offset="-12" />
+      <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0" />
+      <Options val="NoWrapping | ScaleToPreventTruncation" />
+      <Style val="StoreSkinHeroListButtonLabel" />
+      <Text val="{$parent/@CollectionCategory[Name]}" />
+    </Frame>
+    <Frame type="TextFormatFrame" name="CountTextFormatFrame">
+      <Anchor relative="$parent" />
+      <FormatText val="@UI/Collection/Category/Count" />
+      <Replacement val="{$parent/@Owned}" index="0" />
+      <Replacement val="{$parent/@Total}" index="1" />
+    </Frame>
+    <Frame type="TextFormatFrame" name="TooltipFormatFrame">
+      <Anchor relative="$parent" />
+      <FormatText val="@UI/Store/DescriptionFormat/OwnedTotal" />
+      <Replacement val="{$parent/CountTextFormatFrame/@Text}" />
+    </Frame>
+    <Frame type="Frame" name="HitTestFrame">
+      <Anchor side="Top" relative="$parent" pos="Min" offset="5" />
+      <Anchor side="Left" relative="$parent" pos="Min" offset="13" />
+      <Anchor side="Right" relative="$parent" pos="Max" offset="-13" />
+      <Anchor side="Bottom" relative="$parent" pos="Max" offset="-5" />
+    </Frame>
+    <Frame type="Image" name="NewItemNotificationBox" template="StandardTemplates/ItemNotificationBoxTemplate">
+      <Anchor side="Top" relative="$parent" pos="Min" offset="12" />
+      <Anchor side="Left" relative="$parent" pos="Max" offset="-42" />
+      <Tooltip val="{TooltipTextFormatFrame/@Text}" />
+      <Visible val="false" />
+      <Frame type="Label" name="ItemQuantityLabel">
+        <Text val="{$parent/$parent/@UnseenItemsCount}" />
+      </Frame>
+      <Frame type="TextFormatFrame" name="TooltipTextFormatFrame">
+        <Anchor relative="$parent" />
+        <FormatText val="@UI/ScreenNavigation/StoreButtonCountTooltip" />
+        <Replacement val="{$parent/ItemQuantityLabel/@Text}" />
+      </Frame>
+      <StateGroup name="VisibilityStates">
+        <State name="HasUnseenItems">
+          <When type="Property" frame="$parent" operator="NotEqual" UnseenItemsCount="0" />
+          <Action type="SetProperty" Visible="true" />
+        </State>
+      </StateGroup>
+    </Frame>
+    <StateGroup name="FontStates">
+      <State name="NonHovered">
+        <When type="Property" hovered="False" />
+        <When type="Property" selected="False" />
+        <Action type="SetProperty" frame="CategoryLabel" style="StoreSkinHeroListButtonLabel" />
+      </State>
+      <State name="Hovered">
+        <When type="Property" hovered="True" />
+        <When type="Property" selected="False" />
+        <Action type="SetProperty" frame="CategoryLabel" style="StoreSkinHeroListButtonSelectedLabel" />
+      </State>
+      <State name="Toggled">
+        <When type="Property" selected="True" />
+        <Action type="SetProperty" frame="CategoryLabel" style="StoreSkinHeroListButtonSelectedLabel" />
+      </State>
+    </StateGroup>
+  </Frame>
+  <Frame type="UnlockableCategoryTileList" name="UnlockableCategoryTileListTemplate">
+    <ReportsStats val="true" />
+    <AcceptsMouse val="True" />
+    <RenderPriority val="601" />
+    <ScrollStepValue val="1" />
+    <MaxItemPerPage val="8" />
+    <SelectedIndex val="0" />
+    <RequireSelection val="true" />
+    <Frame type="ScrollBar" name="ScrollBar" template="StandardTemplates/WideScrollableBarTemplate">
+      <Anchor side="Top" relative="$parent" pos="Min" offset="5" />
+      <Anchor side="Right" relative="$parent/Item0" pos="Max" offset="21" />
+      <Anchor side="Bottom" relative="$parent" pos="Max" offset="-5" />
+      <IncrementSound val="" />
+    </Frame>
+    <Frame type="UnlockableCategoryTileListItem" name="Item0" template="PortraitSelectionPanel/UnlockableCategoryTileListItemTemplate">
+      <Anchor side="Top" relative="$parent" pos="Min" offset="0" />
+      <Anchor side="Left" relative="$parent" pos="Min" offset="0" />
+    </Frame>
+    <Frame type="UnlockableCategoryTileListItem" name="Item1" template="PortraitSelectionPanel/UnlockableCategoryTileListItemTemplate">
+      <Anchor side="Top" relative="$parent/Item0" pos="Max" offset="#CollectionCategoryTileListItemSpacing" />
+      <Anchor side="Left" relative="$parent/Item0" pos="Min" offset="0" />
+    </Frame>
+    <Frame type="UnlockableCategoryTileListItem" name="Item2" template="PortraitSelectionPanel/UnlockableCategoryTileListItemTemplate">
+      <Anchor side="Top" relative="$parent/Item1" pos="Max" offset="#CollectionCategoryTileListItemSpacing" />
+      <Anchor side="Left" relative="$parent/Item0" pos="Min" offset="0" />
+    </Frame>
+    <Frame type="UnlockableCategoryTileListItem" name="Item3" template="PortraitSelectionPanel/UnlockableCategoryTileListItemTemplate">
+      <Anchor side="Top" relative="$parent/Item2" pos="Max" offset="#CollectionCategoryTileListItemSpacing" />
+      <Anchor side="Left" relative="$parent/Item0" pos="Min" offset="0" />
+    </Frame>
+    <Frame type="UnlockableCategoryTileListItem" name="Item4" template="PortraitSelectionPanel/UnlockableCategoryTileListItemTemplate">
+      <Anchor side="Top" relative="$parent/Item3" pos="Max" offset="#CollectionCategoryTileListItemSpacing" />
+      <Anchor side="Left" relative="$parent/Item0" pos="Min" offset="0" />
+    </Frame>
+    <Frame type="UnlockableCategoryTileListItem" name="Item5" template="PortraitSelectionPanel/UnlockableCategoryTileListItemTemplate">
+      <Anchor side="Top" relative="$parent/Item4" pos="Max" offset="#CollectionCategoryTileListItemSpacing" />
+      <Anchor side="Left" relative="$parent/Item0" pos="Min" offset="0" />
+    </Frame>
+    <Frame type="UnlockableCategoryTileListItem" name="Item6" template="PortraitSelectionPanel/UnlockableCategoryTileListItemTemplate">
+      <Anchor side="Top" relative="$parent/Item5" pos="Max" offset="#CollectionCategoryTileListItemSpacing" />
+      <Anchor side="Left" relative="$parent/Item0" pos="Min" offset="0" />
+    </Frame>
+    <Frame type="UnlockableCategoryTileListItem" name="Item7" template="PortraitSelectionPanel/UnlockableCategoryTileListItemTemplate">
+      <Anchor side="Top" relative="$parent/Item6" pos="Max" offset="#CollectionCategoryTileListItemSpacing" />
+      <Anchor side="Left" relative="$parent/Item0" pos="Min" offset="0" />
+    </Frame>
+    <Frame type="UnlockableCategoryTileListItem" name="Item8" template="PortraitSelectionPanel/UnlockableCategoryTileListItemTemplate">
+      <Anchor side="Top" relative="$parent/Item7" pos="Max" offset="#CollectionCategoryTileListItemSpacing" />
+      <Anchor side="Left" relative="$parent/Item0" pos="Min" offset="0" />
+    </Frame>
+    <Frame type="UnlockableCategoryTileListItem" name="Item9" template="PortraitSelectionPanel/UnlockableCategoryTileListItemTemplate">
+      <Anchor side="Top" relative="$parent/Item8" pos="Max" offset="#CollectionCategoryTileListItemSpacing" />
+      <Anchor side="Left" relative="$parent/Item0" pos="Min" offset="0" />
+    </Frame>
+  </Frame>
+  <Frame type="UnlockableTileListItem" name="PortraitBorderListItemTemplate">
+    <AcceptsMouse val="true" />
+    <Width val="85" />
+    <Height val="85" />
+    <SelectedSound val="@UI_BNet_ShopTileSelect" />
+    <Frame type="RewardCacheFrame" name="RewardCacheFrame">
+      <Anchor relative="$parent" />
+      <PresenceId val="{$BattleUI/@LocalToonPresenceId}" />
+      <UnlockableTag val="{$parent/UnlockableFrame/@UnlockableTag}" />
+      <UnlockableIndex val="{$parent/UnlockableFrame/@UnlockableIndex}" />
+    </Frame>
+    <Frame type="UnlockableFrame" name="UnlockableFrame" template="StandardTemplates/UnlockableFrameTemplate">
+      <Anchor side="Top" relative="$parent" pos="Min" offset="0" />
+      <Anchor side="Left" relative="$parent" pos="Min" offset="0" />
+      <Anchor side="Bottom" relative="$parent" pos="Max" offset="0" />
+      <Anchor side="Right" relative="$parent" pos="Max" offset="0" />
+      <Width val="0" />
+      <Height val="0" />
+      <Frame type="Image" name="UnlockableImage">
+        <Visible val="false" />
+      </Frame>
+      <Frame type="AvatarFrame" name="AvatarFrame" template="AvatarFrameTemplates/AvatarStateTemplate_Friend">
+        <Anchor side="Top" relative="$parent/Background" pos="Mid" offset="0" />
+        <Anchor side="Bottom" relative="$parent/Background" pos="Mid" offset="0" />
+        <Anchor side="Left" relative="$parent/Background" pos="Mid" offset="0" />
+        <Anchor side="Right" relative="$parent/Background" pos="Mid" offset="0" />
+        <Animation name="Hover">
+          <Event event="OnMouseEnter" action="DirectionForward,Play" frame="$parent/$parent" />
+          <Event event="OnMouseExit" action="DirectionReverse,Play" frame="$parent/$parent" />
+          <Controller type="AdjustmentColor" end="Pause" frame="$this/PortraitContainer/AvatarBorderImage">
+            <Key type="Curve" time="0" value="0,255,255,255" inout="Linear" />
+            <Key type="Curve" time="0.2" value="75,255,255,255" inout="Slow,Linear" />
+          </Controller>
+          <Controller type="AdjustmentColor" end="Pause" frame="$this/PortraitContainer/AvatarBorderImage/GrandMasterBorder">
+            <Key type="Curve" time="0" value="0,255,255,255" inout="Linear" />
+            <Key type="Curve" time="0.2" value="75,255,255,255" inout="Slow,Linear" />
+          </Controller>
+          <Controller type="AdjustmentColor" end="Pause" frame="$this/PortraitContainer/AvatarBorderImage/RankBadgeImage">
+            <Key type="Curve" time="0" value="0,255,255,255" inout="Linear" />
+            <Key type="Curve" time="0.2" value="75,255,255,255" inout="Slow,Linear" />
+          </Controller>
+        </Animation>
+      </Frame>
+      <StateGroup name="SelectedAvatarImageState">
+        <State name="Deselect">
+          <When type="Property" frame="$parent/RewardCacheFrame" Selected="false" />
+          <Action type="SetProperty" frame="AvatarFrame" alpha="100" undo="true" />
+        </State>
+      </StateGroup>
+    </Frame>
+  </Frame>
+  <Frame type="UnlockablePanel" name="PortraitBorderSelectionPanelTemplate">
+    <Anchor side="Top" relative="BorderSelection" pos="Min" offset="-25" />
+    <Anchor side="Left" relative="$parent/UnlockableCategoryTileList" pos="Min" offset="5" />
+    <Anchor side="Right" relative="$parent/UnlockableCategoryTileList/Item0" pos="Max" offset="-4" />
+    <Anchor side="Bottom" relative="$parent/UnlockableCategoryTileList" pos="Min" offset="0" />
+    <UnlockableTag val="POVT" />
+    <Frame type="Image" name="BackgroundImage">
+      <Anchor side="Top" relative="$parent" pos="Min" offset="6" />
+      <Anchor side="Left" relative="$parent" pos="Min" offset="0" />
+      <Anchor side="Right" relative="$parent" pos="Max" offset="0" />
+      <Anchor side="Bottom" relative="$parent" pos="Max" offset="-9" />
+      <TextureType val="NineSlice" />
+      <Texture val="@UI/Storm_Generic_SmallPanel_Border" />
+    </Frame>
+    <Frame type="Label" name="BorderSelection">
+      <Anchor side="Left" relative="$parent/SelectedBorder" pos="Min" offset="0" />
+      <Anchor side="Bottom" relative="$parent/SelectedBorder" pos="Min" offset="0" />
+      <Style val="StorePortraitBorderSelectionLabel" />
+      <Text val="@UI/ScreenStore/SelectedPortraitBorder" />
+    </Frame>
+    <Frame type="Label" name="SelectedBorder">
+      <Anchor side="Left" relative="$parent/UnlockableTileList/Item0" pos="Min" offset="14" />
+      <Anchor side="Bottom" relative="$parent/UnlockableTileList" pos="Min" offset="-12" />
+      <Style val="StorePortraitSelectedBorderLabel" />
+      <StateGroup name="SelectedBorderStateGroup">
+        <State name="BasicBorderSelected">
+          <When type="Property" frame="$parent/UnlockableTileList" SelectedIndex="0" />
+          <Action type="SetProperty" Text="{$parent/UnlockableTileList/Item0/RewardCacheFrame/@Name}" />
+        </State>
+        <State name="HeroLeagueBorderSelected">
+          <When type="Property" frame="$parent/UnlockableTileList" SelectedIndex="1" />
+          <Action type="SetProperty" Text="{$parent/UnlockableTileList/Item1/RewardCacheFrame/@Name}" />
+        </State>
+        <State name="TeamLeagueBorderSelected">
+          <When type="Property" frame="$parent/UnlockableTileList" SelectedIndex="2" />
+          <Action type="SetProperty" Text="{$parent/UnlockableTileList/Item2/RewardCacheFrame/@Name}" />
+        </State>
+      </StateGroup>
+    </Frame>
+    <Frame type="TileList" name="UnlockableTileList">
+      <Anchor side="Top" relative="Item1" pos="Min" offset="0" />
+      <Anchor side="Left" relative="$parent" pos="Min" offset="0" />
+      <Anchor side="Right" relative="$parent" pos="Max" offset="0" />
+      <Anchor side="Bottom" relative="$parent" pos="Max" offset="0" />
+      <ReportsStats val="true" />
+      <Handle val="UnlockablePanelPortraitOverlay_TileList" />
+      <Frame type="UnlockableTileListItem" name="Item0" template="PortraitSelectionPanel/PortraitBorderListItemTemplate">
+        <Anchor side="Right" relative="$parent/Item1" pos="Min" offset="14" />
+        <Anchor side="Bottom" relative="$parent/Item1" pos="Max" offset="0" />
+        <Frame type="UnlockableFrame" name="UnlockableFrame">
+          <Frame type="AvatarFrame" name="AvatarFrame">
+            <Handle val="PortraitSelectionPanel_BasicBorder" />
+          </Frame>
+        </Frame>
+      </Frame>
+      <Frame type="UnlockableTileListItem" name="Item1" template="PortraitSelectionPanel/PortraitBorderListItemTemplate">
+        <Anchor side="Left" relative="$parent" pos="Mid" offset="0" />
+        <Anchor side="Right" relative="$parent" pos="Mid" offset="0" />
+        <Anchor side="Bottom" relative="$parent" pos="Max" offset="-25" />
+        <Frame type="UnlockableFrame" name="UnlockableFrame">
+          <Frame type="AvatarFrame" name="AvatarFrame">
+            <Handle val="PortraitSelectionPanel_HeroRankBorder" />
+          </Frame>
+        </Frame>
+      </Frame>
+      <Frame type="UnlockableTileListItem" name="Item2" template="PortraitSelectionPanel/PortraitBorderListItemTemplate">
+        <Anchor side="Left" relative="$parent/Item1" pos="Max" offset="-14" />
+        <Anchor side="Bottom" relative="$parent/Item1" pos="Max" offset="0" />
+        <Frame type="UnlockableFrame" name="UnlockableFrame">
+          <Frame type="AvatarFrame" name="AvatarFrame">
+            <Handle val="PortraitSelectionPanel_TeamRankBorder" />
+          </Frame>
+        </Frame>
+      </Frame>
+    </Frame>
+  </Frame>
+  <Frame type="PortraitSelectionPanel" name="PortraitPanelTemplate">
+    <PresenceId val="{$BattleUI/@LocalToonPresenceId}" />
+    <Frame type="UnlockablePanel" name="UnlockablePortraitOverlayPanel" template="PortraitSelectionPanel/PortraitBorderSelectionPanelTemplate" />
+    <Frame type="UnlockableCategoryTileList" name="UnlockableCategoryTileList" template="PortraitSelectionPanel/UnlockableCategoryTileListTemplate">
+      <Anchor side="Top" relative="$parent" pos="Min" offset="345" />
+      <Anchor side="Left" relative="$parent" pos="Mid" offset="#CollectionCategoryNormalLeftOffset" />
+      <Anchor side="Right" relative="ScrollBar" pos="Max" offset="0" />
+      <Anchor side="Bottom" relative="Item7" pos="Max" offset="0" />
+      <Handle val="ScreenCollection_Portrait_CategoryTileList" />
+      <UnlockableTag val="{$parent/UnlockablePortraitPanel/@UnlockableTag}" />
+      <PresenceId val="{$parent/@PresenceId}" />
+    </Frame>
+    <Frame type="AspectRatioFrame" name="AspectRatioFrame" template="CollectionTemplates/CategoryTileListAspectRatioFrameTemplate">
+      <StateGroup name="AspectRatioStates">
+        <State name="Not4x3_Normal">
+          <When type="Property" Visible="true" />
+          <Action type="SetAnchor" frame="$parent/SearchEditBox" side="Right" relative="$parent" pos="Mid" offset="#SearchEditBoxNormalRightOffset" />
+          <Action type="SetAnchor" frame="$parent/BigSectionHeader" side="Left" relative="$parent" pos="Mid" offset="#BigSectionHeaderNormalLeftOffset" />
+          <Action type="SetAnchor" frame="$parent/UnlockableCategoryTileList" side="Left" relative="$parent" pos="Mid" offset="#CollectionCategoryNormalLeftOffset" />
+        </State>
+        <State name="Not4x3_Wide">
+          <When type="Property" Visible="true" />
+          <Action type="SetAnchor" frame="$parent/SearchEditBox" side="Right" relative="$parent" pos="Mid" offset="#SearchEditBoxNormalRightOffset" />
+          <Action type="SetAnchor" frame="$parent/BigSectionHeader" side="Left" relative="$parent" pos="Mid" offset="#BigSectionHeaderNormalLeftOffset" />
+          <Action type="SetAnchor" frame="$parent/UnlockableCategoryTileList" side="Left" relative="$parent" pos="Mid" offset="#CollectionCategoryNormalLeftOffset" />
+        </State>
+        <State name="Is4x3_Normal">
+          <When type="Property" Visible="false" />
+          <Action type="SetAnchor" frame="$parent/SearchEditBox" side="Right" relative="$parent" pos="Mid" offset="#SearchEditBox4x3RightOffset" />
+          <Action type="SetAnchor" frame="$parent/BigSectionHeader" side="Left" relative="$parent" pos="Mid" offset="#BigSectionHeader4x3LeftOffset" />
+          <Action type="SetAnchor" frame="$parent/UnlockableCategoryTileList" side="Left" relative="$parent" pos="Mid" offset="#CollectionCategory4x3LeftOffset" />
+        </State>
+        <State name="Is4x3_Wide">
+          <When type="Property" Visible="false" />
+          <Action type="SetAnchor" frame="$parent/SearchEditBox" side="Right" relative="$parent" pos="Mid" offset="#SearchEditBox4x3RightOffset" />
+          <Action type="SetAnchor" frame="$parent/BigSectionHeader" side="Left" relative="$parent" pos="Mid" offset="#BigSectionHeader4x3LeftOffset" />
+          <Action type="SetAnchor" frame="$parent/UnlockableCategoryTileList" side="Left" relative="$parent" pos="Mid" offset="#CollectionCategory4x3LeftOffset" />
+        </State>
+      </StateGroup>
+    </Frame>
+    <Frame type="Frame" name="BigSectionHeader" template="CollectionTemplates/SectionHeaderTemplate">
+      <Anchor side="Top" relative="$parent/$parent" pos="Min" offset="20" />
+      <Anchor side="Left" relative="$parent/UnlockableCategoryTileList" pos="Min" offset="10" />
+      <Anchor side="Right" relative="$parent/SearchEditBox" pos="Max" offset="0" />
+      <Frame type="Image" name="TitleIcon">
+        <Texture val="@UI/Storm_UI_Store_TitleIcon_Portraits" />
+      </Frame>
+      <Frame type="Label" name="TitleLabel">
+        <Text val="@UI/ScreenStore/BigSectionTitle/Portraits" />
+      </Frame>
+    </Frame>
+    <Frame type="EditBox" name="SearchEditBox" template="CollectionTemplates/SearchEditBoxTemplate">
+      <Anchor side="Top" relative="$parent/BigSectionHeader/TitleLabel" pos="Mid" offset="0" />
+      <Anchor side="Bottom" relative="$parent/BigSectionHeader/TitleLabel" pos="Mid" offset="0" />
+      <Anchor side="Right" relative="$parent" pos="Mid" offset="822" />
+      <Frame type="Label" name="SearchTextLabel">
+        <Text val="@UI/ScreenStore/SearchEditBox/Portraits" />
+      </Frame>
+    </Frame>
+    <Frame type="GameContentTileList" name="ContentTileList">
+      <Anchor relative="$parent" />
+      <Visible val="false" />
+      <StateGroup name="ExactMatch">
+        <State name="Exact">
+          <When type="Property" SearchFlags="UseExactMatchForNames" />
+          <When type="Property" frame="$parent/SearchEditBox" operator="NotEqual" Text="" />
+          <Action type="SetProperty" frame="$parent/UnlockablePortraitPanel" UseExactMatchForNames="true" />
+          <Action type="SetProperty" frame="$parent/UnlockablePortraitPanel" OwnershipFilter="AllContent" />
+          <Action type="SetProperty" frame="$parent/UnlockablePortraitPanel" OnlyShowUnseen="false" />
+          <Action type="SetProperty" frame="$parent/UnlockablePortraitPanel/OwnershipFilterPulldown" Visible="false" />
+          <Action type="SetProperty" frame="$parent/UnlockablePortraitPanel/FilterNewlyAcquired" Visible="false" />
+        </State>
+      </StateGroup>
+    </Frame>
+    <Frame type="UnlockablePanel" name="UnlockablePortraitPanel" template="UnlockablePanel/UnlockablePanelTemplate">
+      <Anchor relative="$parent" />
+      <UnlockableTag val="PORT" />
+      <CollectionCategoryFilter val="{$parent/UnlockableCategoryTileList/@SelectedCollectionCategory}" />
+      <OnlyShowUnseen val="{FilterNewlyAcquired/@Toggled}" />
+      <FilterString val="{$parent/SearchEditBox/@Text}" />
+      <Frame type="EditBox" name="SearchEditBox">
+        <Anchor relative="$parent/$parent/SearchEditBox" />
+        <Visible val="false" />
+      </Frame>
+      <Frame type="TileList" name="UnlockableTileList">
+        <Anchor side="Top" relative="$parent/$parent/UnlockablePortraitOverlayPanel" pos="Min" offset="7" />
+        <Anchor side="Left" relative="$parent/$parent/UnlockableCategoryTileList" pos="Max" offset="122" />
+        <Anchor side="Right" relative="$parent" pos="Max" offset="0" />
+        <Anchor side="Bottom" relative="$parent" pos="Max" offset="0" />
+      </Frame>
+      <StateGroup name="SearchHideContent">
+        <State name="SearchActive">
+          <When type="StateGroup" NormalOrWideState="Wide" />
+          <Action type="SetProperty" frame="$this" CollectionCategoryFilter="" undo="false" />
+          <Action type="SetProperty" frame="$parent/UnlockableCategoryTileList" Visible="false" />
+          <Action type="SetProperty" frame="$parent/UnlockablePortraitOverlayPanel" Visible="false" />
+          <Action type="SetProperty" frame="$this" CollectionCategoryFilter="{$parent/UnlockableCategoryTileList/@SelectedCollectionCategory}" on="Exit" />
+        </State>
+      </StateGroup>
+      <StateGroup name="NormalOrWideState">
+        <DefaultState val="Normal" />
+        <State name="Normal" />
+        <State name="Wide" />
+      </StateGroup>
+      <StateGroup name="NewlyAcquiredAndSearchStates">
+        <State name="Inactive">
+          <When type="Property" frame="$parent/SearchEditBox" Text="" />
+          <When type="Property" frame="FilterNewlyAcquired" Toggled="false" />
+          <Action type="SetState" group="NormalOrWideState" state="Normal" />
+        </State>
+        <State name="SearchActive">
+          <When type="Property" frame="$parent/SearchEditBox" operator="NotEqual" Text="" />
+          <When type="Property" frame="FilterNewlyAcquired" Toggled="false" />
+          <Action type="SetState" group="NormalOrWideState" state="Wide" />
+        </State>
+        <State name="NewlyAcquiredActive">
+          <When type="Property" frame="$parent/SearchEditBox" Text="" />
+          <When type="Property" frame="FilterNewlyAcquired" Toggled="true" />
+          <Action type="SetState" group="NormalOrWideState" state="Wide" />
+        </State>
+        <State name="BothActive">
+          <When type="Property" frame="$parent/SearchEditBox" operator="NotEqual" Text="" />
+          <When type="Property" frame="FilterNewlyAcquired" Toggled="true" />
+          <Action type="SetState" group="NormalOrWideState" state="Wide" />
+        </State>
+      </StateGroup>
+      <StateGroup name="MaxItemPerPageStates">
+        <State name="Normal_Not4x3">
+          <When type="StateGroup" NormalOrWideState="Normal" />
+          <When type="Property" frame="$parent/AspectRatioFrame" Visible="true" />
+          <Action type="SetProperty" frame="UnlockableTileList" MaxItemPerPage="28" />
+          <Action type="SetAnchor" frame="UnlockableTileList" side="Left" relative="$parent/$parent/UnlockableCategoryTileList" pos="Max" offset="111" />
+        </State>
+        <State name="Normal_Is4x3">
+          <When type="StateGroup" NormalOrWideState="Normal" />
+          <When type="Property" frame="$parent/AspectRatioFrame" Visible="false" />
+          <Action type="SetProperty" frame="UnlockableTileList" MaxItemPerPage="24" />
+          <Action type="SetAnchor" frame="UnlockableTileList" side="Left" relative="$parent/$parent/UnlockableCategoryTileList" pos="Max" offset="136" />
+        </State>
+        <State name="Wide_Not4x3">
+          <When type="StateGroup" NormalOrWideState="Wide" />
+          <When type="Property" frame="$parent/AspectRatioFrame" Visible="true" />
+          <Action type="SetProperty" frame="UnlockableTileList" MaxItemPerPage="36" />
+          <Action type="SetAnchor" frame="UnlockableTileList" side="Left" relative="$parent" pos="Mid" offset="-874" />
+        </State>
+        <State name="Wide_Is4x3">
+          <When type="StateGroup" NormalOrWideState="Wide" />
+          <When type="Property" frame="$parent/AspectRatioFrame" Visible="false" />
+          <Action type="SetProperty" frame="UnlockableTileList" MaxItemPerPage="32" />
+          <Action type="SetAnchor" frame="UnlockableTileList" side="Left" relative="$parent" pos="Mid" offset="-748" />
+        </State>
+      </StateGroup>
+    </Frame>
+  </Frame>
 </Desc>
