@@ -11,6 +11,7 @@ import org.apache.logging.log4j.Logger;
 import org.xml.sax.SAXException;
 
 import com.ahli.mpq.i18n.Messages;
+import com.ahli.mpq.mpqeditor.MpqEditorSettingsInterface;
 import com.ahli.util.DeepCopyable;
 
 /**
@@ -24,6 +25,7 @@ public class MpqEditorInterface implements MpqInterface, DeepCopyable {
 	private String mpqEditor = "plugins" + File.separator + "mpq" + File.separator + "MPQEditor.exe"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	private String mpqCachePath;
 	private final static char q = '\"';
+	private final MpqEditorSettingsInterface settings;
 	
 	/**
 	 * Constructor.
@@ -34,6 +36,7 @@ public class MpqEditorInterface implements MpqInterface, DeepCopyable {
 	 */
 	public MpqEditorInterface(final String mpqCachePath2) {
 		mpqCachePath = mpqCachePath2;
+		settings = new MpqEditorSettingsInterface();
 	}
 	
 	/**
@@ -657,5 +660,23 @@ public class MpqEditorInterface implements MpqInterface, DeepCopyable {
 	// // wait for the script to finish (optional?)
 	// int exitVal = p.waitFor();
 	// }
+	
+	/**
+	 * @throws IOException
+	 */
+	public void backUpSettings() throws IOException {
+		settings.saveOriginalSettingFiles();
+	}
+	
+	/**
+	 * 
+	 */
+	public void restoreSettings() {
+		settings.restoreOriginalSettingFiles();
+	}
+	
+	public void applySetting(final int saveMode) {
+		settings.applySettings(saveMode);
+	}
 	
 }
