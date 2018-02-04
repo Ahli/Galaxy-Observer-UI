@@ -1,5 +1,13 @@
 package com.ahli.galaxy.archive;
 
+import com.ahli.mpq.MpqException;
+import com.ahli.mpq.MpqInterface;
+import com.ahli.util.Pair;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.xml.sax.SAXException;
+
+import javax.xml.parsers.ParserConfigurationException;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -7,19 +15,9 @@ import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-import javax.xml.parsers.ParserConfigurationException;
-
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.xml.sax.SAXException;
-
-import com.ahli.mpq.MpqException;
-import com.ahli.mpq.MpqInterface;
-import com.ahli.util.Pair;
-
 /**
  * Stores the Data of a Desc Index File.
- * 
+ *
  * @author Ahli
  */
 // TODO rebuild to use the UI object model instead of parsing all layout files
@@ -38,16 +36,15 @@ public class DescIndexData {
 	private static final String UTF_8 = "UTF-8";
 	
 	private static Logger logger = LogManager.getLogger();
-	
+	private final MpqInterface mpqi;
 	private String descIndexIntPath = null;
 	private ArrayList<Pair<File, String>> fileIntPathList = new ArrayList<>();
-	private final MpqInterface mpqi;
 	
 	/**
 	 * Constructor.
-	 * 
+	 *
 	 * @param mpqi
-	 *            MpqInterface
+	 *         MpqInterface
 	 */
 	public DescIndexData(final MpqInterface mpqi) {
 		this.mpqi = mpqi;
@@ -78,6 +75,47 @@ public class DescIndexData {
 	
 	/**
 	 * @param intPath
+	 * @return
+	 */
+	public boolean removeLayoutIntPath(final String intPath) {
+		for (int i = 0; i < fileIntPathList.size(); i++) {
+			final Pair<File, String> p = fileIntPathList.get(i);
+			if (p.getValue().equals(intPath)) {
+				fileIntPathList.remove(i);
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	/**
+	 * @param descIndexPath
+	 */
+	public void setDescIndexPathAndClear(final String descIndexPath) {
+		clear();
+		setDescIndexIntPath(descIndexPath);
+	}
+	
+	/**
+	 *
+	 */
+	public void clear() {
+		fileIntPathList.clear();
+	}
+	
+	/**
+	 * @param layoutPathList
+	 * @throws MpqException
+	 */
+	public void addLayoutIntPath(final Iterable<String> layoutPathList) throws MpqException {
+		final Iterator<String> it = layoutPathList.iterator();
+		while (it.hasNext()) {
+			this.addLayoutIntPath(it.next());
+		}
+	}
+	
+	/**
+	 * @param intPath
 	 * @throws MpqException
 	 */
 	public void addLayoutIntPath(final String intPath) throws MpqException {
@@ -97,47 +135,6 @@ public class DescIndexData {
 		if (logger.isTraceEnabled()) {
 			logger.trace("added Layout path: " + intPath2);
 			logger.trace("added File path: " + f.getAbsolutePath());
-		}
-	}
-	
-	/**
-	 * @param intPath
-	 * @return
-	 */
-	public boolean removeLayoutIntPath(final String intPath) {
-		for (int i = 0; i < fileIntPathList.size(); i++) {
-			final Pair<File, String> p = fileIntPathList.get(i);
-			if (p.getValue().equals(intPath)) {
-				fileIntPathList.remove(i);
-				return true;
-			}
-		}
-		return false;
-	}
-	
-	/**
-	 * 
-	 */
-	public void clear() {
-		fileIntPathList.clear();
-	}
-	
-	/**
-	 * @param descIndexPath
-	 */
-	public void setDescIndexPathAndClear(final String descIndexPath) {
-		clear();
-		setDescIndexIntPath(descIndexPath);
-	}
-	
-	/**
-	 * @param layoutPathList
-	 * @throws MpqException
-	 */
-	public void addLayoutIntPath(final Iterable<String> layoutPathList) throws MpqException {
-		final Iterator<String> it = layoutPathList.iterator();
-		while (it.hasNext()) {
-			this.addLayoutIntPath(it.next());
 		}
 	}
 	
@@ -186,7 +183,7 @@ public class DescIndexData {
 	
 	/**
 	 * Orders layout files in DescIndex.
-	 * 
+	 *
 	 * @throws IOException
 	 * @throws SAXException
 	 * @throws ParserConfigurationException
@@ -237,7 +234,8 @@ public class DescIndexData {
 						boolean constantDefinedBefore = false;
 						// check if it appears before the template
 						if (i > 0) {
-							y: for (int i2 = 0; i2 < i; i2++) {
+							y:
+							for (int i2 = 0; i2 < i; i2++) {
 								// Pair<File, String> otherPair =
 								// fileIntPathList.get(i2);
 								// String fileName =
@@ -253,16 +251,15 @@ public class DescIndexData {
 							}
 						}
 						if (!constantDefinedBefore) {
-							y: for (int i2 = i + 1; i2 < dependencies.size(); i2++) {
+							y:
+							for (int i2 = i + 1; i2 < dependencies.size(); i2++) {
 								final Pair<File, String> otherPair = fileIntPathList.get(i2);
 								String fileName = otherPair.getKey().getName();
 								fileName = fileName.substring(0, fileName.lastIndexOf('.'));
 								for (final String constant : ownConstants.get(i2)) {
 									if (constant.equals(curDependencyTo)) {
 										if (logger.isTraceEnabled()) {
-											logger.trace("checked " + fileIntPathList.get(i).getKey().getName()
-													+ " with dependency " + curDependencyTo + " and " + constant + " i="
-													+ i + " j=" + j + " i2=" + i2);
+											logger.trace("checked " + fileIntPathList.get(i).getKey().getName() + " with dependency " + curDependencyTo + " and " + constant + " i=" + i + " j=" + j + " i2=" + i2);
 											logger.trace("fileIntPathList:" + fileIntPathList);
 										}
 										// i's needs to be inserted after i2
@@ -273,16 +270,13 @@ public class DescIndexData {
 										fileIntPathList.add(i, pair);
 										constantDefinedBefore = true;
 										if (logger.isTraceEnabled()) {
-											logger.trace("inserted " + fileIntPathList.get(i).getKey().getName()
-													+ " after " + fileName);
+											logger.trace("inserted " + fileIntPathList.get(i).getKey().getName() + " after " + fileName);
 											logger.trace("fileIntPathList: " + fileIntPathList);
 										}
 										break y;
 									} else {
 										if (logger.isTraceEnabled()) {
-											logger.trace("checked " + fileIntPathList.get(i).getKey().getName()
-													+ " with dependency " + curDependencyTo + " and " + constant + " i="
-													+ i + " j=" + j + " i2=" + i2);
+											logger.trace("checked " + fileIntPathList.get(i).getKey().getName() + " with dependency " + curDependencyTo + " and " + constant + " i=" + i + " j=" + j + " i2=" + i2);
 										}
 									}
 								}
@@ -304,7 +298,8 @@ public class DescIndexData {
 				logger.trace("counter=" + counter);
 			}
 			insertOccurred = false;
-			x: for (int i = 0; i < dependencies.size(); i++) {
+			x:
+			for (int i = 0; i < dependencies.size(); i++) {
 				
 				final ArrayList<String> curLayoutDepList = dependencies.get(i);
 				final Pair<File, String> pair = fileIntPathList.get(i);
@@ -322,9 +317,7 @@ public class DescIndexData {
 							
 							if (fileName.equals(curDependencyTo)) {
 								if (logger.isTraceEnabled()) {
-									logger.trace("checked " + fileIntPathList.get(i).getKey().getName()
-											+ " with dependency " + curDependencyTo + " and " + fileName + " i=" + i
-											+ " j=" + j + " i2=" + i2);
+									logger.trace("checked " + fileIntPathList.get(i).getKey().getName() + " with dependency " + curDependencyTo + " and " + fileName + " i=" + i + " j=" + j + " i2=" + i2);
 									logger.trace("fileIntPathList:" + fileIntPathList);
 								}
 								// i's needs to be inserted after i2
@@ -335,16 +328,13 @@ public class DescIndexData {
 								fileIntPathList.add(i, pair);
 								insertOccurred = true;
 								if (logger.isTraceEnabled()) {
-									logger.trace("inserted " + fileIntPathList.get(i).getKey().getName() + " after "
-											+ fileName);
+									logger.trace("inserted " + fileIntPathList.get(i).getKey().getName() + " after " + fileName);
 									logger.trace("fileIntPathList: " + fileIntPathList);
 								}
 								break x;
 							} else {
 								if (logger.isTraceEnabled()) {
-									logger.trace("checked " + fileIntPathList.get(i).getKey().getName()
-											+ " with dependency " + curDependencyTo + " and " + fileName + " i=" + i
-											+ " j=" + j + " i2=" + i2);
+									logger.trace("checked " + fileIntPathList.get(i).getKey().getName() + " with dependency " + curDependencyTo + " and " + fileName + " i=" + i + " j=" + j + " i2=" + i2);
 								}
 							}
 						}

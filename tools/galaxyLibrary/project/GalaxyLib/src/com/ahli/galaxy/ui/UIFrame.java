@@ -18,18 +18,17 @@ public class UIFrame extends UIElement {
 	private static final String ZERO = "0";
 	
 	/**
-	 * 
+	 *
 	 */
 	private static final long serialVersionUID = -4610017347746925885L;
 	
 	// private static final Logger LOGGER = LogManager.getLogger();
-	
-	private String type;
-	private List<UIElement> children;
 	private final List<UIAttribute> attributes;
 	private final String[] pos = new String[4];
 	private final String[] offset = new String[4];
 	private final String[] relative = new String[4];
+	private String type;
+	private List<UIElement> children;
 	
 	/**
 	 * @param name
@@ -39,27 +38,6 @@ public class UIFrame extends UIElement {
 		super(name);
 		// this.type = type.equals(FRAME) ? null : type;
 		init();
-		attributes = new ArrayList<>();
-		children = new ArrayList<>();
-	}
-	
-	/**
-	 * @param name
-	 * @param type
-	 */
-	public UIFrame(final String name, final int initialAttributesCapacity, final int initialChildrenCapacity) {
-		super(name);
-		init();
-		attributes = new ArrayList<>(initialAttributesCapacity);
-		children = new ArrayList<>(initialChildrenCapacity);
-	}
-	
-	/**
-	 * @param name
-	 */
-	public UIFrame(final String name) {
-		super(name);
-		type = null;
 		attributes = new ArrayList<>();
 		children = new ArrayList<>();
 	}
@@ -81,6 +59,27 @@ public class UIFrame extends UIElement {
 		offset[1] = ZERO;
 		offset[2] = ZERO;
 		offset[3] = ZERO;
+	}
+	
+	/**
+	 * @param name
+	 * @param type
+	 */
+	public UIFrame(final String name, final int initialAttributesCapacity, final int initialChildrenCapacity) {
+		super(name);
+		init();
+		attributes = new ArrayList<>(initialAttributesCapacity);
+		children = new ArrayList<>(initialChildrenCapacity);
+	}
+	
+	/**
+	 * @param name
+	 */
+	public UIFrame(final String name) {
+		super(name);
+		type = null;
+		attributes = new ArrayList<>();
+		children = new ArrayList<>();
 	}
 	
 	/**
@@ -114,7 +113,7 @@ public class UIFrame extends UIElement {
 	
 	/**
 	 * @param type
-	 *            the type to set
+	 *         the type to set
 	 */
 	public void setType(final String type) {
 		// type of "frame" is null
@@ -167,6 +166,7 @@ public class UIFrame extends UIElement {
 	// this.attributes = attributes;
 	// }
 	//
+	
 	/**
 	 * @param value
 	 */

@@ -1,38 +1,35 @@
 package com.ahli.mpq;
 
-import java.io.File;
-import java.io.IOException;
-
-import javax.xml.parsers.ParserConfigurationException;
-
+import com.ahli.mpq.i18n.Messages;
+import com.ahli.mpq.mpqeditor.MpqEditorSettingsInterface;
+import com.ahli.util.DeepCopyable;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.xml.sax.SAXException;
 
-import com.ahli.mpq.i18n.Messages;
-import com.ahli.mpq.mpqeditor.MpqEditorSettingsInterface;
-import com.ahli.util.DeepCopyable;
+import javax.xml.parsers.ParserConfigurationException;
+import java.io.File;
+import java.io.IOException;
 
 /**
  * Implements a MpqInterface for Ladislav Zezula's MpqEditor.exe.
- * 
+ *
  * @author Ahli
  */
 public class MpqEditorInterface implements MpqInterface, DeepCopyable {
+	private final static char q = '\"';
 	private static Logger logger = LogManager.getLogger();
-	
+	private final MpqEditorSettingsInterface settings;
 	private String mpqEditor = "plugins" + File.separator + "mpq" + File.separator + "MPQEditor.exe"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	private String mpqCachePath;
-	private final static char q = '\"';
-	private final MpqEditorSettingsInterface settings;
 	
 	/**
 	 * Constructor.
-	 * 
+	 *
 	 * @param mpqCachePath
-	 *            path of the directory that will temporarily contain the extracted
-	 *            mpq
+	 *         path of the directory that will temporarily contain the extracted
+	 *         mpq
 	 */
 	public MpqEditorInterface(final String mpqCachePath2) {
 		mpqCachePath = mpqCachePath2;
@@ -40,8 +37,51 @@ public class MpqEditorInterface implements MpqInterface, DeepCopyable {
 	}
 	
 	/**
+	 * Returns the file count in a folder including all subfolders.
+	 *
+	 * @param file
+	 * @return
+	 */
+	public static int getFileCountInFolder(final File file) {
+		final File[] files = file.listFiles();
+		int count = 0;
+		if (files != null) {
+			for (final File f : files) {
+				if (f.isDirectory()) {
+					count += getFileCountInFolder(f);
+				} else {
+					count++;
+				}
+			}
+		}
+		return count;
+	}
+	
+	/**
+	 * @param f
+	 * @return
+	 */
+	public static boolean deleteDir(final File f) {
+		if (f.isDirectory()) {
+			final File[] content = f.listFiles();
+			if (content != null) {
+				for (int i = 0; i < content.length; i++) {
+					if (!deleteDir(content[i])) {
+						return false;
+					}
+				}
+			}
+		}
+		final boolean result = f.delete();
+		if (!result) {
+			logger.error("Deleting file/folder " + f.getPath() + " failed."); //$NON-NLS-1$ //$NON-NLS-2$
+		}
+		return result;
+	}
+	
+	/**
 	 * Returns the cache path as String.
-	 * 
+	 *
 	 * @return cache path as String
 	 */
 	public String getMpqCachePath() {
@@ -50,22 +90,12 @@ public class MpqEditorInterface implements MpqInterface, DeepCopyable {
 	
 	/**
 	 * Sets the cache path.
-	 * 
+	 *
 	 * @param mpqCachePath
-	 *            new cache path as String
+	 *         new cache path as String
 	 */
 	public void setMpqCachePath(final String mpqCachePath2) {
 		mpqCachePath = mpqCachePath2;
-	}
-	
-	/**
-	 * Sets the MpqEditor path.
-	 * 
-	 * @param editorPath
-	 *            new editor path as String
-	 */
-	public void setMpqEditorPath(final String editorPath) {
-		mpqEditor = editorPath;
 	}
 	
 	/**
@@ -79,38 +109,46 @@ public class MpqEditorInterface implements MpqInterface, DeepCopyable {
 	}
 	
 	/**
+	 * Sets the MpqEditor path.
+	 *
+	 * @param editorPath
+	 *         new editor path as String
+	 */
+	public void setMpqEditorPath(final String editorPath) {
+		mpqEditor = editorPath;
+	}
+	
+	/**
 	 * Build MPQ from cache.
-	 * 
+	 *
 	 * @param buildPath
 	 * @param buildFileName
 	 * @param protectMPQ
 	 * @param buildBoth
-	 *            if protectMPQ, then this controls if an unprotected version is
-	 *            build, too
+	 *         if protectMPQ, then this controls if an unprotected version is
+	 *         build, too
 	 * @throws IOException
 	 * @throws InterruptedException
 	 * @throws MpqException
 	 */
-	public void buildMpq(final String buildPath, final String buildFileName, final boolean protectMPQ,
-			final boolean buildBoth) throws IOException, InterruptedException, MpqException {
+	public void buildMpq(final String buildPath, final String buildFileName, final boolean protectMPQ, final boolean buildBoth) throws IOException, InterruptedException, MpqException {
 		final String absolutePath = buildPath + File.separator + buildFileName;
 		buildMpq(absolutePath, protectMPQ, buildBoth);
 	}
 	
 	/**
 	 * Build MPQ from cache.
-	 * 
+	 *
 	 * @param absolutePath
 	 * @param protectMPQ
 	 * @param buildBoth
-	 *            if protectMPQ, then this controls if an unprotected version is
-	 *            build, too
+	 *         if protectMPQ, then this controls if an unprotected version is
+	 *         build, too
 	 * @throws IOException
 	 * @throws InterruptedException
 	 * @throws MpqException
 	 */
-	public void buildMpq(final String absolutePath, final boolean protectMPQ, final boolean buildBoth)
-			throws IOException, InterruptedException, MpqException {
+	public void buildMpq(final String absolutePath, final boolean protectMPQ, final boolean buildBoth) throws IOException, InterruptedException, MpqException {
 		// add 2 to be sure to have enough space for listfile and attributes
 		final int fileCount = 2 + getFileCountInFolder(new File(mpqCachePath));
 		
@@ -136,8 +174,7 @@ public class MpqEditorInterface implements MpqInterface, DeepCopyable {
 					if (!fup.delete()) {
 						final String msg = "ERROR: Could not delete file " + unprotectedAbsolutePath; //$NON-NLS-1$
 						logger.error(msg);
-						throw new MpqException(
-								String.format(Messages.getString("MpqInterface.CouldNotOverwriteFile"), absolutePath)); //$NON-NLS-1$
+						throw new MpqException(String.format(Messages.getString("MpqInterface.CouldNotOverwriteFile"), absolutePath)); //$NON-NLS-1$
 					}
 				}
 				
@@ -153,8 +190,7 @@ public class MpqEditorInterface implements MpqInterface, DeepCopyable {
 				if (!f.delete()) {
 					final String msg = "ERROR: Could not delete file " + absolutePath; //$NON-NLS-1$
 					logger.error(msg);
-					throw new MpqException(
-							String.format(Messages.getString("MpqInterface.CouldNotOverwriteFile"), absolutePath)); //$NON-NLS-1$
+					throw new MpqException(String.format(Messages.getString("MpqInterface.CouldNotOverwriteFile"), absolutePath)); //$NON-NLS-1$
 				}
 			}
 			
@@ -192,8 +228,7 @@ public class MpqEditorInterface implements MpqInterface, DeepCopyable {
 				if (!f.delete()) {
 					final String msg = "ERROR: Could not delete file " + absolutePath; //$NON-NLS-1$
 					logger.error(msg);
-					throw new MpqException(
-							String.format(Messages.getString("MpqInterface.CouldNotOverwriteFile"), absolutePath)); //$NON-NLS-1$
+					throw new MpqException(String.format(Messages.getString("MpqInterface.CouldNotOverwriteFile"), absolutePath)); //$NON-NLS-1$
 				}
 			}
 			
@@ -208,34 +243,13 @@ public class MpqEditorInterface implements MpqInterface, DeepCopyable {
 	
 	/**
 	 * Returns path with suffix via changing file name.
-	 * 
+	 *
 	 * @param absolutePath
 	 * @return
 	 */
 	private String getPathWithSuffix(final String absolutePath, final String suffix) {
 		final int i = absolutePath.lastIndexOf('.');
 		return absolutePath.substring(0, i) + suffix + absolutePath.substring(i);
-	}
-	
-	/**
-	 * Returns the file count in a folder including all subfolders.
-	 * 
-	 * @param file
-	 * @return
-	 */
-	public static int getFileCountInFolder(final File file) {
-		final File[] files = file.listFiles();
-		int count = 0;
-		if (files != null) {
-			for (final File f : files) {
-				if (f.isDirectory()) {
-					count += getFileCountInFolder(f);
-				} else {
-					count++;
-				}
-			}
-		}
-		return count;
 	}
 	
 	/**
@@ -273,7 +287,7 @@ public class MpqEditorInterface implements MpqInterface, DeepCopyable {
 	
 	/**
 	 * Removes the "(attributes)" file from the cache.
-	 * 
+	 *
 	 * @return
 	 */
 	private boolean clearCacheAttributesFile() {
@@ -307,36 +321,13 @@ public class MpqEditorInterface implements MpqInterface, DeepCopyable {
 	}
 	
 	/**
-	 * @param f
-	 * @return
-	 */
-	public static boolean deleteDir(final File f) {
-		if (f.isDirectory()) {
-			final File[] content = f.listFiles();
-			if (content != null) {
-				for (int i = 0; i < content.length; i++) {
-					if (!deleteDir(content[i])) {
-						return false;
-					}
-				}
-			}
-		}
-		final boolean result = f.delete();
-		if (!result) {
-			logger.error("Deleting file/folder " + f.getPath() + " failed."); //$NON-NLS-1$ //$NON-NLS-2$
-		}
-		return result;
-	}
-	
-	/**
 	 * @param mpqPath
 	 * @param maxFileCount
 	 * @throws InterruptedException
 	 * @throws IOException
 	 * @throws MpqException
 	 */
-	public void newMpq(final String mpqPath, final int maxFileCount)
-			throws InterruptedException, IOException, MpqException {
+	public void newMpq(final String mpqPath, final int maxFileCount) throws InterruptedException, IOException, MpqException {
 		if (!verifyMpqEditor()) {
 			throw new MpqException(String.format(Messages.getString("MpqInterface.MPQEditorNotFound"), mpqEditor)); //$NON-NLS-1$
 		}
@@ -351,16 +342,6 @@ public class MpqEditorInterface implements MpqInterface, DeepCopyable {
 	}
 	
 	/**
-	 * Verifies the existence of the MPQEditor.exe at the stored file path.
-	 * 
-	 * @return
-	 */
-	private boolean verifyMpqEditor() {
-		final File f = new File(mpqEditor);
-		return f.exists() && f.isFile();
-	}
-	
-	/**
 	 * @param mpqPath
 	 * @param sourceFilePath
 	 * @param targetName
@@ -368,8 +349,7 @@ public class MpqEditorInterface implements MpqInterface, DeepCopyable {
 	 * @throws IOException
 	 * @throws MpqException
 	 */
-	public void addToMpq(final String mpqPath, final String sourceFilePath, final String targetName)
-			throws InterruptedException, IOException, MpqException {
+	public void addToMpq(final String mpqPath, final String sourceFilePath, final String targetName) throws InterruptedException, IOException, MpqException {
 		if (!verifyMpqEditor()) {
 			throw new MpqException(String.format(Messages.getString("MpqInterface.MPQEditorNotFound"), mpqEditor)); //$NON-NLS-1$
 		}
@@ -392,8 +372,7 @@ public class MpqEditorInterface implements MpqInterface, DeepCopyable {
 	 * @throws IOException
 	 * @throws MpqException
 	 */
-	public void extractFromMpq(final String mpqPath, final String fileName, final String targetPath,
-			final boolean inclSubFolders) throws InterruptedException, IOException, MpqException {
+	public void extractFromMpq(final String mpqPath, final String fileName, final String targetPath, final boolean inclSubFolders) throws InterruptedException, IOException, MpqException {
 		if (!verifyMpqEditor()) {
 			throw new MpqException(String.format(Messages.getString("MpqInterface.MPQEditorNotFound"), mpqEditor)); //$NON-NLS-1$
 		}
@@ -442,8 +421,7 @@ public class MpqEditorInterface implements MpqInterface, DeepCopyable {
 	 * @throws IOException
 	 * @throws MpqException
 	 */
-	public void scriptMpq(final String mpqPath, final String scriptPath)
-			throws InterruptedException, IOException, MpqException {
+	public void scriptMpq(final String mpqPath, final String scriptPath) throws InterruptedException, IOException, MpqException {
 		if (!verifyMpqEditor()) {
 			throw new MpqException(String.format(Messages.getString("MpqInterface.MPQEditorNotFound"), mpqEditor)); //$NON-NLS-1$
 		}
@@ -456,14 +434,23 @@ public class MpqEditorInterface implements MpqInterface, DeepCopyable {
 	}
 	
 	/**
+	 * Verifies the existence of the MPQEditor.exe at the stored file path.
+	 *
+	 * @return
+	 */
+	private boolean verifyMpqEditor() {
+		final File f = new File(mpqEditor);
+		return f.exists() && f.isFile();
+	}
+	
+	/**
 	 * @param mpqPath
 	 * @param filePath
 	 * @throws InterruptedException
 	 * @throws IOException
 	 * @throws MpqException
 	 */
-	public void deleteFileInMpq(final String mpqPath, final String filePath)
-			throws InterruptedException, IOException, MpqException {
+	public void deleteFileInMpq(final String mpqPath, final String filePath) throws InterruptedException, IOException, MpqException {
 		if (!verifyMpqEditor()) {
 			throw new MpqException(String.format(Messages.getString("MpqInterface.MPQEditorNotFound"), mpqEditor)); //$NON-NLS-1$
 		}
@@ -483,8 +470,7 @@ public class MpqEditorInterface implements MpqInterface, DeepCopyable {
 	 * @throws IOException
 	 * @throws MpqException
 	 */
-	public void renameFileInMpq(final String mpqPath, final String oldfilePath, final String newFilePath)
-			throws InterruptedException, IOException, MpqException {
+	public void renameFileInMpq(final String mpqPath, final String oldfilePath, final String newFilePath) throws InterruptedException, IOException, MpqException {
 		if (!verifyMpqEditor()) {
 			throw new MpqException(String.format(Messages.getString("MpqInterface.MPQEditorNotFound"), mpqEditor)); //$NON-NLS-1$
 		}
@@ -500,7 +486,7 @@ public class MpqEditorInterface implements MpqInterface, DeepCopyable {
 	
 	/**
 	 * Returns a file from the cache with the specified internal path.
-	 * 
+	 *
 	 * @param descIndexIntPath
 	 * @return
 	 */
@@ -511,7 +497,7 @@ public class MpqEditorInterface implements MpqInterface, DeepCopyable {
 	
 	/**
 	 * Returns the componentList file.
-	 * 
+	 *
 	 * @return
 	 */
 	public File getComponentListFile() {
@@ -526,7 +512,7 @@ public class MpqEditorInterface implements MpqInterface, DeepCopyable {
 	}
 	
 	/**
-	 * 
+	 *
 	 */
 	@Override
 	public boolean isHeroesMpq() throws MpqException {
@@ -561,7 +547,7 @@ public class MpqEditorInterface implements MpqInterface, DeepCopyable {
 	}
 	
 	/**
-	 * 
+	 *
 	 */
 	public void restoreSettings() {
 		settings.restoreOriginalSettingFiles();

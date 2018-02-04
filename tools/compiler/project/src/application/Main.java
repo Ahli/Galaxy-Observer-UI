@@ -1,5 +1,51 @@
 package application;
 
+import application.controller.ErrorTabPaneController;
+import application.integration.ReplayFinder;
+import application.integration.SettingsIniInterface;
+import application.util.JarHelper;
+import application.util.logger.log4j2plugin.StylizedTextAreaAppender;
+import com.ahli.galaxy.ModData;
+import com.ahli.galaxy.archive.ComponentsListReader;
+import com.ahli.galaxy.archive.DescIndexData;
+import com.ahli.galaxy.game.GameData;
+import com.ahli.galaxy.game.def.HeroesGameDef;
+import com.ahli.galaxy.game.def.SC2GameDef;
+import com.ahli.galaxy.game.def.abstracts.GameDef;
+import com.ahli.galaxy.ui.DescIndexReader;
+import com.ahli.galaxy.ui.exception.UIException;
+import com.ahli.galaxy.ui.interfaces.UICatalog;
+import com.ahli.mpq.MpqEditorInterface;
+import com.ahli.mpq.MpqException;
+import javafx.animation.PauseTransition;
+import javafx.application.Application;
+import javafx.application.Platform;
+import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Scene;
+import javafx.scene.control.Tab;
+import javafx.scene.control.TabPane;
+import javafx.scene.image.Image;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.BorderPane;
+import javafx.stage.Stage;
+import javafx.util.Duration;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOCase;
+import org.apache.commons.io.filefilter.IOFileFilter;
+import org.apache.commons.io.filefilter.SuffixFileFilter;
+import org.apache.commons.io.filefilter.TrueFileFilter;
+import org.apache.commons.io.filefilter.WildcardFileFilter;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.fxmisc.flowless.VirtualizedScrollPane;
+import org.fxmisc.richtext.StyleClassedTextArea;
+import org.xml.sax.SAXException;
+
+import javax.swing.JFileChooser;
+import javax.xml.parsers.ParserConfigurationException;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -19,86 +65,32 @@ import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-import javax.swing.JFileChooser;
-import javax.xml.parsers.ParserConfigurationException;
-
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOCase;
-import org.apache.commons.io.filefilter.IOFileFilter;
-import org.apache.commons.io.filefilter.SuffixFileFilter;
-import org.apache.commons.io.filefilter.TrueFileFilter;
-import org.apache.commons.io.filefilter.WildcardFileFilter;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.fxmisc.flowless.VirtualizedScrollPane;
-import org.fxmisc.richtext.StyleClassedTextArea;
-import org.xml.sax.SAXException;
-
-import com.ahli.galaxy.ModData;
-import com.ahli.galaxy.archive.ComponentsListReader;
-import com.ahli.galaxy.archive.DescIndexData;
-import com.ahli.galaxy.game.GameData;
-import com.ahli.galaxy.game.def.HeroesGameDef;
-import com.ahli.galaxy.game.def.SC2GameDef;
-import com.ahli.galaxy.game.def.abstracts.GameDef;
-import com.ahli.galaxy.ui.DescIndexReader;
-import com.ahli.galaxy.ui.exception.UIException;
-import com.ahli.galaxy.ui.interfaces.UICatalog;
-import com.ahli.mpq.MpqEditorInterface;
-import com.ahli.mpq.MpqException;
-
-import application.controller.ErrorTabPaneController;
-import application.integration.ReplayFinder;
-import application.integration.SettingsIniInterface;
-import application.util.JarHelper;
-import application.util.logger.log4j2plugin.StylizedTextAreaAppender;
-import javafx.animation.PauseTransition;
-import javafx.application.Application;
-import javafx.application.Platform;
-import javafx.collections.ObservableList;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Scene;
-import javafx.scene.control.Tab;
-import javafx.scene.control.TabPane;
-import javafx.scene.image.Image;
-import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.BorderPane;
-import javafx.stage.Stage;
-import javafx.util.Duration;
-
 /**
  * Interface Compiler and Builder Application.
- * 
+ *
  * @author Ahli
  */
 public final class Main extends Application {
 	
-	private static Logger logger = LogManager.getLogger();
+	private static final Logger logger = LogManager.getLogger();
+	// performance
+	private static long startTime;
+	private final ReplayFinder replayFinder = new ReplayFinder();
+	private final CompileManager compileManager = new CompileManager();
+	// data
+	private final String documentsPath = new JFileChooser().getFileSystemView().getDefaultDirectory().toString();
+	private final GameData gameSC2 = new GameData(new SC2GameDef());
+	private final List<ErrorTabPaneController> errorTabControllers = new ArrayList<>();
 	private ThreadPoolExecutor executor;
-	
 	// Components
 	private MpqEditorInterface baseMpqInterface = null;
 	private SettingsIniInterface settings = null;
-	private final ReplayFinder replayFinder = new ReplayFinder();
-	private final CompileManager compileManager = new CompileManager();
-	
-	// data
-	private final String documentsPath = new JFileChooser().getFileSystemView().getDefaultDirectory().toString();
 	private File basePath = null;
-	private final GameData gameSC2 = new GameData(new SC2GameDef());
 	private GameData gameHeroes = new GameData(new HeroesGameDef());
-	
 	// GUI
 	// private StyleClassedTextArea txtArea = null;
 	private TabPane tabPane = null;
 	private boolean userPreventedAutomaticClosing = false;
-	private final List<ErrorTabPaneController> errorTabControllers = new ArrayList<>();
-	
-	// performance
-	private static long startTime;
-	
 	// Command Line Parameter
 	private boolean hasParamCompilePath = false;
 	private String paramCompilePath = null;
@@ -107,9 +99,9 @@ public final class Main extends Application {
 	
 	/**
 	 * Entry point of the App.
-	 * 
+	 *
 	 * @param args
-	 *            command line arguments
+	 * 		command line arguments
 	 */
 	public static void main(final String[] args) {
 		startTime = System.currentTimeMillis();
@@ -125,6 +117,44 @@ public final class Main extends Application {
 		logger.info("Max Heap Space: " + Runtime.getRuntime().maxMemory() / 1048576L + "mb.");
 		
 		launch(args);
+	}
+	
+	/**
+	 * Copies a file or folder.
+	 *
+	 * @param source
+	 * 		source location
+	 * @param target
+	 * 		target location
+	 * @throws IOException
+	 * 		when something goes wrong
+	 */
+	private static void copyFileOrFolder(final File source, final File target) throws IOException {
+		if (source.isDirectory()) {
+			// create folder if not existing
+			if (!target.exists() && !target.mkdir()) {
+				final String msg = "Could not create directory " + target.getAbsolutePath(); //$NON-NLS-1$
+				logger.error(msg);
+				throw new IOException(msg);
+			}
+			
+			// copy all contained files recursively
+			final String[] fileList = source.list();
+			if (fileList == null) {
+				final String msg = "Source directory's files returned null"; //$NON-NLS-1$
+				logger.error(msg);
+				throw new IOException(msg);
+			}
+			for (final String file : fileList) {
+				final File srcFile = new File(source, file);
+				final File destFile = new File(target, file);
+				// Recursive function call
+				copyFileOrFolder(srcFile, destFile);
+			}
+		} else {
+			// copy the file
+			Files.copy(source.toPath(), target.toPath(), StandardCopyOption.REPLACE_EXISTING);
+		}
 	}
 	
 	/**
@@ -155,43 +185,6 @@ public final class Main extends Application {
 	}
 	
 	/**
-	 * Worker Thread Factory for the Thread Pool.
-	 * 
-	 * @author Ahli
-	 */
-	private static final class MyThreadFactory implements ThreadFactory {
-		@Override
-		public Thread newThread(final Runnable runnable) {
-			final Thread t = new Thread(runnable);
-			t.setPriority(Thread.NORM_PRIORITY);
-			return t;
-		}
-	}
-	
-	private static final class MyThreadPoolExecutor extends ThreadPoolExecutor {
-		
-		public MyThreadPoolExecutor(final int arg0, final int arg1, final long arg2, final TimeUnit arg3,
-				final BlockingQueue<Runnable> arg4, final ThreadFactory arg5) {
-			super(arg0, arg1, arg2, arg3, arg4, arg5);
-		}
-		
-		@Override
-		protected void beforeExecute(final Thread t, final Runnable r) {
-			super.beforeExecute(t, r);
-			// altering the thread name allows the logger to use the correct controller
-			// -> log message is always put into the correct ID
-			t.setName(t.getId() + "_" + r.hashCode());
-		}
-		
-		@Override
-		protected void afterExecute(final Runnable r, final Throwable t) {
-			super.afterExecute(r, t);
-			StylizedTextAreaAppender.finishedWork(Thread.currentThread().getName());
-		}
-		
-	};
-	
-	/**
 	 * Initializes the ThreadPool.
 	 */
 	private void initThreadPool() {
@@ -210,16 +203,15 @@ public final class Main extends Application {
 		// durations/thread# for my 4cpu/8threads: 16, 13, 12, 12, 12,... 12
 		
 		final int maxThreads = Math.max(1, Math.min(numberOfProcessors / 2, 1));
-		executor = new MyThreadPoolExecutor(maxThreads, maxThreads, 5000L, TimeUnit.MILLISECONDS,
-				new LinkedBlockingQueue<Runnable>(), new MyThreadFactory());
+		executor = new MyThreadPoolExecutor(maxThreads, maxThreads, 5000L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<>(), new MyThreadFactory());
 		executor.allowCoreThreadTimeOut(true);
 	}
 	
 	/**
 	 * Returns the path the a game's base UI folder.
-	 * 
+	 *
 	 * @param gameDef
-	 *            the game
+	 * 		the game
 	 * @return path to the baseUI folder of the specified game
 	 */
 	private String getBaseUiPath(final GameDef gameDef) {
@@ -228,9 +220,9 @@ public final class Main extends Application {
 	
 	/**
 	 * Starts the Application's work thread.
-	 * 
+	 *
 	 * @param primaryStage
-	 *            app's main stage
+	 * 		app's main stage
 	 */
 	private void executeWorkPipeline(final Stage primaryStage) {
 		new Thread() {
@@ -240,8 +232,7 @@ public final class Main extends Application {
 					Thread.currentThread().setName("Supervisor"); //$NON-NLS-1$
 					Thread.currentThread().setPriority(Thread.MIN_PRIORITY);
 					final ThreadPoolExecutor executor = getExecutor();
-					final String path = isHasParamCompilePath() ? getParamCompilePath()
-							: getBasePath().getAbsolutePath();
+					final String path = isHasParamCompilePath() ? getParamCompilePath() : getBasePath().getAbsolutePath();
 					
 					final boolean workHeroes = pathContainsCompileableForGame(path, getGameHeroes());
 					if (workHeroes) {
@@ -268,9 +259,7 @@ public final class Main extends Application {
 					executor.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
 					final long executionTime = (System.currentTimeMillis() - startTime);
 					logger.info("Execution time: " + String.format("%d min, %d sec", //$NON-NLS-1$ //$NON-NLS-2$
-							TimeUnit.MILLISECONDS.toMinutes(executionTime),
-							TimeUnit.MILLISECONDS.toSeconds(executionTime)
-									- TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(executionTime))));
+							TimeUnit.MILLISECONDS.toMinutes(executionTime), TimeUnit.MILLISECONDS.toSeconds(executionTime) - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(executionTime))));
 					Platform.runLater(new Runnable() {
 						@Override
 						public void run() {
@@ -346,7 +335,7 @@ public final class Main extends Application {
 	}
 	
 	/**
-	 * @param gameHeroes2
+	 * @param game
 	 * @param path
 	 * @throws InterruptedException
 	 */
@@ -366,7 +355,7 @@ public final class Main extends Application {
 	/**
 	 * Returns whether the specified path contains a compilable file for the
 	 * specified game.
-	 * 
+	 *
 	 * @param path
 	 * @param game
 	 * @return
@@ -395,25 +384,23 @@ public final class Main extends Application {
 	
 	/**
 	 * Parses the default UI of the specified game.
-	 * 
+	 *
 	 * @param game
-	 *            game whose default UI is parsed
+	 * 		game whose default UI is parsed
 	 * @throws InterruptedException
 	 */
 	private void parseDefaultUI(final GameData game) throws InterruptedException {
 		printLogMessageToGeneral("Starting to parse base " + game.getGameDef().getName() + " UI."); //$NON-NLS-1$ //$NON-NLS-2$
 		
 		final UICatalog uiCatalog = game.getUiCatalog();
-		final String gameDir = getBaseUiPath(game.getGameDef()) + File.separator
-				+ game.getGameDef().getModsSubDirectory();
+		final String gameDir = getBaseUiPath(game.getGameDef()) + File.separator + game.getGameDef().getModsSubDirectory();
 		try {
 			
 			for (final String modOrDir : game.getGameDef().getCoreModsOrDirectories()) {
 				
 				final File directory = new File(gameDir + File.separator + modOrDir);
 				
-				final Collection<File> descIndexFiles = FileUtils.listFiles(directory,
-						new WildcardFileFilter("DescIndex.*Layout"), TrueFileFilter.INSTANCE); //$NON-NLS-1$
+				final Collection<File> descIndexFiles = FileUtils.listFiles(directory, new WildcardFileFilter("DescIndex.*Layout"), TrueFileFilter.INSTANCE); //$NON-NLS-1$
 				logger.info("number of descIndexFiles found: " + descIndexFiles.size()); //$NON-NLS-1$
 				
 				for (final File descIndexFile : descIndexFiles) {
@@ -435,11 +422,11 @@ public final class Main extends Application {
 	
 	/**
 	 * Sets title of stage.
-	 * 
+	 *
 	 * @param title
-	 *            the new title
+	 * 		the new title
 	 * @param stage
-	 *            stage receiving the title
+	 * 		stage receiving the title
 	 */
 	private void setStageTitle(final String title, final Stage stage) {
 		Platform.runLater(new Runnable() {
@@ -459,7 +446,7 @@ public final class Main extends Application {
 	 * Action depends on fields.
 	 *
 	 * @param primaryStage
-	 *            app's main stage
+	 * 		app's main stage
 	 */
 	private void startReplayOrQuitOrShowError(final Stage primaryStage) {
 		if (!anyErrorTrackerEncounteredError()) {
@@ -473,7 +460,7 @@ public final class Main extends Application {
 							try {
 								// close after 5 seconds, if compiled all and no errors
 								final PauseTransition delay = new PauseTransition(Duration.seconds(5));
-								delay.setOnFinished(new EventHandler<ActionEvent>() {
+								delay.setOnFinished(new EventHandler<>() {
 									@Override
 									public void handle(final ActionEvent event) {
 										if (!isUserPreventedAutomaticClosing()) {
@@ -637,9 +624,9 @@ public final class Main extends Application {
 	
 	/**
 	 * Initialize GUI.
-	 * 
+	 *
 	 * @param primaryStage
-	 *            the main App's Stage
+	 * 		the main App's Stage
 	 */
 	private void initGUI(final Stage primaryStage) {
 		// Build UI
@@ -656,7 +643,7 @@ public final class Main extends Application {
 		
 		final FXMLLoader loader = new FXMLLoader();
 		// loader.setResources(Messages.getBundle());
-		try (InputStream is = Main.class.getResourceAsStream("view/TabsLayout.fxml");) { //$NON-NLS-1$
+		try (InputStream is = Main.class.getResourceAsStream("view/TabsLayout.fxml")) { //$NON-NLS-1$
 			tabPane = (TabPane) loader.load(is); // $NON-NLS-1$
 		} catch (final IOException e) {
 			logger.error("failed to load TabsLayout.fxml"); //$NON-NLS-1$
@@ -679,7 +666,7 @@ public final class Main extends Application {
 		}
 		
 		// mouse click detection to prevent auto-closing
-		scene.addEventFilter(MouseEvent.MOUSE_PRESSED, new EventHandler<MouseEvent>() {
+		scene.addEventFilter(MouseEvent.MOUSE_PRESSED, new EventHandler<>() {
 			@Override
 			public void handle(final MouseEvent mouseEvent) {
 				setUserPreventedAutomaticClosing(true);
@@ -693,13 +680,6 @@ public final class Main extends Application {
 	}
 	
 	/**
-	 * @param b
-	 */
-	public void setUserPreventedAutomaticClosing(final boolean b) {
-		userPreventedAutomaticClosing = b;
-	}
-	
-	/**
 	 * @return the userPreventedAutomaticClosing
 	 */
 	public boolean isUserPreventedAutomaticClosing() {
@@ -707,9 +687,17 @@ public final class Main extends Application {
 	}
 	
 	/**
+	 * @param b
+	 */
+	public void setUserPreventedAutomaticClosing(final boolean b) {
+		userPreventedAutomaticClosing = b;
+	}
+	
+	/**
 	 * Adds a Tab for the specified Thread ID containing its log messages.
-	 * 
-	 * @param threadId
+	 *
+	 * @param threadName
+	 * @param tabTitle
 	 */
 	private void addThreadLoggerTab(final String threadName, final String tabTitle) {
 		final Tab newTab = new Tab();
@@ -718,8 +706,7 @@ public final class Main extends Application {
 		errorTabCtrl.setRunning(true);
 		errorTabControllers.add(errorTabCtrl);
 		
-		final VirtualizedScrollPane<StyleClassedTextArea> virtualizedScrollPane = new VirtualizedScrollPane<>(
-				newTxtArea);
+		final VirtualizedScrollPane<StyleClassedTextArea> virtualizedScrollPane = new VirtualizedScrollPane<>(newTxtArea);
 		newTab.setContent(virtualizedScrollPane);
 		StylizedTextAreaAppender.setWorkerTaskController(errorTabCtrl, threadName);
 		newTab.setText(tabTitle);
@@ -742,9 +729,9 @@ public final class Main extends Application {
 	/**
 	 * ParamPath might be some layout or folder within the interface, so it is cut
 	 * down to the interface base path.
-	 * 
+	 *
 	 * @param paramPath
-	 *            application's compileParam's value
+	 * 		application's compileParam's value
 	 * @return shortens the path to the Interface root folder
 	 */
 	private String getInterfaceRootFromPath(final String paramPath) {
@@ -767,14 +754,14 @@ public final class Main extends Application {
 	
 	/**
 	 * Build all Interfaces for a game's subdirectory.
-	 * 
+	 *
 	 * @param subfolderName
-	 *            name from the base path to the directory whose interfaces are
-	 *            built.
+	 * 		name from the base path to the directory whose interfaces are
+	 * 		built.
 	 * @param gameData
-	 *            the game information
+	 * 		the game information
 	 * @throws IOException
-	 *             when something goes wrong
+	 * 		when something goes wrong
 	 */
 	public void buildGamesUIs(final String subfolderName, final GameData gameData) throws IOException {
 		final File dir = new File(basePath.getAbsolutePath() + File.separator + subfolderName);
@@ -791,11 +778,11 @@ public final class Main extends Application {
 	
 	/**
 	 * Builds a specific Interface in a Build Thread.
-	 * 
+	 *
 	 * @param interfaceFolder
-	 *            folder of the interface file to be built
+	 * 		folder of the interface file to be built
 	 * @param game
-	 *            the game information about the file
+	 * 		the game information about the file
 	 */
 	public void buildSpecificUI(final File interfaceFolder, final GameData game) {
 		if (interfaceFolder.isDirectory()) {
@@ -807,8 +794,7 @@ public final class Main extends Application {
 						try {
 							addThreadLoggerTab(Thread.currentThread().getName(), interfaceFolder.getName());
 							// create unique cache path
-							final MpqEditorInterface threadsMpqInterface = (MpqEditorInterface) getBaseMpqInterface()
-									.deepCopy();
+							final MpqEditorInterface threadsMpqInterface = (MpqEditorInterface) getBaseMpqInterface().deepCopy();
 							final long threadId = Thread.currentThread().getId();
 							threadsMpqInterface.setMpqCachePath(getBaseMpqInterface().getMpqCachePath() + threadId);
 							
@@ -837,9 +823,9 @@ public final class Main extends Application {
 	
 	/**
 	 * Prints a message to the message log.
-	 * 
+	 *
 	 * @param msg
-	 *            the message
+	 * 		the message
 	 */
 	public void printLogMessageToGeneral(final String msg) {
 		Platform.runLater(new Runnable() {
@@ -857,19 +843,18 @@ public final class Main extends Application {
 	/**
 	 * Builds MPQ Archive File. Run this in its own thread! Conditions: - Specified
 	 * MpqInterface requires a unique cache path for multithreading.
-	 * 
+	 *
 	 * @param sourceFile
-	 *            folder location
+	 * 		folder location
 	 * @param game
-	 *            set to true, if Heroes
+	 * 		set to true, if Heroes
 	 * @param mpqi
-	 *            MpqInterface with unique cache path
+	 * 		MpqInterface with unique cache path
 	 * @throws IOException
-	 *             when something goes wrong
+	 * 		when something goes wrong
 	 * @throws InterruptedException
 	 */
-	private void buildFile(final File sourceFile, final GameData game, final MpqEditorInterface mpqi)
-			throws IOException, InterruptedException {
+	private void buildFile(final File sourceFile, final GameData game, final MpqEditorInterface mpqi) throws IOException, InterruptedException {
 		printLogMessageToGeneral(sourceFile.getName() + " started construction.");
 		
 		final GameDef gameDef = game.getGameDef();
@@ -891,7 +876,8 @@ public final class Main extends Application {
 			throw new IOException(msg);
 		}
 		int cacheClearAttempts = 0;
-		y: for (cacheClearAttempts = 0; cacheClearAttempts <= 100; cacheClearAttempts++) {
+		y:
+		for (cacheClearAttempts = 0; cacheClearAttempts <= 100; cacheClearAttempts++) {
 			if (!mpqi.clearCacheExtractedMpq()) {
 				// sleep and hope the file gets released soon
 				Thread.sleep(500);
@@ -908,7 +894,8 @@ public final class Main extends Application {
 		mod.setMpqCachePath(cache);
 		// put files into cache
 		int copyAttempts = 0;
-		x: for (copyAttempts = 0; copyAttempts <= 100; copyAttempts++) {
+		x:
+		for (copyAttempts = 0; copyAttempts <= 100; copyAttempts++) {
 			try {
 				copyFileOrFolder(sourceFile, cache);
 				// logger.trace("Copy Folder took " + copyAttempts + " attempts to succeed.");
@@ -971,20 +958,10 @@ public final class Main extends Application {
 		// perform checks/improvements on code
 		compileManager.compile(mod, "Terr"); //$NON-NLS-1$
 		
-		// TODO performance test
-		// mod.getUi().setConstants(null);
-		// mod.getUi().setTemplates(null);
-		// mod.getUi().setBlizzOnlyConstants(null);
-		// mod.getUi().setDevLayouts(null);
-		// mod.getUi().setBlizzOnlyTemplates(null);
-		// mod.setUi(null);
-		// mod = null;
-		
 		logger.info("Building... " + sourceFile.getName()); //$NON-NLS-1$
 		
 		try {
-			final boolean protectMPQ = game.getGameDef() instanceof HeroesGameDef ? settings.isHeroesProtectMPQ()
-					: settings.isSC2ProtectMPQ();
+			final boolean protectMPQ = game.getGameDef() instanceof HeroesGameDef ? settings.isHeroesProtectMPQ() : settings.isSC2ProtectMPQ();
 			mpqi.buildMpq(targetPath, sourceFile.getName(), protectMPQ, settings.isBuildUnprotectedToo());
 			logger.info("Finished building... " + sourceFile.getName()); //$NON-NLS-1$
 		} catch (final IOException | MpqException e) {
@@ -1006,8 +983,7 @@ public final class Main extends Application {
 		try {
 			executor.awaitTermination(120L, TimeUnit.SECONDS);
 		} catch (final InterruptedException e) {
-			logger.error(
-					"ERROR: Executor timed out waiting for Worker Theads to terminate. A Thread might run rampage.", e); //$NON-NLS-1$
+			logger.error("ERROR: Executor timed out waiting for Worker Theads to terminate. A Thread might run rampage.", e); //$NON-NLS-1$
 		}
 		baseMpqInterface.clearCacheExtractedMpq();
 		logger.info("App waves Goodbye!"); //$NON-NLS-1$
@@ -1027,10 +1003,10 @@ public final class Main extends Application {
 	/**
 	 * Initializes the Settings File Interface. It either uses the specified
 	 * SettingsIniInterface or loads them from the default location.
-	 * 
+	 *
 	 * @param optionalSettingsToLoad
-	 *            optional SettingsIniInterface, set to null to load from default
-	 *            location
+	 * 		optional SettingsIniInterface, set to null to load from default
+	 * 		location
 	 */
 	private void initSettings(final SettingsIniInterface optionalSettingsToLoad) {
 		SettingsIniInterface settings2 = optionalSettingsToLoad;
@@ -1045,44 +1021,6 @@ public final class Main extends Application {
 			e.printStackTrace();
 		}
 		settings = settings2;
-	}
-	
-	/**
-	 * Copies a file or folder.
-	 * 
-	 * @param source
-	 *            source location
-	 * @param target
-	 *            target location
-	 * @throws IOException
-	 *             when something goes wrong
-	 */
-	private static void copyFileOrFolder(final File source, final File target) throws IOException {
-		if (source.isDirectory()) {
-			// create folder if not existing
-			if (!target.exists() && !target.mkdir()) {
-				final String msg = "Could not create directory " + target.getAbsolutePath(); //$NON-NLS-1$
-				logger.error(msg);
-				throw new IOException(msg);
-			}
-			
-			// copy all contained files recursively
-			final String[] fileList = source.list();
-			if (fileList == null) {
-				final String msg = "Source directory's files returned null"; //$NON-NLS-1$
-				logger.error(msg);
-				throw new IOException(msg);
-			}
-			for (final String file : fileList) {
-				final File srcFile = new File(source, file);
-				final File destFile = new File(target, file);
-				// Recursive function call
-				copyFileOrFolder(srcFile, destFile);
-			}
-		} else {
-			// copy the file
-			Files.copy(source.toPath(), target.toPath(), StandardCopyOption.REPLACE_EXISTING);
-		}
 	}
 	
 	/**
@@ -1118,6 +1056,42 @@ public final class Main extends Application {
 	 */
 	public TabPane getTabPane() {
 		return tabPane;
+	}
+	
+	/**
+	 * Worker Thread Factory for the Thread Pool.
+	 *
+	 * @author Ahli
+	 */
+	private static final class MyThreadFactory implements ThreadFactory {
+		@Override
+		public Thread newThread(final Runnable runnable) {
+			final Thread t = new Thread(runnable);
+			t.setPriority(Thread.NORM_PRIORITY);
+			return t;
+		}
+	}
+	
+	private static final class MyThreadPoolExecutor extends ThreadPoolExecutor {
+		
+		public MyThreadPoolExecutor(final int arg0, final int arg1, final long arg2, final TimeUnit arg3, final BlockingQueue<Runnable> arg4, final ThreadFactory arg5) {
+			super(arg0, arg1, arg2, arg3, arg4, arg5);
+		}
+		
+		@Override
+		protected void beforeExecute(final Thread t, final Runnable r) {
+			super.beforeExecute(t, r);
+			// altering the thread name allows the logger to use the correct controller
+			// -> log message is always put into the correct ID
+			t.setName(t.getId() + "_" + r.hashCode());
+		}
+		
+		@Override
+		protected void afterExecute(final Runnable r, final Throwable t) {
+			super.afterExecute(r, t);
+			StylizedTextAreaAppender.finishedWork(Thread.currentThread().getName());
+		}
+		
 	}
 	
 }

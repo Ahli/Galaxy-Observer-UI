@@ -1,7 +1,13 @@
 /*
- * 
+ *
  */
 package application.integration;
+
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.io.filefilter.TrueFileFilter;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -11,29 +17,48 @@ import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.Collection;
 
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.io.filefilter.TrueFileFilter;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
 /**
  * Class that finds replays.
- * 
+ *
  * @author Ahli
  */
 public class ReplayFinder {
 	private static Logger logger = LogManager.getLogger();
 	
 	/**
+	 * Gets the last or newest replay.
+	 *
+	 * @param isHeroes
+	 *         gameIsHeroes
+	 * @param documentsPath
+	 *         the documents path
+	 * @return the last or newest replay
+	 */
+	public File getLastUsedOrNewestReplay(final boolean isHeroes, final String documentsPath) {
+		File replay = null;
+		try {
+			replay = getLastUsedReplay(isHeroes, documentsPath);
+		} catch (final IOException e) {
+			logger.error("Failed to receive last used replay.", e);
+		}
+		if (replay == null || !replay.exists() || !replay.isFile()) {
+			if (logger.isTraceEnabled()) {
+				logger.trace("Last used replay is invalid, getting newest replay instead.");
+			}
+			replay = getNewestReplay(isHeroes, documentsPath);
+		}
+		return replay;
+	}
+	
+	/**
 	 * Returns the last used replay file read from the game's Variables.txt.
 	 *
 	 * @param isHeroes
 	 * @param documentsPath
-	 *            the documents path
+	 *         the documents path
 	 * @return the last used replay
 	 * @throws IOException
-	 *             Signals that an I/O exception has occurred.
+	 *         Signals that an I/O exception has occurred.
 	 */
 	public File getLastUsedReplay(final boolean isHeroes, final String documentsPath) throws IOException {
 		String basePath = documentsPath + File.separator;
@@ -48,8 +73,7 @@ public class ReplayFinder {
 		}
 		
 		String line, replayPath = null;
-		try (final InputStreamReader is = new InputStreamReader(new FileInputStream(new File(basePath)),
-				StandardCharsets.UTF_8); BufferedReader br = new BufferedReader(is);) {
+		try (final InputStreamReader is = new InputStreamReader(new FileInputStream(new File(basePath)), StandardCharsets.UTF_8); BufferedReader br = new BufferedReader(is);) {
 			
 			boolean found = false;
 			final String searchToken = "lastReplayFilePath=";
@@ -74,7 +98,7 @@ public class ReplayFinder {
 	 *
 	 * @param isHeroes
 	 * @param documentsPath
-	 *            the documents path
+	 *         the documents path
 	 * @return the newest replay
 	 */
 	public File getNewestReplay(final boolean isHeroes, final String documentsPath) {
@@ -92,8 +116,7 @@ public class ReplayFinder {
 			logger.trace(basePath);
 		}
 		
-		final Collection<File> allReplays = FileUtils.listFiles(new File(basePath), TrueFileFilter.INSTANCE,
-				TrueFileFilter.INSTANCE);
+		final Collection<File> allReplays = FileUtils.listFiles(new File(basePath), TrueFileFilter.INSTANCE, TrueFileFilter.INSTANCE);
 		
 		if (logger.isTraceEnabled()) {
 			logger.trace("# Replays found: " + allReplays.size());
@@ -127,30 +150,5 @@ public class ReplayFinder {
 			logger.info("newest Replay: " + newestReplay.getName());
 		}
 		return newestReplay;
-	}
-	
-	/**
-	 * Gets the last or newest replay.
-	 *
-	 * @param isHeroes
-	 *            gameIsHeroes
-	 * @param documentsPath
-	 *            the documents path
-	 * @return the last or newest replay
-	 */
-	public File getLastUsedOrNewestReplay(final boolean isHeroes, final String documentsPath) {
-		File replay = null;
-		try {
-			replay = getLastUsedReplay(isHeroes, documentsPath);
-		} catch (final IOException e) {
-			logger.error("Failed to receive last used replay.", e);
-		}
-		if (replay == null || !replay.exists() || !replay.isFile()) {
-			if (logger.isTraceEnabled()) {
-				logger.trace("Last used replay is invalid, getting newest replay instead.");
-			}
-			replay = getNewestReplay(isHeroes, documentsPath);
-		}
-		return replay;
 	}
 }

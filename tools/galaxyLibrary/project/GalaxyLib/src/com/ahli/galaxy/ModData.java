@@ -1,10 +1,10 @@
 package com.ahli.galaxy;
 
-import java.io.File;
-
 import com.ahli.galaxy.archive.DescIndexData;
 import com.ahli.galaxy.game.GameData;
 import com.ahli.galaxy.ui.interfaces.UICatalog;
+
+import java.io.File;
 
 /**
  * @author Ahli
@@ -21,9 +21,9 @@ public class ModData {
 	
 	/**
 	 * Constructor.
-	 * 
+	 *
 	 * @param game
-	 *            GameData of this Mod
+	 *         GameData of this Mod
 	 */
 	public ModData(final GameData game) {
 		gameData = game;
@@ -38,7 +38,7 @@ public class ModData {
 	
 	/**
 	 * @param descIndexData
-	 *            the descIndexData to set
+	 *         the descIndexData to set
 	 */
 	public void setDescIndexData(final DescIndexData descIndexData) {
 		this.descIndexData = descIndexData;
@@ -53,7 +53,7 @@ public class ModData {
 	
 	/**
 	 * @param gameData
-	 *            the gameData to set
+	 *         the gameData to set
 	 */
 	public void setGameData(final GameData gameData) {
 		this.gameData = gameData;
@@ -68,7 +68,7 @@ public class ModData {
 	
 	/**
 	 * @param componentListFile
-	 *            the componentListFile to set
+	 *         the componentListFile to set
 	 */
 	public void setComponentListFile(final File componentListFile) {
 		this.componentListFile = componentListFile;
@@ -83,7 +83,7 @@ public class ModData {
 	
 	/**
 	 * @param sourcePath
-	 *            the sourcePath to set
+	 *         the sourcePath to set
 	 */
 	public void setSourcePath(final File sourcePath) {
 		this.sourcePath = sourcePath;
@@ -98,7 +98,7 @@ public class ModData {
 	
 	/**
 	 * @param mpqCachePath
-	 *            the mpqCachePath to set
+	 *         the mpqCachePath to set
 	 */
 	public void setMpqCachePath(final File mpqCachePath) {
 		this.mpqCachePath = mpqCachePath;
@@ -113,17 +113,10 @@ public class ModData {
 	
 	/**
 	 * @param targetPath
-	 *            the targetPath to set
+	 *         the targetPath to set
 	 */
 	public void setTargetPath(final File targetPath) {
 		this.targetPath = targetPath;
-	}
-	
-	/**
-	 * @param catalog
-	 */
-	public void setUi(final UICatalog catalog) {
-		this.catalog = catalog;
 	}
 	
 	/**
@@ -131,5 +124,12 @@ public class ModData {
 	 */
 	public UICatalog getUi() {
 		return catalog;
+	}
+	
+	/**
+	 * @param catalog
+	 */
+	public void setUi(final UICatalog catalog) {
+		this.catalog = catalog;
 	}
 }

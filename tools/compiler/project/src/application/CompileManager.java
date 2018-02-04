@@ -1,22 +1,20 @@
 package application;
 
-import java.io.File;
-import java.io.IOException;
-
-import javax.xml.parsers.ParserConfigurationException;
-
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.xml.sax.SAXException;
-
 import com.ahli.galaxy.ModData;
 import com.ahli.galaxy.archive.DescIndexData;
 import com.ahli.galaxy.ui.exception.UIException;
 import com.ahli.galaxy.ui.interfaces.UICatalog;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.xml.sax.SAXException;
+
+import javax.xml.parsers.ParserConfigurationException;
+import java.io.File;
+import java.io.IOException;
 
 /**
  * Compiles MPQ stuff.
- * 
+ *
  * @author Ahli
  */
 public class CompileManager {
@@ -30,11 +28,11 @@ public class CompileManager {
 	
 	/**
 	 * Compiles and updates the data in the cache.
-	 * 
+	 *
 	 * @param mod
-	 *            the mod
+	 *         the mod
 	 * @param raceId
-	 *            the raceId used
+	 *         the raceId used
 	 * @throws InterruptedException
 	 */
 	public UICatalog compile(final ModData mod, final String raceId) throws InterruptedException {
@@ -53,8 +51,7 @@ public class CompileManager {
 			// logger.info("DescIndex management took " + executionTime + "ms.");
 			
 			// validate catalog
-			final File descIndexFile = new File(
-					mod.getCachePath() + File.separator + mod.getDescIndexData().getDescIndexIntPath());
+			final File descIndexFile = new File(mod.getCachePath() + File.separator + mod.getDescIndexData().getDescIndexIntPath());
 			// logger.trace("processing descIndexFile: " + descIndexFile);
 			startTime = System.currentTimeMillis();
 			
@@ -86,14 +83,13 @@ public class CompileManager {
 	/**
 	 * Creates a correct ordering of the layout files based on their internal
 	 * dependencies.
-	 * 
+	 *
 	 * @param descIndex
 	 * @throws ParserConfigurationException
 	 * @throws SAXException
 	 * @throws IOException
 	 */
-	private void manageOrderOfLayoutFiles(final DescIndexData descIndex)
-			throws ParserConfigurationException, SAXException, IOException {
+	private void manageOrderOfLayoutFiles(final DescIndexData descIndex) throws ParserConfigurationException, SAXException, IOException {
 		// manage order of layout files in DescIndex
 		descIndex.orderLayoutFiles();
 		descIndex.persistDescIndexFile();
@@ -101,9 +97,9 @@ public class CompileManager {
 	
 	/**
 	 * Clones the specified UICatalog.
-	 * 
+	 *
 	 * @param mod
-	 *            ModData that containing the source CatalogUI
+	 *         ModData that containing the source CatalogUI
 	 * @return clone of mod's CatalogUI
 	 */
 	private UICatalog getClonedUICatalog(final ModData mod) {

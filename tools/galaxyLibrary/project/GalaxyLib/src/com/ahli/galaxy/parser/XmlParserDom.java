@@ -1,15 +1,8 @@
 package com.ahli.galaxy.parser;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-
+import com.ahli.galaxy.parser.abstracts.XmlParserAbstract;
+import com.ahli.galaxy.parser.interfaces.ParsedXmlConsumer;
+import com.ahli.galaxy.ui.exception.UIException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.w3c.dom.NamedNodeMap;
@@ -17,21 +10,25 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
-import com.ahli.galaxy.parser.abstracts.XmlParserAbstract;
-import com.ahli.galaxy.parser.interfaces.ParsedXmlConsumer;
-import com.ahli.galaxy.ui.exception.UIException;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
 
 public class XmlParserDom extends XmlParserAbstract {
-	private static Logger logger = LogManager.getLogger();
 	private static final String ANY_TAG = "*";
-	
+	private static Logger logger = LogManager.getLogger();
 	private DocumentBuilder dBuilder;
 	
 	private List<String> attrTypes;
 	private List<String> attrValues;
 	
 	/**
-	 * 
+	 *
 	 */
 	public XmlParserDom() {
 		super(null);
@@ -94,8 +91,7 @@ public class XmlParserDom extends XmlParserAbstract {
 						attrValues.add(attr.getNodeValue());
 					}
 				}
-				consumer.parse(getLevel(node.getParentNode()), node.getNodeName().toLowerCase(Locale.ROOT), attrTypes,
-						attrValues);
+				consumer.parse(getLevel(node.getParentNode()), node.getNodeName().toLowerCase(Locale.ROOT), attrTypes, attrValues);
 				attrTypes.clear();
 				attrValues.clear();
 			}
@@ -107,7 +103,7 @@ public class XmlParserDom extends XmlParserAbstract {
 	
 	/**
 	 * Returns the level of the parent's child node.
-	 * 
+	 *
 	 * @param parent
 	 * @return
 	 */

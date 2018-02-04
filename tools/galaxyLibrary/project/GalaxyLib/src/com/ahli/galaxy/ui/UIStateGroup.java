@@ -9,7 +9,7 @@ import java.util.List;
 public class UIStateGroup extends UIElement {
 	
 	/**
-	 * 
+	 *
 	 */
 	private static final long serialVersionUID = 6020966617264020882L;
 	
@@ -54,7 +54,7 @@ public class UIStateGroup extends UIElement {
 	
 	/**
 	 * @param defaultState
-	 *            the defaultState to set
+	 *         the defaultState to set
 	 */
 	public void setDefaultState(final String defaultState) {
 		this.defaultState = defaultState;
@@ -69,7 +69,7 @@ public class UIStateGroup extends UIElement {
 	
 	/**
 	 * @param states
-	 *            the states to set
+	 *         the states to set
 	 */
 	public void setStates(final ArrayList<UIState> states) {
 		this.states = states;

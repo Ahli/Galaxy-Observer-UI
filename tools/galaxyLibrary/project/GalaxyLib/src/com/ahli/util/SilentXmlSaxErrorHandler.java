@@ -6,9 +6,8 @@ import org.xml.sax.SAXParseException;
 
 /**
  * Error Handler for XML parsing that is completely silent.
- * 
- * @author Ahli
  *
+ * @author Ahli
  */
 public class SilentXmlSaxErrorHandler implements ErrorHandler {
 	

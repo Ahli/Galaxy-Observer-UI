@@ -8,7 +8,7 @@ import com.ahli.galaxy.game.def.abstracts.GameDef;
 public class SC2GameDef extends GameDef {
 	
 	/**
-	 * 
+	 *
 	 */
 	public SC2GameDef() {
 		setName("StarCraft II");

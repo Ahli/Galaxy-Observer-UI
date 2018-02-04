@@ -1,15 +1,14 @@
 package application.controller;
 
-import org.fxmisc.richtext.StyleClassedTextArea;
-
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
 import javafx.scene.control.Tab;
 import javafx.scene.paint.Color;
+import org.fxmisc.richtext.StyleClassedTextArea;
 
 /**
  * Tracks occurrence of an error.
- * 
+ *
  * @author Ahli
  */
 public final class ErrorTabPaneController {
@@ -26,11 +25,10 @@ public final class ErrorTabPaneController {
 	
 	/**
 	 * Constructor
-	 * 
+	 *
 	 * @param tabPane
 	 */
-	public ErrorTabPaneController(final Tab tab, final StyleClassedTextArea textArea, final boolean colorizeTitle,
-			final boolean noResultIcon) {
+	public ErrorTabPaneController(final Tab tab, final StyleClassedTextArea textArea, final boolean colorizeTitle, final boolean noResultIcon) {
 		this.tab = tab;
 		this.textArea = textArea;
 		this.colorizeTitle = colorizeTitle;
@@ -64,7 +62,7 @@ public final class ErrorTabPaneController {
 	
 	/**
 	 * @param tab
-	 *            the tab to set
+	 *         the tab to set
 	 */
 	public void setTabPane(final Tab tab) {
 		this.tab = tab;
@@ -79,7 +77,7 @@ public final class ErrorTabPaneController {
 	
 	/**
 	 * @param running
-	 *            the running to set
+	 *         the running to set
 	 */
 	public void setRunning(final boolean running) {
 		this.running = running;
@@ -87,7 +85,7 @@ public final class ErrorTabPaneController {
 	}
 	
 	/**
-	 * 
+	 *
 	 */
 	private void updateIcon() {
 		if (!running) {
@@ -107,16 +105,14 @@ public final class ErrorTabPaneController {
 				} else {
 					if (encounteredError) {
 						if (state != 2) {
-							final FontAwesomeIconView errorIcon = new FontAwesomeIconView(
-									FontAwesomeIcon.EXCLAMATION_TRIANGLE);
+							final FontAwesomeIconView errorIcon = new FontAwesomeIconView(FontAwesomeIcon.EXCLAMATION_TRIANGLE);
 							errorIcon.setFill(Color.RED);
 							tab.setGraphic(errorIcon);
 							state = 2;
 						}
 					} else {
 						if (state != 3) {
-							final FontAwesomeIconView warningIcon = new FontAwesomeIconView(
-									FontAwesomeIcon.EXCLAMATION_TRIANGLE);
+							final FontAwesomeIconView warningIcon = new FontAwesomeIconView(FontAwesomeIcon.EXCLAMATION_TRIANGLE);
 							warningIcon.setFill(Color.YELLOW);
 							tab.setGraphic(warningIcon);
 							state = 3;
@@ -146,7 +142,7 @@ public final class ErrorTabPaneController {
 	}
 	
 	/**
-	 * 
+	 *
 	 */
 	public void reportError() {
 		if (!encounteredError) {
@@ -159,7 +155,7 @@ public final class ErrorTabPaneController {
 	}
 	
 	/**
-	 * 
+	 *
 	 */
 	public void reportWarning() {
 		if (!encounteredWarning) {

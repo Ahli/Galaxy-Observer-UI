@@ -3,7 +3,6 @@ package com.ahli.hotkeyUi.application.controller;
 import com.ahli.hotkeyUi.application.Main;
 import com.ahli.hotkeyUi.application.i18n.Messages;
 import com.ahli.hotkeyUi.application.ui.Alerts;
-
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
@@ -11,12 +10,14 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  * @author Ahli
  */
 public class MenuBarController {
-	// static Logger logger = LogManager.getLogger(MenuBarController.class);
+	static Logger logger = LogManager.getLogger(MenuBarController.class);
 	// //$NON-NLS-1$
 	
 	private Main main;
@@ -36,8 +37,7 @@ public class MenuBarController {
 	public void initialize() {
 		menuOpen.setAccelerator(new KeyCodeCombination(KeyCode.O, KeyCombination.CONTROL_DOWN));
 		menuSave.setAccelerator(new KeyCodeCombination(KeyCode.S, KeyCombination.CONTROL_DOWN));
-		menuSaveAs.setAccelerator(
-				new KeyCodeCombination(KeyCode.S, KeyCombination.CONTROL_DOWN, KeyCombination.ALT_DOWN));
+		menuSaveAs.setAccelerator(new KeyCodeCombination(KeyCode.S, KeyCombination.CONTROL_DOWN, KeyCombination.ALT_DOWN));
 		menuClose.setAccelerator(new KeyCodeCombination(KeyCode.W, KeyCombination.CONTROL_DOWN));
 	}
 	
@@ -108,7 +108,14 @@ public class MenuBarController {
 				+ Messages.getString("MenuBarController.AboutText2");
 		final String title = Messages.getString("MenuBarController.About"); //$NON-NLS-1$
 		final String header = Messages.getString("MenuBarController.ObserverUISettingsEditor"); //$NON-NLS-1$
-		final String imgUrl = Main.class.getResource("/res/ahliLogo.png").toString(); //$NON-NLS-1$
+		String imgUrl;
+		try {
+			imgUrl = Main.class.getResource("/res/ahliLogo.png").toString(); //$NON-NLS-1$
+		} catch (final NullPointerException e) {
+			logger.error("Error loading resource");
+			imgUrl = "ahliLogo.png";
+		}
+		
 		final Alert alert = Alerts.buildAboutAlert(main.getPrimaryStage(), title, header, content, imgUrl);
 		alert.showAndWait();
 	}

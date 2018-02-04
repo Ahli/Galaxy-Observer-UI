@@ -1,19 +1,17 @@
 package com.ahli.galaxy.ui.interfaces;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.List;
-
-import javax.xml.parsers.ParserConfigurationException;
-
-import org.w3c.dom.DOMException;
-import org.xml.sax.SAXException;
-
 import com.ahli.galaxy.ui.UIConstant;
 import com.ahli.galaxy.ui.UIElement;
 import com.ahli.galaxy.ui.UITemplate;
 import com.ahli.galaxy.ui.exception.UIException;
 import com.ahli.util.DeepCopyable;
+import org.w3c.dom.DOMException;
+import org.xml.sax.SAXException;
+
+import javax.xml.parsers.ParserConfigurationException;
+import java.io.File;
+import java.io.IOException;
+import java.util.List;
 
 public interface UICatalog extends DeepCopyable {
 	
@@ -30,24 +28,23 @@ public interface UICatalog extends DeepCopyable {
 	
 	/**
 	 * @param f
-	 *            descIndex file to process
+	 *         descIndex file to process
 	 * @param raceId
-	 *            to use to check constants starting with ##
+	 *         to use to check constants starting with ##
 	 * @throws SAXException
 	 * @throws IOException
 	 * @throws ParserConfigurationException
 	 * @throws UIException
 	 * @throws InterruptedException
-	 *             if the current Thread was interrupted
+	 *         if the current Thread was interrupted
 	 */
-	void processDescIndex(File f, String raceId)
-			throws SAXException, IOException, ParserConfigurationException, UIException, InterruptedException;
+	void processDescIndex(File f, String raceId) throws SAXException, IOException, ParserConfigurationException, UIException, InterruptedException;
 	
 	/**
 	 * @param f
-	 *            layout file to process
+	 *         layout file to process
 	 * @param raceId
-	 *            to use to check constants starting with ##
+	 *         to use to check constants starting with ##
 	 * @throws SAXException
 	 * @throws IOException
 	 * @throws ParserConfigurationException
@@ -55,13 +52,12 @@ public interface UICatalog extends DeepCopyable {
 	 * @throws InterruptedException
 	 * @throws DOMException
 	 */
-	void processLayoutFile(File f, String raceId, boolean isDevLayout) throws SAXException, IOException,
-			ParserConfigurationException, UIException, DOMException, InterruptedException;
+	void processLayoutFile(File f, String raceId, boolean isDevLayout) throws SAXException, IOException, ParserConfigurationException, UIException, DOMException, InterruptedException;
 	
 	/**
 	 * @param constantRef
 	 * @param raceId
-	 *            id String of the viewer's Race
+	 *         id String of the viewer's Race
 	 * @return
 	 */
 	String getConstantValue(String constantRef, String raceId, boolean isDevLayout);
@@ -73,7 +69,7 @@ public interface UICatalog extends DeepCopyable {
 	
 	/**
 	 * @param templates
-	 *            the templates to set
+	 *         the templates to set
 	 */
 	void setTemplates(List<UITemplate> templates);
 	
@@ -84,7 +80,7 @@ public interface UICatalog extends DeepCopyable {
 	
 	/**
 	 * @param blizzOnlyTemplates
-	 *            the blizzOnlyTemplates to set
+	 *         the blizzOnlyTemplates to set
 	 */
 	void setBlizzOnlyTemplates(List<UITemplate> blizzOnlyTemplates);
 	
@@ -95,7 +91,7 @@ public interface UICatalog extends DeepCopyable {
 	
 	/**
 	 * @param constants
-	 *            the constants to set
+	 *         the constants to set
 	 */
 	void setConstants(List<UIConstant> constants);
 	
@@ -106,7 +102,7 @@ public interface UICatalog extends DeepCopyable {
 	
 	/**
 	 * @param blizzOnlyConstants
-	 *            the blizzOnlyConstants to set
+	 *         the blizzOnlyConstants to set
 	 */
 	void setBlizzOnlyConstants(List<UIConstant> blizzOnlyConstants);
 	
@@ -117,7 +113,7 @@ public interface UICatalog extends DeepCopyable {
 	
 	/**
 	 * @param devLayouts
-	 *            the devLayouts to set
+	 *         the devLayouts to set
 	 */
 	void setDevLayouts(List<String> devLayouts);
 	
@@ -129,7 +125,7 @@ public interface UICatalog extends DeepCopyable {
 	/**
 	 * Adds a Constant to the correct list. It removes other values and loggs
 	 * warnings, if problems arise.
-	 * 
+	 *
 	 * @param constant
 	 * @param isDevLayout
 	 */
@@ -142,8 +138,7 @@ public interface UICatalog extends DeepCopyable {
 	 * @return
 	 * @throws UIException
 	 */
-	UITemplate addTemplate(final String fileName, final UIElement thisElem, final boolean isDevLayout)
-			throws UIException;
+	UITemplate addTemplate(final String fileName, final UIElement thisElem, final boolean isDevLayout) throws UIException;
 	
 	void processInclude(String path, boolean isDevLayout, String raceId);
 }

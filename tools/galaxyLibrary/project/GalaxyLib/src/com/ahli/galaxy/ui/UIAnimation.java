@@ -1,16 +1,16 @@
 package com.ahli.galaxy.ui;
 
+import com.ahli.util.Pair;
+
 import java.util.ArrayList;
 import java.util.List;
-
-import com.ahli.util.Pair;
 
 /**
  * @author Ahli
  */
 public class UIAnimation extends UIElement {
 	/**
-	 * 
+	 *
 	 */
 	private static final long serialVersionUID = 7493401910318905210L;
 	
@@ -31,9 +31,9 @@ public class UIAnimation extends UIElement {
 	
 	/**
 	 * Constructor.
-	 * 
+	 *
 	 * @param name
-	 *            Element's name
+	 *         Element's name
 	 */
 	public UIAnimation(final String name, final int minEventsCapacity, final int minControllerCapacity) {
 		super(name);
@@ -78,7 +78,7 @@ public class UIAnimation extends UIElement {
 	
 	/**
 	 * @param controllers
-	 *            the controllers to set
+	 *         the controllers to set
 	 */
 	public void setControllers(final List<UIController> controllers) {
 		this.controllers = controllers;
@@ -108,7 +108,7 @@ public class UIAnimation extends UIElement {
 	
 	/**
 	 * @param events
-	 *            the events to set
+	 *         the events to set
 	 */
 	public void setEvents(final List<Pair<String, UIAttribute>> events) {
 		this.events = events;
@@ -168,7 +168,7 @@ public class UIAnimation extends UIElement {
 	
 	/**
 	 * @param driver
-	 *            the driver to set
+	 *         the driver to set
 	 */
 	public void setDriver(final UIAttribute driver) {
 		this.driver = driver;

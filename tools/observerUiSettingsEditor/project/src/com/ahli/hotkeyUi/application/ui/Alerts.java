@@ -1,11 +1,6 @@
 package com.ahli.hotkeyUi.application.ui;
 
-import org.apache.commons.lang3.exception.ExceptionUtils;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
 import com.ahli.hotkeyUi.application.i18n.Messages;
-
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ButtonBar.ButtonData;
@@ -16,6 +11,9 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
 import javafx.stage.Window;
+import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  * @author Ahli
@@ -30,13 +28,11 @@ public class Alerts {
 	 * @param content
 	 * @return
 	 */
-	public static Alert buildYesNoCancelAlert(final Window owner, final String title, final String header,
-			final String content) {
+	public static Alert buildYesNoCancelAlert(final Window owner, final String title, final String header, final String content) {
 		final long time = System.nanoTime();
 		final ButtonType yesButton = new ButtonType(Messages.getString("General.YesButton"), ButtonData.YES); //$NON-NLS-1$
 		final ButtonType noButton = new ButtonType(Messages.getString("General.NoButton"), ButtonData.NO); //$NON-NLS-1$
-		final ButtonType cancelButton = new ButtonType(Messages.getString("General.CancelButton"),
-				ButtonData.CANCEL_CLOSE); // $NON-NLS-1$
+		final ButtonType cancelButton = new ButtonType(Messages.getString("General.CancelButton"), ButtonData.CANCEL_CLOSE); // $NON-NLS-1$
 		final Alert alert = new Alert(AlertType.INFORMATION, content, yesButton, noButton, cancelButton);
 		alert.initOwner(owner);
 		alert.setTitle(title);
@@ -52,8 +48,7 @@ public class Alerts {
 	 * @param content
 	 * @return
 	 */
-	public static Alert buildErrorAlert(final Window owner, final String title, final String header,
-			final String content) {
+	public static Alert buildErrorAlert(final Window owner, final String title, final String header, final String content) {
 		final long time = System.nanoTime();
 		final ButtonType okButton = new ButtonType(Messages.getString("General.OkButton"), ButtonData.YES); //$NON-NLS-1$
 		final Alert alert = new Alert(AlertType.ERROR, content, okButton);
@@ -71,8 +66,7 @@ public class Alerts {
 	 * @param content
 	 * @return
 	 */
-	public static Alert buildInfoAlert(final Window owner, final String title, final String header,
-			final String content) {
+	public static Alert buildInfoAlert(final Window owner, final String title, final String header, final String content) {
 		final long time = System.nanoTime();
 		final ButtonType okButton = new ButtonType(Messages.getString("General.OkButton"), ButtonData.YES); //$NON-NLS-1$
 		final Alert alert = new Alert(AlertType.INFORMATION, content, okButton);
@@ -90,8 +84,7 @@ public class Alerts {
 	 * @param content
 	 * @return
 	 */
-	public static Alert buildWarningAlert(final Window owner, final String title, final String header,
-			final String content) {
+	public static Alert buildWarningAlert(final Window owner, final String title, final String header, final String content) {
 		final long time = System.nanoTime();
 		final ButtonType okButton = new ButtonType(Messages.getString("General.OkButton"), ButtonData.YES); //$NON-NLS-1$
 		final Alert alert = new Alert(AlertType.WARNING, content, okButton);
@@ -110,8 +103,7 @@ public class Alerts {
 	 * @param imageUrl
 	 * @return
 	 */
-	public static Alert buildAboutAlert(final Window owner, final String title, final String header,
-			final String content, final String imageUrl) {
+	public static Alert buildAboutAlert(final Window owner, final String title, final String header, final String content, final String imageUrl) {
 		final long time = System.nanoTime();
 		final ButtonType okButton = new ButtonType(Messages.getString("General.OkButton"), ButtonData.OK_DONE); //$NON-NLS-1$
 		final Alert alert = new Alert(AlertType.INFORMATION, content, okButton);

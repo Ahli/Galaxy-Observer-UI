@@ -1,13 +1,6 @@
 package com.ahli.galaxy.ui;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-
+import com.ahli.util.XmlDomHelper;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.w3c.dom.Document;
@@ -16,34 +9,38 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
-import com.ahli.util.XmlDomHelper;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
 
 /**
  * Reads a a Desc Index File.
- * 
+ *
  * @author Ahli
  */
 public final class DescIndexReader {
 	private static Logger logger = LogManager.getLogger();
 	
 	/**
-	 * 
+	 *
 	 */
 	private DescIndexReader() {
 	}
 	
 	/**
 	 * Grabs all layout file paths from a given descIndex file.
-	 * 
+	 *
 	 * @param f
-	 *            descIndex file
+	 *         descIndex file
 	 * @return
 	 * @throws IOException
 	 * @throws SAXException
 	 * @throws ParserConfigurationException
 	 */
-	public static ArrayList<String> getLayoutPathList(final File f, final boolean ignoreRequiredToLoadEntries)
-			throws SAXException, IOException, ParserConfigurationException {
+	public static ArrayList<String> getLayoutPathList(final File f, final boolean ignoreRequiredToLoadEntries) throws SAXException, IOException, ParserConfigurationException {
 		final ArrayList<String> list = new ArrayList<>();
 		
 		final DocumentBuilder dBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();

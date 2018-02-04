@@ -1,22 +1,21 @@
 package com.ahli.galaxy.ui;
 
+import com.ahli.util.Pair;
+
 import java.util.ArrayList;
 import java.util.List;
-
-import com.ahli.util.Pair;
 
 /**
  * @author Ahli
  */
 public class UIController extends UIElement {
 	/**
-	 * 
+	 *
 	 */
 	private static final long serialVersionUID = -5133613746543071378L;
-	
-	private List<UIAttribute> keys;
 	// private Map<String, String> values = null;
 	private final List<Pair<String, String>> values;
+	private List<UIAttribute> keys;
 	private boolean nextAdditionShouldOverride;
 	private boolean nameIsImplicit = true;
 	
@@ -74,7 +73,7 @@ public class UIController extends UIElement {
 	
 	/**
 	 * @param keys
-	 *            the keys to set
+	 *         the keys to set
 	 */
 	public void setKeys(final List<UIAttribute> keys) {
 		this.keys = keys;
@@ -89,7 +88,7 @@ public class UIController extends UIElement {
 	
 	/**
 	 * @param nextAdditionShouldOverride
-	 *            the nextAdditionShouldOverride to set
+	 *         the nextAdditionShouldOverride to set
 	 */
 	public void setNextAdditionShouldOverride(final boolean nextAdditionShouldOverride) {
 		this.nextAdditionShouldOverride = nextAdditionShouldOverride;
@@ -165,7 +164,7 @@ public class UIController extends UIElement {
 	
 	/**
 	 * @param nameIsImplicit
-	 *            the nameIsImplicit to set
+	 *         the nameIsImplicit to set
 	 */
 	public void setNameIsImplicit(final boolean nameIsImplicit) {
 		this.nameIsImplicit = nameIsImplicit;

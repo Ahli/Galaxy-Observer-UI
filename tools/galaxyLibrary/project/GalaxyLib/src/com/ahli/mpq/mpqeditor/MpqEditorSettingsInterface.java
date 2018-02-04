@@ -1,8 +1,5 @@
 package com.ahli.mpq.mpqeditor;
 
-import java.io.File;
-import java.io.IOException;
-
 import org.apache.commons.configuration2.INIConfiguration;
 import org.apache.commons.configuration2.SubnodeConfiguration;
 import org.apache.commons.configuration2.builder.FileBasedConfigurationBuilder;
@@ -10,6 +7,9 @@ import org.apache.commons.configuration2.builder.fluent.Parameters;
 import org.apache.commons.configuration2.ex.ConfigurationException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
+import java.io.File;
+import java.io.IOException;
 
 public class MpqEditorSettingsInterface {
 	private static final Logger logger = LogManager.getLogger();
@@ -28,12 +28,10 @@ public class MpqEditorSettingsInterface {
 	
 	public void useCustomRuleset() {
 		try {
-			final File iniFile = backupActive ? new File(this.iniFile.getParent() + File.separator + "MPQEditor.ini")
-					: this.iniFile;
+			final File iniFile = backupActive ? new File(this.iniFile.getParent() + File.separator + "MPQEditor.ini") : this.iniFile;
 			
 			final Parameters params = new Parameters();
-			final FileBasedConfigurationBuilder<INIConfiguration> b = new FileBasedConfigurationBuilder<>(
-					INIConfiguration.class).configure(params.ini().setFile(iniFile).setEncoding("UTF-8"));
+			final FileBasedConfigurationBuilder<INIConfiguration> b = new FileBasedConfigurationBuilder<>(INIConfiguration.class).configure(params.ini().setFile(iniFile).setEncoding("UTF-8"));
 			final INIConfiguration ini = b.getConfiguration();
 			
 			final SubnodeConfiguration options = ini.getSection("Options");

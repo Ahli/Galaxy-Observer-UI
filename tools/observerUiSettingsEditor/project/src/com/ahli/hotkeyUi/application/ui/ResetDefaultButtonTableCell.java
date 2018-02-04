@@ -1,24 +1,30 @@
 package com.ahli.hotkeyUi.application.ui;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
 import com.ahli.hotkeyUi.application.model.ValueDef;
-
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.control.Button;
 import javafx.scene.control.TableCell;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  * A table cell for ValueDef model data to reset its value to the default value.
- * 
+ *
  * @author Ahli
  */
 public class ResetDefaultButtonTableCell extends TableCell<ValueDef, Boolean> {
 	private static Logger logger = LogManager.getLogger(ResetDefaultButtonTableCell.class);
 	
 	private final Button cellButton = new Button();
+	
+	/**
+	 * @param text
+	 */
+	public ResetDefaultButtonTableCell(final String text) {
+		this();
+		cellButton.setText(text);
+	}
 	
 	/**
 	 * Constructor.
@@ -32,14 +38,6 @@ public class ResetDefaultButtonTableCell extends TableCell<ValueDef, Boolean> {
 				data.setValue(data.getDefaultValue());
 			}
 		});
-	}
-	
-	/**
-	 * @param text
-	 */
-	public ResetDefaultButtonTableCell(final String text) {
-		this();
-		cellButton.setText(text);
 	}
 	
 	// Display button if the row is not empty

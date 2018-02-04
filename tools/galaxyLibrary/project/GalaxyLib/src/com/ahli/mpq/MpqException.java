@@ -2,18 +2,16 @@ package com.ahli.mpq;
 
 /**
  * Exception created while handling MPQ archives.
- * 
+ *
  * @author Ahli
- * 
  */
 public class MpqException extends Exception {
 	/**
-	 * 
+	 *
 	 */
 	private static final long serialVersionUID = -7580471301069587942L;
 	
 	/**
-	 * 
 	 * @param string
 	 */
 	public MpqException(final String string) {
@@ -21,7 +19,6 @@ public class MpqException extends Exception {
 	}
 	
 	/**
-	 * 
 	 * @param e
 	 */
 	public MpqException(final Exception e) {
@@ -29,7 +26,6 @@ public class MpqException extends Exception {
 	}
 	
 	/**
-	 * 
 	 * @param msg
 	 * @param e
 	 */

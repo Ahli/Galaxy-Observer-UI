@@ -3,7 +3,7 @@ package com.ahli.hotkeyUi.application.ui;
 /**
  * An Exception that is meant to be shown to the user of the application. The
  * Exception should be localized.
- * 
+ *
  * @author Ahli
  */
 public final class ShowToUserException extends Exception {
@@ -12,7 +12,7 @@ public final class ShowToUserException extends Exception {
 	
 	/**
 	 * Constructor.
-	 * 
+	 *
 	 * @param msg
 	 */
 	public ShowToUserException(final String msg) {
@@ -21,7 +21,7 @@ public final class ShowToUserException extends Exception {
 	
 	/**
 	 * Constructor.
-	 * 
+	 *
 	 * @param msg
 	 * @param e
 	 */
@@ -31,7 +31,7 @@ public final class ShowToUserException extends Exception {
 	
 	/**
 	 * Constructor.
-	 * 
+	 *
 	 * @param e
 	 */
 	public ShowToUserException(final Exception e) {

@@ -5,7 +5,7 @@ import org.w3c.dom.Node;
 
 /**
  * Helper methods for handling XML content.
- * 
+ *
  * @author Ahli
  */
 public final class XmlDomHelper {
@@ -21,12 +21,24 @@ public final class XmlDomHelper {
 	}
 	
 	/**
+	 * Checks if any attribute is the requiredToLoad one and does not start with
+	 * "!".
+	 *
+	 * @param attributes
+	 * @return
+	 */
+	public static boolean isFailingRequiredToLoad(final NamedNodeMap attributes) {
+		final Node requiredtoloadAttr = XmlDomHelper.getNamedItemIgnoringCase(attributes, REQUIREDTOLOAD);
+		return requiredtoloadAttr != null && !requiredtoloadAttr.getNodeValue().trim().startsWith(NEG_PREFIX);
+	}
+	
+	/**
 	 * Returns named item of a specified NamedNodeMap (e.g. from attributes).
-	 * 
+	 *
 	 * @param nodes
-	 *            NamedNodeMap that are scanned
+	 *         NamedNodeMap that are scanned
 	 * @param name
-	 *            String
+	 *         String
 	 * @return first node with that name ignoring case
 	 */
 	public static Node getNamedItemIgnoringCase(final NamedNodeMap nodes, final String name) {
@@ -40,17 +52,5 @@ public final class XmlDomHelper {
 			}
 		}
 		return node;
-	}
-	
-	/**
-	 * Checks if any attribute is the requiredToLoad one and does not start with
-	 * "!".
-	 * 
-	 * @param attributes
-	 * @return
-	 */
-	public static boolean isFailingRequiredToLoad(final NamedNodeMap attributes) {
-		final Node requiredtoloadAttr = XmlDomHelper.getNamedItemIgnoringCase(attributes, REQUIREDTOLOAD);
-		return requiredtoloadAttr != null && !requiredtoloadAttr.getNodeValue().trim().startsWith(NEG_PREFIX);
 	}
 }

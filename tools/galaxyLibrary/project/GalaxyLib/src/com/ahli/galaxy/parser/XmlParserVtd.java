@@ -1,14 +1,5 @@
 package com.ahli.galaxy.parser;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.util.ArrayList;
-import java.util.List;
-
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
 import com.ahli.galaxy.parser.abstracts.XmlParserAbstract;
 import com.ahli.galaxy.parser.interfaces.ParsedXmlConsumer;
 import com.ahli.galaxy.ui.exception.UIException;
@@ -17,18 +8,25 @@ import com.ximpleware.NavException;
 import com.ximpleware.ParseException;
 import com.ximpleware.VTDGen;
 import com.ximpleware.VTDNav;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.util.ArrayList;
+import java.util.List;
 
 public class XmlParserVtd extends XmlParserAbstract {
-	private static Logger logger = LogManager.getLogger();
 	private static final String ANY_TAG = "*";
-	
+	private static Logger logger = LogManager.getLogger();
 	private VTDGen vtd;
 	
 	private List<String> attrTypes;
 	private List<String> attrValues;
 	
 	/**
-	 * 
+	 *
 	 */
 	public XmlParserVtd() {
 		super(null);
@@ -84,8 +82,7 @@ public class XmlParserVtd extends XmlParserAbstract {
 					attrTypes.add(nav.toRawStringLowerCase(i));
 					attrValues.add(nav.toRawString(i + 1));
 				}
-				consumer.parse(nav.getCurrentDepth() + 1, nav.toRawStringLowerCase(nav.getCurrentIndex()), attrTypes,
-						attrValues);
+				consumer.parse(nav.getCurrentDepth() + 1, nav.toRawStringLowerCase(nav.getCurrentIndex()), attrTypes, attrValues);
 				attrTypes.clear();
 				attrValues.clear();
 			}

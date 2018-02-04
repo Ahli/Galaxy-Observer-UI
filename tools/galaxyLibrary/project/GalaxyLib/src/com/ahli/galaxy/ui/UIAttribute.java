@@ -1,19 +1,19 @@
 package com.ahli.galaxy.ui;
 
+import com.ahli.util.Pair;
+
 import java.util.ArrayList;
 import java.util.List;
 
-import com.ahli.util.Pair;
-
 /**
  * Basic Attribute implementation to describe default UI's attribute.
- * 
+ *
  * @author Ahli
  */
 public class UIAttribute extends UIElement {
 	
 	/**
-	 * 
+	 *
 	 */
 	private static final long serialVersionUID = 5420685675382001338L;
 	
@@ -22,9 +22,9 @@ public class UIAttribute extends UIElement {
 	
 	/**
 	 * Constructor.
-	 * 
+	 *
 	 * @param name
-	 *            Element's name
+	 *         Element's name
 	 */
 	public UIAttribute(final String name) {
 		super(name);
@@ -34,9 +34,9 @@ public class UIAttribute extends UIElement {
 	
 	/**
 	 * Constructor.
-	 * 
+	 *
 	 * @param name
-	 *            Element's name
+	 *         Element's name
 	 */
 	public UIAttribute(final String name, final int initialValuesMaxCapacity) {
 		super(name);
@@ -96,7 +96,7 @@ public class UIAttribute extends UIElement {
 	
 	/**
 	 * Adds a value for the key and returns any overridden value.
-	 * 
+	 *
 	 * @param key
 	 * @param value
 	 */
