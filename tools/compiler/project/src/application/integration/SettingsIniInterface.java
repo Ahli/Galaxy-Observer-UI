@@ -2,7 +2,6 @@ package application.integration;
 
 import java.io.BufferedReader;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
@@ -14,7 +13,7 @@ import java.nio.charset.StandardCharsets;
  */
 public class SettingsIniInterface {
 	
-	private String settingsFilePath = "";
+	private String settingsFilePath;
 	private String sc2Path = "", heroesPath = "", heroesPtrPath = "";
 	private boolean ptrActive = false, sc2X64 = false, heroesX64 = false, heroesPtrX64 = false, heroesProtectMpq = false, sc2ProtectMpq = false, buildUnprotectedToo = false;
 	
@@ -48,17 +47,15 @@ public class SettingsIniInterface {
 	/**
 	 * Read all Settings from the Settings file.
 	 *
-	 * @throws FileNotFoundException
-	 * 		when no file exists
+	 * @throws IOException
+	 * 		when there is an error reading the file
 	 */
-	public void readSettingsFromFile() throws FileNotFoundException {
+	public void readSettingsFromFile() throws IOException {
 		String line;
 		try (final InputStreamReader is = new InputStreamReader(new FileInputStream(settingsFilePath), StandardCharsets.UTF_8); final BufferedReader br = new BufferedReader(is)) {
 			while ((line = br.readLine()) != null) {
 				parseLine(line);
 			}
-		} catch (final IOException e) {
-			e.printStackTrace();
 		}
 	}
 	

@@ -16,7 +16,7 @@ public class UIException extends Exception {
 	 * Constructor.
 	 *
 	 * @param string
-	 *         the message
+	 * 		the message
 	 */
 	public UIException(final String string) {
 		super(string);
@@ -26,9 +26,9 @@ public class UIException extends Exception {
 	 * Constructor.
 	 *
 	 * @param string
-	 *         the message
+	 * 		the message
 	 * @param e
-	 *         the contained Exception
+	 * 		the contained Exception
 	 */
 	public UIException(final String string, final Exception e) {
 		super(string, e);
@@ -38,7 +38,7 @@ public class UIException extends Exception {
 	 * Constructor.
 	 *
 	 * @param e
-	 *         the contained Exception
+	 * 		the contained Exception
 	 */
 	public UIException(final Exception e) {
 		super(e);

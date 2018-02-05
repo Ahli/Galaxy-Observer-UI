@@ -17,14 +17,13 @@ public class UIAttribute extends UIElement {
 	 */
 	private static final long serialVersionUID = 5420685675382001338L;
 	
-	// private final Map<String, String> values;
 	private final List<Pair<String, String>> values;
 	
 	/**
 	 * Constructor.
 	 *
 	 * @param name
-	 *         Element's name
+	 * 		Element's name
 	 */
 	public UIAttribute(final String name) {
 		super(name);
@@ -36,11 +35,10 @@ public class UIAttribute extends UIElement {
 	 * Constructor.
 	 *
 	 * @param name
-	 *         Element's name
+	 * 		Element's name
 	 */
 	public UIAttribute(final String name, final int initialValuesMaxCapacity) {
 		super(name);
-		// values = new THashMap<>(initialValuesMaxCapacity, 1f);
 		values = new ArrayList<>(initialValuesMaxCapacity);
 	}
 	
@@ -50,49 +48,12 @@ public class UIAttribute extends UIElement {
 	@Override
 	public Object deepCopy() {
 		final UIAttribute clone = new UIAttribute(getName(), values.size());
-		// final Map<String, String> clonedMap = clone.values;
-		// final Object[] entries = values.entrySet().toArray();
-		// for (int fix = 0, i = fix; i < entries.length; i++) {
-		// @SuppressWarnings("unchecked")
-		// final Entry<String, String> entry = (Entry<String, String>) entries[i];
-		// clonedMap.put(entry.getKey(), entry.getValue());
-		// }
 		for (int i = 0, len = values.size(); i < len; i++) {
 			final Pair<String, String> p = values.get(i);
 			clone.values.add(new Pair<>(p.getKey(), p.getValue()));
 		}
 		return clone;
 	}
-	
-	// /**
-	// * @return the values
-	// */
-	// public Map<String, String> getValues() {
-	// return values;
-	// }
-	//
-	// /**
-	// * @param values
-	// * the values to set
-	// */
-	// public void setValues(final Map<String, String> values) {
-	// this.values = values;
-	// }
-	
-	// /**
-	// * @return the values
-	// */
-	// public List<Pair<String, String>> getValues() {
-	// return values;
-	// }
-	
-	// /**
-	// * @param values
-	// * the values to set
-	// */
-	// public void setValues(final ArrayList<Pair<String, String>> values) {
-	// this.values = values;
-	// }
 	
 	/**
 	 * Adds a value for the key and returns any overridden value.
@@ -104,7 +65,7 @@ public class UIAttribute extends UIElement {
 		// final Pair<String, String> newPair = new Pair<>(key, value);
 		// final int i = values.indexOf(newPair);
 		int i = 0;
-		int len = 0;
+		final int len;
 		Pair<String, String> p = null;
 		for (len = values.size(); i < len; i++) {
 			p = values.get(i);
@@ -112,7 +73,7 @@ public class UIAttribute extends UIElement {
 				break;
 			}
 		}
-		if (i == len) {
+		if (i == len || p == null) {
 			// not found
 			values.add(new Pair<>(key, value));
 			return null;
@@ -129,7 +90,7 @@ public class UIAttribute extends UIElement {
 	 */
 	public String getValue(final String key) {
 		int i;
-		Pair<String, String> p = null;
+		Pair<String, String> p;
 		for (i = 0; i < values.size(); i++) {
 			p = values.get(i);
 			if (p.getKey().equals(key)) {
@@ -137,8 +98,6 @@ public class UIAttribute extends UIElement {
 			}
 		}
 		return null;
-		
-		// return values.get(key);
 	}
 	
 	@Override

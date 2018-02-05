@@ -49,11 +49,11 @@ public final class StylizedTextAreaAppender extends AbstractAppender {
 	 * method to construct the appender with the configured attributes.
 	 *
 	 * @param name
-	 *         Name of appender
+	 * 		Name of appender
 	 * @param layout
-	 *         Log layout of appender
+	 * 		Log layout of appender
 	 * @param filter
-	 *         Filter for appender
+	 * 		Filter for appender
 	 * @return The TextAreaAppender
 	 */
 	@PluginFactory
@@ -68,21 +68,17 @@ public final class StylizedTextAreaAppender extends AbstractAppender {
 		return new StylizedTextAreaAppender(name, filter, layout, true);
 	}
 	
+	
 	/**
-	 * Set TextArea to append.
-	 *
-	 * @param textArea
-	 *         TextArea to append
+	 * @param controller
 	 */
 	public static void setGeneralController(final ErrorTabPaneController controller) {
 		StylizedTextAreaAppender.generalController = controller;
 	}
 	
 	/**
-	 * Set TextArea to append.
-	 *
-	 * @param textArea
-	 *         TextArea to append
+	 * @param controller
+	 * @param threadName
 	 */
 	public static void setWorkerTaskController(final ErrorTabPaneController controller, final String threadName) {
 		workerTaskControllers.put(threadName, controller);
@@ -113,7 +109,7 @@ public final class StylizedTextAreaAppender extends AbstractAppender {
 	 * This method is where the appender does the work.
 	 *
 	 * @param event
-	 *         Log event with log data
+	 * 		Log event with log data
 	 */
 	@Override
 	public void append(final LogEvent event) {
@@ -131,16 +127,14 @@ public final class StylizedTextAreaAppender extends AbstractAppender {
 					@Override
 					public void run() {
 						try {
-							if (controller != null) {
-								final int length = txtArea.getLength();
-								txtArea.appendText(message);
-								txtArea.setStyleClass(length, txtArea.getLength(), level.toString());
-								
-								if (level == Level.ERROR || level == Level.FATAL) {
-									controller.reportError();
-								} else if (level == Level.WARN) {
-									controller.reportWarning();
-								}
+							final int length = txtArea.getLength();
+							txtArea.appendText(message);
+							txtArea.setStyleClass(length, txtArea.getLength(), level.toString());
+							
+							if (level == Level.ERROR || level == Level.FATAL) {
+								controller.reportError();
+							} else if (level == Level.WARN) {
+								controller.reportWarning();
 							}
 						} catch (final Throwable t) {
 							System.err.println("Error while append to TextArea: " + t.getMessage());

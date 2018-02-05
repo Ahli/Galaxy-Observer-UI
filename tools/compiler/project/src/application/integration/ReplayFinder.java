@@ -23,15 +23,15 @@ import java.util.Collection;
  * @author Ahli
  */
 public class ReplayFinder {
-	private static Logger logger = LogManager.getLogger();
+	private static final Logger logger = LogManager.getLogger();
 	
 	/**
 	 * Gets the last or newest replay.
 	 *
 	 * @param isHeroes
-	 *         gameIsHeroes
+	 * 		gameIsHeroes
 	 * @param documentsPath
-	 *         the documents path
+	 * 		the documents path
 	 * @return the last or newest replay
 	 */
 	public File getLastUsedOrNewestReplay(final boolean isHeroes, final String documentsPath) {
@@ -55,10 +55,10 @@ public class ReplayFinder {
 	 *
 	 * @param isHeroes
 	 * @param documentsPath
-	 *         the documents path
+	 * 		the documents path
 	 * @return the last used replay
 	 * @throws IOException
-	 *         Signals that an I/O exception has occurred.
+	 * 		Signals that an I/O exception has occurred.
 	 */
 	public File getLastUsedReplay(final boolean isHeroes, final String documentsPath) throws IOException {
 		String basePath = documentsPath + File.separator;
@@ -73,7 +73,7 @@ public class ReplayFinder {
 		}
 		
 		String line, replayPath = null;
-		try (final InputStreamReader is = new InputStreamReader(new FileInputStream(new File(basePath)), StandardCharsets.UTF_8); BufferedReader br = new BufferedReader(is);) {
+		try (final InputStreamReader is = new InputStreamReader(new FileInputStream(new File(basePath)), StandardCharsets.UTF_8); BufferedReader br = new BufferedReader(is)) {
 			
 			boolean found = false;
 			final String searchToken = "lastReplayFilePath=";
@@ -98,12 +98,12 @@ public class ReplayFinder {
 	 *
 	 * @param isHeroes
 	 * @param documentsPath
-	 *         the documents path
+	 * 		the documents path
 	 * @return the newest replay
 	 */
 	public File getNewestReplay(final boolean isHeroes, final String documentsPath) {
 		String basePath = documentsPath + File.separator;
-		String[] extensions = null;
+		final String[] extensions;
 		if (isHeroes) {
 			basePath += "Heroes of the Storm";
 			extensions = new String[] { "StormReplay" };

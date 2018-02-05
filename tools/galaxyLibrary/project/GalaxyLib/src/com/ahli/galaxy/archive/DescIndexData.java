@@ -35,16 +35,16 @@ public class DescIndexData {
 	
 	private static final String UTF_8 = "UTF-8";
 	
-	private static Logger logger = LogManager.getLogger();
+	private static final Logger logger = LogManager.getLogger();
 	private final MpqInterface mpqi;
+	private final ArrayList<Pair<File, String>> fileIntPathList;
 	private String descIndexIntPath = null;
-	private ArrayList<Pair<File, String>> fileIntPathList = new ArrayList<>();
 	
 	/**
 	 * Constructor.
 	 *
 	 * @param mpqi
-	 *         MpqInterface
+	 * 		MpqInterface
 	 */
 	public DescIndexData(final MpqInterface mpqi) {
 		this.mpqi = mpqi;
@@ -110,7 +110,7 @@ public class DescIndexData {
 	public void addLayoutIntPath(final Iterable<String> layoutPathList) throws MpqException {
 		final Iterator<String> it = layoutPathList.iterator();
 		while (it.hasNext()) {
-			this.addLayoutIntPath(it.next());
+			addLayoutIntPath(it.next());
 		}
 	}
 	
@@ -193,10 +193,9 @@ public class DescIndexData {
 		final ArrayList<ArrayList<String>> ownConstants = new ArrayList<>();
 		
 		// grab dependencies and constant definitions for every layout file
+		ArrayList<String> layoutDeps;
+		ArrayList<String> curConstants;
 		for (final Pair<File, String> pair : fileIntPathList) {
-			ArrayList<String> layoutDeps = null;
-			ArrayList<String> curConstants = null;
-			
 			curConstants = LayoutReader.getLayoutsConstantDefinitions(pair.getKey());
 			
 			// add calculated list of dependencies from layout file
@@ -268,7 +267,7 @@ public class DescIndexData {
 										i = i2;
 										dependencies.add(i, curLayoutDepList);
 										fileIntPathList.add(i, pair);
-										constantDefinedBefore = true;
+										//constantDefinedBefore = true;
 										if (logger.isTraceEnabled()) {
 											logger.trace("inserted " + fileIntPathList.get(i).getKey().getName() + " after " + fileName);
 											logger.trace("fileIntPathList: " + fileIntPathList);

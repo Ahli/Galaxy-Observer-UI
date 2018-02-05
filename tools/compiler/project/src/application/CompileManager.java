@@ -30,9 +30,9 @@ public class CompileManager {
 	 * Compiles and updates the data in the cache.
 	 *
 	 * @param mod
-	 *         the mod
+	 * 		the mod
 	 * @param raceId
-	 *         the raceId used
+	 * 		the raceId used
 	 * @throws InterruptedException
 	 */
 	public UICatalog compile(final ModData mod, final String raceId) throws InterruptedException {
@@ -99,7 +99,7 @@ public class CompileManager {
 	 * Clones the specified UICatalog.
 	 *
 	 * @param mod
-	 *         ModData that containing the source CatalogUI
+	 * 		ModData that containing the source CatalogUI
 	 * @return clone of mod's CatalogUI
 	 */
 	private UICatalog getClonedUICatalog(final ModData mod) {

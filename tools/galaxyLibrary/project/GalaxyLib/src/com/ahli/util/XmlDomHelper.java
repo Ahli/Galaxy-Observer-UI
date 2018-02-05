@@ -36,9 +36,9 @@ public final class XmlDomHelper {
 	 * Returns named item of a specified NamedNodeMap (e.g. from attributes).
 	 *
 	 * @param nodes
-	 *         NamedNodeMap that are scanned
+	 * 		NamedNodeMap that are scanned
 	 * @param name
-	 *         String
+	 * 		String
 	 * @return first node with that name ignoring case
 	 */
 	public static Node getNamedItemIgnoringCase(final NamedNodeMap nodes, final String name) {

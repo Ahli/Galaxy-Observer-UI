@@ -28,7 +28,7 @@ public final class LayoutReader {
 	private static final String CONSTANT = "Constant";
 	private static final String NAME = "name";
 	private static final String CONSTANT_MARKER = "#";
-	private static Logger logger = LogManager.getLogger();
+	private static final Logger logger = LogManager.getLogger();
 	
 	/**
 	 * Disabled Constructor.
@@ -130,24 +130,22 @@ public final class LayoutReader {
 				
 				// attribute name
 				if (attrName.startsWith(CONSTANT_MARKER)) {
-					final String constName = attrName;
-					if (!doesNameAppearInList(constName, usedConstants) && !doesConstantNameAppearInList(constName, ownConstants)) {
+					if (!doesNameAppearInList(attrName, usedConstants) && !doesConstantNameAppearInList(attrName, ownConstants)) {
 						if (logger.isTraceEnabled()) {
-							logger.trace(nameWOfileEnding + " uses undefined constant " + constName);
+							logger.trace(nameWOfileEnding + " uses undefined constant " + attrName);
 						}
-						usedConstants.add(constName);
-						list.add(constName);
+						usedConstants.add(attrName);
+						list.add(attrName);
 					}
 				}
 				// attribute value
 				if (attrValue.startsWith(CONSTANT_MARKER)) {
-					final String constName = attrValue;
-					if (!doesNameAppearInList(constName, usedConstants) && !doesConstantNameAppearInList(constName, ownConstants)) {
+					if (!doesNameAppearInList(attrValue, usedConstants) && !doesConstantNameAppearInList(attrValue, ownConstants)) {
 						if (logger.isTraceEnabled()) {
-							logger.trace(nameWOfileEnding + " uses undefined constant " + constName);
+							logger.trace(nameWOfileEnding + " uses undefined constant " + attrValue);
 						}
-						usedConstants.add(constName);
-						list.add(constName);
+						usedConstants.add(attrValue);
+						list.add(attrValue);
 					}
 				}
 			}

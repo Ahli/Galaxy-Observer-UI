@@ -19,7 +19,7 @@ import java.io.IOException;
  */
 public class MpqEditorInterface implements MpqInterface, DeepCopyable {
 	private final static char q = '\"';
-	private static Logger logger = LogManager.getLogger();
+	private static final Logger logger = LogManager.getLogger();
 	private final MpqEditorSettingsInterface settings;
 	private String mpqEditor = "plugins" + File.separator + "mpq" + File.separator + "MPQEditor.exe"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	private String mpqCachePath;
@@ -27,9 +27,9 @@ public class MpqEditorInterface implements MpqInterface, DeepCopyable {
 	/**
 	 * Constructor.
 	 *
-	 * @param mpqCachePath
-	 *         path of the directory that will temporarily contain the extracted
-	 *         mpq
+	 * @param mpqCachePath2
+	 * 		path of the directory that will temporarily contain the extracted
+	 * 		mpq
 	 */
 	public MpqEditorInterface(final String mpqCachePath2) {
 		mpqCachePath = mpqCachePath2;
@@ -91,8 +91,8 @@ public class MpqEditorInterface implements MpqInterface, DeepCopyable {
 	/**
 	 * Sets the cache path.
 	 *
-	 * @param mpqCachePath
-	 *         new cache path as String
+	 * @param mpqCachePath2
+	 * 		new cache path as String
 	 */
 	public void setMpqCachePath(final String mpqCachePath2) {
 		mpqCachePath = mpqCachePath2;
@@ -112,7 +112,7 @@ public class MpqEditorInterface implements MpqInterface, DeepCopyable {
 	 * Sets the MpqEditor path.
 	 *
 	 * @param editorPath
-	 *         new editor path as String
+	 * 		new editor path as String
 	 */
 	public void setMpqEditorPath(final String editorPath) {
 		mpqEditor = editorPath;
@@ -125,8 +125,8 @@ public class MpqEditorInterface implements MpqInterface, DeepCopyable {
 	 * @param buildFileName
 	 * @param protectMPQ
 	 * @param buildBoth
-	 *         if protectMPQ, then this controls if an unprotected version is
-	 *         build, too
+	 * 		if protectMPQ, then this controls if an unprotected version is
+	 * 		build, too
 	 * @throws IOException
 	 * @throws InterruptedException
 	 * @throws MpqException
@@ -142,8 +142,8 @@ public class MpqEditorInterface implements MpqInterface, DeepCopyable {
 	 * @param absolutePath
 	 * @param protectMPQ
 	 * @param buildBoth
-	 *         if protectMPQ, then this controls if an unprotected version is
-	 *         build, too
+	 * 		if protectMPQ, then this controls if an unprotected version is
+	 * 		build, too
 	 * @throws IOException
 	 * @throws InterruptedException
 	 * @throws MpqException
@@ -223,9 +223,8 @@ public class MpqEditorInterface implements MpqInterface, DeepCopyable {
 			// NO PROTECTION OPTION
 			
 			// make way for file
-			final File f = targetFile;
-			if (f.exists() && f.isFile()) {
-				if (!f.delete()) {
+			if (targetFile.exists() && targetFile.isFile()) {
+				if (!targetFile.delete()) {
 					final String msg = "ERROR: Could not delete file " + absolutePath; //$NON-NLS-1$
 					logger.error(msg);
 					throw new MpqException(String.format(Messages.getString("MpqInterface.CouldNotOverwriteFile"), absolutePath)); //$NON-NLS-1$
@@ -487,7 +486,7 @@ public class MpqEditorInterface implements MpqInterface, DeepCopyable {
 	/**
 	 * Returns a file from the cache with the specified internal path.
 	 *
-	 * @param descIndexIntPath
+	 * @param intPath
 	 * @return
 	 */
 	@Override
@@ -549,7 +548,7 @@ public class MpqEditorInterface implements MpqInterface, DeepCopyable {
 	/**
 	 *
 	 */
-	public void restoreSettings() {
+	public void restoreSettings() throws IOException {
 		settings.restoreOriginalSettingFiles();
 	}
 	

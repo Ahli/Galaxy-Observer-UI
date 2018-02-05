@@ -45,11 +45,11 @@ public final class TextAreaAppender extends AbstractAppender {
 	 * method to construct the appender with the configured attributes.
 	 *
 	 * @param name
-	 *         Name of appender
+	 * 		Name of appender
 	 * @param layout
-	 *         Log layout of appender
+	 * 		Log layout of appender
 	 * @param filter
-	 *         Filter for appender
+	 * 		Filter for appender
 	 * @return The TextAreaAppender
 	 */
 	@PluginFactory
@@ -68,7 +68,7 @@ public final class TextAreaAppender extends AbstractAppender {
 	 * Set TextArea to append.
 	 *
 	 * @param textArea
-	 *         TextArea to append
+	 * 		TextArea to append
 	 */
 	public static void setTextArea(final TextArea textArea) {
 		TextAreaAppender.textArea = textArea;
@@ -78,7 +78,7 @@ public final class TextAreaAppender extends AbstractAppender {
 	 * This method is where the appender does the work.
 	 *
 	 * @param event
-	 *         Log event with log data
+	 * 		Log event with log data
 	 */
 	@Override
 	public void append(final LogEvent event) {

@@ -73,9 +73,8 @@ public class LayoutExtensionReader {
 	 * @param layoutFiles
 	 * @throws ParserConfigurationException
 	 * @throws SAXException
-	 * @throws IOException
 	 */
-	public void processLayoutFiles(final Collection<File> layoutFiles) throws ParserConfigurationException, SAXException, IOException {
+	public void processLayoutFiles(final Collection<File> layoutFiles) throws ParserConfigurationException, SAXException {
 		
 		logger.info("Scanning for XML file...");
 		
@@ -84,24 +83,13 @@ public class LayoutExtensionReader {
 		// console
 		dBuilder.setErrorHandler(new SilentXmlSaxErrorHandler());
 		
-		x:
+		Document doc;
 		for (final File curFile : layoutFiles) {
-			Document doc = null;
-			// try (InputStream is = new FileInputStream(curFile)) {
 			try {
-				// parse XML file
-				
-				// THIS DOES NOT CLOSE THE INPUTSTREAM ON EXCEPTION
-				// CREATING TONS OF FILE ACCESS PROBLEMS. DO NOT USE!
 				doc = dBuilder.parse(curFile);
-				
-				// WORKAROUND -> provide Inputstream
-				// doc = dBuilder.parse(is);
-				
 			} catch (SAXParseException | IOException e) {
 				// couldn't parse, most likely no XML file
-				
-				continue x;
+				continue;
 			}
 			
 			logger.debug("comments - processing file: " + curFile.getPath());
@@ -112,24 +100,13 @@ public class LayoutExtensionReader {
 			readComments(childNodes);
 		}
 		
-		x:
 		for (final File curFile : layoutFiles) {
-			Document doc = null;
-			// try (InputStream is = new FileInputStream(curFile);) {
 			try {
 				// parse XML file
-				
-				// THIS DOES NOT CLOSE THE INPUTSTREAM ON EXCEPTION
-				// CREATING TONS OF FILE ACCESS PROBLEMS. DO NOT USE!
 				doc = dBuilder.parse(curFile);
-				
-				// WORKAROUND -> provide Inputstream
-				
-				// doc = dBuilder.parse(is);
-				
 			} catch (SAXParseException | IOException e) {
 				// couldn't parse, most likely no XML file
-				continue x;
+				continue;
 			}
 			
 			logger.debug("constants - processing file: " + curFile.getPath());
@@ -168,13 +145,11 @@ public class LayoutExtensionReader {
 	 * @param textInput
 	 */
 	public void processCommentText(final String textInput) {
-		String constant = "", description = "", defaultValue = "";
+		String constant, description, defaultValue;
 		
-		// String textInputLower = textInput.toLowerCase();
 		logger.debug("textInput:" + textInput);
 		try {
-			// split at keywords @hotkey or @setting without removing, case
-			// insensitive
+			// split at keywords @hotkey or @setting without removing, case insensitive
 			for (String text : textInput.split("(?=@hotkey|@setting)/i")) {
 				logger.debug("token start:" + text);
 				text = text.trim();
@@ -305,42 +280,21 @@ public class LayoutExtensionReader {
 	 * @throws IOException
 	 * @throws SAXException
 	 */
-	public void updateLayoutFiles(final Collection<File> layoutFiles) throws ParserConfigurationException, SAXException, IOException {
+	public void updateLayoutFiles(final Collection<File> layoutFiles) throws ParserConfigurationException, SAXException {
 		logger.info("Scanning for XML file...");
 		
 		final DocumentBuilder dBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-		// provide error handler that does not print incompatible files into
-		// console
+		// provide error handler that does not print incompatible files into console
 		dBuilder.setErrorHandler(new SilentXmlSaxErrorHandler());
 		
-		// InputStream is = null;
-		
-		x:
+		Document doc;
 		for (final File curFile : layoutFiles) {
-			Document doc = null;
 			try {
 				// parse XML file
-				
-				// THIS DOES NOT CLOSE THE INPUTSTREAM ON EXCEPTION
-				// CREATING TONS OF FILE ACCESS PROBLEMS. DO NOT USE!
 				doc = dBuilder.parse(curFile);
-				
-				// WORKAROUND -> provide Inputstream
-				// is = new FileInputStream(curFile);
-				// doc = dBuilder.parse(is);
-				
 			} catch (SAXParseException | IOException e) {
-				// couldn't parse, most likely no XML file
-				// if (is != null) {
-				// is.close();
-				// }
-				continue x;
+				continue;
 			}
-			// finally {
-			// if (is != null) {
-			// is.close();
-			// }
-			// }
 			
 			logger.debug("processing file: " + curFile.getPath());
 			

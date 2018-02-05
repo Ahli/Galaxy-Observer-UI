@@ -26,7 +26,7 @@ public abstract class GameDef {
 	
 	/**
 	 * @param layoutFileEnding
-	 *         the layoutFileEnding to set
+	 * 		the layoutFileEnding to set
 	 */
 	public void setLayoutFileEnding(final String layoutFileEnding) {
 		this.layoutFileEnding = layoutFileEnding;
@@ -43,7 +43,7 @@ public abstract class GameDef {
 	 * Saves a copy of the specified array.
 	 *
 	 * @param coreModsOrDirectories
-	 *         the coreModsOrDirectories to set
+	 * 		the coreModsOrDirectories to set
 	 */
 	public void setCoreModsOrDirectories(final String[] coreModsOrDirectories) {
 		this.coreModsOrDirectories = Arrays.copyOf(coreModsOrDirectories, coreModsOrDirectories.length);
@@ -58,7 +58,7 @@ public abstract class GameDef {
 	
 	/**
 	 * @param defaultRaceId
-	 *         the defaultRaceId to set
+	 * 		the defaultRaceId to set
 	 */
 	public void setDefaultRaceId(final String defaultRaceId) {
 		this.defaultRaceId = defaultRaceId;
@@ -73,7 +73,7 @@ public abstract class GameDef {
 	
 	/**
 	 * @param documentsGameDirectoryName
-	 *         the documentsGameDirectoryName to set
+	 * 		the documentsGameDirectoryName to set
 	 */
 	public void setDocumentsGameDirectoryName(final String documentsGameDirectoryName) {
 		this.documentsGameDirectoryName = documentsGameDirectoryName;
@@ -88,7 +88,7 @@ public abstract class GameDef {
 	
 	/**
 	 * @param documentsInterfaceSubdirectoryName
-	 *         the documentsInterfaceSubdirectoryName to set
+	 * 		the documentsInterfaceSubdirectoryName to set
 	 */
 	public void setDocumentsInterfaceSubdirectoryName(final String documentsInterfaceSubdirectoryName) {
 		this.documentsInterfaceSubdirectoryName = documentsInterfaceSubdirectoryName;
@@ -103,7 +103,7 @@ public abstract class GameDef {
 	
 	/**
 	 * @param modFileEnding
-	 *         the modFileEnding to set
+	 * 		the modFileEnding to set
 	 */
 	public void setModFileEnding(final String modFileEnding) {
 		this.modFileEnding = modFileEnding;
@@ -118,7 +118,7 @@ public abstract class GameDef {
 	
 	/**
 	 * @param modsSubDirectory
-	 *         the modsSubDirectory to set
+	 * 		the modsSubDirectory to set
 	 */
 	public void setModsSubDirectory(final String modsSubDirectory) {
 		this.modsSubDirectory = modsSubDirectory;
@@ -133,7 +133,7 @@ public abstract class GameDef {
 	
 	/**
 	 * @param name
-	 *         the name to set
+	 * 		the name to set
 	 */
 	public void setName(final String name) {
 		this.name = name;
@@ -148,7 +148,7 @@ public abstract class GameDef {
 	
 	/**
 	 * @param nameHandle
-	 *         the nameHandle to set
+	 * 		the nameHandle to set
 	 */
 	public void setNameHandle(final String nameHandle) {
 		this.nameHandle = nameHandle;
@@ -163,7 +163,7 @@ public abstract class GameDef {
 	
 	/**
 	 * @param baseDataFolderName
-	 *         the baseDataFolderName to set
+	 * 		the baseDataFolderName to set
 	 */
 	public void setBaseDataFolderName(final String baseDataFolderName) {
 		this.baseDataFolderName = baseDataFolderName;

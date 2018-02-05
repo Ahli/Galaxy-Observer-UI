@@ -21,7 +21,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Predicate;
 
 public class UICatalogParser implements ParsedXmlConsumer {
 	private static final String TYPE = "type";
@@ -281,7 +280,8 @@ public class UICatalogParser implements ParsedXmlConsumer {
 	}
 	
 	/**
-	 * @param template
+	 * @param path
+	 * @param newName
 	 * @return Template instance
 	 */
 	private UIElement instanciateTemplate(String path, final String newName) {
@@ -394,11 +394,11 @@ public class UICatalogParser implements ParsedXmlConsumer {
 	 * @return
 	 */
 	private UIElement instanciateTemplateFromList(final List<UITemplate> templates, final String fileName, final String path, final String newName) {
+		final String newPath = UIElement.removeLeftPathLevel(path);
 		
 		for (final UITemplate curTemplate : templates) {
 			if (curTemplate.getFileName().equalsIgnoreCase(fileName)) {
 				// found template file
-				final String newPath = UIElement.removeLeftPathLevel(path);
 				final UIElement frameFromPath = curTemplate.receiveFrameFromPath(newPath);
 				
 				if (frameFromPath == null) {
@@ -431,12 +431,7 @@ public class UICatalogParser implements ParsedXmlConsumer {
 		while (true) {
 			final String name = type + "_" + i;
 			
-			if (controllers.stream().noneMatch(new Predicate<UIController>() {
-				@Override
-				public boolean test(final UIController t) {
-					return t.getName() != null && t.getName().compareToIgnoreCase(name) == 0;
-				}
-			})) {
+			if (controllers.stream().noneMatch(t -> t.getName() != null && t.getName().compareToIgnoreCase(name) == 0)) {
 				logger.trace("Constructing implicit controller name: {}", () -> name);
 				return name;
 			}

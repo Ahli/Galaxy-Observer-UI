@@ -47,7 +47,6 @@ import org.xml.sax.SAXException;
 import javax.swing.JFileChooser;
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.FileSystemException;
@@ -337,18 +336,12 @@ public final class Main extends Application {
 	/**
 	 * @param game
 	 * @param path
-	 * @throws InterruptedException
 	 */
-	private void buildGamesInterfaceFiles(final GameData game, final String path) throws InterruptedException {
-		try {
-			if (hasParamCompilePath) {
-				buildSpecificUI(new File(path), game);
-			} else {
-				buildGamesUIs(game.getGameDef().getNameHandle(), game);
-			}
-		} catch (final IOException e) {
-			logger.error("ERROR while building a UI for " + game.getGameDef().getName() + ": " + e); //$NON-NLS-1$ //$NON-NLS-2$
-			e.printStackTrace();
+	private void buildGamesInterfaceFiles(final GameData game, final String path) {
+		if (hasParamCompilePath) {
+			buildSpecificUI(new File(path), game);
+		} else {
+			buildGamesUIs(game.getGameDef().getNameHandle(), game);
 		}
 	}
 	
@@ -509,8 +502,8 @@ public final class Main extends Application {
 	 * Attempts to run a game with a replay, if desired.
 	 */
 	public void attemptToRunGameWithReplay() {
-		boolean isHeroes = false;
-		String gamePath = null;
+		final boolean isHeroes;
+		final String gamePath;
 		
 		if (!compileAndRun) {
 			// use the run param
@@ -582,7 +575,7 @@ public final class Main extends Application {
 		if (paramCompilePath != null) {
 			logger.info("compile param path: " + paramCompilePath); //$NON-NLS-1$
 			if (compileAndRun) {
-				logger.info("run after compile: " + compileAndRun); //$NON-NLS-1$
+				logger.info("run after compile: true"); //$NON-NLS-1$
 			}
 		}
 		if (paramRunPath != null) {
@@ -644,7 +637,7 @@ public final class Main extends Application {
 		final FXMLLoader loader = new FXMLLoader();
 		// loader.setResources(Messages.getBundle());
 		try (InputStream is = Main.class.getResourceAsStream("view/TabsLayout.fxml")) { //$NON-NLS-1$
-			tabPane = (TabPane) loader.load(is); // $NON-NLS-1$
+			tabPane = loader.load(is); // $NON-NLS-1$
 		} catch (final IOException e) {
 			logger.error("failed to load TabsLayout.fxml"); //$NON-NLS-1$
 			e.printStackTrace();
@@ -760,10 +753,8 @@ public final class Main extends Application {
 	 * 		built.
 	 * @param gameData
 	 * 		the game information
-	 * @throws IOException
-	 * 		when something goes wrong
 	 */
-	public void buildGamesUIs(final String subfolderName, final GameData gameData) throws IOException {
+	public void buildGamesUIs(final String subfolderName, final GameData gameData) {
 		final File dir = new File(basePath.getAbsolutePath() + File.separator + subfolderName);
 		if (dir.exists() && dir.isDirectory()) {
 			final File[] directoryListing = dir.listFiles();
@@ -875,15 +866,14 @@ public final class Main extends Application {
 			logger.error(msg);
 			throw new IOException(msg);
 		}
-		int cacheClearAttempts = 0;
-		y:
+		int cacheClearAttempts;
 		for (cacheClearAttempts = 0; cacheClearAttempts <= 100; cacheClearAttempts++) {
 			if (!mpqi.clearCacheExtractedMpq()) {
 				// sleep and hope the file gets released soon
 				Thread.sleep(500);
 			} else {
 				// success
-				break y;
+				break;
 			}
 		}
 		if (cacheClearAttempts > 100) {
@@ -893,14 +883,13 @@ public final class Main extends Application {
 		}
 		mod.setMpqCachePath(cache);
 		// put files into cache
-		int copyAttempts = 0;
-		x:
+		int copyAttempts;
 		for (copyAttempts = 0; copyAttempts <= 100; copyAttempts++) {
 			try {
 				copyFileOrFolder(sourceFile, cache);
 				// logger.trace("Copy Folder took " + copyAttempts + " attempts to succeed.");
 				// //$NON-NLS-1$ //$NON-NLS-2$
-				break x;
+				break;
 			} catch (final FileSystemException e) {
 				if (copyAttempts == 0) {
 					logger.warn("Attempt to copy directory failed.", e); //$NON-NLS-1$
@@ -1016,8 +1005,8 @@ public final class Main extends Application {
 		}
 		try {
 			settings2.readSettingsFromFile();
-		} catch (final FileNotFoundException e) {
-			logger.error("settings file could not be found", e); //$NON-NLS-1$
+		} catch (final IOException e) {
+			logger.error("settings file could not be read.", e); //$NON-NLS-1$
 			e.printStackTrace();
 		}
 		settings = settings2;

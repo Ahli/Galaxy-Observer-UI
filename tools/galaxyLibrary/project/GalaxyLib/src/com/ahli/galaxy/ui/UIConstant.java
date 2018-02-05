@@ -37,7 +37,7 @@ public class UIConstant extends UIElement {
 	
 	/**
 	 * @param value
-	 *         the value to set
+	 * 		the value to set
 	 */
 	public void setValue(final String value) {
 		this.value = value;

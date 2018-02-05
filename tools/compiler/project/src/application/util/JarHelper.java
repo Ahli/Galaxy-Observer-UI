@@ -29,7 +29,7 @@ public final class JarHelper {
 	 * @param aclass
 	 * @return File at base path
 	 */
-	public static File getJarDir(final Class<? extends Object> aclass) {
+	public static File getJarDir(final Class<?> aclass) {
 		logger.trace("_FINDING JAR'S PATH", () -> ""); //$NON-NLS-1$
 		
 		// ATTEMPT #1
@@ -56,7 +56,7 @@ public final class JarHelper {
 				final String dirStr = dir.toString();
 				final String tools = "\\tools\\";
 				str += dirStr.substring(dirStr.indexOf(tools) + tools.length(), dirStr.indexOf("\\target\\"));
-				str = str.replaceAll("\\\\", "/");
+				str = str.replace('\\', '/');
 			}
 			
 			if (str.startsWith("file:/")) { //$NON-NLS-1$

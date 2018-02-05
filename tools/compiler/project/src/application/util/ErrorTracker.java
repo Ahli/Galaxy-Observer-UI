@@ -27,7 +27,7 @@ public interface ErrorTracker {
 	 * Reports that an error occurred.
 	 *
 	 * @param exception
-	 *         occurred Exception
+	 * 		occurred Exception
 	 */
 	void reportErrorEncounter(Exception exception);
 	

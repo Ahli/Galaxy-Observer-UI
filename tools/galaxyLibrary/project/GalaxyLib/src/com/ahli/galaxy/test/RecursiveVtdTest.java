@@ -1,12 +1,8 @@
 package com.ahli.galaxy.test;
 
 import com.ximpleware.AutoPilot;
-import com.ximpleware.EOFException;
-import com.ximpleware.EncodingException;
-import com.ximpleware.EntityException;
 import com.ximpleware.NavException;
 import com.ximpleware.ParseException;
-import com.ximpleware.PilotException;
 import com.ximpleware.VTDGen;
 import com.ximpleware.VTDNav;
 
@@ -21,7 +17,7 @@ public class RecursiveVtdTest {
 	private static final String TAG = "*";
 	
 	public static void main(final String[] args) {
-		long endMem;
+		final long endMem;
 		int iterations = 0;
 		try {
 			Thread.sleep(1000);
@@ -65,7 +61,7 @@ public class RecursiveVtdTest {
 		}
 	}
 	
-	public static void loadRecursiveXML(final VTDGen vtd, final File f) throws PilotException, NavException, IOException, EncodingException, EOFException, EntityException, ParseException {
+	public static void loadRecursiveXML(final VTDGen vtd, final File f) throws NavException, IOException, ParseException {
 		// long startTime = System.currentTimeMillis();
 		// if (!vtd.parseFile(f.getPath(), false)) {
 		// return;

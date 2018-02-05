@@ -63,7 +63,8 @@ public class UIFrame extends UIElement {
 	
 	/**
 	 * @param name
-	 * @param type
+	 * @param initialAttributesCapacity
+	 * @param initialChildrenCapacity
 	 */
 	public UIFrame(final String name, final int initialAttributesCapacity, final int initialChildrenCapacity) {
 		super(name);
@@ -113,7 +114,7 @@ public class UIFrame extends UIElement {
 	
 	/**
 	 * @param type
-	 *         the type to set
+	 * 		the type to set
 	 */
 	public void setType(final String type) {
 		// type of "frame" is null
@@ -320,13 +321,15 @@ public class UIFrame extends UIElement {
 			final String curName = UIElement.getLeftPathLevel(path);
 			// LOGGER.trace("curName: " + curName);
 			// LOGGER.trace("children to check: " + children.size());
-			for (final UIElement curElem : children) {
-				// LOGGER.trace("checking child: " + curElem.getName());
-				if (curName.equalsIgnoreCase(curElem.getName())) {
-					// found right frame -> cut path
-					final String newPath = UIElement.removeLeftPathLevel(path);
-					// LOGGER.trace("match! newPath:" + newPath);
-					return curElem.receiveFrameFromPath(newPath);
+			if (curName != null) {
+				for (final UIElement curElem : children) {
+					// LOGGER.trace("checking child: " + curElem.getName());
+					if (curName.equalsIgnoreCase(curElem.getName())) {
+						// found right frame -> cut path
+						final String newPath = UIElement.removeLeftPathLevel(path);
+						// LOGGER.trace("match! newPath:" + newPath);
+						return curElem.receiveFrameFromPath(newPath);
+					}
 				}
 			}
 			return null;

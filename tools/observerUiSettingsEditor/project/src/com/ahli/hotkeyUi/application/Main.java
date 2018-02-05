@@ -244,9 +244,7 @@ public class Main extends Application {
 				if (result.get() == ButtonType.YES) {
 					saveUiMpq();
 				} else {
-					if (result.get() == ButtonType.CANCEL) {
-						return false;
-					}
+					return result.get() != ButtonType.CANCEL;
 				}
 			}
 		}

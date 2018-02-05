@@ -32,7 +32,7 @@ public final class ComponentsListReader {
 	 * Returns the internal path of DescIndex of the mpq file.
 	 *
 	 * @param f
-	 *         components list file
+	 * 		components list file
 	 * @return
 	 * @throws IOException
 	 * @throws SAXException
@@ -49,9 +49,9 @@ public final class ComponentsListReader {
 	 * Locales are not supported here.
 	 *
 	 * @param f
-	 *         components list file
+	 * 		components list file
 	 * @param typeVal
-	 *         value of the type, e.g. "uiui"
+	 * 		value of the type, e.g. "uiui"
 	 * @return path information of the specified type value
 	 * @throws ParserConfigurationException
 	 * @throws IOException

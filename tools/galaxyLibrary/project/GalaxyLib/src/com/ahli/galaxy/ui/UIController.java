@@ -73,7 +73,7 @@ public class UIController extends UIElement {
 	
 	/**
 	 * @param keys
-	 *         the keys to set
+	 * 		the keys to set
 	 */
 	public void setKeys(final List<UIAttribute> keys) {
 		this.keys = keys;
@@ -88,7 +88,7 @@ public class UIController extends UIElement {
 	
 	/**
 	 * @param nextAdditionShouldOverride
-	 *         the nextAdditionShouldOverride to set
+	 * 		the nextAdditionShouldOverride to set
 	 */
 	public void setNextAdditionShouldOverride(final boolean nextAdditionShouldOverride) {
 		this.nextAdditionShouldOverride = nextAdditionShouldOverride;
@@ -145,7 +145,7 @@ public class UIController extends UIElement {
 	 */
 	public String getValue(final String key) {
 		int i;
-		Pair<String, String> p = null;
+		Pair<String, String> p;
 		for (i = 0; i < values.size(); i++) {
 			p = values.get(i);
 			if (p.getKey().equals(key)) {
@@ -164,7 +164,7 @@ public class UIController extends UIElement {
 	
 	/**
 	 * @param nameIsImplicit
-	 *         the nameIsImplicit to set
+	 * 		the nameIsImplicit to set
 	 */
 	public void setNameIsImplicit(final boolean nameIsImplicit) {
 		this.nameIsImplicit = nameIsImplicit;

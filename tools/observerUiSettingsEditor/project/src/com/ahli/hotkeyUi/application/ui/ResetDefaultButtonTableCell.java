@@ -14,7 +14,7 @@ import org.apache.logging.log4j.Logger;
  * @author Ahli
  */
 public class ResetDefaultButtonTableCell extends TableCell<ValueDef, Boolean> {
-	private static Logger logger = LogManager.getLogger(ResetDefaultButtonTableCell.class);
+	private static final Logger logger = LogManager.getLogger(ResetDefaultButtonTableCell.class);
 	
 	private final Button cellButton = new Button();
 	
@@ -30,11 +30,11 @@ public class ResetDefaultButtonTableCell extends TableCell<ValueDef, Boolean> {
 	 * Constructor.
 	 */
 	public ResetDefaultButtonTableCell() {
-		cellButton.setOnAction(new EventHandler<ActionEvent>() {
+		cellButton.setOnAction(new EventHandler<>() {
 			@Override
 			public void handle(final ActionEvent t) {
 				logger.trace("reset table item clicked");
-				final ValueDef data = (ValueDef) getTableRow().getItem();
+				final ValueDef data = getTableRow().getItem();
 				data.setValue(data.getDefaultValue());
 			}
 		});

@@ -27,9 +27,9 @@ public class Pair <K, V> implements Serializable {
 	 * Creates a new pair
 	 *
 	 * @param key
-	 *         The key for this pair
+	 * 		The key for this pair
 	 * @param value
-	 *         The value to use for this pair
+	 * 		The value to use for this pair
 	 */
 	public Pair(final K key, final V value) {
 		this.key = key;
@@ -109,8 +109,8 @@ public class Pair <K, V> implements Serializable {
 	 * </p>
 	 *
 	 * @param o
-	 *         the <code>Object</code> to test for equality with this
-	 *         <code>Pair</code>
+	 * 		the <code>Object</code> to test for equality with this
+	 * 		<code>Pair</code>
 	 * @return <code>true</code> if the given <code>Object</code> is equal to this
 	 * <code>Pair</code> else <code>false</code>
 	 */
@@ -121,10 +121,7 @@ public class Pair <K, V> implements Serializable {
 		}
 		if (o instanceof Pair) {
 			final Pair<?, ?> pair = (Pair<?, ?>) o;
-			if (key != null ? !key.equals(pair.key) : pair.key != null) {
-				return false;
-			}
-			return true;
+			return key != null ? key.equals(pair.key) : pair.key == null;
 		}
 		return false;
 	}

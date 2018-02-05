@@ -34,7 +34,7 @@ public final class DescIndexReader {
 	 * Grabs all layout file paths from a given descIndex file.
 	 *
 	 * @param f
-	 *         descIndex file
+	 * 		descIndex file
 	 * @return
 	 * @throws IOException
 	 * @throws SAXException

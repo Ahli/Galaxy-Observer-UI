@@ -54,7 +54,7 @@ public class UIStateGroup extends UIElement {
 	
 	/**
 	 * @param defaultState
-	 *         the defaultState to set
+	 * 		the defaultState to set
 	 */
 	public void setDefaultState(final String defaultState) {
 		this.defaultState = defaultState;
@@ -69,7 +69,7 @@ public class UIStateGroup extends UIElement {
 	
 	/**
 	 * @param states
-	 *         the states to set
+	 * 		the states to set
 	 */
 	public void setStates(final ArrayList<UIState> states) {
 		this.states = states;
@@ -87,11 +87,13 @@ public class UIStateGroup extends UIElement {
 		} else {
 			// go deeper
 			final String curName = UIElement.getLeftPathLevel(path);
-			for (final UIElement curElem : states) {
-				if (curName.equalsIgnoreCase(curElem.getName())) {
-					// found right frame -> cut path
-					final String newPath = UIElement.removeLeftPathLevel(path);
-					return curElem.receiveFrameFromPath(newPath);
+			if (curName != null) {
+				for (final UIElement curElem : states) {
+					if (curName.equalsIgnoreCase(curElem.getName())) {
+						// found right frame -> cut path
+						final String newPath = UIElement.removeLeftPathLevel(path);
+						return curElem.receiveFrameFromPath(newPath);
+					}
 				}
 			}
 			return null;

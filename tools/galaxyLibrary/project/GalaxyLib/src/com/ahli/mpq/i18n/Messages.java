@@ -30,7 +30,7 @@ public final class Messages {
 	 * Returns the String of the key.
 	 *
 	 * @param key
-	 *         the key
+	 * 		the key
 	 * @return string of the key
 	 */
 	public static String getString(final String key) {
@@ -54,7 +54,7 @@ public final class Messages {
 	 * Sets a bundle based on the specified Locale.
 	 *
 	 * @param loc
-	 *         the Locale
+	 * 		the Locale
 	 */
 	public static void setBundle(final Locale loc) {
 		resourceBundle = ResourceBundle.getBundle(BUNDLE_NAME, loc);
@@ -74,7 +74,7 @@ public final class Messages {
 	 * Checks if the Locale's resource bundle is the one used.
 	 *
 	 * @param locale
-	 *         a Locale
+	 * 		a Locale
 	 * @return whether the specified Locale is used or not
 	 */
 	public static boolean checkIfTargetResourceIsUsed(final Locale locale) {

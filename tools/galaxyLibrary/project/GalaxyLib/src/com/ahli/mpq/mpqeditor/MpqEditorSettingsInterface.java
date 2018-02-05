@@ -63,7 +63,9 @@ public class MpqEditorSettingsInterface {
 					throw new IOException("Could not find unique name for MPQEditor_Ruleset.ini's backup copy.");
 				}
 			} while (backupFile.exists());
-			rulesetFile.renameTo(backupFile);
+			if (!rulesetFile.renameTo(backupFile)) {
+				throw new IOException("Could not rename " + rulesetFile.getAbsolutePath() + " to " + backupFile.getName());
+			}
 		}
 		
 		// ini file
@@ -76,13 +78,15 @@ public class MpqEditorSettingsInterface {
 					throw new IOException("Could not find unique name for MPQEditor.ini's backup copy.");
 				}
 			} while (backupFile.exists());
-			iniFile.renameTo(backupFile);
+			if (!iniFile.renameTo(backupFile)) {
+				throw new IOException("Could not rename " + iniFile.getAbsolutePath() + " to " + backupFile.getName());
+			}
 		}
 		
 		backupActive = true;
 	}
 	
-	public void restoreOriginalSettingFiles() {
+	public void restoreOriginalSettingFiles() throws IOException {
 		if (!backupActive) {
 			return;
 		}
@@ -92,13 +96,17 @@ public class MpqEditorSettingsInterface {
 		// ruleset file
 		if (rulesetFile.exists()) {
 			originalName = new File(directoryPath + File.separator + "MPQEditor_Ruleset.ini");
-			rulesetFile.renameTo(originalName);
+			if (!rulesetFile.renameTo(originalName)) {
+				throw new IOException("Could not restore original via renaming " + rulesetFile.getAbsolutePath() + " to " + originalName);
+			}
 		}
 		
 		// ini file
 		if (iniFile.exists()) {
 			originalName = new File(directoryPath + File.separator + "MPQEditor.ini");
-			iniFile.renameTo(originalName);
+			if (!iniFile.renameTo(originalName)) {
+				throw new IOException("Could not restore original via renaming " + iniFile.getAbsolutePath() + " to " + originalName);
+			}
 		}
 		
 		backupActive = false;

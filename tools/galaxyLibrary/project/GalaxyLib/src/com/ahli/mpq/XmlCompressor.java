@@ -37,7 +37,7 @@ public final class XmlCompressor {
 	private static final String AHLI_SETTING = "@setting";
 	private static final String AHLI_HOTKEY = "@hotkey";
 	private static final String ANY_TAGNAME = "*";
-	private static Logger logger = LogManager.getLogger();
+	private static final Logger logger = LogManager.getLogger();
 	
 	/**
 	 *
@@ -52,7 +52,7 @@ public final class XmlCompressor {
 	 * @throws SAXException
 	 * @throws IOException
 	 */
-	public static void processCache(final String cachePath, final int ignoreCommentCountPerFile) throws ParserConfigurationException, SAXException, IOException {
+	public static void processCache(final String cachePath, final int ignoreCommentCountPerFile) throws ParserConfigurationException, SAXException {
 		
 		logger.info("Compressing XML files...");
 		logger.trace("cachePath: {}", () -> cachePath);
@@ -66,15 +66,14 @@ public final class XmlCompressor {
 		// provide error handler that does not print incompatible files into console
 		dBuilder.setErrorHandler(new SilentXmlSaxErrorHandler());
 		
-		x:
 		for (final File curFile : filesOfCache) {
-			Document doc = null;
+			final Document doc;
 			try (InputStream is = new FileInputStream(curFile)) {
 				
 				doc = dBuilder.parse(is);
 				
 			} catch (SAXParseException | IOException e) {
-				continue x;
+				continue;
 			}
 			
 			logger.trace("compression - processing file: {}", () -> curFile.getPath());

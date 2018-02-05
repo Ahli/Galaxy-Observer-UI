@@ -97,7 +97,7 @@ public class UICatalogImpl implements UICatalog {
 	}
 	
 	@Override
-	public void processDescIndex(final File f, final String raceId) throws SAXException, IOException, ParserConfigurationException, UIException, InterruptedException {
+	public void processDescIndex(final File f, final String raceId) throws SAXException, IOException, ParserConfigurationException, InterruptedException {
 		
 		final ArrayList<String> generalLayouts = DescIndexReader.getLayoutPathList(f, true);
 		
@@ -120,7 +120,7 @@ public class UICatalogImpl implements UICatalog {
 	 * @param toProcessList
 	 * @param basePath
 	 * @throws InterruptedException
-	 *         if the current thread was interrupted
+	 * 		if the current thread was interrupted
 	 */
 	private void processLayouts(final ArrayList<String> toProcessList, final String basePath, final String raceId) throws InterruptedException {
 		loop:
@@ -226,10 +226,10 @@ public class UICatalogImpl implements UICatalog {
 	
 	/**
 	 * @param curBasePath
-	 *         the curBasePath to set
+	 * 		the curBasePath to set
 	 */
-	public void setCurBasePath(final String curBasePath2) {
-		curBasePath = curBasePath2;
+	public void setCurBasePath(final String curBasePath) {
+		this.curBasePath = curBasePath;
 	}
 	
 	/**
