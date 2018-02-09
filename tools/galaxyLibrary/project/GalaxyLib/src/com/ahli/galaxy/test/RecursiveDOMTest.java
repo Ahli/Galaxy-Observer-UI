@@ -1,24 +1,23 @@
 package com.ahli.galaxy.test;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
+
 public class RecursiveDOMTest {
-	private static final String TAG = "*";
 	final static List<Object> list = new ArrayList<>();
+	private static final String TAG = "*";
 	
 	public static void main(final String[] args) {
 		long endMem;
@@ -32,8 +31,7 @@ public class RecursiveDOMTest {
 		final Runtime rt = Runtime.getRuntime();
 		final long startMem = rt.totalMemory() - rt.freeMemory();
 		final long startTime = System.currentTimeMillis();
-		final File f = new File(
-				"F:\\Spiele\\GalaxyObsUI\\baseUI\\heroes\\mods\\core.stormmod\\base.stormdata\\UI\\Layout\\UI\\GameUI.StormLayout");
+		final File f = new File("F:\\Spiele\\GalaxyObsUI\\baseUI\\heroes\\mods\\core.stormmod\\base.stormdata\\UI\\Layout\\UI\\GameUI.StormLayout");
 		DocumentBuilder dBuilder;
 		
 		try {
@@ -54,8 +52,7 @@ public class RecursiveDOMTest {
 		
 		final long executionTime = (System.currentTimeMillis() - startTime);
 		endMem = rt.totalMemory() - rt.freeMemory();
-		System.out.println("recursive traversal took " + executionTime + "ms. Per iteration: "
-				+ executionTime / iterations + "ms.");
+		System.out.println("recursive traversal took " + executionTime + "ms. Per iteration: " + executionTime / iterations + "ms.");
 		System.out.println("elements: " + list.size());
 		System.out.println("Memory Use: " + ((float) endMem - startMem) / (1 << 20) + " MB.");
 		System.out.println("iterations: " + iterations);

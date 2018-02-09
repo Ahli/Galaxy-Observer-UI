@@ -3,18 +3,16 @@ package com.ahli.galaxy.parser.interfaces;
 import java.io.File;
 import java.io.IOException;
 
-import com.ahli.galaxy.parser.interfaces.ParsedXmlConsumer;
-
 /**
  * Interface for Parser
- * 
+ *
  * @author Ahli
  */
 public interface XmlParser {
 	
 	/**
 	 * Parses a file and calls a consumer.
-	 * 
+	 *
 	 * @param f
 	 * @throws IOException
 	 */

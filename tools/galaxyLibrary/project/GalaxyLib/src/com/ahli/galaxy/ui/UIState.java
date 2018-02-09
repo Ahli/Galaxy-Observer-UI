@@ -8,7 +8,7 @@ import java.util.List;
  */
 public class UIState extends UIElement {
 	/**
-	 * 
+	 *
 	 */
 	private static final long serialVersionUID = -2094212167992593460L;
 	
@@ -65,7 +65,7 @@ public class UIState extends UIElement {
 	
 	/**
 	 * @param whens
-	 *            the whens to set
+	 * 		the whens to set
 	 */
 	public void setWhens(final List<UIAttribute> whens) {
 		this.whens = whens;
@@ -80,7 +80,7 @@ public class UIState extends UIElement {
 	
 	/**
 	 * @param actions
-	 *            the actions to set
+	 * 		the actions to set
 	 */
 	public void setActions(final List<UIAttribute> actions) {
 		this.actions = actions;
@@ -95,7 +95,7 @@ public class UIState extends UIElement {
 	
 	/**
 	 * @param nextAdditionShouldOverrideWhens
-	 *            the nextAdditionShouldOverrideWhens to set
+	 * 		the nextAdditionShouldOverrideWhens to set
 	 */
 	public void setNextAdditionShouldOverrideWhens(final boolean nextAdditionShouldOverrideWhens) {
 		this.nextAdditionShouldOverrideWhens = nextAdditionShouldOverrideWhens;
@@ -110,7 +110,7 @@ public class UIState extends UIElement {
 	
 	/**
 	 * @param nextAdditionShouldOverrideActions
-	 *            the nextAdditionShouldOverrideActions to set
+	 * 		the nextAdditionShouldOverrideActions to set
 	 */
 	public void setNextAdditionShouldOverrideActions(final boolean nextAdditionShouldOverrideActions) {
 		this.nextAdditionShouldOverrideActions = nextAdditionShouldOverrideActions;

@@ -5,7 +5,7 @@ package com.ahli.galaxy.ui;
  */
 public class UIConstant extends UIElement {
 	/**
-	 * 
+	 *
 	 */
 	private static final long serialVersionUID = -1827619598265805855L;
 	
@@ -37,7 +37,7 @@ public class UIConstant extends UIElement {
 	
 	/**
 	 * @param value
-	 *            the value to set
+	 * 		the value to set
 	 */
 	public void setValue(final String value) {
 		this.value = value;

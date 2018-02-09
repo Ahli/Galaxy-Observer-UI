@@ -4,7 +4,7 @@ import javafx.beans.property.SimpleStringProperty;
 
 /**
  * Class that defines a Hotkey or Settings value to be used in UI.
- * 
+ *
  * @author Ahli
  */
 public class ValueDef {
@@ -15,7 +15,7 @@ public class ValueDef {
 	
 	/**
 	 * Constructor.
-	 * 
+	 *
 	 * @param id
 	 * @param value
 	 * @param description

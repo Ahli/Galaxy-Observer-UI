@@ -1,15 +1,15 @@
 package com.ahli.galaxy.ui;
 
-import java.io.Serializable;
-
 import com.ahli.util.DeepCopyable;
+
+import java.io.Serializable;
 
 /**
  * @author Ahli
  */
 public class UITemplate implements Serializable, DeepCopyable {
 	/**
-	 * 
+	 *
 	 */
 	private static final long serialVersionUID = 7686203678975623860L;
 	
@@ -21,7 +21,7 @@ public class UITemplate implements Serializable, DeepCopyable {
 	
 	/**
 	 * @param fileName
-	 * @param frame
+	 * @param element
 	 */
 	public UITemplate(final String fileName, final UIElement element) {
 		this.fileName = fileName;
@@ -47,7 +47,7 @@ public class UITemplate implements Serializable, DeepCopyable {
 	
 	/**
 	 * @param fileName
-	 *            the fileName to set
+	 * 		the fileName to set
 	 */
 	public void setFileName(final String fileName) {
 		this.fileName = fileName;
@@ -62,7 +62,7 @@ public class UITemplate implements Serializable, DeepCopyable {
 	
 	/**
 	 * @param element
-	 *            the element to set
+	 * 		the element to set
 	 */
 	public void setElement(final UIElement element) {
 		this.element = element;
@@ -77,7 +77,7 @@ public class UITemplate implements Serializable, DeepCopyable {
 	
 	/**
 	 * @param isLocked
-	 *            the isLocked to set
+	 * 		the isLocked to set
 	 */
 	public void setLocked(final boolean isLocked) {
 		this.isLocked = isLocked;
@@ -92,11 +92,13 @@ public class UITemplate implements Serializable, DeepCopyable {
 		// logger.trace("template's element name: " + element.getName());
 		final String curName = UIElement.getLeftPathLevel(path);
 		// logger.trace("searched name: " + curName);
-		if (curName.equalsIgnoreCase(element.getName())) {
-			final String newPath = UIElement.removeLeftPathLevel(path);
-			// logger.trace("match! new Path: " + newPath);
-			
-			return element.receiveFrameFromPath(newPath);
+		if (curName != null) {
+			if (curName.equalsIgnoreCase(element.getName())) {
+				final String newPath = UIElement.removeLeftPathLevel(path);
+				// logger.trace("match! new Path: " + newPath);
+				
+				return element.receiveFrameFromPath(newPath);
+			}
 		}
 		// logger.trace("did not find template: " + path);
 		return null;

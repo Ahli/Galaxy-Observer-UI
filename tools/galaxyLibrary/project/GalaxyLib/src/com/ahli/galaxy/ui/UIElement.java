@@ -1,15 +1,15 @@
 package com.ahli.galaxy.ui;
 
-import java.io.Serializable;
-
 import com.ahli.util.DeepCopyable;
+
+import java.io.Serializable;
 
 /**
  * @author Ahli
  */
 public abstract class UIElement implements Serializable, DeepCopyable {
 	/**
-	 * 
+	 *
 	 */
 	private static final long serialVersionUID = -9128521308405405698L;
 	
@@ -17,12 +17,32 @@ public abstract class UIElement implements Serializable, DeepCopyable {
 	
 	/**
 	 * Constructor.
-	 * 
+	 *
 	 * @param name
-	 *            element's name
+	 * 		element's name
 	 */
 	public UIElement(final String name) {
 		this.name = name;
+	}
+	
+	/**
+	 * Removes the left/top-most level of the specified path and returns the remaining.
+	 *
+	 * @param path
+	 * @return
+	 */
+	public static String removeLeftPathLevel(final String path) {
+		final int i = path.indexOf('/');
+		return (i == -1) ? null : path.substring(i + 1);
+	}
+	
+	/**
+	 * @param path
+	 * @return
+	 */
+	public static String getLeftPathLevel(final String path) {
+		final int i = path.indexOf('/');
+		return (i == -1) ? path : path.substring(0, i);
 	}
 	
 	/**
@@ -34,7 +54,7 @@ public abstract class UIElement implements Serializable, DeepCopyable {
 	
 	/**
 	 * @param name
-	 *            the name to set
+	 * 		the name to set
 	 */
 	public void setName(final String name) {
 		this.name = name;
@@ -43,37 +63,12 @@ public abstract class UIElement implements Serializable, DeepCopyable {
 	/**
 	 * Returns the correct frame based on a specified path. For example, the frame
 	 * that a path in a template references.
-	 * 
+	 *
 	 * @param path
-	 *            path of an element
+	 * 		path of an element
 	 * @return Frame element
 	 */
 	public abstract UIElement receiveFrameFromPath(String path);
-	
-	/**
-	 * @param path
-	 * @return
-	 */
-	public static String removeLeftPathLevel(final String path) {
-		final int i = path.indexOf('/');
-		if (i == -1) {
-			return null;
-		}
-		final String newPath = path.substring(i + 1);
-		return newPath;
-	}
-	
-	/**
-	 * @param path
-	 * @return
-	 */
-	public static String getLeftPathLevel(final String path) {
-		final int i = path.indexOf('/');
-		if (i == -1) {
-			return path;
-		}
-		return path.substring(0, i);
-	}
 	
 	@Override
 	public String toString() {

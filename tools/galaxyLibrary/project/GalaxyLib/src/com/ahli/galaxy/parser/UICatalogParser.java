@@ -1,14 +1,5 @@
 package com.ahli.galaxy.parser;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.function.Predicate;
-
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
 import com.ahli.galaxy.parser.interfaces.ParsedXmlConsumer;
 import com.ahli.galaxy.parser.interfaces.XmlParser;
 import com.ahli.galaxy.ui.UIAnchorSide;
@@ -23,6 +14,13 @@ import com.ahli.galaxy.ui.UIStateGroup;
 import com.ahli.galaxy.ui.UITemplate;
 import com.ahli.galaxy.ui.exception.UIException;
 import com.ahli.galaxy.ui.interfaces.UICatalog;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class UICatalogParser implements ParsedXmlConsumer {
 	private static final String TYPE = "type";
@@ -31,17 +29,17 @@ public class UICatalogParser implements ParsedXmlConsumer {
 	
 	private final UICatalog catalog;
 	private final XmlParser parser;
+	// private final UiTagType curType = UiTagType.invalid;
+	private final List<UIElement> curPath = new ArrayList<>();
+	private final List<UIState> statesToClose;
+	private final List<Integer> statesToCloseLevel;
 	private UIElement curElement = null;
 	private int curLevel;
 	private boolean curIsDevLayout;
 	private String raceId;
-	// private final UiTagType curType = UiTagType.invalid;
-	private final List<UIElement> curPath = new ArrayList<>();
 	// private UITemplate curTemplate;
 	// private boolean editingMode;
 	private String curFileName;
-	private final List<UIState> statesToClose;
-	private final List<Integer> statesToCloseLevel;
 	
 	public UICatalogParser(final UICatalog catalog2, final XmlParser parser2) {
 		catalog = catalog2;
@@ -60,8 +58,7 @@ public class UICatalogParser implements ParsedXmlConsumer {
 	}
 	
 	@Override
-	public void parse(final int level, final String tagName, final List<String> attrTypes,
-			final List<String> attrValues) throws UIException {
+	public void parse(final int level, final String tagName, final List<String> attrTypes, final List<String> attrValues) throws UIException {
 		logger.trace("level={}, tag={}", () -> level, () -> tagName);
 		if (tagName == null) {
 			logger.error("ERROR: tag in XML is null.");
@@ -124,17 +121,13 @@ public class UICatalogParser implements ParsedXmlConsumer {
 				logger.error("unexpected attribute 'file=' found in " + curElement);
 			}
 		}
-		final String name = ((i = attrTypes.indexOf("name")) != -1)
-				? catalog.getConstantValue(attrValues.get(i), raceId, curIsDevLayout)
-				: null;
+		final String name = ((i = attrTypes.indexOf("name")) != -1) ? catalog.getConstantValue(attrValues.get(i), raceId, curIsDevLayout) : null;
 		// TODO editingMode retrieving existing element if possible
 		
 		// TODO copy template settings, if template used in existing frame
 		
 		// create from template (actions may use template= and need to be ignored)
-		UIElement newElem = ((i = attrTypes.indexOf("template")) != -1 && !tagName.equals("action"))
-				? instanciateTemplate(attrValues.get(i), name)
-				: null;
+		UIElement newElem = ((i = attrTypes.indexOf("template")) != -1 && !tagName.equals("action")) ? instanciateTemplate(attrValues.get(i), name) : null;
 		
 		// use lowercase for cases!
 		switch (tagName) {
@@ -142,9 +135,7 @@ public class UICatalogParser implements ParsedXmlConsumer {
 				if (newElem == null) {
 					newElem = new UIFrame(name);
 				}
-				final String type = ((i = attrTypes.indexOf(TYPE)) != -1)
-						? catalog.getConstantValue(attrValues.get(i), raceId, curIsDevLayout)
-						: null;
+				final String type = ((i = attrTypes.indexOf(TYPE)) != -1) ? catalog.getConstantValue(attrValues.get(i), raceId, curIsDevLayout) : null;
 				if (!checkFrameTypeCompatibility(type, ((UIFrame) newElem).getType())) {
 					logger.error("ERROR: The type of the frame is not compatible with the used template.");
 				}
@@ -226,9 +217,7 @@ public class UICatalogParser implements ParsedXmlConsumer {
 				if (newElem == null) {
 					newElem = new UIConstant(name);
 				}
-				final String val = ((i = attrTypes.indexOf("val")) != -1)
-						? catalog.getConstantValue(attrValues.get(i), raceId, curIsDevLayout)
-						: null;
+				final String val = ((i = attrTypes.indexOf("val")) != -1) ? catalog.getConstantValue(attrValues.get(i), raceId, curIsDevLayout) : null;
 				if (val == null) {
 					logger.error("Value of Constant '" + name + "' is null");
 					return;
@@ -255,8 +244,7 @@ public class UICatalogParser implements ParsedXmlConsumer {
 				newElem = new UIAttribute(tagName);
 				i = 0;
 				for (final int len = attrTypes.size(); i < len; i++) {
-					((UIAttribute) newElem).addValue(attrTypes.get(i),
-							catalog.getConstantValue(attrValues.get(i), raceId, curIsDevLayout));
+					((UIAttribute) newElem).addValue(attrTypes.get(i), catalog.getConstantValue(attrValues.get(i), raceId, curIsDevLayout));
 				}
 				// add to parent
 				if (curElement instanceof UIFrame) {
@@ -291,15 +279,43 @@ public class UICatalogParser implements ParsedXmlConsumer {
 		
 	}
 	
-	@Override
-	public void endLayoutFile() {
-		// close all states
-		for (final UIState s : statesToClose) {
-			s.setNextAdditionShouldOverrideActions(true);
-			s.setNextAdditionShouldOverrideWhens(true);
+	/**
+	 * @param path
+	 * @param newName
+	 * @return Template instance
+	 */
+	private UIElement instanciateTemplate(String path, final String newName) {
+		if (path == null) {
+			return null;
 		}
-		statesToClose.clear();
-		statesToCloseLevel.clear();
+		
+		if (logger.isTraceEnabled()) {
+			logger.trace("Instanciating Template of path " + path);
+		}
+		path = path.replace('\\', '/');
+		final String fileName = path.substring(0, path.indexOf('/'));
+		
+		// 1. check templates
+		UIElement templateInstance = instanciateTemplateFromList(catalog.getTemplates(), fileName, path, newName);
+		if (templateInstance != null) {
+			return templateInstance;
+		} else {
+			// 2. if fail -> check dev templates
+			templateInstance = instanciateTemplateFromList(catalog.getBlizzOnlyTemplates(), fileName, path, newName);
+			if (templateInstance != null) {
+				if (!curIsDevLayout) {
+					logger.error("ERROR: the non-Blizz-only frame '" + curElement + "' uses a Blizz-only template '" + path + "'.");
+				}
+				return templateInstance;
+			}
+		}
+		// template does not exist or its layout was not loaded, yet
+		if (!curIsDevLayout) {
+			logger.error("ERROR: Template of path '" + path + "' could not be found.");
+		} else {
+			logger.warn("WARNING: Template of path '" + path + "' could not be found, but we are creating a Blizz-only layout, so this is fine.");
+		}
+		return null;
 	}
 	
 	/**
@@ -318,18 +334,10 @@ public class UICatalogParser implements ParsedXmlConsumer {
 	 */
 	private void parseAnchor(final List<String> attrTypes, final List<String> attrValues) {
 		int i;
-		final String side = ((i = attrTypes.indexOf("side")) != -1)
-				? catalog.getConstantValue(attrValues.get(i), raceId, curIsDevLayout)
-				: null;
-		final String relative = ((i = attrTypes.indexOf("relative")) != -1)
-				? catalog.getConstantValue(attrValues.get(i), raceId, curIsDevLayout)
-				: null;
-		final String pos = ((i = attrTypes.indexOf("pos")) != -1)
-				? catalog.getConstantValue(attrValues.get(i), raceId, curIsDevLayout)
-				: null;
-		final String offset = ((i = attrTypes.indexOf("offset")) != -1)
-				? catalog.getConstantValue(attrValues.get(i), raceId, curIsDevLayout)
-				: null;
+		final String side = ((i = attrTypes.indexOf("side")) != -1) ? catalog.getConstantValue(attrValues.get(i), raceId, curIsDevLayout) : null;
+		final String relative = ((i = attrTypes.indexOf("relative")) != -1) ? catalog.getConstantValue(attrValues.get(i), raceId, curIsDevLayout) : null;
+		final String pos = ((i = attrTypes.indexOf("pos")) != -1) ? catalog.getConstantValue(attrValues.get(i), raceId, curIsDevLayout) : null;
+		final String offset = ((i = attrTypes.indexOf("offset")) != -1) ? catalog.getConstantValue(attrValues.get(i), raceId, curIsDevLayout) : null;
 		
 		if (curElement instanceof UIFrame) {
 			final UIFrame frame = (UIFrame) curElement;
@@ -359,74 +367,6 @@ public class UICatalogParser implements ParsedXmlConsumer {
 	}
 	
 	/**
-	 * @param template
-	 * @return Template instance
-	 */
-	private UIElement instanciateTemplate(String path, final String newName) {
-		if (path == null) {
-			return null;
-		}
-		
-		if (logger.isTraceEnabled()) {
-			logger.trace("Instanciating Template of path " + path);
-		}
-		path = path.replace('\\', '/');
-		final String fileName = path.substring(0, path.indexOf('/'));
-		
-		// 1. check templates
-		UIElement templateInstance = instanciateTemplateFromList(catalog.getTemplates(), fileName, path, newName);
-		if (templateInstance != null) {
-			return templateInstance;
-		} else {
-			// 2. if fail -> check dev templates
-			templateInstance = instanciateTemplateFromList(catalog.getBlizzOnlyTemplates(), fileName, path, newName);
-			if (templateInstance != null) {
-				if (!curIsDevLayout) {
-					logger.error("ERROR: the non-Blizz-only frame '" + curElement + "' uses a Blizz-only template '"
-							+ path + "'.");
-				}
-				return templateInstance;
-			}
-		}
-		// template does not exist or its layout was not loaded, yet
-		if (!curIsDevLayout) {
-			logger.error("ERROR: Template of path '" + path + "' could not be found.");
-		} else {
-			logger.warn("WARNING: Template of path '" + path
-					+ "' could not be found, but we are creating a Blizz-only layout, so this is fine.");
-		}
-		return null;
-	}
-	
-	/**
-	 * @param templates
-	 * @param fileName
-	 * @param path
-	 * @param newName
-	 * @return
-	 */
-	private UIElement instanciateTemplateFromList(final List<UITemplate> templates, final String fileName,
-			final String path, final String newName) {
-		
-		for (final UITemplate curTemplate : templates) {
-			if (curTemplate.getFileName().equalsIgnoreCase(fileName)) {
-				// found template file
-				final String newPath = UIElement.removeLeftPathLevel(path);
-				final UIElement frameFromPath = curTemplate.receiveFrameFromPath(newPath);
-				
-				if (frameFromPath == null) {
-					// not the correct template
-					continue;
-				}
-				final UIElement clone = (UIElement) frameFromPath.deepCopy();
-				clone.setName(newName);
-				return clone;
-			}
-		}
-		return null;
-	}
-	
-	/**
 	 * Set the implicit names of controllers in animations.
 	 *
 	 * @param thisElem
@@ -447,6 +387,33 @@ public class UICatalogParser implements ParsedXmlConsumer {
 	}
 	
 	/**
+	 * @param templates
+	 * @param fileName
+	 * @param path
+	 * @param newName
+	 * @return
+	 */
+	private UIElement instanciateTemplateFromList(final List<UITemplate> templates, final String fileName, final String path, final String newName) {
+		final String newPath = UIElement.removeLeftPathLevel(path);
+		
+		for (final UITemplate curTemplate : templates) {
+			if (curTemplate.getFileName().equalsIgnoreCase(fileName)) {
+				// found template file
+				final UIElement frameFromPath = curTemplate.receiveFrameFromPath(newPath);
+				
+				if (frameFromPath == null) {
+					// not the correct template
+					continue;
+				}
+				final UIElement clone = (UIElement) frameFromPath.deepCopy();
+				clone.setName(newName);
+				return clone;
+			}
+		}
+		return null;
+	}
+	
+	/**
 	 * @param type
 	 * @param controllers
 	 * @return
@@ -464,17 +431,23 @@ public class UICatalogParser implements ParsedXmlConsumer {
 		while (true) {
 			final String name = type + "_" + i;
 			
-			if (controllers.stream().noneMatch(new Predicate<UIController>() {
-				@Override
-				public boolean test(final UIController t) {
-					return t.getName() != null && t.getName().compareToIgnoreCase(name) == 0;
-				}
-			})) {
+			if (controllers.stream().noneMatch(t -> t.getName() != null && t.getName().compareToIgnoreCase(name) == 0)) {
 				logger.trace("Constructing implicit controller name: {}", () -> name);
 				return name;
 			}
 			logger.trace("Implicit controller name existing: {}", () -> name);
 			i++;
 		}
+	}
+	
+	@Override
+	public void endLayoutFile() {
+		// close all states
+		for (final UIState s : statesToClose) {
+			s.setNextAdditionShouldOverrideActions(true);
+			s.setNextAdditionShouldOverrideWhens(true);
+		}
+		statesToClose.clear();
+		statesToCloseLevel.clear();
 	}
 }

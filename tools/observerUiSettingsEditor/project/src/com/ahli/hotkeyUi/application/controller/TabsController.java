@@ -1,13 +1,9 @@
 package com.ahli.hotkeyUi.application.controller;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
 import com.ahli.hotkeyUi.application.Main;
 import com.ahli.hotkeyUi.application.i18n.Messages;
 import com.ahli.hotkeyUi.application.model.ValueDef;
 import com.ahli.hotkeyUi.application.ui.ResetDefaultButtonTableCell;
-
 import javafx.application.Platform;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.value.ChangeListener;
@@ -27,56 +23,33 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.layout.VBox;
 import javafx.util.Callback;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  * @author Ahli
  */
 public class TabsController {
+	private static final Callback<CellDataFeatures<ValueDef, Boolean>, ObservableValue<Boolean>> ActionColumnCellValueFactory = new Callback<>() {
+		@Override
+		public ObservableValue<Boolean> call(final TableColumn.CellDataFeatures<ValueDef, Boolean> p) {
+			return new SimpleBooleanProperty(p.getValue() != null);
+		}
+	};
+	private static final Callback<TableColumn<ValueDef, Boolean>, TableCell<ValueDef, Boolean>> ActionColumnCellFactoryReset = new Callback<>() {
+		@Override
+		public TableCell<ValueDef, Boolean> call(final TableColumn<ValueDef, Boolean> p) {
+			return new ResetDefaultButtonTableCell(Messages.getString("TabsController.Reset")); //$NON-NLS-1$
+		}
+	};
 	static Logger logger = LogManager.getLogger(TabsController.class);
-	
-	private Main main;
-	
-	private final ObservableList<ValueDef> hotkeysData = FXCollections.observableArrayList();
-	
-	private final ObservableList<ValueDef> settingsData = FXCollections.observableArrayList();
-	
-	@FXML
-	private Tab hotkeysTab;
-	@FXML
-	private TableView<ValueDef> hotkeysTable;
-	@FXML
-	private TableColumn<ValueDef, String> hotkeysNameCol;
-	@FXML
-	private TableColumn<ValueDef, String> hotkeysDescriptionCol;
-	@FXML
-	private TableColumn<ValueDef, String> hotkeysDefaultCol;
-	@FXML
-	private TableColumn<ValueDef, String> hotkeysKeyCol;
-	@FXML
-	private TableColumn<ValueDef, Boolean> hotkeysActionsCol;
-	
-	@FXML
-	private Tab settingsTab;
-	@FXML
-	private TableView<ValueDef> settingsTable;
-	@FXML
-	private TableColumn<ValueDef, String> settingsNameCol;
-	@FXML
-	private TableColumn<ValueDef, String> settingsDescriptionCol;
-	@FXML
-	private TableColumn<ValueDef, String> settingsDefaultCol;
-	@FXML
-	private TableColumn<ValueDef, String> settingsValueCol;
-	@FXML
-	private TableColumn<ValueDef, Boolean> settingsActionsCol;
-	
 	// based on:
 	// http://jluger.de/blog/20160731_javafx_text_rendering_in_tableview.html
-	private static final Callback<TableColumn<ValueDef, String>, TableCell<ValueDef, String>> WRAPPING_CELL_FACTORY = new Callback<TableColumn<ValueDef, String>, TableCell<ValueDef, String>>() {
+	private static final Callback<TableColumn<ValueDef, String>, TableCell<ValueDef, String>> WRAPPING_CELL_FACTORY = new Callback<>() {
 		
 		@Override
 		public TableCell<ValueDef, String> call(final TableColumn<ValueDef, String> param) {
-			final TableCell<ValueDef, String> tableCell = new TableCell<ValueDef, String>() {
+			return new TableCell<>() {
 				@Override
 				protected void updateItem(final String item, final boolean empty) {
 					if (empty || item == null) {
@@ -93,10 +66,9 @@ public class TabsController {
 							final Label l = new Label(item);
 							l.setWrapText(true);
 							final VBox box = new VBox(l);
-							l.heightProperty().addListener(new ChangeListener<Number>() {
+							l.heightProperty().addListener(new ChangeListener<>() {
 								@Override
-								public void changed(final ObservableValue<? extends Number> observable,
-										final Number oldValue, final Number newValue) {
+								public void changed(final ObservableValue<? extends Number> observable, final Number oldValue, final Number newValue) {
 									box.setPrefHeight(newValue.doubleValue() + 7);
 									Platform.runLater(new Runnable() {
 										@Override
@@ -113,23 +85,39 @@ public class TabsController {
 					}
 				}
 			};
-			return tableCell;
 		}
 	};
-	
-	private static final Callback<CellDataFeatures<ValueDef, Boolean>, ObservableValue<Boolean>> ActionColumnCellValueFactory = new Callback<CellDataFeatures<ValueDef, Boolean>, ObservableValue<Boolean>>() {
-		@Override
-		public ObservableValue<Boolean> call(final TableColumn.CellDataFeatures<ValueDef, Boolean> p) {
-			return new SimpleBooleanProperty(p.getValue() != null);
-		}
-	};
-	
-	private static final Callback<TableColumn<ValueDef, Boolean>, TableCell<ValueDef, Boolean>> ActionColumnCellFactoryReset = new Callback<TableColumn<ValueDef, Boolean>, TableCell<ValueDef, Boolean>>() {
-		@Override
-		public TableCell<ValueDef, Boolean> call(final TableColumn<ValueDef, Boolean> p) {
-			return new ResetDefaultButtonTableCell(Messages.getString("TabsController.Reset")); //$NON-NLS-1$
-		}
-	};
+	private final ObservableList<ValueDef> hotkeysData = FXCollections.observableArrayList();
+	private final ObservableList<ValueDef> settingsData = FXCollections.observableArrayList();
+	private Main main;
+	@FXML
+	private Tab hotkeysTab;
+	@FXML
+	private TableView<ValueDef> hotkeysTable;
+	@FXML
+	private TableColumn<ValueDef, String> hotkeysNameCol;
+	@FXML
+	private TableColumn<ValueDef, String> hotkeysDescriptionCol;
+	@FXML
+	private TableColumn<ValueDef, String> hotkeysDefaultCol;
+	@FXML
+	private TableColumn<ValueDef, String> hotkeysKeyCol;
+	@FXML
+	private TableColumn<ValueDef, Boolean> hotkeysActionsCol;
+	@FXML
+	private Tab settingsTab;
+	@FXML
+	private TableView<ValueDef> settingsTable;
+	@FXML
+	private TableColumn<ValueDef, String> settingsNameCol;
+	@FXML
+	private TableColumn<ValueDef, String> settingsDescriptionCol;
+	@FXML
+	private TableColumn<ValueDef, String> settingsDefaultCol;
+	@FXML
+	private TableColumn<ValueDef, String> settingsValueCol;
+	@FXML
+	private TableColumn<ValueDef, Boolean> settingsActionsCol;
 	
 	/**
 	 * On Controller initialization.
@@ -143,8 +131,8 @@ public class TabsController {
 		hotkeysDescriptionCol.setCellFactory(WRAPPING_CELL_FACTORY);
 		hotkeysDefaultCol.setCellValueFactory(new PropertyValueFactory<>("defaultValue"));
 		hotkeysKeyCol.setCellValueFactory(new PropertyValueFactory<>("value"));
-		hotkeysKeyCol.setCellFactory(TextFieldTableCell.<ValueDef>forTableColumn());
-		hotkeysKeyCol.setOnEditCommit(new EventHandler<CellEditEvent<ValueDef, String>>() {
+		hotkeysKeyCol.setCellFactory(TextFieldTableCell.forTableColumn());
+		hotkeysKeyCol.setOnEditCommit(new EventHandler<>() {
 			@Override
 			public void handle(final CellEditEvent<ValueDef, String> t) {
 				if (!t.getOldValue().equals(t.getNewValue())) {
@@ -163,8 +151,8 @@ public class TabsController {
 		settingsDescriptionCol.setCellFactory(WRAPPING_CELL_FACTORY);
 		settingsDefaultCol.setCellValueFactory(new PropertyValueFactory<>("defaultValue"));
 		settingsValueCol.setCellValueFactory(new PropertyValueFactory<>("value"));
-		settingsValueCol.setCellFactory(TextFieldTableCell.<ValueDef>forTableColumn());
-		settingsValueCol.setOnEditCommit(new EventHandler<CellEditEvent<ValueDef, String>>() {
+		settingsValueCol.setCellFactory(TextFieldTableCell.forTableColumn());
+		settingsValueCol.setOnEditCommit(new EventHandler<>() {
 			@Override
 			public void handle(final CellEditEvent<ValueDef, String> t) {
 				if (!t.getOldValue().equals(t.getNewValue())) {

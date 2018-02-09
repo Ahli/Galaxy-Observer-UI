@@ -2,26 +2,24 @@ package application.integration;
 
 import java.io.BufferedReader;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 
 /**
  * Interface Class for the Settings .ini file.
- * 
+ *
  * @author Ahli
  */
 public class SettingsIniInterface {
 	
-	private String settingsFilePath = "";
+	private String settingsFilePath;
 	private String sc2Path = "", heroesPath = "", heroesPtrPath = "";
-	private boolean ptrActive = false, sc2X64 = false, heroesX64 = false, heroesPtrX64 = false,
-			heroesProtectMpq = false, sc2ProtectMpq = false, buildUnprotectedToo = false;
+	private boolean ptrActive = false, sc2X64 = false, heroesX64 = false, heroesPtrX64 = false, heroesProtectMpq = false, sc2ProtectMpq = false, buildUnprotectedToo = false;
 	
 	/**
 	 * Constructor.
-	 * 
+	 *
 	 * @param settingsFilePath
 	 */
 	public SettingsIniInterface(final String settingsFilePath) {
@@ -29,17 +27,8 @@ public class SettingsIniInterface {
 	}
 	
 	/**
-	 * Constructor.
-	 * 
-	 * @param path
-	 */
-	public void setSettingsFilePath(final String path) {
-		settingsFilePath = path;
-	}
-	
-	/**
 	 * Returns path to settings file.
-	 * 
+	 *
 	 * @return path as String
 	 */
 	public String getSettingsFilePath() {
@@ -47,38 +36,37 @@ public class SettingsIniInterface {
 	}
 	
 	/**
-	 * Read all Settings from the Settings file.
-	 * 
-	 * @throws FileNotFoundException
-	 *             when no file exists
+	 * Constructor.
+	 *
+	 * @param path
 	 */
-	public void readSettingsFromFile() throws FileNotFoundException {
-		final InputStreamReader is = new InputStreamReader(new FileInputStream(settingsFilePath),
-				StandardCharsets.UTF_8);
-		final BufferedReader br = new BufferedReader(is);
+	public void setSettingsFilePath(final String path) {
+		settingsFilePath = path;
+	}
+	
+	/**
+	 * Read all Settings from the Settings file.
+	 *
+	 * @throws IOException
+	 * 		when there is an error reading the file
+	 */
+	public void readSettingsFromFile() throws IOException {
 		String line;
-		try {
+		try (final InputStreamReader is = new InputStreamReader(new FileInputStream(settingsFilePath), StandardCharsets.UTF_8); final BufferedReader br = new BufferedReader(is)) {
 			while ((line = br.readLine()) != null) {
 				parseLine(line);
-			}
-		} catch (final IOException e) {
-			e.printStackTrace();
-		} finally {
-			try {
-				br.close();
-			} catch (final IOException e) {
 			}
 		}
 	}
 	
 	/**
 	 * Parse a line from the Settings file.
-	 * 
+	 *
 	 * @param line
-	 *            line of settings
+	 * 		line of settings
 	 */
 	private void parseLine(final String line) {
-		String val;
+		final String val;
 		if (line.startsWith("Heroes_Path")) {
 			val = getValFromIniLine(line);
 			heroesPath = val;
@@ -114,7 +102,7 @@ public class SettingsIniInterface {
 	
 	/**
 	 * Reads the Value from a line from the Settings file.
-	 * 
+	 *
 	 * @param line
 	 * @return
 	 */
@@ -186,7 +174,7 @@ public class SettingsIniInterface {
 	}
 	
 	/**
-	 * 
+	 *
 	 */
 	public boolean isBuildUnprotectedToo() {
 		return buildUnprotectedToo;

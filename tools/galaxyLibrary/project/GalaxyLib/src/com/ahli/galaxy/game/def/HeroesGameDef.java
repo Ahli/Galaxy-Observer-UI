@@ -8,7 +8,7 @@ import com.ahli.galaxy.game.def.abstracts.GameDef;
 public class HeroesGameDef extends GameDef {
 	
 	/**
-	 * 
+	 *
 	 */
 	public HeroesGameDef() {
 		setName("Heroes of the Storm");

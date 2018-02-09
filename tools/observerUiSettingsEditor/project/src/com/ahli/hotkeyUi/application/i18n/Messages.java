@@ -1,23 +1,21 @@
 package com.ahli.hotkeyUi.application.i18n;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import java.util.Locale;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
 /**
  * Class to internationalize messages. Hint: FXML files can be localized via
  * text="%key", if the FxmlLoader receives the correct resource bundle.
- * 
+ *
  * @author Ahli
  */
 public final class Messages {
-	private static Logger logger = LogManager.getLogger(Messages.class); // $NON-NLS-1$
-	
 	private static final String BUNDLE_NAME = "com.ahli.hotkeyUi.application.i18n.messages"; //$NON-NLS-1$
-	
+	private static Logger logger = LogManager.getLogger(Messages.class); // $NON-NLS-1$
 	private static ResourceBundle resourceBundle = ResourceBundle.getBundle(BUNDLE_NAME);
 	
 	private static Locale usedLocale = Locale.getDefault();
@@ -30,7 +28,7 @@ public final class Messages {
 	
 	/**
 	 * Returns the String of the key.
-	 * 
+	 *
 	 * @param key
 	 * @return
 	 */
@@ -43,8 +41,17 @@ public final class Messages {
 	}
 	
 	/**
+	 * Returns the currently used bundle.
+	 *
+	 * @return
+	 */
+	public static ResourceBundle getBundle() {
+		return resourceBundle;
+	}
+	
+	/**
 	 * Sets a bundle based on the specified Locale.
-	 * 
+	 *
 	 * @param loc
 	 */
 	public static void setBundle(final Locale loc) {
@@ -53,17 +60,8 @@ public final class Messages {
 	}
 	
 	/**
-	 * Returns the currently used bundle.
-	 * 
-	 * @return
-	 */
-	public static ResourceBundle getBundle() {
-		return resourceBundle;
-	}
-	
-	/**
 	 * Returns the Locale that was used to get the bundle in effect.
-	 * 
+	 *
 	 * @return
 	 */
 	public static Locale getUsedLocale() {
@@ -72,14 +70,13 @@ public final class Messages {
 	
 	/**
 	 * Checks if the Locale's resource bundle is the one used.
-	 * 
+	 *
 	 * @param locale
 	 * @return
 	 */
 	public static boolean checkIfTargetResourceIsUsed(final Locale locale) {
 		final boolean result = resourceBundle.equals(ResourceBundle.getBundle(BUNDLE_NAME, locale));
-		logger.trace("compare used locale's resource '" + usedLocale + "' with one for locale '" + locale
-				+ "', result: " + result);
+		logger.trace("compare used locale's resource '" + usedLocale + "' with one for locale '" + locale + "', result: " + result);
 		return result;
 	}
 }

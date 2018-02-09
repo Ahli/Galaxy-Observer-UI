@@ -1,11 +1,16 @@
 package com.ahli.mpq;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Collection;
-import java.util.Locale;
+import com.ahli.util.SilentXmlSaxErrorHandler;
+import org.apache.commons.io.FileUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.w3c.dom.Comment;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
+import org.xml.sax.SAXParseException;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -18,19 +23,12 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.TransformerFactoryConfigurationError;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
-
-import org.apache.commons.io.FileUtils;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.w3c.dom.Comment;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-import org.xml.sax.SAXException;
-import org.xml.sax.SAXParseException;
-
-import com.ahli.util.SilentXmlSaxErrorHandler;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Collection;
+import java.util.Locale;
 
 /**
  * @author Ahli
@@ -39,10 +37,10 @@ public final class XmlCompressor {
 	private static final String AHLI_SETTING = "@setting";
 	private static final String AHLI_HOTKEY = "@hotkey";
 	private static final String ANY_TAGNAME = "*";
-	private static Logger logger = LogManager.getLogger();
+	private static final Logger logger = LogManager.getLogger();
 	
 	/**
-	 * 
+	 *
 	 */
 	private XmlCompressor() {
 	}
@@ -54,8 +52,7 @@ public final class XmlCompressor {
 	 * @throws SAXException
 	 * @throws IOException
 	 */
-	public static void processCache(final String cachePath, final int ignoreCommentCountPerFile)
-			throws ParserConfigurationException, SAXException, IOException {
+	public static void processCache(final String cachePath, final int ignoreCommentCountPerFile) throws ParserConfigurationException, SAXException {
 		
 		logger.info("Compressing XML files...");
 		logger.trace("cachePath: {}", () -> cachePath);
@@ -69,14 +66,14 @@ public final class XmlCompressor {
 		// provide error handler that does not print incompatible files into console
 		dBuilder.setErrorHandler(new SilentXmlSaxErrorHandler());
 		
-		x: for (final File curFile : filesOfCache) {
-			Document doc = null;
+		for (final File curFile : filesOfCache) {
+			final Document doc;
 			try (InputStream is = new FileInputStream(curFile)) {
 				
 				doc = dBuilder.parse(is);
 				
 			} catch (SAXParseException | IOException e) {
-				continue x;
+				continue;
 			}
 			
 			logger.trace("compression - processing file: {}", () -> curFile.getPath());

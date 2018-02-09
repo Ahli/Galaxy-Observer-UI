@@ -1,20 +1,20 @@
 package application.util;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import java.io.File;
 import java.net.URI;
 import java.net.URL;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
 /**
  * Helper class for the executable jar file. It is capable of determining the
  * position.
- * 
+ *
  * @author Ahli
  */
 public final class JarHelper {
-	private static Logger logger = LogManager.getLogger();
+	private static final Logger logger = LogManager.getLogger();
 	
 	/**
 	 * Disabled Constructor.
@@ -25,11 +25,11 @@ public final class JarHelper {
 	/**
 	 * from stackoverflow because why doesn't java have this functionality? It's not
 	 * like nobody would need that or it is trivial to create...
-	 * 
+	 *
 	 * @param aclass
 	 * @return File at base path
 	 */
-	public static File getJarDir(final Class<? extends Object> aclass) {
+	public static File getJarDir(final Class<?> aclass) {
 		logger.trace("_FINDING JAR'S PATH", () -> ""); //$NON-NLS-1$
 		
 		// ATTEMPT #1
@@ -49,6 +49,15 @@ public final class JarHelper {
 			
 			str = uri.getPath();
 			logger.trace("_URI path:", () -> uri.getPath()); //$NON-NLS-1$
+			
+			// fix for intellij
+			if (str.endsWith("/tools/./")) {
+				str = str.substring(0, str.length() - 2);
+				final String dirStr = dir.toString();
+				final String tools = "\\tools\\";
+				str += dirStr.substring(dirStr.indexOf(tools) + tools.length(), dirStr.indexOf("\\target\\"));
+				str = str.replace('\\', '/');
+			}
 			
 			if (str.startsWith("file:/")) { //$NON-NLS-1$
 				str = str.substring(6);

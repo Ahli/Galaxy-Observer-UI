@@ -1,15 +1,15 @@
 package com.ahli.galaxy.game;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import com.ahli.galaxy.game.def.abstracts.GameDef;
 import com.ahli.galaxy.ui.UICatalogImpl;
 import com.ahli.galaxy.ui.interfaces.UICatalog;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * Class containing the data of a game (Sc2/Heroes/...).
- * 
+ *
  * @author Ahli
  */
 public class GameData {
@@ -20,9 +20,9 @@ public class GameData {
 	
 	/**
 	 * Constructor.
-	 * 
+	 *
 	 * @param gameDef
-	 *            game described by the data
+	 * 		game described by the data
 	 */
 	public GameData(final GameDef gameDef) {
 		this.gameDef = gameDef;
@@ -40,7 +40,7 @@ public class GameData {
 	
 	/**
 	 * @param uiCatalog
-	 *            the uiCatalog to set
+	 * 		the uiCatalog to set
 	 */
 	public void setUiCatalog(final UICatalog uiCatalog) {
 		this.uiCatalog = uiCatalog;
@@ -55,7 +55,7 @@ public class GameData {
 	
 	/**
 	 * @param gameDef
-	 *            the gameDef to set
+	 * 		the gameDef to set
 	 */
 	public void setGameDef(final GameDef gameDef) {
 		this.gameDef = gameDef;

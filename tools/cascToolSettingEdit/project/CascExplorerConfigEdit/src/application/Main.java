@@ -1,9 +1,10 @@
 package application;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import org.w3c.dom.Document;
+import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -16,16 +17,14 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.TransformerFactoryConfigurationError;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
-
-import org.w3c.dom.Document;
-import org.w3c.dom.NamedNodeMap;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-import org.xml.sax.SAXException;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 
 /**
  * Application that edits the config file of the CascExplorerConsole.exe.
- * 
+ *
  * @author Ahli
  */
 public class Main {
@@ -46,9 +45,7 @@ public class Main {
 		final File f = new File(path);
 		try (InputStream is = new FileInputStream(f)) {
 			final DocumentBuilder dBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-			Document doc = null;
-			
-			doc = dBuilder.parse(is);
+			final Document doc = dBuilder.parse(is);
 			
 			// edit document
 			final NodeList nodeList = doc.getElementsByTagName("setting");
@@ -81,8 +78,7 @@ public class Main {
 			final Transformer xformer = TransformerFactory.newInstance().newTransformer();
 			xformer.transform(source, result);
 			
-		} catch (IOException | ParserConfigurationException | SAXException | TransformerFactoryConfigurationError
-				| TransformerException e1) {
+		} catch (IOException | ParserConfigurationException | SAXException | TransformerFactoryConfigurationError | TransformerException e1) {
 			e1.printStackTrace();
 		}
 	}
@@ -93,14 +89,13 @@ public class Main {
 	 */
 	private static void replaceValueInSettingNode(final Node settingNode, final String newSettingVal) {
 		final NodeList children = settingNode.getChildNodes();
-		x: for (int a = 0; a < children.getLength(); a++) {
+		for (int a = 0; a < children.getLength(); a++) {
 			final Node curChild = children.item(a);
 			if (curChild.getNodeName().equalsIgnoreCase("value")) {
 				curChild.setTextContent(newSettingVal);
-				break x;
+				break;
 			}
 		}
-		
 	}
 	
 }

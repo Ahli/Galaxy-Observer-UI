@@ -1,25 +1,23 @@
 package com.ahli.galaxy.ui;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.xml.parsers.ParserConfigurationException;
-
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.xml.sax.SAXException;
-
 import com.ahli.galaxy.parser.UICatalogParser;
 import com.ahli.galaxy.parser.XmlParserDom;
 import com.ahli.galaxy.parser.interfaces.XmlParser;
 import com.ahli.galaxy.ui.exception.UIException;
 import com.ahli.galaxy.ui.interfaces.UICatalog;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.xml.sax.SAXException;
+
+import javax.xml.parsers.ParserConfigurationException;
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 /***
  * Represents a container for UI frame.**
- * 
+ *
  * @author Ahli
  */
 public class UICatalogImpl implements UICatalog {
@@ -56,8 +54,7 @@ public class UICatalogImpl implements UICatalog {
 	 *
 	 * @throws ParserConfigurationException
 	 */
-	public UICatalogImpl(final int templatesCapacity, final int blizzOnlyTemplatesCapacity, final int constantsCapacity,
-			final int blizzOnlyConstantsCapacity, final int blizzOnlyLayoutsCapacity) {
+	public UICatalogImpl(final int templatesCapacity, final int blizzOnlyTemplatesCapacity, final int constantsCapacity, final int blizzOnlyConstantsCapacity, final int blizzOnlyLayoutsCapacity) {
 		templates = new ArrayList<>(templatesCapacity);
 		blizzOnlyTemplates = new ArrayList<>(blizzOnlyTemplatesCapacity);
 		constants = new ArrayList<>(constantsCapacity);
@@ -71,8 +68,7 @@ public class UICatalogImpl implements UICatalog {
 	@Override
 	public Object deepCopy() {
 		// clone with additional space for templates and constants, but perfect fits
-		final UICatalogImpl clone = new UICatalogImpl(templates.size() * 3 / 2 + 1, blizzOnlyTemplates.size(),
-				constants.size() * 3 / 2 + 1, blizzOnlyConstants.size(), blizzOnlyLayouts.size());
+		final UICatalogImpl clone = new UICatalogImpl(templates.size() * 3 / 2 + 1, blizzOnlyTemplates.size(), constants.size() * 3 / 2 + 1, blizzOnlyConstants.size(), blizzOnlyLayouts.size());
 		// testing shows that iterators are not faster and are not thread safe
 		int i, len;
 		for (i = 0, len = templates.size(); i < len; i++) {
@@ -100,15 +96,8 @@ public class UICatalogImpl implements UICatalog {
 		parser = null;
 	}
 	
-	private void prepareParser() {
-		if (parser == null) {
-			parser = new UICatalogParser(this, new XmlParserDom(null));
-		}
-	}
-	
 	@Override
-	public void processDescIndex(final File f, final String raceId)
-			throws SAXException, IOException, ParserConfigurationException, UIException, InterruptedException {
+	public void processDescIndex(final File f, final String raceId) throws SAXException, IOException, ParserConfigurationException, InterruptedException {
 		
 		final ArrayList<String> generalLayouts = DescIndexReader.getLayoutPathList(f, true);
 		
@@ -131,11 +120,11 @@ public class UICatalogImpl implements UICatalog {
 	 * @param toProcessList
 	 * @param basePath
 	 * @throws InterruptedException
-	 *             if the current thread was interrupted
+	 * 		if the current thread was interrupted
 	 */
-	private void processLayouts(final ArrayList<String> toProcessList, final String basePath, final String raceId)
-			throws InterruptedException {
-		loop: for (final String intPath : toProcessList) {
+	private void processLayouts(final ArrayList<String> toProcessList, final String basePath, final String raceId) throws InterruptedException {
+		loop:
+		for (final String intPath : toProcessList) {
 			final boolean isDevLayout = blizzOnlyLayouts.contains(intPath);
 			logger.trace("intPath={}", () -> intPath);
 			logger.trace("isDevLayout={}", () -> isDevLayout);
@@ -161,8 +150,7 @@ public class UICatalogImpl implements UICatalog {
 			try {
 				processLayoutFile(layoutFile, raceId, isDevLayout);
 			} catch (final IOException e) {
-				logger.error("ERROR: encountered an Exception while processing the layout file '" + layoutFile + "'.",
-						e);
+				logger.error("ERROR: encountered an Exception while processing the layout file '" + layoutFile + "'.", e);
 				e.printStackTrace();
 			}
 			if (Thread.interrupted()) {
@@ -171,10 +159,28 @@ public class UICatalogImpl implements UICatalog {
 		}
 	}
 	
+	public void printDebugStats() {
+		logger.info("UICatalogSizes: " + templates.size() + " " + blizzOnlyTemplates.size() + " " + constants.size() + " " + blizzOnlyConstants.size() + " " + blizzOnlyLayouts.size());
+		// int count = 0;
+		// for(int i = 0; i < templates.size(); i++) {
+		// UIElement elem = templates.get(i).getElement();
+		// if(elem instanceof UIFrame) {
+		// UIFrame frame = (UIFrame) elem;
+		// frame.getChildren();
+		// }
+		// }
+	}
+	
 	@Override
 	public void processLayoutFile(final File f, final String raceId, final boolean isDevLayout) throws IOException {
 		prepareParser();
 		parser.parseFile(f, raceId, isDevLayout);
+	}
+	
+	private void prepareParser() {
+		if (parser == null) {
+			parser = new UICatalogParser(this, new XmlParserDom(null));
+		}
 	}
 	
 	@Override
@@ -213,6 +219,19 @@ public class UICatalogImpl implements UICatalog {
 		xmlParser.clear();
 	}
 	
+	@Override
+	public String getCurBasePath() {
+		return curBasePath;
+	}
+	
+	/**
+	 * @param curBasePath
+	 * 		the curBasePath to set
+	 */
+	public void setCurBasePath(final String curBasePath) {
+		this.curBasePath = curBasePath;
+	}
+	
 	/**
 	 * @param fileName
 	 * @param thisElem
@@ -220,8 +239,7 @@ public class UICatalogImpl implements UICatalog {
 	 * @throws UIException
 	 */
 	@Override
-	public UITemplate addTemplate(final String fileName, final UIElement thisElem, final boolean isDevLayout)
-			throws UIException {
+	public UITemplate addTemplate(final String fileName, final UIElement thisElem, final boolean isDevLayout) throws UIException {
 		if (thisElem == null) {
 			throw new UIException("Cannot create Template definition for a 'null' UIElement.");
 		}
@@ -249,8 +267,7 @@ public class UICatalogImpl implements UICatalog {
 			removeConstantFromList(name, constants);
 			constants.add(constant);
 			if (removedBlizzOnly) {
-				logger.warn("WARNING: constant '" + name
-						+ "' overrides value from Blizz-only constant, so this might be fine.");
+				logger.warn("WARNING: constant '" + name + "' overrides value from Blizz-only constant, so this might be fine.");
 			}
 		} else {
 			// is blizz-only layout
@@ -258,8 +275,7 @@ public class UICatalogImpl implements UICatalog {
 			final boolean removedGeneral = removeConstantFromList(name, constants);
 			blizzOnlyConstants.add(constant);
 			if (removedGeneral) {
-				logger.warn("WARNING: constant '" + name
-						+ "' from Blizz-only layout overrides a general constant, so this might be fine.");
+				logger.warn("WARNING: constant '" + name + "' from Blizz-only layout overrides a general constant, so this might be fine.");
 			}
 		}
 	}
@@ -313,13 +329,11 @@ public class UICatalogImpl implements UICatalog {
 			}
 		}
 		if (i >= 3) {
-			logger.error("ERROR: Encountered a constant definition with three #'" + constantRef
-					+ "' when its maximum is two '#'.");
+			logger.error("ERROR: Encountered a constant definition with three #'" + constantRef + "' when its maximum is two '#'.");
 		}
 		
 		if (!isDevLayout) {
-			logger.warn("WARNING: Did not find a constant definition for '" + constantRef + "', so '" + constantName
-					+ "' is used instead.");
+			logger.warn("WARNING: Did not find a constant definition for '" + constantRef + "', so '" + constantName + "' is used instead.");
 		} else {
 			// inside blizz-only
 			for (final UIConstant c : blizzOnlyConstants) {
@@ -327,8 +341,7 @@ public class UICatalogImpl implements UICatalog {
 					return c.getValue();
 				}
 			}
-			logger.warn("WARNING: Did not find a constant definition for '" + constantRef
-					+ "', but it is a Blizz-only layout, so this is fine.");
+			logger.warn("WARNING: Did not find a constant definition for '" + constantRef + "', but it is a Blizz-only layout, so this is fine.");
 		}
 		return constantName;
 	}
@@ -381,32 +394,6 @@ public class UICatalogImpl implements UICatalog {
 	@Override
 	public void setDevLayouts(final List<String> devLayouts) {
 		blizzOnlyLayouts = devLayouts;
-	}
-	
-	@Override
-	public String getCurBasePath() {
-		return curBasePath;
-	}
-	
-	/**
-	 * @param curBasePath
-	 *            the curBasePath to set
-	 */
-	public void setCurBasePath(final String curBasePath2) {
-		curBasePath = curBasePath2;
-	}
-	
-	public void printDebugStats() {
-		logger.info("UICatalogSizes: " + templates.size() + " " + blizzOnlyTemplates.size() + " " + constants.size()
-				+ " " + blizzOnlyConstants.size() + " " + blizzOnlyLayouts.size());
-		// int count = 0;
-		// for(int i = 0; i < templates.size(); i++) {
-		// UIElement elem = templates.get(i).getElement();
-		// if(elem instanceof UIFrame) {
-		// UIFrame frame = (UIFrame) elem;
-		// frame.getChildren();
-		// }
-		// }
 	}
 	
 }

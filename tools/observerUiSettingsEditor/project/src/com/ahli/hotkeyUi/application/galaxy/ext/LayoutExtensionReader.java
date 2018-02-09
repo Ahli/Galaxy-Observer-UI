@@ -1,10 +1,17 @@
 package com.ahli.hotkeyUi.application.galaxy.ext;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Locale;
+import com.ahli.hotkeyUi.application.model.ValueDef;
+import com.ahli.util.SilentXmlSaxErrorHandler;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.w3c.dom.Comment;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
+import org.xml.sax.SAXParseException;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -17,20 +24,11 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.TransformerFactoryConfigurationError;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
-
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.w3c.dom.Comment;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.NamedNodeMap;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-import org.xml.sax.SAXException;
-import org.xml.sax.SAXParseException;
-
-import com.ahli.hotkeyUi.application.model.ValueDef;
-import com.ahli.util.SilentXmlSaxErrorHandler;
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Locale;
 
 public class LayoutExtensionReader {
 	static Logger logger = LogManager.getLogger(LayoutExtensionReader.class);
@@ -47,7 +45,7 @@ public class LayoutExtensionReader {
 	
 	/**
 	 * @param hotkeys
-	 *            the hotkeys to set
+	 * 		the hotkeys to set
 	 */
 	public void setHotkeys(final ArrayList<ValueDef> hotkeys) {
 		this.hotkeys = hotkeys;
@@ -62,7 +60,7 @@ public class LayoutExtensionReader {
 	
 	/**
 	 * @param settings
-	 *            the settings to set
+	 * 		the settings to set
 	 */
 	public void setSettings(final ArrayList<ValueDef> settings) {
 		this.settings = settings;
@@ -71,14 +69,12 @@ public class LayoutExtensionReader {
 	/**
 	 * Processes the specified Layout files. It finds hotkeys and setting
 	 * definitions.
-	 * 
+	 *
 	 * @param layoutFiles
 	 * @throws ParserConfigurationException
 	 * @throws SAXException
-	 * @throws IOException
 	 */
-	public void processLayoutFiles(final Collection<File> layoutFiles)
-			throws ParserConfigurationException, SAXException, IOException {
+	public void processLayoutFiles(final Collection<File> layoutFiles) throws ParserConfigurationException, SAXException {
 		
 		logger.info("Scanning for XML file...");
 		
@@ -87,23 +83,13 @@ public class LayoutExtensionReader {
 		// console
 		dBuilder.setErrorHandler(new SilentXmlSaxErrorHandler());
 		
-		x: for (final File curFile : layoutFiles) {
-			Document doc = null;
-			// try (InputStream is = new FileInputStream(curFile)) {
+		Document doc;
+		for (final File curFile : layoutFiles) {
 			try {
-				// parse XML file
-				
-				// THIS DOES NOT CLOSE THE INPUTSTREAM ON EXCEPTION
-				// CREATING TONS OF FILE ACCESS PROBLEMS. DO NOT USE!
 				doc = dBuilder.parse(curFile);
-				
-				// WORKAROUND -> provide Inputstream
-				// doc = dBuilder.parse(is);
-				
 			} catch (SAXParseException | IOException e) {
 				// couldn't parse, most likely no XML file
-				
-				continue x;
+				continue;
 			}
 			
 			logger.debug("comments - processing file: " + curFile.getPath());
@@ -114,23 +100,13 @@ public class LayoutExtensionReader {
 			readComments(childNodes);
 		}
 		
-		x: for (final File curFile : layoutFiles) {
-			Document doc = null;
-			// try (InputStream is = new FileInputStream(curFile);) {
+		for (final File curFile : layoutFiles) {
 			try {
 				// parse XML file
-				
-				// THIS DOES NOT CLOSE THE INPUTSTREAM ON EXCEPTION
-				// CREATING TONS OF FILE ACCESS PROBLEMS. DO NOT USE!
 				doc = dBuilder.parse(curFile);
-				
-				// WORKAROUND -> provide Inputstream
-				
-				// doc = dBuilder.parse(is);
-				
 			} catch (SAXParseException | IOException e) {
 				// couldn't parse, most likely no XML file
-				continue x;
+				continue;
 			}
 			
 			logger.debug("constants - processing file: " + curFile.getPath());
@@ -144,7 +120,7 @@ public class LayoutExtensionReader {
 	
 	/**
 	 * Processes the Comments in the given Nodes.
-	 * 
+	 *
 	 * @param childNodes
 	 */
 	private void readComments(final NodeList childNodes) {
@@ -165,17 +141,15 @@ public class LayoutExtensionReader {
 	
 	/**
 	 * Creates ValueDef for the Hotkey and Setting definitions found in this comment
-	 * 
+	 *
 	 * @param textInput
 	 */
 	public void processCommentText(final String textInput) {
-		String constant = "", description = "", defaultValue = "";
+		String constant, description, defaultValue;
 		
-		// String textInputLower = textInput.toLowerCase();
 		logger.debug("textInput:" + textInput);
 		try {
-			// split at keywords @hotkey or @setting without removing, case
-			// insensitive
+			// split at keywords @hotkey or @setting without removing, case insensitive
 			for (String text : textInput.split("(?=@hotkey|@setting)/i")) {
 				logger.debug("token start:" + text);
 				text = text.trim();
@@ -235,21 +209,19 @@ public class LayoutExtensionReader {
 		}
 	}
 	
-	public void addHotkeyValueDef(final String constant, final String description, final String defaultValue,
-			final String curValue) {
+	public void addHotkeyValueDef(final String constant, final String description, final String defaultValue, final String curValue) {
 		final ValueDef def = new ValueDef(constant, curValue, description, defaultValue);
 		hotkeys.add(def);
 	}
 	
-	public void addSettingValueDef(final String constant, final String description, final String defaultValue,
-			final String curValue) {
+	public void addSettingValueDef(final String constant, final String description, final String defaultValue, final String curValue) {
 		final ValueDef def = new ValueDef(constant, curValue, description, defaultValue);
 		settings.add(def);
 	}
 	
 	/**
 	 * Processes the Constants in the given Nodes.
-	 * 
+	 *
 	 * @param childNodes
 	 */
 	private void readConstants(final NodeList childNodes) {
@@ -308,42 +280,21 @@ public class LayoutExtensionReader {
 	 * @throws IOException
 	 * @throws SAXException
 	 */
-	public void updateLayoutFiles(final Collection<File> layoutFiles)
-			throws ParserConfigurationException, SAXException, IOException {
+	public void updateLayoutFiles(final Collection<File> layoutFiles) throws ParserConfigurationException, SAXException {
 		logger.info("Scanning for XML file...");
 		
 		final DocumentBuilder dBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-		// provide error handler that does not print incompatible files into
-		// console
+		// provide error handler that does not print incompatible files into console
 		dBuilder.setErrorHandler(new SilentXmlSaxErrorHandler());
 		
-		// InputStream is = null;
-		
-		x: for (final File curFile : layoutFiles) {
-			Document doc = null;
+		Document doc;
+		for (final File curFile : layoutFiles) {
 			try {
 				// parse XML file
-				
-				// THIS DOES NOT CLOSE THE INPUTSTREAM ON EXCEPTION
-				// CREATING TONS OF FILE ACCESS PROBLEMS. DO NOT USE!
 				doc = dBuilder.parse(curFile);
-				
-				// WORKAROUND -> provide Inputstream
-				// is = new FileInputStream(curFile);
-				// doc = dBuilder.parse(is);
-				
 			} catch (SAXParseException | IOException e) {
-				// couldn't parse, most likely no XML file
-				// if (is != null) {
-				// is.close();
-				// }
-				continue x;
+				continue;
 			}
-			// finally {
-			// if (is != null) {
-			// is.close();
-			// }
-			// }
 			
 			logger.debug("processing file: " + curFile.getPath());
 			
@@ -355,7 +306,7 @@ public class LayoutExtensionReader {
 			// write DOM back to XML
 			final Source source = new DOMSource(doc);
 			final Result result = new StreamResult(curFile);
-			Transformer xformer;
+			final Transformer xformer;
 			try {
 				xformer = TransformerFactory.newInstance().newTransformer();
 				xformer.transform(source, result);
@@ -386,7 +337,7 @@ public class LayoutExtensionReader {
 	
 	/**
 	 * Modify a Constant node from XML with data's current value.
-	 * 
+	 *
 	 * @param node
 	 */
 	private void modifyConstant(final Node node) {
