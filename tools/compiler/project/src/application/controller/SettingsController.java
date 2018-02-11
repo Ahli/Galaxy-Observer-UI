@@ -74,10 +74,13 @@ public class SettingsController implements Updateable {
 				content = initFXML(loader, "view/Content_Settings_GamesPaths.fxml");
 				break;
 			case 1:
+				content = initFXML(loader, "view/Content_Settings_GuiTool.fxml");
+				break;
 			case 2:
 				content = initFXML(loader, "view/Content_Settings_CommandLineTool.fxml");
 				break;
 			default:
+				logger.error("Attempted to load a settings category that does not exist");
 				return;
 		}
 		controller = loader.getController();

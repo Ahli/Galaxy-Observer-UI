@@ -6,10 +6,8 @@ import javafx.fxml.FXML;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.RadioButton;
 
-public class SettingsCommandLineToolController extends SettingsAutoSaveController {
+public class SettingsGuiToolController extends SettingsAutoSaveController {
 	
-	@FXML
-	private CheckBox heroesPtrActive;
 	@FXML
 	private CheckBox buildUnprotectedToo;
 	@FXML
@@ -38,13 +36,12 @@ public class SettingsCommandLineToolController extends SettingsAutoSaveControlle
 	
 	private void loadValuesFromSettings() {
 		final SettingsIniInterface settings = app.getIniSettings();
-		checkXml.setSelected(settings.isCmdLineVerifyXml());
-		checkLayout.setSelected(settings.isCmdLineVerifyLayout());
-		repairLayoutOrder.setSelected(settings.isCmdLineRepairLayoutOrder());
-		compressXml.setSelected(settings.isCmdLineCompressXml());
-		initCompressMpq(settings.getCmdLineCompressMpq());
-		buildUnprotectedToo.setSelected(settings.isCmdLineBuildUnprotectedToo());
-		heroesPtrActive.setSelected(settings.isHeroesPtrActive());
+		checkXml.setSelected(settings.isGuiVerifyXml());
+		checkLayout.setSelected(settings.isGuiVerifyLayout());
+		repairLayoutOrder.setSelected(settings.isGuiRepairLayoutOrder());
+		compressXml.setSelected(settings.isGuiCompressXml());
+		initCompressMpq(settings.getGuiCompressMpq());
+		buildUnprotectedToo.setSelected(settings.isGuiBuildUnprotectedToo());
 	}
 	
 	/**
@@ -81,48 +78,48 @@ public class SettingsCommandLineToolController extends SettingsAutoSaveControlle
 	@FXML
 	public void onCheckXmlClick(ActionEvent actionEvent) {
 		boolean val = ((CheckBox) actionEvent.getSource()).selectedProperty().getValue();
-		app.getIniSettings().setCmdLineVerifyXml(val);
+		app.getIniSettings().setGuiVerifyXml(val);
 		persistSettingsIni();
 	}
 	
 	@FXML
 	public void onCheckLayoutClick(final ActionEvent actionEvent) {
 		boolean val = ((CheckBox) actionEvent.getSource()).selectedProperty().getValue();
-		app.getIniSettings().setCmdLineVerifyLayout(val);
+		app.getIniSettings().setGuiVerifyLayout(val);
 		persistSettingsIni();
 	}
 	
 	@FXML
 	public void onRepairLayoutOrderClick(final ActionEvent actionEvent) {
 		boolean val = ((CheckBox) actionEvent.getSource()).selectedProperty().getValue();
-		app.getIniSettings().setCmdLineRepairLayoutOrder(val);
+		app.getIniSettings().setGuiRepairLayoutOrder(val);
 		persistSettingsIni();
 	}
 	
 	@FXML
 	public void onCompressXmlClick(final ActionEvent actionEvent) {
 		boolean val = ((CheckBox) actionEvent.getSource()).selectedProperty().getValue();
-		app.getIniSettings().setCmdLineCompressXml(val);
+		app.getIniSettings().setGuiCompressXml(val);
 		persistSettingsIni();
 	}
 	
 	@FXML
 	public void onCompressMpqNoneClick() {
-		app.getIniSettings().setCmdLineCompressMpq(0);
+		app.getIniSettings().setGuiCompressMpq(0);
 		persistSettingsIni();
 		initCompressMpq(0);
 	}
 	
 	@FXML
 	public void onCompressMpqBlizzClick() {
-		app.getIniSettings().setCmdLineCompressMpq(1);
+		app.getIniSettings().setGuiCompressMpq(1);
 		persistSettingsIni();
 		initCompressMpq(1);
 	}
 	
 	@FXML
 	public void onCompressMpqExperimentalBestClick() {
-		app.getIniSettings().setCmdLineCompressMpq(2);
+		app.getIniSettings().setGuiCompressMpq(2);
 		persistSettingsIni();
 		initCompressMpq(2);
 	}
@@ -130,14 +127,7 @@ public class SettingsCommandLineToolController extends SettingsAutoSaveControlle
 	@FXML
 	public void onBuildUnprotectedTooClick(final ActionEvent actionEvent) {
 		boolean val = ((CheckBox) actionEvent.getSource()).selectedProperty().getValue();
-		app.getIniSettings().setCmdLineBuildUnprotectedToo(val);
-		persistSettingsIni();
-	}
-	
-	@FXML
-	public void onHeroesPtrActiveClick(final ActionEvent actionEvent) {
-		boolean val = ((CheckBox) actionEvent.getSource()).selectedProperty().getValue();
-		app.getIniSettings().setIsHeroesPtrActive(val);
+		app.getIniSettings().setGuiBuildUnprotectedToo(val);
 		persistSettingsIni();
 	}
 }

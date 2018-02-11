@@ -29,12 +29,13 @@ public class SettingsIniInterface {
 	private static final String HEROES_PTR_USE64BIT = "HeroesPTR_use64bit";
 	private static final String STARCRAFT2_USE64BIT = "StarCraft2_use64bit";
 	private static final String CATEGORY_COMMAND_LINE_TOOL = "CommandLineExecution";
-	private static final String CMDLINE_VERIFY_XML = "verifyXml";
-	private static final String CMDLINE_VERIFY_LAYOUT = "verifyLayout";
-	private static final String CMDLINE_REPAIR_LAYOUT_ORDER = "repairLayoutOrder";
-	private static final String CMDLINE_COMPRESS_XML = "compressXml";
-	private static final String CMDLINE_COMPRESS_MPQ = "compressMPQ";
-	private static final String CMDLINE_BUILD_UNPROTECTED_TOO = "cmdLineBuildUnprotectedToo";
+	private static final String CATEGORY_GUI_TOOL = "GuiExecution";
+	private static final String VERIFY_XML = "verifyXml";
+	private static final String VERIFY_LAYOUT = "verifyLayout";
+	private static final String REPAIR_LAYOUT_ORDER = "repairLayoutOrder";
+	private static final String COMPRESS_XML = "compressXml";
+	private static final String COMPRESS_MPQ = "compressMPQ";
+	private static final String BUILD_UNPROTECTED_TOO = "buildUnprotectedToo";
 	private static final String UTF_8 = "UTF-8";
 	private static final String CATEGORY_INTERNAL_VARIABLES = "InternalVariables";
 	private static final String HEROES_PTR_ACTIVE = "HeroesPTRactive";
@@ -53,6 +54,13 @@ public class SettingsIniInterface {
 	/* compression: 0=None, 1=Blizz, 2=ExperimentalBest */
 	private int cmdLineCompressMpq = 0;
 	private boolean cmdLineBuildUnprotectedToo = false;
+	private boolean guiVerifyXml = true;
+	private boolean guiRepairLayoutOrder = false;
+	private boolean guiVerifyLayout = false;
+	private boolean guiCompressXml = false;
+	/* compression: 0=None, 1=Blizz, 2=ExperimentalBest */
+	private int guiCompressMpq = 0;
+	private boolean guiBuildUnprotectedToo = false;
 	
 	/**
 	 * Constructor.
@@ -61,6 +69,90 @@ public class SettingsIniInterface {
 	 */
 	public SettingsIniInterface(final String settingsFilePath) {
 		this.settingsFilePath = settingsFilePath;
+	}
+	
+	/**
+	 * @return
+	 */
+	public boolean isGuiVerifyXml() {
+		return guiVerifyXml;
+	}
+	
+	/**
+	 * @param guiVerifyXml
+	 */
+	public void setGuiVerifyXml(final boolean guiVerifyXml) {
+		this.guiVerifyXml = guiVerifyXml;
+	}
+	
+	/**
+	 * @return
+	 */
+	public boolean isGuiRepairLayoutOrder() {
+		return guiRepairLayoutOrder;
+	}
+	
+	/**
+	 * @param guiRepairLayoutOrder
+	 */
+	public void setGuiRepairLayoutOrder(final boolean guiRepairLayoutOrder) {
+		this.guiRepairLayoutOrder = guiRepairLayoutOrder;
+	}
+	
+	/**
+	 * @return
+	 */
+	public boolean isGuiVerifyLayout() {
+		return guiVerifyLayout;
+	}
+	
+	/**
+	 * @param guiVerifyLayout
+	 */
+	public void setGuiVerifyLayout(final boolean guiVerifyLayout) {
+		this.guiVerifyLayout = guiVerifyLayout;
+	}
+	
+	/**
+	 * @return
+	 */
+	public boolean isGuiCompressXml() {
+		return guiCompressXml;
+	}
+	
+	/**
+	 * @param guiCompressXml
+	 */
+	public void setGuiCompressXml(final boolean guiCompressXml) {
+		this.guiCompressXml = guiCompressXml;
+	}
+	
+	/**
+	 * @return
+	 */
+	public int getGuiCompressMpq() {
+		return guiCompressMpq;
+	}
+	
+	/**
+	 * @param guiCompressMpq
+	 */
+	public void setGuiCompressMpq(final int guiCompressMpq) {
+		this.guiCompressMpq = guiCompressMpq;
+	}
+	
+	/**
+	 * @return
+	 */
+	public boolean isGuiBuildUnprotectedToo() {
+		return guiBuildUnprotectedToo;
+	}
+	
+	/**
+	 * @param guiBuildUnprotectedToo
+	 */
+	public void setGuiBuildUnprotectedToo(final boolean guiBuildUnprotectedToo) {
+		this.guiBuildUnprotectedToo = guiBuildUnprotectedToo;
 	}
 	
 	/**
@@ -91,10 +183,9 @@ public class SettingsIniInterface {
 		try {
 			final File f = new File(settingsFilePath);
 			logger.info("Loading settings from: '" + settingsFilePath + "' which exists: " + f.exists());
-			INIBuilderParameters params = new Parameters().ini().setFile(f).setEncoding(UTF_8);
-			FileBasedConfigurationBuilder<INIConfiguration> b =
-					new FileBasedConfigurationBuilder<>(INIConfiguration.class);
-			b = b.configure(params);
+			final INIBuilderParameters params = new Parameters().ini().setFile(f).setEncoding(UTF_8);
+			final FileBasedConfigurationBuilder<INIConfiguration> b =
+					new FileBasedConfigurationBuilder<>(INIConfiguration.class).configure(params);
 			readValuesFromIni(b.getConfiguration());
 		} catch (ConfigurationException | ExceptionInInitializerError | IllegalArgumentException | NullPointerException e) {
 			throw new IOException("Could not read settings.ini.", e);
@@ -115,12 +206,20 @@ public class SettingsIniInterface {
 		sc2X64 = section.getBoolean(STARCRAFT2_USE64BIT, false);
 		
 		section = ini.getSection(CATEGORY_COMMAND_LINE_TOOL);
-		cmdLineVerifyXml = section.getBoolean(CMDLINE_VERIFY_XML, true);
-		cmdLineVerifyLayout = section.getBoolean(CMDLINE_VERIFY_LAYOUT, true);
-		cmdLineRepairLayoutOrder = section.getBoolean(CMDLINE_REPAIR_LAYOUT_ORDER, true);
-		cmdLineCompressXml = section.getBoolean(CMDLINE_COMPRESS_XML, false);
-		cmdLineCompressMpq = section.getInt(CMDLINE_COMPRESS_MPQ, 0);
-		cmdLineBuildUnprotectedToo = section.getBoolean(CMDLINE_BUILD_UNPROTECTED_TOO, false);
+		cmdLineVerifyXml = section.getBoolean(VERIFY_XML, true);
+		cmdLineVerifyLayout = section.getBoolean(VERIFY_LAYOUT, true);
+		cmdLineRepairLayoutOrder = section.getBoolean(REPAIR_LAYOUT_ORDER, true);
+		cmdLineCompressXml = section.getBoolean(COMPRESS_XML, false);
+		cmdLineCompressMpq = section.getInt(COMPRESS_MPQ, 0);
+		cmdLineBuildUnprotectedToo = section.getBoolean(BUILD_UNPROTECTED_TOO, false);
+		
+		section = ini.getSection(CATEGORY_GUI_TOOL);
+		guiVerifyXml = section.getBoolean(VERIFY_XML, true);
+		guiVerifyLayout = section.getBoolean(VERIFY_LAYOUT, true);
+		guiRepairLayoutOrder = section.getBoolean(REPAIR_LAYOUT_ORDER, true);
+		guiCompressXml = section.getBoolean(COMPRESS_XML, true);
+		guiCompressMpq = section.getInt(COMPRESS_MPQ, 1);
+		guiBuildUnprotectedToo = section.getBoolean(BUILD_UNPROTECTED_TOO, false);
 		
 		section = ini.getSection(CATEGORY_INTERNAL_VARIABLES);
 		heroesPtrActive = section.getBoolean(HEROES_PTR_ACTIVE, false);
@@ -165,12 +264,20 @@ public class SettingsIniInterface {
 		section.setProperty(HEROES_PTR_USE64BIT, heroesPtrX64);
 		
 		section = ini.getSection(CATEGORY_COMMAND_LINE_TOOL);
-		section.setProperty(CMDLINE_VERIFY_XML, cmdLineVerifyXml);
-		section.setProperty(CMDLINE_VERIFY_LAYOUT, cmdLineVerifyLayout);
-		section.setProperty(CMDLINE_REPAIR_LAYOUT_ORDER, cmdLineRepairLayoutOrder);
-		section.setProperty(CMDLINE_COMPRESS_XML, cmdLineCompressXml);
-		section.setProperty(CMDLINE_COMPRESS_MPQ, cmdLineCompressMpq);
-		section.setProperty(CMDLINE_BUILD_UNPROTECTED_TOO, cmdLineBuildUnprotectedToo);
+		section.setProperty(VERIFY_XML, cmdLineVerifyXml);
+		section.setProperty(VERIFY_LAYOUT, cmdLineVerifyLayout);
+		section.setProperty(REPAIR_LAYOUT_ORDER, cmdLineRepairLayoutOrder);
+		section.setProperty(COMPRESS_XML, cmdLineCompressXml);
+		section.setProperty(COMPRESS_MPQ, cmdLineCompressMpq);
+		section.setProperty(BUILD_UNPROTECTED_TOO, cmdLineBuildUnprotectedToo);
+		
+		section = ini.getSection(CATEGORY_GUI_TOOL);
+		section.setProperty(VERIFY_XML, guiVerifyXml);
+		section.setProperty(VERIFY_LAYOUT, guiVerifyLayout);
+		section.setProperty(REPAIR_LAYOUT_ORDER, guiRepairLayoutOrder);
+		section.setProperty(COMPRESS_XML, guiCompressXml);
+		section.setProperty(COMPRESS_MPQ, guiCompressMpq);
+		section.setProperty(BUILD_UNPROTECTED_TOO, guiBuildUnprotectedToo);
 		
 		section = ini.getSection(CATEGORY_INTERNAL_VARIABLES);
 		section.setProperty(HEROES_PTR_ACTIVE, heroesPtrActive);
