@@ -1,8 +1,7 @@
 package com.ahli.hotkeyUi.application.ui;
 
 /**
- * An Exception that is meant to be shown to the user of the application. The
- * Exception should be localized.
+ * An Exception that is meant to be shown to the user of the application. The Exception should be localized.
  *
  * @author Ahli
  */

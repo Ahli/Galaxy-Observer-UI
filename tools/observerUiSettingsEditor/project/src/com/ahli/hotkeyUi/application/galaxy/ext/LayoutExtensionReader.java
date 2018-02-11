@@ -67,14 +67,14 @@ public class LayoutExtensionReader {
 	}
 	
 	/**
-	 * Processes the specified Layout files. It finds hotkeys and setting
-	 * definitions.
+	 * Processes the specified Layout files. It finds hotkeys and setting definitions.
 	 *
 	 * @param layoutFiles
 	 * @throws ParserConfigurationException
 	 * @throws SAXException
 	 */
-	public void processLayoutFiles(final Collection<File> layoutFiles) throws ParserConfigurationException, SAXException {
+	public void processLayoutFiles(final Collection<File> layoutFiles)
+			throws ParserConfigurationException, SAXException {
 		
 		logger.info("Scanning for XML file...");
 		
@@ -209,12 +209,14 @@ public class LayoutExtensionReader {
 		}
 	}
 	
-	public void addHotkeyValueDef(final String constant, final String description, final String defaultValue, final String curValue) {
+	public void addHotkeyValueDef(final String constant, final String description, final String defaultValue,
+			final String curValue) {
 		final ValueDef def = new ValueDef(constant, curValue, description, defaultValue);
 		hotkeys.add(def);
 	}
 	
-	public void addSettingValueDef(final String constant, final String description, final String defaultValue, final String curValue) {
+	public void addSettingValueDef(final String constant, final String description, final String defaultValue,
+			final String curValue) {
 		final ValueDef def = new ValueDef(constant, curValue, description, defaultValue);
 		settings.add(def);
 	}
@@ -280,7 +282,8 @@ public class LayoutExtensionReader {
 	 * @throws IOException
 	 * @throws SAXException
 	 */
-	public void updateLayoutFiles(final Collection<File> layoutFiles) throws ParserConfigurationException, SAXException {
+	public void updateLayoutFiles(final Collection<File> layoutFiles)
+			throws ParserConfigurationException, SAXException {
 		logger.info("Scanning for XML file...");
 		
 		final DocumentBuilder dBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();

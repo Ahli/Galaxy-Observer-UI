@@ -38,15 +38,15 @@ public final class ComponentsListReader {
 	 * @throws SAXException
 	 * @throws ParserConfigurationException
 	 */
-	public static String getDescIndexPath(final File f, final GameDef game) throws ParserConfigurationException, SAXException, IOException {
+	public static String getDescIndexPath(final File f, final GameDef game)
+			throws ParserConfigurationException, SAXException, IOException {
 		final String str = game.getBaseDataFolderName() + File.separator + getComponentsListValue(f, "uiui");
 		logger.trace("DescIndexPath: {}", () -> str);
 		return str;
 	}
 	
 	/**
-	 * Returns the path information of a given type value, e.g. "uiui" or "font".
-	 * Locales are not supported here.
+	 * Returns the path information of a given type value, e.g. "uiui" or "font". Locales are not supported here.
 	 *
 	 * @param f
 	 * 		components list file
@@ -57,7 +57,8 @@ public final class ComponentsListReader {
 	 * @throws IOException
 	 * @throws SAXException
 	 */
-	public static String getComponentsListValue(final File f, final String typeVal) throws ParserConfigurationException, SAXException, IOException {
+	public static String getComponentsListValue(final File f, final String typeVal)
+			throws ParserConfigurationException, SAXException, IOException {
 		// find the type in the xml
 		final DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 		factory.setIgnoringComments(true);

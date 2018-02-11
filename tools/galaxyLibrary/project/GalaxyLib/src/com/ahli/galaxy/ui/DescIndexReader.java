@@ -40,7 +40,8 @@ public final class DescIndexReader {
 	 * @throws SAXException
 	 * @throws ParserConfigurationException
 	 */
-	public static ArrayList<String> getLayoutPathList(final File f, final boolean ignoreRequiredToLoadEntries) throws SAXException, IOException, ParserConfigurationException {
+	public static ArrayList<String> getLayoutPathList(final File f, final boolean ignoreRequiredToLoadEntries)
+			throws SAXException, IOException, ParserConfigurationException {
 		final ArrayList<String> list = new ArrayList<>();
 		
 		final DocumentBuilder dBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();

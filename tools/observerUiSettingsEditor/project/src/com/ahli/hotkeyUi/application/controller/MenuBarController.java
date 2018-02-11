@@ -3,7 +3,6 @@ package com.ahli.hotkeyUi.application.controller;
 import com.ahli.hotkeyUi.application.Main;
 import com.ahli.hotkeyUi.application.i18n.Messages;
 import com.ahli.hotkeyUi.application.ui.Alerts;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.MenuItem;
@@ -37,7 +36,8 @@ public class MenuBarController {
 	public void initialize() {
 		menuOpen.setAccelerator(new KeyCodeCombination(KeyCode.O, KeyCombination.CONTROL_DOWN));
 		menuSave.setAccelerator(new KeyCodeCombination(KeyCode.S, KeyCombination.CONTROL_DOWN));
-		menuSaveAs.setAccelerator(new KeyCodeCombination(KeyCode.S, KeyCombination.CONTROL_DOWN, KeyCombination.ALT_DOWN));
+		menuSaveAs.setAccelerator(
+				new KeyCodeCombination(KeyCode.S, KeyCombination.CONTROL_DOWN, KeyCombination.ALT_DOWN));
 		menuClose.setAccelerator(new KeyCodeCombination(KeyCode.W, KeyCombination.CONTROL_DOWN));
 	}
 	
@@ -52,7 +52,7 @@ public class MenuBarController {
 	 * Called when the user clicks on the delete button.
 	 */
 	@FXML
-	public void close(final ActionEvent event) {
+	public void close() {
 		main.closeFile();
 	}
 	
@@ -60,7 +60,7 @@ public class MenuBarController {
 	 * Called when the user clicks on the open button.
 	 */
 	@FXML
-	public void open(final ActionEvent event) {
+	public void open() {
 		main.openUiMpq();
 	}
 	
@@ -68,7 +68,7 @@ public class MenuBarController {
 	 * Called when the user clicks on the save as button.
 	 */
 	@FXML
-	public void saveAs(final ActionEvent event) {
+	public void saveAs() {
 		main.saveAsUiMpq();
 	}
 	
@@ -76,7 +76,7 @@ public class MenuBarController {
 	 * Called when the user clicks on the save as button.
 	 */
 	@FXML
-	public void saveCurrent(final ActionEvent event) {
+	public void saveCurrent() {
 		main.saveUiMpqThreaded();
 	}
 	
@@ -84,7 +84,7 @@ public class MenuBarController {
 	 * Called when the user clicks on the save as button.
 	 */
 	@FXML
-	public void exit(final ActionEvent event) {
+	public void exit() {
 		main.closeApp();
 	}
 	
@@ -104,8 +104,9 @@ public class MenuBarController {
 	 */
 	@FXML
 	public void aboutClicked() {
-		final String content = String.format(Messages.getString("MenuBarController.AboutText"), Main.VERSION) + "\n\n" //$NON-NLS-2$
-				+ Messages.getString("MenuBarController.AboutText2");
+		final String content =
+				String.format(Messages.getString("MenuBarController.AboutText"), Main.VERSION) + "\n\n" //$NON-NLS-2$
+						+ Messages.getString("MenuBarController.AboutText2");
 		final String title = Messages.getString("MenuBarController.About"); //$NON-NLS-1$
 		final String header = Messages.getString("MenuBarController.ObserverUISettingsEditor"); //$NON-NLS-1$
 		String imgUrl;

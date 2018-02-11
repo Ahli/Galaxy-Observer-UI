@@ -28,10 +28,13 @@ public class MpqEditorSettingsInterface {
 	
 	public void useCustomRuleset() {
 		try {
-			final File iniFile = backupActive ? new File(this.iniFile.getParent() + File.separator + "MPQEditor.ini") : this.iniFile;
+			final File iniFile =
+					backupActive ? new File(this.iniFile.getParent() + File.separator + "MPQEditor.ini") : this.iniFile;
 			
 			final Parameters params = new Parameters();
-			final FileBasedConfigurationBuilder<INIConfiguration> b = new FileBasedConfigurationBuilder<>(INIConfiguration.class).configure(params.ini().setFile(iniFile).setEncoding("UTF-8"));
+			final FileBasedConfigurationBuilder<INIConfiguration> b =
+					new FileBasedConfigurationBuilder<>(INIConfiguration.class)
+							.configure(params.ini().setFile(iniFile).setEncoding("UTF-8"));
 			final INIConfiguration ini = b.getConfiguration();
 			
 			final SubnodeConfiguration options = ini.getSection("Options");
@@ -64,7 +67,8 @@ public class MpqEditorSettingsInterface {
 				}
 			} while (backupFile.exists());
 			if (!rulesetFile.renameTo(backupFile)) {
-				throw new IOException("Could not rename " + rulesetFile.getAbsolutePath() + " to " + backupFile.getName());
+				throw new IOException(
+						"Could not rename " + rulesetFile.getAbsolutePath() + " to " + backupFile.getName());
 			}
 		}
 		
@@ -97,7 +101,9 @@ public class MpqEditorSettingsInterface {
 		if (rulesetFile.exists()) {
 			originalName = new File(directoryPath + File.separator + "MPQEditor_Ruleset.ini");
 			if (!rulesetFile.renameTo(originalName)) {
-				throw new IOException("Could not restore original via renaming " + rulesetFile.getAbsolutePath() + " to " + originalName);
+				throw new IOException(
+						"Could not restore original via renaming " + rulesetFile.getAbsolutePath() + " to " +
+								originalName);
 			}
 		}
 		
@@ -105,7 +111,8 @@ public class MpqEditorSettingsInterface {
 		if (iniFile.exists()) {
 			originalName = new File(directoryPath + File.separator + "MPQEditor.ini");
 			if (!iniFile.renameTo(originalName)) {
-				throw new IOException("Could not restore original via renaming " + iniFile.getAbsolutePath() + " to " + originalName);
+				throw new IOException(
+						"Could not restore original via renaming " + iniFile.getAbsolutePath() + " to " + originalName);
 			}
 		}
 		

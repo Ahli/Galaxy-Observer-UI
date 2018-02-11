@@ -73,7 +73,8 @@ public class ReplayFinder {
 		}
 		
 		String line, replayPath = null;
-		try (final InputStreamReader is = new InputStreamReader(new FileInputStream(new File(basePath)), StandardCharsets.UTF_8); BufferedReader br = new BufferedReader(is)) {
+		try (final InputStreamReader is = new InputStreamReader(new FileInputStream(new File(basePath)),
+				StandardCharsets.UTF_8); BufferedReader br = new BufferedReader(is)) {
 			
 			boolean found = false;
 			final String searchToken = "lastReplayFilePath=";
@@ -116,7 +117,8 @@ public class ReplayFinder {
 			logger.trace(basePath);
 		}
 		
-		final Collection<File> allReplays = FileUtils.listFiles(new File(basePath), TrueFileFilter.INSTANCE, TrueFileFilter.INSTANCE);
+		final Collection<File> allReplays =
+				FileUtils.listFiles(new File(basePath), TrueFileFilter.INSTANCE, TrueFileFilter.INSTANCE);
 		
 		if (logger.isTraceEnabled()) {
 			logger.trace("# Replays found: " + allReplays.size());

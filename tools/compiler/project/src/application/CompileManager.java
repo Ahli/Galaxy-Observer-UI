@@ -51,7 +51,8 @@ public class CompileManager {
 			// logger.info("DescIndex management took " + executionTime + "ms.");
 			
 			// validate catalog
-			final File descIndexFile = new File(mod.getCachePath() + File.separator + mod.getDescIndexData().getDescIndexIntPath());
+			final File descIndexFile =
+					new File(mod.getCachePath() + File.separator + mod.getDescIndexData().getDescIndexIntPath());
 			// logger.trace("processing descIndexFile: " + descIndexFile);
 			startTime = System.currentTimeMillis();
 			
@@ -81,15 +82,15 @@ public class CompileManager {
 	}
 	
 	/**
-	 * Creates a correct ordering of the layout files based on their internal
-	 * dependencies.
+	 * Creates a correct ordering of the layout files based on their internal dependencies.
 	 *
 	 * @param descIndex
 	 * @throws ParserConfigurationException
 	 * @throws SAXException
 	 * @throws IOException
 	 */
-	private void manageOrderOfLayoutFiles(final DescIndexData descIndex) throws ParserConfigurationException, SAXException, IOException {
+	private void manageOrderOfLayoutFiles(final DescIndexData descIndex)
+			throws ParserConfigurationException, SAXException, IOException {
 		// manage order of layout files in DescIndex
 		descIndex.orderLayoutFiles();
 		descIndex.persistDescIndexFile();

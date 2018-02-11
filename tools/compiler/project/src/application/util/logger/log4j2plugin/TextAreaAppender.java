@@ -19,8 +19,7 @@ import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
- * TextAreaAppender for Log4j2. Source:
- * http://blog.pikodat.com/2015/10/11/frontend-logging-with-javafx/
+ * TextAreaAppender for Log4j2. Source: http://blog.pikodat.com/2015/10/11/frontend-logging-with-javafx/
  */
 @Plugin (name = "TextAreaAppender", category = "Core", elementType = "appender", printObject = true)
 public final class TextAreaAppender extends AbstractAppender {
@@ -36,13 +35,14 @@ public final class TextAreaAppender extends AbstractAppender {
 	 * @param layout
 	 * @param ignoreExceptions
 	 */
-	protected TextAreaAppender(final String name, final Filter filter, final Layout<? extends Serializable> layout, final boolean ignoreExceptions) {
+	protected TextAreaAppender(final String name, final Filter filter, final Layout<? extends Serializable> layout,
+			final boolean ignoreExceptions) {
 		super(name, filter, layout, ignoreExceptions);
 	}
 	
 	/**
-	 * Factory method. Log4j will parse the configuration and call this factory
-	 * method to construct the appender with the configured attributes.
+	 * Factory method. Log4j will parse the configuration and call this factory method to construct the appender with
+	 * the configured attributes.
 	 *
 	 * @param name
 	 * 		Name of appender
@@ -53,7 +53,9 @@ public final class TextAreaAppender extends AbstractAppender {
 	 * @return The TextAreaAppender
 	 */
 	@PluginFactory
-	public static TextAreaAppender createAppender(@PluginAttribute ("name") final String name, @PluginElement ("Layout") Layout<? extends Serializable> layout, @PluginElement ("Filter") final Filter filter) {
+	public static TextAreaAppender createAppender(@PluginAttribute ("name") final String name,
+			@PluginElement ("Layout") Layout<? extends Serializable> layout,
+			@PluginElement ("Filter") final Filter filter) {
 		if (name == null) {
 			LOGGER.error("No name provided for TextAreaAppender");
 			return null;

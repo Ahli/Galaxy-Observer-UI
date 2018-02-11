@@ -13,7 +13,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.util.ArrayList;
-import java.util.Iterator;
 
 /**
  * Stores the Data of a Desc Index File.
@@ -31,7 +30,8 @@ public class DescIndexData {
 	
 	private static final String INCLUDE_PATH = "    <Include path=\"";
 	
-	private static final String XML_VERSION_1_0_ENCODING_UTF_8_STANDALONE_YES_DESC = "<?xml version=\"1.0\" encoding=\"utf-8\" standalone=\"yes\"?>\r\n<Desc>\r\n";
+	private static final String XML_VERSION_1_0_ENCODING_UTF_8_STANDALONE_YES_DESC =
+			"<?xml version=\"1.0\" encoding=\"utf-8\" standalone=\"yes\"?>\r\n<Desc>\r\n";
 	
 	private static final String UTF_8 = "UTF-8";
 	
@@ -108,9 +108,8 @@ public class DescIndexData {
 	 * @throws MpqException
 	 */
 	public void addLayoutIntPath(final Iterable<String> layoutPathList) throws MpqException {
-		final Iterator<String> it = layoutPathList.iterator();
-		while (it.hasNext()) {
-			addLayoutIntPath(it.next());
+		for (final String aLayoutPathList : layoutPathList) {
+			addLayoutIntPath(aLayoutPathList);
 		}
 	}
 	
@@ -258,7 +257,9 @@ public class DescIndexData {
 								for (final String constant : ownConstants.get(i2)) {
 									if (constant.equals(curDependencyTo)) {
 										if (logger.isTraceEnabled()) {
-											logger.trace("checked " + fileIntPathList.get(i).getKey().getName() + " with dependency " + curDependencyTo + " and " + constant + " i=" + i + " j=" + j + " i2=" + i2);
+											logger.trace("checked " + fileIntPathList.get(i).getKey().getName() +
+													" with dependency " + curDependencyTo + " and " + constant + " i=" +
+													i + " j=" + j + " i2=" + i2);
 											logger.trace("fileIntPathList:" + fileIntPathList);
 										}
 										// i's needs to be inserted after i2
@@ -269,13 +270,16 @@ public class DescIndexData {
 										fileIntPathList.add(i, pair);
 										//constantDefinedBefore = true;
 										if (logger.isTraceEnabled()) {
-											logger.trace("inserted " + fileIntPathList.get(i).getKey().getName() + " after " + fileName);
+											logger.trace("inserted " + fileIntPathList.get(i).getKey().getName() +
+													" after " + fileName);
 											logger.trace("fileIntPathList: " + fileIntPathList);
 										}
 										break y;
 									} else {
 										if (logger.isTraceEnabled()) {
-											logger.trace("checked " + fileIntPathList.get(i).getKey().getName() + " with dependency " + curDependencyTo + " and " + constant + " i=" + i + " j=" + j + " i2=" + i2);
+											logger.trace("checked " + fileIntPathList.get(i).getKey().getName() +
+													" with dependency " + curDependencyTo + " and " + constant + " i=" +
+													i + " j=" + j + " i2=" + i2);
 										}
 									}
 								}
@@ -316,7 +320,9 @@ public class DescIndexData {
 							
 							if (fileName.equals(curDependencyTo)) {
 								if (logger.isTraceEnabled()) {
-									logger.trace("checked " + fileIntPathList.get(i).getKey().getName() + " with dependency " + curDependencyTo + " and " + fileName + " i=" + i + " j=" + j + " i2=" + i2);
+									logger.trace("checked " + fileIntPathList.get(i).getKey().getName() +
+											" with dependency " + curDependencyTo + " and " + fileName + " i=" + i +
+											" j=" + j + " i2=" + i2);
 									logger.trace("fileIntPathList:" + fileIntPathList);
 								}
 								// i's needs to be inserted after i2
@@ -327,13 +333,16 @@ public class DescIndexData {
 								fileIntPathList.add(i, pair);
 								insertOccurred = true;
 								if (logger.isTraceEnabled()) {
-									logger.trace("inserted " + fileIntPathList.get(i).getKey().getName() + " after " + fileName);
+									logger.trace("inserted " + fileIntPathList.get(i).getKey().getName() + " after " +
+											fileName);
 									logger.trace("fileIntPathList: " + fileIntPathList);
 								}
 								break x;
 							} else {
 								if (logger.isTraceEnabled()) {
-									logger.trace("checked " + fileIntPathList.get(i).getKey().getName() + " with dependency " + curDependencyTo + " and " + fileName + " i=" + i + " j=" + j + " i2=" + i2);
+									logger.trace("checked " + fileIntPathList.get(i).getKey().getName() +
+											" with dependency " + curDependencyTo + " and " + fileName + " i=" + i +
+											" j=" + j + " i2=" + i2);
 								}
 							}
 						}

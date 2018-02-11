@@ -38,7 +38,8 @@ public interface UICatalog extends DeepCopyable {
 	 * @throws InterruptedException
 	 * 		if the current Thread was interrupted
 	 */
-	void processDescIndex(File f, String raceId) throws SAXException, IOException, ParserConfigurationException, UIException, InterruptedException;
+	void processDescIndex(File f, String raceId)
+			throws SAXException, IOException, ParserConfigurationException, UIException, InterruptedException;
 	
 	/**
 	 * @param f
@@ -52,7 +53,9 @@ public interface UICatalog extends DeepCopyable {
 	 * @throws InterruptedException
 	 * @throws DOMException
 	 */
-	void processLayoutFile(File f, String raceId, boolean isDevLayout) throws SAXException, IOException, ParserConfigurationException, UIException, DOMException, InterruptedException;
+	void processLayoutFile(File f, String raceId, boolean isDevLayout)
+			throws SAXException, IOException, ParserConfigurationException, UIException, DOMException,
+			InterruptedException;
 	
 	/**
 	 * @param constantRef
@@ -123,8 +126,7 @@ public interface UICatalog extends DeepCopyable {
 	String getCurBasePath();
 	
 	/**
-	 * Adds a Constant to the correct list. It removes other values and loggs
-	 * warnings, if problems arise.
+	 * Adds a Constant to the correct list. It removes other values and loggs warnings, if problems arise.
 	 *
 	 * @param constant
 	 * @param isDevLayout
@@ -138,7 +140,8 @@ public interface UICatalog extends DeepCopyable {
 	 * @return
 	 * @throws UIException
 	 */
-	UITemplate addTemplate(final String fileName, final UIElement thisElem, final boolean isDevLayout) throws UIException;
+	UITemplate addTemplate(final String fileName, final UIElement thisElem, final boolean isDevLayout)
+			throws UIException;
 	
 	void processInclude(String path, boolean isDevLayout, String raceId);
 }

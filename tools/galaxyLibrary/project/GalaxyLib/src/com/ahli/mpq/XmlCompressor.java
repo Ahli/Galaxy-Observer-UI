@@ -52,7 +52,8 @@ public final class XmlCompressor {
 	 * @throws SAXException
 	 * @throws IOException
 	 */
-	public static void processCache(final String cachePath, final int ignoreCommentCountPerFile) throws ParserConfigurationException, SAXException {
+	public static void processCache(final String cachePath, final int ignoreCommentCountPerFile)
+			throws ParserConfigurationException, SAXException {
 		
 		logger.info("Compressing XML files...");
 		logger.trace("cachePath: {}", () -> cachePath);

@@ -1,10 +1,14 @@
 package application.integration;
 
-import java.io.BufferedReader;
-import java.io.FileInputStream;
+import org.apache.commons.configuration2.INIConfiguration;
+import org.apache.commons.configuration2.SubnodeConfiguration;
+import org.apache.commons.configuration2.builder.FileBasedConfigurationBuilder;
+import org.apache.commons.configuration2.builder.fluent.Parameters;
+import org.apache.commons.configuration2.ex.ConfigurationException;
+
+import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.nio.charset.StandardCharsets;
 
 /**
  * Interface Class for the Settings .ini file.
@@ -13,9 +17,38 @@ import java.nio.charset.StandardCharsets;
  */
 public class SettingsIniInterface {
 	
+	private static final String CATEGORY_GAME_PATHS = "GamePaths";
+	private static final String HEROES_PATH = "Heroes_Path";
+	private static final String HEROES_PTR_PATH = "HeroesPTR_Path";
+	private static final String STARCRAFT2_PATH = "StarCraft2_Path";
+	private static final String HEROES_USE64BIT = "Heroes_use64bit";
+	private static final String HEROES_PTR_USE64BIT = "HeroesPTR_use64bit";
+	private static final String STARCRAFT2_USE64BIT = "StarCraft2_use64bit";
+	private static final String CATEGORY_COMMAND_LINE_TOOL = "CommandLineExecution";
+	private static final String CMDLINE_VERIFY_XML = "verifyXml";
+	private static final String CMDLINE_VERIFY_LAYOUT = "verifyLayout";
+	private static final String CMDLINE_REPAIR_LAYOUT_ORDER = "repairLayoutOrder";
+	private static final String CMDLINE_COMPRESS_XML = "compressXml";
+	private static final String CMDLINE_COMPRESS_MPQ = "compressMPQ";
+	private static final String CMDLINE_BUILD_UNPROTECTED_TOO = "cmdLineBuildUnprotectedToo";
+	private static final String UTF_8 = "UTF-8";
+	private static final String CATEGORY_INTERNAL_VARIABLES = "InternalVariables";
+	private static final String HEROES_PTR_ACTIVE = "HeroesPTRactive";
 	private String settingsFilePath;
-	private String sc2Path = "", heroesPath = "", heroesPtrPath = "";
-	private boolean ptrActive = false, sc2X64 = false, heroesX64 = false, heroesPtrX64 = false, heroesProtectMpq = false, sc2ProtectMpq = false, buildUnprotectedToo = false;
+	private String sc2Path = "";
+	private String heroesPath = "";
+	private String heroesPtrPath = "";
+	private boolean heroesPtrActive = false;
+	private boolean sc2X64 = false;
+	private boolean heroesX64 = false;
+	private boolean heroesPtrX64 = false;
+	private boolean cmdLineVerifyXml = false;
+	private boolean cmdLineRepairLayoutOrder = false;
+	private boolean cmdLineVerifyLayout = false;
+	private boolean cmdLineCompressXml = false;
+	/* compression: 0=None, 1=Blizz, 2=ExperimentalBest */
+	private int cmdLineCompressMpq = 0;
+	private boolean cmdLineBuildUnprotectedToo = false;
 	
 	/**
 	 * Constructor.
@@ -51,70 +84,86 @@ public class SettingsIniInterface {
 	 * 		when there is an error reading the file
 	 */
 	public void readSettingsFromFile() throws IOException {
-		String line;
-		try (final InputStreamReader is = new InputStreamReader(new FileInputStream(settingsFilePath), StandardCharsets.UTF_8); final BufferedReader br = new BufferedReader(is)) {
-			while ((line = br.readLine()) != null) {
-				parseLine(line);
-			}
+		final Parameters params = new Parameters();
+		final FileBasedConfigurationBuilder<INIConfiguration> b =
+				new FileBasedConfigurationBuilder<>(INIConfiguration.class)
+						.configure(params.ini().setFile(new File(settingsFilePath)).setEncoding(UTF_8));
+		final INIConfiguration ini;
+		try {
+			ini = b.getConfiguration();
+		} catch (ConfigurationException e) {
+			throw new IOException("Could not read settings.ini.", e);
+		}
+		readValuesFromIni(ini);
+	}
+	
+	private void readValuesFromIni(final INIConfiguration ini) {
+		final String emptryStr = "";
+		SubnodeConfiguration section = ini.getSection(CATEGORY_GAME_PATHS);
+		heroesPath = section.getString(HEROES_PATH, emptryStr);
+		heroesPtrPath = section.getString(HEROES_PTR_PATH, emptryStr);
+		sc2Path = section.getString(STARCRAFT2_PATH, emptryStr);
+		heroesX64 = section.getBoolean(HEROES_USE64BIT, false);
+		heroesPtrX64 = section.getBoolean(HEROES_PTR_USE64BIT, false);
+		sc2X64 = section.getBoolean(STARCRAFT2_USE64BIT, false);
+		
+		section = ini.getSection(CATEGORY_COMMAND_LINE_TOOL);
+		cmdLineVerifyXml = section.getBoolean(CMDLINE_VERIFY_XML, true);
+		cmdLineVerifyLayout = section.getBoolean(CMDLINE_VERIFY_LAYOUT, true);
+		cmdLineRepairLayoutOrder = section.getBoolean(CMDLINE_REPAIR_LAYOUT_ORDER, true);
+		cmdLineCompressXml = section.getBoolean(CMDLINE_COMPRESS_XML, false);
+		cmdLineCompressMpq = section.getInt(CMDLINE_COMPRESS_MPQ, 0);
+		cmdLineBuildUnprotectedToo = section.getBoolean(CMDLINE_BUILD_UNPROTECTED_TOO, false);
+		
+		section = ini.getSection(CATEGORY_INTERNAL_VARIABLES);
+		heroesPtrActive = section.getBoolean(HEROES_PTR_ACTIVE, false);
+	}
+	
+	/**
+	 * Persists the Settings file.
+	 *
+	 * @throws IOException
+	 */
+	public void writeSettingsToFile() throws IOException {
+		final Parameters params = new Parameters();
+		final FileBasedConfigurationBuilder<INIConfiguration> b =
+				new FileBasedConfigurationBuilder<>(INIConfiguration.class)
+						.configure(params.ini().setFile(new File(settingsFilePath)).setEncoding("UTF-8"));
+		INIConfiguration ini;
+		try {
+			// load current file
+			ini = b.getConfiguration();
+		} catch (ConfigurationException e) {
+			// create new one if not present
+			ini = new INIConfiguration();
+		}
+		writeValuesToIni(ini);
+		try {
+			ini.write(new FileWriter(new File(settingsFilePath)));
+		} catch (ConfigurationException e) {
+			throw new IOException("Could not write settings.ini.", e);
 		}
 	}
 	
-	/**
-	 * Parse a line from the Settings file.
-	 *
-	 * @param line
-	 * 		line of settings
-	 */
-	private void parseLine(final String line) {
-		final String val;
-		if (line.startsWith("Heroes_Path")) {
-			val = getValFromIniLine(line);
-			heroesPath = val;
-		} else if (line.startsWith("HeroesPTR_Path")) {
-			val = getValFromIniLine(line);
-			heroesPtrPath = val;
-		} else if (line.startsWith("StarCraft2_Path")) {
-			val = getValFromIniLine(line);
-			sc2Path = val;
-		} else if (line.startsWith("PTRactive")) {
-			val = getValFromIniLine(line);
-			ptrActive = Boolean.parseBoolean(val);
-		} else if (line.startsWith("Heroes_use64bit")) {
-			val = getValFromIniLine(line);
-			heroesX64 = Boolean.parseBoolean(val);
-		} else if (line.startsWith("HeroesPTR_use64bit")) {
-			val = getValFromIniLine(line);
-			heroesPtrX64 = Boolean.parseBoolean(val);
-		} else if (line.startsWith("StarCraft2_use64bit")) {
-			val = getValFromIniLine(line);
-			sc2X64 = Boolean.parseBoolean(val);
-		} else if (line.startsWith("Heroes_protectMPQ")) {
-			val = getValFromIniLine(line);
-			heroesProtectMpq = Boolean.parseBoolean(val);
-		} else if (line.startsWith("StarCraft2_protectMPQ")) {
-			val = getValFromIniLine(line);
-			sc2ProtectMpq = Boolean.parseBoolean(val);
-		} else if (line.startsWith("buildUnprotectedToo")) {
-			val = getValFromIniLine(line);
-			buildUnprotectedToo = Boolean.parseBoolean(val);
-		}
-	}
-	
-	/**
-	 * Reads the Value from a line from the Settings file.
-	 *
-	 * @param line
-	 * @return
-	 */
-	private String getValFromIniLine(final String line) {
-		return line.substring(line.indexOf('=') + 1);
-	}
-	
-	/**
-	 * @return
-	 */
-	public String getSC2Path() {
-		return sc2Path;
+	private void writeValuesToIni(final INIConfiguration ini) {
+		SubnodeConfiguration section = ini.getSection(CATEGORY_GAME_PATHS);
+		section.addProperty(STARCRAFT2_PATH, sc2Path);
+		section.addProperty(HEROES_PATH, heroesPath);
+		section.addProperty(HEROES_PTR_PATH, heroesPtrPath);
+		section.addProperty(STARCRAFT2_USE64BIT, sc2X64);
+		section.addProperty(HEROES_USE64BIT, heroesX64);
+		section.addProperty(HEROES_PTR_USE64BIT, heroesPtrX64);
+		
+		section = ini.getSection(CATEGORY_COMMAND_LINE_TOOL);
+		section.addProperty(CMDLINE_VERIFY_XML, cmdLineVerifyXml);
+		section.addProperty(CMDLINE_VERIFY_LAYOUT, cmdLineVerifyLayout);
+		section.addProperty(CMDLINE_REPAIR_LAYOUT_ORDER, cmdLineRepairLayoutOrder);
+		section.addProperty(CMDLINE_COMPRESS_XML, cmdLineCompressXml);
+		section.addProperty(CMDLINE_COMPRESS_MPQ, cmdLineCompressMpq);
+		section.addProperty(CMDLINE_BUILD_UNPROTECTED_TOO, cmdLineBuildUnprotectedToo);
+		
+		section = ini.getSection(CATEGORY_INTERNAL_VARIABLES);
+		section.addProperty(HEROES_PTR_ACTIVE, heroesPtrActive);
 	}
 	
 	/**
@@ -124,6 +173,10 @@ public class SettingsIniInterface {
 		return heroesPath;
 	}
 	
+	public void setHeroesPath(final String heroesPath) {
+		this.heroesPath = heroesPath;
+	}
+	
 	/**
 	 * @return
 	 */
@@ -131,17 +184,25 @@ public class SettingsIniInterface {
 		return heroesPtrPath;
 	}
 	
-	/**
-	 * @return
-	 */
-	public boolean isPtrActive() {
-		return ptrActive;
+	public void setHeroesPtrPath(final String heroesPtrPath) {
+		this.heroesPtrPath = heroesPtrPath;
 	}
 	
 	/**
 	 * @return
 	 */
-	public boolean isSC264bit() {
+	public boolean isHeroesPtrActive() {
+		return heroesPtrActive;
+	}
+	
+	public void setIsHeroesPtrActive(boolean heroesPtrActive) {
+		this.heroesPtrActive = heroesPtrActive;
+	}
+	
+	/**
+	 * @return
+	 */
+	public boolean isSc64bit() {
 		return sc2X64;
 	}
 	
@@ -160,23 +221,94 @@ public class SettingsIniInterface {
 	}
 	
 	/**
-	 * @return
+	 * @param sc2Is64Bit
 	 */
-	public boolean isHeroesProtectMPQ() {
-		return heroesProtectMpq;
+	public void setSc2Is64Bit(final boolean sc2Is64Bit) {
+		this.sc2X64 = sc2Is64Bit;
+	}
+	
+	/**
+	 * @param heroesIs64Bit
+	 */
+	public void setHeroesIs64Bit(final boolean heroesIs64Bit) {
+		this.heroesX64 = heroesIs64Bit;
+	}
+	
+	/**
+	 * @param heroesPtrIs64Bit
+	 */
+	public void setHeroesPtrIs64Bit(final boolean heroesPtrIs64Bit) {
+		this.heroesX64 = heroesPtrIs64Bit;
 	}
 	
 	/**
 	 * @return
 	 */
-	public boolean isSC2ProtectMPQ() {
-		return sc2ProtectMpq;
+	public boolean isCmdLineCompressXml() {
+		return cmdLineCompressXml;
 	}
 	
 	/**
-	 *
+	 * @param cmdLineCompressXml
 	 */
-	public boolean isBuildUnprotectedToo() {
-		return buildUnprotectedToo;
+	public void setCmdLineCompressXml(boolean cmdLineCompressXml) {
+		this.cmdLineCompressXml = cmdLineCompressXml;
+	}
+	
+	/**
+	 * @return
+	 */
+	public int getCmdLineCompressMpq() {
+		return cmdLineCompressMpq;
+	}
+	
+	/**
+	 * @param cmdLineCompressMpq
+	 */
+	public void setCmdLineCompressMpq(int cmdLineCompressMpq) {
+		this.cmdLineCompressMpq = cmdLineCompressMpq;
+	}
+	
+	public String getSc2Path() {
+		return sc2Path;
+	}
+	
+	/**
+	 * @param sc2Path
+	 */
+	public void setSc2Path(final String sc2Path) {
+		this.sc2Path = sc2Path;
+	}
+	
+	public boolean isCmdLineRepairLayoutOrder() {
+		return cmdLineRepairLayoutOrder;
+	}
+	
+	public void setCmdLineRepairLayoutOrder(boolean cmdLineRepairLayoutOrder) {
+		this.cmdLineRepairLayoutOrder = cmdLineRepairLayoutOrder;
+	}
+	
+	public boolean isCmdLineVerifyLayout() {
+		return cmdLineVerifyLayout;
+	}
+	
+	public void setCmdLineVerifyLayout(boolean cmdLineVerifyLayout) {
+		this.cmdLineVerifyLayout = cmdLineVerifyLayout;
+	}
+	
+	public boolean isCmdLineBuildUnprotectedToo() {
+		return cmdLineBuildUnprotectedToo;
+	}
+	
+	public void setCmdLineBuildUnprotectedToo(boolean cmdLineBuildUnprotectedToo) {
+		this.cmdLineBuildUnprotectedToo = cmdLineBuildUnprotectedToo;
+	}
+	
+	public boolean isCmdLineVerifyXml() {
+		return cmdLineVerifyXml;
+	}
+	
+	public void setCmdLineVerifyXml(boolean cmdLineVerifyXml) {
+		this.cmdLineVerifyXml = cmdLineVerifyXml;
 	}
 }

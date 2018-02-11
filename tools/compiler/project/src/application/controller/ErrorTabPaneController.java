@@ -31,7 +31,8 @@ public final class ErrorTabPaneController {
 	 * @param colorizeTitle
 	 * @param noResultIcon
 	 */
-	public ErrorTabPaneController(final Tab tab, final StyleClassedTextArea textArea, final boolean colorizeTitle, final boolean noResultIcon) {
+	public ErrorTabPaneController(final Tab tab, final StyleClassedTextArea textArea, final boolean colorizeTitle,
+			final boolean noResultIcon) {
 		this.tab = tab;
 		this.textArea = textArea;
 		this.colorizeTitle = colorizeTitle;
@@ -108,14 +109,16 @@ public final class ErrorTabPaneController {
 				} else {
 					if (encounteredError) {
 						if (state != 2) {
-							final FontAwesomeIconView errorIcon = new FontAwesomeIconView(FontAwesomeIcon.EXCLAMATION_TRIANGLE);
+							final FontAwesomeIconView errorIcon =
+									new FontAwesomeIconView(FontAwesomeIcon.EXCLAMATION_TRIANGLE);
 							errorIcon.setFill(Color.RED);
 							tab.setGraphic(errorIcon);
 							state = 2;
 						}
 					} else {
 						if (state != 3) {
-							final FontAwesomeIconView warningIcon = new FontAwesomeIconView(FontAwesomeIcon.EXCLAMATION_TRIANGLE);
+							final FontAwesomeIconView warningIcon =
+									new FontAwesomeIconView(FontAwesomeIcon.EXCLAMATION_TRIANGLE);
 							warningIcon.setFill(Color.YELLOW);
 							tab.setGraphic(warningIcon);
 							state = 3;

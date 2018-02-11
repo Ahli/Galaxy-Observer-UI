@@ -28,7 +28,8 @@ public class RecursiveVtdTest {
 		final Runtime rt = Runtime.getRuntime();
 		final long startMem = rt.totalMemory() - rt.freeMemory();
 		final long startTime = System.currentTimeMillis();
-		final File f = new File("F:\\Spiele\\GalaxyObsUI\\baseUI\\heroes\\mods\\core.stormmod\\base.stormdata\\UI\\Layout\\UI\\GameUI.StormLayout");
+		final File f = new File(
+				"F:\\Spiele\\GalaxyObsUI\\baseUI\\heroes\\mods\\core.stormmod\\base.stormdata\\UI\\Layout\\UI\\GameUI.StormLayout");
 		final VTDGen vtd;
 		
 		try {
@@ -49,7 +50,9 @@ public class RecursiveVtdTest {
 		
 		final long executionTime = (System.currentTimeMillis() - startTime);
 		endMem = rt.totalMemory() - rt.freeMemory();
-		System.out.println("recursive traversal took " + executionTime + "ms. Per iteration: " + executionTime / iterations + "ms.");
+		System.out.println(
+				"recursive traversal took " + executionTime + "ms. Per iteration: " + executionTime / iterations +
+						"ms.");
 		System.out.println("elements: " + list.size());
 		System.out.println("Memory Use: " + ((float) endMem - startMem) / (1 << 20) + " MB.");
 		System.out.println("iterations: " + iterations);
@@ -61,7 +64,8 @@ public class RecursiveVtdTest {
 		}
 	}
 	
-	public static void loadRecursiveXML(final VTDGen vtd, final File f) throws NavException, IOException, ParseException {
+	public static void loadRecursiveXML(final VTDGen vtd, final File f)
+			throws NavException, IOException, ParseException {
 		// long startTime = System.currentTimeMillis();
 		// if (!vtd.parseFile(f.getPath(), false)) {
 		// return;

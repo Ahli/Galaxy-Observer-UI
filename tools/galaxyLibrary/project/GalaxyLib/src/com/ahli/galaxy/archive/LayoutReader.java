@@ -44,9 +44,11 @@ public final class LayoutReader {
 	 * @throws SAXException
 	 * @throws IOException
 	 */
-	public static ArrayList<String> getDependencyLayouts(final File f, ArrayList<String> ownConstants) throws ParserConfigurationException, SAXException, IOException {
+	public static ArrayList<String> getDependencyLayouts(final File f, ArrayList<String> ownConstants)
+			throws ParserConfigurationException, SAXException, IOException {
 		final String nameWithFileEnding = f.getName();
-		final String nameWOfileEnding = nameWithFileEnding.substring(0, Math.max(0, nameWithFileEnding.lastIndexOf('.')));
+		final String nameWOfileEnding =
+				nameWithFileEnding.substring(0, Math.max(0, nameWithFileEnding.lastIndexOf('.')));
 		
 		final DocumentBuilder dBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
 		final Document doc = dBuilder.parse(f);
@@ -130,7 +132,8 @@ public final class LayoutReader {
 				
 				// attribute name
 				if (attrName.startsWith(CONSTANT_MARKER)) {
-					if (!doesNameAppearInList(attrName, usedConstants) && !doesConstantNameAppearInList(attrName, ownConstants)) {
+					if (!doesNameAppearInList(attrName, usedConstants) &&
+							!doesConstantNameAppearInList(attrName, ownConstants)) {
 						if (logger.isTraceEnabled()) {
 							logger.trace(nameWOfileEnding + " uses undefined constant " + attrName);
 						}
@@ -140,7 +143,8 @@ public final class LayoutReader {
 				}
 				// attribute value
 				if (attrValue.startsWith(CONSTANT_MARKER)) {
-					if (!doesNameAppearInList(attrValue, usedConstants) && !doesConstantNameAppearInList(attrValue, ownConstants)) {
+					if (!doesNameAppearInList(attrValue, usedConstants) &&
+							!doesConstantNameAppearInList(attrValue, ownConstants)) {
 						if (logger.isTraceEnabled()) {
 							logger.trace(nameWOfileEnding + " uses undefined constant " + attrValue);
 						}
@@ -254,7 +258,8 @@ public final class LayoutReader {
 	 * @throws SAXException
 	 * @throws IOException
 	 */
-	public static ArrayList<String> getLayoutsConstantDefinitions(final File f) throws ParserConfigurationException, SAXException, IOException {
+	public static ArrayList<String> getLayoutsConstantDefinitions(final File f)
+			throws ParserConfigurationException, SAXException, IOException {
 		final DocumentBuilder dBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
 		final Document doc = dBuilder.parse(f);
 		

@@ -61,8 +61,8 @@ public abstract class UIElement implements Serializable, DeepCopyable {
 	}
 	
 	/**
-	 * Returns the correct frame based on a specified path. For example, the frame
-	 * that a path in a template references.
+	 * Returns the correct frame based on a specified path. For example, the frame that a path in a template
+	 * references.
 	 *
 	 * @param path
 	 * 		path of an element

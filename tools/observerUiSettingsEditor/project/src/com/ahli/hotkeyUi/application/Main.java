@@ -15,6 +15,7 @@ import com.ahli.hotkeyUi.application.ui.Alerts;
 import com.ahli.hotkeyUi.application.ui.ShowToUserException;
 import com.ahli.mpq.MpqEditorInterface;
 import com.ahli.mpq.MpqException;
+import com.ahli.mpq.mpqeditor.MpqEditorCompression;
 import com.ahli.util.JarHelper;
 import javafx.animation.FadeTransition;
 import javafx.application.Application;
@@ -63,7 +64,6 @@ public class Main extends Application {
 	private MenuBarController mbarCtrl;
 	private TabsController tabsCtrl;
 	private String openedDocPath = null;
-	private boolean isNamespaceHeroes = true;
 	private MpqEditorInterface mpqi = null;
 	private DescIndexData descIndex = null;
 	private File basePath = null;
@@ -84,7 +84,8 @@ public class Main extends Application {
 		logger.error("error log visible"); //$NON-NLS-1$
 		logger.fatal("fatal log visible"); //$NON-NLS-1$
 		
-		logger.trace("Configuration File of System: " + System.getProperty("log4j.configurationFile")); //$NON-NLS-1$ //$NON-NLS-2$
+		logger.trace("Configuration File of System: " +
+				System.getProperty("log4j.configurationFile")); //$NON-NLS-1$ //$NON-NLS-2$
 		
 		// TEST Locale
 		// Messages.setBundle(Locale.CHINA);
@@ -109,7 +110,8 @@ public class Main extends Application {
 			
 			// if it fails to load the resource in as a jar, check the eclipse settings
 			try {
-				primaryStage.getIcons().add(new Image(Main.class.getResourceAsStream("/res/ahliLogo.png"))); //$NON-NLS-1$
+				primaryStage.getIcons()
+						.add(new Image(Main.class.getResourceAsStream("/res/ahliLogo.png"))); //$NON-NLS-1$
 			} catch (final NullPointerException e) {
 				logger.error("Error loading resource");
 				primaryStage.getIcons().add(new Image("ahliLogo.png"));
@@ -126,7 +128,7 @@ public class Main extends Application {
 			
 			final TabPane tabPane;
 			try (InputStream is = Main.class.getResourceAsStream("view/TabsLayout.fxml")) {
-				tabPane = (TabPane) loader.load(is); // $NON-NLS-1$
+				tabPane = loader.load(is); // $NON-NLS-1$
 			}
 			
 			logger.warn("initialized tab layout within " + (System.nanoTime() - time) / 1000000 + "ms.");
@@ -187,7 +189,7 @@ public class Main extends Application {
 		loader.setResources(Messages.getBundle());
 		
 		try (InputStream is = Main.class.getResourceAsStream("view/RootLayout.fxml")) {
-			rootLayout = (BorderPane) loader.load(is); // $NON-NLS-1$
+			rootLayout = loader.load(is); // $NON-NLS-1$
 		}
 		logger.warn("initialized root layout fxml within " + (System.nanoTime() - time) / 1000000 + "ms.");
 		
@@ -234,7 +236,8 @@ public class Main extends Application {
 		if (hasUnsavedFileChanges()) {
 			// ask to save changes in the file
 			final String title = Messages.getString("Main.unsavedChangesTitle"); //$NON-NLS-1$
-			final String content = String.format(Messages.getString("Main.hasUnsavedChanges"), openedDocPath); //$NON-NLS-1$
+			final String content =
+					String.format(Messages.getString("Main.hasUnsavedChanges"), openedDocPath); //$NON-NLS-1$
 			
 			final Alert alert = Alerts.buildYesNoCancelAlert(primaryStage, title, title, content);
 			
@@ -265,7 +268,8 @@ public class Main extends Application {
 		final String tempDirectory = System.getProperty("java.io.tmpdir");
 		final String cachePath = tempDirectory + "ObserverUiSettingsEditor" + File.separator + "_ExtractedMpq";
 		mpqi = new MpqEditorInterface(cachePath);
-		final String path = basePath + File.separator + "plugins" + File.separator + "mpq" + File.separator //$NON-NLS-1$ //$NON-NLS-2$
+		final String path = basePath + File.separator + "plugins" + File.separator + "mpq" + File.separator
+				//$NON-NLS-1$ //$NON-NLS-2$
 				+ "MPQEditor.exe"; //$NON-NLS-1$
 		mpqi.setMpqEditorPath(path);
 		final File f = new File(path);
@@ -287,8 +291,8 @@ public class Main extends Application {
 	}
 	
 	/**
-	 * Update the menu bar in the main window. E.g. this needs to be done after
-	 * opening/closing a document to enable/disable the save buttons.
+	 * Update the menu bar in the main window. E.g. this needs to be done after opening/closing a document to
+	 * enable/disable the save buttons.
 	 */
 	private void updateMenuBar() {
 		Platform.runLater(new Runnable() {
@@ -322,7 +326,7 @@ public class Main extends Application {
 		
 		try {
 			compile();
-			mpqi.buildMpq(openedDocPath, false, false);
+			mpqi.buildMpq(openedDocPath, false, MpqEditorCompression.BLIZZARD_SC2_HEROES, false);
 			hasUnsavedFileChanges = false;
 			updateAppTitle();
 		} catch (IOException | InterruptedException | ParserConfigurationException | SAXException | MpqException e) {
@@ -341,8 +345,8 @@ public class Main extends Application {
 	}
 	
 	/**
-	 * Returns true, if the path of the current opened document is valid. Invalid
-	 * usually means that no document has been opened.
+	 * Returns true, if the path of the current opened document is valid. Invalid usually means that no document has
+	 * been opened.
 	 *
 	 * @return
 	 */
@@ -357,7 +361,7 @@ public class Main extends Application {
 	 * @throws SAXException
 	 * @throws ParserConfigurationException
 	 */
-	public void compile() throws ParserConfigurationException, SAXException, IOException {
+	public void compile() throws ParserConfigurationException, SAXException {
 		final File cache = new File(mpqi.getMpqCachePath());
 		final boolean recursive = true;
 		final String[] extensions = new String[] { "StormLayout", "SC2Layout" }; //$NON-NLS-1$ //$NON-NLS-2$
@@ -431,16 +435,37 @@ public class Main extends Application {
 		final FileChooser fileChooser = new FileChooser();
 		fileChooser.setTitle(Messages.getString("Main.openObserverInterfaceTitle")); //$NON-NLS-1$
 		
-		final ExtensionFilter genExtFilter = new ExtensionFilter(Messages.getString("Main.sc2HeroesObserverInterfaceExtFilter"), "*.SC2Interface", //$NON-NLS-1$ //$NON-NLS-2$
-				"*.StormInterface"); //$NON-NLS-1$
+		final ExtensionFilter genExtFilter =
+				new ExtensionFilter(Messages.getString("Main.sc2HeroesObserverInterfaceExtFilter"), "*.SC2Interface",
+						//$NON-NLS-1$ //$NON-NLS-2$
+						"*.StormInterface"); //$NON-NLS-1$
 		
-		fileChooser.getExtensionFilters().addAll(new ExtensionFilter(Messages.getString("Main.allFilesFilter"), "*.*"), //$NON-NLS-1$ //$NON-NLS-2$
-				genExtFilter, new ExtensionFilter(Messages.getString("Main.sc2InterfaceFilter"), "*.SC2Interface"), //$NON-NLS-1$ //$NON-NLS-2$
-				new ExtensionFilter(Messages.getString("Main.heroesInterfaceFilter"), "*.StormInterface")); //$NON-NLS-1$ //$NON-NLS-2$
+		fileChooser.getExtensionFilters().addAll(new ExtensionFilter(Messages.getString("Main.allFilesFilter"), "*.*"),
+				//$NON-NLS-1$ //$NON-NLS-2$
+				genExtFilter, new ExtensionFilter(Messages.getString("Main.sc2InterfaceFilter"), "*.SC2Interface"),
+				//$NON-NLS-1$ //$NON-NLS-2$
+				new ExtensionFilter(Messages.getString("Main.heroesInterfaceFilter"),
+						"*.StormInterface")); //$NON-NLS-1$ //$NON-NLS-2$
 		fileChooser.setSelectedExtensionFilter(genExtFilter);
 		final File f = fileChooser.showOpenDialog(primaryStage);
 		
-		openMpqFile(f);
+		openMpqFileThreaded(f);
+	}
+	
+	/**
+	 * Opens the specified MPQ file.
+	 *
+	 * @param f
+	 */
+	public void openMpqFileThreaded(final File f) {
+		new Thread() {
+			@Override
+			public void run() {
+				Thread.currentThread().setPriority(Thread.NORM_PRIORITY);
+				setName(getName().replaceFirst("Thread", "Open")); //$NON-NLS-1$
+				openMpqFile(f);
+			}
+		}.start();
 	}
 	
 	/**
@@ -455,6 +480,7 @@ public class Main extends Application {
 				updateAppTitle();
 				
 				// load desc index from mpq
+				final boolean isNamespaceHeroes;
 				try {
 					isNamespaceHeroes = mpqi.isHeroesMpq();
 				} catch (final MpqException e) {
@@ -473,7 +499,8 @@ public class Main extends Application {
 				descIndex.setDescIndexPathAndClear(ComponentsListReader.getDescIndexPath(componentListFile, game));
 				
 				final File descIndexFile = mpqi.getFileFromMpq(descIndex.getDescIndexIntPath());
-				descIndex.addLayoutIntPath(DescIndexReader.getLayoutPathList(descIndexFile, ignoreRequiredToLoadEntries));
+				descIndex.addLayoutIntPath(
+						DescIndexReader.getLayoutPathList(descIndexFile, ignoreRequiredToLoadEntries));
 				
 				tabsCtrl.clearData();
 				hasUnsavedFileChanges = false;
@@ -492,7 +519,8 @@ public class Main extends Application {
 				tabsCtrl.getSettingsData().addAll(settings);
 				
 			} catch (MpqException | ShowToUserException e) {
-				logger.error("File could not be opened. MPQ-Error: " + ExceptionUtils.getStackTrace(e), e); //$NON-NLS-1$
+				logger.error("File could not be opened. MPQ-Error: " + ExceptionUtils.getStackTrace(e),
+						e); //$NON-NLS-1$
 				openedDocPath = null;
 				updateAppTitle();
 				showErrorAlert(e);
@@ -537,22 +565,6 @@ public class Main extends Application {
 	}
 	
 	/**
-	 * Opens the specified MPQ file.
-	 *
-	 * @param f
-	 */
-	public void openMpqFileThreaded(final File f) {
-		new Thread() {
-			@Override
-			public void run() {
-				Thread.currentThread().setPriority(Thread.NORM_PRIORITY);
-				setName(getName().replaceFirst("Thread", "Open")); //$NON-NLS-1$
-				openMpqFile(f);
-			}
-		}.start();
-	}
-	
-	/**
 	 * Closes the currently opened document.
 	 */
 	public void closeFile() {
@@ -566,15 +578,6 @@ public class Main extends Application {
 			layoutExtReader.clearData();
 			hasUnsavedFileChanges = false;
 		}
-	}
-	
-	/**
-	 * Returns true, if it belongs to Heroes of the Storm, false otherwise.
-	 *
-	 * @return
-	 */
-	public boolean isHeroesFile() {
-		return isNamespaceHeroes;
 	}
 	
 	/**
@@ -603,12 +606,17 @@ public class Main extends Application {
 		final FileChooser fileChooser = new FileChooser();
 		fileChooser.setTitle(Messages.getString("Main.saveUiTitle")); //$NON-NLS-1$
 		
-		final ExtensionFilter genExtFilter = new ExtensionFilter(Messages.getString("Main.sc2HeroesObserverInterfaceExtFilter"), "*.SC2Interface", //$NON-NLS-1$ //$NON-NLS-2$
-				"*.StormInterface"); //$NON-NLS-1$
+		final ExtensionFilter genExtFilter =
+				new ExtensionFilter(Messages.getString("Main.sc2HeroesObserverInterfaceExtFilter"), "*.SC2Interface",
+						//$NON-NLS-1$ //$NON-NLS-2$
+						"*.StormInterface"); //$NON-NLS-1$
 		
-		fileChooser.getExtensionFilters().addAll(new ExtensionFilter(Messages.getString("Main.allFilesFilter"), "*.*"), //$NON-NLS-1$ //$NON-NLS-2$
-				genExtFilter, new ExtensionFilter(Messages.getString("Main.sc2InterfaceFilter"), "*.SC2Interface"), //$NON-NLS-1$ //$NON-NLS-2$
-				new ExtensionFilter(Messages.getString("Main.heroesInterfaceFilter"), "*.StormInterface")); //$NON-NLS-1$ //$NON-NLS-2$
+		fileChooser.getExtensionFilters().addAll(new ExtensionFilter(Messages.getString("Main.allFilesFilter"), "*.*"),
+				//$NON-NLS-1$ //$NON-NLS-2$
+				genExtFilter, new ExtensionFilter(Messages.getString("Main.sc2InterfaceFilter"), "*.SC2Interface"),
+				//$NON-NLS-1$ //$NON-NLS-2$
+				new ExtensionFilter(Messages.getString("Main.heroesInterfaceFilter"),
+						"*.StormInterface")); //$NON-NLS-1$ //$NON-NLS-2$
 		fileChooser.setSelectedExtensionFilter(genExtFilter);
 		
 		final File loadedF = new File(getOpenedDocPath());
@@ -620,7 +628,8 @@ public class Main extends Application {
 		if (f != null) {
 			try {
 				compile();
-				mpqi.buildMpq(f.getParentFile().getAbsolutePath(), f.getName(), false, false);
+				mpqi.buildMpq(f.getParentFile().getAbsolutePath(), f.getName(), false,
+						MpqEditorCompression.BLIZZARD_SC2_HEROES, false);
 				hasUnsavedFileChanges = false;
 				openedDocPath = f.getAbsolutePath();
 				updateAppTitle();

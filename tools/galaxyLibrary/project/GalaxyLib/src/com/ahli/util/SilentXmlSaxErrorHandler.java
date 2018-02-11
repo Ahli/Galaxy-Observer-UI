@@ -12,7 +12,7 @@ import org.xml.sax.SAXParseException;
 public class SilentXmlSaxErrorHandler implements ErrorHandler {
 	
 	@Override
-	public void warning(final SAXParseException e) throws SAXException {
+	public void warning(final SAXParseException e) {
 	}
 	
 	@Override

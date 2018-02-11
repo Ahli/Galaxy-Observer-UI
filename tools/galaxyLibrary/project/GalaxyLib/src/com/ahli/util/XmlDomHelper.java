@@ -21,8 +21,7 @@ public final class XmlDomHelper {
 	}
 	
 	/**
-	 * Checks if any attribute is the requiredToLoad one and does not start with
-	 * "!".
+	 * Checks if any attribute is the requiredToLoad one and does not start with "!".
 	 *
 	 * @param attributes
 	 * @return
