@@ -15,7 +15,6 @@ public class UIAnimation extends UIElement {
 	private static final long serialVersionUID = 7493401910318905210L;
 	
 	private List<UIController> controllers;
-	// private Map<String, UIAttribute> events = new HashMap<>();
 	private List<Pair<String, UIAttribute>> events;
 	private boolean nextEventsAdditionShouldOverride;
 	private UIAttribute driver;
@@ -37,7 +36,6 @@ public class UIAnimation extends UIElement {
 	 */
 	public UIAnimation(final String name, final int minEventsCapacity, final int minControllerCapacity) {
 		super(name);
-		// values = new HashMap<>(minAttributeCapacity, 1);
 		events = new ArrayList<>(minEventsCapacity);
 		controllers = new ArrayList<>(minControllerCapacity);
 	}
@@ -51,13 +49,6 @@ public class UIAnimation extends UIElement {
 		for (int i = 0, len = controllers.size(); i < len; i++) {
 			clone.controllers.add((UIController) controllers.get(i).deepCopy());
 		}
-		// final Object[] entries = events.entrySet().toArray();
-		// for (int fix = 0, i = fix; i < entries.length; i++) {
-		// @SuppressWarnings("unchecked")
-		// final Entry<String, UIAttribute> entry = (Entry<String, UIAttribute>)
-		// entries[i];
-		// clone.events.put(entry.getKey(), (UIAttribute) entry.getValue().deepCopy());
-		// }
 		for (int i = 0, len = events.size(); i < len; i++) {
 			final Pair<String, UIAttribute> p = events.get(i);
 			clone.events.add(new Pair<>(p.getKey(), (UIAttribute) p.getValue().deepCopy()));
@@ -83,21 +74,6 @@ public class UIAnimation extends UIElement {
 	public void setControllers(final List<UIController> controllers) {
 		this.controllers = controllers;
 	}
-	
-	// /**
-	// * @return the events
-	// */
-	// public Map<String, UIAttribute> getEvents() {
-	// return events;
-	// }
-	//
-	// /**
-	// * @param events
-	// * the events to set
-	// */
-	// public void setEvents(final Map<String, UIAttribute> events) {
-	// this.events = events;
-	// }
 	
 	/**
 	 * @return the events

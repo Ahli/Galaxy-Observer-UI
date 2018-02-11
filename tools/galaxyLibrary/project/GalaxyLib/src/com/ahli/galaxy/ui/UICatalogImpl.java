@@ -73,7 +73,8 @@ public class UICatalogImpl implements UICatalog {
 				new UICatalogImpl(templates.size() * 3 / 2 + 1, blizzOnlyTemplates.size(), constants.size() * 3 / 2 + 1,
 						blizzOnlyConstants.size(), blizzOnlyLayouts.size());
 		// testing shows that iterators are not faster and are not thread safe
-		int i, len;
+		int i;
+		int len;
 		for (i = 0, len = templates.size(); i < len; i++) {
 			clone.templates.add((UITemplate) templates.get(i).deepCopy());
 		}
@@ -103,9 +104,9 @@ public class UICatalogImpl implements UICatalog {
 	public void processDescIndex(final File f, final String raceId)
 			throws SAXException, IOException, ParserConfigurationException, InterruptedException {
 		
-		final ArrayList<String> generalLayouts = DescIndexReader.getLayoutPathList(f, true);
+		final List<String> generalLayouts = DescIndexReader.getLayoutPathList(f, true);
 		
-		final ArrayList<String> combinedList = new ArrayList<>(DescIndexReader.getLayoutPathList(f, false));
+		final List<String> combinedList = new ArrayList<>(DescIndexReader.getLayoutPathList(f, false));
 		
 		blizzOnlyLayouts.addAll(combinedList);
 		blizzOnlyLayouts.removeAll(generalLayouts);
@@ -126,16 +127,16 @@ public class UICatalogImpl implements UICatalog {
 	 * @throws InterruptedException
 	 * 		if the current thread was interrupted
 	 */
-	private void processLayouts(final ArrayList<String> toProcessList, final String basePath, final String raceId)
+	private void processLayouts(final List<String> toProcessList, final String basePath, final String raceId)
 			throws InterruptedException {
-		loop:
 		for (final String intPath : toProcessList) {
 			final boolean isDevLayout = blizzOnlyLayouts.contains(intPath);
 			logger.trace("intPath={}", () -> intPath);
 			logger.trace("isDevLayout={}", () -> isDevLayout);
 			String basePathTemp = basePath;
-			while (!new File(basePathTemp + File.separator + intPath).exists()) {
-				final int lastIndex = basePathTemp.lastIndexOf(File.separatorChar);
+			int lastIndex = 0;
+			while (!new File(basePathTemp + File.separator + intPath).exists() && lastIndex != -1) {
+				lastIndex = basePathTemp.lastIndexOf(File.separatorChar);
 				if (lastIndex != -1) {
 					basePathTemp = basePathTemp.substring(0, basePathTemp.lastIndexOf(File.separatorChar));
 					if (logger.isTraceEnabled()) {
@@ -147,20 +148,21 @@ public class UICatalogImpl implements UICatalog {
 					} else {
 						logger.warn("WARNING: Cannot find Blizz-only layout file: " + intPath + ", so this is fine.");
 					}
-					continue loop;
 				}
 			}
-			curBasePath = basePathTemp;
-			final File layoutFile = new File(basePathTemp + File.separator + intPath);
-			try {
-				processLayoutFile(layoutFile, raceId, isDevLayout);
-			} catch (final IOException e) {
-				logger.error("ERROR: encountered an Exception while processing the layout file '" + layoutFile + "'.",
-						e);
-				e.printStackTrace();
-			}
-			if (Thread.interrupted()) {
-				throw new InterruptedException();
+			if (lastIndex != -1) {
+				curBasePath = basePathTemp;
+				final File layoutFile = new File(basePathTemp + File.separator + intPath);
+				try {
+					processLayoutFile(layoutFile, raceId, isDevLayout);
+				} catch (final IOException e) {
+					logger.error(
+							"ERROR: encountered an Exception while processing the layout file '" + layoutFile + "'.",
+							e);
+				}
+				if (Thread.interrupted()) {
+					throw new InterruptedException();
+				}
 			}
 		}
 	}
@@ -169,14 +171,6 @@ public class UICatalogImpl implements UICatalog {
 		logger.info(
 				"UICatalogSizes: " + templates.size() + " " + blizzOnlyTemplates.size() + " " + constants.size() + " " +
 						blizzOnlyConstants.size() + " " + blizzOnlyLayouts.size());
-		// int count = 0;
-		// for(int i = 0; i < templates.size(); i++) {
-		// UIElement elem = templates.get(i).getElement();
-		// if(elem instanceof UIFrame) {
-		// UIFrame frame = (UIFrame) elem;
-		// frame.getChildren();
-		// }
-		// }
 	}
 	
 	@Override
@@ -214,7 +208,6 @@ public class UICatalogImpl implements UICatalog {
 				return;
 			}
 		}
-		// curBasePath = basePathTemp;
 		final File file = new File(basePathTemp + File.separator + path);
 		final XmlParser xmlParser = new XmlParserDom();
 		final UICatalogParser parserTemp = new UICatalogParser(this, xmlParser);
@@ -222,7 +215,6 @@ public class UICatalogImpl implements UICatalog {
 			parserTemp.parseFile(file, raceId, isDevLayout);
 		} catch (final IOException e) {
 			logger.error("ERROR: while parsing include appearing within usual layouts.", e);
-			e.printStackTrace();
 		}
 		xmlParser.clear();
 	}
@@ -309,8 +301,6 @@ public class UICatalogImpl implements UICatalog {
 	
 	@Override
 	public String getConstantValue(final String constantRef, final String raceId, final boolean isDevLayout) {
-		// String id = constantRef;
-		
 		int i = 0;
 		if (constantRef.length() > 0) {
 			while (constantRef.charAt(i) == '#') {

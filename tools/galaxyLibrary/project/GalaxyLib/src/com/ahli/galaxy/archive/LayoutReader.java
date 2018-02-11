@@ -14,6 +14,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Reads a Layout file.
@@ -44,7 +45,7 @@ public final class LayoutReader {
 	 * @throws SAXException
 	 * @throws IOException
 	 */
-	public static ArrayList<String> getDependencyLayouts(final File f, ArrayList<String> ownConstants)
+	public static List<String> getDependencyLayouts(final File f, List<String> ownConstants)
 			throws ParserConfigurationException, SAXException, IOException {
 		final String nameWithFileEnding = f.getName();
 		final String nameWOfileEnding =
@@ -79,13 +80,12 @@ public final class LayoutReader {
 							}
 							firstIndex = Math.min(firstIndex, firstIndex2);
 							final String layoutName = dependency.substring(0, firstIndex);
-							if (!layoutName.equalsIgnoreCase(nameWOfileEnding)) {
-								if (!doesNameAppearInList(layoutName, list)) {
-									if (logger.isTraceEnabled()) {
-										logger.trace(nameWOfileEnding + " has dependency to " + layoutName);
-									}
-									list.add(layoutName);
+							if (!layoutName.equalsIgnoreCase(nameWOfileEnding) &&
+									!doesNameAppearInList(layoutName, list)) {
+								if (logger.isTraceEnabled()) {
+									logger.trace(nameWOfileEnding + " has dependency to " + layoutName);
 								}
+								list.add(layoutName);
 							}
 						}
 						
@@ -131,26 +131,22 @@ public final class LayoutReader {
 				final String attrValue = attribute.getNodeValue();
 				
 				// attribute name
-				if (attrName.startsWith(CONSTANT_MARKER)) {
-					if (!doesNameAppearInList(attrName, usedConstants) &&
-							!doesConstantNameAppearInList(attrName, ownConstants)) {
-						if (logger.isTraceEnabled()) {
-							logger.trace(nameWOfileEnding + " uses undefined constant " + attrName);
-						}
-						usedConstants.add(attrName);
-						list.add(attrName);
+				if (attrName.startsWith(CONSTANT_MARKER) && !doesNameAppearInList(attrName, usedConstants) &&
+						!doesConstantNameAppearInList(attrName, ownConstants)) {
+					if (logger.isTraceEnabled()) {
+						logger.trace(nameWOfileEnding + " uses undefined constant " + attrName);
 					}
+					usedConstants.add(attrName);
+					list.add(attrName);
 				}
 				// attribute value
-				if (attrValue.startsWith(CONSTANT_MARKER)) {
-					if (!doesNameAppearInList(attrValue, usedConstants) &&
-							!doesConstantNameAppearInList(attrValue, ownConstants)) {
-						if (logger.isTraceEnabled()) {
-							logger.trace(nameWOfileEnding + " uses undefined constant " + attrValue);
-						}
-						usedConstants.add(attrValue);
-						list.add(attrValue);
+				if (attrValue.startsWith(CONSTANT_MARKER) && !doesNameAppearInList(attrValue, usedConstants) &&
+						!doesConstantNameAppearInList(attrValue, ownConstants)) {
+					if (logger.isTraceEnabled()) {
+						logger.trace(nameWOfileEnding + " uses undefined constant " + attrValue);
 					}
+					usedConstants.add(attrValue);
+					list.add(attrValue);
 				}
 			}
 			// }
@@ -200,7 +196,7 @@ public final class LayoutReader {
 	 * @throws SAXException
 	 * @throws IOException
 	 */
-	public static ArrayList<String> getLayoutsConstantDefinitions(final Document doc) {
+	public static List<String> getLayoutsConstantDefinitions(final Document doc) {
 		// create list of own constant definitions
 		final ArrayList<String> ownConstants = new ArrayList<>();
 		final NodeList constants = doc.getElementsByTagName(CONSTANT);
@@ -227,7 +223,7 @@ public final class LayoutReader {
 	 * @param list
 	 * @return
 	 */
-	private static boolean doesConstantNameAppearInList(final String constUsage, final ArrayList<String> list) {
+	private static boolean doesConstantNameAppearInList(final String constUsage, final List<String> list) {
 		
 		String name = constUsage;
 		
@@ -258,7 +254,7 @@ public final class LayoutReader {
 	 * @throws SAXException
 	 * @throws IOException
 	 */
-	public static ArrayList<String> getLayoutsConstantDefinitions(final File f)
+	public static List<String> getLayoutsConstantDefinitions(final File f)
 			throws ParserConfigurationException, SAXException, IOException {
 		final DocumentBuilder dBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
 		final Document doc = dBuilder.parse(f);

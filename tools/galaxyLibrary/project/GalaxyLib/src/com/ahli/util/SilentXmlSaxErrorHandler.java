@@ -13,6 +13,7 @@ public class SilentXmlSaxErrorHandler implements ErrorHandler {
 	
 	@Override
 	public void warning(final SAXParseException e) {
+		// do nothing to be silent
 	}
 	
 	@Override

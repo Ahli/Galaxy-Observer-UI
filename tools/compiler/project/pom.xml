@@ -205,7 +205,8 @@
                     <!-- stops generating a new pom.xml (minus its dependencies) in the
                         project that doesn't seem to be used -->
                     <createDependencyReducedPom>false</createDependencyReducedPom>
-                    <!-- minimizeJar = remove unused classes -->
+                    <!-- minimizeJar = remove unused classes; can cause problems with dependencies like log4j that
+                    dynamically load classes -->
                     <minimizeJar>true</minimizeJar>
                     <filters>
                         <filter>
@@ -219,14 +220,9 @@
                         <filter>
                             <artifact>org.apache.logging.log4j:*</artifact>
                             <includes>
-                                <!-- <include>org.apache.commons.logging.impl.LogFactoryImpl</include>-->
-                                <include>org/apache/logging/log4j/**</include>
-
-                                <!-- <include>Log4j-*.xsd</include> -->
-                                <!-- <include>Log4j-*.dtd</include> -->
+                                <include>**org/apache/logging/log4j/**</include>
                                 <include>META-INF/versions/**</include>
                                 <include>META-INF/services/**</include>
-                                <!-- 								<include>**</include> -->
                             </includes>
                             <excludes>
                                 <exclude>org/apache/logging/log4j/core/appender/db/**</exclude>
@@ -252,6 +248,16 @@
                                 <exclude>org/apache/logging/log4j/status**</exclude>
                                 <exclude>org/apache/logging/log4j/util**</exclude>
                             </excludes>
+                        </filter>
+                        <filter>
+                            <!-- required to make minimized jar work; it is used in apache's ini configuration -->
+                            <artifact>commons-logging:commons-logging</artifact>
+                            <includes>
+                                <include>org/apache/commons/logging/impl/LogFactoryImpl*</include>
+                                <include>org/apache/commons/logging/Log*</include>
+                                <include>org/apache/commons/logging/impl/NoOpLog*</include>
+                                <include>org/apache/commons/logging/impl/SimpleLog*</include>
+                            </includes>
                         </filter>
                     </filters>
                     <transformers>

@@ -73,12 +73,7 @@ public class TabsController {
 										public void changed(final ObservableValue<? extends Number> observable,
 												final Number oldValue, final Number newValue) {
 											box.setPrefHeight(newValue.doubleValue() + 7);
-											Platform.runLater(new Runnable() {
-												@Override
-												public void run() {
-													getTableRow().requestLayout();
-												}
-											});
+											Platform.runLater(() -> getTableRow().requestLayout());
 										}
 									});
 									super.setGraphic(box);

@@ -14,7 +14,8 @@ import javafx.stage.DirectoryChooser;
 import java.io.File;
 
 public class SettingsGamesPathsController extends SettingsAutoSaveController {
-	//	private static final Logger logger = LogManager.getLogger();
+	public static final String HEROES_SWITCHER_EXE = "HeroesSwitcher.exe";
+	public static final String SC2_SWITCHER_EXE = "SC2Switcher.exe";
 	
 	@FXML
 	private TextField sc2Path;
@@ -38,6 +39,7 @@ public class SettingsGamesPathsController extends SettingsAutoSaveController {
 	/**
 	 * Automatically called by FxmlLoader
 	 */
+	@Override
 	public void initialize() {
 		super.initialize();
 		sc2PathLabel.setTextFill(Color.YELLOW);
@@ -84,29 +86,29 @@ public class SettingsGamesPathsController extends SettingsAutoSaveController {
 			}
 		});
 		
-		validatePath(sc2Path.getText(), "SC2Switcher.exe", sc2PathLabel);
-		validatePath(heroesPath.getText(), "HeroesSwitcher.exe", heroesPathLabel);
-		validatePath(heroesPtrPath.getText(), "HeroesSwitcher.exe", heroesPtrPathLabel);
+		validatePath(sc2Path.getText(), SC2_SWITCHER_EXE, sc2PathLabel);
+		validatePath(heroesPath.getText(), HEROES_SWITCHER_EXE, heroesPathLabel);
+		validatePath(heroesPtrPath.getText(), HEROES_SWITCHER_EXE, heroesPtrPathLabel);
 	}
 	
 	private void setSc2Path(String path) {
 		sc2Path.setText(path);
 		app.getIniSettings().setSc2Path(path);
-		validatePath(path, "SC2Switcher.exe", sc2PathLabel);
+		validatePath(path, SC2_SWITCHER_EXE, sc2PathLabel);
 		persistSettingsIni();
 	}
 	
 	private void setHeroesPath(String path) {
 		heroesPath.setText(path);
 		app.getIniSettings().setHeroesPath(path);
-		validatePath(path, "HeroesSwitcher.exe", heroesPathLabel);
+		validatePath(path, HEROES_SWITCHER_EXE, heroesPathLabel);
 		persistSettingsIni();
 	}
 	
 	private void setHeroesPtrPath(String path) {
 		heroesPtrPath.setText(path);
 		app.getIniSettings().setHeroesPtrPath(path);
-		validatePath(path, "HeroesSwitcher.exe", heroesPtrPathLabel);
+		validatePath(path, HEROES_SWITCHER_EXE, heroesPtrPathLabel);
 		persistSettingsIni();
 	}
 	

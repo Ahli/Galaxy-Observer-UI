@@ -1,6 +1,8 @@
 package application;
 
 import application.controller.ErrorTabPaneController;
+import application.controller.NavigationController;
+import application.controller.TabPaneController;
 import application.integration.ReplayFinder;
 import application.integration.SettingsIniInterface;
 import application.util.JarHelper;
@@ -80,19 +82,19 @@ public final class InterfaceBuilderApp extends Application {
 	private final String documentsPath = new JFileChooser().getFileSystemView().getDefaultDirectory().toString();
 	private final GameData gameSC2 = new GameData(new SC2GameDef());
 	private final List<ErrorTabPaneController> errorTabControllers = new ArrayList<>();
+	// GUI
 	private ThreadPoolExecutor executor;
 	// Components
 	private MpqEditorInterface baseMpqInterface = null;
 	private SettingsIniInterface settings = null;
 	private File basePath = null;
 	private GameData gameHeroes = new GameData(new HeroesGameDef());
-	// GUI
-	private TabPane tabPane = null;
 	// Command Line Parameter
 	private boolean hasParamCompilePath = false;
 	private String paramCompilePath = null;
 	private boolean compileAndRun = false;
 	private String paramRunPath = null;
+	private NavigationController navController;
 	
 	/**
 	 * Entry point of the App.
@@ -171,8 +173,10 @@ public final class InterfaceBuilderApp extends Application {
 	public void start(final Stage primaryStage) throws Exception {
 		if (instance == null) {
 			instance = this;
+			logger.trace("Application singleton successfull.");
 		} else {
-			throw new Exception("Application cannot be started multiple times.");
+			logger.error("Application cannot be started multiple times.");
+			throw new ExceptionInInitializerError("Application cannot be started multiple times.");
 		}
 		
 		Thread.currentThread().setName("UI"); //$NON-NLS-1$
@@ -203,17 +207,6 @@ public final class InterfaceBuilderApp extends Application {
 	private void initThreadPool() {
 		final int numberOfProcessors = Runtime.getRuntime().availableProcessors();
 		logger.info("detected processor count: " + numberOfProcessors); //$NON-NLS-1$
-		// test sleepytasks:
-		// durations/thread# for my 4cpu/8threads: 18, 14, 12, 15, 15, 17, 16, 19, .,14
-		// test new:
-		// durations/thread# for my 4cpu/8threads: 15, 12, 15, 15, 15, 15, 14, 14, .,14
-		// after frame attribute cloning fix:
-		// durations/thread# for my 4cpu/8threads: 16, 13, 16, 16
-		// after memory optimizations:
-		// durations/thread# for my 4cpu/8threads: 13, 11, 11, 10, 10, 10, 10, 10
-		
-		// test with proper compression of mpqeditor
-		// durations/thread# for my 4cpu/8threads: 16, 13, 12, 12, 12,... 12
 		
 		final int maxThreads = Math.max(1, Math.min(numberOfProcessors / 2, 1));
 		executor = new MyThreadPoolExecutor(maxThreads, maxThreads, 5000L, TimeUnit.MILLISECONDS,
@@ -240,63 +233,60 @@ public final class InterfaceBuilderApp extends Application {
 	 * 		app's main stage
 	 */
 	private void executeWorkPipeline(final Stage primaryStage) {
+		navController.lockNavToProgress();
 		new Thread() {
 			@Override
 			public void run() {
 				try {
 					Thread.currentThread().setName("Supervisor"); //$NON-NLS-1$
 					Thread.currentThread().setPriority(Thread.MIN_PRIORITY);
-					final ThreadPoolExecutor executor = getExecutor();
+					final ThreadPoolExecutor executorTmp = getExecutor();
 					final String path =
 							isHasParamCompilePath() ? getParamCompilePath() : getBasePath().getAbsolutePath();
 					
-					final boolean workHeroes = pathContainsCompileableForGame(path, getGameHeroes());
+					final boolean workHeroes = pathContainsCompileableForGame(path, gameHeroes);
 					if (workHeroes) {
-						startWorkOnGame(getGameHeroes(), path);
+						startWorkOnGame(gameHeroes, path);
 					}
 					
 					// wait until all UIs were build to save baseUI memory
-					while (executor.getQueue().size() > 0 || executor.getActiveCount() > 0) {
+					while (!executorTmp.getQueue().isEmpty() || executorTmp.getActiveCount() > 0) {
 						Thread.sleep(50);
 					}
 					gameHeroes = null;
 					
-					final boolean workSC2 = pathContainsCompileableForGame(path, getGameSC2());
+					final boolean workSC2 = pathContainsCompileableForGame(path, gameSC2);
 					if (workSC2) {
-						startWorkOnGame(getGameSC2(), path);
+						startWorkOnGame(gameSC2, path);
 					}
 					
-					while (executor.getQueue().size() > 0 || executor.getActiveCount() > 0) {
+					while (!executorTmp.getQueue().isEmpty() || executorTmp.getActiveCount() > 0) {
 						Thread.sleep(50);
 					}
 					setStageTitle("Compiling completed.", primaryStage); //$NON-NLS-1$
 					startReplayOrQuitOrShowError(primaryStage);
-					executor.shutdown();
-					executor.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
+					executorTmp.shutdown();
+					executorTmp.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
 					final long executionTime = (System.currentTimeMillis() - startTime);
 					logger.info("Execution time: " + String.format("%d min, %d sec", //$NON-NLS-1$ //$NON-NLS-2$
 							TimeUnit.MILLISECONDS.toMinutes(executionTime),
 							TimeUnit.MILLISECONDS.toSeconds(executionTime) -
 									TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(executionTime))));
-					Platform.runLater(new Runnable() {
-						@Override
-						public void run() {
-							try {
-								getErrorTabControllers().get(0).setRunning(false);
-							} catch (final Throwable e) {
-								logger.fatal("FATAL ERROR: ", e);
-							}
+					Platform.runLater(() -> {
+						try {
+							getErrorTabControllers().get(0).setRunning(false);
+							navController.unlockNav();
+						} catch (final Exception e) {
+							logger.fatal("FATAL ERROR: ", e);
 						}
 					});
 				} catch (final InterruptedException e) {
-					// logger.trace("INTERRUPT: Execution time measuring Thread was interrupted.");
-					// //$NON-NLS-1$
-				} catch (final Throwable e) {
+					Thread.currentThread().interrupt();
+				} catch (final Exception e) {
 					logger.fatal("FATAL ERROR: ", e);
 				}
 			}
 		}.start();
-		
 	}
 	
 	/**
@@ -332,23 +322,18 @@ public final class InterfaceBuilderApp extends Application {
 	 * @param path
 	 */
 	private void startWorkOnGame(final GameData game, final String path) {
-		executor.execute(new Runnable() {
-			@Override
-			public void run() {
-				try {
-					addThreadLoggerTab(Thread.currentThread().getName(),
-							game.getGameDef().getNameHandle() + "UI"); //$NON-NLS-1$
-					
-					parseDefaultUI(game);
-					
-					buildGamesInterfaceFiles(game, path);
-				} catch (final InterruptedException e) {
-					// logger.trace("INTERRUPT: Building " + game.getGameDef().getNameHandle()
-					// //$NON-NLS-1$
-					// + " interface files was interrupted."); //$NON-NLS-1$
-				} catch (final Throwable e) {
-					logger.fatal("FATAL ERROR: ", e);
-				}
+		executor.execute(() -> {
+			try {
+				addThreadLoggerTab(Thread.currentThread().getName(),
+						game.getGameDef().getNameHandle() + "UI"); //$NON-NLS-1$
+				
+				parseDefaultUI(game);
+				
+				buildGamesInterfaceFiles(game, path);
+			} catch (final InterruptedException e) {
+				Thread.currentThread().interrupt();
+			} catch (final Exception e) {
+				logger.fatal("FATAL ERROR: ", e);
 			}
 		});
 	}
@@ -373,13 +358,6 @@ public final class InterfaceBuilderApp extends Application {
 	 * @return
 	 */
 	private boolean pathContainsCompileableForGame(final String path, final GameData game) {
-		
-		// final String fileFilter = "DescIndex" +
-		// game.getGameDef().getLayoutFileEnding();
-		// final Collection<File> descIndexFiles = FileUtils.listFiles(new File(path),
-		// new WildcardFileFilter(fileFilter),
-		// TrueFileFilter.INSTANCE);
-		// return !descIndexFiles.isEmpty();
 		
 		final String[] extensions = new String[1];
 		extensions[0] = game.getGameDef().getLayoutFileEnding();
@@ -430,7 +408,6 @@ public final class InterfaceBuilderApp extends Application {
 		} catch (final SAXException | IOException | ParserConfigurationException | UIException e) {
 			logger.error("ERROR parsing base UI catalog for '" + game.getGameDef().getName() + "'.",
 					e); //$NON-NLS-1$ //$NON-NLS-2$
-			e.printStackTrace();
 		}
 		final String msg =
 				"Finished parsing base UI for " + game.getGameDef().getName() + "."; //$NON-NLS-1$ //$NON-NLS-2$
@@ -447,14 +424,11 @@ public final class InterfaceBuilderApp extends Application {
 	 * 		stage receiving the title
 	 */
 	private void setStageTitle(final String title, final Stage stage) {
-		Platform.runLater(new Runnable() {
-			@Override
-			public void run() {
-				try {
-					stage.setTitle(title);
-				} catch (final Throwable e) {
-					logger.fatal("FATAL ERROR: ", e);
-				}
+		Platform.runLater(() -> {
+			try {
+				stage.setTitle(title);
+			} catch (final Exception e) {
+				logger.fatal("FATAL ERROR: ", e);
 			}
 		});
 	}
@@ -469,44 +443,32 @@ public final class InterfaceBuilderApp extends Application {
 		if (!anyErrorTrackerEncounteredError()) {
 			// start game, launch replay
 			attemptToRunGameWithReplay();
-			//			if (!userPreventedAutomaticClosing) {
 			if (!hasParamCompilePath) {
-				Platform.runLater(new Runnable() {
-					@Override
-					public void run() {
-						try {
-							// close after 5 seconds, if compiled all and no errors
-							final PauseTransition delay = new PauseTransition(Duration.seconds(5));
-							delay.setOnFinished(new EventHandler<>() {
-								@Override
-								public void handle(final ActionEvent event) {
-									//										if (!isUserPreventedAutomaticClosing()) {
-									primaryStage.close();
-									//										}
-								}
-							});
-							delay.play();
-						} catch (final Throwable e) {
-							logger.fatal("FATAL ERROR: ", e);
-						}
+				Platform.runLater(() -> {
+					try {
+						// close after 5 seconds, if compiled all and no errors
+						final PauseTransition delay = new PauseTransition(Duration.seconds(5));
+						delay.setOnFinished(new EventHandler<>() {
+							@Override
+							public void handle(final ActionEvent event) {
+								primaryStage.close();
+							}
+						});
+						delay.play();
+					} catch (final Exception e) {
+						logger.fatal("FATAL ERROR: ", e);
 					}
 				});
 			} else {
-				// close instantly, if compiled special and no errors
-				Platform.runLater(new Runnable() {
-					
-					@Override
-					public void run() {
-						try {
-							primaryStage.close();
-						} catch (final Throwable e) {
-							logger.fatal("FATAL ERROR: ", e);
-						}
+				// close instantly, if compiled special
+				Platform.runLater(() -> {
+					try {
+						primaryStage.close();
+					} catch (final Exception e) {
+						logger.fatal("FATAL ERROR: ", e);
 					}
-					
 				});
 			}
-			//			}
 		}
 	}
 	
@@ -587,7 +549,7 @@ public final class InterfaceBuilderApp extends Application {
 				Runtime.getRuntime().exec(cmd);
 				// logger.trace("after Start attempt..."); //$NON-NLS-1$
 			} catch (final IOException e) {
-				e.printStackTrace();
+				logger.error("Failed to execute the game launch command.", e); //$NON-NLS-1$
 			}
 		} else {
 			logger.error("Failed to find any replay."); //$NON-NLS-1$
@@ -658,12 +620,12 @@ public final class InterfaceBuilderApp extends Application {
 		
 		// Build Navigation
 		final BorderPane root;
-		FXMLLoader loader = new FXMLLoader();
+		final FXMLLoader loader = new FXMLLoader();
 		try (InputStream is = getClass().getResourceAsStream("view/Navigation.fxml")) { //$NON-NLS-1$
 			root = loader.load(is);
+			navController = loader.getController();
 		} catch (final IOException e) {
 			logger.error("Failed to load Navigation.fxml:", e); //$NON-NLS-1$
-			e.printStackTrace();
 			throw new IOException("Failed to load Navigation.fxml.", e);
 		}
 		final Scene scene = new Scene(root, 1200, 600);
@@ -689,7 +651,7 @@ public final class InterfaceBuilderApp extends Application {
 	 *
 	 * @param errorTabCtrl
 	 */
-	public void addErrorTabController(ErrorTabPaneController errorTabCtrl) {
+	public void addErrorTabController(final ErrorTabPaneController errorTabCtrl) {
 		errorTabControllers.add(errorTabCtrl);
 	}
 	
@@ -715,14 +677,11 @@ public final class InterfaceBuilderApp extends Application {
 		
 		// runlater needs to appear below the edits above, else it might be added before
 		// which results in UI edits not in UI thread -> error
-		Platform.runLater(new Runnable() {
-			@Override
-			public void run() {
-				try {
-					getTabPane().getTabs().add(newTab);
-				} catch (final Throwable e) {
-					logger.fatal("FATAL ERROR: ", e);
-				}
+		Platform.runLater(() -> {
+			try {
+				getTabPane().getTabs().add(newTab);
+			} catch (final Exception e) {
+				logger.fatal("FATAL ERROR: ", e);
 			}
 		});
 	}
@@ -738,17 +697,14 @@ public final class InterfaceBuilderApp extends Application {
 		String str = paramPath;
 		if (str != null) {
 			while (str.length() > 0 && !str.endsWith("Interface")) { //$NON-NLS-1$
-				// logger.trace("cutting progress: " + str);
 				final int lastIndex = str.lastIndexOf(File.separatorChar);
 				if (lastIndex != -1) {
 					str = str.substring(0, lastIndex);
 				} else {
-					// logger.trace("LastIndex is -1 => null compile path");
 					return null;
 				}
 			}
 		}
-		// logger.trace("cutting result: " + str); //$NON-NLS-1$
 		return str;
 	}
 	
@@ -785,32 +741,26 @@ public final class InterfaceBuilderApp extends Application {
 		if (interfaceFolder.isDirectory()) {
 			if (!executor.isShutdown()) {
 				// create tasks for the worker pool
-				executor.execute(new Runnable() {
-					@Override
-					public void run() {
-						try {
-							addThreadLoggerTab(Thread.currentThread().getName(), interfaceFolder.getName());
-							// create unique cache path
-							final MpqEditorInterface threadsMpqInterface =
-									(MpqEditorInterface) getBaseMpqInterface().deepCopy();
-							final long threadId = Thread.currentThread().getId();
-							threadsMpqInterface.setMpqCachePath(getBaseMpqInterface().getMpqCachePath() + threadId);
-							
-							// work
-							try {
-								boolean compressXml = settings.isCmdLineCompressXml();
-								int compressMpqSetting = settings.getCmdLineCompressMpq();
-								buildFile(interfaceFolder, game, threadsMpqInterface, compressXml, compressMpqSetting);
-								threadsMpqInterface.clearCacheExtractedMpq();
-							} catch (final InterruptedException e) {
-								// logger.trace("INTERRUPT: building a File was interrupted."); //$NON-NLS-1$
-							} catch (final IOException e) {
-								logger.error("ERROR: Exception while building UIs.", e); //$NON-NLS-1$
-								e.printStackTrace();
-							}
-						} catch (final Throwable e) {
-							logger.fatal("FATAL ERROR: ", e);
-						}
+				executor.execute(() -> {
+					try {
+						addThreadLoggerTab(Thread.currentThread().getName(), interfaceFolder.getName());
+						// create unique cache path
+						final MpqEditorInterface threadsMpqInterface =
+								(MpqEditorInterface) getBaseMpqInterface().deepCopy();
+						final long threadId = Thread.currentThread().getId();
+						threadsMpqInterface.setMpqCachePath(getBaseMpqInterface().getMpqCachePath() + threadId);
+						
+						// work
+						final boolean compressXml = settings.isCmdLineCompressXml();
+						final int compressMpqSetting = settings.getCmdLineCompressMpq();
+						buildFile(interfaceFolder, game, threadsMpqInterface, compressXml, compressMpqSetting);
+						threadsMpqInterface.clearCacheExtractedMpq();
+					} catch (final InterruptedException e) {
+						Thread.currentThread().interrupt();
+					} catch (final IOException e) {
+						logger.error("ERROR: Exception while building UIs.", e); //$NON-NLS-1$
+					} catch (final Exception e) {
+						logger.fatal("FATAL ERROR: ", e);
 					}
 				});
 			} else {
@@ -829,14 +779,11 @@ public final class InterfaceBuilderApp extends Application {
 	 * 		the message
 	 */
 	public void printLogMessageToGeneral(final String msg) {
-		Platform.runLater(new Runnable() {
-			@Override
-			public void run() {
-				try {
-					logger.info(msg);
-				} catch (final Throwable e) {
-					logger.fatal("FATAL ERROR: ", e);
-				}
+		Platform.runLater(() -> {
+			try {
+				logger.info(msg);
+			} catch (final Exception e) {
+				logger.fatal("FATAL ERROR: ", e);
 			}
 		});
 	}
@@ -848,7 +795,7 @@ public final class InterfaceBuilderApp extends Application {
 	 * @param sourceFile
 	 * 		folder location
 	 * @param game
-	 * 		set to true, if Heroes
+	 * 		the game data with game definition
 	 * @param mpqi
 	 * 		MpqInterface with unique cache path
 	 * @throws IOException
@@ -856,16 +803,16 @@ public final class InterfaceBuilderApp extends Application {
 	 * @throws InterruptedException
 	 */
 	private void buildFile(final File sourceFile, final GameData game, final MpqEditorInterface mpqi,
-			boolean compressXml, int compressMpq) throws IOException, InterruptedException {
+			final boolean compressXml, final int compressMpq) throws IOException, InterruptedException {
 		printLogMessageToGeneral(sourceFile.getName() + " started construction.");
 		
 		final GameDef gameDef = game.getGameDef();
 		
-		String targetPath = documentsPath + File.separator;
-		targetPath += gameDef.getDocumentsGameDirectoryName();
-		targetPath += File.separator + gameDef.getDocumentsInterfaceSubdirectoryName();
+		final String targetPath =
+				documentsPath + File.separator + gameDef.getDocumentsGameDirectoryName() + File.separator +
+						gameDef.getDocumentsInterfaceSubdirectoryName();
 		
-		// do stuff
+		// init mod data
 		final ModData mod = new ModData(game);
 		mod.setSourcePath(sourceFile);
 		mod.setTargetPath(new File(targetPath));
@@ -908,7 +855,6 @@ public final class InterfaceBuilderApp extends Application {
 					final String msg =
 							"Unable to copy directory after 100 copy attempts: " + e.getMessage(); //$NON-NLS-1$
 					logger.error(msg, e);
-					e.printStackTrace();
 					throw new FileSystemException(msg);
 				}
 				// sleep and hope the file gets released soon
@@ -916,7 +862,6 @@ public final class InterfaceBuilderApp extends Application {
 			} catch (final IOException e) {
 				final String msg = "Unable to copy directory"; //$NON-NLS-1$
 				logger.error(msg, e);
-				e.printStackTrace();
 			}
 		}
 		if (copyAttempts > 100) {
@@ -939,7 +884,6 @@ public final class InterfaceBuilderApp extends Application {
 		} catch (ParserConfigurationException | SAXException | IOException e) {
 			final String msg = "ERROR: unable to read DescIndex path."; //$NON-NLS-1$
 			logger.error(msg, e);
-			e.printStackTrace();
 			throw new IOException(msg, e);
 		}
 		
@@ -951,7 +895,6 @@ public final class InterfaceBuilderApp extends Application {
 			descIndexData.addLayoutIntPath(DescIndexReader.getLayoutPathList(descIndexFile, false));
 		} catch (SAXException | ParserConfigurationException | IOException | MpqException e) {
 			logger.error("unable to read Layout paths", e); //$NON-NLS-1$
-			e.printStackTrace();
 		}
 		
 		logger.info("Compiling... " + sourceFile.getName()); //$NON-NLS-1$
@@ -962,13 +905,12 @@ public final class InterfaceBuilderApp extends Application {
 		logger.info("Building... " + sourceFile.getName()); //$NON-NLS-1$
 		
 		try {
-			MpqEditorCompression compressMpqMode = getCompressionModeOfSetting(compressMpq);
+			final MpqEditorCompression compressMpqMode = getCompressionModeOfSetting(compressMpq);
 			mpqi.buildMpq(targetPath, sourceFile.getName(), compressXml, compressMpqMode,
 					settings.isCmdLineBuildUnprotectedToo());
 			logger.info("Finished building... " + sourceFile.getName()); //$NON-NLS-1$
 		} catch (final IOException | MpqException e) {
 			logger.error("ERROR: unable to construct final Interface file.", e); //$NON-NLS-1$
-			e.printStackTrace();
 		}
 		printLogMessageToGeneral(sourceFile.getName() + " finished construction.");
 	}
@@ -1003,6 +945,7 @@ public final class InterfaceBuilderApp extends Application {
 			logger.error(
 					"ERROR: Executor timed out waiting for Worker Theads to terminate. A Thread might run rampage.",
 					e); //$NON-NLS-1$
+			Thread.currentThread().interrupt();
 		}
 		baseMpqInterface.clearCacheExtractedMpq();
 		logger.info("App waves Goodbye!"); //$NON-NLS-1$
@@ -1037,8 +980,7 @@ public final class InterfaceBuilderApp extends Application {
 		try {
 			settings2.readSettingsFromFile();
 		} catch (final IOException e) {
-			logger.error("settings file could not be read.", e); //$NON-NLS-1$
-			e.printStackTrace();
+			logger.error("Settings file could not be read.", e); //$NON-NLS-1$
 		}
 		settings = settings2;
 	}
@@ -1075,7 +1017,7 @@ public final class InterfaceBuilderApp extends Application {
 	 * @return
 	 */
 	public TabPane getTabPane() {
-		return tabPane;
+		return TabPaneController.getInstance().getTabPane();
 	}
 	
 	/**

@@ -1,7 +1,6 @@
 package application.controller;
 
 import application.InterfaceBuilderApp;
-import application.integration.SettingsIniInterface;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
 import javafx.animation.FadeTransition;
@@ -42,8 +41,6 @@ public abstract class SettingsAutoSaveController implements Updateable {
 	
 	@Override
 	public void update() {
-		// load values from ini
-		SettingsIniInterface settings = app.getIniSettings();
 		savedAnimLabel.setOpacity(0);
 	}
 	

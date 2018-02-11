@@ -12,8 +12,10 @@ import java.io.File;
 import java.io.IOException;
 
 public class MpqEditorSettingsInterface {
+	public static final String MPQEDITOR_RULESET_INI = "MPQEditor_Ruleset.ini";
+	private static final String MPQEDITOR_INI = "MPQEditor.ini";
 	private static final Logger logger = LogManager.getLogger();
-	
+	private static final String APPDATA = "APPDATA";
 	private final File iniFile;
 	private final File rulesetFile;
 	private boolean backupActive = false;
@@ -21,20 +23,20 @@ public class MpqEditorSettingsInterface {
 	private int saveMode = 0;
 	
 	public MpqEditorSettingsInterface() {
-		iniFile = new File(System.getenv("APPDATA") + File.separator + "MPQEditor.ini");
-		rulesetFile = new File(System.getenv("APPDATA") + File.separator + "MPQEditor_Ruleset.ini");
+		iniFile = new File(System.getenv(APPDATA) + File.separator + MPQEDITOR_INI);
+		rulesetFile = new File(System.getenv(APPDATA) + File.separator + MPQEDITOR_RULESET_INI);
 		logger.info("MpqEditor ini file: " + iniFile.getAbsolutePath());
 	}
 	
 	public void useCustomRuleset() {
 		try {
-			final File iniFile =
-					backupActive ? new File(this.iniFile.getParent() + File.separator + "MPQEditor.ini") : this.iniFile;
+			final File iniFileRef =
+					backupActive ? new File(this.iniFile.getParent() + File.separator + MPQEDITOR_INI) : this.iniFile;
 			
 			final Parameters params = new Parameters();
 			final FileBasedConfigurationBuilder<INIConfiguration> b =
 					new FileBasedConfigurationBuilder<>(INIConfiguration.class)
-							.configure(params.ini().setFile(iniFile).setEncoding("UTF-8"));
+							.configure(params.ini().setFile(iniFileRef).setEncoding("UTF-8"));
 			final INIConfiguration ini = b.getConfiguration();
 			
 			final SubnodeConfiguration options = ini.getSection("Options");
@@ -99,7 +101,7 @@ public class MpqEditorSettingsInterface {
 		
 		// ruleset file
 		if (rulesetFile.exists()) {
-			originalName = new File(directoryPath + File.separator + "MPQEditor_Ruleset.ini");
+			originalName = new File(directoryPath + File.separator + MPQEDITOR_RULESET_INI);
 			if (!rulesetFile.renameTo(originalName)) {
 				throw new IOException(
 						"Could not restore original via renaming " + rulesetFile.getAbsolutePath() + " to " +
@@ -109,7 +111,7 @@ public class MpqEditorSettingsInterface {
 		
 		// ini file
 		if (iniFile.exists()) {
-			originalName = new File(directoryPath + File.separator + "MPQEditor.ini");
+			originalName = new File(directoryPath + File.separator + MPQEDITOR_INI);
 			if (!iniFile.renameTo(originalName)) {
 				throw new IOException(
 						"Could not restore original via renaming " + iniFile.getAbsolutePath() + " to " + originalName);

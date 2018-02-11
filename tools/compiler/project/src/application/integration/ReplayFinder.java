@@ -72,7 +72,8 @@ public class ReplayFinder {
 			logger.trace(basePath);
 		}
 		
-		String line, replayPath = null;
+		String line;
+		String replayPath = null;
 		try (final InputStreamReader is = new InputStreamReader(new FileInputStream(new File(basePath)),
 				StandardCharsets.UTF_8); BufferedReader br = new BufferedReader(is)) {
 			

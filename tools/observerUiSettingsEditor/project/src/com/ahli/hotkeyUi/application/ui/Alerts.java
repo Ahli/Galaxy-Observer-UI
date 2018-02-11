@@ -19,7 +19,12 @@ import org.apache.logging.log4j.Logger;
  * @author Ahli
  */
 public class Alerts {
+	public static final String GENERAL_OK_BUTTON = "General.OkButton";
 	private static Logger logger = LogManager.getLogger(Alerts.class);
+	
+	private Alerts() {
+		// disallow class instances
+	}
 	
 	/**
 	 * @param owner
@@ -54,8 +59,7 @@ public class Alerts {
 	public static Alert buildErrorAlert(final Window owner, final String title, final String header,
 			final String content) {
 		final long time = System.nanoTime();
-		final ButtonType okButton =
-				new ButtonType(Messages.getString("General.OkButton"), ButtonData.YES); //$NON-NLS-1$
+		final ButtonType okButton = new ButtonType(Messages.getString(GENERAL_OK_BUTTON), ButtonData.YES); //$NON-NLS-1$
 		final Alert alert = new Alert(AlertType.ERROR, content, okButton);
 		alert.initOwner(owner);
 		alert.setTitle(title);

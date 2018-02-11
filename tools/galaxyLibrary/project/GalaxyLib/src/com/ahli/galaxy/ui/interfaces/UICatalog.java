@@ -54,8 +54,7 @@ public interface UICatalog extends DeepCopyable {
 	 * @throws DOMException
 	 */
 	void processLayoutFile(File f, String raceId, boolean isDevLayout)
-			throws SAXException, IOException, ParserConfigurationException, UIException, DOMException,
-			InterruptedException;
+			throws SAXException, IOException, ParserConfigurationException, UIException, InterruptedException;
 	
 	/**
 	 * @param constantRef

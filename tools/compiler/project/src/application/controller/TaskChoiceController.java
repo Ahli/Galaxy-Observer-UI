@@ -12,7 +12,7 @@ public class TaskChoiceController {
 	 * Automatically called by FxmlLoader
 	 */
 	public void initialize() {
-	
+		// TODO
 	}
 	
 	/**
@@ -20,6 +20,6 @@ public class TaskChoiceController {
 	 */
 	@FXML
 	public void buildClicked() {
-	
+		// TODO
 	}
 }

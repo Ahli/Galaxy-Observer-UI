@@ -27,8 +27,6 @@ public class GameData {
 	public GameData(final GameDef gameDef) {
 		this.gameDef = gameDef;
 		uiCatalog = new UICatalogImpl();
-		// uiCatalog = new UICatalogDomParser();
-		// uiCatalog = new UICatalogVtdXmlParser();
 	}
 	
 	/**

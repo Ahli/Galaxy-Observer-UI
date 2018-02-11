@@ -44,7 +44,6 @@ public final class JarHelper {
 			// results in: "file:/D:/GalaxyObsUI/dev/./"
 			// but maybe results in something completely different like
 			// notepad++'s directory...
-			// addLogMessage("METHOD TEST: " + new File(".").toURI());
 			
 			str = uri.getPath();
 			logger.debug("_URI path:" + str); //$NON-NLS-1$

@@ -13,7 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class RecursiveVtdTest {
-	final static List<Object> list = new ArrayList<>();
+	private static final List<Object> list = new ArrayList<>();
 	private static final String TAG = "*";
 	
 	public static void main(final String[] args) {
@@ -23,6 +23,7 @@ public class RecursiveVtdTest {
 			Thread.sleep(1000);
 		} catch (final InterruptedException e1) {
 			e1.printStackTrace();
+			Thread.currentThread().interrupt();
 		}
 		System.out.println("memory: " + Runtime.getRuntime().totalMemory());
 		final Runtime rt = Runtime.getRuntime();
@@ -50,9 +51,13 @@ public class RecursiveVtdTest {
 		
 		final long executionTime = (System.currentTimeMillis() - startTime);
 		endMem = rt.totalMemory() - rt.freeMemory();
-		System.out.println(
-				"recursive traversal took " + executionTime + "ms. Per iteration: " + executionTime / iterations +
-						"ms.");
+		if (iterations != 0) {
+			System.out.println(
+					"recursive traversal took " + executionTime + "ms. Per iteration: " + executionTime / iterations +
+							"ms.");
+		} else {
+			System.out.println("no iterations performed");
+		}
 		System.out.println("elements: " + list.size());
 		System.out.println("Memory Use: " + ((float) endMem - startMem) / (1 << 20) + " MB.");
 		System.out.println("iterations: " + iterations);
@@ -61,6 +66,7 @@ public class RecursiveVtdTest {
 			Thread.sleep(1000);
 		} catch (final InterruptedException e1) {
 			e1.printStackTrace();
+			Thread.currentThread().interrupt();
 		}
 	}
 	

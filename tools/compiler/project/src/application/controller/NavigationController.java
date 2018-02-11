@@ -75,7 +75,6 @@ public class NavigationController {
 			controllers[index] = (controller instanceof Updateable) ? (Updateable) controller : null;
 		} catch (IOException e) {
 			logger.error("failed to load FXML: " + path + ".", e); //$NON-NLS-1$
-			e.printStackTrace();
 			contentPages[index] = null;
 			controllers[index] = null;
 		}
@@ -122,5 +121,21 @@ public class NavigationController {
 		showPanelContent(1);
 	}
 	
+	/**
+	 * Locks the navigation to the Progress screen.
+	 */
+	public void lockNavToProgress() {
+		home.setDisable(true);
+		settings.setDisable(true);
+		showPanelContent(1);
+	}
 	
+	/**
+	 * Releases all navigation button locks.
+	 */
+	public void unlockNav() {
+		home.setDisable(false);
+		settings.setDisable(false);
+		progress.setDisable(false);
+	}
 }

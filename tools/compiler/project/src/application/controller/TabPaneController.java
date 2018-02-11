@@ -9,10 +9,28 @@ import javafx.scene.control.TabPane;
 import org.fxmisc.flowless.VirtualizedScrollPane;
 import org.fxmisc.richtext.StyleClassedTextArea;
 
-public class TabPaneController {
+public class TabPaneController implements Updateable {
+	private static TabPaneController instance = null;
 	
 	@FXML
 	private TabPane tabPane;
+	
+	public TabPaneController() {
+		if (instance == null) {
+			instance = this;
+		} else {
+			throw new ExceptionInInitializerError("Cannot create multiple TabPaneController.");
+		}
+	}
+	
+	/**
+	 * Returns the singleton instance.
+	 *
+	 * @return instance or null
+	 */
+	public static TabPaneController getInstance() {
+		return instance;
+	}
 	
 	/**
 	 * Automatically called by FxmlLoader
@@ -36,4 +54,17 @@ public class TabPaneController {
 		StylizedTextAreaAppender.setGeneralController(errorTabCtrl);
 	}
 	
+	/**
+	 * Returns the TabPane.
+	 *
+	 * @return
+	 */
+	public TabPane getTabPane() {
+		return tabPane;
+	}
+	
+	@Override
+	public void update() {
+		// nothing to do
+	}
 }

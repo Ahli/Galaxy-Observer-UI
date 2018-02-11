@@ -11,8 +11,6 @@ import java.util.List;
  * performance improvements
  */
 public class UIFrame extends UIElement {
-	// private static final String FRAME = "frame";
-	// private static final String PARENT = "$parent";
 	private static final String THIS = "$this";
 	private static final String[] POSI = { "Min", "Max" };
 	private static final String ZERO = "0";
@@ -22,7 +20,6 @@ public class UIFrame extends UIElement {
 	 */
 	private static final long serialVersionUID = -4610017347746925885L;
 	
-	// private static final Logger LOGGER = LogManager.getLogger();
 	private final List<UIAttribute> attributes;
 	private final String[] pos = new String[4];
 	private final String[] offset = new String[4];
@@ -36,7 +33,6 @@ public class UIFrame extends UIElement {
 	 */
 	public UIFrame(final String name, final String type) {
 		super(name);
-		// this.type = type.equals(FRAME) ? null : type;
 		init();
 		attributes = new ArrayList<>();
 		children = new ArrayList<>();
@@ -117,8 +113,6 @@ public class UIFrame extends UIElement {
 	 * 		the type to set
 	 */
 	public void setType(final String type) {
-		// type of "frame" is null
-		// this.type = type.equals(FRAME) ? null : type;
 		this.type = type;
 	}
 	
@@ -135,38 +129,6 @@ public class UIFrame extends UIElement {
 	public void setChildren(final List<UIElement> children) {
 		this.children = children;
 	}
-	
-	// /**
-	// * @return the attributes
-	// */
-	// public Map<String, UIAttribute> getAttributes() {
-	// return attributes;
-	// }
-	//
-	// /**
-	// * @param attributes
-	// * the attributes to set
-	// */
-	// public void setAttributes(final Map<String, UIAttribute> attributes) {
-	// this.attributes = attributes;
-	// }
-	
-	// /**
-	// * @return the attributes
-	// */
-	// public ArrayList<Pair<String, UIAttribute>> getAttributes() {
-	// return attributes;
-	// }
-	//
-	// /**
-	// * @param attributes
-	// * the attributes to set
-	// */
-	// public void setAttributes(final ArrayList<Pair<String, UIAttribute>>
-	// attributes) {
-	// this.attributes = attributes;
-	// }
-	//
 	
 	/**
 	 * @param value
@@ -201,9 +163,6 @@ public class UIFrame extends UIElement {
 	 * @param relative
 	 */
 	public void setAnchorRelative(final UIAnchorSide side, final String relative) {
-		// $parent is null
-		// final int i = side.ordinal();
-		// this.relative[i] = relative.equalsIgnoreCase(PARENT) ? null : relative;
 		this.relative[side.ordinal()] = relative;
 	}
 	
@@ -212,7 +171,6 @@ public class UIFrame extends UIElement {
 	 * @param offset
 	 */
 	public void setAnchorOffset(final UIAnchorSide side, final String offset) {
-		// this.offset[side.ordinal()] = offset.equals(ZERO) ? null : offset;
 		this.offset[side.ordinal()] = offset;
 	}
 	
@@ -221,9 +179,6 @@ public class UIFrame extends UIElement {
 	 * @param pos
 	 */
 	public void setAnchorPos(final UIAnchorSide side, final String pos) {
-		// top/left with Min is null; bottom/right with Max is null
-		// final int i = side.ordinal();
-		// this.pos[i] = pos.equalsIgnoreCase(POSI[i / 2]) ? null : pos;
 		this.pos[side.ordinal()] = pos;
 	}
 	
@@ -256,44 +211,14 @@ public class UIFrame extends UIElement {
 	 * @param offset
 	 */
 	public void setAnchor(final String relative, final String offset) {
-		// if (relative.equalsIgnoreCase(PARENT)) {
-		// // $parent is null
-		// this.relative[0] = null;
-		// this.relative[1] = null;
-		// this.relative[2] = null;
-		// this.relative[3] = null;
-		// } else {
-		// this.relative[0] = relative;
-		// this.relative[1] = relative;
-		// this.relative[2] = relative;
-		// this.relative[3] = relative;
-		// }
 		this.relative[0] = relative;
 		this.relative[1] = relative;
 		this.relative[2] = relative;
 		this.relative[3] = relative;
-		
-		// top/left with Min is null; bottom/right with Max is null
-		// pos[0] = null;
-		// pos[1] = null;
-		// pos[2] = null;
-		// pos[3] = null;
 		pos[0] = POSI[0];
 		pos[1] = POSI[0];
 		pos[2] = POSI[1];
 		pos[3] = POSI[1];
-		// if (offset.equals(ZERO)) {
-		// // offset "0" is null
-		// this.offset[0] = null;
-		// this.offset[1] = null;
-		// this.offset[2] = null;
-		// this.offset[3] = null;
-		// } else {
-		// this.offset[0] = offset;
-		// this.offset[1] = offset;
-		// this.offset[2] = Integer.toString((Integer.parseInt(offset) * (-1)));
-		// this.offset[3] = Integer.toString((Integer.parseInt(offset) * (-1)));
-		// }
 		if (offset != null) {
 			this.offset[0] = offset;
 			this.offset[1] = offset;
@@ -319,15 +244,11 @@ public class UIFrame extends UIElement {
 		} else {
 			// go deeper
 			final String curName = UIElement.getLeftPathLevel(path);
-			// LOGGER.trace("curName: " + curName);
-			// LOGGER.trace("children to check: " + children.size());
 			if (curName != null) {
 				for (final UIElement curElem : children) {
-					// LOGGER.trace("checking child: " + curElem.getName());
 					if (curName.equalsIgnoreCase(curElem.getName())) {
 						// found right frame -> cut path
 						final String newPath = UIElement.removeLeftPathLevel(path);
-						// LOGGER.trace("match! newPath:" + newPath);
 						return curElem.receiveFrameFromPath(newPath);
 					}
 				}

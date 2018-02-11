@@ -5,7 +5,7 @@ import java.io.Serializable;
 /**
  * <p> A convenience class to represent name-value pairs. </p>
  */
-public class Pair <K, V> implements Serializable {
+public class Pair <K extends Serializable, V extends Serializable> implements Serializable {
 	
 	/**
 	 *

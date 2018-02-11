@@ -21,12 +21,6 @@ public class CompileManager {
 	private static Logger logger = LogManager.getLogger();
 	
 	/**
-	 * Constructor.
-	 */
-	public CompileManager() {
-	}
-	
-	/**
 	 * Compiles and updates the data in the cache.
 	 *
 	 * @param mod
@@ -76,7 +70,6 @@ public class CompileManager {
 			
 		} catch (ParserConfigurationException | SAXException | IOException | UIException e) {
 			logger.error("ERROR: encountered error while compiling.", e);
-			e.printStackTrace();
 		}
 		return catalogClone;
 	}

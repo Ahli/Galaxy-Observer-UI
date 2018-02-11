@@ -71,7 +71,7 @@ public class UIStateGroup extends UIElement {
 	 * @param states
 	 * 		the states to set
 	 */
-	public void setStates(final ArrayList<UIState> states) {
+	public void setStates(final List<UIState> states) {
 		this.states = states;
 	}
 	

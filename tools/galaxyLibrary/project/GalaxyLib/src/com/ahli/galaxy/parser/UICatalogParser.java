@@ -153,7 +153,6 @@ public class UICatalogParser implements ParsedXmlConsumer {
 				}
 				break;
 			case "anchor":
-				newElem = null;
 				parseAnchor(attrTypes, attrValues);
 				return;
 			case "state":
@@ -359,13 +358,13 @@ public class UICatalogParser implements ParsedXmlConsumer {
 			} else {
 				UIAnchorSide sideVal = null;
 				if (side.compareToIgnoreCase("left") == 0) {
-					sideVal = UIAnchorSide.Left;
+					sideVal = UIAnchorSide.LEFT;
 				} else if (side.compareToIgnoreCase("bottom") == 0) {
-					sideVal = UIAnchorSide.Bottom;
+					sideVal = UIAnchorSide.BOTTOM;
 				} else if (side.compareToIgnoreCase("right") == 0) {
-					sideVal = UIAnchorSide.Right;
+					sideVal = UIAnchorSide.RIGHT;
 				} else if (side.compareToIgnoreCase("top") == 0) {
-					sideVal = UIAnchorSide.Top;
+					sideVal = UIAnchorSide.TOP;
 				} else {
 					logger.error("'Anchor' attribute has unrecognizable value for 'side='. Value is '" + side + "'.");
 				}

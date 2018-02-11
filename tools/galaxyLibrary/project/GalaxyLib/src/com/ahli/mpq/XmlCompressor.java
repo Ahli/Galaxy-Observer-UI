@@ -101,7 +101,6 @@ public final class XmlCompressor {
 				xformer.transform(source, result);
 			} catch (TransformerFactoryConfigurationError | TransformerException e) {
 				logger.error("Transforming to generate XML file failed.", e);
-				e.printStackTrace();
 			}
 			
 		}

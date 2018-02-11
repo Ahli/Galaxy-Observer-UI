@@ -13,8 +13,6 @@ public class UITemplate implements Serializable, DeepCopyable {
 	 */
 	private static final long serialVersionUID = 7686203678975623860L;
 	
-	// private static final Logger logger = LogManager.getLogger();
-	
 	private String fileName;
 	private UIElement element;
 	private boolean isLocked;
@@ -88,19 +86,11 @@ public class UITemplate implements Serializable, DeepCopyable {
 	 * @return
 	 */
 	public UIElement receiveFrameFromPath(final String path) {
-		// logger.trace("receive Frame from path: " + path);
-		// logger.trace("template's element name: " + element.getName());
 		final String curName = UIElement.getLeftPathLevel(path);
-		// logger.trace("searched name: " + curName);
-		if (curName != null) {
-			if (curName.equalsIgnoreCase(element.getName())) {
-				final String newPath = UIElement.removeLeftPathLevel(path);
-				// logger.trace("match! new Path: " + newPath);
-				
-				return element.receiveFrameFromPath(newPath);
-			}
+		if (curName != null && curName.equalsIgnoreCase(element.getName())) {
+			final String newPath = UIElement.removeLeftPathLevel(path);
+			return element.receiveFrameFromPath(newPath);
 		}
-		// logger.trace("did not find template: " + path);
 		return null;
 	}
 	

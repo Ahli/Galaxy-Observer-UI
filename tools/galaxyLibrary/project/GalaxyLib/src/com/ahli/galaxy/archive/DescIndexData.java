@@ -13,6 +13,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Stores the Data of a Desc Index File.
@@ -122,7 +123,7 @@ public class DescIndexData {
 		File f = mpqi.getFileFromMpq(intPath);
 		if (!f.exists()) {
 			// add base folder to the path
-			intPath2 = (mpqi.isHeroesMpq() ? "Base.StormData" : "Base.SC2Data") + "/" + intPath;
+			intPath2 = (mpqi.isHeroesMpq() ? "Base.StormData" : "Base.SC2Data") + File.separator + intPath;
 			f = mpqi.getFileFromMpq(intPath2);
 		}
 		if (!f.exists()) {
@@ -188,12 +189,12 @@ public class DescIndexData {
 	 * @throws ParserConfigurationException
 	 */
 	public void orderLayoutFiles() throws ParserConfigurationException, SAXException, IOException {
-		final ArrayList<ArrayList<String>> dependencies = new ArrayList<>();
-		final ArrayList<ArrayList<String>> ownConstants = new ArrayList<>();
+		final List<List<String>> dependencies = new ArrayList<>();
+		final List<List<String>> ownConstants = new ArrayList<>();
 		
 		// grab dependencies and constant definitions for every layout file
-		ArrayList<String> layoutDeps;
-		ArrayList<String> curConstants;
+		List<String> layoutDeps;
+		List<String> curConstants;
 		for (final Pair<File, String> pair : fileIntPathList) {
 			curConstants = LayoutReader.getLayoutsConstantDefinitions(pair.getKey());
 			
@@ -215,7 +216,7 @@ public class DescIndexData {
 			insertOccurred = false;
 			for (int i = 0; i < dependencies.size(); i++) {
 				
-				final ArrayList<String> curLayoutDepList = dependencies.get(i);
+				final List<String> curLayoutDepList = dependencies.get(i);
 				final Pair<File, String> pair = fileIntPathList.get(i);
 				
 				for (int j = 0; j < curLayoutDepList.size(); j++) {
@@ -304,7 +305,7 @@ public class DescIndexData {
 			x:
 			for (int i = 0; i < dependencies.size(); i++) {
 				
-				final ArrayList<String> curLayoutDepList = dependencies.get(i);
+				final List<String> curLayoutDepList = dependencies.get(i);
 				final Pair<File, String> pair = fileIntPathList.get(i);
 				
 				for (int j = 0; j < curLayoutDepList.size(); j++) {

@@ -45,8 +45,8 @@ import java.awt.SplashScreen;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 
@@ -56,7 +56,9 @@ import java.util.Optional;
  * @author Ahli
  */
 public class Main extends Application {
-	public final static String VERSION = "alpha";
+	public static final String VERSION = "alpha";
+	public static final String STORM_INTERFACE_FILE_FILTER = "*.StormInterface";
+	public static final String SC2_INTERFACE_FILE_FILTER = "*.SC2Interface";
 	static Logger logger = LogManager.getLogger(Main.class); // $NON-NLS-1$
 	private final long appStartTime = System.nanoTime();
 	private Stage primaryStage;
@@ -108,14 +110,7 @@ public class Main extends Application {
 			
 			setUserAgentStylesheet(STYLESHEET_MODENA);
 			
-			// if it fails to load the resource in as a jar, check the eclipse settings
-			try {
-				primaryStage.getIcons()
-						.add(new Image(Main.class.getResourceAsStream("/res/ahliLogo.png"))); //$NON-NLS-1$
-			} catch (final NullPointerException e) {
-				logger.error("Error loading resource");
-				primaryStage.getIcons().add(new Image("ahliLogo.png"));
-			}
+			initAppIcon();
 			
 			long time = System.nanoTime();
 			initRootLayout();
@@ -168,12 +163,21 @@ public class Main extends Application {
 			
 			initMpqInterface();
 			
-		} catch (final Throwable e) {
+		} catch (final Exception e) {
 			logger.error("App Error: " + ExceptionUtils.getStackTrace(e), e); //$NON-NLS-1$
-			e.printStackTrace();
 			this.primaryStage.setOpacity(1);
 			Alerts.buildExceptionAlert(this.primaryStage, e).showAndWait();
 			closeApp();
+		}
+	}
+	
+	private void initAppIcon() {
+		// if it fails to load the resource in as a jar, check the eclipse settings
+		try {
+			primaryStage.getIcons().add(new Image(Main.class.getResourceAsStream("/res/ahliLogo.png"))); //$NON-NLS-1$
+		} catch (final NullPointerException e) {
+			logger.error("Error loading resource");
+			primaryStage.getIcons().add(new Image("ahliLogo.png"));
 		}
 	}
 	
@@ -295,13 +299,7 @@ public class Main extends Application {
 	 * enable/disable the save buttons.
 	 */
 	private void updateMenuBar() {
-		Platform.runLater(new Runnable() {
-			@Override
-			public void run() {
-				// Update UI here
-				getMbarCtrl().updateMenuBar();
-			}
-		});
+		Platform.runLater(() -> getMbarCtrl().updateMenuBar());
 	}
 	
 	/**
@@ -331,7 +329,6 @@ public class Main extends Application {
 			updateAppTitle();
 		} catch (IOException | InterruptedException | ParserConfigurationException | SAXException | MpqException e) {
 			logger.error(ExceptionUtils.getStackTrace(e), e);
-			e.printStackTrace();
 			showErrorAlert(e);
 		}
 		logger.warn("opened mpq within " + (System.nanoTime() - time) / 1000000 + "ms.");
@@ -373,20 +370,17 @@ public class Main extends Application {
 	 * Updates the title of the App.
 	 */
 	public void updateAppTitle() {
-		Platform.runLater(new Runnable() {
-			@Override
-			public void run() {
-				// Update UI here
-				String title = Messages.getString("Main.observerUiSettingsEditorTitle"); //$NON-NLS-1$
-				final String openedDocPath = getOpenedDocPath();
-				if (openedDocPath != null) {
-					title += "- [" + openedDocPath + "]"; //$NON-NLS-1$ //$NON-NLS-2$
-				}
-				if (hasUnsavedFileChanges()) {
-					title += "*"; //$NON-NLS-1$
-				}
-				getPrimaryStage().setTitle(title);
+		Platform.runLater(() -> {
+			// Update UI here
+			String title = Messages.getString("Main.observerUiSettingsEditorTitle"); //$NON-NLS-1$
+			final String openedDocPathTmp = getOpenedDocPath();
+			if (openedDocPathTmp != null) {
+				title += "- [" + openedDocPathTmp + "]"; //$NON-NLS-1$ //$NON-NLS-2$
 			}
+			if (hasUnsavedFileChanges()) {
+				title += "*"; //$NON-NLS-1$
+			}
+			getPrimaryStage().setTitle(title);
 		});
 		
 	}
@@ -397,16 +391,12 @@ public class Main extends Application {
 	 * @param e
 	 */
 	private void showErrorAlert(final Exception e) {
-		Platform.runLater(new Runnable() {
-			@Override
-			public void run() {
-				// Update UI here
-				logger.trace("showing error popup");
-				final String title = Messages.getString("Main.anErrorOccured"); //$NON-NLS-1$
-				final String content = e.getMessage();
-				final Alert alert = Alerts.buildErrorAlert(getPrimaryStage(), title, title, content);
-				alert.showAndWait();
-			}
+		Platform.runLater(() -> {
+			logger.trace("showing error popup");
+			final String title = Messages.getString("Main.anErrorOccured"); //$NON-NLS-1$
+			final String content = e.getMessage();
+			final Alert alert = Alerts.buildErrorAlert(getPrimaryStage(), title, title, content);
+			alert.showAndWait();
 		});
 	}
 	
@@ -436,16 +426,16 @@ public class Main extends Application {
 		fileChooser.setTitle(Messages.getString("Main.openObserverInterfaceTitle")); //$NON-NLS-1$
 		
 		final ExtensionFilter genExtFilter =
-				new ExtensionFilter(Messages.getString("Main.sc2HeroesObserverInterfaceExtFilter"), "*.SC2Interface",
-						//$NON-NLS-1$ //$NON-NLS-2$
-						"*.StormInterface"); //$NON-NLS-1$
+				new ExtensionFilter(Messages.getString("Main.sc2HeroesObserverInterfaceExtFilter"),
+						SC2_INTERFACE_FILE_FILTER, STORM_INTERFACE_FILE_FILTER);
 		
 		fileChooser.getExtensionFilters().addAll(new ExtensionFilter(Messages.getString("Main.allFilesFilter"), "*.*"),
 				//$NON-NLS-1$ //$NON-NLS-2$
-				genExtFilter, new ExtensionFilter(Messages.getString("Main.sc2InterfaceFilter"), "*.SC2Interface"),
+				genExtFilter,
+				new ExtensionFilter(Messages.getString("Main.sc2InterfaceFilter"), SC2_INTERFACE_FILE_FILTER),
 				//$NON-NLS-1$ //$NON-NLS-2$
 				new ExtensionFilter(Messages.getString("Main.heroesInterfaceFilter"),
-						"*.StormInterface")); //$NON-NLS-1$ //$NON-NLS-2$
+						STORM_INTERFACE_FILE_FILTER)); //$NON-NLS-1$ //$NON-NLS-2$
 		fileChooser.setSelectedExtensionFilter(genExtFilter);
 		final File f = fileChooser.showOpenDialog(primaryStage);
 		
@@ -512,10 +502,10 @@ public class Main extends Application {
 				layoutExtReader = new LayoutExtensionReader();
 				layoutExtReader.processLayoutFiles(layoutFiles);
 				
-				final ArrayList<ValueDef> hotkeys = layoutExtReader.getHotkeys();
+				final List<ValueDef> hotkeys = layoutExtReader.getHotkeys();
 				tabsCtrl.getHotkeysData().addAll(hotkeys);
 				
-				final ArrayList<ValueDef> settings = layoutExtReader.getSettings();
+				final List<ValueDef> settings = layoutExtReader.getSettings();
 				tabsCtrl.getSettingsData().addAll(settings);
 				
 			} catch (MpqException | ShowToUserException e) {
@@ -526,18 +516,8 @@ public class Main extends Application {
 				showErrorAlert(e);
 			} catch (final Exception e) {
 				logger.error("File could not be opened. Error: " + ExceptionUtils.getStackTrace(e), e); //$NON-NLS-1$
-				e.printStackTrace();
 				openedDocPath = null;
 				updateAppTitle();
-				// Alert alert = new Alert(AlertType.ERROR);
-				// alert.setTitle(Messages.getString("Main.errorOpeningFileTitle"));
-				// //$NON-NLS-1$
-				// alert.setHeaderText(Messages.getString("Main.errorOpeningFileTitle"));
-				// //$NON-NLS-1$
-				// alert.setContentText(Messages.getString("Main.anErrorOccured")
-				// + e.getMessage()); //$NON-NLS-1$
-				// alert.showAndWait();
-				
 				showExceptionAlert(e);
 			}
 			updateMenuBar();
@@ -553,14 +533,10 @@ public class Main extends Application {
 	 * @param e
 	 */
 	private void showExceptionAlert(final Exception e) {
-		Platform.runLater(new Runnable() {
-			@Override
-			public void run() {
-				// Update UI here
-				logger.trace("showing exception popup");
-				final Alert alert = Alerts.buildExceptionAlert(getPrimaryStage(), e);
-				alert.showAndWait();
-			}
+		Platform.runLater(() -> {
+			logger.trace("showing exception popup");
+			final Alert alert = Alerts.buildExceptionAlert(getPrimaryStage(), e);
+			alert.showAndWait();
 		});
 	}
 	
@@ -607,16 +583,18 @@ public class Main extends Application {
 		fileChooser.setTitle(Messages.getString("Main.saveUiTitle")); //$NON-NLS-1$
 		
 		final ExtensionFilter genExtFilter =
-				new ExtensionFilter(Messages.getString("Main.sc2HeroesObserverInterfaceExtFilter"), "*.SC2Interface",
+				new ExtensionFilter(Messages.getString("Main.sc2HeroesObserverInterfaceExtFilter"),
+						SC2_INTERFACE_FILE_FILTER,
 						//$NON-NLS-1$ //$NON-NLS-2$
-						"*.StormInterface"); //$NON-NLS-1$
+						STORM_INTERFACE_FILE_FILTER); //$NON-NLS-1$
 		
 		fileChooser.getExtensionFilters().addAll(new ExtensionFilter(Messages.getString("Main.allFilesFilter"), "*.*"),
 				//$NON-NLS-1$ //$NON-NLS-2$
-				genExtFilter, new ExtensionFilter(Messages.getString("Main.sc2InterfaceFilter"), "*.SC2Interface"),
+				genExtFilter,
+				new ExtensionFilter(Messages.getString("Main.sc2InterfaceFilter"), SC2_INTERFACE_FILE_FILTER),
 				//$NON-NLS-1$ //$NON-NLS-2$
 				new ExtensionFilter(Messages.getString("Main.heroesInterfaceFilter"),
-						"*.StormInterface")); //$NON-NLS-1$ //$NON-NLS-2$
+						STORM_INTERFACE_FILE_FILTER)); //$NON-NLS-1$ //$NON-NLS-2$
 		fileChooser.setSelectedExtensionFilter(genExtFilter);
 		
 		final File loadedF = new File(getOpenedDocPath());
@@ -635,7 +613,6 @@ public class Main extends Application {
 				updateAppTitle();
 			} catch (IOException | InterruptedException | ParserConfigurationException | SAXException | MpqException e) {
 				logger.error(ExceptionUtils.getStackTrace(e), e);
-				e.printStackTrace();
 				showErrorAlert(e);
 			}
 		}

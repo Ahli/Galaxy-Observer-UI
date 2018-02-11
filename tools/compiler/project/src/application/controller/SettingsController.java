@@ -114,7 +114,6 @@ public class SettingsController implements Updateable {
 			return loader.load(InterfaceBuilderApp.class.getResourceAsStream(path));
 		} catch (IOException e) {
 			logger.error("failed to load FXML: " + path + ".", e); //$NON-NLS-1$
-			e.printStackTrace();
 		}
 		return null;
 	}

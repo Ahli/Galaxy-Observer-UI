@@ -13,7 +13,6 @@ public class UIController extends UIElement {
 	 *
 	 */
 	private static final long serialVersionUID = -5133613746543071378L;
-	// private Map<String, String> values = null;
 	private final List<Pair<String, String>> values;
 	private List<UIAttribute> keys;
 	private boolean nextAdditionShouldOverride;
@@ -24,7 +23,6 @@ public class UIController extends UIElement {
 	 */
 	public UIController(final String name) {
 		super(name);
-		// values = new HashMap<>(1, 1f);
 		values = new ArrayList<>();
 		keys = new ArrayList<>();
 	}
@@ -34,7 +32,6 @@ public class UIController extends UIElement {
 	 */
 	public UIController(final String name, final int initialValuesMaxCapacity, final int initialKeysMaxCapacity) {
 		super(name);
-		// values = new HashMap<>(initialValuesMaxCapacity, 1f);
 		values = new ArrayList<>(initialValuesMaxCapacity);
 		keys = new ArrayList<>(initialKeysMaxCapacity);
 	}
@@ -48,13 +45,6 @@ public class UIController extends UIElement {
 		for (int i = 0, len = keys.size(); i < len; i++) {
 			clone.keys.add((UIAttribute) keys.get(i).deepCopy());
 		}
-		// final Object[] entries = values.entrySet().toArray();
-		// final Map<String, String> clonedMap = clone.values;
-		// for (int fix = 0, i = fix; i < entries.length; i++) {
-		// @SuppressWarnings("unchecked")
-		// final Entry<String, String> entry = (Entry<String, String>) entries[i];
-		// clonedMap.put(entry.getKey(), entry.getValue());
-		// }
 		for (int i = 0, len = values.size(); i < len; i++) {
 			final Pair<String, String> p = values.get(i);
 			clone.values.add(new Pair<>(p.getKey(), p.getValue()));
@@ -93,36 +83,6 @@ public class UIController extends UIElement {
 	public void setNextAdditionShouldOverride(final boolean nextAdditionShouldOverride) {
 		this.nextAdditionShouldOverride = nextAdditionShouldOverride;
 	}
-	
-	// /**
-	// * @return the values
-	// */
-	// public Map<String, String> getValues() {
-	// return values;
-	// }
-	//
-	// /**
-	// * @param values
-	// * the values to set
-	// */
-	// public void setValues(final Map<String, String> values) {
-	// this.values = values;
-	// }
-	
-	// /**
-	// * @return the values
-	// */
-	// public List<Pair<String, String>> getValues() {
-	// return values;
-	// }
-	
-	// /**
-	// * @param values
-	// * the values to set
-	// */
-	// public void setValues(final List<Pair<String, String>> values) {
-	// this.values = values;
-	// }
 	
 	/**
 	 * @param key

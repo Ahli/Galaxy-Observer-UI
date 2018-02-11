@@ -3,8 +3,11 @@ package application.integration;
 import org.apache.commons.configuration2.INIConfiguration;
 import org.apache.commons.configuration2.SubnodeConfiguration;
 import org.apache.commons.configuration2.builder.FileBasedConfigurationBuilder;
+import org.apache.commons.configuration2.builder.fluent.INIBuilderParameters;
 import org.apache.commons.configuration2.builder.fluent.Parameters;
 import org.apache.commons.configuration2.ex.ConfigurationException;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -16,6 +19,7 @@ import java.io.IOException;
  * @author Ahli
  */
 public class SettingsIniInterface {
+	private static final Logger logger = LogManager.getLogger();
 	
 	private static final String CATEGORY_GAME_PATHS = "GamePaths";
 	private static final String HEROES_PATH = "Heroes_Path";
@@ -84,19 +88,22 @@ public class SettingsIniInterface {
 	 * 		when there is an error reading the file
 	 */
 	public void readSettingsFromFile() throws IOException {
-		final Parameters params = new Parameters();
-		final FileBasedConfigurationBuilder<INIConfiguration> b =
-				new FileBasedConfigurationBuilder<>(INIConfiguration.class)
-						.configure(params.ini().setFile(new File(settingsFilePath)).setEncoding(UTF_8));
-		final INIConfiguration ini;
 		try {
-			ini = b.getConfiguration();
-		} catch (ConfigurationException e) {
+			final File f = new File(settingsFilePath);
+			logger.info("Loading settings from: '" + settingsFilePath + "' which exists: " + f.exists());
+			INIBuilderParameters params = new Parameters().ini().setFile(f).setEncoding(UTF_8);
+			FileBasedConfigurationBuilder<INIConfiguration> b =
+					new FileBasedConfigurationBuilder<>(INIConfiguration.class);
+			b = b.configure(params);
+			readValuesFromIni(b.getConfiguration());
+		} catch (ConfigurationException | ExceptionInInitializerError | IllegalArgumentException | NullPointerException e) {
 			throw new IOException("Could not read settings.ini.", e);
 		}
-		readValuesFromIni(ini);
 	}
 	
+	/**
+	 * @param ini
+	 */
 	private void readValuesFromIni(final INIConfiguration ini) {
 		final String emptryStr = "";
 		SubnodeConfiguration section = ini.getSection(CATEGORY_GAME_PATHS);
@@ -128,42 +135,45 @@ public class SettingsIniInterface {
 		final Parameters params = new Parameters();
 		final FileBasedConfigurationBuilder<INIConfiguration> b =
 				new FileBasedConfigurationBuilder<>(INIConfiguration.class)
-						.configure(params.ini().setFile(new File(settingsFilePath)).setEncoding("UTF-8"));
+						.configure(params.ini().setFile(new File(settingsFilePath)).setEncoding(UTF_8));
 		INIConfiguration ini;
 		try {
 			// load current file
 			ini = b.getConfiguration();
-		} catch (ConfigurationException e) {
+		} catch (final ConfigurationException e) {
 			// create new one if not present
 			ini = new INIConfiguration();
 		}
 		writeValuesToIni(ini);
 		try {
 			ini.write(new FileWriter(new File(settingsFilePath)));
-		} catch (ConfigurationException e) {
+		} catch (final ConfigurationException e) {
 			throw new IOException("Could not write settings.ini.", e);
 		}
 	}
 	
+	/**
+	 * @param ini
+	 */
 	private void writeValuesToIni(final INIConfiguration ini) {
 		SubnodeConfiguration section = ini.getSection(CATEGORY_GAME_PATHS);
-		section.addProperty(STARCRAFT2_PATH, sc2Path);
-		section.addProperty(HEROES_PATH, heroesPath);
-		section.addProperty(HEROES_PTR_PATH, heroesPtrPath);
-		section.addProperty(STARCRAFT2_USE64BIT, sc2X64);
-		section.addProperty(HEROES_USE64BIT, heroesX64);
-		section.addProperty(HEROES_PTR_USE64BIT, heroesPtrX64);
+		section.setProperty(STARCRAFT2_PATH, sc2Path);
+		section.setProperty(HEROES_PATH, heroesPath);
+		section.setProperty(HEROES_PTR_PATH, heroesPtrPath);
+		section.setProperty(STARCRAFT2_USE64BIT, sc2X64);
+		section.setProperty(HEROES_USE64BIT, heroesX64);
+		section.setProperty(HEROES_PTR_USE64BIT, heroesPtrX64);
 		
 		section = ini.getSection(CATEGORY_COMMAND_LINE_TOOL);
-		section.addProperty(CMDLINE_VERIFY_XML, cmdLineVerifyXml);
-		section.addProperty(CMDLINE_VERIFY_LAYOUT, cmdLineVerifyLayout);
-		section.addProperty(CMDLINE_REPAIR_LAYOUT_ORDER, cmdLineRepairLayoutOrder);
-		section.addProperty(CMDLINE_COMPRESS_XML, cmdLineCompressXml);
-		section.addProperty(CMDLINE_COMPRESS_MPQ, cmdLineCompressMpq);
-		section.addProperty(CMDLINE_BUILD_UNPROTECTED_TOO, cmdLineBuildUnprotectedToo);
+		section.setProperty(CMDLINE_VERIFY_XML, cmdLineVerifyXml);
+		section.setProperty(CMDLINE_VERIFY_LAYOUT, cmdLineVerifyLayout);
+		section.setProperty(CMDLINE_REPAIR_LAYOUT_ORDER, cmdLineRepairLayoutOrder);
+		section.setProperty(CMDLINE_COMPRESS_XML, cmdLineCompressXml);
+		section.setProperty(CMDLINE_COMPRESS_MPQ, cmdLineCompressMpq);
+		section.setProperty(CMDLINE_BUILD_UNPROTECTED_TOO, cmdLineBuildUnprotectedToo);
 		
 		section = ini.getSection(CATEGORY_INTERNAL_VARIABLES);
-		section.addProperty(HEROES_PTR_ACTIVE, heroesPtrActive);
+		section.setProperty(HEROES_PTR_ACTIVE, heroesPtrActive);
 	}
 	
 	/**
@@ -173,6 +183,9 @@ public class SettingsIniInterface {
 		return heroesPath;
 	}
 	
+	/**
+	 * @param heroesPath
+	 */
 	public void setHeroesPath(final String heroesPath) {
 		this.heroesPath = heroesPath;
 	}
@@ -184,6 +197,9 @@ public class SettingsIniInterface {
 		return heroesPtrPath;
 	}
 	
+	/**
+	 * @param heroesPtrPath
+	 */
 	public void setHeroesPtrPath(final String heroesPtrPath) {
 		this.heroesPtrPath = heroesPtrPath;
 	}
@@ -195,7 +211,10 @@ public class SettingsIniInterface {
 		return heroesPtrActive;
 	}
 	
-	public void setIsHeroesPtrActive(boolean heroesPtrActive) {
+	/**
+	 * @param heroesPtrActive
+	 */
+	public void setIsHeroesPtrActive(final boolean heroesPtrActive) {
 		this.heroesPtrActive = heroesPtrActive;
 	}
 	
@@ -224,21 +243,21 @@ public class SettingsIniInterface {
 	 * @param sc2Is64Bit
 	 */
 	public void setSc2Is64Bit(final boolean sc2Is64Bit) {
-		this.sc2X64 = sc2Is64Bit;
+		sc2X64 = sc2Is64Bit;
 	}
 	
 	/**
 	 * @param heroesIs64Bit
 	 */
 	public void setHeroesIs64Bit(final boolean heroesIs64Bit) {
-		this.heroesX64 = heroesIs64Bit;
+		heroesX64 = heroesIs64Bit;
 	}
 	
 	/**
 	 * @param heroesPtrIs64Bit
 	 */
 	public void setHeroesPtrIs64Bit(final boolean heroesPtrIs64Bit) {
-		this.heroesX64 = heroesPtrIs64Bit;
+		heroesPtrX64 = heroesPtrIs64Bit;
 	}
 	
 	/**
@@ -251,7 +270,7 @@ public class SettingsIniInterface {
 	/**
 	 * @param cmdLineCompressXml
 	 */
-	public void setCmdLineCompressXml(boolean cmdLineCompressXml) {
+	public void setCmdLineCompressXml(final boolean cmdLineCompressXml) {
 		this.cmdLineCompressXml = cmdLineCompressXml;
 	}
 	
@@ -265,10 +284,13 @@ public class SettingsIniInterface {
 	/**
 	 * @param cmdLineCompressMpq
 	 */
-	public void setCmdLineCompressMpq(int cmdLineCompressMpq) {
+	public void setCmdLineCompressMpq(final int cmdLineCompressMpq) {
 		this.cmdLineCompressMpq = cmdLineCompressMpq;
 	}
 	
+	/**
+	 * @return
+	 */
 	public String getSc2Path() {
 		return sc2Path;
 	}
@@ -280,35 +302,59 @@ public class SettingsIniInterface {
 		this.sc2Path = sc2Path;
 	}
 	
+	/**
+	 * @return
+	 */
 	public boolean isCmdLineRepairLayoutOrder() {
 		return cmdLineRepairLayoutOrder;
 	}
 	
-	public void setCmdLineRepairLayoutOrder(boolean cmdLineRepairLayoutOrder) {
+	/**
+	 * @param cmdLineRepairLayoutOrder
+	 */
+	public void setCmdLineRepairLayoutOrder(final boolean cmdLineRepairLayoutOrder) {
 		this.cmdLineRepairLayoutOrder = cmdLineRepairLayoutOrder;
 	}
 	
+	/**
+	 * @return
+	 */
 	public boolean isCmdLineVerifyLayout() {
 		return cmdLineVerifyLayout;
 	}
 	
-	public void setCmdLineVerifyLayout(boolean cmdLineVerifyLayout) {
+	/**
+	 * @param cmdLineVerifyLayout
+	 */
+	public void setCmdLineVerifyLayout(final boolean cmdLineVerifyLayout) {
 		this.cmdLineVerifyLayout = cmdLineVerifyLayout;
 	}
 	
+	/**
+	 * @return
+	 */
 	public boolean isCmdLineBuildUnprotectedToo() {
 		return cmdLineBuildUnprotectedToo;
 	}
 	
-	public void setCmdLineBuildUnprotectedToo(boolean cmdLineBuildUnprotectedToo) {
+	/**
+	 * @param cmdLineBuildUnprotectedToo
+	 */
+	public void setCmdLineBuildUnprotectedToo(final boolean cmdLineBuildUnprotectedToo) {
 		this.cmdLineBuildUnprotectedToo = cmdLineBuildUnprotectedToo;
 	}
 	
+	/**
+	 * @return
+	 */
 	public boolean isCmdLineVerifyXml() {
 		return cmdLineVerifyXml;
 	}
 	
-	public void setCmdLineVerifyXml(boolean cmdLineVerifyXml) {
+	/**
+	 * @param cmdLineVerifyXml
+	 */
+	public void setCmdLineVerifyXml(final boolean cmdLineVerifyXml) {
 		this.cmdLineVerifyXml = cmdLineVerifyXml;
 	}
 }

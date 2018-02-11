@@ -15,6 +15,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Reads a a Desc Index File.
@@ -40,7 +41,7 @@ public final class DescIndexReader {
 	 * @throws SAXException
 	 * @throws ParserConfigurationException
 	 */
-	public static ArrayList<String> getLayoutPathList(final File f, final boolean ignoreRequiredToLoadEntries)
+	public static List<String> getLayoutPathList(final File f, final boolean ignoreRequiredToLoadEntries)
 			throws SAXException, IOException, ParserConfigurationException {
 		final ArrayList<String> list = new ArrayList<>();
 		

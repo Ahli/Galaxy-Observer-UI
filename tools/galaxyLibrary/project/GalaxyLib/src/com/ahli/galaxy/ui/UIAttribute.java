@@ -27,7 +27,6 @@ public class UIAttribute extends UIElement {
 	 */
 	public UIAttribute(final String name) {
 		super(name);
-		// values = new THashMap<>(1, 1f);
 		values = new ArrayList<>();
 	}
 	
@@ -62,8 +61,6 @@ public class UIAttribute extends UIElement {
 	 * @param value
 	 */
 	public String addValue(final String key, final String value) {
-		// final Pair<String, String> newPair = new Pair<>(key, value);
-		// final int i = values.indexOf(newPair);
 		int i = 0;
 		final int len;
 		Pair<String, String> p = null;

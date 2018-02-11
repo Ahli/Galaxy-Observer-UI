@@ -30,6 +30,7 @@ public class SettingsCommandLineToolController extends SettingsAutoSaveControlle
 	/**
 	 * Automatically called by FxmlLoader
 	 */
+	@Override
 	public void initialize() {
 		super.initialize();
 		loadValuesFromSettings();
