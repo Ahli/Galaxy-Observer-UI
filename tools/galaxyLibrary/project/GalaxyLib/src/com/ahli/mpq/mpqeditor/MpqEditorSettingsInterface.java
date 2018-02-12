@@ -9,17 +9,22 @@ import org.apache.commons.configuration2.ex.ConfigurationException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Class to manage the settings of Ladik's MpqEditor.
  */
 public class MpqEditorSettingsInterface {
 	public static final String MPQEDITOR_RULESET_INI = "MPQEditor_Ruleset.ini";
+	public static final String CUSTOM_RULE_PROPERTY_KEY = "CustomRules. ";
 	private static final String MPQEDITOR_INI = "MPQEditor.ini";
 	private static final Logger logger = LogManager.getLogger();
 	private static final String APPDATA = "APPDATA";
@@ -240,7 +245,55 @@ public class MpqEditorSettingsInterface {
 		
 		switch (compression) {
 			case CUSTOM:
-				// TODO implement custom ruleset
+				// TODO implement editable custom ruleset instead of this:
+				ini.addProperty(CUSTOM_RULE_PROPERTY_KEY, "Size:0-0=0x02000000, 0x00000000, 0xFFFFFFFF");
+				ini.addProperty(CUSTOM_RULE_PROPERTY_KEY, "Mask:DocumentHeader=0x01000200, 0x00000010, 0xFFFFFFFF");
+				ini.addProperty(CUSTOM_RULE_PROPERTY_KEY, "Mask:DocumentInfo=0x01000200, 0x00000010, 0xFFFFFFFF");
+				ini.addProperty(CUSTOM_RULE_PROPERTY_KEY, "Mask:MapInfo=0x01000200, 0x00000010, 0xFFFFFFFF");
+				ini.addProperty(CUSTOM_RULE_PROPERTY_KEY, "Mask:*.mp3=0x01000200, 0x00000010, 0xFFFFFFFF");
+				ini.addProperty(CUSTOM_RULE_PROPERTY_KEY, "Mask:*.ogg=0x01000200, 0x00000002, 0xFFFFFFFF");
+				ini.addProperty(CUSTOM_RULE_PROPERTY_KEY, "Mask:*.ogv=0x01000200, 0x00000002, 0xFFFFFFFF");
+				ini.addProperty(CUSTOM_RULE_PROPERTY_KEY, "Mask:*.wav=0x00000200, 0x00000002, 0xFFFFFFFF");
+				ini.addProperty(CUSTOM_RULE_PROPERTY_KEY, "Mask:*.dds=0x01000200, 0x00000010, 0xFFFFFFFF");
+				ini.addProperty(CUSTOM_RULE_PROPERTY_KEY, "Mask:*.png=0x01000200, 0x00000010, 0xFFFFFFFF");
+				ini.addProperty(CUSTOM_RULE_PROPERTY_KEY, "Mask:*.tga=0x01000200, 0x00000010, 0xFFFFFFFF");
+				ini.addProperty(CUSTOM_RULE_PROPERTY_KEY, "Mask:*.jpg=0x01000200, 0x00000010, 0xFFFFFFFF");
+				ini.addProperty(CUSTOM_RULE_PROPERTY_KEY, "Mask:*.txt=0x01000200, 0x00000002, 0xFFFFFFFF");
+				ini.addProperty(CUSTOM_RULE_PROPERTY_KEY, "Mask:*.swf=0x01000200, 0x00000002, 0xFFFFFFFF");
+				ini.addProperty(CUSTOM_RULE_PROPERTY_KEY, "Mask:*.ttf=0x01000200, 0x00000002, 0xFFFFFFFF");
+				ini.addProperty(CUSTOM_RULE_PROPERTY_KEY, "Mask:*.otf=0x01000200, 0x00000002, 0xFFFFFFFF");
+				ini.addProperty(CUSTOM_RULE_PROPERTY_KEY, "Mask:*.m3=0x01000200, 0x00000002, 0xFFFFFFFF");
+				ini.addProperty(CUSTOM_RULE_PROPERTY_KEY, "Mask:*.m3a=0x01000200, 0x00000010, 0xFFFFFFFF");
+				ini.addProperty(CUSTOM_RULE_PROPERTY_KEY, "Mask:*.xml=0x01000200, 0x00000010, 0xFFFFFFFF");
+				ini.addProperty(CUSTOM_RULE_PROPERTY_KEY, "Mask:*.StormLayout=0x01000200, 0x00000010, 0xFFFFFFFF");
+				ini.addProperty(CUSTOM_RULE_PROPERTY_KEY, "Mask:*.SC2Layout=0x01000200, 0x00000010, 0xFFFFFFFF");
+				ini.addProperty(CUSTOM_RULE_PROPERTY_KEY, "Mask:*.StormComponents=0x01000200, 0x00000010, 0xFFFFFFFF");
+				ini.addProperty(CUSTOM_RULE_PROPERTY_KEY, "Mask:*.SC2Components=0x01000200, 0x00000010, 0xFFFFFFFF");
+				ini.addProperty(CUSTOM_RULE_PROPERTY_KEY, "Mask:*.StormStyle=0x01000200, 0x00000010, 0xFFFFFFFF");
+				ini.addProperty(CUSTOM_RULE_PROPERTY_KEY, "Mask:*.SC2Style=0x01000200, 0x00000010, 0xFFFFFFFF");
+				ini.addProperty(CUSTOM_RULE_PROPERTY_KEY, "Mask:*.StormCutscene=0x01000200, 0x00000010, 0xFFFFFFFF");
+				ini.addProperty(CUSTOM_RULE_PROPERTY_KEY, "Mask:*.SC2Cutscene=0x01000200, 0x00000010, 0xFFFFFFFF");
+				ini.addProperty(CUSTOM_RULE_PROPERTY_KEY, "Mask:*.StormLightning=0x01000200, 0x00000010, 0xFFFFFFFF");
+				ini.addProperty(CUSTOM_RULE_PROPERTY_KEY, "Mask:*.SC2Lightning=0x01000200, 0x00000010, 0xFFFFFFFF");
+				ini.addProperty(CUSTOM_RULE_PROPERTY_KEY, "Mask:*.version=0x01000200, 0x00000010, 0xFFFFFFFF");
+				ini.addProperty(CUSTOM_RULE_PROPERTY_KEY, "Mask:*.galaxy=0x01000200, 0x00000010, 0xFFFFFFFF");
+				ini.addProperty(CUSTOM_RULE_PROPERTY_KEY, "Mask:Objects=0x01000200, 0x00000010, 0xFFFFFFFF");
+				ini.addProperty(CUSTOM_RULE_PROPERTY_KEY,
+						"Mask:PaintedPathingLayer=0x01000200, 0x00000010, 0xFFFFFFFF");
+				ini.addProperty(CUSTOM_RULE_PROPERTY_KEY, "Mask:Regions=0x01000200, 0x00000010, 0xFFFFFFFF");
+				ini.addProperty(CUSTOM_RULE_PROPERTY_KEY, "Mask:t3CellFlags=0x01000200, 0x00000010, 0xFFFFFFFF");
+				ini.addProperty(CUSTOM_RULE_PROPERTY_KEY, "Mask:t3FluffDoodad=0x01000200, 0x00000010, 0xFFFFFFFF");
+				ini.addProperty(CUSTOM_RULE_PROPERTY_KEY, "Mask:t3HardTile=0x01000200, 0x00000010, 0xFFFFFFFF");
+				ini.addProperty(CUSTOM_RULE_PROPERTY_KEY, "Mask:t3HeightMap=0x01000200, 0x00000010, 0xFFFFFFFF");
+				ini.addProperty(CUSTOM_RULE_PROPERTY_KEY, "Mask:t3SyncCliffLevel=0x01000200, 0x00000010, 0xFFFFFFFF");
+				ini.addProperty(CUSTOM_RULE_PROPERTY_KEY, "Mask:t3SyncHeightMap=0x01000200, 0x00000010, 0xFFFFFFFF");
+				ini.addProperty(CUSTOM_RULE_PROPERTY_KEY, "Mask:t3SyncTextureInfo=0x01000200, 0x00000010, 0xFFFFFFFF");
+				ini.addProperty(CUSTOM_RULE_PROPERTY_KEY, "Mask:t3TextureMasks=0x01000200, 0x00000010, 0xFFFFFFFF");
+				ini.addProperty(CUSTOM_RULE_PROPERTY_KEY, "Mask:t3VertCol=0x01000200, 0x00000010, 0xFFFFFFFF");
+				ini.addProperty(CUSTOM_RULE_PROPERTY_KEY, "Mask:t3Water=0x01000200, 0x00000010, 0xFFFFFFFF");
+				ini.addProperty(CUSTOM_RULE_PROPERTY_KEY, "Mask:Triggers=0x01000200, 0x00000010, 0xFFFFFFFF");
+				ini.addProperty(CUSTOM_RULE_PROPERTY_KEY, "Mask:Attributes=0x01000200, 0x00000010, 0xFFFFFFFF");
+				ini.addProperty(CUSTOM_RULE_PROPERTY_KEY, "Size:0-16384=0x01000200, 0x00000010, 0xFFFFFFFF");
 				break;
 			case NONE:
 				section.addProperty("Default", "0x02000000, 0x00000000, 0xFFFFFFFF");
@@ -250,11 +303,23 @@ public class MpqEditorSettingsInterface {
 			default:
 				break;
 		}
+		logger.info(ini.toString());
 		
-		try (final FileWriter fw = new FileWriter(rulesetFile)) {
-			ini.write(fw);
+		try (final FileWriter fw = new FileWriter(rulesetFile); final BufferedWriter bw = new BufferedWriter(fw)) {
+			ini.write(bw);
 		} catch (final ConfigurationException | IOException e) {
 			throw new IOException("Could not write '" + rulesetFile.getAbsolutePath() + "'.", e);
+		}
+		
+		// remove custom ruleset line beginnings
+		if (compression == MpqEditorCompression.CUSTOM) {
+			final List<String> editedLines;
+			try (final Stream<String> lineStream = Files.lines(rulesetFile.toPath())) {
+				editedLines = lineStream.map(line -> line.replace("  = ", "")).collect(Collectors.toList());
+			}
+			try (final FileWriter fw = new FileWriter(rulesetFile); final BufferedWriter bw = new BufferedWriter(fw)) {
+				Files.write(rulesetFile.toPath(), editedLines);
+			}
 		}
 	}
 }

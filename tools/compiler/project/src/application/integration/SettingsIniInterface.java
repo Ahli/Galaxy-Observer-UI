@@ -9,6 +9,7 @@ import org.apache.commons.configuration2.ex.ConfigurationException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -244,8 +245,9 @@ public class SettingsIniInterface {
 			ini = new INIConfiguration();
 		}
 		writeValuesToIni(ini);
-		try (final FileWriter fw = new FileWriter(new File(settingsFilePath))) {
-			ini.write(fw);
+		try (final FileWriter fw = new FileWriter(new File(settingsFilePath));
+		     final BufferedWriter bw = new BufferedWriter(fw)) {
+			ini.write(bw);
 		} catch (final ConfigurationException e) {
 			throw new IOException("Could not write settings.ini.", e);
 		}
