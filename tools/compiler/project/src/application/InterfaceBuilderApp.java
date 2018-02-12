@@ -73,18 +73,15 @@ import java.util.concurrent.TimeUnit;
 public final class InterfaceBuilderApp extends Application {
 	
 	private static final Logger logger = LogManager.getLogger();
-	// performance
 	private static long startTime;
+	
 	private static InterfaceBuilderApp instance = null;
 	private final ReplayFinder replayFinder = new ReplayFinder();
 	private final CompileManager compileManager = new CompileManager();
-	// data
 	private final String documentsPath = new JFileChooser().getFileSystemView().getDefaultDirectory().toString();
 	private final GameData gameSC2 = new GameData(new SC2GameDef());
 	private final List<ErrorTabPaneController> errorTabControllers = new ArrayList<>();
-	// GUI
 	private ThreadPoolExecutor executor;
-	// Components
 	private MpqEditorInterface baseMpqInterface = null;
 	private SettingsIniInterface settings = null;
 	private File basePath = null;
@@ -95,6 +92,7 @@ public final class InterfaceBuilderApp extends Application {
 	private boolean compileAndRun = false;
 	private String paramRunPath = null;
 	private NavigationController navController;
+	private boolean wasStartedWithParameters;
 	
 	/**
 	 * Entry point of the App.
@@ -249,7 +247,7 @@ public final class InterfaceBuilderApp extends Application {
 						startWorkOnGame(gameHeroes, path);
 					}
 					
-					// wait until all UIs were build to save baseUI memory
+					// wait until all UIs were build to save memory
 					while (!executorTmp.getQueue().isEmpty() || executorTmp.getActiveCount() > 0) {
 						Thread.sleep(50);
 					}
@@ -327,7 +325,9 @@ public final class InterfaceBuilderApp extends Application {
 				addThreadLoggerTab(Thread.currentThread().getName(),
 						game.getGameDef().getNameHandle() + "UI"); //$NON-NLS-1$
 				
-				parseDefaultUI(game);
+				if (isRequiredToParseDefaultUi()) {
+					parseDefaultUI(game);
+				}
 				
 				buildGamesInterfaceFiles(game, path);
 			} catch (final InterruptedException e) {
@@ -440,7 +440,7 @@ public final class InterfaceBuilderApp extends Application {
 	 * 		app's main stage
 	 */
 	private void startReplayOrQuitOrShowError(final Stage primaryStage) {
-		if (!anyErrorTrackerEncounteredError()) {
+		if (wasStartedWithParameters && !anyErrorTrackerEncounteredError()) {
 			// start game, launch replay
 			attemptToRunGameWithReplay();
 			if (!hasParamCompilePath) {
@@ -582,14 +582,17 @@ public final class InterfaceBuilderApp extends Application {
 		// e.g. "--paramname=value".
 		final Parameters params = getParameters();
 		final Map<String, String> namedParams = params.getNamed();
+		wasStartedWithParameters = !namedParams.isEmpty();
 		
 		// COMPILE / COMPILERUN PARAM
 		// --compile="D:\GalaxyObsUI\dev\heroes\AhliObs.StormInterface"
-		paramCompilePath = namedParams.get("compile"); //$NON-NLS-1$
-		compileAndRun = false;
-		if (namedParams.get("compileRun") != null) { //$NON-NLS-1$
+		paramCompilePath = namedParams.get("compileRun");
+		if (paramCompilePath != null) { //$NON-NLS-1$
 			paramCompilePath = namedParams.get("compileRun"); //$NON-NLS-1$
 			compileAndRun = true;
+		} else {
+			paramCompilePath = namedParams.get("compile"); //$NON-NLS-1$
+			compileAndRun = false;
 		}
 		paramCompilePath = getInterfaceRootFromPath(paramCompilePath);
 		hasParamCompilePath = (paramCompilePath != null);
@@ -689,12 +692,11 @@ public final class InterfaceBuilderApp extends Application {
 	/**
 	 * ParamPath might be some layout or folder within the interface, so it is cut down to the interface base path.
 	 *
-	 * @param paramPath
+	 * @param str
 	 * 		application's compileParam's value
 	 * @return shortens the path to the Interface root folder
 	 */
-	private String getInterfaceRootFromPath(final String paramPath) {
-		String str = paramPath;
+	private String getInterfaceRootFromPath(String str) {
 		if (str != null) {
 			while (str.length() > 0 && !str.endsWith("Interface")) { //$NON-NLS-1$
 				final int lastIndex = str.lastIndexOf(File.separatorChar);
@@ -751,9 +753,29 @@ public final class InterfaceBuilderApp extends Application {
 						threadsMpqInterface.setMpqCachePath(getBaseMpqInterface().getMpqCachePath() + threadId);
 						
 						// work
-						final boolean compressXml = settings.isCmdLineCompressXml();
-						final int compressMpqSetting = settings.getCmdLineCompressMpq();
-						buildFile(interfaceFolder, game, threadsMpqInterface, compressXml, compressMpqSetting);
+						final boolean compressXml;
+						final int compressMpqSetting;
+						final boolean buildUnprotectedToo;
+						final boolean repairLayoutOrder;
+						final boolean verifyLayout;
+						final boolean verifyXml;
+						if (wasStartedWithParameters) {
+							compressXml = settings.isCmdLineCompressXml();
+							compressMpqSetting = settings.getCmdLineCompressMpq();
+							buildUnprotectedToo = settings.isCmdLineBuildUnprotectedToo();
+							repairLayoutOrder = settings.isCmdLineRepairLayoutOrder();
+							verifyLayout = settings.isCmdLineVerifyLayout();
+							verifyXml = settings.isCmdLineVerifyXml();
+						} else {
+							compressXml = settings.isGuiCompressXml();
+							compressMpqSetting = settings.getGuiCompressMpq();
+							buildUnprotectedToo = settings.isGuiBuildUnprotectedToo();
+							repairLayoutOrder = settings.isGuiRepairLayoutOrder();
+							verifyLayout = settings.isGuiVerifyLayout();
+							verifyXml = settings.isGuiVerifyXml();
+						}
+						buildFile(interfaceFolder, game, threadsMpqInterface, compressXml, compressMpqSetting,
+								buildUnprotectedToo, repairLayoutOrder, verifyLayout, verifyXml);
 						threadsMpqInterface.clearCacheExtractedMpq();
 					} catch (final InterruptedException e) {
 						Thread.currentThread().interrupt();
@@ -798,12 +820,20 @@ public final class InterfaceBuilderApp extends Application {
 	 * 		the game data with game definition
 	 * @param mpqi
 	 * 		MpqInterface with unique cache path
+	 * @param compressXml
+	 * @param compressMpq
+	 * @param buildUnprotectedToo
+	 * @param repairLayoutOrder
+	 * @param verifyLayout
+	 * @param verifyXml
 	 * @throws IOException
 	 * 		when something goes wrong
 	 * @throws InterruptedException
 	 */
 	private void buildFile(final File sourceFile, final GameData game, final MpqEditorInterface mpqi,
-			final boolean compressXml, final int compressMpq) throws IOException, InterruptedException {
+			final boolean compressXml, final int compressMpq, final boolean buildUnprotectedToo,
+			final boolean repairLayoutOrder, final boolean verifyLayout, final boolean verifyXml)
+			throws IOException, InterruptedException {
 		printLogMessageToGeneral(sourceFile.getName() + " started construction.");
 		
 		final GameDef gameDef = game.getGameDef();
@@ -900,14 +930,13 @@ public final class InterfaceBuilderApp extends Application {
 		logger.info("Compiling... " + sourceFile.getName()); //$NON-NLS-1$
 		
 		// perform checks/improvements on code
-		compileManager.compile(mod, "Terr"); //$NON-NLS-1$
+		compileManager.compile(mod, "Terr", repairLayoutOrder, verifyLayout, verifyXml); //$NON-NLS-1$
 		
 		logger.info("Building... " + sourceFile.getName()); //$NON-NLS-1$
 		
 		try {
-			final MpqEditorCompression compressMpqMode = getCompressionModeOfSetting(compressMpq);
-			mpqi.buildMpq(targetPath, sourceFile.getName(), compressXml, compressMpqMode,
-					settings.isCmdLineBuildUnprotectedToo());
+			mpqi.buildMpq(targetPath, sourceFile.getName(), compressXml, getCompressionModeOfSetting(compressMpq),
+					buildUnprotectedToo);
 			logger.info("Finished building... " + sourceFile.getName()); //$NON-NLS-1$
 		} catch (final IOException | MpqException e) {
 			logger.error("ERROR: unable to construct final Interface file.", e); //$NON-NLS-1$
@@ -1031,6 +1060,13 @@ public final class InterfaceBuilderApp extends Application {
 	 */
 	public SettingsIniInterface getIniSettings() {
 		return settings;
+	}
+	
+	/**
+	 * @return
+	 */
+	public boolean isRequiredToParseDefaultUi() {
+		return wasStartedWithParameters ? settings.isCmdLineVerifyLayout() : settings.isGuiVerifyLayout();
 	}
 	
 	/**

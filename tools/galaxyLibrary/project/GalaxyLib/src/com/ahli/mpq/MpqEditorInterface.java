@@ -143,14 +143,14 @@ public class MpqEditorInterface implements MpqInterface, DeepCopyable {
 	 * @param absolutePath
 	 * @param compressXml
 	 * @param compressMpq
-	 * @param buildBoth
+	 * @param buildUnprotectedToo
 	 * 		if compressXml, then this controls if an unprotected version is build, too
 	 * @throws IOException
 	 * @throws InterruptedException
 	 * @throws MpqException
 	 */
 	public void buildMpq(final String absolutePath, final boolean compressXml, final MpqEditorCompression compressMpq,
-			final boolean buildBoth) throws IOException, InterruptedException, MpqException {
+			final boolean buildUnprotectedToo) throws IOException, InterruptedException, MpqException {
 		// add 2 to be sure to have enough space for listfile and attributes
 		final int fileCount = 2 + getFileCountInFolder(new File(mpqCachePath));
 		
@@ -166,7 +166,7 @@ public class MpqEditorInterface implements MpqInterface, DeepCopyable {
 		
 		if (compressXml) {
 			
-			if (buildBoth) {
+			if (buildUnprotectedToo) {
 				// special unprotected file path
 				final String unprotectedAbsolutePath = getPathWithSuffix(absolutePath, "_unprtctd"); //$NON-NLS-1$
 				
@@ -186,9 +186,7 @@ public class MpqEditorInterface implements MpqInterface, DeepCopyable {
 				}
 				
 				// build unprotected file
-				newMpq(unprotectedAbsolutePath, fileCount);
-				addToMpq(unprotectedAbsolutePath, mpqCachePath, ""); //$NON-NLS-1$
-				compactMpq(unprotectedAbsolutePath);
+				buildMpqWithCompression(MpqEditorCompression.NONE, unprotectedAbsolutePath, fileCount);
 			}
 			
 			// make way for protected file

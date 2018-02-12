@@ -18,7 +18,7 @@ import java.io.IOException;
  * @author Ahli
  */
 public class CompileManager {
-	private static Logger logger = LogManager.getLogger();
+	private static final Logger logger = LogManager.getLogger();
 	
 	/**
 	 * Compiles and updates the data in the cache.
@@ -27,46 +27,56 @@ public class CompileManager {
 	 * 		the mod
 	 * @param raceId
 	 * 		the raceId used
+	 * @param repairLayoutOrder
+	 * @param verifyLayout
+	 * @param verifyXml
 	 * @throws InterruptedException
 	 */
-	public UICatalog compile(final ModData mod, final String raceId) throws InterruptedException {
+	public UICatalog compile(final ModData mod, final String raceId, final boolean repairLayoutOrder,
+			final boolean verifyLayout, final boolean verifyXml) throws InterruptedException {
 		UICatalog catalogClone = null;
 		try {
 			long startTime;
 			long executionTime;
 			
-			// startTime = System.currentTimeMillis();
-			
 			// manage descIndexData
 			final DescIndexData descIndex = mod.getDescIndexData();
-			manageOrderOfLayoutFiles(descIndex);
-			
-			// executionTime = (System.currentTimeMillis() - startTime);
-			// logger.info("DescIndex management took " + executionTime + "ms.");
-			
-			// validate catalog
-			final File descIndexFile =
-					new File(mod.getCachePath() + File.separator + mod.getDescIndexData().getDescIndexIntPath());
-			// logger.trace("processing descIndexFile: " + descIndexFile);
-			startTime = System.currentTimeMillis();
-			
-			catalogClone = getClonedUICatalog(mod);
-			
-			executionTime = (System.currentTimeMillis() - startTime);
-			logger.info("BaseUI Cloning took " + executionTime + "ms.");
-			
-			startTime = System.currentTimeMillis();
-			
-			// apply mod's UI
-			catalogClone.processDescIndex(descIndexFile, raceId);
-			catalogClone.clearParser();
-			
-			// test performance for GC
-			// mod.setUi(catalogClone);
-			// catalogClone = null;
-			
-			executionTime = (System.currentTimeMillis() - startTime);
-			logger.info("Processing DescIndex took " + executionTime + "ms.");
+			if (repairLayoutOrder) {
+				startTime = System.currentTimeMillis();
+				manageOrderOfLayoutFiles(descIndex);
+				executionTime = (System.currentTimeMillis() - startTime);
+				logger.info("Checking and repairing the Layout order took " + executionTime + "ms.");
+			}
+			if (verifyLayout) {
+				// validate catalog
+				final File descIndexFile =
+						new File(mod.getCachePath() + File.separator + mod.getDescIndexData().getDescIndexIntPath());
+				// logger.trace("processing descIndexFile: " + descIndexFile);
+				startTime = System.currentTimeMillis();
+				
+				catalogClone = getClonedUICatalog(mod);
+				
+				executionTime = (System.currentTimeMillis() - startTime);
+				logger.info("BaseUI Cloning took " + executionTime + "ms.");
+				
+				startTime = System.currentTimeMillis();
+				
+				// apply mod's UI
+				catalogClone.processDescIndex(descIndexFile, raceId);
+				catalogClone.clearParser();
+				
+				// test performance for GC
+				// mod.setUi(catalogClone);
+				// catalogClone = null;
+				
+				executionTime = (System.currentTimeMillis() - startTime);
+				logger.info("Processing DescIndex took " + executionTime + "ms.");
+			} else {
+				if (!repairLayoutOrder && verifyXml) {
+					// only verify XML and nothing else
+					// TODO verify XML
+				}
+			}
 			
 		} catch (ParserConfigurationException | SAXException | IOException | UIException e) {
 			logger.error("ERROR: encountered error while compiling.", e);
