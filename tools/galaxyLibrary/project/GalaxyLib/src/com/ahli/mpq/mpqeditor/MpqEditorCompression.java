@@ -5,7 +5,7 @@ package com.ahli.mpq.mpqeditor;
  */
 public enum MpqEditorCompression {
 	/**
-	 *
+	 * Files will not be compressed.
 	 */
 	NONE,
 	
@@ -17,5 +17,10 @@ public enum MpqEditorCompression {
 	/**
 	 * Custom compression ruleset.
 	 */
-	CUSTOM
+	CUSTOM,
+	
+	/**
+	 * Uses the existing settings files.
+	 */
+	SYSTEM_DEFAULT
 }

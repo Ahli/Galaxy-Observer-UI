@@ -921,12 +921,16 @@ public final class InterfaceBuilderApp extends Application {
 	 */
 	private MpqEditorCompression getCompressionModeOfSetting(final int compressMpqSetting) {
 		switch (compressMpqSetting) {
+			case 0:
+				return MpqEditorCompression.NONE;
 			case 1:
 				return MpqEditorCompression.BLIZZARD_SC2_HEROES;
 			case 2:
 				return MpqEditorCompression.CUSTOM;
+			case 3:
+				return MpqEditorCompression.SYSTEM_DEFAULT;
 			default:
-				return MpqEditorCompression.NONE;
+				throw new IllegalArgumentException("Unsupported mpq compression mode.");
 		}
 	}
 	

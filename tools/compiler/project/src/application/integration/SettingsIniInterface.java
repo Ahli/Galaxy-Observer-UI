@@ -218,7 +218,7 @@ public class SettingsIniInterface {
 		guiVerifyLayout = section.getBoolean(VERIFY_LAYOUT, true);
 		guiRepairLayoutOrder = section.getBoolean(REPAIR_LAYOUT_ORDER, true);
 		guiCompressXml = section.getBoolean(COMPRESS_XML, true);
-		guiCompressMpq = section.getInt(COMPRESS_MPQ, 1);
+		guiCompressMpq = section.getInt(COMPRESS_MPQ, 4);
 		guiBuildUnprotectedToo = section.getBoolean(BUILD_UNPROTECTED_TOO, false);
 		
 		section = ini.getSection(CATEGORY_INTERNAL_VARIABLES);
@@ -244,8 +244,8 @@ public class SettingsIniInterface {
 			ini = new INIConfiguration();
 		}
 		writeValuesToIni(ini);
-		try {
-			ini.write(new FileWriter(new File(settingsFilePath)));
+		try (final FileWriter fw = new FileWriter(new File(settingsFilePath))) {
+			ini.write(fw);
 		} catch (final ConfigurationException e) {
 			throw new IOException("Could not write settings.ini.", e);
 		}

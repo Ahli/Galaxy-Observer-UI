@@ -175,9 +175,9 @@ public class MpqEditorInterface implements MpqInterface, DeepCopyable {
 				if (fup.exists() && fup.isFile()) {
 					try {
 						Files.delete(fup.toPath());
-					} catch (IOException e) {
-						final String msg = "ERROR: Could not delete file " + unprotectedAbsolutePath + ".";
-						//$NON-NLS-1$
+					} catch (final IOException e) {
+						final String msg =
+								"ERROR: Could not delete file " + unprotectedAbsolutePath + ".";    //$NON-NLS-1$
 						logger.error(msg, e);
 						throw new MpqException(
 								String.format(Messages.getString("MpqInterface.CouldNotOverwriteFile"), absolutePath),
@@ -196,7 +196,7 @@ public class MpqEditorInterface implements MpqInterface, DeepCopyable {
 			if (f.exists() && f.isFile()) {
 				try {
 					Files.delete(f.toPath());
-				} catch (IOException e) {
+				} catch (final IOException e) {
 					final String msg = "ERROR: Could not delete file " + absolutePath + ".";
 					//$NON-NLS-1$
 					logger.error(msg, e);
@@ -206,26 +206,23 @@ public class MpqEditorInterface implements MpqInterface, DeepCopyable {
 				}
 			}
 			
-			// extra compression
+			// extra file compression
 			try {
 				XmlCompressor.processCache(mpqCachePath, 1);
 			} catch (ParserConfigurationException | SAXException e) {
 				logger.error(ExceptionUtils.getStackTrace(e));
 			}
 			
-			// build protected file
-			newMpq(absolutePath, fileCount);
-			addToMpq(absolutePath, mpqCachePath, ""); //$NON-NLS-1$
-			compactMpq(absolutePath);
+			buildMpqWithCompression(compressMpq, absolutePath, fileCount);
 			
 		} else {
-			// NO PROTECTION OPTION
+			// NO CONTENT COMPRESSION/PROTECTION OPTIONS
 			
 			// make way for file
 			if (targetFile.exists() && targetFile.isFile()) {
 				try {
 					Files.delete(targetFile.toPath());
-				} catch (IOException e) {
+				} catch (final IOException e) {
 					final String msg = "ERROR: Could not delete file " + absolutePath + ".";
 					//$NON-NLS-1$
 					logger.error(msg, e);
@@ -235,13 +232,31 @@ public class MpqEditorInterface implements MpqInterface, DeepCopyable {
 				}
 			}
 			
-			// build unprotected file
+			buildMpqWithCompression(compressMpq, absolutePath, fileCount);
+		}
+	}
+	
+	/**
+	 * @param compressMpq
+	 * @param absolutePath
+	 * @param fileCount
+	 * @throws IOException
+	 * @throws MpqException
+	 * @throws InterruptedException
+	 */
+	private void buildMpqWithCompression(final MpqEditorCompression compressMpq, final String absolutePath,
+			final int fileCount) throws IOException, MpqException, InterruptedException {
+		// mpq compression
+		settings.setCompression(compressMpq);
+		settings.applyCompression();
+		try {
+			// build protected file
 			newMpq(absolutePath, fileCount);
 			addToMpq(absolutePath, mpqCachePath, ""); //$NON-NLS-1$
 			compactMpq(absolutePath);
-			
+		} finally {
+			settings.restoreOriginalSettingFiles();
 		}
-		
 	}
 	
 	/**
@@ -306,7 +321,7 @@ public class MpqEditorInterface implements MpqInterface, DeepCopyable {
 		if (f.exists()) {
 			try {
 				deleteDir(f);
-			} catch (IOException e) {
+			} catch (final IOException e) {
 				if (logger.isTraceEnabled()) {
 					logger.error("clearing Cache FAILED"); //$NON-NLS-1$
 				}
@@ -563,24 +578,6 @@ public class MpqEditorInterface implements MpqInterface, DeepCopyable {
 	@Override
 	public void setCache(final File cache) {
 		mpqCachePath = cache.getPath();
-	}
-	
-	/**
-	 * @throws IOException
-	 */
-	public void backUpSettings() throws IOException {
-		settings.saveOriginalSettingFiles();
-	}
-	
-	/**
-	 *
-	 */
-	public void restoreSettings() throws IOException {
-		settings.restoreOriginalSettingFiles();
-	}
-	
-	public void applySetting(final int saveMode) {
-		settings.applySettings(saveMode);
 	}
 	
 }

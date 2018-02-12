@@ -17,6 +17,8 @@ public class SettingsGuiToolController extends SettingsAutoSaveController {
 	@FXML
 	private RadioButton compressMpqExperimentalBest;
 	@FXML
+	private RadioButton compressMpqSystemDefault;
+	@FXML
 	private CheckBox compressXml;
 	@FXML
 	private CheckBox checkLayout;
@@ -50,22 +52,31 @@ public class SettingsGuiToolController extends SettingsAutoSaveController {
 	 * @param val
 	 * 		selected mpq compression mode
 	 */
-	private void initCompressMpq(int val) {
+	private void initCompressMpq(final int val) {
 		switch (val) {
 			case 1:
 				compressMpqNone.setSelected(false);
 				compressMpqBlizz.setSelected(true);
 				compressMpqExperimentalBest.setSelected(false);
+				compressMpqSystemDefault.setSelected(false);
 				return;
 			case 2:
 				compressMpqNone.setSelected(false);
 				compressMpqBlizz.setSelected(false);
 				compressMpqExperimentalBest.setSelected(true);
+				compressMpqSystemDefault.setSelected(false);
+				return;
+			case 3:
+				compressMpqNone.setSelected(false);
+				compressMpqBlizz.setSelected(false);
+				compressMpqExperimentalBest.setSelected(false);
+				compressMpqSystemDefault.setSelected(true);
 				return;
 			default:
 				compressMpqNone.setSelected(true);
 				compressMpqBlizz.setSelected(false);
 				compressMpqExperimentalBest.setSelected(false);
+				compressMpqSystemDefault.setSelected(false);
 		}
 	}
 	
@@ -76,57 +87,65 @@ public class SettingsGuiToolController extends SettingsAutoSaveController {
 	}
 	
 	@FXML
-	public void onCheckXmlClick(ActionEvent actionEvent) {
-		boolean val = ((CheckBox) actionEvent.getSource()).selectedProperty().getValue();
+	public void onCheckXmlClick(final ActionEvent actionEvent) {
+		final boolean val = ((CheckBox) actionEvent.getSource()).selectedProperty().getValue();
 		app.getIniSettings().setGuiVerifyXml(val);
 		persistSettingsIni();
 	}
 	
 	@FXML
 	public void onCheckLayoutClick(final ActionEvent actionEvent) {
-		boolean val = ((CheckBox) actionEvent.getSource()).selectedProperty().getValue();
+		final boolean val = ((CheckBox) actionEvent.getSource()).selectedProperty().getValue();
 		app.getIniSettings().setGuiVerifyLayout(val);
 		persistSettingsIni();
 	}
 	
 	@FXML
 	public void onRepairLayoutOrderClick(final ActionEvent actionEvent) {
-		boolean val = ((CheckBox) actionEvent.getSource()).selectedProperty().getValue();
+		final boolean val = ((CheckBox) actionEvent.getSource()).selectedProperty().getValue();
 		app.getIniSettings().setGuiRepairLayoutOrder(val);
 		persistSettingsIni();
 	}
 	
 	@FXML
 	public void onCompressXmlClick(final ActionEvent actionEvent) {
-		boolean val = ((CheckBox) actionEvent.getSource()).selectedProperty().getValue();
+		final boolean val = ((CheckBox) actionEvent.getSource()).selectedProperty().getValue();
 		app.getIniSettings().setGuiCompressXml(val);
 		persistSettingsIni();
 	}
 	
 	@FXML
 	public void onCompressMpqNoneClick() {
-		app.getIniSettings().setGuiCompressMpq(0);
+		clickedCompressionMode(0);
+	}
+	
+	/**
+	 * @param i
+	 */
+	private void clickedCompressionMode(final int i) {
+		app.getIniSettings().setGuiCompressMpq(i);
 		persistSettingsIni();
-		initCompressMpq(0);
+		initCompressMpq(i);
 	}
 	
 	@FXML
 	public void onCompressMpqBlizzClick() {
-		app.getIniSettings().setGuiCompressMpq(1);
-		persistSettingsIni();
-		initCompressMpq(1);
+		clickedCompressionMode(1);
 	}
 	
 	@FXML
 	public void onCompressMpqExperimentalBestClick() {
-		app.getIniSettings().setGuiCompressMpq(2);
-		persistSettingsIni();
-		initCompressMpq(2);
+		clickedCompressionMode(2);
+	}
+	
+	@FXML
+	public void onCompressMpqSystemDefaultClick() {
+		clickedCompressionMode(3);
 	}
 	
 	@FXML
 	public void onBuildUnprotectedTooClick(final ActionEvent actionEvent) {
-		boolean val = ((CheckBox) actionEvent.getSource()).selectedProperty().getValue();
+		final boolean val = ((CheckBox) actionEvent.getSource()).selectedProperty().getValue();
 		app.getIniSettings().setGuiBuildUnprotectedToo(val);
 		persistSettingsIni();
 	}
