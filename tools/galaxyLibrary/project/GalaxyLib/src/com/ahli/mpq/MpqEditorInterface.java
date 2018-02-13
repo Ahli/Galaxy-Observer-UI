@@ -2,6 +2,7 @@ package com.ahli.mpq;
 
 import com.ahli.mpq.i18n.Messages;
 import com.ahli.mpq.mpqeditor.MpqEditorCompression;
+import com.ahli.mpq.mpqeditor.MpqEditorCompressionRule;
 import com.ahli.mpq.mpqeditor.MpqEditorSettingsInterface;
 import com.ahli.util.DeepCopyable;
 import org.apache.commons.lang3.exception.ExceptionUtils;
@@ -578,4 +579,22 @@ public class MpqEditorInterface implements MpqInterface, DeepCopyable {
 		mpqCachePath = cache.getPath();
 	}
 	
+	/**
+	 * Returns the custom ruleset for the file attributes and compression.
+	 *
+	 * @return
+	 */
+	public MpqEditorCompressionRule[] getCustomRuleSet() {
+		return settings.getCustomRuleSet();
+	}
+	
+	/**
+	 * Sets a custom ruleset for the file attributes and compression. To use it, the archive needs to use
+	 * MpqEditorCompression.CUSTOM.
+	 *
+	 * @param ruleSet
+	 */
+	public void setCustomRuleSet(final MpqEditorCompressionRule[] ruleSet) {
+		settings.setCustomRuleSet(ruleSet);
+	}
 }
