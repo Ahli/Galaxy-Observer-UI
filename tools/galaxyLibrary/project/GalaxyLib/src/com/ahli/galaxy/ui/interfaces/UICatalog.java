@@ -5,7 +5,6 @@ import com.ahli.galaxy.ui.UIElement;
 import com.ahli.galaxy.ui.UITemplate;
 import com.ahli.galaxy.ui.exception.UIException;
 import com.ahli.util.DeepCopyable;
-import org.w3c.dom.DOMException;
 import org.xml.sax.SAXException;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -51,7 +50,6 @@ public interface UICatalog extends DeepCopyable {
 	 * @throws ParserConfigurationException
 	 * @throws UIException
 	 * @throws InterruptedException
-	 * @throws DOMException
 	 */
 	void processLayoutFile(File f, String raceId, boolean isDevLayout)
 			throws SAXException, IOException, ParserConfigurationException, UIException, InterruptedException;
