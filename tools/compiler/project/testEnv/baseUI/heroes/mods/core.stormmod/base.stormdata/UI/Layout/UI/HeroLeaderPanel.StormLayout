@@ -8,6 +8,7 @@
     <Constant name="RenderPriorityLevel_2" val="525"/>
     <Constant name="RenderPriorityLevel_3" val="530"/>
     <Constant name="RenderPriorityLevel_4" val="535"/>
+    <Constant name="RenderPriorityLevel_5" val="540"/>
 
     <Constant name="OnFireColor_Blue" val="2167f5"/>
     <Constant name="OnFireColor_Red" val="c2282f"/>
@@ -1250,13 +1251,58 @@
         <Height val="68"/>
         <Batch val="False"/>
 
-        <Frame type="BattleUserVoiceFrame" name="VoiceFrame" template="BattleUserVoiceFrame/BattleUserVoiceFrame_AdjustableSpeaker_Template" requiredtoload="IS_VOICECHAT_ENABLED">
+        <Frame type="BattleUserVoiceFrame" name="VoiceFrame" template="BattleUserVoiceFrame/BattleUserVoiceFrame_AdjustableSpeaker_Template">
             <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
             <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
             <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
 
             <PresenceId val="{$ancestor[@oftype=HeroLeaderPanelPlayerFrame]/@PresenceId}"/>
             <ContextMenu val="$ancestor[@type=TabControl]/PlayerContextMenu"/>
+
+            <Frame type="BattleUserVoiceFrame" name="SpeakingIndicator">
+                <StateGroup name="IconTexture">
+                    <State name="Self">
+                        <When type="StateGroup" Muted="NotMuted"/>
+                        <When type="Property" IsLocalUser="true"/>
+                        <When type="Property" frame="SpeakerPowerBar/FillImageContainer/FillImage_Self" enabled="True"/>
+                        <Action type="SetProperty" frame="Icon" Texture="@UI/VoiceChat_Voice_Player"/>
+                    </State>
+                    <State name="Other">
+                        <When type="StateGroup" Muted="NotMuted"/>
+                        <When type="Property" IsLocalUser="false"/>
+                        <Action type="SetProperty" frame="Icon" Texture="@UI/VoiceChat_Voice_Party"/>
+                    </State>
+                    <State name="SelfMuted">
+                        <When type="StateGroup" Muted="NotMuted" operator="NotEqual"/>
+                        <When type="Property" IsLocalUser="true"/>
+                        <Action type="SetProperty" frame="Icon" Texture="@UI/VoiceChat_Voice_Player_Muted"/>
+                    </State>
+                    <State name="OtherMuted">
+                        <When type="StateGroup" Muted="NotMuted" operator="NotEqual"/>
+                        <When type="Property" IsLocalUser="false"/>
+                        <Action type="SetProperty" frame="Icon" texture="@UI/VoiceChat_Voice_Party_Muted"/>
+                    </State>
+                </StateGroup>
+
+                <StateGroup name="ColorStates">
+                    <State name="Team">
+                        <When type="Property" ChannelType="Team"/>
+                        <When type="Property" frame="$ancestor[@type=HeroLeaderPanelPlayerFrame]/PlayerHeroIconFrame" HasVoiceSilencePenalty="false"/>
+                    </State>
+                    <State name="Party">
+                        <When type="Property" ChannelType="Party"/>
+                        <When type="Property" frame="$ancestor[@type=HeroLeaderPanelPlayerFrame]/PlayerHeroIconFrame" HasVoiceSilencePenalty="false"/>
+                    </State>
+                    <State name="VoiceSilence">
+                        <When type="Property" frame="$ancestor[@type=HeroLeaderPanelPlayerFrame]/PlayerHeroIconFrame" HasVoiceSilencePenalty="true"/>
+                        <When type="Property" ChannelType="Team"/>
+                        <Action type="SetProperty" frame="Icon" Color="ff0000"/>
+                        <Action type="SetProperty" AcceptsMouse="false"/>
+                        <Action type="SetProperty" AcceptsMouseTooltip="true"/>
+                        <Action type="SetProperty" Tooltip="@UI/BattleUser/VoiceSilenced"/>
+                    </State>
+                </StateGroup>
+            </Frame>
         </Frame>
 
         <Frame type="Image" name="Background">
@@ -1301,26 +1347,31 @@
                 <RenderPriority val="#RenderPriorityLevel_1"/>
             </Frame>
 
-            <Frame type="Image" name="SilencedIcon">
+            <Frame type="Image" name="SilencedIcon" template="StandardTemplates/TooltippedSilencedIconTemplate">
                 <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
                 <Anchor side="Right" relative="$parent" pos="Max" offset="-6"/>
                 <Width val="27"/>
                 <Height val="24"/>
-                <Visible val="False"/>
                 <IgnoreParentColor val="true"/>
                 <RenderPriority val="#RenderPriorityLevel_2"/>
 
-                <Texture val="@UI/Storm_UI_PortraitBorder_SilencePenaltyIcon"/>
                 <AcceptsMouseTooltip val="True"/>
                 <Tooltip val="@UI/BattleUser/Silenced"/>
 
-                <Animation name="SilencePenalty">
-                    <Event event="SilencedPenaltyOn" action="Play" frame="$parent"/>
-                    <Event event="SilencedPenaltyOff" action="Stop" frame="$parent"/>
-                    <Controller type="Visibility" end="Pause">
-                        <Key type="Bool" time="0" value="true"/>
-                    </Controller>
-                </Animation>
+                <StateGroup name="SilencedStates">
+                    <State name="ChatSilenced">
+                        <When type="Property" frame="$parent" HasSilencePenalty="true"/>
+                        <When type="Property" frame="$parent" HasVoiceSilencePenalty="false"/>
+                    </State>
+                    <State name="VoiceSilenced">
+                        <When type="Property" frame="$parent" HasSilencePenalty="false"/>
+                        <When type="Property" frame="$parent" HasVoiceSilencePenalty="true"/>
+                    </State>
+                    <State name="ChatAndVoiceSilenced">
+                        <When type="Property" frame="$parent" HasSilencePenalty="true"/>
+                        <When type="Property" frame="$parent" HasVoiceSilencePenalty="true"/>
+                    </State>
+                </StateGroup>
             </Frame>
         </Frame>
 
@@ -1418,39 +1469,6 @@
                     <IgnoreParentColor val="True"/>
                     <Anchor relative="$parent"/>
                     <TextureType val="Normal"/>
-                </Frame>
-            </Frame>
-        </Frame>
-
-        <Frame type="PlayerScoreValueFrame" name="JunkratBombCarriedFrame">
-            <Anchor relative="$parent/PlayerHeroIconFrame"/>
-            <Frame type="ScoreValueImageArrayFrame" name="ScoreValueFrame0">
-                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
-                <Anchor side="Top" relative="$parent" pos="Min" offset="8"/>
-                <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
-                <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
-                <ShowForSelf val="true"/>
-                <ShowForAlly val="true"/>
-                <ShowForEnemy val="false"/>
-                <ScoreValueLink val="JunkratTargetBombsCarried"/>
-                <RenderPriority val="800"/>
-                <Frame type="Image" name="Image0">
-                    <Anchor side="Left" relative="$parent" pos="Min" offset="-6"/>
-                    <Anchor side="Bottom" relative="$parent" pos="Max" offset="6"/>
-                    <Height val="32"/>
-                    <Width val="32"/>
-                </Frame>
-                <Frame type="Image" name="Image1">
-                    <Anchor side="Left" relative="$parent/Image0" pos="Max" offset="0"/>
-                    <Anchor side="Top" relative="$parent/Image0" pos="Min" offset="0"/>
-                    <Height val="32"/>
-                    <Width val="32"/>
-                </Frame>
-                <Frame type="Image" name="Image2">
-                    <Anchor side="Left" relative="$parent/Image1" pos="Max" offset="0"/>
-                    <Anchor side="Top" relative="$parent/Image0" pos="Min" offset="0"/>
-                    <Height val="32"/>
-                    <Width val="32"/>
                 </Frame>
             </Frame>
         </Frame>
@@ -1945,7 +1963,7 @@
                                 <Action type="SetProperty" frame="$parent/HeroSelectedTalentTreeFrame/TalentTreeIcon4/IconBorderImage" Visible="true"/>
                             </State>
                             <State name="OnCooldown">
-                                <When type="Property" frame="AbilIcon/CooldownImage" Visible="true"/>
+                                <When type="Property" frame="AbilIcon/CooldownBar" Visible="true"/>
                                 <Action type="SetProperty" frame="$parent/HeroSelectedTalentTreeFrame/TalentTreeIcon4/CooldownBorderImage" Visible="true"/>
                                 <Action type="SetProperty" frame="$parent/HeroSelectedTalentTreeFrame/TalentTreeIcon4/IconBorderImage" Visible="False"/>
                             </State>
@@ -1968,16 +1986,45 @@
                                 <RenderPriority val="#RenderPriorityLevel_1"/>
                             </Frame>
 
-                            <Frame type="Image" name="CooldownImage">
+                            <Frame type="ProgressBar" name="CooldownBar">
                                 <Anchor relative="$parent/IconImage"/>
-                                <Texture val="@UI/HUD_BTN_Ability_Cooldown_Anim"/>
-                                <TextureCoords top="0.0" left="0.0" bottom="0.2" right="0.1"/>
-                                <Animating val="True"/>
-                                <ManagedAnim val="False"/>
-                                <AnimColumns val="10"/>
-                                <AnimCount val="50"/>
-                                <Alpha val="192"/>
                                 <RenderPriority val="#RenderPriorityLevel_3"/>
+                                <Alpha val="220"/>
+
+                                <MinValue val="0"/>
+                                <MaxValue val="100"/>
+                                <Circular val="true"/>
+                                <CircularStart val="0"/>
+                                <CircularEndOffset val="360"/>
+
+                                <Frame type="Frame" name="FillImageContainer">
+                                    <Anchor relative="$parent"/>
+
+                                    <Frame type="Image" name="FillImage">
+                                        <Debugging val="True"/>
+                                        <Anchor relative="$parent"/>
+                                        <RenderPriority val="#RenderPriorityLevel_3"/>
+
+                                        <LayerCount val="2"/>
+                                        <LayerColor val="000000" layer="0"/>
+                                        <TextureType val="None" layer="0"/>
+
+                                        <Texture val="@UI/Storm_UI_GenFX_BallAlpha" layer="1"/>
+                                        <TextureType val="Circular" layer="1"/>
+                                        <TextureCoords top=".05" bottom=".95" left =".05" right=".95"/>
+                                        <LayerColor val="00BBFF" layer="1"/>
+
+                                        <ImageMaskTexture val="@UI/HUD_BTN_BG_Ability_AlphaMask"/>
+                                    </Frame>
+                                </Frame>
+
+                                <Frame type="Image" name="EndCapImage">
+                                    <Anchor relative="$parent"/>
+                                    <RenderPriority val="#RenderPriorityLevel_4"/>
+
+                                    <Texture val="@UI/HUD_BTN_Ability_Cooldown_Endcap" layer="0"/>
+                                    <LayerColor val="00BBFF" layer="0"/>
+                                </Frame>
                             </Frame>
 
                             <Frame type="Label" name="CooldownLabel">
@@ -1986,7 +2033,7 @@
                                 <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
                                 <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
                                 <Style val="Storm_LeaderTalentCooldown"/>
-                                <RenderPriority val="#RenderPriorityLevel_4"/>
+                                <RenderPriority val="#RenderPriorityLevel_5"/>
                             </Frame>
                         </Frame>
                     </Frame>
@@ -2537,20 +2584,20 @@
 
                     <!-- "Button" So we have normal and hover image. The button does nothing. -->
                     <Frame type="Button" name="ButtonQuest">
-                        <Anchor side="Top" relative="$parent/TalentTierLabel0" pos="Min" offset="6"/>
-                        <Anchor side="Left" relative="$parent/TalentTierLabel0" pos="Max" offset="-120"/>
-                        <Width val="32"/>
-                        <Height val="32"/>
+                        <Anchor side="Top" relative="$parent/TalentTierLabel0" pos="Min" offset="-2"/>
+                        <Anchor side="Left" relative="$parent/TalentTierLabel0" pos="Max" offset="-128"/>
+                        <Width val="48"/>
+                        <Height val="48"/>
                         <Toggleable val="false"/>
 
                         <Frame type="Image" name="NormalImage">
                             <Anchor relative="$parent"/>
-                            <Texture val="@@UI/Storm_UI_ScoreScreen_Icon_Quest"/>
+                            <Texture val="@@UI/HUD_KillLog_QuestIcon"/>
                         </Frame>
 
                         <Frame type="Image" name="HoverImage">
                             <Anchor relative="$parent"/>
-                            <Texture val="@@UI/Storm_UI_ScoreScreen_Icon_Quest_Hover"/> 
+                            <Texture val="@@UI/HUD_KillLog_QuestIcon"/>
                         </Frame>
                     </Frame>
 
@@ -2722,9 +2769,9 @@
             </Frame>
 
             <!-- Voice Channel selector -->
-            <Frame type="Frame" name="ChannelSelector" template="VoiceChannelSelector/VoiceChannelSelectorTemplate" requiredtoload="IS_VOICECHAT_ENABLED">
-                <Anchor side="Top" relative="$parent" pos="Min" offset="30"/>
-                <Anchor side="Left" relative="$parent" pos="Min" offset="64"/>
+            <Frame type="Frame" name="ChannelSelector" template="VoiceChannelSelector/VoiceChannelSelectorTemplate">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="17"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="59"/>
             </Frame>
 
             <!-- BLUE TEAM -->

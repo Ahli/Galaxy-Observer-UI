@@ -11,13 +11,20 @@
         <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
         
         <Visible val="false"/>
+
+        <Frame type="UnitStatusColor" name="Team1GlowColors">
+            <ColorStyle val="MapMechanicFX"/>
+            <ForcedTeam val="0"/>
+        </Frame>
+        
+        <Frame type="UnitStatusColor" name="Team2GlowColors">
+            <ColorStyle val="MapMechanicFX"/>
+            <ForcedTeam val="1"/>
+        </Frame>
         
         <Frame type="Frame" name="Team1SoulFrame">
             <Anchor relative="$parent"/>
-
-            <Frame type="Image" name="Team1BackgroundBlue" template="StandardTemplates/RemoveThisFrameTemplate"/>
-            <Frame type="Image" name="Team1BackgroundRed" template="StandardTemplates/RemoveThisFrameTemplate"/>
-            
+    
             <Frame type="Image" name="Background">
                 <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
                 <Anchor side="Right" relative="$parent" pos="Mid" offset="1"/>
@@ -27,9 +34,6 @@
                 <LightAdjustColor val="#ColorWhite"/>
                 <DarkAdjustColor val="{$GameUI/TeamOrderColors/@Color}"/>
             </Frame>
-            
-            <Frame type="Image" name="SoulIconBlue" template="StandardTemplates/RemoveThisFrameTemplate"/>
-            <Frame type="Image" name="SoulIconRed" template="StandardTemplates/RemoveThisFrameTemplate"/>
 
             <Frame type="Image" name="SoulIconFrameTeam1">
                 <Anchor side="Bottom" relative="$parent/Background" pos="Max" offset="0"/>
@@ -71,13 +75,166 @@
                 <DarkAdjustColor val="{$GameUI/TeamOrderColors/@Color}"/>
                 <GlowColor val="{$GameUI/TeamOrderColors/@Color}"/>
             </Frame>
+            
+            <!-- This frame receives from triggers:
+                    * animation event: "TurninReadyAnim" when coin is picked up that allows for full turn in
+                    * stategroup: TurninReady; states: IsReady, NotReady -->
+            <Frame type="Frame" name="MapMechanicGlowContainer">
+                <Anchor side="Top" relative="GemGlow" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="GemGlow" pos="Min" offset="0"/>
+                <Anchor side="Bottom" relative="GemGlow" pos="Max" offset="0"/>
+                <Anchor side="Right" relative="CounterGlow" pos="Max" offset="0"/>
+                
+                <Visible val="False"/>
+                <RenderPriority val="500"/>
+                
+                <Frame type="Image" name="GemGlow">
+                    <Anchor side="Top" relative="$parent/$parent/SoulIconFrameTeam1" pos="Mid" offset="5"/>
+                    <Anchor side="Left" relative="$parent/$parent/SoulIconFrameTeam1" pos="Mid" offset="1"/>
+                    <Anchor side="Bottom" relative="$parent/$parent/SoulIconFrameTeam1" pos="Mid" offset="5"/>
+                    <Anchor side="Right" relative="$parent/$parent/SoulIconFrameTeam1" pos="Mid" offset="1"/>
+                    
+                    <Texture val="@UI/HUD_MapMechanic_SpiderQueen_TurninGlow_gemglow"/>
+                    <ColorAdjustMode val="Colorize"/>
+                    <LightAdjustColor val="{$parent/$parent/$parent/Team1GlowColors/@Color}"/>
+                    <DarkAdjustColor val="{$parent/$parent/$parent/Team1GlowColors/@Color}"/>
+                </Frame>
+                
+                <Frame type="Image" name="CounterGlow">
+                    <Anchor side="Left" relative="$parent/$parent/Background" pos="Min" offset="5"/>
+                    <Anchor side="Bottom" relative="$parent/$parent/Background" pos="Max" offset="-10"/>
+                    <Anchor side="Right" relative="$parent/$parent/Background" pos="Max" offset="0"/>
+                
+                    <Texture val="@UI/HUD_MapMechanic_SpiderQueen_TurninGlow_backglow"/>
+                    <ColorAdjustMode val="Colorize"/>
+                    <LightAdjustColor val="{$parent/$parent/$parent/Team1GlowColors/@Color}"/>
+                    <DarkAdjustColor val="{$parent/$parent/$parent/Team1GlowColors/@Color}"/>
+                </Frame>
+
+                <Animation name="Pulse">
+                    <Event event="OnShown" action="Reset,Play"/>
+                    <Event event="OnHidden" action="Reset, Stop"/>
+
+                    <Controller type="Fade" end="Loop">
+                        <Key type="Curve" time="0.25" value="255" inout="Linear"/>
+                        <Key type="Curve" time="1.25" value="100" inout="Slow,Linear"/>
+                        <Key type="Curve" time="2.25" value="255" inout="Linear"/>
+                    </Controller>
+                </Animation>
+            </Frame>
+
+            <Frame type="Frame" name="MapMechanicTurninEffectGem">
+                <Anchor side="Top" relative="$parent/SoulIconFrameTeam1" pos="Mid" offset="0"/>
+                <Anchor side="Bottom" relative="$parent/SoulIconFrameTeam1" pos="Mid" offset="0"/>
+                <Anchor side="Left" relative="$parent/SoulIconFrameTeam1" pos="Mid" offset="0"/>
+                <Anchor side="Right" relative="$parent/SoulIconFrameTeam1" pos="Mid" offset="0"/>
+                <Width val="312"/>
+                <Height val="288"/>
+                <Visible val="False"/>
+
+                <Frame type="Image" name="FrameImage">
+                    <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+                    <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+                    <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+                    <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+                    <Texture val="@UI/HUD_MapMechanic_SpiderQueen_Soul_Bar_Blue"/>
+                    <Alpha val="0"/>
+                    <BlendMode val="Add"/>
+
+                    <Animation name="FadeIn">
+                        <Event event="OnShown" action="Reset,Play" frame="$parent"/>
+
+                        <Controller type="Anchor" end="Pause" side="Left" relative="true">
+                            <Key type="Curve" time="0.1" value="-118" inout="Fast"/>
+                            <Key type="Curve" time="0.25" value="-52" inout="Slow"/>
+                        </Controller>
+
+                        <Controller type="Anchor" end="Pause" side="Right" relative="true">
+                            <Key type="Curve" time="0.1" value="118" inout="Fast"/>
+                            <Key type="Curve" time="0.25" value="52" inout="Slow"/>
+                        </Controller>
+
+                        <Controller type="Anchor" end="Pause" side="Top" relative="true">
+                            <Key type="Curve" time="0.1" value="-112" inout="Fast"/>
+                            <Key type="Curve" time="0.25" value="-48" inout="Slow"/>
+                        </Controller>
+
+                        <Controller type="Anchor" end="Pause" side="Bottom" relative="true">
+                            <Key type="Curve" time="0.1" value="112" inout="Fast"/>
+                            <Key type="Curve" time="0.25" value="48" inout="Slow"/>
+                        </Controller>
+
+                        <Controller type="Fade" end="Pause">
+                            <Key type="Curve" time="0.12" value="0" inout="Linear"/>
+                            <Key type="Curve" time="0.25" value="255" inout="Slow,Linear"/>
+                            <Key type="Curve" time="0.45" value="0" inout="Linear"/>
+                        </Controller>
+                    </Animation>
+                </Frame>
+
+                <Frame type="Image" name="GemImage">
+                    <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+                    <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+                    <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+                    <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+                    <Texture val="@UI/HUD_MapMechanic_SpiderQueen_Soul_Bar_Red"/>
+                    <Alpha val="0"/>
+                    <BlendMode val="Add"/>
+
+                    <ColorAdjustMode val="Colorize"/>
+                    <LightAdjustColor val="#ColorWhite"/>
+                    <DarkAdjustColor val="{$parent/$parent/$parent/Team1GlowColors/@Color}"/>
+
+                    <Animation name="FadeIn">
+                        <Event event="OnShown" action="Reset,Play" frame="$parent"/>
+
+                        <Controller type="Anchor" end="Pause" side="Left" relative="true">
+                            <Key type="Curve" time="0.1" value="-118" inout="Fast"/>
+                            <Key type="Curve" time="0.25" value="-52" inout="Slow"/>
+                        </Controller>
+
+                        <Controller type="Anchor" end="Pause" side="Right" relative="true">
+                            <Key type="Curve" time="0.1" value="118" inout="Fast"/>
+                            <Key type="Curve" time="0.25" value="52" inout="Slow"/>
+                        </Controller>
+
+                        <Controller type="Anchor" end="Pause" side="Top" relative="true">
+                            <Key type="Curve" time="0.1" value="-112" inout="Fast"/>
+                            <Key type="Curve" time="0.25" value="-48" inout="Slow"/>
+                        </Controller>
+
+                        <Controller type="Anchor" end="Pause" side="Bottom" relative="true">
+                            <Key type="Curve" time="0.1" value="112" inout="Fast"/>
+                            <Key type="Curve" time="0.25" value="48" inout="Slow"/>
+                        </Controller>
+
+                        <Controller type="Fade" end="Pause">
+                            <Key type="Curve" time="0.1" value="0" inout="Linear"/>
+                            <Key type="Curve" time="0.20" value="255" inout="Slow,Linear"/>
+                            <Key type="Curve" time="0.40" value="0" inout="Linear"/>
+                        </Controller>
+                    </Animation>
+                </Frame>
+                
+            </Frame>
+
+            <StateGroup name="TurninReady">
+                <State name="IsReady">
+                    <When type="AnimationState" frame="MapMechanicGlowContainer" TurninReady="IsReady"/>
+                    <Action type="SetProperty" frame="MapMechanicGlowContainer" Visible="True"/>
+                    <Action type="SetProperty" frame="MapMechanicTurninEffectGem" Visible="True"/>
+                </State>
+
+                <State name="NotReady">
+                    <When type="AnimationState" frame="MapMechanicGlowContainer" TurninReady="NotReady"/>
+                    <Action type="SetProperty" frame="MapMechanicGlowContainer" Visible="False"/>
+                    <Action type="SetProperty" frame="MapMechanicTurninEffectGem" Visible="False"/>
+                </State>
+            </StateGroup>
         </Frame>
         
         <Frame type="Frame" name="Team2SoulFrame">
             <Anchor relative="$parent"/>
-            
-            <Frame type="Image" name="Team2BackgroundRed" template="StandardTemplates/RemoveThisFrameTemplate"/>
-            <Frame type="Image" name="Team2BackgroundBlue" template="StandardTemplates/RemoveThisFrameTemplate"/>
 
             <Frame type="Image" name="Background">
                 <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
@@ -89,9 +246,6 @@
                 <LightAdjustColor val="#ColorWhite"/>
                 <DarkAdjustColor val="{$GameUI/TeamChaosColors/@Color}"/>
             </Frame>
-            
-            <Frame type="Image" name="SoulIconBlue"  template="StandardTemplates/RemoveThisFrameTemplate"/>
-            <Frame type="Image" name="SoulIconRed"  template="StandardTemplates/RemoveThisFrameTemplate"/>
 
             <Frame type="Image" name="SoulIconFrameTeam2">
                 <Anchor side="Bottom" relative="$parent/Background" pos="Max" offset="0"/>
@@ -135,6 +289,161 @@
                 <DarkAdjustColor val="{$GameUI/TeamChaosColors/@Color}"/>
                 <GlowColor val="{$GameUI/TeamChaosColors/@Color}"/>
             </Frame>
+            
+            <Frame type="Frame" name="MapMechanicGlowContainer">
+                <Anchor side="Top" relative="GemGlow" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="CounterGlow" pos="Min" offset="0"/>
+                <Anchor side="Bottom" relative="GemGlow" pos="Max" offset="0"/>
+                <Anchor side="Right" relative="GemGlow" pos="Max" offset="0"/>
+                
+                <Visible val="False"/>
+                <RenderPriority val="500"/>
+                
+                <Frame type="Image" name="GemGlow">
+                    <Anchor side="Top" relative="$parent/$parent/SoulIconFrameTeam2" pos="Mid" offset="5"/>
+                    <Anchor side="Left" relative="$parent/$parent/SoulIconFrameTeam2" pos="Mid" offset="-1"/>
+                    <Anchor side="Bottom" relative="$parent/$parent/SoulIconFrameTeam2" pos="Mid" offset="5"/>
+                    <Anchor side="Right" relative="$parent/$parent/SoulIconFrameTeam2" pos="Mid" offset="-1"/>
+                    
+                    <Texture val="@UI/HUD_MapMechanic_SpiderQueen_TurninGlow_gemglow"/>
+                    <TextureCoords top="0.0" left="1.0" bottom="1.0" right="0.0"/>
+                    <ColorAdjustMode val="Colorize"/>
+                    <LightAdjustColor val="{$parent/$parent/$parent/Team2GlowColors/@Color}"/>
+                    <DarkAdjustColor val="{$parent/$parent/$parent/Team2GlowColors/@Color}"/>
+                </Frame>
+                
+                <Frame type="Image" name="CounterGlow">
+                    <Anchor side="Left" relative="$parent/$parent/Background" pos="Min" offset="0"/>
+                    <Anchor side="Bottom" relative="$parent/$parent/Background" pos="Max" offset="-10"/>
+                    <Anchor side="Right" relative="$parent/$parent/Background" pos="Max" offset="-5"/>
+                
+                    <Texture val="@UI/HUD_MapMechanic_SpiderQueen_TurninGlow_backglow"/>
+                    <ColorAdjustMode val="Colorize"/>
+                    <LightAdjustColor val="{$parent/$parent/$parent/Team2GlowColors/@Color}"/>
+                    <DarkAdjustColor val="{$parent/$parent/$parent/Team2GlowColors/@Color}"/>
+                </Frame>
+
+                <Animation name="Pulse">
+                    <Event event="OnShown" action="Reset,Play"/>
+                    <Event event="OnHidden" action="Reset, Stop"/>
+
+                    <Controller type="Fade" end="Loop">
+                        <Key type="Curve" time="0.25" value="255" inout="Linear"/>
+                        <Key type="Curve" time="1.25" value="100" inout="Slow,Linear"/>
+                        <Key type="Curve" time="2.25" value="255" inout="Linear"/>
+                    </Controller>
+                </Animation>
+            </Frame>
+
+            <Frame type="Frame" name="MapMechanicTurninEffectGem">
+                <Anchor side="Top" relative="$parent/SoulIconFrameTeam2" pos="Mid" offset="0"/>
+                <Anchor side="Bottom" relative="$parent/SoulIconFrameTeam2" pos="Mid" offset="0"/>
+                <Anchor side="Left" relative="$parent/SoulIconFrameTeam2" pos="Mid" offset="0"/>
+                <Anchor side="Right" relative="$parent/SoulIconFrameTeam2" pos="Mid" offset="0"/>
+                <Width val="312"/>
+                <Height val="288"/>
+                <Visible val="False"/>
+
+                <Frame type="Image" name="FrameImage">
+                    <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+                    <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+                    <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+                    <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+                    <Texture val="@UI/HUD_MapMechanic_SpiderQueen_Soul_Bar_Blue"/>
+                    <TextureCoords top="0.0" left="1.0" bottom="1.0" right="0.0"/>
+                    <Alpha val="0"/>
+                    <BlendMode val="Add"/>
+
+                    <Animation name="FadeIn">
+                        <Event event="OnShown" action="Reset,Play" frame="$parent"/>
+
+                        <Controller type="Anchor" end="Pause" side="Left" relative="true">
+                            <Key type="Curve" time="0.1" value="-118" inout="Fast"/>
+                            <Key type="Curve" time="0.25" value="-52" inout="Slow"/>
+                        </Controller>
+
+                        <Controller type="Anchor" end="Pause" side="Right" relative="true">
+                            <Key type="Curve" time="0.1" value="118" inout="Fast"/>
+                            <Key type="Curve" time="0.25" value="52" inout="Slow"/>
+                        </Controller>
+
+                        <Controller type="Anchor" end="Pause" side="Top" relative="true">
+                            <Key type="Curve" time="0.1" value="-112" inout="Fast"/>
+                            <Key type="Curve" time="0.25" value="-48" inout="Slow"/>
+                        </Controller>
+
+                        <Controller type="Anchor" end="Pause" side="Bottom" relative="true">
+                            <Key type="Curve" time="0.1" value="112" inout="Fast"/>
+                            <Key type="Curve" time="0.25" value="48" inout="Slow"/>
+                        </Controller>
+
+                        <Controller type="Fade" end="Pause">
+                            <Key type="Curve" time="0.12" value="0" inout="Linear"/>
+                            <Key type="Curve" time="0.25" value="255" inout="Slow,Linear"/>
+                            <Key type="Curve" time="0.45" value="0" inout="Linear"/>
+                        </Controller>
+                    </Animation>
+                </Frame>
+
+                <Frame type="Image" name="GemImage">
+                    <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+                    <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+                    <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+                    <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+                    <Texture val="@UI/HUD_MapMechanic_SpiderQueen_Soul_Bar_Red"/>
+                    <TextureCoords top="0.0" left="1.0" bottom="1.0" right="0.0"/>
+                    <Alpha val="0"/>
+                    <BlendMode val="Add"/>
+
+                    <ColorAdjustMode val="Colorize"/>
+                    <LightAdjustColor val="#ColorWhite"/>
+                    <DarkAdjustColor val="{$parent/$parent/$parent/Team2GlowColors/@Color}"/>
+
+                    <Animation name="FadeIn">
+                        <Event event="OnShown" action="Reset,Play" frame="$parent"/>
+
+                        <Controller type="Anchor" end="Pause" side="Left" relative="true">
+                            <Key type="Curve" time="0.1" value="-118" inout="Fast"/>
+                            <Key type="Curve" time="0.25" value="-52" inout="Slow"/>
+                        </Controller>
+
+                        <Controller type="Anchor" end="Pause" side="Right" relative="true">
+                            <Key type="Curve" time="0.1" value="118" inout="Fast"/>
+                            <Key type="Curve" time="0.25" value="52" inout="Slow"/>
+                        </Controller>
+
+                        <Controller type="Anchor" end="Pause" side="Top" relative="true">
+                            <Key type="Curve" time="0.1" value="-112" inout="Fast"/>
+                            <Key type="Curve" time="0.25" value="-48" inout="Slow"/>
+                        </Controller>
+
+                        <Controller type="Anchor" end="Pause" side="Bottom" relative="true">
+                            <Key type="Curve" time="0.1" value="112" inout="Fast"/>
+                            <Key type="Curve" time="0.25" value="48" inout="Slow"/>
+                        </Controller>
+
+                        <Controller type="Fade" end="Pause">
+                            <Key type="Curve" time="0.1" value="0" inout="Linear"/>
+                            <Key type="Curve" time="0.20" value="255" inout="Slow,Linear"/>
+                            <Key type="Curve" time="0.40" value="0" inout="Linear"/>
+                        </Controller>
+                    </Animation>
+                </Frame>
+            </Frame>
+
+            <StateGroup name="TurninReady">
+                <State name="IsReady">
+                    <When type="AnimationState" frame="MapMechanicGlowContainer" TurninReady="IsReady"/>
+                    <Action type="SetProperty" frame="MapMechanicGlowContainer" Visible="True"/>
+                    <Action type="SetProperty" frame="MapMechanicTurninEffectGem" Visible="True"/>
+                </State>
+
+                <State name="NotReady">
+                    <When type="AnimationState" frame="MapMechanicGlowContainer" TurninReady="NotReady"/>
+                    <Action type="SetProperty" frame="MapMechanicGlowContainer" Visible="False"/>
+                    <Action type="SetProperty" frame="MapMechanicTurninEffectGem" Visible="False"/>
+                </State>
+            </StateGroup>
         </Frame>
 
         <Frame type="Frame" name="AuraFrame">

@@ -38,8 +38,8 @@
             <Anchor side="Top" relative="$parent/NameLabel" pos="Mid" offset="0"/>
             <Anchor side="Bottom" relative="$parent/NameLabel" pos="Mid" offset="0"/>
             <Anchor side="Right" relative="$parent/NameLabel" pos="Min" offset="10"/>
-            <Width val="36"/>
-            <Height val="36"/>
+            <Width val="32"/>
+            <Height val="32"/>
             <Texture val="@UI/Storm_Checkbox_CheckMark"/>
             <Visible val="False"/>
         </Frame>
@@ -48,9 +48,8 @@
             <Anchor side="Top" relative="$parent" pos="Mid" offset="1"/>
             <Anchor side="Bottom" relative="$parent" pos="Mid" offset="1"/>
             <Anchor side="Left" relative="$parent" pos="Min" offset="15"/>
-            <Visible val="False"/>
-            <Width val="36"/>
-            <Height val="36"/>
+            <Width val="32"/>
+            <Height val="32"/>
             <AcceptsMouse val="true"/>
         </Frame>
 
@@ -92,7 +91,7 @@
         </Frame>
 
         <!-- Managing channel state for VoiceChannelFrame -->
-        <StateGroup name="CheckmarkStates" requiredtoload="IS_VOICECHAT_ENABLED">
+        <StateGroup name="CheckmarkStates">
             <State name="Party">
                 <When type="Property" frame="VoiceChannelFrame" ChannelType="Party"/>
                 <Action type="SetProperty" frame="VoiceChannelFrame" Visible="True"/>
@@ -113,7 +112,7 @@
             </State>
         </StateGroup>
 
-        <StateGroup name="HighlightStates" requiredtoload="IS_VOICECHAT_ENABLED">
+        <StateGroup name="HighlightStates">
             <DefaultState val="Invisible"/>
             <State name="Invisible"/>
             <State name="Visible">
@@ -123,37 +122,55 @@
             </State>
         </StateGroup>
 
-        <!-- Managing mute state for icon & slider -->
-        <StateGroup name="MuteType" requiredtoload="IS_VOICECHAT_ENABLED">
-            <DefaultState val="Default"/>
+        <!-- Managing mute state for icon -->
+        <StateGroup name="IconStates">
+            <State name="Mic">
+                <When type="Property" frame="$this" MenuAction="VoiceInputVolume"/>
+                <When type="Property" frame="$VoiceChatUI" IsActiveMicMuted="False"/>
+                <When type="Property" frame="$ancestor[@type=BattleUserContextMenu]/BattleUserVoiceFrame" IsMutedForAll="false"/>
+                <Action type="SetProperty" frame="Icon" Texture="@UI/VoiceChat_Voice_Menu_Sensitivity"/>
+            </State>
             <State name="MicMuted">
                 <When type="Property" frame="$this" MenuAction="VoiceInputVolume"/>
-                <When type="Property" frame="$VoiceChatUI" IsActiveMicMuted="true"/>
-                <Action type="SetState" group="MuteState" state="Muted"/>
+                <When type="Property" frame="$VoiceChatUI" IsActiveMicMuted="True"/>
+                <When type="Property" frame="$ancestor[@type=BattleUserContextMenu]/BattleUserVoiceFrame" IsMutedForAll="false"/>
+                <Action type="SetProperty" frame="Icon" Texture="@UI/VoiceChat_Voice_Menu_Sensitivity_Mute"/>
+            </State>
+            <State name="Speaker">
+                <When type="Property" frame="$this" MenuAction="VoiceOutputVolume"/>
+                <When type="Property" frame="$VoiceChatUI" IsActiveSpeakerMuted="False"/>
+                <Action type="SetProperty" frame="Icon" Texture="@UI/VoiceChat_Voice_Menu_Volume"/>
             </State>
             <State name="SpeakerMuted">
                 <When type="Property" frame="$this" MenuAction="VoiceOutputVolume"/>
-                <When type="Property" frame="$VoiceChatUI" IsActiveSpeakerMuted="true"/>
-                <Action type="SetState" group="MuteState" state="Muted"/>
+                <When type="Property" frame="$VoiceChatUI" IsActiveSpeakerMuted="True"/>
+                <Action type="SetProperty" frame="Icon" Texture="@UI/VoiceChat_Voice_Menu_Volume_Mute"/>
             </State>
-            <State name="UserMuted">
+            <State name="Member">
                 <When type="Property" frame="$this" MenuAction="VoiceMemberVolume"/>
-                <When type="Property" frame="$ancestor[@type=BattleUserContextMenu]/BattleUserVoiceFrame" IsMutedForMe="true"/>
-                <Action type="SetState" group="MuteState" state="Muted"/>
+                <When type="Property" frame="$ancestor[@type=BattleUserContextMenu]/BattleUserVoiceFrame" IsMutedForMe="False"/>
+                <When type="Property" frame="$ancestor[@type=BattleUserContextMenu]/BattleUserVoiceFrame" IsMutedForAll="false"/>
+                <Action type="SetProperty" frame="Icon" Texture="@UI/VoiceChat_Voice_Menu_Volume"/>
             </State>
-            <State name="Default">
-                <Action type="SetState" group="MuteState" state="Unmuted"/>
+            <State name="MemberMuted">
+                <When type="Property" frame="$this" MenuAction="VoiceMemberVolume"/>
+                <When type="Property" frame="$ancestor[@type=BattleUserContextMenu]/BattleUserVoiceFrame" IsMutedForMe="True"/>
+                <When type="Property" frame="$ancestor[@type=BattleUserContextMenu]/BattleUserVoiceFrame" IsMutedForAll="false"/>
+                <Action type="SetProperty" frame="Icon" Texture="@UI/VoiceChat_Voice_Menu_Volume_Mute"/>
             </State>
-        </StateGroup>
-
-        <StateGroup name="MuteState">
-            <State name="Unmuted">
-                <Action type="SetProperty" frame="Slider" alpha="255"/>
-                <Action type="SetProperty" frame="Icon" alpha="255"/>
+             <State name="VoiceSilenceMicMuted">
+                <When type="Property" frame="$this" MenuAction="VoiceInputVolume"/>
+                <When type="Property" frame="$ancestor[@type=BattleUserContextMenu]/BattleUserVoiceFrame" IsMutedForAll="true"/>
+                <Action type="SetProperty" frame="Icon" Texture="@UI/VoiceChat_Voice_Menu_Sensitivity_Mute"/>
             </State>
-            <State name="Muted">
-                <Action type="SetProperty" frame="Slider" alpha="128"/>
-                <Action type="SetProperty" frame="Icon" alpha="128"/>
+            <State name="VoiceSilenceMemeberMuted">
+                <When type="Property" frame="$this" MenuAction="VoiceMemberVolume"/>
+                <When type="Property" frame="$ancestor[@type=BattleUserContextMenu]/BattleUserVoiceFrame" IsMutedForAll="true"/>
+                <Action type="SetProperty" frame="Icon" Texture="@UI/VoiceChat_Voice_Menu_Volume_Mute"/>
+            </State>
+            <DefaultState val="Hidden"/>
+            <State name="Hidden">
+                <Action type="SetProperty" frame="Icon" Visible="False"/>
             </State>
         </StateGroup>
     </Frame>
@@ -175,7 +192,7 @@
             <RenderPriority val="600"/>
         </Frame>
 
-        <Frame type="BattleUserVoiceFrame" name="BattleUserVoiceFrame" requiredtoload="IS_VOICECHAT_ENABLED">
+        <Frame type="BattleUserVoiceFrame" name="BattleUserVoiceFrame">
             <Anchor relative="$parent"/>
             <Visible val="false"/>
             <PresenceId val="{$parent/@PresenceId}"/>

@@ -9,7 +9,8 @@
         <Frame type="Label" name="PlayerName_Label">
             <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
             <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
-            <Anchor side="Right" relative="$parent/HeroContainerFrame" pos="Min" offset="-1"/>
+            <Anchor side="Right" relative="$parent/HeroContainerFrame" pos="Min" offset="-2"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
 
             <Text val="{$parent/Player_VoiceFrame/@DisplayName}"/>
             <StateGroup name="OverrideNameSource" requiredtoload="IS_TRADESHOW_CODE_ENABLED">
@@ -20,13 +21,22 @@
             </StateGroup>
             
             <StateGroup name="Style">
+                <State name="SelfColorblind">
+                    <When type="Option" colorblind="True"/>
+                    <When type="Property" frame="$parent/Player_VoiceFrame" IsLocalUser="True"/>
+                    <Action type="SetProperty" Style="Storm_UnitNameLabelRight_SelfColorblind"/>
+                </State>
+                <State name="Self">
+                    <When type="Property" frame="$parent/Player_VoiceFrame" IsLocalUser="True"/>
+                    <Action type="SetProperty" Style="Storm_UnitNameLabelRight_Self"/>
+                </State>
                 <State name="Team">
                     <When type="StateGroup" frame="$parent/Player_VoiceFrame" ColorStates="Team"/>
-                    <Action type="SetProperty" Style="Storm_UnitNameLabel_Team"/>
+                    <Action type="SetProperty" Style="Storm_UnitNameLabelRight_Team"/>
                 </State>
                 <State name="Party">
                     <When type="StateGroup" frame="$parent/Player_VoiceFrame" ColorStates="Party"/>
-                    <Action type="SetProperty" Style="Storm_UnitNameLabel_Party"/>
+                    <Action type="SetProperty" Style="Storm_UnitNameLabelRight_Party"/>
                 </State>
             </StateGroup>
         </Frame>
@@ -47,7 +57,7 @@
                 <LayerCount val="2"/>
                 <TextureCoords top=".1" left=".1" bottom=".9" right=".9" layer="1"/>
 
-                <LayerColor val="{$parent/$parent/Player_VoiceFrame/BackgroundImage/@Color}" layer="1"/>
+                <LayerColor val="{$parent/$parent/Player_VoiceFrame/Icon/@Color}" layer="1"/>
                 <Texture val="Assets\Textures\storm_ui_minimapicon_herobg.dds" layer="1"/>
             </Frame>
             
@@ -56,6 +66,15 @@
                 <Visible val="false"/>
                 <HeroLabelType val="Name"/>
             </Frame>
+
+            <StateGroup name="Hide">
+                <DefaultState val="Visible"/>
+                <State name="Visible"/>
+                <State name="Hidden">
+                    <When type="Property" Hero=""/>
+                    <Action type="SetProperty" visible="False"/>
+                </State>
+            </StateGroup>
         </Frame>
 
         <Frame type="BattleUserVoiceFrame" name="Player_VoiceFrame" template="BattleUserVoiceFrame/BattleUserVoiceFrame_Speaker_Template">
@@ -65,7 +84,7 @@
             <ChannelType val="{$ancestor[@oftype=TalkerPanel]/@ChannelType}"/>
             <AcceptsMouse val="false"/>
 
-            <Frame type="Image" name="BackgroundImage">
+            <Frame type="Image" name="Icon">
                 <Texture val="@UI/VoiceChat_Voice_Talker"/>
             </Frame>
 
@@ -92,6 +111,7 @@
         <!-- Use ExcludeFilterFlags property to manage player excluded from the list, by default it's set to "LocalPlayer|NonSpeaking" -->
         <!-- Always show self speaking -->
         <ExcludeFilterFlags val="NonSpeaking"/>
+        <ChannelType val="{$VoiceChatUI/@ActiveChannelType}"/>
 
         <Frame type="Frame" name="TalkerEntry1" template="TalkerPanel/TalkerEntry_Template">
             <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>

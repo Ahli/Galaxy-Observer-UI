@@ -250,6 +250,26 @@
     <Frame type="UnitStatusEnergyBar" name="UnitStatusSolidEnergyTemplate" template="UnitStatus/UnitStatusEnergyBarTemplate">
         <ReductionShown val="True"/>
     </Frame>
+    
+    <!-- Shield Bar Templates -->
+    <Frame type="UnitStatusBar" name="UnitStatusShieldBarTemplate" template="UnitStatus/UnitStatusBarTemplate">
+        <Texture val="@UI/HUD_Bar_Nameplate_Generic"/>
+        <ReductionColor val="109, 255, 255" index="0"/>
+        <ColorStyle val="Shields" index="0"/>
+        <ReductionColor val="109, 255, 255" index="1"/>
+        <ColorStyle val="Shields" index="1"/>
+        <ReductionShown val="true"/>
+        <IncreaseDuration val="#LifeIncreaseDuration"/>
+        <DecreaseDuration val="#LifeLossDuration"/>
+    </Frame>
+
+    <Frame type="UnitStatusShieldsBar" name="UnitStatusSegmentedShieldsBarTemplate" template="UnitStatus/UnitStatusShieldBarTemplate">
+        <Segmented val="true"/>
+        <SegmentValue val="250"/>
+        <SegmentGroupCount val="4"/>
+        <MaxSegmentCount val="400"/>
+        <Segmented val="true"/>
+    </Frame>
 
      <!-- Progress Bar Templates -->
     <Frame type="UnitStatusProgressBar" name="UnitStatusProgressBarTemplate" template="UnitStatus/UnitStatusBarTemplate">
@@ -350,7 +370,8 @@
 
         <Height val="30"/>
         <Width val="220"/>
-        <UseNameTypeVisibilityRules val="true"/>
+        <NameType val="Automatic"/>
+        <UseNameTypeVisibilityRules val="False"/>
 
         <Frame type="Label" name="Label">
             <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
@@ -361,10 +382,16 @@
     </Frame>
 
     <!-- Player Name Templates -->
-    <Frame type="UnitStatusPlayerName" name="UnitStatusPlayerNameTemplate" template="UnitStatus/UnitStatusNameTemplate"/>
+    <Frame type="UnitStatusName" name="UnitStatusPlayerNameTemplate" template="UnitStatus/UnitStatusNameTemplate">
+        <NameType val="Player"/>
+        <UseNameTypeVisibilityRules val="True"/>
+    </Frame>
 
     <!-- Unit Name Templates -->
-    <Frame type="UnitStatusUnitName" name="UnitStatusUnitNameTemplate" template="UnitStatus/UnitStatusNameTemplate"/>
+    <Frame type="UnitStatusName" name="UnitStatusUnitNameTemplate" template="UnitStatus/UnitStatusNameTemplate">
+        <NameType val="Unit"/>
+        <UseNameTypeVisibilityRules val="True"/>
+    </Frame>
 
     <!-- Ammo Templates -->
     <Frame type="Image" name="AmmoImageTemplate">
@@ -1044,7 +1071,7 @@
                 <Action type="SetProperty" Visible="false" frame="StacksProgressBar"/>
             </State>
         </StateGroup>
-        </Frame>
+    </Frame>
 
     <!-- Armor Display -->
     <Frame type="UnitStatusUnitArmor" name="UnitArmorStatusDisplayTemplate">
@@ -1307,9 +1334,9 @@
             </State>
         </StateGroup>
     </Frame>
-    
+
     <!-- Hero Health/Energy Bar -->
-    <Frame type="UnitStatusFrame" name="HeroUnitStatusFrameNoEnergyTemplate">
+    <Frame type="UnitStatusFrame" name="HeroUnitStatusFrameNoHealthNoEnergyTemplate">
         <Width val="260"/>
         <Height val="168"/>
         <OwnerRenderPriority val="812"/>
@@ -1543,7 +1570,27 @@
                         <Anchor relative="$parent" offset="-7"/>
                         <ImageMaskTexture val="@UI/StormHeroConsoleCircleButtonMask"/>
                     </Frame>
+                </Frame>
+            </Frame>
+            
+            <Frame type="UnitStatusBehaviorIcon" name="UnitStatusMapMechanicInstantBehavior4Icon">
+                <Anchor side="Top" relative="$parent/HeroFrameBackgroundContainer" pos="Mid" offset="0"/>
+                <Anchor side="Bottom" relative="$parent/HeroFrameBackgroundContainer" pos="Mid" offset="0"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="10"/>
+                <Width val="45"/>
+                <Height val="45"/>
+                <Behavior val="HasMapMechanicInstantAbility4"/>
 
+                <Frame type="BehaviorIcon" name="BehaviorIcon">
+                    <Anchor relative="$parent"/>
+                    <MinStackCountDisplayed val="1"/>
+
+                    <Frame type="Image" name="IconImage">
+                        <LayerCount val="2"/>
+                        <LayerVisible index="0" val="false"/>
+                        <Anchor relative="$parent" offset="-7"/>
+                        <ImageMaskTexture val="@UI/StormHeroConsoleCircleButtonMask"/>
+                    </Frame>
                 </Frame>
             </Frame>
 
@@ -1598,12 +1645,12 @@
             </Frame>
 
 
-            <Frame type="UnitStatusPlayerName" name="PlayerNameLabel" template="UnitStatus/UnitStatusPlayerNameTemplate">
+            <Frame type="UnitStatusName" name="PlayerUnitNameLabel" template="UnitStatus/UnitStatusNameTemplate">
                 <Anchor side="Bottom" relative="$parent/HeroFrameBackgroundContainer" pos="Min" offset="1"/>
                 <Anchor side="Left" relative="$parent/HeroFrameBackgroundContainer" pos="Mid" offset="0"/>
                 <Anchor side="Right" relative="$parent/HeroFrameBackgroundContainer" pos="Mid" offset="0"/>
 
-                <!-- Use a fade animation to hide the PlayerNameLabel when the TalentAvailableIndicator is shown -->
+                <!-- Use a fade animation to hide the PlayerUnitNameLabel when the TalentAvailableIndicator is shown -->
                 <Animation name="Fade">
                     <Event event="OnShown" action="DirectionForward,Play" frame="$parent/TalentAvailableIndicator"/>
                     <Event event="OnHidden" action="DirectionReverse,Play" frame="$parent/TalentAvailableIndicator"/>
@@ -1615,21 +1662,96 @@
                 </Animation>
             </Frame>
 
-            <Frame type="UnitStatusUnitName" name="UnitNameLabel" template="UnitStatus/UnitStatusUnitNameTemplate">
-                <Anchor side="Bottom" relative="$parent/PlayerNameLabel" pos="Max" offset="0"/>
-                <Anchor side="Left" relative="$parent/HeroFrameBackgroundContainer" pos="Mid" offset="0"/>
-                <Anchor side="Right" relative="$parent/HeroFrameBackgroundContainer" pos="Mid" offset="0"/>
-            </Frame>
-
             <Frame type="Label" name="BotDifficultyLabel">
-                <Anchor side="Bottom" relative="$parent/PlayerNameLabel" pos="Min" offset="0"/>
-                <Anchor side="Left" relative="$parent/PlayerNameLabel" pos="Mid" offset="0"/>
-                <Anchor side="Right" relative="$parent/PlayerNameLabel" pos="Mid" offset="0"/>
+                <Anchor side="Bottom" relative="$parent/PlayerUnitNameLabel" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/PlayerUnitNameLabel" pos="Mid" offset="0"/>
+                <Anchor side="Right" relative="$parent/PlayerUnitNameLabel" pos="Mid" offset="0"/>
                 <Width val="220"/>
                 <Height val="24"/>
                 <Style val="Storm_UnitNameLabel"/>
             </Frame>
 
+            <Frame type="UnitStatusTalentAvailableIndicator" name="TalentAvailableIndicator" template="UnitStatus/TalentAvailableIndicatorTemplate">
+                <Anchor side="Bottom" relative="$parent/HeroFrameBackgroundContainer" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="TalentAvailableBg" pos="Min" offset="0"/>
+                <Anchor side="Right" relative="TalentAvailableBg" pos="Max" offset="0"/>
+                <Height val="50"/>
+                <AnchorUseDeviceOffset val="True"/>
+                <CollapseLayout val="true"/>
+                <VisibleToOwner val="true"/>
+                <VisibleToAlly val="false"/>
+                <VisibleToEnemy val="false"/>
+                <Visible val="false"/>
+
+                <Frame type="Label" name="TalentAvailableLabel">
+                    <Anchor side="Bottom" relative="$parent/$parent/PlayerUnitNameLabel/Label" pos="Max" offset="0"/>
+                </Frame>
+            </Frame>
+
+            <Frame type="UnitStatusBuffDebuffElement" name="UnitStatusBuffDebuffDisplay" template="UnitStatus/UnitStatusBuffDebuffDisplayTemplate">
+                <Anchor side="Bottom" relative="$parent/HeroFrameBackgroundContainer" pos="Min" offset="15"/>
+                <Anchor side="Left" relative="$parent/HeroFrameBackgroundContainer" pos="Mid" offset="0"/>
+                <Anchor side="Right" relative="$parent/HeroFrameBackgroundContainer" pos="Mid" offset="0"/>
+                <CollapseLayout val="true"/>
+                <VisibleToOwner val="true"/>
+                <VisibleToAlly val="true"/>
+                <VisibleToEnemy val="true"/>
+                <Width val="193"/>
+                <Height val="64"/>
+            </Frame>
+
+            <Frame type="UnitStatusUnitHealingModifier" name="UnitStatusHealingDisplay" template="UnitStatus/UnitStatusHealingDisplayTemplate">
+                <Anchor side="Top" relative="$parent/HeroFrameBackgroundContainer" pos="Mid" offset="-16"/>
+                <Anchor side="Left" relative="$parent/HeroFrameBackgroundContainer" pos="Max" offset="0"/>
+            </Frame>
+
+            <Frame type="UnitStatusUnitArmor" name="UnitArmorStatusDisplay" template="UnitStatus/UnitArmorStatusDisplayTemplate">
+                <Anchor side="Top" relative="$parent/HeroFrameBackgroundContainer" pos="Mid" offset="-36"/>
+                <Anchor side="Left" relative="$parent/UnitStatusHealingDisplay" pos="Max" offset="-12"/>
+
+                <!-- Can't use collapselayout to shift the frames; they need to be "visible" at all times for everything to work -->
+                <StateGroup name="AnchorShift">
+                    <State name="NoPotions">
+                        <When type="StateGroup" frame="$parent/UnitStatusHealingDisplay" HealingBonusIconController="Neutral"/>
+                        <Action type="SetAnchor" side="Left" relative="$parent/HeroFrameBackgroundContainer" pos="Max" offset="0"/>
+                    </State>
+                </StateGroup>
+            </Frame>
+
+            <Frame type="Image" name="DimmingFrame">
+                <!--<Anchor relative="$parent"/>-->
+                <Anchor side="Top" relative="$parent/HeroFrameBackgroundContainer" pos="Min" offset="0"/>
+                <!--<Anchor side="Bottom" relative="$parent/HeroFrameBackgroundContainer" pos="Mid" offset="0"/>-->
+                <Anchor side="Left" relative="$parent/HeroFrameBackgroundContainer" pos="Mid" offset="0"/>
+                <Anchor side="Right" relative="$parent/HeroFrameBackgroundContainer" pos="Mid" offset="0"/>
+                <Width val="143"/>
+                <Height val="16"/>
+                <RenderPriority val="520"/>
+
+                <Texture val="@UI/StormTempWhite"/>
+                <Color val="000000"/>
+                <Alpha val="160"/>
+                <Visible val="false"/>
+                <Animation name="DimmedOn">
+                    <Event event="DimmedOn" action="Reset,Play"/>
+                    <Controller type="Visibility" end="Pause">
+                        <Key type="Bool" time="0.0" value="true"/>
+                    </Controller>
+                </Animation>
+                <Animation name="DimmedOff">
+                    <Event event="DimmedOff" action="Reset,Play"/>
+                    <Controller type="Visibility" end="Pause">
+                        <Key type="Bool" time="0.0" value="false"/>
+                    </Controller>
+                </Animation>
+            </Frame>
+        </Frame>
+    </Frame>
+    
+    
+    <!-- Hero Health/Energy Bar -->
+    <Frame type="UnitStatusFrame" name="HeroUnitStatusFrameNoEnergyTemplate" template="UnitStatus/HeroUnitStatusFrameNoHealthNoEnergyTemplate">
+        <Frame type="Frame" name="HeroUnitStatusParentFrame">
             <!-- This is the health bar for the hero in-game, not the console -->
             <Frame type="UnitStatusShieldedHealthBar" name="HealthBar" template="UnitStatus/UnitStatusSegmentedShieldedHealthBarTemplate">
                 <!-- <OwnerColor val="255, 251, 0"/> -->
@@ -1658,15 +1780,15 @@
                 <Tiled index="3" val="true"/>
                 <Animation name="ResistantOn">
                     <Event event="ResistantOn" action="Play"/>
-                        <Controller type="Dimension" dimension="Height" relative="False" percentage="False" end="Pause">
-                            <Key type="Curve" time="0.0" value="12" inout="Linear,Auto"/>
-                        </Controller>
+                    <Controller type="Dimension" dimension="Height" relative="False" percentage="False" end="Pause">
+                        <Key type="Curve" time="0.0" value="12" inout="Linear,Auto"/>
+                    </Controller>
                 </Animation>
                 <Animation name="ResistantOff">
                     <Event event="ResistantOff" action="Play"/>
-                        <Controller type="Dimension" dimension="Height" relative="False" percentage="False" end="Pause">
-                            <Key type="Curve" time="0.0" value="0" inout="Linear,Auto"/>
-                        </Controller>
+                    <Controller type="Dimension" dimension="Height" relative="False" percentage="False" end="Pause">
+                        <Key type="Curve" time="0.0" value="0" inout="Linear,Auto"/>
+                    </Controller>
                 </Animation>
             </Frame>
 
@@ -1683,15 +1805,15 @@
                 <Tiled index="3" val="true"/>
                 <Animation name="VulnerableOn">
                     <Event event="VulnerableOn" action="Play"/>
-                        <Controller type="Dimension" dimension="Height" relative="False" percentage="False" end="Pause">
-                            <Key type="Curve" time="0.0" value="12" inout="Linear,Auto"/>
-                        </Controller>
+                    <Controller type="Dimension" dimension="Height" relative="False" percentage="False" end="Pause">
+                        <Key type="Curve" time="0.0" value="12" inout="Linear,Auto"/>
+                    </Controller>
                 </Animation>
                 <Animation name="VulnerableOff">
                     <Event event="VulnerableOff" action="Play"/>
-                        <Controller type="Dimension" dimension="Height" relative="False" percentage="False" end="Pause">
-                            <Key type="Curve" time="0.0" value="0" inout="Linear,Auto"/>
-                        </Controller>
+                    <Controller type="Dimension" dimension="Height" relative="False" percentage="False" end="Pause">
+                        <Key type="Curve" time="0.0" value="0" inout="Linear,Auto"/>
+                    </Controller>
                 </Animation>
             </Frame>
 
@@ -1832,88 +1954,267 @@
                 <Height val="20"/>
                 <HeroSpecificLocation val="HeroSpecificStackingBuffsStatus"/>
             </Frame>
+        </Frame>
+    </Frame>
 
-            <Frame type="UnitStatusTalentAvailableIndicator" name="TalentAvailableIndicator" template="UnitStatus/TalentAvailableIndicatorTemplate">
-                <Anchor side="Bottom" relative="$parent/HeroFrameBackgroundContainer" pos="Min" offset="0"/>
-                <Anchor side="Left" relative="TalentAvailableBg" pos="Min" offset="0"/>
-                <Anchor side="Right" relative="TalentAvailableBg" pos="Max" offset="0"/>
-                <Height val="50"/>
-                <AnchorUseDeviceOffset val="True"/>
-                <CollapseLayout val="true"/>
-                <VisibleToOwner val="true"/>
-                <VisibleToAlly val="false"/>
-                <VisibleToEnemy val="false"/>
-                <Visible val="false"/>
+    <!-- Hero Health/Energy Bar -->
+    <Frame type="UnitStatusFrame" name="HeroUnitStatusFrameSeparateShieldBar" template="UnitStatus/HeroUnitStatusFrameNoHealthNoEnergyTemplate">
+        <Frame type="Frame" name="HeroUnitStatusParentFrame">
+            <!-- This is the health bar for the hero in-game, not the console -->
+
+            <Frame type="UnitStatusElement" name="HeroFrameBackgroundContainer">
+                <Anchor side="Top" relative="$parent/ShieldsBar" pos="Min" offset="-1"/>
+                <Anchor side="Bottom" relative="$parent/HealthBar" pos="Max" offset="1"/>
+                <Anchor side="Left" relative="$parent/ShieldsBar" pos="Min" offset="-1"/>
+                <Anchor side="Right" relative="$parent/ShieldsBar" pos="Max" offset="1"/>
             </Frame>
 
-            <Frame type="UnitStatusBuffDebuffElement" name="UnitStatusBuffDebuffDisplay" template="UnitStatus/UnitStatusBuffDebuffDisplayTemplate">
-                <Anchor side="Bottom" relative="$parent/HeroFrameBackgroundContainer" pos="Min" offset="15"/>
-                <Anchor side="Left" relative="$parent/HeroFrameBackgroundContainer" pos="Mid" offset="0"/>
-                <Anchor side="Right" relative="$parent/HeroFrameBackgroundContainer" pos="Mid" offset="0"/>
-                <CollapseLayout val="true"/>
-                <VisibleToOwner val="true"/>
-                <VisibleToAlly val="true"/>
-                <VisibleToEnemy val="true"/>
-                <Width val="193"/>
-                <Height val="64"/>
+            <Frame type="UnitStatusSplitShieldsBar" name="ShieldsBar" template="UnitStatus/UnitStatusSegmentedShieldsBarTemplate">
+                <!-- <OwnerColor val="255, 251, 0"/> -->
+                <Anchor side="Top" relative="$parent/$parent" pos="Min" offset="107"/>
+                <Anchor side="Left" relative="$parent/$parent" pos="Min" offset="57"/>
+                <Width val="140"/>
+                <Height val="8"/>
+                <SnapToDevicePixels val="True"/>
+                <BorderWidth val="1"/>
+                <BorderColor val="255,122,135,154"/>
+                <BarInsetRect top="2" left="2" bottom="2" right="2"/>
+                <BackgroundColor val="180,0,0,0"/>
+                <BackgroundInsetRect top="-1" left="-1" bottom="-1" right="-1"/>
             </Frame>
+            
 
-            <Frame type="UnitStatusUnitHealingModifier" name="UnitStatusHealingDisplay" template="UnitStatus/UnitStatusHealingDisplayTemplate">
-                <Anchor side="Top" relative="$parent/HeroFrameBackgroundContainer" pos="Mid" offset="-16"/>
-                <Anchor side="Left" relative="$parent/HeroFrameBackgroundContainer" pos="Max" offset="0"/>
-            </Frame>
-
-            <Frame type="UnitStatusUnitArmor" name="UnitArmorStatusDisplay" template="UnitStatus/UnitArmorStatusDisplayTemplate">
-                <Anchor side="Top" relative="$parent/HeroFrameBackgroundContainer" pos="Mid" offset="-36"/>
-                <Anchor side="Left" relative="$parent/UnitStatusHealingDisplay" pos="Max" offset="-12"/>
-
-                <!-- Can't use collapselayout to shift the frames; they need to be "visible" at all times for everything to work -->
-                <StateGroup name="AnchorShift">
-                    <State name="NoPotions">
-                        <When type="StateGroup" frame="$parent/UnitStatusHealingDisplay" HealingBonusIconController="Neutral"/>
-                        <Action type="SetAnchor" side="Left" relative="$parent/HeroFrameBackgroundContainer" pos="Max" offset="0"/>
-                    </State>
-                </StateGroup>
-            </Frame>
-
-            <Frame type="Image" name="DimmingFrame">
-                <!--<Anchor relative="$parent"/>-->
-                <Anchor side="Top" relative="$parent/HeroFrameBackgroundContainer" pos="Min" offset="0"/>
-                <!--<Anchor side="Bottom" relative="$parent/HeroFrameBackgroundContainer" pos="Mid" offset="0"/>-->
-                <Anchor side="Left" relative="$parent/HeroFrameBackgroundContainer" pos="Mid" offset="0"/>
-                <Anchor side="Right" relative="$parent/HeroFrameBackgroundContainer" pos="Mid" offset="0"/>
-                <Width val="143"/>
+            <Frame type="UnitStatusHealthBar" name="HealthBar" template="UnitStatus/UnitStatusSegmentedShieldedHealthBarTemplate">
+                <!-- <OwnerColor val="255, 251, 0"/> -->
+                <Anchor side="Top" relative="$parent/ShieldsBar" pos="Max" offset="-1"/>
+                <Anchor side="Left" relative="$parent/ShieldsBar" pos="Min" offset="0"/>
+                <Width val="140"/>
                 <Height val="16"/>
-                <Texture val="@UI/StormTempWhite"/>
-                <Color val="000000"/>
-                <Alpha val="160"/>
-                <Visible val="false"/>
-                <Animation name="DimmedOn">
-                    <Event event="DimmedOn" action="Reset,Play"/>
-                    <Controller type="Visibility" end="Pause">
-                        <Key type="Bool" time="0.0" value="true"/>
+                <SnapToDevicePixels val="True"/>
+                <BorderWidth val="1"/>
+                <BorderColor val="255,122,135,154"/>
+                <BarInsetRect top="2" left="2" bottom="2" right="2"/>
+                <BackgroundColor val="180,0,0,0"/>
+                <BackgroundInsetRect top="1" left="-1" bottom="-1" right="-1"/>
+            </Frame>
+
+            <Frame type="UnitStatusHealthBar" name="HealthBarResistant" template="UnitStatus/UnitStatusSegmentedShieldedHealthBarTemplate">
+                <!-- <OwnerColor val="255, 251, 0"/> -->
+                <Anchor side="Top" relative="$parent/HeroFrameBackgroundContainer" pos="Min" offset="3"/>
+                <Anchor side="Left" relative="$parent/HeroFrameBackgroundContainer" pos="Min" offset="4"/>
+                <Width val="136"/>
+                <Height val="0"/>
+                <Texture val="Assets\Textures\storm_placeholder_hpbar_texture_arrows_up.dds"/>
+                <Tiled index="0" val="true"/>
+                <Tiled index="1" val="true"/>
+                <Tiled index="2" val="true"/>
+                <Tiled index="3" val="true"/>
+                <Animation name="ResistantOn">
+                    <Event event="ResistantOn" action="Play"/>
+                    <Controller type="Dimension" dimension="Height" relative="False" percentage="False" end="Pause">
+                        <Key type="Curve" time="0.0" value="20" inout="Linear,Auto"/>
                     </Controller>
                 </Animation>
-                <Animation name="DimmedOff">
-                    <Event event="DimmedOff" action="Reset,Play"/>
-                    <Controller type="Visibility" end="Pause">
-                        <Key type="Bool" time="0.0" value="false"/>
+                <Animation name="ResistantOff">
+                    <Event event="ResistantOff" action="Play"/>
+                    <Controller type="Dimension" dimension="Height" relative="False" percentage="False" end="Pause">
+                        <Key type="Curve" time="0.0" value="0" inout="Linear,Auto"/>
                     </Controller>
                 </Animation>
+            </Frame>
+
+            <Frame type="UnitStatusHealthBar" name="HealthBarVulnerable" template="UnitStatus/UnitStatusSegmentedShieldedHealthBarTemplate">
+                <!-- <OwnerColor val="255, 251, 0"/> -->
+                <Anchor side="Top" relative="$parent/HeroFrameBackgroundContainer" pos="Min" offset="3"/>
+                <Anchor side="Left" relative="$parent/HeroFrameBackgroundContainer" pos="Min" offset="4"/>
+                <Width val="136"/>
+                <Height val="0"/>
+                <Texture val="Assets\Textures\storm_placeholder_hpbar_texture_arrows_down.dds"/>
+                <Tiled index="0" val="true"/>
+                <Tiled index="1" val="true"/>
+                <Tiled index="2" val="true"/>
+                <Tiled index="3" val="true"/>
+                <Animation name="VulnerableOn">
+                    <Event event="VulnerableOn" action="Play"/>
+                    <Controller type="Dimension" dimension="Height" relative="False" percentage="False" end="Pause">
+                        <Key type="Curve" time="0.0" value="20" inout="Linear,Auto"/>
+                    </Controller>
+                </Animation>
+                <Animation name="VulnerableOff">
+                    <Event event="VulnerableOff" action="Play"/>
+                    <Controller type="Dimension" dimension="Height" relative="False" percentage="False" end="Pause">
+                        <Key type="Curve" time="0.0" value="0" inout="Linear,Auto"/>
+                    </Controller>
+                </Animation>
+            </Frame>
+
+            <Frame type="Frame" name="InvincibleHealthBarFrame">
+                <Anchor side="Top" relative="$parent/HeroFrameBackgroundContainer" pos="Min" offset="12"/>
+                <Anchor side="Left" relative="$parent/HeroFrameBackgroundContainer" pos="Min" offset="0"/>
+                <Width val="140"/>
+                <Height val="12"/>
+                <Visible val="False"/>
+
+                <Frame type="UnitStatusHealthBar" name="HealthBarInvincible" template="UnitStatus/UnitStatusProtectedHealthBarTemplate">
+                    <Anchor relative="$parent/$parent/HealthBar"/>
+                    <SnapToDevicePixels val="True"/>
+                    <BorderWidth val="1"/>
+                    <BarInsetRect top="2" left="2" bottom="2" right="2"/>
+                    <BackgroundInsetRect top="1" left="1" bottom="1" right="1"/>
+                    <AllyColor val="B3DAFF"/>
+                    <EnemyColor val="FFAFAF"/>
+                </Frame>
+
+                <Animation name="ProtectedHealthBarFlashOn">
+                    <Event event="OnShown" action="Reset, Play"/>
+
+                    <Controller type="Event" end="Stop" frame="$parent/HealthBarInvincibleFlash">
+                        <Key type="Event" time="0" event="FlashOn"/>
+                    </Controller>
+                </Animation>
+                <Animation name="ProtectedHealthBarFlashOff">
+                    <Event event="OnHidden" action="Reset, Play"/>
+
+                    <Controller type="Event" end="Stop" frame="$parent/HealthBarInvincibleFlash">
+                        <Key type="Event" time="0" event="FlashOff"/>
+                    </Controller>
+                </Animation>
+            </Frame>
+            
+            <Frame type="Frame" name="InvincibleShieldBarFrame">
+                <Anchor side="Top" relative="$parent/HeroFrameBackgroundContainer" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/HeroFrameBackgroundContainer" pos="Min" offset="0"/>
+                <Width val="140"/>
+                <Height val="16"/>
+                <Visible val="False"/>
+
+                <Frame type="UnitStatusShieldsBar" name="ShieldsBarInvincible" template="UnitStatus/UnitStatusProtectedHealthBarTemplate">
+                    <Anchor relative="$parent/$parent/ShieldsBar"/>
+                    <SnapToDevicePixels val="True"/>
+                    <BorderWidth val="1"/>
+                    <BarInsetRect top="2" left="2" bottom="2" right="2"/>
+                    <BackgroundInsetRect top="1" left="1" bottom="1" right="1"/>
+                    <AllyColor val="B3DAFF"/>
+                    <EnemyColor val="FFAFAF"/>
+                </Frame>
+            </Frame>
+
+            <Frame type="Image" name="HealthBarInvincibleFlash">
+                <Anchor side="Top" relative="$parent/HeroFrameBackgroundContainer" pos="Mid" offset="-8"/>
+                <Anchor side="Left" relative="$parent/HeroFrameBackgroundContainer" pos="Mid" offset="0"/>
+                <Anchor side="Right" relative="$parent/HeroFrameBackgroundContainer" pos="Mid" offset="0"/>
+                <Anchor side="Bottom" relative="$parent/HeroFrameBackgroundContainer" pos="Mid" offset="0"/>
+                <RenderPriority val="497"/>
+                <Color val="255, 255, 255"/>
+                <Alpha val="0"/>
+                <BlendMode val="Add"/>
+                <Height val="52"/>
+                <Width val="193"/>
+                <Texture val="@UI/StormTalentAlertNameplateBG"/>
+
+                <Animation name="FlashOn">
+                    <Event event="FlashOn" action="Reset, DirectionForward, Play"/>
+
+                    <Controller type="Fade" end="Pause">
+                        <Key type="Curve" time="0" value="0"/>
+                        <Key type="Curve" time=".1" value="255"/>
+                        <Key type="Curve" time=".3" value="0"/>
+                    </Controller>
+                    <Controller type="Dimension" dimension="Height" relative="False" percentage="True" end="Pause">
+                        <Key type="Curve" time="0" value="95"/>
+                        <Key type="Curve" time=".3" value="150"/>
+                    </Controller>
+                    <Controller type="Dimension" dimension="Width" relative="False" percentage="True" end="Pause">
+                        <Key type="Curve" time="0" value="95"/>
+                        <Key type="Curve" time=".3" value="200"/>
+                    </Controller>
+                </Animation>
+                <Animation name="FlashOff">
+                    <Event event="FlashOff" action="Reset, DirectionForward, Play"/>
+
+                    <Controller type="Fade" end="Pause">
+                        <Key type="Curve" time="0" value="0"/>
+                        <Key type="Curve" time=".1" value="220"/>
+                        <Key type="Curve" time=".25" value="0"/>
+                    </Controller>
+                    <Controller type="Dimension" dimension="Height" relative="False" percentage="True" end="Pause">
+                        <Key type="Curve" time="0" value="150"/>
+                        <Key type="Curve" time=".2" value="95"/>
+                    </Controller>
+                    <Controller type="Dimension" dimension="Width" relative="False" percentage="True" end="Pause">
+                        <Key type="Curve" time="0" value="200"/>
+                        <Key type="Curve" time=".2" value="95"/>
+                    </Controller>
+                </Animation>
+            </Frame>
+
+            <Frame type="UnitStatusValidatorAnimElement" name="ValidatorBasedVisibilityAnims">
+                <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+
+                <Validator val="TargetHasUserCategoryProtected"/>
+                <Validator val="TargetHasNoUserCategoryProtected"/>
+
+                <!-- this will show/hide the protected health bars -->
+                <Animation name="ShowHideProtectedHealthBar">
+                    <Event event="TargetHasUserCategoryProtected" action="Reset, Play"/>
+                    <Event event="TargetHasNoUserCategoryProtected" action="Stop"/>
+
+                    <Controller type="Visibility" end="Pause" frame="$parent/InvincibleHealthBarFrame">
+                        <Key type="Bool" time="0" value="True"/>
+                    </Controller>
+                    <Controller type="Visibility" end="Pause" frame="$parent/InvincibleShieldBarFrame">
+                        <Key type="Bool" time="0" value="True"/>
+                    </Controller>
+                </Animation>
+            </Frame>
+
+            <Frame type="Label" name="BotStatusLabel">
+                <Anchor side="Top" relative="$parent/HealthBar" pos="Max" offset="8"/>
+                <Anchor side="Left" relative="$parent/HealthBar" pos="Min" offset="6"/>
+                <Height val="108"/>
+                <Width val="200"/>
+                <Style val="Storm_DebugAIStatusLabel"/>
+            </Frame>
+
+            <Frame type="UnitStatusProgressBar" name="ProgressBar" template="UnitStatus/UnitStatusProgressBarTemplate">
+                <Anchor side="Top" relative="$parent/HealthBar" pos="Max" offset="3"/>
+                <Anchor side="Left" relative="$parent/HealthBar" pos="Min" offset="1"/>
+                <CollapseLayout val="true"/>
+                <AnchorUseDeviceOffset val="True"/>
+                <SnapToDevicePixels val="False"/>
+                <Width val="136"/>
+                <Height val="4"/>
+            </Frame>
+
+            <Frame type="UnitStatusDurationBar" name="DurationBar" template="UnitStatus/UnitStatusDurationBarTemplate">
+                <Anchor side="Top" relative="$parent/ProgressBar" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/ProgressBar" pos="Min" offset="0"/>
+                <CollapseLayout val="true"/>
+                <VisibleToOwner val="true"/>
+                <Width val="136"/>
+                <Height val="4"/>
+            </Frame>
+
+            <Frame type="HeroSpecificContainerPanel" name="HeroSpecificStackingBuffsPanel">
+                <Anchor side="Top" relative="$parent/DurationBar" pos="Max" offset="3"/>
+                <Anchor side="Left" relative="$parent/DurationBar" pos="Min" offset="0"/>
+                <CollapseLayout val="true"/>
+                <Width val="136"/>
+                <Height val="20"/>
+                <HeroSpecificLocation val="HeroSpecificStackingBuffsStatus"/>
             </Frame>
         </Frame>
     </Frame>
+
 
     <!-- Hero Health/Energy Bar -->
 
     <Frame type="UnitStatusFrame" name="HeroUnitStatusFrameNoNameNoEnergyTemplate" template="UnitStatus/HeroUnitStatusFrameNoEnergyTemplate">
         <Frame type="Frame" name="HeroUnitStatusParentFrame">
-            <Frame type="UnitStatusPlayerName" name="PlayerNameLabel">
-                <VisibleToOwner val="false"/>
-                <VisibleToAlly val="false"/>
-                <VisibleToEnemy val="false"/>
-            </Frame>
-            <Frame type="UnitStatusUnitName" name="UnitNameLabel">
+            <Frame type="UnitStatusName" name="PlayerUnitNameLabel">
                 <VisibleToOwner val="false"/>
                 <VisibleToAlly val="false"/>
                 <VisibleToEnemy val="false"/>
@@ -1938,13 +2239,8 @@
 
     <Frame type="UnitStatusFrame" name="HeroUnitStatusFrameNoNameNoEnergyShowDebuffs_PetTemplate" template="UnitStatus/HeroUnitStatusFrameNoEnergyTemplate">
         <Frame type="Frame" name="HeroUnitStatusParentFrame">
-            <Frame type="UnitStatusPlayerName" name="PlayerNameLabel">
+            <Frame type="UnitStatusName" name="PlayerUnitNameLabel">
                 <UseNameTypeVisibilityRules val="false"/>
-                <VisibleToOwner val="false"/>
-                <VisibleToAlly val="false"/>
-                <VisibleToEnemy val="false"/>
-            </Frame>
-            <Frame type="UnitStatusUnitName" name="UnitNameLabel">
                 <VisibleToOwner val="false"/>
                 <VisibleToAlly val="false"/>
                 <VisibleToEnemy val="false"/>
@@ -1997,11 +2293,7 @@
 
     <Frame type="UnitStatusFrame" name="LostVikingsUnitStatusFrameTemplate" template="UnitStatus/HeroUnitStatusFrameNoEnergyTemplate">
         <Frame type="Frame" name="HeroUnitStatusParentFrame">
-            <Frame type="UnitStatusPlayerName" name="PlayerNameLabel">
-                <VisibleToOwner val="false"/>
-            </Frame>
-
-            <Frame type="UnitStatusUnitName" name="UnitNameLabel">
+            <Frame type="UnitStatusName" name="PlayerUnitNameLabel">
                 <VisibleToOwner val="false"/>
             </Frame>
 
@@ -2011,12 +2303,12 @@
             </Frame>
 
             <Frame type="UnitStatusControlGroupHotkeyFrame" name="VikingIdentityFrame">
-                <Anchor side="Top" relative="$parent/HeroFrameBackgroundContainer" pos="Min" offset="-40"/>
-                <Anchor side="Bottom" relative="$parent/HeroFrameBackgroundContainer" pos="Min" offset="-40"/>
+                <Anchor side="Top" relative="$parent/HeroFrameBackgroundContainer" pos="Min" offset="-44"/>
+                <Anchor side="Bottom" relative="$parent/HeroFrameBackgroundContainer" pos="Min" offset="-44"/>
                 <Anchor side="Left" relative="$parent/HeroFrameBackgroundContainer" pos="Mid" offset="0"/>
                 <Anchor side="Right" relative="$parent/HeroFrameBackgroundContainer" pos="Mid" offset="0"/>
-                <Width val="32"/>
-                <Height val="36"/>
+                <Width val="36"/>
+                <Height val="40"/>
                 <HookupAlias original="HotkeyFrame" alias="SelectionNumberLabel"/>
 
                 <VisibleToOwner val="true"/>
@@ -2024,7 +2316,12 @@
                 <VisibleToEnemy val="false"/>
 
                 <Frame type="Image" name="SelectionStatusIcon">
-                    <Anchor relative="$parent"/>
+                    <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+                    <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+                    <Anchor side="Left" relative="$parent" pos="Mid" offset="-2"/>
+                    <Anchor side="Right" relative="$parent" pos="Mid" offset="-2"/>
+                    <Height val="40"/>
+                    <Width val="40"/>
                 </Frame>
 
                 <Frame type="CommandHotkeyFrame" name="SelectionNumberLabel" template="UnitStatus/UnitSelectionNumberLabelTemplate">
@@ -2129,45 +2426,35 @@
                 <SegmentValue val="2000"/>
             </Frame>
 
-            <Frame type="UnitStatusPlayerName" name="PlayerNameLabel">
-                <UseNameTypeVisibilityRules val="False"/>
-                <VisibleToOwner val="false"/>
-                <VisibleToAlly val="false"/>
-                <VisibleToEnemy val="false"/>
-            </Frame>
-
-            <Frame type="UnitStatusUnitName" name="UnitNameLabel">
-                <UseNameTypeVisibilityRules val="False"/>
-                <VisibleToOwner val="true"/>
-                <VisibleToAlly val="true"/>
-                <VisibleToEnemy val="true"/>
+            <Frame type="UnitStatusName" name="PlayerUnitNameLabel">
+                <NameType val="Unit"/>
             </Frame>
 
             <!-- Added frame for Unit Container Tracking -->
             <Frame type="UnitStatusUnitTrackingBehavior" name="UnitTrackingElement" template="UnitStatusUnitTracking/UnitTrackingElementSingleTemplate">
-                <Anchor side="Top" relative="$parent/UnitNameLabel/Label" pos="Mid" offset="0"/>
-                <Anchor side="Bottom" relative="$parent/UnitNameLabel/Label" pos="Mid" offset="0"/>
-                <Anchor side="Right" relative="$parent/UnitNameLabel/Label" pos="Min" offset="-1"/>
+                <Anchor side="Top" relative="$parent/PlayerUnitNameLabel/Label" pos="Mid" offset="0"/>
+                <Anchor side="Bottom" relative="$parent/PlayerUnitNameLabel/Label" pos="Mid" offset="0"/>
+                <Anchor side="Right" relative="$parent/PlayerUnitNameLabel/Label" pos="Min" offset="-1"/>
                 <Anchor side="Left" relative="$this" pos="Max" offset="#TrackedUnitFrameSizeNeg"/>
 
                 <Behavior val="VehicleGenericHeroInsideUnitTracker"/>
-                <VisibleToOwner val="{$parent/UnitNameLabel/@Visible}"/>
+                <VisibleToOwner val="{$parent/PlayerUnitNameLabel/@Visible}"/>
             </Frame>
         </Frame>
     </Frame>
 
     <Frame type="UnitStatusFrame" name="HeroUnit1SegmentStatusFrame" template="UnitStatus/HeroUnitStatusFrameNoEnergyTemplate">
         <Frame type="Frame" name="HeroUnitStatusParentFrame">
-            <Frame type="UnitStatusPlayerName" name="PlayerNameLabel">
-                <Visible val="false"/>
-            </Frame>
+            <!-- Frame type="UnitStatusName" name="PlayerUnitNameLabel">
+                <Visible val="false"/ This will do nothing.  To accomplish this, use the 3 'VisibleToXXX' fields>
+            </Frame -->
             <Frame type="UnitStatusShieldedHealthBar" name="HealthBar">
                 <SegmentValue val="1"/>
-                <Visible val="false"/>
+                <!-- Visible val="false"/ This will do nothing.  To accomplish this, use the 3 'VisibleToXXX' fields -->
             </Frame>
             <Frame type="UnitStatusShieldedHealthBar" name="HealthBarResistant">
                 <SegmentValue val="1"/>
-                <Visible val="false"/>
+                <!-- Visible val="false"/ This will do nothing.  To accomplish this, use the 3 'VisibleToXXX' fields -->
             </Frame>
         </Frame>
     </Frame>
@@ -2339,13 +2626,7 @@
                 <VisibleToEnemy val="true"/>
             </Frame>
 
-            <Frame type="UnitStatusPlayerName" name="PlayerNameLabel">
-                <VisibleToOwner val="false"/>
-                <VisibleToAlly val="false"/>
-                <VisibleToEnemy val="true"/>
-            </Frame>
-
-            <Frame type="UnitStatusUnitName" name="UnitNameLabel">
+            <Frame type="UnitStatusName" name="PlayerUnitNameLabel">
                 <VisibleToOwner val="false"/>
                 <VisibleToAlly val="false"/>
                 <VisibleToEnemy val="true"/>
@@ -2488,10 +2769,89 @@
 
     </Frame>
 
-    <Frame type="UnitStatusFrame" name="HeroUnitStatusConsoleFrameTemplate">
+    <Frame type="UnitStatusFrame" name="HeroUnitStatusConsoleFrameNoHealthTemplate">
         <Height val="39"/>
         <Width val="244"/>
+        <Frame type="UnitStatusEnergyBar" name="EnergyBar" template="UnitStatus/UnitStatusEnergyBarTemplate">
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+            <Width val="232"/>
+            <Height val="15"/>
+            <Texture val="@UI/HUD_Bar_Mana"/>
+            <BackgroundColor val="0, 0, 0, 0"/>
+            <VisibleToAlly val="true"/>
+            <VisibleToEnemy val="true"/>
+            <AcceptsMouse val="true"/>
+            <ShowStatusTooltip val="true"/>
+            <Announcable val="true"/>
 
+            <!-- Energy Bar -->
+            <OwnerColor val="26bdf8" index="0"/>
+            <AllyColor val="26bdf8" index="0"/>
+            <EnemyColor val="26bdf8" index="0"/>
+            <Tiled val="true" index="0"/>
+
+            <!-- Expected Energy Grant Bar -->
+            <OwnerColor val="0072ff" index="1"/>
+            <AllyColor val="0072ff" index="1"/>
+            <EnemyColor val="0072ff" index="1"/>
+            <Tiled val="true" index="1"/>
+
+            <Frame type="Label" name="StatusBarLabel">
+                <Anchor side="Bottom" relative="$parent" pos="Max" offset="-4"/>
+                <Anchor side="Right" relative="$parent" pos="Max" offset="-15"/>
+                <Style val="Storm_VitalsLabel_R"/>
+                <Alpha val="0"/>
+            </Frame>
+        </Frame>
+
+        <Frame type="UnitStatusEnergyLabel" name="EnergyBarLabel">
+            <Anchor side="Top" relative="$parent/EnergyBar" pos="Min" offset="-1"/>
+            <Anchor side="Right" relative="$parent/EnergyBar" pos="Mid" offset="20"/>
+            <Anchor side="Bottom" relative="$parent/EnergyBar" pos="Max" offset="1"/>
+            <Anchor side="Left" relative="$parent/EnergyBar" pos="Min" offset="12"/>
+
+            <Frame type="Label" name="StatusLabel">
+                <Anchor side="Top" relative="$parent" pos="Mid" offset="1"/>
+                <Anchor side="Bottom" relative="$parent" pos="Mid" offset="1"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                <Style val="Storm_VitalsLabel_R_Small"/>
+            </Frame>
+        </Frame>
+
+        <Frame type="Image" name="HardenedFocusIndicator">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="78%" offset="0"/>
+            <Visible val="False"/>
+            <!--BlendMode val="Add"/-->
+            <!-- This will make the image glow more -->
+            <!--Texture val="@UI/Storm_UI_MainNavigation_Separator"/-->
+            <Texture val="@UI/HUD_DeathTimer_PortraitArrow"/>
+        </Frame>
+
+        <Frame type="UnitStatusValidatorAnimElement" name="HardenedFocusVisibilityAnims">
+            <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+
+            <Validator val="HasHardenedFocusTalent"/>
+            <Validator val="NoHardenedFocusTalent"/>
+
+            <!-- this will show/hide the indicator based off of the validators -->
+            <Animation name="ShowHideHardenedFocusIndicator">
+                <Event event="HasHardenedFocusTalent" action="Reset,Play"/>
+                <Event event="NoHardenedFocusTalent" action="Stop"/>
+
+                <Controller type="Visibility" end="Pause" frame="$parent/HardenedFocusIndicator">
+                    <Key type="Bool" time="0" value="True"/>
+                </Controller>
+            </Animation>
+        </Frame>
+
+    </Frame>
+
+    <Frame type="UnitStatusFrame" name="HeroUnitStatusConsoleFrameTemplate" template="UnitStatus/HeroUnitStatusConsoleFrameNoHealthTemplate">
         <!-- Invisible by default to turn on the correct color in triggers -->
         <Visible val="False"/>
 
@@ -2558,82 +2918,75 @@
             </Frame>
         </Frame>
 
-        <Frame type="UnitStatusEnergyBar" name="EnergyBar" template="UnitStatus/UnitStatusEnergyBarTemplate">
-            <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
-            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
-            <Width val="232"/>
-            <Height val="15"/>
-            <Texture val="@UI/HUD_Bar_Mana"/>
+    </Frame>
+
+    <Frame type="UnitStatusFrame" name="HeroUnitStatusConsoleFrameNoShieldTemplate" template="UnitStatus/HeroUnitStatusConsoleFrameNoHealthTemplate">
+
+        <!-- Invisible by default to turn on the correct color in triggers -->
+        <Visible val="False"/>
+
+        <Frame type="UnitStatusHealthBar" name="HealthBar" template="UnitStatus/UnitStatusShieldedHealthBarTemplate">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="10"/>
+            <Width val="234"/>
+            <Height val="21"/>
+            <Texture val="@UI/HUD_Bar_Health_Generic"/>
             <BackgroundColor val="0, 0, 0, 0"/>
             <VisibleToAlly val="true"/>
             <VisibleToEnemy val="true"/>
             <AcceptsMouse val="true"/>
-            <ShowStatusTooltip val="true"/>
             <Announcable val="true"/>
 
-            <!-- Energy Bar -->
-            <OwnerColor val="26bdf8" index="0"/>
-            <AllyColor val="26bdf8" index="0"/>
-            <EnemyColor val="26bdf8" index="0"/>
+            <!-- Health Bar -->
+            <OwnerColor val="3be000" index="0"/>
+            <AllyColor val="3be000" index="0"/>
+            <EnemyColor val="3be000" index="0"/>
             <Tiled val="true" index="0"/>
 
-            <!-- Expected Energy Grant Bar -->
-            <OwnerColor val="0072ff" index="1"/>
-            <AllyColor val="0072ff" index="1"/>
-            <EnemyColor val="0072ff" index="1"/>
+            <!-- Shield Bar - Unused for now, but keeping in case we want to put behaviorshields on here. -->
+            <Tiled val="true" index="1"/>
+            <OwnerColor val="225ac2" index="1"/>
+            <AllyColor val="225ac2" index="1"/>
+            <EnemyColor val="225ac2" index="1"/>
+            <DecreaseDuration val="#LifeIncreaseDuration" index="1"/>
+            <IncreaseDuration val="#LifeIncreaseDuration" index="1"/>
             <Tiled val="true" index="1"/>
 
+            <!-- Expected Life Grant Bar -->
+            <OwnerColor val="3c8e00" index="2"/>
+            <AllyColor val="82ff94" index="2"/>
+            <EnemyColor val="42ba19" index="2"/>
+            <Tiled val="true" index="2"/>
+
+            <!-- Expected Life Lost Bar -->
+            <OwnerColor val="e82c1e" index="3"/>
+            <AllyColor val="e82c1e" index="3"/>
+            <EnemyColor val="e82c1e" index="3"/>
+            <Tiled val="true" index="3"/>
+
             <Frame type="Label" name="StatusBarLabel">
-                <Anchor side="Bottom" relative="$parent" pos="Max" offset="-4"/>
+                <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
                 <Anchor side="Right" relative="$parent" pos="Max" offset="-15"/>
                 <Style val="Storm_VitalsLabel_R"/>
                 <Alpha val="0"/>
             </Frame>
         </Frame>
 
-        <Frame type="UnitStatusEnergyLabel" name="EnergyBarLabel">
-            <Anchor side="Top" relative="$parent/EnergyBar" pos="Min" offset="-1"/>
-            <Anchor side="Right" relative="$parent/EnergyBar" pos="Mid" offset="20"/>
-            <Anchor side="Bottom" relative="$parent/EnergyBar" pos="Max" offset="1"/>
-            <Anchor side="Left" relative="$parent/EnergyBar" pos="Min" offset="12"/>
+        <Frame type="UnitStatusHealthLabel" name="HealthBarLabel">
+            <Anchor side="Top" relative="$parent/HealthBar" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent/HealthBar" pos="Min" offset="14"/>
+            <Anchor side="Bottom" relative="$parent/HealthBar" pos="Max" offset="0"/>
+            <Anchor side="Right" relative="$parent/HealthBar" pos="Max" offset="-20"/>
+
+            <ShowWhileInvulnerable val="True"/>
 
             <Frame type="Label" name="StatusLabel">
-                <Anchor side="Top" relative="$parent" pos="Mid" offset="1"/>
-                <Anchor side="Bottom" relative="$parent" pos="Mid" offset="1"/>
+                <Anchor side="Top" relative="$parent" pos="Min" offset="-2"/>
+                <Anchor side="Bottom" relative="$parent" pos="Max" offset="3"/>
                 <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
-                <Style val="Storm_VitalsLabel_R_Small"/>
+                <Style val="Storm_VitalsLabel_R"/>
             </Frame>
         </Frame>
-
-        <Frame type="Image" name="HardenedFocusIndicator">
-            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
-            <Anchor side="Left" relative="$parent" pos="78%" offset="0"/>
-            <Visible val="False"/>
-            <!--BlendMode val="Add"/--> <!-- This will make the image glow more -->
-            <!--Texture val="@UI/Storm_UI_MainNavigation_Separator"/-->
-            <Texture val="@UI/HUD_DeathTimer_PortraitArrow"/>
-        </Frame>
-
-        <Frame type="UnitStatusValidatorAnimElement" name="HardenedFocusVisibilityAnims">
-            <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
-            <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
-            <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
-            <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
-
-            <Validator val="HasHardenedFocusTalent"/>
-            <Validator val="NoHardenedFocusTalent"/>
-
-            <!-- this will show/hide the indicator based off of the validators -->
-            <Animation name="ShowHideHardenedFocusIndicator">
-                <Event event="HasHardenedFocusTalent" action="Reset,Play"/>
-                <Event event="NoHardenedFocusTalent" action="Stop"/>
-
-                <Controller type="Visibility" end="Pause" frame="$parent/HardenedFocusIndicator">
-                    <Key type="Bool" time="0" value="True"/>
-                </Controller>
-            </Animation>
-        </Frame>
-
     </Frame>
 
     <!-- Heroes without a Mana/Resource (Illidan/Murky/etc) -->
@@ -2658,6 +3011,53 @@
         </Frame>
 
         <Frame type="UnitStatusShieldedHealthLabel" name="HealthBarLabel">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+            <Anchor side="Left" relative="$parent/HealthBar" pos="Min" offset="19"/>
+            <RenderPriority val="512"/>
+        </Frame>
+
+        <Frame type="UnitStatusEnergyBar" name="EnergyBar" template="UnitStatus/UnitStatusEnergyBarTemplate">
+            <Anchor side="Top" relative="$parent/HealthBar" pos="Mid" offset="0"/>
+            <Anchor side="Left" relative="$parent/HealthBar" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent/HealthBar" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent/HealthBar" pos="Mid" offset="0"/>
+            <RenderPriority val="511"/>
+            <VisibleToOwner val="False"/>
+            <VisibleToAlly val="False"/>
+            <VisibleToEnemy val="False"/>
+        </Frame>
+
+        <Frame type="UnitStatusEnergyLabel" name="EnergyBarLabel">
+            <Anchor relative="$parent/EnergyBar"/>
+            <RenderPriority val="511"/>
+            <VisibleToOwner val="False"/>
+            <VisibleToAlly val="False"/>
+            <VisibleToEnemy val="False"/>
+        </Frame>
+    </Frame>
+
+    <Frame type="UnitStatusFrame" name="HeroUnitStatusConsoleFrameNoEnergyNoShieldTemplate" template="UnitStatus/HeroUnitStatusConsoleFrameNoShieldTemplate">
+        <Frame type="UnitStatusHealthBar" name="HealthBar" template="UnitStatus/UnitStatusShieldedHealthBarTemplate">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+            <Width val="244"/>
+            <Height val="39"/>
+            <Texture val="@UI/Storm_UI_InGame_hud_Bar_Health_Generic_NoResource"/>
+            <BackgroundColor val="0, 0, 0, 0"/>
+            <VisibleToAlly val="true"/>
+            <VisibleToEnemy val="true"/>
+            <AcceptsMouse val="true"/>
+
+            <!-- Health Bar -->
+            <OwnerColor val="3be000" index="0"/>
+            <AllyColor val="3be000" index="0"/>
+            <EnemyColor val="3be000" index="0"/>
+            <Tiled val="true" index="0"/>
+            <RenderPriority val="512"/>
+        </Frame>
+
+        <Frame type="UnitStatusHealthLabel" name="HealthBarLabel">
             <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
             <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
             <Anchor side="Left" relative="$parent/HealthBar" pos="Min" offset="19"/>
@@ -3674,11 +4074,14 @@
         <Frame type="UnitStatusProgressBar" name="ProgressBar" template="UnitStatus/UnitStatusProgressBarTemplate">
             <Width val="136"/>
             <Height val="4"/>
-            <Anchor side="Top" relative="$parent/HealthBar" pos="Max" offset="3"/>
+            <Anchor side="Top" relative="$parent/HealthBar" pos="Max" offset="6"/>
             <Anchor side="Left" relative="$parent/HealthBar" pos="Min" offset="0"/>
             <VisibleToOwner val="true"/>
             <VisibleToAlly val="true"/>
             <VisibleToEnemy val="true"/>
+            <BackgroundShown val="true"/>
+            <BackgroundColor val="180, 0, 0, 0"/>
+            <BackgroundInsetRect top="0" left="0" bottom="0" right="0"/>
         </Frame>
 
         <Frame type="UnitStatusDurationBar" name="DurationBar" template="UnitStatus/UnitStatusDurationBarTemplate">
@@ -3705,6 +4108,97 @@
         </Frame>
     </Frame>
 
+    <Frame type="UnitStatusFrame" name="SuperCreepUnitStatusFrameTemplateSmaller" template="UnitStatus/SuperCreepUnitStatusFrameTemplate">
+        <Width val="133.5"/>
+        <Height val="24.75"/>
+
+        <Frame type="Frame" name="BGImageContainer">
+            <Anchor relative="$parent"/>
+
+            <Frame type="Image" name="BGImage">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+                <Width val="108"/>
+                <Height val="24"/>
+                <Texture val="@UI/Storm_UI_Ingame_BossBar_Border"/>
+                <SubpixelRendering val="True"/>
+                <RenderPriority val="#RenderPriority_Background"/>
+            </Frame>
+
+            <Frame type="Image" name="BGImageLeft">
+                <Anchor side="Top" relative="$parent/BGImage" pos="Mid" offset="0"/>
+                <Anchor side="Bottom" relative="$parent/BGImage" pos="Mid" offset="0"/>
+                <Anchor side="Right" relative="$parent/BGImage" pos="Min" offset="10"/>
+                <Texture val="@UI/Storm_UI_Ingame_BossBar_HorizLights"/>
+                <SubpixelRendering val="True"/>
+                <RenderPriority val="#RenderPriority_Background"/>
+                <ColorAdjustMode val="Desaturate"/>
+                <LightAdjustColor val="{$parent/$parent/PrimaryHighlightColorFrame/@Color}"/>
+                <DarkAdjustColor val="{$parent/$parent/PrimaryColorFrame/@Color}"/>
+            </Frame>
+            <Frame type="Image" name="BGImageRight">
+                <Anchor side="Top" relative="$parent/BGImage" pos="Mid" offset="0"/>
+                <Anchor side="Bottom" relative="$parent/BGImage" pos="Mid" offset="0"/>
+                <Anchor side="Left" relative="$parent/BGImage" pos="Max" offset="-10"/>
+                <Texture val="@UI/Storm_UI_Ingame_BossBar_HorizLights"/>
+                <TextureCoords top="0" left="1" bottom="1" right="0"/>
+                <SubpixelRendering val="True"/>
+                <RenderPriority val="#RenderPriority_Background"/>
+                <ColorAdjustMode val="Desaturate"/>
+                <LightAdjustColor val="{$parent/$parent/PrimaryHighlightColorFrame/@Color}"/>
+                <DarkAdjustColor val="{$parent/$parent/PrimaryColorFrame/@Color}"/>
+            </Frame>
+        </Frame>
+
+        <Frame type="UnitStatusHealthBar" name="HealthBar" template="UnitStatus/UnitStatusSegmentedHealthBarTemplate">
+            <Width val="100.5"/>
+            <Height val="10.5"/>
+            <Anchor side="Top" relative="$parent/BGImageContainer" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent/BGImageContainer" pos="Mid" offset="0"/>
+            <Anchor side="Left" relative="$parent/BGImageContainer" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent/BGImageContainer" pos="Mid" offset="0"/>
+            <ReductionShown val="false"/>
+            <DecreaseDuration val="#DecreaseDuration_NoReduction"/>
+            <SegmentValue val="2000"/>
+        </Frame>
+
+        <Frame type="UnitStatusProgressBar" name="ProgressBar" template="UnitStatus/UnitStatusProgressBarTemplate">
+            <Width val="102"/>
+            <Height val="3"/>
+            <Anchor side="Top" relative="$parent/HealthBar" pos="Max" offset="3"/>
+            <Anchor side="Left" relative="$parent/HealthBar" pos="Min" offset="0"/>
+            <VisibleToOwner val="true"/>
+            <VisibleToAlly val="true"/>
+            <VisibleToEnemy val="true"/>
+        </Frame>
+
+        <Frame type="UnitStatusDurationBar" name="DurationBar" template="UnitStatus/UnitStatusDurationBarTemplate">
+            <Width val="102"/>
+            <Height val="3"/>
+            <Anchor side="Top" relative="$parent/HealthBar" pos="Max" offset="3"/>
+            <Anchor side="Left" relative="$parent/HealthBar" pos="Min" offset="0"/>
+            <VisibleToOwner val="true"/>
+            <VisibleToAlly val="true"/>
+            <VisibleToEnemy val="true"/>
+        </Frame>
+
+        <Frame type="Label" name="BotStatusLabel">
+            <Anchor side="Top" relative="$parent" pos="Max" offset="4"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="6"/>
+            <Height val="54"/>
+            <Width val="200"/>
+            <Style val="Storm_DebugAIStatusLabel"/>
+        </Frame>
+
+        <Frame type="UnitStatusUnitHealingModifier" name="UnitStatusHealingDisplay" template="UnitStatus/UnitStatusHealingDisplayTemplate">
+            <Anchor side="Top" relative="$parent/HealthBar" pos="Mid" offset="-16"/>
+            <Anchor side="Left" relative="$parent/HealthBar" pos="Max" offset="15"/>
+        </Frame>
+        
+    </Frame>
+    
+    
     <Frame type="UnitStatusFrame" name="SuperCreepNeutralUnitStatusFrameTemplate" template="UnitStatus/SuperCreepUnitStatusFrameTemplate">
         <Frame type="UnitStatusHealthBar" name="HealthBar">
             <EnemyColor val="242, 186, 38"/>
@@ -4188,250 +4682,6 @@
             <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
             <Style val="Storm_MapMechanicHelpButton"/>
         </Frame>
-    </Frame>
-
-    <Frame type="UnitStatusEnergyBar" name="TargetInfoPanelEnergyBarTemplate" template="UnitStatus/UnitStatusSegmentedEnergyTemplate">
-        <Height val="20"/>
-        <Width val="148"/>
-        <Texture val="@UI/Storm_UI_TargetInfoPanel_StatusBar"/>
-
-        <Frame type="UnitStatusEnergyLabel" name="StatusBarLabel">
-            <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
-            <Anchor side="Left" relative="$parent" pos="Min" offset="2"/>
-            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
-            <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
-            <Height val="20"/>
-            <HideMax val="false"/>
-
-            <Frame type="Label" name="StatusLabel">
-                <Anchor relative="$parent"/>
-                <Style val="Storm_TargetInfoPanel_Label"/>
-            </Frame>
-        </Frame>
-
-        <Frame type="UnitStatusEnergyRegenLabel" name="UnitStatusEnergyRegenLabel">
-            <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
-            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
-            <Anchor side="Right" relative="$parent" pos="Max" offset="-2"/>
-            <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
-            <Height val="20"/>
-            <HideMax val="true"/>
-            <FractionDigits val="2"/>
-            <RoundMode val="None"/>
-
-            <Frame type="Label" name="StatusLabel">
-                <Anchor relative="$parent"/>
-                <Visible val="false"/>
-            </Frame>
-
-            <Frame type="TextFormatFrame" name="RegenAmountFormatFrame">
-                <Anchor relative="$parent"/>
-                <FormatText val="@UI/TargetInfoPanel/AmountPerSecond"/>
-                <Replacement index="0" val="{$parent/StatusLabel/@Text}"/>
-                <ReplacedName index="0" val="amount"/>
-            </Frame>
-
-            <Frame type="Label" name="FormattedLabel">
-                <Anchor relative="$parent"/>
-                <Style val="Storm_TargetInfoPanel_Label_Right"/>
-                <Text val="{$parent/RegenAmountFormatFrame/@Text}"/>
-            </Frame>
-        </Frame>
-    </Frame>
-
-    <Frame type="UnitStatusFrame" name="TargetPanelHealthAndManaUnitStatus">
-        <Frame type="Image" name="HealthBarBackgroundImage">
-            <Anchor relative="$parent/HealthBar"/>
-            <Visible val="{$parent/HealthBar/@Visible}"/>
-            <TextureType val="Nineslice"/>
-            <Texture val="@UI/Storm_UI_TargetInfoPanel_StatusBar_Background"/>
-        </Frame>
-
-        <Frame type="UnitStatusShieldedHealthBar" name="HealthBar" template="UnitStatus/UnitStatusSegmentedShieldedHealthBarTemplate">
-            <Anchor side="Top" relative="$parent" pos="Min" offset="13"/>
-            <Anchor side="Right" relative="$parent" pos="Max" offset="-12"/>
-            <Height val="20"/>
-            <Width val="148"/>
-            <Texture val="@UI/Storm_UI_TargetInfoPanel_StatusBar"/>
-            <EnemyColor val="ff3f3f"/>
-            <AllyColor val="49, 132, 255"/>
-            <Segmented val="false"/>
-
-            <Frame type="UnitStatusShieldedHealthLabel" name="StatusBarLabel">
-                <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
-                <Anchor side="Left" relative="$parent" pos="Min" offset="2"/>
-                <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
-                <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
-                <Height val="20"/>
-                <HideMax val="false"/>
-
-                <Frame type="Label" name="StatusLabel">
-                    <Anchor relative="$parent"/>
-                    <Style val="Storm_TargetInfoPanel_Label"/>
-                </Frame>
-            </Frame>
-
-            <Frame type="UnitStatusHealthRegenLabel" name="UnitStatusHealthRegenLabel">
-                <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
-                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
-                <Anchor side="Right" relative="$parent" pos="Max" offset="-2"/>
-                <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
-                <Height val="20"/>
-                <ShowMaxZero val="True"/>
-                <HideMax val="True"/>
-                <FractionDigits val="2"/>
-                <VisibleWhenUserControlled val="true"/>
-                <ShowGrouping val="true"/>
-                <RoundMode val="None"/>
-
-                <Frame type="Label" name="StatusLabel">
-                    <Anchor relative="$parent"/>
-                    <Visible val="false"/>
-                </Frame>
-
-                <Frame type="TextFormatFrame" name="RegenAmountFormatFrame">
-                    <Anchor relative="$parent"/>
-                    <FormatText val="@UI/TargetInfoPanel/AmountPerSecond"/>
-                    <Replacement index="0" val="{$parent/StatusLabel/@Text}"/>
-                    <ReplacedName index="0" val="amount"/>
-                </Frame>
-
-                <Frame type="Label" name="FormattedLabel">
-                    <Anchor relative="$parent"/>
-                    <Style val="Storm_TargetInfoPanel_Label_Right"/>
-                    <Text val="{$parent/RegenAmountFormatFrame/@Text}"/>
-                </Frame>
-            </Frame>
-
-            <StateGroup name="ExpandedStates">
-                <State name="Expand">
-                    <When type="Property" frame="$parent/NormalEnergyBar" Visible="false"/>
-                    <Action type="SetProperty" Height="43"/>
-                </State>
-            </StateGroup>
-        </Frame>
-
-        <Frame type="Image" name="EnergyBarBackgroundImage">
-            <Anchor relative="$parent/NormalEnergyBar"/>
-            <Visible val="{$parent/NormalEnergyBar/@Visible}"/>
-            <TextureType val="Nineslice"/>
-            <Texture val="@UI/Storm_UI_TargetInfoPanel_StatusBar_Background"/>
-        </Frame>
-
-        <Frame type="UnitStatusEnergyBar" name="NormalEnergyBar" template="UnitStatus/TargetInfoPanelEnergyBarTemplate">
-            <Anchor side="Top" relative="$parent/HealthBar" pos="Max" offset="0"/>
-            <Anchor side="Left" relative="$parent/HealthBar" pos="Min" offset="0"/>
-            <Visible val="false"/>
-            <Alpha val="0"/>
-            <OwnerColor val="#BlueResourceColor"/>
-            <AllyColor val="#BlueResourceColor"/>
-            <EnemyColor val="#BlueResourceColor"/>
-        </Frame>
-
-        <Frame type="UnitStatusEnergyBar" name="OrangeEnergyBar" template="UnitStatus/TargetInfoPanelEnergyBarTemplate">
-            <Anchor side="Top" relative="$parent/HealthBar" pos="Max" offset="0"/>
-            <Anchor side="Left" relative="$parent/HealthBar" pos="Min" offset="0"/>
-            <Visible val="false"/>
-            <Alpha val="0"/>
-            <OwnerColor val="#OrangeResourceColor"/>
-            <AllyColor val="#OrangeResourceColor"/>
-            <EnemyColor val="#OrangeResourceColor"/>
-        </Frame>
-
-        <Frame type="UnitStatusEnergyBar" name="PinkEnergyBar" template="UnitStatus/TargetInfoPanelEnergyBarTemplate">
-            <Anchor side="Top" relative="$parent/HealthBar" pos="Max" offset="0"/>
-            <Anchor side="Left" relative="$parent/HealthBar" pos="Min" offset="0"/>
-            <Visible val="false"/>
-            <Alpha val="0"/>
-            <OwnerColor val="#PinkResourceColor"/>
-            <AllyColor val="#PinkResourceColor"/>
-            <EnemyColor val="#PinkResourceColor"/>
-        </Frame>
-
-        <Frame type="UnitStatusEnergyBar" name="PurpleEnergyBar" template="UnitStatus/TargetInfoPanelEnergyBarTemplate">
-            <Anchor side="Top" relative="$parent/HealthBar" pos="Max" offset="0"/>
-            <Anchor side="Left" relative="$parent/HealthBar" pos="Min" offset="0"/>
-            <Visible val="false"/>
-            <Alpha val="0"/>
-            <OwnerColor val="#PurpleResourceColor"/>
-            <AllyColor val="#PurpleResourceColor"/>
-            <EnemyColor val="#PurpleResourceColor"/>
-        </Frame>
-
-        <Frame type="UnitStatusEnergyBar" name="YellowEnergyBar" template="UnitStatus/TargetInfoPanelEnergyBarTemplate">
-            <Anchor side="Top" relative="$parent/HealthBar" pos="Max" offset="0"/>
-            <Anchor side="Left" relative="$parent/HealthBar" pos="Min" offset="0"/>
-            <Visible val="false"/>
-            <Alpha val="0"/>
-            <OwnerColor val="#YellowResourceColor"/>
-            <AllyColor val="#YellowResourceColor"/>
-            <EnemyColor val="#YellowResourceColor"/>
-        </Frame>
-
-        <StateGroup name="ResourceColorStates">
-            <DefaultState val="Normal"/>
-
-            <State name="Orange">
-                <Action type="SetProperty" frame="OrangeEnergyBar" Alpha="255"/>
-            </State>
-            <State name="Pink">
-                <Action type="SetProperty" frame="PinkEnergyBar" Alpha="255"/>
-            </State>
-            <State name="Purple">
-                <Action type="SetProperty" frame="PurpleEnergyBar" Alpha="255"/>
-            </State>
-            <State name="Yellow">
-                <Action type="SetProperty" frame="YellowEnergyBar" Alpha="255"/>
-            </State>
-            <State name="Normal">
-                <Action type="SetProperty" frame="NormalEnergyBar" Alpha="255"/>
-            </State>
-            <State name="None"/>
-        </StateGroup>
-
-        <StateGroup name="HeroResourceStates">
-            <DefaultState val="Normal"/>
-
-            <State name="Auriel">
-                <When type="Property" Unit="HeroAuriel"/>
-                <Action type="SetState" group="ResourceColorStates" state="Yellow"/>
-            </State>
-            <State name="Chen">
-                <When type="Property" Unit="HeroChen"/>
-                <Action type="SetState" group="ResourceColorStates" state="Yellow"/>
-            </State>
-            <State name="Valeera">
-                <When type="Property" Unit="HeroValeera"/>
-                <Action type="SetState" group="ResourceColorStates" state="Yellow"/>
-            </State>
-            <State name="Morales">
-                <When type="Property" Unit="HeroMedic"/>
-                <Action type="SetState" group="ResourceColorStates" state="Yellow"/>
-            </State>
-            <State name="Zarya">
-                <When type="Property" Unit="HeroZarya"/>
-                <Action type="SetState" group="ResourceColorStates" state="Pink"/>
-            </State>
-            <State name="HeroDVaPilot">
-                <When type="Property" Unit="HeroDVaPilot"/>
-                <Action type="SetState" group="ResourceColorStates" state="Pink"/>
-            </State>
-            <State name="DVaMech">
-                <When type="Property" Unit="HeroDVaMech"/>
-                <Action type="SetState" group="ResourceColorStates" state="Pink"/>
-            </State>
-            <State name="VolskayaGunner">
-                <When type="Property" Unit="VolskayaVehicleGunner"/>
-                <Action type="SetState" group="ResourceColorStates" state="Pink"/>
-            </State>
-            <State name="Sonya">
-                <When type="Property" Unit="HeroBarbarian"/>
-                <Action type="SetState" group="ResourceColorStates" state="Orange"/>
-            </State>
-            <State name="Normal">
-                <Action type="SetState" group="ResourceColorStates" state="Normal"/>
-            </State>
-        </StateGroup>
     </Frame>
 
     <Frame type="Frame" name="MedivacBarTemplate">

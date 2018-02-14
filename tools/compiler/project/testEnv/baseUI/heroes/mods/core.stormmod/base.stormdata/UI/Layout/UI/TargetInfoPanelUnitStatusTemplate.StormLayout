@@ -1,0 +1,363 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<Desc>
+    <!--===============================================================================================
+    <! Templates
+    <!==============================================================================================-->
+    <Frame type="UnitStatusEnergyBar" name="TargetInfoPanelEnergyBarTemplate" template="UnitStatus/UnitStatusSegmentedEnergyTemplate">
+        <Height val="16"/>
+        <Width val="136"/>
+        <AcceptsMouseTooltip val="false"/>
+        <Texture val="@UI/Storm_UI_TargetInfoPanel_StatusBar"/>
+
+        <Frame type="UnitStatusEnergyLabel" name="StatusBarLabel">
+            <Anchor side="Top" relative="$parent" pos="Mid" offset="1"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="2"/>
+            <Anchor side="Bottom" relative="$parent" pos="Mid" offset="1"/>
+            <Width val="85"/>
+            <Height val="20"/>
+            <HideMax val="false"/>
+
+            <Frame type="Label" name="StatusLabel">
+                <Anchor relative="$parent"/>
+                <Style val="Storm_TargetInfoPanel_Label"/>
+                <Options val="NoWrapping | ScaleToPreventTruncation | TooltipIfTruncated"/>
+            </Frame>
+        </Frame>
+
+        <Frame type="UnitStatusEnergyRegenLabel" name="UnitStatusEnergyRegenLabel">
+            <Anchor side="Top" relative="$parent" pos="Mid" offset="1"/>
+            <Anchor side="Left" relative="$parent/StatusBarLabel" pos="Max" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="-2"/>
+            <Anchor side="Bottom" relative="$parent" pos="Mid" offset="1"/>
+            <Height val="20"/>
+            <HideMax val="true"/>
+            <FractionDigits val="2"/>
+            <RoundMode val="None"/>
+
+            <Frame type="Label" name="StatusLabel">
+                <Anchor relative="$parent"/>
+                <Visible val="false"/>
+            </Frame>
+
+            <Frame type="TextFormatFrame" name="RegenAmountFormatFrame">
+                <Anchor relative="$parent"/>
+                <FormatText val="@UI/TargetInfoPanel/AmountPerSecond"/>
+                <Replacement index="0" val="{$parent/StatusLabel/@Text}"/>
+                <ReplacedName index="0" val="amount"/>
+            </Frame>
+
+            <Frame type="Label" name="FormattedLabel">
+                <Anchor relative="$parent"/>
+                <Style val="Storm_TargetInfoPanel_Label_Right"/>
+                <Options val="NoWrapping | ScaleToPreventTruncation | TooltipIfTruncated"/>
+                <Text val="{$parent/RegenAmountFormatFrame/@Text}"/>
+            </Frame>
+        </Frame>
+
+        <Frame type="TextFormatFrame" name="RegenTooltipFormatFrame">
+            <Anchor relative="$parent"/>
+            <FormatText val="@UI/TargetInfoPanel/ResourceRegenTooltip"/>
+            <Replacement index="0" val="{$ancestor[@type=TargetInfoFrame]/@UnitVitalName}"/>
+            <ReplacedName index="0" val="resource"/>
+            <Replacement index="1" val="{$parent/StatusBarLabel/StatusLabel/@Text}"/>
+            <ReplacedName index="1" val="amount"/>
+            <Replacement index="2" val="{$parent/UnitStatusEnergyRegenLabel/FormattedLabel/@Text}"/>
+            <ReplacedName index="2" val="regen"/>
+        </Frame>
+
+        <Frame type="TextFormatFrame" name="NoRegenTooltipFormatFrame">
+            <Anchor relative="$parent"/>
+            <FormatText val="@UI/TargetInfoPanel/ResourceTooltip"/>
+            <Replacement index="0" val="{$ancestor[@type=TargetInfoFrame]/@UnitVitalName}"/>
+            <ReplacedName index="0" val="resource"/>
+            <Replacement index="1" val="{$parent/StatusBarLabel/StatusLabel/@Text}"/>
+            <ReplacedName index="1" val="amount"/>
+        </Frame>
+
+        <StateGroup name="TooltipStates">
+            <State name="RegenTooltip">
+                <When type="Property" frame="UnitStatusEnergyRegenLabel" Visible="true"/>
+                <Action type="SetProperty" Tooltip="{RegenTooltipFormatFrame/@Text}"/>
+            </State>
+            <State name="NoRegenTooltip">
+                <When type="Property" frame="UnitStatusEnergyRegenLabel" Visible="false"/>
+                <Action type="SetProperty" Tooltip="{NoRegenTooltipFormatFrame/@Text}"/>
+            </State>
+        </StateGroup>
+
+        <StateGroup name="SegmentedStates">
+            <State name="Segmented1">
+                <When type="Property" frame="StatusBarLabel" operator="LessThan" MaxValue="21"/>
+                <Action type="SetProperty" Segmented="true"/>
+                <Action type="SetProperty" SegmentValue="1"/>
+                <Action type="SetProperty" SegmentGroupCount="5"/>
+            </State>
+            <State name="Segmented2">
+                <When type="Property" frame="StatusBarLabel" operator="LessThan" MaxValue="41"/>
+                <When type="Property" frame="StatusBarLabel" operator="GreaterThan" MaxValue="20"/>
+                <Action type="SetProperty" Segmented="true"/>
+                <Action type="SetProperty" SegmentValue="2"/>
+                <Action type="SetProperty" SegmentGroupCount="5"/>
+            </State>
+        </StateGroup>
+    </Frame>
+
+    <Frame type="UnitStatusFrame" name="TargetInfoPanelUnitStatusBarTemplate">
+        <Frame type="Image" name="HealthBarBackgroundImage">
+            <Anchor side="Top" relative="$parent/HealthBar" pos="Min" offset="-2"/>
+            <Anchor side="Left" relative="$parent/HealthBar" pos="Min" offset="-2"/>
+            <Anchor side="Right" relative="$parent/HealthBar" pos="Max" offset="2"/>
+            <Anchor side="Bottom" relative="$parent/HealthBar" pos="Max" offset="2"/>
+            <Visible val="{$parent/HealthBar/@Visible}"/>
+            <TextureType val="Nineslice"/>
+            <Texture val="@UI/Storm_UI_TargetInfoPanel_StatusBar_Background"/>
+        </Frame>
+
+        <Frame type="UnitStatusShieldedHealthBar" name="HealthBar" template="UnitStatus/UnitStatusSegmentedShieldedHealthBarTemplate">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="10"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="-10"/>
+            <Height val="16"/>
+            <Width val="136"/>
+            <AcceptsMouseTooltip val="true"/>
+            <EnemyColor val="ff3f3f"/>
+            <AllyColor val="49, 132, 255"/>
+            <Segmented val="false"/>
+            <Texture val="@UI/Storm_UI_TargetInfoPanel_StatusBar"/>
+
+            <Frame type="UnitStatusShieldedHealthLabel" name="StatusBarLabel">
+                <Anchor side="Top" relative="$parent" pos="Mid" offset="1"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="2"/>
+                <Anchor side="Bottom" relative="$parent" pos="Mid" offset="1"/>
+                <Width val="85"/>
+                <Height val="20"/>
+                <HideMax val="false"/>
+                <ShowWhileInvulnerable val="true"/>
+
+                <Frame type="Label" name="StatusLabel">
+                    <Anchor relative="$parent"/>
+                    <Style val="Storm_TargetInfoPanel_Label"/>
+                    <Options val="NoWrapping | ScaleToPreventTruncation | TooltipIfTruncated"/>
+                </Frame>
+
+                <StateGroup name="WidthStates">
+                    <State name="NoRegen">
+                        <When type="Property" frame="$parent/UnitStatusHealthRegenLabel" Visible="false"/>
+                        <Action type="SetProperty" Width="130"/>
+                    </State>
+                </StateGroup>
+            </Frame>
+
+            <Frame type="UnitStatusHealthRegenLabel" name="UnitStatusHealthRegenLabel">
+                <Anchor side="Top" relative="$parent" pos="Mid" offset="1"/>
+                <Anchor side="Left" relative="$parent/StatusBarLabel" pos="Max" offset="0"/>
+                <Anchor side="Right" relative="$parent" pos="Max" offset="-2"/>
+                <Anchor side="Bottom" relative="$parent" pos="Mid" offset="1"/>
+                <Height val="20"/>
+                <HideMax val="True"/>
+                <FractionDigits val="2"/>
+                <VisibleWhenUserControlled val="true"/>
+                <ShowGrouping val="true"/>
+                <RoundMode val="None"/>
+
+                <Frame type="Label" name="StatusLabel">
+                    <Anchor relative="$parent"/>
+                    <Visible val="false"/>
+                </Frame>
+
+                <Frame type="TextFormatFrame" name="RegenAmountFormatFrame">
+                    <Anchor relative="$parent"/>
+                    <FormatText val="@UI/TargetInfoPanel/AmountPerSecond"/>
+                    <Replacement index="0" val="{$parent/StatusLabel/@Text}"/>
+                    <ReplacedName index="0" val="amount"/>
+                </Frame>
+
+                <Frame type="Label" name="FormattedLabel">
+                    <Anchor relative="$parent"/>
+                    <Style val="Storm_TargetInfoPanel_Label_Right"/>
+                    <Text val="{$parent/RegenAmountFormatFrame/@Text}"/>
+                    <Options val="NoWrapping | ScaleToPreventTruncation | TooltipIfTruncated"/>
+                </Frame>
+            </Frame>
+
+            <Frame type="TextFormatFrame" name="RegenTooltipFormatFrame">
+                <Anchor relative="$parent"/>
+                <FormatText val="@UI/TargetInfoPanel/HealthRegenTooltip"/>
+                <Replacement index="0" val="{$parent/StatusBarLabel/StatusLabel/@Text}"/>
+                <ReplacedName index="0" val="health"/>
+                <Replacement index="1" val="{$parent/UnitStatusHealthRegenLabel/FormattedLabel/@Text}"/>
+                <ReplacedName index="1" val="regen"/>
+            </Frame>
+
+            <Frame type="TextFormatFrame" name="NoRegenTooltipFormatFrame">
+                <Anchor relative="$parent"/>
+                <FormatText val="@UI/TargetInfoPanel/HealthTooltip"/>
+                <Replacement index="0" val="{$parent/StatusBarLabel/StatusLabel/@Text}"/>
+                <ReplacedName index="0" val="health"/>
+            </Frame>
+
+            <StateGroup name="TooltipStates">
+                <State name="Regen">
+                    <When type="Property" frame="UnitStatusHealthRegenLabel" Visible="true"/>
+                    <Action type="SetProperty" Tooltip="{RegenTooltipFormatFrame/@Text}"/>
+                </State>
+                <State name="NoRegen">
+                    <When type="Property" frame="UnitStatusHealthRegenLabel" Visible="false"/>
+                    <Action type="SetProperty" Tooltip="{NoRegenTooltipFormatFrame/@Text}"/>
+                </State>
+            </StateGroup>
+
+            <StateGroup name="ExpandedHealthBarStates">
+                <State name="Expanded">
+                    <When type="Property" frame="$parent/EnergyBarBackgroundImage" Visible="false"/>
+                    <Action type="SetProperty" Height="34"/>
+                    <Action type="SetProperty" Texture="@UI/Storm_UI_TargetInfoPanel_StatusBarLarge"/>
+                </State>
+            </StateGroup>
+        </Frame>
+
+        <Frame type="Image" name="EnergyBarBackgroundImage">
+            <Anchor side="Top" relative="$parent/NormalEnergyBar" pos="Min" offset="-2"/>
+            <Anchor side="Left" relative="$parent/NormalEnergyBar" pos="Min" offset="-2"/>
+            <Anchor side="Right" relative="$parent/NormalEnergyBar" pos="Max" offset="2"/>
+            <Anchor side="Bottom" relative="$parent/NormalEnergyBar" pos="Max" offset="2"/>
+            <Visible val="{$parent/NormalEnergyBar/@Visible}"/>
+            <TextureType val="Nineslice"/>
+            <Texture val="@UI/Storm_UI_TargetInfoPanel_StatusBar_Background"/>
+        </Frame>
+
+        <Frame type="UnitStatusEnergyBar" name="NormalEnergyBar" template="TargetInfoPanelUnitStatusTemplate/TargetInfoPanelEnergyBarTemplate">
+            <Anchor side="Top" relative="$parent/HealthBar" pos="Max" offset="2"/>
+            <Anchor side="Left" relative="$parent/HealthBar" pos="Min" offset="0"/>
+            <Visible val="false"/>
+            <Alpha val="0"/>
+            <OwnerColor val="#BlueResourceColor"/>
+            <AllyColor val="#BlueResourceColor"/>
+            <EnemyColor val="#BlueResourceColor"/>
+        </Frame>
+
+        <Frame type="UnitStatusEnergyBar" name="OrangeEnergyBar" template="TargetInfoPanelUnitStatusTemplate/TargetInfoPanelEnergyBarTemplate">
+            <Anchor side="Top" relative="$parent/HealthBar" pos="Max" offset="2"/>
+            <Anchor side="Left" relative="$parent/HealthBar" pos="Min" offset="0"/>
+            <Visible val="false"/>
+            <Alpha val="0"/>
+            <OwnerColor val="#OrangeResourceColor"/>
+            <AllyColor val="#OrangeResourceColor"/>
+            <EnemyColor val="#OrangeResourceColor"/>
+        </Frame>
+
+        <Frame type="UnitStatusEnergyBar" name="PinkEnergyBar" template="TargetInfoPanelUnitStatusTemplate/TargetInfoPanelEnergyBarTemplate">
+            <Anchor side="Top" relative="$parent/HealthBar" pos="Max" offset="2"/>
+            <Anchor side="Left" relative="$parent/HealthBar" pos="Min" offset="0"/>
+            <Visible val="false"/>
+            <Alpha val="0"/>
+            <OwnerColor val="#PinkResourceColor"/>
+            <AllyColor val="#PinkResourceColor"/>
+            <EnemyColor val="#PinkResourceColor"/>
+        </Frame>
+
+        <Frame type="UnitStatusEnergyBar" name="PurpleEnergyBar" template="TargetInfoPanelUnitStatusTemplate/TargetInfoPanelEnergyBarTemplate">
+            <Anchor side="Top" relative="$parent/HealthBar" pos="Max" offset="2"/>
+            <Anchor side="Left" relative="$parent/HealthBar" pos="Min" offset="0"/>
+            <Visible val="false"/>
+            <Alpha val="0"/>
+            <OwnerColor val="#PurpleResourceColor"/>
+            <AllyColor val="#PurpleResourceColor"/>
+            <EnemyColor val="#PurpleResourceColor"/>
+        </Frame>
+
+        <Frame type="UnitStatusEnergyBar" name="YellowEnergyBar" template="TargetInfoPanelUnitStatusTemplate/TargetInfoPanelEnergyBarTemplate">
+            <Anchor side="Top" relative="$parent/HealthBar" pos="Max" offset="2"/>
+            <Anchor side="Left" relative="$parent/HealthBar" pos="Min" offset="0"/>
+            <Visible val="false"/>
+            <Alpha val="0"/>
+            <OwnerColor val="#YellowResourceColor"/>
+            <AllyColor val="#YellowResourceColor"/>
+            <EnemyColor val="#YellowResourceColor"/>
+        </Frame>
+
+        <StateGroup name="ResourceColorStates">
+            <DefaultState val="Normal"/>
+
+            <State name="Orange">
+                <Action type="SetProperty" frame="OrangeEnergyBar" Alpha="255"/>
+            </State>
+            <State name="Pink">
+                <Action type="SetProperty" frame="PinkEnergyBar" Alpha="255"/>
+            </State>
+            <State name="Purple">
+                <Action type="SetProperty" frame="PurpleEnergyBar" Alpha="255"/>
+            </State>
+            <State name="Yellow">
+                <Action type="SetProperty" frame="YellowEnergyBar" Alpha="255"/>
+            </State>
+            <State name="Normal">
+                <Action type="SetProperty" frame="NormalEnergyBar" Alpha="255"/>
+            </State>
+            <State name="None"/>
+        </StateGroup>
+
+        <StateGroup name="HeroResourceStates">
+            <DefaultState val="Normal"/>
+
+            <State name="Auriel">
+                <When type="Property" Unit="HeroAuriel"/>
+                <Action type="SetState" group="ResourceColorStates" state="Yellow"/>
+                <Action type="SetProperty" frame="YellowEnergyBar" AcceptsMouseTooltip="true"/>
+            </State>
+            <State name="Chen">
+                <When type="Property" Unit="HeroChen"/>
+                <Action type="SetState" group="ResourceColorStates" state="Yellow"/>
+                <Action type="SetProperty" frame="YellowEnergyBar" AcceptsMouseTooltip="true"/>
+            </State>
+            <State name="DVaPilot">
+                <When type="Property" Unit="HeroDVaPilot"/>
+                <Action type="SetState" group="ResourceColorStates" state="Pink"/>
+                <Action type="SetProperty" frame="PinkEnergyBar" AcceptsMouseTooltip="true"/>
+            </State>
+            <State name="DVaMech">
+                <When type="Property" Unit="HeroDVaMech"/>
+                <Action type="SetState" group="ResourceColorStates" state="Pink"/>
+                <Action type="SetProperty" frame="PinkEnergyBar" AcceptsMouseTooltip="true"/>
+            </State>
+            <State name="Junkrat">
+                <When type="Property" Unit="HeroJunkrat"/>
+                <Action type="SetState" group="ResourceColorStates" state="Orange"/>
+                <Action type="SetProperty" frame="OrangeEnergyBar" AcceptsMouseTooltip="true"/>
+            </State>
+            <State name="Morales">
+                <When type="Property" Unit="HeroMedic"/>
+                <Action type="SetState" group="ResourceColorStates" state="Yellow"/>
+                <Action type="SetProperty" frame="YellowEnergyBar" AcceptsMouseTooltip="true"/>
+            </State>
+            <State name="Sonya">
+                <When type="Property" Unit="HeroBarbarian"/>
+                <Action type="SetState" group="ResourceColorStates" state="Orange"/>
+                <Action type="SetProperty" frame="OrangeEnergyBar" AcceptsMouseTooltip="true"/>
+            </State>
+            <State name="Tracer">
+                <When type="Property" Unit="HeroTracer"/>
+                <Action type="SetState" group="ResourceColorStates" state="Normal"/>
+                <Action type="SetProperty" frame="NormalEnergyBar" AcceptsMouseTooltip="true"/>
+            </State>
+            <State name="Valeera">
+                <When type="Property" Unit="HeroValeera"/>
+                <Action type="SetState" group="ResourceColorStates" state="Yellow"/>
+                <Action type="SetProperty" frame="YellowEnergyBar" AcceptsMouseTooltip="true"/>
+            </State>
+            <State name="VolskayaGunner">
+                <When type="Property" Unit="VolskayaVehicleGunner"/>
+                <Action type="SetState" group="ResourceColorStates" state="Pink"/>
+                <Action type="SetProperty" frame="PinkEnergyBar" AcceptsMouseTooltip="true"/>
+            </State>
+            <State name="Zarya">
+                <When type="Property" Unit="HeroZarya"/>
+                <Action type="SetState" group="ResourceColorStates" state="Pink"/>
+                <Action type="SetProperty" frame="PinkEnergyBar" AcceptsMouseTooltip="true"/>
+            </State>
+            <State name="Normal">
+                <Action type="SetState" group="ResourceColorStates" state="Normal"/>
+                <Action type="SetProperty" frame="NormalEnergyBar" AcceptsMouseTooltip="true"/>
+            </State>
+        </StateGroup>
+    </Frame>
+</Desc>

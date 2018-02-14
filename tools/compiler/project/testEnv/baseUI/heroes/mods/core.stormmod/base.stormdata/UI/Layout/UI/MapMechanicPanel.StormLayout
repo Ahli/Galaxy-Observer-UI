@@ -40,11 +40,6 @@
             <DarkAdjustColor val="{$GameUI/TeamChaosColors/@Color}"/>
         </Frame>
 
-        <Frame type="Image" name="Team1BackgroundBlue" template="StandardTemplates/RemoveThisFrameTemplate"/>
-        <Frame type="Image" name="Team1BackgroundRed" template="StandardTemplates/RemoveThisFrameTemplate"/>
-        <Frame type="Image" name="Team2BackgroundRed" template="StandardTemplates/RemoveThisFrameTemplate"/>
-        <Frame type="Image" name="Team2BackgroundBlue" template="StandardTemplates/RemoveThisFrameTemplate"/>
-
         <Frame type="Image" name="Team1CollectionIcon">
             <Anchor side="Bottom" relative="$parent/Team1Background" pos="Max" offset="10"/>
             <Anchor side="Left" relative="$parent/Team1Background" pos="Min" offset="-5"/>
@@ -766,17 +761,6 @@
                     <DarkAdjustColor val="{$GameUI/TeamChaosColors/@Color}"/>
                 </Frame>
 
-                <Frame type="Image" name="Team1BackgroundBlue" template="StandardTemplates/RemoveThisFrameTemplate"/>
-                <Frame type="Image" name="Team1BackgroundRed" template="StandardTemplates/RemoveThisFrameTemplate"/>
-                <Frame type="Image" name="Team2BackgroundRed" template="StandardTemplates/RemoveThisFrameTemplate"/>
-                <Frame type="Image" name="Team2BackgroundBlue" template="StandardTemplates/RemoveThisFrameTemplate"/>
-
-                <Frame type="Image" name="Team1DoubloonBlue" template="StandardTemplates/RemoveThisFrameTemplate"/>
-                <Frame type="Image" name="Team1DoubloonRed" template="StandardTemplates/RemoveThisFrameTemplate"/>
-                <Frame type="Image" name="Team2DoubloonRed" template="StandardTemplates/RemoveThisFrameTemplate"/>
-                <Frame type="Image" name="Team2DoubloonBlue" template="StandardTemplates/RemoveThisFrameTemplate"/>
-
-
                 <Frame type="Image" name="Team1DoubloonBackground">
                     <Anchor side="Bottom" relative="$parent/Team1Background" pos="Max" offset="2"/>
                     <Anchor side="Left" relative="$parent/Team1Background" pos="Min" offset="-15"/>
@@ -862,6 +846,238 @@
                     <DarkAdjustColor val="{$GameUI/TeamChaosColors/@Color}"/>
                     <GlowColor val="{$GameUI/TeamChaosColors/@Color}"/>
                 </Frame>
+                
+                <Frame type="UnitStatusColor" name="Team1GlowColors">
+                    <ColorStyle val="MapMechanicFX"/>
+                    <ForcedTeam val="0"/>
+                </Frame>
+
+                <Frame type="UnitStatusColor" name="Team2GlowColors">
+                    <ColorStyle val="MapMechanicFX"/>
+                    <ForcedTeam val="1"/>
+                </Frame>
+                
+                <!-- This frame receives from triggers:
+                    * animation event: "TurninReadyAnim" when coin is picked up that allows for full turn in
+                    * stategroup: TurninReady; states: IsReady, NotReady -->
+                <Frame type="Frame" name="Team1MapMechanicGlowContainer">
+                    <Anchor side="Top" relative="GemGlow" pos="Min" offset="0"/>
+                    <Anchor side="Left" relative="GemGlow" pos="Min" offset="0"/>
+                    <Anchor side="Bottom" relative="GemGlow" pos="Max" offset="0"/>
+                    <Anchor side="Right" relative="CounterGlow" pos="Max" offset="0"/>
+                    
+                    <Visible val="False"/>
+                    <RenderPriority val="500"/>
+                    <Unclipped val="True"/>
+                    
+                    <Frame type="Image" name="GemGlow">
+                        <Anchor side="Top" relative="$parent/$parent/Team1DoubloonIcon" pos="Mid" offset="0"/>
+                        <Anchor side="Left" relative="$parent/$parent/Team1DoubloonIcon" pos="Mid" offset="0"/>
+                        <Anchor side="Bottom" relative="$parent/$parent/Team1DoubloonIcon" pos="Mid" offset="0"/>
+                        <Anchor side="Right" relative="$parent/$parent/Team1DoubloonIcon" pos="Mid" offset="0"/>
+                        
+                        <Texture val="@UI/HUD_MapMechanic_Blackhearts_TurninGlow_coinglow"/>
+                        <ColorAdjustMode val="Colorize"/>
+                        <LightAdjustColor val="{$parent/$parent/Team1GlowColors/@Color}"/>
+                        <DarkAdjustColor val="{$parent/$parent/Team1GlowColors/@Color}"/>
+                    </Frame>
+                    
+                    <Frame type="Image" name="CounterGlow">
+                        <Anchor side="Left" relative="$parent/$parent/Team1Background" pos="Min" offset="5"/>
+                        <Anchor side="Bottom" relative="$parent/$parent/Team1Background" pos="Max" offset="-10"/>
+                        <Anchor side="Right" relative="$parent/$parent/Team1Background" pos="Max" offset="0"/>
+                    
+                        <Texture val="@UI/HUD_MapMechanic_SpiderQueen_TurninGlow_backglow"/>
+                        <ColorAdjustMode val="Colorize"/>
+                        <LightAdjustColor val="{$parent/$parent/Team1GlowColors/@Color}"/>
+                        <DarkAdjustColor val="{$parent/$parent/Team1GlowColors/@Color}"/>
+                    </Frame>
+
+                    <Animation name="Pulse">
+                        <Event event="OnShown" action="Reset,Play"/>
+                        <Event event="OnHidden" action="Reset, Stop"/>
+
+                        <Controller type="Fade" end="Loop">
+                            <Key type="Curve" time="0.25" value="255" inout="Linear"/>
+                            <Key type="Curve" time="1.25" value="100" inout="Slow,Linear"/>
+                            <Key type="Curve" time="2.25" value="255" inout="Linear"/>
+                        </Controller>
+                    </Animation>
+                </Frame>
+
+                <Frame type="Frame" name="Team1MapMechanicTurninEffectCoin">
+                    <Anchor side="Top" relative="$parent/Team1DoubloonIcon" pos="Mid" offset="0"/>
+                    <Anchor side="Bottom" relative="$parent/Team1DoubloonIcon" pos="Mid" offset="0"/>
+                    <Anchor side="Left" relative="$parent/Team1DoubloonIcon" pos="Mid" offset="0"/>
+                    <Anchor side="Right" relative="$parent/Team1DoubloonIcon" pos="Mid" offset="0"/>
+                    <Width val="312"/>
+                    <Height val="312"/>
+                    <Visible val="False"/>
+
+                    <Frame type="Image" name="GemImage">
+                        <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+                        <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+                        <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+                        <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+                        <Texture val="@UI/HUD_MapMechanic_BlackheartsBay_DoubloonBlue"/>
+                        <Alpha val="0"/>
+                        <BlendMode val="Add"/>
+
+                        <Animation name="FadeIn">
+                            <Event event="OnShown" action="Reset,Play" frame="$parent"/>
+
+                            <Controller type="Anchor" end="Pause" side="Left" relative="true">
+                                <Key type="Curve" time="0.1" value="-100" inout="Fast"/>
+                                <Key type="Curve" time="0.25" value="-37" inout="Slow"/>
+                            </Controller>
+
+                            <Controller type="Anchor" end="Pause" side="Right" relative="true">
+                                <Key type="Curve" time="0.1" value="100" inout="Fast"/>
+                                <Key type="Curve" time="0.25" value="37" inout="Slow"/>
+                            </Controller>
+
+                            <Controller type="Anchor" end="Pause" side="Top" relative="true">
+                                <Key type="Curve" time="0.1" value="-100" inout="Fast"/>
+                                <Key type="Curve" time="0.25" value="-37" inout="Slow"/>
+                            </Controller>
+
+                            <Controller type="Anchor" end="Pause" side="Bottom" relative="true">
+                                <Key type="Curve" time="0.1" value="100" inout="Fast"/>
+                                <Key type="Curve" time="0.25" value="37" inout="Slow"/>
+                            </Controller>
+
+                            <Controller type="Fade" end="Pause">
+                                <Key type="Curve" time="0.1" value="0" inout="Linear"/>
+                                <Key type="Curve" time="0.20" value="255" inout="Slow,Linear"/>
+                                <Key type="Curve" time="0.40" value="0" inout="Linear"/>
+                            </Controller>
+                        </Animation>
+                    </Frame>
+                </Frame>
+                
+                <Frame type="Frame" name="Team2MapMechanicGlowContainer">
+                    <Anchor side="Top" relative="GemGlow" pos="Min" offset="0"/>
+                    <Anchor side="Left" relative="CounterGlow" pos="Min" offset="0"/>
+                    <Anchor side="Bottom" relative="GemGlow" pos="Max" offset="0"/>
+                    <Anchor side="Right" relative="GemGlow" pos="Max" offset="0"/>
+                    
+                    <Visible val="False"/>
+                    <RenderPriority val="500"/>
+                    <Unclipped val="True"/>
+                    
+                    <Frame type="Image" name="GemGlow">
+                        <Anchor side="Top" relative="$parent/$parent/Team2DoubloonIcon" pos="Mid" offset="0"/>
+                        <Anchor side="Left" relative="$parent/$parent/Team2DoubloonIcon" pos="Mid" offset="0"/>
+                        <Anchor side="Bottom" relative="$parent/$parent/Team2DoubloonIcon" pos="Mid" offset="0"/>
+                        <Anchor side="Right" relative="$parent/$parent/Team2DoubloonIcon" pos="Mid" offset="0"/>
+                        
+                        <Texture val="@UI/HUD_MapMechanic_Blackhearts_TurninGlow_coinglow"/>
+                        <ColorAdjustMode val="Colorize"/>
+                        <LightAdjustColor val="{$parent/$parent/Team2GlowColors/@Color}"/>
+                        <DarkAdjustColor val="{$parent/$parent/Team2GlowColors/@Color}"/>
+                    </Frame>
+                    
+                    <Frame type="Image" name="CounterGlow">
+                        <Anchor side="Left" relative="$parent/$parent/Team2Background" pos="Min" offset="0"/>
+                        <Anchor side="Bottom" relative="$parent/$parent/Team2Background" pos="Max" offset="-10"/>
+                        <Anchor side="Right" relative="$parent/$parent/Team2Background" pos="Max" offset="-5"/>
+                    
+                        <Texture val="@UI/HUD_MapMechanic_SpiderQueen_TurninGlow_backglow"/>
+                        <ColorAdjustMode val="Colorize"/>
+                        <LightAdjustColor val="{$parent/$parent/Team2GlowColors/@Color}"/>
+                        <DarkAdjustColor val="{$parent/$parent/Team2GlowColors/@Color}"/>
+                    </Frame>
+
+                    <Animation name="Pulse">
+                        <Event event="OnShown" action="Reset,Play"/>
+                        <Event event="OnHidden" action="Reset, Stop"/>
+
+                        <Controller type="Fade" end="Loop">
+                            <Key type="Curve" time="0.25" value="255" inout="Linear"/>
+                            <Key type="Curve" time="1.25" value="100" inout="Slow,Linear"/>
+                            <Key type="Curve" time="2.25" value="255" inout="Linear"/>
+                        </Controller>
+                    </Animation>
+                </Frame>
+
+                <Frame type="Frame" name="Team2MapMechanicTurninEffectCoin">
+                    <Anchor side="Top" relative="$parent/Team2DoubloonIcon" pos="Mid" offset="0"/>
+                    <Anchor side="Bottom" relative="$parent/Team2DoubloonIcon" pos="Mid" offset="0"/>
+                    <Anchor side="Left" relative="$parent/Team2DoubloonIcon" pos="Mid" offset="0"/>
+                    <Anchor side="Right" relative="$parent/Team2DoubloonIcon" pos="Mid" offset="0"/>
+                    <Width val="312"/>
+                    <Height val="312"/>
+                    <Visible val="False"/>
+
+                    <Frame type="Image" name="GemImage">
+                        <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+                        <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+                        <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+                        <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+                        <Texture val="@UI/HUD_MapMechanic_BlackheartsBay_DoubloonBlue"/>
+                        <Alpha val="0"/>
+                        <BlendMode val="Add"/>
+                        <TextureCoords top="0.0" left="1.0" bottom="1.0" right="0.0"/>
+
+                        <Animation name="FadeIn">
+                            <Event event="OnShown" action="Reset,Play" frame="$parent"/>
+
+                            <Controller type="Anchor" end="Pause" side="Left" relative="true">
+                                <Key type="Curve" time="0.1" value="-100" inout="Fast"/>
+                                <Key type="Curve" time="0.25" value="-37" inout="Slow"/>
+                            </Controller>
+
+                            <Controller type="Anchor" end="Pause" side="Right" relative="true">
+                                <Key type="Curve" time="0.1" value="100" inout="Fast"/>
+                                <Key type="Curve" time="0.25" value="37" inout="Slow"/>
+                            </Controller>
+
+                            <Controller type="Anchor" end="Pause" side="Top" relative="true">
+                                <Key type="Curve" time="0.1" value="-100" inout="Fast"/>
+                                <Key type="Curve" time="0.25" value="-37" inout="Slow"/>
+                            </Controller>
+
+                            <Controller type="Anchor" end="Pause" side="Bottom" relative="true">
+                                <Key type="Curve" time="0.1" value="100" inout="Fast"/>
+                                <Key type="Curve" time="0.25" value="37" inout="Slow"/>
+                            </Controller>
+
+                            <Controller type="Fade" end="Pause">
+                                <Key type="Curve" time="0.1" value="0" inout="Linear"/>
+                                <Key type="Curve" time="0.20" value="255" inout="Slow,Linear"/>
+                                <Key type="Curve" time="0.40" value="0" inout="Linear"/>
+                            </Controller>
+                        </Animation>
+                    </Frame>
+                </Frame>
+
+                <StateGroup name="TurninReadyTeam1">
+                    <State name="IsReady">
+                        <When type="AnimationState" frame="Team1MapMechanicGlowContainer" TurninReady="IsReady"/>
+                        <Action type="SetProperty" frame="Team1MapMechanicGlowContainer" Visible="True"/>
+                        <Action type="SetProperty" frame="Team1MapMechanicTurninEffectCoin" Visible="True"/>
+                    </State>
+
+                    <State name="NotReady">
+                        <When type="AnimationState" frame="Team1MapMechanicGlowContainer" TurninReady="NotReady"/>
+                        <Action type="SetProperty" frame="Team1MapMechanicGlowContainer" Visible="False"/>
+                        <Action type="SetProperty" frame="Team1MapMechanicTurninEffectCoin" Visible="False"/>
+                    </State>
+                </StateGroup>
+
+                <StateGroup name="TurninReadyTeam2">
+                    <State name="IsReady">
+                        <When type="AnimationState" frame="Team2MapMechanicGlowContainer" TurninReady="IsReady"/>
+                        <Action type="SetProperty" frame="Team2MapMechanicGlowContainer" Visible="True"/>
+                        <Action type="SetProperty" frame="Team2MapMechanicTurninEffectCoin" Visible="True"/>
+                    </State>
+
+                    <State name="NotReady">
+                        <When type="AnimationState" frame="Team2MapMechanicGlowContainer" TurninReady="NotReady"/>
+                        <Action type="SetProperty" frame="Team2MapMechanicGlowContainer" Visible="False"/>
+                        <Action type="SetProperty" frame="Team2MapMechanicTurninEffectCoin" Visible="False"/>
+                    </State>
+                </StateGroup>
             </Frame>
 
             <Frame type="Frame" name="CannonModeFrame">

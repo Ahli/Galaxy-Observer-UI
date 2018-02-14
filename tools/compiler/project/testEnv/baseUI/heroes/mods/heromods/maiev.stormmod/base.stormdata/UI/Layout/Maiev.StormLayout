@@ -1,0 +1,554 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<Desc>
+
+<!-- Modify VaultFade to adjust Vault of the Wardens' Health Bar fade value -->
+<Constant name="VaultFade" val="160"/>
+
+<!-- Template for hiding color overrides on Shadow Orb and Naisha's Memento talent items -->
+    <Frame type="UnitStatusFrame" name="MaievInventoryOverlayFrameTemplate">
+	
+		<Frame type="UnitStatusValidatorAnimElement" name="MaievInventoryButtonProgressBarDisplay">
+            <Anchor relative="$parent"/>
+
+            <Animation name="ShowProgressBar">
+                <Event event="NoState" action="DirectionReverse, Play"/>
+
+                <Controller type="State" frame="$parent" stateGroup="ProgressBarVisibility" end="Pause">
+                    <Key type="Identifier" time="0.00" value="Hide"/>
+                    <Key type="Identifier" time="0.01" value="Show"/>
+                </Controller>
+            </Animation>
+        </Frame>
+
+		<!-- Manages the visibility of the UnitStatusInventoryAbilCharge -->
+        <StateGroup name="ProgressBarVisibility">
+            <DefaultState val="Hide"/>
+            
+            <State name="Show">
+                <Action type="SetProperty" frame="ProgressBarContainer" Visible="True"/>
+            </State>
+            <State name="Hide">
+                <Action type="SetProperty" frame="ProgressBarContainer" Visible="False"/>
+            </State>
+        </StateGroup>
+
+        <Frame type="Frame" name="ProgressBarContainer">
+            <Anchor relative="$parent"/>
+		</Frame>
+
+    </Frame>
+
+<!-- Vault of the Wardens Health Bar fading -->
+    <Frame type="UnitStatusFrame" name="MaievVaultOfTheWardensStatusFrame" template="UnitStatus/HeroUnitStatusFrameTemplate">
+	
+		<Frame type="UnitStatusValidatorAnimElement" name="VaultOfTheWardensFadeAnim">
+			<Anchor relative="$parent"/>
+
+			<Validator val="MaievHasVaultOfTheWardensAirborneStasisBehavior"/>
+			
+			<Animation name="Show">
+				<Event event="NoState" action="Stop"/>
+				<Event event="MaievHasVaultOfTheWardensAirborneStasisBehavior" action="Reset,Play"/>
+				 
+				<Controller type="Fade" end="Pause" frame="$parent/HeroUnitStatusParentFrame">
+					<Key type="Curve" time="0" value="#VaultFade" inout="Slow"/>
+				</Controller>
+			</Animation>
+		</Frame>
+    </Frame>
+
+<!-- Cruel Chain talent stack icons -->	
+    <Frame type="SelectionUnitStatusPanel" name="MaievStacksFrameContainer">
+        <Anchor relative="$parent"/>
+        <SpecificUnit val="HeroMaiev"/>
+        <CheckPassengers val="True"/>
+
+        <Frame type="UnitStatusUnitStackingDebuffElement" name="MaievCruelChainStacksFrame" template="UnitStatus/StackingBehaviorTemplate">
+			<Anchor relative="$parent"/>
+            <BuffBehavior val="MaievUmbralBindCruelChainToken"/>
+            <StackBehavior val="MaievUmbralBindCruelChainToken"/>
+            <DebuffType val="TokenCounter"/>
+
+            <Frame type="ProgressBar" name="StacksProgressBar">
+				<Height val="30"/>
+				<Width val="120"/>
+            </Frame>
+
+            <Frame type="Image" name="Stacking">
+                <Texture val="@UI/storm_ui_HeroUI_Maiev_ConstrictionStack"/>
+            </Frame>
+            
+            <Frame type="Image" name="StacksFull">
+                <Texture val="@UI/storm_ui_HeroUI_Maiev_ConstrictionStack_Full"/>
+            </Frame>
+        </Frame>
+    </Frame>
+
+<!-- Progress bar setup for Naisha's Memento -->	
+	<Frame type="UnitStatusFrame" name="MaievNaishasMementoOverlayFrame" template="Maiev/MaievInventoryOverlayFrameTemplate">
+        <Anchor relative="$parent"/>
+        <Visible val="True"/>
+
+		<Frame type="UnitStatusValidatorAnimElement" name="MaievInventoryButtonProgressBarDisplay">
+            <Anchor relative="$parent"/>
+			<Validator val="MaievFanOfKnivesNaishasMementoProgressBar"/>
+
+            <Animation name="ShowProgressBar">
+                <Event event="MaievFanOfKnivesNaishasMementoProgressBar" action="Reset, Play"/>
+            </Animation>
+        </Frame>
+		
+        <Frame type="Frame" name="ProgressBarContainer">
+            <Anchor relative="$parent"/>
+		
+			<!-- Animation Events to flash the Progress Bar when useable-->
+			<Frame type="UnitStatusValidatorAnimElement" name="MaievNaishasMementoActiveAnims">
+				<Anchor relative="$parent"/>
+				<Validator val="MaievFanOfKnivesNaishasMementoChargeIsMax"/>
+
+				<Animation name="MaievNaishasMementoReadyPulse">
+					<Event event="Reset" action="Stop"/>
+					<Event event="NoState" action="Stop"/>
+					<Event event="MaievFanOfKnivesNaishasMementoChargeIsMax" action="Restart, Play"/>
+
+					<Controller type="Property" property="ColorAdjustMode" end="Pause" frame="$parent/MaievNaishasMementoChargeLocationFrame/ChargeFillProgress/FillImageContainer/FillImage">
+					  <Key type="Property" time="0" value="Addself"/>
+					</Controller>
+
+					<Controller type="AdjustmentColor" end="pingpong" frame="$parent/MaievNaishasMementoChargeLocationFrame/ChargeFillProgress/FillImageContainer/FillImage">
+						<Key type="Curve" time="0" value="001612" inout="Linear"/>
+						<Key type="Curve" time=".5" value="003d2f" inout="Linear,Slow"/>
+					</Controller>
+
+					<Controller type="Visibility" end="Pause" frame="$parent/MaievNaishasMementoChargeLocationFrame/ChargeFillProgress/EndCapImage">
+						<Key type="Bool" time="0" value="False"/>
+					</Controller>
+				</Animation>
+			</Frame>
+
+			<Frame type="Image" name="MaievNaishasMementoDarkBackGround">
+				<Anchor relative="$parent/MaievNaishasMementoChargeLocationFrame/ChargeFillProgress"/>
+				<Visible val="True"/>
+				<Alpha val="255"/>
+				<ColorAdjustMode val="None"/>
+				<Desaturated val="True"/>
+				<DesaturationColor val="3f3f3f"/>
+				<SubpixelRendering val="True"/>
+				<BlendMode val="Normal"/>
+				<RenderType val="LDR"/>
+				<Texture val="@UI/storm_ui_icon_maiev_memento"/>
+				<ImageMaskTexture val="@UI/HUD_BTN_BG_Ability_AlphaMask"/>
+			</Frame>
+
+			<!-- Progress Bar for Naisha's Memento activation-->			
+			<Frame type="UnitStatusInventoryAbilCharge" name="MaievNaishasMementoChargeLocationFrame">
+				<Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+				<Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+				<Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+				<Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+				<AcceptsMouse val="False"/>
+				<AbilityLink val="MaievFanOfKnivesNaishasMemento"/>
+				<ChargeLink val="Abil/MaievFanOfKnivesNaishasMemento"/>
+				<SendChargesEmptyAnimEvent val="True"/>
+				<SendChargesFullAnimEvent val="True"/>
+				<SendCurrentChangedAnimEvent val="True"/>
+				<ChargeLocation val="Player"/>
+				<Visible val="True"/>
+				
+				<Frame type="ProgressBar" name="ChargeFillProgress">
+					<Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+					<Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+					<Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+					<Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+					<AcceptsMouse val="False"/>
+					<MinValue val="0"/>
+					<MaxValue val="0"/>
+					<Value val="0"/>
+					<FillInset val="0.0"/>
+					<Height val="66"/>
+					<Width val="66"/>
+					<Vertical val="True"/>
+					<UseFillContainer val="False"/>
+					<AlphaMaskTexture val="@UI/HUD_BTN_BG_Ability_AlphaMask"/>
+
+					<Frame type="Frame" name="FillImageContainer">
+						<Anchor relative="$parent"/>
+
+						<Frame type="Image" name="FillImage">
+							<Anchor relative="$parent"/>
+							<Texture val="@UI/storm_ui_icon_maiev_memento"/>
+							<RenderPriority val="600"/>
+							<SubpixelRendering val="True"/>
+							<ColorAdjustMode val="None"/>
+							<Desaturated val="True"/>
+							<DesaturationColor val="494B83"/>
+							<Alpha val="255"/>
+							<ImageMaskTexture val="@UI/HUD_BTN_BG_Ability_AlphaMask"/>
+						</Frame>
+					</Frame>
+					
+					<Frame type="Image" name="EndCapImage">
+						<Anchor side="Top" relative="$parent/FillImageContainer/FillImage" pos="Min" offset="0"/>
+						<Anchor side="Left" relative="$parent/FillImageContainer/FillImage" pos="Min" offset="0"/>
+						<Anchor side="Right" relative="$parent/FillImageContainer/FillImage" pos="Max" offset="0"/>
+						<Height val="4"/>
+						<Texture val="Assets/Textures/storm_ui_hud_bar_cap.dds"/>
+					</Frame>
+				</Frame>	
+			</Frame>
+		</Frame>			
+    </Frame>
+
+<!-- Progress bar setup for Shadow Orb: Huntress -->		
+	<Frame type="UnitStatusFrame" name="MaievShadowOrbHuntressOverlayFrame" template="Maiev/MaievInventoryOverlayFrameTemplate">
+        <Anchor relative="$parent"/>
+        <Visible val="True"/>
+
+		<Frame type="UnitStatusValidatorAnimElement" name="MaievInventoryButtonProgressBarDisplay">
+            <Anchor relative="$parent"/>
+			<Validator val="MaievShadowOrbHuntressProgressBar"/>
+
+            <Animation name="ShowProgressBar">
+                <Event event="MaievShadowOrbHuntressProgressBar" action="Reset, Play"/>
+            </Animation>
+        </Frame>
+
+		<Frame type="Frame" name="ProgressBarContainer">
+            <Anchor relative="$parent"/>
+			
+			<!-- Animation Events to flash the Progress Bar when useable-->
+			<Frame type="UnitStatusValidatorAnimElement" name="MaievShadowOrbHuntressActiveAnims">
+				<Anchor relative="$parent"/>
+				<Validator val="MaievShadowOrbHuntressChargeIsMax"/>
+
+				<Animation name="MaievShadowOrbHuntressReadyPulse">
+					<Event event="Reset" action="Stop"/>
+					<Event event="NoState" action="Stop"/>
+					<Event event="MaievShadowOrbHuntressChargeIsMax" action="Restart, Play"/>
+
+					<Controller type="Property" property="ColorAdjustMode" end="Pause" frame="$parent/MaievShadowOrbHuntressChargeLocationFrame/ChargeFillProgress/FillImageContainer/FillImage">
+					  <Key type="Property" time="0" value="Addself"/>
+					</Controller>
+
+					<Controller type="AdjustmentColor" end="pingpong" frame="$parent/MaievShadowOrbHuntressChargeLocationFrame/ChargeFillProgress/FillImageContainer/FillImage">
+						<Key type="Curve" time="0" value="0e051c" inout="Linear"/>
+						<Key type="Curve" time=".5" value="3a106d" inout="Linear,Slow"/>
+					</Controller>
+
+					<Controller type="Visibility" end="Pause" frame="$parent/MaievShadowOrbHuntressChargeLocationFrame/ChargeFillProgress/EndCapImage">
+						<Key type="Bool" time="0" value="False"/>
+					</Controller>
+				</Animation>
+			</Frame>
+
+			<Frame type="Image" name="MaievShadowOrbHuntressDarkBackGround">
+				<Anchor relative="$parent/MaievShadowOrbHuntressChargeLocationFrame/ChargeFillProgress"/>
+				<Visible val="True"/>
+				<Alpha val="255"/>
+				<ColorAdjustMode val="None"/>
+				<Desaturated val="True"/>
+				<DesaturationColor val="262626"/>
+				<SubpixelRendering val="True"/>
+				<BlendMode val="Normal"/>
+				<RenderType val="LDR"/>
+				<Texture val="@UI/storm_ui_icon_maiev_shadoworb_relentless"/>
+				<ImageMaskTexture val="@UI/HUD_BTN_BG_Ability_AlphaMask"/>
+			</Frame>
+
+			<!-- Progress Bar for Shadow Orb: Huntress activation-->			
+			<Frame type="UnitStatusInventoryAbilCharge" name="MaievShadowOrbHuntressChargeLocationFrame">
+				<Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+				<Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+				<Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+				<Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+				<AcceptsMouse val="False"/>
+				<AbilityLink val="MaievShadowOrbHuntress"/>
+				<ChargeLink val="Abil/MaievShadowOrbHuntress"/>
+				<SendChargesEmptyAnimEvent val="True"/>
+				<SendChargesFullAnimEvent val="True"/>
+				<SendCurrentChangedAnimEvent val="True"/>
+				<ChargeLocation val="Player"/>
+				<Visible val="True"/>
+				
+				<Frame type="ProgressBar" name="ChargeFillProgress">
+					<Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+					<Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+					<Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+					<Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+					<AcceptsMouse val="False"/>
+					<MinValue val="0"/>
+					<MaxValue val="0"/>
+					<Value val="0"/>
+					<FillInset val="0.0"/>
+					<Height val="66"/>
+					<Width val="66"/>
+					<Vertical val="True"/>
+					<UseFillContainer val="False"/>
+					<AlphaMaskTexture val="@UI/HUD_BTN_BG_Ability_AlphaMask"/>              
+
+					<Frame type="Frame" name="FillImageContainer">
+						<Anchor relative="$parent"/>
+
+						<Frame type="Image" name="FillImage">
+							<Anchor relative="$parent"/>
+							<Texture val="@UI/storm_ui_icon_maiev_shadoworb_relentless"/>
+							<RenderPriority val="600"/>
+							<SubpixelRendering val="True"/>
+							<ColorAdjustMode val="None"/>
+							<Desaturated val="True"/>
+							<DesaturationColor val="494B83"/>
+							<Alpha val="255"/>
+							<ImageMaskTexture val="@UI/HUD_BTN_BG_Ability_AlphaMask"/>
+						</Frame>
+					</Frame>
+					<Frame type="Image" name="EndCapImage">
+						<Anchor side="Top" relative="$parent/FillImageContainer/FillImage" pos="Min" offset="0"/>
+						<Anchor side="Left" relative="$parent/FillImageContainer/FillImage" pos="Min" offset="0"/>
+						<Anchor side="Right" relative="$parent/FillImageContainer/FillImage" pos="Max" offset="0"/>
+						<Height val="4"/>
+						<Texture val="Assets/Textures/storm_ui_hud_bar_cap.dds"/>
+					</Frame>
+				</Frame>	
+			</Frame>
+		</Frame>			
+    </Frame>
+
+	<!-- Progress bar setup for Shadow Orb: Shadow Strike -->	
+	<Frame type="UnitStatusFrame" name="MaievShadowOrbShadowStrikeOverlayFrame" template="Maiev/MaievInventoryOverlayFrameTemplate">
+        <Anchor relative="$parent"/>
+        <Visible val="True"/>
+		
+		<Frame type="UnitStatusValidatorAnimElement" name="MaievInventoryButtonProgressBarDisplay">
+            <Anchor relative="$parent"/>
+			<Validator val="MaievShadowOrbShadowStrikeProgressBar"/>
+
+            <Animation name="ShowProgressBar">
+                <Event event="MaievShadowOrbShadowStrikeProgressBar" action="Reset, Play"/>
+            </Animation>
+        </Frame>
+		
+        <Frame type="Frame" name="ProgressBarContainer">
+            <Anchor relative="$parent"/>
+			
+			<!-- Animation Events to flash the Progress Bar when useable-->
+			<Frame type="UnitStatusValidatorAnimElement" name="MaievShadowOrbShadowStrikeActiveAnims">
+				<Anchor relative="$parent"/>
+				<Validator val="MaievShadowOrbShadowStrikeChargeIsMax"/>
+
+				<Animation name="MaievShadowOrbShadowStrikeReadyPulse">
+					<Event event="Reset" action="Stop"/>
+					<Event event="NoState" action="Stop"/>
+					<Event event="MaievShadowOrbShadowStrikeChargeIsMax" action="Restart, Play"/>
+
+					<Controller type="Property" property="ColorAdjustMode" end="Pause" frame="$parent/MaievShadowOrbShadowStrikeChargeLocationFrame/ChargeFillProgress/FillImageContainer/FillImage">
+					  <Key type="Property" time="0" value="Addself"/>
+					</Controller>
+
+					<Controller type="AdjustmentColor" end="pingpong" frame="$parent/MaievShadowOrbShadowStrikeChargeLocationFrame/ChargeFillProgress/FillImageContainer/FillImage">
+						<Key type="Curve" time="0" value="0e051c" inout="Linear"/>
+						<Key type="Curve" time=".5" value="3a106d" inout="Linear,Slow"/>
+					</Controller>
+
+					<Controller type="Visibility" end="Pause" frame="$parent/MaievShadowOrbShadowStrikeChargeLocationFrame/ChargeFillProgress/EndCapImage">
+						<Key type="Bool" time="0" value="False"/>
+					</Controller>
+				</Animation>
+			</Frame>
+
+			<Frame type="Image" name="MaievShadowOrbShadowStrikeDarkBackGround">
+				<Anchor relative="$parent/MaievShadowOrbShadowStrikeChargeLocationFrame/ChargeFillProgress"/>
+				<Visible val="True"/>
+				<Alpha val="255"/>
+				<ColorAdjustMode val="None"/>
+				<Desaturated val="True"/>
+				<DesaturationColor val="262626"/>
+				<SubpixelRendering val="True"/>
+				<BlendMode val="Normal"/>
+				<RenderType val="LDR"/>
+				<Texture val="@UI/storm_ui_icon_maiev_shadoworb_strike"/>
+				<ImageMaskTexture val="@UI/HUD_BTN_BG_Ability_AlphaMask"/>
+			</Frame>
+
+			<!-- Progress Bar for Shadow Orb: Shadow Strike activation-->			
+			<Frame type="UnitStatusInventoryAbilCharge" name="MaievShadowOrbShadowStrikeChargeLocationFrame">
+				<Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+				<Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+				<Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+				<Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+				<AcceptsMouse val="False"/>
+				<AbilityLink val="MaievShadowOrbShadowStrike"/>
+				<ChargeLink val="Abil/MaievShadowOrbShadowStrike"/>
+				<SendChargesEmptyAnimEvent val="True"/>
+				<SendChargesFullAnimEvent val="True"/>
+				<SendCurrentChangedAnimEvent val="True"/>
+				<ChargeLocation val="Player"/>
+				<Visible val="True"/>
+				
+				<Frame type="ProgressBar" name="ChargeFillProgress">
+					<Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+					<Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+					<Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+					<Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+					<AcceptsMouse val="False"/>
+					<MinValue val="0"/>
+					<MaxValue val="0"/>
+					<Value val="0"/>
+					<FillInset val="0.0"/>
+					<Height val="66"/>
+					<Width val="66"/>
+					<Vertical val="True"/>
+					<UseFillContainer val="False"/>
+					<AlphaMaskTexture val="@UI/HUD_BTN_BG_Ability_AlphaMask"/>               
+
+					<Frame type="Frame" name="FillImageContainer">
+						<Anchor relative="$parent"/>
+
+						<Frame type="Image" name="FillImage">
+							<Anchor relative="$parent"/>
+							<Texture val="@UI/storm_ui_icon_maiev_shadoworb_strike"/>
+							<RenderPriority val="600"/>
+							<SubpixelRendering val="True"/>
+							<ColorAdjustMode val="None"/>
+							<Desaturated val="True"/>
+							<DesaturationColor val="494B83"/>
+							<Alpha val="255"/>
+							<ImageMaskTexture val="@UI/HUD_BTN_BG_Ability_AlphaMask"/>
+						</Frame>
+					</Frame>
+					<Frame type="Image" name="EndCapImage">
+						<Anchor side="Top" relative="$parent/FillImageContainer/FillImage" pos="Min" offset="0"/>
+						<Anchor side="Left" relative="$parent/FillImageContainer/FillImage" pos="Min" offset="0"/>
+						<Anchor side="Right" relative="$parent/FillImageContainer/FillImage" pos="Max" offset="0"/>
+						<Height val="4"/>
+						<Texture val="Assets/Textures/storm_ui_hud_bar_cap.dds"/>
+					</Frame>
+				</Frame>	
+			</Frame>
+		</Frame>			
+    </Frame>
+
+<!-- Progress bar setup for Shadow Orb: Vengeance-->		
+	<Frame type="UnitStatusFrame" name="MaievSpiritOfVengeanceShadowOrbVengeanceOverlayFrame" template="Maiev/MaievInventoryOverlayFrameTemplate">
+        <Anchor relative="$parent"/>
+        <Visible val="True"/>
+		
+		<Frame type="UnitStatusValidatorAnimElement" name="MaievInventoryButtonProgressBarDisplay">
+            <Anchor relative="$parent"/>
+			<Validator val="MaievSpiritOfVengeanceShadowOrbVengeanceProgressBar"/>
+
+            <Animation name="ShowProgressBar">
+                <Event event="MaievSpiritOfVengeanceShadowOrbVengeanceProgressBar" action="Reset, Play"/>
+            </Animation>
+        </Frame>
+		
+		<Frame type="Frame" name="ProgressBarContainer">
+            <Anchor relative="$parent"/>
+			
+			<!-- Animation Events to flash the Progress Bar when useable-->
+			<Frame type="UnitStatusValidatorAnimElement" name="MaievSpiritOfVengeanceShadowOrbVengeanceActiveAnims">
+				<Anchor relative="$parent"/>
+				<Validator val="MaievSpiritOfVengeanceShadowOrbVengeanceChargeCombine"/>
+
+				<Animation name="MaievSpiritOfVengeanceShadowOrbVengeanceReadyPulse">
+					<Event event="Reset" action="Stop"/>
+					<Event event="NoState" action="Stop"/>
+					<Event event="MaievSpiritOfVengeanceShadowOrbVengeanceChargeCombine" action="Restart, Play"/>
+
+					<Controller type="Property" property="ColorAdjustMode" end="Pause" frame="$parent/MaievSpiritOfVengeanceShadowOrbVengeanceChargeLocationFrame/ChargeFillProgress/FillImageContainer/FillImage">
+					  <Key type="Property" time="0" value="Addself"/>
+					</Controller>
+
+					<Controller type="AdjustmentColor" end="pingpong" frame="$parent/MaievSpiritOfVengeanceShadowOrbVengeanceChargeLocationFrame/ChargeFillProgress/FillImageContainer/FillImage">
+						<Key type="Curve" time="0" value="0e051c" inout="Linear"/>
+						<Key type="Curve" time=".5" value="3a106d" inout="Linear,Slow"/>
+					</Controller>
+				</Animation>
+			</Frame>
+
+			<Frame type="UnitStatusValidatorAnimElement" name="MaievSpiritOfVengeanceShadowOrbVengeanceHideEndCap">
+				<Validator val="MaievSpiritOfVengeanceShadowOrbVengeanceChargeIsMax"/>
+
+				<Animation name="MaievSpiritOfVengeanceShadowOrbVengeanceHideEndCap">
+					<Event event="Reset" action="Stop"/>
+					<Event event="NoState" action="Stop"/>
+					<Event event="MaievSpiritOfVengeanceShadowOrbVengeanceChargeIsMax" action="Restart, Play"/>
+
+					<Controller type="Visibility" end="Pause" frame="$parent/MaievSpiritOfVengeanceShadowOrbVengeanceChargeLocationFrame/ChargeFillProgress/EndCapImage">
+						<Key type="Bool" time="0" value="False"/>
+					</Controller>
+				</Animation>
+			</Frame>
+			
+			<Frame type="Image" name="MaievSpiritOfVengeanceShadowOrbVengeanceDarkBackGround">
+				<Anchor relative="$parent/MaievSpiritOfVengeanceShadowOrbVengeanceChargeLocationFrame/ChargeFillProgress"/>
+				<Visible val="True"/>
+				<Alpha val="255"/>
+				<ColorAdjustMode val="None"/>
+				<Desaturated val="True"/>
+				<DesaturationColor val="262626"/>
+				<SubpixelRendering val="True"/>
+				<BlendMode val="Normal"/>
+				<RenderType val="LDR"/>
+				<Texture val="@UI/storm_ui_icon_maiev_shadoworb_vengeance"/>
+				<ImageMaskTexture val="@UI/HUD_BTN_BG_Ability_AlphaMask"/>
+			</Frame>
+
+			<!-- Progress Bar for Shadow Orb: Vengeance activation-->			
+			<Frame type="UnitStatusInventoryAbilCharge" name="MaievSpiritOfVengeanceShadowOrbVengeanceChargeLocationFrame">
+				<Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+				<Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+				<Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+				<Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+				<AcceptsMouse val="False"/>
+				<AbilityLink val="MaievSpiritOfVengeanceShadowOrbVengeance"/>
+				<ChargeLink val="Abil/MaievSpiritOfVengeanceShadowOrbVengeance"/>
+				<SendChargesEmptyAnimEvent val="True"/>
+				<SendChargesFullAnimEvent val="True"/>
+				<SendCurrentChangedAnimEvent val="True"/>
+				<ChargeLocation val="Player"/>
+				<Visible val="True"/>
+				
+				<Frame type="ProgressBar" name="ChargeFillProgress">
+					<Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+					<Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+					<Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+					<Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+					<AcceptsMouse val="False"/>
+					<MinValue val="0"/>
+					<MaxValue val="0"/>
+					<Value val="0"/>
+					<FillInset val="0.0"/>
+					<Height val="66"/>
+					<Width val="66"/>
+					<Vertical val="True"/>
+					<UseFillContainer val="False"/>
+					<AlphaMaskTexture val="@UI/HUD_BTN_BG_Ability_AlphaMask"/>              
+
+					<Frame type="Frame" name="FillImageContainer">
+						<Anchor relative="$parent"/>
+
+						<Frame type="Image" name="FillImage">
+							<Anchor relative="$parent"/>
+							<Texture val="@UI/storm_ui_icon_maiev_shadoworb_vengeance"/>
+							<RenderPriority val="600"/>
+							<SubpixelRendering val="True"/>
+							<ColorAdjustMode val="None"/>
+							<Desaturated val="True"/>
+							<DesaturationColor val="494B83"/>
+							<Alpha val="255"/>
+							<ImageMaskTexture val="@UI/HUD_BTN_BG_Ability_AlphaMask"/>
+						</Frame>
+					</Frame>
+					<Frame type="Image" name="EndCapImage">
+						<Anchor side="Top" relative="$parent/FillImageContainer/FillImage" pos="Min" offset="0"/>
+						<Anchor side="Left" relative="$parent/FillImageContainer/FillImage" pos="Min" offset="0"/>
+						<Anchor side="Right" relative="$parent/FillImageContainer/FillImage" pos="Max" offset="0"/>
+						<Anchor side="Bottom" relative="$parent/FillImageContainer/FillImage" pos="Max" offset="-100"/>
+						<Height val="4"/>
+						<Texture val="Assets/Textures/storm_ui_hud_bar_cap.dds"/>
+					</Frame>
+				</Frame>	
+			</Frame>
+		</Frame>			
+    </Frame>
+</Desc>

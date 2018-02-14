@@ -1,16 +1,6 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <Desc>
-    <!--
-    <Constant name="blue" val="669af0"/>
-    <Constant name="medblue" val="3b7cdf"/>
-    <Constant name="darkblue" val="003acd"/>
-    <Constant name="red" val="f05f66"/>
-    <Constant name="medred" val="df373f"/>
-    <Constant name="darkred" val="a8040c"/>
-    <Constant name="purple" val="cd8df6"/>
-    <Constant name="medpurple" val="b764e2"/>
-    <Constant name="darkpurple" val="680b93"/>
-    -->
+    
     <Constant name="KillLog_AnimTime" val=".25"/>
 
     <Animation name="IconVisibility">
@@ -272,76 +262,39 @@
             <Height val="350"/>
             <RenderType val="HDR"/>
             <Unclipped val="True"/>
+            <AutoPlay val="True"/>
+            <!-- Cutscene file managed externally in Item frame (parent), KillLogItemType stategroup -->
 
             <Frame type="Frame" name="CutsceneColorblindFilterSupport" template="StandardAnimationTemplates/CutsceneColorblindFilterSupportTemplate"/>
 
-            <StateGroup name="SetCutsceneColor">
-                <State name="SetAlly">
-                    <When type="AnimationState" frame="$parent" SrcColor="Blue"/>
-                    <Action type="SendEvent" frame="$this" event="SetAllyColor"/>
-                </State>
-                <State name="SetEnemy">
-                    <When type="AnimationState" frame="$parent" SrcColor="Red"/>
-                    <Action type="SendEvent" frame="$this" event="SetEnemyColor"/>
-                </State>
-                <State name="SetNeutral">
-                    <When type="AnimationState" frame="$parent" SrcColor="Purple"/>
-                    <When type="AnimationState" frame="$parent" TgtColor="Blue"/>
-                    <Action type="SendEvent" frame="$this" event="SetNeutralColor"/>
-                </State>
-                <State name="SetNeutralGood">
-                    <When type="AnimationState" frame="$parent" SrcColor="Purple"/>
-                    <When type="AnimationState" frame="$parent" TgtColor="Red"/>
-                    <Action type="SendEvent" frame="$this" event="SetAllyColor"/>
-                </State>
-            </StateGroup>
-
-            <Animation name="PlayBg">
+            <Animation name="PlayBg_Ally">
                 <Event event="SetAllyColor" action="Reset,Play"/>
-
-                <Controller type="Cutscene" end="Pause">
-                    <Key type="Cutscene" time="0.2" action="Play"/>
-                    <Key type="Cutscene" time="0.21" action="Bookmark" bookmark="Start"/>
-                    <Key type="Cutscene" time="0.22" action="RemoveFilter" filter="Enemy"/>
-                    <Key type="Cutscene" time="0.23" action="AddFilter" filter="Ally"/>
+                <Event event="SetEnemyColor" action="Stop"/>
+                <Controller type="Cutscene" end="Stop">
+                    <Key type="Cutscene" time="0" action="ClearFilters"/>
+                    <Key type="Cutscene" time=".2" action="AddFilter" filter="Ally"/>
+                    <Key type="Cutscene" time=".2" action="Bookmark" bookmark="Start"/>
                 </Controller>
             </Animation>
 
             <Animation name="PlayBg_Enemy">
                 <Event event="SetEnemyColor" action="Reset,Play"/>
-
-                <Controller type="Cutscene" end="Pause">
-                    <Key type="Cutscene" time="0.2" action="Play"/>
-                    <Key type="Cutscene" time="0.21" action="Bookmark" bookmark="Start"/>
-                    <Key type="Cutscene" time="0.22" action="RemoveFilter" filter="Ally"/>
-                    <Key type="Cutscene" time="0.23" action="AddFilter" filter="Enemy"/>
-                </Controller>
-            </Animation>
-            
-            <Animation name="PlayBg_Neutral">
-                <Event event="SetNeutralColor" action="Reset,Play"/>
-
-                <Controller type="Cutscene" end="Pause">
-                    <Key type="Cutscene" time="0.2" action="Play"/>
-                    <Key type="Cutscene" time="0.21" action="Bookmark" bookmark="Start"/>
-                    <Key type="Cutscene" time="0.22" action="RemoveFilter" filter="Ally"/>
-                    <Key type="Cutscene" time="0.23" action="AddFilter" filter="Enemy"/>
+                <Event event="SetAllyColor" action="Stop"/>
+                <Controller type="Cutscene" end="Stop">
+                    <Key type="Cutscene" time="0" action="ClearFilters"/>
+                    <Key type="Cutscene" time=".2" action="AddFilter" filter="Enemy"/>
+                    <Key type="Cutscene" time=".2" action="Bookmark" bookmark="Start"/>
                 </Controller>
             </Animation>
 
-            <Animation name="SetCutsceneFile_Quest"> 
-                <Event event="Quest" action="Reset,Play"/>
-                <Controller type="Cutscene" end="Pause">
-                    <Key type="Cutscene" time="0" action="SetCutscene" file="Cutscenes/GameUI_KillLogQuest.StormCutscene"/>
-                </Controller>
-            </Animation>
-
-            <Animation name="SetCutsceneFile_Kill">
-                <Event event="Kill" action="Reset,Play"/>
-                <Controller type="Cutscene" end="Pause">
-                    <Key type="Cutscene" time="0" action="SetCutscene" file="Cutscenes/GameUI_KillLog.StormCutscene"/>
-                </Controller>
-            </Animation>
+            <StateGroup name="CutsceneStatus">
+                <DefaultState val="Inactive"/>
+                <State name="Inactive"/>
+                <State name="Active">
+                    <When type="Property" Visible="True"/>
+                    <When type="AnimationState" CutsceneLoad="Loaded"/>
+                </State>
+            </StateGroup>
         </Frame>
 
         <!-- Separator images -->
@@ -640,17 +593,41 @@
 
         <StateGroup name="KillLogItemType">
             <State name="Hidden">
-                <When type="Property" visible="false"/>
+                <When type="Property" visible="False"/>
             </State>
             <State name="Kill">
                 <When type="AnimationState" KillLogItemType="Kill"/>
-                <Action type="SendEvent" frame="BackgroundCutscene" event="Kill"/>
+                <Action type="SetProperty" frame="BackgroundCutscene" file="Cutscenes/GameUI_KillLog.StormCutscene"/>
                 <Action type="SetProperty" frame="VsImage" visible="True"/>
             </State>
             <State name="Quest">
                 <When type="AnimationState" KillLogItemType="Quest"/>
-                <Action type="SendEvent" frame="BackgroundCutscene" event="Quest"/>
+                <Action type="SetProperty" frame="BackgroundCutscene" file="Cutscenes/GameUI_KillLogQuest.StormCutscene"/>
                 <Action type="SetProperty" frame="QuestImage" visible="True"/>
+            </State>
+        </StateGroup>
+
+        <StateGroup name="CutsceneColor">
+            <State name="None">
+                <When type="StateGroup" frame="BackgroundCutscene" CutsceneStatus="Inactive"/>
+            </State>
+            <State name="SetAlly">
+                <When type="AnimationState" SrcColor="Blue"/>
+                <Action type="SendEvent" frame="BackgroundCutscene" event="SetAllyColor"/>
+            </State>
+            <State name="SetEnemy">
+                <When type="AnimationState" SrcColor="Red"/>
+                <Action type="SendEvent" frame="BackgroundCutscene" event="SetEnemyColor"/>
+            </State>
+            <State name="SetNeutralToEnemy">
+                <When type="AnimationState" SrcColor="Purple"/>
+                <When type="AnimationState" TgtColor="Red"/>
+                <Action type="SendEvent" frame="BackgroundCutscene" event="SetAllyColor"/>
+            </State>
+            <State name="SetNeutralToAlly">
+                <When type="AnimationState" SrcColor="Purple"/>
+                <When type="AnimationState" TgtColor="Blue"/>
+                <Action type="SendEvent" frame="BackgroundCutscene" event="SetEnemyColor"/>
             </State>
         </StateGroup>
     </Frame>
