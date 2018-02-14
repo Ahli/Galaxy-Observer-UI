@@ -206,7 +206,7 @@ public final class InterfaceBuilderApp extends Application {
 		final int numberOfProcessors = Runtime.getRuntime().availableProcessors();
 		logger.info("detected processor count: " + numberOfProcessors); //$NON-NLS-1$
 		
-		final int maxThreads = Math.max(1, Math.min(numberOfProcessors / 2, 1));
+		final int maxThreads = Math.max(1, numberOfProcessors / 2);
 		executor = new MyThreadPoolExecutor(maxThreads, maxThreads, 5000L, TimeUnit.MILLISECONDS,
 				new LinkedBlockingQueue<>(), new MyThreadFactory());
 		executor.allowCoreThreadTimeOut(true);
@@ -588,7 +588,6 @@ public final class InterfaceBuilderApp extends Application {
 		// --compile="D:\GalaxyObsUI\dev\heroes\AhliObs.StormInterface"
 		paramCompilePath = namedParams.get("compileRun");
 		if (paramCompilePath != null) { //$NON-NLS-1$
-			paramCompilePath = namedParams.get("compileRun"); //$NON-NLS-1$
 			compileAndRun = true;
 		} else {
 			paramCompilePath = namedParams.get("compile"); //$NON-NLS-1$
@@ -1085,9 +1084,9 @@ public final class InterfaceBuilderApp extends Application {
 	
 	private static final class MyThreadPoolExecutor extends ThreadPoolExecutor {
 		
-		public MyThreadPoolExecutor(final int arg0, final int arg1, final long arg2, final TimeUnit arg3,
-				final BlockingQueue<Runnable> arg4, final ThreadFactory arg5) {
-			super(arg0, arg1, arg2, arg3, arg4, arg5);
+		public MyThreadPoolExecutor(final int corePoolSize, final int maximumPoolSize, final long keepAliveTime,
+				final TimeUnit unit, final BlockingQueue<Runnable> workQueue, final ThreadFactory threadFactory) {
+			super(corePoolSize, maximumPoolSize, keepAliveTime, unit, workQueue, threadFactory);
 		}
 		
 		@Override

@@ -70,7 +70,7 @@ public class CompileManager {
 				// catalogClone = null;
 				
 				executionTime = (System.currentTimeMillis() - startTime);
-				logger.info("Processing DescIndex took " + executionTime + "ms.");
+				logger.info("Validating Layouts took " + executionTime + "ms.");
 			} else {
 				if (!repairLayoutOrder && verifyXml) {
 					// only verify XML and nothing else

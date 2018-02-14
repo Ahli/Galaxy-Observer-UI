@@ -172,38 +172,15 @@ public class MpqEditorInterface implements MpqInterface, DeepCopyable {
 				final String unprotectedAbsolutePath = getPathWithSuffix(absolutePath, "_unprtctd"); //$NON-NLS-1$
 				
 				// make way for unprotected file
-				final File fup = new File(unprotectedAbsolutePath);
-				if (fup.exists() && fup.isFile()) {
-					try {
-						Files.delete(fup.toPath());
-					} catch (final IOException e) {
-						final String msg =
-								"ERROR: Could not delete file " + unprotectedAbsolutePath + ".";    //$NON-NLS-1$
-						logger.error(msg, e);
-						throw new MpqException(
-								String.format(Messages.getString("MpqInterface.CouldNotOverwriteFile"), absolutePath),
-								e); //$NON-NLS-1$
-					}
-				}
+				deleteFile(unprotectedAbsolutePath);
+				
 				
 				// build unprotected file
 				buildMpqWithCompression(MpqEditorCompression.NONE, unprotectedAbsolutePath, fileCount);
 			}
 			
 			// make way for protected file
-			final File f = new File(absolutePath);
-			if (f.exists() && f.isFile()) {
-				try {
-					Files.delete(f.toPath());
-				} catch (final IOException e) {
-					final String msg = "ERROR: Could not delete file " + absolutePath + ".";
-					//$NON-NLS-1$
-					logger.error(msg, e);
-					throw new MpqException(
-							String.format(Messages.getString("MpqInterface.CouldNotOverwriteFile"), absolutePath),
-							e); //$NON-NLS-1$
-				}
-			}
+			deleteFile(absolutePath);
 			
 			// extra file compression
 			try {
@@ -218,20 +195,39 @@ public class MpqEditorInterface implements MpqInterface, DeepCopyable {
 			// NO CONTENT COMPRESSION/PROTECTION OPTIONS
 			
 			// make way for file
-			if (targetFile.exists() && targetFile.isFile()) {
-				try {
-					Files.delete(targetFile.toPath());
-				} catch (final IOException e) {
-					final String msg = "ERROR: Could not delete file " + absolutePath + ".";
-					//$NON-NLS-1$
-					logger.error(msg, e);
-					throw new MpqException(
-							String.format(Messages.getString("MpqInterface.CouldNotOverwriteFile"), absolutePath),
-							e); //$NON-NLS-1$
-				}
-			}
+			deleteFile(absolutePath);
 			
 			buildMpqWithCompression(compressMpq, absolutePath, fileCount);
+		}
+	}
+	
+	/**
+	 * Deletes a file of the specified path.
+	 *
+	 * @param path
+	 * @throws MpqException
+	 */
+	private void deleteFile(final String path) throws MpqException {
+		final File fup = new File(path);
+		if (fup.exists()) {
+			if (fup.isFile()) {
+				if (fup.canWrite()) {
+					try {
+						Files.delete(fup.toPath());
+					} catch (final IOException e) {
+						final String msg = "ERROR: Could not delete file '" + path + "'.";    //$NON-NLS-1$
+						logger.error(msg, e);
+						throw new MpqException(
+								String.format(Messages.getString("MpqInterface.CouldNotOverwriteFile"), path),
+								e); //$NON-NLS-1$
+					}
+				} else {
+					logger.error(
+							"ERROR: Could not delete file '" + path + "'." + " It might be used by another process.");
+				}
+			} else {
+				logger.error("ERROR: Could not delete file '" + path + "'. A directory with the same name exists.");
+			}
 		}
 	}
 	
@@ -247,14 +243,18 @@ public class MpqEditorInterface implements MpqInterface, DeepCopyable {
 			final int fileCount) throws IOException, MpqException, InterruptedException {
 		// mpq compression
 		settings.setCompression(compressMpq);
-		settings.applyCompression();
-		try {
-			// build protected file
-			newMpq(absolutePath, fileCount);
-			addToMpq(absolutePath, mpqCachePath, ""); //$NON-NLS-1$
-			compactMpq(absolutePath);
-		} finally {
-			settings.restoreOriginalSettingFiles();
+		/* MpqEditor reads its settings from ini files in a specific location.
+		   Multiple different compression settings would cause race conditions and problems. */
+		synchronized (MpqEditorInterface.class) {
+			settings.applyCompression();
+			try {
+				// build protected file
+				newMpq(absolutePath, fileCount);
+				addToMpq(absolutePath, mpqCachePath, ""); //$NON-NLS-1$
+				compactMpq(absolutePath);
+			} finally {
+				settings.restoreOriginalSettingFiles();
+			}
 		}
 	}
 	
