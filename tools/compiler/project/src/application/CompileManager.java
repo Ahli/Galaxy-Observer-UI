@@ -30,6 +30,7 @@ public class CompileManager {
 	 * @param repairLayoutOrder
 	 * @param verifyLayout
 	 * @param verifyXml
+	 * @return UICatalog describing the UI when verifyLayout was enabled; else null
 	 * @throws InterruptedException
 	 */
 	public UICatalog compile(final ModData mod, final String raceId, final boolean repairLayoutOrder,
@@ -48,26 +49,20 @@ public class CompileManager {
 				logger.info("Checking and repairing the Layout order took " + executionTime + "ms.");
 			}
 			if (verifyLayout) {
-				// validate catalog
-				final File descIndexFile =
-						new File(mod.getCachePath() + File.separator + mod.getDescIndexData().getDescIndexIntPath());
-				// logger.trace("processing descIndexFile: " + descIndexFile);
 				startTime = System.currentTimeMillis();
 				
+				// validate catalog
 				catalogClone = getClonedUICatalog(mod);
 				
 				executionTime = (System.currentTimeMillis() - startTime);
 				logger.info("BaseUI Cloning took " + executionTime + "ms.");
-				
 				startTime = System.currentTimeMillis();
 				
 				// apply mod's UI
+				final File descIndexFile =
+						new File(mod.getCachePath() + File.separator + mod.getDescIndexData().getDescIndexIntPath());
 				catalogClone.processDescIndex(descIndexFile, raceId);
 				catalogClone.clearParser();
-				
-				// test performance for GC
-				// mod.setUi(catalogClone);
-				// catalogClone = null;
 				
 				executionTime = (System.currentTimeMillis() - startTime);
 				logger.info("Validating Layouts took " + executionTime + "ms.");
@@ -81,6 +76,7 @@ public class CompileManager {
 		} catch (ParserConfigurationException | SAXException | IOException | UIException e) {
 			logger.error("ERROR: encountered error while compiling.", e);
 		}
+		
 		return catalogClone;
 	}
 	

@@ -380,7 +380,7 @@ public final class InterfaceBuilderApp extends Application {
 	 * @throws InterruptedException
 	 */
 	private void parseDefaultUI(final GameData game) throws InterruptedException {
-		printLogMessageToGeneral(
+		printInfoLogMessageToGeneral(
 				"Starting to parse base " + game.getGameDef().getName() + " UI."); //$NON-NLS-1$ //$NON-NLS-2$
 		
 		final UICatalog uiCatalog = game.getUiCatalog();
@@ -412,7 +412,7 @@ public final class InterfaceBuilderApp extends Application {
 		final String msg =
 				"Finished parsing base UI for " + game.getGameDef().getName() + "."; //$NON-NLS-1$ //$NON-NLS-2$
 		logger.info(msg);
-		printLogMessageToGeneral(msg);
+		printInfoLogMessageToGeneral(msg);
 	}
 	
 	/**
@@ -554,7 +554,7 @@ public final class InterfaceBuilderApp extends Application {
 		} else {
 			logger.error("Failed to find any replay."); //$NON-NLS-1$
 		}
-		printLogMessageToGeneral("The game starts with a replay now..."); //$NON-NLS-1$
+		printInfoLogMessageToGeneral("The game starts with a replay now..."); //$NON-NLS-1$
 	}
 	
 	/**
@@ -799,7 +799,7 @@ public final class InterfaceBuilderApp extends Application {
 	 * @param msg
 	 * 		the message
 	 */
-	public void printLogMessageToGeneral(final String msg) {
+	public void printInfoLogMessageToGeneral(final String msg) {
 		Platform.runLater(() -> {
 			try {
 				logger.info(msg);
@@ -808,6 +808,23 @@ public final class InterfaceBuilderApp extends Application {
 			}
 		});
 	}
+	
+	/**
+	 * Prints a message to the message log.
+	 *
+	 * @param msg
+	 * 		the message
+	 */
+	public void printErrorLogMessageToGeneral(final String msg) {
+		Platform.runLater(() -> {
+			try {
+				logger.error(msg);
+			} catch (final Exception e) {
+				logger.fatal("FATAL ERROR: ", e);
+			}
+		});
+	}
+	
 	
 	/**
 	 * Builds MPQ Archive File. Run this in its own thread! Conditions: - Specified MpqInterface requires a unique cache
@@ -833,7 +850,7 @@ public final class InterfaceBuilderApp extends Application {
 			final boolean compressXml, final int compressMpq, final boolean buildUnprotectedToo,
 			final boolean repairLayoutOrder, final boolean verifyLayout, final boolean verifyXml)
 			throws IOException, InterruptedException {
-		printLogMessageToGeneral(sourceFile.getName() + " started construction.");
+		printInfoLogMessageToGeneral(sourceFile.getName() + " started construction.");
 		
 		final GameDef gameDef = game.getGameDef();
 		
@@ -844,7 +861,8 @@ public final class InterfaceBuilderApp extends Application {
 		// init mod data
 		final ModData mod = new ModData(game);
 		mod.setSourcePath(sourceFile);
-		mod.setTargetPath(new File(targetPath));
+		final File targetFile = new File(targetPath);
+		mod.setTargetPath(targetFile);
 		
 		// get and create cache
 		final File cache = new File(mpqi.getMpqCachePath());
@@ -936,11 +954,15 @@ public final class InterfaceBuilderApp extends Application {
 		try {
 			mpqi.buildMpq(targetPath, sourceFile.getName(), compressXml, getCompressionModeOfSetting(compressMpq),
 					buildUnprotectedToo);
-			logger.info("Finished building... " + sourceFile.getName()); //$NON-NLS-1$
+			
+			logger.info("Finished building... " + sourceFile.getName() + ". Size: " +
+					(new File(targetPath + File.separator + sourceFile.getName()).length() / 1024) + " " + "kb");
+			//$NON-NLS-1$
+			printInfoLogMessageToGeneral(sourceFile.getName() + " finished construction.");
 		} catch (final IOException | MpqException e) {
 			logger.error("ERROR: unable to construct final Interface file.", e); //$NON-NLS-1$
+			printErrorLogMessageToGeneral(sourceFile.getName() + " could not be created.");
 		}
-		printLogMessageToGeneral(sourceFile.getName() + " finished construction.");
 	}
 	
 	/**

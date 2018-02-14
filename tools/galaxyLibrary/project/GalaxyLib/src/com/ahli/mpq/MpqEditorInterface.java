@@ -205,7 +205,9 @@ public class MpqEditorInterface implements MpqInterface, DeepCopyable {
 	 * Deletes a file of the specified path.
 	 *
 	 * @param path
+	 * 		file path
 	 * @throws MpqException
+	 * 		if file is existing but could not be deleted
 	 */
 	private void deleteFile(final String path) throws MpqException {
 		final File fup = new File(path);
@@ -222,11 +224,12 @@ public class MpqEditorInterface implements MpqInterface, DeepCopyable {
 								e); //$NON-NLS-1$
 					}
 				} else {
-					logger.error(
+					throw new MpqException(
 							"ERROR: Could not delete file '" + path + "'." + " It might be used by another process.");
 				}
 			} else {
-				logger.error("ERROR: Could not delete file '" + path + "'. A directory with the same name exists.");
+				throw new MpqException(
+						"ERROR: Could not delete file '" + path + "'. A directory with the same name exists.");
 			}
 		}
 	}
