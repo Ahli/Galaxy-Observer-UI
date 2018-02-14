@@ -48,19 +48,19 @@ public class SettingsIniInterface {
 	private boolean sc2X64 = false;
 	private boolean heroesX64 = false;
 	private boolean heroesPtrX64 = false;
-	private boolean cmdLineVerifyXml = false;
-	private boolean cmdLineRepairLayoutOrder = false;
-	private boolean cmdLineVerifyLayout = false;
+	private boolean cmdLineVerifyXml = true;
+	private boolean cmdLineRepairLayoutOrder = true;
+	private boolean cmdLineVerifyLayout = true;
 	private boolean cmdLineCompressXml = false;
-	/* compression: 0=None, 1=Blizz, 2=ExperimentalBest */
+	/* compression: 0=None, 1=Blizz, 2=ExperimentalBest, 3=SystemDefault */
 	private int cmdLineCompressMpq = 0;
 	private boolean cmdLineBuildUnprotectedToo = false;
 	private boolean guiVerifyXml = true;
-	private boolean guiRepairLayoutOrder = false;
-	private boolean guiVerifyLayout = false;
-	private boolean guiCompressXml = false;
-	/* compression: 0=None, 1=Blizz, 2=ExperimentalBest */
-	private int guiCompressMpq = 0;
+	private boolean guiRepairLayoutOrder = true;
+	private boolean guiVerifyLayout = true;
+	private boolean guiCompressXml = true;
+	/* compression: 0=None, 1=Blizz, 2=ExperimentalBest, 3=SystemDefault */
+	private int guiCompressMpq = 3;
 	private boolean guiBuildUnprotectedToo = false;
 	
 	/**
@@ -175,21 +175,25 @@ public class SettingsIniInterface {
 	}
 	
 	/**
-	 * Read all Settings from the Settings file.
+	 * Read all Settings from the Settings file. If that file does not exist, it will be created.
 	 *
 	 * @throws IOException
 	 * 		when there is an error reading the file
 	 */
 	public void readSettingsFromFile() throws IOException {
-		try {
-			final File f = new File(settingsFilePath);
-			logger.info("Loading settings from: '" + settingsFilePath + "' which exists: " + f.exists());
-			final INIBuilderParameters params = new Parameters().ini().setFile(f).setEncoding(UTF_8);
-			final FileBasedConfigurationBuilder<INIConfiguration> b =
-					new FileBasedConfigurationBuilder<>(INIConfiguration.class).configure(params);
-			readValuesFromIni(b.getConfiguration());
-		} catch (ConfigurationException | ExceptionInInitializerError | IllegalArgumentException | NullPointerException e) {
-			throw new IOException("Could not read settings.ini.", e);
+		final File f = new File(settingsFilePath);
+		if (f.exists()) {
+			try {
+				logger.info("Loading settings from: " + settingsFilePath);
+				final INIBuilderParameters params = new Parameters().ini().setFile(f).setEncoding(UTF_8);
+				final FileBasedConfigurationBuilder<INIConfiguration> b =
+						new FileBasedConfigurationBuilder<>(INIConfiguration.class).configure(params);
+				readValuesFromIni(b.getConfiguration());
+			} catch (ConfigurationException | ExceptionInInitializerError | IllegalArgumentException | NullPointerException e) {
+				throw new IOException("Could not read settings.ini.", e);
+			}
+		} else {
+			writeSettingsToFile();
 		}
 	}
 	
@@ -219,7 +223,7 @@ public class SettingsIniInterface {
 		guiVerifyLayout = section.getBoolean(VERIFY_LAYOUT, true);
 		guiRepairLayoutOrder = section.getBoolean(REPAIR_LAYOUT_ORDER, true);
 		guiCompressXml = section.getBoolean(COMPRESS_XML, true);
-		guiCompressMpq = section.getInt(COMPRESS_MPQ, 4);
+		guiCompressMpq = section.getInt(COMPRESS_MPQ, 3);
 		guiBuildUnprotectedToo = section.getBoolean(BUILD_UNPROTECTED_TOO, false);
 		
 		section = ini.getSection(CATEGORY_INTERNAL_VARIABLES);
