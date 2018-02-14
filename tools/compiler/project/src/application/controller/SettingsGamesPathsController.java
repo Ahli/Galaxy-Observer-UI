@@ -61,7 +61,7 @@ public class SettingsGamesPathsController extends SettingsAutoSaveController {
 		super.update();
 		
 		// load values from ini
-		SettingsIniInterface settings = app.getIniSettings();
+		final SettingsIniInterface settings = app.getIniSettings();
 		heroesPath.setText(settings.getHeroesPath());
 		heroesArchitecture.setSelected(settings.isHeroes64bit());
 		heroesPtrPath.setText(settings.getHeroesPtrPath());
@@ -91,21 +91,21 @@ public class SettingsGamesPathsController extends SettingsAutoSaveController {
 		validatePath(heroesPtrPath.getText(), HEROES_SWITCHER_EXE, heroesPtrPathLabel);
 	}
 	
-	private void setSc2Path(String path) {
+	private void setSc2Path(final String path) {
 		sc2Path.setText(path);
 		app.getIniSettings().setSc2Path(path);
 		validatePath(path, SC2_SWITCHER_EXE, sc2PathLabel);
 		persistSettingsIni();
 	}
 	
-	private void setHeroesPath(String path) {
+	private void setHeroesPath(final String path) {
 		heroesPath.setText(path);
 		app.getIniSettings().setHeroesPath(path);
 		validatePath(path, HEROES_SWITCHER_EXE, heroesPathLabel);
 		persistSettingsIni();
 	}
 	
-	private void setHeroesPtrPath(String path) {
+	private void setHeroesPtrPath(final String path) {
 		heroesPtrPath.setText(path);
 		app.getIniSettings().setHeroesPtrPath(path);
 		validatePath(path, HEROES_SWITCHER_EXE, heroesPtrPathLabel);
@@ -123,10 +123,10 @@ public class SettingsGamesPathsController extends SettingsAutoSaveController {
 	 * 		label set visible if invalid, can be null
 	 * @return whether the path belongs to that game directory or not
 	 */
-	private boolean validatePath(String path, String switcher, Label invalidLabel) {
+	private boolean validatePath(final String path, final String switcher, final Label invalidLabel) {
 		boolean valid = false;
 		if (path != null) {
-			File f = new File(path);
+			final File f = new File(path);
 			valid = f.exists() && f.isDirectory() &&
 					new File(path + File.separator + "Support" + File.separator + switcher).exists();
 		}
@@ -137,32 +137,32 @@ public class SettingsGamesPathsController extends SettingsAutoSaveController {
 	}
 	
 	@FXML
-	public void onSc2ArchitectureChange(ActionEvent event) {
-		boolean val = ((CheckBox) event.getSource()).selectedProperty().getValue();
+	public void onSc2ArchitectureChange(final ActionEvent event) {
+		final boolean val = ((CheckBox) event.getSource()).selectedProperty().getValue();
 		app.getIniSettings().setSc2Is64Bit(val);
 		persistSettingsIni();
 	}
 	
 	@FXML
-	public void onHeroesArchitectureChange(ActionEvent event) {
-		boolean val = ((CheckBox) event.getSource()).selectedProperty().getValue();
+	public void onHeroesArchitectureChange(final ActionEvent event) {
+		final boolean val = ((CheckBox) event.getSource()).selectedProperty().getValue();
 		app.getIniSettings().setHeroesIs64Bit(val);
 		persistSettingsIni();
 	}
 	
 	@FXML
-	public void onHeroesPtrArchitectureChange(ActionEvent event) {
-		boolean val = ((CheckBox) event.getSource()).selectedProperty().getValue();
+	public void onHeroesPtrArchitectureChange(final ActionEvent event) {
+		final boolean val = ((CheckBox) event.getSource()).selectedProperty().getValue();
 		app.getIniSettings().setHeroesPtrIs64Bit(val);
 		persistSettingsIni();
 	}
 	
 	@FXML
 	public void onSc2PathButtonClick() {
-		File selectedFile = showDirectoryChooser("Select StarCraft II's installation directory", sc2Path.getText());
+		final File selectedFile =
+				showDirectoryChooser("Select StarCraft II's installation directory", sc2Path.getText());
 		if (selectedFile != null) {
-			String path = selectedFile.getAbsolutePath();
-			setSc2Path(path);
+			setSc2Path(selectedFile.getAbsolutePath());
 		}
 	}
 	
@@ -176,30 +176,56 @@ public class SettingsGamesPathsController extends SettingsAutoSaveController {
 	 * @param initialPath
 	 * @return the selected directory or null if no directory has been selected
 	 */
-	private File showDirectoryChooser(String title, String initialPath) {
-		DirectoryChooser directoryChooser = new DirectoryChooser();
+	private File showDirectoryChooser(final String title, final String initialPath) {
+		final DirectoryChooser directoryChooser = new DirectoryChooser();
 		directoryChooser.setTitle(title);
-		directoryChooser.setInitialDirectory(new File(initialPath));
+		final File f = cutTillValidDirectory(initialPath);
+		if (f != null) {
+			directoryChooser.setInitialDirectory(f);
+		}
 		return directoryChooser.showDialog(getWindow());
+	}
+	
+	/**
+	 * Shortens the path to become a valid directory. Returns null if no valid directory exists.
+	 *
+	 * @param path
+	 * @return
+	 */
+	private File cutTillValidDirectory(String path) {
+		File f = new File(path);
+		if (!f.isDirectory()) {
+			final char sep = File.separatorChar;
+			int i;
+			do {
+				i = path.lastIndexOf(sep);
+				if (i != -1) {
+					path = path.substring(0, i);
+					f = new File(path);
+				} else {
+					f = null;
+					break;
+				}
+			} while (!f.isDirectory());
+		}
+		return f;
 	}
 	
 	@FXML
 	public void onHeroesPathButtonClick() {
-		File selectedFile =
+		final File selectedFile =
 				showDirectoryChooser("Select Heroes of the Storm's installation directory", heroesPath.getText());
 		if (selectedFile != null) {
-			String path = selectedFile.getAbsolutePath();
-			setHeroesPath(path);
+			setHeroesPath(selectedFile.getAbsolutePath());
 		}
 	}
 	
 	@FXML
 	public void onHeroesPtrPathButtonClick() {
-		File selectedFile = showDirectoryChooser("Select Heroes of the Storm's PTR installation directory",
+		final File selectedFile = showDirectoryChooser("Select Heroes of the Storm's PTR installation directory",
 				heroesPtrPath.getText());
 		if (selectedFile != null) {
-			String path = selectedFile.getAbsolutePath();
-			setHeroesPtrPath(path);
+			setHeroesPtrPath(selectedFile.getAbsolutePath());
 		}
 	}
 }
