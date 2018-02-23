@@ -271,16 +271,16 @@ public class Main extends Application {
 	private void initMpqInterface() {
 		final String tempDirectory = System.getProperty("java.io.tmpdir");
 		final String cachePath = tempDirectory + "ObserverUiSettingsEditor" + File.separator + "_ExtractedMpq";
-		mpqi = new MpqEditorInterface(cachePath);
-		final String path = basePath + File.separator + "plugins" + File.separator + "mpq" + File.separator
+		final String mpqEditorPath = basePath + File.separator + "plugins" + File.separator + "mpq" + File.separator
 				//$NON-NLS-1$ //$NON-NLS-2$
 				+ "MPQEditor.exe"; //$NON-NLS-1$
-		mpqi.setMpqEditorPath(path);
-		final File f = new File(path);
+		mpqi = new MpqEditorInterface(cachePath, mpqEditorPath);
+		final File f = new File(mpqEditorPath);
 		if (!f.exists() || !f.isFile()) {
-			logger.error("Could not find MPQEditor.exe within its expected path: " + path);
+			logger.error("Could not find MPQEditor.exe within its expected path: " + mpqEditorPath);
 			final String title = Messages.getString("Main.warningAlertTitle"); //$NON-NLS-1$
-			final String content = String.format(Messages.getString("Main.couldNotFindMpqEditor"), path); //$NON-NLS-1$
+			final String content =
+					String.format(Messages.getString("Main.couldNotFindMpqEditor"), mpqEditorPath); //$NON-NLS-1$
 			final Alert alert = Alerts.buildWarningAlert(primaryStage, title, title, content);
 			alert.showAndWait();
 		}
