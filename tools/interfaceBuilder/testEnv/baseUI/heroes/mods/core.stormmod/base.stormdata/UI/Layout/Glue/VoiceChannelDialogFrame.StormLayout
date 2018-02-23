@@ -1,0 +1,359 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<Desc>
+    <DescFlags val="Locked"/>
+
+    <Constant name="VoiceChatReminderTimeout" val="30"/>
+
+    <!-- Channel switch confirmation/invitation dialog -->
+    <Frame type="VoiceChannelFrame" name="VoiceChannelDialogTemplate" template="StandardTemplates/InfoPanelTemplate">
+        <Anchor side="Bottom" relative="DisableReminderButton/AnchorFrame" pos="Max" offset="11"/>
+        <Width val="320"/>
+        <AcceptsMouse val="False"/>
+
+        <Visible val="False"/>
+        <ChannelType val="{$VoiceChatUI/@PendingChannelType}"/>
+        
+        <Frame type="Button" name="CloseButton">
+            <Visible val="False"/>
+        </Frame>
+
+        <!-- Header Label -->
+        <Frame type="Label" name="TitleLabel">
+            <Anchor side="Left" relative="$parent" pos="Min" offset="20"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="-20"/>
+            <Style val="HeroesBrawlInfoPanel_TopTitleCenter"/>
+
+            <Text val="{TextFormatter/@Text}"/>
+
+            <Frame type="TextFormatFrame" name="TextFormatter">
+                <Anchor relative="$parent"/>
+                <Replacement index="0" val="{$ancestor[@oftype=VoiceChannelFrame]/PendingChannelColorFormatter/@Text}"/>
+                <ReplacedName index="0" val="color"/>
+            </Frame>
+        </Frame>
+
+        <!-- "New Channel Available" Text -->
+        <Frame type="Label" name="PendingChannelLabel">
+            <Anchor side="Top" relative="$parent/TitleLabel" pos="Max" offset="10"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+
+            <Style val="VoiceChatDialogMessageLabel"/>
+            <Text val="{TextFormatter/@Text}"/>
+
+            <Frame type="TextFormatFrame" name="TextFormatter">
+                <Anchor relative="$parent"/>
+                <Replacement index="0" val="{$ancestor[@oftype=VoiceChannelFrame]/PendingChannelColorFormatter/@Text}"/>
+                <ReplacedName index="0" val="color"/>
+                <Replacement index="1" val="{$ancestor[@oftype=VoiceChannelFrame]/@ActiveMemberCount}"/>
+                <ReplacedName index="1" val="count"/>
+            </Frame>
+        </Frame>
+
+        <!-- "Leaving Old Channel" Text -->
+        <Frame type="Label" name="LeavingChannelLabel">
+            <Anchor side="Top" relative="$parent/PendingChannelLabel" pos="Max" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+            <CollapseLayout val="True"/>
+
+            <Style val="{$parent/PendingChannelLabel/@Style}"/>
+            <Text val="{TextFormatter/@Text}"/>
+
+            <Frame type="TextFormatFrame" name="TextFormatter">
+                <Anchor relative="$parent"/>
+                <Replacement index="0" val="{$ancestor[@oftype=VoiceChannelFrame]/LeavingChannelColorFormatter/@Text}"/>
+                <ReplacedName index="0" val="color"/>
+            </Frame>
+        </Frame>
+
+        <!-- Buttons -->
+        <Frame type="TimeFormatFrame" name="CountDown">
+            <Anchor relative="$parent"/>
+            <Time val="{$this/@Alpha}"/>
+
+            <Animation name="SuggestTimeOut">
+                <Event event="SuggestStart" frame="$parent" action="Play"/>
+                <Controller type="Fade" end="Pause"> 
+                    <Key type="Curve" time="0" value="#VoiceChatReminderTimeout" inout="Linear"/>
+                    <Key type="Curve" time="#VoiceChatReminderTimeout" value="0" inout="Linear"/>
+                </Controller>
+                <Controller type="Event" frame="$VoiceChatUI" end="Stop">
+                    <Key type="Event" time="#VoiceChatReminderTimeout" event="CancelPendingChannel"/>
+                </Controller>
+            </Animation>
+
+            <Animation name="AutoJoinTimeOut">
+                <Event event="AutoJoinStart" frame="$parent" action="Play"/>
+                <Controller type="Fade" end="Pause">
+                    <Key type="Curve" time="0" value="#VoiceChatReminderTimeout" inout="Linear"/>
+                    <Key type="Curve" time="#VoiceChatReminderTimeout" value="0" inout="Linear"/>
+                </Controller>
+                <Controller type="Event" frame="$VoiceChatUI" end="Stop">
+                    <Key type="Event" time="#VoiceChatReminderTimeout" event="JoinPendingChannel"/>
+                </Controller>
+            </Animation>
+        </Frame>
+
+        <Frame type="Button" name="OkButton" template="StandardTemplates/StandardButtonMiniTemplate">
+            <Anchor side="Top" relative="$parent/LeavingChannelLabel" pos="Max" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="0" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos=".54" offset="0"/>
+            <Width val="0"/>
+            <Height val="80"/>
+            <Text val="@UI/VoiceAutoJoin/Button/Join"/>
+
+            <Frame type="Label" name="Label">
+                <Style val="StandardGlueButtonMiniUppercase"/>
+            </Frame>
+
+            <Animation name="Confirm">
+                <Event event="OnClick" action="Play"/>
+                <Controller type="Event" frame="$VoiceChatUI" end="Stop">
+                    <Key type="Event" time="0" event="JoinPendingChannel"/>
+                </Controller>
+                <Controller type="Event" frame="$ancestor[@oftype=VoiceChannelFrame]" end="Stop">
+                    <Key type="Event" time="0" event="Hide"/>
+                </Controller>
+            </Animation>
+        </Frame>
+
+        <Frame type="Button" name="CancelButton" template="StandardTemplates/StandardButtonMiniTemplate">
+            <Anchor side="Top" relative="$parent/OkButton" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos=".46" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="1" offset="0"/>
+            <Width val="0"/>
+            <Height val="80"/>
+            <Text val="@UI/VoiceAutoJoin/Button/Cancel"/>
+
+            <Frame type="Label" name="Label">
+                <Style val="StandardGlueButtonMiniUppercase"/>
+            </Frame>
+
+            <Animation name="Cancel">
+                <Event event="OnClick" action="Play"/>
+                <Controller type="Event" frame="$VoiceChatUI" end="Stop">
+                    <Key type="Event" time="0.0" event="CancelPendingChannel"/>
+                </Controller>
+                <Controller type="Event" frame="$ancestor[@oftype=VoiceChannelFrame]" end="Stop">
+                    <Key type="Event" time="0" event="Hide"/>
+                </Controller>
+            </Animation>
+        </Frame>
+
+        <Frame type="Button" name="DisableReminderButton">
+            <Anchor side="Top" relative="$parent/OkButton" pos="Max" offset="-12"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="2"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="-2"/>
+            <Height val="48"/>
+            <Visible val="False"/>
+            <CollapseLayout val="True"/>
+
+            <DisplayType val="ImageLayer"/>
+
+            <Frame type="Image" name="NormalImage">
+                <Anchor relative="$parent"/>
+                <Texture val="@UI/Storm_Checkbox_Normal" layer="0"/>
+                <Texture val="@UI/Storm_Checkbox_Down" layer="1"/>
+                <Texture val="@UI/Storm_Checkbox_Down" layer="2"/>
+                <Texture val="@UI/Storm_Checkbox_Disabled" layer="3"/>
+                <TextureType val="Nineslice" layer="0"/>
+                <TextureType val="Nineslice" layer="1"/>
+                <TextureType val="Nineslice" layer="2"/>
+                <TextureType val="Nineslice" layer="3"/>
+                <StateCount val="1"/>
+                <LayerCount val="4"/>
+                <DesaturateOnDisable val="false"/>
+            </Frame>
+
+            <Frame type="Image" name="HoverImage">
+                <Anchor relative="$parent"/>
+                <Texture val="@UI/Storm_Checkbox_Hover" layer="0"/>
+                <Texture val="@UI/Storm_Checkbox_Down" layer="1"/>
+                <Texture val="@UI/Storm_Checkbox_Down" layer="2"/>
+                <Texture val="@UI/Storm_Checkbox_Disabled" layer="3"/>
+                <TextureType val="Nineslice" layer="0"/>
+                <TextureType val="Nineslice" layer="1"/>
+                <TextureType val="Nineslice" layer="2"/>
+                <TextureType val="Nineslice" layer="3"/>
+                <StateCount val="1"/>
+                <LayerCount val="4"/>
+                <DesaturateOnDisable val="false"/>
+            </Frame>
+
+            <Frame type="Image" name="Icon">
+                <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Right" relative="$parent/Label" pos="Min" offset="-5"/>
+                <Width val="30"/>
+                <Height val="30"/>
+                <Texture val="@UI/Storm_CloseButtonDisabled"/>
+            </Frame>
+
+            <Frame type="Label" name="Label">
+                <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Left" relative="$parent" pos="Mid" offset="15"/>
+                <Anchor side="Right" relative="$parent" pos="Mid" offset="15"/>
+                <Style val="{$parent/$parent/PendingChannelLabel/@Style}"/>
+                <Text val="@UI/DontShowThisAgain"/>
+            </Frame>
+
+            <Frame type="Frame" name="AnchorFrame">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+                <Anchor side="Bottom" relative="$parent" pos="Max" offset="-10"/>
+            </Frame>
+
+            <Animation name="Dismiss">
+                <Event event="OnClick" action="Play"/>
+                <Controller type="Event" frame="$VoiceChatUI" end="Stop">
+                    <Key type="Event" time="0.0" event="DisableTeamReminder"/>
+                    <Key type="Event" time="0.0" event="CancelPendingChannel"/>
+                </Controller>
+            </Animation>
+        </Frame>
+
+        <!-- Channel color providers, managed by PendingChannelType/LeavingChannelType stategroups -->
+        <Frame type="TextFormatFrame" name="PendingChannelColorFormatter">
+            <Anchor relative="$parent"/>
+            <FormatText val="ffffff"/>
+        </Frame>
+
+        <Frame type="TextFormatFrame" name="LeavingChannelColorFormatter">
+            <Anchor relative="$parent"/>
+            <FormatText val="ffffff"/>
+        </Frame>
+
+        <!-- Stategroups -->
+        <!-- Disabled undo for many property updates to preserve label texts for fade-out animation -->
+        <StateGroup name="PendingChannelContext">
+            <State name="AutoJoin">
+                <When type="Property" frame="$VoiceChatUI" IsPendingAutoJoin="True"/>
+                <When type="Property" frame="$VoiceChatUI" IsInMicTestMode="False"/>
+                <When type="Property" operator="NotEqual" ChannelType="Invalid"/>
+                <Action type="SetProperty" frame="DisableReminderButton" Visible="False" undo="False"/>
+                <Action type="SetProperty" frame="CountDown" FormatText="@UI/VoiceAutoJoin/Button/JoinTimeout" undo="False"/>
+                <Action type="SetProperty" frame="OkButton" Text="{$parent/CountDown/@Text}" undo="False"/>
+                <Action type="SetProperty" frame="CancelButton" Text="@UI/VoiceAutoJoin/Button/Cancel" undo="False"/>
+                <Action type="SendEvent" event="InitAutoJoin"/>
+            </State>
+            <State name="Suggest">
+                <When type="Property" frame="$VoiceChatUI" IsPendingAutoJoin="False"/>
+                <When type="Property" frame="$VoiceChatUI" IsInMicTestMode="False"/>
+                <When type="Property" operator="NotEqual" ChannelType="Invalid"/>
+                <Action type="SetProperty" frame="DisableReminderButton" Visible="True" undo="False"/>
+                <Action type="SetProperty" frame="CountDown" FormatText="@UI/VoiceAutoJoin/Button/CancelTimeout" undo="False"/>
+                <Action type="SetProperty" frame="OkButton" Text="@UI/VoiceAutoJoin/Button/Join" undo="False"/>
+                <Action type="SetProperty" frame="CancelButton" Text="{$parent/CountDown/@Text}" undo="False"/>
+                <Action type="SendEvent" event="InitSuggest"/>
+            </State>
+            <DefaultState val="Hidden"/>
+            <State name="Hidden">
+                <Action type="SendEvent" event="Hide"/>
+            </State>
+        </StateGroup>
+
+        <StateGroup name="PendingChannelTypeTitle">
+            <State name="TeamAutoJoin">
+                <When type="Property" ChannelType="Team"/>
+                <When type="StateGroup" PendingChannelContext="AutoJoin"/>
+                <Action type="SetProperty" frame="TitleLabel/TextFormatter" FormatText="@UI/VoiceAutoJoin/Title/Team" undo="False"/>
+            </State>
+            <State name="TeamSuggest">
+                <When type="Property" ChannelType="Team"/>
+                <When type="StateGroup" PendingChannelContext="Suggest"/>
+                <Action type="SetProperty" frame="TitleLabel/TextFormatter" FormatText="@UI/VoiceAutoJoin/Title/TeamSuggest" undo="False"/>
+            </State>
+            <State name="PartyAutoJoin">
+                <When type="Property" ChannelType="Party"/>
+                <When type="StateGroup" PendingChannelContext="AutoJoin"/>
+                <Action type="SetProperty" frame="TitleLabel/TextFormatter" FormatText="@UI/VoiceAutoJoin/Title/Party" undo="False"/>
+            </State>
+            <State name="PartySuggest">
+                <When type="Property" ChannelType="Party"/>
+                <When type="StateGroup" PendingChannelContext="Suggest"/>
+                <Action type="SetProperty" frame="TitleLabel/TextFormatter" FormatText="@UI/VoiceAutoJoin/Title/PartySuggest" undo="False"/>
+            </State>
+        </StateGroup>
+
+        <StateGroup name="PendingChannelType">
+            <State name="TeamEmpty">
+                <When type="Property" ChannelType="Team"/>
+                <When type="Property" ActiveMemberCount="0"/>
+                <Action type="SetProperty" frame="PendingChannelLabel/TextFormatter" FormatText="@UI/VoiceAutoJoin/PendingChannel/TeamEmpty" undo="False"/>
+                <Action type="SetProperty" frame="PendingChannelColorFormatter" FormatText="#VoiceChatColor_Team" undo="False"/>
+            </State>
+            <State name="Team">
+                <When type="Property" ChannelType="Team"/>
+                <Action type="SetProperty" frame="PendingChannelLabel/TextFormatter" FormatText="@UI/VoiceAutoJoin/PendingChannel/Team" undo="False"/>
+                <Action type="SetProperty" frame="PendingChannelColorFormatter" FormatText="#VoiceChatColor_Team" undo="False"/>
+            </State>
+            <State name="PartyEmpty">
+                <When type="Property" ChannelType="Party"/>
+                <When type="Property" ActiveMemberCount="0"/>
+                <Action type="SetProperty" frame="PendingChannelLabel/TextFormatter" FormatText="@UI/VoiceAutoJoin/PendingChannel/PartyEmpty" undo="False"/>
+                <Action type="SetProperty" frame="PendingChannelColorFormatter" FormatText="#VoiceChatColor_Party" undo="False"/>
+            </State>
+            <State name="Party">
+                <When type="Property" ChannelType="Party"/>
+                <Action type="SetProperty" frame="PendingChannelLabel/TextFormatter" FormatText="@UI/VoiceAutoJoin/PendingChannel/Party" undo="False"/>
+                <Action type="SetProperty" frame="PendingChannelColorFormatter" FormatText="#VoiceChatColor_Party" undo="False"/>
+            </State>
+        </StateGroup>
+
+        <StateGroup name="LeavingChannelType">
+            <State name="Team">
+                <When type="Property" frame="$VoiceChatUI" ActiveChannelType="Team"/>
+                <When type="Property" operator="NotEqual" ChannelType="Invalid"/>
+                <Action type="SetProperty" frame="LeavingChannelLabel/TextFormatter" FormatText="@UI/VoiceAutoJoin/LeavingChannel/Team" undo="False"/>
+                <Action type="SetProperty" frame="LeavingChannelColorFormatter" FormatText="#VoiceChatColor_Team" undo="False"/>
+                <Action type="SetProperty" frame="LeavingChannelLabel" Visible="True" undo="False"/>
+            </State>
+            <State name="Party">
+                <When type="Property" frame="$VoiceChatUI" ActiveChannelType="Party"/>
+                <When type="Property" operator="NotEqual" ChannelType="Invalid"/>
+                <Action type="SetProperty" frame="LeavingChannelLabel/TextFormatter" FormatText="@UI/VoiceAutoJoin/LeavingChannel/Party" undo="False"/>
+                <Action type="SetProperty" frame="LeavingChannelColorFormatter" FormatText="#VoiceChatColor_Party" undo="False"/>
+                <Action type="SetProperty" frame="LeavingChannelLabel" Visible="True" undo="False"/>
+            </State>
+            <State name="Hidden">
+                <When type="Property" Visible="False"/>
+                <Action type="SetProperty" frame="LeavingChannelLabel" Visible="False" undo="False"/>
+            </State>
+        </StateGroup>
+
+        <!-- Fade in delay animation -->
+        <Animation name="InitAutoJoin">
+            <Event event="InitAutoJoin" action="Restart,Play"/>
+            <Event event="Hide" action="Stop"/>
+        </Animation>
+
+        <Animation name="InitSuggest">
+            <Event event="InitSuggest" action="Restart,Play"/>
+            <Event event="Hide" action="Stop"/>
+        </Animation>
+
+        <!-- Fade in/out animation -->
+        <Animation name="VisibilityAnim">
+            <Event event="AutoJoinStart" action="DirectionForward,Play"/>
+            <Event event="SuggestStart" action="DirectionForward,Play"/>
+            <Event event="Hide" action="DirectionReverse,Play"/>
+            <Controller type="Visibility" end="Pause">
+                <Key type="Bool" time="0" value="False"/>
+                <Key type="Bool" time="0" value="True"/>
+                <Key type="Bool" time=".2" value="True"/>
+            </Controller>
+            <Controller type="Fade" end="Pause">
+                <Key type="Curve" time="0" value="0"/>
+                <Key type="Curve" time=".2" value="255"/>
+            </Controller>
+            <Controller type="Anchor" end="Pause" side="Top" relative="True">
+                <Key type="Curve" time="0" value="-20"/>
+                <Key type="Curve" time=".2" value="0"/>
+            </Controller>
+        </Animation>
+    </Frame>
+
+</Desc>

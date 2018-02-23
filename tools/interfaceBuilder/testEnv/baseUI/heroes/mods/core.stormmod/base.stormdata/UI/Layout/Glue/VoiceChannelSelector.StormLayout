@@ -1,0 +1,332 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<Desc>
+    <DescFlags val="Locked"/>
+
+    <Frame type="Frame" name="SelectorFrameTemplate">
+        <Width val="48"/>
+        <Height val="48"/>
+
+        <!-- Background and content -->
+        <Frame type="Image" name="Background">
+            <Anchor relative="$parent" offset="0"/>
+            <Texture val="@UI/VoiceChat_ChannelSelector_JoinLeave_Button"/>
+        </Frame>
+
+        <Frame type="Image" name="Hover">
+            <Anchor relative="$parent/Background" offset="0"/>
+            <Texture val="{$parent/Background/@Texture}"/>
+            <Color val="{$parent/Background/@Color}"/>
+            <BlendMode val="Add"/>
+            <Unclipped val="True"/>
+
+            <Alpha val="0"/>
+            <Animation name="HoverAnim">
+                <Event event="OnMouseEnter" frame="$parent/ClickableFrame" action="DirectionForward,Play"/>
+                <Event event="OnMouseExit" frame="$parent/ClickableFrame" action="DirectionReverse,Play"/>
+                <Event event="OnMouseEnter" frame="$parent/VoiceChannelFrame" action="DirectionForward,Play"/>
+                <Event event="OnMouseExit" frame="$parent/VoiceChannelFrame" action="DirectionReverse,Play"/>
+
+                <Controller type="Fade" end="Pause">
+                    <Key type="Curve" time="0" value="0" inout="Linear"/>
+                    <Key type="Curve" time="0.2" value="127" inout="Slow"/>
+                </Controller>
+            </Animation>
+        </Frame>
+
+        <Frame type="Image" name="Icon">
+            <Anchor side="Top" relative="$parent" pos="Mid" offset="1"/>
+            <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Mid" offset="1"/>
+
+            <ColorAdjustMode val="{$parent/Background/@ColorAdjustMode}"/>
+            <AdjustmentColor val="{$parent/Background/@AdjustmentColor}"/>
+            <Height val="48"/>
+            <ScaleWidthToTexture val="True"/>
+        </Frame>
+
+        <Frame type="Frame" name="ClickableFrame">
+            <Anchor relative="$parent" offset="0"/>
+            <Tooltip val="{$parent/VoiceChannelFrame/@Tooltip}"/>
+            <TooltipAnchorPosition val="BottomRight"/>
+            <AcceptsMouse val="True"/>
+        </Frame>
+
+        <Frame type="VoiceChannelFrame" name="VoiceChannelFrame">
+            <Anchor relative="$parent/ClickableFrame"/>
+            <ChannelType val="Invalid"/>
+            <Enabled val="{$VoiceChatUI/@ServiceAvailable}"/>
+            <TooltipAnchorPosition val="BottomRight"/>
+        </Frame>
+    </Frame>
+
+    <Frame type="Frame" name="ChannelFrameTemplate" template="VoiceChannelSelector/SelectorFrameTemplate">
+        <Height val="38"/>
+        <Width val="55"/>
+        <CollapseLayout val="True"/>
+        <Visible val="{VoiceChannelFrame/@IsValid}"/>
+        <Alpha val="180"/>
+        
+        <Frame type="Image" name="Background">
+            <Anchor relative="$parent" offset="0"/>
+            <Texture val="@UI/VoiceChat_ChannelSelector_Channel_Button"/>
+        </Frame>
+
+        <Frame type="Image" name="Hover">
+            <Anchor relative="$parent/Background" offset="12"/>
+            <Texture val="@UI/VoiceChat_ChannelSelector_Channel_Button_Glow"/>
+        </Frame>
+
+        <Frame type="Image" name="Icon">
+            <Anchor side="Left" relative="$parent" pos=".36" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos=".36" offset="0"/>
+            <Height val="38"/>
+            <ScaleWidthToTexture val="True"/>
+
+            <Color val="{$parent/Background/@Color}"/>
+        </Frame>
+
+        <Frame type="Label" name="MemberCount">
+            <Anchor side="Top" relative="$parent" pos="Mid" offset="1"/>
+            <Anchor side="Bottom" relative="$parent" pos="Mid" offset="1"/>
+            <Anchor side="Left" relative="$parent" pos=".74" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos=".74" offset="0"/>
+
+            <Text val="{$parent/VoiceChannelFrame/@ActiveMemberCount}"/>
+            <ColorAdjustMode val="{$parent/Background/@ColorAdjustMode}"/>
+            <AdjustmentColor val="{$parent/Background/@AdjustmentColor}"/>
+        </Frame>
+
+        <Animation name="SelectAnim">
+            <Event event="OnMouseDown" action="Restart,Play" frame="ClickableFrame"/>
+            <Event event="OnClick" action="Restart,Play" frame="VoiceChannelFrame"/>
+        </Animation>
+
+        <StateGroup name="Selection">
+            <State name="Active">
+                <Action type="SetProperty" Alpha="255"/>
+            </State>
+            <State name="Deselected">
+                <Action type="SetProperty" frame="Background" Visible="False"/>
+            </State>
+            <DefaultState val="Deselected"/>
+        </StateGroup>
+    </Frame>
+
+    <Frame type="Frame" name="VoiceChannelSelectorTemplate">
+        <Height val="56"/>
+        <Width val="176"/>
+        <Visible val="{$VoiceChatUI/@ServiceAvailable}"/>
+
+        <Frame type="Image" name="BackgroundImage">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+            <Alpha val="100"/>
+
+            <!-- Texture is managed in ChannelsAvailableStates stategroup -->
+            <ColorAdjustMode val="Colorize"/>
+            <AdjustmentColor val="{$parent/JoinLeaveFrame/Background/@Color}"/>
+        </Frame>
+
+        <!-- Channel buttons -->
+        <Frame type="Frame" name="JoinLeaveFrame" template="VoiceChannelSelector/SelectorFrameTemplate">
+            <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="4"/>
+
+            <Frame type="Image" name="Background">
+                <Color val="#VoiceChatColor_Default"/>
+            </Frame>
+
+            <Frame type="Image" name="Icon">
+                <Texture val="@UI/VoiceChat_Voice_Menu_Enabled"/>
+            </Frame>
+
+            <!-- Manages this button state and tooltip -->
+            <StateGroup name="SelectedChannel">
+                <DefaultState val="None"/>
+                <State name="None">
+                    <Action type="SetProperty" frame="VoiceChannelFrame" Tooltip="@UI/VoiceChat/Tooltip/Leave"/>
+                </State>
+                <State name="Party">
+                    <When type="StateGroup" Selection="Selected" frame="$parent/ChannelParty"/>
+                    <Action type="SetProperty" frame="VoiceChannelFrame" ChannelType="Party"/>
+                    <Action type="SetProperty" frame="VoiceChannelFrame" Tooltip="@UI/VoiceChat/Tooltip/EnableParty"/>
+                </State>
+                <State name="Team">
+                    <When type="StateGroup" Selection="Selected" frame="$parent/ChannelTeam"/>
+                    <Action type="SetProperty" frame="VoiceChannelFrame" ChannelType="Team"/>
+                    <Action type="SetProperty" frame="VoiceChannelFrame" Tooltip="@UI/VoiceChat/Tooltip/EnableTeam"/>
+                </State>
+                <State name="NoneAvailable">
+                    <When type="StateGroup" ChannelsAvailable="None" frame="$parent"/>
+                    <Action type="SetProperty" frame="VoiceChannelFrame" Tooltip="@UI/VoiceChat/Tooltip/NoneAvailable"/>
+                </State>
+            </StateGroup>
+
+            <StateGroup name="ActiveChannel">
+                <DefaultState val="None"/>
+                <State name="None">
+                    <Action type="SetProperty" frame="Background" Alpha="127"/>
+                    <Action type="SetProperty" frame="Icon" Texture="@UI/VoiceChat_Voice_Menu_Exited"/>
+                </State>
+                <State name="Party">
+                    <When type="StateGroup" Selection="Active" frame="$parent/ChannelParty"/>
+                    <Action type="SetProperty" frame="Background" Color="#VoiceChatColor_Party"/>
+                    <Action type="SetState" frame="$parent" group="Selection" state="Party"/>
+                </State>
+                <State name="Team">
+                    <When type="StateGroup" Selection="Active" frame="$parent/ChannelTeam"/>
+                    <Action type="SetProperty" frame="Background" Color="#VoiceChatColor_Team"/>
+                    <Action type="SetState" frame="$parent" group="Selection" state="Team"/>
+                </State>
+            </StateGroup>
+        </Frame>
+
+        <Frame type="Frame" name="ChannelTeam" template="VoiceChannelSelector/ChannelFrameTemplate">
+            <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Left" relative="$parent/JoinLeaveFrame" pos="Max" offset="1"/>
+
+            <!-- Content override -->
+            <Frame type="Image" name="Background">
+                <Color val="#VoiceChatColor_Team"/>
+            </Frame>
+            <Frame type="Image" name="Icon">
+                <Texture val="@UI/VoiceChat_Channel_Team"/>
+            </Frame>
+            <Frame type="Label" name="MemberCount">
+                <Style val="Storm_VoiceChannelSelector_Team"/>
+            </Frame>
+
+            <Frame type="VoiceChannelFrame" name="VoiceChannelFrame">
+                <ChannelType val="Team"/>
+                <Tooltip val="@UI/VoiceChat/Tooltip/JoinTeam"/>
+            </Frame>
+
+            <!-- Frame stategroups override -->
+            <StateGroup name="Selection">
+                <State name="Active">
+                    <When type="Property" frame="$VoiceChatUI" ActiveChannelType="Team"/>
+                </State>
+                <State name="Selected">
+                    <When type="StateGroup" frame="$parent" Selection="Team"/>
+                </State>
+            </StateGroup>
+
+            <Animation name="SelectAnim">
+                <Controller type="State" stateGroup="Selection" end="Pause" frame="$parent">
+                    <Key type="Identifier" time="0" value="Team"/>
+                </Controller>
+            </Animation>
+
+            <StateGroup name="NoActiveChannel">
+                <State name="Team">
+                    <When type="Property" frame="$VoiceChatUI" ActiveChannelType="Invalid"/>
+                    <Action type="SetProperty" AcceptsMouse="False" frame="VoiceChannelFrame"/>
+                </State>
+            </StateGroup>
+        </Frame>
+
+        <Frame type="Frame" name="ChannelParty" template="VoiceChannelSelector/ChannelFrameTemplate">
+            <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Left" relative="$parent/ChannelTeam" pos="Max" offset="3"/>
+
+            <!-- Content override -->
+            <Frame type="Image" name="Background">
+                <Color val="#VoiceChatColor_Party"/>
+            </Frame>
+            <Frame type="Image" name="Icon">
+                <Texture val="@UI/VoiceChat_Channel_Party"/>
+            </Frame>
+            <Frame type="Label" name="MemberCount">
+                <Style val="Storm_VoiceChannelSelector_Party"/>
+            </Frame>
+
+            <Frame type="VoiceChannelFrame" name="VoiceChannelFrame">
+                <ChannelType val="Party"/>
+                <Tooltip val="@UI/VoiceChat/Tooltip/JoinParty"/>
+            </Frame>
+
+            <StateGroup name="Selection">
+                <State name="Active">
+                    <When type="Property" frame="$VoiceChatUI" ActiveChannelType="Party"/>
+                </State>
+                <State name="Selected">
+                    <When type="StateGroup" frame="$parent" Selection="Party"/>
+                </State>
+            </StateGroup>
+
+            <Animation name="SelectAnim">
+                <Controller type="State" stateGroup="Selection" end="Pause" frame="$parent">
+                    <Key type="Identifier" time="0" value="Party"/>
+                </Controller>
+            </Animation>
+
+            <StateGroup name="NoActiveChannel">
+                <State name="Team">
+                    <When type="Property" frame="$VoiceChatUI" ActiveChannelType="Invalid"/>
+                    <Action type="SetProperty" AcceptsMouse="False" frame="VoiceChannelFrame"/>
+                </State>
+            </StateGroup>
+        </Frame>
+
+        <StateGroup name="Selection">
+            <DefaultState val="Unknown"/>
+            <State name="Unknown"/>
+            <State name="Team"/>
+            <State name="Party"/>
+        </StateGroup>
+
+        <!-- Adjust background texture -->
+        <StateGroup name="ChannelsAvailable">
+            <DefaultState val="None"/>
+            <State name="None">
+                <Action type="SetProperty" frame="BackgroundImage" Texture="@UI/VoiceChat_ChannelSelector_Background1"/>
+            </State>
+            <State name="Both">
+                <When type="Property" frame="ChannelTeam/VoiceChannelFrame" IsValid="True"/>
+                <When type="Property" frame="ChannelParty/VoiceChannelFrame" IsValid="True"/>
+                <Action type="SetProperty" frame="BackgroundImage" Texture="@UI/VoiceChat_ChannelSelector_Background3"/>
+            </State>
+            <State name="Team">
+                <When type="Property" frame="ChannelTeam/VoiceChannelFrame" IsValid="True"/>
+                <Action type="SetProperty" frame="BackgroundImage" Texture="@UI/VoiceChat_ChannelSelector_Background2"/>
+            </State>
+            <State name="Party">
+                <When type="Property" frame="ChannelParty/VoiceChannelFrame" IsValid="True"/>
+                <Action type="SetProperty" frame="BackgroundImage" Texture="@UI/VoiceChat_ChannelSelector_Background2"/>
+            </State>
+        </StateGroup>
+
+        <!-- Auto selects default channel if needed -->
+        <StateGroup name="ForceSelectChannel">
+            <State name="None">
+                <When type="StateGroup" ChannelsAvailable="None"/>
+                <Action type="SetState" group="Selection" state="Unknown"/>
+            </State>
+            <State name="PartyOnly">
+                <When type="StateGroup" ChannelsAvailable="Party"/>
+                <Action type="SetState" group="Selection" state="Party"/>
+            </State>
+            <State name="TeamOnly">
+                <When type="StateGroup" ChannelsAvailable="Team"/>
+                <Action type="SetState" group="Selection" state="Team"/>
+            </State>
+            <State name="PreselectParty">
+                <When type="StateGroup" ChannelsAvailable="Both"/>
+                <When type="StateGroup" Selection="Unknown"/>
+                <Action type="SetState" group="Selection" state="Party"/>
+            </State>
+        </StateGroup>
+
+        <StateGroup name="ParentalControls">
+            <State name="NotAllowed">
+                <When type="Property" frame="$VoiceChatUI" ParentalControlAccess="NotAllowed"/>
+                <Action type="SetProperty" Visible="False"/>
+            </State>
+        </StateGroup>
+    </Frame>
+</Desc>

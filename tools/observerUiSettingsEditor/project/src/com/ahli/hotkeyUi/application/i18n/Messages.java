@@ -8,8 +8,8 @@ import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
 /**
- * Class to internationalize messages. Hint: FXML files can be localized via
- * text="%key", if the FxmlLoader receives the correct resource bundle.
+ * Class to internationalize messages. Hint: FXML files can be localized via text="%key", if the FxmlLoader receives the
+ * correct resource bundle.
  *
  * @author Ahli
  */
@@ -76,7 +76,9 @@ public final class Messages {
 	 */
 	public static boolean checkIfTargetResourceIsUsed(final Locale locale) {
 		final boolean result = resourceBundle.equals(ResourceBundle.getBundle(BUNDLE_NAME, locale));
-		logger.trace("compare used locale's resource '" + usedLocale + "' with one for locale '" + locale + "', result: " + result);
+		logger.trace(
+				"compare used locale's resource '" + usedLocale + "' with one for locale '" + locale + "', result: " +
+						result);
 		return result;
 	}
 }

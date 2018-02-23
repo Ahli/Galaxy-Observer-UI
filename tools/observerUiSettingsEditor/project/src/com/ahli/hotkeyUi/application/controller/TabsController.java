@@ -13,7 +13,6 @@ import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
-import javafx.scene.control.Tab;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableColumn.CellDataFeatures;
@@ -30,13 +29,15 @@ import org.apache.logging.log4j.Logger;
  * @author Ahli
  */
 public class TabsController {
-	private static final Callback<CellDataFeatures<ValueDef, Boolean>, ObservableValue<Boolean>> ActionColumnCellValueFactory = new Callback<>() {
+	private static final Callback<CellDataFeatures<ValueDef, Boolean>, ObservableValue<Boolean>>
+			ActionColumnCellValueFactory = new Callback<>() {
 		@Override
 		public ObservableValue<Boolean> call(final TableColumn.CellDataFeatures<ValueDef, Boolean> p) {
 			return new SimpleBooleanProperty(p.getValue() != null);
 		}
 	};
-	private static final Callback<TableColumn<ValueDef, Boolean>, TableCell<ValueDef, Boolean>> ActionColumnCellFactoryReset = new Callback<>() {
+	private static final Callback<TableColumn<ValueDef, Boolean>, TableCell<ValueDef, Boolean>>
+			ActionColumnCellFactoryReset = new Callback<>() {
 		@Override
 		public TableCell<ValueDef, Boolean> call(final TableColumn<ValueDef, Boolean> p) {
 			return new ResetDefaultButtonTableCell(Messages.getString("TabsController.Reset")); //$NON-NLS-1$
@@ -45,53 +46,48 @@ public class TabsController {
 	static Logger logger = LogManager.getLogger(TabsController.class);
 	// based on:
 	// http://jluger.de/blog/20160731_javafx_text_rendering_in_tableview.html
-	private static final Callback<TableColumn<ValueDef, String>, TableCell<ValueDef, String>> WRAPPING_CELL_FACTORY = new Callback<>() {
-		
-		@Override
-		public TableCell<ValueDef, String> call(final TableColumn<ValueDef, String> param) {
-			return new TableCell<>() {
+	private static final Callback<TableColumn<ValueDef, String>, TableCell<ValueDef, String>> WRAPPING_CELL_FACTORY =
+			new Callback<>() {
+				
 				@Override
-				protected void updateItem(final String item, final boolean empty) {
-					if (empty || item == null) {
-						logger.trace("update wrapping table cell - null");
-						super.updateItem(item, empty);
-						super.setGraphic(null);
-						super.setText(null);
-					} else {
-						// check if old value equals new value
-						final boolean equals = item.equals(getItem());
-						super.updateItem(item, empty);
-						if (!equals) {
-							logger.trace("update wrapping table cell - newLabel " + item);
-							final Label l = new Label(item);
-							l.setWrapText(true);
-							final VBox box = new VBox(l);
-							l.heightProperty().addListener(new ChangeListener<>() {
-								@Override
-								public void changed(final ObservableValue<? extends Number> observable, final Number oldValue, final Number newValue) {
-									box.setPrefHeight(newValue.doubleValue() + 7);
-									Platform.runLater(new Runnable() {
+				public TableCell<ValueDef, String> call(final TableColumn<ValueDef, String> param) {
+					return new TableCell<>() {
+						@Override
+						protected void updateItem(final String item, final boolean empty) {
+							if (empty || item == null) {
+								logger.trace("update wrapping table cell - null");
+								super.updateItem(item, empty);
+								super.setGraphic(null);
+								super.setText(null);
+							} else {
+								// check if old value equals new value
+								final boolean equals = item.equals(getItem());
+								super.updateItem(item, empty);
+								if (!equals) {
+									logger.trace("update wrapping table cell - newLabel " + item);
+									final Label l = new Label(item);
+									l.setWrapText(true);
+									final VBox box = new VBox(l);
+									l.heightProperty().addListener(new ChangeListener<>() {
 										@Override
-										public void run() {
-											getTableRow().requestLayout();
+										public void changed(final ObservableValue<? extends Number> observable,
+												final Number oldValue, final Number newValue) {
+											box.setPrefHeight(newValue.doubleValue() + 7);
+											Platform.runLater(() -> getTableRow().requestLayout());
 										}
 									});
+									super.setGraphic(box);
+								} else {
+									logger.trace("update wrapping table cell - equal");
 								}
-							});
-							super.setGraphic(box);
-						} else {
-							logger.trace("update wrapping table cell - equal");
+							}
 						}
-					}
+					};
 				}
 			};
-		}
-	};
 	private final ObservableList<ValueDef> hotkeysData = FXCollections.observableArrayList();
 	private final ObservableList<ValueDef> settingsData = FXCollections.observableArrayList();
 	private Main main;
-	@FXML
-	private Tab hotkeysTab;
 	@FXML
 	private TableView<ValueDef> hotkeysTable;
 	@FXML
@@ -104,8 +100,6 @@ public class TabsController {
 	private TableColumn<ValueDef, String> hotkeysKeyCol;
 	@FXML
 	private TableColumn<ValueDef, Boolean> hotkeysActionsCol;
-	@FXML
-	private Tab settingsTab;
 	@FXML
 	private TableView<ValueDef> settingsTable;
 	@FXML

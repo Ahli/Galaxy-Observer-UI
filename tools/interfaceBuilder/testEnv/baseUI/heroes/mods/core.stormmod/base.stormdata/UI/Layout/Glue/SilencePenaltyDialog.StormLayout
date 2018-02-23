@@ -1,0 +1,190 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<Desc>
+    <DescFlags val="Locked"/>
+
+    <Frame type="SilencePenaltyDialog" name="SilencePenaltyDialog">
+        <Anchor relative="$parent"/>
+
+        <Animation name="DialogAnimation">
+            <Event event="OnShown" action="DirectionForward,Play"/>
+            <Event event="DialogDismissed" action="DirectionReverse,Play"/>
+            <Controller type="Fade" end="Pause">
+                <Key type="Curve" time="0" value="0"/>
+                <Key type="Curve" time=".2" value="255"/>
+            </Controller>
+        </Animation>
+
+        <Frame type="BlurFrame" name="FullscreenBlurFrame" template="StandardTemplates/FullscreenBlurFrame">
+            <Anchor relative="$parent"/>
+
+            <Animation name="DialogAnimation">
+                <Event event="OnShown" action="DirectionForward,Play" frame="$parent"/>
+                <Event event="DialogDismissed" action="DirectionReverse,Play" frame="$parent"/>
+                <Controller type="Blur" end="Pause">
+                    <Key type="Curve" time="0" value="0.0" inout="Linear,Auto"/>
+                    <Key type="Curve" time="0.2" value="1.0" inout="Auto,Linear"/>
+                </Controller>
+            </Animation>
+        </Frame>
+
+        <Frame type="Image" name="BackgroundImage">
+            <Anchor relative="$parent"/>
+            <Texture val="@UI/DefaultLoadingImage_Storm"/>
+            <IgnoreParentAlpha val="true"/>
+        </Frame>
+
+        <Frame type="Image" name="FullscreenBlackoutImage">
+            <Anchor relative="$parent"/>
+            <Color val="0, 0, 0"/>
+            <Alpha val="80"/>
+            <IgnoreParentAlpha val="true"/>
+        </Frame>
+
+        <Frame type="AvatarFrame" name="AvatarExample" template="AvatarFrameTemplates/AvatarStateTemplate_Profile">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="50"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="-100"/>
+
+            <Frame type="Frame" name="PortraitContainer">
+                <Frame type="Frame" name="IconContainer">
+                    <Frame type="Image" name="SilencedIcon">
+                        <Visible val="true"/>
+
+                        <Animation name="LookHere">
+                            <Event event="OnShown" action="Play"/>
+                            <Controller type="Color" end="PingPong">
+                                <Key type="Curve" time="0" value="255,255,255"/>
+                                <Key type="Curve" time=".25" value="255,255,255"/>
+                                <Key type="Curve" time=".5" value="255,0,0"/>
+                            </Controller>
+                        </Animation>
+
+                        <StateGroup name="SilencedStates">
+                            <State name="ChatSilenced">
+                                <When type="Property" frame="$ancestor[@type=SilencePenaltyDialog]" HasSilencePenalty="true"/>
+                                <When type="Property" frame="$ancestor[@type=SilencePenaltyDialog]" HasVoiceSilencePenalty="false"/>
+                            </State>
+                            <State name="VoiceSilenced">
+                                <When type="Property" frame="$ancestor[@type=SilencePenaltyDialog]" HasSilencePenalty="false"/>
+                                <When type="Property" frame="$ancestor[@type=SilencePenaltyDialog]" HasVoiceSilencePenalty="true"/>
+                            </State>
+                            <State name="ChatAndVoiceSilenced">
+                                <When type="Property" frame="$ancestor[@type=SilencePenaltyDialog]" HasSilencePenalty="true"/>
+                                <When type="Property" frame="$ancestor[@type=SilencePenaltyDialog]" HasVoiceSilencePenalty="true"/>
+                            </State>
+                        </StateGroup>
+                    </Frame>
+                </Frame>
+            </Frame>
+        </Frame>
+
+        <Frame type="Label" name="TimeRemainingLabel">
+            <Anchor side="Top" relative="$parent/AvatarExample" pos="Max" offset="-10"/>
+            <Anchor side="Left" relative="$parent/AvatarExample" pos="Min" offset="-100"/>
+            <Anchor side="Right" relative="$parent/AvatarExample" pos="Max" offset="100"/>
+            <Visible val="{$parent/@HasSilencePenalty}"/>
+            <CollapseLayout val="true"/>
+            <Style val="TimerTextBottom"/>
+        </Frame>
+
+        <Frame type="Label" name="VoiceTimeRemainingLabel">
+            <Anchor side="Top" relative="$parent/TimeRemainingLabel" pos="Max" offset="0"/>
+            <Anchor side="Left" relative="$parent/AvatarExample" pos="Min" offset="-100"/>
+            <Anchor side="Right" relative="$parent/AvatarExample" pos="Max" offset="100"/>
+            <Visible val="{$parent/@HasVoiceSilencePenalty}"/>
+            <CollapseLayout val="true"/>
+            <Style val="TimerTextBottom"/>
+        </Frame>
+
+        <Frame type="Label" name="TitleLabel">
+            <Anchor side="Top" relative="$parent/VoiceTimeRemainingLabel" pos="Max" offset="30"/>
+            <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+            <Width val="1200"/>
+
+            <Style val="SilencePenaltyText"/>
+            <Text val="@UI/SilencePenalty/Title"/>
+        </Frame>
+
+        <Frame type="Label" name="TextSilenceLabel">
+            <Anchor side="Top" relative="$parent/TitleLabel" pos="Max" offset="75"/>
+            <Anchor side="Left" relative="$parent/TitleLabel" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent/TitleLabel" pos="Max" offset="0"/>
+            <CollapseLayout val="true"/>
+            <Visible val="{$parent/@HasSilencePenalty}"/>
+
+            <Style val="SilencePenaltyText"/>
+            <Text val="@UI/SilencePenalty/TextDescription"/>
+        </Frame>
+
+        <Frame type="Label" name="VoiceSilenceLabel">
+            <Anchor side="Top" relative="$parent/TextSilenceLabel" pos="Max" offset="20"/>
+            <Anchor side="Left" relative="$parent/TitleLabel" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent/TitleLabel" pos="Max" offset="0"/>
+            <CollapseLayout val="true"/>
+            <Visible val="{$parent/@HasVoiceSilencePenalty}"/>
+
+            <Style val="SilencePenaltyText"/>
+            <Text val="@UI/SilencePenalty/VoiceDescription"/>
+        </Frame>
+
+        <Frame type="Label" name="GameModesLabel">
+            <Anchor side="Top" relative="$parent/VoiceSilenceLabel" pos="Max" offset="20"/>
+            <Anchor side="Left" relative="$parent/TitleLabel" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent/TitleLabel" pos="Max" offset="0"/>
+            <CollapseLayout val="true"/>
+            <Visible val="{$parent/@HasSilencePenalty}"/>
+
+            <Style val="SilencePenaltyText"/>
+            <Text val="@UI/SilencePenalty/GameModeDescription"/>
+        </Frame>
+
+        <Frame type="Label" name="SilenceIconLabel">
+            <Anchor side="Top" relative="$parent/GameModesLabel" pos="Max" offset="20"/>
+            <Anchor side="Left" relative="$parent/TitleLabel" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent/TitleLabel" pos="Max" offset="0"/>
+
+            <Style val="SilencePenaltyText"/>
+            <Text val="@UI/SilencePenalty/IconDescription"/>
+        </Frame>
+
+        <Frame type="Button" name="DismissButton" template="StandardTemplates/StandardButtonSmallTemplate">
+            <Anchor side="Top" relative="$parent/SilenceIconLabel" pos="Max" offset="0"/>
+            <Anchor side="Left" relative="$parent/TitleLabel" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent/TitleLabel" pos="Mid" offset="0"/>
+
+            <Text val="@UI/OptionsDialogOk_Control"/>
+            <Visible val="False"/>
+        </Frame>
+
+        <Frame type="ProgressBar" name="TimerProgressBar">
+            <Anchor side="Top" relative="$parent/DismissButton" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent/DismissButton" pos="Mid" offset="0"/>
+            <Anchor side="Left" relative="$parent/DismissButton" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent/DismissButton" pos="Mid" offset="0"/>
+            <Width val="124"/>
+            <Height val="124"/>
+
+            <Circular val="true"/>
+            <CircularStart val="0"/>
+            <CircularEndOffset val="360"/>
+            <MinValue val="0.000000"/>
+            <MaxValue val="1.00"/>
+            <FillInset val="0.0"/>
+
+            <Frame type="Image" name="BackImage">
+                <Anchor relative="$parent"/>
+                <TextureType val="NineSlice"/>
+                <Texture val="@UI/Storm_standardButtonSmall_Blue_Normal"/>
+            </Frame>
+
+            <Frame type="Frame" name="FillImageContainer">
+                <Anchor relative="$parent" offset="-16"/>
+                <Frame type="Image" name="FillImage">
+                    <Anchor relative="$parent"/>
+                    <TextureType val="Circular"/>
+                    <Texture val="@UI/Storm_UI_ProfileDialog_MostPlayed_Empty"/>
+                </Frame>
+            </Frame>
+        </Frame>
+    </Frame>
+</Desc>

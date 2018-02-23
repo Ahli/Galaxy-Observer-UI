@@ -28,18 +28,22 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.Locale;
 
 public class LayoutExtensionReader {
+	public static final String CONSTANT = "constant";
+	public static final String DEFAULT = "default";
+	public static final String DESCRIPTION = "description";
 	static Logger logger = LogManager.getLogger(LayoutExtensionReader.class);
 	
-	private ArrayList<ValueDef> hotkeys = new ArrayList<>();
-	private ArrayList<ValueDef> settings = new ArrayList<>();
+	private List<ValueDef> hotkeys = new ArrayList<>();
+	private List<ValueDef> settings = new ArrayList<>();
 	
 	/**
 	 * @return the hotkeys
 	 */
-	public ArrayList<ValueDef> getHotkeys() {
+	public List<ValueDef> getHotkeys() {
 		return hotkeys;
 	}
 	
@@ -47,14 +51,14 @@ public class LayoutExtensionReader {
 	 * @param hotkeys
 	 * 		the hotkeys to set
 	 */
-	public void setHotkeys(final ArrayList<ValueDef> hotkeys) {
+	public void setHotkeys(final List<ValueDef> hotkeys) {
 		this.hotkeys = hotkeys;
 	}
 	
 	/**
 	 * @return the settings
 	 */
-	public ArrayList<ValueDef> getSettings() {
+	public List<ValueDef> getSettings() {
 		return settings;
 	}
 	
@@ -62,19 +66,19 @@ public class LayoutExtensionReader {
 	 * @param settings
 	 * 		the settings to set
 	 */
-	public void setSettings(final ArrayList<ValueDef> settings) {
+	public void setSettings(final List<ValueDef> settings) {
 		this.settings = settings;
 	}
 	
 	/**
-	 * Processes the specified Layout files. It finds hotkeys and setting
-	 * definitions.
+	 * Processes the specified Layout files. It finds hotkeys and setting definitions.
 	 *
 	 * @param layoutFiles
 	 * @throws ParserConfigurationException
 	 * @throws SAXException
 	 */
-	public void processLayoutFiles(final Collection<File> layoutFiles) throws ParserConfigurationException, SAXException {
+	public void processLayoutFiles(final Collection<File> layoutFiles)
+			throws ParserConfigurationException, SAXException {
 		
 		logger.info("Scanning for XML file...");
 		
@@ -145,7 +149,9 @@ public class LayoutExtensionReader {
 	 * @param textInput
 	 */
 	public void processCommentText(final String textInput) {
-		String constant, description, defaultValue;
+		String constant;
+		String description;
+		String defaultValue;
 		
 		logger.debug("textInput:" + textInput);
 		try {
@@ -175,17 +181,17 @@ public class LayoutExtensionReader {
 						part = part.trim();
 						final String partLower = part.toLowerCase(Locale.ROOT);
 						logger.debug("part: " + part);
-						if (partLower.startsWith("constant")) {
+						if (partLower.startsWith(CONSTANT)) {
 							// move beyond '='
 							part = part.substring(1 + part.indexOf('=')).trim();
 							constant = part.substring(part.indexOf('"') + 1, part.lastIndexOf('"'));
 							logger.debug("constant = " + constant);
-						} else if (partLower.startsWith("default")) {
+						} else if (partLower.startsWith(DEFAULT)) {
 							// move beyond '='
 							part = part.substring(1 + part.indexOf('=')).trim();
 							defaultValue = part.substring(part.indexOf('"') + 1, part.lastIndexOf('"'));
 							logger.debug("default = " + defaultValue);
-						} else if (partLower.startsWith("description")) {
+						} else if (partLower.startsWith(DESCRIPTION)) {
 							// move beyond '='
 							part = part.substring(1 + part.indexOf('=')).trim();
 							description = part.substring(part.indexOf('"') + 1, part.lastIndexOf('"'));
@@ -209,12 +215,14 @@ public class LayoutExtensionReader {
 		}
 	}
 	
-	public void addHotkeyValueDef(final String constant, final String description, final String defaultValue, final String curValue) {
+	public void addHotkeyValueDef(final String constant, final String description, final String defaultValue,
+			final String curValue) {
 		final ValueDef def = new ValueDef(constant, curValue, description, defaultValue);
 		hotkeys.add(def);
 	}
 	
-	public void addSettingValueDef(final String constant, final String description, final String defaultValue, final String curValue) {
+	public void addSettingValueDef(final String constant, final String description, final String defaultValue,
+			final String curValue) {
 		final ValueDef def = new ValueDef(constant, curValue, description, defaultValue);
 		settings.add(def);
 	}
@@ -231,7 +239,7 @@ public class LayoutExtensionReader {
 			if (curNode.getNodeType() == Node.ELEMENT_NODE) {
 				
 				final String nodeName = curNode.getNodeName().toLowerCase(Locale.ROOT);
-				if (nodeName.equals("constant")) {
+				if (nodeName.equals(CONSTANT)) {
 					processConstant(curNode);
 				}
 				
@@ -246,12 +254,19 @@ public class LayoutExtensionReader {
 	 */
 	public void processConstant(final Node node) {
 		final Node nameAttrNode = getNamedItemIgnoreCase(node.getAttributes(), "name");
-		final String name = nameAttrNode.getNodeValue();
-		final Node valAttrNode = getNamedItemIgnoreCase(node.getAttributes(), "val");
-		final String val = valAttrNode.getNodeValue();
-		logger.debug("Constant: name = " + name + ", val = " + val);
-		
-		setValueDefCurValue(name, val);
+		if (nameAttrNode != null) {
+			final String name = nameAttrNode.getNodeValue();
+			final Node valAttrNode = getNamedItemIgnoreCase(node.getAttributes(), "val");
+			if (valAttrNode != null) {
+				final String val = valAttrNode.getNodeValue();
+				logger.debug("Constant: name = " + name + ", val = " + val);
+				setValueDefCurValue(name, val);
+			} else {
+				logger.warn("Constant has no 'val' attribute defined.");
+			}
+		} else {
+			logger.warn("Constant has no 'name' attribute defined.");
+		}
 	}
 	
 	/**
@@ -280,7 +295,8 @@ public class LayoutExtensionReader {
 	 * @throws IOException
 	 * @throws SAXException
 	 */
-	public void updateLayoutFiles(final Collection<File> layoutFiles) throws ParserConfigurationException, SAXException {
+	public void updateLayoutFiles(final Collection<File> layoutFiles)
+			throws ParserConfigurationException, SAXException {
 		logger.info("Scanning for XML file...");
 		
 		final DocumentBuilder dBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
@@ -312,7 +328,6 @@ public class LayoutExtensionReader {
 				xformer.transform(source, result);
 			} catch (TransformerFactoryConfigurationError | TransformerException e) {
 				logger.error("Transforming to generate XML file failed.", e);
-				e.printStackTrace();
 			}
 		}
 		
@@ -325,7 +340,7 @@ public class LayoutExtensionReader {
 			if (curNode.getNodeType() == Node.ELEMENT_NODE) {
 				
 				final String nodeName = curNode.getNodeName().toLowerCase(Locale.ROOT);
-				if (nodeName.equals("constant")) {
+				if (nodeName.equals(CONSTANT)) {
 					modifyConstant(curNode);
 				}
 				
@@ -342,21 +357,29 @@ public class LayoutExtensionReader {
 	 */
 	private void modifyConstant(final Node node) {
 		final Node nameAttrNode = getNamedItemIgnoreCase(node.getAttributes(), "name");
-		final String name = nameAttrNode.getNodeValue();
-		final Node valAttrNode = getNamedItemIgnoreCase(node.getAttributes(), "val");
-		final String val = valAttrNode.getNodeValue();
-		
-		for (final ValueDef item : hotkeys) {
-			if (item.getId().equalsIgnoreCase(name)) {
-				logger.debug("updating hotkey constant: " + name + ", with val: " + val);
-				valAttrNode.setNodeValue(item.getValue());
+		if (nameAttrNode != null) {
+			final String name = nameAttrNode.getNodeValue();
+			final Node valAttrNode = getNamedItemIgnoreCase(node.getAttributes(), "val");
+			if (valAttrNode != null) {
+				final String val = valAttrNode.getNodeValue();
+				
+				for (final ValueDef item : hotkeys) {
+					if (item.getId().equalsIgnoreCase(name)) {
+						logger.debug("updating hotkey constant: " + name + ", with val: " + val);
+						valAttrNode.setNodeValue(item.getValue());
+					}
+				}
+				for (final ValueDef item : settings) {
+					if (item.getId().equalsIgnoreCase(name)) {
+						logger.debug("updating setting constant:" + name + ", with val: " + val);
+						valAttrNode.setNodeValue(item.getValue());
+					}
+				}
+			} else {
+				logger.warn("Constant has no 'val' attribute defined.");
 			}
-		}
-		for (final ValueDef item : settings) {
-			if (item.getId().equalsIgnoreCase(name)) {
-				logger.debug("updating setting constant:" + name + ", with val: " + val);
-				valAttrNode.setNodeValue(item.getValue());
-			}
+		} else {
+			logger.warn("Constant has no 'name' attribute defined.");
 		}
 	}
 	

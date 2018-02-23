@@ -15,6 +15,7 @@ import com.ahli.hotkeyUi.application.ui.Alerts;
 import com.ahli.hotkeyUi.application.ui.ShowToUserException;
 import com.ahli.mpq.MpqEditorInterface;
 import com.ahli.mpq.MpqException;
+import com.ahli.mpq.mpqeditor.MpqEditorCompression;
 import com.ahli.util.JarHelper;
 import javafx.animation.FadeTransition;
 import javafx.application.Application;
@@ -44,8 +45,8 @@ import java.awt.SplashScreen;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 
@@ -55,7 +56,9 @@ import java.util.Optional;
  * @author Ahli
  */
 public class Main extends Application {
-	public final static String VERSION = "alpha";
+	public static final String VERSION = "alpha";
+	public static final String STORM_INTERFACE_FILE_FILTER = "*.StormInterface";
+	public static final String SC2_INTERFACE_FILE_FILTER = "*.SC2Interface";
 	static Logger logger = LogManager.getLogger(Main.class); // $NON-NLS-1$
 	private final long appStartTime = System.nanoTime();
 	private Stage primaryStage;
@@ -63,7 +66,6 @@ public class Main extends Application {
 	private MenuBarController mbarCtrl;
 	private TabsController tabsCtrl;
 	private String openedDocPath = null;
-	private boolean isNamespaceHeroes = true;
 	private MpqEditorInterface mpqi = null;
 	private DescIndexData descIndex = null;
 	private File basePath = null;
@@ -84,7 +86,8 @@ public class Main extends Application {
 		logger.error("error log visible"); //$NON-NLS-1$
 		logger.fatal("fatal log visible"); //$NON-NLS-1$
 		
-		logger.trace("Configuration File of System: " + System.getProperty("log4j.configurationFile")); //$NON-NLS-1$ //$NON-NLS-2$
+		logger.trace("Configuration File of System: " +
+				System.getProperty("log4j.configurationFile")); //$NON-NLS-1$ //$NON-NLS-2$
 		
 		// TEST Locale
 		// Messages.setBundle(Locale.CHINA);
@@ -107,13 +110,7 @@ public class Main extends Application {
 			
 			setUserAgentStylesheet(STYLESHEET_MODENA);
 			
-			// if it fails to load the resource in as a jar, check the eclipse settings
-			try {
-				primaryStage.getIcons().add(new Image(Main.class.getResourceAsStream("/res/ahliLogo.png"))); //$NON-NLS-1$
-			} catch (final NullPointerException e) {
-				logger.error("Error loading resource");
-				primaryStage.getIcons().add(new Image("ahliLogo.png"));
-			}
+			initAppIcon();
 			
 			long time = System.nanoTime();
 			initRootLayout();
@@ -126,7 +123,7 @@ public class Main extends Application {
 			
 			final TabPane tabPane;
 			try (InputStream is = Main.class.getResourceAsStream("view/TabsLayout.fxml")) {
-				tabPane = (TabPane) loader.load(is); // $NON-NLS-1$
+				tabPane = loader.load(is); // $NON-NLS-1$
 			}
 			
 			logger.warn("initialized tab layout within " + (System.nanoTime() - time) / 1000000 + "ms.");
@@ -166,12 +163,21 @@ public class Main extends Application {
 			
 			initMpqInterface();
 			
-		} catch (final Throwable e) {
+		} catch (final Exception e) {
 			logger.error("App Error: " + ExceptionUtils.getStackTrace(e), e); //$NON-NLS-1$
-			e.printStackTrace();
 			this.primaryStage.setOpacity(1);
 			Alerts.buildExceptionAlert(this.primaryStage, e).showAndWait();
 			closeApp();
+		}
+	}
+	
+	private void initAppIcon() {
+		// if it fails to load the resource in as a jar, check the eclipse settings
+		try {
+			primaryStage.getIcons().add(new Image(Main.class.getResourceAsStream("/res/ahliLogo.png"))); //$NON-NLS-1$
+		} catch (final NullPointerException e) {
+			logger.error("Error loading resource");
+			primaryStage.getIcons().add(new Image("ahliLogo.png"));
 		}
 	}
 	
@@ -187,7 +193,7 @@ public class Main extends Application {
 		loader.setResources(Messages.getBundle());
 		
 		try (InputStream is = Main.class.getResourceAsStream("view/RootLayout.fxml")) {
-			rootLayout = (BorderPane) loader.load(is); // $NON-NLS-1$
+			rootLayout = loader.load(is); // $NON-NLS-1$
 		}
 		logger.warn("initialized root layout fxml within " + (System.nanoTime() - time) / 1000000 + "ms.");
 		
@@ -234,7 +240,8 @@ public class Main extends Application {
 		if (hasUnsavedFileChanges()) {
 			// ask to save changes in the file
 			final String title = Messages.getString("Main.unsavedChangesTitle"); //$NON-NLS-1$
-			final String content = String.format(Messages.getString("Main.hasUnsavedChanges"), openedDocPath); //$NON-NLS-1$
+			final String content =
+					String.format(Messages.getString("Main.hasUnsavedChanges"), openedDocPath); //$NON-NLS-1$
 			
 			final Alert alert = Alerts.buildYesNoCancelAlert(primaryStage, title, title, content);
 			
@@ -264,15 +271,16 @@ public class Main extends Application {
 	private void initMpqInterface() {
 		final String tempDirectory = System.getProperty("java.io.tmpdir");
 		final String cachePath = tempDirectory + "ObserverUiSettingsEditor" + File.separator + "_ExtractedMpq";
-		mpqi = new MpqEditorInterface(cachePath);
-		final String path = basePath + File.separator + "plugins" + File.separator + "mpq" + File.separator //$NON-NLS-1$ //$NON-NLS-2$
+		final String mpqEditorPath = basePath + File.separator + "plugins" + File.separator + "mpq" + File.separator
+				//$NON-NLS-1$ //$NON-NLS-2$
 				+ "MPQEditor.exe"; //$NON-NLS-1$
-		mpqi.setMpqEditorPath(path);
-		final File f = new File(path);
+		mpqi = new MpqEditorInterface(cachePath, mpqEditorPath);
+		final File f = new File(mpqEditorPath);
 		if (!f.exists() || !f.isFile()) {
-			logger.error("Could not find MPQEditor.exe within its expected path: " + path);
+			logger.error("Could not find MPQEditor.exe within its expected path: " + mpqEditorPath);
 			final String title = Messages.getString("Main.warningAlertTitle"); //$NON-NLS-1$
-			final String content = String.format(Messages.getString("Main.couldNotFindMpqEditor"), path); //$NON-NLS-1$
+			final String content =
+					String.format(Messages.getString("Main.couldNotFindMpqEditor"), mpqEditorPath); //$NON-NLS-1$
 			final Alert alert = Alerts.buildWarningAlert(primaryStage, title, title, content);
 			alert.showAndWait();
 		}
@@ -287,17 +295,11 @@ public class Main extends Application {
 	}
 	
 	/**
-	 * Update the menu bar in the main window. E.g. this needs to be done after
-	 * opening/closing a document to enable/disable the save buttons.
+	 * Update the menu bar in the main window. E.g. this needs to be done after opening/closing a document to
+	 * enable/disable the save buttons.
 	 */
 	private void updateMenuBar() {
-		Platform.runLater(new Runnable() {
-			@Override
-			public void run() {
-				// Update UI here
-				getMbarCtrl().updateMenuBar();
-			}
-		});
+		Platform.runLater(() -> getMbarCtrl().updateMenuBar());
 	}
 	
 	/**
@@ -322,12 +324,11 @@ public class Main extends Application {
 		
 		try {
 			compile();
-			mpqi.buildMpq(openedDocPath, false, false);
+			mpqi.buildMpq(openedDocPath, false, MpqEditorCompression.BLIZZARD_SC2_HEROES, false);
 			hasUnsavedFileChanges = false;
 			updateAppTitle();
 		} catch (IOException | InterruptedException | ParserConfigurationException | SAXException | MpqException e) {
 			logger.error(ExceptionUtils.getStackTrace(e), e);
-			e.printStackTrace();
 			showErrorAlert(e);
 		}
 		logger.warn("opened mpq within " + (System.nanoTime() - time) / 1000000 + "ms.");
@@ -341,8 +342,8 @@ public class Main extends Application {
 	}
 	
 	/**
-	 * Returns true, if the path of the current opened document is valid. Invalid
-	 * usually means that no document has been opened.
+	 * Returns true, if the path of the current opened document is valid. Invalid usually means that no document has
+	 * been opened.
 	 *
 	 * @return
 	 */
@@ -357,7 +358,7 @@ public class Main extends Application {
 	 * @throws SAXException
 	 * @throws ParserConfigurationException
 	 */
-	public void compile() throws ParserConfigurationException, SAXException, IOException {
+	public void compile() throws ParserConfigurationException, SAXException {
 		final File cache = new File(mpqi.getMpqCachePath());
 		final boolean recursive = true;
 		final String[] extensions = new String[] { "StormLayout", "SC2Layout" }; //$NON-NLS-1$ //$NON-NLS-2$
@@ -369,20 +370,17 @@ public class Main extends Application {
 	 * Updates the title of the App.
 	 */
 	public void updateAppTitle() {
-		Platform.runLater(new Runnable() {
-			@Override
-			public void run() {
-				// Update UI here
-				String title = Messages.getString("Main.observerUiSettingsEditorTitle"); //$NON-NLS-1$
-				final String openedDocPath = getOpenedDocPath();
-				if (openedDocPath != null) {
-					title += "- [" + openedDocPath + "]"; //$NON-NLS-1$ //$NON-NLS-2$
-				}
-				if (hasUnsavedFileChanges()) {
-					title += "*"; //$NON-NLS-1$
-				}
-				getPrimaryStage().setTitle(title);
+		Platform.runLater(() -> {
+			// Update UI here
+			String title = Messages.getString("Main.observerUiSettingsEditorTitle"); //$NON-NLS-1$
+			final String openedDocPathTmp = getOpenedDocPath();
+			if (openedDocPathTmp != null) {
+				title += "- [" + openedDocPathTmp + "]"; //$NON-NLS-1$ //$NON-NLS-2$
 			}
+			if (hasUnsavedFileChanges()) {
+				title += "*"; //$NON-NLS-1$
+			}
+			getPrimaryStage().setTitle(title);
 		});
 		
 	}
@@ -393,16 +391,12 @@ public class Main extends Application {
 	 * @param e
 	 */
 	private void showErrorAlert(final Exception e) {
-		Platform.runLater(new Runnable() {
-			@Override
-			public void run() {
-				// Update UI here
-				logger.trace("showing error popup");
-				final String title = Messages.getString("Main.anErrorOccured"); //$NON-NLS-1$
-				final String content = e.getMessage();
-				final Alert alert = Alerts.buildErrorAlert(getPrimaryStage(), title, title, content);
-				alert.showAndWait();
-			}
+		Platform.runLater(() -> {
+			logger.trace("showing error popup");
+			final String title = Messages.getString("Main.anErrorOccured"); //$NON-NLS-1$
+			final String content = e.getMessage();
+			final Alert alert = Alerts.buildErrorAlert(getPrimaryStage(), title, title, content);
+			alert.showAndWait();
 		});
 	}
 	
@@ -431,109 +425,21 @@ public class Main extends Application {
 		final FileChooser fileChooser = new FileChooser();
 		fileChooser.setTitle(Messages.getString("Main.openObserverInterfaceTitle")); //$NON-NLS-1$
 		
-		final ExtensionFilter genExtFilter = new ExtensionFilter(Messages.getString("Main.sc2HeroesObserverInterfaceExtFilter"), "*.SC2Interface", //$NON-NLS-1$ //$NON-NLS-2$
-				"*.StormInterface"); //$NON-NLS-1$
+		final ExtensionFilter genExtFilter =
+				new ExtensionFilter(Messages.getString("Main.sc2HeroesObserverInterfaceExtFilter"),
+						SC2_INTERFACE_FILE_FILTER, STORM_INTERFACE_FILE_FILTER);
 		
-		fileChooser.getExtensionFilters().addAll(new ExtensionFilter(Messages.getString("Main.allFilesFilter"), "*.*"), //$NON-NLS-1$ //$NON-NLS-2$
-				genExtFilter, new ExtensionFilter(Messages.getString("Main.sc2InterfaceFilter"), "*.SC2Interface"), //$NON-NLS-1$ //$NON-NLS-2$
-				new ExtensionFilter(Messages.getString("Main.heroesInterfaceFilter"), "*.StormInterface")); //$NON-NLS-1$ //$NON-NLS-2$
+		fileChooser.getExtensionFilters().addAll(new ExtensionFilter(Messages.getString("Main.allFilesFilter"), "*.*"),
+				//$NON-NLS-1$ //$NON-NLS-2$
+				genExtFilter,
+				new ExtensionFilter(Messages.getString("Main.sc2InterfaceFilter"), SC2_INTERFACE_FILE_FILTER),
+				//$NON-NLS-1$ //$NON-NLS-2$
+				new ExtensionFilter(Messages.getString("Main.heroesInterfaceFilter"),
+						STORM_INTERFACE_FILE_FILTER)); //$NON-NLS-1$ //$NON-NLS-2$
 		fileChooser.setSelectedExtensionFilter(genExtFilter);
 		final File f = fileChooser.showOpenDialog(primaryStage);
 		
-		openMpqFile(f);
-	}
-	
-	/**
-	 * @param f
-	 */
-	public void openMpqFile(final File f) {
-		final long time = System.nanoTime();
-		if (f != null) {
-			try {
-				mpqi.extractEntireMPQ(f.getAbsolutePath());
-				openedDocPath = f.getAbsolutePath();
-				updateAppTitle();
-				
-				// load desc index from mpq
-				try {
-					isNamespaceHeroes = mpqi.isHeroesMpq();
-				} catch (final MpqException e) {
-					// special case to show readable error to user
-					throw new ShowToUserException(Messages.getString("Main.OpenedFileNoComponentList"));
-				}
-				final boolean ignoreRequiredToLoadEntries = true;
-				
-				final File componentListFile = mpqi.getComponentListFile();
-				if (componentListFile == null) {
-					throw new ShowToUserException(Messages.getString("Main.OpenedFileNoComponentList")); //$NON-NLS-1$
-				}
-				
-				final GameDef game = isNamespaceHeroes ? new HeroesGameDef() : new SC2GameDef();
-				
-				descIndex.setDescIndexPathAndClear(ComponentsListReader.getDescIndexPath(componentListFile, game));
-				
-				final File descIndexFile = mpqi.getFileFromMpq(descIndex.getDescIndexIntPath());
-				descIndex.addLayoutIntPath(DescIndexReader.getLayoutPathList(descIndexFile, ignoreRequiredToLoadEntries));
-				
-				tabsCtrl.clearData();
-				hasUnsavedFileChanges = false;
-				
-				final boolean recursive = true;
-				final File cache = new File(mpqi.getMpqCachePath());
-				final Collection<File> layoutFiles = FileUtils.listFiles(cache, null, recursive);
-				
-				layoutExtReader = new LayoutExtensionReader();
-				layoutExtReader.processLayoutFiles(layoutFiles);
-				
-				final ArrayList<ValueDef> hotkeys = layoutExtReader.getHotkeys();
-				tabsCtrl.getHotkeysData().addAll(hotkeys);
-				
-				final ArrayList<ValueDef> settings = layoutExtReader.getSettings();
-				tabsCtrl.getSettingsData().addAll(settings);
-				
-			} catch (MpqException | ShowToUserException e) {
-				logger.error("File could not be opened. MPQ-Error: " + ExceptionUtils.getStackTrace(e), e); //$NON-NLS-1$
-				openedDocPath = null;
-				updateAppTitle();
-				showErrorAlert(e);
-			} catch (final Exception e) {
-				logger.error("File could not be opened. Error: " + ExceptionUtils.getStackTrace(e), e); //$NON-NLS-1$
-				e.printStackTrace();
-				openedDocPath = null;
-				updateAppTitle();
-				// Alert alert = new Alert(AlertType.ERROR);
-				// alert.setTitle(Messages.getString("Main.errorOpeningFileTitle"));
-				// //$NON-NLS-1$
-				// alert.setHeaderText(Messages.getString("Main.errorOpeningFileTitle"));
-				// //$NON-NLS-1$
-				// alert.setContentText(Messages.getString("Main.anErrorOccured")
-				// + e.getMessage()); //$NON-NLS-1$
-				// alert.showAndWait();
-				
-				showExceptionAlert(e);
-			}
-			updateMenuBar();
-		} else {
-			logger.trace("File to open was null, most likely due to 'cancel'."); //$NON-NLS-1$
-		}
-		logger.warn("opened mpq within " + (System.nanoTime() - time) / 1000000 + "ms.");
-	}
-	
-	/**
-	 * Shows an Exception Alert.
-	 *
-	 * @param e
-	 */
-	private void showExceptionAlert(final Exception e) {
-		Platform.runLater(new Runnable() {
-			@Override
-			public void run() {
-				// Update UI here
-				logger.trace("showing exception popup");
-				final Alert alert = Alerts.buildExceptionAlert(getPrimaryStage(), e);
-				alert.showAndWait();
-			}
-		});
+		openMpqFileThreaded(f);
 	}
 	
 	/**
@@ -553,6 +459,88 @@ public class Main extends Application {
 	}
 	
 	/**
+	 * @param f
+	 */
+	public void openMpqFile(final File f) {
+		final long time = System.nanoTime();
+		if (f != null) {
+			try {
+				mpqi.extractEntireMPQ(f.getAbsolutePath());
+				openedDocPath = f.getAbsolutePath();
+				updateAppTitle();
+				
+				// load desc index from mpq
+				final boolean isNamespaceHeroes;
+				try {
+					isNamespaceHeroes = mpqi.isHeroesMpq();
+				} catch (final MpqException e) {
+					// special case to show readable error to user
+					throw new ShowToUserException(Messages.getString("Main.OpenedFileNoComponentList"));
+				}
+				final boolean ignoreRequiredToLoadEntries = true;
+				
+				final File componentListFile = mpqi.getComponentListFile();
+				if (componentListFile == null) {
+					throw new ShowToUserException(Messages.getString("Main.OpenedFileNoComponentList")); //$NON-NLS-1$
+				}
+				
+				final GameDef game = isNamespaceHeroes ? new HeroesGameDef() : new SC2GameDef();
+				
+				descIndex.setDescIndexPathAndClear(ComponentsListReader.getDescIndexPath(componentListFile, game));
+				
+				final File descIndexFile = mpqi.getFileFromMpq(descIndex.getDescIndexIntPath());
+				descIndex.addLayoutIntPath(
+						DescIndexReader.getLayoutPathList(descIndexFile, ignoreRequiredToLoadEntries));
+				
+				tabsCtrl.clearData();
+				hasUnsavedFileChanges = false;
+				
+				final boolean recursive = true;
+				final File cache = new File(mpqi.getMpqCachePath());
+				final Collection<File> layoutFiles = FileUtils.listFiles(cache, null, recursive);
+				
+				layoutExtReader = new LayoutExtensionReader();
+				layoutExtReader.processLayoutFiles(layoutFiles);
+				
+				final List<ValueDef> hotkeys = layoutExtReader.getHotkeys();
+				tabsCtrl.getHotkeysData().addAll(hotkeys);
+				
+				final List<ValueDef> settings = layoutExtReader.getSettings();
+				tabsCtrl.getSettingsData().addAll(settings);
+				
+			} catch (MpqException | ShowToUserException e) {
+				logger.error("File could not be opened. MPQ-Error: " + ExceptionUtils.getStackTrace(e),
+						e); //$NON-NLS-1$
+				openedDocPath = null;
+				updateAppTitle();
+				showErrorAlert(e);
+			} catch (final Exception e) {
+				logger.error("File could not be opened. Error: " + ExceptionUtils.getStackTrace(e), e); //$NON-NLS-1$
+				openedDocPath = null;
+				updateAppTitle();
+				showExceptionAlert(e);
+			}
+			updateMenuBar();
+		} else {
+			logger.trace("File to open was null, most likely due to 'cancel'."); //$NON-NLS-1$
+		}
+		logger.warn("opened mpq within " + (System.nanoTime() - time) / 1000000 + "ms.");
+	}
+	
+	/**
+	 * Shows an Exception Alert.
+	 *
+	 * @param e
+	 */
+	private void showExceptionAlert(final Exception e) {
+		Platform.runLater(() -> {
+			logger.trace("showing exception popup");
+			final Alert alert = Alerts.buildExceptionAlert(getPrimaryStage(), e);
+			alert.showAndWait();
+		});
+	}
+	
+	/**
 	 * Closes the currently opened document.
 	 */
 	public void closeFile() {
@@ -566,15 +554,6 @@ public class Main extends Application {
 			layoutExtReader.clearData();
 			hasUnsavedFileChanges = false;
 		}
-	}
-	
-	/**
-	 * Returns true, if it belongs to Heroes of the Storm, false otherwise.
-	 *
-	 * @return
-	 */
-	public boolean isHeroesFile() {
-		return isNamespaceHeroes;
 	}
 	
 	/**
@@ -603,12 +582,19 @@ public class Main extends Application {
 		final FileChooser fileChooser = new FileChooser();
 		fileChooser.setTitle(Messages.getString("Main.saveUiTitle")); //$NON-NLS-1$
 		
-		final ExtensionFilter genExtFilter = new ExtensionFilter(Messages.getString("Main.sc2HeroesObserverInterfaceExtFilter"), "*.SC2Interface", //$NON-NLS-1$ //$NON-NLS-2$
-				"*.StormInterface"); //$NON-NLS-1$
+		final ExtensionFilter genExtFilter =
+				new ExtensionFilter(Messages.getString("Main.sc2HeroesObserverInterfaceExtFilter"),
+						SC2_INTERFACE_FILE_FILTER,
+						//$NON-NLS-1$ //$NON-NLS-2$
+						STORM_INTERFACE_FILE_FILTER); //$NON-NLS-1$
 		
-		fileChooser.getExtensionFilters().addAll(new ExtensionFilter(Messages.getString("Main.allFilesFilter"), "*.*"), //$NON-NLS-1$ //$NON-NLS-2$
-				genExtFilter, new ExtensionFilter(Messages.getString("Main.sc2InterfaceFilter"), "*.SC2Interface"), //$NON-NLS-1$ //$NON-NLS-2$
-				new ExtensionFilter(Messages.getString("Main.heroesInterfaceFilter"), "*.StormInterface")); //$NON-NLS-1$ //$NON-NLS-2$
+		fileChooser.getExtensionFilters().addAll(new ExtensionFilter(Messages.getString("Main.allFilesFilter"), "*.*"),
+				//$NON-NLS-1$ //$NON-NLS-2$
+				genExtFilter,
+				new ExtensionFilter(Messages.getString("Main.sc2InterfaceFilter"), SC2_INTERFACE_FILE_FILTER),
+				//$NON-NLS-1$ //$NON-NLS-2$
+				new ExtensionFilter(Messages.getString("Main.heroesInterfaceFilter"),
+						STORM_INTERFACE_FILE_FILTER)); //$NON-NLS-1$ //$NON-NLS-2$
 		fileChooser.setSelectedExtensionFilter(genExtFilter);
 		
 		final File loadedF = new File(getOpenedDocPath());
@@ -620,13 +606,13 @@ public class Main extends Application {
 		if (f != null) {
 			try {
 				compile();
-				mpqi.buildMpq(f.getParentFile().getAbsolutePath(), f.getName(), false, false);
+				mpqi.buildMpq(f.getParentFile().getAbsolutePath(), f.getName(), false,
+						MpqEditorCompression.BLIZZARD_SC2_HEROES, false);
 				hasUnsavedFileChanges = false;
 				openedDocPath = f.getAbsolutePath();
 				updateAppTitle();
 			} catch (IOException | InterruptedException | ParserConfigurationException | SAXException | MpqException e) {
 				logger.error(ExceptionUtils.getStackTrace(e), e);
-				e.printStackTrace();
 				showErrorAlert(e);
 			}
 		}

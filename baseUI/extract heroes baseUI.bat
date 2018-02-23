@@ -103,8 +103,8 @@ del %~dp0debug.log
 
 : Make Live Heroes active
 set file=%parentLevel%\settings.ini
-set findstr="PTRactive=true"
-set replacestr="PTRactive=false"
+set findstr="HeroesPTRactive = true"
+set replacestr="HeroesPTRactive = false"
 call :FindReplace %findstr% %replacestr% %file%
 exit /b 
 : Functions from http://stackoverflow.com/questions/23087463/batch-script-to-find-and-replace-a-string-in-text-file-within-a-minute-for-files

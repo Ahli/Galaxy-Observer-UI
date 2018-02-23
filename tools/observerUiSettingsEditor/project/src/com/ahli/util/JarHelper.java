@@ -8,8 +8,7 @@ import java.net.URI;
 import java.net.URL;
 
 /**
- * Helper class for the executable jar file. It is capable of determining the
- * position.
+ * Helper class for the executable jar file. It is capable of determining the position.
  *
  * @author Ahli
  */
@@ -23,8 +22,8 @@ public final class JarHelper {
 	}
 	
 	/**
-	 * from stackoverflow because why doesn't java have this functionality? It's not
-	 * like nobody would need that or it is trivial to create...
+	 * from stackoverflow because why doesn't java have this functionality? It's not like nobody would need that or it
+	 * is trivial to create...
 	 *
 	 * @param aclass
 	 * @return File at base path
@@ -45,7 +44,6 @@ public final class JarHelper {
 			// results in: "file:/D:/GalaxyObsUI/dev/./"
 			// but maybe results in something completely different like
 			// notepad++'s directory...
-			// addLogMessage("METHOD TEST: " + new File(".").toURI());
 			
 			str = uri.getPath();
 			logger.debug("_URI path:" + str); //$NON-NLS-1$
