@@ -11,6 +11,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
+import org.springframework.data.domain.Example;
+import org.springframework.data.domain.ExampleMatcher;
 
 import java.io.File;
 import java.util.Iterator;
@@ -59,7 +61,13 @@ public class ProjectService {
 		return projectRepo.findAll();
 	}
 	
-	public Project addProject(final Project project) {
+	/**
+	 * Saves the specified project to the database.
+	 *
+	 * @param project
+	 * @return updated instance
+	 */
+	public Project saveProject(final Project project) {
 		try {
 			return projectRepo.save(project);
 		} catch (final DataAccessException e) {
@@ -80,7 +88,33 @@ public class ProjectService {
 		}
 	}
 	
+	/**
+	 * Removes the specified Project from the database.
+	 *
+	 * @param project
+	 */
 	public void deleteProject(final Project project) {
 		projectRepo.delete(project);
 	}
+	
+	/**
+	 * Returns a list of Projects using the specified path.
+	 *
+	 * @param path
+	 * @return list of Projects with matching path
+	 */
+	public List<Project> getProjectsOfPath(final String path) {
+		return projectRepo.findAll(new Example<>() {
+			@Override
+			public Project getProbe() {
+				return new Project(null, path, null);
+			}
+			
+			@Override
+			public ExampleMatcher getMatcher() {
+				return ExampleMatcher.matchingAll().withIgnoreNullValues();
+			}
+		});
+	}
+	
 }

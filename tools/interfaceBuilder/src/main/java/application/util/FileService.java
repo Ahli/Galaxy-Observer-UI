@@ -3,7 +3,9 @@ package application.util;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
+import java.util.stream.Stream;
 
 public class FileService {
 	
@@ -66,5 +68,35 @@ public class FileService {
 			} while (!f.isDirectory());
 		}
 		return f;
+	}
+	
+	/**
+	 * Returns the count of files within the specified directory.
+	 *
+	 * @param f
+	 * @return count of files in directory and subdirectories
+	 * @throws IOException
+	 */
+	public long getFileCountOfDirectory(final File f) throws IOException {
+		final long count;
+		try (final Stream<Path> walk = Files.walk(f.toPath())) {
+			count = walk.filter(p -> p.toFile().isFile()).count();
+		}
+		return count;
+	}
+	
+	/**
+	 * Returns the size of the specified directory in bytes.
+	 *
+	 * @param f
+	 * @return size of all contained files in bytes
+	 * @throws IOException
+	 */
+	public long getDirectorySize(final File f) throws IOException {
+		final long size;
+		try (final Stream<Path> walk = Files.walk(f.toPath())) {
+			size = walk.filter(p -> p.toFile().isFile()).mapToLong(p -> p.toFile().length()).sum();
+		}
+		return size;
 	}
 }

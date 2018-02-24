@@ -63,8 +63,14 @@ public class AddProjectController {
 			actionEvent.consume();
 			return;
 		}
-		project = new Project(name, path, game);
-		project = projectService.addProject(project);
+		if (project == null) {
+			project = new Project(name, path, game);
+		} else {
+			project.setGame(game);
+			project.setName(name);
+			project.setProjectPath(path);
+		}
+		project = projectService.saveProject(project);
 	}
 	
 	public void browsePathAction() {
@@ -82,6 +88,14 @@ public class AddProjectController {
 	
 	private Window getWindow() {
 		return projectPathLabel.getScene().getWindow();
+	}
+	
+	public void setProjectToEdit(final Project project) {
+		this.project = project;
+		dialog.setTitle("Edit Observer Interface Project...");
+		projectNameLabel.setText(project.getName());
+		projectPathLabel.setText(project.getProjectPath());
+		gameDropdown.getSelectionModel().select(project.getGame());
 	}
 	
 }
