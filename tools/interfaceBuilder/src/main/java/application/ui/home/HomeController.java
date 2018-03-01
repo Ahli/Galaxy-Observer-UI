@@ -1,11 +1,17 @@
 package application.ui.home;
 
 import application.InterfaceBuilderApp;
+import application.compress.ExperimentalCompressionMiner;
+import application.compress.gameService.GameService;
+import application.config.ConfigService;
 import application.projects.Project;
 import application.projects.ProjectService;
 import application.ui.settings.Updateable;
 import application.util.FXMLSpringLoader;
 import application.util.FileService;
+import com.ahli.galaxy.ModData;
+import com.ahli.galaxy.game.def.abstracts.GameDef;
+import com.ahli.mpq.MpqException;
 import javafx.beans.InvalidationListener;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -71,8 +77,13 @@ public class HomeController implements Updateable {
 	private ProjectService projectService;
 	@Autowired
 	private FileService fileService;
+	@Autowired
+	private ConfigService configService;
 	
 	private ObservableList<Project> projectsObservable;
+	@Autowired
+	private GameService gameService;
+	
 	
 	/**
 	 * Automatically called by FxmlLoader
@@ -280,5 +291,63 @@ public class HomeController implements Updateable {
 	 */
 	public Window getWindow() {
 		return selectionList.getScene().getWindow();
+	}
+	
+	/**
+	 * Action to view the best compression ruleset for the selected project.
+	 *
+	 * @throws IOException
+	 */
+	public void viewBestCompressionForSelected() throws IOException {
+		final List<Project> selectedItems = selectionList.getSelectionModel().getSelectedItems();
+		if (selectedItems.size() == 1) {
+			final Project project = selectedItems.get(0);
+			final FXMLLoader loader = new FXMLSpringLoader(appContext);
+			final Dialog<Project> dialog =
+					loader.load(appContext.getResource("view/Home_ViewRuleSet.fxml").getInputStream());
+			((ViewRuleSetController) loader.getController()).setProject(project);
+			dialog.initOwner(addProject.getScene().getWindow());
+			dialog.showAndWait();
+		}
+	}
+	
+	/**
+	 * Action to mine a better compression for the selected project.
+	 */
+	public void mineBetterCompressionForSelected() {
+		final List<Project> selectedItems = selectionList.getSelectionModel().getSelectedItems();
+		if (selectedItems.size() == 1) {
+			final Project project = selectedItems.get(0);
+			InterfaceBuilderApp.getInstance().getExecutor().execute(() -> {
+				try {
+					// TODO what the f*ck
+					final ModData mod = gameService.getModData(project.getGame());
+					final GameDef gameDef = mod.getGameData().getGameDef();
+					final File projectSource = new File(project.getProjectPath());
+					final File f = new File(configService.getDocumentsPath() + File.separator +
+							gameDef.getDocumentsGameDirectoryName() + File.separator +
+							gameDef.getDocumentsInterfaceSubdirectoryName() + File.separator + projectSource.getName());
+					mod.setTargetFile(f);
+					mod.setSourceDirectory(projectSource);
+					
+					final ExperimentalCompressionMiner expCompMiner =
+							new ExperimentalCompressionMiner(mod, configService.getMpqCachePath(),
+									configService.getMpqEditorPath(), fileService);
+					long lastSize = expCompMiner.getBestSize();
+					logger.info(String.format("Best size before mining: %s kb)", lastSize / 1024));
+					for (int i = 0; i < 30; i++) {
+						lastSize = expCompMiner.randomizeRuleAndBuild();
+						logger.info(String.format("Mined compression of size %s kb.", lastSize / 1024));
+					}
+					final long newBest = expCompMiner.getBestSize();
+					logger.info(
+							String.format("Best Compression mined has compression producing size: %s", newBest / 1024));
+				} catch (IOException | MpqException e) {
+					logger.error("Experimental Compression Minder experienced a problem.", e);
+				} catch (final InterruptedException e) {
+					Thread.currentThread().interrupt();
+				}
+			});
+		}
 	}
 }

@@ -3,6 +3,7 @@ package application.config;
 import application.InterfaceBuilderApp;
 import application.build.MpqBuilderService;
 import application.compile.CompileService;
+import application.compress.gameService.GameService;
 import application.integration.JarHelper;
 import application.integration.ReplayFinder;
 import application.integration.SettingsIniInterface;
@@ -143,5 +144,10 @@ public class AppConfiguration {
 	//	ExperimentalCompressionMiner experimentalCompressionMiner() throws InterruptedException, MpqException, IOException {
 	//		return new ExperimentalCompressionMiner(modData);
 	//	}
+	
+	@Bean
+	public GameService gameService() {
+		return new GameService();
+	}
 	
 }

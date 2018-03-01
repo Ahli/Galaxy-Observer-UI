@@ -1,14 +1,17 @@
 package application.projects;
 
+import application.compress.RuleSet;
 import application.projects.enums.Game;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import java.util.Date;
 
@@ -34,6 +37,9 @@ public class Project {
 	
 	@Column
 	private Long lastBuildSize;
+	
+	@ManyToOne (fetch = FetchType.LAZY)
+	private RuleSet bestCompressionRuleSet;
 	
 	public Project() {
 		// required
@@ -96,5 +102,13 @@ public class Project {
 	
 	public void setLastBuildSize(final long lastBuildSize) {
 		this.lastBuildSize = lastBuildSize;
+	}
+	
+	public RuleSet getBestCompressionRuleSet() {
+		return bestCompressionRuleSet;
+	}
+	
+	public void setBestCompressionRuleSet(final RuleSet bestCompressionRuleSet) {
+		this.bestCompressionRuleSet = bestCompressionRuleSet;
 	}
 }

@@ -2,13 +2,13 @@ package application.config;
 
 import application.ui.home.AddProjectController;
 import application.ui.home.HomeController;
+import application.ui.home.ViewRuleSetController;
 import application.ui.navigation.NavigationController;
 import application.ui.progress.TabPaneController;
 import application.ui.settings.SettingsCommandLineToolController;
 import application.ui.settings.SettingsController;
 import application.ui.settings.SettingsGamesPathsController;
 import application.ui.settings.SettingsGuiToolController;
-import application.util.FXMLSpringLoader;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
@@ -24,9 +24,14 @@ public class FxmlConfiguration {
 	@Autowired
 	private ApplicationContext applicationContext;
 	
+	//	@Bean
+	//	public FXMLSpringLoader fxmlSpringLoader() {
+	//		return new FXMLSpringLoader(applicationContext);
+	//	}
+	
 	@Bean
-	public FXMLSpringLoader fxmlSpringLoader() {
-		return new FXMLSpringLoader(applicationContext);
+	public ViewRuleSetController viewRuleSetController() {
+		return new ViewRuleSetController();
 	}
 	
 	@Bean
