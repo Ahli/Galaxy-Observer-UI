@@ -584,13 +584,13 @@ public class MpqEditorInterface implements MpqInterface, DeepCopyable {
 	}
 	
 	/**
-	 * Sets a custom ruleset for the file attributes and compression. To use it, the archive needs to use
+	 * Sets custom rules for the file attributes and compression. To use it, the archive needs to use
 	 * MpqEditorCompression.CUSTOM.
 	 *
-	 * @param ruleSet
+	 * @param rules
 	 */
-	public void setCustomRuleSet(final MpqEditorCompressionRule[] ruleSet) {
-		settings.setCustomRuleSet(ruleSet);
+	public void setCustomCompressionRules(final MpqEditorCompressionRule[] rules) {
+		settings.setCustomRules(rules);
 	}
 	
 	/**

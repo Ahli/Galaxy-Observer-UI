@@ -36,7 +36,7 @@ public class MpqEditorSettingsInterface implements DeepCopyable {
 	private File iniFileBackUp = null;
 	private File rulesetFileBackUp = null;
 	private boolean backupActive = false;
-	private MpqEditorCompressionRule[] customRuleSet = null;
+	private MpqEditorCompressionRule[] customRules = null;
 	
 	private MpqEditorCompression compression = MpqEditorCompression.BLIZZARD_SC2_HEROES;
 	
@@ -246,9 +246,9 @@ public class MpqEditorSettingsInterface implements DeepCopyable {
 		
 		switch (compression) {
 			case CUSTOM:
-				if (customRuleSet != null) {
-					for (int i = 0, len = customRuleSet.length; i < len; i++) {
-						ini.addProperty(CUSTOM_RULE_PROPERTY_KEY, customRuleSet[i].toString());
+				if (customRules != null) {
+					for (int i = 0, len = customRules.length; i < len; i++) {
+						ini.addProperty(CUSTOM_RULE_PROPERTY_KEY, customRules[i].toString());
 					}
 				} else {
 					section.addProperty(DEFAULT, NO_COMPRESSION_CUSTOM_RULE);
@@ -329,24 +329,23 @@ public class MpqEditorSettingsInterface implements DeepCopyable {
 	}
 	
 	public MpqEditorCompressionRule[] getCustomRuleSet() {
-		return customRuleSet;
+		return customRules;
 	}
 	
 	/**
-	 * @param customRuleSet
+	 * @param customRules
 	 */
-	public void setCustomRuleSet(final MpqEditorCompressionRule[] customRuleSet) {
-		this.customRuleSet = customRuleSet;
+	public void setCustomRules(final MpqEditorCompressionRule[] customRules) {
+		this.customRules = customRules;
 	}
 	
 	@Override
 	public Object deepCopy() {
 		final MpqEditorSettingsInterface clone = new MpqEditorSettingsInterface();
-		if (customRuleSet != null) {
-			clone.customRuleSet = new MpqEditorCompressionRule[customRuleSet.length];
-			for (int i = 0, len = customRuleSet.length; i < len; i++) {
-				customRuleSet[i] =
-						customRuleSet[i] == null ? null : (MpqEditorCompressionRule) customRuleSet[i].deepCopy();
+		if (customRules != null) {
+			clone.customRules = new MpqEditorCompressionRule[customRules.length];
+			for (int i = 0, len = customRules.length; i < len; i++) {
+				customRules[i] = customRules[i] == null ? null : (MpqEditorCompressionRule) customRules[i].deepCopy();
 			}
 		}
 		clone.compression = compression;

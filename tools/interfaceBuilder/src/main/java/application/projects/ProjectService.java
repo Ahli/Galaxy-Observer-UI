@@ -1,6 +1,7 @@
 package application.projects;
 
 import application.build.MpqBuilderService;
+import application.compress.RuleSet;
 import com.ahli.galaxy.game.GameData;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOCase;
@@ -9,10 +10,13 @@ import org.apache.commons.io.filefilter.SuffixFileFilter;
 import org.apache.commons.io.filefilter.TrueFileFilter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.ExampleMatcher;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.File;
 import java.util.Iterator;
@@ -21,6 +25,7 @@ import java.util.List;
 /**
  * ProjectService manages Observer Interface project related tasks.
  */
+@Service
 public class ProjectService {
 	private static final Logger logger = LogManager.getLogger();
 	
@@ -117,4 +122,21 @@ public class ProjectService {
 		});
 	}
 	
+	
+	/**
+	 * Initializes the BestCompressionRuleSet field of the specified project and returns it.
+	 *
+	 * @param project
+	 * @return
+	 */
+	@Transactional
+	public RuleSet fetchBestCompressionRuleSet(final Project project) {
+		if (!Hibernate.isInitialized(project.getBestCompressionRuleSet())) {
+			// grab from DB wire compression rules to old instance
+			final Project project2 = projectRepo.getOne(project.getId());
+			Hibernate.initialize(project2.getBestCompressionRuleSet());
+			project.setBestCompressionRuleSet(project2.getBestCompressionRuleSet());
+		}
+		return project.getBestCompressionRuleSet();
+	}
 }

@@ -2,7 +2,8 @@ package application.ui.home;
 
 import application.InterfaceBuilderApp;
 import application.compress.ExperimentalCompressionMiner;
-import application.compress.gameService.GameService;
+import application.compress.GameService;
+import application.compress.RuleSet;
 import application.config.ConfigService;
 import application.projects.Project;
 import application.projects.ProjectService;
@@ -320,7 +321,7 @@ public class HomeController implements Updateable {
 			final Project project = selectedItems.get(0);
 			InterfaceBuilderApp.getInstance().getExecutor().execute(() -> {
 				try {
-					// TODO what the f*ck
+					// TODO too complex?
 					final ModData mod = gameService.getModData(project.getGame());
 					final GameDef gameDef = mod.getGameData().getGameDef();
 					final File projectSource = new File(project.getProjectPath());
@@ -335,11 +336,14 @@ public class HomeController implements Updateable {
 									configService.getMpqEditorPath(), fileService);
 					long lastSize = expCompMiner.getBestSize();
 					logger.info(String.format("Best size before mining: %s kb)", lastSize / 1024));
-					for (int i = 0; i < 30; i++) {
-						lastSize = expCompMiner.randomizeRuleAndBuild();
+					for (int i = 0; i < 3; i++) {
+						expCompMiner.randomizeRules();
+						lastSize = expCompMiner.build();
 						logger.info(String.format("Mined compression of size %s kb.", lastSize / 1024));
 					}
 					final long newBest = expCompMiner.getBestSize();
+					project.setBestCompressionRuleSet(new RuleSet(expCompMiner.getBestRuleSet()));
+					projectService.saveProject(project);
 					logger.info(
 							String.format("Best Compression mined has compression producing size: %s", newBest / 1024));
 				} catch (IOException | MpqException e) {

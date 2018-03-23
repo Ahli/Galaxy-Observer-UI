@@ -3,6 +3,7 @@ package application.projects;
 import application.compress.RuleSet;
 import application.projects.enums.Game;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -11,7 +12,7 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.ManyToOne;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import java.util.Date;
 
@@ -38,7 +39,7 @@ public class Project {
 	@Column
 	private Long lastBuildSize;
 	
-	@ManyToOne (fetch = FetchType.LAZY)
+	@OneToOne (fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
 	private RuleSet bestCompressionRuleSet;
 	
 	public Project() {

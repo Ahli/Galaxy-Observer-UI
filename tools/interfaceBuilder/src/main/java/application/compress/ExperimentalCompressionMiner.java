@@ -86,14 +86,21 @@ public class ExperimentalCompressionMiner {
 	 */
 	private long build(final MpqEditorCompressionRule[] rules, final boolean compressXml)
 			throws InterruptedException, MpqException, IOException {
-		mpqInterface.setCustomRuleSet(rules);
+		mpqInterface.setCustomCompressionRules(rules);
 		final File targetFile = mod.getTargetFile();
 		mpqInterface.buildMpq(targetFile.getAbsolutePath(), compressXml, MpqEditorCompression.CUSTOM, false);
 		return targetFile.length();
 	}
 	
-	public long randomizeRuleAndBuild() throws InterruptedException, IOException, MpqException {
-		randomizeRules(rules);
+	/**
+	 * Builds the rules.
+	 *
+	 * @return
+	 * @throws InterruptedException
+	 * @throws IOException
+	 * @throws MpqException
+	 */
+	public long build() throws InterruptedException, IOException, MpqException {
 		final long size = build(rules, false);
 		if (size < bestSize) {
 			bestSize = size;
@@ -102,7 +109,7 @@ public class ExperimentalCompressionMiner {
 		return size;
 	}
 	
-	private void randomizeRules(final MpqEditorCompressionRule[] rules) {
+	public void randomizeRules() {
 		for (final MpqEditorCompressionRule r : rules) {
 			if (r instanceof MpqEditorCompressionRuleMask) {
 				r.setCompressionMethod(getRandomCompressionMethod());

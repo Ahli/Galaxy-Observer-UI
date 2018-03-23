@@ -1,4 +1,4 @@
-package application.compress.gameService;
+package application.compress;
 
 import application.projects.enums.Game;
 import com.ahli.galaxy.ModData;
