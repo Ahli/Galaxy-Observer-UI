@@ -22,7 +22,7 @@ public class FileService {
 	public void copyFileOrDirectory(final File source, final File target) throws IOException {
 		if (source.isDirectory()) {
 			// create folder if not existing
-			if (!target.exists() && !target.mkdir()) {
+			if (!target.exists() && !target.mkdirs()) {
 				final String msg = "Could not create directory " + target.getAbsolutePath(); //$NON-NLS-1$
 				throw new IOException(msg);
 			}
