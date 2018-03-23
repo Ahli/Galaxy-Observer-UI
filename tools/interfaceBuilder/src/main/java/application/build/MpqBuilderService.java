@@ -2,6 +2,7 @@ package application.build;
 
 import application.InterfaceBuilderApp;
 import application.compile.CompileService;
+import application.compress.RuleSet;
 import application.config.ConfigService;
 import application.integration.SettingsIniInterface;
 import application.projects.Project;
@@ -187,9 +188,12 @@ public class MpqBuilderService {
 					verifyXml = settings.isGuiVerifyXml();
 				}
 				
+				// load best compression ruleset
 				if (compressXml && compressMpqSetting == 2) {
-					threadsMpqInterface.setCustomCompressionRules(
-							projectService.fetchBestCompressionRuleSet(project).getCompressionRules());
+					final RuleSet ruleSet = projectService.fetchBestCompressionRuleSet(project);
+					if(ruleSet != null){
+						threadsMpqInterface.setCustomCompressionRules(ruleSet.getCompressionRules());
+					}
 				}
 				
 				buildFile(interfaceDirectory, game, threadsMpqInterface, compressXml, compressMpqSetting,
