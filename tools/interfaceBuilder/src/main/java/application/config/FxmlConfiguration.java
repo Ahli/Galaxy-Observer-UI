@@ -17,7 +17,6 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.context.annotation.Scope;
 
 @Lazy
-@Scope ("prototype")
 @Configuration
 public class FxmlConfiguration {
 	
@@ -30,46 +29,55 @@ public class FxmlConfiguration {
 	//	}
 	
 	@Bean
+	@Scope ("prototype")
 	public ViewRuleSetController viewRuleSetController() {
 		return new ViewRuleSetController();
 	}
 	
 	@Bean
+	@Scope ("prototype")
 	public NavigationController navigationController() {
 		return new NavigationController();
 	}
 	
 	@Bean
+	@Scope ("prototype")
 	public HomeController homeController() {
 		return new HomeController();
 	}
 	
 	@Bean
+	@Scope ("prototype")
 	public SettingsCommandLineToolController settingsCommandLineToolController() {
 		return new SettingsCommandLineToolController();
 	}
 	
 	@Bean
+	@Scope ("prototype")
 	public SettingsController settingsController() {
 		return new SettingsController();
 	}
 	
 	@Bean
+	@Scope ("prototype")
 	public SettingsGamesPathsController settingsGamesPathsController() {
 		return new SettingsGamesPathsController();
 	}
 	
 	@Bean
+	@Scope ("prototype")
 	public SettingsGuiToolController settingsGuiToolController() {
 		return new SettingsGuiToolController();
 	}
 	
 	@Bean
+	@Scope ("prototype")
 	public TabPaneController tabPaneController() {
 		return new TabPaneController();
 	}
 	
 	@Bean
+	@Scope ("prototype")
 	public AddProjectController addProjectController() {
 		return new AddProjectController();
 	}
