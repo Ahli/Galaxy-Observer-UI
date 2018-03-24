@@ -19,7 +19,7 @@ public class TabPaneController implements Updateable {
 		if (instance == null) {
 			instance = this;
 		} else {
-			throw new ExceptionInInitializerError("Cannot create multiple TabPaneController.");
+			throw new ExceptionInInitializerError("Cannot create multiple TabPaneControllers.");
 		}
 	}
 	
@@ -49,7 +49,7 @@ public class TabPaneController implements Updateable {
 		
 		
 		final ErrorTabController errorTabCtrl = new ErrorTabController(tab, txtArea, false, true);
-		errorTabCtrl.setRunning(true);
+		//errorTabCtrl.setRunning(true);
 		InterfaceBuilderApp.getInstance().addErrorTabController(errorTabCtrl);
 		StylizedTextAreaAppender.setGeneralController(errorTabCtrl);
 	}

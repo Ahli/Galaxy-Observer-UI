@@ -15,13 +15,13 @@ public final class ErrorTabController {
 	private static final String TAB_TEXT_COLOR_YELLOW = "-tab-text-color: yellow;";
 	private static final String TAB_TEXT_COLOR_RED = "-tab-text-color: red;";
 	private final boolean colorizeTitle;
-	private final boolean noResultIcon;
+	private final boolean showResultIcon;
 	private boolean encounteredError = false;
 	private Tab tab;
 	private StyleClassedTextArea textArea;
 	private boolean running = false;
 	private boolean encounteredWarning;
-	private byte state = 0;
+	private State state = State.NOT_STARTED;
 	
 	/**
 	 * Constructor
@@ -36,7 +36,7 @@ public final class ErrorTabController {
 		this.tab = tab;
 		this.textArea = textArea;
 		this.colorizeTitle = colorizeTitle;
-		this.noResultIcon = noResultIcon;
+		showResultIcon = !noResultIcon;
 	}
 	
 	/**
@@ -92,44 +92,27 @@ public final class ErrorTabController {
 	 *
 	 */
 	private void updateIcon() {
-		if (!running) {
-			if (noResultIcon) {
-				if (state != 0) {
-					tab.setGraphic(null);
-					state = 0;
-				}
-			} else {
-				if (!encounteredError && !encounteredWarning) {
-					if (state != 1) {
-						final FontAwesomeIconView checkedIcon = new FontAwesomeIconView(FontAwesomeIcon.CHECK);
-						checkedIcon.setFill(Color.LAWNGREEN);
-						tab.setGraphic(checkedIcon);
-						state = 1;
-					}
-				} else {
-					if (encounteredError) {
-						if (state != 2) {
-							final FontAwesomeIconView errorIcon =
-									new FontAwesomeIconView(FontAwesomeIcon.EXCLAMATION_TRIANGLE);
-							errorIcon.setFill(Color.RED);
-							tab.setGraphic(errorIcon);
-							state = 2;
-						}
-					} else {
-						if (state != 3) {
-							final FontAwesomeIconView warningIcon =
-									new FontAwesomeIconView(FontAwesomeIcon.EXCLAMATION_TRIANGLE);
-							warningIcon.setFill(Color.YELLOW);
-							tab.setGraphic(warningIcon);
-							state = 3;
-						}
-					}
-				}
-			}
+		if (running) {
+			setIconAppearance(State.RUNNING, FontAwesomeIcon.SPINNER, Color.GAINSBORO);
+		} else if (encounteredError) {
+			setIconAppearance(State.ERROR, FontAwesomeIcon.EXCLAMATION_TRIANGLE, Color.RED);
+		} else if (encounteredWarning) {
+			setIconAppearance(State.WARNING, FontAwesomeIcon.EXCLAMATION_TRIANGLE, Color.YELLOW);
 		} else {
-			final FontAwesomeIconView loadingIcon = new FontAwesomeIconView(FontAwesomeIcon.SPINNER);
-			loadingIcon.setFill(Color.GAINSBORO);
-			tab.setGraphic(loadingIcon);
+			setIconAppearance(State.GOOD, FontAwesomeIcon.CHECK, Color.LAWNGREEN);
+		}
+	}
+	
+	private void setIconAppearance(final State newState, final FontAwesomeIcon icon, final Color color) {
+		if (state != newState) {
+			state = newState;
+			if (newState == State.RUNNING || newState == State.NOT_STARTED || showResultIcon) {
+				final FontAwesomeIconView iconView = new FontAwesomeIconView(icon);
+				iconView.setFill(color);
+				tab.setGraphic(iconView);
+			} else {
+				tab.setGraphic(null);
+			}
 		}
 	}
 	
@@ -172,4 +155,6 @@ public final class ErrorTabController {
 			updateIcon();
 		}
 	}
+	
+	private enum State {NOT_STARTED, RUNNING, WARNING, ERROR, GOOD}
 }
