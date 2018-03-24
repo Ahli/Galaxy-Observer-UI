@@ -29,6 +29,7 @@ public abstract class MpqEditorCompressionRule implements DeepCopyable, Serializ
 		encryptAdjusted = original.encryptAdjusted;
 		includeSectorChecksum = original.includeSectorChecksum;
 		markedForDeletion = original.markedForDeletion;
+		compressionMethod = original.compressionMethod;
 	}
 	
 	/**
