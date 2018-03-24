@@ -6,6 +6,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+/**
+ * Converter that is automatically loaded by Hibernate without any references.
+ */
 @Converter
 public class StringArrayToListConverter implements AttributeConverter<String[], List<String>> {
 	

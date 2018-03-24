@@ -253,56 +253,9 @@ public class MpqEditorSettingsInterface implements DeepCopyable {
 				} else {
 					section.addProperty(DEFAULT, NO_COMPRESSION_CUSTOM_RULE);
 				}
-				//				ini.addProperty(CUSTOM_RULE_PROPERTY_KEY, "Size:0-0=0x02000000, 0x00000000, 0xFFFFFFFF");
-				//				ini.addProperty(CUSTOM_RULE_PROPERTY_KEY, "Mask:DocumentHeader=0x01000200, 0x00000010, 0xFFFFFFFF");
-				//				ini.addProperty(CUSTOM_RULE_PROPERTY_KEY, "Mask:DocumentInfo=0x01000200, 0x00000010, 0xFFFFFFFF");
-				//				ini.addProperty(CUSTOM_RULE_PROPERTY_KEY, "Mask:MapInfo=0x01000200, 0x00000010, 0xFFFFFFFF");
-				//				ini.addProperty(CUSTOM_RULE_PROPERTY_KEY, "Mask:*.mp3=0x01000200, 0x00000010, 0xFFFFFFFF");
-				//				ini.addProperty(CUSTOM_RULE_PROPERTY_KEY, "Mask:*.ogg=0x01000200, 0x00000002, 0xFFFFFFFF");
-				//				ini.addProperty(CUSTOM_RULE_PROPERTY_KEY, "Mask:*.ogv=0x01000200, 0x00000002, 0xFFFFFFFF");
-				//				ini.addProperty(CUSTOM_RULE_PROPERTY_KEY, "Mask:*.wav=0x00000200, 0x00000002, 0xFFFFFFFF");
-				//				ini.addProperty(CUSTOM_RULE_PROPERTY_KEY, "Mask:*.dds=0x01000200, 0x00000010, 0xFFFFFFFF");
-				//				ini.addProperty(CUSTOM_RULE_PROPERTY_KEY, "Mask:*.png=0x01000200, 0x00000010, 0xFFFFFFFF");
-				//				ini.addProperty(CUSTOM_RULE_PROPERTY_KEY, "Mask:*.tga=0x01000200, 0x00000010, 0xFFFFFFFF");
-				//				ini.addProperty(CUSTOM_RULE_PROPERTY_KEY, "Mask:*.jpg=0x01000200, 0x00000010, 0xFFFFFFFF");
-				//				ini.addProperty(CUSTOM_RULE_PROPERTY_KEY, "Mask:*.txt=0x01000200, 0x00000002, 0xFFFFFFFF");
-				//				ini.addProperty(CUSTOM_RULE_PROPERTY_KEY, "Mask:*.swf=0x01000200, 0x00000002, 0xFFFFFFFF");
-				//				ini.addProperty(CUSTOM_RULE_PROPERTY_KEY, "Mask:*.ttf=0x01000200, 0x00000002, 0xFFFFFFFF");
-				//				ini.addProperty(CUSTOM_RULE_PROPERTY_KEY, "Mask:*.otf=0x01000200, 0x00000002, 0xFFFFFFFF");
-				//				ini.addProperty(CUSTOM_RULE_PROPERTY_KEY, "Mask:*.m3=0x01000200, 0x00000002, 0xFFFFFFFF");
-				//				ini.addProperty(CUSTOM_RULE_PROPERTY_KEY, "Mask:*.m3a=0x01000200, 0x00000010, 0xFFFFFFFF");
-				//				ini.addProperty(CUSTOM_RULE_PROPERTY_KEY, "Mask:*.xml=0x01000200, 0x00000010, 0xFFFFFFFF");
-				//				ini.addProperty(CUSTOM_RULE_PROPERTY_KEY, "Mask:*.StormLayout=0x01000200, 0x00000010, 0xFFFFFFFF");
-				//				ini.addProperty(CUSTOM_RULE_PROPERTY_KEY, "Mask:*.SC2Layout=0x01000200, 0x00000010, 0xFFFFFFFF");
-				//				ini.addProperty(CUSTOM_RULE_PROPERTY_KEY, "Mask:*.StormComponents=0x01000200, 0x00000010, 0xFFFFFFFF");
-				//				ini.addProperty(CUSTOM_RULE_PROPERTY_KEY, "Mask:*.SC2Components=0x01000200, 0x00000010, 0xFFFFFFFF");
-				//				ini.addProperty(CUSTOM_RULE_PROPERTY_KEY, "Mask:*.StormStyle=0x01000200, 0x00000010, 0xFFFFFFFF");
-				//				ini.addProperty(CUSTOM_RULE_PROPERTY_KEY, "Mask:*.SC2Style=0x01000200, 0x00000010, 0xFFFFFFFF");
-				//				ini.addProperty(CUSTOM_RULE_PROPERTY_KEY, "Mask:*.StormCutscene=0x01000200, 0x00000010, 0xFFFFFFFF");
-				//				ini.addProperty(CUSTOM_RULE_PROPERTY_KEY, "Mask:*.SC2Cutscene=0x01000200, 0x00000010, 0xFFFFFFFF");
-				//				ini.addProperty(CUSTOM_RULE_PROPERTY_KEY, "Mask:*.StormLightning=0x01000200, 0x00000010, 0xFFFFFFFF");
-				//				ini.addProperty(CUSTOM_RULE_PROPERTY_KEY, "Mask:*.SC2Lightning=0x01000200, 0x00000010, 0xFFFFFFFF");
-				//				ini.addProperty(CUSTOM_RULE_PROPERTY_KEY, "Mask:*.version=0x01000200, 0x00000010, 0xFFFFFFFF");
-				//				ini.addProperty(CUSTOM_RULE_PROPERTY_KEY, "Mask:*.galaxy=0x01000200, 0x00000010, 0xFFFFFFFF");
-				//				ini.addProperty(CUSTOM_RULE_PROPERTY_KEY, "Mask:Objects=0x01000200, 0x00000010, 0xFFFFFFFF");
-				//				ini.addProperty(CUSTOM_RULE_PROPERTY_KEY, "Mask:PaintedPathingLayer=0x01000200, 0x00000010, 0xFFFFFFFF");
-				//				ini.addProperty(CUSTOM_RULE_PROPERTY_KEY, "Mask:Regions=0x01000200, 0x00000010, 0xFFFFFFFF");
-				//				ini.addProperty(CUSTOM_RULE_PROPERTY_KEY, "Mask:t3CellFlags=0x01000200, 0x00000010, 0xFFFFFFFF");
-				//				ini.addProperty(CUSTOM_RULE_PROPERTY_KEY, "Mask:t3FluffDoodad=0x01000200, 0x00000010, 0xFFFFFFFF");
-				//				ini.addProperty(CUSTOM_RULE_PROPERTY_KEY, "Mask:t3HardTile=0x01000200, 0x00000010, 0xFFFFFFFF");
-				//				ini.addProperty(CUSTOM_RULE_PROPERTY_KEY, "Mask:t3HeightMap=0x01000200, 0x00000010, 0xFFFFFFFF");
-				//				ini.addProperty(CUSTOM_RULE_PROPERTY_KEY, "Mask:t3SyncCliffLevel=0x01000200, 0x00000010, 0xFFFFFFFF");
-				//				ini.addProperty(CUSTOM_RULE_PROPERTY_KEY, "Mask:t3SyncHeightMap=0x01000200, 0x00000010, 0xFFFFFFFF");
-				//				ini.addProperty(CUSTOM_RULE_PROPERTY_KEY, "Mask:t3SyncTextureInfo=0x01000200, 0x00000010, 0xFFFFFFFF");
-				//				ini.addProperty(CUSTOM_RULE_PROPERTY_KEY, "Mask:t3TextureMasks=0x01000200, 0x00000010, 0xFFFFFFFF");
-				//				ini.addProperty(CUSTOM_RULE_PROPERTY_KEY, "Mask:t3VertCol=0x01000200, 0x00000010, 0xFFFFFFFF");
-				//				ini.addProperty(CUSTOM_RULE_PROPERTY_KEY, "Mask:t3Water=0x01000200, 0x00000010, 0xFFFFFFFF");
-				//				ini.addProperty(CUSTOM_RULE_PROPERTY_KEY, "Mask:Triggers=0x01000200, 0x00000010, 0xFFFFFFFF");
-				//				ini.addProperty(CUSTOM_RULE_PROPERTY_KEY, "Mask:Attributes=0x01000200, 0x00000010, 0xFFFFFFFF");
-				//				ini.addProperty(CUSTOM_RULE_PROPERTY_KEY, "Size:0-16384=0x01000200, 0x00000010, 0xFFFFFFFF");
 				break;
 			case NONE:
-				section.addProperty("Default", NO_COMPRESSION_CUSTOM_RULE);
+				section.addProperty(DEFAULT, NO_COMPRESSION_CUSTOM_RULE);
 				break;
 			case SYSTEM_DEFAULT:
 			case BLIZZARD_SC2_HEROES:

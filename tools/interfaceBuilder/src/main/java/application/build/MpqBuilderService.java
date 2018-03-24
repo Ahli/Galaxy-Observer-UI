@@ -191,7 +191,7 @@ public class MpqBuilderService {
 				// load best compression ruleset
 				if (compressXml && compressMpqSetting == 2) {
 					final RuleSet ruleSet = projectService.fetchBestCompressionRuleSet(project);
-					if(ruleSet != null){
+					if (ruleSet != null) {
 						threadsMpqInterface.setCustomCompressionRules(ruleSet.getCompressionRules());
 					}
 				}
