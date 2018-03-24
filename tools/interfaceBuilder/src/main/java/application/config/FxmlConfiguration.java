@@ -9,8 +9,6 @@ import application.ui.settings.SettingsCommandLineToolController;
 import application.ui.settings.SettingsController;
 import application.ui.settings.SettingsGamesPathsController;
 import application.ui.settings.SettingsGuiToolController;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
@@ -19,14 +17,6 @@ import org.springframework.context.annotation.Scope;
 @Lazy
 @Configuration
 public class FxmlConfiguration {
-	
-	@Autowired
-	private ApplicationContext applicationContext;
-	
-	//	@Bean
-	//	public FXMLSpringLoader fxmlSpringLoader() {
-	//		return new FXMLSpringLoader(applicationContext);
-	//	}
 	
 	@Bean
 	@Scope ("prototype")
@@ -71,7 +61,6 @@ public class FxmlConfiguration {
 	}
 	
 	@Bean
-	@Scope ("prototype")
 	public TabPaneController tabPaneController() {
 		return new TabPaneController();
 	}
