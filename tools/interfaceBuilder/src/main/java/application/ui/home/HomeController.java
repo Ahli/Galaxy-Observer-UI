@@ -7,9 +7,9 @@ import application.compress.RuleSet;
 import application.config.ConfigService;
 import application.projects.Project;
 import application.projects.ProjectService;
-import application.ui.settings.Updateable;
 import application.ui.FXMLSpringLoader;
-import application.util.FileService;
+import application.ui.settings.Updateable;
+import application.integration.FileService;
 import com.ahli.galaxy.ModData;
 import com.ahli.galaxy.game.def.abstracts.GameDef;
 import com.ahli.mpq.MpqException;
@@ -347,7 +347,7 @@ public class HomeController implements Updateable {
 					logger.info(
 							String.format("Best Compression mined has compression producing size: %s", newBest / 1024));
 				} catch (IOException | MpqException e) {
-					logger.error("Experimental Compression Minder experienced a problem.", e);
+					logger.error("Experimental Compression Miner experienced a problem.", e);
 				} catch (final InterruptedException e) {
 					Thread.currentThread().interrupt();
 				}

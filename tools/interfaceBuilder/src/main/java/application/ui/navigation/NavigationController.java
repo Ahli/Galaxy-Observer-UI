@@ -1,8 +1,8 @@
 package application.ui.navigation;
 
 import application.InterfaceBuilderApp;
-import application.ui.settings.Updateable;
 import application.ui.FXMLSpringLoader;
+import application.ui.settings.Updateable;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
 import javafx.collections.ObservableList;
