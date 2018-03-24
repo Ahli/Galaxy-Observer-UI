@@ -54,7 +54,7 @@ public class ExperimentalCompressionMiner {
 		try (Stream<Path> ps = Files.walk(cacheModDirectory)) {
 			ps.filter(Files::isRegularFile).forEach(p -> initRules
 					.add(new MpqEditorCompressionRuleMask("*" + p.getFileName().toString()).setSingleUnit(true)
-							.setCompress(true)));
+							.setCompress(true).setCompressionMethod(MpqEditorCompressionRuleMethod.BZIP2)));
 		}
 		return initRules.toArray(new MpqEditorCompressionRule[0]);
 	}
