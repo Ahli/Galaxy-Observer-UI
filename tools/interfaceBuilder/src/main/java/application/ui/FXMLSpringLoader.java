@@ -1,4 +1,4 @@
-package application.util;
+package application.ui;
 
 import javafx.fxml.FXMLLoader;
 import org.springframework.context.ApplicationContext;

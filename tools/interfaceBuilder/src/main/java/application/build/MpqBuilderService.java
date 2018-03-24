@@ -8,7 +8,7 @@ import application.integration.SettingsIniInterface;
 import application.projects.Project;
 import application.projects.ProjectService;
 import application.projects.enums.Game;
-import application.util.FileService;
+import application.integration.FileService;
 import com.ahli.galaxy.ModData;
 import com.ahli.galaxy.archive.ComponentsListReader;
 import com.ahli.galaxy.archive.DescIndexData;

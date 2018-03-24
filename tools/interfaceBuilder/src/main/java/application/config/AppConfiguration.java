@@ -9,7 +9,7 @@ import application.integration.ReplayFinder;
 import application.integration.SettingsIniInterface;
 import application.projects.ProjectService;
 import application.ui.progress.StylizedTextAreaAppenderThreadPoolExecutor;
-import application.util.FileService;
+import application.integration.FileService;
 import com.ahli.galaxy.game.GameData;
 import com.ahli.galaxy.game.def.HeroesGameDef;
 import com.ahli.galaxy.game.def.SC2GameDef;

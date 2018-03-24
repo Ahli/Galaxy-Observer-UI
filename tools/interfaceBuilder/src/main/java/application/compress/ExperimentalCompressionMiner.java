@@ -1,6 +1,6 @@
 package application.compress;
 
-import application.util.FileService;
+import application.integration.FileService;
 import com.ahli.galaxy.ModData;
 import com.ahli.mpq.MpqEditorInterface;
 import com.ahli.mpq.MpqException;
