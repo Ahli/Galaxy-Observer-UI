@@ -8,7 +8,7 @@ import application.ui.navigation.NavigationController;
 import application.ui.progress.ErrorTabController;
 import application.ui.progress.StylizedTextAreaAppender;
 import application.ui.progress.TabPaneController;
-import application.util.FXMLSpringLoader;
+import application.ui.FXMLSpringLoader;
 import javafx.animation.FadeTransition;
 import javafx.animation.PauseTransition;
 import javafx.application.Application;

@@ -8,7 +8,7 @@ import application.config.ConfigService;
 import application.projects.Project;
 import application.projects.ProjectService;
 import application.ui.settings.Updateable;
-import application.util.FXMLSpringLoader;
+import application.ui.FXMLSpringLoader;
 import application.util.FileService;
 import com.ahli.galaxy.ModData;
 import com.ahli.galaxy.game.def.abstracts.GameDef;

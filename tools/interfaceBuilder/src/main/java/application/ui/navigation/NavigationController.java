@@ -2,7 +2,7 @@ package application.ui.navigation;
 
 import application.InterfaceBuilderApp;
 import application.ui.settings.Updateable;
-import application.util.FXMLSpringLoader;
+import application.ui.FXMLSpringLoader;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
 import javafx.collections.ObservableList;
