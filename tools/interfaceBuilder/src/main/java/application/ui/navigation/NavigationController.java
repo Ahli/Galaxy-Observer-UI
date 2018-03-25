@@ -1,8 +1,8 @@
 package application.ui.navigation;
 
 import application.InterfaceBuilderApp;
+import application.ui.FXMLSpringLoader;
 import application.ui.settings.Updateable;
-import application.util.FXMLSpringLoader;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
 import javafx.collections.ObservableList;
@@ -22,6 +22,7 @@ import java.io.IOException;
 
 public class NavigationController {
 	private static final Logger logger = LogManager.getLogger();
+	private static NavigationController instance = null;
 	/* ContentPages:
 	 * 0: taskChoice
 	 * 1: tabPane
@@ -39,6 +40,23 @@ public class NavigationController {
 	@FXML
 	private Button progress;
 	private int activeContent = -1;
+	
+	public NavigationController() {
+		if (instance == null) {
+			instance = this;
+		} else {
+			throw new ExceptionInInitializerError("Cannot create multiple NavigationControllers.");
+		}
+	}
+	
+	/**
+	 * Returns the singleton instance.
+	 *
+	 * @return instance or null
+	 */
+	public static NavigationController getInstance() {
+		return instance;
+	}
 	
 	/**
 	 * Automatically called by FxmlLoader

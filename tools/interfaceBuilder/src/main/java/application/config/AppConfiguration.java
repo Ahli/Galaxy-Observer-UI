@@ -3,12 +3,13 @@ package application.config;
 import application.InterfaceBuilderApp;
 import application.build.MpqBuilderService;
 import application.compile.CompileService;
+import application.compress.GameService;
+import application.integration.FileService;
 import application.integration.JarHelper;
 import application.integration.ReplayFinder;
 import application.integration.SettingsIniInterface;
 import application.projects.ProjectService;
 import application.ui.progress.StylizedTextAreaAppenderThreadPoolExecutor;
-import application.util.FileService;
 import com.ahli.galaxy.game.GameData;
 import com.ahli.galaxy.game.def.HeroesGameDef;
 import com.ahli.galaxy.game.def.SC2GameDef;
@@ -143,5 +144,10 @@ public class AppConfiguration {
 	//	ExperimentalCompressionMiner experimentalCompressionMiner() throws InterruptedException, MpqException, IOException {
 	//		return new ExperimentalCompressionMiner(modData);
 	//	}
+	
+	@Bean
+	public GameService gameService() {
+		return new GameService();
+	}
 	
 }

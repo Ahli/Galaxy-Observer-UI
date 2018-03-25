@@ -19,7 +19,7 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>2.0.0.RC2</version>
+		<version>2.0.0.RELEASE</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 
@@ -37,6 +37,13 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
+			<exclusions>
+				<exclusion>
+					<!-- exclude junit4 as junit5 is used -->
+					<groupId>junit</groupId>
+					<artifactId>junit</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 
 		<dependency>
@@ -76,6 +83,7 @@
 		</dependency>
 
 		<!-- JavaEE's JAXB for JPA/Hibernate -->
+		<!-- https://mvnrepository.com/artifact/javax.xml.bind/jaxb-api -->
 		<dependency>
 			<groupId>javax.xml.bind</groupId>
 			<artifactId>jaxb-api</artifactId>
@@ -95,20 +103,20 @@
 		<dependency>
 			<groupId>org.apache.logging.log4j</groupId>
 			<artifactId>log4j-api</artifactId>
-			<version>2.10.0</version>
+			<version>2.11.0</version>
 		</dependency>
 		<!-- https://mvnrepository.com/artifact/org.apache.logging.log4j/log4j-core -->
 		<dependency>
 			<groupId>org.apache.logging.log4j</groupId>
 			<artifactId>log4j-core</artifactId>
-			<version>2.10.0</version>
+			<version>2.11.0</version>
 		</dependency>
 		<!-- async logging in log4j -->
 		<!-- https://mvnrepository.com/artifact/com.lmax/disruptor -->
 		<dependency>
 			<groupId>com.lmax</groupId>
 			<artifactId>disruptor</artifactId>
-			<version>3.3.8</version>
+			<version>3.4.1</version>
 		</dependency>
 
 		<!-- to get stack trace as String -->
@@ -154,15 +162,48 @@
 		<dependency>
 			<groupId>com.h2database</groupId>
 			<artifactId>h2</artifactId>
-			<version>1.4.196</version>
+			<version>1.4.197</version>
 			<scope>runtime</scope>
 		</dependency>
 
 		<!-- additional controls for javaFX -->
+		<!-- https://mvnrepository.com/artifact/org.controlsfx/controlsfx -->
 		<dependency>
 			<groupId>org.controlsfx</groupId>
 			<artifactId>controlsfx</artifactId>
 			<version>9.0.0</version>
+		</dependency>
+
+		<!-- Testing Framework JUnit5 -->
+		<!-- also: exclude junit4 in spring boot + add it as dependency to maven surefire -->
+		<dependency>
+			<!-- https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-api -->
+			<groupId>org.junit.jupiter</groupId>
+			<artifactId>junit-jupiter-api</artifactId>
+			<version>5.1.0</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<!-- https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-engine -->
+			<groupId>org.junit.jupiter</groupId>
+			<artifactId>junit-jupiter-engine</artifactId>
+			<version>5.1.0</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<!-- https://mvnrepository.com/artifact/org.junit.platform/junit-platform-surefire-provider -->
+			<groupId>org.junit.platform</groupId>
+			<artifactId>junit-platform-surefire-provider</artifactId>
+			<version>1.1.0</version>
+			<scope>test</scope>
+		</dependency>
+		<!-- Mockito to assist unit tests with fake-DB info -->
+		<dependency>
+			<!-- https://mvnrepository.com/artifact/org.mockito/mockito-core -->
+			<groupId>org.mockito</groupId>
+			<artifactId>mockito-core</artifactId>
+			<version>2.16.0</version>
+			<scope>test</scope>
 		</dependency>
 
 	</dependencies>
@@ -288,13 +329,15 @@
 			<plugin>
 				<!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-surefire-plugin -->
 				<artifactId>maven-surefire-plugin</artifactId>
-				<version>2.20.1</version>
-				<configuration>
-					<!-- fix for tests in java 9 -->
-					<argLine>--add-modules java.base</argLine>
-					<!-- skip tests, re-enable them when maven surefire's java10 bug fix is released -->
-					<skipTests>true</skipTests>
-				</configuration>
+				<version>2.21.0</version>
+				<dependencies>
+					<dependency>
+						<!-- https://mvnrepository.com/artifact/org.junit.platform/junit-platform-surefire-provider -->
+						<groupId>org.junit.platform</groupId>
+						<artifactId>junit-platform-surefire-provider</artifactId>
+						<version>1.1.0</version>
+					</dependency>
+				</dependencies>
 			</plugin>
 			<plugin>
 				<!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-resources-plugin -->
@@ -336,27 +379,27 @@
 		</plugins>
 	</build>
 
-	<repositories>
-		<repository>
-			<id>spring-snapshots</id>
-			<name>Spring Snapshots</name>
-			<url>https://repo.spring.io/snapshot</url>
-			<snapshots>
-				<enabled>true</enabled>
-			</snapshots>
-		</repository>
-		<repository>
-			<id>spring-milestones</id>
-			<name>Spring Milestones</name>
-			<url>https://repo.spring.io/milestone</url>
-			<snapshots>
-				<enabled>false</enabled>
-			</snapshots>
-		</repository>
-	</repositories>
+	<!--<repositories>-->
+	<!--<repository>-->
+	<!--<id>spring-snapshots</id>-->
+	<!--<name>Spring Snapshots</name>-->
+	<!--<url>https://repo.spring.io/snapshot</url>-->
+	<!--<snapshots>-->
+	<!--<enabled>true</enabled>-->
+	<!--</snapshots>-->
+	<!--</repository>-->
+	<!--<repository>-->
+	<!--<id>spring-milestones</id>-->
+	<!--<name>Spring Milestones</name>-->
+	<!--<url>https://repo.spring.io/milestone</url>-->
+	<!--<snapshots>-->
+	<!--<enabled>false</enabled>-->
+	<!--</snapshots>-->
+	<!--</repository>-->
+	<!--</repositories>-->
 
 	<pluginRepositories>
-		<pluginRepository>
+		<!--<pluginRepository>
 			<id>spring-snapshots</id>
 			<name>Spring Snapshots</name>
 			<url>https://repo.spring.io/snapshot</url>
@@ -371,7 +414,7 @@
 			<snapshots>
 				<enabled>false</enabled>
 			</snapshots>
-		</pluginRepository>
+		</pluginRepository>-->
 		<pluginRepository>
 			<id>central</id>
 			<name>Central Repository</name>

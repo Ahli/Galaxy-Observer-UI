@@ -90,7 +90,8 @@ public class Main extends Application {
 				System.getProperty("log4j.configurationFile")); //$NON-NLS-1$ //$NON-NLS-2$
 		
 		// TEST Locale
-		// Messages.setBundle(Locale.CHINA);
+		//Messages.setBundle(Locale.CHINA);
+		//com.ahli.mpq.i18n.Messages.setBundle(Locale.CHINA);
 		
 		launch(args);
 	}

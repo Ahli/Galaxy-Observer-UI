@@ -1,7 +1,7 @@
 package application.ui.settings;
 
 import application.InterfaceBuilderApp;
-import application.util.FXMLSpringLoader;
+import application.ui.FXMLSpringLoader;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXML;

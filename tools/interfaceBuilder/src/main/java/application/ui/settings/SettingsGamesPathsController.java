@@ -1,7 +1,7 @@
 package application.ui.settings;
 
+import application.integration.FileService;
 import application.integration.SettingsIniInterface;
-import application.util.FileService;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
 import javafx.event.ActionEvent;

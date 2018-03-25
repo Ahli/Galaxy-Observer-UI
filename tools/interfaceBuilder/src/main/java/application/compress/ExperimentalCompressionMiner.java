@@ -1,5 +1,6 @@
 package application.compress;
 
+import application.integration.FileService;
 import com.ahli.galaxy.ModData;
 import com.ahli.mpq.MpqEditorInterface;
 import com.ahli.mpq.MpqException;
@@ -26,6 +27,7 @@ public class ExperimentalCompressionMiner {
 	private final MpqEditorInterface mpqInterface;
 	private final Random random = new Random();
 	private final MpqEditorCompressionRuleMethod[] compressionSetting = MpqEditorCompressionRuleMethod.values();
+	private final FileService fileService;
 	private long bestSize;
 	private MpqEditorCompressionRule[] bestRuleSet = null;
 	
@@ -34,21 +36,25 @@ public class ExperimentalCompressionMiner {
 	 * 		GameMod with a set sourcePath
 	 * @throws IOException
 	 */
-	public ExperimentalCompressionMiner(final ModData mod, final String mpqCachePath, final String mpqEditorPath)
-			throws IOException, MpqException, InterruptedException {
+	public ExperimentalCompressionMiner(final ModData mod, final String mpqCachePath, final String mpqEditorPath,
+			final FileService fileService) throws IOException, MpqException, InterruptedException {
 		this.mod = mod;
+		this.fileService = fileService;
 		mpqInterface = new MpqEditorInterface(mpqCachePath + Thread.currentThread().getId(), mpqEditorPath);
-		rules = buildInitialRuleset(mod.getSourceDirectory().toPath());
+		mod.setMpqCacheDirectory(new File(mpqInterface.getMpqCachePath()));
+		fileService.copyFileOrDirectory(mod.getSourceDirectory(), mpqInterface.getCache());
+		rules = createInitialRuleset(mod.getSourceDirectory().toPath());
 		bestRuleSet = deepCopy(rules);
-		bestSize = build(rules);
+		bestSize = build(rules, true);
 	}
 	
-	private MpqEditorCompressionRule[] buildInitialRuleset(final Path cacheModDirectory) throws IOException {
+	private MpqEditorCompressionRule[] createInitialRuleset(final Path cacheModDirectory) throws IOException {
 		final List<MpqEditorCompressionRule> initRules = new ArrayList<>();
-		initRules.add(new MpqEditorCompressionRuleSize(0, 0).setSingleUnit(true).setCompress(true));
+		initRules.add(new MpqEditorCompressionRuleSize(0, 0).setSingleUnit(true));
 		try (Stream<Path> ps = Files.walk(cacheModDirectory)) {
-			ps.filter(Files::isRegularFile)
-					.forEach(p -> initRules.add(new MpqEditorCompressionRuleMask(p.getFileName().toString())));
+			ps.filter(Files::isRegularFile).forEach(p -> initRules
+					.add(new MpqEditorCompressionRuleMask("*" + p.getFileName().toString()).setSingleUnit(true)
+							.setCompress(true).setCompressionMethod(MpqEditorCompressionRuleMethod.BZIP2)));
 		}
 		return initRules.toArray(new MpqEditorCompressionRule[0]);
 	}
@@ -68,16 +74,34 @@ public class ExperimentalCompressionMiner {
 		return clone;
 	}
 	
-	private long build(final MpqEditorCompressionRule[] rules) throws InterruptedException, MpqException, IOException {
-		mpqInterface.setCustomRuleSet(rules);
+	/**
+	 * Build the mpq with the specified ruleset. CompressXml should only be enabled for the first build.
+	 *
+	 * @param rules
+	 * @param compressXml
+	 * @return
+	 * @throws InterruptedException
+	 * @throws MpqException
+	 * @throws IOException
+	 */
+	private long build(final MpqEditorCompressionRule[] rules, final boolean compressXml)
+			throws InterruptedException, MpqException, IOException {
+		mpqInterface.setCustomCompressionRules(rules);
 		final File targetFile = mod.getTargetFile();
-		mpqInterface.buildMpq(targetFile.getAbsolutePath(), true, MpqEditorCompression.CUSTOM, false);
+		mpqInterface.buildMpq(targetFile.getAbsolutePath(), compressXml, MpqEditorCompression.CUSTOM, false);
 		return targetFile.length();
 	}
 	
-	public long randomizeRuleAndBuild() throws InterruptedException, IOException, MpqException {
-		randomizeRules(rules);
-		final long size = build(rules);
+	/**
+	 * Builds the rules.
+	 *
+	 * @return
+	 * @throws InterruptedException
+	 * @throws IOException
+	 * @throws MpqException
+	 */
+	public long build() throws InterruptedException, IOException, MpqException {
+		final long size = build(rules, false);
 		if (size < bestSize) {
 			bestSize = size;
 			bestRuleSet = rules.clone();
@@ -85,7 +109,7 @@ public class ExperimentalCompressionMiner {
 		return size;
 	}
 	
-	private void randomizeRules(final MpqEditorCompressionRule[] rules) {
+	public void randomizeRules() {
 		for (final MpqEditorCompressionRule r : rules) {
 			if (r instanceof MpqEditorCompressionRuleMask) {
 				r.setCompressionMethod(getRandomCompressionMethod());

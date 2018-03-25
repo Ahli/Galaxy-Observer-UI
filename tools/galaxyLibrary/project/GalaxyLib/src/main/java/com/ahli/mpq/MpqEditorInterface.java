@@ -276,7 +276,7 @@ public class MpqEditorInterface implements MpqInterface, DeepCopyable {
 			throws InterruptedException, IOException, MpqException {
 		if (!verifyMpqEditor()) {
 			throw new MpqException(
-					String.format(Messages.getString("MpqInterface.MPQEditorNotFound"), mpqEditorPath)); //$NON-NLS-1$
+					String.format(Messages.getString("MpqInterface.MpqEditorNotFound"), mpqEditorPath)); //$NON-NLS-1$
 		}
 		
 		final String cmd = "cmd /C " + QUOTE + QUOTE + mpqEditorPath + QUOTE + " n " + QUOTE + mpqPath + QUOTE + " " +
@@ -301,7 +301,7 @@ public class MpqEditorInterface implements MpqInterface, DeepCopyable {
 			throws InterruptedException, IOException, MpqException {
 		if (!verifyMpqEditor()) {
 			throw new MpqException(
-					String.format(Messages.getString("MpqInterface.MPQEditorNotFound"), mpqEditorPath)); //$NON-NLS-1$
+					String.format(Messages.getString("MpqInterface.MpqEditorNotFound"), mpqEditorPath)); //$NON-NLS-1$
 		}
 		final String cmd =
 				"cmd /C " + QUOTE + QUOTE + mpqEditorPath + QUOTE + " a " + QUOTE + mpqPath + QUOTE + " " + QUOTE +
@@ -325,7 +325,7 @@ public class MpqEditorInterface implements MpqInterface, DeepCopyable {
 	public void compactMpq(final String mpqPath) throws InterruptedException, IOException, MpqException {
 		if (!verifyMpqEditor()) {
 			throw new MpqException(
-					String.format(Messages.getString("MpqInterface.MPQEditorNotFound"), mpqEditorPath)); //$NON-NLS-1$
+					String.format(Messages.getString("MpqInterface.MpqEditorNotFound"), mpqEditorPath)); //$NON-NLS-1$
 		}
 		final String cmd = "cmd /C " + QUOTE + QUOTE + mpqEditorPath + QUOTE + " compact " + QUOTE + mpqPath + QUOTE +
 				QUOTE; //$NON-NLS-1$ //$NON-NLS-2$
@@ -411,7 +411,7 @@ public class MpqEditorInterface implements MpqInterface, DeepCopyable {
 			final boolean inclSubFolders) throws InterruptedException, IOException, MpqException {
 		if (!verifyMpqEditor()) {
 			throw new MpqException(
-					String.format(Messages.getString("MpqInterface.MPQEditorNotFound"), mpqEditorPath)); //$NON-NLS-1$
+					String.format(Messages.getString("MpqInterface.MpqEditorNotFound"), mpqEditorPath)); //$NON-NLS-1$
 		}
 		final String cmd =
 				"cmd /C " + QUOTE + QUOTE + mpqEditorPath + QUOTE + " e " + QUOTE + mpqPath + QUOTE + " " + QUOTE +
@@ -447,7 +447,7 @@ public class MpqEditorInterface implements MpqInterface, DeepCopyable {
 			throws InterruptedException, IOException, MpqException {
 		if (!verifyMpqEditor()) {
 			throw new MpqException(
-					String.format(Messages.getString("MpqInterface.MPQEditorNotFound"), mpqEditorPath)); //$NON-NLS-1$
+					String.format(Messages.getString("MpqInterface.MpqEditorNotFound"), mpqEditorPath)); //$NON-NLS-1$
 		}
 		final String cmd =
 				"cmd /C " + QUOTE + QUOTE + mpqEditorPath + QUOTE + " s " + QUOTE + mpqPath + QUOTE + " " + QUOTE +
@@ -480,7 +480,7 @@ public class MpqEditorInterface implements MpqInterface, DeepCopyable {
 			throws InterruptedException, IOException, MpqException {
 		if (!verifyMpqEditor()) {
 			throw new MpqException(
-					String.format(Messages.getString("MpqInterface.MPQEditorNotFound"), mpqEditorPath)); //$NON-NLS-1$
+					String.format(Messages.getString("MpqInterface.MpqEditorNotFound"), mpqEditorPath)); //$NON-NLS-1$
 		}
 		final String cmd =
 				"cmd /C " + QUOTE + QUOTE + mpqEditorPath + QUOTE + " d " + QUOTE + mpqPath + QUOTE + " " + QUOTE +
@@ -504,7 +504,7 @@ public class MpqEditorInterface implements MpqInterface, DeepCopyable {
 			throws InterruptedException, IOException, MpqException {
 		if (!verifyMpqEditor()) {
 			throw new MpqException(
-					String.format(Messages.getString("MpqInterface.MPQEditorNotFound"), mpqEditorPath)); //$NON-NLS-1$
+					String.format(Messages.getString("MpqInterface.MpqEditorNotFound"), mpqEditorPath)); //$NON-NLS-1$
 		}
 		final String cmd =
 				"cmd /C " + QUOTE + QUOTE + mpqEditorPath + QUOTE + " r " + QUOTE + mpqPath + QUOTE + " " + QUOTE +
@@ -584,13 +584,13 @@ public class MpqEditorInterface implements MpqInterface, DeepCopyable {
 	}
 	
 	/**
-	 * Sets a custom ruleset for the file attributes and compression. To use it, the archive needs to use
+	 * Sets custom rules for the file attributes and compression. To use it, the archive needs to use
 	 * MpqEditorCompression.CUSTOM.
 	 *
-	 * @param ruleSet
+	 * @param rules
 	 */
-	public void setCustomRuleSet(final MpqEditorCompressionRule[] ruleSet) {
-		settings.setCustomRuleSet(ruleSet);
+	public void setCustomCompressionRules(final MpqEditorCompressionRule[] rules) {
+		settings.setCustomRules(rules);
 	}
 	
 	/**
