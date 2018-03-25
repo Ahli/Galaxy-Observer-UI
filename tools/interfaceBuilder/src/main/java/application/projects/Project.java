@@ -105,6 +105,11 @@ public class Project {
 		this.lastBuildSize = lastBuildSize;
 	}
 	
+	/**
+	 * Returns the RuleSet with the best compression.
+	 *
+	 * @return
+	 */
 	public RuleSet getBestCompressionRuleSet() {
 		return bestCompressionRuleSet;
 	}
