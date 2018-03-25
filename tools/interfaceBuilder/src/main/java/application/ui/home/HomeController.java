@@ -1,23 +1,22 @@
 package application.ui.home;
 
 import application.InterfaceBuilderApp;
-import application.compress.ExperimentalCompressionMiner;
 import application.compress.GameService;
-import application.compress.RuleSet;
 import application.config.ConfigService;
 import application.integration.FileService;
 import application.projects.Project;
 import application.projects.ProjectService;
 import application.ui.FXMLSpringLoader;
+import application.ui.navigation.NavigationController;
+import application.ui.progress.CompressionMiningController;
+import application.ui.progress.TabPaneController;
 import application.ui.settings.Updateable;
-import com.ahli.galaxy.ModData;
-import com.ahli.galaxy.game.def.abstracts.GameDef;
-import com.ahli.mpq.MpqException;
 import javafx.beans.InvalidationListener;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
@@ -27,6 +26,8 @@ import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.control.MultipleSelectionModel;
 import javafx.scene.control.SelectionMode;
+import javafx.scene.control.Tab;
+import javafx.scene.control.TabPane;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
@@ -315,43 +316,26 @@ public class HomeController implements Updateable {
 	/**
 	 * Action to mine a better compression for the selected project.
 	 */
-	public void mineBetterCompressionForSelected() {
+	public void mineBetterCompressionForSelected() throws IOException {
 		final List<Project> selectedItems = selectionList.getSelectionModel().getSelectedItems();
 		if (selectedItems.size() == 1) {
 			final Project project = selectedItems.get(0);
-			InterfaceBuilderApp.getInstance().getExecutor().execute(() -> {
-				try {
-					// TODO too complex?
-					final ModData mod = gameService.getModData(project.getGame());
-					final GameDef gameDef = mod.getGameData().getGameDef();
-					final File projectSource = new File(project.getProjectPath());
-					final File f = new File(configService.getDocumentsPath() + File.separator +
-							gameDef.getDocumentsGameDirectoryName() + File.separator +
-							gameDef.getDocumentsInterfaceSubdirectoryName() + File.separator + projectSource.getName());
-					mod.setTargetFile(f);
-					mod.setSourceDirectory(projectSource);
-					
-					final ExperimentalCompressionMiner expCompMiner =
-							new ExperimentalCompressionMiner(mod, configService.getMpqCachePath(),
-									configService.getMpqEditorPath(), fileService);
-					long lastSize = expCompMiner.getBestSize();
-					logger.info(String.format("Best size before mining: %s kb)", lastSize / 1024));
-					for (int i = 0; i < 3; i++) {
-						expCompMiner.randomizeRules();
-						lastSize = expCompMiner.build();
-						logger.info(String.format("Mined compression of size %s kb.", lastSize / 1024));
-					}
-					final long newBest = expCompMiner.getBestSize();
-					project.setBestCompressionRuleSet(new RuleSet(expCompMiner.getBestRuleSet()));
-					projectService.saveProject(project);
-					logger.info(
-							String.format("Best Compression mined has compression producing size: %s", newBest / 1024));
-				} catch (IOException | MpqException e) {
-					logger.error("Experimental Compression Miner experienced a problem.", e);
-				} catch (final InterruptedException e) {
-					Thread.currentThread().interrupt();
-				}
-			});
+			// init UI as Tab in Progress
+			final FXMLLoader loader = new FXMLSpringLoader(appContext);
+			final Parent content =
+					loader.load(appContext.getResource("view/ProgressTab_CompressionMining.fxml").getInputStream());
+			final Tab newTab = new Tab();
+			newTab.setContent(content);
+			newTab.setText(String.format("%s Compression Mining", project.getName()));
+			final TabPane tabPane = TabPaneController.getInstance().getTabPane();
+			tabPane.getTabs().add(newTab);
+			final CompressionMiningController controller = (CompressionMiningController) loader.getController();
+			controller.setProject(project);
+			// switch to progress and the new tab
+			NavigationController.getInstance().clickProgress();
+			tabPane.getSelectionModel().select(newTab);
+			// start mining
+			controller.startMining();
 		}
 	}
 }

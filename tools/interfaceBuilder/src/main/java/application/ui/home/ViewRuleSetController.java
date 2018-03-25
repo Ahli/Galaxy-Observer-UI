@@ -57,28 +57,21 @@ public class ViewRuleSetController {
 	 * Automatically called by FxmlLoader
 	 */
 	public void initialize() {
-		dialog.setTitle("Add Observer Interface Project...");
 		final DialogPane dialogPane = dialog.getDialogPane();
 		dialogPane.getButtonTypes().addAll(ButtonType.OK);
 		
-		columnCompress.setCellValueFactory(cellData -> {
-			return new SimpleBooleanProperty(cellData.getValue().isCompress()).asString();
-		});
-		columnEncrypt.setCellValueFactory(cellData -> {
-			return new SimpleBooleanProperty(cellData.getValue().isEncrypt()).asString();
-		});
-		columnEncryptAdjusted.setCellValueFactory(cellData -> {
-			return new SimpleBooleanProperty(cellData.getValue().isEncryptAdjusted()).asString();
-		});
-		columnIncludeSectorChecksum.setCellValueFactory(cellData -> {
-			return new SimpleBooleanProperty(cellData.getValue().isIncludeSectorChecksum()).asString();
-		});
-		columnMarkedForDeletion.setCellValueFactory(cellData -> {
-			return new SimpleBooleanProperty(cellData.getValue().isMarkedForDeletion()).asString();
-		});
-		columnSingleFile.setCellValueFactory(cellData -> {
-			return new SimpleBooleanProperty(cellData.getValue().isSingleUnit()).asString();
-		});
+		columnCompress.setCellValueFactory(
+				cellData -> new SimpleBooleanProperty(cellData.getValue().isCompress()).asString());
+		columnEncrypt
+				.setCellValueFactory(cellData -> new SimpleBooleanProperty(cellData.getValue().isEncrypt()).asString());
+		columnEncryptAdjusted.setCellValueFactory(
+				cellData -> new SimpleBooleanProperty(cellData.getValue().isEncryptAdjusted()).asString());
+		columnIncludeSectorChecksum.setCellValueFactory(
+				cellData -> new SimpleBooleanProperty(cellData.getValue().isIncludeSectorChecksum()).asString());
+		columnMarkedForDeletion.setCellValueFactory(
+				cellData -> new SimpleBooleanProperty(cellData.getValue().isMarkedForDeletion()).asString());
+		columnSingleFile.setCellValueFactory(
+				cellData -> new SimpleBooleanProperty(cellData.getValue().isSingleUnit()).asString());
 		columnMaskSize.setCellValueFactory(cellData -> {
 			final MpqEditorCompressionRule rule = cellData.getValue();
 			if (rule instanceof MpqEditorCompressionRuleMask) {
@@ -90,9 +83,8 @@ public class ViewRuleSetController {
 				return new SimpleStringProperty("");
 			}
 		});
-		columnCompressionAlgo.setCellValueFactory(cellData -> {
-			return new SimpleStringProperty(cellData.getValue().getCompressionMethod().toString());
-		});
+		columnCompressionAlgo.setCellValueFactory(
+				cellData -> new SimpleStringProperty(cellData.getValue().getCompressionMethod().toString()));
 		columnType.setCellValueFactory(cellData -> {
 			final MpqEditorCompressionRule rule = cellData.getValue();
 			if (rule instanceof MpqEditorCompressionRuleMask) {
@@ -112,6 +104,7 @@ public class ViewRuleSetController {
 	 */
 	public void setProject(final Project project) {
 		this.project = project;
+		dialog.setTitle(String.format("Best Compression Ruleset for %s", project.getName()));
 		showProjectsRuleSet(project);
 	}
 	

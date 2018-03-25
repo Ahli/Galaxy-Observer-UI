@@ -4,6 +4,7 @@ import application.ui.home.AddProjectController;
 import application.ui.home.HomeController;
 import application.ui.home.ViewRuleSetController;
 import application.ui.navigation.NavigationController;
+import application.ui.progress.CompressionMiningController;
 import application.ui.progress.TabPaneController;
 import application.ui.settings.SettingsCommandLineToolController;
 import application.ui.settings.SettingsController;
@@ -25,7 +26,6 @@ public class FxmlConfiguration {
 	}
 	
 	@Bean
-	@Scope ("prototype")
 	public NavigationController navigationController() {
 		return new NavigationController();
 	}
@@ -69,5 +69,11 @@ public class FxmlConfiguration {
 	@Scope ("prototype")
 	public AddProjectController addProjectController() {
 		return new AddProjectController();
+	}
+	
+	@Bean
+	@Scope ("prototype")
+	public CompressionMiningController compressionMiningController() {
+		return new CompressionMiningController();
 	}
 }
