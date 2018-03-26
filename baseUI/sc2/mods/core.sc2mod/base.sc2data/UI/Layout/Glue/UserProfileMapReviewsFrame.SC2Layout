@@ -25,23 +25,39 @@
     <Animation name="HelpfulHoverTemplate">
         <Event event="OnMouseEnter" action="Reset,Play"/>
         <Event event="OnMouseExit" action="Reset,Stop"/>
-        <Event event="OnMouseEnter" action="Reset,Play" frame="$parent/ReviewLabel"/>
-        <Event event="OnMouseExit" action="Reset,Stop" frame="$parent/ReviewLabel"/>
 
-        <Controller type="Visibility" end="Pause" frame="$parent/HelpfulInfoLabel">
+        <Controller type="Visibility" end="Pause" frame="$ancestor[@type=BattleMapReviewListBoxItem]/HelpfulInfoLabel">
             <Key type="Bool" time="0" value="True"/>
         </Controller>
 
-        <Controller type="Fade" end="Pause" frame="$parent/HelpfulButton">
+        <Controller type="Fade" end="Pause" frame="$ancestor[@type=BattleMapReviewListBoxItem]/HelpfulButton">
             <Key type="Curve" time="0" value="255" out="Auto"/>
         </Controller>
 
-        <Controller type="Fade" end="Pause" frame="$parent/ReportButton">
+        <Controller type="Fade" end="Pause" frame="$ancestor[@type=BattleMapReviewListBoxItem]/ReportButton">
+            <Key type="Curve" time="0" value="255" out="Auto"/>
+        </Controller>
+    </Animation>
+
+    <Animation name="HelpfulHoverListItemTemplate">
+        <Event event="OnMouseEnter" action="Reset,Play"/>
+        <Event event="OnMouseExit" action="Reset,Stop"/>
+
+        <Controller type="Visibility" end="Pause" frame="HelpfulInfoLabel">
+            <Key type="Bool" time="0" value="True"/>
+        </Controller>
+
+        <Controller type="Fade" end="Pause" frame="HelpfulButton">
+            <Key type="Curve" time="0" value="255" out="Auto"/>
+        </Controller>
+
+        <Controller type="Fade" end="Pause" frame="ReportButton">
             <Key type="Curve" time="0" value="255" out="Auto"/>
         </Controller>
     </Animation>
     
     <Frame type="BattleMapReviewListBoxItem" name="ListBoxItemTemplate">
+        <Animation name="HelpfulHover" template="UserProfileMapReviewsFrame/HelpfulHoverListItemTemplate"/>
         <!-- This frame determines the size of the list box item -->
         <Frame type="Frame" name="AnchorFrame">
             <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
@@ -66,6 +82,7 @@
             <AcceptsMouse val="true"/>
             <ContextMenu val="$parent/MapContextMenu"/>
             <MapHandle val="{$parent/@MapHandle}"/>
+            <Animation name="HelpfulHover" template="UserProfileMapReviewsFrame/HelpfulHoverTemplate"/>
         </Frame>
         
         <Frame type="Label" name="MapLabel">
@@ -94,6 +111,7 @@
             <MinValue val="0"/>
             <MaxValue val="5"/>
             <Value val="{$parent/@Rating}"/>
+            <AcceptsMouse val="False"/>
         </Frame>
 
         <Frame type="Label" name="HelpfulLabel">
@@ -117,7 +135,6 @@
             <Style val="@Arcade_GameInfo_HowToPlay_Desc"/>
             <AutoSizeClamps minHeight="40"/>
             <Options val="NewLineIfTruncated"/>
-            <AcceptsMouse val="true"/>
         </Frame>
 
         <Frame type="Label" name="TimeLabel">
@@ -148,7 +165,7 @@
             <Anchor side="Left" relative="$parent/HelpfulInfoLabel" pos="Max" offset="5"/>
             <Tooltip val="@UI/BattleMapReviewListBoxItem/NotHelpfulTooltip"/>
             <Alpha val="0"/>
-            <Animation name="HelpfulHover" template="BattleMapProfileReviewsPanel/HelpfulHoverTemplate"/>
+            <Animation name="HelpfulHover" template="UserProfileMapReviewsFrame/HelpfulHoverTemplate"/>
             
             <Frame type="Image" name="Icon">
                 <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
@@ -175,7 +192,7 @@
             <Anchor side="Left" relative="$parent/HelpfulButton" pos="Max" offset="3"/>
             <Tooltip val="@UI/BattleMapReviewListBoxItem/ReportTooltip"/>
             <Alpha val="0"/>
-            <Animation name="HelpfulHover" template="BattleMapProfileReviewsPanel/HelpfulHoverTemplate"/>
+            <Animation name="HelpfulHover" template="UserProfileMapReviewsFrame/HelpfulHoverTemplate"/>
             
             <Frame type="Image" name="Icon">
                 <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
@@ -205,6 +222,12 @@
 
         <StateGroup name="HelpfulStateGroup">
             <DefaultState val="NotHelpfulState"/>
+            
+            <State name="LocalUserState">
+                <When type="Property" frame="$BattleUI" LocalToonPresenceId="{$UserProfileAchievementsFrame/@PresenceId}"/>
+                <Action type="SetProperty" frame="HelpfulButton" Visible="False"/>
+                <Action type="SetProperty" frame="ReportButton" Visible="False"/>
+            </State>
             
             <State name="NotHelpfulState">
                 <When type="AnimationState" frame="$this" HelpfulState="NotHelpful"/>
@@ -291,6 +314,28 @@
                 <Orientation val="Vertical"/>
                 <Width val="16"/>
             </Frame>
+        </Frame>
+        
+        <Frame type="Label" name="NoReviewsLabel">
+            <Anchor side="Top" relative="$parent/ListBox" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent/ListBox" pos="Mid" offset="0"/>
+            <Anchor side="Left" relative="$parent/ListBox" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent/ListBox" pos="Mid" offset="0"/>
+            <Style val="@Tournament_Subtitle"/>
+            <Text val="@UI/ScreenUserProfile/NoReviewsWritten"/>
+            
+            <StateGroup name="VisibilityState">
+                <DefaultState val="NotVisible"/>
+                
+                <State name="Visible">
+                    <When type="Property" frame="$parent/ListBox" DataCount="0"/>
+                    <Action type="SetProperty" Visible="True"/>
+                </State>
+                
+                <State name="NotVisible">
+                    <Action type="SetProperty" Visible="False"/>
+                </State>
+            </StateGroup>
         </Frame>
     </Frame>
 </Desc>
