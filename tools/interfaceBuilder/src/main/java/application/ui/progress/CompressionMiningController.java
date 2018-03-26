@@ -192,6 +192,7 @@ public class CompressionMiningController implements Updateable {
 					bestSize = expCompMiner.getBestSize();
 					logger.info(String.format("Best size before mining: %s kb)", bestSize / 1024));
 					updateUiRules(expCompMiner.getBestRuleSet());
+					updateUiSizeToBeat(bestSize);
 					long lastSize;
 					for (int attempts = 1; attempts < Integer.MAX_VALUE; attempts++) {
 						expCompMiner.randomizeRules();
