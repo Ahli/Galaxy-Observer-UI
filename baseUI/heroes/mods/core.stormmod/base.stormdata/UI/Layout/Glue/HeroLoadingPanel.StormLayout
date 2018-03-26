@@ -1,376 +1,287 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <Desc>
-    <DescFlags val="Locked"/>
-    <Constant name="LoadingPanelHeroVerticalCenterOffset" val="200"/>
-
-    <!--===========================================================================================
-    <! HeroLoadingPanelPlayerFrame
-    <!==========================================================================================-->
-    <Frame type="HeroLoadingPanelPlayerFrame" name="HeroLoadingPanelPlayerFrameTemplate">
-        <Height val="147"/>
-        <Width val="353"/>
-
-        <Frame type="Image" name="PlayerBorder">
-            <Texture val="@UI/LoadingScreen_PlayerFrame_Blue"/>
-            <Anchor side="Top" relative="$parent" pos="Min" offset="-5"/>
-            <Unclipped val="True"/>
-        </Frame>
-
-        <Frame type="HeroContainerFrame" name="HeroContainerFrame">
-            <Anchor side="Top" relative="$parent" pos="Min" offset="12"/>
-            <Anchor side="Left" relative="$parent" pos="Min" offset="11"/>
-            <Anchor side="Bottom" relative="$parent" pos="Max" offset="-12"/>
-            <Anchor side="Right" relative="$parent" pos="Max" offset="-3"/>
-
-            <Frame type="HeroImage" name="PortraitPanel">
-                <Anchor side="Bottom" relative="$parent" pos="Max" offset="1"/>
-                <TextureType val="Normal"/>
-                <HeroImageType val="LoadingScreen"/>
-            </Frame>
-
-            <Frame type="Image" name="HeroMask">
-                <Texture val="@UI/LoadingScreen_HeroMask"/>
-                <Anchor relative="$parent"/>
-                <Visible val="true"/>
-            </Frame>
-
-            <Frame type="HeroLabel" name="HeroName">
-                <Anchor side="Bottom" relative="$parent/$parent/NameLabel" pos="Min" offset="6" />
-                <HeroLabelType val="Name" />
-            </Frame>
-        </Frame>
-
-        <Frame type="Image" name="ComputerImage">
-            <Anchor relative="$parent/AvatarFrame/PortraitContainer/PortraitBackground" />
-            <Texture val="@UI/Storm_HeroSelect_Icon_AI"/>
-            <Visible val="false" />
-
-            <Animation name="ComputerImageVisibility">
-                <Event event="IsPlayer" action="Stop" frame="$parent"/>
-                <Event event="IsComputer" action="Play" frame="$parent"/>
-                <Event event="IsOfflinePlayer" action="Play" frame="$parent"/>
-
-                <Controller type="Visibility" end="Pause">
-                    <Key type="Bool" time="0" value="True"/>
-                </Controller>
-            </Animation>
-        </Frame>
-
-        <Frame type="AvatarFrame" name="AvatarFrame" template="AvatarFrameTemplates/AvatarStateTemplate_Loading">
-            <Anchor side="Top" relative="$parent" pos="Min" offset="10"/>
-
-            <!-- Disable GM animation for loading screen -->
-            <Frame type="Frame" name="PortraitContainer">
-                <Frame type="Image" name="AvatarBorderImage">
-                    <Frame type="Image" name="GrandMasterBorder">
-                        <Enabled val="false"/>
-                    </Frame>
-                </Frame>
-            </Frame>
-        </Frame>
-
-        <Frame type="Label" name="NameLabel">
-            <Anchor side="Bottom" relative="$parent" pos="Max" offset="-27"/>
-            <Options val="Ellipsis | NoWrapping"/>
-            <Text val="NameLabel"/>
-        </Frame>
-
-        <Frame type="Label" name="BuildLabel">
-            <Anchor side="Bottom" relative="$parent/HeroContainerFrame/HeroName" pos="Min" offset="5"/>
-            <Style val="MultiplayerLoadingPanelPlayerBuild"/>
-        </Frame>
-
-        <Frame type="Image" name="LoadingProgressBarImage">
-            <Anchor side="Top" relative="$parent" pos="Min" offset="135"/>
-            <Texture val="@UI/LoadingScreen_LoadingBar_Blue"/>
-            <TextureType val="NineSlice"/>
-            <Unclipped val="True"/>
-        </Frame>
-
-        <Frame type="Label" name="LoadingLabel">
-            <Anchor side="Top" relative="$parent" pos="Min" offset="15"/>
-            <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
-            <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
-            <Style val="MultiplayerLoadingPanelPlayerLoading"/>
-            <Text val="@UI/MultiplayerLoadingComplete"/>
-            <Alpha val="0"/>
-        </Frame>
-
-        <Frame type="Image" name="PartyIdImage">
-            <Anchor side="Top" relative="$parent" pos="Min" offset="15"/>
-            <ColorAdjustMode val="Colorize"/>
-            <Texture val="@UI/UI_ingame_LoadScreen_PartyLink"/>
-        </Frame>
-
-        <!--=======================================================================================
-        <! Voice Chat
-        <!======================================================================================-->
-        <Frame type="BattleUserVoiceFrame" name="VoiceChatFrame" template="BattleUserVoiceFrame/BattleUserVoiceFrame_AdjustableSpeaker_Template">
-            <ChannelType val="{$VoiceChatUI/@ActiveChannelType}"/>
-            <PresenceId val="{$parent/AvatarFrame/@PresenceId}"/>
-            <ContextMenu val="$ancestor[@type=HeroLoadingPanel]/PlayerContextMenu"/>
-        </Frame>
-
-        <!--=======================================================================================
-        <! BLUE/RED TEAM STATE
-        <!======================================================================================-->
-        <StateGroup name="TeamBorder">
-            <State name="RedTeamBorder">
-                <When type="AnimationState" PlayerTeam="RedTeam"/>
-                <Action type="SetProperty" frame="PlayerBorder" texture="@UI/LoadingScreen_PlayerFrame_Red"/>
-                <Action type="SetProperty" frame="LoadingProgressBarImage" texture="@UI/LoadingScreen_LoadingBar_Red"/>
-            </State>
-        </StateGroup>
-
-        <StateGroup name="PlayerLabelColor">
-            <DefaultState val="BluePlayerName"/>
-
-            <!-- Player name only -->
-            <State name="LocalPlayerNameOnly">
-                <When type="Property" frame="$ancestor[@type=CustomLoadingPanel]" UseInGameHeroSelection="true"/>
-                <When type="AnimationState" LocalPlayer="True"/>
-                <Action type="SetProperty" frame="HeroContainerFrame" visible="false"/>
-                <Action type="SetProperty" frame="NameLabel" style="LoadingPlayerNameBigLocal"/>
-            </State>
-            <State name="RedPlayerNameOnly">
-                <When type="Property" frame="$ancestor[@type=CustomLoadingPanel]" UseInGameHeroSelection="true"/>
-                <When type="AnimationState" PlayerTeam="RedTeam"/>
-                <Action type="SetProperty" frame="HeroContainerFrame" visible="false"/>
-                <Action type="SetProperty" frame="NameLabel" style="LoadingPlayerNameBigRed"/>
-            </State>
-            <State name="BluePlayerNameOnly">
-                <When type="Property" frame="$ancestor[@type=CustomLoadingPanel]" UseInGameHeroSelection="true"/>
-                <Action type="SetProperty" frame="HeroContainerFrame" visible="false"/>
-                <Action type="SetProperty" frame="NameLabel" style="LoadingPlayerNameBigBlue"/>
-            </State>
-
-            <!-- Player name and hero name -->
-            <State name="LocalPlayerName">
-                <When type="AnimationState" LocalPlayer="True"/>
-                <Action type="SetProperty" frame="NameLabel" style="LoadingPlayerNameSmallLocal"/>
-            </State>
-            <State name="RedPlayerName">
-                <When type="AnimationState" PlayerTeam="RedTeam"/>
-                <Action type="SetProperty" frame="NameLabel" style="LoadingPlayerNameSmallRed"/>
-            </State>
-            <State name="BluePlayerName">
-                <Action type="SetProperty" frame="NameLabel" style="LoadingPlayerNameSmallBlue"/>
-            </State>
-        </StateGroup>
+  <DescFlags val="Locked" />
+  <Constant name="LoadingPanelHeroVerticalCenterOffset" val="200" />
+  <Frame type="HeroLoadingPanelPlayerFrame" name="HeroLoadingPanelPlayerFrameTemplate">
+    <Height val="147" />
+    <Width val="353" />
+    <Frame type="Image" name="PlayerBorder">
+      <Texture val="@UI/LoadingScreen_PlayerFrame_Blue" />
+      <Anchor side="Top" relative="$parent" pos="Min" offset="-5" />
+      <Unclipped val="True" />
     </Frame>
-
-    <!--=======================================================================================
-    <! LEFT PLAYER
-    <!======================================================================================-->
-    <Frame type="HeroLoadingPanelPlayerFrame" name="HeroLoadingPanelPlayerFrameLeftTemplate" template="HeroLoadingPanel/HeroLoadingPanelPlayerFrameTemplate">
-        <CollapseLayout val="true"/>
-
-        <Frame type="Image" name="PlayerBorder">
-            <Anchor side="Left" relative="$parent" pos="Min" offset="-4"/>
-        </Frame>
-
-        <Frame type="Image" name="AvatarFrame">
-            <Anchor side="Left" relative="$parent" pos="Min" offset="10"/>
-        </Frame>
-
-        <Frame type="HeroContainerFrame" name="HeroContainerFrame">
-            <Frame type="HeroImage" name="PortraitPanel">
-                <Anchor side="Right" relative="$parent" pos="Max" offset="1"/>
-            </Frame>
-
-            <Frame type="Image" name="HeroMask">
-                <TextureCoords top="0.0" left="1.0" bottom="1.0" right="0.0"/>
-            </Frame>
-
-            <Frame type="HeroLabel" name="HeroName">
-                <Anchor side="Left" relative="$parent/$parent/AvatarFrame" pos="Max" offset="-6"/>
-                <Anchor side="Right" relative="$parent/$parent/HeroContainerFrame" pos="Max" offset="0" />
-                <Style val="LoadingHeroNameLeft"/>
-            </Frame>
-        </Frame>
-
-        <Frame type="Label" name="NameLabel">
-            <Anchor side="Left" relative="$parent/HeroContainerFrame/HeroName" pos="Min" offset="0"/>
-        </Frame>
-
-        <Frame type="Label" name="BuildLabel">
-            <Anchor side="Left" relative="$parent/NameLabel" pos="Min" offset="0"/>
-        </Frame>
-
-        <Frame type="Image" name="LoadingProgressBarImage">
-            <Anchor side="Left" relative="$parent" pos="Min" offset="5"/>
-        </Frame>
-
-        <Frame type="Image" name="PartyIdImage">
-            <Anchor side="Right" relative="$parent" pos="Max" offset="-10"/>
-        </Frame>
-
-        <Frame type="BattleUserVoiceFrame" name="VoiceChatFrame" template="BattleUserVoiceFrame/BattleUserVoiceFrame_AdjustableSpeaker_Template">
-            <Anchor side="Right" relative="$parent" pos="Max" offset="-5"/>
-            <Anchor side="Bottom" relative="$parent" pos="Max" offset="-13"/>
-        </Frame>
+    <Frame type="HeroContainerFrame" name="HeroContainerFrame">
+      <Anchor side="Top" relative="$parent" pos="Min" offset="12" />
+      <Anchor side="Left" relative="$parent" pos="Min" offset="11" />
+      <Anchor side="Bottom" relative="$parent" pos="Max" offset="-12" />
+      <Anchor side="Right" relative="$parent" pos="Max" offset="-3" />
+      <Frame type="HeroImage" name="PortraitPanel">
+        <Anchor side="Bottom" relative="$parent" pos="Max" offset="1" />
+        <TextureType val="Normal" />
+        <HeroImageType val="LoadingScreen" />
+      </Frame>
+      <Frame type="Image" name="HeroMask">
+        <Texture val="@UI/LoadingScreen_HeroMask" />
+        <Anchor relative="$parent" />
+        <Visible val="true" />
+      </Frame>
+      <Frame type="HeroLabel" name="HeroName">
+        <Anchor side="Bottom" relative="$parent/$parent/NameLabel" pos="Min" offset="6" />
+        <HeroLabelType val="Name" />
+      </Frame>
     </Frame>
-
-    <!--=======================================================================================
-    <! RIGHT PLAYER
-    <!======================================================================================-->
-    <Frame type="HeroLoadingPanelPlayerFrame" name="HeroLoadingPanelPlayerFrameRightTemplate" template="HeroLoadingPanel/HeroLoadingPanelPlayerFrameTemplate">
-        <CollapseLayout val="true"/>
-
-        <Frame type="Image" name="PlayerBorder">
-            <Anchor side="Right" relative="$parent" pos="Max" offset="4"/>
-            <TextureCoords top="0.0" left="1.0" bottom="1.0" right="0.0"/>
-        </Frame>
-
-        <Frame type="Image" name="AvatarFrame">
-            <Anchor side="Right" relative="$parent" pos="Max" offset="-10"/>
-        </Frame>
-
-        <Frame type="HeroContainerFrame" name="HeroContainerFrame">
-            <Anchor side="Left" relative="$parent" pos="Min" offset="3"/>
-            <Anchor side="Right" relative="$parent" pos="Max" offset="-11"/>
-
-            <Frame type="HeroImage" name="PortraitPanel">
-                <TextureCoords top="0.0" left="1.0" bottom="1.0" right="0.0"/>
-                <Anchor side="Left" relative="$parent" pos="Min" offset="-1"/>
-            </Frame>
-
-            <Frame type="HeroLabel" name="HeroName">
-                <Anchor side="Right" relative="$parent/$parent/AvatarFrame" pos="Min" offset="6"/>
-                <Anchor side="Left" relative="$parent/$parent/HeroContainerFrame" pos="Min" offset="0"/>
-                <Style val="LoadingHeroNameRight"/>
-            </Frame>
-        </Frame>
-
-        <Frame type="Label" name="NameLabel">
-            <Anchor side="Right" relative="$parent/HeroContainerFrame/HeroName" pos="Max" offset="0"/>
-        </Frame>
-
-        <Frame type="Label" name="BuildLabel">
-            <Anchor side="Right" relative="$parent/NameLabel" pos="Max" offset="0"/>
-        </Frame>
-
-        <Frame type="Image" name="LoadingProgressBarImage">
-            <Anchor side="Right" relative="$parent" pos="Max" offset="-3"/>
-        </Frame>
-
-        <Frame type="Image" name="PartyIdImage">
-            <Anchor side="Left" relative="$parent" pos="Min" offset="10"/>
-        </Frame>
-
-        <Frame type="BattleUserVoiceFrame" name="VoiceChatFrame" template="BattleUserVoiceFrame/BattleUserVoiceFrame_AdjustableSpeaker_Template">
-            <Anchor side="Left" relative="$parent" pos="Min" offset="5"/>
-            <Anchor side="Bottom" relative="$parent" pos="Max" offset="-13"/>
-        </Frame>
+    <Frame type="Image" name="ComputerImage">
+      <Anchor relative="$parent/AvatarFrame/PortraitContainer/PortraitBackground" />
+      <Texture val="@UI/Storm_HeroSelect_Icon_AI" />
+      <Visible val="false" />
+      <Animation name="ComputerImageVisibility">
+        <Event event="IsPlayer" action="Stop" frame="$parent" />
+        <Event event="IsComputer" action="Play" frame="$parent" />
+        <Event event="IsOfflinePlayer" action="Play" frame="$parent" />
+        <Controller type="Visibility" end="Pause">
+          <Key type="Bool" time="0" value="True" />
+        </Controller>
+      </Animation>
     </Frame>
-
-    <Frame type="HeroLoadingPanel" name="HeroLoadingPanelTemplate">
-
-        <!--=======================================================================================
-        <! TEAM BACKGROUND
-        <!======================================================================================-->
-        <Frame type="Image" name="LeftTeamBackgroundImage">
-            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
-            <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
-            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
-            <Texture val="@UI/LoadingScreen_TeamGrid"/>
-            <TextureCoords top="0.0" left="1.0" bottom="1.0" right="0.0"/>
-            <ColorAdjustMode val="Colorize"/>
-            <AdjustmentColor val="242f67"/>
+    <Frame type="AvatarFrame" name="AvatarFrame" template="AvatarFrameTemplates/AvatarStateTemplate_Loading">
+      <Anchor side="Top" relative="$parent" pos="Min" offset="10" />
+      <Frame type="Frame" name="PortraitContainer">
+        <Frame type="Image" name="AvatarBorderImage">
+          <Frame type="Image" name="GrandMasterBorder">
+            <Enabled val="false" />
+          </Frame>
         </Frame>
-
-        <Frame type="Image" name="RightTeamBackgroundImage">
-            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
-            <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
-            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
-            <Texture val="@UI/LoadingScreen_TeamGrid"/>
-            <ColorAdjustMode val="Colorize"/>
-            <AdjustmentColor val="612326"/>
-        </Frame>
-
-        <Animation name="RedTeamOnLeft">
-            <Event event="BlueTeamOnLeft" action="Stop"/>
-            <Event event="RedTeamOnLeft" action="Reset,Play"/>
-
-            <Controller type="AdjustmentColor" end="Pause" frame="LeftTeamBackgroundImage">
-                <Key type="Curve" time="0.0" value="97,35,38" inout="Linear,Step"/>
-            </Controller>
-            <Controller type="AdjustmentColor" end="Pause" frame="RightTeamBackgroundImage">
-                <Key type="Curve" time="0.0" value="36,47,103" inout="Linear,Step"/>
-            </Controller>
-        </Animation>
-
-        <Frame type="BattleUserContextMenu" name="PlayerContextMenu" template="BattleUserContextMenu/BattleUserContextMenu" >
-            <Anchor side="Top" relative="$parent" pos="Max" offset="0"/>
-            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
-        </Frame>
-
-        <!--=======================================================================================
-        <! LEFT PLAYERS
-        <!======================================================================================-->
-
-        <Frame type="HeroLoadingPanelPlayerFrame" name="PlayerFrame0" template="HeroLoadingPanel/HeroLoadingPanelPlayerFrameLeftTemplate">
-            <Anchor side="Top" relative="$parent" pos="Min" offset="#LoadingPanelHeroVerticalCenterOffset"/>
-            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
-        </Frame>
-
-        <Frame type="HeroLoadingPanelPlayerFrame" name="PlayerFrame1" template="HeroLoadingPanel/HeroLoadingPanelPlayerFrameLeftTemplate">
-            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
-            <Anchor side="Top" relative="$parent/PlayerFrame0" pos="Max" offset="0"/>
-        </Frame>
-
-        <Frame type="HeroLoadingPanelPlayerFrame" name="PlayerFrame2" template="HeroLoadingPanel/HeroLoadingPanelPlayerFrameLeftTemplate">
-            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
-            <Anchor side="Top" relative="$parent/PlayerFrame1" pos="Max" offset="0"/>
-        </Frame>
-
-        <Frame type="HeroLoadingPanelPlayerFrame" name="PlayerFrame3" template="HeroLoadingPanel/HeroLoadingPanelPlayerFrameLeftTemplate">
-            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
-            <Anchor side="Top" relative="$parent/PlayerFrame2" pos="Max" offset="0"/>
-        </Frame>
-
-        <Frame type="HeroLoadingPanelPlayerFrame" name="PlayerFrame4" template="HeroLoadingPanel/HeroLoadingPanelPlayerFrameLeftTemplate">
-            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
-            <Anchor side="Top" relative="$parent/PlayerFrame3" pos="Max" offset="0"/>
-        </Frame>
-
-        <!--=======================================================================================
-        <! RIGHT PLAYERS
-        <!======================================================================================-->
-
-        <Frame type="HeroLoadingPanelPlayerFrame" name="PlayerFrame5" template="HeroLoadingPanel/HeroLoadingPanelPlayerFrameRightTemplate">
-            <Anchor side="Top" relative="$parent" pos="Min" offset="#LoadingPanelHeroVerticalCenterOffset"/>
-            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
-            <Visible val="true"/>
-        </Frame>
-
-        <Frame type="HeroLoadingPanelPlayerFrame" name="PlayerFrame6" template="HeroLoadingPanel/HeroLoadingPanelPlayerFrameRightTemplate">
-            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
-            <Anchor side="Top" relative="$parent/PlayerFrame5" pos="Max" offset="0"/>
-            <Visible val="true"/>
-        </Frame>
-
-        <Frame type="HeroLoadingPanelPlayerFrame" name="PlayerFrame7" template="HeroLoadingPanel/HeroLoadingPanelPlayerFrameRightTemplate">
-            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
-            <Anchor side="Top" relative="$parent/PlayerFrame6" pos="Max" offset="0"/>
-            <Visible val="true"/>
-        </Frame>
-
-        <Frame type="HeroLoadingPanelPlayerFrame" name="PlayerFrame8" template="HeroLoadingPanel/HeroLoadingPanelPlayerFrameRightTemplate">
-            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
-            <Anchor side="Top" relative="$parent/PlayerFrame7" pos="Max" offset="0"/>
-            <Visible val="true"/>
-        </Frame>
-
-        <Frame type="HeroLoadingPanelPlayerFrame" name="PlayerFrame9" template="HeroLoadingPanel/HeroLoadingPanelPlayerFrameRightTemplate">
-            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
-            <Anchor side="Top" relative="$parent/PlayerFrame8" pos="Max" offset="0"/>
-            <Visible val="true"/>
-        </Frame>
-
-        <Frame type="Frame" name="ChannelSelector" template="VoiceChannelSelector/VoiceChannelSelectorTemplate">
-            <Anchor side="Top" relative="$parent" pos="Min" offset="5"/>
-            <Anchor side="Left" relative="$parent" pos="Min" offset="5"/>
-        </Frame>
+      </Frame>
     </Frame>
+    <Frame type="Label" name="NameLabel">
+      <Anchor side="Bottom" relative="$parent" pos="Max" offset="-27" />
+      <Options val="Ellipsis | NoWrapping" />
+      <Text val="NameLabel" />
+    </Frame>
+    <Frame type="Label" name="BuildLabel">
+      <Anchor side="Bottom" relative="$parent/HeroContainerFrame/HeroName" pos="Min" offset="5" />
+      <Style val="MultiplayerLoadingPanelPlayerBuild" />
+    </Frame>
+    <Frame type="Image" name="LoadingProgressBarImage">
+      <Anchor side="Top" relative="$parent" pos="Min" offset="135" />
+      <Texture val="@UI/LoadingScreen_LoadingBar_Blue" />
+      <TextureType val="NineSlice" />
+      <Unclipped val="True" />
+    </Frame>
+    <Frame type="Label" name="LoadingLabel">
+      <Anchor side="Top" relative="$parent" pos="Min" offset="15" />
+      <Anchor side="Left" relative="$parent" pos="Mid" offset="0" />
+      <Anchor side="Right" relative="$parent" pos="Mid" offset="0" />
+      <Style val="MultiplayerLoadingPanelPlayerLoading" />
+      <Text val="@UI/MultiplayerLoadingComplete" />
+      <Alpha val="0" />
+    </Frame>
+    <Frame type="Image" name="PartyIdImage">
+      <Anchor side="Top" relative="$parent" pos="Min" offset="15" />
+      <ColorAdjustMode val="Colorize" />
+      <Texture val="@UI/UI_ingame_LoadScreen_PartyLink" />
+    </Frame>
+    <Frame type="BattleUserVoiceFrame" name="VoiceChatFrame" template="BattleUserVoiceFrame/BattleUserVoiceFrame_AdjustableSpeaker_Template">
+      <ChannelType val="{$VoiceChatUI/@ActiveChannelType}" />
+      <PresenceId val="{$parent/AvatarFrame/@PresenceId}" />
+      <ContextMenu val="$ancestor[@type=HeroLoadingPanel]/PlayerContextMenu" />
+    </Frame>
+    <StateGroup name="TeamBorder">
+      <State name="RedTeamBorder">
+        <When type="AnimationState" PlayerTeam="RedTeam" />
+        <Action type="SetProperty" frame="PlayerBorder" texture="@UI/LoadingScreen_PlayerFrame_Red" />
+        <Action type="SetProperty" frame="LoadingProgressBarImage" texture="@UI/LoadingScreen_LoadingBar_Red" />
+      </State>
+    </StateGroup>
+    <StateGroup name="PlayerLabelColor">
+      <DefaultState val="BluePlayerName" />
+      <State name="LocalPlayerNameOnly">
+        <When type="Property" frame="$ancestor[@type=CustomLoadingPanel]" UseInGameHeroSelection="true" />
+        <When type="AnimationState" LocalPlayer="True" />
+        <Action type="SetProperty" frame="HeroContainerFrame" visible="false" />
+        <Action type="SetProperty" frame="NameLabel" style="LoadingPlayerNameBigLocal" />
+      </State>
+      <State name="RedPlayerNameOnly">
+        <When type="Property" frame="$ancestor[@type=CustomLoadingPanel]" UseInGameHeroSelection="true" />
+        <When type="AnimationState" PlayerTeam="RedTeam" />
+        <Action type="SetProperty" frame="HeroContainerFrame" visible="false" />
+        <Action type="SetProperty" frame="NameLabel" style="LoadingPlayerNameBigRed" />
+      </State>
+      <State name="BluePlayerNameOnly">
+        <When type="Property" frame="$ancestor[@type=CustomLoadingPanel]" UseInGameHeroSelection="true" />
+        <Action type="SetProperty" frame="HeroContainerFrame" visible="false" />
+        <Action type="SetProperty" frame="NameLabel" style="LoadingPlayerNameBigBlue" />
+      </State>
+      <State name="LocalPlayerName">
+        <When type="AnimationState" LocalPlayer="True" />
+        <Action type="SetProperty" frame="NameLabel" style="LoadingPlayerNameSmallLocal" />
+      </State>
+      <State name="RedPlayerName">
+        <When type="AnimationState" PlayerTeam="RedTeam" />
+        <Action type="SetProperty" frame="NameLabel" style="LoadingPlayerNameSmallRed" />
+      </State>
+      <State name="BluePlayerName">
+        <Action type="SetProperty" frame="NameLabel" style="LoadingPlayerNameSmallBlue" />
+      </State>
+    </StateGroup>
+  </Frame>
+  <Frame type="HeroLoadingPanelPlayerFrame" name="HeroLoadingPanelPlayerFrameLeftTemplate" template="HeroLoadingPanel/HeroLoadingPanelPlayerFrameTemplate">
+    <CollapseLayout val="true" />
+    <Frame type="Image" name="PlayerBorder">
+      <Anchor side="Left" relative="$parent" pos="Min" offset="-4" />
+    </Frame>
+    <Frame type="Image" name="AvatarFrame">
+      <Anchor side="Left" relative="$parent" pos="Min" offset="10" />
+    </Frame>
+    <Frame type="HeroContainerFrame" name="HeroContainerFrame">
+      <Frame type="HeroImage" name="PortraitPanel">
+        <Anchor side="Right" relative="$parent" pos="Max" offset="1" />
+      </Frame>
+      <Frame type="Image" name="HeroMask">
+        <TextureCoords top="0.0" left="1.0" bottom="1.0" right="0.0" />
+      </Frame>
+      <Frame type="HeroLabel" name="HeroName">
+        <Anchor side="Left" relative="$parent/$parent/AvatarFrame" pos="Max" offset="-6" />
+        <Anchor side="Right" relative="$parent/$parent/HeroContainerFrame" pos="Max" offset="0" />
+        <Style val="LoadingHeroNameLeft" />
+      </Frame>
+    </Frame>
+    <Frame type="Label" name="NameLabel">
+      <Anchor side="Left" relative="$parent/HeroContainerFrame/HeroName" pos="Min" offset="0" />
+    </Frame>
+    <Frame type="Label" name="BuildLabel">
+      <Anchor side="Left" relative="$parent/NameLabel" pos="Min" offset="0" />
+    </Frame>
+    <Frame type="Image" name="LoadingProgressBarImage">
+      <Anchor side="Left" relative="$parent" pos="Min" offset="5" />
+    </Frame>
+    <Frame type="Image" name="PartyIdImage">
+      <Anchor side="Right" relative="$parent" pos="Max" offset="-10" />
+    </Frame>
+    <Frame type="BattleUserVoiceFrame" name="VoiceChatFrame" template="BattleUserVoiceFrame/BattleUserVoiceFrame_AdjustableSpeaker_Template">
+      <Anchor side="Right" relative="$parent" pos="Max" offset="-5" />
+      <Anchor side="Bottom" relative="$parent" pos="Max" offset="-13" />
+    </Frame>
+  </Frame>
+  <Frame type="HeroLoadingPanelPlayerFrame" name="HeroLoadingPanelPlayerFrameRightTemplate" template="HeroLoadingPanel/HeroLoadingPanelPlayerFrameTemplate">
+    <CollapseLayout val="true" />
+    <Frame type="Image" name="PlayerBorder">
+      <Anchor side="Right" relative="$parent" pos="Max" offset="4" />
+      <TextureCoords top="0.0" left="1.0" bottom="1.0" right="0.0" />
+    </Frame>
+    <Frame type="Image" name="AvatarFrame">
+      <Anchor side="Right" relative="$parent" pos="Max" offset="-10" />
+    </Frame>
+    <Frame type="HeroContainerFrame" name="HeroContainerFrame">
+      <Anchor side="Left" relative="$parent" pos="Min" offset="3" />
+      <Anchor side="Right" relative="$parent" pos="Max" offset="-11" />
+      <Frame type="HeroImage" name="PortraitPanel">
+        <TextureCoords top="0.0" left="1.0" bottom="1.0" right="0.0" />
+        <Anchor side="Left" relative="$parent" pos="Min" offset="-1" />
+      </Frame>
+      <Frame type="HeroLabel" name="HeroName">
+        <Anchor side="Right" relative="$parent/$parent/AvatarFrame" pos="Min" offset="6" />
+        <Anchor side="Left" relative="$parent/$parent/HeroContainerFrame" pos="Min" offset="0" />
+        <Style val="LoadingHeroNameRight" />
+      </Frame>
+    </Frame>
+    <Frame type="Label" name="NameLabel">
+      <Anchor side="Right" relative="$parent/HeroContainerFrame/HeroName" pos="Max" offset="0" />
+    </Frame>
+    <Frame type="Label" name="BuildLabel">
+      <Anchor side="Right" relative="$parent/NameLabel" pos="Max" offset="0" />
+    </Frame>
+    <Frame type="Image" name="LoadingProgressBarImage">
+      <Anchor side="Right" relative="$parent" pos="Max" offset="-3" />
+    </Frame>
+    <Frame type="Image" name="PartyIdImage">
+      <Anchor side="Left" relative="$parent" pos="Min" offset="10" />
+    </Frame>
+    <Frame type="BattleUserVoiceFrame" name="VoiceChatFrame" template="BattleUserVoiceFrame/BattleUserVoiceFrame_AdjustableSpeaker_Template">
+      <Anchor side="Left" relative="$parent" pos="Min" offset="5" />
+      <Anchor side="Bottom" relative="$parent" pos="Max" offset="-13" />
+    </Frame>
+  </Frame>
+  <Frame type="HeroLoadingPanel" name="HeroLoadingPanelTemplate">
+    <Frame type="Image" name="LeftTeamBackgroundImage">
+      <Anchor side="Top" relative="$parent" pos="Min" offset="0" />
+      <Anchor side="Bottom" relative="$parent" pos="Max" offset="0" />
+      <Anchor side="Left" relative="$parent" pos="Min" offset="0" />
+      <Texture val="@UI/LoadingScreen_TeamGrid" />
+      <TextureCoords top="0.0" left="1.0" bottom="1.0" right="0.0" />
+      <ColorAdjustMode val="Colorize" />
+      <AdjustmentColor val="242f67" />
+    </Frame>
+    <Frame type="Image" name="RightTeamBackgroundImage">
+      <Anchor side="Top" relative="$parent" pos="Min" offset="0" />
+      <Anchor side="Bottom" relative="$parent" pos="Max" offset="0" />
+      <Anchor side="Right" relative="$parent" pos="Max" offset="0" />
+      <Texture val="@UI/LoadingScreen_TeamGrid" />
+      <ColorAdjustMode val="Colorize" />
+      <AdjustmentColor val="612326" />
+    </Frame>
+    <Animation name="RedTeamOnLeft">
+      <Event event="BlueTeamOnLeft" action="Stop" />
+      <Event event="RedTeamOnLeft" action="Reset,Play" />
+      <Controller type="AdjustmentColor" end="Pause" frame="LeftTeamBackgroundImage">
+        <Key type="Curve" time="0.0" value="97,35,38" inout="Linear,Step" />
+      </Controller>
+      <Controller type="AdjustmentColor" end="Pause" frame="RightTeamBackgroundImage">
+        <Key type="Curve" time="0.0" value="36,47,103" inout="Linear,Step" />
+      </Controller>
+    </Animation>
+    <Frame type="BattleUserContextMenu" name="PlayerContextMenu" template="BattleUserContextMenu/BattleUserContextMenu">
+      <Anchor side="Top" relative="$parent" pos="Max" offset="0" />
+      <Anchor side="Right" relative="$parent" pos="Max" offset="0" />
+    </Frame>
+    <Frame type="HeroLoadingPanelPlayerFrame" name="PlayerFrame0" template="HeroLoadingPanel/HeroLoadingPanelPlayerFrameLeftTemplate">
+      <Anchor side="Top" relative="$parent" pos="Min" offset="#LoadingPanelHeroVerticalCenterOffset" />
+      <Anchor side="Left" relative="$parent" pos="Min" offset="0" />
+    </Frame>
+    <Frame type="HeroLoadingPanelPlayerFrame" name="PlayerFrame1" template="HeroLoadingPanel/HeroLoadingPanelPlayerFrameLeftTemplate">
+      <Anchor side="Left" relative="$parent" pos="Min" offset="0" />
+      <Anchor side="Top" relative="$parent/PlayerFrame0" pos="Max" offset="0" />
+    </Frame>
+    <Frame type="HeroLoadingPanelPlayerFrame" name="PlayerFrame2" template="HeroLoadingPanel/HeroLoadingPanelPlayerFrameLeftTemplate">
+      <Anchor side="Left" relative="$parent" pos="Min" offset="0" />
+      <Anchor side="Top" relative="$parent/PlayerFrame1" pos="Max" offset="0" />
+    </Frame>
+    <Frame type="HeroLoadingPanelPlayerFrame" name="PlayerFrame3" template="HeroLoadingPanel/HeroLoadingPanelPlayerFrameLeftTemplate">
+      <Anchor side="Left" relative="$parent" pos="Min" offset="0" />
+      <Anchor side="Top" relative="$parent/PlayerFrame2" pos="Max" offset="0" />
+    </Frame>
+    <Frame type="HeroLoadingPanelPlayerFrame" name="PlayerFrame4" template="HeroLoadingPanel/HeroLoadingPanelPlayerFrameLeftTemplate">
+      <Anchor side="Left" relative="$parent" pos="Min" offset="0" />
+      <Anchor side="Top" relative="$parent/PlayerFrame3" pos="Max" offset="0" />
+    </Frame>
+    <Frame type="HeroLoadingPanelPlayerFrame" name="PlayerFrame5" template="HeroLoadingPanel/HeroLoadingPanelPlayerFrameRightTemplate">
+      <Anchor side="Top" relative="$parent" pos="Min" offset="#LoadingPanelHeroVerticalCenterOffset" />
+      <Anchor side="Right" relative="$parent" pos="Max" offset="0" />
+      <Visible val="true" />
+    </Frame>
+    <Frame type="HeroLoadingPanelPlayerFrame" name="PlayerFrame6" template="HeroLoadingPanel/HeroLoadingPanelPlayerFrameRightTemplate">
+      <Anchor side="Right" relative="$parent" pos="Max" offset="0" />
+      <Anchor side="Top" relative="$parent/PlayerFrame5" pos="Max" offset="0" />
+      <Visible val="true" />
+    </Frame>
+    <Frame type="HeroLoadingPanelPlayerFrame" name="PlayerFrame7" template="HeroLoadingPanel/HeroLoadingPanelPlayerFrameRightTemplate">
+      <Anchor side="Right" relative="$parent" pos="Max" offset="0" />
+      <Anchor side="Top" relative="$parent/PlayerFrame6" pos="Max" offset="0" />
+      <Visible val="true" />
+    </Frame>
+    <Frame type="HeroLoadingPanelPlayerFrame" name="PlayerFrame8" template="HeroLoadingPanel/HeroLoadingPanelPlayerFrameRightTemplate">
+      <Anchor side="Right" relative="$parent" pos="Max" offset="0" />
+      <Anchor side="Top" relative="$parent/PlayerFrame7" pos="Max" offset="0" />
+      <Visible val="true" />
+    </Frame>
+    <Frame type="HeroLoadingPanelPlayerFrame" name="PlayerFrame9" template="HeroLoadingPanel/HeroLoadingPanelPlayerFrameRightTemplate">
+      <Anchor side="Right" relative="$parent" pos="Max" offset="0" />
+      <Anchor side="Top" relative="$parent/PlayerFrame8" pos="Max" offset="0" />
+      <Visible val="true" />
+    </Frame>
+    <Frame type="Frame" name="ChannelSelector" template="VoiceChannelSelector/VoiceChannelSelectorTemplate">
+      <Anchor side="Top" relative="$parent" pos="Min" offset="5" />
+      <Anchor side="Left" relative="$parent" pos="Min" offset="5" />
+    </Frame>
+  </Frame>
 </Desc>

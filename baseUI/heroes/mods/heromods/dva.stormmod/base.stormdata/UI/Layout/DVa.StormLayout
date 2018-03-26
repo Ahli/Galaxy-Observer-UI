@@ -1,1447 +1,788 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <Desc>
-
-<!-- Start: Custom Unit Status Frame to Show/Hide elements for Self Destructing D.Va Mech -->
-    <Frame type="UnitStatusFrame" name="DVaUnitStatusFrameTemplate" template="UnitStatus/HeroUnitStatusFramePinkEnergy">
-        <Frame type="Frame" name="HeroUnitStatusParentFrame">
-
-            <Frame type="UnitStatusValidatorAnimElement" name="ChargingAnims">
-                <Anchor relative="$parent"/>
-                
-                <Validator val="DVaSelfDestructandHasCargo"/>
-                    
-                <Animation name="Recharging">
-                    <Event event="NoState" action="Stop"/>
-                    <Event event="DVaSelfDestructandHasCargo" action="Reset,Play"/>
-                    
-                    <Controller type="Visibility" end="Pause"  frame="$parent/EnergyBar/RechargeFlash">
-                        <Key type="Bool" time="0" value="true"/>
-                    </Controller>
-                </Animation>
-            </Frame>
-
-            <Frame type="UnitStatusEnergyBar" name="EnergyBar">
-                <Frame type="Image" name="RechargeFlash">
-                    <Anchor side="Bottom" relative="$parent" pos="Max" offset="8"/>
-                    <Anchor side="Left" relative="$parent" pos="Min" offset="-6"/>
-                    <Anchor side="Right" relative="$parent" pos="Max" offset="7"/>
-                    <Anchor side="Top" relative="$parent" pos="Min" offset="-8"/>
-                    <Texture val="@UI/Storm_UI_HUD_Overhead_EnergyBar_Pulse"/>
-                    <RenderPriority val="612"/>
-                    <ColorAdjustMode val="Fill"/>
-                    <AdjustmentColor val="FF69B4"/>
-                    <Visible val="False"/>
-                              
-                     <Animation name="Pulse">
-                        <Event event="OnShown" action="Reset,Play"/>
-                        <Controller type="Fade" end="PingPong">
-                            <Key type="Curve" time="0.0" value="50" inout="Linear,Auto"/>
-                            <Key type="Curve" time="0.33" value="250" inout="Linear,Auto"/>
-                        </Controller>
-                    </Animation>
-                </Frame>
-            </Frame>
-            
-            <!-- Hide parts of the UnitStatusFrame when DVa is Self-Destructing -->
-            <Frame type="UnitStatusValidatorAnimElement" name="SelfDestructingAnims">
-                <Anchor relative="$parent"/>
-                <Validator val="DVaMechSelfDestructAbandoned"/>
-
-                <Animation name="DVaMechSelfDestructAbandoned">
-                    <Event event="Reset" action="Stop"/>
-                    <Event event="NoState" action="Stop"/>
-                    <Event event="DVaMechSelfDestructAbandoned" action="Restart, Play"/>
-
-                    <Controller type="Visibility" end="Pause" frame="$parent/HealthBar">
-                        <Key type="Bool" time="0" value="False"/>
-                    </Controller>
-
-                    <Controller type="Visibility" end="Pause" frame="$parent/PlayerNameLabel/Label">
-                        <Key type="Bool" time="0" value="False"/>
-                    </Controller>
-
-                    <Controller type="Visibility" end="Pause" frame="$parent/TalentAvailableIndicator/TalentAvailableBg">
-                        <Key type="Bool" time="0" value="False"/>
-                    </Controller>
-
-                    <Controller type="Visibility" end="Pause" frame="$parent/TalentAvailableIndicator/TalentAvailableLabel">
-                        <Key type="Bool" time="0" value="False"/>
-                    </Controller>
-
-                    <Controller type="Visibility" end="Pause" frame="$parent/HealthBlackOverlayIcon">
-                        <Key type="Bool" time="0" value="True"/>
-                    </Controller>
-
-                    <Controller type="Visibility" end="Pause" frame="$parent/EnergyBlackOverlayIcon">
-                        <Key type="Bool" time="0" value="True"/>
-                    </Controller>
-                    
-                    <!-- These frames have their visibility managed in code. We hide them with Fade as a result -->
-                    <Controller type="Fade" end="Pause" frame="$parent/UnitArmorStatusDisplay">
-                        <Key type="Curve" time="0" value="0"/>
-                    </Controller>
-
-                    <Controller type="Fade" end="Pause" frame="$parent/UnitStatusHealingDisplay">
-                        <Key type="Curve" time="0" value="0"/>
-                    </Controller>
-                </Animation>
-            </Frame>
-
-            <Frame type="UnitStatusShieldedHealthBar" name="HealthBar">
-                <Visible val="True"/>
-            </Frame>
-
-            <Frame type="UnitStatusTalentAvailableIndicator" name="TalentAvailableIndicator">
-                <Frame type="Image" name="TalentAvailableBg">
-                    <Visible val="True"/>
-                </Frame>
-                <Frame type="Label" name="TalentAvailableLabel">
-                    <Visible val="True"/>
-                </Frame>
-            </Frame>
-
-            <!-- Black Images used to overlay the Health and Energy bars since they cannot be hidden normally -->
-            <Frame type="Image" name="HealthBlackOverlayIcon">
-                <Anchor side="Top" relative="$parent/$parent" pos="Min" offset="108"/>
-                <Anchor side="Left" relative="$parent/$parent" pos="Min" offset="58"/>
-                <Width val="138"/>
-                <Height val="14"/>
-                <ColorAdjustMode val="Fill"/>
-                <AdjustmentColor val="000000"/>
-                <BlendMode val="Normal"/>
-                <Visible val="False"/>
-                <Texture val="@UI/StormTempWhite"/>
-            </Frame>
-
-            <Frame type="Image" name="EnergyBlackOverlayIcon">
-                <Anchor side="Top" relative="$parent/HealthBar" pos="Max" offset="2"/>
-                <Anchor side="Left" relative="$parent/HealthBar" pos="Min" offset="0"/>
-                <Width val="138"/>
-                <Height val="4"/>
-                <ColorAdjustMode val="Fill"/>
-                <AdjustmentColor val="000000"/>
-                <BlendMode val="Normal"/>
-                <Visible val="False"/>
-                <Texture val="@UI/StormTempWhite"/>
-            </Frame>
-
-            <!-- Team Coloring used for the Progress bar -->
-            <Frame type="UnitStatusColor" name="PrimaryColorFrame">
-                <Anchor relative="$parent"/>
-                <ColorStyle val="MinimapTeams"/>
-            </Frame>
-
-            <Frame type="UnitStatusBehaviorIcon" name="SelfDestructIcon">
-                <Anchor side="Top" relative="$parent/EnergyBlackOverlayIcon" pos="Min" offset="0"/>
-                <Anchor side="Bottom" relative="$parent/EnergyBlackOverlayIcon" pos="max" offset="0"/>
-                <Anchor side="Left" relative="$parent/EnergyBlackOverlayIcon" pos="Min" offset="1"/>
-                <Anchor side="Right" relative="$parent/EnergyBlackOverlayIcon" pos="Max" offset="-1"/>
-                <Behavior val="DVaMechSelfDestructMechDetonationCountdown"/>
-                <RenderPriority val="600"/>
-
-                <Frame type="BehaviorIcon" name="BehaviorIcon">
-                    <Anchor relative="$parent"/>
-
-                    <Frame type="ProgressBar" name="CooldownBar">
-                        <Anchor relative="$parent"/>
-                        <Alpha val="255"/>
-                        <AcceptsMouse val="False"/>
-                        <Visible val="True"/>
-                        <RenderPriority val="600"/>
-
-                        <MinValue val="0"/>
-                        <MaxValue val="1"/>
-                        <Value val="0"/>
-                        <FillInset val="0.0"/>
-                        <Vertical val="False"/>
-                        <UseFillContainer val="false"/>
-
-                        <Frame type="Frame" name="FillImageContainer">
-                            <Anchor relative="$parent"/>
-
-                            <Frame type="Image" name="FillImage">
-                                <Anchor relative="$parent/$parent"/>
-                                <RenderPriority val="600"/>
-                                <Visible val="True"/>
-                                <Alpha val="255"/>
-                                <SubpixelRendering val="true"/>
-                                <Texture val="@UI/StormTempWhite"/>
-                                <ColorAdjustMode val="Desaturate"/>
-                                <LightAdjustColor val="{$parent/$parent/$parent/$parent/$parent/PrimaryColorFrame/@Color}"/>
-                                <DarkAdjustColor val="000000"/>
-                            </Frame>
-                        </Frame>
-                    </Frame>
-                </Frame>
-            </Frame>
-        </Frame>
-    </Frame>
-<!-- End: Custom Unit Status Frame to Show/Hide elements for Self Destructing D.Va Mech -->
-
-    <Frame type="Image" name="DVaTriangleTemplatetImage">
-        <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
-        <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
-        <BlendMode val="Normal"/>
-        <Visible val="False"/>
-        <Texture val="@UI/storm_ui_DVa_bg_triangle"/>
-
-        <Animation name="TriangleFade">
-            <Event event="TriangleFade" action="Restart, Play"/>
-            <Controller type="Fade" end="Pause">
-                <Key type="Curve" time="0" value="0" inout="Linear"/>
-                <Key type="Curve" time=".3" value="255" inout="Linear"/>
-                <Key type="Curve" time=".5" value="0" inout="Linear"/>
-            </Controller>
+  <Frame type="UnitStatusFrame" name="DVaUnitStatusFrameTemplate" template="UnitStatus/HeroUnitStatusFramePinkEnergy">
+    <Frame type="Frame" name="HeroUnitStatusParentFrame">
+      <Frame type="UnitStatusValidatorAnimElement" name="ChargingAnims">
+        <Anchor relative="$parent" />
+        <Validator val="DVaSelfDestructandHasCargo" />
+        <Animation name="Recharging">
+          <Event event="NoState" action="Stop" />
+          <Event event="DVaSelfDestructandHasCargo" action="Reset,Play" />
+          <Controller type="Visibility" end="Pause" frame="$parent/EnergyBar/RechargeFlash">
+            <Key type="Bool" time="0" value="true" />
+          </Controller>
         </Animation>
-    </Frame>
-
-    <Frame type="Image" name="DvaBloodHazeImageTemplate">
-        <BlendMode val="Normal"/>
-        <RenderType val="HDR"/>
-        <Visible val="False"/>
-        <Alpha val="0"/>
-        <RenderPriority val="500"/>
-        <Texture val="@UI/storm_ui_DVa_bg_ejecting"/>
-
-        <Animation name="BloodFlashAnim">
-            <Event event="BloodFlashAnim" action="Restart, Play"/>
-            <Controller type="Fade" end="Pause">
-                <Key type="Curve" time="0" value="0" inout="Linear"/>
-                <Key type="Curve" time=".1" value="210" inout="Linear"/>
-                <Key type="Curve" time=".3" value="180" inout="Linear"/>
-                <Key type="Curve" time=".5" value="220" inout="Linear"/>
-                <Key type="Curve" time=".6" value="160" inout="Linear"/>
-                <Key type="Curve" time=".7" value="255" inout="Linear"/>
-                <Key type="Curve" time=".75" value="0" inout="Linear"/>
+      </Frame>
+      <Frame type="UnitStatusEnergyBar" name="EnergyBar">
+        <Frame type="Image" name="RechargeFlash">
+          <Anchor side="Bottom" relative="$parent" pos="Max" offset="8" />
+          <Anchor side="Left" relative="$parent" pos="Min" offset="-6" />
+          <Anchor side="Right" relative="$parent" pos="Max" offset="7" />
+          <Anchor side="Top" relative="$parent" pos="Min" offset="-8" />
+          <Texture val="@UI/Storm_UI_HUD_Overhead_EnergyBar_Pulse" />
+          <RenderPriority val="612" />
+          <ColorAdjustMode val="Fill" />
+          <AdjustmentColor val="FF69B4" />
+          <Visible val="False" />
+          <Animation name="Pulse">
+            <Event event="OnShown" action="Reset,Play" />
+            <Controller type="Fade" end="PingPong">
+              <Key type="Curve" time="0.0" value="50" inout="Linear,Auto" />
+              <Key type="Curve" time="0.33" value="250" inout="Linear,Auto" />
             </Controller>
+          </Animation>
+        </Frame>
+      </Frame>
+      <Frame type="UnitStatusValidatorAnimElement" name="SelfDestructingAnims">
+        <Anchor relative="$parent" />
+        <Validator val="DVaMechSelfDestructAbandoned" />
+        <Animation name="DVaMechSelfDestructAbandoned">
+          <Event event="Reset" action="Stop" />
+          <Event event="NoState" action="Stop" />
+          <Event event="DVaMechSelfDestructAbandoned" action="Restart, Play" />
+          <Controller type="Visibility" end="Pause" frame="$parent/HealthBar">
+            <Key type="Bool" time="0" value="False" />
+          </Controller>
+          <Controller type="Visibility" end="Pause" frame="$parent/PlayerNameLabel/Label">
+            <Key type="Bool" time="0" value="False" />
+          </Controller>
+          <Controller type="Visibility" end="Pause" frame="$parent/TalentAvailableIndicator/TalentAvailableBg">
+            <Key type="Bool" time="0" value="False" />
+          </Controller>
+          <Controller type="Visibility" end="Pause" frame="$parent/TalentAvailableIndicator/TalentAvailableLabel">
+            <Key type="Bool" time="0" value="False" />
+          </Controller>
+          <Controller type="Visibility" end="Pause" frame="$parent/HealthBlackOverlayIcon">
+            <Key type="Bool" time="0" value="True" />
+          </Controller>
+          <Controller type="Visibility" end="Pause" frame="$parent/EnergyBlackOverlayIcon">
+            <Key type="Bool" time="0" value="True" />
+          </Controller>
+          <Controller type="Fade" end="Pause" frame="$parent/UnitArmorStatusDisplay">
+            <Key type="Curve" time="0" value="0" />
+          </Controller>
+          <Controller type="Fade" end="Pause" frame="$parent/UnitStatusHealingDisplay">
+            <Key type="Curve" time="0" value="0" />
+          </Controller>
         </Animation>
-    </Frame>
-
-<!-- Start: Enter and Exit Mech UI -->
-    <Frame type="SelectionUnitStatusPanel" name="DVaPilotEnterFrame">
-        <Anchor relative="$parent"/>
-        <AcceptsMouse val="false"/>
-        <RenderType val="LDR"/>
-        <RenderPriority val="600"/>
-
-        <Frame type="UnitStatusFrame" name="UnitStatusFrame0">
-            <Anchor relative="$parent"/>
-
-            <Frame type="UnitStatusValidatorAnimElement" name="EnteringMechAnims1">
-                <Anchor relative="$parent"/>
-                <!-- <Validator val="DVaEnterMechCombine"/> -->
-                <!-- <Validator val="DVaMechCallMEKAfallCombine"/> -->
-                <Validator val="DVaMechBreakdownActive"/>
-
-            <!-- Start: Call Mech Validators -->
-                <!-- <Animation name="DVaEnterMechCombine">
-                    <Event event="Reset" action="Stop"/>
-                    <Event event="NoState" action="Stop"/>
-                    <Event event="DVaEnterMechCombine" action="Restart, Play"/>
-
-                    <Controller type="Visibility" end="Pause" frame="$parent/DVaVerticalLeftImage">
-                        <Key type="Bool" time="0" value="True"/>
-                    </Controller>
-
-                    <Controller type="Animation" end="Pause" frame="$parent/DVaVerticalLeftImage" animation="VerticleLeftAnim">
-                        <Key type="Animation" time="0" action="reset"/>
-                        <Key type="Animation" time="0" action="Play"/>
-                    </Controller>
-
-                    <Controller type="Visibility" end="Pause" frame="$parent/DVaVerticalRightImage">
-                        <Key type="Bool" time="0" value="True"/>
-                    </Controller>
-
-                    <Controller type="Animation" end="Pause" frame="$parent/DVaVerticalRightImage" animation="VerticleRightAnim">
-                        <Key type="Animation" time="0" action="reset"/>
-                        <Key type="Animation" time="0" action="Play"/>
-                    </Controller>
-
-                    <Controller type="Visibility" end="Pause" frame="$parent/DVaHorizontalImage">
-                        <Key type="Bool" time="0" value="True"/>
-                    </Controller>
-
-                    <Controller type="Animation" end="Pause" frame="$parent/DVaHorizontalImage" animation="HorizontalCenterAnim">
-                        <Key type="Animation" time="0" action="reset"/>
-                        <Key type="Animation" time="0" action="Play"/>
-                    </Controller>
-
-                    <Controller type="Visibility" end="Pause" frame="$parent/DVaHorizontalImageLeft">
-                        <Key type="Bool" time="0" value="True"/>
-                    </Controller>
-
-                    <Controller type="Animation" end="Pause" frame="$parent/DVaHorizontalImageLeft" animation="HorizontalLeftAnim">
-                        <Key type="Animation" time="0" action="reset"/>
-                        <Key type="Animation" time="0" action="Play"/>
-                    </Controller>
-
-                    <Controller type="Visibility" end="Pause" frame="$parent/DVaHorizontalImageRight">
-                        <Key type="Bool" time="0" value="True"/>
-                    </Controller>
-
-                    <Controller type="Animation" end="Pause" frame="$parent/DVaHorizontalImageRight" animation="HorizontalRightAnim">
-                        <Key type="Animation" time="0" action="reset"/>
-                        <Key type="Animation" time="0" action="Play"/>
-                    </Controller>
-
-                    <Controller type="Visibility" end="Pause" frame="$parent/DVaBunnyImage">
-                        <Key type="Bool" time="0" value="True"/>
-                    </Controller>
-
-                    <Controller type="Animation" end="Pause" frame="$parent/DVaBunnyImage" animation="BunnyAnim">
-                        <Key type="Animation" time="0" action="reset"/>
-                        <Key type="Animation" time="0" action="Play"/>
-                    </Controller>
-
-                    <Controller type="Visibility" end="Pause" frame="$parent/DVaTrianglesTopRightImage">
-                        <Key type="Bool" time="0" value="True"/>
-                    </Controller>
-
-                    <Controller type="Animation" end="Pause" frame="$parent/DVaTrianglesTopRightImage" animation="TriangleFade">
-                        <Key type="Animation" time="0" action="reset"/>
-                        <Key type="Animation" time="0" action="Play"/>
-                    </Controller>
-
-                    <Controller type="Visibility" end="Pause" frame="$parent/DVaTrianglesBottomRightImage">
-                        <Key type="Bool" time="0" value="True"/>
-                    </Controller>
-
-                    <Controller type="Animation" end="Pause" frame="$parent/DVaTrianglesBottomRightImage" animation="TriangleFade">
-                        <Key type="Animation" time="0" action="reset"/>
-                        <Key type="Animation" time="0" action="Play"/>
-                    </Controller>
-
-                    <Controller type="Visibility" end="Pause" frame="$parent/DVaTrianglesTopLeftImage">
-                        <Key type="Bool" time="0" value="True"/>
-                    </Controller>
-
-                    <Controller type="Animation" end="Pause" frame="$parent/DVaTrianglesTopLeftImage" animation="TriangleFade">
-                        <Key type="Animation" time="0" action="reset"/>
-                        <Key type="Animation" time="0" action="Play"/>
-                    </Controller>
-
-                    <Controller type="Visibility" end="Pause" frame="$parent/DVaTrianglesBottomLeftImage">
-                        <Key type="Bool" time="0" value="True"/>
-                    </Controller>
-
-                    <Controller type="Animation" end="Pause" frame="$parent/DVaTrianglesBottomLeftImage" animation="TriangleFade">
-                        <Key type="Animation" time="0" action="reset"/>
-                        <Key type="Animation" time="0" action="Play"/>
-                    </Controller>
-                </Animation> -->
-            <!-- End: Call Mech Validators -->
-
-            <!-- Start: MEKAfall Validators -->
-                <!-- <Animation name="DVaMechCallMEKAfallCombine">
-                    <Event event="Reset" action="Stop"/>
-                    <Event event="NoState" action="Stop"/>
-                    <Event event="DVaMechCallMEKAfallCombine" action="Restart, Play"/>
-
-                    <Controller type="Visibility" end="Pause" frame="$parent/DVaVerticalLeftImage">
-                        <Key type="Bool" time="0" value="True"/>
-                    </Controller>
-
-                    <Controller type="Animation" end="Pause" frame="$parent/DVaVerticalLeftImage" animation="VerticleLeftAnim">
-                        <Key type="Animation" time="0" action="reset"/>
-                        <Key type="Animation" time="0" action="Play"/>
-                    </Controller>
-
-                    <Controller type="Visibility" end="Pause" frame="$parent/DVaVerticalRightImage">
-                        <Key type="Bool" time="0" value="True"/>
-                    </Controller>
-
-                    <Controller type="Animation" end="Pause" frame="$parent/DVaVerticalRightImage" animation="VerticleRightAnim">
-                        <Key type="Animation" time="0" action="reset"/>
-                        <Key type="Animation" time="0" action="Play"/>
-                    </Controller>
-
-                    <Controller type="Visibility" end="Pause" frame="$parent/DVaHorizontalImage">
-                        <Key type="Bool" time="0" value="True"/>
-                    </Controller>
-
-                    <Controller type="Animation" end="Pause" frame="$parent/DVaHorizontalImage" animation="HorizontalCenterAnim">
-                        <Key type="Animation" time="0" action="reset"/>
-                        <Key type="Animation" time="0" action="Play"/>
-                    </Controller>
-
-                    <Controller type="Visibility" end="Pause" frame="$parent/DVaHorizontalImageLeft">
-                        <Key type="Bool" time="0" value="True"/>
-                    </Controller>
-
-                    <Controller type="Animation" end="Pause" frame="$parent/DVaHorizontalImageLeft" animation="HorizontalLeftAnim">
-                        <Key type="Animation" time="0" action="reset"/>
-                        <Key type="Animation" time="0" action="Play"/>
-                    </Controller>
-
-                    <Controller type="Visibility" end="Pause" frame="$parent/DVaHorizontalImageRight">
-                        <Key type="Bool" time="0" value="True"/>
-                    </Controller>
-
-                    <Controller type="Animation" end="Pause" frame="$parent/DVaHorizontalImageRight" animation="HorizontalRightAnim">
-                        <Key type="Animation" time="0" action="reset"/>
-                        <Key type="Animation" time="0" action="Play"/>
-                    </Controller>
-
-                    <Controller type="Visibility" end="Pause" frame="$parent/DVaBunnyImage">
-                        <Key type="Bool" time="0" value="True"/>
-                    </Controller>
-
-                    <Controller type="Animation" end="Pause" frame="$parent/DVaBunnyImage" animation="BunnyAnimAlt">
-                        <Key type="Animation" time="0" action="reset"/>
-                        <Key type="Animation" time="0" action="Play"/>
-                    </Controller>
-
-                    <Controller type="Visibility" end="Pause" frame="$parent/DVaTrianglesTopRightImage">
-                        <Key type="Bool" time="0" value="True"/>
-                    </Controller>
-
-                    <Controller type="Animation" end="Pause" frame="$parent/DVaTrianglesTopRightImage" animation="TriangleFade">
-                        <Key type="Animation" time="0" action="reset"/>
-                        <Key type="Animation" time="0" action="Play"/>
-                    </Controller>
-
-                    <Controller type="Visibility" end="Pause" frame="$parent/DVaTrianglesBottomRightImage">
-                        <Key type="Bool" time="0" value="True"/>
-                    </Controller>
-
-                    <Controller type="Animation" end="Pause" frame="$parent/DVaTrianglesBottomRightImage" animation="TriangleFade">
-                        <Key type="Animation" time="0" action="reset"/>
-                        <Key type="Animation" time="0" action="Play"/>
-                    </Controller>
-
-                    <Controller type="Visibility" end="Pause" frame="$parent/DVaTrianglesTopLeftImage">
-                        <Key type="Bool" time="0" value="True"/>
-                    </Controller>
-
-                    <Controller type="Animation" end="Pause" frame="$parent/DVaTrianglesTopLeftImage" animation="TriangleFade">
-                        <Key type="Animation" time="0" action="reset"/>
-                        <Key type="Animation" time="0" action="Play"/>
-                    </Controller>
-
-                    <Controller type="Visibility" end="Pause" frame="$parent/DVaTrianglesBottomLeftImage">
-                        <Key type="Bool" time="0" value="True"/>
-                    </Controller>
-
-                    <Controller type="Animation" end="Pause" frame="$parent/DVaTrianglesBottomLeftImage" animation="TriangleFade">
-                        <Key type="Animation" time="0" action="reset"/>
-                        <Key type="Animation" time="0" action="Play"/>
-                    </Controller>
-                </Animation> -->
-            <!-- End: MEKAfall Validators -->
-
-            <!-- Start: Mech Death Validators -->
-                <Animation name="DVaMechBreakdownActive">
-                    <Event event="Reset" action="Stop"/>
-                    <Event event="NoState" action="Stop"/>
-                    <Event event="DVaMechBreakdownActive" action="Restart, Play"/>
-
-                    <Controller type="Visibility" end="Pause" frame="$parent/DVaWarningImage">
-                        <Key type="Bool" time="0" value="True"/>
-                    </Controller>
-
-                    <Controller type="Animation" end="Pause" frame="$parent/DVaWarningImage" animation="WarningAnim">
-                        <Key type="Animation" time="0" action="reset"/>
-                        <Key type="Animation" time="0" action="Play"/>
-                    </Controller>
-
-                    <Controller type="Visibility" end="Pause" frame="$parent/DvaBloodHazeTopLeftImage">
-                        <Key type="Bool" time="0" value="True"/>
-                    </Controller>
-
-                    <Controller type="Animation" end="Pause" frame="$parent/DvaBloodHazeTopLeftImage" animation="BloodFlashAnim">
-                        <Key type="Animation" time="0" action="reset"/>
-                        <Key type="Animation" time="0" action="Play"/>
-                    </Controller>
-
-                    <Controller type="Visibility" end="Pause" frame="$parent/DvaBloodHazeTopRightImage">
-                        <Key type="Bool" time="0" value="True"/>
-                    </Controller>
-
-                    <Controller type="Animation" end="Pause" frame="$parent/DvaBloodHazeTopRightImage" animation="BloodFlashAnim">
-                        <Key type="Animation" time="0" action="reset"/>
-                        <Key type="Animation" time="0" action="Play"/>
-                    </Controller>
-
-                    <Controller type="Visibility" end="Pause" frame="$parent/DvaBloodHazeBottomRightImage">
-                        <Key type="Bool" time="0" value="True"/>
-                    </Controller>
-
-                    <Controller type="Animation" end="Pause" frame="$parent/DvaBloodHazeBottomRightImage" animation="BloodFlashAnim">
-                        <Key type="Animation" time="0" action="reset"/>
-                        <Key type="Animation" time="0" action="Play"/>
-                    </Controller>
-
-                    <Controller type="Visibility" end="Pause" frame="$parent/DvaBloodHazeBottomLeftImage">
-                        <Key type="Bool" time="0" value="True"/>
-                    </Controller>
-
-                    <Controller type="Animation" end="Pause" frame="$parent/DvaBloodHazeBottomLeftImage" animation="BloodFlashAnim">
-                        <Key type="Animation" time="0" action="reset"/>
-                        <Key type="Animation" time="0" action="Play"/>
-                    </Controller>
-
-                    <!-- <Controller type="Visibility" end="Pause" frame="$parent/BlackFadeImage">
-                        <Key type="Bool" time="0" value="True"/>
-                    </Controller> -->
-
-                    <!-- <Controller type="Animation" end="Pause" frame="$parent/BlackFadeImage" animation="BlackOutAnim">
-                        <Key type="Animation" time="0" action="reset"/>
-                        <Key type="Animation" time="0" action="Play"/>
-                    </Controller> -->
-                </Animation>
-            <!-- End: Mech Death Validators -->
-            </Frame>
-
-        <!-- Start: Call Mech/MEKAfall Images -->
-            <!-- <Frame type="Image" name="DVaVerticalLeftImage">
-                <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
-                <Anchor side="Right" relative="$parent" pos="Mid" offset="-50"/>
-                <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
-                <Anchor side="Left" relative="$parent" pos="Mid" offset="-50"/>
-                <BlendMode val="Normal"/>
-                <Visible val="False"/>
-                <Alpha val="0"/>
-                <Texture val="@UI/storm_ui_DVa_call_mech_line_verticul"/>
-
-                <Animation name="VerticleLeftAnim">
-                    <Event event="OnShown" action="Pause"/>
-                    <Event event="VerticleLeftAnim" action="Restart, Play"/>
-                    <Controller type="Fade" end="Pause">
-                        <Key type="Curve" time="0" value="0" inout="Linear"/>
-                        <Key type="Curve" time=".2" value="0" inout="Linear"/>
-                        <Key type="Curve" time=".3" value="127" inout="Linear"/>
-                        <Key type="Curve" time=".4" value="255" inout="Linear"/>
-                        <Key type="Curve" time=".5" value="255" inout="Linear"/>
-                    </Controller>
-
-                    <Controller type="Anchor" end="Pause" side="Left" relative="true">
-                        <Key type="Curve" time="0" value="0" inout="Linear"/>
-                        <Key type="Curve" time=".3" value="0" inout="Linear"/>
-                        <Key type="Curve" time=".5" value="-1000" inout="Linear"/>
-                    </Controller>
-
-                    <Controller type="Anchor" end="Pause" side="Right" relative="true">
-                        <Key type="Curve" time="0" value="0" inout="Linear"/>
-                        <Key type="Curve" time=".3" value="0" inout="Linear"/>
-                        <Key type="Curve" time=".5" value="-1000" inout="Linear"/>
-                    </Controller>
-                </Animation>
-            </Frame>
-
-            <Frame type="Image" name="DVaVerticalRightImage">
-                <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
-                <Anchor side="Right" relative="$parent" pos="Mid" offset="50"/>
-                <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
-                <Anchor side="Left" relative="$parent" pos="Mid" offset="50"/>
-                <TextureCoords top="0" left="1" bottom="1" right="0"/>
-                <BlendMode val="Normal"/>
-                <Visible val="False"/>
-                <Alpha val="0"/>
-                <Texture val="@UI/storm_ui_DVa_call_mech_line_verticul"/>
-
-                <Animation name="VerticleRightAnim">
-                    <Event event="VerticleRightAnim" action="Restart, Play"/>
-                     <Controller type="Fade" end="Pause">
-                        <Key type="Curve" time="0" value="0" inout="Linear"/>
-                        <Key type="Curve" time=".2" value="0" inout="Linear"/>
-                        <Key type="Curve" time=".3" value="127" inout="Linear"/>
-                        <Key type="Curve" time=".4" value="255" inout="Linear"/>
-                        <Key type="Curve" time=".5" value="255" inout="Linear"/>
-                    </Controller>
-
-                    <Controller type="Anchor" end="Pause" side="Left" relative="true">
-                        <Key type="Curve" time="0" value="0" inout="Linear"/>
-                        <Key type="Curve" time=".3" value="0" inout="Linear"/>
-                        <Key type="Curve" time=".5" value="1000" inout="Linear"/>
-                    </Controller>
-
-                    <Controller type="Anchor" end="Pause" side="Right" relative="true">
-                        <Key type="Curve" time="0" value="0" inout="Linear"/>
-                        <Key type="Curve" time=".3" value="0" inout="Linear"/>
-                        <Key type="Curve" time=".5" value="1000" inout="Linear"/>
-                    </Controller>
-                </Animation>
-            </Frame>
-
-            <Frame type="Image" name="DVaHorizontalImage">
-                <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
-                <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
-                <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
-                <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
-                <BlendMode val="Normal"/>
-                <Visible val="False"/>
-                <Alpha val="0"/>
-                <Texture val="@UI/storm_ui_DVa_call_mech_line_horizontal"/>
-
-                <Animation name="HorizontalCenterAnim">
-                    <Event event="HorizontalCenterAnim" action="Restart, Play"/>
-                     <Controller type="Fade" end="Pause">
-                        <Key type="Curve" time="0" value="0" inout="Linear"/>
-                        <Key type="Curve" time=".08" value="127" inout="Linear"/>
-                        <Key type="Curve" time=".11" value="255" inout="Linear"/>
-                        <Key type="Curve" time=".17" value="0" inout="Linear"/>
-                    </Controller>
-
-                    <Controller type="Dimension" dimension="Width" relative="False" percentage="True" end="Pause">
-                        <Key type="Curve" time="0" value="50" inout="Linear"/>
-                        <Key type="Curve" time=".08" value="50" inout="Linear"/>
-                        <Key type="Curve" time=".11" value="75" inout="Linear"/>
-                        <Key type="Curve" time=".17" value="100" inout="Linear"/>
-                    </Controller>
-
-                    <Controller type="Dimension" dimension="Height" relative="False" percentage="True" end="Pause">
-                        <Key type="Curve" time="0" value="50" inout="Linear"/>
-                        <Key type="Curve" time=".08" value="50" inout="Linear"/>
-                        <Key type="Curve" time=".11" value="75" inout="Linear"/>
-                        <Key type="Curve" time=".17" value="100" inout="Linear"/>
-                    </Controller>
-                </Animation>
-            </Frame>
-
-            <Frame type="Image" name="DVaHorizontalImageLeft">
-                <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
-                <Anchor side="Right" relative="$parent" pos="Mid" offset="100"/>
-                <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
-                <Anchor side="Left" relative="$parent" pos="Min" offset="-100"/>
-                <BlendMode val="Normal"/>
-                <Visible val="False"/>
-                <Alpha val="0"/>
-                <Texture val="@UI/storm_ui_DVa_call_mech_line_horizontal"/>
-
-                <Animation name="HorizontalLeftAnim">
-                    <Event event="HorizontalLeftAnim" action="Restart, Play"/>
-                    <Controller type="Fade" end="Pause">
-                        <Key type="Curve" time="0" value="0" inout="Linear"/>
-                        <Key type="Curve" time=".2" value="0" inout="Linear"/>
-                        <Key type="Curve" time=".3" value="127" inout="Linear"/>
-                        <Key type="Curve" time=".4" value="255" inout="Linear"/>
-                        <Key type="Curve" time=".5" value="0" inout="Linear"/>
-                    </Controller>
-
-                    <Controller type="Anchor" end="Pause" side="Right" relative="True">
-                        <Key type="Curve" time="0" value="0" inout="Linear"/>
-                        <Key type="Curve" time=".3" value="0" inout="Linear"/>
-                        <Key type="Curve" time=".5" value="-1000" inout="Linear"/>
-                    </Controller>
-
-                    <Controller type="Anchor" end="Pause" side="Left" relative="True">
-                        <Key type="Curve" time="0" value="0" inout="Linear"/>
-                        <Key type="Curve" time=".3" value="0" inout="Linear"/>
-                        <Key type="Curve" time=".5" value="-1000" inout="Linear"/>
-                    </Controller>
-                </Animation>
-            </Frame>
-
-            <Frame type="Image" name="DVaHorizontalImageRight">
-                <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
-                <Anchor side="Right" relative="$parent" pos="Max" offset="100"/>
-                <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
-                <Anchor side="Left" relative="$parent" pos="Mid" offset="-100"/>
-                <BlendMode val="Normal"/>
-                <Visible val="False"/>
-                <Alpha val="0"/>
-                <Texture val="@UI/storm_ui_DVa_call_mech_line_horizontal"/>
-
-                <Animation name="HorizontalRightAnim">
-                    <Event event="HorizontalRightAnim" action="Restart, Play"/>
-                    <Controller type="Fade" end="Pause">
-                        <Key type="Curve" time="0" value="0" inout="Linear"/>
-                        <Key type="Curve" time=".2" value="0" inout="Linear"/>
-                        <Key type="Curve" time=".3" value="127" inout="Linear"/>
-                        <Key type="Curve" time=".4" value="255" inout="Linear"/>
-                        <Key type="Curve" time=".5" value="0" inout="Linear"/>
-                    </Controller>
-
-                    <Controller type="Anchor" end="Pause" side="Right" relative="True">
-                        <Key type="Curve" time="0" value="0" inout="Linear"/>
-                        <Key type="Curve" time=".3" value="0" inout="Linear"/>
-                        <Key type="Curve" time=".5" value="1000" inout="Linear"/>
-                    </Controller>
-
-                    <Controller type="Anchor" end="Pause" side="Left" relative="True">
-                        <Key type="Curve" time="0" value="0" inout="Linear"/>
-                        <Key type="Curve" time=".3" value="0" inout="Linear"/>
-                        <Key type="Curve" time=".5" value="1000" inout="Linear"/>
-                    </Controller>
-                </Animation>
-            </Frame>
-
-            <Frame type="Image" name="DVaBunnyImage">
-                <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
-                <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
-                <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
-                <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
-                <BlendMode val="Normal"/>
-                <Visible val="False"/>
-                <Alpha val="0"/>
-                <Texture val="@UI/storm_ui_DVa_icon_call_mech"/>
-
-                <Animation name="BunnyAnim">
-                    <Event event="BunnyAnim" action="Restart, Play"/>
-                    <Controller type="Fade" end="Pause">
-                        <Key type="Curve" time="0" value="0" inout="Linear"/>
-                        <Key type="Curve" time=".05" value="153" inout="Linear"/>
-                        <Key type="Curve" time=".08" value="255" inout="Linear"/>
-                        
-                        <Key type="Curve" time=".49" value="255" inout="Linear"/>
-                        <Key type="Curve" time=".50" value="0" inout="Linear"/>
-                        <Key type="Curve" time=".53" value="0" inout="Linear"/>
-                        <Key type="Curve" time=".54" value="255" inout="Linear"/>
-                        
-                        <Key type="Curve" time=".65" value="255" inout="Linear"/>
-                        <Key type="Curve" time=".66" value="0" inout="Linear"/>
-                        <Key type="Curve" time=".69" value="0" inout="Linear"/>
-                        <Key type="Curve" time=".70" value="255" inout="Linear"/>
-                        
-                        <Key type="Curve" time=".80" value="255" inout="Linear"/>
-                        <Key type="Curve" time=".81" value="0" inout="Linear"/>
-                        <Key type="Curve" time=".84" value="0" inout="Linear"/>
-                        <Key type="Curve" time=".85" value="255" inout="Linear"/>
-
-                        <Key type="Curve" time=".97" value="255" inout="Linear"/>
-                        <Key type="Curve" time=".98" value="0" inout="Linear"/>
-                        <Key type="Curve" time=".99" value="0" inout="Linear"/>
-                        <Key type="Curve" time="1" value="255" inout="Linear"/>
-                    </Controller>
-                </Animation>
-
-                <Animation name="BunnyAnimAlt">
-                    <Event event="BunnyAnimAlt" action="Restart, Play"/>
-                    <Controller type="Fade" end="Pause">
-                        <Key type="Curve" time="0" value="0" inout="Linear"/>
-                        <Key type="Curve" time=".05" value="153" inout="Linear"/>
-                        <Key type="Curve" time=".08" value="255" inout="Linear"/>
-                        
-                        <Key type="Curve" time=".39" value="255" inout="Linear"/>
-                        <Key type="Curve" time=".40" value="0" inout="Linear"/>
-                        <Key type="Curve" time=".43" value="0" inout="Linear"/>
-                        <Key type="Curve" time=".44" value="255" inout="Linear"/>
-                        
-                        <Key type="Curve" time=".52" value="255" inout="Linear"/>
-                        <Key type="Curve" time=".53" value="0" inout="Linear"/>
-                        <Key type="Curve" time=".55" value="0" inout="Linear"/>
-                        <Key type="Curve" time=".56" value="255" inout="Linear"/>
-                        
-                        <Key type="Curve" time=".64" value="255" inout="Linear"/>
-                        <Key type="Curve" time=".65" value="0" inout="Linear"/>
-                        <Key type="Curve" time=".67" value="0" inout="Linear"/>
-                        <Key type="Curve" time=".68" value="255" inout="Linear"/>
-
-                        <Key type="Curve" time=".77" value="255" inout="Linear"/>
-                        <Key type="Curve" time=".78" value="0" inout="Linear"/>
-                        <Key type="Curve" time=".79" value="0" inout="Linear"/>
-                        <Key type="Curve" time=".8" value="255" inout="Linear"/>
-                    </Controller>
-                </Animation>
-            </Frame>
-
-            <Frame type="Image" name="DVaTrianglesTopRightImage" template="Dva/DVaTriangleTemplatetImage">
-                <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
-                <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
-            </Frame>
-
-            <Frame type="Image" name="DVaTrianglesBottomRightImage" template="Dva/DVaTriangleTemplatetImage">
-                <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
-                <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
-                <Anchor side="Top" relative="$this" pos="Max" offset="0"/>
-                <TextureCoords top="1" left="0" bottom="0" right="1"/>
-            </Frame>
- 
-            <Frame type="Image" name="DVaTrianglesTopLeftImage" template="Dva/DVaTriangleTemplatetImage">
-                <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
-                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
-                <Anchor side="Right" relative="$this" pos="Min" offset="0"/>
-                <TextureCoords top="0" left="1" bottom="1" right="0"/>
-            </Frame>
-
-            <Frame type="Image" name="DVaTrianglesBottomLeftImage" template="Dva/DVaTriangleTemplatetImage">
-                <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
-                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
-                <Anchor side="Top" relative="$this" pos="Max" offset="0"/>
-                <Anchor side="Right" relative="$this" pos="Min" offset="0"/>
-                <TextureCoords top="1" left="1" bottom="0" right="0"/>
-            </Frame> -->
-        <!-- End: Call Mech/MEKAfall Images -->
-
-        <!-- Start: Mech Death Images -->
-            <Frame type="Image" name="DVaWarningImage">
-                <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
-                <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
-                <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
-                <Anchor side="Bottom" relative="$parent" pos="MId" offset="0"/>
-                <ColorAdjustMode val="Fill"/>
-                <AdjustmentColor val="e70000"/>
-                <BlendMode val="Normal"/>
-                <RenderType val="LDR"/>
-                <Visible val="False"/>
-                <Texture val="@UI/storm_ui_DVa_icon_ejecting"/>
-                <Alpha val="0"/>
-                <RenderPriority val="600"/>
-
-                <Animation name="WarningAnim">
-                    <Event event="WarningAnim" action="Restart, Play"/>
-                    <Controller type="Fade" end="Pause">
-                        <Key type="Curve" time="0" value="255" inout="Linear"/>
-                        <Key type="Curve" time=".1" value="255" inout="Linear"/>
-                        <Key type="Curve" time=".2" value="100" inout="Linear"/>
-                        <Key type="Curve" time=".4" value="255" inout="Linear"/>
-                        <Key type="Curve" time=".5" value="255" inout="Linear"/>
-                        <Key type="Curve" time=".7" value="100" inout="Linear"/>
-                    </Controller>
-                    <Controller type="AdjustmentColor" end="pause">
-                        <Key type="Curve" time="0" value="e70000" inout="Linear"/>
-                        <Key type="Curve" time=".3" value="7a0203" inout="Linear"/>
-                        <Key type="Curve" time=".4" value="e70000" inout="Linear,Slow"/>
-                        <Key type="Curve" time=".5" value="e70000" inout="Linear,Slow"/>
-                        <Key type="Curve" time=".7" value="7a0203" inout="Linear"/>
-                    </Controller>
-                </Animation>
-            </Frame>
-
-            <Frame type="Image" name="DvaBloodHazeTopLeftImage" template="Dva/DvaBloodHazeImageTemplate">
-                <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
-                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
-            </Frame>
-
-            <Frame type="Image" name="DvaBloodHazeTopRightImage" template="Dva/DvaBloodHazeImageTemplate">
-                <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
-                <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
-                <TextureCoords top="0" left="1" bottom="1" right="0"/>
-            </Frame>
-
-            <Frame type="Image" name="DvaBloodHazeBottomRightImage" template="Dva/DvaBloodHazeImageTemplate">
-                <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
-                <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
-                <TextureCoords top="1" left="1" bottom="0" right="0"/>
-            </Frame>
-
-            <Frame type="Image" name="DvaBloodHazeBottomLeftImage" template="Dva/DvaBloodHazeImageTemplate">
-                <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
-                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
-                <TextureCoords top="1" left="0" bottom="0" right="1"/>
-            </Frame>
-
-            <!-- <Frame type="Image" name="BlackFadeImage">
-                <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
-                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
-                <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
-                <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
-                <ColorAdjustMode val="Fill"/>
-                <AdjustmentColor val="000000"/>
-                <BlendMode val="Normal"/>
-                <RenderType val="HDR"/>
-                <Visible val="False"/>
-                <Texture val="@UI/StormTempWhite"/>
-                <Alpha val="0"/>
-                <RenderPriority val="400"/>
-
-                <Animation name="BlackOutAnim">
-                    <Event event="BlackOutAnim" action="Restart, Play"/>
-                    <Controller type="Fade" end="Pause">
-                        <Key type="Curve" time="0" value="0" inout="Linear"/>
-                        <Key type="Curve" time=".5" value="0" inout="Linear"/>
-                        <Key type="Curve" time=".6" value="170" inout="Linear"/>
-                        <Key type="Curve" time=".65" value="200" inout="Linear"/>
-                        <Key type="Curve" time=".7" value="255" inout="Linear"/>
-                        <Key type="Curve" time=".75" value="100" inout="Linear"/>
-                    </Controller>
-                </Animation>
-            </Frame> -->
-        <!-- End: Mech Death Images -->
-
+      </Frame>
+      <Frame type="UnitStatusShieldedHealthBar" name="HealthBar">
+        <Visible val="True" />
+      </Frame>
+      <Frame type="UnitStatusTalentAvailableIndicator" name="TalentAvailableIndicator">
+        <Frame type="Image" name="TalentAvailableBg">
+          <Visible val="True" />
         </Frame>
-    </Frame>
-
-<!-- End: Enter and Exit Mech UI -->
-
-    <Frame type="SelectionUnitStatusPanel" name="DVaMechDefenceMatrixFrame">
-        <Anchor relative="$parent"/>
-        <AcceptsMouse val="false"/>
-        <SpecificUnit val="HeroDVaMech"/>
-
-        <Frame type="UnitStatusFrame" name="UnitStatusFrame0">
-            <Anchor relative="$parent"/>
-
-<!-- Start: Animations for the Defense Matrix during pre and cast -->
-
-            <Frame type="UnitStatusValidatorAnimElement" name="DefenseMatrixAnims">
-                <Anchor relative="$parent"/>
-                <Validator val="DVaMechDefenseMatrixCasterPreChannelling"/>
-                <Validator val="DVaMechDefenseMatrixDummyCombine"/>
-
-                <Animation name="DVaMechDefenseMatrixCasterPreChannelling">
-                    <Event event="Reset" action="Stop"/>
-                    <Event event="NoState" action="Stop"/>
-                    <Event event="DVaMechDefenseMatrixCasterPreChannelling" action="Restart, Play"/>
-
-                    <Controller type="Fade" end="Pause" frame="$parent/DVaFrameImage3">
-                        <Key type="Curve" time="0" value="255" inout="Linear"/>
-                    </Controller>
-
-                    <Controller type="Fade" end="Pause" frame="$parent/DVaFrameImage2">
-                        <Key type="Curve" time="0" value="0" inout="Linear"/>
-                        <Key type="Curve" time=".0625" value="0" inout="Linear"/>
-                        <Key type="Curve" time=".0625" value="255" inout="Linear"/>
-                    </Controller>
-                </Animation>
-
-                <Animation name="DVaMechDefenseMatrixDummyCombine">
-                    <Event event="Reset" action="Stop"/>
-                    <Event event="NoState" action="Stop"/>
-                    <Event event="DVaMechDefenseMatrixDummyCombine" action="Restart, Play"/>
-
-                    <Controller type="Fade" end="Pause" frame="$parent/DefenseMatrixAbsorbedValueLabel">
-                        <Key type="Curve" time="0" value="100" inout="Linear"/>
-                        <Key type="Curve" time=".125" value="200" inout="Linear"/>
-                    </Controller>
-
-                    <Controller type="Fade" end="Pause" frame="$parent/DVaFrameImage3">
-                        <Key type="Curve" time="0" value="100" inout="Linear"/>
-                        <Key type="Curve" time=".125" value="80" inout="Linear"/>
-                    </Controller>
-
-                    <Controller type="Fade" end="Pause" frame="$parent/DVaFrameImage2">
-                        <Key type="Curve" time="0" value="100" inout="Linear"/>
-                        <Key type="Curve" time=".125" value="80" inout="Linear"/>
-                    </Controller>
-
-                    <Controller type="Fade" end="Pause" frame="$parent/DVaFrameImage1">
-                        <Key type="Curve" time="0" value="200" inout="Linear"/>
-                    </Controller>
-
-                    <Controller type="Fade" end="Pause" frame="$parent/DVaFrameSideGaugeImage">
-                        <Key type="Curve" time="0" value="200" inout="Linear"/>
-                    </Controller>
-                </Animation>
-
-            </Frame>
-
-<!-- End: Animations for the Defense Matrix during pre and cast -->
-
-<!-- Start: Animations for the Defense Matrix when it expires -->
-
-            <Frame type="UnitStatusValidatorAnimElement" name="DefenseMatrixAnims2">
-                <Anchor relative="$parent"/>
-                <Validator val="DVaMechDefenseMatrixDummyFinal"/>
-
-                <Animation name="DVaMechDefenseMatrixDummyFinal">
-                    <Event event="Reset" action="Stop"/>
-                    <Event event="NoState" action="Stop"/>
-                    <Event event="DVaMechDefenseMatrixDummyFinal" action="Restart, Play"/>
-
-                    <Controller type="Style" end="Pause" style1="DefenseMatrixTracker" style2="DefenseMatrixTrackerPop" frame="$parent/DefenseMatrixAbsorbedValueLabel">
-                        <Key type="Curve" time="0" value="0"/>
-                        <Key type="Curve" time=".04" value="1"/>
-                        <Key type="Curve" time=".08" value="0"/>
-                    </Controller>
-
-                    <Controller type="Fade" end="Pause" frame="$parent/DVaFrameSideGaugeImage">
-                        <Key type="Curve" time="0" value="100" inout="Linear"/>
-                    </Controller>
-
-                    <Controller type="Fade" end="Pause" frame="$parent/DefenseMatrixAbsorbedValueLabel">
-                        <Key type="Curve" time="0" value="200" inout="Linear"/>
-                        <Key type="Curve" time=".08" value="100" inout="Linear"/>
-                    </Controller>
-
-                    <Controller type="Fade" end="Pause" frame="$parent/DVaFrameImage1">
-                        <Key type="Curve" time="0" value="153" inout="Linear"/>
-                        <Key type="Curve" time=".02" value="153" inout="Linear"/>
-                        <Key type="Curve" time=".03" value="153" inout="Linear"/>
-                        <Key type="Curve" time=".04" value="153" inout="Linear"/>
-                        <Key type="Curve" time=".05" value="114" inout="Linear"/>
-                        <Key type="Curve" time=".06" value="114" inout="Linear"/>
-                        <Key type="Curve" time=".07" value="76.5" inout="Linear"/>
-                        <Key type="Curve" time=".08" value="76.5" inout="Linear"/>
-                        <Key type="Curve" time=".09" value="153" inout="Linear"/>
-                    </Controller>
-
-                    <Controller type="Anchor" end="Pause" side="Top" relative="true" frame="$parent/DVaFrameImage1">
-                        <Key type="Curve" time="0" value="0" inout="Linear"/>
-                        <Key type="Curve" time=".02" value="10" inout="Linear"/>
-                        <Key type="Curve" time=".03" value="10" inout="Linear"/>
-                        <Key type="Curve" time=".04" value="0" inout="Linear"/>
-                        <Key type="Curve" time=".05" value="0" inout="Linear"/>
-                        <Key type="Curve" time=".06" value="0" inout="Linear"/>
-                        <Key type="Curve" time=".07" value="0" inout="Linear"/>
-                        <Key type="Curve" time=".08" value="0" inout="Linear"/>
-                    </Controller>
-
-                    <Controller type="Anchor" end="Pause" side="Left" relative="true" frame="$parent/DVaFrameImage1">
-                        <Key type="Curve" time="0" value="0" inout="Linear"/>
-                        <Key type="Curve" time=".02" value="0" inout="Linear"/>
-                        <Key type="Curve" time=".03" value="0" inout="Linear"/>
-                        <Key type="Curve" time=".04" value="0" inout="Linear"/>
-                        <Key type="Curve" time=".05" value="10" inout="Linear"/>
-                        <Key type="Curve" time=".06" value="10" inout="Linear"/>
-                        <Key type="Curve" time=".07" value="0" inout="Linear"/>
-                        <Key type="Curve" time=".08" value="0" inout="Linear"/>
-                    </Controller>
-
-                    <Controller type="Fade" end="Pause" frame="$parent/DVaFrameImage4">
-                        <Key type="Curve" time="0" value="76" inout="Linear"/>
-                        <Key type="Curve" time=".02" value="76" inout="Linear"/>
-                        <Key type="Curve" time=".03" value="76" inout="Linear"/>
-                        <Key type="Curve" time=".04" value="45" inout="Linear"/>
-                        <Key type="Curve" time=".05" value="45" inout="Linear"/>
-                        <Key type="Curve" time=".06" value="15" inout="Linear"/>
-                        <Key type="Curve" time=".07" value="15" inout="Linear"/>
-                        <Key type="Curve" time=".08" value="0" inout="Linear"/>
-                    </Controller>
-
-                    <Controller type="Dimension" dimension="Width" relative="False" percentage="True" end="Pause" frame="$parent/DVaFrameImage4">
-                        <Key type="Curve" time="0" value="100" inout="Linear"/>
-                        <Key type="Curve" time=".02" value="100" inout="Linear"/>
-                        <Key type="Curve" time=".04" value="120" inout="Linear"/>
-                        <Key type="Curve" time=".06" value="140" inout="Linear"/>
-                        <Key type="Curve" time=".08" value="150" inout="Linear"/>
-                    </Controller>
-
-                    <Controller type="Dimension" dimension="Height" relative="False" percentage="True" end="Pause" frame="$parent/DVaFrameImage4">
-                        <Key type="Curve" time="0" value="100" inout="Linear"/>
-                        <Key type="Curve" time=".02" value="100" inout="Linear"/>
-                        <Key type="Curve" time=".04" value="120" inout="Linear"/>
-                        <Key type="Curve" time=".06" value="140" inout="Linear"/>
-                        <Key type="Curve" time=".08" value="150" inout="Linear"/>
-                    </Controller>
-
-                    <Controller type="Fade" end="Pause" frame="$parent/DVaFrameImage3">
-                        <Key type="Curve" time="0" value="25" inout="Linear"/>
-                        <Key type="Curve" time=".02" value="25" inout="Linear"/>
-                        <Key type="Curve" time=".03" value="25" inout="Linear"/>
-                        <Key type="Curve" time=".04" value="25" inout="Linear"/>
-                        <Key type="Curve" time=".05" value="12" inout="Linear"/>
-                        <Key type="Curve" time=".06" value="12" inout="Linear"/>
-                        <Key type="Curve" time=".07" value="0" inout="Linear"/>
-                        <Key type="Curve" time=".08" value="0" inout="Linear"/>
-                    </Controller>
-
-                    <Controller type="Anchor" end="Pause" side="Top" relative="true" frame="$parent/DVaFrameImage3">
-                        <Key type="Curve" time="0" value="0" inout="Linear"/>
-                        <Key type="Curve" time=".02" value="10" inout="Linear"/>
-                        <Key type="Curve" time=".03" value="10" inout="Linear"/>
-                        <Key type="Curve" time=".04" value="-4" inout="Linear"/>
-                        <Key type="Curve" time=".05" value="-4" inout="Linear"/>
-                        <Key type="Curve" time=".06" value="-7" inout="Linear"/>
-                        <Key type="Curve" time=".07" value="-7" inout="Linear"/>
-                        <Key type="Curve" time=".08" value="0" inout="Linear"/>
-                    </Controller>
-
-                    <Controller type="Anchor" end="Pause" side="Bottom" relative="true" frame="$parent/DVaFrameImage3">
-                        <Key type="Curve" time="0" value="0" inout="Linear"/>
-                        <Key type="Curve" time=".02" value="10" inout="Linear"/>
-                        <Key type="Curve" time=".03" value="10" inout="Linear"/>
-                        <Key type="Curve" time=".04" value="-4" inout="Linear"/>
-                        <Key type="Curve" time=".05" value="-4" inout="Linear"/>
-                        <Key type="Curve" time=".06" value="-7" inout="Linear"/>
-                        <Key type="Curve" time=".07" value="-7" inout="Linear"/>
-                        <Key type="Curve" time=".08" value="0" inout="Linear"/>
-                    </Controller>
-
-                    <Controller type="Anchor" end="Pause" side="Left" relative="true" frame="$parent/DVaFrameImage3">
-                        <Key type="Curve" time="0" value="0" inout="Linear"/>
-                        <Key type="Curve" time=".02" value="0" inout="Linear"/>
-                        <Key type="Curve" time=".03" value="6" inout="Linear"/>
-                        <Key type="Curve" time=".04" value="6" inout="Linear"/>
-                        <Key type="Curve" time=".05" value="15" inout="Linear"/>
-                        <Key type="Curve" time=".06" value="15" inout="Linear"/>
-                        <Key type="Curve" time=".07" value="20" inout="Linear"/>
-                        <Key type="Curve" time=".08" value="20" inout="Linear"/>
-                        <Key type="Curve" time=".09" value="0" inout="Linear"/>
-                    </Controller>
-
-                    <Controller type="Anchor" end="Pause" side="Right" relative="true" frame="$parent/DVaFrameImage3">
-                        <Key type="Curve" time="0" value="0" inout="Linear"/>
-                        <Key type="Curve" time=".02" value="0" inout="Linear"/>
-                        <Key type="Curve" time=".03" value="6" inout="Linear"/>
-                        <Key type="Curve" time=".04" value="6" inout="Linear"/>
-                        <Key type="Curve" time=".05" value="15" inout="Linear"/>
-                        <Key type="Curve" time=".06" value="15" inout="Linear"/>
-                        <Key type="Curve" time=".07" value="20" inout="Linear"/>
-                        <Key type="Curve" time=".08" value="20" inout="Linear"/>
-                        <Key type="Curve" time=".09" value="0" inout="Linear"/>
-                    </Controller>
-
-                    <Controller type="Fade" end="Pause" frame="$parent/DVaFrameImage2">
-                        <Key type="Curve" time="0" value="51" inout="Linear"/>
-                        <Key type="Curve" time=".02" value="51" inout="Linear"/>
-                        <Key type="Curve" time=".03" value="40" inout="Linear"/>
-                        <Key type="Curve" time=".04" value="40" inout="Linear"/>
-                        <Key type="Curve" time=".05" value="20" inout="Linear"/>
-                        <Key type="Curve" time=".06" value="20" inout="Linear"/>
-                        <Key type="Curve" time=".07" value="0" inout="Linear"/>
-                        <Key type="Curve" time=".08" value="0" inout="Linear"/>
-                    </Controller>
-
-                    <Controller type="Dimension" dimension="Width" relative="False" percentage="True" end="Pause" frame="$parent/DVaFrameImage2">
-                        <Key type="Curve" time="0" value="100" inout="Linear"/>
-                        <Key type="Curve" time=".02" value="100" inout="Linear"/>
-                        <Key type="Curve" time=".04" value="110" inout="Linear"/>
-                        <Key type="Curve" time=".06" value="130" inout="Linear"/>
-                        <Key type="Curve" time=".08" value="150" inout="Linear"/>
-                        <Key type="Curve" time=".09" value="100" inout="Linear"/>
-                    </Controller>
-
-                    <Controller type="Dimension" dimension="Height" relative="False" percentage="True" end="Pause" frame="$parent/DVaFrameImage2">
-                        <Key type="Curve" time="0" value="100" inout="Linear"/>
-                        <Key type="Curve" time=".02" value="100" inout="Linear"/>
-                        <Key type="Curve" time=".04" value="110" inout="Linear"/>
-                        <Key type="Curve" time=".06" value="130" inout="Linear"/>
-                        <Key type="Curve" time=".08" value="150" inout="Linear"/>
-                        <Key type="Curve" time=".09" value="100" inout="Linear"/>
-                    </Controller>
-                    
-                    <Controller type="Fade" end="Pause" frame="$parent/DVaFrameImage5">
-                        <Key type="Curve" time="0" value="51" inout="Linear"/>
-                        <Key type="Curve" time=".02" value="51" inout="Linear"/>
-                        <Key type="Curve" time=".03" value="51" inout="Linear"/>
-                        <Key type="Curve" time=".04" value="51" inout="Linear"/>
-                        <Key type="Curve" time=".05" value="25" inout="Linear"/>
-                        <Key type="Curve" time=".06" value="25" inout="Linear"/>
-                        <Key type="Curve" time=".07" value="0" inout="Linear"/>
-                        <Key type="Curve" time=".08" value="0" inout="Linear"/>
-                    </Controller>
-
-                    <Controller type="Anchor" end="Pause" side="Left" relative="true" frame="$parent/DVaFrameImage5">
-                        <Key type="Curve" time="0" value="0" inout="Linear"/>
-                        <Key type="Curve" time=".02" value="0" inout="Linear"/>
-                        <Key type="Curve" time=".03" value="6" inout="Linear"/>
-                        <Key type="Curve" time=".04" value="6" inout="Linear"/>
-                        <Key type="Curve" time=".05" value="15" inout="Linear"/>
-                        <Key type="Curve" time=".06" value="15" inout="Linear"/>
-                        <Key type="Curve" time=".07" value="20" inout="Linear"/>
-                        <Key type="Curve" time=".08" value="20" inout="Linear"/>
-                        <Key type="Curve" time=".09" value="0" inout="Linear"/>
-                    </Controller>
-
-                    <Controller type="Anchor" end="Pause" side="Right" relative="true" frame="$parent/DVaFrameImage5">
-                        <Key type="Curve" time="0" value="0" inout="Linear"/>
-                        <Key type="Curve" time=".02" value="0" inout="Linear"/>
-                        <Key type="Curve" time=".03" value="6" inout="Linear"/>
-                        <Key type="Curve" time=".04" value="6" inout="Linear"/>
-                        <Key type="Curve" time=".05" value="15" inout="Linear"/>
-                        <Key type="Curve" time=".06" value="15" inout="Linear"/>
-                        <Key type="Curve" time=".07" value="20" inout="Linear"/>
-                        <Key type="Curve" time=".08" value="20" inout="Linear"/>
-                        <Key type="Curve" time=".09" value="0" inout="Linear"/>
-                    </Controller>
-
-                </Animation>
-            </Frame>
-
-<!-- End: Animations for the Defense Matrix when it expires -->
-
-            <!-- Label that tracks the amound of damage blocked. Number is set through triggers -->
-            <Frame type="Label" name="DefenseMatrixAbsorbedValueLabel">
-                <Anchor side="Top" relative="$parent/DVaFrameImageDummy" pos="Mid" offset="1"/>
-                <Anchor side="Right" relative="$parent/DVaFrameImageDummy" pos="Mid" offset="2"/>
-                <Anchor side="Bottom" relative="$parent/DVaFrameImageDummy" pos="Mid" offset="1"/>
-                <Anchor side="Left" relative="$parent/DVaFrameImageDummy" pos="Mid" offset="2"/>
-                <Alpha val="100"/>
-                <Visible val="True"/>
-                <Height val="45"/>
-                <Style val="DefenseMatrixTracker"/>
-                <Text val="0"/>
-                <RenderPriority val="520"/>
-
-                <Animation name="StyleDefualtAnim">
-                    <Event event="StyleDefualtAnim" action="Restart, Play"/>
-                    <Controller type="Style" end="Pause" style1="DefenseMatrixTracker" style2="DefenseMatrixTrackerPop">
-                        <Key type="Curve" time="0" value="0"/>
-                    </Controller>
-                </Animation>
-
-                <Animation name="StyleIncreaseAnim">
-                    <Event event="StyleIncreaseAnim" action="Restart, Play"/>
-                    <Controller type="Style" end="Pause" style1="DefenseMatrixTracker" style2="DefenseMatrixTrackerPop">
-                        <Key type="Curve" time="0" value="1"/>
-                    </Controller>
-                </Animation>
-
-                <Animation name="StyleGiantIncreaseAnim">
-                    <Event event="StyleGiantIncreaseAnim" action="Restart, Play"/>
-                    <Controller type="Style" end="Pause" style1="DefenseMatrixTrackerPop" style2="DefenseMatrixTrackerGiant">
-                        <Key type="Curve" time="0" value="1"/>
-                    </Controller>
-                </Animation>
-            </Frame>
-
-            <Frame type="Image" name="DVaFrameImageBackground">
-                <Anchor side="Bottom" relative="$parent" pos="Max" offset="-10"/>
-                <Anchor side="Left" relative="$parent" pos="Min" offset="25"/>
-                <Texture val="@UI/storm_ui_DVa_shadow"/>
-                <RenderPriority val="500"/>
-            </Frame>
-
-            <Frame type="Image" name="DVaFrameSideGaugeImage">
-                <Anchor side="Top" relative="$parent/DVaFrameImageBackground" pos="Min" offset="2"/>
-                <Anchor side="Right" relative="$parent/DVaFrameImageBackground" pos="Max" offset="-6"/>
-                <Texture val="@UI/storm_ui_DVa_gauge_bar"/>
-                <Alpha val="100"/>
-                <RenderType val="LDR"/>
-                <RenderPriority val="501"/>
-            </Frame>
-
-            <!-- Dummy Image used as an anchor point for the rest of the images. This was done becasue all of the below images have animations that move them all in seperate directions. So anchorning them to each other would have made animating each one more difficult. -->
-            <Frame type="Image" name="DVaFrameImageDummy">
-                <Anchor side="Top" relative="$parent/DVaFrameImageBackground" pos="Min" offset="5"/>
-                <Anchor side="Left" relative="$parent/DVaFrameImageBackground" pos="Min" offset="3"/>
-                <Texture val="@UI/storm_ui_DVa_frame_a"/>
-                <Alpha val="0"/>
-                <RenderType val="LDR"/>
-                <RenderPriority val="501"/>
-            </Frame>
-
-            <Frame type="Image" name="DVaFrameImage1">
-                <Anchor side="Top" relative="$parent/DVaFrameImageBackground" pos="Min" offset="5"/>
-                <Anchor side="Left" relative="$parent/DVaFrameImageBackground" pos="Min" offset="3"/>
-                <Texture val="@UI/storm_ui_DVa_frame_a"/>
-                <Alpha val="153"/>
-                <RenderType val="LDR"/>
-                <RenderPriority val="501"/>
-            </Frame>
-
-            <Frame type="Image" name="DVaFrameImage4">
-                <Anchor side="Top" relative="$parent/DVaFrameImageBackground" pos="Mid" offset="0"/>
-                <Anchor side="Left" relative="$parent/DVaFrameImageBackground" pos="Mid" offset="-23"/>
-                <Anchor side="Bottom" relative="$parent/DVaFrameImageBackground" pos="Mid" offset="0"/>
-                <Anchor side="Right" relative="$parent/DVaFrameImageBackground" pos="Mid" offset="-23"/>
-                <Texture val="@UI/storm_ui_DVa_frame_a"/>
-                <Alpha val="0"/>
-                <RenderType val="LDR"/>
-                <RenderPriority val="501"/>
-                
-                <Frame type="BehaviorIcon" name="BehaviorTooltipFrame">
-                    <Anchor relative="$parent"/>
-                    <TooltipFrame val="BehaviorIconTooltip"/>
-                    <Behavior val="DVaMechDefenseMatrixChannelling"/>
-                </Frame>
-            </Frame>
-
-            <Frame type="Image" name="DVaFrameImage2">
-                <Anchor side="Top" relative="$parent/DVaFrameImageDummy" pos="Mid" offset="-1"/>
-                <Anchor side="Right" relative="$parent/DVaFrameImageDummy" pos="Mid" offset="0"/>
-                <Anchor side="Bottom" relative="$parent/DVaFrameImageDummy" pos="Mid" offset="-1"/>
-                <Anchor side="Left" relative="$parent/DVaFrameImageDummy" pos="Mid" offset="0"/>
-                <Texture val="@UI/storm_ui_DVa_frame_b"/>
-                <Alpha val="0"/>
-                <RenderType val="LDR"/>
-                <RenderPriority val="502"/>
-            </Frame>
-
-            <Frame type="Image" name="DVaFrameImage5">
-                <Anchor side="Top" relative="$parent/DVaFrameImageDummy" pos="Mid" offset="-1"/>
-                <Anchor side="Right" relative="$parent/DVaFrameImageDummy" pos="Mid" offset="0"/>
-                <Anchor side="Bottom" relative="$parent/DVaFrameImageDummy" pos="Mid" offset="-1"/>
-                <Anchor side="Left" relative="$parent/DVaFrameImageDummy" pos="Mid" offset="0"/>
-                <Texture val="@UI/storm_ui_DVa_frame_b"/>
-                <Alpha val="0"/>
-                <RenderType val="LDR"/>
-                <RenderPriority val="502"/>
-            </Frame>
-
-            <Frame type="Image" name="DVaFrameImage3">
-                <Anchor side="Top" relative="$parent/DVaFrameImageDummy" pos="Min" offset="19"/>
-                <Anchor side="Right" relative="$parent/DVaFrameImageDummy" pos="Max" offset="-27"/>
-                <Anchor side="Bottom" relative="$parent/DVaFrameImageDummy" pos="Max" offset="-19"/>
-                <Anchor side="Left" relative="$parent/DVaFrameImageDummy" pos="Min" offset="27"/>
-                <Texture val="@UI/storm_ui_DVa_frame_b"/>
-                <Alpha val="0"/>
-                <RenderType val="LDR"/>
-                <RenderPriority val="502"/>
-            </Frame>
-
-            <!-- Progress Bar for the Defense Matrix duration -->
-            <Frame type="UnitStatusBehaviorIcon" name="DefenseMatrixIcon">
-                <Anchor side="Top" relative="$parent/DVaFrameSideGaugeImage" pos="Min" offset="0"/>
-                <Anchor side="Bottom" relative="$parent/DVaFrameSideGaugeImage" pos="max" offset="-2"/>
-                <Anchor side="Left" relative="$parent/DVaFrameSideGaugeImage" pos="Min" offset="-4"/>
-                <Anchor side="Right" relative="$parent/DVaFrameSideGaugeImage" pos="Max" offset="-24"/>
-                <Behavior val="DVaMechDefenseMatrixChannelling"/>
-                <RenderPriority val="511"/>
-
-                <Frame type="BehaviorIcon" name="BehaviorIcon">
-                    <Anchor relative="$parent"/>
-
-                    <Frame type="ProgressBar" name="CooldownBar">
-                        <Anchor relative="$parent"/>
-                        <Alpha val="255"/>
-                        <AcceptsMouse val="False"/>
-                        <Visible val="True"/>
-                        <RenderPriority val="502"/>
-
-                        <MinValue val="0"/>
-                        <MaxValue val="1"/>
-                        <Value val="0"/>
-                        <FillInset val="0.0"/>
-                        <Vertical val="True"/>
-                        <UseFillContainer val="false"/>
-
-                        <Frame type="Frame" name="FillImageContainer">
-                            <Anchor relative="$parent"/>
-
-                            <Frame type="Image" name="FillImage">
-                                <Anchor relative="$parent/$parent"/>
-                                <RenderPriority val="514"/>
-                                <Visible val="True"/>
-                                <Alpha val="255"/>
-                                <SubpixelRendering val="true"/>
-
-                                <Texture val="@UI/storm_ui_DVa_gauge_bar_on"/>
-                                <TextureCoords top="0" left="0.5" bottom="0" right="1"/>
-                            </Frame>
-                        </Frame>
-                    </Frame>
-                </Frame>
-            </Frame>
-
+        <Frame type="Label" name="TalentAvailableLabel">
+          <Visible val="True" />
         </Frame>
-    </Frame>
-
-    <!-- This is the frame used for the Self-Destruct Progress button -->
-    <Frame type="SelectionUnitStatusPanel" name="DVaMechCommandCardFrame">
-        <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
-        <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
-        <Height val="80"/>
-        <Width val="80"/>
-        <SpecificUnit val="HeroDVaMech"/>
-        <AcceptsMouse val="False"/>
-
-        <Frame type="UnitStatusFrame" name="UnitStatusFrame0">
-            <Anchor relative="$parent"/>
-            <AcceptsMouse val="False"/>
-
-            <Frame type="UnitStatusValidatorAnimElement" name="VisibilityValidator">
-                <Anchor relative="$parent"/>
-                <Validator val="DVaMechEmergencySh3llActive"/>
-
-                <Animation name="Visibility">
-                    <Event event="NoState" action="Stop"/>
-                    <Event event="DVaMechEmergencySh3llActive" action="Restart,Play"/>
-                    <Controller type="Visibility" end="Pause" frame="$parent">
-                        <Key type="Bool" time="0" value="True"/>
-                    </Controller>
-                    <Controller type="Fade" end="Pause" frame="$parent">
-                        <Key type="Curve" time="0" value="0"/>
-                    </Controller>
-                </Animation>
+      </Frame>
+      <Frame type="Image" name="HealthBlackOverlayIcon">
+        <Anchor side="Top" relative="$parent/$parent" pos="Min" offset="108" />
+        <Anchor side="Left" relative="$parent/$parent" pos="Min" offset="58" />
+        <Width val="138" />
+        <Height val="14" />
+        <ColorAdjustMode val="Fill" />
+        <AdjustmentColor val="000000" />
+        <BlendMode val="Normal" />
+        <Visible val="False" />
+        <Texture val="@UI/StormTempWhite" />
+      </Frame>
+      <Frame type="Image" name="EnergyBlackOverlayIcon">
+        <Anchor side="Top" relative="$parent/HealthBar" pos="Max" offset="2" />
+        <Anchor side="Left" relative="$parent/HealthBar" pos="Min" offset="0" />
+        <Width val="138" />
+        <Height val="4" />
+        <ColorAdjustMode val="Fill" />
+        <AdjustmentColor val="000000" />
+        <BlendMode val="Normal" />
+        <Visible val="False" />
+        <Texture val="@UI/StormTempWhite" />
+      </Frame>
+      <Frame type="UnitStatusColor" name="PrimaryColorFrame">
+        <Anchor relative="$parent" />
+        <ColorStyle val="MinimapTeams" />
+      </Frame>
+      <Frame type="UnitStatusBehaviorIcon" name="SelfDestructIcon">
+        <Anchor side="Top" relative="$parent/EnergyBlackOverlayIcon" pos="Min" offset="0" />
+        <Anchor side="Bottom" relative="$parent/EnergyBlackOverlayIcon" pos="max" offset="0" />
+        <Anchor side="Left" relative="$parent/EnergyBlackOverlayIcon" pos="Min" offset="1" />
+        <Anchor side="Right" relative="$parent/EnergyBlackOverlayIcon" pos="Max" offset="-1" />
+        <Behavior val="DVaMechSelfDestructMechDetonationCountdown" />
+        <RenderPriority val="600" />
+        <Frame type="BehaviorIcon" name="BehaviorIcon">
+          <Anchor relative="$parent" />
+          <Frame type="ProgressBar" name="CooldownBar">
+            <Anchor relative="$parent" />
+            <Alpha val="255" />
+            <AcceptsMouse val="False" />
+            <Visible val="True" />
+            <RenderPriority val="600" />
+            <MinValue val="0" />
+            <MaxValue val="1" />
+            <Value val="0" />
+            <FillInset val="0.0" />
+            <Vertical val="False" />
+            <UseFillContainer val="false" />
+            <Frame type="Frame" name="FillImageContainer">
+              <Anchor relative="$parent" />
+              <Frame type="Image" name="FillImage">
+                <Anchor relative="$parent/$parent" />
+                <RenderPriority val="600" />
+                <Visible val="True" />
+                <Alpha val="255" />
+                <SubpixelRendering val="true" />
+                <Texture val="@UI/StormTempWhite" />
+                <ColorAdjustMode val="Desaturate" />
+                <LightAdjustColor val="{$parent/$parent/$parent/$parent/$parent/PrimaryColorFrame/@Color}" />
+                <DarkAdjustColor val="000000" />
+              </Frame>
             </Frame>
-            
-            
-            <!-- Frame for DVa's (Mech) Self-Destruct charge button animatons -->
-            <Frame type="UnitStatusAbilCharge" name="DVaMechSelfDestructChargeFrame">
-                <Anchor side="Top" relative="$parent" pos="Min" offset="-6"/>
-                <Anchor side="Left" relative="$parent" pos="Min" offset="16"/>
-                <AcceptsMouse val="False"/>
-                <AbilityLink val="DVaMechSelfDestruct"/>
-                <ChargeLink val="Abil/DVaMechSelfDestruct"/>
-                <ChargeLocation val="Player"/>
-                <SendChargesEmptyAnimEvent val="True"/>
-                <SendChargesFullAnimEvent val="True"/>
-                <SendCurrentChangedAnimEvent val="True"/>
-
-                <Frame type="Image" name="DVaMechSelfDestructBackgroundImage">
-                    <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
-                    <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
-                    <Height val="76"/>
-                    <Width val="68"/>
-                    <Texture val="@UI/Storm_UI_HUD_Tracer_Pulse_Bomb_Background"/>
-                    <RenderPriority val="500"/>
-                </Frame>
-
-                <Frame type="ProgressBar" name="ChargeFillProgress">
-                    <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
-                    <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
-                    <AcceptsMouse val="False"/>
-                    <RenderPriority val="512"/>
-                    <Height val="76"/>
-                    <Width val="68"/>
-                    <FillInset val="0.0"/>
-                    <Circular val="True"/>
-                    <CircularStart val="0"/>
-                    <CircularEndOffset val="360"/>
-                    <MinValue val="1"/>
-                    <MaxValue val="100"/>
-                    <Value val="50"/>
-                    
-                    <Frame type="Frame" name="FillImageContainer">
-                        <Anchor relative="$parent"/>
-
-                        <Frame type="Image" name="FillImage">
-                            <Anchor relative="$parent"/>
-                            <Texture val="@UI/Storm_UI_HUD_Tracer_Pulse_Bomb_Fill_Image"/>
-                            <ColorAdjustMode val="Fill"/>
-                            <AdjustmentColor val="FF69B4"/>
-                            <TextureType layer="0" val="Circular"/>
-                        </Frame>
-                    </Frame>
-                </Frame>
-
-                <Frame type="Label" name="ChargesLabel">
-                    <Anchor side="Bottom" relative="$parent/ChargePercentLabel" pos="Max" offset="0"/>
-                    <Anchor side="Right" relative="$parent/ChargePercentLabel" pos="Min" offset="4"/>
-                    <Style val="Storm_HUD_Tracer_Pulse_Bomb_Charge"/>
-                </Frame>
-
-                <Frame type="Label" name="ChargePercentLabel">
-                    <Anchor side="Top" relative="$parent/DVaMechSelfDestructBackgroundImage" pos="Mid" offset="-10"/>
-                    <Anchor side="Right" relative="$parent/DVaMechSelfDestructBackgroundImage" pos="Max" offset="-11"/>
-                    <Text val="%"/>
-                    <Style val="Storm_HUD_Tracer_Pulse_Bomb_Charge_Percent"/>
-                </Frame>
-
-                <Frame type="Image" name="PulseBombReadyPingImage">
-                    <Anchor side="Top" relative="$parent/DVaMechSelfDestructBackgroundImage" pos="Mid" offset="0"/>
-                    <Anchor side="Left" relative="$parent/DVaMechSelfDestructBackgroundImage" pos="Mid" offset="0"/>
-                    <Anchor side="Right" relative="$parent/DVaMechSelfDestructBackgroundImage" pos="Mid" offset="0"/>
-                    <Anchor side="Bottom" relative="$parent/DVaMechSelfDestructBackgroundImage" pos="Mid" offset="0"/>
-                    <BlendMode val="Add"/>
-                    <Visible val="False"/>
-                    <Texture val="@UI/Storm_UI_HeroUI_Greymane_PulseRing"/>
-
-                    <Animation name="ReadyPulseAnim">
-                        <Event event="OnShown" action="Reset, DirectionForward, Play"/>
-
-                        <Controller type="Fade" end="Pause">
-                            <Key type="Curve" time="0" value="255"/>
-                            <Key type="Curve" time=".5" value="0"/>
-                        </Controller>
-                        <Controller type="Dimension" dimension="Height" percentage="True" end="Pause">
-                            <Key type="Curve" time="0" value="50"/>
-                            <Key type="Curve" time=".05" value="50"/>
-                            <Key type="Curve" time=".5" value="170"/>
-                        </Controller>
-                        <Controller type="Dimension" dimension="Width" percentage="True" end="Pause">
-                            <Key type="Curve" time="0" value="50"/>
-                            <Key type="Curve" time=".05" value="50"/>
-                            <Key type="Curve" time=".5" value="170"/>
-                        </Controller>
-                    </Animation>
-                </Frame>
-
-                <Animation name="Show/HideProgressBarAnims">
-                    <Event event="ChargesFull" action="Restart, DirectionForward, Play"/>
-                    <Event event="ChargesEmpty" action="Stop"/>
-                    <Event event="CurrentChanged_1" action="Stop"/>
-
-                    <Controller type="Visibility" end="Pause" frame="DVaMechSelfDestructBackgroundImage">
-                        <Key type="Bool" time="0" value="False"/>
-                    </Controller>
-                    <Controller type="Visibility" end="Pause" frame="ChargeFillProgress/FillImageContainer">
-                        <Key type="Bool" time="0" value="False"/>
-                    </Controller>
-                    <Controller type="Visibility" end="Pause" frame="ChargesLabel">
-                        <Key type="Bool" time="0" value="False"/>
-                    </Controller>
-                    <Controller type="Visibility" end="Pause" Frame="ChargePercentLabel">
-                        <Key type="Bool" time="0" value="False"/>
-                    </Controller>
-                    <Controller type="Visibility" end="Pause" frame="PulseBombReadyPingImage">
-                        <Key type="Bool" time="0" value="True"/>
-                    </Controller>
-                </Animation>
-            </Frame>
+          </Frame>
         </Frame>
+      </Frame>
     </Frame>
-
+  </Frame>
+  <Frame type="Image" name="DVaTriangleTemplatetImage">
+    <Anchor side="Top" relative="$parent" pos="Min" offset="0" />
+    <Anchor side="Right" relative="$parent" pos="Max" offset="0" />
+    <BlendMode val="Normal" />
+    <Visible val="False" />
+    <Texture val="@UI/storm_ui_DVa_bg_triangle" />
+    <Animation name="TriangleFade">
+      <Event event="TriangleFade" action="Restart, Play" />
+      <Controller type="Fade" end="Pause">
+        <Key type="Curve" time="0" value="0" inout="Linear" />
+        <Key type="Curve" time=".3" value="255" inout="Linear" />
+        <Key type="Curve" time=".5" value="0" inout="Linear" />
+      </Controller>
+    </Animation>
+  </Frame>
+  <Frame type="Image" name="DvaBloodHazeImageTemplate">
+    <BlendMode val="Normal" />
+    <RenderType val="HDR" />
+    <Visible val="False" />
+    <Alpha val="0" />
+    <RenderPriority val="500" />
+    <Texture val="@UI/storm_ui_DVa_bg_ejecting" />
+    <Animation name="BloodFlashAnim">
+      <Event event="BloodFlashAnim" action="Restart, Play" />
+      <Controller type="Fade" end="Pause">
+        <Key type="Curve" time="0" value="0" inout="Linear" />
+        <Key type="Curve" time=".1" value="210" inout="Linear" />
+        <Key type="Curve" time=".3" value="180" inout="Linear" />
+        <Key type="Curve" time=".5" value="220" inout="Linear" />
+        <Key type="Curve" time=".6" value="160" inout="Linear" />
+        <Key type="Curve" time=".7" value="255" inout="Linear" />
+        <Key type="Curve" time=".75" value="0" inout="Linear" />
+      </Controller>
+    </Animation>
+  </Frame>
+  <Frame type="SelectionUnitStatusPanel" name="DVaPilotEnterFrame">
+    <Anchor relative="$parent" />
+    <AcceptsMouse val="false" />
+    <RenderType val="LDR" />
+    <RenderPriority val="600" />
+    <Frame type="UnitStatusFrame" name="UnitStatusFrame0">
+      <Anchor relative="$parent" />
+      <Frame type="UnitStatusValidatorAnimElement" name="EnteringMechAnims1">
+        <Anchor relative="$parent" />
+        <Validator val="DVaMechBreakdownActive" />
+        <Animation name="DVaMechBreakdownActive">
+          <Event event="Reset" action="Stop" />
+          <Event event="NoState" action="Stop" />
+          <Event event="DVaMechBreakdownActive" action="Restart, Play" />
+          <Controller type="Visibility" end="Pause" frame="$parent/DVaWarningImage">
+            <Key type="Bool" time="0" value="True" />
+          </Controller>
+          <Controller type="Animation" end="Pause" frame="$parent/DVaWarningImage" animation="WarningAnim">
+            <Key type="Animation" time="0" action="reset" />
+            <Key type="Animation" time="0" action="Play" />
+          </Controller>
+          <Controller type="Visibility" end="Pause" frame="$parent/DvaBloodHazeTopLeftImage">
+            <Key type="Bool" time="0" value="True" />
+          </Controller>
+          <Controller type="Animation" end="Pause" frame="$parent/DvaBloodHazeTopLeftImage" animation="BloodFlashAnim">
+            <Key type="Animation" time="0" action="reset" />
+            <Key type="Animation" time="0" action="Play" />
+          </Controller>
+          <Controller type="Visibility" end="Pause" frame="$parent/DvaBloodHazeTopRightImage">
+            <Key type="Bool" time="0" value="True" />
+          </Controller>
+          <Controller type="Animation" end="Pause" frame="$parent/DvaBloodHazeTopRightImage" animation="BloodFlashAnim">
+            <Key type="Animation" time="0" action="reset" />
+            <Key type="Animation" time="0" action="Play" />
+          </Controller>
+          <Controller type="Visibility" end="Pause" frame="$parent/DvaBloodHazeBottomRightImage">
+            <Key type="Bool" time="0" value="True" />
+          </Controller>
+          <Controller type="Animation" end="Pause" frame="$parent/DvaBloodHazeBottomRightImage" animation="BloodFlashAnim">
+            <Key type="Animation" time="0" action="reset" />
+            <Key type="Animation" time="0" action="Play" />
+          </Controller>
+          <Controller type="Visibility" end="Pause" frame="$parent/DvaBloodHazeBottomLeftImage">
+            <Key type="Bool" time="0" value="True" />
+          </Controller>
+          <Controller type="Animation" end="Pause" frame="$parent/DvaBloodHazeBottomLeftImage" animation="BloodFlashAnim">
+            <Key type="Animation" time="0" action="reset" />
+            <Key type="Animation" time="0" action="Play" />
+          </Controller>
+        </Animation>
+      </Frame>
+      <Frame type="Image" name="DVaWarningImage">
+        <Anchor side="Top" relative="$parent" pos="Mid" offset="0" />
+        <Anchor side="Left" relative="$parent" pos="Mid" offset="0" />
+        <Anchor side="Right" relative="$parent" pos="Mid" offset="0" />
+        <Anchor side="Bottom" relative="$parent" pos="MId" offset="0" />
+        <ColorAdjustMode val="Fill" />
+        <AdjustmentColor val="e70000" />
+        <BlendMode val="Normal" />
+        <RenderType val="LDR" />
+        <Visible val="False" />
+        <Texture val="@UI/storm_ui_DVa_icon_ejecting" />
+        <Alpha val="0" />
+        <RenderPriority val="600" />
+        <Animation name="WarningAnim">
+          <Event event="WarningAnim" action="Restart, Play" />
+          <Controller type="Fade" end="Pause">
+            <Key type="Curve" time="0" value="255" inout="Linear" />
+            <Key type="Curve" time=".1" value="255" inout="Linear" />
+            <Key type="Curve" time=".2" value="100" inout="Linear" />
+            <Key type="Curve" time=".4" value="255" inout="Linear" />
+            <Key type="Curve" time=".5" value="255" inout="Linear" />
+            <Key type="Curve" time=".7" value="100" inout="Linear" />
+          </Controller>
+          <Controller type="AdjustmentColor" end="pause">
+            <Key type="Curve" time="0" value="e70000" inout="Linear" />
+            <Key type="Curve" time=".3" value="7a0203" inout="Linear" />
+            <Key type="Curve" time=".4" value="e70000" inout="Linear,Slow" />
+            <Key type="Curve" time=".5" value="e70000" inout="Linear,Slow" />
+            <Key type="Curve" time=".7" value="7a0203" inout="Linear" />
+          </Controller>
+        </Animation>
+      </Frame>
+      <Frame type="Image" name="DvaBloodHazeTopLeftImage" template="Dva/DvaBloodHazeImageTemplate">
+        <Anchor side="Top" relative="$parent" pos="Min" offset="0" />
+        <Anchor side="Left" relative="$parent" pos="Min" offset="0" />
+      </Frame>
+      <Frame type="Image" name="DvaBloodHazeTopRightImage" template="Dva/DvaBloodHazeImageTemplate">
+        <Anchor side="Top" relative="$parent" pos="Min" offset="0" />
+        <Anchor side="Right" relative="$parent" pos="Max" offset="0" />
+        <TextureCoords top="0" left="1" bottom="1" right="0" />
+      </Frame>
+      <Frame type="Image" name="DvaBloodHazeBottomRightImage" template="Dva/DvaBloodHazeImageTemplate">
+        <Anchor side="Bottom" relative="$parent" pos="Max" offset="0" />
+        <Anchor side="Right" relative="$parent" pos="Max" offset="0" />
+        <TextureCoords top="1" left="1" bottom="0" right="0" />
+      </Frame>
+      <Frame type="Image" name="DvaBloodHazeBottomLeftImage" template="Dva/DvaBloodHazeImageTemplate">
+        <Anchor side="Bottom" relative="$parent" pos="Max" offset="0" />
+        <Anchor side="Left" relative="$parent" pos="Min" offset="0" />
+        <TextureCoords top="1" left="0" bottom="0" right="1" />
+      </Frame>
+    </Frame>
+  </Frame>
+  <Frame type="SelectionUnitStatusPanel" name="DVaMechDefenceMatrixFrame">
+    <Anchor relative="$parent" />
+    <AcceptsMouse val="false" />
+    <SpecificUnit val="HeroDVaMech" />
+    <Frame type="UnitStatusFrame" name="UnitStatusFrame0">
+      <Anchor relative="$parent" />
+      <Frame type="UnitStatusValidatorAnimElement" name="DefenseMatrixAnims">
+        <Anchor relative="$parent" />
+        <Validator val="DVaMechDefenseMatrixCasterPreChannelling" />
+        <Validator val="DVaMechDefenseMatrixDummyCombine" />
+        <Animation name="DVaMechDefenseMatrixCasterPreChannelling">
+          <Event event="Reset" action="Stop" />
+          <Event event="NoState" action="Stop" />
+          <Event event="DVaMechDefenseMatrixCasterPreChannelling" action="Restart, Play" />
+          <Controller type="Fade" end="Pause" frame="$parent/DVaFrameImage3">
+            <Key type="Curve" time="0" value="255" inout="Linear" />
+          </Controller>
+          <Controller type="Fade" end="Pause" frame="$parent/DVaFrameImage2">
+            <Key type="Curve" time="0" value="0" inout="Linear" />
+            <Key type="Curve" time=".0625" value="0" inout="Linear" />
+            <Key type="Curve" time=".0625" value="255" inout="Linear" />
+          </Controller>
+        </Animation>
+        <Animation name="DVaMechDefenseMatrixDummyCombine">
+          <Event event="Reset" action="Stop" />
+          <Event event="NoState" action="Stop" />
+          <Event event="DVaMechDefenseMatrixDummyCombine" action="Restart, Play" />
+          <Controller type="Fade" end="Pause" frame="$parent/DefenseMatrixAbsorbedValueLabel">
+            <Key type="Curve" time="0" value="100" inout="Linear" />
+            <Key type="Curve" time=".125" value="200" inout="Linear" />
+          </Controller>
+          <Controller type="Fade" end="Pause" frame="$parent/DVaFrameImage3">
+            <Key type="Curve" time="0" value="100" inout="Linear" />
+            <Key type="Curve" time=".125" value="80" inout="Linear" />
+          </Controller>
+          <Controller type="Fade" end="Pause" frame="$parent/DVaFrameImage2">
+            <Key type="Curve" time="0" value="100" inout="Linear" />
+            <Key type="Curve" time=".125" value="80" inout="Linear" />
+          </Controller>
+          <Controller type="Fade" end="Pause" frame="$parent/DVaFrameImage1">
+            <Key type="Curve" time="0" value="200" inout="Linear" />
+          </Controller>
+          <Controller type="Fade" end="Pause" frame="$parent/DVaFrameSideGaugeImage">
+            <Key type="Curve" time="0" value="200" inout="Linear" />
+          </Controller>
+        </Animation>
+      </Frame>
+      <Frame type="UnitStatusValidatorAnimElement" name="DefenseMatrixAnims2">
+        <Anchor relative="$parent" />
+        <Validator val="DVaMechDefenseMatrixDummyFinal" />
+        <Animation name="DVaMechDefenseMatrixDummyFinal">
+          <Event event="Reset" action="Stop" />
+          <Event event="NoState" action="Stop" />
+          <Event event="DVaMechDefenseMatrixDummyFinal" action="Restart, Play" />
+          <Controller type="Style" end="Pause" style1="DefenseMatrixTracker" style2="DefenseMatrixTrackerPop" frame="$parent/DefenseMatrixAbsorbedValueLabel">
+            <Key type="Curve" time="0" value="0" />
+            <Key type="Curve" time=".04" value="1" />
+            <Key type="Curve" time=".08" value="0" />
+          </Controller>
+          <Controller type="Fade" end="Pause" frame="$parent/DVaFrameSideGaugeImage">
+            <Key type="Curve" time="0" value="100" inout="Linear" />
+          </Controller>
+          <Controller type="Fade" end="Pause" frame="$parent/DefenseMatrixAbsorbedValueLabel">
+            <Key type="Curve" time="0" value="200" inout="Linear" />
+            <Key type="Curve" time=".08" value="100" inout="Linear" />
+          </Controller>
+          <Controller type="Fade" end="Pause" frame="$parent/DVaFrameImage1">
+            <Key type="Curve" time="0" value="153" inout="Linear" />
+            <Key type="Curve" time=".02" value="153" inout="Linear" />
+            <Key type="Curve" time=".03" value="153" inout="Linear" />
+            <Key type="Curve" time=".04" value="153" inout="Linear" />
+            <Key type="Curve" time=".05" value="114" inout="Linear" />
+            <Key type="Curve" time=".06" value="114" inout="Linear" />
+            <Key type="Curve" time=".07" value="76.5" inout="Linear" />
+            <Key type="Curve" time=".08" value="76.5" inout="Linear" />
+            <Key type="Curve" time=".09" value="153" inout="Linear" />
+          </Controller>
+          <Controller type="Anchor" end="Pause" side="Top" relative="true" frame="$parent/DVaFrameImage1">
+            <Key type="Curve" time="0" value="0" inout="Linear" />
+            <Key type="Curve" time=".02" value="10" inout="Linear" />
+            <Key type="Curve" time=".03" value="10" inout="Linear" />
+            <Key type="Curve" time=".04" value="0" inout="Linear" />
+            <Key type="Curve" time=".05" value="0" inout="Linear" />
+            <Key type="Curve" time=".06" value="0" inout="Linear" />
+            <Key type="Curve" time=".07" value="0" inout="Linear" />
+            <Key type="Curve" time=".08" value="0" inout="Linear" />
+          </Controller>
+          <Controller type="Anchor" end="Pause" side="Left" relative="true" frame="$parent/DVaFrameImage1">
+            <Key type="Curve" time="0" value="0" inout="Linear" />
+            <Key type="Curve" time=".02" value="0" inout="Linear" />
+            <Key type="Curve" time=".03" value="0" inout="Linear" />
+            <Key type="Curve" time=".04" value="0" inout="Linear" />
+            <Key type="Curve" time=".05" value="10" inout="Linear" />
+            <Key type="Curve" time=".06" value="10" inout="Linear" />
+            <Key type="Curve" time=".07" value="0" inout="Linear" />
+            <Key type="Curve" time=".08" value="0" inout="Linear" />
+          </Controller>
+          <Controller type="Fade" end="Pause" frame="$parent/DVaFrameImage4">
+            <Key type="Curve" time="0" value="76" inout="Linear" />
+            <Key type="Curve" time=".02" value="76" inout="Linear" />
+            <Key type="Curve" time=".03" value="76" inout="Linear" />
+            <Key type="Curve" time=".04" value="45" inout="Linear" />
+            <Key type="Curve" time=".05" value="45" inout="Linear" />
+            <Key type="Curve" time=".06" value="15" inout="Linear" />
+            <Key type="Curve" time=".07" value="15" inout="Linear" />
+            <Key type="Curve" time=".08" value="0" inout="Linear" />
+          </Controller>
+          <Controller type="Dimension" dimension="Width" relative="False" percentage="True" end="Pause" frame="$parent/DVaFrameImage4">
+            <Key type="Curve" time="0" value="100" inout="Linear" />
+            <Key type="Curve" time=".02" value="100" inout="Linear" />
+            <Key type="Curve" time=".04" value="120" inout="Linear" />
+            <Key type="Curve" time=".06" value="140" inout="Linear" />
+            <Key type="Curve" time=".08" value="150" inout="Linear" />
+          </Controller>
+          <Controller type="Dimension" dimension="Height" relative="False" percentage="True" end="Pause" frame="$parent/DVaFrameImage4">
+            <Key type="Curve" time="0" value="100" inout="Linear" />
+            <Key type="Curve" time=".02" value="100" inout="Linear" />
+            <Key type="Curve" time=".04" value="120" inout="Linear" />
+            <Key type="Curve" time=".06" value="140" inout="Linear" />
+            <Key type="Curve" time=".08" value="150" inout="Linear" />
+          </Controller>
+          <Controller type="Fade" end="Pause" frame="$parent/DVaFrameImage3">
+            <Key type="Curve" time="0" value="25" inout="Linear" />
+            <Key type="Curve" time=".02" value="25" inout="Linear" />
+            <Key type="Curve" time=".03" value="25" inout="Linear" />
+            <Key type="Curve" time=".04" value="25" inout="Linear" />
+            <Key type="Curve" time=".05" value="12" inout="Linear" />
+            <Key type="Curve" time=".06" value="12" inout="Linear" />
+            <Key type="Curve" time=".07" value="0" inout="Linear" />
+            <Key type="Curve" time=".08" value="0" inout="Linear" />
+          </Controller>
+          <Controller type="Anchor" end="Pause" side="Top" relative="true" frame="$parent/DVaFrameImage3">
+            <Key type="Curve" time="0" value="0" inout="Linear" />
+            <Key type="Curve" time=".02" value="10" inout="Linear" />
+            <Key type="Curve" time=".03" value="10" inout="Linear" />
+            <Key type="Curve" time=".04" value="-4" inout="Linear" />
+            <Key type="Curve" time=".05" value="-4" inout="Linear" />
+            <Key type="Curve" time=".06" value="-7" inout="Linear" />
+            <Key type="Curve" time=".07" value="-7" inout="Linear" />
+            <Key type="Curve" time=".08" value="0" inout="Linear" />
+          </Controller>
+          <Controller type="Anchor" end="Pause" side="Bottom" relative="true" frame="$parent/DVaFrameImage3">
+            <Key type="Curve" time="0" value="0" inout="Linear" />
+            <Key type="Curve" time=".02" value="10" inout="Linear" />
+            <Key type="Curve" time=".03" value="10" inout="Linear" />
+            <Key type="Curve" time=".04" value="-4" inout="Linear" />
+            <Key type="Curve" time=".05" value="-4" inout="Linear" />
+            <Key type="Curve" time=".06" value="-7" inout="Linear" />
+            <Key type="Curve" time=".07" value="-7" inout="Linear" />
+            <Key type="Curve" time=".08" value="0" inout="Linear" />
+          </Controller>
+          <Controller type="Anchor" end="Pause" side="Left" relative="true" frame="$parent/DVaFrameImage3">
+            <Key type="Curve" time="0" value="0" inout="Linear" />
+            <Key type="Curve" time=".02" value="0" inout="Linear" />
+            <Key type="Curve" time=".03" value="6" inout="Linear" />
+            <Key type="Curve" time=".04" value="6" inout="Linear" />
+            <Key type="Curve" time=".05" value="15" inout="Linear" />
+            <Key type="Curve" time=".06" value="15" inout="Linear" />
+            <Key type="Curve" time=".07" value="20" inout="Linear" />
+            <Key type="Curve" time=".08" value="20" inout="Linear" />
+            <Key type="Curve" time=".09" value="0" inout="Linear" />
+          </Controller>
+          <Controller type="Anchor" end="Pause" side="Right" relative="true" frame="$parent/DVaFrameImage3">
+            <Key type="Curve" time="0" value="0" inout="Linear" />
+            <Key type="Curve" time=".02" value="0" inout="Linear" />
+            <Key type="Curve" time=".03" value="6" inout="Linear" />
+            <Key type="Curve" time=".04" value="6" inout="Linear" />
+            <Key type="Curve" time=".05" value="15" inout="Linear" />
+            <Key type="Curve" time=".06" value="15" inout="Linear" />
+            <Key type="Curve" time=".07" value="20" inout="Linear" />
+            <Key type="Curve" time=".08" value="20" inout="Linear" />
+            <Key type="Curve" time=".09" value="0" inout="Linear" />
+          </Controller>
+          <Controller type="Fade" end="Pause" frame="$parent/DVaFrameImage2">
+            <Key type="Curve" time="0" value="51" inout="Linear" />
+            <Key type="Curve" time=".02" value="51" inout="Linear" />
+            <Key type="Curve" time=".03" value="40" inout="Linear" />
+            <Key type="Curve" time=".04" value="40" inout="Linear" />
+            <Key type="Curve" time=".05" value="20" inout="Linear" />
+            <Key type="Curve" time=".06" value="20" inout="Linear" />
+            <Key type="Curve" time=".07" value="0" inout="Linear" />
+            <Key type="Curve" time=".08" value="0" inout="Linear" />
+          </Controller>
+          <Controller type="Dimension" dimension="Width" relative="False" percentage="True" end="Pause" frame="$parent/DVaFrameImage2">
+            <Key type="Curve" time="0" value="100" inout="Linear" />
+            <Key type="Curve" time=".02" value="100" inout="Linear" />
+            <Key type="Curve" time=".04" value="110" inout="Linear" />
+            <Key type="Curve" time=".06" value="130" inout="Linear" />
+            <Key type="Curve" time=".08" value="150" inout="Linear" />
+            <Key type="Curve" time=".09" value="100" inout="Linear" />
+          </Controller>
+          <Controller type="Dimension" dimension="Height" relative="False" percentage="True" end="Pause" frame="$parent/DVaFrameImage2">
+            <Key type="Curve" time="0" value="100" inout="Linear" />
+            <Key type="Curve" time=".02" value="100" inout="Linear" />
+            <Key type="Curve" time=".04" value="110" inout="Linear" />
+            <Key type="Curve" time=".06" value="130" inout="Linear" />
+            <Key type="Curve" time=".08" value="150" inout="Linear" />
+            <Key type="Curve" time=".09" value="100" inout="Linear" />
+          </Controller>
+          <Controller type="Fade" end="Pause" frame="$parent/DVaFrameImage5">
+            <Key type="Curve" time="0" value="51" inout="Linear" />
+            <Key type="Curve" time=".02" value="51" inout="Linear" />
+            <Key type="Curve" time=".03" value="51" inout="Linear" />
+            <Key type="Curve" time=".04" value="51" inout="Linear" />
+            <Key type="Curve" time=".05" value="25" inout="Linear" />
+            <Key type="Curve" time=".06" value="25" inout="Linear" />
+            <Key type="Curve" time=".07" value="0" inout="Linear" />
+            <Key type="Curve" time=".08" value="0" inout="Linear" />
+          </Controller>
+          <Controller type="Anchor" end="Pause" side="Left" relative="true" frame="$parent/DVaFrameImage5">
+            <Key type="Curve" time="0" value="0" inout="Linear" />
+            <Key type="Curve" time=".02" value="0" inout="Linear" />
+            <Key type="Curve" time=".03" value="6" inout="Linear" />
+            <Key type="Curve" time=".04" value="6" inout="Linear" />
+            <Key type="Curve" time=".05" value="15" inout="Linear" />
+            <Key type="Curve" time=".06" value="15" inout="Linear" />
+            <Key type="Curve" time=".07" value="20" inout="Linear" />
+            <Key type="Curve" time=".08" value="20" inout="Linear" />
+            <Key type="Curve" time=".09" value="0" inout="Linear" />
+          </Controller>
+          <Controller type="Anchor" end="Pause" side="Right" relative="true" frame="$parent/DVaFrameImage5">
+            <Key type="Curve" time="0" value="0" inout="Linear" />
+            <Key type="Curve" time=".02" value="0" inout="Linear" />
+            <Key type="Curve" time=".03" value="6" inout="Linear" />
+            <Key type="Curve" time=".04" value="6" inout="Linear" />
+            <Key type="Curve" time=".05" value="15" inout="Linear" />
+            <Key type="Curve" time=".06" value="15" inout="Linear" />
+            <Key type="Curve" time=".07" value="20" inout="Linear" />
+            <Key type="Curve" time=".08" value="20" inout="Linear" />
+            <Key type="Curve" time=".09" value="0" inout="Linear" />
+          </Controller>
+        </Animation>
+      </Frame>
+      <Frame type="Label" name="DefenseMatrixAbsorbedValueLabel">
+        <Anchor side="Top" relative="$parent/DVaFrameImageDummy" pos="Mid" offset="1" />
+        <Anchor side="Right" relative="$parent/DVaFrameImageDummy" pos="Mid" offset="2" />
+        <Anchor side="Bottom" relative="$parent/DVaFrameImageDummy" pos="Mid" offset="1" />
+        <Anchor side="Left" relative="$parent/DVaFrameImageDummy" pos="Mid" offset="2" />
+        <Alpha val="100" />
+        <Visible val="True" />
+        <Height val="45" />
+        <Style val="DefenseMatrixTracker" />
+        <Text val="0" />
+        <RenderPriority val="520" />
+        <Animation name="StyleDefualtAnim">
+          <Event event="StyleDefualtAnim" action="Restart, Play" />
+          <Controller type="Style" end="Pause" style1="DefenseMatrixTracker" style2="DefenseMatrixTrackerPop">
+            <Key type="Curve" time="0" value="0" />
+          </Controller>
+        </Animation>
+        <Animation name="StyleIncreaseAnim">
+          <Event event="StyleIncreaseAnim" action="Restart, Play" />
+          <Controller type="Style" end="Pause" style1="DefenseMatrixTracker" style2="DefenseMatrixTrackerPop">
+            <Key type="Curve" time="0" value="1" />
+          </Controller>
+        </Animation>
+        <Animation name="StyleGiantIncreaseAnim">
+          <Event event="StyleGiantIncreaseAnim" action="Restart, Play" />
+          <Controller type="Style" end="Pause" style1="DefenseMatrixTrackerPop" style2="DefenseMatrixTrackerGiant">
+            <Key type="Curve" time="0" value="1" />
+          </Controller>
+        </Animation>
+      </Frame>
+      <Frame type="Image" name="DVaFrameImageBackground">
+        <Anchor side="Bottom" relative="$parent" pos="Max" offset="-10" />
+        <Anchor side="Left" relative="$parent" pos="Min" offset="25" />
+        <Texture val="@UI/storm_ui_DVa_shadow" />
+        <RenderPriority val="500" />
+      </Frame>
+      <Frame type="Image" name="DVaFrameSideGaugeImage">
+        <Anchor side="Top" relative="$parent/DVaFrameImageBackground" pos="Min" offset="2" />
+        <Anchor side="Right" relative="$parent/DVaFrameImageBackground" pos="Max" offset="-6" />
+        <Texture val="@UI/storm_ui_DVa_gauge_bar" />
+        <Alpha val="100" />
+        <RenderType val="LDR" />
+        <RenderPriority val="501" />
+      </Frame>
+      <Frame type="Image" name="DVaFrameImageDummy">
+        <Anchor side="Top" relative="$parent/DVaFrameImageBackground" pos="Min" offset="5" />
+        <Anchor side="Left" relative="$parent/DVaFrameImageBackground" pos="Min" offset="3" />
+        <Texture val="@UI/storm_ui_DVa_frame_a" />
+        <Alpha val="0" />
+        <RenderType val="LDR" />
+        <RenderPriority val="501" />
+      </Frame>
+      <Frame type="Image" name="DVaFrameImage1">
+        <Anchor side="Top" relative="$parent/DVaFrameImageBackground" pos="Min" offset="5" />
+        <Anchor side="Left" relative="$parent/DVaFrameImageBackground" pos="Min" offset="3" />
+        <Texture val="@UI/storm_ui_DVa_frame_a" />
+        <Alpha val="153" />
+        <RenderType val="LDR" />
+        <RenderPriority val="501" />
+      </Frame>
+      <Frame type="Image" name="DVaFrameImage4">
+        <Anchor side="Top" relative="$parent/DVaFrameImageBackground" pos="Mid" offset="0" />
+        <Anchor side="Left" relative="$parent/DVaFrameImageBackground" pos="Mid" offset="-23" />
+        <Anchor side="Bottom" relative="$parent/DVaFrameImageBackground" pos="Mid" offset="0" />
+        <Anchor side="Right" relative="$parent/DVaFrameImageBackground" pos="Mid" offset="-23" />
+        <Texture val="@UI/storm_ui_DVa_frame_a" />
+        <Alpha val="0" />
+        <RenderType val="LDR" />
+        <RenderPriority val="501" />
+        <Frame type="BehaviorIcon" name="BehaviorTooltipFrame">
+          <Anchor relative="$parent" />
+          <TooltipFrame val="BehaviorIconTooltip" />
+          <Behavior val="DVaMechDefenseMatrixChannelling" />
+        </Frame>
+      </Frame>
+      <Frame type="Image" name="DVaFrameImage2">
+        <Anchor side="Top" relative="$parent/DVaFrameImageDummy" pos="Mid" offset="-1" />
+        <Anchor side="Right" relative="$parent/DVaFrameImageDummy" pos="Mid" offset="0" />
+        <Anchor side="Bottom" relative="$parent/DVaFrameImageDummy" pos="Mid" offset="-1" />
+        <Anchor side="Left" relative="$parent/DVaFrameImageDummy" pos="Mid" offset="0" />
+        <Texture val="@UI/storm_ui_DVa_frame_b" />
+        <Alpha val="0" />
+        <RenderType val="LDR" />
+        <RenderPriority val="502" />
+      </Frame>
+      <Frame type="Image" name="DVaFrameImage5">
+        <Anchor side="Top" relative="$parent/DVaFrameImageDummy" pos="Mid" offset="-1" />
+        <Anchor side="Right" relative="$parent/DVaFrameImageDummy" pos="Mid" offset="0" />
+        <Anchor side="Bottom" relative="$parent/DVaFrameImageDummy" pos="Mid" offset="-1" />
+        <Anchor side="Left" relative="$parent/DVaFrameImageDummy" pos="Mid" offset="0" />
+        <Texture val="@UI/storm_ui_DVa_frame_b" />
+        <Alpha val="0" />
+        <RenderType val="LDR" />
+        <RenderPriority val="502" />
+      </Frame>
+      <Frame type="Image" name="DVaFrameImage3">
+        <Anchor side="Top" relative="$parent/DVaFrameImageDummy" pos="Min" offset="19" />
+        <Anchor side="Right" relative="$parent/DVaFrameImageDummy" pos="Max" offset="-27" />
+        <Anchor side="Bottom" relative="$parent/DVaFrameImageDummy" pos="Max" offset="-19" />
+        <Anchor side="Left" relative="$parent/DVaFrameImageDummy" pos="Min" offset="27" />
+        <Texture val="@UI/storm_ui_DVa_frame_b" />
+        <Alpha val="0" />
+        <RenderType val="LDR" />
+        <RenderPriority val="502" />
+      </Frame>
+      <Frame type="UnitStatusBehaviorIcon" name="DefenseMatrixIcon">
+        <Anchor side="Top" relative="$parent/DVaFrameSideGaugeImage" pos="Min" offset="0" />
+        <Anchor side="Bottom" relative="$parent/DVaFrameSideGaugeImage" pos="max" offset="-2" />
+        <Anchor side="Left" relative="$parent/DVaFrameSideGaugeImage" pos="Min" offset="-4" />
+        <Anchor side="Right" relative="$parent/DVaFrameSideGaugeImage" pos="Max" offset="-24" />
+        <Behavior val="DVaMechDefenseMatrixChannelling" />
+        <RenderPriority val="511" />
+        <Frame type="BehaviorIcon" name="BehaviorIcon">
+          <Anchor relative="$parent" />
+          <Frame type="ProgressBar" name="CooldownBar">
+            <Anchor relative="$parent" />
+            <Alpha val="255" />
+            <AcceptsMouse val="False" />
+            <Visible val="True" />
+            <RenderPriority val="502" />
+            <MinValue val="0" />
+            <MaxValue val="1" />
+            <Value val="0" />
+            <FillInset val="0.0" />
+            <Vertical val="True" />
+            <UseFillContainer val="false" />
+            <Frame type="Frame" name="FillImageContainer">
+              <Anchor relative="$parent" />
+              <Frame type="Image" name="FillImage">
+                <Anchor relative="$parent/$parent" />
+                <RenderPriority val="514" />
+                <Visible val="True" />
+                <Alpha val="255" />
+                <SubpixelRendering val="true" />
+                <Texture val="@UI/storm_ui_DVa_gauge_bar_on" />
+                <TextureCoords top="0" left="0.5" bottom="0" right="1" />
+              </Frame>
+            </Frame>
+          </Frame>
+        </Frame>
+      </Frame>
+    </Frame>
+  </Frame>
+  <Frame type="SelectionUnitStatusPanel" name="DVaMechCommandCardFrame">
+    <Anchor side="Bottom" relative="$parent" pos="Max" offset="0" />
+    <Anchor side="Left" relative="$parent" pos="Min" offset="0" />
+    <Height val="80" />
+    <Width val="80" />
+    <SpecificUnit val="HeroDVaMech" />
+    <AcceptsMouse val="False" />
+    <Frame type="UnitStatusFrame" name="UnitStatusFrame0">
+      <Anchor relative="$parent" />
+      <AcceptsMouse val="False" />
+      <Frame type="UnitStatusValidatorAnimElement" name="VisibilityValidator">
+        <Anchor relative="$parent" />
+        <Validator val="DVaMechEmergencySh3llActive" />
+        <Animation name="Visibility">
+          <Event event="NoState" action="Stop" />
+          <Event event="DVaMechEmergencySh3llActive" action="Restart,Play" />
+          <Controller type="Visibility" end="Pause" frame="$parent">
+            <Key type="Bool" time="0" value="True" />
+          </Controller>
+          <Controller type="Fade" end="Pause" frame="$parent">
+            <Key type="Curve" time="0" value="0" />
+          </Controller>
+        </Animation>
+      </Frame>
+      <Frame type="UnitStatusAbilCharge" name="DVaMechSelfDestructChargeFrame">
+        <Anchor side="Top" relative="$parent" pos="Min" offset="-6" />
+        <Anchor side="Left" relative="$parent" pos="Min" offset="16" />
+        <AcceptsMouse val="False" />
+        <AbilityLink val="DVaMechSelfDestruct" />
+        <ChargeLink val="Abil/DVaMechSelfDestruct" />
+        <ChargeLocation val="Player" />
+        <SendChargesEmptyAnimEvent val="True" />
+        <SendChargesFullAnimEvent val="True" />
+        <SendCurrentChangedAnimEvent val="True" />
+        <Frame type="Image" name="DVaMechSelfDestructBackgroundImage">
+          <Anchor side="Top" relative="$parent" pos="Min" offset="0" />
+          <Anchor side="Left" relative="$parent" pos="Min" offset="0" />
+          <Height val="76" />
+          <Width val="68" />
+          <Texture val="@UI/Storm_UI_HUD_Tracer_Pulse_Bomb_Background" />
+          <RenderPriority val="500" />
+        </Frame>
+        <Frame type="ProgressBar" name="ChargeFillProgress">
+          <Anchor side="Top" relative="$parent" pos="Min" offset="0" />
+          <Anchor side="Left" relative="$parent" pos="Min" offset="0" />
+          <AcceptsMouse val="False" />
+          <RenderPriority val="512" />
+          <Height val="76" />
+          <Width val="68" />
+          <FillInset val="0.0" />
+          <Circular val="True" />
+          <CircularStart val="0" />
+          <CircularEndOffset val="360" />
+          <MinValue val="1" />
+          <MaxValue val="100" />
+          <Value val="50" />
+          <Frame type="Frame" name="FillImageContainer">
+            <Anchor relative="$parent" />
+            <Frame type="Image" name="FillImage">
+              <Anchor relative="$parent" />
+              <Texture val="@UI/Storm_UI_HUD_Tracer_Pulse_Bomb_Fill_Image" />
+              <ColorAdjustMode val="Fill" />
+              <AdjustmentColor val="FF69B4" />
+              <TextureType layer="0" val="Circular" />
+            </Frame>
+          </Frame>
+        </Frame>
+        <Frame type="Label" name="ChargesLabel">
+          <Anchor side="Bottom" relative="$parent/ChargePercentLabel" pos="Max" offset="0" />
+          <Anchor side="Right" relative="$parent/ChargePercentLabel" pos="Min" offset="4" />
+          <Style val="Storm_HUD_Tracer_Pulse_Bomb_Charge" />
+        </Frame>
+        <Frame type="Label" name="ChargePercentLabel">
+          <Anchor side="Top" relative="$parent/DVaMechSelfDestructBackgroundImage" pos="Mid" offset="-10" />
+          <Anchor side="Right" relative="$parent/DVaMechSelfDestructBackgroundImage" pos="Max" offset="-11" />
+          <Text val="%" />
+          <Style val="Storm_HUD_Tracer_Pulse_Bomb_Charge_Percent" />
+        </Frame>
+        <Frame type="Image" name="PulseBombReadyPingImage">
+          <Anchor side="Top" relative="$parent/DVaMechSelfDestructBackgroundImage" pos="Mid" offset="0" />
+          <Anchor side="Left" relative="$parent/DVaMechSelfDestructBackgroundImage" pos="Mid" offset="0" />
+          <Anchor side="Right" relative="$parent/DVaMechSelfDestructBackgroundImage" pos="Mid" offset="0" />
+          <Anchor side="Bottom" relative="$parent/DVaMechSelfDestructBackgroundImage" pos="Mid" offset="0" />
+          <BlendMode val="Add" />
+          <Visible val="False" />
+          <Texture val="@UI/Storm_UI_HeroUI_Greymane_PulseRing" />
+          <Animation name="ReadyPulseAnim">
+            <Event event="OnShown" action="Reset, DirectionForward, Play" />
+            <Controller type="Fade" end="Pause">
+              <Key type="Curve" time="0" value="255" />
+              <Key type="Curve" time=".5" value="0" />
+            </Controller>
+            <Controller type="Dimension" dimension="Height" percentage="True" end="Pause">
+              <Key type="Curve" time="0" value="50" />
+              <Key type="Curve" time=".05" value="50" />
+              <Key type="Curve" time=".5" value="170" />
+            </Controller>
+            <Controller type="Dimension" dimension="Width" percentage="True" end="Pause">
+              <Key type="Curve" time="0" value="50" />
+              <Key type="Curve" time=".05" value="50" />
+              <Key type="Curve" time=".5" value="170" />
+            </Controller>
+          </Animation>
+        </Frame>
+        <Animation name="Show/HideProgressBarAnims">
+          <Event event="ChargesFull" action="Restart, DirectionForward, Play" />
+          <Event event="ChargesEmpty" action="Stop" />
+          <Event event="CurrentChanged_1" action="Stop" />
+          <Controller type="Visibility" end="Pause" frame="DVaMechSelfDestructBackgroundImage">
+            <Key type="Bool" time="0" value="False" />
+          </Controller>
+          <Controller type="Visibility" end="Pause" frame="ChargeFillProgress/FillImageContainer">
+            <Key type="Bool" time="0" value="False" />
+          </Controller>
+          <Controller type="Visibility" end="Pause" frame="ChargesLabel">
+            <Key type="Bool" time="0" value="False" />
+          </Controller>
+          <Controller type="Visibility" end="Pause" Frame="ChargePercentLabel">
+            <Key type="Bool" time="0" value="False" />
+          </Controller>
+          <Controller type="Visibility" end="Pause" frame="PulseBombReadyPingImage">
+            <Key type="Bool" time="0" value="True" />
+          </Controller>
+        </Animation>
+      </Frame>
+    </Frame>
+  </Frame>
 </Desc>

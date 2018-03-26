@@ -1,138 +1,113 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <Desc>
-    <DescFlags val="Locked"/>
-
-    <Frame type="Frame" name="PageTemplate">
-        <!--==========================================================
-        <!  Header
-        <!=========================================================-->
-        <Frame type="Label" name="TitleLabel">
-            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
-            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
-            <Width val="1200"/>
-            <Anchor side="Bottom" relative="$parent/SubtitleLabel" pos="Min" offset="0"/>
-            <Style val="ConversionDialog_Title"/>
-            <Text val="@UI/ProgressionConverted/Dialog/Page1/Title"/>
-        </Frame>
-        <Frame type="Label" name="SubtitleLabel">
-            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
-            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
-            <Anchor side="Bottom" relative="$ProgressionConvertedDialog/BackgroundFrame" pos="Min" offset="17"/>
-            <Style val="ConversionDialog_Subtitle"/>
-            <Text val="@UI/ProgressionConverted/Dialog/Page1/Subtitle"/>
-        </Frame>
-
-        <Animation name="Fade">
-            <Event event="Show" action="Restart,Play"/>
-            <Event event="Hide" action="DirectionReverse,Play"/>
-            <Controller type="Visibility" end="Pause">
-                <Key type="Bool" time="0" value="False"/>
-                <Key type="Bool" time="0" value="True"/>
-                <Key type="Bool" time=".25" value="True"/>
-            </Controller>
-            <Controller type="Fade" end="Pause">
-                <Key type="Curve" time="0" value="0"/>
-                <Key type="Curve" time=".25" value="255"/>
-            </Controller>
-        </Animation>
+  <DescFlags val="Locked" />
+  <Frame type="Frame" name="PageTemplate">
+    <Frame type="Label" name="TitleLabel">
+      <Anchor side="Left" relative="$parent" pos="Min" offset="0" />
+      <Anchor side="Right" relative="$parent" pos="Max" offset="0" />
+      <Width val="1200" />
+      <Anchor side="Bottom" relative="$parent/SubtitleLabel" pos="Min" offset="0" />
+      <Style val="ConversionDialog_Title" />
+      <Text val="@UI/ProgressionConverted/Dialog/Page1/Title" />
     </Frame>
-
-    <!-- Main Frame -->
-    <Frame type="ProgressionConvertedDialog" name="ProgressionConvertedDialog" template="PromotionalFanfareDialog/PromotionalFanfareDialog">
-        <Anchor relative="$parent"/>
-        <Handle val="ProgressionConvertedDialog"/>
-
-        <!-- Animations -->
-        <Animation name="ConversionSound">
-            <Event event="OnShown" action="Reset,Play"/>
-            <Controller type="Sound" end="Pause">
-                <Key type="Sound" time="0" sound="@UI_BNet_Menu_Show" />
-                <Key type="Sound" time="0" sound="@UI_BNet_RewardUnlocked" />
-            </Controller>
-        </Animation>
-
-        <StateGroup name="ConversionDialogFlow">
-            <State name="ShowAsensionBadge">
-                <When type="Property" ShowReward="false"/>
-                <Action type="SetProperty" frame="Page1" visible="true"/>
-                <Action type="SetProperty" frame="InfoIcon" visible="false"/>
-            </State>
-        </StateGroup>
-
-        <Frame type="Frame" name="AnchoredPopupAnchorFrame">
-            <Frame type="AnchoredPopup" name="RewardDescriptionPopup">
-                <Animation name="ShowPopup">
-                    <Event event="OnMouseEnter" action="Play" frame="$ProgressionConvertedDialog/InfoIcon"/>
-                    <Event event="OnMouseExit" action="Stop" frame="$ProgressionConvertedDialog/InfoIcon"/>
-                </Animation>
-
-                <Frame type="PropertyBind" name="PropertyBindText">
-                    <Source frame="$ProgressionConvertedDialog" property="DescriptionText"/>
-                </Frame>
-            </Frame>
-        </Frame>
-
-        <!--==========================================================
-        <!  Titles, Body and Chests Count
-        <!=========================================================-->
-
-        <!-- Ascension content -->
-        <Frame type="Frame" name="Page1" template="ProgressionConvertedDialog/PageTemplate">
-            <Anchor relative="$parent"/>
-            <Visible val="false"/>
-
-            <Animation name="StartAnimation">
-                <Event event="OnShown" action="Reset,Play"/>
-                <Controller type="Fade" end="Pause" frame="AscensionFrame">
-                    <Key type="Curve" time="0" value="0"/>
-                    <Key type="Curve" time="1.2" value="255" inout="Auto"/>
-                </Controller>
-                <Controller type="Event" end="Stop" frame="PlayerLevelLabel">
-                    <Key type="Event" time="1.2" event="Start"/>
-                </Controller>
-            </Animation>
-
-            <Frame type="Label" name="TitleLabel">
-                <Text val="@UI/ProgressionConverted/Dialog/Page1/Title"/>
-            </Frame>
-            <Frame type="Label" name="SubtitleLabel">
-                <Text val="@UI/ProgressionConverted/Dialog/Page1/Subtitle"/>
-            </Frame>
-
-            <Frame type="CountdownLabel" name="PlayerLevelLabel">
-                <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
-                <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
-                <Anchor side="Top" relative="$parent/SubtitleLabel" pos="Max" offset="0"/>
-                <Text val="0"/>
-                <Style val="ConversionDialog_Title"/>
-                <StartValue val="0"/>
-                <TargetValue val="{$ProgressionConvertedDialog/@PlayerLevel}"/>
-
-                <Animation name="CountUp">
-                    <Event event="Start" action="Reset,Play"/>
-                    <Event event="OnHidden" action="Reset"/>
-                    <Controller type="Counter" end="Pause">
-                        <Key type="Curve" time="0.0" value="0.0" inout="linear"/>
-                        <Key type="Curve" time="1.75" value="1.0" inout="linear"/>
-                    </Controller>
-                    <Controller type="Sound" end="Stop">
-                        <Key type="Sound" time="0.001" sound="*@UI_BNet_Progression_Levelup_Rank100"/>
-                    </Controller>
-                    <Controller type="Event" frame="$parent/AscensionFrame" end="Stop">
-                        <Key type="Event" time="0" event="BadgeTransitionFlash"/>
-                    </Controller>
-                </Animation>
-            </Frame>
-
-            <Frame type="AscensionFrame" name="AscensionFrame" template="AscensionBadge/AscensionScoreBadgeBigTemplate">
-                <Anchor side="Top" relative="$ProgressionConvertedDialog/BackgroundFrame" pos="Mid" offset="0"/>
-                <Anchor side="Left" relative="$ProgressionConvertedDialog/BackgroundFrame" pos="Mid" offset="0"/>
-                <Anchor side="Right" relative="$ProgressionConvertedDialog/BackgroundFrame" pos="Mid" offset="0"/>
-                <Anchor side="Bottom" relative="$ProgressionConvertedDialog/BackgroundFrame" pos="Mid" offset="0"/>
-
-                <AccountLevel val="{$parent/PlayerLevelLabel/@Text}"/>
-            </Frame>
-        </Frame>
-
+    <Frame type="Label" name="SubtitleLabel">
+      <Anchor side="Left" relative="$parent" pos="Min" offset="0" />
+      <Anchor side="Right" relative="$parent" pos="Max" offset="0" />
+      <Anchor side="Bottom" relative="$ProgressionConvertedDialog/BackgroundFrame" pos="Min" offset="17" />
+      <Style val="ConversionDialog_Subtitle" />
+      <Text val="@UI/ProgressionConverted/Dialog/Page1/Subtitle" />
     </Frame>
+    <Animation name="Fade">
+      <Event event="Show" action="Restart,Play" />
+      <Event event="Hide" action="DirectionReverse,Play" />
+      <Controller type="Visibility" end="Pause">
+        <Key type="Bool" time="0" value="False" />
+        <Key type="Bool" time="0" value="True" />
+        <Key type="Bool" time=".25" value="True" />
+      </Controller>
+      <Controller type="Fade" end="Pause">
+        <Key type="Curve" time="0" value="0" />
+        <Key type="Curve" time=".25" value="255" />
+      </Controller>
+    </Animation>
+  </Frame>
+  <Frame type="ProgressionConvertedDialog" name="ProgressionConvertedDialog" template="PromotionalFanfareDialog/PromotionalFanfareDialog">
+    <Anchor relative="$parent" />
+    <Handle val="ProgressionConvertedDialog" />
+    <Animation name="ConversionSound">
+      <Event event="OnShown" action="Reset,Play" />
+      <Controller type="Sound" end="Pause">
+        <Key type="Sound" time="0" sound="@UI_BNet_Menu_Show" />
+        <Key type="Sound" time="0" sound="@UI_BNet_RewardUnlocked" />
+      </Controller>
+    </Animation>
+    <StateGroup name="ConversionDialogFlow">
+      <State name="ShowAsensionBadge">
+        <When type="Property" ShowReward="false" />
+        <Action type="SetProperty" frame="Page1" visible="true" />
+        <Action type="SetProperty" frame="InfoIcon" visible="false" />
+      </State>
+    </StateGroup>
+    <Frame type="Frame" name="AnchoredPopupAnchorFrame">
+      <Frame type="AnchoredPopup" name="RewardDescriptionPopup">
+        <Animation name="ShowPopup">
+          <Event event="OnMouseEnter" action="Play" frame="$ProgressionConvertedDialog/InfoIcon" />
+          <Event event="OnMouseExit" action="Stop" frame="$ProgressionConvertedDialog/InfoIcon" />
+        </Animation>
+        <Frame type="PropertyBind" name="PropertyBindText">
+          <Source frame="$ProgressionConvertedDialog" property="DescriptionText" />
+        </Frame>
+      </Frame>
+    </Frame>
+    <Frame type="Frame" name="Page1" template="ProgressionConvertedDialog/PageTemplate">
+      <Anchor relative="$parent" />
+      <Visible val="false" />
+      <Animation name="StartAnimation">
+        <Event event="OnShown" action="Reset,Play" />
+        <Controller type="Fade" end="Pause" frame="AscensionFrame">
+          <Key type="Curve" time="0" value="0" />
+          <Key type="Curve" time="1.2" value="255" inout="Auto" />
+        </Controller>
+        <Controller type="Event" end="Stop" frame="PlayerLevelLabel">
+          <Key type="Event" time="1.2" event="Start" />
+        </Controller>
+      </Animation>
+      <Frame type="Label" name="TitleLabel">
+        <Text val="@UI/ProgressionConverted/Dialog/Page1/Title" />
+      </Frame>
+      <Frame type="Label" name="SubtitleLabel">
+        <Text val="@UI/ProgressionConverted/Dialog/Page1/Subtitle" />
+      </Frame>
+      <Frame type="CountdownLabel" name="PlayerLevelLabel">
+        <Anchor side="Left" relative="$parent" pos="Mid" offset="0" />
+        <Anchor side="Right" relative="$parent" pos="Mid" offset="0" />
+        <Anchor side="Top" relative="$parent/SubtitleLabel" pos="Max" offset="0" />
+        <Text val="0" />
+        <Style val="ConversionDialog_Title" />
+        <StartValue val="0" />
+        <TargetValue val="{$ProgressionConvertedDialog/@PlayerLevel}" />
+        <Animation name="CountUp">
+          <Event event="Start" action="Reset,Play" />
+          <Event event="OnHidden" action="Reset" />
+          <Controller type="Counter" end="Pause">
+            <Key type="Curve" time="0.0" value="0.0" inout="linear" />
+            <Key type="Curve" time="1.75" value="1.0" inout="linear" />
+          </Controller>
+          <Controller type="Sound" end="Stop">
+            <Key type="Sound" time="0.001" sound="*@UI_BNet_Progression_Levelup_Rank100" />
+          </Controller>
+          <Controller type="Event" frame="$parent/AscensionFrame" end="Stop">
+            <Key type="Event" time="0" event="BadgeTransitionFlash" />
+          </Controller>
+        </Animation>
+      </Frame>
+      <Frame type="AscensionFrame" name="AscensionFrame" template="AscensionBadge/AscensionScoreBadgeBigTemplate">
+        <Anchor side="Top" relative="$ProgressionConvertedDialog/BackgroundFrame" pos="Mid" offset="0" />
+        <Anchor side="Left" relative="$ProgressionConvertedDialog/BackgroundFrame" pos="Mid" offset="0" />
+        <Anchor side="Right" relative="$ProgressionConvertedDialog/BackgroundFrame" pos="Mid" offset="0" />
+        <Anchor side="Bottom" relative="$ProgressionConvertedDialog/BackgroundFrame" pos="Mid" offset="0" />
+        <AccountLevel val="{$parent/PlayerLevelLabel/@Text}" />
+      </Frame>
+    </Frame>
+  </Frame>
 </Desc>

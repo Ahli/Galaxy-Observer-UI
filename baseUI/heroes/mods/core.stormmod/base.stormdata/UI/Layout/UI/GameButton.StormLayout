@@ -1,485 +1,417 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <Desc>
-    <Frame type="GameButton" name="GameButtonTemplate">
-        <Width val="100"/>
-        <Height val="100"/>
-        <ClickSound val="@UI_Game_Generic_01"/>
-        <ShowCooldownText val="true"/>
-
-        <Frame type="Image" name="NormalImage">
-            <Anchor side="Top" relative="$parent" pos="Min" offset="10"/>
-            <Anchor side="Bottom" relative="$parent" pos="Max" offset="-10"/>
-            <Anchor side="Left" relative="$parent" pos="Min" offset="10"/>
-            <Anchor side="Right" relative="$parent" pos="Max" offset="-10"/>
-
-            <DesaturationColor val="#DesaturationColor"/>
-            <OnDisableDesaturationColor val="#DesaturationColor"/>
-            <DisabledAlpha val="255"/>
-            <ImageMaskTexture val="@UI/HUD_BTN_BG_Ability_AlphaMask"/>
-
-            <LayerCount val="1"/>
-
-            <!-- Layer 0 used for icon -->
-            <TextureType val="Normal" layer="0"/>
-
-            <RenderPriority val="500"/>
-        </Frame>
-
-        <Frame type="ProgressBar" name="CooldownProgress">
-            <Anchor side="Top" relative="$parent/NormalImage" pos="Min" offset="0"/>
-            <Anchor side="Left" relative="$parent/NormalImage" pos="Min" offset="0"/>
-            <Anchor side="Right" relative="$parent/NormalImage" pos="Max" offset="0"/>
-            <Anchor side="Bottom" relative="$parent/NormalImage" pos="Max" offset="0"/>
-            <RenderPriority val="502"/>
-            <Visible val="{$parent/@MaxCooldownValue}"/>
-            <Alpha val="220"/>
-
-            <MinValue val="0"/>
-            <MaxValue val="{$parent/@MaxCooldownValue}"/>
-            <Value val="{$parent/@CurrentCooldownValue}"/>
-            <Circular val="true"/>
-            <CircularStart val="0"/>
-            <CircularEndOffset val="360"/>
-            <FillInset val="0.0"/>
-
-            <Frame type="Frame" name="FillImageContainer">
-                <Anchor relative="$parent"/>
-
-                <Frame type="Image" name="FillImage">
-                    <Anchor relative="$parent"/>
-                    <RenderPriority val="502"/>
-
-                    <LayerCount val="2"/>
-                    <LayerColor val="000000" layer="0"/>
-                    <TextureType val="None" layer="0"/>
-
-                    <Texture val="@UI/Storm_UI_GenFX_BallAlpha" layer="1"/>
-                    <TextureType val="Circular" layer="1"/>
-                    <TextureCoords top=".05" bottom=".95" left =".05" right=".95"/>
-                    <LayerColor val="00BBFF" layer="1"/>
-
-                    <ImageMaskTexture val="{$parent/$parent/$parent/NormalImage/@ImageMaskTexture}"/>
-                </Frame>
-            </Frame>
-
-            <Frame type="Image" name="EndCapImage">
-                <Anchor relative="$parent"/>
-                <RenderPriority val="503"/>
-
-                <Texture val="@UI/HUD_BTN_Ability_Cooldown_Endcap" layer="0"/>
-                <LayerColor val="00BBFF" layer="0"/>
-            </Frame>
-        </Frame>
-        
-        <Frame type="Image" name="GameButtonDefaultBorder">
-            <Anchor side="Top" relative="$parent/NormalImage" pos="Mid" offset="0"/>
-            <Anchor side="Bottom" relative="$parent/NormalImage" pos="Mid" offset="0"/>
-            <Anchor side="Left" relative="$parent/NormalImage" pos="Mid" offset="0"/>
-            <Anchor side="Right" relative="$parent/NormalImage" pos="Mid" offset="0"/>
-            <Texture val="@UI/Storm_UI_InGame_AbilityButtonBorder"/>
-            <RenderPriority val="504"/>
-
-            <DesaturateOnDisable val="True"/>
-            <DesaturationColor val="#DesaturationColor"/>
-            <OnDisableDesaturationColor val="#DesaturationColor"/>
-        </Frame>
-
-        <Frame type="Image" name="GameButtonDefaultHoverBorder">
-            <Anchor relative="$parent/GameButtonDefaultBorder"/>
-            <Texture val="@UI/Storm_UI_InGame_AbilityButtonBorder_Hover"/>
-            <RenderPriority val="505"/>
-
-            <Alpha val="0"/>
-            <DesaturationColor val="#DesaturationColor"/>
-            <OnDisableDesaturationColor val="#DesaturationColor"/>
-            <Animation name="Hover">
-                <Event event="OnMouseEnter" action="DirectionForward,Play" frame="$parent"/>
-                <Event event="OnMouseExit" action="DirectionReverse,Play" frame="$parent"/>
-                <Controller type="Fade" end="Pause">
-                    <Key type="Curve" time="0" value="0" inout="Linear"/>
-                    <Key type="Curve" time=".2" value="255" inout="Slow,Linear"/>
-                </Controller>
-            </Animation>
-        </Frame>
-
-        <Frame type="Frame" name="HitTestFrame">
-            <Anchor side="Top" relative="$parent" pos="Min" offset="5"/>
-            <Anchor side="Left" relative="$parent" pos="Min" offset="5"/>
-            <Anchor side="Right" relative="$parent" pos="Max" offset="-5"/>
-            <Anchor side="Bottom" relative="$parent" pos="Max" offset="-5"/>
-            <HitTestTexture val="@UI/HUD_BTN_BG_Ability_AlphaMask"/>
-        </Frame>
-
-        <Frame type="Frame" name="ActiveEffect">
-            <Anchor relative="$parent"/>
-            <Alpha val="0"/>
-
-            <Animation name="EffectState">
-                <Event event="ActiveState" action="DirectionForward,Play" frame="$parent"/>
-                <!-- Event event="NoState" action="DirectionReverse,Play" frame="Not Set in Template"/ -->
-                <Controller type="Fade" end="Pause">
-                    <Key type="Curve" time="0" value="0" inout="Linear"/>
-                    <Key type="Curve" time=".2" value="255" inout="Slow,Linear"/>
-                </Controller>
-                <Controller type="Visibility" end="Pause" frame="ActiveEffectImage">
-                    <Key type="Bool" time="0" value="false"/>
-                    <Key type="Bool" time="0.01" value="true"/>
-                    <Key type="Bool" time="0.2" value="true"/>
-                </Controller>
-                <Controller type="Visibility" end="Pause" frame="ActiveEffect2Image">
-                    <Key type="Bool" time="0" value="false"/>
-                    <Key type="Bool" time="0.01" value="true"/>
-                    <Key type="Bool" time="0.2" value="true"/>
-                </Controller>
-            </Animation>
-            
-            <Animation name="HealType">
-                <!-- No Events in the template -->
-
-                <Controller type="Event" end="Stop" frame="$parent">
-                    <Key type="Event" time="0" event="ActiveState"/>
-                </Controller>
-                <Controller type="AdjustmentColor" end="Pause" frame="ActiveEffectImage">
-                    <Key type="Curve" time="0" value="141,241,87"/>
-                </Controller>
-                <Controller type="AdjustmentColor" end="Pause" frame="ActiveEffect2Image">
-                    <Key type="Curve" time="0" value="141,241,87"/>
-                </Controller>
-            </Animation>
-
-            <Animation name="DamageType">
-                <!-- No Events in the template -->
-
-                <Controller type="Event" end="Stop" frame="$parent">
-                    <Key type="Event" time="0" event="ActiveState"/>
-                </Controller>
-                <Controller type="AdjustmentColor" end="Pause" frame="ActiveEffectImage">
-                    <Key type="Curve" time="0" value="255,36,0"/>
-                </Controller>
-                <Controller type="AdjustmentColor" end="Pause" frame="ActiveEffect2Image">
-                    <Key type="Curve" time="0" value="255,36,0"/>
-                </Controller>
-            </Animation>
-
-            <Animation name="ManaType">
-                <!-- No Events in the template -->
-
-                <Controller type="Event" end="Stop" frame="$parent">
-                    <Key type="Event" time="0" event="ActiveState"/>
-                </Controller>
-                <Controller type="AdjustmentColor" end="Pause" frame="ActiveEffectImage">
-                    <Key type="Curve" time="0" value="0,132,255"/>
-                </Controller>
-                <Controller type="AdjustmentColor" end="Pause" frame="ActiveEffect2Image">
-                    <Key type="Curve" time="0" value="0,132,255"/>
-                </Controller>
-            </Animation>
-
-            <Frame type="Image" name="ActiveEffectImage">
-                <Anchor side="Top" relative="$parent/$parent/NormalImage" pos="Mid" offset="0"/>
-                <Anchor side="Bottom" relative="$parent/$parent/NormalImage" pos="Mid" offset="0"/>
-                <Anchor side="Left" relative="$parent/$parent/NormalImage" pos="Mid" offset="0"/>
-                <Anchor side="Right" relative="$parent/$parent/NormalImage" pos="Mid" offset="0"/>
-                <SubpixelRendering val="True"/>
-                <ColorAdjustMode val="Colorize"/>
-                <AdjustmentColor val="8df157"/>
-                <Visible val="false"/>
-
-                <Texture val="@UI/Storm_UI_InGame_AbilityButton_Active_Add"/>
-                <BlendMode val="Add"/>
-                <Animation name="Glow">
-                    <Event event="OnShown" action="Restart,Play"/>
-                    <Controller type="Fade" end="Loop">
-                        <Key type="Curve" time="0" value="50" inout="Linear,Slow"/>
-                        <Key type="Curve" time=".4" value="255" inout="Linear,Slow"/>
-                        <Key type="Curve" time=".6" value="255" inout="Slow,Linear"/>
-                        <Key type="Curve" time="1.4" value="50" inout="Slow,Linear"/>
-                    </Controller>
-                </Animation>
-            </Frame>
-            
-            <Frame type="Image" name="ActiveEffect2Image">
-                <Anchor side="Top" relative="$parent/$parent/NormalImage" pos="Mid" offset="0"/>
-                <Anchor side="Bottom" relative="$parent/$parent/NormalImage" pos="Mid" offset="0"/>
-                <Anchor side="Left" relative="$parent/$parent/NormalImage" pos="Mid" offset="0"/>
-                <Anchor side="Right" relative="$parent/$parent/NormalImage" pos="Mid" offset="0"/>
-                <SubpixelRendering val="True"/>
-                <Color val="8df157"/>
-                <Visible val="false"/>
-
-                <Texture val="@UI/Storm_UI_InGame_AbilityButton_Active_Add"/>
-                <BlendMode val="Add"/>
-                <Animation name="Glow">
-                    <Event event="OnShown" action="Restart,Play"/>
-                    <Controller type="Fade" end="Loop">
-                        <Key type="Curve" time="0" value="75" inout="Linear,Slow"/>
-                        <Key type="Curve" time=".3" value="255" inout="Linear,Slow"/>
-                        <Key type="Curve" time=".7" value="255" inout="Slow,Linear"/>
-                        <Key type="Curve" time="1.4" value="75" inout="Slow,Linear"/>
-                    </Controller>
-                </Animation>
-            </Frame>
-        </Frame>
-
-        <Frame type="Frame" name="AttentionEffect">
-            <Anchor relative="$parent"/>
-            <Alpha val="0"/>
-
-            <Animation name="EffectState">
-                <Event event="AttentionState" action="DirectionForward,Play" frame="$parent"/>
-                <!-- Event event="NoState" action="DirectionReverse,Play" frame="Not Set in Template"/ -->
-                <Controller type="Fade" end="Pause">
-                    <Key type="Curve" time="0" value="0" inout="Linear"/>
-                    <Key type="Curve" time=".2" value="255" inout="Slow,Linear"/>
-                </Controller>
-                <Controller type="Visibility" end="Pause" frame="AttentionEffectImage">
-                    <Key type="Bool" time="0" value="false"/>
-                    <Key type="Bool" time="0.01" value="true"/>
-                    <Key type="Bool" time="0.2" value="true"/>
-                </Controller>
-                <Controller type="Visibility" end="Pause" frame="AttentionEffect2Image">
-                    <Key type="Bool" time="0" value="false"/>
-                    <Key type="Bool" time="0.01" value="true"/>
-                    <Key type="Bool" time="0.2" value="true"/>
-                </Controller>
-                <Controller type="Visibility" end="Pause" frame="InnerGlowImage">
-                    <Key type="Bool" time="0" value="false"/>
-                    <Key type="Bool" time="0.01" value="true"/>
-                    <Key type="Bool" time="0.2" value="true"/>
-                </Controller>
-            </Animation>
-            
-            <Animation name="HealType">
-                <!-- No Events in the template -->
-
-                <Controller type="Event" end="Stop" frame="$parent">
-                    <Key type="Event" time="0" event="AttentionState"/>
-                </Controller>
-                <Controller type="Color" end="Pause" frame="AttentionEffectImage">
-                    <Key type="Curve" time="0" value="141,241,87"/>
-                </Controller>
-                <Controller type="Color" end="Pause" frame="AttentionEffect2Image">
-                    <Key type="Curve" time="0" value="141,241,87"/>
-                </Controller>
-                <Controller type="Color" end="Pause" frame="InnerGlowImage">
-                    <Key type="Curve" time="0" value="141,241,87"/>
-                </Controller>
-            </Animation>
-
-            <Animation name="DamageType">
-                <!-- No Events in the template -->
-
-                <Controller type="Event" end="Stop" frame="$parent">
-                    <Key type="Event" time="0" event="AttentionState"/>
-                </Controller>
-                <Controller type="Color" end="Pause" frame="AttentionEffectImage">
-                    <Key type="Curve" time="0" value="255,36,0"/>
-                </Controller>
-                <Controller type="Color" end="Pause" frame="AttentionEffect2Image">
-                    <Key type="Curve" time="0" value="255,36,0"/>
-                </Controller>
-                <Controller type="Color" end="Pause" frame="InnerGlowImage">
-                    <Key type="Curve" time="0" value="255,36,0"/>
-                </Controller>
-            </Animation>
-
-            <Animation name="ManaType">
-                <!-- No Events in the template -->
-
-                <Controller type="Event" end="Stop" frame="$parent">
-                    <Key type="Event" time="0" event="AttentionState"/>
-                </Controller>
-                <Controller type="Color" end="Pause" frame="AttentionEffectImage">
-                    <Key type="Curve" time="0" value="0,132,255"/>
-                </Controller>
-                <Controller type="Color" end="Pause" frame="AttentionEffect2Image">
-                    <Key type="Curve" time="0" value="0,132,255"/>
-                </Controller>
-                <Controller type="Color" end="Pause" frame="InnerGlowImage">
-                    <Key type="Curve" time="0" value="0,132,255"/>
-                </Controller>
-            </Animation>
-
-            <Frame type="Image" name="AttentionEffectImage">
-                <Anchor side="Top" relative="$parent/$parent/NormalImage" pos="Mid" offset="0"/>
-                <Anchor side="Bottom" relative="$parent/$parent/NormalImage" pos="Mid" offset="0"/>
-                <Anchor side="Left" relative="$parent/$parent/NormalImage" pos="Mid" offset="0"/>
-                <Anchor side="Right" relative="$parent/$parent/NormalImage" pos="Mid" offset="0"/>
-                <SubpixelRendering val="True"/>
-                <Color val="8df157"/>
-                <Visible val="false"/>
-
-                <Texture val="@UI/Storm_UI_InGame_AbilityButton_Activate_Add"/>
-                <BlendMode val="Add"/>
-                <Animation name="Glow">
-                    <Event event="OnShown" action="Restart,Play"/>
-                    <Controller type="Fade" end="Loop">
-                        <Key type="Curve" time="0" value="0" inout="Linear,Slow"/>
-                        <Key type="Curve" time=".1" value="255" inout="Slow,Linear"/>
-                        <Key type="Curve" time=".6" value="0" inout="Slow,Linear"/>
-                        <Key type="Curve" time="1" value="0" inout="Slow,Linear"/>
-                    </Controller>
-                    <Controller type="Dimension" dimension="Width" relative="False" percentage="True" end="Loop" >
-                        <Key type="Curve" time="0" value="100"/>
-                        <Key type="Curve" time=".6" value="140"/>
-                        <Key type="Curve" time="1" value="140"/>
-                    </Controller>
-                    <Controller type="Dimension" dimension="Height" relative="False" percentage="True" end="Loop" >
-                        <Key type="Curve" time="0" value="100"/>
-                        <Key type="Curve" time=".6" value="140"/>
-                        <Key type="Curve" time="1" value="140"/>
-                    </Controller>
-                </Animation>
-            </Frame>
-            
-            <Frame type="Image" name="AttentionEffect2Image" template="GameButton/GameButtonTemplate/AttentionEffect/AttentionEffectImage">
-                <Color val="8df157"/>
-                <Animation name="Glow">
-                    <Event event="OnShown" action="Restart,Play"/>
-                    <Controller type="Fade" end="Loop">
-                        <Key type="Curve" time="0" value="0" inout="Linear,Slow"/>
-                        <Key type="Curve" time="0" value="0" inout="Linear,Slow"/>
-                        <Key type="Curve" time=".3" value="180" inout="Slow,Linear"/>
-                        <Key type="Curve" time="1" value="0" inout="Slow,Linear"/>
-                    </Controller>
-                    <Controller type="Dimension" dimension="Width" relative="False" percentage="True" end="Loop" >
-                        <Key type="Curve" time="0" value="100"/>
-                        <Key type="Curve" time=".2" value="100"/>
-                        <Key type="Curve" time="1" value="150"/>
-                    </Controller>
-                    <Controller type="Dimension" dimension="Height" relative="False" percentage="True" end="Loop" >
-                        <Key type="Curve" time="0" value="100"/>
-                        <Key type="Curve" time=".2" value="100"/>
-                        <Key type="Curve" time="1" value="150"/>
-                    </Controller>
-                </Animation>
-            </Frame>
-            
-            <Frame type="Image" name="InnerGlowImage">
-                <Anchor side="Top" relative="$parent/AttentionEffectImage" pos="Mid" offset="0"/>
-                <Anchor side="Bottom" relative="$parent/AttentionEffectImage" pos="Mid" offset="0"/>
-                <Anchor side="Left" relative="$parent/AttentionEffectImage" pos="Mid" offset="0"/>
-                <Anchor side="Right" relative="$parent/AttentionEffectImage" pos="Mid" offset="0"/>
-                <Width val="0"/>
-                <Height val="0"/>
-                <Color val="8df157"/>
-                <BlendMode val="Add"/>
-                <Texture val="@UI/Storm_UI_InGame_AbilityButton_ActivateBorder_Add"/>
-                <Visible val="false"/>
-                <Animation name="Hover">
-                    <Event event="OnShown" action="DirectionForward,Play"/>
-                    <Controller type="Fade" end="Loop">
-                        <Key type="Curve" time="0" value="0" inout="Linear"/>
-                        <Key type="Curve" time=".2" value="255" inout="Slow,Linear"/>
-                        <Key type="Curve" time=".6" value="0" inout="Slow,Linear"/>
-                        <Key type="Curve" time="1" value="0" inout="Slow,Linear"/>
-                    </Controller>
-                </Animation>
-            </Frame>
-        </Frame>
-
-        <Frame type="Image" name="ChargeBackground">
-            <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
-            <Anchor side="Right" relative="$parent" pos="Max" offset="-10"/>
-            <Texture val="@UI/Storm_UI_InGame_ChargeBackground"/>
-            <Visible val="False"/>
-
-            <Animation name="ToggleVisibility">
-                <Event event="OnShown" action="Play" frame="$parent/ChargeLabel"/>
-                <Event event="OnHidden" action="Reset" frame="$parent/ChargeLabel"/>
-                <Controller type="Visibility" end="Pause">
-                    <Key type="Bool" time="0" value="true"/>
-                </Controller>
-            </Animation>
-        </Frame>
-        
-        <Frame type="Image" name="ChargeCompleteImage">
-            <Anchor relative="$parent/ChargeBackground"/>
-            <Texture val="@UI/Storm_UI_InGame_ChargeBackground"/>
-            <BlendMode val="Add"/>
-            <Alpha val="0"/>
-            <Visible val="False"/>
-
-            <Animation name="StateChange">
-                <Event event="Finished" action="Restart,Play" frame="$parent/ChargeCooldown"/>
-                <Controller type="Fade" end="Pause">
-                    <Key type="Curve" time="0" value="0" inout="Fast"/>
-                    <Key type="Curve" time=".05" value="255" inout="Fast"/>
-                    <Key type="Curve" time=".4" value="0" inout="Slow"/>
-                </Controller>
-            </Animation>
-
-            <Animation name="FirstCooldownStarted">
-                <Event event="Cooldown" action="Restart,Play" frame="$parent/ChargeCooldown"/>
-                <Controller type="Visibility" end="Pause">
-                    <Key type="Bool" time="0" value="True"/>
-                </Controller>
-            </Animation>
-        </Frame>
-
-        <Frame type="ProgressBar" name="ChargeCooldown">
-            <Anchor side="Top" relative="$parent/ChargeBackground" pos="Mid" offset="-2"/>
-            <Anchor side="Bottom" relative="$parent/ChargeBackground" pos="Mid" offset="-2"/>
-            <Anchor side="Left" relative="$parent/ChargeBackground" pos="Mid" offset="-1"/>
-            <Anchor side="Right" relative="$parent/ChargeBackground" pos="Mid" offset="-1"/>
-            <Width val="64"/>
-            <Height val="64"/>
-            <Visible val="True"/>
-
-            <Circular val="true"/>
-            <CircularStart val="0"/>
-            <CircularEndOffset val="360"/>
-            <AcceptsMouse val="false"/>
-
-            <Animation name="StateChange">
-                <Event event="Cooldown" action="Stop"/>
-                <Event event="Finished" action="Restart,Play"/>
-
-                <Controller type="Visibility" end="Pause" frame="FillImageContainer">
-                    <Key type="Bool" time="0" value="false"/>
-                </Controller>
-            </Animation>
-
-            <Frame type="Frame" name="FillImageContainer">
-                <Anchor relative="$parent"/>
-
-                <Frame type="Image" name="FillImage">
-                    <Anchor relative="$parent"/>
-                    <LayerCount val="1"/>
-                    <BlendMode val="Add"/>
-
-                    <Texture val="@UI/Storm_UI_Ingame_Charge_Cooldown" layer="0"/>
-                    <TextureType layer="0" val="Circular"/>
-                </Frame>
-            </Frame>
-        </Frame>
-
-        <Frame type="Label" name="ChargeLabel">
-            <Anchor side="Top" relative="$parent/ChargeBackground" pos="Mid" offset="-2"/>
-            <Anchor side="Bottom" relative="$parent/ChargeBackground" pos="Mid" offset="-2"/>
-            <Anchor side="Left" relative="$parent/ChargeBackground" pos="Mid" offset="1"/>
-            <Anchor side="Right" relative="$parent/ChargeBackground" pos="Mid" offset="1"/>
-            <Style val="Storm_CommandButttonChargeLabel"/>
-            <RenderPriority val="520"/>
-        </Frame>
-
-        <Frame type="Label" name="CooldownLabel">
-            <Anchor side="Top" relative="$parent/GameButtonDefaultBorder" pos="Mid" offset="0"/>
-            <Anchor side="Bottom" relative="$parent/GameButtonDefaultBorder" pos="Mid" offset="0"/>
-            <Anchor side="Left" relative="$parent" pos="Min" offset="5"/>
-            <Anchor side="Right" relative="$parent" pos="Max" offset="-5"/>
-            <Style val="GameButtonCooldown"/>
-            <Visible val="false"/>
-        </Frame>
-
-        <Frame type="CommandHotkeyFrame" name="HotkeyFrame" template="StandardTemplates/HotkeyFrameTemplate">
-            <RenderPriority val="700"/>
-
-            <Frame type="Label" name="HotkeyLabel">
-                <Anchor side="Bottom" relative="$parent/$parent" pos="Max" offset="0"/>
-                <Anchor side="Left" relative="$parent/$parent" pos="Min" offset="0"/>
-                <Options val="NoWrapping | ScaleToPreventTruncation"/>
-            </Frame>
-        </Frame>
+  <Frame type="GameButton" name="GameButtonTemplate">
+    <Width val="100" />
+    <Height val="100" />
+    <ClickSound val="@UI_Game_Generic_01" />
+    <ShowCooldownText val="true" />
+    <Frame type="Image" name="NormalImage">
+      <Anchor side="Top" relative="$parent" pos="Min" offset="10" />
+      <Anchor side="Bottom" relative="$parent" pos="Max" offset="-10" />
+      <Anchor side="Left" relative="$parent" pos="Min" offset="10" />
+      <Anchor side="Right" relative="$parent" pos="Max" offset="-10" />
+      <DesaturationColor val="#DesaturationColor" />
+      <OnDisableDesaturationColor val="#DesaturationColor" />
+      <DisabledAlpha val="255" />
+      <ImageMaskTexture val="@UI/HUD_BTN_BG_Ability_AlphaMask" />
+      <LayerCount val="1" />
+      <TextureType val="Normal" layer="0" />
+      <RenderPriority val="500" />
     </Frame>
+    <Frame type="ProgressBar" name="CooldownProgress">
+      <Anchor side="Top" relative="$parent/NormalImage" pos="Min" offset="0" />
+      <Anchor side="Left" relative="$parent/NormalImage" pos="Min" offset="0" />
+      <Anchor side="Right" relative="$parent/NormalImage" pos="Max" offset="0" />
+      <Anchor side="Bottom" relative="$parent/NormalImage" pos="Max" offset="0" />
+      <RenderPriority val="502" />
+      <Visible val="{$parent/@MaxCooldownValue}" />
+      <Alpha val="220" />
+      <MinValue val="0" />
+      <MaxValue val="{$parent/@MaxCooldownValue}" />
+      <Value val="{$parent/@CurrentCooldownValue}" />
+      <Circular val="true" />
+      <CircularStart val="0" />
+      <CircularEndOffset val="360" />
+      <FillInset val="0.0" />
+      <Frame type="Frame" name="FillImageContainer">
+        <Anchor relative="$parent" />
+        <Frame type="Image" name="FillImage">
+          <Anchor relative="$parent" />
+          <RenderPriority val="502" />
+          <LayerCount val="2" />
+          <LayerColor val="000000" layer="0" />
+          <TextureType val="None" layer="0" />
+          <Texture val="@UI/Storm_UI_GenFX_BallAlpha" layer="1" />
+          <TextureType val="Circular" layer="1" />
+          <TextureCoords top=".05" bottom=".95" left=".05" right=".95" />
+          <LayerColor val="00BBFF" layer="1" />
+          <ImageMaskTexture val="{$parent/$parent/$parent/NormalImage/@ImageMaskTexture}" />
+        </Frame>
+      </Frame>
+      <Frame type="Image" name="EndCapImage">
+        <Anchor relative="$parent" />
+        <RenderPriority val="503" />
+        <Texture val="@UI/HUD_BTN_Ability_Cooldown_Endcap" layer="0" />
+        <LayerColor val="00BBFF" layer="0" />
+      </Frame>
+    </Frame>
+    <Frame type="Image" name="GameButtonDefaultBorder">
+      <Anchor side="Top" relative="$parent/NormalImage" pos="Mid" offset="0" />
+      <Anchor side="Bottom" relative="$parent/NormalImage" pos="Mid" offset="0" />
+      <Anchor side="Left" relative="$parent/NormalImage" pos="Mid" offset="0" />
+      <Anchor side="Right" relative="$parent/NormalImage" pos="Mid" offset="0" />
+      <Texture val="@UI/Storm_UI_InGame_AbilityButtonBorder" />
+      <RenderPriority val="504" />
+      <DesaturateOnDisable val="True" />
+      <DesaturationColor val="#DesaturationColor" />
+      <OnDisableDesaturationColor val="#DesaturationColor" />
+    </Frame>
+    <Frame type="Image" name="GameButtonDefaultHoverBorder">
+      <Anchor relative="$parent/GameButtonDefaultBorder" />
+      <Texture val="@UI/Storm_UI_InGame_AbilityButtonBorder_Hover" />
+      <RenderPriority val="505" />
+      <Alpha val="0" />
+      <DesaturationColor val="#DesaturationColor" />
+      <OnDisableDesaturationColor val="#DesaturationColor" />
+      <Animation name="Hover">
+        <Event event="OnMouseEnter" action="DirectionForward,Play" frame="$parent" />
+        <Event event="OnMouseExit" action="DirectionReverse,Play" frame="$parent" />
+        <Controller type="Fade" end="Pause">
+          <Key type="Curve" time="0" value="0" inout="Linear" />
+          <Key type="Curve" time=".2" value="255" inout="Slow,Linear" />
+        </Controller>
+      </Animation>
+    </Frame>
+    <Frame type="Frame" name="HitTestFrame">
+      <Anchor side="Top" relative="$parent" pos="Min" offset="5" />
+      <Anchor side="Left" relative="$parent" pos="Min" offset="5" />
+      <Anchor side="Right" relative="$parent" pos="Max" offset="-5" />
+      <Anchor side="Bottom" relative="$parent" pos="Max" offset="-5" />
+      <HitTestTexture val="@UI/HUD_BTN_BG_Ability_AlphaMask" />
+    </Frame>
+    <Frame type="Frame" name="ActiveEffect">
+      <Anchor relative="$parent" />
+      <Alpha val="0" />
+      <Animation name="EffectState">
+        <Event event="ActiveState" action="DirectionForward,Play" frame="$parent" />
+        <Controller type="Fade" end="Pause">
+          <Key type="Curve" time="0" value="0" inout="Linear" />
+          <Key type="Curve" time=".2" value="255" inout="Slow,Linear" />
+        </Controller>
+        <Controller type="Visibility" end="Pause" frame="ActiveEffectImage">
+          <Key type="Bool" time="0" value="false" />
+          <Key type="Bool" time="0.01" value="true" />
+          <Key type="Bool" time="0.2" value="true" />
+        </Controller>
+        <Controller type="Visibility" end="Pause" frame="ActiveEffect2Image">
+          <Key type="Bool" time="0" value="false" />
+          <Key type="Bool" time="0.01" value="true" />
+          <Key type="Bool" time="0.2" value="true" />
+        </Controller>
+      </Animation>
+      <Animation name="HealType">
+        <Controller type="Event" end="Stop" frame="$parent">
+          <Key type="Event" time="0" event="ActiveState" />
+        </Controller>
+        <Controller type="AdjustmentColor" end="Pause" frame="ActiveEffectImage">
+          <Key type="Curve" time="0" value="141,241,87" />
+        </Controller>
+        <Controller type="AdjustmentColor" end="Pause" frame="ActiveEffect2Image">
+          <Key type="Curve" time="0" value="141,241,87" />
+        </Controller>
+      </Animation>
+      <Animation name="DamageType">
+        <Controller type="Event" end="Stop" frame="$parent">
+          <Key type="Event" time="0" event="ActiveState" />
+        </Controller>
+        <Controller type="AdjustmentColor" end="Pause" frame="ActiveEffectImage">
+          <Key type="Curve" time="0" value="255,36,0" />
+        </Controller>
+        <Controller type="AdjustmentColor" end="Pause" frame="ActiveEffect2Image">
+          <Key type="Curve" time="0" value="255,36,0" />
+        </Controller>
+      </Animation>
+      <Animation name="ManaType">
+        <Controller type="Event" end="Stop" frame="$parent">
+          <Key type="Event" time="0" event="ActiveState" />
+        </Controller>
+        <Controller type="AdjustmentColor" end="Pause" frame="ActiveEffectImage">
+          <Key type="Curve" time="0" value="0,132,255" />
+        </Controller>
+        <Controller type="AdjustmentColor" end="Pause" frame="ActiveEffect2Image">
+          <Key type="Curve" time="0" value="0,132,255" />
+        </Controller>
+      </Animation>
+      <Frame type="Image" name="ActiveEffectImage">
+        <Anchor side="Top" relative="$parent/$parent/NormalImage" pos="Mid" offset="0" />
+        <Anchor side="Bottom" relative="$parent/$parent/NormalImage" pos="Mid" offset="0" />
+        <Anchor side="Left" relative="$parent/$parent/NormalImage" pos="Mid" offset="0" />
+        <Anchor side="Right" relative="$parent/$parent/NormalImage" pos="Mid" offset="0" />
+        <SubpixelRendering val="True" />
+        <ColorAdjustMode val="Colorize" />
+        <AdjustmentColor val="8df157" />
+        <Visible val="false" />
+        <Texture val="@UI/Storm_UI_InGame_AbilityButton_Active_Add" />
+        <BlendMode val="Add" />
+        <Animation name="Glow">
+          <Event event="OnShown" action="Restart,Play" />
+          <Controller type="Fade" end="Loop">
+            <Key type="Curve" time="0" value="50" inout="Linear,Slow" />
+            <Key type="Curve" time=".4" value="255" inout="Linear,Slow" />
+            <Key type="Curve" time=".6" value="255" inout="Slow,Linear" />
+            <Key type="Curve" time="1.4" value="50" inout="Slow,Linear" />
+          </Controller>
+        </Animation>
+      </Frame>
+      <Frame type="Image" name="ActiveEffect2Image">
+        <Anchor side="Top" relative="$parent/$parent/NormalImage" pos="Mid" offset="0" />
+        <Anchor side="Bottom" relative="$parent/$parent/NormalImage" pos="Mid" offset="0" />
+        <Anchor side="Left" relative="$parent/$parent/NormalImage" pos="Mid" offset="0" />
+        <Anchor side="Right" relative="$parent/$parent/NormalImage" pos="Mid" offset="0" />
+        <SubpixelRendering val="True" />
+        <Color val="8df157" />
+        <Visible val="false" />
+        <Texture val="@UI/Storm_UI_InGame_AbilityButton_Active_Add" />
+        <BlendMode val="Add" />
+        <Animation name="Glow">
+          <Event event="OnShown" action="Restart,Play" />
+          <Controller type="Fade" end="Loop">
+            <Key type="Curve" time="0" value="75" inout="Linear,Slow" />
+            <Key type="Curve" time=".3" value="255" inout="Linear,Slow" />
+            <Key type="Curve" time=".7" value="255" inout="Slow,Linear" />
+            <Key type="Curve" time="1.4" value="75" inout="Slow,Linear" />
+          </Controller>
+        </Animation>
+      </Frame>
+    </Frame>
+    <Frame type="Frame" name="AttentionEffect">
+      <Anchor relative="$parent" />
+      <Alpha val="0" />
+      <Animation name="EffectState">
+        <Event event="AttentionState" action="DirectionForward,Play" frame="$parent" />
+        <Controller type="Fade" end="Pause">
+          <Key type="Curve" time="0" value="0" inout="Linear" />
+          <Key type="Curve" time=".2" value="255" inout="Slow,Linear" />
+        </Controller>
+        <Controller type="Visibility" end="Pause" frame="AttentionEffectImage">
+          <Key type="Bool" time="0" value="false" />
+          <Key type="Bool" time="0.01" value="true" />
+          <Key type="Bool" time="0.2" value="true" />
+        </Controller>
+        <Controller type="Visibility" end="Pause" frame="AttentionEffect2Image">
+          <Key type="Bool" time="0" value="false" />
+          <Key type="Bool" time="0.01" value="true" />
+          <Key type="Bool" time="0.2" value="true" />
+        </Controller>
+        <Controller type="Visibility" end="Pause" frame="InnerGlowImage">
+          <Key type="Bool" time="0" value="false" />
+          <Key type="Bool" time="0.01" value="true" />
+          <Key type="Bool" time="0.2" value="true" />
+        </Controller>
+      </Animation>
+      <Animation name="HealType">
+        <Controller type="Event" end="Stop" frame="$parent">
+          <Key type="Event" time="0" event="AttentionState" />
+        </Controller>
+        <Controller type="Color" end="Pause" frame="AttentionEffectImage">
+          <Key type="Curve" time="0" value="141,241,87" />
+        </Controller>
+        <Controller type="Color" end="Pause" frame="AttentionEffect2Image">
+          <Key type="Curve" time="0" value="141,241,87" />
+        </Controller>
+        <Controller type="Color" end="Pause" frame="InnerGlowImage">
+          <Key type="Curve" time="0" value="141,241,87" />
+        </Controller>
+      </Animation>
+      <Animation name="DamageType">
+        <Controller type="Event" end="Stop" frame="$parent">
+          <Key type="Event" time="0" event="AttentionState" />
+        </Controller>
+        <Controller type="Color" end="Pause" frame="AttentionEffectImage">
+          <Key type="Curve" time="0" value="255,36,0" />
+        </Controller>
+        <Controller type="Color" end="Pause" frame="AttentionEffect2Image">
+          <Key type="Curve" time="0" value="255,36,0" />
+        </Controller>
+        <Controller type="Color" end="Pause" frame="InnerGlowImage">
+          <Key type="Curve" time="0" value="255,36,0" />
+        </Controller>
+      </Animation>
+      <Animation name="ManaType">
+        <Controller type="Event" end="Stop" frame="$parent">
+          <Key type="Event" time="0" event="AttentionState" />
+        </Controller>
+        <Controller type="Color" end="Pause" frame="AttentionEffectImage">
+          <Key type="Curve" time="0" value="0,132,255" />
+        </Controller>
+        <Controller type="Color" end="Pause" frame="AttentionEffect2Image">
+          <Key type="Curve" time="0" value="0,132,255" />
+        </Controller>
+        <Controller type="Color" end="Pause" frame="InnerGlowImage">
+          <Key type="Curve" time="0" value="0,132,255" />
+        </Controller>
+      </Animation>
+      <Frame type="Image" name="AttentionEffectImage">
+        <Anchor side="Top" relative="$parent/$parent/NormalImage" pos="Mid" offset="0" />
+        <Anchor side="Bottom" relative="$parent/$parent/NormalImage" pos="Mid" offset="0" />
+        <Anchor side="Left" relative="$parent/$parent/NormalImage" pos="Mid" offset="0" />
+        <Anchor side="Right" relative="$parent/$parent/NormalImage" pos="Mid" offset="0" />
+        <SubpixelRendering val="True" />
+        <Color val="8df157" />
+        <Visible val="false" />
+        <Texture val="@UI/Storm_UI_InGame_AbilityButton_Activate_Add" />
+        <BlendMode val="Add" />
+        <Animation name="Glow">
+          <Event event="OnShown" action="Restart,Play" />
+          <Controller type="Fade" end="Loop">
+            <Key type="Curve" time="0" value="0" inout="Linear,Slow" />
+            <Key type="Curve" time=".1" value="255" inout="Slow,Linear" />
+            <Key type="Curve" time=".6" value="0" inout="Slow,Linear" />
+            <Key type="Curve" time="1" value="0" inout="Slow,Linear" />
+          </Controller>
+          <Controller type="Dimension" dimension="Width" relative="False" percentage="True" end="Loop">
+            <Key type="Curve" time="0" value="100" />
+            <Key type="Curve" time=".6" value="140" />
+            <Key type="Curve" time="1" value="140" />
+          </Controller>
+          <Controller type="Dimension" dimension="Height" relative="False" percentage="True" end="Loop">
+            <Key type="Curve" time="0" value="100" />
+            <Key type="Curve" time=".6" value="140" />
+            <Key type="Curve" time="1" value="140" />
+          </Controller>
+        </Animation>
+      </Frame>
+      <Frame type="Image" name="AttentionEffect2Image" template="GameButton/GameButtonTemplate/AttentionEffect/AttentionEffectImage">
+        <Color val="8df157" />
+        <Animation name="Glow">
+          <Event event="OnShown" action="Restart,Play" />
+          <Controller type="Fade" end="Loop">
+            <Key type="Curve" time="0" value="0" inout="Linear,Slow" />
+            <Key type="Curve" time="0" value="0" inout="Linear,Slow" />
+            <Key type="Curve" time=".3" value="180" inout="Slow,Linear" />
+            <Key type="Curve" time="1" value="0" inout="Slow,Linear" />
+          </Controller>
+          <Controller type="Dimension" dimension="Width" relative="False" percentage="True" end="Loop">
+            <Key type="Curve" time="0" value="100" />
+            <Key type="Curve" time=".2" value="100" />
+            <Key type="Curve" time="1" value="150" />
+          </Controller>
+          <Controller type="Dimension" dimension="Height" relative="False" percentage="True" end="Loop">
+            <Key type="Curve" time="0" value="100" />
+            <Key type="Curve" time=".2" value="100" />
+            <Key type="Curve" time="1" value="150" />
+          </Controller>
+        </Animation>
+      </Frame>
+      <Frame type="Image" name="InnerGlowImage">
+        <Anchor side="Top" relative="$parent/AttentionEffectImage" pos="Mid" offset="0" />
+        <Anchor side="Bottom" relative="$parent/AttentionEffectImage" pos="Mid" offset="0" />
+        <Anchor side="Left" relative="$parent/AttentionEffectImage" pos="Mid" offset="0" />
+        <Anchor side="Right" relative="$parent/AttentionEffectImage" pos="Mid" offset="0" />
+        <Width val="0" />
+        <Height val="0" />
+        <Color val="8df157" />
+        <BlendMode val="Add" />
+        <Texture val="@UI/Storm_UI_InGame_AbilityButton_ActivateBorder_Add" />
+        <Visible val="false" />
+        <Animation name="Hover">
+          <Event event="OnShown" action="DirectionForward,Play" />
+          <Controller type="Fade" end="Loop">
+            <Key type="Curve" time="0" value="0" inout="Linear" />
+            <Key type="Curve" time=".2" value="255" inout="Slow,Linear" />
+            <Key type="Curve" time=".6" value="0" inout="Slow,Linear" />
+            <Key type="Curve" time="1" value="0" inout="Slow,Linear" />
+          </Controller>
+        </Animation>
+      </Frame>
+    </Frame>
+    <Frame type="Image" name="ChargeBackground">
+      <Anchor side="Bottom" relative="$parent" pos="Max" offset="0" />
+      <Anchor side="Right" relative="$parent" pos="Max" offset="-10" />
+      <Texture val="@UI/Storm_UI_InGame_ChargeBackground" />
+      <Visible val="False" />
+      <Animation name="ToggleVisibility">
+        <Event event="OnShown" action="Play" frame="$parent/ChargeLabel" />
+        <Event event="OnHidden" action="Reset" frame="$parent/ChargeLabel" />
+        <Controller type="Visibility" end="Pause">
+          <Key type="Bool" time="0" value="true" />
+        </Controller>
+      </Animation>
+    </Frame>
+    <Frame type="Image" name="ChargeCompleteImage">
+      <Anchor relative="$parent/ChargeBackground" />
+      <Texture val="@UI/Storm_UI_InGame_ChargeBackground" />
+      <BlendMode val="Add" />
+      <Alpha val="0" />
+      <Visible val="False" />
+      <Animation name="StateChange">
+        <Event event="Finished" action="Restart,Play" frame="$parent/ChargeCooldown" />
+        <Controller type="Fade" end="Pause">
+          <Key type="Curve" time="0" value="0" inout="Fast" />
+          <Key type="Curve" time=".05" value="255" inout="Fast" />
+          <Key type="Curve" time=".4" value="0" inout="Slow" />
+        </Controller>
+      </Animation>
+      <Animation name="FirstCooldownStarted">
+        <Event event="Cooldown" action="Restart,Play" frame="$parent/ChargeCooldown" />
+        <Controller type="Visibility" end="Pause">
+          <Key type="Bool" time="0" value="True" />
+        </Controller>
+      </Animation>
+    </Frame>
+    <Frame type="ProgressBar" name="ChargeCooldown">
+      <Anchor side="Top" relative="$parent/ChargeBackground" pos="Mid" offset="-2" />
+      <Anchor side="Bottom" relative="$parent/ChargeBackground" pos="Mid" offset="-2" />
+      <Anchor side="Left" relative="$parent/ChargeBackground" pos="Mid" offset="-1" />
+      <Anchor side="Right" relative="$parent/ChargeBackground" pos="Mid" offset="-1" />
+      <Width val="64" />
+      <Height val="64" />
+      <Visible val="True" />
+      <Circular val="true" />
+      <CircularStart val="0" />
+      <CircularEndOffset val="360" />
+      <AcceptsMouse val="false" />
+      <Animation name="StateChange">
+        <Event event="Cooldown" action="Stop" />
+        <Event event="Finished" action="Restart,Play" />
+        <Controller type="Visibility" end="Pause" frame="FillImageContainer">
+          <Key type="Bool" time="0" value="false" />
+        </Controller>
+      </Animation>
+      <Frame type="Frame" name="FillImageContainer">
+        <Anchor relative="$parent" />
+        <Frame type="Image" name="FillImage">
+          <Anchor relative="$parent" />
+          <LayerCount val="1" />
+          <BlendMode val="Add" />
+          <Texture val="@UI/Storm_UI_Ingame_Charge_Cooldown" layer="0" />
+          <TextureType layer="0" val="Circular" />
+        </Frame>
+      </Frame>
+    </Frame>
+    <Frame type="Label" name="ChargeLabel">
+      <Anchor side="Top" relative="$parent/ChargeBackground" pos="Mid" offset="-2" />
+      <Anchor side="Bottom" relative="$parent/ChargeBackground" pos="Mid" offset="-2" />
+      <Anchor side="Left" relative="$parent/ChargeBackground" pos="Mid" offset="1" />
+      <Anchor side="Right" relative="$parent/ChargeBackground" pos="Mid" offset="1" />
+      <Style val="Storm_CommandButttonChargeLabel" />
+      <RenderPriority val="520" />
+    </Frame>
+    <Frame type="Label" name="CooldownLabel">
+      <Anchor side="Top" relative="$parent/GameButtonDefaultBorder" pos="Mid" offset="0" />
+      <Anchor side="Bottom" relative="$parent/GameButtonDefaultBorder" pos="Mid" offset="0" />
+      <Anchor side="Left" relative="$parent" pos="Min" offset="5" />
+      <Anchor side="Right" relative="$parent" pos="Max" offset="-5" />
+      <Style val="GameButtonCooldown" />
+      <Visible val="false" />
+    </Frame>
+    <Frame type="CommandHotkeyFrame" name="HotkeyFrame" template="StandardTemplates/HotkeyFrameTemplate">
+      <RenderPriority val="700" />
+      <Frame type="Label" name="HotkeyLabel">
+        <Anchor side="Bottom" relative="$parent/$parent" pos="Max" offset="0" />
+        <Anchor side="Left" relative="$parent/$parent" pos="Min" offset="0" />
+        <Options val="NoWrapping | ScaleToPreventTruncation" />
+      </Frame>
+    </Frame>
+  </Frame>
 </Desc>

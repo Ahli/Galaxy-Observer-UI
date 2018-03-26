@@ -1,1123 +1,944 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <Desc>
-
-    <!--===============================================================================================
-    <! Constants
-    <!==============================================================================================-->
-    <Constant name="LoadoutTileListHorizontalSpacing" val="41"/>
-    <Constant name="LoadoutTileListVerticalSpacing" val="41"/>
-    <Constant name="LoadoutCategoryTileListItemSpacing" val="13"/>
-
-    <!--===============================================================================================
-    <! Tile List Templates
-    <!==============================================================================================-->
-    <Frame type="Image" name="SprayBackgroundGlowTemplate">
-        <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
-        <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
-        <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
-        <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
-        <ScaleWidthToTexture val="True"/>
-        <Visible val="False"/>
-        
-        <Texture val="@UI/Storm_UI_GenFX_BallAlpha"/>
-        <ColorAdjustMode val="Fill"/>
-        <AdjustmentColor val="403584"/>
-        
-        <StateGroup name="VisibilityState">
-            <State name="IsVisible">
-                <When type="Property" frame="$parent/$parent/GameContentFrame" ContentType="Spray"/>
-                <Action type="SetProperty" Visible="True"/>
-            </State>
-        </StateGroup>
+  <Constant name="LoadoutTileListHorizontalSpacing" val="41" />
+  <Constant name="LoadoutTileListVerticalSpacing" val="41" />
+  <Constant name="LoadoutCategoryTileListItemSpacing" val="13" />
+  <Frame type="Image" name="SprayBackgroundGlowTemplate">
+    <Anchor side="Top" relative="$parent" pos="Min" offset="0" />
+    <Anchor side="Left" relative="$parent" pos="Mid" offset="0" />
+    <Anchor side="Bottom" relative="$parent" pos="Max" offset="0" />
+    <Anchor side="Right" relative="$parent" pos="Mid" offset="0" />
+    <ScaleWidthToTexture val="True" />
+    <Visible val="False" />
+    <Texture val="@UI/Storm_UI_GenFX_BallAlpha" />
+    <ColorAdjustMode val="Fill" />
+    <AdjustmentColor val="403584" />
+    <StateGroup name="VisibilityState">
+      <State name="IsVisible">
+        <When type="Property" frame="$parent/$parent/GameContentFrame" ContentType="Spray" />
+        <Action type="SetProperty" Visible="True" />
+      </State>
+    </StateGroup>
+  </Frame>
+  <Frame type="GameContentTileListItem" name="LoadoutTileListItemTemplate">
+    <SelectedSound val="@UI_BNet_Generic_04" />
+    <HideWhenCleared val="false" />
+    <Height val="171" />
+    <Width val="146" />
+    <Frame type="Image" name="EmptyImage">
+      <Anchor relative="$parent" />
+      <TextureType val="Nineslice" />
+      <Texture val="@UI/Storm_Heroselect_Loadout_ItemFrame_Disabled" />
+      <DesaturateOnDisable val="false" />
     </Frame>
-    
-    <Frame type="GameContentTileListItem" name="LoadoutTileListItemTemplate">
-        <SelectedSound val="@UI_BNet_Generic_04"/>
-        <HideWhenCleared val="false"/>
-        <Height val="171"/>
-        <Width val="146"/>
-
-        <Frame type="Image" name="EmptyImage">
-            <Anchor relative="$parent"/>
-            <TextureType val="Nineslice"/>
-            <Texture val="@UI/Storm_Heroselect_Loadout_ItemFrame_Disabled"/>
-            <DesaturateOnDisable val="false"/>
-        </Frame>
-        
-        <Frame type="HeroCutsceneFrame" name="PortraitCutscene">
-            <Anchor relative="$parent/EmptyImage" offset="-26"/>
-            <GameContent val="{$parent/GameContentFrame/@GameContent}"/>
-            <HeroCutsceneType val="ShopTile"/>
-            <AutoPause val="true"/>
-            <RenderPriority val="513"/>
-        </Frame>
-
-        <Frame type="GameContentFrame" name="GameContentFrame">
-            <Anchor relative="$parent"/>
-            <GameContent val="{$parent/@GameContent}"/>
-        </Frame>
-
-        <Frame type="Image" name="LockedOverlayImage">
-            <Anchor relative="$parent/PortraitCutscene"/>
-            <RenderPriority val="514"/>
-            <Color val="6056a8"/>
-            <Visible val="False"/>
-            <BlendMode val="Multiply"/>
-            <IgnoreParentAlpha val="True"/>
-            <DesaturateOnDisable val="false"/>
-            <Animation name="MultiplyFade">
-                <Event event="Hide" action="DirectionForward,Play" frame="$parent/$parent/$parent/$parent"/>
-                <Event event="Show" action="DirectionReverse,Play" frame="$parent/$parent/$parent/$parent"/>
-                <Controller type="Color" end="Pause">
-                    <Key type="Curve" time="0" value="96,86,128" inout="Linear"/>
-                    <Key type="Curve" time=".175" value="255,255,255" inout="Linear,Slow"/>
-                </Controller>
-            </Animation>
-        </Frame>
-
-        <Frame type="Image" name="LockedBorderImage">
-            <Anchor relative="$parent/EmptyImage"/>
-            <TextureType val="Nineslice"/>
-            <Texture val="@UI/Storm_Heroselect_Loadout_ItemFrame_Disabled"/>
-            <Visible val="False"/>
-            <DesaturateOnDisable val="false"/>
-        </Frame>
-
-        <Frame type="Image" name="NormalImage">
-            <Anchor relative="$parent/EmptyImage"/>
-            <TextureType val="Nineslice"/>
-            <Texture val="@UI/Storm_Heroselect_Loadout_ItemFrame_Normal"/>
-            <DesaturateOnDisable val="false"/>
-        </Frame>
-
-        <Frame type="Image" name="HoverImage">
-            <Anchor relative="$parent/EmptyImage"/>
-            <TextureType val="Nineslice"/>
-            <Texture val="@UI/Storm_Heroselect_Loadout_ItemFrame_Hover"/>
-            <DisabledAlpha val="0"/>
-        </Frame>
-        
-        <Frame type="Frame" name="GlowContainerFrame">
-            <Anchor relative="$parent/PortraitCutscene"/>
-            
-            <Frame type="Image" name="SprayBackgroundGlow" template="HeroSelectLoadoutTemplates/SprayBackgroundGlowTemplate">
-                <StateGroup name="GlowState">
-                    <State name="Selected">
-                        <When type="Property" frame="$parent/$parent/SelectedImage" Visible="True"/>
-                        <Action type="SetProperty" AdjustmentColor="1a5bff"/>
-                        <Action type="SetProperty" Alpha="128"/>
-                    </State>
-                    
-                    <State name="Unowned">
-                        <When type="StateGroup" frame="$parent/$parent" Locked="Locked"/>
-                        <Action type="SetProperty" AdjustmentColor="211d50"/>
-                    </State>
-                </StateGroup>
-            </Frame>
-        </Frame>
-
-        <Frame type="Image" name="SelectedImage">
-            <Anchor relative="$parent/EmptyImage"/>
-            <TextureType val="Nineslice"/>
-            <Texture val="@UI/Storm_Heroselect_Loadout_ItemFrame_Active"/>
-        </Frame>
-
-        <Frame type="Frame" name="HitTestFrame">
-            <Anchor side="Top" relative="$parent" pos="Min" offset="23"/>
-            <Anchor side="Left" relative="$parent" pos="Min" offset="23"/>
-            <Anchor side="Right" relative="$parent" pos="Max" offset="-23"/>
-            <Anchor side="Bottom" relative="$parent" pos="Max" offset="-23"/>
-        </Frame>
-
-        <Frame type="Image" name="LockedIconImage">
-            <Anchor side="Bottom" relative="$parent" pos="Max" offset="-28"/>
-            <Anchor side="Right" relative="$parent" pos="Max" offset="-28"/>
-            <RenderPriority val="515"/>
-            <Texture val="@UI/Storm_HeroSelect_CustomizePanel_SkinFrame_Locked"/>
-            <Visible val="False"/>
-            <DesaturateOnDisable val="false"/>
-        </Frame>
-
-        <Frame type="Frame" name="IGRBenefitFrame">
-            <Anchor side="Bottom" relative="$parent" pos="Max" offset="-28"/>
-            <Anchor side="Right" relative="$parent" pos="Max" offset="-28"/>
-            <Width val="56"/>
-            <Height val="56"/>
-            <Visible val="False"/>
-
-            <Frame type="Image" name="IGRBenefitGlow">
-                <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
-                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
-                <Texture val="@UI/Storm_UI_Play_F2P_LogoGlow"/>
-                <BlendMode val="Add"/>
-                <Animation name="Pulse">
-                    <Event event="OnShown" action="DirectionForward,Play"/>
-                    <Controller type="Fade" end="PingPong">
-                        <Key type="Curve" time="0" value="0" inout="Linear"/>
-                        <Key type="Curve" time=".7" value="255" inout="Slow,Linear"/>
-                    </Controller>
-                </Animation>
-                <DesaturateOnDisable val="false"/>
-            </Frame>
-
-            <Frame type="Image" name="IGRLogo">
-                <Anchor relative="$parent/IGRBenefitGlow"/>
-                <Texture val="@UI/Storm_UI_Play_IGR_Logo"/>
-                <DesaturateOnDisable val="false"/>
-            </Frame>
-        </Frame>
-
-        <Frame type="Image" name="SeasonalEventBadge" template="StoreTemplates/SeasonalEventBadgeTemplate">
-            <Anchor side="Top" relative="$parent" pos="Min" offset="28"/>
-            <Anchor side="Right" relative="$parent" pos="Max" offset="-26"/>
-            <RenderPriority val="514"/>
-            <Width val="36"/>
-            <Height val="36"/>
-
-            <Frame type="Label" name="EventNameLabel">
-                <Text val="{$parent/$parent/GameContentFrame/@EventName}"/>
-            </Frame>
-        </Frame>
-
-        <!-- State Groups -->
-        <StateGroup name="SelectionDisabled">
-            <State name="SelectionDisabled">
-                <When type="Property" frame="$this" selectionDisabled="True"/>
-                <Action type="SetProperty" frame="$this" enabled="False"/>
-            </State>
-        </StateGroup>
-
-        <StateGroup name="Locked">
-            <DefaultState val="NotLocked"/>
-
-            <State name="Locked">
-                <When type="Property" frame="GameContentFrame" isAllowed="False"/>
-                <When type="Property" frame="GameContentFrame" isValid="True"/>
-                <When type="Property" frame="$GlueUI" tradeshowMode="False"/>
-                <Action type="SetProperty" frame="LockedIconImage" visible="True"/>
-                <Action type="SetProperty" frame="LockedBorderImage" visible="True"/>
-                <Action type="SetProperty" frame="LockedOverlayImage" visible="True"/>
-                <Action type="SetProperty" frame="NormalImage" alpha="0"/>
-            </State>
-
-            <State name="NotLocked">
-                <Action type="SetProperty" frame="LockedIconImage" visible="False"/>
-                <Action type="SetProperty" frame="LockedBorderImage" visible="False"/>
-                <Action type="SetProperty" frame="LockedOverlayImage" visible="False"/>
-                <Action type="SetProperty" frame="NormalImage" alpha="255"/>
-            </State>
-        </StateGroup>
-
-        <StateGroup name="IGRBenefit">
-            <State name="IGRBenefit">
-                <When type="Property" frame="GameContentFrame" isAwardedByIGRBenefit="True"/>
-                <When type="Property" frame="GameContentFrame" isAllowed="True"/>
-                <Action type="SetProperty" frame="IGRBenefitFrame" visible="True"/>
-            </State>
-        </StateGroup>
-
-        <StateGroup name="Tooltip">
-            <State name="CantPurchase">
-                <When type="Property" frame="GameContentFrame" canPurchase="False"/>
-                <When type="Property" frame="$this" isMasterSkin="True"/>
-                <When type="Property" frame="$GlueUI" tradeshowMode="False"/>
-                <Action type="SetProperty" frame="$this" tooltip="{$this/GameContentFrame/@CantPurchaseReason}"/>
-            </State>
-            <State name="SelectionDisabled">
-                <When type="Property" frame="$this" selectionDisabled="True"/>
-                <Action type="SetProperty" frame="$this" tooltip="@UI/Store/SkinDisabled"/>
-            </State>
-        </StateGroup>
-
-        <StateGroup name="DeemphasizedStates">
-            <State name="Deemphasized">
-                <When type="Property" frame="$this" MatchesFilter="False"/>
-                <Action type="SetProperty" Alpha="128"/>
-            </State>
-        </StateGroup>
+    <Frame type="HeroCutsceneFrame" name="PortraitCutscene">
+      <Anchor relative="$parent/EmptyImage" offset="-26" />
+      <GameContent val="{$parent/GameContentFrame/@GameContent}" />
+      <HeroCutsceneType val="ShopTile" />
+      <AutoPause val="true" />
+      <RenderPriority val="513" />
     </Frame>
-
-    <Frame type="GameContentTileListItem" name="LargeLoadoutTileListItemTemplate" template="HeroSelectLoadoutTemplates/LoadoutTileListItemTemplate">
-        <Height val="236"/>
+    <Frame type="GameContentFrame" name="GameContentFrame">
+      <Anchor relative="$parent" />
+      <GameContent val="{$parent/@GameContent}" />
     </Frame>
-
-    <Frame type="LoadoutTileList" name="BaseLoadoutTileListTemplate" template="HeroSelectCustomizePanel/HeroSelectCustomizePanelTileListTemplate">
-        <RequireSelection val="false"/>
-        <AcceptsMouse val="true"/>
-        <FilterFlags val="Default|NoDupes|Selectable|NoMatchFilterString|!NoValidProduct|!CanNotPurchase"/>
-        <SortMethod index="0" val="FilterString"/>
-        <SortMethod index="1" val="Default"/>
-        <SortMethod index="2" val="Allowed"/>
-        <SortMethod index="3" val="Alphabetical"/>
-        <UpdateWhenLicensesChange val="true"/>
-        <ScrollStepValue val="6"/>
-        <LoadoutHero val="{$ancestor[@type=HeroSelectLoadoutsPanel]/@HeroLink}"/>
-
-        <StateGroup name="UpdateWhenHidden">
-            <State name="ShouldUpdate">
-                <When type="Property" frame="$ancestor[@type=HeroSelectLoadoutsPanel]" Visible="true"/>
-                <When type="Property" frame="$ancestor[@type=HeroSelectLoadoutsPanel]" HeroLink="" operator="NotEqual"/>
-                <Action type="SetProperty" UpdateWhenHidden="true"/>
-            </State>
+    <Frame type="Image" name="LockedOverlayImage">
+      <Anchor relative="$parent/PortraitCutscene" />
+      <RenderPriority val="514" />
+      <Color val="6056a8" />
+      <Visible val="False" />
+      <BlendMode val="Multiply" />
+      <IgnoreParentAlpha val="True" />
+      <DesaturateOnDisable val="false" />
+      <Animation name="MultiplyFade">
+        <Event event="Hide" action="DirectionForward,Play" frame="$parent/$parent/$parent/$parent" />
+        <Event event="Show" action="DirectionReverse,Play" frame="$parent/$parent/$parent/$parent" />
+        <Controller type="Color" end="Pause">
+          <Key type="Curve" time="0" value="96,86,128" inout="Linear" />
+          <Key type="Curve" time=".175" value="255,255,255" inout="Linear,Slow" />
+        </Controller>
+      </Animation>
+    </Frame>
+    <Frame type="Image" name="DeemphasizeOverlayImage">
+      <Anchor relative="$parent/PortraitCutscene" />
+      <RenderPriority val="514" />
+      <Color val="000000" />
+      <Visible val="False" />
+      <IgnoreParentAlpha val="True" />
+      <DesaturateOnDisable val="false" />
+      <Alpha val="128" />
+    </Frame>
+    <Frame type="Image" name="LockedBorderImage">
+      <Anchor relative="$parent/EmptyImage" />
+      <TextureType val="Nineslice" />
+      <Texture val="@UI/Storm_Heroselect_Loadout_ItemFrame_Disabled" />
+      <Visible val="False" />
+      <DesaturateOnDisable val="false" />
+    </Frame>
+    <Frame type="Image" name="NormalImage">
+      <Anchor relative="$parent/EmptyImage" />
+      <TextureType val="Nineslice" />
+      <Texture val="@UI/Storm_Heroselect_Loadout_ItemFrame_Normal" />
+      <DesaturateOnDisable val="false" />
+    </Frame>
+    <Frame type="Image" name="HoverImage">
+      <Anchor relative="$parent/EmptyImage" />
+      <TextureType val="Nineslice" />
+      <Texture val="@UI/Storm_Heroselect_Loadout_ItemFrame_Hover" />
+      <DisabledAlpha val="0" />
+    </Frame>
+    <Frame type="Frame" name="GlowContainerFrame">
+      <Anchor relative="$parent/PortraitCutscene" />
+      <Frame type="Image" name="SprayBackgroundGlow" template="HeroSelectLoadoutTemplates/SprayBackgroundGlowTemplate">
+        <StateGroup name="GlowState">
+          <State name="Selected">
+            <When type="Property" frame="$parent/$parent/SelectedImage" Visible="True" />
+            <Action type="SetProperty" AdjustmentColor="1a5bff" />
+            <Action type="SetProperty" Alpha="128" />
+          </State>
+          <State name="Unowned">
+            <When type="StateGroup" frame="$parent/$parent" Locked="Locked" />
+            <Action type="SetProperty" AdjustmentColor="211d50" />
+          </State>
         </StateGroup>
-
-        <Frame type="GameContentFrame" name="GameContentFrame">
-            <Anchor relative="$parent"/>
-            <GameContent val="{$parent/@SelectedGameContent}"/>
-        </Frame>
-
-        <Frame type="ScrollBar" name="ScrollBar" template="StandardTemplates/ScrollableBarTemplate">
-            <Anchor side="Top" relative="$parent/Item0" pos="Min" offset="22"/>
-            <Anchor side="Right" relative="$parent" pos="Max" offset="-8"/>
-            <Anchor side="Bottom" relative="$parent/Item17" pos="Max" offset="-21"/>
-            <IncrementSound val=""/>
-        </Frame>
-
-        <Frame type="Image" name="EmptyScrollBarImage">
-            <Anchor relative="$parent/ScrollBar"/>
-            <Texture val="@UI/Storm_Scrollbar_Background_Disabled"/>
-            <TextureType val="Nineslice"/>
-            <Tiled val="true"/>
-            <Visible val="False"/>
-
-            <StateGroup name="VisibilityStates">
-                <State name="ShowEmptyScrollBar">
-                    <When type="Property" frame="$parent/ScrollBar" Visible="false"/>
-                    <Action type="SetProperty" Visible="true"/>
-                </State>
-            </StateGroup>
-        </Frame>
+      </Frame>
     </Frame>
-
-    <Frame type="LoadoutTileList" name="LoadoutTileListTemplate" template="HeroSelectLoadoutTemplates/BaseLoadoutTileListTemplate">
-        <Anchor side="Top" relative="Item0" pos="Min" offset="0"/>
-        <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
-        <Anchor side="Right" relative="$parent" pos="Max" offset="-2"/>
-        <Anchor side="Bottom" relative="$parent" pos="Max" offset="-10"/>
-        <MaxItemPerPage val="12"/>
-
-        <Frame type="GameContentTileListItem" name="Item0" template="HeroSelectLoadoutTemplates/LoadoutTileListItemTemplate">
-            <Anchor side="Top" relative="$parent/Item5" pos="Min" offset="0"/>
-            <Anchor side="Right" relative="$parent/Item1" pos="Min" offset="#LoadoutTileListHorizontalSpacing"/>
-        </Frame>
-
-        <Frame type="GameContentTileListItem" name="Item1" template="HeroSelectLoadoutTemplates/LoadoutTileListItemTemplate">
-            <Anchor side="Top" relative="$parent/Item5" pos="Min" offset="0"/>
-            <Anchor side="Right" relative="$parent/Item2" pos="Min" offset="#LoadoutTileListHorizontalSpacing"/>
-        </Frame>
-
-        <Frame type="GameContentTileListItem" name="Item2" template="HeroSelectLoadoutTemplates/LoadoutTileListItemTemplate">
-            <Anchor side="Top" relative="$parent/Item5" pos="Min" offset="0"/>
-            <Anchor side="Right" relative="$parent/Item3" pos="Min" offset="#LoadoutTileListHorizontalSpacing"/>
-        </Frame>
-
-        <Frame type="GameContentTileListItem" name="Item3" template="HeroSelectLoadoutTemplates/LoadoutTileListItemTemplate">
-            <Anchor side="Top" relative="$parent/Item5" pos="Min" offset="0"/>
-            <Anchor side="Right" relative="$parent/Item4" pos="Min" offset="#LoadoutTileListHorizontalSpacing"/>
-        </Frame>
-
-        <Frame type="GameContentTileListItem" name="Item4" template="HeroSelectLoadoutTemplates/LoadoutTileListItemTemplate">
-            <Anchor side="Top" relative="$parent/Item5" pos="Min" offset="0"/>
-            <Anchor side="Right" relative="$parent/Item5" pos="Min" offset="#LoadoutTileListHorizontalSpacing"/>
-        </Frame>
-
-        <Frame type="GameContentTileListItem" name="Item5" template="HeroSelectLoadoutTemplates/LoadoutTileListItemTemplate">
-            <Anchor side="Right" relative="$parent/Item17" pos="Max" offset="0"/>
-            <Anchor side="Bottom" relative="$parent/Item6" pos="Min" offset="#LoadoutTileListVerticalSpacing"/>
-        </Frame>
-        <!-- End Row -->
-
-        <Frame type="GameContentTileListItem" name="Item6" template="HeroSelectLoadoutTemplates/LoadoutTileListItemTemplate">
-            <Anchor side="Top" relative="$parent/Item11" pos="Min" offset="0"/>
-            <Anchor side="Right" relative="$parent/Item7" pos="Min" offset="#LoadoutTileListVerticalSpacing"/>
-        </Frame>
-
-        <Frame type="GameContentTileListItem" name="Item7" template="HeroSelectLoadoutTemplates/LoadoutTileListItemTemplate">
-            <Anchor side="Top" relative="$parent/Item11" pos="Min" offset="0"/>
-            <Anchor side="Right" relative="$parent/Item8" pos="Min" offset="#LoadoutTileListVerticalSpacing"/>
-        </Frame>
-
-        <Frame type="GameContentTileListItem" name="Item8" template="HeroSelectLoadoutTemplates/LoadoutTileListItemTemplate">
-            <Anchor side="Top" relative="$parent/Item11" pos="Min" offset="0"/>
-            <Anchor side="Right" relative="$parent/Item9" pos="Min" offset="#LoadoutTileListHorizontalSpacing"/>
-        </Frame>
-
-        <Frame type="GameContentTileListItem" name="Item9" template="HeroSelectLoadoutTemplates/LoadoutTileListItemTemplate">
-            <Anchor side="Top" relative="$parent/Item11" pos="Min" offset="0"/>
-            <Anchor side="Right" relative="$parent/Item10" pos="Min" offset="#LoadoutTileListHorizontalSpacing"/>
-        </Frame>
-
-        <Frame type="GameContentTileListItem" name="Item10" template="HeroSelectLoadoutTemplates/LoadoutTileListItemTemplate">
-            <Anchor side="Top" relative="$parent/Item11" pos="Min" offset="0"/>
-            <Anchor side="Right" relative="$parent/Item11" pos="Min" offset="#LoadoutTileListHorizontalSpacing"/>
-        </Frame>
-
-        <Frame type="GameContentTileListItem" name="Item11" template="HeroSelectLoadoutTemplates/LoadoutTileListItemTemplate">
-            <Anchor side="Right" relative="$parent/Item17" pos="Max" offset="0"/>
-            <Anchor side="Bottom" relative="$parent/Item12" pos="Min" offset="#LoadoutTileListVerticalSpacing"/>
-        </Frame>
-        <!-- End Row -->
-
-        <Frame type="GameContentTileListItem" name="Item12" template="HeroSelectLoadoutTemplates/LoadoutTileListItemTemplate">
-            <Anchor side="Top" relative="$parent/Item17" pos="Min" offset="0"/>
-            <Anchor side="Right" relative="$parent/Item13" pos="Min" offset="#LoadoutTileListHorizontalSpacing"/>
-        </Frame>
-
-        <Frame type="GameContentTileListItem" name="Item13" template="HeroSelectLoadoutTemplates/LoadoutTileListItemTemplate">
-            <Anchor side="Top" relative="$parent/Item17" pos="Min" offset="0"/>
-            <Anchor side="Right" relative="$parent/Item14" pos="Min" offset="#LoadoutTileListHorizontalSpacing"/>
-        </Frame>
-
-        <Frame type="GameContentTileListItem" name="Item14" template="HeroSelectLoadoutTemplates/LoadoutTileListItemTemplate">
-            <Anchor side="Top" relative="$parent/Item17" pos="Min" offset="0"/>
-            <Anchor side="Right" relative="$parent/Item15" pos="Min" offset="#LoadoutTileListHorizontalSpacing"/>
-        </Frame>
-
-        <Frame type="GameContentTileListItem" name="Item15" template="HeroSelectLoadoutTemplates/LoadoutTileListItemTemplate">
-            <Anchor side="Top" relative="$parent/Item17" pos="Min" offset="0"/>
-            <Anchor side="Right" relative="$parent/Item16" pos="Min" offset="#LoadoutTileListHorizontalSpacing"/>
-        </Frame>
-
-        <Frame type="GameContentTileListItem" name="Item16" template="HeroSelectLoadoutTemplates/LoadoutTileListItemTemplate">
-            <Anchor side="Top" relative="$parent/Item17" pos="Min" offset="0"/>
-            <Anchor side="Right" relative="$parent/Item17" pos="Min" offset="#LoadoutTileListHorizontalSpacing"/>
-        </Frame>
-
-        <Frame type="GameContentTileListItem" name="Item17" template="HeroSelectLoadoutTemplates/LoadoutTileListItemTemplate">
-            <Anchor side="Right" relative="$parent/ScrollBar" pos="Min" offset="21"/>
-            <Anchor side="Bottom" relative="$parent" pos="Max" offset="20"/>
-        </Frame>
-
-        <StateGroup name="MaxItemAnchorStates">
-            <State name="12Items">
-                <When type="Property" MaxItemPerPage="12"/>
-                <Action type="SetProperty" ScrollStepValue="4"/>
-                <Action type="SetAnchor" frame="Item0" side="Top" relative="$parent/Item3" pos="Min" offset="0"/>
-                <Action type="SetAnchor" frame="Item0" side="Right" relative="$parent/Item8" pos="Max" offset="0"/>
-                <Action type="SetAnchor" frame="Item1" side="Top" relative="$parent/Item3" pos="Min" offset="0"/>
-                <Action type="SetAnchor" frame="Item1" side="Right" relative="$parent/Item9" pos="Max" offset="0"/>
-                <Action type="SetAnchor" frame="Item2" side="Top" relative="$parent/Item3" pos="Min" offset="0"/>
-                <Action type="SetAnchor" frame="Item2" side="Right" relative="$parent/Item10" pos="Max" offset="0"/>
-                <Action type="SetAnchor" frame="Item3" side="Top" relative="$parent/Item7" pos="Min" offset="-130"/>
-                <Action type="SetAnchor" frame="Item3" side="Right" relative="$parent/Item11" pos="Max" offset="0"/>
-                <Action type="SetAnchor" frame="Item3" side="Bottom" relative="$parent/Item7" pos="Min" offset="#LoadoutTileListVerticalSpacing"/>
-                <Action type="SetAnchor" frame="Item4" side="Top" relative="$parent/Item7" pos="Min" offset="0"/>
-                <Action type="SetAnchor" frame="Item4" side="Right" relative="$parent/Item8" pos="Max" offset="0"/>
-                <Action type="SetAnchor" frame="Item5" side="Top" relative="$parent/Item7" pos="Min" offset="0"/>
-                <Action type="SetAnchor" frame="Item5" side="Right" relative="$parent/Item9" pos="Max" offset="0"/>
-                <Action type="SetAnchor" frame="Item5" side="Bottom" relative="$parent/Item7" pos="Max" offset="0"/>
-                <Action type="SetAnchor" frame="Item6" side="Top" relative="$parent/Item7" pos="Min" offset="0"/>
-                <Action type="SetAnchor" frame="Item6" side="Right" relative="$parent/Item10" pos="Max" offset="0"/>
-                <Action type="SetAnchor" frame="Item7" side="Top" relative="$parent/Item11" pos="Min" offset="-130"/>
-                <Action type="SetAnchor" frame="Item7" side="Right" relative="$parent/Item11" pos="Max" offset="0"/>
-                <Action type="SetAnchor" frame="Item7" side="Bottom" relative="$parent/Item11" pos="Min" offset="#LoadoutTileListVerticalSpacing"/>
-                <Action type="SetAnchor" frame="Item8" side="Top" relative="$parent/Item11" pos="Min" offset="0"/>
-                <Action type="SetAnchor" frame="Item8" side="Right" relative="$parent/Item9" pos="Min" offset="#LoadoutTileListHorizontalSpacing"/>
-                <Action type="SetAnchor" frame="Item9" side="Top" relative="$parent/Item11" pos="Min" offset="0"/>
-                <Action type="SetAnchor" frame="Item9" side="Right" relative="$parent/Item10" pos="Min" offset="#LoadoutTileListHorizontalSpacing"/>
-                <Action type="SetAnchor" frame="Item10" side="Top" relative="$parent/Item11" pos="Min" offset="0"/>
-                <Action type="SetAnchor" frame="Item10" side="Right" relative="$parent/Item11" pos="Min" offset="#LoadoutTileListHorizontalSpacing"/>
-                <Action type="SetAnchor" frame="Item11" side="Right" relative="$parent/ScrollBar" pos="Min" offset="21"/>
-                <Action type="SetAnchor" frame="Item11" side="Bottom" relative="$parent" pos="Max" offset="20"/>
-                <Action type="SetAnchor" frame="ScrollBar" side="Bottom" relative="$parent/Item11" pos="Max" offset="-21"/>
-            </State>
-        </StateGroup>
+    <Frame type="Image" name="SelectedImage">
+      <Anchor relative="$parent/EmptyImage" />
+      <TextureType val="Nineslice" />
+      <Texture val="@UI/Storm_Heroselect_Loadout_ItemFrame_Active" />
     </Frame>
-
-    <Frame type="LoadoutTileList" name="LargeLoadoutTileListTemplate" template="HeroSelectLoadoutTemplates/BaseLoadoutTileListTemplate">
-        <Anchor side="Top" relative="Item0" pos="Min" offset="0"/>
-        <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
-        <Anchor side="Right" relative="$parent" pos="Max" offset="-2"/>
-        <Anchor side="Bottom" relative="$parent" pos="Max" offset="-10"/>
-        <ScrollStepValue val="6"/>
-
-        <Frame type="ScrollBar" name="ScrollBar" template="StandardTemplates/ScrollableBarTemplate">
-            <Anchor side="Bottom" relative="$parent/Item11" pos="Max" offset="-21"/>
-        </Frame>
-
-        <Frame type="GameContentTileListItem" name="Item0" template="HeroSelectLoadoutTemplates/LargeLoadoutTileListItemTemplate">
-            <Anchor side="Top" relative="$parent/Item5" pos="Min" offset="0"/>
-            <Anchor side="Right" relative="$parent/Item6" pos="Max" offset="0"/>
-        </Frame>
-
-        <Frame type="GameContentTileListItem" name="Item1" template="HeroSelectLoadoutTemplates/LargeLoadoutTileListItemTemplate">
-            <Anchor side="Top" relative="$parent/Item5" pos="Min" offset="0"/>
-            <Anchor side="Right" relative="$parent/Item7" pos="Max" offset="0"/>
-        </Frame>
-
-        <Frame type="GameContentTileListItem" name="Item2" template="HeroSelectLoadoutTemplates/LargeLoadoutTileListItemTemplate">
-            <Anchor side="Top" relative="$parent/Item5" pos="Min" offset="0"/>
-            <Anchor side="Right" relative="$parent/Item8" pos="Max" offset="0"/>
-        </Frame>
-
-        <Frame type="GameContentTileListItem" name="Item3" template="HeroSelectLoadoutTemplates/LargeLoadoutTileListItemTemplate">
-            <Anchor side="Top" relative="$parent/Item5" pos="Min" offset="0"/>
-            <Anchor side="Right" relative="$parent/Item9" pos="Max" offset="0"/>
-        </Frame>
-
-        <Frame type="GameContentTileListItem" name="Item4" template="HeroSelectLoadoutTemplates/LargeLoadoutTileListItemTemplate">
-            <Anchor side="Top" relative="$parent/Item5" pos="Min" offset="0"/>
-            <Anchor side="Right" relative="$parent/Item10" pos="Max" offset="0"/>
-        </Frame>
-
-        <Frame type="GameContentTileListItem" name="Item5" template="HeroSelectLoadoutTemplates/LargeLoadoutTileListItemTemplate">
-            <Anchor side="Top" relative="$this" pos="Max" offset="0"/>
-            <Anchor side="Right" relative="$parent/Item11" pos="Max" offset="0"/>
-            <Anchor side="Bottom" relative="$parent/Item11" pos="Min" offset="#LoadoutTileListVerticalSpacing"/>
-        </Frame>
-        <!-- End Row -->
-
-        <Frame type="GameContentTileListItem" name="Item6" template="HeroSelectLoadoutTemplates/LargeLoadoutTileListItemTemplate">
-            <Anchor side="Top" relative="$parent/Item11" pos="Min" offset="0"/>
-            <Anchor side="Right" relative="$parent/Item7" pos="Min" offset="#LoadoutTileListHorizontalSpacing"/>
-        </Frame>
-
-        <Frame type="GameContentTileListItem" name="Item7" template="HeroSelectLoadoutTemplates/LargeLoadoutTileListItemTemplate">
-            <Anchor side="Top" relative="$parent/Item11" pos="Min" offset="0"/>
-            <Anchor side="Right" relative="$parent/Item8" pos="Min" offset="#LoadoutTileListHorizontalSpacing"/>
-            <Anchor side="Bottom" relative="$this" pos="Min" offset="0"/>
-        </Frame>
-
-        <Frame type="GameContentTileListItem" name="Item8" template="HeroSelectLoadoutTemplates/LargeLoadoutTileListItemTemplate">
-            <Anchor side="Top" relative="$parent/Item11" pos="Min" offset="0"/>
-            <Anchor side="Right" relative="$parent/Item9" pos="Min" offset="#LoadoutTileListHorizontalSpacing"/>
-        </Frame>
-
-        <Frame type="GameContentTileListItem" name="Item9" template="HeroSelectLoadoutTemplates/LargeLoadoutTileListItemTemplate">
-            <Anchor side="Top" relative="$parent/Item11" pos="Min" offset="0"/>
-            <Anchor side="Right" relative="$parent/Item10" pos="Min" offset="#LoadoutTileListHorizontalSpacing"/>
-        </Frame>
-
-        <Frame type="GameContentTileListItem" name="Item10" template="HeroSelectLoadoutTemplates/LargeLoadoutTileListItemTemplate">
-            <Anchor side="Top" relative="$parent/Item11" pos="Min" offset="0"/>
-            <Anchor side="Right" relative="$parent/Item11" pos="Min" offset="#LoadoutTileListHorizontalSpacing"/>
-        </Frame>
-
-        <Frame type="GameContentTileListItem" name="Item11" template="HeroSelectLoadoutTemplates/LargeLoadoutTileListItemTemplate">
-            <Anchor side="Right" relative="$parent/ScrollBar" pos="Min" offset="21"/>
-            <Anchor side="Bottom" relative="$parent" pos="Max" offset="20"/>
-        </Frame>
-        <!-- End Row -->
-
-        <StateGroup name="MaxItemAnchorStates">
-            <State name="8Items">
-                <When type="Property" MaxItemPerPage="8"/>
-                <Action type="SetProperty" ScrollStepValue="4"/>
-                <Action type="SetAnchor" frame="Item0" side="Top" relative="$parent/Item3" pos="Min" offset="0"/>
-                <Action type="SetAnchor" frame="Item0" side="Right" relative="$parent/Item4" pos="Max" offset="0"/>
-                <Action type="SetAnchor" frame="Item1" side="Top" relative="$parent/Item3" pos="Min" offset="0"/>
-                <Action type="SetAnchor" frame="Item1" side="Right" relative="$parent/Item5" pos="Max" offset="0"/>
-                <Action type="SetAnchor" frame="Item2" side="Top" relative="$parent/Item3" pos="Min" offset="0"/>
-                <Action type="SetAnchor" frame="Item2" side="Right" relative="$parent/Item6" pos="Max" offset="0"/>
-                <Action type="SetAnchor" frame="Item3" side="Top" relative="$parent/Item7" pos="Min" offset="-195"/>
-                <Action type="SetAnchor" frame="Item3" side="Right" relative="$parent/Item7" pos="Max" offset="0"/>
-                <Action type="SetAnchor" frame="Item3" side="Bottom" relative="$parent/Item7" pos="Min" offset="#LoadoutTileListVerticalSpacing"/>
-                <Action type="SetAnchor" frame="Item4" side="Top" relative="$parent/Item7" pos="Min" offset="0"/>
-                <Action type="SetAnchor" frame="Item4" side="Right" relative="$parent/Item5" pos="Min" offset="#LoadoutTileListHorizontalSpacing"/>
-                <Action type="SetAnchor" frame="Item5" side="Top" relative="$parent/Item7" pos="Min" offset="0"/>
-                <Action type="SetAnchor" frame="Item5" side="Right" relative="$parent/Item6" pos="Min" offset="#LoadoutTileListHorizontalSpacing"/>
-                <Action type="SetAnchor" frame="Item5" side="Bottom" relative="$parent/Item7" pos="Max" offset="0"/>
-                <Action type="SetAnchor" frame="Item6" side="Top" relative="$parent/Item7" pos="Min" offset="0"/>
-                <Action type="SetAnchor" frame="Item6" side="Right" relative="$parent/Item7" pos="Min" offset="#LoadoutTileListHorizontalSpacing"/>
-                <Action type="SetAnchor" frame="Item7" side="Top" relative="$parent" pos="Max" offset="-216"/>
-                <Action type="SetAnchor" frame="Item7" side="Right" relative="$parent/ScrollBar" pos="Min" offset="21"/>
-                <Action type="SetAnchor" frame="Item7" side="Bottom" relative="$parent" pos="Max" offset="20"/>
-            </State>
-        </StateGroup>
+    <Frame type="Frame" name="HitTestFrame">
+      <Anchor side="Top" relative="$parent" pos="Min" offset="23" />
+      <Anchor side="Left" relative="$parent" pos="Min" offset="23" />
+      <Anchor side="Right" relative="$parent" pos="Max" offset="-23" />
+      <Anchor side="Bottom" relative="$parent" pos="Max" offset="-23" />
     </Frame>
-
-    <!--===============================================================================================
-    <! Category Tile List Templates
-    <!==============================================================================================-->
-    <Frame type="CollectionCategoryTileListItem" name="LoadoutCategoryTileListItem">
-        <AcceptsMouse val="True"/>
-        <SelectedSound val="@UI_BNet_Generic_01"/>
-        <Width val="203"/>
-        <Height val="62"/>
-
-        <Frame type="GameContentFrame" name="GameContentFrame">
-            <Anchor relative="$parent"/>
-            <GameContent val="{$parent/@GameContent}"/>
-        </Frame>
-
-        <Frame type="Image" name="NormalImage">
-            <Anchor relative="$parent"/>
-            <Texture val="@UI/Storm_UI_LeftNav_MiniButton_Normal"/>
-        </Frame>
-
-        <Frame type="Image" name="SelectedImage">
-            <Anchor relative="$parent"/>
-            <Texture val="@UI/Storm_UI_LeftNav_MiniButton_Selected"/>
-        </Frame>
-
-        <Frame type="Image" name="HoverImage">
-            <Anchor relative="$parent"/>
-            <Texture val="@UI/Storm_UI_LeftNav_MiniButton_Selected"/>
-        </Frame>
-
-        <Frame type="Label" name="CategoryLabel">
-            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
-            <Anchor side="Left" relative="$parent" pos="Min" offset="21"/>
-            <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
-            <Style val="LoadoutCategoryNormalLabel"/>
-            <Text val="{$parent/GameContentFrame/@StoreName}"/>
-        </Frame>
-
-        <Frame type="Frame" name="HitTestFrame">
-            <Anchor side="Top" relative="$parent" pos="Min" offset="5"/>
-            <Anchor side="Left" relative="$parent" pos="Min" offset="13"/>
-            <Anchor side="Right" relative="$parent" pos="Max" offset="-13"/>
-            <Anchor side="Bottom" relative="$parent" pos="Max" offset="-5"/>
-        </Frame>
-
-        <StateGroup name="FontStates">
-            <State name="NonHovered">
-                <When type="Property" hovered="False"/>
-                <When type="Property" selected="False"/>
-                <Action type="SetProperty" frame="CategoryLabel" style="LoadoutCategoryNormalLabel"/>
-            </State>
-            <State name="Hovered">
-                <When type="Property" hovered="True"/>
-                <When type="Property" selected="False"/>
-                <Action type="SetProperty" frame="CategoryLabel" style="LoadoutCategorySelectedLabel"/>
-            </State>
-            <State name="Toggled">
-                <When type="Property" selected="True"/>
-                <Action type="SetProperty" frame="CategoryLabel" style="LoadoutCategorySelectedLabel"/>
-            </State>
-        </StateGroup>
-
-        <!-- <Animation name="ResetPageLocation">
-            <Event event="OnClick" action="Reset, Play"/>
-
-            <Controller type="Property" property="Value" frame="$parent/$parent/ContentTileList/ScrollBar" end="Pause">
-                <Key type="Property" time="0" value="0"/>
-            </Controller>
-        </Animation> -->
+    <Frame type="Image" name="LockedIconImage">
+      <Anchor side="Bottom" relative="$parent" pos="Max" offset="-28" />
+      <Anchor side="Right" relative="$parent" pos="Max" offset="-28" />
+      <RenderPriority val="515" />
+      <Texture val="@UI/Storm_HeroSelect_CustomizePanel_SkinFrame_Locked" />
+      <Visible val="False" />
+      <DesaturateOnDisable val="false" />
     </Frame>
-
-    <Frame type="CollectionCategoryTileList" name="LoadoutCategoryTileListTemplate">
-        <Anchor side="Top" relative="Item0" pos="Min" offset="0"/>
-        <Anchor side="Left" relative="$parent" pos="Min" offset="5"/>
-        <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
-        <Anchor side="Right" relative="ScrollBar" pos="Max" offset="0"/>
-        <RequireSelection val="true"/>
-        <ReportsStats val="true"/>
-        <AcceptsMouse val="true"/>
-        <RenderPriority val="601"/>
-        <ScrollStepValue val="1"/>
-        <MaxItemPerPage val="9"/>
-        <Height val="800"/>
-
-        <RequireParentHeroFilter val="false"/>
-
-        <SelectedIndex val="#InvalidIndex"/>
-
-        <UpdateWhenLicensesChange val="true"/>
-        <FilterFlags val="Default|NoDupes|Selectable|NoMatchFilterString|!NoValidProduct|!CanNotPurchase"/>
-        <SearchFlags val=""/>
-        <GenerationMode val="Default"/>
-        <SortMethod index="0" val="Alphabetical"/>
-
-        <StateGroup name="UpdateWhenHidden">
-            <State name="ShouldUpdate">
-                <When type="Property" frame="$ancestor[@type=HeroSelectPanel]" HeroLink="" operator="NotEqual"/>
-                <Action type="SetProperty" UpdateWhenHidden="true"/>
-            </State>
-        </StateGroup>
-
-        <Frame type="GameContentFrame" name="GameContentData">
-            <Anchor relative="$parent"/>
-            <GameContent val="{$parent/@SelectedGameContent}"/>
-        </Frame>
-
-        <Frame type="ScrollBar" name="ScrollBar" template="StandardTemplates/ScrollableBarTemplate">
-            <Anchor side="Top" relative="$parent/Item0" pos="Min" offset="6"/>
-            <Anchor side="Right" relative="$parent/Item0" pos="Max" offset="10"/>
-            <Anchor side="Bottom" relative="$parent/Item7" pos="Max" offset="-13"/>
-            <IncrementSound val=""/>
-        </Frame>
-
-        <Frame type="Image" name="EmptyScrollBarImage">
-            <Anchor relative="$parent/ScrollBar"/>
-            <Texture val="@UI/Storm_Scrollbar_Background_Disabled"/>
-            <TextureType val="Nineslice"/>
-            <Tiled val="true"/>
-            <Visible val="False"/>
-
-            <StateGroup name="VisibilityStates">
-                <State name="ShowEmptyScrollBar">
-                    <When type="Property" frame="$parent/ScrollBar" Visible="false"/>
-                    <Action type="SetProperty" Visible="true"/>
-                </State>
-            </StateGroup>
-        </Frame>
-
-        <Frame type="CollectionCategoryTileListItem" name="Item0" template="HeroSelectLoadoutTemplates/LoadoutCategoryTileListItem">
-            <Anchor side="Left" relative="$parent/Item7" pos="Min" offset="0"/>
-            <Anchor side="Bottom" relative="$parent/Item1" pos="Min" offset="#LoadoutCategoryTileListItemSpacing"/>
-        </Frame>
-
-        <Frame type="CollectionCategoryTileListItem" name="Item1" template="HeroSelectLoadoutTemplates/LoadoutCategoryTileListItem">
-            <Anchor side="Left" relative="$parent/Item7" pos="Min" offset="0"/>
-            <Anchor side="Bottom" relative="$parent/Item2" pos="Min" offset="#LoadoutCategoryTileListItemSpacing"/>
-        </Frame>
-
-        <Frame type="CollectionCategoryTileListItem" name="Item2" template="HeroSelectLoadoutTemplates/LoadoutCategoryTileListItem">
-            <Anchor side="Left" relative="$parent/Item7" pos="Min" offset="0"/>
-            <Anchor side="Bottom" relative="$parent/Item3" pos="Min" offset="#LoadoutCategoryTileListItemSpacing"/>
-        </Frame>
-
-        <Frame type="CollectionCategoryTileListItem" name="Item3" template="HeroSelectLoadoutTemplates/LoadoutCategoryTileListItem">
-            <Anchor side="Left" relative="$parent/Item7" pos="Min" offset="0"/>
-            <Anchor side="Bottom" relative="$parent/Item4" pos="Min" offset="#LoadoutCategoryTileListItemSpacing"/>
-        </Frame>
-
-        <Frame type="CollectionCategoryTileListItem" name="Item4" template="HeroSelectLoadoutTemplates/LoadoutCategoryTileListItem">
-            <Anchor side="Left" relative="$parent/Item7" pos="Min" offset="0"/>
-            <Anchor side="Bottom" relative="$parent/Item5" pos="Min" offset="#LoadoutCategoryTileListItemSpacing"/>
-        </Frame>
-
-        <Frame type="CollectionCategoryTileListItem" name="Item5" template="HeroSelectLoadoutTemplates/LoadoutCategoryTileListItem">
-            <Anchor side="Left" relative="$parent/Item7" pos="Min" offset="0"/>
-            <Anchor side="Bottom" relative="$parent/Item6" pos="Min" offset="#LoadoutCategoryTileListItemSpacing"/>
-        </Frame>
-
-        <Frame type="CollectionCategoryTileListItem" name="Item6" template="HeroSelectLoadoutTemplates/LoadoutCategoryTileListItem">
-            <Anchor side="Left" relative="$parent/Item7" pos="Min" offset="0"/>
-            <Anchor side="Bottom" relative="$parent/Item7" pos="Min" offset="#LoadoutCategoryTileListItemSpacing"/>
-        </Frame>
-
-        <Frame type="CollectionCategoryTileListItem" name="Item7" template="HeroSelectLoadoutTemplates/LoadoutCategoryTileListItem">
-            <Anchor side="Left" relative="$parent" pos="Min" offset="5"/>
-            <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
-        </Frame>
-    </Frame>
-
-    <!--===============================================================================================
-    <! Purchase Panel Templates
-    <!==============================================================================================-->
-    <Frame type="PurchaseInfoPanel" name="LoadoutPurchaseInfoPanel">
-        <Anchor side="Left" relative="$parent/BlurBackground" pos="Min" offset="0"/>
-        <Anchor side="Right" relative="$parent/BlurBackground" pos="Max" offset="0"/>
-        <Anchor side="Bottom" relative="$parent/BlurBackground" pos="Min" offset="0"/>
-        <Height val="300"/>
-
-        <Frame type="BlurFrame" name="BlurBackground">
-            <Anchor relative="$parent/BorderImage"/>
-            <BlurAmount val="0.8"/>
-            <RenderPriority val="399"/>
-            <AcceptsMouse val="true"/>
-
-            <Frame type="Image" name="LowImage">
-                <Anchor relative="$parent" />
-                <TextureType val="Normal"/>
-                <Texture val="@UI/Storm_Generic_Background_Low"/>
-            </Frame>
-        </Frame>
-
-        <Frame type="Image" name="BorderImage">
-            <Anchor side="Top" relative="$parent/NameLabel" pos="Min" offset="-10"/>
-            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
-            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
-            <Anchor side="Bottom" relative="$parent" pos="Max" offset="-5"/>
-            <Texture val="@UI/Storm_Generic_SmallPanel_Border"/>
-            <TextureType val="Nineslice"/>
-            <RenderPriority val="400"/>
-        </Frame>
-
-        <Frame type="Label" name="NameLabel">
-            <Anchor side="Top" relative="$this" pos="Max" offset="0"/>
-            <Anchor side="Bottom" relative="$parent/DescriptionLabel" pos="Min" offset="0"/>
-            <Anchor side="Left" relative="$parent/BlurBackground" pos="Min" offset="10"/>
-            <Anchor side="Right" relative="$parent/BlurBackground" pos="Max" offset="-10"/>
-            <Style val="HeroSelectPanelPurchaseLabel"/>
-        </Frame>
-
-        <Frame type="Label" name="DescriptionLabel">
-            <Anchor side="Top" relative="$this" pos="Max" offset="0"/>
-            <Anchor side="Bottom" relative="$parent" pos="Max" offset="-87"/>
-            <Anchor side="Left" relative="$parent/BlurBackground" pos="Min" offset="10"/>
-            <Anchor side="Right" relative="$parent/BlurBackground" pos="Max" offset="-10"/>
-            <CollapseLayout val="True"/>
-            <Style val="HeroSelectPanelPurchaseError"/>
-
-            <StateGroup name="PositionAdjustStates">
-                <State name="MountShown">
-                    <When type="Property" frame="$ancestor[@type=HeroSelectLoadoutsPanel]/LoadoutPanelTabs/PanelContainer/MountsPanel" Visible="true"/>
-                    <Action type="SetAnchor" frame="$parent/NameLabel" side="Top" relative="$ancestor[@type=HeroSelectLoadoutsPanel]/CutscenePreviewFrame/BlurBackground" pos="Min" offset="10"/>
-                    <Action type="SetAnchor" frame="$parent/NameLabel" side="Bottom" relative="$this" pos="Min" offset="0"/>
-                    <Action type="SetAnchor" side="Top" relative="$parent/NameLabel" pos="Max" offset="0"/>
-                    <Action type="SetAnchor" side="Bottom" relative="$this" pos="Min" offset="0"/>
-
-                    <!-- Reset the anchors on Exit -->
-                    <Action type="SetAnchor" frame="$parent/NameLabel" side="Top" relative="$this" pos="Max" offset="0" On="Exit"/>
-                    <Action type="SetAnchor" frame="$parent/NameLabel" side="Bottom" relative="$parent/DescriptionLabel" pos="Min" offset="0" On="Exit"/>
-                    <Action type="SetAnchor" side="Top" relative="$this" pos="Max" offset="0" On="Exit"/>
-                    <Action type="SetAnchor" side="Bottom" relative="$parent" pos="Max" offset="-87" On="Exit"/>
-                </State>
-            </StateGroup>
-        </Frame>
-
-        <Animation name="Show">
-            <Event event="OnShown" action="Reset, Play"/>
-            <Event event="OnHidden" action="DirectionReverse, Play"/>
-
-            <Controller type="Fade" end="Pause">
-                <Key type="Curve" time="0" value="0" inout="Linear"/>
-                <Key type="Curve" time=".3" value="255" inout="Slow,Linear"/>
-            </Controller>
-            <Controller type="Fade" end="Pause" frame="$parent/PurchaseCurrencySelectPanel">
-                <Key type="Curve" time="0" value="0" inout="Linear"/>
-                <Key type="Curve" time=".3" value="255" inout="Slow,Linear"/>
-            </Controller>
+    <Frame type="Frame" name="IGRBenefitFrame">
+      <Anchor side="Bottom" relative="$parent" pos="Max" offset="-28" />
+      <Anchor side="Right" relative="$parent" pos="Max" offset="-28" />
+      <Width val="56" />
+      <Height val="56" />
+      <Visible val="False" />
+      <Frame type="Image" name="IGRBenefitGlow">
+        <Anchor side="Top" relative="$parent" pos="Min" offset="0" />
+        <Anchor side="Left" relative="$parent" pos="Min" offset="0" />
+        <Texture val="@UI/Storm_UI_Play_F2P_LogoGlow" />
+        <BlendMode val="Add" />
+        <Animation name="Pulse">
+          <Event event="OnShown" action="DirectionForward,Play" />
+          <Controller type="Fade" end="PingPong">
+            <Key type="Curve" time="0" value="0" inout="Linear" />
+            <Key type="Curve" time=".7" value="255" inout="Slow,Linear" />
+          </Controller>
         </Animation>
-
-        <StateGroup name="CutscenePreviewVisibility">
-            <State name="PreviewCutsceneShown">
-                <When type="Property" frame="$parent/CutscenePreviewFrame" Visible="true"/>
-                <Action type="SetProperty" frame="BlurBackground" Visible="false"/>
-                <Action type="SetProperty" frame="BorderImage" Visible="false"/>
-            </State>
-        </StateGroup>
+        <DesaturateOnDisable val="false" />
+      </Frame>
+      <Frame type="Image" name="IGRLogo">
+        <Anchor relative="$parent/IGRBenefitGlow" />
+        <Texture val="@UI/Storm_UI_Play_IGR_Logo" />
+        <DesaturateOnDisable val="false" />
+      </Frame>
     </Frame>
-
-    <Frame type="PurchaseCurrencySelectPanel" name="LoadoutPurchaseCurrencySelectPanel">
-        <Anchor relative="$parent/PurchaseInfoPanel/BlurBackground"/>
-        <Visible val="False"/>
-
-        <Frame type="BuyButton" name="BuyButton0" template="StoreTemplates/BuyButtonSmallTemplate">
-            <Anchor side="Top" relative="$parent/ShopIconImage" pos="Mid" offset="0"/>
-            <Anchor side="Bottom" relative="$parent/ShopIconImage" pos="Mid" offset="0"/>
-            <Anchor side="Left" relative="$parent" pos="Min" offset="5"/>
-            <Anchor side="Right" relative="$parent" pos="Mid" offset="-10"/>
-            <Width val="0"/>
-            <CollapseLayout val="true"/>
-            <PositionHint val="HeroSelect"/>
-
-            <Frame type="Frame" name="HitTestFrame">
-                <TooltipAnchorPosition val="TopCenter"/>
-            </Frame>
-        </Frame>
-
-        <Frame type="BuyButton" name="BuyButton1" template="StoreTemplates/BuyButtonSmallTemplate">
-            <Anchor side="Top" relative="$parent/ShopIconImage" pos="Mid" offset="0"/>
-            <Anchor side="Bottom" relative="$parent/ShopIconImage" pos="Mid" offset="0"/>
-            <Anchor side="Left" relative="$parent" pos="Mid" offset="10"/>
-            <Anchor side="Right" relative="$parent" pos="Max" offset="-5"/>
-            <Width val="0"/>
-            <CollapseLayout val="true"/>
-            <PositionHint val="HeroSelect"/>
-
-            <Frame type="Frame" name="HitTestFrame">
-                <TooltipAnchorPosition val="TopCenter"/>
-            </Frame>
-        </Frame>
-
-        <Frame type="BuyButton" name="BuyButton2" template="StoreTemplates/BuyButtonSmallTemplate">
-            <Anchor side="Top" relative="$parent/BuyButton1" pos="Mid" offset="60"/>
-            <Anchor side="Bottom" relative="$parent/BuyButton1" pos="Mid" offset="60"/>
-            <Anchor side="Left" relative="$parent" pos="Mid" offset="10"/>
-            <Anchor side="Right" relative="$parent" pos="Max" offset="-5"/>
-            <Width val="0"/>
-            <CollapseLayout val="true"/>
-            <PositionHint val="HeroSelect"/>
-
-            <Frame type="Frame" name="HitTestFrame">
-                <TooltipAnchorPosition val="TopCenter"/>
-            </Frame>
-        </Frame>
-
-        <Frame type="Image" name="ShopIconImage">
-            <Anchor side="Bottom" relative="$parent" pos="Max" offset="14"/>
-            <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
-            <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
-            <Texture val="@UI/Storm_UI_Play_HeroAttributes_PurchaseIcon"/>
-        </Frame>
-
-        <StateGroup name="ShopIconShowHideStates">
-            <State name="HideShopIcon">
-                <When type="Property" frame="BuyButton0" visible="False"/>
-                <When type="Property" frame="BuyButton1" visible="False"/>
-                <Action type="SetProperty" frame="ShopIconImage" visible="False"/>
-            </State>
-            <State name="ShowShopIcon">
-                <Action type="SetProperty" frame="ShopIconImage" visible="True"/>
-            </State>
-        </StateGroup>
+    <Frame type="Image" name="SeasonalEventBadge" template="StoreTemplates/SeasonalEventBadgeTemplate">
+      <Anchor side="Top" relative="$parent" pos="Min" offset="28" />
+      <Anchor side="Right" relative="$parent" pos="Max" offset="-26" />
+      <RenderPriority val="514" />
+      <Width val="36" />
+      <Height val="36" />
+      <Frame type="Label" name="EventNameLabel">
+        <Text val="{$parent/$parent/GameContentFrame/@EventName}" />
+      </Frame>
     </Frame>
-
-    <Frame type="PurchaseConfirmPanel" name="LoadoutPurchaseConfirmPanel">
-        <Anchor relative="$parent/PurchaseCurrencySelectPanel"/>
-        <Visible val="false"/>
-
-        <Frame type="Button" name="ConfirmButton" template="StandardTemplates/StandardButtonSmallTemplate">
-            <Anchor side="Top" relative="$parent/ShopIconImage" pos="Mid" offset="0"/>
-            <Anchor side="Bottom" relative="$parent/ShopIconImage" pos="Mid" offset="0"/>
-            <Anchor side="Left" relative="$parent" pos="Min" offset="5"/>
-            <Anchor side="Right" relative="$parent" pos="Mid" offset="-10"/>
-            <Width val="0"/>
-            <CollapseLayout val="true"/>
-            <Text val="@UI/ProductPurchase/GoldConfirmButton"/>
-
-            <Frame type="Frame" name="HitTestFrame">
-                <TooltipAnchorPosition val="TopCenter"/>
-            </Frame>
-
-            <!-- The Buy with Gold label truncates in long languages. This narrows the label so that it can word wrap -->
-            <Frame type="Label" name="Label">
-                <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
-                <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
-                <Width val="157"/>
-            </Frame>
-        </Frame>
-
-        <Frame type="Button" name="CancelButton" template="StandardTemplates/StandardButtonSmallTemplate">
-            <Anchor side="Top" relative="$parent/ShopIconImage" pos="Mid" offset="0"/>
-            <Anchor side="Bottom" relative="$parent/ShopIconImage" pos="Mid" offset="0"/>
-            <Anchor side="Left" relative="$parent" pos="Mid" offset="10"/>
-            <Anchor side="Right" relative="$parent" pos="Max" offset="-5"/>
-            <Width val="0"/>
-            <CollapseLayout val="true"/>
-            <Text val="@UI/ProductPurchase/CancelButton"/>
-
-            <Frame type="Frame" name="HitTestFrame">
-                <TooltipAnchorPosition val="TopCenter"/>
-            </Frame>
-        </Frame>
-
-        <Frame type="Image" name="ShopIconImage">
-            <Anchor side="Bottom" relative="$parent" pos="Max" offset="14"/>
-            <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
-            <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
-            <Texture val="@UI/Storm_UI_Play_HeroAttributes_PurchaseIcon"/>
-        </Frame>
+    <StateGroup name="SelectionDisabled">
+      <State name="SelectionDisabled">
+        <When type="Property" frame="$this" selectionDisabled="True" />
+        <Action type="SetProperty" frame="$this" enabled="False" />
+      </State>
+    </StateGroup>
+    <StateGroup name="Locked">
+      <DefaultState val="NotLocked" />
+      <State name="Locked">
+        <When type="Property" frame="GameContentFrame" isAllowed="False" />
+        <When type="Property" frame="GameContentFrame" isValid="True" />
+        <When type="Property" frame="$GlueUI" tradeshowMode="False" />
+        <Action type="SetProperty" frame="LockedIconImage" visible="True" />
+        <Action type="SetProperty" frame="LockedBorderImage" visible="True" />
+        <Action type="SetProperty" frame="LockedOverlayImage" visible="True" />
+        <Action type="SetProperty" frame="NormalImage" alpha="0" />
+      </State>
+      <State name="NotLocked">
+        <Action type="SetProperty" frame="LockedIconImage" visible="False" />
+        <Action type="SetProperty" frame="LockedBorderImage" visible="False" />
+        <Action type="SetProperty" frame="LockedOverlayImage" visible="False" />
+        <Action type="SetProperty" frame="NormalImage" alpha="255" />
+      </State>
+    </StateGroup>
+    <StateGroup name="IGRBenefit">
+      <State name="IGRBenefit">
+        <When type="Property" frame="GameContentFrame" isAwardedByIGRBenefit="True" />
+        <When type="Property" frame="GameContentFrame" isAllowed="True" />
+        <Action type="SetProperty" frame="IGRBenefitFrame" visible="True" />
+      </State>
+    </StateGroup>
+    <StateGroup name="Tooltip">
+      <State name="CantPurchase">
+        <When type="Property" frame="GameContentFrame" canPurchase="False" />
+        <When type="Property" frame="$this" isMasterSkin="True" />
+        <When type="Property" frame="$GlueUI" tradeshowMode="False" />
+        <Action type="SetProperty" frame="$this" tooltip="{$this/GameContentFrame/@CantPurchaseReason}" />
+      </State>
+      <State name="SelectionDisabled">
+        <When type="Property" frame="$this" selectionDisabled="True" />
+        <Action type="SetProperty" frame="$this" tooltip="@UI/Store/SkinDisabled" />
+      </State>
+    </StateGroup>
+    <StateGroup name="DeemphasizedStates">
+      <State name="Deemphasized">
+        <When type="Property" frame="$this" MatchesFilter="False" />
+        <Action type="SetProperty" frame="DeemphasizeOverlayImage" visible="True" />
+      </State>
+    </StateGroup>
+  </Frame>
+  <Frame type="GameContentTileListItem" name="LargeLoadoutTileListItemTemplate" template="HeroSelectLoadoutTemplates/LoadoutTileListItemTemplate">
+    <Height val="236" />
+  </Frame>
+  <Frame type="LoadoutTileList" name="BaseLoadoutTileListTemplate" template="HeroSelectCustomizePanel/HeroSelectCustomizePanelTileListTemplate">
+    <RequireSelection val="false" />
+    <AcceptsMouse val="true" />
+    <FilterFlags val="Default|NoDupes|Selectable|NoMatchFilterString|!NoValidProduct|!CanNotPurchase" />
+    <SortMethod index="0" val="FilterString" />
+    <SortMethod index="1" val="Default" />
+    <SortMethod index="2" val="Allowed" />
+    <SortMethod index="3" val="Alphabetical" />
+    <UpdateWhenLicensesChange val="true" />
+    <ScrollStepValue val="6" />
+    <LoadoutHero val="{$ancestor[@type=HeroSelectLoadoutsPanel]/@HeroLink}" />
+    <StateGroup name="UpdateWhenHidden">
+      <State name="ShouldUpdate">
+        <When type="Property" frame="$ancestor[@type=HeroSelectLoadoutsPanel]" Visible="true" />
+        <When type="Property" frame="$ancestor[@type=HeroSelectLoadoutsPanel]" HeroLink="" operator="NotEqual" />
+        <Action type="SetProperty" UpdateWhenHidden="true" />
+      </State>
+    </StateGroup>
+    <Frame type="GameContentFrame" name="GameContentFrame">
+      <Anchor relative="$parent" />
+      <GameContent val="{$parent/@SelectedGameContent}" />
     </Frame>
-
-    <!--===============================================================================================
-    <! Miscellaneous Templates
-    <!==============================================================================================-->
-    <Frame type="Label" name="SelectedItemNameLabelTemplate">
-        <Anchor side="Top" relative="$parent/SearchEditBox" pos="Mid" offset="0"/>
-        <Anchor side="Left" relative="$parent" pos="Min" offset="25"/>
-        <Anchor side="Right" relative="$parent/OwnershipFilterPulldown" pos="Min" offset="0"/>
-        <Anchor side="Bottom" relative="$parent/SearchEditBox" pos="Mid" offset="0"/>
-        <Height val="35"/>
-        <Style val="HeroSelectPanelHeaderLabel"/>
-        <AcceptsMouseTooltip val="true"/>
-        <Options val="NoWrapping | TooltipIfTruncated"/>
-        <TooltipAnchorPosition val="TopCenter"/>
+    <Frame type="ScrollBar" name="ScrollBar" template="StandardTemplates/ScrollableBarTemplate">
+      <Anchor side="Top" relative="$parent/Item0" pos="Min" offset="22" />
+      <Anchor side="Right" relative="$parent" pos="Max" offset="-8" />
+      <Anchor side="Bottom" relative="$parent/Item17" pos="Max" offset="-21" />
+      <IncrementSound val="" />
     </Frame>
-
-    <Frame type="GameContentOwnershipFilterPulldown" name="LoadoutOwnershipFilterPulldownTemplate" template="StandardTemplates/StandardPulldownTemplate">
-        <Anchor side="Top" relative="$parent/SearchEditBox" pos="Mid" offset="0"/>
-        <Anchor side="Bottom" relative="$parent/SearchEditBox" pos="Mid" offset="0"/>
-        <Anchor side="Right" relative="$parent/SearchEditBox" pos="Min" offset="0"/>
-        <Item val="CollectionTemplates/OwnershipListBoxItemTemplate"/>
-        <Width val="165"/>
-        <ShowContentType val="false"/>
-
-        <Frame type="Frame" name="ItemContainer">
-            <Anchor side="Top" relative="$parent" pos="Min" offset="5"/>
-            <Anchor side="Left" relative="$parent" pos="Min" offset="15"/>
-            <Anchor side="Bottom" relative="$parent" pos="Max" offset="-5"/>
-            <AcceptsMouseTooltip val="true"/>
-        </Frame>
-     </Frame>
-
-    <Frame type="EditBox" name="LoadoutSearchBoxTemplate" template="StandardTemplates/StandardSearchEditBoxTemplate">
-        <Width val="155"/>
-
-        <Frame type="Button" name="ClearTextButton">
-            <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
-            <Anchor side="Right" relative="$parent" pos="Max" offset="-21"/>
-            <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
-            <Height val="24"/>
-            <Width val="24"/>
-
-            <Frame type="Image" name="NormalImage">
-                <Texture val="@UI/Storm_UI_Icon_CloseSearch_Disabled" layer="0"/>
-            </Frame>
-
-            <Frame type="Image" name="HoverImage">
-                <Texture val="@UI/Storm_UI_Icon_CloseSearch_Hover" layer="0"/>
-            </Frame>
-        </Frame>
-
-        <Frame type="Image" name="FilterSearchImage">
-            <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
-            <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
-            <Anchor side="Right" relative="$parent" pos="Max" offset="-10"/>
-            <Texture val="@UI/Storm_UI_Icon_SearchGlass_Dark"/>
-
-            <Animation name="FilterSearchImage">
-                <Event event="OnShown" action="DirectionForward, Play" frame="$parent/ClearTextButton"/>
-                <Event event="OnHidden" action="DirectionReverse, Play" frame="$parent/ClearTextButton"/>
-
-                <Controller type="Fade" end="Pause">
-                    <Key type="Curve" time="0" value="255" inout="Linear,Slow"/>
-                    <Key type="Curve" time=".1" value="0" inout="Slow,Linear"/>
-                </Controller>
-            </Animation>
-        </Frame>
+    <Frame type="Image" name="EmptyScrollBarImage">
+      <Anchor relative="$parent/ScrollBar" />
+      <Texture val="@UI/Storm_Scrollbar_Background_Disabled" />
+      <TextureType val="Nineslice" />
+      <Tiled val="true" />
+      <Visible val="False" />
+      <StateGroup name="VisibilityStates">
+        <State name="ShowEmptyScrollBar">
+          <When type="Property" frame="$parent/ScrollBar" Visible="false" />
+          <Action type="SetProperty" Visible="true" />
+        </State>
+      </StateGroup>
     </Frame>
-
-    <Frame type="Image" name="EquippedFrameTemplate">
-        <Height val="171"/>
-        <Width val="146"/>
-        <CollapseLayout val="true"/>
-        <Texture val="@UI/Storm_Heroselect_Loadout_ItemFrame_Hover"/>
-        <TextureType val="Nineslice"/>
-
-        <Frame type="GameContentFrame" name="GameContentFrame">
-            <Anchor relative="$parent"/>
-        </Frame>
-        
-        <Frame type="Frame" name="GlowContainerFrame">
-            <Anchor relative="$parent/TooltipFrame"/>
-            <Frame type="Image" name="SprayBackgroundGlow" template="HeroSelectLoadoutTemplates/SprayBackgroundGlowTemplate"/>
-        </Frame>
-
-        <Frame type="Control" name="TooltipFrame">
-            <Anchor side="Top" relative="$parent" pos="Min" offset="23"/>
-            <Anchor side="Left" relative="$parent" pos="Min" offset="23"/>
-            <Anchor side="Right" relative="$parent" pos="Max" offset="-23"/>
-            <Anchor side="Bottom" relative="$parent" pos="Max" offset="-23"/>
-            <AcceptsMouse val="true"/>
-            <TooltipAnchorPosition val="TopCenter"/>
-            <Tooltip val="{$parent/GameContentFrame/@Name}"/>
-        </Frame>
+  </Frame>
+  <Frame type="LoadoutTileList" name="LoadoutTileListTemplate" template="HeroSelectLoadoutTemplates/BaseLoadoutTileListTemplate">
+    <Anchor side="Top" relative="Item0" pos="Min" offset="0" />
+    <Anchor side="Left" relative="$parent" pos="Min" offset="0" />
+    <Anchor side="Right" relative="$parent" pos="Max" offset="-2" />
+    <Anchor side="Bottom" relative="$parent" pos="Max" offset="-10" />
+    <MaxItemPerPage val="12" />
+    <Frame type="GameContentTileListItem" name="Item0" template="HeroSelectLoadoutTemplates/LoadoutTileListItemTemplate">
+      <Anchor side="Top" relative="$parent/Item5" pos="Min" offset="0" />
+      <Anchor side="Right" relative="$parent/Item1" pos="Min" offset="#LoadoutTileListHorizontalSpacing" />
     </Frame>
-
-    <Frame type="Frame" name="CutscenePreviewFrameTemplate">
-        <Anchor side="Left" relative="$parent/BlurBackground" pos="Min" offset="0"/>
-        <Anchor side="Right" relative="$parent/BlurBackground" pos="Max" offset="0"/>
-        <Anchor side="Bottom" relative="$parent/BlurBackground" pos="Min" offset="0"/>
-        <Visible val="false"/>
-        <Height val="303"/>
-
-        <Frame type="BlurFrame" name="BlurBackground">
-            <Anchor relative="$parent/BorderImage"/>
-            <BlurAmount val="0.8"/>
-            <RenderPriority val="399"/>
-            <AcceptsMouse val="true"/>
-
-            <Frame type="Image" name="LowImage">
-                <Anchor relative="$parent" />
-                <TextureType val="Normal"/>
-                <Texture val="@UI/Storm_Generic_Background_Low"/>
-            </Frame>
-        </Frame>
-
-        <Frame type="Image" name="MountPreviewBackgroundImage">
-            <Anchor side="Left" relative="$parent/BlurBackground" pos="Min" offset="5"/>
-            <Anchor side="Right" relative="$parent/BlurBackground" pos="Max" offset="-5"/>
-            <Anchor side="Bottom" relative="$parent/BlurBackground" pos="Max" offset="-3"/>
-            <Texture val="@UI/Storm_UI_Play_HeroAttributes_PreviewBackground"/>
-        </Frame>
-
-        <Frame type="Image" name="BorderImage">
-            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
-            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
-            <Anchor side="Bottom" relative="$parent" pos="Max" offset="-5"/>
-            <Height val="250"/>
-            <RenderPriority val="400"/>
-            <Texture val="@UI/Storm_Generic_SmallPanel_Border"/>
-            <TextureType val="Nineslice"/>
-        </Frame>
-
-        <Frame type="HeroCutsceneFrame" name="MountPreviewCutscene">
-            <Anchor side="Left" relative="$parent/BlurBackground" pos="Min" offset="0"/>
-            <Anchor side="Right" relative="$parent/BlurBackground" pos="Max" offset="0"/>
-            <Anchor side="Bottom" relative="$parent/BlurBackground" pos="Max" offset="15"/>
-            <Height val="314"/>
-            <HeroCutsceneType val="HeroSelect"/>
-            <HeroCutsceneDragEnabled val="true"/>
-            <GameContent val="{$ancestor[@type=HeroSelectLoadoutsPanel]/LoadoutPanelTabs/PanelContainer/MountsPanel/ContentTileList/@SelectedGameContent}"/>
-        </Frame>
-
-        <StateGroup name="CutscenePreviewState">
-            <State name="ShowMountCutscenePreview">
-                <When type="Property" frame="$ancestor[@type=HeroSelectLoadoutsPanel]/LoadoutPanelTabs/PanelContainer/MountsPanel" Visible="true"/>
-                <When type="Property" frame="$ancestor[@type=HeroSelectLoadoutsPanel]" HeroUsesMounts="true"/>
-                <When type="Property" frame="$ancestor[@type=HeroSelectLoadoutsPanel]/LoadoutPanelTabs/PanelContainer/MountsPanel/ContentTileList" operator="NotEqual" SelectedIndex="#InvalidIndex"/>
-                <Action type="SetProperty" Visible="true"/>
-            </State>
-        </StateGroup>
-
-        <Animation name="Show">
-            <Event event="OnShown" action="Reset, Play"/>
-            <Event event="OnHidden" action="DirectionReverse, Play"/>
-
-            <Controller type="Fade" end="Pause">
-                <Key type="Curve" time="0" value="0" inout="Linear"/>
-                <Key type="Curve" time=".3" value="255" inout="Slow,Linear"/>
-            </Controller>
-        </Animation>
+    <Frame type="GameContentTileListItem" name="Item1" template="HeroSelectLoadoutTemplates/LoadoutTileListItemTemplate">
+      <Anchor side="Top" relative="$parent/Item5" pos="Min" offset="0" />
+      <Anchor side="Right" relative="$parent/Item2" pos="Min" offset="#LoadoutTileListHorizontalSpacing" />
     </Frame>
-
-    <!--===============================================================================================
-    <! Main Panel Template
-    <!==============================================================================================-->
-    <Frame type="Frame" name="HeroSelectLoadoutItemPanelTemplate">
-        <Anchor relative="$parent"/>
-        <Visible val="false"/>
-
-        <Frame type="Label" name="SelectedContentLabel" template="HeroSelectLoadoutTemplates/SelectedItemNameLabelTemplate">
-            <Text val="{$parent/ContentTileList/@SelectedGameContent[Name]}"/>
-        </Frame>
-
-        <Frame type="GameContentOwnershipFilterPulldown" name="OwnershipFilterPulldown" template="HeroSelectLoadoutTemplates/LoadoutOwnershipFilterPulldownTemplate">
-            <GameContentType val="{$parent/ContentTileList/@GameContentType}"/>
-        </Frame>
-
-        <Frame type="EditBox" name="SearchEditBox" template="HeroSelectLoadoutTemplates/LoadoutSearchBoxTemplate">
-            <Anchor side="Right" relative="$parent/ContentTileList/ScrollBar" pos="Max" offset="0"/>
-            <Anchor side="Bottom" relative="$parent/ContentTileList/Item0" pos="Min" offset="16"/>
-            <InputDelayTimeout val="#EditBoxInputTimeout"/>
-
-            <StateGroup name="SearchHideContent">
-                <State name="SearchInactive">
-                    <When type="Property" frame="$this" Text=""/>
-                    <Action type="SetProperty" frame="$parent/ContentTileList" SearchFlags=""/>
-                </State>
-                <State name="SearchActive">
-                    <When type="Property" frame="$this" Text="" operator="NotEqual"/>
-                    <Action type="SetProperty" frame="$parent/CategoryTileList" Visible="false"/>
-                    <Action type="SetProperty" frame="$parent/ContentTileList" MaxItemPerPage="18"/>
-                    <Action type="SetProperty" frame="$parent/ContentTileList" CollectionCategoryFilter="" undo="false"/>
-                    <Action type="SetProperty" frame="$parent/ContentTileList" ProductAttribute="" index="0"/>
-                    <Action type="SetProperty" frame="$parent/ContentTileList" CollectionCategoryFilter="{$parent/CategoryTileList/@SelectedCollectionCategory}" on="Exit"/>
-                </State>
-            </StateGroup>
-        </Frame>
-
-        <Frame type="CollectionCategoryTileList" name="CategoryTileList" template="HeroSelectLoadoutTemplates/LoadoutCategoryTileListTemplate">
-            <FilterFlags val="{$parent/ContentTileList/@FilterFlags}"/>
-            <UpdateWhenLicensesChange val="{$parent/ContentTileList/@UpdateWhenLicensesChange}"/>
-        </Frame>
-
-        <Frame type="LoadoutTileList" name="ContentTileList">
-            <FilterString val="{$parent/SearchEditBox/@Text}"/>
-            <CollectionCategoryFilter val="{$parent/CategoryTileList/@SelectedCollectionCategory}"/>
-
-            <StateGroup name="OwnershipFilter">
-                <State name="AllContent">
-                    <When type="Property" frame="$parent/OwnershipFilterPulldown" SelectedFilter="AllContent"/>
-                    <Action type="SetProperty" FilterFlag_Owned="true"/>
-                    <Action type="SetProperty" FilterFlag_NotOwned="true"/>
-                </State>
-                <State name="OwnedContent">
-                    <When type="Property" frame="$parent/OwnershipFilterPulldown" SelectedFilter="OwnedContent"/>
-                    <Action type="SetProperty" FilterFlag_Owned="true"/>
-                    <Action type="SetProperty" FilterFlag_NotOwned="false"/>
-                </State>
-                <State name="UnownedContent">
-                    <When type="Property" frame="$parent/OwnershipFilterPulldown" SelectedFilter="UnownedContent"/>
-                    <Action type="SetProperty" FilterFlag_Owned="false"/>
-                    <Action type="SetProperty" FilterFlag_NotOwned="true"/>
-                </State>
-            </StateGroup>
-        </Frame>
+    <Frame type="GameContentTileListItem" name="Item2" template="HeroSelectLoadoutTemplates/LoadoutTileListItemTemplate">
+      <Anchor side="Top" relative="$parent/Item5" pos="Min" offset="0" />
+      <Anchor side="Right" relative="$parent/Item3" pos="Min" offset="#LoadoutTileListHorizontalSpacing" />
     </Frame>
+    <Frame type="GameContentTileListItem" name="Item3" template="HeroSelectLoadoutTemplates/LoadoutTileListItemTemplate">
+      <Anchor side="Top" relative="$parent/Item5" pos="Min" offset="0" />
+      <Anchor side="Right" relative="$parent/Item4" pos="Min" offset="#LoadoutTileListHorizontalSpacing" />
+    </Frame>
+    <Frame type="GameContentTileListItem" name="Item4" template="HeroSelectLoadoutTemplates/LoadoutTileListItemTemplate">
+      <Anchor side="Top" relative="$parent/Item5" pos="Min" offset="0" />
+      <Anchor side="Right" relative="$parent/Item5" pos="Min" offset="#LoadoutTileListHorizontalSpacing" />
+    </Frame>
+    <Frame type="GameContentTileListItem" name="Item5" template="HeroSelectLoadoutTemplates/LoadoutTileListItemTemplate">
+      <Anchor side="Right" relative="$parent/Item17" pos="Max" offset="0" />
+      <Anchor side="Bottom" relative="$parent/Item6" pos="Min" offset="#LoadoutTileListVerticalSpacing" />
+    </Frame>
+    <Frame type="GameContentTileListItem" name="Item6" template="HeroSelectLoadoutTemplates/LoadoutTileListItemTemplate">
+      <Anchor side="Top" relative="$parent/Item11" pos="Min" offset="0" />
+      <Anchor side="Right" relative="$parent/Item7" pos="Min" offset="#LoadoutTileListVerticalSpacing" />
+    </Frame>
+    <Frame type="GameContentTileListItem" name="Item7" template="HeroSelectLoadoutTemplates/LoadoutTileListItemTemplate">
+      <Anchor side="Top" relative="$parent/Item11" pos="Min" offset="0" />
+      <Anchor side="Right" relative="$parent/Item8" pos="Min" offset="#LoadoutTileListVerticalSpacing" />
+    </Frame>
+    <Frame type="GameContentTileListItem" name="Item8" template="HeroSelectLoadoutTemplates/LoadoutTileListItemTemplate">
+      <Anchor side="Top" relative="$parent/Item11" pos="Min" offset="0" />
+      <Anchor side="Right" relative="$parent/Item9" pos="Min" offset="#LoadoutTileListHorizontalSpacing" />
+    </Frame>
+    <Frame type="GameContentTileListItem" name="Item9" template="HeroSelectLoadoutTemplates/LoadoutTileListItemTemplate">
+      <Anchor side="Top" relative="$parent/Item11" pos="Min" offset="0" />
+      <Anchor side="Right" relative="$parent/Item10" pos="Min" offset="#LoadoutTileListHorizontalSpacing" />
+    </Frame>
+    <Frame type="GameContentTileListItem" name="Item10" template="HeroSelectLoadoutTemplates/LoadoutTileListItemTemplate">
+      <Anchor side="Top" relative="$parent/Item11" pos="Min" offset="0" />
+      <Anchor side="Right" relative="$parent/Item11" pos="Min" offset="#LoadoutTileListHorizontalSpacing" />
+    </Frame>
+    <Frame type="GameContentTileListItem" name="Item11" template="HeroSelectLoadoutTemplates/LoadoutTileListItemTemplate">
+      <Anchor side="Right" relative="$parent/Item17" pos="Max" offset="0" />
+      <Anchor side="Bottom" relative="$parent/Item12" pos="Min" offset="#LoadoutTileListVerticalSpacing" />
+    </Frame>
+    <Frame type="GameContentTileListItem" name="Item12" template="HeroSelectLoadoutTemplates/LoadoutTileListItemTemplate">
+      <Anchor side="Top" relative="$parent/Item17" pos="Min" offset="0" />
+      <Anchor side="Right" relative="$parent/Item13" pos="Min" offset="#LoadoutTileListHorizontalSpacing" />
+    </Frame>
+    <Frame type="GameContentTileListItem" name="Item13" template="HeroSelectLoadoutTemplates/LoadoutTileListItemTemplate">
+      <Anchor side="Top" relative="$parent/Item17" pos="Min" offset="0" />
+      <Anchor side="Right" relative="$parent/Item14" pos="Min" offset="#LoadoutTileListHorizontalSpacing" />
+    </Frame>
+    <Frame type="GameContentTileListItem" name="Item14" template="HeroSelectLoadoutTemplates/LoadoutTileListItemTemplate">
+      <Anchor side="Top" relative="$parent/Item17" pos="Min" offset="0" />
+      <Anchor side="Right" relative="$parent/Item15" pos="Min" offset="#LoadoutTileListHorizontalSpacing" />
+    </Frame>
+    <Frame type="GameContentTileListItem" name="Item15" template="HeroSelectLoadoutTemplates/LoadoutTileListItemTemplate">
+      <Anchor side="Top" relative="$parent/Item17" pos="Min" offset="0" />
+      <Anchor side="Right" relative="$parent/Item16" pos="Min" offset="#LoadoutTileListHorizontalSpacing" />
+    </Frame>
+    <Frame type="GameContentTileListItem" name="Item16" template="HeroSelectLoadoutTemplates/LoadoutTileListItemTemplate">
+      <Anchor side="Top" relative="$parent/Item17" pos="Min" offset="0" />
+      <Anchor side="Right" relative="$parent/Item17" pos="Min" offset="#LoadoutTileListHorizontalSpacing" />
+    </Frame>
+    <Frame type="GameContentTileListItem" name="Item17" template="HeroSelectLoadoutTemplates/LoadoutTileListItemTemplate">
+      <Anchor side="Right" relative="$parent/ScrollBar" pos="Min" offset="21" />
+      <Anchor side="Bottom" relative="$parent" pos="Max" offset="20" />
+    </Frame>
+    <StateGroup name="MaxItemAnchorStates">
+      <State name="12Items">
+        <When type="Property" MaxItemPerPage="12" />
+        <Action type="SetProperty" ScrollStepValue="4" />
+        <Action type="SetAnchor" frame="Item0" side="Top" relative="$parent/Item3" pos="Min" offset="0" />
+        <Action type="SetAnchor" frame="Item0" side="Right" relative="$parent/Item8" pos="Max" offset="0" />
+        <Action type="SetAnchor" frame="Item1" side="Top" relative="$parent/Item3" pos="Min" offset="0" />
+        <Action type="SetAnchor" frame="Item1" side="Right" relative="$parent/Item9" pos="Max" offset="0" />
+        <Action type="SetAnchor" frame="Item2" side="Top" relative="$parent/Item3" pos="Min" offset="0" />
+        <Action type="SetAnchor" frame="Item2" side="Right" relative="$parent/Item10" pos="Max" offset="0" />
+        <Action type="SetAnchor" frame="Item3" side="Top" relative="$parent/Item7" pos="Min" offset="-130" />
+        <Action type="SetAnchor" frame="Item3" side="Right" relative="$parent/Item11" pos="Max" offset="0" />
+        <Action type="SetAnchor" frame="Item3" side="Bottom" relative="$parent/Item7" pos="Min" offset="#LoadoutTileListVerticalSpacing" />
+        <Action type="SetAnchor" frame="Item4" side="Top" relative="$parent/Item7" pos="Min" offset="0" />
+        <Action type="SetAnchor" frame="Item4" side="Right" relative="$parent/Item8" pos="Max" offset="0" />
+        <Action type="SetAnchor" frame="Item5" side="Top" relative="$parent/Item7" pos="Min" offset="0" />
+        <Action type="SetAnchor" frame="Item5" side="Right" relative="$parent/Item9" pos="Max" offset="0" />
+        <Action type="SetAnchor" frame="Item5" side="Bottom" relative="$parent/Item7" pos="Max" offset="0" />
+        <Action type="SetAnchor" frame="Item6" side="Top" relative="$parent/Item7" pos="Min" offset="0" />
+        <Action type="SetAnchor" frame="Item6" side="Right" relative="$parent/Item10" pos="Max" offset="0" />
+        <Action type="SetAnchor" frame="Item7" side="Top" relative="$parent/Item11" pos="Min" offset="-130" />
+        <Action type="SetAnchor" frame="Item7" side="Right" relative="$parent/Item11" pos="Max" offset="0" />
+        <Action type="SetAnchor" frame="Item7" side="Bottom" relative="$parent/Item11" pos="Min" offset="#LoadoutTileListVerticalSpacing" />
+        <Action type="SetAnchor" frame="Item8" side="Top" relative="$parent/Item11" pos="Min" offset="0" />
+        <Action type="SetAnchor" frame="Item8" side="Right" relative="$parent/Item9" pos="Min" offset="#LoadoutTileListHorizontalSpacing" />
+        <Action type="SetAnchor" frame="Item9" side="Top" relative="$parent/Item11" pos="Min" offset="0" />
+        <Action type="SetAnchor" frame="Item9" side="Right" relative="$parent/Item10" pos="Min" offset="#LoadoutTileListHorizontalSpacing" />
+        <Action type="SetAnchor" frame="Item10" side="Top" relative="$parent/Item11" pos="Min" offset="0" />
+        <Action type="SetAnchor" frame="Item10" side="Right" relative="$parent/Item11" pos="Min" offset="#LoadoutTileListHorizontalSpacing" />
+        <Action type="SetAnchor" frame="Item11" side="Right" relative="$parent/ScrollBar" pos="Min" offset="21" />
+        <Action type="SetAnchor" frame="Item11" side="Bottom" relative="$parent" pos="Max" offset="20" />
+        <Action type="SetAnchor" frame="ScrollBar" side="Bottom" relative="$parent/Item11" pos="Max" offset="-21" />
+      </State>
+    </StateGroup>
+  </Frame>
+  <Frame type="LoadoutTileList" name="LargeLoadoutTileListTemplate" template="HeroSelectLoadoutTemplates/BaseLoadoutTileListTemplate">
+    <Anchor side="Top" relative="Item0" pos="Min" offset="0" />
+    <Anchor side="Left" relative="$parent" pos="Min" offset="0" />
+    <Anchor side="Right" relative="$parent" pos="Max" offset="-2" />
+    <Anchor side="Bottom" relative="$parent" pos="Max" offset="-10" />
+    <ScrollStepValue val="6" />
+    <Frame type="ScrollBar" name="ScrollBar" template="StandardTemplates/ScrollableBarTemplate">
+      <Anchor side="Bottom" relative="$parent/Item11" pos="Max" offset="-21" />
+    </Frame>
+    <Frame type="GameContentTileListItem" name="Item0" template="HeroSelectLoadoutTemplates/LargeLoadoutTileListItemTemplate">
+      <Anchor side="Top" relative="$parent/Item5" pos="Min" offset="0" />
+      <Anchor side="Right" relative="$parent/Item6" pos="Max" offset="0" />
+    </Frame>
+    <Frame type="GameContentTileListItem" name="Item1" template="HeroSelectLoadoutTemplates/LargeLoadoutTileListItemTemplate">
+      <Anchor side="Top" relative="$parent/Item5" pos="Min" offset="0" />
+      <Anchor side="Right" relative="$parent/Item7" pos="Max" offset="0" />
+    </Frame>
+    <Frame type="GameContentTileListItem" name="Item2" template="HeroSelectLoadoutTemplates/LargeLoadoutTileListItemTemplate">
+      <Anchor side="Top" relative="$parent/Item5" pos="Min" offset="0" />
+      <Anchor side="Right" relative="$parent/Item8" pos="Max" offset="0" />
+    </Frame>
+    <Frame type="GameContentTileListItem" name="Item3" template="HeroSelectLoadoutTemplates/LargeLoadoutTileListItemTemplate">
+      <Anchor side="Top" relative="$parent/Item5" pos="Min" offset="0" />
+      <Anchor side="Right" relative="$parent/Item9" pos="Max" offset="0" />
+    </Frame>
+    <Frame type="GameContentTileListItem" name="Item4" template="HeroSelectLoadoutTemplates/LargeLoadoutTileListItemTemplate">
+      <Anchor side="Top" relative="$parent/Item5" pos="Min" offset="0" />
+      <Anchor side="Right" relative="$parent/Item10" pos="Max" offset="0" />
+    </Frame>
+    <Frame type="GameContentTileListItem" name="Item5" template="HeroSelectLoadoutTemplates/LargeLoadoutTileListItemTemplate">
+      <Anchor side="Top" relative="$this" pos="Max" offset="0" />
+      <Anchor side="Right" relative="$parent/Item11" pos="Max" offset="0" />
+      <Anchor side="Bottom" relative="$parent/Item11" pos="Min" offset="#LoadoutTileListVerticalSpacing" />
+    </Frame>
+    <Frame type="GameContentTileListItem" name="Item6" template="HeroSelectLoadoutTemplates/LargeLoadoutTileListItemTemplate">
+      <Anchor side="Top" relative="$parent/Item11" pos="Min" offset="0" />
+      <Anchor side="Right" relative="$parent/Item7" pos="Min" offset="#LoadoutTileListHorizontalSpacing" />
+    </Frame>
+    <Frame type="GameContentTileListItem" name="Item7" template="HeroSelectLoadoutTemplates/LargeLoadoutTileListItemTemplate">
+      <Anchor side="Top" relative="$parent/Item11" pos="Min" offset="0" />
+      <Anchor side="Right" relative="$parent/Item8" pos="Min" offset="#LoadoutTileListHorizontalSpacing" />
+      <Anchor side="Bottom" relative="$this" pos="Min" offset="0" />
+    </Frame>
+    <Frame type="GameContentTileListItem" name="Item8" template="HeroSelectLoadoutTemplates/LargeLoadoutTileListItemTemplate">
+      <Anchor side="Top" relative="$parent/Item11" pos="Min" offset="0" />
+      <Anchor side="Right" relative="$parent/Item9" pos="Min" offset="#LoadoutTileListHorizontalSpacing" />
+    </Frame>
+    <Frame type="GameContentTileListItem" name="Item9" template="HeroSelectLoadoutTemplates/LargeLoadoutTileListItemTemplate">
+      <Anchor side="Top" relative="$parent/Item11" pos="Min" offset="0" />
+      <Anchor side="Right" relative="$parent/Item10" pos="Min" offset="#LoadoutTileListHorizontalSpacing" />
+    </Frame>
+    <Frame type="GameContentTileListItem" name="Item10" template="HeroSelectLoadoutTemplates/LargeLoadoutTileListItemTemplate">
+      <Anchor side="Top" relative="$parent/Item11" pos="Min" offset="0" />
+      <Anchor side="Right" relative="$parent/Item11" pos="Min" offset="#LoadoutTileListHorizontalSpacing" />
+    </Frame>
+    <Frame type="GameContentTileListItem" name="Item11" template="HeroSelectLoadoutTemplates/LargeLoadoutTileListItemTemplate">
+      <Anchor side="Right" relative="$parent/ScrollBar" pos="Min" offset="21" />
+      <Anchor side="Bottom" relative="$parent" pos="Max" offset="20" />
+    </Frame>
+    <StateGroup name="MaxItemAnchorStates">
+      <State name="8Items">
+        <When type="Property" MaxItemPerPage="8" />
+        <Action type="SetProperty" ScrollStepValue="4" />
+        <Action type="SetAnchor" frame="Item0" side="Top" relative="$parent/Item3" pos="Min" offset="0" />
+        <Action type="SetAnchor" frame="Item0" side="Right" relative="$parent/Item4" pos="Max" offset="0" />
+        <Action type="SetAnchor" frame="Item1" side="Top" relative="$parent/Item3" pos="Min" offset="0" />
+        <Action type="SetAnchor" frame="Item1" side="Right" relative="$parent/Item5" pos="Max" offset="0" />
+        <Action type="SetAnchor" frame="Item2" side="Top" relative="$parent/Item3" pos="Min" offset="0" />
+        <Action type="SetAnchor" frame="Item2" side="Right" relative="$parent/Item6" pos="Max" offset="0" />
+        <Action type="SetAnchor" frame="Item3" side="Top" relative="$parent/Item7" pos="Min" offset="-195" />
+        <Action type="SetAnchor" frame="Item3" side="Right" relative="$parent/Item7" pos="Max" offset="0" />
+        <Action type="SetAnchor" frame="Item3" side="Bottom" relative="$parent/Item7" pos="Min" offset="#LoadoutTileListVerticalSpacing" />
+        <Action type="SetAnchor" frame="Item4" side="Top" relative="$parent/Item7" pos="Min" offset="0" />
+        <Action type="SetAnchor" frame="Item4" side="Right" relative="$parent/Item5" pos="Min" offset="#LoadoutTileListHorizontalSpacing" />
+        <Action type="SetAnchor" frame="Item5" side="Top" relative="$parent/Item7" pos="Min" offset="0" />
+        <Action type="SetAnchor" frame="Item5" side="Right" relative="$parent/Item6" pos="Min" offset="#LoadoutTileListHorizontalSpacing" />
+        <Action type="SetAnchor" frame="Item5" side="Bottom" relative="$parent/Item7" pos="Max" offset="0" />
+        <Action type="SetAnchor" frame="Item6" side="Top" relative="$parent/Item7" pos="Min" offset="0" />
+        <Action type="SetAnchor" frame="Item6" side="Right" relative="$parent/Item7" pos="Min" offset="#LoadoutTileListHorizontalSpacing" />
+        <Action type="SetAnchor" frame="Item7" side="Top" relative="$parent" pos="Max" offset="-216" />
+        <Action type="SetAnchor" frame="Item7" side="Right" relative="$parent/ScrollBar" pos="Min" offset="21" />
+        <Action type="SetAnchor" frame="Item7" side="Bottom" relative="$parent" pos="Max" offset="20" />
+      </State>
+    </StateGroup>
+  </Frame>
+  <Frame type="CollectionCategoryTileListItem" name="LoadoutCategoryTileListItem">
+    <AcceptsMouse val="True" />
+    <SelectedSound val="@UI_BNet_Generic_01" />
+    <Width val="203" />
+    <Height val="62" />
+    <Frame type="GameContentFrame" name="GameContentFrame">
+      <Anchor relative="$parent" />
+      <GameContent val="{$parent/@GameContent}" />
+    </Frame>
+    <Frame type="Image" name="NormalImage">
+      <Anchor relative="$parent" />
+      <Texture val="@UI/Storm_UI_LeftNav_MiniButton_Normal" />
+    </Frame>
+    <Frame type="Image" name="SelectedImage">
+      <Anchor relative="$parent" />
+      <Texture val="@UI/Storm_UI_LeftNav_MiniButton_Selected" />
+    </Frame>
+    <Frame type="Image" name="HoverImage">
+      <Anchor relative="$parent" />
+      <Texture val="@UI/Storm_UI_LeftNav_MiniButton_Selected" />
+    </Frame>
+    <Frame type="Label" name="CategoryLabel">
+      <Anchor side="Top" relative="$parent" pos="Min" offset="0" />
+      <Anchor side="Left" relative="$parent" pos="Min" offset="21" />
+      <Anchor side="Bottom" relative="$parent" pos="Max" offset="0" />
+      <Style val="LoadoutCategoryNormalLabel" />
+      <Text val="{$parent/GameContentFrame/@StoreName}" />
+    </Frame>
+    <Frame type="Frame" name="HitTestFrame">
+      <Anchor side="Top" relative="$parent" pos="Min" offset="5" />
+      <Anchor side="Left" relative="$parent" pos="Min" offset="13" />
+      <Anchor side="Right" relative="$parent" pos="Max" offset="-13" />
+      <Anchor side="Bottom" relative="$parent" pos="Max" offset="-5" />
+    </Frame>
+    <StateGroup name="FontStates">
+      <State name="NonHovered">
+        <When type="Property" hovered="False" />
+        <When type="Property" selected="False" />
+        <Action type="SetProperty" frame="CategoryLabel" style="LoadoutCategoryNormalLabel" />
+      </State>
+      <State name="Hovered">
+        <When type="Property" hovered="True" />
+        <When type="Property" selected="False" />
+        <Action type="SetProperty" frame="CategoryLabel" style="LoadoutCategorySelectedLabel" />
+      </State>
+      <State name="Toggled">
+        <When type="Property" selected="True" />
+        <Action type="SetProperty" frame="CategoryLabel" style="LoadoutCategorySelectedLabel" />
+      </State>
+    </StateGroup>
+  </Frame>
+  <Frame type="CollectionCategoryTileList" name="LoadoutCategoryTileListTemplate">
+    <Anchor side="Top" relative="Item0" pos="Min" offset="0" />
+    <Anchor side="Left" relative="$parent" pos="Min" offset="5" />
+    <Anchor side="Bottom" relative="$parent" pos="Max" offset="0" />
+    <Anchor side="Right" relative="ScrollBar" pos="Max" offset="0" />
+    <RequireSelection val="true" />
+    <ReportsStats val="true" />
+    <AcceptsMouse val="true" />
+    <RenderPriority val="601" />
+    <ScrollStepValue val="1" />
+    <MaxItemPerPage val="9" />
+    <Height val="800" />
+    <RequireParentHeroFilter val="false" />
+    <SelectedIndex val="#InvalidIndex" />
+    <UpdateWhenLicensesChange val="true" />
+    <FilterFlags val="Default|NoDupes|Selectable|NoMatchFilterString|!NoValidProduct|!CanNotPurchase" />
+    <SearchFlags val="" />
+    <GenerationMode val="Default" />
+    <SortMethod index="0" val="Alphabetical" />
+    <StateGroup name="UpdateWhenHidden">
+      <State name="ShouldUpdate">
+        <When type="Property" frame="$ancestor[@type=HeroSelectPanel]" HeroLink="" operator="NotEqual" />
+        <Action type="SetProperty" UpdateWhenHidden="true" />
+      </State>
+    </StateGroup>
+    <Frame type="GameContentFrame" name="GameContentData">
+      <Anchor relative="$parent" />
+      <GameContent val="{$parent/@SelectedGameContent}" />
+    </Frame>
+    <Frame type="ScrollBar" name="ScrollBar" template="StandardTemplates/ScrollableBarTemplate">
+      <Anchor side="Top" relative="$parent/Item0" pos="Min" offset="6" />
+      <Anchor side="Right" relative="$parent/Item0" pos="Max" offset="10" />
+      <Anchor side="Bottom" relative="$parent/Item7" pos="Max" offset="-13" />
+      <IncrementSound val="" />
+    </Frame>
+    <Frame type="Image" name="EmptyScrollBarImage">
+      <Anchor relative="$parent/ScrollBar" />
+      <Texture val="@UI/Storm_Scrollbar_Background_Disabled" />
+      <TextureType val="Nineslice" />
+      <Tiled val="true" />
+      <Visible val="False" />
+      <StateGroup name="VisibilityStates">
+        <State name="ShowEmptyScrollBar">
+          <When type="Property" frame="$parent/ScrollBar" Visible="false" />
+          <Action type="SetProperty" Visible="true" />
+        </State>
+      </StateGroup>
+    </Frame>
+    <Frame type="CollectionCategoryTileListItem" name="Item0" template="HeroSelectLoadoutTemplates/LoadoutCategoryTileListItem">
+      <Anchor side="Left" relative="$parent/Item7" pos="Min" offset="0" />
+      <Anchor side="Bottom" relative="$parent/Item1" pos="Min" offset="#LoadoutCategoryTileListItemSpacing" />
+    </Frame>
+    <Frame type="CollectionCategoryTileListItem" name="Item1" template="HeroSelectLoadoutTemplates/LoadoutCategoryTileListItem">
+      <Anchor side="Left" relative="$parent/Item7" pos="Min" offset="0" />
+      <Anchor side="Bottom" relative="$parent/Item2" pos="Min" offset="#LoadoutCategoryTileListItemSpacing" />
+    </Frame>
+    <Frame type="CollectionCategoryTileListItem" name="Item2" template="HeroSelectLoadoutTemplates/LoadoutCategoryTileListItem">
+      <Anchor side="Left" relative="$parent/Item7" pos="Min" offset="0" />
+      <Anchor side="Bottom" relative="$parent/Item3" pos="Min" offset="#LoadoutCategoryTileListItemSpacing" />
+    </Frame>
+    <Frame type="CollectionCategoryTileListItem" name="Item3" template="HeroSelectLoadoutTemplates/LoadoutCategoryTileListItem">
+      <Anchor side="Left" relative="$parent/Item7" pos="Min" offset="0" />
+      <Anchor side="Bottom" relative="$parent/Item4" pos="Min" offset="#LoadoutCategoryTileListItemSpacing" />
+    </Frame>
+    <Frame type="CollectionCategoryTileListItem" name="Item4" template="HeroSelectLoadoutTemplates/LoadoutCategoryTileListItem">
+      <Anchor side="Left" relative="$parent/Item7" pos="Min" offset="0" />
+      <Anchor side="Bottom" relative="$parent/Item5" pos="Min" offset="#LoadoutCategoryTileListItemSpacing" />
+    </Frame>
+    <Frame type="CollectionCategoryTileListItem" name="Item5" template="HeroSelectLoadoutTemplates/LoadoutCategoryTileListItem">
+      <Anchor side="Left" relative="$parent/Item7" pos="Min" offset="0" />
+      <Anchor side="Bottom" relative="$parent/Item6" pos="Min" offset="#LoadoutCategoryTileListItemSpacing" />
+    </Frame>
+    <Frame type="CollectionCategoryTileListItem" name="Item6" template="HeroSelectLoadoutTemplates/LoadoutCategoryTileListItem">
+      <Anchor side="Left" relative="$parent/Item7" pos="Min" offset="0" />
+      <Anchor side="Bottom" relative="$parent/Item7" pos="Min" offset="#LoadoutCategoryTileListItemSpacing" />
+    </Frame>
+    <Frame type="CollectionCategoryTileListItem" name="Item7" template="HeroSelectLoadoutTemplates/LoadoutCategoryTileListItem">
+      <Anchor side="Left" relative="$parent" pos="Min" offset="5" />
+      <Anchor side="Bottom" relative="$parent" pos="Max" offset="0" />
+    </Frame>
+  </Frame>
+  <Frame type="PurchaseInfoPanel" name="LoadoutPurchaseInfoPanel">
+    <Anchor side="Left" relative="$parent/BlurBackground" pos="Min" offset="0" />
+    <Anchor side="Right" relative="$parent/BlurBackground" pos="Max" offset="0" />
+    <Anchor side="Bottom" relative="$parent/BlurBackground" pos="Min" offset="0" />
+    <Height val="300" />
+    <Frame type="BlurFrame" name="BlurBackground">
+      <Anchor relative="$parent/BorderImage" />
+      <BlurAmount val="0.8" />
+      <RenderPriority val="399" />
+      <AcceptsMouse val="true" />
+      <Frame type="Image" name="LowImage">
+        <Anchor relative="$parent" />
+        <TextureType val="Normal" />
+        <Texture val="@UI/Storm_Generic_Background_Low" />
+      </Frame>
+    </Frame>
+    <Frame type="Image" name="BorderImage">
+      <Anchor side="Top" relative="$parent/NameLabel" pos="Min" offset="-10" />
+      <Anchor side="Left" relative="$parent" pos="Min" offset="0" />
+      <Anchor side="Right" relative="$parent" pos="Max" offset="0" />
+      <Anchor side="Bottom" relative="$parent" pos="Max" offset="-5" />
+      <Texture val="@UI/Storm_Generic_SmallPanel_Border" />
+      <TextureType val="Nineslice" />
+      <RenderPriority val="400" />
+    </Frame>
+    <Frame type="Label" name="NameLabel">
+      <Anchor side="Top" relative="$this" pos="Max" offset="0" />
+      <Anchor side="Bottom" relative="$parent/DescriptionLabel" pos="Min" offset="0" />
+      <Anchor side="Left" relative="$parent/BlurBackground" pos="Min" offset="10" />
+      <Anchor side="Right" relative="$parent/BlurBackground" pos="Max" offset="-10" />
+      <Style val="HeroSelectPanelPurchaseLabel" />
+    </Frame>
+    <Frame type="Label" name="DescriptionLabel">
+      <Anchor side="Top" relative="$this" pos="Max" offset="0" />
+      <Anchor side="Bottom" relative="$parent" pos="Max" offset="-87" />
+      <Anchor side="Left" relative="$parent/BlurBackground" pos="Min" offset="10" />
+      <Anchor side="Right" relative="$parent/BlurBackground" pos="Max" offset="-10" />
+      <CollapseLayout val="True" />
+      <Style val="HeroSelectPanelPurchaseError" />
+      <StateGroup name="PositionAdjustStates">
+        <State name="MountShown">
+          <When type="Property" frame="$ancestor[@type=HeroSelectLoadoutsPanel]/LoadoutPanelTabs/PanelContainer/MountsPanel" Visible="true" />
+          <Action type="SetAnchor" frame="$parent/NameLabel" side="Top" relative="$ancestor[@type=HeroSelectLoadoutsPanel]/CutscenePreviewFrame/BlurBackground" pos="Min" offset="10" />
+          <Action type="SetAnchor" frame="$parent/NameLabel" side="Bottom" relative="$this" pos="Min" offset="0" />
+          <Action type="SetAnchor" side="Top" relative="$parent/NameLabel" pos="Max" offset="0" />
+          <Action type="SetAnchor" side="Bottom" relative="$this" pos="Min" offset="0" />
+          <Action type="SetAnchor" frame="$parent/NameLabel" side="Top" relative="$this" pos="Max" offset="0" On="Exit" />
+          <Action type="SetAnchor" frame="$parent/NameLabel" side="Bottom" relative="$parent/DescriptionLabel" pos="Min" offset="0" On="Exit" />
+          <Action type="SetAnchor" side="Top" relative="$this" pos="Max" offset="0" On="Exit" />
+          <Action type="SetAnchor" side="Bottom" relative="$parent" pos="Max" offset="-87" On="Exit" />
+        </State>
+      </StateGroup>
+    </Frame>
+    <Animation name="Show">
+      <Event event="OnShown" action="Reset, Play" />
+      <Event event="OnHidden" action="DirectionReverse, Play" />
+      <Controller type="Fade" end="Pause">
+        <Key type="Curve" time="0" value="0" inout="Linear" />
+        <Key type="Curve" time=".3" value="255" inout="Slow,Linear" />
+      </Controller>
+      <Controller type="Fade" end="Pause" frame="$parent/PurchaseCurrencySelectPanel">
+        <Key type="Curve" time="0" value="0" inout="Linear" />
+        <Key type="Curve" time=".3" value="255" inout="Slow,Linear" />
+      </Controller>
+    </Animation>
+    <StateGroup name="CutscenePreviewVisibility">
+      <State name="PreviewCutsceneShown">
+        <When type="Property" frame="$parent/CutscenePreviewFrame" Visible="true" />
+        <Action type="SetProperty" frame="BlurBackground" Visible="false" />
+        <Action type="SetProperty" frame="BorderImage" Visible="false" />
+      </State>
+    </StateGroup>
+  </Frame>
+  <Frame type="PurchaseCurrencySelectPanel" name="LoadoutPurchaseCurrencySelectPanel">
+    <Anchor relative="$parent/PurchaseInfoPanel/BlurBackground" />
+    <Visible val="False" />
+    <Frame type="BuyButton" name="BuyButton0" template="StoreTemplates/BuyButtonSmallTemplate">
+      <Anchor side="Top" relative="$parent/ShopIconImage" pos="Mid" offset="0" />
+      <Anchor side="Bottom" relative="$parent/ShopIconImage" pos="Mid" offset="0" />
+      <Anchor side="Left" relative="$parent" pos="Min" offset="5" />
+      <Anchor side="Right" relative="$parent" pos="Mid" offset="-10" />
+      <Width val="0" />
+      <CollapseLayout val="true" />
+      <PositionHint val="HeroSelect" />
+      <Frame type="Frame" name="HitTestFrame">
+        <TooltipAnchorPosition val="TopCenter" />
+      </Frame>
+    </Frame>
+    <Frame type="BuyButton" name="BuyButton1" template="StoreTemplates/BuyButtonSmallTemplate">
+      <Anchor side="Top" relative="$parent/ShopIconImage" pos="Mid" offset="0" />
+      <Anchor side="Bottom" relative="$parent/ShopIconImage" pos="Mid" offset="0" />
+      <Anchor side="Left" relative="$parent" pos="Mid" offset="10" />
+      <Anchor side="Right" relative="$parent" pos="Max" offset="-5" />
+      <Width val="0" />
+      <CollapseLayout val="true" />
+      <PositionHint val="HeroSelect" />
+      <Frame type="Frame" name="HitTestFrame">
+        <TooltipAnchorPosition val="TopCenter" />
+      </Frame>
+    </Frame>
+    <Frame type="BuyButton" name="BuyButton2" template="StoreTemplates/BuyButtonSmallTemplate">
+      <Anchor side="Top" relative="$parent/BuyButton1" pos="Mid" offset="60" />
+      <Anchor side="Bottom" relative="$parent/BuyButton1" pos="Mid" offset="60" />
+      <Anchor side="Left" relative="$parent" pos="Mid" offset="10" />
+      <Anchor side="Right" relative="$parent" pos="Max" offset="-5" />
+      <Width val="0" />
+      <CollapseLayout val="true" />
+      <PositionHint val="HeroSelect" />
+      <Frame type="Frame" name="HitTestFrame">
+        <TooltipAnchorPosition val="TopCenter" />
+      </Frame>
+    </Frame>
+    <Frame type="Image" name="ShopIconImage">
+      <Anchor side="Bottom" relative="$parent" pos="Max" offset="14" />
+      <Anchor side="Left" relative="$parent" pos="Mid" offset="0" />
+      <Anchor side="Right" relative="$parent" pos="Mid" offset="0" />
+      <Texture val="@UI/Storm_UI_Play_HeroAttributes_PurchaseIcon" />
+    </Frame>
+    <StateGroup name="ShopIconShowHideStates">
+      <State name="HideShopIcon">
+        <When type="Property" frame="BuyButton0" visible="False" />
+        <When type="Property" frame="BuyButton1" visible="False" />
+        <Action type="SetProperty" frame="ShopIconImage" visible="False" />
+      </State>
+      <State name="ShowShopIcon">
+        <Action type="SetProperty" frame="ShopIconImage" visible="True" />
+      </State>
+    </StateGroup>
+  </Frame>
+  <Frame type="PurchaseConfirmPanel" name="LoadoutPurchaseConfirmPanel">
+    <Anchor relative="$parent/PurchaseCurrencySelectPanel" />
+    <Visible val="false" />
+    <Frame type="Button" name="ConfirmButton" template="StandardTemplates/StandardButtonSmallTemplate">
+      <Anchor side="Top" relative="$parent/ShopIconImage" pos="Mid" offset="0" />
+      <Anchor side="Bottom" relative="$parent/ShopIconImage" pos="Mid" offset="0" />
+      <Anchor side="Left" relative="$parent" pos="Min" offset="5" />
+      <Anchor side="Right" relative="$parent" pos="Mid" offset="-10" />
+      <Width val="0" />
+      <CollapseLayout val="true" />
+      <Text val="@UI/ProductPurchase/GoldConfirmButton" />
+      <Frame type="Frame" name="HitTestFrame">
+        <TooltipAnchorPosition val="TopCenter" />
+      </Frame>
+      <Frame type="Label" name="Label">
+        <Anchor side="Left" relative="$parent" pos="Mid" offset="0" />
+        <Anchor side="Right" relative="$parent" pos="Mid" offset="0" />
+        <Width val="157" />
+      </Frame>
+    </Frame>
+    <Frame type="Button" name="CancelButton" template="StandardTemplates/StandardButtonSmallTemplate">
+      <Anchor side="Top" relative="$parent/ShopIconImage" pos="Mid" offset="0" />
+      <Anchor side="Bottom" relative="$parent/ShopIconImage" pos="Mid" offset="0" />
+      <Anchor side="Left" relative="$parent" pos="Mid" offset="10" />
+      <Anchor side="Right" relative="$parent" pos="Max" offset="-5" />
+      <Width val="0" />
+      <CollapseLayout val="true" />
+      <Text val="@UI/ProductPurchase/CancelButton" />
+      <Frame type="Frame" name="HitTestFrame">
+        <TooltipAnchorPosition val="TopCenter" />
+      </Frame>
+    </Frame>
+    <Frame type="Image" name="ShopIconImage">
+      <Anchor side="Bottom" relative="$parent" pos="Max" offset="14" />
+      <Anchor side="Left" relative="$parent" pos="Mid" offset="0" />
+      <Anchor side="Right" relative="$parent" pos="Mid" offset="0" />
+      <Texture val="@UI/Storm_UI_Play_HeroAttributes_PurchaseIcon" />
+    </Frame>
+  </Frame>
+  <Frame type="Label" name="SelectedItemNameLabelTemplate">
+    <Anchor side="Top" relative="$parent/SearchEditBox" pos="Mid" offset="0" />
+    <Anchor side="Left" relative="$parent" pos="Min" offset="25" />
+    <Anchor side="Right" relative="$parent/OwnershipFilterPulldown" pos="Min" offset="0" />
+    <Anchor side="Bottom" relative="$parent/SearchEditBox" pos="Mid" offset="0" />
+    <Height val="35" />
+    <Style val="HeroSelectPanelHeaderLabel" />
+    <AcceptsMouseTooltip val="true" />
+    <Options val="NoWrapping | TooltipIfTruncated" />
+    <TooltipAnchorPosition val="TopCenter" />
+  </Frame>
+  <Frame type="GameContentOwnershipFilterPulldown" name="LoadoutOwnershipFilterPulldownTemplate" template="StandardTemplates/StandardPulldownTemplate">
+    <Anchor side="Top" relative="$parent/SearchEditBox" pos="Mid" offset="0" />
+    <Anchor side="Bottom" relative="$parent/SearchEditBox" pos="Mid" offset="0" />
+    <Anchor side="Right" relative="$parent/SearchEditBox" pos="Min" offset="0" />
+    <Item val="CollectionTemplates/OwnershipListBoxItemTemplate" />
+    <Width val="165" />
+    <ShowContentType val="false" />
+    <Frame type="Frame" name="ItemContainer">
+      <Anchor side="Top" relative="$parent" pos="Min" offset="5" />
+      <Anchor side="Left" relative="$parent" pos="Min" offset="15" />
+      <Anchor side="Bottom" relative="$parent" pos="Max" offset="-5" />
+      <AcceptsMouseTooltip val="true" />
+    </Frame>
+  </Frame>
+  <Frame type="EditBox" name="LoadoutSearchBoxTemplate" template="StandardTemplates/StandardSearchEditBoxTemplate">
+    <Width val="155" />
+    <Frame type="Button" name="ClearTextButton">
+      <Anchor side="Top" relative="$parent" pos="Mid" offset="0" />
+      <Anchor side="Right" relative="$parent" pos="Max" offset="-21" />
+      <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0" />
+      <Height val="24" />
+      <Width val="24" />
+      <Frame type="Image" name="NormalImage">
+        <Texture val="@UI/Storm_UI_Icon_CloseSearch_Disabled" layer="0" />
+      </Frame>
+      <Frame type="Image" name="HoverImage">
+        <Texture val="@UI/Storm_UI_Icon_CloseSearch_Hover" layer="0" />
+      </Frame>
+    </Frame>
+    <Frame type="Image" name="FilterSearchImage">
+      <Anchor side="Top" relative="$parent" pos="Mid" offset="0" />
+      <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0" />
+      <Anchor side="Right" relative="$parent" pos="Max" offset="-10" />
+      <Texture val="@UI/Storm_UI_Icon_SearchGlass_Dark" />
+      <Animation name="FilterSearchImage">
+        <Event event="OnShown" action="DirectionForward, Play" frame="$parent/ClearTextButton" />
+        <Event event="OnHidden" action="DirectionReverse, Play" frame="$parent/ClearTextButton" />
+        <Controller type="Fade" end="Pause">
+          <Key type="Curve" time="0" value="255" inout="Linear,Slow" />
+          <Key type="Curve" time=".1" value="0" inout="Slow,Linear" />
+        </Controller>
+      </Animation>
+    </Frame>
+  </Frame>
+  <Frame type="Image" name="EquippedFrameTemplate">
+    <Height val="171" />
+    <Width val="146" />
+    <CollapseLayout val="true" />
+    <Texture val="@UI/Storm_Heroselect_Loadout_ItemFrame_Hover" />
+    <TextureType val="Nineslice" />
+    <Frame type="GameContentFrame" name="GameContentFrame">
+      <Anchor relative="$parent" />
+    </Frame>
+    <Frame type="Frame" name="GlowContainerFrame">
+      <Anchor relative="$parent/TooltipFrame" />
+      <Frame type="Image" name="SprayBackgroundGlow" template="HeroSelectLoadoutTemplates/SprayBackgroundGlowTemplate" />
+    </Frame>
+    <Frame type="Control" name="TooltipFrame">
+      <Anchor side="Top" relative="$parent" pos="Min" offset="23" />
+      <Anchor side="Left" relative="$parent" pos="Min" offset="23" />
+      <Anchor side="Right" relative="$parent" pos="Max" offset="-23" />
+      <Anchor side="Bottom" relative="$parent" pos="Max" offset="-23" />
+      <AcceptsMouse val="true" />
+      <TooltipAnchorPosition val="TopCenter" />
+      <Tooltip val="{$parent/GameContentFrame/@Name}" />
+    </Frame>
+  </Frame>
+  <Frame type="Frame" name="CutscenePreviewFrameTemplate">
+    <Anchor side="Left" relative="$parent/BlurBackground" pos="Min" offset="0" />
+    <Anchor side="Right" relative="$parent/BlurBackground" pos="Max" offset="0" />
+    <Anchor side="Bottom" relative="$parent/BlurBackground" pos="Min" offset="0" />
+    <Visible val="false" />
+    <Height val="303" />
+    <Frame type="BlurFrame" name="BlurBackground">
+      <Anchor relative="$parent/BorderImage" />
+      <BlurAmount val="0.8" />
+      <RenderPriority val="399" />
+      <AcceptsMouse val="true" />
+      <Frame type="Image" name="LowImage">
+        <Anchor relative="$parent" />
+        <TextureType val="Normal" />
+        <Texture val="@UI/Storm_Generic_Background_Low" />
+      </Frame>
+    </Frame>
+    <Frame type="Image" name="MountPreviewBackgroundImage">
+      <Anchor side="Left" relative="$parent/BlurBackground" pos="Min" offset="5" />
+      <Anchor side="Right" relative="$parent/BlurBackground" pos="Max" offset="-5" />
+      <Anchor side="Bottom" relative="$parent/BlurBackground" pos="Max" offset="-3" />
+      <Texture val="@UI/Storm_UI_Play_HeroAttributes_PreviewBackground" />
+    </Frame>
+    <Frame type="Image" name="BorderImage">
+      <Anchor side="Left" relative="$parent" pos="Min" offset="0" />
+      <Anchor side="Right" relative="$parent" pos="Max" offset="0" />
+      <Anchor side="Bottom" relative="$parent" pos="Max" offset="-5" />
+      <Height val="250" />
+      <RenderPriority val="400" />
+      <Texture val="@UI/Storm_Generic_SmallPanel_Border" />
+      <TextureType val="Nineslice" />
+    </Frame>
+    <Frame type="HeroCutsceneFrame" name="MountPreviewCutscene">
+      <Anchor side="Left" relative="$parent/BlurBackground" pos="Min" offset="0" />
+      <Anchor side="Right" relative="$parent/BlurBackground" pos="Max" offset="0" />
+      <Anchor side="Bottom" relative="$parent/BlurBackground" pos="Max" offset="15" />
+      <Height val="314" />
+      <HeroCutsceneType val="HeroSelect" />
+      <HeroCutsceneDragEnabled val="true" />
+      <GameContent val="{$ancestor[@type=HeroSelectLoadoutsPanel]/LoadoutPanelTabs/PanelContainer/MountsPanel/ContentTileList/@SelectedGameContent}" />
+    </Frame>
+    <StateGroup name="CutscenePreviewState">
+      <State name="ShowMountCutscenePreview">
+        <When type="Property" frame="$ancestor[@type=HeroSelectLoadoutsPanel]/LoadoutPanelTabs/PanelContainer/MountsPanel" Visible="true" />
+        <When type="Property" frame="$ancestor[@type=HeroSelectLoadoutsPanel]" HeroUsesMounts="true" />
+        <When type="Property" frame="$ancestor[@type=HeroSelectLoadoutsPanel]/LoadoutPanelTabs/PanelContainer/MountsPanel/ContentTileList" operator="NotEqual" SelectedIndex="#InvalidIndex" />
+        <Action type="SetProperty" Visible="true" />
+      </State>
+    </StateGroup>
+    <Animation name="Show">
+      <Event event="OnShown" action="Reset, Play" />
+      <Event event="OnHidden" action="DirectionReverse, Play" />
+      <Controller type="Fade" end="Pause">
+        <Key type="Curve" time="0" value="0" inout="Linear" />
+        <Key type="Curve" time=".3" value="255" inout="Slow,Linear" />
+      </Controller>
+    </Animation>
+  </Frame>
+  <Frame type="Frame" name="HeroSelectLoadoutItemPanelTemplate">
+    <Anchor relative="$parent" />
+    <Visible val="false" />
+    <Frame type="Label" name="SelectedContentLabel" template="HeroSelectLoadoutTemplates/SelectedItemNameLabelTemplate">
+      <Text val="{$parent/ContentTileList/@SelectedGameContent[Name]}" />
+    </Frame>
+    <Frame type="GameContentOwnershipFilterPulldown" name="OwnershipFilterPulldown" template="HeroSelectLoadoutTemplates/LoadoutOwnershipFilterPulldownTemplate">
+      <GameContentType val="{$parent/ContentTileList/@GameContentType}" />
+    </Frame>
+    <Frame type="EditBox" name="SearchEditBox" template="HeroSelectLoadoutTemplates/LoadoutSearchBoxTemplate">
+      <Anchor side="Right" relative="$parent/ContentTileList/ScrollBar" pos="Max" offset="0" />
+      <Anchor side="Bottom" relative="$parent/ContentTileList/Item0" pos="Min" offset="16" />
+      <InputDelayTimeout val="#EditBoxInputTimeout" />
+      <StateGroup name="SearchHideContent">
+        <State name="SearchInactive">
+          <When type="Property" frame="$this" Text="" />
+          <Action type="SetProperty" frame="$parent/ContentTileList" SearchFlags="" />
+        </State>
+        <State name="SearchActive">
+          <When type="Property" frame="$this" Text="" operator="NotEqual" />
+          <Action type="SetProperty" frame="$parent/CategoryTileList" Visible="false" />
+          <Action type="SetProperty" frame="$parent/ContentTileList" MaxItemPerPage="18" />
+          <Action type="SetProperty" frame="$parent/ContentTileList" CollectionCategoryFilter="" undo="false" />
+          <Action type="SetProperty" frame="$parent/ContentTileList" ProductAttribute="" index="0" />
+          <Action type="SetProperty" frame="$parent/ContentTileList" CollectionCategoryFilter="{$parent/CategoryTileList/@SelectedCollectionCategory}" on="Exit" />
+        </State>
+      </StateGroup>
+    </Frame>
+    <Frame type="CollectionCategoryTileList" name="CategoryTileList" template="HeroSelectLoadoutTemplates/LoadoutCategoryTileListTemplate">
+      <FilterFlags val="{$parent/ContentTileList/@FilterFlags}" />
+      <UpdateWhenLicensesChange val="{$parent/ContentTileList/@UpdateWhenLicensesChange}" />
+    </Frame>
+    <Frame type="LoadoutTileList" name="ContentTileList">
+      <FilterString val="{$parent/SearchEditBox/@Text}" />
+      <CollectionCategoryFilter val="{$parent/CategoryTileList/@SelectedCollectionCategory}" />
+      <StateGroup name="OwnershipFilter">
+        <State name="AllContent">
+          <When type="Property" frame="$parent/OwnershipFilterPulldown" SelectedFilter="AllContent" />
+          <Action type="SetProperty" FilterFlag_Owned="true" />
+          <Action type="SetProperty" FilterFlag_NotOwned="true" />
+        </State>
+        <State name="OwnedContent">
+          <When type="Property" frame="$parent/OwnershipFilterPulldown" SelectedFilter="OwnedContent" />
+          <Action type="SetProperty" FilterFlag_Owned="true" />
+          <Action type="SetProperty" FilterFlag_NotOwned="false" />
+        </State>
+        <State name="UnownedContent">
+          <When type="Property" frame="$parent/OwnershipFilterPulldown" SelectedFilter="UnownedContent" />
+          <Action type="SetProperty" FilterFlag_Owned="false" />
+          <Action type="SetProperty" FilterFlag_NotOwned="true" />
+        </State>
+      </StateGroup>
+    </Frame>
+  </Frame>
 </Desc>

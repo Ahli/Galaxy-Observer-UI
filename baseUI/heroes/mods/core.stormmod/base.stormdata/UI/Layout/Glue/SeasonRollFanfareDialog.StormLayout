@@ -1,310 +1,255 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <Desc>
-    <DescFlags val="Locked"/>
-
-    <!--
-        Main Frame
-    -->
-    <Frame type="SeasonRollFanfareDialog" name="SeasonRollFanfareDialog" template="StandardDialog/GridPulseDialogTemplate">
-        <Anchor relative="$parent"/>
-        <!--
-            State Groups
-        -->
-        <StateGroup name="BadgeTypeState">
-            <DefaultState val="NormalSeasonState"/>
-
-            <State name="PreseasonHeroLeagueState">
-                <When type="Property" BadgeType="PreseasonHeroLeague"/>
-                <Action type="SetProperty" frame="RankFrame/HeroRankFrame" Visible="True" />
-            </State>
-
-            <State name="PreseasonTeamLeagueState">
-                <When type="Property" BadgeType="PreseasonTeamLeague"/>
-                <Action type="SetProperty" frame="RankFrame/TeamRankFrame" Visible="True" />
-            </State>
-
-            <State name="NormalSeasonState">
-                <When type="Property" BadgeType="NormalSeason"/>
-                <Action type="SetProperty" frame="RankFrame/RankBadgeFrame" Visible="True" />
-            </State>
-        </StateGroup>
-
-        <StateGroup name="LeagueTypeState">
-            <State name="HeroLeagueState">
-                <When type="Property" LeagueType="HeroLeague"/>
-                <Action type="SetProperty" frame="RankTypeLabel" Text="@UI/GameFilter/RankedSolo"/>
-            </State>
-
-            <State name="TeamLeagueState">
-                <When type="Property" LeagueType="TeamLeague"/>
-                <Action type="SetProperty" frame="RankTypeLabel" Text="@UI/GameFilter/RankedTeam"/>
-            </State>
-        </StateGroup>
-
-        <!--
-            Property Bindings
-        -->
-        <Frame type="PropertyBind" name="BindHeroRank">
-            <Anchor relative="$parent"/>
-            <Source frame="$parent" property="Rank"/>
-            <Target frame="$parent/RankFrame/HeroRankFrame/RankInformationContainer/NumericRankLabel" property="Text"/>
-        </Frame>
-
-        <Frame type="PropertyBind" name="BindTeamRank">
-            <Anchor relative="$parent"/>
-            <Source frame="$parent" property="Rank"/>
-            <Target frame="$parent/RankFrame/TeamRankFrame/RankInformationContainer/NumericRankLabel" property="Text"/>
-        </Frame>
-
-        <!--
-            Animations
-        -->
-        <Animation name="ShowAnimation">
-            <Event event="OnShown" action="Reset,Play"/>
-
-            <Controller type="Sound" end="Pause">
-                <Key type="Sound" time="0" sound="@UI_BNet_Menu_Show" />
-                <Key type="Sound" time="0" sound="@UI_BNet_Ranked_SeasonRoll_PreSeason" />
-            </Controller>
-        </Animation>
-
-        <Animation name="HideAnimation">
-            <Event event="OnHidden" action="Reset,Play"/>
-
-            <Controller type="Sound" end="Pause">
-                <Key type="Sound" time="0" sound="@UI_BNet_Menu_Hide" />
-            </Controller>
-        </Animation>
-
-        <!--
-            Frames
-        -->
-
-        <Frame type="Label" name="SeasonTitleLabel">
-            <Anchor side="Top" relative="$parent/BackgroundFrame" pos="Min" offset="0"/>
-            <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
-            <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
-            <Style val="FanfareLabelUnlocked"/>
-            <Text val="@UI/SeasonRollFanfare/Dialog/Title"/>
-            <Alpha val="0"/>
-
-            <Animation name="IntroAnim">
-                <Event event="OnShown" action="Reset,Play" frame="$ancestor[@type=SeasonRollFanfareDialog]"/>
-
-                <Controller type="Fade" end="Pause">
-                    <Key type="Curve" time="0" value="0"/>
-                    <Key type="Curve" time=".45" value="0"/>
-                    <Key type="Curve" time=".65" value="255"/>
-                </Controller>
-            </Animation>
-        </Frame>
-
-        <Frame type="Label" name="SubtitleLabel">
-            <Anchor side="Top" relative="$parent/SeasonTitleLabel" pos="Max" offset="0"/>
-            <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
-            <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
-            <Style val="FanfareItemTitle"/>
-            <Alpha val="0"/>
-
-            <Animation name="IntroAnim">
-                <Event event="OnShown" action="Reset,Play" frame="$ancestor[@type=SeasonRollFanfareDialog]"/>
-
-                <Controller type="Fade" end="Pause">
-                    <Key type="Curve" time="0" value="0"/>
-                    <Key type="Curve" time=".4" value="0"/>
-                    <Key type="Curve" time=".6" value="255"/>
-                </Controller>
-            </Animation>
-        </Frame>
-
-        <Frame type="Frame" name="RankFrame">
-            <Anchor side="Top" relative="$parent/SubtitleLabel" pos="Max" offset="50"/>
-            <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
-            <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
-            <Width val="350" />
-            <Height val="375" />
-
-            <Frame type="Frame" name="HeroRankFrame" template="HeroRankedLeagueBadge/HeroRankBadgeTemplate">
-                <Visible val="False" />
-                <Frame type="Frame" name="ProgressBackground" template="StandardTemplates/ScoreProgressBackgroundTemplate">
-                    <Frame type="Frame" name="HeroBackgroundContainer">
-                        <Frame type="Image" name="ProgressBackgroundImage">
-                            <ColorAdjustMode val="AddSelf"/>
-                            <AdjustmentColor val="0,255,255,255"/>
-                            <Animation name="IntroAnim">
-                                <Event event="OnShown" action="Reset,Play" frame="$ancestor[@type=SeasonRollFanfareDialog]"/>
-
-                                <Controller type="Dimension" dimension="Height" percentage="True">
-                                    <Key type="Curve" time="0" value="300" inout="Linear"/>
-                                    <Key type="Curve" time=".2" value="100" inout="Linear,Slow"/>
-                                </Controller>
-                                <Controller type="Dimension" dimension="Width" percentage="True">
-                                    <Key type="Curve" time="0" value="300" inout="Linear"/>
-                                    <Key type="Curve" time=".2" value="100" inout="Linear,Slow"/>
-                                </Controller>
-                                <Controller type="AdjustmentColor" end="Pause">
-                                    <Key type="Curve" time="0" value="255,255,255,255" inout="Linear"/>
-                                    <Key type="Curve" time=".4" value="0,255,255,255" inout="Linear,Slow"/>
-                                </Controller>
-                                <Controller type="Fade" end="Pause" frame="FillImage">
-                                    <Key type="Curve" time="0" value="255"/>
-                                    <Key type="Curve" time=".15" value="255" inout="Linear"/>
-                                    <Key type="Curve" time=".25" value="0" inout="Linear,Slow"/>
-                                </Controller>
-                            </Animation>
-
-                            <Frame type="Image" name="FillImage">
-                                <Anchor relative="$parent"/>
-                                <ColorAdjustMode val="Fill"/>
-                                <AdjustmentColor val="200,255,255,255"/>
-                                <Alpha val="0"/>
-                                <BlendMode val="Add"/>
-                                <Blur val="true"/>
-                                <BlurAmount val="2"/>
-                            </Frame>
-
-                            <Frame type="PropertyBind" name="BindTexture">
-                                <Anchor relative="$parent"/>
-                                <Enabled val="True"/>
-                                <Source frame="$parent" property="Texture"/>
-                                <Target frame="$parent/FillImage" property="Texture"/>
-                            </Frame>
-                        </Frame>
-                    </Frame>
-                </Frame>
-
-                <Animation name="HeroAdditionalInfoIntroAnim">
-                    <Event event="OnShown" action="Reset,Play" frame="$ancestor[@type=SeasonRollFanfareDialog]"/>
-
-                    <Controller type="Fade" end="Pause" frame="$this/ProgressBar">
-                        <Key type="Curve" time="0" value="0"/>
-                        <Key type="Curve" time=".2" value="0"/>
-                        <Key type="Curve" time=".4" value="255"/>
-                    </Controller>
-                    <Controller type="Fade" end="Pause" frame="$this/RankInformationContainer">
-                        <Key type="Curve" time="0" value="0"/>
-                        <Key type="Curve" time=".2" value="0"/>
-                        <Key type="Curve" time=".4" value="255"/>
-                    </Controller>
-                    <Controller type="Fade" end="Pause" frame="$this/FleurishContainer">
-                        <Key type="Curve" time="0" value="0"/>
-                        <Key type="Curve" time=".2" value="0"/>
-                        <Key type="Curve" time=".4" value="255"/>
-                    </Controller>
-                </Animation>
-            </Frame>
-
-            <Frame type="Frame" name="TeamRankFrame" template="HeroRankedLeagueBadge/TeamRankBadgeTemplate">
-                <Visible val="False" />
-                <Frame type="Frame" name="ProgressBackground" template="StandardTemplates/ScoreProgressBackgroundTemplate">
-                    <Frame type="Frame" name="TeamBackgroundContainer">
-                        <Frame type="Image" name="ProgressBackgroundImage">
-
-                            <ColorAdjustMode val="AddSelf"/>
-                            <AdjustmentColor val="0,255,255,255"/>
-                            <Animation name="IntroAnim">
-                                <Event event="OnShown" action="Reset,Play" frame="$ancestor[@type=SeasonRollFanfareDialog]"/>
-
-                                <Controller type="Dimension" dimension="Height" percentage="True">
-                                    <Key type="Curve" time="0" value="300" inout="Linear"/>
-                                    <Key type="Curve" time=".2" value="100"/>
-                                </Controller>
-                                <Controller type="Dimension" dimension="Width" percentage="True">
-                                    <Key type="Curve" time="0" value="300" inout="Linear"/>
-                                    <Key type="Curve" time=".2" value="100"/>
-                                </Controller>
-                                <Controller type="AdjustmentColor" end="Pause">
-                                    <Key type="Curve" time="0" value="255,255,255,255" inout="Linear"/>
-                                    <Key type="Curve" time=".4" value="0,255,255,255"/>
-                                </Controller>
-                                <Controller type="Fade" end="Pause" frame="FillImage">
-                                    <Key type="Curve" time="0" value="255"/>
-                                    <Key type="Curve" time=".15" value="255" inout="Linear"/>
-                                    <Key type="Curve" time=".25" value="0" inout="Linear,Slow"/>
-                                </Controller>
-                            </Animation>
-
-                            <Frame type="Image" name="FillImage">
-                                <Anchor relative="$parent"/>
-                                <ColorAdjustMode val="Fill"/>
-                                <AdjustmentColor val="200,255,255,255"/>
-                                <Alpha val="0"/>
-                                <BlendMode val="Add"/>
-                                <Blur val="true"/>
-                                <BlurAmount val="2"/>
-                            </Frame>
-
-                            <Frame type="PropertyBind" name="BindTexture">
-                                <Anchor relative="$parent"/>
-                                <Enabled val="True"/>
-                                <Source frame="$parent" property="Texture"/>
-                                <Target frame="$parent/FillImage" property="Texture"/>
-                            </Frame>
-                        </Frame>
-                    </Frame>
-                </Frame>
-
-                <Animation name="TeamAdditionalInfoIntroAnim">
-                    <Event event="OnShown" action="Reset,Play" frame="$ancestor[@type=SeasonRollFanfareDialog]"/>
-
-                    <Controller type="Fade" end="Pause" frame="$this/ProgressBar">
-                        <Key type="Curve" time="0" value="0"/>
-                        <Key type="Curve" time=".2" value="0"/>
-                        <Key type="Curve" time=".4" value="255"/>
-                    </Controller>
-                    <Controller type="Fade" end="Pause" frame="$this/RankInformationContainer">
-                        <Key type="Curve" time="0" value="0"/>
-                        <Key type="Curve" time=".2" value="0"/>
-                        <Key type="Curve" time=".4" value="255"/>
-                    </Controller>
-                    <Controller type="Fade" end="Pause" frame="$this/FleurishContainer">
-                        <Key type="Curve" time="0" value="0"/>
-                        <Key type="Curve" time=".2" value="0"/>
-                        <Key type="Curve" time=".4" value="255"/>
-                    </Controller>
-                </Animation>
-            </Frame>
-
-            <Frame type="RankBadge" name="RankBadgeFrame" template="RankBadgeTemplates/RankBadgeTemplate">
-                <Anchor relative="$parent" />
-                <RenderType val="LDR" />
-                <Visible val="false" />
-            </Frame>
-        </Frame>
-
-        <Frame type="Label" name="RankTypeLabel">
-            <Anchor side="Top" relative="$parent/RankFrame" pos="Max" offset="30"/>
-            <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
-            <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
-            <Style val="FanfareLabelDescription"/>
-            <Alpha val="0"/>
-        </Frame>
-
-        <Frame type="Button" name="Button" template="StandardTemplates/StandardButtonTemplate">
-            <Anchor side="Top" relative="$parent/RankTypeLabel" pos="Max" offset="0"/>
-            <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
-            <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
-            <Text val="@UI/Sweet"/>
-            <Shortcut val="@UI/StandardDialog_Ok_Hotkey"/>
-            <Alpha val="0"/>
-            <VisibilityOnFade val="true"/>
-        </Frame>
-
-        <Animation name="IntroAnim">
-            <Event event="OnShown" action="Reset, Play"/>
-
-            <Controller type="Fade" end="Pause" frame="Button">
-                <Key type="Curve" time="0.0" value="0"/>
-                <Key type="Curve" time="0.3" value="0"/>
-                <Key type="Curve" time="0.5" value="255"/>
-            </Controller>
-
-            <Controller type="Fade" end="Pause" frame="RankTypeLabel">
-                <Key type="Curve" time="0.0" value="0"/>
-                <Key type="Curve" time="0.3" value="0"/>
-                <Key type="Curve" time="0.5" value="255"/>
-            </Controller>
-        </Animation>
-        
+  <DescFlags val="Locked" />
+  <Frame type="SeasonRollFanfareDialog" name="SeasonRollFanfareDialog" template="StandardDialog/GridPulseDialogTemplate">
+    <Anchor relative="$parent" />
+    <StateGroup name="BadgeTypeState">
+      <DefaultState val="NormalSeasonState" />
+      <State name="PreseasonHeroLeagueState">
+        <When type="Property" BadgeType="PreseasonHeroLeague" />
+        <Action type="SetProperty" frame="RankFrame/HeroRankFrame" Visible="True" />
+      </State>
+      <State name="PreseasonTeamLeagueState">
+        <When type="Property" BadgeType="PreseasonTeamLeague" />
+        <Action type="SetProperty" frame="RankFrame/TeamRankFrame" Visible="True" />
+      </State>
+      <State name="NormalSeasonState">
+        <When type="Property" BadgeType="NormalSeason" />
+        <Action type="SetProperty" frame="RankFrame/RankBadgeFrame" Visible="True" />
+      </State>
+    </StateGroup>
+    <StateGroup name="LeagueTypeState">
+      <State name="HeroLeagueState">
+        <When type="Property" LeagueType="HeroLeague" />
+        <Action type="SetProperty" frame="RankTypeLabel" Text="@UI/GameFilter/RankedSolo" />
+      </State>
+      <State name="TeamLeagueState">
+        <When type="Property" LeagueType="TeamLeague" />
+        <Action type="SetProperty" frame="RankTypeLabel" Text="@UI/GameFilter/RankedTeam" />
+      </State>
+    </StateGroup>
+    <Frame type="PropertyBind" name="BindHeroRank">
+      <Anchor relative="$parent" />
+      <Source frame="$parent" property="Rank" />
+      <Target frame="$parent/RankFrame/HeroRankFrame/RankInformationContainer/NumericRankLabel" property="Text" />
     </Frame>
+    <Frame type="PropertyBind" name="BindTeamRank">
+      <Anchor relative="$parent" />
+      <Source frame="$parent" property="Rank" />
+      <Target frame="$parent/RankFrame/TeamRankFrame/RankInformationContainer/NumericRankLabel" property="Text" />
+    </Frame>
+    <Animation name="ShowAnimation">
+      <Event event="OnShown" action="Reset,Play" />
+      <Controller type="Sound" end="Pause">
+        <Key type="Sound" time="0" sound="@UI_BNet_Menu_Show" />
+        <Key type="Sound" time="0" sound="@UI_BNet_Ranked_SeasonRoll_PreSeason" />
+      </Controller>
+    </Animation>
+    <Animation name="HideAnimation">
+      <Event event="OnHidden" action="Reset,Play" />
+      <Controller type="Sound" end="Pause">
+        <Key type="Sound" time="0" sound="@UI_BNet_Menu_Hide" />
+      </Controller>
+    </Animation>
+    <Frame type="Label" name="SeasonTitleLabel">
+      <Anchor side="Top" relative="$parent/BackgroundFrame" pos="Min" offset="0" />
+      <Anchor side="Left" relative="$parent" pos="Mid" offset="0" />
+      <Anchor side="Right" relative="$parent" pos="Mid" offset="0" />
+      <Style val="FanfareLabelUnlocked" />
+      <Text val="@UI/SeasonRollFanfare/Dialog/Title" />
+      <Alpha val="0" />
+      <Animation name="IntroAnim">
+        <Event event="OnShown" action="Reset,Play" frame="$ancestor[@type=SeasonRollFanfareDialog]" />
+        <Controller type="Fade" end="Pause">
+          <Key type="Curve" time="0" value="0" />
+          <Key type="Curve" time=".45" value="0" />
+          <Key type="Curve" time=".65" value="255" />
+        </Controller>
+      </Animation>
+    </Frame>
+    <Frame type="Label" name="SubtitleLabel">
+      <Anchor side="Top" relative="$parent/SeasonTitleLabel" pos="Max" offset="0" />
+      <Anchor side="Left" relative="$parent" pos="Mid" offset="0" />
+      <Anchor side="Right" relative="$parent" pos="Mid" offset="0" />
+      <Style val="FanfareItemTitle" />
+      <Alpha val="0" />
+      <Animation name="IntroAnim">
+        <Event event="OnShown" action="Reset,Play" frame="$ancestor[@type=SeasonRollFanfareDialog]" />
+        <Controller type="Fade" end="Pause">
+          <Key type="Curve" time="0" value="0" />
+          <Key type="Curve" time=".4" value="0" />
+          <Key type="Curve" time=".6" value="255" />
+        </Controller>
+      </Animation>
+    </Frame>
+    <Frame type="Frame" name="RankFrame">
+      <Anchor side="Top" relative="$parent/SubtitleLabel" pos="Max" offset="50" />
+      <Anchor side="Left" relative="$parent" pos="Mid" offset="0" />
+      <Anchor side="Right" relative="$parent" pos="Mid" offset="0" />
+      <Width val="350" />
+      <Height val="375" />
+      <Frame type="Frame" name="HeroRankFrame" template="HeroRankedLeagueBadge/HeroRankBadgeTemplate">
+        <Visible val="False" />
+        <Frame type="Frame" name="ProgressBackground" template="StandardTemplates/ScoreProgressBackgroundTemplate">
+          <Frame type="Frame" name="HeroBackgroundContainer">
+            <Frame type="Image" name="ProgressBackgroundImage">
+              <ColorAdjustMode val="AddSelf" />
+              <AdjustmentColor val="0,255,255,255" />
+              <Animation name="IntroAnim">
+                <Event event="OnShown" action="Reset,Play" frame="$ancestor[@type=SeasonRollFanfareDialog]" />
+                <Controller type="Dimension" dimension="Height" percentage="True">
+                  <Key type="Curve" time="0" value="300" inout="Linear" />
+                  <Key type="Curve" time=".2" value="100" inout="Linear,Slow" />
+                </Controller>
+                <Controller type="Dimension" dimension="Width" percentage="True">
+                  <Key type="Curve" time="0" value="300" inout="Linear" />
+                  <Key type="Curve" time=".2" value="100" inout="Linear,Slow" />
+                </Controller>
+                <Controller type="AdjustmentColor" end="Pause">
+                  <Key type="Curve" time="0" value="255,255,255,255" inout="Linear" />
+                  <Key type="Curve" time=".4" value="0,255,255,255" inout="Linear,Slow" />
+                </Controller>
+                <Controller type="Fade" end="Pause" frame="FillImage">
+                  <Key type="Curve" time="0" value="255" />
+                  <Key type="Curve" time=".15" value="255" inout="Linear" />
+                  <Key type="Curve" time=".25" value="0" inout="Linear,Slow" />
+                </Controller>
+              </Animation>
+              <Frame type="Image" name="FillImage">
+                <Anchor relative="$parent" />
+                <ColorAdjustMode val="Fill" />
+                <AdjustmentColor val="200,255,255,255" />
+                <Alpha val="0" />
+                <BlendMode val="Add" />
+                <Blur val="true" />
+                <BlurAmount val="2" />
+              </Frame>
+              <Frame type="PropertyBind" name="BindTexture">
+                <Anchor relative="$parent" />
+                <Enabled val="True" />
+                <Source frame="$parent" property="Texture" />
+                <Target frame="$parent/FillImage" property="Texture" />
+              </Frame>
+            </Frame>
+          </Frame>
+        </Frame>
+        <Animation name="HeroAdditionalInfoIntroAnim">
+          <Event event="OnShown" action="Reset,Play" frame="$ancestor[@type=SeasonRollFanfareDialog]" />
+          <Controller type="Fade" end="Pause" frame="$this/ProgressBar">
+            <Key type="Curve" time="0" value="0" />
+            <Key type="Curve" time=".2" value="0" />
+            <Key type="Curve" time=".4" value="255" />
+          </Controller>
+          <Controller type="Fade" end="Pause" frame="$this/RankInformationContainer">
+            <Key type="Curve" time="0" value="0" />
+            <Key type="Curve" time=".2" value="0" />
+            <Key type="Curve" time=".4" value="255" />
+          </Controller>
+          <Controller type="Fade" end="Pause" frame="$this/FleurishContainer">
+            <Key type="Curve" time="0" value="0" />
+            <Key type="Curve" time=".2" value="0" />
+            <Key type="Curve" time=".4" value="255" />
+          </Controller>
+        </Animation>
+      </Frame>
+      <Frame type="Frame" name="TeamRankFrame" template="HeroRankedLeagueBadge/TeamRankBadgeTemplate">
+        <Visible val="False" />
+        <Frame type="Frame" name="ProgressBackground" template="StandardTemplates/ScoreProgressBackgroundTemplate">
+          <Frame type="Frame" name="TeamBackgroundContainer">
+            <Frame type="Image" name="ProgressBackgroundImage">
+              <ColorAdjustMode val="AddSelf" />
+              <AdjustmentColor val="0,255,255,255" />
+              <Animation name="IntroAnim">
+                <Event event="OnShown" action="Reset,Play" frame="$ancestor[@type=SeasonRollFanfareDialog]" />
+                <Controller type="Dimension" dimension="Height" percentage="True">
+                  <Key type="Curve" time="0" value="300" inout="Linear" />
+                  <Key type="Curve" time=".2" value="100" />
+                </Controller>
+                <Controller type="Dimension" dimension="Width" percentage="True">
+                  <Key type="Curve" time="0" value="300" inout="Linear" />
+                  <Key type="Curve" time=".2" value="100" />
+                </Controller>
+                <Controller type="AdjustmentColor" end="Pause">
+                  <Key type="Curve" time="0" value="255,255,255,255" inout="Linear" />
+                  <Key type="Curve" time=".4" value="0,255,255,255" />
+                </Controller>
+                <Controller type="Fade" end="Pause" frame="FillImage">
+                  <Key type="Curve" time="0" value="255" />
+                  <Key type="Curve" time=".15" value="255" inout="Linear" />
+                  <Key type="Curve" time=".25" value="0" inout="Linear,Slow" />
+                </Controller>
+              </Animation>
+              <Frame type="Image" name="FillImage">
+                <Anchor relative="$parent" />
+                <ColorAdjustMode val="Fill" />
+                <AdjustmentColor val="200,255,255,255" />
+                <Alpha val="0" />
+                <BlendMode val="Add" />
+                <Blur val="true" />
+                <BlurAmount val="2" />
+              </Frame>
+              <Frame type="PropertyBind" name="BindTexture">
+                <Anchor relative="$parent" />
+                <Enabled val="True" />
+                <Source frame="$parent" property="Texture" />
+                <Target frame="$parent/FillImage" property="Texture" />
+              </Frame>
+            </Frame>
+          </Frame>
+        </Frame>
+        <Animation name="TeamAdditionalInfoIntroAnim">
+          <Event event="OnShown" action="Reset,Play" frame="$ancestor[@type=SeasonRollFanfareDialog]" />
+          <Controller type="Fade" end="Pause" frame="$this/ProgressBar">
+            <Key type="Curve" time="0" value="0" />
+            <Key type="Curve" time=".2" value="0" />
+            <Key type="Curve" time=".4" value="255" />
+          </Controller>
+          <Controller type="Fade" end="Pause" frame="$this/RankInformationContainer">
+            <Key type="Curve" time="0" value="0" />
+            <Key type="Curve" time=".2" value="0" />
+            <Key type="Curve" time=".4" value="255" />
+          </Controller>
+          <Controller type="Fade" end="Pause" frame="$this/FleurishContainer">
+            <Key type="Curve" time="0" value="0" />
+            <Key type="Curve" time=".2" value="0" />
+            <Key type="Curve" time=".4" value="255" />
+          </Controller>
+        </Animation>
+      </Frame>
+      <Frame type="RankBadge" name="RankBadgeFrame" template="RankBadgeTemplates/RankBadgeTemplate">
+        <Anchor relative="$parent" />
+        <RenderType val="LDR" />
+        <Visible val="false" />
+      </Frame>
+    </Frame>
+    <Frame type="Label" name="RankTypeLabel">
+      <Anchor side="Top" relative="$parent/RankFrame" pos="Max" offset="30" />
+      <Anchor side="Left" relative="$parent" pos="Mid" offset="0" />
+      <Anchor side="Right" relative="$parent" pos="Mid" offset="0" />
+      <Style val="FanfareLabelDescription" />
+      <Alpha val="0" />
+    </Frame>
+    <Frame type="Button" name="Button" template="StandardTemplates/StandardButtonTemplate">
+      <Anchor side="Top" relative="$parent/RankTypeLabel" pos="Max" offset="0" />
+      <Anchor side="Left" relative="$parent" pos="Mid" offset="0" />
+      <Anchor side="Right" relative="$parent" pos="Mid" offset="0" />
+      <Text val="@UI/Sweet" />
+      <Shortcut val="@UI/StandardDialog_Ok_Hotkey" />
+      <Alpha val="0" />
+      <VisibilityOnFade val="true" />
+    </Frame>
+    <Animation name="IntroAnim">
+      <Event event="OnShown" action="Reset, Play" />
+      <Controller type="Fade" end="Pause" frame="Button">
+        <Key type="Curve" time="0.0" value="0" />
+        <Key type="Curve" time="0.3" value="0" />
+        <Key type="Curve" time="0.5" value="255" />
+      </Controller>
+      <Controller type="Fade" end="Pause" frame="RankTypeLabel">
+        <Key type="Curve" time="0.0" value="0" />
+        <Key type="Curve" time="0.3" value="0" />
+        <Key type="Curve" time="0.5" value="255" />
+      </Controller>
+    </Animation>
+  </Frame>
 </Desc>

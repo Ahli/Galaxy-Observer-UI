@@ -1,779 +1,671 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <Desc>
-    
-    <Constant name="KillLog_AnimTime" val=".25"/>
-
-    <Animation name="IconVisibility">
-        <Event event="FadeIn" action="Reset,Play"/>
-        <Event event="OnHidden" action="Stop" frame="$parent"/>
-
-        <Controller type="Visibility" end="Pause">
-            <Key type="Bool" time="0" value="True"/>
-        </Controller>
+  <Constant name="KillLog_AnimTime" val=".25" />
+  <Animation name="IconVisibility">
+    <Event event="FadeIn" action="Reset,Play" />
+    <Event event="OnHidden" action="Stop" frame="$parent" />
+    <Controller type="Visibility" end="Pause">
+      <Key type="Bool" time="0" value="True" />
+    </Controller>
+  </Animation>
+  <Animation name="IconFade">
+    <Event event="FadeIn" action="Reset,Play" />
+    <Event event="FadeOut" action="DirectionReverse,Play" frame="$parent" />
+    <Controller type="Anchor" end="Pause" side="Left" relative="True">
+      <Key type="Curve" time="0" value="35" />
+      <Key type="Curve" time="#KillLog_AnimTime" value="0" inout="Fast,Linear" />
+    </Controller>
+    <Controller type="Fade" end="Pause">
+      <Key type="Curve" time="0" value="0" />
+      <Key type="Curve" time="#KillLog_AnimTime" value="255" />
+    </Controller>
+  </Animation>
+  <Frame type="Frame" name="StrikethroughTemplate">
+    <Unclipped val="true" />
+    <RenderPriority val="525" />
+    <Frame type="Image" name="Glow">
+      <Anchor relative="$parent" />
+      <Texture val="@UI/HUD_KillLog_Portrait_Strikethrough_Glow" />
+      <ColorAdjustMode val="Colorize" />
+      <Visible val="{$parent/Image/@Visible}" />
+      <Rotation val="-15" />
+      <Alpha val="{$parent/Image/@Alpha}" />
+    </Frame>
+    <Frame type="Image" name="Image">
+      <Anchor relative="$parent" />
+      <Texture val="@UI/HUD_KillLog_Portrait_Strikethrough" />
+      <Visible val="False" />
+      <Rotation val="-15" />
+      <ColorAdjustMode val="Colorize" />
+    </Frame>
+    <Animation name="StrikeAnim">
+      <Event event="StrikeAnim" action="Restart,Play" />
+      <Controller type="Visibility" frame="Image" end="Pause">
+        <Key type="Bool" time="0" value="False" />
+        <Key type="Bool" time=".01" value="True" />
+        <Key type="Bool" time="1.45" value="False" />
+      </Controller>
+      <Controller type="Fade" frame="Image" end="Pause">
+        <Key type="Curve" time="0.0" value="0" />
+        <Key type="Curve" time="0.55" value="0" />
+        <Key type="Curve" time="0.551" value="255" />
+        <Key type="Curve" time="1.25" value="255" />
+        <Key type="Curve" time="1.45" value="0" />
+      </Controller>
+      <Controller type="Dimension" dimension="Width" relative="False" percentage="True" end="Pause" frame="Image">
+        <Key type="Curve" time="0" value="0.01" />
+        <Key type="Curve" time="0.5" value="0.01" />
+        <Key type="Curve" time="0.625" value="100" />
+      </Controller>
+      <Controller type="Dimension" dimension="Height" relative="False" percentage="True" end="Pause" frame="Image">
+        <Key type="Curve" time="0" value="0.01" />
+        <Key type="Curve" time="0.5" value="0.01" />
+        <Key type="Curve" time="0.625" value="100" />
+      </Controller>
     </Animation>
-
-    <Animation name="IconFade">
-        <Event event="FadeIn" action="Reset,Play"/>
-        <Event event="FadeOut" action="DirectionReverse,Play" frame="$parent"/>
-
+    <StateGroup name="Colors">
+      <State name="Red">
+        <Action type="SetProperty" frame="Image" DarkAdjustColor="{$ancestor[@name=KillLogPanel]/EnemyColors/@Color}" />
+        <Action type="SetProperty" frame="Glow" LightAdjustColor="{$ancestor[@name=KillLogPanel]/EnemyColors/@AdditionalColor[1]}" />
+        <Action type="SetProperty" frame="Glow" DarkAdjustColor="{$ancestor[@name=KillLogPanel]/EnemyColors/@AdditionalColor[1]}" />
+      </State>
+      <State name="Blue">
+        <Action type="SetProperty" frame="Image" DarkAdjustColor="{$ancestor[@name=KillLogPanel]/AllyColors/@Color}" />
+        <Action type="SetProperty" frame="Glow" LightAdjustColor="{$ancestor[@name=KillLogPanel]/AllyColors/@AdditionalColor[1]}" />
+        <Action type="SetProperty" frame="Glow" DarkAdjustColor="{$ancestor[@name=KillLogPanel]/AllyColors/@AdditionalColor[1]}" />
+      </State>
+    </StateGroup>
+  </Frame>
+  <Frame type="Frame" name="QuestIconTemplate">
+    <Width val="68" />
+    <Height val="68" />
+    <Visible val="False" />
+    <Animation name="IconVisibility" template="KillLog/IconVisibility" />
+    <Animation name="IconFade" template="KillLog/IconFade" />
+    <Frame type="Image" name="IconImage">
+      <Anchor side="Left" relative="$parent" pos="0.1923" offset="0" />
+      <Anchor side="Right" relative="$parent" pos="0.8077" offset="0" />
+      <Anchor side="Top" relative="$parent" pos="0.1923" offset="0" />
+      <Anchor side="Bottom" relative="$parent" pos="0.8077" offset="0" />
+    </Frame>
+    <Frame type="Image" name="IconBorder">
+      <Anchor relative="$parent" />
+      <Texture val="@UI/Storm_UI_InGame_Leader_Talent_Available" />
+    </Frame>
+    <Frame type="ProgressBar" name="IconBorderQuestProgressBar">
+      <Anchor relative="$parent" />
+      <Texture val="@UI/Storm_UI_InGame_Tab_Screen_Quest_Progress_Bar" />
+      <IgnoreParentColor val="True" />
+      <Vertical val="True" />
+      <FillInset val="0.1" />
+      <Value val="{$parent/ProgressValue/@Text}" />
+      <Frame type="Frame" name="FillImageContainer">
+        <Anchor relative="$parent" />
+        <Frame type="Image" name="FillImage">
+          <TextureCoords top="0" left="0.5" bottom="0" right="1" />
+        </Frame>
+      </Frame>
+    </Frame>
+    <Frame type="Label" name="ProgressValue">
+      <Anchor relative="$parent" />
+      <Visible val="False" />
+    </Frame>
+    <Frame type="Label" name="TimestampLabel">
+      <Anchor side="Left" relative="$parent" pos="Mid" offset="0" />
+      <Anchor side="Right" relative="$parent" pos="Mid" offset="0" />
+      <Anchor side="Top" relative="$parent" pos="Mid" offset="35" />
+      <Anchor side="Bottom" relative="$parent" pos="Mid" offset="35" />
+      <Text val="99:99" />
+      <Style val="KillLog_Timestamp" />
+      <Visible val="False" />
+      <Unclipped val="True" />
+      <StateGroup name="ShowOnFullProgress">
+        <State name="Full">
+          <When type="Property" frame="$parent/IconBorderQuestProgressBar" value="1" />
+          <Action type="SetProperty" visible="true" />
+        </State>
+      </StateGroup>
+    </Frame>
+  </Frame>
+  <Frame type="Frame" name="PortraitTemplate">
+    <Width val="120" />
+    <Height val="120" />
+    <Frame type="Image" name="PortraitImage">
+      <Anchor relative="$parent" offset="-27" />
+      <AlphaMaskTexture val="Assets\Textures\storm_ui_minimapicon_rehgar.dds" />
+    </Frame>
+    <Frame type="Image" name="PortraitBorder">
+      <Anchor relative="$parent" />
+      <StateGroup name="ColorblindSupport">
+        <State name="Colorblind">
+          <When type="Option" colorblind="True" />
+          <Action type="SetProperty" ColorAdjustMode="Colorize" />
+        </State>
+        <State name="Default" />
+        <DefaultState val="Default" />
+      </StateGroup>
+    </Frame>
+    <StateGroup name="Colors">
+      <State name="Red">
+        <Action type="SetProperty" frame="PortraitBorder" LightAdjustColor="{$ancestor[@name=KillLogPanel]/EnemyColors/@AdditionalColor[0]}" />
+        <Action type="SetProperty" frame="PortraitBorder" DarkAdjustColor="{$ancestor[@name=KillLogPanel]/EnemyColors/@Color}" />
+        <Action type="SetProperty" frame="PortraitBorder" texture="@UI/HUD_KillLog_Portrait_Border_Red" />
+      </State>
+      <State name="Blue">
+        <Action type="SetProperty" frame="PortraitBorder" LightAdjustColor="{$ancestor[@name=KillLogPanel]/AllyColors/@AdditionalColor[0]}" />
+        <Action type="SetProperty" frame="PortraitBorder" DarkAdjustColor="{$ancestor[@name=KillLogPanel]/AllyColors/@Color}" />
+        <Action type="SetProperty" frame="PortraitBorder" texture="@UI/HUD_KillLog_Portrait_Border_Blue" />
+      </State>
+      <State name="Purple">
+        <Action type="SetProperty" frame="PortraitBorder" LightAdjustColor="{$ancestor[@name=KillLogPanel]/NexusColors/@AdditionalColor[0]}" />
+        <Action type="SetProperty" frame="PortraitBorder" DarkAdjustColor="{$ancestor[@name=KillLogPanel]/NexusColors/@Color}" />
+        <Action type="SetProperty" frame="PortraitBorder" texture="@UI/HUD_KillLog_Portrait_Border_Purple" />
+      </State>
+    </StateGroup>
+  </Frame>
+  <Frame type="Frame" name="Item">
+    <Anchor side="Top" relative="$parent" pos="Min" offset="0" />
+    <Anchor side="Left" relative="$parent" pos="Min" offset="0" />
+    <Height val="160" />
+    <Width val="600" />
+    <Visible val="False" />
+    <Animation name="FadeIn">
+      <Event event="FadeIn" action="Reset,Play" />
+      <Event event="FadeOut" action="DirectionReverse,Play" />
+      <Controller type="Fade" end="Pause">
+        <Key type="Curve" time="0" value="0" />
+        <Key type="Curve" time="#KillLog_AnimTime" value="255" />
+      </Controller>
+      <Controller type="Visibility" end="Pause">
+        <Key type="Bool" time="0" value="True" />
+      </Controller>
+    </Animation>
+    <Animation name="SlideUp">
+      <Event event="SlideUp" action="RefreshBaseValue,Reset,Play" />
+      <Controller type="Anchor" end="Pause" side="Top" relative="True">
+        <Key type="Curve" time="0" value="160" />
+        <Key type="Curve" time="#KillLog_AnimTime" value="80" />
+      </Controller>
+      <Controller type="Anchor" end="Pause" side="Bottom" relative="True">
+        <Key type="Curve" time="0" value="160" />
+        <Key type="Curve" time="#KillLog_AnimTime" value="80" />
+      </Controller>
+    </Animation>
+    <Animation name="SlideOut">
+      <Event event="FadeOut" action="RefreshBaseValue,Reset,Play" />
+      <Controller type="Anchor" end="Pause" side="Top" relative="True">
+        <Key type="Curve" time="0" value="0" />
+        <Key type="Curve" time="#KillLog_AnimTime" value="-80" />
+      </Controller>
+      <Controller type="Anchor" end="Pause" side="Bottom" relative="True">
+        <Key type="Curve" time="0" value="0" />
+        <Key type="Curve" time="#KillLog_AnimTime" value="-80" />
+      </Controller>
+    </Animation>
+    <Frame type="CutsceneFrame" name="BackgroundCutscene">
+      <Anchor side="Left" relative="$parent" pos="Min" offset="-270" />
+      <Anchor side="Top" relative="$parent" pos="Mid" offset="0" />
+      <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0" />
+      <Width val="900" />
+      <Height val="350" />
+      <RenderType val="HDR" />
+      <Unclipped val="True" />
+      <AutoPlay val="True" />
+      <Frame type="Frame" name="CutsceneColorblindFilterSupport" template="StandardAnimationTemplates/CutsceneColorblindFilterSupportTemplate" />
+      <Animation name="PlayBg_Ally">
+        <Event event="SetAllyColor" action="Reset,Play" />
+        <Event event="SetEnemyColor" action="Stop" />
+        <Controller type="Cutscene" end="Stop">
+          <Key type="Cutscene" time="0" action="ClearFilters" />
+          <Key type="Cutscene" time=".2" action="AddFilter" filter="Ally" />
+          <Key type="Cutscene" time=".2" action="Bookmark" bookmark="Start" />
+        </Controller>
+      </Animation>
+      <Animation name="PlayBg_Enemy">
+        <Event event="SetEnemyColor" action="Reset,Play" />
+        <Event event="SetAllyColor" action="Stop" />
+        <Controller type="Cutscene" end="Stop">
+          <Key type="Cutscene" time="0" action="ClearFilters" />
+          <Key type="Cutscene" time=".2" action="AddFilter" filter="Enemy" />
+          <Key type="Cutscene" time=".2" action="Bookmark" bookmark="Start" />
+        </Controller>
+      </Animation>
+      <StateGroup name="CutsceneStatus">
+        <DefaultState val="Inactive" />
+        <State name="Inactive" />
+        <State name="Active">
+          <When type="Property" Visible="True" />
+          <When type="AnimationState" CutsceneLoad="Loaded" />
+        </State>
+      </StateGroup>
+    </Frame>
+    <Frame type="Image" name="VsImage">
+      <Anchor side="Top" relative="$parent" pos="Mid" offset="0" />
+      <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0" />
+      <Anchor side="Left" relative="$parent" pos="Min" offset="88" />
+      <Texture val="@UI/HUD_KillLog_VsImage_Glow" />
+      <ColorAdjustMode val="Colorize" />
+      <Visible val="False" />
+      <Frame type="Image" name="VsImageInset">
+        <Anchor relative="$parent" />
+        <Texture val="@UI/HUD_KillLog_VsImage" />
+        <ColorAdjustMode val="Colorize" />
+      </Frame>
+      <StateGroup name="Colors">
+        <DefaultState val="Red" />
+        <State name="Blue">
+          <When type="AnimationState" frame="$parent" SrcColor="Blue" />
+          <Action type="SetProperty" frame="VsImageInset" DarkAdjustColor="{$ancestor[@name=KillLogPanel]/AllyColors/@Color}" />
+          <Action type="SetProperty" LightAdjustColor="{$ancestor[@name=KillLogPanel]/AllyColors/@AdditionalColor[1]}" />
+          <Action type="SetProperty" DarkAdjustColor="{$ancestor[@name=KillLogPanel]/AllyColors/@AdditionalColor[1]}" />
+        </State>
+        <State name="BlueNeutral">
+          <When type="AnimationState" frame="$parent" TgtColor="Red" />
+          <When type="AnimationState" frame="$parent" SrcColor="Purple" />
+          <Action type="SetProperty" frame="VsImageInset" DarkAdjustColor="{$ancestor[@name=KillLogPanel]/AllyColors/@Color}" />
+          <Action type="SetProperty" LightAdjustColor="{$ancestor[@name=KillLogPanel]/AllyColors/@AdditionalColor[1]}" />
+          <Action type="SetProperty" DarkAdjustColor="{$ancestor[@name=KillLogPanel]/AllyColors/@AdditionalColor[1]}" />
+        </State>
+        <State name="Red">
+          <Action type="SetProperty" frame="VsImageInset" DarkAdjustColor="{$ancestor[@name=KillLogPanel]/EnemyColors/@Color}" />
+          <Action type="SetProperty" LightAdjustColor="{$ancestor[@name=KillLogPanel]/EnemyColors/@AdditionalColor[1]}" />
+          <Action type="SetProperty" DarkAdjustColor="{$ancestor[@name=KillLogPanel]/EnemyColors/@AdditionalColor[1]}" />
+        </State>
+      </StateGroup>
+    </Frame>
+    <Frame type="Image" name="QuestImage">
+      <Anchor side="Top" relative="$parent" pos="Mid" offset="0" />
+      <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0" />
+      <Anchor side="Left" relative="$parent/VsImage" pos="Mid" offset="2" />
+      <Anchor side="Right" relative="$parent/VsImage" pos="Mid" offset="2" />
+      <Texture val="@UI/HUD_KillLog_QuestIcon" />
+      <Visible val="False" />
+    </Frame>
+    <Frame type="Frame" name="SrcPortrait" template="KillLog/PortraitTemplate">
+      <Anchor side="Top" relative="$parent" pos="Mid" offset="0" />
+      <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0" />
+      <Anchor side="Left" relative="$parent" pos="Min" offset="0" />
+      <Animation name="IconFade">
+        <Event event="FadeIn" action="Reset,Play" frame="$parent" />
+        <Event event="FadeOut" action="DirectionReverse,Play" frame="$parent" />
         <Controller type="Anchor" end="Pause" side="Left" relative="True">
-            <Key type="Curve" time="0" value="35"/>
-            <Key type="Curve" time="#KillLog_AnimTime" value="0" inout="Fast,Linear"/>
+          <Key type="Curve" time="0.0" value="-35" />
+          <Key type="Curve" time="#KillLog_AnimTime" value="0" inout="Fast,Linear" />
         </Controller>
         <Controller type="Fade" end="Pause">
-            <Key type="Curve" time="0" value="0"/>
-            <Key type="Curve" time="#KillLog_AnimTime" value="255"/>
+          <Key type="Curve" time="0.0" value="0" />
+          <Key type="Curve" time="#KillLog_AnimTime" value="255" />
         </Controller>
-    </Animation>
-
-   <!--=======================================================================================
-   <! KILL LOG ENTRY COMPONENTS
-   <!======================================================================================-->
-
-    <Frame type="Frame" name="StrikethroughTemplate">
-        <Unclipped val="true"/>
-        <RenderPriority val="525"/>
-
-        <Frame type="Image" name="Glow">
-            <Anchor relative="$parent"/>
-            <Texture val="@UI/HUD_KillLog_Portrait_Strikethrough_Glow"/>
-            <ColorAdjustMode val="Colorize"/>
-            <Visible val="{$parent/Image/@Visible}"/>
-            <Rotation val="-15"/>
-            <Alpha val="{$parent/Image/@Alpha}"/>
-        </Frame>
-        <Frame type="Image" name="Image">
-            <Anchor relative="$parent"/>
-            <Texture val="@UI/HUD_KillLog_Portrait_Strikethrough"/>
-            <Visible val="False"/>
-            <Rotation val="-15"/>
-            <ColorAdjustMode val="Colorize"/>
-        </Frame>
-
-        <Animation name="StrikeAnim">
-            <Event event="StrikeAnim" action="Restart,Play"/>
-
-            <Controller type="Visibility" frame="Image" end="Pause">
-                <Key type="Bool" time="0" value="False"/>
-                <Key type="Bool" time=".01" value="True"/>
-                <Key type="Bool" time="1.45" value="False"/>
-            </Controller>
-            <Controller type="Fade" frame="Image" end="Pause">
-                <Key type="Curve" time="0.0" value="0"/>
-                <Key type="Curve" time="0.55" value="0"/>
-                <Key type="Curve" time="0.551" value="255"/>
-                <Key type="Curve" time="1.25" value="255"/>
-                <Key type="Curve" time="1.45" value="0"/>
-            </Controller>
-            <Controller type="Dimension" dimension="Width" relative="False" percentage="True" end="Pause" frame="Image">
-                <Key type="Curve" time="0" value="0.01"/>
-                <Key type="Curve" time="0.5" value="0.01"/>
-                <Key type="Curve" time="0.625" value="100"/>
-            </Controller>
-            <Controller type="Dimension" dimension="Height" relative="False" percentage="True" end="Pause" frame="Image">
-                <Key type="Curve" time="0" value="0.01"/>
-                <Key type="Curve" time="0.5" value="0.01"/>
-                <Key type="Curve" time="0.625" value="100"/>
-            </Controller>
+      </Animation>
+      <StateGroup name="Colors">
+        <State name="Blue">
+          <When type="AnimationState" frame="$parent" SrcColor="Blue" />
+        </State>
+        <State name="Red">
+          <When type="AnimationState" frame="$parent" SrcColor="Red" />
+        </State>
+        <State name="Purple">
+          <When type="AnimationState" frame="$parent" SrcColor="Purple" />
+        </State>
+      </StateGroup>
+    </Frame>
+    <Frame type="Frame" name="TgtPortrait0" template="KillLog/PortraitTemplate">
+      <Anchor side="Top" relative="$parent" pos="Mid" offset="0" />
+      <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0" />
+      <Anchor side="Left" relative="$parent" pos="Min" offset="117" />
+      <Unclipped val="True" />
+      <Visible val="False" />
+      <Animation name="IconVisibility" template="KillLog/IconVisibility" />
+      <Animation name="IconFade" template="KillLog/IconFade" />
+      <StateGroup name="Colors">
+        <State name="Blue">
+          <When type="AnimationState" frame="$parent" TgtColor="Blue" />
+        </State>
+        <State name="Red">
+          <When type="AnimationState" frame="$parent" TgtColor="Red" />
+        </State>
+      </StateGroup>
+      <StateGroup name="StrikeColors">
+        <State name="Red">
+          <When type="AnimationState" frame="$parent" TgtColor="Red" />
+          <Action type="SetState" frame="StrikethroughFrame" group="Colors" state="Red" />
+          <Action type="SetState" frame="QuestResetIcon1/StrikethroughFrame" group="Colors" state="Red" />
+          <Action type="SetState" frame="QuestResetIcon2/StrikethroughFrame" group="Colors" state="Red" />
+          <Action type="SetState" frame="QuestResetIcon3/StrikethroughFrame" group="Colors" state="Red" />
+          <Action type="SetState" frame="QuestResetIcon4/StrikethroughFrame" group="Colors" state="Red" />
+        </State>
+        <State name="Blue">
+          <When type="AnimationState" frame="$parent" TgtColor="Blue" />
+          <Action type="SetState" frame="StrikethroughFrame" group="Colors" state="Blue" />
+          <Action type="SetState" frame="QuestResetIcon1/StrikethroughFrame" group="Colors" state="Blue" />
+          <Action type="SetState" frame="QuestResetIcon2/StrikethroughFrame" group="Colors" state="Blue" />
+          <Action type="SetState" frame="QuestResetIcon3/StrikethroughFrame" group="Colors" state="Blue" />
+          <Action type="SetState" frame="QuestResetIcon4/StrikethroughFrame" group="Colors" state="Blue" />
+        </State>
+      </StateGroup>
+      <Frame type="Frame" name="StrikethroughFrame" template="KillLog/StrikethroughTemplate">
+        <Anchor side="Left" relative="$parent" pos=".07" offset="0" />
+        <Anchor side="Right" relative="$parent" pos=".93" offset="0" />
+        <Anchor side="Top" relative="$parent" pos=".07" offset="0" />
+        <Anchor side="Bottom" relative="$parent" pos=".93" offset="0" />
+        <Animation name="RunImmediateStrikeAnim">
+          <Event event="OnShown" action="Restart,Play" />
+          <Controller type="Event" end="Stop">
+            <Key type="Event" time="0" event="StrikeAnim" />
+          </Controller>
         </Animation>
-
-        <!-- Colors -->
-        <!-- Managed externally from Log Item -->
-        <StateGroup name="Colors">
-            <State name="Red">
-                <Action type="SetProperty" frame="Image" DarkAdjustColor="{$ancestor[@name=KillLogPanel]/EnemyColors/@Color}"/>
-                <Action type="SetProperty" frame="Glow" LightAdjustColor="{$ancestor[@name=KillLogPanel]/EnemyColors/@AdditionalColor[1]}"/>
-                <Action type="SetProperty" frame="Glow" DarkAdjustColor="{$ancestor[@name=KillLogPanel]/EnemyColors/@AdditionalColor[1]}"/>
-            </State>
-            <State name="Blue">
-                <Action type="SetProperty" frame="Image" DarkAdjustColor="{$ancestor[@name=KillLogPanel]/AllyColors/@Color}"/>
-                <Action type="SetProperty" frame="Glow" LightAdjustColor="{$ancestor[@name=KillLogPanel]/AllyColors/@AdditionalColor[1]}"/>
-                <Action type="SetProperty" frame="Glow" DarkAdjustColor="{$ancestor[@name=KillLogPanel]/AllyColors/@AdditionalColor[1]}"/>
-            </State>
-        </StateGroup>
+      </Frame>
+      <Frame type="Frame" name="QuestResetIcon1" template="KillLog/QuestIconTemplate">
+        <Anchor side="Left" relative="$parent" pos="Mid" offset="-23" />
+        <Anchor side="Right" relative="$parent" pos="Mid" offset="-23" />
+        <Anchor side="Top" relative="$parent" pos="Mid" offset="0" />
+        <RenderPriority val="524" />
+        <Width val="40" />
+        <Height val="40" />
+        <Unclipped val="True" />
+        <Frame type="Frame" name="StrikethroughFrame" template="KillLog/StrikethroughTemplate">
+          <Anchor side="Left" relative="$parent" pos="-.18" offset="0" />
+          <Anchor side="Right" relative="$parent" pos="1.18" offset="0" />
+          <Anchor side="Top" relative="$parent" pos="-.18" offset="0" />
+          <Anchor side="Bottom" relative="$parent" pos="1.18" offset="0" />
+          <Animation name="RunDelayedStrikeAnim">
+            <Event event="OnShown" action="Restart,Play" />
+            <Controller type="Event" end="Stop">
+              <Key type="Event" time=".5" event="StrikeAnim" />
+            </Controller>
+          </Animation>
+        </Frame>
+      </Frame>
+      <Frame type="Frame" name="QuestResetIcon2" template="KillLog/Item/TgtPortrait0/QuestResetIcon1">
+        <Anchor side="Right" relative="$parent/QuestResetIcon1" pos="Max" offset="-8" />
+        <Anchor side="Top" relative="$parent/QuestResetIcon1" pos="Min" offset="-14" />
+        <RenderPriority val="523" />
+      </Frame>
+      <Frame type="Frame" name="QuestResetIcon3" template="KillLog/Item/TgtPortrait0/QuestResetIcon1">
+        <Anchor side="Right" relative="$parent/QuestResetIcon1" pos="Max" offset="14" />
+        <Anchor side="Top" relative="$parent/QuestResetIcon1" pos="Min" offset="8" />
+        <RenderPriority val="522" />
+      </Frame>
+      <Frame type="Frame" name="QuestResetIcon4" template="KillLog/Item/TgtPortrait0/QuestResetIcon1">
+        <Anchor side="Right" relative="$parent/QuestResetIcon1" pos="Max" offset="-8" />
+        <Anchor side="Top" relative="$parent/QuestResetIcon1" pos="Min" offset="8" />
+        <RenderPriority val="521" />
+      </Frame>
     </Frame>
-
-    <!-- Quest Icon -->
-    <Frame type="Frame" name="QuestIconTemplate">
-        <Width val="68"/>
-        <Height val="68"/>
-
-        <Visible val="False"/>
-        <Animation name="IconVisibility" template="KillLog/IconVisibility"/>
-        <Animation name="IconFade" template="KillLog/IconFade"/>
-
-        <!-- Icon and Border -->
-        <Frame type="Image" name="IconImage">
-            <Anchor side="Left" relative="$parent" pos="0.1923" offset="0"/>
-            <Anchor side="Right" relative="$parent" pos="0.8077" offset="0"/>
-            <Anchor side="Top" relative="$parent" pos="0.1923" offset="0"/>
-            <Anchor side="Bottom" relative="$parent" pos="0.8077" offset="0"/>
-        </Frame>
-        <Frame type="Image" name="IconBorder">
-            <Anchor relative="$parent"/>
-            <Texture val="@UI/Storm_UI_InGame_Leader_Talent_Available"/>
-        </Frame>
-
-        <!-- Progress Bar -->
-        <Frame type="ProgressBar" name="IconBorderQuestProgressBar">
-            <Anchor relative="$parent"/>
-
-            <Texture val="@UI/Storm_UI_InGame_Tab_Screen_Quest_Progress_Bar"/>
-            <IgnoreParentColor val="True"/>
-            <Vertical val="True"/>
-            <FillInset val="0.1"/>
-            <Value val="{$parent/ProgressValue/@Text}"/>
-
-            <Frame type="Frame" name="FillImageContainer">
-                <Anchor relative="$parent"/>
-                <Frame type="Image" name="FillImage">
-                    <TextureCoords top="0" left="0.5" bottom="0" right="1"/>
-                </Frame>
-            </Frame>
-        </Frame>
-
-        <!-- Proxy frame for storing Progress bar value, updated by trigger -->
-        <Frame type="Label" name="ProgressValue">
-            <Anchor relative="$parent"/>
-            <Visible val="False"/>
-        </Frame>
-
-        <!-- Timestap Label -->
-        <Frame type="Label" name="TimestampLabel">
-            <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
-            <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
-            <Anchor side="Top" relative="$parent" pos="Mid" offset="35"/>
-            <Anchor side="Bottom" relative="$parent" pos="Mid" offset="35"/>
-            <Text val="99:99"/>
-            <Style val="KillLog_Timestamp"/>
-            <Visible val="False"/>
-            <Unclipped val="True"/>
-
-            <StateGroup name="ShowOnFullProgress">
-                <State name="Full">
-                    <When type="Property" frame="$parent/IconBorderQuestProgressBar" value="1"/>
-                    <Action type="SetProperty" visible="true"/>
-                </State>
-            </StateGroup>
-        </Frame>
+    <Frame type="Frame" name="TgtPortrait1" template="KillLog/Item/TgtPortrait0">
+      <Anchor side="Left" relative="$parent/TgtPortrait0" pos="Min" offset="43" />
+      <Anchor side="Top" relative="$parent/TgtPortrait0" pos="Mid" offset="0" />
+      <Anchor side="Bottom" relative="$parent/TgtPortrait0" pos="Mid" offset="0" />
     </Frame>
-
-    <!-- Hero Portrait -->
-    <Frame type="Frame" name="PortraitTemplate">
-        <Width val="120"/>
-        <Height val="120"/>
-
-        <!-- Icon and Border -->
-        <Frame type="Image" name="PortraitImage">
-            <Anchor relative="$parent" offset="-27"/>
-            <AlphaMaskTexture val="Assets\Textures\storm_ui_minimapicon_rehgar.dds"/> <!-- TODO: use proper circular mask instead of PH -->
-        </Frame>
-        <Frame type="Image" name="PortraitBorder">
-            <Anchor relative="$parent"/>
-
-            <!-- Uses colorization only if colorblind mode is enabled -->
-            <StateGroup name="ColorblindSupport">
-                <State name="Colorblind">
-                    <When type="Option" colorblind="True"/>
-                    <Action type="SetProperty" ColorAdjustMode="Colorize"/>
-                </State>
-                <State name="Default"/>
-                <DefaultState val="Default"/>
-            </StateGroup>
-        </Frame>
-
-        <!-- Colors -->
-        <StateGroup name="Colors">
-            <State name="Red">
-                <Action type="SetProperty" frame="PortraitBorder" LightAdjustColor="{$ancestor[@name=KillLogPanel]/EnemyColors/@AdditionalColor[0]}"/>
-                <Action type="SetProperty" frame="PortraitBorder" DarkAdjustColor="{$ancestor[@name=KillLogPanel]/EnemyColors/@Color}"/>
-                <Action type="SetProperty" frame="PortraitBorder" texture="@UI/HUD_KillLog_Portrait_Border_Red"/>
-            </State>
-            <State name="Blue">
-                <Action type="SetProperty" frame="PortraitBorder" LightAdjustColor="{$ancestor[@name=KillLogPanel]/AllyColors/@AdditionalColor[0]}"/>
-                <Action type="SetProperty" frame="PortraitBorder" DarkAdjustColor="{$ancestor[@name=KillLogPanel]/AllyColors/@Color}"/>
-                <Action type="SetProperty" frame="PortraitBorder" texture="@UI/HUD_KillLog_Portrait_Border_Blue"/>
-            </State>
-            <State name="Purple">
-                <Action type="SetProperty" frame="PortraitBorder" LightAdjustColor="{$ancestor[@name=KillLogPanel]/NexusColors/@AdditionalColor[0]}"/>
-                <Action type="SetProperty" frame="PortraitBorder" DarkAdjustColor="{$ancestor[@name=KillLogPanel]/NexusColors/@Color}"/>
-                <Action type="SetProperty" frame="PortraitBorder" texture="@UI/HUD_KillLog_Portrait_Border_Purple"/>
-            </State>
-        </StateGroup>
+    <Frame type="Frame" name="TgtPortrait2" template="KillLog/Item/TgtPortrait0">
+      <Anchor side="Left" relative="$parent/TgtPortrait1" pos="Min" offset="43" />
+      <Anchor side="Top" relative="$parent/TgtPortrait0" pos="Mid" offset="-4" />
+      <Anchor side="Bottom" relative="$parent/TgtPortrait0" pos="Mid" offset="-4" />
     </Frame>
-
-   <!--=======================================================================================
-   <! KILL LOG ENTRY
-   <!======================================================================================-->
-
-    <Frame type="Frame" name="Item">
-        <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
-        <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
-        <Height val="160"/>
-        <Width val="600"/>
-        <Visible val="False"/>
-
-        <!-- Fade/visibility animations -->
-        <Animation name="FadeIn">
-            <Event event="FadeIn" action="Reset,Play"/>
-            <Event event="FadeOut" action="DirectionReverse,Play"/>
-            
-            <Controller type="Fade" end="Pause">
-                <Key type="Curve" time="0" value="0"/>
-                <Key type="Curve" time="#KillLog_AnimTime" value="255"/>
-            </Controller>
-            <Controller type="Visibility" end="Pause">
-                <Key type="Bool" time="0" value="True"/>
-            </Controller>
-        </Animation>
-
-        <!-- Transition animations -->
-        <Animation name="SlideUp">
-            <Event event="SlideUp" action="RefreshBaseValue,Reset,Play"/>
-
-            <Controller type="Anchor" end="Pause" side="Top" relative="True">
-                <Key type="Curve" time="0" value="160"/>
-                <Key type="Curve" time="#KillLog_AnimTime" value="80"/>
-            </Controller>
-            <Controller type="Anchor" end="Pause" side="Bottom" relative="True">
-                <Key type="Curve" time="0" value="160"/>
-                <Key type="Curve" time="#KillLog_AnimTime" value="80"/>
-            </Controller>
-        </Animation>
-        <Animation name="SlideOut">
-            <Event event="FadeOut" action="RefreshBaseValue,Reset,Play"/>
-
-            <Controller type="Anchor" end="Pause" side="Top" relative="True">
-                <Key type="Curve" time="0" value="0"/>
-                <Key type="Curve" time="#KillLog_AnimTime" value="-80"/>
-            </Controller>
-            <Controller type="Anchor" end="Pause" side="Bottom" relative="True">
-                <Key type="Curve" time="0" value="0"/>
-                <Key type="Curve" time="#KillLog_AnimTime" value="-80"/>
-            </Controller>
-        </Animation>
-
-        <!-- Item Background -->
-        <Frame type="CutsceneFrame" name="BackgroundCutscene">
-            <Anchor side="Left" relative="$parent" pos="Min" offset="-270"/>
-            <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
-            <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
-            <Width val="900"/>
-            <Height val="350"/>
-            <RenderType val="HDR"/>
-            <Unclipped val="True"/>
-            <AutoPlay val="True"/>
-            <!-- Cutscene file managed externally in Item frame (parent), KillLogItemType stategroup -->
-
-            <Frame type="Frame" name="CutsceneColorblindFilterSupport" template="StandardAnimationTemplates/CutsceneColorblindFilterSupportTemplate"/>
-
-            <Animation name="PlayBg_Ally">
-                <Event event="SetAllyColor" action="Reset,Play"/>
-                <Event event="SetEnemyColor" action="Stop"/>
-                <Controller type="Cutscene" end="Stop">
-                    <Key type="Cutscene" time="0" action="ClearFilters"/>
-                    <Key type="Cutscene" time=".2" action="AddFilter" filter="Ally"/>
-                    <Key type="Cutscene" time=".2" action="Bookmark" bookmark="Start"/>
-                </Controller>
-            </Animation>
-
-            <Animation name="PlayBg_Enemy">
-                <Event event="SetEnemyColor" action="Reset,Play"/>
-                <Event event="SetAllyColor" action="Stop"/>
-                <Controller type="Cutscene" end="Stop">
-                    <Key type="Cutscene" time="0" action="ClearFilters"/>
-                    <Key type="Cutscene" time=".2" action="AddFilter" filter="Enemy"/>
-                    <Key type="Cutscene" time=".2" action="Bookmark" bookmark="Start"/>
-                </Controller>
-            </Animation>
-
-            <StateGroup name="CutsceneStatus">
-                <DefaultState val="Inactive"/>
-                <State name="Inactive"/>
-                <State name="Active">
-                    <When type="Property" Visible="True"/>
-                    <When type="AnimationState" CutsceneLoad="Loaded"/>
-                </State>
-            </StateGroup>
-        </Frame>
-
-        <!-- Separator images -->
-        <Frame type="Image" name="VsImage">
-            <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
-            <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
-            <Anchor side="Left" relative="$parent" pos="Min" offset="88"/>
-            <Texture val="@UI/HUD_KillLog_VsImage_Glow"/>
-            <ColorAdjustMode val="Colorize"/>
-            <Visible val="False"/>
-
-            <Frame type="Image" name="VsImageInset">
-                <Anchor relative="$parent"/>
-                <Texture val="@UI/HUD_KillLog_VsImage"/>
-                <ColorAdjustMode val="Colorize"/>
-            </Frame>
-
-            <StateGroup name="Colors">
-                <DefaultState val="Red"/>
-                <State name="Blue">
-                    <When type="AnimationState" frame="$parent" SrcColor="Blue"/>
-                    <Action type="SetProperty" frame="VsImageInset" DarkAdjustColor="{$ancestor[@name=KillLogPanel]/AllyColors/@Color}"/>
-                    <Action type="SetProperty" LightAdjustColor="{$ancestor[@name=KillLogPanel]/AllyColors/@AdditionalColor[1]}"/>
-                    <Action type="SetProperty" DarkAdjustColor="{$ancestor[@name=KillLogPanel]/AllyColors/@AdditionalColor[1]}"/>
-                </State>
-                <State name="BlueNeutral">
-                    <When type="AnimationState" frame="$parent" TgtColor="Red"/>
-                    <When type="AnimationState" frame="$parent" SrcColor="Purple"/>
-                    <Action type="SetProperty" frame="VsImageInset" DarkAdjustColor="{$ancestor[@name=KillLogPanel]/AllyColors/@Color}"/>
-                    <Action type="SetProperty" LightAdjustColor="{$ancestor[@name=KillLogPanel]/AllyColors/@AdditionalColor[1]}"/>
-                    <Action type="SetProperty" DarkAdjustColor="{$ancestor[@name=KillLogPanel]/AllyColors/@AdditionalColor[1]}"/>
-                </State>
-                <State name="Red">
-                    <Action type="SetProperty" frame="VsImageInset" DarkAdjustColor="{$ancestor[@name=KillLogPanel]/EnemyColors/@Color}"/>
-                    <Action type="SetProperty" LightAdjustColor="{$ancestor[@name=KillLogPanel]/EnemyColors/@AdditionalColor[1]}"/>
-                    <Action type="SetProperty" DarkAdjustColor="{$ancestor[@name=KillLogPanel]/EnemyColors/@AdditionalColor[1]}"/>
-                </State>
-            </StateGroup>
-        </Frame>
-        <Frame type="Image" name="QuestImage">
-            <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
-            <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
-            <Anchor side="Left" relative="$parent/VsImage" pos="Mid" offset="2"/>
-            <Anchor side="Right" relative="$parent/VsImage" pos="Mid" offset="2"/>
-            <Texture val="@UI/HUD_KillLog_QuestIcon"/>
-            <Visible val="False"/>
-        </Frame>
-
-        <!-- Main portraits -->
-        <Frame type="Frame" name="SrcPortrait" template="KillLog/PortraitTemplate">
-            <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
-            <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
-            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
-
-            <Animation name="IconFade">
-                <Event event="FadeIn" action="Reset,Play" frame="$parent"/>
-                <Event event="FadeOut" action="DirectionReverse,Play" frame="$parent"/>
-
-                <Controller type="Anchor" end="Pause" side="Left" relative="True">
-                    <Key type="Curve" time="0.0" value="-35"/>
-                    <Key type="Curve" time="#KillLog_AnimTime" value="0" inout="Fast,Linear"/>
-                </Controller>
-                <Controller type="Fade" end="Pause">
-                    <Key type="Curve" time="0.0" value="0"/>
-                    <Key type="Curve" time="#KillLog_AnimTime" value="255"/>
-                </Controller>
-            </Animation>
-
-            <StateGroup name="Colors">
-                <State name="Blue">
-                    <When type="AnimationState" frame="$parent" SrcColor="Blue"/>
-                </State>
-                <State name="Red">
-                    <When type="AnimationState" frame="$parent" SrcColor="Red"/>
-                </State>
-                <State name="Purple">
-                    <When type="AnimationState" frame="$parent" SrcColor="Purple"/>
-                </State>
-            </StateGroup>
-        </Frame>
-
-        <Frame type="Frame" name="TgtPortrait0" template="KillLog/PortraitTemplate">
-            <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
-            <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
-            <Anchor side="Left" relative="$parent" pos="Min" offset="117"/>
-            <Unclipped val="True"/>
-            <Visible val="False"/>
-
-            <Animation name="IconVisibility" template="KillLog/IconVisibility"/>
-            <Animation name="IconFade" template="KillLog/IconFade"/>
-
-            <StateGroup name="Colors">
-                <State name="Blue">
-                    <When type="AnimationState" frame="$parent" TgtColor="Blue"/>
-                </State>
-                <State name="Red">
-                    <When type="AnimationState" frame="$parent" TgtColor="Red"/>
-                </State>
-            </StateGroup>
-
-            <StateGroup name="StrikeColors">
-                <State name="Red">
-                    <When type="AnimationState" frame="$parent" TgtColor="Red"/>
-                    <Action type="SetState" frame="StrikethroughFrame" group="Colors" state="Red"/>
-                    <Action type="SetState" frame="QuestResetIcon1/StrikethroughFrame" group="Colors" state="Red"/>
-                    <Action type="SetState" frame="QuestResetIcon2/StrikethroughFrame" group="Colors" state="Red"/>
-                    <Action type="SetState" frame="QuestResetIcon3/StrikethroughFrame" group="Colors" state="Red"/>
-                    <Action type="SetState" frame="QuestResetIcon4/StrikethroughFrame" group="Colors" state="Red"/>
-                </State>
-                <State name="Blue">
-                    <When type="AnimationState" frame="$parent" TgtColor="Blue"/>
-                    <Action type="SetState" frame="StrikethroughFrame" group="Colors" state="Blue"/>
-                    <Action type="SetState" frame="QuestResetIcon1/StrikethroughFrame" group="Colors" state="Blue"/>
-                    <Action type="SetState" frame="QuestResetIcon2/StrikethroughFrame" group="Colors" state="Blue"/>
-                    <Action type="SetState" frame="QuestResetIcon3/StrikethroughFrame" group="Colors" state="Blue"/>
-                    <Action type="SetState" frame="QuestResetIcon4/StrikethroughFrame" group="Colors" state="Blue"/>
-                </State>
-            </StateGroup>
-
-            <!-- Strikethrough -->
-            <Frame type="Frame" name="StrikethroughFrame" template="KillLog/StrikethroughTemplate"> 
-                <Anchor side="Left" relative="$parent" pos=".07" offset="0"/>
-                <Anchor side="Right" relative="$parent" pos=".93" offset="0"/>
-                <Anchor side="Top" relative="$parent" pos=".07" offset="0"/>
-                <Anchor side="Bottom" relative="$parent" pos=".93" offset="0"/>
-
-                <Animation name="RunImmediateStrikeAnim">
-                    <Event event="OnShown" action="Restart,Play"/>
-                    <Controller type="Event" end="Stop">
-                        <Key type="Event" time="0" event="StrikeAnim"/>
-                    </Controller>
-                </Animation>
-            </Frame>
-
-            <!-- Quest Reset Icon(s) -->
-            <Frame type="Frame" name="QuestResetIcon1" template="KillLog/QuestIconTemplate">
-                <Anchor side="Left" relative="$parent" pos="Mid" offset="-23"/>
-                <Anchor side="Right" relative="$parent" pos="Mid" offset="-23"/>
-                <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
-                <RenderPriority val="524"/>
-
-                <Width val="40"/>
-                <Height val="40"/>
-                <Unclipped val="True"/>
-
-                <!-- Strikethrough -->
-                <Frame type="Frame" name="StrikethroughFrame" template="KillLog/StrikethroughTemplate">
-                    <Anchor side="Left" relative="$parent" pos="-.18" offset="0"/>
-                    <Anchor side="Right" relative="$parent" pos="1.18" offset="0"/>
-                    <Anchor side="Top" relative="$parent" pos="-.18" offset="0"/>
-                    <Anchor side="Bottom" relative="$parent" pos="1.18" offset="0"/>
-     
-                    <Animation name="RunDelayedStrikeAnim">
-                        <Event event="OnShown" action="Restart,Play"/>
-                        <Controller type="Event" end="Stop">
-                            <Key type="Event" time=".5" event="StrikeAnim"/>
-                        </Controller>
-                    </Animation>
-                </Frame>
-            </Frame>
-            <Frame type="Frame" name="QuestResetIcon2" template="KillLog/Item/TgtPortrait0/QuestResetIcon1">
-                <Anchor side="Right" relative="$parent/QuestResetIcon1" pos="Max" offset="-8"/>
-                <Anchor side="Top" relative="$parent/QuestResetIcon1" pos="Min" offset="-14"/>
-                <RenderPriority val="523"/>
-            </Frame>
-            <Frame type="Frame" name="QuestResetIcon3" template="KillLog/Item/TgtPortrait0/QuestResetIcon1">
-                <Anchor side="Right" relative="$parent/QuestResetIcon1" pos="Max" offset="14"/>
-                <Anchor side="Top" relative="$parent/QuestResetIcon1" pos="Min" offset="8"/>
-                <RenderPriority val="522"/>
-            </Frame>
-            <Frame type="Frame" name="QuestResetIcon4" template="KillLog/Item/TgtPortrait0/QuestResetIcon1">
-                <Anchor side="Right" relative="$parent/QuestResetIcon1" pos="Max" offset="-8"/>
-                <Anchor side="Top" relative="$parent/QuestResetIcon1" pos="Min" offset="8"/>
-                <RenderPriority val="521"/>
-            </Frame>
-        </Frame>
-
-        <!-- Combo (Multi-kill/Multi-completion) portraits -->
-        <Frame type="Frame" name="TgtPortrait1" template="KillLog/Item/TgtPortrait0">
-            <Anchor side="Left" relative="$parent/TgtPortrait0" pos="Min" offset="43"/>
-            <Anchor side="Top" relative="$parent/TgtPortrait0" pos="Mid" offset="0"/>
-            <Anchor side="Bottom" relative="$parent/TgtPortrait0" pos="Mid" offset="0"/>
-        </Frame>
-        <Frame type="Frame" name="TgtPortrait2" template="KillLog/Item/TgtPortrait0">
-            <Anchor side="Left" relative="$parent/TgtPortrait1" pos="Min" offset="43"/>
-            <Anchor side="Top" relative="$parent/TgtPortrait0" pos="Mid" offset="-4"/>
-            <Anchor side="Bottom" relative="$parent/TgtPortrait0" pos="Mid" offset="-4"/>
-        </Frame>
-        <Frame type="Frame" name="TgtPortrait3" template="KillLog/Item/TgtPortrait0">
-            <Anchor side="Left" relative="$parent/TgtPortrait2" pos="Min" offset="41"/>
-            <Anchor side="Top" relative="$parent/TgtPortrait0" pos="Mid" offset="18"/>
-            <Anchor side="Bottom" relative="$parent/TgtPortrait0" pos="Mid" offset="18"/>
-        </Frame>
-        <Frame type="Frame" name="TgtPortrait4" template="KillLog/Item/TgtPortrait0">
-            <Anchor side="Left" relative="$parent/TgtPortrait3" pos="Min" offset="19"/>
-            <Anchor side="Top" relative="$parent/TgtPortrait0" pos="Mid" offset="-20"/>
-            <Anchor side="Bottom" relative="$parent/TgtPortrait0" pos="Mid" offset="-20"/>
-        </Frame>
-        <Frame type="Frame" name="TgtPortrait5" template="KillLog/Item/TgtPortrait0">
-            <Anchor side="Left" relative="$parent/TgtPortrait4" pos="Min" offset="30"/>
-            <Anchor side="Top" relative="$parent/TgtPortrait0" pos="Mid" offset="0"/>
-            <Anchor side="Bottom" relative="$parent/TgtPortrait0" pos="Mid" offset="0"/>
-        </Frame>
-        <Frame type="Frame" name="TgtPortrait6" template="KillLog/Item/TgtPortrait0">
-            <Anchor side="Left" relative="$parent/TgtPortrait5" pos="Min" offset="29"/>
-            <Anchor side="Top" relative="$parent/TgtPortrait0" pos="Mid" offset="33"/>
-            <Anchor side="Bottom" relative="$parent/TgtPortrait0" pos="Mid" offset="33"/>
-        </Frame>
-        <Frame type="Frame" name="TgtPortrait7" template="KillLog/Item/TgtPortrait0">
-            <Anchor side="Left" relative="$parent/TgtPortrait6" pos="Min" offset="13"/>
-            <Anchor side="Top" relative="$parent/TgtPortrait0" pos="Mid" offset="-32"/>
-            <Anchor side="Bottom" relative="$parent/TgtPortrait0" pos="Mid" offset="-32"/>
-        </Frame>
-        <Frame type="Frame" name="TgtPortrait8" template="KillLog/Item/TgtPortrait0">
-            <Anchor side="Left" relative="$parent/TgtPortrait7" pos="Min" offset="32"/>
-            <Anchor side="Top" relative="$parent/TgtPortrait0" pos="Mid" offset="6"/>
-            <Anchor side="Bottom" relative="$parent/TgtPortrait0" pos="Mid" offset="6"/>
-        </Frame>
-        <Frame type="Frame" name="TgtPortrait9" template="KillLog/Item/TgtPortrait0">
-            <Anchor side="Left" relative="$parent/TgtPortrait8" pos="Min" offset="40"/>
-            <Anchor side="Top" relative="$parent/TgtPortrait0" pos="Mid" offset="44"/>
-            <Anchor side="Bottom" relative="$parent/TgtPortrait0" pos="Mid" offset="44"/>
-        </Frame>
-        <Frame type="Frame" name="TgtPortrait10" template="KillLog/Item/TgtPortrait0">
-            <Anchor side="Left" relative="$parent/TgtPortrait9" pos="Min" offset="-7"/>
-            <Anchor side="Top" relative="$parent/TgtPortrait0" pos="Mid" offset="-42"/>
-            <Anchor side="Bottom" relative="$parent/TgtPortrait0" pos="Mid" offset="-42"/>
-        </Frame>
-
-        <Frame type="Frame" name="QuestIcon0" template="KillLog/QuestIconTemplate">
-            <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
-            <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
-            <Anchor side="Left" relative="$parent" pos="Min" offset="138"/>
-
-            <Animation name="Combo">
-                <Event event="FadeIn" action="Restart,Pause" frame="$this"/>
-                <Event event="FadeIn" action="Restart,Play" frame="$parent/QuestIcon1"/>
-                <Event event="OnHidden" action="Stop" frame="$this"/>
-
-                <!-- Timestamp Label -->
-                <Controller type="Style" frame="TimestampLabel" end="Stop" style1="KillLog_Timestamp_Big" style2="KillLog_Timestamp" >
-                    <Key type="Curve" time="0" value="0"/>
-                    <Key type="Curve" time="#KillLog_AnimTime" value="1"/>
-                </Controller>
-                <Controller type="Anchor" frame="TimestampLabel" end="Pause" side="Left" relative="True">
-                    <Key type="Curve" time="0" value="67" inout="Slow"/>
-                    <Key type="Curve" time="#KillLog_AnimTime" value="0" inout="Slow"/>
-                </Controller>
-                <Controller type="Anchor" frame="TimestampLabel" end="Pause" side="Right" relative="True">
-                    <Key type="Curve" time="0" value="67" inout="Slow"/>
-                    <Key type="Curve" time="#KillLog_AnimTime" value="0" inout="Slow"/>
-                </Controller>
-                <Controller type="Anchor" frame="TimestampLabel" end="Pause" side="Top" relative="True">
-                    <Key type="Curve" time="0" value="-33" inout="Slow"/>
-                    <Key type="Curve" time="#KillLog_AnimTime" value="0" inout="Slow"/>
-                </Controller>
-                <Controller type="Anchor" frame="TimestampLabel" end="Pause" side="Bottom" relative="True">
-                    <Key type="Curve" time="0" value="-33" inout="Slow"/>
-                    <Key type="Curve" time="#KillLog_AnimTime" value="0" inout="Slow"/>
-                </Controller>
-
-                <!-- Portrait -->
-                <Controller type="Anchor" frame="$this" end="Pause" side="Top">
-                    <Key type="Curve" time="0" value="0" inout="Slow"/>
-                    <Key type="Curve" time="#KillLog_AnimTime" value="-7" inout="Slow"/>
-                </Controller>
-                <Controller type="Anchor" frame="$this" end="Pause" side="Bottom">
-                    <Key type="Curve" time="0" value="0" inout="Slow"/>
-                    <Key type="Curve" time="#KillLog_AnimTime" value="-7" inout="Slow"/>
-                </Controller>
-                <Controller type="Anchor" frame="$this" end="Pause" side="Left" relative="True">
-                    <Key type="Curve" time="0" value="0" inout="Slow"/>
-                    <Key type="Curve" time="#KillLog_AnimTime" value="3" inout="Slow"/>
-                </Controller> 
-                <Controller type="Dimension" frame="$this" dimension="Width" end="Pause" percentage="True">
-                    <Key type="Curve" time="0" value="130" inout="Slow"/>
-                    <Key type="Curve" time="#KillLog_AnimTime" value="100" inout="Slow"/>
-                </Controller>
-                <Controller type="Dimension" frame="$this" dimension="Height" end="Pause" percentage="True">
-                    <Key type="Curve" time="0" value="130" inout="Slow"/>
-                    <Key type="Curve" time="#KillLog_AnimTime" value="100" inout="Slow"/>
-                </Controller>
-            </Animation>
-        </Frame>
-        <Frame type="Frame" name="QuestIcon1" template="KillLog/QuestIconTemplate">
-            <Anchor side="Top" relative="$parent" pos="Mid" offset="-7"/>
-            <Anchor side="Bottom" relative="$parent" pos="Mid" offset="-7"/>
-            <Anchor side="Left" relative="$parent/QuestIcon0" pos="Max" offset="-10"/>
-        </Frame>
-        <Frame type="Frame" name="QuestIcon2" template="KillLog/Item/QuestIcon1">
-            <Anchor side="Left" relative="$parent/QuestIcon1" pos="Max" offset="-10"/>
-        </Frame>
-        <Frame type="Frame" name="QuestIcon3" template="KillLog/Item/QuestIcon1">
-            <Anchor side="Left" relative="$parent/QuestIcon2" pos="Max" offset="-10"/>
-        </Frame>
-
-        <StateGroup name="KillLogItemType">
-            <State name="Hidden">
-                <When type="Property" visible="False"/>
-            </State>
-            <State name="Kill">
-                <When type="AnimationState" KillLogItemType="Kill"/>
-                <Action type="SetProperty" frame="BackgroundCutscene" file="Cutscenes/GameUI_KillLog.StormCutscene"/>
-                <Action type="SetProperty" frame="VsImage" visible="True"/>
-            </State>
-            <State name="Quest">
-                <When type="AnimationState" KillLogItemType="Quest"/>
-                <Action type="SetProperty" frame="BackgroundCutscene" file="Cutscenes/GameUI_KillLogQuest.StormCutscene"/>
-                <Action type="SetProperty" frame="QuestImage" visible="True"/>
-            </State>
-        </StateGroup>
-
-        <StateGroup name="CutsceneColor">
-            <State name="None">
-                <When type="StateGroup" frame="BackgroundCutscene" CutsceneStatus="Inactive"/>
-            </State>
-            <State name="SetAlly">
-                <When type="AnimationState" SrcColor="Blue"/>
-                <Action type="SendEvent" frame="BackgroundCutscene" event="SetAllyColor"/>
-            </State>
-            <State name="SetEnemy">
-                <When type="AnimationState" SrcColor="Red"/>
-                <Action type="SendEvent" frame="BackgroundCutscene" event="SetEnemyColor"/>
-            </State>
-            <State name="SetNeutralToEnemy">
-                <When type="AnimationState" SrcColor="Purple"/>
-                <When type="AnimationState" TgtColor="Red"/>
-                <Action type="SendEvent" frame="BackgroundCutscene" event="SetAllyColor"/>
-            </State>
-            <State name="SetNeutralToAlly">
-                <When type="AnimationState" SrcColor="Purple"/>
-                <When type="AnimationState" TgtColor="Blue"/>
-                <Action type="SendEvent" frame="BackgroundCutscene" event="SetEnemyColor"/>
-            </State>
-        </StateGroup>
+    <Frame type="Frame" name="TgtPortrait3" template="KillLog/Item/TgtPortrait0">
+      <Anchor side="Left" relative="$parent/TgtPortrait2" pos="Min" offset="41" />
+      <Anchor side="Top" relative="$parent/TgtPortrait0" pos="Mid" offset="18" />
+      <Anchor side="Bottom" relative="$parent/TgtPortrait0" pos="Mid" offset="18" />
     </Frame>
-
-   <!--=======================================================================================
-   <! DEBUG
-   <!======================================================================================-->
-
-    <Frame type="Frame" name="DebugPanel">
-        <Width val="700"/>
-        <Height val="570"/>
-
-        <Visible val="False"/>
-
-        <Frame type="Frame" name="Background" template="StandardTooltip/TooltipBlurFrameTemplate">
-            <Anchor relative="$parent"/>
-            <Alpha val="192"/>
-        </Frame>
-
-        <Frame type="Label" name="TitleLabel">
-            <Text val="Kill Log Debug Panel"/>
-            <Style val="Storm_OutOfRangeLabel"/>
-            <Anchor side="Top" relative="$parent" pos="Min" offset="10"/>
-            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
-            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
-        </Frame>
-
-        <Frame type="Button" name="CloseButton" template="StandardTemplates/SmallPanelCloseButtonTemplate">
-            <Anchor side="Top" relative="$parent/Background" pos="Min" offset="3"/>
-            <Anchor side="Right" relative="$parent/Background" pos="Max" offset="-4"/>
-
-            <Animation name="Hide">
-                <Event event="OnClick" action="Restart,Play"/>
-                <Controller type="Visibility" end="Pause" frame="$parent">
-                    <Key type="Bool" time="0" value="False"/>
-                </Controller>
-            </Animation>
-        </Frame>
-
-        <Frame type="Frame" name="QuestFrame">
-            <Anchor side="Left" relative="$parent" pos="0.465" offset="0"/>
-            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
-            <Anchor side="Top" relative="$parent" pos="Min" offset="60"/>
-            <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
-
-            <Frame type="Frame" name="CategoryHeader" template="StandardTemplates/StormHeaderStyle1Template">
-                <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
-                <Anchor side="Left" relative="$parent/Button1/HitTestFrame" pos="Min" offset="-4"/>
-                <Anchor side="Right" relative="$parent/Button6/HitTestFrame" pos="Max" offset="4"/>
-                <Width val="0"/>
-                <Frame type="Label" name="StormHeaderLabel">
-                    <Text val="Quest Completion"/>
-                </Frame>
-            </Frame>
-
-            <Frame type="CheckBox" name="Checkbox" template="StandardTemplates/StandardCheckBoxTemplate">
-                <Anchor side="Top" relative="$parent/CategoryHeader" pos="Max" offset="10"/>
-                <Anchor side="Left" relative="$parent/CategoryHeader" pos="Min" offset="0"/>
-                <Enabled val="False"/>
-            </Frame>
-            <Frame type="Label" name="CheckboxText">
-                <Anchor side="Left" relative="$parent/Checkbox" pos="Max" offset="0"/>
-                <Anchor side="Top" relative="$parent/Checkbox" pos="Mid" offset="0"/>
-                <Anchor side="Bottom" relative="$parent/Checkbox" pos="Mid" offset="0"/>
-                <Style val="Storm_CheckboxStyle"/>
-                <Enabled val="False"/>
-                <Text val="Milestone (Deprecated)"/>
-            </Frame>
-
-            <!-- Hero Buttons -->
-            <Frame type="Button" name="Button1" template="StandardTemplates/StandardButtonSmallTemplate">
-                <Anchor side="Top" relative="$parent/Checkbox" pos="Max" offset="-10"/>
-                <Anchor side="Left" relative="$parent" pos=".29" offset="0"/>
-                <Anchor side="Right" relative="$parent" pos=".29" offset="0"/>
-                <Width val="190"/>
-                <Height val="80"/>
-                <Enabled val="False"/>
-            </Frame>
-            <Frame type="Button" name="Button2" template="KillLog/DebugPanel/QuestFrame/Button1">
-                <Anchor side="Top" relative="$parent/Button1" pos="Max" offset="-30"/>
-            </Frame>
-            <Frame type="Button" name="Button3" template="KillLog/DebugPanel/QuestFrame/Button1">
-                <Anchor side="Top" relative="$parent/Button2" pos="Max" offset="-30"/>
-            </Frame>
-            <Frame type="Button" name="Button4" template="KillLog/DebugPanel/QuestFrame/Button1">
-                <Anchor side="Top" relative="$parent/Button3" pos="Max" offset="-30"/>
-            </Frame>
-            <Frame type="Button" name="Button5" template="KillLog/DebugPanel/QuestFrame/Button1">
-                <Anchor side="Top" relative="$parent/Button4" pos="Max" offset="-30"/>
-            </Frame>
-            <Frame type="Button" name="Button6" template="KillLog/DebugPanel/QuestFrame/Button1">
-                <Anchor side="Left" relative="$parent" pos=".71" offset="0"/>
-                <Anchor side="Right" relative="$parent" pos=".71" offset="0"/>
-            </Frame>
-            <Frame type="Button" name="Button7" template="KillLog/DebugPanel/QuestFrame/Button6">
-                <Anchor side="Top" relative="$parent/Button6" pos="Max" offset="-30"/>
-            </Frame>
-            <Frame type="Button" name="Button8" template="KillLog/DebugPanel/QuestFrame/Button6">
-                <Anchor side="Top" relative="$parent/Button7" pos="Max" offset="-30"/>
-            </Frame>
-            <Frame type="Button" name="Button9" template="KillLog/DebugPanel/QuestFrame/Button6">
-                <Anchor side="Top" relative="$parent/Button8" pos="Max" offset="-30"/>
-            </Frame>
-            <Frame type="Button" name="Button10" template="KillLog/DebugPanel/QuestFrame/Button6">
-                <Anchor side="Top" relative="$parent/Button9" pos="Max" offset="-30"/>
-            </Frame>
-        </Frame>
-
-        <Frame type="Frame" name="KillFrame" template="KillLog/DebugPanel/QuestFrame">
-            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
-            <Anchor side="Right" relative="$parent" pos="0.535" offset="0"/>
-
-            <Frame type="Frame" name="CategoryHeader">
-                <Frame type="Label" name="StormHeaderLabel">
-                    <Text val="Kills"/>
-                </Frame>
-            </Frame>
-
-            <Frame type="CheckBox" name="Checkbox">
-                <Enabled val="True"/>
-            </Frame>
-            <Frame type="Label" name="CheckboxText">
-                <Text val="Quest Reset"/>
-                <Enabled val="True"/>
-            </Frame>
-
-            <Frame type="Button" name="Button11" template="KillLog/DebugPanel/QuestFrame/Button1">
-                <Anchor side="Top" relative="$parent/Button5" pos="Max" offset="-30"/>
-                <Text val="Order Minions"/>
-            </Frame>
-            <Frame type="Button" name="Button12" template="KillLog/DebugPanel/QuestFrame/Button6">
-                <Anchor side="Top" relative="$parent/Button10" pos="Max" offset="-30"/>
-                <Text val="Chaos Minions"/>
-            </Frame>
-            <Frame type="Button" name="Button13" template="KillLog/DebugPanel/QuestFrame/Button1">
-                <Anchor side="Top" relative="$parent/Button11" pos="Max" offset="-30"/>
-                <Text val="Order Allies"/>
-            </Frame>
-            <Frame type="Button" name="Button14" template="KillLog/DebugPanel/QuestFrame/Button6">
-                <Anchor side="Top" relative="$parent/Button12" pos="Max" offset="-30"/>
-                <Text val="Chaos Allies"/>
-            </Frame>
-            <Frame type="Button" name="Button15" template="KillLog/DebugPanel/QuestFrame/Button1">
-                <Anchor side="Top" relative="$parent/Button13" pos="Max" offset="-30"/>
-                <Text val="Hostile"/>
-            </Frame>
-        </Frame>
+    <Frame type="Frame" name="TgtPortrait4" template="KillLog/Item/TgtPortrait0">
+      <Anchor side="Left" relative="$parent/TgtPortrait3" pos="Min" offset="19" />
+      <Anchor side="Top" relative="$parent/TgtPortrait0" pos="Mid" offset="-20" />
+      <Anchor side="Bottom" relative="$parent/TgtPortrait0" pos="Mid" offset="-20" />
     </Frame>
+    <Frame type="Frame" name="TgtPortrait5" template="KillLog/Item/TgtPortrait0">
+      <Anchor side="Left" relative="$parent/TgtPortrait4" pos="Min" offset="30" />
+      <Anchor side="Top" relative="$parent/TgtPortrait0" pos="Mid" offset="0" />
+      <Anchor side="Bottom" relative="$parent/TgtPortrait0" pos="Mid" offset="0" />
+    </Frame>
+    <Frame type="Frame" name="TgtPortrait6" template="KillLog/Item/TgtPortrait0">
+      <Anchor side="Left" relative="$parent/TgtPortrait5" pos="Min" offset="29" />
+      <Anchor side="Top" relative="$parent/TgtPortrait0" pos="Mid" offset="33" />
+      <Anchor side="Bottom" relative="$parent/TgtPortrait0" pos="Mid" offset="33" />
+    </Frame>
+    <Frame type="Frame" name="TgtPortrait7" template="KillLog/Item/TgtPortrait0">
+      <Anchor side="Left" relative="$parent/TgtPortrait6" pos="Min" offset="13" />
+      <Anchor side="Top" relative="$parent/TgtPortrait0" pos="Mid" offset="-32" />
+      <Anchor side="Bottom" relative="$parent/TgtPortrait0" pos="Mid" offset="-32" />
+    </Frame>
+    <Frame type="Frame" name="TgtPortrait8" template="KillLog/Item/TgtPortrait0">
+      <Anchor side="Left" relative="$parent/TgtPortrait7" pos="Min" offset="32" />
+      <Anchor side="Top" relative="$parent/TgtPortrait0" pos="Mid" offset="6" />
+      <Anchor side="Bottom" relative="$parent/TgtPortrait0" pos="Mid" offset="6" />
+    </Frame>
+    <Frame type="Frame" name="TgtPortrait9" template="KillLog/Item/TgtPortrait0">
+      <Anchor side="Left" relative="$parent/TgtPortrait8" pos="Min" offset="40" />
+      <Anchor side="Top" relative="$parent/TgtPortrait0" pos="Mid" offset="44" />
+      <Anchor side="Bottom" relative="$parent/TgtPortrait0" pos="Mid" offset="44" />
+    </Frame>
+    <Frame type="Frame" name="TgtPortrait10" template="KillLog/Item/TgtPortrait0">
+      <Anchor side="Left" relative="$parent/TgtPortrait9" pos="Min" offset="-7" />
+      <Anchor side="Top" relative="$parent/TgtPortrait0" pos="Mid" offset="-42" />
+      <Anchor side="Bottom" relative="$parent/TgtPortrait0" pos="Mid" offset="-42" />
+    </Frame>
+    <Frame type="Frame" name="QuestIcon0" template="KillLog/QuestIconTemplate">
+      <Anchor side="Top" relative="$parent" pos="Mid" offset="0" />
+      <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0" />
+      <Anchor side="Left" relative="$parent" pos="Min" offset="138" />
+      <Animation name="Combo">
+        <Event event="FadeIn" action="Restart,Pause" frame="$this" />
+        <Event event="FadeIn" action="Restart,Play" frame="$parent/QuestIcon1" />
+        <Event event="OnHidden" action="Stop" frame="$this" />
+        <Controller type="Style" frame="TimestampLabel" end="Stop" style1="KillLog_Timestamp_Big" style2="KillLog_Timestamp">
+          <Key type="Curve" time="0" value="0" />
+          <Key type="Curve" time="#KillLog_AnimTime" value="1" />
+        </Controller>
+        <Controller type="Anchor" frame="TimestampLabel" end="Pause" side="Left" relative="True">
+          <Key type="Curve" time="0" value="67" inout="Slow" />
+          <Key type="Curve" time="#KillLog_AnimTime" value="0" inout="Slow" />
+        </Controller>
+        <Controller type="Anchor" frame="TimestampLabel" end="Pause" side="Right" relative="True">
+          <Key type="Curve" time="0" value="67" inout="Slow" />
+          <Key type="Curve" time="#KillLog_AnimTime" value="0" inout="Slow" />
+        </Controller>
+        <Controller type="Anchor" frame="TimestampLabel" end="Pause" side="Top" relative="True">
+          <Key type="Curve" time="0" value="-33" inout="Slow" />
+          <Key type="Curve" time="#KillLog_AnimTime" value="0" inout="Slow" />
+        </Controller>
+        <Controller type="Anchor" frame="TimestampLabel" end="Pause" side="Bottom" relative="True">
+          <Key type="Curve" time="0" value="-33" inout="Slow" />
+          <Key type="Curve" time="#KillLog_AnimTime" value="0" inout="Slow" />
+        </Controller>
+        <Controller type="Anchor" frame="$this" end="Pause" side="Top">
+          <Key type="Curve" time="0" value="0" inout="Slow" />
+          <Key type="Curve" time="#KillLog_AnimTime" value="-7" inout="Slow" />
+        </Controller>
+        <Controller type="Anchor" frame="$this" end="Pause" side="Bottom">
+          <Key type="Curve" time="0" value="0" inout="Slow" />
+          <Key type="Curve" time="#KillLog_AnimTime" value="-7" inout="Slow" />
+        </Controller>
+        <Controller type="Anchor" frame="$this" end="Pause" side="Left" relative="True">
+          <Key type="Curve" time="0" value="0" inout="Slow" />
+          <Key type="Curve" time="#KillLog_AnimTime" value="3" inout="Slow" />
+        </Controller>
+        <Controller type="Dimension" frame="$this" dimension="Width" end="Pause" percentage="True">
+          <Key type="Curve" time="0" value="130" inout="Slow" />
+          <Key type="Curve" time="#KillLog_AnimTime" value="100" inout="Slow" />
+        </Controller>
+        <Controller type="Dimension" frame="$this" dimension="Height" end="Pause" percentage="True">
+          <Key type="Curve" time="0" value="130" inout="Slow" />
+          <Key type="Curve" time="#KillLog_AnimTime" value="100" inout="Slow" />
+        </Controller>
+      </Animation>
+    </Frame>
+    <Frame type="Frame" name="QuestIcon1" template="KillLog/QuestIconTemplate">
+      <Anchor side="Top" relative="$parent" pos="Mid" offset="-7" />
+      <Anchor side="Bottom" relative="$parent" pos="Mid" offset="-7" />
+      <Anchor side="Left" relative="$parent/QuestIcon0" pos="Max" offset="-10" />
+    </Frame>
+    <Frame type="Frame" name="QuestIcon2" template="KillLog/Item/QuestIcon1">
+      <Anchor side="Left" relative="$parent/QuestIcon1" pos="Max" offset="-10" />
+    </Frame>
+    <Frame type="Frame" name="QuestIcon3" template="KillLog/Item/QuestIcon1">
+      <Anchor side="Left" relative="$parent/QuestIcon2" pos="Max" offset="-10" />
+    </Frame>
+    <StateGroup name="KillLogItemType">
+      <State name="Hidden">
+        <When type="Property" visible="False" />
+      </State>
+      <State name="Kill">
+        <When type="AnimationState" KillLogItemType="Kill" />
+        <Action type="SetProperty" frame="BackgroundCutscene" file="Cutscenes/GameUI_KillLog.StormCutscene" />
+        <Action type="SetProperty" frame="VsImage" visible="True" />
+      </State>
+      <State name="Quest">
+        <When type="AnimationState" KillLogItemType="Quest" />
+        <Action type="SetProperty" frame="BackgroundCutscene" file="Cutscenes/GameUI_KillLogQuest.StormCutscene" />
+        <Action type="SetProperty" frame="QuestImage" visible="True" />
+      </State>
+    </StateGroup>
+    <StateGroup name="CutsceneColor">
+      <State name="None">
+        <When type="StateGroup" frame="BackgroundCutscene" CutsceneStatus="Inactive" />
+      </State>
+      <State name="SetAlly">
+        <When type="AnimationState" SrcColor="Blue" />
+        <Action type="SendEvent" frame="BackgroundCutscene" event="SetAllyColor" />
+      </State>
+      <State name="SetEnemy">
+        <When type="AnimationState" SrcColor="Red" />
+        <Action type="SendEvent" frame="BackgroundCutscene" event="SetEnemyColor" />
+      </State>
+      <State name="SetNeutralToEnemy">
+        <When type="AnimationState" SrcColor="Purple" />
+        <When type="AnimationState" TgtColor="Red" />
+        <Action type="SendEvent" frame="BackgroundCutscene" event="SetAllyColor" />
+      </State>
+      <State name="SetNeutralToAlly">
+        <When type="AnimationState" SrcColor="Purple" />
+        <When type="AnimationState" TgtColor="Blue" />
+        <Action type="SendEvent" frame="BackgroundCutscene" event="SetEnemyColor" />
+      </State>
+    </StateGroup>
+  </Frame>
+  <Frame type="Frame" name="DebugPanel">
+    <Width val="700" />
+    <Height val="570" />
+    <Visible val="False" />
+    <Frame type="Frame" name="Background" template="StandardTooltip/TooltipBlurFrameTemplate">
+      <Anchor relative="$parent" />
+      <Alpha val="192" />
+    </Frame>
+    <Frame type="Label" name="TitleLabel">
+      <Text val="Kill Log Debug Panel" />
+      <Style val="Storm_OutOfRangeLabel" />
+      <Anchor side="Top" relative="$parent" pos="Min" offset="10" />
+      <Anchor side="Left" relative="$parent" pos="Min" offset="0" />
+      <Anchor side="Right" relative="$parent" pos="Max" offset="0" />
+    </Frame>
+    <Frame type="Button" name="CloseButton" template="StandardTemplates/SmallPanelCloseButtonTemplate">
+      <Anchor side="Top" relative="$parent/Background" pos="Min" offset="3" />
+      <Anchor side="Right" relative="$parent/Background" pos="Max" offset="-4" />
+      <Animation name="Hide">
+        <Event event="OnClick" action="Restart,Play" />
+        <Controller type="Visibility" end="Pause" frame="$parent">
+          <Key type="Bool" time="0" value="False" />
+        </Controller>
+      </Animation>
+    </Frame>
+    <Frame type="Frame" name="QuestFrame">
+      <Anchor side="Left" relative="$parent" pos="0.465" offset="0" />
+      <Anchor side="Right" relative="$parent" pos="Max" offset="0" />
+      <Anchor side="Top" relative="$parent" pos="Min" offset="60" />
+      <Anchor side="Bottom" relative="$parent" pos="Max" offset="0" />
+      <Frame type="Frame" name="CategoryHeader" template="StandardTemplates/StormHeaderStyle1Template">
+        <Anchor side="Top" relative="$parent" pos="Min" offset="0" />
+        <Anchor side="Left" relative="$parent/Button1/HitTestFrame" pos="Min" offset="-4" />
+        <Anchor side="Right" relative="$parent/Button6/HitTestFrame" pos="Max" offset="4" />
+        <Width val="0" />
+        <Frame type="Label" name="StormHeaderLabel">
+          <Text val="Quest Completion" />
+        </Frame>
+      </Frame>
+      <Frame type="CheckBox" name="Checkbox" template="StandardTemplates/StandardCheckBoxTemplate">
+        <Anchor side="Top" relative="$parent/CategoryHeader" pos="Max" offset="10" />
+        <Anchor side="Left" relative="$parent/CategoryHeader" pos="Min" offset="0" />
+        <Enabled val="False" />
+      </Frame>
+      <Frame type="Label" name="CheckboxText">
+        <Anchor side="Left" relative="$parent/Checkbox" pos="Max" offset="0" />
+        <Anchor side="Top" relative="$parent/Checkbox" pos="Mid" offset="0" />
+        <Anchor side="Bottom" relative="$parent/Checkbox" pos="Mid" offset="0" />
+        <Style val="Storm_CheckboxStyle" />
+        <Enabled val="False" />
+        <Text val="Milestone (Deprecated)" />
+      </Frame>
+      <Frame type="Button" name="Button1" template="StandardTemplates/StandardButtonSmallTemplate">
+        <Anchor side="Top" relative="$parent/Checkbox" pos="Max" offset="-10" />
+        <Anchor side="Left" relative="$parent" pos=".29" offset="0" />
+        <Anchor side="Right" relative="$parent" pos=".29" offset="0" />
+        <Width val="190" />
+        <Height val="80" />
+        <Enabled val="False" />
+      </Frame>
+      <Frame type="Button" name="Button2" template="KillLog/DebugPanel/QuestFrame/Button1">
+        <Anchor side="Top" relative="$parent/Button1" pos="Max" offset="-30" />
+      </Frame>
+      <Frame type="Button" name="Button3" template="KillLog/DebugPanel/QuestFrame/Button1">
+        <Anchor side="Top" relative="$parent/Button2" pos="Max" offset="-30" />
+      </Frame>
+      <Frame type="Button" name="Button4" template="KillLog/DebugPanel/QuestFrame/Button1">
+        <Anchor side="Top" relative="$parent/Button3" pos="Max" offset="-30" />
+      </Frame>
+      <Frame type="Button" name="Button5" template="KillLog/DebugPanel/QuestFrame/Button1">
+        <Anchor side="Top" relative="$parent/Button4" pos="Max" offset="-30" />
+      </Frame>
+      <Frame type="Button" name="Button6" template="KillLog/DebugPanel/QuestFrame/Button1">
+        <Anchor side="Left" relative="$parent" pos=".71" offset="0" />
+        <Anchor side="Right" relative="$parent" pos=".71" offset="0" />
+      </Frame>
+      <Frame type="Button" name="Button7" template="KillLog/DebugPanel/QuestFrame/Button6">
+        <Anchor side="Top" relative="$parent/Button6" pos="Max" offset="-30" />
+      </Frame>
+      <Frame type="Button" name="Button8" template="KillLog/DebugPanel/QuestFrame/Button6">
+        <Anchor side="Top" relative="$parent/Button7" pos="Max" offset="-30" />
+      </Frame>
+      <Frame type="Button" name="Button9" template="KillLog/DebugPanel/QuestFrame/Button6">
+        <Anchor side="Top" relative="$parent/Button8" pos="Max" offset="-30" />
+      </Frame>
+      <Frame type="Button" name="Button10" template="KillLog/DebugPanel/QuestFrame/Button6">
+        <Anchor side="Top" relative="$parent/Button9" pos="Max" offset="-30" />
+      </Frame>
+    </Frame>
+    <Frame type="Frame" name="KillFrame" template="KillLog/DebugPanel/QuestFrame">
+      <Anchor side="Left" relative="$parent" pos="Min" offset="0" />
+      <Anchor side="Right" relative="$parent" pos="0.535" offset="0" />
+      <Frame type="Frame" name="CategoryHeader">
+        <Frame type="Label" name="StormHeaderLabel">
+          <Text val="Kills" />
+        </Frame>
+      </Frame>
+      <Frame type="CheckBox" name="Checkbox">
+        <Enabled val="True" />
+      </Frame>
+      <Frame type="Label" name="CheckboxText">
+        <Text val="Quest Reset" />
+        <Enabled val="True" />
+      </Frame>
+      <Frame type="Button" name="Button11" template="KillLog/DebugPanel/QuestFrame/Button1">
+        <Anchor side="Top" relative="$parent/Button5" pos="Max" offset="-30" />
+        <Text val="Order Minions" />
+      </Frame>
+      <Frame type="Button" name="Button12" template="KillLog/DebugPanel/QuestFrame/Button6">
+        <Anchor side="Top" relative="$parent/Button10" pos="Max" offset="-30" />
+        <Text val="Chaos Minions" />
+      </Frame>
+      <Frame type="Button" name="Button13" template="KillLog/DebugPanel/QuestFrame/Button1">
+        <Anchor side="Top" relative="$parent/Button11" pos="Max" offset="-30" />
+        <Text val="Order Allies" />
+      </Frame>
+      <Frame type="Button" name="Button14" template="KillLog/DebugPanel/QuestFrame/Button6">
+        <Anchor side="Top" relative="$parent/Button12" pos="Max" offset="-30" />
+        <Text val="Chaos Allies" />
+      </Frame>
+      <Frame type="Button" name="Button15" template="KillLog/DebugPanel/QuestFrame/Button1">
+        <Anchor side="Top" relative="$parent/Button13" pos="Max" offset="-30" />
+        <Text val="Hostile" />
+      </Frame>
+    </Frame>
+  </Frame>
 </Desc>
