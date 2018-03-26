@@ -5,23 +5,40 @@
     <Animation name="HelpfulHoverTemplate">
         <Event event="OnMouseEnter" action="Reset,Play"/>
         <Event event="OnMouseExit" action="Reset,Stop"/>
-        <Event event="OnMouseEnter" action="Reset,Play" frame="$parent/ReviewLabel"/>
-        <Event event="OnMouseExit" action="Reset,Stop" frame="$parent/ReviewLabel"/>
 
-        <Controller type="Visibility" end="Pause" frame="$parent/HelpfulInfoLabel">
+        <Controller type="Visibility" end="Pause" frame="$ancestor[@type=BattleMapReviewListBoxItem]/HelpfulInfoLabel">
             <Key type="Bool" time="0" value="True"/>
         </Controller>
 
-        <Controller type="Fade" end="Pause" frame="$parent/HelpfulButton">
+        <Controller type="Fade" end="Pause" frame="$ancestor[@type=BattleMapReviewListBoxItem]/HelpfulButton">
             <Key type="Curve" time="0" value="255" out="Auto"/>
         </Controller>
 
-        <Controller type="Fade" end="Pause" frame="$parent/ReportButton">
+        <Controller type="Fade" end="Pause" frame="$ancestor[@type=BattleMapReviewListBoxItem]/ReportButton">
+            <Key type="Curve" time="0" value="255" out="Auto"/>
+        </Controller>
+    </Animation>
+
+    <Animation name="HelpfulHoverListItemTemplate">
+        <Event event="OnMouseEnter" action="Reset,Play"/>
+        <Event event="OnMouseExit" action="Reset,Stop"/>
+
+        <Controller type="Visibility" end="Pause" frame="HelpfulInfoLabel">
+            <Key type="Bool" time="0" value="True"/>
+        </Controller>
+
+        <Controller type="Fade" end="Pause" frame="HelpfulButton">
+            <Key type="Curve" time="0" value="255" out="Auto"/>
+        </Controller>
+
+        <Controller type="Fade" end="Pause" frame="ReportButton">
             <Key type="Curve" time="0" value="255" out="Auto"/>
         </Controller>
     </Animation>
     
     <Frame type="BattleMapReviewListBoxItem" name="ListBoxItemTemplate">
+        <Animation name="HelpfulHover" template="BattleMapProfileReviewsPanel/HelpfulHoverListItemTemplate"/>
+        
         <!-- This frame determines the size of the list box item -->
         <Frame type="Frame" name="AnchorFrame">
             <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
@@ -45,8 +62,6 @@
             <Texture val="@UI/SC2_UI_Battlenet_Glue_Arcade_MainListItem_Normal"/>
             <TextureType val="NineSlice"/>
             <Alpha val="0"/>
-            <AcceptsMouse val="true"/>
-            <Animation name="HelpfulHover" template="BattleMapProfileReviewsPanel/HelpfulHoverTemplate"/>
         </Frame>
 
         <Frame type="AvatarFrame" name="AvatarFrame" template="StandardTemplates/AvatarFrameMediumTemplate">
@@ -56,6 +71,7 @@
             <ContextMenu val="$parent/UserContextMenu"/>
             <BypassOnlineChecks val="true"/>
             <PresenceId val="{$parent/@PresenceId}"/>
+            <Animation name="HelpfulHover" template="BattleMapProfileReviewsPanel/HelpfulHoverTemplate"/>
         </Frame>
 
         <Frame type="Label" name="AuthorLabel">
@@ -90,6 +106,7 @@
             <MinValue val="0"/>
             <MaxValue val="5"/>
             <Value val="{$parent/@Rating}"/>
+            <Animation name="HelpfulHover" template="BattleMapProfileReviewsPanel/HelpfulHoverTemplate"/>
         </Frame>
 
         <Frame type="Label" name="HelpfulLabel">
@@ -113,7 +130,6 @@
             <Style val="@Arcade_GameInfo_HowToPlay_Desc"/>
             <AutoSizeClamps minHeight="40"/>
             <Options val="NewLineIfTruncated"/>
-            <AcceptsMouse val="true"/>
         </Frame>
 
         <Frame type="Label" name="TimeLabel">
@@ -200,6 +216,12 @@
 
         <StateGroup name="HelpfulStateGroup">
             <DefaultState val="NotHelpfulState"/>
+            
+            <State name="LocalUserState">
+                <When type="Property" frame="$BattleUI" LocalToonPresenceId="{$this/@PresenceId}"/>
+                <Action type="SetProperty" frame="HelpfulButton" Visible="False"/>
+                <Action type="SetProperty" frame="ReportButton" Visible="False"/>
+            </State>
             
             <State name="NotHelpfulState">
                 <When type="AnimationState" frame="$this" HelpfulState="NotHelpful"/>

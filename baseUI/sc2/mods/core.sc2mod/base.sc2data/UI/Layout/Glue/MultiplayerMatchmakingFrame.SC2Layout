@@ -370,6 +370,8 @@
             </Frame>
 
             <StateGroup name="RaceSelectEnabledGroup">
+                <DefaultState val="RaceSelectionEnabled"/>
+                
                 <State name="RaceSelectionMatched">
                     <When type="AnimationState" MatchmakingQueueState="MatchmakingStateRaceSelectionMatched"/>
                     <Action type="SetProperty" enabled="false"/>
@@ -529,8 +531,35 @@
         <Frame type="MatchmakingVersusAIPanel" name="VersusAIPanel" template="MatchmakingVersusAIPanel/MatchmakingVersusAIPanelTemplate">
             <Anchor side="Top" relative="$parent/QueueTileList" pos="Max" offset="-31"/>
             <Anchor side="Left" relative="$Anchor_Standard_Left" pos="Min" offset="0"/>
-            <Visible val="{$parent/QueueTileList/@HasSelectedData}"/>
+            <Visible val="True"/>
             <QueueHandle val="{$parent/QueueTileList/@SelectedQueueHandle}"/>
+            
+            <!-- When you are in a group and not the party leader, we'll display the league panel info for 1vAI -->
+            <StateGroup name="QueueSelectabilityState">
+                <DefaultState val="Selectable"/>
+                
+                <State name="NotSelectable3">
+                    <When type="Property" frame="$parent/QueueTileList" HasSelectedData="False"/>
+                    <When type="Property" frame="$ScreenForeground_PartyPanel/TileList" operator="GreaterThanOrEqual" DataCount="3"/>
+                    <Action type="SetProperty" QueueHandle="{$parent/QueueTileList/Item3/@QueueHandle}"/>
+                </State>
+                
+                <State name="NotSelectable2">
+                    <When type="Property" frame="$parent/QueueTileList" HasSelectedData="False"/>
+                    <When type="Property" frame="$ScreenForeground_PartyPanel/TileList" operator="GreaterThanOrEqual" DataCount="2"/>
+                    <Action type="SetProperty" QueueHandle="{$parent/QueueTileList/Item2/@QueueHandle}"/>
+                </State>
+                
+                <State name="NotSelectable1">
+                    <When type="Property" frame="$parent/QueueTileList" HasSelectedData="False"/>
+                    <When type="Property" frame="$ScreenForeground_PartyPanel/TileList" operator="GreaterThanOrEqual" DataCount="1"/>
+                    <Action type="SetProperty" QueueHandle="{$parent/QueueTileList/Item0/@QueueHandle}"/>
+                </State>
+                
+                <State name="Selectable">
+                    <Action type="SetProperty" QueueHandle="{$parent/QueueTileList/@SelectedQueueHandle}"/>
+                </State>
+            </StateGroup>
         </Frame>
     </Frame>
 
@@ -554,9 +583,36 @@
         <Frame type="MatchmakingLeaguePanel" name="LeaguePanel" template="MatchmakingLeaguePanel/MatchmakingLeaguePanelTemplate">
             <Anchor side="Top" relative="$parent/QueueTileList" pos="Max" offset="-31"/>
             <Anchor side="Left" relative="$Anchor_Standard_Left" pos="Min" offset="0"/>
-            <Visible val="{$parent/QueueTileList/@HasSelectedData}"/>
+            <Visible val="True"/>
             <QueueHandle val="{$parent/QueueTileList/@SelectedQueueHandle}"/>
             <Race val="{$parent/RaceTileList/@Race}"/>
+            
+            <!-- When you are in a group and not the party leader, we'll display the league panel info for 2v2 -->
+            <StateGroup name="QueueSelectabilityState">
+                <DefaultState val="Selectable"/>
+                
+                <State name="NotSelectable4">
+                    <When type="Property" frame="$parent/QueueTileList" HasSelectedData="False"/>
+                    <When type="Property" frame="$ScreenForeground_PartyPanel/TileList" operator="GreaterThanOrEqual" DataCount="4"/>
+                    <Action type="SetProperty" QueueHandle="{$parent/QueueTileList/Item3/@QueueHandle}"/>
+                </State>
+                
+                <State name="NotSelectable3">
+                    <When type="Property" frame="$parent/QueueTileList" HasSelectedData="False"/>
+                    <When type="Property" frame="$ScreenForeground_PartyPanel/TileList" operator="GreaterThanOrEqual" DataCount="3"/>
+                    <Action type="SetProperty" QueueHandle="{$parent/QueueTileList/Item2/@QueueHandle}"/>
+                </State>
+                
+                <State name="NotSelectable2">
+                    <When type="Property" frame="$parent/QueueTileList" HasSelectedData="False"/>
+                    <When type="Property" frame="$ScreenForeground_PartyPanel/TileList" operator="GreaterThanOrEqual" DataCount="2"/>
+                    <Action type="SetProperty" QueueHandle="{$parent/QueueTileList/Item1/@QueueHandle}"/>
+                </State>
+                
+                <State name="Selectable">
+                    <Action type="SetProperty" QueueHandle="{$parent/QueueTileList/@SelectedQueueHandle}"/>
+                </State>
+            </StateGroup>
         </Frame>
 
         <Frame type="MatchmakingPlayButton" name="PlayButton" template="MultiplayerMatchmakingFrame/PlayRankedButtonTemplate">
@@ -661,6 +717,34 @@
         <Frame type="Label" name="RaceLabel">
             <Anchor side="Top" relative="$parent/ModeLabel" pos="Min" offset="0"/>
         </Frame>
+        
+        <Frame type="MatchmakingPlayButton" name="PlayUnrankedButton">
+            <EnabledWhileInParty val="False"/>
+        </Frame>
+
+        <Frame type="MatchmakingLeaguePanel" name="LeaguePanel" template="MatchmakingLeaguePanel/MatchmakingLeaguePanelTemplate">
+            <Visible val="True"/>
+            
+            <StateGroup name="QueueSelectabilityState">
+                <DefaultState val="Selectable"/>
+                
+                <State name="NotSelectable4">
+                    <Action type="SetProperty" QueueHandle="{$parent/QueueTileList/@SelectedQueueHandle}"/>
+                </State>
+                
+                <State name="NotSelectable3">
+                    <Action type="SetProperty" QueueHandle="{$parent/QueueTileList/@SelectedQueueHandle}"/>
+                </State>
+                
+                <State name="NotSelectable2">
+                    <Action type="SetProperty" QueueHandle="{$parent/QueueTileList/@SelectedQueueHandle}"/>
+                </State>
+                
+                <State name="Selectable">
+                    <Action type="SetProperty" QueueHandle="{$parent/QueueTileList/@SelectedQueueHandle}"/>
+                </State>
+            </StateGroup>
+        </Frame>
     </Frame>
 
     <Frame type="Frame" name="MultiplayerTestingFrameTemplate" template="MultiplayerMatchmakingFrame/MultiplayerMatchmakingFrameTemplate">
@@ -688,24 +772,16 @@
         </Frame>
 
         <Frame type="BattleQueueFrame" name="QueueInfoPanel" template="MatchmakingQueueInfoPanel/MatchmakingQueueInfoPanelTemplate">
-            <Anchor side="Top" relative="$parent/RaceTileList" pos="Max" offset="33"/>
-            <Anchor side="Left" relative="$parent/RaceTileList" pos="Min" offset="-32"/>
+            <Anchor side="Top" relative="$parent/QueueTileList" pos="Max" offset="-31"/>
+            <Anchor side="Left" relative="$Anchor_Standard_Left" pos="Min" offset="0"/>
             <QueueHandle val="{$parent/QueueTileList/@SelectedQueueHandle}"/>
             <Visible val="{$parent/QueueTileList/@HasSelectedData}"/>
 
             <Frame type="BlurFrame" name="ContainerBGBlur">
-                <Visible val="false"/>
-            </Frame>
-
-            <Frame type="Image" name="QueueInfoPanelContainmentBG">
-                <Visible val="false"/>
-            </Frame>
-
-            <Frame type="BlurFrame" name="ContainerBGBlur_Testing">
                 <Visible val="true"/>
             </Frame>
 
-            <Frame type="Image" name="QueueInfoPanelContainmentBG_Testing">
+            <Frame type="Image" name="QueueInfoPanelContainmentBG">
                 <Visible val="true"/>
             </Frame>
 
@@ -718,8 +794,8 @@
             </Frame>
 
             <Frame type="ViewMapProfileButton" name="MapProfileButton" template="StandardBattlenetTemplates/BattlenetSmallButtonTemplate">
-                <Anchor side="Bottom" relative="$parent/QueueInfoPanelContainmentBG_Testing" pos="Max" offset="-35"/>
-                <Anchor side="Left" relative="$parent/QueueInfoPanelContainmentBG_Testing" pos="Min" offset="45"/>
+                <Anchor side="Bottom" relative="$parent/QueueInfoPanelContainmentBG" pos="Max" offset="-15"/>
+                <Anchor side="Left" relative="$parent/TitleLabel" pos="Min" offset="-5"/>
                 <Text val="@UI/ScreenMatchmaking/ViewMapProfile"/>
                 <Width val="200"/>
                 <CollapseLayout val="true"/>
@@ -727,12 +803,50 @@
             </Frame>
 
             <Frame type="LaunchURLButton" name="ForumsButton" template="StandardBattlenetTemplates/BattlenetSmallButtonTemplate">
-                <Anchor side="Bottom" relative="$parent/QueueInfoPanelContainmentBG_Testing" pos="Max" offset="-35"/>
+                <Anchor side="Bottom" relative="$parent/QueueInfoPanelContainmentBG" pos="Max" offset="-15"/>
                 <Anchor side="Left" relative="$parent/MapProfileButton" pos="Max" offset="0"/>
                 <Text val="@UI/ScreenMatchmaking/ViewForums"/>
                 <Nydus val="forum/general"/>
                 <Width val="200"/>
             </Frame>
+        </Frame>
+
+        <Frame type="GlueButton" name="MapVetoButton" template="StandardBattlenetTemplates/BattlenetStandardButtonTemplate">
+            <Anchor side="Top" relative="$parent/PlayButton" pos="Min" offset="1"/>
+            <Anchor side="Left" relative="$parent/PlayButton" pos="Max" offset="20"/>
+            <Width val="180"/>
+            <CollapseLayout val="true"/>
+            <HoverSound val="@UI_HoverTick"/>
+            <Text val="@UI/ScreenMatchmaking/MapVetoButtonShort"/>
+            <Enabled val="{$parent/QueueTileList/@HasSelectedData}"/>
+
+            <Frame type="BattleQueueFrame" name="QueueFrame">
+                <Anchor relative="$parent"/>
+                <QueueHandle val="{$parent/$parent/QueueTileList/@SelectedQueueHandle}"/>
+            </Frame>
+
+            <Frame type="TextFormatFrame" name="FormatFrame">
+                <Anchor relative="$parent"/>
+                <FormatText val="@UI/ScreenMatchmaking/MapVetoButton"/>
+                <Replacement index="0" val="{$parent/QueueFrame/@ShortName}"/>
+            </Frame>
+        </Frame>
+
+        <Frame type="MatchmakingMapVetoFrame" name="MapVetoFrame" template="MatchmakingMapVetoFrame/MatchmakingMapVetoFrameTemplate">
+            <Anchor relative="$parent"/>
+            <Visible val="false"/>
+            <QueueHandle val="{$parent/QueueTileList/@SelectedQueueHandle}"/>
+
+            <Animation name="ToggleMapVetoListFrameVisibility">
+                <Event event="OnClick" action="ToggleDirection,Play" frame="$parent/MapVetoButton"/>
+                <Event event="OnHidden" action="DirectionForward,Play" frame="$parent/MapVetoButton"/>
+                <Event event="OnClick" action="DirectionForward,Play" frame="CancelButton"/>
+                <Event event="OnClick" action="DirectionForward,Play" frame="AcceptButton"/>
+                <Controller name="Name1" type="Visibility" end="Pause">
+                    <Key type="Bool" time="0" value="true"/>
+                    <Key type="Bool" time=".01" value="false"/>
+                </Controller>
+            </Animation>
         </Frame>
     </Frame>
 </Desc>

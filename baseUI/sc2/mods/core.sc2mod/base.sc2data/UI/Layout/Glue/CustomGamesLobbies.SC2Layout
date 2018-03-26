@@ -85,6 +85,7 @@
         <StateGroup name="ExpansionStateGroup">
             <DefaultState val="NoMod"/>
             <State name="WoLState">
+                <When type="StateGroup" LoadingState="Loaded"/>
                 <When type="Property" frame="$this" MapHandle="0,0" operator="NotEqual"/>
                 <When type="Property" frame="$this/BattleMapFrame" IsArcade="False"/>
                 <When type="Property" frame="MultiModFrame" ExpansionLevel="1"/>
@@ -93,6 +94,7 @@
                 <Action type="SetProperty" frame="$this/ExpansionLevelIcon" Tooltip="@UI/ScreenCustomGames/ExpansionLevelTooltip/WoL"/>
             </State>
             <State name="HotSState">
+                <When type="StateGroup" LoadingState="Loaded"/>
                 <When type="Property" frame="$this" MapHandle="0,0" operator="NotEqual"/>
                 <When type="Property" frame="$this/BattleMapFrame" IsArcade="False"/>
                 <When type="Property" frame="MultiModFrame" ExpansionLevel="2"/>
@@ -101,6 +103,7 @@
                 <Action type="SetProperty" frame="$this/ExpansionLevelIcon" Tooltip="@UI/ScreenCustomGames/ExpansionLevelTooltip/HotS"/>
             </State>
             <State name="LotVState">
+                <When type="StateGroup" LoadingState="Loaded"/>
                 <When type="Property" frame="$this" MapHandle="0,0" operator="NotEqual"/>
                 <When type="Property" frame="$this/BattleMapFrame" IsArcade="False"/>
                 <When type="Property" frame="MultiModFrame" ExpansionLevel="3"/>
@@ -109,6 +112,7 @@
                 <Action type="SetProperty" frame="$this/ExpansionLevelIcon" Tooltip="@UI/ScreenCustomGames/ExpansionLevelTooltip/LotV"/>
             </State>
             <State name="WoLModState">
+                <When type="StateGroup" LoadingState="Loaded"/>
                 <When type="Property" frame="$this" MapHandle="0,0" operator="NotEqual"/>
                 <When type="Property" frame="$this/BattleMapFrame" IsArcade="False"/>
                 <When type="Property" frame="BattleModFrame" ExpansionLevel="1"/>
@@ -117,6 +121,7 @@
                 <Action type="SetProperty" frame="$this/ExpansionLevelIcon" Tooltip="@UI/ScreenCustomGames/ExpansionLevelTooltip/WoL"/>
             </State>
             <State name="HotSModState">
+                <When type="StateGroup" LoadingState="Loaded"/>
                 <When type="Property" frame="$this" MapHandle="0,0" operator="NotEqual"/>
                 <When type="Property" frame="$this/BattleMapFrame" IsArcade="False"/>
                 <When type="Property" frame="BattleModFrame" ExpansionLevel="2"/>
@@ -125,6 +130,7 @@
                 <Action type="SetProperty" frame="$this/ExpansionLevelIcon" Tooltip="@UI/ScreenCustomGames/ExpansionLevelTooltip/HotS"/>
             </State>
             <State name="LotVModState">
+                <When type="StateGroup" LoadingState="Loaded"/>
                 <When type="Property" frame="$this" MapHandle="0,0" operator="NotEqual"/>
                 <When type="Property" frame="$this/BattleMapFrame" IsArcade="False"/>
                 <When type="Property" frame="BattleModFrame" ExpansionLevel="3"/>
@@ -201,20 +207,12 @@
                 <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
                 <ScaleWidthToTexture val="True"/>
             </Frame>
-                
-            <Animation name="FadeIn">
-                <Event event="OnShown" action="Reset,Play"/>
-
-                <Controller name="FadeIn" type="Fade" end="Pause">
-                    <Key type="Curve" time="0.0" value="0" in="Auto"/>
-                    <Key type="Curve" time="0.20" value="255" in="Auto"/>
-                </Controller>
-            </Animation>
             
             <StateGroup name="VisibleState">
                 <DefaultState val="NotVisible"/>
                 
                 <State name="Visible">
+                    <When type="StateGroup" frame="$parent" LoadingState="Loaded"/>
                     <When type="Property" frame="$parent" MapHandle="0,0" operator="NotEqual"/>
                     <When type="AnimationState" frame="$this" IconState="Show"/>
                     <Action type="SetProperty" frame="$this" Visible="True"/>
@@ -232,7 +230,7 @@
             <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
             <Anchor side="Left" relative="$parent/ExpansionLevelIcon" pos="Max" offset="2"/>
             <Anchor side="Right" relative="$parent/TitleLabel" pos="Min" offset="-20"/>
-            <Height val="20"/>
+            <Height val="22"/>
             <AcceptsMouseTooltip val="True"/>
             <Options val="Ellipsis | TooltipIfTruncated | NoWrapping"/>
  
@@ -242,6 +240,19 @@
                 <Replacement index="0" val="{$parent/$parent/BattleMapFrame/@Name}"/>
                 <Replacement index="1" val="{$parent/$parent/BattleModFrame/@Name}"/>
             </Frame>
+            
+            <StateGroup name="VisibleState">
+                <DefaultState val="NotVisible"/>
+                
+                <State name="Visible">
+                    <When type="StateGroup" frame="$parent" LoadingState="Loaded"/>
+                    <Action type="SetProperty" frame="$this" Visible="True"/>
+                </State>
+
+                <State name="NotVisible">
+                    <Action type="SetProperty" frame="$this" Visible="False"/>
+                </State>
+            </StateGroup>
             
             <StateGroup name="StyleState">
                 <DefaultState val="Empty"/>
@@ -290,6 +301,69 @@
                 </State>
             </StateGroup>
         </Frame>
+
+        <Frame type="Frame" name="LoadingSpinner" template="StandardBattlenetTemplates/IdleSpinnerTemplate">
+            <Anchor side="Top" relative="$parent/BattleMapIcon" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent/BattleMapIcon" pos="Mid" offset="0"/>
+            <Anchor side="Left" relative="$parent/BattleMapIcon" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent/BattleMapIcon" pos="Mid" offset="0"/>
+            <Width val="34"/>
+            <Height val="34"/>
+            <Visible val="false"/>
+            
+            <StateGroup name="VisibleState">
+                <DefaultState val="NotVisible"/>
+                
+                <State name="Visible">
+                    <When type="StateGroup" frame="$parent" LoadingState="Loading"/>
+                    <Action type="SetProperty" frame="$this" Visible="True"/>
+                </State>
+
+                <State name="NotVisible">
+                    <Action type="SetProperty" frame="$this" Visible="False"/>
+                </State>
+            </StateGroup>
+        </Frame>
+                
+         <Frame type="Label" name="LoadingLabel">
+            <Anchor relative="$parent/MapName"/>
+            <AcceptsMouseTooltip val="True"/>
+            <Options val="Ellipsis | TooltipIfTruncated | NoWrapping"/>
+            <Style val="@InternationalListItemTitle_Small_Standard_Normal"/>
+            <Text val="{$this/FormattedLoadingText/@Text}"/>
+ 
+            <Frame type="TextFormatFrame" name="FormattedLoadingText">
+                <Anchor relative="$parent"/>
+                <FormatText val="@UI/WaitingLoading"/>
+                <Replacement index="0" val=""/>
+                <ReplacedName index="0" val="dots"/>
+            </Frame>
+            
+            <Animation name="Show">
+                <Event event="OnShown" frame="$parent" action="Reset,Play"/>
+                 
+                <Controller type="Property" frame="FormattedLoadingText" property="Replacement" index="0" end="Loop">
+                    <Key type="Property" time="0" value=""/>
+                    <Key type="Property" time=".25" value="@UI/WaitingDot1"/>
+                    <Key type="Property" time=".5" value="@UI/WaitingDot2"/>
+                    <Key type="Property" time=".75" value="@UI/WaitingDot3"/>
+                    <Key type="Property" time="1" value="@UI/WaitingDot3"/>
+                </Controller>
+            </Animation>
+            
+            <StateGroup name="VisibleState">
+                <DefaultState val="NotVisible"/>
+                
+                <State name="Visible">
+                    <When type="StateGroup" frame="$parent" LoadingState="Loading"/>
+                    <Action type="SetProperty" frame="$this" Visible="True"/>
+                </State>
+
+                <State name="NotVisible">
+                    <Action type="SetProperty" frame="$this" Visible="False"/>
+                </State>
+            </StateGroup>
+        </Frame>
         
         <!-- Lobby Name -->
          <Frame type="Label" name="TitleLabel">
@@ -300,6 +374,19 @@
             <Height val="20"/>
             <Style val="@CustomGames_ListItem_Normal"/>
             <Text val="{$parent/@LobbyName}"/>
+            
+            <StateGroup name="VisibleState">
+                <DefaultState val="NotVisible"/>
+                
+                <State name="Visible">
+                    <When type="StateGroup" frame="$parent" LoadingState="Loaded"/>
+                    <Action type="SetProperty" frame="$this" Visible="True"/>
+                </State>
+
+                <State name="NotVisible">
+                    <Action type="SetProperty" frame="$this" Visible="False"/>
+                </State>
+            </StateGroup>
             
             <StateGroup name="StyleState">
                 
@@ -351,9 +438,22 @@
             <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
             <Anchor side="Left" relative="$parent/$parent/$parent/ModeName" pos="Min" offset="0"/>
             <Anchor side="Right" relative="$parent/PlayerCount" pos="Min" offset="-20"/>
-            <Height val="20"/>
+            <Height val="22"/>
             <Style val="{$parent/TitleLabel/@Style}"/>
             <Text val="{$parent/BattleMapVariantFrame/@ModeName}"/>
+            
+            <StateGroup name="VisibleState">
+                <DefaultState val="NotVisible"/>
+                
+                <State name="Visible">
+                    <When type="StateGroup" frame="$parent" LoadingState="Loaded"/>
+                    <Action type="SetProperty" frame="$this" Visible="True"/>
+                </State>
+
+                <State name="NotVisible">
+                    <Action type="SetProperty" frame="$this" Visible="False"/>
+                </State>
+            </StateGroup>
         </Frame>
 
         <Frame type="BattleMapVariantFrame" name="BattleMapVariantFrame">
@@ -376,7 +476,7 @@
             <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
             <Anchor side="Left" relative="$parent/$parent/$parent/PlayerCountIcon" pos="Mid" offset="0"/>
             <Anchor side="Right" relative="$parent/$parent/$parent/PlayerCountIcon" pos="Mid" offset="0"/>
-            <Height val="20"/>
+            <Height val="24"/>
             <Style val="{$parent/TitleLabel/@Style}"/>
             <Text val="{$parent/PlayerCountFormatFrame/@Text}"/>
             
@@ -384,6 +484,7 @@
                 <DefaultState val="NotVisible"/>
             
                 <State name="Visible">
+                    <When type="StateGroup" frame="$parent" LoadingState="Loaded"/>
                     <When type="StateGroup" frame="$parent" EmptyState="NotEmpty"/>
                     <Action type="SetProperty" frame="$this" Visible="True"/>
                 </State>
@@ -400,9 +501,22 @@
             <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
             <Anchor side="Left" relative="$parent/$parent/$parent/HostName" pos="Min" offset="0"/>
             <Anchor side="Right" relative="$parent/EquippedIcon" pos="Min" offset="-20"/>
-            <Height val="20"/>
+            <Height val="22"/>
             <Style val="{$parent/TitleLabel/@Style}"/>
             <Text val="{$parent/@HostName}"/>
+            
+            <StateGroup name="VisibleState">
+                <DefaultState val="NotVisible"/>
+                
+                <State name="Visible">
+                    <When type="StateGroup" frame="$parent" LoadingState="Loaded"/>
+                    <Action type="SetProperty" frame="$this" Visible="True"/>
+                </State>
+
+                <State name="NotVisible">
+                    <Action type="SetProperty" frame="$this" Visible="False"/>
+                </State>
+            </StateGroup>
         </Frame>
             
         <!-- EQUIPPED ICON -->
@@ -419,6 +533,22 @@
             </State>
             <State name="NotEquipped">
             </State>
+        </StateGroup>
+        
+        <StateGroup name="LoadingState">
+            <DefaultState val="NotLoaded"/>
+            
+            <State name="Loaded">
+                <When type="StateGroup" EmptyState="NotEmpty"/>
+                <When type="Property" frame="BattleMapFrame" operator="NotEqual" Name=""/>
+                <When type="Property" frame="BattleMapIcon" operator="NotEqual" ImagePath=""/>
+            </State>
+            
+            <State name="Loading">
+                <When type="StateGroup" EmptyState="NotEmpty"/>
+            </State>
+            
+            <State name="NotLoaded"/>
         </StateGroup>
     </Frame>
     
@@ -775,6 +905,23 @@
                             </Frame>
                         </Frame>
                     </Frame>
+                    
+                    <!-- Determines whether or not both the Lobby preview and game info have been fully loaded -->
+                    <StateGroup name="LoadingState">
+                        <DefaultState val="NotLoaded"/>
+                    
+                        <State name="Loaded">
+                            <When type="Property" frame="BattleMapFrame" operator="NotEqual" MapHandle="0,0"/>
+                            <When type="Property" frame="BottomSection/Panel1/LobbyPreview/TeamTileList" operator="GreaterThan" DataCount="0"/>
+                            <When type="AnimationState" frame="InfoPanel/Panel1/BattleMapInfoPanel" GameInfo="Loaded"/>
+                        </State>
+                    
+                        <State name="Loading">
+                            <When type="Property" frame="BattleMapFrame" operator="NotEqual" MapHandle="0,0"/>
+                        </State>
+                        
+                        <State name="NotLoaded"/>
+                    </StateGroup>
                 </Frame>
             </Frame>
         </Frame>

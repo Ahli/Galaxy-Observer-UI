@@ -51,333 +51,6 @@
     
     <!-- 
     ========================
-    MELEE LIST ITEM TEMPLATE
-    ========================
-    -->
-    <Frame type="CustomGameTileListItem" name="MeleeListItemTemplate" template="StandardTileListTemplates/StandardSmallTileListItemTemplate">
-        <ContextMenu val="$parent/$parent/$parent/$parent/$parent/ItemContextMenu"/>
-        <HasItemContextMenu val="true"/>
-        <HideWhenCleared val="False"/>
-
-        <Frame type="BattleMapFrame" name="BattleModFrame">
-            <Anchor relative="$parent"/>
-            <MapHandle val="{$parent/@ModHandle}"/>
-        </Frame>
-
-        <Frame type="BattleMapFrame" name="BattleMapFrame">
-            <Anchor relative="$parent"/>
-            <MapHandle val="{$parent/@MapHandle}"/>
-        </Frame>
-                
-        <!-- ExtensionState -->
-        <StateGroup name="ExtensionState">
-            <DefaultState val="NoExtension"/>
-            <State name="Extension">
-                <When type="Property" frame="$this" ModHandle="0,0" operator="NotEqual"/>
-            </State>
-            <State name="NoExtension"/>
-        </StateGroup>
-                
-        <!-- BookmarkedState -->
-        <StateGroup name="BookmarkedState">
-            <DefaultState val="Bookmarked"/>
-            <State name="NotBookmarked">
-                <When type="Property" frame="$this/BattleMapFrame" IsBookmarked="False"/>
-                <When type="Property" frame="$this/BattleModFrame" IsBookmarked="False"/>
-            </State>
-            <State name="Bookmarked"/>
-        </StateGroup>
-        
-         <Frame type="Frame" name="AnchorFrame">
-            <Anchor side="Left" relative="$parent/$parent" pos="Min" offset="16"/>
-            <Anchor side="Right" relative="$parent/$parent/ScrollBar" pos="Min" offset="-2"/>
-        </Frame>
-        
-         <!-- MaxPlayers Label -->
-         <Frame type="Label" name="MaxPlayersLabel">
-            <Anchor side="Top" relative="$parent/AnchorFrame" pos="Mid" offset="1"/>
-            <Anchor side="Bottom" relative="$parent/AnchorFrame" pos="Mid" offset="1"/>
-            <Anchor side="Left" relative="$parent/$parent/$parent/PlayerCountIcon" pos="Mid" offset="1"/>
-            <Anchor side="Right" relative="$parent/$parent/$parent/PlayerCountIcon" pos="Mid" offset="1"/>
-            <Style val="@CustomGames_Melee_PlayerCount_Normal"/>
-            <Text val="2"/>
-            
-            <StateGroup name="VisibleState">
-                <DefaultState val="NotVisible"/>
-                
-                <State name="Visible">
-                    <When type="Property" frame="$parent" HasData="True"/>
-                    <Action type="SetProperty" frame="$this" Visible="True"/>
-                </State>
-
-                <State name="NotVisible">
-                    <Action type="SetProperty" frame="$this" Visible="False"/>
-                </State>
-            </StateGroup>
-            
-            <StateGroup name="StyleState">
-                <DefaultState val="Normal"/>
-                
-                <State name="Selected">
-                    <When type="StateGroup" frame="$parent" SelectedState="Selected"/>
-                    <Action type="SetProperty" frame="$this" Style="@CustomGames_Melee_PlayerCount_Selected"/>
-                </State>
-                
-                <State name="Hovered">
-                    <When type="StateGroup" frame="$parent" HoveredState="Hovered"/>
-                    <Action type="SetProperty" frame="$this" Style="@CustomGames_Melee_PlayerCount_Hovered"/>
-                </State>
-                
-                <State name="Normal">
-                    <Action type="SetProperty" frame="$this" Style="@CustomGames_Melee_PlayerCount_Normal"/>
-                </State>
-            </StateGroup>
-        </Frame>
-        
-        <!-- MaxPlayersVariantLabel -->
-         <Frame type="Label" name="MaxPlayersVariantLabel">
-            <Anchor side="Top" relative="$parent/AnchorFrame" pos="Min" offset="0"/>
-            <Anchor side="Bottom" relative="$parent/AnchorFrame" pos="Max" offset="0"/>
-            <Anchor side="Left" relative="$parent/AnchorFrame" pos="Min" offset="0"/>
-            <Width val="30"/>
-            <Style val="@CustomGames_Melee_PlayerCount"/>
-            <Visible val="false"/>
-        </Frame>
-        
-        <!-- ModLabel -->
-         <Frame type="Label" name="ModLabel">
-            <Anchor side="Top" relative="$parent/AnchorFrame" pos="Min" offset="0"/>
-            <Anchor side="Bottom" relative="$parent/AnchorFrame" pos="Max" offset="0"/>
-            <Anchor side="Left" relative="$parent/AnchorFrame" pos="Min" offset="0"/>
-            <Width val="30"/>
-            <Style val="@CustomGames_Melee_PlayerCount"/>
-            <Visible val="false"/>
-        </Frame>
-                
-        <!-- Map/Game Name -->
-        <Frame type="Label" name="Name">
-            <Anchor side="Top" relative="$parent/AnchorFrame" pos="Mid" offset="0"/>
-            <Anchor side="Bottom" relative="$parent/AnchorFrame" pos="Mid" offset="0"/>
-            <Anchor side="Left" relative="$parent/MaxPlayersLabel" pos="Max" offset="0"/>
-            <Width val="200"/>
-            <Height val="20"/>
-            <Style val="@CustomGames_ListItem_Normal"/>
-            <Text val="Map/Game Name"/>
-            <Visible val="False"/>
-        </Frame>
-                
-        <!-- Map/Game Name -->
-        <Frame type="Label" name="MapName">
-            <Anchor side="Top" relative="$parent/AnchorFrame" pos="Mid" offset="0"/>
-            <Anchor side="Bottom" relative="$parent/AnchorFrame" pos="Mid" offset="0"/>
-            <Anchor side="Left" relative="$parent/$parent/$parent/MapName" pos="Min" offset="0"/>
-            <Anchor side="Right" relative="$parent/TitleLabel" pos="Min" offset="-10"/>
-            <Height val="20"/>
-            <Style val="@CustomGames_ListItem_Normal"/>
- 
-            <Frame type="TextFormatFrame" name="FormattedMapName">
-                <Anchor relative="$parent"/>
-                <Replacement index="0" val="{$parent/$parent/Name/@Text}"/>
-                <Replacement index="1" val="{$parent/$parent/BattleModFrame/@Name}"/>
-            </Frame>
-            
-            <StateGroup name="StyleState">
-                <DefaultState val="Empty"/>
-                
-                <State name="ExtensionSelected">
-                    <When type="StateGroup" frame="$parent" SelectedState="Selected"/>
-                    <When type="StateGroup" frame="$parent" ExtensionState="Extension"/>
-                    <Action type="SetProperty" frame="$this/FormattedMapName" FormatText="@UI/ScreenCustomGames/MapWithMod/Selected"/>
-                    <Action type="SetProperty" frame="$this" Text="{$this/FormattedMapName/@Text}"/>
-                </State>
-                
-                <State name="ExtensionHovered">
-                    <When type="StateGroup" frame="$parent" HoveredState="Hovered"/>
-                    <When type="StateGroup" frame="$parent" ExtensionState="Extension"/>
-                    <Action type="SetProperty" frame="$this/FormattedMapName" FormatText="@UI/ScreenCustomGames/MapWithMod/Hovered"/>
-                    <Action type="SetProperty" frame="$this" Text="{$this/FormattedMapName/@Text}"/>
-                </State>
-                
-                <State name="ExtensionNormal">
-                    <When type="StateGroup" frame="$parent" EmptyState="NotEmpty"/>
-                    <When type="StateGroup" frame="$parent" ExtensionState="Extension"/>
-                    <Action type="SetProperty" frame="$this/FormattedMapName" FormatText="@UI/ScreenCustomGames/MapWithMod/Normal"/>
-                    <Action type="SetProperty" frame="$this" Text="{$this/FormattedMapName/@Text}"/>
-                </State>
-                
-                <State name="Selected">
-                    <When type="StateGroup" frame="$parent" SelectedState="Selected"/>
-                    <Action type="SetProperty" frame="$this" Style="@InternationalListItemTitle_Small_Standard_Selected"/>
-                    <Action type="SetProperty" frame="$this" Text="{$parent/Name/@Text}"/>
-                </State>
-                
-                <State name="Hovered">
-                    <When type="StateGroup" frame="$parent" HoveredState="Hovered"/>
-                    <Action type="SetProperty" frame="$this" Style="@InternationalListItemTitle_Small_Standard_Hovered"/>
-                    <Action type="SetProperty" frame="$this" Text="{$parent/Name/@Text}"/>
-                </State>
-                
-                <State name="Normal">
-                    <When type="StateGroup" frame="$parent" EmptyState="NotEmpty"/>
-                    <Action type="SetProperty" frame="$this" Style="@InternationalListItemTitle_Small_Standard_Normal"/>
-                    <Action type="SetProperty" frame="$this" Text="{$parent/Name/@Text}"/>
-                </State>
-
-                <State name="Empty">
-                    <Action type="SetProperty" frame="$this" Text=""/>
-                </State>
-            </StateGroup>
-        </Frame>
-        
-        <!-- Mode Label -->
-        <Frame type="Label" name="Mode">
-            <Anchor side="Top" relative="$parent/AnchorFrame" pos="Mid" offset="0"/>
-            <Anchor side="Bottom" relative="$parent/AnchorFrame" pos="Mid" offset="0"/>
-            <Anchor side="Left" relative="$parent/MaxPlayersLabel" pos="Max" offset="0"/>
-            <Width val="200"/>
-            <Height val="20"/>
-            <Style val="@CustomGames_ListItem_Normal"/>
-            <Visible val="false"/>
-        </Frame>
-        
-        <!-- Categories Label -->
-        <Frame type="Label" name="CategoriesLabel">
-            <Anchor side="Top" relative="$parent/AnchorFrame" pos="Mid" offset="0"/>
-            <Anchor side="Bottom" relative="$parent/AnchorFrame" pos="Mid" offset="0"/>
-            <Anchor side="Left" relative="$parent/Mode" pos="Max" offset="0"/>
-            <Width val="200"/>
-            <Height val="20"/>
-            <Style val="@CustomGames_ListItem_Normal"/>
-            <Visible val="false"/>
-        </Frame>
-        
-        <!-- Author Name Label -->
-        <Frame type="Label" name="TitleLabel">
-            <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
-            <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
-            <Anchor side="Left" relative="$parent/$parent/$parent/AuthorName" pos="Min" offset="0"/>
-            <Anchor side="Right" relative="$parent/AnchorFrame" pos="Max" offset="-15"/>
-            <Height val="20"/>
-            <Style val="@CustomGames_ListItem_Normal"/>
-            <Text val="{$parent/@AuthorName}"/>
-
-            <StateGroup name="VisibleState">
-                <DefaultState val="NotVisible"/>
-                
-                <State name="Visible">
-                    <When type="Property" frame="$parent/BattleMapFrame" IsBlizzardMap="False"/>
-                    <Action type="SetProperty" frame="$this" Visible="True"/>
-                </State>
-
-                <State name="NotVisible">
-                    <Action type="SetProperty" frame="$this" Visible="False"/>
-                </State>
-            </StateGroup>
-            
-            <StateGroup name="StyleState">
-                
-                <State name="Locked">
-                    <Action type="SetProperty" frame="$this" Style="@InternationalListItemTitle_Small_Locked_Normal"/>
-                </State>
-            
-                <State name="EquippedSelected">
-                    <Action type="SetProperty" frame="$this" Style="@InternationalListItemTitle_Small_Standard_Selected"/>
-                </State>
-            
-                <State name="PurchasableSelected">
-                    <Action type="SetProperty" frame="$this" Style="@InternationalListItemTitle_Small_Standard_Selected"/>
-                </State>
-            
-                <State name="Selected">
-                    <Action type="SetProperty" frame="$this" Style="@InternationalListItemTitle_Small_Standard_Selected"/>
-                </State>
-                
-                <State name="EquippedHovered">
-                    <Action type="SetProperty" frame="$this" Style="@InternationalListItemTitle_Small_Standard_Hovered"/>
-                </State>
-            
-                <State name="PurchasableHovered">
-                    <Action type="SetProperty" frame="$this" Style="@InternationalListItemTitle_Small_Standard_Hovered"/>
-                </State>
-                
-                <State name="Hovered">
-                    <Action type="SetProperty" frame="$this" Style="@InternationalListItemTitle_Small_Standard_Hovered"/>
-                </State>
-
-                <State name="EquippedNormal">
-                    <Action type="SetProperty" frame="$this" Style="@InternationalListItemTitle_Small_Standard_Normal"/>
-                </State>
-            
-                <State name="PurchasableNormal">
-                    <Action type="SetProperty" frame="$this" Style="@InternationalListItemTitle_Small_Standard_Normal"/>
-                </State>
-
-                <State name="Normal">
-                    <Action type="SetProperty" frame="$this" Style="@InternationalListItemTitle_Small_Standard_Normal"/>
-                </State>
-            </StateGroup>
-        </Frame>
-        
-        <Frame type="Image" name="BlizzardAuthoredIcon">
-            <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
-            <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
-            <Anchor side="Left" relative="$parent/$parent/$parent/AuthorName" pos="Min" offset="3"/>
-            <Width val="44"/>
-            <Height val="20"/>
-            <Texture val="@UI/Glues_Icons_BlizzardAuthored_Normal"/>
-            <Visible val="False"/>
-            
-            <StateGroup name="VisibleState">
-                <DefaultState val="NotVisible"/>
-                
-                <State name="Visible">
-                    <When type="Property" frame="$parent/BattleMapFrame" IsBlizzardMap="True"/>
-                    <Action type="SetProperty" frame="$this" Visible="True"/>
-                </State>
-
-                <State name="NotVisible">
-                    <Action type="SetProperty" frame="$this" Visible="False"/>
-                </State>
-            </StateGroup>
-            
-            <StateGroup name="DisplayState">
-                <DefaultState val="Normal"/>
-                
-                <State name="Selected">
-                    <When type="StateGroup" frame="$parent" SelectedState="Selected"/>
-                    <Action type="SetProperty" frame="$this" Texture="@UI/Glues_Icons_BlizzardAuthored_Selected"/>
-                </State>
-                
-                <State name="Hovered">
-                    <When type="StateGroup" frame="$parent" HoveredState="Hovered"/>
-                    <Action type="SetProperty" frame="$this" Texture="@UI/Glues_Icons_BlizzardAuthored_Hovered"/>
-                </State>
-                
-                <State name="Normal">
-                    <Action type="SetProperty" frame="$this" Texture="@UI/Glues_Icons_BlizzardAuthored_Normal"/>
-                </State>
-            </StateGroup>
-        </Frame>
-            
-        <!-- EQUIPPED ICON -->
-        <Frame type="Image" name="EquippedIcon">
-            <Anchor side="Top" relative="$parent/AnchorFrame" pos="Min" offset="0"/>
-            <Anchor side="Right" relative="$parent/AnchorFrame" pos="Max" offset="0"/>
-            <Texture val="@UI/Glues_Battlenet_PageAssets_StandardListItem_Icon_Bookmark"/>
-        </Frame>
-        
-        <StateGroup name="EquippedState">
-            <DefaultState val="NotEquipped"/>
-            <State name="Equipped">
-                <When type="StateGroup" frame="$this" BookmarkedState="Bookmarked"/>
-            </State>
-            <State name="NotEquipped">
-            </State>
-        </StateGroup>
-    </Frame>
-    
-    <!-- 
-    ========================
     MELEE MAP LIST TEMPLATE
     ========================
     -->
@@ -419,91 +92,91 @@
             <AcceptsMouse val="true"/>
             <RequireSelection val="true"/>
                 
-            <Frame type="CustomGameTileListItem" name="Item0" template="CustomGamesMelee/MeleeListItemTemplate">
+            <Frame type="CustomGameTileListItem" name="Item0" template="CustomGamesTemplates/MeleeListItemTemplate">
                 <Frame type="Frame" name="AnchorFrame">
                     <Anchor side="Top" relative="$parent/$parent" pos="Min" offset="4"/>
                 </Frame>
             </Frame>
 
-            <Frame type="CustomGameTileListItem" name="Item1" template="CustomGamesMelee/MeleeListItemTemplate">
+            <Frame type="CustomGameTileListItem" name="Item1" template="CustomGamesTemplates/MeleeListItemTemplate">
                 <Frame type="Frame" name="AnchorFrame">
                     <Anchor side="Top" relative="$parent/$parent/Item0/AnchorFrame" pos="Max" offset="2"/>
                 </Frame>
             </Frame>
 
-            <Frame type="CustomGameTileListItem" name="Item2" template="CustomGamesMelee/MeleeListItemTemplate">
+            <Frame type="CustomGameTileListItem" name="Item2" template="CustomGamesTemplates/MeleeListItemTemplate">
                 <Frame type="Frame" name="AnchorFrame">
                     <Anchor side="Top" relative="$parent/$parent/Item1/AnchorFrame" pos="Max" offset="2"/>
                 </Frame>
             </Frame>
 
-            <Frame type="CustomGameTileListItem" name="Item3" template="CustomGamesMelee/MeleeListItemTemplate">
+            <Frame type="CustomGameTileListItem" name="Item3" template="CustomGamesTemplates/MeleeListItemTemplate">
                 <Frame type="Frame" name="AnchorFrame">
                     <Anchor side="Top" relative="$parent/$parent/Item2/AnchorFrame" pos="Max" offset="2"/>
                 </Frame>
             </Frame>
 
-            <Frame type="CustomGameTileListItem" name="Item4" template="CustomGamesMelee/MeleeListItemTemplate">
+            <Frame type="CustomGameTileListItem" name="Item4" template="CustomGamesTemplates/MeleeListItemTemplate">
                 <Frame type="Frame" name="AnchorFrame">
                     <Anchor side="Top" relative="$parent/$parent/Item3/AnchorFrame" pos="Max" offset="2"/>
                 </Frame>
             </Frame>
 
-            <Frame type="CustomGameTileListItem" name="Item5" template="CustomGamesMelee/MeleeListItemTemplate">
+            <Frame type="CustomGameTileListItem" name="Item5" template="CustomGamesTemplates/MeleeListItemTemplate">
                 <Frame type="Frame" name="AnchorFrame">
                     <Anchor side="Top" relative="$parent/$parent/Item4/AnchorFrame" pos="Max" offset="2"/>
                 </Frame>
             </Frame>
 
-            <Frame type="CustomGameTileListItem" name="Item6" template="CustomGamesMelee/MeleeListItemTemplate">
+            <Frame type="CustomGameTileListItem" name="Item6" template="CustomGamesTemplates/MeleeListItemTemplate">
                 <Frame type="Frame" name="AnchorFrame">
                     <Anchor side="Top" relative="$parent/$parent/Item5/AnchorFrame" pos="Max" offset="2"/>
                 </Frame>
             </Frame>
 
-            <Frame type="CustomGameTileListItem" name="Item7" template="CustomGamesMelee/MeleeListItemTemplate">
+            <Frame type="CustomGameTileListItem" name="Item7" template="CustomGamesTemplates/MeleeListItemTemplate">
                 <Frame type="Frame" name="AnchorFrame">
                     <Anchor side="Top" relative="$parent/$parent/Item6/AnchorFrame" pos="Max" offset="2"/>
                 </Frame>
             </Frame>
 
-            <Frame type="CustomGameTileListItem" name="Item8" template="CustomGamesMelee/MeleeListItemTemplate">
+            <Frame type="CustomGameTileListItem" name="Item8" template="CustomGamesTemplates/MeleeListItemTemplate">
                 <Frame type="Frame" name="AnchorFrame">
                     <Anchor side="Top" relative="$parent/$parent/Item7/AnchorFrame" pos="Max" offset="2"/>
                 </Frame>
             </Frame>
 
-            <Frame type="CustomGameTileListItem" name="Item9" template="CustomGamesMelee/MeleeListItemTemplate">
+            <Frame type="CustomGameTileListItem" name="Item9" template="CustomGamesTemplates/MeleeListItemTemplate">
                 <Frame type="Frame" name="AnchorFrame">
                     <Anchor side="Top" relative="$parent/$parent/Item8/AnchorFrame" pos="Max" offset="2"/>
                 </Frame>
             </Frame>
 
-            <Frame type="CustomGameTileListItem" name="Item10" template="CustomGamesMelee/MeleeListItemTemplate">
+            <Frame type="CustomGameTileListItem" name="Item10" template="CustomGamesTemplates/MeleeListItemTemplate">
                 <Frame type="Frame" name="AnchorFrame">
                     <Anchor side="Top" relative="$parent/$parent/Item9/AnchorFrame" pos="Max" offset="2"/>
                 </Frame>
             </Frame>
 
-            <Frame type="CustomGameTileListItem" name="Item11" template="CustomGamesMelee/MeleeListItemTemplate">
+            <Frame type="CustomGameTileListItem" name="Item11" template="CustomGamesTemplates/MeleeListItemTemplate">
                 <Frame type="Frame" name="AnchorFrame">
                     <Anchor side="Top" relative="$parent/$parent/Item10/AnchorFrame" pos="Max" offset="2"/>
                 </Frame>
             </Frame>
 
-            <Frame type="CustomGameTileListItem" name="Item12" template="CustomGamesMelee/MeleeListItemTemplate">
+            <Frame type="CustomGameTileListItem" name="Item12" template="CustomGamesTemplates/MeleeListItemTemplate">
                 <Frame type="Frame" name="AnchorFrame">
                     <Anchor side="Top" relative="$parent/$parent/Item11/AnchorFrame" pos="Max" offset="2"/>
                 </Frame>
             </Frame>
 
-            <Frame type="CustomGameTileListItem" name="Item13" template="CustomGamesMelee/MeleeListItemTemplate">
+            <Frame type="CustomGameTileListItem" name="Item13" template="CustomGamesTemplates/MeleeListItemTemplate">
                 <Frame type="Frame" name="AnchorFrame">
                     <Anchor side="Top" relative="$parent/$parent/Item12/AnchorFrame" pos="Max" offset="2"/>
                 </Frame>
             </Frame>
 
-            <Frame type="CustomGameTileListItem" name="Item14" template="CustomGamesMelee/MeleeListItemTemplate">
+            <Frame type="CustomGameTileListItem" name="Item14" template="CustomGamesTemplates/MeleeListItemTemplate">
                 <Frame type="Frame" name="AnchorFrame">
                     <Anchor side="Top" relative="$parent/$parent/Item13/AnchorFrame" pos="Max" offset="2"/>
                 </Frame>

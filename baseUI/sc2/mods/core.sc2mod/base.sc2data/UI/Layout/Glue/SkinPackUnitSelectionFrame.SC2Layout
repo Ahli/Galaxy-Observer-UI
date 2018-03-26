@@ -695,6 +695,81 @@
             <GameContent val="{$parent/ContentContainer/SecondaryPanel/UnitSkinSelectionFrame/@SelectedGameContent}"/>
         </Frame>
         
+        <Frame type="Button" name="ViewBundleButton" template="StandardBattlenetTemplates/BattlenetStandardButtonTemplate">
+            <Anchor side="Bottom" relative="$Anchor_ActionButton" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent/BuyButton" pos="Max" offset="5"/>
+            <CollapseLayout val="true"/>
+            <Text val="@UI/ScreenCollection/Buttons/ViewBundle"/>
+
+            <StateGroup name="ViewBundleVisibilityStateGroup">
+                <DefaultState val="ViewBundleNotVisible"/>
+
+                <State name="CanEquip">
+                    <When type="AnimationState" frame="$parent/SelectUnlockableButton/RewardCacheFrame" AllowedState="Allowed"/>
+                    <Action type="SetProperty" frame="$this" visible="False"/>
+                </State>
+
+                <State name="HasBundle">
+                    <When type="Property" frame="$parent/SelectedBundleFrame" operator="NotEqual" Bundle=""/>
+                    <Action type="SetProperty" frame="$this" visible="True"/>
+                </State>
+
+                <State name="ViewBundleNotVisible">
+                    <Action type="SetProperty" frame="$this" visible="False"/>
+                </State>
+            </StateGroup>
+
+            <Animation name="Event">
+                <Event event="OnClick" action="Reset,Play"/>
+
+                <Controller type="Property" frame="$parent/SelectedBundleFrame" property="Visible" end="Pause">
+                    <Key type="Property" time="0" value="false"/>
+                    <Key type="Property" time="0.01" value="true"/>
+                </Controller>
+            </Animation>
+        </Frame>
+        
+        <Frame type="SelectedBundleFrame" name="SelectedBundleFrame" template="SelectedBundleFrame/SelectedBundleFrameTemplate">
+            <Anchor side="Top" relative="$parent/$parent" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent/$parent" pos="Min" offset="0"/>
+            <Anchor side="Bottom" relative="$parent/$parent" pos="Max" offset="0"/>
+            <Anchor side="Right" relative="$parent/$parent" pos="Max" offset="0"/>
+            <Bundle val="{$parent/SelectUnlockableButton/RewardCacheFrame/@ParentBundle}"/>
+            <RenderPriority val="600"/>
+
+            <Frame type="BuyButton" name="BuyButton" template="CollectionTemplates/BuyButtonTemplate">
+                <ShowPrice val="true"/>
+                <AlwaysShow val="true"/>
+
+                <GameContent val="{$parent/BundleCacheFrame/@GameContent}"/>
+                <CollapseLayout val="false"/>
+            </Frame>
+
+            <Frame type="BundleCacheFrame" name="BundleCacheFrame">
+                <Anchor relative="$parent"/>
+                <Bundle val="{$parent/@Bundle}"/>
+            </Frame>
+
+            <Frame type="GameContentFrame" name="GameContentFrame">
+                <Anchor relative="$parent"/>
+                <GameContent val="{$parent/BundleCacheFrame/@GameContent}"/>
+            </Frame>
+
+            <Frame type="StoreCacheFrame" name="StoreCacheFrame">
+                <Anchor relative="$parent"/>
+                <GameContent val="{$parent/BundleCacheFrame/@GameContent}"/>
+            </Frame>
+
+            <Animation name="Event">
+                <Event event="OnClick" frame="$this/CloseButton" action="Reset,Play"/>
+
+                <Controller type="Property" property="Visible" end="Pause">
+                    <Key type="Property" time="0" value="true"/>
+                    <Key type="Property" time="0.01" value="false"/>
+                </Controller>
+            </Animation>
+        </Frame>
+        
         <Frame type="Frame" name="EquippedWarningContainer" template="CollectionTemplates/EquippedWarningContainerTemplate">
             <Anchor side="Top" relative="$parent/SelectUnlockableButton" pos="Min" offset="0"/>
             <Anchor side="Left" relative="$parent/SelectUnlockableButton" pos="Max" offset="13"/>
