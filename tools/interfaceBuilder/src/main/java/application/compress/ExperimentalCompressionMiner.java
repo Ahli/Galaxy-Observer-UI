@@ -42,6 +42,7 @@ public class ExperimentalCompressionMiner {
 		this.fileService = fileService;
 		mpqInterface = new MpqEditorInterface(mpqCachePath + Thread.currentThread().getId(), mpqEditorPath);
 		mod.setMpqCacheDirectory(new File(mpqInterface.getMpqCachePath()));
+		mpqInterface.clearCacheExtractedMpq();
 		fileService.copyFileOrDirectory(mod.getSourceDirectory(), mpqInterface.getCache());
 		rules = createInitialRuleset(mod.getSourceDirectory().toPath());
 		bestRuleSet = deepCopy(rules);
@@ -127,5 +128,12 @@ public class ExperimentalCompressionMiner {
 	
 	public long getBestSize() {
 		return bestSize;
+	}
+	
+	/**
+	 * Removes files that were used during the compression mining.
+	 */
+	public void cleanUp() {
+		mpqInterface.clearCacheExtractedMpq();
 	}
 }

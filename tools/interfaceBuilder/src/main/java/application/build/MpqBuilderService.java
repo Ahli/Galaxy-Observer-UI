@@ -195,7 +195,7 @@ public class MpqBuilderService {
 						threadsMpqInterface.setCustomCompressionRules(ruleSet.getCompressionRules());
 					}
 				}
-				
+				threadsMpqInterface.clearCacheExtractedMpq();
 				buildFile(interfaceDirectory, game, threadsMpqInterface, compressXml, compressMpqSetting,
 						buildUnprotectedToo, repairLayoutOrder, verifyLayout, verifyXml, project);
 				threadsMpqInterface.clearCacheExtractedMpq();

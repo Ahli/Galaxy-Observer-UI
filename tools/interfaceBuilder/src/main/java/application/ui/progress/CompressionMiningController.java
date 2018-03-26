@@ -210,6 +210,8 @@ public class CompressionMiningController implements Updateable {
 						Thread.sleep(50);
 						if (Thread.currentThread().isInterrupted() || expCompMiner == null || task == null) {
 							logger.info("Stopping the mining task.");
+							expCompMiner.cleanUp();
+							expCompMiner = null;
 							return;
 						}
 					}
@@ -234,7 +236,6 @@ public class CompressionMiningController implements Updateable {
 		if (expCompMiner != null) {
 			final long newBest = expCompMiner.getBestSize();
 			project.setBestCompressionRuleSet(new RuleSet(expCompMiner.getBestRuleSet()));
-			expCompMiner = null;
 			logger.info(String.format("Best Compression mined has compression producing size: %s", newBest / 1024));
 			projectService.saveProject(project);
 		}
