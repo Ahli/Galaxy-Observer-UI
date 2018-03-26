@@ -140,11 +140,6 @@ public class AppConfiguration {
 		return basePath().getParent() + File.separator + "baseUI";
 	}
 	
-	//	@Bean
-	//	ExperimentalCompressionMiner experimentalCompressionMiner() throws InterruptedException, MpqException, IOException {
-	//		return new ExperimentalCompressionMiner(modData);
-	//	}
-	
 	@Bean
 	public GameService gameService() {
 		return new GameService();
