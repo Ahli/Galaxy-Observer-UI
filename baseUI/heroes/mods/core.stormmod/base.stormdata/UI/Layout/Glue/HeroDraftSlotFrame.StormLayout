@@ -372,6 +372,16 @@
         <Action type="SetState" group="SlotVisualState" state="HiddenSelection" />
       </State>
     </StateGroup>
+    <StateGroup name="PlayerNameStateController">
+      <State name="ShowPlayerName">
+        <When type="Property" PlayerNameState="ShowPlayerName" />
+        <Action type="SetState" group="PlayerNameVisualState" state="ShowPlayerName" />
+      </State>
+      <State name="ShowPlayerNumber">
+        <When type="Property" PlayerNameState="ShowPlayerNumber" />
+        <Action type="SetState" group="PlayerNameVisualState" state="ShowPlayerNumber" />
+      </State>
+    </StateGroup>
     <StateGroup name="PortraitOverlayState">
       <State name="None">
         <Action type="SetProperty" frame="PortraitContainer/PortraitOverlay" Visible="False" />
@@ -408,13 +418,13 @@
       <DefaultState val="NotSelectedNotYourTurn" />
       <State name="PreviewSelect">
         <Action type="SetState" group="PortraitState" state="HeroAndBackground" />
-        <Action type="SetState" group="HeroLabelState" state="Hidden" />
+        <Action type="SetState" group="HeroLabelState" state="Previewing" />
         <Action type="SetState" group="NameLabelState" state="NotSelected" />
         <Action type="SetState" group="PortraitOverlayState" state="Regular" />
       </State>
       <State name="PreviewSelectNotYourTurn">
         <Action type="SetState" group="PortraitState" state="HeroOnly" />
-        <Action type="SetState" group="HeroLabelState" state="Hidden" />
+        <Action type="SetState" group="HeroLabelState" state="PreviewingNotYourTurn" />
         <Action type="SetState" group="NameLabelState" state="Disabled" />
         <Action type="SetState" group="PortraitOverlayState" state="Regular" />
       </State>
@@ -432,19 +442,19 @@
       </State>
       <State name="SelectedNotYourTurn">
         <Action type="SetState" group="PortraitState" state="HeroOnly" />
-        <Action type="SetState" group="HeroLabelState" state="Disabled" />
-        <Action type="SetState" group="NameLabelState" state="Disabled" />
+        <Action type="SetState" group="HeroLabelState" state="SelectedNotYourTurn" />
+        <Action type="SetState" group="NameLabelState" state="SelectedNotYourTurn" />
         <Action type="SetState" group="PortraitOverlayState" state="NotYourTurn" />
       </State>
       <State name="NotSelectedYourTurn">
         <Action type="SetState" group="PortraitState" state="BackgroundOnly" />
-        <Action type="SetState" group="HeroLabelState" state="Hidden" />
+        <Action type="SetState" group="HeroLabelState" state="NotSelected" />
         <Action type="SetState" group="NameLabelState" state="NotSelected" />
         <Action type="SetState" group="PortraitOverlayState" state="None" />
       </State>
       <State name="NotSelectedNotYourTurn">
         <Action type="SetState" group="PortraitState" state="None" />
-        <Action type="SetState" group="HeroLabelState" state="Hidden" />
+        <Action type="SetState" group="HeroLabelState" state="NotSelectedNotYourTurn" />
         <Action type="SetState" group="NameLabelState" state="Disabled" />
         <Action type="SetState" group="PortraitOverlayState" state="None" />
       </State>
@@ -458,9 +468,18 @@
       <State name="HiddenSelection">
         <Action type="SetState" group="PortraitState" state="BackgroundOnly" />
         <Action type="SetProperty" frame="PortraitContainer/UnknownSelection" Visible="True" />
-        <Action type="SetState" group="HeroLabelState" state="Picking" />
+        <Action type="SetState" group="HeroLabelState" state="HiddenForObservers" />
         <Action type="SetState" group="NameLabelState" state="NotSelected" />
         <Action type="SetState" group="PortraitOverlayState" state="None" />
+      </State>
+    </StateGroup>
+    <StateGroup name="PlayerNameVisualState">
+      <DefaultState val="ShowPlayerNumber" />
+      <State name="ShowPlayerName">
+        <Action type="SetState" group="PlayerNameLabelState" state="ShowPlayerName" />
+      </State>
+      <State name="ShowPlayerNumber">
+        <Action type="SetState" group="PlayerNameLabelState" state="ShowPlayerNumber" />
       </State>
     </StateGroup>
     <Frame type="Image" name="PortraitBorderSelectedGlowImage">
@@ -829,40 +848,32 @@
       <Width val="152" />
       <Height val="140" />
     </Frame>
-    <Frame type="Label" name="NameLabel">
-      <Anchor side="Top" relative="$parent/NameLabelBackgroundImage" pos="Min" offset="23" />
-      <Anchor side="Left" relative="$parent/NameLabelBackgroundImage" pos="Min" offset="27" />
-      <Anchor side="Right" relative="$parent/NameLabelBackgroundImage" pos="Max" offset="10" />
-      <Rotation val="#DraftNameRotationLeft" />
-      <RotationPosition val="TopLeft" />
-      <Style val="HeroDraftPlayerLeftName" />
-      <Options val="Ellipsis | NoWrapping" />
-      <HitTestTexture val="@UI/Storm_Draft_Nameplate_Hero_Selected_Blue" />
-    </Frame>
     <Frame type="Image" name="HeroLabelBackgroundImage">
       <Anchor side="Right" relative="$parent/NameLabelBackgroundImage" pos="Max" offset="-2" />
       <Anchor side="Top" relative="$parent/NameLabelBackgroundImage" pos="Mid" offset="-21" />
-      <Texture val="@UI/Storm_Draft_Nameplate_Hero_Selected_Blue" />
+      <Texture val="@UI/Storm_Draft_Nameplate_Hero_Disabled_Blue" />
       <Height val="112" />
       <Width val="140" />
     </Frame>
     <Frame type="Frame" name="PickingLabelBackgroundImage">
-      <Anchor relative="$parent/HeroLabelBackgroundImage" />
+      <Anchor relative="$parent/NameLabelBackgroundImage" />
       <Alpha val="0" />
       <Frame type="Image" name="PickingBackgroundImage">
         <Anchor relative="$parent" />
         <Texture val="@UI/storm_ui_glues_draft_nameplate_picking" />
       </Frame>
       <Frame type="Image" name="StripesImage">
-        <Anchor side="Left" relative="$parent" pos="Min" offset="2" />
-        <Anchor side="Top" relative="$parent" pos="Min" offset="2" />
-        <Width val="130" />
-        <Height val="101" />
+        <Anchor side="Left" relative="$parent" pos="Min" offset="9" />
+        <Anchor side="Top" relative="$parent" pos="Min" offset="1" />
+        <Width val="140" />
+        <Height val="140" />
         <LayerCount val="2" />
+        <BlendMode val="Add" />
+        <Alpha val="50" />
         <Texture val="@UI/storm_ui_glues_draft_nameplate_picking_stripes_mask" layer="0" />
         <AlphaLayer val="True" layer="0" />
         <Texture val="@UI/storm_ui_glues_draft_nameplate_picking_stripes" layer="1" />
-        <TextureCoords top="0" left="0" bottom=".94" right="1.37" layer="1" />
+        <TextureCoords top="0" left="0" bottom="1" right="1" layer="1" />
         <WrapUV val="True" layer="1" />
       </Frame>
       <Animation name="PreviewSelectPicking">
@@ -883,16 +894,46 @@
         </Controller>
       </Animation>
     </Frame>
-    <Frame type="Label" name="HeroLabel">
+    <Frame type="Label" name="NameLabel">
       <Anchor side="Top" relative="$parent/HeroLabelBackgroundImage" pos="Min" offset="11" />
       <Anchor side="Left" relative="$parent/HeroLabelBackgroundImage" pos="Min" offset="13" />
       <Anchor side="Right" relative="$parent/HeroLabelBackgroundImage" pos="Max" offset="10" />
+      <Rotation val="#DraftNameRotationLeft" />
+      <RotationPosition val="TopLeft" />
+      <Style val="HeroDraftPlayerLeftName" />
+      <Options val="Ellipsis | NoWrapping" />
+      <HitTestTexture val="@UI/Storm_Draft_Nameplate_Hero_Selected_Blue" />
+    </Frame>
+    <Frame type="Label" name="DraftFillNameLabel">
+      <Anchor side="Top" relative="$parent/HeroLabelBackgroundImage" pos="Min" offset="11" />
+      <Anchor side="Left" relative="$parent/HeroLabelBackgroundImage" pos="Min" offset="13" />
+      <Anchor side="Right" relative="$parent/HeroLabelBackgroundImage" pos="Max" offset="10" />
+      <Rotation val="#DraftNameRotationLeft" />
+      <RotationPosition val="TopLeft" />
+      <Style val="{$parent/NameLabel/@Style}" />
+    </Frame>
+    <Frame type="Label" name="HeroLabel">
+      <Anchor side="Top" relative="$parent/NameLabelBackgroundImage" pos="Min" offset="23" />
+      <Anchor side="Left" relative="$parent/NameLabelBackgroundImage" pos="Min" offset="27" />
+      <Anchor side="Right" relative="$parent/NameLabelBackgroundImage" pos="Max" offset="20" />
       <Rotation val="#DraftNameRotationLeft" />
       <RotationPosition val="TopLeft" />
       <Style val="HeroDraftHeroLeftName" />
       <Text val="@UI/HeroDraftPanel/Picking" />
       <Options val="Ellipsis | NoWrapping" />
       <HitTestTexture val="@UI/Storm_Draft_Nameplate_Hero_Selected_Blue" />
+    </Frame>
+    <Frame type="Label" name="ObserverHeroPickingLabel">
+      <Anchor side="Top" relative="$parent/NameLabelBackgroundImage" pos="Min" offset="23" />
+      <Anchor side="Left" relative="$parent/NameLabelBackgroundImage" pos="Min" offset="27" />
+      <Anchor side="Right" relative="$parent/NameLabelBackgroundImage" pos="Max" offset="20" />
+      <Rotation val="#DraftNameRotationLeft" />
+      <RotationPosition val="TopLeft" />
+      <Style val="HeroDraftHeroLeftName" />
+      <Text val="@UI/HeroDraftPanel/Picking" />
+      <Options val="Ellipsis | NoWrapping" />
+      <HitTestTexture val="@UI/Storm_Draft_Nameplate_Hero_Selected_Blue" />
+      <Alpha val="0" />
     </Frame>
     <Frame type="Image" name="SilencedIcon" template="StandardTemplates/SilencedIconTemplate">
       <Anchor side="Top" relative="$parent" pos="Mid" offset="65" />
@@ -918,14 +959,11 @@
       </StateGroup>
     </Frame>
     <Frame type="Frame" name="BanChooserFrame" template="HeroDraftSlotFrame/BanChooserFrameTemplate">
-      <Anchor side="Top" relative="$parent" pos="Min" offset="69" />
+      <Anchor side="Top" relative="$parent" pos="Min" offset="75" />
       <Anchor side="Left" relative="$parent" pos="Mid" offset="0" />
       <Anchor side="Right" relative="$parent" pos="Mid" offset="0" />
       <RenderPriority val="600" />
       <StateGroup name="BanChooserState">
-        <State name="BanChooserOff">
-          <When type="Property" frame="$ancestor[@type=HeroDraftPanel]" IsTournamentSpectator="True" />
-        </State>
         <State name="BanChooserBanning">
           <When type="AnimationState" frame="$parent" BanChooserState="BanChooserBanning" />
         </State>
@@ -978,22 +1016,6 @@
         </Animation>
       </Frame>
     </Frame>
-    <StateGroup name="HeroLabelTournamentOverride">
-      <State name="TournamentSelected">
-        <When type="StateGroup" HeroLabelState="Selected" />
-        <When type="Property" frame="$ancestor[@type=HeroDraftPanel]" IsTournamentSpectator="True" />
-        <When type="Property" operator="NotEqual" SlotState="Countdown" />
-        <Action type="SetProperty" frame="HeroLabel" Visible="false" />
-        <Action type="SetProperty" frame="HeroLabelBackgroundImage" Visible="false" />
-      </State>
-      <State name="TournamentDisabled">
-        <When type="StateGroup" HeroLabelState="Disabled" />
-        <When type="Property" frame="$ancestor[@type=HeroDraftPanel]" IsTournamentSpectator="True" />
-        <When type="Property" operator="NotEqual" SlotState="Countdown" />
-        <Action type="SetProperty" frame="HeroLabel" Visible="false" />
-        <Action type="SetProperty" frame="HeroLabelBackgroundImage" Visible="false" />
-      </State>
-    </StateGroup>
   </Frame>
   <Frame type="HeroDraftSlotFrame" name="HeroDraftSlotFrameLeftTemplate" template="HeroDraftSlotFrame/HeroDraftSlotFrameTemplate">
     <Animation name="IntroAnchor">
@@ -1008,25 +1030,26 @@
       <Anchor side="Left" relative="$parent/AnchorFrame" pos="Min" offset="-13" />
       <Width val="0" />
     </Frame>
-    <Frame type="Frame" name="PickingLabelBackgroundImage">
-      <Frame type="Image" name="StripesImage">
-        <Animation name="UVScroll">
-          <Event event="HiddenSelection" action="Reset,Play" frame="$parent/$parent" />
-          <Event event="NotSelectedPicking" action="Reset,Play" frame="$parent/$parent" />
-          <Event event="PreviewSelectPicking" action="Reset,Play" frame="$parent/$parent" />
-          <Controller type="LayerUV" layer="1" side="Left" relative="True" sidelock="True" end="Loop">
-            <Key type="Curve" time="0" value="-1" inout="Linear" />
-            <Key type="Curve" time="1.9" value="0" inout="Linear" />
-          </Controller>
-        </Animation>
-      </Frame>
-    </Frame>
     <Frame type="Image" name="NameLabelBackgroundImage">
       <Anchor side="Right" relative="$parent/BorderImage" pos="Mid" offset="22" />
       <Anchor side="Bottom" relative="$parent/BorderImage" pos="Max" offset="-11" />
       <Width val="152" />
       <Height val="140" />
       <Texture val="@UI/Storm_Draft_Nameplate_NotSelected_Blue" />
+    </Frame>
+    <Frame type="Frame" name="PickingLabelBackgroundImage">
+      <Frame type="Image" name="StripesImage">
+        <LayerColor val="92cdff" />
+        <Animation name="UVScroll">
+          <Event event="HiddenSelection" action="Reset,Play" frame="$parent/$parent" />
+          <Event event="NotSelectedPicking" action="Reset,Play" frame="$parent/$parent" />
+          <Event event="PreviewSelectPicking" action="Reset,Play" frame="$parent/$parent" />
+          <Controller type="LayerUV" layer="1" side="Left" relative="True" sidelock="True" end="Loop">
+            <Key type="Curve" time="0" value="-1" inout="Linear" />
+            <Key type="Curve" time="2.5" value="0" inout="Linear" />
+          </Controller>
+        </Animation>
+      </Frame>
     </Frame>
     <Frame type="CutsceneFrame" name="HeroSelectedCutscene">
       <Animation name="SetFilters">
@@ -1120,6 +1143,10 @@
       <ContextMenu val="$ancestor[@type=HeroDraftPanel]/VoiceOnlyContextMenu" />
     </Frame>
     <StateGroup name="NameLabelState">
+      <State name="SelectedNotYourTurn">
+        <Action type="SetProperty" frame="NameLabel" Style="HeroDraftPlayerLeftName_Disabled" />
+        <Action type="SetProperty" frame="NameLabelBackgroundImage" Texture="@UI/Storm_Draft_Nameplate_Hero_Disabled_Selected_Blue" />
+      </State>
       <State name="NotSelected">
         <Action type="SetProperty" frame="NameLabel" Style="HeroDraftPlayerLeftName" />
         <Action type="SetProperty" frame="NameLabelBackgroundImage" Texture="@UI/Storm_Draft_Nameplate_NotSelected_Blue" />
@@ -1138,21 +1165,57 @@
       </State>
     </StateGroup>
     <StateGroup name="HeroLabelState">
-      <State name="Hidden">
-        <Action type="SetProperty" frame="HeroLabelBackgroundImage" Alpha="0" />
+      <State name="SelectedNotYourTurn">
+        <Action type="SetProperty" frame="HeroLabel" Style="HeroDraftHeroLeftName_SelectedNotTurn" />
+        <Action type="SetProperty" frame="HeroLabel" Alpha="178" />
+        <Action type="SetProperty" frame="HeroLabelBackgroundImage" Texture="@UI/Storm_Draft_Nameplate_Hero_Disabled_Blue" />
+      </State>
+      <State name="NotSelectedNotYourTurn">
+        <Action type="SetProperty" frame="HeroLabel" Style="HeroDraftHeroLeftName_Disabled" undo="false" />
         <Action type="SetProperty" frame="HeroLabel" Alpha="0" />
+        <Action type="SetProperty" frame="HeroLabelBackgroundImage" Texture="@UI/Storm_Draft_Nameplate_Hero_Disabled_Blue" undo="false" />
+      </State>
+      <State name="NotSelected">
+        <Action type="SetProperty" frame="HeroLabel" Style="HeroDraftHeroLeftPicking" />
+        <Action type="SetProperty" frame="HeroLabel" Alpha="0" />
+        <Action type="SetProperty" frame="HeroLabelBackgroundImage" Texture="@UI/Storm_Draft_Nameplate_Hero_Selected_Blue" />
       </State>
       <State name="Picking">
         <Action type="SetProperty" frame="HeroLabel" Style="HeroDraftHeroLeftPicking" />
-        <Action type="SetProperty" frame="HeroLabelBackgroundImage" Texture="@UI/Storm_Draft_Nameplate_Hero_Picking_Blue" />
+        <Action type="SetProperty" frame="HeroLabelBackgroundImage" Texture="@UI/Storm_Draft_Nameplate_Hero_Selected_Blue" />
+      </State>
+      <State name="HiddenForObservers">
+        <Action type="SetProperty" frame="HeroLabel" Style="HeroDraftHeroLeftPicking" />
+        <Action type="SetProperty" frame="HeroLabel" Alpha="0" />
+        <Action type="SetProperty" frame="HeroLabelBackgroundImage" Texture="@UI/Storm_Draft_Nameplate_Hero_Selected_Blue" />
+        <Action type="SetProperty" frame="ObserverHeroPickingLabel" Style="HeroDraftHeroLeftPicking" />
+        <Action type="SetProperty" frame="ObserverHeroPickingLabel" Alpha="255" />
       </State>
       <State name="Selected">
-        <Action type="SetProperty" frame="HeroLabel" Style="HeroDraftHeroLeftName" undo="false" />
+        <Action type="SetProperty" frame="HeroLabel" Style="HeroDraftHeroLeftName_Selected" undo="false" />
         <Action type="SetProperty" frame="HeroLabelBackgroundImage" Texture="@UI/Storm_Draft_Nameplate_Hero_Selected_Blue" undo="false" />
       </State>
       <State name="Disabled">
         <Action type="SetProperty" frame="HeroLabel" Style="HeroDraftHeroLeftName_Disabled" undo="false" />
         <Action type="SetProperty" frame="HeroLabelBackgroundImage" Texture="@UI/Storm_Draft_Nameplate_Hero_Disabled_Blue" undo="false" />
+      </State>
+      <State name="Previewing">
+        <Action type="SetProperty" frame="HeroLabel" Style="HeroDraftHeroLeftPreview" />
+        <Action type="SetProperty" frame="HeroLabelBackgroundImage" Texture="@UI/Storm_Draft_Nameplate_Hero_Selected_Blue" undo="false" />
+      </State>
+      <State name="PreviewingNotYourTurn">
+        <Action type="SetProperty" frame="HeroLabel" Style="HeroDraftHeroLeftPreviewNotYourTurn" />
+        <Action type="SetProperty" frame="HeroLabelBackgroundImage" Texture="@UI/Storm_Draft_Nameplate_Hero_Disabled_Blue" undo="false" />
+      </State>
+    </StateGroup>
+    <StateGroup name="PlayerNameLabelState">
+      <State name="ShowPlayerName">
+        <Action type="SetProperty" frame="NameLabel" Visible="True" />
+        <Action type="SetProperty" frame="DraftFillNameLabel" Visible="False" />
+      </State>
+      <State name="ShowPlayerNumber">
+        <Action type="SetProperty" frame="NameLabel" Visible="False" />
+        <Action type="SetProperty" frame="DraftFillNameLabel" Visible="True" />
       </State>
     </StateGroup>
   </Frame>
@@ -1227,21 +1290,29 @@
     </Frame>
     <Frame type="Image" name="NameLabelBackgroundImage">
       <Anchor side="Left" relative="$parent/BorderImage" pos="Mid" offset="-22" />
-      <Anchor side="Bottom" relative="$parent/BorderImage" pos="Max" offset="-7" />
+      <Anchor side="Bottom" relative="$parent/BorderImage" pos="Max" offset="-11" />
       <Width val="152" />
       <Height val="140" />
       <Texture val="@UI/Storm_Draft_Nameplate_NotSelected_Red" />
     </Frame>
     <Frame type="Label" name="NameLabel">
-      <Anchor side="Top" relative="$parent/NameLabelBackgroundImage" pos="Min" offset="23" />
-      <Anchor side="Left" relative="$parent/NameLabelBackgroundImage" pos="Min" offset="-10" />
-      <Anchor side="Right" relative="$parent/NameLabelBackgroundImage" pos="Max" offset="-27" />
+      <Anchor side="Top" relative="$parent/HeroLabelBackgroundImage" pos="Min" offset="10" />
+      <Anchor side="Left" relative="$parent/HeroLabelBackgroundImage" pos="Min" offset="-10" />
+      <Anchor side="Right" relative="$parent/HeroLabelBackgroundImage" pos="Max" offset="-13" />
       <Rotation val="#DraftNameRotationRight" />
       <RotationPosition val="TopRight" />
       <Style val="HeroDraftPlayerRightName" />
     </Frame>
+    <Frame type="Label" name="DraftFillNameLabel">
+      <Anchor side="Top" relative="$parent/HeroLabelBackgroundImage" pos="Min" offset="10" />
+      <Anchor side="Left" relative="$parent/HeroLabelBackgroundImage" pos="Min" offset="-10" />
+      <Anchor side="Right" relative="$parent/HeroLabelBackgroundImage" pos="Max" offset="-13" />
+      <Rotation val="#DraftNameRotationRight" />
+      <RotationPosition val="TopRight" />
+      <Style val="{$parent/NameLabel/@Style}" />
+    </Frame>
     <Frame type="Image" name="HeroLabelBackgroundImage">
-      <Anchor side="Left" relative="$parent/NameLabelBackgroundImage" pos="Min" offset="1" />
+      <Anchor side="Left" relative="$parent/NameLabelBackgroundImage" pos="Min" offset="-5" />
       <Anchor side="Top" relative="$parent/NameLabelBackgroundImage" pos="Mid" offset="-22" />
       <Texture val="@UI/Storm_Draft_Nameplate_Hero_Selected_Red" />
       <Height val="112" />
@@ -1249,32 +1320,41 @@
     </Frame>
     <Frame type="Frame" name="PickingLabelBackgroundImage">
       <Frame type="Image" name="PickingBackgroundImage">
-        <TextureCoords top="0" left="1" bottom="1" right="0" layer="0" />
+        <Texture val="@UI/storm_ui_glues_draft_nameplate_picking_red" />
       </Frame>
       <Frame type="Image" name="StripesImage">
         <Anchor side="Left" relative="$parent" pos="Min" offset="1" />
-        <Anchor side="Right" relative="$parent" pos="Max" offset="2" />
-        <Anchor side="Top" relative="$parent" pos="Min" offset="4" />
+        <Anchor side="Top" relative="$parent" pos="Min" offset="1" />
         <TextureCoords top="0" left="1" bottom="1" right="0" layer="0" />
-        <TextureCoords top="0" left="1.37" bottom=".94" right="0" layer="1" />
+        <TextureCoords top="0" left="1" bottom="1" right="0" layer="1" />
+        <LayerColor val="ff92a1" />
         <Animation name="UVScroll">
           <Event event="HiddenSelection" action="Reset,Play" frame="$parent/$parent" />
           <Event event="NotSelectedPicking" action="Reset,Play" frame="$parent/$parent" />
           <Event event="PreviewSelectPicking" action="Reset,Play" frame="$parent/$parent" />
           <Controller type="LayerUV" layer="1" side="Left" relative="True" sidelock="True" end="Loop">
             <Key type="Curve" time="0" value="-1" inout="Linear" />
-            <Key type="Curve" time="1.9" value="0" inout="Linear" />
+            <Key type="Curve" time="2.5" value="0" inout="Linear" />
           </Controller>
         </Animation>
       </Frame>
     </Frame>
     <Frame type="Label" name="HeroLabel">
-      <Anchor side="Top" relative="$parent/HeroLabelBackgroundImage" pos="Min" offset="10" />
-      <Anchor side="Left" relative="$parent/HeroLabelBackgroundImage" pos="Min" offset="-10" />
-      <Anchor side="Right" relative="$parent/HeroLabelBackgroundImage" pos="Max" offset="-13" />
+      <Anchor side="Top" relative="$parent/NameLabelBackgroundImage" pos="Min" offset="23" />
+      <Anchor side="Left" relative="$parent/NameLabelBackgroundImage" pos="Min" offset="-20" />
+      <Anchor side="Right" relative="$parent/NameLabelBackgroundImage" pos="Max" offset="-27" />
       <Rotation val="#DraftNameRotationRight" />
       <RotationPosition val="TopRight" />
       <Style val="HeroDraftHeroRightName" />
+    </Frame>
+    <Frame type="Label" name="ObserverHeroPickingLabel">
+      <Anchor side="Top" relative="$parent/NameLabelBackgroundImage" pos="Min" offset="23" />
+      <Anchor side="Left" relative="$parent/NameLabelBackgroundImage" pos="Min" offset="-20" />
+      <Anchor side="Right" relative="$parent/NameLabelBackgroundImage" pos="Max" offset="-27" />
+      <Rotation val="#DraftNameRotationRight" />
+      <RotationPosition val="TopRight" />
+      <Style val="HeroDraftHeroRightName" />
+      <Alpha val="0" />
     </Frame>
     <Frame type="Image" name="SilencedIcon" template="StandardTemplates/SilencedIconTemplate">
       <Anchor side="Top" relative="$parent" pos="Mid" offset="65" />
@@ -1309,6 +1389,10 @@
       </Animation>
     </Frame>
     <StateGroup name="NameLabelState">
+      <State name="SelectedNotYourTurn">
+        <Action type="SetProperty" frame="NameLabel" Style="HeroDraftPlayerRightName_Disabled" />
+        <Action type="SetProperty" frame="NameLabelBackgroundImage" Texture="@UI/Storm_Draft_Nameplate_Hero_Disabled_Selected_Red" />
+      </State>
       <State name="NotSelected">
         <Action type="SetProperty" frame="NameLabel" Style="HeroDraftPlayerRightName" />
         <Action type="SetProperty" frame="NameLabelBackgroundImage" Texture="@UI/Storm_Draft_Nameplate_NotSelected_Red" />
@@ -1327,13 +1411,31 @@
       </State>
     </StateGroup>
     <StateGroup name="HeroLabelState">
-      <State name="Hidden">
-        <Action type="SetProperty" frame="HeroLabelBackgroundImage" Alpha="0" />
+      <State name="SelectedNotYourTurn">
+        <Action type="SetProperty" frame="HeroLabel" Style="HeroDraftHeroRightName_SelectedNotTurn" />
+        <Action type="SetProperty" frame="HeroLabel" Alpha="178" />
+        <Action type="SetProperty" frame="HeroLabelBackgroundImage" Texture="@UI/Storm_Draft_Nameplate_Hero_Disabled_Red" />
+      </State>
+      <State name="NotSelectedNotYourTurn">
+        <Action type="SetProperty" frame="HeroLabel" Style="HeroDraftHeroRightName_Disabled" undo="false" />
         <Action type="SetProperty" frame="HeroLabel" Alpha="0" />
+        <Action type="SetProperty" frame="HeroLabelBackgroundImage" Texture="@UI/Storm_Draft_Nameplate_Hero_Disabled_Red" undo="false" />
+      </State>
+      <State name="NotSelected">
+        <Action type="SetProperty" frame="HeroLabel" Style="HeroDraftHeroRightPicking" />
+        <Action type="SetProperty" frame="HeroLabel" Alpha="0" />
+        <Action type="SetProperty" frame="HeroLabelBackgroundImage" Texture="@UI/Storm_Draft_Nameplate_Hero_Selected_Red" />
       </State>
       <State name="Picking">
         <Action type="SetProperty" frame="HeroLabel" Style="HeroDraftHeroRightPicking" />
-        <Action type="SetProperty" frame="HeroLabelBackgroundImage" Texture="@UI/Storm_Draft_Nameplate_Hero_Picking_Red" />
+        <Action type="SetProperty" frame="HeroLabelBackgroundImage" Texture="@UI/Storm_Draft_Nameplate_Hero_Selected_Red" />
+      </State>
+      <State name="HiddenForObservers">
+        <Action type="SetProperty" frame="HeroLabel" Style="HeroDraftHeroRightPicking" />
+        <Action type="SetProperty" frame="HeroLabel" Alpha="0" />
+        <Action type="SetProperty" frame="HeroLabelBackgroundImage" Texture="@UI/Storm_Draft_Nameplate_Hero_Selected_Red" />
+        <Action type="SetProperty" frame="ObserverHeroPickingLabel" Style="HeroDraftHeroRightPicking" />
+        <Action type="SetProperty" frame="ObserverHeroPickingLabel" Alpha="255" />
       </State>
       <State name="Selected">
         <Action type="SetProperty" frame="HeroLabel" Style="HeroDraftHeroRightName" undo="false" />
@@ -1342,6 +1444,16 @@
       <State name="Disabled">
         <Action type="SetProperty" frame="HeroLabel" Style="HeroDraftHeroRightName_Disabled" undo="false" />
         <Action type="SetProperty" frame="HeroLabelBackgroundImage" Texture="@UI/Storm_Draft_Nameplate_Hero_Disabled_Red" undo="false" />
+      </State>
+    </StateGroup>
+    <StateGroup name="PlayerNameLabelState">
+      <State name="ShowPlayerName">
+        <Action type="SetProperty" frame="NameLabel" Visible="True" />
+        <Action type="SetProperty" frame="DraftFillNameLabel" Visible="False" />
+      </State>
+      <State name="ShowPlayerNumber">
+        <Action type="SetProperty" frame="NameLabel" Visible="False" />
+        <Action type="SetProperty" frame="DraftFillNameLabel" Visible="True" />
       </State>
     </StateGroup>
   </Frame>
