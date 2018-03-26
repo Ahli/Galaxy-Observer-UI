@@ -27,8 +27,8 @@ for /f "usebackq delims=" %%a in ("!file!") do (
         for /f "tokens=1,2 delims==" %%b in ("!ln!") do (
             set currkey=%%b
             set currval=%%c
-            if "x!area!"=="x!currarea!" if "x!key!"=="x!currkey!" (
-                set val=!currval!
+            if "x!area!"=="x!currarea!" if "x!key! "=="x!currkey!" (
+                set val=!currval:~1!
             )
         )
     )
