@@ -1,8 +1,8 @@
 package application.ui.progress;
 
 import application.InterfaceBuilderApp;
-import application.compress.ExperimentalCompressionMiner;
 import application.compress.GameService;
+import application.compress.RandomCompressionMiner;
 import application.compress.RuleSet;
 import application.config.ConfigService;
 import application.integration.FileService;
@@ -77,7 +77,7 @@ public class CompressionMiningController implements Updateable {
 	private Project project;
 	private ObservableList<MpqEditorCompressionRule> ruleSetObservableItems;
 	private Runnable task;
-	private ExperimentalCompressionMiner expCompMiner = null;
+	private RandomCompressionMiner expCompMiner = null;
 	private long bestSize = Long.MAX_VALUE;
 	
 	/**
@@ -185,34 +185,51 @@ public class CompressionMiningController implements Updateable {
 								projectSource.getName());
 						mod.setTargetFile(f);
 						mod.setSourceDirectory(projectSource);
-						
-						expCompMiner = new ExperimentalCompressionMiner(mod, configService.getMpqCachePath(),
-								configService.getMpqEditorPath(), fileService);
+						final RuleSet bestCompressionRuleSet = projectService.fetchBestCompressionRuleSet(project);
+						final MpqEditorCompressionRule[] prevBestCompressionRules =
+								(bestCompressionRuleSet != null) ? bestCompressionRuleSet.getCompressionRules() : null;
+						expCompMiner = new RandomCompressionMiner(mod, configService.getMpqCachePath(),
+								configService.getMpqEditorPath(), prevBestCompressionRules, fileService);
+						bestSize = expCompMiner.getBestSize();
+						/* save initial as best, if there was no best before
+						initial one might have been altered by the miner */
+						if (bestCompressionRuleSet == null ||
+								!new RuleSet(expCompMiner.getBestRuleSet()).equals(bestCompressionRuleSet)) {
+							project.setBestCompressionRuleSet(new RuleSet(expCompMiner.getBestRuleSet()));
+							projectService.saveProject(project);
+						}
 					}
-					bestSize = expCompMiner.getBestSize();
 					logger.info(String.format("Best size before mining: %s kb)", bestSize / 1024));
 					updateUiRules(expCompMiner.getBestRuleSet());
 					updateUiSizeToBeat(bestSize);
 					long lastSize;
+					final RandomCompressionMiner comprMiner = expCompMiner;
 					for (int attempts = 1; attempts < Integer.MAX_VALUE; attempts++) {
-						expCompMiner.randomizeRules();
-						lastSize = expCompMiner.build();
+						comprMiner.randomizeRules();
+						lastSize = comprMiner.build();
 						updateUiAttemptSize(lastSize, attempts);
 						if (lastSize < bestSize) {
 							bestSize = lastSize;
 							logger.info(String.format("Mined better compression of size %s kb.", lastSize / 1024));
-							project.setBestCompressionRuleSet(new RuleSet(expCompMiner.getBestRuleSet()));
+							project.setBestCompressionRuleSet(new RuleSet(comprMiner.getBestRuleSet()));
 							projectService.saveProject(project);
 							updateUiSizeToBeat(lastSize);
-							updateUiRules(expCompMiner.getBestRuleSet());
+							updateUiRules(comprMiner.getBestRuleSet());
 						} else {
 							logger.info(String.format("Mined compression of size %s kb.", lastSize / 1024));
 						}
 						Thread.sleep(50);
-						if (Thread.currentThread().isInterrupted() || expCompMiner == null || task == null) {
+						if (Thread.currentThread().isInterrupted() || task == null) {
 							logger.info("Stopping the mining task.");
 							expCompMiner.cleanUp();
 							expCompMiner = null;
+							
+							// save best ruleset if better than previously saved best
+							final RuleSet bestCompressionRuleSet = new RuleSet(comprMiner.getBestRuleSet());
+							if (!project.getBestCompressionRuleSet().equals(bestCompressionRuleSet)) {
+								project.setBestCompressionRuleSet(bestCompressionRuleSet);
+								projectService.saveProject(project);
+							}
 							return;
 						}
 					}
@@ -237,8 +254,8 @@ public class CompressionMiningController implements Updateable {
 		if (expCompMiner != null) {
 			final long newBest = expCompMiner.getBestSize();
 			project.setBestCompressionRuleSet(new RuleSet(expCompMiner.getBestRuleSet()));
+			expCompMiner = null;
 			logger.info(String.format("Best Compression mined has compression producing size: %s", newBest / 1024));
-			projectService.saveProject(project);
 		}
 		miningButton.setText("Start Mining");
 	}
@@ -256,6 +273,15 @@ public class CompressionMiningController implements Updateable {
 	}
 	
 	/**
+	 * Updates the UI with the size that the miner needs to beat.
+	 *
+	 * @param bestSize
+	 */
+	private void updateUiSizeToBeat(final long bestSize) {
+		Platform.runLater(() -> sizeToBeatLabel.setText(bestSize / 1024 + " kb"));
+	}
+	
+	/**
 	 * Updates the UI with the mined size and mining attempt counter information.
 	 *
 	 * @param lastSize
@@ -265,17 +291,6 @@ public class CompressionMiningController implements Updateable {
 		Platform.runLater(() -> {
 			lastSizeLabel.setText(lastSize / 1024 + " kb");
 			attemptCounterLabel.setText(String.valueOf(attempts));
-		});
-	}
-	
-	/**
-	 * Updates the UI with the size that the miner needs to beat.
-	 *
-	 * @param bestSize
-	 */
-	private void updateUiSizeToBeat(final long bestSize) {
-		Platform.runLater(() -> {
-			sizeToBeatLabel.setText(bestSize / 1024 + " kb");
 		});
 	}
 }
