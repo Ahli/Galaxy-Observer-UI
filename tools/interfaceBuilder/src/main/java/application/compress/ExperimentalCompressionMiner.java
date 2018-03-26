@@ -53,8 +53,8 @@ public class ExperimentalCompressionMiner {
 		initRules.add(new MpqEditorCompressionRuleSize(0, 0).setSingleUnit(true));
 		try (Stream<Path> ps = Files.walk(cacheModDirectory)) {
 			ps.filter(Files::isRegularFile).forEach(p -> initRules
-					.add(new MpqEditorCompressionRuleMask("*" + p.getFileName().toString()).setSingleUnit(true)
-							.setCompress(true).setCompressionMethod(MpqEditorCompressionRuleMethod.BZIP2)));
+					.add(new MpqEditorCompressionRuleMask(getFileMask(p)).setSingleUnit(true).setCompress(true)
+							.setCompressionMethod(MpqEditorCompressionRuleMethod.BZIP2)));
 		}
 		return initRules.toArray(new MpqEditorCompressionRule[0]);
 	}
@@ -90,6 +90,17 @@ public class ExperimentalCompressionMiner {
 		final File targetFile = mod.getTargetFile();
 		mpqInterface.buildMpq(targetFile.getAbsolutePath(), compressXml, MpqEditorCompression.CUSTOM, false);
 		return targetFile.length();
+	}
+	
+	/**
+	 * Returns the MpqCompressionRuleSet's mask String for the Path of an extracted interface's file.
+	 *
+	 * @param p
+	 * @return
+	 */
+	private String getFileMask(final Path p) {
+		final String name = p.normalize().toString();
+		return name.substring(mod.getSourceDirectory().getAbsolutePath().length() + 1);
 	}
 	
 	/**
