@@ -194,7 +194,7 @@ public class CompressionMiningController implements Updateable {
 						/* save initial as best, if there was no best before
 						initial one might have been altered by the miner */
 						if (bestCompressionRuleSet == null ||
-								!expCompMiner.getBestRuleSet().equals(bestCompressionRuleSet)) {
+								!new RuleSet(expCompMiner.getBestRuleSet()).equals(bestCompressionRuleSet)) {
 							project.setBestCompressionRuleSet(new RuleSet(expCompMiner.getBestRuleSet()));
 							projectService.saveProject(project);
 						}
