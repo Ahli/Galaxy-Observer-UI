@@ -221,6 +221,13 @@ public class CompressionMiningController implements Updateable {
 						Thread.sleep(50);
 						if (Thread.currentThread().isInterrupted() || task == null) {
 							logger.info("Stopping the mining task.");
+							
+							// save best ruleset if better than previously saved best
+							final RuleSet bestCompressionRuleSet = new RuleSet(comprMiner.getBestRuleSet());
+							if (!project.getBestCompressionRuleSet().equals(bestCompressionRuleSet)) {
+								project.setBestCompressionRuleSet(bestCompressionRuleSet);
+								projectService.saveProject(project);
+							}
 							return;
 						}
 					}
