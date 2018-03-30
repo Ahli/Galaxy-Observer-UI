@@ -5,6 +5,7 @@ import application.compress.GameService;
 import application.compress.RandomCompressionMiner;
 import application.compress.RuleSet;
 import application.config.ConfigService;
+import application.i18n.Messages;
 import application.integration.FileService;
 import application.projects.Project;
 import application.projects.ProjectService;
@@ -233,7 +234,7 @@ public class CompressionMiningController implements Updateable {
 							return;
 						}
 					}
-				} catch (IOException | MpqException e) {
+				} catch (final IOException | MpqException e) {
 					logger.error("Experimental Compression Miner experienced a problem.", e);
 				} catch (final InterruptedException e) {
 					Thread.currentThread().interrupt();
@@ -242,7 +243,7 @@ public class CompressionMiningController implements Updateable {
 		};
 		attemptCounterLabel.setText("0");
 		InterfaceBuilderApp.getInstance().getExecutor().execute(task);
-		miningButton.setText("Stop Mining");
+		miningButton.setText(Messages.getString("progress.compressionMining.stopMining"));
 	}
 	
 	public void stopMining() {
@@ -257,7 +258,7 @@ public class CompressionMiningController implements Updateable {
 			expCompMiner = null;
 			logger.info(String.format("Best Compression mined has compression producing size: %s", newBest / 1024));
 		}
-		miningButton.setText("Start Mining");
+		miningButton.setText(Messages.getString("progress.compressionMining.startMining"));
 	}
 	
 	/**
