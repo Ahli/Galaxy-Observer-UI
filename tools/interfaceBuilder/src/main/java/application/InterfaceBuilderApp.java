@@ -2,6 +2,7 @@ package application;
 
 import application.build.MpqBuilderService;
 import application.config.ConfigService;
+import application.i18n.Messages;
 import application.integration.ReplayFinder;
 import application.integration.SettingsIniInterface;
 import application.ui.FXMLSpringLoader;
@@ -181,7 +182,7 @@ public class InterfaceBuilderApp extends Application {
 		// Build Navigation
 		final BorderPane root;
 		final FXMLLoader loader = new FXMLSpringLoader(appContext);
-		try (InputStream is = appContext.getResource("view/Navigation.fxml").getInputStream()) { //$NON-NLS-1$
+		try (final InputStream is = appContext.getResource("view/Navigation.fxml").getInputStream()) { //$NON-NLS-1$
 			root = loader.load(is);
 			navigationController = loader.getController();
 		} catch (final IOException | NullPointerException e) {
@@ -201,7 +202,7 @@ public class InterfaceBuilderApp extends Application {
 		}
 		primaryStage.setMaximized(true);
 		primaryStage.setScene(scene);
-		primaryStage.setTitle("Interface Builder"); //$NON-NLS-1$
+		primaryStage.setTitle(Messages.getString("app.title"));
 		
 		// Fade animation (to hide white stage background flash)
 		primaryStage.setOpacity(0);

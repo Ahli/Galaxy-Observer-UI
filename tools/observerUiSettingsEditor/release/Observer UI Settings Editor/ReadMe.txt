@@ -1,7 +1,7 @@
 Observer Interface Settings Editor
 ----------------------------------
 Author: Christoph "Ahli" Ahlers (twitter: @AhliSC2)
-version: alpha (June 2017)
+version: alpha
 
 
 Legal Information
