@@ -152,7 +152,7 @@ public class RandomCompressionMiner {
 		final long size = build(rules, false);
 		if (size < bestSize) {
 			bestSize = size;
-			bestRuleSet = rules.clone();
+			bestRuleSet = deepCopy(rules);
 		}
 		return size;
 	}
