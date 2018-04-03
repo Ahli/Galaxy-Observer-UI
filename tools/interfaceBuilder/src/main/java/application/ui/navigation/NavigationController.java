@@ -11,6 +11,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.paint.Color;
 import org.apache.logging.log4j.LogManager;
@@ -19,6 +20,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class NavigationController {
 	private static final Logger logger = LogManager.getLogger();
@@ -29,6 +32,13 @@ public class NavigationController {
 	 * 2: settings */
 	private final Parent[] contentPages = new Parent[3];
 	private final Updateable[] controllers = new Updateable[3];
+	private final List<Notification> notifications = new ArrayList<>();
+	@FXML
+	private Button notificationCloseButton;
+	@FXML
+	private Label notificationLabel;
+	@FXML
+	private AnchorPane notificationBar;
 	@Autowired
 	private ApplicationContext appContext;
 	@FXML
@@ -159,5 +169,46 @@ public class NavigationController {
 		home.setDisable(false);
 		settings.setDisable(false);
 		progress.setDisable(false);
+	}
+	
+	/**
+	 * Appends a notification that will be shown.
+	 *
+	 * @param notification
+	 */
+	public void appendNotification(final Notification notification) {
+		notifications.add(notification);
+		showFirstNotification();
+	}
+	
+	private void showFirstNotification() {
+		notificationBar.setVisible(true);
+		final Notification notification = notifications.get(0);
+		notificationLabel.setText(notification.getText());
+	}
+	
+	@FXML
+	public void closeActiveNotification() {
+		notifications.remove(0);
+		if (notifications.isEmpty()) {
+			notificationBar.setVisible(false);
+		} else {
+			showFirstNotification();
+		}
+	}
+	
+	@FXML
+	public void openNotificationLink() {
+		final Notification notification = notifications.get(0);
+		showNavPage(notification.getNavPageIndex());
+	}
+	
+	/**
+	 * Shows the nav page of the specified index.
+	 *
+	 * @param navPageIndex
+	 */
+	public void showNavPage(final int navPageIndex) {
+		showPanelContent(navPageIndex);
 	}
 }
