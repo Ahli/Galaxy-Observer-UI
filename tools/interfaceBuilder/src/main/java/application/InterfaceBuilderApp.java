@@ -215,14 +215,6 @@ public class InterfaceBuilderApp extends Application {
 		primaryStage.setOpacity(1);
 		logger.info("Initializing App..."); //$NON-NLS-1$
 		
-		// hide apps splash screen image
-		if (!GraphicsEnvironment.isHeadless()) {
-			final SplashScreen splash = SplashScreen.getSplashScreen();
-			if (splash != null) {
-				splash.close();
-			}
-		}
-		
 		hidePreloader();
 	}
 	
