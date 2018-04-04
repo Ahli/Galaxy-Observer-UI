@@ -20,6 +20,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 
 @Service
 public class BaseUiService {
+	public static final String UNKNOWN_GAME_EXCEPTION = "Unknown Game";
 	private static final char QUOTE = '\"';
 	private final Logger logger = LogManager.getLogger();
 	@Autowired
@@ -63,7 +64,7 @@ public class BaseUiService {
 			if (game.equals(Game.HEROES)) {
 				gamePath = usePtr ? iniSettings.getHeroesPtrPath() : iniSettings.getHeroesPath();
 			} else {
-				throw new InvalidParameterException("Unknown Game");
+				throw new InvalidParameterException(UNKNOWN_GAME_EXCEPTION);
 			}
 		}
 		return gamePath;
@@ -138,7 +139,7 @@ public class BaseUiService {
 				product = "heroes";
 				break;
 			default:
-				throw new InvalidParameterException("Unknown Game");
+				throw new InvalidParameterException(UNKNOWN_GAME_EXCEPTION);
 		}
 		CascExplorerConfigFileEditor.write(configFile, storagePath, onlineMode, product, locale);
 	}
@@ -150,7 +151,7 @@ public class BaseUiService {
 			case HEROES:
 				return new String[] { "*.StormLayout", "*Assets.txt", "*.StormStyle" };
 			default:
-				throw new InvalidParameterException("Unknown Game");
+				throw new InvalidParameterException(UNKNOWN_GAME_EXCEPTION);
 		}
 	}
 }

@@ -17,12 +17,9 @@ import javafx.scene.control.DialogPane;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 
 public class ViewRuleSetController {
-	private static final Logger logger = LogManager.getLogger();
 	@FXML
 	private TableColumn<MpqEditorCompressionRule, String> columnMarkedForDeletion;
 	@FXML
@@ -49,9 +46,6 @@ public class ViewRuleSetController {
 	
 	@Autowired
 	private ProjectService projectService;
-	
-	private Project project;
-	private ObservableList<MpqEditorCompressionRule> ruleSetObservableItems;
 	
 	/**
 	 * Automatically called by FxmlLoader
@@ -103,7 +97,6 @@ public class ViewRuleSetController {
 	 * @param project
 	 */
 	public void setProject(final Project project) {
-		this.project = project;
 		dialog.setTitle(String.format("Best Compression Ruleset for %s", project.getName()));
 		showProjectsRuleSet(project);
 	}
@@ -114,7 +107,7 @@ public class ViewRuleSetController {
 	 * @param project
 	 */
 	public void showProjectsRuleSet(final Project project) {
-		ruleSetObservableItems = FXCollections.observableArrayList();
+		final ObservableList<MpqEditorCompressionRule> ruleSetObservableItems = FXCollections.observableArrayList();
 		final RuleSet bestCompressionRuleSet = projectService.fetchBestCompressionRuleSet(project);
 		if (bestCompressionRuleSet != null) {
 			final MpqEditorCompressionRule[] rules = bestCompressionRuleSet.getCompressionRules();

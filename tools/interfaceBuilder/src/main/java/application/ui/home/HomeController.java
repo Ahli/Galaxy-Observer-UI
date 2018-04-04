@@ -329,7 +329,7 @@ public class HomeController implements Updateable {
 			newTab.setText(String.format("%s Compression Mining", project.getName()));
 			final TabPane tabPane = TabPaneController.getInstance().getTabPane();
 			tabPane.getTabs().add(newTab);
-			final CompressionMiningController controller = (CompressionMiningController) loader.getController();
+			final CompressionMiningController controller = loader.getController();
 			controller.setProject(project);
 			// switch to progress and the new tab
 			NavigationController.getInstance().clickProgress();
