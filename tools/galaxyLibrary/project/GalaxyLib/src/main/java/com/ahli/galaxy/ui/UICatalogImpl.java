@@ -1,7 +1,7 @@
 package com.ahli.galaxy.ui;
 
 import com.ahli.galaxy.parser.UICatalogParser;
-import com.ahli.galaxy.parser.XmlParserDom;
+import com.ahli.galaxy.parser.XmlParserVtd;
 import com.ahli.galaxy.parser.interfaces.XmlParser;
 import com.ahli.galaxy.ui.abstracts.UIElement;
 import com.ahli.galaxy.ui.exception.UIException;
@@ -176,7 +176,7 @@ public class UICatalogImpl implements UICatalog {
 	
 	private void prepareParser() {
 		if (parser == null) {
-			parser = new UICatalogParser(this, new XmlParserDom(null));
+			parser = new UICatalogParser(this, new XmlParserVtd(null));
 		}
 	}
 	
@@ -210,7 +210,7 @@ public class UICatalogImpl implements UICatalog {
 			}
 		}
 		final File file = new File(basePathTemp + File.separator + path);
-		final XmlParser xmlParser = new XmlParserDom();
+		final XmlParser xmlParser = new XmlParserVtd();
 		final UICatalogParser parserTemp = new UICatalogParser(this, xmlParser);
 		try {
 			parserTemp.parseFile(file, raceId, isDevLayout);

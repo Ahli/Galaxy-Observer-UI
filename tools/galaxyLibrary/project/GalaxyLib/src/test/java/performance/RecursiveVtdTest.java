@@ -1,4 +1,4 @@
-package com.ahli.galaxy.test;
+package performance;
 
 import com.ximpleware.AutoPilot;
 import com.ximpleware.NavException;
@@ -30,13 +30,15 @@ public class RecursiveVtdTest {
 		final long startMem = rt.totalMemory() - rt.freeMemory();
 		final long startTime = System.currentTimeMillis();
 		final File f = new File(
-				"F:\\Spiele\\GalaxyObsUI\\baseUI\\heroes\\mods\\core.stormmod\\base.stormdata\\UI\\Layout\\UI\\GameUI.StormLayout");
+				"D:\\GalaxyObsUI\\baseUI\\heroes\\mods\\core.stormmod\\base.stormdata\\UI\\Layout\\UI\\GameUI" +
+						".StormLayout");
 		final VTDGen vtd;
 		
 		try {
 			vtd = new VTDGen();
 			// for (int i = 0; i < 1000; i++) {
-			while (System.currentTimeMillis() - startTime < 60000) {
+			while (System.currentTimeMillis() - startTime < 30000) {
+				list.clear();
 				loadRecursiveXML(vtd, f);
 				iterations++;
 				// if (i % 100 == 0) {

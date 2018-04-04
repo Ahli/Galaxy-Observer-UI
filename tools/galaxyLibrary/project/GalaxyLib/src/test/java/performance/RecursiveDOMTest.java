@@ -1,4 +1,4 @@
-package com.ahli.galaxy.test;
+package performance;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
@@ -20,7 +20,7 @@ public class RecursiveDOMTest {
 	private static final String TAG = "*";
 	
 	public static void main(final String[] args) {
-		long endMem;
+		final long endMem;
 		int iterations = 0;
 		try {
 			Thread.sleep(1000);
@@ -33,13 +33,15 @@ public class RecursiveDOMTest {
 		final long startMem = rt.totalMemory() - rt.freeMemory();
 		final long startTime = System.currentTimeMillis();
 		final File f = new File(
-				"F:\\Spiele\\GalaxyObsUI\\baseUI\\heroes\\mods\\core.stormmod\\base.stormdata\\UI\\Layout\\UI\\GameUI.StormLayout");
-		DocumentBuilder dBuilder;
+				"D:\\GalaxyObsUI\\baseUI\\heroes\\mods\\core.stormmod\\base.stormdata\\UI\\Layout\\UI\\GameUI" +
+						".StormLayout");
+		final DocumentBuilder dBuilder;
 		
 		try {
 			dBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
 			// for (int i = 0; i < 1000; i++) {
-			while (System.currentTimeMillis() - startTime < 60000) {
+			while (System.currentTimeMillis() - startTime < 30000) {
+				list.clear();
 				loadRecursiveXML(dBuilder, f);
 				iterations++;
 				// if (i % 100 == 0) {
@@ -93,7 +95,7 @@ public class RecursiveDOMTest {
 		String attrVal;
 		int i;
 		int j;
-		int len;
+		final int len;
 		int len2;
 		for (j = 0, len = elements.getLength(); j < len; j++) {
 			node = elements.item(j);
