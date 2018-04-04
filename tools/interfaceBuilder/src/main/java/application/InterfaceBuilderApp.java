@@ -22,6 +22,8 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
+import javafx.scene.control.ContextMenu;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.image.Image;
@@ -489,6 +491,13 @@ public class InterfaceBuilderApp extends Application {
 		StylizedTextAreaAppender.setWorkerTaskController(errorTabCtrl, threadName);
 		newTab.setText(tabTitle);
 		newTxtArea.setEditable(false);
+		
+		// context menu with close option
+		final ContextMenu contextMenu = new ContextMenu();
+		final MenuItem closeItem = new MenuItem("Close");
+		closeItem.setOnAction(event -> getTabPane().getTabs().remove(newTab));
+		contextMenu.getItems().addAll(closeItem);
+		newTab.setContextMenu(contextMenu);
 		
 		// runlater needs to appear below the edits above, else it might be added before
 		// which results in UI edits not in UI thread -> error

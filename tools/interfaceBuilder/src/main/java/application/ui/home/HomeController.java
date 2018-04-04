@@ -20,10 +20,12 @@ import javafx.scene.Parent;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
+import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.MultipleSelectionModel;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.Tab;
@@ -328,8 +330,20 @@ public class HomeController implements Updateable {
 			newTab.setContent(content);
 			newTab.setText(String.format("%s Compression Mining", project.getName()));
 			final TabPane tabPane = TabPaneController.getInstance().getTabPane();
-			tabPane.getTabs().add(newTab);
 			final CompressionMiningController controller = loader.getController();
+			
+			// context menu with close option
+			final ContextMenu contextMenu = new ContextMenu();
+			final MenuItem closeItem = new MenuItem("Close");
+			closeItem.setOnAction(event -> {
+				TabPaneController.getInstance().getTabPane().getTabs().remove(newTab);
+				logger.trace("close tab");
+				controller.stopMining();
+			});
+			contextMenu.getItems().addAll(closeItem);
+			newTab.setContextMenu(contextMenu);
+			
+			tabPane.getTabs().add(newTab);
 			controller.setProject(project);
 			// switch to progress and the new tab
 			NavigationController.getInstance().clickProgress();
