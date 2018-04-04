@@ -8,11 +8,15 @@ import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundFill;
+import javafx.scene.layout.CornerRadii;
 import javafx.scene.paint.Color;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -30,9 +34,11 @@ public class NavigationController {
 	 * 0: taskChoice
 	 * 1: tabPane
 	 * 2: settings */
-	private final Parent[] contentPages = new Parent[3];
-	private final Updateable[] controllers = new Updateable[3];
+	private final Parent[] contentPages = new Parent[4];
+	private final Updateable[] controllers = new Updateable[4];
 	private final List<Notification> notifications = new ArrayList<>();
+	@FXML
+	private Button browse;
 	@FXML
 	private Button notificationCloseButton;
 	@FXML
@@ -85,14 +91,24 @@ public class NavigationController {
 		icon.setFill(Color.WHITE);
 		progress.setGraphic(icon);
 		progress.setText(null);
+		icon = new FontAwesomeIconView(FontAwesomeIcon.EYE);
+		icon.setFill(Color.WHITE);
+		browse.setGraphic(icon);
+		browse.setText(null);
+		
+		notificationBar.setVisible(false);
+		notificationBar.managedProperty().bind(notificationBar.visibleProperty());
+		notificationBar.setBackground(new Background(
+				new BackgroundFill(Color.color(211d / 256d, 168d / 255d, 3d / 255d), CornerRadii.EMPTY, Insets.EMPTY)));
 		
 		// content pages
 		initFXML("view/Content_Home.fxml", 0);
 		initFXML("view/Content_TabPane.fxml", 1);
 		initFXML("view/Content_Settings.fxml", 2);
+		initFXML("view/Content_UiBrowser.fxml", 3);
 		
 		// make tabPane visible
-		showPanelContent(1);
+		showPanelContent(0);
 	}
 	
 	/**
@@ -189,11 +205,13 @@ public class NavigationController {
 	
 	@FXML
 	public void closeActiveNotification() {
-		notifications.remove(0);
-		if (notifications.isEmpty()) {
-			notificationBar.setVisible(false);
-		} else {
-			showFirstNotification();
+		if (!notifications.isEmpty()) {
+			notifications.remove(0);
+			if (notifications.isEmpty()) {
+				notificationBar.setVisible(false);
+			} else {
+				showFirstNotification();
+			}
 		}
 	}
 	
@@ -210,5 +228,10 @@ public class NavigationController {
 	 */
 	public void showNavPage(final int navPageIndex) {
 		showPanelContent(navPageIndex);
+	}
+	
+	@FXML
+	public void clickBrowse() {
+		showPanelContent(3);
 	}
 }

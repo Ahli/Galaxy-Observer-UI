@@ -1,10 +1,13 @@
 package application.integration;
 
+import org.apache.commons.io.FileUtils;
+
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
+import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 public class FileService {
@@ -71,21 +74,6 @@ public class FileService {
 	}
 	
 	/**
-	 * Returns the count of files within the specified directory.
-	 *
-	 * @param f
-	 * @return count of files in directory and subdirectories
-	 * @throws IOException
-	 */
-	public long getFileCountOfDirectory(final File f) throws IOException {
-		final long count;
-		try (final Stream<Path> walk = Files.walk(f.toPath())) {
-			count = walk.filter(p -> p.toFile().isFile()).count();
-		}
-		return count;
-	}
-	
-	/**
 	 * Returns the size of the specified directory in bytes.
 	 *
 	 * @param f
@@ -98,5 +86,62 @@ public class FileService {
 			size = walk.filter(p -> p.toFile().isFile()).mapToLong(p -> p.toFile().length()).sum();
 		}
 		return size;
+	}
+	
+	/**
+	 * Compares the files within a specified directory to a compareDate.
+	 *
+	 * @param compareDate
+	 * @param directory
+	 * @return true, if the compareDate is newer than the compare date
+	 * @throws IOException
+	 */
+	public boolean directoryFilesAreUpToDate(final long compareDate, final File directory) throws IOException {
+		try (final Stream<Path> ps = Files.walk(directory.toPath())) {
+			final Predicate<Path> predicateIsYoungerThanCompareDate = new Predicate<>() {
+				@Override
+				public boolean test(final Path p) {
+					return p.toFile().lastModified() > compareDate;
+				}
+			};
+			return ps.filter(Files::isRegularFile).allMatch(predicateIsYoungerThanCompareDate);
+		}
+	}
+	
+	/**
+	 * Cleans a directory without deleting it.
+	 *
+	 * @param directory
+	 * @throws IOException
+	 */
+	public void cleanDirectory(final File directory) throws IOException {
+		FileUtils.cleanDirectory(directory);
+	}
+	
+	/**
+	 * Checks if a directory is empty or not.
+	 *
+	 * @param directory
+	 * @return true, if the directory is empty
+	 * @throws IOException
+	 * 		if it is not a directory or another problem occurred
+	 */
+	public boolean isEmptyDirectory(final File directory) throws IOException {
+		return getFileCountOfDirectory(directory) <= 0;
+	}
+	
+	/**
+	 * Returns the count of files within the specified directory.
+	 *
+	 * @param f
+	 * @return count of files in directory and subdirectories
+	 * @throws IOException
+	 */
+	public long getFileCountOfDirectory(final File f) throws IOException {
+		final long count;
+		try (final Stream<Path> walk = Files.walk(f.toPath())) {
+			count = walk.filter(p -> p.toFile().isFile()).count();
+		}
+		return count;
 	}
 }

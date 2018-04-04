@@ -19,6 +19,6 @@ public class SC2GameDef extends GameDef {
 		setDocumentsGameDirectoryName("StarCraft II");
 		setLayoutFileEnding("sc2layout");
 		setBaseDataFolderName("Base.SC2Data");
+		setRootExeName("StarCraft II.exe");
 	}
-	
 }

@@ -17,6 +17,8 @@ public abstract class GameDef implements Serializable {
 	private String nameHandle = "sc2";
 	private String layoutFileEnding = ".sc2layout";
 	private String baseDataFolderName = "Base.SC2Data";
+	private String rootExeName = "StarCraft II.exe";
+	private String ptrRootExeName = "StarCraft II Public Test.exe";
 	
 	/**
 	 * @return the layoutFileEnding
@@ -170,4 +172,34 @@ public abstract class GameDef implements Serializable {
 		this.baseDataFolderName = baseDataFolderName;
 	}
 	
+	/**
+	 * Returns the name of the game's rootExecutable.
+	 *
+	 * @return
+	 */
+	public String getRootExeName() {
+		return rootExeName;
+	}
+	
+	/**
+	 * Set the name of the game's rootExecutable.
+	 *
+	 * @param rootExeName
+	 */
+	public void setRootExeName(final String rootExeName) {
+		this.rootExeName = rootExeName;
+	}
+	
+	public String getPtrRootExeName() {
+		return ptrRootExeName;
+	}
+	
+	/**
+	 * Set the name of the game's rootExecutable of the PTR client.
+	 *
+	 * @param ptrRootExeName
+	 */
+	public void setPtrRootExeName(final String ptrRootExeName) {
+		this.ptrRootExeName = ptrRootExeName;
+	}
 }

@@ -38,6 +38,14 @@ public class ConfigService {
 	@Qualifier ("baseUiPath")
 	private String baseUiPath;
 	
+	@Autowired
+	@Qualifier ("cascExtractorConfigFile")
+	private File cascExtractorConfigFile;
+	
+	@Autowired
+	@Qualifier ("cascExtractorConsoleExeFile")
+	private File cascExtractorConsoleExeFile;
+	
 	public String getMpqEditorPath() {
 		return mpqEditorPath;
 	}
@@ -66,4 +74,11 @@ public class ConfigService {
 		return baseUiPath + File.separator + gameDef.getNameHandle();
 	}
 	
+	public File getCascExtractorConfigFile() {
+		return cascExtractorConfigFile;
+	}
+	
+	public File getCascExtractorConsoleExeFile() {
+		return cascExtractorConsoleExeFile;
+	}
 }

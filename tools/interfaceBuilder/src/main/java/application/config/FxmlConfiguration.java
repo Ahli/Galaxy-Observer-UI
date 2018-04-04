@@ -1,5 +1,6 @@
 package application.config;
 
+import application.ui.browse.BrowseController;
 import application.ui.home.AddProjectController;
 import application.ui.home.HomeController;
 import application.ui.home.ViewRuleSetController;
@@ -75,5 +76,11 @@ public class FxmlConfiguration {
 	@Scope ("prototype")
 	public CompressionMiningController compressionMiningController() {
 		return new CompressionMiningController();
+	}
+	
+	@Bean
+	@Scope ("prototype")
+	public BrowseController browseController() {
+		return new BrowseController();
 	}
 }

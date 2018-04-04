@@ -16,6 +16,16 @@ public class GameService {
 	 * @return
 	 */
 	public ModData getModData(final Game game) {
+		return new ModData(new GameData(getGameDef(game)));
+	}
+	
+	/**
+	 * Returns a GameDef instance containing the specified game definition.
+	 *
+	 * @param game
+	 * @return
+	 */
+	public GameDef getGameDef(final Game game) {
 		final GameDef gameDef;
 		switch (game) {
 			case SC2:
@@ -27,6 +37,6 @@ public class GameService {
 			default:
 				throw new IllegalArgumentException("Unknown game value " + game);
 		}
-		return new ModData(new GameData(gameDef));
+		return gameDef;
 	}
 }

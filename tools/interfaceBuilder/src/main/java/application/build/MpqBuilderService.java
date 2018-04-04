@@ -332,7 +332,7 @@ public class MpqBuilderService {
 		
 		try {
 			descIndexData.setDescIndexPathAndClear(ComponentsListReader.getDescIndexPath(componentListFile, gameDef));
-		} catch (ParserConfigurationException | SAXException | IOException e) {
+		} catch (final ParserConfigurationException | SAXException | IOException e) {
 			final String msg = "ERROR: unable to read DescIndex path."; //$NON-NLS-1$
 			logger.error(msg, e);
 			throw new IOException(msg, e);
@@ -341,7 +341,7 @@ public class MpqBuilderService {
 		final File descIndexFile = mpqi.getFileFromMpq(descIndexData.getDescIndexIntPath());
 		try {
 			descIndexData.addLayoutIntPath(DescIndexReader.getLayoutPathList(descIndexFile, false));
-		} catch (SAXException | ParserConfigurationException | IOException | MpqException e) {
+		} catch (final SAXException | ParserConfigurationException | IOException | MpqException e) {
 			logger.error("unable to read Layout paths", e); //$NON-NLS-1$
 		}
 		
@@ -399,6 +399,9 @@ public class MpqBuilderService {
 						for (final String modOrDir : game.getGameDef().getCoreModsOrDirectories()) {
 							
 							final File directory = new File(gameDir + File.separator + modOrDir);
+							if (!directory.exists() || !directory.isDirectory()) {
+								throw new IOException("BaseUI out of date.");
+							}
 							
 							final Collection<File> descIndexFiles = FileUtils
 									.listFiles(directory, new WildcardFileFilter("DescIndex.*Layout"),

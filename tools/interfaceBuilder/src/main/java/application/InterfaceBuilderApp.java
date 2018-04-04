@@ -1,12 +1,15 @@
 package application;
 
+import application.baseUi.BaseUiService;
 import application.build.MpqBuilderService;
 import application.config.ConfigService;
 import application.i18n.Messages;
 import application.integration.ReplayFinder;
 import application.integration.SettingsIniInterface;
+import application.projects.enums.Game;
 import application.ui.FXMLSpringLoader;
 import application.ui.navigation.NavigationController;
+import application.ui.navigation.Notification;
 import application.ui.progress.ErrorTabController;
 import application.ui.progress.StylizedTextAreaAppender;
 import application.ui.progress.TabPaneController;
@@ -84,6 +87,9 @@ public class InterfaceBuilderApp extends Application {
 	private ConfigService configService;
 	private NavigationController navigationController;
 	
+	@Autowired
+	private BaseUiService baseUiService;
+	
 	/**
 	 * Entry point of the App.
 	 *
@@ -135,6 +141,8 @@ public class InterfaceBuilderApp extends Application {
 			buildStartReplayExit(primaryStage);
 		} else {
 			navigationController.clickHome();
+			
+			checkBaseUiUpdate();
 		}
 	}
 	
@@ -259,6 +267,33 @@ public class InterfaceBuilderApp extends Application {
 				}
 			}
 		}.start();
+	}
+	
+	private void checkBaseUiUpdate() {
+		try {
+			if (baseUiService.isOutdated(Game.SC2, false)) {
+				navigationController.appendNotification(
+						new Notification(Messages.getString("browse.notification.sc2OutOfDate"), 3));
+			}
+		} catch (final IOException e) {
+			logger.error("Error during SC2 baseUI update check.", e);
+		}
+		try {
+			if (baseUiService.isOutdated(Game.HEROES, false)) {
+				navigationController.appendNotification(
+						new Notification(Messages.getString("browse.notification.heroesOutOfDate"), 3));
+			}
+		} catch (final IOException e) {
+			logger.error("Error during Heroes baseUI update check.", e);
+		}
+		try {
+			if (baseUiService.isOutdated(Game.HEROES, true)) {
+				navigationController.appendNotification(
+						new Notification(Messages.getString("browse.notification.heroesPtrOutOfDate"), 3));
+			}
+		} catch (final IOException e) {
+			logger.error("Error during Heroes PTR baseUI update check.", e);
+		}
 	}
 	
 	/**

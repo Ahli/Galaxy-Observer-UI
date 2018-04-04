@@ -19,5 +19,7 @@ public class HeroesGameDef extends GameDef {
 		setDocumentsGameDirectoryName("Heroes of the Storm");
 		setLayoutFileEnding("stormlayout");
 		setBaseDataFolderName("Base.StormData");
+		setRootExeName("Heroes of the Storm.exe");
+		setPtrRootExeName("Heroes of the Storm Public Test.exe");
 	}
 }

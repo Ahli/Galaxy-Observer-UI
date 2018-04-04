@@ -1,6 +1,7 @@
 package application.config;
 
 import application.InterfaceBuilderApp;
+import application.baseUi.BaseUiService;
 import application.build.MpqBuilderService;
 import application.compile.CompileService;
 import application.compress.GameService;
@@ -81,6 +82,20 @@ public class AppConfiguration {
 	}
 	
 	@Bean
+	public File cascExtractorConfigFile() {
+		return new File(
+				basePath().getParent() + File.separator + "tools" + File.separator + "plugins" + File.separator +
+						"casc" + File.separator + "CASCConsole.exe.config");
+	}
+	
+	@Bean
+	public File cascExtractorConsoleExeFile() {
+		return new File(
+				basePath().getParent() + File.separator + "tools" + File.separator + "plugins" + File.separator +
+						"casc" + File.separator + "CASCConsole.exe");
+	}
+	
+	@Bean
 	public String raceId() {
 		return "Terr";
 	}
@@ -143,6 +158,11 @@ public class AppConfiguration {
 	@Bean
 	public GameService gameService() {
 		return new GameService();
+	}
+	
+	@Bean
+	public BaseUiService baseUiService() {
+		return new BaseUiService();
 	}
 	
 }
