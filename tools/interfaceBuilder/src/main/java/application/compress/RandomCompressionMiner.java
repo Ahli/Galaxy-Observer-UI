@@ -205,7 +205,7 @@ public class RandomCompressionMiner {
 	private MpqEditorCompressionRule[] createInitialRuleset(final Path cacheModDirectory) throws IOException {
 		final List<MpqEditorCompressionRule> initRules = new ArrayList<>();
 		initRules.add(new MpqEditorCompressionRuleSize(0, 0).setSingleUnit(true));
-		final File sourceDir = mod.getSourceDirectory();
+		final File sourceDir = mod.getMpqCacheDirectory();
 		try (final Stream<Path> ps = Files.walk(cacheModDirectory)) {
 			ps.filter(Files::isRegularFile).forEach(p -> initRules
 					.add(new MpqEditorCompressionRuleMask(getFileMask(p, sourceDir)).setSingleUnit(true)
