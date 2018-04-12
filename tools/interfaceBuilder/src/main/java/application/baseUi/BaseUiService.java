@@ -44,6 +44,10 @@ public class BaseUiService {
 				new File(gamePath + File.separator + (usePtr ? gameDef.getPtrRootExeName() : gameDef.getRootExeName()));
 		final File gameBaseUI = new File(configService.getBaseUiPath(gameDef));
 		
+		if (!gameBaseUI.exists()) {
+			gameBaseUI.mkdirs();
+		}
+		
 		return fileService.isEmptyDirectory(gameBaseUI) ||
 				!fileService.directoryFilesAreUpToDate(gameExe.lastModified(), gameBaseUI);
 	}
@@ -85,6 +89,9 @@ public class BaseUiService {
 		final File destination = new File(configService.getBaseUiPath(gameDef));
 		
 		try {
+			if (!destination.exists()) {
+				destination.mkdirs();
+			}
 			fileService.cleanDirectory(destination);
 		} catch (final IOException e) {
 			logger.error(String.format("Directory %s could not be cleaned.", destination), e);
@@ -93,15 +100,23 @@ public class BaseUiService {
 		
 		final File extractorExe = configService.getCascExtractorConsoleExeFile();
 		final String[] queryMasks = getQueryMasks(game);
+		int i = 0;
 		for (final String mask : queryMasks) {
+			final int sleepDuration = 1000 + i * 5000;
 			final Runnable task = new Runnable() {
 				@Override
 				public void run() {
 					try {
 						final String cmd =
-								"cmd /C " + QUOTE + QUOTE + extractorExe + QUOTE + " " + mask + " " + destination +
-										" " + "enUS" + " " + "None" + QUOTE;
-						Runtime.getRuntime().exec(cmd).waitFor();
+								"cmd start cmd /C " + QUOTE + QUOTE + extractorExe + QUOTE +
+										" " + mask + " " + destination +
+										File.separator + " " + "enUS" + " " + "None" + QUOTE;
+						logger.trace("executing: " + cmd);
+						// TODO replace with proper check if config file finished writing
+						Thread.sleep(sleepDuration);
+//						Runtime.getRuntime().exec(cmd).waitFor();
+						Runtime.getRuntime().exec(cmd);
+//						logger.trace("finished executing: " + cmd);
 					} catch (final IOException e) {
 						logger.error("Extracting files from CASC via CascExtractor failed.", e); //$NON-NLS-1$
 					} catch (final InterruptedException e) {
@@ -110,6 +125,7 @@ public class BaseUiService {
 				}
 			};
 			executor.execute(task);
+			i++;
 		}
 	}
 	
@@ -132,9 +148,9 @@ public class BaseUiService {
 				break;
 			case HEROES:
 				if (usePtr) {
-					storagePath = configService.getIniSettings().getHeroesPath();
-				} else {
 					storagePath = configService.getIniSettings().getHeroesPtrPath();
+				} else {
+					storagePath = configService.getIniSettings().getHeroesPath();
 				}
 				product = "heroes";
 				break;
