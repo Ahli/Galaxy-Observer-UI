@@ -1,0 +1,493 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<Desc>
+    <DescFlags val="Locked"/>
+    
+    <Constant name="GameInfoPageButtonSpacing" val="12"/>
+    
+    <Frame type="Button" name="PreviewButtonTemplate" template="StandardTileListTemplates/GraphicTileListButtonTemplate">
+        <Toggleable val="True"/>
+        
+        <Frame type="Frame" name="AnchorFrame">
+            <Width val="184"/>
+            <Height val="106"/>
+        </Frame>
+        
+        <Frame type="Image" name="Icon">
+            <Anchor side="Top" relative="$parent/AnchorFrame" pos="Min" offset="3"/>
+            <Anchor side="Bottom" relative="$parent/AnchorFrame" pos="Max" offset="-3"/>
+            <Anchor side="Left" relative="$parent/AnchorFrame" pos="Min" offset="3"/>
+            <Anchor side="Right" relative="$parent/AnchorFrame" pos="Max" offset="-3"/>
+            <Visible val="True"/>
+        </Frame>
+        
+        <Frame type="Image" name="TextBackground">
+            <Visible val="False"/>
+            
+            <StateGroup name="VisibleState">
+                <DefaultState val="NotVisible"/>
+            
+                <State name="Visible">
+                    <Action type="SetProperty" frame="$this" Visible="False"/>
+                </State>
+                
+                <State name="NotVisible">
+                    <Action type="SetProperty" frame="$this" Visible="False"/>
+                </State>
+            </StateGroup>
+        </Frame>
+		
+        <Frame type="Image" name="BorderHighlight">
+			<Visible val="False"/>
+        </Frame>
+    </Frame>
+	
+	<Frame type="TabControl" name="PreviewContainerTemplate">
+		<Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+		<Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+		<Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+		<Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+		<TabListItem val="$this/PreviewButtons/PreviewButton0"/>
+		<TabListItem val="$this/PreviewButtons/PreviewButton1"/>
+		<TabListItem val="$this/PreviewButtons/PreviewButton2"/>
+		<TabListItem val="$this/PreviewButtons/PreviewButton3"/>
+		<PanelListItem val="$this/PreviewPanels/Preview0"/>
+		<PanelListItem val="$this/PreviewPanels/Preview1"/>
+		<PanelListItem val="$this/PreviewPanels/Preview2"/>
+		<PanelListItem val="$this/PreviewPanels/Preview3"/>
+		
+		<Frame type="Frame" name="PreviewPanels">
+			<Anchor side="Top" relative="$parent" pos="Min" offset="14"/>
+			<Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+			<Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+			<Width val="766"/>
+			<Height val="434"/>
+			
+			<Frame type="Frame" name="Preview0" template="StandardTemplates/StandardMovieTemplate">
+				<Anchor side="Top" relative="$parent" pos="Min" offset="3"/>
+				<Anchor side="Bottom" relative="$parent" pos="Max" offset="-3"/>
+				<Anchor side="Left" relative="$parent" pos="Min" offset="3"/>
+				<Anchor side="Right" relative="$parent" pos="Max" offset="-3"/>
+			
+				<Frame type="MovieFrame" name="Movie" template="StandardTemplates/StandardMovieTemplate">
+					<Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+					<Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+					<Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+					<Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+					<PauseAllowed val="True"/>
+					<File val=""/>
+					<Visible val="False"/>
+					<MuteBgMusicWhilePlaying val="True"/>
+	
+					<StateGroup name="FinishedState">
+						<DefaultState val="NotFinished"/>
+					
+						<State name="Finished">
+							<When type="Property" frame="$this" Finished="True"/>
+							<Action type="SendEvent" frame="$parent/MoviePreviewButton" event="Finished" on="Enter"/>
+						</State>
+						
+						<State name="NotFinished"/>
+					</StateGroup>
+					
+					<StateGroup name="PlayingState">
+						<DefaultState val="NotPlaying"/>
+					
+						<State name="Playing">
+							<When type="Property" frame="$this" Visible="True"/>
+							<Action type="SetProperty" frame="$this" file="{$parent/$parent/$parent/$parent/PremiumMapCacheFrame/@MoviePath}" undo="False"/>
+						</State>
+						
+						<State name="NotPlaying">
+							<When type="Property" frame="$this" Visible="False"/>
+							<Action type="SetProperty" frame="$this" file="" undo="False"/>
+						</State>
+					</StateGroup>
+				</Frame>
+				
+				<Frame type="Button" name="MoviePreviewButton">
+					<Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+					<Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+					<Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+					<Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+					
+					<Frame type="Image" name="MoviePreviewImage">
+						<Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+						<Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+						<Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+						<Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+						<Texture val="{$parent/$parent/$parent/$parent/$parent/PremiumMapCacheFrame/@MoviePreviewImage}"/>
+					</Frame>
+	
+					<Frame type="Image" name="PulseImage">
+						<Anchor side="Top" relative="$parent/PlayButtonIcon" pos="Mid" offset="0"/>
+						<Anchor side="Bottom" relative="$parent/PlayButtonIcon" pos="Mid" offset="0"/>
+						<Anchor side="Left" relative="$parent/PlayButtonIcon" pos="Mid" offset="0"/>
+						<Anchor side="Right" relative="$parent/PlayButtonIcon" pos="Mid" offset="0"/>
+						<Width val="200"/>
+						<Height val="200"/>
+						<Texture val="@UI/Glues_Generic_Effect_RadialGradient_256x256"/>
+						<Color val="40,100,200"/>
+
+						<Animation name="Pulse">
+							<Event event="OnShown" action="DirectionForward,Play"/>
+
+							<Controller type="Fade" end="Loop">
+								<Key type="Curve" time="0" value="120" out="Slow"/>
+								<Key type="Curve" time="1.5" value="255" in="Slow"/>
+								<Key type="Curve" time="3" value="120" out="Slow"/>
+							</Controller>
+						</Animation>
+					</Frame>
+		
+					<Frame type="Image" name="PlayButtonIcon">
+						<!-- <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/> -->
+						<Anchor side="Bottom" relative="$parent" pos="Max" offset="-14"/>
+						<!-- <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/> -->
+						<Anchor side="Right" relative="$parent" pos="Max" offset="-14"/>
+						<Width val="96"/>
+						<Height val="96"/>
+						<Texture val="@UI/SC2_UI_Battlenet_Glue_Campaign_MapIcon_PlayButton"/>
+						
+						<!-- <Animation name="Show">
+							<Event event="OnShown" action="Reset,Play" frame="$parent" />
+
+							<Controller type="Fade" end="Pause">
+								<Key type="Curve" time="0.0" value="255" out="Fast"/>
+								<Key type="Curve" time="0.35" value="255" out="Fast"/>
+								<Key type="Curve" time="0.75" value="255" in="Slow"/>
+							</Controller>
+						</Animation> -->
+						
+						<Animation name="Hover">
+							<Event event="OnMouseEnter" action="Reset,Play" frame="$parent"/>
+							<Event event="OnMouseExit" action="Reset,Stop" frame="$parent"/>
+
+							<Controller type="Texture" end="Pause">
+								<Key type="Image" time="0" image="@UI/SC2_UI_Battlenet_Glue_Campaign_MapIcon_PlayButton_Hover"/>
+							</Controller>
+						</Animation>
+						
+						<Animation name="Click">
+							<Event event="OnMouseDown" action="Reset,Play" frame="$parent"/>
+							<Event event="OnMouseUp" action="Reset,Stop" frame="$parent"/>
+
+							<Controller type="Texture" end="Pause">
+								<Key type="Image" time="0" image="@UI/SC2_UI_Battlenet_Glue_Campaign_MapIcon_PlayButton_Pressed"/>
+							</Controller>
+							<Controller type="Sound" end="Stop">
+								<Key type="Sound" time="0" sound="@UI_MoviePlayerButtonClick"/>
+							</Controller>
+						</Animation>
+					</Frame>
+					
+					<Animation name="PlayMovie">
+						<Event event="OnClick" action="Reset,Play"/>
+						<Event event="Finished" action="Reset"/>
+						<Event event="OnHidden" action="Reset" frame="$parent"/>
+						 
+						<Controller type="Visibility" end="Pause" frame="$this">
+							<Key type="Bool" time="0" value="True"/>
+							<Key type="Bool" time="0.01" value="False"/>
+						</Controller>
+						 
+						<Controller type="Visibility" end="Pause" frame="$parent/Movie">
+							<Key type="Bool" time="0" value="False"/>
+							<Key type="Bool" time="0.01" value="True"/>
+						</Controller>
+					</Animation>
+				</Frame>
+			</Frame>
+			
+			<Frame type="Image" name="Preview1">
+				<Anchor side="Top" relative="$parent" pos="Min" offset="3"/>
+				<Anchor side="Bottom" relative="$parent" pos="Max" offset="-3"/>
+				<Anchor side="Left" relative="$parent" pos="Min" offset="3"/>
+				<Anchor side="Right" relative="$parent" pos="Max" offset="-3"/>
+				<Texture val="{$parent/$parent/$parent/PremiumMapCacheFrame/@ScreenShotImage[0]}"/>
+			</Frame>
+			
+			<Frame type="Image" name="Preview2">
+				<Anchor side="Top" relative="$parent" pos="Min" offset="3"/>
+				<Anchor side="Bottom" relative="$parent" pos="Max" offset="-3"/>
+				<Anchor side="Left" relative="$parent" pos="Min" offset="3"/>
+				<Anchor side="Right" relative="$parent" pos="Max" offset="-3"/>
+				<Texture val="{$parent/$parent/$parent/PremiumMapCacheFrame/@ScreenShotImage[1]}"/>
+			</Frame>
+			
+			<Frame type="Image" name="Preview3">
+				<Anchor side="Top" relative="$parent" pos="Min" offset="3"/>
+				<Anchor side="Bottom" relative="$parent" pos="Max" offset="-3"/>
+				<Anchor side="Left" relative="$parent" pos="Min" offset="3"/>
+				<Anchor side="Right" relative="$parent" pos="Max" offset="-3"/>
+				<Texture val="{$parent/$parent/$parent/PremiumMapCacheFrame/@ScreenShotImage[2]}"/>
+			</Frame>
+				
+			<Frame type="Frame" name="PreviewBorder" template="StandardElementsTemplates/ImageBorderTemplate">
+				<Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+				<Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+				<Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+				<Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+			</Frame>
+		</Frame>
+		
+		<Frame type="Label" name="DescriptionLabel">
+			<Anchor side="Top" relative="$parent/PreviewPanels" pos="Max" offset="14"/>
+			<Anchor side="Bottom" relative="$parent/HorizontalDivider" pos="Min" offset="-14"/>
+			<Anchor side="Left" relative="$parent/PreviewPanels" pos="Min" offset="0"/>
+			<Anchor side="Right" relative="$parent/PreviewPanels" pos="Max" offset="0"/>
+			<Style val="@Arcade_GameInfo_LongDescription"/>
+			<Text val=""/>
+	
+			<StateGroup name="SelectionState">
+				<DefaultState val="NoSelection"/>
+			
+				<State name="PreviewItem0">
+					<When type="Property" frame="$parent" SelectedIndex="0"/>
+					<Action type="SetProperty" frame="$this" Text="{$parent/$parent/PremiumMapCacheFrame/@MovieDescription}"/>
+				</State>
+			
+				<State name="PreviewItem1">
+					<When type="Property" frame="$parent" SelectedIndex="1"/>
+					<Action type="SetProperty" frame="$this" Text="{$parent/$parent/PremiumMapCacheFrame/@ScreenShotDescription[0]}"/>
+				</State>
+			
+				<State name="PreviewItem2">
+					<When type="Property" frame="$parent" SelectedIndex="2"/>
+					<Action type="SetProperty" frame="$this" Text="{$parent/$parent/PremiumMapCacheFrame/@ScreenShotDescription[1]}"/>
+				</State>
+			
+				<State name="PreviewItem3">
+					<When type="Property" frame="$parent" SelectedIndex="3"/>
+					<Action type="SetProperty" frame="$this" Text="{$parent/$parent/PremiumMapCacheFrame/@ScreenShotDescription[2]}"/>
+				</State>
+				
+				<State name="NoSelection">
+					<Action type="SetProperty" frame="$this" Text=""/>
+				</State>
+			</StateGroup>
+		</Frame>
+		
+		<Frame type="Image" name="HorizontalDivider" template="StandardBattlenetTemplates/BattlenetStandardContentContainerDividerTemplate">
+			<Anchor side="Bottom" relative="$parent" pos="Max" offset="-135"/>
+			<Anchor side="Left" relative="$parent" pos="Min" offset="16"/>
+			<Anchor side="Right" relative="$parent" pos="Max" offset="-16"/>
+			<Height val="2"/>
+		</Frame>
+		
+		<Frame type="Frame" name="PreviewButtons">
+			<Anchor side="Top" relative="$parent/HorizontalDivider" pos="Max" offset="0"/>
+			<Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+			<Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+			<Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+			
+			<Frame type="Button" name="PreviewButton0" template="BattleMapProfilePremiumPanel/PreviewButtonTemplate">
+	
+				<Frame type="Frame" name="AnchorFrame">
+					<Anchor side="Bottom" relative="$parent/$parent" pos="Max" offset="-14"/>
+					<Anchor side="Left" relative="$parent/$parent" pos="Min" offset="14"/>
+				</Frame>
+				
+				<Frame type="Image" name="Icon">
+					<Texture val="{$parent/$parent/$parent/$parent/PremiumMapCacheFrame/@MovieImageThumbnail}" layer="1"/>
+				</Frame>
+		
+				<Frame type="Image" name="PlayButtonIcon">
+					<!-- <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/> -->
+					<Anchor side="Bottom" relative="$parent" pos="Max" offset="-26"/>
+					<!-- <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/> -->
+					<Anchor side="Right" relative="$parent" pos="Max" offset="-26"/>
+					<Width val="40"/>
+					<Height val="40"/>
+					<Texture val="@UI/SC2_UI_Battlenet_Glue_Campaign_MapIcon_PlayButton"/>
+				</Frame>
+			</Frame>
+			
+			<Frame type="Button" name="PreviewButton1" template="BattleMapProfilePremiumPanel/PreviewButtonTemplate">
+	
+				<Frame type="Frame" name="AnchorFrame">
+					<Anchor side="Bottom" relative="$parent/$parent/PreviewButton0/AnchorFrame" pos="Max" offset="0"/>
+					<Anchor side="Left" relative="$parent/$parent/PreviewButton0/AnchorFrame" pos="Max" offset="10"/>
+				</Frame>
+				
+				<Frame type="Image" name="Icon">
+					<Texture val="{$parent/$parent/$parent/$parent/PremiumMapCacheFrame/@ScreenShotImageThumbnail[0]}" layer="1"/>
+				</Frame>
+			</Frame>
+			
+			<Frame type="Button" name="PreviewButton2" template="BattleMapProfilePremiumPanel/PreviewButtonTemplate">
+	
+				<Frame type="Frame" name="AnchorFrame">
+					<Anchor side="Bottom" relative="$parent/$parent/PreviewButton0/AnchorFrame" pos="Max" offset="0"/>
+					<Anchor side="Left" relative="$parent/$parent/PreviewButton1/AnchorFrame" pos="Max" offset="10"/>
+				</Frame>
+				
+				<Frame type="Image" name="Icon">
+					<Texture val="{$parent/$parent/$parent/$parent/PremiumMapCacheFrame/@ScreenShotImageThumbnail[1]}" layer="1"/>
+				</Frame>
+			</Frame>
+			
+			<Frame type="Button" name="PreviewButton3" template="BattleMapProfilePremiumPanel/PreviewButtonTemplate">
+	
+				<Frame type="Frame" name="AnchorFrame">
+					<Anchor side="Bottom" relative="$parent/$parent/PreviewButton0/AnchorFrame" pos="Max" offset="0"/>
+					<Anchor side="Left" relative="$parent/$parent/PreviewButton2/AnchorFrame" pos="Max" offset="10"/>
+				</Frame>
+				
+				<Frame type="Image" name="Icon">
+					<Texture val="{$parent/$parent/$parent/$parent/PremiumMapCacheFrame/@ScreenShotImageThumbnail[2]}" layer="1"/>
+				</Frame>
+			</Frame>
+		</Frame>
+	</Frame>
+
+    <Frame type="Frame" name="BattleMapPremiumPanelTemplate">
+        <Anchor relative="$parent"/>
+        <!-- Available Animation Events: -->
+        <!-- Empty: No game selected -->
+        <!-- Loading: Loading game info -->
+        <!-- Loaded: Game info complete -->
+        
+        <Frame type="PremiumMapCacheFrame" name="PremiumMapCacheFrame">
+            <Anchor relative="$parent"/>
+            <MapHandle val="{$ScreenBattleMapProfile/@MapHandle}"/>
+        </Frame>
+        
+        <Frame type="Image" name="Divider" template="StandardBattlenetTemplates/BattlenetStandardContentContainerDividerTemplate">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="676"/>
+            <Width val="2"/>
+        </Frame>
+        
+        <Frame type="Frame" name="DetailsContainer">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent/Divider" pos="Min" offset="0"/>
+			
+			<Frame type="Image" name="HeaderBG">
+				<Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+				<Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+				<Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+				<Height val="86"/>
+				<RenderPriority val="510"/>
+				<Color val="255,170,0"/>
+				<Alpha val="26"/>
+			</Frame>
+        
+			<Frame type="Image" name="Divider" template="StandardBattlenetTemplates/BattlenetStandardContentContainerDividerTemplate">
+				<Anchor side="Top" relative="$parent/HeaderBG" pos="Max" offset="0"/>
+				<Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+				<Anchor side="Right" relative="$parent/$parent/Divider" pos="Min" offset="0"/>
+				<Height val="2"/>
+				<Color val="255,170,0"/>
+			</Frame>
+			
+			<Frame type="Frame" name="PremiumIcon" template="StandardElementsTemplates/PremiumMapLargeIconTemplate">
+				<Anchor side="Top" relative="$parent" pos="Min" offset="5"/>
+				<Anchor side="Left" relative="$parent" pos="Min" offset="5"/>
+			</Frame>
+            
+            <Frame type="Label" name="TitleLabel">
+                <Anchor side="Bottom" relative="$parent/PremiumIcon" pos="Mid" offset="7"/>
+                <Anchor side="Left" relative="$parent/PremiumIcon" pos="Max" offset="2"/>
+                <Anchor side="Right" relative="$parent" pos="Max" offset="-14"/>
+				<Style val="@Arcade_Premium_Title"/>
+                <Text val="{$ScreenBattleMapProfile/BattleMapFrame/@Name}"/>
+            </Frame>
+            
+            <Frame type="Label" name="SubtitleLabel">
+                <Anchor side="Top" relative="$parent/PremiumIcon" pos="Mid" offset="4"/>
+                <Anchor side="Left" relative="$parent/TitleLabel" pos="Min" offset="0"/>
+                <Anchor side="Right" relative="$parent" pos="Max" offset="-14"/>
+				<Style val="@Arcade_Premium_Subtitle"/>
+                <Text val="@UI/PremiumMaps/PremiumContent"/>
+            </Frame>
+            
+            <Frame type="Label" name="DescriptionLabel">
+                <Anchor side="Top" relative="$parent/Divider" pos="Max" offset="16"/>
+                <Anchor side="Bottom" relative="$parent/LanguageWarningLabel" pos="Min" offset="-16"/>
+                <Anchor side="Left" relative="$parent/PremiumIcon" pos="Min" offset="14"/>
+                <Anchor side="Right" relative="$parent/TitleLabel" pos="Max" offset="0"/>
+				<Style val="@Arcade_GameInfo_LongDescription"/>
+                <Text val="{$parent/$parent/PremiumMapCacheFrame/@Description}"/>
+            </Frame>
+			
+			<Frame type="Label" name="LanguageWarningLabel">
+                <Anchor side="Bottom" relative="$parent" pos="Max" offset="-14"/>
+                <Anchor side="Left" relative="$parent/PremiumIcon" pos="Min" offset="14"/>
+                <Anchor side="Right" relative="$parent/TitleLabel" pos="Max" offset="0"/>
+				<Style val="@VoicePack_ItemFrame_LanguageWarning"/>
+				<Text val="@UI/PremiumMaps/ARKStar/LanguageWarning"/>
+			</Frame>
+        </Frame>
+        
+        <Frame type="TabControl" name="PreviewContainer" template="BattleMapProfilePremiumPanel/PreviewContainerTemplate">
+            <Anchor side="Left" relative="$parent/Divider" pos="Max" offset="0"/>
+        </Frame>
+    </Frame>
+
+    <Frame type="Frame" name="BattleMapProfilePremiumPanelTemplate">
+        <Frame type="Frame" name="PremiumInfoPanel" template="BattleMapProfilePremiumPanel/BattleMapPremiumPanelTemplate">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+        </Frame>
+        
+        <Frame type="Frame" name="InfoEmpty">
+            <Anchor relative="$parent"/>
+            <Visible val="False"/>
+            
+            <Frame type="Label" name="EmptyLabel">
+                <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="40"/>
+                <Anchor side="Right" relative="$parent" pos="Max" offset="-40"/>
+                <Style val="@Arcade_ListError"/>
+                <Text val="@UI/BattleMapInfoPanel/Empty"/>
+            </Frame>
+        </Frame>
+        
+        <Frame type="Frame" name="InfoDownloading">
+            <Anchor relative="$parent"/>
+            <Visible val="False"/>
+            
+            <Frame type="Frame" name="IdleSpinner" template="StandardBattlenetTemplates/IdleSpinnerTemplate">
+                <Anchor side="Top" relative="$parent/$parent/PremiumInfoPanel" pos="Mid" offset="0"/>
+                <Anchor side="Bottom" relative="$parent/$parent/PremiumInfoPanel" pos="Mid" offset="0"/>
+                <Anchor side="Left" relative="$parent/$parent/PremiumInfoPanel" pos="Mid" offset="0"/>
+                <Anchor side="Right" relative="$parent/$parent/PremiumInfoPanel" pos="Mid" offset="0"/>
+            </Frame>
+        </Frame>
+        
+        <!-- 
+
+        INFO STATE ANIMATIONS
+        
+        -->
+        
+        <!-- <StateGroup name="GameInfoStateGroup">
+            <DefaultState val="EmptyState"/>
+            
+            <State name="LoadingState">
+                <When type="AnimationState" frame="$this/MapInfoPanel" GameInfo="Loading"/>
+                <Action type="SetProperty" frame="MapInfoPanel" visible="false"/>
+                <Action type="SetProperty" frame="InfoEmpty" visible="false"/>
+                <Action type="SetProperty" frame="InfoDownloading" visible="true"/>
+            </State>
+
+            <State name="LoadedState">
+                <When type="AnimationState" frame="$this/MapInfoPanel" GameInfo="Loaded"/>
+                <Action type="SetProperty" frame="MapInfoPanel" visible="true"/>
+                <Action type="SetProperty" frame="InfoEmpty" visible="false"/>
+                <Action type="SetProperty" frame="InfoDownloading" visible="false"/>
+            </State>
+            
+            <State name="EmptyState">
+                <When type="AnimationState" frame="$this/MapInfoPanel" GameInfo="Empty"/>
+                <Action type="SetProperty" frame="MapInfoPanel" visible="false"/>
+                <Action type="SetProperty" frame="InfoEmpty" visible="true"/>
+                <Action type="SetProperty" frame="InfoDownloading" visible="false"/>
+            </State>
+        </StateGroup> -->
+    </Frame>
+</Desc>

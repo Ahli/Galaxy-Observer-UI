@@ -46,6 +46,11 @@
             <Anchor relative="$parent"/>
             <MapHandle val="{$parent/@MultiModHandle}"/>
         </Frame>
+        
+        <Frame type="PremiumMapCacheFrame" name="PremiumMapCacheFrame">
+            <Anchor relative="$parent"/>
+            <MapHandle val="{$parent/@MapHandle}"/>
+        </Frame>
 
         <Frame type="Frame" name="ExpansionAnchorFrame">
             <Anchor side="Top" relative="$parent/ExtendedExperienceBG/AnchorFrame" pos="Min" offset="39"/>
@@ -109,11 +114,44 @@
                 </State>
             </StateGroup>
         </Frame>
+		
+		<Frame type="Frame" name="PremiumContentIcon" template="StandardElementsTemplates/PremiumMapLargeIconTemplate">
+            <Anchor side="Top" relative="$parent/ExpansionAnchorFrame" pos="Mid" offset="3"/>
+            <Anchor side="Bottom" relative="$parent/ExpansionAnchorFrame" pos="Mid" offset="3"/>
+            <Anchor side="Left" relative="$parent/ExpansionIconFrame" pos="Max" offset="10"/>
+			<CollapseLayout val="True"/>
+			<PreserveAnchorOffset val="False"/>
+			<AcceptsMouse val="True"/>
+			<Tooltip val="@UI/PremiumMaps/PremiumContentLobbyWarning"/>
+			<Visible val="False"/>
+
+            <StateGroup name="VisibleState">
+                <State name="Visible">
+                    <When type="Property" frame="$parent/LobbyMatchOptionsFrame/OptionsTileList/Item0" VariantIsPremium="True"/>
+                    <Action type="SetProperty" frame="$this" Visible="True"/>
+                </State>
+
+                <State name="NotVisible">
+                    <Action type="SetProperty" frame="$this" Visible="False"/>
+                </State>
+            </StateGroup>
+		</Frame>
+		
+		<Frame type="Frame" name="PremiumContentIconAnchor">
+            <Anchor side="Top" relative="$parent/ExpansionAnchorFrame" pos="Mid" offset="3"/>
+            <Anchor side="Bottom" relative="$parent/ExpansionAnchorFrame" pos="Mid" offset="3"/>
+            <Anchor side="Left" relative="$parent/ExpansionIconFrame" pos="Max" offset="10"/>
+			<Width val="66"/>
+			<Height val="76"/>
+			<CollapseLayout val="True"/>
+			<PreserveAnchorOffset val="False"/>
+			<Visible val="{$parent/PremiumContentIcon/@Visible}"/>
+		</Frame>
 
         <Frame type="Label" name="MapNameLabel">
             <Anchor side="Top" relative="$parent/ExpansionAnchorFrame" pos="Mid" offset="-9"/>
             <Anchor side="Bottom" relative="$parent/ExpansionAnchorFrame" pos="Mid" offset="-9"/>
-            <Anchor side="Left" relative="$parent/ExpansionIconFrame" pos="Max" offset="10"/>
+            <Anchor side="Left" relative="$parent/PremiumContentIconAnchor" pos="Max" offset="10"/>
             <AutoSizeClamps maxWidth="430"/>
             <Style val="@Lobby_Title"/>
             <AcceptsMouseTooltip val="true"/>
@@ -175,7 +213,7 @@
 
         <Frame type="Label" name="LobbyNameLabel">
             <Anchor side="Top" relative="$parent/MapNameLabel" pos="Max" offset="0"/>
-            <Anchor side="Left" relative="$parent/ExpansionIconFrame" pos="Max" offset="10"/>
+            <Anchor side="Left" relative="$parent/MapNameLabel" pos="Min" offset="0"/>
             <AutoSizeClamps maxWidth="430"/>
             <Style val="@Lobby_Name"/>
             <AcceptsMouseTooltip val="true"/>
@@ -270,7 +308,7 @@
             
                 <State name="LobbyUnnamed">
                     <When type="Property" frame="$ancestor[@type=ScreenBattleLobby]" LobbyName=""/>
-                    <Action type="SetAnchor" frame="$this" side="Left" relative="$parent/ExpansionIconFrame" pos="Max" offset="2"/>
+                    <Action type="SetAnchor" frame="$this" side="Left" relative="$parent/PremiumContentIconAnchor" pos="Max" offset="2"/>
                     <Action type="SetAnchor" frame="$this" side="Right" relative="$this/EditLobbyNameLabel" pos="Max" offset="0"/>
                 </State>
                 
@@ -321,7 +359,7 @@
                     <When type="Property" frame="$parent" CanAddParticipant="false"/>
                     <When type="Property" frame="$parent" CanAddObserver="false"/>
                     <Action type="SetProperty" Enabled="false"/>
-                    <Action type="SetProperty" Tooltip="@UI/ScreenBattleLobby/InvitePlayerTooltip"/>
+                    <Action type="SetProperty" Tooltip=""/>
                 </State>
                 
                 <State name="CountdownState">
@@ -343,7 +381,7 @@
                 <State name="ComputerState">
                     <When type="Property" frame="$parent" CanAddComputer="false"/>
                     <Action type="SetProperty" Enabled="false"/>
-                    <Action type="SetProperty" Tooltip="@UI/ScreenBattleLobby/AddComputerTooltip"/>
+                    <Action type="SetProperty" Tooltip=""/>
                 </State>
                 
                 <State name="CountdownState">
@@ -504,6 +542,100 @@
                 <Action type="SetProperty" frame="LobbyMatchOptionsFrame" Visible="true"/>
             </State>
         </StateGroup>
+		
+		<Frame type="Frame" name="PremiumContentCalloutContainer">
+            <Anchor side="Top" relative="$parent/GameInfoBackground" pos="Max" offset="6"/>
+            <Anchor side="Left" relative="$parent/LobbyPlayerSlotsFrame" pos="Max" offset="-23"/>
+            <Anchor side="Right" relative="$parent/ExtendedExperienceBG/AnchorFrame" pos="Max" offset="-34"/>
+            <Height val="263"/>
+		
+			<Frame type="Image" name="GameInfoBackground">
+				<Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+				<Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+				<Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+				<Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+				<Texture val="@UI/Glues_ExtendedXP_InnerContainer_1"/>
+				<TextureType val="NineSlice"/>
+				<RenderPriority val="512"/>
+			</Frame>
+			
+			<Frame type="Frame" name="PremiumIcon" template="StandardElementstemplates/PremiumMapSmallIconTemplate">
+				<Anchor side="Top" relative="$parent" pos="Min" offset="-12"/>
+				<Anchor side="Left" relative="$parent" pos="Min" offset="-4"/>
+				<Width val="76"/>
+				<Height val="76"/>
+			</Frame>
+
+			<Frame type="Label" name="PremiumContentTitleLabel">
+				<Anchor side="Top" relative="$parent" pos="Min" offset="15"/>
+				<Anchor side="Left" relative="$parent/PremiumIcon" pos="Max" offset="-12"/>
+				<Anchor side="Right" relative="$parent" pos="Max" offset="-15"/>
+				<Style val="@Lobby_TeamTitle"/>
+				<Text val="@UI/PremiumMaps/PremiumContent"/>
+			</Frame>
+
+			<Frame type="TextFormatFrame" name="UpsellDescriptionFormatFrame">
+				<Anchor relative="$parent"/>
+				<FormatText val="@UI/PremiumMaps/PremiumContentUpsell"/>
+				<Replacement index="0" val="{$ScreenBattleLobby/MapFrame/@Name}"/>
+			</Frame>
+			
+			<Frame type="Label" name="PremiumContentUpsellLabel">
+				<Anchor side="Top" relative="$parent" pos="Min" offset="60"/>
+				<Anchor side="Left" relative="$parent" pos="Min" offset="25"/>
+				<Anchor side="Right" relative="$parent" pos="Max" offset="-25"/>
+				<Style val="@Arcade_Premium_LobbyPromoDescription"/>
+				<Text val="{$parent/UpsellDescriptionFormatFrame/@Text}"/>
+			</Frame>
+			
+			<Frame type="Label" name="PremiumContentDescriptionLabel">
+				<Anchor side="Top" relative="$parent/PremiumContentUpsellLabel" pos="Max" offset="20"/>
+				<Anchor side="Bottom" relative="$parent/MoreInfoButton" pos="Min" offset="-20"/>
+				<Anchor side="Left" relative="$parent" pos="Min" offset="25"/>
+				<Anchor side="Right" relative="$parent" pos="Max" offset="-25"/>
+				<Style val="@Arcade_Premium_LobbyPromoDescription"/>
+				<Text val="{$ScreenBattleLobby/PremiumMapCacheFrame/@ShortDescription}"/>
+			</Frame>
+        
+			<Frame type="ViewMapProfileButton" name="MoreInfoButton" template="StandardBattlenetTemplates/BattlenetSmallButtonTemplate">
+				<Anchor side="Bottom" relative="$parent" pos="Max" offset="-20"/>
+				<Anchor side="Left" relative="$parent" pos="Min" offset="20"/>
+				<Text val="@UI/ScreenCustomGames/GameInfo/MoreInfo"/>
+				<HoverSound val="@UI_HoverTick"/>
+				<MapHandle val="{$parent/$parent/@MapHandle}"/>
+				<UseHyperLink val="true"/>
+				<HyperLinkIndex val="#MapInfoIndex_Premium"/>
+        
+				<!-- Anchor Frame -->
+				<!-- <Frame type="Frame" name="AnchorFrame">
+					<Anchor side="Bottom" relative="$parent/$parent" pos="Max" offset="-20"/>
+					<Anchor side="Left" relative="$parent/$parent" pos="Min" offset="20"/>
+				</Frame> -->
+
+				<StateGroup name="GameInfoButtonState">
+					<State name="MapHandleInvalid">
+						<When type="Property" SelectedMapHandle="0,0"/>
+						<Action type="SetProperty" frame="$this" Enabled="false"/>
+					</State>
+					<State name="MapHandleValid">
+						<Action type="SetProperty" frame="$this" Enabled="true"/>
+					</State>
+				</StateGroup>
+			</Frame>
+			
+			<StateGroup name="VisibleState">
+				<DefaultState val="NotVisible"/>
+				
+				<State name="Visible">
+					<When type="Property" frame="$ScreenBattleLobby/PremiumMapCacheFrame" HasPremium="True"/>
+					<When type="Property" frame="$ScreenBattleLobby/PremiumMapCacheFrame" Owned="False"/>
+					<Action type="SetProperty" frame="$this" Visible="True"/>
+				</State>
+				<State name="NotVisible">
+					<Action type="SetProperty" frame="$this" Visible="False"/>
+				</State>
+			</StateGroup>
+		</Frame>
 
         <!-- BOTTOM BUTTONS -->
 

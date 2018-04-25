@@ -186,10 +186,15 @@
             <Anchor relative="$parent"/>
             <MapHandle val="{$parent/@MapHandle}"/>
         </Frame>
+        
+        <Frame type="PremiumMapCacheFrame" name="PremiumMapCacheFrame">
+            <Anchor relative="$parent"/>
+            <MapHandle val="{$parent/@MapHandle}"/>
+        </Frame>
 
         <Frame type="Label" name="MapNameLabel">
             <Anchor side="Top" relative="$parent" pos="Min" offset="5"/>
-            <Anchor side="Left" relative="$parent" pos="Min" offset="15"/>
+            <Anchor side="Left" relative="$parent/PremiumIconAnchor" pos="Max" offset="0"/>
             <Anchor side="Right" relative="$parent" pos="Max" offset="-15"/>
             <Height val="32"/>
             <Style val="@CustomGames_MapInfoPreview_Title"/>
@@ -211,10 +216,63 @@
                 </State>
             </StateGroup>
         </Frame>
+		
+		<Frame type="Frame" name="PremiumIconAnchor">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="15"/>
+			<Width val="35"/>
+			<Height val="30"/>
+			<CollapseLayout val="True"/>
+			<Visible val="{$parent/PremiumIcon/@Visible}"/>
+		</Frame>
+		
+		<Frame type="Frame" name="PremiumIcon" template="StandardElementstemplates/PremiumMapSmallIconTemplate">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="-18"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="-9"/>
+			<CollapseLayout val="True"/>
+			<Visible val="False"/>
+            
+            <StateGroup name="VisibleState">
+                <DefaultState val="NotVisible"/>
+            
+                <State name="Visible">
+                    <When type="Property" frame="$parent/PremiumMapCacheFrame" HasPremium="True"/>
+                    <Action type="SetProperty" frame="$this" Visible="True"/>
+                </State>
+                
+                <State name="NotVisible">
+                    <Action type="SetProperty" frame="$this" Visible="False"/>
+                </State>
+            </StateGroup>
+        
+			<Frame type="ViewMapProfileButton" name="GameInfoButton">
+				<Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+				<Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+				<Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+				<Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+				<Width val="30"/>
+				<Height val="30"/>
+				<HoverSound val="@UI_HoverTick"/>
+				<MapHandle val="{$parent/$parent/@MapHandle}"/>
+				<UseHyperLink val="true"/>
+				<HyperLinkIndex val="#MapInfoIndex_Premium"/>
+				<Tooltip val="@UI/PremiumMaps/PremiumContentInfo"/>
+
+				<StateGroup name="GameInfoButtonState">
+					<State name="MapHandleInvalid">
+						<When type="Property" SelectedMapHandle="0,0"/>
+						<Action type="SetProperty" frame="$this" Enabled="false"/>
+					</State>
+					<State name="MapHandleValid">
+						<Action type="SetProperty" frame="$this" Enabled="true"/>
+					</State>
+				</StateGroup>
+			</Frame>
+		</Frame>
 
         <Frame type="Label" name="AuthorLabel">
             <Anchor side="Top" relative="$parent/MapNameLabel" pos="Max" offset="2"/>
-            <Anchor side="Left" relative="$parent/MapNameLabel" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent/PremiumIconAnchor" pos="Min" offset="0"/>
             <Anchor side="Right" relative="$parent/MapNameLabel" pos="Max" offset="0"/>
             <Style val="@CustomGames_MapInfoPreview_Author"/>
             
@@ -236,7 +294,7 @@
         
         <Frame type="Image" name="BlizzardIcon">
             <Anchor side="Top" relative="$parent/MapNameLabel" pos="Max" offset="5"/>
-            <Anchor side="Left" relative="$parent/MapNameLabel" pos="Min" offset="1"/>
+            <Anchor side="Left" relative="$parent/PremiumIconAnchor" pos="Min" offset="1"/>
             <Width val="40"/>
             <ScaleHeightToTexture val="True"/>
             <Texture val="@UI/Glues_Icons_BlizzardAuthored_Normal"/>
@@ -334,7 +392,7 @@
         <Frame type="Label" name="DescriptionLabel">
             <Anchor side="Top" relative="$parent/InfoLabel" pos="Max" offset="11"/>
             <Anchor side="Bottom" relative="$parent/WebsiteLabel" pos="Min" offset="-10"/>
-            <Anchor side="Left" relative="$parent/MapNameLabel" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent/PremiumIconAnchor" pos="Min" offset="0"/>
             <Anchor side="Right" relative="$parent/MapNameLabel" pos="Max" offset="0"/>
             <Style val="@CustomGames_MapInfoPreview_Description"/>
             <Text val="{$parent/BattleMapFrame/@Description}"/>
@@ -358,7 +416,7 @@
 
         <Frame type="Label" name="WebsiteLabel">
             <Anchor side="Bottom" relative="$parent" pos="Max" offset="-14"/>
-            <Anchor side="Left" relative="$parent/MapNameLabel" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent/PremiumIconAnchor" pos="Min" offset="0"/>
             <Anchor side="Right" relative="$parent/MapNameLabel" pos="Max" offset="0"/>
             <Height val="24"/>
             <Style val="@CustomGames_MapInfoPreview_Website"/>
@@ -1665,7 +1723,7 @@
     ARCADE LIST ITEM TEMPLATE
     ========================
     -->
-    <Frame type="ArcadeBrowseTileListItem" name="ArcadeListItemTemplate" template="StandardTileListTemplates/UnlockableTileListItemTemplate">
+    <Frame type="TileListItem" name="ArcadeListItemTemplate" template="StandardTileListTemplates/UnlockableTileListItemTemplate">
         <HideWhenCleared val="False"/>
         <SelectedSound val="@UI_FileSelectionSelect"/>
         <!-- <TooltipFrame val="BattleMapInfoTooltip"/> -->
@@ -1677,6 +1735,11 @@
         <Frame type="Frame" name="AnchorFrame">
             <Width val="198"/>
             <Height val="206"/>
+        </Frame>
+        
+        <Frame type="PremiumMapCacheFrame" name="PremiumMapCacheFrame">
+            <Anchor relative="$parent"/>
+            <MapHandle val="{$parent/@MapHandle}"/>
         </Frame>
 
         <Frame type="BattleMapIcon" name="BattleMapIcon">
@@ -1856,6 +1919,84 @@
                 </State>
             </StateGroup>
         </Frame>
+		
+		<!-- PREMIUM CONTENT ICON -->
+		<Frame type="Frame" name="PremiumContentIconContainer">
+            <Anchor side="Top" relative="$parent/Divider" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent/Divider" pos="Mid" offset="0"/>
+            <Anchor side="Left" relative="$parent/AnchorFrame" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent/AnchorFrame" pos="Max" offset="0"/>
+			<Height val="76"/>
+            <RenderPriority val="530"/>
+			
+			<Frame type="Frame" name="GapContainer">
+				<Anchor side="Top" relative="$parent/$parent/Divider" pos="Mid" offset="0"/>
+				<Anchor side="Bottom" relative="$parent/$parent/Divider" pos="Mid" offset="0"/>
+				<Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+				<Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+				<Width val="34"/>
+				<Height val="2"/>
+				<RenderPriority val="510"/>
+		
+				<Frame type="Image" name="GapImage">
+					<Anchor side="Top" relative="$parent/$parent/Icon" pos="Mid" offset="0"/>
+					<Anchor side="Bottom" relative="$parent/$parent/Icon" pos="Mid" offset="0"/>
+					<Anchor side="Left" relative="$parent/$parent/Icon" pos="Mid" offset="0"/>
+					<Anchor side="Right" relative="$parent/$parent/Icon" pos="Mid" offset="0"/>
+					<Width val="34"/>
+					<Height val="34"/>
+					<LayerCount val="1"/>
+					
+					<Texture val="@UI/Glues_Generic_Mask_Circle_76x76_Buffer12pt" layer="0"/>
+					<TextureCoords top="0.075" left="0.075" bottom="0.925" right="0.925" layer="0"/>
+					<LayerColor val="18,42,64" layer="0"/>
+				</Frame>
+			</Frame>
+			
+			<Frame type="Image" name="LeftFiligree">
+				<Anchor side="Top" relative="$parent" pos="Mid" offset="-9"/>
+				<Anchor side="Bottom" relative="$parent" pos="Mid" offset="-9"/>
+				<Anchor side="Right" relative="$parent" pos="Mid" offset="-12"/>
+				<Width val="52"/>
+				<Height val="12"/>
+				<Texture val="@UI/SC2_UI_Battlenet_Glue_PremiumArcade_SmallIcon_Filigree"/>
+				<Color val="255,189,139"/>
+			</Frame>
+			
+			<Frame type="Image" name="RightFiligree">
+				<Anchor side="Top" relative="$parent" pos="Mid" offset="-9"/>
+				<Anchor side="Bottom" relative="$parent" pos="Mid" offset="-9"/>
+				<Anchor side="Left" relative="$parent" pos="Mid" offset="12"/>
+				<Width val="52"/>
+				<Height val="12"/>
+				<Texture val="@UI/SC2_UI_Battlenet_Glue_PremiumArcade_SmallIcon_Filigree"/>
+				<TextureCoords top="0" left="1" bottom="1" right="0" layer="0"/>
+				<Color val="255,189,139"/>
+			</Frame>
+			
+			<Frame type="Frame" name="Icon" template="StandardElementstemplates/PremiumMapSmallIconTemplate">
+				<Anchor side="Top" relative="$parent" pos="Mid" offset="-6"/>
+				<Anchor side="Bottom" relative="$parent" pos="Mid" offset="-6"/>
+				<Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+				<Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+				<Width val="76"/>
+				<Height val="76"/>
+			</Frame>
+            
+            <StateGroup name="VisibleState">
+                <DefaultState val="NotVisible"/>
+                
+                <State name="Visible">
+                    <When type="Property" frame="$parent/PremiumMapCacheFrame" HasPremium="True"/>
+                    <Action type="SetProperty" frame="$this" Visible="True"/>
+                </State>
+
+                <State name="NotVisible">
+                    <Action type="SetProperty" frame="$this" Visible="False"/>
+                </State>
+            </StateGroup>
+		</Frame>
+		
         
         <StateGroup name="EquippedState">
             <DefaultState val="NotEquipped"/>
