@@ -1,0 +1,1627 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<Desc>
+    <DescFlags val="Locked"/>
+    
+    <!--
+    ======================================
+    DETAILS PANEL TEMPLATE
+    ======================================
+    -->
+    <Frame type="BattleMapInfoPanel" name="DetailsPanelTemplate">
+        <Anchor side="Top" relative="$parent/AnchorFrame" pos="Min" offset="8"/>
+        <Anchor side="Bottom" relative="$parent/AnchorFrame" pos="Max" offset="-8"/>
+        <Anchor side="Right" relative="$parent/AnchorFrame" pos="Max" offset="-8"/>
+        <Width val="412"/>
+        <MapHandle val="{$parent/@SelectedMapHandle}"/>
+        
+        <Frame type="BattleMapFrame" name="BattleMapFrame">
+            <Anchor relative="$parent"/>
+            <MapHandle val="{$parent/@MapHandle}"/>
+        </Frame>
+                
+        <Frame type="BattleMapGameInfoScreenshotTileList" name="ScreenshotTileList" template="CustomGamesTemplates/ScreenshotTileListTemplate">
+            <Width val="384"/>
+            <Height val="290"/>
+            <MapHandle val="{$parent/@MapHandle}"/>
+
+            <Frame type="BattleMapScreenshotTileListItem" name="Item0">
+                <Width val="378"/>
+                <Height val="284"/>
+            </Frame>
+        </Frame>
+
+        <Frame type="Label" name="MapNameLabel">
+            <Anchor side="Top" relative="$parent/ScreenshotTileList" pos="Max" offset="8"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="15"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="-15"/>
+            <Height val="32"/>
+            <Style val="@CustomGames_MapInfoPreview_Title"/>
+            <Text val="{$parent/BattleMapFrame/@Name}"/>
+            <AcceptsMouse val="True"/>
+            <Options val="Ellipsis | TooltipIfTruncated | NoWrapping"/>
+            
+            <StateGroup name="VisibleState">
+                <DefaultState val="NotVisible"/>
+            
+                <State name="Visible">
+                    <When type="StateGroup" frame="$ancestor[@name=DetailsPanel]" LoadingState="Loaded"/>
+                    <When type="Property" frame="$parent" MapHandle="0,0" operator="NotEqual"/>
+                    <Action type="SetProperty" frame="$this" Visible="True"/>
+                </State>
+                
+                <State name="NotVisible">
+                    <Action type="SetProperty" frame="$this" Visible="False"/>
+                </State>
+            </StateGroup>
+        </Frame>
+
+        <Frame type="Label" name="AuthorLabel">
+            <Anchor side="Top" relative="$parent/MapNameLabel" pos="Max" offset="2"/>
+            <Anchor side="Left" relative="$parent/MapNameLabel" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent/MapNameLabel" pos="Max" offset="0"/>
+            <Style val="@CustomGames_MapInfoPreview_Author"/>
+            
+            <StateGroup name="VisibleState">
+                <DefaultState val="NotVisible"/>
+                
+                <State name="Visible">
+                    <When type="Property" frame="$parent/BattleMapFrame" IsBlizzardMap="False"/>
+                    <When type="StateGroup" frame="$ancestor[@name=DetailsPanel]" LoadingState="Loaded"/>
+                    <When type="Property" frame="$parent" MapHandle="0,0" operator="NotEqual"/>
+                    <Action type="SetProperty" frame="$this" Visible="True"/>
+                </State>
+
+                <State name="NotVisible">
+                    <Action type="SetProperty" frame="$this" Visible="False"/>
+                </State>
+            </StateGroup>
+        </Frame>
+        
+        <Frame type="Image" name="BlizzardIcon">
+            <Anchor side="Top" relative="$parent/MapNameLabel" pos="Max" offset="5"/>
+            <Anchor side="Left" relative="$parent/MapNameLabel" pos="Min" offset="1"/>
+            <Width val="40"/>
+            <ScaleHeightToTexture val="True"/>
+            <Texture val="@UI/Glues_Icons_BlizzardAuthored_Normal"/>
+            
+            <StateGroup name="VisibleState">
+                <DefaultState val="NotVisible"/>
+                
+                <State name="Visible">
+                    <When type="StateGroup" frame="$ancestor[@name=DetailsPanel]" LoadingState="Loaded"/>
+                    <When type="Property" frame="$parent/BattleMapFrame" IsBlizzardMap="True"/>
+                    <Action type="SetProperty" frame="$this" Visible="True"/>
+                </State>
+
+                <State name="NotVisible">
+                    <Action type="SetProperty" frame="$this" Visible="False"/>
+                </State>
+            </StateGroup>
+        </Frame>
+
+        <Frame type="Label" name="ModeLabel">
+            <Anchor side="Top" relative="$parent/AuthorLabel" pos="Max" offset="18"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="20"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+            <Style val="@CustomGames_MapInfoPreview_Info"/>
+            <Visible val="False"/>
+        </Frame>
+
+        <Frame type="Label" name="PlayerLabel">
+            <Anchor side="Top" relative="$parent/ModeLabel" pos="Max" offset="18"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="20"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+            <Style val="@CustomGames_MapInfoPreview_Info"/>
+            <Visible val="False"/>
+        </Frame>
+ 
+        <Frame type="TextFormatFrame" name="FormattedInfoText">
+            <Anchor relative="$parent"/>
+            <Replacement index="0" val="{$parent/PlayerLabel/@Text}"/>
+            <Replacement index="1" val="{$parent/BattleMapFrame/@Genre}"/>
+            <FormatText val="%0% | %1%"/>
+        </Frame>
+
+        <Frame type="Label" name="InfoLabel">
+            <Anchor side="Top" relative="$parent/AuthorLabel" pos="Max" offset="2"/>
+            <Anchor side="Left" relative="$parent/AuthorLabel" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent/VersionLabel" pos="Min" offset="-30"/>
+            <AcceptsMouseTooltip val="True"/>
+            <Options val="Ellipsis | TooltipIfTruncated | NoWrapping"/>
+            <Style val="@CustomGames_MapInfoPreview_Info"/>
+            <Text val="{$parent/FormattedInfoText/@Text}"/>
+            
+            <StateGroup name="VisibleState">
+                <DefaultState val="NotVisible"/>
+            
+                <State name="Visible">
+                    <When type="StateGroup" frame="$ancestor[@name=DetailsPanel]" LoadingState="Loaded"/>
+                    <When type="Property" frame="$parent" MapHandle="0,0" operator="NotEqual"/>
+                    <Action type="SetProperty" frame="$this" Visible="True"/>
+                </State>
+                
+                <State name="NotVisible">
+                    <Action type="SetProperty" frame="$this" Visible="False"/>
+                </State>
+            </StateGroup>
+        </Frame>
+
+        <Frame type="Label" name="VersionLabel">
+            <Anchor side="Top" relative="$parent/InfoLabel" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent/MapNameLabel" pos="Max" offset="0"/>
+            <Style val="@CustomGames_MapInfoPreview_Info"/>
+            <Text val="{$parent/FormattedVersionText/@Text}"/>
+            
+            <StateGroup name="VisibleState">
+                <DefaultState val="NotVisible"/>
+            
+                <State name="Visible">
+                    <When type="StateGroup" frame="$ancestor[@name=DetailsPanel]" LoadingState="Loaded"/>
+                    <When type="Property" frame="$parent" MapHandle="0,0" operator="NotEqual"/>
+                    <Action type="SetProperty" frame="$this" Visible="True"/>
+                </State>
+                
+                <State name="NotVisible">
+                    <Action type="SetProperty" frame="$this" Visible="False"/>
+                </State>
+            </StateGroup>
+        </Frame>
+ 
+        <Frame type="TextFormatFrame" name="FormattedVersionText">
+            <Anchor relative="$parent"/>
+            <Replacement index="0" val="{$parent/BattleMapFrame/@MajorVersionNum}"/>
+            <Replacement index="1" val="{$parent/BattleMapFrame/@MinorVersionNum}"/>
+            <FormatText val="@UI/ScreenCustomGames/VersionNumFormatText"/>
+        </Frame>
+
+        <Frame type="Label" name="DescriptionLabel">
+            <Anchor side="Top" relative="$parent/InfoLabel" pos="Max" offset="11"/>
+            <Anchor side="Bottom" relative="$parent/WebsiteLabel" pos="Min" offset="-10"/>
+            <Anchor side="Left" relative="$parent/MapNameLabel" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent/MapNameLabel" pos="Max" offset="0"/>
+            <Style val="@CustomGames_MapInfoPreview_Description"/>
+            <Text val="{$parent/BattleMapFrame/@Description}"/>
+            <AcceptsMouse val="True"/>
+            <Options val="Ellipsis | TooltipIfTruncated | NewLineIfTruncated"/>
+            
+            <StateGroup name="VisibleState">
+                <DefaultState val="NotVisible"/>
+            
+                <State name="Visible">
+                    <When type="StateGroup" frame="$ancestor[@name=DetailsPanel]" LoadingState="Loaded"/>
+                    <When type="Property" frame="$parent" MapHandle="0,0" operator="NotEqual"/>
+                    <Action type="SetProperty" frame="$this" Visible="True"/>
+                </State>
+                
+                <State name="NotVisible">
+                    <Action type="SetProperty" frame="$this" Visible="False"/>
+                </State>
+            </StateGroup>
+        </Frame>
+
+        <Frame type="Label" name="WebsiteLabel">
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="-14"/>
+            <Anchor side="Left" relative="$parent/MapNameLabel" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent/MapNameLabel" pos="Max" offset="0"/>
+            <Height val="24"/>
+            <Style val="@CustomGames_MapInfoPreview_Website"/>
+            <AcceptsMouse val="true"/>
+            
+            <StateGroup name="VisibleState">
+                <DefaultState val="NotVisible"/>
+            
+                <State name="Visible">
+                    <When type="StateGroup" frame="$ancestor[@name=DetailsPanel]" LoadingState="Loaded"/>
+                    <When type="Property" frame="$parent" MapHandle="0,0" operator="NotEqual"/>
+                    <Action type="SetProperty" frame="$this" Visible="True"/>
+                </State>
+                
+                <State name="NotVisible">
+                    <Action type="SetProperty" frame="$this" Visible="False"/>
+                </State>
+            </StateGroup>
+        </Frame>
+        
+        <!-- ERROR LABEL -->
+        <Frame type="Label" name="ErrorLabel">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="20"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="-20"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="25"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="-25"/>
+            <Style val="@InternationalListItemTitle_Small_Locked_Normal_Centered"/>
+            <Text val=""/>
+            
+            <StateGroup name="VisibleState">
+                <DefaultState val="NotVisible"/>
+            
+                <State name="Visible">
+                    <When type="StateGroup" frame="$ancestor[@name=DetailsPanel]" LoadingState="Loaded"/>
+                    <When type="Property" frame="$parent" MapHandle="0,0" operator="Equal"/>
+                    <Action type="SetProperty" frame="$this" Visible="True"/>
+                </State>
+                
+                <State name="NotVisible">
+                    <Action type="SetProperty" frame="$this" Visible="False"/>
+                </State>
+            </StateGroup>
+        </Frame>
+
+        <Frame Type="BattleUserContextMenu" name="UserContextMenu" template="BattleUserContextMenu/BattleUserContextMenu">
+            <Anchor side="Top" relative="$parent" pos="Max" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+        </Frame>
+                    
+        <!-- Determines whether or not both the Lobby preview and game info have been fully loaded -->
+        <StateGroup name="LoadingState">
+            <DefaultState val="NotLoaded"/>
+        
+            <State name="Loaded">
+                <When type="Property" operator="NotEqual" MapHandle="0,0"/>
+                <When type="AnimationState" GameInfo="Loaded"/>
+            </State>
+        
+            <State name="Loading">
+                <When type="Property" operator="NotEqual" MapHandle="0,0"/>
+            </State>
+            
+            <State name="NotLoaded"/>
+        </StateGroup>
+    </Frame>
+    
+    
+    <!-- 
+    ======================================
+    ARCADE LIST ITEM TEMPLATE
+    ======================================
+    -->
+    <Frame type="BookmarkSelectionTileListItem" name="ArcadeListItemTemplate" template="CustomGamesTemplates/ArcadeListItemTemplate">
+        <ContextMenu val="$parent/$parent/ItemContextMenu"/>
+        <TooltipFrame val="BattleMapInfoTooltip"/>
+        <AllowOpenOnClick val="False"/>
+        
+        <Frame type="Frame" name="AnchorFrame">
+            <Anchor side="Top" relative="$parent/$sibling-1/AnchorFrame" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent/$sibling-1/AnchorFrame" pos="Max" offset="8"/>
+            <Height val="237"/>
+        </Frame>
+
+        <Frame type="BattleMapFrame" name="BattleMapFrame">
+            <Anchor relative="$parent"/>
+            <MapHandle val="{$parent/@MapHandle}"/>
+        </Frame>
+        
+        <Frame type="Image" name="TextBackground">
+            <Height val="101"/>
+        </Frame>
+        
+        <Frame type="Image" name="Divider">
+            <Anchor side="Top" relative="$parent/UnlockableFrame" pos="Max" offset="-19"/>
+        </Frame>
+        
+        <Frame type="Label" name="TitleLabel">
+            <Text val="{$parent/BattleMapFrame/@Name}"/>
+        </Frame>
+        
+        <StateGroup name="EquippedState">
+            <DefaultState val="NotEquipped"/>
+            <State name="Equipped">
+                <When type="Property" frame="$this/BattleMapFrame" IsBookmarked="True"/>
+            </State>
+            <State name="NotEquipped">
+            </State>
+        </StateGroup>
+    </Frame>
+    
+    <!-- 
+    ======================================
+    ARCADE LIST TEMPLATE
+    ======================================
+    -->
+    <Frame type="TileList" name="ArcadeGamesListTemplate">
+        <Width val="1058"/>
+        <Height val="510"/>
+        <AcceptsMouse val="true"/>
+        <ScrollStepValue val="5"/>
+        <RequireSelection val="true"/>
+
+        <Frame type="BattleMapInfoTooltip" name="BattleMapInfoTooltip" template="BattleMapInfoTooltip/BattleMapInfoTooltipTemplate"/>
+
+        <!-- Row 1 -->
+        <Frame type="BookmarkSelectionTileListItem" name="Item0" template="ScreenCustomFeatured/ArcadeListItemTemplate">
+            <Frame type="Frame" name="AnchorFrame">
+                <Anchor side="Top" relative="$parent/$parent" pos="Min" offset="14"/>
+                <Anchor side="Left" relative="$parent/$parent" pos="Min" offset="14"/>
+            </Frame>
+        </Frame>
+        
+        <Frame type="BookmarkSelectionTileListItem" name="Item1" template="ScreenCustomFeatured/ArcadeListItemTemplate"/>
+        <Frame type="BookmarkSelectionTileListItem" name="Item2" template="ScreenCustomFeatured/ArcadeListItemTemplate"/>
+        <Frame type="BookmarkSelectionTileListItem" name="Item3" template="ScreenCustomFeatured/ArcadeListItemTemplate"/>
+        <Frame type="BookmarkSelectionTileListItem" name="Item4" template="ScreenCustomFeatured/ArcadeListItemTemplate"/>
+
+        <!-- Row 2 -->
+        <Frame type="BookmarkSelectionTileListItem" name="Item5" template="ScreenCustomFeatured/ArcadeListItemTemplate">
+            <Frame type="Frame" name="AnchorFrame">
+                <Anchor side="Top" relative="$parent/$parent/Item0/AnchorFrame" pos="Max" offset="8"/>
+                <Anchor side="Left" relative="$parent/$parent/Item0/AnchorFrame" pos="Min" offset="0"/>
+            </Frame>
+        </Frame>
+        
+        <Frame type="BookmarkSelectionTileListItem" name="Item6" template="ScreenCustomFeatured/ArcadeListItemTemplate"/>
+        <Frame type="BookmarkSelectionTileListItem" name="Item7" template="ScreenCustomFeatured/ArcadeListItemTemplate"/>
+        <Frame type="BookmarkSelectionTileListItem" name="Item8" template="ScreenCustomFeatured/ArcadeListItemTemplate"/>
+        <Frame type="BookmarkSelectionTileListItem" name="Item9" template="ScreenCustomFeatured/ArcadeListItemTemplate"/>
+            
+        <Frame type="Image" name="ScrollBarBackground" template="StandardTileListTemplates/StandardTileListScrollBarBackgroundTemplate"/>
+
+        <Frame type="ScrollBar" name="ScrollBar" template="StandardTileListTemplates/StandardTileListScrollBarTemplate">
+            <Anchor side="Top" relative="$parent/Item0" pos="Min" offset="14"/>
+            <Anchor side="Bottom" relative="$parent/Item9" pos="Max" offset="-14"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="-2"/>
+        </Frame>
+    </Frame>
+    
+    <!--
+    ======================================
+    ARCADE MULTIPLE CONTAINER
+    ======================================
+    -->
+    <Frame type="UserProfileMapFavoritesSelectionFrame" name="ArcadeMultipleContainerTemplate">
+        <Anchor relative="$parent"/>
+        <Visible val="False"/>
+        <Arcade val="True"/>
+        <ToonEmail val="{$CustomGamesFeaturedPanelContentFeed/@ToonEmail}"/>
+        <RandomizeContent val="{$CustomGamesFeaturedPanelContentFeed/@Shuffle}"/>
+        
+        <Frame type="Frame" name="AnchorFrame">
+            <Anchor relative="$parent/$parent/ContentMultipleBackground"/>
+        </Frame>
+
+        <!-- <Frame type="Pulldown" name="FilterPulldown" template="StandardSmallButtonTemplates/StandardSmallPulldownTemplate">
+            <Visible val="False"/>
+            
+            <Frame type="Frame" name="AnchorFrame">
+                <Anchor side="Top" relative="$parent/$parent" pos="Mid" offset="0"/>
+                <Anchor side="Bottom" relative="$parent/$parent" pos="Mid" offset="0"/>
+                <Anchor side="Right" relative="$parent/$parent" pos="Max" offset="-15"/>
+            </Frame>
+        </Frame>
+
+        <Frame type="Pulldown" name="GenrePulldown" template="StandardSmallButtonTemplates/StandardSmallPulldownTemplate">
+            <Visible val="False"/>
+            
+            <Frame type="Frame" name="AnchorFrame">
+                <Anchor side="Top" relative="$parent/$parent" pos="Mid" offset="0"/>
+                <Anchor side="Bottom" relative="$parent/$parent" pos="Mid" offset="0"/>
+                <Anchor side="Right" relative="$parent/$parent/FilterPulldown/AnchorFrame" pos="Min" offset="-14"/>
+            </Frame>
+        </Frame>
+        
+        <Frame type="TileList" name="GamesTileList">
+            <Anchor side="Top" relative="$parent/AnchorFrame" pos="Max" offset="800"/>
+            <Anchor side="Left" relative="$parent/AnchorFrame" pos="Max" offset="800"/>
+            <Width val="1"/>
+            <Height val="1"/>
+            <Visible val="False"/>
+        </Frame> -->
+        
+        <Frame type="TileList" name="BookmarkTileList" template="ScreenCustomFeatured/ArcadeGamesListTemplate">
+            <Anchor side="Bottom" relative="$parent/AnchorFrame" pos="Max" offset="-8"/>
+            <Anchor side="Left" relative="$parent/AnchorFrame" pos="Min" offset="8"/>
+        </Frame>
+        
+        <Frame type="BattleMapInfoPanel" name="DetailsPanel" template="ScreenCustomFeatured/DetailsPanelTemplate"/>
+
+        <Frame type="CustomGamePlayButton" name="CreateButton" template="StandardBattlenetTemplates/BattlenetAlternateButtonTemplate">
+            <Anchor side="Top" relative="$parent/AnchorFrame" pos="Max" offset="11"/>
+            <Anchor side="Left" relative="$parent/AnchorFrame" pos="Min" offset="4"/>
+            <Width val="288"/>
+            <Text val="@UI/ScreenCustomGames/CreateButton"/>
+            <MapHandle val="{$parent/@SelectedMapHandle}"/>
+            <UseDefaultVariant val="true"/>
+
+            <Animation name="ItemDoubleClicked">
+                <Event event="OnItemDoubleClicked" action="Reset,Play" frame="$parent/BookmarkTileList"/>
+
+                <Controller type="Event" end="Pause">
+                    <Key type="Event" time="0" event="ControlClickRequest"/>
+                </Controller>
+            </Animation>
+        </Frame>
+
+        <Frame type="CustomGamePlayButton" name="AutoJoinButton" template="StandardBattlenetTemplates/BattlenetStandardButtonTemplate">
+            <Anchor side="Bottom" relative="$parent/CreateButton" pos="Max" offset="0"/>
+            <Anchor side="Left" relative="$parent/CreateButton" pos="Max" offset="8"/>
+            <Width val="288"/>
+            <Text val="@UI/ScreenCustomGames/AutoJoinButton"/>
+            <Tooltip val="@UI/ScreenCustomGames/AutoJoinTooltip"/>
+            <AcceptsMouseTooltip val="True"/>
+            <TooltipDelayed val="True"/>
+            <MapHandle val="{$parent/@SelectedMapHandle}"/>
+            <UseDefaultVariant val="False"/>
+            <VariantIndex val="{$parent/VariantPulldown/@VariantIndex}"/>
+            <PlayMode val="JoinOrCreate"/>
+
+            <Animation name="ItemDoubleClicked">
+                <Event event="OnItemDoubleClicked" action="Reset,Play" frame="$parent/BookmarkTileList"/>
+
+                <Controller type="Event" end="Pause">
+                    <Key type="Event" time="0" event="ControlClickRequest"/>
+                </Controller>
+            </Animation>
+        </Frame>
+
+        <Frame type="BattleMapVariantPulldown" name="VariantPulldown" template="StandardBattlenetTemplates/BattlenetLargePulldownTemplate">
+            <Anchor side="Bottom" relative="$parent/CreateButton" pos="Max" offset="-4"/>
+            <Anchor side="Left" relative="$parent/AutoJoinButton" pos="Max" offset="8"/>
+            <Width val="288"/>
+            <MapHandle val="{$parent/@SelectedMapHandle}"/>
+                
+            <StateGroup name="EnabledState">
+                <DefaultState val="Disabled"/>
+            
+                <State name="Enabled">
+                    <When type="Property" frame="$parent/AutoJoinButton" Enabled="True"/>
+                    <Action type="SetProperty" frame="$this" Enabled="True"/>
+                </State>
+                
+                <State name="Disabled">
+                    <Action type="SetProperty" frame="$this" Enabled="False"/>
+                </State>
+            </StateGroup>
+        </Frame>
+        
+        <Frame type="ViewMapProfileButton" name="GameInfoButton" template="StandardBattlenetTemplates/BattlenetStandardButtonTemplate">
+            <Anchor side="Bottom" relative="$parent/CreateButton" pos="Max" offset="0"/>
+            <Anchor side="Left" relative="$parent/VariantPulldown" pos="Max" offset="8"/>
+            <Width val="288"/>
+            <Text val="@UI/ScreenCustomGames/MapInfoButton"/>
+            <HoverSound val="@UI_HoverTick"/>
+            <MapHandle val="{$parent/@SelectedMapHandle}"/>
+            <UseHyperLink val="true"/>
+            <HyperLinkIndex val="#MapInfoIndex_Premium"/>
+
+            <StateGroup name="GameInfoButtonState">
+                <State name="MapHandleInvalid">
+                    <When type="Property" frame="$parent" SelectedMapHandle="0,0"/>
+                    <Action type="SetProperty" frame="$this" Enabled="false"/>
+                </State>
+                <State name="MapHandleValid">
+                    <Action type="SetProperty" frame="$this" Enabled="true"/>
+                </State>
+            </StateGroup>
+        </Frame>
+
+        <Frame type="BattleMapContextMenu" name="ItemContextMenu" template="StandardTemplates/StandardContextMenuTemplate">
+            <Anchor side="Top" relative="$parent" pos="Max" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+            <ShowMapInfo val="true"/>
+            <ShowCreateOffline val="false"/>
+            <MapHandle val="{$parent/@SelectedMapHandle}"/>
+        </Frame>
+    </Frame>
+    
+    <!-- 
+    ======================================
+    MELEE LIST ITEM TEMPLATE
+    ======================================
+    -->
+    <Frame type="BookmarkSelectionTileListItem" name="MeleeListItemTemplate" template="CustomGamesTemplates/BookmarkSelectionTileListItemTemplate">
+        <ContextMenu val="$parent/$parent/ItemContextMenu"/>
+        <TooltipFrame val="BattleMapInfoTooltip"/>
+        <UseTooltip val="False"/>
+        <HideWhenCleared val="False"/>
+        <AllowOpenOnClick val="False"/>
+        
+        <Frame type="Frame" name="AnchorFrame">
+            <Anchor side="Top" relative="$parent/$sibling-1/AnchorFrame" pos="Max" offset="2"/>
+            <Anchor side="Left" relative="$parent/$parent" pos="Min" offset="16"/>
+            <Anchor side="Right" relative="$parent/$parent/ScrollBar" pos="Min" offset="-2"/>
+        </Frame>
+
+        <Frame type="BattleMapFrame" name="BattleMapFrame">
+            <Anchor relative="$parent"/>
+            <MapHandle val="{$parent/@MapHandle}"/>
+        </Frame>
+        
+        <!-- Author Name Label -->
+        <Frame type="Label" name="AuthorLabel">
+            <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Left" relative="$parent/AnchorFrame" pos="Min" offset="830"/>
+            <Anchor side="Right" relative="$parent/AnchorFrame" pos="Max" offset="-15"/>
+            <Height val="20"/>
+            <Style val="{$parent/MapName/@Style}"/>
+            <Text val="{$parent/BattleMapFrame/@AuthorName}"/>
+
+            <StateGroup name="VisibleState">
+                <DefaultState val="NotVisible"/>
+                
+                <State name="Visible">
+                    <When type="Property" frame="$parent/BattleMapFrame" IsBlizzardMap="False"/>
+                    <Action type="SetProperty" frame="$this" Visible="True"/>
+                </State>
+
+                <State name="NotVisible">
+                    <Action type="SetProperty" frame="$this" Visible="False"/>
+                </State>
+            </StateGroup>
+        </Frame>
+        
+        <Frame type="Image" name="BlizzardAuthoredIcon">
+            <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Left" relative="$parent/AuthorLabel" pos="Min" offset="0"/>
+            <Width val="44"/>
+            <Height val="20"/>
+            <Texture val="@UI/Glues_Icons_BlizzardAuthored_Normal"/>
+            <Visible val="False"/>
+            
+            <StateGroup name="VisibleState">
+                <DefaultState val="NotVisible"/>
+                
+                <State name="Visible">
+                    <When type="Property" frame="$parent/BattleMapFrame" IsBlizzardMap="True"/>
+                    <Action type="SetProperty" frame="$this" Visible="True"/>
+                </State>
+
+                <State name="NotVisible">
+                    <Action type="SetProperty" frame="$this" Visible="False"/>
+                </State>
+            </StateGroup>
+            
+            <StateGroup name="DisplayState">
+                <DefaultState val="Normal"/>
+                
+                <State name="Selected">
+                    <When type="StateGroup" frame="$parent" SelectedState="Selected"/>
+                    <Action type="SetProperty" frame="$this" Texture="@UI/Glues_Icons_BlizzardAuthored_Selected"/>
+                </State>
+                
+                <State name="Hovered">
+                    <When type="StateGroup" frame="$parent" HoveredState="Hovered"/>
+                    <Action type="SetProperty" frame="$this" Texture="@UI/Glues_Icons_BlizzardAuthored_Hovered"/>
+                </State>
+                
+                <State name="Normal">
+                    <Action type="SetProperty" frame="$this" Texture="@UI/Glues_Icons_BlizzardAuthored_Normal"/>
+                </State>
+            </StateGroup>
+        </Frame>
+        
+        <Frame type="Image" name="BookmarkIcon">
+            
+            <StateGroup name="VisibleState">
+                <DefaultState val="NotVisible"/>
+            
+                <State name="Visible">
+                    <When type="Property" frame="$parent/BattleMapFrame" IsBookmarked="True"/>
+                    <Action type="SetProperty" frame="$this" Visible="True"/>
+                </State>
+                
+                <State name="NotVisible">
+                    <Action type="SetProperty" frame="$this" Visible="False"/>
+                </State>
+            </StateGroup>
+        </Frame>
+    </Frame>
+    
+    <!-- 
+    ======================================
+    MELEE LIST TEMPLATE
+    ======================================
+    -->
+    <Frame type="TileList" name="MeleeGamesListTemplate">
+        <Width val="1058"/>
+        <Height val="486"/>
+        <AcceptsMouse val="true"/>
+        <RequireSelection val="true"/>
+            
+        <Frame type="BookmarkSelectionTileListItem" name="Item0" template="ScreenCustomFeatured/MeleeListItemTemplate">
+            <Frame type="Frame" name="AnchorFrame">
+                <Anchor side="Top" relative="$parent/$parent" pos="Min" offset="4"/>
+            </Frame>
+        </Frame>
+        
+        <Frame type="BookmarkSelectionTileListItem" name="Item1" template="ScreenCustomFeatured/MeleeListItemTemplate"/>
+        <Frame type="BookmarkSelectionTileListItem" name="Item2" template="ScreenCustomFeatured/MeleeListItemTemplate"/>
+        <Frame type="BookmarkSelectionTileListItem" name="Item3" template="ScreenCustomFeatured/MeleeListItemTemplate"/>
+        <Frame type="BookmarkSelectionTileListItem" name="Item4" template="ScreenCustomFeatured/MeleeListItemTemplate"/>
+        <Frame type="BookmarkSelectionTileListItem" name="Item5" template="ScreenCustomFeatured/MeleeListItemTemplate"/>
+        <Frame type="BookmarkSelectionTileListItem" name="Item6" template="ScreenCustomFeatured/MeleeListItemTemplate"/>
+        <Frame type="BookmarkSelectionTileListItem" name="Item7" template="ScreenCustomFeatured/MeleeListItemTemplate"/>
+        <Frame type="BookmarkSelectionTileListItem" name="Item8" template="ScreenCustomFeatured/MeleeListItemTemplate"/>
+        <Frame type="BookmarkSelectionTileListItem" name="Item9" template="ScreenCustomFeatured/MeleeListItemTemplate"/>
+        <Frame type="BookmarkSelectionTileListItem" name="Item10" template="ScreenCustomFeatured/MeleeListItemTemplate"/>
+        <Frame type="BookmarkSelectionTileListItem" name="Item11" template="ScreenCustomFeatured/MeleeListItemTemplate"/>
+        
+        <Frame type="Image" name="ScrollBarBackground" template="StandardTileListTemplates/StandardTileListScrollBarBackgroundTemplate"/>
+
+        <Frame type="ScrollBar" name="ScrollBar" template="StandardTileListTemplates/StandardTileListScrollBarTemplate">
+            <Anchor side="Top" relative="$parent/Item0" pos="Min" offset="2"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="-2"/>
+            <Anchor side="Bottom" relative="$parent/Item11" pos="Max" offset="-2"/>
+        </Frame>
+    </Frame>
+    
+    <!--
+    ======================================
+    MELEE MULTIPLE CONTAINER
+    ======================================
+    -->
+    <Frame type="UserProfileMapFavoritesSelectionFrame" name="MeleeMultipleContainerTemplate">
+        <Anchor relative="$parent"/>
+        <Visible val="True"/>
+        <Arcade val="False"/>
+        <ToonEmail val="{$CustomGamesFeaturedPanelContentFeed/@ToonEmail}"/>
+        <RandomizeContent val="{$CustomGamesFeaturedPanelContentFeed/@Shuffle}"/>
+        
+        <Frame type="Frame" name="AnchorFrame">
+            <Anchor relative="$parent/$parent/ContentMultipleBackground"/>
+        </Frame>
+        
+        <Frame type="Label" name="MapName">
+            <Anchor side="Bottom" relative="$parent/BookmarkTileList" pos="Min" offset="-8"/>
+            <Anchor side="Left" relative="$parent/BookmarkTileList" pos="Min" offset="85"/>
+            <Text val="@UI/ScreenCustomGames/Lobbies/MapName"/>
+            <Style val="@CustomGames_ListInfoCategoryTitle"/>
+            <Visible val="False"/>
+        </Frame>
+        
+        <Frame type="Image" name="PlayerCountIcon">
+            <Anchor side="Top" relative="$parent/MapName" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent/MapName" pos="Mid" offset="0"/>
+            <Anchor side="Left" relative="$parent/BookmarkTileList" pos="Min" offset="35"/>
+            <Width val="20"/>
+            <Height val="24"/>
+            <Texture val="@UI/Glues_Icons_NumPlayers"/>
+            <Color val="220,238,255"/>
+            <Visible val="False"/>
+        </Frame>
+        
+        <Frame type="Label" name="AuthorName">
+            <Anchor side="Bottom" relative="$parent/MapName" pos="Max" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="1069"/>
+            <Text val="@UI/ScreenCustomGames/Melee/Author"/>
+            <Style val="@CustomGames_ListInfoCategoryTitle"/>
+            <Visible val="False"/>
+        </Frame>
+
+        <Frame type="Pulldown" name="FilterPulldown" template="StandardSmallButtonTemplates/StandardSmallPulldownTemplate">
+            <Visible val="False"/>
+            
+            <Frame type="Frame" name="AnchorFrame">
+                <Anchor side="Top" relative="$parent/$parent" pos="Mid" offset="0"/>
+                <Anchor side="Bottom" relative="$parent/$parent" pos="Mid" offset="0"/>
+                <Anchor side="Right" relative="$parent/$parent" pos="Max" offset="-15"/>
+            </Frame>
+        </Frame>
+        
+        <Frame type="TileList" name="BookmarkTileList" template="ScreenCustomFeatured/MeleeGamesListTemplate">
+            <Anchor side="Bottom" relative="$parent/AnchorFrame" pos="Max" offset="-20"/>
+            <Anchor side="Left" relative="$parent/AnchorFrame" pos="Min" offset="8"/>
+        </Frame>
+        
+        <Frame type="BattleMapInfoPanel" name="DetailsPanel" template="ScreenCustomFeatured/DetailsPanelTemplate"/>
+
+        <Frame type="CustomGamePlayButton" name="CreateButton" template="StandardBattlenetTemplates/BattlenetAlternateButtonTemplate">
+            <Anchor side="Top" relative="$parent/AnchorFrame" pos="Max" offset="11"/>
+            <Anchor side="Left" relative="$parent/AnchorFrame" pos="Min" offset="4"/>
+            <Width val="288"/>
+            <Text val="@UI/ScreenCustomGames/CreateButton"/>
+            <MapHandle val="{$parent/@SelectedMapHandle}"/>
+            <!--<ModHandle val="{$parent/@SelectedModHandle}"/>-->
+            <!--<ExpansionTag val="{$parent/@ExpansionTag}"/>-->
+            <!--<VariantIndex val="{$parent/@SelectedVariantIndex}"/>-->
+            <!--<GameSpeed val="{$parent/@SelectedGameSpeed}"/>-->
+            <UseDefaultVariant val="true"/>
+
+            <Animation name="ItemDoubleClicked">
+                <Event event="OnItemDoubleClicked" action="Reset,Play" frame="$parent/BookmarkTileList"/>
+
+                <Controller type="Event" end="Pause">
+                    <Key type="Event" time="0" event="ControlClickRequest"/>
+                </Controller>
+            </Animation>
+        </Frame>
+
+        <Frame type="ViewMapProfileButton" name="GameInfoButton" template="StandardBattlenetTemplates/BattlenetStandardButtonTemplate">
+            <Anchor side="Bottom" relative="$parent/CreateButton" pos="Max" offset="0"/>
+            <Anchor side="Left" relative="$parent/CreateButton" pos="Max" offset="8"/>
+            <Width val="288"/>
+            <Text val="@UI/ScreenCustomGames/MapInfoButton"/>
+            <HoverSound val="@UI_HoverTick"/>
+            <MapHandle val="{$parent/@SelectedMapHandle}"/>
+
+            <StateGroup name="GameInfoButtonState">
+                <State name="MapHandleInvalid">
+                    <When type="Property" frame="$parent" SelectedMapHandle="0,0"/>
+                    <Action type="SetProperty" frame="$this" Enabled="false"/>
+                </State>
+                <State name="MapHandleValid">
+                    <Action type="SetProperty" frame="$this" Enabled="true"/>
+                </State>
+            </StateGroup>
+        </Frame>
+
+        <Frame type="BattleMapContextMenu" name="ItemContextMenu" template="StandardTemplates/StandardContextMenuTemplate">
+            <Anchor side="Top" relative="$parent" pos="Max" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+            <ShowMapInfo val="true"/>
+            <ShowCreateOffline val="false"/>
+            <MapHandle val="{$parent/@SelectedMapHandle}"/>
+        </Frame>
+    </Frame>
+
+    <!--
+    ======================================
+    CLOSE BUTTON TEMPLATE
+    ======================================
+    -->
+    <Frame type="Button" name="CloseButtonTemplate" template="StandardBattlenetTemplates/CloseButton">
+        <Anchor side="Top" relative="$parent/ExtendedExperienceBG/AnchorFrame" pos="Min" offset="11"/>
+        <Anchor side="Right" relative="$parent/ExtendedExperienceBG/AnchorFrame" pos="Max" offset="-14"/>
+        <Shortcut val="@UI/ScreenNavigationBack_Hotkey"/>
+        <ClickSound val="@UI_BnetDefaultClick"/>
+        
+        <Animation name="Close">
+            <Event event="OnClick" action="Reset,Play"/>
+            
+            <Controller type="Visibility" frame="$parent" end="Pause">
+                <Key type="Bool" time="0" value="False"/>
+            </Controller>
+        </Animation>
+    </Frame>
+    
+    <!--
+    ======================================
+    CTA BANNER TEMPLATE
+    ======================================
+    -->
+    <Frame type="Frame" name="CTABannerTemplate">
+        <Anchor side="Top" relative="$parent" pos="Min" offset="22"/>
+        <Anchor side="Left" relative="$parent" pos="Min" offset="22"/>
+        <Width val="1030"/>
+        <Height val="216"/>
+        
+        <Frame type="Image" name="BannerImage">
+            <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+            <Width val="1024"/>
+            <Height val="210"/>
+            <Texture val="{$CustomGamesFeaturedPanelContentFeed/@FeaturedImage}"/>
+            <Color val="255,255,255"/>
+        </Frame>
+        
+        <Frame type="Image" name="BannerVignette">
+            <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Left" relative="$parent/BannerImage" pos="Min" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+            <Width val="700"/>
+            <Height val="210"/>
+            <Texture val="@UI/SC2_UI_Battlenet_Glue_CustomFeatured_AdvertVignette"/>
+            <Alpha val="245"/>
+        </Frame>
+        
+        <Frame type="Label" name="HeaderLabel">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="13"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="19"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="-19"/>
+            <Height val="29"/>
+            <Style val="ExtendedExperienceHeader"/>
+            <Text val="{$CustomGamesFeaturedPanelContentFeed/@AdvertTitle}"/>
+        </Frame>
+        
+        <Frame type="Label" name="DescriptionLabel">
+            <Anchor side="Top" relative="$parent/HeaderLabel" pos="Max" offset="8"/>
+            <Anchor side="Left" relative="$parent/HeaderLabel" pos="Min" offset="0"/>
+            <Width val="510"/>
+            <Height val="130"/>
+            <Style val="ExtendedExperienceDescription"/>
+            <Text val="{$CustomGamesFeaturedPanelContentFeed/@Description0}"/>
+        </Frame>
+        
+        <Frame type="Label" name="MoreInfoLabel">
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="-13"/>
+            <Anchor side="Left" relative="$parent/HeaderLabel" pos="Min" offset="0"/>
+            <Height val="21"/>
+            <Style val="ExtendedExperienceDescription"/>
+            <Text val="@UI/ScreenCustomGames/Featured/MoreDetails"/>
+        </Frame>
+        
+        <Frame type="LaunchURLButton" name="WebsiteButton">
+            <Anchor side="Bottom" relative="$parent/MoreInfoLabel" pos="Max" offset="0"/>
+            <Anchor side="Left" relative="$parent/MoreInfoLabel" pos="Max" offset="0"/>
+            <Anchor side="Right" relative="$parent/HeaderLabel" pos="Max" offset="0"/>
+            <Height val="21"/>
+            <Style val="ExtendedExperienceHyperlink"/>
+            <Text val="{$CustomGamesFeaturedPanelContentFeed/@Url}"/>
+            <URL val="{$CustomGamesFeaturedPanelContentFeed/@Url}"/>
+        </Frame>
+            
+        <!-- BORDER OUTER -->
+        <Frame type="Image" name="BorderOuter">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+            <Texture val="@UI/Glues_Battlenet_PageAssets_GraphicListItem_Border_Outer"/>
+            <TextureType val="NineSlice"/>
+            <Color val="0,0,0"/>
+            <RenderPriority val="520"/>
+        </Frame>
+        
+        <!-- BORDER INNER -->
+        <Frame type="Image" name="BorderInner">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+            <Texture val="@UI/Glues_Battlenet_PageAssets_GraphicListItem_Border_Inner"/>
+            <TextureType val="NineSlice"/>
+            <Color val="29,46,69"/>
+            <RenderPriority val="521"/>
+        </Frame>
+    </Frame>
+        
+    <!--
+    ======================================
+    CONTENT MULTIPLE BACKGROUND TEMPLATE
+    ======================================
+    -->
+    <Frame type="Frame" name="ContentMultipleBackgroundTemplate" template="StandardBattlenetTemplates/BattlenetStandardContentContainerTemplate">
+        <Anchor side="Top" relative="$parent/ExtendedExperienceBG/BackgroundContainer" pos="Min" offset="125"/>
+        <Anchor side="Bottom" relative="$this" pos="Min" offset="0"/>
+        <Anchor side="Left" relative="$parent/ExtendedExperienceBG/BackgroundContainer" pos="Min" offset="36"/>
+        <Anchor side="Right" relative="$parent/ExtendedExperienceBG/BackgroundContainer" pos="Max" offset="-36"/>
+        <Height val="754"/>
+        
+        <Frame type="Frame" name="DividerAnchor">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="76"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="1066"/>
+        </Frame>
+        
+        <Frame type="Frame" name="DividerLeft">
+            <Visible val="False"/>
+        </Frame>
+        
+        <Frame type="Frame" name="DividerRight">
+            <Visible val="False"/>
+        </Frame>
+        
+        <Frame type="Frame" name="CTABanner" template="ScreenCustomFeatured/CTABannerTemplate"/>
+        
+        <StateGroup name="VisibilityState">
+            <DefaultState val="Visible"/>
+            
+            <State name="NotVisible">
+                <When type="Property" frame="$parent/ArcadeMultipleContainer" Visible="False"/>
+                <When type="Property" frame="$parent/MeleeMultipleContainer" Visible="False"/>
+                <Action type="SetProperty" Visible="False"/>
+            </State>
+            
+            <State name="Visible">
+                <Action type="SetProperty" Visible="True"/>
+            </State>
+        </StateGroup>
+    </Frame>
+    
+    <!--
+    ======================================
+    SCREENSHOT PREVIEW BUTTON TEMPLATE
+    ======================================
+    -->
+    <Frame type="Button" name="ScreenshotPreviewButtonTemplate" template="StandardTileListTemplates/GraphicTileListButtonTemplate">
+        <Toggleable val="True"/>
+        
+        <Frame type="Frame" name="AnchorFrame">
+            <Anchor side="Top" relative="$parent/$sibling-1/AnchorFrame" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent/$sibling-1/AnchorFrame" pos="Max" offset="2"/>
+            <Width val="173"/>
+            <Height val="102"/>
+        </Frame>
+        
+        <Frame type="Image" name="TextBackground">
+            <Alpha val="0"/>
+        </Frame>
+    </Frame>
+        
+    <!--
+    ======================================
+    CONTENT LEFT/RIGHT CONTAINER TEMPLATES
+    ======================================
+    -->
+    <Frame type="BookmarkSelectionTileListItem" name="ContentLeftContainerTemplate" template="StandardBattlenetTemplates/BattlenetStandardContentContainerTemplate">
+        <Anchor side="Top" relative="$parent/$parent/$parent/ExtendedExperienceBG/BackgroundContainer" pos="Min" offset="125"/>
+        <Anchor side="Bottom" relative="$this" pos="Min" offset="0"/>
+        <Anchor side="Left" relative="$parent/$parent/$parent/ExtendedExperienceBG/BackgroundContainer" pos="Min" offset="36"/>
+        <Anchor side="Right" relative="$this" pos="Min" offset="0"/>
+        <Width val="742"/>
+        <Height val="838"/>
+        <Visible val="False"/>
+        <HideWhenCleared val="True"/>
+        <AcceptsMouse val="False"/>
+        
+        <Frame type="BattleMapFrame" name="BattleMapFrame">
+            <Anchor relative="$parent"/>
+            <MapHandle val="{$parent/@MapHandle}"/>
+        </Frame>
+        
+        <Frame type="PremiumMapCacheFrame" name="PremiumMapCacheFrame">
+            <Anchor relative="$parent"/>
+            <MapHandle val="{$parent/@MapHandle}"/>
+        </Frame>
+        
+        <Frame type="Frame" name="DividerAnchor">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="76"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="14"/>
+        </Frame>
+        
+        <Frame type="Frame" name="DividerTop">
+            <Visible val="False"/>
+        </Frame>
+        
+        <Frame type="Frame" name="DividerBottom">
+            <Visible val="False"/>
+        </Frame>
+        
+        <Frame type="Label" name="HeaderLabel">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="28"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="22"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="-22"/>
+            <Height val="29"/>
+            <Style val="ExtendedExperienceHeader"/>
+            <Text val="{$parent/BattleMapFrame/@Name}"/>
+        </Frame>
+        
+        <Frame type="TabControl" name="PreviewContainer" template="BattleMapProfilePremiumPanel/PreviewContainerTemplate">
+            <Anchor side="Top" relative="$parent/DividerAnchor" pos="Max" offset="0"/>
+            <Anchor side="Bottom" relative="$parent/AnchorFrame" pos="Max" offset="0"/>
+            <Anchor side="Left" relative="$parent/AnchorFrame" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent/AnchorFrame" pos="Max" offset="0"/>
+            
+            <Frame type="Frame" name="PreviewPanels">
+                <Width val="698"/>
+                <Height val="395"/>
+            </Frame>
+        
+            <Frame type="Label" name="ShortDescriptionLabel">
+                <Anchor side="Top" relative="$parent/PreviewButtons" pos="Max" offset="0"/>
+                <Anchor side="Bottom" relative="$parent/HorizontalDivider" pos="Min" offset="-14"/>
+                <Anchor side="Left" relative="$parent/PreviewPanels" pos="Min" offset="0"/>
+                <Anchor side="Right" relative="$parent/PreviewPanels" pos="Max" offset="0"/>
+                <Style val="@Arcade_GameInfo_LongDescription"/>
+                <Text val="{$parent/$parent/PremiumMapCacheFrame/@CustomFeaturedDescription}"/>
+            </Frame>
+        
+            <Frame type="Label" name="DescriptionLabel">
+                <Anchor side="Top" relative="$parent/PreviewButtons" pos="Max" offset="0"/>
+                <Anchor side="Bottom" relative="$parent/HorizontalDivider" pos="Min" offset="-14"/>
+                <Visible val="False"/>
+            </Frame>
+            
+            <Frame type="Image" name="HorizontalDivider" template="StandardBattlenetTemplates/BattlenetStandardContentContainerDividerTemplate">
+                <Anchor side="Bottom" relative="$parent" pos="Max" offset="-112"/>
+                <Visible val="True"/>
+            </Frame>
+        
+            <Frame type="Frame" name="PreviewButtons">
+                <Anchor side="Top" relative="$parent/PreviewPanels" pos="Max" offset="-12"/>
+                <Anchor side="Bottom" relative="$this/PreviewButton3" pos="Max" offset="0"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+                
+                <Frame type="Button" name="PreviewButton0">
+        
+                    <Frame type="Frame" name="AnchorFrame">
+                        <Anchor side="Top" relative="$parent/$parent" pos="Min" offset="18"/>
+                        <Anchor side="Bottom" relative="$this" pos="Min" offset="0"/>
+                        <Anchor side="Left" relative="$parent/$parent" pos="Min" offset="14"/>
+                        <Width val="170"/>
+                        <Height val="102"/>
+                    </Frame>
+                </Frame>
+                
+                <Frame type="Button" name="PreviewButton1">
+        
+                    <Frame type="Frame" name="AnchorFrame">
+                        <Anchor side="Bottom" relative="$parent/$parent/PreviewButton0/AnchorFrame" pos="Max" offset="0"/>
+                        <Anchor side="Left" relative="$parent/$parent/PreviewButton0/AnchorFrame" pos="Max" offset="6"/>
+                        <Width val="170"/>
+                        <Height val="102"/>
+                    </Frame>
+                </Frame>
+                
+                <Frame type="Button" name="PreviewButton2">
+        
+                    <Frame type="Frame" name="AnchorFrame">
+                        <Anchor side="Bottom" relative="$parent/$parent/PreviewButton0/AnchorFrame" pos="Max" offset="0"/>
+                        <Anchor side="Left" relative="$parent/$parent/PreviewButton1/AnchorFrame" pos="Max" offset="6"/>
+                        <Width val="170"/>
+                        <Height val="102"/>
+                    </Frame>
+                </Frame>
+                
+                <Frame type="Button" name="PreviewButton3">
+        
+                    <Frame type="Frame" name="AnchorFrame">
+                        <Anchor side="Bottom" relative="$parent/$parent/PreviewButton0/AnchorFrame" pos="Max" offset="0"/>
+                        <Anchor side="Left" relative="$parent/$parent/PreviewButton2/AnchorFrame" pos="Max" offset="6"/>
+                        <Width val="170"/>
+                        <Height val="102"/>
+                    </Frame>
+                </Frame>
+            </Frame>
+        </Frame>
+        
+        <Frame type="Label" name="MoreInfoLabel">
+            <Anchor side="Bottom" relative="$parent/PreviewContainer/HorizontalDivider" pos="Min" offset="-13"/>
+            <Anchor side="Left" relative="$parent/PreviewContainer/ShortDescriptionLabel" pos="Min" offset="0"/>
+            <Height val="21"/>
+            <Style val="ExtendedExperienceDescription"/>
+            <Text val="@UI/ScreenCustomGames/Featured/MoreDetails"/>
+        </Frame>
+        
+        <Frame type="LaunchURLButton" name="WebsiteButton">
+            <Anchor side="Bottom" relative="$parent/MoreInfoLabel" pos="Max" offset="0"/>
+            <Anchor side="Left" relative="$parent/MoreInfoLabel" pos="Max" offset="0"/>
+            <Anchor side="Right" relative="$parent/PreviewContainer/ShortDescriptionLabel" pos="Max" offset="0"/>
+            <Height val="21"/>
+            <Style val="ExtendedExperienceHyperlink"/>
+            <Text val="{$CustomGamesFeaturedPanelContentFeed/@Url}"/>
+            <URL val="{$CustomGamesFeaturedPanelContentFeed/@Url}"/>
+        </Frame>
+        
+        <Frame type="ViewMapProfileButton" name="GameInfoButton" template="StandardBattlenetTemplates/BattlenetAlternateButtonTemplate">
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="-26"/>
+            <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+            <Width val="288"/>
+            <Text val="@UI/ScreenCustomGames/GameInfo/MoreInfo"/>
+            <HoverSound val="@UI_HoverTick"/>
+            <MapHandle val="{$parent/@MapHandle}"/>
+            <UseHyperLink val="true"/>
+            <HyperLinkIndex val="#MapInfoIndex_Premium"/>
+
+            <StateGroup name="GameInfoButtonState">
+                <State name="MapHandleInvalid">
+                    <When type="Property" SelectedMapHandle="0,0"/>
+                    <Action type="SetProperty" frame="$this" Enabled="false"/>
+                </State>
+                <State name="MapHandleValid">
+                    <Action type="SetProperty" frame="$this" Enabled="true"/>
+                </State>
+            </StateGroup>
+
+            <Animation name="Show">
+                <Event event="OnClick" action="Reset,Play" frame="$this"/>
+                
+                <Controller type="Event" end="Stop" frame="$ScreenCustomFeatured/DualPremiumContainer/BookmarkTileList/Item0/PreviewContainer/PreviewPanels/Preview0/Movie">
+                    <Key type="Event" time="0" event="PauseMovie"/>
+                </Controller>
+                
+                <Controller type="Event" end="Stop" frame="$ScreenCustomFeatured/DualPremiumContainer/BookmarkTileList/Item1/PreviewContainer/PreviewPanels/Preview0/Movie">
+                    <Key type="Event" time="0" event="PauseMovie"/>
+                </Controller>
+            </Animation>
+        </Frame>
+    </Frame>
+    
+    <Frame type="BookmarkSelectionTileListItem" name="ContentRightContainerTemplate" template="ScreenCustomFeatured/ContentLeftContainerTemplate">
+        <Anchor side="Left" relative="$parent/Item0" pos="Max" offset="4"/>
+    </Frame>
+    
+    <Frame type="UserProfileMapFavoritesSelectionFrame" name="DualPremiumContainerTemplate">
+        <Anchor relative="$parent"/>
+        <Visible val="True"/>
+        <Arcade val="True"/>
+        <ToonEmail val="{$CustomGamesFeaturedPanelContentFeed/@ToonEmail}"/>
+        <RandomizeContent val="{$CustomGamesFeaturedPanelContentFeed/@Shuffle}"/>
+        
+        <Frame type="TileList" name="BookmarkTileList">
+            <Anchor relative="$parent"/>
+        
+            <Frame type="BookmarkSelectionTileListItem" name="Item0" template="ScreenCustomFeatured/ContentLeftContainerTemplate"/>
+            <Frame type="BookmarkSelectionTileListItem" name="Item1" template="ScreenCustomFeatured/ContentRightContainerTemplate"/>
+        </Frame>
+    </Frame>
+    
+    
+    
+    <!-- 
+    ======================================
+    SINGLEMAP LIST ITEM TEMPLATE
+    ======================================
+    -->
+    <Frame type="BookmarkSelectionTileListItem" name="SingleMapTemplate">
+        <Anchor relative="$parent"/>
+        <!-- <ContextMenu val="$parent/$parent/ItemContextMenu"/> -->
+        <!-- <TooltipFrame val="BattleMapInfoTooltip"/> -->
+        <AllowOpenOnClick val="False"/>
+        
+        <Frame type="Frame" name="Background" template="StandardBattlenetTemplates/BattlenetStandardContentContainerTemplate">
+            <Anchor side="Top" relative="$parent/$parent/$parent/$parent/ExtendedExperienceBG/BackgroundContainer" pos="Min" offset="125"/>
+            <Anchor side="Bottom" relative="$this" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent/$parent/$parent/$parent/ExtendedExperienceBG/BackgroundContainer" pos="Min" offset="36"/>
+            <Anchor side="Right" relative="$parent/$parent/$parent/$parent/ExtendedExperienceBG/BackgroundContainer" pos="Max" offset="-36"/>
+            <Height val="754"/>
+            
+            <Frame type="Frame" name="DividerAnchor">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="76"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="1066"/>
+            </Frame>
+            
+            <Frame type="Frame" name="DividerTop">
+                <Visible val="False"/>
+            </Frame>
+            
+            <Frame type="Frame" name="DividerBottom">
+                <Visible val="False"/>
+            </Frame>
+        </Frame>
+        
+        <Frame type="Label" name="HeaderLabel">
+            <Anchor side="Top" relative="$parent/Background" pos="Min" offset="28"/>
+            <Anchor side="Left" relative="$parent/Background" pos="Min" offset="22"/>
+            <Anchor side="Right" relative="$parent/Background" pos="Max" offset="-22"/>
+            <Height val="29"/>
+            <Style val="ExtendedExperienceHeader"/>
+            <Text val="{$parent/BattleMapInfoPanel/BattleMapFrame/@Name}"/>
+        </Frame>
+        
+        <Frame type="BattleMapInfoPanel" name="BattleMapInfoPanel" template="BattleMapProfileOverviewPanel/BattleMapInfoPanelTemplate">
+            <Anchor side="Top" relative="$parent/Background/DividerAnchor" pos="Max" offset="0"/>
+            <Anchor side="Bottom" relative="$parent/Background/AnchorFrame" pos="Max" offset="0"/>
+            <Anchor side="Left" relative="$parent/Background/AnchorFrame" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent/Background/AnchorFrame" pos="Max" offset="0"/>
+            <Handle val="CustomFeaturedSingleMapBattleMapInfoPanel"/>
+            <MapHandle val="{$parent/@MapHandle}"/>
+        
+            <Frame type="BattleMapFrame" name="BattleMapFrame">
+                <MapHandle val="{$parent/$parent/@MapHandle}"/>
+            </Frame>
+        
+            <Frame type="Image" name="Divider" template="StandardBattlenetTemplates/BattlenetStandardContentContainerDividerTemplate">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="737"/>
+                <Width val="2"/>
+            </Frame>
+        
+            <Frame type="Frame" name="DetailsContainer">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Right" relative="$parent/Divider" pos="Min" offset="0"/>
+                
+                <Frame type="Image" name="HorizontalDivider" template="StandardBattlenetTemplates/BattlenetStandardContentContainerDividerTemplate">
+                    <Anchor side="Top" relative="$this" pos="Max" offset="0"/>
+                    <Anchor side="Bottom" relative="$parent" pos="Max" offset="-100"/>
+                    <Anchor side="Left" relative="$parent" pos="Min" offset="16"/>
+                    <Anchor side="Right" relative="$parent" pos="Max" offset="-16"/>
+                </Frame>
+                
+                <Frame type="Image" name="VerticalDivider1" template="StandardBattlenetTemplates/BattlenetStandardContentContainerDividerTemplate">
+                    <Anchor side="Top" relative="$parent/HorizontalDivider" pos="Max" offset="16"/>
+                    <Anchor side="Bottom" relative="$parent" pos="Max" offset="-16"/>
+                    <Anchor side="Left" relative="$parent" pos="Min" offset="308"/>
+                </Frame>
+                
+                <Frame type="Image" name="VerticalDivider2" template="StandardBattlenetTemplates/BattlenetStandardContentContainerDividerTemplate">
+                    <Anchor side="Top" relative="$parent/HorizontalDivider" pos="Max" offset="16"/>
+                    <Anchor side="Bottom" relative="$parent" pos="Max" offset="-16"/>
+                    <Anchor side="Left" relative="$parent" pos="Min" offset="492"/>
+                </Frame>
+            </Frame>
+            
+            <Frame type="Frame" name="AdvertContainer">
+                <Anchor side="Top" relative="$parent/DetailsContainer" pos="Min" offset="14"/>
+                <Anchor side="Left" relative="$parent/DetailsContainer" pos="Min" offset="14"/>
+                <Width val="709"/>
+                <Height val="216"/>
+                
+                <Frame type="Image" name="BannerImage">
+                    <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+                    <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+                    <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+                    <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+                    <Width val="703"/>
+                    <Height val="210"/>
+                    <Texture val="{$CustomGamesFeaturedPanelContentFeed/@FeaturedImage}"/>
+                    <Color val="255,255,255"/>
+                </Frame>
+                    
+                <!-- BORDER OUTER -->
+                <Frame type="Image" name="BorderOuter">
+                    <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                    <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+                    <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                    <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+                    <Texture val="@UI/Glues_Battlenet_PageAssets_GraphicListItem_Border_Outer"/>
+                    <TextureType val="NineSlice"/>
+                    <Color val="0,0,0"/>
+                    <RenderPriority val="520"/>
+                </Frame>
+                
+                <!-- BORDER INNER -->
+                <Frame type="Image" name="BorderInner">
+                    <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                    <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+                    <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                    <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+                    <Texture val="@UI/Glues_Battlenet_PageAssets_GraphicListItem_Border_Inner"/>
+                    <TextureType val="NineSlice"/>
+                    <Color val="29,46,69"/>
+                    <RenderPriority val="521"/>
+                </Frame>
+            </Frame>
+                
+            <Frame type="Label" name="DescriptionLabel">
+                <Anchor side="Top" relative="$parent/AdvertContainer" pos="Max" offset="16"/>
+                <Anchor side="Bottom" relative="$parent/MoreInfoLabel" pos="Min" offset="-20"/>
+                <Anchor side="Left" relative="$parent/AdvertContainer" pos="Min" offset="2"/>
+                <Anchor side="Right" relative="$parent/AdvertContainer" pos="Max" offset="-2"/>
+                <Height val="130"/>
+                <Style val="@Arcade_GameInfo_LongDescription"/>
+                <Text val="{$CustomGamesFeaturedPanelContentFeed/@Description0}"/>
+            </Frame>
+                
+            <Frame type="Label" name="MoreInfoLabel">
+                <Anchor side="Bottom" relative="$parent/DetailsContainer/HorizontalDivider" pos="Min" offset="-13"/>
+                <Anchor side="Left" relative="$parent/DescriptionLabel" pos="Min" offset="0"/>
+                <Height val="21"/>
+                <Style val="ExtendedExperienceDescription"/>
+                <Text val="@UI/ScreenCustomGames/Featured/MoreDetails"/>
+            </Frame>
+        
+            <Frame type="LaunchURLButton" name="WebsiteButton">
+                <Anchor side="Top" relative="$this" pos="Max" offset="0"/>
+                <Anchor side="Bottom" relative="$parent/MoreInfoLabel" pos="Max" offset="0"/>
+                <Anchor side="Left" relative="$parent/MoreInfoLabel" pos="Max" offset="0"/>
+                <Anchor side="Right" relative="$parent/DescriptionLabel" pos="Max" offset="0"/>
+                <Height val="21"/>
+                <Style val="ExtendedExperienceHyperlink"/>
+                <Text val="{$CustomGamesFeaturedPanelContentFeed/@Url}"/>
+                <URL val="{$CustomGamesFeaturedPanelContentFeed/@Url}"/>
+            </Frame>
+            
+            <Frame type="AvatarFrame" name="AvatarFrame">
+                <Anchor side="Top" relative="$parent/DetailsContainer/HorizontalDivider" pos="Max" offset="8"/>
+            </Frame>
+                
+            <Frame type="Frame" name="AvatarSpacer">
+                <Anchor side="Top" relative="$parent/DetailsContainer/HorizontalDivider" pos="Max" offset="8"/>
+            </Frame>
+
+            <Frame type="Label" name="YourRatingTitle">
+                <Visible val="False"/>
+            </Frame>
+
+            <Frame type="BattleMapRatingSelector" name="RatingSelector">
+                <Visible val="False"/>
+            </Frame>
+        
+            <Frame type="Label" name="VersionTitle">
+                <Anchor side="Top" relative="$parent/DetailsContainer/HorizontalDivider" pos="Max" offset="16"/>
+                <Anchor side="Left" relative="$parent/DetailsContainer/VerticalDivider2" pos="Max" offset="16"/>
+                <Style val="@Arcade_GameInfo_InfoTitle"/>
+                <Text val="@UI/BattleMapInfoPanel/VersionTitle"/>
+            </Frame>
+        
+            <Frame type="Frame" name="ScreenshotsContainer">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+                <Anchor side="Left" relative="$parent/Divider" pos="Max" offset="0"/>
+                <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+
+                <Frame type="BattleMapGameInfoScreenshotTileList" name="ScreenshotTileList">
+                    <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                    <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+                    <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                    <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+                    <Visible val="True"/>
+                    <MapHandle val="{$parent/$parent/@MapHandle}"/>
+                    
+                    <Frame type="Image" name="ScreenshotBackground">
+                        <Anchor side="Top" relative="$parent/Item0/ScreenshotImage" pos="Min" offset="0"/>
+                        <Anchor side="Bottom" relative="$parent/Item0/ScreenshotImage" pos="Max" offset="0"/>
+                        <Anchor side="Left" relative="$parent/Item0/ScreenshotImage" pos="Min" offset="0"/>
+                        <Anchor side="Right" relative="$parent/Item0/ScreenshotImage" pos="Max" offset="0"/>
+                        <LayerColor val="02060b"/>
+                        <Alpha val="255"/>
+                    </Frame>
+
+                    <!-- This shows if the map has no screenshots -->
+                    <Frame type="BattleMapIcon" name="MapIcon">
+                        <Anchor side="Top" relative="$parent/Item0/ScreenshotImage" pos="Min" offset="0"/>
+                        <Anchor side="Left" relative="$parent/Item0/ScreenshotImage" pos="Min" offset="0"/>
+                        <Anchor side="Right" relative="$parent/Item0/ScreenshotImage" pos="Max" offset="0"/>
+                        <Anchor side="Bottom" relative="$parent/Item0/ScreenshotImage" pos="Max" offset="0"/>
+
+                        <Frame type="Image" name="Image">
+                            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                            <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+                            <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+                            <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+                            <ScaleWidthToTexture val="true"/>
+                            <TextureType val="Normal"/>
+                            <AutoSizeClamps maxWidth="723"/>
+                        </Frame>
+                    </Frame>
+
+                    <Frame type="BattleMapScreenshotTileListItem" name="Item0">
+                        <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                        <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+                        <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                        <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+                        
+                        <Frame type="Image" name="ScreenshotImage">
+                            <Anchor side="Top" relative="$parent" pos="Min" offset="17"/>
+                            <Anchor side="Right" relative="$parent" pos="Max" offset="-17"/>
+                            <Width val="699"/>
+                            <Height val="524"/>
+                            <ImageMaskTexture val="@UI/SC2_UI_Battlenet_Glue_Arcade_ScreenshotMask"/>
+                        </Frame>
+                        
+                        <Frame type="Label" name="CaptionLabel">
+                            <Anchor side="Top" relative="$parent/ScreenshotImage" pos="Max" offset="16"/>
+                            <Anchor side="Left" relative="$parent" pos="Min" offset="16"/>
+                            <Anchor side="Bottom" relative="$parent" pos="Max" offset="-16"/>
+                            <Anchor side="Right" relative="$parent" pos="Max" offset="-16"/>
+                            <Style val="@Arcade_GameInfo_LongDescription"/>
+                            <Visible val="True"/>
+                        </Frame>
+                    </Frame>
+
+                    <Frame type="PageSelectorButtonList" name="PageSelector" template="StandardElementsTemplates/PageSelectorButtonListTemplate">
+                        <Anchor side="Top" relative="$parent/Item0/ScreenshotImage" pos="Min" offset="0"/>
+                        <Anchor side="Bottom" relative="$parent/Item0/ScreenshotImage" pos="Max" offset="0"/>
+                        <Anchor side="Left" relative="$parent/Item0/ScreenshotImage" pos="Min" offset="0"/>
+                        <Anchor side="Right" relative="$parent/Item0/ScreenshotImage" pos="Max" offset="0"/>
+
+                        <Animation name="HideDisabled">
+                            <Event event="OnEnabled" action="Reset,Stop"/>
+                            <Event event="OnDisabled" action="Reset,Play"/>
+
+                            <Controller type="Visibility" end="Pause">
+                                <Key type="Bool" time="0" value="false"/>
+                            </Controller>
+                        </Animation>
+                    </Frame>
+                        
+                    <Frame type="Frame" name="ScreenshotBorder" template="StandardElementsTemplates/ImageBorderTemplate">
+                        <Anchor side="Top" relative="$parent/Item0/ScreenshotImage" pos="Min" offset="-3"/>
+                        <Anchor side="Bottom" relative="$parent/Item0//ScreenshotImage" pos="Max" offset="3"/>
+                        <Anchor side="Left" relative="$parent/Item0//ScreenshotImage" pos="Min" offset="-3"/>
+                        <Anchor side="Right" relative="$parent/Item0//ScreenshotImage" pos="Max" offset="3"/>
+                    </Frame>
+                </Frame>
+            </Frame>
+        </Frame>
+    </Frame>
+    
+    <Frame type="UserProfileMapFavoritesSelectionFrame" name="SingleMapContainerTemplate">
+        <Anchor relative="$parent"/>
+        <Visible val="True"/>
+        <Arcade val="True"/>
+        <ToonEmail val="{$CustomGamesFeaturedPanelContentFeed/@ToonEmail}"/>
+        
+        <Frame type="Frame" name="AnchorFrame">
+            <Anchor side="Top" relative="$parent/$parent/ExtendedExperienceBG/BackgroundContainer" pos="Min" offset="125"/>
+            <Anchor side="Left" relative="$parent/$parent/ExtendedExperienceBG/BackgroundContainer" pos="Min" offset="36"/>
+            <Anchor side="Right" relative="$parent/$parent/ExtendedExperienceBG/BackgroundContainer" pos="Max" offset="-36"/>
+            <Height val="754"/>
+        </Frame>
+        
+        <Frame type="TileList" name="BookmarkTileList">
+            <Anchor relative="$parent/AnchorFrame"/>
+            <RequireSelection val="True"/>
+        
+            <Frame type="BookmarkSelectionTileListItem" name="Item0" template="ScreenCustomFeatured/SingleMapTemplate"/>
+        </Frame>
+
+        <Frame type="CustomGamePlayButton" name="CreateButton" template="StandardBattlenetTemplates/BattlenetAlternateButtonTemplate">
+            <Anchor side="Top" relative="$parent/AnchorFrame" pos="Max" offset="11"/>
+            <Anchor side="Left" relative="$parent/AnchorFrame" pos="Min" offset="4"/>
+            <Width val="288"/>
+            <Text val="@UI/ScreenCustomGames/CreateButton"/>
+            <MapHandle val="{$parent/@SelectedMapHandle}"/>
+            <UseDefaultVariant val="true"/>
+
+            <Animation name="ItemDoubleClicked">
+                <Event event="OnItemDoubleClicked" action="Reset,Play" frame="$parent/BookmarkTileList"/>
+
+                <Controller type="Event" end="Pause">
+                    <Key type="Event" time="0" event="ControlClickRequest"/>
+                </Controller>
+            </Animation>
+        </Frame>
+
+        <Frame type="CustomGamePlayButton" name="AutoJoinButton" template="StandardBattlenetTemplates/BattlenetStandardButtonTemplate">
+            <Anchor side="Bottom" relative="$parent/CreateButton" pos="Max" offset="0"/>
+            <Anchor side="Left" relative="$parent/CreateButton" pos="Max" offset="8"/>
+            <Width val="288"/>
+            <Text val="@UI/ScreenCustomGames/AutoJoinButton"/>
+            <Tooltip val="@UI/ScreenCustomGames/AutoJoinTooltip"/>
+            <AcceptsMouseTooltip val="True"/>
+            <TooltipDelayed val="True"/>
+            <MapHandle val="{$parent/@SelectedMapHandle}"/>
+            <UseDefaultVariant val="False"/>
+            <VariantIndex val="{$parent/VariantPulldown/@VariantIndex}"/>
+            <PlayMode val="JoinOrCreate"/>
+
+            <Animation name="ItemDoubleClicked">
+                <Event event="OnItemDoubleClicked" action="Reset,Play" frame="$parent/BookmarkTileList"/>
+
+                <Controller type="Event" end="Pause">
+                    <Key type="Event" time="0" event="ControlClickRequest"/>
+                </Controller>
+            </Animation>
+        </Frame>
+
+        <Frame type="BattleMapVariantPulldown" name="VariantPulldown" template="StandardBattlenetTemplates/BattlenetLargePulldownTemplate">
+            <Anchor side="Bottom" relative="$parent/CreateButton" pos="Max" offset="-4"/>
+            <Anchor side="Left" relative="$parent/AutoJoinButton" pos="Max" offset="8"/>
+            <Width val="288"/>
+            <MapHandle val="{$parent/@SelectedMapHandle}"/>
+                
+            <StateGroup name="EnabledState">
+                <DefaultState val="Disabled"/>
+            
+                <State name="Enabled">
+                    <When type="Property" frame="$parent/AutoJoinButton" Enabled="True"/>
+                    <Action type="SetProperty" frame="$this" Enabled="True"/>
+                </State>
+                
+                <State name="Disabled">
+                    <Action type="SetProperty" frame="$this" Enabled="False"/>
+                </State>
+            </StateGroup>
+        </Frame>
+        
+        <Frame type="ViewMapProfileButton" name="GameInfoButton" template="StandardBattlenetTemplates/BattlenetStandardButtonTemplate">
+            <Anchor side="Bottom" relative="$parent/CreateButton" pos="Max" offset="0"/>
+            <Anchor side="Left" relative="$parent/VariantPulldown" pos="Max" offset="8"/>
+            <Width val="288"/>
+            <Text val="@UI/ScreenCustomGames/MapInfoButton"/>
+            <HoverSound val="@UI_HoverTick"/>
+            <MapHandle val="{$parent/@SelectedMapHandle}"/>
+
+            <StateGroup name="GameInfoButtonState">
+                <State name="MapHandleInvalid">
+                    <When type="Property" frame="$parent" SelectedMapHandle="0,0"/>
+                    <Action type="SetProperty" frame="$this" Enabled="false"/>
+                </State>
+                <State name="MapHandleValid">
+                    <Action type="SetProperty" frame="$this" Enabled="true"/>
+                </State>
+            </StateGroup>
+        </Frame>
+
+        <Frame type="BattleMapContextMenu" name="ItemContextMenu" template="StandardTemplates/StandardContextMenuTemplate">
+            <Anchor side="Top" relative="$parent" pos="Max" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+            <ShowMapInfo val="true"/>
+            <ShowCreateOffline val="false"/>
+            <MapHandle val="{$parent/@SelectedMapHandle}"/>
+        </Frame>
+    </Frame>
+    
+    
+    <!--
+    ======================================
+    TITLE TEMPLATES
+    ======================================
+    -->
+    <Frame type="Label" name="TitleLabelTemplate">
+        <Anchor side="Top" relative="$parent/ExtendedExperienceBG/BackgroundContainer" pos="Min" offset="49"/>
+        <Anchor side="Left" relative="$parent/ExtendedExperienceBG/BackgroundContainer" pos="Min" offset="45"/>
+        <Anchor side="Right" relative="$parent/ExtendedExperienceBG/BackgroundContainer" pos="Max" offset="-45"/>
+        <Height val="42"/>
+        <Style val="ExtendedExperienceTitle"/>
+        <Text val="{$CustomGamesFeaturedPanelContentFeed/@Title}"/>
+    </Frame>
+    
+    <!-- Subtitle -->
+    <Frame type="Label" name="SubtitleLabelTemplate">
+        <Anchor side="Top" relative="$parent/TitleLabel" pos="Max" offset="0"/>
+        <Anchor side="Left" relative="$parent/TitleLabel" pos="Min" offset="0"/>
+        <Anchor side="Right" relative="$parent/TitleLabel" pos="Max" offset="0"/>
+        <Height val="23"/>
+        <Style val="ExtendedExperienceSubtitle"/>
+        <Text val="{$CustomGamesFeaturedPanelContentFeed/@Subtitle}"/>
+    </Frame>
+    
+    <!--
+    ======================================
+    CUSTOM GAMES FEATURED PANEL
+    ======================================
+    -->
+    <Frame type="ScreenCustomFeatured" name="ScreenCustomFeatured">
+        <Anchor relative="$parent"/>
+        <Handle val="ScreenCustomFeatured"/>
+        <RenderPriority val="630"/>
+        <Visible val="False"/>
+        
+        <Frame type="Frame" name="ExtendedExperienceBG" template="StandardExtendedExperienceTemplates/StandardSizeExtendedExperienceTemplate"/>
+        <Frame type="Button" name="CloseButton" template="ScreenCustomFeatured/CloseButtonTemplate"/>
+        <Frame type="Label" name="TitleLabel" template="ScreenCustomFeatured/TitleLabelTemplate"/>
+        <Frame type="Label" name="SubtitleLabel" template="ScreenCustomFeatured/SubtitleLabelTemplate"/>
+        <Frame type="Frame" name="ContentMultipleBackground" template="ScreenCustomFeatured/ContentMultipleBackgroundTemplate"/>
+        <Frame type="UserProfileMapFavoritesSelectionFrame" name="ArcadeMultipleContainer" template="ScreenCustomFeatured/ArcadeMultipleContainerTemplate"/>
+        <Frame type="UserProfileMapFavoritesSelectionFrame" name="MeleeMultipleContainer" template="ScreenCustomFeatured/MeleeMultipleContainerTemplate"/>
+        <Frame type="UserProfileMapFavoritesSelectionFrame" name="DualPremiumContainer" template="ScreenCustomFeatured/DualPremiumContainerTemplate"/>
+        <Frame type="UserProfileMapFavoritesSelectionFrame" name="SingleMapContainer" template="ScreenCustomFeatured/SingleMapContainerTemplate"/>
+        
+        <StateGroup name="DisplayState">
+            <DefaultState val="Empty"/>
+            
+            <State name="GroupArcade">
+                <When type="Property" frame="$CustomGamesFeaturedPanelContentFeed" FeaturedType="GroupArcade"/>
+                <Action type="SetProperty" frame="$this/ArcadeMultipleContainer" Visible="True"/>
+                <Action type="SetProperty" frame="$this/MeleeMultipleContainer" Visible="False"/>
+                <Action type="SetProperty" frame="$this/DualPremiumContainer" Visible="False"/>
+                <Action type="SetProperty" frame="$this/SingleMapContainer" Visible="False"/>
+            </State>
+            
+            <State name="GroupMelee">
+                <When type="Property" frame="$CustomGamesFeaturedPanelContentFeed" FeaturedType="GroupMelee"/>
+                <Action type="SetProperty" frame="$this/ArcadeMultipleContainer" Visible="False"/>
+                <Action type="SetProperty" frame="$this/MeleeMultipleContainer" Visible="True"/>
+                <Action type="SetProperty" frame="$this/DualPremiumContainer" Visible="False"/>
+                <Action type="SetProperty" frame="$this/SingleMapContainer" Visible="False"/>
+            </State>
+            
+            <State name="DualPremium">
+                <When type="Property" frame="$CustomGamesFeaturedPanelContentFeed" FeaturedType="DualPremium"/>
+                <Action type="SetProperty" frame="$this/ArcadeMultipleContainer" Visible="False"/>
+                <Action type="SetProperty" frame="$this/MeleeMultipleContainer" Visible="False"/>
+                <Action type="SetProperty" frame="$this/DualPremiumContainer" Visible="True"/>
+                <Action type="SetProperty" frame="$this/SingleMapContainer" Visible="False"/>
+            </State>
+            
+            <State name="SingleMap">
+                <When type="Property" frame="$CustomGamesFeaturedPanelContentFeed" FeaturedType="SingleMap"/>
+                <Action type="SetProperty" frame="$this/ArcadeMultipleContainer" Visible="False"/>
+                <Action type="SetProperty" frame="$this/MeleeMultipleContainer" Visible="False"/>
+                <Action type="SetProperty" frame="$this/DualPremiumContainer" Visible="False"/>
+                <Action type="SetProperty" frame="$this/SingleMapContainer" Visible="True"/>
+            </State>
+            
+            <State name="Empty">
+                <Action type="SetProperty" frame="$this/ArcadeMultipleContainer" Visible="False"/>
+                <Action type="SetProperty" frame="$this/MeleeMultipleContainer" Visible="False"/>
+                <Action type="SetProperty" frame="$this/DualPremiumContainer" Visible="False"/>
+                <Action type="SetProperty" frame="$this/SingleMapContainer" Visible="False"/>
+            </State>
+        </StateGroup>
+        
+        <StateGroup name="VisibilityVersionTrigger">
+            <DefaultState val="NotVisible"/>
+            
+            <State name="Visible">
+                <When type="Property" frame="$CustomFeaturedVersionNotificationFrame" Visible="True"/>
+                <When type="Property" frame="$ScreenCustom" Visible="True"/>
+                <Action type="SendEvent" frame="$GlueUI" event="ShowFeaturedMapContent"/>
+            </State>
+            
+            <State name="NotVisible"/>
+        </StateGroup>
+        
+        <!-- this animation must be called Open so the game knows to close this window when you logout -->
+        <Animation name="Open">
+            <Event event="ShowFeaturedMapContent" frame="$GlueUI" action="Reset,Play"/>
+            
+            <Controller type="Visibility" end="Pause">
+                <Key type="Bool" time="0" value="True"/>
+            </Controller>
+            
+            <Controller type="Event" end="Stop" frame="$CustomFeaturedVersionNotificationFrame">
+                <Key type="Event" time="0" event="SetVersion"/>
+            </Controller>
+        </Animation>
+    </Frame>
+</Desc>

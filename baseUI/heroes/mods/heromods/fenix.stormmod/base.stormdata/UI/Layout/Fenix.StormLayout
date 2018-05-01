@@ -60,32 +60,52 @@
         <Texture val="@UI/storm_ui_fenix_base" />
         <TextureType val="NineSlice" />
       </Frame>
-      <Frame type="ProgressBar" name="ShieldValueBar">
-        <Anchor side="Top" relative="$parent/ProgressBarBackground" pos="Min" offset="9" />
-        <Anchor side="Left" relative="$parent/ProgressBarBackground" pos="Min" offset="16" />
-        <Width val="232" />
-        <Height val="24" />
-        <MinValue val="0" />
-        <MaxValue val="{$parent/HealthValues/@MaxShields}" />
-        <Value val="{$parent/HealthValues/@Shields}" />
-        <UseFillContainer val="True" />
-        <Frame type="Frame" name="FillImageContainer">
-          <Anchor side="Top" relative="$parent" pos="Min" offset="0" />
-          <Anchor side="Left" relative="$parent" pos="Min" offset="0" />
+      <Frame type="UnitStatusValidatorAnimElement" name="HideShieldOnDeath">
+        <Anchor relative="$parent" />
+        <Validator val="CasterIsDead" />
+        <Animation name="CasterIsDead">
+          <Event event="Reset" action="Stop" />
+          <Event event="NoState" action="Stop" />
+          <Event event="CasterIsDead" action="Restart, Play" />
+          <Controller type="Visibility" end="Pause" frame="$parent/ProgressBarParent">
+            <Key type="Bool" time="0" value="False" />
+          </Controller>
+          <Controller type="Visibility" end="Pause" frame="$parent/FenixCurrentShields">
+            <Key type="Bool" time="0" value="False" />
+          </Controller>
+        </Animation>
+      </Frame>
+      <Frame type="Frame" name="ProgressBarParent">
+        <Anchor relative="$parent" />
+        <Visible val="True" />
+        <Frame type="ProgressBar" name="ShieldValueBar">
+          <Anchor side="Top" relative="$parent/$parent/ProgressBarBackground" pos="Min" offset="9" />
+          <Anchor side="Left" relative="$parent/$parent/ProgressBarBackground" pos="Min" offset="16" />
           <Width val="232" />
           <Height val="24" />
-          <Frame type="Image" name="FillImage">
+          <MinValue val="0" />
+          <MaxValue val="{$parent/$parent/HealthValues/@MaxShields}" />
+          <Value val="{$parent/$parent/HealthValues/@Shields}" />
+          <UseFillContainer val="True" />
+          <Frame type="Frame" name="FillImageContainer">
             <Anchor side="Top" relative="$parent" pos="Min" offset="0" />
             <Anchor side="Left" relative="$parent" pos="Min" offset="0" />
             <Width val="232" />
             <Height val="24" />
-            <Texture val="@UI/storm_ui_fenix_fill" />
-            <TextureType val="NineSlice" />
+            <Frame type="Image" name="FillImage">
+              <Anchor side="Top" relative="$parent" pos="Min" offset="0" />
+              <Anchor side="Left" relative="$parent" pos="Min" offset="0" />
+              <Width val="232" />
+              <Height val="24" />
+              <Texture val="@UI/storm_ui_fenix_fill" />
+              <TextureType val="NineSlice" />
+            </Frame>
           </Frame>
         </Frame>
       </Frame>
       <Frame type="TextFormatFrame" name="ShieldsText">
         <Anchor relative="$parent" />
+        <Visible val="True" />
         <FormatText val="%0%/%1%" />
         <Replacement val="{$parent/HealthValues/@Shields}" index="0" />
         <Replacement val="{$parent/HealthValues/@MaxShields}" index="1" />
@@ -94,6 +114,7 @@
         <Anchor side="Top" relative="$parent/ProgressBarBackground" pos="Mid" offset="-2" />
         <Anchor side="Bottom" relative="$parent/ProgressBarBackground" pos="Mid" offset="-2" />
         <Anchor side="Left" relative="$parent/ProgressBarBackground" pos="Min" offset="29" />
+        <Visible val="True" />
         <Style val="Storm_VitalsLabel_R" />
         <Text val="{$parent/ShieldsText/@Text}" />
       </Frame>

@@ -224,13 +224,18 @@
     ===========================================================
     -->
     <Frame type="ArcadeBrowseListPanel" name="CustomGamesArcade" template="CustomGamesTemplates/CustomGamesBaseTemplate">
+        <Anchor relative="$parent"/>
         <HookupAlias original="FilterPulldown" alias="ContentContainer/HeaderPanel/FilterPulldown"/>
         <HookupAlias original="GenrePulldown" alias="ContentContainer/HeaderPanel/GenrePulldown"/>
         <HookupAlias original="GamesTileList" alias="ContentContainer/PrimaryPanel/GamesTileList"/>
         <HookupAlias original="GamesTileList/ScrollBar" alias="ContentContainer/PrimaryPanel/GamesTileList/ScrollBar"/>
         <SearchText val="{$this/ContentContainer/HeaderPanel/SearchEditBox/@Text}"/>
-
-        <Anchor relative="$parent"/>
+        
+        <Frame type="PremiumMapCacheFrame" name="PremiumMapCacheFrame">
+            <Anchor relative="$parent"/>
+			<Handle val="CustomGamesArcadePremiumMapCache"/>
+            <MapHandle val="{$parent/@SelectedMapHandle}"/>
+        </Frame>
 
         <Frame type="Label" name="TitleLabel">
             <Text val="@UI/ScreenCustomGames/Arcade/Title"/>
@@ -370,7 +375,9 @@
             <Width val="260"/>
             <Text val="@UI/ScreenCustomGames/CreateButton"/>
             <MapHandle val="{$parent/@SelectedMapHandle}"/>
-            <UseDefaultVariant val="true"/>
+            <UseDefaultVariant val="False"/>
+            <VariantIndex val="{$parent/VariantPulldown/@VariantIndex}"/>
+			<CollapseLayout val="True"/>
 
             <Animation name="ItemDoubleClicked">
                 <Event event="OnItemDoubleClicked" action="Reset,Play" frame="$parent/ContentContainer/PrimaryPanel/GamesTileList"/>
@@ -379,6 +386,21 @@
                     <Key type="Event" time="0" event="ControlClickRequest"/>
                 </Controller>
             </Animation>
+
+			<StateGroup name="VisibleState">
+				<DefaultState val="Visible"/>
+				
+				<State name="NotVisible">
+					<When type="Property" frame="$CustomGamesArcadePremiumMapCache" HasPremium="True"/>
+					<When type="Property" frame="$CustomGamesArcadePremiumMapCache" PayToPlay="True"/>
+					<When type="Property" frame="$CustomGamesArcadePremiumMapCache" Owned="False"/>
+					<Action type="SetProperty" frame="$this" Visible="false"/>
+				</State>
+				
+				<State name="Visible">
+					<Action type="SetProperty" frame="$this" Visible="True"/>
+				</State>
+			</StateGroup>
         </Frame>
 
         <Frame type="CustomGamePlayButton" name="AutoJoinButton" template="StandardBattlenetTemplates/BattlenetStandardButtonTemplate">
@@ -393,6 +415,7 @@
             <UseDefaultVariant val="False"/>
             <VariantIndex val="{$parent/VariantPulldown/@VariantIndex}"/>
             <PlayMode val="JoinOrCreate"/>
+			<CollapseLayout val="True"/>
 
             <Animation name="ItemDoubleClicked">
                 <Event event="OnItemDoubleClicked" action="Reset,Play" frame="$parent/ContentContainer/PrimaryPanel/GamesTileList"/>
@@ -401,6 +424,21 @@
                     <Key type="Event" time="0" event="ControlClickRequest"/>
                 </Controller>
             </Animation>
+
+			<StateGroup name="VisibleState">
+				<DefaultState val="Visible"/>
+				
+				<State name="NotVisible">
+					<When type="Property" frame="$CustomGamesArcadePremiumMapCache" HasPremium="True"/>
+					<When type="Property" frame="$CustomGamesArcadePremiumMapCache" PayToPlay="True"/>
+					<When type="Property" frame="$CustomGamesArcadePremiumMapCache" Owned="False"/>
+					<Action type="SetProperty" frame="$this" Visible="false"/>
+				</State>
+				
+				<State name="Visible">
+					<Action type="SetProperty" frame="$this" Visible="True"/>
+				</State>
+			</StateGroup>
         </Frame>
 
         <Frame type="BattleMapVariantPulldown" name="VariantPulldown" template="StandardBattlenetTemplates/BattlenetLargePulldownTemplate">
@@ -408,6 +446,7 @@
             <Anchor side="Left" relative="$parent/AutoJoinButton" pos="Max" offset="8"/>
             <Width val="260"/>
             <MapHandle val="{$parent/@SelectedMapHandle}"/>
+			<CollapseLayout val="True"/>
                 
             <StateGroup name="EnabledState">
                 <DefaultState val="Disabled"/>
@@ -421,6 +460,21 @@
                     <Action type="SetProperty" frame="$this" Enabled="False"/>
                 </State>
             </StateGroup>
+
+			<StateGroup name="VisibleState">
+				<DefaultState val="Visible"/>
+				
+				<State name="NotVisible">
+					<When type="Property" frame="$CustomGamesArcadePremiumMapCache" HasPremium="True"/>
+					<When type="Property" frame="$CustomGamesArcadePremiumMapCache" PayToPlay="True"/>
+					<When type="Property" frame="$CustomGamesArcadePremiumMapCache" Owned="False"/>
+					<Action type="SetProperty" frame="$this" Visible="false"/>
+				</State>
+				
+				<State name="Visible">
+					<Action type="SetProperty" frame="$this" Visible="True"/>
+				</State>
+			</StateGroup>
         </Frame>
         
         <Frame type="ViewMapProfileButton" name="GameInfoButton" template="StandardBattlenetTemplates/BattlenetStandardButtonTemplate">
@@ -430,6 +484,9 @@
             <Text val="@UI/ScreenCustomGames/MapInfoButton"/>
             <HoverSound val="@UI_HoverTick"/>
             <MapHandle val="{$parent/@SelectedMapHandle}"/>
+			<UseHyperLink val="True"/>
+			<HyperLinkIndex val="0"/>
+			<CollapseLayout val="True"/>
 
             <StateGroup name="GameInfoButtonState">
                 <State name="MapHandleInvalid">
@@ -440,6 +497,23 @@
                     <Action type="SetProperty" frame="$this" Enabled="true"/>
                 </State>
             </StateGroup>
+
+			<StateGroup name="LinkState">
+				<DefaultState val="Overview"/>
+				
+				<State name="Premium">
+					<When type="Property" frame="$CustomGamesArcadePremiumMapCache" HasPremium="True"/>
+					<When type="Property" frame="$CustomGamesArcadePremiumMapCache" PayToPlay="True"/>
+					<When type="Property" frame="$CustomGamesArcadePremiumMapCache" Owned="False"/>
+					<Action type="SetProperty" frame="$this" HyperLinkIndex="1"/>
+					<Action type="SetProperty" frame="$this" Text="@UI/ScreenCustomGames/PremiumInfoButton"/>
+				</State>
+				
+				<State name="Overview">
+					<Action type="SetProperty" frame="$this" HyperLinkIndex="0"/>
+					<Action type="SetProperty" frame="$this" Text="@UI/ScreenCustomGames/MapInfoButton"/>
+				</State>
+			</StateGroup>
         </Frame>
 
         <Frame type="BattleMapContextMenu" name="ItemContextMenu" template="StandardTemplates/StandardContextMenuTemplate">
@@ -455,13 +529,13 @@
 
             <State name="SearchingState">
                 <When type="AnimationState" frame="$this" SearchState="Searching"/>
-                <Action type="SetProperty" frame="ContentContainer/HeaderPanel/FilterPulldown" Visible="false"/>
-                <Action type="SetProperty" frame="ContentContainer/HeaderPanel/GenrePulldown" Visible="false"/>
+                <Action type="SetProperty" frame="ContentContainer/HeaderPanel/FilterPulldown" Enabled="false"/>
+                <Action type="SetProperty" frame="ContentContainer/HeaderPanel/GenrePulldown" Enabled="false"/>
             </State>
 
             <State name="NotSearchingState">
-                <Action type="SetProperty" frame="ContentContainer/HeaderPanel/FilterPulldown" Visible="true"/>
-                <Action type="SetProperty" frame="ContentContainer/HeaderPanel/GenrePulldown" Visible="true"/>
+                <Action type="SetProperty" frame="ContentContainer/HeaderPanel/FilterPulldown" Enabled="true"/>
+                <Action type="SetProperty" frame="ContentContainer/HeaderPanel/GenrePulldown" Enabled="true"/>
             </State>
         </StateGroup>
     </Frame>
