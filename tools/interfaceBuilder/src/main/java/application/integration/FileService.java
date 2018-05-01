@@ -138,6 +138,9 @@ public class FileService {
 	 * @throws IOException
 	 */
 	public long getFileCountOfDirectory(final File f) throws IOException {
+		if (!f.exists()) {
+			return 0;
+		}
 		final long count;
 		try (final Stream<Path> walk = Files.walk(f.toPath())) {
 			count = walk.filter(p -> p.toFile().isFile()).count();
