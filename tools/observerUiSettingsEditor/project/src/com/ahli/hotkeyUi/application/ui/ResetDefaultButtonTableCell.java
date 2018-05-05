@@ -46,6 +46,8 @@ public class ResetDefaultButtonTableCell extends TableCell<ValueDef, Boolean> {
 		super.updateItem(t, empty);
 		if (!empty) {
 			setGraphic(cellButton);
+		} else {
+			setGraphic(null);
 		}
 	}
 }
