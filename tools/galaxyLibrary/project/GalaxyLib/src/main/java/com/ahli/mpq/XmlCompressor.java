@@ -69,11 +69,11 @@ public final class XmlCompressor {
 		
 		for (final File curFile : filesOfCache) {
 			final Document doc;
-			try (InputStream is = new FileInputStream(curFile)) {
+			try (final InputStream is = new FileInputStream(curFile)) {
 				
 				doc = dBuilder.parse(is);
 				
-			} catch (SAXParseException | IOException e) {
+			} catch (final SAXParseException | IOException e) {
 				continue;
 			}
 			
@@ -99,7 +99,7 @@ public final class XmlCompressor {
 			try {
 				final Transformer xformer = TransformerFactory.newInstance().newTransformer();
 				xformer.transform(source, result);
-			} catch (TransformerFactoryConfigurationError | TransformerException e) {
+			} catch (final TransformerFactoryConfigurationError | TransformerException e) {
 				logger.error("Transforming to generate XML file failed.", e);
 			}
 			

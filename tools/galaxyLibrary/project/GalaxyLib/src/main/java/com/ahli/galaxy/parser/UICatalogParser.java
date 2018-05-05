@@ -353,7 +353,7 @@ public class UICatalogParser implements ParsedXmlConsumer {
 		if (curElement instanceof UIFrame) {
 			final UIFrame frame = (UIFrame) curElement;
 			if (side == null) {
-				if(logger.isTraceEnabled()){
+				if (logger.isTraceEnabled()) {
 					logger.trace("relative=" + relative + ", offset=" + offset);
 				}
 				frame.setAnchor(relative, offset);

@@ -91,21 +91,20 @@ public final class TextAreaAppender extends AbstractAppender {
 			final String message = new String(getLayout().toByteArray(event), StandardCharsets.UTF_8);
 			
 			Platform.runLater(() -> {
-					try {
-						if (textArea != null) {
-							if (textArea.getText().length() == 0) {
-								textArea.setText(message);
-							} else {
-								textArea.selectEnd();
-								textArea.insertText(textArea.getText().length(), message);
-							}
+				try {
+					if (textArea != null) {
+						if (textArea.getText().length() == 0) {
+							textArea.setText(message);
+						} else {
+							textArea.selectEnd();
+							textArea.insertText(textArea.getText().length(), message);
 						}
-					} catch (final Throwable t) {
-						// do not call log4j's logger here!
-						System.err.println("Error while append to TextArea: " + t.getMessage());
 					}
+				} catch (final Throwable t) {
+					// do not call log4j's logger here!
+					System.err.println("Error while append to TextArea: " + t.getMessage());
 				}
-			);
+			});
 		} catch (final IllegalStateException ex) {
 			ex.printStackTrace();
 		} finally {

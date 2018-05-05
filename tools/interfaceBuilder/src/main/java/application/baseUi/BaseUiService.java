@@ -90,7 +90,7 @@ public class BaseUiService {
 		
 		try {
 			if (!destination.exists()) {
-				if(!destination.mkdirs()){
+				if (!destination.mkdirs()) {
 					logger.error(String.format("Directory %s could not be created.", destination));
 					return;
 				}
@@ -111,15 +111,14 @@ public class BaseUiService {
 				public void run() {
 					try {
 						final String cmd =
-								"cmd start cmd /C " + QUOTE + QUOTE + extractorExe + QUOTE +
-										" " + mask + " " + destination +
-										File.separator + " " + "enUS" + " " + "None" + QUOTE;
+								"cmd start cmd /C " + QUOTE + QUOTE + extractorExe + QUOTE + " " + mask + " " +
+										destination + File.separator + " " + "enUS" + " " + "None" + QUOTE;
 						logger.trace("executing: " + cmd);
 						// TODO replace with proper check if config file finished writing
 						Thread.sleep(sleepDuration);
-//						Runtime.getRuntime().exec(cmd).waitFor();
+						//						Runtime.getRuntime().exec(cmd).waitFor();
 						Runtime.getRuntime().exec(cmd);
-//						logger.trace("finished executing: " + cmd);
+						//						logger.trace("finished executing: " + cmd);
 					} catch (final IOException e) {
 						logger.error("Extracting files from CASC via CascExtractor failed.", e); //$NON-NLS-1$
 					} catch (final InterruptedException e) {

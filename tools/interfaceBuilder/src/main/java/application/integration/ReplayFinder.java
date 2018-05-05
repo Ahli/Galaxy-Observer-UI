@@ -75,7 +75,7 @@ public class ReplayFinder {
 		String line;
 		String replayPath = null;
 		try (final InputStreamReader is = new InputStreamReader(new FileInputStream(new File(basePath)),
-				StandardCharsets.UTF_8); BufferedReader br = new BufferedReader(is)) {
+				StandardCharsets.UTF_8); final BufferedReader br = new BufferedReader(is)) {
 			
 			boolean found = false;
 			final String searchToken = "lastReplayFilePath=";

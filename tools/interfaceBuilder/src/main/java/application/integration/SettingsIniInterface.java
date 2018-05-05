@@ -92,7 +92,7 @@ public class SettingsIniInterface {
 				final FileBasedConfigurationBuilder<INIConfiguration> b =
 						new FileBasedConfigurationBuilder<>(INIConfiguration.class).configure(params);
 				readValuesFromIni(b.getConfiguration());
-			} catch (ConfigurationException | ExceptionInInitializerError | IllegalArgumentException | NullPointerException e) {
+			} catch (final ConfigurationException | ExceptionInInitializerError | IllegalArgumentException | NullPointerException e) {
 				throw new IOException("Could not read settings.ini.", e);
 			}
 		} else {
