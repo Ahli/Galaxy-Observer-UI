@@ -9,6 +9,8 @@ import com.ahli.mpq.mpqeditor.MpqEditorCompressionRule;
 import com.ahli.mpq.mpqeditor.MpqEditorCompressionRuleMask;
 import com.ahli.mpq.mpqeditor.MpqEditorCompressionRuleMethod;
 import com.ahli.mpq.mpqeditor.MpqEditorCompressionRuleSize;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.File;
 import java.io.IOException;
@@ -27,6 +29,7 @@ public class RandomCompressionMiner {
 	private final MpqEditorInterface mpqInterface;
 	private final Random random = new Random();
 	private final MpqEditorCompressionRuleMethod[] compressionSetting = MpqEditorCompressionRuleMethod.values();
+	private final Logger logger = LogManager.getLogger();
 	private MpqEditorCompressionRule[] rules;
 	private long bestSize;
 	private MpqEditorCompressionRule[] bestRuleSet = null;
@@ -80,8 +83,8 @@ public class RandomCompressionMiner {
 			}
 			rules = removeUnusedMaskEnries(rules, cache);
 			
-			bestRuleSet = deepCopy(oldBestRuleset);
-			bestSize = build(oldBestRuleset, true);
+			bestRuleSet = deepCopy(rules);
+			bestSize = build(rules, true);
 			
 		} else {
 			bestSize = Long.MAX_VALUE;
@@ -133,8 +136,11 @@ public class RandomCompressionMiner {
 		// copy old
 		System.arraycopy(oldBestRuleset, 0, merged, 0, oldRuleCount);
 		// insert new untracked
-		for (int i = oldRuleCount, len = untrackedFiles.size(); i < len; i++) {
-			merged[i] = new MpqEditorCompressionRuleMask(getFileMask(untrackedFiles.get(i).toPath(), cacheDir));
+		for (int i = 0, len = untrackedFiles.size(); i < len; i++) {
+			merged[oldRuleCount + i] =
+					new MpqEditorCompressionRuleMask(getFileMask(untrackedFiles.get(i).toPath(), cacheDir))
+							.setSingleUnit(true).setCompress(true)
+							.setCompressionMethod(MpqEditorCompressionRuleMethod.NONE);
 		}
 		return merged;
 	}
@@ -154,9 +160,15 @@ public class RandomCompressionMiner {
 				mask = ((MpqEditorCompressionRuleMask) rule).getMask();
 				if (isValidFileSpecificMask(mask, cacheDir)) {
 					clean.add(rule);
+				} else {
+					logger.trace("removing rule from ruleset due to invalid mask: " + mask);
 				}
 			} else {
-				clean.add(rule);
+				if (rule != null) {
+					clean.add(rule);
+				} else {
+					logger.trace("removing null entry from ruleset");
+				}
 			}
 		}
 		return clean.toArray(new MpqEditorCompressionRule[0]);
@@ -217,8 +229,9 @@ public class RandomCompressionMiner {
 	private static boolean containsFile(final MpqEditorCompressionRule[] rules, final Path p) {
 		for (int i = 0; i < rules.length; i++) {
 			if (rules[i] instanceof MpqEditorCompressionRuleMask) {
-				final String mask = ((MpqEditorCompressionRuleMask) rules[i]).getMask();
-				if (p.endsWith(mask)) {
+				final String cleanedMask =
+						File.separator + ((MpqEditorCompressionRuleMask) rules[i]).getMask().replace("*", "");
+				if (p.toString().endsWith(cleanedMask)) {
 					return true;
 				}
 			}

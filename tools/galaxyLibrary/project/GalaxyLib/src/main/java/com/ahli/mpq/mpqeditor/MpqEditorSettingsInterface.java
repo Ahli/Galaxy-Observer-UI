@@ -248,7 +248,12 @@ public class MpqEditorSettingsInterface implements DeepCopyable {
 			case CUSTOM:
 				if (customRules != null) {
 					for (int i = 0, len = customRules.length; i < len; i++) {
-						ini.addProperty(CUSTOM_RULE_PROPERTY_KEY, customRules[i].toString());
+						if(customRules[i] != null) {
+							ini.addProperty(CUSTOM_RULE_PROPERTY_KEY, customRules[i].toString());
+						} else {
+							throw new IllegalArgumentException("Compression Rules in MpqEditorSettingsInterface has " +
+									"null entry");
+						}
 					}
 				} else {
 					section.addProperty(DEFAULT, NO_COMPRESSION_CUSTOM_RULE);
