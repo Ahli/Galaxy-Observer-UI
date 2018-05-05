@@ -6,22 +6,22 @@ version: alpha
 
 Legal Information
 -----------------
-Use at your own risk. This software is free.
+Use at your own risk. This software is free to use.
 Do not duplicate, copy, steal, sell, eat, etc.
-Copyright 2017 <Christoph Ahlers>
+Copyright 2018 <Christoph Ahlers>
 
 
 What does it do?
 ----------------
 This program is a simple editor to load and edit hotkeys and settings within Observer Interface files which use the file types .SC2Interface and .StormInterface.
 These Observer Interface files can be loaded in the game options of Blizzard Entertainment's games StarCraft II and Heroes of the Storm to adjust the UI of an observer.
-The interfaces are required to define 
+The interfaces are required to define adjustable constants within a layout file with the syntax described at the end of this document.
 
 
 Requirements:
 -------------
-- Java 8 (or newer) by Oracle needs to be installed. Just try to start the "settingsEditor.jar" file and you will see if it works.
-
+- Java 10 JRE (or newer) needs to be installed. Just try to start the "settingsEditor.jar" file and you will see if it works.
+     You can download it here: http://www.oracle.com/technetwork/java/javase/downloads/index.html
 
 Installation:
 -------------
@@ -36,8 +36,8 @@ Contained Files:
 - plugins/mpq/History.txt							Changelog of Ladik's MpqEditor.
 
 
-Files that are created and perist:
-----------------------------------
+Files that are created and persist:
+-----------------------------------
 - %AppData%\Roaming\MPQEditor.ini						Ladik's MpqEditor settings file.
 - %AppData%\Roaming\MPQEditor_Ruleset.ini					Ladik's MpqEditor settings file for custom file compression.
 - %UserHome%\.GalaxyObsUiSettingsEditor\logs\settingsEditor_lastRun.log		Log file of the last settings editor execution for debugging.

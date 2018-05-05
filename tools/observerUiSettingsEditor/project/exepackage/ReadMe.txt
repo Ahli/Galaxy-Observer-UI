@@ -1,50 +1,47 @@
 Observer Interface Settings Editor
 ----------------------------------
 Author: Christoph "Ahli" Ahlers (twitter: @AhliSC2)
-version: alpha (September 2017)
+version: alpha
 
 
 Legal Information
 -----------------
-Use at your own risk. This software is free.
+Use at your own risk. This software is free to use.
 Do not duplicate, copy, steal, sell, eat, etc.
-Copyright 2017 <Christoph Ahlers>
+Copyright 2018 <Christoph Ahlers>
 
 
 What does it do?
 ----------------
 This program is a simple editor to load and edit hotkeys and settings within Observer Interface files which use the file types .SC2Interface and .StormInterface.
 These Observer Interface files can be loaded in the game options of Blizzard Entertainment's games StarCraft II and Heroes of the Storm to adjust the UI of an observer.
-Interface files are required to define settings and/or hotkeys to be able to edit them.
-
-
-Requirements:
--------------
-- Windows
+The interfaces are required to define adjustable constants within a layout file with the syntax described at the end of this document.
 
 
 Installation:
 -------------
-Execute the "Observer UI Settings Editor App.msi" file.
-It will install the editor to the path of your choice and place a shortcut on your desktop.
+Place the editor's folder somewhere on your computer.
 
 
-Running the Program:
---------------------
-You can start the program via the shortcut on your desktop.
+Contained Files:
+----------------
+The files installed into your install directory.
 
 
-Files that are created by this program or its plugins:
-------------------------------------------------------
+Files that are created and persist:
+-----------------------------------
 - %AppData%\Roaming\MPQEditor.ini						Ladik's MpqEditor settings file.
 - %AppData%\Roaming\MPQEditor_Ruleset.ini					Ladik's MpqEditor settings file for custom file compression.
 - %UserHome%\.GalaxyObsUiSettingsEditor\logs\settingsEditor_lastRun.log		Log file of the last settings editor execution for debugging.
+
 
 
 Credits:
 --------
 - @tinkoliu for translating the editor to Chinese and Taiwanese
 - Ladislav "Ladik" Zezula for creating his MpqEditor. It is used to open and create the Observer Interface files.
+
+
 
 
 How to add Hotkeys and Settings to your Observer Interface?
