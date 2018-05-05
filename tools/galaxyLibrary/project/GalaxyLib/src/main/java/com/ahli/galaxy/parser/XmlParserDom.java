@@ -49,7 +49,6 @@ public class XmlParserDom extends XmlParserAbstract {
 			}
 		} catch (final ParserConfigurationException e) {
 			logger.error(e);
-			e.printStackTrace();
 		}
 		attrTypes = new ArrayList<>();
 		attrValues = new ArrayList<>();

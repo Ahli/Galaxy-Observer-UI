@@ -1,8 +1,8 @@
 package com.ahli.mpq.mpqeditor;
 
 public class MpqEditorCompressionRuleSize extends MpqEditorCompressionRule {
-	private int minSize = 0;
-	private int maxSize = 0;
+	private int minSize;
+	private int maxSize;
 	
 	public MpqEditorCompressionRuleSize(final int minSize, final int maxSize) {
 		super();

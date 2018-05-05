@@ -98,12 +98,9 @@ public class FileService {
 	 */
 	public boolean directoryFilesAreUpToDate(final long compareDate, final File directory) throws IOException {
 		try (final Stream<Path> ps = Files.walk(directory.toPath())) {
-			final Predicate<Path> predicateIsYoungerThanCompareDate = new Predicate<>() {
-				@Override
-				public boolean test(final Path p) {
-					return p.toFile().lastModified() > compareDate;
-				}
-			};
+			
+			final Predicate<Path> predicateIsYoungerThanCompareDate =
+					path -> path.toFile().lastModified() > compareDate;
 			return ps.filter(Files::isRegularFile).allMatch(predicateIsYoungerThanCompareDate);
 		}
 	}

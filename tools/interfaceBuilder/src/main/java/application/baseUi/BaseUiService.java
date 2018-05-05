@@ -45,7 +45,7 @@ public class BaseUiService {
 		final File gameBaseUI = new File(configService.getBaseUiPath(gameDef));
 		
 		if (!gameBaseUI.exists()) {
-			gameBaseUI.mkdirs();
+			return true;
 		}
 		
 		return fileService.isEmptyDirectory(gameBaseUI) ||
@@ -90,7 +90,10 @@ public class BaseUiService {
 		
 		try {
 			if (!destination.exists()) {
-				destination.mkdirs();
+				if(!destination.mkdirs()){
+					logger.error(String.format("Directory %s could not be created.", destination));
+					return;
+				}
 			}
 			fileService.cleanDirectory(destination);
 		} catch (final IOException e) {

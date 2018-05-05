@@ -71,11 +71,12 @@ public class UIAttribute extends UIElement {
 				break;
 			}
 		}
-		if (i == len || p == null) {
+		if (i == len) {
 			// not found
 			values.add(new Pair<>(key, value));
 			return null;
 		} else {
+			// p cannot be null here, ignore linter warning
 			final String oldVal = p.getValue();
 			p.setValue(value);
 			return oldVal;

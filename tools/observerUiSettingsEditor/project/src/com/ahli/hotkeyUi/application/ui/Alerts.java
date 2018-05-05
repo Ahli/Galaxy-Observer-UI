@@ -19,8 +19,7 @@ import org.apache.logging.log4j.Logger;
  * @author Ahli
  */
 public class Alerts {
-	public static final String GENERAL_OK_BUTTON = "General.OkButton";
-	private static Logger logger = LogManager.getLogger(Alerts.class);
+	private static final Logger logger = LogManager.getLogger(Alerts.class);
 	
 	private Alerts() {
 		// disallow class instances
@@ -59,7 +58,7 @@ public class Alerts {
 	public static Alert buildErrorAlert(final Window owner, final String title, final String header,
 			final String content) {
 		final long time = System.nanoTime();
-		final ButtonType okButton = new ButtonType(Messages.getString(GENERAL_OK_BUTTON), ButtonData.YES); //$NON-NLS-1$
+		final ButtonType okButton = createOkButton();
 		final Alert alert = new Alert(AlertType.ERROR, content, okButton);
 		alert.initOwner(owner);
 		alert.setTitle(title);
@@ -68,24 +67,8 @@ public class Alerts {
 		return alert;
 	}
 	
-	/**
-	 * @param owner
-	 * @param title
-	 * @param header
-	 * @param content
-	 * @return
-	 */
-	public static Alert buildInfoAlert(final Window owner, final String title, final String header,
-			final String content) {
-		final long time = System.nanoTime();
-		final ButtonType okButton =
-				new ButtonType(Messages.getString("General.OkButton"), ButtonData.YES); //$NON-NLS-1$
-		final Alert alert = new Alert(AlertType.INFORMATION, content, okButton);
-		alert.initOwner(owner);
-		alert.setTitle(title);
-		alert.setHeaderText(header);
-		logger.warn("created infoAlert within " + (System.nanoTime() - time) / 1000000 + "ms.");
-		return alert;
+	private static ButtonType createOkButton() {
+		return new ButtonType(Messages.getString("General.OkButton"), ButtonData.OK_DONE);
 	}
 	
 	/**
@@ -98,8 +81,7 @@ public class Alerts {
 	public static Alert buildWarningAlert(final Window owner, final String title, final String header,
 			final String content) {
 		final long time = System.nanoTime();
-		final ButtonType okButton =
-				new ButtonType(Messages.getString("General.OkButton"), ButtonData.YES); //$NON-NLS-1$
+		final ButtonType okButton = createOkButton();
 		final Alert alert = new Alert(AlertType.WARNING, content, okButton);
 		alert.initOwner(owner);
 		alert.setTitle(title);
@@ -119,8 +101,7 @@ public class Alerts {
 	public static Alert buildAboutAlert(final Window owner, final String title, final String header,
 			final String content, final String imageUrl) {
 		final long time = System.nanoTime();
-		final ButtonType okButton =
-				new ButtonType(Messages.getString("General.OkButton"), ButtonData.OK_DONE); //$NON-NLS-1$
+		final ButtonType okButton = createOkButton();
 		final Alert alert = new Alert(AlertType.INFORMATION, content, okButton);
 		alert.initOwner(owner);
 		alert.setTitle(title);
@@ -140,8 +121,7 @@ public class Alerts {
 	 */
 	public static Alert buildExceptionAlert(final Window owner, final Throwable e) {
 		final long time = System.nanoTime();
-		final ButtonType okButton =
-				new ButtonType(Messages.getString("General.OkButton"), ButtonData.OK_DONE); //$NON-NLS-1$
+		final ButtonType okButton = createOkButton();
 		final String localizedMsg = e.getLocalizedMessage();
 		final Alert alert = new Alert(AlertType.ERROR, localizedMsg, okButton);
 		alert.initOwner(owner);

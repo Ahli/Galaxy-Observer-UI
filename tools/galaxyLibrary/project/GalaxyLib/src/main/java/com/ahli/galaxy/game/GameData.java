@@ -16,7 +16,7 @@ public class GameData implements Serializable {
 	
 	private GameDef gameDef;
 	private UICatalog uiCatalog;
-	private Map<Object, Object> keyValueStore = new HashMap<>();
+	private Map<Serializable, Serializable> keyValueStore = new HashMap<>();
 	
 	/**
 	 * Constructor.
@@ -62,14 +62,14 @@ public class GameData implements Serializable {
 	/**
 	 * @return
 	 */
-	public Map<Object, Object> getKeyValueStore() {
+	public Map<Serializable, Serializable> getKeyValueStore() {
 		return keyValueStore;
 	}
 	
 	/**
 	 * @param keyValueStore
 	 */
-	public void setKeyValueStore(final Map<Object, Object> keyValueStore) {
+	public void setKeyValueStore(final Map<Serializable, Serializable> keyValueStore) {
 		this.keyValueStore = keyValueStore;
 	}
 	

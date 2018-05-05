@@ -471,13 +471,7 @@ public class Main extends Application {
 				updateAppTitle();
 				
 				// load desc index from mpq
-				final boolean isNamespaceHeroes;
-				try {
-					isNamespaceHeroes = mpqi.isHeroesMpq();
-				} catch (final MpqException e) {
-					// special case to show readable error to user
-					throw new ShowToUserException(Messages.getString("Main.OpenedFileNoComponentList"));
-				}
+				final boolean isNamespaceHeroes = isNameSpaceHeroes(mpqi);
 				final boolean ignoreRequiredToLoadEntries = true;
 				
 				final File componentListFile = mpqi.getComponentListFile();
@@ -526,6 +520,20 @@ public class Main extends Application {
 			logger.trace("File to open was null, most likely due to 'cancel'."); //$NON-NLS-1$
 		}
 		logger.warn("opened mpq within " + (System.nanoTime() - time) / 1000000 + "ms.");
+	}
+	
+	/**
+	 * @param mpqi
+	 * @return
+	 * @throws ShowToUserException
+	 */
+	private boolean isNameSpaceHeroes(final MpqEditorInterface mpqi) throws ShowToUserException {
+		try {
+			return mpqi.isHeroesMpq();
+		} catch (final MpqException e) {
+			// special case to show readable error to user
+			throw new ShowToUserException(Messages.getString("Main.OpenedFileNoComponentList"));
+		}
 	}
 	
 	/**

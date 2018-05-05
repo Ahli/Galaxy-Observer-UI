@@ -25,7 +25,7 @@ public class UICatalogImpl implements UICatalog {
 	
 	private static final Logger logger = LogManager.getLogger();
 	
-	private UICatalogParser parser = null;
+	private transient UICatalogParser parser = null;
 	
 	// members
 	private List<UITemplate> templates;

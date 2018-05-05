@@ -12,6 +12,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,7 +23,7 @@ import java.util.List;
  */
 // TODO rebuild to use the UI object model instead of parsing all layout files
 // another time
-public class DescIndexData {
+public class DescIndexData implements Serializable {
 	private static final String STRING2 = "#";
 	
 	private static final String DESC = "</Desc>\r\n";

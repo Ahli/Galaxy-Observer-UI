@@ -90,9 +90,7 @@ public final class TextAreaAppender extends AbstractAppender {
 		try {
 			final String message = new String(getLayout().toByteArray(event), StandardCharsets.UTF_8);
 			
-			Platform.runLater(new Runnable() {
-				@Override
-				public void run() {
+			Platform.runLater(() -> {
 					try {
 						if (textArea != null) {
 							if (textArea.getText().length() == 0) {
@@ -103,13 +101,13 @@ public final class TextAreaAppender extends AbstractAppender {
 							}
 						}
 					} catch (final Throwable t) {
+						// do not call log4j's logger here!
 						System.err.println("Error while append to TextArea: " + t.getMessage());
 					}
 				}
-			});
+			);
 		} catch (final IllegalStateException ex) {
 			ex.printStackTrace();
-			
 		} finally {
 			readLock.unlock();
 		}

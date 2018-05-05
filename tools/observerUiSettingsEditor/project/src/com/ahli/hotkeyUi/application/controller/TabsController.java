@@ -62,7 +62,7 @@ public class TabsController {
 							} else {
 								// check if old value equals new value
 								final boolean equals = item.equals(getItem());
-								super.updateItem(item, empty);
+								super.updateItem(item, false);
 								if (!equals) {
 									logger.trace("update wrapping table cell - newLabel " + item);
 									final Label l = new Label(item);
