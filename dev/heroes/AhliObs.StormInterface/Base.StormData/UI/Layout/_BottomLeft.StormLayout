@@ -105,7 +105,17 @@
 		</Animation>
 	</Frame>
 	
-	
+	<Frame type="UnitStatusLabel" name="UnitStatusLabelTemplate">
+        <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+        <Width val="123"/>
+        <Height val="27"/>
+        <ShowGrouping val="true"/>
+        <RoundMode val="None"/>
+        <Frame type="Label" name="StatusLabel">
+            <Anchor relative="$parent"/>
+            <Style val="HeroStatDescriptionLabel"/>
+        </Frame>
+    </Frame>
 	
 	<Frame type="ConsolePanel" name="GameUI/UIContainer/ConsolePanel" file="GameUI">
 	
@@ -2347,11 +2357,13 @@
 					</Frame>
 				</Frame>-->
 				
-				<Frame type="UnitStatusUnitName" name="UnitName">
+				<Frame type="UnitStatusName" name="UnitName">
 					<Anchor side="Bottom" relative="$PortraitPanel/Portrait" pos="Max" offset="-10"/>
 					<Anchor side="Left" relative="$PortraitPanel/Portrait" pos="Min" offset="44"/>
 					<Anchor side="Right" relative="$PortraitPanel/Portrait" pos="Max" offset="-44"/>
 					<Height val="34"/>
+					<NameType val="Unit"/>
+					<UseNameTypeVisibilityRules val="False"/>
 
 					<Frame type="Label" name="Label">
 						<Anchor relative="$parent"/>
@@ -2469,31 +2481,84 @@
 					<DarkAdjustColor val="cecece"/>
 					<Rotation val="-97"/>
 				</Frame>
+				
+				<Frame type="UnitStatusDamageLabel" name="BaseDamageValueLabel">
+					<Anchor relative="$parent/DamageImage"/>
+					<Handle val="SelectedUnitBaseDamageLabel"/>
+					<HideMax val="True"/>
+					<ShowMaxZero val="true"/>
+					<ShowHeroicMultiplier val="false"/>
+					<ShowMinionMultiplier val="false"/>
+					<ShowStructureMultiplier val="false"/>
+					<Frame type="Label" name="StatusLabel">
+						<Anchor relative="$parent"/>
+					</Frame>
+					<Alpha val="0"/>
+				</Frame>
+				<Frame type="UnitStatusDamageLabel" name="MinionDamageValueLabel">
+					<Anchor relative="$parent/DamageImage"/>
+					<Handle val="SelectedUnitMinionDamageLabel"/>
+					<HideMax val="True"/>
+					<ShowMaxZero val="true"/>
+					<ShowHeroicMultiplier val="false"/>
+					<ShowMinionMultiplier val="true"/>
+					<ShowStructureMultiplier val="false"/>
+					<Frame type="Label" name="StatusLabel">
+						<Anchor relative="$parent"/>
+					</Frame>
+					<Alpha val="0"/>
+				</Frame>
 				<Frame type="UnitStatusDamageLabel" name="DamageValueLabel">
 					<Anchor side="Top" relative="$parent/DamageImage" pos="Min" offset="-2"/>
 					<Anchor side="Left" relative="$parent/DamageImage" pos="Min" offset="6"/>
 					<Anchor side="Right" relative="$parent/DamageImage" pos="Max" offset="6"/>
 					<Anchor side="Bottom" relative="$parent/DamageImage" pos="Max" offset="-2"/>
 					<HideMax val="True"/>
-					<ShowGrouping val="true"/>
-					<VisibleWhenUserControlled val="true"/>
-					<ShowMaxZero val="false"/>
+					<!--<ShowGrouping val="true"/>
+					<VisibleWhenUserControlled val="true"/>-->
+					<ShowMaxZero val="false"/>					
+					<ShowHeroicMultiplier val="true"/>
+					<ShowMinionMultiplier val="false"/>
+					<ShowStructureMultiplier val="false"/>
+				    <AcceptsMouseTooltip val="true" />
+					<Tooltip val="{TooltipFormatFrame/@Text}"/>
+					<TooltipAnchorFrame val="$parent/TooltipAnchorFrame"/>
 					<Frame type="Label" name="StatusLabel">
 						<Anchor relative="$parent"/>
 						<Style val="Ahli_Portrait_MiniStat"/>
 					</Frame>
+					<Frame type="TextFormatFrame" name="TooltipFormatFrame">
+						<Anchor relative="$parent"/>
+						<FormatText val="@UI/portraitDamageTooltip"/>
+						<Replacement index="0" val="{$parent/StatusLabel/@Text}"/>
+						<ReplacedName index="0" val="exp2"/>
+						<Replacement index="1" val="{$SelectedUnitBaseDamageLabel/@Text}"/>
+						<ReplacedName index="1" val="exp1"/>
+						<Replacement index="2" val="{$SelectedUnitMinionDamageLabel/@Text}"/>
+						<ReplacedName index="2" val="exp3"/>
+						<Replacement index="3" val="{$SelectedUnitStructureDamageLabel/@Text}"/>
+						<ReplacedName index="3" val="exp4"/>
+					</Frame>
+				</Frame>
+				<Frame type="Frame" name="TooltipAnchorFrame">
+				  <Anchor side="Top" relative="$parent/$parent" pos="Min" offset="2"/>
+				  <Anchor side="Left" relative="$parent" pos="Min" offset="-1"/>
+				  <Anchor side="Bottom" relative="$parent/$parent" pos="Max" offset="-2"/>
+				  <Width val="10"/>
+				  <TooltipAnchorPosition val="TopToBottom | LeftToLeft"/>
 				</Frame>
 				
 				<!--
-				<Frame type="Label" name="AttackDamageLabel" template="HeroCharacterSheetPanel/HeroStatDescriptionTemplate">
+				<Frame type="Label" name="AttackDamageLabel">
 					<Anchor side="Top" relative="$parent/EnergyBar" pos="Max" offset="10"/>
 					<Anchor side="Left" relative="$parent/EnergyBar" pos="Min" offset="0"/>
 					<Text val="@UI/HeroCharacterSheetPanel/AttackDamage"/>
 					<Style val="AhliUnitStatTitle"/>
 					<CollapseLayout val="true"/>
 					<Visible val="{$parent/UnitStatusDamageLabel/@Visible}"/>
+					<Style val="HeroStatNameLabel"/>
 				</Frame>
-				<Frame type="UnitStatusDamageLabel" name="UnitStatusDamageLabel" template="HeroCharacterSheetPanel/UnitStatusLabelTemplate">
+				<Frame type="UnitStatusDamageLabel" name="UnitStatusDamageLabel" template="_BottomLeft/UnitStatusLabelTemplate">
 					<Anchor side="Top" relative="$parent/AttackDamageLabel" pos="Min" offset="0"/>
 					<Anchor side="Right" relative="$parent/EnergyBar" pos="Max" offset="0"/>
 					<Width val="148"/>
@@ -2911,13 +2976,13 @@
 						<Unclipped val="true"/>
 					</Frame>
 
-					<Frame type="UnitStatusUnitName" name="UnitStatusUnitName">
+					<Frame type="UnitStatusName" name="UnitStatusUnitName">
 						<Anchor side="Top" relative="$parent" pos="Min" offset="10"/>
 						<Anchor side="Left" relative="$parent" pos="Min" offset="15"/>
 						<Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
 						<Anchor side="Bottom" relative="$this/Label" pos="Max" offset="0"/>
-						<VisibleToOwner val="true"/>
-						<VisibleWhenUserControlled val="true"/>
+						<NameType val="Unit" />
+						<UseNameTypeVisibilityRules val="True" />
 						<Unclipped val="true"/>
 
 						<Frame type="Label" name="Label">
@@ -2953,14 +3018,15 @@
 						<Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
 						<Anchor side="Bottom" relative="$parent/HealthLabelB" pos="Max" offset="0"/>
 						
-						<Frame type="Label" name="HealthLabel" template="HeroCharacterSheetPanel/HeroStatDescriptionTemplate">
+						<Frame type="Label" name="HealthLabel">
 							<Anchor side="Top" relative="$parent/$parent/UnitStatusUnitName" pos="Max" offset="5"/>
 							<Anchor side="Left" relative="$parent" pos="Min" offset="15"/>
-							<Text val="@UI/HeroCharacterSheetPanel/HealthPoints"/>
+							<Text val="@UI/Talents/Health"/>
 							<Unclipped val="false"/>
+							<Style val="HeroStatNameLabel"/>
 						</Frame>
 					</Frame>
-					<Frame type="UnitStatusHealthLabel" name="UnitStatusHealthLabel" template="HeroCharacterSheetPanel/UnitStatusLabelTemplate">
+					<Frame type="UnitStatusHealthLabel" name="UnitStatusHealthLabel" template="_BottomLeft/UnitStatusLabelTemplate">
 						<Anchor side="Top" relative="$parent/HealthLabelORgate/HealthLabel" pos="Min" offset="0"/>
 						<FractionDigits val="1"/>
 						<Width val="156"/>
@@ -2980,15 +3046,16 @@
 							</Controller>
 						</Animation>
 					</Frame>
-					<Frame type="Label" name="HealthRegenLabel" template="HeroCharacterSheetPanel/HeroStatDescriptionTemplate">
+					<Frame type="Label" name="HealthRegenLabel">
 						<Anchor side="Top" relative="$parent/HealthLabelORgate/HealthLabel" pos="Max" offset="0"/>
 						<Anchor side="Left" relative="$parent/HealthLabelORgate/HealthLabel" pos="Min" offset="0"/>
 						<Text val="@UI/HeroCharacterSheetPanel/HealthRegen"/>
 						<Unclipped val="true"/>
 						<CollapseLayout val="true"/>
 						<Visible val="false"/>
+						<Style val="HeroStatNameLabel"/>
 					</Frame>
-					<Frame type="UnitStatusHealthRegenLabel" name="UnitStatusHealthRegenLabel" template="HeroCharacterSheetPanel/UnitStatusLabelTemplate">
+					<Frame type="UnitStatusHealthRegenLabel" name="UnitStatusHealthRegenLabel" template="_BottomLeft/UnitStatusLabelTemplate">
 						<Anchor side="Top" relative="$parent/HealthRegenLabel" pos="Min" offset="0"/>
 						<FractionDigits val="2"/>
 						<Unclipped val="true"/>
@@ -3011,15 +3078,16 @@
 						</Animation>
 					</Frame>
 					
-					<Frame type="Label" name="ShieldsLabel" template="HeroCharacterSheetPanel/HeroStatDescriptionTemplate">
+					<Frame type="Label" name="ShieldsLabel">
 						<Anchor side="Top" relative="$parent/HealthRegenLabel" pos="Max" offset="15"/>
 						<Anchor side="Left" relative="$parent/HealthRegenLabel" pos="Min" offset="0"/>
 						<Text val="@e_gameUIStringShields"/>
 						<Unclipped val="true"/>
 						<CollapseLayout val="true"/>
 						<Visible val="false"/>
+						<Style val="HeroStatNameLabel"/>
 					</Frame>
-					<Frame type="UnitStatusShieldsLabel" name="UnitStatusShieldsLabel" template="HeroCharacterSheetPanel/UnitStatusLabelTemplate">
+					<Frame type="UnitStatusShieldsLabel" name="UnitStatusShieldsLabel" template="_BottomLeft/UnitStatusLabelTemplate">
 						<Anchor side="Top" relative="$parent/ShieldsLabel" pos="Min" offset="0"/>
 						<FractionDigits val="1"/>
 						<Width val="156"/>
@@ -3066,9 +3134,10 @@
 							<Anchor side="Right" relative="$parent/StatusLabel" pos="Min" offset="0"/>
 							
 							<!-- Energy Type Label displaying actor data -->
-							<Frame type="Label" name="Label" template="HeroCharacterSheetPanel/HeroStatDescriptionTemplate">
+							<Frame type="Label" name="Label">
 								<Anchor relative="$parent"/>
 								<Unclipped val="true"/>
+								<Style val="HeroStatNameLabel"/>
 								
 								<Animation name="Show">
 									<Event event="Show" action="Reset,Play"/>
@@ -3085,11 +3154,12 @@
 							</Frame>
 							
 							<!-- Structure Ammunition -->
-							<Frame type="Label" name="AmmunitionLabel" template="HeroCharacterSheetPanel/HeroStatDescriptionTemplate">
+							<Frame type="Label" name="AmmunitionLabel">
 								<Anchor relative="$parent"/>
 								<Unclipped val="true"/>
 								<Text val="@Ahli/Ammunition"/>
 								<Visible val="false"/>
+								<Style val="HeroStatNameLabel"/>
 								
 								<Animation name="Show">
 									<Event event="Show" action="Reset,Play"/>
@@ -3195,13 +3265,14 @@
 							<Unclipped val="true"/>
 						</Frame>
 
-						<Frame type="Label" name="EnergyRegenLabel" template="HeroCharacterSheetPanel/HeroStatDescriptionTemplate">
+						<Frame type="Label" name="EnergyRegenLabel">
 							<Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
 							<Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
 							<Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
 							<Anchor side="Right" relative="$parent/StatusLabel" pos="Min" offset="0"/>
 							<Text val="@UI/HeroCharacterSheetPanel/EnergyRegen"/>
 							<Unclipped val="true"/>
+							<Style val="HeroStatNameLabel"/>
 						</Frame>
 					</Frame>
 					<!-- This is a hidden UnitStatusEnergyLabel used purely for padding and collapsing -->
@@ -3222,14 +3293,15 @@
 						</Frame>
 					</Frame>
 					
-					<Frame type="Label" name="AbilityPowerLabel" template="HeroCharacterSheetPanel/HeroStatDescriptionTemplate">
+					<Frame type="Label" name="AbilityPowerLabel">
 						<Anchor side="Top" relative="$parent/EnergyRegenPadding" pos="Max" offset="0"/>
 						<Anchor side="Left" relative="$parent/EnergyRegenPadding" pos="Min" offset="0"/>
-						<Text val="@UI/HeroCharacterSheetPanel/AbilityPower"/>
+						<Text val="@UI/Talents/AbilityPower"/>
 						<Unclipped val="true"/>
 						<CollapseLayout val="true"/>
+						<Style val="HeroStatNameLabel"/>
 					</Frame>
-					<Frame type="UnitStatusAbilityPowerLabel" name="UnitStatusAbilityPowerLabel" template="HeroCharacterSheetPanel/UnitStatusLabelTemplate">
+					<Frame type="UnitStatusAbilityPowerLabel" name="UnitStatusAbilityPowerLabel" template="_BottomLeft/UnitStatusLabelTemplate">
 						<Anchor side="Top" relative="$parent/AbilityPowerLabel" pos="Min" offset="0"/>
 						<Frame type="Label" name="StatusLabel">
 							<Unclipped val="true"/>
@@ -3249,14 +3321,15 @@
 					</Frame>
 					
 					<!-- might not be used anymore, but I keep it because it exists -->
-					<Frame type="Label" name="CooldownReductionLabel" template="HeroCharacterSheetPanel/HeroStatDescriptionTemplate">
+					<Frame type="Label" name="CooldownReductionLabel">
 						<Anchor side="Top" relative="$parent/AbilityPowerLabel" pos="Max" offset="0"/>
 						<Anchor side="Left" relative="$parent/AbilityPowerLabel" pos="Min" offset="0"/>
-						<Text val="@UI/HeroCharacterSheetPanel/CooldownReduction"/>
+						<Text val="@UI/Talents/CooldownReduction"/>
 						<Unclipped val="true"/>
 						<CollapseLayout val="true"/>
+						<Style val="HeroStatNameLabel"/>
 					</Frame>
-					<Frame type="UnitStatusCooldownReductionLabel" name="UnitStatusCooldownReductionLabel" template="HeroCharacterSheetPanel/UnitStatusLabelTemplate">
+					<Frame type="UnitStatusCooldownReductionLabel" name="UnitStatusCooldownReductionLabel" template="_BottomLeft/UnitStatusLabelTemplate">
 						<Anchor side="Top" relative="$parent/CooldownReductionLabel" pos="Min" offset="0"/>
 						<Frame type="Label" name="StatusLabel">
 							<Unclipped val="true"/>
@@ -3275,14 +3348,15 @@
 						</StateGroup>
 					</Frame>
 					
-					<Frame type="Label" name="AbilityArmorLabel" template="HeroCharacterSheetPanel/HeroStatDescriptionTemplate">
+					<Frame type="Label" name="AbilityArmorLabel">
 						<Anchor side="Top" relative="$parent/CooldownReductionLabel" pos="Max" offset="15"/>
 						<Anchor side="Left" relative="$parent/CooldownReductionLabel" pos="Min" offset="0"/>
 						<Text val="@UI/HeroCharacterSheetPanel/ArmorAbility"/>
 						<Unclipped val="true"/>
 						<CollapseLayout val="true"/>
+						<Style val="HeroStatNameLabel"/>
 					</Frame>
-					<Frame type="UnitStatusLabel" name="AbilityArmorValueLabel" template="HeroCharacterSheetPanel/UnitStatusLabelTemplate">
+					<Frame type="UnitStatusLabel" name="AbilityArmorValueLabel" template="_BottomLeft/UnitStatusLabelTemplate">
 						<Anchor side="Top" relative="$parent/AbilityArmorLabel" pos="Min" offset="0"/>
 						<CurrentValue val="{$this/ArmorValue/@CurrentAbilityArmor}"/>
 						<MaxValue val="1000"/>
@@ -3309,14 +3383,15 @@
 						</StateGroup>
 					</Frame>
 					
-					<Frame type="Label" name="PhysicalArmorLabel" template="HeroCharacterSheetPanel/HeroStatDescriptionTemplate">
+					<Frame type="Label" name="PhysicalArmorLabel">
 						<Anchor side="Top" relative="$parent/AbilityArmorLabel" pos="Max" offset="0"/>
 						<Anchor side="Left" relative="$parent/AbilityArmorLabel" pos="Min" offset="0"/>
 						<Text val="@UI/HeroCharacterSheetPanel/ArmorPhysical"/>
 						<Unclipped val="true"/>
 						<CollapseLayout val="true"/>
+						<Style val="HeroStatNameLabel"/>
 					</Frame>
-					<Frame type="UnitStatusLabel" name="PhysicalArmorValueLabel" template="HeroCharacterSheetPanel/UnitStatusLabelTemplate">
+					<Frame type="UnitStatusLabel" name="PhysicalArmorValueLabel" template="_BottomLeft/UnitStatusLabelTemplate">
 						<Anchor side="Top" relative="$parent/PhysicalArmorLabel" pos="Min" offset="0"/>
 						<CurrentValue val="{$this/ArmorValue/@CurrentPhysicalArmor}"/>
 						<MaxValue val="1000"/>
@@ -3342,14 +3417,15 @@
 							</State>
 						</StateGroup>
 					</Frame>
-					<Frame type="Label" name="PhysicalArmorHeroOnlyLabel" template="HeroCharacterSheetPanel/HeroStatDescriptionTemplate">
+					<Frame type="Label" name="PhysicalArmorHeroOnlyLabel">
 						<Anchor side="Top" relative="$parent/PhysicalArmorLabel" pos="Max" offset="0"/>
 						<Anchor side="Left" relative="$parent/PhysicalArmorLabel" pos="Min" offset="0"/>
 						<Text val="@UI/HeroCharacterSheetPanel/ArmorPhysicalHeroOnly"/>
 						<Unclipped val="true"/>
 						<CollapseLayout val="true"/>
+						<Style val="HeroStatNameLabel"/>
 					</Frame>
-					<Frame type="UnitStatusLabel" name="PhysicalArmorHeroOnlyValueLabel" template="HeroCharacterSheetPanel/UnitStatusLabelTemplate">
+					<Frame type="UnitStatusLabel" name="PhysicalArmorHeroOnlyValueLabel" template="_BottomLeft/UnitStatusLabelTemplate">
 						<Anchor side="Top" relative="$parent/PhysicalArmorHeroOnlyLabel" pos="Min" offset="0"/>
 						<CurrentValue val="{$this/ArmorValue/@CurrentPhysicalArmor}"/>
 						<MaxValue val="1000"/>
@@ -3832,15 +3908,16 @@
 						</StateGroup>
 					</Frame>
 					
-					<Frame type="Label" name="AttackRangeLabel" template="HeroCharacterSheetPanel/HeroStatDescriptionTemplate">
+					<Frame type="Label" name="AttackRangeLabel">
 						<Anchor side="Top" relative="$parent/PhysicalArmorHeroOnlyLabel" pos="Max" offset="15"/>
 						<Anchor side="Left" relative="$parent/PhysicalArmorHeroOnlyLabel" pos="Min" offset="0"/>
 						<Text val="@UI/HeroCharacterSheetPanel/AttackRange"/>
 						<Unclipped val="true"/>
 						<CollapseLayout val="true"/>
 						<Visible val="false"/>
+						<Style val="HeroStatNameLabel"/>
 					</Frame>
-					<Frame type="UnitStatusAttackRangeLabel" name="UnitStatusAttackRangeLabel" template="HeroCharacterSheetPanel/UnitStatusLabelTemplate">
+					<Frame type="UnitStatusAttackRangeLabel" name="UnitStatusAttackRangeLabel" template="_BottomLeft/UnitStatusLabelTemplate">
 						<Anchor side="Top" relative="$parent/AttackRangeLabel" pos="Min" offset="0"/>
 						<FractionDigits val="1"/>
 						<ShowMaxZero val="false"/>
@@ -3859,15 +3936,16 @@
 						</Animation>
 					</Frame>
 					
-					<Frame type="Label" name="AttackDamageLabel" template="HeroCharacterSheetPanel/HeroStatDescriptionTemplate">
+					<Frame type="Label" name="AttackDamageLabel">
 						<Anchor side="Top" relative="$parent/AttackRangeLabel" pos="Max" offset="0"/>
 						<Anchor side="Left" relative="$parent/AttackRangeLabel" pos="Min" offset="0"/>
-						<Text val="@UI/HeroCharacterSheetPanel/AttackDamage"/>
+						<Text val="@UI/Talents/AttackDamage"/>
 						<Unclipped val="true"/>
 						<CollapseLayout val="true"/>
 						<Visible val="false"/>
+						<Style val="HeroStatNameLabel"/>
 					</Frame>
-					<Frame type="UnitStatusDamageLabel" name="UnitStatusDamageLabel" template="HeroCharacterSheetPanel/UnitStatusLabelTemplate">
+					<Frame type="UnitStatusDamageLabel" name="UnitStatusDamageLabel" template="_BottomLeft/UnitStatusLabelTemplate">
 						<Anchor side="Top" relative="$parent/AttackDamageLabel" pos="Min" offset="0"/>
 						<FractionDigits val="1"/>
 						<ShowMaxZero val="false"/>
@@ -3887,15 +3965,16 @@
 						</Animation>
 					</Frame>
 					
-					<Frame type="Label" name="AttackSpeedLabel" template="HeroCharacterSheetPanel/HeroStatDescriptionTemplate">
+					<Frame type="Label" name="AttackSpeedLabel">
 						<Anchor side="Top" relative="$parent/AttackDamageLabel" pos="Max" offset="0"/>
 						<Anchor side="Left" relative="$parent/AttackDamageLabel" pos="Min" offset="0"/>
 						<Text val="@UI/HeroCharacterSheetPanel/AttackSpeed"/>
 						<Unclipped val="true"/>
 						<CollapseLayout val="true"/>
 						<Visible val="false"/>
+						<Style val="HeroStatNameLabel"/>
 					</Frame>
-					<Frame type="UnitStatusAttackSpeedLabel" name="UnitStatusAttackSpeedLabel" template="HeroCharacterSheetPanel/UnitStatusLabelTemplate">
+					<Frame type="UnitStatusAttackSpeedLabel" name="UnitStatusAttackSpeedLabel" template="_BottomLeft/UnitStatusLabelTemplate">
 						<Anchor side="Top" relative="$parent/AttackSpeedLabel" pos="Min" offset="0"/>
 						<FractionDigits val="2"/>
 						<ShowMaxZero val="false"/>
@@ -3914,14 +3993,15 @@
 						</Animation>
 					</Frame>
 					
-					<Frame type="Label" name="LifeStealLabel" template="HeroCharacterSheetPanel/HeroStatDescriptionTemplate">
+					<Frame type="Label" name="LifeStealLabel">
 						<Anchor side="Top" relative="$parent/AttackSpeedLabel" pos="Max" offset="0"/>
 						<Anchor side="Left" relative="$parent/AttackSpeedLabel" pos="Min" offset="0"/>
 						<Text val="@UI/HeroCharacterSheetPanel/LifeSteal"/>
 						<Unclipped val="true"/>
 						<CollapseLayout val="true"/>
+						<Style val="HeroStatNameLabel"/>
 					</Frame>
-					<Frame type="UnitStatusLifeStealLabel" name="UnitStatusLifeStealLabel" template="HeroCharacterSheetPanel/UnitStatusLabelTemplate">
+					<Frame type="UnitStatusLifeStealLabel" name="UnitStatusLifeStealLabel" template="_BottomLeft/UnitStatusLabelTemplate">
 						<Anchor side="Top" relative="$parent/LifeStealLabel" pos="Min" offset="0"/>
 						<FractionDigits val="0"/>
 						<Frame type="Label" name="StatusLabel">
@@ -3941,17 +4021,24 @@
 						</StateGroup>
 					</Frame>
 					
-					<Frame type="Label" name="StructureDamageLabel" template="HeroCharacterSheetPanel/HeroStatDescriptionTemplate">
+					<Frame type="Label" name="StructureDamageLabel">
 						<Anchor side="Top" relative="$parent/LifeStealLabel" pos="Max" offset="0"/>
 						<Anchor side="Left" relative="$parent/LifeStealLabel" pos="Min" offset="0"/>
 						<Text val="@UI/HeroCharacterSheetPanel/StructureDamage"/>
 						<Unclipped val="true"/>
 						<CollapseLayout val="true"/>
+						<Visible val="false"/>
+						<Style val="HeroStatNameLabel"/>
 					</Frame>
-					<Frame type="UnitStatusStructureDamageLabel" name="UnitStatusStructureDamageLabel" template="HeroCharacterSheetPanel/UnitStatusLabelTemplate">
+					<Frame type="UnitStatusStructureDamageLabel" name="UnitStatusStructureDamageLabel" template="_BottomLeft/UnitStatusLabelTemplate">
 						<Anchor side="Top" relative="$parent/StructureDamageLabel" pos="Min" offset="0"/>
 						<FractionDigits val="1"/>
 						<ShowMaxZero val="false"/>
+						<Visible val="false"/>
+						<ShowHeroicMultiplier val="false"/>
+						<ShowMinionMultiplier val="false"/>
+						<ShowStructureMultiplier val="true"/>
+						<Handle val="SelectedUnitStructureDamageLabel"/>
 						<Frame type="Label" name="StatusLabel">
 							<Unclipped val="true"/>
 						</Frame>
@@ -3976,14 +4063,15 @@
 						</StateGroup>
 					</Frame>
 					
-					<Frame type="Label" name="MoveSpeedLabel" template="HeroCharacterSheetPanel/HeroStatDescriptionTemplate">
+					<Frame type="Label" name="MoveSpeedLabel">
 						<Anchor side="Top" relative="$parent/StructureDamageLabel" pos="Max" offset="0"/>
 						<Anchor side="Left" relative="$parent/StructureDamageLabel" pos="Min" offset="0"/>
-						<Text val="@UI/HeroCharacterSheetPanel/MoveSpeed"/>
+						<Text val="@UI/Talents/MovementSpeed"/>
 						<Unclipped val="true"/>
 						<CollapseLayout val="true"/>
+						<Style val="HeroStatNameLabel"/>
 					</Frame>
-					<Frame type="UnitStatusMoveSpeedLabel" name="UnitStatusMoveSpeedLabel" template="HeroCharacterSheetPanel/UnitStatusLabelTemplate">
+					<Frame type="UnitStatusMoveSpeedLabel" name="UnitStatusMoveSpeedLabel" template="_BottomLeft/UnitStatusLabelTemplate">
 						<Anchor side="Top" relative="$parent/MoveSpeedLabel" pos="Min" offset="0"/>
 						<ShowMaxZero val="false"/>
 						<Frame type="Label" name="StatusLabel">
@@ -4010,14 +4098,15 @@
 					</Frame>
 					
 					<!-- Kills label not working?
-					<Frame type="Label" name="KillsLabel" template="HeroCharacterSheetPanel/HeroStatDescriptionTemplate">
+					<Frame type="Label" name="KillsLabel">
 						<Anchor side="Top" relative="$parent/MoveSpeedLabel" pos="Max" offset="0"/>
 						<Anchor side="Left" relative="$parent/MoveSpeedLabel" pos="Min" offset="0"/>
 						<Text val="Kills"/>
 						<Unclipped val="true"/>
 						<CollapseLayout val="true"/>
+						<Style val="HeroStatNameLabel"/>
 					</Frame>
-					<Frame type="UnitStatusKills" name="UnitStatusKillsLabel" template="HeroCharacterSheetPanel/UnitStatusLabelTemplate">
+					<Frame type="UnitStatusKills" name="UnitStatusKillsLabel" template="_BottomLeft/UnitStatusLabelTemplate">
 						<Anchor side="Top" relative="$parent/KillsLabel" pos="Min" offset="0"/>
 						<Frame type="Label" name="StatusLabel">
 							<Unclipped val="true"/>
@@ -4025,13 +4114,14 @@
 					</Frame> -->
 
 					<!-- Level label not working?
-					<Frame type="Label" name="LevelLabel" template="HeroCharacterSheetPanel/HeroStatDescriptionTemplate">
+					<Frame type="Label" name="LevelLabel">
 						<Anchor side="Top" relative="$parent/KillsLabel" pos="Max" offset="0"/>
 						<Anchor side="Left" relative="$parent/KillsLabel" pos="Min" offset="0"/>
 						<Text val="Level"/>
 						<Unclipped val="true"/>
+						<Style val="HeroStatNameLabel"/>
 					</Frame>
-					<Frame type="UnitStatusLevel" name="UnitStatusLevelLabel" template="HeroCharacterSheetPanel/UnitStatusLabelTemplate">
+					<Frame type="UnitStatusLevel" name="UnitStatusLevelLabel" template="_BottomLeft/UnitStatusLabelTemplate">
 						<Anchor side="Top" relative="$parent/LevelLabel" pos="Min" offset="0"/>
 						<Frame type="Label" name="StatusLabel">
 							<Unclipped val="true"/>
@@ -4039,11 +4129,12 @@
 					</Frame> -->
 					
 					<!-- no mineral field in heroes
-					<Frame type="Label" name="ResourcesRemainingLabel" template="HeroCharacterSheetPanel/HeroStatDescriptionTemplate">
+					<Frame type="Label" name="ResourcesRemainingLabel">
 						<Anchor side="Top" relative="$parent/LevelLabel" pos="Max" offset="0"/>
 						<Anchor side="Left" relative="$parent/LevelLabel" pos="Min" offset="0"/>
 						<Text val="RecourcesRemaining"/>
 						<Unclipped val="true"/>
+						<Style val="HeroStatNameLabel"/>
 					</Frame>
 					<Frame type="UnitStatusResourcesRemaining" name="UnitStatusResourcesRemaining">
 						<Anchor side="Top" relative="$parent/ResourcesRemainingLabel" pos="Min" offset="0"/>
@@ -4058,13 +4149,14 @@
 						</Frame>
 					</Frame> -->
 					
-					<Frame type="Label" name="CarriedMechanicLabel" template="HeroCharacterSheetPanel/HeroStatDescriptionTemplate">
+					<Frame type="Label" name="CarriedMechanicLabel">
 						<Anchor side="Top" relative="$parent/MoveSpeedLabel" pos="Max" offset="0"/>
 						<Anchor side="Left" relative="$parent/MoveSpeedLabel" pos="Min" offset="0"/>
 						<Text val="@ScoreValue/Name/CarriedMechanic"/>
 						<Unclipped val="true"/>
 						<CollapseLayout val="true"/>
 						<Visible val="false"/>
+						<Style val="HeroStatNameLabel"/>
 					</Frame>
 					<Frame type="UnitStatusBehaviorIcon" name="UnitStatusCarriedMechanicLabel">
 						<Anchor side="Top" relative="$parent/CarriedMechanicLabel" pos="Min" offset="0"/>
@@ -4113,15 +4205,16 @@
 					</Frame>
 					
 					<!-- ShieldedHealth (duplicated info)
-					<Frame type="Label" name="VitalityLabel" template="HeroCharacterSheetPanel/HeroStatDescriptionTemplate">
+					<Frame type="Label" name="VitalityLabel">
 						<Anchor side="Top" relative="$parent/CarriedMechanicLabel" pos="Max" offset="0"/>
 						<Anchor side="Left" relative="$parent/CarriedMechanicLabel" pos="Min" offset="0"/>
 						<Text val="Vitality"/>
 						<Unclipped val="true"/>
 						<CollapseLayout val="true"/>
 						<Visible val="false"/>
+						<Style val="HeroStatNameLabel"/>
 					</Frame>
-					<Frame type="UnitStatusShieldedHealthLabel" name="UnitStatusVitalityLabel" template="HeroCharacterSheetPanel/UnitStatusLabelTemplate">
+					<Frame type="UnitStatusShieldedHealthLabel" name="UnitStatusVitalityLabel" template="_BottomLeft/UnitStatusLabelTemplate">
 						<Anchor side="Top" relative="$parent/VitalityLabel" pos="Min" offset="0"/>
 						<FractionDigits val="1"/>
 						<Width val="156"/>
@@ -4142,13 +4235,14 @@
 					-->
 
 					<!-- KillStreak -->
-					<Frame type="Label" name="KillStreakLabel" template="HeroCharacterSheetPanel/HeroStatDescriptionTemplate">
+					<Frame type="Label" name="KillStreakLabel">
 						<Anchor side="Top" relative="$parent/CarriedMechanicLabel" pos="Max" offset="0"/>
 						<Anchor side="Left" relative="$parent/CarriedMechanicLabel" pos="Min" offset="0"/>
-						<Text val="@UI/HeroCharacterSheetPanel/KillStreak"/>
+						<Text val="@ScoreValue/Name/KillStreak"/>
 						<Unclipped val="true"/>
 						<CollapseLayout val="true"/>
 						<Visible val="{$parent/UnitStatusKillStreakLabel/ScoreValueFrame0/Label/@Visible}"/>
+						<Style val="HeroStatNameLabel"/>
 					</Frame>
 					<Frame type="UnitStatusScoreValue" name="UnitStatusKillStreakLabel">
 						<Anchor side="Top" relative="$parent/KillStreakLabel" pos="Min" offset="0"/>
@@ -4174,11 +4268,12 @@
 					</Frame>
 					
 					<!-- TimeSpentDead of Player (DOES NOT SEEM TO GIVE ME PLAYERID FOR CHILD FRAMES)
-					<Frame type="Label" name="TimeSpentDeadLabel" template="HeroCharacterSheetPanel/HeroStatDescriptionTemplate">
+					<Frame type="Label" name="TimeSpentDeadLabel">
 						<Anchor side="Top" relative="$parent/KillStreakLabel" pos="Max" offset="0"/>
 						<Anchor side="Left" relative="$parent/KillStreakLabel" pos="Min" offset="0"/>
 						<Text val="KillXP"/>
 						<Unclipped val="true"/>
+						<Style val="HeroStatNameLabel"/>
 					</Frame>
 					<Frame type="UnitStatusScoreValue" name="UnitStatusKillXP">
 						<Anchor side="Top" relative="$parent/TimeSpentDeadLabel" pos="Min" offset="0"/>
@@ -4209,7 +4304,7 @@
 						<Frame type="UnitStatusValidatorAnimElement" name="BuffDisplayStasis" template="_BottomLeft/UnitStatusDebuffTemplate">
 							<Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
 							<Anchor side="Left" relative="$parent" pos="Min" offset="10"/>
-							<Validator val="UserCategoryTargetStasis"/>
+							<Validator val="TargetIsStasis"/>
 
 							<Frame type="Image" name="DebuffPlateBg">
 								<Color val="E5BE07"/>
@@ -4222,7 +4317,7 @@
 							</Frame>
 							
 							<Animation name="Ahlimation">
-								<Event event="UserCategoryTargetStasis" action="Restart,Play"/>
+								<Event event="TargetIsStasis" action="Reset,Play"/>
 								<Event event="NoState" action="Stop"/>
 								
 								<Controller type="Visibility" end="Pause">
@@ -4247,7 +4342,7 @@
 							</Frame>
 							
 							<Animation name="Ahlimation">
-								<Event event="TargetIsTimeStopped" action="Restart,Play"/>
+								<Event event="TargetIsTimeStopped" action="Reset,Play"/>
 								<Event event="NoState" action="Stop"/>
 								
 								<Controller type="Visibility" end="Pause">
@@ -4259,7 +4354,7 @@
 						<Frame type="UnitStatusValidatorAnimElement" name="BuffDisplayInvulnerable" template="_BottomLeft/UnitStatusDebuffTemplate">
 							<Anchor side="Top" relative="$parent/BuffDisplayStasis" pos="Min" offset="0"/>
 							<Anchor side="Left" relative="$parent/BuffDisplayTimeStop" pos="Max" offset="0"/>
-							<Validator val="UserCategoryTargetInvulnerable"/>
+							<Validator val="TargetIsInvulnerable"/>
 
 							<Frame type="Image" name="DebuffPlateBg">
 								<Color val="C67B06"/>
@@ -4272,7 +4367,7 @@
 							</Frame>
 							
 							<Animation name="Ahlimation">
-								<Event event="UserCategoryTargetInvulnerable" action="Restart,Play"/>
+								<Event event="TargetIsInvulnerable" action="Reset,Play"/>
 								<Event event="NoState" action="Stop"/>
 								
 								<Controller type="Visibility" end="Pause">
@@ -4284,7 +4379,7 @@
 						<Frame type="UnitStatusValidatorAnimElement" name="BuffDisplayUnstoppable" template="_BottomLeft/UnitStatusDebuffTemplate">
 							<Anchor side="Top" relative="$parent/BuffDisplayStasis" pos="Min" offset="0"/>
 							<Anchor side="Left" relative="$parent/BuffDisplayInvulnerable" pos="Max" offset="0"/>
-							<Validator val="UserCategoryTargetUnstoppable"/>
+							<Validator val="TargetIsUnstoppableCategory"/>
 
 							<Frame type="Image" name="DebuffPlateBg">
 								<Color val="B163ED"/>
@@ -4297,7 +4392,7 @@
 							</Frame>
 							
 							<Animation name="Ahlimation">
-								<Event event="UserCategoryTargetUnstoppable" action="Restart,Play"/>
+								<Event event="TargetIsUnstoppableCategory" action="Reset,Play"/>
 								<Event event="NoState" action="Stop"/>
 								
 								<Controller type="Visibility" end="Pause">
@@ -4309,7 +4404,7 @@
 						<Frame type="UnitStatusValidatorAnimElement" name="BuffDisplayStunned" template="_BottomLeft/UnitStatusDebuffTemplate">
 							<Anchor side="Top" relative="$parent/BuffDisplayStasis" pos="Min" offset="0"/>
 							<Anchor side="Left" relative="$parent/BuffDisplayUnstoppable" pos="Max" offset="0"/>
-							<Validator val="UserCategoryTargetStunned"/>
+							<Validator val="TargetIsStunned"/>
 
 							<Frame type="Image" name="DebuffPlateBg">
 								<Color val="E00709"/>
@@ -4322,7 +4417,7 @@
 							</Frame>
 							
 							<Animation name="Ahlimation">
-								<Event event="UserCategoryTargetStunned" action="Restart,Play"/>
+								<Event event="TargetIsStunned" action="Reset,Play"/>
 								<Event event="NoState" action="Stop"/>
 								
 								<Controller type="Visibility" end="Pause">
@@ -4347,7 +4442,7 @@
 							</Frame>
 							
 							<Animation name="Ahlimation">
-								<Event event="TargetIsSleeping" action="Restart,Play"/>
+								<Event event="TargetIsSleeping" action="Reset,Play"/>
 								<Event event="NoState" action="Stop"/>
 								
 								<Controller type="Visibility" end="Pause">
@@ -4359,7 +4454,7 @@
 						<Frame type="UnitStatusValidatorAnimElement" name="BuffDisplayRooted" template="_BottomLeft/UnitStatusDebuffTemplate">
 							<Anchor side="Top" relative="$parent/BuffDisplayStasis" pos="Min" offset="0"/>
 							<Anchor side="Left" relative="$parent/BuffDisplaySleeping" pos="Max" offset="0"/>
-							<Validator val="UserCategoryTargetRooted"/>
+							<Validator val="TargetIsRooted"/>
 
 							<Frame type="Image" name="DebuffPlateBg">
 								<Color val="008000"/>
@@ -4372,7 +4467,7 @@
 							</Frame>
 							
 							<Animation name="Ahlimation">
-								<Event event="UserCategoryTargetRooted" action="Restart,Play"/>
+								<Event event="TargetIsRooted" action="Reset,Play"/>
 								<Event event="NoState" action="Stop"/>
 								
 								<Controller type="Visibility" end="Pause">
@@ -4384,7 +4479,7 @@
 						<Frame type="UnitStatusValidatorAnimElement" name="BuffDisplayPolymorphed" template="_BottomLeft/UnitStatusDebuffTemplate">
 							<Anchor side="Top" relative="$parent/BuffDisplayStasis" pos="Min" offset="0"/>
 							<Anchor side="Left" relative="$parent/BuffDisplayRooted" pos="Max" offset="0"/>
-							<Validator val="TargetIsPolymorphedCombine"/>
+							<Validator val="TargetIsPolymorphed"/>
 
 							<Frame type="Image" name="DebuffPlateBg">
 								<Color val="FFFFFF"/>
@@ -4397,7 +4492,7 @@
 							</Frame>
 							
 							<Animation name="Ahlimation">
-								<Event event="TargetIsPolymorphedCombine" action="Restart,Play"/>
+								<Event event="TargetIsPolymorphed" action="Reset,Play"/>
 								<Event event="NoState" action="Stop"/>
 								
 								<Controller type="Visibility" end="Pause">
@@ -4409,7 +4504,7 @@
 						<Frame type="UnitStatusValidatorAnimElement" name="BuffDisplaySilenced" template="_BottomLeft/UnitStatusDebuffTemplate">
 							<Anchor side="Top" relative="$parent/BuffDisplayStasis" pos="Min" offset="0"/>
 							<Anchor side="Left" relative="$parent/BuffDisplayPolymorphed" pos="Max" offset="0"/>
-							<Validator val="UserCategoryTargetSilenced"/>
+							<Validator val="TargetIsSilenced"/>
 
 							<Frame type="Image" name="DebuffPlateBg">
 								<Color val="3176E7"/>
@@ -4422,7 +4517,7 @@
 							</Frame>
 							
 							<Animation name="Ahlimation">
-								<Event event="UserCategoryTargetSilenced" action="Restart,Play"/>
+								<Event event="TargetIsSilenced" action="Reset,Play"/>
 								<Event event="NoState" action="Stop"/>
 								
 								<Controller type="Visibility" end="Pause">
@@ -4434,7 +4529,7 @@
 						<Frame type="UnitStatusValidatorAnimElement" name="BuffDisplayBlinded" template="_BottomLeft/UnitStatusDebuffTemplate">
 							<Anchor side="Top" relative="$parent/BuffDisplayStasis" pos="Min" offset="0"/>
 							<Anchor side="Left" relative="$parent/BuffDisplaySilenced" pos="Max" offset="0"/>
-							<Validator val="UserCategoryTargetBlinded"/>
+							<Validator val="TargetIsBlinded"/>
 
 							<Frame type="Image" name="DebuffPlateBg">
 								<Color val="7F7F7F"/>
@@ -4447,7 +4542,7 @@
 							</Frame>
 							
 							<Animation name="Ahlimation">
-								<Event event="UserCategoryTargetBlinded" action="Restart,Play"/>
+								<Event event="TargetIsBlinded" action="Reset,Play"/>
 								<Event event="NoState" action="Stop"/>
 								
 								<Controller type="Visibility" end="Pause">
@@ -4459,7 +4554,7 @@
 						<Frame type="UnitStatusValidatorAnimElement" name="BuffDisplaySlowed" template="_BottomLeft/UnitStatusDebuffTemplate">
 							<Anchor side="Top" relative="$parent/BuffDisplayStasis" pos="Min" offset="0"/>
 							<Anchor side="Left" relative="$parent/BuffDisplayBlinded" pos="Max" offset="0"/>
-							<Validator val="UserCategoryTargetSlowed"/>
+							<Validator val="TargetIsSlowed"/>
 
 							<Frame type="Image" name="DebuffPlateBg">
 								<Color val="00FFFF"/>
@@ -4472,7 +4567,7 @@
 							</Frame>
 							
 							<Animation name="Ahlimation">
-								<Event event="UserCategoryTargetSlowed" action="Restart,Play"/>
+								<Event event="TargetIsSlowed" action="Reset,Play"/>
 								<Event event="NoState" action="Stop"/>
 								
 								<Controller type="Visibility" end="Pause">
@@ -4484,7 +4579,7 @@
 						<Frame type="UnitStatusValidatorAnimElement" name="BuffDisplayTaunted" template="_BottomLeft/UnitStatusDebuffTemplate">
 							<Anchor side="Top" relative="$parent/BuffDisplayStasis" pos="Min" offset="0"/>
 							<Anchor side="Left" relative="$parent/BuffDisplaySlowed" pos="Max" offset="0"/>
-							<Validator val="TargetTaunted"/>
+							<Validator val="TargetIsTaunted"/>
 
 							<Frame type="Image" name="DebuffPlateBg">
 								<Color val="D28400"/>
@@ -4497,7 +4592,7 @@
 							</Frame>
 							
 							<Animation name="Ahlimation">
-								<Event event="TargetTaunted" action="Restart,Play"/>
+								<Event event="TargetIsTaunted" action="Reset,Play"/>
 								<Event event="NoState" action="Stop"/>
 								
 								<Controller type="Visibility" end="Pause">
@@ -4509,7 +4604,7 @@
 						<Frame type="UnitStatusValidatorAnimElement" name="BuffDisplayFeared" template="_BottomLeft/UnitStatusDebuffTemplate">
 							<Anchor side="Top" relative="$parent/BuffDisplayStasis" pos="Min" offset="0"/>
 							<Anchor side="Left" relative="$parent/BuffDisplayTaunted" pos="Max" offset="0"/>
-							<Validator val="TargetFeared"/>
+							<Validator val="TargetIsFeared"/>
 
 							<Frame type="Image" name="DebuffPlateBg">
 								<Color val="5D06AE"/>
@@ -4522,7 +4617,7 @@
 							</Frame>
 							
 							<Animation name="Ahlimation">
-								<Event event="TargetFeared" action="Restart,Play"/>
+								<Event event="TargetIsFeared" action="Reset,Play"/>
 								<Event event="NoState" action="Stop"/>
 								
 								<Controller type="Visibility" end="Pause">
@@ -4534,7 +4629,7 @@
 						<Frame type="UnitStatusValidatorAnimElement" name="BuffDisplayMindControlled" template="_BottomLeft/UnitStatusDebuffTemplate">
 							<Anchor side="Top" relative="$parent/BuffDisplayStasis" pos="Min" offset="0"/>
 							<Anchor side="Left" relative="$parent/BuffDisplayFeared" pos="Max" offset="0"/>
-							<Validator val="CasterMindControlled"/>
+							<Validator val="CasterIsMindControlled"/>
 
 							<Frame type="Image" name="DebuffPlateBg">
 								<Color val="5D06AE"/>
@@ -4547,7 +4642,7 @@
 							</Frame>
 							
 							<Animation name="Ahlimation">
-								<Event event="CasterMindControlled" action="Restart,Play"/>
+								<Event event="CasterIsMindControlled" action="Reset,Play"/>
 								<Event event="NoState" action="Stop"/>
 								
 								<Controller type="Visibility" end="Pause">
@@ -4559,7 +4654,7 @@
 						<Frame type="UnitStatusValidatorAnimElement" name="BuffDisplayProtected" template="_BottomLeft/UnitStatusDebuffTemplate">
 							<Anchor side="Top" relative="$parent/BuffDisplayStasis" pos="Min" offset="0"/>
 							<Anchor side="Left" relative="$parent/BuffDisplayMindControlled" pos="Max" offset="0"/>
-							<Validator val="TargetHasUserCategoryProtected"/>
+							<Validator val="TargetIsProtected"/>
 
 							<Frame type="Image" name="DebuffPlateBg">
 								<Color val="C67B06"/>
@@ -4572,7 +4667,7 @@
 							</Frame>
 							
 							<Animation name="Ahlimation">
-								<Event event="TargetHasUserCategoryProtected" action="Restart,Play"/>
+								<Event event="TargetIsProtected" action="Reset,Play"/>
 								<Event event="NoState" action="Stop"/>
 								
 								<Controller type="Visibility" end="Pause">
@@ -4597,7 +4692,7 @@
 							</Frame>
 							
 							<Animation name="Ahlimation">
-								<Event event="CasterIsUnkillable" action="Restart,Play"/>
+								<Event event="CasterIsUnkillable" action="Reset,Play"/>
 								<Event event="NoState" action="Stop"/>
 								
 								<Controller type="Visibility" end="Pause">
@@ -4626,7 +4721,7 @@
 							</Frame>
 
 							<Animation name="Ahlimation">
-								<Event event="UserCategorySourceRevealed" action="Restart,Play"/>
+								<Event event="UserCategorySourceRevealed" action="Reset,Play"/>
 								<Event event="NoState" action="Stop"/>
 								
 								<Controller type="Visibility" end="Pause">
@@ -4695,6 +4790,83 @@
 							</StateGroup>
 						</Frame>
 
+						<Frame type="UnitStatusValidatorAnimElement" name="BuffDisplayPushPull" template="_BottomLeft/UnitStatusDebuffTemplate">
+							<Anchor side="Top" relative="$parent/BuffDisplayStasis" pos="Min" offset="0"/>
+							<Anchor side="Left" relative="$parent/UnitArmorStatusDisplay" pos="Max" offset="0"/>
+							<Validator val="TargetIsPushPull"/>
+
+							<Frame type="Image" name="DebuffPlateBg">
+								<Color val="aaaaaa"/>
+							</Frame>
+							<Frame type="Image" name="DebuffIconLeft">
+								<Texture val=""/>
+							</Frame>
+							<Frame type="Label" name="DebuffLabel">
+								<Text val="PushPull"/>
+							</Frame>
+							
+							<Animation name="Ahlimation">
+								<Event event="TargetIsPushPull" action="Reset,Play"/>
+								<Event event="NoState" action="Stop"/>
+								
+								<Controller type="Visibility" end="Pause">
+									<Key type="Bool" time="0" value="true"/>
+								</Controller>
+							</Animation>
+						</Frame>
+						
+						<Frame type="UnitStatusValidatorAnimElement" name="BuffDisplayUnrevealableCloak" template="_BottomLeft/UnitStatusDebuffTemplate">
+							<Anchor side="Top" relative="$parent/BuffDisplayStasis" pos="Min" offset="0"/>
+							<Anchor side="Left" relative="$parent/BuffDisplayPushPull" pos="Max" offset="0"/>
+							<Validator val="TargetIsUnrevealable"/>
+
+							<Frame type="Image" name="DebuffPlateBg">
+								<Color val="aaaaaa"/>
+							</Frame>
+							<Frame type="Image" name="DebuffIconLeft">
+								<Texture val=""/>
+							</Frame>
+							<Frame type="Label" name="DebuffLabel">
+								<Text val="UnrevealableCloak"/>
+							</Frame>
+							
+							<Animation name="Ahlimation">
+								<Event event="TargetIsUnrevealable" action="Reset,Play"/>
+								<Event event="NoState" action="Stop"/>
+								
+								<Controller type="Visibility" end="Pause">
+									<Key type="Bool" time="0" value="true"/>
+								</Controller>
+							</Animation>
+						</Frame>
+						
+						<Frame type="UnitStatusValidatorAnimElement" name="BuffDisplayEvasion" template="_BottomLeft/UnitStatusDebuffTemplate">
+							<Anchor side="Top" relative="$parent/BuffDisplayStasis" pos="Min" offset="0"/>
+							<Anchor side="Left" relative="$parent/BuffDisplayUnrevealableCloak" pos="Max" offset="0"/>
+							<Validator val="UserCategoryTargetNotEvading"/>
+							<Visible val="true"/>
+
+							<Frame type="Image" name="DebuffPlateBg">
+								<Color val="aaaaaa"/>
+							</Frame>
+							<Frame type="Image" name="DebuffIconLeft">
+								<Texture val=""/>
+							</Frame>
+							<Frame type="Label" name="DebuffLabel">
+								<Text val="Evasion"/>
+							</Frame>
+							
+							<Animation name="Ahlimation">
+								<Event event="UserCategoryTargetNotEvading" action="Reset,Play"/>
+								<Event event="NoState" action="Stop"/>
+								
+								<Controller type="Visibility" end="Pause">
+									<Key type="Bool" time="0" value="false"/>
+								</Controller>
+							</Animation>
+						</Frame>
+						
+						
 					</Frame>
 				</Frame>
 				
