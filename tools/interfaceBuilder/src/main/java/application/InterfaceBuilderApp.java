@@ -528,7 +528,13 @@ public class InterfaceBuilderApp extends Application {
 			throw new ExceptionInInitializerError("Application cannot be started multiple times.");
 		}
 		// start Spring
-		appContext = SpringApplication.run(InterfaceBuilderApp.class, getParameters().getRaw().toArray(new String[0]));
+		try {
+			appContext =
+					SpringApplication.run(InterfaceBuilderApp.class, getParameters().getRaw().toArray(new String[0]));
+		} catch (final IllegalStateException e) {
+			logger.fatal(e);
+			throw e;
+		}
 		// trigger autowiring of this JavaFX-created instance
 		final AutowireCapableBeanFactory autowireCapableBeanFactory = appContext.getAutowireCapableBeanFactory();
 		autowireCapableBeanFactory.autowireBean(this);
