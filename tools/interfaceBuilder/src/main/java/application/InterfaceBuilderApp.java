@@ -374,7 +374,7 @@ public class InterfaceBuilderApp extends Application {
 	 */
 	private boolean anyErrorTrackerEncounteredError() {
 		for (final ErrorTabController ctrl : errorTabControllers) {
-			if (ctrl.hasEncounteredError()) {
+			if (ctrl.hasEncounteredError() && !ctrl.isErrorsDoNotPreventExit()) {
 				return true;
 			}
 		}
@@ -478,10 +478,12 @@ public class InterfaceBuilderApp extends Application {
 	 * @param threadName
 	 * @param tabTitle
 	 */
-	public void addThreadLoggerTab(final String threadName, final String tabTitle) {
+	public void addThreadLoggerTab(final String threadName, final String tabTitle,
+			final boolean errorsDoNotPreventExit) {
 		final Tab newTab = new Tab();
 		final StyleClassedTextArea newTxtArea = new StyleClassedTextArea();
-		final ErrorTabController errorTabCtrl = new ErrorTabController(newTab, newTxtArea, true, false);
+		final ErrorTabController errorTabCtrl =
+				new ErrorTabController(newTab, newTxtArea, true, false, errorsDoNotPreventExit);
 		errorTabCtrl.setRunning(true);
 		errorTabControllers.add(errorTabCtrl);
 		

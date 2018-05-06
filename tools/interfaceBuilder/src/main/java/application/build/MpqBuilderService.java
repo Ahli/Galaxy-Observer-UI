@@ -162,7 +162,7 @@ public class MpqBuilderService {
 		// create tasks for the worker pool
 		app.getExecutor().execute(() -> {
 			try {
-				app.addThreadLoggerTab(Thread.currentThread().getName(), interfaceDirectory.getName());
+				app.addThreadLoggerTab(Thread.currentThread().getName(), interfaceDirectory.getName(), false);
 				// create unique cache path
 				final MpqEditorInterface threadsMpqInterface =
 						new MpqEditorInterface(configService.getMpqCachePath() + Thread.currentThread().getId(),
@@ -391,7 +391,8 @@ public class MpqBuilderService {
 					uiCatalog = new UICatalogImpl();
 					app.printInfoLogMessageToGeneral("Starting to parse base " + game.getGameDef().getName() +
 							" UI."); //$NON-NLS-1$ //$NON-NLS-2$
-					app.addThreadLoggerTab(Thread.currentThread().getName(), game.getGameDef().getNameHandle() + "UI");
+					app.addThreadLoggerTab(Thread.currentThread().getName(), game.getGameDef().getNameHandle() + "UI",
+							true);
 					//$NON-NLS-1$
 					final String gameDir = configService.getBaseUiPath(game.getGameDef()) + File.separator +
 							game.getGameDef().getModsSubDirectory();
