@@ -28,6 +28,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class NavigationController {
+	public static final int HOME_TAB = 0;
+	public static final int PROGRESS_TAB = 1;
+	public static final int BROWSE_TAB = 2;
+	public static final int SETTINGS_TAB = 3;
 	private static final Logger logger = LogManager.getLogger();
 	private static NavigationController instance = null;
 	/* ContentPages:
@@ -37,6 +41,8 @@ public class NavigationController {
 	private final Parent[] contentPages = new Parent[4];
 	private final Updateable[] controllers = new Updateable[4];
 	private final List<Notification> notifications = new ArrayList<>();
+	@FXML
+	private AnchorPane selectedMarker;
 	@FXML
 	private Button browse;
 	@FXML
@@ -100,15 +106,17 @@ public class NavigationController {
 		notificationBar.managedProperty().bind(notificationBar.visibleProperty());
 		notificationBar.setBackground(new Background(
 				new BackgroundFill(Color.color(211d / 256d, 168d / 255d, 3d / 255d), CornerRadii.EMPTY, Insets.EMPTY)));
+		selectedMarker.setBackground(new Background(
+				new BackgroundFill(Color.color(211d / 256d, 168d / 255d, 3d / 255d), CornerRadii.EMPTY, Insets.EMPTY)));
 		
 		// content pages
 		initFXML("view/Content_Home.fxml", 0);
 		initFXML("view/Content_TabPane.fxml", 1);
-		initFXML("view/Content_Settings.fxml", 2);
-		initFXML("view/Content_UiBrowser.fxml", 3);
+		initFXML("view/Content_UiBrowser.fxml", 2);
+		initFXML("view/Content_Settings.fxml", 3);
 		
 		// make tabPane visible
-		showPanelContent(0);
+		showPanelContent(HOME_TAB);
 	}
 	
 	/**
@@ -138,11 +146,21 @@ public class NavigationController {
 			activeContent = contentIndex;
 			final ObservableList<Node> activeNodes = contentContainer.getChildren();
 			activeNodes.clear();
+			// update event for controller
 			if (controllers[contentIndex] != null) {
 				controllers[contentIndex].update();
 			}
 			activeNodes.add(contentPages[contentIndex]);
+			// move marker image
+			markTab(contentIndex);
 		}
+	}
+	
+	/**
+	 * @param contentIndex
+	 */
+	private void markTab(final int contentIndex) {
+		selectedMarker.setLayoutY(8 + contentIndex * 28);
 	}
 	
 	/**
@@ -150,15 +168,7 @@ public class NavigationController {
 	 */
 	@FXML
 	public void clickHome() {
-		showPanelContent(0);
-	}
-	
-	/**
-	 * Called when the user clicks on the settings button.
-	 */
-	@FXML
-	public void clickSettings() {
-		showPanelContent(2);
+		showPanelContent(HOME_TAB);
 	}
 	
 	/**
@@ -166,7 +176,23 @@ public class NavigationController {
 	 */
 	@FXML
 	public void clickProgress() {
-		showPanelContent(1);
+		showPanelContent(PROGRESS_TAB);
+	}
+	
+	/**
+	 *
+	 */
+	@FXML
+	public void clickBrowse() {
+		showPanelContent(BROWSE_TAB);
+	}
+	
+	/**
+	 * Called when the user clicks on the settings button.
+	 */
+	@FXML
+	public void clickSettings() {
+		showPanelContent(SETTINGS_TAB);
 	}
 	
 	/**
@@ -175,7 +201,7 @@ public class NavigationController {
 	public void lockNavToProgress() {
 		home.setDisable(true);
 		settings.setDisable(true);
-		showPanelContent(1);
+		showPanelContent(PROGRESS_TAB);
 	}
 	
 	/**
@@ -230,8 +256,4 @@ public class NavigationController {
 		showPanelContent(navPageIndex);
 	}
 	
-	@FXML
-	public void clickBrowse() {
-		showPanelContent(3);
-	}
 }

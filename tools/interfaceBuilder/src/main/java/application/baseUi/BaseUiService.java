@@ -89,11 +89,9 @@ public class BaseUiService {
 		final File destination = new File(configService.getBaseUiPath(gameDef));
 		
 		try {
-			if (!destination.exists()) {
-				if (!destination.mkdirs()) {
-					logger.error(String.format("Directory %s could not be created.", destination));
-					return;
-				}
+			if (!destination.exists() && !destination.mkdirs()) {
+				logger.error(String.format("Directory %s could not be created.", destination));
+				return;
 			}
 			fileService.cleanDirectory(destination);
 		} catch (final IOException e) {
@@ -106,27 +104,30 @@ public class BaseUiService {
 		int i = 0;
 		for (final String mask : queryMasks) {
 			final int sleepDuration = 1000 + i * 5000;
-			final Runnable task = new Runnable() {
-				@Override
-				public void run() {
-					try {
-						final String cmd =
-								"cmd start cmd /C " + QUOTE + QUOTE + extractorExe + QUOTE + " " + mask + " " +
-										destination + File.separator + " " + "enUS" + " " + "None" + QUOTE;
-						logger.trace("executing: " + cmd);
-						// TODO replace with proper check if config file finished writing
-						Thread.sleep(sleepDuration);
-						//						Runtime.getRuntime().exec(cmd).waitFor();
-						Runtime.getRuntime().exec(cmd);
-						//						logger.trace("finished executing: " + cmd);
-					} catch (final IOException e) {
-						logger.error("Extracting files from CASC via CascExtractor failed.", e); //$NON-NLS-1$
-					} catch (final InterruptedException e) {
-						Thread.currentThread().interrupt();
-					}
+			final Runnable task = () -> {
+				try {
+					final String cmd = "cmd start cmd /C " + QUOTE + QUOTE + extractorExe + QUOTE + " " + mask + " " +
+							destination + File.separator + " " + "enUS" + " " + "None" + QUOTE;
+					logger.trace("executing: " + cmd);
+					// TODO replace with proper check if config file finished writing
+					Thread.sleep(sleepDuration);
+					//						Runtime.getRuntime().exec(cmd).waitFor();
+					
+					//ProcessBuilder pb = new ProcessBuilder(cmd);
+					final Process process = Runtime.getRuntime().exec(cmd);
+					// OutputStream outstream = process.getOutputStream();
+					
+					
+					// logger.trace("finished executing: " + cmd);
+					
+				} catch (final IOException e) {
+					logger.error("Extracting files from CASC via CascExtractor failed.", e); //$NON-NLS-1$
+				} catch (final InterruptedException e) {
+					Thread.currentThread().interrupt();
 				}
 			};
 			executor.execute(task);
+			
 			i++;
 		}
 	}
