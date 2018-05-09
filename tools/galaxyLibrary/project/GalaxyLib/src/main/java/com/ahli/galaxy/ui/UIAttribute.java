@@ -1,10 +1,8 @@
 package com.ahli.galaxy.ui;
 
 import com.ahli.galaxy.ui.abstracts.UIElement;
-import com.ahli.util.Pair;
 
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Basic Attribute implementation to describe default UI's attribute.
@@ -18,7 +16,7 @@ public class UIAttribute extends UIElement {
 	 */
 	private static final long serialVersionUID = 5420685675382001338L;
 	
-	private final List<Pair<String, String>> values;
+	private final ArrayList<String> keyValueList;
 	
 	/**
 	 * Constructor.
@@ -28,7 +26,7 @@ public class UIAttribute extends UIElement {
 	 */
 	public UIAttribute(final String name) {
 		super(name);
-		values = new ArrayList<>();
+		keyValueList = new ArrayList<>(0);
 	}
 	
 	/**
@@ -39,7 +37,7 @@ public class UIAttribute extends UIElement {
 	 */
 	public UIAttribute(final String name, final int initialValuesMaxCapacity) {
 		super(name);
-		values = new ArrayList<>(initialValuesMaxCapacity);
+		keyValueList = new ArrayList<>(initialValuesMaxCapacity);
 	}
 	
 	/**
@@ -47,10 +45,9 @@ public class UIAttribute extends UIElement {
 	 */
 	@Override
 	public Object deepCopy() {
-		final UIAttribute clone = new UIAttribute(getName(), values.size());
-		for (int i = 0, len = values.size(); i < len; i++) {
-			final Pair<String, String> p = values.get(i);
-			clone.values.add(new Pair<>(p.getKey(), p.getValue()));
+		final UIAttribute clone = new UIAttribute(getName(), keyValueList.size());
+		for (int i = 0, len = keyValueList.size(); i < len; i++) {
+			clone.keyValueList.add(keyValueList.get(i));
 		}
 		return clone;
 	}
@@ -63,23 +60,19 @@ public class UIAttribute extends UIElement {
 	 */
 	public String addValue(final String key, final String value) {
 		int i = 0;
-		final int len;
-		Pair<String, String> p = null;
-		for (len = values.size(); i < len; i++) {
-			p = values.get(i);
-			if (p.getKey().equals(key)) {
+		final int len = keyValueList.size();
+		for (; i < len; i += 2) {
+			if (keyValueList.get(i).equals(key)) {
 				break;
 			}
 		}
-		if (i == len) {
+		if (i >= len) {
 			// not found
-			values.add(new Pair<>(key, value));
+			keyValueList.add(key);
+			keyValueList.add(value);
 			return null;
 		} else {
-			// p cannot be null here, ignore linter warning
-			final String oldVal = p.getValue();
-			p.setValue(value);
-			return oldVal;
+			return keyValueList.set(i, value);
 		}
 	}
 	
@@ -88,12 +81,10 @@ public class UIAttribute extends UIElement {
 	 * @return
 	 */
 	public String getValue(final String key) {
-		int i;
-		Pair<String, String> p;
-		for (i = 0; i < values.size(); i++) {
-			p = values.get(i);
-			if (p.getKey().equals(key)) {
-				return p.getValue();
+		int i = 0;
+		for (final int len = keyValueList.size(); i < len; i += 2) {
+			if (keyValueList.get(i).equals(key)) {
+				return keyValueList.get(i + 1);
 			}
 		}
 		return null;

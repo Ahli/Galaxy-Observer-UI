@@ -1,7 +1,6 @@
 package com.ahli.galaxy.ui;
 
 import com.ahli.galaxy.ui.abstracts.UIElement;
-import com.ahli.util.Pair;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,7 +13,7 @@ public class UIController extends UIElement {
 	 *
 	 */
 	private static final long serialVersionUID = -5133613746543071378L;
-	private final List<Pair<String, String>> values;
+	private final List<String> attributesKeyValueList;
 	private List<UIAttribute> keys;
 	private boolean nextAdditionShouldOverride;
 	private boolean nameIsImplicit = true;
@@ -24,8 +23,8 @@ public class UIController extends UIElement {
 	 */
 	public UIController(final String name) {
 		super(name);
-		values = new ArrayList<>();
-		keys = new ArrayList<>();
+		attributesKeyValueList = new ArrayList<>(0);
+		keys = new ArrayList<>(0);
 	}
 	
 	/**
@@ -33,7 +32,7 @@ public class UIController extends UIElement {
 	 */
 	public UIController(final String name, final int initialValuesMaxCapacity, final int initialKeysMaxCapacity) {
 		super(name);
-		values = new ArrayList<>(initialValuesMaxCapacity);
+		attributesKeyValueList = new ArrayList<>(initialValuesMaxCapacity);
 		keys = new ArrayList<>(initialKeysMaxCapacity);
 	}
 	
@@ -42,13 +41,12 @@ public class UIController extends UIElement {
 	 */
 	@Override
 	public Object deepCopy() {
-		final UIController clone = new UIController(getName(), values.size(), keys.size());
+		final UIController clone = new UIController(getName(), attributesKeyValueList.size(), keys.size());
 		for (int i = 0, len = keys.size(); i < len; i++) {
 			clone.keys.add((UIAttribute) keys.get(i).deepCopy());
 		}
-		for (int i = 0, len = values.size(); i < len; i++) {
-			final Pair<String, String> p = values.get(i);
-			clone.values.add(new Pair<>(p.getKey(), p.getValue()));
+		for (int i = 0, len = attributesKeyValueList.size(); i < len; i++) {
+			clone.attributesKeyValueList.add(attributesKeyValueList.get(i));
 		}
 		clone.nextAdditionShouldOverride = nextAdditionShouldOverride;
 		clone.nameIsImplicit = nameIsImplicit;
@@ -86,17 +84,26 @@ public class UIController extends UIElement {
 	}
 	
 	/**
+	 * Adds a value for the key and returns any overridden value.
+	 *
 	 * @param key
 	 * @param value
 	 */
 	public String addValue(final String key, final String value) {
-		final Pair<String, String> newPair = new Pair<>(key, value);
-		final int i = values.indexOf(newPair);
-		if (i == -1) {
-			values.add(newPair);
+		int i = 0;
+		final int len = attributesKeyValueList.size();
+		for (; i < len; i += 2) {
+			if (attributesKeyValueList.get(i).equals(key)) {
+				break;
+			}
+		}
+		if (i >= len) {
+			// not found
+			attributesKeyValueList.add(key);
+			attributesKeyValueList.add(value);
 			return null;
 		} else {
-			return values.set(i, newPair).getValue();
+			return attributesKeyValueList.set(i, value);
 		}
 	}
 	
@@ -105,12 +112,10 @@ public class UIController extends UIElement {
 	 * @return
 	 */
 	public String getValue(final String key) {
-		int i;
-		Pair<String, String> p;
-		for (i = 0; i < values.size(); i++) {
-			p = values.get(i);
-			if (p.getKey().equals(key)) {
-				return p.getValue();
+		int i = 0;
+		for (final int len = attributesKeyValueList.size(); i < len; i += 2) {
+			if (attributesKeyValueList.get(i).equals(key)) {
+				return attributesKeyValueList.get(i + 1);
 			}
 		}
 		return null;

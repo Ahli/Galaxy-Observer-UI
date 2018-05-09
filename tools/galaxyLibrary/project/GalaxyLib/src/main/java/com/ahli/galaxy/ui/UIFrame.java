@@ -21,11 +21,10 @@ public class UIFrame extends UIElement {
 	 *
 	 */
 	private static final long serialVersionUID = -4610017347746925885L;
-	
-	private final List<UIAttribute> attributes;
 	private final String[] pos = new String[4];
 	private final String[] offset = new String[4];
 	private final String[] relative = new String[4];
+	private List<UIAttribute> attributes;
 	private String type;
 	private List<UIElement> children;
 	
@@ -36,8 +35,9 @@ public class UIFrame extends UIElement {
 	public UIFrame(final String name, final String type) {
 		super(name);
 		init();
-		attributes = new ArrayList<>();
-		children = new ArrayList<>();
+		attributes = null;
+		children = null;
+		this.type = type;
 	}
 	
 	/**
@@ -48,7 +48,6 @@ public class UIFrame extends UIElement {
 		relative[1] = THIS;
 		relative[2] = THIS;
 		relative[3] = THIS;
-		
 		pos[0] = POSI[0];
 		pos[1] = POSI[0];
 		pos[2] = POSI[1];
@@ -67,8 +66,8 @@ public class UIFrame extends UIElement {
 	public UIFrame(final String name, final int initialAttributesCapacity, final int initialChildrenCapacity) {
 		super(name);
 		init();
-		attributes = new ArrayList<>(initialAttributesCapacity);
-		children = new ArrayList<>(initialChildrenCapacity);
+		attributes = initialAttributesCapacity > 0 ? new ArrayList<>(initialAttributesCapacity) : null;
+		children = initialChildrenCapacity > 0 ? new ArrayList<>(initialChildrenCapacity) : null;
 	}
 	
 	/**
@@ -77,8 +76,8 @@ public class UIFrame extends UIElement {
 	public UIFrame(final String name) {
 		super(name);
 		type = null;
-		attributes = new ArrayList<>();
-		children = new ArrayList<>();
+		attributes = null;
+		children = null;
 	}
 	
 	/**
@@ -86,14 +85,19 @@ public class UIFrame extends UIElement {
 	 */
 	@Override
 	public Object deepCopy() {
-		final UIFrame clone = new UIFrame(getName(), attributes.size(), children.size());
+		final int attrSize = attributes != null ? attributes.size() : 0;
+		final int childrenSize = children != null ? children.size() : 0;
+		final UIFrame clone = new UIFrame(getName(), attrSize, childrenSize);
 		clone.type = type;
-		final List<UIElement> childrenClone = clone.children;
-		for (int i = 0, len = children.size(); i < len; i++) {
-			childrenClone.add((UIElement) children.get(i).deepCopy());
+		if (childrenSize > 0) {
+			for (int i = 0; i < childrenSize; i++) {
+				clone.children.add((UIElement) children.get(i).deepCopy());
+			}
 		}
-		for (int i = 0, len = attributes.size(); i < len; i++) {
-			clone.attributes.add((UIAttribute) attributes.get(i).deepCopy());
+		if (attrSize > 0) {
+			for (int i = 0; i < attrSize; i++) {
+				clone.attributes.add((UIAttribute) attributes.get(i).deepCopy());
+			}
 		}
 		for (int i = 0; i <= 3; i++) {
 			clone.relative[i] = relative[i];
@@ -104,7 +108,7 @@ public class UIFrame extends UIElement {
 	}
 	
 	/**
-	 * @return the type
+	 * @return the type, may be null if not set
 	 */
 	public String getType() {
 		return type;
@@ -119,9 +123,12 @@ public class UIFrame extends UIElement {
 	}
 	
 	/**
-	 * @return
+	 * @return list of children
 	 */
 	public List<UIElement> getChildren() {
+		if (children == null) {
+			children = new ArrayList<>(0);
+		}
 		return children;
 	}
 	
@@ -137,10 +144,14 @@ public class UIFrame extends UIElement {
 	 */
 	public UIAttribute addAttribute(final UIAttribute value) {
 		final String key = value.getName();
-		for (int i = 0, len = attributes.size(); i < len; i++) {
-			if (attributes.get(i).getName().equalsIgnoreCase(key)) {
-				return attributes.set(i, value);
+		if (attributes != null) {
+			for (int i = 0, len = attributes.size(); i < len; i++) {
+				if (attributes.get(i).getName().equalsIgnoreCase(key)) {
+					return attributes.set(i, value);
+				}
 			}
+		} else {
+			attributes = new ArrayList<>(1);
 		}
 		attributes.add(value);
 		return null;
@@ -151,10 +162,12 @@ public class UIFrame extends UIElement {
 	 * @return
 	 */
 	public UIAttribute getValue(final String key) {
-		for (int i = 0, len = attributes.size(); i < len; i++) {
-			final UIAttribute a = attributes.get(i);
-			if (a.getName().equalsIgnoreCase(key)) {
-				return a;
+		if (attributes != null) {
+			for (int i = 0, len = attributes.size(); i < len; i++) {
+				final UIAttribute a = attributes.get(i);
+				if (a.getName().equalsIgnoreCase(key)) {
+					return a;
+				}
 			}
 		}
 		return null;
@@ -227,10 +240,10 @@ public class UIFrame extends UIElement {
 			this.offset[2] = Integer.toString((Integer.parseInt(offset) * (-1)));
 			this.offset[3] = Integer.toString((Integer.parseInt(offset) * (-1)));
 		} else {
-			this.offset[0] = "0";
-			this.offset[1] = "0";
-			this.offset[2] = "0";
-			this.offset[3] = "0";
+			this.offset[0] = ZERO;
+			this.offset[1] = ZERO;
+			this.offset[2] = ZERO;
+			this.offset[3] = ZERO;
 		}
 	}
 	
@@ -246,7 +259,7 @@ public class UIFrame extends UIElement {
 		} else {
 			// go deeper
 			final String curName = UIElement.getLeftPathLevel(path);
-			if (curName != null) {
+			if (curName != null && children != null) {
 				for (final UIElement curElem : children) {
 					if (curName.equalsIgnoreCase(curElem.getName())) {
 						// found right frame -> cut path

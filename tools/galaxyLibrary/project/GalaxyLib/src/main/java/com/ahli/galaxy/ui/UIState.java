@@ -24,8 +24,8 @@ public class UIState extends UIElement {
 	 */
 	public UIState(final String name) {
 		super(name);
-		whens = new ArrayList<>();
-		actions = new ArrayList<>();
+		whens = new ArrayList<>(0);
+		actions = new ArrayList<>(0);
 	}
 	
 	/**

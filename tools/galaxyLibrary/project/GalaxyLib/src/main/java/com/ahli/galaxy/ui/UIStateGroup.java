@@ -23,7 +23,7 @@ public class UIStateGroup extends UIElement {
 	 */
 	public UIStateGroup(final String name) {
 		super(name);
-		states = new ArrayList<>();
+		states = new ArrayList<>(0);
 	}
 	
 	/**

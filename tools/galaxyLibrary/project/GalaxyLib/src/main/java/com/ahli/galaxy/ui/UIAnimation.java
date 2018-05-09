@@ -25,8 +25,8 @@ public class UIAnimation extends UIElement {
 	 */
 	public UIAnimation(final String name) {
 		super(name);
-		events = new ArrayList<>();
-		controllers = new ArrayList<>();
+		events = new ArrayList<>(0);
+		controllers = new ArrayList<>(0);
 	}
 	
 	/**
