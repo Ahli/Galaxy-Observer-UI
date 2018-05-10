@@ -40,9 +40,16 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ConfigurableApplicationContext;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
+import java.net.InetAddress;
+import java.net.ServerSocket;
+import java.net.Socket;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -62,6 +69,9 @@ public class InterfaceBuilderApp extends Application {
 	private static final Logger logger = LogManager.getLogger();
 	
 	private static InterfaceBuilderApp instance = null;
+	private static ServerSocket serverSocket;
+	private static Thread serverThread = null;
+	
 	private final List<ErrorTabController> errorTabControllers = new ArrayList<>();
 	
 	@Autowired
@@ -99,6 +109,8 @@ public class InterfaceBuilderApp extends Application {
 	 * 		command line arguments
 	 */
 	public static void main(final String[] args) {
+		initInterProcessCommunication(args, 12317);
+		
 		logger.trace("trace log visible"); //$NON-NLS-1$
 		logger.debug("debug log visible"); //$NON-NLS-1$
 		logger.info("info log visible"); //$NON-NLS-1$
@@ -113,6 +125,62 @@ public class InterfaceBuilderApp extends Application {
 		
 		System.setProperty("javafx.preloader", AppPreloader.class.getCanonicalName());
 		launch(args);
+	}
+	
+	/**
+	 * Initiates the communication between processes.
+	 *
+	 * @param args
+	 * @param port
+	 */
+	private static void initInterProcessCommunication(final String[] args, final int port) {
+		try {
+			serverSocket = new ServerSocket(port, 4, InetAddress.getLocalHost());
+			serverThread = new Thread() {
+				@Override
+				public void run() {
+					Socket clientSocket;
+					while (true) {
+						try {
+							clientSocket = serverSocket.accept();
+							try (final PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
+							     final BufferedReader in = new BufferedReader(
+									     new InputStreamReader(clientSocket.getInputStream()))) {
+								String inputLine;
+								while ((inputLine = in.readLine()) != null) {
+									out.println(inputLine);
+									logger.info("message from client: " + inputLine);
+								}
+							}
+						} catch (final IOException e) {
+							logger.fatal("I/O Exception while waiting for client connections.", e);
+						}
+					}
+				}
+			};
+			serverThread.setName("IPCserver");
+			serverThread.setDaemon(true);
+			serverThread.setPriority(Thread.MIN_PRIORITY);
+			serverThread.start();
+		} catch (final UnknownHostException e) {
+			logger.fatal("Could not retrieve localhost address.", e);
+			System.exit(1);
+		} catch (final IOException e) {
+			// port taken, so app is already running
+			logger.info("App already running. Passing over command line arguments.");
+			
+			try (final Socket socket = new Socket(InetAddress.getLocalHost(), port)) {
+				final PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
+				// sending parameters
+				out.println(Arrays.toString(args));
+			} catch (final IOException e1) {
+				logger.fatal("Exception while sending parameters to primary instance.", e1);
+				System.exit(1);
+				return;
+			}
+			
+			System.exit(0);
+		}
 	}
 	
 	/**
