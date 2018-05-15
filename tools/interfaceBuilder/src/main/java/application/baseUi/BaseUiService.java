@@ -21,7 +21,6 @@ import java.util.concurrent.ThreadPoolExecutor;
 @Service
 public class BaseUiService {
 	public static final String UNKNOWN_GAME_EXCEPTION = "Unknown Game";
-	private static final char QUOTE = '\"';
 	private final Logger logger = LogManager.getLogger();
 	@Autowired
 	ConfigService configService;
@@ -106,19 +105,12 @@ public class BaseUiService {
 			final int sleepDuration = 1000 + i * 5000;
 			final Runnable task = () -> {
 				try {
-					final String cmd = "cmd start cmd /C " + QUOTE + QUOTE + extractorExe + QUOTE + " " + mask + " " +
-							destination + File.separator + " " + "enUS" + " " + "None" + QUOTE;
-					logger.trace("executing: " + cmd);
 					// TODO replace with proper check if config file finished writing
 					Thread.sleep(sleepDuration);
-					//						Runtime.getRuntime().exec(cmd).waitFor();
+					new ProcessBuilder(extractorExe.getAbsolutePath(), mask, destination + File.separator, "enUS",
+							"None").start();
 					
-					//ProcessBuilder pb = new ProcessBuilder(cmd);
-					final Process process = Runtime.getRuntime().exec(cmd);
-					// OutputStream outstream = process.getOutputStream();
-					
-					
-					// logger.trace("finished executing: " + cmd);
+					// TODO wait for thread to finish, once it works
 					
 				} catch (final IOException e) {
 					logger.error("Extracting files from CASC via CascExtractor failed.", e); //$NON-NLS-1$

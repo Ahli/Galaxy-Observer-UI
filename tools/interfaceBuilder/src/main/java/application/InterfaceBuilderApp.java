@@ -53,7 +53,6 @@ import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
@@ -73,25 +72,14 @@ public class InterfaceBuilderApp extends Application {
 	private static Thread serverThread = null;
 	
 	private final List<ErrorTabController> errorTabControllers = new ArrayList<>();
-	
 	@Autowired
 	private ConfigService config;
-	
 	@Autowired
 	private ReplayFinder replayFinder;
-	
 	@Autowired
 	private MpqBuilderService mpqBuilderService;
-	
 	@Autowired
 	private ThreadPoolExecutor executor;
-	
-	// Command Line Parameter
-	private boolean hasParamCompilePath = false;
-	private String paramCompilePath = null;
-	private boolean compileAndRun = false;
-	private String paramRunPath = null;
-	private boolean wasStartedWithParameters;
 	
 	private ConfigurableApplicationContext appContext;
 	
@@ -101,6 +89,7 @@ public class InterfaceBuilderApp extends Application {
 	
 	@Autowired
 	private BaseUiService baseUiService;
+	private Stage primaryStage = null;
 	
 	/**
 	 * Entry point of the App.
@@ -135,7 +124,7 @@ public class InterfaceBuilderApp extends Application {
 	 */
 	private static void initInterProcessCommunication(final String[] args, final int port) {
 		try {
-			serverSocket = new ServerSocket(port, 4, InetAddress.getLocalHost());
+			serverSocket = new ServerSocket(port, 4, InetAddress.getByAddress(new byte[] { 127, 0, 0, 1 }));
 			serverThread = new Thread() {
 				@Override
 				public void run() {
@@ -150,6 +139,9 @@ public class InterfaceBuilderApp extends Application {
 								while ((inputLine = in.readLine()) != null) {
 									out.println(inputLine);
 									logger.info("message from client: " + inputLine);
+									final List<String> params =
+											Arrays.asList(inputLine.substring(1, inputLine.length() - 1).split(", "));
+									getInstance().executeCommand(params);
 								}
 							}
 						} catch (final IOException e) {
@@ -169,7 +161,7 @@ public class InterfaceBuilderApp extends Application {
 			// port taken, so app is already running
 			logger.info("App already running. Passing over command line arguments.");
 			
-			try (final Socket socket = new Socket(InetAddress.getLocalHost(), port)) {
+			try (final Socket socket = new Socket(InetAddress.getByAddress(new byte[] { 127, 0, 0, 1 }), port)) {
 				final PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
 				// sending parameters
 				out.println(Arrays.toString(args));
@@ -184,6 +176,20 @@ public class InterfaceBuilderApp extends Application {
 	}
 	
 	/**
+	 * Executes the specified command line arguments.
+	 *
+	 * @param paramList
+	 */
+	private void executeCommand(final List<String> paramList) {
+		// TODO
+		final CommandLineParams params = new CommandLineParams(paramList.toArray(new String[0]));
+		
+		if (params.isHasParamCompilePath()) {
+			buildStartReplayExit(InterfaceBuilderApp.getInstance().getPrimaryStage(), params);
+		}
+	}
+	
+	/**
 	 * Returns the instance of the builder App
 	 *
 	 * @return
@@ -192,126 +198,7 @@ public class InterfaceBuilderApp extends Application {
 		return instance;
 	}
 	
-	/**
-	 * Called when the App is starting within the UI Thread.
-	 */
-	@Override
-	public void start(final Stage primaryStage) throws Exception {
-		Thread.currentThread().setName("UI"); //$NON-NLS-1$
-		Thread.currentThread().setPriority(Thread.MAX_PRIORITY);
-		
-		initParams();
-		
-		initGUI(primaryStage);
-		
-		printVariables();
-		
-		// command line tool build
-		if (hasParamCompilePath) {
-			buildStartReplayExit(primaryStage);
-		} else {
-			navigationController.clickHome();
-			
-			checkBaseUiUpdate();
-		}
-	}
-	
-	/**
-	 * Turns App's parameters into variables.
-	 */
-	private void initParams() {
-		// named params
-		// e.g. "--paramname=value".
-		final Parameters params = getParameters();
-		final Map<String, String> namedParams = params.getNamed();
-		wasStartedWithParameters = !namedParams.isEmpty();
-		
-		// COMPILE / COMPILERUN PARAM
-		// --compile="D:\GalaxyObsUI\dev\heroes\AhliObs.StormInterface"
-		paramCompilePath = namedParams.get("compileRun");
-		if (paramCompilePath != null) { //$NON-NLS-1$
-			compileAndRun = true;
-		} else {
-			paramCompilePath = namedParams.get("compile"); //$NON-NLS-1$
-			compileAndRun = false;
-		}
-		paramCompilePath = getInterfaceRootFromPath(paramCompilePath);
-		hasParamCompilePath = (paramCompilePath != null);
-		
-		// RUN PARAM
-		// --run="F:\Games\Heroes of the Storm\Support\HeroesSwitcher.exe"
-		paramRunPath = namedParams.get("run"); //$NON-NLS-1$
-	}
-	
-	/**
-	 * Initialize GUI.
-	 *
-	 * @param primaryStage
-	 * 		the main App's Stage
-	 * @throws IOException
-	 * 		when loading the UI definition fails
-	 */
-	private void initGUI(final Stage primaryStage) throws IOException {
-		// UI layout: borderPane -center-> tabPane (via layout) -tab_0-> virtualizedScrollPane -> StyleClassedTextArea
-		//                       -left-> navigation button bar
-		
-		// Build Navigation
-		final BorderPane root;
-		final FXMLLoader loader = new FXMLSpringLoader(appContext);
-		try (final InputStream is = appContext.getResource("view/Navigation.fxml").getInputStream()) { //$NON-NLS-1$
-			root = loader.load(is);
-			navigationController = loader.getController();
-		} catch (final IOException | NullPointerException e) {
-			logger.error("Failed to load Navigation.fxml:", e); //$NON-NLS-1$
-			throw new IOException("Failed to load Navigation.fxml.", e);
-		}
-		final Scene scene = new Scene(root, 1200, 600);
-		
-		scene.getStylesheets().add(appContext.getResource("view/application.css").getURI().toString()); //$NON-NLS-1$
-		scene.getStylesheets().add(appContext.getResource("view/textStyles.css").getURI().toString()); //$NON-NLS-1$
-		
-		// app icon
-		try {
-			primaryStage.getIcons().add(new Image(getClass().getResourceAsStream("/res/ahli.png"))); //$NON-NLS-1$
-		} catch (final Exception e) {
-			logger.error("Failed to load ahli.png"); //$NON-NLS-1$
-		}
-		primaryStage.setMaximized(true);
-		primaryStage.setScene(scene);
-		primaryStage.setTitle(Messages.getString("app.title"));
-		
-		// Fade animation (to hide white stage background flash)
-		primaryStage.setOpacity(0);
-		final FadeTransition ft = new FadeTransition(Duration.millis(750), root);
-		ft.setFromValue(0);
-		ft.setToValue(1.0);
-		ft.play();
-		
-		primaryStage.show();
-		primaryStage.setOpacity(1);
-		logger.info("Initializing App..."); //$NON-NLS-1$
-		
-		hidePreloader();
-	}
-	
-	/**
-	 * Prints variables into console.
-	 */
-	private void printVariables() {
-		logger.info("basePath: " + config.getBasePath()); //$NON-NLS-1$
-		logger.info("documentsPath: " + config.getDocumentsPath()); //$NON-NLS-1$
-		if (paramCompilePath != null) {
-			logger.info("compile param path: " + paramCompilePath); //$NON-NLS-1$
-			if (compileAndRun) {
-				logger.info("run after compile: true"); //$NON-NLS-1$
-			}
-		}
-		if (paramRunPath != null) {
-			logger.info("run param path: " + paramRunPath); //$NON-NLS-1$
-		}
-	}
-	
-	private void buildStartReplayExit(final Stage stage) {
+	private void buildStartReplayExit(final Stage stage, final CommandLineParams params) {
 		new Thread() {
 			@Override
 			public void run() {
@@ -321,12 +208,12 @@ public class InterfaceBuilderApp extends Application {
 					final ThreadPoolExecutor executorTmp = getExecutor();
 					Platform.runLater(() -> navigationController.lockNavToProgress());
 					
-					mpqBuilderService.build(paramCompilePath);
+					mpqBuilderService.build(params.getParamCompilePath());
 					
 					while (!executorTmp.getQueue().isEmpty() || executorTmp.getActiveCount() > 0) {
 						Thread.sleep(50);
 					}
-					startReplayOrQuitOrShowError(stage);
+					startReplayOrQuitOrShowError(stage, params);
 					Platform.runLater(() -> navigationController.unlockNav());
 					executorTmp.shutdown();
 					executorTmp.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
@@ -339,56 +226,8 @@ public class InterfaceBuilderApp extends Application {
 		}.start();
 	}
 	
-	private void checkBaseUiUpdate() {
-		try {
-			if (baseUiService.isOutdated(Game.SC2, false)) {
-				navigationController.appendNotification(
-						new Notification(Messages.getString("browse.notification.sc2OutOfDate"), 3));
-			}
-		} catch (final IOException e) {
-			logger.error("Error during SC2 baseUI update check.", e);
-		}
-		try {
-			if (baseUiService.isOutdated(Game.HEROES, false)) {
-				navigationController.appendNotification(
-						new Notification(Messages.getString("browse.notification.heroesOutOfDate"), 3));
-			}
-		} catch (final IOException e) {
-			logger.error("Error during Heroes baseUI update check.", e);
-		}
-		try {
-			if (baseUiService.isOutdated(Game.HEROES, true)) {
-				navigationController.appendNotification(
-						new Notification(Messages.getString("browse.notification.heroesPtrOutOfDate"), 3));
-			}
-		} catch (final IOException e) {
-			logger.error("Error during Heroes PTR baseUI update check.", e);
-		}
-	}
-	
-	/**
-	 * ParamPath might be some layout or folder within the interface, so it is cut down to the interface base path.
-	 *
-	 * @param str
-	 * 		application's compileParam's value
-	 * @return shortens the path to the Interface root folder
-	 */
-	private String getInterfaceRootFromPath(String str) {
-		if (str != null) {
-			while (str.length() > 0 && !str.endsWith("Interface")) { //$NON-NLS-1$
-				final int lastIndex = str.lastIndexOf(File.separatorChar);
-				if (lastIndex != -1) {
-					str = str.substring(0, lastIndex);
-				} else {
-					return null;
-				}
-			}
-		}
-		return str;
-	}
-	
-	private void hidePreloader() {
-		notifyPreloader(new Preloader.StateChangeNotification(Preloader.StateChangeNotification.Type.BEFORE_START));
+	private Stage getPrimaryStage() {
+		return primaryStage;
 	}
 	
 	/**
@@ -404,11 +243,11 @@ public class InterfaceBuilderApp extends Application {
 	 * @param primaryStage
 	 * 		app's main stage
 	 */
-	private void startReplayOrQuitOrShowError(final Stage primaryStage) {
-		if (wasStartedWithParameters && !anyErrorTrackerEncounteredError()) {
+	private void startReplayOrQuitOrShowError(final Stage primaryStage, final CommandLineParams params) {
+		if (params.isWasStartedWithParameters() && !anyErrorTrackerEncounteredError()) {
 			// start game, launch replay
-			attemptToRunGameWithReplay();
-			if (!hasParamCompilePath) {
+			attemptToRunGameWithReplay(params);
+			if (!params.isHasParamCompilePath()) {
 				Platform.runLater(() -> {
 					try {
 						// close after 5 seconds, if compiled all and no errors
@@ -449,25 +288,24 @@ public class InterfaceBuilderApp extends Application {
 		return false;
 	}
 	
-	
 	/**
 	 * Attempts to run a game with a replay, if desired.
 	 */
-	public void attemptToRunGameWithReplay() {
+	public void attemptToRunGameWithReplay(final CommandLineParams params) {
 		final boolean isHeroes;
 		final String gamePath;
 		
-		if (!compileAndRun) {
+		if (!params.isCompileAndRun()) {
 			// use the run param
-			if (paramRunPath == null) {
+			gamePath = params.getParamRunPath();
+			if (gamePath == null) {
 				return;
 			}
-			gamePath = paramRunPath;
 			isHeroes = gamePath.contains("HeroesSwitcher.exe"); //$NON-NLS-1$
 		} else {
 			final SettingsIniInterface settings = configService.getIniSettings();
 			// compileAndRun is active -> figure out the right game
-			if (paramCompilePath.contains(File.separator + "heroes" + File.separator)) { //$NON-NLS-1$
+			if (params.getParamCompilePath().contains(File.separator + "heroes" + File.separator)) { //$NON-NLS-1$
 				// Heroes
 				isHeroes = true;
 				if (settings.isHeroesPtrActive()) {
@@ -538,6 +376,139 @@ public class InterfaceBuilderApp extends Application {
 				logger.fatal("FATAL ERROR: ", e);
 			}
 		});
+	}
+	
+	/**
+	 * Called when the App is starting within the UI Thread.
+	 */
+	@Override
+	public void start(final Stage primaryStage) throws Exception {
+		Thread.currentThread().setName("UI"); //$NON-NLS-1$
+		Thread.currentThread().setPriority(Thread.MAX_PRIORITY);
+		this.primaryStage = primaryStage;
+		
+		final CommandLineParams startingParams = initParams();
+		
+		initGUI(primaryStage);
+		
+		printVariables(startingParams);
+		
+		// command line tool build
+		if (startingParams.isHasParamCompilePath()) {
+			buildStartReplayExit(primaryStage, startingParams);
+		} else {
+			navigationController.clickHome();
+			
+			checkBaseUiUpdate();
+		}
+	}
+	
+	/**
+	 * Turns App's parameters into variables.
+	 */
+	private CommandLineParams initParams() {
+		return new CommandLineParams(getParameters());
+	}
+	
+	/**
+	 * Initialize GUI.
+	 *
+	 * @param primaryStage
+	 * 		the main App's Stage
+	 * @throws IOException
+	 * 		when loading the UI definition fails
+	 */
+	private void initGUI(final Stage primaryStage) throws IOException {
+		// UI layout: borderPane -center-> tabPane (via layout) -tab_0-> virtualizedScrollPane -> StyleClassedTextArea
+		//                       -left-> navigation button bar
+		
+		// Build Navigation
+		final BorderPane root;
+		final FXMLLoader loader = new FXMLSpringLoader(appContext);
+		try (final InputStream is = appContext.getResource("view/Navigation.fxml").getInputStream()) { //$NON-NLS-1$
+			root = loader.load(is);
+			navigationController = loader.getController();
+		} catch (final IOException | NullPointerException e) {
+			logger.error("Failed to load Navigation.fxml:", e); //$NON-NLS-1$
+			throw new IOException("Failed to load Navigation.fxml.", e);
+		}
+		final Scene scene = new Scene(root, 1200, 600);
+		
+		scene.getStylesheets().add(appContext.getResource("view/application.css").getURI().toString()); //$NON-NLS-1$
+		scene.getStylesheets().add(appContext.getResource("view/textStyles.css").getURI().toString()); //$NON-NLS-1$
+		
+		// app icon
+		try {
+			primaryStage.getIcons().add(new Image(getClass().getResourceAsStream("/res/ahli.png"))); //$NON-NLS-1$
+		} catch (final Exception e) {
+			logger.error("Failed to load ahli.png"); //$NON-NLS-1$
+		}
+		primaryStage.setMaximized(true);
+		primaryStage.setScene(scene);
+		primaryStage.setTitle(Messages.getString("app.title"));
+		
+		// Fade animation (to hide white stage background flash)
+		primaryStage.setOpacity(0);
+		final FadeTransition ft = new FadeTransition(Duration.millis(750), root);
+		ft.setFromValue(0);
+		ft.setToValue(1.0);
+		ft.play();
+		
+		primaryStage.show();
+		primaryStage.setOpacity(1);
+		logger.info("Initializing App..."); //$NON-NLS-1$
+		
+		hidePreloader();
+	}
+	
+	/**
+	 * Prints variables into console.
+	 */
+	private void printVariables(final CommandLineParams params) {
+		logger.info("basePath: " + config.getBasePath()); //$NON-NLS-1$
+		logger.info("documentsPath: " + config.getDocumentsPath()); //$NON-NLS-1$
+		final String paramCompilePath = params.getParamCompilePath();
+		if (paramCompilePath != null) {
+			logger.info("compile param path: " + paramCompilePath); //$NON-NLS-1$
+			if (params.isCompileAndRun()) {
+				logger.info("run after compile: true"); //$NON-NLS-1$
+			}
+		}
+		final String paramRunPath = params.getParamRunPath();
+		if (paramRunPath != null) {
+			logger.info("run param path: " + paramRunPath); //$NON-NLS-1$
+		}
+	}
+	
+	private void checkBaseUiUpdate() {
+		try {
+			if (baseUiService.isOutdated(Game.SC2, false)) {
+				navigationController.appendNotification(
+						new Notification(Messages.getString("browse.notification.sc2OutOfDate"), 3));
+			}
+		} catch (final IOException e) {
+			logger.error("Error during SC2 baseUI update check.", e);
+		}
+		try {
+			if (baseUiService.isOutdated(Game.HEROES, false)) {
+				navigationController.appendNotification(
+						new Notification(Messages.getString("browse.notification.heroesOutOfDate"), 3));
+			}
+		} catch (final IOException e) {
+			logger.error("Error during Heroes baseUI update check.", e);
+		}
+		try {
+			if (baseUiService.isOutdated(Game.HEROES, true)) {
+				navigationController.appendNotification(
+						new Notification(Messages.getString("browse.notification.heroesPtrOutOfDate"), 3));
+			}
+		} catch (final IOException e) {
+			logger.error("Error during Heroes PTR baseUI update check.", e);
+		}
+	}
+	
+	private void hidePreloader() {
+		notifyPreloader(new Preloader.StateChangeNotification(Preloader.StateChangeNotification.Type.BEFORE_START));
 	}
 	
 	/**
