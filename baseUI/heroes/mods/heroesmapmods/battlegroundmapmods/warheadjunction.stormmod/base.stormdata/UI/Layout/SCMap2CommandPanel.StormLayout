@@ -9,8 +9,73 @@
         </Frame>
       </Frame>
     </Frame>
+    <Frame type="CommandButton" name="CommandButton15" template="CommandButton/CommandButtonTemplate">
+      <Anchor side="Top" relative="$parent/ButtonHolder" pos="Min" offset="-21" />
+      <Anchor side="Left" relative="$parent/ButtonHolder" pos="Min" offset="68" />
+      <ClickSound val="@UI_Game_ActionClick" />
+      <BatchGroup val="false" />
+      <RenderPriority val="511" />
+      <Frame type="Image" name="DisabledLockOverlay">
+        <Anchor relative="$parent/NormalImage" />
+        <Texture val="@UI/HUD_Btn_BG_Ability_Locked" />
+        <ImageMaskTexture val="@UI/HUD_BTN_BG_Ability_AlphaMask" />
+        <Animation name="Fade">
+          <Event event="FadeOut" action="DirectionForward,Play" />
+          <Event event="FadeIn" action="DirectionReverse,Play" />
+          <Controller type="Fade" layer="1" end="Pause">
+            <Key type="Curve" time="0" value="255" />
+            <Key type="Curve" time="0.25" value="0" />
+          </Controller>
+          <Controller type="Visibility" end="Pause">
+            <Key type="Bool" time="0" value="True" />
+            <Key type="Bool" time="0.25" value="True" />
+            <Key type="Bool" time="0.25" value="False" />
+          </Controller>
+        </Animation>
+      </Frame>
+      <Frame type="Image" name="GameButtonDefaultBorder">
+        <StateGroup name="BorderStates">
+          <DefaultState val="Disabled" />
+          <State name="Cleared">
+            <When type="Property" frame="$parent" Cleared="true" />
+            <Action type="SetProperty" frame="$parent" Visible="false" />
+            <Action type="SetProperty" frame="$parent/$parent/ButtonHolder" Visible="false" />
+            <Action type="SetProperty" frame="$parent/$parent/LedContainer" Visible="false" />
+          </State>
+          <State name="Disabled">
+            <When type="AnimationState" frame="$parent/$parent/CommandUnitSelectionPanel/UnitStatusFrame0/ArmedValidator" UnitStatusValidatorState="MapMechanicHeroHasNoNukes" />
+            <Action type="SetProperty" frame="$this" Texture="@UI/Storm_UI_InGame_AbilityButtonBorder_Terran_Off" />
+            <Action type="SetProperty" frame="$parent/GameButtonDefaultHoverBorder" Visible="false" />
+            <Action type="SendEvent" frame="$parent/$parent/LedContainer" event="Stop" />
+            <Action type="SendEvent" frame="$parent/DisabledLockOverlay" event="FadeIn" />
+          </State>
+          <State name="Arming">
+            <When type="Property" frame="$parent/CooldownLabel" Visible="true" />
+            <Action type="SetProperty" frame="$this" Texture="@UI/Storm_UI_InGame_AbilityButtonBorder_Terran" />
+            <Action type="SetProperty" frame="$parent/GameButtonDefaultHoverBorder" Visible="true" />
+            <Action type="SendEvent" frame="$parent/$parent/LedContainer" event="Arming" />
+            <Action type="SendEvent" frame="$parent/DisabledLockOverlay" event="FadeOut" />
+          </State>
+          <State name="Normal">
+            <When type="Property" frame="$parent" Executing="false" />
+            <Action type="SetProperty" frame="$this" Texture="@UI/Storm_UI_InGame_AbilityButtonBorder_Terran" />
+            <Action type="SetProperty" frame="$parent/GameButtonDefaultHoverBorder" Visible="true" />
+            <Action type="SendEvent" frame="$parent/$parent/LedContainer" event="Armed" />
+            <Action type="SendEvent" frame="$parent/DisabledLockOverlay" event="FadeOut" />
+          </State>
+          <State name="Executing">
+            <When type="Property" frame="$parent" Executing="true" />
+            <Action type="SetProperty" frame="$this" Texture="@UI/Storm_UI_InGame_AbilityButtonBorder_Terran_Hover" />
+            <Action type="SetProperty" frame="$parent/GameButtonDefaultHoverBorder" Visible="false" />
+          </State>
+        </StateGroup>
+      </Frame>
+      <Frame type="Image" name="GameButtonDefaultHoverBorder">
+        <Texture val="@UI/Storm_UI_InGame_AbilityButtonBorder_Terran_Hover" />
+      </Frame>
+    </Frame>
     <Frame type="Image" name="ButtonHolder">
-      <Anchor side="Top" relative="$parent/CommandButton05" pos="Min" offset="27" />
+      <Anchor side="Top" relative="$parent/CommandButton05" pos="Min" offset="21" />
       <Anchor side="Left" relative="$parent/CommandButton05" pos="Min" offset="130" />
       <BatchGroup val="false" />
       <RenderPriority val="495" />
@@ -147,71 +212,6 @@
           <Key type="Curve" time=".2" value="0" inout="Slow,Linear" />
         </Controller>
       </Animation>
-    </Frame>
-    <Frame type="CommandButton" name="CommandButton15" template="CommandButton/CommandButtonTemplate">
-      <Anchor side="Top" relative="$parent/ButtonHolder" pos="Min" offset="-21" />
-      <Anchor side="Left" relative="$parent/ButtonHolder" pos="Min" offset="68" />
-      <ClickSound val="@UI_Game_ActionClick" />
-      <BatchGroup val="false" />
-      <RenderPriority val="511" />
-      <Frame type="Image" name="DisabledLockOverlay">
-        <Anchor relative="$parent/NormalImage" />
-        <Texture val="@UI/HUD_Btn_BG_Ability_Locked" />
-        <ImageMaskTexture val="@UI/HUD_BTN_BG_Ability_AlphaMask" />
-        <Animation name="Fade">
-          <Event event="FadeOut" action="DirectionForward,Play" />
-          <Event event="FadeIn" action="DirectionReverse,Play" />
-          <Controller type="Fade" layer="1" end="Pause">
-            <Key type="Curve" time="0" value="255" />
-            <Key type="Curve" time="0.25" value="0" />
-          </Controller>
-          <Controller type="Visibility" end="Pause">
-            <Key type="Bool" time="0" value="True" />
-            <Key type="Bool" time="0.25" value="True" />
-            <Key type="Bool" time="0.25" value="False" />
-          </Controller>
-        </Animation>
-      </Frame>
-      <Frame type="Image" name="GameButtonDefaultBorder">
-        <StateGroup name="BorderStates">
-          <DefaultState val="Disabled" />
-          <State name="Cleared">
-            <When type="Property" frame="$parent" Cleared="true" />
-            <Action type="SetProperty" frame="$parent" Visible="false" />
-            <Action type="SetProperty" frame="$parent/$parent/ButtonHolder" Visible="false" />
-            <Action type="SetProperty" frame="$parent/$parent/LedContainer" Visible="false" />
-          </State>
-          <State name="Disabled">
-            <When type="AnimationState" frame="$parent/$parent/CommandUnitSelectionPanel/UnitStatusFrame0/ArmedValidator" UnitStatusValidatorState="MapMechanicHeroHasNoNukes" />
-            <Action type="SetProperty" frame="$this" Texture="@UI/Storm_UI_InGame_AbilityButtonBorder_Terran_Off" />
-            <Action type="SetProperty" frame="$parent/GameButtonDefaultHoverBorder" Visible="false" />
-            <Action type="SendEvent" frame="$parent/$parent/LedContainer" event="Stop" />
-            <Action type="SendEvent" frame="$parent/DisabledLockOverlay" event="FadeIn" />
-          </State>
-          <State name="Arming">
-            <When type="Property" frame="$parent/CooldownLabel" Visible="true" />
-            <Action type="SetProperty" frame="$this" Texture="@UI/Storm_UI_InGame_AbilityButtonBorder_Terran" />
-            <Action type="SetProperty" frame="$parent/GameButtonDefaultHoverBorder" Visible="true" />
-            <Action type="SendEvent" frame="$parent/$parent/LedContainer" event="Arming" />
-            <Action type="SendEvent" frame="$parent/DisabledLockOverlay" event="FadeOut" />
-          </State>
-          <State name="Normal">
-            <When type="Property" frame="$parent" Executing="false" />
-            <Action type="SetProperty" frame="$this" Texture="@UI/Storm_UI_InGame_AbilityButtonBorder_Terran" />
-            <Action type="SetProperty" frame="$parent/GameButtonDefaultHoverBorder" Visible="true" />
-            <Action type="SendEvent" frame="$parent/$parent/LedContainer" event="Armed" />
-            <Action type="SendEvent" frame="$parent/DisabledLockOverlay" event="FadeOut" />
-          </State>
-          <State name="Executing">
-            <When type="Property" frame="$parent" Executing="true" />
-            <Action type="SetProperty" frame="$this" Texture="@UI/Storm_UI_InGame_AbilityButtonBorder_Terran_Hover" />
-            <Action type="SetProperty" frame="$parent/GameButtonDefaultHoverBorder" Visible="false" />
-          </State>
-        </StateGroup>
-      </Frame>
-      <Frame type="Image" name="GameButtonDefaultHoverBorder">
-        <Texture val="@UI/Storm_UI_InGame_AbilityButtonBorder_Terran_Hover" />
-      </Frame>
     </Frame>
   </Frame>
 </Desc>

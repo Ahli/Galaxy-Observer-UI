@@ -1,71 +1,111 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <Desc>
-
-    <Frame type="SelectionUnitStatusPanel" name="MalfurionStacksFrameContainer">
-        <Anchor relative="$parent"/>
-        <SpecificUnit val="HeroMalfurion"/>
-        <CheckPassengers val="True"/>
-
-        <Frame type="UnitStatusUnitStackingDebuffElement" name="StacksFrame" template="UnitStatus/SingleBehaviorTemplate">
-            <BuffBehavior val="Regrowth"/>
-
-            <Frame type="Image" name="StacksFull">
-                <Anchor side="Top" relative="$parent" pos="Min" offset="1"/>
-                <Anchor side="Left" relative="$parent" pos="Min" offset="-1"/>
-                <Texture val="@UI/Stacks/Malfurion"/>
-            </Frame>
-        </Frame>
-    </Frame>
-
-    <Frame type="SelectionUnitStatusPanel" name="MalfurionBackplate" template="StandardHeroUITemplates/CircularHeroUIBackplateTemplate">
-        <SpecificUnit val="HeroMalfurion"/>
-    </Frame>
-
-    <Frame type="SelectionUnitStatusPanel" name="MalfurionFrame" template="StandardHeroUITemplates/CircularHeroUITemplate">
-        <SpecificUnit val="HeroMalfurion"/>
-
-        <Frame type="UnitStatusFrame" name="UnitStatusFrame0">
-
-            <Frame type="Image" name="MechanicTexture">
-                <Visible val="False"/>
-                <Texture val="Assets\Textures\storm_ui_icon_malfurion_regrowth.dds"/>
-                <Frame type="BehaviorIcon" name="RegrowthTooltip">
-                    <Anchor relative="$parent"/>
-                    <TooltipFrame val="BehaviorIconTooltip"/>
-                    <Behavior val="MalfurionRegrowthTokenCounter"/>
+  <Frame type="SelectionUnitStatusPanel" name="MalfurionStacksFrameContainer">
+    <Anchor relative="$parent" />
+    <SpecificUnit val="HeroMalfurion" />
+    <CheckPassengers val="True" />
+    <Frame type="UnitStatusUnitStackingDebuffElement" name="RegrowthStatusFrame">
+      <Anchor relative="$ancestor[@name=HeroUnitStatusParentFrame]/PlayerUnitNameLabel" />
+      <BuffBehavior val="Regrowth" />
+      <ShowForBehaviorOwner val="True" />
+      <Frame type="Image" name="RegrowthStatusBase">
+        <Anchor side="Bottom" relative="$parent" pos="Min" offset="0" />
+        <Anchor side="Left" relative="$parent" pos="Mid" offset="0" />
+        <Anchor side="Right" relative="$parent" pos="Mid" offset="0" />
+        <Texture val="@UI/Malfurion/RegrowthStatusBase" />
+        <Visible val="true" />
+        <Frame type="UnitStatusBehaviorIcon" name="RegrowthStatusCountdownFrame">
+          <Behavior val="Regrowth" />
+          <Anchor relative="$parent" />
+          <Frame type="BehaviorIcon" name="BehaviorIcon">
+            <Anchor relative="$parent" />
+            <AcceptsMouse val="False" />
+            <Frame type="ProgressBar" name="CooldownBar">
+              <Anchor side="Top" relative="$parent" pos="Mid" offset="0" />
+              <Anchor side="Left" relative="$parent" pos="Mid" offset="0" />
+              <Anchor side="Right" relative="$parent" pos="Mid" offset="0" />
+              <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0" />
+              <Height val="48" />
+              <Width val="48" />
+              <Color val="5DFF2F" />
+              <StateGroup name="RegrowthDurationState">
+                <State name="Red">
+                  <When type="Property" operator="LessThan" Value="80" />
+                  <Action type="SetProperty" Color="FF4D47" />
+                  <Action type="SetProperty" Frame="RegrowthStatusCenterIcon" LightAdjustColor="FFFFFF" />
+                  <Action type="SetProperty" Frame="RegrowthStatusCenterIcon" DarkAdjustColor="FF4D47" />
+                </State>
+                <State name="Yellow">
+                  <When type="Property" operator="LessThan" Value="160" />
+                  <Action type="SetProperty" Color="FFBB20" />
+                  <Action type="SetProperty" Frame="RegrowthStatusCenterIcon" LightAdjustColor="FFFFFF" />
+                  <Action type="SetProperty" Frame="RegrowthStatusCenterIcon" DarkAdjustColor="FFBB20" />
+                </State>
+              </StateGroup>
+              <Circular val="True" />
+              <CircularStart val="0" />
+              <CircularEndOffset val="360" />
+              <Frame type="Frame" name="FillImageContainer">
+                <Anchor relative="$parent" />
+                <Frame type="Image" name="FillImage">
+                  <Anchor relative="$parent" />
+                  <Texture val="@UI/Malfurion/RegrowthStatusBar" />
+                  <TextureType val="Circular" />
                 </Frame>
+              </Frame>
+              <Frame type="Image" name="RegrowthStatusCenterIcon">
+                <Anchor relative="$parent" offset="-8" />
+                <Texture val="@UI/Malfurion/RegrowthStatusCenterIcon" />
+                <Visible val="true" />
+                <IgnoreParentColor val="true" />
+                <ColorAdjustMode val="Colorize" />
+                <LightAdjustColor val="FFFFFF" />
+                <DarkAdjustColor val="5DFF2F" />
+              </Frame>
             </Frame>
-
-            <Frame type="UnitStatusBehaviorIcon" name="RegrowthStackCountFrame" template="StandardHeroUITemplates/SmallCicularBehaviorStackCountTemplate">
-                <Behavior val="MalfurionRegrowthTokenCounter"/>
-            </Frame>
-
-            <Frame type="UnitStatusBehaviorIcon" name="RegrowthCountdownFrame" template="StandardHeroUITemplates/CircularBehaviorCountdownBarTemplate">
-                <Behavior val="Regrowth"/>
-            </Frame>
-
-            <Frame type="UnitStatusBehaviorAnim" name="RegrowthAnim" template="StandardHeroUITemplates/BehaviorAnimTemplate">
-                <Behavior val="MalfurionRegrowthTokenCounter"/>
-
-                <Animation name="ShowMechanicTexture">
-                    <Event event="BehaviorCreate" action="Reset, Play"/>
-                    <Event event="BehaviorDestroy" action="Stop"/>
-
-                    <Controller type="Visibility" end="Pause" frame="$parent/MechanicTexture">
-                        <Key type="Bool" time="0" value="True"/>
-                    </Controller>
-                </Animation>
-                <Animation name="HideMechanicTexture">
-                    <Event event="BehaviorCreate" action="Reset, Play"/>
-                    <Event event="BehaviorDestroy" action="Reset, Play"/>
-
-                    <Controller type="Visibility" end="Pause" frame="$parent/RegrowthCountdownFrame/BehaviorIcon/CooldownBar/FillImageContainer">
-                        <Key type="Bool" time="0" value="False"/>
-                    </Controller>
-                </Animation>
-            </Frame>
-
+          </Frame>
         </Frame>
+      </Frame>
     </Frame>
-
+  </Frame>
+  <Frame type="SelectionUnitStatusPanel" name="MalfurionBackplate" template="StandardHeroUITemplates/CircularHeroUIBackplateTemplate">
+    <SpecificUnit val="HeroMalfurion" />
+  </Frame>
+  <Frame type="SelectionUnitStatusPanel" name="MalfurionFrame" template="StandardHeroUITemplates/CircularHeroUITemplate">
+    <SpecificUnit val="HeroMalfurion" />
+    <Frame type="UnitStatusFrame" name="UnitStatusFrame0">
+      <Frame type="Image" name="MechanicTexture">
+        <Visible val="False" />
+        <Texture val="Assets\Textures\storm_ui_icon_malfurion_regrowth.dds" />
+        <Frame type="BehaviorIcon" name="RegrowthTooltip">
+          <Anchor relative="$parent" />
+          <TooltipFrame val="BehaviorIconTooltip" />
+          <Behavior val="MalfurionRegrowthTokenCounter" />
+        </Frame>
+      </Frame>
+      <Frame type="UnitStatusBehaviorIcon" name="RegrowthStackCountFrame" template="StandardHeroUITemplates/SmallCicularBehaviorStackCountTemplate">
+        <Behavior val="MalfurionRegrowthTokenCounter" />
+      </Frame>
+      <Frame type="UnitStatusBehaviorIcon" name="RegrowthCountdownFrame" template="StandardHeroUITemplates/CircularBehaviorCountdownBarTemplate">
+        <Behavior val="Regrowth" />
+      </Frame>
+      <Frame type="UnitStatusBehaviorAnim" name="RegrowthAnim" template="StandardHeroUITemplates/BehaviorAnimTemplate">
+        <Behavior val="MalfurionRegrowthTokenCounter" />
+        <Animation name="ShowMechanicTexture">
+          <Event event="BehaviorCreate" action="Reset, Play" />
+          <Event event="BehaviorDestroy" action="Stop" />
+          <Controller type="Visibility" end="Pause" frame="$parent/MechanicTexture">
+            <Key type="Bool" time="0" value="True" />
+          </Controller>
+        </Animation>
+        <Animation name="HideMechanicTexture">
+          <Event event="BehaviorCreate" action="Reset, Play" />
+          <Event event="BehaviorDestroy" action="Reset, Play" />
+          <Controller type="Visibility" end="Pause" frame="$parent/RegrowthCountdownFrame/BehaviorIcon/CooldownBar/FillImageContainer">
+            <Key type="Bool" time="0" value="False" />
+          </Controller>
+        </Animation>
+      </Frame>
+    </Frame>
+  </Frame>
 </Desc>
