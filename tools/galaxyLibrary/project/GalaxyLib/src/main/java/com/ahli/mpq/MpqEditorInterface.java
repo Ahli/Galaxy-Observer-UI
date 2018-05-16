@@ -26,8 +26,7 @@ public class MpqEditorInterface implements MpqInterface, DeepCopyable {
 	private static final String MPQ_INTERFACE_MPQ_EDITOR_NOT_FOUND = "MpqInterface.MpqEditorNotFound";
 	private static final String CMD_C = "cmd /C ";
 	private MpqEditorSettingsInterface settings;
-	private String mpqEditorPath = "plugins" + File.separator + "mpq" + File.separator + "MPQEditor.exe";
-	//$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+	private String mpqEditorPath;
 	private String mpqCachePath;
 	
 	/**

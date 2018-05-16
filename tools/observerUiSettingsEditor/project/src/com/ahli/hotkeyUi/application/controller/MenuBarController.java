@@ -16,8 +16,7 @@ import org.apache.logging.log4j.Logger;
  * @author Ahli
  */
 public class MenuBarController {
-	static Logger logger = LogManager.getLogger(MenuBarController.class);
-	// //$NON-NLS-1$
+	private static final Logger logger = LogManager.getLogger();
 	
 	private Main main;
 	

@@ -21,7 +21,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 @Service
 public class BaseUiService {
 	public static final String UNKNOWN_GAME_EXCEPTION = "Unknown Game";
-	private final Logger logger = LogManager.getLogger();
+	private static final Logger logger = LogManager.getLogger();
 	@Autowired
 	ConfigService configService;
 	@Autowired

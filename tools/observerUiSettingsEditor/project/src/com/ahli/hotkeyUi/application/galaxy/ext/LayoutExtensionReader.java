@@ -35,7 +35,7 @@ public class LayoutExtensionReader {
 	public static final String CONSTANT = "constant";
 	public static final String DEFAULT = "default";
 	public static final String DESCRIPTION = "description";
-	static Logger logger = LogManager.getLogger(LayoutExtensionReader.class);
+	private static final Logger logger = LogManager.getLogger();
 	
 	private List<ValueDef> hotkeys = new ArrayList<>();
 	private List<ValueDef> settings = new ArrayList<>();
@@ -91,7 +91,7 @@ public class LayoutExtensionReader {
 		for (final File curFile : layoutFiles) {
 			try {
 				doc = dBuilder.parse(curFile);
-			} catch (SAXParseException | IOException e) {
+			} catch (final SAXParseException | IOException e) {
 				// couldn't parse, most likely no XML file
 				continue;
 			}
@@ -108,7 +108,7 @@ public class LayoutExtensionReader {
 			try {
 				// parse XML file
 				doc = dBuilder.parse(curFile);
-			} catch (SAXParseException | IOException e) {
+			} catch (final SAXParseException | IOException e) {
 				// couldn't parse, most likely no XML file
 				continue;
 			}
@@ -308,7 +308,7 @@ public class LayoutExtensionReader {
 			try {
 				// parse XML file
 				doc = dBuilder.parse(curFile);
-			} catch (SAXParseException | IOException e) {
+			} catch (final SAXParseException | IOException e) {
 				continue;
 			}
 			
@@ -326,7 +326,7 @@ public class LayoutExtensionReader {
 			try {
 				xformer = TransformerFactory.newInstance().newTransformer();
 				xformer.transform(source, result);
-			} catch (TransformerFactoryConfigurationError | TransformerException e) {
+			} catch (final TransformerFactoryConfigurationError | TransformerException e) {
 				logger.error("Transforming to generate XML file failed.", e);
 			}
 		}

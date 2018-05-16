@@ -2,7 +2,6 @@ package application.compile;
 
 import com.ahli.galaxy.ModData;
 import com.ahli.galaxy.archive.DescIndexData;
-import com.ahli.galaxy.ui.exception.UIException;
 import com.ahli.galaxy.ui.interfaces.UICatalog;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -73,7 +72,7 @@ public class CompileService {
 				}
 			}
 			
-		} catch (ParserConfigurationException | SAXException | IOException | UIException e) {
+		} catch (final ParserConfigurationException | SAXException | IOException e) {
 			logger.error("ERROR: encountered error while compiling.", e);
 		}
 		

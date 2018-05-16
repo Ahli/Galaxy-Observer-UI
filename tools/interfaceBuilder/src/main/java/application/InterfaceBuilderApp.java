@@ -181,7 +181,6 @@ public class InterfaceBuilderApp extends Application {
 	 * @param paramList
 	 */
 	private void executeCommand(final List<String> paramList) {
-		// TODO
 		final CommandLineParams params = new CommandLineParams(paramList.toArray(new String[0]));
 		
 		if (params.isHasParamCompilePath()) {

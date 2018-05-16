@@ -42,7 +42,7 @@ public class CommandLineParams {
 	private String getParamsValue(final String[] params, final String paramNameAndEqualSign) {
 		for (int i = 0; i < params.length; i++) {
 			if (params[i].startsWith(paramNameAndEqualSign)) {
-				return params[i].substring(paramNameAndEqualSign.length()+1);
+				return params[i].substring(paramNameAndEqualSign.length() + 1);
 			}
 		}
 		return null;

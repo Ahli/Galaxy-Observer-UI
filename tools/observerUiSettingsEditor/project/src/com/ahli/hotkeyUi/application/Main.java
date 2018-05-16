@@ -59,7 +59,7 @@ public class Main extends Application {
 	public static final String VERSION = "alpha";
 	public static final String STORM_INTERFACE_FILE_FILTER = "*.StormInterface";
 	public static final String SC2_INTERFACE_FILE_FILTER = "*.SC2Interface";
-	static Logger logger = LogManager.getLogger(Main.class); // $NON-NLS-1$
+	private static final Logger logger = LogManager.getLogger();
 	private final long appStartTime = System.nanoTime();
 	private Stage primaryStage;
 	private BorderPane rootLayout;
@@ -123,7 +123,7 @@ public class Main extends Application {
 			loader.setResources(Messages.getBundle());
 			
 			final TabPane tabPane;
-			try (InputStream is = Main.class.getResourceAsStream("view/TabsLayout.fxml")) {
+			try (final InputStream is = Main.class.getResourceAsStream("view/TabsLayout.fxml")) {
 				tabPane = loader.load(is); // $NON-NLS-1$
 			}
 			
@@ -193,7 +193,7 @@ public class Main extends Application {
 		final FXMLLoader loader = new FXMLLoader();
 		loader.setResources(Messages.getBundle());
 		
-		try (InputStream is = Main.class.getResourceAsStream("view/RootLayout.fxml")) {
+		try (final InputStream is = Main.class.getResourceAsStream("view/RootLayout.fxml")) {
 			rootLayout = loader.load(is); // $NON-NLS-1$
 		}
 		logger.warn("initialized root layout fxml within " + (System.nanoTime() - time) / 1000000 + "ms.");
@@ -328,7 +328,7 @@ public class Main extends Application {
 			mpqi.buildMpq(openedDocPath, false, MpqEditorCompression.BLIZZARD_SC2_HEROES, false);
 			hasUnsavedFileChanges = false;
 			updateAppTitle();
-		} catch (IOException | InterruptedException | ParserConfigurationException | SAXException | MpqException e) {
+		} catch (final IOException | InterruptedException | ParserConfigurationException | SAXException | MpqException e) {
 			logger.error(ExceptionUtils.getStackTrace(e), e);
 			showErrorAlert(e);
 		}
@@ -503,7 +503,7 @@ public class Main extends Application {
 				final List<ValueDef> settings = layoutExtReader.getSettings();
 				tabsCtrl.getSettingsData().addAll(settings);
 				
-			} catch (MpqException | ShowToUserException e) {
+			} catch (final MpqException | ShowToUserException e) {
 				logger.error("File could not be opened. MPQ-Error: " + ExceptionUtils.getStackTrace(e),
 						e); //$NON-NLS-1$
 				openedDocPath = null;
@@ -620,7 +620,7 @@ public class Main extends Application {
 				hasUnsavedFileChanges = false;
 				openedDocPath = f.getAbsolutePath();
 				updateAppTitle();
-			} catch (IOException | InterruptedException | ParserConfigurationException | SAXException | MpqException e) {
+			} catch (final IOException | InterruptedException | ParserConfigurationException | SAXException | MpqException e) {
 				logger.error(ExceptionUtils.getStackTrace(e), e);
 				showErrorAlert(e);
 			}

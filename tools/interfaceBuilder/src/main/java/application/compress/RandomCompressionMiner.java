@@ -25,11 +25,11 @@ import java.util.stream.Stream;
  * This miner searches for a better compression via randomized rules.
  */
 public class RandomCompressionMiner {
+	private static final Logger logger = LogManager.getLogger();
 	private final ModData mod;
 	private final MpqEditorInterface mpqInterface;
 	private final Random random = new Random();
 	private final MpqEditorCompressionRuleMethod[] compressionSetting = MpqEditorCompressionRuleMethod.values();
-	private final Logger logger = LogManager.getLogger();
 	private MpqEditorCompressionRule[] rules;
 	private long bestSize;
 	private MpqEditorCompressionRule[] bestRuleSet = null;

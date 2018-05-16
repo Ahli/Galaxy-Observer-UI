@@ -16,7 +16,6 @@ import com.ahli.galaxy.game.GameData;
 import com.ahli.galaxy.game.def.abstracts.GameDef;
 import com.ahli.galaxy.ui.DescIndexReader;
 import com.ahli.galaxy.ui.UICatalogImpl;
-import com.ahli.galaxy.ui.exception.UIException;
 import com.ahli.galaxy.ui.interfaces.UICatalog;
 import com.ahli.mpq.MpqEditorInterface;
 import com.ahli.mpq.MpqException;
@@ -416,7 +415,7 @@ public class MpqBuilderService {
 							}
 						}
 						game.setUiCatalog(uiCatalog);
-					} catch (final SAXException | IOException | ParserConfigurationException | UIException e) {
+					} catch (final SAXException | IOException | ParserConfigurationException e) {
 						logger.error("ERROR parsing base UI catalog for '" + game.getGameDef().getName() + "'.", e);
 						//$NON-NLS-1$ //$NON-NLS-2$
 					} catch (final InterruptedException e) {

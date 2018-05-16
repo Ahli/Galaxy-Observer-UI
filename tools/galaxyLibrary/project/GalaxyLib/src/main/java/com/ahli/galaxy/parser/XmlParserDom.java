@@ -21,7 +21,7 @@ import java.util.Locale;
 
 public class XmlParserDom extends XmlParserAbstract {
 	private static final String ANY_TAG = "*";
-	private static Logger logger = LogManager.getLogger();
+	private static final Logger logger = LogManager.getLogger();
 	private DocumentBuilder dBuilder;
 	
 	private List<String> attrTypes;

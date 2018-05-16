@@ -15,7 +15,7 @@ import java.util.ResourceBundle;
  */
 public final class Messages {
 	private static final String BUNDLE_NAME = "com.ahli.hotkeyUi.application.i18n.messages"; //$NON-NLS-1$
-	private static Logger logger = LogManager.getLogger(Messages.class); // $NON-NLS-1$
+	private static final Logger logger = LogManager.getLogger();
 	private static ResourceBundle resourceBundle = ResourceBundle.getBundle(BUNDLE_NAME);
 	
 	private static Locale usedLocale = Locale.getDefault();

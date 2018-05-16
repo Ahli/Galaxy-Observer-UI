@@ -39,7 +39,7 @@ public interface UICatalog extends DeepCopyable, Serializable {
 	 * 		if the current Thread was interrupted
 	 */
 	void processDescIndex(File f, String raceId)
-			throws SAXException, IOException, ParserConfigurationException, UIException, InterruptedException;
+			throws SAXException, IOException, ParserConfigurationException, InterruptedException;
 	
 	/**
 	 * @param f
@@ -52,8 +52,7 @@ public interface UICatalog extends DeepCopyable, Serializable {
 	 * @throws UIException
 	 * @throws InterruptedException
 	 */
-	void processLayoutFile(File f, String raceId, boolean isDevLayout)
-			throws SAXException, IOException, ParserConfigurationException, UIException, InterruptedException;
+	void processLayoutFile(File f, String raceId, boolean isDevLayout) throws IOException;
 	
 	/**
 	 * @param constantRef

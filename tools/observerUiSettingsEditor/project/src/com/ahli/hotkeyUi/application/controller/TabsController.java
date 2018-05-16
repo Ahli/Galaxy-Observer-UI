@@ -29,6 +29,7 @@ import org.apache.logging.log4j.Logger;
  * @author Ahli
  */
 public class TabsController {
+	private static final Logger logger = LogManager.getLogger();
 	private static final Callback<CellDataFeatures<ValueDef, Boolean>, ObservableValue<Boolean>>
 			ActionColumnCellValueFactory = new Callback<>() {
 		@Override
@@ -43,7 +44,6 @@ public class TabsController {
 			return new ResetDefaultButtonTableCell(Messages.getString("TabsController.Reset")); //$NON-NLS-1$
 		}
 	};
-	static Logger logger = LogManager.getLogger(TabsController.class);
 	// based on:
 	// http://jluger.de/blog/20160731_javafx_text_rendering_in_tableview.html
 	private static final Callback<TableColumn<ValueDef, String>, TableCell<ValueDef, String>> WRAPPING_CELL_FACTORY =
