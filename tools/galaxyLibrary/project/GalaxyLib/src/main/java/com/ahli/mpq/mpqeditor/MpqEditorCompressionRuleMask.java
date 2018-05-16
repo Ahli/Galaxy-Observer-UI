@@ -5,7 +5,7 @@ public class MpqEditorCompressionRuleMask extends MpqEditorCompressionRule {
 	
 	public MpqEditorCompressionRuleMask(final String mask) {
 		super();
-		setMask(mask);
+		this.mask = mask;
 	}
 	
 	/**

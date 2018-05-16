@@ -39,7 +39,7 @@ public class DescIndexData implements Serializable {
 	
 	private static final Logger logger = LogManager.getLogger();
 	private final MpqInterface mpqi;
-	private final ArrayList<Pair<File, String>> fileIntPathList;
+	private final List<Pair<File, String>> fileIntPathList;
 	private String descIndexIntPath = null;
 	
 	/**
@@ -166,7 +166,7 @@ public class DescIndexData implements Serializable {
 	public void persistDescIndexFile() throws IOException {
 		final File f = mpqi.getFileFromMpq(descIndexIntPath);
 		
-		try (OutputStreamWriter bw = new OutputStreamWriter(new FileOutputStream(f, false), UTF_8)) {
+		try (final OutputStreamWriter bw = new OutputStreamWriter(new FileOutputStream(f, false), UTF_8)) {
 			bw.write(XML_VERSION_1_0_ENCODING_UTF_8_STANDALONE_YES_DESC);
 			
 			for (final Pair<File, String> p : fileIntPathList) {

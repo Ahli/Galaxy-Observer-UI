@@ -24,7 +24,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-public class CascExplorerConfigFileEditor {
+public final class CascExplorerConfigFileEditor {
 	private static final Logger logger = LogManager.getLogger();
 	
 	private CascExplorerConfigFileEditor() {

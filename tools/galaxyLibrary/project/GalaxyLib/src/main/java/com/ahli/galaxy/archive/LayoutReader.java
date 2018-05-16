@@ -178,7 +178,7 @@ public final class LayoutReader {
 	 * @param list
 	 * @return
 	 */
-	private static boolean doesNameAppearInList(final String name, final ArrayList<String> list) {
+	private static boolean doesNameAppearInList(final String name, final List<String> list) {
 		for (final String n : list) {
 			if (n.equalsIgnoreCase(name)) {
 				return true;

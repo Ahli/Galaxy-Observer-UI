@@ -1,6 +1,5 @@
 package application.ui.settings;
 
-import application.InterfaceBuilderApp;
 import application.config.ConfigService;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
@@ -16,20 +15,16 @@ import java.io.IOException;
 
 public abstract class SettingsAutoSaveController implements Updateable {
 	
-	@FXML
-	protected Label savedAnimLabel;
-	
 	@Autowired
 	protected ConfigService configService;
-	
-	protected InterfaceBuilderApp app;
+	@FXML
+	private Label savedAnimLabel;
 	private boolean lastSaveFailed = false;
 	
 	/**
 	 * Automatically called by FxmlLoader
 	 */
 	public void initialize() {
-		app = InterfaceBuilderApp.getInstance();
 		initSavingLabel();
 	}
 	
@@ -38,7 +33,7 @@ public abstract class SettingsAutoSaveController implements Updateable {
 	 */
 	private void initSavingLabel() {
 		savedAnimLabel.setOpacity(0);
-		FontAwesomeIconView icon = new FontAwesomeIconView(FontAwesomeIcon.CHECK);
+		final FontAwesomeIconView icon = new FontAwesomeIconView(FontAwesomeIcon.CHECK);
 		icon.setFill(Color.LIMEGREEN);
 		savedAnimLabel.setTextFill(Color.LIMEGREEN);
 		savedAnimLabel.setGraphic(icon);
@@ -68,16 +63,16 @@ public abstract class SettingsAutoSaveController implements Updateable {
 				lastSaveFailed = false;
 				initSavingLabel();
 			}
-		} catch (IOException e) {
+		} catch (final IOException e) {
 			savedAnimLabel.setText("Saving failed!");
-			FontAwesomeIconView icon = new FontAwesomeIconView(FontAwesomeIcon.EXCLAMATION_TRIANGLE);
+			final FontAwesomeIconView icon = new FontAwesomeIconView(FontAwesomeIcon.EXCLAMATION_TRIANGLE);
 			icon.setFill(Color.RED);
 			savedAnimLabel.setTextFill(Color.RED);
 			savedAnimLabel.setGraphic(icon);
 			lastSaveFailed = true;
 		}
 		// label animation
-		FadeTransition trans = new FadeTransition(Duration.millis(2500), savedAnimLabel);
+		final FadeTransition trans = new FadeTransition(Duration.millis(2500), savedAnimLabel);
 		trans.setFromValue(0.0);
 		trans.setToValue(1.0);
 		trans.setAutoReverse(true);

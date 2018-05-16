@@ -3,6 +3,7 @@ package com.ahli.galaxy.ui;
 import com.ahli.galaxy.ui.abstracts.UIElement;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Basic Attribute implementation to describe default UI's attribute.
@@ -16,7 +17,7 @@ public class UIAttribute extends UIElement {
 	 */
 	private static final long serialVersionUID = 5420685675382001338L;
 	
-	private final ArrayList<String> keyValueList;
+	private final List<String> keyValueList;
 	
 	/**
 	 * Constructor.

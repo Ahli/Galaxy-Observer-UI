@@ -79,7 +79,6 @@ public class CompressionMiningController implements Updateable {
 	private ObservableList<MpqEditorCompressionRule> ruleSetObservableItems;
 	private Runnable task;
 	private RandomCompressionMiner expCompMiner = null;
-	private long bestSize = Long.MAX_VALUE;
 	
 	/**
 	 * Automatically called by FxmlLoader
@@ -175,6 +174,7 @@ public class CompressionMiningController implements Updateable {
 			@Override
 			public void run() {
 				try {
+					long bestSize;
 					// TODO too complex?
 					{
 						final ModData mod = gameService.getModData(project.getGame());

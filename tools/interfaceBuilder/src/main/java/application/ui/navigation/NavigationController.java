@@ -45,8 +45,8 @@ public class NavigationController {
 	private AnchorPane selectedMarker;
 	@FXML
 	private Button browse;
-	@FXML
-	private Button notificationCloseButton;
+	//@FXML
+	//private Button notificationCloseButton;
 	@FXML
 	private Label notificationLabel;
 	@FXML

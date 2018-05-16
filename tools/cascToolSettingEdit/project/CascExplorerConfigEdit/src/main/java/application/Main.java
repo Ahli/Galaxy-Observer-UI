@@ -10,8 +10,12 @@ import java.io.File;
  *
  * @author Ahli
  */
-public class Main {
+public final class Main {
 	private static final Logger logger = LogManager.getLogger();
+	
+	private Main() {
+		// no instance
+	}
 	
 	/**
 	 * @param args

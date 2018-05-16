@@ -69,7 +69,6 @@ public class InterfaceBuilderApp extends Application {
 	
 	private static InterfaceBuilderApp instance = null;
 	private static ServerSocket serverSocket;
-	private static Thread serverThread = null;
 	
 	private final List<ErrorTabController> errorTabControllers = new ArrayList<>();
 	@Autowired
@@ -125,7 +124,7 @@ public class InterfaceBuilderApp extends Application {
 	private static void initInterProcessCommunication(final String[] args, final int port) {
 		try {
 			serverSocket = new ServerSocket(port, 4, InetAddress.getByAddress(new byte[] { 127, 0, 0, 1 }));
-			serverThread = new Thread() {
+			final Thread serverThread = new Thread() {
 				@Override
 				public void run() {
 					Socket clientSocket;

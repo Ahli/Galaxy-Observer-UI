@@ -1,6 +1,6 @@
 package com.ahli.mpq.mpqeditor;
 
-public class MpqEditorCompressionRuleParser {
+public final class MpqEditorCompressionRuleParser {
 	
 	private MpqEditorCompressionRuleParser() {
 		// no instances
@@ -42,28 +42,28 @@ public class MpqEditorCompressionRuleParser {
 		return rule;
 	}
 	
-	private static void parseAbstractFields(final MpqEditorCompressionRule rule, String ruleString) {
-		ruleString = ruleString.trim();
-		final int i = ruleString.indexOf('=');
+	private static void parseAbstractFields(final MpqEditorCompressionRule rule, final String ruleString) {
+		final String ruleStr = ruleString.trim();
+		final int i = ruleStr.indexOf('=');
 		if (i != -1) {
-			if (ruleString.charAt(i + 4) == '1') {
+			if (ruleStr.charAt(i + 4) == '1') {
 				rule.setSingleUnit(true);
-			} else if (ruleString.charAt(i + 4) == '2') {
+			} else if (ruleStr.charAt(i + 4) == '2') {
 				rule.setMarkedForDeletion(true);
 			}
 			
-			if (ruleString.charAt(i + 6) == '1') {
+			if (ruleStr.charAt(i + 6) == '1') {
 				rule.setEncrypt(true);
-			} else if (ruleString.charAt(i + 6) == '3') {
+			} else if (ruleStr.charAt(i + 6) == '3') {
 				rule.setEncrypt(true);
 				rule.setEncryptAdjusted(true);
 			}
 			
-			if (ruleString.charAt(i + 8) == '2') {
+			if (ruleStr.charAt(i + 8) == '2') {
 				rule.setCompress(true);
 			}
 			
-			rule.setCompressionMethod(parseCompressionMethod(ruleString.substring(ruleString.indexOf(',') + 2)));
+			rule.setCompressionMethod(parseCompressionMethod(ruleStr.substring(ruleStr.indexOf(',') + 2)));
 		}
 	}
 	
