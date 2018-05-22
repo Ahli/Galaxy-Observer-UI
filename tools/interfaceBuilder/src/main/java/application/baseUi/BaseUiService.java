@@ -8,6 +8,7 @@ import application.integration.FileService;
 import application.integration.SettingsIniInterface;
 import application.projects.enums.Game;
 import com.ahli.galaxy.game.def.abstracts.GameDef;
+import org.apache.commons.io.IOUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +16,8 @@ import org.springframework.stereotype.Service;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.Charset;
 import java.security.InvalidParameterException;
 import java.util.concurrent.ThreadPoolExecutor;
 
@@ -100,17 +103,23 @@ public class BaseUiService {
 		
 		final File extractorExe = configService.getCascExtractorConsoleExeFile();
 		final String[] queryMasks = getQueryMasks(game);
-		int i = 0;
 		for (final String mask : queryMasks) {
-			final int sleepDuration = 1000 + i * 5000;
 			final Runnable task = () -> {
 				try {
-					// TODO replace with proper check if config file finished writing
-					Thread.sleep(sleepDuration);
-					new ProcessBuilder(extractorExe.getAbsolutePath(), mask, destination + File.separator, "enUS",
-							"None").start();
+					final ProcessBuilder pb =
+							new ProcessBuilder(extractorExe.getAbsolutePath(), mask, destination + File.separator,
+									"enUS", "None");
+					// put error and normal output into the same stream
+					pb.redirectErrorStream(true);
 					
-					// TODO wait for thread to finish, once it works
+					final Process process = pb.start();
+					// empty output buffers and print to console
+					final InputStream is = process.getInputStream();
+					do {
+						Thread.sleep(50);
+						logger.info(IOUtils.toString(is, Charset.defaultCharset()));
+					} while (process.isAlive());
+					is.close();
 					
 				} catch (final IOException e) {
 					logger.error("Extracting files from CASC via CascExtractor failed.", e); //$NON-NLS-1$
@@ -119,9 +128,8 @@ public class BaseUiService {
 				}
 			};
 			executor.execute(task);
-			
-			i++;
 		}
+		
 	}
 	
 	/**
