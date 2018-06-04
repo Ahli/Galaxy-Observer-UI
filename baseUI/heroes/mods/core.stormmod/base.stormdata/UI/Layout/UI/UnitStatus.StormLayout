@@ -10,7 +10,7 @@
   <Constant name="StasisColor" val="E5BE07" />
   <Constant name="TimeStopColor" val="CC0000" />
   <Constant name="InvulnerableColor" val="C67B06" />
-  <Constant name="AbsorbingColor" val="1344BF" />
+  <Constant name="AbsorbingColor" val="EB00B7" />
   <Constant name="UnstoppableColor" val="B163ED" />
   <Constant name="UnkillableColor" val="C67B06" />
   <Constant name="ProtectedColor" val="C67B06" />
@@ -720,7 +720,7 @@
       <State name="Absorbing">
         <When type="AnimationState" UnitStatusValidatorState="CasterIsAbsorbing" />
         <Action type="SetProperty" frame="DebuffLabel" text="@UI/State/Absorbing" />
-        <Action type="SetProperty" frame="DebuffIconLeft" texture="@UI/State/UnstoppableIcon" />
+        <Action type="SetProperty" frame="DebuffIconLeft" texture="@UI/State/AbsorbingIcon" />
         <Action type="SetProperty" frame="DebuffPlateBg" color="#AbsorbingColor" />
       </State>
       <State name="Unstoppable">
@@ -1648,14 +1648,16 @@
         <Anchor side="Right" relative="$parent" pos="Mid" offset="0" />
         <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0" />
         <Validator val="TargetIsProtected" />
-        <Validator val="TargetNotProtected" />
-        <Animation name="ShowHideProtectedHealthBar">
-          <Event event="TargetIsProtected" action="Reset, Play" />
-          <Event event="TargetNotProtected" action="Stop" />
-          <Controller type="Visibility" end="Pause" frame="$parent/InvincibleHealthBarFrame">
-            <Key type="Bool" time="0" value="True" />
-          </Controller>
-        </Animation>
+        <StateGroup name="DebuffState">
+          <DefaultState val="NoState" />
+          <State name="NoState">
+            <When type="AnimationState" UnitStatusValidatorState="NoState" />/&gt;
+                    </State>
+          <State name="Protected">
+            <When type="AnimationState" UnitStatusValidatorState="TargetIsProtected" />
+            <Action type="SetProperty" frame="$parent/InvincibleHealthBarFrame" visible="true" />
+          </State>
+        </StateGroup>
       </Frame>
       <Frame type="Label" name="BotStatusLabel">
         <Anchor side="Top" relative="$parent/HealthBar" pos="Max" offset="8" />
@@ -3661,12 +3663,9 @@
       <VisibleToEnemy val="true" />
       <Width val="193" />
       <Height val="64" />
-      <StateGroup name="BuffState">
-        <State name="Invulnerable">
+      <StateGroup name="ProtectedVisibleState">
+        <State name="ShowProtectedBar">
           <When type="AnimationState" UnitStatusValidatorState="ShowInvulnerableNameplate" />
-          <Action type="SetProperty" frame="DebuffLabel" text="@UI/State/Protected" />
-          <Action type="SetProperty" frame="BuffIconLeft" texture="@UI/State/InvulnerableIcon" />
-          <Action type="SetProperty" frame="BuffPlateBg" color="#UnkillableColor" />
           <Action type="SetProperty" frame="$parent/HealthBarProtected" visible="true" />
         </State>
       </StateGroup>

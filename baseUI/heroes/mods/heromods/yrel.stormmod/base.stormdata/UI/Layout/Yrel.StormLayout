@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<Desc>
+    <Frame type="SelectionUnitStatusPanel" name="YrelStacksFrameContainer">
+        <Anchor relative="$parent"/>
+        <SpecificUnit val="HeroYrel"/>
+        <CheckPassengers val="True"/>
+
+        <Frame type="UnitStatusUnitStackingDebuffElement" name="YrelMaraadsInsightFrame">
+            <Anchor relative="$parent"/>
+            <BuffBehavior val="YrelMaraadsInsightBuff"/>
+            <ShowForBehaviorOwner val="True"/>
+
+            <Frame type="Image" name="YrelMaraadsInsightBase">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="-5"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="-5"/>
+                <Visible val="True"/>
+                <Texture val="@UI/Stacks/Yrel/MaraadsInsight"/>
+            </Frame>
+        </Frame>
+
+        <Frame type="UnitStatusUnitStackingDebuffElement" name="YrelHolyWrathFrame">
+            <Anchor relative="$parent"/>
+            <BuffBehavior val="YrelHolyWrathBuff"/>
+            <ShowForBehaviorOwner val="True"/>
+
+            <Frame type="UnitStatusValidatorAnimElement" name="MaraadsInsightAnchorShift">
+                <Anchor relative="$parent"/>
+                <Validator val="YrelMaraadsInsightCasterDoesNotHaveBuff"/>
+                <Validator val="YrelMaraadsInsightCasterHasBuff"/>
+
+                <StateGroup name="HolyWrathShiftedState">
+                    <DefaultState val="NoState"/>
+                    <State name="NoState">
+                        <When type="AnimationState" UnitStatusValidatorState="NoState"/>
+                    </State>
+
+                    <State name="NotShifted">
+                        <When type="AnimationState" UnitStatusValidatorState="YrelMaraadsInsightCasterDoesNotHaveBuff"/>
+                        <Action type="SetAnchor" frame="YrelHolyWrathBase" side="Left" relative="$parent" pos="Min" offset="-5"/>
+                    </State>
+
+                    <State name="Shifted">
+                        <When type="AnimationState" UnitStatusValidatorState="YrelMaraadsInsightCasterHasBuff"/>
+                        <Action type="SetAnchor" frame="YrelHolyWrathBase" side="Left" relative="$parent/$parent/$parent/YrelMaraadsInsightFrame/YrelMaraadsInsightBase" pos="Max" offset="-10"/>
+                    </State>
+                </StateGroup>
+
+                <Frame type="Image" name="YrelHolyWrathBase">
+                    <Anchor side="Top" relative="$parent" pos="Min" offset="-5"/>
+                    <Visible val="True"/>
+                    <Texture val="@UI/Stacks/Yrel/HolyWrath"/>
+                </Frame>
+            </Frame>
+        </Frame>
+    </Frame>
+
+    <Frame type="SelectionUnitStatusPanel" name="YrelStatusFrame" template="StandardHeroUITemplates/CircularHeroUITemplate">
+        <SpecificUnit val="HeroYrel"/>
+
+        <Frame type="UnitStatusFrame" name="UnitStatusFrame0">
+            <Frame type="Image" name="MechanicTexture">
+                <Visible val="False"/>
+                <Texture val="Assets\Textures\storm_ui_icon_yrel_velens_chosen.dds"/>
+
+                <Frame type="BehaviorIcon" name="YrelVelensChosenTooltip" template="StandardHeroUITemplates/SmallBehaviorTooltiptemplate">
+                    <Anchor relative="$parent"/>
+                    <TooltipFrame val="BehaviorIconTooltip"/>
+                    <Behavior val="YrelVelensChosenAbilityPowerBuff"/>
+                </Frame>
+            </Frame>
+
+            <Frame type="UnitStatusBehaviorIcon" name="YrelVelensChosenStackCountFrame" template="StandardHeroUITemplates/SmallCicularBehaviorStackCountTemplate">
+                <Behavior val="YrelVelensChosenAbilityPowerToken"/>
+            </Frame>
+
+            <Frame type="UnitStatusBehaviorIcon" name="YrelVelensChosenCountdownFrame" template="StandardHeroUITemplates/CircularBehaviorCountdownBarTemplate">
+                <Behavior val="YrelVelensChosenAbilityPowerBuff"/>
+
+                <Frame type="BehaviorIcon" name="BehaviorIcon">
+                    <Frame type="ProgressBar" name="CooldownBar">
+                        <Frame type="Frame" name="FillImageContainer">
+                            <Frame type="Image" name="FillImage">
+                                <ColorAdjustMode val="Colorize"/>
+                                <LightAdjustColor val="ffd973"/>
+                                <DarkAdjustColor val="cc2985"/>
+                            </Frame>
+                        </Frame>
+                    </Frame>
+                </Frame>
+
+                <Animation name="YrelVelensChosenActivate">
+                    <Event event="OnShown" action="Reset, Play"/>
+                    <Event event="OnHidden" action="Stop"/>
+
+                    <Controller type="Texture" end="Pause" frame="$parent/MechanicTexture">
+                        <Key type="Image" time="0" image="Assets\Textures\storm_ui_icon_yrel_velens_chosen_active.dds"/>
+                    </Controller>
+                    <Controller type="Event" end="Stop" frame="$parent/CircularHeroUIEffects">
+                        <Key type="Event" time="0" event="PulseIn"/>
+                    </Controller>
+                </Animation>
+
+                <Animation name="YrelVelensChosenDeactivate">
+                    <Event event="OnHidden" action="Reset, Play"/>
+                    <Event event="OnShown" action="Stop"/>
+
+                    <Controller type="Event" end="Stop" frame="$parent/CircularHeroUIEffects">
+                        <Key type="Event" time="0" event="PulseOut"/>
+                    </Controller>
+                </Animation>
+            </Frame>
+
+            <Frame type="UnitStatusBehaviorAnim" name="YrelVelensChosenUIAnim" template="StandardHeroUITemplates/BehaviorAnimTemplate">
+                <Behavior val="YrelVelensChosenAbilityPowerToken"/>
+
+                <Animation name="ShowMechanicTexture">
+                    <Event event="BehaviorCreate" action="Reset, Play"/>
+                    <Event event="BehaviorDestroy" action="Stop"/>
+
+                    <Controller type="Visibility" end="Pause" frame="$parent/MechanicTexture">
+                        <Key type="Bool" time="0" value="True"/>
+                    </Controller>
+                </Animation>
+            </Frame>
+
+            <Frame type="UnitStatusValidatorAnimElement" name="YrelSamaarasLightHealthIndicatorVisibility">
+                <Anchor relative="$parent"/>
+                <Validator val="YrelSamaarasLightHasTalent"/>
+            </Frame>
+        </Frame>
+
+        <Frame type="Image" name="YrelSamaarasLightHealthIndicator">
+            <Anchor side="Bottom" relative="$parent/$parent/$parent/HeroConsolePanel/HeroStatsFrame/HeroUnitStatusFrame/HealthBar" pos="Mid" offset="9"/>
+            <Anchor side="Left" relative="$parent/$parent/$parent/HeroConsolePanel/HeroStatsFrame/HeroUnitStatusFrame/HealthBar" pos="50%" offset="-16"/>
+            <Texture val="@UI/HeroConsole/Yrel/SamaarasLightHealthIndicator"/>
+            <Unclipped val="True"/>
+            <Visible val="{$parent/UnitStatusFrame0/YrelSamaarasLightHealthIndicatorVisibility/@Visible}"/>
+        </Frame>
+    </Frame>
+
+</Desc>
