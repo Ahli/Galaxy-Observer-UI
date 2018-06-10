@@ -5,12 +5,11 @@ import com.ahli.galaxy.game.GameData;
 import com.ahli.galaxy.ui.interfaces.UICatalog;
 
 import java.io.File;
-import java.io.Serializable;
 
 /**
  * @author Ahli
  */
-public class ModData implements Serializable {
+public class ModData {
 	
 	private GameData gameData;
 	private File sourceDirectory = null;

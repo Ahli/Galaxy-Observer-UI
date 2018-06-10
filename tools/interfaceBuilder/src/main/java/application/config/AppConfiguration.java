@@ -2,6 +2,7 @@ package application.config;
 
 import application.InterfaceBuilderApp;
 import application.baseUi.BaseUiService;
+import application.baseUi.DiscCacheService;
 import application.build.MpqBuilderService;
 import application.compile.CompileService;
 import application.compress.GameService;
@@ -165,4 +166,8 @@ public class AppConfiguration {
 		return new BaseUiService();
 	}
 	
+	@Bean
+	public DiscCacheService discCacheService() {
+		return new DiscCacheService();
+	}
 }

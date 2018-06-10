@@ -7,8 +7,6 @@ package com.ahli.hotkeyUi.application.ui;
  */
 public final class ShowToUserException extends Exception {
 	
-	private static final long serialVersionUID = 6225880770962102124L;
-	
 	/**
 	 * Constructor.
 	 *

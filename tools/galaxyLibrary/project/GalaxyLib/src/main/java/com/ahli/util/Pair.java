@@ -1,16 +1,9 @@
 package com.ahli.util;
 
-import java.io.Serializable;
-
 /**
  * <p> A convenience class to represent name-value pairs. </p>
  */
-public class Pair <K extends Serializable, V extends Serializable> implements Serializable {
-	
-	/**
-	 *
-	 */
-	private static final long serialVersionUID = -1667836105069533647L;
+public class Pair <K, V> {
 	
 	/**
 	 * Key of this <code>Pair</code>.

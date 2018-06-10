@@ -10,15 +10,16 @@ import java.util.List;
  * @author Ahli
  */
 public class UIAnimation extends UIElement {
-	/**
-	 *
-	 */
-	private static final long serialVersionUID = 7493401910318905210L;
-	
 	private List<UIController> controllers;
 	private List<Pair<String, UIAttribute>> events;
 	private boolean nextEventsAdditionShouldOverride;
 	private UIAttribute driver;
+	
+	public UIAnimation(){
+		super(null);
+		events = new ArrayList<>(0);
+		controllers = new ArrayList<>(0);
+	}
 	
 	/**
 	 * @param name

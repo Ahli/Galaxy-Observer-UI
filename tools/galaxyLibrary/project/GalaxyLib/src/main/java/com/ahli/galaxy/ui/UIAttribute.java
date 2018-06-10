@@ -12,12 +12,12 @@ import java.util.List;
  */
 public class UIAttribute extends UIElement {
 	
-	/**
-	 *
-	 */
-	private static final long serialVersionUID = 5420685675382001338L;
-	
 	private final List<String> keyValueList;
+	
+	public UIAttribute(){
+		super(null);
+		keyValueList = new ArrayList<>(0);
+	}
 	
 	/**
 	 * Constructor.

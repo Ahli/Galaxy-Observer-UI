@@ -7,30 +7,44 @@ import application.config.ConfigService;
 import application.integration.FileService;
 import application.integration.SettingsIniInterface;
 import application.projects.enums.Game;
+import com.ahli.galaxy.game.GameData;
 import com.ahli.galaxy.game.def.abstracts.GameDef;
+import com.ahli.galaxy.ui.UICatalogImpl;
+import com.ahli.galaxy.ui.interfaces.UICatalog;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.io.filefilter.TrueFileFilter;
+import org.apache.commons.io.filefilter.WildcardFileFilter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.xml.sax.SAXException;
 
+import javax.xml.parsers.ParserConfigurationException;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.security.InvalidParameterException;
+import java.util.Collection;
 import java.util.concurrent.ThreadPoolExecutor;
 
 @Service
 public class BaseUiService {
 	public static final String UNKNOWN_GAME_EXCEPTION = "Unknown Game";
 	private static final Logger logger = LogManager.getLogger();
+	
+	private final InterfaceBuilderApp app = InterfaceBuilderApp.getInstance();
+	
 	@Autowired
 	ConfigService configService;
 	@Autowired
 	GameService gameService;
 	@Autowired
 	FileService fileService;
+	@Autowired
+	DiscCacheService discCacheService;
 	
 	/**
 	 * Checks if the specified game's baseUI is older than the game files.
@@ -173,4 +187,92 @@ public class BaseUiService {
 				throw new InvalidParameterException(UNKNOWN_GAME_EXCEPTION);
 		}
 	}
+	
+	/**
+	 * Parses the baseUI of the specified game in its own thread. Afterwards, a specified followupTask is executed. The
+	 * parsing of the baseUI is synchronized.
+	 *
+	 * @param game
+	 * 		game whose default UI is parsed
+	 * @param followupTask
+	 * @throws InterruptedException
+	 */
+	public void parseBaseUI(final GameData game, final Runnable followupTask) {
+		// create tasks for the worker pool
+		app.getExecutor().execute(() -> {
+			// lock per game
+			synchronized (game.getGameDef().getName()) {
+				UICatalog uiCatalog = game.getUiCatalog();
+				if (uiCatalog != null) {
+					logger.trace("Aborting parsing baseUI for '" + game.getGameDef().getName() + "' as was already " +
+							"parsed.");
+				} else {
+					uiCatalog = new UICatalogImpl();
+					app.printInfoLogMessageToGeneral("Starting to parse base " + game.getGameDef().getName() +
+							" UI."); //$NON-NLS-1$ //$NON-NLS-2$
+					app.addThreadLoggerTab(Thread.currentThread().getName(), game.getGameDef().getNameHandle() + "UI",
+							true);
+					//$NON-NLS-1$
+					final String gameDir = configService.getBaseUiPath(game.getGameDef()) + File.separator +
+							game.getGameDef().getModsSubDirectory();
+					try {
+						for (final String modOrDir : game.getGameDef().getCoreModsOrDirectories()) {
+							
+							final File directory = new File(gameDir + File.separator + modOrDir);
+							if (!directory.exists() || !directory.isDirectory()) {
+								throw new IOException("BaseUI out of date.");
+							}
+							
+							final Collection<File> descIndexFiles = FileUtils
+									.listFiles(directory, new WildcardFileFilter("DescIndex.*Layout"),
+											TrueFileFilter.INSTANCE); //$NON-NLS-1$
+							logger.info("number of descIndexFiles found: " + descIndexFiles.size()); //$NON-NLS-1$
+							
+							for (final File descIndexFile : descIndexFiles) {
+								logger.info("parsing descIndexFile '" + descIndexFile.getPath() +
+										"'"); //$NON-NLS-1$ //$NON-NLS-2$
+								uiCatalog.processDescIndex(descIndexFile, game.getGameDef().getDefaultRaceId());
+							}
+						}
+						game.setUiCatalog(uiCatalog);
+					} catch (final SAXException | IOException | ParserConfigurationException e) {
+						logger.error("ERROR parsing base UI catalog for '" + game.getGameDef().getName() + "'.", e);
+						//$NON-NLS-1$ //$NON-NLS-2$
+					} catch (final InterruptedException e) {
+						Thread.currentThread().interrupt();
+					} finally {
+						uiCatalog.clearParser();
+					}
+					final String msg = "Finished parsing base UI for " + game.getGameDef().getName() +
+							"."; //$NON-NLS-1$ //$NON-NLS-2$
+					logger.info(msg);
+					app.printInfoLogMessageToGeneral(msg);
+					
+					// TODO caching baseUI
+					try {
+						discCacheService.put(uiCatalog, "test");
+						final UICatalog test = discCacheService.get("test", UICatalogImpl.class);
+					} catch (IOException e) {
+						logger.error("ERROR serializing UI catalog.", e);
+						e.printStackTrace();
+					}
+					
+				}
+			}
+			
+			addTaskToExecutor(followupTask);
+		});
+	}
+	
+	/**
+	 * Adds a task to the executor.
+	 *
+	 * @param followupTask
+	 */
+	private void addTaskToExecutor(final Runnable followupTask) {
+		if (followupTask != null) {
+			app.getExecutor().execute(followupTask);
+		}
+	}
+	
 }

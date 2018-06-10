@@ -9,14 +9,16 @@ import java.util.List;
  * @author Ahli
  */
 public class UIController extends UIElement {
-	/**
-	 *
-	 */
-	private static final long serialVersionUID = -5133613746543071378L;
 	private final List<String> attributesKeyValueList;
 	private List<UIAttribute> keys;
 	private boolean nextAdditionShouldOverride;
 	private boolean nameIsImplicit = true;
+	
+	public UIController(){
+		super(null);
+		attributesKeyValueList = new ArrayList<>(0);
+		keys = new ArrayList<>(0);
+	}
 	
 	/**
 	 * @param name

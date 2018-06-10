@@ -6,12 +6,11 @@ import com.ahli.galaxy.ui.abstracts.UIElement;
  * @author Ahli
  */
 public class UIConstant extends UIElement {
-	/**
-	 *
-	 */
-	private static final long serialVersionUID = -1827619598265805855L;
-	
 	private String value;
+	
+	public UIConstant(){
+		super(null);
+	}
 	
 	/**
 	 * @param name

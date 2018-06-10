@@ -1,6 +1,7 @@
 package application.build;
 
 import application.InterfaceBuilderApp;
+import application.baseUi.BaseUiService;
 import application.compile.CompileService;
 import application.compress.RuleSet;
 import application.config.ConfigService;
@@ -61,6 +62,8 @@ public class MpqBuilderService {
 	
 	@Autowired
 	private ProjectService projectService;
+	@Autowired
+	private BaseUiService baseUiService;
 	
 	/**
 	 * Finds and builds a project based on the specified path.
@@ -226,9 +229,20 @@ public class MpqBuilderService {
 			verifyLayout = settings.isGuiVerifyLayout();
 		}
 		if (gameData.getUiCatalog() == null && verifyLayout) {
-			parseBaseUI(gameData, followupTask);
+			baseUiService.parseBaseUI(gameData, followupTask);
 		} else {
 			addTaskToExecutor(followupTask);
+		}
+	}
+	
+	/**
+	 * Adds a task to the executor.
+	 *
+	 * @param followupTask
+	 */
+	private void addTaskToExecutor(final Runnable followupTask) {
+		if (followupTask != null) {
+			app.getExecutor().execute(followupTask);
 		}
 	}
 	
@@ -368,82 +382,6 @@ public class MpqBuilderService {
 		}
 	}
 	
-	/**
-	 * Parses the baseUI of the specified game in its own thread. Afterwards, a specified followupTask is executed. The
-	 * parsing of the baseUI is synchronized.
-	 *
-	 * @param game
-	 * 		game whose default UI is parsed
-	 * @param followupTask
-	 * @throws InterruptedException
-	 */
-	private void parseBaseUI(final GameData game, final Runnable followupTask) {
-		// create tasks for the worker pool
-		app.getExecutor().execute(() -> {
-			// lock per game
-			synchronized (game.getGameDef().getName()) {
-				UICatalog uiCatalog = game.getUiCatalog();
-				if (uiCatalog != null) {
-					logger.trace("Aborting parsing baseUI for '" + game.getGameDef().getName() + "' as was already " +
-							"parsed.");
-				} else {
-					uiCatalog = new UICatalogImpl();
-					app.printInfoLogMessageToGeneral("Starting to parse base " + game.getGameDef().getName() +
-							" UI."); //$NON-NLS-1$ //$NON-NLS-2$
-					app.addThreadLoggerTab(Thread.currentThread().getName(), game.getGameDef().getNameHandle() + "UI",
-							true);
-					//$NON-NLS-1$
-					final String gameDir = configService.getBaseUiPath(game.getGameDef()) + File.separator +
-							game.getGameDef().getModsSubDirectory();
-					try {
-						for (final String modOrDir : game.getGameDef().getCoreModsOrDirectories()) {
-							
-							final File directory = new File(gameDir + File.separator + modOrDir);
-							if (!directory.exists() || !directory.isDirectory()) {
-								throw new IOException("BaseUI out of date.");
-							}
-							
-							final Collection<File> descIndexFiles = FileUtils
-									.listFiles(directory, new WildcardFileFilter("DescIndex.*Layout"),
-											TrueFileFilter.INSTANCE); //$NON-NLS-1$
-							logger.info("number of descIndexFiles found: " + descIndexFiles.size()); //$NON-NLS-1$
-							
-							for (final File descIndexFile : descIndexFiles) {
-								logger.info("parsing descIndexFile '" + descIndexFile.getPath() +
-										"'"); //$NON-NLS-1$ //$NON-NLS-2$
-								uiCatalog.processDescIndex(descIndexFile, game.getGameDef().getDefaultRaceId());
-							}
-						}
-						game.setUiCatalog(uiCatalog);
-					} catch (final SAXException | IOException | ParserConfigurationException e) {
-						logger.error("ERROR parsing base UI catalog for '" + game.getGameDef().getName() + "'.", e);
-						//$NON-NLS-1$ //$NON-NLS-2$
-					} catch (final InterruptedException e) {
-						Thread.currentThread().interrupt();
-					} finally {
-						uiCatalog.clearParser();
-					}
-					final String msg = "Finished parsing base UI for " + game.getGameDef().getName() +
-							"."; //$NON-NLS-1$ //$NON-NLS-2$
-					logger.info(msg);
-					app.printInfoLogMessageToGeneral(msg);
-				}
-			}
-			
-			addTaskToExecutor(followupTask);
-		});
-	}
-	
-	/**
-	 * Adds a task to the executor.
-	 *
-	 * @param followupTask
-	 */
-	private void addTaskToExecutor(final Runnable followupTask) {
-		if (followupTask != null) {
-			app.getExecutor().execute(followupTask);
-		}
-	}
 	
 	/**
 	 * @param compressMpqSetting

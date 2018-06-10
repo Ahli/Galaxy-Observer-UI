@@ -1,17 +1,13 @@
 package com.ahli.galaxy.ui.abstracts;
 
 import com.ahli.util.DeepCopyable;
-
-import java.io.Serializable;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
 /**
  * @author Ahli
  */
-public abstract class UIElement implements Serializable, DeepCopyable {
-	/**
-	 *
-	 */
-	private static final long serialVersionUID = -9128521308405405698L;
+@JsonTypeInfo(use= JsonTypeInfo.Id.MINIMAL_CLASS)
+public abstract class UIElement implements DeepCopyable {
 	
 	private String name;
 	

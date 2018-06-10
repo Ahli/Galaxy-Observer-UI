@@ -17,16 +17,16 @@ public class UIFrame extends UIElement {
 	private static final String[] POSI = { "Min", "Max" };
 	private static final String ZERO = "0";
 	
-	/**
-	 *
-	 */
-	private static final long serialVersionUID = -4610017347746925885L;
 	private final String[] pos = new String[4];
 	private final String[] offset = new String[4];
 	private final String[] relative = new String[4];
 	private List<UIAttribute> attributes;
 	private String type;
 	private List<UIElement> children;
+	
+	public UIFrame(){
+		super(null);
+	}
 	
 	/**
 	 * @param name

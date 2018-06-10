@@ -2,18 +2,12 @@ package com.ahli.galaxy.ui;
 
 import com.ahli.galaxy.ui.abstracts.UIElement;
 import com.ahli.util.DeepCopyable;
-
-import java.io.Serializable;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
 /**
  * @author Ahli
  */
-public class UITemplate implements Serializable, DeepCopyable {
-	/**
-	 *
-	 */
-	private static final long serialVersionUID = 7686203678975623860L;
-	
+public class UITemplate implements DeepCopyable {
 	private String fileName;
 	private UIElement element;
 	private boolean isLocked;
@@ -25,6 +19,9 @@ public class UITemplate implements Serializable, DeepCopyable {
 	public UITemplate(final String fileName, final UIElement element) {
 		this.fileName = fileName;
 		this.element = element;
+	}
+	
+	public UITemplate(){
 	}
 	
 	/**

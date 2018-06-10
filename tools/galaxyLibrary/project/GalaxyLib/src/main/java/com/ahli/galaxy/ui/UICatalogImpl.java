@@ -6,6 +6,7 @@ import com.ahli.galaxy.parser.interfaces.XmlParser;
 import com.ahli.galaxy.ui.abstracts.UIElement;
 import com.ahli.galaxy.ui.exception.UIException;
 import com.ahli.galaxy.ui.interfaces.UICatalog;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.xml.sax.SAXException;
@@ -23,8 +24,10 @@ import java.util.List;
  */
 public class UICatalogImpl implements UICatalog {
 	
+	@JsonIgnore
 	private static final Logger logger = LogManager.getLogger();
 	
+	@JsonIgnore
 	private transient UICatalogParser parser = null;
 	
 	// members
@@ -35,6 +38,7 @@ public class UICatalogImpl implements UICatalog {
 	private List<String> blizzOnlyLayouts;
 	
 	// internal, used during processing
+	@JsonIgnore
 	private String curBasePath;
 	
 	/**

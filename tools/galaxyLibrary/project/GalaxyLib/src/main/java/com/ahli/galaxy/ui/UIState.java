@@ -9,15 +9,17 @@ import java.util.List;
  * @author Ahli
  */
 public class UIState extends UIElement {
-	/**
-	 *
-	 */
-	private static final long serialVersionUID = -2094212167992593460L;
 	
 	private List<UIAttribute> whens;
 	private List<UIAttribute> actions;
 	private boolean nextAdditionShouldOverrideWhens;
 	private boolean nextAdditionShouldOverrideActions;
+	
+	public UIState(){
+		super(null);
+		whens = new ArrayList<>(0);
+		actions = new ArrayList<>(0);
+	}
 	
 	/**
 	 * @param name

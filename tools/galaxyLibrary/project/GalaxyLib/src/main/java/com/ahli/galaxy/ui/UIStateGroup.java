@@ -10,13 +10,13 @@ import java.util.List;
  */
 public class UIStateGroup extends UIElement {
 	
-	/**
-	 *
-	 */
-	private static final long serialVersionUID = 6020966617264020882L;
-	
 	private String defaultState;
 	private List<UIState> states;
+	
+	public UIStateGroup() {
+		super(null);
+		states = new ArrayList<>(0);
+	}
 	
 	/**
 	 * @param name

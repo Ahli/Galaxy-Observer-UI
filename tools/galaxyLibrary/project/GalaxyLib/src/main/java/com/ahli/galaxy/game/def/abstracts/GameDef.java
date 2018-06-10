@@ -1,12 +1,11 @@
 package com.ahli.galaxy.game.def.abstracts;
 
-import java.io.Serializable;
 import java.util.Arrays;
 
 /**
  * @author Ahli
  */
-public abstract class GameDef implements Serializable {
+public abstract class GameDef {
 	private String[] coreModsOrDirectories = null;
 	private String defaultRaceId = "Terr";
 	private String documentsGameDirectoryName = "StarCraft II";

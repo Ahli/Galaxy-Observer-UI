@@ -3,7 +3,6 @@ package com.ahli.galaxy.game;
 import com.ahli.galaxy.game.def.abstracts.GameDef;
 import com.ahli.galaxy.ui.interfaces.UICatalog;
 
-import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -12,11 +11,11 @@ import java.util.Map;
  *
  * @author Ahli
  */
-public class GameData implements Serializable {
+public class GameData {
 	
 	private GameDef gameDef;
 	private UICatalog uiCatalog;
-	private Map<Serializable, Serializable> keyValueStore = new HashMap<>();
+	private Map<Object, Object> keyValueStore = new HashMap<>();
 	
 	/**
 	 * Constructor.
@@ -62,14 +61,14 @@ public class GameData implements Serializable {
 	/**
 	 * @return
 	 */
-	public Map<Serializable, Serializable> getKeyValueStore() {
+	public Map<Object, Object> getKeyValueStore() {
 		return keyValueStore;
 	}
 	
 	/**
 	 * @param keyValueStore
 	 */
-	public void setKeyValueStore(final Map<Serializable, Serializable> keyValueStore) {
+	public void setKeyValueStore(final Map<Object, Object> keyValueStore) {
 		this.keyValueStore = keyValueStore;
 	}
 	

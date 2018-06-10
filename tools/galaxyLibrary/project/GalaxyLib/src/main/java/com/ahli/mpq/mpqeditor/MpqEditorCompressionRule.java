@@ -2,9 +2,7 @@ package com.ahli.mpq.mpqeditor;
 
 import com.ahli.util.DeepCopyable;
 
-import java.io.Serializable;
-
-public abstract class MpqEditorCompressionRule implements DeepCopyable, Serializable {
+public abstract class MpqEditorCompressionRule implements DeepCopyable {
 	private boolean singleUnit = false;
 	private boolean compress = false;
 	private boolean encrypt = false;
