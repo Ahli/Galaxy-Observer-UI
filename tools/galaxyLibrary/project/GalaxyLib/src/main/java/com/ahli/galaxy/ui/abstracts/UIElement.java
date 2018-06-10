@@ -6,7 +6,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 /**
  * @author Ahli
  */
-@JsonTypeInfo(use= JsonTypeInfo.Id.MINIMAL_CLASS)
+@JsonTypeInfo (use = JsonTypeInfo.Id.MINIMAL_CLASS)
 public abstract class UIElement implements DeepCopyable {
 	
 	private String name;

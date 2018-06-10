@@ -14,7 +14,7 @@ public class UIAttribute extends UIElement {
 	
 	private final List<String> keyValueList;
 	
-	public UIAttribute(){
+	public UIAttribute() {
 		super(null);
 		keyValueList = new ArrayList<>(0);
 	}

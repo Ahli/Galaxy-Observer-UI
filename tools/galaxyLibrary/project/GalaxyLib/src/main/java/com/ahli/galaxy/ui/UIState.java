@@ -15,7 +15,7 @@ public class UIState extends UIElement {
 	private boolean nextAdditionShouldOverrideWhens;
 	private boolean nextAdditionShouldOverrideActions;
 	
-	public UIState(){
+	public UIState() {
 		super(null);
 		whens = new ArrayList<>(0);
 		actions = new ArrayList<>(0);

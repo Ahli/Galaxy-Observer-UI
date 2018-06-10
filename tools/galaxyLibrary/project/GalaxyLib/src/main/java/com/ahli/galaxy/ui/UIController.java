@@ -14,7 +14,7 @@ public class UIController extends UIElement {
 	private boolean nextAdditionShouldOverride;
 	private boolean nameIsImplicit = true;
 	
-	public UIController(){
+	public UIController() {
 		super(null);
 		attributesKeyValueList = new ArrayList<>(0);
 		keys = new ArrayList<>(0);

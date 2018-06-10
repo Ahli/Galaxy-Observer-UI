@@ -15,7 +15,7 @@ public class UIAnimation extends UIElement {
 	private boolean nextEventsAdditionShouldOverride;
 	private UIAttribute driver;
 	
-	public UIAnimation(){
+	public UIAnimation() {
 		super(null);
 		events = new ArrayList<>(0);
 		controllers = new ArrayList<>(0);

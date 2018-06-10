@@ -2,7 +2,6 @@ package com.ahli.galaxy.ui;
 
 import com.ahli.galaxy.ui.abstracts.UIElement;
 import com.ahli.util.DeepCopyable;
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
 /**
  * @author Ahli
@@ -21,7 +20,7 @@ public class UITemplate implements DeepCopyable {
 		this.element = element;
 	}
 	
-	public UITemplate(){
+	public UITemplate() {
 	}
 	
 	/**

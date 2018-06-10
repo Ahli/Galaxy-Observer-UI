@@ -8,7 +8,7 @@ import com.ahli.galaxy.ui.abstracts.UIElement;
 public class UIConstant extends UIElement {
 	private String value;
 	
-	public UIConstant(){
+	public UIConstant() {
 		super(null);
 	}
 	

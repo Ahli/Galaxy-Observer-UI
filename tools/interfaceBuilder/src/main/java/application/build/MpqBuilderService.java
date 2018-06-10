@@ -16,14 +16,9 @@ import com.ahli.galaxy.archive.DescIndexData;
 import com.ahli.galaxy.game.GameData;
 import com.ahli.galaxy.game.def.abstracts.GameDef;
 import com.ahli.galaxy.ui.DescIndexReader;
-import com.ahli.galaxy.ui.UICatalogImpl;
-import com.ahli.galaxy.ui.interfaces.UICatalog;
 import com.ahli.mpq.MpqEditorInterface;
 import com.ahli.mpq.MpqException;
 import com.ahli.mpq.mpqeditor.MpqEditorCompression;
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.filefilter.TrueFileFilter;
-import org.apache.commons.io.filefilter.WildcardFileFilter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,7 +29,6 @@ import javax.xml.parsers.ParserConfigurationException;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.FileSystemException;
-import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
@@ -236,17 +230,6 @@ public class MpqBuilderService {
 	}
 	
 	/**
-	 * Adds a task to the executor.
-	 *
-	 * @param followupTask
-	 */
-	private void addTaskToExecutor(final Runnable followupTask) {
-		if (followupTask != null) {
-			app.getExecutor().execute(followupTask);
-		}
-	}
-	
-	/**
 	 * Builds MPQ Archive File. Run this in its own thread! Conditions: - Specified MpqInterface requires a unique cache
 	 * path for multithreading.
 	 *
@@ -382,6 +365,16 @@ public class MpqBuilderService {
 		}
 	}
 	
+	/**
+	 * Adds a task to the executor.
+	 *
+	 * @param followupTask
+	 */
+	private void addTaskToExecutor(final Runnable followupTask) {
+		if (followupTask != null) {
+			app.getExecutor().execute(followupTask);
+		}
+	}
 	
 	/**
 	 * @param compressMpqSetting

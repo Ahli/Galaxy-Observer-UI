@@ -24,7 +24,7 @@ public class UIFrame extends UIElement {
 	private String type;
 	private List<UIElement> children;
 	
-	public UIFrame(){
+	public UIFrame() {
 		super(null);
 	}
 	
