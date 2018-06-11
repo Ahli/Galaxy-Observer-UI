@@ -1,12 +1,14 @@
 package com.ahli.galaxy.ui.abstracts;
 
 import com.ahli.util.DeepCopyable;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
 /**
  * @author Ahli
  */
 @JsonTypeInfo (use = JsonTypeInfo.Id.MINIMAL_CLASS)
+@JsonInclude (JsonInclude.Include.NON_EMPTY)
 public abstract class UIElement implements DeepCopyable {
 	
 	private String name;

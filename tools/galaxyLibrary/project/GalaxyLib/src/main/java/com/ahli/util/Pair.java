@@ -1,8 +1,11 @@
 package com.ahli.util;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+
 /**
  * <p> A convenience class to represent name-value pairs. </p>
  */
+@JsonInclude (JsonInclude.Include.NON_EMPTY)
 public class Pair <K, V> {
 	
 	/**

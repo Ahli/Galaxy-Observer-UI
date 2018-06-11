@@ -2,14 +2,16 @@ package com.ahli.galaxy.ui;
 
 import com.ahli.galaxy.ui.abstracts.UIElement;
 import com.ahli.util.DeepCopyable;
+import com.fasterxml.jackson.annotation.JsonInclude;
 
 /**
  * @author Ahli
  */
+@JsonInclude (JsonInclude.Include.NON_DEFAULT)
 public class UITemplate implements DeepCopyable {
 	private String fileName;
 	private UIElement element;
-	private boolean isLocked;
+	private boolean isLocked = false;
 	
 	/**
 	 * @param fileName

@@ -1,6 +1,7 @@
 package com.ahli.galaxy.ui;
 
 import com.ahli.galaxy.ui.abstracts.UIElement;
+import com.fasterxml.jackson.annotation.JsonInclude;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,6 +13,7 @@ import java.util.List;
  * NOTES: using null for certain often occurring values did not yield in
  * performance improvements
  */
+@JsonInclude (JsonInclude.Include.NON_EMPTY)
 public class UIFrame extends UIElement {
 	private static final String THIS = "$this";
 	private static final String[] POSI = { "Min", "Max" };

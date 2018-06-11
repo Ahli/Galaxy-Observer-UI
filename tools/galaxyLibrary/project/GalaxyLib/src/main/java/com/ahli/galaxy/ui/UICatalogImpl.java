@@ -7,6 +7,7 @@ import com.ahli.galaxy.ui.abstracts.UIElement;
 import com.ahli.galaxy.ui.exception.UIException;
 import com.ahli.galaxy.ui.interfaces.UICatalog;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.xml.sax.SAXException;
@@ -22,6 +23,7 @@ import java.util.List;
  *
  * @author Ahli
  */
+@JsonInclude (JsonInclude.Include.NON_EMPTY)
 public class UICatalogImpl implements UICatalog {
 	
 	@JsonIgnore

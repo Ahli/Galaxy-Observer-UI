@@ -1,10 +1,12 @@
 package com.ahli.galaxy.ui;
 
 import com.ahli.galaxy.ui.abstracts.UIElement;
+import com.fasterxml.jackson.annotation.JsonInclude;
 
 /**
  * @author Ahli
  */
+@JsonInclude (JsonInclude.Include.NON_EMPTY)
 public class UIConstant extends UIElement {
 	private String value;
 	

@@ -1,6 +1,7 @@
 package com.ahli.galaxy.ui;
 
 import com.ahli.galaxy.ui.abstracts.UIElement;
+import com.fasterxml.jackson.annotation.JsonInclude;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -8,6 +9,7 @@ import java.util.List;
 /**
  * @author Ahli
  */
+@JsonInclude (JsonInclude.Include.NON_EMPTY)
 public class UIStateGroup extends UIElement {
 	
 	private String defaultState;
