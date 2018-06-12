@@ -57,6 +57,11 @@ public class AppConfiguration {
 	}
 	
 	@Bean
+	public String cachePath() {
+		return System.getProperty("user.home") + File.separator + ".GalaxyObsUI" + File.separator + "cache";
+	}
+	
+	@Bean
 	public MpqEditorInterface mpqEditorInterface() {
 		return new MpqEditorInterface(mpqCachePath(), mpqEditorPath());
 	}

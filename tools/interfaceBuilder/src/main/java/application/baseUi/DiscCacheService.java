@@ -23,10 +23,9 @@ public class DiscCacheService {
 	 * @param id
 	 * @throws IOException
 	 */
-	public void put(final UICatalog catalog, final String id) throws IOException {
+	public void put(final UICatalog catalog, final String id, final boolean isPtr) throws IOException {
 		final ObjectMapper objMapper = new ObjectMapper();
-		final String path = configService.getBasePath() + File.separator + "Cache" + File.separator + id + ".zip";
-		final File f = new File(path);
+		final File f = getCacheFile(id, isPtr);
 		Files.createDirectories(f.getParentFile().toPath());
 		Files.deleteIfExists(f.toPath());
 		
@@ -38,20 +37,50 @@ public class DiscCacheService {
 	
 	/**
 	 * @param id
+	 * @return
+	 */
+	private File getCacheFile(final String id, final boolean isPtr) {
+		final String path = configService.getCachePath() + File.separator + id + (isPtr ? " PTR" : "") + ".zip";
+		return new File(path);
+	}
+	
+	/**
+	 * @param id
+	 * @param isPtr
 	 * @param clazz
 	 * @param <T>
 	 * @return
 	 * @throws IOException
 	 */
-	public <T> T get(final String id, final Class<T> clazz) throws IOException {
+	public <T> T get(final String id, final boolean isPtr, final Class<T> clazz) throws IOException {
 		final T catalog;
 		final ObjectMapper objMapper = new ObjectMapper();
-		final String path = configService.getBasePath() + File.separator + "Cache" + File.separator + id + ".zip";
-		final File f = new File(path);
+		final File f = getCacheFile(id, isPtr);
 		try (final ZipInputStream in = new ZipInputStream(new FileInputStream(f))) {
 			in.getNextEntry();
 			catalog = objMapper.readValue(in, clazz);
 		}
 		return catalog;
+	}
+	
+	/**
+	 * @param id
+	 * @param isPtr
+	 * @throws IOException
+	 */
+	public void remove(final String id, final boolean isPtr) throws IOException {
+		final File f = getCacheFile(id, isPtr);
+		if (f.exists()) {
+			Files.delete(f.toPath());
+		}
+	}
+	
+	/**
+	 * @param id
+	 * @param isPtr
+	 * @return
+	 */
+	public boolean exists(final String id, final boolean isPtr) {
+		return getCacheFile(id, isPtr).exists();
 	}
 }

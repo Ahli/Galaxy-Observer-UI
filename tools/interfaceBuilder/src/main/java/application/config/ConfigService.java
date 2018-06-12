@@ -46,6 +46,10 @@ public class ConfigService {
 	@Qualifier ("cascExtractorConsoleExeFile")
 	private File cascExtractorConsoleExeFile;
 	
+	@Autowired
+	@Qualifier ("cachePath")
+	private String cachePath;
+	
 	public String getMpqEditorPath() {
 		return mpqEditorPath;
 	}
@@ -80,5 +84,9 @@ public class ConfigService {
 	
 	public File getCascExtractorConsoleExeFile() {
 		return cascExtractorConsoleExeFile;
+	}
+	
+	public String getCachePath() {
+		return cachePath;
 	}
 }

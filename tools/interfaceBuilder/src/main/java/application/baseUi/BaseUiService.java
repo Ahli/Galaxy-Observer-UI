@@ -110,6 +110,7 @@ public class BaseUiService {
 				return;
 			}
 			fileService.cleanDirectory(destination);
+			discCacheService.remove(game.name(), configService.getIniSettings().isHeroesPtrActive());
 		} catch (final IOException e) {
 			logger.error(String.format("Directory %s could not be cleaned.", destination), e);
 			return;
@@ -136,7 +137,7 @@ public class BaseUiService {
 					is.close();
 					
 				} catch (final IOException e) {
-					logger.error("Extracting files from CASC via CascExtractor failed.", e); //$NON-NLS-1$
+					logger.error("Extracting files from CASC via CascExtractor failed.", e);
 				} catch (final InterruptedException e) {
 					Thread.currentThread().interrupt();
 				}
@@ -203,60 +204,67 @@ public class BaseUiService {
 			// lock per game
 			synchronized (game.getGameDef().getName()) {
 				UICatalog uiCatalog = game.getUiCatalog();
+				final String gameName = game.getGameDef().getName();
 				if (uiCatalog != null) {
-					logger.trace("Aborting parsing baseUI for '" + game.getGameDef().getName() + "' as was already " +
-							"parsed.");
+					logger.trace("Aborting parsing baseUI for '" + gameName + "' as was already " + "parsed.");
 				} else {
-					uiCatalog = new UICatalogImpl();
-					app.printInfoLogMessageToGeneral("Starting to parse base " + game.getGameDef().getName() +
-							" UI."); //$NON-NLS-1$ //$NON-NLS-2$
-					app.addThreadLoggerTab(Thread.currentThread().getName(), game.getGameDef().getNameHandle() + "UI",
-							true);
-					//$NON-NLS-1$
-					final String gameDir = configService.getBaseUiPath(game.getGameDef()) + File.separator +
-							game.getGameDef().getModsSubDirectory();
-					try {
-						for (final String modOrDir : game.getGameDef().getCoreModsOrDirectories()) {
-							
-							final File directory = new File(gameDir + File.separator + modOrDir);
-							if (!directory.exists() || !directory.isDirectory()) {
-								throw new IOException("BaseUI out of date.");
-							}
-							
-							final Collection<File> descIndexFiles = FileUtils
-									.listFiles(directory, new WildcardFileFilter("DescIndex.*Layout"),
-											TrueFileFilter.INSTANCE); //$NON-NLS-1$
-							logger.info("number of descIndexFiles found: " + descIndexFiles.size()); //$NON-NLS-1$
-							
-							for (final File descIndexFile : descIndexFiles) {
-								logger.info("parsing descIndexFile '" + descIndexFile.getPath() +
-										"'"); //$NON-NLS-1$ //$NON-NLS-2$
-								uiCatalog.processDescIndex(descIndexFile, game.getGameDef().getDefaultRaceId());
-							}
+					boolean needToParseAgain = true;
+					boolean isPtr = configService.getIniSettings().isHeroesPtrActive();
+					if (discCacheService.exists(gameName, isPtr)) {
+						// load from cache
+						try {
+							uiCatalog = discCacheService.get(gameName, isPtr, UICatalogImpl.class);
+							game.setUiCatalog(uiCatalog);
+							needToParseAgain = false;
+							logger.trace("Loaded UI from cache");
+						} catch (final IOException e) {
+							logger.warn("ERROR: loading cached base UI failed.", e);
 						}
-						game.setUiCatalog(uiCatalog);
-					} catch (final SAXException | IOException | ParserConfigurationException e) {
-						logger.error("ERROR parsing base UI catalog for '" + game.getGameDef().getName() + "'.", e);
-						//$NON-NLS-1$ //$NON-NLS-2$
-					} catch (final InterruptedException e) {
-						Thread.currentThread().interrupt();
-					} finally {
-						uiCatalog.clearParser();
 					}
-					final String msg = "Finished parsing base UI for " + game.getGameDef().getName() +
-							"."; //$NON-NLS-1$ //$NON-NLS-2$
-					logger.info(msg);
-					app.printInfoLogMessageToGeneral(msg);
-					
-					// TODO caching baseUI
-					try {
-						discCacheService.put(uiCatalog, "test");
-						final UICatalog test = discCacheService.get("test", UICatalogImpl.class);
-					} catch (IOException e) {
-						logger.error("ERROR serializing UI catalog.", e);
-						e.printStackTrace();
+					if (needToParseAgain) {
+						// parse baseUI
+						uiCatalog = new UICatalogImpl();
+						app.printInfoLogMessageToGeneral("Starting to parse base " + gameName + " UI.");
+						app.addThreadLoggerTab(Thread.currentThread().getName(),
+								game.getGameDef().getNameHandle() + "UI", true);
+						final String gameDir = configService.getBaseUiPath(game.getGameDef()) + File.separator +
+								game.getGameDef().getModsSubDirectory();
+						try {
+							for (final String modOrDir : game.getGameDef().getCoreModsOrDirectories()) {
+								
+								final File directory = new File(gameDir + File.separator + modOrDir);
+								if (!directory.exists() || !directory.isDirectory()) {
+									throw new IOException("BaseUI out of date.");
+								}
+								
+								final Collection<File> descIndexFiles = FileUtils
+										.listFiles(directory, new WildcardFileFilter("DescIndex.*Layout"),
+												TrueFileFilter.INSTANCE);
+								logger.info("number of descIndexFiles found: " + descIndexFiles.size());
+								
+								for (final File descIndexFile : descIndexFiles) {
+									logger.info("parsing descIndexFile '" + descIndexFile.getPath() + "'");
+									uiCatalog.processDescIndex(descIndexFile, game.getGameDef().getDefaultRaceId());
+								}
+							}
+							game.setUiCatalog(uiCatalog);
+						} catch (final SAXException | IOException | ParserConfigurationException e) {
+							logger.error("ERROR parsing base UI catalog for '" + gameName + "'.", e);
+						} catch (final InterruptedException e) {
+							Thread.currentThread().interrupt();
+						} finally {
+							uiCatalog.clearParser();
+						}
+						final String msg = "Finished parsing base UI for " + gameName + ".";
+						logger.info(msg);
+						app.printInfoLogMessageToGeneral(msg);
+						try {
+							discCacheService
+									.put(uiCatalog, gameName, configService.getIniSettings().isHeroesPtrActive());
+						} catch (final IOException e) {
+							logger.error("ERROR when creating cache file of UI", e);
+						}
 					}
-					
 				}
 			}
 			
