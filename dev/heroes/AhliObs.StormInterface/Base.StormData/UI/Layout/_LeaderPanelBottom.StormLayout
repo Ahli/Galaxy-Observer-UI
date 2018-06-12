@@ -1163,6 +1163,321 @@
 		</StateGroup>
 	</Frame>
 	
+
+	<Frame type="UnitStatusTalentIcon" name="TalentTreeIconHybridTemplate">
+		<Unclipped val="true"/>
+		
+		<Frame type="Image" name="IconBackgroundImage">
+			<Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+			<Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+			<Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+			<Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+			<Width val="36"/>
+			<Height val="36"/>
+			<RenderPriority val="510"/>
+		</Frame>
+		
+		<Frame type="Image" name="IconBorderImage">
+			<Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+			<Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+			<Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+			<Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+			<Width val="40"/>
+			<Height val="40"/>
+			<Alpha val="#talentBorderAlpha2"/>
+			<Unclipped val="true"/>
+			<RenderPriority val="531"/>
+		</Frame>
+		
+		<Frame type="Image" name="IconImage">
+			<Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+			<Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+			<Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+			<Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+			<Width val="40"/>
+			<Height val="40"/>
+			<ImageMaskTexture val="_Assets\Textures\talentIconAlphaMask.dds"/>
+			<RenderPriority val="531"/>
+		</Frame>
+		
+		<!-- Custom highlight image that should be blended in when mouse hovers over the time. -->
+		<Frame type="Image" name="IconBorderImageHighlight">
+			<Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+			<Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+			<Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+			<Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+			<Width val="48"/>
+			<Height val="48"/>
+			<Texture val="_Assets\Textures\talentIconHighlight.dds"/>
+			<Visible val="false"/>
+			<Alpha val="0"/>
+			<RenderPriority val="700"/>
+			<IgnoreParentColor val="true"/>
+			<Unclipped val="true"/>
+		</Frame>
+		<Animation name="MouseHighlight">
+			<Event event="OnMouseEnter" action="DirectionForward,Play"/>
+			<Event event="OnMouseExit" action="DirectionReverse,Play"/>
+			
+			<Controller type="Fade" end="Pause" frame="IconBorderImageHighlight">
+				<Key type="Curve" time="0" value="0"/>
+				<Key type="Curve" time="0.25" value="0"/>
+				<Key type="Curve" time="0.5" value="255"/>
+				<Key type="Curve" time="1.0" value="255"/>
+			</Controller>
+		</Animation>
+		
+		<!-- @Override -->
+		<StateGroup name="TalentTierState">
+			<DefaultState val="TalentTierNotAvailable"/>
+			<State name="TierHidden">
+				<When type="AnimationState" frame="$this" TalentTierState="TierHidden"/>
+				<Action type="SetProperty" frame="$this" visible="false"/>
+				<Action type="SetProperty" frame="$this/IconImage" texture="_Assets\Textures\transparent.dds"/>
+				<Action type="SetProperty" frame="$this/IconBorderImage" alpha="#lockedTalentBorderAlpha"/>
+				<Action type="SetProperty" frame="$this/IconBorderImage" desaturated="true"/>
+				<Action type="SetProperty" frame="$this/IconBackgroundImage" alpha="100"/>
+			</State>
+			<State name="TalentTierNotAvailable">
+				<When type="AnimationState" frame="$this" TalentTierState="TierNotAvailable"/>
+				<When type="AnimationState" frame="$this" TalentTypeState="TypeTalent"/>
+				<Action type="SetProperty" frame="$this/IconImage" visible="false"/>
+				<Action type="SetProperty" frame="$this/IconImage" texture="_Assets\Textures\transparent.dds"/>
+				<Action type="SetProperty" frame="$this" visible="true"/>
+				<Action type="SetProperty" frame="IconBorderImageHighlight" visible="false"/>
+				<Action type="SetProperty" frame="$this/IconBorderImage" alpha="#lockedTalentBorderAlpha"/>
+				<Action type="SetProperty" frame="$this/IconBorderImage" desaturated="true"/>
+				<Action type="SetProperty" frame="$this/IconBackgroundImage" alpha="100"/>
+			</State>
+			<State name="TalentTierAvailable">
+				<When type="AnimationState" frame="$this" TalentTierState="TierAvailable"/>
+				<When type="AnimationState" frame="$this" TalentTypeState="TypeTalent"/>
+				<Action type="SetProperty" frame="$this" visible="true"/>
+				<Action type="SetProperty" frame="IconBorderImageHighlight" visible="true"/>
+				<Action type="SetProperty" frame="$this/IconImage" visible="true"/>
+				<Action type="SetProperty" frame="$this/IconImage" texture="@UI/Storm_UI_InGame_Leader_Talent_Unselected"/>
+				<Action type="SetProperty" frame="$this/IconBorderImage" alpha="255"/>
+				<Action type="SetProperty" frame="$this/IconBorderImage" desaturated="false"/>
+				<Action type="SetProperty" frame="$this/IconBackgroundImage" alpha="255"/>
+			</State>
+			<State name="TalentTierSelected">
+				<When type="AnimationState" frame="$this" TalentTierState="TierSelected"/>
+				<When type="AnimationState" frame="$this" operator="NotEqual" TalentTypeState="TypeUltimate"/>
+				<Action type="SetProperty" frame="$this" visible="true"/>
+				<Action type="SetProperty" frame="IconBorderImageHighlight" visible="true"/>
+				<Action type="SetProperty" frame="$this/IconImage" visible="true"/>
+				<Action type="SetProperty" frame="$this/IconBorderImage" alpha="255"/>
+				<Action type="SetProperty" frame="$this/IconBorderImage" desaturated="false"/>
+				<Action type="SetProperty" frame="$this/IconBackgroundImage" alpha="255"/>
+				<!-- IconImage Texture taken care of by code -->
+			</State>
+		</StateGroup>
+		
+		<Frame type="Image" name="UnfilledProgressImage">
+			<Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+			<Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+			<Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+			<Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+			<Width val="40"/>
+			<Height val="40"/>
+			<Unclipped val="true"/>
+			<RenderPriority val="535"/>
+			<Alpha val="42"/>
+			<Texture val="_Assets\Textures\talentQuestProgressBarBackground.dds"/>
+		</Frame>
+		<Frame type="ProgressBar" name="QuestProgressBar">
+			<Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+			<Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+			<Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+			<Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+			<Width val="40"/>
+			<Height val="40"/>
+			<Unclipped val="true"/>
+			<RenderPriority val="536"/>
+			<Vertical val="False"/>
+			<Circular val="true"/>
+			<CircularStart val="0"/>
+			<CircularEndOffset val="360"/>
+			<FillInset val="0.0"/>
+			
+			<Frame type="Frame" name="FillImageContainer">
+				<Frame type="Image" name="FillImage">
+					<Anchor relative="$parent"/>
+					<Unclipped val="true"/>
+					<TextureType val="Circular"/>
+					<RenderPriority val="536"/>
+					<LayerCount val="1"/>
+					<Texture val="_Assets\Textures\talentQuestProgressBar.dds"/>
+					<TextureCoords top="0" left="0" bottom="1" right="1"/>
+				</Frame>
+			</Frame>
+		</Frame>
+		<Frame type="Image" name="QuestCompleteImage">
+			<Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+			<Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+			<Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+			<Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+			<Width val="40"/>
+			<Height val="40"/>
+			<Unclipped val="true"/>
+			<RenderPriority val="537"/>
+			<Texture val="_Assets\Textures\talentQuestProgressBarComplete.dds"/>
+			
+			<StateGroup name="Colorblind">
+				<State name="Default"/>
+				<State name="ColorBlindEnabled">
+					<When type="Option" colorblind="True"/>
+					<Action type="SetProperty" Texture="_Assets\Textures\talentQuestProgressBarComplete_CB.dds"/>
+				</State>
+			</StateGroup>
+		</Frame>
+		<Frame type="Label" name="QuestProgressStackLabel">
+			<Anchor side="Bottom" relative="$parent/QuestProgressBar" pos="Max" offset="4"/>
+			<Anchor side="Left" relative="$parent" pos="Min" offset="15"/>
+			<Anchor side="Right" relative="$parent" pos="Max" offset="-10"/>
+			<Style val="BottomPanel_TalentQuestStack"/>
+			<Options val="NoWrapping | ScaleToPreventTruncation"/>
+			
+			<StateGroup name="Style">
+				<DefaultState val="Other"/>
+				<State name="5Digit">
+					<When type="Property" frame="$parent/QuestProgressBar" operator="GreaterThanOrEqual" Value="10000"/>
+					<Action type="SetProperty" frame="$this" Style="BottomPanel_TalentQuestStack_small"/>
+				</State>
+				<State name="Other">
+					<Action type="SetProperty" frame="$this" Style="BottomPanel_TalentQuestStack"/>
+				</State>
+			</StateGroup>
+		</Frame>
+		
+		<!-- @override GameStatsPanel/SelectedTalentTreeIconImageTemplate/TalentQuestProgress -->
+		<StateGroup name="TalentQuestProgress">
+			<DefaultState val="NoQuest"/>
+			<State name="HasQuest">
+				<When type="Property" frame="$this" QuestProgress="QuestInProgress"/>
+				<Action type="SetProperty" frame="QuestProgressBar" visible="True"/>
+				<Action type="SetProperty" frame="UnfilledProgressImage" visible="True"/>
+				<Action type="SetProperty" frame="QuestCompleteImage" visible="False"/>
+				<Action type="SetProperty" frame="QuestProgressStackLabel" visible="True"/>
+				<Action type="SetProperty" frame="IconBorderImage" visible="True"/>
+				<Action type="SetProperty" frame="IconBorderImage" renderPriority="531"/>
+			</State>
+			<State name="HasUntrackedQuest">
+				<When type="Property" frame="$this" QuestProgress="ProgressUntracked"/>
+				<Action type="SetProperty" frame="QuestProgressBar" visible="false"/>
+				<Action type="SetProperty" frame="UnfilledProgressImage" visible="True"/>
+				<Action type="SetProperty" frame="QuestCompleteImage" visible="False"/>
+				<Action type="SetProperty" frame="QuestProgressStackLabel" visible="False"/>
+				<Action type="SetProperty" frame="IconBorderImage" visible="True"/>
+			</State>
+			<State name="FinishedQuest">
+				<When type="Property" frame="$this" QuestProgress="FinishedQuest"/>
+				<Action type="SetProperty" frame="QuestProgressBar" visible="False"/>
+				<Action type="SetProperty" frame="UnfilledProgressImage" visible="True"/>
+				<Action type="SetProperty" frame="QuestCompleteImage" visible="True"/>
+				<Action type="SetProperty" frame="QuestProgressStackLabel" visible="False"/>
+				<Action type="SetProperty" frame="IconBorderImage" visible="False"/>
+			</State>
+			<State name="FinishedUnlimitedQuest">
+				<When type="Property" frame="$this" QuestProgress="FinishedUnlimitedQuest"/>
+				<Action type="SetProperty" frame="QuestProgressBar" visible="False"/>
+				<Action type="SetProperty" frame="UnfilledProgressImage" visible="True"/>
+				<Action type="SetProperty" frame="QuestCompleteImage" visible="True"/>
+				<Action type="SetProperty" frame="QuestProgressStackLabel" visible="True"/>
+				<Action type="SetProperty" frame="IconBorderImage" visible="False"/>
+			</State>
+			<State name="NoQuest">
+				<Action type="SetProperty" frame="QuestProgressBar" visible="False"/>
+				<Action type="SetProperty" frame="UnfilledProgressImage" visible="False"/>
+				<Action type="SetProperty" frame="QuestCompleteImage" visible="False"/>
+				<Action type="SetProperty" frame="QuestProgressStackLabel" visible="False"/>
+				<Action type="SetProperty" frame="IconBorderImage" visible="True"/>
+				<Action type="SetProperty" frame="IconBorderImage" renderPriority="532"/>
+			</State>
+		</StateGroup>
+		
+		<!-- Heroic Adaption changes -->
+		<StateGroup name="HeroicAdaption">
+			<DefaultState val="TypeTalent"/>
+			<State name="TypeTalent">
+				<When type="AnimationState" frame="$this" TalentTypeState="TypeTalent"/>
+			</State>
+			<State name="TypeUltimate">
+				<When type="AnimationState" frame="$this" TalentTypeState="TypeUltimate"/>
+				<Action type="SetProperty" frame="$this/IconBackgroundImage" width="40"/>
+				<Action type="SetProperty" frame="$this/IconBackgroundImage" height="40"/>
+				<Action type="SetProperty" frame="$this/IconBackgroundImage" ImageMaskTexture="_Assets\Textures\talentHeroicAlphaMask.dds"/>
+				<Action type="SetProperty" frame="$this/IconBorderImage" width="48"/>
+				<Action type="SetProperty" frame="$this/IconBorderImage" height="48"/>
+				<Action type="SetProperty" frame="$this/IconBorderImage" alpha="#ultimateTalentBorderAlpha2"/>
+				<Action type="SetProperty" frame="$this/IconBorderImage" renderPriority="532"/>
+				<Action type="SetProperty" frame="$this/IconBorderImage" rotation="45"/>
+				<Action type="SetProperty" frame="$this/IconBorderImage" DesaturationColor="ffffff"/>
+				<!-- enable rotation animation -->
+				<Action type="SetProperty" frame="$this/IconImage" ImageMaskTexture="_Assets\Textures\talentHeroicAlphaMask.dds"/>
+				<Action type="SetProperty" frame="$this/UnfilledProgressImage" width="48"/>
+				<Action type="SetProperty" frame="$this/UnfilledProgressImage" height="48"/>
+				<Action type="SetProperty" frame="$this/QuestProgressBar" width="48"/>
+				<Action type="SetProperty" frame="$this/QuestProgressBar" height="48"/>
+				<Action type="SetProperty" frame="$this/QuestCompleteImage" width="48"/>
+				<Action type="SetProperty" frame="$this/QuestCompleteImage" height="48"/>
+			</State>
+		</StateGroup>
+		
+	</Frame>
+	<Frame type="UnitStatusTalentIcon" name="TalentTreeIconHybridTemplate_R" template="_LeaderPanelBottom/TalentTreeIconHybridTemplate">
+		<!-- @Override -->
+		<StateGroup name="TalentTypeState">
+			<DefaultState val="TypeTalent"/>
+			<State name="TypeTalent">
+				<When type="AnimationState" frame="$this" TalentTypeState="TypeTalent"/>
+				<When type="Option" colorblind="False"/>
+				<Action type="SetProperty" frame="$this/IconBorderImage" texture="_Assets\Textures\talentBorder_red.dds"/>
+			</State>
+			<State name="TypeTalent_CB">
+				<When type="AnimationState" frame="$this" TalentTypeState="TypeTalent"/>
+				<When type="Option" colorblind="True"/>
+				<Action type="SetProperty" frame="$this/IconBorderImage" texture="_Assets\Textures\talentBorder_orange.dds"/>
+			</State>
+			<State name="TypeUltimate">
+				<When type="AnimationState" frame="$this" TalentTypeState="TypeUltimate"/>
+				<When type="Option" colorblind="False"/>
+				<Action type="SetProperty" frame="$this/IconBorderImage" texture="_Assets\Textures\talentBorder_red.dds"/>
+			</State>
+			<State name="TypeUltimate_CB">
+				<When type="AnimationState" frame="$this" TalentTypeState="TypeUltimate"/>
+				<When type="Option" colorblind="True"/>
+				<Action type="SetProperty" frame="$this/IconBorderImage" texture="_Assets\Textures\talentBorder_orange.dds"/>
+			</State>
+		</StateGroup>
+	</Frame>
+	<Frame type="UnitStatusTalentIcon" name="TalentTreeIconHybridTemplate_L" template="_LeaderPanelBottom/TalentTreeIconHybridTemplate">
+		<!-- @Override -->
+		<StateGroup name="TalentTypeState">
+			<DefaultState val="TypeTalent"/>
+			<State name="TypeTalent">
+				<When type="AnimationState" frame="$this" TalentTypeState="TypeTalent"/>
+				<When type="Option" colorblind="False"/>
+				<Action type="SetProperty" frame="$this/IconBorderImage" texture="_Assets\Textures\talentBorder_blue.dds"/>
+			</State>
+			<State name="TypeTalent_CB">
+				<When type="AnimationState" frame="$this" TalentTypeState="TypeTalent"/>
+				<When type="Option" colorblind="True"/>
+				<Action type="SetProperty" frame="$this/IconBorderImage" texture="_Assets\Textures\talentBorder_cyan.dds"/>
+			</State>
+			<State name="TypeUltimate">
+				<When type="AnimationState" frame="$this" TalentTypeState="TypeUltimate"/>
+				<When type="Option" colorblind="False"/>
+				<Action type="SetProperty" frame="$this/IconBorderImage" texture="_Assets\Textures\talentBorder_blue.dds"/>
+			</State>
+			<State name="TypeUltimate_CB">
+				<When type="AnimationState" frame="$this" TalentTypeState="TypeUltimate"/>
+				<When type="Option" colorblind="True"/>
+				<Action type="SetProperty" frame="$this/IconBorderImage" texture="_Assets\Textures\talentBorder_cyan.dds"/>
+			</State>
+		</StateGroup>
+	</Frame>
+	
 	<Frame type="UnitStatusTalentIcon" name="QuestIconTemplate">
 		<Unclipped val="true"/>
 		
@@ -2033,27 +2348,6 @@
 						<Anchor side="Right" relative="$parent" pos="Max" offset="9999"/>
 						<Anchor side="Bottom" relative="$parent" pos="Max" offset="9999"/>
 						<Visible val="false"/>
-						
-						<!-- Override stategroup -->
-						<StateGroup name="UpdateCooldownAndBorder">
-							<State name="OnAvailableEnemy">
-								<When type="Property" frame="$this" Visible="true"/>
-								<When type="Property" frame="$this" Visible="false"/>
-							</State>
-							<State name="OnSelectedEnemy">
-								<When type="Property" frame="$this" Visible="true"/>
-								<When type="Property" frame="$this" Visible="false"/>
-							</State>
-							<State name="OnCooldown">
-								<When type="Property" frame="$this" Visible="true"/>
-								<When type="Property" frame="$this" Visible="false"/>
-							</State>
-							<State name="OnAvailable">
-								<When type="Property" frame="$this" Visible="true"/>
-								<When type="Property" frame="$this" Visible="false"/>
-							</State>
-						</StateGroup>
-						
 					</Frame>
 					
 				</Frame>
@@ -3459,7 +3753,7 @@
 		<Frame type="HeroLeaderPanel" name="TalentOverview" template="_LeaderPanelBottom/CleanLeaderPanelBottomTemplate">
 			<!-- Custom Tooltips containing hero portrait -->
 			<Frame type="TalentTooltip" name="HeroTalentTooltip_L0_T1" template="_LeaderPanelBottom/HeroTalentTooltip_L0_Base">
-				<Handle val="TalentTooltipL0T1"/> <!-- TEST NOTIFICATIONS -->
+				<Handle val="TalentTooltipL0T1"/> <!-- TEST NOTIFICATIONS NAME -->
 				<Frame type="Image" name="HeroPortrait">
 					<Texture val="{$BottomPanelTalentsL0/PlayerHeroIconFrame/HeroIconImage/@Texture}"/>
 				</Frame>
