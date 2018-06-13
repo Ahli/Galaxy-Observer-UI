@@ -153,7 +153,7 @@ public class UICatalogImpl implements UICatalog {
 					if (!isDevLayout) {
 						logger.error("ERROR: Cannot find layout file: " + intPath);
 					} else {
-						logger.warn("WARNING: Cannot find Blizz-only layout file: " + intPath + ", so this is fine.");
+						logger.warn("WARNING: Cannot find Blizz-only layout file: " + intPath + ", so this is fine." );
 					}
 				}
 			}
@@ -195,7 +195,7 @@ public class UICatalogImpl implements UICatalog {
 	@Override
 	public void processInclude(final String path, final boolean isDevLayout, final String raceId) {
 		if (logger.isTraceEnabled()) {
-			logger.trace("processing Include appearing within a real layout");
+			logger.trace("processing Include appearing within a real layout" );
 		}
 		
 		String basePathTemp = getCurBasePath();
@@ -210,7 +210,7 @@ public class UICatalogImpl implements UICatalog {
 				if (!isDevLayout) {
 					logger.error("ERROR: Cannot find layout file: " + path);
 				} else {
-					logger.warn("WARNING: Cannot find Blizz-only layout file: " + path + ", so this is fine.");
+					logger.warn("WARNING: Cannot find Blizz-only layout file: " + path + ", so this is fine." );
 				}
 				return;
 			}
@@ -249,7 +249,7 @@ public class UICatalogImpl implements UICatalog {
 	public UITemplate addTemplate(final String fileName, final UIElement thisElem, final boolean isDevLayout)
 			throws UIException {
 		if (thisElem == null) {
-			throw new UIException("Cannot create Template definition for a 'null' UIElement.");
+			throw new UIException("Cannot create Template definition for a 'null' UIElement." );
 		}
 		
 		final List<UITemplate> list = isDevLayout ? blizzOnlyTemplates : templates;
@@ -275,7 +275,7 @@ public class UICatalogImpl implements UICatalog {
 			constants.add(constant);
 			if (removedBlizzOnly) {
 				logger.warn("WARNING: constant '" + name +
-						"' overrides value from Blizz-only constant, so this might be fine.");
+						"' overrides value from Blizz-only constant, so this might be fine." );
 			}
 		} else {
 			// is blizz-only layout
@@ -284,7 +284,7 @@ public class UICatalogImpl implements UICatalog {
 			blizzOnlyConstants.add(constant);
 			if (removedGeneral) {
 				logger.warn("WARNING: constant '" + name +
-						"' from Blizz-only layout overrides a general constant, so this might be fine.");
+						"' from Blizz-only layout overrides a general constant, so this might be fine." );
 			}
 		}
 	}
@@ -337,12 +337,12 @@ public class UICatalogImpl implements UICatalog {
 		}
 		if (i >= 3) {
 			logger.error("ERROR: Encountered a constant definition with three #'" + constantRef +
-					"' when its maximum is two '#'.");
+					"' when its maximum is two '#'." );
 		}
 		
 		if (!isDevLayout) {
 			logger.warn("WARNING: Did not find a constant definition for '" + constantRef + "', so '" + constantName +
-					"' is used instead.");
+					"' is used instead." );
 		} else {
 			// inside blizz-only
 			for (final UIConstant c : blizzOnlyConstants) {
@@ -351,7 +351,7 @@ public class UICatalogImpl implements UICatalog {
 				}
 			}
 			logger.warn("WARNING: Did not find a constant definition for '" + constantRef +
-					"', but it is a Blizz-only layout, so this is fine.");
+					"', but it is a Blizz-only layout, so this is fine." );
 		}
 		return constantName;
 	}

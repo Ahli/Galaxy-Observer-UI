@@ -50,10 +50,10 @@ public final class DescIndexReader {
 		final Document doc = dBuilder.parse(f);
 		
 		// must be in a DataComponent node
-		final NodeList nodeList = doc.getElementsByTagName("*");
+		final NodeList nodeList = doc.getElementsByTagName("*" );
 		for (int i = 0, len = nodeList.getLength(); i < len; i++) {
 			final Node node = nodeList.item(i);
-			if (node.getNodeName().equalsIgnoreCase("Include")) {
+			if (node.getNodeName().equalsIgnoreCase("Include" )) {
 				final NamedNodeMap attributes = node.getAttributes();
 				final String path = attributes.item(0).getNodeValue();
 				

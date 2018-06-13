@@ -67,7 +67,7 @@ public class NavigationController {
 		if (instance == null) {
 			instance = this;
 		} else {
-			throw new ExceptionInInitializerError("Cannot create multiple NavigationControllers.");
+			throw new ExceptionInInitializerError("Cannot create multiple NavigationControllers." );
 		}
 	}
 	

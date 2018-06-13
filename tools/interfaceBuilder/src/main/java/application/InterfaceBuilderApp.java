@@ -99,17 +99,17 @@ public class InterfaceBuilderApp extends Application {
 	public static void main(final String[] args) {
 		initInterProcessCommunication(args, 12317);
 		
-		logger.trace("trace log visible"); //$NON-NLS-1$
-		logger.debug("debug log visible"); //$NON-NLS-1$
-		logger.info("info log visible"); //$NON-NLS-1$
-		logger.warn("warn log visible"); //$NON-NLS-1$
-		logger.error("error log visible"); //$NON-NLS-1$
-		logger.fatal("fatal log visible"); //$NON-NLS-1$
+		logger.trace("trace log visible" ); //$NON-NLS-1$
+		logger.debug("debug log visible" ); //$NON-NLS-1$
+		logger.info("info log visible" ); //$NON-NLS-1$
+		logger.warn("warn log visible" ); //$NON-NLS-1$
+		logger.error("error log visible" ); //$NON-NLS-1$
+		logger.fatal("fatal log visible" ); //$NON-NLS-1$
 		
 		logger.trace("Configuration File of System: {}",
-				() -> System.getProperty("log4j.configurationFile")); //$NON-NLS-1$ //$NON-NLS-2$
+				() -> System.getProperty("log4j.configurationFile" )); //$NON-NLS-1$ //$NON-NLS-2$
 		logger.info("Launch arguments: " + Arrays.toString(args)); //$NON-NLS-1$
-		logger.info("Max Heap Space: " + Runtime.getRuntime().maxMemory() / 1048576L + "mb.");
+		logger.info("Max Heap Space: " + Runtime.getRuntime().maxMemory() / 1048576L + "mb." );
 		
 		System.setProperty("javafx.preloader", AppPreloader.class.getCanonicalName());
 		launch(args);
@@ -139,7 +139,7 @@ public class InterfaceBuilderApp extends Application {
 									out.println(inputLine);
 									logger.info("message from client: " + inputLine);
 									final List<String> params =
-											Arrays.asList(inputLine.substring(1, inputLine.length() - 1).split(", "));
+											Arrays.asList(inputLine.substring(1, inputLine.length() - 1).split(", " ));
 									getInstance().executeCommand(params);
 								}
 							}
@@ -149,7 +149,7 @@ public class InterfaceBuilderApp extends Application {
 					}
 				}
 			};
-			serverThread.setName("IPCserver");
+			serverThread.setName("IPCserver" );
 			serverThread.setDaemon(true);
 			serverThread.setPriority(Thread.MIN_PRIORITY);
 			serverThread.start();
@@ -158,7 +158,7 @@ public class InterfaceBuilderApp extends Application {
 			System.exit(1);
 		} catch (final IOException e) {
 			// port taken, so app is already running
-			logger.info("App already running. Passing over command line arguments.");
+			logger.info("App already running. Passing over command line arguments." );
 			
 			try (final Socket socket = new Socket(InetAddress.getByAddress(new byte[] { 127, 0, 0, 1 }), port)) {
 				final PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
@@ -201,7 +201,7 @@ public class InterfaceBuilderApp extends Application {
 			@Override
 			public void run() {
 				try {
-					Thread.currentThread().setName("Supervisor"); //$NON-NLS-1$
+					Thread.currentThread().setName("Supervisor" ); //$NON-NLS-1$
 					Thread.currentThread().setPriority(Thread.MIN_PRIORITY);
 					final ThreadPoolExecutor executorTmp = getExecutor();
 					Platform.runLater(() -> navigationController.lockNavToProgress());
@@ -299,7 +299,7 @@ public class InterfaceBuilderApp extends Application {
 			if (gamePath == null) {
 				return;
 			}
-			isHeroes = gamePath.contains("HeroesSwitcher.exe"); //$NON-NLS-1$
+			isHeroes = gamePath.contains("HeroesSwitcher.exe" ); //$NON-NLS-1$
 		} else {
 			final SettingsIniInterface settings = configService.getIniSettings();
 			// compileAndRun is active -> figure out the right game
@@ -355,9 +355,9 @@ public class InterfaceBuilderApp extends Application {
 				logger.error("Failed to execute the game launch command.", e); //$NON-NLS-1$
 			}
 		} else {
-			logger.error("Failed to find any replay."); //$NON-NLS-1$
+			logger.error("Failed to find any replay." ); //$NON-NLS-1$
 		}
-		printInfoLogMessageToGeneral("The game starts with a replay now..."); //$NON-NLS-1$
+		printInfoLogMessageToGeneral("The game starts with a replay now..." ); //$NON-NLS-1$
 	}
 	
 	/**
@@ -381,7 +381,7 @@ public class InterfaceBuilderApp extends Application {
 	 */
 	@Override
 	public void start(final Stage primaryStage) throws Exception {
-		Thread.currentThread().setName("UI"); //$NON-NLS-1$
+		Thread.currentThread().setName("UI" ); //$NON-NLS-1$
 		Thread.currentThread().setPriority(Thread.MAX_PRIORITY);
 		this.primaryStage = primaryStage;
 		
@@ -423,7 +423,7 @@ public class InterfaceBuilderApp extends Application {
 		// Build Navigation
 		final BorderPane root;
 		final FXMLLoader loader = new FXMLSpringLoader(appContext);
-		try (final InputStream is = appContext.getResource("view/Navigation.fxml").getInputStream()) { //$NON-NLS-1$
+		try (final InputStream is = appContext.getResource("view/Navigation.fxml" ).getInputStream()) { //$NON-NLS-1$
 			root = loader.load(is);
 			navigationController = loader.getController();
 		} catch (final IOException | NullPointerException e) {
@@ -432,18 +432,18 @@ public class InterfaceBuilderApp extends Application {
 		}
 		final Scene scene = new Scene(root, 1200, 600);
 		
-		scene.getStylesheets().add(appContext.getResource("view/application.css").getURI().toString()); //$NON-NLS-1$
-		scene.getStylesheets().add(appContext.getResource("view/textStyles.css").getURI().toString()); //$NON-NLS-1$
+		scene.getStylesheets().add(appContext.getResource("view/application.css" ).getURI().toString()); //$NON-NLS-1$
+		scene.getStylesheets().add(appContext.getResource("view/textStyles.css" ).getURI().toString()); //$NON-NLS-1$
 		
 		// app icon
 		try {
-			primaryStage.getIcons().add(new Image(getClass().getResourceAsStream("/res/ahli.png"))); //$NON-NLS-1$
+			primaryStage.getIcons().add(new Image(getClass().getResourceAsStream("/res/ahli.png" ))); //$NON-NLS-1$
 		} catch (final Exception e) {
-			logger.error("Failed to load ahli.png"); //$NON-NLS-1$
+			logger.error("Failed to load ahli.png" ); //$NON-NLS-1$
 		}
 		primaryStage.setMaximized(true);
 		primaryStage.setScene(scene);
-		primaryStage.setTitle(Messages.getString("app.title"));
+		primaryStage.setTitle(Messages.getString("app.title" ));
 		
 		// Fade animation (to hide white stage background flash)
 		primaryStage.setOpacity(0);
@@ -454,7 +454,7 @@ public class InterfaceBuilderApp extends Application {
 		
 		primaryStage.show();
 		primaryStage.setOpacity(1);
-		logger.info("Initializing App..."); //$NON-NLS-1$
+		logger.info("Initializing App..." ); //$NON-NLS-1$
 		
 		hidePreloader();
 	}
@@ -469,7 +469,7 @@ public class InterfaceBuilderApp extends Application {
 		if (paramCompilePath != null) {
 			logger.info("compile param path: " + paramCompilePath); //$NON-NLS-1$
 			if (params.isCompileAndRun()) {
-				logger.info("run after compile: true"); //$NON-NLS-1$
+				logger.info("run after compile: true" ); //$NON-NLS-1$
 			}
 		}
 		final String paramRunPath = params.getParamRunPath();
@@ -482,7 +482,7 @@ public class InterfaceBuilderApp extends Application {
 		try {
 			if (baseUiService.isOutdated(Game.SC2, false)) {
 				navigationController.appendNotification(
-						new Notification(Messages.getString("browse.notification.sc2OutOfDate"), 3));
+						new Notification(Messages.getString("browse.notification.sc2OutOfDate" ), 3));
 			}
 		} catch (final IOException e) {
 			logger.error("Error during SC2 baseUI update check.", e);
@@ -490,7 +490,7 @@ public class InterfaceBuilderApp extends Application {
 		try {
 			if (baseUiService.isOutdated(Game.HEROES, false)) {
 				navigationController.appendNotification(
-						new Notification(Messages.getString("browse.notification.heroesOutOfDate"), 3));
+						new Notification(Messages.getString("browse.notification.heroesOutOfDate" ), 3));
 			}
 		} catch (final IOException e) {
 			logger.error("Error during Heroes baseUI update check.", e);
@@ -498,7 +498,7 @@ public class InterfaceBuilderApp extends Application {
 		try {
 			if (baseUiService.isOutdated(Game.HEROES, true)) {
 				navigationController.appendNotification(
-						new Notification(Messages.getString("browse.notification.heroesPtrOutOfDate"), 3));
+						new Notification(Messages.getString("browse.notification.heroesPtrOutOfDate" ), 3));
 			}
 		} catch (final IOException e) {
 			logger.error("Error during Heroes PTR baseUI update check.", e);
@@ -533,7 +533,7 @@ public class InterfaceBuilderApp extends Application {
 		
 		// context menu with close option
 		final ContextMenu contextMenu = new ContextMenu();
-		final MenuItem closeItem = new MenuItem("Close");
+		final MenuItem closeItem = new MenuItem("Close" );
 		closeItem.setOnAction(event -> getTabPane().getTabs().remove(newTab));
 		contextMenu.getItems().addAll(closeItem);
 		newTab.setContextMenu(contextMenu);
@@ -561,10 +561,10 @@ public class InterfaceBuilderApp extends Application {
 	public void init() {
 		if (instance == null) {
 			instance = this;
-			logger.trace("Application singleton successfull.");
+			logger.trace("Application singleton successfull." );
 		} else {
-			logger.error("Application cannot be started multiple times.");
-			throw new ExceptionInInitializerError("Application cannot be started multiple times.");
+			logger.error("Application cannot be started multiple times." );
+			throw new ExceptionInInitializerError("Application cannot be started multiple times." );
 		}
 		// start Spring
 		try {
@@ -611,7 +611,7 @@ public class InterfaceBuilderApp extends Application {
 	 */
 	@Override
 	public void stop() {
-		logger.info("App is about to shut down."); //$NON-NLS-1$
+		logger.info("App is about to shut down." ); //$NON-NLS-1$
 		if (!executor.isShutdown()) {
 			executor.shutdownNow();
 		}
@@ -623,7 +623,7 @@ public class InterfaceBuilderApp extends Application {
 					e); //$NON-NLS-1$
 			Thread.currentThread().interrupt();
 		}
-		logger.info("App waves Goodbye!"); //$NON-NLS-1$
+		logger.info("App waves Goodbye!" ); //$NON-NLS-1$
 		appContext.stop();
 	}
 	

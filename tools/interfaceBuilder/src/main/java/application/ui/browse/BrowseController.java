@@ -28,15 +28,15 @@ public class BrowseController implements Updateable {
 	 * Automatically called by FxmlLoader
 	 */
 	public void initialize() {
-		heroesChoiceBox.setItems(
-				FXCollections.observableArrayList(Messages.getString("browse.live"), Messages.getString("browse.ptr")));
+		heroesChoiceBox.setItems(FXCollections
+				.observableArrayList(Messages.getString("browse.live" ), Messages.getString("browse.ptr" )));
 		final boolean ptrActive = configService.getIniSettings().isHeroesPtrActive();
 		heroesChoiceBox.getSelectionModel().select(ptrActive ? 1 : 0);
 		updatePtrStatusLabel(ptrActive);
 	}
 	
 	private void updatePtrStatusLabel(final boolean ptrActive) {
-		ptrStatusLabel.setText(ptrActive ? Messages.getString("browse.ptrActive") : "");
+		ptrStatusLabel.setText(ptrActive ? Messages.getString("browse.ptrActive" ) : "" );
 	}
 	
 	@Override

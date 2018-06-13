@@ -74,7 +74,7 @@ public class ViewRuleSetController {
 				return new SimpleStringProperty(((MpqEditorCompressionRuleSize) rule).getMinSize() + " - " +
 						((MpqEditorCompressionRuleSize) rule).getMaxSize());
 			} else {
-				return new SimpleStringProperty("");
+				return new SimpleStringProperty("" );
 			}
 		});
 		columnCompressionAlgo.setCellValueFactory(
@@ -82,11 +82,11 @@ public class ViewRuleSetController {
 		columnType.setCellValueFactory(cellData -> {
 			final MpqEditorCompressionRule rule = cellData.getValue();
 			if (rule instanceof MpqEditorCompressionRuleMask) {
-				return new SimpleStringProperty("Mask");
+				return new SimpleStringProperty("Mask" );
 			} else if (rule instanceof MpqEditorCompressionRuleSize) {
-				return new SimpleStringProperty("Size");
+				return new SimpleStringProperty("Size" );
 			} else {
-				return new SimpleStringProperty("Default");
+				return new SimpleStringProperty("Default" );
 			}
 		});
 	}

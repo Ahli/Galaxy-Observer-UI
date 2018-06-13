@@ -80,7 +80,7 @@ public class LayoutExtensionReader {
 	public void processLayoutFiles(final Collection<File> layoutFiles)
 			throws ParserConfigurationException, SAXException {
 		
-		logger.info("Scanning for XML file...");
+		logger.info("Scanning for XML file..." );
 		
 		final DocumentBuilder dBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
 		// provide error handler that does not print incompatible files into
@@ -156,7 +156,7 @@ public class LayoutExtensionReader {
 		logger.debug("textInput:" + textInput);
 		try {
 			// split at keywords @hotkey or @setting without removing, case insensitive
-			for (String text : textInput.split("(?=@hotkey|@setting)/i")) {
+			for (String text : textInput.split("(?=@hotkey|@setting)/i" )) {
 				logger.debug("token start:" + text);
 				text = text.trim();
 				
@@ -164,11 +164,11 @@ public class LayoutExtensionReader {
 				description = "";
 				defaultValue = "";
 				
-				final boolean isHotkey = text.toLowerCase(Locale.ROOT).startsWith("@hotkey");
-				final boolean isSetting = text.toLowerCase(Locale.ROOT).startsWith("@setting");
+				final boolean isHotkey = text.toLowerCase(Locale.ROOT).startsWith("@hotkey" );
+				final boolean isSetting = text.toLowerCase(Locale.ROOT).startsWith("@setting" );
 				
 				if (isHotkey || isSetting) {
-					logger.debug("detected hotkey or setting");
+					logger.debug("detected hotkey or setting" );
 					// move behind keyword
 					final int pos = (isHotkey) ? "@hotkey".length() : "@setting".length();
 					String toProcess = text.substring(pos);
@@ -177,7 +177,7 @@ public class LayoutExtensionReader {
 					toProcess = toProcess.substring(1 + toProcess.indexOf('(')).trim();
 					
 					// split at keyword
-					for (String part : toProcess.split("(?i)(?=(constant|default|description)[\\s]*=)")) {
+					for (String part : toProcess.split("(?i)(?=(constant|default|description)[\\s]*=)" )) {
 						part = part.trim();
 						final String partLower = part.toLowerCase(Locale.ROOT);
 						logger.debug("part: " + part);
@@ -199,11 +199,11 @@ public class LayoutExtensionReader {
 						}
 					}
 					
-					if (!constant.equals("")) {
+					if (!constant.equals("" )) {
 						if (isHotkey) {
-							addHotkeyValueDef(constant, description, defaultValue, "");
+							addHotkeyValueDef(constant, description, defaultValue, "" );
 						} else {
-							addSettingValueDef(constant, description, defaultValue, "");
+							addSettingValueDef(constant, description, defaultValue, "" );
 						}
 					}
 				}
@@ -253,19 +253,19 @@ public class LayoutExtensionReader {
 	 * @param node
 	 */
 	public void processConstant(final Node node) {
-		final Node nameAttrNode = getNamedItemIgnoreCase(node.getAttributes(), "name");
+		final Node nameAttrNode = getNamedItemIgnoreCase(node.getAttributes(), "name" );
 		if (nameAttrNode != null) {
 			final String name = nameAttrNode.getNodeValue();
-			final Node valAttrNode = getNamedItemIgnoreCase(node.getAttributes(), "val");
+			final Node valAttrNode = getNamedItemIgnoreCase(node.getAttributes(), "val" );
 			if (valAttrNode != null) {
 				final String val = valAttrNode.getNodeValue();
 				logger.debug("Constant: name = " + name + ", val = " + val);
 				setValueDefCurValue(name, val);
 			} else {
-				logger.warn("Constant has no 'val' attribute defined.");
+				logger.warn("Constant has no 'val' attribute defined." );
 			}
 		} else {
-			logger.warn("Constant has no 'name' attribute defined.");
+			logger.warn("Constant has no 'name' attribute defined." );
 		}
 	}
 	
@@ -297,7 +297,7 @@ public class LayoutExtensionReader {
 	 */
 	public void updateLayoutFiles(final Collection<File> layoutFiles)
 			throws ParserConfigurationException, SAXException {
-		logger.info("Scanning for XML file...");
+		logger.info("Scanning for XML file..." );
 		
 		final DocumentBuilder dBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
 		// provide error handler that does not print incompatible files into console
@@ -356,10 +356,10 @@ public class LayoutExtensionReader {
 	 * @param node
 	 */
 	private void modifyConstant(final Node node) {
-		final Node nameAttrNode = getNamedItemIgnoreCase(node.getAttributes(), "name");
+		final Node nameAttrNode = getNamedItemIgnoreCase(node.getAttributes(), "name" );
 		if (nameAttrNode != null) {
 			final String name = nameAttrNode.getNodeValue();
-			final Node valAttrNode = getNamedItemIgnoreCase(node.getAttributes(), "val");
+			final Node valAttrNode = getNamedItemIgnoreCase(node.getAttributes(), "val" );
 			if (valAttrNode != null) {
 				final String val = valAttrNode.getNodeValue();
 				
@@ -376,10 +376,10 @@ public class LayoutExtensionReader {
 					}
 				}
 			} else {
-				logger.warn("Constant has no 'val' attribute defined.");
+				logger.warn("Constant has no 'val' attribute defined." );
 			}
 		} else {
-			logger.warn("Constant has no 'name' attribute defined.");
+			logger.warn("Constant has no 'name' attribute defined." );
 		}
 	}
 	

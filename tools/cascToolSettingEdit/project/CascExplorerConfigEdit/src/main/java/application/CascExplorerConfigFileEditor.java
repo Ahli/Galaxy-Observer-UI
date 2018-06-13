@@ -46,7 +46,7 @@ public final class CascExplorerConfigFileEditor {
 			final Document doc = dBuilder.parse(is);
 			
 			// edit document
-			final NodeList nodeList = doc.getElementsByTagName("setting");
+			final NodeList nodeList = doc.getElementsByTagName("setting" );
 			for (int i = 0; i < nodeList.getLength(); i++) {
 				final Node curNode = nodeList.item(i);
 				
@@ -57,13 +57,13 @@ public final class CascExplorerConfigFileEditor {
 					if (attrNode != null) {
 						final String val = attrNode.getNodeValue();
 						
-						if (val.equalsIgnoreCase("StoragePath")) {
+						if (val.equalsIgnoreCase("StoragePath" )) {
 							replaceValueInSettingNode(curNode, storagePath);
-						} else if (val.equalsIgnoreCase("OnlineMode")) {
+						} else if (val.equalsIgnoreCase("OnlineMode" )) {
 							replaceValueInSettingNode(curNode, onlineMode);
-						} else if (val.equalsIgnoreCase("Product")) {
+						} else if (val.equalsIgnoreCase("Product" )) {
 							replaceValueInSettingNode(curNode, product);
-						} else if (val.equalsIgnoreCase("Locale")) {
+						} else if (val.equalsIgnoreCase("Locale" )) {
 							replaceValueInSettingNode(curNode, locale);
 						}
 					}
@@ -90,7 +90,7 @@ public final class CascExplorerConfigFileEditor {
 		final NodeList children = settingNode.getChildNodes();
 		for (int a = 0; a < children.getLength(); a++) {
 			final Node curChild = children.item(a);
-			if (curChild.getNodeName().equalsIgnoreCase("value")) {
+			if (curChild.getNodeName().equalsIgnoreCase("value" )) {
 				curChild.setTextContent(newSettingVal);
 				break;
 			}

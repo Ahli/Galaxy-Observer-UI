@@ -104,7 +104,7 @@ public class CompressionMiningController implements Updateable {
 				return new SimpleStringProperty(((MpqEditorCompressionRuleSize) rule).getMinSize() + " - " +
 						((MpqEditorCompressionRuleSize) rule).getMaxSize());
 			} else {
-				return new SimpleStringProperty("");
+				return new SimpleStringProperty("" );
 			}
 		});
 		columnCompressionAlgo.setCellValueFactory(
@@ -112,16 +112,16 @@ public class CompressionMiningController implements Updateable {
 		columnType.setCellValueFactory(cellData -> {
 			final MpqEditorCompressionRule rule = cellData.getValue();
 			if (rule instanceof MpqEditorCompressionRuleMask) {
-				return new SimpleStringProperty("Mask");
+				return new SimpleStringProperty("Mask" );
 			} else if (rule instanceof MpqEditorCompressionRuleSize) {
-				return new SimpleStringProperty("Size");
+				return new SimpleStringProperty("Size" );
 			} else {
-				return new SimpleStringProperty("Default");
+				return new SimpleStringProperty("Default" );
 			}
 		});
-		attemptCounterLabel.setText("0");
-		sizeToBeatLabel.setText("- kb");
-		lastSizeLabel.setText("- kb");
+		attemptCounterLabel.setText("0" );
+		sizeToBeatLabel.setText("- kb" );
+		lastSizeLabel.setText("- kb" );
 	}
 	
 	/**
@@ -221,7 +221,7 @@ public class CompressionMiningController implements Updateable {
 						}
 						Thread.sleep(50);
 						if (Thread.currentThread().isInterrupted() || task == null) {
-							logger.info("Stopping the mining task.");
+							logger.info("Stopping the mining task." );
 							comprMiner.cleanUp();
 							expCompMiner = null;
 							return;
@@ -234,9 +234,9 @@ public class CompressionMiningController implements Updateable {
 				}
 			}
 		};
-		attemptCounterLabel.setText("0");
+		attemptCounterLabel.setText("0" );
 		InterfaceBuilderApp.getInstance().getExecutor().execute(task);
-		miningButton.setText(Messages.getString("progress.compressionMining.stopMining"));
+		miningButton.setText(Messages.getString("progress.compressionMining.stopMining" ));
 	}
 	
 	public void stopMining() {
@@ -250,7 +250,7 @@ public class CompressionMiningController implements Updateable {
 			expCompMiner = null;
 			logger.info(String.format("Currently best Compression produces archives of size: %s", newBest / 1024));
 		}
-		miningButton.setText(Messages.getString("progress.compressionMining.startMining"));
+		miningButton.setText(Messages.getString("progress.compressionMining.startMining" ));
 	}
 	
 	/**
@@ -271,7 +271,7 @@ public class CompressionMiningController implements Updateable {
 	 * @param bestSize
 	 */
 	private void updateUiSizeToBeat(final long bestSize) {
-		Platform.runLater(() -> sizeToBeatLabel.setText(bestSize / 1024 + " kb"));
+		Platform.runLater(() -> sizeToBeatLabel.setText(bestSize / 1024 + " kb" ));
 	}
 	
 	/**
@@ -282,7 +282,7 @@ public class CompressionMiningController implements Updateable {
 	 */
 	private void updateUiAttemptSize(final long lastSize, final int attempts) {
 		Platform.runLater(() -> {
-			lastSizeLabel.setText(lastSize / 1024 + " kb");
+			lastSizeLabel.setText(lastSize / 1024 + " kb" );
 			attemptCounterLabel.setText(String.valueOf(attempts));
 		});
 	}

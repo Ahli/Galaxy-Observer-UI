@@ -36,15 +36,16 @@ public class Alerts {
 			final String content) {
 		final long time = System.nanoTime();
 		final ButtonType yesButton =
-				new ButtonType(Messages.getString("General.YesButton"), ButtonData.YES); //$NON-NLS-1$
-		final ButtonType noButton = new ButtonType(Messages.getString("General.NoButton"), ButtonData.NO); //$NON-NLS-1$
+				new ButtonType(Messages.getString("General.YesButton" ), ButtonData.YES); //$NON-NLS-1$
+		final ButtonType noButton =
+				new ButtonType(Messages.getString("General.NoButton" ), ButtonData.NO); //$NON-NLS-1$
 		final ButtonType cancelButton =
-				new ButtonType(Messages.getString("General.CancelButton"), ButtonData.CANCEL_CLOSE); // $NON-NLS-1$
+				new ButtonType(Messages.getString("General.CancelButton" ), ButtonData.CANCEL_CLOSE); // $NON-NLS-1$
 		final Alert alert = new Alert(AlertType.INFORMATION, content, yesButton, noButton, cancelButton);
 		alert.initOwner(owner);
 		alert.setTitle(title);
 		alert.setHeaderText(header);
-		logger.warn("created yesNoCancelAlert within " + (System.nanoTime() - time) / 1000000 + "ms.");
+		logger.warn("created yesNoCancelAlert within " + (System.nanoTime() - time) / 1000000 + "ms." );
 		return alert;
 	}
 	
@@ -63,12 +64,12 @@ public class Alerts {
 		alert.initOwner(owner);
 		alert.setTitle(title);
 		alert.setHeaderText(header);
-		logger.warn("created errorAlert within " + (System.nanoTime() - time) / 1000000 + "ms.");
+		logger.warn("created errorAlert within " + (System.nanoTime() - time) / 1000000 + "ms." );
 		return alert;
 	}
 	
 	private static ButtonType createOkButton() {
-		return new ButtonType(Messages.getString("General.OkButton"), ButtonData.OK_DONE);
+		return new ButtonType(Messages.getString("General.OkButton" ), ButtonData.OK_DONE);
 	}
 	
 	/**
@@ -86,7 +87,7 @@ public class Alerts {
 		alert.initOwner(owner);
 		alert.setTitle(title);
 		alert.setHeaderText(header);
-		logger.warn("created warningAlert within " + (System.nanoTime() - time) / 1000000 + "ms.");
+		logger.warn("created warningAlert within " + (System.nanoTime() - time) / 1000000 + "ms." );
 		return alert;
 	}
 	
@@ -110,7 +111,7 @@ public class Alerts {
 			alert.setGraphic(new ImageView(imageUrl));
 		}
 		alert.getDialogPane().setPrefSize(480, 360);
-		logger.warn("initialized about-alert within " + (System.nanoTime() - time) / 1000000 + "ms.");
+		logger.warn("initialized about-alert within " + (System.nanoTime() - time) / 1000000 + "ms." );
 		return alert;
 	}
 	
@@ -126,7 +127,7 @@ public class Alerts {
 		final Alert alert = new Alert(AlertType.ERROR, localizedMsg, okButton);
 		alert.initOwner(owner);
 		
-		final Label label = new Label(Messages.getString("General.ExceptionStackTrace")); //$NON-NLS-1$
+		final Label label = new Label(Messages.getString("General.ExceptionStackTrace" )); //$NON-NLS-1$
 		final String stackTrace = ExceptionUtils.getStackTrace(e);
 		
 		final TextArea textArea = new TextArea(stackTrace);
@@ -145,7 +146,7 @@ public class Alerts {
 		
 		// Set expandable Exception into the dialog pane.
 		alert.getDialogPane().setExpandableContent(expContent);
-		logger.warn("created exceptionAlert within " + (System.nanoTime() - time) / 1000000 + "ms.");
+		logger.warn("created exceptionAlert within " + (System.nanoTime() - time) / 1000000 + "ms." );
 		
 		return alert;
 	}

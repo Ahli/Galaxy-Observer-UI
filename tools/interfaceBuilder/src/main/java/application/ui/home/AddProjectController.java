@@ -42,7 +42,7 @@ public class AddProjectController {
 	 * Automatically called by FxmlLoader
 	 */
 	public void initialize() {
-		dialog.setTitle("Add Observer Interface Project...");
+		dialog.setTitle("Add Observer Interface Project..." );
 		final DialogPane dialogPane = dialog.getDialogPane();
 		dialogPane.getButtonTypes().addAll(ButtonType.APPLY, ButtonType.CANCEL);
 		final Button okBttn = (Button) dialogPane.lookupButton(ButtonType.APPLY);
@@ -54,7 +54,7 @@ public class AddProjectController {
 	}
 	
 	public void addProjectAction(final ActionEvent actionEvent) {
-		logger.trace("add project dialog creates project instance");
+		logger.trace("add project dialog creates project instance" );
 		final String name = projectNameLabel.getText();
 		final String path = projectPathLabel.getText();
 		final Game game = gameDropdown.getValue();
@@ -75,7 +75,7 @@ public class AddProjectController {
 	
 	public void browsePathAction() {
 		final DirectoryChooser directoryChooser = new DirectoryChooser();
-		directoryChooser.setTitle("Select an existing Observer UI's directory.");
+		directoryChooser.setTitle("Select an existing Observer UI's directory." );
 		File f = fileService.cutTillValidDirectory(projectPathLabel.getText());
 		if (f != null) {
 			directoryChooser.setInitialDirectory(f);
@@ -92,7 +92,7 @@ public class AddProjectController {
 	
 	public void setProjectToEdit(final Project project) {
 		this.project = project;
-		dialog.setTitle("Edit Observer Interface Project...");
+		dialog.setTitle("Edit Observer Interface Project..." );
 		projectNameLabel.setText(project.getName());
 		projectPathLabel.setText(project.getProjectPath());
 		gameDropdown.getSelectionModel().select(project.getGame());

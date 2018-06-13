@@ -21,8 +21,8 @@ public final class Main {
 	 * @param args
 	 */
 	public static void main(final String[] args) {
-		logger.info("Command Line Parameters: [ConfigFilePath] [StoragePath] [OnlineMode] [Product] [Locale]");
-		logger.info("Parameters provided:");
+		logger.info("Command Line Parameters: [ConfigFilePath] [StoragePath] [OnlineMode] [Product] [Locale]" );
+		logger.info("Parameters provided:" );
 		if (args.length >= 5) {
 			logger.info("ConfigFilePath: " + args[0]);
 			logger.info("StoragePath: " + args[1]);
@@ -30,7 +30,7 @@ public final class Main {
 			logger.info("Product: " + args[3]);
 			logger.info("Locale: " + args[4]);
 		} else {
-			logger.error("Not enough parameters provided.");
+			logger.error("Not enough parameters provided." );
 			return;
 		}
 		final String path = args[0];

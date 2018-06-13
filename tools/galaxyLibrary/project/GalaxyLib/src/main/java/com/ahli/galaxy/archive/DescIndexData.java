@@ -123,7 +123,7 @@ public class DescIndexData {
 		File f = mpqi.getFileFromMpq(intPath);
 		if (!f.exists()) {
 			// add base folder to the path
-			intPath2 = (mpqi.isHeroesMpq() ? "Base.StormData" : "Base.SC2Data") + File.separator + intPath;
+			intPath2 = (mpqi.isHeroesMpq() ? "Base.StormData" : "Base.SC2Data" ) + File.separator + intPath;
 			f = mpqi.getFileFromMpq(intPath2);
 		}
 		if (!f.exists()) {

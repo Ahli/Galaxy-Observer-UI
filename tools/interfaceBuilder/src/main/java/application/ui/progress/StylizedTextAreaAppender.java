@@ -57,11 +57,11 @@ public final class StylizedTextAreaAppender extends AbstractAppender {
 	 * @return The TextAreaAppender
 	 */
 	@PluginFactory
-	public static StylizedTextAreaAppender createAppender(@PluginAttribute ("name") final String name,
-			@PluginElement ("Layout") Layout<? extends Serializable> layout,
-			@PluginElement ("Filter") final Filter filter) {
+	public static StylizedTextAreaAppender createAppender(@PluginAttribute ("name" ) final String name,
+			@PluginElement ("Layout" ) Layout<? extends Serializable> layout,
+			@PluginElement ("Filter" ) final Filter filter) {
 		if (name == null) {
-			LOGGER.error("No name provided for StylizedTextAreaAppender");
+			LOGGER.error("No name provided for StylizedTextAreaAppender" );
 			return null;
 		}
 		if (layout == null) {

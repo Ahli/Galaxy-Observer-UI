@@ -155,7 +155,7 @@ public class MpqEditorInterface implements MpqInterface, DeepCopyable {
 		if (!parentFolder.exists() && !parentFolder.mkdirs()) {
 			final String msg = "ERROR: Could not create path " + parentFolder.getAbsolutePath(); //$NON-NLS-1$
 			logger.error(msg);
-			throw new MpqException(String.format(Messages.getString("MpqInterface.CouldNotCreatePath"), //$NON-NLS-1$
+			throw new MpqException(String.format(Messages.getString("MpqInterface.CouldNotCreatePath" ), //$NON-NLS-1$
 					parentFolder.getAbsolutePath()));
 		}
 		
@@ -163,7 +163,7 @@ public class MpqEditorInterface implements MpqInterface, DeepCopyable {
 			
 			if (buildUnprotectedToo) {
 				// special unprotected file path
-				final String unprotectedAbsolutePath = getPathWithSuffix(absolutePath, "_unprtctd"); //$NON-NLS-1$
+				final String unprotectedAbsolutePath = getPathWithSuffix(absolutePath, "_unprtctd" ); //$NON-NLS-1$
 				
 				// make way for unprotected file
 				deleteFile(unprotectedAbsolutePath);
@@ -225,16 +225,16 @@ public class MpqEditorInterface implements MpqInterface, DeepCopyable {
 						final String msg = "ERROR: Could not delete file '" + path + "'.";    //$NON-NLS-1$
 						logger.error(msg, e);
 						throw new MpqException(
-								String.format(Messages.getString("MpqInterface.CouldNotOverwriteFile"), path),
+								String.format(Messages.getString("MpqInterface.CouldNotOverwriteFile" ), path),
 								e); //$NON-NLS-1$
 					}
 				} else {
 					throw new MpqException(
-							"ERROR: Could not delete file '" + path + "'." + " It might be used by another process.");
+							"ERROR: Could not delete file '" + path + "'." + " It might be used by another process." );
 				}
 			} else {
 				throw new MpqException(
-						"ERROR: Could not delete file '" + path + "'. A directory with the same name exists.");
+						"ERROR: Could not delete file '" + path + "'. A directory with the same name exists." );
 			}
 		}
 	}
@@ -258,7 +258,7 @@ public class MpqEditorInterface implements MpqInterface, DeepCopyable {
 			try {
 				// build protected file
 				newMpq(absolutePath, fileCount);
-				addToMpq(absolutePath, mpqCachePath, ""); //$NON-NLS-1$
+				addToMpq(absolutePath, mpqCachePath, "" ); //$NON-NLS-1$
 				compactMpq(absolutePath);
 			} finally {
 				settings.restoreOriginalSettingFiles();
@@ -287,7 +287,7 @@ public class MpqEditorInterface implements MpqInterface, DeepCopyable {
 		logger.trace("executing: {}", () -> cmd); //$NON-NLS-1$
 		Runtime.getRuntime().exec(cmd).waitFor();
 		if (logger.isTraceEnabled()) {
-			logger.trace("execution finished"); //$NON-NLS-1$
+			logger.trace("execution finished" ); //$NON-NLS-1$
 		}
 	}
 	
@@ -314,7 +314,7 @@ public class MpqEditorInterface implements MpqInterface, DeepCopyable {
 		logger.trace("executing: {}", () -> cmd); //$NON-NLS-1$
 		Runtime.getRuntime().exec(cmd).waitFor();
 		if (logger.isTraceEnabled()) {
-			logger.trace("execution finished"); //$NON-NLS-1$
+			logger.trace("execution finished" ); //$NON-NLS-1$
 		}
 	}
 	
@@ -334,7 +334,7 @@ public class MpqEditorInterface implements MpqInterface, DeepCopyable {
 		logger.trace("executing: {}", () -> cmd); //$NON-NLS-1$
 		Runtime.getRuntime().exec(cmd).waitFor();
 		if (logger.isTraceEnabled()) {
-			logger.trace("execution finished"); //$NON-NLS-1$
+			logger.trace("execution finished" ); //$NON-NLS-1$
 		}
 		
 	}
@@ -358,7 +358,7 @@ public class MpqEditorInterface implements MpqInterface, DeepCopyable {
 		
 		if (getFileCountInFolder(new File(mpqCachePath)) <= 0) {
 			throw new MpqException(
-					String.format(Messages.getString("MpqInterface.NoFilesExtracted"), mpqSourcePath)); //$NON-NLS-1$
+					String.format(Messages.getString("MpqInterface.NoFilesExtracted" ), mpqSourcePath)); //$NON-NLS-1$
 		}
 	}
 	
@@ -368,7 +368,7 @@ public class MpqEditorInterface implements MpqInterface, DeepCopyable {
 	 * @return whether the cache's list file was deleted
 	 */
 	private boolean clearCacheListFile() {
-		final File f = new File(mpqCachePath + File.separator + "(listfile)"); //$NON-NLS-1$
+		final File f = new File(mpqCachePath + File.separator + "(listfile)" ); //$NON-NLS-1$
 		return !f.exists() || f.isDirectory() || f.delete();
 	}
 	
@@ -378,7 +378,7 @@ public class MpqEditorInterface implements MpqInterface, DeepCopyable {
 	 * @return whether the cache's attribute file was deleted
 	 */
 	private boolean clearCacheAttributesFile() {
-		final File f = new File(mpqCachePath + File.separator + "(attributes)"); //$NON-NLS-1$
+		final File f = new File(mpqCachePath + File.separator + "(attributes)" ); //$NON-NLS-1$
 		return !f.exists() || f.isDirectory() || f.delete();
 	}
 	
@@ -392,7 +392,7 @@ public class MpqEditorInterface implements MpqInterface, DeepCopyable {
 				deleteDir(f);
 			} catch (final IOException e) {
 				if (logger.isTraceEnabled()) {
-					logger.error("clearing Cache FAILED"); //$NON-NLS-1$
+					logger.error("clearing Cache FAILED" ); //$NON-NLS-1$
 				}
 				return false;
 			}
@@ -419,12 +419,12 @@ public class MpqEditorInterface implements MpqInterface, DeepCopyable {
 				CMD_C + QUOTE + QUOTE + mpqEditorPath + QUOTE + " e " + QUOTE + mpqPath + QUOTE + " " + QUOTE +
 						fileName + QUOTE + " "
 						//$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-						+ QUOTE + targetPath + QUOTE + (inclSubFolders ? " /fp" : "") +
+						+ QUOTE + targetPath + QUOTE + (inclSubFolders ? " /fp" : "" ) +
 						QUOTE; //$NON-NLS-1$ //$NON-NLS-2$
 		logger.trace("executing: {}", () -> cmd); //$NON-NLS-1$
 		Runtime.getRuntime().exec(cmd).waitFor();
 		if (logger.isTraceEnabled()) {
-			logger.trace("execution finished"); //$NON-NLS-1$
+			logger.trace("execution finished" ); //$NON-NLS-1$
 		}
 		
 		// // MONITOR https://github.com/inwc3/JMPQ3 if it can handle sc2 files
@@ -457,7 +457,7 @@ public class MpqEditorInterface implements MpqInterface, DeepCopyable {
 		logger.trace("executing: {}", () -> cmd); //$NON-NLS-1$
 		Runtime.getRuntime().exec(cmd).waitFor();
 		if (logger.isTraceEnabled()) {
-			logger.trace("execution finished"); //$NON-NLS-1$
+			logger.trace("execution finished" ); //$NON-NLS-1$
 		}
 	}
 	
@@ -490,7 +490,7 @@ public class MpqEditorInterface implements MpqInterface, DeepCopyable {
 		logger.trace("executing: {}", () -> cmd); //$NON-NLS-1$
 		Runtime.getRuntime().exec(cmd).waitFor();
 		if (logger.isTraceEnabled()) {
-			logger.trace("execution finished"); //$NON-NLS-1$
+			logger.trace("execution finished" ); //$NON-NLS-1$
 		}
 	}
 	
@@ -517,7 +517,7 @@ public class MpqEditorInterface implements MpqInterface, DeepCopyable {
 		logger.trace("executing: {}", () -> cmd); //$NON-NLS-1$
 		Runtime.getRuntime().exec(cmd).waitFor();
 		if (logger.isTraceEnabled()) {
-			logger.trace("execution finished"); //$NON-NLS-1$
+			logger.trace("execution finished" ); //$NON-NLS-1$
 		}
 	}
 	
@@ -538,9 +538,9 @@ public class MpqEditorInterface implements MpqInterface, DeepCopyable {
 	 * @return
 	 */
 	public File getComponentListFile() {
-		File f = new File(mpqCachePath + File.separator + "ComponentList.StormComponents"); //$NON-NLS-1$
+		File f = new File(mpqCachePath + File.separator + "ComponentList.StormComponents" ); //$NON-NLS-1$
 		if (!f.exists() || f.isDirectory()) {
-			f = new File(mpqCachePath + File.separator + "ComponentList.SC2Components"); //$NON-NLS-1$
+			f = new File(mpqCachePath + File.separator + "ComponentList.SC2Components" ); //$NON-NLS-1$
 			if (!f.exists() || f.isDirectory()) {
 				return null;
 			}
@@ -553,13 +553,13 @@ public class MpqEditorInterface implements MpqInterface, DeepCopyable {
 	 */
 	@Override
 	public boolean isHeroesMpq() throws MpqException {
-		File f = new File(mpqCachePath + File.separator + "ComponentList.StormComponents"); //$NON-NLS-1$
+		File f = new File(mpqCachePath + File.separator + "ComponentList.StormComponents" ); //$NON-NLS-1$
 		if (!f.exists() || f.isDirectory()) {
 			logger.trace("file not found in archive: " + f.getAbsolutePath()); //$NON-NLS-1$
-			f = new File(mpqCachePath + File.separator + "ComponentList.SC2Components"); //$NON-NLS-1$
+			f = new File(mpqCachePath + File.separator + "ComponentList.SC2Components" ); //$NON-NLS-1$
 			if (!f.exists() || f.isDirectory()) {
-				logger.error("ERROR: archive has no ComponentList file."); //$NON-NLS-1$
-				throw new MpqException("ERROR: Cannot identify if file belongs to Heroes or SC2."); //$NON-NLS-1$
+				logger.error("ERROR: archive has no ComponentList file." ); //$NON-NLS-1$
+				throw new MpqException("ERROR: Cannot identify if file belongs to Heroes or SC2." ); //$NON-NLS-1$
 			}
 			return false;
 		}

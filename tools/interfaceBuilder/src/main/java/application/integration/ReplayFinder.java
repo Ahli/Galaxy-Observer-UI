@@ -43,7 +43,7 @@ public class ReplayFinder {
 		}
 		if (replay == null || !replay.exists() || !replay.isFile()) {
 			if (logger.isTraceEnabled()) {
-				logger.trace("Last used replay is invalid, getting newest replay instead.");
+				logger.trace("Last used replay is invalid, getting newest replay instead." );
 			}
 			replay = getNewestReplay(isHeroes, documentsPath);
 		}

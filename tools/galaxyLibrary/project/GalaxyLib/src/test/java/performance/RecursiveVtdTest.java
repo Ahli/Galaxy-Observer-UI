@@ -31,7 +31,7 @@ public class RecursiveVtdTest {
 		final long startTime = System.currentTimeMillis();
 		final File f = new File(
 				"D:\\GalaxyObsUI\\baseUI\\heroes\\mods\\core.stormmod\\base.stormdata\\UI\\Layout\\UI\\GameUI" +
-						".StormLayout");
+						".StormLayout" );
 		final VTDGen vtd;
 		
 		try {
@@ -56,12 +56,12 @@ public class RecursiveVtdTest {
 		if (iterations != 0) {
 			System.out.println(
 					"recursive traversal took " + executionTime + "ms. Per iteration: " + executionTime / iterations +
-							"ms.");
+							"ms." );
 		} else {
-			System.out.println("no iterations performed");
+			System.out.println("no iterations performed" );
 		}
 		System.out.println("elements: " + list.size());
-		System.out.println("Memory Use: " + ((float) endMem - startMem) / (1 << 20) + " MB.");
+		System.out.println("Memory Use: " + ((float) endMem - startMem) / (1 << 20) + " MB." );
 		System.out.println("iterations: " + iterations);
 		
 		try {

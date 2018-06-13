@@ -40,7 +40,7 @@ public final class ComponentsListReader {
 	 */
 	public static String getDescIndexPath(final File f, final GameDef game)
 			throws ParserConfigurationException, SAXException, IOException {
-		final String str = game.getBaseDataFolderName() + File.separator + getComponentsListValue(f, "uiui");
+		final String str = game.getBaseDataFolderName() + File.separator + getComponentsListValue(f, "uiui" );
 		logger.trace("DescIndexPath: {}", () -> str);
 		return str;
 	}
@@ -66,12 +66,12 @@ public final class ComponentsListReader {
 		final Document doc = dBuilder.parse(f);
 		
 		// must be in a DataComponent node
-		final NodeList nodeList = doc.getElementsByTagName("DataComponent");
+		final NodeList nodeList = doc.getElementsByTagName("DataComponent" );
 		for (int i = 0, len = nodeList.getLength(); i < len; i++) {
 			final Node node = nodeList.item(i);
 			final Node attrZero = node.getAttributes().item(0);
 			// first attribute's name is Type & value must be as specified
-			if (attrZero.getNodeName().equals("Type") && attrZero.getNodeValue().equals(typeVal)) {
+			if (attrZero.getNodeName().equals("Type" ) && attrZero.getNodeValue().equals(typeVal)) {
 				// the text is the value between the tags
 				return node.getTextContent();
 			}

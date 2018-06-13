@@ -41,7 +41,7 @@ public class TabsController {
 			ActionColumnCellFactoryReset = new Callback<>() {
 		@Override
 		public TableCell<ValueDef, Boolean> call(final TableColumn<ValueDef, Boolean> p) {
-			return new ResetDefaultButtonTableCell(Messages.getString("TabsController.Reset")); //$NON-NLS-1$
+			return new ResetDefaultButtonTableCell(Messages.getString("TabsController.Reset" )); //$NON-NLS-1$
 		}
 	};
 	// based on:
@@ -55,7 +55,7 @@ public class TabsController {
 						@Override
 						protected void updateItem(final String item, final boolean empty) {
 							if (empty || item == null) {
-								logger.trace("update wrapping table cell - null");
+								logger.trace("update wrapping table cell - null" );
 								super.updateItem(item, empty);
 								super.setGraphic(null);
 								super.setText(null);
@@ -78,7 +78,7 @@ public class TabsController {
 									});
 									super.setGraphic(box);
 								} else {
-									logger.trace("update wrapping table cell - equal");
+									logger.trace("update wrapping table cell - equal" );
 								}
 							}
 						}
@@ -118,13 +118,13 @@ public class TabsController {
 	 */
 	@FXML
 	public void initialize() {
-		logger.trace("initializing");
+		logger.trace("initializing" );
 		
-		hotkeysNameCol.setCellValueFactory(new PropertyValueFactory<>("id"));
-		hotkeysDescriptionCol.setCellValueFactory(new PropertyValueFactory<>("description"));
+		hotkeysNameCol.setCellValueFactory(new PropertyValueFactory<>("id" ));
+		hotkeysDescriptionCol.setCellValueFactory(new PropertyValueFactory<>("description" ));
 		hotkeysDescriptionCol.setCellFactory(WRAPPING_CELL_FACTORY);
-		hotkeysDefaultCol.setCellValueFactory(new PropertyValueFactory<>("defaultValue"));
-		hotkeysKeyCol.setCellValueFactory(new PropertyValueFactory<>("value"));
+		hotkeysDefaultCol.setCellValueFactory(new PropertyValueFactory<>("defaultValue" ));
+		hotkeysKeyCol.setCellValueFactory(new PropertyValueFactory<>("value" ));
 		hotkeysKeyCol.setCellFactory(TextFieldTableCell.forTableColumn());
 		hotkeysKeyCol.setOnEditCommit(new EventHandler<>() {
 			@Override
@@ -140,11 +140,11 @@ public class TabsController {
 		hotkeysActionsCol.setCellValueFactory(ActionColumnCellValueFactory);
 		hotkeysActionsCol.setCellFactory(ActionColumnCellFactoryReset);
 		
-		settingsNameCol.setCellValueFactory(new PropertyValueFactory<>("id"));
-		settingsDescriptionCol.setCellValueFactory(new PropertyValueFactory<>("description"));
+		settingsNameCol.setCellValueFactory(new PropertyValueFactory<>("id" ));
+		settingsDescriptionCol.setCellValueFactory(new PropertyValueFactory<>("description" ));
 		settingsDescriptionCol.setCellFactory(WRAPPING_CELL_FACTORY);
-		settingsDefaultCol.setCellValueFactory(new PropertyValueFactory<>("defaultValue"));
-		settingsValueCol.setCellValueFactory(new PropertyValueFactory<>("value"));
+		settingsDefaultCol.setCellValueFactory(new PropertyValueFactory<>("defaultValue" ));
+		settingsValueCol.setCellValueFactory(new PropertyValueFactory<>("value" ));
 		settingsValueCol.setCellFactory(TextFieldTableCell.forTableColumn());
 		settingsValueCol.setOnEditCommit(new EventHandler<>() {
 			@Override

@@ -47,11 +47,11 @@ public class MpqBuilderService {
 	private FileService fileService;
 	
 	@Autowired
-	@Qualifier ("sc2BaseGameData")
+	@Qualifier ("sc2BaseGameData" )
 	private GameData sc2BaseGameData;
 	
 	@Autowired
-	@Qualifier ("heroesBaseGameData")
+	@Qualifier ("heroesBaseGameData" )
 	private GameData heroesBaseGameData;
 	
 	@Autowired
@@ -76,7 +76,7 @@ public class MpqBuilderService {
 			} else if (projectService.pathContainsCompileableForGame(path, sc2BaseGameData)) {
 				game = Game.SC2;
 			} else {
-				throw new IllegalArgumentException("Specified path '" + path + "' did not contain any project.");
+				throw new IllegalArgumentException("Specified path '" + path + "' did not contain any project." );
 			}
 			project = new Project(f.getName(), f.getAbsolutePath(), game);
 		} else {
@@ -118,7 +118,7 @@ public class MpqBuilderService {
 				baseGame = heroesBaseGameData;
 				break;
 			default:
-				throw new IllegalArgumentException("Unhandled game enum " + game.toString() + ".");
+				throw new IllegalArgumentException("Unhandled game enum " + game.toString() + "." );
 		}
 		return baseGame;
 	}
@@ -134,12 +134,12 @@ public class MpqBuilderService {
 	private void buildSpecificUI(final File interfaceDirectory, final GameData game, final boolean useCmdLineSettings,
 			final Project project) {
 		if (app.getExecutor().isShutdown()) {
-			logger.error("ERROR: Executor shut down. Skipping building a UI..."); //$NON-NLS-1$
+			logger.error("ERROR: Executor shut down. Skipping building a UI..." ); //$NON-NLS-1$
 			return;
 		}
 		if (!interfaceDirectory.exists() || !interfaceDirectory.isDirectory()) {
 			logger.error("ERROR: Can't build UI from file '" + interfaceDirectory +
-					"', expected an existing directory."); //$NON-NLS-1$ //$NON-NLS-2$
+					"', expected an existing directory." ); //$NON-NLS-1$ //$NON-NLS-2$
 			return;
 		}
 		final boolean verifyLayout;
@@ -152,7 +152,7 @@ public class MpqBuilderService {
 		if (game.getUiCatalog() == null && verifyLayout) {
 			// parse default UI
 			throw new IllegalStateException(
-					"Base UI of game '" + game.getGameDef().getName() + "' has not been parsed.");
+					"Base UI of game '" + game.getGameDef().getName() + "' has not been parsed." );
 		}
 		
 		// create tasks for the worker pool
@@ -254,7 +254,7 @@ public class MpqBuilderService {
 			final boolean compressXml, final int compressMpq, final boolean buildUnprotectedToo,
 			final boolean repairLayoutOrder, final boolean verifyLayout, final boolean verifyXml, final Project project)
 			throws IOException, InterruptedException {
-		app.printInfoLogMessageToGeneral(sourceFile.getName() + " started construction.");
+		app.printInfoLogMessageToGeneral(sourceFile.getName() + " started construction." );
 		
 		final GameDef gameDef = game.getGameDef();
 		
@@ -355,13 +355,13 @@ public class MpqBuilderService {
 			project.setLastBuildDate(new Date());
 			final long size = new File(targetPath + File.separator + sourceFile.getName()).length();
 			project.setLastBuildSize(size);
-			logger.info("Finished building... " + sourceFile.getName() + ". Size: " + (size / 1024) + " " + "kb");
+			logger.info("Finished building... " + sourceFile.getName() + ". Size: " + (size / 1024) + " " + "kb" );
 			//$NON-NLS-1$
 			projectService.saveProject(project);
-			app.printInfoLogMessageToGeneral(sourceFile.getName() + " finished construction.");
+			app.printInfoLogMessageToGeneral(sourceFile.getName() + " finished construction." );
 		} catch (final IOException | MpqException e) {
 			logger.error("ERROR: unable to construct final Interface file.", e); //$NON-NLS-1$
-			app.printErrorLogMessageToGeneral(sourceFile.getName() + " could not be created.");
+			app.printErrorLogMessageToGeneral(sourceFile.getName() + " could not be created." );
 		}
 	}
 	
@@ -391,7 +391,7 @@ public class MpqBuilderService {
 			case 3:
 				return MpqEditorCompression.SYSTEM_DEFAULT;
 			default:
-				throw new IllegalArgumentException("Unsupported mpq compression mode.");
+				throw new IllegalArgumentException("Unsupported mpq compression mode." );
 		}
 	}
 }
