@@ -57,7 +57,8 @@ public class BaseUiService {
 		final String gamePath = getGamePath(game, usePtr);
 		final GameDef gameDef = gameService.getGameDef(game);
 		final File gameExe =
-				new File(gamePath + File.separator + (usePtr ? gameDef.getPtrRootExeName() : gameDef.getRootExeName()));
+				new File(gamePath + File.separator + (usePtr ? gameDef.getPtrRootExeName() :
+						gameDef.getRootExeName()));
 		final File gameBaseUI = new File(configService.getBaseUiPath(gameDef));
 		
 		if (!gameBaseUI.exists()) {
@@ -121,21 +122,14 @@ public class BaseUiService {
 		for (final String mask : queryMasks) {
 			final Runnable task = () -> {
 				try {
-					final ProcessBuilder pb =
-							new ProcessBuilder(extractorExe.getAbsolutePath(), mask, destination + File.separator,
-									"enUS", "None");
-					// put error and normal output into the same stream
-					pb.redirectErrorStream(true);
-					
-					final Process process = pb.start();
-					// empty output buffers and print to console
-					final InputStream is = process.getInputStream();
-					do {
+					if (!extract(extractorExe, mask, destination)) {
 						Thread.sleep(50);
-						logger.info(IOUtils.toString(is, Charset.defaultCharset()));
-					} while (process.isAlive());
-					is.close();
-					
+						if (!extract(extractorExe, mask, destination)) {
+							logger.warn(
+									"Extraction failed due to a file access. Try closing the Battle.net App, if it is " +
+											"running and this fails to extract all files." );
+						}
+					}
 				} catch (final IOException e) {
 					logger.error("Extracting files from CASC via CascExtractor failed.", e);
 				} catch (final InterruptedException e) {
@@ -190,6 +184,39 @@ public class BaseUiService {
 	}
 	
 	/**
+	 * @param extractorExe
+	 * @param mask
+	 * @param destination
+	 * @return
+	 * @throws IOException
+	 * @throws InterruptedException
+	 */
+	private boolean extract(final File extractorExe, final String mask, final File destination)
+			throws IOException, InterruptedException {
+		final ProcessBuilder pb =
+				new ProcessBuilder(extractorExe.getAbsolutePath(), mask, destination + File.separator, "enUS", "None"
+				);
+		// put error and normal output into the same stream
+		pb.redirectErrorStream(true);
+		
+		boolean retry = false;
+		final Process process = pb.start();
+		// empty output buffers and print to console
+		try (final InputStream is = process.getInputStream()) {
+			do {
+				Thread.sleep(50);
+				final String log = IOUtils.toString(is, Charset.defaultCharset());
+				if (log.contains("Unhandled Exception: System.IO.IOException: The process cannot access the file" )) {
+					retry = true;
+				} else {
+					logger.info(log);
+				}
+			} while (process.isAlive());
+		}
+		return retry;
+	}
+	
+	/**
 	 * Parses the baseUI of the specified game in its own thread. Afterwards, a specified followupTask is executed. The
 	 * parsing of the baseUI is synchronized.
 	 *
@@ -206,17 +233,17 @@ public class BaseUiService {
 				UICatalog uiCatalog = game.getUiCatalog();
 				final String gameName = game.getGameDef().getName();
 				if (uiCatalog != null) {
-					logger.trace("Aborting parsing baseUI for '" + gameName + "' as was already " + "parsed.");
+					logger.trace("Aborting parsing baseUI for '" + gameName + "' as was already " + "parsed." );
 				} else {
 					boolean needToParseAgain = true;
-					boolean isPtr = configService.getIniSettings().isHeroesPtrActive();
+					final boolean isPtr = configService.getIniSettings().isHeroesPtrActive();
 					if (discCacheService.exists(gameName, isPtr)) {
 						// load from cache
 						try {
 							uiCatalog = discCacheService.get(gameName, isPtr, UICatalogImpl.class);
 							game.setUiCatalog(uiCatalog);
 							needToParseAgain = false;
-							logger.trace("Loaded UI from cache");
+							logger.trace("Loaded UI from cache" );
 						} catch (final IOException e) {
 							logger.warn("ERROR: loading cached base UI failed.", e);
 						}
@@ -224,7 +251,7 @@ public class BaseUiService {
 					if (needToParseAgain) {
 						// parse baseUI
 						uiCatalog = new UICatalogImpl();
-						app.printInfoLogMessageToGeneral("Starting to parse base " + gameName + " UI.");
+						app.printInfoLogMessageToGeneral("Starting to parse base " + gameName + " UI." );
 						app.addThreadLoggerTab(Thread.currentThread().getName(),
 								game.getGameDef().getNameHandle() + "UI", true);
 						final String gameDir = configService.getBaseUiPath(game.getGameDef()) + File.separator +
@@ -234,16 +261,16 @@ public class BaseUiService {
 								
 								final File directory = new File(gameDir + File.separator + modOrDir);
 								if (!directory.exists() || !directory.isDirectory()) {
-									throw new IOException("BaseUI out of date.");
+									throw new IOException("BaseUI out of date." );
 								}
 								
 								final Collection<File> descIndexFiles = FileUtils
-										.listFiles(directory, new WildcardFileFilter("DescIndex.*Layout"),
+										.listFiles(directory, new WildcardFileFilter("DescIndex.*Layout" ),
 												TrueFileFilter.INSTANCE);
 								logger.info("number of descIndexFiles found: " + descIndexFiles.size());
 								
 								for (final File descIndexFile : descIndexFiles) {
-									logger.info("parsing descIndexFile '" + descIndexFile.getPath() + "'");
+									logger.info("parsing descIndexFile '" + descIndexFile.getPath() + "'" );
 									uiCatalog.processDescIndex(descIndexFile, game.getGameDef().getDefaultRaceId());
 								}
 							}
