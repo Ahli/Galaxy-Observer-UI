@@ -64,7 +64,7 @@ public abstract class SettingsAutoSaveController implements Updateable {
 				initSavingLabel();
 			}
 		} catch (final IOException e) {
-			savedAnimLabel.setText("Saving failed!" );
+			savedAnimLabel.setText("Saving failed!");
 			final FontAwesomeIconView icon = new FontAwesomeIconView(FontAwesomeIcon.EXCLAMATION_TRIANGLE);
 			icon.setFill(Color.RED);
 			savedAnimLabel.setTextFill(Color.RED);

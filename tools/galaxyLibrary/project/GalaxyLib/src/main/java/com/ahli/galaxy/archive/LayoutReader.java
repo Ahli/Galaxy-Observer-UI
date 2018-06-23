@@ -101,7 +101,7 @@ public final class LayoutReader {
 			ownConstants = getLayoutsConstantDefinitions(doc);
 			
 			if (logger.isTraceEnabled()) {
-				for (final String str : ownConstants) {
+				for (final String str: ownConstants) {
 					logger.trace(nameWOfileEnding + " defines constant " + str);
 				}
 			}
@@ -179,7 +179,7 @@ public final class LayoutReader {
 	 * @return
 	 */
 	private static boolean doesNameAppearInList(final String name, final List<String> list) {
-		for (final String n : list) {
+		for (final String n: list) {
 			if (n.equalsIgnoreCase(name)) {
 				return true;
 			}
@@ -235,7 +235,7 @@ public final class LayoutReader {
 			}
 		}
 		
-		for (final String n : list) {
+		for (final String n: list) {
 			if (n.equalsIgnoreCase(name)) {
 				// System.out.println("check - true - "+constUsage);
 				return true;

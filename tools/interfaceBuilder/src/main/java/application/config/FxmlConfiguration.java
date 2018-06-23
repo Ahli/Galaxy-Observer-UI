@@ -1,6 +1,7 @@
 package application.config;
 
 import application.ui.browse.BrowseController;
+import application.ui.browse.BrowseTabController;
 import application.ui.home.AddProjectController;
 import application.ui.home.HomeController;
 import application.ui.home.ViewRuleSetController;
@@ -21,7 +22,7 @@ import org.springframework.context.annotation.Scope;
 public class FxmlConfiguration {
 	
 	@Bean
-	@Scope ("prototype" )
+	@Scope ("prototype")
 	public ViewRuleSetController viewRuleSetController() {
 		return new ViewRuleSetController();
 	}
@@ -32,31 +33,31 @@ public class FxmlConfiguration {
 	}
 	
 	@Bean
-	@Scope ("prototype" )
+	@Scope ("prototype")
 	public HomeController homeController() {
 		return new HomeController();
 	}
 	
 	@Bean
-	@Scope ("prototype" )
+	@Scope ("prototype")
 	public SettingsCommandLineToolController settingsCommandLineToolController() {
 		return new SettingsCommandLineToolController();
 	}
 	
 	@Bean
-	@Scope ("prototype" )
+	@Scope ("prototype")
 	public SettingsController settingsController() {
 		return new SettingsController();
 	}
 	
 	@Bean
-	@Scope ("prototype" )
+	@Scope ("prototype")
 	public SettingsGamesPathsController settingsGamesPathsController() {
 		return new SettingsGamesPathsController();
 	}
 	
 	@Bean
-	@Scope ("prototype" )
+	@Scope ("prototype")
 	public SettingsGuiToolController settingsGuiToolController() {
 		return new SettingsGuiToolController();
 	}
@@ -67,20 +68,25 @@ public class FxmlConfiguration {
 	}
 	
 	@Bean
-	@Scope ("prototype" )
+	@Scope ("prototype")
 	public AddProjectController addProjectController() {
 		return new AddProjectController();
 	}
 	
 	@Bean
-	@Scope ("prototype" )
+	@Scope ("prototype")
 	public CompressionMiningController compressionMiningController() {
 		return new CompressionMiningController();
 	}
 	
 	@Bean
-	@Scope ("prototype" )
+	@Scope ("prototype")
 	public BrowseController browseController() {
 		return new BrowseController();
+	}
+	
+	@Bean
+	public BrowseTabController browseTabController() {
+		return new BrowseTabController();
 	}
 }

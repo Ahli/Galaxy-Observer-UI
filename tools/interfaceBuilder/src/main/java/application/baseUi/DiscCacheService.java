@@ -16,7 +16,7 @@ import java.util.zip.ZipOutputStream;
 
 public class DiscCacheService {
 	@Autowired
-	ConfigService configService;
+	private ConfigService configService;
 	
 	/**
 	 * @param catalog
@@ -30,7 +30,7 @@ public class DiscCacheService {
 		Files.deleteIfExists(f.toPath());
 		
 		try (final ZipOutputStream out = new ZipOutputStream(new FileOutputStream(f))) {
-			out.putNextEntry(new ZipEntry("c.json" ));
+			out.putNextEntry(new ZipEntry("c.json"));
 			objMapper.writeValue(out, catalog);
 		}
 	}
@@ -40,7 +40,7 @@ public class DiscCacheService {
 	 * @return
 	 */
 	private File getCacheFile(final String id, final boolean isPtr) {
-		final String path = configService.getCachePath() + File.separator + id + (isPtr ? " PTR" : "" ) + ".zip";
+		final String path = configService.getCachePath() + File.separator + id + (isPtr ? " PTR" : "") + ".zip";
 		return new File(path);
 	}
 	

@@ -34,7 +34,7 @@ public class RecursiveDOMTest {
 		final long startTime = System.currentTimeMillis();
 		final File f = new File(
 				"D:\\GalaxyObsUI\\baseUI\\heroes\\mods\\core.stormmod\\base.stormdata\\UI\\Layout\\UI\\GameUI" +
-						".StormLayout" );
+						".StormLayout");
 		final DocumentBuilder dBuilder;
 		
 		try {
@@ -59,12 +59,12 @@ public class RecursiveDOMTest {
 		if (iterations != 0) {
 			System.out.println(
 					"recursive traversal took " + executionTime + "ms. Per iteration: " + executionTime / iterations +
-							"ms." );
+							"ms.");
 		} else {
-			System.out.println("no iterations performed" );
+			System.out.println("no iterations performed");
 		}
 		System.out.println("elements: " + list.size());
-		System.out.println("Memory Use: " + ((float) endMem - startMem) / (1 << 20) + " MB." );
+		System.out.println("Memory Use: " + ((float) endMem - startMem) / (1 << 20) + " MB.");
 		System.out.println("iterations: " + iterations);
 		
 		try {
@@ -75,7 +75,8 @@ public class RecursiveDOMTest {
 		}
 	}
 	
-	public static void loadRecursiveXML(final DocumentBuilder dBuilder, final File f) throws SAXException, IOException {
+	public static void loadRecursiveXML(final DocumentBuilder dBuilder, final File f) throws SAXException,
+			IOException {
 		
 		// long startTime = System.currentTimeMillis();
 		

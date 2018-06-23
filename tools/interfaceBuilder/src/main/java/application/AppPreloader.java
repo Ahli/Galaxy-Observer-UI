@@ -24,13 +24,13 @@ public class AppPreloader extends Preloader {
 		stage.initStyle(StageStyle.TRANSPARENT);
 		scene.setFill(Color.TRANSPARENT);
 		try {
-			scene.getStylesheets().add(getClass().getResource("/view/preload.css" ).toURI().toString());
+			scene.getStylesheets().add(getClass().getResource("/view/preload.css").toURI().toString());
 		} catch (final URISyntaxException e) {
 			logger.error("preloader stylesheet loading error", e);
 		}
 		stage.setScene(scene);
-		stage.setTitle("Interface Builder" );
-		stage.getIcons().add(new Image(getClass().getResourceAsStream("/res/ahli.png" ))); //$NON-NLS-1$
+		stage.setTitle("Interface Builder");
+		stage.getIcons().add(new Image(getClass().getResourceAsStream("/res/ahli.png")));
 		stage.show();
 	}
 	

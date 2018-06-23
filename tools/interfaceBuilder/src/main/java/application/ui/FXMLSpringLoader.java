@@ -38,7 +38,7 @@ public class FXMLSpringLoader extends FXMLLoader implements ApplicationContextAw
 			return super.load(inputStream);
 		} else {
 			throw new IllegalStateException(
-					"Spring context was not set. Use 'new FXMLLoader', if no Spring Bean is desired." );
+					"Spring context was not set. Use 'new FXMLLoader', if no Spring Bean is desired.");
 		}
 	}
 	

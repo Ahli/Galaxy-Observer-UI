@@ -2,6 +2,7 @@ package application;
 
 import application.baseUi.BaseUiService;
 import application.build.MpqBuilderService;
+import application.compress.GameService;
 import application.config.ConfigService;
 import application.i18n.Messages;
 import application.integration.ReplayFinder;
@@ -13,6 +14,7 @@ import application.ui.navigation.Notification;
 import application.ui.progress.ErrorTabController;
 import application.ui.progress.StylizedTextAreaAppender;
 import application.ui.progress.TabPaneController;
+import com.ahli.galaxy.game.def.abstracts.GameDef;
 import javafx.animation.FadeTransition;
 import javafx.animation.PauseTransition;
 import javafx.application.Application;
@@ -66,10 +68,8 @@ import java.util.concurrent.TimeUnit;
 public class InterfaceBuilderApp extends Application {
 	
 	private static final Logger logger = LogManager.getLogger();
-	
 	private static InterfaceBuilderApp instance = null;
 	private static ServerSocket serverSocket;
-	
 	private final List<ErrorTabController> errorTabControllers = new ArrayList<>();
 	@Autowired
 	private ConfigService config;
@@ -79,16 +79,16 @@ public class InterfaceBuilderApp extends Application {
 	private MpqBuilderService mpqBuilderService;
 	@Autowired
 	private ThreadPoolExecutor executor;
-	
-	private ConfigurableApplicationContext appContext;
-	
 	@Autowired
 	private ConfigService configService;
-	private NavigationController navigationController;
-	
 	@Autowired
 	private BaseUiService baseUiService;
+	@Autowired
+	private GameService gameService;
+	private ConfigurableApplicationContext appContext;
 	private Stage primaryStage = null;
+	private NavigationController navigationController;
+	
 	
 	/**
 	 * Entry point of the App.
@@ -99,17 +99,16 @@ public class InterfaceBuilderApp extends Application {
 	public static void main(final String[] args) {
 		initInterProcessCommunication(args, 12317);
 		
-		logger.trace("trace log visible" ); //$NON-NLS-1$
-		logger.debug("debug log visible" ); //$NON-NLS-1$
-		logger.info("info log visible" ); //$NON-NLS-1$
-		logger.warn("warn log visible" ); //$NON-NLS-1$
-		logger.error("error log visible" ); //$NON-NLS-1$
-		logger.fatal("fatal log visible" ); //$NON-NLS-1$
+		logger.trace("trace log visible");
+		logger.debug("debug log visible");
+		logger.info("info log visible");
+		logger.warn("warn log visible");
+		logger.error("error log visible");
+		logger.fatal("fatal log visible");
 		
-		logger.trace("Configuration File of System: {}",
-				() -> System.getProperty("log4j.configurationFile" )); //$NON-NLS-1$ //$NON-NLS-2$
-		logger.info("Launch arguments: " + Arrays.toString(args)); //$NON-NLS-1$
-		logger.info("Max Heap Space: " + Runtime.getRuntime().maxMemory() / 1048576L + "mb." );
+		logger.trace("Configuration File of System: {}", () -> System.getProperty("log4j.configurationFile"));
+		logger.info("Launch arguments: " + Arrays.toString(args));
+		logger.info("Max Heap Space: " + Runtime.getRuntime().maxMemory() / 1048576L + "mb.");
 		
 		System.setProperty("javafx.preloader", AppPreloader.class.getCanonicalName());
 		launch(args);
@@ -135,21 +134,31 @@ public class InterfaceBuilderApp extends Application {
 							     final BufferedReader in = new BufferedReader(
 									     new InputStreamReader(clientSocket.getInputStream()))) {
 								String inputLine;
-								while ((inputLine = in.readLine()) != null) {
+								while (in.ready() && (inputLine = in.readLine()) != null) {
 									out.println(inputLine);
 									logger.info("message from client: " + inputLine);
 									final List<String> params =
-											Arrays.asList(inputLine.substring(1, inputLine.length() - 1).split(", " ));
+											Arrays.asList(inputLine.substring(1, inputLine.length() - 1).split(", "));
 									getInstance().executeCommand(params);
 								}
+								
+								clientSocket.close();
 							}
 						} catch (final IOException e) {
 							logger.fatal("I/O Exception while waiting for client connections.", e);
 						}
+						logger.info("socket host loop");
+						//						try {
+						//							serverSocket =
+						//									new ServerSocket(port, 4, InetAddress.getByAddress(new
+						// byte[] { 127, 0, 0, 1 }));
+						//						} catch (final IOException e) {
+						//							logger.error("error creating new server socket: ", e);
+						//						}
 					}
 				}
 			};
-			serverThread.setName("IPCserver" );
+			serverThread.setName("IPCserver");
 			serverThread.setDaemon(true);
 			serverThread.setPriority(Thread.MIN_PRIORITY);
 			serverThread.start();
@@ -158,7 +167,7 @@ public class InterfaceBuilderApp extends Application {
 			System.exit(1);
 		} catch (final IOException e) {
 			// port taken, so app is already running
-			logger.info("App already running. Passing over command line arguments." );
+			logger.info("App already running. Passing over command line arguments.");
 			
 			try (final Socket socket = new Socket(InetAddress.getByAddress(new byte[] { 127, 0, 0, 1 }), port)) {
 				final PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
@@ -181,6 +190,7 @@ public class InterfaceBuilderApp extends Application {
 	 */
 	private void executeCommand(final List<String> paramList) {
 		final CommandLineParams params = new CommandLineParams(paramList.toArray(new String[0]));
+		params.setParamsOriginateFromExternalSource(true);
 		
 		if (params.isHasParamCompilePath()) {
 			buildStartReplayExit(InterfaceBuilderApp.getInstance().getPrimaryStage(), params);
@@ -201,7 +211,7 @@ public class InterfaceBuilderApp extends Application {
 			@Override
 			public void run() {
 				try {
-					Thread.currentThread().setName("Supervisor" ); //$NON-NLS-1$
+					Thread.currentThread().setName("Supervisor");
 					Thread.currentThread().setPriority(Thread.MIN_PRIORITY);
 					final ThreadPoolExecutor executorTmp = getExecutor();
 					Platform.runLater(() -> navigationController.lockNavToProgress());
@@ -245,31 +255,35 @@ public class InterfaceBuilderApp extends Application {
 		if (params.isWasStartedWithParameters() && !anyErrorTrackerEncounteredError()) {
 			// start game, launch replay
 			attemptToRunGameWithReplay(params);
-			if (!params.isHasParamCompilePath()) {
-				Platform.runLater(() -> {
-					try {
-						// close after 5 seconds, if compiled all and no errors
-						final PauseTransition delay = new PauseTransition(Duration.seconds(5));
-						delay.setOnFinished(new EventHandler<>() {
-							@Override
-							public void handle(final ActionEvent event) {
-								primaryStage.close();
-							}
-						});
-						delay.play();
-					} catch (final Exception e) {
-						logger.fatal("FATAL ERROR: ", e);
-					}
-				});
-			} else {
-				// close instantly, if compiled special
-				Platform.runLater(() -> {
-					try {
-						primaryStage.close();
-					} catch (final Exception e) {
-						logger.fatal("FATAL ERROR: ", e);
-					}
-				});
+			
+			// app started with params => potentially close itself
+			if (!params.isParamsOriginateFromExternalSource()) {
+				if (!params.isHasParamCompilePath()) {
+					Platform.runLater(() -> {
+						try {
+							// close after 5 seconds, if compiled all and no errors
+							final PauseTransition delay = new PauseTransition(Duration.seconds(5));
+							delay.setOnFinished(new EventHandler<>() {
+								@Override
+								public void handle(final ActionEvent event) {
+									primaryStage.close();
+								}
+							});
+							delay.play();
+						} catch (final Exception e) {
+							logger.fatal("FATAL ERROR: ", e);
+						}
+					});
+				} else {
+					// close instantly, if only run or something else
+					Platform.runLater(() -> {
+						try {
+							primaryStage.close();
+						} catch (final Exception e) {
+							logger.fatal("FATAL ERROR: ", e);
+						}
+					});
+				}
 			}
 		}
 	}
@@ -278,7 +292,7 @@ public class InterfaceBuilderApp extends Application {
 	 * @return
 	 */
 	private boolean anyErrorTrackerEncounteredError() {
-		for (final ErrorTabController ctrl : errorTabControllers) {
+		for (final ErrorTabController ctrl: errorTabControllers) {
 			if (ctrl.hasEncounteredError() && !ctrl.isErrorsDoNotPreventExit()) {
 				return true;
 			}
@@ -299,65 +313,51 @@ public class InterfaceBuilderApp extends Application {
 			if (gamePath == null) {
 				return;
 			}
-			isHeroes = gamePath.contains("HeroesSwitcher.exe" ); //$NON-NLS-1$
+			isHeroes = gamePath.contains("HeroesSwitcher");
 		} else {
 			final SettingsIniInterface settings = configService.getIniSettings();
 			// compileAndRun is active -> figure out the right game
-			if (params.getParamCompilePath().contains(File.separator + "heroes" + File.separator)) { //$NON-NLS-1$
+			final GameDef gameDef;
+			if (params.getParamCompilePath().contains(File.separator + "heroes" + File.separator)) {
 				// Heroes
 				isHeroes = true;
-				if (settings.isHeroesPtrActive()) {
-					// PTR Heroes
-					if (settings.isHeroesPtr64bit()) {
-						gamePath = settings.getHeroesPtrPath() + File.separator + "Support64" + File.separator
-								//$NON-NLS-1$
-								+ "HeroesSwitcher_x64.exe"; //$NON-NLS-1$
-					} else {
-						gamePath =
-								settings.getHeroesPtrPath() + File.separator + "Support" + File.separator //$NON-NLS-1$
-										+ "HeroesSwitcher.exe"; //$NON-NLS-1$
-					}
-				} else {
-					// live Heroes
-					if (settings.isHeroes64bit()) {
-						gamePath =
-								settings.getHeroesPath() + File.separator + "Support64" + File.separator //$NON-NLS-1$
-										+ "HeroesSwitcher_x64.exe"; //$NON-NLS-1$
-					} else {
-						gamePath = settings.getHeroesPath() + File.separator + "Support" + File.separator //$NON-NLS-1$
-								+ "HeroesSwitcher.exe"; //$NON-NLS-1$
-					}
-				}
+				gameDef = gameService.getGameDef(Game.HEROES);
+				final boolean isPtr = settings.isHeroesPtrActive();
+				final boolean is64bit = isPtr ? settings.isHeroesPtr64bit() : settings.isHeroes64bit();
+				final String supportDir = is64bit ? gameDef.getSupportDirectoryX64() :
+						gameDef.getSupportDirectoryX32();
+				final String swicherExe = is64bit ? gameDef.getSwitcherExeNameX64() : gameDef.getSwitcherExeNameX32();
+				gamePath =
+						(isPtr ? settings.getHeroesPtrPath() : settings.getHeroesPath()) + File.separator + supportDir +
+								File.separator + swicherExe;
 			} else {
 				// SC2
 				isHeroes = false;
-				if (settings.isSc64bit()) {
-					gamePath = settings.getSc2Path() + File.separator + "Support64" + File.separator //$NON-NLS-1$
-							+ "SC2Switcher_x64.exe"; //$NON-NLS-1$
-				} else {
-					gamePath = settings.getSc2Path() + File.separator + "Support" + File.separator +
-							"SC2Switcher.exe"; //$NON-NLS-1$ //$NON-NLS-2$
-				}
+				gameDef = gameService.getGameDef(Game.SC2);
+				final boolean is64bit = settings.isSc64bit();
+				final String supportDir = is64bit ? gameDef.getSupportDirectoryX64() :
+						gameDef.getSupportDirectoryX32();
+				final String swicherExe = is64bit ? gameDef.getSwitcherExeNameX64() : gameDef.getSwitcherExeNameX32();
+				gamePath = settings.getSc2Path() + File.separator + supportDir + File.separator + swicherExe;
 			}
 		}
-		logger.info("Game location: " + gamePath); //$NON-NLS-1$
+		logger.info("Game location: " + gamePath);
 		
 		final File replay = replayFinder.getLastUsedOrNewestReplay(isHeroes, config.getDocumentsPath());
 		if (replay != null && replay.exists() && replay.isFile()) {
-			logger.info("Starting game with replay: " + replay.getName()); //$NON-NLS-1$
-			final String cmd = "cmd /C start \"\" \"" + gamePath + "\" \"" + replay.getAbsolutePath() +
-					"\""; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-			// logging.trace("executing: " + cmd); //$NON-NLS-1$
+			logger.info("Starting game with replay: " + replay.getName());
+			final String cmd = "cmd /C start \"\" \"" + gamePath + "\" \"" + replay.getAbsolutePath() + "\"";
+			// logging.trace("executing: " + cmd);
 			try {
 				Runtime.getRuntime().exec(cmd);
-				// logging.trace("after Start attempt..."); //$NON-NLS-1$
+				// logging.trace("after Start attempt...");
 			} catch (final IOException e) {
-				logger.error("Failed to execute the game launch command.", e); //$NON-NLS-1$
+				logger.error("Failed to execute the game launch command.", e);
 			}
 		} else {
-			logger.error("Failed to find any replay." ); //$NON-NLS-1$
+			logger.error("Failed to find any replay.");
 		}
-		printInfoLogMessageToGeneral("The game starts with a replay now..." ); //$NON-NLS-1$
+		printInfoLogMessageToGeneral("The game starts with a replay now...");
 	}
 	
 	/**
@@ -381,7 +381,7 @@ public class InterfaceBuilderApp extends Application {
 	 */
 	@Override
 	public void start(final Stage primaryStage) throws Exception {
-		Thread.currentThread().setName("UI" ); //$NON-NLS-1$
+		Thread.currentThread().setName("UI");
 		Thread.currentThread().setPriority(Thread.MAX_PRIORITY);
 		this.primaryStage = primaryStage;
 		
@@ -423,27 +423,27 @@ public class InterfaceBuilderApp extends Application {
 		// Build Navigation
 		final BorderPane root;
 		final FXMLLoader loader = new FXMLSpringLoader(appContext);
-		try (final InputStream is = appContext.getResource("view/Navigation.fxml" ).getInputStream()) { //$NON-NLS-1$
+		try (final InputStream is = appContext.getResource("view/Navigation.fxml").getInputStream()) {
 			root = loader.load(is);
 			navigationController = loader.getController();
 		} catch (final IOException | NullPointerException e) {
-			logger.error("Failed to load Navigation.fxml:", e); //$NON-NLS-1$
+			logger.error("Failed to load Navigation.fxml:", e);
 			throw new IOException("Failed to load Navigation.fxml.", e);
 		}
 		final Scene scene = new Scene(root, 1200, 600);
 		
-		scene.getStylesheets().add(appContext.getResource("view/application.css" ).getURI().toString()); //$NON-NLS-1$
-		scene.getStylesheets().add(appContext.getResource("view/textStyles.css" ).getURI().toString()); //$NON-NLS-1$
+		scene.getStylesheets().add(appContext.getResource("view/application.css").getURI().toString());
+		scene.getStylesheets().add(appContext.getResource("view/textStyles.css").getURI().toString());
 		
 		// app icon
 		try {
-			primaryStage.getIcons().add(new Image(getClass().getResourceAsStream("/res/ahli.png" ))); //$NON-NLS-1$
+			primaryStage.getIcons().add(new Image(getClass().getResourceAsStream("/res/ahli.png")));
 		} catch (final Exception e) {
-			logger.error("Failed to load ahli.png" ); //$NON-NLS-1$
+			logger.error("Failed to load ahli.png");
 		}
 		primaryStage.setMaximized(true);
 		primaryStage.setScene(scene);
-		primaryStage.setTitle(Messages.getString("app.title" ));
+		primaryStage.setTitle(Messages.getString("app.title"));
 		
 		// Fade animation (to hide white stage background flash)
 		primaryStage.setOpacity(0);
@@ -454,7 +454,7 @@ public class InterfaceBuilderApp extends Application {
 		
 		primaryStage.show();
 		primaryStage.setOpacity(1);
-		logger.info("Initializing App..." ); //$NON-NLS-1$
+		logger.info("Initializing App...");
 		
 		hidePreloader();
 	}
@@ -463,42 +463,45 @@ public class InterfaceBuilderApp extends Application {
 	 * Prints variables into console.
 	 */
 	private void printVariables(final CommandLineParams params) {
-		logger.info("basePath: " + config.getBasePath()); //$NON-NLS-1$
-		logger.info("documentsPath: " + config.getDocumentsPath()); //$NON-NLS-1$
+		logger.info("basePath: " + config.getBasePath());
+		logger.info("documentsPath: " + config.getDocumentsPath());
 		final String paramCompilePath = params.getParamCompilePath();
 		if (paramCompilePath != null) {
-			logger.info("compile param path: " + paramCompilePath); //$NON-NLS-1$
+			logger.info("compile param path: " + paramCompilePath);
 			if (params.isCompileAndRun()) {
-				logger.info("run after compile: true" ); //$NON-NLS-1$
+				logger.info("run after compile: true");
 			}
 		}
 		final String paramRunPath = params.getParamRunPath();
 		if (paramRunPath != null) {
-			logger.info("run param path: " + paramRunPath); //$NON-NLS-1$
+			logger.info("run param path: " + paramRunPath);
 		}
 	}
 	
 	private void checkBaseUiUpdate() {
 		try {
-			if (baseUiService.isOutdated(Game.SC2, false)) {
+			if (baseUiService.isOutdated(Game.SC2, false, configService.getIniSettings().isSc64bit())) {
 				navigationController.appendNotification(
-						new Notification(Messages.getString("browse.notification.sc2OutOfDate" ), 3));
+						new Notification(Messages.getString("browse.notification.sc2OutOfDate"),
+								NavigationController.BROWSE_TAB));
 			}
 		} catch (final IOException e) {
 			logger.error("Error during SC2 baseUI update check.", e);
 		}
 		try {
-			if (baseUiService.isOutdated(Game.HEROES, false)) {
+			if (baseUiService.isOutdated(Game.HEROES, false, configService.getIniSettings().isHeroes64bit())) {
 				navigationController.appendNotification(
-						new Notification(Messages.getString("browse.notification.heroesOutOfDate" ), 3));
+						new Notification(Messages.getString("browse.notification.heroesOutOfDate"),
+								NavigationController.BROWSE_TAB));
 			}
 		} catch (final IOException e) {
 			logger.error("Error during Heroes baseUI update check.", e);
 		}
 		try {
-			if (baseUiService.isOutdated(Game.HEROES, true)) {
+			if (baseUiService.isOutdated(Game.HEROES, true, configService.getIniSettings().isHeroesPtr64bit())) {
 				navigationController.appendNotification(
-						new Notification(Messages.getString("browse.notification.heroesPtrOutOfDate" ), 3));
+						new Notification(Messages.getString("browse.notification.heroesPtrOutOfDate"),
+								NavigationController.BROWSE_TAB));
 			}
 		} catch (final IOException e) {
 			logger.error("Error during Heroes PTR baseUI update check.", e);
@@ -533,7 +536,7 @@ public class InterfaceBuilderApp extends Application {
 		
 		// context menu with close option
 		final ContextMenu contextMenu = new ContextMenu();
-		final MenuItem closeItem = new MenuItem("Close" );
+		final MenuItem closeItem = new MenuItem("Close");
 		closeItem.setOnAction(event -> getTabPane().getTabs().remove(newTab));
 		contextMenu.getItems().addAll(closeItem);
 		newTab.setContextMenu(contextMenu);
@@ -561,10 +564,10 @@ public class InterfaceBuilderApp extends Application {
 	public void init() {
 		if (instance == null) {
 			instance = this;
-			logger.trace("Application singleton successfull." );
+			logger.trace("Application singleton successfull.");
 		} else {
-			logger.error("Application cannot be started multiple times." );
-			throw new ExceptionInInitializerError("Application cannot be started multiple times." );
+			logger.error("Application cannot be started multiple times.");
+			throw new ExceptionInInitializerError("Application cannot be started multiple times.");
 		}
 		// start Spring
 		try {
@@ -611,7 +614,7 @@ public class InterfaceBuilderApp extends Application {
 	 */
 	@Override
 	public void stop() {
-		logger.info("App is about to shut down." ); //$NON-NLS-1$
+		logger.info("App is about to shut down.");
 		if (!executor.isShutdown()) {
 			executor.shutdownNow();
 		}
@@ -620,10 +623,10 @@ public class InterfaceBuilderApp extends Application {
 		} catch (final InterruptedException e) {
 			logger.error(
 					"ERROR: Executor timed out waiting for Worker Theads to terminate. A Thread might run rampage.",
-					e); //$NON-NLS-1$
+					e);
 			Thread.currentThread().interrupt();
 		}
-		logger.info("App waves Goodbye!" ); //$NON-NLS-1$
+		logger.info("App waves Goodbye!");
 		appContext.stop();
 	}
 	

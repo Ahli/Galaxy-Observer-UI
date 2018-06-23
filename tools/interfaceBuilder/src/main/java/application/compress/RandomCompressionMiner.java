@@ -155,7 +155,7 @@ public class RandomCompressionMiner {
 			final File cacheDir) {
 		final List<MpqEditorCompressionRule> clean = new ArrayList<>();
 		String mask;
-		for (final MpqEditorCompressionRule rule : dirty) {
+		for (final MpqEditorCompressionRule rule: dirty) {
 			if (rule instanceof MpqEditorCompressionRuleMask) {
 				mask = ((MpqEditorCompressionRuleMask) rule).getMask();
 				if (isValidFileSpecificMask(mask, cacheDir)) {
@@ -167,7 +167,7 @@ public class RandomCompressionMiner {
 				if (rule != null) {
 					clean.add(rule);
 				} else {
-					logger.trace("removing null entry from ruleset" );
+					logger.trace("removing null entry from ruleset");
 				}
 			}
 		}
@@ -230,7 +230,7 @@ public class RandomCompressionMiner {
 		for (int i = 0; i < rules.length; i++) {
 			if (rules[i] instanceof MpqEditorCompressionRuleMask) {
 				final String cleanedMask =
-						File.separator + ((MpqEditorCompressionRuleMask) rules[i]).getMask().replace("*", "" );
+						File.separator + ((MpqEditorCompressionRuleMask) rules[i]).getMask().replace("*", "");
 				if (p.toString().endsWith(cleanedMask)) {
 					return true;
 				}
@@ -260,7 +260,7 @@ public class RandomCompressionMiner {
 	 * @return true if file exists within the cache and is not a directory
 	 */
 	private boolean isValidFileSpecificMask(final String mask, final File cacheDir) {
-		if (mask.contains("*" )) {
+		if (mask.contains("*")) {
 			return false;
 		}
 		final File referencedFile = new File(cacheDir.getAbsolutePath() + File.separator + mask);
@@ -290,7 +290,7 @@ public class RandomCompressionMiner {
 	public void randomizeRules() {
 		// fine for all: NONE, BZIP2, ZLIB, PKWARE, SPARSE, SPARSE_BZIP2, SPARSE_ZLIB
 		// not fine: LZMA (crash during load)
-		for (final MpqEditorCompressionRule r : rules) {
+		for (final MpqEditorCompressionRule r: rules) {
 			if (r instanceof MpqEditorCompressionRuleMask) {
 				r.setCompressionMethod(getRandomCompressionMethod());
 			}

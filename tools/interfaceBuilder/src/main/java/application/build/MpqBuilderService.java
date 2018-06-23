@@ -47,11 +47,11 @@ public class MpqBuilderService {
 	private FileService fileService;
 	
 	@Autowired
-	@Qualifier ("sc2BaseGameData" )
+	@Qualifier ("sc2BaseGameData")
 	private GameData sc2BaseGameData;
 	
 	@Autowired
-	@Qualifier ("heroesBaseGameData" )
+	@Qualifier ("heroesBaseGameData")
 	private GameData heroesBaseGameData;
 	
 	@Autowired
@@ -76,7 +76,7 @@ public class MpqBuilderService {
 			} else if (projectService.pathContainsCompileableForGame(path, sc2BaseGameData)) {
 				game = Game.SC2;
 			} else {
-				throw new IllegalArgumentException("Specified path '" + path + "' did not contain any project." );
+				throw new IllegalArgumentException("Specified path '" + path + "' did not contain any project.");
 			}
 			project = new Project(f.getName(), f.getAbsolutePath(), game);
 		} else {
@@ -108,7 +108,7 @@ public class MpqBuilderService {
 	 * @param game
 	 * @return
 	 */
-	private GameData getGameData(final Game game) {
+	public GameData getGameData(final Game game) {
 		final GameData baseGame;
 		switch (game) {
 			case SC2:
@@ -118,7 +118,7 @@ public class MpqBuilderService {
 				baseGame = heroesBaseGameData;
 				break;
 			default:
-				throw new IllegalArgumentException("Unhandled game enum " + game.toString() + "." );
+				throw new IllegalArgumentException("Unhandled game enum " + game.toString() + ".");
 		}
 		return baseGame;
 	}
@@ -134,12 +134,12 @@ public class MpqBuilderService {
 	private void buildSpecificUI(final File interfaceDirectory, final GameData game, final boolean useCmdLineSettings,
 			final Project project) {
 		if (app.getExecutor().isShutdown()) {
-			logger.error("ERROR: Executor shut down. Skipping building a UI..." ); //$NON-NLS-1$
+			logger.error("ERROR: Executor shut down. Skipping building a UI...");
 			return;
 		}
 		if (!interfaceDirectory.exists() || !interfaceDirectory.isDirectory()) {
-			logger.error("ERROR: Can't build UI from file '" + interfaceDirectory +
-					"', expected an existing directory." ); //$NON-NLS-1$ //$NON-NLS-2$
+			logger.error(
+					"ERROR: Can't build UI from file '" + interfaceDirectory + "', expected an existing directory.");
 			return;
 		}
 		final boolean verifyLayout;
@@ -152,7 +152,7 @@ public class MpqBuilderService {
 		if (game.getUiCatalog() == null && verifyLayout) {
 			// parse default UI
 			throw new IllegalStateException(
-					"Base UI of game '" + game.getGameDef().getName() + "' has not been parsed." );
+					"Base UI of game '" + game.getGameDef().getName() + "' has not been parsed.");
 		}
 		
 		// create tasks for the worker pool
@@ -198,7 +198,7 @@ public class MpqBuilderService {
 			} catch (final InterruptedException e) {
 				Thread.currentThread().interrupt();
 			} catch (final IOException e) {
-				logger.error("ERROR: Exception while building UIs.", e); //$NON-NLS-1$
+				logger.error("ERROR: Exception while building UIs.", e);
 			} catch (final Exception e) {
 				logger.fatal("FATAL ERROR: ", e);
 			}
@@ -230,7 +230,8 @@ public class MpqBuilderService {
 	}
 	
 	/**
-	 * Builds MPQ Archive File. Run this in its own thread! Conditions: - Specified MpqInterface requires a unique cache
+	 * Builds MPQ Archive File. Run this in its own thread! Conditions: - Specified MpqInterface requires a unique
+	 * cache
 	 * path for multithreading.
 	 *
 	 * @param sourceFile
@@ -252,9 +253,10 @@ public class MpqBuilderService {
 	 */
 	private void buildFile(final File sourceFile, final GameData game, final MpqEditorInterface mpqi,
 			final boolean compressXml, final int compressMpq, final boolean buildUnprotectedToo,
-			final boolean repairLayoutOrder, final boolean verifyLayout, final boolean verifyXml, final Project project)
+			final boolean repairLayoutOrder, final boolean verifyLayout, final boolean verifyXml,
+			final Project project)
 			throws IOException, InterruptedException {
-		app.printInfoLogMessageToGeneral(sourceFile.getName() + " started construction." );
+		app.printInfoLogMessageToGeneral(sourceFile.getName() + " started construction.");
 		
 		final GameDef gameDef = game.getGameDef();
 		
@@ -271,7 +273,7 @@ public class MpqBuilderService {
 		// get and create cache
 		final File cache = new File(mpqi.getMpqCachePath());
 		if (!cache.exists() && !cache.mkdirs()) {
-			final String msg = "Unable to create cache directory."; //$NON-NLS-1$
+			final String msg = "Unable to create cache directory.";
 			logger.error(msg);
 			throw new IOException(msg);
 		}
@@ -286,7 +288,7 @@ public class MpqBuilderService {
 			}
 		}
 		if (cacheClearAttempts > 100) {
-			final String msg = "ERROR: Cache could not be cleared"; //$NON-NLS-1$
+			final String msg = "ERROR: Cache could not be cleared";
 			logger.error(msg);
 			return;
 		}
@@ -299,23 +301,22 @@ public class MpqBuilderService {
 				break;
 			} catch (final FileSystemException e) {
 				if (copyAttempts == 0) {
-					logger.warn("Attempt to copy directory failed.", e); //$NON-NLS-1$
+					logger.warn("Attempt to copy directory failed.", e);
 				} else if (copyAttempts >= 100) {
-					final String msg =
-							"Unable to copy directory after 100 copy attempts: " + e.getMessage(); //$NON-NLS-1$
+					final String msg = "Unable to copy directory after 100 copy attempts: " + e.getMessage();
 					logger.error(msg, e);
 					throw new FileSystemException(msg);
 				}
 				// sleep and hope the file gets released soon
 				Thread.sleep(500);
 			} catch (final IOException e) {
-				final String msg = "Unable to copy directory"; //$NON-NLS-1$
+				final String msg = "Unable to copy directory";
 				logger.error(msg, e);
 			}
 		}
 		if (copyAttempts > 100) {
 			// copy keeps failing -> abort
-			final String msg = "Above code did not throw exception about copy attempt threshold reached."; //$NON-NLS-1$
+			final String msg = "Above code did not throw exception about copy attempt threshold reached.";
 			logger.error(msg);
 			throw new IOException(msg);
 		}
@@ -329,7 +330,7 @@ public class MpqBuilderService {
 		try {
 			descIndexData.setDescIndexPathAndClear(ComponentsListReader.getDescIndexPath(componentListFile, gameDef));
 		} catch (final ParserConfigurationException | SAXException | IOException e) {
-			final String msg = "ERROR: unable to read DescIndex path."; //$NON-NLS-1$
+			final String msg = "ERROR: unable to read DescIndex path.";
 			logger.error(msg, e);
 			throw new IOException(msg, e);
 		}
@@ -338,15 +339,15 @@ public class MpqBuilderService {
 		try {
 			descIndexData.addLayoutIntPath(DescIndexReader.getLayoutPathList(descIndexFile, false));
 		} catch (final SAXException | ParserConfigurationException | IOException | MpqException e) {
-			logger.error("unable to read Layout paths", e); //$NON-NLS-1$
+			logger.error("unable to read Layout paths", e);
 		}
 		
-		logger.info("Compiling... " + sourceFile.getName()); //$NON-NLS-1$
+		logger.info("Compiling... " + sourceFile.getName());
 		
 		// perform checks/improvements on code
-		compileService.compile(mod, "Terr", repairLayoutOrder, verifyLayout, verifyXml); //$NON-NLS-1$
+		compileService.compile(mod, "Terr", repairLayoutOrder, verifyLayout, verifyXml);
 		
-		logger.info("Building... " + sourceFile.getName()); //$NON-NLS-1$
+		logger.info("Building... " + sourceFile.getName());
 		
 		try {
 			mpqi.buildMpq(targetPath, sourceFile.getName(), compressXml, getCompressionModeOfSetting(compressMpq),
@@ -355,13 +356,12 @@ public class MpqBuilderService {
 			project.setLastBuildDate(new Date());
 			final long size = new File(targetPath + File.separator + sourceFile.getName()).length();
 			project.setLastBuildSize(size);
-			logger.info("Finished building... " + sourceFile.getName() + ". Size: " + (size / 1024) + " " + "kb" );
-			//$NON-NLS-1$
+			logger.info("Finished building... " + sourceFile.getName() + ". Size: " + (size / 1024) + " " + "kb");
 			projectService.saveProject(project);
-			app.printInfoLogMessageToGeneral(sourceFile.getName() + " finished construction." );
+			app.printInfoLogMessageToGeneral(sourceFile.getName() + " finished construction.");
 		} catch (final IOException | MpqException e) {
-			logger.error("ERROR: unable to construct final Interface file.", e); //$NON-NLS-1$
-			app.printErrorLogMessageToGeneral(sourceFile.getName() + " could not be created." );
+			logger.error("ERROR: unable to construct final Interface file.", e);
+			app.printErrorLogMessageToGeneral(sourceFile.getName() + " could not be created.");
 		}
 	}
 	
@@ -391,7 +391,7 @@ public class MpqBuilderService {
 			case 3:
 				return MpqEditorCompression.SYSTEM_DEFAULT;
 			default:
-				throw new IllegalArgumentException("Unsupported mpq compression mode." );
+				throw new IllegalArgumentException("Unsupported mpq compression mode.");
 		}
 	}
 }

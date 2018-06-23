@@ -67,7 +67,7 @@ public class NavigationController {
 		if (instance == null) {
 			instance = this;
 		} else {
-			throw new ExceptionInInitializerError("Cannot create multiple NavigationControllers." );
+			throw new ExceptionInInitializerError("Cannot create multiple NavigationControllers.");
 		}
 	}
 	
@@ -105,9 +105,11 @@ public class NavigationController {
 		notificationBar.setVisible(false);
 		notificationBar.managedProperty().bind(notificationBar.visibleProperty());
 		notificationBar.setBackground(new Background(
-				new BackgroundFill(Color.color(211d / 256d, 168d / 255d, 3d / 255d), CornerRadii.EMPTY, Insets.EMPTY)));
+				new BackgroundFill(Color.color(211d / 256d, 168d / 255d, 3d / 255d), CornerRadii.EMPTY,
+						Insets.EMPTY)));
 		selectedMarker.setBackground(new Background(
-				new BackgroundFill(Color.color(211d / 256d, 168d / 255d, 3d / 255d), CornerRadii.EMPTY, Insets.EMPTY)));
+				new BackgroundFill(Color.color(211d / 256d, 168d / 255d, 3d / 255d), CornerRadii.EMPTY,
+						Insets.EMPTY)));
 		
 		// content pages
 		initFXML("view/Content_Home.fxml", 0);
@@ -130,7 +132,7 @@ public class NavigationController {
 			final Object controller = loader.getController();
 			controllers[index] = (controller instanceof Updateable) ? (Updateable) controller : null;
 		} catch (final IOException e) {
-			logger.error("failed to load FXML: " + path + ".", e); //$NON-NLS-1$
+			logger.error("failed to load FXML: " + path + ".", e);
 			contentPages[index] = null;
 			controllers[index] = null;
 		}

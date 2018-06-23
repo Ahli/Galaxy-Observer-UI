@@ -19,7 +19,7 @@ public class TabPaneController implements Updateable {
 		if (instance == null) {
 			instance = this;
 		} else {
-			throw new ExceptionInInitializerError("Cannot create multiple TabPaneControllers." );
+			throw new ExceptionInInitializerError("Cannot create multiple TabPaneControllers.");
 		}
 	}
 	

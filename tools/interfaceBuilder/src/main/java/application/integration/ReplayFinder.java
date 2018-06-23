@@ -43,7 +43,7 @@ public class ReplayFinder {
 		}
 		if (replay == null || !replay.exists() || !replay.isFile()) {
 			if (logger.isTraceEnabled()) {
-				logger.trace("Last used replay is invalid, getting newest replay instead." );
+				logger.trace("Last used replay is invalid, getting newest replay instead.");
 			}
 			replay = getNewestReplay(isHeroes, documentsPath);
 		}
@@ -127,7 +127,7 @@ public class ReplayFinder {
 		
 		long newestDate = Long.MIN_VALUE;
 		File newestReplay = null;
-		for (final File curReplay : allReplays) {
+		for (final File curReplay: allReplays) {
 			// check extension of file
 			final String curReplayName = curReplay.getName();
 			if (logger.isTraceEnabled()) {

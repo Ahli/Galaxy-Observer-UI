@@ -7,11 +7,11 @@ public final class MpqEditorCompressionRuleParser {
 	}
 	
 	public static MpqEditorCompressionRule parse(final String ruleString) {
-		if (ruleString.startsWith("M" )) {
+		if (ruleString.startsWith("M")) {
 			return parseRuleMask(ruleString);
-		} else if (ruleString.startsWith("S" )) {
+		} else if (ruleString.startsWith("S")) {
 			return parseRuleSize(ruleString);
-		} else if (ruleString.startsWith("D" )) {
+		} else if (ruleString.startsWith("D")) {
 			return parseRuleDefault(ruleString);
 		}
 		throw new IllegalArgumentException("Unknown type of rule string: " + ruleString);

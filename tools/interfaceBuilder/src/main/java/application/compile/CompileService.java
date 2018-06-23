@@ -45,7 +45,7 @@ public class CompileService {
 				startTime = System.currentTimeMillis();
 				manageOrderOfLayoutFiles(descIndex);
 				executionTime = (System.currentTimeMillis() - startTime);
-				logger.info("Checking and repairing the Layout order took " + executionTime + "ms." );
+				logger.info("Checking and repairing the Layout order took " + executionTime + "ms.");
 			}
 			if (verifyLayout) {
 				startTime = System.currentTimeMillis();
@@ -54,7 +54,7 @@ public class CompileService {
 				catalogClone = getClonedUICatalog(mod);
 				
 				executionTime = (System.currentTimeMillis() - startTime);
-				logger.info("BaseUI Cloning took " + executionTime + "ms." );
+				logger.info("BaseUI Cloning took " + executionTime + "ms.");
 				startTime = System.currentTimeMillis();
 				
 				// apply mod's UI
@@ -64,7 +64,7 @@ public class CompileService {
 				catalogClone.clearParser();
 				
 				executionTime = (System.currentTimeMillis() - startTime);
-				logger.info("Validating Layouts took " + executionTime + "ms." );
+				logger.info("Validating Layouts took " + executionTime + "ms.");
 			} else {
 				if (!repairLayoutOrder && verifyXml) {
 					// only verify XML and nothing else

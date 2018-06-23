@@ -147,17 +147,17 @@ public class HomeController implements Updateable {
 			selectedPanel.setVisible(true);
 			final Project p = selectedItems.get(0);
 			selectedName.setText(p.getName());
-			final SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss" );
+			final SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 			selectedBuildDate.setText(p.getLastBuildDate() == null ? "-" : formatter.format(p.getLastBuildDate()));
 			selectedBuildSize.setText(
-					p.getLastBuildSize() == null ? "-" : String.format("%,d", p.getLastBuildSize() / 1024) + " kb" );
+					p.getLastBuildSize() == null ? "-" : String.format("%,d", p.getLastBuildSize() / 1024) + " kb");
 			try {
 				final File f = new File(p.getProjectPath());
-				selectedDirFiles.setText(String.format("%,d", fileService.getFileCountOfDirectory(f)) + " files" );
-				selectedDirSize.setText(String.format("%,d", fileService.getDirectorySize(f) / 1024) + " kb" );
+				selectedDirFiles.setText(String.format("%,d", fileService.getFileCountOfDirectory(f)) + " files");
+				selectedDirSize.setText(String.format("%,d", fileService.getDirectorySize(f) / 1024) + " kb");
 			} catch (final IOException e) {
-				selectedDirSize.setText("-" );
-				selectedDirFiles.setText("-" );
+				selectedDirSize.setText("-");
+				selectedDirFiles.setText("-");
 			}
 			selectedPath.setText(p.getProjectPath());
 			try {
@@ -211,7 +211,7 @@ public class HomeController implements Updateable {
 	public void addProjectAction() throws IOException {
 		final FXMLLoader loader = new FXMLSpringLoader(appContext);
 		final Dialog<Project> dialog =
-				loader.load(appContext.getResource("view/Home_AddProject.fxml" ).getInputStream());
+				loader.load(appContext.getResource("view/Home_AddProject.fxml").getInputStream());
 		dialog.initOwner(addProject.getScene().getWindow());
 		final Optional<Project> result = dialog.showAndWait();
 		if (result.isPresent()) {
@@ -231,7 +231,7 @@ public class HomeController implements Updateable {
 			final Project project = projects.get(0);
 			final FXMLLoader loader = new FXMLSpringLoader(appContext);
 			final Dialog<Project> dialog =
-					loader.load(appContext.getResource("view/Home_AddProject.fxml" ).getInputStream());
+					loader.load(appContext.getResource("view/Home_AddProject.fxml").getInputStream());
 			dialog.initOwner(addProject.getScene().getWindow());
 			((AddProjectController) loader.getController()).setProjectToEdit(project);
 			final Optional<Project> result = dialog.showAndWait();
@@ -249,7 +249,7 @@ public class HomeController implements Updateable {
 		final MultipleSelectionModel<Project> selectionModel = selectionList.getSelectionModel();
 		final Object[] selectedIndices = selectionModel.getSelectedIndices().toArray();
 		selectionModel.clearSelection();
-		for (final Object i : selectedIndices) {
+		for (final Object i: selectedIndices) {
 			selectionModel.select((int) i);
 		}
 	}
@@ -277,10 +277,10 @@ public class HomeController implements Updateable {
 			alert.setTitle(
 					String.format("Remove selected Project from list? - %s items selected", selectedItems.size()));
 			alert.setHeaderText("Are you sure you want to remove the selected projects?" + "\n" +
-					"This will not remove any files from the project." );
+					"This will not remove any files from the project.");
 			final Optional<ButtonType> result = alert.showAndWait();
 			if (result.isPresent() && result.get() == ButtonType.OK) {
-				for (final Project p : items) {
+				for (final Project p: items) {
 					projectService.deleteProject(p);
 					projectsObservable.remove(p);
 				}
@@ -308,7 +308,7 @@ public class HomeController implements Updateable {
 			final Project project = selectedItems.get(0);
 			final FXMLLoader loader = new FXMLSpringLoader(appContext);
 			final Dialog<Project> dialog =
-					loader.load(appContext.getResource("view/Home_ViewRuleSet.fxml" ).getInputStream());
+					loader.load(appContext.getResource("view/Home_ViewRuleSet.fxml").getInputStream());
 			((ViewRuleSetController) loader.getController()).setProject(project);
 			dialog.initOwner(addProject.getScene().getWindow());
 			dialog.showAndWait();
@@ -325,7 +325,7 @@ public class HomeController implements Updateable {
 			// init UI as Tab in Progress
 			final FXMLLoader loader = new FXMLSpringLoader(appContext);
 			final Parent content =
-					loader.load(appContext.getResource("view/ProgressTab_CompressionMining.fxml" ).getInputStream());
+					loader.load(appContext.getResource("view/ProgressTab_CompressionMining.fxml").getInputStream());
 			final Tab newTab = new Tab();
 			newTab.setContent(content);
 			newTab.setText(String.format("%s Compression Mining", project.getName()));
@@ -334,10 +334,10 @@ public class HomeController implements Updateable {
 			
 			// context menu with close option
 			final ContextMenu contextMenu = new ContextMenu();
-			final MenuItem closeItem = new MenuItem("Close" );
+			final MenuItem closeItem = new MenuItem("Close");
 			closeItem.setOnAction(event -> {
 				TabPaneController.getInstance().getTabPane().getTabs().remove(newTab);
-				logger.trace("close tab" );
+				logger.trace("close tab");
 				controller.stopMining();
 			});
 			contextMenu.getItems().addAll(closeItem);

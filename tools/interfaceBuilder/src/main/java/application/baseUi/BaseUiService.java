@@ -51,14 +51,15 @@ public class BaseUiService {
 	 *
 	 * @param game
 	 * @param usePtr
+	 * @param useX64
 	 * @return true, if outdated
 	 */
-	public boolean isOutdated(final Game game, final boolean usePtr) throws IOException {
+	public boolean isOutdated(final Game game, final boolean usePtr, final boolean useX64) throws IOException {
 		final String gamePath = getGamePath(game, usePtr);
 		final GameDef gameDef = gameService.getGameDef(game);
-		final File gameExe =
-				new File(gamePath + File.separator + (usePtr ? gameDef.getPtrRootExeName() :
-						gameDef.getRootExeName()));
+		final String supportDir = (useX64 ? gameDef.getSupportDirectoryX64() : gameDef.getSupportDirectoryX32());
+		final String switcherExe = (useX64 ? gameDef.getSwitcherExeNameX64() : gameDef.getSwitcherExeNameX32());
+		final File updatedExe = new File(gamePath + File.separator + supportDir + File.separator + switcherExe);
 		final File gameBaseUI = new File(configService.getBaseUiPath(gameDef));
 		
 		if (!gameBaseUI.exists()) {
@@ -66,7 +67,7 @@ public class BaseUiService {
 		}
 		
 		return fileService.isEmptyDirectory(gameBaseUI) ||
-				!fileService.directoryFilesAreUpToDate(gameExe.lastModified(), gameBaseUI);
+				!fileService.directoryFilesAreUpToDate(updatedExe.lastModified(), gameBaseUI);
 	}
 	
 	/**
@@ -119,15 +120,16 @@ public class BaseUiService {
 		
 		final File extractorExe = configService.getCascExtractorConsoleExeFile();
 		final String[] queryMasks = getQueryMasks(game);
-		for (final String mask : queryMasks) {
+		for (final String mask: queryMasks) {
 			final Runnable task = () -> {
 				try {
-					if (!extract(extractorExe, mask, destination)) {
+					final String maskFinal = mask;
+					if (extract(extractorExe, maskFinal, destination)) {
 						Thread.sleep(50);
-						if (!extract(extractorExe, mask, destination)) {
+						if (extract(extractorExe, maskFinal, destination)) {
 							logger.warn(
-									"Extraction failed due to a file access. Try closing the Battle.net App, if it is " +
-											"running and this fails to extract all files." );
+									"Extraction failed due to a file access. Try closing the Battle.net App, if it " +
+											"is" + " " + "running and this fails to extract all files.");
 						}
 					}
 				} catch (final IOException e) {
@@ -194,8 +196,7 @@ public class BaseUiService {
 	private boolean extract(final File extractorExe, final String mask, final File destination)
 			throws IOException, InterruptedException {
 		final ProcessBuilder pb =
-				new ProcessBuilder(extractorExe.getAbsolutePath(), mask, destination + File.separator, "enUS", "None"
-				);
+				new ProcessBuilder(extractorExe.getAbsolutePath(), mask, destination + File.separator, "enUS", "None");
 		// put error and normal output into the same stream
 		pb.redirectErrorStream(true);
 		
@@ -206,7 +207,7 @@ public class BaseUiService {
 			do {
 				Thread.sleep(50);
 				final String log = IOUtils.toString(is, Charset.defaultCharset());
-				if (log.contains("Unhandled Exception: System.IO.IOException: The process cannot access the file" )) {
+				if (log.contains("Unhandled Exception: System.IO.IOException: The process cannot access the file")) {
 					retry = true;
 				} else {
 					logger.info(log);
@@ -233,7 +234,7 @@ public class BaseUiService {
 				UICatalog uiCatalog = game.getUiCatalog();
 				final String gameName = game.getGameDef().getName();
 				if (uiCatalog != null) {
-					logger.trace("Aborting parsing baseUI for '" + gameName + "' as was already " + "parsed." );
+					logger.trace("Aborting parsing baseUI for '" + gameName + "' as was already " + "parsed.");
 				} else {
 					boolean needToParseAgain = true;
 					final boolean isPtr = configService.getIniSettings().isHeroesPtrActive();
@@ -243,7 +244,7 @@ public class BaseUiService {
 							uiCatalog = discCacheService.get(gameName, isPtr, UICatalogImpl.class);
 							game.setUiCatalog(uiCatalog);
 							needToParseAgain = false;
-							logger.trace("Loaded UI from cache" );
+							logger.trace("Loaded UI from cache");
 						} catch (final IOException e) {
 							logger.warn("ERROR: loading cached base UI failed.", e);
 						}
@@ -251,26 +252,26 @@ public class BaseUiService {
 					if (needToParseAgain) {
 						// parse baseUI
 						uiCatalog = new UICatalogImpl();
-						app.printInfoLogMessageToGeneral("Starting to parse base " + gameName + " UI." );
+						app.printInfoLogMessageToGeneral("Starting to parse base " + gameName + " UI.");
 						app.addThreadLoggerTab(Thread.currentThread().getName(),
 								game.getGameDef().getNameHandle() + "UI", true);
 						final String gameDir = configService.getBaseUiPath(game.getGameDef()) + File.separator +
 								game.getGameDef().getModsSubDirectory();
 						try {
-							for (final String modOrDir : game.getGameDef().getCoreModsOrDirectories()) {
+							for (final String modOrDir: game.getGameDef().getCoreModsOrDirectories()) {
 								
 								final File directory = new File(gameDir + File.separator + modOrDir);
 								if (!directory.exists() || !directory.isDirectory()) {
-									throw new IOException("BaseUI out of date." );
+									throw new IOException("BaseUI out of date.");
 								}
 								
 								final Collection<File> descIndexFiles = FileUtils
-										.listFiles(directory, new WildcardFileFilter("DescIndex.*Layout" ),
+										.listFiles(directory, new WildcardFileFilter("DescIndex.*Layout"),
 												TrueFileFilter.INSTANCE);
 								logger.info("number of descIndexFiles found: " + descIndexFiles.size());
 								
-								for (final File descIndexFile : descIndexFiles) {
-									logger.info("parsing descIndexFile '" + descIndexFile.getPath() + "'" );
+								for (final File descIndexFile: descIndexFiles) {
+									logger.info("parsing descIndexFile '" + descIndexFile.getPath() + "'");
 									uiCatalog.processDescIndex(descIndexFile, game.getGameDef().getDefaultRaceId());
 								}
 							}

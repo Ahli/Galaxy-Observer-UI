@@ -12,6 +12,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -33,8 +34,6 @@ public class DescIndexData {
 	
 	private static final String XML_VERSION_1_0_ENCODING_UTF_8_STANDALONE_YES_DESC =
 			"<?xml version=\"1.0\" encoding=\"utf-8\" standalone=\"yes\"?>\r\n<Desc>\r\n";
-	
-	private static final String UTF_8 = "UTF-8";
 	
 	private static final Logger logger = LogManager.getLogger();
 	private final MpqInterface mpqi;
@@ -109,7 +108,7 @@ public class DescIndexData {
 	 * @throws MpqException
 	 */
 	public void addLayoutIntPath(final Iterable<String> layoutPathList) throws MpqException {
-		for (final String aLayoutPathList : layoutPathList) {
+		for (final String aLayoutPathList: layoutPathList) {
 			addLayoutIntPath(aLayoutPathList);
 		}
 	}
@@ -123,7 +122,7 @@ public class DescIndexData {
 		File f = mpqi.getFileFromMpq(intPath);
 		if (!f.exists()) {
 			// add base folder to the path
-			intPath2 = (mpqi.isHeroesMpq() ? "Base.StormData" : "Base.SC2Data" ) + File.separator + intPath;
+			intPath2 = (mpqi.isHeroesMpq() ? "Base.StormData" : "Base.SC2Data") + File.separator + intPath;
 			f = mpqi.getFileFromMpq(intPath2);
 		}
 		if (!f.exists()) {
@@ -165,10 +164,11 @@ public class DescIndexData {
 	public void persistDescIndexFile() throws IOException {
 		final File f = mpqi.getFileFromMpq(descIndexIntPath);
 		
-		try (final OutputStreamWriter bw = new OutputStreamWriter(new FileOutputStream(f, false), UTF_8)) {
+		try (final OutputStreamWriter bw = new OutputStreamWriter(new FileOutputStream(f, false),
+				StandardCharsets.UTF_8)) {
 			bw.write(XML_VERSION_1_0_ENCODING_UTF_8_STANDALONE_YES_DESC);
 			
-			for (final Pair<File, String> p : fileIntPathList) {
+			for (final Pair<File, String> p: fileIntPathList) {
 				bw.write(INCLUDE_PATH);
 				bw.write(p.getValue());
 				bw.write(STRING);
@@ -195,7 +195,7 @@ public class DescIndexData {
 		// grab dependencies and constant definitions for every layout file
 		List<String> layoutDeps;
 		List<String> curConstants;
-		for (final Pair<File, String> pair : fileIntPathList) {
+		for (final Pair<File, String> pair: fileIntPathList) {
 			curConstants = LayoutReader.getLayoutsConstantDefinitions(pair.getKey());
 			
 			// add calculated list of dependencies from layout file
@@ -241,7 +241,7 @@ public class DescIndexData {
 								// otherPair.getKey().getName();
 								// fileName = fileName.substring(0,
 								// fileName.lastIndexOf('.'));
-								for (final String constant : ownConstants.get(i2)) {
+								for (final String constant: ownConstants.get(i2)) {
 									if (constant.equals(curDependencyTo)) {
 										constantDefinedBefore = true;
 										break y;
@@ -255,12 +255,12 @@ public class DescIndexData {
 								final Pair<File, String> otherPair = fileIntPathList.get(i2);
 								String fileName = otherPair.getKey().getName();
 								fileName = fileName.substring(0, fileName.lastIndexOf('.'));
-								for (final String constant : ownConstants.get(i2)) {
+								for (final String constant: ownConstants.get(i2)) {
 									if (constant.equals(curDependencyTo)) {
 										if (logger.isTraceEnabled()) {
 											logger.trace("checked " + fileIntPathList.get(i).getKey().getName() +
-													" with dependency " + curDependencyTo + " and " + constant + " i=" +
-													i + " j=" + j + " i2=" + i2);
+													" with dependency " + curDependencyTo + " and " + constant + " " +
+													"i=" + i + " j=" + j + " i2=" + i2);
 											logger.trace("fileIntPathList:" + fileIntPathList);
 										}
 										// i's needs to be inserted after i2
@@ -279,8 +279,8 @@ public class DescIndexData {
 									} else {
 										if (logger.isTraceEnabled()) {
 											logger.trace("checked " + fileIntPathList.get(i).getKey().getName() +
-													" with dependency " + curDependencyTo + " and " + constant + " i=" +
-													i + " j=" + j + " i2=" + i2);
+													" with dependency " + curDependencyTo + " and " + constant + " " +
+													"i=" + i + " j=" + j + " i2=" + i2);
 										}
 									}
 								}

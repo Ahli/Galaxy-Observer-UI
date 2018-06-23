@@ -53,11 +53,11 @@ public final class TextAreaAppender extends AbstractAppender {
 	 * @return The TextAreaAppender
 	 */
 	@PluginFactory
-	public static TextAreaAppender createAppender(@PluginAttribute ("name" ) final String name,
-			@PluginElement ("Layout" ) Layout<? extends Serializable> layout,
-			@PluginElement ("Filter" ) final Filter filter) {
+	public static TextAreaAppender createAppender(@PluginAttribute ("name") final String name,
+			@PluginElement ("Layout") Layout<? extends Serializable> layout,
+			@PluginElement ("Filter") final Filter filter) {
 		if (name == null) {
-			LOGGER.error("No name provided for TextAreaAppender" );
+			LOGGER.error("No name provided for TextAreaAppender");
 			return null;
 		}
 		if (layout == null) {

@@ -104,15 +104,15 @@ public class MenuBarController {
 	@FXML
 	public void aboutClicked() {
 		final String content =
-				String.format(Messages.getString("MenuBarController.AboutText" ), Main.VERSION) + "\n\n" //$NON-NLS-2$
-						+ Messages.getString("MenuBarController.AboutText2" );
-		final String title = Messages.getString("MenuBarController.About" ); //$NON-NLS-1$
-		final String header = Messages.getString("MenuBarController.ObserverUISettingsEditor" ); //$NON-NLS-1$
+				String.format(Messages.getString("MenuBarController.AboutText"), Main.VERSION) + "\n" + "\n" +
+						Messages.getString("MenuBarController.AboutText2");
+		final String title = Messages.getString("MenuBarController.About");
+		final String header = Messages.getString("MenuBarController.ObserverUISettingsEditor");
 		String imgUrl;
 		try {
-			imgUrl = Main.class.getResource("/res/ahliLogo.png" ).toString(); //$NON-NLS-1$
+			imgUrl = Main.class.getResource("/res/ahliLogo.png").toString();
 		} catch (final NullPointerException e) {
-			logger.error("Error loading resource" );
+			logger.error("Error loading resource");
 			imgUrl = "ahliLogo.png";
 		}
 		

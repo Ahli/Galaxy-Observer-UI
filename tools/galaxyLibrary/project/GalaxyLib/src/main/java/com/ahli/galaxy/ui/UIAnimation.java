@@ -167,7 +167,7 @@ public class UIAnimation extends UIElement {
 		} else {
 			// go deeper
 			final String curName = UIElement.getLeftPathLevel(path);
-			for (final UIElement curElem : controllers) {
+			for (final UIElement curElem: controllers) {
 				if (curName.equalsIgnoreCase(curElem.getName())) {
 					// found right frame -> cut path
 					final String newPath = UIElement.removeLeftPathLevel(path);

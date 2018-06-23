@@ -15,6 +15,7 @@ public class CommandLineParams {
 	private final boolean hasParamCompilePath;
 	private final String paramCompilePath;
 	private final boolean wasStartedWithParameters;
+	private boolean paramsOriginateFromExternalSource;
 	
 	public CommandLineParams(final String[] params) {
 		wasStartedWithParameters = (params.length > 0);
@@ -57,7 +58,7 @@ public class CommandLineParams {
 	 */
 	private String getInterfaceRootFromPath(String str) {
 		if (str != null) {
-			while (str.length() > 0 && !str.endsWith("Interface" )) {
+			while (str.length() > 0 && !str.endsWith("Interface")) {
 				final int lastIndex = str.lastIndexOf(File.separatorChar);
 				if (lastIndex != -1) {
 					str = str.substring(0, lastIndex);
@@ -110,5 +111,13 @@ public class CommandLineParams {
 	
 	public boolean isHasParamCompilePath() {
 		return hasParamCompilePath;
+	}
+	
+	public boolean isParamsOriginateFromExternalSource() {
+		return paramsOriginateFromExternalSource;
+	}
+	
+	public void setParamsOriginateFromExternalSource(final boolean paramsOriginateFromExternalSource) {
+		this.paramsOriginateFromExternalSource = paramsOriginateFromExternalSource;
 	}
 }

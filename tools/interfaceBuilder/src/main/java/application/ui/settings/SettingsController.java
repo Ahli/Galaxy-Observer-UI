@@ -36,9 +36,9 @@ public class SettingsController implements Updateable {
 	 */
 	public void initialize() {
 		categoryTree.setRoot(new TreeItem<>());
-		addCategoryItem(new TreeItem<>("Games & Paths" ), 0);
-		addCategoryItem(new TreeItem<>("GUI Mode" ), 1);
-		addCategoryItem(new TreeItem<>("Command Line Mode" ), 2);
+		addCategoryItem(new TreeItem<>("Games & Paths"), 0);
+		addCategoryItem(new TreeItem<>("GUI Mode"), 1);
+		addCategoryItem(new TreeItem<>("Command Line Mode"), 2);
 		
 		// load page for selected setting
 		categoryTree.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<>() {
@@ -73,16 +73,16 @@ public class SettingsController implements Updateable {
 		final Object controller;
 		switch (getCategoryIndex(category)) {
 			case 0:
-				content = initFXML(loader, "view/Content_Settings_GamesPaths.fxml" );
+				content = initFXML(loader, "view/Content_Settings_GamesPaths.fxml");
 				break;
 			case 1:
-				content = initFXML(loader, "view/Content_Settings_GuiTool.fxml" );
+				content = initFXML(loader, "view/Content_Settings_GuiTool.fxml");
 				break;
 			case 2:
-				content = initFXML(loader, "view/Content_Settings_CommandLineTool.fxml" );
+				content = initFXML(loader, "view/Content_Settings_CommandLineTool.fxml");
 				break;
 			default:
-				logger.error("Attempted to load a settings category that does not exist" );
+				logger.error("Attempted to load a settings category that does not exist");
 				return;
 		}
 		controller = loader.getController();
@@ -118,7 +118,7 @@ public class SettingsController implements Updateable {
 		try {
 			return loader.load(InterfaceBuilderApp.getInstance().getAppContext().getResource(path).getInputStream());
 		} catch (final IOException e) {
-			logger.error("failed to load FXML: " + path + ".", e); //$NON-NLS-1$
+			logger.error("failed to load FXML: " + path + ".", e);
 		}
 		return null;
 	}

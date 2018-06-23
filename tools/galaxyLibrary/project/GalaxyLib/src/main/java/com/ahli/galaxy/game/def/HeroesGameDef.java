@@ -11,15 +11,20 @@ public class HeroesGameDef extends GameDef {
 	 *
 	 */
 	public HeroesGameDef() {
-		setName("Heroes of the Storm" );
-		setNameHandle("heroes" );
-		setModFileEnding("stormmod" );
+		setName("Heroes of the Storm");
+		setNameHandle("heroes");
+		setModFileEnding("stormmod");
 		setCoreModsOrDirectories(new String[] { "core.stormmod", "heroesdata.stormmod", "heromods" });
-		setDefaultRaceId("Terr" );
-		setDocumentsGameDirectoryName("Heroes of the Storm" );
-		setLayoutFileEnding("stormlayout" );
-		setBaseDataFolderName("Base.StormData" );
-		setRootExeName("Heroes of the Storm.exe" );
-		setPtrRootExeName("Heroes of the Storm Public Test.exe" );
+		setDefaultRaceId("Terr");
+		setDocumentsGameDirectoryName("Heroes of the Storm");
+		setLayoutFileEnding("stormlayout");
+		setBaseDataFolderName("Base.StormData");
+		setRootExeName("Heroes of the Storm.exe");
+		setPtrRootExeName("Heroes of the Storm Public Test.exe");
+		setSwitcherExeNameX32("HeroesSwitcher.exe");
+		setSwitcherExeNameX64("HeroesSwitcher_x64.exe");
+		setSupportDirectoryX32("Support");
+		setSupportDirectoryX64("Support64");
 	}
+	
 }

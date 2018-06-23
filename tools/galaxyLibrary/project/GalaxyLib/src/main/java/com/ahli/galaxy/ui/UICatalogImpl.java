@@ -61,7 +61,8 @@ public class UICatalogImpl implements UICatalog {
 	 *
 	 * @throws ParserConfigurationException
 	 */
-	public UICatalogImpl(final int templatesCapacity, final int blizzOnlyTemplatesCapacity, final int constantsCapacity,
+	public UICatalogImpl(final int templatesCapacity, final int blizzOnlyTemplatesCapacity,
+			final int constantsCapacity,
 			final int blizzOnlyConstantsCapacity, final int blizzOnlyLayoutsCapacity) {
 		templates = new ArrayList<>(templatesCapacity);
 		blizzOnlyTemplates = new ArrayList<>(blizzOnlyTemplatesCapacity);
@@ -77,7 +78,8 @@ public class UICatalogImpl implements UICatalog {
 	public Object deepCopy() {
 		// clone with additional space for templates and constants
 		final UICatalogImpl clone =
-				new UICatalogImpl(templates.size() * 3 / 2 + 1, blizzOnlyTemplates.size(), constants.size() * 3 / 2 + 1,
+				new UICatalogImpl(templates.size() * 3 / 2 + 1, blizzOnlyTemplates.size(),
+						constants.size() * 3 / 2 + 1,
 						blizzOnlyConstants.size(), blizzOnlyLayouts.size());
 		// testing shows that iterators are not faster and are not thread safe
 		int i;
@@ -136,7 +138,7 @@ public class UICatalogImpl implements UICatalog {
 	 */
 	private void processLayouts(final List<String> toProcessList, final String basePath, final String raceId)
 			throws InterruptedException {
-		for (final String intPath : toProcessList) {
+		for (final String intPath: toProcessList) {
 			final boolean isDevLayout = blizzOnlyLayouts.contains(intPath);
 			logger.trace("intPath={}", () -> intPath);
 			logger.trace("isDevLayout={}", () -> isDevLayout);
@@ -153,7 +155,7 @@ public class UICatalogImpl implements UICatalog {
 					if (!isDevLayout) {
 						logger.error("ERROR: Cannot find layout file: " + intPath);
 					} else {
-						logger.warn("WARNING: Cannot find Blizz-only layout file: " + intPath + ", so this is fine." );
+						logger.warn("WARNING: Cannot find Blizz-only layout file: " + intPath + ", so this is fine.");
 					}
 				}
 			}
@@ -188,14 +190,15 @@ public class UICatalogImpl implements UICatalog {
 	
 	public void printDebugStats() {
 		logger.info(
-				"UICatalogSizes: " + templates.size() + " " + blizzOnlyTemplates.size() + " " + constants.size() + " " +
+				"UICatalogSizes: " + templates.size() + " " + blizzOnlyTemplates.size() + " " + constants.size() +
+						" " +
 						blizzOnlyConstants.size() + " " + blizzOnlyLayouts.size());
 	}
 	
 	@Override
 	public void processInclude(final String path, final boolean isDevLayout, final String raceId) {
 		if (logger.isTraceEnabled()) {
-			logger.trace("processing Include appearing within a real layout" );
+			logger.trace("processing Include appearing within a real layout");
 		}
 		
 		String basePathTemp = getCurBasePath();
@@ -210,7 +213,7 @@ public class UICatalogImpl implements UICatalog {
 				if (!isDevLayout) {
 					logger.error("ERROR: Cannot find layout file: " + path);
 				} else {
-					logger.warn("WARNING: Cannot find Blizz-only layout file: " + path + ", so this is fine." );
+					logger.warn("WARNING: Cannot find Blizz-only layout file: " + path + ", so this is fine.");
 				}
 				return;
 			}
@@ -249,7 +252,7 @@ public class UICatalogImpl implements UICatalog {
 	public UITemplate addTemplate(final String fileName, final UIElement thisElem, final boolean isDevLayout)
 			throws UIException {
 		if (thisElem == null) {
-			throw new UIException("Cannot create Template definition for a 'null' UIElement." );
+			throw new UIException("Cannot create Template definition for a 'null' UIElement.");
 		}
 		
 		final List<UITemplate> list = isDevLayout ? blizzOnlyTemplates : templates;
@@ -275,7 +278,7 @@ public class UICatalogImpl implements UICatalog {
 			constants.add(constant);
 			if (removedBlizzOnly) {
 				logger.warn("WARNING: constant '" + name +
-						"' overrides value from Blizz-only constant, so this might be fine." );
+						"' overrides value from Blizz-only constant, so this might be fine.");
 			}
 		} else {
 			// is blizz-only layout
@@ -284,7 +287,7 @@ public class UICatalogImpl implements UICatalog {
 			blizzOnlyConstants.add(constant);
 			if (removedGeneral) {
 				logger.warn("WARNING: constant '" + name +
-						"' from Blizz-only layout overrides a general constant, so this might be fine." );
+						"' from Blizz-only layout overrides a general constant, so this might be fine.");
 			}
 		}
 	}
@@ -321,7 +324,7 @@ public class UICatalogImpl implements UICatalog {
 		final String prefix = constantRef.substring(0, i);
 		final String constantName = constantRef.substring(i);
 		logger.trace("Encountered Constant: prefix='{}', constantName='{}'", () -> prefix, () -> constantName);
-		for (final UIConstant c : constants) {
+		for (final UIConstant c: constants) {
 			if (c.getName().equalsIgnoreCase(constantName)) {
 				return c.getValue();
 			}
@@ -329,7 +332,7 @@ public class UICatalogImpl implements UICatalog {
 		// constant tag with race suffix
 		if (i == 2) {
 			final String constantNameWithRacePostFix = constantName + "_" + raceId;
-			for (final UIConstant c : constants) {
+			for (final UIConstant c: constants) {
 				if (c.getName().equalsIgnoreCase(constantNameWithRacePostFix)) {
 					return c.getValue();
 				}
@@ -337,21 +340,21 @@ public class UICatalogImpl implements UICatalog {
 		}
 		if (i >= 3) {
 			logger.error("ERROR: Encountered a constant definition with three #'" + constantRef +
-					"' when its maximum is two '#'." );
+					"' when its maximum is two '#'.");
 		}
 		
 		if (!isDevLayout) {
 			logger.warn("WARNING: Did not find a constant definition for '" + constantRef + "', so '" + constantName +
-					"' is used instead." );
+					"' is used instead.");
 		} else {
 			// inside blizz-only
-			for (final UIConstant c : blizzOnlyConstants) {
+			for (final UIConstant c: blizzOnlyConstants) {
 				if (c.getName().equalsIgnoreCase(constantName)) {
 					return c.getValue();
 				}
 			}
 			logger.warn("WARNING: Did not find a constant definition for '" + constantRef +
-					"', but it is a Blizz-only layout, so this is fine." );
+					"', but it is a Blizz-only layout, so this is fine.");
 		}
 		return constantName;
 	}

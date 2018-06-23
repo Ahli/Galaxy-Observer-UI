@@ -88,7 +88,7 @@ public class ProjectService {
 	 * @param useCmdLineSettings
 	 */
 	public void build(final List<Project> projects, final boolean useCmdLineSettings) {
-		for (final Project project : projects) {
+		for (final Project project: projects) {
 			mpqBuilderService.build(project, useCmdLineSettings);
 		}
 	}

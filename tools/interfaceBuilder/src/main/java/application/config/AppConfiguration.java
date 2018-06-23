@@ -58,7 +58,7 @@ public class AppConfiguration {
 	
 	@Bean
 	public String cachePath() {
-		return System.getProperty("user.home" ) + File.separator + ".GalaxyObsUI" + File.separator + "cache";
+		return System.getProperty("user.home") + File.separator + ".GalaxyObsUI" + File.separator + "cache";
 	}
 	
 	@Bean
@@ -73,13 +73,14 @@ public class AppConfiguration {
 	
 	@Bean
 	public String mpqEditorPath() {
-		return basePath().getParent() + File.separator + "tools" + File.separator + "plugins" + File.separator + "mpq" +
+		return basePath().getParent() + File.separator + "tools" + File.separator + "plugins" + File.separator +
+				"mpq" +
 				File.separator + "MPQEditor.exe";
 	}
 	
 	@Bean
 	public String tempDirectory() {
-		return System.getProperty("java.io.tmpdir" );
+		return System.getProperty("java.io.tmpdir");
 	}
 	
 	@Bean
@@ -91,14 +92,14 @@ public class AppConfiguration {
 	public File cascExtractorConfigFile() {
 		return new File(
 				basePath().getParent() + File.separator + "tools" + File.separator + "plugins" + File.separator +
-						"casc" + File.separator + "CASCConsole.exe.config" );
+						"casc" + File.separator + "CASCConsole.exe.config");
 	}
 	
 	@Bean
 	public File cascExtractorConsoleExeFile() {
 		return new File(
 				basePath().getParent() + File.separator + "tools" + File.separator + "plugins" + File.separator +
-						"casc" + File.separator + "CASCConsole.exe" );
+						"casc" + File.separator + "CASCConsole.exe");
 	}
 	
 	@Bean

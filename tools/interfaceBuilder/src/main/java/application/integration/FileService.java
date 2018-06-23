@@ -26,17 +26,17 @@ public class FileService {
 		if (source.isDirectory()) {
 			// create folder if not existing
 			if (!target.exists() && !target.mkdirs()) {
-				final String msg = "Could not create directory " + target.getAbsolutePath(); //$NON-NLS-1$
+				final String msg = "Could not create directory " + target.getAbsolutePath();
 				throw new IOException(msg);
 			}
 			
 			// copy all contained files recursively
 			final String[] fileList = source.list();
 			if (fileList == null) {
-				final String msg = "Source directory's files returned null"; //$NON-NLS-1$
+				final String msg = "Source directory's files returned null";
 				throw new IOException(msg);
 			}
-			for (final String file : fileList) {
+			for (final String file: fileList) {
 				final File srcFile = new File(source, file);
 				final File destFile = new File(target, file);
 				// Recursive traversal of directories

@@ -18,6 +18,10 @@ public abstract class GameDef {
 	private String baseDataFolderName = "Base.SC2Data";
 	private String rootExeName = "StarCraft II.exe";
 	private String ptrRootExeName = "StarCraft II Public Test.exe";
+	private String switcherExeNameX32 = "SC2Switcher.exe";
+	private String switcherExeNameX64 = "SC2Switcher_x64.exe";
+	private String supportDirectoryX32 = "Support";
+	private String supportDirectoryX64 = "Support64";
 	
 	/**
 	 * @return the layoutFileEnding
@@ -200,5 +204,37 @@ public abstract class GameDef {
 	 */
 	public void setPtrRootExeName(final String ptrRootExeName) {
 		this.ptrRootExeName = ptrRootExeName;
+	}
+	
+	public String getSwitcherExeNameX32() {
+		return switcherExeNameX32;
+	}
+	
+	public void setSwitcherExeNameX32(final String switcherExeNameX32) {
+		this.switcherExeNameX32 = switcherExeNameX32;
+	}
+	
+	public String getSwitcherExeNameX64() {
+		return switcherExeNameX64;
+	}
+	
+	public void setSwitcherExeNameX64(final String switcherExeNameX64) {
+		this.switcherExeNameX64 = switcherExeNameX64;
+	}
+	
+	public String getSupportDirectoryX32() {
+		return supportDirectoryX32;
+	}
+	
+	public void setSupportDirectoryX32(final String supportDirectoryX32) {
+		this.supportDirectoryX32 = supportDirectoryX32;
+	}
+	
+	public String getSupportDirectoryX64() {
+		return supportDirectoryX64;
+	}
+	
+	public void setSupportDirectoryX64(final String supportDirectoryX64) {
+		this.supportDirectoryX64 = supportDirectoryX64;
 	}
 }

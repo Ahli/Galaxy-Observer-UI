@@ -106,7 +106,7 @@ public final class ErrorTabController {
 	}
 	
 	private void setIconAppearance(final State newState, final FontAwesomeIcon icon, final Color color) {
-		if (state != newState) {
+		if (!state.equals(newState)) {
 			state = newState;
 			if (newState == State.RUNNING || newState == State.NOT_STARTED || showResultIcon) {
 				final FontAwesomeIconView iconView = new FontAwesomeIconView(icon);
@@ -162,7 +162,7 @@ public final class ErrorTabController {
 		return errorsDoNotPreventExit;
 	}
 	
-	public void setErrorsDoNotPreventExit(boolean errorsDoNotPreventExit) {
+	public void setErrorsDoNotPreventExit(final boolean errorsDoNotPreventExit) {
 		this.errorsDoNotPreventExit = errorsDoNotPreventExit;
 	}
 	
