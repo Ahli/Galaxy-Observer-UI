@@ -2186,6 +2186,17 @@
           <Target frame="$parent" property="Text" />
         </Frame>
       </Frame>
+      <Frame type="Label" name="FailureLabel">
+        <Anchor side="Top" relative="$parent" pos="Mid" offset="0" />
+        <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0" />
+        <Anchor side="Left" relative="$parent" pos="Mid" offset="0" />
+        <Anchor side="Right" relative="$parent" pos="Mid" offset="0" />
+        <Width val="184" />
+        <RenderType val="LDR" />
+        <Visible val="False" />
+        <Text val="@UI/ScoreScreen/ProfileReadWriteErrorLabel" />
+        <Style val="RankedBadge_Failure_Label" />
+      </Frame>
       <Animation name="RenderType">
         <Event event="ForceHDR" action="Play" frame="$ancestor[@type=RankBadge]" />
         <Event event="StopHDR" action="Stop" frame="$ancestor[@type=RankBadge]" />
@@ -2203,6 +2214,9 @@
           <Key type="Property" time="0.00" value="HDR" />
         </Controller>
         <Controller type="Property" property="RenderType" end="Pause" frame="PlacementLabel">
+          <Key type="Property" time="0.00" value="HDR" />
+        </Controller>
+        <Controller type="Property" property="RenderType" end="Pause" frame="FailureLabel">
           <Key type="Property" time="0.00" value="HDR" />
         </Controller>
       </Animation>
@@ -2519,7 +2533,29 @@
   </Frame>
   <Frame type="RankBadge" name="RankBadgeBaseTemplateNoOverlaySound" template="RankBadgeTemplates/RankBadgeBaseTemplate">
     <StateGroup name="RankType">
-      <DefaultState val="Placement" />
+      <State name="UpdateFailure">
+        <When type="Property" rankUpdateFailure="True" />
+        <Action type="SetProperty" frame="ProgressContainer/ProgressBar" value="0" />
+        <Action type="SendEvent" frame="RankIconContainer/RankIconImage" event="ShineNormal" />
+        <Action type="SetProperty" frame="BadgeContainer/LeagueLabel" visible="False" />
+        <Action type="SetProperty" frame="BadgeContainer/LeagueLabel" visible="False" />
+        <Action type="SetProperty" frame="BadgeContainer/LeagueLabelBlur" visible="False" />
+        <Action type="SetProperty" frame="BadgeContainer/RankLabel" visible="False" />
+        <Action type="SetProperty" frame="BadgeContainer/RankLabelBlur" visible="False" />
+        <Action type="SetProperty" frame="BadgeContainer/PlacementLabel" visible="False" />
+        <Action type="SetProperty" frame="BadgeContainer/FailureLabel" visible="True" />
+        <Action type="SetProperty" frame="ProgressContainer/BackgroundImage" texture="@UI/Ranked_Badge_Placement_Ring" />
+        <Action type="SetProperty" frame="ProgressContainer/ProgressBar" visible="False" />
+        <Action type="SetProperty" frame="ProgressContainer/GlowProgressBar" visible="False" />
+        <Action type="SetProperty" frame="PlacementBackgroundEffect" visible="True" />
+        <Action type="SetProperty" frame="BadgeContainer/GemCutscene" visible="False" />
+        <Action type="SetProperty" frame="RankIconContainer/RankIconImage" texture="@UI/Ranked_Badge_Placement_Icon" />
+        <Action type="SendEvent" frame="RankIconContainer/RankIconImage" event="StoreBaseTexture" />
+        <Action type="SetProperty" frame="RankIconContainer/RankPlateImage" visible="False" />
+        <Action type="SetProperty" frame="OverlayCutsceneContainer/Promotion_Glow" texture="@UI/Ranked_Badge_Placement_Promotion_Glow" />
+        <Action type="SetProperty" frame="WingContainer" visible="False" />
+        <Action type="SendEvent" frame="RankIconContainer/RankIconImage" event="RotateIcon" />
+      </State>
       <State name="Placement">
         <When type="Property" rankType="Placement" />
         <Action type="SendEvent" frame="RankIconContainer/RankIconImage" event="ShineNormal" />

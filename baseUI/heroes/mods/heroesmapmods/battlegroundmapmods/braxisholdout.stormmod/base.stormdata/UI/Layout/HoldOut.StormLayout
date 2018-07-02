@@ -6,11 +6,11 @@
     <DisplayFlags val="Shields" />
     <ColorStyle val="HoldOutShields" index="0" />
     <ReductionColor val="200,200,255" index="0" />
-    <Segmented val="true" index="0" />
+    <Segmented val="false" index="0" />
     <ReductionShown val="True" index="0" />
     <SegmentValue val="250.000000" index="0" />
     <MaxSegmentCount val="400" index="0" />
-    <IncreaseDuration val="1000" index="0" />
+    <IncreaseDuration val="2000" index="0" />
     <DecreaseDuration val="3000" index="0" />
   </Frame>
   <Frame type="UnitStatusFrame" name="MapMechanicShieldBarTemplate">
@@ -74,7 +74,7 @@
       <Anchor side="Left" relative="$parent/BGImage" pos="Min" offset="20" />
       <Width val="137" />
       <Height val="11" />
-      <Segmented val="true" index="0" />
+      <Segmented val="false" index="0" />
       <ReductionShown val="true" index="0" />
       <SegmentValue val="250.000000" index="0" />
       <MaxSegmentCount val="400" index="0" />
@@ -232,88 +232,199 @@
       <Anchor side="Right" relative="$parent/BackgroundImage" pos="Max" offset="-3" />
       <Texture val="@UI/hud_minimap_angle_right" />
     </Frame>
-    <Frame type="Image" name="HealthBarBgTop">
-      <IgnoreParentColor val="True" />
-      <IgnoreParentAlpha val="True" />
-      <RenderPriority val="512" />
-      <Color val="504e4d" />
-      <Anchor side="Top" relative="$parent/BackgroundImage" pos="Min" offset="16" />
-      <Anchor side="Left" relative="$parent/BossHudLeft" pos="Max" offset="-17" />
-      <Anchor side="Right" relative="$parent/BossHudLeft" pos="Min" offset="338" />
-      <Texture val="@UI/Storm_UI_HUD_Holdout_Health_Bar" />
-      <TextureType val="NineSlice" />
-    </Frame>
-    <Frame type="Image" name="HealthBarBgTopBorder">
-      <RenderPriority val="550" />
-      <Visible val="true" />
-      <Anchor side="Top" relative="$parent/HealthBarBgTop" pos="Min" offset="0" />
-      <Anchor side="Left" relative="$parent/HealthBarBgTop" pos="Min" offset="0" />
-      <Anchor side="Right" relative="$parent/HealthBarBgTop" pos="Max" offset="0" />
-      <Texture val="@UI/Storm_UI_HUD_Holdout_Health_Bar_Border" />
-      <TextureType val="NineSlice" />
-    </Frame>
-    <Frame type="Image" name="HealthBarBgBottom">
-      <IgnoreParentColor val="True" />
-      <IgnoreParentAlpha val="True" />
-      <RenderPriority val="1" />
-      <Color val="504e4d" />
-      <Anchor side="Top" relative="$parent/HealthBarBgTop" pos="Mid" offset="10" />
-      <Anchor side="Left" relative="$parent/HealthBarBgTop" pos="Min" offset="40" />
-      <Anchor side="Right" relative="$parent/HealthBarBgTop" pos="Max" offset="40" />
-      <Texture val="@UI/Storm_UI_HUD_Holdout_Health_Bar" />
-      <TextureType val="NineSlice" />
-    </Frame>
-    <Frame type="Image" name="HealthBarBgBottomBorder">
-      <RenderPriority val="550" />
-      <Visible val="true" />
-      <Anchor side="Top" relative="$parent/HealthBarBgBottom" pos="Min" offset="0" />
-      <Anchor side="Left" relative="$parent/HealthBarBgBottom" pos="Min" offset="0" />
-      <Anchor side="Right" relative="$parent/HealthBarBgBottom" pos="Max" offset="0" />
-      <Texture val="@UI/Storm_UI_HUD_Holdout_Health_Bar_Border" />
-      <TextureType val="NineSlice" />
-    </Frame>
-    <Frame type="UnitStatusFrame" name="AllyBossHealthBar" template="MapMechanicPanel/MapMechanicHealthBarTemplate">
-      <Width val="0" />
-      <Height val="0" />
-      <Anchor side="Top" relative="$parent/HealthBarBgTop" pos="Min" offset="0" />
-      <Anchor side="Bottom" relative="$parent/HealthBarBgTop" pos="Max" offset="0" />
-      <Anchor side="Left" relative="$parent/HealthBarBgTop" pos="Min" offset="0" />
-      <Anchor side="Right" relative="$parent/HealthBarBgTop" pos="Max" offset="0" />
-      <Frame type="UnitStatusShieldedHealthBar" name="HealthBar" template="UnitStatus/UnitStatusSegmentedHealthBarTemplate">
+    <Frame type="Frame" name="HealthBarTopContainerFrame">
+      <Anchor side="Top" relative="$parent/BackgroundImage" pos="Min" offset="17" />
+      <Anchor side="Bottom" relative="$parent/BackgroundImage" pos="Min" offset="39" />
+      <Anchor side="Left" relative="$parent/BossHudLeft" pos="Max" offset="-16" />
+      <Anchor side="Right" relative="$parent/BossHudLeft" pos="Min" offset="372" />
+      <Frame type="Frame" name="HealthBarTopAnimFrame">
         <Anchor relative="$parent" />
-        <Width val="0" />
-        <Height val="0" />
-        <RenderPriority val="600" />
-        <Texture val="@UI/Storm_UI_HUD_Holdout_Health_Bar" />
-        <Expansion val="Right" />
-        <SegmentValue val="100.000000" index="0" />
+        <Animation name="CaptureCompletedTransition">
+          <Event event="OnShown" action="Restart,Pause" />
+          <Event event="CaptureComplete" action="Restart,DirectionForward,Play" />
+          <Event event="BarsReset" action="DirectionReverse,Play" />
+          <Controller type="Anchor" end="Pause" side="Left" relative="true">
+            <Key type="Curve" time="0" value="0" inout="Linear,Slow" />
+            <Key type="Curve" time="0.3" value="-350" inout="Slow,Linear" />
+          </Controller>
+          <Controller type="Anchor" end="Pause" side="Right" relative="true">
+            <Key type="Curve" time="0" value="0" inout="Linear,Slow" />
+            <Key type="Curve" time="0.3" value="-350" inout="Slow,Linear" />
+          </Controller>
+          <Controller type="Event" end="Stop" frame="HealthBarBgTopBorder">
+            <Key type="Event" time="0.4" event="ToggleVis" />
+          </Controller>
+          <Controller type="Event" end="Stop" frame="HealthBarBgTopBorderSegmented">
+            <Key type="Event" time="0.4" event="ToggleVis" />
+          </Controller>
+          <Controller type="Event" end="Stop">
+            <Key type="Event" time="0.4" event="StopFlashing" />
+          </Controller>
+        </Animation>
+        <Animation name="CaptureCompletedFlash">
+          <Event event="OnShown" action="Restart,Pause" />
+          <Event event="FlashBars" action="DirectionForward,Play" />
+          <Event event="StopFlashing" action="Stop" />
+          <Controller type="Fade" end="PingPong">
+            <Key type="Curve" time="0" value="255" inout="Fast" />
+            <Key type="Curve" time=".5" value="128" inout="Slow" />
+          </Controller>
+        </Animation>
+        <Frame type="Image" name="HealthBarBgTop">
+          <Anchor relative="$parent" />
+          <IgnoreParentColor val="True" />
+          <IgnoreParentAlpha val="True" />
+          <RenderPriority val="512" />
+          <Color val="504e4d" />
+          <Anchor relative="$parent" />
+          <Texture val="@UI/Storm_UI_HUD_Holdout_Health_Bar_Angled" />
+          <TextureType val="NineSlice" />
+        </Frame>
+        <Frame type="Image" name="HealthBarBgTopBorder">
+          <Anchor relative="$parent" />
+          <RenderPriority val="550" />
+          <Visible val="true" />
+          <Anchor relative="$parent" />
+          <Texture val="@UI/Storm_UI_HUD_Holdout_Health_Bar_Border_Angled" />
+          <Animation name="VisibilityControl">
+            <Event event="OnHidden" action="Stop" />
+            <Event event="ToggleVis" action="Play" />
+            <Controller type="Visibility" end="Pause">
+              <Key type="Bool" time="0" value="True" />
+              <Key type="Bool" time=".01" value="False" />
+            </Controller>
+          </Animation>
+        </Frame>
+        <Frame type="Image" name="HealthBarBgTopBorderSegmented">
+          <Anchor relative="$parent" />
+          <RenderPriority val="550" />
+          <Visible val="false" />
+          <Anchor relative="$parent" />
+          <Texture val="@UI/Storm_UI_HUD_Holdout_Health_Bar_BorderSep_Angled" />
+          <Animation name="VisibilityControl">
+            <Event event="OnHidden" action="Stop" />
+            <Event event="ToggleVis" action="Play" />
+            <Controller type="Visibility" end="Pause">
+              <Key type="Bool" time="0" value="False" />
+              <Key type="Bool" time=".01" value="True" />
+            </Controller>
+          </Animation>
+        </Frame>
+        <Frame type="UnitStatusFrame" name="AllyBossHealthBar" template="MapMechanicPanel/MapMechanicHealthBarTemplate">
+          <Width val="0" />
+          <Height val="0" />
+          <Anchor relative="$parent" />
+          <Frame type="UnitStatusShieldedHealthBar" name="HealthBar" template="UnitStatus/UnitStatusSegmentedHealthBarTemplate">
+            <Anchor relative="$parent" />
+            <Width val="0" />
+            <Height val="0" />
+            <RenderPriority val="600" />
+            <Texture val="@UI/Storm_UI_HUD_Holdout_Health_Bar_Angled" />
+            <Expansion val="Right" />
+            <Segmented val="false" />
+          </Frame>
+          <Frame type="UnitStatusHealthLabel" name="HealthLabel">
+            <Anchor relative="$parent" />
+            <Visible val="True" />
+            <Alpha val="0" />
+          </Frame>
+        </Frame>
       </Frame>
-      <Frame type="UnitStatusHealthLabel" name="HealthLabel">
-        <Anchor relative="$parent" />
-        <Visible val="True" />
-        <Alpha val="0" />
-      </Frame>
     </Frame>
-    <Frame type="UnitStatusFrame" name="EnemyBossHealthBar" template="MapMechanicPanel/MapMechanicHealthBarTemplate">
-      <Width val="0" />
-      <Height val="0" />
-      <Anchor side="Top" relative="$parent/HealthBarBgBottom" pos="Min" offset="0" />
-      <Anchor side="Bottom" relative="$parent/HealthBarBgBottom" pos="Max" offset="0" />
-      <Anchor side="Left" relative="$parent/HealthBarBgBottom" pos="Min" offset="1" />
-      <Anchor side="Right" relative="$parent/HealthBarBgBottom" pos="Max" offset="-1" />
-      <Frame type="UnitStatusShieldedHealthBar" name="HealthBar" template="UnitStatus/UnitStatusSegmentedHealthBarTemplate">
+    <Frame type="Frame" name="HealthBarBottomContainerFrame">
+      <Anchor side="Top" relative="$parent/HealthBarTopContainerFrame" pos="Mid" offset="11" />
+      <Anchor side="Bottom" relative="$parent/HealthBarTopContainerFrame" pos="Min" offset="44" />
+      <Anchor side="Left" relative="$parent/HealthBarTopContainerFrame" pos="Min" offset="6" />
+      <Anchor side="Right" relative="$parent/HealthBarTopContainerFrame" pos="Max" offset="6" />
+      <Frame type="Frame" name="HealthBarBottomAnimFrame">
         <Anchor relative="$parent" />
-        <Width val="0" />
-        <Height val="0" />
-        <RenderPriority val="600" />
-        <Texture val="@UI/Storm_UI_HUD_Holdout_Health_Bar" />
-        <Expansion val="Left" />
-        <SegmentValue val="100.000000" index="0" />
-      </Frame>
-      <Frame type="UnitStatusHealthLabel" name="HealthLabel">
-        <Anchor relative="$parent" />
-        <Visible val="false" />
-        <Alpha val="0" />
+        <Animation name="CaptureCompletedTransition">
+          <Event event="OnShown" action="Restart,Pause" />
+          <Event event="CaptureComplete" action="Restart,DirectionForward,Play" />
+          <Event event="BarsReset" action="DirectionReverse,Play" />
+          <Controller type="Anchor" end="Pause" side="Left" relative="true">
+            <Key type="Curve" time="0" value="0" inout="Linear,Slow" />
+            <Key type="Curve" time="0.3" value="350" inout="Slow,Linear" />
+          </Controller>
+          <Controller type="Anchor" end="Pause" side="Right" relative="true">
+            <Key type="Curve" time="0" value="0" inout="Linear,Slow" />
+            <Key type="Curve" time="0.3" value="350" inout="Slow,Linear" />
+          </Controller>
+          <Controller type="Event" end="Stop" frame="HealthBarBgBottomBorder">
+            <Key type="Event" time="0.4" event="ToggleVis" />
+          </Controller>
+          <Controller type="Event" end="Stop" frame="HealthBarBgBottomBorderSegmented">
+            <Key type="Event" time="0.4" event="ToggleVis" />
+          </Controller>
+          <Controller type="Event" end="Stop">
+            <Key type="Event" time="0.4" event="StopFlashing" />
+          </Controller>
+        </Animation>
+        <Animation name="CaptureCompletedFlash">
+          <Event event="OnShown" action="Restart,Pause" />
+          <Event event="FlashBars" action="DirectionForward,Play" />
+          <Event event="StopFlashing" action="Stop" />
+          <Controller type="Fade" end="PingPong">
+            <Key type="Curve" time="0" value="255" inout="Fast" />
+            <Key type="Curve" time=".5" value="128" inout="Slow" />
+          </Controller>
+        </Animation>
+        <Frame type="Image" name="HealthBarBgBottom">
+          <IgnoreParentColor val="True" />
+          <IgnoreParentAlpha val="True" />
+          <RenderPriority val="1" />
+          <Color val="504e4d" />
+          <Anchor relative="$parent" />
+          <Texture val="@UI/Storm_UI_HUD_Holdout_Health_Bar_Angled180" />
+          <TextureType val="NineSlice" />
+        </Frame>
+        <Frame type="Image" name="HealthBarBgBottomBorder">
+          <RenderPriority val="550" />
+          <Visible val="true" />
+          <Anchor relative="$parent" />
+          <Texture val="@UI/Storm_UI_HUD_Holdout_Health_Bar_Border_Angled180" />
+          <Animation name="VisibilityControl">
+            <Event event="OnHidden" action="Stop" />
+            <Event event="ToggleVis" action="Play" />
+            <Controller type="Visibility" end="Pause">
+              <Key type="Bool" time="0" value="True" />
+              <Key type="Bool" time=".01" value="False" />
+            </Controller>
+          </Animation>
+        </Frame>
+        <Frame type="Image" name="HealthBarBgBottomBorderSegmented">
+          <RenderPriority val="550" />
+          <Visible val="false" />
+          <Anchor relative="$parent" />
+          <Texture val="@UI/Storm_UI_HUD_Holdout_Health_Bar_BorderSep_Angled180" />
+          <Animation name="VisibilityControl">
+            <Event event="OnHidden" action="Stop" />
+            <Event event="ToggleVis" action="Play" />
+            <Controller type="Visibility" end="Pause">
+              <Key type="Bool" time="0" value="False" />
+              <Key type="Bool" time=".01" value="True" />
+            </Controller>
+          </Animation>
+        </Frame>
+        <Frame type="UnitStatusFrame" name="EnemyBossHealthBar" template="MapMechanicPanel/MapMechanicHealthBarTemplate">
+          <Width val="0" />
+          <Height val="0" />
+          <Anchor relative="$parent" />
+          <Frame type="UnitStatusShieldedHealthBar" name="HealthBar" template="UnitStatus/UnitStatusSegmentedHealthBarTemplate">
+            <Anchor relative="$parent" />
+            <Width val="0" />
+            <Height val="0" />
+            <RenderPriority val="600" />
+            <Texture val="@UI/Storm_UI_HUD_Holdout_Health_Bar_Angled180" />
+            <Expansion val="Left" />
+            <Segmented val="false" />
+          </Frame>
+          <Frame type="UnitStatusHealthLabel" name="HealthLabel">
+            <Anchor relative="$parent" />
+            <Visible val="false" />
+            <Alpha val="0" />
+          </Frame>
+        </Frame>
       </Frame>
     </Frame>
     <Frame type="Image" name="BossHudRight">
@@ -793,8 +904,10 @@
     <Frame type="Frame" name="HoldOutWarningFrame">
       <Anchor relative="$parent" />
       <Frame type="Image" name="BackgroundImage">
-        <Anchor side="Bottom" relative="$parent/TimerImage" pos="Max" offset="-33" />
-        <Anchor side="Right" relative="$parent/TimerImage" pos="Max" offset="15" />
+        <Anchor side="Top" relative="$parent/TimerImage" pos="Min" offset="70" />
+        <Anchor side="Bottom" relative="$parent/TimerImage" pos="Max" offset="-11" />
+        <Anchor side="Left" relative="$parent/TimerImage" pos="Min" offset="-324" />
+        <Anchor side="Right" relative="$parent/TimerImage" pos="Max" offset="9" />
         <Texture val="@UI/HUD_MapMechanic_BG_CenterBar" />
       </Frame>
       <Frame type="Image" name="TimerImage">
@@ -1025,48 +1138,100 @@
         <Anchor side="Left" relative="$parent/BackgroundImage" pos="Min" offset="125" />
         <Style val="Storm_MapMechanic_MechanicCounterSmallLeft_Red" />
       </Frame>
-      <Frame type="Image" name="HealthBarBgTop">
-        <Anchor side="Top" relative="$parent/BackgroundImage" pos="Min" offset="16" />
-        <Anchor side="Left" relative="$parent/BossHudLeft" pos="Max" offset="24" />
-        <Anchor side="Right" relative="$parent/BossHudRight" pos="Min" offset="16" />
-      </Frame>
-      <Frame type="Image" name="HealthBarBgBottom">
-        <Anchor side="Top" relative="$parent/HealthBarBgTop" pos="Mid" offset="10" />
-        <Anchor side="Left" relative="$parent/HealthBarBgTop" pos="Min" offset="-40" />
-        <Anchor side="Right" relative="$parent/HealthBarBgTop" pos="Max" offset="-40" />
-      </Frame>
-      <Frame type="UnitStatusFrame" name="AllyBossHealthBar" template="MapMechanicPanel/MapMechanicHealthBarTemplate">
-        <Width val="0" />
-        <Height val="0" />
-        <Anchor side="Top" relative="$parent/HealthBarBgTop" pos="Min" offset="0" />
-        <Anchor side="Bottom" relative="$parent/HealthBarBgTop" pos="Max" offset="0" />
-        <Anchor side="Left" relative="$parent/HealthBarBgTop" pos="Min" offset="0" />
-        <Anchor side="Right" relative="$parent/HealthBarBgTop" pos="Max" offset="0" />
-        <Frame type="UnitStatusShieldedHealthBar" name="HealthBar" template="UnitStatus/UnitStatusSegmentedHealthBarTemplate">
-          <Anchor relative="$parent" />
-          <Width val="0" />
-          <Height val="0" />
-          <RenderPriority val="600" />
-          <Texture val="@UI/Storm_UI_HUD_Holdout_Health_Bar" />
-          <Expansion val="Left" />
-          <SegmentValue val="100.000000" index="0" />
+      <Frame type="Frame" name="HealthBarTopContainerFrame">
+        <Anchor side="Left" relative="$parent/BossHudLeft" pos="Max" offset="-12" />
+        <Anchor side="Right" relative="$parent/BossHudLeft" pos="Min" offset="376" />
+        <Frame type="Frame" name="HealthBarTopAnimFrame">
+          <Animation name="CaptureCompletedTransition">
+            <Event event="OnShown" action="Restart,Pause" />
+            <Event event="CaptureComplete" action="Restart,DirectionForward,Play" />
+            <Event event="BarsReset" action="DirectionReverse,Play" />
+            <Controller type="Anchor" end="Pause" side="Left" relative="true">
+              <Key type="Curve" time="0" value="0" inout="Linear,Slow" />
+              <Key type="Curve" time="0.3" value="350" inout="Slow,Linear" />
+            </Controller>
+            <Controller type="Anchor" end="Pause" side="Right" relative="true">
+              <Key type="Curve" time="0" value="0" inout="Linear,Slow" />
+              <Key type="Curve" time="0.3" value="350" inout="Slow,Linear" />
+            </Controller>
+            <Controller type="Event" end="Stop" frame="HealthBarBgTopBorder">
+              <Key type="Event" time="0.4" event="ToggleVis" />
+            </Controller>
+            <Controller type="Event" end="Stop" frame="HealthBarBgTopBorderSegmented">
+              <Key type="Event" time="0.4" event="ToggleVis" />
+            </Controller>
+          </Animation>
+          <Frame type="Image" name="HealthBarBgTop">
+            <Texture val="@UI/Storm_UI_HUD_Holdout_Health_Bar_AngledFlip" />
+          </Frame>
+          <Frame type="Image" name="HealthBarBgTopBorder">
+            <Texture val="@UI/Storm_UI_HUD_Holdout_Health_Bar_Border_AngledFlip" />
+          </Frame>
+          <Frame type="Image" name="HealthBarBgTopBorderSegmented">
+            <Texture val="@UI/Storm_UI_HUD_Holdout_Health_Bar_BorderSep_AngledFlip" />
+          </Frame>
+          <Frame type="UnitStatusFrame" name="AllyBossHealthBar" template="MapMechanicPanel/MapMechanicHealthBarTemplate">
+            <Width val="0" />
+            <Height val="0" />
+            <Anchor relative="$parent" />
+            <Frame type="UnitStatusShieldedHealthBar" name="HealthBar" template="UnitStatus/UnitStatusSegmentedHealthBarTemplate">
+              <Anchor relative="$parent" />
+              <Width val="0" />
+              <Height val="0" />
+              <RenderPriority val="600" />
+              <Texture val="@UI/Storm_UI_HUD_Holdout_Health_Bar_AngledFlip" />
+              <Expansion val="Left" />
+              <Segmented val="false" />
+            </Frame>
+          </Frame>
         </Frame>
       </Frame>
-      <Frame type="UnitStatusFrame" name="EnemyBossHealthBar" template="MapMechanicPanel/MapMechanicHealthBarTemplate">
-        <Width val="0" />
-        <Height val="0" />
-        <Anchor side="Top" relative="$parent/HealthBarBgBottom" pos="Min" offset="0" />
-        <Anchor side="Bottom" relative="$parent/HealthBarBgBottom" pos="Max" offset="0" />
-        <Anchor side="Left" relative="$parent/HealthBarBgBottom" pos="Min" offset="0" />
-        <Anchor side="Right" relative="$parent/HealthBarBgBottom" pos="Max" offset="0" />
-        <Frame type="UnitStatusShieldedHealthBar" name="HealthBar" template="UnitStatus/UnitStatusSegmentedHealthBarTemplate">
-          <Anchor relative="$parent" />
-          <Width val="0" />
-          <Height val="0" />
-          <RenderPriority val="600" />
-          <Texture val="@UI/Storm_UI_HUD_Holdout_Health_Bar" />
-          <Expansion val="Right" />
-          <SegmentValue val="100.000000" index="0" />
+      <Frame type="Frame" name="HealthBarBottomContainerFrame">
+        <Anchor side="Left" relative="$parent/HealthBarTopContainerFrame" pos="Min" offset="-2" />
+        <Anchor side="Right" relative="$parent/HealthBarTopContainerFrame" pos="Max" offset="-2" />
+        <Frame type="Frame" name="HealthBarBottomAnimFrame">
+          <Animation name="CaptureCompletedTransition">
+            <Event event="OnShown" action="Restart,Pause" />
+            <Event event="CaptureComplete" action="Restart,DirectionForward,Play" />
+            <Event event="BarsReset" action="DirectionReverse,Play" />
+            <Controller type="Anchor" end="Pause" side="Left" relative="true">
+              <Key type="Curve" time="0" value="0" inout="Linear,Slow" />
+              <Key type="Curve" time="0.3" value="-350" inout="Slow,Linear" />
+            </Controller>
+            <Controller type="Anchor" end="Pause" side="Right" relative="true">
+              <Key type="Curve" time="0" value="0" inout="Linear,Slow" />
+              <Key type="Curve" time="0.3" value="-350" inout="Slow,Linear" />
+            </Controller>
+            <Controller type="Event" end="Stop" frame="HealthBarBgBottomBorder">
+              <Key type="Event" time="0.4" event="ToggleVis" />
+            </Controller>
+            <Controller type="Event" end="Stop" frame="HealthBarBgBottomBorderSegmented">
+              <Key type="Event" time="0.4" event="ToggleVis" />
+            </Controller>
+          </Animation>
+          <Frame type="Image" name="HealthBarBgBottom">
+            <Texture val="@UI/Storm_UI_HUD_Holdout_Health_Bar_Angled180Flip" />
+          </Frame>
+          <Frame type="Image" name="HealthBarBgBottomBorder">
+            <Texture val="@UI/Storm_UI_HUD_Holdout_Health_Bar_Border_Angled180Flip" />
+          </Frame>
+          <Frame type="Image" name="HealthBarBgBottomBorderSegmented">
+            <Texture val="@UI/Storm_UI_HUD_Holdout_Health_Bar_BorderSep_Angled180Flip" />
+          </Frame>
+          <Frame type="UnitStatusFrame" name="EnemyBossHealthBar" template="MapMechanicPanel/MapMechanicHealthBarTemplate">
+            <Width val="0" />
+            <Height val="0" />
+            <Anchor relative="$parent" />
+            <Frame type="UnitStatusShieldedHealthBar" name="HealthBar" template="UnitStatus/UnitStatusSegmentedHealthBarTemplate">
+              <Anchor relative="$parent" />
+              <Width val="0" />
+              <Height val="0" />
+              <RenderPriority val="600" />
+              <Texture val="@UI/Storm_UI_HUD_Holdout_Health_Bar_Angled180Flip" />
+              <Expansion val="Right" />
+              <Segmented val="false" />
+            </Frame>
+          </Frame>
         </Frame>
       </Frame>
       <Frame type="Image" name="BossHudRight">

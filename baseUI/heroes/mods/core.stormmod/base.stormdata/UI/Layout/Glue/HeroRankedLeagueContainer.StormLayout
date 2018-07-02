@@ -1,6 +1,9 @@
 ﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <Desc>
   <DescFlags val="Locked" />
+  <Constant name="ColorRankedDecayStatusNormal" val="03F27A" />
+  <Constant name="ColorRankedDecayStatusWarning" val="FBAD58" />
+  <Constant name="ColorRankedDecayStatusDecaying" val="FF2221" />
   <Frame type="RankedHeroInfoDisplay" name="FavoriteHeroTemplate">
     <Anchor side="Bottom" relative="HeroContainer" pos="Max" offset="0" />
     <Anchor side="Right" relative="HeroContainer" pos="Max" offset="0" />
@@ -362,6 +365,169 @@
         <Anchor side="Left" relative="$parent" pos="Min" offset="0" />
       </Frame>
     </Frame>
+    <Frame type="HeroRankedDecayFrame" name="HeroRankedDecayFrame">
+      <Anchor relative="$parent" />
+      <QueueTag val="{$parent/@QueueTag}" />
+      <RankType val="{$parent/RankBadge/@RankType}" />
+      <Frame type="Frame" name="DecayIcon">
+        <Anchor side="Top" relative="$ancestor[@type=HeroRankedLeagueContainer]/RankBadge/BadgeContainer" pos="Min" offset="72" />
+        <Anchor side="Bottom" relative="$ancestor[@type=HeroRankedLeagueContainer]/RankBadge/BadgeContainer" pos="Min" offset="72" />
+        <Anchor side="Left" relative="$ancestor[@type=HeroRankedLeagueContainer]/RankBadge/BadgeContainer" pos="Mid" offset="0" />
+        <Anchor side="Right" relative="$ancestor[@type=HeroRankedLeagueContainer]/RankBadge/BadgeContainer" pos="Mid" offset="0" />
+        <Width val="144" />
+        <Height val="96" />
+        <Visible val="False" />
+        <RenderType val="LDR" />
+        <AcceptsMouseTooltip val="True" />
+        <TooltipAnchorPosition val="BottomCenter" />
+        <Tooltip val="{TooltipFormatter/@Text}" />
+        <Frame type="TextFormatFrame" name="TooltipFormatter">
+          <Anchor relative="$parent" />
+          <Replacement val="{$ancestor[@type=HeroRankedDecayFrame]/@DecayedRankPoints}" />
+          <ReplacedName val="decayedPoints" />
+        </Frame>
+        <Frame type="CutsceneFrame" name="IconBackgroundCutscene">
+          <Anchor side="Top" relative="$parent" pos="Mid" offset="0" />
+          <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0" />
+          <Anchor side="Left" relative="$parent" pos="Mid" offset="0" />
+          <Anchor side="Right" relative="$parent" pos="Mid" offset="0" />
+          <Width val="320" />
+          <Height val="320" />
+          <Unclipped val="True" />
+          <AutoPlay val="True" />
+          <File val="Cutscenes/LossForgiveness_Deserter.StormCutscene" />
+        </Frame>
+        <Frame type="Image" name="IconImage">
+          <Anchor relative="$parent" />
+          <Texture val="@UI/Storm_UI_Ranked_Decay_Icon" />
+        </Frame>
+      </Frame>
+      <Frame type="Image" name="LabelBackground">
+        <Anchor side="Top" relative="$parent/StatusLabel" pos="-0.1" offset="0" />
+        <Anchor side="Left" relative="$parent/StatusLabel" pos="-0.25" offset="-38" />
+        <Anchor side="Right" relative="$parent/StatusLabel" pos="1.25" offset="0" />
+        <Anchor side="Bottom" relative="$parent/StatusLabel" pos="1.15" offset="0" />
+        <Texture val="@UI/Storm_UI_Label_Background" />
+        <Alpha val="232" />
+        <Visible val="False" />
+        <Unclipped val="True" />
+      </Frame>
+      <Frame type="Image" name="HourglassIcon">
+        <Anchor side="Right" relative="$parent/StatusLabel" pos="Min" offset="0" />
+        <Anchor side="Top" relative="$parent/StatusLabel" pos="Mid" offset="0" />
+        <Anchor side="Bottom" relative="$parent/StatusLabel" pos="Mid" offset="0" />
+        <Texture val="@UI/Storm_UI_Ranked_Decay_HourglassIcon" />
+        <Visible val="{$parent/StatusLabel/@Visible}" />
+        <AcceptsMouseTooltip val="{$parent/StatusLabel/@AcceptsMouseTooltip}" />
+        <TooltipAnchorPosition val="{$parent/StatusLabel/@TooltipAnchorPosition}" />
+        <Tooltip val="{$parent/StatusLabel/@Tooltip}" />
+      </Frame>
+      <Frame type="Label" name="StatusLabel">
+        <Anchor side="Bottom" relative="$ancestor[@type=HeroRankedLeagueContainer]/TitleLabel" pos="Min" offset="3" />
+        <Anchor side="Left" relative="$ancestor[@type=HeroRankedLeagueContainer]/TitleLabel" pos="Mid" offset="15" />
+        <Anchor side="Right" relative="$ancestor[@type=HeroRankedLeagueContainer]/TitleLabel" pos="Mid" offset="15" />
+        <Text val="{TextFormatter/@Text}" />
+        <AcceptsMouseTooltip val="True" />
+        <TooltipAnchorPosition val="BottomCenter" />
+        <Tooltip val="{TooltipFormatter/@Text}" />
+        <Frame type="TextFormatFrame" name="TextFormatter">
+          <Anchor relative="$parent" />
+          <FormatText val="@UI/RankedPlay/Decay/Timer" />
+          <Replacement val="{$ancestor[@type=HeroRankedDecayFrame]/@InactivityTimer}" />
+          <ReplacedName val="days" />
+        </Frame>
+        <Frame type="TextFormatFrame" name="TooltipFormatter">
+          <Anchor relative="$parent" />
+          <Replacement val="{$ancestor[@type=HeroRankedDecayFrame]/@InactivityTimer}" index="0" />
+          <ReplacedName val="days" index="0" />
+          <Replacement val="{$ancestor[@type=HeroRankedDecayFrame]/@InactivityTimerMax}" index="1" />
+          <ReplacedName val="maxDays" index="1" />
+          <Replacement val="{$ancestor[@type=HeroRankedDecayFrame]/@RankPointDecayRate}" index="2" />
+          <ReplacedName val="decayRate" index="2" />
+        </Frame>
+      </Frame>
+      <Stategroup name="RankDecayState">
+        <DefaultState val="CannotDecay" />
+        <State name="CannotDecay">
+          <Action type="SetProperty" frame="StatusLabel" Visible="False" />
+        </State>
+        <State name="GraceDays">
+          <When type="Property" DecayState="GraceDays" />
+          <Action type="SetProperty" frame="StatusLabel" Style="HeroLobbyRankDecayStatusLabelNormal" />
+          <Action type="SetProperty" frame="HourglassIcon" Color="#ColorRankedDecayStatusNormal" />
+        </State>
+        <State name="Countdown">
+          <When type="Property" DecayState="Countdown" />
+          <Action type="SetProperty" frame="StatusLabel" Style="HeroLobbyRankDecayStatusLabelNormal" />
+          <Action type="SetProperty" frame="HourglassIcon" Color="#ColorRankedDecayStatusNormal" />
+        </State>
+        <State name="Warning">
+          <When type="Property" DecayState="Warning" />
+          <Action type="SetProperty" frame="StatusLabel" Style="HeroLobbyRankDecayStatusLabelWarning" />
+          <Action type="SetProperty" frame="HourglassIcon" Color="#ColorRankedDecayStatusWarning" />
+        </State>
+        <State name="Decaying">
+          <When type="Property" DecayState="Decaying" />
+          <Action type="SetProperty" frame="HourglassIcon" Color="#ColorRankedDecayStatusDecaying" />
+          <Action type="SetProperty" frame="StatusLabel" Style="HeroLobbyRankDecayStatusLabelDecaying" />
+          <Action type="SetProperty" frame="StatusLabel/TextFormatter" FormatText="@UI/RankedPlay/Decay/TimerDecaying" />
+          <Action type="SetProperty" frame="DecayIcon" Visible="True" />
+        </State>
+        <State name="Unknown">
+          <When type="Property" DecayState="Unknown" />
+          <Action type="SetProperty" frame="StatusLabel" Style="HeroLobbyRankDecayStatusLabelWarning" />
+          <Action type="SetProperty" frame="HourglassIcon" Color="#ColorRankedDecayStatusWarning" />
+          <Action type="SetProperty" frame="StatusLabel/TextFormatter" FormatText="@UI/RankedPlay/Decay/TimerUnknown" />
+        </State>
+        <State name="PostDecay">
+          <When type="Property" HasDecayed="true" />
+          <Action type="SetProperty" frame="StatusLabel" Visible="False" />
+          <Action type="SetProperty" frame="DecayIcon" Visible="True" />
+        </State>
+      </Stategroup>
+      <Stategroup name="PartyHudStates">
+        <DefaultState val="None" />
+        <State name="None" />
+        <State name="Warning">
+          <When type="StateGroup" RankDecayState="Warning" />
+        </State>
+        <State name="Decaying">
+          <When type="StateGroup" RankDecayState="Decaying" />
+        </State>
+      </Stategroup>
+      <Stategroup name="TooltipsStates">
+        <DefaultState val="None" />
+        <State name="None" />
+        <State name="GraceDays">
+          <When type="StateGroup" RankDecayState="GraceDays" />
+        </State>
+        <State name="Countdown">
+          <When type="StateGroup" RankDecayState="Countdown" />
+        </State>
+        <State name="Warning">
+          <When type="StateGroup" RankDecayState="Warning" />
+        </State>
+        <State name="Decaying">
+          <When type="StateGroup" RankDecayState="Decaying" />
+        </State>
+        <State name="Unknown">
+          <When type="StateGroup" RankDecayState="Unknown" />
+        </State>
+        <State name="PostDecay">
+          <When type="StateGroup" RankDecayState="PostDecay" />
+        </State>
+      </Stategroup>
+      <Stategroup name="LabelBackgroundStates">
+        <DefaultState val="None" />
+        <State name="None" />
+        <State name="Visible">
+          <When type="Property" frame="$parent/RankBadge" RankType="GrandMaster" />
+          <When type="Property" frame="StatusLabel" Visible="True" />
+          <When type="Property" frame="StatusLabel" operator="NotEqual" Text="" />
+          <Action type="SetProperty" frame="LabelBackground" Visible="True" />
+        </State>
+      </Stategroup>
+    </Frame>
   </Frame>
   <Frame type="HeroRankedLeagueContainer" name="HeroRankedLeagueContainerTemplate" template="HeroRankedLeagueContainer/RankedLeagueContainerTemplate">
     <Frame type="Image" name="Background">
@@ -381,6 +547,40 @@
           </Frame>
         </Frame>
       </Frame>
+    </Frame>
+    <Frame type="HeroRankedDecayFrame" name="HeroRankedDecayFrame">
+      <Stategroup name="PartyHudStates">
+        <State name="None">
+          <Action type="SetProperty" frame="$ScreenNavigation_PartyPanel/TileList/RankDecayFrame/HeroLeagueStatus" FormatText="STATE_NONE" />
+        </State>
+        <State name="Warning">
+          <Action type="SetProperty" frame="$ScreenNavigation_PartyPanel/TileList/RankDecayFrame/HeroLeagueStatus" FormatText="STATE_WARNING" />
+        </State>
+        <State name="Decaying">
+          <Action type="SetProperty" frame="$ScreenNavigation_PartyPanel/TileList/RankDecayFrame/HeroLeagueStatus" FormatText="STATE_DECAYING" />
+        </State>
+      </Stategroup>
+      <Stategroup name="TooltipsStates">
+        <State name="GraceDays">
+          <Action type="SetProperty" frame="StatusLabel/TooltipFormatter" FormatText="@UI/RankedPlay/Decay/LabelTooltip/GraceDays/HeroLeague" />
+        </State>
+        <State name="Countdown">
+          <Action type="SetProperty" frame="StatusLabel/TooltipFormatter" FormatText="@UI/RankedPlay/Decay/LabelTooltip/Countdown/HeroLeague" />
+        </State>
+        <State name="Warning">
+          <Action type="SetProperty" frame="StatusLabel/TooltipFormatter" FormatText="@UI/RankedPlay/Decay/LabelTooltip/Warning/HeroLeague" />
+        </State>
+        <State name="Decaying">
+          <Action type="SetProperty" frame="StatusLabel/TooltipFormatter" FormatText="@UI/RankedPlay/Decay/LabelTooltip/Decaying/HeroLeague" />
+          <Action type="SetProperty" frame="DecayIcon/TooltipFormatter" FormatText="@UI/RankedPlay/Decay/IconTooltip/Decaying/HeroLeague" />
+        </State>
+        <State name="Unknown">
+          <Action type="SetProperty" frame="StatusLabel/TooltipFormatter" FormatText="@UI/RankedPlay/Decay/LabelTooltip/Unknown/HeroLeague" />
+        </State>
+        <State name="PostDecay">
+          <Action type="SetProperty" frame="DecayIcon/TooltipFormatter" FormatText="@UI/RankedPlay/Decay/IconTooltip/PostDecay/HeroLeague" />
+        </State>
+      </Stategroup>
     </Frame>
   </Frame>
   <Frame type="HeroRankedLeagueContainer" name="TeamRankedLeagueContainerTemplate" template="HeroRankedLeagueContainer/RankedLeagueContainerTemplate">
@@ -417,5 +617,39 @@
         <Action type="SetProperty" frame="DescriptionLabel" style="HeroLobbyRankedHeroLeagueDescription" />
       </State>
     </StateGroup>
+    <Frame type="HeroRankedDecayFrame" name="HeroRankedDecayFrame">
+      <Stategroup name="PartyHudStates">
+        <State name="None">
+          <Action type="SetProperty" frame="$ScreenNavigation_PartyPanel/TileList/RankDecayFrame/TeamLeagueStatus" FormatText="STATE_NONE" />
+        </State>
+        <State name="Warning">
+          <Action type="SetProperty" frame="$ScreenNavigation_PartyPanel/TileList/RankDecayFrame/TeamLeagueStatus" FormatText="STATE_WARNING" />
+        </State>
+        <State name="Decaying">
+          <Action type="SetProperty" frame="$ScreenNavigation_PartyPanel/TileList/RankDecayFrame/TeamLeagueStatus" FormatText="STATE_DECAYING" />
+        </State>
+      </Stategroup>
+      <Stategroup name="TooltipsStates">
+        <State name="GraceDays">
+          <Action type="SetProperty" frame="StatusLabel/TooltipFormatter" FormatText="@UI/RankedPlay/Decay/LabelTooltip/GraceDays/TeamLeague" />
+        </State>
+        <State name="Countdown">
+          <Action type="SetProperty" frame="StatusLabel/TooltipFormatter" FormatText="@UI/RankedPlay/Decay/LabelTooltip/Countdown/TeamLeague" />
+        </State>
+        <State name="Warning">
+          <Action type="SetProperty" frame="StatusLabel/TooltipFormatter" FormatText="@UI/RankedPlay/Decay/LabelTooltip/Warning/TeamLeague" />
+        </State>
+        <State name="Decaying">
+          <Action type="SetProperty" frame="StatusLabel/TooltipFormatter" FormatText="@UI/RankedPlay/Decay/LabelTooltip/Decaying/TeamLeague" />
+          <Action type="SetProperty" frame="DecayIcon/TooltipFormatter" FormatText="@UI/RankedPlay/Decay/IconTooltip/Decaying/TeamLeague" />
+        </State>
+        <State name="Unknown">
+          <Action type="SetProperty" frame="StatusLabel/TooltipFormatter" FormatText="@UI/RankedPlay/Decay/LabelTooltip/Unknown/TeamLeague" />
+        </State>
+        <State name="PostDecay">
+          <Action type="SetProperty" frame="DecayIcon/TooltipFormatter" FormatText="@UI/RankedPlay/Decay/IconTooltip/PostDecay/TeamLeague" />
+        </State>
+      </Stategroup>
+    </Frame>
   </Frame>
 </Desc>

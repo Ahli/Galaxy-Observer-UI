@@ -1,45 +1,113 @@
 ﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <Desc>
   <Constant name="RoadmapItemSize" val="20" />
-  <Constant name="RoadmapItemSpacing" val="5" />
+  <Constant name="RoadmapItemSpacing" val="3" />
   <Constant name="RoadmapContainerFrameSize" val="136" />
   <Constant name="RoadmapItemInactiveTopOffset" val="-10" />
   <Constant name="RoadmapItemActiveTopOffset" val="-58" />
   <Constant name="RoadmapAnchorFrameInitialOffset" val="-68" />
-  <Constant name="RoadmapAnchorFrameTransitionOffset" val="-25" />
+  <Constant name="RoadmapAnchorFrameTransitionOffset" val="-23" />
   <Frame type="HeroDraftRoadmapItem" name="HeroDraftRoadmapItemTemplate">
     <Anchor side="Top" relative="$parent" pos="Mid" offset="#RoadmapItemInactiveTopOffset" />
     <Height val="#RoadmapItemSize" />
     <Width val="#RoadmapItemSize" />
+    <Visible val="{$this/@IsValid}" />
     <AcceptsMouseTooltip val="true" />
-    <StateGroup name="DraftRoundType">
-      <DefaultState val="BlueTeamPick" />
-      <State name="TeamBan">
-        <When type="AnimationState" frame="$this" AnimStateActiveTeam="Ban" />
+    <StateGroup name="RoadmapItemStates">
+      <State name="AllyTeamBan">
+        <When type="Property" IsMyTeamRound="true" />
+        <When type="Property" IsSwapRound="false" />
+        <When type="Property" IsBanRound="true" />
+        <When type="Property" IsWatcher="false" />
+        <Action type="SetProperty" Tooltip="@UI/HeroDraft/ActiveRoundTooltip/YourTeamBans" />
         <Action type="SetProperty" frame="RoundTypeImage" AdjustmentColor="60386b" />
+        <Action type="SetProperty" frame="RoundTypeImage/BanArrow" Rotation="180" />
+        <Action type="SetAnchor" frame="RoundTypeImage/BanArrow" side="Left" relative="$parent" pos="Mid" offset="-1" />
+        <Action type="SetAnchor" frame="RoundTypeImage/BanArrow" side="Right" relative="$parent" pos="Mid" offset="-1" />
       </State>
-      <State name="RedTeamPick">
-        <When type="AnimationState" frame="$this" AnimStateActiveTeam="TeamRed" />
-        <Action type="SetProperty" frame="RoundTypeImage" AdjustmentColor="7e0018" />
+      <State name="EnemyTeamBan">
+        <When type="Property" IsMyTeamRound="false" />
+        <When type="Property" IsSwapRound="false" />
+        <When type="Property" IsBanRound="true" />
+        <When type="Property" IsWatcher="false" />
+        <Action type="SetProperty" Tooltip="@UI/HeroDraft/ActiveRoundTooltip/EnemyTeamBans" />
+        <Action type="SetProperty" frame="RoundTypeImage" AdjustmentColor="60386b" />
+        <Action type="SetAnchor" frame="RoundTypeImage/BanArrow" side="Left" relative="$parent" pos="Mid" offset="1" />
+        <Action type="SetAnchor" frame="RoundTypeImage/BanArrow" side="Right" relative="$parent" pos="Mid" offset="1" />
       </State>
-      <State name="BlueTeamPick">
-        <When type="AnimationState" frame="$this" AnimStateActiveTeam="TeamBlue" />
+      <State name="AllyTeamPick">
+        <When type="Property" IsMyTeamRound="true" />
+        <When type="Property" IsSwapRound="false" />
+        <When type="Property" IsBanRound="false" />
+        <When type="Property" IsWatcher="false" />
+        <Action type="SetProperty" Tooltip="@UI/HeroDraft/ActiveRoundTooltip/YourTeamPicks" />
         <Action type="SetProperty" frame="RoundTypeImage" AdjustmentColor="173d94" />
       </State>
-    </StateGroup>
-    <StateGroup name="ItemValidity">
-      <DefaultState val="InvalidState" />
-      <State name="ValidState">
-        <When type="AnimationState" frame="$this" AnimStateValidItem="Valid" />
-        <Action type="SetProperty" frame="$this" visible="true" />
+      <State name="EnemyTeamPick">
+        <When type="Property" IsMyTeamRound="false" />
+        <When type="Property" IsSwapRound="false" />
+        <When type="Property" IsBanRound="false" />
+        <When type="Property" IsWatcher="false" />
+        <Action type="SetProperty" Tooltip="@UI/HeroDraft/ActiveRoundTooltip/EnemyTeamPicks" />
+        <Action type="SetProperty" frame="RoundTypeImage" AdjustmentColor="7e0018" />
       </State>
-      <State name="InvalidState">
-        <Action type="SetProperty" frame="$this" visible="false" />
+      <State name="BlueTeamBan">
+        <When type="Property" IsMyTeamRound="true" />
+        <When type="Property" IsSwapRound="false" />
+        <When type="Property" IsBanRound="true" />
+        <When type="Property" IsWatcher="true" />
+        <Action type="SetProperty" Tooltip="@UI/HeroDraft/ActiveRoundTooltip/BlueTeamBans" />
+        <Action type="SetProperty" frame="RoundTypeImage" AdjustmentColor="60386b" />
+        <Action type="SetProperty" frame="RoundTypeImage/BanArrow" Rotation="180" />
+        <Action type="SetAnchor" frame="RoundTypeImage/BanArrow" side="Left" relative="$parent" pos="Mid" offset="-1" />
+        <Action type="SetAnchor" frame="RoundTypeImage/BanArrow" side="Right" relative="$parent" pos="Mid" offset="-1" />
+      </State>
+      <State name="RedTeamBan">
+        <When type="Property" IsMyTeamRound="false" />
+        <When type="Property" IsSwapRound="false" />
+        <When type="Property" IsBanRound="true" />
+        <When type="Property" IsWatcher="true" />
+        <Action type="SetProperty" Tooltip="@UI/HeroDraft/ActiveRoundTooltip/RedTeamBans" />
+        <Action type="SetProperty" frame="RoundTypeImage" AdjustmentColor="60386b" />
+        <Action type="SetAnchor" frame="RoundTypeImage/BanArrow" side="Left" relative="$parent" pos="Mid" offset="1" />
+        <Action type="SetAnchor" frame="RoundTypeImage/BanArrow" side="Right" relative="$parent" pos="Mid" offset="1" />
+      </State>
+      <State name="BlueTeamPick">
+        <When type="Property" IsMyTeamRound="true" />
+        <When type="Property" IsSwapRound="false" />
+        <When type="Property" IsBanRound="false" />
+        <When type="Property" IsWatcher="true" />
+        <Action type="SetProperty" Tooltip="@UI/HeroDraft/ActiveRoundTooltip/BlueTeamPicks" />
+        <Action type="SetProperty" frame="RoundTypeImage" AdjustmentColor="173d94" />
+      </State>
+      <State name="RedTeamPick">
+        <When type="Property" IsMyTeamRound="false" />
+        <When type="Property" IsSwapRound="false" />
+        <When type="Property" IsBanRound="false" />
+        <When type="Property" IsWatcher="true" />
+        <Action type="SetProperty" Tooltip="@UI/HeroDraft/ActiveRoundTooltip/RedTeamPicks" />
+        <Action type="SetProperty" frame="RoundTypeImage" AdjustmentColor="7e0018" />
+      </State>
+      <State name="SwapRound">
+        <When type="Property" IsSwapRound="true" />
+        <When type="Property" IsBanRound="false" />
+        <Action type="SetProperty" Tooltip="@UI/HeroDraft/ActiveRoundTooltip/SwapRound" />
+        <Action type="SetProperty" frame="RoundTypeImage" AdjustmentColor="60386b" />
+      </State>
+    </StateGroup>
+    <StateGroup name="ActiveStates">
+      <State name="Active">
+        <When type="Property" IsActive="true" />
+        <Action type="SendEvent" Event="ActiveProperty" />
+      </State>
+      <State name="Inactive">
+        <When type="Property" IsActive="false" />
+        <Action type="SendEvent" Event="InactiveProperty" />
       </State>
     </StateGroup>
     <Animation name="ActivationAnimations">
-      <Event event="Active" action="DirectionForward,Play" />
-      <Event event="Inactive" action="DirectionReverse,Play" />
+      <Event event="ActiveProperty" action="DirectionForward,Play" />
+      <Event event="InactiveProperty" action="DirectionReverse,Play" />
       <Controller type="Dimension" dimension="Width" end="Pause">
         <Key type="Curve" time="0" value="#RoadmapItemSize" inout="Linear,Slow" />
         <Key type="Curve" time=".2" value="#RoadmapContainerFrameSize" inout="Slow,Linear" />
@@ -62,6 +130,14 @@
       <Texture val="@UI/storm_ui_glues_draft_hero_team_turn_pip" />
       <ColorAdjustMode val="Colorize" />
       <SubpixelRendering val="true" />
+      <Frame type="Image" name="BanArrow">
+        <Anchor side="Top" relative="$parent" pos="Mid" offset="0" />
+        <Anchor side="Left" relative="$parent" pos="Mid" offset="0" />
+        <Anchor side="Right" relative="$parent" pos="Mid" offset="0" />
+        <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0" />
+        <Visible val="{$parent/$parent/@IsBanRound}" />
+        <Texture val="@UI/storm_ui_glues_draft_hero_team_turn_ban_arrow" />
+      </Frame>
     </Frame>
   </Frame>
   <Frame type="Image" name="RoundActivityIndicatorTemplate">
