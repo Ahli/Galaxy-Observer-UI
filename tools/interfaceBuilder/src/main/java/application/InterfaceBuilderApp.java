@@ -292,7 +292,7 @@ public class InterfaceBuilderApp extends Application {
 	 * @return
 	 */
 	private boolean anyErrorTrackerEncounteredError() {
-		for (final ErrorTabController ctrl: errorTabControllers) {
+		for (final ErrorTabController ctrl : errorTabControllers) {
 			if (ctrl.hasEncounteredError() && !ctrl.isErrorsDoNotPreventExit()) {
 				return true;
 			}

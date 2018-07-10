@@ -32,19 +32,19 @@ import java.util.concurrent.ThreadPoolExecutor;
 
 @Service
 public class BaseUiService {
-	public static final String UNKNOWN_GAME_EXCEPTION = "Unknown Game";
+	private static final String UNKNOWN_GAME_EXCEPTION = "Unknown Game";
 	private static final Logger logger = LogManager.getLogger();
 	
 	private final InterfaceBuilderApp app = InterfaceBuilderApp.getInstance();
 	
 	@Autowired
-	ConfigService configService;
+	private ConfigService configService;
 	@Autowired
-	GameService gameService;
+	private GameService gameService;
 	@Autowired
-	FileService fileService;
+	private FileService fileService;
 	@Autowired
-	DiscCacheService discCacheService;
+	private DiscCacheService discCacheService;
 	
 	/**
 	 * Checks if the specified game's baseUI is older than the game files.
@@ -120,7 +120,7 @@ public class BaseUiService {
 		
 		final File extractorExe = configService.getCascExtractorConsoleExeFile();
 		final String[] queryMasks = getQueryMasks(game);
-		for (final String mask: queryMasks) {
+		for (final String mask : queryMasks) {
 			final Runnable task = () -> {
 				try {
 					final String maskFinal = mask;
@@ -224,7 +224,6 @@ public class BaseUiService {
 	 * @param game
 	 * 		game whose default UI is parsed
 	 * @param followupTask
-	 * @throws InterruptedException
 	 */
 	public void parseBaseUI(final GameData game, final Runnable followupTask) {
 		// create tasks for the worker pool
@@ -258,7 +257,7 @@ public class BaseUiService {
 						final String gameDir = configService.getBaseUiPath(game.getGameDef()) + File.separator +
 								game.getGameDef().getModsSubDirectory();
 						try {
-							for (final String modOrDir: game.getGameDef().getCoreModsOrDirectories()) {
+							for (final String modOrDir : game.getGameDef().getCoreModsOrDirectories()) {
 								
 								final File directory = new File(gameDir + File.separator + modOrDir);
 								if (!directory.exists() || !directory.isDirectory()) {
@@ -270,7 +269,7 @@ public class BaseUiService {
 												TrueFileFilter.INSTANCE);
 								logger.info("number of descIndexFiles found: " + descIndexFiles.size());
 								
-								for (final File descIndexFile: descIndexFiles) {
+								for (final File descIndexFile : descIndexFiles) {
 									logger.info("parsing descIndexFile '" + descIndexFile.getPath() + "'");
 									uiCatalog.processDescIndex(descIndexFile, game.getGameDef().getDefaultRaceId());
 								}

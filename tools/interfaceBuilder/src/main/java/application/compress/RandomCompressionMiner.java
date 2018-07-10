@@ -155,7 +155,7 @@ public class RandomCompressionMiner {
 			final File cacheDir) {
 		final List<MpqEditorCompressionRule> clean = new ArrayList<>();
 		String mask;
-		for (final MpqEditorCompressionRule rule: dirty) {
+		for (final MpqEditorCompressionRule rule : dirty) {
 			if (rule instanceof MpqEditorCompressionRuleMask) {
 				mask = ((MpqEditorCompressionRuleMask) rule).getMask();
 				if (isValidFileSpecificMask(mask, cacheDir)) {
@@ -290,7 +290,7 @@ public class RandomCompressionMiner {
 	public void randomizeRules() {
 		// fine for all: NONE, BZIP2, ZLIB, PKWARE, SPARSE, SPARSE_BZIP2, SPARSE_ZLIB
 		// not fine: LZMA (crash during load)
-		for (final MpqEditorCompressionRule r: rules) {
+		for (final MpqEditorCompressionRule r : rules) {
 			if (r instanceof MpqEditorCompressionRuleMask) {
 				r.setCompressionMethod(getRandomCompressionMethod());
 			}

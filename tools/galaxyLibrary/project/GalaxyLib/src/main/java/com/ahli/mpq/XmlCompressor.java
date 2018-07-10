@@ -67,7 +67,7 @@ public final class XmlCompressor {
 		// provide error handler that does not print incompatible files into console
 		dBuilder.setErrorHandler(new SilentXmlSaxErrorHandler());
 		
-		for (final File curFile: filesOfCache) {
+		for (final File curFile : filesOfCache) {
 			final Document doc;
 			try (final InputStream is = new FileInputStream(curFile)) {
 				

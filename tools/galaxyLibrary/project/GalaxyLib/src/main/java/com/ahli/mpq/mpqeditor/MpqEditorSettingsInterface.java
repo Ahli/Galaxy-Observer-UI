@@ -228,15 +228,20 @@ public class MpqEditorSettingsInterface implements DeepCopyable {
 	 *
 	 */
 	private void writeMpqRuleset() throws IOException {
-		INIConfiguration ini;
-		try {
-			final INIBuilderParameters params = new Parameters().ini().setFile(rulesetFile).setEncoding("UTF-8");
-			final FileBasedConfigurationBuilder<INIConfiguration> b =
-					new FileBasedConfigurationBuilder<>(INIConfiguration.class).configure(params);
-			ini = b.getConfiguration();
-			ini.clear();
-		} catch (final ConfigurationException e) {
-			logger.error("Error while editing custom ruleset file.", e);
+		INIConfiguration ini = null;
+		if (rulesetFile.exists()) {
+			try {
+				final INIBuilderParameters params = new Parameters().ini().setFile(rulesetFile).setEncoding("UTF-8");
+				final FileBasedConfigurationBuilder<INIConfiguration> b =
+						new FileBasedConfigurationBuilder<>(INIConfiguration.class).configure(params);
+				ini = b.getConfiguration();
+				ini.clear();
+			} catch (final ConfigurationException e) {
+				logger.error("Error while editing custom ruleset file.", e);
+				ini = null;
+			}
+		}
+		if (ini == null) {
 			ini = new INIConfiguration();
 		}
 		final SubnodeConfiguration section = ini.getSection("CustomRules");

@@ -36,7 +36,7 @@ public class FileService {
 				final String msg = "Source directory's files returned null";
 				throw new IOException(msg);
 			}
-			for (final String file: fileList) {
+			for (final String file : fileList) {
 				final File srcFile = new File(source, file);
 				final File destFile = new File(target, file);
 				// Recursive traversal of directories

@@ -108,7 +108,7 @@ public class DescIndexData {
 	 * @throws MpqException
 	 */
 	public void addLayoutIntPath(final Iterable<String> layoutPathList) throws MpqException {
-		for (final String aLayoutPathList: layoutPathList) {
+		for (final String aLayoutPathList : layoutPathList) {
 			addLayoutIntPath(aLayoutPathList);
 		}
 	}
@@ -168,7 +168,7 @@ public class DescIndexData {
 				StandardCharsets.UTF_8)) {
 			bw.write(XML_VERSION_1_0_ENCODING_UTF_8_STANDALONE_YES_DESC);
 			
-			for (final Pair<File, String> p: fileIntPathList) {
+			for (final Pair<File, String> p : fileIntPathList) {
 				bw.write(INCLUDE_PATH);
 				bw.write(p.getValue());
 				bw.write(STRING);
@@ -195,7 +195,7 @@ public class DescIndexData {
 		// grab dependencies and constant definitions for every layout file
 		List<String> layoutDeps;
 		List<String> curConstants;
-		for (final Pair<File, String> pair: fileIntPathList) {
+		for (final Pair<File, String> pair : fileIntPathList) {
 			curConstants = LayoutReader.getLayoutsConstantDefinitions(pair.getKey());
 			
 			// add calculated list of dependencies from layout file
@@ -241,7 +241,7 @@ public class DescIndexData {
 								// otherPair.getKey().getName();
 								// fileName = fileName.substring(0,
 								// fileName.lastIndexOf('.'));
-								for (final String constant: ownConstants.get(i2)) {
+								for (final String constant : ownConstants.get(i2)) {
 									if (constant.equals(curDependencyTo)) {
 										constantDefinedBefore = true;
 										break y;
@@ -255,7 +255,7 @@ public class DescIndexData {
 								final Pair<File, String> otherPair = fileIntPathList.get(i2);
 								String fileName = otherPair.getKey().getName();
 								fileName = fileName.substring(0, fileName.lastIndexOf('.'));
-								for (final String constant: ownConstants.get(i2)) {
+								for (final String constant : ownConstants.get(i2)) {
 									if (constant.equals(curDependencyTo)) {
 										if (logger.isTraceEnabled()) {
 											logger.trace("checked " + fileIntPathList.get(i).getKey().getName() +

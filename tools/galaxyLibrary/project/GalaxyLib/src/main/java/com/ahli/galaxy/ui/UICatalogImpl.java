@@ -138,7 +138,7 @@ public class UICatalogImpl implements UICatalog {
 	 */
 	private void processLayouts(final List<String> toProcessList, final String basePath, final String raceId)
 			throws InterruptedException {
-		for (final String intPath: toProcessList) {
+		for (final String intPath : toProcessList) {
 			final boolean isDevLayout = blizzOnlyLayouts.contains(intPath);
 			logger.trace("intPath={}", () -> intPath);
 			logger.trace("isDevLayout={}", () -> isDevLayout);
@@ -324,7 +324,7 @@ public class UICatalogImpl implements UICatalog {
 		final String prefix = constantRef.substring(0, i);
 		final String constantName = constantRef.substring(i);
 		logger.trace("Encountered Constant: prefix='{}', constantName='{}'", () -> prefix, () -> constantName);
-		for (final UIConstant c: constants) {
+		for (final UIConstant c : constants) {
 			if (c.getName().equalsIgnoreCase(constantName)) {
 				return c.getValue();
 			}
@@ -332,7 +332,7 @@ public class UICatalogImpl implements UICatalog {
 		// constant tag with race suffix
 		if (i == 2) {
 			final String constantNameWithRacePostFix = constantName + "_" + raceId;
-			for (final UIConstant c: constants) {
+			for (final UIConstant c : constants) {
 				if (c.getName().equalsIgnoreCase(constantNameWithRacePostFix)) {
 					return c.getValue();
 				}
@@ -348,7 +348,7 @@ public class UICatalogImpl implements UICatalog {
 					"' is used instead.");
 		} else {
 			// inside blizz-only
-			for (final UIConstant c: blizzOnlyConstants) {
+			for (final UIConstant c : blizzOnlyConstants) {
 				if (c.getName().equalsIgnoreCase(constantName)) {
 					return c.getValue();
 				}

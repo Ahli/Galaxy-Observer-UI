@@ -389,7 +389,7 @@ public class UICatalogParser implements ParsedXmlConsumer {
 			logger.trace("Setting implicit controller names for UIAnimation " + thisElem.getName());
 		}
 		final List<UIController> controllers = thisElem.getControllers();
-		for (final UIController contr: controllers) {
+		for (final UIController contr : controllers) {
 			if (contr.getName() == null) {
 				final String type = contr.getValue(TYPE);
 				logger.trace("type = {}", () -> type);
@@ -410,7 +410,7 @@ public class UICatalogParser implements ParsedXmlConsumer {
 			final String path, final String newName) {
 		final String newPath = UIElement.removeLeftPathLevel(path);
 		
-		for (final UITemplate curTemplate: templates) {
+		for (final UITemplate curTemplate : templates) {
 			if (curTemplate.getFileName().equalsIgnoreCase(fileName)) {
 				// found template file
 				final UIElement frameFromPath = curTemplate.receiveFrameFromPath(newPath);
@@ -458,7 +458,7 @@ public class UICatalogParser implements ParsedXmlConsumer {
 	@Override
 	public void endLayoutFile() {
 		// close all states
-		for (final UIState s: statesToClose) {
+		for (final UIState s : statesToClose) {
 			s.setNextAdditionShouldOverrideActions(true);
 			s.setNextAdditionShouldOverrideWhens(true);
 		}

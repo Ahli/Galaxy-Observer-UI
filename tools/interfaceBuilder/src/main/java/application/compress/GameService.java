@@ -39,4 +39,22 @@ public class GameService {
 		}
 		return gameDef;
 	}
+	
+	
+	/**
+	 * Returns the path of the image that reflects the specified game.
+	 *
+	 * @param game
+	 * @return
+	 */
+	public String getGameItemPath(final Game game) {
+		switch (game) {
+			case SC2:
+				return "res/sc2.png";
+			case HEROES:
+				return "res/heroes.png";
+			default:
+				return "res/ahli.png";
+		}
+	}
 }

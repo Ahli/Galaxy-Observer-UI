@@ -51,7 +51,7 @@ public class CompileService {
 				startTime = System.currentTimeMillis();
 				
 				// validate catalog
-				catalogClone = getClonedUICatalog(mod);
+				catalogClone = getClonedUICatalog(mod.getGameData().getUiCatalog());
 				
 				executionTime = (System.currentTimeMillis() - startTime);
 				logger.info("BaseUI Cloning took " + executionTime + "ms.");
@@ -97,11 +97,10 @@ public class CompileService {
 	/**
 	 * Clones the specified UICatalog.
 	 *
-	 * @param mod
-	 * 		ModData that containing the source CatalogUI
-	 * @return clone of mod's CatalogUI
+	 * @param uiCatalog
+	 * @return clone of the CatalogUI
 	 */
-	private UICatalog getClonedUICatalog(final ModData mod) {
-		return (UICatalog) mod.getGameData().getUiCatalog().deepCopy();
+	private UICatalog getClonedUICatalog(final UICatalog uiCatalog) {
+		return (UICatalog) uiCatalog.deepCopy();
 	}
 }

@@ -88,7 +88,7 @@ public class LayoutExtensionReader {
 		dBuilder.setErrorHandler(new SilentXmlSaxErrorHandler());
 		
 		Document doc;
-		for (final File curFile: layoutFiles) {
+		for (final File curFile : layoutFiles) {
 			try {
 				doc = dBuilder.parse(curFile);
 			} catch (final SAXParseException | IOException e) {
@@ -104,7 +104,7 @@ public class LayoutExtensionReader {
 			readComments(childNodes);
 		}
 		
-		for (final File curFile: layoutFiles) {
+		for (final File curFile : layoutFiles) {
 			try {
 				// parse XML file
 				doc = dBuilder.parse(curFile);
@@ -156,7 +156,7 @@ public class LayoutExtensionReader {
 		logger.debug("textInput:" + textInput);
 		try {
 			// split at keywords @hotkey or @setting without removing, case insensitive
-			for (String text: textInput.split("(?=@hotkey|@setting)/i")) {
+			for (String text : textInput.split("(?=@hotkey|@setting)/i")) {
 				logger.debug("token start:" + text);
 				text = text.trim();
 				
@@ -177,7 +177,7 @@ public class LayoutExtensionReader {
 					toProcess = toProcess.substring(1 + toProcess.indexOf('(')).trim();
 					
 					// split at keyword
-					for (String part: toProcess.split("(?i)(?=(constant|default|description)[\\s]*=)")) {
+					for (String part : toProcess.split("(?i)(?=(constant|default|description)[\\s]*=)")) {
 						part = part.trim();
 						final String partLower = part.toLowerCase(Locale.ROOT);
 						logger.debug("part: " + part);
@@ -274,13 +274,13 @@ public class LayoutExtensionReader {
 	 * @param val
 	 */
 	private void setValueDefCurValue(final String name, final String val) {
-		for (final ValueDef item: hotkeys) {
+		for (final ValueDef item : hotkeys) {
 			if (item.getId().equalsIgnoreCase(name)) {
 				item.setValue(val);
 				return;
 			}
 		}
-		for (final ValueDef item: settings) {
+		for (final ValueDef item : settings) {
 			if (item.getId().equalsIgnoreCase(name)) {
 				item.setValue(val);
 				return;
@@ -304,7 +304,7 @@ public class LayoutExtensionReader {
 		dBuilder.setErrorHandler(new SilentXmlSaxErrorHandler());
 		
 		Document doc;
-		for (final File curFile: layoutFiles) {
+		for (final File curFile : layoutFiles) {
 			try {
 				// parse XML file
 				doc = dBuilder.parse(curFile);
@@ -363,13 +363,13 @@ public class LayoutExtensionReader {
 			if (valAttrNode != null) {
 				final String val = valAttrNode.getNodeValue();
 				
-				for (final ValueDef item: hotkeys) {
+				for (final ValueDef item : hotkeys) {
 					if (item.getId().equalsIgnoreCase(name)) {
 						logger.debug("updating hotkey constant: " + name + ", with val: " + val);
 						valAttrNode.setNodeValue(item.getValue());
 					}
 				}
-				for (final ValueDef item: settings) {
+				for (final ValueDef item : settings) {
 					if (item.getId().equalsIgnoreCase(name)) {
 						logger.debug("updating setting constant:" + name + ", with val: " + val);
 						valAttrNode.setNodeValue(item.getValue());

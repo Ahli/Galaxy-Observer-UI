@@ -132,7 +132,8 @@ public class HomeController implements Updateable {
 	 * @throws IOException
 	 */
 	private ImageView getListItemGameImage(final Project project) throws IOException {
-		final ImageView iv = new ImageView(getResourceAsUrl(getGameItemPath(project)).toString());
+		final ImageView iv =
+				new ImageView(getResourceAsUrl(gameService.getGameItemPath(project.getGame())).toString());
 		iv.setFitHeight(32);
 		iv.setFitWidth(32);
 		return iv;
@@ -161,7 +162,8 @@ public class HomeController implements Updateable {
 			}
 			selectedPath.setText(p.getProjectPath());
 			try {
-				selectedImage.setImage(new Image(getResourceAsUrl(getGameItemPath(p)).toString()));
+				selectedImage
+						.setImage(new Image(getResourceAsUrl(gameService.getGameItemPath(p.getGame())).toString()));
 			} catch (final IOException e) {
 				logger.error("Failed to load image from project's game setting.", e);
 			}
@@ -179,23 +181,6 @@ public class HomeController implements Updateable {
 	 */
 	private URL getResourceAsUrl(final String path) throws IOException {
 		return appContext.getResource(path).getURL();
-	}
-	
-	/**
-	 * Returns the path of the image that reflects the game of the specified project.
-	 *
-	 * @param project
-	 * @return
-	 */
-	private String getGameItemPath(final Project project) {
-		switch (project.getGame()) {
-			case SC2:
-				return "res/sc2.png";
-			case HEROES:
-				return "res/heroes.png";
-			default:
-				return "res/ahli.png";
-		}
 	}
 	
 	@Override
@@ -249,7 +234,7 @@ public class HomeController implements Updateable {
 		final MultipleSelectionModel<Project> selectionModel = selectionList.getSelectionModel();
 		final Object[] selectedIndices = selectionModel.getSelectedIndices().toArray();
 		selectionModel.clearSelection();
-		for (final Object i: selectedIndices) {
+		for (final Object i : selectedIndices) {
 			selectionModel.select((int) i);
 		}
 	}
@@ -280,7 +265,7 @@ public class HomeController implements Updateable {
 					"This will not remove any files from the project.");
 			final Optional<ButtonType> result = alert.showAndWait();
 			if (result.isPresent() && result.get() == ButtonType.OK) {
-				for (final Project p: items) {
+				for (final Project p : items) {
 					projectService.deleteProject(p);
 					projectsObservable.remove(p);
 				}

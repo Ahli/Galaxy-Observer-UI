@@ -92,7 +92,7 @@ public class UIStateGroup extends UIElement {
 			// go deeper
 			final String curName = UIElement.getLeftPathLevel(path);
 			if (curName != null) {
-				for (final UIElement curElem: states) {
+				for (final UIElement curElem : states) {
 					if (curName.equalsIgnoreCase(curElem.getName())) {
 						// found right frame -> cut path
 						final String newPath = UIElement.removeLeftPathLevel(path);

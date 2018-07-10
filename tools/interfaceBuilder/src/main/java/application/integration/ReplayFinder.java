@@ -127,7 +127,7 @@ public class ReplayFinder {
 		
 		long newestDate = Long.MIN_VALUE;
 		File newestReplay = null;
-		for (final File curReplay: allReplays) {
+		for (final File curReplay : allReplays) {
 			// check extension of file
 			final String curReplayName = curReplay.getName();
 			if (logger.isTraceEnabled()) {

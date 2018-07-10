@@ -53,7 +53,7 @@ public class MpqEditorInterface implements MpqInterface, DeepCopyable {
 		final File[] files = file.listFiles();
 		int count = 0;
 		if (files != null) {
-			for (final File f: files) {
+			for (final File f : files) {
 				if (f.isFile()) {
 					count++;
 				} else {
