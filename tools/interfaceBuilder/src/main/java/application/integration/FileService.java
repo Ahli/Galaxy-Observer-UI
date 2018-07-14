@@ -37,10 +37,8 @@ public class FileService {
 				throw new IOException(msg);
 			}
 			for (final String file : fileList) {
-				final File srcFile = new File(source, file);
-				final File destFile = new File(target, file);
 				// Recursive traversal of directories
-				copyFileOrDirectory(srcFile, destFile);
+				copyFileOrDirectory(new File(source, file), new File(target, file));
 			}
 		} else {
 			// copy a file

@@ -73,8 +73,7 @@ public class AppConfiguration {
 	
 	@Bean
 	public String mpqEditorPath() {
-		return basePath().getParent() + File.separator + "tools" + File.separator + "plugins" + File.separator +
-				"mpq" +
+		return basePath().getParent() + File.separator + "tools" + File.separator + "plugins" + File.separator + "mpq" +
 				File.separator + "MPQEditor.exe";
 	}
 	

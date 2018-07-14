@@ -15,6 +15,8 @@ import org.xml.sax.SAXException;
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,7 +32,7 @@ public class UICatalogImpl implements UICatalog {
 	private static final Logger logger = LogManager.getLogger();
 	
 	@JsonIgnore
-	private transient UICatalogParser parser = null;
+	private transient UICatalogParser parser;
 	
 	// members
 	private List<UITemplate> templates;
@@ -61,8 +63,7 @@ public class UICatalogImpl implements UICatalog {
 	 *
 	 * @throws ParserConfigurationException
 	 */
-	public UICatalogImpl(final int templatesCapacity, final int blizzOnlyTemplatesCapacity,
-			final int constantsCapacity,
+	public UICatalogImpl(final int templatesCapacity, final int blizzOnlyTemplatesCapacity, final int constantsCapacity,
 			final int blizzOnlyConstantsCapacity, final int blizzOnlyLayoutsCapacity) {
 		templates = new ArrayList<>(templatesCapacity);
 		blizzOnlyTemplates = new ArrayList<>(blizzOnlyTemplatesCapacity);
@@ -78,8 +79,7 @@ public class UICatalogImpl implements UICatalog {
 	public Object deepCopy() {
 		// clone with additional space for templates and constants
 		final UICatalogImpl clone =
-				new UICatalogImpl(templates.size() * 3 / 2 + 1, blizzOnlyTemplates.size(),
-						constants.size() * 3 / 2 + 1,
+				new UICatalogImpl(templates.size() * 3 / 2 + 1, blizzOnlyTemplates.size(), constants.size() * 3 / 2 + 1,
 						blizzOnlyConstants.size(), blizzOnlyLayouts.size());
 		// testing shows that iterators are not faster and are not thread safe
 		int i;
@@ -138,11 +138,12 @@ public class UICatalogImpl implements UICatalog {
 	 */
 	private void processLayouts(final List<String> toProcessList, final String basePath, final String raceId)
 			throws InterruptedException {
+		String basePathTemp;
 		for (final String intPath : toProcessList) {
 			final boolean isDevLayout = blizzOnlyLayouts.contains(intPath);
 			logger.trace("intPath={}", () -> intPath);
 			logger.trace("isDevLayout={}", () -> isDevLayout);
-			String basePathTemp = basePath;
+			basePathTemp = basePath;
 			int lastIndex = 0;
 			while (!new File(basePathTemp + File.separator + intPath).exists() && lastIndex != -1) {
 				lastIndex = basePathTemp.lastIndexOf(File.separatorChar);
@@ -190,8 +191,7 @@ public class UICatalogImpl implements UICatalog {
 	
 	public void printDebugStats() {
 		logger.info(
-				"UICatalogSizes: " + templates.size() + " " + blizzOnlyTemplates.size() + " " + constants.size() +
-						" " +
+				"UICatalogSizes: " + templates.size() + " " + blizzOnlyTemplates.size() + " " + constants.size() + " " +
 						blizzOnlyConstants.size() + " " + blizzOnlyLayouts.size());
 	}
 	
@@ -202,7 +202,7 @@ public class UICatalogImpl implements UICatalog {
 		}
 		
 		String basePathTemp = getCurBasePath();
-		while (!new File(basePathTemp + File.separator + path).exists()) {
+		while (!Files.exists(Paths.get(basePathTemp + File.separator + path))) {
 			final int lastIndex = basePathTemp.lastIndexOf(File.separatorChar);
 			if (lastIndex != -1) {
 				basePathTemp = basePathTemp.substring(0, basePathTemp.lastIndexOf(File.separatorChar));

@@ -19,7 +19,7 @@ public abstract class SettingsAutoSaveController implements Updateable {
 	protected ConfigService configService;
 	@FXML
 	private Label savedAnimLabel;
-	private boolean lastSaveFailed = false;
+	private boolean lastSaveFailed;
 	
 	/**
 	 * Automatically called by FxmlLoader

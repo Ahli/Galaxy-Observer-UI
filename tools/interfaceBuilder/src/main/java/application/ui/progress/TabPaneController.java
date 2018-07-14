@@ -10,7 +10,7 @@ import org.fxmisc.flowless.VirtualizedScrollPane;
 import org.fxmisc.richtext.StyleClassedTextArea;
 
 public class TabPaneController implements Updateable {
-	private static TabPaneController instance = null;
+	private static TabPaneController instance;
 	
 	@FXML
 	private TabPane tabPane;

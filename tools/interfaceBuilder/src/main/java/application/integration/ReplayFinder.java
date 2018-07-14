@@ -11,10 +11,9 @@ import org.apache.logging.log4j.Logger;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Collection;
 
 /**
@@ -61,12 +60,7 @@ public class ReplayFinder {
 	 * 		Signals that an I/O exception has occurred.
 	 */
 	public File getLastUsedReplay(final boolean isHeroes, final String documentsPath) throws IOException {
-		String basePath = documentsPath + File.separator;
-		if (isHeroes) {
-			basePath += "Heroes of the Storm";
-		} else {
-			basePath += "StarCraft II";
-		}
+		String basePath = documentsPath + File.separator + (isHeroes ? "Heroes of the Storm" : "StarCraft II");
 		basePath += File.separator + "Variables.txt";
 		if (logger.isTraceEnabled()) {
 			logger.trace(basePath);
@@ -74,9 +68,7 @@ public class ReplayFinder {
 		
 		String line;
 		String replayPath = null;
-		try (final InputStreamReader is = new InputStreamReader(new FileInputStream(new File(basePath)),
-				StandardCharsets.UTF_8); final BufferedReader br = new BufferedReader(is)) {
-			
+		try (final BufferedReader br = Files.newBufferedReader(Paths.get(basePath))) {
 			boolean found = false;
 			final String searchToken = "lastReplayFilePath=";
 			while ((line = br.readLine()) != null && !found) {

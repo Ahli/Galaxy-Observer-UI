@@ -15,7 +15,7 @@ import java.util.Locale;
  * now.
  */
 public class FXMLSpringLoader extends FXMLLoader implements ApplicationContextAware {
-	private boolean contextSet = false;
+	private boolean contextSet;
 	
 	public FXMLSpringLoader() {
 	}

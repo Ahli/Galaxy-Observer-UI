@@ -230,8 +230,7 @@ public class MpqBuilderService {
 	}
 	
 	/**
-	 * Builds MPQ Archive File. Run this in its own thread! Conditions: - Specified MpqInterface requires a unique
-	 * cache
+	 * Builds MPQ Archive File. Run this in its own thread! Conditions: - Specified MpqInterface requires a unique cache
 	 * path for multithreading.
 	 *
 	 * @param sourceFile
@@ -253,8 +252,7 @@ public class MpqBuilderService {
 	 */
 	private void buildFile(final File sourceFile, final GameData game, final MpqEditorInterface mpqi,
 			final boolean compressXml, final int compressMpq, final boolean buildUnprotectedToo,
-			final boolean repairLayoutOrder, final boolean verifyLayout, final boolean verifyXml,
-			final Project project)
+			final boolean repairLayoutOrder, final boolean verifyLayout, final boolean verifyXml, final Project project)
 			throws IOException, InterruptedException {
 		app.printInfoLogMessageToGeneral(sourceFile.getName() + " started construction.");
 		
@@ -335,7 +333,7 @@ public class MpqBuilderService {
 			throw new IOException(msg, e);
 		}
 		
-		final File descIndexFile = mpqi.getFileFromMpq(descIndexData.getDescIndexIntPath());
+		final File descIndexFile = mpqi.getFilePathFromMpq(descIndexData.getDescIndexIntPath()).toFile();
 		try {
 			descIndexData.addLayoutIntPath(DescIndexReader.getLayoutPathList(descIndexFile, false));
 		} catch (final SAXException | ParserConfigurationException | IOException | MpqException e) {

@@ -73,8 +73,7 @@ public class BrowseController implements Updateable {
 	public void initialize() {
 		controllers = new ArrayList<>();
 		heroesChoiceBox.setItems(
-				FXCollections.observableArrayList(Messages.getString("browse.live"),
-						Messages.getString("browse.ptr")));
+				FXCollections.observableArrayList(Messages.getString("browse.live"), Messages.getString("browse.ptr")));
 		final boolean ptrActive = configService.getIniSettings().isHeroesPtrActive();
 		heroesChoiceBox.getSelectionModel().select(ptrActive ? 1 : 0);
 		updatePtrStatusLabel(ptrActive);
@@ -118,9 +117,8 @@ public class BrowseController implements Updateable {
 	 * @return
 	 * @throws IOException
 	 */
-	private ImageView getListItemGameImage(final Project project) throws IOException {
-		final ImageView iv =
-				new ImageView(getResourceAsUrl(gameService.getGameItemPath(project.getGame())).toString());
+	ImageView getListItemGameImage(final Project project) throws IOException {
+		final ImageView iv = new ImageView(getResourceAsUrl(gameService.getGameItemPath(project.getGame())).toString());
 		iv.setFitHeight(32);
 		iv.setFitWidth(32);
 		return iv;
@@ -201,9 +199,9 @@ public class BrowseController implements Updateable {
 			if (controller != null) {
 				// TODO project -> compile -> ModData with UiCatalog
 				
-				ModData mod = gameService.getModData(project.getGame());
+				final ModData mod = gameService.getModData(project.getGame());
 				mod.setSourceDirectory(new File(project.getProjectPath()));
-				String path = configService.getMpqCachePath() + File.separator + "browseCache";
+				final String path = configService.getMpqCachePath() + File.separator + "browseCache";
 				mod.setMpqCacheDirectory(new File(path));
 				
 				//compileService.compile();

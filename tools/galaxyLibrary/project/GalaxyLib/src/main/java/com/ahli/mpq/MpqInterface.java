@@ -1,6 +1,7 @@
 package com.ahli.mpq;
 
 import java.io.File;
+import java.nio.file.Path;
 
 /**
  * Interface for the interaction of MPQ files.
@@ -15,7 +16,7 @@ public interface MpqInterface {
 	 * @param internalPath
 	 * @return File from the mpq with specified internal Path
 	 */
-	File getFileFromMpq(String internalPath);
+	Path getFilePathFromMpq(String internalPath);
 	
 	/**
 	 * @return

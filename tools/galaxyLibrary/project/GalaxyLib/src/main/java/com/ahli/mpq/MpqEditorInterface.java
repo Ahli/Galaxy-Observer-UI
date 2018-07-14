@@ -14,6 +14,8 @@ import javax.xml.parsers.ParserConfigurationException;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 /**
  * Implements a MpqInterface for Ladislav Zezula's MpqEditor.exe.
@@ -511,14 +513,15 @@ public class MpqEditorInterface implements MpqInterface, DeepCopyable {
 	}
 	
 	/**
-	 * Returns a file from the cache with the specified internal path.
+	 * Returns the path to a file from the cache with the specified internal path.
 	 *
 	 * @param intPath
-	 * @return
+	 * 		internal path
+	 * @return path
 	 */
 	@Override
-	public File getFileFromMpq(final String intPath) {
-		return new File(mpqCachePath + File.separator + intPath);
+	public Path getFilePathFromMpq(final String intPath) {
+		return Paths.get(mpqCachePath + File.separator + intPath);
 	}
 	
 	/**
@@ -580,7 +583,7 @@ public class MpqEditorInterface implements MpqInterface, DeepCopyable {
 	 *
 	 * @param rules
 	 */
-	public void setCustomCompressionRules(final MpqEditorCompressionRule[] rules) {
+	public void setCustomCompressionRules(final MpqEditorCompressionRule... rules) {
 		settings.setCustomRules(rules);
 	}
 	

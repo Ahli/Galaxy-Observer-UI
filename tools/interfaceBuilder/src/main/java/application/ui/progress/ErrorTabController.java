@@ -16,10 +16,10 @@ public final class ErrorTabController {
 	private static final String TAB_TEXT_COLOR_RED = "-tab-text-color: red;";
 	private final boolean colorizeTitle;
 	private final boolean showResultIcon;
-	private boolean encounteredError = false;
+	private boolean encounteredError;
 	private Tab tab;
 	private StyleClassedTextArea textArea;
-	private boolean running = false;
+	private boolean running;
 	private boolean encounteredWarning;
 	private State state = State.NOT_STARTED;
 	private boolean errorsDoNotPreventExit;

@@ -68,7 +68,7 @@ import java.util.concurrent.TimeUnit;
 public class InterfaceBuilderApp extends Application {
 	
 	private static final Logger logger = LogManager.getLogger();
-	private static InterfaceBuilderApp instance = null;
+	private static InterfaceBuilderApp instance;
 	private static ServerSocket serverSocket;
 	private final List<ErrorTabController> errorTabControllers = new ArrayList<>();
 	@Autowired
@@ -86,7 +86,7 @@ public class InterfaceBuilderApp extends Application {
 	@Autowired
 	private GameService gameService;
 	private ConfigurableApplicationContext appContext;
-	private Stage primaryStage = null;
+	private Stage primaryStage;
 	private NavigationController navigationController;
 	
 	
@@ -324,8 +324,7 @@ public class InterfaceBuilderApp extends Application {
 				gameDef = gameService.getGameDef(Game.HEROES);
 				final boolean isPtr = settings.isHeroesPtrActive();
 				final boolean is64bit = isPtr ? settings.isHeroesPtr64bit() : settings.isHeroes64bit();
-				final String supportDir = is64bit ? gameDef.getSupportDirectoryX64() :
-						gameDef.getSupportDirectoryX32();
+				final String supportDir = is64bit ? gameDef.getSupportDirectoryX64() : gameDef.getSupportDirectoryX32();
 				final String swicherExe = is64bit ? gameDef.getSwitcherExeNameX64() : gameDef.getSwitcherExeNameX32();
 				gamePath =
 						(isPtr ? settings.getHeroesPtrPath() : settings.getHeroesPath()) + File.separator + supportDir +
@@ -335,8 +334,7 @@ public class InterfaceBuilderApp extends Application {
 				isHeroes = false;
 				gameDef = gameService.getGameDef(Game.SC2);
 				final boolean is64bit = settings.isSc64bit();
-				final String supportDir = is64bit ? gameDef.getSupportDirectoryX64() :
-						gameDef.getSupportDirectoryX32();
+				final String supportDir = is64bit ? gameDef.getSupportDirectoryX64() : gameDef.getSupportDirectoryX32();
 				final String swicherExe = is64bit ? gameDef.getSwitcherExeNameX64() : gameDef.getSwitcherExeNameX32();
 				gamePath = settings.getSc2Path() + File.separator + supportDir + File.separator + swicherExe;
 			}
@@ -622,8 +620,7 @@ public class InterfaceBuilderApp extends Application {
 			executor.awaitTermination(120L, TimeUnit.SECONDS);
 		} catch (final InterruptedException e) {
 			logger.error(
-					"ERROR: Executor timed out waiting for Worker Theads to terminate. A Thread might run rampage.",
-					e);
+					"ERROR: Executor timed out waiting for Worker Theads to terminate. A Thread might run rampage.", e);
 			Thread.currentThread().interrupt();
 		}
 		logger.info("App waves Goodbye!");

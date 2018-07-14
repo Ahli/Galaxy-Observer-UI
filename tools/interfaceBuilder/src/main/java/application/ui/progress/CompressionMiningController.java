@@ -78,7 +78,7 @@ public class CompressionMiningController implements Updateable {
 	private Project project;
 	private ObservableList<MpqEditorCompressionRule> ruleSetObservableItems;
 	private Runnable task;
-	private RandomCompressionMiner expCompMiner = null;
+	private RandomCompressionMiner expCompMiner;
 	
 	/**
 	 * Automatically called by FxmlLoader
@@ -258,7 +258,7 @@ public class CompressionMiningController implements Updateable {
 	 *
 	 * @param rules
 	 */
-	private void updateUiRules(final MpqEditorCompressionRule[] rules) {
+	private void updateUiRules(final MpqEditorCompressionRule... rules) {
 		Platform.runLater(() -> {
 			ruleSetObservableItems.setAll(rules);
 			ruleSetTable.setItems(ruleSetObservableItems);

@@ -11,8 +11,9 @@ import org.apache.logging.log4j.Logger;
 
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
 /**
  * Interface Class for the Settings .ini file.
@@ -44,24 +45,24 @@ public class SettingsIniInterface {
 	private String sc2Path = "";
 	private String heroesPath = "";
 	private String heroesPtrPath = "";
-	private boolean heroesPtrActive = false;
-	private boolean sc2X64 = false;
-	private boolean heroesX64 = false;
-	private boolean heroesPtrX64 = false;
+	private boolean heroesPtrActive;
+	private boolean sc2X64;
+	private boolean heroesX64;
+	private boolean heroesPtrX64;
 	private boolean cmdLineVerifyXml = true;
 	private boolean cmdLineRepairLayoutOrder = true;
 	private boolean cmdLineVerifyLayout = true;
-	private boolean cmdLineCompressXml = false;
+	private boolean cmdLineCompressXml;
 	/* compression: 0=None, 1=Blizz, 2=ExperimentalBest, 3=SystemDefault */
-	private int cmdLineCompressMpq = 0;
-	private boolean cmdLineBuildUnprotectedToo = false;
+	private int cmdLineCompressMpq;
+	private boolean cmdLineBuildUnprotectedToo;
 	private boolean guiVerifyXml = true;
 	private boolean guiRepairLayoutOrder = true;
 	private boolean guiVerifyLayout = true;
 	private boolean guiCompressXml = true;
 	/* compression: 0=None, 1=Blizz, 2=ExperimentalBest, 3=SystemDefault */
 	private int guiCompressMpq = 3;
-	private boolean guiBuildUnprotectedToo = false;
+	private boolean guiBuildUnprotectedToo;
 	
 	/**
 	 * Constructor.
@@ -152,8 +153,7 @@ public class SettingsIniInterface {
 			ini = new INIConfiguration();
 		}
 		writeValuesToIni(ini);
-		try (final FileWriter fw = new FileWriter(new File(settingsFilePath));
-		     final BufferedWriter bw = new BufferedWriter(fw)) {
+		try (final BufferedWriter bw = Files.newBufferedWriter(Paths.get(settingsFilePath))) {
 			ini.write(bw);
 		} catch (final ConfigurationException e) {
 			throw new IOException("Could not write settings.ini.", e);

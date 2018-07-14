@@ -6,7 +6,7 @@ import java.util.Arrays;
  * @author Ahli
  */
 public abstract class GameDef {
-	private String[] coreModsOrDirectories = null;
+	private String[] coreModsOrDirectories;
 	private String defaultRaceId = "Terr";
 	private String documentsGameDirectoryName = "StarCraft II";
 	private String documentsInterfaceSubdirectoryName = "Interfaces";
@@ -51,7 +51,7 @@ public abstract class GameDef {
 	 * @param coreModsOrDirectories
 	 * 		the coreModsOrDirectories to set
 	 */
-	public void setCoreModsOrDirectories(final String[] coreModsOrDirectories) {
+	public void setCoreModsOrDirectories(final String... coreModsOrDirectories) {
 		this.coreModsOrDirectories = Arrays.copyOf(coreModsOrDirectories, coreModsOrDirectories.length);
 	}
 	

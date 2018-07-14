@@ -2,7 +2,6 @@ package application.ui.home;
 
 import application.InterfaceBuilderApp;
 import application.compress.GameService;
-import application.config.ConfigService;
 import application.integration.FileService;
 import application.projects.Project;
 import application.projects.ProjectService;
@@ -45,6 +44,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 
 public class HomeController implements Updateable {
@@ -81,8 +81,6 @@ public class HomeController implements Updateable {
 	private ProjectService projectService;
 	@Autowired
 	private FileService fileService;
-	@Autowired
-	private ConfigService configService;
 	
 	private ObservableList<Project> projectsObservable;
 	@Autowired
@@ -132,8 +130,7 @@ public class HomeController implements Updateable {
 	 * @throws IOException
 	 */
 	private ImageView getListItemGameImage(final Project project) throws IOException {
-		final ImageView iv =
-				new ImageView(getResourceAsUrl(gameService.getGameItemPath(project.getGame())).toString());
+		final ImageView iv = new ImageView(getResourceAsUrl(gameService.getGameItemPath(project.getGame())).toString());
 		iv.setFitHeight(32);
 		iv.setFitWidth(32);
 		return iv;
@@ -148,7 +145,7 @@ public class HomeController implements Updateable {
 			selectedPanel.setVisible(true);
 			final Project p = selectedItems.get(0);
 			selectedName.setText(p.getName());
-			final SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+			final SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
 			selectedBuildDate.setText(p.getLastBuildDate() == null ? "-" : formatter.format(p.getLastBuildDate()));
 			selectedBuildSize.setText(
 					p.getLastBuildSize() == null ? "-" : String.format("%,d", p.getLastBuildSize() / 1024) + " kb");

@@ -257,6 +257,7 @@ public class BaseUiService {
 						final String gameDir = configService.getBaseUiPath(game.getGameDef()) + File.separator +
 								game.getGameDef().getModsSubDirectory();
 						try {
+							final WildcardFileFilter fileFilter = new WildcardFileFilter("DescIndex.*Layout");
 							for (final String modOrDir : game.getGameDef().getCoreModsOrDirectories()) {
 								
 								final File directory = new File(gameDir + File.separator + modOrDir);
@@ -264,9 +265,8 @@ public class BaseUiService {
 									throw new IOException("BaseUI out of date.");
 								}
 								
-								final Collection<File> descIndexFiles = FileUtils
-										.listFiles(directory, new WildcardFileFilter("DescIndex.*Layout"),
-												TrueFileFilter.INSTANCE);
+								final Collection<File> descIndexFiles =
+										FileUtils.listFiles(directory, fileFilter, TrueFileFilter.INSTANCE);
 								logger.info("number of descIndexFiles found: " + descIndexFiles.size());
 								
 								for (final File descIndexFile : descIndexFiles) {

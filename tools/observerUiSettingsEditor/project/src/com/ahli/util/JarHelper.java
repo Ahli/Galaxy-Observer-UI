@@ -60,7 +60,7 @@ public final class JarHelper {
 			if (str.startsWith("file:/")) {
 				str = str.substring(6);
 			}
-			if (str.startsWith("/")) {
+			if (str.charAt(0) == '/') {
 				str = str.substring(1);
 			}
 			if (str.endsWith("/./")) {

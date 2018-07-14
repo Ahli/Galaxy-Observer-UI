@@ -12,12 +12,12 @@ import java.io.File;
 public class ModData {
 	
 	private GameData gameData;
-	private File sourceDirectory = null;
-	private File mpqCacheDirectory = null;
-	private File targetFile = null;
-	private DescIndexData descIndexData = null;
-	private File componentListFile = null;
-	private UICatalog uiCatalog = null;
+	private File sourceDirectory;
+	private File mpqCacheDirectory;
+	private File targetFile;
+	private DescIndexData descIndexData;
+	private File componentListFile;
+	private UICatalog uiCatalog;
 	
 	/**
 	 * Constructor.

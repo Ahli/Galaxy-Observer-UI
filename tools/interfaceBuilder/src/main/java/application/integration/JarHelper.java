@@ -56,11 +56,10 @@ public final class JarHelper {
 				str += dirStr.substring(dirStr.indexOf(tools) + tools.length(), dirStr.indexOf("\\target\\"));
 				str = str.replace('\\', '/');
 			}
-			
 			if (str.startsWith("file:/")) {
 				str = str.substring(6);
 			}
-			if (str.startsWith("/")) {
+			if (str.charAt(0) == '/') {
 				str = str.substring(1);
 			}
 			if (str.endsWith("/./")) {

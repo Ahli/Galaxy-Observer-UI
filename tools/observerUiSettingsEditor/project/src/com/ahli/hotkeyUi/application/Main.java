@@ -65,11 +65,11 @@ public class Main extends Application {
 	private BorderPane rootLayout;
 	private MenuBarController mbarCtrl;
 	private TabsController tabsCtrl;
-	private String openedDocPath = null;
-	private MpqEditorInterface mpqi = null;
-	private DescIndexData descIndex = null;
-	private File basePath = null;
-	private boolean hasUnsavedFileChanges = false;
+	private String openedDocPath;
+	private MpqEditorInterface mpqi;
+	private DescIndexData descIndex;
+	private File basePath;
+	private boolean hasUnsavedFileChanges;
 	private LayoutExtensionReader layoutExtReader;
 	
 	/**
@@ -246,7 +246,7 @@ public class Main extends Application {
 			
 			final Optional<ButtonType> result = alert.showAndWait();
 			
-			if ((result.isPresent())) {
+			if (result.isPresent()) {
 				if (result.get() == ButtonType.YES) {
 					saveUiMpq();
 				} else {
@@ -357,9 +357,8 @@ public class Main extends Application {
 	 */
 	public void compile() throws ParserConfigurationException, SAXException {
 		final File cache = new File(mpqi.getMpqCachePath());
-		final boolean recursive = true;
 		final String[] extensions = new String[] { "StormLayout", "SC2Layout" };
-		final Collection<File> layoutFiles = FileUtils.listFiles(cache, extensions, recursive);
+		final Collection<File> layoutFiles = FileUtils.listFiles(cache, extensions, true);
 		layoutExtReader.updateLayoutFiles(layoutFiles);
 	}
 	
@@ -369,15 +368,15 @@ public class Main extends Application {
 	public void updateAppTitle() {
 		Platform.runLater(() -> {
 			// Update UI here
-			String title = Messages.getString("Main.observerUiSettingsEditorTitle");
+			final StringBuilder sb = new StringBuilder(Messages.getString("Main.observerUiSettingsEditorTitle"));
 			final String openedDocPathTmp = getOpenedDocPath();
 			if (openedDocPathTmp != null) {
-				title += "- [" + openedDocPathTmp + "]";
+				sb.append("- [").append(openedDocPathTmp).append(']');
 			}
 			if (hasUnsavedFileChanges()) {
-				title += "*";
+				sb.append('*');
 			}
-			getPrimaryStage().setTitle(title);
+			getPrimaryStage().setTitle(sb.toString());
 		});
 		
 	}
@@ -477,7 +476,7 @@ public class Main extends Application {
 				
 				descIndex.setDescIndexPathAndClear(ComponentsListReader.getDescIndexPath(componentListFile, game));
 				
-				final File descIndexFile = mpqi.getFileFromMpq(descIndex.getDescIndexIntPath());
+				final File descIndexFile = mpqi.getFilePathFromMpq(descIndex.getDescIndexIntPath()).toFile();
 				descIndex.addLayoutIntPath(
 						DescIndexReader.getLayoutPathList(descIndexFile, ignoreRequiredToLoadEntries));
 				

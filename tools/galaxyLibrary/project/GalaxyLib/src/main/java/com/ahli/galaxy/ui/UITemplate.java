@@ -11,7 +11,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 public class UITemplate implements DeepCopyable {
 	private String fileName;
 	private UIElement element;
-	private boolean isLocked = false;
+	private boolean isLocked;
 	
 	/**
 	 * @param fileName

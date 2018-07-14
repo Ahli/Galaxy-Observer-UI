@@ -75,8 +75,7 @@ public class RecursiveDOMTest {
 		}
 	}
 	
-	public static void loadRecursiveXML(final DocumentBuilder dBuilder, final File f) throws SAXException,
-			IOException {
+	public static void loadRecursiveXML(final DocumentBuilder dBuilder, final File f) throws SAXException, IOException {
 		
 		// long startTime = System.currentTimeMillis();
 		

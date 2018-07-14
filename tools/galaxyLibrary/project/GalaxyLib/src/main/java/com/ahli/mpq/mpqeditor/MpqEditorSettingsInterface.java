@@ -12,7 +12,6 @@ import org.apache.logging.log4j.Logger;
 
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
@@ -33,10 +32,10 @@ public class MpqEditorSettingsInterface implements DeepCopyable {
 	private static final String DEFAULT = "Default";
 	private final File iniFile;
 	private final File rulesetFile;
-	private File iniFileBackUp = null;
-	private File rulesetFileBackUp = null;
-	private boolean backupActive = false;
-	private MpqEditorCompressionRule[] customRules = null;
+	private File iniFileBackUp;
+	private File rulesetFileBackUp;
+	private boolean backupActive;
+	private MpqEditorCompressionRule[] customRules;
 	
 	private MpqEditorCompression compression = MpqEditorCompression.BLIZZARD_SC2_HEROES;
 	
@@ -112,8 +111,7 @@ public class MpqEditorSettingsInterface implements DeepCopyable {
 	}
 	
 	/**
-	 * Applies the compression. Make sure to call <code>restoreOriginalSettingFiles()</code> afterwards to restore
-	 * these
+	 * Applies the compression. Make sure to call <code>restoreOriginalSettingFiles()</code> afterwards to restore these
 	 * files.
 	 */
 	public void applyCompression() throws IOException {
@@ -274,7 +272,7 @@ public class MpqEditorSettingsInterface implements DeepCopyable {
 				break;
 		}
 		
-		try (final FileWriter fw = new FileWriter(rulesetFile); final BufferedWriter bw = new BufferedWriter(fw)) {
+		try (final BufferedWriter bw = Files.newBufferedWriter(rulesetFile.toPath())) {
 			ini.write(bw);
 		} catch (final ConfigurationException | IOException e) {
 			throw new IOException("Could not write '" + rulesetFile.getAbsolutePath() + "'.", e);
@@ -286,12 +284,17 @@ public class MpqEditorSettingsInterface implements DeepCopyable {
 			try (final Stream<String> lineStream = Files.lines(rulesetFile.toPath())) {
 				editedLines = lineStream.map(line -> line.replace("  = ", "")).collect(Collectors.toList());
 			}
-			try (final FileWriter fw = new FileWriter(rulesetFile); final BufferedWriter bw = new BufferedWriter(fw)) {
+			try (final BufferedWriter bw = Files.newBufferedWriter(rulesetFile.toPath())) {
 				Files.write(rulesetFile.toPath(), editedLines);
 			}
 		}
 	}
 	
+	/**
+	 * Returns the ruleset array used by this class.
+	 *
+	 * @return
+	 */
 	public MpqEditorCompressionRule[] getCustomRuleSet() {
 		return customRules;
 	}
@@ -299,7 +302,7 @@ public class MpqEditorSettingsInterface implements DeepCopyable {
 	/**
 	 * @param customRules
 	 */
-	public void setCustomRules(final MpqEditorCompressionRule[] customRules) {
+	public void setCustomRules(final MpqEditorCompressionRule... customRules) {
 		this.customRules = customRules;
 	}
 	

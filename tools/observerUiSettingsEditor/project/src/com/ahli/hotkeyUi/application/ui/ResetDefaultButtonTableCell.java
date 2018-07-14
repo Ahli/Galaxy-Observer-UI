@@ -30,6 +30,7 @@ public class ResetDefaultButtonTableCell extends TableCell<ValueDef, Boolean> {
 	 * Constructor.
 	 */
 	public ResetDefaultButtonTableCell() {
+		super();
 		cellButton.setOnAction(new EventHandler<>() {
 			@Override
 			public void handle(final ActionEvent t) {

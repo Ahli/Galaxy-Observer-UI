@@ -32,7 +32,7 @@ public class UICatalogParser implements ParsedXmlConsumer {
 	private final List<UIElement> curPath = new ArrayList<>();
 	private final List<UIState> statesToClose;
 	private final List<Integer> statesToCloseLevel;
-	private UIElement curElement = null;
+	private UIElement curElement;
 	private int curLevel;
 	private boolean curIsDevLayout;
 	private String raceId;
@@ -112,7 +112,7 @@ public class UICatalogParser implements ParsedXmlConsumer {
 		
 		// file in attributes or template (filtering out key and action tags as they can
 		// contain file=, e.g. for cutscene frames)
-		if ((i = attrTypes.indexOf("file")) != -1 && !tagName.equals("key") && !tagName.equals("action")) {
+		if ((i = attrTypes.indexOf("file")) != -1 && !"key".equals(tagName) && !"action".equals(tagName)) {
 			if (level == 2) {
 				// editingMode = true;
 				// TODO edit existing template
@@ -128,7 +128,7 @@ public class UICatalogParser implements ParsedXmlConsumer {
 		// TODO copy template settings, if template used in existing frame
 		
 		// create from template (actions may use template= and need to be ignored)
-		UIElement newElem = ((i = attrTypes.indexOf("template")) != -1 && !tagName.equals("action")) ?
+		UIElement newElem = ((i = attrTypes.indexOf("template")) != -1 && !"action".equals(tagName)) ?
 				instanciateTemplate(attrValues.get(i), name) : null;
 		
 		// use lowercase for cases!

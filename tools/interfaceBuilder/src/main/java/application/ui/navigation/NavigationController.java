@@ -33,7 +33,7 @@ public class NavigationController {
 	public static final int BROWSE_TAB = 2;
 	public static final int SETTINGS_TAB = 3;
 	private static final Logger logger = LogManager.getLogger();
-	private static NavigationController instance = null;
+	private static NavigationController instance;
 	/* ContentPages:
 	 * 0: taskChoice
 	 * 1: tabPane
@@ -105,11 +105,9 @@ public class NavigationController {
 		notificationBar.setVisible(false);
 		notificationBar.managedProperty().bind(notificationBar.visibleProperty());
 		notificationBar.setBackground(new Background(
-				new BackgroundFill(Color.color(211d / 256d, 168d / 255d, 3d / 255d), CornerRadii.EMPTY,
-						Insets.EMPTY)));
+				new BackgroundFill(Color.color(211d / 256d, 168d / 255d, 3d / 255d), CornerRadii.EMPTY, Insets.EMPTY)));
 		selectedMarker.setBackground(new Background(
-				new BackgroundFill(Color.color(211d / 256d, 168d / 255d, 3d / 255d), CornerRadii.EMPTY,
-						Insets.EMPTY)));
+				new BackgroundFill(Color.color(211d / 256d, 168d / 255d, 3d / 255d), CornerRadii.EMPTY, Insets.EMPTY)));
 		
 		// content pages
 		initFXML("view/Content_Home.fxml", 0);

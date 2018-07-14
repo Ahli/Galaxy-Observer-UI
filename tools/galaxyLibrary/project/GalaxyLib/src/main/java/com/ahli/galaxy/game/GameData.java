@@ -3,8 +3,8 @@ package com.ahli.galaxy.game;
 import com.ahli.galaxy.game.def.abstracts.GameDef;
 import com.ahli.galaxy.ui.interfaces.UICatalog;
 
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Class containing the data of a game (Sc2/Heroes/...).
@@ -15,7 +15,7 @@ public class GameData {
 	
 	private GameDef gameDef;
 	private UICatalog uiCatalog;
-	private Map<Object, Object> keyValueStore = new HashMap<>();
+	private Map<Object, Object> keyValueStore = new ConcurrentHashMap<>();
 	
 	/**
 	 * Constructor.

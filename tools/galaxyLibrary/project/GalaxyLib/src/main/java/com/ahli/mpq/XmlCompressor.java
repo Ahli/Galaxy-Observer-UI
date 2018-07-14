@@ -15,8 +15,6 @@ import org.xml.sax.SAXParseException;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.Result;
-import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
@@ -24,9 +22,9 @@ import javax.xml.transform.TransformerFactoryConfigurationError;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
 import java.util.Collection;
 import java.util.Locale;
 
@@ -69,7 +67,7 @@ public final class XmlCompressor {
 		
 		for (final File curFile : filesOfCache) {
 			final Document doc;
-			try (final InputStream is = new FileInputStream(curFile)) {
+			try (final InputStream is = Files.newInputStream(curFile.toPath())) {
 				
 				doc = dBuilder.parse(is);
 				
@@ -94,11 +92,9 @@ public final class XmlCompressor {
 			removeCommentsInChildNodes(childNodes, ignoreCommentCountPerFile);
 			
 			// write DOM back to XML
-			final Source source = new DOMSource(doc);
-			final Result result = new StreamResult(curFile);
 			try {
 				final Transformer xformer = TransformerFactory.newInstance().newTransformer();
-				xformer.transform(source, result);
+				xformer.transform(new DOMSource(doc), new StreamResult(curFile));
 			} catch (final TransformerFactoryConfigurationError | TransformerException e) {
 				logger.error("Transforming to generate XML file failed.", e);
 			}

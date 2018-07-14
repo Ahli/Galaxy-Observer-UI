@@ -17,7 +17,7 @@ public class CommandLineParams {
 	private final boolean wasStartedWithParameters;
 	private boolean paramsOriginateFromExternalSource;
 	
-	public CommandLineParams(final String[] params) {
+	public CommandLineParams(final String... params) {
 		wasStartedWithParameters = (params.length > 0);
 		String paramCompilePathTmp = getParamsValue(params, "--" + COMPILE_RUN + EQUAL);
 		if (paramCompilePathTmp != null) {

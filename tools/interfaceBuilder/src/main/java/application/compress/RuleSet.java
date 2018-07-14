@@ -30,7 +30,7 @@ public class RuleSet {
 		// required
 	}
 	
-	public RuleSet(final MpqEditorCompressionRule[] compressionRules) {
+	public RuleSet(final MpqEditorCompressionRule... compressionRules) {
 		setCompressionRules(compressionRules);
 	}
 	
@@ -55,7 +55,7 @@ public class RuleSet {
 	}
 	
 	@Transient
-	public void setCompressionRules(final MpqEditorCompressionRule[] compressionRules) {
+	public void setCompressionRules(final MpqEditorCompressionRule... compressionRules) {
 		this.compressionRules = compressionRules;
 		
 		// update string representation in DB

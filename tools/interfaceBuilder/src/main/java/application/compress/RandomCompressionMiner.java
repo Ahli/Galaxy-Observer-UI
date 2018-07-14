@@ -32,7 +32,7 @@ public class RandomCompressionMiner {
 	private final MpqEditorCompressionRuleMethod[] compressionSetting = MpqEditorCompressionRuleMethod.values();
 	private MpqEditorCompressionRule[] rules;
 	private long bestSize;
-	private MpqEditorCompressionRule[] bestRuleSet = null;
+	private MpqEditorCompressionRule[] bestRuleSet;
 	
 	/**
 	 * Creates a Miner with a ruleset whose entries all refer to exactly a single file within the source location.
@@ -180,7 +180,7 @@ public class RandomCompressionMiner {
 	 * @param rules
 	 * @return
 	 */
-	private MpqEditorCompressionRule[] deepCopy(final MpqEditorCompressionRule[] rules) {
+	private MpqEditorCompressionRule[] deepCopy(final MpqEditorCompressionRule... rules) {
 		final int len = rules.length;
 		final MpqEditorCompressionRule[] clone = new MpqEditorCompressionRule[len];
 		for (int i = 0; i < len; i++) {

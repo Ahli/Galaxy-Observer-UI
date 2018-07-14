@@ -20,9 +20,9 @@ import javax.xml.transform.TransformerFactoryConfigurationError;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
 
 public final class CascExplorerConfigFileEditor {
 	private static final Logger logger = LogManager.getLogger();
@@ -41,7 +41,7 @@ public final class CascExplorerConfigFileEditor {
 	 */
 	public static void write(final File f, final String storagePath, final String onlineMode, final String product,
 			final String locale) {
-		try (final InputStream is = new FileInputStream(f)) {
+		try (final InputStream is = Files.newInputStream(f.toPath())) {
 			final DocumentBuilder dBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
 			final Document doc = dBuilder.parse(is);
 			
@@ -57,13 +57,13 @@ public final class CascExplorerConfigFileEditor {
 					if (attrNode != null) {
 						final String val = attrNode.getNodeValue();
 						
-						if (val.equalsIgnoreCase("StoragePath")) {
+						if ("StoragePath".equalsIgnoreCase(val)) {
 							replaceValueInSettingNode(curNode, storagePath);
-						} else if (val.equalsIgnoreCase("OnlineMode")) {
+						} else if ("OnlineMode".equalsIgnoreCase(val)) {
 							replaceValueInSettingNode(curNode, onlineMode);
-						} else if (val.equalsIgnoreCase("Product")) {
+						} else if ("Product".equalsIgnoreCase(val)) {
 							replaceValueInSettingNode(curNode, product);
-						} else if (val.equalsIgnoreCase("Locale")) {
+						} else if ("Locale".equalsIgnoreCase(val)) {
 							replaceValueInSettingNode(curNode, locale);
 						}
 					}

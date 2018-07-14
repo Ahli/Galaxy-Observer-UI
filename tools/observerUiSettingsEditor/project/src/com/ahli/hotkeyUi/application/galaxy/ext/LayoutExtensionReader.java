@@ -16,8 +16,6 @@ import org.xml.sax.SAXParseException;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.Result;
-import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
@@ -170,7 +168,7 @@ public class LayoutExtensionReader {
 				if (isHotkey || isSetting) {
 					logger.debug("detected hotkey or setting");
 					// move behind keyword
-					final int pos = (isHotkey) ? "@hotkey".length() : "@setting".length();
+					final int pos = isHotkey ? "@hotkey".length() : "@setting".length();
 					String toProcess = text.substring(pos);
 					
 					// move beyond '('
@@ -320,12 +318,9 @@ public class LayoutExtensionReader {
 			modifyConstants(childNodes);
 			
 			// write DOM back to XML
-			final Source source = new DOMSource(doc);
-			final Result result = new StreamResult(curFile);
-			final Transformer xformer;
 			try {
-				xformer = TransformerFactory.newInstance().newTransformer();
-				xformer.transform(source, result);
+				final Transformer xformer = TransformerFactory.newInstance().newTransformer();
+				xformer.transform(new DOMSource(doc), new StreamResult(curFile));
 			} catch (final TransformerFactoryConfigurationError | TransformerException e) {
 				logger.error("Transforming to generate XML file failed.", e);
 			}

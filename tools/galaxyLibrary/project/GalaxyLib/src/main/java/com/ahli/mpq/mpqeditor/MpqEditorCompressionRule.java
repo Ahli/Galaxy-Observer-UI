@@ -3,12 +3,12 @@ package com.ahli.mpq.mpqeditor;
 import com.ahli.util.DeepCopyable;
 
 public abstract class MpqEditorCompressionRule implements DeepCopyable {
-	private boolean singleUnit = false;
-	private boolean compress = false;
-	private boolean encrypt = false;
-	private boolean encryptAdjusted = false;
-	private boolean includeSectorChecksum = false;
-	private boolean markedForDeletion = false;
+	private boolean singleUnit;
+	private boolean compress;
+	private boolean encrypt;
+	private boolean encryptAdjusted;
+	private boolean includeSectorChecksum;
+	private boolean markedForDeletion;
 	
 	private MpqEditorCompressionRuleMethod compressionMethod = MpqEditorCompressionRuleMethod.NONE;
 	
