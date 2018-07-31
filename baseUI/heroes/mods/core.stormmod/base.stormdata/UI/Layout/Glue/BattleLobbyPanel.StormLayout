@@ -484,6 +484,22 @@
                 <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
                 <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
                 <Texture val="@UI/Storm_Lobby_Icon_Settings"/>
+                <DesaturateOnDisable val="False"/>
+                <DisabledAlpha val="150"/>
+                <ColorAdjustMode val="None"/>
+                <LightAdjustColor val="464069"/>
+                <DarkAdjustColor val="464069"/>
+                
+                <StateGroup name="OnThisEnabled">
+                    <State name="OnButtonEnabled">
+                        <When type="Property" frame="$parent" enabled="True"/>
+                        <Action type="SetProperty" frame="$this" ColorAdjustMode="None"/>
+                    </State>
+                    <State name="OnButtonDisabled">
+                        <When type="Property" frame="$parent" enabled="False"/>
+                        <Action type="SetProperty" frame="$this" ColorAdjustMode="Colorize"/>
+                    </State>
+                </StateGroup>
             </Frame>
             
             <Frame type="Image" name="SettingsIconGlow">
@@ -571,8 +587,8 @@
         </Frame>
 
         <Frame type="BattleLobbyPlayerFrame" name="Slot8" template="BattleLobbyPanel/BattleLobbyPlayerFrameTemplate">
-            <Anchor side="Top" relative="$parent/Slot0" pos="Max" offset="#LobbyItemVerticalSpacing"/>
-            <Anchor side="Left" relative="$parent/Slot0" pos="Max" offset="0"/>
+            <Anchor side="Top" relative="$parent/Slot0" pos="Min" offset="#LobbyItemVerticalSpacing"/>
+            <Anchor side="Left" relative="$parent/Slot0" pos="Max" offset="50"/>
             <CollapseLayout val="true"/>
         </Frame>
 
@@ -744,7 +760,41 @@
         <Frame type="Label" name="ReplayDateLabel">
             <Anchor side="Bottom" relative="$parent/MapNameLabel" pos="Min" offset="0"/>
             <Anchor side="Left" relative="$parent/MapNameLabel" pos="Min" offset="0"/>
-            <Style val="HeroLobbyDropdownLabel"/>
+            <Style val="HeroLobbyEntryLabel"/>
+
+            <StateGroup name="ReplayLobby">
+                <State name="InReplayLobbyNoMapImage">
+                    <When type="Property" frame="$this" visible="True"/>
+                    <When type="Property" frame="$parent/MapImage" visible="False"/>
+                    <Action type="SetProperty" frame="$parent/GameAttributesPanel" visible="False"/>
+                    <Action type="SetProperty" frame="$parent/GameAttributeTitleLabel" visible="False"/>
+                    <Action type="SetProperty" frame="$parent/Team0" width="1556"/>
+                </State>
+
+                <State name="InReplayLobbyMapImage">
+                    <When type="Property" frame="$this" visible="True"/>
+                    <When type="Property" frame="$parent/MapImage" visible="true"/>
+                    <Action type="SetProperty" frame="$parent/GameAttributesPanel" visible="False"/>
+                    <Action type="SetProperty" frame="$parent/GameAttributeTitleLabel" visible="False"/>
+                    <Action type="SetProperty" frame="$parent/Team0" width="1556"/>
+                </State>
+
+                <State name="NotReplayLobbyNoMapImage">
+                    <When type="Property" frame="$this" visible="False"/>
+                    <When type="Property" frame="$parent/MapImage" visible="False"/>
+                    <Action type="SetProperty" frame="$parent/GameAttributesPanel" visible="False"/>
+                    <Action type="SetProperty" frame="$parent/GameAttributeTitleLabel" visible="False"/>
+                    <Action type="SetProperty" frame="$parent/Team0" width="#LobbyColumnWidth"/>
+                </State>
+
+                <State name="NotReplayLobbyMapImage">
+                    <When type="Property" frame="$this" visible="False"/>
+                    <When type="Property" frame="$parent/MapImage" visible="true"/>
+                    <Action type="SetProperty" frame="$parent/GameAttributesPanel" visible="True"/>
+                    <Action type="SetProperty" frame="$parent/GameAttributeTitleLabel" visible="True"/>
+                    <Action type="SetProperty" frame="$parent/Team0" width="#LobbyColumnWidth"/>
+                </State>
+            </StateGroup>
         </Frame>
         
         <Frame type="BattleLobbyAttributesPanel" name="GameAttributesPanel" template="BattleLobbyPanel/GameAttributesPanelTemplate">
@@ -752,20 +802,6 @@
             <Anchor side="Left" relative="$parent/Team2" pos="Max" offset="50"/>
             <Anchor side="Bottom" relative="$parent/Team2/Slot5" pos="Max" offset="0"/>
             <Width val="750"/>
-
-            <Animation name="Hide">
-                <Event event="OnHidden" action="Reset,Play" frame="$parent/MapImage"/>
-                <Controller type="Visibility" end="Pause">
-                    <Key type="Bool" time="0.00" value="false"/>
-                </Controller>
-            </Animation>
-
-            <Animation name="Show">
-                <Event event="OnShown" action="Reset,Play" frame="$parent/MapImage"/>
-                <Controller type="Visibility" end="Pause">
-                    <Key type="Bool" time="0.00" value="true"/>
-                </Controller>
-            </Animation>
         </Frame>
 
         <Frame type="BattleLobbyResumePanel" name="ResumePanel">
