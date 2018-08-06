@@ -170,68 +170,64 @@ public class CompressionMiningController implements Updateable {
 		if (task != null) {
 			return;
 		}
-		task = new Runnable() {
-			@Override
-			public void run() {
-				try {
-					long bestSize;
-					// TODO too complex?
-					{
-						final ModData mod = gameService.getModData(project.getGame());
-						final GameDef gameDef = mod.getGameData().getGameDef();
-						final File projectSource = new File(project.getProjectPath());
-						final File f = new File(configService.getDocumentsPath() + File.separator +
-								gameDef.getDocumentsGameDirectoryName() + File.separator +
-								gameDef.getDocumentsInterfaceSubdirectoryName() + File.separator +
-								projectSource.getName());
-						mod.setTargetFile(f);
-						mod.setSourceDirectory(projectSource);
-						final RuleSet bestCompressionRuleSet = projectService.fetchBestCompressionRuleSet(project);
-						final MpqEditorCompressionRule[] prevBestCompressionRules =
-								(bestCompressionRuleSet != null) ? bestCompressionRuleSet.getCompressionRules() : null;
-						expCompMiner = new RandomCompressionMiner(mod, configService.getMpqCachePath(),
-								configService.getMpqEditorPath(), prevBestCompressionRules, fileService);
-						bestSize = expCompMiner.getBestSize();
+		task = () -> {
+			try {
+				long bestSize;
+				// TODO too complex?
+				{
+					final ModData mod = gameService.getModData(project.getGame());
+					final GameDef gameDef = mod.getGameData().getGameDef();
+					final File projectSource = new File(project.getProjectPath());
+					final File f = new File(configService.getDocumentsPath() + File.separator +
+							gameDef.getDocumentsGameDirectoryName() + File.separator +
+							gameDef.getDocumentsInterfaceSubdirectoryName() + File.separator + projectSource.getName());
+					mod.setTargetFile(f);
+					mod.setSourceDirectory(projectSource);
+					final RuleSet bestCompressionRuleSet = projectService.fetchBestCompressionRuleSet(project);
+					final MpqEditorCompressionRule[] prevBestCompressionRules =
+							(bestCompressionRuleSet != null) ? bestCompressionRuleSet.getCompressionRules() : null;
+					expCompMiner = new RandomCompressionMiner(mod, configService.getMpqCachePath(),
+							configService.getMpqEditorPath(), prevBestCompressionRules, fileService);
+					bestSize = expCompMiner.getBestSize();
 						/* save initial as best, if there was no best before
 						initial one might have been altered by the miner */
-						if (bestCompressionRuleSet == null ||
-								!new RuleSet(expCompMiner.getBestRuleSet()).equals(bestCompressionRuleSet)) {
-							project.setBestCompressionRuleSet(new RuleSet(expCompMiner.getBestRuleSet()));
-							projectService.saveProject(project);
-						}
+					if (bestCompressionRuleSet == null ||
+							!new RuleSet(expCompMiner.getBestRuleSet()).equals(bestCompressionRuleSet)) {
+						project.setBestCompressionRuleSet(new RuleSet(expCompMiner.getBestRuleSet()));
+						projectService.saveProject(project);
 					}
-					logger.info(String.format("Best size before mining: %s kb)", bestSize / 1024));
-					updateUiRules(expCompMiner.getBestRuleSet());
-					updateUiSizeToBeat(bestSize);
-					long lastSize;
-					final RandomCompressionMiner comprMiner = expCompMiner;
-					for (int attempts = 1; attempts < Integer.MAX_VALUE; attempts++) {
-						comprMiner.randomizeRules();
-						lastSize = comprMiner.build();
-						updateUiAttemptSize(lastSize, attempts);
-						if (lastSize < bestSize) {
-							bestSize = lastSize;
-							logger.info(String.format("Mined better compression of size %s kb.", lastSize / 1024));
-							project.setBestCompressionRuleSet(new RuleSet(comprMiner.getBestRuleSet()));
-							projectService.saveProject(project);
-							updateUiSizeToBeat(lastSize);
-							updateUiRules(comprMiner.getBestRuleSet());
-						} else {
-							logger.info(String.format("Mined compression of size %s kb.", lastSize / 1024));
-						}
-						Thread.sleep(50);
-						if (Thread.currentThread().isInterrupted() || task == null) {
-							logger.info("Stopping the mining task.");
-							comprMiner.cleanUp();
-							expCompMiner = null;
-							return;
-						}
-					}
-				} catch (final IOException | MpqException e) {
-					logger.error("Experimental Compression Miner experienced a problem.", e);
-				} catch (final InterruptedException e) {
-					Thread.currentThread().interrupt();
 				}
+				logger.info(String.format("Best size before mining: %s kb)", bestSize / 1024));
+				updateUiRules(expCompMiner.getBestRuleSet());
+				updateUiSizeToBeat(bestSize);
+				long lastSize;
+				final RandomCompressionMiner comprMiner = expCompMiner;
+				for (int attempts = 1; attempts < Integer.MAX_VALUE; attempts++) {
+					comprMiner.randomizeRules();
+					lastSize = comprMiner.build();
+					updateUiAttemptSize(lastSize, attempts);
+					if (lastSize < bestSize) {
+						bestSize = lastSize;
+						logger.info(String.format("Mined better compression of size %s kb.", lastSize / 1024));
+						project.setBestCompressionRuleSet(new RuleSet(comprMiner.getBestRuleSet()));
+						projectService.saveProject(project);
+						updateUiSizeToBeat(lastSize);
+						updateUiRules(comprMiner.getBestRuleSet());
+					} else {
+						logger.info(String.format("Mined compression of size %s kb.", lastSize / 1024));
+					}
+					Thread.sleep(50);
+					if (Thread.currentThread().isInterrupted() || task == null) {
+						logger.info("Stopping the mining task.");
+						comprMiner.cleanUp();
+						expCompMiner = null;
+						return;
+					}
+				}
+			} catch (final IOException | MpqException e) {
+				logger.error("Experimental Compression Miner experienced a problem.", e);
+			} catch (final InterruptedException e) {
+				Thread.currentThread().interrupt();
 			}
 		};
 		attemptCounterLabel.setText("0");

@@ -32,7 +32,7 @@ public class UICatalogImpl implements UICatalog {
 	private static final Logger logger = LogManager.getLogger();
 	
 	@JsonIgnore
-	private transient UICatalogParser parser;
+	private UICatalogParser parser;
 	
 	// members
 	private List<UITemplate> templates;

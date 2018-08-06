@@ -197,7 +197,7 @@ public class LayoutExtensionReader {
 						}
 					}
 					
-					if (!constant.equals("")) {
+					if (!"".equals(constant)) {
 						if (isHotkey) {
 							addHotkeyValueDef(constant, description, defaultValue, "");
 						} else {

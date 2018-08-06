@@ -8,9 +8,11 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
+import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Result;
 import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
@@ -73,8 +75,12 @@ public final class CascExplorerConfigFileEditor {
 			// write DOM back to XML
 			final Source source = new DOMSource(doc);
 			final Result result = new StreamResult(f);
-			final Transformer xformer = TransformerFactory.newInstance().newTransformer();
-			xformer.transform(source, result);
+			
+			final TransformerFactory factory = TransformerFactory.newInstance();
+			factory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
+			final Transformer transformer = factory.newTransformer();
+			transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+			transformer.transform(source, result);
 			
 		} catch (final IOException | ParserConfigurationException | SAXException | TransformerFactoryConfigurationError | TransformerException e1) {
 			logger.error("Error editing CascExplroer's configuration file.", e1);

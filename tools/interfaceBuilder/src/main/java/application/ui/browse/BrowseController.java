@@ -39,7 +39,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class BrowseController implements Updateable {
-	private final Logger logger = LogManager.getLogger();
+	private static final Logger logger = LogManager.getLogger();
 	
 	@FXML
 	public ListView<Project> projectListView;

@@ -46,9 +46,9 @@ public final class JarHelper {
 		if (i > 0) {
 			final String check = str.substring(0, i);
 			logger.trace("target/classes location: {}", () -> check);
-			if(check.indexOf(';') < 0){
+			if (check.indexOf(';') < 0) {
 				Path p = Paths.get(check).getParent().getParent();
-				if(Files.exists(p)){
+				if (Files.exists(p)) {
 					return new File(p + File.separator + "dev");
 				}
 			}

@@ -12,9 +12,11 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
+import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
@@ -93,8 +95,11 @@ public final class XmlCompressor {
 			
 			// write DOM back to XML
 			try {
-				final Transformer xformer = TransformerFactory.newInstance().newTransformer();
-				xformer.transform(new DOMSource(doc), new StreamResult(curFile));
+				final TransformerFactory factory = TransformerFactory.newInstance();
+				factory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
+				final Transformer transformer = factory.newTransformer();
+				transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+				transformer.transform(new DOMSource(doc), new StreamResult(curFile));
 			} catch (final TransformerFactoryConfigurationError | TransformerException e) {
 				logger.error("Transforming to generate XML file failed.", e);
 			}

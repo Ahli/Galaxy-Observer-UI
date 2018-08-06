@@ -129,7 +129,7 @@ public class InterfaceBuilderApp extends Application {
 					Socket clientSocket;
 					while (true) {
 						try {
-							clientSocket = serverSocket.accept();
+							clientSocket = InterfaceBuilderApp.serverSocket.accept();
 							try (final PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
 							     final BufferedReader in = new BufferedReader(
 									     new InputStreamReader(clientSocket.getInputStream()))) {
