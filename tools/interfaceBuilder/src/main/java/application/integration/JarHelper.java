@@ -29,13 +29,13 @@ public final class JarHelper {
 	 * @return File at base path
 	 */
 	public static File getJarDir(final Class<?> aclass) {
-		logger.trace("_FINDING JAR'S PATH", () -> "");
+		logger.trace("_FINDING JAR'S PATH");
 		
 		// ATTEMPT #1
 		final File f = new File(System.getProperty("java.class.path"));
 		final File dir = f.getAbsoluteFile().getParentFile();
 		String str = dir.toString();
-		logger.trace("Attempt#1 java.class.path: ", () -> dir.toString());
+		logger.trace("Attempt#1 java.class.path: {}", () -> dir.toString());
 		
 		// check if started in eclipse
 		if (str.contains(File.separator + "target" + File.separator + "classes;")) {
@@ -46,7 +46,7 @@ public final class JarHelper {
 			// notepad++'s directory...
 			
 			str = uri.getPath();
-			logger.trace("_URI path:", () -> uri.getPath());
+			logger.trace("_URI path: {}", () -> uri.getPath());
 			
 			// fix for intellij
 			if (str.endsWith("/tools/./")) {
