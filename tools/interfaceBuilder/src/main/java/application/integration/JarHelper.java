@@ -6,6 +6,9 @@ import org.apache.logging.log4j.Logger;
 import java.io.File;
 import java.net.URI;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 /**
  * Helper class for the executable jar file. It is capable of determining the position.
@@ -38,7 +41,18 @@ public final class JarHelper {
 		logger.trace("Attempt#1 java.class.path: {}", () -> dir.toString());
 		
 		// check if started in eclipse
-		if (str.contains(File.separator + "target" + File.separator + "classes;")) {
+		final String targetClasses = File.separator + "target" + File.separator + "classes;";
+		int i = str.indexOf(targetClasses);
+		if (i > 0) {
+			final String check = str.substring(0, i);
+			logger.trace("target/classes location: {}", () -> check);
+			if(check.indexOf(';') < 0){
+				Path p = Paths.get(check).getParent().getParent();
+				if(Files.exists(p)){
+					return new File(p + File.separator + "dev");
+				}
+			}
+			
 			// get current working directory
 			final URI uri = new File(".").toURI();
 			// results in: "file:/D:/GalaxyObsUI/dev/./"
