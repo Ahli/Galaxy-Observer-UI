@@ -13,6 +13,7 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
 import java.nio.file.Paths;
 
 /**
@@ -155,7 +156,7 @@ public class SettingsIniInterface {
 		writeValuesToIni(ini);
 		try (final BufferedWriter bw = Files.newBufferedWriter(Paths.get(settingsFilePath))) {
 			ini.write(bw);
-		} catch (final ConfigurationException e) {
+		} catch (final ConfigurationException | NoSuchFileException e) {
 			throw new IOException("Could not write settings.ini.", e);
 		}
 	}
