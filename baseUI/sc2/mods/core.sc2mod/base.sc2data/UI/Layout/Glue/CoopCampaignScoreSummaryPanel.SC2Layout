@@ -2,6 +2,11 @@
 <Desc>
     <DescFlags val="Locked"/>
     
+    <Constant name="ScoreRewardSourceBase_Color" val="50,103,236"/>
+    <Constant name="ScoreRewardSourceBonus_Color" val="252,132,34"/>
+    <Constant name="ScoreRewardSourceBoost_Color" val="248,52,252"/>
+    <Constant name="ScoreRewardSourceBounty_Color" val="66,181,33"/>
+    
     <!--
     
     
@@ -87,6 +92,8 @@
     </Frame>
     
     <Frame type="CommanderTalentTileListItem" name="CommanderTalentTileListItemEarnedTemplate">
+        <Anchor side="Top" relative="$sibling+1" pos="Min" offset="0"/>
+        <Anchor side="Right" relative="$sibling+1" pos="Min" offset="-3"/>
         <Width val="72"/>
         <Height val="72"/>
         <HideWhenCleared val="true"/>
@@ -129,6 +136,7 @@
     </Frame>
 
     <Frame type="ScoreRewardItem" name="RewardXPItemTemplate">
+
         <Frame type="Image" name="IconImage">
             <Visible val="false"/>
         </Frame>
@@ -143,9 +151,9 @@
         <Frame type="Image" name="AmountAccent">
             <Anchor side="Top" relative="$parent/AmountLabel" pos="Mid" offset="0"/>
             <Anchor side="Bottom" relative="$parent/AmountLabel" pos="Mid" offset="0"/>
-            <Anchor side="Left" relative="$parent/AmountLabel" pos="Mid" offset="0"/>
-            <Anchor side="Right" relative="$parent/AmountLabel" pos="Mid" offset="0"/>
-            <Texture val="@UI/SC2_UI_Battlenet_Glue_Campaign_Purchase_Celebration_Accent"/>
+            <Anchor side="Left" relative="$parent/AmountLabel" pos="Mid" offset="20"/>
+            <Anchor side="Right" relative="$parent/AmountLabel" pos="Mid" offset="20"/>
+            <Texture val="@UI/SC2_UI_Coop_Score_XPItem_Glow"/>
             <Width val="200"/>
             <Height val="70"/>
             <Alpha val="0"/>
@@ -157,13 +165,13 @@
                 <Controller type="Fade" end="Pause">
                     <Key type="Curve" time="0" value="0" out="Slow"/>
                     <Key type="Curve" time="0.6" value="255" in="Slow"/>
-                     <Key type="Curve" time="4" value="255" in="Slow"/>
+                     <Key type="Curve" time="4" value="220" in="Slow"/>
                 </Controller>
                 
                 <Controller type="Dimension" dimension="Width" relative="False" percentage="True" end="Pause" >
                     <Key type="Curve" time="0" value="0"/>
-                    <Key type="Curve" time="0.6" value="150"/>
-                    <Key type="Curve" time="4" value="100"/>
+                    <Key type="Curve" time="0.6" value="200"/>
+                    <Key type="Curve" time="4" value="150"/>
                 </Controller>
                 
                 <Controller type="Dimension" dimension="Height" relative="False" percentage="True" end="Pause" >
@@ -194,7 +202,7 @@
         <Frame type="Label" name="PlusSign">
             <Anchor side="Top" relative="$parent/SourceLabel" pos="Max" offset="1"/>
             <Anchor side="Left" relative="$parent/SourceLabel" pos="Min" offset="0"/>
-            <Style val="Coop_ScoreScreen_RewardAmount"/>
+            <Style val="{$parent/AmountLabel/@Style}"/>
             <Text val="+"/>
         </Frame>
 
@@ -235,9 +243,76 @@
         <Frame type="Label" name="XPLabel">
             <Anchor side="Top" relative="$parent/SourceLabel" pos="Max" offset="1"/>
             <Anchor side="Left" relative="$parent/AmountLabel" pos="Max" offset="5"/>
-            <Style val="Coop_ScoreScreen_RewardAmount"/>
+            <Style val="{$parent/AmountLabel/@Style}"/>
             <Text val="@UI/ScreenCoopCampaign/ScoreSummaryPanel/XP"/>
         </Frame>
+        
+        <StateGroup name="XPSourceState">
+            <DefaultState val="DefaultToBonus"/>
+            
+            <!-- Base -->
+            <State name="SourceGame">
+                <When type="Property" ScoreRewardSource="ScoreRewardSourceGame"/>
+                <Action type="SetState" group="XPSourceTypeState" state="BaseXP"/>
+            </State>
+            
+            <!-- Boosts -->
+            <State name="SourceWarChestBoost">
+                <When type="Property" ScoreRewardSource="ScoreRewardSourceAnyActiveWarchest"/>
+                <Action type="SetState" group="XPSourceTypeState" state="BoostXP"/>
+            </State>
+            
+            <State name="SourceStimpackBoost">
+                <When type="Property" ScoreRewardSource="ScoreRewardSourceBoost"/>
+                <Action type="SetState" group="XPSourceTypeState" state="BoostXP"/>
+            </State>
+            
+            <!-- Bounties -->
+            <State name="SourceFirstWinBounty">
+                <When type="Property" ScoreRewardSource="ScoreRewardSourceFirstWinOfDay"/>
+                <Action type="SetState" group="XPSourceTypeState" state="BountyXP"/>
+            </State>
+            <State name="SourceFirstCoopWinBounty">
+                <When type="Property" ScoreRewardSource="ScoreRewardSourceCoopFirstWin"/>
+                <Action type="SetState" group="XPSourceTypeState" state="BountyXP"/>
+            </State>
+            
+            <State name="SourceWeeklyMutationBounty">
+                <When type="Property" ScoreRewardSource="ScoreRewardSourceMutatorBounty"/>
+                <Action type="SetState" group="XPSourceTypeState" state="BountyXP"/>
+            </State>
+            
+            <!-- Bonuses -->
+            <State name="DefaultToBonus">
+                <Action type="SetState" group="XPSourceTypeState" state="BonusXP"/>
+            </State>
+        </StateGroup>
+        
+        <StateGroup name="XPSourceTypeState">
+            <State name="BaseXP">
+                <Action type="SetProperty" frame="SourceLabel" Style="Coop_ScoreScreen_RewardSource_Base"/>
+                <Action type="SetProperty" frame="AmountLabel" Style="Coop_ScoreScreen_RewardAmount_Base"/>
+                <Action type="SetProperty" frame="AmountAccent" Color="#ScoreRewardSourceBase_Color"/>
+            </State>
+            
+            <State name="BoostXP">
+                <Action type="SetProperty" frame="SourceLabel" Style="Coop_ScoreScreen_RewardSource_Boost"/>
+                <Action type="SetProperty" frame="AmountLabel" Style="Coop_ScoreScreen_RewardAmount_Boost"/>
+                <Action type="SetProperty" frame="AmountAccent" Color="#ScoreRewardSourceBoost_Color"/>
+            </State>
+            
+            <State name="BountyXP">
+                <Action type="SetProperty" frame="SourceLabel" Style="Coop_ScoreScreen_RewardSource_Bounty"/>
+                <Action type="SetProperty" frame="AmountLabel" Style="Coop_ScoreScreen_RewardAmount_Bounty"/>
+                <Action type="SetProperty" frame="AmountAccent" Color="#ScoreRewardSourceBounty_Color"/>
+            </State>
+            
+            <State name="BonusXP">
+                <Action type="SetProperty" frame="SourceLabel" Style="Coop_ScoreScreen_RewardSource_Bonus"/>
+                <Action type="SetProperty" frame="AmountLabel" Style="Coop_ScoreScreen_RewardAmount_Bonus"/>
+                <Action type="SetProperty" frame="AmountAccent" Color="#ScoreRewardSourceBonus_Color"/>
+            </State>
+        </StateGroup>
     </Frame>
 
     <Frame type="ScoreRewardTileListItem" name="RewardXPTileListItemTemplate">
@@ -251,8 +326,7 @@
             <Visible val="false"/>
 
             <Animation name="Show">
-                <Event event="ShowRewardItem" action="Reset" frame="$parent"/>
-                <Event event="ShowRewardItem" action="Play" frame="$parent"/>
+                <Event event="ShowRewardItem" action="Reset,Play" frame="$parent"/>
 
                 <Controller type="Visibility" end="Pause">
                     <Key type="Bool" time="0" value="false"/>
@@ -294,11 +368,93 @@
             </State>
         </StateGroup>
         
+        <Animation name="Loop">
+            <Event event="ShowNextRewardItem" action="Reset,Play" frame="XPBreakdownTileList/Item4"/>
+
+            <Controller type="Event" end="Stop">
+                <Key type="Event" time="0.0" event="ScrollDown"/>
+            </Controller>
+        </Animation>
+        
+        <Animation name="ReplayLastItem">
+            <Event event="LoopRewardItem" action="Reset,Play"/>
+
+            <Controller type="Event" end="Stop">
+                <Key type="Event" time="0.1" event="ShowLastRewardItem"/>
+            </Controller>
+        </Animation>
+
+        <Frame type="Image" name="XPBackdropItem0">
+            <Anchor side="Top" relative="$parent/XPBreakdownTileList/Item0/ScoreRewardItem/SourceLabel" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent/XPBreakdownTileList/Item0/ScoreRewardItem/SourceLabel" pos="Mid" offset="0"/>
+            <Anchor side="Left" relative="$parent/XPBreakdownTileList/Item0/ScoreRewardItem/SourceLabel" pos="Min" offset="-5"/>
+            <Width val="785"/>
+            <Height val="24"/>
+            <Texture val="Assets/Textures/white.dds"/>
+            <Color val="0,0,0"/>
+            <Alpha val="63"/>
+            <Visible val="{$parent/XPBreakdownTileList/Item0/@Visible}"/>
+        </Frame>
+        
+        <Frame type="Image" name="XPBackdropItem1">
+            <Anchor side="Top" relative="$parent/XPBreakdownTileList/Item1/ScoreRewardItem/SourceLabel" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent/XPBreakdownTileList/Item1/ScoreRewardItem/SourceLabel" pos="Mid" offset="0"/>
+            <Anchor side="Left" relative="$parent/XPBreakdownTileList/Item1/ScoreRewardItem/SourceLabel" pos="Min" offset="-5"/>
+            <Width val="785"/>
+            <Height val="24"/>
+            <Texture val="Assets/Textures/white.dds"/>
+            <Color val="0,0,0"/>
+            <Alpha val="63"/>
+            <Visible val="{$parent/XPBreakdownTileList/Item1/@Visible}"/>
+        </Frame>
+        
+        <Frame type="Image" name="XPBackdropItem2">
+            <Anchor side="Top" relative="$parent/XPBreakdownTileList/Item2/ScoreRewardItem/SourceLabel" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent/XPBreakdownTileList/Item2/ScoreRewardItem/SourceLabel" pos="Mid" offset="0"/>
+            <Anchor side="Left" relative="$parent/XPBreakdownTileList/Item2/ScoreRewardItem/SourceLabel" pos="Min" offset="-5"/>
+            <Width val="785"/>
+            <Height val="24"/>
+            <Texture val="Assets/Textures/white.dds"/>
+            <Color val="0,0,0"/>
+            <Alpha val="63"/>
+            <Visible val="{$parent/XPBreakdownTileList/Item2/@Visible}"/>
+        </Frame>
+        
+        <Frame type="Image" name="XPBackdropItem3">
+            <Anchor side="Top" relative="$parent/XPBreakdownTileList/Item3/ScoreRewardItem/SourceLabel" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent/XPBreakdownTileList/Item3/ScoreRewardItem/SourceLabel" pos="Mid" offset="0"/>
+            <Anchor side="Left" relative="$parent/XPBreakdownTileList/Item3/ScoreRewardItem/SourceLabel" pos="Min" offset="-5"/>
+            <Width val="785"/>
+            <Height val="24"/>
+            <Texture val="Assets/Textures/white.dds"/>
+            <Color val="0,0,0"/>
+            <Alpha val="63"/>
+            <Visible val="{$parent/XPBreakdownTileList/Item3/@Visible}"/>
+        </Frame>
+        
+        <Frame type="Image" name="XPBackdropItem4">
+            <Anchor side="Top" relative="$parent/XPBreakdownTileList/Item4/ScoreRewardItem/SourceLabel" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent/XPBreakdownTileList/Item4/ScoreRewardItem/SourceLabel" pos="Mid" offset="0"/>
+            <Anchor side="Left" relative="$parent/XPBreakdownTileList/Item4/ScoreRewardItem/SourceLabel" pos="Min" offset="-5"/>
+            <Width val="785"/>
+            <Height val="24"/>
+            <Texture val="Assets/Textures/white.dds"/>
+            <Color val="0,0,0"/>
+            <Alpha val="63"/>
+            <Visible val="{$parent/XPBreakdownTileList/Item4/@Visible}"/>
+        </Frame>
+
         <Frame type="TileList" name="XPBreakdownTileList">
             <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
             <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
             <Anchor side="Right" relative="$parent" pos="Max" offset="-10"/>
             <Anchor side="Bottom" relative="$parent/TotalXPTitleLabel" pos="Min" offset="0"/>
+            <!--While the XP list is animating, we want to hide the scroll bar. This is done by turning on-->
+            <!--ShowScrollBarManually and setting visible to false on the scroll bar itself. The coop campain-->
+            <!--summary code itself turns off manual control when the items are done animating in, which has-->
+            <!--the effect of showing the scroll bar at that point (if there enough items in the list to require scrolling.-->
+            <ShowScrollBarManually val="True"/>
+            <AcceptsMouse val="false"/>
             
             <Frame type="ScoreRewardTileListItem" name="Item0" template="CoopCampaignScoreSummaryPanel/RewardXPTileListItemTemplate">
                 <Anchor side="Top" relative="$parent" pos="Min" offset="16"/>
@@ -376,35 +532,52 @@
                         <Key type="Event" time="0.0" event="ShowRewardItem"/>
                     </Controller>
                 </Animation>
-            </Frame>
-            
-            <Frame type="ScoreRewardTileListItem" name="Item5" template="CoopCampaignScoreSummaryPanel/RewardXPTileListItemTemplate">
-                <Anchor side="Top" relative="$parent/Item4" pos="Max" offset="0"/>
-                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
 
-                <Animation name="Show">
-                    <Event event="ShowNextRewardItem" action="Reset" frame="$parent/Item4"/>
-                    <Event event="ShowNextRewardItem" action="Play" frame="$parent/Item4"/>
+                <Animation name="CountUp">
+                    <!-- Only reset this label's animation when we begin the whole process, so it doesn't reset from just hiding/showing -->
+                    <!-- We must begin the counter on being shown so that the hidden items do not affect the TotalXPLabel animation -->
+                    <Event event="ShowLastRewardItem" action="Reset,Play" frame="$parent/$parent"/>
 
-                    <Controller type="Event" end="Stop">
-                        <Key type="Event" time="0.0" event="ShowRewardItem"/>
+                    <!-- This controls how long it takes to count up -->
+                    <Controller type="Counter" end="Pause" frame="ScoreRewardItem/AmountLabel">
+                        <Key type="Curve" time="0.0" value="0.0" out="Slow"/>
+                        <Key type="Curve" time="1.0" value="1.0" in="Slow"/>
+                    </Controller>
+
+                    <!-- This controls the delay before the next item beings counting up -->
+                    <Controller type="Event" end="Pause">
+                        <Key type="Event" time="0.0" event="Restart"/>
+                        <Key type="Event" time="0.5" event="ShowNextRewardItem"/>
+                    </Controller>
+
+                    <!-- Every time a label begins counting up, it resets the total count label until the last one is finished
+                    <!   so it only starts after all the breakdown categories finish.  BeginTotalCounter must not begin counting
+                    <!   until after ShowNextRewardItem begins. -->
+                    <!--<Controller type="Event" end="Pause" frame="$parent/$parent/$parent/$parent/TotalXPLabel">-->
+                    <Controller type="Event" end="Pause" frame="$parent/$parent/TotalXPLabel">
+                        <Key type="Event" time="0.0" event="DelayTotalCounter"/>
                     </Controller>
                 </Animation>
             </Frame>
 
-            <Frame type="ScoreRewardTileListItem" name="Item6" template="CoopCampaignScoreSummaryPanel/RewardXPTileListItemTemplate">
-                <Anchor side="Top" relative="$parent/Item5" pos="Max" offset="0"/>
-                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
-
-                <Animation name="Show">
-                    <Event event="ShowNextRewardItem" action="Reset" frame="$parent/Item5"/>
-                    <Event event="ShowNextRewardItem" action="Play" frame="$parent/Item5"/>
-
-                    <Controller type="Event" end="Stop">
-                        <Key type="Event" time="0.0" event="ShowRewardItem"/>
-                    </Controller>
-                </Animation>
+            <Frame type="ScrollBar" name="ScrollBar" template="StandardTileListTemplates/StandardTileListScrollBarTemplate">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="8"/>
+                <Anchor side="Bottom" relative="$parent" pos="Max" offset="-29"/>
+                <Anchor side="Left" relative="$parent/Item0" pos="Max" offset="-10"/>
+                <Visible val="False"/>
             </Frame>
+                
+			<!-- Disabling mousewheel scroll for this tilelist while code is autoscrolling it -->
+			<StateGroup name="MouseWheelScrollState">
+				<DefaultState val="DontScroll"/>
+				<State name="Scroll">
+					<When type="Property" frame="$this/ScrollBar" Visible="True"/>
+					<Action type="SetProperty" frame="$this" AcceptsMouse="True"/>
+				</State>
+				<State name="DontScroll">
+					<Action type="SetProperty" frame="$this" AcceptsMouse="False"/>
+				</State>
+			</StateGroup>
         </Frame>
 
         <Frame type="Label" name="TotalXPTitleLabel">
@@ -420,6 +593,17 @@
                     <Key type="Curve" time="0" value="1"/>
                 </Controller>
             </Animation>
+        </Frame>
+        
+        <Frame type="Image" name="RewardSourceInfo">
+            <Anchor side="Top" relative="$parent/TotalXPTitleLabel" pos="Mid" offset="-1"/>
+            <Anchor side="Bottom" relative="$parent/TotalXPTitleLabel" pos="Mid" offset="-1"/>
+            <Anchor side="Left" relative="$parent/TotalXPTitleLabel" pos="Max" offset="4"/>
+            <Width val="24"/>
+            <Height val="24"/>
+            <Texture val="@UI/Glues_Icons_GenericInfo"/>
+            <AcceptsMouseTooltip val="true"/>
+            <Tooltip val="@UI/RewardItemTooltip"/>
         </Frame>
         
         <Frame type="Image" name="TotalXPAccent">
@@ -617,7 +801,7 @@
         </Frame>
 
         <Frame type="Label" name="LevelLabel">
-            <Anchor side="Bottom" relative="$parent" pos="Max" offset="-36"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="-76"/>
             <Anchor side="Left" relative="$parent" pos="Min" offset="109"/>
             <Style val="Coop_ScoreScreen_CommanderInfo"/>
             <Text val="{$this/FormatFrame/@Text}"/>
@@ -645,14 +829,7 @@
                 <Anchor relative="$parent"/>
                 <FormatText val="@UI/ScreenCoopCampaign/ScoreSummaryPanel/LevelTitle"/>
                 <Replacement index="0" val="{$parent/LevelMathFrame/@ResultInt}"/>
-                <Replacement index="1" val="{$parent/$parent/@CommanderId[Name]}"/>
-                
-                <StateGroup name="AscensionStateGroup">
-                    <State name="AscensionActiveState">
-                        <When type="Property" frame="$parent/LevelMathFrame" operator="GreaterThan" ResultInt="90"/>
-                        <Action type="SetProperty" frame="$this" FormatText="@UI/ScreenCoopCampaign/ScoreSummaryPanel/LevelTitleAscension"/>
-                    </State>
-                </StateGroup>
+                <Replacement index="1" val=""/>
             </Frame>
                         
             <Animation name="LevelUp">
@@ -665,6 +842,33 @@
                     <Key type="Curve" time="0.5" value="0"/>
                 </Controller>
             </Animation>
+        </Frame>
+        
+        <Frame type="Label" name="CommanderNameLabel">
+            <Anchor side="Top" relative="$parent/LevelLabel" pos="Max" offset="2"/>
+            <Anchor side="Left" relative="$parent/LevelLabel" pos="Min" offset="0"/>
+            <Width val="400"/>
+            <Text val="{$parent/@CommanderId[Name]}"/>
+            <Style val="Coop_ScoreScreen_CommanderName"/>
+            <Options val="NoWrapping|ScaleToPreventTruncation"/>
+			
+			<StateGroup name="MasteryStateGroup">
+				<DefaultState val="Standard"/>
+			
+				<State name="Ascension">
+					<When type="Property" frame="$parent/LevelLabel/LevelMathFrame" operator="GreaterThan" ResultInt="90"/>
+					<Action type="SetProperty" frame="$this" Text="@UI/ScreenCoopCampaign/ScoreSummaryPanel/Ascension"/>
+				</State>
+				
+				<State name="Mastery">
+					<When type="Property" frame="$parent/LevelLabel/LevelMathFrame" operator="GreaterThan" ResultInt="15"/>
+					<Action type="SetProperty" frame="$this" Text="@UI/ScreenCoopCampaign/ScoreSummaryPanel/Mastery"/>
+				</State>
+				
+				<State name="Standard">
+					<Action type="SetProperty" frame="$this" Text="{$parent/@CommanderId[Name]}"/>
+				</State>
+			</StateGroup>
         </Frame>
         
         <Frame type="Label" name="LevelMasteryMaxLabel">
@@ -810,10 +1014,12 @@
         
         <!-- Earned Unlocked Item0 Support Frames -->
         <Frame type="Image" name="GlowItem0" template="CoopCampaignScoreSummaryPanel/EarnedUpgradeGlowTemplate">
-            <Anchor side="Top" relative="$parent/EarnedTalentTileList/Item0" pos="Mid" offset="0"/>
-            <Anchor side="Bottom" relative="$parent/EarnedTalentTileList/Item0" pos="Mid" offset="0"/>
-            <Anchor side="Left" relative="$parent/EarnedTalentTileList/Item0" pos="Mid" offset="0"/>
-            <Anchor side="Right" relative="$parent/EarnedTalentTileList/Item0" pos="Mid" offset="0"/>
+            <Anchor side="Top" relative="$parent/EarnedTalentTileList" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent/EarnedTalentTileList" pos="Mid" offset="0"/>
+            <Anchor side="Left" relative="$parent/EarnedTalentTileList" pos="Max" offset="-36"/>
+            <Anchor side="Right" relative="$parent/EarnedTalentTileList" pos="Max" offset="-36"/>
+            <Width val="132"/>
+            <Height val="132"/>
             
             <Animation name="Show">
                 <Event event="OnShown" action="Reset,Play" frame="$parent/EarnedTalentTileList/Item0"/>
@@ -825,31 +1031,14 @@
             </Animation>
         </Frame>
         
-        <Frame type="Label" name="EarnedUnlockTitleLabelItem0">
-            <Anchor side="Top" relative="$parent/EarnedTalentTileList/Item0" pos="Mid" offset="0"/>
-            <Anchor side="Bottom" relative="$parent/EarnedTalentTileList/Item0" pos="Mid" offset="0"/>
-            <Anchor side="Right" relative="$parent/EarnedTalentTileList" pos="Min" offset="0"/>
-			<Width val="250"/>
-            <Style val="Coop_ScoreScreen_NextRewardSource"/>
-            <Text val="@UI/ScreenCoopCampaign/ScoreSummaryPanel/EarnedUnlockTitle"/>
-            <Visible val="False"/>
-            
-            <Animation name="Show">
-                <Event event="OnShown" action="Reset,Play" frame="$parent/EarnedTalentTileList/Item0"/>
-                <Event event="OnHidden" action="Reset,Stop" frame="$parent/EarnedTalentTileList/Item0"/>
-                
-                <Controller type="Visibility" end="Pause">
-                    <Key type="Bool" time="0" value="True"/>
-                </Controller>
-            </Animation>
-        </Frame>
-        
         <!-- Earned Unlocked Item1 Support Frames -->
         <Frame type="Image" name="GlowItem1" template="CoopCampaignScoreSummaryPanel/EarnedUpgradeGlowTemplate">
-            <Anchor side="Top" relative="$parent/EarnedTalentTileList/Item1" pos="Mid" offset="0"/>
-            <Anchor side="Bottom" relative="$parent/EarnedTalentTileList/Item1" pos="Mid" offset="0"/>
-            <Anchor side="Left" relative="$parent/EarnedTalentTileList/Item1" pos="Mid" offset="0"/>
-            <Anchor side="Right" relative="$parent/EarnedTalentTileList/Item1" pos="Mid" offset="0"/>
+            <Anchor side="Top" relative="$sibling-1" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$sibling-1" pos="Mid" offset="0"/>
+            <Anchor side="Left" relative="$sibling-1" pos="Mid" offset="-75"/>
+            <Anchor side="Right" relative="$sibling-1" pos="Mid" offset="-75"/>
+            <Width val="132"/>
+            <Height val="132"/>
             
             <Animation name="Show">
                 <Event event="OnShown" action="Reset,Play" frame="$parent/EarnedTalentTileList/Item1"/>
@@ -861,31 +1050,14 @@
             </Animation>
         </Frame>
         
-        <Frame type="Label" name="EarnedUnlockTitleLabelItem1">
-            <Anchor side="Top" relative="$parent/EarnedTalentTileList/Item1" pos="Mid" offset="0"/>
-            <Anchor side="Bottom" relative="$parent/EarnedTalentTileList/Item1" pos="Mid" offset="0"/>
-            <Anchor side="Right" relative="$parent/EarnedTalentTileList" pos="Min" offset="0"/>
-			<Width val="250"/>
-            <Style val="Coop_ScoreScreen_NextRewardSource"/>
-            <Text val="@UI/ScreenCoopCampaign/ScoreSummaryPanel/EarnedUnlockTitle"/>
-            <Visible val="False"/>
-            
-            <Animation name="Show">
-                <Event event="OnShown" action="Reset,Play" frame="$parent/EarnedTalentTileList/Item1"/>
-                <Event event="OnHidden" action="Reset,Stop" frame="$parent/EarnedTalentTileList/Item1"/>
-                
-                <Controller type="Visibility" end="Pause">
-                    <Key type="Bool" time="0" value="True"/>
-                </Controller>
-            </Animation>
-        </Frame>
-        
         <!-- Earned Unlocked Item2 Support Frames -->
         <Frame type="Image" name="GlowItem2" template="CoopCampaignScoreSummaryPanel/EarnedUpgradeGlowTemplate">
-            <Anchor side="Top" relative="$parent/EarnedTalentTileList/Item2" pos="Mid" offset="0"/>
-            <Anchor side="Bottom" relative="$parent/EarnedTalentTileList/Item2" pos="Mid" offset="0"/>
-            <Anchor side="Left" relative="$parent/EarnedTalentTileList/Item2" pos="Mid" offset="0"/>
-            <Anchor side="Right" relative="$parent/EarnedTalentTileList/Item2" pos="Mid" offset="0"/>
+            <Anchor side="Top" relative="$sibling-1" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$sibling-1" pos="Mid" offset="0"/>
+            <Anchor side="Left" relative="$sibling-1" pos="Mid" offset="-75"/>
+            <Anchor side="Right" relative="$sibling-1" pos="Mid" offset="-75"/>
+            <Width val="132"/>
+            <Height val="132"/>
             
             <Animation name="Show">
                 <Event event="OnShown" action="Reset,Play" frame="$parent/EarnedTalentTileList/Item2"/>
@@ -897,31 +1069,14 @@
             </Animation>
         </Frame>
         
-        <Frame type="Label" name="EarnedUnlockTitleLabelItem2">
-            <Anchor side="Top" relative="$parent/EarnedTalentTileList/Item2" pos="Mid" offset="0"/>
-            <Anchor side="Bottom" relative="$parent/EarnedTalentTileList/Item2" pos="Mid" offset="0"/>
-            <Anchor side="Right" relative="$parent/EarnedTalentTileList" pos="Min" offset="0"/>
-			<Width val="250"/>
-            <Style val="Coop_ScoreScreen_NextRewardSource"/>
-            <Text val="@UI/ScreenCoopCampaign/ScoreSummaryPanel/EarnedUnlockTitle"/>
-            <Visible val="False"/>
-            
-            <Animation name="Show">
-                <Event event="OnShown" action="Reset,Play" frame="$parent/EarnedTalentTileList/Item2"/>
-                <Event event="OnHidden" action="Reset,Stop" frame="$parent/EarnedTalentTileList/Item2"/>
-                
-                <Controller type="Visibility" end="Pause">
-                    <Key type="Bool" time="0" value="True"/>
-                </Controller>
-            </Animation>
-        </Frame>
-        
         <!-- Earned Unlocked Item3 Support Frames -->
         <Frame type="Image" name="GlowItem3" template="CoopCampaignScoreSummaryPanel/EarnedUpgradeGlowTemplate">
-            <Anchor side="Top" relative="$parent/EarnedTalentTileList/Item3" pos="Mid" offset="0"/>
-            <Anchor side="Bottom" relative="$parent/EarnedTalentTileList/Item3" pos="Mid" offset="0"/>
-            <Anchor side="Left" relative="$parent/EarnedTalentTileList/Item3" pos="Mid" offset="0"/>
-            <Anchor side="Right" relative="$parent/EarnedTalentTileList/Item3" pos="Mid" offset="0"/>
+            <Anchor side="Top" relative="$sibling-1" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$sibling-1" pos="Mid" offset="0"/>
+            <Anchor side="Left" relative="$sibling-1" pos="Mid" offset="-75"/>
+            <Anchor side="Right" relative="$sibling-1" pos="Mid" offset="-75"/>
+            <Width val="132"/>
+            <Height val="132"/>
             
             <Animation name="Show">
                 <Event event="OnShown" action="Reset,Play" frame="$parent/EarnedTalentTileList/Item3"/>
@@ -933,298 +1088,72 @@
             </Animation>
         </Frame>
         
-        <Frame type="Label" name="EarnedUnlockTitleLabelItem3">
-            <Anchor side="Top" relative="$parent/EarnedTalentTileList/Item3" pos="Mid" offset="0"/>
-            <Anchor side="Bottom" relative="$parent/EarnedTalentTileList/Item3" pos="Mid" offset="0"/>
-            <Anchor side="Right" relative="$parent/EarnedTalentTileList" pos="Min" offset="0"/>
-			<Width val="250"/>
-            <Style val="Coop_ScoreScreen_NextRewardSource"/>
-            <Text val="@UI/ScreenCoopCampaign/ScoreSummaryPanel/EarnedUnlockTitle"/>
-            <Visible val="False"/>
-            
-            <Animation name="Show">
-                <Event event="OnShown" action="Reset,Play" frame="$parent/EarnedTalentTileList/Item3"/>
-                <Event event="OnHidden" action="Reset,Stop" frame="$parent/EarnedTalentTileList/Item3"/>
-                
-                <Controller type="Visibility" end="Pause">
-                    <Key type="Bool" time="0" value="True"/>
-                </Controller>
-            </Animation>
-        </Frame>
-        
-        <!-- Earned Unlocked Item4 Support Frames -->
-        <Frame type="Image" name="GlowItem4" template="CoopCampaignScoreSummaryPanel/EarnedUpgradeGlowTemplate">
-            <Anchor side="Top" relative="$parent/EarnedTalentTileList/Item4" pos="Mid" offset="0"/>
-            <Anchor side="Bottom" relative="$parent/EarnedTalentTileList/Item4" pos="Mid" offset="0"/>
-            <Anchor side="Left" relative="$parent/EarnedTalentTileList/Item4" pos="Mid" offset="0"/>
-            <Anchor side="Right" relative="$parent/EarnedTalentTileList/Item4" pos="Mid" offset="0"/>
-            
-            <Animation name="Show">
-                <Event event="OnShown" action="Reset,Play" frame="$parent/EarnedTalentTileList/Item4"/>
-                <Event event="OnHidden" action="Reset" frame="$parent/EarnedTalentTileList/Item4"/>
-         
-                <Controller type="Visibility" end="Pause">
-                    <Key type="Bool" time="0" value="True"/>
-                </Controller>
-            </Animation>
-        </Frame>
-        
-        <Frame type="Label" name="EarnedUnlockTitleLabelItem4">
-            <Anchor side="Top" relative="$parent/EarnedTalentTileList/Item4" pos="Mid" offset="0"/>
-            <Anchor side="Bottom" relative="$parent/EarnedTalentTileList/Item4" pos="Mid" offset="0"/>
-            <Anchor side="Right" relative="$parent/EarnedTalentTileList" pos="Min" offset="0"/>
-			<Width val="250"/>
-            <Style val="Coop_ScoreScreen_NextRewardSource"/>
-            <Text val="@UI/ScreenCoopCampaign/ScoreSummaryPanel/EarnedUnlockTitle"/>
-            <Visible val="False"/>
-            
-            <Animation name="Show">
-                <Event event="OnShown" action="Reset,Play" frame="$parent/EarnedTalentTileList/Item4"/>
-                <Event event="OnHidden" action="Reset,Stop" frame="$parent/EarnedTalentTileList/Item4"/>
-                
-                <Controller type="Visibility" end="Pause">
-                    <Key type="Bool" time="0" value="True"/>
-                </Controller>
-            </Animation>
-        </Frame>
-        
-        <!-- Earned Unlocked Item5 Support Frames -->
-        <Frame type="Image" name="GlowItem5" template="CoopCampaignScoreSummaryPanel/EarnedUpgradeGlowTemplate">
-            <Anchor side="Top" relative="$parent/EarnedTalentTileList/Item5" pos="Mid" offset="0"/>
-            <Anchor side="Bottom" relative="$parent/EarnedTalentTileList/Item5" pos="Mid" offset="0"/>
-            <Anchor side="Left" relative="$parent/EarnedTalentTileList/Item5" pos="Mid" offset="0"/>
-            <Anchor side="Right" relative="$parent/EarnedTalentTileList/Item5" pos="Mid" offset="0"/>
-            
-            <Animation name="Show">
-                <Event event="OnShown" action="Reset,Play" frame="$parent/EarnedTalentTileList/Item5"/>
-                <Event event="OnHidden" action="Reset" frame="$parent/EarnedTalentTileList/Item5"/>
-         
-                <Controller type="Visibility" end="Pause">
-                    <Key type="Bool" time="0" value="True"/>
-                </Controller>
-            </Animation>
-        </Frame>
-        
-        <Frame type="Label" name="EarnedUnlockTitleLabelItem5">
-            <Anchor side="Top" relative="$parent/EarnedTalentTileList/Item5" pos="Mid" offset="0"/>
-            <Anchor side="Bottom" relative="$parent/EarnedTalentTileList/Item5" pos="Mid" offset="0"/>
-            <Anchor side="Right" relative="$parent/EarnedTalentTileList" pos="Min" offset="0"/>
-			<Width val="250"/>
-            <Style val="Coop_ScoreScreen_NextRewardSource"/>
-            <Text val="@UI/ScreenCoopCampaign/ScoreSummaryPanel/EarnedUnlockTitle"/>
-            <Visible val="False"/>
-            
-            <Animation name="Show">
-                <Event event="OnShown" action="Reset,Play" frame="$parent/EarnedTalentTileList/Item5"/>
-                <Event event="OnHidden" action="Reset,Stop" frame="$parent/EarnedTalentTileList/Item5"/>
-                
-                <Controller type="Visibility" end="Pause">
-                    <Key type="Bool" time="0" value="True"/>
-                </Controller>
-            </Animation>
-        </Frame>
-        
-        <!-- Earned Unlocked Item6 Support Frames -->
-        <Frame type="Image" name="GlowItem6" template="CoopCampaignScoreSummaryPanel/EarnedUpgradeGlowTemplate">
-            <Anchor side="Top" relative="$parent/EarnedTalentTileList/Item6" pos="Mid" offset="0"/>
-            <Anchor side="Bottom" relative="$parent/EarnedTalentTileList/Item6" pos="Mid" offset="0"/>
-            <Anchor side="Left" relative="$parent/EarnedTalentTileList/Item6" pos="Mid" offset="0"/>
-            <Anchor side="Right" relative="$parent/EarnedTalentTileList/Item6" pos="Mid" offset="0"/>
-            
-            <Animation name="Show">
-                <Event event="OnShown" action="Reset,Play" frame="$parent/EarnedTalentTileList/Item6"/>
-                <Event event="OnHidden" action="Reset" frame="$parent/EarnedTalentTileList/Item6"/>
-         
-                <Controller type="Visibility" end="Pause">
-                    <Key type="Bool" time="0" value="True"/>
-                </Controller>
-            </Animation>
-        </Frame>
-        
-        <Frame type="Label" name="EarnedUnlockTitleLabelItem6">
-            <Anchor side="Top" relative="$parent/EarnedTalentTileList/Item6" pos="Mid" offset="0"/>
-            <Anchor side="Bottom" relative="$parent/EarnedTalentTileList/Item6" pos="Mid" offset="0"/>
-            <Anchor side="Right" relative="$parent/EarnedTalentTileList" pos="Min" offset="0"/>
-			<Width val="250"/>
-            <Style val="Coop_ScoreScreen_NextRewardSource"/>
-            <Text val="@UI/ScreenCoopCampaign/ScoreSummaryPanel/EarnedUnlockTitle"/>
-            <Visible val="False"/>
-            
-            <Animation name="Show">
-                <Event event="OnShown" action="Reset,Play" frame="$parent/EarnedTalentTileList/Item6"/>
-                <Event event="OnHidden" action="Reset,Stop" frame="$parent/EarnedTalentTileList/Item6"/>
-                
-                <Controller type="Visibility" end="Pause">
-                    <Key type="Bool" time="0" value="True"/>
-                </Controller>
-            </Animation>
-        </Frame>
-        
-        <!-- Earned Unlocked Item7 Support Frames -->
-        <Frame type="Image" name="GlowItem7" template="CoopCampaignScoreSummaryPanel/EarnedUpgradeGlowTemplate">
-            <Anchor side="Top" relative="$parent/EarnedTalentTileList/Item7" pos="Mid" offset="0"/>
-            <Anchor side="Bottom" relative="$parent/EarnedTalentTileList/Item7" pos="Mid" offset="0"/>
-            <Anchor side="Left" relative="$parent/EarnedTalentTileList/Item7" pos="Mid" offset="0"/>
-            <Anchor side="Right" relative="$parent/EarnedTalentTileList/Item7" pos="Mid" offset="0"/>
-            
-            <Animation name="Show">
-                <Event event="OnShown" action="Reset,Play" frame="$parent/EarnedTalentTileList/Item7"/>
-                <Event event="OnHidden" action="Reset" frame="$parent/EarnedTalentTileList/Item7"/>
-         
-                <Controller type="Visibility" end="Pause">
-                    <Key type="Bool" time="0" value="True"/>
-                </Controller>
-            </Animation>
-        </Frame>
-        
-        <Frame type="Label" name="EarnedUnlockTitleLabelItem7">
-            <Anchor side="Top" relative="$parent/EarnedTalentTileList/Item7" pos="Mid" offset="0"/>
-            <Anchor side="Bottom" relative="$parent/EarnedTalentTileList/Item7" pos="Mid" offset="0"/>
-            <Anchor side="Right" relative="$parent/EarnedTalentTileList" pos="Min" offset="0"/>
-			<Width val="250"/>
-            <Style val="Coop_ScoreScreen_NextRewardSource"/>
-            <Text val="@UI/ScreenCoopCampaign/ScoreSummaryPanel/EarnedUnlockTitle"/>
-            <Visible val="False"/>
-            
-            <Animation name="Show">
-                <Event event="OnShown" action="Reset,Play" frame="$parent/EarnedTalentTileList/Item7"/>
-                <Event event="OnHidden" action="Reset,Stop" frame="$parent/EarnedTalentTileList/Item7"/>
-                
-                <Controller type="Visibility" end="Pause">
-                    <Key type="Bool" time="0" value="True"/>
-                </Controller>
-            </Animation>
-        </Frame>
-        
-        <!-- Earned Unlocked Item8 Support Frames -->
-        <Frame type="Image" name="GlowItem8" template="CoopCampaignScoreSummaryPanel/EarnedUpgradeGlowTemplate">
-            <Anchor side="Top" relative="$parent/EarnedTalentTileList/Item8" pos="Mid" offset="0"/>
-            <Anchor side="Bottom" relative="$parent/EarnedTalentTileList/Item8" pos="Mid" offset="0"/>
-            <Anchor side="Left" relative="$parent/EarnedTalentTileList/Item8" pos="Mid" offset="0"/>
-            <Anchor side="Right" relative="$parent/EarnedTalentTileList/Item8" pos="Mid" offset="0"/>
-            
-            <Animation name="Show">
-                <Event event="OnShown" action="Reset,Play" frame="$parent/EarnedTalentTileList/Item8"/>
-                <Event event="OnHidden" action="Reset" frame="$parent/EarnedTalentTileList/Item8"/>
-         
-                <Controller type="Visibility" end="Pause">
-                    <Key type="Bool" time="0" value="True"/>
-                </Controller>
-            </Animation>
-        </Frame>
-        
-        <Frame type="Label" name="EarnedUnlockTitleLabelItem8">
-            <Anchor side="Top" relative="$parent/EarnedTalentTileList/Item8" pos="Mid" offset="0"/>
-            <Anchor side="Bottom" relative="$parent/EarnedTalentTileList/Item8" pos="Mid" offset="0"/>
-            <Anchor side="Right" relative="$parent/EarnedTalentTileList" pos="Min" offset="0"/>
-			<Width val="250"/>
-            <Style val="Coop_ScoreScreen_NextRewardSource"/>
-            <Text val="@UI/ScreenCoopCampaign/ScoreSummaryPanel/EarnedUnlockTitle"/>
-            <Visible val="False"/>
-            
-            <Animation name="Show">
-                <Event event="OnShown" action="Reset,Play" frame="$parent/EarnedTalentTileList/Item8"/>
-                <Event event="OnHidden" action="Reset,Stop" frame="$parent/EarnedTalentTileList/Item8"/>
-                
-                <Controller type="Visibility" end="Pause">
-                    <Key type="Bool" time="0" value="True"/>
-                </Controller>
-            </Animation>
-        </Frame>
-        
-        <!-- Earned Unlocked Item9 Support Frames -->
-        <Frame type="Image" name="GlowItem9" template="CoopCampaignScoreSummaryPanel/EarnedUpgradeGlowTemplate">
-            <Anchor side="Top" relative="$parent/EarnedTalentTileList/Item9" pos="Mid" offset="0"/>
-            <Anchor side="Bottom" relative="$parent/EarnedTalentTileList/Item9" pos="Mid" offset="0"/>
-            <Anchor side="Left" relative="$parent/EarnedTalentTileList/Item9" pos="Mid" offset="0"/>
-            <Anchor side="Right" relative="$parent/EarnedTalentTileList/Item9" pos="Mid" offset="0"/>
-            
-            <Animation name="Show">
-                <Event event="OnShown" action="Reset,Play" frame="$parent/EarnedTalentTileList/Item9"/>
-                <Event event="OnHidden" action="Reset" frame="$parent/EarnedTalentTileList/Item9"/>
-         
-                <Controller type="Visibility" end="Pause">
-                    <Key type="Bool" time="0" value="True"/>
-                </Controller>
-            </Animation>
-        </Frame>
-        
-        <Frame type="Label" name="EarnedUnlockTitleLabelItem9">
-            <Anchor side="Top" relative="$parent/EarnedTalentTileList/Item9" pos="Mid" offset="0"/>
-            <Anchor side="Bottom" relative="$parent/EarnedTalentTileList/Item9" pos="Mid" offset="0"/>
-            <Anchor side="Right" relative="$parent/EarnedTalentTileList" pos="Min" offset="0"/>
-			<Width val="250"/>
-            <Style val="Coop_ScoreScreen_NextRewardSource"/>
-            <Text val="@UI/ScreenCoopCampaign/ScoreSummaryPanel/EarnedUnlockTitle"/>
-            <Visible val="False"/>
-            
-            <Animation name="Show">
-                <Event event="OnShown" action="Reset,Play" frame="$parent/EarnedTalentTileList/Item9"/>
-                <Event event="OnHidden" action="Reset,Stop" frame="$parent/EarnedTalentTileList/Item9"/>
-                
-                <Controller type="Visibility" end="Pause">
-                    <Key type="Bool" time="0" value="True"/>
-                </Controller>
-            </Animation>
-        </Frame>
-        
         <!-- EarnedTalentTileList -->
         <Frame type="TileList" name="EarnedTalentTileList">
-            <Anchor side="Bottom" relative="$parent/NextTalentTileList" pos="Min" offset="-5"/>
-            <Anchor side="Left" relative="$parent/NextTalentTileList" pos="Max" offset="0"/>
+            <Anchor side="Top" relative="$parent/TotalXPBar" pos="Max" offset="0"/>
+            <!-- <Anchor side="Left" relative="Item3" pos="Min" offset="0"/> -->
             <Anchor side="Right" relative="$parent/NextTalentTileList" pos="Max" offset="0"/>
-            <Width val="150"/>
-            <Height val="600"/>
+            <Width val="297"/>
+            <Height val="72"/>
 
-            <Frame type="CommanderTalentTileListItem" name="Item0" template="CoopCampaignScoreSummaryPanel/CommanderTalentTileListItemEarnedTemplate">
-                <Anchor side="Bottom" relative="$parent/Item1" pos="Min" offset="-5"/>
-                <Anchor side="Right" relative="$parent/Item1" pos="Max" offset="0"/>
-            </Frame>
-
-            <Frame type="CommanderTalentTileListItem" name="Item1" template="CoopCampaignScoreSummaryPanel/CommanderTalentTileListItemEarnedTemplate">
-                <Anchor side="Bottom" relative="$parent/Item2" pos="Min" offset="-5"/>
-                <Anchor side="Right" relative="$parent/Item2" pos="Max" offset="0"/>
-            </Frame>
-
-            <Frame type="CommanderTalentTileListItem" name="Item2" template="CoopCampaignScoreSummaryPanel/CommanderTalentTileListItemEarnedTemplate">
-                <Anchor side="Bottom" relative="$parent/Item3" pos="Min" offset="-5"/>
-                <Anchor side="Right" relative="$parent/Item3" pos="Max" offset="0"/>
-            </Frame>
-
-            <Frame type="CommanderTalentTileListItem" name="Item3" template="CoopCampaignScoreSummaryPanel/CommanderTalentTileListItemEarnedTemplate">
-                <Anchor side="Bottom" relative="$parent/Item4" pos="Min" offset="-5"/>
-                <Anchor side="Right" relative="$parent/Item4" pos="Max" offset="0"/>
-            </Frame>
-
-            <Frame type="CommanderTalentTileListItem" name="Item4" template="CoopCampaignScoreSummaryPanel/CommanderTalentTileListItemEarnedTemplate">
-                <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
-                <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
-            </Frame>
-
-            <Frame type="CommanderTalentTileListItem" name="Item5" template="CoopCampaignScoreSummaryPanel/CommanderTalentTileListItemEarnedTemplate">
-                <Anchor side="Bottom" relative="$parent/Item6" pos="Min" offset="-5"/>
-                <Anchor side="Right" relative="$parent/Item6" pos="Max" offset="0"/>
-            </Frame>
-
-            <Frame type="CommanderTalentTileListItem" name="Item6" template="CoopCampaignScoreSummaryPanel/CommanderTalentTileListItemEarnedTemplate">
-                <Anchor side="Bottom" relative="$parent/Item7" pos="Min" offset="-5"/>
-                <Anchor side="Right" relative="$parent/Item7" pos="Max" offset="0"/>
-            </Frame>
-
-            <Frame type="CommanderTalentTileListItem" name="Item7" template="CoopCampaignScoreSummaryPanel/CommanderTalentTileListItemEarnedTemplate">
-                <Anchor side="Bottom" relative="$parent/Item8" pos="Min" offset="-5"/>
-                <Anchor side="Right" relative="$parent/Item8" pos="Max" offset="0"/>
-            </Frame>
-
-            <Frame type="CommanderTalentTileListItem" name="Item8" template="CoopCampaignScoreSummaryPanel/CommanderTalentTileListItemEarnedTemplate">
-                <Anchor side="Bottom" relative="$parent/Item9" pos="Min" offset="-5"/>
-                <Anchor side="Right" relative="$parent/Item9" pos="Max" offset="0"/>
-            </Frame>
-
-            <Frame type="CommanderTalentTileListItem" name="Item9" template="CoopCampaignScoreSummaryPanel/CommanderTalentTileListItemEarnedTemplate">
-                <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+            <Frame type="CommanderTalentTileListItem" name="Item0" template="CoopCampaignScoreSummaryPanel/CommanderTalentTileListItemEarnedTemplate"/>
+            <Frame type="CommanderTalentTileListItem" name="Item1" template="CoopCampaignScoreSummaryPanel/CommanderTalentTileListItemEarnedTemplate"/>
+            <Frame type="CommanderTalentTileListItem" name="Item2" template="CoopCampaignScoreSummaryPanel/CommanderTalentTileListItemEarnedTemplate"/>
+            <Frame type="CommanderTalentTileListItem" name="Item3" template="CoopCampaignScoreSummaryPanel/CommanderTalentTileListItemEarnedTemplate"/>
+            <Frame type="CommanderTalentTileListItem" name="Item4" template="CoopCampaignScoreSummaryPanel/CommanderTalentTileListItemEarnedTemplate"/>
+            <Frame type="CommanderTalentTileListItem" name="Item5" template="CoopCampaignScoreSummaryPanel/CommanderTalentTileListItemEarnedTemplate"/>
+            <Frame type="CommanderTalentTileListItem" name="Item6" template="CoopCampaignScoreSummaryPanel/CommanderTalentTileListItemEarnedTemplate"/>
+            <Frame type="CommanderTalentTileListItem" name="Item7" template="CoopCampaignScoreSummaryPanel/CommanderTalentTileListItemEarnedTemplate"/>
+            <Frame type="CommanderTalentTileListItem" name="Item8" template="CoopCampaignScoreSummaryPanel/CommanderTalentTileListItemEarnedTemplate"/>
+            <Frame type="CommanderTalentTileListItem" name="Item9" template="CoopCampaignScoreSummaryPanel/CommanderTalentTileListItemEarnedTemplate"/>
+            <Frame type="CommanderTalentTileListItem" name="Item10" template="CoopCampaignScoreSummaryPanel/CommanderTalentTileListItemEarnedTemplate"/>
+            <Frame type="CommanderTalentTileListItem" name="Item11" template="CoopCampaignScoreSummaryPanel/CommanderTalentTileListItemEarnedTemplate"/>
+            <Frame type="CommanderTalentTileListItem" name="Item12" template="CoopCampaignScoreSummaryPanel/CommanderTalentTileListItemEarnedTemplate"/>
+            <Frame type="CommanderTalentTileListItem" name="Item13" template="CoopCampaignScoreSummaryPanel/CommanderTalentTileListItemEarnedTemplate"/>
+            <Frame type="CommanderTalentTileListItem" name="Item14" template="CoopCampaignScoreSummaryPanel/CommanderTalentTileListItemEarnedTemplate"/>
+            <Frame type="CommanderTalentTileListItem" name="Item15" template="CoopCampaignScoreSummaryPanel/CommanderTalentTileListItemEarnedTemplate"/>
+            <Frame type="CommanderTalentTileListItem" name="Item16" template="CoopCampaignScoreSummaryPanel/CommanderTalentTileListItemEarnedTemplate"/>
+            <Frame type="CommanderTalentTileListItem" name="Item17" template="CoopCampaignScoreSummaryPanel/CommanderTalentTileListItemEarnedTemplate"/>
+            <Frame type="CommanderTalentTileListItem" name="Item18" template="CoopCampaignScoreSummaryPanel/CommanderTalentTileListItemEarnedTemplate"/>
+            
+            <Frame type="CommanderTalentTileListItem" name="Item19" template="CoopCampaignScoreSummaryPanel/CommanderTalentTileListItemEarnedTemplate">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
                 <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
             </Frame>
+        </Frame>
+        
+        <Frame type="Label" name="ExcessiveEarnedTalentLabel">
+            <Anchor side="Top" relative="$parent/EarnedTalentTileList" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent/EarnedTalentTileList" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent/EarnedTalentTileList" pos="Min" offset="-10"/>
+            <Style val="Coop_ScoreScreen_TotalRewardAmount"/>
+            <Text val="{$this/TextFormatFrame/@Text}"/>
+            
+            <Frame type="TextFormatFrame" name="TextFormatFrame">
+                <Anchor relative="$parent"/>
+                <FormatText val="+%0%"/>
+                <Replacement index="0" val="{$parent/EarnedBeyond4MathFrame/@ResultInt}"/>
+            </Frame>
+            
+            <Frame type="MathFrame" name="EarnedBeyond4MathFrame">
+                <Anchor relative="$parent"/>
+                <A val="{$parent/$parent/EarnedTalentTileList/@DataCount}"/>
+                <B val="4"/>
+                <Operator val="Subtract"/>
+            </Frame>
+            
+            <StateGroup name="VisibilityState">
+                <DefaultState val="NotVisible"/>
+                
+                <State name="Visible">
+                    <When type="Property" frame="EarnedBeyond4MathFrame" operator="GreaterThan" ResultInt="0"/>
+                    <Action type="SetProperty" Visible="True"/>
+                </State>
+                
+                <State name="NotVisible">
+                    <Action type="SetProperty" Visible="False"/>
+                </State>
+            </StateGroup>
         </Frame>
 
         <!-- This container has a bunch of ScoreValueResultFrames.  It uses these to calculate and populate values in the tile list. -->

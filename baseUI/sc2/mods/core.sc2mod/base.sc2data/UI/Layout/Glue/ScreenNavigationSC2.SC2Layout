@@ -301,6 +301,7 @@
                 <Shortcut val="@UI/ScreenNavigation3_Hotkey"/>
                 <Enabled val="{$BattleUI/@IsOnline}"/>
                 <TooltipDelayed val="True"/>
+                <AcceptsMouseTooltip val="True"/>
                 
                 <Frame type="Frame" name="HitTestFrame">
                     <Anchor side="Top" relative="$parent/$parent" pos="Min" offset="0"/>
@@ -330,11 +331,25 @@
                     <Height val="36"/>
                     <CollapseLayout val="True"/>
                     <Visible val="False"/>
+                    <AcceptsMouseTooltip val="True"/>
             
                     <StateGroup name="VisibleState">
                         <DefaultState val="NotVisible"/>
                         
-                        <State name="Visible">
+                        <!-- <State name="VisibleBoth">
+                            <When type="Property" frame="$parent/StimpackCacheFrame" IsAvailable="True"/>
+                            <Action type="SetProperty" frame="$this" Visible="True"/>
+                            <Action type="SetProperty" frame="$parent" Tooltip="{$this/StimpackTimeRemainingTooltip/@Text}"/>
+                        </State> -->
+                        
+                        <State name="VisibleWarChest">
+                            <When type="Property" frame="$WarChestInfo" WarChestPurchased="True"/>
+                            <When type="Property" frame="$WarChestInfo" operator="GreaterThan" PurchaseEndTimeRemaining="0"/>
+                            <Action type="SetProperty" frame="$this" Visible="True"/>
+                            <Action type="SetProperty" frame="$parent" Tooltip="@UI/ScreenCoopCampaign/WarChestBoostActiveTooltip"/>
+                        </State>
+                        
+                        <State name="VisibleStim">
                             <When type="Property" frame="$parent/StimpackCacheFrame" IsAvailable="True"/>
                             <Action type="SetProperty" frame="$this" Visible="True"/>
                             <Action type="SetProperty" frame="$parent" Tooltip="{$this/StimpackTimeRemainingTooltip/@Text}"/>
@@ -412,25 +427,32 @@
                     <Event event="OldVersion" action="Reset,Stop" frame="$this/NewContentFrame"/>
                     <Event event="InvalidVersion" action="Reset,Stop" frame="$this/NewContentFrame"/>
 
-                    <Controller type="Tooltip" end="Pause">
+                    <!-- <Controller type="Tooltip" end="Pause">
                         <Key type="Text" time="0" text="@UI/ScreenNavigation/NewContent"/>
-                    </Controller>
+                    </Controller> -->
                 </Animation>
 
                 <Animation Name="ButtonTooltipOffline">
                     <Event event="Offline" action="Reset,Play" frame="$parent/$parent"/>
-                    <Controller type="Tooltip" end="Pause">
-                        <Key type="Text" time="0" text="@UI/OfflineDisabledTooltip"/>
-                    </Controller>
+					
+					<Controller type="State" stateGroup="OnlineState" end="Pause">
+						<Key type="Identifier" time="0" value="Offline"/>
+					</Controller>
                 </Animation>
 
                 <Animation Name="Online">
                     <Event event="Online" action="Reset,Play" frame="$parent/$parent"/>
-
-                    <Controller type="Tooltip" end="Pause">
-                        <Key type="Text" time="0" text=""/>
-                    </Controller>
+					
+					<Controller type="State" stateGroup="OnlineState" end="Pause">
+						<Key type="Identifier" time="0" value="Online"/>
+					</Controller>
                 </Animation>
+				
+				<StateGroup name="OnlineState">
+					<DefaultState val="Offline"/>
+					<State name="Online"/>
+					<State name="Offline"/>
+				</StateGroup>
             </Frame>
 
             <Frame type="Button" name="MultiplayerButton" template="ScreenNavigationSC2/ScreenNavigationButtonTemplate">

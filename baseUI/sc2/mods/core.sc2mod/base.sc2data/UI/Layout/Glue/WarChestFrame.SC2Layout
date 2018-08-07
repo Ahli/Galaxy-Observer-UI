@@ -1837,6 +1837,68 @@
             <Anchor side="Left" relative="$Anchor_Subheader" pos="Max" offset="0"/>
             <Text val="@UI/ScreenCollection/WarChest/Subtitle"/>
             <Style val="@BattlenetSubtitle"/>
+        
+            <Frame type="TimeFormatFrame" name="OwnedTimeFormatFrame">
+                <Anchor relative="$parent"/>
+                <FormatText val="@UI/ScreenCollection/WarChest/SubtitleOwnedDays"/>
+                <Time val="{$ancestor[@name=WarChestFrame]/@EndTimeRemaining}"/>
+            </Frame>
+        
+            <Frame type="TimeFormatFrame" name="EndedTimeFormatFrame">
+                <Anchor relative="$parent"/>
+                <FormatText val="@UI/ScreenCollection/WarChest/SubtitleEndedDays"/>
+                <Time val="{$ancestor[@name=WarChestFrame]/@EndTimeRemaining}"/>
+            </Frame>
+                
+            <StateGroup name="TimeRemainingState">
+                <DefaultState val="Days"/>
+                
+                <State name="Seconds">
+                    <When type="Property" frame="OwnedTimeFormatFrame" operator="LessThan" Time="60"/>
+                    <Action type="SetProperty" frame="OwnedTimeFormatFrame" FormatText="@UI/ScreenCollection/WarChest/SubtitleOwnedSeconds"/>
+                    <Action type="SetProperty" frame="EndedTimeFormatFrame" FormatText="@UI/ScreenCollection/WarChest/SubtitleEndedSeconds"/>
+                </State>
+                
+                <State name="Minutes">
+                    <When type="Property" frame="OwnedTimeFormatFrame" operator="LessThan" Time="3600"/>
+                    <Action type="SetProperty" frame="OwnedTimeFormatFrame" FormatText="@UI/ScreenCollection/WarChest/SubtitleOwnedMinutes"/>
+                    <Action type="SetProperty" frame="EndedTimeFormatFrame" FormatText="@UI/ScreenCollection/WarChest/SubtitleEndedMinutes"/>
+                </State>
+                
+                <State name="Hours">
+                    <When type="Property" frame="OwnedTimeFormatFrame" operator="LessThan" Time="86400"/>
+                    <Action type="SetProperty" frame="OwnedTimeFormatFrame" FormatText="@UI/ScreenCollection/WarChest/SubtitleOwnedHours"/>
+                    <Action type="SetProperty" frame="EndedTimeFormatFrame" FormatText="@UI/ScreenCollection/WarChest/SubtitleEndedHours"/>
+                </State>
+                
+                <State name="Days">
+                    <Action type="SetProperty" frame="OwnedTimeFormatFrame" FormatText="@UI/ScreenCollection/WarChest/SubtitleOwnedDays"/>
+                    <Action type="SetProperty" frame="EndedTimeFormatFrame" FormatText="@UI/ScreenCollection/WarChest/SubtitleEndedDays"/>
+                </State>
+            </StateGroup>
+            
+            <StateGroup name="SubtitleTextState">
+                <DefaultState val="Owned"/>
+                
+                <State name="NotPurchaseableNotOwned">
+                    <When type="Property" frame="$WarChestFrame" IsPurchaseAvailable="false"/>
+                    <When type="StateGroup" frame="$TerranWarChest/WarChestNode0" OwnedState="NotOwned"/>
+                    <When type="StateGroup" frame="$ZergWarChest/WarChestNode0" OwnedState="NotOwned"/>
+                    <When type="StateGroup" frame="$ProtossWarChest/WarChestNode0" OwnedState="NotOwned"/>
+                    <Action type="SetProperty" Text="{$this/EndedTimeFormatFrame/@Text}"/>
+                </State>
+                
+                <State name="PurchaseableNotOwned">
+                    <When type="StateGroup" frame="$TerranWarChest/WarChestNode0" OwnedState="NotOwned"/>
+                    <When type="StateGroup" frame="$ZergWarChest/WarChestNode0" OwnedState="NotOwned"/>
+                    <When type="StateGroup" frame="$ProtossWarChest/WarChestNode0" OwnedState="NotOwned"/>
+                    <Action type="SetProperty" Text="@UI/ScreenCollection/WarChest/Subtitle"/>
+                </State>
+                
+                <State name="Owned">
+                    <Action type="SetProperty" Text="{$this/OwnedTimeFormatFrame/@Text}"/>
+                </State>
+            </StateGroup>
         </Frame>
         
         <Frame type="Frame" name="Wheel" template="WarChestWheelTemplate/WarChestWheelTemplate">
