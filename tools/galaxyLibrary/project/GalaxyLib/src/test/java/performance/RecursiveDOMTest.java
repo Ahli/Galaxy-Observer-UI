@@ -33,14 +33,14 @@ public class RecursiveDOMTest {
 		final long startMem = rt.totalMemory() - rt.freeMemory();
 		final long startTime = System.currentTimeMillis();
 		final File f = new File(
-				"D:\\GalaxyObsUI\\baseUI\\heroes\\mods\\core.stormmod\\base.stormdata\\UI\\Layout\\UI\\GameUI" +
+				"D:\\Galaxy-Observer-UI\\baseUI\\heroes\\mods\\core.stormmod\\base.stormdata\\UI\\Layout\\UI\\GameUI" +
 						".StormLayout");
 		final DocumentBuilder dBuilder;
 		
 		try {
 			dBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
 			// for (int i = 0; i < 1000; i++) {
-			while (System.currentTimeMillis() - startTime < 30000) {
+			while (System.currentTimeMillis() - startTime < 60000) {
 				list.clear();
 				loadRecursiveXML(dBuilder, f);
 				iterations++;
