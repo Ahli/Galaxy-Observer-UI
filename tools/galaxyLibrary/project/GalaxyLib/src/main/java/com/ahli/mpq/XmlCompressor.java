@@ -58,10 +58,7 @@ public final class XmlCompressor {
 		logger.info("Compressing XML files...");
 		logger.trace("cachePath: {}", () -> cachePath);
 		
-		final File cache = new File(cachePath);
-		final boolean recursive = true;
-		
-		final Collection<File> filesOfCache = FileUtils.listFiles(cache, null, recursive);
+		final Collection<File> filesOfCache = FileUtils.listFiles(new File(cachePath), null, true);
 		
 		final DocumentBuilder dBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
 		// provide error handler that does not print incompatible files into console
@@ -98,7 +95,6 @@ public final class XmlCompressor {
 				final TransformerFactory factory = TransformerFactory.newInstance();
 				factory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
 				final Transformer transformer = factory.newTransformer();
-				transformer.setOutputProperty(OutputKeys.INDENT, "yes");
 				transformer.transform(new DOMSource(doc), new StreamResult(curFile));
 			} catch (final TransformerFactoryConfigurationError | TransformerException e) {
 				logger.error("Transforming to generate XML file failed.", e);

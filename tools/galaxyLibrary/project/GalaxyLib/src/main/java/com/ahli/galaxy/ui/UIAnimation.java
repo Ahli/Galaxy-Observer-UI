@@ -5,6 +5,7 @@ import com.ahli.util.Pair;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -181,5 +182,10 @@ public class UIAnimation extends UIElement {
 	@Override
 	public String toString() {
 		return "<Animation name='" + getName() + "'>";
+	}
+	
+	@Override
+	public List<UIElement> getChildren() {
+		return Collections.emptyList();
 	}
 }

@@ -4,6 +4,8 @@ import com.ahli.util.DeepCopyable;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
+import java.util.List;
+
 /**
  * @author Ahli
  */
@@ -64,7 +66,7 @@ public abstract class UIElement implements DeepCopyable {
 	 *
 	 * @param path
 	 * 		path of an element
-	 * @return Frame element
+	 * @return UIFrame element
 	 */
 	public abstract UIElement receiveFrameFromPath(String path);
 	
@@ -72,4 +74,11 @@ public abstract class UIElement implements DeepCopyable {
 	public String toString() {
 		return "<UIElement name='" + name + "'>";
 	}
+	
+	/**
+	 * Returns all child UIElements.
+	 *
+	 * @return
+	 */
+	public abstract List<UIElement> getChildren();
 }

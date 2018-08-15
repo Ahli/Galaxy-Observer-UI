@@ -79,7 +79,6 @@ public final class CascExplorerConfigFileEditor {
 			final TransformerFactory factory = TransformerFactory.newInstance();
 			factory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
 			final Transformer transformer = factory.newTransformer();
-			transformer.setOutputProperty(OutputKeys.INDENT, "yes");
 			transformer.transform(source, result);
 			
 		} catch (final IOException | ParserConfigurationException | SAXException | TransformerFactoryConfigurationError | TransformerException e1) {

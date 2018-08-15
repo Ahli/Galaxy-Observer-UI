@@ -278,5 +278,4 @@ public class UIFrame extends UIElement {
 	public String toString() {
 		return "<Frame type='" + type + "' name='" + getName() + "'>";
 	}
-	
 }

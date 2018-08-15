@@ -4,6 +4,7 @@ import com.ahli.galaxy.ui.abstracts.UIElement;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -101,5 +102,10 @@ public class UIAttribute extends UIElement {
 	@Override
 	public String toString() {
 		return "<" + getName() + ">";
+	}
+	
+	@Override
+	public List<UIElement> getChildren() {
+		return Collections.emptyList();
 	}
 }

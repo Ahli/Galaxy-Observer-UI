@@ -3,6 +3,9 @@ package com.ahli.galaxy.ui;
 import com.ahli.galaxy.ui.abstracts.UIElement;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
+import java.util.Collections;
+import java.util.List;
+
 /**
  * @author Ahli
  */
@@ -58,5 +61,10 @@ public class UIConstant extends UIElement {
 	@Override
 	public String toString() {
 		return "<Constant name='" + getName() + "', value='" + value + "'>";
+	}
+	
+	@Override
+	public List<UIElement> getChildren() {
+		return Collections.emptyList();
 	}
 }

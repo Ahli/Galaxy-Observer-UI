@@ -3,13 +3,18 @@ package interfacebuilder.compile;
 import com.ahli.galaxy.ModData;
 import com.ahli.galaxy.archive.DescIndexData;
 import com.ahli.galaxy.ui.interfaces.UICatalog;
+import com.ahli.util.SilentXmlSaxErrorHandler;
+import org.apache.commons.io.FileUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.xml.sax.SAXException;
 
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.File;
 import java.io.IOException;
+import java.util.Collection;
 
 /**
  * Compiles MPQ stuff.
@@ -68,10 +73,14 @@ public class CompileService {
 			} else {
 				if (!repairLayoutOrder && verifyXml) {
 					// only verify XML and nothing else
-					// TODO verify XML
+					final String[] extensions =
+							{ "xml", "SC2Layout", "StormLayout", "StormComponents", "SC2Components", "StormCutscene",
+									"SC2Cutscene", "StormStyle", "SC2Style" };
+					final Collection<File> filesOfCache =
+							FileUtils.listFiles(mod.getMpqCacheDirectory(), extensions, true);
+					verifyXml(filesOfCache);
 				}
 			}
-			
 		} catch (final ParserConfigurationException | SAXException | IOException e) {
 			logger.error("ERROR: encountered error while compiling.", e);
 		}
@@ -102,5 +111,17 @@ public class CompileService {
 	 */
 	private UICatalog getClonedUICatalog(final UICatalog uiCatalog) {
 		return (UICatalog) uiCatalog.deepCopy();
+	}
+	
+	/**
+	 * Verifies the syntax of the xml document.
+	 */
+	private void verifyXml(Collection<File> files) throws IOException, SAXException, ParserConfigurationException {
+		final DocumentBuilder dBuilder;
+		dBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+		dBuilder.setErrorHandler(new SilentXmlSaxErrorHandler());
+		for (File file : files) {
+			dBuilder.parse(file);
+		}
 	}
 }
