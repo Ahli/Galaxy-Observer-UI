@@ -14,7 +14,7 @@ import java.util.ResourceBundle;
  * @author Ahli
  */
 public final class Messages {
-	private static final String BUNDLE_NAME = "com.ahli.hotkeyUi.application.i18n.messages";
+	private static final String BUNDLE_NAME = "i18n.messages";
 	private static final Logger logger = LogManager.getLogger();
 	private static ResourceBundle resourceBundle = ResourceBundle.getBundle(BUNDLE_NAME);
 	

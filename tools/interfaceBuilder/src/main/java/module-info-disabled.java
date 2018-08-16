@@ -1,12 +1,11 @@
-//open module interfacex.builder {
-//	requires java.annotation; // maybe not required
+//module interfacex.builder {
 //	requires java.desktop;
 //	requires java.persistence;
-//	//requires java.sql;
 //	requires java.xml;
-//	//requires java.xml.bind;
 //	requires com.fasterxml.jackson.databind;
 //	requires com.fasterxml.jackson.annotation;
+//	requires controlsfx;
+//	requires core;
 //	requires de.jensd.fx.glyphs.fontawesome;
 //	requires flowless;
 //	requires hibernate.core;
@@ -21,17 +20,18 @@
 //	requires richtextfx;
 //	requires spring.beans;
 //	requires spring.boot.autoconfigure;
-//	requires spring.boot;
 //	requires spring.context;
 //	requires spring.core;
 //	requires spring.data.commons;
 //	requires spring.data.jpa;
 //	requires spring.tx;
-//	requires trove4j;
 //	requires CascExplorerConfigFileEdit;
 //	requires GalaxyLib;
-////	requires javax.transaction.api;
-////	requires jaxb.api;
-////	requires java.xml.bind;
-////	requires java.transaction;
+//	requires java.sql;
+//	//requires javax.transaction.api;
+//
+//	exports interfacebuilder to javafx.graphics, spring.core;
+//	exports interfacebuilder.config to spring.core;
+//	opens interfacebuilder to spring.core;
+//	opens interfacebuilder.config to spring.core;
 //}

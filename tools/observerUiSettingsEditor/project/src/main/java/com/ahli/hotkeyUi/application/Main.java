@@ -10,13 +10,13 @@ import com.ahli.hotkeyUi.application.controller.MenuBarController;
 import com.ahli.hotkeyUi.application.controller.TabsController;
 import com.ahli.hotkeyUi.application.galaxy.ext.LayoutExtensionReader;
 import com.ahli.hotkeyUi.application.i18n.Messages;
+import com.ahli.hotkeyUi.application.integration.JarHelper;
 import com.ahli.hotkeyUi.application.model.ValueDef;
 import com.ahli.hotkeyUi.application.ui.Alerts;
 import com.ahli.hotkeyUi.application.ui.ShowToUserException;
 import com.ahli.mpq.MpqEditorInterface;
 import com.ahli.mpq.MpqException;
 import com.ahli.mpq.mpqeditor.MpqEditorCompression;
-import com.ahli.util.JarHelper;
 import javafx.animation.FadeTransition;
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -49,6 +49,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
+
+;
 
 /**
  * Application
@@ -93,8 +95,8 @@ public class Main extends Application {
 		logger.trace("Configuration File of System: {}", () -> System.getProperty("log4j.configurationFile"));
 		
 		// TEST Locale
-		//Messages.setBundle(Locale.CHINA);
-		//com.ahli.mpq.i18n.Messages.setBundle(Locale.CHINA);
+		//		Messages.setBundle(Locale.CHINA);
+		//		com.ahli.mpq.i18n.Messages.setBundle(Locale.CHINA);
 		
 		launch(args);
 	}
@@ -126,8 +128,8 @@ public class Main extends Application {
 			loader.setResources(Messages.getBundle());
 			
 			final TabPane tabPane;
-			try (InputStream is = Main.class.getResourceAsStream("view/TabsLayout.fxml")) {
-				tabPane = loader.load(is); // $NON-NLS-1$
+			try (InputStream is = Main.class.getResourceAsStream("/view/TabsLayout.fxml")) {
+				tabPane = loader.load(is);
 			}
 			
 			logger.trace("initialized tab layout within {}ms.", () -> (System.nanoTime() - time2) / 1000000);
@@ -196,8 +198,8 @@ public class Main extends Application {
 		final FXMLLoader loader = new FXMLLoader();
 		loader.setResources(Messages.getBundle());
 		
-		try (InputStream is = Main.class.getResourceAsStream("view/RootLayout.fxml")) {
-			rootLayout = loader.load(is); // $NON-NLS-1$
+		try (InputStream is = Main.class.getResourceAsStream("/view/RootLayout.fxml")) {
+			rootLayout = loader.load(is);
 		}
 		logger.trace("initialized root layout fxml within {}ms.", () -> (System.nanoTime() - time) / 1000000);
 		
@@ -210,7 +212,7 @@ public class Main extends Application {
 		// Show the scene containing the root layout.
 		final Scene scene = new Scene(rootLayout);
 		final long time3 = System.nanoTime();
-		scene.getStylesheets().add(Main.class.getResource("view/application.css").toExternalForm());
+		scene.getStylesheets().add(Main.class.getResource("/view/application.css").toExternalForm());
 		
 		if (logger.isTraceEnabled()) {
 			logger.trace("installed font families: " + Font.getFamilies());
@@ -220,10 +222,7 @@ public class Main extends Application {
 		}
 		if (Messages.checkIfTargetResourceIsUsed(Locale.CHINA)) {
 			logger.trace("apply Chinese css");
-			
-			scene.getStylesheets().add(Main.class.getResource("i18n/china.css").toExternalForm());
-			//
-			
+			scene.getStylesheets().add(Main.class.getResource("/i18n/china.css").toExternalForm());
 		}
 		logger.trace("initialized root layout css within {}ms.", () -> (System.nanoTime() - time3) / 1000000);
 		

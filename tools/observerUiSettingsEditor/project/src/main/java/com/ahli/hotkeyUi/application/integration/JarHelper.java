@@ -1,4 +1,4 @@
-package com.ahli.util;
+package com.ahli.hotkeyUi.application.integration;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -69,6 +69,9 @@ public final class JarHelper {
 				final String tools = "\\tools\\";
 				str += dirStr.substring(dirStr.indexOf(tools) + tools.length(), dirStr.indexOf("\\target\\"));
 				str = str.replace('\\', '/');
+				if(logger.isTraceEnabled()) {
+					logger.trace("after intellij #1: " + str);
+				}
 			}
 			
 			if (str.startsWith("file:/")) {
@@ -99,6 +102,21 @@ public final class JarHelper {
 					logger.trace("path before .jar: " + str);
 				}
 				str = str.substring(0, str.lastIndexOf(File.separator));
+			} else {
+				// test if intellij
+				if(f.getAbsolutePath().contains("\\lib\\idea_rt.jar")){
+					str = Paths.get("").toAbsolutePath().toString();
+					if(logger.isTraceEnabled()) {
+						logger.trace("current working directory: " + str);
+					}
+					str = System.getProperty("user.dir");
+					if(logger.isTraceEnabled()) {
+						logger.trace("current user.dir: " + str);
+					}
+				}
+				// cant find a dynamic way
+				str = "D:\\Galaxy-Observer-UI\\tools";
+				
 			}
 			
 		}

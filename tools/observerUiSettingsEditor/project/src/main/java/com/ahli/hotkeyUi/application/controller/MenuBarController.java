@@ -117,7 +117,7 @@ public class MenuBarController {
 			imgUrl = Main.class.getResource("/res/ahliLogo.png").toString();
 		} catch (final NullPointerException e) {
 			logger.error("Error loading resource");
-			imgUrl = "ahliLogo.png";
+			imgUrl = "/ahliLogo.png";
 		}
 		
 		final Alert alert = Alerts.buildAboutAlert(main.getPrimaryStage(), title, header, content, imgUrl);
